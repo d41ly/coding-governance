@@ -63,12 +63,12 @@ disagrees with it is worse than no predicate.
 **TWO MODALITIES, because there are two ways a session spawns agents.** A `Workflow` call carries a
 script, so it is read STATICALLY. A direct `Agent` call carries no script, so it is COUNTED at
 runtime. The matcher is therefore the exact-string list `"Workflow|Agent"` in one group. For a whole
-release the hook was wired on `Workflow` alone and the commonest modality — a session fanning out
-with direct `Agent` calls — met no rule at all.
+release it was wired on `Workflow` alone, and a session fanning out with direct `Agent` calls met
+no rule at all.
 
 **Concurrency is not a budget.** `boundedParallel(thunks, 5)` bounds how many run at once; N findings
-still spawn N agents, five at a time. The two rules are separate for that reason, and the arity one is
-the one reviews actually break.
+still spawn N agents, five at a time. The two rules are separate for that reason, and the arity one
+is the one reviews break.
 
 **The static half READS THE NUMBER, in all three places a bound is written** — the helper call site,
 the helper's own default parameter, and the width a `gov:bounded-fanout` line claims. Until kit 1.2 it
@@ -87,25 +87,25 @@ becomes a password.
 
 **The cap is a FILE CONSTANT and a set `AGENT_CAP` is refused, not ignored.** An environment-settable
 ceiling is the defeatable class this guard exists to remove, and it leaves no diff behind. The header
-advertised that override for two releases after it stopped deciding anything, which is exactly how a
-silently-ignored knob survives.
+advertised that override for two releases after it stopped deciding anything — how a silently-ignored
+knob survives.
 
 **The runtime half claims a NUMBERED SLOT with `O_EXCL`; it does not count.** Read-then-decide loses
 updates — measured, a four-call burst overlapped its hook processes and two of four read the same
-count. Create-a-token-then-count does not fix it either: six concurrent processes each observe a
-count between their own ordinal and six, so several deny where exactly one must. Only the atomic
+count. Create-a-token-then-count does not fix it: six concurrent processes each observe a count
+between their own ordinal and six, so several deny where exactly one must. Only the atomic
 create decides. The budget is keyed per `session_id` + `prompt_id` under the git common dir, so a new
 user prompt resets it with no cleanup step, and it is idempotent per `tool_use_id` so a re-invoked
 hook cannot spend the turn's budget on one spawn.
 
 **Fail closed on the static half; the runtime half splits deliberately.** A K the file cannot resolve
-denies — the burden is on the fan-out. A spawn whose token cannot be CREATED denies. But a session
+denies — the burden is the fan-out's. A spawn whose token cannot be CREATED denies. But a session
 whose token directory cannot be RESOLVED at all fails OPEN and silently, because a hook that denies
 every spawn on a filesystem hiccup is worse than the burst it prevents.
 
-**The home holds TWO guards now, and they share only their shape.** `agent-cap.js` bounds review
-fan-out and reads a Workflow script statically; `scratch-guard.js` bounds where agent scratch may be
-written and reads a shell command string. Both deny by stderr plus exit 2, both fail OPEN on stdin
+**The home holds TWO guards, sharing only their shape.** `agent-cap.js` bounds review fan-out and
+reads a Workflow script statically; `scratch-guard.js` bounds where agent scratch may be written
+and reads a shell command string. Both deny by stderr plus exit 2, both fail OPEN on stdin
 they cannot parse, and both are matched on a `|`-joined pair of exact tool names because a guard
 wired to one modality leaves the same act available through the other — the lesson `agent-cap`
 learned when `Workflow` alone left direct `Agent` spawns unguarded. The kit entry is still named
@@ -131,7 +131,9 @@ to both toplevels before the compare; there is no second normaliser.
 (`TOOL-aBlindedTrial-4`, for the ruling `TOOL-aBlindedTrial-6`). A `Workflow` call whose
 structured `args` carry `kind: "spec-audit"` is denied unless the build README at
 `<args.repo>/<parent of args.reviewDir>/README.md` declares `spec-audit: <YYYY-MM-DD>` in its front
-matter. It makes the pre-code spec audit FORBIDDEN in an attended session, not merely unowed. Three
+matter, or carries no key while `<args.repo>/.unattended.conf` declares `SPEC_AUDIT_DEFAULT` as a
+date (`TOOL-aBlindedTrial-7`; last assignment wins, a non-date denies by name, the README wins).
+It makes the pre-code spec audit FORBIDDEN in an attended session, not merely unowed. Three
 choices are load-bearing: it keys on `tool_input.args`, never on script text (both harnesses spell
 `spec-audit` in comments and would deny themselves); it sits ABOVE the script read in `main()`, so a
 `name:`-only invocation is judged too; and it fails CLOSED for this kind alone — an unplaceable call
@@ -144,8 +146,8 @@ in a linked worktree is the primary tree's `.git`.
 **`readFrontMatterKey` in `tools/hooks/scratch-guard.js` is the ONE front-matter reader for both
 hooks.** It returns the single-token value of a key between the opening `---` and the next `---`, or null;
 `checkAuthorizedReadme` reads `authorized-by:` through it and the spec-audit rule reads
-`spec-audit:`, required lazily inside the rule's try so a withdrawn sibling is a deny, not a crash. It takes bytes, not a path: the staged-blob caller has no file to name. One reader
-keeps "a fenced example in the body is not front matter" one answer (F10) for both keys.
+`spec-audit:`, required lazily inside the rule's try so a withdrawn sibling is a deny, not a crash.
+It takes bytes, not a path: the staged-blob caller has no file to name. One reader keeps "a fenced example in the body is not front matter" one answer (F10) for both keys.
 
 **Every declared hook path is asserted to SHIP, in both directions.** A fragment names a
 destination and an adopter script writes one, and neither is any use if the file it points at
@@ -159,9 +161,9 @@ kit dir, which is what made a checker necessary rather than merely tidy.
 
 `topLevelArgs` in `tools/hooks/agent-cap.js` is the ONE splitter: it splits on top-level commas and
 drops a trailing empty segment. Both the call-site argument walk and the array-literal element counter
-call it, which is what keeps "what is an element" a single answer. It exists because the two of them
-disagreed — see the `trailing-comma-counted-as-an-element` class, whose worst instance was the
-element counter's off-by-one being normalised into `MAX_LENSES = 6`.
+call it, which keeps "what is an element" a single answer. It exists because the two disagreed —
+the `trailing-comma-counted-as-an-element` class, whose worst instance was the element counter's
+off-by-one being normalised into `MAX_LENSES = 6`.
 
 `boundedK` is the one resolver for every bound the file reads — the marker's K, the call-site
 argument and the default parameter. Adding a consumer means adding a call site, never a second
@@ -169,8 +171,8 @@ resolver.
 
 `tools/workflows/check-verifier-fanout.sh` DELEGATES to the hook rather than re-implementing it: it
 builds a payload and feeds each committed harness through `tools/hooks/agent-cap.js`. One predicate,
-two entry points. A bash re-implementation of a node predicate would not disagree loudly — it would
-drift the day either side is tightened.
+two entry points. A bash re-implementation would not disagree loudly — it would drift the day
+either side is tightened.
 
 `tools/settings-merge.py` owns the wiring fragment (event, matcher, marker, hook path, plus the
 optional interpreter and args `TOOL-aReplayedCard-2` added for the bash-scripted card verb) and
@@ -181,8 +183,8 @@ asks each through `--resolve-fragment` and refuses when they disagree.
 
 `tools/workflows/check-protocol-parity.test.sh` keeps the shipped
 `tools/workflows/REVIEW-PROTOCOL.template.md` equal to the live `memory/guides/REVIEW-PROTOCOL.md`
-modulo the install prefix, and asserts the cap's NUMBER so parity cannot hold over a document that
-stopped stating the rule.
+modulo the install prefix, and asserts the cap's NUMBER so parity cannot hold over a document
+that no longer states the rule.
 
 The FIFTH rule is the ref-keyed verdict join, lifted from `tools/workflows/check-review-join.sh` by
 `TOOL-dTieredTribunal-14`. It is last because it is the cheapest failure to recover from: the four
@@ -205,21 +207,20 @@ turns the cap rules off with no diff.
   the hook's header and in `tools/hooks/README.md`, with no waiver clause by owner decision.
 - **The join rule reads a blanked view, and a regex literal survives it.** So a file holding the ban
   table matches its own rule, and `check-review-join.sh` carries a self-exclusion row for the hook.
-  The exclusion is measured rather than defensive, and it is the kind of row that silently widens if
-  the table ever moves.
+  The exclusion is measured, not defensive, and silently widens if the table ever moves.
 - **Agents spawned INSIDE a workflow sidechain are uncounted, and always will be.** The script's
   `agent()` is a runtime call and not a TOOL call, so the `Workflow|Agent` matcher has nothing to
   match, and a sidechain agent holds neither tool to re-fan-out with. NOT because a sidechain runs no
   hooks — it does, MEASURED 2026-09-12: a project `PreToolUse` guard on `Bash|PowerShell` denied a
-  Bash command issued from inside one. Declared here and in the protocol rather than implied away; it
-  is the reason the `Workflow` half is static.
+  Bash command issued from inside one. Declared here and in the protocol; it is why the `Workflow`
+  half is static.
 - **A `Workflow({name:'…'})` run supplies no source to the hook.** Covered second-hand by the
   merge-bar leg over `tools/workflows/`, which is why that leg exists. The spec-audit rule needs no
   source, so a name-only spec audit IS judged.
 - **The spec-audit rule has three stated limits.** A harness's nested `workflow()` is a runtime
   call, not a tool call — that route is `TOOL-aBlindedTrial-3`'s. It reads the WORKTREE README
-  while the driver reads BASE, so one uncommitted edit can split them. An unparseable `args` string
-  shows it no `kind` and is admitted; the harness throws on it, so no audit runs unrefused.
+  and conf while the driver reads BASE, so one uncommitted edit can split them. An unparseable
+  `args` string shows it no `kind` and is admitted; the harness throws on it, so no audit runs.
 - **The runtime count does not distinguish a verifier from any other agent.** Keying on "is this a
   verify agent" needs a session-to-build binding no payload field provides. Accepted because the
   concurrency rule binds every fan-out to the same number anyway; the residual is a wide fan-out that

@@ -40,7 +40,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.26   # gov:kit unattended@1.26 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.27   # gov:kit unattended@1.27 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -336,7 +336,10 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""
+GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; SPEC_AUDIT_DEFAULT=""
+# SPEC_AUDIT_DEFAULT (TOOL-aBlindedTrial-7) is defaulted here like its neighbours so the source-level
+# arm sees it, but the value THIS source binds decides nothing: check_authorization re-reads the key
+# from the conf blob at the pinned BASE, because a run could blank its working copy to opt out.
 # TOOL-dLoggedFlight-2 - the run log's two inputs. RUNLOG_SESSION_VARS is a declared key and defaults
 # here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so it is copied BEFORE the conf is
 # sourced: a tracked file the run commits itself must not be what turns that run's own log off.
@@ -465,7 +468,9 @@ DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 # carrying no name, no reason and no record. DIRECTIVES_EXTRA is where a project ADDS.
 # TOOL-aBlindedTrial-6 (owner, 2026-09-20) supersedes that ruling for ONE member: the spec-audit pair
 # (`specs-reviewed` here, `specs-audited` in DOD_CORE) is opt-in per build, declared by a dated
-# `spec-audit:` key in the build README at BASE; both members stay in the core sets so no adopter's
+# `spec-audit:` key in the build README at BASE, or by a project-wide SPEC_AUDIT_DEFAULT in
+# .unattended.conf at BASE (TOOL-aBlindedTrial-7 - the ADD the ruling allows, a README key winning);
+# both members stay in the core sets so no adopter's
 # floor moves, and the evidence is the trial report under memory/builds/aBlindedTrial/build/.
 #
 # Two handles may cite one section - the section is the carrier, not the rule.
@@ -789,8 +794,12 @@ AUTH_RECORDS=""
 # ALSO the value before check_authorization has run at all, so `AUTH_SPEC_AUDIT_DERIVED` says which
 # (round 2, R3): set to 1 on the line after the derivation, and a grader that finds it empty refuses
 # as NOT GRADABLE rather than printing a sentence about a README nobody read.
+# TOOL-aBlindedTrial-7 - a SECOND source at the SAME BASE: the README key when it carries one, else
+# SPEC_AUDIT_DEFAULT from .unattended.conf at that base. `AUTH_SPEC_AUDIT_FROM` names which
+# (`readme` | `project`) so the preflight line can say so without a second pinned fact.
 AUTH_SPEC_AUDIT=""
 AUTH_SPEC_AUDIT_DERIVED=""
+AUTH_SPEC_AUDIT_FROM=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -1460,7 +1469,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb _sa_shown
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _sa_shown _cf _sad
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -1513,6 +1522,28 @@ check_authorization() { # slug · base
     *) fail 52 "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: $_sa_shown"
        return 1 ;;
   esac
+  AUTH_SPEC_AUDIT_FROM=""
+  [ -n "$AUTH_SPEC_AUDIT" ] && AUTH_SPEC_AUDIT_FROM=readme
+  # TOOL-aBlindedTrial-7 - the PROJECT default, consulted only when the README carries NO
+  # `spec-audit:` line at all: a key that is present, even malformed, has already decided above, so
+  # a typo never falls back to the default (that would be the read-as-absent opt-out fail 52 refuses).
+  # Read from the conf blob at the SAME BASE, the `_pb` idiom below, so a run cannot blank its
+  # working copy to escape; an absent blob is no default. The blob is read the file's OWN way -
+  # evaluated in a subshell, never a sed pipeline, which reads `KEY='v'`, `KEY="v" # note` and a
+  # last-wins pair differently from the shell (gotcha two-readers-of-one-config-one-re-derived). The
+  # variable is BLANKED first so a BASE conf that predates the key cannot inherit the working copy's
+  # value through the environment, and an `exit` inside the conf ends the subshell before the read,
+  # which reads as no default. A non-date is fail 54 on fail 52's reasoning, one file over.
+  if [ -z "$AUTH_SPEC_AUDIT" ] && ! printf '%s\n' "$_fm" | grep -q '^spec-audit=' \
+     && _cf=$(GIT show "$base:.unattended.conf" 2>/dev/null); then
+    _sad=$( SPEC_AUDIT_DEFAULT=""; eval "$_cf" >/dev/null 2>&1; printf '%s' "${SPEC_AUDIT_DEFAULT:-}" )
+    case "$_sad" in
+      "") ;;
+      [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) AUTH_SPEC_AUDIT="$_sad"; AUTH_SPEC_AUDIT_FROM=project ;;
+      *) fail 54 "the project conf at the pinned BASE declares SPEC_AUDIT_DEFAULT with a value that is not a YYYY-MM-DD date, and a project-wide opt-in is a dated declaration or not at all - declared: $_sad"
+         return 1 ;;
+    esac
+  fi
   # out of the SAME scan. The `No second GIT show` rule above bounds THAT
   # front-matter parse and is not a rule against reading a second FILE, which S2b does.
   AUTH_PLAYBOOK=$(printf '%s\n' "$_fm" | sed -n 's/^playbook=//p' | head -1)
@@ -2884,7 +2915,9 @@ verb_preflight() { # slug · keepalive-id
   # TOOL-aBlindedTrial-2 - the opt-in, pinned once and only when DECLARED, on the recipe facts'
   # terms: a blank fact would be a key that reads as configured while carrying nothing, and the
   # `specs-audited` grader compares the fact against the BASE derivation as evidence (fail 53 on a
-  # presence disagreement).
+  # presence disagreement). Since TOOL-aBlindedTrial-7 the value may come from the project's
+  # SPEC_AUDIT_DEFAULT at the same BASE; check_authorization folded it into AUTH_SPEC_AUDIT, so
+  # the same line pins it and no second fact exists to disagree with the first.
   if [ -n "${AUTH_SPEC_AUDIT:-}" ]; then
     [ -n "$(fact "$rel" spec-audit)" ] || set_fact "$rel" spec-audit "$AUTH_SPEC_AUDIT" || return 1
   fi
@@ -2922,7 +2955,10 @@ verb_preflight() { # slug · keepalive-id
 
 # TOOL-aBlindedTrial-2 - the ONE line a reader learns the opt-in state from at the start of a run;
 # the other is the `specs-audited` item's own at --close. Reads the PINNED fact; at --close the
-# grader re-derives from BASE and refuses (fail 53) if the two disagree on presence. Silent-at-zero
+# grader re-derives from BASE and refuses (fail 53) if the two disagree on presence. THREE
+# spellings, and the Skill quotes all three: the source rides `AUTH_SPEC_AUDIT_FROM`, set by
+# check_authorization in this same shell, so `project` (TOOL-aBlindedTrial-7) names the conf key
+# rather than a README line the build never wrote. Silent-at-zero
 # is the house rule for the
 # recommendation clause: a one-unit build with no open fork is what the trial measured the audit
 # buying nothing on, so the clause rides only where the build has two or more units in its
@@ -2931,7 +2967,11 @@ print_spec_audit_line() { # slug · run-state file
   local sa why="" n=0 _sp
   sa=$(fact "$2" spec-audit)
   if [ -n "$sa" ]; then
-    echo "unattended: spec-audit — opted in by README spec-audit: $sa"
+    if [ "${AUTH_SPEC_AUDIT_FROM:-}" = project ]; then
+      echo "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: $sa"
+    else
+      echo "unattended: spec-audit — opted in by README spec-audit: $sa"
+    fi
     return 0
   fi
   n=$(unit_rows "$(readme_of "$1")" 2>/dev/null | row_ids_of | grep -c .)
@@ -3828,7 +3868,9 @@ $_bcnon"
     specs-audited)
       # OWED ONLY WHEN DECLARED (TOOL-aBlindedTrial-2, on the owner's ruling TOOL-aBlindedTrial-6):
       # the pre-code spec audit is opt-in per build, and the build opts in with a dated `spec-audit:`
-      # key in its README at BASE, read by `authorization-reachable` into `AUTH_SPEC_AUDIT` in this
+      # key in its README at BASE - or, since TOOL-aBlindedTrial-7, its project does with a dated
+      # SPEC_AUDIT_DEFAULT in .unattended.conf at the same BASE, the README key winning when present
+      # - read by `authorization-reachable` into `AUTH_SPEC_AUDIT` in this
       # same shell. Term zero below keys on THAT; the `spec-audit` fact --preflight pins is EVIDENCE
       # compared against it, and a presence disagreement is fail 53. Derived absent, the item is MET
       # and announces that nothing was owed. The item stays in DOD_CORE so no adopter's CORE_FLOOR
@@ -3868,11 +3910,11 @@ $_bcnon"
       fi
       _sa_fact=$(fact "$rel" spec-audit)
       if [ "${AUTH_SPEC_AUDIT:+1}" != "${_sa_fact:+1}" ]; then
-        fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
+        fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README, or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
         return 1
       fi
       if [ -z "${AUTH_SPEC_AUDIT:-}" ]; then
-        DOD_OUT="specs-audited — not owed: the spec audit is opt-in and the build README at BASE declares no spec-audit: key, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
+        DOD_OUT="specs-audited — not owed: the spec audit is opt-in, the build README at BASE declares no spec-audit: key and the project conf at BASE declares no SPEC_AUDIT_DEFAULT, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
         return 0
       fi
       if ! _sa_rows=$(unit_rows "$(readme_of "$slug")"); then

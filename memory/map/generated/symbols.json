@@ -1243,6 +1243,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_cutoff_relation",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "check_declaration",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
@@ -1266,6 +1271,11 @@
       "id": "check_fences",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_guard_trips",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "check_guarded",
@@ -2083,6 +2093,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_guarded_legs",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "derive_id_families",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -2536,6 +2551,11 @@
       "id": "extract_decorators",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extract_files_touched",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "extract_gates",
@@ -3896,6 +3916,11 @@
       "id": "readSpanEnd",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readSpecAuditDefault",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "readStdin",

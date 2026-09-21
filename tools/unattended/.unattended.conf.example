@@ -201,6 +201,13 @@ UNITS_REGION_CUTOFF=""
 # passing silently. Set to the day this landed.
 SPEC_THIN_CUTOFF=""
 
+# TOOL-aBlindedTrial-7 - a PROJECT-WIDE opt-in to the pre-code spec audit: a YYYY-MM-DD date from
+# which every build whose README declares no `spec-audit:` key owes the audit as if it had. Read at
+# the pinned BASE by check_authorization, never from the working copy, so a run cannot blank it to
+# escape; a README key wins whatever it says; a non-date is a refusal. BLANK or absent keeps the
+# per-build opt-in - a per-adopter fact, like every cutoff above, so the example ships it blank.
+SPEC_AUDIT_DEFAULT=""
+
 PHASES_EXTRA=""
 DOD_EXTRA=""
 

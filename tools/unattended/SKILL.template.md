@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.26 -->
+<!-- gov:kit unattended@1.27 -->
 
 # Unattended runs
 
@@ -197,10 +197,13 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    continues. Read the refusal it prints — each one names itself.
 
    One line before `preflight OK` states the spec-audit posture: `unattended: spec-audit — opted in
-   by README spec-audit: <date>` when the build README at BASE declares `spec-audit: <date>`, or
-   `unattended: spec-audit — not owed (opt-in)` when it does not. The pre-code audit is OPT-IN per
-   build (owner ruling of 2026-09-20, `TOOL-aBlindedTrial-6`); the key is read at BASE, so a
-   working-copy edit opts nothing in, and a value that is not a date is a refusal. The `not owed`
+   by README spec-audit: <date>` when the build README at BASE declares `spec-audit: <date>`,
+   `unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: <date>` when the README
+   declares no key and the project's `.unattended.conf` at BASE declares that date
+   (`TOOL-aBlindedTrial-7`; the README key wins whatever it says), or
+   `unattended: spec-audit — not owed (opt-in)` when neither does. The pre-code audit is OPT-IN per
+   build (owner ruling of 2026-09-20, `TOOL-aBlindedTrial-6`); both keys are read at BASE, so a
+   working-copy edit opts nothing in or out, and a value that is not a date is a refusal. The `not owed`
    line carries a recommendation when the build has two or more units or a spec grades FORKED —
    that is where the audit earned its cost in the trial. Keep the line: the harness call needs it.
    After a compaction, `--status` carries the same fact as `· spec-audit <date>`.
@@ -591,7 +594,8 @@ definition, so the absence is a decision and not an oversight.
   `{{TOOL_ROOT}}workflows/unattended-build.js`, which runs SPEC, then — only when the build declares
   `spec-audit:` — AUDIT and DISPOSAL as ordered stages, and hands back the ordered roster on a
   terminal `--review` verdict, or at SPEC completion when the audit is off by declaration. **Pass
-  `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>`**, and
+  `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>` or
+  `opted in by project default SPEC_AUDIT_DEFAULT: <date>`**, and
   omit it when it read `not owed (opt-in)`; the harness owns the OFF branch and logs it. Each unit is
   then built by
   `{{TOOL_ROOT}}workflows/unattended-unit.js`, one unit per call, holding that unit's brief and spec and
@@ -711,7 +715,8 @@ It answers with one of five states, and the state is what you act on:
   record names yet — under their own one-round bound. `auditIds` and `subjects` are never passed
   together: the harness refuses the pair by name, because a supplied subject set cannot be scoped to
   the promoted units. Skip that re-invocation and the promoted unit closes un-audited, which
-  `specs-audited` refuses at `--close` on a build that declared `spec-audit:`; a build that did not
+  `specs-audited` refuses at `--close` on a build that declared `spec-audit:` or whose project declared
+  a `SPEC_AUDIT_DEFAULT`; a build under neither
   owes no audit and the item announces `not owed` instead.
 - **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
