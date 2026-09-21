@@ -3751,6 +3751,292 @@ hit "$(sed -n '/answers only inside the queried/,+2p' "$SCRIPT")" "does not foll
 
 rm -f "$ric_fn"; rm -rf "$ric_root"
 
+
+# ---- TOOL-dDerivedDocket-18: THE ASK-MANDATE SECOND OPINIONS ------------------------------------
+# Six arms over the four facts the ask path pins (`asks:`, `m-base:`, `asks-ready:` and the
+# `asks-at-landing:` freeze), each observed RED here and each beside the control that shows the
+# break is the only thing that changed. The leg re-derives every fact from inputs the run cannot
+# move; a fixture that let the run move them would grade the leg against itself.
+#
+# ITS OWN REPOSITORY, outside the scratch tree, for the reason the resolver block above gives: the
+# arms need a second branch, a pushed tip, a remote whose HEAD can be repointed and a build folder
+# whose README carries an `asks:` line AT THE ANCHOR, and `reset_tree` would delete all of it.
+#
+# THE RECALL KIT'S REAL EXTRACTOR, copied in. S3's whole claim is that it judges an anchor by that
+# kit's `anchor_at` and holds no copy of its shapes, so a fixture carrying a stub extractor would be
+# grading a double this block wrote - a green arm over a shape the real callee never returns.
+#
+# THE STUB PRODUCER READS ITS TABLE AT THE REV IT IS ASKED ABOUT, so an arm can tell "re-derived at
+# the pinned tree" from "re-derived at HEAD": a table that moves after the pin changes the answer
+# only for a leg that asked about the wrong tree.
+#
+# `--skip 28` ON EVERY RUN. These arms live in the per-record loop, and check 28 is half the leg's
+# wall clock and none of this block's subject.
+reset_tree
+ak_root=$(mktemp -d)
+ak="$ak_root/repo"; ak_origin="$ak_root/origin.git"
+ak_R=memory/builds/tRun/RUN.md
+ak_B=memory/builds/tRun/README.md
+mkdir -p "$ak/$KIT_REL" "$ak/rk" "$ak/memory/guides" "$ak/memory/builds/tRun" "$ak/memory/builds/aFoo"
+cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_REL/lib-unattended.sh" \
+   "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
+   "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
+   "$TMP/$KIT_REL/.unattended.conf.example" "$ak/$KIT_REL/"
+cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ak/memory/guides/UNATTENDED-PROTOCOL.md"
+cp "$TMP/$KIT_REL/VERBS.template.md" "$ak/memory/guides/UNATTENDED-VERBS.md"
+# the recall kit's extractor and its conf reader, into a directory the declared RECALL_CLI names
+cp "$HERE/../memory-recall/extract.py" "$HERE/../memory-recall/recall_conf.py" "$ak/rk/"
+n=$((n+1)); [ -f "$ak/rk/extract.py" ] || { echo "FAIL the ask block could not copy the recall kit's extractor, so every S3 arm below would grade a missing grammar"; st=1; }
+printf 'MEMORY_ROOT=memory\nFAMILIES="example:EXMP tooling:TOOL"\n' > "$ak/.memory-tree.conf"
+cat > "$ak/.unattended.conf" <<AKCONF
+MEMORY_ROOT=memory
+LANDER="echo land"
+BYPASS_BAN="--no-verify"
+GATE_CMD="true"
+WIRING_CHECK="true"
+CORE_FLOOR="$CORE_FLOOR_DERIVED"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+DIRECTIVES_EXTRA=""
+DIRECTIVES_FLOOR="$DIRECTIVES_FLOOR_DERIVED"
+DIRECTIVES_EXTRA_TABLE=""
+HALT_CODES_EXTRA=""
+HALT_FLOOR="$HALT_FLOOR_DERIVED"
+HOLD_CODES_EXTRA=""
+HOLD_FLOOR="$HOLD_FLOOR_DERIVED"
+RECALL_CLI="rk/query.py"
+ASKS_CMD="bash stub-asks.sh"
+AKCONF
+cat > "$ak/stub-asks.sh" <<'AKSTUB'
+#!/usr/bin/env bash
+set -u
+ids=""; mode=""; rev=""
+for a in "$@"; do
+  case "$a" in
+    --ready) mode=ids; continue ;;
+    --at) mode=at; continue ;;
+    --*) mode=""; continue ;;
+  esac
+  [ "$mode" = ids ] && ids="$ids $a"
+  [ "$mode" = at ] && rev="$a"
+done
+tbl=$(git show "$rev:stub-table.txt" 2>/dev/null)
+k=0
+for i in $ids; do
+  s=$(printf '%s\n' "$tbl" | sed -n "s/^$i status //p"); [ -n "$s" ] || s=OPEN
+  r=$(printf '%s\n' "$tbl" | sed -n "s/^$i ready //p"); [ -n "$r" ] || r=yes
+  printf 'ask\t%s\t%s\tnobody\t-\tHIGH\t%s\t-\t-\t-\t-\n' "$i" "$s" "$r"
+  k=$((k+1))
+done
+printf 'examined\t%s\n' "$k"
+AKSTUB
+printf 'EXMP-aFoo-3 ready yes\nEXMP-aFoo-3 status OPEN\n' > "$ak/stub-table.txt"
+printf '# aFoo asks\n\n- EXMP-aFoo-3 · filed 2026-09-01 · unit · do the thing\n' > "$ak/memory/builds/aFoo/BACKLOG.md"
+printf -- '---\nslug: tRun\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: TOOL\nids: TOOL-tRun-1\nasks: EXMP-aFoo-3\n---\n\n# tRun\n\n<!-- gen:build-index -->\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n' > "$ak/$ak_B"
+printf '# tRun - run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: WITNESS\nbase: BASE\nmode: slug\nasks: EXMP-aFoo-3\n' > "$ak/$ak_R"
+(
+  cd "$ak" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  printf 'a second commit, so the anchor has an OLDER ancestor to forge a pin to\n' > second.txt
+  git add -A >/dev/null && git commit -q -m second --no-verify
+  git init -q --bare "$ak_origin"
+  git --git-dir="$ak_origin" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$ak_origin" && git push -q origin main
+  git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify
+  # THE THREE PINNED ASK FACTS IN ONE COMMIT, which is what preflight's staging produces, so the
+  # commit introducing `m-base:` is findable and its first parent is HEAD at preflight.
+  # FROM THE LOCAL `main`, not `origin/main`: the tracking ref exists only if the push above
+  # succeeded, and a push that failed would leave both pins EMPTY while every arm below went on
+  # grading a record that pins nothing.
+  mb=$(git merge-base main HEAD)
+  sed -i "s|^witness: WITNESS$|witness: $(git rev-parse HEAD)|; s|^base: BASE$|base: $mb|" "$ak_R"
+  printf 'anchor-sha: %s\nm-base: %s\nasks-ready: EXMP-aFoo-3=yes\n' "$(git rev-parse main)" "$mb" >> "$ak_R"
+  git add -A >/dev/null && git commit -q -m facts --no-verify
+)
+AK_PRISTINE=$(git -C "$ak" rev-parse HEAD); AK_ANCHOR=$(git -C "$ak" rev-parse main); AK_C1=$(git -C "$ak" rev-parse main~1)
+# THE FIXTURE MUST ACTUALLY PIN SOMETHING, and the remote must actually hold the anchor: a build that
+# half-failed would red thirty arms below for a reason none of them names.
+n=$((n+1)); { grep -qE '^m-base: [0-9a-f]{40}$' "$ak/$ak_R" && [ "$(git --git-dir="$ak_origin" rev-parse main 2>/dev/null)" = "$AK_ANCHOR" ]; } \
+  || { echo "FAIL the ask block's fixture pinned no m-base or its remote holds no anchor, so every arm below would grade a record that pins nothing"; st=1; }
+set_ak_pristine() {
+  ( cd "$ak" && git reset -q --hard "$AK_PRISTINE" && git clean -qfd && git branch -f main "$AK_ANCHOR" \
+      && git push -q -f origin "$AK_ANCHOR":main && git --git-dir="$ak_origin" symbolic-ref HEAD refs/heads/main )
+}
+run_ak_leg() { ( cd "$ak" && GOV_UNATTENDED_REPORT=1 bash "$KIT_REL/check-unattended.sh" --skip 28 2>&1 ); }
+add_ak_commit() { ( cd "$ak" && git add -A >/dev/null && git commit -q -m "$1" --no-verify ); }
+
+# control: the conforming mandated record fires none of the six arms, and says what it examined
+set_ak_pristine; out=$(run_ak_leg)
+miss "$out" "UNATTENDED check 19 FAILED"
+miss "$out" "UNATTENDED check 15 FAILED"
+miss "$out" "UNATTENDED check 37 FAILED"
+hit  "$out" "check 37 found no foreign anchor under memory/builds/tRun"
+hit  "$out" "the ask-mandate second opinions examined 1 run-state record(s) pinning an asks: fact"
+
+# AC1: the pinned fact differs by one id from the README line at the recorded BASE
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_R"; out=$(run_ak_leg)
+hit "$out" "a run-state file pins an asks: mandate the build README at its own recorded BASE does not declare, so the set the run says authorized it is not the set its authorization asked for - pinned against declared follow: ["
+hit "$out" "pinned against declared follow: [EXMP-aFoo-3 EXMP-aFoo-4] against [EXMP-aFoo-3]"
+
+# AC2: a LIVE record's README edited at HEAD reds; the same edit under a record past its close does not
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_B"; add_ak_commit "head edit"; out=$(run_ak_leg)
+hit "$out" "a LIVE run's build README carries an asks: line at HEAD that is not the one the run pinned, so the mandate this run will be measured against was edited underneath it - pinned against HEAD follow: ["
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_B"
+sed -i 's/^phase: RUNNING$/phase: LANDING/' "$ak/$ak_R"; add_ak_commit "head edit under LANDING"; out=$(run_ak_leg)
+miss "$out" "carries an asks: line at HEAD that is not the one the run pinned"
+hit  "$out" "which is past its close, and the pinned-mandate property binds a LIVE run"
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_B"
+mutate "$ak/$ak_R" 's/^phase: RUNNING$/phase: LANDED/'
+printf 'asks-at-landing: EXMP-aFoo-3=OPEN\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "head edit under LANDED"; out=$(run_ak_leg)
+miss "$out" "carries an asks: line at HEAD that is not the one the run pinned"
+
+# AC3: no filed row for the mandated ask in its home BACKLOG at the recorded m-base. The anchor moves
+# too, so the equality arm stays green and this is the only refusal the fixture can reach.
+set_ak_pristine
+( cd "$ak" && git checkout -q main && sed -i '/EXMP-aFoo-3/d' memory/builds/aFoo/BACKLOG.md \
+    && git commit -q -am "drop the ask row" --no-verify && git push -q -f origin main \
+    && git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1 \
+    && nm=$(git rev-parse main) \
+    && sed -i "s|^m-base: .*|m-base: $nm|; s|^anchor-sha: .*|anchor-sha: $nm|; s|^base: .*|base: $nm|" "$ak_R" \
+    && git commit -q -am "re-record against the row-less anchor" --no-verify )
+out=$(run_ak_leg)
+hit  "$out" "a mandated ask has no filed row in the tree this run pinned its mandate against, so the run was authorized by a record that tree does not carry and could have written the row itself"
+hit  "$out" "EXMP-aFoo-3, wanted in memory/builds/aFoo/BACKLOG.md"
+miss "$out" "is not the merge-base of the anchor it pinned"
+
+# AC4: base: and m-base: forged TOGETHER to an older ancestor of anchor-sha still red, naming m-base:
+set_ak_pristine; sed -i "s|^m-base: .*|m-base: $AK_C1|; s|^base: .*|base: $AK_C1|" "$ak/$ak_R"; add_ak_commit "forge the pair"; out=$(run_ak_leg)
+hit "$out" "a run-state file's m-base: is not the merge-base of the anchor it pinned and the tree its own preflight stood on, so the tree its mandate was asserted against was chosen rather than derived - recorded against re-derived follow: ["
+hit "$out" "[$AK_C1] against [$AK_ANCHOR]"
+# ...an m-base: line no commit introduced falls back to ANCESTRY and says so, and S8 skips by name
+set_ak_pristine; sed -i "s|^m-base: .*|m-base: $AK_C1|" "$ak/$ak_R"; out=$(run_ak_leg)
+hit  "$out" "FELL BACK TO ANCESTRY for the m-base:"
+hit  "$out" "SKIPPED the pin re-derivation"
+miss "$out" "is not an ancestor of both the anchor it pinned"
+# ...and the fallback is a test that can fail: a pin OFF the anchor's history reds under it
+set_ak_pristine; sed -i "s|^m-base: .*|m-base: $(git -C "$ak" rev-parse HEAD~1)|" "$ak/$ak_R"; out=$(run_ak_leg)
+hit "$out" "a run-state file's m-base: is not an ancestor of both the anchor it pinned and this working history, so the tree its mandate was asserted against does not lie on the history that authorized the run: m-base ["
+# ...and an m-base: nothing can read is its own refusal rather than a skip
+set_ak_pristine; sed -i '/^m-base: /d' "$ak/$ak_R"; out=$(run_ak_leg)
+hit "$out" "a run-state file pins an asks: mandate and no m-base: this clone can read, so every property about the tree that mandate was asserted against would be graded over an empty blob or, worse, over the index the run itself staged: m-base ["
+
+# AC5: a backticked foreign id in a table row's first cell ANCHORS; a link-wrapped one does not
+set_ak_pristine
+printf '# notes\n\n| `TOOL-zOther-7` | a foreign id, backticked |\n| [TOOL-zOther-8](x.md) | a foreign id, link-wrapped |\n' > "$ak/memory/builds/tRun/notes.md"
+add_ak_commit "foreign anchors"; out=$(run_ak_leg)
+hit  "$out" "a mandated run's own build folder ANCHORS a record id belonging to another build, so this folder is a second claimant for an id it does not own and the two builds' records can no longer be told apart"
+hit  "$out" "memory/builds/tRun/notes.md:3:TOOL-zOther-7"
+miss "$out" "TOOL-zOther-8"
+
+# AC6: a blank RECALL_CLI is a named skip, never zero anchors found
+set_ak_pristine
+printf '# notes\n\n| `TOOL-zOther-7` | a foreign id, backticked |\n' > "$ak/memory/builds/tRun/notes.md"
+sed -i 's|^RECALL_CLI=.*|RECALL_CLI=""|' "$ak/.unattended.conf"; add_ak_commit "blank recall cli"; out=$(run_ak_leg)
+hit  "$out" "check 37 SKIPPED for memory/builds/tRun"
+hit  "$out" "RECALL_CLI is blank in this project"
+miss "$out" "ANCHORS a record id belonging to another build"
+
+# AC7: a LANDED record under a mandate with no freeze (its control is AC12b's record below)
+set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"; printf 'landed-anchor: local\n' >> "$ak/$ak_R"
+add_ak_commit "landed, no freeze"; out=$(run_ak_leg)
+hit "$out" "a record claims LANDED under an asks: mandate and freezes no answer to it, so what that run actually answered is whatever the tree says today rather than what it said at landing"
+
+# AC8: EVERY member of the driver's second-anchor set is refused, read from the constant; and a slug
+# record under a blank ASKS_CMD is refused by the conf half alone
+ak_modes=$(sed -n 's/^SECOND_ANCHOR_MODES="\(.*\)"$/\1/p' "$TMP/$KIT_REL/unattended.sh")
+n=$((n+1)); [ -n "$ak_modes" ] || { echo "FAIL the driver's SECOND_ANCHOR_MODES read empty, so the mode arms below would loop over nothing"; st=1; }
+for ak_m in $ak_modes; do
+  set_ak_pristine; sed -i "s/^mode: slug$/mode: $ak_m/" "$ak/$ak_R"; out=$(run_ak_leg)
+  hit "$out" "a run-state file pins an asks: mandate while recording an authorization mode whose discipline lets the run reach the anchor it writes, so the mandate and the tree it is asserted against could both be this run's own: mode ["
+done
+set_ak_pristine; sed -i 's|^ASKS_CMD=.*|ASKS_CMD=""|' "$ak/.unattended.conf"; out=$(run_ak_leg)
+hit  "$out" "a run-state file pins an asks: mandate while this project declares no ASKS_CMD, so nothing here or in the driver ever said whether any of that mandate is executable and every check keyed on it passes over an ungraded list"
+miss "$out" "recording an authorization mode whose discipline"
+
+# AC9's direct form: a tree where no record pins an asks: fact announces the vacuity with its count
+set_ak_pristine; sed -i '/^asks: EXMP-aFoo-3$/d' "$ak/$ak_R" "$ak/$ak_B"; add_ak_commit "no mandate anywhere"; out=$(run_ak_leg)
+hit "$out" "0 run-state records pin an asks: fact"
+
+# AC11: a forged grade on an UNPUBLISHED record reds naming both pairs...
+set_ak_pristine; sed -i 's/^asks-ready: .*/asks-ready: EXMP-aFoo-3=no/' "$ak/$ak_R"; add_ak_commit "forge the grade"; out=$(run_ak_leg)
+hit "$out" "a run-state file's asks-ready: is not what the declared producer says at the very tree the run pinned, so the grades that mandate was admitted on are not the producer's - recorded against re-derived follow: ["
+hit "$out" "[EXMP-aFoo-3=no] against [EXMP-aFoo-3=yes]"
+# ...the same forgery once PUBLISHED is counted and not re-derived...
+set_ak_pristine; sed -i 's/^asks-ready: .*/asks-ready: EXMP-aFoo-3=no/' "$ak/$ak_R"; add_ak_commit "forge the grade"
+git -C "$ak" push -q -f origin HEAD:main; out=$(run_ak_leg)
+miss "$out" "is not what the declared producer says at the very tree the run pinned"
+hit  "$out" "is published, not re-derived"
+# ...a producer past the bound is UNANSWERED and never a red...
+set_ak_pristine; mutate "$ak/$KIT_REL/unattended.sh" 's/^REMOTE_BOUND="[0-9]*"/REMOTE_BOUND="2"/'
+printf '#!/usr/bin/env bash\nsleep 30\n' > "$ak/stub-asks.sh"
+sed -i 's/^asks-ready: .*/asks-ready: EXMP-aFoo-3=no/' "$ak/$ak_R"; add_ak_commit "a stalled producer over a forged grade"; out=$(run_ak_leg)
+hit  "$out" "UNANSWERED rather than red"
+hit  "$out" "was KILLED by this leg's wall-clock bound"
+miss "$out" "is not what the declared producer says at the very tree the run pinned"
+# ...an unobserved default tip re-derives EVERY mandated record and prints why...
+set_ak_pristine; git --git-dir="$ak_origin" symbolic-ref HEAD refs/heads/nothing-here; out=$(run_ak_leg)
+hit "$out" "re-deriving the pins of EVERY mandated record because this run observed no readable default-branch tip"
+git --git-dir="$ak_origin" symbolic-ref HEAD refs/heads/main
+# ...and a producer whose answer MOVED after the pin is graded at the pinned tree, not at HEAD
+set_ak_pristine; mutate "$ak/stub-table.txt" 's/^EXMP-aFoo-3 ready yes$/EXMP-aFoo-3 ready no/'
+add_ak_commit "the table moves after the pin"; out=$(run_ak_leg)
+miss "$out" "is not what the declared producer says at the very tree the run pinned"
+
+# AC12: a forged freeze on an unpublished record reds naming both...
+set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"
+printf 'asks-at-landing: EXMP-aFoo-3=CLOSED\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "forge the freeze"; out=$(run_ak_leg)
+hit "$out" "a landed record's asks-at-landing: is not what the declared producer says at the tree its landing verb examined, so the answer frozen into a terminal record is not the one that tree gives - recorded against re-derived follow: ["
+hit "$out" "[EXMP-aFoo-3=CLOSED] against [EXMP-aFoo-3=OPEN]"
+# ...a REOPEN at HEAD does not red a PUBLISHED record...
+set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"
+printf 'asks-at-landing: EXMP-aFoo-3=CLOSED\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "the freeze"
+git -C "$ak" push -q -f origin HEAD:main
+mutate "$ak/stub-table.txt" 's/^EXMP-aFoo-3 status OPEN$/EXMP-aFoo-3 status REOPEN/'
+add_ak_commit "a later REOPEN"; out=$(run_ak_leg)
+miss "$out" "is not what the declared producer says at the tree its landing verb examined"
+# ...nor an UNPUBLISHED one, whose freeze is graded at the tree the landing examined. This record
+# is also AC7's control: LANDED, mandated, and carrying its freeze.
+set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"
+mutate "$ak/stub-table.txt" 's/^EXMP-aFoo-3 status OPEN$/EXMP-aFoo-3 status CLOSED/'
+add_ak_commit "the tree the landing examined"
+printf 'asks-at-landing: EXMP-aFoo-3=CLOSED\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "the freeze"
+sed -i 's/^EXMP-aFoo-3 status CLOSED$/EXMP-aFoo-3 status REOPEN/' "$ak/stub-table.txt"; add_ak_commit "a later REOPEN"; out=$(run_ak_leg)
+miss "$out" "is not what the declared producer says at the tree its landing verb examined"
+miss "$out" "freezes no answer to it"
+
+# AC13: a freeze that omits one mandated id reds naming that id
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_R"
+sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"
+printf 'asks-at-landing: EXMP-aFoo-3=OPEN\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "freeze missing an id"; out=$(run_ak_leg)
+hit "$out" "a landed record's asks-at-landing: omits an ask its own mandate names, so that ask's answer at landing is lost and the freeze covers less than the question the run was authorized by"
+hit "$out" "EXMP-aFoo-4 in memory/builds/tRun/RUN.md"
+
+# THE ROTATED RECORD, which is where S2 meets TOOL-dDerivedDocket-52's resolver for the first time
+# (that unit's AC1 and AC3 left their check-19 half to this commit). The anchor MOVES after
+# preflight, the run merges it, lands and is rotated by the next preflight, so HEAD-at-preflight and
+# the rotation's first parent have DIFFERENT merge-bases with the pinned anchor. A resolver that
+# answered the rotation commit would grade this honest archived record against a base nobody wrote.
+set_ak_pristine
+( cd "$ak" && git checkout -q main && printf 'the anchor moves after preflight\n' > third.txt \
+    && git add -A >/dev/null && git commit -q -m "main moves" --no-verify && git push -q -f origin main \
+    && nm=$(git rev-parse main) && git checkout -q unit \
+    && sed -i "s|^anchor-sha: .*|anchor-sha: $nm|" "$ak_R" && git commit -q -am "the anchor preflight observed" --no-verify \
+    && git merge -q --no-edit main >/dev/null 2>&1 \
+    && sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak_R" \
+    && printf 'asks-at-landing: EXMP-aFoo-3=OPEN\nlanded-anchor: local\n' >> "$ak_R" \
+    && git commit -q -am "land" --no-verify \
+    && git mv "$ak_R" memory/builds/tRun/RUN.LANDED.deadbeef.md \
+    && printf '# tRun - run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: %s\nbase: %s\n' "$(git rev-parse HEAD)" "$nm" > "$ak_R" \
+    && git add -A >/dev/null && git commit -q -m "the next preflight rotates the record" --no-verify )
+out=$(run_ak_leg)
+miss "$out" "is not the merge-base of the anchor it pinned"
+miss "$out" "FELL BACK TO ANCESTRY for the m-base: of memory/builds/tRun/RUN.LANDED.deadbeef.md"
+hit  "$out" "the ask-mandate second opinions examined 1 run-state record(s) pinning an asks: fact"
+
+rm -rf "$ak_root"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
@@ -3797,7 +4083,12 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- `hit`/`same`/`miss` calls plus its two bare `n=$((n+1))` sites, and the block was executed
 # ---- once standalone in a replica of this prologue to confirm it -- thirty-eight assertions,
 # ---- green, and red under each of six staged breaks.
-FLOOR_ASSERTIONS=457
+# ---- RAISED 457 -> 517 by exactly the arm, TOOL-dDerivedDocket-18: the ask-mandate block's
+# ---- sixty executed assertions, all in its own repository at the END of region two, so
+# ---- FLOOR_SHARD_2 carries the same +60 and FLOOR_SHARD_1 is untouched. COUNTED by executing the
+# ---- block standalone in a replica of this prologue, the same way and for the same reason as the
+# ---- line above: this unit's pass may run no suite.
+FLOOR_ASSERTIONS=517
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -3823,7 +4114,7 @@ FLOOR_ASSERTIONS=457
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=91
-FLOOR_SHARD_2=366
+FLOOR_SHARD_2=426
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

@@ -554,3 +554,40 @@ asks_unit_in() { # BACKLOG.md text -> every filed `unit` ask id, one per line, i
   printf '%s\n' "$1" \
     | sed -n 's/^- \([A-Z][A-Z]*-[A-Za-z0-9][A-Za-z0-9]*-[0-9][0-9]*\) · filed [0-9][0-9-]* · unit · .*/\1/p'
 }
+# ------------------------------------------------------------ the id-run expander, and the home
+# MOVED HERE FROM THE DRIVER by TOOL-dDerivedDocket-18, unchanged, for the reason the ask match
+# above is here: the gate leg re-derives the pinned mandate and must answer "which ids is this run
+# under" with the SAME bytes the driver answered it with. Two expanders disagree silently on the
+# one input that matters - a range - and the leg would then red an honest record for a row it never
+# looked for. The leg can source no driver, so a shared answer has to live in the shared file.
+#
+# The RECORD-BINDING id grammar is WIDER than `_ids_of`'s, and reading it with the narrow one is
+# wrong in both directions. `memory/HYGIENE.md` admits a trailing `@rev-N` and a contiguous run
+# written `<family>-<slug>-N..M`, which EXPANDS at authoring time - and only `gen_build_index.py`
+# expands it, which is the memory-tree kit's, and this kit copy-installs without it. Measured over
+# this corpus: 18 of 123 tracked `spec-audit` binding lines use the range form. A join that does not
+# expand blocks a unit that WAS audited under `TOOL-x-1..5`; a join that matches as a SUBSTRING lets
+# `TOOL-x-19` satisfy `TOOL-x-1`. This emits whole tokens, one per line, for a `grep -qxF` join.
+expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, one per line
+  awk '{
+    n = split($0, w, /[ \t]+/)
+    for (i = 1; i <= n; i++) {
+      t = w[i]
+      sub(/@rev-[0-9]+$/, "", t)
+      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+\.\.[0-9]+$/) {
+        p = index(t, "..")
+        head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
+        match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0
+        stem = substr(head, 1, RSTART - 1)
+        for (k = lo; k <= hi; k++) print stem k
+      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
+    }
+  }'
+}
+# The build folder an ask is FILED in: the slug segment of its own id. An id nobody filed still
+# names its home this way, which is what lets the P5 refusal say WHERE to go and look. MOVED HERE
+# from the driver with the expander above, and for the same reason: the leg reads the same blob per
+# home and a second spelling of "which folder" would send the two readers at different files.
+ask_home_of() { # ask id -> the slug segment
+  local _t="${1#*-}"; printf '%s' "${_t%-*}"
+}

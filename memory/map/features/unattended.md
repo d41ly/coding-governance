@@ -201,6 +201,12 @@ exist, because the act is a field of the reason. The history complement subtract
 without that a retire row matches both alternations and `--status` reports one row as a decision AND
 as a note.
 
+**The leg second-opinions the ask mandate from inputs the run cannot move.** `asks:` against the
+README at BASE, P5 from the home BACKLOG blob at `m-base:`, and `m-base:` as the merge-base of the
+pinned `anchor-sha:` and HEAD at preflight, never `base:`. Check 37 bans a foreign anchor in the
+run's folder by the recall kit's own `anchor_at`, reached through `RECALL_CLI`. `asks-ready:` and
+the freeze are re-derived by re-running `ASKS_CMD` until the record is published.
+
 ## Shared seams
 
 - `memory/guides/REVIEW-PROTOCOL.md` — the structural precedent for a BINDING guide: charter-cited,
@@ -243,19 +249,12 @@ silently; re-derive this section whenever the feature is touched.*
   `assertion-between-two-derived-values` was found here, in this kit's own leg, and the arm that
   proves it is this kit's. The class is general — any checker that composes both sides of a
   comparison has it — and nothing sweeps for it repo-wide.
-- **The gate leg still recomputes BASE against a live local ref.** The driver's anchor is observed;
-  the leg's is not. It reads `GOV_DEFAULT_BRANCH` and `refs/remotes/origin/<d>`, so handed a tree
-  with a forged tracking ref it recomputes the same wrong value and agrees. The driver refuses such a
-  run before a run-state file exists, so the reachable damage is bounded, but the leg's own
-  independence is not what it claims. Open as `TOOL-aStandingWrit-6`.
-
-- **Check 9's three silent exits were specced and never landed.** The `aMooredAnchor` spec's S4
-  scoped a named refusal for each — the default branch is unresolvable, no candidate ref resolves,
-  and a candidate resolves but the merge-base fails — and its rev-4 rebase note lists four items
-  carried forward with S4 absent from them. The spec closed anyway. So on a clone with no
-  `origin/HEAD` and no environment override, the whole `if [ -n "$d" ]` block is skipped in silence,
-  and check 15's ancestry half inherits that. This is an ABSENT ref, distinct from the forged one
-  above, and it was owned by nobody until this dossier row.
+- **The ask-mandate second opinions (`TOOL-dDerivedDocket-18`) have two named holes.** A producer
+  that cannot run, breaches the bound or answers in a refused shape is UNANSWERED, so a forged
+  `asks-ready:` or freeze behind a broken `ASKS_CMD` passes; and a record already on the advertised
+  default tip is never re-derived. Both are in the leg's header. Re-derived 2026-09-21: the two
+  check-9 rows this replaced are closed — the leg reads no local ref on the BASE path any more, and
+  an unobserved remote fails check 9 closed by name.
 
 - **The DIRECTIVE LAYER is gated on both halves.** The registry is joined to the Skill's table in
   both directions by check 16, every cited method section resolves, and the protocol's own §3 phase

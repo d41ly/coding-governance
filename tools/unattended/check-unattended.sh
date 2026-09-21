@@ -129,6 +129,12 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""
 HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LEASE_STALE_AFTER=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""
 RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
+# TOOL-dDerivedDocket-18 - the two optional declared commands the ask-mandate second opinions read.
+# BOTH default to blank and blank means NOT ADOPTED, which is the register both keys already sit in
+# elsewhere in this kit. They are initialised HERE and admitted by the allow-list below, or the leg
+# would read them blank whatever the project declares and every arm keyed on them would announce a
+# skip on an adopting repo - a check that is dark while reading green.
+RECALL_CLI=""; ASKS_CMD=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
 # ---- and the second is why the guard is now structural rather than a probe.
 # ----
@@ -194,6 +200,7 @@ while IFS= read -r -d '' _ck; do
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
     HALT_FLOOR|HOLD_CODES_EXTRA|HOLD_FLOOR|LEASE_STALE_AFTER|\
     RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
+    RECALL_CLI|ASKS_CMD|\
     UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
     # gov:conf-allow-end
   esac
@@ -402,6 +409,85 @@ HALT_CODES_CORE=$(core_of HALT_CODES_CORE)
 # nothing grades is a vocabulary with a floor nobody enforces.
 HOLD_CODES_CORE=$(core_of HOLD_CODES_CORE)
 HALT_CODES="$HALT_CODES_CORE $HALT_CODES_EXTRA"
+
+# ---- TOOL-dDerivedDocket-18 — the driver's UNQUOTED numeric constants. `core_of` above matches
+# ---- `KEY="value"` and nothing else, by a contract check 1 refuses on, so a constant the driver
+# ---- declares BARE is invisible to it and reads as the empty string. Two ways out were rejected:
+# ---- quoting the driver's declaration is a kit file edited to suit its reader, and restating the
+# ---- number here is the drift this whole file exists to catch. This reads the bare form instead.
+# ---- DIGITS ONLY. A bare value that is not a plain integer is NOT an answer — it comes back empty,
+# ---- exactly as `core_of` does on an unreadable line, and the caller names its own skip. Widening
+# ---- this to "anything after the `=`" would import an unquoted expression, a trailing comment and
+# ---- a `$(…)` as though they were constants.
+read_bare_const() { # KEY  ->  the unquoted integer from $DRIVER, or nothing
+  local l p="$1=" v
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    while :; do case "$l" in *' '|*$'\t') l=${l%?} ;; *) break ;; esac; done
+    case "$l" in
+      "$p"*) v=${l#"$p"}
+             case "$v" in ""|*[!0-9]*) ;; *) printf '%s\n' "$v"; return 0 ;; esac ;;
+    esac
+  done < "$DRIVER"
+  return 0
+}
+# ---- The declared shape of the ask generator's projection, read from the driver for the reason
+# ---- every other closed set here is: the leg re-runs the SAME two call shapes the driver runs
+# ---- (S8) and a second spelling of the column contract is how the two come to read different
+# ---- fields of one row. An unreadable value is a NAMED SKIP at the arm, never a guessed width.
+# ---- READ LAZILY, on the first producer call and never before it. The three keys sit ~2700 lines
+# ---- into the driver, so the pure-bash scan costs about a third of a second each - measured on
+# ---- node d 2026-09-21, a second a leg run, paid by every run of this leg and every arm of its
+# ---- suite for records that do not exist yet. Only a mandated, unpublished record reaches a call.
+ASK_TSV_HEAD=""; ASK_TSV_EXAMINED=""; ASK_TSV_FIELDS=""; ASK_TSV_READ=0
+read_ask_tsv_contract() {
+  [ "$ASK_TSV_READ" = 1 ] && return 0
+  ASK_TSV_READ=1
+  ASK_TSV_HEAD=$(core_of ASK_TSV_HEAD)
+  ASK_TSV_EXAMINED=$(core_of ASK_TSV_EXAMINED)
+  ASK_TSV_FIELDS=$(read_bare_const ASK_TSV_FIELDS)
+}
+
+# ---- TOOL-dDerivedDocket-18 — THE PYTHON LAUNCHER, RESOLVED. The anchor ban below reaches the
+# ---- recall kit's own extractor through an interpreter, and this leg is the first thing in the kit
+# ---- to spawn one. The block between the markers is byte-identical to the canonical copy its own
+# ---- marker line names, and its parity gate reds if it drifts; it is carried INLINE because a
+# ---- copy-installed kit has
+# ---- no shared library to source, which is the same reason the driver has carried it since
+# ---- aDeferredBar. A resolver that finds no usable launcher is a NAMED SKIP at the arm, never a
+# ---- silent pass: being on PATH is not evidence, so the candidate is RUN.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
   fail 1 "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set: $DRIVER"
   exit "$status"
@@ -1304,7 +1390,221 @@ resolve_introducing_commit() { # run-state path · literal line -> the introduci
   return 1
 }
 
+
+# ================ THE ASK MANDATE, SECOND-OPINIONED — TOOL-dDerivedDocket-18 ======================
+# Unit 16 pins `asks:`, `m-base:` and `asks-ready:` at preflight and unit 17 freezes
+# `asks-at-landing:` at the landing. Every one of those facts is written into a run-state file BY
+# THE RUN BEING GRADED, so the bar needs its own reading of each, re-derived from inputs the run
+# cannot move. That is the pattern check 19 already applies to `authorized-by:`, `playbook:` and
+# `pieces:`, extended to the four facts the ask path adds.
+#
+# A SECOND OPINION AND NOT A SECOND IMPLEMENTATION. Nothing here re-implements the READY rule or
+# the status fold: the arm below re-RUNS the project's own declared producer over the inputs the
+# record pinned and compares. The independence is in the INPUTS, never in a second grammar — which
+# is why the ask-row match, the id-range expander and the filing home are the kit library's,
+# shared with the driver, rather than spelled a second time here.
+#
+# WHAT THESE ARMS DO NOT CHECK, said here because a structural check reads as a semantic one to
+# everybody who did not write it:
+#   * a declared producer that cannot be run, breaches the bound, or answers in a shape this leg
+#     refuses is reported UNANSWERED and never red. "This pin is forged" and "nobody could ask" are
+#     different claims, and a bar that reds on a broken external command sends its reader at the
+#     wrong thing. A forged pin behind a broken producer is therefore invisible here.
+#   * a record whose preflight commit is already reachable from the advertised default tip is
+#     counted and NOT re-derived, so a pin that was wrong when written and has since landed is out
+#     of reach here for ever. That is the price of never grading an archived record against a
+#     producer whose rules moved after it landed.
+#   * the freeze is re-derived at the FIRST PARENT of the commit that introduced it, which is the
+#     tree the landing verb examined under both lander modes. A project whose lander commits the
+#     record somewhere else gets a re-derivation of a different tree — and that is a RED here, not
+#     a skip, because the leg cannot tell it from a forged freeze.
+#   * none of it says the asks were answered WELL. It says the facts on the record are the ones its
+#     own declared inputs produce.
+
+# The `asks:` value out of a build README blob's front matter, parsed HERE rather than read back
+# from the record — the same shape as the `authorized-by:` and `playbook:` reads in check 19 above.
+# FRONT MATTER ONLY, closing on the first `---` after line 1, for the reason that parse gives: `---`
+# is also a horizontal rule, so a scan running to the end of the file could take an `asks:` line out
+# of the body and read a sentence as a mandate.
+read_asks_of() { # README blob text -> the asks: value, or nothing
+  printf '%s\n' "$1" | awk '
+    NR == 1 { next }
+    /^---[[:space:]]*\r?$/ { exit }
+    /^asks:/ { v = $0; sub(/^asks:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }'
+}
+
+# ---- THE DECLARED PRODUCER, RUN BOUNDED. S8 re-runs the driver's own two call shapes —
+# ---- `<ASKS_CMD> --tsv --ready <ids> --target <slug> --at <rev>` — over the inputs a record pinned.
+# ---- `$ASKS_CMD` IS UNQUOTED, exactly as `$WIRING_CHECK`, `$LANDER` and `$GATE_CMD` are in the
+# ---- driver, so a project may declare a launcher and a script rather than one word.
+# ----
+# ---- CAPTURED THROUGH A FILE AND NOT A SUBSTITUTION. `out=$(timeout N cmd)` reads until EOF and a
+# ---- surviving descendant holds the pipe, so the verdict would be bounded while the clock is not —
+# ---- the defect this leg already records against its own remote observation.
+# ----
+# ---- THE BOUND IS THE ONE THIS LEG ALREADY READS FROM THE DRIVER. A second number declared here
+# ---- would be a bound that goes wrong silently when the driver's moves, and the driver's own
+# ---- `GATE_BOUND` is an hour — a figure written for a whole merge bar and not for one leg of one.
+# ---- A BREACH IS UNANSWERED, NEVER A RED: "this ask is not ready" and "nobody asked" are not the
+# ---- same claim, and this leg says which it observed.
+AQ_ROWS=""; AQ_WHY=""
+run_ask_query() { # target slug · rev · ids… -> 0 and AQ_ROWS (id TAB status TAB ready), or 1 and AQ_WHY
+  local _tgt="$1" _rev="$2" _rc _aqd _id _bad
+  shift 2
+  AQ_ROWS=""; AQ_WHY=""
+  if [ -z "$ASKS_CMD" ]; then
+    AQ_WHY="this project declares no ASKS_CMD, so there is no producer to re-run and nothing here could grade a pinned mandate"
+    return 1
+  fi
+  read_ask_tsv_contract
+  if [ -z "$ASK_TSV_HEAD" ] || [ -z "$ASK_TSV_EXAMINED" ] || [ -z "$ASK_TSV_FIELDS" ]; then
+    AQ_WHY="the driver declares no readable projection contract — its row keyword, its examined keyword or its field count — so a positional read of the producer's rows here would report columns nobody printed"
+    return 1
+  fi
+  _aqd=$(mktemp -d) || { AQ_WHY="cannot create a capture directory, so this leg observed NOTHING of the declared producer; that is a fault on THIS side rather than an answer about any pin"; return 1; }
+  if [ "$REMOTE_BOUND_LIVE" = 1 ]; then
+    timeout -k 5s "$REMOTE_BOUND" $ASKS_CMD --tsv --ready "$@" --target "$_tgt" --at "$_rev" \
+      </dev/null >"$_aqd/out" 2>"$_aqd/err"
+    _rc=$?
+  else
+    $ASKS_CMD --tsv --ready "$@" --target "$_tgt" --at "$_rev" \
+      </dev/null >"$_aqd/out" 2>"$_aqd/err"
+    _rc=$?
+  fi
+  # ONE AWK over the whole stream, in the driver's own projection order, keeping the three columns
+  # every caller here reads. Anything that is neither a row of the declared width nor the declared
+  # `examined` line emits a `BAD` line and stops, so the refusal can quote what it refused.
+  # STDOUT ONLY. The producer's notices are on stderr by contract (TOOL-dDerivedDocket-48), and a
+  # parse that refused any line not leading with the row keyword would read a HEALTHY producer as a
+  # malformed one.
+  AQ_ROWS=$(ASK_HEAD="$ASK_TSV_HEAD" ASK_EX="$ASK_TSV_EXAMINED" ASK_N="$ASK_TSV_FIELDS" awk -F'\t' '
+      BEGIN { h = ENVIRON["ASK_HEAD"]; ex = ENVIRON["ASK_EX"]; want = ENVIRON["ASK_N"] + 0 }
+      $0 == "" { next }
+      $1 == ex { next }
+      $1 == h && NF == want { print $2 "\t" $3 "\t" $7; next }
+      { print "BAD\t" $0; exit }' "$_aqd/out")
+  _bad=$(printf '%s\n' "$AQ_ROWS" | sed -n 's/^BAD\t//p' | sed -n 1p)
+  rm -rf "$_aqd" 2>/dev/null
+  if [ "$_rc" = 124 ]; then
+    AQ_ROWS=""
+    AQ_WHY="the declared producer was KILLED by this leg's wall-clock bound of ${REMOTE_BOUND}s rather than answering, so the pin was NEVER ANSWERED here; that is a stalled or absent generator and not a statement about the pin"
+    return 1
+  fi
+  if [ -n "$_bad" ]; then
+    AQ_ROWS=""
+    AQ_WHY="the declared producer printed a line that is not the $ASK_TSV_FIELDS-field $ASK_TSV_HEAD projection, so a positional read of it would report fields nobody printed — the line: $_bad"
+    return 1
+  fi
+  if [ "$_rc" != 0 ]; then
+    AQ_ROWS=""
+    AQ_WHY="the declared producer exited $_rc, so the rows it printed are not an answer this leg may grade a pin against"
+    return 1
+  fi
+  # THE MANDATE IS ITERATED, NEVER THE ROWS. A loop over what came back can only confirm what came
+  # back: a producer that dropped an id would be graded on the ids it did return, and the missing
+  # one would never be mentioned at all.
+  for _id in "$@"; do
+    printf '%s\n' "$AQ_ROWS" | cut -f1 | grep -qxF -- "$_id" && continue
+    AQ_ROWS=""
+    AQ_WHY="DEAD PROBE — the declared producer answered for fewer asks than it was asked about, and an id it never graded is an id nothing here can compare: $_id is missing from its rows"
+    return 1
+  done
+  return 0
+}
+# One projected row's field, BY NAME, so no caller here counts tabs.
+read_ask_row() { # ask id · status|ready -> the value, or nothing
+  local _n
+  case "$2" in status) _n=2 ;; ready) _n=3 ;; *) return 0 ;; esac
+  printf '%s\n' "$AQ_ROWS" | awk -F'\t' -v i="$1" -v n="$_n" '$1 == i { print $n; exit }'
+}
+
+# ---- S3's ANCHOR JUDGEMENT, THROUGH THE RECALL KIT'S OWN EXTRACTOR. Whether a line ANCHORS an id
+# ---- (defines the record) or merely cites one is that kit's `anchor_at`, and a local list of the
+# ---- shapes it admits is two copies of one grammar: they disagree silently, and the copy is always
+# ---- the one that rots. The extractor is reached through the DECLARED `RECALL_CLI`, whose
+# ---- directory holds it — a kit file may name nothing outside itself by literal, and a
+# ---- `tools/<kit>/` spelling resolves to nothing in an adopter installed at another prefix.
+# ----
+# ---- A BLANK KEY, A MISSING EXTRACTOR AND AN UNRESOLVABLE INTERPRETER ARE THREE NAMED SKIPS. None
+# ---- of them is zero anchors found, and the caller prints which one it took.
+ASK_ANCHOR_PY='
+import sys
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+try:
+    import extract
+except Exception as exc:
+    sys.stderr.write("the anchor extractor did not import: %s\n" % exc)
+    raise SystemExit(3)
+try:
+    g = extract.grammar_for(sys.argv[2])
+except Exception as exc:
+    sys.stderr.write("the anchor extractor could not bind a grammar: %s\n" % exc)
+    raise SystemExit(3)
+slug = sys.argv[3]
+for raw in sys.stdin.read().split("\n"):
+    path = raw.rstrip("\r")
+    if not path:
+        continue
+    try:
+        with open(path, "rb") as fh:
+            body = fh.read().decode("utf-8", "replace")
+    except OSError:
+        continue
+    for i, line in enumerate(body.replace("\r\n", "\n").split("\n"), 1):
+        got = extract.anchor_at(line, g)
+        if not got:
+            continue
+        home = got.split("-", 1)[1].rsplit("-", 1)[0]
+        if home != slug:
+            sys.stdout.write("%s\t%d\t%s\n" % (path, i, got))
+'
+ASK_ANCHORS=""; ASK_ANCHOR_WHY=""
+scan_foreign_anchors() { # build folder · slug -> 0 and ASK_ANCHORS, or 1 and ASK_ANCHOR_WHY
+  local _dir="$1" _slug="$2" _rdir _ext _py _rc _askd
+  ASK_ANCHORS=""; ASK_ANCHOR_WHY=""
+  if [ -z "$RECALL_CLI" ]; then
+    ASK_ANCHOR_WHY="RECALL_CLI is blank in this project, so the recall kit is not adopted here and the anchor grammar this arm judges by is absent — which is NOT the same answer as no foreign anchor found"
+    return 1
+  fi
+  case "$RECALL_CLI" in */*) _rdir="${RECALL_CLI%/*}" ;; *) _rdir="." ;; esac
+  _ext="$_rdir/extract.py"
+  if [ ! -f "$_ext" ]; then
+    ASK_ANCHOR_WHY="the declared RECALL_CLI names a directory that holds no anchor extractor, so there is no grammar to read and a local copy of its shapes would be a second one: $_ext"
+    return 1
+  fi
+  _py=$(resolve_python 2>/dev/null) || _py=""
+  if [ -z "$_py" ]; then
+    ASK_ANCHOR_WHY="no python launcher on this node RAN, so the anchor extractor could not be reached; every candidate is executed rather than looked up, because being on PATH is not evidence"
+    return 1
+  fi
+  _askd=$(mktemp -d) || { ASK_ANCHOR_WHY="cannot create a capture directory, so the anchor extractor was never run and this folder went unjudged"; return 1; }
+  GIT ls-files -- "$_dir" >"$_askd/files" 2>/dev/null
+  if [ "$REMOTE_BOUND_LIVE" = 1 ]; then
+    timeout -k 5s "$REMOTE_BOUND" "$_py" -c "$ASK_ANCHOR_PY" "$_rdir" "$ROOT" "$_slug" \
+      <"$_askd/files" >"$_askd/out" 2>"$_askd/err"
+    _rc=$?
+  else
+    "$_py" -c "$ASK_ANCHOR_PY" "$_rdir" "$ROOT" "$_slug" \
+      <"$_askd/files" >"$_askd/out" 2>"$_askd/err"
+    _rc=$?
+  fi
+  ASK_ANCHORS=$(cat "$_askd/out" 2>/dev/null)
+  ASK_ANCHOR_WHY=$(sed -n 1p "$_askd/err" 2>/dev/null)
+  rm -rf "$_askd" 2>/dev/null
+  if [ "$_rc" != 0 ]; then
+    ASK_ANCHORS=""
+    [ -n "$ASK_ANCHOR_WHY" ] || ASK_ANCHOR_WHY="the anchor extractor exited $_rc without saying why"
+    return 1
+  fi
+  ASK_ANCHOR_WHY=""
+  return 0
+}
 live=""; nlive=0
+# TOOL-dDerivedDocket-18 - how many records pin an asks: fact, and how many of those were already
+# published and so deliberately not re-derived. Counted here rather than derived after the loop,
+# because the population is the loop's own and a second selection would be a second answer.
+asks_n=0; asks_pub=0
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   if [ ! -f "$f" ]; then
@@ -1717,9 +2017,231 @@ while IFS= read -r f; do
   done <<WAIVERS
 $(tr -d '' < "$f" 2>/dev/null | grep -E '^[0-9][0-9-]*T[0-9:]*Z waiver · item [^ ]* · reason ' || true)
 WAIVERS
+
+  # ---- THE ASK MANDATE, SECOND-OPINIONED — TOOL-dDerivedDocket-18. The helpers and the honest
+  # ---- limits are at the head of this file; what follows is the six arms, keyed on the ONE fact
+  # ---- that makes a record mandated. Every one of them is VACUOUS on a record with no `asks:`
+  # ---- fact, which is every record in this tree today, so the count is announced after the loop:
+  # ---- a skip that looks like a pass is indistinguishable from coverage.
+  recasks=$(fact_of "$f" asks)
+  if [ -n "$recasks" ]; then
+    asks_n=$((asks_n + 1))
+    askslug=${f#"$M/builds/"}; askslug=${askslug%%/*}
+    asksre="$M/builds/$askslug/README.md"
+    askids=$(printf '%s\n' "$recasks" | expand_id_runs)
+
+    # ---- S5: ONE AUTHORIZATION PATH (owner ruling D12-a). A mandate is admissible on the FIRST
+    # ---- anchor's discipline alone — mode `slug`, where the owner landed the folder before the run
+    # ---- existed. The driver refuses the rest at preflight, so a record reaching this arm was
+    # ---- written around the driver rather than by it. The blank-conf half is its own refusal and
+    # ---- not a consequence of the mode one: a `slug` record pinning a mandate with no declared
+    # ---- producer is a pinned set nothing ever graded.
+    askmode=$(fact_of "$f" mode)
+    [ "$askmode" = slug ] \
+      || fail 19 "a run-state file pins an asks: mandate while recording an authorization mode whose discipline lets the run reach the anchor it writes, so the mandate and the tree it is asserted against could both be this run's own: mode [${askmode:-(none)}] in $f"
+    [ -n "$ASKS_CMD" ] \
+      || fail 19 "a run-state file pins an asks: mandate while this project declares no ASKS_CMD, so nothing here or in the driver ever said whether any of that mandate is executable and every check keyed on it passes over an ungraded list: $f"
+
+    # ---- S1: THE `asks:` FACT AGAINST THE BUILD README ITSELF — at the recorded BASE, and while
+    # ---- the run is still live at HEAD too. Two halves catching two different things: a fact that
+    # ---- never matched its authorization, and an authorization edited underneath a live run
+    # ---- (property P6). A record at LANDING or at a terminal phase is PAST ITS CLOSE and the HEAD
+    # ---- half does not touch it — otherwise the owner's next edit to that README reds a landed
+    # ---- record for ever, and under the in-place lander it does so through a record that never
+    # ---- rotates.
+    if [ -n "$rb" ] && check_rev "$rb" && askbb=$(GIT show "$rb:$asksre" 2>/dev/null); then
+      askdecl=$(read_asks_of "$askbb")
+      [ "$recasks" = "$askdecl" ] \
+        || fail 19 "a run-state file pins an asks: mandate the build README at its own recorded BASE does not declare, so the set the run says authorized it is not the set its authorization asked for - pinned against declared follow: [$recasks] against [${askdecl:-(none)}] in $f"
+      case " LANDING $PHASES_TERMINAL " in
+        *" $ph "*)
+          report "check 19 did not re-read $asksre at HEAD for $f - the record is at $ph, which is past its close, and the pinned-mandate property binds a LIVE run" ;;
+        *)
+          askhead=$(read_asks_of "$(GIT show "HEAD:$asksre" 2>/dev/null)")
+          [ "$recasks" = "$askhead" ] \
+            || fail 19 "a LIVE run's build README carries an asks: line at HEAD that is not the one the run pinned, so the mandate this run will be measured against was edited underneath it - pinned against HEAD follow: [$recasks] against [${askhead:-(none)}] in $f" ;;
+      esac
+    else
+      report "check 19 could not read the build README at the recorded BASE for $f, so its asks: fact was not compared against the authorization here; check 13 owns that refusal"
+    fi
+
+    # ---- S2: PROPERTY P5 RE-DERIVED. Every mandated ask has a filed row in its HOME build's
+    # ---- BACKLOG at the tree the mandate was asserted against — the blob at `m-base:`, never the
+    # ---- working tree, because a row filed after the run began would otherwise satisfy a property
+    # ---- about provenance. The line match is the kit library's, shared with the driver's own P5:
+    # ---- the independence of a second opinion is in its INPUTS, never in a second grammar.
+    # ----
+    # ---- ...and `m-base:` ITSELF is graded against the pinned `anchor-sha:` and never against
+    # ---- `base:`, because a forged pair that agrees with itself is the whole hazard. Equality is
+    # ---- safe here in a way it is not for check 9: this is the merge-base of two FROZEN commits,
+    # ---- and a merge-base of two frozen commits never moves.
+    askmb=$(fact_of "$f" m-base)
+    askash=$(fact_of "$f" anchor-sha)
+    askpf=""
+    if [ -z "$askmb" ] || ! check_rev "$askmb"; then
+      fail 19 "a run-state file pins an asks: mandate and no m-base: this clone can read, so every property about the tree that mandate was asserted against would be graded over an empty blob or, worse, over the index the run itself staged: m-base [${askmb:-(none)}] in $f"
+    else
+      askhomeseen=""; askhomeblob=""
+      for askid in $askids; do
+        askhome=$(ask_home_of "$askid")
+        if [ "$askhome" != "$askhomeseen" ]; then
+          askhomeseen=$askhome
+          askhomeblob=$(GIT show "$askmb:$M/builds/$askhome/BACKLOG.md" 2>/dev/null || true)
+        fi
+        ask_filed_in "$askhomeblob" "$askid" \
+          || fail 19 "a mandated ask has no filed row in the tree this run pinned its mandate against, so the run was authorized by a record that tree does not carry and could have written the row itself: $askid, wanted in $M/builds/$askhome/BACKLOG.md at $askmb"
+      done
+      # HEAD AT PREFLIGHT is the FIRST PARENT of the earliest commit whose copy of this record
+      # carries the `m-base:` line: preflight refuses a dirty tree and stages the record, so the
+      # next commit carries it. `resolve_introducing_commit` says when it cannot name that commit
+      # rather than handing back a plausible wrong one.
+      askpf=$(resolve_introducing_commit "$f" "m-base: $askmb" 2>/dev/null) || askpf=""
+      askpar=""
+      [ -n "$askpf" ] && askpar=$(GIT rev-parse --verify --quiet "$askpf^1^{commit}" 2>/dev/null)
+      askwant=""
+      [ -n "$askpar" ] && [ -n "$askash" ] && check_rev "$askash" \
+        && askwant=$(GIT merge-base "$askash" "$askpar" 2>/dev/null)
+      if [ -n "$askwant" ]; then
+        askgot=$(resolve_full_sha "$askmb"); [ -n "$askgot" ] || askgot=$askmb
+        [ "$askgot" = "$askwant" ] \
+          || fail 19 "a run-state file's m-base: is not the merge-base of the anchor it pinned and the tree its own preflight stood on, so the tree its mandate was asserted against was chosen rather than derived - recorded against re-derived follow: [$askmb] against [$askwant] in $f"
+      else
+        report "check 19 FELL BACK TO ANCESTRY for the m-base: of $f - the commit that introduced that line, or its first parent, could not be named, so this is the weaker reading and a pin moved to any older common commit passes it"
+        askfb=1
+        { [ -n "$askash" ] && check_rev "$askash" \
+          && GIT merge-base --is-ancestor "$askmb" "$askash" 2>/dev/null; } || askfb=0
+        check_head_reaches "$askmb" || askfb=0
+        [ "$askfb" = 1 ] \
+          || fail 19 "a run-state file's m-base: is not an ancestor of both the anchor it pinned and this working history, so the tree its mandate was asserted against does not lie on the history that authorized the run: m-base [$askmb] against anchor [${askash:-(none)}] in $f"
+      fi
+    fi
+
+    # ---- S3: THE FOLDER-WIDE ANCHOR BAN. No tracked file under a mandated run's own build folder
+    # ---- may ANCHOR an id whose slug is not this build's. Both a foreign ask id and a foreign unit
+    # ---- id anchored here make this build a SECOND CLAIMANT for a record it does not own, and the
+    # ---- narrower predicate — "an id whose ask row is filed elsewhere" — would need the witness,
+    # ---- which this arm deliberately does not read.
+    if scan_foreign_anchors "$M/builds/$askslug" "$askslug"; then
+      if [ -n "$ASK_ANCHORS" ]; then
+        askhit=$(printf '%s\n' "$ASK_ANCHORS" | sed -n 1p | tr '\t' ':')
+        askhitn=$(printf '%s\n' "$ASK_ANCHORS" | grep -c . || true)
+        fail 37 "a mandated run's own build folder ANCHORS a record id belonging to another build, so this folder is a second claimant for an id it does not own and the two builds' records can no longer be told apart: $askhit ($askhitn in all) under $M/builds/$askslug"
+        printf '%s\n' "$ASK_ANCHORS" | tr '\t' ':' | while IFS= read -r askline; do
+          [ -n "$askline" ] && report "check 37 foreign anchor under $M/builds/$askslug: $askline"
+        done
+      else
+        report "check 37 found no foreign anchor under $M/builds/$askslug"
+      fi
+    else
+      report "check 37 SKIPPED for $M/builds/$askslug - $ASK_ANCHOR_WHY"
+    fi
+
+    # ---- S4: THE FREEZE IS PRESENT ON A LANDED RECORD, and it names every mandated id. Ruling D4
+    # ---- makes CLOSED non-absorbing, so a later REOPEN would retroactively change what a landed
+    # ---- record appears to have answered: the answer is pinned at the moment of landing or it is
+    # ---- not an answer about this run at all. A freeze missing one mandated id loses that ask's
+    # ---- frozen answer, which is why PRESENCE alone is not the check.
+    askfz=$(fact_of "$f" asks-at-landing)
+    if [ "$ph" = LANDED ]; then
+      if [ -z "$askfz" ]; then
+        fail 15 "a record claims LANDED under an asks: mandate and freezes no answer to it, so what that run actually answered is whatever the tree says today rather than what it said at landing: $f"
+      else
+        for askid in $askids; do
+          case " $askfz " in
+            *" $askid="*) ;;
+            *) fail 15 "a landed record's asks-at-landing: omits an ask its own mandate names, so that ask's answer at landing is lost and the freeze covers less than the question the run was authorized by: $askid in $f" ;;
+          esac
+        done
+      fi
+    fi
+
+    # ---- S8: THE PINS RE-DERIVED, BEFORE PUBLICATION. `asks-ready:` and the freeze are the two
+    # ---- ask facts nothing above can re-derive from a blob, because their content is the declared
+    # ---- producer's answer and not a line in a file. So the producer is RE-RUN over the inputs the
+    # ---- record pinned and its answer compared — bounded to records whose preflight commit is not
+    # ---- yet reachable from the advertised default tip. A published record is counted and left
+    # ---- alone: re-deriving one would grade an archived pin against a producer whose rules moved
+    # ---- after it landed, and it would cost one generator run per mandated record per bar for ever.
+    if [ -z "$ASKS_CMD" ]; then
+      report "check 19 did not re-derive the pins of $f - this project declares no ASKS_CMD, and S5 above has already refused the record for exactly that"
+    elif [ -z "$askpf" ]; then
+      report "check 19 SKIPPED the pin re-derivation for $f - the commit that introduced its m-base: could not be named, so whether this record is published cannot be asked at all"
+    else
+      askrederive=1
+      if [ "$ADV_HEAD_OK" != 1 ]; then
+        report "check 19 is re-deriving the pins of EVERY mandated record because this run observed no readable default-branch tip, so no record can be shown published: $f"
+      elif check_adv_reaches "$askpf"; then
+        askrederive=0
+        asks_pub=$((asks_pub + 1))
+        report "check 19 - $f is published, not re-derived: its preflight commit $askpf is an ancestor of the advertised default tip"
+      fi
+      if [ "$askrederive" = 1 ]; then
+        askready=$(fact_of "$f" asks-ready)
+        if run_ask_query "$askslug" "$askmb" $askids; then
+          askpairs=""
+          for askid in $askids; do askpairs="$askpairs $askid=$(read_ask_row "$askid" ready)"; done
+          askpairs=${askpairs# }
+          [ "$askready" = "$askpairs" ] \
+            || fail 19 "a run-state file's asks-ready: is not what the declared producer says at the very tree the run pinned, so the grades that mandate was admitted on are not the producer's - recorded against re-derived follow: [${askready:-(none)}] against [$askpairs] in $f"
+        else
+          report "check 19 reports the asks-ready: of $f UNANSWERED rather than red - $AQ_WHY"
+        fi
+        # THE FREEZE, at the FIRST PARENT of the commit that introduced it, which is the tree the
+        # landing verb examined. Its scope is the mandate THEN this build's own filings at that same
+        # commit, deduplicated, and the pairs are emitted in the driver's own stable order - slug
+        # then numeric sequence, never a string sort, which puts `-10` before `-2`.
+        if [ -n "$askfz" ]; then
+          askfzc=$(resolve_introducing_commit "$f" "asks-at-landing: $askfz" 2>/dev/null) || askfzc=""
+          askfzp=""
+          [ -n "$askfzc" ] && askfzp=$(GIT rev-parse --verify --quiet "$askfzc^1^{commit}" 2>/dev/null)
+          if [ -z "$askfzp" ]; then
+            report "check 15 SKIPPED the freeze re-derivation for $f - the commit that introduced its asks-at-landing: line, or that commit's first parent, could not be named, so the tree the landing verb examined cannot be reached"
+          else
+            askscope=""
+            for askid in $askids; do
+              case " $askscope " in *" $askid "*) continue ;; esac
+              askscope="$askscope $askid"
+            done
+            for askid in $(asks_filed_in "$(GIT show "$askfzp:$M/builds/$askslug/BACKLOG.md" 2>/dev/null)"); do
+              [ "$(ask_home_of "$askid")" = "$askslug" ] || continue
+              case " $askscope " in *" $askid "*) continue ;; esac
+              askscope="$askscope $askid"
+            done
+            askscope=${askscope# }
+            if [ -z "$askscope" ]; then
+              report "check 15 SKIPPED the freeze re-derivation for $f - its mandate expands to no id and its folder files none at that tree, so the scope the freeze covers is empty and there is nothing to compare"
+            elif run_ask_query "$askslug" "$askfzp" $askscope; then
+              askpairs=""
+              for askid in $(printf '%s\n' $askscope | sort -t- -k2,2 -k3,3n); do
+                askst=$(read_ask_row "$askid" status)
+                askpairs="$askpairs$askid=${askst:--} "
+              done
+              askpairs=${askpairs% }
+              [ "$askfz" = "$askpairs" ] \
+                || fail 15 "a landed record's asks-at-landing: is not what the declared producer says at the tree its landing verb examined, so the answer frozen into a terminal record is not the one that tree gives - recorded against re-derived follow: [$askfz] against [$askpairs] in $f"
+            else
+              report "check 15 reports the asks-at-landing: of $f UNANSWERED rather than red - $AQ_WHY"
+            fi
+          fi
+        fi
+      fi
+    fi
+  fi
 done <<EOF
 $RUNS
 EOF
+
+# ---- TOOL-dDerivedDocket-18 — THE ASK-MANDATE SECOND OPINIONS, COUNTED. One line per run, and it
+# ---- is emitted whether the count is zero or not: a check that quantifies over an empty population
+# ---- is silent for exactly the same reason a passing one is, and "no record pins an asks: fact" is
+# ---- a finding about the tree rather than a verdict about a record. On the REPORT channel with
+# ---- every other announcement of a case a check could not reach, so the contract at the head of
+# ---- this file — exit 0 and no output is clean — keeps its meaning.
+if [ "$asks_n" = 0 ]; then
+  report "the ask-mandate second opinions (checks 19, 15 and 37) are VACUOUS on this tree: 0 run-state records pin an asks: fact, so every arm examined nothing and a green verdict here is coverage of an empty population"
+else
+  report "the ask-mandate second opinions examined $asks_n run-state record(s) pinning an asks: fact, of which $asks_pub were already published on the advertised default tip and so were not re-derived"
+fi
 
 # ---- 7: REPORT the concurrent unattended runs. This check no longer asserts anything about how many
 # ---- are live, and it cannot fail. TOOL-aUnblockedFleet-2.

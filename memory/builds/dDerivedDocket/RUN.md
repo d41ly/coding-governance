@@ -208,3 +208,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T12:14:17Z dispatch · item 6af11b57 TOOL-dDerivedDocket-52 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-52.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
 
 2026-09-21T12:14:22Z brief · item TOOL-dDerivedDocket-52 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T12:56:16Z dispatch · item 89cc16cf TOOL-dDerivedDocket-18 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.sh .memory-tree.conf memory/guides/SESSION-KICKOFF.md tools/install-prefix-carried.txt tools/install-prefix-waivers.txt memory/map/features/unattended.md memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-18.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T12:56:21Z brief · item TOOL-dDerivedDocket-18 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md

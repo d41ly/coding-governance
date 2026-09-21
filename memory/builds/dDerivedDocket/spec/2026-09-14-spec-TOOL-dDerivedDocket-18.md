@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 18
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-18-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-18-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
@@ -181,7 +182,31 @@ S1, S2 and S5 are declaration second opinions and report under check 19, beside 
 extend. S4 is a terminal-record fact and reports under check 15. S8's `asks-ready:` half reports
 under check 19, its freeze half under check 15. S3 is a new class and takes a new
 leg code, allocated at build time as the next integer above the leg's highest, because other units
-of this build allocate leg codes concurrently.
+of this build allocate leg codes concurrently. Allocated at build (rev-6): check 37, the leg's
+highest having been 36.
+
+### Where the announcements go, and the bound (rev-6)
+
+Every line §6 says the leg PRINTS without redding — the vacuity count, the ancestry fallback, the
+S3 skip, the published count, the unobserved-tip reason, the unanswered producer and the S8 skip —
+is on the leg's REPORT channel, the one `GOV_UNATTENDED_REPORT=1` turns on. The leg's contract is
+that exit 0 with no default-channel output is clean, and it names the only three exceptions; a
+fourth default-channel line would falsify that sentence on every bar, and a skip announced there is
+exactly the case its exception ONE routes to REPORT. A fail line stays on the default channel.
+
+S8's producer calls are bounded by `REMOTE_BOUND`, the one wall-clock bound the leg already reads
+from the driver, and they run under the same probed `timeout -k` capability, capturing through a
+scratch file rather than a substitution. The driver's own `GATE_BOUND` is an hour, written for a
+whole merge bar, and a second number declared in the leg would drift from the driver's silently.
+The producer's column contract is read from the driver too: `ASK_TSV_HEAD` and `ASK_TSV_EXAMINED`
+through `core_of`, and the UNQUOTED `ASK_TSV_FIELDS` through a digits-only reader, `read_bare_const`,
+because `core_of` matches a quoted value only by a contract check 1 refuses on. An unreadable
+contract makes S8 report UNANSWERED rather than guess a width.
+
+`expand_id_runs` and `ask_home_of` MOVE, unchanged, from the driver into `lib-unattended.sh`. S2,
+S4 and S8 iterate "every mandated id", the leg can source no driver, and a mandate may be written
+with the `N..M` range form, so a leg-local expander would be a second grammar that disagrees
+silently on the one input that matters.
 
 ### Rollout
 
@@ -201,7 +226,10 @@ and listed between `gov:conf-allow-begin` and `gov:conf-allow-end`, so `RECALL_C
 join both or the leg reads them blank whatever the conf declares ·
 `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/lib-unattended.sh`, only if unit 16's matcher is not already there ·
-`.memory-tree.conf` for `ARMS_FLOORS` · `memory/map/features/unattended.md`.
+`.memory-tree.conf` for `ARMS_FLOORS` · `memory/map/features/unattended.md`. At build (rev-6): unit
+16's matcher was already there, and the library still moves, because `expand_id_runs` and
+`ask_home_of` move into it; `tools/unattended/unattended.sh` loses those two definitions and gains
+nothing else.
 
 ### Alternatives rejected
 
@@ -276,8 +304,8 @@ join both or the leg reads them blank whatever the conf declares ·
   refusal keys on `prompt` alone, so a `recipe` record — which resolves at the anchor the run can
   write, the same hazard — carries a pinned mandate ungraded; or the blank-conf arm is reached only
   through the mode refusal, so a `slug` record pinning a mandate with no declared producer passes.
-- **AC9** — When the leg runs over today's tree, it prints one line stating that no record pins an
-  `asks:` fact, with the count 0.
+- **AC9** — When the leg runs over today's tree with `GOV_UNATTENDED_REPORT=1`, it prints one line
+  on its report channel stating that no record pins an `asks:` fact, with the count 0.
   Red when: the leg prints nothing, so vacuity reads as a pass.
   permission: unit passes run no gate legs (fix F7, and the unit child prompt since
   TOOL-aProbedUnit-1), so this run of the leg over the real tree is observed at the one post-build
@@ -450,6 +478,21 @@ New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per a
   mode fixtures, where S5 refuses a blank conf for ANY record, so the arm was reachable through the
   mode refusal alone; it now names a THIRD fixture in mode `slug`, and its `Red when:` names that
   reading. The verifier also restored the S2 paragraph break the promotion note ran into.
+
+- rev-6 · 2026-09-21 · build pass · §4 · AC9, status CLOSED. No S-item, fork or other criterion
+  moves. Three facts the spec left to build time are recorded where they bind: S3 takes check 37,
+  the leg's highest having been 36; S8's producer calls are bounded by the driver's `REMOTE_BOUND`,
+  the one wall-clock bound the leg already reads, and the producer's column contract is read from the
+  driver, its unquoted field count through the digits-only `read_bare_const`, lazily, because the
+  scan costs about a second a leg run when paid at startup. One divergence from the estimate:
+  `expand_id_runs` and `ask_home_of` MOVE unchanged from the driver into `lib-unattended.sh`, so
+  `tools/unattended/unattended.sh` joins the write set; the leg can source no driver and a leg-local
+  range expander would be a second grammar. AC9 is AMENDED: its line is on the leg's REPORT channel
+  under `GOV_UNATTENDED_REPORT=1`, as every other line §6 says the leg prints without redding is,
+  because the leg's contract names only three default-channel exceptions and a fourth would falsify
+  it on every bar. Two refusals §5 already named get their own branches and arms: an `m-base:` this
+  clone cannot read, and the ancestry fallback failing. The suite block adds a rotated mandated
+  record, which is where `TOOL-dDerivedDocket-52`'s AC1 and AC3 left their check-19 half.
 
 ## 10. Reuse audit
 

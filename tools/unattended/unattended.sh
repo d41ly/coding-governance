@@ -2640,29 +2640,10 @@ row_ids_of() { # stdin: unit rows -> each row's own id, one per line, sorted
     printf '%s\n' "$_ri_row" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | head -1
   done | sort -u
 }
-# The RECORD-BINDING id grammar is WIDER than `_ids_of`'s, and reading it with the narrow one is
-# wrong in both directions. `memory/HYGIENE.md` admits a trailing `@rev-N` and a contiguous run
-# written `<family>-<slug>-N..M`, which EXPANDS at authoring time - and only `gen_build_index.py`
-# expands it, which is the memory-tree kit's, and this kit copy-installs without it. Measured over
-# this corpus: 18 of 123 tracked `spec-audit` binding lines use the range form. A join that does not
-# expand blocks a unit that WAS audited under `TOOL-x-1..5`; a join that matches as a SUBSTRING lets
-# `TOOL-x-19` satisfy `TOOL-x-1`. This emits whole tokens, one per line, for a `grep -qxF` join.
-expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, one per line
-  awk '{
-    n = split($0, w, /[ \t]+/)
-    for (i = 1; i <= n; i++) {
-      t = w[i]
-      sub(/@rev-[0-9]+$/, "", t)
-      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+\.\.[0-9]+$/) {
-        p = index(t, "..")
-        head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
-        match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0
-        stem = substr(head, 1, RSTART - 1)
-        for (k = lo; k <= hi; k++) print stem k
-      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
-    }
-  }'
-}
+# `expand_id_runs` USED TO BE DEFINED HERE. TOOL-dDerivedDocket-18 moved it, unchanged, into
+# `lib-unattended.sh` beside `ask_filed_in`, because the gate leg re-derives this run's pinned
+# mandate and has to expand the same ranges into the same tokens - and the leg can source no
+# driver. Its reasoning moved with it rather than being left behind as a second explanation.
 # S3 - a malformed or absent pair is a NAMED refusal rather than a silent empty selection. `region`
 # exits 3 for ABSENT and for MALFORMED alike and this kit has already paid once for reading that one
 # status as "absent", so the message names both possibilities and the repair.
@@ -2721,11 +2702,9 @@ read_asks_key() { # README blob text -> the asks: value, or nothing
 asks_ids_of() { # asks: value -> the mandated ids, one per line
   printf '%s\n' "$1" | expand_id_runs
 }
-# The build folder an ask is FILED in: the slug segment of its own id. An id nobody filed still
-# names its home this way, which is what lets the P5 refusal say WHERE to go and look.
-ask_home_of() { # ask id -> the slug segment
-  local _t="${1#*-}"; printf '%s' "${_t%-*}"
-}
+# `ask_home_of` USED TO BE DEFINED HERE, and moved to `lib-unattended.sh` with the expander above,
+# for the same reason: the leg reads one BACKLOG blob per home when it re-derives P5, and two
+# spellings of "which folder" would send the two readers at different files.
 # The two BACKLOG verbs off a spec's status header, read with the memory kit's own tolerant
 # separator and its anchored value. `order_verb_of` reads the third verb the same way and for the
 # same recorded reason: a bespoke reader disagreed with the generator on a doubled separator space
