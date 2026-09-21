@@ -24,7 +24,7 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
 ]
-guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md"]
+guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md", "UNATTENDED-ASKS.md"]
 backlog-shards = []
 lexicon-verbs = []
 [paths]
@@ -97,6 +97,12 @@ time, and its value reaches an agent only through the rendered Skill. The kit ow
 CORE of both sets and the project may only EXTEND them, asserted against a shrink-only floor —
 without that floor, deleting an item is a silent, reason-free override of everything keyed on it,
 and the fleet has a recorded case of a pin RAISE indistinguishable from a drain.
+
+**Condition 3's two keys may not name one path.** A `SHARED_RECORDS` path may never be declared by a
+pass and a `GENERATED_INDEXES` index may be, alone, so a path under both is answered by whichever
+rule `--dispatch` reaches first. The library's `scan_shared_index_overlaps` compares the two by
+containment in either direction; the driver refuses such a conf at load and the leg reports check
+38, both over the one `resolve_shared_records` default (`TOOL-dDerivedDocket-20`).
 
 **The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
 contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on

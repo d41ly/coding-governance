@@ -486,6 +486,32 @@ has   "above cap: one wave, and it is at or under the cap" "$o" "parallel:4"
 # ---- behaviour with no signal.
 has "fallback: the unit with no brief is named" "$o" "A-tB-1 has no specBriefPath"
 
+# ---- TOOL-dDerivedDocket-20 S8: a unit's `closes` ids reach ITS writer's SPEC prompt, and only its.
+# ---- Two slices at a cap of five are two writers, one unit each, so the per-unit claim is visible as
+# ---- a per-writer one. The control is the SAME args with no `closes` anywhere: the writer of the unit
+# ---- that carries none must be handed a byte-identical prompt, or the new clause leaked into a group
+# ---- that asked for nothing.
+CL_RET='{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}'
+CL_WITH='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+  {"id":"A-tB-1","order":1,"specPath":"s1","closes":["EXMP-aFoo-3","EXMP-aFoo-4"]},
+  {"id":"A-tB-2","order":2,"specPath":"s2"}]}'
+CL_NONE='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+  {"id":"A-tB-1","order":1,"specPath":"s1"},
+  {"id":"A-tB-2","order":2,"specPath":"s2"}]}'
+o=$(run_wf "$CL_WITH" "$CL_RET")
+cw0=$(printf '%s\n' "$o" | grep '^prompt:spec:tB:g0:')
+cw1=$(printf '%s\n' "$o" | grep '^prompt:spec:tB:g1:')
+o=$(run_wf "$CL_NONE" "$CL_RET")
+cn0=$(printf '%s\n' "$o" | grep '^prompt:spec:tB:g0:')
+cn1=$(printf '%s\n' "$o" | grep '^prompt:spec:tB:g1:')
+has    "closes: the unit's ids reach its own writer" "$cw0" "A-tB-1: this unit closes EXMP-aFoo-3 EXMP-aFoo-4"
+hasnt_ "closes: the other unit's writer is not handed them" "$cw1" "EXMP-aFoo-3"
+same   "closes: a unit with no closes gets its prompt unchanged" "$cw1" "$cn1"
+hasnt_ "closes: with no closes anywhere, no writer is told of any" "$cn0" "this unit closes"
+n=$((n+1)); if [ -n "$cw1" ] && [ -n "$cn1" ]; then echo "ok   closes: both controls captured a prompt"; else echo "FAIL closes: a control captured no prompt, so the byte comparison above compared two empty strings"; st=1; fi
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","closes":"EXMP-aFoo-3"}]}' "$CL_RET")
+has "closes: a string in place of a list THROWS by name" "$o" "carries a \`closes\` that is not a non-empty array of ask ids"
+
 # ---- AC4: one dead writer is REFUSED, not dropped, and its siblings still return.
 o=$(run_wf "$S3" '{"spec:tB:g0":null,"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "one dead writer: reported as DEGRADED" "$o" "DEGRADED — 1 of 3 writer(s) returned nothing"

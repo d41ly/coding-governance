@@ -143,7 +143,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate](spec/2026-09-14-spec-TOOL-dDerivedDocket-18.md) | 18 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-54 — the cross-run exclusion probe reads history unsimplified](spec/2026-09-20-spec-TOOL-dDerivedDocket-54.md) | 18 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-dDerivedDocket-19 — authority only from an owner-committed README](spec/2026-09-14-spec-TOOL-dDerivedDocket-19.md) | 19 | 2 | CLOSED | rev-7 | 2026-09-21 |
-| [TOOL-dDerivedDocket-20 — unattended carriers and the two-key refusal](spec/2026-09-14-spec-TOOL-dDerivedDocket-20.md) | 20 | 2 | SPECCED | rev-5 | 2026-09-20 |
+| [TOOL-dDerivedDocket-20 — unattended carriers and the two-key refusal](spec/2026-09-14-spec-TOOL-dDerivedDocket-20.md) | 20 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-21 — remote-relative bases and complete leg guards](spec/2026-09-14-spec-TOOL-dDerivedDocket-21.md) | 21 | 2 | SPECCED | rev-5 | 2026-09-20 |
 | [TOOL-dDerivedDocket-22 — LANDED derived from the tip](spec/2026-09-14-spec-TOOL-dDerivedDocket-22.md) | 22 | 2 | SPECCED | rev-6 | 2026-09-20 |
 | [TOOL-dDerivedDocket-23 — red attribution, report-only](spec/2026-09-14-spec-TOOL-dDerivedDocket-23.md) | 23 | 2 | SPECCED | rev-5 | 2026-09-20 |
@@ -164,7 +164,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 38 | 1 | SPECCED | rev-5 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 50 bound to this build, across 4 record folder(s).
+Records: 52 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

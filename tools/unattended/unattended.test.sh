@@ -4964,6 +4964,31 @@ run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes $KIT_REL/memory-tree/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
+# ---- TOOL-dDerivedDocket-20 S1: THE TWO HALVES MAY NOT NAME ONE PATH, refused at CONF LOAD. A path
+# ---- under both keys is answered by whichever rule above --dispatch reaches first. Three shapes, each
+# ---- a different way to get the predicate wrong: a nested pair in EACH direction reds an equality
+# ---- test, and an UNDECLARED SHARED_RECORDS reds a reader that skips the kit default. Not a `fail`
+# ---- branch - the refusal is `read_bound_key`'s echo-and-exit shape - so no armed-branch pin moves.
+TWO_KEY_MSG="a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch would answer it by whichever of condition 3's two rules it reached first and the other declaration would mean nothing"
+reset_tree
+printf '\nSHARED_RECORDS="memory"\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+out=$(run --status tRun)
+hit "$out" "$TWO_KEY_MSG"
+hit "$out" "SHARED_RECORDS memory overlaps the GENERATED_INDEXES index memory/LIVE.md"
+reset_tree
+printf '\nSHARED_RECORDS="memory/LIVE.md"\nGENERATED_INDEXES="memory:gen.py"\n' >> .unattended.conf
+hit "$(run --status tRun)" "SHARED_RECORDS memory/LIVE.md overlaps the GENERATED_INDEXES index memory"
+reset_tree
+printf '\nGENERATED_INDEXES="memory/backlog:gen.py"\n' >> .unattended.conf
+hit "$(run --status tRun)" "SHARED_RECORDS memory/backlog overlaps the GENERATED_INDEXES index memory/backlog"
+# ...a DECLARED blank is the empty set rather than the default, so the same index is then accepted,
+# and the untouched fixture conf, which declares neither key, is the control.
+reset_tree
+printf '\nSHARED_RECORDS=""\nGENERATED_INDEXES="memory/backlog:gen.py"\n' >> .unattended.conf
+miss "$(run --status tRun)" "$TWO_KEY_MSG"
+reset_tree
+miss "$(run --status tRun)" "$TWO_KEY_MSG"
+
 # ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in
 # ---- a space-joined value the path has already become two tokens by the time the verb sees it.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -7760,7 +7785,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # two, so FLOOR_SHARD_2 carries the same +31 and FLOOR_SHARD_1 is untouched. MEASURED, not typed:
 # the block was run alone behind this suite's own prologue by hand, n 20 -> 51, because this pass
 # runs no suite; the figure is the block's own and keeps the headroom declared above.
-FLOOR_ASSERTIONS=1008
+# RAISED 1008 -> 1014 by TOOL-dDerivedDocket-20, the conf-load two-key arms: six assertions, all in
+# region two beside condition 3's own arms, so FLOOR_SHARD_2 carries the same +6 and FLOOR_SHARD_1
+# is untouched. COUNTED off the block's own `hit`/`miss` lines, every one unconditional; this pass
+# runs no suite, and the refusal each arm names was observed by hand over a scratch fixture conf.
+FLOOR_ASSERTIONS=1014
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -7804,7 +7833,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=812
+FLOOR_SHARD_2=818
+# +6 for the TOOL-dDerivedDocket-20 two-key arms, all in region two - see FLOOR_ASSERTIONS.
 # +31 for the TOOL-dDerivedDocket-19 grant arms, all in region two - see FLOOR_ASSERTIONS.
 # +43 for the TOOL-dDerivedDocket-17 asks-disposed and freeze arms, all in region two — see
 # FLOOR_ASSERTIONS. `dispsetup`'s one `mutate` lives in that block too, not in the prologue, so

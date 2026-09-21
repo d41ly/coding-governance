@@ -274,6 +274,13 @@ VERBS_OUT="$ROOT/$VERBS_REL"
 STOPS_SHIP="$KIT_DIR/STOPS.template.md"
 STOPS_REL="$MEMORY_ROOT/guides/UNATTENDED-STOPS.md"
 STOPS_OUT="$ROOT/$STOPS_REL"
+# the SEVENTH artifact, the ask guide (TOOL-dDerivedDocket-20 S4). The ask contract - routes,
+# orientation, owner-call parking, discovery filing and the asks-disposed terms - did not fit in a
+# protocol a kilobyte under its cap. Copied rather than rendered, for the reason the four above it
+# are: it carries no placeholder, so a render step would be a second spelling of `cat`.
+ASKS_SHIP="$KIT_DIR/ASKS.template.md"
+ASKS_REL="$MEMORY_ROOT/guides/UNATTENDED-ASKS.md"
+ASKS_OUT="$ROOT/$ASKS_REL"
 # the FIFTH artifact (TOOL-dRetiredFork-12), and the only one besides the Skill that is RENDERED
 # rather than copied: it carries `{{KIT_DIR}}` five times. It also lands inside the kit directory
 # rather than under the memory root, because it is a fixture the kit's own validity gate reads.
@@ -396,6 +403,13 @@ if [ "$MODE" = "--check" ]; then
   if ! diff -q <(tr -d '' < "$STOPS_OUT") "$STOPS_SHIP" >/dev/null 2>&1; then
     echo "unattended: $STOPS_REL has drifted from the shipped stop contract; re-run $0"; exit 1
   fi
+  # the SEVENTH artifact, the same two refusals for the same reason.
+  if [ ! -f "$ASKS_OUT" ]; then
+    echo "unattended: $ASKS_REL is missing — run $0 to install the ask guide"; exit 1
+  fi
+  if ! diff -q <(tr -d '' < "$ASKS_OUT") "$ASKS_SHIP" >/dev/null 2>&1; then
+    echo "unattended: $ASKS_REL has drifted from the shipped ask guide; re-run $0"; exit 1
+  fi
   # the FIFTH artifact. RENDERED, so it is compared the way the Skill is and not the way the three
   # copied ones are: re-render from the template and diff. This is the parity assertion that makes
   # the role change safe -- at the default prefix the render must reproduce the committed bytes
@@ -505,6 +519,12 @@ fi
 if [ ! -f "$STOPS_OUT" ] || ! diff -q <(tr -d '' < "$STOPS_OUT") "$STOPS_SHIP" >/dev/null 2>&1; then
   tr -d '' < "$STOPS_SHIP" > "$STOPS_OUT"
   echo "unattended: installed $STOPS_REL"
+fi
+# the ask guide, the same shape again. Without this the kit would ship a gate its own adopter could
+# not satisfy, which is the defect the protocol block above records having had.
+if [ ! -f "$ASKS_OUT" ] || ! diff -q <(tr -d '' < "$ASKS_OUT") "$ASKS_SHIP" >/dev/null 2>&1; then
+  tr -d '' < "$ASKS_SHIP" > "$ASKS_OUT"
+  echo "unattended: installed $ASKS_REL"
 fi
 # the fifth artifact, RENDERED rather than copied. It is written into the kit directory itself, so
 # an adopter installed at any prefix gets a fixture whose paths name THEIR prefix -- which is the

@@ -52,6 +52,8 @@ cp "$HERE/unattended.sh" "$HERE/check-unattended.sh" "$HERE/lib-unattended.sh" "
 cp "$HERE/../../memory/guides/BUILD-METHOD.md" memory/guides/
 cp "$HERE/../../memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
 cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
+cp "$HERE/ASKS.template.md" tools/unattended/
+cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
 sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|tools/unattended|g' \
     -e 's|{{KEEPALIVE_CREATE}}|CronCreate|g' -e 's|{{KEEPALIVE_DELETE}}|CronDelete|g' \
     -e 's|{{RESUME_SCHEDULE_CREATE}}|TheScheduleCreate|g' -e 's|{{RESUME_SCHEDULE_DELETE}}|TheScheduleDelete|g' \

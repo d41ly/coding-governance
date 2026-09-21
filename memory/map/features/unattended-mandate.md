@@ -24,6 +24,7 @@ globs = [
   "tools/unattended/check-unattended.sh",
   "tools/unattended/lib-unattended.sh",
   "memory/guides/UNATTENDED-PROTOCOL.md",
+  "memory/guides/UNATTENDED-ASKS.md",
   ".unattended.conf",
 ]
 ```
@@ -85,6 +86,14 @@ commits for one writing a `may:` line into any build README: a live record to HE
 advertised tip, a terminal one from its witness past what `read_run_exclusions` reads off the merges
 behind it, a merge answering only for the lines neither parent holds. An ask-row `may` is a proposal
 the owner copies by hand, and a `SCOPE`-row one is V13.
+
+**The ask contract is its own carrier, and the Skill routes into it** (`TOOL-dDerivedDocket-20`).
+`UNATTENDED-ASKS.md` — check 10's third byte-compared pair — holds the routes, P5 and P6,
+orientation per ask, owner-call parking, discovery filing, the `asks-disposed` terms and the
+`ASKS_CMD` call shapes, because the protocol stood a kilobyte under its cap. Ids, a prompt naming ids
+and a filing-home slug all route to `--preflight`'s check-6 refusal, whose scaffold recipe the run
+relays and never runs: only an owner-landed README carries a mandate. Each Skill step names the
+guide section it follows and states no rule of its own.
 
 ## Shared seams
 

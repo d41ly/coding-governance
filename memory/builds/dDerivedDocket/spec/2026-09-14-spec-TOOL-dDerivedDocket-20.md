@@ -1,12 +1,14 @@
 # TOOL-dDerivedDocket-20 — unattended carriers and the two-key refusal
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 20
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 20
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-20-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-20-1-acceptance-ledger.md) | journal | — |
+| [2026-09-21-build-TOOL-dDerivedDocket-20-2-carrier-sweep.md](../build/2026-09-21-build-TOOL-dDerivedDocket-20-2-carrier-sweep.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 |
@@ -63,8 +65,9 @@ index.
   paragraph. Observed by AC3.
 - **S4** A companion guide: `tools/unattended/ASKS.template.md`, installed as
   `memory/guides/UNATTENDED-ASKS.md` by `tools/unattended/adopt-unattended.sh`, declared in the kit
-  descriptor with an LF pin, and byte-compared as a pair in leg check 10 beside the protocol, verbs
-  and stops pairs (unit 4 S10 adds the stops pair first). It carries the ask contract of design
+  descriptor with an LF pin, and byte-compared as a pair in leg check 10 beside the protocol and
+  verbs pairs, the third pair that check compares; unit 4 S10 installs the stop contract through
+  its adopter alone and never added a check-10 pair for it. It carries the ask contract of design
   §19.2 to §19.6 as the rulings amended it, and the `asks-disposed` terms, override route and KEEP
   rule unit 17 hands off. Observed by AC4.
 - **S5** Skill routing, in `tools/unattended/SKILL.template.md` and its render: a slug whose README
@@ -162,7 +165,7 @@ A path in `SHARED_RECORDS` may never be declared by a pass. An index in `GENERAT
 alone. One path in both makes `--dispatch` answer by whichever rule it reaches first
 (`tools/unattended/unattended.sh:5051-5131`), and makes the declaration of the other meaningless.
 The predicate compares the kit's own two keys and nothing else, so it lands in any adopter
-unchanged. Gov declares no overlap at BASE (`.unattended.conf:236-237`), so it lands green; the
+unchanged. Gov declares no overlap at BASE (`.unattended.conf:294-295`), so it lands green; the
 switch-over edits both keys in one commit and this is what catches a half edit.
 
 ### Wording that is true in both modes
@@ -556,6 +559,24 @@ New arm: `tools/workflows/unattended-build.test.sh` · a unit carrying `closes` 
   new phrase in the pointer row, which was the one row with no phrase of its own, and S3 says the
   pointer sentence is spelled to carry it and that §11's kept sentence is deliberately uncounted.
   This was the review's own first option, which the M8 fold did not take.
+- rev-6 · 2026-09-21 · §2 · §4 · S4 · the build pass. S4 read that check 10 compares a stops pair
+  that unit 4 adds first; on the tree check 10 carries two pairs, protocol and verbs, and unit 4
+  installs `UNATTENDED-STOPS.md` through the adopter alone, so the ask guide is the THIRD pair and
+  AC4's pair count reads three. The leg's check code allocated at build time is 38, the next free
+  integer above check 37. Gov's two keys moved to `.unattended.conf:294-295`. Built beyond the
+  letter, each named here: the S9 sweep found the Skill's plan loop still said `--plan` prints four
+  `next:` shapes, which unit 16's UNDECIDED shape made five, and found protocol §11's
+  no-machine-half paragraph still saying a declined discovery leaves a backlog row, so both
+  sentences changed with the rest, and check 38 took its carrier sentence in the protocol's
+  `SHARED_RECORDS` row; S5's route is its own Skill section, "Ids go through the
+  scaffold", with S6's steps as the slug path's steps 5 and 6; the harness refuses a `closes` that
+  is not a non-empty array of ids rather than coercing one; and the fixture seed in
+  `tools/unattended/cross-component.test.sh` copies the ask-guide pair, as the leg suite's own seeds
+  do, because check 10 would otherwise red every arm there on the missing pair. S10's `guides` key
+  is claimed in `memory/map/features/unattended.md` as written; the prose refresh about the ask
+  contract lands in `memory/map/features/unattended-mandate.md`, the dossier split out for what a
+  run was pointed at, and the two-key paragraph in `unattended.md`. No S-item's scope moved, no
+  cap was raised, and no criterion changed.
 
 ## 10. Reuse audit
 

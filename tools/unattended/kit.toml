@@ -68,6 +68,16 @@ role = "rendered"
 to = "{memory_root}/guides/UNATTENDED-STOPS.md"
 placeholders = []
 
+# the ask guide (TOOL-dDerivedDocket-20 S4): routes, the mandate's two added properties, orientation,
+# owner-call parking, discovery filing, the asks-disposed terms and the ASKS_CMD call shapes. The
+# protocol stood a kilobyte under its cap with five units still owing it text, so the contract went
+# to its own pair, on the verb carrier's precedent. Placeholder-free like the four above it.
+[[files]]
+include = ["ASKS.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/UNATTENDED-ASKS.md"
+placeholders = []
+
 # the playbook template. Placeholder-free like the protocol, so the
 # adopter copies it rather than rendering it.
 [[files]]
@@ -280,6 +290,9 @@ why = "an installed artifact both its adopter and check 10 byte-compare"
 [[lf_pin]]
 pattern = "{memory_root}/guides/UNATTENDED-STOPS.md"
 why = "an installed artifact its own adopter byte-compares"
+[[lf_pin]]
+pattern = "{memory_root}/guides/UNATTENDED-ASKS.md"
+why = "an installed artifact both its adopter and check 10 byte-compare"
 [[lf_pin]]
 pattern = ".claude/skills/unattended/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

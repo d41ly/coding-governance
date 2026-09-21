@@ -141,6 +141,7 @@ function chunk(a, n) {
 //   base: "<immutable sha>",                        // the review anchor, for the record
 //   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
 //            specBriefPath,                        //   optional: the per-unit SPEC brief
+//            closes,                               //   optional: [<ask id>], the asks this unit answers
 //            planState }],                         //   REQUIRED in attended mode, from --plan
 //   mode: "unattended" | "attended",              // DEFAULTS to "unattended"
 //   runStateExists: <bool>,                         // caller-supplied; this script cannot detect it
@@ -247,6 +248,22 @@ for (const t of TYPED) {
     )
   }
 }
+// TOOL-dDerivedDocket-20 S8 — A UNIT'S `closes` LIST, when present, is an array of ask ids and nothing
+// else. It is the ONE carrier of which asks a unit groups (the build method's M2), so a string, an
+// empty entry or a non-array is refused by name rather than coerced: a coerced list attributes asks
+// to a unit nobody pointed at them.
+for (const u of units) {
+  if (u.closes === undefined) continue
+  const ok = Array.isArray(u.closes) && u.closes.length > 0 &&
+    u.closes.every(function (id) { return typeof id === 'string' && /^\S+$/.test(id) })
+  if (!ok) {
+    throw new Error(
+      'unattended-build: unit ' + u.id + ' carries a `closes` that is not a non-empty array of ask ids, ' +
+        'got ' + JSON.stringify(u.closes) + '. Refusing rather than coercing: this list is the only ' +
+        'record of which asks the unit answers, and a coerced one attributes them to the wrong unit.',
+    )
+  }
+}
 const roundNo = a.round === undefined ? 1 : a.round
 const subjectRound = a.subjectRound === undefined ? roundNo : a.subjectRound
 const subject = slug + '-spec-set-r' + subjectRound
@@ -328,6 +345,16 @@ function renderRoster(list, buildSlug, briefRoot) {
         ' | spec ' + (u.specPath || '(to be authored under memory/builds/' + buildSlug + '/spec/)') +
         ' | brief ' + (u.briefPath || '(to be written under ' + briefRoot + ')')
     })
+    .join('\n')
+}
+// TOOL-dDerivedDocket-20 S8 — the asks each unit of a group answers, one line per unit that carries a
+// `closes` list and none for a unit that does not, so a group with no such unit is handed exactly the
+// prompt it was handed before. Per unit and never per group: a writer holding two units must not
+// write one unit's asks into the other's header.
+function renderCloses(list) {
+  return list
+    .filter(function (u) { return Array.isArray(u.closes) && u.closes.length })
+    .map(function (u) { return '  ' + u.id + ': this unit closes ' + u.closes.join(' ') })
     .join('\n')
 }
 
@@ -519,6 +546,7 @@ const specResults = await boundedParallel(
       const briefs = gUnits
         .filter(function (u) { return u.specBriefPath })
         .map(function (u) { return u.id + ' -> ' + u.specBriefPath })
+      const closing = renderCloses(gUnits)
       return agent(
         GROUND +
           'SPEC every unit below, IN THIS ORDER. This is YOUR GROUP and it is all you are ' +
@@ -527,6 +555,10 @@ const specResults = await boundedParallel(
           (briefs.length
             ? 'Read the brief for each unit that names one, and no other brief:\n  ' +
               briefs.join('\n  ') + '\n\n'
+            : '') +
+          (closing
+            ? 'The asks each unit below answers. Write that unit\'s list into ITS spec header as the ' +
+              '`closes` verb, and into no other unit\'s:\n' + closing + '\n\n'
             : '') +
           'For each: if a conforming spec already carries that id, leave it alone and count it in ' +
           'alreadyPresent. Otherwise author it against `memory/TEMPLATE-SPEC.md` at the tier the ' +

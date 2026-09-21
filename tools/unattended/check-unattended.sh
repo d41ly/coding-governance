@@ -129,6 +129,12 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""
 HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LEASE_STALE_AFTER=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""
 RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
+# TOOL-dDerivedDocket-20 - condition 3's two keys, which check 38 compares with each other. The
+# SENTINEL, not blank, for the driver's reason: an undeclared SHARED_RECORDS takes the kit default and
+# a declared blank is the empty set, and `resolve_shared_records` in the kit library tells the two
+# apart for both readers. Initialised here and admitted by the allow-list below, or this leg would read
+# both keys at their defaults whatever the project declares.
+SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""
 # TOOL-dDerivedDocket-18 - the two optional declared commands the ask-mandate second opinions read.
 # BOTH default to blank and blank means NOT ADOPTED, which is the register both keys already sit in
 # elsewhere in this kit. They are initialised HERE and admitted by the allow-list below, or the leg
@@ -200,7 +206,7 @@ while IFS= read -r -d '' _ck; do
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
     HALT_FLOOR|HOLD_CODES_EXTRA|HOLD_FLOOR|LEASE_STALE_AFTER|\
     RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
-    RECALL_CLI|ASKS_CMD|\
+    RECALL_CLI|ASKS_CMD|SHARED_RECORDS|GENERATED_INDEXES|\
     UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
     # gov:conf-allow-end
   esac
@@ -217,6 +223,28 @@ if [ "$_conf_ok" != 1 ]; then
   exit "$status"
 fi
 M="$MEMORY_ROOT"
+# The kit default of an undeclared SHARED_RECORDS, resolved by the same library call the driver makes,
+# so the two readers cannot disagree about a conf that leaves the key out.
+SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
+
+# ---- 38: NO PATH IS BOTH A SHARED RECORD AND A GENERATED INDEX. TOOL-dDerivedDocket-20 S1. The two
+# ---- keys are condition 3's two halves and `--dispatch` answers each by its own rule, so one path
+# ---- under both is answered by whichever rule the verb reaches first and the other declaration means
+# ---- nothing. The driver refuses such a conf at load; this is the same library predicate on the bar,
+# ---- which is what reaches a conf no run has read yet. CONTAINMENT in either direction, never string
+# ---- equality, because `memory` beside a `memory/LIVE.md` index is the same contradiction.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that either key names the RIGHT paths. It compares the kit's own two
+# ---- keys with each other and nothing else - no memory-tree state, no index on disk - which is what
+# ---- lets it land unchanged in any adopter.
+_c38=$(scan_shared_index_overlaps "$SHARED_RECORDS" "$GENERATED_INDEXES")
+if [ -n "$_c38" ]; then
+  # Formatted OUTSIDE the message: the arm meta-gate reads a branch's signature up to the message's
+  # first closing quote, so a substitution quoting its own argument inside it would end the signature
+  # on shell source no assertion can emit.
+  _c38_pairs=$(printf '%s\n' "$_c38" | awk -F'\t' '{ printf "%sSHARED_RECORDS %s overlaps the index %s", (NR > 1 ? "; " : ""), $1, $2 }')
+  fail 38 "a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch answers it by whichever of condition 3's two rules it reaches first and the other declaration means nothing: $_c38_pairs"
+fi
 
 # ====================================================================== bulk git, warmed once
 # ---- THE SAME QUESTION, ABOUT THE SAME COMMIT, 127 TIMES. Measured on this tree with every git
@@ -2556,6 +2584,28 @@ elif [ "$_c10rc" -ne 0 ]; then
   fail 10 "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on: $VERBSHIP vs $VERBDOC"
   diff <(printf '%s\n' "$nl") <(printf '%s\n' "$ns") | head -10 | sed 's/^/    /'
 fi
+# ---- THE THIRD PAIR, the ask guide. TOOL-dDerivedDocket-20 S4 moved the ask contract - routes,
+# ---- orientation, parking, discovery filing and the asks-disposed terms - out to its own carrier,
+# ---- because the protocol stood a kilobyte under its cap with five units still owing it text. The
+# ---- same two refusals, each in its own sentence for the arm meta-gate's reason above.
+ASKSHIP="$HERE/ASKS.template.md"
+ASKSDOC="$M/guides/UNATTENDED-ASKS.md"
+_c10_cmp "$ASKSHIP" "$ASKSDOC"; _c10rc=$?
+if [ "$_c10rc" -eq 2 ]; then
+  fail 10 "one half of the ask-guide pair is missing, and a parity check with one file is a check that cannot fail: $ASKSHIP / $ASKSDOC"
+elif [ "$_c10rc" -ne 0 ]; then
+  fail 10 "the shipped ask guide and this repo's installed copy have drifted, so the kit ships something other than what it runs on: $ASKSHIP vs $ASKSDOC"
+  diff <(printf '%s\n' "$nl") <(printf '%s\n' "$ns") | head -10 | sed 's/^/    /'
+fi
+# THE PAIR COUNT, on the report channel, so a reader can tell which pairs this check actually compared
+# without opening this file. Derived from the three pairs above rather than typed: a pair added without
+# a row here is a pair the count does not name, which is visible in one run.
+_c10_names=(protocol verbs asks); _c10_ship=("$SHIP" "$VERBSHIP" "$ASKSHIP"); _c10_live=("$LIVEDOC" "$VERBDOC" "$ASKSDOC")
+_c10_n=0
+for _c10_i in "${!_c10_names[@]}"; do
+  [ -f "${_c10_ship[$_c10_i]}" ] && [ -f "${_c10_live[$_c10_i]}" ] && _c10_n=$((_c10_n + 1))
+done
+report "check 10 byte-compared $_c10_n of its ${#_c10_names[@]} pairs: ${_c10_names[*]}"
 
 # ---- 16: the INSTALLED protocol describes the rotation it is the rules for. Check 10 above cannot
 # ---- see this: it is a byte-diff of the pair, and it is green whatever BOTH of them say. A rotation

@@ -76,6 +76,10 @@ cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 # iterates two pairs and check 26 reads this carrier ALONE, so a fixture missing either half
 # models a broken install and every arm below grades that refusal instead of its own subject.
 cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
+# THE ASK GUIDE, BOTH HALVES (TOOL-dDerivedDocket-20 S4), for the verb carrier's reason: check 10
+# iterates a third pair, and a fixture missing either half grades that refusal in every arm below.
+cp "$HERE/ASKS.template.md" $KIT_REL/
+cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
 SCRIPT="$TMP/$KIT_REL/check-unattended.sh"
 
 mkconf() { cat > .unattended.conf <<EOF
@@ -1071,6 +1075,43 @@ hit "$out" "the shipped verb carrier and this repo's installed copy have drifted
 hit "$out" "drifted line"
 reset_tree; rm -f $KIT_REL/VERBS.template.md
 hit "$(run)" "one half of the verb-carrier pair is missing, and a parity check with one file is a check that cannot fail"
+
+# ---- check 10, THE THIRD PAIR. TOOL-dDerivedDocket-20 S4 moved the ask contract into its own
+# ---- byte-compared guide, and a pair added without its own two arms is a pair nothing watches.
+reset_tree; printf '\ndrifted line\n' >> memory/guides/UNATTENDED-ASKS.md
+out=$(run)
+hit "$out" "the shipped ask guide and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
+hit "$out" "drifted line"
+reset_tree; rm -f memory/guides/UNATTENDED-ASKS.md
+hit "$(run)" "one half of the ask-guide pair is missing, and a parity check with one file is a check that cannot fail"
+# ...and the report channel names every pair it compared, so a pair whose row was never added to the
+# count is visible in one run rather than only by reading the source.
+reset_tree
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 10 byte-compared 3 of its 3 pairs: protocol verbs asks"
+
+# ---- check 38: NO PATH IS BOTH A SHARED RECORD AND A GENERATED INDEX (TOOL-dDerivedDocket-20 S1).
+# ---- Three shapes, because each is a different way to get the predicate wrong: a nested pair in
+# ---- EACH direction reds an equality test, and an UNDECLARED SHARED_RECORDS reds a leg that reads the
+# ---- key as blank instead of taking the kit default the driver takes. The control is the pristine
+# ---- conf, which declares neither key, so the default is compared against an empty index set.
+C38_MSG="a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch answers it by whichever of condition 3's two rules it reaches first and the other declaration means nothing"
+reset_tree
+miss "$(run)" "$C38_MSG"
+printf '\nSHARED_RECORDS="memory"\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+out=$(run)
+hit "$out" "a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch answers it by whichever of condition 3's two rules it reaches first and the other declaration means nothing"
+hit "$out" "SHARED_RECORDS memory overlaps the index memory/LIVE.md"
+reset_tree
+printf '\nSHARED_RECORDS="memory/LIVE.md"\nGENERATED_INDEXES="memory:gen.py"\n' >> .unattended.conf
+hit "$(run)" "SHARED_RECORDS memory/LIVE.md overlaps the index memory"
+reset_tree
+printf '\nGENERATED_INDEXES="memory/backlog:gen.py"\n' >> .unattended.conf
+hit "$(run)" "SHARED_RECORDS memory/backlog overlaps the index memory/backlog"
+# ...and a DECLARED blank is the empty set, not the default, so the same index is then accepted.
+reset_tree
+printf '\nSHARED_RECORDS=""\nGENERATED_INDEXES="memory/backlog:gen.py"\n' >> .unattended.conf
+miss "$(run)" "$C38_MSG"
+reset_tree
 
 # ---- check 12: the kickoff hand-back, all four states. This is the only check that reads a file
 # ---- outside the kit, and it exists because nothing else read the engine's TEXT — the manifest
@@ -3381,6 +3422,8 @@ lm_dir=$(mktemp -d)
      "$HERE/.unattended.conf.example" tools/unattended/
   cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
   cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
+  cp "$HERE/ASKS.template.md" tools/unattended/
+  cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
   cp "$HERE/STOPS.template.md" memory/guides/UNATTENDED-STOPS.md
   cat > .unattended.conf <<'LMC'
 MEMORY_ROOT=memory
@@ -3784,6 +3827,8 @@ cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_
    "$TMP/$KIT_REL/.unattended.conf.example" "$ak/$KIT_REL/"
 cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ak/memory/guides/UNATTENDED-PROTOCOL.md"
 cp "$TMP/$KIT_REL/VERBS.template.md" "$ak/memory/guides/UNATTENDED-VERBS.md"
+cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/$KIT_REL/"
+cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/memory/guides/UNATTENDED-ASKS.md"
 # the recall kit's extractor and its conf reader, into a directory the declared RECALL_CLI names
 cp "$HERE/../memory-recall/extract.py" "$HERE/../memory-recall/recall_conf.py" "$ak/rk/"
 n=$((n+1)); [ -f "$ak/rk/extract.py" ] || { echo "FAIL the ask block could not copy the recall kit's extractor, so every S3 arm below would grade a missing grammar"; st=1; }
@@ -4213,6 +4258,8 @@ ma_init() { # name -> $ma_root/<name>, built to the shape above
      "$TMP/$KIT_REL/.unattended.conf.example" "$d/$KIT_REL/"
   cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$d/memory/guides/UNATTENDED-PROTOCOL.md"
   cp "$TMP/$KIT_REL/VERBS.template.md" "$d/memory/guides/UNATTENDED-VERBS.md"
+  cp "$TMP/$KIT_REL/ASKS.template.md" "$d/$KIT_REL/"
+  cp "$TMP/$KIT_REL/ASKS.template.md" "$d/memory/guides/UNATTENDED-ASKS.md"
   cp "$TMP/.unattended.conf" "$d/.unattended.conf"
   ma_readme "$d" tRun; ma_readme "$d" tOther; ma_readme "$d" tOther2; ma_readme "$d" tOther3
   ma_run "$d" tRun
@@ -4244,6 +4291,8 @@ cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_
    "$TMP/$KIT_REL/.unattended.conf.example" "$ma0/$KIT_REL/"
 cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ma0/memory/guides/UNATTENDED-PROTOCOL.md"
 cp "$TMP/$KIT_REL/VERBS.template.md" "$ma0/memory/guides/UNATTENDED-VERBS.md"
+cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/$KIT_REL/"
+cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/memory/guides/UNATTENDED-ASKS.md"
 cp "$TMP/.unattended.conf" "$ma0/.unattended.conf"
 ma_readme "$ma0" tRun
 ma_readme "$ma0" tTick 'may: `tools/push-main.sh`'
@@ -4437,7 +4486,11 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- RAISED 549 -> 582 by exactly the arm, TOOL-dDerivedDocket-19: the grant block's 33
 # ---- assertions, all in region two, so FLOOR_SHARD_2 moves by the same 33. Measured by running the
 # ---- block alone behind this suite's prologue by hand, n 0 -> 33; this pass runs no suite.
-FLOOR_ASSERTIONS=582
+# ---- RAISED 582 -> 592 by exactly the arm, TOOL-dDerivedDocket-20: the ask-guide pair's three
+# ---- check-10 arms, its pair-count report arm and check 38's six, ten unconditional `hit`/`miss`
+# ---- calls, all beside check 10 inside region one, so FLOOR_SHARD_1 carries the same +10 and
+# ---- FLOOR_SHARD_2 is untouched. COUNTED off the diff; this pass runs no suite.
+FLOOR_ASSERTIONS=592
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -4462,7 +4515,7 @@ FLOOR_ASSERTIONS=582
 # check asserting it, because the driver suite's own three constants cannot satisfy the same
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
-FLOOR_SHARD_1=91
+FLOOR_SHARD_1=101
 FLOOR_SHARD_2=491
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;

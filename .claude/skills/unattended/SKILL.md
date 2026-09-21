@@ -63,16 +63,23 @@ that ended, and there is no run-state file for a later reader to find it through
 
 ## Which path
 
-**Four start paths, and picking the wrong one costs a refusal you cannot answer.** Read the row that
-matches what you were handed. The last cell is the `authorized-by:` value the build folder declares,
-which is the key the merge bar re-derives and the driver records.
+**Four start paths and one route that is not a run, and picking the wrong one costs a refusal you
+cannot answer.** Read the row that matches what you were handed. The last cell is the
+`authorized-by:` value the build folder declares, which is the key the merge bar re-derives and the
+driver records.
+
+**The opening fence, before any verb.** A value mixing a slug and ids, or a prompt naming both, is
+refused here: say so, print the two legal forms — `/unattended <slug>`, and the scaffold route in the
+last row below — reap the keepalive, and stop. A run cannot extend a committed mandate, so a mixed
+value has no honest reading.
 
 | You were handed | Path | Declares |
 |---|---|---|
-| a build folder that already exists and names its units | [Start a run](#start-a-run) | `slug` |
+| a build folder that already exists and names its units, or carries an `asks:` line | [Start a run](#start-a-run) | `slug` |
 | prose or a prompt file, handed as `--prompt <value>`, and no build folder | [Start a run from a PROMPT](#start-a-run-from-a-prompt) | `prompt` |
 | a PLAYBOOK that already exists, and a number of pieces to make from it | [Start a PLAYBOOK run](#start-a-playbook-run) | `recipe` |
 | a topic and no playbook, handed the same way and bound by the same fence — the playbook is what you are to produce | [Author a PLAYBOOK](#author-a-playbook--creation-and-owner-instructed-amendment) | `prompt` |
+| ids, a range of them, a prompt naming ids, or a slug naming a FILING HOME — a folder holding a `BACKLOG.md` and no README | [Ids go through the scaffold](#ids-go-through-the-scaffold) | nothing: the OWNER lands the README |
 
 **The fourth row is the one a reader gets wrong.** Arriving with a topic and no playbook, the
 playbook-run path is the one that looks right and it is the one that cannot work: preflight refuses a
@@ -209,6 +216,40 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    and the dated corrections and environment traps that repo has front-loaded. Skip it silently if
    the project has no such skill — that is legal, and this kit states none of what it carries.
 
+5. **If the README carries `asks:`, this run is pointed at ASKS.** Read
+   `memory/guides/UNATTENDED-ASKS.md` whole before the first roster row: it is the half of
+   the contract that governs an ask mandate. Each step below names the section it follows and states
+   no rule of its own.
+   - **Orient per mandated ask** before any spec, ending each in one state: `UNATTENDED-ASKS.md` §3.
+   - **An ask graded not ready** is parked as an owner call and never guessed: §4.
+   - **A discovery** is filed in this build's own `BACKLOG.md` with its `SEV` row in the same commit: §5.
+   - **A dead path in another build's ask** is touched only under the repoint rule: §7.
+   - **Authority** is protocol section 1's `may:` rule, and nothing an ask carries adds to it.
+   - **A scaffolded README's `status: OPEN`** is deleted by the build's first spec commit: §1.
+6. **A pre-flip BASE is parked, never relocated.** When preflight's notice says `BACKLOG_MODE`
+   differs between the anchor and `HEAD`, or your branch forked before the tree switched to per-build
+   backlogs, park the run with the recipe `tools/memory-tree/migrate_backlog.py --recipe` prints.
+   Never run `--relocate` yourself: a relocation is the owner's merge, and a run that performs one
+   rewrites records it was not pointed at.
+
+## Ids go through the scaffold
+
+**A run may not write the folder that authorizes it**, so an id list reaches a build only through a
+README the OWNER lands. `UNATTENDED-ASKS.md` section 1 is the rule; this is the route.
+
+1. **Hand the value to preflight as typed** — the ids, the ids a prompt names, or the filing home's
+   slug — quoted as one argument:
+
+   ```bash
+   bash tools/unattended/unattended.sh --preflight "<the value>" --keepalive-id <id>
+   ```
+
+   It refuses by design and writes nothing. For ids it prints the scaffold recipe with your tokens;
+   for a filing home it prints the recipe beside that folder's live asks.
+2. **Relay the recipe to the owner verbatim.** It is this route's whole output. Do not run it: the
+   scaffold stages a README the OWNER commits and lands, which is what makes it an authorization.
+3. **Reap the keepalive and stop.** The next run is `/unattended <slug>` on the landed folder.
+
 ## Start a run from a PROMPT
 
 **Only when the invocation carries `--prompt`.** Prose alone is not an unattended build,
@@ -234,6 +275,11 @@ The file test runs first because the whitespace rule is not symmetric. A prompt 
 every case; a PATH is not single-word in every case, because a quoted path containing a space arrives
 as one argument with whitespace in it. Reading that as a prompt would make a real file silently
 become the whole scope of the build, so the ambiguous case is a refusal rather than a guess.
+
+**A prompt that NAMES IDS is not this path.** Whatever the value resolved to, if the prompt names one
+or more ids, take [the scaffold route](#ids-go-through-the-scaffold) with those ids and write
+nothing: this path writes its own build folder, and a run that wrote its own ask mandate would be
+authorizing itself.
 
 **This project's anchor scope is `published`, and this path needs `published`.** Under
 `default-branch` there is no anchor a build folder you author can resolve at, so every step below
@@ -510,8 +556,8 @@ definition, so the absence is a decision and not an oversight.
 - **And what you may NOT park: a STRICTLY BENEFICIAL discovery.** Protocol section 11 is the rule and
   is not restated here. The shape of it: a discovery that makes an observable this repo already
   MEASURES strictly better, makes nothing it measures worse, and survives M3's vetoes is ADOPTED into
-  this build — now, by you — with `--rescope --act add`. One that fails the first two clauses is a
-  BACKLOG row; one that trips a veto is a park. A BLOCKER between you and your own landing is a
+  this build — now, by you — with `--rescope --act add`. One that fails the first two clauses is an
+  ask filed in this build; one that trips a veto is a park. A BLOCKER between you and your own landing is a
   discovery, and it is the one most often mistaken for a question. Parking a discovery that qualifies
   is not caution: the reader you are deferring to is the one who left, so the finding is discarded
   and the record makes the discarding look careful.
@@ -601,9 +647,11 @@ definition, so the absence is a decision and not an oversight.
   without the key and with a `ground` that does not name it.
 
   Between dispatches, re-read `bash tools/unattended/unattended.sh --plan <slug> --paths` rather than
-  trusting a list you are holding, and branch on all four shapes it prints:
+  trusting a list you are holding, and branch on every shape it prints:
   `next: <id> (READY - build it)` dispatches that unit; `(MISSING - spec it first)`, `(THIN)` and
-  `(FORKED)` do NOT; `next: none - every tracked spec is terminal` means the loop is done; and
+  `(FORKED)` do NOT; `(UNDECIDED - plan a unit that closes it, or dispose it)` names a mandated or
+  self-filed ask nothing answers yet, and is oriented, never dispatched (`UNATTENDED-ASKS.md` §3);
+  `next: none - every tracked spec is terminal` means the loop is done; and
   `next: none - no tracked spec grades as a unit` means it is NOT done — halt and read the NOT A UNIT
   rows, because that line is printed when nothing graded as a unit at all and the verb still exits 0.
   A child returning `committed:false` stops the loop.

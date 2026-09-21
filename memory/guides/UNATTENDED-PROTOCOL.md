@@ -249,11 +249,14 @@ The authored half never restates a derivable fact — not a unit status, not a p
 Restating the run's own BASE is not possible, because nothing else holds it.
 
 **The anchor ban.** A dash or pipe row leading with an id ANCHORS that id under this build folder,
-which makes the build a claimant of it. A run-state file naturally wants to write cross-build rows —
-a parked dependency, a blocked unit elsewhere — and that is exactly the shape that collides. So
-authored rows cite ids **inline in prose** and never lead with a dash or a pipe followed by an id. A
-sha and a workflow id are safe on both counts. A planned unit is minted as a backlog row before the
-run-state file names it, and is NAMED rather than LINKED until its record exists.
+which makes the build a claimant of it. A run wants cross-build rows — a parked dependency, a
+blocked unit elsewhere — and that shape collides. So every tracked file under the run's build folder
+cites a foreign id **inline in prose**, or pastes the link-wrapped `--asks --ready` table, and never
+leads a row with one. A sha and a workflow id are safe on both counts. A planned unit is
+minted as an ask in the run's own build before the run-state file names it, and is NAMED rather
+than LINKED until its record exists. Every ask, disposition and header verb a run writes
+sits in its own folder under the folder slug, and a sequential pass may declare that folder's
+`BACKLOG.md`; the ask contract and the dispositions live in `UNATTENDED-ASKS.md`.
 
 **The size budget and the spill rule.** The file is in the index set, carries the tree's index caps,
 and is designed to GROW. The authored region is budgeted at 8 KB; at the budget the oldest parked
@@ -478,7 +481,7 @@ where this document says it may:
 | `SPEC_TOKENS_CLI` | the repo-relative path to the spec-token checker `--dispatch` runs over the live tree BEFORE it admits a build pass, refusing the dispatch on a non-zero exit. OPTIONAL, on `RECALL_CLI`'s terms: blank or absent means no spec-token checker is carried, and the verb announces the skip on stdout rather than passing over it. |
 | `ASKS_CMD` | the ask generator the driver calls, in the shapes `UNATTENDED-ASKS.md` lists. OPTIONAL: blank or absent means not adopted, and the skip is announced |
 | `RESUME_SCHEDULE` · `RESUME_SCHEDULE_CREATE` · `RESUME_SCHEDULE_DELETE` · `RESUME_SCHEDULE_DELAY` · `RESUME_SCHEDULE_LIMIT` | the durable restart a hold owes. `UNATTENDED-STOPS.md` |
-| `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set |
+| `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set. No path may sit under both keys |
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
@@ -609,11 +612,11 @@ which is why this rule binds from the run's first act rather than from its first
 3. it survives the build method's M3 vetoes unchanged.
 
 **Three dispositions, and choosing between them is not a judgement call.** Passes all three → ADOPT,
-now, by the run that found it. Fails 1 or 2 → a BACKLOG row naming what was seen and why it was
-declined, which is a decision the run TOOK. Trips a veto → PARK, with the question, the options and
-the refusal, which is a decision the run REFUSED. **Veto 2 is the one that bites**: a discovery
-needing a new external dependency, a new install location, a new public surface, or a change to a
-governance carrier is an owner turn and is parked.
+now, by the run that found it. Fails 1 or 2 → an ask filed in the run's own build, carrying what
+was seen and why it was declined, which is a decision the run TOOK. Trips a veto → PARK, with the
+question, the options and the refusal, which is a decision the run REFUSED. **Veto 2 is the one that
+bites**: a discovery needing a new external dependency, a new install location, a new public
+surface, or a change to a governance carrier is an owner turn and is parked.
 
 **Adoption is the M2 ADD act and introduces no authority.** M3 already delegates a build's own scope
 to a standing mandate through M2's amendment acts; what was missing was the instruction to use it.
@@ -622,11 +625,7 @@ unit at its tier, and build it like any other. The build README's GOAL statement
 unit is added beside the goal, never in place of it — and on a project whose `ANCHOR_SCOPE` is
 `published` a grown roster is committed AND PUSHED before the next authorization read.
 
-**Decide AT ONCE.** A discovery adopted late costs a second pass over the same code; a discovery
-deferred costs the whole finding. The corpus is unambiguous on this: a run that recorded a measured
-sixteen-fold improvement, parked it, was told to proceed, and parked it a second time. "Write it down
-and move on" is not a stable state under a mandate, because the reader it defers to is the one who
-left.
+**Decide AT ONCE**, for the reason `UNATTENDED-ASKS.md` §5 gives.
 
 **What this does NOT license.** It is not permission to widen a build with work that is merely good.
 A refactor nobody measured, a rename, a "while we are here" is not a discovery — it is taste, and
@@ -637,7 +636,7 @@ substituted for it.
 **THERE IS NO MACHINE HALF, and this section says so rather than implying otherwise.** Nothing in
 this kit can observe a discovery a run did not record, so no gate can tell an adopted discovery from
 one silently dropped. What IS observable afterwards is the trail each disposition leaves: an adopted
-one leaves a `--rescope` row, a spec and a unit in the roster; a declined one leaves a backlog row; a
+one leaves a `--rescope` row, a spec and a unit in the roster; a declined one leaves a filed ask; a
 parked one leaves a parked entry the wrap-up surfaces. That is the property parking-everything
 destroyed, and it is the closest thing to enforcement this rule has.
 

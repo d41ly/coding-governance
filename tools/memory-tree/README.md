@@ -29,6 +29,14 @@ ARCH-bOrderlyAtlas-1.)
 | `merge-rows.test.sh` | the driver's replay fixtures, built on ONE bar: **never worse than `git merge-file` on the identical three blobs**. Every case runs a live control and the comparison is arithmetic — losing a line git keeps, or writing a row more often than git does, fails the suite by name. Conflicting where git resolves correctly is acceptable and is COUNTED by name against a shrink-only constant, currently 2 — a row one side moved and the other deleted, in both directions, the one shape where the row plane and the skeleton disagree about intent. On top of that bar: id-set equality against a grammar-independent oracle, the audit line reconciled against the written file at BOTH exit codes, all seven newline sites, the three fail-closed grammar failures, an end-to-end two-branch `git merge` through the real attribute + config, and five sabotage arms that prove each postcondition is the sole net for a defect class. Every case runs a control — two of twenty-eight groups did before — but the arithmetic comparison can only bind where the control EXITS 0, which is 16 of 40 cases and is FLOORED so a fixture edit cannot quietly drop one. Stating that precisely is the point: a suite that reads stronger than it is, is how this driver twice signed off on rc-0 corruption. |
 | `check-memory-hygiene.test.sh` | fixture self-test for check 12 (red + green classes in a scratch repo). |
 
+**`gotchas.py --for-diff` takes a COMMITTED range, so it runs after the commit, not before it.**
+Staged-but-uncommitted work is not in `HEAD`, so the pre-commit spelling `<pass-base>..HEAD`
+resolves to an empty range and prints "touches no file" — which reads as a clean checklist and is
+not one. Its stdout IS the checklist and it always exits 0 — finish it, do not read its status. If a
+class it names is already violated, that is the next pass. Moved here from the build method's M6 by
+TOOL-dDerivedDocket-20, because it is prose about this tool rather than a rule of the method; M6
+keeps the one line that points here.
+
 ## Configure
 
 Copy `.memory-tree.conf.example` to your repo root as `.memory-tree.conf` and edit:

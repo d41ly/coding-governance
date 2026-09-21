@@ -4308,6 +4308,16 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "renderCloses",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderCloses",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "renderCodeView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"

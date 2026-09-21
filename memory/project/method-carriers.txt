@@ -20,3 +20,4 @@ tools/workflows/unattended-build.js · the build harness POINTS at the method: i
 tools/workflows/unattended-build.template.js · the SOURCE the build harness above is rendered from; its prompts point at the method in the same words, since the render fills install paths and nothing else. It states no rule the method does not.
 tools/template-size-limits.txt · the DECLARED byte ceiling for the rendered method, and the identity of the leg that reads it — a row keyed by the file, never a restatement of what the method says
 tools/template-size-highwater.txt · the MEASURED high-water for the rendered method, written by --bump and never by hand — a measurement of the file, never a restatement of it
+tools/unattended/ASKS.template.md · the ask guide names M2 as the one carrier of how asks group into a unit and points there; it states no rule of the method

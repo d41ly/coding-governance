@@ -554,8 +554,23 @@ M="$MEMORY_ROOT"
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
 # `memory`, so an adopter at any other layout got a default naming a directory it does not have — a
 # refusal that can never fire, which is the same shape as no refusal at all. The sentinel is what
-# keeps a DECLARED blank meaning the empty set, as the protocol's own conf table promises.
-[ "$SHARED_RECORDS" = "__kit-default__" ] && SHARED_RECORDS="$MEMORY_ROOT/DECISIONS.md $MEMORY_ROOT/backlog"
+# keeps a DECLARED blank meaning the empty set, as the protocol's own conf table promises. The
+# resolution itself lives in the kit library since TOOL-dDerivedDocket-20, because the gate leg reads
+# the same key and a default spelled in two callers is two answers to one question.
+SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
+# THE TWO CONDITION-3 KEYS MAY NOT NAME ONE PATH - TOOL-dDerivedDocket-20 S1. A path under both is
+# answered by whichever of condition 3's two rules `--dispatch` reaches first, and the declaration of
+# the other means nothing. Refused at LOAD, on `read_bound_key`'s pattern, because the first refusal
+# must not arrive after the work is done; the gate leg asks the same library predicate, so a conf no
+# run has read yet is refused on the bar too.
+_two_key=$(scan_shared_index_overlaps "$SHARED_RECORDS" "$GENERATED_INDEXES")
+if [ -n "$_two_key" ]; then
+  echo "unattended: REFUSING - a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch would answer it by whichever of condition 3's two rules it reached first and the other declaration would mean nothing. Declare each path under one key in $CONF:" >&2
+  while IFS=$'\t' read -r _tk_s _tk_i; do
+    echo "  SHARED_RECORDS $_tk_s overlaps the GENERATED_INDEXES index $_tk_i" >&2
+  done <<<"$_two_key"
+  exit 2
+fi
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }

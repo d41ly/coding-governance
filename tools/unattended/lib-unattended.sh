@@ -111,6 +111,53 @@ is_repo_root() {
   return 1
 }
 
+# ------------------------------------------------ condition 3's two keys, resolved and compared once
+# TOOL-dDerivedDocket-20 S1. `SHARED_RECORDS` and `GENERATED_INDEXES` are the two halves of the build
+# method's condition 3, and `--dispatch` answers each by its own rule: a shared record may never be
+# declared, a generated index may be declared alone. One path under BOTH keys is answered by whichever
+# rule the verb reaches first, and makes the other declaration mean nothing. So the pair is refused at
+# conf load by the driver AND by the gate leg, through the one predicate below — the driver alone would
+# let the bar pass a conf no run has read yet, and the leg alone would let a run start on one.
+#
+# THE DEFAULT IS RESOLVED HERE TOO, and that is half the point. An UNDECLARED `SHARED_RECORDS` means a
+# memory tree at its conventional layout, `<memory root>/DECISIONS.md <memory root>/backlog`; a DECLARED
+# blank means the empty set, which is why both callers initialise the key to the sentinel below rather
+# than to blank. The driver used to resolve that default inline while the leg read the key as blank, so
+# a conf leaving it undeclared would have been refused by one reader and passed by the other — two
+# readers of one config, one of them re-deriving it (memory/gotchas/two-readers-of-one-config-one-re-derived.md).
+resolve_shared_records() { # declared value · memory root -> the effective set
+  if [ "$1" = "__kit-default__" ]; then
+    printf '%s' "$2/DECISIONS.md $2/backlog"
+  else
+    printf '%s' "$1"
+  fi
+}
+# One `<shared record><TAB><index>` line per pair that overlaps, on `overlaps` — CONTAINMENT, in either
+# direction, never string equality: `memory` shared beside a `memory/LIVE.md` index is the same
+# contradiction as the two spelled alike, and so is the reverse nesting. Only the INDEX half of a
+# `GENERATED_INDEXES` pair is compared, because the generator is product code a pass may write. Read
+# into arrays rather than word-split, so a glob character in a value is compared as written rather than
+# expanded against the working tree. Prints nothing when the keys agree; it reads no memory-tree state.
+scan_shared_index_overlaps() { # shared-records · generated-indexes -> the overlapping pairs
+  local -a _so_shared=() _so_pairs=()
+  local _so_s _so_p _so_i
+  read -ra _so_shared <<<"$1"
+  read -ra _so_pairs <<<"$2"
+  for _so_s in "${_so_shared[@]}"; do
+    [ -n "$_so_s" ] || continue
+    for _so_p in "${_so_pairs[@]}"; do
+      _so_i=${_so_p%%:*}
+      [ -n "$_so_i" ] || continue
+      # A whole-repository spelling contains everything and is under nothing, so `overlaps` cannot
+      # say so; it is a contradiction with every index there is.
+      if is_repo_root "$_so_s" || is_repo_root "$_so_i" || overlaps "$_so_s" "$_so_i"; then
+        printf '%s\t%s\n' "$_so_s" "$_so_i"
+      fi
+    done
+  done
+  return 0
+}
+
 # --------------------------------------------------- the paths a unit's brief rows name, once
 # Prints, one per line and normalised, every path a ` brief · item <unit> · reason ` row names in
 # the run-state file AS IT STANDS AT <commit>. Two consumers, one parser: `pass_commit` subtracts
@@ -239,11 +286,14 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
 # and a spec pass legitimately writes more than those two: the regenerated index, the build README,
 # the run-state file and the month ledger all sit outside them. So a SPEC commit naming the unit id
 # won the selection and its caller then graded ITS parent — where, correctly, no spec exists yet.
-# `SHARED_RECORDS` was omitted after that and it is not a corner: template section 1 MANDATES a
-# backlog row, so a conforming spec-first run writes `memory/backlog/<FAMILY>.md` in the same commit,
-# which put the commit back outside the exclusion and redded the run that followed the method
-# exactly. `GENERATED_INDEXES` arrives as `index:generator` pairs; only the index half is an excluded
-# path, because a commit touching the GENERATOR is touching product code.
+# `SHARED_RECORDS` was omitted after that and it is not a corner. A backlog row is owed only by a
+# unit planned before its spec, and a run that plans one writes that row in the same commit as the
+# spec, which put the commit back outside the exclusion and redded a run that followed the method
+# exactly. So the exclusion is whatever the project DECLARES, in either backlog mode: every
+# `SHARED_RECORDS` path, and the index half of every `GENERATED_INDEXES` pair, whether the row lands
+# in a shared shard or as an ask in the run's own build. `GENERATED_INDEXES` arrives as
+# `index:generator` pairs; the generator half is never excluded, because a commit touching the
+# GENERATOR is touching product code.
 build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · shared-records · [cap] · [order]
   _bc_range=$1; _bc_id=$2; _bc_dir=$3; _bc_gen=$4; _bc_shared=$5
   _bc_cap=${6:-}

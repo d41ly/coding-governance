@@ -34,6 +34,7 @@ closed forks.
 **Decompose first**, before anything is classified: **one mechanism per spec.** A separate document, gate, adopter
 or generated artifact is a separate unit with its own id and spec. Two mechanisms in one spec make a "unit built"
 pass unreviewable — the closing diff cannot tell which half a finding lands on.
+Grouping asks into one unit is written ONLY as that unit's `closes` list.
 
 **Detect.** The roster is the build README's authored Units table where one exists, else the conforming specs under
 `memory/builds/<slug>/spec/`. **`ids:` is not it either** — it is DERIVED and rewritten by the index generator, so it
@@ -176,10 +177,7 @@ checklist over what you just committed, and act on it before the next pass begin
 python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
 ```
 
-**It takes a COMMITTED range, so it runs after the commit, not before it.** Staged-but-uncommitted work is not in
-`HEAD`, so the pre-commit spelling `<pass-base>..HEAD` resolves to an empty range and prints "touches no file" —
-which reads as a clean checklist and is not one. Its stdout IS the checklist and it always exits 0 — finish it, do
-not read its status. If a class it names is already violated, that is the next pass.
+**It takes a COMMITTED range and always exits 0**: the trap and the reading are beside its row in `tools/memory-tree/README.md`.
 
 **A pass runs no merge bar and no self-test suite.** Its verification is the direct check its
 spec's acceptance names — a checker run on a staged break, a `--selftest` flag, a fixture — and a
@@ -199,7 +197,7 @@ fallback.** Two passes MUST run
 concurrently when, and may only when: (1) their WRITE sets — actual paths, written down before dispatch — do
 not intersect; (2) neither writes a file the other reads as a contract (conf, template, interface, generator
 input) or as an acceptance input, and neither depends on the other's output either way; (3) neither touches a
-shared mutable record — `memory/DECISIONS.md`, `memory/backlog/*.md`, the run-state file, or a generated index
+shared mutable record — `memory/DECISIONS.md`, an authored backlog shard, the run-state file, or a generated index
 TOGETHER WITH its generator. If you cannot write both path lists down, the work is not known to be disjoint —
 sequence it. Both lists are RECORDED, not merely written: the unattended kit's `--dispatch`.
 
@@ -281,6 +279,7 @@ from, the line does not go in.**
 |---|---|
 | build log and slug | `memory/builds/<slug>/` + generated `memory/LIVE.md` and `memory/ledger/<month>.md` |
 | decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted |
+| asks filed and disposed | the index generator's `--asks --build <slug> --all` |
 | problems resolved | each review record's `## Verdict` line and its blockers/highs (M4, M8) + the bug classes the checklist selected |
 | open / parked | every `surfaced`-class parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver. `history`-class entries — a review round, say — are append-only sequence, carry no question, and are not the owner's to adjudicate |
 | repo state | branch · shas · gate verdict · under a mandate the phase claim and its witness |
