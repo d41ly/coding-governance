@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-21T15:19:20+03:00 @ 144cd1fb196e0c38f7f6aee50816817606de2c69
+last-audit: 2026-09-21T16:43:45+03:00 @ 315201b0cf4c5654afc03c556f286018d1f72593
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 85d930a90b8d8c917454866b22a9d2e013fa82a7
+last-body-change: 315201b0cf4c5654afc03c556f286018d1f72593
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -105,6 +105,16 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   read Gates as acceptance (`TOOL-dBriefedPass-1`). Date-grandfathered on the spec's FILENAME against
   `.unattended.conf`'s `SPEC_THIN_CUTOFF`; BLANK turns the term OFF. `TOOL-aGradedMandate-4`.
 
+- **From `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`) a LIVE spec's §7 leg line must name every
+  gate leg its §4 `### Files touched` trips** — `python tools/check-spec-tokens.py --list` prints the
+  `NEAR [guards]` rows to add BEFORE the spec is dated; a guard more legs share than the checker's
+  floor is excluded and printed with its count, a one-segment root such as `tools/` under the sub-head
+  declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
+
+- **The pre-code spec audit is owed where the build README's `spec-audit: <date>` OR the conf's
+  `SPEC_AUDIT_DEFAULT` (read at BASE, the README winning) declares it; under neither, nothing is owed
+  and the kickoff engine asks the owner once at READY.** `TOOL-aBlindedTrial-6`, `-7`, `KICK-aBlindedTrial-1`.
+
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
   `tools/unattended/` on 2026-08-21, and `check-memory-hygiene.sh` on 2026-09-13 by two sessions
@@ -150,7 +160,7 @@ python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints> 
 
 ### Tier rule
 
-Tier 2 (a spec before building; the spec audit is opt-in, M4) for: a change to the governance template's
+Tier 2 (a spec before building; the spec audit only where the build or its project declares it, M4) for: a change to the governance template's
 rules, the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
 Tier 1 (gates + one focused self-review).
 

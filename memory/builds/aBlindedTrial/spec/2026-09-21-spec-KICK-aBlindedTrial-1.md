@@ -1,12 +1,13 @@
 # KICK-aBlindedTrial-1 — the kickoff engine puts the spec-audit question to the owner at READY
 
-**Status:** INPROGRESS · rev-2 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams kickoff · order 1 · ratified 2026-09-21
+**Status:** INPROGRESS · rev-3 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams kickoff · order 1 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
+| [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md) | diff-review | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
 
 <!-- /gen:spec-records -->
 
@@ -25,10 +26,12 @@ shape the trial could not measure, and writes the line on a yes.
   for this build?" — recommending yes when the roster has two or more units or a spec carries an open
   §8 fork, and no otherwise; on yes, write `spec-audit: <today>` into the build README front matter
   before the spec pass (create the README first when the DoR authors it); on no, nothing is written.
-  Observed by AC1, AC2.
-- S2 — Step 5's READY card `## open` section carries the answer as one line, `spec audit: declared
-  <date>` or `spec audit: not declared (owner)`, so the choice is on the card the session re-reads.
-  Observed by AC3.
+  Do NOT ask when the build README already carries `spec-audit:` (the README answered), else when
+  `<repo>/.unattended.conf` declares a dated `SPEC_AUDIT_DEFAULT` (the project answered; a "no"
+  could change nothing — round 1 R7, round 2 R10). Observed by AC1, AC2.
+- S2 — Step 5's READY card `## open` section carries the answer, or what answered for it, as one
+  line: `spec audit: declared <date>`, `spec audit: not declared (owner)` or `spec audit: project
+  default <date>`, so the choice is on the card the session re-reads. Observed by AC3.
 - S3 — Step 5b (the unattended hand-back) never asks: under a mandate the README at BASE decides and
   the driver's preflight line already says so. One sentence there. Observed by AC4.
 - S4 — the engine stays under its 18432-byte cap (17349 today) and the installed junction still matches
@@ -113,6 +116,11 @@ shape the trial could not measure, and writes the line on a yes.
   it — and Step 5 gains the third `## open` spelling, which AC3 now names. R6: the leg line names every
   leg the §4 files-touched trips under the guards join at the fold — the three `skills/session-kickoff/`
   legs and the two `memory/` recall legs.
+- rev-3 · 2026-09-21 · S1 · S2 · closing diff review round 2 folded. R11: the scope items now
+  describe what rev-2 built — S1 carries the no-ask clause and S2 the third `## open` spelling AC3
+  names; the rev-2 line listed §6 and §7 only. R10: the no-ask clause takes README precedence, the
+  driver's own order — a README `spec-audit:` is carded `declared <date>`, and the conf default is
+  consulted and carded `project default <date>` only when the README carries no key.
 
 ## 10. Reuse audit
 

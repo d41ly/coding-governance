@@ -5773,6 +5773,27 @@ mutate memory/builds/tRun/RUN.md '/^spec-audit: /d'; git add -A >/dev/null
 out=$(run --close tRun $bcov)
 hit "$out" "or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-21; recorded: (none)"
 miss "$out" "close OK"
+
+# ---- closing review of units 7/8, round 2, R2 — a REFUSED read leaves the grader NOT GRADABLE. The
+# ---- fold's fail 55 (and fail 52, fail 54) returned with AUTH_SPEC_AUDIT_DERIVED already set from the
+# ---- README half, so `specs-audited` printed the very absence the refusal had declined to assert:
+# ---- `at BASE: (none)` under a pinned fact, `not owed … declares no SPEC_AUDIT_DEFAULT` without one.
+# ---- Fixture: a run pinned on the dated BASE, then main gains a blob that dies before the read and the
+# ---- run branch merges it, so the merge-base --close derives IS the dying blob while the pinned base
+# ---- stays its ancestor. Observed RED-first on the round-1 driver: fail 53 with `at BASE: (none)`.
+_sa_main7=$(git rev-parse main)
+init_sa_run; crfix; git add -A >/dev/null; git commit -q -m sa-run-pinned --no-verify
+git checkout -qf main; printf 'return 0\n' >> .unattended.conf
+git add -A >/dev/null; git commit -q -m sa-base-dies-after-preflight --no-verify; git push -q -f origin main
+git checkout -qf unit; git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --close tRun $bcov)
+hit "$out" "the project conf at the pinned BASE could not be evaluated to the end"
+hit "$out" "specs-audited — not gradable: the README at BASE was not derived in this shell (authorization-reachable is unmet above)"
+miss "$out" "at BASE: (none)"
+miss "$out" "specs-audited — not owed"
+miss "$out" "close OK"
+git checkout -qf main; git reset -q --hard "$_sa_main7"; git push -q -f origin main
+git checkout -qf unit; init_sa_tree
 git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
 git checkout -qf unit; BCP=$_sa_bcp0; bcreset
 
@@ -5860,6 +5881,19 @@ for _sa_shape in 'return 0|0' 'exit 0|1' 'X="$UNSET_IN_THIS_FIXTURE"|1' '^if|1';
   git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
   git checkout -qf unit; bcreset
 done
+
+# ---- round 2, R6 — a blob read to its END is the date whatever its LAST statement's status. The
+# ---- round-1 sentinel was gated on the eval's exit status, so a conf ending in `false` — or the
+# ---- ordinary `[ -n "${OPT:-}" ] && Y=1` idiom with OPT unset — was refused as "could not be
+# ---- evaluated to the end" while the startup source and the hook both read the date. The sentinel
+# ---- now prints from inside the eval'd text; same bytes on the branch, so no repair. Observed
+# ---- RED-first on the round-1 driver: fail 55.
+init_sa_base_ending_early 'false' 0
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
+miss "$out" "could not be evaluated to the end"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
 
 # ==================================================================================================
 # TOOL-aGradedMandate-5 / -10 — the parked split, on BOTH axes.

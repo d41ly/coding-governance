@@ -792,7 +792,8 @@ AUTH_RECORDS=""
 # the same provenance property: a run cannot opt itself in or out by editing its working copy.
 # Empty is the ordinary case and means the pre-code audit is not owed by this build. That empty is
 # ALSO the value before check_authorization has run at all, so `AUTH_SPEC_AUDIT_DERIVED` says which
-# (round 2, R3): set to 1 on the line after the derivation, and a grader that finds it empty refuses
+# (round 2, R3): set to 1 after BOTH halves of the derivation - README key, then conf default - so
+# a refusal in either half leaves it blank, and a grader that finds it empty refuses
 # as NOT GRADABLE rather than printing a sentence about a README nobody read.
 # TOOL-aBlindedTrial-7 - a SECOND source at the SAME BASE: the README key when it carries one, else
 # SPEC_AUDIT_DEFAULT from .unattended.conf at that base. `AUTH_SPEC_AUDIT_FROM` names which
@@ -1514,7 +1515,6 @@ check_authorization() { # slug · base
   # silent opt-out the sentence above forbids, one value narrower. Present-and-empty is shown as
   # `(empty)` so it takes the refusal; a README with no such line still falls through as not owed.
   AUTH_SPEC_AUDIT=$(printf '%s\n' "$_fm" | sed -n 's/^spec-audit=//p' | head -1)
-  AUTH_SPEC_AUDIT_DERIVED=1
   _sa_shown="$AUTH_SPEC_AUDIT"
   if [ -z "$AUTH_SPEC_AUDIT" ] && printf '%s\n' "$_fm" | grep -q '^spec-audit='; then _sa_shown="(empty)"; fi
   case "$_sa_shown" in
@@ -1532,16 +1532,21 @@ check_authorization() { # slug · base
   # evaluated in a subshell, never a sed pipeline, which reads `KEY='v'`, `KEY="v" # note` and a
   # last-wins pair differently from the shell (gotcha two-readers-of-one-config-one-re-derived). The
   # variable is BLANKED first so a BASE conf that predates the key cannot inherit the working copy's
-  # value through the environment. THE SUBSHELL PROVES IT FINISHED (closing review of units 7/8,
-  # R2): the eval's status gates a sentinel printed after it, so a blob that ends before the read -
-  # a `return` (legal at the top of a sourced file, and the SAME bytes read as the date at startup),
-  # an `exit`, an unbound reference under this file's set -u, a syntax error - prints no sentinel
-  # and is fail 55, never "no default": unknown is not absent, and reading it as absent was the
-  # opt-out fail 52 and fail 54 exist to refuse, through the one path they did not cover. A
-  # non-date is fail 54 on fail 52's reasoning, one file over.
+  # value through the environment. THE BLOB PROVES IT WAS READ TO THE END (closing review of units
+  # 7/8, R2 and round 2 R6): the sentinel is printed FROM INSIDE the eval'd text, appended after a
+  # newline on a descriptor the blob's own redirect does not cover, so it appears iff evaluation
+  # reached the end WHATEVER the last statement's status - a trailing `false` or `[ -n "${OPT:-}" ]`
+  # is an ordinary conf and reads as the date, as the startup source and the hook read it. A blob
+  # that ends before the read - a `return` (legal at the top of a sourced file, and the SAME bytes
+  # read as the date at startup), an `exit`, an unbound reference under this file's set -u, a
+  # syntax error - prints no sentinel and is fail 55, never "no default": unknown is not absent,
+  # and reading it as absent was the opt-out fail 52 and fail 54 exist to refuse, through the one
+  # path they did not cover. The $'\n' matters: without it a blob ending in a comment line swallows
+  # the printf. A non-date is fail 54 on fail 52's reasoning, one file over.
   if [ -z "$AUTH_SPEC_AUDIT" ] && ! printf '%s\n' "$_fm" | grep -q '^spec-audit=' \
      && _cf=$(GIT show "$base:.unattended.conf" 2>/dev/null); then
-    _sad=$( SPEC_AUDIT_DEFAULT=""; eval "$_cf" >/dev/null 2>&1 && printf 'OK %s' "${SPEC_AUDIT_DEFAULT:-}" )
+    _sad=$( SPEC_AUDIT_DEFAULT=""; exec 3>&1
+            eval "$_cf"$'\n''printf "OK %s" "${SPEC_AUDIT_DEFAULT:-}" >&3' >/dev/null 2>&1 )
     case "$_sad" in
       "OK "*) _sad=${_sad#OK } ;;
       *) fail 55 "the project conf at the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
@@ -1554,6 +1559,10 @@ check_authorization() { # slug · base
          return 1 ;;
     esac
   fi
+  # Set AFTER BOTH halves (round 2, R2): a refusing return above - fail 52, 54 or 55 - leaves it
+  # blank, so the specs-audited grader lands on its NOT GRADABLE branch instead of printing the
+  # absence the refusal just declined to assert.
+  AUTH_SPEC_AUDIT_DERIVED=1
   # out of the SAME scan. The `No second GIT show` rule above bounds THAT
   # front-matter parse and is not a rule against reading a second FILE, which S2b does.
   AUTH_PLAYBOOK=$(printf '%s\n' "$_fm" | sed -n 's/^playbook=//p' | head -1)

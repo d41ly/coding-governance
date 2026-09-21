@@ -2073,6 +2073,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_dir_segments",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "derive_ext",
       "kind": "function",
       "file": "tools/codebase-map/map_imports.py"

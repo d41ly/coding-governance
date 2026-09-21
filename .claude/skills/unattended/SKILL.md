@@ -591,8 +591,8 @@ definition, so the absence is a decision and not an oversight.
   pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
   commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
 - **Drive the build as ONE program, and know exactly what that buys.** The harness is
-  `tools/workflows/unattended-build.js`, which runs SPEC, then — only when the build declares
-  `spec-audit:` — AUDIT and DISPOSAL as ordered stages, and hands back the ordered roster on a
+  `tools/workflows/unattended-build.js`, which runs SPEC, then — only when the build or its
+  project declares the audit — AUDIT and DISPOSAL as ordered stages, and hands back the ordered roster on a
   terminal `--review` verdict, or at SPEC completion when the audit is off by declaration. **Pass
   `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>` or
   `opted in by project default SPEC_AUDIT_DEFAULT: <date>`**, and

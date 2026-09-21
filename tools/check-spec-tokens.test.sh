@@ -15,7 +15,7 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=62
+FLOOR_ASSERTIONS=66
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
@@ -29,6 +29,9 @@ FLOOR_ASSERTIONS=62
 # RAISED 55 -> 62 at the closing diff review of TOOL-aBlindedTrial-7/8 (round 1), by the count of
 # `arm` lines its diff added: the breadth pair (R1), the declared-prefix pair (R3), the no-Gates
 # precondition (R4) and the exact-file guard pair (R12).
+# RAISED 62 -> 66 at round 2 of that review, by the count of `arm`/`pass=` lines its diff added: the
+# one-segment root pair (R1: rc and the --list row), the duplicated-entry breadth arm (R7) and the
+# no-Gates --list row (R8).
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -469,27 +472,67 @@ git -C "$d" reset -q --hard "$clean"
 # closing review round 1, R3 — a DIRECTORY token under the sub-head is a declared PREFIX, not prose.
 # rev-1 dropped every trailing-slash token before the join, so writing the folder instead of the
 # files was a clean pass with no NEAR row. Symmetric: the declared prefix trips a guard it equals or
-# sits under, AND a guard that sits under it. Observed RED-first on the rev-1 checker, both arms.
+# sits under, AND a guard that sits under it — an exact-file guard included (round 2, R1 retargeted
+# this arm from bare `tools/`, which is a ROOT and declares nothing; observed RED on a staged break of
+# the symmetric clause). Observed RED-first on the rev-1 checker, the first arm.
 printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
 printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
 write_files_touched '### Files touched (estimate)' '`tools/x/`'
 git -C "$d" add -A >/dev/null
 arm "a declared directory equal to the guard trips it and REDS" 1 "$d" '[guards] `guarded leg <- tools/x/`'
-sed -i 's|^`tools/x/`$|`tools/`|' "$spec"
+printf '[{"name":"real leg"},{"name":"exact leg","guard":["tools/x/y.sh"]}]\n' > "$d/tools/gate-legs.json"
 git -C "$d" add -A >/dev/null
-arm "a declared root that CONTAINS the guard trips it and REDS" 1 "$d" '[guards] `guarded leg <- tools/`'
+arm "a declared directory that CONTAINS an exact-file guard trips it and REDS" 1 "$d" '[guards] `exact leg <- tools/x/`'
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 2, R1 — a ONE-SEGMENT root under the sub-head declares NOTHING. Round 1's fold
+# kept `tools/` as a declared prefix, so the corpus's most common negation — "No file under `tools/`
+# is touched" — owed every non-broad leg under `tools/` (34 on the live manifest). A root is prose;
+# `--list` names it so the skip is not silent. Observed RED-first on the round-1 checker: exit 1.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' 'New: `memory/builds/tOne/build/note.md`. No file under `tools/` is touched.'
+git -C "$d" add -A >/dev/null
+arm "a one-segment root in a negation sentence declares nothing and is no hit" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s)"
+out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: tools/ — a one-segment root declares nothing, not joined'; then
+  echo "arm ok    --list names the one-segment root as NEAR [guards], not joined"; pass=$((pass+1))
+else
+  echo "arm FAIL  --list — expected a NEAR [guards] row naming tools/ as a root that declares nothing"
+  printf '%s\n' "$out" | grep -F 'NEAR' | head -3; fail=$((fail+1))
+fi
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 2, R7 — breadth is counted in LEGS, not guard entries. A guard carried by
+# exactly the floor with one leg listing it twice counted as floor+1 and left the join, dropping the
+# motivating class silently. Observed RED-first on the round-1 checker: exit 0.
+printf '[{"name":"real leg"},{"name":"f1","guard":["tools/x/","tools/x/"]},{"name":"f2","guard":["tools/x/"]},{"name":"f3","guard":["tools/x/"]},{"name":"f4","guard":["tools/x/"]},{"name":"f5","guard":["tools/x/"]}]\n' > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a guard on exactly the floor's legs, one listing it twice, stays joined and REDS" 1 "$d" '[guards] `f1 <- tools/x/thing.sh`'
 git -C "$d" reset -q --hard "$clean"
 
 # closing review round 1, R4 — the join grades only a spec that CARRIES a Gates heading, the legline
 # arm's own precondition: a Tier-1 spec under the light profile may omit the section, and rev-1 gave
 # it one hit per tripped leg while the same run counted it as "no Gates heading to grade". Observed
-# RED-first on the rev-1 checker: exit 1 with two [guards] rows.
+# RED-first on the rev-1 checker: exit 1 with two [guards] rows. Round 2, R8: the skipped spec is
+# NOT "examined" — that figure reads zero — and the path it skipped is named by a NEAR row; `./`,
+# `../` and `tools/./` are not declared paths at all. Observed RED-first on the round-1 checker.
 printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
 printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
-write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh` · `./` · `../` · `tools/./`'
 awk '/^## 7[.] Gates$/{exit} {print}' "$spec" > "$d/.tmp.md"; mv "$d/.tmp.md" "$spec"
 git -C "$d" add -A >/dev/null
-arm "a post-cutoff spec with NO Gates heading is not joined, and is counted on the guards line" 0 "$d" "1 declare a path and carry no Gates heading, not joined"
+arm "a post-cutoff spec with NO Gates heading is not joined, not examined, and is counted on the guards line" 0 "$d" "guards join · 0 declared path(s) examined in 0 live spec(s) at/after SPEC_GUARD_LEGS_CUTOFF 2026-09-01 · 0 pre-cutoff live spec(s) carry a missing guarded leg and are not graded · 0 carry no Files touched sub-head · 1 declare a path and carry no Gates heading, not joined"
+out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if [ "$(printf '%s\n' "$out" | grep -c 'NEAR   \[guards\]')" = 1 ] \
+   && printf '%s\n' "$out" | grep -qF ':: tools/x/thing.sh — no Gates heading, not joined'; then
+  echo "arm ok    --list names the skipped path as NEAR [guards] and nothing else (dot tokens declare nothing)"; pass=$((pass+1))
+else
+  echo "arm FAIL  --list — expected exactly one NEAR [guards] row, naming tools/x/thing.sh as skipped for no Gates heading"
+  printf '%s\n' "$out" | grep -F 'NEAR' | head -5; fail=$((fail+1))
+fi
 git -C "$d" reset -q --hard "$clean"
 
 # closing review round 1, R12 — the EXACT-FILE branch of check_guard_trips, seen to fail. Every arm

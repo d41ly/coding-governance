@@ -111,7 +111,7 @@ decision the owner did not make. The mark must be the documented SHAPE — the w
 `(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each item: with any
 item present ONLY a conforming mark resolves it, the first line does not vote, and §8 says what that cannot see.
 
-## M4 — The spec audit — owed only where the build declares it
+## M4 — The spec audit — owed only where the build or its project declares it
 
 **When**, and `specs-reviewed` is owed only then: the build README's front matter carries `spec-audit: <date>`, or the
 project's `.unattended.conf` at BASE declares a dated `SPEC_AUDIT_DEFAULT` and the README declares no key

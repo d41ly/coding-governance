@@ -81,14 +81,17 @@ as `SPEC_DIRECT_CUTOFF`, asserted by one helper for both keys). The measured cas
 aBlindedTrial build edited `tools/hooks/scratch-guard.js` and omitted `scratch-guard self-test`, and
 closing review round 1 found it as F7 where no gate did. BROAD guards are excluded from the join and
 listed by `--list` as `NEAR`, and broad is BREADTH: a guard carried by more than `BROAD_LEG_FLOOR`
-legs (a file constant of the checker), whatever its depth — several legs guard bare `tools/` and
-many more guard `tools/lib/`, so naming them adds nothing and buries the specific one. The set the
+legs (a file constant of the checker; a guard listed twice in one row is one leg), whatever its
+depth — a guard many legs share adds nothing when named and buries the specific one. The set the
 floor excludes is derived and printed with its per-guard counts on the guards line of every run,
 never typed in prose (the closing review of units 7/8, R1 and R11: the first cut split on depth,
-which joined `tools/lib/` and excluded `.githooks/`). A directory token under the sub-head is a
-declared PREFIX and trips symmetrically — a guard it equals or sits under, and a guard under it
-(R3). A spec with no Gates heading is not joined and is counted, the legline arm's own precondition
-(R4). The hit token is the composite `<leg> <- <path>`, one per missing leg naming the first path
+which joined `tools/lib/` and excluded `.githooks/`). A directory token of two or more segments
+under the sub-head is a declared PREFIX and trips symmetrically — a guard it equals or sits under,
+and a guard under it, an exact-file guard included (R3); a one-segment ROOT (`tools/`) is how prose
+names a tree, declares nothing, and is listed as NEAR so the skip has a name (round 2, R1). A spec
+with no Gates heading is not joined and is counted, not examined, its tripping paths listed as
+NEAR — the legline arm's own precondition (R4, round 2 R8). The hit token is the composite
+`<leg> <- <path>`, one per missing leg naming the first path
 that trips it, so a `[leg]` waiver row keyed on the bare leg name cannot swallow it. The join reads
 the ESTIMATE as written, not the write set the build made, and reads no path named in prose outside
 the sub-head. The report carries a `guards join` line on every run: declared paths examined in how

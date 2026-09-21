@@ -54,15 +54,19 @@ population plus one of its own, the declared write set.
          trips must be a name on the section 7 leg line, in a LIVE spec dated at or after
          SPEC_GUARD_LEGS_CUTOFF (blank = off) -> a hit whose token is the composite
          `<leg> <- <path>` (TOOL-aBlindedTrial-8). A DIRECTORY token under the sub-head — one
-         ending in `/`, `tools/` and `tools/run-gates/` alike — is a declared PREFIX and trips
-         SYMMETRICALLY: a guard it equals or sits under, and a guard that sits under it (closing
-         review round 1, R3; writing the folder instead of the files was a clean pass before). The
-         join grades only a spec that CARRIES a Gates heading, the legline arm's own precondition:
-         a Tier-1 spec under the light profile may omit the section, and one that does is COUNTED
-         on the guards line rather than joined (R4). BROAD guards are EXCLUDED from the join and
-         listed by --list as NEAR, and broad is BREADTH, not depth (R1): a guard carried by MORE
-         than BROAD_LEG_FLOOR legs, whatever its depth, because several legs guard bare `tools/`
-         and thirty guard `tools/lib/`, so naming them adds no information and buries the specific
+         ending in `/` and of TWO OR MORE segments, `tools/run-gates/` — is a declared PREFIX and
+         trips SYMMETRICALLY: a guard it equals or sits under, and a guard that sits under it
+         (closing review round 1, R3; writing the folder instead of the files was a clean pass
+         before). A ONE-segment token, `tools/`, is a ROOT and declares nothing: it is how prose
+         names a tree ("No file under `tools/` is touched"), and --list names it as NEAR (round
+         2, R1). The residual, stated: a two-segment directory named in prose is still read as
+         declared. The join grades only a spec that CARRIES a Gates heading, the legline arm's own
+         precondition: a Tier-1 spec under the light profile may omit the section, and one that
+         does is COUNTED on the guards line rather than joined or examined, its tripping paths
+         listed as NEAR (R4, round 2 R8). BROAD guards are EXCLUDED from the join and listed by
+         --list as NEAR, and broad is BREADTH, not depth (R1): a guard carried by MORE than
+         BROAD_LEG_FLOOR LEGS (a guard listed twice in one row is one leg), whatever its depth,
+         because a guard many legs share adds no information when named and buries the specific
          one. The excluded set is printed WITH its per-guard leg counts on the guards line of every
          run, so the exclusion announces itself and no count of it lives in prose. A leg without a
          `guard` key is not joined; a spec without the sub-head declares nothing and is counted
@@ -218,14 +222,17 @@ def extract_acceptance(text):
 
 
 def extract_files_touched(text, files):
-    """The declared write set: every path-shaped word inside backticks under the `### Files touched`
-    sub-head, in order and without repeats, PLUS every directory-shaped one kept with its trailing
-    `/` so the join can read it as a prefix (closing review round 1, R3 — the trailing-slash rule of
-    `check_path_shaped` is right for the paths and cites joins and wrong here, where `tools/x/`
-    declares everything under it). None when the spec carries no such sub-head, which the report
-    counts apart from a sub-head declaring nothing (TOOL-aBlindedTrial-8). The body closes at the
-    next heading of ANY depth, unlike the section readers above, because the sub-head has siblings
-    inside section 4.
+    """The declared write set and the roots it mentions, as `(paths, roots)`. `paths` is every
+    path-shaped word inside backticks under the `### Files touched` sub-head, in order and without
+    repeats, PLUS every directory-shaped one kept with its trailing `/` so the join can read it as a
+    prefix (closing review round 1, R3 — the trailing-slash rule of `check_path_shaped` is right for
+    the paths and cites joins and wrong here, where `tools/x/` declares everything under it). `roots`
+    is every ONE-segment directory token — `tools/`, `memory/` — which declares NOTHING (round 2,
+    R1: the corpus writes "No file under `tools/` is touched" fourteen times, and reading that as
+    declaring the whole root owed 34 legs on the live manifest); they are returned so `--list` can
+    name the skip. None when the spec carries no such sub-head, which the report counts apart from a
+    sub-head declaring nothing (TOOL-aBlindedTrial-8). The body closes at the next heading of ANY
+    depth, unlike the section readers above, because the sub-head has siblings inside section 4.
     """
     m = FILES_HEAD.search(text)
     if not m:
@@ -233,28 +240,42 @@ def extract_files_touched(text, files):
     rest = text[m.end():]
     nxt = re.search(r"^##+ ", rest, re.M)
     body = rest[:nxt.start()] if nxt else rest
-    paths = []
+    paths, roots = [], []
     for tok in TICK.findall(body):
         for word in tok.split():
-            if (check_path_shaped(word, files) or check_dir_shaped(word)) and word not in paths:
+            if len(derive_dir_segments(word)) == 1:
+                if word not in roots:
+                    roots.append(word)
+            elif (check_path_shaped(word, files) or check_dir_shaped(word)) and word not in paths:
                 paths.append(word)
-    return paths
+    return paths, roots
+
+
+def derive_dir_segments(tok):
+    """The REAL segments of a `/`-terminated token this join could read, or `[]` for anything else:
+    a token that is not `/`-terminated, opens like a deploy-time token, carries a glob or a space, or
+    has a segment that is empty, `.` or `..` — so `./`, `../` and `tools/./` are nothing, not a path
+    (round 2, R8). `tools/` -> `['tools']`; `tools/run-gates/` -> `['tools', 'run-gates']`."""
+    if NOT_A_TOKEN.match(tok) or " " in tok or "*" in tok or "?" in tok or not tok.endswith("/"):
+        return []
+    parts = tok.rstrip("/").split("/")
+    return [] if any(x in ("", ".", "..") for x in parts) else parts
 
 
 def check_dir_shaped(tok):
-    """A declared PREFIX: a token ending in `/` that is otherwise a token this join could read — no
-    deploy-time opener, glob or whitespace, and something before the slash. `tools/` and
-    `tools/run-gates/` both are; a bare `/` and a `$KIT/` are not."""
-    if NOT_A_TOKEN.match(tok) or " " in tok or "*" in tok or "?" in tok:
-        return False
-    return tok.endswith("/") and tok.rstrip("/") != ""
+    """A declared PREFIX: a directory token of TWO OR MORE real segments. A one-segment token is a
+    ROOT (`tools/`), which is how prose names a tree and declares nothing (round 2, R1); round 1's
+    fold kept it and owed every non-broad leg under it. The residual, stated: a two-segment
+    directory named in prose is still read as declared."""
+    return len(derive_dir_segments(tok)) >= 2
 
 
 def check_guard_trips(path, guard):
     """Git-pathspec semantics for a manifest guard: the exact path, or anything under it as a
     directory. Never a bare prefix, so `tools/x.sh` does not trip on `tools/x.sh.bak`. A declared
-    DIRECTORY (its trailing `/` kept by `extract_files_touched`) trips symmetrically: it also trips
-    a guard that sits under it, because `tools/` declares `tools/x/` (R3)."""
+    DIRECTORY (its trailing `/` kept by `extract_files_touched`, two or more segments — a root never
+    reaches here) trips symmetrically: it also trips a guard that sits under it, an exact-file guard
+    included, because `tools/x/` declares `tools/x/y.sh` (R3)."""
     p, g = path.rstrip("/"), guard.rstrip("/")
     if p == g or p.startswith(g + "/"):
         return True
@@ -272,7 +293,7 @@ def derive_guarded_legs(rows):
     property the exclusion was written for (closing review round 1, R1)."""
     count = {}
     for r in rows:
-        for g in r.get("guard") or []:
+        for g in set(r.get("guard") or []):   # LEGS, not entries: a guard listed twice in one row is one leg (round 2, R7)
             count[g] = count.get(g, 0) + 1
     broad = {g: n for g, n in count.items() if n > BROAD_LEG_FLOOR}
     joined = []
@@ -522,16 +543,26 @@ def main(argv):
         # THE GUARDS JOIN (TOOL-aBlindedTrial-8): the declared write set against every guarded leg.
         # One hit per MISSING leg, its token naming the first declared path that trips it — the
         # composite keeps a `[leg]` waiver row keyed on the bare leg name from swallowing it.
-        declared = extract_files_touched(text, files)
-        if declared is None:
+        touched = extract_files_touched(text, files)
+        if touched is None:
             g_nosubhead += 1
-            declared = []
+            touched = ([], [])
+        declared, roots = touched
+        # A one-segment ROOT under the sub-head declares nothing (round 2, R1), and says so.
+        near += [(f, "guards", p, "a one-segment root declares nothing, not joined") for p in roots]
         missing = []
         # The legline arm's precondition, mirrored (R4): a spec with NO Gates heading is the light
-        # profile's legal shape and is not joined — counted, so the skip has a size.
+        # profile's legal shape and is not joined — counted, NOT examined, and every path it declares
+        # that would have tripped a joined guard is named as NEAR, so the skip has a size and a name
+        # (round 2, R8).
         if declared and extract_gates(text) is None:
             g_nogates += 1
+            near += [(f, "guards", p, "no Gates heading, not joined") for p in declared
+                     if any(check_guard_trips(p, g) for _, gs in guarded for g in gs)]
         elif extract_gates(text) is not None:
+            if g_armed:
+                g_specs += 1
+                g_examined += len(declared)
             for leg, gs in guarded:
                 if leg in named:
                     continue
@@ -539,8 +570,6 @@ def main(argv):
                 if path is not None:
                     missing.append((leg, path))
         if g_armed:
-            g_specs += 1
-            g_examined += len(declared)
             hits += [(f, "guards", f"{leg} <- {path}",
                       f"§4 files-touched names {path}, which trips the guard of leg {leg!r}, "
                       "absent from the §7 leg line") for leg, path in missing]
