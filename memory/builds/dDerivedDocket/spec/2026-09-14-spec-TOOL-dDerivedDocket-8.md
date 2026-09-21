@@ -159,8 +159,8 @@ each way would be a cycle. No third conf reader is written.
 | the check 6 `BACKLOG.md` branch | a new `fail 6` call | the check-arms signature, armed in the engine's self-test |
 | the check 8 and check 10 announcement lines | stdout lines | none |
 | `--print-backlog-mode` | a print mode in the engine, beside its two siblings | none; one word on stdout |
-| `backlog_module` · `read_backlog_conf` | module-level accessors in `corpus_ids.py` | python, tool |
-| `read_backlog_mode` · `row_stems` | module-level accessors in `row_grammar.py` | python, tool |
+| `load_backlog` · `read_backlog_conf` | module-level accessors in `corpus_ids.py` | python, tool |
+| `read_backlog_mode` · `derive_row_stems` | module-level accessors in `row_grammar.py` | python, tool |
 
 ### Files touched (estimate)
 
@@ -486,6 +486,9 @@ New arm: `tools/memory-tree/row_grammar.py` `--selftest` · a builds-mode tree w
   LOWERED 10 -> 8 by hand, because S14's two departing rows took two carried literals with them and
   `--write-ratchet`, which is that verdict's own remedy, refuses to write at all while an unrelated
   ROSE row from another unit stands.
+  The gotchas checklist's fold, same rev: two of the four accessors led with a NOUN, which the
+  lexicon's P1 verb arm refuses and this table had already recorded under those names. They are
+  `load_backlog` and `derive_row_stems`, asked of `--suggest` rather than guessed at.
 
 ## 10. Reuse audit
 

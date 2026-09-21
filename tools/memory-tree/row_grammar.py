@@ -173,7 +173,7 @@ GENERIC_ID = re.compile(r"[A-Z][A-Z0-9]{1,9}-[A-Za-z0-9]+-[0-9]+[a-z]*")
 # catch, and it missed this one because its fixture held no such name — so the fixture now does.
 # Built from the declared stems so it is the same conjunction the shell spells, in the same order.
 def build_rotated_re(conf):
-    stems = "|".join(re.escape(x) for x in ["DECISIONS"] + row_stems(conf))
+    stems = "|".join(re.escape(x) for x in ["DECISIONS"] + derive_row_stems(conf))
     return re.compile(r"(?:" + stems + r")\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md\Z")
 
 
@@ -196,7 +196,7 @@ def read_backlog_mode(conf):
         raise Problem(f"row-grammar: {exc}") from None
 
 
-def row_stems(conf):
+def derive_row_stems(conf):
     """The family stems that name a ROW DOCUMENT in this tree's declared layout.
 
     Under `shards` every family has an authored shard, so every family is a stem. Under `builds` the

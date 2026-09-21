@@ -284,7 +284,7 @@ def grammar(root: str):
     return extract.grammar_for(root)
 
 
-def backlog_module():
+def load_backlog():
     """The parser kit-mate, imported LAZILY and for one reason: it owns the backlog layout.
 
     Lazy, and not a module-level import, because `row_grammar.py` imports `parse_conf` from THIS
@@ -311,7 +311,7 @@ def read_backlog_conf(conf: dict):
     parser's own exception is re-raised as this module's, because `main()` promises a named line and
     never a traceback, and `except Problem` here would not catch a class from over there.
     """
-    bk = backlog_module()
+    bk = load_backlog()
     try:
         return bk.read_conf(conf)
     except bk.Problem as exc:
@@ -421,7 +421,7 @@ def walk(root: str, conf: dict) -> dict:
     # CHECK 13's SKIP, armed only under `builds`. The grammar is the PARSER module's, built from the
     # family tokens the id grammar above already derived — never a second derivation, and never a
     # second spelling of the ask row.
-    bk = backlog_module() if builds_mode else None
+    bk = load_backlog() if builds_mode else None
     ask_grammar = bk.build_grammar(E.families) if builds_mode else None
     cutoff_armed = bk.check_cutoff_armed(bconf) if builds_mode else False
     unarmed_asks = 0

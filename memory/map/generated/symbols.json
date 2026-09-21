@@ -303,11 +303,6 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
-      "id": "backlog_module",
-      "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
       "id": "blob_at",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1548,6 +1543,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_row_stems",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "derive_rule_kind",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -2091,6 +2091,11 @@
       "id": "load_aliases",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "load_backlog",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
     },
     {
       "id": "load_conf",
@@ -4071,11 +4076,6 @@
       "id": "row_ids",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
-    },
-    {
-      "id": "row_stems",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "rrf",
