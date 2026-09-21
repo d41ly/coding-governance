@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 71 · guides: 8 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 107 · kits: 16 · git-hooks: 4 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 71 · guides: 8 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -109,6 +109,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `testsuite counts (every bar self-test prints one)` | testsuite-counts |
 | `testsuite counts self-test` | testsuite-counts |
 | `tier2-review self-test` | review-harnesses |
+| `transition-audit arms` | memory-tree-hygiene |
 | `unattended kit gate` | unattended |
 | `unattended skill wiring` | unattended |
 | `verdict epoch (kit version dates the engine)` | memory-tree-hygiene |
@@ -142,6 +143,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 
 | key | claimant |
 |---|---|
+| `commit-msg` | memory-tree-hygiene |
 | `gate-env.sh` | foundation |
 | `pre-commit` | baseline |
 | `pre-push` | baseline |

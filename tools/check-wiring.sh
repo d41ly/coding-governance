@@ -20,7 +20,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.3   # gov:kit check-wiring@1.3 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.5   # gov:kit check-wiring@1.5 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -259,7 +259,7 @@ fi
 # bypassed. The severity carries the whole fork resolution.
 #
 # WRITTEN OVER A LIST, so a third hook is one row rather than a third copy of the comparison.
-GOV_WIRING_HOOKS="pre-commit pre-push"
+GOV_WIRING_HOOKS="commit-msg pre-commit pre-push"
 check_hook_blobs() { # $1 = resolved hooks dir, $2 = the configured value as written
   local dir="$1" shown="$2" hook resolved tracked otherbranch
   for hook in $GOV_WIRING_HOOKS; do

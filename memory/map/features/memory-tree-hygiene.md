@@ -1,4 +1,4 @@
-# memory-tree hygiene engine — the 21-check gate over the memory tree
+# memory-tree hygiene engine — the numbered gate over the memory tree
 
 ```toml
 feature = "memory-tree-hygiene"
@@ -8,9 +8,9 @@ streams = ["tooling"]
 decisions = ["TOOL-aRelaxedShard-1", "TOOL-aWidenedGuide-1"]
 
 [claims]
-gate-legs = ["memory hygiene", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity"]
+gate-legs = ["memory hygiene", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms"]
 kits = ["memory-tree"]
-git-hooks = []
+git-hooks = ["commit-msg"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -26,15 +26,19 @@ globs = [
   "tools/memory-tree/check-memory-hygiene.sh",
   "tools/memory-tree/check-memory-hygiene.test.sh",
   "tools/memory-tree/check-verdict-epoch.sh",
+  "tools/memory-tree/transition_audit.py",
+  "tools/memory-tree/transition-audit.test.sh",
+  ".githooks/commit-msg",
 ]
 ```
 
 ## What it is
 
-One shell engine over the tracked contents of `<MEMORY_ROOT>/`, 22 checks, plus the epoch rule that
-makes its verdicts datable. Checks 9 and 13-21 delegate to sibling Python modules
-(`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`); this dossier owns the engine,
-its self-test and the epoch, not those modules. The self-test's project-key arms run the engine over
+One shell engine over the tracked contents of `<MEMORY_ROOT>/`, plus the epoch rule that makes its
+verdicts datable. How many numbered checks it carries is derivable from the engine and is not
+written here, for the same reason the H1 stopped saying it. Several of them delegate to sibling
+Python modules (`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`, `transition_audit.py`);
+this dossier owns the engine, its self-test, the epoch and the transition audit, not the other modules. The self-test's project-key arms run the engine over
 the suite's own scratch tree, one invocation per arm, never over an archive of this repository
 (`TOOL-aRatifiedRulings-3`), so a red in the live corpus cannot red an arm that grades a conf key.
 
@@ -144,6 +148,34 @@ guessing it; extend by adding a print mode beside it rather than exporting the v
 seam: the DELEGATE-STATUS idiom — reuse for any check that hands its parse to a sibling module: the
 capture keeps `$?`, and a row the delegate prints on every run is the liveness test, so a delegate
 that exited 0 having done nothing is refused too. Check 21's `_b21rc` and `n21` are the worked case.
+
+## Check 25 — the transition-merge audit
+
+`transition_audit.py` is the one delegate whose population is the commit GRAPH rather than the
+tracked tree, and the one that is DARK until a project sets `BACKLOG_MODE=builds`. It classifies a
+merge as a TRANSITION by LINEAGE — some parent's lineage holds a shards-mode commit touching the
+watched paths, and some other parent's holds a builds-mode commit — never by a parent's tip conf,
+because a straggler that pulled the new conf early has a builds-mode tip and shards-mode content.
+
+Three properties are worth knowing before touching it. It pins the DEREFERENCE the way the
+unattended kit's history leg does (`--no-replace-objects` plus an empty `GIT_GRAFT_FILE`), and both
+halves are armed by fixtures that re-parent a merge and then expect the audit to see through it.
+Its WATCHED PATHS are the backlog directory plus the FAMILY-named rotated archives alone: widening
+the archive half to the whole directory makes every id anchored in a rotated decision log read as a
+lost row, which the rotation arm stages. And it caches only the DELTA, under the git common dir,
+keyed by merge sha and a module `CACHE_EPOCH` — never the verdict, which a later `RELOCATED` row
+changes.
+
+The memory-recall kit is a hard prerequisite under `builds` and is resolved EAGERLY, before any
+merge is classified. Resolving it lazily was measured as a defect: a warm delta cache answers every
+merge without keying a row, so a tree whose recall kit had been deleted reported a clean audit. The
+kit descriptor carries a `requires_if` edge naming that prerequisite, which govkit's selfcheck
+grades and which installs nothing.
+
+The commit-time carrier is the tracked `commit-msg` hook, which is the one hook a clean `git merge`
+and a conflicted merge concluded by `git commit` both reach — `pre-commit` never fires on the clean
+one, measured with git 2.54. It derives every path it uses and announces a skip rather than blocking
+a commit when the kit or a python launcher is missing.
 
 ## Gaps
 

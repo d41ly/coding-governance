@@ -102,6 +102,7 @@
       "testsuite counts (every bar self-test prints one)",
       "testsuite counts self-test",
       "tier2-review self-test",
+      "transition-audit arms",
       "unattended kit gate",
       "unattended skill wiring",
       "verdict epoch (kit version dates the engine)",
@@ -129,6 +130,7 @@
       "workflows"
     ],
     "git-hooks": [
+      "commit-msg",
       "gate-env.sh",
       "pre-commit",
       "pre-push"

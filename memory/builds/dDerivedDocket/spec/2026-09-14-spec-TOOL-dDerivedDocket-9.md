@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-9 — transition-merge audit over history and at commit time
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 9
+**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-9-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-9-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
@@ -74,7 +75,9 @@ change reds the bar everywhere and is repaired forward instead of trusted.
   `transition_audit.py --staged` when `MERGE_HEAD` exists and the module resolves in the committing
   tree. It audits the pending merge, parents HEAD and every `MERGE_HEAD` line, tree the index, and
   refuses the commit on an unaccounted entry. With no `MERGE_HEAD` the hook exits 0 and prints
-  nothing. Observed by AC8.
+  nothing. When the kit or a python launcher is unresolvable it prints one line SAYING SO and exits
+  0 rather than blocking the commit: a commit-time carrier that refuses work because an interpreter
+  is missing gets disabled, and check 25 binds again at the push boundary over the whole history. Observed by AC8.
 - **S10** A per-merge cache under the git common dir, keyed by merge sha and a module constant
   `CACHE_EPOCH`, holding the delta only, because the delta is immutable and the verdict is not. An
   unreadable or foreign-epoch cache is recomputed, costing wall clock only. A cache entry recomputed
@@ -84,7 +87,8 @@ change reds the bar everywhere and is repaired forward instead of trusted.
   `transition-audit arms`, in chunk `declarations` with subject `repo`, so it is not held the way a
   kit self-test is (design A3). One fixture repo per §18r.1 row the audit can see, plus the
   criss-cross, liveness, registry and commit-msg arms, S12's edge-presence arm and S16's real-tree
-  arm. It prints the agreed `PASS (<n> assertions)` line against a floor. The leg is guarded on
+  arm. It prints the agreed `PASS (<n> assertions)` line against a floor; the suite as built prints 58 and pins
+  `FLOOR_ASSERTIONS=58`, and it cost 43 s on node `d`, well under the ceiling below. The leg is guarded on
   `.githooks/`, `tools/check-wiring.sh`, `tools/lib/`, `tools/memory-recall/` and
   `tools/memory-tree/`, every path its arms read, and declares a `ceiling` in `tools/gate-legs.json`:
   900 s, the `memory-hygiene self-test` sibling's, until the post-build bar's first reading
@@ -131,7 +135,10 @@ change reds the bar everywhere and is repaired forward instead of trusted.
 - **S15** On a builds-mode HEAD with the memory-recall kit's `extract.py` unresolvable from the kit
   directory the module derives, check 25 refuses by name — the kit, the path it looked in, that there
   is no degraded mode, and the remedy line `install the memory-recall kit` beside this one, because
-  govkit selects no kit from S12's edge (§8 F6) — and exits 1. On a shards-mode HEAD it never imports
+  govkit selects no kit from S12's edge (§8 F6) — and exits 1. The grammar is resolved EAGERLY,
+  before any merge is classified, and not at the first row keyed: S10's cache answers every merge
+  from disk without keying anything, so a lazy resolution let a tree whose recall kit had been
+  deleted report a clean audit. Measured as the staged RED of AC15 (rev-7). On a shards-mode HEAD it never imports
   the kit and prints its dormant line. Observed by AC15.
 - **S16** Two hook-list arms (§8 F7). In `tools/check-wiring.test.sh`, a FIXTURE arm: check H prints
   `commit-msg DIVERGES` for a fixture whose tracked `.githooks/commit-msg` differs from the resolved
@@ -150,7 +157,8 @@ change reds the bar everywhere and is repaired forward instead of trusted.
   `git show origin/main:tools/check-wiring.sh` reads at the pass after a fetch; unit 34's landing
   reconcile re-checks it against the advertised tip and moves it above any tip value at or above it.
   `tools/check-kit-versions.sh` holds no need row for this constant, so no gate requires the move and
-  a criterion reads it. Observed by AC17.
+  a criterion reads it. Read in the pass: `fb07ca25` holds 1.3 and `origin/main` after a fetch holds
+  1.4, so the move lands on 1.5. Observed by AC17.
 
 ## 3. Non-goals (OUT)
 
@@ -433,11 +441,20 @@ edge's `why`, the `project-owned` include) · `transition-audit.txt` (new, empty
   re-parents the merge, it exits 1 the same way.
   Red when: one git call in the module lacks `--no-replace-objects` or the `GIT_GRAFT_FILE` pin, so a
   ref an agent can write hides the lost row and check 25 reads clean.
-- **AC14** — When a fixture straggler merges a shards-mode default commit that changes one row, then
-  merges into the builds-mode default, `transition_audit.py --report` lists no delta entry for that
-  id, while a row the straggler changed itself is listed.
+  fixture: each half carries its own liveness assertion, added at rev-7 because the first cut of both
+  was vacuous. `git replace` takes no `-q`, so the fixture's replace ref was never created and the arm
+  graded nothing; and grafts are deprecated, so the arm asserts first that the graft file re-parents
+  the merge for git ITSELF before crediting the module's pin with resisting it.
+- **AC14** — When a fixture straggler takes a shards-mode default commit's row change across and
+  then merges into the builds-mode default, `transition_audit.py --report` lists no delta entry for
+  that id, while a row the straggler changed itself is listed.
   Red when: the A6 clause is dropped, so a row that came across from the default side is reported as
   the straggler's own change and demands a provenance row nobody can honestly write.
+  fixture: the straggler CHERRY-PICKS that commit; it may not merge it. A merge makes the commit a
+  common ancestor, so `merge-base --all` returns it and S4's every-base comparison already excludes
+  the row — the arm would then pass with A6 deleted. Amended at rev-7, after exactly that was
+  measured: the merge-shaped fixture stayed green under the staged break and the cherry-picked one
+  reds.
 - **AC15** — When `transition-audit.test.sh` runs check 25 over a builds-mode fixture whose
   memory-recall kit directory is absent, it exits 1 naming `memory-recall`, the path it looked in and
   the remedy line `install the memory-recall kit`; over a shards-mode fixture with the kit absent it
@@ -638,6 +655,28 @@ New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged 
   `builds` and the dormant branch no longer exists here; the permission line says so, and both of
   AC5's runs now stay in this unit's own pass as fixture runs. S6 and S7 keep their AC5 citations,
   the dormant observation still being made.
+- rev-7 · 2026-09-21 · built. Four divergences found while building, each recorded here rather
+  than absorbed. S15 + AC15: the memory-recall grammar is resolved EAGERLY rather than at the first
+  row keyed — S10's cache answers every merge from disk without keying anything, so the lazy form let
+  a builds-mode tree whose recall kit had been DELETED print a clean audit and never reach S15's
+  refusal. Found by staging AC15 RED against a fixture with a warm cache, which is what the arm was
+  for. AC14: the fixture is a CHERRY-PICK and not a merge, because a merged commit is a common
+  ancestor, `merge-base --all` returns it, and S4's every-base comparison already excludes the row —
+  measured, the merge-shaped fixture stayed green with the A6 clause deleted. AC13: both halves
+  gained a liveness assertion after the first cut of each was measured vacuous (`git replace` takes
+  no `-q`, and grafts are deprecated). S9: the hook announces a skip and exits 0 when the kit or a
+  python launcher is unresolvable, which S9 did not say and which a commit-time carrier owes.
+  S11 and S17 record two figures the pass MEASURED rather than predicted: the suite prints 58
+  assertions in 43 s, and `KIT_CHECK_WIRING_VERSION` moves to 1.5, strictly above `fb07ca25`'s 1.3
+  and `origin/main`'s 1.4 after a fetch in the pass.
+  NOT TAKEN, and named rather than left silent: `lexicon.py --suggest` refuses both `delta` and
+  `accounted`, which §4's Inventory anticipated. The rename it would force is NOT made. The two names
+  are the interface four specs cite — this one, unit 12, unit 13 and unit 34 — so the rename is a
+  build-wide edit across specs this pass does not own, and the two offenders join a
+  `VERB_OFFENDER_PIN` reconcile the branch ALREADY owes: measured at this pass's base commit the tree
+  reports 1001 offenders against a declared pin of 983, so the `lexicon naming predicates` leg is red
+  before this unit and one reconcile clears both. Every other function this unit adds leads with a
+  verb `.lexicon.conf` declares.
 
 ## 10. Reuse audit
 

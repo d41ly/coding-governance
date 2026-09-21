@@ -1124,6 +1124,23 @@
     "ceiling": 12720
   },
   {
+    "name": "transition-audit arms",
+    "argv": [
+      "bash",
+      "tools/memory-tree/transition-audit.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/check-wiring.sh",
+      "tools/lib/",
+      "tools/memory-recall/",
+      "tools/memory-tree/"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 900
+  },
+  {
     "name": "marker contracts",
     "argv": [
       "bash",

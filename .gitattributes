@@ -25,6 +25,7 @@ tools/template-size-limits.txt text eol=lf
 tools/run-gates/gate-profiles.txt text eol=lf
 
 # Git hooks are extensionless (the *.sh rule above misses them); a CRLF hook won't execute.
+.githooks/commit-msg text eol=lf
 .githooks/pre-commit text eol=lf
 .githooks/pre-push text eol=lf
 

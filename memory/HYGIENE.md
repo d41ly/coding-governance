@@ -121,6 +121,9 @@ there is no UNDECLARED third state, because every check below has to grade some 
   and its status is FOLDED from disposition rows and spec header verbs rather than typed.
 - Which checks move, and how, is in each check's own entry in the catalog below: 4, 6, 7, 8, 10, 13,
   15, 20 and 24. Under `shards` every one of them behaves exactly as it did before the key existed.
+- Check 25 is not in that list because it has no `shards` behaviour to preserve: it arrived with
+  the key, it grades merges across the switch itself, and on a shards-mode tree it announces that it
+  is dormant rather than reporting a clean zero.
 - `ASK_CUTOFF` is read only under `builds`. It is the zero-padded date that separates asks MIGRATED
   from a shard — whose ids are already anchored in another build's records — from asks filed after
   the switch-over. Check 13 below is its one consumer.
@@ -361,6 +364,33 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     it graded nothing rather than reporting clean.
     Under `BACKLOG_MODE=builds` it follows check 20's population out: a family archive is check 9's
     archive guard's, and this check grades the decision-log archive alone.
+
+25. **a TRANSITION MERGE loses no row** — a merge that joins a lineage still editing AUTHORED
+    backlog shards to a lineage already rendering them from build folders can drop a row change with
+    nothing watching: the shards side edits a file the builds side no longer authors, so a clean
+    three-way merge takes a side and neither outcome is a conflict. Every such merge in the history
+    HEAD carries is classified BY LINEAGE and never by a parent's tip — a straggler that pulled the
+    new conf early has a builds-mode tip and shards-mode content — and each row it changed owes
+    exactly ONE `RELOCATED` provenance row naming the id and the change commit. Delegated to
+    `transition_audit.py`, which owns the walk, and keyed through the memory-recall kit's anchor
+    grammar, so no second row grammar is spelled here. LIVE ONLY UNDER `BACKLOG_MODE=builds`: on a
+    shards-mode tree it prints that it is DORMANT and why, because a silent zero there reads exactly
+    like a clean audit. Three DEAD PROBE refusals guard it — a shallow repository, a history whose
+    shards-mode commits yield no mode boundary, and a walk that finds no builds-mode commit at all
+    while the shell's own conf read says `builds`, which is two readers of one key disagreeing.
+    Every line it prints, refusals included, begins `memory-hygiene: check 25 `, so one grep reaches
+    all of them.
+    NOT GRADED, and said out loud: a rebase, a squash or a cherry-pick that discards rows leaves no
+    merge behind and is invisible here; a text change on a continuation line of a wrapped legacy row
+    is not a version change to an anchor-keyed reader; and the truth of a `RELOCATED` row's `why` is
+    nobody's assertion. The watched paths are `backlog/` and the FAMILY-named rotated archives ALONE,
+    never the whole of `archive/`: rotating the decision log is routine, and a directory-wide
+    selector would report every id anchored in a rotated log as a lost row. Known transitions are
+    pinned in `project/transition-audit.txt`, which is APPEND-ONLY because a transition in history is
+    permanent; an unpinned one is COUNTED on the liveness line and never refused, since a merge
+    cannot list its own sha. A tree that wants the same refusal at the moment a merge is CONCLUDED
+    wires the module as a `commit-msg` hook, which is the one hook a clean `git merge` and a
+    conflicted one both reach.
 
 21. **every record names the spec it is evidence about** — a build folder holds one spec per unit,
     and everything else in it (an adversarial review, a build ledger, a research report, a

@@ -63,6 +63,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "DeadProbe",
+      "kind": "class",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "Dossier",
       "kind": "class",
       "file": "tools/codebase-map/map_lib.py"
@@ -138,6 +143,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "Problem",
+      "kind": "class",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "Ranked",
       "kind": "class",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -193,6 +203,16 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "Walk",
+      "kind": "class",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "accounted",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "addRoot",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -201,6 +221,11 @@
       "id": "addTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "add_kit_to_path",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "add_spec_records_region",
@@ -473,6 +498,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "build_entry",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "build_filtered",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -481,6 +511,11 @@
       "id": "build_form_index",
       "kind": "function",
       "file": "tools/lexicon/canon.py"
+    },
+    {
+      "id": "build_git_env",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "build_gov_index",
@@ -496,6 +531,11 @@
       "id": "build_grammar",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "build_graph",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "build_index",
@@ -993,6 +1033,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "check_watched",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "checks",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -1228,6 +1273,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "cmd_staged",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "cmd_survey",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1338,6 +1388,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "delta",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "demand_adopt_index_clean",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1398,6 +1453,11 @@
       "file": "tools/workflows/drift-audit-state.js"
     },
     {
+      "id": "derive_ancestors",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "derive_attribution",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1406,6 +1466,16 @@
       "id": "derive_backlog_path",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
+    },
+    {
+      "id": "derive_bases",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_boundaries",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "derive_candidates",
@@ -1433,14 +1503,29 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_change_commit",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "derive_ci_file",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_conf_rel",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "derive_default_branch",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_entries",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "derive_evidence",
@@ -1491,6 +1576,11 @@
       "id": "derive_lf_oid",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
+    },
+    {
+      "id": "derive_lineage",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "derive_live_rows",
@@ -1583,6 +1673,11 @@
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
+      "id": "derive_transition",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "derive_unsatisfied_requires",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1596,6 +1691,11 @@
       "id": "derive_verdicts",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "derive_watched",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "derive_width",
@@ -2183,6 +2283,11 @@
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
     },
     {
+      "id": "load_kit_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "load_map_tree",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -2416,6 +2521,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "main",
@@ -2868,14 +2978,49 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "print_detail",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_dormant",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_entries",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "print_last",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "print_pin_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "print_populations",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "print_recomputed",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_registry",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_report",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "print_summary",
@@ -3088,6 +3233,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_backlog_files",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "read_backlog_mode",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -3098,9 +3248,19 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_blobs",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "read_bytes_as_text",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "read_cache",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "read_canon_refusal",
@@ -3218,6 +3378,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_index_files",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "read_input",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -3268,6 +3433,21 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "read_merge_heads",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_mode",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_modes",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "read_oracle_answer",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -3276,6 +3456,11 @@
       "id": "read_registry",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "read_registry",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "read_roots",
@@ -3406,6 +3591,11 @@
       "id": "read_ts_type_end",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_versions",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "read_view_grammar_lines",
@@ -3688,6 +3878,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_liveness",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "render_map_md",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -3878,6 +4073,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "resolve_anchor",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "resolve_backend",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -3896,6 +4096,11 @@
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "resolve_cache_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "resolve_cell",
@@ -3978,6 +4183,16 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "resolve_recall_kit",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "resolve_registry",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "resolve_repo_root",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -3996,6 +4211,11 @@
       "id": "resolve_root",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "resolve_root",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "resolve_row_needles",
@@ -4230,6 +4450,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
     },
     {
@@ -4378,6 +4603,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "scan_history",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "scan_js_definitions",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -4421,6 +4651,11 @@
       "id": "scan_substituted",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "scan_touching",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "scan_tracked_specs",
@@ -5851,6 +6086,11 @@
       "id": "write_block",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "write_cache",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "write_lookup",

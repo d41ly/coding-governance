@@ -1,0 +1,20 @@
+# transition-audit.txt — the PINNED transition merges hygiene check 25 knows about.
+#
+# One row per merge: `<sha> accounted`. A row is APPEND-ONLY, because a transition in history is
+# permanent: the merge exists for as long as the history does, so a row that names one never stops
+# being true and is never drained. That is what makes this list different from its siblings under
+# this directory, every one of which is a shrink-only waiver registry.
+#
+# WHAT A ROW BUYS. Check 25 reds when a listed sha is absent from HEAD's history, when it no longer
+# CLASSIFIES as a transition, or when it no longer reads `accounted`. The middle one is the reason
+# the file exists: a classifier regression that drops one of several known transitions is otherwise
+# invisible, because the check would simply examine fewer merges and report a clean zero over the
+# ones it still sees.
+#
+# AN UNLISTED TRANSITION IS COUNTED, NEVER REFUSED. A merge cannot list its own sha — the sha does
+# not exist until the merge is written — so an unpinned transition is reported on the liveness line
+# as `unpinned <n>` and nothing more. `transition_audit.py --pin` prints the rows the unpinned ones
+# owe; it writes nothing, and a later commit appends what it printed.
+#
+# EMPTY ON ARRIVAL, and that is the expected state until the flip: this tree declares no
+# `BACKLOG_MODE=builds` commit yet, so its history holds no transition merge to pin.

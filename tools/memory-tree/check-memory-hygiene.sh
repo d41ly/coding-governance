@@ -544,6 +544,10 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # other than this one.
   F:spec-token-waivers.txt|F:readme-contract.txt) ;;
   F:stale-header-waiver.txt) ;;
+  # TOOL-dDerivedDocket-9 — check 25's pinned transition registry. APPEND-ONLY: a transition in
+  # history is permanent, so its row is too, and an unlisted transition is COUNTED rather than
+  # refused, because a merge cannot list its own sha.
+  F:transition-audit.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
   # forking this whitelist, which is what NicoCares carved this file out to do.
   #
@@ -1198,6 +1202,29 @@ if [ "$STAGED" = 0 ]; then
   if ! rotm=$("$_PY" "$HERE/row_grammar.py" --check-rotation 2>&1); then
     printf '%s\n' "$rotm"; status=1
   fi
+fi
+
+# 25 — the TRANSITION-MERGE audit. Delegated to transition_audit.py for the reason 24 is: the
+# assertion is a walk over the commit GRAPH keyed by the anchor grammar, and this file must not
+# spell a second row grammar or a second ancestry rule.
+#
+# THE SHELL'S OWN READING OF THE MODE IS PASSED IN. `BMODE` is resolved above, from the conf this
+# script sources; the module reads the mode a SECOND way, from each commit's own conf BLOB. A guard
+# sharing a variable with the thing it guards is not a guard, and two readers are — so when this
+# file says `builds` and the module's walk finds no builds-mode commit anywhere in the history, that
+# disagreement is a DEAD PROBE rather than a clean zero. Without the flag the module announces on
+# its own liveness line that the cross-check was not run.
+#
+# HELD UNDER --staged: the population is the commit GRAPH, which no staged path list narrows. The
+# commit-time carrier for a merge is `.githooks/commit-msg`, which calls the module directly.
+if [ "$STAGED" = 0 ]; then
+  if [ "$BMODE" = builds ]; then
+    tam=$("$_PY" "$HERE/transition_audit.py" --expect-builds 2>&1); _tarc=$?
+  else
+    tam=$("$_PY" "$HERE/transition_audit.py" 2>&1); _tarc=$?
+  fi
+  [ -n "$tam" ] && printf '%s\n' "$tam"
+  [ "$_tarc" -ne 0 ] && status=1
 fi
 
 # 11 — old-tree tombstone (only if TOMBSTONE_ROOTS is configured; never grandfathered).

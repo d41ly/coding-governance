@@ -942,6 +942,24 @@ out=$(bash "$SCRIPT" --check 2>&1); rc=$?
 ck "hooks: the pre-commit half is reported too" \
    "$(printf '%s' "$out" | grep -q 'pre-commit DIVERGES' && echo 1 || echo 0)"
 ck "hooks: two divergences still exit 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+# TOOL-dDerivedDocket-9 — THE THIRD HOOK. `commit-msg` carries hygiene check 25 at the moment
+# a merge is CONCLUDED, so a sibling checkout supplying somebody else's copy of it is exactly
+# the divergence this check exists to report — and until `commit-msg` joined
+# `GOV_WIRING_HOOKS` it could never report one. A FIXTURE arm, because an adopter's hook
+# population is theirs; the both-ways comparison against THIS repo's tracked hooks lives in
+# the memory-tree kit's transition-audit suite, which is gov-only.
+printf '#!/bin/sh
+exit 0
+' > .githooks/commit-msg; chmod +x .githooks/commit-msg
+git add -A; git commit -q -m "track the commit-msg hook"
+cp .githooks/commit-msg "$OOT/"
+out=$(bash "$SCRIPT" --check 2>&1)
+ck "hooks: an identical commit-msg reports no divergence" \n   "$(printf '%s' "$out" | grep -q 'commit-msg DIVERGES' && echo 0 || echo 1)"
+printf '# planted
+' >> "$OOT/commit-msg"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: a diverging commit-msg is REPORTED" \n   "$(printf '%s' "$out" | grep -q 'commit-msg DIVERGES' && echo 1 || echo 0)"
+ck "hooks: the commit-msg divergence does not gate either" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
 rm -f "$OOT/pre-push"
 out=$(bash "$SCRIPT" --check 2>&1)
 ck "hooks: an unreadable side is UNKNOWN, never ok" \

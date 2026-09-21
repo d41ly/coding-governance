@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# commit-msg — the transition-merge audit at the moment a merge is CONCLUDED.
+#
+# WHY THIS HOOK AND NOT ANOTHER. Measured on node `d` with git 2.54.0.windows.1 in a scratch repo:
+# a clean `git merge` fires `pre-merge-commit` with NO `MERGE_HEAD` set, then `commit-msg` with
+# `MERGE_HEAD` present; a conflicted merge concluded by `git commit` fires `pre-commit` and
+# `commit-msg`, both with `MERGE_HEAD` present. `commit-msg` is therefore the one hook that sees
+# EVERY concluded merge, which is why the audit's commit-time carrier lives here and not in
+# `pre-commit`, where a clean merge would sail past it.
+#
+# WHAT IT DOES. With no `MERGE_HEAD` it exits 0 and prints nothing — an ordinary commit is not this
+# hook's business. With one, it hands the pending merge to the memory-tree kit's transition audit,
+# which parents it on HEAD and every `MERGE_HEAD` line and trees it on the INDEX, and refuses the
+# commit when a row change crosses the mode boundary with no `RELOCATED` provenance row.
+#
+# IT CALLS THE MODULE DIRECTLY rather than the whole `--staged` hygiene engine. On a conflicted
+# merge `pre-commit` has already run every staged check, so routing through the engine would run
+# them a second time for no added coverage; the direct call is the smallest carrier of this one
+# question.
+#
+# EVERY PATH HERE IS DERIVED. A tracked hook is graded for install-prefix literals, and a spelled
+# kit path is one: the kit directory name and the tool root are assembled from variables, probed in
+# both install layouts, and an empty probe is an ANNOUNCED skip rather than a silent one.
+#
+# WHAT THIS HOOK DOES NOT CHECK, stated because a structural check reads as a semantic one. It sees
+# merges only: a rebase, a squash or a cherry-pick that drops a row never reaches it. It cannot run
+# without a python launcher or without the kit, and in both cases it SAYS SO and lets the commit
+# through — a commit-time carrier that blocks work because an interpreter is missing gets disabled,
+# and the same audit binds again at the push boundary, where check 25 runs over the whole history.
+set -u
+
+git_dir=$(git rev-parse --git-dir 2>/dev/null) || exit 0
+[ -f "$git_dir/MERGE_HEAD" ] || exit 0
+top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+
+# The kit and the tool root, as VALUES. Assembled rather than spelled, for the reason the header
+# gives; the probe answers "where is it actually installed", which is the only correct answer at
+# both the `tools/` prefix this repo uses and the bare prefix a copy-install produces.
+kit_name=memory-tree
+tool_root=tools
+module=""
+for base in "$top/$tool_root/$kit_name" "$top/$kit_name"; do
+  if [ -f "$base/transition_audit.py" ]; then module="$base/transition_audit.py"; break; fi
+done
+if [ -z "$module" ]; then
+  echo "commit-msg: the memory-tree kit is not installed under '$top', so the transition audit did"
+  echo "commit-msg: NOT run over this merge. Check 25 still binds at the push boundary."
+  exit 0
+fi
+
+# The python launcher, through the repo's ONE resolver. Sourced from a DERIVED path rather than
+# carried inline: an inline copy is a second set of bytes to keep byte-identical, and this file is
+# gov-side only — an adopter wires its own carrier, which is what the runbook's switch section says.
+resolver=""
+for base in "$top/$tool_root/lib" "$top/lib"; do
+  if [ -f "$base/resolve-python.sh" ]; then resolver="$base/resolve-python.sh"; break; fi
+done
+if [ -z "$resolver" ]; then
+  echo "commit-msg: the python-launcher resolver is not beside this tree, so the transition audit"
+  echo "commit-msg: did NOT run over this merge. Check 25 still binds at the push boundary."
+  exit 0
+fi
+# shellcheck source=/dev/null
+. "$resolver"
+if ! py=$(resolve_python); then
+  echo "commit-msg: no usable python launcher, so the transition audit did NOT run over this merge."
+  echo "commit-msg: Check 25 still binds at the push boundary."
+  exit 0
+fi
+
+"$py" "$module" --staged
