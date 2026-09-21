@@ -1631,6 +1631,120 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
 
 
 
+def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
+    """The comparison base is the REMOTE-TRACKING ref — TOOL-dDerivedDocket-21 S1 and S2, AC1 and AC2.
+
+    A pin raise that already LANDED on origin is the whole shape of the defect. Against the bare
+    branch name the report read the node's LOCAL main, so one commit graded a WEAKENED RATCHET on a
+    node whose local main was behind the raise and graded clean on every other node. Three states of
+    local main over ONE fixture — behind the raise, equal to origin, ahead by an unrelated commit —
+    must report the same signal values and the same verdict.
+
+    THE CONTROL IS WHAT MAKES THE THREE GREENS MEAN SOMETHING. The same behind state measured with
+    `--base-ref refs/heads/main`, the base the report used to take, must red: without it the three
+    agreeing states would pass just as well over a fixture whose raise never reached the ratchet.
+    """
+    import json
+
+    print("BASE is remote-tracking (local main behind, equal and ahead of origin: one answer)")
+    r = make_repo(tmp, name="remotebase")
+    conf = r / ".memory-tree.conf"
+    sig = r / "drift-audit" / "drift_signals.py"
+    conf.write_text(conf.read_text(encoding="utf-8") + 'ORPHAN_ID_PIN="5"\n',
+                    encoding="utf-8", newline="\n")
+    sig.write_text(
+        sig.read_text(encoding="utf-8")
+        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"}]\n',
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "seed the ratchet", "--no-verify"], r)
+    before = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+
+    bare = tmp / "remotebase.git"
+    run(["git", "init", "-q", "--bare", str(bare)], tmp)
+    run(["git", "remote", "add", "origin", str(bare)], r)
+    # THE RAISE, UNJUSTIFIED, pushed — what a raise another node already landed looks like from here.
+    conf.write_text(conf.read_text(encoding="utf-8").replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="9"'),
+                    encoding="utf-8", newline="\n")
+    run(["git", "commit", "-q", "-am", "raise the pin on origin", "--no-verify"], r)
+    tip = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    pushed = run(["git", "push", "-q", "origin", "main"], r)
+    tracked = run(["git", "rev-parse", "--verify", "--quiet", "refs/remotes/origin/main"], r)
+    check("the fixture's origin carries the raise, and the tracking ref names it",
+          pushed.returncode == 0 and tracked.stdout.strip() == tip,
+          (pushed.stdout + pushed.stderr)[-300:])
+    # HEAD stays AT the raise throughout; only local main moves. Detached, so `branch -f` may move it.
+    run(["git", "checkout", "-q", "--detach", tip], r)
+
+    def read_signal_values(*extra: str) -> tuple:
+        out = run([sys.executable, REPORT_REL, "--json", "--check", *extra], r)
+        try:
+            vals = {s["signal"]: (s["value"], s["live"]) for s in json.loads(out.stdout)}
+        except ValueError:
+            vals = {}
+        return vals, out
+
+    run(["git", "branch", "-f", "main", before], r)
+    behind, behind_out = read_signal_values()
+    run(["git", "branch", "-f", "main", tip], r)
+    equal, equal_out = read_signal_values()
+    run(["git", "checkout", "-q", "main"], r)
+    (r / "src" / "unrelated.txt").write_text("local only\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "an unrelated local commit", "--no-verify"], r)
+    run(["git", "checkout", "-q", "--detach", tip], r)
+    ahead, ahead_out = read_signal_values()
+
+    check("AC1: the report produced signals in all three states",
+          bool(behind) and bool(equal) and bool(ahead),
+          (behind_out.stderr + equal_out.stderr + ahead_out.stderr)[-400:])
+    check("AC1: local main BEHIND the raise reports the same signal values as EQUAL",
+          behind == equal, f"{behind} vs {equal}")
+    check("AC1: local main AHEAD by an unrelated commit reports the same signal values as EQUAL",
+          ahead == equal, f"{ahead} vs {equal}")
+    for label, out in (("behind", behind_out), ("equal", equal_out), ("ahead", ahead_out)):
+        check(f"AC1: {label}: the landed raise is NOT a weakened ratchet",
+              out.returncode == 0 and "RATCHET WEAKENED" not in out.stderr,
+              (out.stdout[-200:] + out.stderr)[-400:])
+
+    # THE CONTROL: the base the report used to take, over the behind state.
+    run(["git", "branch", "-f", "main", before], r)
+    _vals, stale = read_signal_values("--base-ref", "refs/heads/main")
+    check("control: against the stale LOCAL main the same raise reds as a weakened ratchet",
+          stale.returncode != 0 and "RATCHET WEAKENED" in stale.stderr,
+          (stale.stdout[-200:] + stale.stderr)[-400:])
+    run(["git", "branch", "-f", "main", tip], r)
+
+    # AC2 — the header carries the base ref AND an eight-hex sha.
+    head = run([sys.executable, REPORT_REL], r)
+    first = head.stdout.splitlines()[0] if head.stdout.strip() else ""
+    check("AC2: the header names refs/remotes/origin/main and the sha it resolved to",
+          re.search(r"\(base refs/remotes/origin/main @ [0-9a-f]{8}\)", first) is not None,
+          first or head.stderr[-300:])
+
+    # AC2 — `origin` configured, no tracking ref: a refusal naming the fetch, never a silent fallback.
+    run(["git", "update-ref", "-d", "refs/remotes/origin/main"], r)
+    unf = run([sys.executable, REPORT_REL, "--json"], r)
+    check("AC2: origin with no tracking ref REFUSES with exit 2",
+          unf.returncode == 2 and not unf.stdout.strip(), f"rc={unf.returncode} {unf.stdout[-200:]}")
+    check("AC2: ...and the refusal names `git fetch origin main`",
+          "git fetch origin main" in unf.stderr, unf.stderr[-400:])
+
+    # AC2 — no `origin` at all: the local branch IS the record, and the report says so.
+    run(["git", "remote", "remove", "origin"], r)
+    loc = run([sys.executable, REPORT_REL, "--json", "--check"], r)
+    check("AC2: a clone with no origin remote names the LOCAL base on stderr",
+          re.search(r"no origin remote, so the base is local main @ [0-9a-f]{8}", loc.stderr)
+          is not None, loc.stderr[-400:])
+    check("AC2: ...and exits as the signals decide, here clean",
+          loc.returncode == 0, (loc.stdout[-200:] + loc.stderr)[-400:])
+    txt = run([sys.executable, REPORT_REL], r)
+    first = txt.stdout.splitlines()[0] if txt.stdout.strip() else ""
+    check("AC2: ...and its header reads refs/heads/main with an eight-hex sha",
+          re.search(r"\(base refs/heads/main @ [0-9a-f]{8}\)", first) is not None,
+          first or txt.stderr[-300:])
+
+
 def test_ratchet_lookback(tmp: pathlib.Path) -> None:
     """The justification WINDOW is a project-layer declaration — TOOL-aDeclaredBound-3.
 
@@ -2312,6 +2426,7 @@ def main() -> int:
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)
+        test_base_is_remote_tracking(tmp)
         test_ratchet_lookback(tmp)
         test_ratchet_message_states_its_window(tmp)
         test_lang_mode_ratchet(tmp)

@@ -153,7 +153,10 @@ guard = []
 name = "kit/dogfood doc parity"
 subject = "repo"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
-guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/guides/BUILD-METHOD.md", "{memory_root}/guides/ANNOTATION-STYLE.md", "{kit}/"]
+guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/guides/BUILD-METHOD.md", "{memory_root}/guides/ANNOTATION-STYLE.md", "{kit}/", ".memory-tree.conf"]
+# `.memory-tree.conf` joined the guard under TOOL-dDerivedDocket-21: the suite names it, govkit
+# classes a declared `[config] file` as `root-conf`, and its selfcheck reds a guarded bar leg whose
+# argv names such a conf its guard lacks. The reasoning below holds for it unchanged.
 # BUILD-METHOD.md is in the guard because the leg VALIDATES it — the pairs this test compares are
 # HYGIENE.md, TEMPLATE-SPEC.md and guides/BUILD-METHOD.md, and the third was missing from both this
 # descriptor and gov's own manifest row. A guard that omits a file the leg reads makes the leg skip

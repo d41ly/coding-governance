@@ -139,3 +139,13 @@ partition, and the derived `mutates_index`. Each carries a LIVENESS arm in the s
 gov tree fed input that must red — because an assertion finding nothing on a clean tree is
 indistinguishable from one that cannot find anything, and that is this repo's own
 `fixture-passes-by-finding-nothing` class.
+
+**The guard partition has a sixth class, and guards are graded for COMPLETENESS.** A root file some
+descriptor declares as its `[config] file` is `root-conf`, derived and never listed, so a guard can
+name the conf its own leg reads; a root file nobody declares still falls into no class and reds 7c.
+Check 7c2 then reds a guarded bar leg, unheld by the runner's own predicate, whose tracked argv bytes
+name a declared root conf its guard lacks. A conf reached through a same-directory import or a
+literally sourced file prints as a report-only near-miss, since a transitive rule would red on every
+shared library. Its liveness refusal needs a declared conf, because a manifest with no guarded bar
+leg and nothing to protect is a true zero. Both counts it prints are derived, never written here.
+TOOL-dDerivedDocket-21.

@@ -147,6 +147,28 @@ The retired ternary had three branches and conflated the last two into the bare 
 a run that measured NOTHING reported the same word as a clean one. Changing any of these sentences
 is a version bump like any other.
 
+## What "landed" is measured against — the base ladder
+
+Every ancestry answer, every `git show <base>:<path>` a ratchet reads and the trace walk are
+measured against ONE ref, and the report prints it on its header line with the commit it resolved
+to: `(base refs/remotes/origin/main @ 1a2b3c4d)`. It is resolved remote-first:
+
+1. `--base-ref <ref>`, verbatim. The escape hatch for every rung below.
+2. The default branch's NAME: `GOV_DEFAULT_BRANCH`, else the last component of
+   `refs/remotes/origin/HEAD`, else a refusal (exit 2) naming both and `git remote set-head origin -a`.
+3. `refs/remotes/origin/<name>`, whenever it resolves.
+4. A clone with **no `origin` remote** compares against `refs/heads/<name>` and says so on stderr.
+   There is no staler or fresher copy of the branch in such a clone, so local is the record.
+5. A clone that **has `origin` but no tracking ref** for the branch refuses with exit 2 and names
+   `git fetch origin <name>`. Falling back to local there is the defect this ladder removes.
+
+The base used to be the bare branch name, which git resolves to the LOCAL branch, so the same commit
+read differently on a node whose local `main` was stale: a pin raise already on origin read as a
+weakened ratchet on that node alone. The report never fetches — it is a leg that must run offline,
+and a fetch would move the ref it is grading — so a node wanting a fresher answer fetches first.
+TOOL-dDerivedDocket-21; shipped under 1.12. A CI checkout that fetches branches without
+`refs/remotes/origin/HEAD` still needs `GOV_DEFAULT_BRANCH`, as before.
+
 ## Why pins rather than a perfect oracle
 
 The spec-status oracle has one residual false-positive mode it cannot cheaply discriminate: an id

@@ -1923,6 +1923,114 @@ user_skills = "/tmp/gk-fake-skills"
         check("that message says the taxonomy must partition its own input",
               "does not partition its own input" in bad_g.stdout, bad_g.stdout)
 
+        # ---- THE `root-conf` CLASS AND GUARD COMPLETENESS (TOOL-dDerivedDocket-21) -----------------
+        # 7c had five prefix classes and no home for a root file, so no guard could name the conf its
+        # own leg reads and a conf-only commit skipped that leg. The class is DERIVED from each
+        # descriptor's `[config] file`; 7c2 then reds a guarded bar leg whose argv names such a conf
+        # its guard lacks. Every arm is a fixture, because over gov's own tree both checks are silent
+        # by construction once the guards are complete.
+        def build_scratch_gov_conf(tag: str, legs: list, files: dict) -> pathlib.Path:
+            """A scratch gov tree whose one kit declares `.lexicon.conf` as its `[config] file`.
+
+            `legs` are manifest rows as (name, argv, guard, chunk); `files` are paths under the kit.
+            """
+            g = tmp / f"govconf-{tag}"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            (g / "tools" / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["tools/*"]\n\n'
+                '[selection]\ndefault = ["demo"]\n\n'
+                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n\n'
+                '[[exempt]]\npath = "tools/gate-legs.json"\nwhy = "a gov-specific leg manifest"\n',
+                encoding="utf-8", newline="\n")
+            body = ('id = "demo"\nhome = "tools/demo"\n'
+                    'version_from = { none = "fixture" }\n\n'
+                    '[check]\nnone = "a fixture kit"\n\n'
+                    '[config]\nfile = ".lexicon.conf"\n\n'
+                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                    '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n')
+            for nm, _argv, _guard, _chunk in legs:
+                body += (f'\n[[gate_leg]]\nname = "{nm}"\nargv = ["true"]\nguard = []\n'
+                         f'subject = "repo"\n')
+            (g / "tools" / "demo" / "kit.toml").write_text(body, encoding="utf-8", newline="\n")
+            (g / "tools" / "demo" / "adopt-demo.sh").write_text(
+                '#!/usr/bin/env bash\ngit add .\n', encoding="utf-8", newline="\n")
+            for rel, text in files.items():
+                (g / "tools" / "demo" / rel).write_text(text, encoding="utf-8", newline="\n")
+            (g / ".lexicon.conf").write_text("VERB_OFFENDER_PIN=0\n", encoding="utf-8",
+                                             newline="\n")
+            (g / "tools" / "gate-legs.json").write_text(
+                json.dumps([{"name": nm, "argv": argv, "guard": guard, "subject": "repo",
+                             "chunk": chunk} for nm, argv, guard, chunk in legs], indent=2) + "\n",
+                encoding="utf-8", newline="\n")
+            (g / "tools" / "govkit" / "subject-pins.tsv").write_text(
+                "# fixture pin\n" + "".join(f"{nm}\trepo\t{chunk}\n" for nm, _a, _g, chunk in legs),
+                encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "base")
+            return g
+
+        _rd = ["python", "tools/demo/reader.py"]
+        _reads = {"reader.py": 'CONF = ".lexicon.conf"\n'}
+        _quiet = ("quiet", ["true"], ["tools/demo/"], "declarations")
+
+        # AC4 — the class admits a DECLARED root conf, and only a declared one.
+        _c1 = run_in(build_scratch_gov_conf(
+            "class", [("demo", _rd, ["tools/demo/", ".lexicon.conf"], "declarations")], _reads))
+        check("root-conf: a guard naming the kit's declared conf falls into exactly one class",
+              _c1.returncode == 0 and "declared classes" not in _c1.stdout, _c1.stdout)
+        _c2 = run_in(build_scratch_gov_conf(
+            "nosuch", [("demo", _rd, ["tools/demo/", ".lexicon.conf", ".nosuch.conf"],
+                        "declarations")], _reads))
+        check("root-conf: a root file NO descriptor declares still reds 7c",
+              _c2.returncode == 1 and "'.nosuch.conf'" in _c2.stdout
+              and "declared classes" in _c2.stdout, _c2.stdout)
+        check("root-conf: ...and the declared conf beside it is not the one named",
+              "'.lexicon.conf'" not in _c2.stdout, _c2.stdout)
+
+        # AC5 — a guarded bar leg whose argv file names the conf, with the conf missing from its guard.
+        _c3 = run_in(build_scratch_gov_conf(
+            "lacks", [("demo", _rd, ["tools/demo/"], "declarations")], _reads))
+        check("7c2: a conf-reading guarded leg WITHOUT the conf reds, naming the leg and the conf",
+              _c3.returncode == 1 and "leg 'demo' reads root conf .lexicon.conf" in _c3.stdout,
+              _c3.stdout)
+        check("7c2: ...and it prints how many legs it graded",
+              "guarded bar legs graded 1 · root-conf readers 1" in _c3.stdout, _c3.stdout)
+        check("7c2: with the conf in the guard the same tree is green",
+              _c1.returncode == 0 and "reads root conf" not in _c1.stdout
+              and "guarded bar legs graded 1 · root-conf readers 1" in _c1.stdout, _c1.stdout)
+        _c4 = run_in(build_scratch_gov_conf(
+            "held", [("demo", _rd, ["tools/demo/"], "selftests"), _quiet], _reads))
+        check("7c2: the same leg moved to chunk `selftests` is not graded",
+              _c4.returncode == 0 and "reads root conf" not in _c4.stdout
+              and "guarded bar legs graded 1 · root-conf readers 0" in _c4.stdout, _c4.stdout)
+
+        # LIVENESS — nothing graded while a conf is declared refuses, it never reads as clean.
+        _c5 = run_in(build_scratch_gov_conf(
+            "dead", [("demo", _rd, ["tools/demo/"], "selftests")], _reads))
+        check("7c2: ZERO guarded bar legs graded with a declared conf is a refusal, not a green zero",
+              _c5.returncode == 1 and "graded ZERO guarded bar legs" in _c5.stdout, _c5.stdout)
+
+        # The residual — a conf read through a module BESIDE the argv file is reported, never graded.
+        _via = {"reader.py": "import confname  # noqa: E402\n",
+                "confname.py": 'CONF_NAME = ".lexicon.conf"\n'}
+        _c6 = run_in(build_scratch_gov_conf(
+            "via", [("demo", _rd, ["tools/demo/"], "declarations")], _via))
+        check("7c2: a conf read through a same-directory module does NOT red",
+              _c6.returncode == 0 and "reads root conf" not in _c6.stdout, _c6.stdout)
+        check("7c2: ...and prints a near-miss naming the leg, the conf and the module",
+              "near-miss: leg 'demo' may read root conf .lexicon.conf through "
+              "tools/demo/confname.py" in _c6.stdout, _c6.stdout)
+        _c7 = run_in(build_scratch_gov_conf(
+            "via-named", [("demo", _rd, ["tools/demo/", ".lexicon.conf"], "declarations")], _via))
+        check("7c2: once the guard names the conf, no near-miss line names the leg",
+              _c7.returncode == 0 and "near-miss: leg 'demo'" not in _c7.stdout, _c7.stdout)
+
         # ---- A REPO-LOCAL GATE POLICY MAY NOT RIDE OUT IN A KIT'S PAYLOAD ------------------------
         # TOOL-dUnstalledConvoy-28. `.githooks/pre-push` ships verbatim to every push-main adopter,
         # so a GATE_SELFTESTS assignment written into it turns the kit self-tests back on for

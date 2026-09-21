@@ -121,11 +121,14 @@ blocks_gate = false
 why = "`adopt-codebase-map.sh` copies the gate template only when it is ABSENT and never again, correctly, because the project owns that file and may customise it. `gen_map.py` is engine and updates on every kit upgrade. So a kit that starts writing a NEW generated artifact starts writing it into upgraded adopters whose frozen gate has no tier for it: the artifact is generated, committed, and compared by nothing. Auto-updating the adopter's gate is a different and more dangerous change and govkit owns update policy, so the hole is declared and COMPENSATED rather than closed."
 discharge = { command = ["python", "{kit}/check_gate_coverage.py"] }
 
+# `.codebase-map.conf` is in the guard because the checker reads it: govkit classes a root file a
+# descriptor declares as its `[config] file` as `root-conf`, and its selfcheck reds a guarded bar
+# leg whose argv names such a conf its guard lacks. TOOL-dDerivedDocket-21.
 [[gate_leg]]
 name = "codebase-map gate coverage"
 subject = "repo"
 argv = ["python", "{kit}/check_gate_coverage.py"]
-guard = ["{kit}/"]
+guard = ["{kit}/", ".codebase-map.conf"]
 
 [[lf_pin]]
 pattern = ".codebase-map.conf"

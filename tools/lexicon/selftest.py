@@ -943,9 +943,11 @@ with build_tempdir() as td:
     # sibling dirs, and the conf is at the repo ROOT — so a branch whose entire diff was the
     # declaration skipped its own verifier, and the tool's own red text instructs an author to
     # produce exactly that commit ("Paste this row into .lexicon.conf"). The guard could not be
-    # widened: govkit's guard taxonomy has no class for a root-level conf and declaring one reds
-    # `govkit selfcheck`, a ruling written into this kit's `kit.toml`. So the grade moved into
-    # `adopt-lexicon.sh --check`, which is the argv of the one leg here carrying an EMPTY guard.
+    # widened then: govkit's guard taxonomy had no class for a root-level conf, and declaring one
+    # redded `govkit selfcheck`. So the grade moved into `adopt-lexicon.sh --check`, which is the
+    # argv of the one leg here carrying an EMPTY guard. TOOL-dDerivedDocket-21 later gave the
+    # taxonomy a `root-conf` class and the guarded leg its conf; this arm still pins the UNGUARDED
+    # grade, which binds however a guard is narrowed.
     #
     # RATIFIED FIRST, because the unratified-seed refusal above would otherwise supply the red and
     # this arm would pass on the wrong refusal — the fixture-reds-for-another-reason class.

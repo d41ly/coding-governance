@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-21 — remote-relative bases and complete leg guards
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 21
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-21-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-21-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
@@ -50,6 +51,7 @@ does not name.
   prints how many legs it graded. It also prints, report-only, one near-miss line per guarded bar
   leg whose tracked argv file imports a module beside it by name, or sources a file by a literal
   path, whose bytes name a declared root conf the guard lacks — the residual §3 leaves ungraded.
+  Its liveness refusal fires when it graded no leg while the registry declares a root conf (§4).
   Observed by AC5, AC6 and AC9.
 - **S6** The three bar legs S5 names at BASE gain their conf, in `tools/gate-legs.json` and in the
   descriptor `[[gate_leg]]` row that declares each: `lexicon naming predicates` gains
@@ -60,7 +62,11 @@ does not name.
   grade, and it is the leg TOOL-aWalkedCorpus-5 was filed on. The fourth leg rev-3 named,
   `review-protocol parity (kit vs dogfood)`, is DONE on main by a different remedy and is dropped
   here: TOOL-dPolishedVitrine-1's round-1 F4 (`2814aaa5`) left it unguarded in both carriers, so it
-  runs on every bar and has no guard left to complete. Observed by AC6 and AC9.
+  runs on every bar and has no guard left to complete. Two more gov-only rows landed after BASE
+  and S5 names both at the build (rev-6): `transition-audit arms` gains `.memory-tree.conf`, and
+  `straggler-guard arms` gains `.memory-tree.conf` and `.lexicon.conf`, each by hand in
+  `tools/gate-legs.json` alone, because each is an `[[exempt_leg]]` no descriptor declares.
+  Observed by AC6 and AC9.
 - **S7** The two comments that record the guard as impossible — `tools/lexicon/kit.toml:97` and
   the B1 block at `tools/lexicon/adopt-lexicon.sh:459` — are rewritten to name the new class. The
   `lexicon wiring` grade stays: it is unguarded, so it still grades the declaration if a guard is
@@ -117,12 +123,13 @@ does not name.
 drift-report: this clone has no origin remote, so the base is local <name> @ <sha8>      (stderr)
 drift-report: origin has no tracking ref for '<name>'; run `git fetch origin <name>`     (exit 2)
 
-govkit selfcheck: guarded bar legs graded <n> · root-conf readers <m>
-govkit selfcheck: leg '<name>' reads root conf <conf> (argv file <path>) and its guard does not name it
-govkit selfcheck: near-miss: leg '<name>' may read root conf <conf> through <path> (not graded)
+govkit: guarded bar legs graded <n> · root-conf readers <m>
+govkit: leg '<name>' reads root conf <conf> (argv file <path>) and its guard does not name it
+govkit: near-miss: leg '<name>' may read root conf <conf> through <path>[, <path>…] (not graded)
 ```
 
-The `--json` shape is unchanged: the base is a header fact, not a signal.
+The `--json` shape is unchanged: the base is a header fact, not a signal. The three selfcheck
+lines print under the `govkit:` prefix every selfcheck line carries (rev-6).
 
 ### The base ladder
 
@@ -150,20 +157,24 @@ Comment-only lines are dropped: a comment names a branch, it never compares agai
 matches a row by FILE; each row records its file's hit count at BASE, so a new site in a listed file
 raises the count.
 
-| Site | Hits at BASE | What the name feeds | Disposition |
+| Site | Hits at BASE · at the build | What the name feeds | Disposition |
 |---|---|---|---|
-| `tools/drift-audit/drift_report.py` | 3 (`:1858`, `:1865`, `:1870`) | the NAME derivation, then ancestry, `git show <base>:<path>` and the trace walk | CONVERT (S1, S2): the name derivation stays exactly as today; the BASE becomes `refs/remotes/origin/<name>` |
-| `tools/memory-tree/check-verdict-epoch.sh` | 3 (`:76`, `:77`, `:84`) | `merge-base` with `origin/<def>`, then local `<def>` | WAIVE: already remote-first; the local rung fires only when no tracking ref resolves, and a too-early base only widens the scan |
-| `tools/run-gates/run-gates.sh` | 4 (`:121`, `:140`, `:1298`, `:1462`) | the name, the scoped-run base `origin/<def>`, and two printed labels | already remote-relative |
-| `tools/push-main.sh` | 4 (`:20`, `:23`, `:24`, `:63`) | the pushed branch and `$remote/$def`, two refusal messages, the current branch's name | already remote-relative; the local push is the in-place landing unit's |
-| `.githooks/pre-push` | 7 (`:91`–`:107`) | which pushed ref is the default branch, and a tracking-ref existence check | a NAME, not a base |
-| `.githooks/pre-commit` | 3 (`:25`–`:27`) | the primary-tree branch guard | a NAME, not a base |
-| `tools/unattended/unattended.sh` | 6 (`:860`, `:862`, `:878`, `:879`, `:1178`, `:2821`) | `check_branch` and `default_branch`, validated against the remote's advertisement, and the `run-branch` fact | a NAME, not a base |
-| `tools/playbook/render_playbook.py` | 1 (`:111`) | a value rendered into the charter | a NAME, not a base |
+| `tools/drift-audit/drift_report.py` | 3 (`:1858`, `:1865`, `:1870`) · 4 (`:1978`, `:1992`, `:1998`, `:2003`, the first in the resolver's docstring) | the NAME derivation, then ancestry, `git show <base>:<path>` and the trace walk | CONVERT (S1, S2): the name derivation stays exactly as today; the BASE becomes `refs/remotes/origin/<name>`, so the count at the build is the converted ladder's own |
+| `tools/memory-tree/check-verdict-epoch.sh` | 3 · 3 (`:76`, `:77`, `:84`) | `merge-base` with `origin/<def>`, then local `<def>` | WAIVE: already remote-first; the local rung fires only when no tracking ref resolves, and a too-early base only widens the scan |
+| `tools/run-gates/run-gates.sh` | 4 · 4 (`:121`, `:140`, `:1298`, `:1462`) | the name, the scoped-run base `origin/<def>`, and two printed labels | already remote-relative |
+| `tools/push-main.sh` | 4 · 5 (`:93`, `:96`, `:97`, `:355`, `:499`) | the pushed branch and `$remote/$def`, two refusal messages, and the current branch's name, read a second time by the in-place landing unit | already remote-relative; the local push is the in-place landing unit's |
+| `.githooks/pre-push` | 7 · 7 (`:93`–`:109`) | which pushed ref is the default branch, and a tracking-ref existence check | a NAME, not a base |
+| `.githooks/pre-commit` | 3 · 3 (`:25`–`:27`) | the primary-tree branch guard | a NAME, not a base |
+| `tools/unattended/unattended.sh` | 6 · 6 (`:1345`, `:1347`, `:1363`, `:1364`, `:1669`, `:4586`) | `check_branch` and `default_branch`, validated against the remote's advertisement, and the `run-branch` fact | a NAME, not a base |
+| `tools/playbook/render_playbook.py` | 1 · 1 (`:111`) | a value rendered into the charter | a NAME, not a base |
+| `.githooks/straggler-guard.sh` | 0 · 6 (`:129`, `:138`, `:166`–`:169`) | the flip's conf, read at `refs/remotes/origin/HEAD` first and at local `<def>` only after, then an environment cross-check | WAIVE: already remote-first, like `check-verdict-epoch.sh`; the local rung fires only where `origin/HEAD` carries no conf, and the cross-check warns and never selects |
+| `tools/memory-tree/migrate_backlog.py` | 0 · 11 (`:1274`–`:1284`, `:2409`–`:3401`) | `resolve_default_tip`: the NAME observed at `origin/HEAD` first, then the TIP read local-first with a remote fallback; the other seven hits are its own fixtures pinning `origin/HEAD` and the environment | WAIVE, residual named: the local-first tip is the contract of TOOL-dDerivedDocket-11's migration verbs, and converting it moves `--relocate` and `--ingest`, which run in the landing tree mid-merge, so it is not this unit's change. A stale local `main` can still misread its straggler inventory; the verb is no gate leg and prints the name and tip it compared against. The fixture lines are a NAME, not a base |
 
 Total at BASE `fb07ca25`: 31 hits in 8 files, PINNED as that measurement. At `abac6d59` it was 30
 in the same 8 files; only `tools/unattended/unattended.sh` moved, gaining the `run-branch` fact
-TOOL-aDeferredBar-3 added, which is a NAME like its five siblings.
+TOOL-aDeferredBar-3 added, which is a NAME like its five siblings. At the build (rev-6) the sweep
+hits 50 times in 10 files: two files landed after BASE in this build, `tools/push-main.sh` gained a
+fifth hit, and the converted report carries four.
 
 ### The `root-conf` class
 
@@ -183,14 +194,19 @@ that has adopted the kit receives the conf in the guard and one that has not dro
 For each manifest row with a non-empty `guard`, `subject` other than `kit` and `chunk` other than
 `selftests`: read every argv element that `git ls-files` tracks, and for each declared root conf
 whose file name occurs in those bytes, require it in the guard. A mention in a comment counts;
-that direction costs one re-run on a conf-only diff and never hides a red. Measured at BASE with a
+that direction costs one re-run on a conf-only diff and never hides a red, and it is why the two
+gov-only rows S6 gained at the build are given their confs although both mentions are fixture
+writes or a comment. Measured at BASE with a
 read-only probe over the real manifest at BASE `fb07ca25`: six guarded bar legs, three of which name
 a root conf, and all three lack it — the three S6 lists. At `abac6d59` it was seven and four; the
 seventh, `review-protocol parity (kit vs dogfood)`, left the guarded population when
-TOOL-dPolishedVitrine-1 dropped its guard, which is why S6 drops it too.
+TOOL-dPolishedVitrine-1 dropped its guard, which is why S6 drops it too. At the build it is
+eight and five: `transition-audit arms` and `straggler-guard arms` landed after BASE (rev-6).
 
-LIVENESS: zero guarded bar legs graded is a refusal naming the manifest, because it reads exactly
-like a corpus with nothing to fix.
+LIVENESS: zero guarded bar legs graded, while the registry declares at least one root conf, is a
+refusal naming the manifest, because it reads exactly like a corpus with nothing to fix. The
+second clause is rev-6's: a manifest with no guarded bar leg and no conf to protect is a TRUE zero,
+and twenty `selfcheck` runs in `tools/govkit/selftest.py` build exactly that tree.
 
 ### Files touched (estimate)
 
@@ -230,7 +246,7 @@ drift-audit version carrier is touched either: the drift-audit bytes ride unit 1
 - security — no new input surface. The base ladder reads refs and a remote URL that git already
   resolves; the completeness check reads tracked files govkit selfcheck already reads.
 - perf / scale — one `git remote get-url` and one `rev-parse` per drift run; the completeness check
-  reads each guarded bar leg's argv files once, six of them at BASE.
+  reads each guarded bar leg's argv files once, six of them at BASE and eight at the build.
 - error / empty / loading states — an unfetched tracking ref refuses with exit 2 and names the
   fetch; a remote-less clone proceeds and announces; zero guarded bar legs refuses as a dead probe.
 - observability — the header's base ref and sha on every drift run; the graded and reader counts on
@@ -508,6 +524,28 @@ New arm: `tools/govkit/selftest.py` · a root-conf guard, an undeclared root fil
   pass's backticking rationale above is corrected in place, both of its halves having been measured
   false, and §7 itself is untouched — the spelling stays as that pass left it and is now recorded as
   ungraded house style rather than as a checker requirement.
+- rev-6 · 2026-09-21 · build pass, same base · §2 S5 S6 · §4 data model, inventory, completeness,
+  LIVENESS · §5. Three divergences the build tree forced, each measured at HEAD `5ce18129`. First,
+  two gov-only guarded bar legs landed after BASE, `transition-audit arms` (TOOL-dDerivedDocket-9)
+  and `straggler-guard arms` (TOOL-dDerivedDocket-13). Both argv files name `.memory-tree.conf` and
+  the second names `.lexicon.conf` as well, so the probe reads eight guarded bar legs and five conf
+  readers where BASE read six and three, and S5 reds on both. Both mentions are fixture writes or a
+  comment, which §4 counts on purpose, so S6 gives both their confs by hand in `tools/gate-legs.json`
+  as it gives `recall floor` its conf, each being an `[[exempt_leg]]` no descriptor declares.
+  Second, LIVENESS as written refused on every manifest with no guarded bar leg, and twenty
+  `selfcheck` runs in `tools/govkit/selftest.py` build such trees: a correspondence tree whose one
+  leg has an empty guard, a ratchet tree whose one leg turns `kit`. A zero there is true, not dead,
+  so the refusal now needs the registry to declare a root conf too, the state where the check has
+  work and did none; gov's registry declares five. Third, the sweep re-run at HEAD hits 10 files:
+  `.githooks/straggler-guard.sh` and `tools/memory-tree/migrate_backlog.py` are new and each gains a
+  row, and `tools/push-main.sh` gained a fifth hit, another read of the current branch's name. The
+  migration verb's local-first tip is WAIVED with its residual named rather than converted, being
+  another unit's contract. §4's data model drops the `govkit selfcheck:` spelling for the `govkit:`
+  prefix every selfcheck line prints. S7's two comments have two more copies of the same stale
+  sentence, in `tools/lexicon/README.md` and a `tools/lexicon/selftest.py` comment, and the build
+  rewrites all four; the drift-audit kit has no dossier, its keys sitting in `baseline.toml`, so
+  only the govkit and lexicon dossiers are refreshed. No criterion's wording moves: AC3 grades §4's
+  rows, AC6's counts are derived at observation, and AC5 and AC9 read as written.
 
 ## 10. Reuse audit
 

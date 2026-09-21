@@ -141,6 +141,11 @@ waived line unpins it, reddening a merge that touched nothing the waiver guards;
 `install-prefix-waivers.txt`'s first real merge and is tracked as `TOOL-aSealedCaravan-1`. A waiver
 whose text is gone reds as STALE, so a registry cannot quietly outlive what it excuses.
 
+**`.lexicon.conf` is in the corpus leg's guard, and `lexicon wiring` still grades it unguarded.** A
+conf-only commit used to skip `lexicon naming predicates`, because govkit's guard partition had no
+class for a root file. Its `root-conf` class now takes every descriptor's `[config] file`, and govkit
+selfcheck reds a guarded bar leg whose argv names one its guard lacks. TOOL-dDerivedDocket-21.
+
 **`check-placeholders.sh` asserts what is true of a SOURCE, not of a render.** In this repo the
 shipped playbook file IS the un-instantiated template and carries placeholders permanently by
 design, so a bare leg asserting "no placeholder survives" would red on its own landing commit. The

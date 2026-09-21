@@ -330,7 +330,8 @@
       "memory/guides/BUILD-METHOD.md",
       "memory/guides/ANNOTATION-STYLE.md",
       "tools/lib/",
-      "tools/memory-tree/"
+      "tools/memory-tree/",
+      ".memory-tree.conf"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -637,7 +638,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [
-      "tools/codebase-map/"
+      "tools/codebase-map/",
+      ".codebase-map.conf"
     ],
     "ceiling": 60
   },
@@ -702,7 +704,8 @@
     ],
     "guard": [
       "tools/memory-recall/",
-      "memory/"
+      "memory/",
+      ".memory-tree.conf"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1084,7 +1087,8 @@
       "tools/",
       "skills/session-kickoff/",
       ".githooks/",
-      ".claude/"
+      ".claude/",
+      ".lexicon.conf"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1160,7 +1164,8 @@
       "tools/check-wiring.sh",
       "tools/lib/",
       "tools/memory-recall/",
-      "tools/memory-tree/"
+      "tools/memory-tree/",
+      ".memory-tree.conf"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1177,7 +1182,9 @@
       "tools/check-wiring.sh",
       "tools/lib/",
       "tools/memory-recall/",
-      "tools/memory-tree/"
+      "tools/memory-tree/",
+      ".memory-tree.conf",
+      ".lexicon.conf"
     ],
     "chunk": "declarations",
     "subject": "repo",

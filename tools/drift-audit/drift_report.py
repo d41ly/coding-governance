@@ -1963,13 +1963,81 @@ class Ctx:
         return None
 
 
+def resolve_base_ref(root: pathlib.Path, explicit: str | None) -> str:
+    """The ref "landed" means, resolved REMOTE-FIRST. TOOL-dDerivedDocket-21 S1 and S2.
+
+    Every ancestry answer, every `git show <base>:<path>` a ratchet reads and the trace walk are
+    measured against what this returns, so it is the one input to the report that is not the tree.
+    It used to be the bare default-branch NAME, which git resolves to the LOCAL branch: the same
+    commit then read differently on a node whose local main was stale. Measured, not supposed — an
+    ORPHAN_ID_PIN signal read 0 against a stale local main and 5 against origin, and a pin raise
+    that had already landed on origin read as a WEAKENED RATCHET on the stale node alone.
+
+    THE LADDER, one answer per rung:
+      1. `--base-ref`, verbatim. The escape hatch for every rung below.
+      2. The NAME: `GOV_DEFAULT_BRANCH`, else the last component of `refs/remotes/origin/HEAD`,
+         else a refusal. Unchanged, and the same derivation the push hooks and the lander share.
+      3. `refs/remotes/origin/<name>`, whenever it resolves.
+      4. A clone with NO `origin` remote: `refs/heads/<name>`, ANNOUNCED on stderr. There is no
+         staler or fresher copy of the branch in such a clone, so local is the record.
+      5. A clone that HAS `origin` and has not fetched the branch: a refusal. It cannot say what
+         landed, and falling back to local there is exactly the defect rung 3 removes.
+
+    Returns the ref; raises DriftError carrying the refusal. It fetches nothing: a report that
+    fetched would be a network call on a leg that must run offline, and would still grade a ref the
+    run itself could move.
+    """
+    if explicit:
+        return explicit
+    name = os.environ.get("GOV_DEFAULT_BRANCH") or ""
+    if not name:
+        # `encoding="utf-8"` like every other probe in this file. `text=True` ALONE decodes with
+        # the platform default, which on a cp125x Windows node mis-decodes a non-ASCII branch name
+        # and, under a strict-encoding lint, is a finding in its own right. Reported by the inCMS
+        # adopter, whose encoding-posture leg requires it (ARCH-dReadoptedConvoy-1 S7).
+        head = subprocess.run(["git", "-C", str(root), "symbolic-ref", "--quiet",
+                               "refs/remotes/origin/HEAD"], capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
+        name = head.stdout.strip().rpartition("/")[2] if head.returncode == 0 else ""
+    if not name:
+        raise DriftError("cannot resolve a default branch. Set GOV_DEFAULT_BRANCH, or pass "
+                         "--base-ref, or `git remote set-head origin -a`. Refusing to guess: every "
+                         "ancestry answer in this report is measured against it.")
+
+    def read_sha8(ref: str) -> str:
+        out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
+                              ref + "^{commit}"], capture_output=True, text=True,
+                             encoding="utf-8", errors="replace")
+        return out.stdout.strip()[:8] if out.returncode == 0 else ""
+
+    tracking = f"refs/remotes/origin/{name}"
+    if read_sha8(tracking):
+        return tracking
+    remote = subprocess.run(["git", "-C", str(root), "remote", "get-url", "origin"],
+                            capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if remote.returncode != 0:
+        local = f"refs/heads/{name}"
+        at = read_sha8(local)
+        if at:
+            # ANNOUNCED, because a reader must never mistake the fallback for the remote answer.
+            # When `at` is empty the caller's resolution check refuses and names the ref.
+            print(f"drift-report: this clone has no origin remote, so the base is local {name} "
+                  f"@ {at}", file=sys.stderr)
+        return local
+    raise DriftError(f"origin has no tracking ref for '{name}'; run `git fetch origin {name}`. "
+                     f"Refusing to fall back to the local branch: a stale local {name} is the "
+                     f"input this report used to grade instead of what landed.")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Report whether this repo's records still match reality.")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--check", action="store_true",
                     help="exit 1 if a GATEABLE signal is over its pin")
     ap.add_argument("--base-ref", default=None,
-                    help="ref that 'landed' means (default: the conf's DEFAULT_BRANCH, else main)")
+                    help="ref that 'landed' means, verbatim (default: refs/remotes/origin/<the "
+                         "default branch>; a clone with no origin remote uses the local branch, "
+                         "announced)")
     args = ap.parse_args(argv)
 
     try:
@@ -1987,32 +2055,21 @@ def main(argv: list[str] | None = None) -> int:
         print(f"drift-report: {exc}", file=sys.stderr)
         return 2
 
-    # THE LADDER THIS REPO ALREADY SHARES — `push-main.sh`, `.githooks/pre-push` and
-    # `check-verdict-epoch.sh` all resolve the default branch this way. The old line was
-    # `args.base_ref or conf["DEFAULT_BRANCH"] or "main"`: a fourth spelling, keyed on a conf key no
-    # kit declares and no doc mentions, falling back to a literal that may not exist. On a repo whose
-    # default is not `main`, every ancestry answer was silently wrong rather than refused.
-    base_ref = args.base_ref or os.environ.get("GOV_DEFAULT_BRANCH") or ""
-    if not base_ref:
-        # `encoding="utf-8"` like every other probe in this file. `text=True` ALONE decodes with
-        # the platform default, which on a cp125x Windows node mis-decodes a non-ASCII branch name
-        # and, under a strict-encoding lint, is a finding in its own right. Fourteen call sites in
-        # this file already carry it; this was the one that did not. Reported by the inCMS adopter,
-        # whose encoding-posture leg requires it (ARCH-dReadoptedConvoy-1 S7).
-        head = subprocess.run(["git", "-C", str(root), "symbolic-ref", "--quiet",
-                               "refs/remotes/origin/HEAD"], capture_output=True, text=True,
-                              encoding="utf-8", errors="replace")
-        base_ref = head.stdout.strip().rpartition("/")[2] if head.returncode == 0 else ""
-    if not base_ref:
-        print("drift-report: cannot resolve a default branch. Set GOV_DEFAULT_BRANCH, or pass "
-              "--base-ref, or `git remote set-head origin -a`. Refusing to guess: every ancestry "
-              "answer in this report is measured against it.", file=sys.stderr)
+    # THE NAME comes from the ladder `push-main.sh`, `.githooks/pre-push` and `check-verdict-epoch.sh`
+    # share; the BASE it names is the remote-tracking ref. `resolve_base_ref` carries both halves.
+    try:
+        base_ref = resolve_base_ref(root, args.base_ref)
+    except DriftError as exc:
+        print(f"drift-report: {exc}", file=sys.stderr)
         return 2
-    if subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", base_ref],
-                      capture_output=True).returncode != 0:
+    base_sha = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
+                               base_ref + "^{commit}"], capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
+    if base_sha.returncode != 0:
         print(f"drift-report: base ref '{base_ref}' does not resolve in this clone — this report "
               f"cannot judge ancestry against it.", file=sys.stderr)
         return 2
+    base_at = base_sha.stdout.strip()[:8]
     ctx = Ctx(root, conf, proj, base_ref)
     out = [s(ctx) for s in SIGNALS]
     for s in out:
@@ -2021,8 +2078,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(out, indent=1))
     else:
-        head = ctx.git.run("rev-parse", "--short", "HEAD").stdout.strip()
-        print(f"# drift-report at {head} (base {base_ref}) · kit {KIT_DRIFT_AUDIT_VERSION}")
+        head = ctx.git.run("rev-parse", "--short=8", "HEAD").stdout.strip()
+        # THE BASE IS A HEADER FACT, ref AND sha. Two nodes comparing reports can then see at once
+        # whether they graded the same commit, which a bare branch name never told them.
+        print(f"# drift-report at {head} (base {base_ref} @ {base_at}) · kit {KIT_DRIFT_AUDIT_VERSION}")
         print(f"# {'signal':<48} {'value':>7} {'of':>6}  status")
         for s in out:
             if s.get("not_asked"):

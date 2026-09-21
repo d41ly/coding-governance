@@ -94,23 +94,25 @@ code = 0
 probe = { must_exist = ".claude/skills/lexicon/SKILL.md" }
 means = "adopted"
 
-# The conf itself is deliberately NOT a guard pathspec. govkit partitions every guard into declared
-# classes — memory-root-relative, verbatim-repo-root, renamed, exempt, kit-relative — and a root-level
-# conf falls into none of them, so declaring one reds `selfcheck` rather than scoping anything.
-# Widening that taxonomy is a change to a different kit's contract.
+# THE CONF IS A GUARD PATHSPEC, since TOOL-dDerivedDocket-21. govkit partitions every guard into
+# declared classes, and until then a root-level conf fell into none of them — memory-root-relative,
+# verbatim-repo-root, renamed, exempt, kit-relative — so declaring one redded `selfcheck` and was
+# struck twice. The partition's sixth class, `root-conf`, is every descriptor's `[config] file`,
+# derived rather than listed, and `.lexicon.conf` is this kit's own, so a conf-only commit now runs
+# this leg. govkit's selfcheck also reds any guarded bar leg whose argv names a declared root conf
+# its guard lacks, so the gap cannot reopen by an edit here. `apply` keeps the entry only where the
+# target tracks the conf.
 #
-# SO THIS LEG IS THE EARLY SIGNAL AND NOT THE AUTHORITY, which is a correction to what this comment
-# used to claim. It said the cost was "an early signal on a conf-only diff, never a merge verdict"
-# because the pre-push hook bypasses every guard — but that force is bounded now (GATE_FULL_MAX_LAG),
-# so a scoped push inside the lag landed a raised pin with NO verdict computed. Closing review B1.
-# The grade moved onto `lexicon wiring` below, which carries an empty guard and already read the
-# declaration; the leg here keeps its guard and keeps saying the same thing sooner, under its own
-# name in the leg log.
+# `lexicon wiring` below STILL grades the declaration, and stays the authority. It carries an empty
+# guard, so it binds on every bar however a guard is narrowed later; this leg says the same thing
+# sooner, under its own name in the leg log. Closing review B1 moved the grade there while no guard
+# could name the conf, and the pre-push force being bounded (GATE_FULL_MAX_LAG) is why a scoped push
+# must never be the only thing between a raised pin and a verdict.
 [[gate_leg]]
 name = "lexicon naming predicates"
 subject = "repo"
 argv = ["python", "{kit}/lexicon.py"]
-guard = ["tools/", "skills/session-kickoff/", ".githooks/", ".claude/"]
+guard = ["tools/", "skills/session-kickoff/", ".githooks/", ".claude/", ".lexicon.conf"]
 
 [[gate_leg]]
 name = "lexicon wiring"

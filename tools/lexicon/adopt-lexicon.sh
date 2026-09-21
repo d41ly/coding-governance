@@ -449,19 +449,21 @@ if [ "$MODE" = "--check" ]; then
   #
   # Every ratchet this kit owns lives in `.lexicon.conf`: the two scalar pins, the `CELLS`
   # conventions, the `PINS` rows, the `CANON` overlay's effect on the DEBT/UNRULED split. The leg
-  # that computes those verdicts (`lexicon naming predicates`) is guarded on `tools/` and three
-  # sibling dirs, and `.lexicon.conf` is at the repo ROOT — so a branch whose whole diff is the
+  # that computes those verdicts (`lexicon naming predicates`) was guarded on `tools/` and three
+  # sibling dirs, and `.lexicon.conf` is at the repo ROOT — so a branch whose whole diff was the
   # declaration skipped its own verifier. Raising `VERB_OFFENDER_PIN` to any number, or flipping a
   # cell to `dark`, landed with no verdict computed. A ratchet whose drain is invisible on the
   # commit that drains it is not a ratchet, and the tool's own red text instructs the author to
   # produce exactly that commit shape ("Paste this row into .lexicon.conf").
   #
-  # THE GUARD IS NOT THE FIX, and that was tried twice and STRUCK twice. govkit partitions every
-  # declared guard into classes — memory-root-relative, verbatim-repo-root, renamed, exempt,
-  # kit-relative — and a root-level conf is in none of them, so declaring one reds `govkit
-  # selfcheck` rather than scoping anything. That ruling is written into this kit's own `kit.toml`.
-  # What was left was this script: it is the argv of `lexicon wiring`, the one leg in this kit
-  # carrying an EMPTY guard, and it already reads the declaration on every bar.
+  # THE GUARD WAS NOT THE FIX THEN, and is half of it now. It was tried twice and STRUCK twice:
+  # govkit partitioned every declared guard into classes with no home for a root-level file, so
+  # declaring `.lexicon.conf` redded `govkit selfcheck` rather than scoping anything. What was left
+  # was this script, the argv of `lexicon wiring`, the one leg in this kit carrying an EMPTY guard,
+  # which already read the declaration on every bar. TOOL-dDerivedDocket-21 then gave the partition
+  # a `root-conf` class, derived from each descriptor's `[config] file`, and the guarded leg names
+  # the conf now. This arm STAYS: unguarded, it grades the declaration however a guard is narrowed
+  # later, and this kit's `kit.toml` says the same beside the two legs.
   #
   # THE OTHER LEG STAYS, and it is not made redundant by this. It runs the same engine SCOPED,
   # which is an early signal under its own name in the leg log; this arm is the one that binds at
