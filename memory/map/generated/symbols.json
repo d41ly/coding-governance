@@ -3583,6 +3583,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_conf_at_rev",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_conf_key",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"

@@ -304,6 +304,78 @@ def load_conf(root: str) -> dict:
     return conf
 
 
+def read_conf_at_rev(root: str, rev: str) -> dict:
+    """The conf AS OF `rev`, through the same parser `load_conf` uses, or a named refusal.
+
+    TOOL-dDerivedDocket-53. A read pinned at a rev used to mix a pinned tree with evaluation-time
+    DECLARATIONS: `main()` resolves the working-tree root and calls `load_conf` on it above every
+    mode dispatch, so a mode that knows a rev was named is reached with the conf already read from
+    whatever the checkout happens to hold. This is the sibling such a mode calls instead, and it
+    pins the DECLARATIONS only — a conf VALUE naming a path still points into whatever tree the
+    caller then reads (`read_contract_rows` is the instance), which is the caller's to route.
+
+    A SIBLING, NOT A DEFAULTED PARAMETER on `load_conf`. One name with two meanings would make
+    every existing caller in the kit a pinned read that happens to be pinned at the working tree,
+    and the shell gate that SOURCES the same file would have no way to say which it meant.
+
+    IT NEVER FALLS BACK. Each of the three refusals is a state that would otherwise answer with
+    evaluation-time declarations while still LOOKING pinned, which is the whole defect wearing a
+    different hat.
+
+    THE THIRD REFUSAL COUNTS DECLARATIONS, AND COUNTS WHAT THE BLOB YIELDED. `parse_conf` cannot
+    fail: it keeps whatever `parse_conf_line` returns and silently drops every line that yields
+    nothing, so a blob of arbitrary bytes does not raise — it parses to the caller's own defaults
+    with nothing merged in, and the grade then rests on those defaults. Counting is not the second
+    grammar S1 bans: it reads no line, accepts every spelling that parser accepts, and decides
+    nothing the shell gate could disagree with. The count is taken from a parse into an EMPTY dict
+    and never from the size of the dict returned below, because the seed would keep that dict
+    non-empty however empty the blob was — a reader grading the returned size would never refuse,
+    which is this refusal's own defect wearing the mechanism meant to catch it.
+
+    STATED RESIDUAL: a conf that is legally all comments and blank lines refuses here. That is
+    deliberate. A file declaring nothing cannot pin anything, and it makes this reader stricter than
+    `load_conf`, which treats an absent file as defaults — the two never have to agree, which is why
+    that one keeps its bytes.
+
+    The seed below is RESPELLED rather than hoisted out of `load_conf` for that same reason; the two
+    literals are held equal by a selftest arm instead of by one constant.
+    """
+    name = ".memory-tree.conf"
+    try:
+        sha = run("git", "rev-parse", "--verify", "--quiet", rev + "^{commit}", cwd=root).strip()
+    except subprocess.CalledProcessError:
+        sha = ""
+    if not sha:
+        raise Problem(
+            f"conf at rev {rev}: that rev resolves to no commit in this repository, so {name} "
+            f"could not be looked up at it — and a pinned read never falls back to the working tree")
+    try:
+        # Through `run()`, the one choke point that scrubs the inherited git environment. Its text
+        # mode folds CRLF exactly as `read_text` does for the working-tree read, and the conf
+        # grammar's structural characters are ASCII, so the two readers see the same declarations.
+        text = run("git", "show", f"{sha}:{name}", cwd=root)
+    except subprocess.CalledProcessError:
+        raise Problem(
+            f"conf at rev {rev} ({sha[:12]}): the tree at that rev carries no {name} blob, so "
+            f"there is nothing there to pin — and a pinned read never falls back to the working "
+            f"tree") from None
+    declared = parse_conf(text, {})
+    count = len(declared)
+    if count == 0:
+        raise Problem(
+            f"conf at rev {rev} ({sha[:12]}): the {name} blob at that rev yields zero "
+            f"declarations, so a pinned answer would grade on this reader's own defaults while "
+            f"still reading as pinned — and a file declaring nothing pins nothing")
+    # S3 — the SOURCE, on every pinned read, on stderr. A pinned read that says nothing about where
+    # its declarations came from is indistinguishable from an unpinned one, and stderr is the
+    # channel every notice in this module already takes: stdout is a value a program parses.
+    print(f"build-index: conf pinned at {rev} ({sha[:12]}) · {name} · {count} declaration(s)",
+          file=sys.stderr)
+    conf = {"MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": ""}
+    conf.update(declared)
+    return conf
+
+
 def unfenced_lines(text: str):
     """Yield (lineno, line) for every line OUTSIDE a fenced block, then the open fence's line.
 
@@ -3846,6 +3918,110 @@ def cmd_selftest() -> int:
             # it is asserted over a SECOND root rather than assumed from the tracked conf.
             arm("a tree that did not declare the family anchors nothing in that same line", "None",
                 lambda: str(_ex_anchor_off(_ex_break)))
+
+    # TOOL-dDerivedDocket-53 — `read_conf_at_rev`. ONE fixture repository, four commits, because the
+    # property under test is a DIFFERENCE BETWEEN REVS and a single-commit fixture cannot hold one.
+    # No arm below reads this repository's own conf: an arm satisfied by whatever gov happens to
+    # declare today would be green over a reader that never looked at the rev at all.
+    with tempfile.TemporaryDirectory() as cbase:
+        cx = os.path.join(cbase, "pinned")
+        os.makedirs(cx)
+        run("git", "init", "-q", ".", cwd=cx)
+        run("git", "config", "user.email", "t@t.test", cwd=cx)
+        run("git", "config", "user.name", "t", cwd=cx)
+
+        def _conf_commit(label: str) -> str:
+            run("git", "add", "-A", cwd=cx)
+            run("git", "commit", "-q", "-m", label, "--no-verify", cwd=cx)
+            return run("git", "rev-parse", "HEAD", cwd=cx).strip()
+
+        write_text(os.path.join(cx, "seed.txt"), "a tree that predates the conf entirely\n")
+        _c_noconf = _conf_commit("no conf blob at all")
+        write_text(os.path.join(cx, ".memory-tree.conf"),
+                   "# every line here is a comment\n\n   \n# and not one of them declares a key\n")
+        _c_silent = _conf_commit("a conf blob that declares nothing")
+        write_text(os.path.join(cx, ".memory-tree.conf"),
+                   'MEMORY_ROOT=memory-old\nASK_CUTOFF="2026-01-01"\n')
+        _c_old = _conf_commit("the older declaration")
+        write_text(os.path.join(cx, ".memory-tree.conf"),
+                   'MEMORY_ROOT=memory-new\nASK_CUTOFF="2026-09-01"\n')
+        _c_new = _conf_commit("the newer declaration, which the working tree also holds")
+
+        def _pinned(rev: str) -> tuple:
+            """(conf, stderr) for one pinned read, with S3's notice captured off the suite's own
+            stream so an arm can assert on it instead of it decorating the run."""
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                conf = read_conf_at_rev(cx, rev)
+            return conf, err.getvalue()
+
+        def _conf_refusal(rev: str) -> str:
+            """One refusal's text with the REV ITSELF neutralised, so the distinctness arm below
+            measures the WORDING and not the argument. Comparing the raw messages would be vacuous:
+            every refusal embeds its own rev, so any two of them differ whatever they say, and three
+            copies of one sentence would read as three distinct texts."""
+            try:
+                read_conf_at_rev(cx, rev)
+            except Problem as exc:
+                return str(exc).replace(rev, "<rev>").replace(rev[:12], "<sha>")
+            return "NO REFUSAL"
+
+        # AC1 — and it is the CONTRAST that makes it evidence. A reader that joined the key's path
+        # to the working-tree root returns `memory-new` for both halves of this one value, which is
+        # exactly the shape this unit exists to remove.
+        arm("a pinned read takes its declarations from the REV, not from the checkout",
+            "pinned=memory-old working=memory-new",
+            lambda: f"pinned={_pinned(_c_old)[0]['MEMORY_ROOT']} "
+                    f"working={load_conf(cx)['MEMORY_ROOT']}")
+        arm("a second key at the same older rev is pinned too, not just the first",
+            "2026-01-01", lambda: _pinned(_c_old)[0]["ASK_CUTOFF"])
+
+        # AC2 — the three refusals. Each names the rev and the path, and none of them degrades to
+        # the working tree, which would still read as pinned.
+        arm("a rev that resolves to nothing is a named refusal", "resolves to no commit",
+            lambda: read_conf_at_rev(cx, "deadbeef" * 5))
+        arm("a rev whose tree carries no conf blob is a named refusal",
+            "carries no .memory-tree.conf blob", lambda: read_conf_at_rev(cx, _c_noconf))
+        arm("a conf blob that declares nothing is a named refusal, not a parse to the defaults",
+            "yields zero declarations", lambda: read_conf_at_rev(cx, _c_silent))
+        _c_texts = [_conf_refusal("deadbeef" * 5), _conf_refusal(_c_noconf),
+                    _conf_refusal(_c_silent)]
+        # THE COUNT OF REFUSALS IS IN THE SAME VALUE as the count of distinct texts, because three
+        # reads that all returned a conf would also be "one distinct text" and would pass a
+        # distinctness arm that only compared strings.
+        arm("the three refusal texts are distinct from one another", "distinct=3 refused=3",
+            lambda: f"distinct={len(set(_c_texts))} "
+                    f"refused={sum(1 for t in _c_texts if t != 'NO REFUSAL')}")
+
+        # AC3 — the source notice, on stderr, naming the rev. stdout is asserted EMPTY in the same
+        # value: a notice that reached stdout would join a machine-read projection there.
+        _c_out, _c_err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(_c_out), contextlib.redirect_stderr(_c_err):
+            read_conf_at_rev(cx, _c_new)
+        arm("the source notice names the rev, on stderr, and stdout stays empty",
+            "notice=True names-rev=True stdout=''",
+            lambda: f"notice={'conf pinned at' in _c_err.getvalue()} "
+                    f"names-rev={_c_new[:12] in _c_err.getvalue()} "
+                    f"stdout={_c_out.getvalue()!r}")
+
+        # AC4 — S5's unchanged working-tree path, asserted on its own rather than only as the
+        # contrast above. `load_conf` reads the checkout and nothing about it moved.
+        arm("the working-tree read still answers from the checkout", "memory-new",
+            lambda: load_conf(cx)["MEMORY_ROOT"])
+        # THE SEED IS RESPELLED IN TWO PLACES because S4 keeps `load_conf`'s bytes, so the drift
+        # that costs is held here instead of by a shared constant: `load_conf` over a root with no
+        # conf file IS the seed, and the pinned read's dict must be it plus what the blob declared.
+        _c_bare = os.path.join(cbase, "bare")
+        os.makedirs(_c_bare)
+        _c_defaults = load_conf(_c_bare)
+        _c_pinned_new = _pinned(_c_new)[0]
+        _c_undeclared = ("DISCIPLINES", "FAMILIES")
+        arm("the pinned reader's seed is load_conf's seed, key for key and value for value",
+            "extra=['ASK_CUTOFF'] missing=[] undeclared-agree=True",
+            lambda: f"extra={sorted(set(_c_pinned_new) - set(_c_defaults))} "
+                    f"missing={sorted(set(_c_defaults) - set(_c_pinned_new))} "
+                    f"undeclared-agree="
+                    f"{all(_c_pinned_new[k] == _c_defaults[k] for k in _c_undeclared)}")
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it

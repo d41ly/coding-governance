@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-53 — a pinned read pins its conf too
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 14
+**Status:** CLOSED · rev-1 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dDerivedDocket-53-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-53-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-54 |
 
 <!-- /gen:spec-records -->
