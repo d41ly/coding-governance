@@ -14,8 +14,12 @@ AC8 carries a `permission:` line deferring its suite run and the `harness arms` 
 main loop runs after the last unit is terminal. Its `ARMS_FLOORS` half is answered here, because it
 is a measurement over source and not a run.
 
-Two criteria moved in rev-2, which was written before the code as the brief requires, and the
-revision log says why each one did.
+Three criteria moved in rev-2, which was written before the code as the brief requires, and with
+them the two scope items and the section 7 line that said the same things in other words. The
+revision log says why each one did. The bug-class checklist was then run over this unit's own
+commit, and the two classes that bit it were closed in a fold rather than reported: AC7's re-measured
+figure had left its own Red-when and S8 spelling the base's number, and AC8 was recorded as amended
+here while its text had not been touched at all.
 
 **Evidences:** TOOL-dDerivedDocket-49
 - AC1 — `derive_next_shape` — over a scratch fixture holding one READY unit and nothing else, the
@@ -59,11 +63,15 @@ revision log says why each one did.
   twice over, because this unit opens none of them. The criterion's pinned headroom figure was
   AMENDED in rev-2 rather than re-cited: it fell from 93 B at the base to 13 B at this parent,
   spent by units that landed in between. It moves no verdict here and would have moved one for any
-  unit that wrote a dossier byte.
-- AC8 — amended rev-2 — the criterion asks that the `ARMS_FLOORS` pair for
-  `tools/unattended/unattended.sh` name a new count, and it does not move. That gate counts
-  `fail <n> "` call sites; measured at 256 at this commit and 256 at its parent, because the ladder
-  adds no refusal at all and `.memory-tree.conf` therefore left the write set unwritten. What DID
+  unit that wrote a dossier byte. The fold then took the same number out of the criterion's own
+  Red-when and out of S8, where the re-measurement had left the base's 93 B standing; the figure
+  lives on one line now.
+- AC8 — amended rev-2 — the draft asked that the `ARMS_FLOORS` pair for
+  `tools/unattended/unattended.sh` name a NEW count, which this unit cannot honestly do: that gate
+  counts `fail <n> "` call sites and the ladder adds no refusal at all. Measured at 256 at this
+  commit and 256 at its parent, so the amended criterion asserts the two counts EQUAL and
+  `.memory-tree.conf` left the write set unwritten. S7 and section 7 named the same pair and are
+  amended with it, which the fold caught. What DID
   move is the suite's own executed-assertion floor, raised by the 26 assertions the new arms add,
   all of them in region two, so `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` each carry +26 and
   `FLOOR_SHARD_1` is untouched; the count is derived from the block's own assertion lines, never

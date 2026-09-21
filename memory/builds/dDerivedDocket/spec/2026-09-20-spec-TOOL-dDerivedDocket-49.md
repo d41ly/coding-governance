@@ -56,12 +56,18 @@ takes, and keep that landed criterion in step with it.
   it needs the ask rung's predicate, which that unit builds, and is observed by its own second arm
   at its own pass. Observed by AC9.
 - **S7** Every new refusal or shape branch gets an arm in `tools/unattended/unattended.test.sh`,
-  each observed RED with its fix unstaged, and the `tools/unattended/unattended.sh` pair of
-  `ARMS_FLOORS` in `.memory-tree.conf` moves in the same commit. Observed by AC8.
+  each observed RED with its fix unstaged, and whichever floor the added arms actually move moves in
+  the same commit. AMENDED at rev-2: the draft named the `tools/unattended/unattended.sh` pair of
+  `ARMS_FLOORS` in `.memory-tree.conf`, and that gate counts `fail <n> "` call sites, of which this
+  unit adds none — the ladder has no refusal in it. What the added arms do move is the suite's own
+  executed-assertion floor, so `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` carry the raise and the
+  meta-gate's pair stays where it is, unchanged rather than unexamined. Observed by AC8.
 - **S8** This unit's delta on every capped carrier is ZERO. It writes no conf key and no guide,
-  Skill or dossier prose; the unattended dossier held 20387 B of a 20480 B cap when this spec was
-  written, and no claim key moves because the codebase map does not scan `.sh` at all. Observed by
-  AC7.
+  Skill or dossier prose, and no claim key moves because the codebase map does not scan `.sh` at
+  all. The dossier's own headroom is read off AC7's `figure:` line and is NOT restated here: the
+  draft carried 20387 B of a 20480 B cap in this bullet as well, and a figure stated in two places
+  is the one that goes stale in the copy nobody re-measures — which is exactly what happened to both
+  between the base and this pass. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -301,8 +307,10 @@ and the only reader that can tell the difference is a source-level arm.
   `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md`, and the line
   count of each protocol copy, read with `git cat-file -p` piped to `wc -l` at both commits,
   matches.
-  Red when: this unit spends the unattended dossier's headroom, which was 93 B when this spec was
-  written, or touches a protocol copy this build has priced for other units.
+  Red when: this unit spends the unattended dossier's headroom, whatever the `figure:` line below
+  currently measures it at, or touches a protocol copy this build has priced for other units. The
+  draft spelled the number here too and the `figure:` line's re-measurement left it standing at
+  93 B; the number lives in one place now.
   figure: AMENDED at rev-2 and RE-MEASURED rather than re-cited. The pin read 93 B, measured
   2026-09-20 at `fb07ca25` as 20387 B against the `DOSSIER_CAP_BYTES` of
   `tools/memory-tree/check-memory-hygiene.sh:90`. At this unit's parent the dossier is 20467 B, so
@@ -310,11 +318,19 @@ and the only reader that can tell the difference is a source-level arm.
   `TOOL-dDerivedDocket-48` recorded. It moves no verdict here, because this unit opens no dossier at
   all, and it would have moved one for any unit that wrote a byte into it. That line declares the
   dossier's line half as 0, so it is off, while the guides' line half at `:84` is read here.
-- **AC8** — When the driver suite runs, every branch this unit adds has an arm, the suite's
-  executed-assertion floor holds, and the `tools/unattended/unattended.sh` pair of `ARMS_FLOORS` in
-  `.memory-tree.conf` names the new count.
+- **AC8** — When the driver suite runs, every branch this unit adds has an arm and the suite's
+  executed-assertion floor holds, raised by the arms this unit adds; and when the `fail <n> "` call
+  sites of `tools/unattended/unattended.sh` are counted at this commit and at its parent, the two
+  counts are equal, so the `ARMS_FLOORS` pair in `.memory-tree.conf` is unchanged BECAUSE nothing it
+  counts moved.
   Red when: a rung lands with no arm, so a ladder whose whole value is that every rung has a failing
-  case ships with a rung that has none.
+  case ships with a rung that has none; or a floor is left where the arms found it, so removing one
+  of them later costs nothing.
+  AMENDED at rev-2. The draft required the `ARMS_FLOORS` pair to name a NEW count, which this unit
+  cannot honestly do: that meta-gate counts refusal branches, the ladder adds none, and a pair moved
+  to satisfy a criterion would be a number rather than a floor. The count is asserted equal instead,
+  which is the same question asked in the direction this unit can answer, and the floor that does
+  move is named.
   permission: the suite run and the `harness arms (fail branches armed or pinned)` leg over the real
   tree are runs this pass may not make, so both are deferred to the run the main loop makes at
   VERIFYING after the last unit. In the pass each new arm is observed RED by hand against a scratch
@@ -336,7 +352,8 @@ and the only reader that can tell the difference is a source-level arm.
 
 New arm: `tools/unattended/unattended.test.sh` · moving the ask rung above the MISSING rung in the
 declared block, and separately emptying the roster of the fixture that grades AC2 · the driver
-suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
+suite's executed-assertion floor, raised by the arms this unit adds. AMENDED at rev-2: `ARMS_FLOORS`
+was named here too and does not move, for the reason AC8 now states.
 
 ## 8. Open questions
 
@@ -404,10 +421,24 @@ suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unatte
   column read as though the table owned the state word and the undecided shape, and it owns neither.
   What it owns for those two rungs is their position, which is the whole point of the unit.
 
-  AC8's `ARMS_FLOORS` clause is NOT amended and the pair does not move: that gate counts `fail <n> "`
-  call sites, measured at 256 in `tools/unattended/unattended.sh` at this commit and 256 at its
-  parent, and this unit adds no refusal at all. The suite's own executed-assertion floors DO move,
-  by the 26 assertions the new arms add, all of them in region two.
+  AC8's `ARMS_FLOORS` clause IS amended, together with S7 and §7's new-arm line, which is the half
+  the first cut of this entry left standing. That gate counts `fail <n> "` call sites, measured at
+  256 in `tools/unattended/unattended.sh` at this commit and 256 at its parent, and this unit adds
+  no refusal at all, so the pair cannot name a new count without being moved to satisfy a criterion
+  rather than to record a measurement. The criterion asserts the two counts EQUAL instead. The
+  suite's own executed-assertion floors DO move, by the 26 assertions the new arms add, all of them
+  in region two.
+
+  Extended on the same pass, same base and rev · S7 · S8 · §7 · AC7 · AC8 · the bug-class
+  checklist's fold, run over this unit's own commit. Two of its classes bit this diff and both are
+  closed here rather than reported. `amendment-leaves-its-other-half-standing`, twice: AC7's
+  `figure:` line was re-measured to 13 B while its Red-when and S8 both went on spelling the base's
+  93 B, and AC8 was recorded as amended in the ledger while its text and S7's and §7's were not
+  touched at all. The headroom figure now lives only on the `figure:` line, and AC8, S7 and §7 say
+  the same thing about `ARMS_FLOORS` in one voice. `two-answers-to-one-question`: the AC6 arms
+  retype two driver literals in the suite, which is deliberate and is now claimed in the arm's own
+  comment — sourcing them from the driver, which is the fix the sibling `RB_TAIL_` pins took at
+  `TOOL-dDerivedDocket-48`, would make this particular pair compare a value against itself.
 
 - rev-1 · 2026-09-20 · initial draft. Promoted from the G3 round-2 spec audit's H1 (raw id 1) at the
   review's bounded exit. Section 8 F1 rules which half of the contradiction yields, the design

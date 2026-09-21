@@ -2098,6 +2098,12 @@ same "rung 5 is the terminal shape"       "$(printf '%s\n' "$rungs" | sed -n 5p)
 # check 30 reads the conjunction of a NOT A UNIT row with the LAST rung's wording, and the runtime
 # arms below match on the same words, so reflowing one of these unwires three readers at once while
 # the ladder goes on reporting itself correct.
+#
+# THE LITERALS ARE RETYPED HERE, AND THAT IS THE MECHANISM RATHER THAN A SECOND COPY TO KEEP IN
+# STEP. The sibling `RB_TAIL_` pins in this file were sourced from the driver precisely so a moved
+# pin could not leave the arms cutting at the old value; these two must NOT be, because the question
+# they ask is whether the driver still spells this exact wording, and a value read out of the driver
+# and compared against itself answers that for every wording equally.
 same "the terminal rung's wording is in the table verbatim, once" \
   "$(grep -c '^rung everything-terminal none - every tracked spec is terminal$' "$SCRIPT")" "1"
 same "the nothing-graded rung's wording is in the table verbatim, once" \
