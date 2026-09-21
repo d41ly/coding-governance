@@ -4677,8 +4677,13 @@ git push -q -f origin HEAD:main 2>/dev/null
 # a marker naming an EARLIER commit — the arm a presence test cannot fail. The refusal names BOTH
 # shas, because "stale marker" and "HEAD moved since the push" are different faults with different
 # remedies and a message naming only the wanted one cannot tell them apart.
-printf 'landed main at 0000000000000000000000000000000000000000 by a previous run\n' > "$GCD/tmarker"
+# TOOL-dDerivedDocket-22 S8: the marker is graded by ANCESTRY now, so an EARLIER landing is a commit
+# that IS on the advertised tip - the fixture's BASE - with this landing's witness not under it. A
+# marker naming a commit the remote does not carry at all is the other refusal, and it has its own arm.
+printf 'landed main at %s by a previous run\n' "$BASE" > "$GCD/tmarker"
 hit "$(run --landed tRun)" "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted"
+printf 'landed main at 0000000000000000000000000000000000000000 by a previous run\n' > "$GCD/tmarker"
+hit "$(run --landed tRun)" "the lander marker names a commit that is not on the tip the remote advertises, so it records a push the remote does not carry and cannot stand as the observation of this landing; re-run the lander. The tip is"
 
 # ...and the marker naming THIS commit is ACCEPTED, which this fixture can finally prove. It used to
 # assert only that execution REACHED the ancestry check, because the unit branch sat one commit past
@@ -6500,7 +6505,11 @@ ip_out=$(mktemp -d)
 # absolute. A developer who happened to export it would see those arms red against a correct
 # driver, which is a fixture inheriting ambient machine state. The one arm that WANTS it exported
 # sets it on its own invocation below and deliberately does not go through this helper.
-iprun() { ( cd "$ip_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" \n              bash "$SCRIPT" "$@" 2>&1 ); }
+# ONE LINE, and the TOOL-dDerivedDocket-22 fix is the reason it says so: the continuation this
+# helper once carried was written through a heredoc that halved its backslash, and the literal
+# `\n` it left became an unquoted `n` - so `env` ran a command named `n` and every arm below it
+# graded the driver's absence.
+iprun() { ( cd "$ip_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" bash "$SCRIPT" "$@" 2>&1 ); }
 ipgit() { git -C "$ip_dir" "$@"; }
 ipreset() {
   ipgit checkout -q --detach "$ip_unit" 2>/dev/null
@@ -7725,6 +7734,432 @@ for may_case in "tMayId EXMP-aFoo3" "tMayAbs /tools/push-main.sh" "tMayDots ../t
 done
 reset_tree
 
+
+# ================== TOOL-dDerivedDocket-22 — LANDED DERIVED FROM THE ADVERTISED TIP ==============
+# ---- SELF-CONTAINED, in its own scratch repository with its own bare origin, for the in-place
+# ---- block's reason: every arm here pushes to the remote or moves `main`, and doing that inside the
+# ---- shared fixture would move the anchor under every later arm. The lander is a STUB that logs each
+# ---- call, so "the lander was not invoked" is read from its own log rather than inferred.
+# ----
+# ---- A LANDING RECORD IS COMMITTED BY HAND in most arms, the pattern every other `--landed` arm in
+# ---- this file uses: the arms are about how the READERS treat a committed LANDING, and a real close
+# ---- would make each one pay a bar. The one arm about what `--close` WRITES runs a real close.
+dl_dir=$(mktemp -d); dl_oroot=$(mktemp -d); dl_origin="$dl_oroot/origin.git"; dl_out=$(mktemp -d)
+(
+  cd "$dl_dir" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  git init -q --bare "$dl_origin"
+  git --git-dir="$dl_origin" config user.email t@t.test
+  git --git-dir="$dl_origin" config user.name t
+  git --git-dir="$dl_origin" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$dl_origin"
+  mkdir -p bin memory/guides memory/builds/tRun memory/builds/tOther
+  printf '# build method\n' > memory/guides/BUILD-METHOD.md
+  cat > bin/lander.sh <<'DLL'
+#!/usr/bin/env bash
+m=""
+for a in "$@"; do case "$a" in --prepare|--land|--carry|--prepared) m=${a#--} ;; esac; done
+printf '%s\n' "$m" >> "$DLOUT/lander.log"
+if [ "$m" = land ]; then
+  git push -q origin HEAD:main || exit 3
+  # KILLED AFTER THE PUSH AND BEFORE ANY MARKER, which is the i150 window: the push landed and
+  # nothing on this side recorded it.
+  [ "${STUB_KILL:-0}" = 1 ] && kill -9 $$
+fi
+v="STUB_$(printf '%s' "$m" | tr 'a-z' 'A-Z')"
+exit "${!v:-0}"
+DLL
+  printf '#!/usr/bin/env bash\necho "bar-stub ran"\nexit 0\n' > bin/bar.sh
+  cat > .unattended.conf <<'DLC'
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="bash bin/lander.sh"
+LANDER_MODE="in-place"
+SELFTESTS_OWED_PATHS=""
+BYPASS_BAN="--no-verify"
+GATE_CMD="bash bin/bar.sh"
+GATE_BOUND="600"
+UNIT_STALL_BOUND="1800"
+LEASE_STALE_AFTER="7200"
+REVIEW_ROUNDS="7"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+DLC
+  for dl_s in tRun tOther; do
+    cat > "memory/builds/$dl_s/README.md" <<DLR
+---
+slug: $dl_s
+node: a
+opened: 2026-08-01
+streams: architecture
+roster: ARCH
+ids: ARCH-$dl_s-1
+---
+
+# $dl_s
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 1 unit(s)
+
+<!-- gen:build-units -->
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-$dl_s-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |
+<!-- /gen:build-units -->
+<!-- /gen:build-index -->
+DLR
+  done
+  printf '# tRun — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\n\n## Parked\n' \
+    > memory/builds/tRun/RUN.md
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  git push -q origin main
+  git checkout -q -b unit
+  git commit -q --allow-empty -m "unit work" --no-verify
+) >/dev/null 2>&1
+dl_unit=$(git -C "$dl_dir" rev-parse unit)
+dl_base=$(git -C "$dl_dir" rev-parse main)
+DL_R=memory/builds/tRun/RUN.md
+DL_LEASE="$dl_dir/.git/unattended/tRun.lease"
+run_dl() { ( cd "$dl_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main DLOUT="$dl_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_dl_git() { git -C "$dl_dir" "$@"; }
+read_dl_sum() { run_dl_git hash-object "$DL_R"; }
+init_dl_fixture() {
+  run_dl_git checkout -qf --detach "$dl_unit" 2>/dev/null
+  run_dl_git branch -qf unit "$dl_unit"; run_dl_git checkout -qf unit
+  run_dl_git reset -q --hard "$dl_unit"; run_dl_git clean -qfd
+  run_dl_git remote set-url origin "$dl_origin"
+  run_dl_git update-ref refs/heads/main "$dl_base"; run_dl_git push -q -f origin "$dl_base":main; run_dl_git fetch -q origin main
+  rm -f "$dl_out/lander.log" "$DL_LEASE"
+}
+# A LANDING record committed by hand on the run branch, with any extra fact lines appended.
+write_dl_landing() { # [extra fact lines, printf %b] -> DL_C, the landing commit
+  init_dl_fixture
+  run_dl --preflight tRun --keepalive-id k1 >/dev/null
+  sed -i 's/^phase: .*/phase: LANDING/' "$dl_dir/$DL_R"
+  [ -z "${1:-}" ] || printf '%b' "$1" >> "$dl_dir/$DL_R"
+  run_dl_git add -A >/dev/null && run_dl_git commit -q -m "records(tRun): close — LANDING" --no-verify
+  DL_C=$(run_dl_git rev-parse HEAD)
+}
+# THE ONE HELPER EVERY ARCHIVE-PRODUCING ARM CALLS, so no such arm can read the archive off disk and
+# miss an edit that rode the move unstaged: the INDEX copy is what every other clone receives.
+check_dl_archive() { # landing commit -> DL_A, after asserting the archive the rotation left
+  local _c="$1" _shown _b8
+  DL_A=$(run_dl_git ls-files 'memory/builds/tRun/RUN.LANDED.*.md' | head -1)
+  n=$((n+1)); [ -n "$DL_A" ] || { echo "FAIL the rotation left no RUN.LANDED. archive in the index"; st=1; return 1; }
+  _shown=$(run_dl_git show ":$DL_A" 2>/dev/null)
+  same "the archive's index copy reads LANDED" "$(printf '%s\n' "$_shown" | sed -n 's/^phase: //p' | head -1)" "LANDED"
+  same "the archive's witness is the landing commit" "$(printf '%s\n' "$_shown" | sed -n 's/^witness: //p' | head -1)" "$_c"
+  hit "$_shown" "landed-derived: $_c "
+  _b8=$(run_dl_git ls-files -s "$DL_A" | awk '{ print substr($2, 1, 8) }')
+  hit "$DL_A" "RUN.LANDED.$_b8.md"
+  n=$((n+1)); run_dl_git diff --quiet -- "$DL_A" || { echo "FAIL the archive differs from its index copy, so the LANDED edit rode the move unstaged"; st=1; }
+}
+
+# ---- AC1: pushed, the committed LANDING derives LANDED and names its commit; merged into local main
+# ---- only, it stays LANDING and says why; and an EARLIER run's landing commit on the remote does not
+# ---- derive a staged LANDING of the same path, which is the walk-back defect.
+write_dl_landing ""
+run_dl_git push -q origin HEAD:main
+out=$(run_dl --status tRun)
+hit "$out" "phase LANDED (derived: ${DL_C:0:8} on refs/heads/main at ${DL_C:0:8})"
+write_dl_landing ""
+run_dl_git update-ref refs/heads/main "$DL_C"
+out=$(run_dl --status tRun)
+hit "$out" "phase LANDING (not on the remote: its landing commit ${DL_C:0:8} is not on refs/heads/main at ${dl_base:0:8})"
+write_dl_landing ""
+run_dl_git push -q origin HEAD:main
+sed -i 's/^witness: .*/witness: 1111111111111111111111111111111111111111/' "$dl_dir/$DL_R"; run_dl_git add "$DL_R"
+out=$(run_dl --status tRun)
+hit  "$out" "phase LANDING (not on the remote: the LANDING record is not committed as it stands"
+miss "$out" "phase LANDED"
+
+# ---- AC2: the lander pushes and is KILLED before any marker, and the record still derives.
+write_dl_landing ""
+( cd "$dl_dir" && STUB_KILL=1 DLOUT="$dl_out" bash -c 'bash bin/lander.sh --land --slug tRun; exit 0' ) >/dev/null 2>&1
+same "the killed lander's push reached the remote" "$(git --git-dir="$dl_origin" rev-parse main)" "$DL_C"
+out=$(run_dl --status tRun)
+hit "$out" "phase LANDED (derived: ${DL_C:0:8}"
+
+# ---- AC4 + AC15: in-place `--landed` OBSERVES. It exits 0, prints the derivation, writes nothing to
+# ---- the tree, and keeps the observation in the lease; the record commit was already on the tip, and
+# ---- the guard that reads the RECORDED phase does not refuse it as finished.
+write_dl_landing ""
+run_dl_git push -q origin HEAD:main
+dl_h=$(run_dl_git rev-parse HEAD)
+out=$(run_dl --landed tRun); rc=$?
+same "in-place --landed on a derived LANDED exits 0" "$rc" "0"
+hit  "$out" "phase LANDED (derived: ${DL_C:0:8} on refs/heads/main at ${DL_C:0:8}) · observed, not written"
+miss "$out" "the run is already finished"
+same "in-place --landed wrote nothing to the tree" "$(run_dl_git status --porcelain)" ""
+same "in-place --landed made no commit" "$(run_dl_git rev-parse HEAD)" "$dl_h"
+same "the record still says LANDING in its own bytes" "$(sed -n 's/^phase: //p' "$dl_dir/$DL_R")" "LANDING"
+n=$((n+1)); grep -q '^released .* landed$' "$DL_LEASE" 2>/dev/null \
+  || { echo "FAIL in-place --landed did not keep its observation as a released-landed lease: $(cat "$DL_LEASE" 2>/dev/null)"; st=1; }
+# ...and the READER that lease exists for: the remote stops answering and the record's commits are
+# older than any lease bound, which is exactly the state that reads presumed-stopped without the row.
+write_dl_landing ""
+run_dl_git push -q origin HEAD:main
+run_dl --landed tRun >/dev/null
+( cd "$dl_dir" && GIT_COMMITTER_DATE="2020-01-01T00:00:00Z" GIT_AUTHOR_DATE="2020-01-01T00:00:00Z" \
+    git commit -q --amend --no-edit --no-verify ) >/dev/null 2>&1
+run_dl_git remote set-url origin "$dl_oroot/nope.git"
+out=$(run_dl --status tRun)
+hit  "$out" "landed · observed by --landed at"
+hit  "$out" "phase LANDING (not on the remote: the remote did not answer"
+miss "$out" "presumed-stopped"
+rm -f "$dl_out/lander.log"; before=$(read_dl_sum)
+out=$(run_dl --resume tRun --keepalive-id C)
+hit  "$out" "nothing to resume — --landed observed this record on the remote at"
+same "the observed-landed resume wrote nothing to the record" "$(read_dl_sum)" "$before"
+same "the observed-landed resume left the tree clean" "$(run_dl_git status --porcelain)" ""
+n=$((n+1)); [ ! -s "$dl_out/lander.log" ] || { echo "FAIL the observed-landed resume invoked the lander: $(cat "$dl_out/lander.log")"; st=1; }
+
+# ---- AC4's refusals, one code for three states: the landing commit merged into local main ONLY,
+# ---- pushed nowhere, and no LANDING record committed at all. Each writes nothing.
+write_dl_landing ""
+run_dl_git update-ref refs/heads/main "$DL_C"
+out=$(run_dl --landed tRun)
+hit "$out" "the landing commit is on the LOCAL default branch and not on the tip the remote advertises, and under in-place landing only the remote is a landing: a local arm would be the record of a merge nobody pushed. Push it with the lander, then observe again"
+same "the refused local-arm --landed wrote nothing" "$(run_dl_git status --porcelain)" ""
+write_dl_landing ""
+out=$(run_dl --landed tRun)
+hit "$out" "the landing commit is not on the tip the remote advertises, so the push has not carried this record; run the lander's --land, then observe again"
+init_dl_fixture
+run_dl --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' "$dl_dir/$DL_R"; run_dl_git add -A >/dev/null
+out=$(run_dl --landed tRun)
+hit "$out" "no LANDING record is committed as it stands, so nothing a push could carry holds this run's close and there is no landing commit to observe on the remote; the in-place close commits its own record, so re-close in this tree"
+
+# ---- AC5: an UNANSWERED remote. `--status` reads LANDING with the observation's own reason and exits
+# ---- as it does for LANDING at BASE; `--hold` and `--abort` exit exactly as they do on a working
+# ---- record, and no refusal line leaks out of the quiet observation into either.
+write_dl_landing "keepalive-reaped: yes\nparked-surfaced: yes\n"
+run_dl_git remote set-url origin "$dl_oroot/nope.git"
+out=$(run_dl --status tRun); rc=$?
+same "an unanswered remote leaves --status exiting 0" "$rc" "0"
+hit  "$out" "phase LANDING (not on the remote: the remote did not answer: origin)"
+out=$(run_dl --hold tRun --code platform-limit --until owner --reason "the remote is gone" --reaped k1); dl_rcl=$?
+miss "$out" "UNATTENDED check"
+write_dl_landing "keepalive-reaped: yes\nparked-surfaced: yes\n"
+run_dl_git remote set-url origin "$dl_oroot/nope.git"
+out=$(run_dl --abort tRun --code external-prerequisite --reason "the remote is gone"); dl_rca=$?
+miss "$out" "UNATTENDED check"
+init_dl_fixture
+run_dl --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> "$dl_dir/$DL_R"
+run_dl_git add -A >/dev/null && run_dl_git commit -q -m working --no-verify
+run_dl_git remote set-url origin "$dl_oroot/nope.git"
+run_dl --hold tRun --code platform-limit --until owner --reason "the remote is gone" --reaped k1 >/dev/null; dl_rcw=$?
+same "--hold on a LANDING record over an unanswered remote exits as on a working record" "$dl_rcl" "$dl_rcw"
+same "--hold on a working record over an unanswered remote exits 0" "$dl_rcw" "0"
+run_dl_git reset -q --hard HEAD
+run_dl --abort tRun --code external-prerequisite --reason "the remote is gone" >/dev/null; dl_rcw=$?
+same "--abort on a LANDING record over an unanswered remote exits as on a working record" "$dl_rca" "$dl_rcw"
+
+# ---- AC8, the driver's half: a LANDING record whose WITNESS was pushed and whose record commit was
+# ---- not is a live run to another slug's preflight; with the record commit pushed it is excluded as
+# ---- derived LANDED. The witness reading this replaced excluded the first one as well.
+init_dl_fixture
+run_dl --preflight tRun --keepalive-id k1 >/dev/null
+run_dl_git add -A >/dev/null && run_dl_git commit -q -m "run state" --no-verify
+run_dl_git push -q origin HEAD:main
+sed -i 's/^phase: .*/phase: LANDING/' "$dl_dir/$DL_R"
+run_dl_git add -A >/dev/null && run_dl_git commit -q -m "records(tRun): close — LANDING" --no-verify
+n=$((n+1)); git --git-dir="$dl_origin" merge-base --is-ancestor "$(sed -n 's/^witness: //p' "$dl_dir/$DL_R")" main \
+  || { echo "FAIL the AC8 fixture's witness is not on the remote, so the arm cannot tell the two readings apart"; st=1; }
+out=$(run_dl --preflight tOther --keepalive-id k9)
+hit  "$out" "1 concurrent unattended run(s) — this run is NOT blocked by them"
+hit  "$out" "memory/builds/tRun/RUN.md · phase LANDING"
+miss "$out" "EXCLUDED memory/builds/tRun/RUN.md"
+run_dl_git reset -q --hard HEAD; run_dl_git clean -qfd
+run_dl_git push -q origin HEAD:main
+out=$(run_dl --preflight tOther --keepalive-id k9)
+hit  "$out" "EXCLUDED memory/builds/tRun/RUN.md from the live-run count — derived LANDED: its landing commit"
+miss "$out" "concurrent unattended run(s)"
+
+# ---- AC6: a derived-LANDED record. `--resume` has nothing to resume and never calls the lander;
+# ---- `--preflight` then WRITES it LANDED, stages it and retires it, over a default branch that took
+# ---- an owner's `may:` grant after BASE. The whole leg then grades the archive without a check 4,
+# ---- 15 or 19 failure; and in a second fixture where the RUN wrote the grant, check 19 reds on it.
+build_dl_rotation() { # "owner" or "run" -> DL_C, the landing commit, pushed; the grant in the named place
+  init_dl_fixture
+  run_dl --preflight tRun --keepalive-id k1 >/dev/null
+  if [ "$1" = run ]; then
+    sed -i '/^slug: tOther$/a may: tools/run-granted.sh' "$dl_dir/memory/builds/tOther/README.md"
+  fi
+  run_dl_git add -A >/dev/null && run_dl_git commit -q -m "run state" --no-verify
+  DL_RUNC=$(run_dl_git rev-parse HEAD)
+  if [ "$1" = owner ]; then
+    run_dl_git checkout -q --detach "$dl_base"
+    sed -i '/^slug: tOther$/a may: tools/owner-granted.sh' "$dl_dir/memory/builds/tOther/README.md"
+    run_dl_git add -A >/dev/null && run_dl_git commit -q -m "owner grants" --no-verify
+    run_dl_git push -q -f origin HEAD:main
+    run_dl_git checkout -q unit
+  fi
+  run_dl_git fetch -q origin main; run_dl_git checkout -q --detach origin/main
+  run_dl_git merge -q --no-ff "$DL_RUNC" -m "merge: tRun - land onto origin/main" >/dev/null
+  run_dl_git update-ref refs/heads/unit "$(run_dl_git rev-parse HEAD)"; run_dl_git checkout -q unit
+  sed -i 's/^phase: .*/phase: LANDING/' "$dl_dir/$DL_R"
+  printf 'units-at-landing: ARCH-tRun-1\n' >> "$dl_dir/$DL_R"
+  run_dl_git add -A >/dev/null && run_dl_git commit -q -m "records(tRun): close — LANDING" --no-verify
+  DL_C=$(run_dl_git rev-parse HEAD)
+  run_dl_git push -q origin HEAD:main
+}
+build_dl_rotation owner
+rm -f "$dl_out/lander.log"
+out=$(run_dl --resume tRun --keepalive-id k1)
+hit  "$out" "nothing to resume — phase LANDED is terminal"
+n=$((n+1)); [ ! -s "$dl_out/lander.log" ] || { echo "FAIL --resume on a derived-LANDED record invoked the lander: $(cat "$dl_out/lander.log")"; st=1; }
+out=$(run_dl --preflight tRun --keepalive-id k2)
+hit  "$out" "wrote the derived terminal — memory/builds/tRun/RUN.md reads LANDED, witness $DL_C, before it is retired"
+hit  "$out" "retired the finished record"
+hit  "$out" "preflight OK"
+check_dl_archive "$DL_C"
+run_dl_leg() { ( cd "$dl_dir" && GOV_UNATTENDED_REPORT=1 bash "$HERE/check-unattended.sh" --skip 28 2>&1 ); }
+out=$(run_dl_leg)
+same "the whole leg reports no check 4, 15 or 19 failure on the rotated archive" \
+  "$(printf '%s\n' "$out" | grep -F "$DL_A" | grep -cE 'UNATTENDED check (4|15|19) FAILED' || true)" "0"
+miss "$out" "in memory/builds/tOther/README.md, run $DL_A"
+build_dl_rotation run
+run_dl --preflight tRun --keepalive-id k2 >/dev/null
+check_dl_archive "$DL_C"
+out=$(run_dl_leg)
+hit "$out" "a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow: $DL_RUNC in memory/builds/tOther/README.md, run $DL_A"
+
+# ---- AC12: under `primary` a derived-LANDED record first committed on or after LANDED_FACTS_CUTOFF
+# ---- and missing the roster is REFUSED at rotation, naming --landed, and neither edited nor moved;
+# ---- the same record grandfathered by the cutoff rotates.
+build_dl_primary() { # cutoff
+  init_dl_fixture
+  sed -i 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' "$dl_dir/.unattended.conf"
+  printf 'LANDED_FACTS_CUTOFF="%s"\n' "$1" >> "$dl_dir/.unattended.conf"
+  run_dl_git add -A >/dev/null && run_dl_git commit -q -m "conf: primary" --no-verify
+  run_dl --preflight tRun --keepalive-id k1 >/dev/null
+  sed -i 's/^phase: .*/phase: LANDING/' "$dl_dir/$DL_R"
+  run_dl_git add -A >/dev/null && run_dl_git commit -q -m "close by hand" --no-verify
+  DL_C=$(run_dl_git rev-parse HEAD)
+  run_dl_git push -q origin HEAD:main
+}
+build_dl_primary 2000-01-01
+before=$(read_dl_sum)
+out=$(run_dl --preflight tRun --keepalive-id k2)
+hit  "$out" "a derived-LANDED record would be retired missing a fact the landed fact-set arm requires of every record first committed on or after LANDED_FACTS_CUTOFF, and no verb may edit a record once it is archived, so the archive would red that arm for ever; nothing was edited or moved - missing [units-at-landing] in memory/builds/tRun/RUN.md, and under primary landing --landed writes it, so run: --landed tRun"
+same "the refused rotation left the record alone" "$(read_dl_sum)" "$before"
+same "the refused rotation left the tree clean" "$(run_dl_git status --porcelain)" ""
+n=$((n+1)); [ -z "$(run_dl_git ls-files 'memory/builds/tRun/RUN.*.md')" ] || { echo "FAIL the refused rotation archived the record anyway"; st=1; }
+build_dl_primary 2999-01-01
+out=$(run_dl --preflight tRun --keepalive-id k2)
+hit "$out" "retired the finished record"
+check_dl_archive "$DL_C"
+
+# ---- S4 step 2, staged RED through a git that stages DIFFERENT bytes: the staged blob is not the
+# ---- one the name encodes, so the record is restored from HEAD and nothing moves.
+build_dl_rotation owner
+dl_shim=$(mktemp -d)
+dl_realgit=$(command -v git)
+cat > "$dl_shim/git" <<DLG
+#!/usr/bin/env bash
+case " \$* " in *" add -- memory/builds/tRun/RUN.md "*) printf 'drift: 1\n' >> memory/builds/tRun/RUN.md ;; esac
+exec "$dl_realgit" "\$@"
+DLG
+chmod +x "$dl_shim/git"
+out=$( cd "$dl_dir" && env -u GATE_SELFTESTS PATH="$dl_shim:$PATH" GOV_DEFAULT_BRANCH=main DLOUT="$dl_out" \
+         bash "$SCRIPT" --preflight tRun --keepalive-id k2 2>&1 )
+hit  "$out" "the LANDED record was written and staged, and the staged blob is not the one its archive name was derived from, so the move would retire bytes the name does not describe; the record was restored from HEAD and nothing was moved: staged"
+same "the blob refusal restored the record" "$(run_dl_git status --porcelain)" ""
+n=$((n+1)); [ -z "$(run_dl_git ls-files 'memory/builds/tRun/RUN.*.md')" ] || { echo "FAIL the blob refusal moved the record anyway"; st=1; }
+rm -rf "$dl_shim"
+
+# ---- AC7: under `primary` the lander marker is graded by ANCESTRY. A --no-ff landing whose marker
+# ---- names the MERGE, run from the run branch so the witness is that merge's second parent, with the
+# ---- record commit already on the advertised tip: accepted, and LANDED is written. A marker naming a
+# ---- commit the remote does not advertise refuses on check 34.
+build_dl_noff() { # -> DL_M, the landing merge; the marker names $1 or the merge
+  init_dl_fixture
+  sed -i 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' "$dl_dir/.unattended.conf"
+  printf 'LANDER_MARKER="dlmarker"\n' >> "$dl_dir/.unattended.conf"
+  run_dl_git add -A >/dev/null && run_dl_git commit -q -m "conf: primary, marker" --no-verify
+  run_dl --preflight tRun --keepalive-id k1 >/dev/null
+  sed -i 's/^phase: .*/phase: LANDING/' "$dl_dir/$DL_R"
+  run_dl_git add -A >/dev/null && run_dl_git commit -q -m "close by hand" --no-verify
+  DL_C=$(run_dl_git rev-parse HEAD)
+  run_dl_git checkout -q main
+  run_dl_git merge -q --no-ff unit -m "land tRun" >/dev/null
+  DL_M=$(run_dl_git rev-parse HEAD)
+  run_dl_git push -q origin main
+  run_dl_git checkout -q unit
+  printf 'landed main at %s by push-main\n' "${1:-$DL_M}" > "$dl_dir/.git/dlmarker"
+}
+build_dl_noff
+same "fixture: the witness is the landing merge's second parent" "$(run_dl_git rev-parse "$DL_M^2")" "$DL_C"
+out=$(run_dl --landed tRun)
+hit  "$out" "phase LANDED · witness $DL_C · anchor remote"
+miss "$out" "the lander marker names"
+miss "$out" "the run is already finished"
+same "--landed under primary wrote the terminal" "$(sed -n 's/^phase: //p' "$dl_dir/$DL_R")" "LANDED"
+run_dl_git reset -q --hard HEAD; run_dl_git checkout -q --detach "$dl_unit"
+run_dl_git commit -q --allow-empty -m "never pushed" --no-verify
+dl_np=$(run_dl_git rev-parse HEAD)
+build_dl_noff "$dl_np"
+out=$(run_dl --landed tRun)
+hit "$out" "the lander marker names a commit that is not on the tip the remote advertises, so it records a push the remote does not carry and cannot stand as the observation of this landing; re-run the lander. The tip is"
+same "the refused primary --landed left the record LANDING" "$(sed -n 's/^phase: //p' "$dl_dir/$DL_R")" "LANDING"
+rm -f "$dl_dir/.git/dlmarker"
+
+# ---- AC3: under `in-place` `--close` writes the roster and the asks freeze beside LANDING in the
+# ---- record it commits; a failing ask witness refuses before any write; under `primary` it writes
+# ---- neither. The build files an ask of its own, which puts one id in the freeze's scope.
+DLOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open --override asks-disposed --reason fixture-ask-is-open"
+build_dl_close() { # mode
+  init_dl_fixture
+  sed -i "s/^LANDER_MODE=.*/LANDER_MODE=\"$1\"/" "$dl_dir/.unattended.conf"
+  printf 'ASKS_CMD="bash %s"\n' "$ASKSTUB" >> "$dl_dir/.unattended.conf"
+  printf '# tRun — asks\n\n## Asks\n- EXMP-tRun-1 · filed 2026-09-10 · this build raised it · seen `memory/builds/tRun/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+    > "$dl_dir/memory/builds/tRun/BACKLOG.md"
+  run_dl_git add -A >/dev/null && run_dl_git commit -q -m "ask conf" --no-verify
+  run_dl --preflight tRun --keepalive-id k1 >/dev/null
+  printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> "$dl_dir/$DL_R"
+  run_dl_git add -A >/dev/null && run_dl_git commit -q -m fixture --no-verify
+  if [ "$1" = in-place ]; then
+    local _old; _old=$(run_dl_git rev-parse HEAD)
+    run_dl_git fetch -q origin main; run_dl_git checkout -q --detach origin/main
+    run_dl_git merge -q --no-ff "$_old" -m "merge: tRun - land onto origin/main" >/dev/null
+    run_dl_git update-ref refs/heads/unit "$(run_dl_git rev-parse HEAD)"; run_dl_git checkout -q unit
+  fi
+}
+askmode ok
+build_dl_close in-place
+out=$(run_dl --close tRun $DLOVR)
+hit  "$out" "phase LANDING, committed at"
+same "the in-place close froze the roster in the record it committed" \
+  "$(run_dl_git show HEAD:"$DL_R" | sed -n 's/^units-at-landing: //p')" "ARCH-tRun-1"
+same "the in-place close froze the asks in the record it committed" \
+  "$(run_dl_git show HEAD:"$DL_R" | sed -n 's/^asks-at-landing: //p')" "EXMP-tRun-1=OPEN"
+build_dl_close in-place
+askmode exit1
+before=$(read_dl_sum); dl_h=$(run_dl_git rev-parse HEAD)
+out=$(run_dl --close tRun $DLOVR)
+hit  "$out" "this run's asks cannot be read at the merge it is closing on, so the LANDING record the push carries would freeze no answer to the question it was authorized by, and under in-place landing no later verb writes that freeze; nothing was written"
+same "the refused close left the record alone" "$(read_dl_sum)" "$before"
+same "the refused close made no commit" "$(run_dl_git rev-parse HEAD)" "$dl_h"
+askmode ok
+build_dl_close primary
+out=$(run_dl --close tRun $DLOVR)
+hit  "$out" "COMMIT the run-state file"
+same "the primary close freezes no roster" "$(grep -c '^units-at-landing:' "$dl_dir/$DL_R")" "0"
+same "the primary close freezes no asks" "$(grep -c '^asks-at-landing:' "$dl_dir/$DL_R")" "0"
+
+cd "$TMP" || exit 2
+rm -rf "$dl_dir" "$dl_out" "$dl_oroot"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
@@ -7789,7 +8224,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region two beside condition 3's own arms, so FLOOR_SHARD_2 carries the same +6 and FLOOR_SHARD_1
 # is untouched. COUNTED off the block's own `hit`/`miss` lines, every one unconditional; this pass
 # runs no suite, and the refusal each arm names was observed by hand over a scratch fixture conf.
-FLOOR_ASSERTIONS=1014
+# RAISED 1014 -> 1102 by TOOL-dDerivedDocket-22: the derived-terminal block's 87 assertions at the END
+# of region two, and one more beside the lander-marker arms for the refusal of a marker the remote
+# does not advertise, so FLOOR_SHARD_2 carries the same +88 and FLOOR_SHARD_1 is untouched. MEASURED,
+# not typed: the block was run alone behind a replica of this prologue by hand, n 0 -> 87 and green,
+# and red under each of seven staged breaks; this pass runs no suite.
+FLOOR_ASSERTIONS=1102
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -7833,7 +8273,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=818
+FLOOR_SHARD_2=906
+# +88 for the TOOL-dDerivedDocket-22 derived-terminal arms, all in region two - see FLOOR_ASSERTIONS.
 # +6 for the TOOL-dDerivedDocket-20 two-key arms, all in region two - see FLOOR_ASSERTIONS.
 # +31 for the TOOL-dDerivedDocket-19 grant arms, all in region two - see FLOOR_ASSERTIONS.
 # +43 for the TOOL-dDerivedDocket-17 asks-disposed and freeze arms, all in region two — see

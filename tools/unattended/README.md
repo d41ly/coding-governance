@@ -86,6 +86,24 @@ necessarily carries unresolved braces, so grading one reds on a target that is n
 until render time. That second exclusion was widened from the first the moment a second template
 existed.
 
+## Two arguments moved out of the protocol's section 2
+
+`TOOL-dDerivedDocket-22` needed protocol bytes for the derived terminal, and it funded them by moving
+the REASONING behind two section 2 rules here, where nothing is capped. Both RULES stay in the
+protocol: the roster at landing is frozen by `--landed` alone (by `--close` under `in-place`), and
+facts 5-7 and 9-11 are evidence that is never read back as an input. What follows is why.
+
+**Why the roster is frozen at landing.** While a run is LIVE the unit list derives from the build
+README, which cannot go stale between reads. But a FINISHED record must still say which units the
+run covered, and that README is mutable: a later build adding a unit would change a landed run's
+answer retroactively. Freezing the ids keeps a terminal record a record.
+
+**Why the evidence facts are never inputs.** A verb branching on the recorded anchor kind would take
+a security decision from a value its subject wrote, the class this kit has been burned by three
+times; the derivation is monotone instead. They exist so a party outside this process can re-derive
+the pin without trusting a byte the run wrote, which is the only form of verification §9 concludes
+actually binds.
+
 ## Why `RECALL_CLI` and `MAP_CLI` are declarations
 
 Both name a repo-relative path in `.unattended.conf` rather than carrying one in the driver, and the

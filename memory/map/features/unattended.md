@@ -89,6 +89,14 @@ under the git common dir keys on the session-scoped keepalive id, so a resume te
 from take-over. Every `phase` read routes through `read_derived_phase` or `read_recorded_phase`.
 See `UNATTENDED-STOPS.md`.
 
+**LANDED is DERIVED, not written after the push (TOOL-dDerivedDocket-22, ruling D12-i2).** A
+committed `LANDING` record whose own commit the advertised tip holds reads landed, found by CONTENT
+through the library's `read_landing_commit`, so the driver's readers and the leg's check 7, fact-set
+arm and grant arm agree about one record; the committed LIVE index never derives. In-place
+`--landed` only observes and keeps that in the lease; `--preflight` writes a derived record `LANDED`
+in a scratch copy, names and stages it, and only then moves it. The dating residual is
+`--follow` following a COPY at a record's first commit — toward grandfathering on a real history.
+
 **Declarations, not constants.** The phase vocabulary, the Definition-of-Done set, the lander, the
 bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and
 the leg READ them; a phase token or a DoD item spelled into a script is a defect. `AUTH_PARAM` lives

@@ -4084,6 +4084,21 @@ miss "$out" "is not the merge-base of the anchor it pinned"
 miss "$out" "FELL BACK TO ANCESTRY for the m-base: of memory/builds/tRun/RUN.LANDED.deadbeef.md"
 hit  "$out" "the ask-mandate second opinions examined 1 run-state record(s) pinning an asks: fact"
 
+
+# ---- TOOL-dDerivedDocket-22 S15 / AC14: under `in-place` landing the freeze is due at the CLOSE, so a
+# ---- COMMITTED LANDING record carrying `asks:` and no `asks-at-landing:` reds; under `primary` the same
+# ---- record does not, because there the freeze is `--landed`'s; and with the fact present it passes.
+set_ak_pristine; printf 'LANDER_MODE="in-place"\nLANDER="echo land"\n' >> "$ak/.unattended.conf"
+sed -i 's/^phase: RUNNING$/phase: LANDING/' "$ak/$ak_R"; add_ak_commit "committed LANDING, no freeze"; out=$(run_ak_leg)
+hit "$out" "a committed LANDING record under an asks: mandate carries no asks-at-landing:, and under in-place landing --close writes that freeze beside the phase, so the record the push carries answers nothing about the question the run was authorized by: memory/builds/tRun/RUN.md"
+set_ak_pristine
+sed -i 's/^phase: RUNNING$/phase: LANDING/' "$ak/$ak_R"; add_ak_commit "committed LANDING under primary"; out=$(run_ak_leg)
+miss "$out" "a committed LANDING record under an asks: mandate carries no asks-at-landing:"
+set_ak_pristine; printf 'LANDER_MODE="in-place"\nLANDER="echo land"\n' >> "$ak/.unattended.conf"
+sed -i 's/^phase: RUNNING$/phase: LANDING/' "$ak/$ak_R"; printf 'asks-at-landing: EXMP-aFoo-3=OPEN\n' >> "$ak/$ak_R"
+add_ak_commit "committed LANDING, frozen at close"; out=$(run_ak_leg)
+miss "$out" "a committed LANDING record under an asks: mandate carries no asks-at-landing:"
+miss "$out" "freezes no answer to it"
 rm -rf "$ak_root"
 
 # ==== TOOL-dDerivedDocket-54: check_touching_commit_reachable, over one scratch fixture ==========
@@ -4429,8 +4444,191 @@ out=$(ma_leg "$ma3")
 hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
 miss "$out" "$MA_OWN_RD"
 
+
+# ---- TOOL-dDerivedDocket-22 S17 / AC17: A DERIVED-LANDED record's own commits run from its landing
+# ---- commit C, with the exclusions its merges' run sides give. Read as LIVE, its range would be what
+# ---- this tree has not pushed - nothing, once it landed - and the run's own grant would go ungraded.
+# ---- In-place: the prepared merge T takes the owner's grant as its first parent, and C sits on T.
+ma_init g22a; ma22="$ma_root/g22a"
+( cd "$ma22" && git fetch -q origin && git checkout -q --detach origin/main \
+    && git merge -q --no-ff --no-edit -m "merge: tRun - land onto origin/main" unit \
+    && git branch -qf unit HEAD && git checkout -q unit ) >/dev/null 2>&1
+ma_facts "$ma22" tRun LANDING unit "$(ma_base "$ma22")"; ma_commit "$ma22" "records(tRun): close — LANDING"
+( cd "$ma22" && git push -q origin HEAD:main ) >/dev/null 2>&1
+MA_RUN=$(git -C "$ma22" log --format=%H --grep='^run grants$' -1)
+same "fixture: the in-place landing commit is on the advertised tip" \
+  "$(git --git-dir="$ma22.git" rev-parse main)" "$(ma_sha "$ma22" HEAD)"
+out=$(ma_leg "$ma22")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+# ---- Primary: the run branch reconciled the default branch PLAINLY mid-run, after the owner's grant
+# ---- landed there, then committed its LANDING and was landed by a --no-ff merge. The reconcile's
+# ---- excluded parent is its SECOND, the owner's side, never the first.
+ma_init g22b; ma22="$ma_root/g22b"
+( cd "$ma22" && git merge -q --no-edit main ) >/dev/null 2>&1
+MA_R=$(ma_sha "$ma22" HEAD)
+same "fixture: the plain reconcile takes the owner's grant as its SECOND parent" \
+  "$(git -C "$ma22" log -1 --format=%s "$MA_R^2")" "owner grants"
+ma_facts "$ma22" tRun LANDING HEAD "$(ma_base "$ma22")"; ma_commit "$ma22" "close by hand"
+( cd "$ma22" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit \
+    && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
+MA_RUN=$(git -C "$ma22" log --format=%H --grep='^run grants$' -1)
+out=$(ma_leg "$ma22")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
 rm -rf "$ma_root"
 
+
+# ================== TOOL-dDerivedDocket-22 — the derived terminal, graded by the leg ==============
+# ---- In the shared fixture, each arm from `reset_tree` and each one that pushes restoring the
+# ---- remote's anchor, so no later arm inherits a moved tip. The leg is run with the report channel
+# ---- on, because the fact-set arm's counts and its disabled state are announced there.
+run_lg_leg() { GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --skip 28 2>&1; }
+write_lg_commit() { # message · [committer date]
+  if [ -n "${2:-}" ]; then
+    GIT_COMMITTER_DATE="$2T12:00:00Z" GIT_AUTHOR_DATE="$2T12:00:00Z" git commit -q -m "$1" --no-verify
+  else
+    git commit -q -m "$1" --no-verify
+  fi
+}
+write_lg_record() { # slug · phase · witness · extra fact lines (printf %b) -> a README and a record, unstaged
+  build "$1"
+  sed -i "s/^phase: .*/phase: $2/; s/^witness: .*/witness: $3/; s/^base: .*/base: $ANCHOR0/" "memory/builds/$1/RUN.md"
+  [ -z "${4:-}" ] || printf '%b' "$4" >> "memory/builds/$1/RUN.md"
+}
+# `--follow` FOLLOWS COPIES as well as renames, so a record sharing more than half its lines with
+# another at its first commit is followed INTO that one and dated by its add. On a real history the
+# source is older and that errs toward grandfathering, but a BACKDATED fixture commit is older than
+# its own copy source, so the dated arms make their records dissimilar rather than assert an artifact.
+write_lg_filler() { # slug -> twenty lines no other record carries
+  local i; for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+    printf '<!-- %s filler %s, unique to this record -->\n' "$1" "$i" >> "memory/builds/$1/RUN.md"
+  done
+}
+
+# ---- AC8, the leg's half: a LANDING record whose WITNESS is on the remote and whose record commit is
+# ---- not is counted live by check 7; with the record commit pushed it is EXCLUDED as derived LANDED.
+# ---- The witness reading this replaced excluded the first record too.
+reset_tree
+write_lg_record tLand LANDING "$ANCHOR0"
+git add -A >/dev/null && write_lg_commit "tLand closes"
+out=$(run)
+hit  "$out" "2 concurrent unattended run(s) — none of them blocks another"
+miss "$out" "check 7 EXCLUDED memory/builds/tLand/RUN.md"
+git push -q -f origin HEAD:main
+out=$(run)
+hit  "$out" "check 7 EXCLUDED memory/builds/tLand/RUN.md — derived LANDED: its landing commit $(git rev-parse HEAD)"
+miss "$out" "concurrent unattended run(s)"
+git push -q -f origin "$ANCHOR0":main
+
+# ---- AC18: a rotated record's `landed-derived` is TESTED, not trusted. The witness is pinned on the
+# ---- advertised tip, so the witness ancestry test cannot red the record in this arm's place.
+reset_tree
+lg_off=$(git rev-parse HEAD)
+write_lg_record tArch LANDED "$ANCHOR0" "landed-derived: $lg_off $ANCHOR0\nunits-at-landing: ARCH-tArch-1\n"
+git add memory/builds/tArch >/dev/null
+git mv -f memory/builds/tArch/RUN.md memory/builds/tArch/RUN.LANDED.deadbeef.md
+git add -A >/dev/null
+out=$(run_lg_leg)
+hit "$out" "a record claims LANDED on derived evidence and the landing commit its landed-derived: names is not on the tip the remote advertises, so the derivation it records is one this remote does not support: $lg_off against $ANCHOR0 in memory/builds/tArch/RUN.LANDED.deadbeef.md"
+miss "$out" "names no anchor kind while its own first commit"
+sed -i "s/^landed-derived: .*/landed-derived: $ANCHOR0 $ANCHOR0/" memory/builds/tArch/RUN.LANDED.deadbeef.md
+git add -A >/dev/null
+out=$(run_lg_leg)
+miss "$out" "a record claims LANDED on derived evidence"
+
+# ---- AC9 and AC16: the fact-set arm, by population and by date. A malformed cutoff refuses; a blank
+# ---- one announces that the arm is off; a recorded LANDED missing the roster reds naming the fact;
+# ---- the count line names every population and says so at zero.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="soon"\n' >> .unattended.conf
+out=$(run_lg_leg)
+hit "$out" "LANDED_FACTS_CUTOFF is declared and is not an ISO date, and a cutoff nothing can compare would grade every landed record or none while reading as configured"
+reset_tree
+out=$(run_lg_leg)
+hit "$out" "the landed fact-set arm of check 15 is OFF - LANDED_FACTS_CUTOFF is blank or undeclared"
+printf 'LANDED_FACTS_CUTOFF="2026-06-01"\n' >> .unattended.conf
+out=$(run_lg_leg)
+hit "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 0 - a count of 0, so this arm graded nothing on this tree"
+write_lg_record tFacts LANDED "$ANCHOR0" "landed-anchor: remote\nunpushed-at-landing: 0\n"
+git add -A >/dev/null && write_lg_commit "a landed record with no roster"
+out=$(run_lg_leg)
+hit "$out" "a landed record first committed on or after LANDED_FACTS_CUTOFF is missing a fact its landing verb writes, so what that landing covered cannot be read from the record it left, and no verb adds a fact to a record once it is terminal or pushed - population landed, missing [units-at-landing] in memory/builds/tFacts/RUN.md"
+hit "$out" "recorded LANDED 1 · rotated derived LANDED 0 · committed LANDING 0"
+# ...a rotated derived record is graded as its own population
+write_lg_record tDer LANDED "$ANCHOR0" "landed-derived: $ANCHOR0 $ANCHOR0\n"
+git add memory/builds/tDer >/dev/null
+git mv -f memory/builds/tDer/RUN.md memory/builds/tDer/RUN.LANDED.cafef00d.md
+git add -A >/dev/null && write_lg_commit "a rotated derived record with no roster"
+out=$(run_lg_leg)
+hit "$out" "population derived, missing [units-at-landing] in memory/builds/tDer/RUN.LANDED.cafef00d.md"
+
+# ---- AC9: a record first committed BEFORE the cutoff and rotated AFTER it is not graded, by either
+# ---- cutoff: `--follow` dates the archive by the run's own first commit, not by the rotation that
+# ---- added its name. Anchorless and factless, so an undated reading reds it twice.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="2026-06-01"\n' >> .unattended.conf
+sed -i 's/^LANDED_ANCHOR_CUTOFF=.*//' .unattended.conf; printf 'LANDED_ANCHOR_CUTOFF="2026-06-01"\n' >> .unattended.conf
+write_lg_record tOld LANDED "$ANCHOR0"; write_lg_filler tOld
+git add memory/builds/tOld >/dev/null && write_lg_commit "an old landed run" 2026-01-01
+git mv memory/builds/tOld/RUN.md memory/builds/tOld/RUN.LANDED.0bd0bd00.md
+write_lg_commit "rotated after the cutoff"
+out=$(run_lg_leg)
+miss "$out" "in memory/builds/tOld/RUN.LANDED.0bd0bd00.md"
+miss "$out" "names no anchor kind while its own first commit is at or after the declared cutoff"
+hit  "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 0"
+same "the archive is dated by its run's first commit" \
+  "$( . "$TMP/$KIT_REL/lib-unattended.sh"; read_first_commit_date memory/builds/tOld/RUN.LANDED.0bd0bd00.md )" "2026-01-01"
+
+# ---- AC9: the LIVE record in a folder that has rotated is dated by its OWN tenancy, the rotation,
+# ---- and not by the previous run's first commit, which `--follow --diff-filter=A` alone returns.
+# ---- The ANCHOR cutoff keeps the unfloored reading, and the same record shows it: anchorless, it
+# ---- is not red for naming no anchor kind, because flooring that older key would red terminal
+# ---- records no verb may now repair.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="2026-02-01"\nLANDED_ANCHOR_CUTOFF="2026-02-01"\n' >> .unattended.conf
+write_lg_record tFloor ABORTED "$ANCHOR0" "halt-code: fork-unresolvable\n"; write_lg_filler tFloor
+git add memory/builds/tFloor >/dev/null && write_lg_commit "the first run" 2026-01-01
+git mv memory/builds/tFloor/RUN.md memory/builds/tFloor/RUN.ABORTED.f1007000.md
+write_lg_record tFloor LANDED "$ANCHOR0" "unpushed-at-landing: 0\n"
+git add memory/builds/tFloor >/dev/null && write_lg_commit "the rotation, and the second run" 2026-03-01
+same "the live record is dated by its own tenancy" \
+  "$( . "$TMP/$KIT_REL/lib-unattended.sh"; read_first_commit_date memory/builds/tFloor/RUN.md )" "2026-03-01"
+same "the anchor cutoff's unfloored reading dates the path's first add" \
+  "$( . "$TMP/$KIT_REL/lib-unattended.sh"; read_first_commit_date memory/builds/tFloor/RUN.md nofloor )" "2026-01-01"
+out=$(run_lg_leg)
+hit  "$out" "population landed, missing [landed-anchor units-at-landing] in memory/builds/tFloor/RUN.md"
+miss "$out" "names no anchor kind while its own first commit is at or after the declared cutoff, so which history was meant to bless its witness cannot be read at all: memory/builds/tFloor/RUN.md"
+
+# ---- AC16: under `in-place` a hand-committed LANDING record with no roster reds, counted as its
+# ---- own population; under `primary` the same record, pushed so it derives LANDED, is REPORTED
+# ---- naming --landed and never graded.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="2026-06-01"\nLANDER_MODE="in-place"\n' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+git add -A >/dev/null && write_lg_commit "a hand-committed LANDING"
+out=$(run_lg_leg)
+hit  "$out" "population landing, missing [units-at-landing] in memory/builds/tRun/RUN.md"
+hit  "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 1"
+sed -i 's/^LANDER_MODE=.*//' .unattended.conf
+git push -q -f origin HEAD:main
+out=$(run_lg_leg)
+miss "$out" "population landing, missing [units-at-landing] in memory/builds/tRun/RUN.md"
+hit  "$out" "check 15 did not grade the landed facts of memory/builds/tRun/RUN.md - it is a committed LANDING the remote already carries, so it derives LANDED, and under primary landing the verb that writes those facts has not run yet: --landed tRun"
+git push -q -f origin "$ANCHOR0":main
+
+# ---- THE DATING SELF-SCAN: a first-commit DATE read with --diff-filter=A and no --follow anywhere in
+# ---- the kit's shell reds, naming the file and line; the same read with --follow does not.
+reset_tree
+printf '#!/usr/bin/env bash\nd=$(git log --diff-filter=A --format=%%cs -- x | tail -1)\n' > "$TMP/$KIT_REL/probe-date.sh"
+out=$(run_lg_leg)
+hit  "$out" "a first-commit DATE is read with --diff-filter=A and no --follow in this kit's own shell, so a rotation re-dates an archived record to the commit that added its name and a cutoff grades a record it was written to grandfather"
+hit  "$out" "probe-date.sh:2"
+printf '#!/usr/bin/env bash\nd=$(git log --follow --diff-filter=A --format=%%cs -- x | tail -1)\n' > "$TMP/$KIT_REL/probe-date.sh"
+out=$(run_lg_leg)
+miss "$out" "a first-commit DATE is read with --diff-filter=A and no --follow"
+rm -f "$TMP/$KIT_REL/probe-date.sh"
+reset_tree
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
@@ -4494,7 +4692,12 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- calls, all beside check 10 inside region one, so FLOOR_SHARD_1 carries the same +10 and
 # ---- FLOOR_SHARD_2 is untouched. COUNTED off the diff; this pass runs no suite. Its checklist fold
 # ---- added check 38's report-channel liveness arm, one more in the same place: 592 -> 593.
-FLOOR_ASSERTIONS=593
+# ---- RAISED 593 -> 633 by exactly the arm, TOOL-dDerivedDocket-22: forty assertions, all in
+# ---- region two - four in the ask block, six in the grant block and thirty in the derived-
+# ---- terminal block at its END - so FLOOR_SHARD_2 carries the same +40 and FLOOR_SHARD_1 is
+# ---- untouched. MEASURED by running the three blocks behind a replica of this prologue by hand,
+# ---- n 0 -> 40 and green, and red under eight staged breaks; this pass runs no suite.
+FLOOR_ASSERTIONS=633
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -4520,7 +4723,7 @@ FLOOR_ASSERTIONS=593
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=102
-FLOOR_SHARD_2=491
+FLOOR_SHARD_2=531
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

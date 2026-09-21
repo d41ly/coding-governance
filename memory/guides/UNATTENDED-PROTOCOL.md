@@ -157,7 +157,8 @@ runs can honestly share a witness, and a name that collided would block every la
 out. Two records with the same content are the same record twice.
 
 What rotation does NOT do: it does not re-open, re-pin, or edit the retired record. Its bytes are
-preserved exactly, `git mv` puts both sides in the index in one operation, and the gate leg reads
+preserved exactly (a derived-LANDED one first written `LANDED`), `git mv` puts both sides in the index
+in one operation, staged first since it carries the STAGED blob, and the gate leg reads
 every archived record as part of its population — an archived record carrying a non-terminal phase
 reds. The collision test runs with the other preconditions, so a name that already exists carrying
 DIFFERENT bytes refuses over an untouched tree; the rename itself runs after every precondition has
@@ -207,10 +208,7 @@ belonging here:
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
 6. **The anchor tip sha**, from that same advertisement.
 7. **The endpoint URL** it was observed from.
-8. **The roster AT LANDING**, frozen by `--landed` alone. While a run is LIVE the unit list derives
-   from the build README, which cannot go stale between reads. But a FINISHED record must still say
-   which units the run covered, and that README is mutable: a later build adding a unit would change
-   a landed run's answer retroactively. Freezing the ids keeps a terminal record a record.
+8. **The roster AT LANDING**, frozen by `--landed` alone (`--close` in-place).
 
 9. **The anchor KIND**, `default-branch` or `run-branch`, recorded by `--preflight`.
 10. **The branch ref name**, as the remote advertised it — present only when the second anchor fired.
@@ -239,11 +237,7 @@ a value the run earned. Nothing reads these lines and no verb writes one: the la
 reader, and writing it is an owner-authorized repair rather than something a run does to its own
 history.
 
-Facts 5-7 and 9-11 are EVIDENCE and are never read back as inputs — fact 9 emphatically so. A verb
-branching on the recorded anchor kind would take a security decision from a value its subject wrote,
-the class this kit has been burned by three times; the derivation is monotone instead. They exist
-so a party outside this process can re-derive the pin without trusting a byte the run wrote, which is
-the only form of verification §9 concludes actually binds.
+Facts 5-7 and 9-11 are EVIDENCE and are never read back as inputs — fact 9 emphatically so.
 
 The authored half never restates a derivable fact — not a unit status, not a per-unit spec base.
 Restating the run's own BASE is not possible, because nothing else holds it.
@@ -311,7 +305,7 @@ locally that cannot push. `landed-anchor` carries `remote` or `local`, and §9 s
 one does not buy. A tag or workflow id there is unjudgeable, and a terminal claim is where that costs
 most — it is the last thing written and nothing re-examines it.
 
-**Terminal is reached by a verb that evaluates what the phase claims, and never by a phase move.**
+**Terminal is reached by a verb that evaluates what the phase claims, or DERIVED (§6), and never by a phase move.**
 `--phase` writes the positions between; `--landed` and `--abort` write the two ends. `LANDING` is
 close-only for the same reason: it is the record that the Definition-of-Done set was evaluated, so a
 phase move into it would be that claim without the evaluation, and `--landed` accepts a record only
@@ -415,6 +409,7 @@ which discards the entire bar the mandate leaned on.
 the node's own default branch. `in-place` is ORDERED and the full-green stamp forces it: `--prepare`
 onto the advertised tip, `--close` grading THAT merge under `GATE_FULL=1` and committing on it,
 `--land`, `--landed`; a reconcile never routes through the local default branch.
+`LANDED` is also DERIVED (D12-i2) from a pushed `LANDING` commit.
 `UNATTENDED-STOPS.md` carries the rest.
 
 `landed-via-lander` is the machine-checked DoD item for this, and the gate greps the close path for
@@ -484,6 +479,7 @@ where this document says it may:
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set. No path may sit under both keys |
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
+| `LANDED_FACTS_CUTOFF` | from this date a landed record carries its verb's facts. Blank is off |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no

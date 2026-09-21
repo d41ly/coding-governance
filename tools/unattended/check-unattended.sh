@@ -124,6 +124,8 @@ ADV_NAME=""
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 DISPOSITION_CUTOFF=""
+# TOOL-dDerivedDocket-22 S10 - the date from which the landed fact-set arm grades a record.
+LANDED_FACTS_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""
 HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LEASE_STALE_AFTER=""
@@ -202,7 +204,7 @@ while IFS= read -r -d '' _ck; do
     # keys instead of 20 and swept in heredoc markers and phase names.
     # gov:conf-allow-begin
     MEMORY_ROOT|LANDER|LANDER_MODE|SELFTESTS_OWED_PATHS|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
-    PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
+    PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|LANDED_FACTS_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
     HALT_FLOOR|HOLD_CODES_EXTRA|HOLD_FLOOR|LEASE_STALE_AFTER|\
     RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
@@ -1696,6 +1698,20 @@ scan_foreign_anchors() { # build folder · slug -> 0 and ASK_ANCHORS, or 1 and A
   ASK_ANCHOR_WHY=""
   return 0
 }
+# ---- TOOL-dDerivedDocket-22 S10 - THE LANDED FACT-SET ARM'S SWITCH, and the landing shape it grades
+# ---- under. A malformed cutoff is a REFUSAL rather than a default, for DISPOSITION_CUTOFF's reason: a
+# ---- string compared against a date grades every record or none and nobody can tell which. A BLANK
+# ---- one turns the arm off and says so on the report channel, where this leg announces every case
+# ---- it could not reach, so a disabled arm never reads as one that found nothing.
+LFC_ON=0; LFC_MODE=${LANDER_MODE:-primary}; lfc_n_landed=0; lfc_n_derived=0; lfc_n_landing=0
+if [ -n "$LANDED_FACTS_CUTOFF" ]; then
+  case "$LANDED_FACTS_CUTOFF" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) LFC_ON=1 ;;
+    *) fail 15 "LANDED_FACTS_CUTOFF is declared and is not an ISO date, and a cutoff nothing can compare would grade every landed record or none while reading as configured: $LANDED_FACTS_CUTOFF" ;;
+  esac
+else
+  report "the landed fact-set arm of check 15 is OFF - LANDED_FACTS_CUTOFF is blank or undeclared, so no landed or committed LANDING record is graded for the facts its landing verb writes"
+fi
 live=""; nlive=0
 # TOOL-dDerivedDocket-18 - how many records pin an asks: fact, and how many of those were already
 # published and so deliberately not re-derived. Counted here rather than derived after the loop,
@@ -1763,6 +1779,47 @@ while IFS= read -r f; do
       [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
       *) fail 15 "a record claims LANDED with a witness that is not sha-shaped, so the claim that the work reached the remote cannot be judged at all, and a terminal claim is exactly where an unjudgeable witness costs the most: $w in $f" ;;
     esac
+  fi
+
+  # ---- 15, THE LANDED FACT SET - TOOL-dDerivedDocket-22 S10, the weak form of
+  # ---- TOOL-aBoundedCeiling-11. GRADED BY MODE over three populations, because the facts are due at a
+  # ---- different verb in each: a recorded LANDED that `--landed` wrote, a recorded LANDED the rotation
+  # ---- wrote with `landed-derived`, and under in-place landing a COMMITTED LANDING, whose roster
+  # ---- `--close` froze beside the phase. The predicate and the dating are the kit library's, shared
+  # ---- with `--preflight`, which refuses to retire a record this arm would then red for ever.
+  # ----
+  # ---- WHAT IT DOES NOT CHECK: that a fact is TRUE, or that the roster names the units the run built.
+  # ---- It grades PRESENCE, on records first committed on or after the cutoff, dated with `--follow`
+  # ---- and floored at a rotated folder's tenancy - `read_first_commit_date` states the direction of
+  # ---- its own error. `asks-at-landing` is the freeze-presence arm's, below, and not graded twice.
+  # ----
+  # ---- UNDER `primary` A COMMITTED LANDING THE REMOTE ALREADY CARRIES is REPORTED and never graded:
+  # ---- `--landed` writes its facts and is the verb that completes it, so a red here would be asking
+  # ---- a record for facts its own next verb has not been run to write.
+  if [ "$LFC_ON" = 1 ]; then
+    lfc_pop=""
+    case "$ph" in
+      LANDED) if grep -q '^landed-derived:' "$f" 2>/dev/null; then lfc_pop=derived; else lfc_pop=landed; fi ;;
+      LANDING)
+        if lfc_c=$(read_landing_commit "$f"); then
+          if [ "$LFC_MODE" = in-place ]; then
+            lfc_pop=landing
+          elif check_adv_reaches "$lfc_c"; then
+            lfc_s=${f#"$M/builds/"}; lfc_s=${lfc_s%%/*}
+            report "check 15 did not grade the landed facts of $f - it is a committed LANDING the remote already carries, so it derives LANDED, and under primary landing the verb that writes those facts has not run yet: --landed $lfc_s"
+          fi
+        fi ;;
+    esac
+    if [ -n "$lfc_pop" ] && check_landed_facts_due "$f" "$LANDED_FACTS_CUTOFF"; then
+      case "$lfc_pop" in
+        landed) lfc_n_landed=$((lfc_n_landed + 1)) ;;
+        derived) lfc_n_derived=$((lfc_n_derived + 1)) ;;
+        landing) lfc_n_landing=$((lfc_n_landing + 1)) ;;
+      esac
+      lfc_miss=$(read_missing_landed_facts "$f" "$lfc_pop")
+      [ -z "$lfc_miss" ] \
+        || fail 15 "a landed record first committed on or after LANDED_FACTS_CUTOFF is missing a fact its landing verb writes, so what that landing covered cannot be read from the record it left, and no verb adds a fact to a record once it is terminal or pushed - population $lfc_pop, missing [$lfc_miss] in $f"
+    fi
   fi
 
   # ---- 8: the generated region holds NO COPY of the unit list. It is DERIVED from the build README
@@ -1912,11 +1969,31 @@ while IFS= read -r f; do
                 local) ;;
                 *) fail 15 "a record claims LANDED with an anchor kind outside the closed set of remote and local, and defaulting an unrecognised one would promote the record to whichever claim the reader assumed: $ak in $f" ;;
               esac
-              if [ -z "$ak" ]; then
+              # TOOL-dDerivedDocket-22 S9 - A `landed-derived` FACT IS THIS RECORD'S ANCHOR EVIDENCE.
+              # Only the rotation writes it, beside `phase: LANDED`, when `--preflight` derived the
+              # landing from the advertised tip; no in-place verb writes `landed-anchor`, so asking
+              # for one would red every rotated record. What it names is TESTED rather than trusted:
+              # the landing commit must be on the tip this remote advertises, or a hand-written
+              # archive would meet the anchor rule without ever having landed.
+              lfd=$(fact_of "$f" landed-derived)
+              if [ -z "$ak" ] && [ -n "$lfd" ]; then
+                lfd_c=${lfd%% *}
+                check_adv_reaches "$lfd_c" \
+                  || fail 15 "a record claims LANDED on derived evidence and the landing commit its landed-derived: names is not on the tip the remote advertises, so the derivation it records is one this remote does not support: $lfd_c against $b in $f"
+                ak=remote
+              elif [ -z "$ak" ]; then
                 # GRANDFATHERED BY DATE, the same idiom this kit's other cutoffs use. Every LANDED
                 # record written before this unit carries no anchor kind and every one of them is in
                 # fact remote-anchored; a record dated at or after the cutoff has no such excuse.
-                fcommit=$(GIT log --diff-filter=A --format=%cs -- "$f" 2>/dev/null | tail -1)
+                # DATED WITH `--follow` (TOOL-dDerivedDocket-22 S9), as DISPOSITION_CUTOFF is: without
+                # it a rotation re-dates a pre-cutoff record to the commit that added its archived
+                # name and moves it into the graded set, where it reds for an anchor kind no verb may
+                # now write. `read_first_commit_date` states the direction of its own error.
+                # UNFLOORED, and deliberately: the tenancy floor would date
+                # `memory/builds/dUnstalledConvoy/RUN.md` to its second run's rotation, 2026-08-24,
+                # past this cutoff, and that LANDED record carries no anchor kind and is terminal -
+                # a red no verb could clear. The fact-set arm, whose key is new, floors.
+                fcommit=$(read_first_commit_date "$f" nofloor)
                 if [ -n "$LANDED_ANCHOR_CUTOFF" ] && [ -n "$fcommit" ] \
                    && printf '%s\n%s\n' "$LANDED_ANCHOR_CUTOFF" "$fcommit" | sort -C; then
                   fail 15 "a record claims LANDED and names no anchor kind while its own first commit is at or after the declared cutoff, so which history was meant to bless its witness cannot be read at all: $f"
@@ -2109,8 +2186,10 @@ while IFS= read -r f; do
     # ---- record walks from its WITNESS and excludes what `read_run_exclusions` reads off the merges
     # ---- on that witness's tail - by which parent reaches the record's own commits, never by parent
     # ---- order and never from a tip - so a landed or aborted record keeps one range for ever. A
-    # ---- derived-LANDED record's endpoint is unit 22's, and until it lands a LANDING record reads as
-    # ---- live, which is the more complete of the two readings (section 8 F7).
+    # ---- DERIVED-LANDED record - a LANDING whose landing commit C the advertised tip holds - walks
+    # ---- from C with the same exclusions (TOOL-dDerivedDocket-22 S17), so it keeps the range its
+    # ---- rotated archive will have. Read as live instead, its range would be whatever this tree has
+    # ---- not pushed, which after a landing is nothing at all.
     # ----
     # ---- A SKIP ANNOUNCES ITSELF. A terminal record with no witness, a witness this clone cannot
     # ---- resolve, or a live one with no tip to exclude is named on the report channel, never passed.
@@ -2135,7 +2214,11 @@ while IFS= read -r f; do
         fi ;;
       *)
         mayend=HEAD
-        if [ "$ADV_HEAD_OK" = 1 ]; then
+        maylc=""
+        [ "$ph" = LANDING ] && maylc=$(read_landing_commit "$f" 2>/dev/null)
+        if [ -n "$maylc" ] && check_adv_reaches "$maylc"; then
+          mayend=$maylc; maywalk=1
+        elif [ "$ADV_HEAD_OK" = 1 ]; then
           mayex=$ADV_HEAD
         elif [ -n "$ADV_NAME" ] && GIT rev-parse --verify --quiet "refs/heads/$ADV_NAME^{commit}" >/dev/null 2>&1; then
           mayex="refs/heads/$ADV_NAME"
@@ -2151,7 +2234,7 @@ while IFS= read -r f; do
     else
       maywr=$(printf '%s\n' "$maycs" | scan_grant_writes)
       if [ -n "$maywr" ] && [ "$maywalk" = 1 ]; then
-        mayex=$(read_run_exclusions "$w" "$rb" "$M/builds/$bslug/RUN.md" 2>/dev/null)
+        mayex=$(read_run_exclusions "$mayend" "$rb" "$M/builds/$bslug/RUN.md" 2>/dev/null)
         [ $? = 0 ] || report "check 19 read the terminal exclusions of $f only in part - the walk or a reachability probe could not answer, so its range keeps commits an exclusion would have removed, which is the fail-closed direction"
         if maycs=$(read_run_commits "$mayend" "$rb" $mayex); then
           maywr=$(printf '%s\n' "$maycs" | scan_grant_writes)
@@ -2160,8 +2243,8 @@ while IFS= read -r f; do
         fi
       fi
       # AN EMPTY RANGE IS SAID OUT LOUD. It is honest for a run that has committed nothing past its
-      # BASE, and it is also what a LANDING record whose work already reached the advertised tip
-      # reads as until unit 22 supplies its landing commit - a skip that looks like a pass otherwise.
+      # BASE, and it is what a live record reads as once everything it wrote is on the advertised
+      # tip without a committed LANDING to walk from - a skip that looks like a pass otherwise.
       [ -n "$maycs" ] || report "check 19's grant-write arm examined NO own commit of $f - the range from $mayend over base $rb past its exclusions is empty"
       while read -r maysha mayrd; do
         [ -n "$maysha" ] || continue
@@ -2343,9 +2426,22 @@ WAIVERS
     # ---- record appears to have answered: the answer is pinned at the moment of landing or it is
     # ---- not an answer about this run at all. A freeze missing one mandated id loses that ask's
     # ---- frozen answer, which is why PRESENCE alone is not the check.
+    # ---- TOOL-dDerivedDocket-22 S15 - UNDER in-place LANDING THE FREEZE IS DUE AT THE CLOSE, which
+    # ---- writes it beside LANDING in the record it commits, so a COMMITTED LANDING record is graded
+    # ---- too. Graded on the recorded LANDED alone, this arm would examine nothing in gov's own mode
+    # ---- until a rotation, and the second opinion would never fire. Under primary it is due at
+    # ---- `--landed`, and only a recorded LANDED is graded, exactly as before.
     askfz=$(fact_of "$f" asks-at-landing)
+    askfzdue=0
     if [ "$ph" = LANDED ]; then
-      if [ -z "$askfz" ]; then
+      askfzdue=1
+    elif [ "$ph" = LANDING ] && [ "$LFC_MODE" = in-place ] && read_landing_commit "$f" >/dev/null; then
+      askfzdue=2
+    fi
+    if [ "$askfzdue" != 0 ]; then
+      if [ -z "$askfz" ] && [ "$askfzdue" = 2 ]; then
+        fail 15 "a committed LANDING record under an asks: mandate carries no asks-at-landing:, and under in-place landing --close writes that freeze beside the phase, so the record the push carries answers nothing about the question the run was authorized by: $f"
+      elif [ -z "$askfz" ]; then
         fail 15 "a record claims LANDED under an asks: mandate and freezes no answer to it, so what that run actually answered is whatever the tree says today rather than what it said at landing: $f"
       else
         for askid in $askids; do
@@ -2439,6 +2535,15 @@ EOF
 # ---- a finding about the tree rather than a verdict about a record. On the REPORT channel with
 # ---- every other announcement of a case a check could not reach, so the contract at the head of
 # ---- this file — exit 0 and no output is clean — keeps its meaning.
+# ---- TOOL-dDerivedDocket-22 S10 - THE FACT-SET ARM, COUNTED PER POPULATION on one line, and a zero
+# ---- says so: in gov's own in-place mode no record says LANDED until a rotation, so an arm grading
+# ---- recorded LANDED alone would pass on nothing, and the count is what shows which one it graded.
+if [ "$LFC_ON" = 1 ]; then
+  lfc_tot=$((lfc_n_landed + lfc_n_derived + lfc_n_landing))
+  lfc_zero=""
+  [ "$lfc_tot" = 0 ] && lfc_zero=" - a count of 0, so this arm graded nothing on this tree and its green is coverage of an empty population"
+  report "the landed fact-set arm of check 15 graded, at LANDED_FACTS_CUTOFF $LANDED_FACTS_CUTOFF under LANDER_MODE $LFC_MODE: recorded LANDED $lfc_n_landed · rotated derived LANDED $lfc_n_derived · committed LANDING $lfc_n_landing$lfc_zero"
+fi
 if [ "$asks_n" = 0 ]; then
   report "the ask-mandate second opinions (checks 19, 15 and 37) are VACUOUS on this tree: 0 run-state records pin an asks: fact, so every arm examined nothing and a green verdict here is coverage of an empty population"
 else
@@ -2462,29 +2567,28 @@ fi
 # ---- TOOL-aBoundedVerdict-24 and TOOL-aReapedTicket-5 — twice cleared only by marking honest runs
 # ---- ABORTED.
 # ----
-# ---- THE `LANDING`-ALREADY-ON-THE-REMOTE EXCLUSION. A record at `LANDING` whose witness is an
-# ---- ancestor of the tip the remote advertises is NOT a competing run — it is a finished one missing
-# ---- a stamp. Nothing keyed on "the run" could ever resolve to it, because its work is already on
-# ---- the branch every later run measures against. Without this, such a record counts forever and
-# ---- reds the bar for every later run on every node, which is the deadlock `TOOL-aBoundedVerdict-24`
-# ---- and `TOOL-aFusedCharter-4` both record and which the fleet previously cleared only by marking
-# ---- honest runs ABORTED. `--landed` cannot repair it either: its check 34 wants a lander marker
-# ---- naming the witness, and a marker is per-machine and per-push, so a run landed from another node
-# ---- is unreachable by the verb by construction.
+# ---- THE `LANDING`-ALREADY-ON-THE-REMOTE EXCLUSION. A record at `LANDING` whose OWN commit - the one
+# ---- that last wrote its committed bytes - is an ancestor of the tip the remote advertises is NOT a
+# ---- competing run: by owner ruling D12-i2 it derives LANDED (TOOL-dDerivedDocket-22). Nothing keyed
+# ---- on "the run" could ever resolve to it, because the record the push carried is already on the
+# ---- branch every later run measures against. Without this, such a record counts forever and reds
+# ---- the bar for every later run on every node, which is the deadlock `TOOL-aBoundedVerdict-24` and
+# ---- `TOOL-aFusedCharter-4` both record and which the fleet previously cleared only by marking
+# ---- honest runs ABORTED.
 # ----
 # ---- WHAT THIS DOES NOT CLAIM, and the header says so because a structural check reads as a semantic
 # ---- one to everybody who did not write it. It does NOT say the run finished correctly, that its
-# ---- Definition of Done was met, or that anything reviewed it. It says one thing: the commit this
-# ---- record names as its witness is on the branch the remote calls its default. `LANDING` stays
-# ---- non-terminal — a phase move into terminality is a PRODUCER's to write, never a leg's — so
-# ---- every other check keyed on the phase grades this record exactly as before.
+# ---- Definition of Done was met, or that anything reviewed it. It says one thing: the commit carrying
+# ---- this record's LANDING is on the branch the remote calls its default. The derivation is a
+# ---- READING and this leg writes nothing, so every other check keyed on the recorded phase grades
+# ---- this record exactly as before.
 # ----
-# ---- SCOPED TO `LANDING` AND NOTHING ELSE. A `BUILDING` record whose witness happens to be on the
+# ---- SCOPED TO `LANDING` AND NOTHING ELSE. A `BUILDING` record whose commits happen to be on the
 # ---- remote is a genuinely live run and keeps counting: `LANDING` is the one phase that means
-# ---- `--close` already evaluated the Definition of Done, so it is the one phase where "missing a
-# ---- stamp" is the whole remaining difference.
+# ---- `--close` already evaluated the Definition of Done, so it is the one phase where "on the
+# ---- remote" is the whole remaining difference.
 # ----
-# ---- IT FAILS CLOSED AND IT SAYS SO. No advertisement, an unresolvable witness, or a tip this clone
+# ---- IT FAILS CLOSED AND IT SAYS SO. No advertisement, an uncommitted record, or a tip this clone
 # ---- has not fetched leaves the record counted, with the reason reported. A check that silently
 # ---- stops excluding is indistinguishable from one that found nothing to exclude, which is this
 # ---- repo's own green-by-absence class.
@@ -2500,21 +2604,18 @@ fi
 c7keep=""; c7drop=""; c7n=0
 for c7f in $live; do
   c7ph=$(phase_of "$c7f")
-  c7w=$(fact_of "$c7f" witness)
-  # SHA-SHAPED FIRST, and it is not decoration. `rev-parse --verify` resolves a TAG or a BRANCH NAME
-  # as happily as a sha, so without this clause a witness reading `main` — which is trivially an
-  # ancestor of the advertised tip — disarms the one guard standing between two concurrent
-  # unsupervised runs. The witness field is authored by the run being graded. Check 5's own
-  # sha-shape test at `:736` is the pattern this borrows, and dropping it here was the difference
-  # between the spec's S1 and the first implementation of it.
-  case "$c7w" in
-    [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) c7sha=1 ;;
-    *) c7sha=0 ;;
-  esac
-  if [ "$c7ph" = LANDING ] && [ -n "$c7anchor" ] && [ "$c7sha" = 1 ]      && GIT rev-parse --verify --quiet "$c7w^{commit}" >/dev/null 2>&1      && GIT merge-base --is-ancestor "$c7w" "$c7anchor" 2>/dev/null; then
+  # TOOL-dDerivedDocket-22 S9 - THE LANDING COMMIT, NOT THE WITNESS. The witness answers whether
+  # the WORK is on the remote; the question is whether the RECORD is, because a run that pushed its
+  # work before committing its LANDING record has a witness on the remote and a record nobody
+  # pushed. `read_landing_commit` is the kit library's, so the driver's `check_single_live` and
+  # `--status` read exactly this commit, and the leg and the driver agree about one record. It is a
+  # commit this leg FOUND - the one that last wrote the record's committed bytes - so no field the
+  # run authors can disarm it, which is what the witness's sha-shape clause used to guard against.
+  c7c=""
+  [ "$c7ph" = LANDING ] && c7c=$(read_landing_commit "$c7f" 2>/dev/null)
+  if [ -n "$c7c" ] && [ -n "$c7anchor" ] && GIT merge-base --is-ancestor "$c7c" "$c7anchor" 2>/dev/null; then
     c7drop="$c7drop $c7f"
-    printf 'unattended: check 7 EXCLUDED %s — LANDING, and its witness %s is an ancestor of the advertised default-branch tip %s, so its work is already on the remote and it is a finished run missing a stamp rather than a second live one
-' "$c7f" "$c7w" "$c7anchor"
+    printf 'unattended: check 7 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so the record the push carried is on the remote and it is a finished run rather than a second live one\n' "$c7f" "$c7c" "$c7anchor"
   else
     c7keep="$c7keep $c7f"; c7n=$((c7n+1))
   fi
@@ -4665,6 +4766,26 @@ if [ -f "$DRIVER" ]; then
   [ -z "${_c33//[[:space:]]/}" ] \
     || fail 33 "a phase another verb PRODUCES is reachable through --phase, so one phase move would write that phase with none of the facts its producer writes beside it, and the verb that releases it would have nothing to read:$_c33"
 fi
+
+# ---- 15, THE DATING SELF-SCAN - TOOL-dDerivedDocket-22 section 7. A FIRST-COMMIT DATE read with
+# ---- `--diff-filter=A` and no `--follow` anywhere in this kit's own shell. That spelling dates an
+# ---- archived record to the rotation that added its name, which moves a grandfathered record into a
+# ---- cutoff's graded set where no verb may repair it; check 15's anchor cutoff carried exactly that
+# ---- line until this unit. The CLASS is gated, not the one instance.
+# ----
+# ---- THE PREDICATE, run over the tree with hits and near-misses printed before it was wired: a
+# ---- non-comment line carrying `--diff-filter=A` AND a date placeholder (`%cs`, `%ad` and their
+# ---- kin) AND no `--follow`. Near-misses it deliberately passes: a SHA read (`--format=%H`), which
+# ---- the rotation-aware introducing-commit resolver answers and which must not follow, and a line
+# ---- that already follows. WHAT IT DOES NOT CATCH: a date read split across two lines, a date read
+# ---- by a language other than shell, or a first commit dated without `--diff-filter=A` at all.
+_c15s=$(for _c15f in "$HERE"/*.sh; do
+          [ -f "$_c15f" ] || continue
+          awk '/^[ \t]*#/ { next }
+               /--diff-filter=A/ && /%[ac][sdiIt]/ && !/--follow/ { printf "\n  %s:%d", FILENAME, FNR }' "$_c15f"
+        done)
+[ -z "${_c15s//[[:space:]]/}" ] \
+  || fail 15 "a first-commit DATE is read with --diff-filter=A and no --follow in this kit's own shell, so a rotation re-dates an archived record to the commit that added its name and a cutoff grades a record it was written to grandfather:$_c15s"
 
 
 exit "$status"

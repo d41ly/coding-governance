@@ -602,6 +602,117 @@ read_run_exclusions() { # witness · base · run-state path -> the exclusion tip
   return 0
 }
 
+# ------------------------------------------------------------ the derived terminal (unit 22)
+# TOOL-dDerivedDocket-22, owner ruling D12-i2. A LANDING record whose OWN commit is reachable from
+# the tip the remote advertises is landed, and that is DERIVED by the readers rather than written by
+# a verb after the push. These four answer the parts both the driver and the gate leg must agree on.
+#
+# THE LANDING COMMIT, found by CONTENT and never by subject or by walking back. The in-place close
+# commits under a fixed subject and a primary close under whatever the agent wrote, so a subject key
+# finds one mode's records. And the run-state path is REUSED after a rotation, so walking the path's
+# history back to the newest LANDING copy passes a staged, uncommitted LANDING and finds an EARLIER
+# run's landing commit - which is on the remote, and would derive the new run landed.
+#
+# So: the record must be byte-identical to HEAD's copy, and HEAD's copy must read `phase: LANDING`;
+# then the answer is the commit that last changed the path, as HEAD's history simplifies it. A staged
+# LANDING has no landing commit and cannot derive, which is right: no history a remote could carry
+# holds it. An unreadable HEAD copy is NOT LANDING, never read as one. Status 1 prints nothing.
+read_landing_commit() { # run-state file -> the commit that carries it at LANDING, or status 1
+  local _lc_f="${1:-}" _lc_ph _lc_c
+  [ -n "$_lc_f" ] || return 1
+  GIT diff --quiet HEAD -- "$_lc_f" 2>/dev/null || return 1
+  _lc_ph=$(GIT show "HEAD:$_lc_f" 2>/dev/null | sed -n 's/^phase: *//p' | head -1 | tr -d '\r')
+  [ "$_lc_ph" = LANDING ] || return 1
+  _lc_c=$(GIT log -1 --format=%H HEAD -- "$_lc_f" 2>/dev/null)
+  [ -n "$_lc_c" ] || return 1
+  printf '%s\n' "$_lc_c"
+}
+
+# THE DATE A RECORD'S OWN RUN BEGAN, for a cutoff that grandfathers by age. It answers a DATE, never
+# a sha: `resolve_introducing_commit` in the leg answers the sha a re-derivation needs and refuses
+# `--follow` for it, which is a different question with a different ruling (TOOL-dDerivedDocket-52).
+#
+# `--follow` IS WHAT KEEPS A ROTATION FROM RE-DATING A RECORD. Without it an archived record dates to
+# the rotation commit that added its archived name, which moves a pre-cutoff record into the graded
+# set: aPacedTurnstile's `RUN.LANDED.a1fd98d8.md` reads 2026-08-20 without it and 2026-08-18 with it.
+#
+# WHAT `--follow` DOES NOT DO, and the direction of its error. It takes the OLDEST add along the
+# followed history, so an archive in a folder that rotated more than once can date to an EARLIER
+# run's first commit. That errs toward grandfathering and never toward a frozen red.
+#
+# THE FLOOR, for the LIVE path. A live `RUN.md` in a folder that has rotated is recorded `M` at the
+# rotation and never re-added, so its oldest add is the PREVIOUS run's preflight and the record would
+# grade older than it is. Its tenancy of the path began at the newest FIRST TOUCH of an archived
+# sibling in the same folder - the rotation - so the date is floored there. First touch rather than
+# an add search, because a rotation landing inside a merge records no add at all.
+#
+# `nofloor` SKIPS THE FLOOR, for a cutoff that predates it. Flooring moves a live record YOUNGER,
+# into a graded set it was never graded by, and where that record is already terminal no verb may
+# add what the cutoff asks for; the caller that passes it says which record that would be.
+#
+# `--follow` ALSO FOLLOWS COPIES: at a record's first commit it may continue into another file that
+# shares more than half its lines, and date by that one's add. On a real history the source is the
+# older file, so the error is again toward grandfathering.
+#
+# NOTHING PRINTED is "this path has no committed history", which a caller reads as NEW - the one
+# thing a record with no first commit certainly is.
+read_first_commit_date() { # record path · [nofloor] -> YYYY-MM-DD, or nothing
+  local _fd_p="${1:-}" _fd_d _fd_s _fd_t _fd_floor=""
+  [ -n "$_fd_p" ] || return 0
+  _fd_d=$(GIT log --follow --diff-filter=A --format=%cs -- "$_fd_p" 2>/dev/null | tail -1)
+  if [ "${_fd_p##*/}" = RUN.md ] && [ "${2:-}" != nofloor ]; then
+    while IFS= read -r _fd_s; do
+      [ -n "$_fd_s" ] || continue
+      _fd_t=$(GIT log --full-history --format=%cs -- "$_fd_s" 2>/dev/null | tail -1)
+      [ -n "$_fd_t" ] || continue
+      if [ -z "$_fd_floor" ] || [[ "$_fd_t" > "$_fd_floor" ]]; then _fd_floor=$_fd_t; fi
+    done <<SIBLINGS
+$(GIT ls-files -- "${_fd_p%/*}/RUN.*.md" 2>/dev/null)
+SIBLINGS
+  fi
+  if [ -n "$_fd_floor" ] && { [ -z "$_fd_d" ] || [[ "$_fd_floor" > "$_fd_d" ]]; }; then _fd_d=$_fd_floor; fi
+  printf '%s' "$_fd_d"
+}
+
+# IS THIS RECORD GRADED by the landed fact-set arm. Status 0 graded · 1 grandfathered · 2 the arm is
+# OFF because the cutoff is blank. A record with no committed history is graded: nothing that has
+# not been committed yet can predate a cutoff that has.
+check_landed_facts_due() { # record path · cutoff -> 0 graded · 1 grandfathered · 2 off
+  local _ld_d
+  [ -n "${2:-}" ] || return 2
+  _ld_d=$(read_first_commit_date "$1")
+  [ -z "$_ld_d" ] && return 0
+  [[ "$_ld_d" < "$2" ]] && return 1
+  return 0
+}
+
+# THE LANDED FACT SET, one predicate for two callers: the leg's fact-set arm, and `--preflight`,
+# which refuses to retire a record that arm would then red for ever. Three populations, each named
+# for what makes a record belong to it:
+#
+#   landed   a recorded LANDED with no `landed-derived` - `--landed` wrote it, so it carries every fact
+#            that verb writes: `landed-anchor`, `units-at-landing`, `unpushed-at-landing`
+#   derived  a recorded LANDED carrying `landed-derived`, which only the rotation writes - the roster
+#            the close froze, and the derivation itself
+#   landing  a committed LANDING under in-place landing - the roster `--close` froze beside the phase
+#
+# `asks-at-landing` is not here: the freeze-presence arm grades it, and one fact graded by two arms
+# is two answers to one question. PRESENCE of the key line is the test; a value is a record's own.
+# Prints the missing keys, space-separated, and nothing when the set is complete.
+read_missing_landed_facts() { # record file · landed|derived|landing -> the missing keys
+  local _mf_f="${1:-}" _mf_k _mf_want _mf_out=""
+  case "${2:-}" in
+    landed)  _mf_want="landed-anchor units-at-landing unpushed-at-landing" ;;
+    derived) _mf_want="units-at-landing landed-derived" ;;
+    landing) _mf_want="units-at-landing" ;;
+    *) return 2 ;;
+  esac
+  for _mf_k in $_mf_want; do
+    grep -q "^$_mf_k:" "$_mf_f" 2>/dev/null || _mf_out="$_mf_out${_mf_out:+ }$_mf_k"
+  done
+  printf '%s' "$_mf_out"
+}
+
 # THE NEXT ANCHOR for a unit after <anchor>, or empty when this is the unit's last row. Chosen by
 # ANCESTRY rather than by the order rows appear in the file: the record is append-only and a run may
 # park rows in any order, so file order is not history order. The earliest strict descendant wins,

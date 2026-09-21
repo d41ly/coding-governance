@@ -93,10 +93,13 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   contract; the rules are not restated here.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
-- `--landed` — the sole producer of `LANDED`, an OBSERVATION rather than a claim. It accepts a record
-  only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip the
-  remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker names HEAD
-  exactly — equality, not ancestry, so any commit between the push and this verb is a refusal. It does
+- `--landed` — an OBSERVATION rather than a claim, guarded on the RECORDED phase. It accepts a record
+  only at `LANDING` and re-observes the anchor. Under `primary` it is the one writer of `LANDED` and
+  refuses unless HEAD is an ancestor of the tip the remote advertises; where `LANDER_MARKER` is
+  declared it ALSO refuses unless the marker's commit is on that tip and the witness is that commit or
+  an ancestor of it — ancestry, so the `--no-ff` merge passes and an earlier landing's marker does
+  not. Under `in-place` it writes nothing to the tree: `LANDED` is DERIVED from the advertised tip
+  (`UNATTENDED-STOPS.md` §12), and the verb prints that derivation or refuses, numbered. It does
   not refuse the default branch: the mandated lander refuses every other one, so landing happens
   exactly where that guard would otherwise fire.
 - `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the unit

@@ -455,6 +455,9 @@ HOLD_CODES_EXTRA=""; HOLD_FLOOR=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""
 RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; LEASE_STALE_AFTER=""
+# TOOL-dDerivedDocket-22 S10 - the date from which the landed fact-set arm grades a record, read here
+# because `--preflight` refuses to retire a record that arm would red. Blank turns both halves off.
+LANDED_FACTS_CUTOFF=""
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -1076,11 +1079,68 @@ fact() { # run-state file · key
 # CALLED AS A PLAIN COMMAND, never inside `$(...)`: a substitution runs it in a SUBSHELL and the two
 # globals it sets are discarded there, which is the status-set-in-a-subshell class this file already
 # carries twice. It prints nothing, never calls `fail`, never touches the global `status`, returns 0.
-DP_PHASE=""; DP_REASON=""
+#
+# TOOL-dDerivedDocket-22 S2 - LANDED IS DERIVED HERE, by owner ruling D12-i2. A LANDING record whose
+# own commit (`read_landing_commit`, in the kit library, shared with the gate leg) is an ancestor of
+# the tip the remote ADVERTISES reads LANDED, with the evidence in DP_LANDING, DP_AREF and DP_TIP.
+# Anything short of that leaves LANDING and says why in DP_REASON. The remote is observed ONLY for a
+# LANDING record, so every other record stays offline, and only through `read_advertised_tip`,
+# which returns a code and never calls `fail` - no caller inherits the observation's refusal.
+DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""
 read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) and DP_REASON
-  DP_PHASE=""; DP_REASON=""
+  DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""
   [ -n "${1:-}" ] || return 0
   DP_PHASE=$(fact "$1" phase)
+  [ "$DP_PHASE" = LANDING ] || return 0
+  DP_LANDING=$(read_landing_commit "$1") || DP_LANDING=""
+  if [ -z "$DP_LANDING" ]; then
+    DP_REASON="the LANDING record is not committed as it stands, so no commit carries it to any remote"
+    return 0
+  fi
+  if ! read_advertised_tip; then
+    DP_REASON="$ADVQ_WHY"
+    return 0
+  fi
+  if GIT merge-base --is-ancestor "$DP_LANDING" "$ADVQ_SHA" 2>/dev/null; then
+    DP_PHASE=LANDED; DP_AREF="$ADVQ_REF"; DP_TIP="$ADVQ_SHA"
+  else
+    DP_REASON="its landing commit ${DP_LANDING:0:8} is not on $ADVQ_REF at ${ADVQ_SHA:0:8}"
+  fi
+  return 0
+}
+# THE QUIET OBSERVATION, in `branch_tip_quiet`'s shape and for its reason: `observe_anchor` refuses
+# through `fail`, which prints and sets the global `status` with no reset, so a phase READ that went
+# through it would make a correct write exit 1. This returns a code and prints nothing; the reason is
+# ADVQ_WHY. ONCE PER PROCESS, and it takes an anchor this process already observed rather than asking
+# again. An advertised tip whose object this clone lacks is an unanswered observation, not a no.
+ADVQ_DONE=0; ADVQ_RC=1; ADVQ_REF=""; ADVQ_SHA=""; ADVQ_WHY=""
+read_advertised_tip() { # -> 0 with ADVQ_REF and ADVQ_SHA, or non-zero with ADVQ_WHY
+  local _aq_rem _aq_f _aq_rc _aq_adv
+  [ "$ADVQ_DONE" = 1 ] && return "$ADVQ_RC"
+  ADVQ_DONE=1; ADVQ_RC=1; ADVQ_REF=""; ADVQ_SHA=""; ADVQ_WHY=""
+  if [ -n "${AREF:-}" ] && [ -n "${ASHA:-}" ]; then
+    ADVQ_REF="$AREF"; ADVQ_SHA="$ASHA"; ADVQ_RC=0; return 0
+  fi
+  _aq_rem=$(GIT remote 2>/dev/null | head -1)
+  if [ -z "$_aq_rem" ]; then ADVQ_WHY="this clone declares no remote to observe"; return 1; fi
+  _aq_f=$(mktemp) || { ADVQ_WHY="no scratch file could be created to capture the remote advertisement"; return 1; }
+  observe_remote "$_aq_f" ls-remote --symref --exit-code "$_aq_rem" HEAD; _aq_rc=$?
+  _aq_adv=$(cat "$_aq_f" 2>/dev/null); rm -f "$_aq_f"
+  case "$_aq_rc" in
+    0) ;;
+    124) ADVQ_WHY="the remote observation was killed by this kit's own ${REMOTE_BOUND}s bound, so the tip is unknown"; return 1 ;;
+    2) ADVQ_WHY="the remote answered and advertised no HEAD, so it names no default branch"; return 1 ;;
+    *) ADVQ_WHY="the remote did not answer: $_aq_rem"; return 1 ;;
+  esac
+  ADVQ_REF=$(printf '%s\n' "$_aq_adv" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^ref: / { sub(/^ref: /,"",$1); print $1; exit }')
+  ADVQ_SHA=$(printf '%s\n' "$_aq_adv" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
+  if [ -z "$ADVQ_REF" ] || [ -z "$ADVQ_SHA" ]; then
+    ADVQ_WHY="the remote answered and advertised no HEAD symref, so it names no default branch"; return 1
+  fi
+  if ! GIT rev-parse --verify --quiet "$ADVQ_SHA^{commit}" >/dev/null 2>&1; then
+    ADVQ_WHY="the remote advertises $ADVQ_REF at ${ADVQ_SHA:0:8}, a tip this clone does not have; fetch and read again"; return 1
+  fi
+  ADVQ_RC=0
   return 0
 }
 read_recorded_phase() { # run-state file -> the phase fact, exactly as written
@@ -1887,46 +1947,34 @@ check_single_live() {
   # a non-terminal phase sit there as an unseen second run — which is exactly what this check exists
   # to make impossible.
   # THE `LANDING`-ALREADY-ON-THE-REMOTE EXCLUSION, the DRIVER's half of the leg's check 7.
-  # TOOL-aPrimedKeepalive-7. A record at LANDING whose witness is an ancestor of the anchor this verb
-  # already observed is not a competing run: it is a finished one missing its stamp, and its work is
-  # on the branch every later run measures against. Without this half, fixing the leg alone still
-  # leaves the NEXT --preflight on this repo refused, which is how the wedge survived being fixed.
-  # Observed before it was written: --preflight printed check 5 at two live records, one of them a
-  # build merged and pushed days earlier.
+  # TOOL-aPrimedKeepalive-7, re-keyed by TOOL-dDerivedDocket-22 S9. A LANDING record whose OWN commit
+  # is on the tip the remote advertises derives LANDED, and a finished run is not a competing one.
+  # It reads the landing commit through `read_derived_phase`, which is the leg's reading too, so
+  # preflight and the bar agree about one record. It used to read the WITNESS, which answers
+  # whether the WORK is on the remote and not the RECORD: a run that pushed its work before
+  # committing its LANDING record was excluded here while nothing had carried its record anywhere.
   #
   # WHAT IT DOES NOT CLAIM: nothing about whether that run finished correctly or met its Definition
-  # of Done. One thing only — the commit its record names as witness is on the branch the remote
-  # calls its default. LANDING stays non-terminal; a terminal phase is a PRODUCER's to write.
+  # of Done. One thing only — the commit carrying its LANDING record is on the branch the remote
+  # calls its default.
   #
-  # FAILS CLOSED. `ASHA` is populated by observe_anchor, which verb_preflight calls BEFORE this; with
-  # no anchor, an unresolvable witness, or any phase but LANDING, the record counts as it always did.
-  local anc="${ASHA:-}" w=""
+  # FAILS CLOSED. No observation, an uncommitted record, or a landing commit off the tip leaves the
+  # record LANDING, and a LANDING record counts as it always did.
+  local anc="${ASHA:-}"
   [ -n "$anc" ] && { GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1 || anc=""; }
   for f in $(GIT ls-files "$M/builds/*/RUN.md" "$M/builds/*/RUN.*.md" 2>/dev/null); do
-    read_derived_phase "$f"; p="$DP_PHASE"; [ -n "$p" ] || continue
-    is_terminal "$p" && continue
     # THIS RUN'S OWN RECORD IS NOT A CONCURRENT RUN. It is absent at a first preflight — the file
     # does not exist yet and is certainly not tracked — but a RE-preflight after a compaction is a
     # sanctioned resume, and there the run's own committed record is tracked and non-terminal. Without
     # this skip the announcement reports the run to itself as its own competitor, which is worse than
     # saying nothing: it is a true-looking count of the wrong population.
     case "$f" in "$M/builds/${SLUG:-}/RUN.md"|"$M/builds/${SLUG:-}/RUN."*".md") continue ;; esac
-    if [ "$p" = LANDING ] && [ -n "$anc" ]; then
-      w=$(fact "$f" witness)
-      # SHA-SHAPED, for the reason the leg's copy states: `rev-parse --verify` resolves a tag or a
-      # branch name too, and the witness is authored by the run being graded. A witness reading
-      # `main` is an ancestor of the anchor by construction. This is the ADMISSION point, so the
-      # weaker predicate here is worth more to an attacker than the leg's.
-      case "$w" in
-        [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
-        *) w="" ;;
-      esac
-      if [ -n "$w" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1          && GIT merge-base --is-ancestor "$w" "$anc" 2>/dev/null; then
-        printf 'unattended: EXCLUDED %s from the live-run count — LANDING, and its witness %s is an ancestor of the observed anchor %s, so its work is already on the remote and it is a finished run missing a stamp rather than a second live one
-' "$f" "$w" "$anc"
-        continue
-      fi
+    read_derived_phase "$f"; p="$DP_PHASE"; [ -n "$p" ] || continue
+    if [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
+      printf 'unattended: EXCLUDED %s from the live-run count — derived LANDED: its landing commit %s is on %s at %s, so it is a finished run and the next --preflight of its slug retires it\n' "$f" "${DP_LANDING:0:8}" "$DP_AREF" "${DP_TIP:0:8}"
+      continue
     fi
+    is_terminal "$p" && continue
     n=$((n + 1)); live="$live $f"
   done
   # THE THRESHOLD IS THE ANNOUNCEMENT'S, and the two must never drift apart. This guard used to read
@@ -2292,13 +2340,22 @@ stage_or_fail() { # run-state file
 #
 # Stable across the fleet: .gitattributes pins `memory/**/*.md text eol=lf`, which covers RUN.*.md,
 # and `git hash-object` applies the path's clean filter, so this is the INDEX blob on every platform.
-archive_name_of() { # run-state file -> its immutable archive path
-  local rel="$1" ph blob
+#
+# TOOL-dDerivedDocket-22 S4 - THE OPTIONAL SECOND ARGUMENT is the bytes to name, when they are not
+# yet the record's. A derived-LANDED record is written LANDED before it is retired, and the name has
+# to derive from the POST-write bytes or the archive would read `RUN.LANDING.` beside a LANDED body.
+# The copy is hashed with `--path=<record>` so the record path's attributes apply exactly as they
+# will when those bytes are staged in place.
+archive_name_of() { # run-state file · [the bytes to name, default the file itself] -> its immutable archive path
+  local rel="$1" src="$1" ph blob
+  # AN EXPLICIT BUT EMPTY copy is a copy that could not be built, and naming the unedited record
+  # in its place is exactly the `RUN.LANDING.` name this argument exists to prevent.
+  if [ "$#" -ge 2 ]; then src="$2"; [ -n "$src" ] || return 1; fi
   # RECORDED, not derived (S8): this names a record by the bytes it was HANDED. The
   # derived-terminal unit's rotation hands it a copy already carrying the terminal, before the
   # write gate, and a derived read here would name that copy by something the file does not say.
-  ph=$(read_recorded_phase "$rel")
-  blob=$(GIT hash-object "$rel" 2>/dev/null) || return 1
+  ph=$(read_recorded_phase "$src")
+  blob=$(GIT hash-object --path="$rel" "$src" 2>/dev/null) || return 1
   [ -n "$ph" ] && [ -n "$blob" ] || return 1
   printf '%s/RUN.%s.%.8s.md' "${rel%/RUN.md}" "$ph" "$blob"
 }
@@ -3818,6 +3875,36 @@ WTS
     fi
     return 1
   fi
+  # TOOL-dDerivedDocket-22 S7 - UNDER `in-place` THIS VERB IS AN OBSERVATION AND WRITES NOTHING TO
+  # THE TREE. The close committed the LANDING record on the graded merge and `--land` pushed exactly
+  # that commit, so the terminal is DERIVED from the advertised tip (D12-i2) and a LANDED commit
+  # written after the push would be the one change no bar ever grades (TOOL-aBoundedCeiling-9).
+  #
+  # The guard above reads the RECORDED phase, never the derived one: a derived guard would refuse
+  # this verb as finished after every good landing, because its own postcondition is the terminal.
+  # `observe_anchor` stays mandatory for its integrity tripwires, and the derivation then reuses that
+  # one observation. The one write is the clone-local lease (S16), under the git common dir: a later
+  # reader that cannot see the remote still has this observation, and never reads it as a phase.
+  if [ "$LANDER_MODE" = in-place ]; then
+    observe_anchor || return 1
+    read_derived_phase "$rel"
+    if [ "$DP_PHASE" = LANDED ]; then
+      write_lease_released "$slug" landed \
+        || echo "unattended: NOTE — the lease could not be rewritten, so a reader that cannot observe the remote later will not see this observation: $(resolve_lease_path "$slug" 2>/dev/null)"
+      echo "unattended: phase LANDED (derived: ${DP_LANDING:0:8} on $DP_AREF at ${DP_TIP:0:8}) · observed, not written: under in-place landing the record the push carried is the terminal, and the next --preflight of $slug retires it"
+      return 0
+    fi
+    if [ -z "$DP_LANDING" ]; then
+      fail 80 "no LANDING record is committed as it stands, so nothing a push could carry holds this run's close and there is no landing commit to observe on the remote; the in-place close commits its own record, so re-close in this tree: $rel"
+      return 1
+    fi
+    if GIT merge-base --is-ancestor "$DP_LANDING" "refs/heads/${AREF#refs/heads/}" 2>/dev/null; then
+      fail 80 "the landing commit is on the LOCAL default branch and not on the tip the remote advertises, and under in-place landing only the remote is a landing: a local arm would be the record of a merge nobody pushed. Push it with the lander, then observe again: ${DP_LANDING:0:8} against $AREF at ${ASHA:0:8}"
+      return 1
+    fi
+    fail 80 "the landing commit is not on the tip the remote advertises, so the push has not carried this record; run the lander's --land, then observe again: $DP_REASON"
+    return 1
+  fi
   check_clean || return 1
   # THE LANDER MARKER, read BEFORE the remote observation. It is the only verb that runs after the
   # push, so this is where the evidence can exist — and it goes first because it is a local file read
@@ -3932,7 +4019,25 @@ WTS
     # AGAINST THE WITNESS, not HEAD. They are the same commit on this arm, which is exactly why the
     # distinction is worth writing down: the gate is scoped to `remote` today, and a future arm that
     # validates something other than HEAD would silently start grading the wrong commit.
-    if ! grep -qF -- "$wit" "$_lm_path" 2>/dev/null; then
+    #
+    # ANCESTRY, NOT EQUALITY - TOOL-dDerivedDocket-22 S8, TOOL-dUnstalledConvoy-38. The lander writes
+    # the commit IT pushed, and on the `--no-ff` landing the charter mandates that is the merge, while
+    # the witness this verb validated is the run's side of it. Equality could never pass on that shape.
+    # So: the marker's commit M must be on the advertised tip, and the witness must be M or an
+    # ancestor of M. An EARLIER landing's marker still refuses - its M is on the tip, and this
+    # landing's witness is not under it.
+    local _lm_m
+    _lm_m=$(tr -d '\r' < "$_lm_path" 2>/dev/null | awk 'NR == 1 { for (i = 1; i < NF; i++) if ($i == "at") { print $(i + 1); exit } }')
+    case "$_lm_m" in
+      [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
+      *) _lm_m="" ;;
+    esac
+    if [ -z "$_lm_m" ] || ! GIT rev-parse --verify --quiet "$_lm_m^{commit}" >/dev/null 2>&1 \
+       || ! GIT merge-base --is-ancestor "$_lm_m" "$ASHA" 2>/dev/null; then
+      fail 34 "the lander marker names a commit that is not on the tip the remote advertises, so it records a push the remote does not carry and cannot stand as the observation of this landing; re-run the lander. The tip is $AREF at $ASHA, and the marker holds: $(tr -d '\r' < "$_lm_path" | head -1)"
+      return 1
+    fi
+    if [ "$wit" != "$(GIT rev-parse "$_lm_m^{commit}" 2>/dev/null)" ] && ! GIT merge-base --is-ancestor "$wit" "$_lm_m" 2>/dev/null; then
       fail 34 "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted $wit, marker holds: $(tr -d '\r' < "$_lm_path" | head -1)"
       return 1
     fi
@@ -4358,7 +4463,7 @@ run_hold() { # slug · code · until · reason · reaped · unreachable
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix
   # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
   # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
   # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
@@ -4383,7 +4488,21 @@ verb_preflight() { # slug · keepalive-id
   # renamed away from the path every reader globs, and return 1.
   read_derived_phase "$rel"
   if [ -f "$rel" ] && is_terminal "$DP_PHASE"; then
-    arch=$(archive_name_of "$rel") || { fail 27 "cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start: $rel"; return 1; }
+    # TOOL-dDerivedDocket-22 S4 - A DERIVED-LANDED RECORD IS WRITTEN LANDED BEFORE IT IS RETIRED
+    # (KF15), so the archive says what the derivation found rather than LANDING under a terminal
+    # name, and check 4 keeps reading a retired record by its own bytes. The edit is made to a
+    # SCRATCH COPY under the git dir, here in the precondition half: the archive name derives from
+    # the post-write bytes, and both collision tests below compare that copy, while the tree is still
+    # untouched. `write_landed_record`, after the gate, is what puts those bytes in place and stages
+    # them before the move.
+    PF_LCOPY=""; src="$rel"
+    if [ -n "$DP_LANDING" ]; then
+      PF_LCOPY=$(mktemp "$(GIT rev-parse --git-dir)/unattended-rotation.XXXXXX" 2>/dev/null) \
+        && cp "$rel" "$PF_LCOPY" && set_fact "$PF_LCOPY" phase LANDED && set_fact "$PF_LCOPY" witness "$DP_LANDING" \
+        && set_fact "$PF_LCOPY" landed-derived "$DP_LANDING $DP_TIP" && src="$PF_LCOPY" \
+        || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; PF_LCOPY=""; src=""; }
+    fi
+    arch=$(archive_name_of "$rel" "$src") || { fail 27 "cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start: $rel"; return 1; }
     # TWO refusals, both BEFORE the write gate, because everything `GIT mv -f` will not refuse for
     # itself has to be refused here.
     #
@@ -4392,12 +4511,31 @@ verb_preflight() { # slug · keepalive-id
     # reader globs, with the verb reporting success. Letting git decide would have made a silent
     # misfiling the happy path.
     if [ -e "$arch" ] && [ ! -f "$arch" ]; then
+      [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"
       fail 28 "the name this record derives is occupied by something that is not a regular file, and a rename onto it would file the finished record somewhere no reader looks rather than fail: $rel -> $arch"
       return 1
     fi
-    if [ -f "$arch" ] && ! cmp -s "$rel" "$arch"; then
+    if [ -f "$arch" ] && ! cmp -s "$src" "$arch"; then
+      [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"
       fail 28 "an archive already exists at the name this record derives, carrying DIFFERENT bytes — that cannot happen by rotation, so something placed it by hand and overwriting it would destroy a finished record: $rel -> $arch"
       return 1
+    fi
+    # S4, S10 - A ROTATION NEVER FREEZES A RECORD THE LEG REDS. The landed fact-set arm grades the
+    # retired bytes, and nothing may edit a record once it is archived, so a copy missing a fact
+    # that arm requires is refused here with nothing moved. The predicate and the dating are the
+    # kit library's, shared with the leg, so the two cannot disagree about one record.
+    if [ -n "$PF_LCOPY" ] && check_landed_facts_due "$rel" "$LANDED_FACTS_CUTOFF"; then
+      _pf_miss=$(read_missing_landed_facts "$PF_LCOPY" derived)
+      if [ -n "$_pf_miss" ]; then
+        rm -f "$PF_LCOPY"
+        if [ "$LANDER_MODE" = in-place ]; then
+          _pf_fix="under in-place landing --close writes it beside the phase, so this LANDING was reached without the close and is repaired by the owner before any rotation"
+        else
+          _pf_fix="under primary landing --landed writes it, so run: --landed $slug"
+        fi
+        fail 81 "a derived-LANDED record would be retired missing a fact the landed fact-set arm requires of every record first committed on or after LANDED_FACTS_CUTOFF, and no verb may edit a record once it is archived, so the archive would red that arm for ever; nothing was edited or moved - missing [$_pf_miss] in $rel, and $_pf_fix"
+        return 1
+      fi
     fi
     rotate=1
   else
@@ -4416,8 +4554,10 @@ verb_preflight() { # slug · keepalive-id
   # so the verb a run is TOLD to re-run after a compaction silently re-pointed the id whose reaping
   # the close attests. Same id: idempotent, and the lease is refreshed. Different id: a refusal
   # naming --resume, whose matrix is where "does this session hold the slug" is actually decided.
+  # A RECORD BEING RETIRED is not a re-preflight: its keepalive names the finished run's job, and
+  # comparing it with this run's id refused every rotation made under a new one (TOOL-dDerivedDocket-22).
   _pf_ka=$(fact "$rel" keepalive)
-  if [ -n "$_pf_ka" ] && [ -n "$kid" ] && [ "$_pf_ka" != "$kid" ]; then
+  if [ "$rotate" != 1 ] && [ -n "$_pf_ka" ] && [ -n "$kid" ] && [ "$_pf_ka" != "$kid" ]; then
     fail 52 "this run already records a keepalive and a re-preflight does not re-pin one, because that id names the job whose reaping the close attests; a session taking this slug over says so through the verb whose matrix decides whether it holds it: --resume"
   fi
   # THE LEASE THIS PREFLIGHT ACTS FOR, so the bounded probes in the precondition half below refresh
@@ -4492,7 +4632,7 @@ verb_preflight() { # slug · keepalive-id
   check_backlog_mode_shift || true
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
-  [ "$status" = 0 ] || { echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
+  [ "$status" = 0 ] || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
 
   # ROTATION, HALF TWO: the RENAME, in scaffold_runmd's position and for scaffold_runmd's reason —
   # nothing is written until every precondition above has passed.
@@ -4507,7 +4647,12 @@ verb_preflight() { # slug · keepalive-id
   # `GIT mv` and not `mv`: BOTH sides have to enter the index in one operation, because the gate leg's
   # whole per-run population is `git ls-files` and an unstaged archive is invisible to every check the
   # widened population gave it.
+  #
+  # A DERIVED-LANDED RECORD IS WRITTEN AND STAGED FIRST (S4 step 2), because `git mv` carries the
+  # STAGED blob: an edit left unstaged would ride the move as the old LANDING bytes under a LANDED
+  # name, on every other clone. The move then retires exactly the bytes the name was derived from.
   if [ "$rotate" = 1 ]; then
+    if [ -n "$PF_LCOPY" ]; then write_landed_record "$rel" "$PF_LCOPY" || return 1; fi
     if ! GIT mv -f -- "$rel" "$arch" >/dev/null 2>&1; then
       fail 29 "cannot retire the finished record, and a half-rotated build is worse than an unrotated one — the run does not start and nothing was moved: $rel -> $arch"
       return 1
@@ -4661,6 +4806,28 @@ verb_preflight() { # slug · keepalive-id
   return 0
 }
 
+# TOOL-dDerivedDocket-22 S4 step 2 - THE LANDED BYTES, PUT IN PLACE AND STAGED, AND THE STAGE
+# CHECKED. The copy already carries `phase: LANDED`, the landing commit as witness and
+# `landed-derived`; the archive name was derived from it before the write gate. After the copy
+# lands on the record and is staged, the INDEX blob must be the one the name encodes, or the move
+# would retire bytes the name does not describe. On a mismatch the record is restored from HEAD -
+# which `read_landing_commit` guaranteed it equalled - so nothing is edited and nothing is moved.
+PF_LCOPY=""
+write_landed_record() { # run-state file · the LANDED copy -> 0 staged as named, or 1 restored
+  local rel="$1" copy="$2" want got
+  want=$(GIT hash-object --path="$rel" "$copy" 2>/dev/null)
+  cp "$copy" "$rel" 2>/dev/null && GIT add -- "$rel" >/dev/null 2>&1
+  got=$(GIT rev-parse --verify --quiet ":$rel" 2>/dev/null)
+  rm -f "$copy"; PF_LCOPY=""
+  if [ -z "$want" ] || [ "$got" != "$want" ]; then
+    GIT checkout HEAD -- "$rel" >/dev/null 2>&1
+    fail 29 "the LANDED record was written and staged, and the staged blob is not the one its archive name was derived from, so the move would retire bytes the name does not describe; the record was restored from HEAD and nothing was moved: staged ${got:-nothing} against ${want:-an unreadable copy} for $rel"
+    return 1
+  fi
+  echo "unattended: wrote the derived terminal — $rel reads LANDED, witness $(fact "$rel" witness), before it is retired"
+  return 0
+}
+
 # Rewrite one `key: value` line in place, or append it under the Run facts heading if absent.
 # A key that can be placed NEITHER way is a REFUSAL, not a silent drop: the caller would otherwise
 # report a successful preflight over a file carrying none of the facts it just claimed to record.
@@ -4680,12 +4847,21 @@ set_fact() { # file · key · value
 
 verb_status() { # slug
   local slug="$1" rel p w unit nparked parked unowed nnoted
-  local _age _lrc _hcode _huntil _hsince _hfrom _hreason _hunp _wit8 _bar
+  local _age _lrc _hcode _huntil _hsince _hfrom _hreason _hunp _wit8 _bar pshow
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to report on: $rel"; return 1; }
   read_derived_phase "$rel"; p="$DP_PHASE"; w=$(fact "$rel" witness)
   [ -n "$p" ] || { fail 10 "the run-state file declares no phase, and a run with no phase is not resumable: $rel"; return 1; }
+  # TOOL-dDerivedDocket-22 S3 - THE DERIVED PHASE CARRIES ITS EVIDENCE, and a LANDING that stays
+  # LANDING carries its reason. A bare LANDED here would be indistinguishable from one `--landed`
+  # wrote, and a bare LANDING from a record nobody has pushed.
+  pshow="$p"
+  if [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
+    pshow="LANDED (derived: ${DP_LANDING:0:8} on $DP_AREF at ${DP_TIP:0:8})"
+  elif [ "$p" = LANDING ] && [ -n "$DP_REASON" ]; then
+    pshow="LANDING (not on the remote: $DP_REASON)"
+  fi
   # The first non-terminal unit, DERIVED from the build README on every read. It used to be read
   # from a copy inside this file, which is exactly the staleness that design removes — main's
   # redesign, taken here over this branch's terminal-exemption workaround for the same problem.
@@ -4765,7 +4941,7 @@ BRIEFROWS
     local hc; hc=$(fact "$rel" halt-code)
     [ -n "$hc" ] && hc=" · halt-code $hc" || hc=""
   printf 'unattended: %s · phase %s · witness %s%s · next %s%s
-' "$slug" "$p" "${w:-NONE}" "$hc" "$unit" "$parked"
+' "$slug" "$pshow" "${w:-NONE}" "$hc" "$unit" "$parked"
   # TOOL-dDerivedDocket-3 - THE LANDING SHAPE, on the status a reader actually opens, and printed
   # only where it DIFFERS from what every other run does. `primary` is announced at conf load like
   # any other defaulted value, so naming it again here would add a line to every adopter's status
@@ -4786,7 +4962,13 @@ BRIEFROWS
   # ---- working-phase record whose lease has gone stale, or which has no lease at all and whose
   # ---- build folder stopped moving, is one whose session is presumed gone. Saying so is what makes
   # ---- --resume's take-over reachable by anybody reading a run rather than only by its author.
-  if [ "$p" != HELD ] && ! is_terminal "$p"; then
+  # S16 - A LANDING RECORD THAT `--landed` OBSERVED ON THE REMOTE is named as such and is never
+  # presumed-stopped: the clone kept the observation because a later reader may not see the remote,
+  # and that reader must not offer a landed run for take-over. The lease is not a phase source, so
+  # the phase above still reads LANDING until the advertised tip is observable again.
+  if [ "$p" = LANDING ] && [ "$LEASE_STATE" = released ] && [ "$LEASE_NOTE" = landed ]; then
+    printf 'unattended: landed · observed by --landed at %s\n' "$LEASE_TAKEN"
+  elif [ "$p" != HELD ] && ! is_terminal "$p"; then
     if [ "$LEASE_STATE" = taken ]; then
       check_lease_fresh "$slug"; _lrc=$?
       case "$_lrc" in
@@ -5001,7 +5183,7 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
 # method's no-id spelling still reads its phase and witness before it is told what to pass.
 verb_resume() { # slug
   local slug="$1" rel p cond hf age bound rhc rc ka _rs_at _rs_bt _rs_rc
-  local ls_state ls_id ls_ref ls_file ls_fresh
+  local ls_state ls_id ls_ref ls_file ls_fresh ls_note ls_taken
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
@@ -5050,6 +5232,7 @@ verb_resume() { # slug
   # decision below is taken against the copy this function made before it printed anything.
   read_lease "$slug"
   ls_state="$LEASE_STATE"; ls_id="$LEASE_ID"; ls_ref="$LEASE_REFRESHED"; ls_file="$LEASE_FILE"
+  ls_note="$LEASE_NOTE"; ls_taken="$LEASE_TAKEN"
   ls_fresh=0
   if [ "$ls_state" = taken ]; then
     check_lease_fresh "$slug"; rc=$?
@@ -5068,6 +5251,15 @@ verb_resume() { # slug
     else
       echo "unattended: nothing to resume — phase $p is terminal"
     fi
+    return 0
+  fi
+  # TOOL-dDerivedDocket-22 S16 - A LANDING RECORD `--landed` OBSERVED ON THE REMOTE. The lease row
+  # the matrix reads for it: nothing to resume and never the lander, whatever this clone can see of
+  # the remote today. Keyed on the LEASE and not on `read_landing_commit` (F9): a run that committed
+  # its close and died before `--land` has a landing commit too, and it must stay recoverable.
+  if [ "$p" = LANDING ] && [ "$ls_state" = released ] && [ "$ls_note" = landed ]; then
+    verb_status "$slug" || true
+    echo "unattended: nothing to resume — --landed observed this record on the remote at $ls_taken, so the run is landed; the rotation waits for the advertised tip, which the next --preflight of $slug reads"
     return 0
   fi
   if [ "$ls_state" = malformed ]; then
@@ -5429,6 +5621,15 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # carrying overrides for a landing that cannot happen. Under `primary` this does not run at all.
   if [ "$LANDER_MODE" = in-place ]; then
     check_landing_carry "$slug" || return 1
+    # TOOL-dDerivedDocket-22 S6 - UNDER `in-place` THE FREEZE IS WRITTEN HERE, beside LANDING, in the
+    # record this verb commits. `--landed` is an observation in this mode and writes nothing to the
+    # tree, so a freeze left there would never reach the record the push carries. Derived BEFORE any
+    # write, for `--landed`'s own ordering reason: a witness that cannot answer refuses while the
+    # record still reads what it read before the close.
+    if ! derive_ask_freeze "$slug" "$(GIT rev-parse HEAD 2>/dev/null)"; then
+      fail 77 "this run's asks cannot be read at the merge it is closing on, so the LANDING record the push carries would freeze no answer to the question it was authorized by, and under in-place landing no later verb writes that freeze; nothing was written: $AW_WHY"
+      return 1
+    fi
   fi
   i=0
   while [ "$i" -lt "$n" ]; do
@@ -5437,6 +5638,16 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     echo "unattended: override recorded for '$ov' (checker $(checker_of "$ov")) — parked entry written"
     i=$((i + 1))
   done
+  # S6 - THE ROSTER AND THE ASKS AT LANDING, written by the close under `in-place` in the same
+  # spelling `--landed` uses under `primary`, so a record reads the same whichever verb froze it.
+  if [ "$LANDER_MODE" = in-place ]; then
+    set_fact "$rel" units-at-landing \
+      "$(unit_rows "$(readme_of "$slug")" \
+         | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
+    if [ -n "$AD_FREEZE" ]; then
+      set_fact "$rel" asks-at-landing "$AD_FREEZE" || return 1
+    fi
+  fi
   # The phase write is the CLOSE. Reporting success before checking it printed "close OK" over a
   # file still reading RUNNING, which is the two-answers class in the verb whose whole job is to
   # make the record agree with reality.

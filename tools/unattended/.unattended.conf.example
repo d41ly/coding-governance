@@ -310,6 +310,14 @@ GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py memory/le
 # Blank or absent grandfathers every record. Set it to the day you adopt the two-anchor landing.
 LANDED_ANCHOR_CUTOFF=""
 
+# The date from which a landed record must carry the facts its landing verb writes (the roster and,
+# where they apply, the anchor kind and the unpushed count). Graded by LANDER_MODE: a recorded LANDED,
+# a rotated derived-LANDED, and under in-place landing a committed LANDING, each on its FIRST-commit
+# date read with --follow. A NEW key and not LANDED_ANCHOR_CUTOFF, because records that key admits
+# may lack facts nobody can reconstruct. --preflight refuses to retire a record this would red.
+# Blank or absent turns the arm off, announced. Set it to the day you adopt the derived terminal.
+LANDED_FACTS_CUTOFF=""
+
 # TOOL-dBriefedPass-3 — the date from which a CLOSED unit whose BUILD COMMIT predates a conforming
 # spec for it blocks the bar. Graded on the build README's `opened:` date, the same idiom
 # UNITS_REGION_CUTOFF and SPEC_THIN_CUTOFF use and for the same reason: a build that landed before

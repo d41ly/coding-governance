@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-22 — LANDED derived from the tip
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 22
+**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-22-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-22-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
@@ -28,10 +29,11 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
 
 ## 2. Scope (IN)
 
-- **S1** `landing_commit_of <run-state file>` in `tools/unattended/lib-unattended.sh`, shared by the
+- **S1** `read_landing_commit <run-state file>` in `tools/unattended/lib-unattended.sh`, shared by the
   driver and the leg: the commit that last changed the run-state file, provided the file is unchanged
   from HEAD's copy and that copy reads `phase: LANDING`; otherwise nothing. Observed by AC1 and AC8.
-- **S2** `derived_phase()` returns LANDED when the recorded phase is LANDING and that commit is an
+  Named `landing_commit_of` through rev-6; the declared verb table refuses `landing` (rev-7).
+- **S2** `read_derived_phase()` returns LANDED when the recorded phase is LANDING and that commit is an
   ancestor of the advertised default tip, and the recorded phase otherwise. The tip is observed only
   for a LANDING record; an unanswered remote leaves the phase LANDING with a stated reason. It
   observes through a quiet helper that returns a code, never through `fail`, so no caller inherits
@@ -51,7 +53,7 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   `tools/unattended/lib-unattended.sh`, shared with S10.
   (2) After the gate, it copies the scratch bytes over the record and stages the record. It then
   asserts that the staged blob, `git rev-parse :<record path>`, is the one the name was derived from.
-  On a mismatch it restores the record from HEAD, which `landing_commit_of` guaranteed equals the
+  On a mismatch it restores the record from HEAD, which `read_landing_commit` guaranteed equals the
   record, and refuses under code 29 with nothing moved.
   (3) Only then does `GIT mv -f` retire it, so the move carries the staged LANDED blob.
   No record is edited after it is retired. Observed by AC6 and AC12.
@@ -61,7 +63,7 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   wherever that fact applies, beside the LANDING phase in the record it commits. Under `primary` both
   stay at `--landed`. Observed by AC3.
 - **S7** Under `LANDER_MODE=in-place`, `--landed` tests terminality on the RECORDED phase through
-  `refuse_if_terminal --recorded`, and only then reads `derived_phase`. A derived LANDED prints the
+  `refuse_if_terminal --recorded`, and only then reads `read_derived_phase`. A derived LANDED prints the
   derivation and exits 0, writing nothing to the tree. It refuses with a new numbered code when the
   landing commit is on local `<def>` and not on the advertised tip (KF4's local arm), and when no
   LANDING record is committed at all. Observed by AC4.
@@ -87,7 +89,7 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   `--landed` writes on its arm: `landed-anchor`, `units-at-landing` and `unpushed-at-landing`. (ii) A
   recorded LANDED record carrying `landed-derived`, which only S4's rotation writes, carries
   `units-at-landing` and `landed-derived`. (iii) While the conf's `LANDER_MODE` is `in-place`, a
-  committed LANDING record, one S1's `landing_commit_of` finds, carries `units-at-landing`, which S6
+  committed LANDING record, one S1's `read_landing_commit` finds, carries `units-at-landing`, which S6
   writes at close. Under `primary`, a committed LANDING record the leg derives LANDED is REPORTED
   naming `--landed <slug>` and is never graded, because `--landed` is the verb that completes it.
   `asks-at-landing` is left to the freeze-presence arm (S15). The arm prints its graded count per
@@ -138,7 +140,7 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
 - **S15** Under `LANDER_MODE=in-place` the freeze is written at `--close` (S6). So the
   freeze-presence arm, `TOOL-dDerivedDocket-18` S4 reporting under check 15, also grades every
   committed LANDING record that carries an `asks:` fact, a committed record being one S1's
-  `landing_commit_of` finds. It does so in the same commit that moves the freeze. Under `primary` the
+  `read_landing_commit` finds. It does so in the same commit that moves the freeze. Under `primary` the
   arm keeps grading recorded LANDED only. A record S4 rotated says LANDED and is graded as before.
   Observed by AC14.
 - **S16** Under `in-place`, `--landed`'s successful observation rewrites the slug's lease file as
@@ -252,7 +254,7 @@ history a remote could carry.
 
 ### Where the tip comes from
 
-`derived_phase` observes the advertised tip through a QUIET helper that returns a code and prints
+`read_derived_phase` observes the advertised tip through a QUIET helper, `read_advertised_tip`, that returns a code and prints
 nothing, in the shape of `branch_tip_quiet` (`tools/unattended/unattended.sh:904`). It never goes
 through `observe_anchor`'s `fail`, which prints to stdout and sets the global `status` with no
 reset. It observes only for a LANDING record, so `--status` on every other record stays offline. An
@@ -264,10 +266,10 @@ its reason in the second global. Every caller then reads LANDING, the writing ve
 
 | Reader | Derives? | Why |
 |---|---|---|
-| `derived_phase()`, hence `refuse_if_terminal`, preflight's rotation test, `--resume`, `--status`, `--audit` | yes | KF5 and KF15 |
+| `read_derived_phase()`, hence `refuse_if_terminal`, preflight's rotation test, `--resume`, `--status`, `--audit` | yes | KF5 and KF15 |
 | `--landed`'s terminal guard | no, recorded | its own postcondition is the terminal; a derived guard refuses it after every good landing |
 | the leg's check 7 exclusion | yes | it already observes the advertised tip (`ADV_HEAD`) |
-| `check_single_live`, the driver's twin of check 7's exclusion | yes, through `landing_commit_of` | preflight and the leg must agree about one record |
+| `check_single_live`, the driver's twin of check 7's exclusion | yes, through `read_landing_commit` | preflight and the leg must agree about one record |
 | the leg's check 4 | no, recorded | unchanged; a rotated record is terminal by its own bytes |
 | the leg's check 15 | reads `landed-derived` | a rotated derived record says LANDED and names its landing commit (S4, S9) |
 | the freeze-presence arm (check 15) | committed LANDING under in-place, plus recorded LANDED | the freeze is due at close under in-place (S15) |
@@ -295,7 +297,7 @@ followed by `landed · observed by --landed at <iso>`, and never `presumed-stopp
 that nothing is left to resume and that the rotation waits for the advertised tip. The next
 `--preflight` that takes the slug's lease overwrites it.
 
-Keying the exemption on `landing_commit_of` instead was rejected (F9). A run that committed its close
+Keying the exemption on `read_landing_commit` instead was rejected (F9). A run that committed its close
 and died before `--land` also has a landing commit, and it must stay recoverable by take-over.
 
 ### Check 34 under `primary`
@@ -456,7 +458,7 @@ the rendered guides and Skill · `memory/map/features/unattended.md`.
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`; that leg is not held, so a plain
   bar carries it too.
 - **AC10** — When this grep runs at the unit's build commit, it prints 0:
-  `grep -cE 'ls-remote|landing_commit_of|derived_phase|is-ancestor' tools/memory-tree/gen_build_index.py`
+  `grep -cE 'ls-remote|read_landing_commit|derived_phase|is-ancestor' tools/memory-tree/gen_build_index.py`
   Red when: the generator reads the advertised tip, or runs an ancestry test against it, so the
   committed index goes stale on the next remote move.
 - **AC11** — When `bash tools/unattended/check-unattended.sh` and the skill-wiring check run over the
@@ -573,7 +575,7 @@ the rendered guides and Skill · `memory/map/features/unattended.md`.
 
 New arm: tools/unattended/unattended.test.sh · a pushed and an unpushed LANDING record, a lander killed after its push, an in-place local-arm landing, and `--landed` in each mode with the record commit already on the advertised tip · the driver suite's executed-assertion floor
 New arm: tools/unattended/check-unattended.test.sh · a record whose witness was pushed and record was not, and a LANDED record missing a fact after the cutoff · the leg suite's executed-assertion floor
-New arm: tools/unattended/check-unattended.test.sh · a derived-LANDED record rotated through --preflight over a default branch that gained an owner `may:` commit after BASE, then graded by the WHOLE leg through one helper every archive-producing arm calls, which reads the archive with `git show :<archive>` and asserts an empty `git diff` for it; staged RED by removing the pre-move stage, and by a leg copy whose check 19 terminal row takes no exclusion at a merge · the leg suite's executed-assertion floor
+New arm: tools/unattended/unattended.test.sh · a derived-LANDED record rotated through --preflight over a default branch that gained an owner `may:` commit after BASE, then graded by the WHOLE leg through one helper every archive-producing arm calls, which reads the archive with `git show :<archive>` and asserts an empty `git diff` for it; staged RED by removing the pre-move stage, and by a leg copy whose check 19 terminal row takes no exclusion at a merge · the driver suite's executed-assertion floor
 New arm: tools/unattended/check-unattended.test.sh · a pre-cutoff LANDED record, anchorless and without the landing facts, rotated after the cutoff · the leg suite's executed-assertion floor
 New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` first-commit date without `--follow` under `tools/unattended/`, the predicate run over the tree with hits and near-misses printed before it is wired (charter §7); `tools/unattended/check-unattended.sh:1313` is a live hit at fb07ca25 · none
 
@@ -776,6 +778,38 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
   close-out, and the DATE-versus-SHA boundary under which both first-commit readings live in
   `tools/unattended/check-unattended.sh`. Its target sits at an EARLIER order, which is what a
   consumes-from edge requires. No assertion moves and no criterion changes.
+- rev-7 · 2026-09-21 · §2 S1 S2 S7 S12 · §4 · §6 AC10 · §7 · the build pass, CLOSED in the same commit.
+  - S1's function is `read_landing_commit`: the declared verb table refuses `landing`, and a name the
+    table refuses is renamed. The derivation lives in unit 4's `read_derived_phase`, and the quiet
+    helper is `read_advertised_tip`. AC10's grep bans the new name; `derived_phase` already matches
+    the reader by substring, and the count at the build commit is 0.
+  - The refusal codes, allocated above the driver's highest (79): 80 for in-place `--landed`, over
+    three states (no committed LANDING, the local arm, not yet pushed), and 81 for the rotation's
+    fact-set refusal. S4's blob mismatch is code 29 in `write_landed_record`, placed after the
+    `GIT mv` branch in line order so the pinned row keeps its ordinal. The in-place close's
+    freeze refusal reuses 77, the freeze's own code.
+  - The whole-leg rotation arm (§7, AC6) lives in the driver suite, beside the rotation that makes
+    the archive: the leg suite's fixtures carry none of `--preflight`'s preconditions.
+  - Found by this unit's rotation arms: `--preflight` compared a RETIRED record's keepalive with the
+    new run's and refused every rotation made under a new id (unit 4's re-preflight rule, red at
+    BASE-of-pass on the suite's own ABORTED rotation arm). The comparison is skipped for a record
+    being retired. And the driver suite's `iprun` helper carried a literal `\n` from a halved heredoc
+    continuation, so `env` ran a command named `n` and every in-place arm graded its absence; fixed.
+  - S12: protocol §3's "reached by a verb" sentence gains "or DERIVED (§6)", and fact 8's
+    `--landed alone` clause gains "(`--close` in-place)", because S6 made both false. Both sit
+    inside the 300-byte gross, which measures 298: the protocol went from 59634 bytes and 670 lines
+    to 59228 and 666. The verb carrier's `--landed` entry and the Skill's landing section stated
+    equality for the lander marker and are corrected to ancestry.
+  - The fact-set arm's per-population count and its blank-cutoff notice print on the leg's REPORT
+    channel, its contract for a case a check could not reach, so a default bar's output is unchanged.
+  - S9's `LANDED_ANCHOR_CUTOFF` site reads the `--follow` date UNFLOORED, and only S10's arm floors.
+    Read over this tree, the floor moves `memory/builds/dUnstalledConvoy/RUN.md` from 2026-08-20 to
+    2026-08-24, past that older cutoff, and the record is a terminal LANDED with no anchor kind: a red
+    no verb could clear, the shape F4 chose a new key to avoid. AC9's fixture pins both readings.
+  - Measured: `git log --follow` follows COPIES as well as renames, so a record sharing more than
+    half its lines with another at its first commit dates by that other's add. On a real history the
+    source is older, which is the grandfathering direction §4 states; the dated fixtures use
+    dissimilar records, because a backdated commit is older than its own copy source.
 
 ## 10. Reuse audit
 

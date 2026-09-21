@@ -32,7 +32,8 @@ Three consequences, and each of them is a refusal in the driver rather than a co
   test, an authorization to re-verify and a lease to take.
 
 Only `--landed` and `--abort` still write a terminal, and both go through the working phase a resume
-returns the run to.
+returns the run to. A `LANDING` record the remote carries reads `LANDED` without either, and the next
+`--preflight` of its slug writes that before it retires the record (§12).
 
 ## 2. The codes
 
@@ -162,7 +163,8 @@ which declines the take-over rather than inviting one.
 Taken by `--preflight`, by a take-over, and by a leaseless record's own holder resuming with the
 keepalive the record names. Refreshed by every writing verb past its own write gate, by a bounded
 command run under a lease this verb's own keepalive holds, and by a `--resume` passing the lease's
-own id. Released by `--hold`; removed at a terminal.
+own id. Released by `--hold`, and by an `in-place` `--landed` that observed the landing, as
+`released <iso> landed` (§12); removed at a terminal the driver writes.
 
 A refresh is a WRITE and obeys the rule every other write obeys: it happens only when the lease reads
 `taken` naming the keepalive the CALLING verb acts for. A released, absent or foreign lease is never
@@ -183,7 +185,8 @@ would lock that lease's own holder out for the whole bound.
 | working | stale | `presumed-stopped`: take-over, refusing a missing id as the first row does |
 | working | absent, and the id passed equals the record's `keepalive` fact | orientation that TAKES the lease: the holder of a run that predates one |
 | working | absent, any other id or none | `presumed-stopped` once the newest commit touching the build folder is older than the bound, and taken over; inside the bound, prints the `--status` block and refuses, naming that commit's age |
-| terminal | any | unchanged: nothing to resume, and never a re-drive of the lander |
+| LANDING | `released … landed` | nothing to resume and never the lander: `--landed` observed it on the remote, and the rotation waits for the advertised tip. Never `presumed-stopped` |
+| terminal, recorded or derived | any | unchanged: nothing to resume, and never a re-drive of the lander |
 
 The no-id rows refuse rather than orienting, because `--resume` is the only point at which a second
 session can be stopped at all. They print the `--status` block FIRST, so a session regrounding by the
@@ -375,3 +378,55 @@ the run HELD with the one thing that could restart it deleted.
 so the `keepalive-reaped` attestation is made over a list the agent was SHOWN. There is no new
 Definition-of-Done item: a durable task outliving the run under a green attestation is the failure
 that item already exists to catch.
+
+## 12. The derived terminal
+
+*Protocol section 6 states it in one sentence citing owner ruling D12-i2. This is the rest.*
+
+**A `LANDING` record whose own commit is on the tip the remote advertises is landed.** Four gaps
+made a written `LANDED` unreliable: a kill after the push and before the lander's marker, a marker
+naming the `--no-ff` merge rather than the witness, a marker another landing overwrote, and a
+`LANDED` commit written after the push, which no bar ever grades. Deriving closes all four.
+
+**The landing commit is found by CONTENT.** The record must be byte-identical to HEAD's copy, and
+that copy must read `LANDING`; the commit that last changed it is the landing commit. Not by the
+close commit's subject, which only one mode fixes, and never by walking the path's history back to
+an older `LANDING`: the path is reused after a rotation, and that walk would find an EARLIER run's
+landing on the remote and call a staged, unpushed record landed.
+
+**Who derives, and who reads the recorded phase.** `--status`, the terminal guard of every writing
+verb, `--resume`, `--audit` and `--preflight`'s rotation test derive; so do the gate leg's check 7
+exclusion, its fact-set arm and its cross-run grant arm. The committed live index does NOT: it is
+freshness-gated, and the remote tip moves while the index does not. `--landed`'s own guard reads the
+RECORDED phase, because its postcondition is the terminal. The remote is observed only for a
+`LANDING` record, quietly; an unanswered remote, or a tip this clone lacks, leaves `LANDING` and
+`--status` prints the reason.
+
+**Under `in-place`, `--landed` is an OBSERVATION.** It writes nothing to the tree, prints the
+derivation, and keeps what it saw in the lease, `released <iso> landed`, so a later reader that
+cannot see the remote still does not presume the run stopped. It refuses, numbered, when no
+`LANDING` record is committed, when the landing commit reached only the LOCAL default branch, and
+when the push has not carried it. Under `primary` it writes `LANDED` as before, and its lander
+marker check is ANCESTRY: the marker's commit is on the advertised tip, and the witness is that
+commit or an ancestor of it.
+
+**The facts move to the close.** Under `in-place`, `--close` writes `units-at-landing`, and
+`asks-at-landing` wherever the ask contract applies, beside `LANDING` in the record it commits; a
+witness that cannot answer refuses before any write.
+
+**The next `--preflight` retires a derived-`LANDED` record, WRITTEN `LANDED` first.** It edits a
+scratch copy under the git dir to `phase: LANDED`, `witness: <landing commit>` and
+`landed-derived: <landing commit> <advertised tip>`, derives the archive name from that copy,
+and refuses, numbered and with nothing moved, when the copy lacks a fact the leg's fact-set arm
+requires. After the write gate it puts the copy in place, STAGES it and checks the index blob is the
+one the name encodes — `git mv` carries the staged blob, so an unstaged edit would ride the move as
+the old bytes — and only then moves it. Check 15 reads `landed-derived` as that record's anchor
+evidence and tests the commit it names against the advertised tip.
+
+**The fact-set arm, graded by `LANDER_MODE` from `LANDED_FACTS_CUTOFF`.** A recorded `LANDED` that
+`--landed` wrote carries `landed-anchor`, `units-at-landing` and `unpushed-at-landing`; a rotated
+derived one carries `units-at-landing` and `landed-derived`; under `in-place` a committed `LANDING`
+carries `units-at-landing`. Under `primary`, a committed `LANDING` the remote already carries is
+REPORTED naming `--landed` and never graded, since that is the verb that completes it. Each record is
+dated by its FIRST commit read with `--follow`, floored at a rotated folder's newest archive, so a
+rotation does not re-date it. Blank turns the arm off, announced.

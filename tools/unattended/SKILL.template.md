@@ -931,6 +931,11 @@ made from this worktree:
 {{LANDER}} --land --slug <slug>
 ```
 
+Then run `--landed`, which under `in-place` is an OBSERVATION and writes nothing to the tree: the
+close already committed your `LANDING` record, the push carried it, and a `LANDING` record whose own
+commit the remote's advertised tip holds reads `LANDED` everywhere — `--status`, every verb's guard,
+the gate leg. So commit nothing after the push. The next `--preflight` of this slug retires it.
+
 Never with a hook-bypass flag, in either mode. The lander is mandatory because it reconciles the
 remote BEFORE the gate, so the bar never runs on an already-stale tree. If it refuses, read why and
 fix it — bypassing discards the entire bar the authorization leaned on, and the gate greps your
@@ -979,13 +984,17 @@ Two facts land in the record and you do not write either: `landed-anchor`, which
 Read the second before you believe the first — a local landing sits on top of whatever else is on
 that branch. What the weaker anchor does not buy is protocol section 9, and it is not repeated here.
 
-**AND DO NOT COMMIT BETWEEN THE PUSH AND THIS VERB.** Where the project declares a lander marker, the
-lander writes the commit it pushed and this verb requires the marker to name HEAD **exactly**. That is
-equality, not ancestry: one more commit after the push — even the record commit — and `--landed`
-refuses. The refusal names both shas, the one it wanted and the one the marker holds, so a stale
-marker and a moved HEAD are distinguishable. Then commit the record it writes and land that commit too; until it is
-committed, every later run still counts yours as live — which no longer reds anyone's bar, but does
-put your unfinished run in every later run's concurrency report.
+**Under `in-place` this verb only OBSERVES**, and says so: it prints the derivation, writes nothing to
+the tree, and refuses, numbered, when your landing commit is on no remote tip — not yet pushed, or
+merged only into the local default branch, which is not a landing in this mode.
+
+**Under `primary`, DO NOT COMMIT BETWEEN THE PUSH AND THIS VERB.** Where the project declares a
+lander marker, the lander writes the commit it pushed and this verb requires that commit to be on
+the tip the remote advertises, and the witness it validated to BE that commit or an ancestor of it.
+That is ancestry, so the `--no-ff` merge the lander pushes satisfies it, and a marker left by an
+EARLIER landing does not: your witness is not under that one. The refusal names both shas, the
+witness and what the marker holds. Then commit the record it writes and land that commit too; until
+it is, your committed record says `LANDING`, and a clone that cannot see the remote reads it as live.
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
 Definition of Done was evaluated without evaluating it.
