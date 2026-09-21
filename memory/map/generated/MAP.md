@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 112 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 85 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 114 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 87 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -38,6 +38,7 @@ Inventories: gate-legs: 112 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `gotchas selftest` | baseline |
 | `govkit acceptance matrix` | govkit |
 | `govkit refusal join` | govkit |
+| `govkit runbook parity` | govkit |
 | `govkit selfcheck` | govkit |
 | `govkit selftest` | govkit |
 | `harness arms (fail branches armed or pinned)` | baseline |
@@ -86,6 +87,7 @@ Inventories: gate-legs: 112 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `python resolver (behaviour + inline parity + idiom ban)` | baseline |
 | `recall floor` | memory-recall |
 | `recall floor arms` | memory-recall |
+| `receipt sync (installed files match the receipt)` | run-gates |
 | `review-join ban (no ref-keyed join)` | review-harnesses |
 | `review-join self-test` | review-harnesses |
 | `review-protocol parity (kit vs dogfood)` | agent-cap |
@@ -220,6 +222,7 @@ Inventories: gate-legs: 112 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
+| `guard-above-a-fold-makes-its-fallback-dead.md` | govkit |
 | `guard-fed-the-value-it-supersedes.md` | unattended |
 | `hand-named-gate-list-green-while-the-bar-reds.md` | build-method |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
@@ -232,6 +235,7 @@ Inventories: gate-legs: 112 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `ledger-token-wrapped-across-a-line-joins-nothing.md` | memory-tree-hygiene |
 | `line-count-reads-empty-capture-as-one.md` | unattended |
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
+| `merge-keeps-both-sides-of-one-derivation.md` | process-monitor |
 | `msys-grep-counts-cr-on-every-line.md` | session-kickoff |
 | `naming-leg-grades-what-python-named.md` | lexicon |
 | `node-check-is-not-a-syntax-gate.md` | review-harnesses |

@@ -402,8 +402,11 @@ PRE_BINDABLE=$(printf '%s\n' "$FILES" | grep -cE "/(build|prompts|reviews)/" || 
 # could-not-fail shape it exists to catch — the same reasoning `PRE_BINDABLE` records one comment up.
 #
 # The KINDS are `index_set`'s members by name: the three memory roots, a ledger / backlog / guides /
-# map-features member at any depth, a build's README, STATUS or RUN record, and FOUNDATION.
-PRE_INDEXY=$(printf '%s\n' "$FILES" | grep -cE "/(LIVE|DECISIONS|FOUNDATION|STATUS|README)\.md$|/(ledger|backlog|guides|features)/[^/]+\.md$|/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$" || true)
+# map-features member at any depth, a build's README, STATUS or RETIRED run record, and FOUNDATION.
+# The retired form ALONE, tracking the membership split above — a live run-state file is in no
+# check's population now, so counting it here would float the floor on a kind nothing grades and
+# make `pop_guard` fire at a selector that is behaving exactly as designed.
+PRE_INDEXY=$(printf '%s\n' "$FILES" | grep -cE "/(LIVE|DECISIONS|FOUNDATION|STATUS|README)\.md$|/(ledger|backlog|guides|features)/[^/]+\.md$|/RUN\.[A-Z]+\.[0-9a-f]{8}\.md$" || true)
 # CR-stripped + marker-matched fences: only the marker that OPENED a fence closes it (a ~~~ line
 # inside a ``` fence is content, not a toggle), and \r is dropped so CRLF worktrees (autocrlf
 # smudge read by WSL/Linux bash) compare equal to LF sources.
@@ -567,15 +570,17 @@ $bad3"
 # A RETIRED run-state file (2.18) joins it as a GRAMMAR rather than a literal — `RUN.<PHASE>.<8 hex>.md`,
 # where the hex is the retired record's own blob hash. A build gets more than one unattended run by
 # ROTATING the finished record to that name, so the family is unbounded and cannot be whitelisted by
-# equality the way the three below are. It joins check 6's caps and check 7's prose exemption too: an
-# archived record is the same document frozen.
+# equality the way the three below are. It alone carries check 6's caps and check 7's prose
+# exemption: an archived record is the same document frozen, and a frozen size is a finished fact.
 #
 # RUN.md (2.3) is the THIRD whitelisted root file: the run-state file an unattended run writes, which
 # needs a name a resuming session can compute without knowing when the run started. A dated recording
 # under build/ is legal today and has no stable resume target, which is why the name is fixed here
-# rather than left to the recording grammar. It joins index_set() (check 6's caps) and check 7's
-# prose exemption; it deliberately does NOT join check 8, whose seven-token status vocabulary cannot
-# express the run phases — the unattended leg owns validating those.
+# rather than left to the recording grammar. This reservation — `RUN.md` at a build root is the
+# run-state file or it is a check-4 finding — is what lets index_set() exempt the LIVE record BY
+# CLASS rather than by filename (TOOL-cMendedVintage-13). It is therefore in NO size check, and it
+# deliberately does not join check 8 either, whose seven-token status vocabulary cannot express the
+# run phases — the unattended leg owns validating those.
 BUILD_N=$(printf '%s\n' "$FILES" | awk -F/ -v m="$M" '$0 ~ "^" m "/builds/" && NF > 3 { print $3 }' | LC_ALL=C sort -u | grep -c .)
 pop_guard 4 "no build folder under $M/builds/" "$BUILD_N" "$PRE_ANYBUILD"
 # S4 — CHECK 4 CONSULTS THE GRANDFATHER REGISTRY, which check 5 has read at its `in_legacy`
@@ -670,13 +675,22 @@ index_set() {
     # chars) rather than the row-document tier, which was measured against a corpus in which these
     # files were not members at all. The numbers live at the top of this file, declared once.
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/README\.md$"
-    # RUN.md (2.3): the run-state file is capped like every other index. It is designed to GROW —
-    # a parked entry per refused decision — so the cap is the point, not an accident: the protocol
-    # spills the oldest parked entries into the build's own build/ folder as a dated recording
-    # (a name check 5's grammar already admits) before the cap is reached. Entry-budget exempt
-    # below, because the standing mandate is verbatim prose, not index rows.
-    # An ARCHIVED record (2.18) is the same document frozen, so the same cap applies to it.
-    printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$"
+    # A RETIRED run-state record (2.18) ONLY — the LIVE one is exempt BY CLASS (TOOL-cMendedVintage-13).
+    # A live record is APPEND-ONLY BY CONSTRUCTION: the driver writes a row per dispatch, brief,
+    # park, rescope and phase and the protocol removes none, so a long enough run always reds. The
+    # comment here used to claim the protocol spills the oldest parked entries into the build's own
+    # build/ folder before the cap is reached. It does not, and no verb in the driver does — the
+    # first 36-unit run went over with nothing able to bring it back. The remedy this check names is
+    # unreachable too: rotation retires a record only once it is TERMINAL, and the driver reads the
+    # live one on every verb, so a cap on it is a bound with no compliant state.
+    #
+    # THE CLASS IS THE NAME, and the name is a RESERVED SLOT rather than a spelling: check 4
+    # whitelists exactly `README.md` and `RUN.md` at a build root and reds every other free name
+    # there, so no document but the run-state file can hold it. That reservation is what makes this
+    # a class test and not a filename test. Retirement is a RENAME, so the two forms partition the
+    # class exactly, and the frozen half keeps the cap: nothing appends to it, its size is a
+    # finished fact, and the split below is the only thing that still bounds this family at all.
+    printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/RUN\.[A-Z]+\.[0-9a-f]{8}\.md$"
     # A GUIDE is mandatory reading — the charter points a session at it — so it carries the same
     # byte/line cap as an index. Check 16 says the same thing from the other side: a charter-cited
     # file under no cap is a read budget nobody watches. Entry-budget exempt: a guide is prose.
@@ -748,14 +762,15 @@ pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, ma
   "$(printf '%s\n' "$sel6" | grep -c . || true)" "$PRE_INDEXY"
 
 # 7 — entry budget, ENTRY_CAP_CHARS per class (grandfather: curation-debt.txt; exempt guides/*.md — a guide is prose,
-#     not index rows — builds/*/RUN.md, whose standing-mandate block is quoted prose reproduced
-#     verbatim and must not be reflowed to fit an index budget — and, when the codebase-map kit is
+#     not index rows — a RETIRED builds/*/RUN.<PHASE>.<blob8>.md, whose standing-mandate block is
+#     quoted prose reproduced verbatim and must not be reflowed to fit an index budget (the LIVE
+#     record is not in INDEX_SET at all, so it never reaches this check) — and, when the codebase-map kit is
 #     adopted under this tree, its dossiers/FOUNDATION (detail files).
 # ONE base plus an APPEND, never a second full spelling (aMendedLedger U3). The MAP_SUB branch used to
 # rebuild the whole expression, which silently dropped the guides/ alternative on any repo carrying a
 # .codebase-map.conf — every guide entered this check's population and nothing said so. Two spellings
 # of one expression is the two-answers-to-one-question class, and this is how it fired.
-ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$'
+ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN\.[A-Z]+\.[0-9a-f]{8}\.md$'
 [ -n "$MAP_SUB" ] && ex7="$ex7|/$MAP_SUB/FOUNDATION\.md\$|/$MAP_SUB/features/[^/]+\.md\$"
 # ONE awk over the whole selected set (was `_unfenced | awk` = 2 forks per file; measured 7.86s here,
 # TOOL-aBatchedLintel-1). `uln` counts the UNFENCED stream, which is what the old `FNR` counted — the
@@ -1940,9 +1955,12 @@ if [ "$STAGED" = 0 ] && [ -n "$DEBT" ]; then
   [ -n "$staleD" ] && fail 6 "curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived, so the row hides nothing and the registry has stopped shrinking — delete the row rather than re-justifying it:
 $staleD"
   # The denominator is DERIVED, never the literal `6 7 8`. A build README is structurally outside
-  # check 8's population and a RUN.md outside check 7's, so a constant denominator reports a row
-  # whose waiver is exactly as wide as its fault as though it were two checks over-wide — which is
-  # the opposite of what this report is for. The three selections are still in scope.
+  # check 8's population and a retired RUN record outside check 7's, so a constant denominator
+  # reports a row whose waiver is exactly as wide as its fault as though it were two checks
+  # over-wide — which is the opposite of what this report is for. The three selections are still in
+  # scope. A LIVE RUN.md is outside all three since TOOL-cMendedVintage-13, so a row naming one can
+  # never earn anything and the stale-entry guard above reds it — which is the intended effect:
+  # a class exemption and a debt row for the same file are two answers to one question.
   printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do
     [ -n "${DEBT_EARNED[$p]+x}" ] || continue
     _appl=""

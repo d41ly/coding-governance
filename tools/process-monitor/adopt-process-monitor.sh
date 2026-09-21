@@ -84,12 +84,16 @@ KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix 2>/dev/null)"
 KIT_REL="${KIT_REL%/}"
 [ -n "$KIT_REL" ] || {
   echo "process-monitor: cannot derive this kit's directory relative to $ROOT" >&2; exit 2; }
-
 PY=$(resolve_python "${GOV_PYTHON:-}" 2>/dev/null) || PY=""
 # The tool root this kit was installed under — `tools` in gov, `scripts` at an adopter that chose
 # that prefix, empty at a root install. DERIVED from KIT_REL, which is this kit's own directory
 # relative to the repo root, because the remedy below names a SIBLING file and a hardcoded `tools/`
-# there is an instruction pointing at a path the operator does not have.
+# there is an instruction pointing at a path the operator does not have. TOOL-cMendedVintage-4, whose
+# own subject was that the remedy used to spell `$ROOT/tools/` and disagreed with the fragment paths
+# two lines above it. ONE route, and that is load bearing: the 2026-09-21 reconcile kept both sides'
+# derivation and they disagreed about the trailing slash, so anything inserted between them would
+# have read a different value from anything after — with TOOL_ROOT="tools" the slash-less form
+# renders `toolssettings-merge.py`. The separator is supplied HERE, by SMERGE_REL, and nowhere else.
 TOOL_ROOT="${KIT_REL%/*}"; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""
 SMERGE_REL="${TOOL_ROOT:+$TOOL_ROOT/}settings-merge.py"
 CONF="$ROOT/.process-monitor.conf"
@@ -233,12 +237,18 @@ if [ "$MODE" = "--check" ]; then
   # readers of one file is the class this repo gates against everywhere else, so the roots question
   # is delegated to the engine's own reader, which also gives `--check-conf` its first caller.
   if [ -f "$KIT_DIR/scope.py" ] && [ -n "$PY" ]; then
-    if PROCMON_ROOT="$ROOT" "$PY" "$KIT_DIR/scope.py" --check-conf >/dev/null 2>&1; then
-      print_note "the engine's own reader agrees, and those roots admit live work on this machine"
-    else
-      print_note "the engine's reader REFUSES this conf, or its roots admit nothing live here — run: PROCMON_ROOT=\"$ROOT\" $PY $KIT_REL/scope.py --check-conf"
-      exit 1
-    fi
+    # THE STATUS IS READ, NOT COLLAPSED INTO true/false. The engine separates a declaration fault
+    # (1) from a well-formed declaration nothing live matches (3), and folding those back together
+    # here is how a correctly installed kit gets rolled back for the time of day. `set -e` is not in
+    # force, so capturing `$?` on the next line is the whole mechanism.
+    PROCMON_ROOT="$ROOT" "$PY" "$KIT_DIR/scope.py" --check-conf >/dev/null 2>&1
+    _scope_rc=$?
+    case "$_scope_rc" in
+      0) print_note "the engine's own reader agrees, and those roots admit live work on this machine" ;;
+      3) print_note "SKIP: the engine's reader ACCEPTED this conf and nothing live matches those roots right now — the live-admission arm went UNEXERCISED, not passed. Re-run while this repo's own work is running: PROCMON_ROOT=\"$ROOT\" $PY $KIT_REL/scope.py --check-conf" ;;
+      *) print_note "the engine's reader REFUSES this conf — run: PROCMON_ROOT=\"$ROOT\" $PY $KIT_REL/scope.py --check-conf"
+         exit 1 ;;
+    esac
   else
     print_note "NOT CHECKED: whether those roots admit this repo's own work — no engine or no runnable python here, so the declaration is all this can grade."
   fi

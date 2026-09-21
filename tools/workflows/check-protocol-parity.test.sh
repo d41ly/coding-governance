@@ -21,9 +21,9 @@
 # filesystem at run time, so it cannot derive those paths itself. Rendering at install is the one
 # derivation it can have, and the owner chose it on 2026-09-12 over having each caller pass the paths
 # in. `kit.toml` declares both pairs `rendered` and names `--render --tracked-only` as the entry's
-# `[[regenerate]]` argv, so an update run with GOVKIT_RERENDER=1 re-renders every pair this install
-# already holds. With GOVKIT_RERENDER unset `update` declines that block without printing anything
-# about it, yet it still prints each moved render's row as `re-rendered` although no render ran, and
+# `[[regenerate]]` argv, so an update re-renders every pair this install already holds unless
+# GOVKIT_RERENDER=0 is exported. With GOVKIT_RERENDER=0 `update` declines that block and NAMES the
+# decline, yet it still prints each moved render's row as `re-rendered` although no render ran, and
 # this leg, wherever a bar wires it, is what reds the stale copy.
 #
 # WHY THE REGENERATE CREATES NOTHING (round 2, R2-3). govkit runs that argv with its output captured,

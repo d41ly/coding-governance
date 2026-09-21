@@ -47,6 +47,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [gate-green-by-accident-on-generated-bytes](gate-green-by-accident-on-generated-bytes.md) | class | 2 |  | a byte-compare gate over a generated file is CRLF-red on Windows and green only right after a render |
 | [git-rm-cached-refuses-a-diverged-index-blob](git-rm-cached-refuses-a-diverged-index-blob.md) | class | 2 |  | `git rm --cached` refuses a path whose index blob differs from both HEAD and the worktree, so a fixture cleanup without `-f` silently leaves the file staged and the next arm measures the wrong fixture |
 | [grammar-bound-to-the-wrong-root](grammar-bound-to-the-wrong-root.md) | class | 2 |  | a module-level grammar resolved at import describes the repo the KIT lives in, not the tree being classified |
+| [guard-above-a-fold-makes-its-fallback-dead](guard-above-a-fold-makes-its-fallback-dead.md) | class | 2 | yes | a guard added above a fold settles the predicate the fold's own fallback re-tests, leaving a dead arm that reads as coverage |
 | [guard-fed-the-value-it-supersedes](guard-fed-the-value-it-supersedes.md) | class | 2 |  | a guard on a relaunch reads only the pid the launch it guards was meant to replace, so the process the launch itself created is invisible to the next launch and the guard never sees the duplicate it exists to stop |
 | [hand-named-gate-list-green-while-the-bar-reds](hand-named-gate-list-green-while-the-bar-reds.md) | class | 6 |  | a spec names the legs its author expects the change to move, the unit is green on exactly those, and the bar is red on an unguarded leg the list never named |
 | [heredoc-escape-reaches-the-regex](heredoc-escape-reaches-the-regex.md) | class | 0 | yes | source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem |
@@ -59,6 +60,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [ledger-token-wrapped-across-a-line-joins-nothing](ledger-token-wrapped-across-a-line-joins-nothing.md) | class | 2 |  | hygiene check 23 extracts a ledger line's backticked tokens PER LINE, so a token the writer wrapped across a line break belongs to no line and the criterion it answers reads as unanswered |
 | [line-count-reads-empty-capture-as-one](line-count-reads-empty-capture-as-one.md) | class | 4 |  | a line count over a captured variable that adds a newline before counting reads an EMPTY capture as one line, so a one-line assertion cannot fail on a command that wrote nothing |
 | [line-keyed-registry-reds-on-a-file-that-grew](line-keyed-registry-reds-on-a-file-that-grew.md) | class | 5 |  | a waiver keyed <path>:<line> stops matching when anything is inserted above it, so a gate reds on a file whose waived line nobody touched |
+| [merge-keeps-both-sides-of-one-derivation](merge-keeps-both-sides-of-one-derivation.md) | class | 2 |  | a conflict-free merge leaves two derivations of one value, disagreeing, and the first is a dead store |
 | [msys-grep-counts-cr-on-every-line](msys-grep-counts-cr-on-every-line.md) | class | 3 |  | on an MSYS node `grep -c $'\r'` matches every line of an LF-only file, so a CR probe reports the whole file as CRLF and a clean tree as dirty |
 | [naming-leg-grades-what-python-named](naming-leg-grades-what-python-named.md) | class | 1 |  | the naming gate grades nested helpers and dunder methods, and its armed set follows symbols.json, so a new file reds on a later unrelated commit and only at the lander |
 | [node-check-is-not-a-syntax-gate](node-check-is-not-a-syntax-gate.md) | class | 2 |  | node --check exits 0 on a file whose parse fails, because module auto-detection retries the parse and swallows the failure, so a gate built on it cannot go red |
@@ -100,6 +102,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-85 record(s): 85 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+87 record(s): 87 class, 0 note, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

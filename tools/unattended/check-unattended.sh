@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.26   # gov:kit unattended@1.26 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.27   # gov:kit unattended@1.27 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -118,7 +118,7 @@ MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 DISPOSITION_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""; UNDECLARED_WRITE_CEILING=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
 # ---- and the second is why the guard is now structural rather than a probe.
 # ----
@@ -182,7 +182,7 @@ while IFS= read -r -d '' _ck; do
     MEMORY_ROOT|LANDER|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
     PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
-    HALT_FLOOR|UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
+    HALT_FLOOR|UNDECLARED_WRITE_CEILING|UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
     # gov:conf-allow-end
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
@@ -2310,6 +2310,11 @@ done
 # ---- NOTHING: `brief-recorded` grades CLOSED units only, at the BUILD commit and not the pass
 # ---- commit, reads the LAST row per unit where this check takes the union, and proves only that the
 # ---- row's hash still names the blob at that path. Nothing asserts the path was a brief.
+# THE RATCHET'S THREE ACCUMULATORS (TOOL-cMendedVintage-14), declared where `set -u` can see them
+# before the loop that fills them. `ds_graded` is the LIVENESS half and counts rows that REACHED
+# the subset test, not rows that failed it: a hit count of zero is a clean tree, a GRADED count of
+# zero under a non-zero ceiling is a probe that died.
+ds_over=""; ds_over_n=0; ds_graded=0
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
@@ -2423,6 +2428,7 @@ DSSIBS
     dsnl=$'\n'; dsbrief="$dsnl$(read_brief_paths "$dshit" "$dsunit" "$f")$dsnl"
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
     # declaration is the defect.
+    ds_graded=$((ds_graded + 1))
     dsout=""
     for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
       # EXACT membership, deliberately not `covers`: that is a containment test, and a row naming a
@@ -2440,11 +2446,59 @@ DSSIBS
       done
       [ "$dsok" = 1 ] || dsout="$dsout $dsq"
     done
-    [ -z "$dsout" ] || printf 'unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch: %s at %s wrote%s in %s\n' "$dsunit" "$dshit" "$dsout" "$f"
+    # THE FINDING NO LONGER PRINTS ITSELF ON STDOUT. It is COUNTED, and the ratchet below decides
+    # the verdict; the per-instance detail goes to the report channel, so a green run keeps this
+    # file's "exit 0 + no output = clean" contract true instead of quietly widening it.
+    if [ -n "$dsout" ]; then
+      ds_over_n=$((ds_over_n + 1))
+      ds_line="$dsunit at $dshit wrote$dsout in $f"
+      ds_over="$ds_over
+  $ds_line"
+      report "check 23 — a dispatched pass committed a path outside the set it declared before dispatch: $ds_line"
+    fi
   done <<DSROWS
 $dsrows
 DSROWS
 done
+
+# ---- 23's RATCHET (TOOL-cMendedVintage-14). The subset test above used to print one line per
+# ---- offending pass and leave the exit status alone, which is a REPORT wearing a gate's number. The
+# ---- declaration was therefore enforced in one direction only: declaring too much wedges the run,
+# ---- declaring too little was a line nobody had to read. It was reported honestly by a builder and
+# ---- no verb, hook or gate raised it.
+# ----
+# ---- SHRINK-ONLY RATHER THAN A PLAIN REFUSAL, and the reason is the tree rather than taste. The
+# ---- instances live in landed history, which is append-only, so a refusal reds builds nobody is
+# ---- going to re-declare. The count may FALL and never RISE. The pin is declared in
+# ---- `.unattended.conf` beside this kit's other shrink-only pins, and undeclared or malformed is a
+# ---- refusal there for their reason too: a pin that quietly defaults is a pin nobody set. An
+# ---- adopter's ceiling is 0 and its whole ratchet is the first sentence of this paragraph.
+# ----
+# ---- WHAT THIS DOES NOT CHECK, because a gate's own header owes its gaps:
+# ----   - A FALL IS NOT A FAILURE HERE, where the carried-prefix ratchet this repo already runs reds
+# ----     on one and tells you to re-stamp. That population is a file listing; THIS one is derived
+# ----     from history REACHABILITY, and a clone that cannot resolve a group anchor legitimately
+# ----     grades fewer rows and takes the skip branches above. Redding on a fall would be a false red
+# ----     on that clone rather than a finding. The fall is announced on the report channel instead
+# ----     and the pin is lowered by hand, which means a ceiling nobody lowers stays slack.
+# ----   - A SWAP IS INVISIBLE. One instance repaired and one introduced holds the count, and only the
+# ----     per-instance report lines show it. The pin is a count, not a row set.
+# ----   - NOTHING HERE MAKES THE DECLARATION HONEST. The limitation this check's own header states is
+# ----     unchanged: both artifacts are the run's, so a run may still declare the wider set up front.
+# ----   - THE OTHER TWO check-23 FINDINGS ARE STILL BARE PRINTS. The dodged-join and ambiguous-
+# ----     attribution branches keep the shape this ruling took off the subset test, deliberately:
+# ----     the ruling named this message and this one only.
+if [ -z "$UNDECLARED_WRITE_CEILING" ]; then
+  fail 23 "UNDECLARED_WRITE_CEILING is undeclared in .unattended.conf, and with no ceiling a pass that wrote outside its declared set is reported and never graded - which is the state this ratchet exists to end"
+elif ! printf '%s' "$UNDECLARED_WRITE_CEILING" | grep -qE '^[0-9]+$'; then
+  fail 23 "UNDECLARED_WRITE_CEILING is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name: $UNDECLARED_WRITE_CEILING"
+elif [ "$UNDECLARED_WRITE_CEILING" -gt 0 ] && [ "$ds_graded" = 0 ]; then
+  fail 23 "the declared ceiling on undeclared writes is above zero while NO dispatched pass was graded at all, so the comparison below would report a reassuring zero for a probe that died rather than for a tree that is clean: $UNDECLARED_WRITE_CEILING against a graded population of $ds_graded"
+elif [ "$ds_over_n" -gt "$UNDECLARED_WRITE_CEILING" ]; then
+  fail 23 "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on: $ds_over_n against $UNDECLARED_WRITE_CEILING$ds_over"
+elif [ "$ds_over_n" -lt "$UNDECLARED_WRITE_CEILING" ]; then
+  report "check 23 - the undeclared-write count sits BELOW its ceiling, $ds_over_n against $UNDECLARED_WRITE_CEILING. Lower the pin in .unattended.conf and say in the commit message what closed; a ceiling nobody lowers stops being a ratchet"
+fi
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
 # ---- `gen:build-units` pair. The driver reads its unit list from that region for four questions -

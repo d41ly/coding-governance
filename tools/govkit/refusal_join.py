@@ -38,7 +38,54 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 217    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 255 UNMOVED ACROSS THE RECONCILE, deliberately. The merge of origin/main into cMendedVintage
+# unions two branch populations and the matcher reads 264 over the merged four modules. The pin
+# is a FLOOR — `len(branches) < BRANCH_PIN` is the whole test — so the larger of the two
+# authored floors satisfies it and neither side's shrink-only guarantee is weakened. It is NOT
+# raised to 264 because doing so would silently close the re-baselining the concurrent deployer
+# unit parked as a backlog row of its own, and would claim this reconcile armed nine branches it
+# did not write. Re-baselining stays that row's job.
+# 252 -> 255 at DEPL-cMendedVintage-13, READ OFF this engine's own output at both ends rather than
+# predicted: 252 over the four modules at that unit's base `a47c286b`, taken from a clean export of
+# that tree, and 255 on the tree it left. The NET is three and the SITES are five, and the
+# difference is the whole record. Four are new, all of them on the update path and all of them the
+# same rule — a refusal that is correct in `apply`, which has written nothing when it reaches the
+# gate-leg step, is a wedge in `update`, whose bytes are already on disk. They are the
+# malformed-runner `r.fail` (S5), the pair that grade the target's `[gate_runner]` before the
+# emission writes through it (one for the validator's findings, one for the containment refusal it
+# raises), and the catch-all that converts every OTHER refusal the emission can raise — the live one
+# is a leg whose name the target's runner carries and its receipt does not claim. One went away: the
+# extraction of `write_gate_legs` merged `apply`'s two `raise Refusal` spellings of "that runner file
+# is not a list of rows" into one, because the update path needs the message as a VALUE before it
+# decides whether to raise it at all. The moved branches are count-neutral, which is what Q2's probe
+# predicted and what these two measurements confirm. 4/4 new sites armed, all in `selftest.py`: the
+# malformed-runner arm asserts the report and the absent traceback, the escaping
+# `[gate_runner].file` arm reaches both grading sites in one run, and the dropped-claim arm reaches
+# the catch-all. Each failing case was observed on a scratch fixture against a staged break before
+# the arm was written.
+# 251 -> 252 at DEPL-cMendedVintage-10. MEASURED both sides: the matcher counted 251 at this unit's
+# base and 252 with its ONE new refusal — the renormalize's dirty-population guard in `_cmd_update`,
+# which refuses to re-stage when a pinned path this run did not write is dirty relative to HEAD. It
+# is the same refusal `apply` already makes one function over, moved onto the verb that now writes
+# the pin block, and it is ARMED by the selftest arm that leaves an unrelated pinned path dirty and
+# asserts the message. Its failing case was observed on a scratch fixture before the arm was
+# written. 1/1 armed.
+# 217 -> 251 at DEPL-cMendedVintage-9. MEASURED, both sides: the matcher counted 250 over the four
+# modules at that unit's base `3ca2f144`, so the pin was 33 BEHIND the population before this unit
+# wrote a line, and this unit's ONE new refusal — the reserved-prefix predicate in selfcheck arm 7h,
+# which refuses a descriptor planning a file under `{memory_root}/project/` — carries it to 251.
+# Raised to the live count and not to 218, on the precedent of the 141 -> 161 entry below and for
+# its reason: a floor that trails the population stops catching the matcher going blind. The new
+# branch is armed by three arms on a scratch gov tree — the destination spelled through
+# `{memory_root}`, the same destination spelled as a literal, and a control one segment above it
+# that stays GREEN — and its failing case was observed TWICE. Once on those fixtures, and once over
+# the SHIPPED descriptors in a detached tree at the commit before the withdrawal, where it exited 1
+# naming `gate-lint`'s `memory/project/substitution-fed-loops.txt`: the real instance, at the last
+# revision that still had one. 1/1 armed.
+# NOTE what this raise does NOT buy, because the docstring above promises an anchor SET and this
+# file enumerates none: the join half still runs only when a reached-set is passed on argv, and
+# nothing in the tree passes one. That is TOOL-dUnstalledConvoy-36, unchanged by this unit.
 # 244 -> 246, PIN UNMOVED, TOOL-aHonedRuleset-8. Two new `fail` branches in `selfcheck()`: the
 # why_conditional REASON gate (arm 7d) and the requires-edge REACHABILITY arm (arm 7e). Both are
 # ARMED -- selftest arms exercise each failing case, and each was observed RED by hand before
@@ -131,7 +178,12 @@ BRANCH_PIN = 217    # DERIVED on the first run over the real engine, not guessed
                     # 135 -> 141 at the origin/main reconcile: upstream's one plan/apply classifier
                     # adds refusal branches of its own. Raised rather than left slack, because a
                     # floor that trails the population stops catching the matcher going blind.
-FILE_PIN = 1        # 1 -> current: the deployer is one module today; a refactor may only grow this
+FILE_PIN = 4        # 1 -> 4 at DEPL-cMendedVintage-9. MEASURED at the same run: the discovered
+# population is four modules — the engine, `census.py`, `check_runbook_parity.py` and
+# `fixtures/make_incms_receipt.py` — and only the engine contributes a refusal branch, which is
+# exactly the scenario this pin exists for and the branch count cannot see. It sat at 1 while three
+# modules had already joined the scan, so a module dropping out of the glob was ungraded by both
+# pins at once. Shrink-only: a refactor may only grow this.
 
 
 def population(root: pathlib.Path) -> list[pathlib.Path]:

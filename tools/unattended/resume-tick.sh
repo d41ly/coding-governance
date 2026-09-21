@@ -344,8 +344,17 @@ run_tick() { # worktree · slug · session · host
 # `.unattended.conf` is a checkout predating the kit: announced and skipped while the other trees
 # are still walked. Zero candidates is an announced nothing.
 scan_worktrees() {
-  local wts wt mr hits stray line f slug sid host seen ntrees=0 ncand=0
-  wts=$(git -C "$ROOT" worktree list --porcelain 2>/dev/null | sed -n 's/^worktree //p')
+  local wts wt mr hits stray line f slug sid host seen ntrees=0 ncand=0 wtf strayf hitsf
+  # SCRATCH FILES, NEVER COMMAND SUBSTITUTIONS FEEDING A LOOP. `GIT` is a shell FUNCTION, so
+  # `$(GIT ...)` forks a subshell which forks git and the reader waits on a GRANDCHILD's write
+  # end -- the 63-minute zero-CPU stall lib-unattended.sh's `pass_commit` carries the account
+  # of. This engine runs on a TICK, so a hang here wedges the thing that exists to unwedge runs.
+  # The two `GIT`-fed reads are the real exposure; the worktree list is an external pipeline and
+  # moves with them because one shape in one function is easier to keep right than two. The leg
+  # could not see any of them until TOOL-cMendedVintage-12 widened its predicate to follow one
+  # assignment. Class: `memory/gotchas/bounded-through-a-pipe-is-unbounded.md`.
+  wtf=$(mktemp) && strayf=$(mktemp) && hitsf=$(mktemp) || { echo "resume-tick: cannot create the scratch files for the worktree scan" >&2; return 1; }
+  git -C "$ROOT" worktree list --porcelain 2>/dev/null | sed -n 's/^worktree //p' >"$wtf"
   # fd 9, not stdin: the driver, the login probe and the launcher all take stdin, and a loop fed
   # on fd 0 would hand them the remaining worktree lines.
   while IFS= read -r -u 9 wt; do
@@ -358,14 +367,17 @@ scan_worktrees() {
     # records first, each one line; then `<file>:session: <value>` and `<file>:host: <value>` off
     # the INDEX, and the split is on the first `:session:` / `:host:`, which a drive letter's colon
     # precedes but never contains. The first `session:` per file is the one `set_fact` rewrites.
-    stray=$(GIT -C "$wt" ls-files --others -- "$mr/builds/*/RUN.md" 2>/dev/null)
+    GIT -C "$wt" ls-files --others -- "$mr/builds/*/RUN.md" >"$strayf" 2>/dev/null || :
     while IFS= read -r -u 8 f; do
       [ -n "$f" ] || continue
       slug=${f%/RUN.md}; slug=${slug##*/}
       ncand=$((ncand + 1))
       print_decision "$slug" "$wt" "skip · RUN.md is not tracked, and the tick launches only on a lease the index holds"
-    done 8<<<"$stray"
-    hits=$(GIT -C "$wt" grep --cached -H -E '^(session|host): ' -- "$mr/builds/*/RUN.md" 2>/dev/null)
+    done 8<"$strayf"
+    GIT -C "$wt" grep --cached -H -E '^(session|host): ' -- "$mr/builds/*/RUN.md" >"$hitsf" 2>/dev/null || :
+    # The host lookup below needs the whole answer as a VALUE, so it is read in with no fork at
+    # all rather than re-spawned per candidate, which would be one spawn per record again.
+    hits=""; IFS= read -r -d '' hits <"$hitsf" || :
     seen=""
     while IFS= read -r -u 8 line; do
       case "$line" in *:session:*) ;; *) continue ;; esac
@@ -384,8 +396,9 @@ scan_worktrees() {
         print_decision "$slug" "$wt" "skip · RUN.md differs from the index, and the tick acts only on the lease the index holds"; continue
       fi
       run_tick "$wt" "$slug" "$sid" "$host"
-    done 8<<<"$hits"
-  done 9<<<"$wts"
+    done 8<"$hitsf"
+  done 9<"$wtf"
+  rm -f "$wtf" "$strayf" "$hitsf"
   [ "$ncand" -gt 0 ] || echo "resume-tick: no bound run in $ntrees worktree(s)"
   return 0
 }

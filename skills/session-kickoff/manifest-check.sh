@@ -119,13 +119,18 @@ cd "$ROOT" || exit 2
 # the same one. The env override exists for the self-test's over-cap arm and is not an adopter knob.
 CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
 
-# The session id: the SessionStart hook hands `{"session_id": …}` on stdin; a hand invocation passes
-# --session. Neither is a refusal naming both, never a card under a guessed id; a separator, `..` or
+# The session id, in PRECEDENCE order: `--session` answers FIRST and SUPPRESSES the stdin read;
+# only a caller that passed none falls through to the `{"session_id": …}` JSON the SessionStart hook
+# hands on stdin. That order is the fix for TOOL-cMendedVintage-9 and supersedes the stdin-first one
+# KICK-aReplayedCard-1 §S2 recorded: `[ -t 0 ]` admits a terminal and the hook's closing pipe, and
+# not the third case — the never-closing pipe every tool-invoked shell hands its child — on which
+# the `sed` below blocks forever, including for a caller that had already answered by flag.
+# Neither channel is a refusal naming both, never a card under a guessed id; a separator, `..` or
 # any byte outside [A-Za-z0-9._-] is refused before it can be joined into a path. `--append` never
 # reads stdin here — stdin is the body it stores — so it takes `--session` alone.
 read_session_id() {
   local sid=""
-  [ "$CARD_VERB" = append ] || [ -t 0 ] || sid=$(sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  [ "$CARD_VERB" = append ] || [ -n "$CARD_SID" ] || [ -t 0 ] || sid=$(sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
   [ -n "$sid" ] || sid="$CARD_SID"
   if [ -z "$sid" ] && [ "$CARD_VERB" = append ]; then
     echo "MANIFEST env ERROR — --card --append has no session id: stdin is the body, so pass --session <sid>"; exit 2
@@ -465,6 +470,15 @@ CARD_PARTS_AWK='{ ln=$0; sub(/\r$/, "", ln)
   if (!intail) { if (ln ~ /^recent —/) inlog=1; else if (inlog && ln !~ /^[0-9a-f]{7,40} /) intail=1 }
   if ((want=="tail") == (intail==1)) print ln }'
 
+# THE READY ANCHOR, and the one place it is spelled. The optional leading `- ` is not cosmetic: the
+# charter's §16 R1 requires an emitted micro-format to be a markdown list item — `- ` at column 0 —
+# so a kickoff body that OBEYS the charter was read here as carrying NO READY line, and the append
+# then reported success while leaving the sentinel in place and skipping the `tree —` re-render.
+# Both forms are accepted, and that is a WIDENING rather than a swap: the sentinel this script
+# renders is bare, as is every card already on disk, and dropping the bare form would strand them.
+# The reader moves; §16 R1 does not (TOOL-cMendedVintage-16).
+CARD_READY_RE='^\(- \)\{0,1\}READY — '
+
 # `--card --append`: the body on stdin, checked, annotated, and stored — or refused with the file
 # byte-identical. Order: the body's READY-line count, the citation check (its refusals come from a
 # reader that could not answer), DEAD PROBE on zero tokens, the stale-BASE refusal, the card's own
@@ -474,21 +488,21 @@ add_card_body() {
   local body="$CARD_TMP/body" nready ready sha tree bytes l
   [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID before appending to it"; exit 2; }
   tr -d '\r' > "$body"
-  grep -v '^READY — none yet$' "$body" > "$body.x"; mv "$body.x" "$body"
-  nready=$(grep -c '^READY — ' "$body"); nready=${nready:-0}
+  grep -v "${CARD_READY_RE}none yet\$" "$body" > "$body.x"; mv "$body.x" "$body"
+  nready=$(grep -c "$CARD_READY_RE" "$body"); nready=${nready:-0}
   [ "$nready" -le 1 ] || { echo "MANIFEST env ERROR — the body carries $nready READY lines; one card holds one kickoff, so exactly one is accepted and nothing was appended"; exit 2; }
   check_card_citations "$body"
   [ "$CARD_TOKENS" -gt 0 ] || { echo "MANIFEST env ERROR — DEAD PROBE: nothing to check — the body carries no path-shaped and no id-shaped token, so nothing was appended"; exit 1; }
   derive_head_state
   if [ "$nready" = 1 ]; then
-    ready=$(grep -m1 '^READY — ' "$body")
+    ready=$(grep -m1 "$CARD_READY_RE" "$body")
     sha=$(printf '%s\n' "$ready" | sed -n 's/.*[ ·]base \([0-9a-f]\{7,40\}\)\([ ·].*\)\{0,1\}$/\1/p')
     case "$HEAD_SHA" in "$sha"*) [ -n "$sha" ] ;; *) false ;; esac \
       || { echo "MANIFEST env ERROR — the READY line's base ${sha:-<none>} is not HEAD $HEAD_SHA at append time; a kickoff pinned to a stale BASE does not land on the card — kick off again, and nothing was appended"; exit 2; }
   fi
   extract_card_parts "$CARD_FILE"
-  [ "$(grep -c '^READY — ' "$CARD_TMP/tail")" = 1 ] \
-    || { echo "MANIFEST env ERROR — $CARD_FILE holds $(grep -c '^READY — ' "$CARD_TMP/tail") READY lines after its startup lines, not one; rewrite it with --card --write --session $CARD_SID, and nothing was appended"; exit 2; }
+  [ "$(grep -c "$CARD_READY_RE" "$CARD_TMP/tail")" = 1 ] \
+    || { echo "MANIFEST env ERROR — $CARD_FILE holds $(grep -c "$CARD_READY_RE" "$CARD_TMP/tail") READY lines after its startup lines, not one; rewrite it with --card --write --session $CARD_SID, and nothing was appended"; exit 2; }
   awk -F '\t' -v m="$CARD_TMP/misses" 'BEGIN { while ((getline l < m) > 0) { split(l, p, "\t"); a[p[1]] = a[p[1]] p[2] "\n" } }
     { print; if (FNR in a) printf "%s", a[FNR] }' "$body" > "$CARD_TMP/annotated"
   if [ "$nready" = 1 ]; then
@@ -496,7 +510,7 @@ add_card_body() {
     { while IFS= read -r l; do case "$l" in "tree — "*) printf '%s\n' "$tree" ;; *) printf '%s\n' "$l" ;; esac; done < "$CARD_TMP/startup"
       cat "$CARD_TMP/annotated"; } > "$CARD_TMP/new"
   else
-    { cat "$CARD_TMP/startup"; grep -v '^READY — ' "$CARD_TMP/tail"; cat "$CARD_TMP/annotated"; grep '^READY — ' "$CARD_TMP/tail"; } > "$CARD_TMP/new"
+    { cat "$CARD_TMP/startup"; grep -v "$CARD_READY_RE" "$CARD_TMP/tail"; cat "$CARD_TMP/annotated"; grep "$CARD_READY_RE" "$CARD_TMP/tail"; } > "$CARD_TMP/new"
   fi
   bytes=$(wc -c < "$CARD_TMP/new" | tr -d '[:space:]')
   if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
@@ -517,7 +531,7 @@ add_card_body() {
 check_card() {
   local real
   [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID"; exit 2; }
-  real=$(grep '^READY — ' "$CARD_FILE" | grep -vc '^READY — none yet'); real=${real:-0}
+  real=$(grep "$CARD_READY_RE" "$CARD_FILE" | grep -vc "${CARD_READY_RE}none yet"); real=${real:-0}
   if [ "$real" -gt 0 ] && ! grep -q '^## task' "$CARD_FILE"; then
     echo "MANIFEST env ERROR — $CARD_FILE carries a real READY line and no '## task' section: a kickoff ran and left no scope on disk"; exit 1
   fi
@@ -864,6 +878,28 @@ $(printf '%s\n' "$sw" | sed 's/^/  /')
       fi
     fi
   fi
+fi
+
+# ---- 12: the manifest carries no CR byte -------------------------------------------------------
+# ROUND 3's M1, and the bullet it protects is the one about CR bytes. Twice the manifest was given a
+# sentence carrying a raw CR to SHOW the byte it names, and twice the next tool to rewrite the file
+# in text mode ate it -- leaving "turns a lone <LF> into <LF>", a sentence asserting that a newline
+# becomes a newline, with the one fact it existed to carry gone and nothing red. The manifest is the
+# document most likely to be rewritten by a text-mode tool, which is exactly why it is the one that
+# must not depend on a control byte surviving. Name the bytes (0x0D, 0x0A); never embed them.
+#
+# DERIVED, and it names no bullet: any CR anywhere in this file reds, so the rule outlives the
+# sentence that motivated it. Failing case observed before wiring -- a CR inserted into the manifest
+# reds this check, removed it passes.
+# THE BYTE IS BUILT INSIDE awk, and that is not style. `grep -q "$(printf ...)"` cannot work here:
+# MSYS command substitution STRIPS a trailing CR, so the pattern arrives EMPTY and matches every
+# line of every file -- the check then reds on a clean manifest, which is how this line was
+# written the first time. `sprintf("%c", 13)` needs no shell quoting and no escape, and it
+# catches a lone CR mid-line as well as a CRLF ending.
+if LC_ALL=C awk 'index($0, sprintf("%c", 13)) { hit = 1 } END { exit !hit }' "$MF" 2>/dev/null; then
+  fail 12 "the manifest carries a CR byte (0x0D), and a text-mode rewrite silently converts it --
+  which has twice destroyed the one fact a §B bullet existed to carry. Name a control byte by its
+  hex value instead of embedding it: $MF"
 fi
 
 exit "$status"
