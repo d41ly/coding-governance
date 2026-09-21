@@ -2034,7 +2034,9 @@ while IFS= read -r f; do
       # ---- this re-reads that same blob with its own parse and normalises it with the SAME function,
       # ---- so a backticked grant and a bare one agree and the comparison does not turn on how the
       # ---- owner copied it. AT BASE, never at HEAD: a README the run edited after its preflight is
-      # ---- not the authorization it ran under.
+      # ---- not the authorization it ran under. The residual is that SHARED normaliser: a grammar wrong
+      # ---- the same way for both callers agrees with itself here, and what catches that is the
+      # ---- driver suite's one refused fixture per negative the grammar declares, not this arm.
       # ----
       # ---- PRESENCE-GUARDED in the direction check 19's mode arm is: a record written before this
       # ---- unit carries no `may:` fact, and over a README declaring nothing that is an honest
@@ -2079,6 +2081,10 @@ while IFS= read -r f; do
     # ----
     # ---- A SKIP ANNOUNCES ITSELF. A terminal record with no witness, a witness this clone cannot
     # ---- resolve, or a live one with no tip to exclude is named on the report channel, never passed.
+    # ----
+    # ---- WHAT IT TRUSTS, because its inputs are the graded record's own. The witness and the BASE
+    # ---- bound the range and the run writes both, so a forged pair moves the range: check 9 grades
+    # ---- the BASE and checks 6 and 15 the witness, and this arm reads them as those checks leave them.
     # ---- A TERMINAL RECORD IS SCANNED OVER `base..witness` FIRST, and walked only on a hit. That range
     # ---- is a SUPERSET of the run's own commits, so a superset writing no grant settles the subset
     # ---- with no walk at all - the ordinary case, since no build README in this tree has ever carried
