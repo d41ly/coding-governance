@@ -357,6 +357,84 @@ read_run_commits() {  # endpoint · base · exclusion-tip…
   GIT rev-list "$_rrc_end" "^$_rrc_base" $_rrc_ex 2>/dev/null
 }
 
+# ----------------------------------------------- is a commit touching a path reachable from here
+# TOOL-dDerivedDocket-54. Given a COMMIT, a BASE and a PATH: is a commit since BASE that touched PATH
+# reachable from COMMIT? The terminal-record exclusion asks it once per PARENT of each merge on a
+# witness's tail and reads the pair of answers, so the subject is always a parent - and a parent may
+# itself be a merge, which is the one subject at which the two spellings of this walk disagree.
+#
+# THREE ANSWERS, AND THE THIRD IS NOT THE SECOND. Status 0 is yes. Status 1 is no: the walk ran to
+# completion and reached none, which is the answer the caller's fail-closed rule trusts. Status 2 is
+# CANNOT ANSWER, with one stderr line naming the commit and the path - the channel `pass_commit`
+# uses for the same shape - and stdout stays empty on every answer. A caller that folds 2 into 1
+# turns a broken probe into a confident negative, so read the status with `case`, never with `if`.
+#
+# THE WALK IS UNSIMPLIFIED ON PURPOSE, and the path restriction does not make the flag redundant: a
+# path-limited walk prunes every other side of a merge that is TREESAME to one side for that path,
+# so a parent that is itself a merge resolving the path back to one side's content answers NO for a
+# touching commit it does reach - and what comes back is EXISTENCE only, never which commit, and
+# never who wrote either side.
+# Measured in a scratch repo on git 2.54.0: from such a nested-merge parent the simplified walk
+# prints nothing and `--full-history` prints the merge, while from a plain parent the two agree, so
+# the flag changes the answer only where the pruning does. The drift report's product-commit walk
+# records the same class for the same flag.
+#
+# BASE IS REFUSED BEFORE THE WALK unless it RESOLVES TO A COMMIT, and a non-empty test is not that
+# test. The caller reads BASE out of the record being graded, so the run supplies it. An empty BASE
+# under the range spelling is `HEAD..<commit>`, which exits 0 printing nothing - byte-identical to an
+# honest no. A blob or tree sha is a legal object, so `^<object>` excludes no commit and the walk
+# answers a confident YES over the whole history. The two fail in OPPOSITE directions, which is why
+# one refusal in front of the walk covers both and neither is left to whatever the walk prints.
+#
+# A SHALLOW CLONE CANNOT ANSWER. Both ends of the range are computed over grafted roots there: the
+# walk from COMMIT can stop short of a touching commit, and "not reachable from BASE" can hold for a
+# commit that is BASE's ancestor through history the clone does not have - a wrong answer of either
+# sign, so neither is given.
+#
+# THE PATH IS ONE PATH. A pathspec is a pattern language, and a glob or `:(exclude)` in the value
+# would widen or invert the question, so the walk runs under `--literal-pathspecs`.
+#
+# `--max-count=1` prints one commit at most, so a yes never enumerates the range into this shell. A
+# no walks the whole range, and a bound on that belongs to the caller's budget.
+check_touching_commit_reachable() { # commit · base · path -> status 0 yes · 1 no · 2 cannot answer
+  _tc_c=$1; _tc_b=$2; _tc_p=$3
+  _tc_why="lib-unattended: check_touching_commit_reachable cannot answer for commit [$_tc_c] and path [$_tc_p]"
+  case $_tc_b in
+    *[![:space:]]*) ;;
+    *) printf '%s: the BASE is empty or blank, so no walk was started over a range nobody resolved\n' "$_tc_why" >&2
+       return 2 ;;
+  esac
+  _tc_bs=$(GIT rev-parse --verify --quiet "$_tc_b^{commit}" 2>/dev/null) || _tc_bs=""
+  if [ -z "$_tc_bs" ]; then
+    printf '%s: the BASE [%s] does not resolve to a commit, and a BASE that is not one excludes nothing from the walk\n' "$_tc_why" "$_tc_b" >&2
+    return 2
+  fi
+  _tc_cs=""
+  [ -n "$_tc_c" ] && { _tc_cs=$(GIT rev-parse --verify --quiet "$_tc_c^{commit}" 2>/dev/null) || _tc_cs=""; }
+  if [ -z "$_tc_cs" ]; then
+    printf '%s: the commit does not resolve to a commit in this history\n' "$_tc_why" >&2
+    return 2
+  fi
+  case $_tc_p in
+    *[![:space:]]*) ;;
+    *) printf '%s: the path is empty or blank, and an empty pathspec is not a path\n' "$_tc_why" >&2
+       return 2 ;;
+  esac
+  case $(GIT rev-parse --is-shallow-repository 2>/dev/null) in
+    false) ;;
+    true) printf '%s: this clone is shallow, so both ends of the range are computed over grafted history\n' "$_tc_why" >&2
+          return 2 ;;
+    *) printf '%s: this repository could not say whether it is shallow\n' "$_tc_why" >&2
+       return 2 ;;
+  esac
+  _tc_hit=$(GIT --literal-pathspecs rev-list --full-history --max-count=1 "$_tc_cs" "^$_tc_bs" -- "$_tc_p" 2>/dev/null) || {
+    printf '%s: the walk itself failed, so its empty output is not a completed walk\n' "$_tc_why" >&2
+    return 2
+  }
+  [ -n "$_tc_hit" ] && return 0
+  return 1
+}
+
 # THE NEXT ANCHOR for a unit after <anchor>, or empty when this is the unit's last row. Chosen by
 # ANCESTRY rather than by the order rows appear in the file: the record is append-only and a run may
 # park rows in any order, so file order is not history order. The earliest strict descendant wins,

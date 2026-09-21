@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-54 — the cross-run exclusion probe reads history unsimplified
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 18
+**Status:** CLOSED · rev-2 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dDerivedDocket-54-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-54-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 |
 
 <!-- /gen:spec-records -->
@@ -43,17 +44,24 @@ from commits the probe can actually see.
   BASE that is a legal object of another TYPE — a blob or a tree sha — makes `^<object>` exclude
   nothing, so both spellings walk the whole history and answer a confident YES for a commit the range
   never contained. BASE is caller-supplied and the caller reads it from the graded record, so neither
-  half is hypothetical. Observed by AC3.
+  half is hypothetical. Two further cases are cannot-answer by the same rule (rev-2): a SHALLOW clone,
+  whose range is computed over grafted roots and can be wrong in either direction, so it is refused
+  by name rather than walked; and a walk git itself refuses, whose empty output is not a completed
+  walk. The path is ONE LITERAL path, walked under `--literal-pathspecs`, because a pattern in the
+  value would widen or invert the question. Observed by AC3.
 - **S5** Arms in `tools/unattended/check-unattended.test.sh` over a witness merge one of whose
   parents is a NESTED merge, staging both sides at that subject — the nested-merge parent from which a
   touching commit is reachable, and the witness's other parent from which none is — plus THREE
   cannot-answer arms: a BASE that is not an object, a BASE that is empty, and a BASE that is a legal
-  object of another type. The suite's executed-assertion floor for
-  `tools/unattended/check-unattended.sh` moves in the same commit. The three arms are separate
-  because they fail differently: the first is caught by any spelling, the second only by the refusal
-  S4 puts in front of the walk, and the third fails in the OPPOSITE direction to both — it answers
-  YES rather than nothing, so an arm asserting only that the probe stayed quiet passes over it.
-  Observed by AC2, AC3 and AC5.
+  object of another type. The three are separate because they fail differently: the first is caught
+  by any spelling, the second only by the refusal S4 puts in front of the walk, and the third fails in
+  the OPPOSITE direction to both — it answers YES rather than nothing, so an arm asserting only that
+  the probe stayed quiet passes over it. One further arm grades each other cannot-answer branch S4
+  names, and one the literal path (rev-2). That suite's own executed-assertion floors,
+  `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, move in the same commit. `.memory-tree.conf`'s
+  `ARMS_FLOORS` does NOT (rev-2): `tools/memory-tree/check-arms.py` keys its population on
+  `fail <n> "` call sites, so both of its figures count `fail` branches, and §4's Fail codes row says
+  this unit adds none. Observed by AC2, AC3 and AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -136,7 +144,7 @@ The same reading is already recorded twice in this tree for the same reason. The
 walks product commits carries it as a comment with its own scratch-repo reproduction
 (`tools/drift-audit/drift_report.py:806-818`), and the rotation-mode check records that a first-add
 search returns EMPTY for two of this repo's four archives because the rotation landed inside a merge
-(`tools/memory-tree/row_grammar.py:335-340`). Neither is a guess about this class; both are
+(`tools/memory-tree/row_grammar.py:369-375`). Neither is a guess about this class; both are
 measurements of it.
 
 ### The BASE that fails open
@@ -160,10 +168,10 @@ it fails the OTHER way: a blob or tree sha is a legal object, `^<object>` theref
 commit, and both spellings answer a commit from outside the range as though the range had been
 applied. No quiet-probe assertion can see that one, because the probe is not quiet — it is confident
 and wrong. BASE reaches this predicate from the caller, which reads it from the record being graded
-(`tools/unattended/check-unattended.sh:1195`), so the value is one a run writes.
+(`tools/unattended/check-unattended.sh:1709`), so the value is one a run writes.
 
 The empty half's trap is already recorded in this tree at
-`tools/memory-tree/row_grammar.py:337-338`, where `git log ""..HEAD -- <path>` exits 0
+`tools/memory-tree/row_grammar.py:373-374`, where `git log ""..HEAD -- <path>` exits 0
 printing nothing and an unresolved baseline reports a clean archive — the passage this spec cites
 elsewhere for the simplification lesson, carrying this one in the same sentence. Rows 1 and 2 fail
 closed, so which spelling the build picks decides whether the EMPTY-BASE defect exists at all; the
@@ -177,12 +185,19 @@ One function taking a commit, a BASE and a path, answering yes, no or cannot-ans
 
 - **Yes** — a commit since BASE touching the path is reachable from the commit. The walk is
   unsimplified, so it follows all parents of a merge even where the merge is TREESAME to one of them,
-  and it stops at the first hit rather than enumerating.
+  and it asks for one commit at most (`--max-count=1`), so no answer is an enumeration handed to the
+  caller; how much of the range git itself visits before printing is not a claim this makes (rev-2).
 - **No** — the walk completed and reached none. This is the answer the caller's fail-closed rule
   depends on, and it is why the cannot-answer outcome may not share its shape.
 - **Cannot answer** — the range, the commit or the path could not be resolved, or the BASE was empty
   or blank and the walk was never started. It is a distinct return and a named line (S4), never the
   silent zero that reads as a clean walk.
+
+Each answer is the function's STATUS — 0 yes, 1 no, 2 cannot answer — and stdout stays empty on every
+one. The cannot-answer line goes to stderr, prefixed
+`lib-unattended: check_touching_commit_reachable cannot answer`, the channel `pass_commit` already
+uses for the same shape in the same file (rev-2). A caller reads the status with `case`, because `if`
+folds 2 into 1.
 
 The probe is EXISTENCE only (S2). The caller asks it once per parent of a merge and decides from the
 pair of answers; it never asks which commit, because a named commit invites the reading that the
@@ -233,19 +248,19 @@ OK.
 
 `.lexicon.conf:23` declares `sh` a `parser` coverage mode rather than a dark one, and
 `.lexicon.conf:422` declares the `sh.function snake` cell, so `lexicon naming predicates`
-(`tools/gate-legs.json:1052`, guarded on `tools/`) grades this identifier at this unit's commit
+(`tools/gate-legs.json:1078`, guarded on `tools/`) grades this identifier at this unit's commit
 whether or not the spec claims the leg. §7 now claims it.
 
 ### Files touched (estimate)
 
-`tools/unattended/lib-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
-`.memory-tree.conf` for the suite's executed-assertion floor.
+`tools/unattended/lib-unattended.sh` · `tools/unattended/check-unattended.test.sh`, whose own
+floors carry the new assertions. Not `.memory-tree.conf` (rev-2, S5).
 
 ### Alternatives rejected
 
 - **Per-parent merge diffs.** They answer a richer question than existence and cost a diff per merge,
   and the rotation-mode record already measures that the plain, unsimplified and per-parent spellings
-  disagree on the same population (`tools/memory-tree/row_grammar.py:335-340`). A predicate whose
+  disagree on the same population (`tools/memory-tree/row_grammar.py:369-375`). A predicate whose
   answer depends on which of three spellings a reader picked is the defect one level up.
 - **First-parent-only walking.** It answers "did the mainline touch this", which is neither of the
   two questions here, and it would exclude exactly the side the run's own commits sit on in one of
@@ -263,7 +278,7 @@ whether or not the spec claims the leg. §7 now claims it.
   reads the commit graph and a tracked path and writes nothing, so the run it grades cannot move a
   RESOLVED answer without moving history. Its BASE is the exception, and it is why S4's refusal is a
   guard rather than a nicety: the caller reads that value from the record being graded
-  (`tools/unattended/check-unattended.sh:1195`), and a value that is a legal object of the wrong type
+  (`tools/unattended/check-unattended.sh:1709`), and a value that is a legal object of the wrong type
   turns the exclusion off while the probe goes on answering (§4).
 - perf / scale — one bounded git read per parent per merge on a witness's tail, stopping at the first
   hit. A negative answer walks the range, which is the cost §8 F3 leaves open; the positive answer is
@@ -305,8 +320,9 @@ whether or not the spec claims the leg. §7 now claims it.
   new arm: staged RED first. The arm may not pass until it has been SEEN RED with the simplified
   spelling in place.
   permission: the criterion asserts the PREDICATE's answer, because check 19 grades no `may:` grant at
-  HEAD — at `tools/unattended/check-unattended.sh:1432-1455` it grades the authorization mode, the
-  playbook and the piece count — and unit 19's cross-run arm is the first caller, at a LATER order.
+  HEAD — at `tools/unattended/check-unattended.sh:1884-1970` it grades the authorization mode, the
+  playbook and the piece count, and the ask mandate's pinned facts unit 18 added below that, none of
+  them a `may:` grant — and unit 19's cross-run arm is the first caller, at a LATER order.
   The check-19 verdict half is therefore observed at unit 19's commit and not in this unit's pass.
   The leg self-test suite that will carry these arms is not run here either: this pass sources the
   predicate over its scratch fixture and observes each new arm RED by hand, and the suite's own run
@@ -327,7 +343,7 @@ whether or not the spec claims the leg. §7 now claims it.
   is indistinguishable from an honest negative and the caller stops fail-closed for the wrong reason;
   or the empty BASE is handed to the walk, which under the range spelling exits 0 printing nothing and
   reports a confident NO for a fact nobody resolved — rows 3 and 5 of §4's BASE table, and the shape
-  `tools/memory-tree/row_grammar.py:337-338` already records on a different path class; or the refusal
+  `tools/memory-tree/row_grammar.py:373-374` already records on a different path class; or the refusal
   tests only that BASE is non-empty, so a blob or tree sha passes it, `^<object>` excludes nothing,
   and the probe answers a confident YES over the whole history for a range it never applied — row 4
   of that table, which is the caller's exclusion turned off by a value the graded run wrote.
@@ -339,13 +355,16 @@ whether or not the spec claims the leg. §7 now claims it.
   names both the TREESAME shape that triggers it and the existence-only limit of S2.
   Red when: the flag lands with no clause beside it, so the next reader removes it as redundant on a
   walk that is already path-restricted.
-- **AC5** — When the arms of S5 land, `.memory-tree.conf`'s executed-assertion floor for
-  `tools/unattended/check-unattended.sh` reads a higher armed count at this unit's commit than at its
-  parent, read with `git show` at both.
+- **AC5** — When the arms of S5 land, the leg suite's own executed-assertion floors,
+  `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` in the suite §7's `New arm:` line names, read higher at this
+  unit's commit than at its parent, read with `git show` at both, and `FLOOR_SHARD_1` is unchanged
+  because every new assertion sits at the end of region two.
   Red when: arms land and the floor holds, so deleting them later costs nothing.
-  figure: DERIVED at observation time from the two commits; no count is written into this spec.
-  permission: the floor is graded by the harness-arms leg over the real tree, which this run may not
-  execute; the observation is made at the build's one post-build bar.
+  figure: DERIVED at observation time from the two commits; no count is written into this spec. The
+  raise is COUNTED rather than measured, because this pass may run no suite: the block was executed
+  standalone in a replica of the suite's prologue to confirm it.
+  permission: that the suite still passes AT the raised floor is observed only by running it, which
+  this pass may not do; that observation is the build's one post-build bar.
 
 ## 7. Gates
 
@@ -354,8 +373,9 @@ whether or not the spec claims the leg. §7 now claims it.
 New arm: `tools/unattended/check-unattended.test.sh` · a witness merge one of whose parents is a
 NESTED merge resolving the run-state path to the other side's content, graded from that parent and
 from the witness's other parent, a BASE that is not an object, an empty BASE, and a
-BASE that is a blob or a tree sha · the leg suite's
-executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
+BASE that is a blob or a tree sha, plus an unknown commit, a blank path, a walk git refuses, a
+glob-shaped path graded as one literal path, and a shallow clone · that suite's own
+`FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`. NOT `ARMS_FLOORS`, for S5's reason.
 
 ## 8. Open questions
 
@@ -408,6 +428,27 @@ executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattend
   says outright that the suite's own run is the VERIFYING run's and that this pass observes the
   sourced predicate over a scratch fixture. The witness, the subject and every `Red when:` arm are
   unchanged.
+- rev-2 · 2026-09-21 · S4 · S5 · §4 · AC1 · AC5 · §7 · the building pass, against the tree and
+  against a scratch fixture rather than against the base. (1) **The floor AC5 named cannot move.**
+  `ARMS_FLOORS` counts `fail` branches and their arms (`tools/memory-tree/check-arms.py` discovers
+  them from `fail <n> "` call sites), and this unit adds none, as §4's Fail codes row said from rev-1;
+  so AC5, S5, §7 and Files-touched now name the suite's own `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`,
+  and `.memory-tree.conf` leaves the write set. The raise is the block's thirty-two assertions,
+  counted by executing the block standalone. (2) **Two more cannot-answer cases and a literal
+  path**, each found by reading what the walk does with a value the caller does not control: a
+  shallow clone computes both ends of the range over grafted roots, so a wrong answer of either sign
+  is possible and the predicate refuses rather than walks; a walk git refuses (a path outside the
+  repository) exits non-zero with empty output, which is not a completed walk; and a glob or
+  `:(exclude)` in the path value would widen or invert the question, so the walk runs under
+  `--literal-pathspecs`. Each is armed. (3) **The Yes bullet overclaimed.** `--max-count=1` bounds
+  what is PRINTED, not what git visits, and §4 now says only the first. (4) **Four citations
+  moved** between the base and this pass and were re-read: the BASE read is now
+  `tools/unattended/check-unattended.sh:1709`, check 19's mode, playbook and piece-count block is
+  `:1884-1970` with unit 18's ask-mandate second opinions after it and still no `may:` grant, the
+  rotation-mode record is `tools/memory-tree/row_grammar.py:369-375` (the empty-baseline sentence
+  `:373-374`), and the naming leg is `tools/gate-legs.json:1078`. The witness, the subject, every
+  `Red when:` arm and §4's two measurement tables are unchanged: rows 1 to 7 and all five BASE rows
+  were re-measured in a scratch repo on git 2.54.0 on 2026-09-21 and each answered as tabled.
 
 ## 10. Reuse audit
 
@@ -418,7 +459,7 @@ layer this predicate is written in. So no existing seam fits, and the evidence i
 probe reads does not contain the layer. The prior art it cannot see was found by reading source: the
 same flag and the same rationale at `tools/drift-audit/drift_report.py:806-818`, and the measurement
 of three spellings disagreeing on this repo's own archives at
-`tools/memory-tree/row_grammar.py:335-340`. This unit reuses that reading rather than either call
+`tools/memory-tree/row_grammar.py:369-375`. This unit reuses that reading rather than either call
 site, both of which answer different questions.
 
 Recall terms used: `python tools/memory-recall/query.py "why does a path-scoped rev-list miss a merge

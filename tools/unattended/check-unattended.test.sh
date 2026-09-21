@@ -4037,6 +4037,130 @@ miss "$out" "FELL BACK TO ANCESTRY for the m-base: of memory/builds/tRun/RUN.LAN
 hit  "$out" "the ask-mandate second opinions examined 1 run-state record(s) pinning an asks: fact"
 
 rm -rf "$ak_root"
+
+# ==== TOOL-dDerivedDocket-54: check_touching_commit_reachable, over one scratch fixture ==========
+# SOURCED FROM THE KIT LIBRARY rather than extracted: the predicate lives in `lib-unattended.sh`,
+# which defines functions and nothing else, so sourcing it is exactly how its callers reach it.
+# Nothing calls it at its own commit - the terminal-record exclusion is its first caller, at a later
+# order - so a suite that ran the leg would grade a code path no check reaches yet.
+#
+# THE SUBJECT IS A PARENT, NEVER THE WITNESS. The caller asks once per parent of each merge on a
+# witness's tail, and the one parent at which the simplified and unsimplified spellings disagree is
+# a parent that is ITSELF a merge, TREESAME to one of its own parents for the record's path. At a
+# plain parent the simplified spelling is already right, so an arm graded there certifies nothing.
+# The fixture's witness therefore takes such a NESTED merge as its first parent and an unrelated
+# side branch off BASE as its second, and every yes/no arm below grades one of those two parents.
+#
+# ITS OWN REPOSITORY, outside the scratch tree, for the reason the two blocks above give. The walks
+# are COUNTED through git's own trace rather than through a shim over the wrapper, so the empty-BASE
+# arm can assert the refusal came BEFORE any walk, and a control below proves the counter moves.
+reset_tree
+tc_root=$(mktemp -d)
+tc_fx=$tc_root/fx
+tc_P=memory/builds/b/RUN.md
+# ONE CALL, IN A SUBSHELL, so the `cd` and the sourced library reach no arm that follows, and the
+# assertions stay in THIS shell, where `n` and `st` live. The STATUS is the answer, so it is printed
+# as `rc=<n>` and is the only stdout a call may carry; the reason line lands in `err`.
+run_touching_probe() { # fixture dir · commit · base · path -> rc=<status>; reason in $tc_root/err, git trace in $tc_root/trace
+  rm -f "$tc_root/err" "$tc_root/trace"
+  ( cd "$1" || exit 9
+    # shellcheck disable=SC1091
+    . "$TMP/$KIT_REL/lib-unattended.sh"
+    GIT_TRACE="$tc_root/trace"; export GIT_TRACE
+    check_touching_commit_reachable "$2" "$3" "$4"; echo "rc=$?" ) 2>"$tc_root/err"
+}
+mkdir -p "$tc_fx/memory/builds/b"
+( cd "$tc_fx" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  printf 'phase: BUILDING\n' > $tc_P; echo seed > seed.txt
+  git add $tc_P seed.txt; git commit -qm "base"
+  git checkout -qb side; echo s > side.txt; git add side.txt; git commit -qm "side work"
+  git checkout -q main; git checkout -qb run
+  printf 'phase: LANDED\n' > $tc_P; git add $tc_P; git commit -qm "run touches the record"
+  git checkout -q main; echo m > main.txt; git add main.txt; git commit -qm "default branch work"
+  git merge -q --no-ff --no-commit run
+  printf 'phase: BUILDING\n' > $tc_P; git add $tc_P
+  git commit -qm "nested merge resolves the record to the default side"
+  git merge -q --no-ff -m "witness" side ) >/dev/null 2>&1
+tc_base=$(git -C "$tc_fx" log --format=%H --grep='^base$')
+tc_nest=$(git -C "$tc_fx" rev-parse --verify --quiet 'HEAD^1' 2>/dev/null)
+tc_other=$(git -C "$tc_fx" rev-parse --verify --quiet 'HEAD^2' 2>/dev/null)
+# A FIXTURE THAT DID NOT BUILD COMPARES EMPTIES, and every arm below would then grade a refusal of
+# its own inputs. The shape is asserted, not inferred: the first parent is a merge, and it is TREESAME
+# to its default-branch parent for the record's path and not to its run-branch parent.
+n=$((n+1)); [ -n "$tc_base" ] && [ -n "$tc_nest" ] && [ -n "$tc_other" ] \
+  || { echo "FAIL the TOOL-dDerivedDocket-54 fixture derived no base, nested parent or other parent - every arm below would grade nothing"; st=1; }
+same "fixture: the witness's first parent is itself a merge" \
+  "$(git -C "$tc_fx" rev-parse --verify --quiet "$tc_nest^2" >/dev/null 2>&1 && echo merge)" "merge"
+same "fixture: the nested merge is TREESAME to its default-branch parent for the record" \
+  "$(git -C "$tc_fx" diff --name-only "$tc_nest^1" "$tc_nest" -- $tc_P)" ""
+same "fixture: the nested merge is NOT treesame to its run-branch parent for the record" \
+  "$(git -C "$tc_fx" diff --name-only "$tc_nest^2" "$tc_nest" -- $tc_P)" "$tc_P"
+
+# ---- AC1: the nested-merge PARENT answers yes, and the simplified spelling answers nothing for that
+# ---- same parent - rows 5 and 6 of the spec's table, reproduced here rather than quoted.
+same "AC1 the witness's nested-merge parent answers yes" \
+  "$(run_touching_probe "$tc_fx" "$tc_nest" "$tc_base" "$tc_P")" "rc=0"
+same "AC1 a yes prints no reason line" "$(cat "$tc_root/err")" ""
+same "AC1 control: the walk counter counts the one walk that ran" \
+  "$(cat "$tc_root/trace" 2>/dev/null | grep -c 'built-in: git rev-list')" "1"
+same "AC1 control: the SIMPLIFIED spelling answers nothing for that same parent" \
+  "$(git -C "$tc_fx" rev-list -1 "$tc_nest" "^$tc_base" -- $tc_P)" ""
+same "AC1 control: the unsimplified spelling answers the nested merge for it" \
+  "$(git -C "$tc_fx" rev-list --full-history -1 "$tc_nest" "^$tc_base" -- $tc_P)" "$tc_nest"
+
+# ---- AC2: the witness's OTHER parent reaches no touching commit and answers no, so exactly one
+# ---- side is excluded. Without this, a predicate that now matches everything passes AC1.
+same "AC2 the witness's other parent answers no" \
+  "$(run_touching_probe "$tc_fx" "$tc_other" "$tc_base" "$tc_P")" "rc=1"
+same "AC2 a no prints no reason line, so it cannot be mistaken for a refusal" "$(cat "$tc_root/err")" ""
+
+# ---- AC3: three BASEs that fail three different ways. Not an object: any spelling catches it.
+same "AC3 a BASE that is not an object cannot answer" \
+  "$(run_touching_probe "$tc_fx" "$tc_nest" 0123456789abcdef0123456789abcdef01234567 "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "check_touching_commit_reachable cannot answer for commit [$tc_nest] and path [$tc_P]"
+# ---- ...EMPTY: the range spelling would exit 0 printing nothing, byte-identical to an honest no,
+# ---- and the caret spelling would fail closed for free - so the arm asserts NO WALK RAN.
+same "AC3 an empty BASE cannot answer" "$(run_touching_probe "$tc_fx" "$tc_nest" "" "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "the BASE is empty or blank, so no walk was started"
+same "AC3 an empty BASE is refused WITHOUT walking" \
+  "$(cat "$tc_root/trace" 2>/dev/null | grep -c 'built-in: git rev-list')" "0"
+# ---- ...a legal object of another TYPE: `^<object>` excludes nothing, so a non-empty test lets the
+# ---- walk answer a confident YES over the whole history. The control proves this fixture shows it.
+tc_blob=$(git -C "$tc_fx" rev-parse --verify --quiet "$tc_base:$tc_P" 2>/dev/null)
+tc_tree=$(git -C "$tc_fx" rev-parse --verify --quiet "$tc_base^{tree}" 2>/dev/null)
+n=$((n+1)); [ -n "$(git -C "$tc_fx" rev-list --full-history -1 "$tc_other" "^$tc_blob" -- $tc_P 2>/dev/null)" ] \
+  || { echo "FAIL AC3 control: a blob BASE excluded something here, so the wrong-type arm below grades nothing"; st=1; }
+same "AC3 a BLOB BASE gives no answer rather than a yes" \
+  "$(run_touching_probe "$tc_fx" "$tc_other" "$tc_blob" "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "does not resolve to a commit"
+same "AC3 a TREE BASE gives no answer rather than a yes" \
+  "$(run_touching_probe "$tc_fx" "$tc_other" "$tc_tree" "$tc_P")" "rc=2"
+
+# ---- The other cannot-answer branches, each a distinct status from the honest no.
+same "an unknown commit cannot answer" "$(run_touching_probe "$tc_fx" deadbeef "$tc_base" "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "the commit does not resolve to a commit in this history"
+same "a blank path cannot answer" "$(run_touching_probe "$tc_fx" "$tc_nest" "$tc_base" " ")" "rc=2"
+hit "$(cat "$tc_root/err")" "the path is empty or blank"
+same "a walk git refuses cannot answer" "$(run_touching_probe "$tc_fx" "$tc_nest" "$tc_base" ../outside)" "rc=2"
+hit "$(cat "$tc_root/err")" "the walk itself failed"
+# the path is LITERAL: as a pattern this one matches the record and would answer yes
+same "a glob-shaped path is one literal path, which nothing touched" \
+  "$(run_touching_probe "$tc_fx" "$tc_nest" "$tc_base" 'memory/builds/*/RUN.md')" "rc=1"
+# a shallow clone keeping every commit, BASE included, so only the shallowness can refuse it
+git clone -q --depth 3 --no-local "file://$tc_fx" "$tc_root/shallow" >/dev/null 2>&1
+same "a shallow clone cannot answer" "$(run_touching_probe "$tc_root/shallow" "$tc_nest" "$tc_base" "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "this clone is shallow"
+
+# ---- AC4: the header sentence naming the simplification, ONCE, naming both the TREESAME shape and
+# ---- the existence-only limit. A flag with no clause beside it survives until the next tidy reader.
+same "AC4 the header sentence naming the simplification appears once" \
+  "$(grep -cF 'THE WALK IS UNSIMPLIFIED ON PURPOSE' "$TMP/$KIT_REL/lib-unattended.sh")" "1"
+hit "$(sed -n '/THE WALK IS UNSIMPLIFIED ON PURPOSE/,+4p' "$TMP/$KIT_REL/lib-unattended.sh")" "TREESAME to one side for that path"
+hit "$(sed -n '/THE WALK IS UNSIMPLIFIED ON PURPOSE/,+4p' "$TMP/$KIT_REL/lib-unattended.sh")" "EXISTENCE only, never which commit"
+
+rm -rf "$tc_root"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
@@ -4088,7 +4212,11 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- FLOOR_SHARD_2 carries the same +60 and FLOOR_SHARD_1 is untouched. COUNTED by executing the
 # ---- block standalone in a replica of this prologue, the same way and for the same reason as the
 # ---- line above: this unit's pass may run no suite.
-FLOOR_ASSERTIONS=517
+# ---- RAISED 517 -> 549 by exactly the arm, TOOL-dDerivedDocket-54: the reachability probe's
+# ---- thirty-two executed assertions over its one fixture repository, all at the END of region
+# ---- two, so FLOOR_SHARD_2 carries the same +32 and FLOOR_SHARD_1 is untouched. COUNTED by
+# ---- executing the block standalone in a replica of this prologue, for the reason above.
+FLOOR_ASSERTIONS=549
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -4114,7 +4242,7 @@ FLOOR_ASSERTIONS=517
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=91
-FLOOR_SHARD_2=426
+FLOOR_SHARD_2=458
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
