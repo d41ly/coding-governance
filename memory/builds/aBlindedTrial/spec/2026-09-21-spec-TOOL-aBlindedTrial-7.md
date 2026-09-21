@@ -1,11 +1,12 @@
 # TOOL-aBlindedTrial-7 — a project-wide spec-audit default, declared once in the conf and read at BASE
 
-**Status:** INPROGRESS · rev-3 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
+**Status:** CLOSED · rev-4 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-aBlindedTrial-7-followups-ledger.md](../build/2026-09-21-build-TOOL-aBlindedTrial-7-followups-ledger.md) | journal | TOOL-aBlindedTrial-8 KICK-aBlindedTrial-1 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-8 KICK-aBlindedTrial-1 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md) | diff-review | TOOL-aBlindedTrial-8 KICK-aBlindedTrial-1 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md) | diff-review | TOOL-aBlindedTrial-8 KICK-aBlindedTrial-1 |
@@ -59,8 +60,8 @@ line.
 
 ### Edges
 
-- **consumes-from** external — `TOOL-aBlindedTrial-2`'s key grammar and `AUTH_SPEC_AUDIT`, landed at
-  `0e61932d`; this unit widens where the value comes from, never its shape.
+- **consumes-from** external — the README key grammar and `AUTH_SPEC_AUDIT` as landed at `0e61932d`
+  (unit 2 of this build, closed there); this unit widens where the value comes from, never its shape.
 
 ## 4. Design
 
@@ -168,6 +169,8 @@ New arm: `tools/hooks/agent-cap.test.sh` · a conf beside the fixture README, da
   R1 (round 3): the BASE-conf sentinel is glued with two newlines, so a key line ending in a
   backslash continuation reads as the date rather than as absent; S1's fail-55 sentence stands.
   R2 (round 3): the not-gradable sentence names all three causes. No criterion changed.
+- rev-4 · 2026-09-21 · §6 · CLOSED. All eight criteria observed (ledger in the follow-ups journal);
+  rounds 1–3 added `fail 55`, the two-newline sentinel glue and the derived-after-both-halves rule.
 
 ## 10. Reuse audit
 

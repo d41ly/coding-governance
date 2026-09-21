@@ -1,11 +1,12 @@
 # TOOL-aBlindedTrial-8 — a spec's §7 leg line must name every leg its files-touched trips
 
-**Status:** INPROGRESS · rev-3 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
+**Status:** CLOSED · rev-4 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-aBlindedTrial-7-followups-ledger.md](../build/2026-09-21-build-TOOL-aBlindedTrial-7-followups-ledger.md) | journal | TOOL-aBlindedTrial-7 KICK-aBlindedTrial-1 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-7 KICK-aBlindedTrial-1 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md) | diff-review | TOOL-aBlindedTrial-7 KICK-aBlindedTrial-1 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md) | diff-review | TOOL-aBlindedTrial-7 KICK-aBlindedTrial-1 |
@@ -184,6 +185,8 @@ the checker's header by hand and make it say the same rule.
   header and the template carry no manifest-derived count. R4: the kit's example conf states the
   breadth rule — no gate compares its comment text, so §7 carries the compensating manual check.
   `FLOOR_ASSERTIONS` 62 -> 66.
+- rev-4 · 2026-09-21 · §6 · CLOSED. All seven criteria observed; the arm ships by breadth with the
+  two-segment prefix rule and a NEAR row for a one-segment root; the corpus grades clean at the cutoff.
 
 ## 10. Reuse audit
 

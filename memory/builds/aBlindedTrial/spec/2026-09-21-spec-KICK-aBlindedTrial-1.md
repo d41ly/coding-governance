@@ -1,11 +1,12 @@
 # KICK-aBlindedTrial-1 — the kickoff engine puts the spec-audit question to the owner at READY
 
-**Status:** INPROGRESS · rev-3 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams kickoff · order 1 · ratified 2026-09-21
+**Status:** CLOSED · rev-4 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams kickoff · order 1 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-aBlindedTrial-7-followups-ledger.md](../build/2026-09-21-build-TOOL-aBlindedTrial-7-followups-ledger.md) | journal | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md) | diff-review | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md) | diff-review | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
@@ -50,8 +51,8 @@ shape the trial could not measure, and writes the line on a yes.
 
 ### Edges
 
-- **consumes-from** external — the `spec-audit: <date>` key grammar (`TOOL-aBlindedTrial-2`) and M4's
-  opt-in sentence (`TOOL-aBlindedTrial-5`), both landed at `0e61932d`.
+- **consumes-from** external — the `spec-audit: <date>` key grammar and M4's opt-in sentence, both
+  landed at `0e61932d` (units 2 and 5 of this build, closed there).
 
 ## 4. Design
 
@@ -122,6 +123,8 @@ shape the trial could not measure, and writes the line on a yes.
   names; the rev-2 line listed §6 and §7 only. R10: the no-ask clause takes README precedence, the
   driver's own order — a README `spec-audit:` is carded `declared <date>`, and the conf default is
   consulted and carded `project default <date>` only when the README carries no key.
+- rev-4 · 2026-09-21 · §6 · CLOSED. AC1–AC4 observed by grep; AC5's size half observed at 18428
+  bytes, its wiring half is observed in the primary tree after landing, where the junction points.
 
 ## 10. Reuse audit
 
