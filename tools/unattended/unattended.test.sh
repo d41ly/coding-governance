@@ -2066,6 +2066,106 @@ same "--plan <slug> <anything else>: still the padded table" \
   "$(run --plan tPlan --frobnicate | grep -cF "$TAB")" "0"
 git reset -q --hard HEAD~1; git clean -qfd
 
+# ---- TOOL-dDerivedDocket-49: the `next:` line comes off a DECLARED ladder ------------------------
+# The precedence between the shapes used to be whichever of `verb_plan`'s two loops bash reached
+# first: three guarded assignments, a rule that existed only in prose, and a fourth shape addable
+# only by typing a fourth assignment and arguing about where. It is a table in the driver now, one
+# line per rung, and these arms read the ORDER back out of the source and then exercise every rung
+# and every adjacent-rung boundary that exists at this unit's order.
+
+# AC1 — no guarded assignment to the line survives, and the ladder is called exactly once. Full-line
+# COMMENTS are stripped first, and deliberately: the driver's own comment QUOTES the retired shape
+# so the next reader knows what was removed, and an arm that reds on that prose teaches whoever
+# meets it to delete the explanation rather than the code.
+same "no guarded next assignment survives in the driver's code" \
+  "$(grep -v '^[[:space:]]*#' "$SCRIPT" | grep -c '|| next=')" "0"
+same "the ladder has exactly one call site" \
+  "$(grep -c 'derive_next_shape "' "$SCRIPT")" "1"
+
+# AC5 — the DECLARED rung order, read back out of the driver rather than out of a copy of it. Five
+# rungs, in order, with the undecided-ask rung THIRD: after both unit rungs and before both terminal
+# ones. That position is what TOOL-dDerivedDocket-16 consumes, and moving a line in the table moves
+# the rule — which is the whole reason the table exists instead of three assignments and a paragraph.
+rungs=$(grep '^rung ' "$SCRIPT" | awk '{print $2}')
+same "the ladder declares exactly five rungs" "$(printf '%s\n' "$rungs" | grep -c .)" "5"
+same "rung 1 is the live unit"            "$(printf '%s\n' "$rungs" | sed -n 1p)" "live-unit"
+same "rung 2 is the missing unit"         "$(printf '%s\n' "$rungs" | sed -n 2p)" "missing-unit"
+same "rung 3 is the undecided ask"        "$(printf '%s\n' "$rungs" | sed -n 3p)" "undecided-ask"
+same "rung 4 is the nothing-graded shape" "$(printf '%s\n' "$rungs" | sed -n 4p)" "nothing-graded"
+same "rung 5 is the terminal shape"       "$(printf '%s\n' "$rungs" | sed -n 5p)" "everything-terminal"
+
+# AC6 — the two terminal shapes stay DISTINCT strings, each present verbatim exactly once. Leg
+# check 30 reads the conjunction of a NOT A UNIT row with the LAST rung's wording, and the runtime
+# arms below match on the same words, so reflowing one of these unwires three readers at once while
+# the ladder goes on reporting itself correct.
+same "the terminal rung's wording is in the table verbatim, once" \
+  "$(grep -c '^rung everything-terminal none - every tracked spec is terminal$' "$SCRIPT")" "1"
+same "the nothing-graded rung's wording is in the table verbatim, once" \
+  "$(grep -c '^rung nothing-graded none - no tracked spec grades as a unit (see the NOT A UNIT rows above)$' "$SCRIPT")" "1"
+
+# AC3 — rung 1 over rung 2. A build with work ready to do reports the READY unit and never the
+# roster id nobody has specced. The MISSING arm further up asserts the ROW and says nothing at all
+# about which of the two rungs took the line, which is the gap this closes.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+roster tPlan "1. ARCH-tPlan-1 the specced one
+2. ARCH-tPlan-7 the one nobody has specced"
+fixture
+out=$(run --plan tPlan)
+same "the MISSING roster id still gets its own row" "$(printf '%s\n' "$out" | grep -c 'MISSING$')" "1"
+hit "$out" "next: ARCH-tPlan-1 (READY - build it)"
+miss "$out" "next: ARCH-tPlan-7"
+git reset -q --hard HEAD~1; git clean -qfd
+
+# AC2 — rung 2 over rung 5, the boundary the promoting record found stated in prose and observed by
+# nothing: a roster id with no tracked spec while every tracked spec IS terminal. The build is not
+# finished, and the one verb an agent reads to pick up work must not tell it otherwise.
+reset_tree; readme tRun
+mutate memory/builds/tRun/README.md 's/ARCH/EXMP/g'
+mkspec tRun EXMP-tRun-1 CLOSED "S1 a thing" "AC1 it works" "the bar" "none"
+roster tRun "1. EXMP-tRun-1 the closed one
+2. EXMP-tRun-2 the one nobody has specced"
+fixture
+out=$(run --plan tRun)
+hit "$out" "next: EXMP-tRun-2 (MISSING - spec it first)"
+miss "$out" "next: none - every tracked spec is terminal"
+# ...and with that one id out of the roster, rung 5 takes the line. Same tree, one roster row fewer:
+# without this half the arm above is satisfied by a driver that prints the MISSING shape whatever
+# the roster holds, which is the could-not-fail shape this build keeps finding one level up.
+mutate memory/builds/tRun/README.md '/^2\. EXMP-tRun-2 the one nobody has specced$/d'
+fixture
+out=$(run --plan tRun)
+hit "$out" "next: none - every tracked spec is terminal"
+miss "$out" "MISSING"
+git reset -q --hard HEAD~2; git clean -qfd
+
+# AC4 — rung 4 fires and rung 5 does not, with the WHOLE line pinned rather than the two phrases.
+# The sibling arm above asserts the wording; a caller parses the shape.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+mutate memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md 's/^\*\*Status:\*\*/  **Status:**/'
+setunits tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "NOT A UNIT (no status header)"
+hit "$out" "next: none - no tracked spec grades as a unit (see the NOT A UNIT rows above)"
+miss "$out" "next: none - every tracked spec is terminal"
+git reset -q --hard HEAD~1; git clean -qfd
+
+# ...and rung 4 sits BELOW rung 2, which is today's behaviour and is now said by an arm rather than
+# by a sentence. Same unparseable spec, with the roster naming its id: nothing grades, and the line
+# still names the unit nobody has specced rather than announcing that nothing graded.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+mutate memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md 's/^\*\*Status:\*\*/  **Status:**/'
+setunits tPlan ""
+roster tPlan "1. ARCH-tPlan-1 the one whose spec does not parse"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "next: ARCH-tPlan-1 (MISSING - spec it first)"
+miss "$out" "next: none - no tracked spec grades as a unit"
+git reset -q --hard HEAD~1; git clean -qfd
+
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
 hit "$out" "unknown argument; the verbs are "
@@ -6892,10 +6992,16 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
+# RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
+# (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
+# terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
+# region two, so FLOOR_SHARD_2 carries the same +26 and FLOOR_SHARD_1 is untouched. COUNTED off
+# the block's own `hit`/`miss`/`same`/`mutate` lines, never off a suite run: this pass runs no
+# suite, so the count is derived from the diff and the floor keeps its declared headroom.
 # RAISED 790 -> 845 by TOOL-dDerivedDocket-5: the durable-restart arms execute 55 assertions,
 # all of them in region two, so FLOOR_SHARD_2 carries the same +55 and FLOOR_SHARD_1 is
 # untouched.
-FLOOR_ASSERTIONS=845
+FLOOR_ASSERTIONS=871
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -6939,7 +7045,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=649
+FLOOR_SHARD_2=675
+# +26 for the TOOL-dDerivedDocket-49 `next:` ladder arms, all in region two — see FLOOR_ASSERTIONS.
 # +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).
 # +4 for the closing diff review of aProbedUnit, round 2, cluster H, in region two.
 # +19 for the closing diff review of aProbedUnit, all in region two — see FLOOR_ASSERTIONS above.

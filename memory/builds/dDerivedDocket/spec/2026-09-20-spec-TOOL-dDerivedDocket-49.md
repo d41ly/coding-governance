@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-49 — one declared ladder decides which next: shape the plan prints
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
+**Status:** CLOSED · rev-2 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dDerivedDocket-49-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-49-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 |
 
 <!-- /gen:spec-records -->
@@ -13,7 +14,8 @@
 ## 1. Goal
 
 `verb_plan` picks its `next:` line by first-wins accumulation across two loops
-(`tools/unattended/unattended.sh:2253-2254` and `:2262`, read at `:2274-2280`), so the precedence
+(`tools/unattended/unattended.sh:2773-2774` and `:2782`, read at `:2794-2800`, at this unit's
+PARENT), so the precedence
 between the shapes is an artefact of iteration order and exists only in prose. Unit 16 adds a third
 shape whose position that prose pins and whose own fixture CONTRADICTED it, which is the defect
 this unit is promoted from. That fixture has since moved: unit 16's AC18 carries the two-arm
@@ -39,7 +41,7 @@ takes, and keep that landed criterion in step with it.
   today. Observed by AC5 and AC6.
 - **S4** The three existing shape literals are byte-identical after this unit, so leg check 30's
   conjunction stays reachable and the driver suite's existing terminal-wording arm
-  (`tools/unattended/unattended.test.sh:1802`) still hits. Observed by AC6.
+  (`tools/unattended/unattended.test.sh:1816`) still hits. Observed by AC6.
 - **S5** Every rung that exists today gets a failing case: a fixture in which it fires and a fixture
   in which the rung above it takes the line instead. The MISSING-against-terminal pair is the same
   boundary the promoted finding names one rung lower, observed where it can be observed at this
@@ -70,7 +72,7 @@ takes, and keep that landed criterion in step with it.
   F4 records the ruling rather than leaving it a boundary sentence. Two next-pickers exist at HEAD
   and this unit replaces one: `verb_plan`'s accumulation, and `verb_status`'s own
   `nonterminal_units ... | head -1` over the RENDERED units region
-  (`tools/unattended/unattended.sh:2910`), which `--resume` inherits by calling that verb (`:3080`).
+  (`tools/unattended/unattended.sh:3846`), which `--resume` inherits by calling that verb (`:4197`).
   The second keeps its own shape, a bare id carrying none of the ladder's five shape strings, so
   this unit changes neither verb's output. Unit 16 S8, AC17 and AC18 once asserted that those two
   verbs print the same `next:` as `--plan`, and no unit of this build builds that join; that parity
@@ -79,7 +81,7 @@ takes, and keep that landed criterion in step with it.
   it. What stays open after this unit is one question with one home, rather than a claim with no
   mechanism.
 - Reordering within a rung. The live-unit rung keeps region order and the MISSING rung keeps
-  whatever order `missing_units` prints (`tools/unattended/unattended.sh:2007-2024`), which today
+  whatever order `missing_units` prints (`tools/unattended/unattended.sh:2527-2545`), which today
   is the STRING order its two `sort -u` inputs and `comm -23` impose — the order that puts `-10`
   before `-2`. `TOOL-dDerivedDocket-16` §4 is the unit that re-sorts MISSING ids by numeric
   sequence, at a later order; this unit neither depends on that nor blocks it, because the rung
@@ -93,8 +95,9 @@ takes, and keep that landed criterion in step with it.
 ### Edges
 
 - **consumes-from** external — `verb_plan`'s two loops and the `next:` block they feed at
-  `tools/unattended/unattended.sh:2231-2280`, and `missing_units` at `:2007-2024`, all of which
-  exist at HEAD. This unit re-points them and builds neither.
+  `tools/unattended/unattended.sh:2751-2800` at this unit's PARENT, and `missing_units` at
+  `:2527-2545`, which this unit does not move. Both existed at the base and at the parent; this
+  unit re-points the first and builds neither.
 - **hands-off** `TOOL-dDerivedDocket-16` — the rung the undecided-ask shape occupies and the input
   that fills it, so that unit adds a predicate to a declared ladder rather than a branch to an
   accumulation, and its `next:` contract for `--plan` has a rung position it can point at. Both
@@ -120,7 +123,8 @@ READY)       [ -n "$next" ] || next="$id (READY - build it)" ;;
 [ -n "$next" ] || next="$miss (MISSING - spec it first)"
 ```
 
-`tools/unattended/unattended.sh:2253-2254` and `:2262`, printed at `:2274-2280`. The precedence is
+`tools/unattended/unattended.sh:2773-2774` and `:2782` at this unit's PARENT, printed at
+`:2794-2800`. The precedence is
 real and correct, and it is stated nowhere: it is whichever loop runs first. A fourth shape is
 therefore added by writing a fourth guarded assignment and arguing in prose about where it goes,
 which is what produced a design sentence and a fixture that cannot both hold.
@@ -135,7 +139,13 @@ which is what produced a design sentence and a fixture that cannot both hold.
 | 4 | nothing graded | no tracked spec graded as a unit | `none - no tracked spec grades as a unit (see the NOT A UNIT rows above)` |
 | 5 | terminal | every tracked spec is terminal | `none - every tracked spec is terminal` |
 
-`derive_next_shape` walks that table in order and returns the first rung whose input is non-empty.
+The table is `NEXT_RUNGS`, five `rung ` lines at column 0 between a lone opening quote and a lone
+closing one, and `derive_next_shape` walks it in order and returns the first rung whose input is
+non-empty. Rungs 1 and 3 declare a bare `<id>` and nothing more: the words inside those two shapes
+belong to whoever supplies them, the state word being `verb_plan`'s and the undecided shape being
+unit 16's, so what the table owns for those two is their POSITION. Rungs 2, 4 and 5 carry their
+whole tail, which is where the three existing literals now live, byte for byte, and the `next: `
+prefix is printed once at the single call site.
 Rung 3's input is the empty string on every call until unit 16 supplies it, so the printed line is
 byte-identical to today's for every tree that exists now — which is what makes this unit's own
 arms a control on the refactor rather than a claim about the ask feature.
@@ -143,7 +153,7 @@ arms a control on the refactor rather than a claim about the ask feature.
 Rung 4 sits below rung 2 deliberately and that is today's behaviour, not a change: the MISSING loop
 assigns the line whether or not anything graded, so a roster id with no spec outranks the
 nothing-graded wording. Leg check 30 reads the conjunction of a NOT A UNIT row and rung 5's wording
-(`tools/unattended/check-unattended.sh:3284`), so rungs 4 and 5 stay distinct strings and rung 4
+(`tools/unattended/check-unattended.sh:3572`), so rungs 4 and 5 stay distinct strings and rung 4
 stays reachable.
 
 ### Why the rung the promoted finding names is pinned and not built
@@ -175,7 +185,7 @@ performs no read of its own.
 | Identifier | Cell | Verb, and why |
 |---|---|---|
 | `derive_next_shape` | `sh.function` | `derive`: the shape is computed from the caller's four values so it never has to be authored; `python tools/lexicon/lexicon.py --suggest derive_next_shape --as sh.function` answered OK on 2026-09-20 |
-| the rung table block | driver source | `.lexicon.conf` declares no shell constant cell, so no naming arm grades its name |
+| `NEXT_RUNGS` | driver source | `.lexicon.conf` declares no shell constant cell, so no naming arm grades its name; the spelling follows the driver's own `DIRECTIVES_CORE` and `HOLD_CODES_CORE` constants |
 
 ### Files touched (estimate)
 
@@ -192,15 +202,15 @@ unit 16 consumes the rung position this unit pins, so this unit cannot sit later
 co-tenancy itself is graded by nothing, because this unit declares no edge to unit 15 or unit 48.
 What check 12's edge arm does grade is the pair this unit shares with unit 16, and both ends hold: a
 hands-off reds only on a target EARLIER than this unit
-(`tools/memory-tree/check-memory-hygiene.sh:1798`) and unit 16 sits later, while unit 16's
-reciprocal consumes-from reds only on a target LATER than that unit (`:1796`) and this one sits
+(`tools/memory-tree/check-memory-hygiene.sh:1926`) and unit 16 sits later, while unit 16's
+reciprocal consumes-from reds only on a target LATER than that unit (`:1924`) and this one sits
 earlier. Dispatch is strictly sequential including within a shared `order` value
 (`tools/workflows/unattended-build.js:70`), and the harness sorts by step and then by id as a string
 (`:314`, with the tiebreak at `:318`), which runs unit 15 first, unit 48 second and this unit third,
 before unit 16. Disjointness is not proven for the group and is not claimed, and the DRIVER does not
 supply the sequence either: `--dispatch`'s own order gate blocks only on a sibling at a STRICTLY
-earlier order (`tools/unattended/unattended.sh:5010`), under a rule that reads a shared value as a
-parallel group which does not block (`:4983`). What holds the sequence is the harness's roster order
+earlier order (`tools/unattended/unattended.sh:6373`), under a rule that reads a shared value as a
+parallel group which does not block (`:6346`). What holds the sequence is the harness's roster order
 and nothing else. This unit reads nothing the other two write, so a renumber may move it to any step
 at or before unit 16's.
 
@@ -272,13 +282,20 @@ and the only reader that can tell the difference is a source-level arm.
   is decided again by whoever types the next assignment. The arm is observed RED by moving the ask
   rung above the MISSING rung before it is allowed to pass.
 - **AC6** — When the three existing shape literals are compared between this unit's commit and its
-  parent with `git cat-file -p`, each is byte-identical, and the string the existing
-  terminal-wording assertion (`tools/unattended/unattended.test.sh:1802`) looks for is still
-  present verbatim in the driver, so that arm has something to hit when the suite next runs. The
-  comparison is over source at both commits, so this criterion owes no suite run of its own — the
-  runtime half is AC2's second arm.
+  parent with `git cat-file -p`, each is byte-identical, and the terminal WORDING the existing
+  assertion (`tools/unattended/unattended.test.sh:1816`) matches on is still present verbatim in the
+  driver, as a whole line of the rung table, so that arm has something to hit when the suite next
+  runs. The comparison is over source at both commits, so this criterion owes no suite run of its
+  own — the runtime half is AC2's second arm.
   Red when: a literal is reflowed or re-punctuated, so leg check 30's predicate and every consumer
   matching on the wording stop matching while the ladder reports itself correct.
+  AMENDED at rev-2, second clause only. It read "the string the ... assertion LOOKS FOR", and that
+  string is `next: none - every tracked spec is terminal` — the printed line, prefix included, which
+  was source text only because one of the three `echo`s carried both halves. S1 moves the prefix to
+  the ONE print site and gives each rung the tail it owns, which IS the refactor, so nothing short of
+  keeping three print sites preserves the prefixed string. What that arm actually reads is the
+  driver's OUTPUT, unchanged and observed by AC2's second arm; what this criterion grades is the
+  wording, verbatim, as a line of its own.
 - **AC7** — When this unit's commit is compared with its parent, `git cat-file -s` at the parent
   equals `wc -c` at the commit for `memory/map/features/unattended.md`,
   `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md`, and the line
@@ -286,10 +303,13 @@ and the only reader that can tell the difference is a source-level arm.
   matches.
   Red when: this unit spends the unattended dossier's headroom, which was 93 B when this spec was
   written, or touches a protocol copy this build has priced for other units.
-  figure: the 93 B of dossier headroom is PINNED, measured 2026-09-20 at `fb07ca25` as 20387 B
-  against the `DOSSIER_CAP_BYTES` of `tools/memory-tree/check-memory-hygiene.sh:90`; that line
-  declares the dossier's line half as 0, so it is off, while the guides' line half at `:84` is read
-  here.
+  figure: AMENDED at rev-2 and RE-MEASURED rather than re-cited. The pin read 93 B, measured
+  2026-09-20 at `fb07ca25` as 20387 B against the `DOSSIER_CAP_BYTES` of
+  `tools/memory-tree/check-memory-hygiene.sh:90`. At this unit's parent the dossier is 20467 B, so
+  the headroom is 13 B — spent by units that landed between the base and this pass, the same fall
+  `TOOL-dDerivedDocket-48` recorded. It moves no verdict here, because this unit opens no dossier at
+  all, and it would have moved one for any unit that wrote a byte into it. That line declares the
+  dossier's line half as 0, so it is off, while the guides' line half at `:84` is read here.
 - **AC8** — When the driver suite runs, every branch this unit adds has an arm, the suite's
   executed-assertion floor holds, and the `tools/unattended/unattended.sh` pair of `ARMS_FLOORS` in
   `.memory-tree.conf` names the new count.
@@ -341,14 +361,53 @@ suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unatte
   unit; or rule it out of this unit and route it to the open backlog row. RESOLVED (agent,
   2026-09-20, delegated): rule it out and route it. What F3 prices at a rename and a source line is
   the LADDER's move; the join is the CALLER's four inputs, which is a different cost. `verb_plan`
-  reads every tracked spec of the build to have them (`tools/unattended/unattended.sh:2148` and
-  `:2156`), while `verb_status` reads the run-state file and the rendered region and nothing else,
+  reads every tracked spec of the build to have them (`tools/unattended/unattended.sh:2756` and
+  `:2764`), while `verb_status` reads the run-state file and the rendered region and nothing else,
   so calling the ladder from it gives the cheap read-only verb the plan verb's whole scan and its
   refusals. It would also change a printed line, since that verb prints a bare id where the ladder
   prints a shape, which is the one property S4 and AC1 exist to hold. The join is a unit of its own,
   and the open backlog row `TOOL-aBoundedVerdict-23` is where the question already lives.
 
 ## 9. Revision log
+
+- rev-2 · 2026-09-21 · §1 · §2 · §3 · §4 · §6 · §8 · §10 · the build pass, written BEFORE the code as the brief
+  requires. Three kinds of change and no fourth.
+
+  CITATIONS. Every `tools/unattended/unattended.sh` line citation in the draft was taken before the
+  regrounding merge and every one had moved: the accumulation the unit retires sits at `:2773-2774`
+  and `:2782` at this unit's PARENT, printed at `:2794-2800`, and the citations that name it now say
+  PARENT, because after this commit that code is gone and a bare number would point at the
+  replacement. The ones naming code this unit does not move name THIS commit: `missing_units` at
+  `:2527-2545`, `verb_status`'s own pick at `:3846` with `--resume` inheriting it at `:4197`,
+  `verb_plan`'s two spec reads at `:2756` and `:2764`, and the dispatch order gate at `:6373` under
+  the rule at `:6346`. Three citations into files this unit does not touch had moved too and are
+  re-pinned: leg check 30 at `tools/unattended/check-unattended.sh:3572`, check 12's two edge arms at
+  `tools/memory-tree/check-memory-hygiene.sh:1926` and `:1924`, and the terminal-wording assertion at
+  `tools/unattended/unattended.test.sh:1816`. Every CLAIM each citation carries was re-read at the
+  line it now names and stands; none of them changed a verdict, and `tools/workflows/unattended-build.js`
+  and the `TOOL-dDerivedDocket-16` and `cBriefedPilot` citations were re-checked and had not moved.
+
+  AC6, second clause only. The clause asked that the string the existing terminal-wording assertion
+  LOOKS FOR stay present verbatim in the driver, and that string is the whole printed line, `next: `
+  included. It was source text only because one of the three `echo` branches carried the prefix and
+  the tail together, and collapsing those three branches into one call is the refactor S1 names. The
+  criterion now grades the terminal WORDING, verbatim and as a line of its own in the rung table,
+  which is what leg check 30 and that arm both actually match on; the prefixed line is still what the
+  verb PRINTS, and AC2's second arm observes it.
+
+  AC7's pinned figure, re-measured rather than re-cited. 93 B of dossier headroom at the base is
+  13 B at this parent, the same fall `TOOL-dDerivedDocket-48` recorded at its own pass. It moves no
+  verdict here: this unit opens no dossier, and the three carriers are byte-equal and line-equal at
+  both commits.
+
+  §4 also names the table `NEXT_RUNGS` and says what rungs 1 and 3 declare, because the draft's Shape
+  column read as though the table owned the state word and the undecided shape, and it owns neither.
+  What it owns for those two rungs is their position, which is the whole point of the unit.
+
+  AC8's `ARMS_FLOORS` clause is NOT amended and the pair does not move: that gate counts `fail <n> "`
+  call sites, measured at 256 in `tools/unattended/unattended.sh` at this commit and 256 at its
+  parent, and this unit adds no refusal at all. The suite's own executed-assertion floors DO move,
+  by the 26 assertions the new arms add, all of them in region two.
 
 - rev-1 · 2026-09-20 · initial draft. Promoted from the G3 round-2 spec audit's H1 (raw id 1) at the
   review's bounded exit. Section 8 F1 rules which half of the contradiction yields, the design
@@ -363,8 +422,8 @@ suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unatte
   unit 16 is owed.
   Extended by the close-out's verifier, same base and rev · §4 · the Rollout no longer says a shared
   `order` is not a parallel instruction. `--dispatch`'s own order gate reads it as exactly that: it
-  blocks only on a STRICTLY earlier sibling (`tools/unattended/unattended.sh:5010`) under the rule
-  stated at `:4983`, so the sequence is the harness's roster order and not a driver refusal.
+  blocks only on a STRICTLY earlier sibling (`tools/unattended/unattended.sh:6373`) under the rule
+  stated at `:6346`, so the sequence is the harness's roster order and not a driver refusal.
 - rev-1 · 2026-09-20 · §1 · §2 · §3 · §4 · §5 · §6 · §10 · fold of the G7 round-1 spec audit
   (`memory/builds/dDerivedDocket/reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md`),
   findings H1 (1, 16) and L4 (47), both disposed FOLD by the orchestrator. H1: the cross-edit S6
@@ -396,7 +455,8 @@ candidates"` returned `plan` in `tools/memory-tree/gen_build_index.py`, `rank_wi
 of which selects a shape from ordered rungs, and its header line reports that `.sh` is an unscanned
 layer, so the map cannot see the driver at all. No existing seam fits: the selection this unit
 declares exists today only as three guarded assignments inside `verb_plan`
-(`tools/unattended/unattended.sh:2253-2254`, `:2262`), which is the code this unit replaces rather
+(`tools/unattended/unattended.sh:2773-2774`, `:2782` at this unit's PARENT), which is the code
+this unit replaces rather
 than a seam it extends. The `unattended` dossier names no second next-picker.
 
 Recall returned `TOOL-dHonouredPark-4`, which closed the earlier disagreement between `--plan` and

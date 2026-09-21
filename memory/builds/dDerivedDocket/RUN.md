@@ -192,3 +192,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T09:04:30Z dispatch · item a36d5994 TOOL-dDerivedDocket-48 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-48.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-48-1-acceptance-ledger.md
 
 2026-09-21T09:04:35Z brief · item TOOL-dDerivedDocket-48 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T09:39:46Z dispatch · item 3e53e2a3 TOOL-dDerivedDocket-49 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh .memory-tree.conf memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-49.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-49-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-21T09:39:50Z brief · item TOOL-dDerivedDocket-49 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md

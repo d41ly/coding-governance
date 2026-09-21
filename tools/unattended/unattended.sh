@@ -2632,8 +2632,96 @@ plan_row() { # id · status · state · specPath
   else printf '%-34s %-11s %s\n' "$1" "$2" "$3"; fi
 }
 
+# ------------------------------------------------------------------- THE `next:` LADDER, DECLARED
+# WHAT THIS REPLACES. The line `--plan` closes with was built by three guarded assignments spread
+# across two loops of `verb_plan` - `[ -n "$next" ] || next=...` - so the PRECEDENCE between the
+# shapes was whichever loop bash reached first. It was real, it was correct, and it was stated
+# nowhere, which means a fourth shape could only be added by typing a fourth guarded assignment and
+# arguing in prose about where it went. That is how one spec of this build came to hold a design
+# sentence and a fixture that could not both be true (TOOL-dDerivedDocket-49 section 8 F1).
+#
+# ONE LINE PER RUNG, IN RUNG ORDER, AND THE ORDER OF THESE LINES IS THE RULE. The selector below
+# walks them top to bottom and returns the first rung whose input is non-empty, so moving a line
+# moves the precedence - and the sibling suite reads that order back out of THIS block. A position
+# in a declared table is gradeable by an arm; a sentence in a design section is not.
+#
+# `rung ` AT COLUMN 0 IS THE HANDLE. Nothing else in this file begins with it, so the arm counts the
+# rungs and reads their order without parsing shell and without a second copy of the table.
+#
+# THE UNDECIDED-ASK RUNG SITS THIRD, after both unit rungs and before both terminal rungs. Its input
+# is the empty string on every call until TOOL-dDerivedDocket-16 builds the predicate that fills it,
+# so the ladder prints today exactly what the three assignments printed. The position is pinned here
+# rather than in that unit because it is the half that can be graded before the predicate exists,
+# and the rule it encodes is that a run with a planned unit nobody has specced is told to spec it,
+# never to go dispose an ask.
+#
+# WHY RUNG 4 SITS BELOW RUNG 2 - today's behaviour, not a change. The MISSING loop assigned the line
+# whether or not anything graded, so a roster id with no spec already outranked the nothing-graded
+# wording, and leg check 30 reads the conjunction of a NOT A UNIT row with the LAST rung's wording.
+#
+# THE THREE SHAPE LITERALS BELOW ARE BYTE FOR BYTE THE ONES THAT STOOD IN `verb_plan`, and the two
+# terminal ones stay distinct strings. That check and the sibling suite both match on the wording,
+# so reflowing one here silently unwires both while this table reports itself correct.
+#
+# RUNGS 1 AND 3 CARRY A BARE `<id>` ON PURPOSE. The words inside those two shapes belong to whoever
+# supplies them - the state word is the caller's, and the undecided shape is unit 16's - so what the
+# table owns for those two is their POSITION, which is the whole subject of the unit that wrote it.
+#
+# `<id>` IS SUBSTITUTED, NEVER `printf`-ed. The id arrives from a build README, a `%` in one would
+# make the shape a format string, and a `printf` handed a spare argument reuses its format rather
+# than ignoring it.
+# BOTH QUOTES SIT ALONE, so every rung line is the rung and nothing else. The opening one buys the
+# fifth rung a column-0 start; the closing one keeps the last rung's wording a WHOLE line, which
+# is what an arm asserting that literal verbatim can anchor on. `read` skips both blanks the same
+# way it skips any line whose first word is not `rung`.
+NEXT_RUNGS='
+rung live-unit <id>
+rung missing-unit <id> (MISSING - spec it first)
+rung undecided-ask <id>
+rung nothing-graded none - no tracked spec grades as a unit (see the NOT A UNIT rows above)
+rung everything-terminal none - every tracked spec is terminal
+'
+
+# FOUR INPUTS AND NO STATE. Every one is derived by the caller from data it already holds, so this
+# runs once per `--plan` and performs no read of its own.
+#
+# THE TWO TERMINAL RUNGS TAKE A SENTINEL, never an id: "nothing graded" and "everything terminal"
+# are conditions rather than subjects, so their input is the word `yes` or nothing at all, and their
+# shapes carry no `<id>` for one to reach.
+#
+# FED BY A HERE-STRING OVER A VARIABLE, never by a command substitution: the loop stays in this
+# shell, and the kit's own shell-hygiene leg has nothing to declare.
+derive_next_shape() { # live-unit shape . first MISSING id . undecided-ask shape . graded flag
+  local _tag _rung _tmpl _in
+  while read -r _tag _rung _tmpl; do
+    [ "$_tag" = rung ] || continue
+    case "$_rung" in
+      live-unit)           _in="$1" ;;
+      missing-unit)        _in="$2" ;;
+      undecided-ask)       _in="$3" ;;
+      nothing-graded)      [ "$4" = 0 ] && _in=yes || _in="" ;;
+      everything-terminal) _in=yes ;;
+      *)                   _in="" ;;
+    esac
+    [ -n "$_in" ] || continue
+    printf '%s\n' "${_tmpl//<id>/$_in}"
+    return 0
+  done <<< "$NEXT_RUNGS"
+  # UNREACHABLE while the last rung's input is the constant above, and it still says something. An
+  # empty tail on a `next:` line is a verb that answered nothing while looking like it answered, and
+  # this is the one state in which the ladder itself is the thing that is broken.
+  printf 'none - the rung table named no shape, which cannot happen while its last rung is unconditional\n'
+  return 0
+}
+
 verb_plan() { # slug
-  local slug="$1" dir specs spec id st state next="" miss nmiss=0
+  local slug="$1" dir specs spec id st state miss nmiss=0
+  # THE LADDER'S INPUTS, collected by the two loops below and read ONCE at the bottom. They
+  # are not the line: `_live` and `_miss1` are first-wins captures of data each loop already
+  # has, `_ask1` is the undecided-ask rung's input and stays EMPTY here until
+  # TOOL-dDerivedDocket-16 fills it, and `_graded` is set beside the unit rows further down.
+  # No branch of this verb assigns the printed line any more.
+  local _live="" _miss1="" _ask1=""
   check_slug "$slug" || return 1
   dir="$M/builds/$slug"
   # A malformed pair is a NAMED refusal, never a silent fall-through to the no-roster path. `region`
@@ -2769,9 +2857,13 @@ verb_plan() { # slug
     case "$st" in CLOSED|WONTDO) [ "$state" = "READY" ] && state="DONE" || state="DONE ($state)" ;; esac
     plan_row "$id" "${st:-?}" "$state" "$spec"
     _graded=1
+    # FIRST WINS, and what wins is an INPUT rather than the line. The guarded assignments to
+    # `next` that stood here and in the loop below settled the precedence between the shapes
+    # by whichever loop bash reached first. The order is declared at NEXT_RUNGS now, and this
+    # branch says only which id and which state word the live-unit rung takes.
     case "$state" in
-      THIN|FORKED) [ -n "$next" ] || next="$id ($state)" ;;
-      READY)       [ -n "$next" ] || next="$id (READY - build it)" ;;
+      THIN|FORKED) [ -n "$_live" ] || _live="$id ($state)" ;;
+      READY)       [ -n "$_live" ] || _live="$id (READY - build it)" ;;
     esac
   done
   # The planned units nobody has specced. These are what M2 calls MISSING, and until this
@@ -2779,7 +2871,7 @@ verb_plan() { # slug
   for miss in $(missing_units "$slug" "$dir"); do
     plan_row "$miss" "-" "MISSING" ""
     nmiss=$((nmiss + 1))
-    [ -n "$next" ] || next="$miss (MISSING - spec it first)"
+    [ -n "$_miss1" ] || _miss1="$miss"
   done
   # The value resolved at the top of this verb, not re-derived. R2-M3: two `$( )` calls here meant two
   # discarded exit-3s, and the guard that replaced them still sat AFTER the listing.
@@ -2791,13 +2883,13 @@ verb_plan() { # slug
   # R3-B1 — THE TERMINAL WORDING IS EARNED, not defaulted. "every tracked spec is terminal" was
   # printed at exit 0 over builds where no spec graded as a unit at all, one line below the NOT A
   # UNIT rows saying so. A reader — or an agent picking up work — is told the build is finished.
-  if [ -n "$next" ]; then
-    echo "next: $next"
-  elif [ "$_graded" = 0 ]; then
-    echo "next: none - no tracked spec grades as a unit (see the NOT A UNIT rows above)"
-  else
-    echo "next: none - every tracked spec is terminal"
-  fi
+  # It is earned by the ladder's LAST rung now, which is the same rule carrying a name and a place.
+  #
+  # ONE WRITER, ONE CALL. Three branches stood here, fed by three guarded assignments in two loops,
+  # and the order among them was an artefact of iteration: a fourth shape could be added only by
+  # arguing in prose about where to type it. `_ask1` is empty on every call until
+  # TOOL-dDerivedDocket-16 supplies it, so this prints byte for byte what the three branches did.
+  echo "next: $(derive_next_shape "$_live" "$_miss1" "$_ask1" "$_graded")"
   return 0
 }
 
