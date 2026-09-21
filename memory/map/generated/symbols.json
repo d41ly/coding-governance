@@ -1478,6 +1478,11 @@
       "file": "tools/govkit/matrix.py"
     },
     {
+      "id": "check_rollback_orders",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_root_shape",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"

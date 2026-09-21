@@ -205,6 +205,60 @@ RETIRED_FLAGS = (
     ("allow-ungraded", "2026-09-16", "DEPL-cMendedVintage-4"),
 )
 
+def check_rollback_orders(root: pathlib.Path, where: str, floor: int) -> None:
+    """DEPL-cMendedVintage-18 S4/AC4: no path a rollback order names ends absent from the
+    receipt while the target still holds it. THE POPULATION IS DISCOVERED, never listed: every
+    rollback order under `root`, and the paths graded are the ones that order itself names, so a
+    new arm that rolls anything back is covered without being added to anything. Called once per
+    scratch root, because the main one is torn down before the end of the suite.
+
+    PRESENT MEANS THE INDEX TOO, and that half is what does the work rather than a second read for
+    symmetry. MEASURED on -18's own fixture: `update-index` re-staged the pre-run blob and
+    `checkout-index` then refused, so the WORKTREE file was absent and the bytes sat in the index.
+    A worktree-only invariant stays green over the exact defect that unit closes.
+    """
+    orders = [q for d in ("", "*/", "*/*/", "*/*/*/")
+              for q in root.glob(d + ".governance/outbox/update-rollback-*.md")]
+    check(f"[-18] S4 LIVENESS the sweep found rollback orders to grade at all over {where} — "
+          "over an empty population it would report a reassuring zero indistinguishable from a "
+          "clean run", len(orders) >= floor, f"{len(orders)} order(s) under the scratch root")
+    verbs = ("NOT restored ", "left alone ", "restored ", "removed ")
+    loss: list[str] = []
+    skip: list[str] = []
+    for o in orders:
+        tg = o.parents[2]
+        rc = tg / ".governance" / "install.json"
+        if not rc.is_file():
+            skip.append(f"{tg.name}: no receipt")
+            continue
+        try:
+            claimed = {f.get("path") for f
+                       in json.loads(rc.read_text(encoding="utf-8")).get("files", [])}
+        except ValueError:
+            # An arm that deliberately corrupted its own receipt. Announced below rather than
+            # skipped quietly: a skip that looks like a pass is indistinguishable from coverage.
+            skip.append(f"{tg.name}: receipt is not JSON")
+            continue
+        for ln in o.read_text(encoding="utf-8").splitlines():
+            vb = next((v for v in verbs if ln.startswith(v)), None)
+            if vb is None:
+                continue
+            fs = ln[len(vb):].split(" — ")[0].split()
+            if not fs or fs[0] in claimed:
+                continue
+            in_index = subprocess.run(["git", "-C", str(tg), "ls-files", "--", fs[0]],
+                                      capture_output=True, text=True).stdout.strip()
+            if (tg / fs[0]).exists() or in_index:
+                loss.append(f"{tg.name}/{o.name}: {fs[0]}")
+    check(f"[-18] AC4 over EVERY rollback order under {where}, no path that order names ends "
+          "absent from the receipt while the target still holds it in the worktree or the index",
+          not loss, "; ".join(loss[:8]))
+    # NOT a `check`: an arm whose condition is a constant is green by construction and this is a
+    # REPORT, not an assertion. The row above is only as wide as this line says it is.
+    print(f"     [-18] S4 sweep over {where}: {len(orders)} order(s) graded, ungradable — "
+          + ("; ".join(skip) or "none"))
+
+
 
 def check_retired_flags(module_path: pathlib.Path = GOVKIT) -> None:
     """Assert every name in `RETIRED_FLAGS` survives under NO spelling in ONE module's text.
@@ -11947,6 +12001,12 @@ user_skills = "/tmp/gk-fake-skills"
               and not (_pvtm / ".git" / "harness-migration-ready").exists(),
               f"rc {_pvmb2c.returncode}: " + _pvmb2c.stdout[-700:])
 
+        # ---- DEPL-cMendedVintage-18 S4, over EVERY rollback order the main scratch holds, run
+        # ---- while that scratch still exists. This sweep sat at the end of the file, past this
+        # ---- block's exit, and graded only what the later fixtures re-created under the same
+        # ---- path: 2 orders, under a floor of 3 measured when the sweep was inside the block.
+        check_rollback_orders(tmp, "the main scratch", 3)
+
 
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #
@@ -12945,55 +13005,13 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- next `update` cannot classify those bytes and `check` reports them as an unclaimed
         # ---- source, which is the shape `-15` closed for the `.gitattributes` block and `-2` left
         # ---- behind for a withdrawal. Asserting it on the one fixture written to satisfy it would
-        # ---- certify that fixture and say nothing about the arms that already existed.
-        # ----
-        # ---- PRESENT MEANS THE INDEX TOO, and that half is what does the work rather than a
-        # ---- second read for symmetry. MEASURED on this unit's own fixture: `update-index`
-        # ---- re-staged the pre-run blob and `checkout-index` then refused, so the WORKTREE file
-        # ---- was absent and the bytes sat in the index. A worktree-only invariant stays green
-        # ---- over the exact defect this unit closes.
-        # ----
-        # ---- THE POPULATION IS DISCOVERED, never listed: every rollback order under every target
-        # ---- this suite built, and the paths graded are the ones that order itself names. A new
-        # ---- arm that rolls anything back is covered without being added to anything.
-        _18_ORDERS = [_q for _d in ("", "*/", "*/*/", "*/*/*/")
-                      for _q in tmp.glob(_d + ".governance/outbox/update-rollback-*.md")]
-        check("[-18] S4 LIVENESS the sweep found rollback orders to grade at all — over an empty "
-              "population it would report a reassuring zero indistinguishable from a clean run",
-              len(_18_ORDERS) >= 3, f"{len(_18_ORDERS)} order(s) under the scratch root")
-        _18_VERBS = ("NOT restored ", "left alone ", "restored ", "removed ")
-        _18_LOSS: list[str] = []
-        _18_SKIP: list[str] = []
-        for _o18 in _18_ORDERS:
-            _tg18 = _o18.parents[2]
-            _rc18 = _tg18 / ".governance" / "install.json"
-            if not _rc18.is_file():
-                _18_SKIP.append(f"{_tg18.name}: no receipt")
-                continue
-            try:
-                _cl18 = {_f.get("path") for _f
-                         in json.loads(_rc18.read_text(encoding="utf-8")).get("files", [])}
-            except ValueError:
-                # An arm that deliberately corrupted its own receipt. Announced below rather than
-                # skipped quietly: a skip that looks like a pass is indistinguishable from coverage.
-                _18_SKIP.append(f"{_tg18.name}: receipt is not JSON")
-                continue
-            for _ln18 in _o18.read_text(encoding="utf-8").splitlines():
-                _vb18 = next((_v for _v in _18_VERBS if _ln18.startswith(_v)), None)
-                if _vb18 is None:
-                    continue
-                _fs18 = _ln18[len(_vb18):].split(" — ")[0].split()
-                if not _fs18 or _fs18[0] in _cl18:
-                    continue
-                if (_tg18 / _fs18[0]).exists() or gout(_tg18, "ls-files", "--", _fs18[0]).strip():
-                    _18_LOSS.append(f"{_tg18.name}/{_o18.name}: {_fs18[0]}")
-        check("[-18] AC4 over EVERY rollback order this suite produced, no path that order names "
-              "ends absent from the receipt while the target still holds it in the worktree or the "
-              "index", not _18_LOSS, "; ".join(_18_LOSS[:8]))
-        # NOT a `check`: an arm whose condition is a constant is green by construction and this is a
-        # REPORT, not an assertion. The row above is only as wide as this line says it is.
-        print(f"     [-18] S4 sweep: {len(_18_ORDERS)} order(s) graded, ungradable — "
-              + ("; ".join(_18_SKIP) or "none"))
+        # ---- certify that fixture and say nothing about the arms that already existed. The
+        # ---- sweep itself is `check_rollback_orders`, beside `check` at the top of this file.
+        # THE SECOND SWEEP. `tmp` was torn down when the main scratch block closed above and was
+        # re-created by the fixtures built since, so this call sees only those: the m13 and
+        # v14-reap targets, two orders between them. The main scratch is swept where it still
+        # exists, at the end of its own block; a single sweep here graded 2 of the suite's ~6.
+        check_rollback_orders(tmp, "the late scratch (m13, v14-reap)", 2)
 
     print()
     if FAILURES:
