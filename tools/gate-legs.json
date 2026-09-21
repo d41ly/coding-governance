@@ -293,6 +293,17 @@
     "ceiling": 900
   },
   {
+    "name": "row-driver view refusal",
+    "argv": [
+      "python3",
+      "tools/memory-tree/merge-rows.py",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "row-keyed merge driver replay",
     "argv": [
       "bash",

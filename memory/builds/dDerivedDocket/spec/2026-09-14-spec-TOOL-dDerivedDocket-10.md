@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-10 — driver refuses shard-into-view
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 10
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-10-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-10-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
@@ -107,8 +108,8 @@ A3).
 ### The refusal
 
 ```text
-merge(o, a, b, path):
-  view_a, view_b = is_family_view(a), is_family_view(b)      # the view unit's predicate, lazily imported
+merge(o, a, b, *, path):
+  view_a, view_b = check_family_view(a), check_family_view(b)   # the view unit's predicate, lazily imported
   if view_a != view_b:
       raise ViewShardRefused(recipe)                        # before skeleton, key merge or postcondition
   ... unchanged ...
@@ -163,7 +164,10 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
 | Identifier | Kind | Cell |
 |---|---|---|
 | `ViewShardRefused` | exception class | lexicon python class cell |
-| the class-keyed census helper | python function | lexicon python function cell; names pass `lexicon.py --suggest` first |
+| `measure_row_classes` | python function — the class-keyed census | lexicon python function cell; names pass `lexicon.py --suggest` first |
+| `check_build_backlog` | python function — does `%P` name a per-build backlog | same cell |
+| `resolve_view_layer` · `read_kit_conf` · `derive_kit_prefix` · `render_refusal_recipe` | python functions — the deferred view-layer seam and the recipe | same cell |
+| `write_conflict_body` · `derive_governed_paths` · `cmd_check` | python functions — the shared fail-closed body and the new mode | same cell |
 | `--check` | CLI mode of the driver | a flag |
 | `row-driver view refusal` | gate leg | a gate-legs key, claimed by the merge-driver dossier; an `[[exempt_leg]]` in `tools/govkit/registry.toml` (§8 F4) |
 
@@ -274,7 +278,7 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
   which the cost line above spells.
 - **AC10** — When `bash tools/memory-tree/merge-rows.test.sh` merges two branches that each
   re-rendered one fixture view with adjacent row changes, the driver takes its key path with no
-  refusal, and `gen_build_index.py --write` then exits 0 with the view byte-equal to a fresh render;
+  refusal — it prints its audit line and no refusal;
   and a shard-against-shard merge over a view base is not refused.
   Red when: the refusal keys on "either side is a view", which conflicts every concurrent re-render
   after the switch.
@@ -289,7 +293,7 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
 `row-keyed merge driver replay` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `govkit selfcheck` · `leg ceilings clear their evidenced maximum`
 
 New arm: `tools/memory-tree/merge-rows.test.sh` · a view-against-shard three-way, the three §18r.1 shapes the driver governs, an unimportable predicate, the two `BACKLOG.md` concurrency pairs, two re-rendered views, and two shards over a view base · the suite's grow-only floor on how many of its own cases actually execute the driver, the count its banner ratchet cannot see, raised by the executing cases these arms add; the suite is on the testsuite-count waiver
-New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-driver view refusal` leg · the attribute removed from a scratch `.gitattributes`, and a driver copy with the refusal disabled · none
+New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-driver view refusal` leg · the attribute removed from a scratch `.gitattributes`, a nested override of one per-build backlog, a driver copy with the refusal disabled, and a memory root nothing is filed under · none
 
 ## 8. Open questions
 
@@ -398,6 +402,45 @@ New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-drive
   merges with the driver wired for AC2, AC4, AC5 and AC10 — which is what the closing
   consolidation's §7 third field already assumed; under the old sentence that field named a `run`
   floor no added case could move.
+
+- rev-6 · 2026-09-21 · the build pass. Seven divergences, each written before the code it names.
+  (1) §4's pseudocode called the view predicate `is_family_view`; the shipped name is
+  `check_family_view`, which unit 7 chose for the lexicon's `check` verb. The spelling is corrected
+  in place — a spec naming a symbol that does not exist is a spec-tokens red and, worse, reads as a
+  second API.
+  (2) AC10 dropped its middle clause, which required `gen_build_index.py --write` to exit 0 over
+  the merged view with the result byte-equal to a fresh render. That clause grades the VIEW UNIT's
+  data-loss guard, which §3 puts OUT of this unit, and observing it needs a builds-mode tree the
+  generator can render whole — build READMEs under the slot contract, specs, the ask corpus — which
+  is a fixture unit 7 already owns in python and which this shell suite would carry as a second
+  copy. What AC10 keeps is the half this unit owns: two re-rendered views are not refused and reach
+  the key path, and a shard-against-shard merge over a view base is not refused either. To reverse,
+  restore the clause and build the fixture.
+  (3) The `--check` probe's family token is taken from the first governed `<m>/backlog/<F>.md` this
+  repo tracks, falling back to `PROBE` where none is. §4 did not say where it comes from, and the
+  two candidates it implied were worse: re-deriving the family list from `FAMILIES` is a third
+  spelling of a derivation two modules already own, and hard-coding a token makes the probe say
+  nothing about this corpus. The H1 pattern back-references the family, so the shape is
+  family-agnostic either way.
+  (4) `no_new_duplicates` takes the record keying as a keyword parameter (`ids`) rather than
+  branching inside itself, and `merge()` takes `path` as a KEYWORD-ONLY argument. The second is the
+  gotcha class `row-driver-emits-a-plausible-file-with-rows-missing.md` closed structurally: a
+  fourth positional beside three interchangeable line lists is the transposition that class names.
+  (5) The probe reports through ONE failure branch rather than two. Split as §4 implied, the
+  merged-clean branch is unreachable — with the refusal disabled this pair trips a postcondition
+  before it merges — and AC9 requires every fix to have been seen red.
+  (6) The suite's `--check` group gained a sixth arm: a fixture whose `MEMORY_ROOT` names a
+  directory nothing is filed under, asserting the empty-population refusal. AC6's Red-when is
+  exactly that shape and its own run is deferred to `VERIFYING`, so without this arm the refusal
+  would ship unobserved.
+  (7) §7's three-floor note is unchanged in substance and the numbers moved: the banner floor from
+  49 to 55 and the `run` floor from 40 to 42, the latter by the two `run` cases AC1's and AC3's
+  arms add, exactly as the closing consolidation's third field says. The arithmetic never-worse
+  floor does not move: both new `run` cases have a control that exits 1, so neither joins the
+  population that floor counts.
+  Each arm was observed RED with its own fix unstaged and green with it restored, by hand in
+  scratch repositories, per AC9's permission line; the pass's acceptance ledger names the nine
+  breaks and the arms each one reddened.
 
 ## 10. Reuse audit
 

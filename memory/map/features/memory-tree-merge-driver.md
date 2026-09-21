@@ -2,13 +2,13 @@
 
 ```toml
 feature = "memory-tree-merge-driver"
-title = "Row-keyed merge driver for memory/DECISIONS.md and memory/backlog/*.md"
+title = "Row-keyed merge driver for the authored indexes, and its view-against-shard refusal"
 status = "shipped"
 streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["row-keyed merge driver replay"]
+gate-legs = ["row-keyed merge driver replay", "row-driver view refusal"]
 kits = []
 git-hooks = []
 workflow-scripts = []
@@ -29,8 +29,9 @@ globs = [
 ## Constraints & why
 
 Two indexes in this tree are AUTHORED and appended to by every node — `memory/DECISIONS.md` and the
-four `memory/backlog/<FAMILY>.md` shards — so two nodes landing work in the same window collide on
-the same file. `merge=union` is the one-line answer and is rejected on measurement, not preference:
+`memory/backlog/<FAMILY>.md` shards — so two nodes landing work in the same window collide on
+the same file. A third class joins them at the per-build backlog switch-over: each build's own
+`builds/<slug>/BACKLOG.md`. `merge=union` is the one-line answer and is rejected on measurement, not preference:
 union never loses an id, but upstream measured it introducing a duplicate in 147 of 151 historical
 `DECISIONS.md` conflicts, and these files hold zero duplicate ids. A design that measured only LOSS
 concluded union was safe.
@@ -88,9 +89,35 @@ more often than git does fails the suite by name, and conflicting where git reso
 counted by name against a shrink-only constant (2 today: a row one side MOVED and the other
 DELETED, in both directions, and nothing else). Every case runs a control — two of twenty-eight
 groups did before kit 2.2 — but the ARITHMETIC comparison can only bind where the control EXITS 0,
-which is 16 of 40 cases and is floored so a fixture edit cannot quietly drop one. Saying it that
-precisely matters: a suite that reads stronger than it is, is how this driver shipped rc-0
-corruption twice.
+which is a minority of its cases and is floored so a fixture edit cannot quietly drop one. The
+suite's own PASS line derives that split and the three floors it holds; no count of them is written
+here, because a number typed beside a population it does not own is wrong at the next commit.
+Saying it that precisely matters: a suite that reads stronger than it is, is how this driver shipped
+rc-0 corruption twice.
+
+**A GENERATED VIEW IS NEVER MERGED WITH AN AUTHORED SHARD, and that refusal is the driver's, not a
+hook's.** After the switch-over `memory/backlog/<FAMILY>.md` is RENDERED from the per-build files,
+while a branch forked before it still edits that path as authored rows. Line-merging the two is
+damage in both directions — the shard's rows land inside a generated table nothing re-renders, or
+the render overwrites an author's work — so `merge()` classifies `%A` and `%B` with the view layer's
+own predicate BEFORE the skeleton, the key merge and every postcondition, and writes a whole-file
+conflict whose closing marker names the refusal, with the relocation recipe on stderr. The recipe is
+the view layer's ONE constant rendered at this install's derived prefix, so the four places an
+operator can meet it are four renderings of one text. It lives in the driver rather than in a hook
+because a hook runs from the node's primary tree and `--no-verify` skips it, while the driver runs
+inside every merge whose tree carries the attribute, on whichever node performs it. It fires where
+the POST-switch tree's attributes govern — a straggler merged into the default branch, `--squash`,
+and `rebase` — and not on the converse shape, where the straggler's own old driver runs.
+
+**Over a `builds/<slug>/BACKLOG.md` the duplicate postcondition keys by ROW CLASS, and that is a
+property of that grammar rather than a preference.** There every row about one ask leads with that
+ask's id — the ask, its SEV row, a status row naming it — so keying on the first id counts a SEV row
+filed on one branch and a KEEP on another as one id written three times against two, and the whole
+file conflicts on a pair a filer and a triager produce on ordinary work. The census therefore asks
+`backlog.extract_row` for each row's (class, target), keeping the real contest — two status rows for
+one target are one key twice — and dropping the false one. The switch is decided by `%P` and never
+sniffed from the content: guessing the grammar from the file would key the check on the grammar it
+is checking. The audit line names which census ran.
 
 **Failure is closed.** A merge driver that raises exits non-zero WITHOUT writing `%A`, and git then
 leaves the path unmerged holding OURS-only content with no markers — the incoming rows are simply
@@ -127,6 +154,15 @@ base section even where the adopter asked for one.
 pre-change behaviour, which is why the attribute and the config can land in one commit without a flag
 day, and why `check_merge_rows` exists to turn "declared" into "wired" per node.
 
+**The committed half has an UNHELD reader: `merge-rows.py --check`, the `row-driver view refusal`
+leg.** It derives the governed population from `.memory-tree.conf` and the index rather than listing
+it, REFUSES an empty one, asks `git check-attr` — never a grep of the declaration, which agrees with
+a tree where a nested `.gitattributes` overrides it — and then drives the refusal in memory over a
+view rendered by this install's own renderer. It is a repo-subject leg with no guard because both
+facts break from anywhere in the tree, and the replay suite that also covers them is HELD. What it
+cannot see is stated in its own header: whether a node configured the driver, whether an old
+branch's driver conflicts, and whether anyone resolves a refused conflict by discarding rows.
+
 ## Shared seams
 
 The anchor grammar is IMPORTED from `tools/memory-recall/extract.py` — `grammar_for(root)` for the id
@@ -145,8 +181,26 @@ population (which is derived by `git grep -l '^# >>> resolve_python'`). It exist
 `tools/check-wiring.sh`'s `first_of` supplies the two-layout path resolution both the driver and its
 wiring arm need (`tools/memory-recall/` here, `memory-recall/` in a copy-installed adopter).
 
+`tools/memory-tree/backlog.py` supplies three things the driver reads and never re-spells: the view
+predicate `check_family_view`, the row classifier `extract_row`, and `render_relocation_recipe` over
+the one `RELOCATION_RECIPE` constant. The dependency runs ONE way — `backlog.py` imports nothing
+here — and the import is deferred into its first call for the same reason the grammar import is.
+The family set that classifier is bound to comes from the grammar `anchors()` already resolved, so
+one declaration is read once; `tools/memory-tree/gen_build_index.py` supplies `GEN_HEADER` on the
+`--check` path alone, because it is the one place that decides what this install's generated header
+says.
+
 ## Gaps
 
+- **The refusal cannot reach the converse merge shape.** The default branch merged INTO a straggler
+  resolves the STRAGGLER's attributes and runs the driver that branch carries, which predates this
+  refusal entirely. What an operator reads there is the view header's own banner, and what catches
+  the result afterwards is the view unit's data-loss guard. Bounded and named rather than hidden:
+  nothing mechanical in this file reaches a tree it is not checked out in.
+- **Nothing stops a refused conflict being resolved by discarding rows.** The refusal buys a stop
+  and an instruction; taking theirs puts shard rows inside a generated table, and taking ours drops
+  them. The recipe says to relocate, the data-loss guard reds the first outcome at the next check,
+  and the second is a deliberate act no driver can distinguish from an intended one.
 - **Not packaged for adopters.** `adopt-memory-tree.sh` is untouched. A copy-installed memory-tree kit
   lands at `<root>/memory-tree/` and cannot reach `tools/lib/pyrun.sh` at all, so shipping the driver
   to adopters is a kit-layout change with its own blast radius. The driver already RESOLVES both

@@ -1500,6 +1500,117 @@ grep -q '^<<<<<<< ours (deleted)$' "$TMP/a" \
 { printf '# tooling backlog\n\n'; row TOOL-zFixture-1 one; } > "$TMP/b"
 run "an ordinary delete is still honoured silently" 0 "TOOL-zFixture-1 " TOOL-zFixture-2
 
+# THE VIEW LAYER'S OWN RENDERERS, never a fixture's copy of their output. A hand-typed view header
+# in this file would pass forever after the renderer stopped emitting it, which is the one failure a
+# refusal keyed on that header must not survive. `sys.dont_write_bytecode` goes FIRST in each block:
+# a suite that leaves `__pycache__` inside `tools/` dirties the tree it gates.
+render_view() {  # $1 = destination · $2 = family · rest: `<id>|<slug>|<filed>|<text>` ask specs
+  local dest=$1; shift
+  "$PY" - "$dest" "$@" <<'PYEOF'
+import os, pathlib, sys
+sys.dont_write_bytecode = True
+# $KIT_REL DOES NOT EXPAND HERE — this heredoc is quoted, so the shell passes the bytes through
+# verbatim. It is read from the environment, which is why the variable is exported at the top.
+_kit = os.environ.get("KIT_REL", "tools")
+sys.path.insert(0, _kit + "/memory-tree")
+import backlog as bk
+import gen_build_index as gb
+dest, family = sys.argv[1], sys.argv[2]
+asks = []
+for spec in sys.argv[3:]:
+    ident, slug, filed, text = spec.split("|", 3)
+    asks.append(bk.Ask(ident, "", slug, filed, False, text, "", 0))
+view = bk.render_family_view(family, asks, bk.Fold({}, {}, {}, {}), "memory",
+                             _kit + "/memory-tree", gb.GEN_HEADER)
+pathlib.Path(dest).write_bytes(view.encode("utf-8"))
+PYEOF
+}
+render_recipe() {  # $1 = destination; the relocation recipe's lines, from the view layer's constant
+  "$PY" - "$1" <<'PYEOF'
+import os, pathlib, sys
+sys.dont_write_bytecode = True
+_kit = os.environ.get("KIT_REL", "tools")
+sys.path.insert(0, _kit + "/memory-tree")
+import backlog as bk
+lines = bk.render_relocation_recipe(_kit + "/memory-tree", "memory")
+pathlib.Path(sys.argv[1]).write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
+PYEOF
+}
+# A `run` case driven by a SCRATCH copy of the driver rather than the tracked one. `$DRV` is word-split
+# by `run`, so a scratch path carrying a space would silently re-target the invocation; routing it
+# through a function keeps every argument quoted and lets the arm read exactly like any other case.
+SCRATCH_DRV=""
+scratch_driver() { "$PY" "$SCRATCH_DRV" "$@"; }
+
+# --- 48. A GENERATED VIEW AGAINST AN AUTHORED SHARD IS REFUSED, NEVER MERGED (AC1) ----------------
+# After the switch-over `memory/backlog/<F>.md` is RENDERED, and a branch forked before it still
+# edits that path as an authored shard. Line-merging the pair is damage in both directions: the
+# shard's rows land inside a generated table nothing re-renders, or the render overwrites an
+# author's rows. The driver classifies both sides before it merges anything and refuses.
+render_view "$TMP/view" TOOL
+grep -q 'live asks, family TOOL' "$TMP/view" \
+  || bad "view/shard: the rendered fixture view carries no family H1, so the predicate reads it as a shard and every arm in this group passes for the wrong reason"
+{ pre; row TOOL-zFixture-1 base; } > "$TMP/o"
+cp "$TMP/view" "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 theirs; } > "$TMP/b"
+run "a rendered view against an authored shard" 1 "TOOL-zFixture-1 TOOL-zFixture-2 "
+grep -q '^<<<<<<< ours$' "$TMP/a" || bad "view/shard: rc 1 with no markers is the marker-free-UU trap"
+grep -q '^>>>>>>> theirs (refused: view vs shard)$' "$TMP/a" \
+  || bad "view/shard: the closing marker does not name the refusal, so an author cannot tell it from an ordinary driver failure"
+grep -q 'live asks, family TOOL' "$TMP/a" || bad "view/shard: ours' view is not in the written conflict"
+grep -q '^- TOOL-zFixture-2 ' "$TMP/a" \
+  || bad "view/shard: theirs' incoming row vanished from the conflict — the silent-take-ours shape"
+# ...and the RECIPE reaches stderr, every line of it and VERBATIM. The relocation engine's
+# `--recipe` output is compared against these bytes, so a per-line prefix would break that compare.
+cp "$TMP/view" "$TMP/a"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" memory/backlog/TOOL.md 2>&1 >/dev/null)
+printf '%s\n' "$err" | grep -q 'REFUSED' \
+  || bad "view/shard: stderr carries no refusal — stderr was [$(printf '%s' "$err" | tr '\n' '|' | cut -c1-120)]"
+render_recipe "$TMP/recipe"
+nrecipe=0
+while IFS= read -r rline; do
+  nrecipe=$((nrecipe+1))
+  printf '%s\n' "$err" | grep -qF -- "$rline" \
+    || bad "view/shard: the refusal's stderr does not carry the recipe line [$rline]"
+done < "$TMP/recipe"
+# ...with the loop's own liveness assertion: an empty recipe would satisfy every iteration above by
+# having none, which is the vacuous-selector class this repo names.
+[ "$nrecipe" -ge 6 ] \
+  || bad "view/shard: the recipe rendered $nrecipe line(s), so the loop above asserts nothing"
+
+# --- 49. THE VIEW PREDICATE IS UNIMPORTABLE — FAIL CLOSED, NEVER TAKE OURS (AC3) ------------------
+# The predicate is imported the way the anchor grammar is, deferred into the first call, so an
+# import failure lands in `main()`'s fail-closed handler. At module scope it would kill the driver
+# BEFORE %A is written, and git then reports a conflict over ours-only content with no markers in
+# it — the incoming rows simply absent, nothing saying so.
+S=$(mkscratch); cp .memory-tree.conf "$S/"
+cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$S/tools/memory-recall/"
+cp $KIT_REL/memory-tree/backlog.py $KIT_REL/memory-tree/corpus_ids.py "$S/tools/memory-tree/"
+# `git init` AND NOT A TIDY-UP: `recall_conf.resolve` refuses a root that is not inside a git
+# repository, so without this the liveness control below fails for that reason and the broken-import
+# arm after it would be graded against a tree that never worked.
+git -C "$S" init -q -b main >/dev/null 2>&1 \
+  || bad "unimportable predicate: could not init the scratch repository"
+SCRATCH_DRV="$S/tools/memory-tree/merge-rows.py"
+# LIVENESS FIRST, and it is the half that makes the arm below mean anything: with an INTACT
+# backlog.py this same scratch driver merges an ordinary append collision clean, so the refusal
+# afterwards is attributable to the broken import rather than to an unusable scratch tree.
+{ pre; row TOOL-zFixture-1 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 ours; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 theirs; } > "$TMP/b"
+"$PY" "$SCRATCH_DRV" "$TMP/o" "$TMP/a" "$TMP/b" x >/dev/null 2>&1 \
+  || bad "unimportable predicate: the scratch driver cannot merge an ordinary append collision with an INTACT backlog.py, so the arm below would refuse for the wrong reason"
+printf 'this is not valid syntax(\n' > "$S/tools/memory-tree/backlog.py"
+{ pre; row TOOL-zFixture-1 base; } > "$TMP/o"
+{ pre; row TOOL-zFixture-1 'ours edited this row'; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 'INCOMING, theirs edited this row'; } > "$TMP/b"
+save_drv=$DRV; DRV=scratch_driver
+run "an unimportable view predicate fails CLOSED" 1 "TOOL-zFixture-1 "
+DRV=$save_drv
+grep -q 'INCOMING' "$TMP/a" \
+  || bad "unimportable predicate: the incoming row vanished — this is the silent-take-ours shape"
+grep -q '^<<<<<<< ours$' "$TMP/a" || bad "unimportable predicate: no conflict markers written"
+
 # --- 34. THE CONSERVATIVE TALLY — a redesign that trades a fix for a conflict must SHOW it (AC3) ---
 ncons=$(printf '%s' "$CONSERVATIVE" | grep -c . || true)
 if [ "$ncons" -gt "$CONSERVATIVE_CAP" ]; then
@@ -1584,6 +1695,261 @@ WT="$W-wt"; SCRATCH="$SCRATCH $WT"
   exit 0
 ) || st=1
 
+# ONE FIXTURE REPOSITORY BUILDER for every group below, wired exactly the way a node is: the
+# SHIPPED `merge-rows.sh` wrapper through `git config merge.rows.driver`, never `pyrun.sh` and never
+# a direct python call. The four sibling modules travel with it because the refusal reads the view
+# layer and the `--check` probe reads the generated header, and a fixture missing one of them would
+# fail closed for a reason that has nothing to do with the arm.
+mkfixrepo() {  # $1 = a directory -> a git repo on `main` with this kit wired as the row driver
+  local d=$1 mt=tools/memory-tree mr=tools/memory-recall lib=tools/lib
+  mkdir -p "$d/$mt" "$d/$mr" "$d/$lib" "$d/memory/backlog"
+  cp "$ROOT/.memory-tree.conf" "$d/"
+  cp "$ROOT/$mt/merge-rows.py" "$ROOT/$mt/merge-rows.sh" "$ROOT/$mt/backlog.py" \
+     "$ROOT/$mt/corpus_ids.py" "$ROOT/$mt/gen_build_index.py" "$d/$mt/"
+  cp "$ROOT/$mr/extract.py" "$ROOT/$mr/recall_conf.py" "$d/$mr/"
+  cp "$ROOT/$lib/pyrun.sh" "$ROOT/$lib/resolve-python.sh" "$d/$lib/"
+  git -C "$d" init -q -b main
+  git -C "$d" config user.email t@e
+  git -C "$d" config user.name t
+  git -C "$d" config core.autocrlf false
+  git -C "$d" config merge.rows.driver "bash $mt/merge-rows.sh %O %A %B %P"
+}
+
+# --- 50. WHERE THE REFUSAL REACHES: MERGE, SQUASH AND REBASE (AC2, design §18r.1) -----------------
+# Three operations resolve the POST-switch tree's attributes and therefore run this driver: a
+# straggler merged INTO the default branch, the same straggler squashed onto it, and the same
+# straggler rebased onto it. Each must stop conflicted on the view. The fourth shape — the default
+# branch merged INTO a straggler — runs the STRAGGLER's own old driver and is out of scope; the
+# view header's banner is what an operator reads there.
+F=$(mktemp -d); SCRATCH="$SCRATCH $F"
+mkfixrepo "$F"
+render_view "$F/view.md" TOOL
+(
+  cd "$F" || exit 2
+  printf 'memory/DECISIONS.md merge=rows\nmemory/backlog/*.md merge=rows\n' > .gitattributes
+  { printf '# tooling backlog\n\n'; row TOOL-zFixture-1 base; } > memory/backlog/TOOL.md
+  git add -A; git commit -q -m base
+  git check-attr merge -- memory/backlog/TOOL.md | grep -q 'merge: rows' \
+    || { echo "FAIL merge shapes: the fixture does not resolve memory/backlog/TOOL.md to merge=rows, so no shape below runs this driver at all"; exit 1; }
+  # The straggler forks HERE, while the file is still an authored shard.
+  git checkout -q -b straggler
+  row TOOL-zFixture-2 straggler >> memory/backlog/TOOL.md
+  git commit -q -am straggler
+  # ...and the default branch then switches that path over to the generated view.
+  git checkout -q main
+  cp view.md memory/backlog/TOOL.md
+  git commit -q -am switch-over
+  fail=0
+  for shape in merge squash rebase; do
+    case $shape in
+      merge)  out=$(git merge --no-edit straggler 2>&1) && rc=0 || rc=$? ;;
+      squash) out=$(git merge --squash straggler 2>&1) && rc=0 || rc=$? ;;
+      rebase) git checkout -q straggler
+              out=$(git rebase main 2>&1) && rc=0 || rc=$? ;;
+    esac
+    if [ "$rc" = 0 ]; then
+      echo "FAIL merge shapes: \`$shape\` completed CLEAN over a view against a straggler shard — this is the silent row loss or row injection the refusal exists to stop"
+      fail=1
+    fi
+    printf '%s\n' "$out" | grep -q 'REFUSED' || {
+      echo "FAIL merge shapes: \`$shape\` did not print the refusal: $(printf '%s' "$out" | tr '\n' '|' | cut -c1-160)"
+      fail=1; }
+    # ORDER MATTERS AND IS NOT TIDINESS. `--squash` sets no MERGE_HEAD, so `merge --abort` refuses
+    # there and the conflicted index survives; a checkout then refuses too and the NEXT shape is set
+    # up on a tree nobody reset. The hard reset goes BEFORE the checkout for that reason.
+    git merge --abort >/dev/null 2>&1
+    git rebase --abort >/dev/null 2>&1
+    git reset -q --hard >/dev/null 2>&1
+    git checkout -q -f main
+    git reset -q --hard main
+    git clean -qfd
+  done
+  exit "$fail"
+) || st=1
+
+# --- 51. TWO BRANCHES EDIT ONE builds/<slug>/BACKLOG.md (AC4, AC5) --------------------------------
+# The id half of `no_new_duplicates` counts a row by the first id on it, and in the per-build
+# backlog grammar EVERY row about one ask leads with that ask's id — the ask, its SEV row, a status
+# row naming it. So a SEV row filed on one branch and a KEEP on another count as one id written
+# three times against two, and the whole file conflicts on a pair a filer and a triager produce on
+# ordinary work. Keying by the classifier's (class, target) drops that false contest and keeps the
+# real one. The attribute line for this file class is the switch-over's to add; the fixture carries
+# it now so the driver is proved over the class BEFORE any such file exists.
+G=$(mktemp -d); SCRATCH="$SCRATCH $G"
+mkfixrepo "$G"
+(
+  cd "$G" || exit 2
+  mkdir -p memory/builds/zFix
+  printf 'memory/DECISIONS.md merge=rows\nmemory/backlog/*.md merge=rows\nmemory/builds/*/BACKLOG.md merge=rows\n' > .gitattributes
+  { printf '# zFix — the fixture build\n\n## Asks\n\n'
+    printf -- '- TOOL-zFixture-1 · filed 2026-09-21 · an ask two nodes will both touch\n'
+    printf '\n## Dispositions\n'; } > memory/builds/zFix/BACKLOG.md
+  git add -A; git commit -q -m base
+  git tag base_tag main
+  git check-attr merge -- memory/builds/zFix/BACKLOG.md | grep -q 'merge: rows' \
+    || { echo "FAIL backlog census: the fixture does not resolve memory/builds/zFix/BACKLOG.md to merge=rows, so neither pair below runs this driver"; exit 1; }
+  git branch -q side
+  fail=0
+  pair() {  # $1 = label · $2 = ours' row · $3 = theirs' row · $4 = the rc this pair must give
+    # `--abort` and `-f` FIRST: the second pair is set up after the first one deliberately left the
+    # index conflicted, and a plain checkout there refuses and takes the rest of the group with it.
+    git merge --abort >/dev/null 2>&1
+    git checkout -q -f main; git reset -q --hard base_tag; git clean -qfd
+    git checkout -q -f side; git reset -q --hard base_tag
+    printf '%s\n' "$3" >> memory/builds/zFix/BACKLOG.md; git commit -q -am theirs
+    git checkout -q -f main
+    printf '%s\n' "$2" >> memory/builds/zFix/BACKLOG.md; git commit -q -am ours
+    out=$(git merge --no-edit side 2>&1) && rc=0 || rc=$?
+    [ "$rc" = "$4" ] || { echo "FAIL backlog census: $1 exited $rc, expected $4: $(printf '%s' "$out" | tr '\n' '|' | cut -c1-160)"; fail=1; }
+  }
+  # (a) A SEV row on one branch and a KEEP on the other: two DIFFERENT record classes about one
+  # ask, which is honest concurrent work and must merge.
+  pair "a SEV row against a KEEP for one ask" \
+       "- SEV · TOOL-zFixture-1 · HIGH · it blocks a landing" \
+       "- KEEP · TOOL-zFixture-1 · still wanted" 0
+  for want in '^- SEV ' '^- KEEP ' '^- TOOL-zFixture-1 '; do
+    c=$(grep -c "$want" memory/builds/zFix/BACKLOG.md)
+    [ "$c" = 1 ] || { echo "FAIL backlog census: [$want] appears $c time(s) after the clean merge, expected exactly 1"; fail=1; }
+  done
+  grep -q '<<<<<<<' memory/builds/zFix/BACKLOG.md \
+    && { echo "FAIL backlog census: conflict markers in a file the merge reported clean"; fail=1; }
+  # (b) ...and TWO STATUS ROWS for one ask still fail closed. One class twice is a real contest and
+  # V4 forbids it anyway; trading a loud conflict for a verdict discovered later is not a trade.
+  pair "two status rows for one ask" \
+       "- CLOSED · TOOL-zFixture-1 · by 1234abc · shipped" \
+       "- KEEP · TOOL-zFixture-1 · still wanted" 1
+  exit "$fail"
+) || st=1
+# ...and WITHOUT %P the generic census runs, and the audit line says which one did. A driver handed
+# three blobs and no path cannot know the file's grammar, and guessing it from the content would key
+# the check on the grammar it is checking. The pair here is two DISJOINT asks, which both censuses
+# resolve: the arm is about which one the line NAMES, and a pair only one of them resolves prints no
+# audit line at all on the other side of the comparison.
+{ printf '# zFix\n\n## Asks\n\n'
+  printf -- '- TOOL-zFixture-1 · filed 2026-09-21 · an ask\n'; } > "$TMP/o"
+{ printf '# zFix\n\n## Asks\n\n'
+  printf -- '- TOOL-zFixture-1 · filed 2026-09-21 · an ask\n'
+  printf -- '- TOOL-zFixture-2 · filed 2026-09-21 · an ask ours filed\n'; } > "$TMP/a"
+{ printf '# zFix\n\n## Asks\n\n'
+  printf -- '- TOOL-zFixture-1 · filed 2026-09-21 · an ask\n'
+  printf -- '- TOOL-zFixture-3 · filed 2026-09-21 · an ask theirs filed\n'; } > "$TMP/b"
+cp "$TMP/a" "$TMP/a.keep"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" memory/builds/zFix/BACKLOG.md 2>&1 >/dev/null)
+printf '%s\n' "$err" | grep -q 'census class-keyed' \
+  || bad "backlog census: %P named a builds BACKLOG.md and the audit line does not say class-keyed — stderr was [$(printf '%s' "$err" | tr '\n' '|' | cut -c1-160)]"
+cp "$TMP/a.keep" "$TMP/a"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" 2>&1 >/dev/null)
+printf '%s\n' "$err" | grep -q 'census generic' \
+  || bad "backlog census: %P was omitted and the audit line does not name the generic census — stderr was [$(printf '%s' "$err" | tr '\n' '|' | cut -c1-160)]"
+# ...and %P naming an ORDINARY governed index keeps the generic census too, so the class-keyed
+# branch is scoped to the file class whose grammar needs it and to nothing else.
+cp "$TMP/a.keep" "$TMP/a"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" memory/backlog/TOOL.md 2>&1 >/dev/null)
+printf '%s\n' "$err" | grep -q 'census generic' \
+  || bad "backlog census: %P named memory/backlog/TOOL.md and the audit line does not name the generic census — stderr was [$(printf '%s' "$err" | tr '\n' '|' | cut -c1-160)]"
+
+# --- 52. TWO RE-RENDERED VIEWS, AND TWO SHARDS OVER A VIEW BASE, ARE NOT REFUSED (AC10) -----------
+# The refusal keys on the two sides DISAGREEING, never on "either side is a view". Keyed the other
+# way it would conflict every concurrent re-render after the switch — the ordinary shape, not the
+# exception — and every merge of two straggler branches whose common ancestor had already switched.
+render_view "$TMP/v1" TOOL 'TOOL-zFixture-1|zFix|2026-09-21|the first ask, as ours re-rendered it' \
+                           'TOOL-zFixture-2|zFix|2026-09-21|the second ask'
+render_view "$TMP/v2" TOOL 'TOOL-zFixture-1|zFix|2026-09-21|the first ask' \
+                           'TOOL-zFixture-2|zFix|2026-09-21|the second ask, as theirs re-rendered it'
+render_view "$TMP/v0" TOOL 'TOOL-zFixture-1|zFix|2026-09-21|the first ask' \
+                           'TOOL-zFixture-2|zFix|2026-09-21|the second ask'
+grep -q 'TOOL-zFixture-1' "$TMP/v0" \
+  || bad "re-rendered views: the fixture view carries no data row, so the merge below is over two headers and proves nothing"
+cp "$TMP/v0" "$TMP/o"; cp "$TMP/v1" "$TMP/a"; cp "$TMP/v2" "$TMP/b"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" memory/backlog/TOOL.md 2>&1 >/dev/null) || true
+printf '%s\n' "$err" | grep -q 'REFUSED' \
+  && bad "re-rendered views: the driver refused a view against a view, which conflicts every concurrent re-render after the switch"
+printf '%s\n' "$err" | grep -q '^merge-rows: rows ' \
+  || bad "re-rendered views: the driver printed no audit line, so it never reached its key path — stderr was [$(printf '%s' "$err" | tr '\n' '|' | cut -c1-160)]"
+# ...and the converse base: two authored SHARDS whose common ancestor was already a view. Neither
+# side is a view, the sides agree, and nothing is refused.
+cp "$TMP/v0" "$TMP/o"
+{ pre; row TOOL-zFixture-1 ours; } > "$TMP/a"
+{ pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 theirs; } > "$TMP/b"
+err=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" memory/backlog/TOOL.md 2>&1 >/dev/null) || true
+printf '%s\n' "$err" | grep -q 'REFUSED' \
+  && bad "shard over a view base: the driver refused a shard against a shard because the BASE was a view — the refusal reads %O, which it must not"
+
+# --- 53. THE REPO-SUBJECT --check MODE (AC7, AC11) ------------------------------------------------
+# Two facts a commit anywhere in the tree can break and no unheld leg watched before this one: the
+# attribute still routes every governed path here, and the refusal still fires. Both are asserted
+# over fixture repositories, where the attribute can be REMOVED and the refusal DISABLED and each
+# arm watched going red — which is what the leg's own run over the real tree cannot do.
+mkcheckrepo() {  # $1 = directory · $2 = shards|builds · $3 = extra .gitattributes lines (may be "")
+  local d=$1 mode=$2 extra=$3
+  mkfixrepo "$d"
+  ( cd "$d" || exit 2
+    sed -i 's/^BACKLOG_MODE=.*$//' .memory-tree.conf 2>/dev/null
+    printf '\nBACKLOG_MODE=%s\nASK_CUTOFF="2026-09-01"\n' "$mode" >> .memory-tree.conf
+    mkdir -p memory/backlog
+    printf '# Decisions\n\n' > memory/DECISIONS.md
+    printf '# tooling backlog\n\n' > memory/backlog/TOOL.md
+    printf 'memory/DECISIONS.md merge=rows\nmemory/backlog/*.md merge=rows\nmemory/builds/*/BACKLOG.md merge=rows\n%s' "$extra" > .gitattributes
+    git add -A; git commit -q -m base )
+}
+check_says() {  # $1 = label · $2 = repo · $3 = expected rc · $4 = a string the output must carry
+  local out rc
+  out=$("$PY" "$2/tools/memory-tree/merge-rows.py" --check 2>&1) && rc=0 || rc=$?
+  [ "$rc" = "$3" ] || bad "--check $1: rc=$rc, expected $3 — output was [$(printf '%s' "$out" | tr '\n' '|' | cut -c1-200)]"
+  printf '%s\n' "$out" | grep -qF -- "$4" \
+    || bad "--check $1: the output does not carry [$4] — output was [$(printf '%s' "$out" | tr '\n' '|' | cut -c1-200)]"
+}
+# (a) A builds-mode tree tracking TWO per-build backlogs counts both. AC6 cannot see a mis-rooted
+# selector for this class, because DECISIONS.md and the shards keep its count above zero.
+C=$(mktemp -d); SCRATCH="$SCRATCH $C"
+mkcheckrepo "$C" builds ""
+( cd "$C" || exit 2
+  mkdir -p memory/builds/zOne memory/builds/zTwo
+  printf '# zOne\n\n## Asks\n\n' > memory/builds/zOne/BACKLOG.md
+  printf '# zTwo\n\n## Asks\n\n' > memory/builds/zTwo/BACKLOG.md
+  git add -A; git commit -q -m builds )
+check_says "a builds tree counts both per-build backlogs" "$C" 0 "4 governed path(s) resolve merge=rows"
+check_says "a builds tree names its mode" "$C" 0 "mode builds"
+# (b) ...one of those two files' attribute overridden in a nested .gitattributes, which is exactly
+# what a grep of the root declaration cannot see.
+( cd "$C" || exit 2
+  printf 'BACKLOG.md -merge\n' > memory/builds/zTwo/.gitattributes
+  git add -A; git commit -q -m override )
+check_says "a nested override is caught" "$C" 1 "memory/builds/zTwo/BACKLOG.md"
+# (c) ...and a builds tree with NO per-build backlog tracked yet announces that and passes: a young
+# builds tree is legal, and a silently empty half is the vacuous-selector class.
+D=$(mktemp -d); SCRATCH="$SCRATCH $D"
+mkcheckrepo "$D" builds ""
+check_says "a young builds tree announces its empty half" "$D" 0 "no tracked memory/builds/*/BACKLOG.md yet"
+# (d) THE SHARDS-MODE TREE with the backlog attribute REMOVED. The population is derived from the
+# conf and the index, so the shard is still governed and must still be named.
+E=$(mktemp -d); SCRATCH="$SCRATCH $E"
+mkcheckrepo "$E" shards ""
+check_says "a shards tree passes before the break" "$E" 0 "view refusal armed"
+( cd "$E" || exit 2
+  printf 'memory/DECISIONS.md merge=rows\n' > .gitattributes
+  git add -A; git commit -q -m 'drop the backlog attribute' )
+check_says "the removed backlog attribute is named" "$E" 1 "memory/backlog/TOOL.md"
+# (e) ...and the PROBE half, with the refusal disabled in a copy of the driver. Without this the
+# whole mode could pass on a tree where the attribute is perfect and the refusal has been deleted.
+P=$(mktemp -d); SCRATCH="$SCRATCH $P"
+mkcheckrepo "$P" shards ""
+sed 's/^    if view_a != view_b:$/    if view_a != view_b and False:/' \
+    "$P/tools/memory-tree/merge-rows.py" > "$P/tools/memory-tree/merge-rows.disabled"
+cmp -s "$P/tools/memory-tree/merge-rows.py" "$P/tools/memory-tree/merge-rows.disabled" \
+  && bad "--check disabled refusal: the staged break changed nothing, so the arm below runs the UNMODIFIED driver and proves nothing"
+mv "$P/tools/memory-tree/merge-rows.disabled" "$P/tools/memory-tree/merge-rows.py"
+check_says "a disabled refusal is caught by the probe" "$P" 1 "view-against-shard probe"
+# (f) ...and an EMPTY governed population REFUSES. Every assertion in this mode is over that
+# population, so a selector rooted at a directory this repo does not use would pass by finding
+# nothing — the one shape a check must not have, and the one AC6's liveness rests on.
+Q=$(mktemp -d); SCRATCH="$SCRATCH $Q"
+mkcheckrepo "$Q" shards ""
+( cd "$Q" || exit 2
+  printf '\nMEMORY_ROOT=nowhere\n' >> .memory-tree.conf
+  git add -A; git commit -q -m 'a memory root nothing is filed under' )
+check_says "an empty governed population refuses" "$Q" 1 "no tracked path under nowhere/"
+
 # The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
 # coverage and goes stale the first time a group is added without touching it. The floor is a
 # RATCHET — raised with the groups, never left behind, or a deleted group passes as a green run.
@@ -1594,8 +1960,8 @@ WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 49 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 49 — a group was deleted"
-[ "$nruns" -ge 40 ] || bad "only $nruns 'run' case(s) remain, expected at least 40 — a group was emptied while its banner stayed, which the banner count cannot see"
+[ "$ngroups" -ge 55 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 55 — a group was deleted"
+[ "$nruns" -ge 42 ] || bad "only $nruns 'run' case(s) remain, expected at least 42 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
 exit "$st"

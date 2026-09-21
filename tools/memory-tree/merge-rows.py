@@ -11,6 +11,30 @@ Auto-resolves the index conflicts that are pure append-collisions — two nodes 
 `memory/DECISIONS.md` or `memory/backlog/<FAMILY>.md` — without duplicating a record, ENFORCED by
 postconditions on the written bytes rather than assumed from the keying.
 
+WHICH FILES IT GOVERNS, and it is three classes rather than two since the per-build backlog landed.
+`memory/DECISIONS.md` and the `memory/backlog/<FAMILY>.md` shards, always; and each build's own
+`memory/builds/<slug>/BACKLOG.md` once the switch-over adds that attribute line. The third class is
+why `%P` is read at all: over a `BACKLOG.md` the duplicate postcondition keys each row by the ROW
+CLASS the kit's one classifier assigns (`backlog.extract_row`) instead of by the first id on the
+line, because in that grammar every row about one ask — the ask, its SEV row, a status row naming
+it — leads with that ask's id, and first-id keying therefore conflicts on a pair a filer and a
+triager produce on ordinary work. The audit line names which census ran.
+
+A GENERATED VIEW IS NEVER MERGED WITH AN AUTHORED SHARD. After the switch-over
+`memory/backlog/<FAMILY>.md` is RENDERED from the per-build files, and a branch forked before it
+still edits that path as an authored shard. Line-merging those two is silent damage in both
+directions — the shard's rows land inside a generated table nothing re-renders, or the view's rows
+overwrite an author's. So `merge()` classifies `%A` and `%B` with the view unit's own predicate
+before it does anything else, and refuses the pair with a whole-file conflict plus the relocation
+recipe on stderr. The recipe is the view layer's ONE constant, rendered at THIS install's prefix.
+
+WHAT THE REFUSAL DOES NOT COVER, said out loud because a structural refusal reads as a total one.
+It fires only where the POST-switch tree's attributes govern: a straggler merged into the default
+branch, `git merge --squash`, `git rebase` and `git pull --rebase` of one. The default branch merged
+INTO a straggler runs the STRAGGLER's own old driver and is not reached here — the view header's
+banner is what the operator reads there. It cannot stop a conflict being resolved by hand in favour
+of the shard, and it says nothing about whether a node configured `merge.rows.driver` at all.
+
 WHY NOT `merge=union`, which is one line of config and no code. Tested with git's own driver over
 every historical conflict upstream: union never LOSES an id (0 of 441) but INTRODUCES a duplicate in
 147 of 151 `DECISIONS.md` conflicts and 118 of 121 backlog conflicts. Those files hold zero duplicate
@@ -119,8 +143,15 @@ unterminated final row while theirs appends a terminated one made rule 3 emit ou
 empty terminator rode along, and `"".join` FUSED TWO RECORDS ONTO ONE LINE at rc 0 with no markers
 and a `clean` audit line, where the `git merge-file` control returns rc 1 with both rows intact.
 
-Exit 0 = merged clean. Exit 1 = conflict markers written to %A; git leaves the path unmerged.
-Exit 2 = called with fewer than the three input paths (usage).
+THE `--check` MODE is not a merge. `merge-rows.py --check` takes no blobs: it asks `git check-attr`
+whether every tracked governed path still resolves `merge=rows`, and then drives `merge()` in memory
+over a view rendered by the view unit's own renderer against an authored shard, asserting the
+refusal fires. It is a REPO-subject gate leg for that reason — the attribute and the refusal are two
+facts a commit anywhere in the tree can break, and the replay suite that also covers them is held.
+Its own header states what it cannot see.
+
+Exit 0 = merged clean, or `--check` passed. Exit 1 = conflict markers written to %A (git leaves the
+path unmerged), or `--check` failed. Exit 2 = called with fewer than the three input paths (usage).
 """
 # Annotations as strings, the same house rule `extract.py` and `map_lib.py` follow. `resolve_python`
 # imposes NO version floor — every candidate is accepted on `-c "import sys"` alone — so the
@@ -214,6 +245,96 @@ def key(line: str) -> str | None:
     """The record id this line anchors, or None if it anchors none."""
     anchor_at, grammar = anchors()
     return anchor_at(line, grammar)
+
+
+_VIEW_LAYER = None
+_KIT_CONF = None
+
+
+def resolve_view_layer():
+    """This kit's own `backlog.py` — the view predicate, the row classifier and the ONE recipe.
+
+    LAZY for `anchors()`'s reason and not for tidiness: at module scope an import failure kills the
+    driver BEFORE `main()` can write `%A`, and git then leaves the path unmerged holding OURS-only
+    content with no markers. Raised from in here it lands in the fail-closed handler and the author
+    gets conflict markers instead of a quietly truncated file.
+
+    APPEND, never `insert(0, …)`, for the reason spelled at the memory-recall append above: this
+    directory carries module names of its own and prepending it would let one shadow a stdlib
+    module. Running as `__main__` already puts this directory first, so the append is what makes the
+    import work when the driver is IMPORTED rather than run — which `--check` does.
+    """
+    global _VIEW_LAYER
+    if _VIEW_LAYER is None:
+        sys.path.append(str(pathlib.Path(__file__).resolve().parent))
+        import backlog as BK  # noqa: PLC0415 — deliberately deferred; see above
+        _VIEW_LAYER = BK
+    return _VIEW_LAYER
+
+
+def read_kit_conf() -> dict:
+    """`.memory-tree.conf` at the anchor root, through the kit's ONE parser.
+
+    The defaults are the READER's, which is the house rule `corpus_ids.load_conf` writes down: one
+    merged defaults dict would hand every reader keys it has no use for and hide which reader
+    depends on which. FAMILIES is deliberately NOT read here — the family set the driver keys on is
+    the one `anchors()` already resolved, and a second derivation from the same declaration is the
+    two-answers-to-one-question class.
+    """
+    global _KIT_CONF
+    if _KIT_CONF is None:
+        root = _anchor_root()
+        sys.path.append(str(pathlib.Path(__file__).resolve().parent))
+        import corpus_ids as CI  # noqa: PLC0415 — deliberately deferred; see above
+        conf = {"MEMORY_ROOT": "memory", "BACKLOG_MODE": ""}
+        with open(root / ".memory-tree.conf", "r", encoding="utf-8",
+                  errors="surrogateescape") as fh:
+            CI.parse_conf(fh.read(), conf)
+        _KIT_CONF = conf
+    return _KIT_CONF
+
+
+def derive_kit_prefix() -> str:
+    """This kit's install prefix relative to the anchor root — DERIVED, never spelled.
+
+    The recipe below is a command an operator pastes, and this file is COPY-INSTALLED at whatever
+    prefix an adopter chose, so a literal `tools/memory-tree` here would render a dead command in
+    their tree. AN EMPTY DERIVATION REFUSES (charter §12): `render_relocation_recipe` refuses one
+    too, and refusing twice costs nothing against rendering `python /migrate_backlog.py`, which
+    looks like an instruction and is not one.
+    """
+    rel = pathlib.Path(__file__).resolve().parent.relative_to(_anchor_root()).as_posix()
+    if not rel or rel == ".":
+        raise RuntimeError(
+            "this kit resolves to no prefix under its own anchor root, so the relocation recipe "
+            "would name a command that cannot run")
+    return rel
+
+
+def render_refusal_recipe() -> list:
+    """The relocation recipe's lines, from the view layer's ONE constant, at this install's prefix.
+
+    Rendered where the refusal is RAISED and not where it is printed. A failure here must land in
+    `main()`'s fail-closed handler, which writes a conflict; raised from the handler itself it would
+    kill the process after nothing had been written, which is the silent-take-ours shape again.
+    """
+    return resolve_view_layer().render_relocation_recipe(
+        derive_kit_prefix(), read_kit_conf()["MEMORY_ROOT"].strip().strip("/") or "memory")
+
+
+class ViewShardRefused(RuntimeError):
+    """One side is a GENERATED family view and the other an AUTHORED shard. Never auto-resolved.
+
+    Not a postcondition and not a failure of this driver: it is the one pair whose CORRECT merge is
+    no merge at all. The rows on the shard side belong in a build's own `BACKLOG.md` and get there
+    by relocation, so line-merging them into a rendered table either buries them where nothing
+    re-renders them or overwrites an author's work with a render. Carries the recipe it was raised
+    with, because rendering it inside the handler would put a raise where nothing has been written.
+    """
+
+    def __init__(self, message: str, recipe: list):
+        super().__init__(message)
+        self.recipe = recipe
 
 
 class DuplicatedContent(RuntimeError):
@@ -338,6 +459,60 @@ def row_ids(lines: list[str]) -> dict[str, int]:
     return out
 
 
+# `%P` NAMES A PER-BUILD BACKLOG when it matches this, and the census keys by row class there. The
+# pattern is deliberately unanchored at the front: git hands the driver a repo-relative path, but a
+# scratch fixture and an adopter's memory root both put a different number of segments in front of
+# `builds/`, and the segment that decides is the FOLDER the file sits in.
+_BUILD_BACKLOG_RE = re.compile(r"(?:^|/)builds/[^/]+/BACKLOG\.md$")
+
+
+def check_build_backlog(path: str | None) -> bool:
+    """Does `%P` name a `builds/<slug>/BACKLOG.md`? Absent `%P` answers False and keeps the generic
+    census, which is the honest disposition: a driver called with three blobs and no path cannot
+    know which grammar the file follows, and guessing one from the content would key the check on
+    the same grammar it is checking."""
+    if not path:
+        return False
+    return bool(_BUILD_BACKLOG_RE.search(path.replace("\\", "/")))
+
+
+def measure_row_classes(lines: list[str]) -> dict[str, int]:
+    """How many rows carry each record key, by the kit's ONE row classifier.
+
+    THE REPLACEMENT FOR `row_ids` OVER A `BACKLOG.md`, and the reason is the grammar rather than a
+    preference. There, every row about one ask leads with that ask's id — the ask itself, its SEV
+    row, a status row naming it — so `row_ids` counts a SEV row added on one branch and a KEEP added
+    on another as one id written three times against two, and the whole file conflicts on a pair a
+    filer and a triager produce on ordinary work. Keying by (class, target) drops that false contest
+    and keeps the real one: two status rows for one target are still one key twice.
+
+    A provenance row keys on its target AND its sha, because two RELOCATED rows for one target from
+    two different merges are two records and not a duplicate.
+
+    A row the classifier cannot place falls back to the generic first-id key — that is the very
+    population the id half was written for — and the namespaces are prefixed so the two cannot
+    collide. The families come from the grammar `anchors()` already resolved, never from a second
+    reading of the same declaration.
+    """
+    bk = resolve_view_layer()
+    _, g = anchors()
+    grammar = bk.build_grammar(g.families)
+    out: dict[str, int] = {}
+    for ln in lines:
+        if not _ROW_RE.match(ln):
+            continue
+        row = bk.extract_row(ln.strip(), grammar)
+        if row is None or row.cls == "unknown" or not row.target:
+            m = _ID_RE.search(ln)
+            if m:
+                out["id:" + m.group(0)] = out.get("id:" + m.group(0), 0) + 1
+            continue
+        k = (f"provenance:{row.target}:{row.value}" if row.cls == "provenance"
+             else f"{row.cls}:{row.target}")
+        out[k] = out.get(k, 0) + 1
+    return out
+
+
 def _over(merged: dict[str, int], inputs: list[dict[str, int]]) -> list[tuple]:
     """Everything written more often than the most any ONE input carried it.
 
@@ -353,8 +528,8 @@ def _over(merged: dict[str, int], inputs: list[dict[str, int]]) -> list[tuple]:
     return sorted((s, n, cap.get(s, 0)) for s, n in merged.items() if n > 1 and n > cap.get(s, 0))
 
 
-def no_new_duplicates(merged: list[str], *inputs: list[str]) -> None:
-    """Refuse to write a row, or an id, more times than the most any ONE input carried it.
+def no_new_duplicates(merged: list[str], *inputs: list[str], ids=row_ids) -> None:
+    """Refuse to write a row, or a record key, more times than the most any ONE input carried it.
 
     The backstop for everything the anchor grammar cannot key. The row plane guarantees conservation
     for every key; this is the check that the KEYS themselves did not launder a duplicate — two
@@ -366,6 +541,11 @@ def no_new_duplicates(merged: list[str], *inputs: list[str]) -> None:
     each once, the cap holds, and the id lands twice in an append-only record at exit 0 — measured.
     So the same rule is lifted from line to record. The population is named at `_ID_RE`: a row-shaped
     line carrying an id and no anchor separator.
+
+    `ids` IS THE RECORD KEYING AND IT IS A PARAMETER, decided by the caller from `%P` rather than
+    sniffed from the content: `row_ids` for the id-anchored indexes, `measure_row_classes` for a
+    per-build `BACKLOG.md`, whose grammar puts one ask's id at the head of every row about it. The
+    line half is unchanged by either, because a line is a line in both grammars.
     """
     clean = settled(merged)
     sides = [settled(side) for side in inputs]
@@ -376,12 +556,12 @@ def no_new_duplicates(merged: list[str], *inputs: list[str]) -> None:
             f"{len(over)} row line(s) would be written more often than any single input carries "
             f"them, e.g. {s[:72]!r} x{n} against x{was}"
         )
-    over = _over(row_ids(clean), [row_ids(s) for s in sides])
+    over = _over(ids(clean), [ids(s) for s in sides])
     if over:
         s, n, was = over[0]
         raise DuplicatedContent(
-            f"{len(over)} id(s) would lead more rows than in any single input, e.g. {s!r} x{n} "
-            f"against x{was} — the same id minted on two nodes with different wording"
+            f"{len(over)} record key(s) would lead more rows than in any single input, e.g. "
+            f"{s!r} x{n} against x{was} — the same record written on two nodes in two wordings"
         )
 
 
@@ -1015,7 +1195,27 @@ def structure_identity(merged: list[str], skel: list[str]) -> None:
 
 # --------------------------------------------------------------------------------------------
 
-def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
+def merge(o_lines, a_lines, b_lines, *, path=None) -> tuple[list[str], bool]:
+    # `path` IS KEYWORD-ONLY, and that is the gotcha class
+    # `row-driver-emits-a-plausible-file-with-rows-missing.md` closed structurally rather than by
+    # care: a fourth POSITIONAL beside three interchangeable line lists is a transposition waiting
+    # to happen, and a transposed argument here yields a well-formed file with rows missing.
+    #
+    # THE VIEW/SHARD REFUSAL COMES FIRST — before the skeleton, the key merge and every
+    # postcondition. There is nothing to reconcile on this pair: one side is a generated table and
+    # the other is authored rows that belong in a build's own file, and any merge of them is damage
+    # in one direction or the other. Only the FIRST TWO LINES of each side are handed to the
+    # predicate, which is what makes it safe to ask mid-merge: the rest of either file may
+    # legitimately be a conflict.
+    bk = resolve_view_layer()
+    view_a = bk.check_family_view("".join(a_lines[:2]))
+    view_b = bk.check_family_view("".join(b_lines[:2]))
+    if view_a != view_b:
+        mine, yours = ("%A", "%B") if view_a else ("%B", "%A")
+        raise ViewShardRefused(
+            f"{mine} is a GENERATED family view and {yours} is an AUTHORED backlog shard, so one "
+            f"branch predates the per-build backlog; those rows are RELOCATED, never line-merged",
+            render_refusal_recipe())
     for name, side in (("%O", o_lines), ("%A", a_lines), ("%B", b_lines)):
         for n, ln in enumerate(side, 1):
             if _SENT in ln:
@@ -1051,7 +1251,9 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
     # list: a terminator defect is invisible in a list where two glued records are still two
     # elements, and both new postconditions passed a list-level reading of the exact corruption they
     # exist to catch.
-    no_new_duplicates(merged, o_lines, a_lines, b_lines)
+    by_class = check_build_backlog(path)
+    no_new_duplicates(merged, o_lines, a_lines, b_lines,
+                      ids=measure_row_classes if by_class else row_ids)
     no_misfiled_rows(merged, o_lines, a_lines, b_lines)
     no_row_loss(merged, resolved, facts)
     structure_identity(merged, skel)
@@ -1074,10 +1276,13 @@ def merge(o_lines, a_lines, b_lines) -> tuple[list[str], bool]:
             f"row conflict(s) plus {facts['regions']} structure conflict(s) — the audit line would "
             f"describe a file this is not")
     verdict = "CONFLICT" if conflicted else "clean"
+    # The census field sits BEFORE the verdict and the verdict stays last: the suite's audit arm
+    # reads the verdict off the end of the line, and every other field off a named neighbour.
     print(f"merge-rows: rows O/A/B {nrow(o_lines)}/{nrow(a_lines)}/{nrow(b_lines)} -> "
           f"{len(written)} written ({keyed} keyed, {len(written) - keyed} hashed), "
           f"{honoured} deletes honoured, {len(facts['conflicts'])} row conflicts, "
-          f"{facts['regions']} structure conflicts, {verdict}", file=sys.stderr)
+          f"{facts['regions']} structure conflicts, "
+          f"census {'class-keyed' if by_class else 'generic'}, {verdict}", file=sys.stderr)
     return merged, conflicted
 
 
@@ -1095,7 +1300,161 @@ def read(p: str) -> list[str]:
         return _lines(fh.read())
 
 
+def write_conflict_body(a: str, b: str, label: str) -> int:
+    """Rewrite `%A` as a whole-file conflict carrying BOTH sides. Always returns 1.
+
+    ONE body, TWO callers, and they differ only in the closing label. A merge driver that raises
+    exits non-zero WITHOUT writing `%A`, and git then leaves the path unmerged holding OURS-only
+    content with no conflict markers in it — the incoming rows are simply absent and nothing says
+    so. That is silent, unrecoverable loss, and it is strictly worse than the crash or the refusal
+    that caused it.
+
+    SITE 6 of the newline contract: the markers carry the dominant terminator, so a refusal on a
+    CRLF worktree file does not write three LF lines into it. And ours' own final line is terminated
+    before `=======` follows it — an unterminated last line is the ordinary shape of "one node's
+    editor left no trailing newline", and joining it to a marker is the same record-fusing defect
+    site 7 closes on the merge path.
+    """
+    try:
+        ours, theirs = read(a), read(b)
+    except Exception:  # noqa: BLE001 — cannot even read the inputs
+        return 1  # leave %A untouched and refuse
+    t = _dominant(ours, theirs)
+    cap = lambda side: [ln if ln.endswith(("\n", "\r")) else ln + t for ln in side]  # noqa: E731
+    body = ([_OPEN + " ours" + t] + cap(ours) + [_SEP + t] + cap(theirs)
+            + [_CLOSE + " " + label + t])
+    pathlib.Path(a).write_bytes("".join(body).encode("utf-8", "surrogateescape"))
+    return 1
+
+
+def derive_governed_paths(memory_root: str, mode: str, tracked) -> list:
+    """Every TRACKED path whose merges this driver must own, under the mode in hand.
+
+    Derived from the conf and the index, never listed: a hand-kept population is the half that goes
+    stale, and the one shape this check must not have is passing by finding nothing. The two always
+    classes are the authored indexes; `builds/<slug>/BACKLOG.md` joins them only under `builds`,
+    because before the switch-over those files are not the family's home and carry no attribute.
+    """
+    m = (memory_root or "").strip().strip("/") or "memory"
+    shard_dir = f"{m}/backlog/"
+    out = [p for p in tracked if p == f"{m}/DECISIONS.md"]
+    out += sorted(p for p in tracked
+                  if p.startswith(shard_dir) and p.endswith(".md")
+                  and "/" not in p[len(shard_dir):])
+    if mode == "builds":
+        out += sorted(p for p in tracked
+                      if p.startswith(f"{m}/") and _BUILD_BACKLOG_RE.search(p))
+    return out
+
+
+def _git(root: pathlib.Path, *args: str, stdin: bytes = b"") -> bytes:
+    """One `git` call at an EXPLICIT root, with the two inherited-directory levers scrubbed.
+
+    `GIT_DIR` reaching a process that means to ask about a worktree is a measured defect in this
+    kit (TOOL-aCollapsedScan-7 made the driver inert until its root was derived rather than asked
+    for), so this passes `-C <root>` AND removes both variables rather than trusting the ambient
+    environment to be empty.
+    """
+    import os  # noqa: PLC0415 — the only use in this module, and only on the --check path
+    env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
+    done = subprocess.run(["git", "-C", str(root), *args], input=stdin,
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, check=False)
+    if done.returncode != 0:
+        raise RuntimeError(f"`git {' '.join(args)}` exited {done.returncode}: "
+                           f"{done.stderr.decode('utf-8', 'replace').strip()[:200]}")
+    return done.stdout
+
+
+def cmd_check(argv: list[str]) -> int:
+    """The repo-subject arm: the attribute is still declared, and the refusal still fires.
+
+    TWO FACTS, both breakable by a commit anywhere in the tree and neither covered by any unheld
+    leg before this one. `.gitattributes` routing the governed paths to `merge=rows` is asserted
+    through `git check-attr` and never by reading the file — an attribute can be overridden in a
+    nested `.gitattributes`, and a grep of the declaration would agree with a tree in which it is.
+    The refusal is asserted by DRIVING it, over a view this install's own renderer produced, so a
+    header change in the view layer reds here rather than in a suite nobody ran.
+
+    WHAT IT DOES NOT CHECK, stated in the mode rather than left to be inferred: whether any node
+    configured `merge.rows.driver` (`tools/check-wiring.sh` owns that, and it is the half a commit
+    cannot break), whether a straggler branch's own OLD driver conflicts (it does not run here at
+    all), and whether anyone later resolves a refused conflict by discarding rows.
+    """
+    if argv:
+        print(f"merge-rows: --check takes no arguments, got {' '.join(argv)!r}", file=sys.stderr)
+        return 2
+    root = _anchor_root()
+    bk = resolve_view_layer()
+    conf = read_kit_conf()
+    memory_root = conf["MEMORY_ROOT"].strip().strip("/") or "memory"
+    mode = bk.read_conf(conf).mode
+    tracked = [p for p in _git(root, "ls-files", "-z").decode("utf-8", "surrogateescape").split("\0")
+               if p]
+    governed = derive_governed_paths(memory_root, mode, tracked)
+    if not governed:
+        print(f"merge-rows: check FAILED — no tracked path under {memory_root}/ is governed by this "
+              f"driver, so every assertion below would pass by finding nothing. Expected "
+              f"{memory_root}/DECISIONS.md and {memory_root}/backlog/<FAMILY>.md at minimum",
+              file=sys.stderr)
+        return 1
+    builds = [p for p in governed if _BUILD_BACKLOG_RE.search(p)]
+    if mode == "builds" and not builds:
+        print(f"merge-rows: check · no tracked {memory_root}/builds/*/BACKLOG.md yet — a young "
+              f"builds tree is legal and this half of the population is empty, announced rather "
+              f"than passed over", file=sys.stderr)
+    out = _git(root, "check-attr", "-z", "merge", "--stdin",
+               stdin="\0".join(governed).encode("utf-8", "surrogateescape"))
+    fields = out.decode("utf-8", "surrogateescape").split("\0")
+    # `check-attr -z` emits <path> NUL <attr> NUL <value> NUL per path, so the triples are read
+    # positionally. A path is keyed back by its own field rather than by input order, because git
+    # is free to answer in any order and a positional zip would then mislabel every row after the
+    # first divergence.
+    attrs = {fields[i]: fields[i + 2] for i in range(0, len(fields) - 2, 3)}
+    wrong = [f"{p} -> {attrs.get(p, '<no answer>')}" for p in governed if attrs.get(p) != "rows"]
+    if wrong:
+        print(f"merge-rows: check FAILED — {len(wrong)} governed path(s) do not resolve "
+              f"merge=rows, so their conflicts fall back to git's line merge, which is measured to "
+              f"DUPLICATE a row at rc 0 on this corpus:", file=sys.stderr)
+        for row in wrong[:8]:
+            print(f"    {row}", file=sys.stderr)
+        return 1
+    # THE PROBE. The family token is taken from a shard this repo actually tracks, so the rendered
+    # H1 is the one a reader meets; with no shard tracked it falls back to a fixture token, which
+    # is honest because the predicate's H1 pattern back-references the family and is otherwise
+    # family-agnostic.
+    shards = [p for p in governed if p.startswith(f"{memory_root}/backlog/")]
+    family = pathlib.Path(shards[0]).stem if shards else "PROBE"
+    sys.path.append(str(pathlib.Path(__file__).resolve().parent))
+    import gen_build_index as GB  # noqa: PLC0415 — only on this path; it owns the generated header
+    view = bk.render_family_view(family, (), bk.Fold({}, {}, {}, {}), memory_root,
+                                 derive_kit_prefix(), GB.GEN_HEADER)
+    shard = (f"# {family} backlog\n\n- {family}-zProbe-1 · OPEN · an authored shard row\n")
+    # ONE failure branch and not two. "It merged" and "it raised something else" are the same
+    # verdict — the refusal did not fire — and splitting them puts a `return 1` on a path no staged
+    # break can reach: with the refusal off, this pair trips a postcondition long before it merges
+    # clean, so the merged-clean branch would be an arm nobody has ever seen red.
+    outcome = ""
+    try:
+        merge(_lines(shard), _lines(view), _lines(shard + f"- {family}-zProbe-2 · OPEN · another\n"))
+        outcome = "merged it"
+    except ViewShardRefused:
+        outcome = ""
+    except Exception as exc:  # noqa: BLE001 — any other outcome is the probe failing, not passing
+        outcome = f"raised {exc.__class__.__name__} ({exc})"
+    if outcome:
+        print(f"merge-rows: check FAILED — the view-against-shard probe did not refuse: it "
+              f"{outcome}. A view rendered by this install's own renderer must be refused against "
+              f"an authored shard, or a straggler branch's rows are line-merged into a generated "
+              f"table with nothing refusing", file=sys.stderr)
+        return 1
+    print(f"merge-rows: check · {len(governed)} governed path(s) resolve merge=rows · mode {mode} "
+          f"· view refusal armed")
+    return 0
+
+
 def main(argv: list[str]) -> int:
+    if len(argv) > 1 and argv[1] == "--check":
+        return cmd_check(argv[2:])
     if len(argv) < 4:
         # The first TWO paragraphs: the summary sentence AND the `git config` line carrying the four
         # `%O %A %B %P` placeholders. Upstream prints `[0]` — the summary alone — so its usage text
@@ -1103,6 +1462,9 @@ def main(argv: list[str]) -> int:
         print("\n\n".join((__doc__ or "").split("\n\n")[:2]), file=sys.stderr)
         return 2
     o, a, b = argv[1], argv[2], argv[3]
+    # `%P` IS OPTIONAL AND IS READ HERE ONLY. Git supplies it, `check-wiring.sh`'s smoke supplies a
+    # placeholder, and a caller that omits it gets the generic census — never a guess.
+    path = argv[4] if len(argv) > 4 else None
     # FAIL CLOSED. A merge driver that raises exits non-zero WITHOUT writing %A, and git then leaves
     # the path unmerged holding OURS-only content with no conflict markers in it — the incoming rows
     # are simply absent and nothing says so. That is silent, unrecoverable loss, and it is strictly
@@ -1110,25 +1472,22 @@ def main(argv: list[str]) -> int:
     # sides written out with markers, so the author sees the incoming content and git refuses the
     # commit until it is resolved.
     try:
-        merged, conflicted = merge(read(o), read(a), read(b))
+        merged, conflicted = merge(read(o), read(a), read(b), path=path)
+    except ViewShardRefused as exc:
+        # THE BODY IS WRITTEN BEFORE ANYTHING IS PRINTED. stderr can fail — a closed pipe, a dead
+        # console — and a refusal that printed first and died would leave exactly the ours-only
+        # unmerged path the fail-closed rule exists to prevent. The recipe goes out VERBATIM, with
+        # no prefix on its lines, because the relocation engine's `--recipe` output is compared
+        # against this block byte for byte.
+        rc = write_conflict_body(a, b, "theirs (refused: view vs shard)")
+        print(f"merge-rows: REFUSED — {exc}", file=sys.stderr)
+        for line in exc.recipe:
+            print(line, file=sys.stderr)
+        return rc
     except Exception as exc:  # noqa: BLE001 — deliberately total; see above
         print(f"merge-rows: FAILED ({exc.__class__.__name__}: {exc}) — writing a conflict rather "
               f"than a silent take-ours", file=sys.stderr)
-        try:
-            ours, theirs = read(a), read(b)
-        except Exception:  # noqa: BLE001 — cannot even read the inputs
-            return 1  # leave %A untouched and refuse
-        # SITE 6 here too: the fail-closed body's markers carry the dominant terminator, so a
-        # refusal on a CRLF worktree file does not write three LF lines into it. And ours' own final
-        # line is terminated before `=======` follows it — an unterminated last line is the ordinary
-        # shape of "one node's editor left no trailing newline", and joining it to a marker is the
-        # same record-fusing defect site 7 closes on the merge path.
-        t = _dominant(ours, theirs)
-        cap = lambda side: [ln if ln.endswith(("\n", "\r")) else ln + t for ln in side]  # noqa: E731
-        body = ([_OPEN + " ours" + t] + cap(ours) + [_SEP + t] + cap(theirs)
-                + [_CLOSE + " theirs (merge-rows failed; resolve by hand)" + t])
-        pathlib.Path(a).write_bytes("".join(body).encode("utf-8", "surrogateescape"))
-        return 1
+        return write_conflict_body(a, b, "theirs (merge-rows failed; resolve by hand)")
     # SITE 4 of the newline contract: written as BYTES, with the newlines already carried by the
     # source lines. `write_text` translates on Windows and would rewrite the whole file's line
     # endings — the governed indexes are CRLF in this repo's worktrees, so that is every line of

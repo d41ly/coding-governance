@@ -88,6 +88,7 @@ recall floor arms	repo	selftests
 review-join ban (no ref-keyed join)	repo	declarations
 review-join self-test	kit	selftests
 review-protocol parity (kit vs dogfood)	repo	declarations
+row-driver view refusal	repo	declarations
 row-grammar selftest	kit	selftests
 row-keyed merge driver replay	kit	selftests
 run-gates adopter e2e	kit	e2e
