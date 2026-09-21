@@ -125,7 +125,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | CLOSED | rev-3 | 2026-09-21 |
 <!-- /gen:build-units -->
 
-Records: 64 bound to this build, across 4 record folder(s).
+Records: 65 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
