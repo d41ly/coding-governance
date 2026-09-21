@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-20
 streams: tooling
 roster: TOOL
-ids: TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4
+ids: TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5
 ---
 
 # dGatedProse — the owner's rulings on dLoggedFlight's parked decisions, built only where a dry run earned it
@@ -57,33 +57,35 @@ items B finds, and the corpus does not use the vocabulary the ruling named.
 method's size budget, and the owner has not yet ruled which stands.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node d · opened 2026-09-20 · streams tooling
-ids TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4
+**Build status:** SPECCED · 5 unit(s) · node d · opened 2026-09-20 · streams tooling
+ids TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads](spec/2026-09-20-spec-TOOL-dGatedProse-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-21 |
-| [TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold](spec/2026-09-20-spec-TOOL-dGatedProse-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-21 |
-| [TOOL-dGatedProse-3 — the guide cap rises on both axes, with the reason recorded beside the figure](spec/2026-09-20-spec-TOOL-dGatedProse-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-21 |
-| [TOOL-dGatedProse-4 — M4 bounds the spec-audit promotion chain by review precision](spec/2026-09-20-spec-TOOL-dGatedProse-4.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-21 |
+| [TOOL-dGatedProse-5 — the corpus answers for its readers before the check that asks](spec/2026-09-21-spec-TOOL-dGatedProse-5.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-21 |
+| [TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads](spec/2026-09-20-spec-TOOL-dGatedProse-1.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-21 |
+| [TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold](spec/2026-09-20-spec-TOOL-dGatedProse-2.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-21 |
+| [TOOL-dGatedProse-3 — the guide cap rises on both axes, with the reason recorded beside the figure](spec/2026-09-20-spec-TOOL-dGatedProse-3.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-21 |
+| [TOOL-dGatedProse-4 — M4 bounds the spec-audit promotion chain by review precision](spec/2026-09-20-spec-TOOL-dGatedProse-4.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-21 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
 
-Ids no record names: TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4.
+Ids no record names: TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5.
 
-Ids no `spec-audit` record has ever named: TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4.
+Ids no `spec-audit` record has ever named: TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-dGatedProse-1` | no |
-| 2 | `TOOL-dGatedProse-2` | no |
-| 3 | `TOOL-dGatedProse-3` | no |
-| 4 | `TOOL-dGatedProse-4` | no |
+| 1 | `TOOL-dGatedProse-5` | no |
+| 2 | `TOOL-dGatedProse-1` | no |
+| 3 | `TOOL-dGatedProse-2` | no |
+| 4 | `TOOL-dGatedProse-3` | no |
+| 5 | `TOOL-dGatedProse-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold
 
-**Status:** SPECCED · rev-3 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

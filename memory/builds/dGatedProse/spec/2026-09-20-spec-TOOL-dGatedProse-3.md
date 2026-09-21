@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-3 — the guide cap rises on both axes, with the reason recorded beside the figure
 
-**Status:** SPECCED · rev-3 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 3 · ratified 2026-09-21
+**Status:** SPECCED · rev-3 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 4 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-4 — M4 bounds the spec-audit promotion chain by review precision
 
-**Status:** SPECCED · rev-3 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
