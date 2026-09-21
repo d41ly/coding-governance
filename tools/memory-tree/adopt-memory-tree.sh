@@ -44,8 +44,9 @@ FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}
 
 # WHY THE MODE EXISTS: TOOL-dRetiredFork-29 measured it. On an adopted tree the converge guard
 # prints "already scaffolded" and exits 0, so every `rendered` row this kit owns went one vintage
-# stale on every `govkit update` — the flag runs a `[[regenerate]]` block and this kit declared
-# none — and the adopter's own parity gate reds on it. A regenerate argv needs a narrow entrypoint
+# stale on every `govkit update`, with GOVKIT_RERENDER unset as much as set, because the flag
+# runs a `[[regenerate]]` block and this kit declared none — and the adopter's own parity gate
+# reds on it. A regenerate argv needs a narrow entrypoint
 # with no adoption guard to trip over; this is that entrypoint.
 # The mode is REQUIRED and stays required: a bare invocation was a usage refusal before `--render`
 # existed and still is, because defaulting a missing word to the verb that creates a tree is a
@@ -172,13 +173,12 @@ ANNOTATION-STYLE.template.md:guides/ANNOTATION-STYLE.md"
 # BEFORE the adoption guard, which exits 0 on the very trees this mode exists for. It creates no
 # directory beyond a destination's own parent, writes no registry, seeds no conf and re-renders
 # nothing outside the set above.
+#
+# THE MARKER IS ALREADY DECIDED, up at the `--render` gate that exits 3. This block used to repeat
+# that exact condition and refuse with exit 1, which the reconcile of 2026-09-21 made unreachable —
+# two answers to one question, and the surviving one is the better of the two: a tree that renders
+# its own docs is a legitimate steady state that `kit.toml` declares ACCEPTED, not a failure.
 if [ "$MODE" = --render ]; then
-  if [ ! -f "$M/HYGIENE.md" ] || ! grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"; then
-    echo "adopt-memory-tree: REFUSING --render — $M/ carries no 'gov:kit memory-tree@' marker, so" >&2
-    echo "adopt-memory-tree: this tree was never adopted by this kit and --render would write this" >&2
-    echo "adopt-memory-tree: kit's documents into somebody else's tree. Run --scaffold instead." >&2
-    exit 1
-  fi
   render_all || exit 1
   exit 0
 fi

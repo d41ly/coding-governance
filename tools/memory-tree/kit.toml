@@ -129,6 +129,7 @@ means = "refused-foreign-tree"
 code = 3
 means = "not-rendered-here"
 ok = true
+probe = { must_exist = "{memory_root}/HYGIENE.md" }
 
 [[gate_leg]]
 name = "memory hygiene"
