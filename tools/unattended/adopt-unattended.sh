@@ -376,21 +376,24 @@ if [ "$MODE" = "--check" ]; then
     grep -nE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT" | head -5 | sed 's/^/    /'
     exit 1
   fi
-  # the SIXTH artifact (TOOL-aDeferredBar-3): the gate-guard hook is WIRED. The hook ships with the
-  # kit and is live only through an entry in .claude/settings.json; nothing else on the bar reads
-  # that file for this marker, so an adopter with the file and no entry has a guard that never
-  # fires and a --check that said "in sync". The marker is read from the kit's own fragment, never
+  # the SIXTH artifact (TOOL-aDeferredBar-3): every hook the kit ships is WIRED. A hook ships with
+  # the kit and is live only through an entry in .claude/settings.json; nothing else on the bar
+  # reads that file for its marker, so an adopter with the file and no entry has a guard that never
+  # fires and a --check that said "in sync". Each marker is read from the kit's own fragment, never
   # spelled here, and the remedy is the one merge command that writes the entry idempotently.
-  # The fragment is SHIPPED SURFACE (closing review F11): KIT_DIR is this script's own directory
-  # and the `**` engine rule ships the fragment beside it, so its absence is a broken copy and a
-  # refusal naming the file, like the five artifacts above — not the silent `in sync` it was.
-  GG_FRAG="$KIT_DIR/gate-guard.fragment.json"
-  [ -f "$GG_FRAG" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json is missing from the kit, so the gate-guard wiring cannot be checked and nothing else on the bar asserts the file — re-copy the kit"; exit 1; }
-  GG_MARK=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
-  [ -n "$GG_MARK" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no marker, so the wiring arm has nothing to look for"; exit 1; }
-  GG_EVENT=$(sed -n 's/^[[:space:]]*"event":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
-  GG_MATCHER=$(sed -n 's/^[[:space:]]*"matcher":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
-  [ -n "$GG_EVENT" ] && [ -n "$GG_MATCHER" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no event or no matcher, so the wiring arm cannot say which group the marker must sit in"; exit 1; }
+  # The fragments are SHIPPED SURFACE (closing review F11): KIT_DIR is this script's own directory
+  # and the `**` engine rule ships each fragment beside it, so a copy that lost EVERY fragment is a
+  # broken copy and a refusal naming the kit dir, like the five artifacts above — not the silent
+  # `in sync` it was.
+  #
+  # GENERALISED FROM ONE NAMED FRAGMENT TO THE POPULATION (TOOL-aWokenSentinel-3): the kit ships a
+  # second hook, and a hand list of fragment names is the class the kit's `**` rule exists to
+  # avoid. WHAT THIS LOOP CANNOT SEE, said here because a glob loop reads as a complete check to
+  # everybody who did not write it: a fragment DELETED from a copy that still holds another is not
+  # detected per file — the old per-name check saw one file, this one sees the population, and the
+  # population floor is the zero guard. The fragment-to-hook join below catches the other half of a
+  # partial copy (a fragment naming a hook the kit does not carry), and the printed count lets a
+  # reader see one where two are expected (spec §8 F5).
   # THE SETTINGS FILE IS RESOLVED THE WAY check-wiring.sh RESOLVES IT (closing review F5): a
   # declared GOV_SETTINGS_JSON first, else the repo's own — an out-of-tree layout is a legitimate
   # per-machine choice that resolver documents, and grepping the in-tree path alone redded it
@@ -409,25 +412,60 @@ if [ "$MODE" = "--check" ]; then
     echo "unattended: REFUSED — GOV_SETTINGS_JSON names $GOV_SETTINGS_JSON, which is not a file, so the gate-guard wiring cannot be read from the file the operator declared"
     exit 1
   fi
-  GG_WIRED=$( [ -f "$SJ" ] && tr -d ' \t\r\n' < "$SJ" | sed 's/{"matcher":/\n{"matcher":/g' \
-    | awk -v M="$GG_MARK" -v W="$GG_MATCHER" -v E="$GG_EVENT" '
-        { lead = prev; prev = $0
-          s = lead
-          while (match(s, /"[A-Za-z]+":\[/)) { key = substr(s, RSTART + 1, RLENGTH - 4); s = substr(s, RSTART + RLENGTH); if (key != "hooks") ev = key }
-          g = $0; sub(/\].*$/, "", g)
-          if (index(g, M) && ev == E && match(g, /^{"matcher":"[^"]*"/) && substr(g, 13, RLENGTH - 13) == W) print "wired"
-        }' | head -1 )
-  if [ "$GG_WIRED" != wired ]; then
-    echo "unattended: the gate-guard hook is UNWIRED — ${SJ#"$ROOT"/} carries no $GG_EVENT entry under matcher $GG_MATCHER naming $GG_MARK, so the hook that refuses a self-test suite inside a build pass never fires"
-    # The remedy names the file the check READ (R10): settings-merge.py takes it as a positional
-    # defaulting to the in-tree path, so an out-of-tree layout handed the bare remedy wrote the
-    # in-tree decoy check-wiring warns about while this arm kept reading the declared file.
-    if [ "$SJ" = "$ROOT/.claude/settings.json" ]; then
-      echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json"
-    else
-      echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json $SJ"
+  # The settings file is FLATTENED ONCE and each fragment's group reader runs over that.
+  SJ_FLAT=""; [ -f "$SJ" ] && SJ_FLAT=$(tr -d ' \t\r\n' < "$SJ" | sed 's/{"matcher":/\n{"matcher":/g')
+  N_FRAG=0
+  for GG_FRAG in "$KIT_DIR"/*.fragment.json; do
+    [ -f "$GG_FRAG" ] || continue
+    N_FRAG=$((N_FRAG + 1))
+    GG_BASE=${GG_FRAG##*/}
+    GG_NAME=$(sed -n 's/^[[:space:]]*"name":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+    GG_MARK=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+    [ -n "$GG_NAME" ] && [ -n "$GG_MARK" ] || { echo "unattended: $KIT_REL/$GG_BASE declares no name or no marker, so the wiring arm has nothing to look for"; exit 1; }
+    GG_EVENT=$(sed -n 's/^[[:space:]]*"event":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+    GG_MATCHER=$(sed -n 's/^[[:space:]]*"matcher":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+    [ -n "$GG_EVENT" ] && [ -n "$GG_MATCHER" ] || { echo "unattended: $KIT_REL/$GG_BASE declares no event or no matcher, so the wiring arm cannot say which group the marker must sit in"; exit 1; }
+    # A fragment naming a hook the kit dir does not carry is the other half of a partial copy: the
+    # entry would point at nothing and the harness would report a hook error on every event.
+    [ -f "$KIT_DIR/$GG_MARK" ] || { echo "unattended: $KIT_REL/$GG_BASE names the hook $GG_MARK, which is not a file in $KIT_REL, so the wired entry would point at nothing — re-copy the kit"; exit 1; }
+    GG_WIRED=$( printf '%s\n' "$SJ_FLAT" \
+      | awk -v M="$GG_MARK" -v W="$GG_MATCHER" -v E="$GG_EVENT" '
+          { lead = prev; prev = $0
+            s = lead
+            while (match(s, /"[A-Za-z]+":\[/)) { key = substr(s, RSTART + 1, RLENGTH - 4); s = substr(s, RSTART + RLENGTH); if (key != "hooks") ev = key }
+            g = $0; sub(/\].*$/, "", g)
+            if (index(g, M) && ev == E && match(g, /^{"matcher":"[^"]*"/) && substr(g, 13, RLENGTH - 13) == W) print "wired"
+          }' | head -1 )
+    if [ "$GG_WIRED" != wired ]; then
+      echo "unattended: the $GG_NAME hook is UNWIRED — ${SJ#"$ROOT"/} carries no $GG_EVENT entry under matcher $GG_MATCHER naming $GG_MARK, so the hook never fires"
+      # The remedy names the file the check READ (R10): settings-merge.py takes it as a positional
+      # defaulting to the in-tree path, so an out-of-tree layout handed the bare remedy wrote the
+      # in-tree decoy check-wiring warns about while this arm kept reading the declared file.
+      if [ "$SJ" = "$ROOT/.claude/settings.json" ]; then
+        echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/$GG_BASE"
+      else
+        echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/$GG_BASE $SJ"
+      fi
+      exit 1
     fi
-    exit 1
+  done
+  # ZERO is a refusal, never a loop over nothing that prints `in sync`: the kit ships its hooks as
+  # fragments, so a kit dir with none is a copy that lost them.
+  [ "$N_FRAG" -gt 0 ] || { echo "unattended: no *.fragment.json in $KIT_REL, so no hook wiring can be checked and nothing else on the bar asserts the files — re-copy the kit"; exit 1; }
+  echo "unattended: hooks: $N_FRAG fragment(s) wired"
+  # THE RESUME TICK'S REGISTRATION, reported and never graded (TOOL-aWokenSentinel-5 S9). Registering
+  # `gov-resume-tick` is the OWNER's act, once per node, and an adopter who has not done it has a
+  # working kit, not a broken one — so this is INFO on either answer and the exit code does not
+  # move. Under MSYS `schtasks //query` — a single `/query` from bash is mangled to a Program Files
+  # path, measured 2026-09-16 — elsewhere the crontab listing.
+  case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*) if schtasks //query //tn gov-resume-tick >/dev/null 2>&1; then RT_REG=1; else RT_REG=0; fi ;;
+    *) if crontab -l 2>/dev/null | grep -qF resume-tick; then RT_REG=1; else RT_REG=0; fi ;;
+  esac
+  if [ "$RT_REG" = 1 ]; then
+    echo "unattended: INFO — the resume tick is registered as gov-resume-tick"
+  else
+    echo "unattended: INFO — no scheduled task named gov-resume-tick on this node; the resume tick is unregistered (the kit README has the line)"
   fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0

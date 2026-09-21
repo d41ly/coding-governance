@@ -414,9 +414,14 @@ const SUBJECTS_SCHEMA = {
         type: 'object',
         properties: {
           path: { type: 'string' },
-          blob: { type: 'string', pattern: '^[0-9a-f]{7,40}$' },
+          // BOTH FULL 40-HEX OBJECT NAMES (TOOL-aWokenSentinel-15). `blob` is `git rev-parse
+          // HEAD:<path>`, `tree` is `git hash-object <path>`, and the pre-flight below compares them
+          // by string equality, so an abbreviated side would read as dirty with a remedy that is
+          // false for a clean tree. The supplied-subject contract stays `{7,40}` at `badSubject`.
+          blob: { type: 'string', pattern: '^[0-9a-f]{40}$' },
+          tree: { type: 'string', pattern: '^[0-9a-f]{40}$' },
         },
-        required: ['path', 'blob'],
+        required: ['path', 'blob', 'tree'],
       },
     },
   },
@@ -673,6 +678,18 @@ if (!specAudit) {
 // A CALLER-SUPPLIED SET WINS. `--plan` already knows the spec set, so a caller that pinned the
 // blobs itself is authoritative and the resolver stage is skipped rather than run for a second
 // opinion about the same files.
+//
+// THE RESOLVER PINS AT A BLOB AND THE LENSES READ THE TREE (TOOL-aWokenSentinel-15). Round 2 of
+// this build's own spec audit pinned two specs at `git rev-parse HEAD:<path>` while the working
+// tree held uncommitted folds of both, and every lens read the tree: a disposition recorded against
+// a pin nobody could open. So the resolver returns each subject's committed `blob` AND its
+// working-tree hash from `git hash-object <path>`, and the script REFUSES to dispatch a lens while
+// any subject differs between the two, naming every such path with both hashes and the one remedy,
+// which is to commit the fold and re-invoke. WHAT THAT DOES NOT PROVE: that the committed blob is
+// the text the lenses read is a property of a clean tree AT DISPATCH TIME, and a fold written by a
+// concurrent session after the check passes is outside it — a workflow script has no filesystem
+// and cannot watch the file between the check and the read. A caller-supplied set never enters
+// the branch and carries no `tree`, so the compare cannot read it; `badSubject` below grades both.
 let subjects = Array.isArray(a.subjects) ? a.subjects : null
 // SCOPED AFTER A DISPOSAL. With `auditIds` the resolver sees only the promoted units, so the audit
 // reads the specs no spec-audit record names yet and not the whole set a terminal round already
@@ -689,13 +706,39 @@ if (specAudit && !subjects) {
     GROUND +
       'Resolve the blob of every spec in this build so an audit can be pinned at immutable bytes.\n' +
       renderRoster(auditUnits, slug, briefDir) + '\n\n' +
-      'For each unit above that HAS a spec path, run `git rev-parse HEAD:<specPath>` in ' + repo +
-      ' and return one entry per spec. Return ONLY units whose spec exists and whose blob resolves; ' +
-      'an unspecced unit is not a subject and must be omitted rather than given an invented blob. ' +
-      'Paths are repo-relative and forward-slashed.',
+      'For each unit above that HAS a spec path, run `git rev-parse HEAD:<specPath>` and ' +
+      '`git hash-object <specPath>` in ' + repo + ' and return both as the full 40-character object ' +
+      'names — `blob` and `tree` respectively, one entry per spec. Return ONLY units whose spec ' +
+      'exists and whose blob resolves; an unspecced unit is omitted rather than given an invented ' +
+      'hash. Paths are repo-relative and forward-slashed.',
     { label: 'audit:subjects:r' + roundNo, phase: 'Audit', schema: SUBJECTS_SCHEMA },
   )
   subjects = (res && Array.isArray(res.subjects)) ? res.subjects : []
+  // THE PRE-FLIGHT, INSIDE THE BRANCH so a supplied `{path, blob}` set never reads as dirty. The
+  // field refusal comes first and is distinct from the dirty verdict: the suite's runner evaluates
+  // no schema, so a resolver that omits `tree` or abbreviates a side is refused NAMING THE FIELD,
+  // never read as a dirty tree with a remedy that is false for a clean one.
+  const badResolved = subjects.findIndex(function (s) {
+    return !s || !/^[0-9a-f]{40}$/.test(String(s.blob || '')) || !/^[0-9a-f]{40}$/.test(String(s.tree || ''))
+  })
+  if (badResolved !== -1) {
+    throw new Error(
+      'unattended-build: resolved subject ' + badResolved + ' does not carry a 40-hex blob and a 40-hex tree: ' +
+        JSON.stringify(subjects[badResolved]) + '. The resolver returns both full object names or the ' +
+        'pre-flight cannot compare them.',
+    )
+  }
+  const dirty = subjects.filter(function (s) { return s.tree !== s.blob })
+  if (dirty.length) {
+    throw new Error(
+      'unattended-build: ' + dirty.length + ' subject(s) differ between HEAD and the working tree, so a lens ' +
+        'would read text the pin does not name: ' +
+        dirty.map(function (s) { return s.path + ' HEAD ' + s.blob + ' tree ' + s.tree }).join('; ') +
+        '. Commit the fold, then re-invoke with the same arguments; an audit is pinned at bytes history holds.',
+    )
+  }
+  // `tier2-review.js` takes `{path, blob}` and that contract is not this stage's to widen.
+  subjects = subjects.map(function (s) { return { path: s.path, blob: s.blob } })
 }
 // REFUSED HERE RATHER THAN DOWNSTREAM. `tier2-review.js` would refuse an empty set too, but its
 // message is about its own arguments; this one can say which stage failed to produce them, which is

@@ -119,5 +119,5 @@ Ids no `spec-audit` record has ever named: TOOL-aPrimedKeepalive-8 TOOL-aPrimedK
 
 <!-- gen:build-edges -->
 
-*This build declares no parent and no build declares it as one.*
+- **Child builds:** [aWokenSentinel](../aWokenSentinel/README.md)
 <!-- /gen:build-edges -->

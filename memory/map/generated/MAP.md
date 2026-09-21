@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 80 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 112 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 85 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -116,6 +116,7 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `tier2-review self-test` | review-harnesses |
 | `unattended kit gate` | unattended |
 | `unattended skill wiring` | unattended |
+| `unattended-build self-test` | review-harnesses |
 | `verdict epoch (kit version dates the engine)` | memory-tree-hygiene |
 | `verdict-epoch self-test` | memory-tree-hygiene |
 | `verifier fan-out` | agent-cap |
@@ -198,6 +199,7 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `assertion-between-two-derived-values.md` | unattended |
 | `async-job-starts-with-sigint-ignored.md` | run-gates |
 | `bash-c-multiline-flattens-under-msys.md` | agent-cap |
+| `borrowed-seed-inherits-its-head-state.md` | unattended |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `check-format-grades-two-populations.md` | build-readme-surface |
 | `concurrency-is-not-a-budget.md` | baseline |
@@ -205,6 +207,7 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `containment-tested-one-way.md` | unattended |
 | `criterion-asserts-what-its-own-command-cannot-show.md` | build-method |
 | `degradation-known-but-unreported.md` | review-harnesses |
+| `destructive-step-before-its-precondition.md` | unattended |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
 | `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixed-sleep-does-not-place-a-signal.md` | runlog |
@@ -217,6 +220,7 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
+| `guard-fed-the-value-it-supersedes.md` | unattended |
 | `hand-named-gate-list-green-while-the-bar-reds.md` | build-method |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
@@ -226,6 +230,7 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `join-key-widened-by-a-shared-location.md` | runlog |
 | `ledger-token-wrapped-across-a-line-joins-nothing.md` | memory-tree-hygiene |
+| `line-count-reads-empty-capture-as-one.md` | unattended |
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
 | `msys-grep-counts-cr-on-every-line.md` | session-kickoff |
 | `naming-leg-grades-what-python-named.md` | lexicon |
@@ -265,6 +270,7 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `vacuous-selector-empty-population.md` | baseline |
 | `waiver-row-that-hides-nothing-reds.md` | memory-tree-hygiene |
 | `withheld-value-recovered-from-a-derived-one.md` | runlog |
+| `witness-graded-against-a-fact-written-after-it.md` | unattended |
 | `worktree-crlf-outside-the-gated-population.md` | run-gates |
 
 ## guides

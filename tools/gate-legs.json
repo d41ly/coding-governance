@@ -574,6 +574,19 @@
     "ceiling": 1800
   },
   {
+    "name": "unattended-build self-test",
+    "argv": [
+      "bash",
+      "tools/workflows/unattended-build.test.sh"
+    ],
+    "guard": [
+      "tools/workflows/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120
+  },
+  {
     "name": "review-join self-test",
     "argv": [
       "bash",

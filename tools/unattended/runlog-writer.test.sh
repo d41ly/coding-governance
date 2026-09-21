@@ -275,12 +275,13 @@ scan_exit_sites() { # file... -> one TAB-separated row per shell exit
 # The exits that run BEFORE the trap exists, named by their TEXT: this unit's own insertions moved
 # their line numbers, and a text that matches twice is a second exit nobody exempted. The sixth is
 # the REVIEW_ROUNDS ceiling refusal main added before the install, found by this enumeration at the
-# second origin/main reconcile (2026-09-16).
+# second origin/main reconcile (2026-09-16). `read_bound_key`'s refusal (`exit 2 ;;`) left this list
+# at the aWokenSentinel reconcile (2026-09-21): that build moved the function into the library, where
+# its two exits carry the marker and no exemption reaches.
 EXEMPT_EXITS='exit 2
 ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
 cd "$ROOT" || exit 2
 echo "unattended: project-specific value from there and restates none of them."; exit 2; }
-exit 2 ;;
 [ "$REVIEW_ROUNDS" -lt "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, at or above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }'
 
 check_exit_rows() { # label · driver · library -> UNMARKED (unexempted unmarked rows), EXEMPTED count

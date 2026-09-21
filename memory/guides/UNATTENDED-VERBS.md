@@ -72,20 +72,44 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   format from the slug COUNT gives a caller two output shapes for one verb: a frame-reading caller
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
-- `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
+- `--status` — one line: the phase, the first non-terminal unit, and the parked counts, then the
+  fields that print only when there is something to report — the resume tick's attempts, and
+  `keepalive <id> present|absent in the harness listing at <utc>` from the stop-guard's newest
+  sidecar line, whatever its phase, omitted when the record names no keepalive id or no line
+  exists. The line stays ONE line: a field joins it or does not print, and the suite arms that.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
   open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
-  `STALLED` line followed by one remedy line. Read-only; the keepalive runs it. It cannot see what
+  `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree.
-- `--resume` — re-enters the run from the run-state file; must agree with `--status`.
+- `--liveness` — key: value lines and one verdict for an OUT-OF-SESSION reader: the phase, the
+  lease, whether the recorded pid exists AND is the leased process (image and start time, not the
+  number alone), seconds since anything moved, the last recorded stall, `TERMINAL`,
+  `FINISHED-UNSTAMPED`, `UNBOUND`, `STALE` or `LIVE`, and last the `stale-bound` the verdict was
+  graded against, so the tick bounds its own reads by this reader's number. Read-only; the
+  stop-guard, the stall-recorder's readers and the resume tick call it rather than deciding for
+  themselves. It cannot see what the session is doing or whether a process is hung — existence is
+  not progress.
+- `--resume` — re-enters the run from the run-state file; must agree with `--status`. With
+  `--keepalive-id <id>` it REPLACES the lease — keepalive, session, pid — so a resumed session's
+  record names the session that now holds it; refused on a terminal record.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
 - `--landed` — the sole producer of `LANDED`, an OBSERVATION rather than a claim. It accepts a record
   only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip the
-  remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker names HEAD
-  exactly — equality, not ancestry, so any commit between the push and this verb is a refusal. It does
+  remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker's commit
+  contains the run's witness and the advertised tip reaches that commit — containment, not
+  equality, so a `--no-ff` landing stamps from the run worktree and a record commit after the push
+  is not a refusal. It does
   not refuse the default branch: the mandated lander refuses every other one, so landing happens
-  exactly where that guard would otherwise fire.
+  exactly where that guard would otherwise fire. It READS THE REAP BACK: the newest line of the
+  stop-guard's sidecar carries the harness listing of the cron store, and the verb compares the
+  recorded keepalive id with it before the anchor round-trip. Two refusals — the line is post-close
+  and still names the id (reap it, end the turn so the listing is recorded again, re-run), or the
+  newest line predates the close, so the check could run and has not (end the turn once; the
+  stop-guard blocks a finished-and-unstamped stop and continues you). A post-close line without the
+  id prints `keepalive-reaped: checked`; no sidecar, or no recorded id, prints `unchecked` with the
+  reason and lands. It parses nothing beyond a substring test for the id, and it does not check that
+  the id was ever this run's job.
 - `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the unit
   as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the three
   acts; this verb is the record. It RECORDS rather than acts: a row derived from the change it just
@@ -137,7 +161,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
-  nothing, so the machine items assert obligations it does not have, while the keepalive is still
+  nothing, so the machine items assert obligations it does not have, while the idle-wake is still
   orphaned and the parked decisions still unseen. The code is validated before it is recorded and the
   refusal names the legal set; it is the twelfth authored fact, and it exists because one terminal
   phase said a run stopped and never said why.

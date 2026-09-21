@@ -854,7 +854,12 @@ has    "B ...and still hands out the roster" "$o" '"roster":[{'
 # review round 2, cluster C, armed below): this fixture used to strip it "so the resolver stage
 # actually runs", which was the arm working around a seam the code let through.
 NOSUBJ=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##' | sed 's#"slug":"tB",#"slug":"tB","round":2,"auditIds":["A-tB-3"],#')
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"abc1234"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+# TOOL-aWokenSentinel-15 - the stubbed RESOLVER return carries a full 40-hex `blob` and an equal
+# `tree`, because the resolver branch refuses anything shorter by name before it compares the two.
+# The supplied-subject fixtures in `$UNITS` keep their 7-hex blobs: they never enter that branch.
+B40=0123456789abcdef0123456789abcdef01234567
+T40=fedcba9876543210fedcba9876543210fedcba98
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "B round 2 over the promoted id does not throw" "$o" "RESULT"
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r2:')
 has    "B round 2 records under its own generation key" "$p" "--subject tB-spec-set-r2 --verdict"
@@ -1035,7 +1040,7 @@ has    "R2-C the post-disposal nextAction names subjects among what NOT to pass"
 # ---- E (id 14): the callee is handed the SUBJECT's round, not the invocation's. Under the kit
 # ---- default every promoted-spec audit lands at invocation round 2, and `tier2-review.js` primed
 # ---- it as a FOLD review of a spec nobody had reviewed.
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"abc1234"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "R2-E a post-disposal re-invoke at round 2 hands the callee round 1" "$w" '"round":1'
 has    "R2-E ...as a spec-audit" "$w" '"kind":"spec-audit"'
@@ -1043,6 +1048,25 @@ o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":3,"
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "R2-E a fold re-invoke at round 3 on a subject first audited at 2 hands the callee round 2" "$w" '"round":2'
 has    "R2-E ...while the harness keeps its own round for the record" "$o" "prompt:audit:record:r3:"
+
+# ---- TOOL-aWokenSentinel-15: the resolver pins at a blob and the lenses read the tree, so the
+# ---- stage compares the two hashes the resolver returned and refuses to dispatch over a dirty
+# ---- subject. INSIDE the resolver branch only: the supplied-subject fixtures above carry no
+# ---- `tree` and never enter it. Each arm read RED first against the render at 12513c25, where
+# ---- the first and third proceed to the sub-workflow and the second finds no `tree` to strip.
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$T40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+has    "WS15 a resolved subject whose tree differs from its blob THROWS" "$o" "THROW"
+has    "WS15 ...naming the path and both hashes" "$o" "s3 HEAD $B40 tree $T40"
+has    "WS15 ...and the remedy" "$o" "Commit the fold"
+same   "WS15 ...and no lens was dispatched" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "0"
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+same   "WS15 an agreeing pair reaches the sub-workflow" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "1"
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has    "WS15 ...handed {path, blob}" "$w" "\"subjects\":[{\"path\":\"s3\",\"blob\":\"$B40\"}]"
+same   "WS15 ...with tree stripped" "$(printf '%s' "$w" | grep -c '"tree"')" "0"
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+has    "WS15 a resolved subject with no tree THROWS naming the field" "$o" "40-hex tree"
+hasnt_ "WS15 ...and not as a dirty tree" "$o" "Commit the fold"
 
 # ---- F (id 16): an UNVERIFIED finding the stage judges not a defect has a route. `refuted` is
 # ---- optional, bounded by `unverified`, in the sum, and the severity floors stand.
@@ -1448,5 +1472,22 @@ else
   echo "SKIP PV-AC12 -- no unattended adopter at $UK, so the two carriers were NOT compared on this run"
 fi
 
+# FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
+# static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
+# over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
+# pass that wrote this line may not run the suite; the first green under GATE_SELFTESTS=1 or
+# run-selftests.sh --kit tools/workflows confirms the executed count against it. The inline
+# `n=$((n+1))` sites — the PV-AC12 branch's among them, the one region that can SKIP — are not in
+# the static count, so it is a LOWER bound on what a green run executes. Lower it in a reviewed
+# diff or not at all.
+FLOOR_ASSERTIONS=293
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
+# NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
+# appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
+# range starts at the exit line itself, so a suite with nothing after it reads exactly 1; a comment
+# or a blank line after it is not counted.
+[ "$(sed -n '/^exit \$st$/,$p' "$0" | grep -cvE '^\s*(#|$)')" = 1 ] || { echo "FAIL a line follows the terminal exit and can never run"; st=1; }
+
 echo "--- $n arms, exit $st"
+[ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit $st

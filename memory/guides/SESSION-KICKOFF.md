@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-21T06:23:48+03:00 @ f883bbda8082239860b26fe0e4ea9bd7e13f11ba
+last-audit: 2026-09-21T12:34:11+03:00 @ 5187706521b0f9a7caee47ddeffff0d730206ca0
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 85d930a90b8d8c917454866b22a9d2e013fa82a7
+last-body-change: 11827d6c156e59efcc2183f45a98655b86c05beb
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -80,7 +80,13 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
   the handles are written here — that is the drift the pointer design exists to avoid. Two invert
-  the reflex: a discovery is ADOPTED not parked; the keepalive precedes orienting. §11 and §5.
+  the reflex: a discovery is ADOPTED not parked; the idle-wake precedes orienting. §11 and §5.
+
+- **The idle-wake is not the keepalive.** The cron job wakes an idle session and nothing else; what
+  resumes a stalled run lives OUTSIDE its session — the stop-guard at every turn end, the
+  stall-recorder at every error end, the resume tick from the OS scheduler — reading the LEASE
+  (`session:`, `pid:`, `host:`, `pid-image:`, `lease-utc:`) the driver records and the verdict
+  `--liveness` derives. `RESUME_STALE_BOUND` is the bound they act on. Protocol §5; `aWokenSentinel`.
 
 - **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`; `GATE_REAP_BOUND` the
   teardown reap.** A breach is KILLED, and `gates-green` then says the bar never RETURNED
