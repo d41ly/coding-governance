@@ -3013,14 +3013,24 @@ check_ask_mandate() { # slug · run-state file -> 1 with its own refusal printed
   # the line match is the kit library's, shared with the leg that re-derives this. Reading the
   # WORKING TREE instead would let a row filed after the run began satisfy a property about
   # provenance, which is the whole of what it is for.
-  for _home in $(printf '%s\n' "$_ids" | sed -n 's/^[A-Z][A-Z]*-\([A-Za-z0-9][A-Za-z0-9]*\)-[0-9][0-9]*$/\1/p' | sort -u); do
-    _blob=$(GIT show "$_mb:$M/builds/$_home/BACKLOG.md" 2>/dev/null || true)
-    for _id in $_ids; do
-      [ "$(ask_home_of "$_id")" = "$_home" ] || continue
-      ask_filed_in "$_blob" "$_id" && continue
-      fail 72 "a mandated ask is not filed in the tree this run is anchored to, so the run would be choosing among records it could have written itself: $_id has no row in $M/builds/$_home/BACKLOG.md at $_mb"
-      return 1
-    done
+  # THE LOOP IS OVER THE MANDATE, never over a derived home list. Deriving the homes first and
+  # iterating THOSE makes the property vacuous on any id the derivation cannot parse: no home,
+  # no iteration, and a mandate this run was never entitled to sails through a check that
+  # printed nothing. Iterating the ids keeps every one of them answerable, and an id whose home
+  # comes out empty reads a path resolving to no blob and is refused by name rather than
+  # skipped.
+  #
+  # ONE `git show` PER FOLDER STILL, through the memo below. A mandate names a handful of homes
+  # and usually one, so the read that costs anything is cached rather than repeated per id.
+  local -A _blobs=()
+  for _id in $_ids; do
+    _home=$(ask_home_of "$_id")
+    if [ -z "${_blobs[$_home]+set}" ]; then
+      _blobs[$_home]=$(GIT show "$_mb:$M/builds/$_home/BACKLOG.md" 2>/dev/null || true)
+    fi
+    ask_filed_in "${_blobs[$_home]}" "$_id" && continue
+    fail 72 "a mandated ask is not filed in the tree this run is anchored to, so the run would be choosing among records it could have written itself: $_id has no row in $M/builds/$_home/BACKLOG.md at $_mb"
+    return 1
   done
   # READY, at `m-base:` and through ONE bounded call. Its row count must equal the mandate's or the
   # witness is a DEAD PROBE: a loop over the rows that came back can only ever confirm them.
@@ -3084,11 +3094,20 @@ describe_foreign_run() { # slug -> one clause about that build's run-state recor
 # in decides whether a build folder files asks at all, so a run whose anchor predates the switch is
 # planning against asks its own BASE never filed. A NOTICE and not a refusal: the change is legal,
 # and what it costs is exactly the silence this line removes.
+read_backlog_mode() { # stdin: a .memory-tree.conf blob -> the declared value, or nothing
+  sed -n 's/^BACKLOG_MODE=[\"'"'"']\{0,1\}\([A-Za-z]*\).*/\1/p' | head -1
+}
 check_backlog_mode_shift() { # -> prints at most one line
   local _a _h
   [ -n "${ASHA:-}" ] || return 0
-  _a=$(GIT show "$ASHA:.memory-tree.conf" 2>/dev/null | sed -n 's/^BACKLOG_MODE=\"*\([A-Za-z]*\)\"*.*/\1/p' | head -1)
-  _h=$(GIT show "HEAD:.memory-tree.conf" 2>/dev/null | sed -n 's/^BACKLOG_MODE=\"*\([A-Za-z]*\)\"*.*/\1/p' | head -1)
+  # READ, NOT SOURCED, and both quote spellings are admitted. That sibling conf is the memory
+  # kit's and its own readers SOURCE it; a second reader that re-parses one is how a legal
+  # spelling comes back as a value nothing matches while the guard reports itself armed. What
+  # bounds this one is that it is a NOTICE: a spelling it cannot read comes back empty, which
+  # prints as `(undeclared)` in the line itself, so a reader sees what was READ rather than a
+  # conclusion drawn from it.
+  _a=$(GIT show "$ASHA:.memory-tree.conf" 2>/dev/null | read_backlog_mode)
+  _h=$(GIT show "HEAD:.memory-tree.conf" 2>/dev/null | read_backlog_mode)
   [ "$_a" != "$_h" ] || return 0
   echo "unattended: preflight — the memory tree's BACKLOG_MODE differs between the anchor and HEAD: [${_a:-(undeclared)}] at the anchor, [${_h:-(undeclared)}] at HEAD. Where a build files its asks moved under this run, so an ask visible at one of those trees may be invisible at the other."
 }
