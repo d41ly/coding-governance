@@ -169,8 +169,11 @@ read_stub_log() {
 # exists. The NOTE-path liveness read (TOOL-aWokenSentinel-13): an empty path, the specced defect's
 # own signature, counts for nothing, and so does a NOTE that never printed.
 measure_note_files() {
-  local n=0 p
-  while IFS= read -r p; do [ -n "$p" ] && [ -f "$p" ] && n=$((n+1)); done <<<"$(printf '%s\n' "$1" | sed -n 's/.*Declare one in \(.*\) to change it.*/\1/p')"
+  local n=0 p paths
+  # The substitution lands in a variable FIRST: a loop fed by a here-string holding a command
+  # substitution is the shape the shell-hygiene leg gates (it reads until an EOF that may never come).
+  paths=$(printf '%s\n' "$1" | sed -n 's/.*Declare one in \(.*\) to change it.*/\1/p')
+  while IFS= read -r p; do [ -n "$p" ] && [ -f "$p" ] && n=$((n+1)); done <<<"$paths"
   printf '%s' "$n"
 }
 # seed_log <n> <utc> [slug] [sidecar] — n attempt lines in the sidecar, all stamped <utc>; tRun in
