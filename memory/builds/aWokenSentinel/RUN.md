@@ -14,8 +14,8 @@ pid-image: claude.exe
 host: compeeto-agent
 pid: 24068
 session: 2db85696-ae7f-456a-9d88-fffc3fe3482a
-witness: 8bdcb035282b81bd111c9d2af652ab173a3c3230
-phase: BUILDING
+witness: 91cbcf3ca34e14af7302df3b3f6e78dc095170b7
+phase: VERIFYING
 branch-sha: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 branch-ref: refs/heads/branch/unattended-kit-keepalive-a29498
 mode: prompt
