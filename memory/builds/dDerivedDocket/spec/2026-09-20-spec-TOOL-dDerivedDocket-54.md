@@ -225,7 +225,7 @@ consumes-from target may share its consumer's order, it may not be LATER than it
 declares a parallel group, and M6 in
 `memory/guides/BUILD-METHOD.md` requires parallel passes only where disjointness is PROVEN. It is not
 proven for this pair, on clause 1: both write `tools/unattended/check-unattended.test.sh` and both
-move a floor in `.memory-tree.conf`, and unit 18 writes
+move that suite's floors, and unit 18 writes
 `tools/unattended/lib-unattended.sh` too where its matcher is not already there. So the pair runs in
 sequence. The roster is handed out ordered by step and then by id, which puts unit 18 first and this
 unit second — the order this unit needs anyway, since its only requirement is to land before unit 19.
@@ -266,7 +266,7 @@ floors carry the new assertions. Not `.memory-tree.conf` (rev-2, S5).
   two questions here, and it would exclude exactly the side the run's own commits sit on in one of
   unit 19's five shapes.
 - **Enumerating the range and diffing each commit.** Correct and unbounded. The unsimplified walk
-  with a first-hit stop gets the same answer in one process; the cost question that remains is the
+  asking for one commit gets the same answer in one process; the cost question that remains is the
   negative answer's, and §8 F3 leaves the cap to the caller's budget.
 - **Leaving the spelling in unit 19's §4.** That is the state this finding came out of: one command
   in prose, a resolution in §8 that the command does not implement, and no arm that could tell them
@@ -280,8 +280,8 @@ floors carry the new assertions. Not `.memory-tree.conf` (rev-2, S5).
   guard rather than a nicety: the caller reads that value from the record being graded
   (`tools/unattended/check-unattended.sh:1709`), and a value that is a legal object of the wrong type
   turns the exclusion off while the probe goes on answering (§4).
-- perf / scale — one bounded git read per parent per merge on a witness's tail, stopping at the first
-  hit. A negative answer walks the range, which is the cost §8 F3 leaves open; the positive answer is
+- perf / scale — one bounded git read per parent per merge on a witness's tail, asking for one
+  commit at most. A negative answer walks the range, which is the cost §8 F3 leaves open; the positive answer is
   the common one on the shapes unit 19 enumerates.
 - error / empty / loading states — S4 is the whole of this row: cannot-answer is a third outcome and
   never a quiet no, and an empty BASE reaches it through a refusal in front of the walk rather than
@@ -390,7 +390,7 @@ glob-shaped path graded as one literal path, and a shallow clone · that suite's
   shares it with a later unit, so an inline copy would be a second spelling of one rule in a file
   whose own header says that is what it exists to prevent.
 - **F3** — Does the negative answer need a cap, and what does a truncated walk mean? A positive answer
-  stops at the first hit; a negative walks the range, which on a long-lived default branch is every
+  asks for one commit; a negative walks the range, which on a long-lived default branch is every
   commit since BASE. S4 already gives truncation somewhere to go, since a truncated negative is a
   cannot-answer and not a no. What the cap VALUE should be belongs with the caller's own budget, which
   unit 19 sets when it wires the walk. Left OPEN on that ground: this unit's scope binds either way.
@@ -449,6 +449,13 @@ glob-shaped path graded as one literal path, and a shallow clone · that suite's
   `:373-374`), and the naming leg is `tools/gate-legs.json:1078`. The witness, the subject, every
   `Red when:` arm and §4's two measurement tables are unchanged: rows 1 to 7 and all five BASE rows
   were re-measured in a scratch repo on git 2.54.0 on 2026-09-21 and each answered as tabled.
+  Extended on the same pass, same base and rev, by the gotchas checklist's fold ·
+  amendment-leaves-its-other-half-standing: §4's Rollout said both units of step 18 move a floor in
+  `.memory-tree.conf`, and the perf row, the rejected alternative and F3 still said the walk stops
+  at its first hit, each the other half of an amendment above; they now say what the amendment
+  says. inputs-inside-the-subjects-reach: the library header now states that the predicate checks
+  BASE is a commit and never that it is the right one, since a run-written BASE naming another real
+  commit moves the range and the leg's check 9 is what grades the pin.
 
 ## 10. Reuse audit
 

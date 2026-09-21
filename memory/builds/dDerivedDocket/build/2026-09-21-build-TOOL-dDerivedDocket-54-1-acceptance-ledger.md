@@ -20,6 +20,13 @@ deleted, the commit's resolve test removed, the blank-path refusal removed, and 
 folded into a no. Both tables in the spec's §4 were re-measured on the fixture, rows 1 to 7 and all
 five BASE rows, and each answered as tabled.
 
+Folded from `python tools/memory-tree/gotchas.py --for-diff fb07ca25..HEAD` after the first commit:
+the spec's Rollout, perf row, rejected alternative and F3 still carried the other half of two rev-2
+amendments, the `.memory-tree.conf` floor and the first-hit stop, and now say what the amendments
+say; and the library header now states that the predicate checks BASE is a commit and never that it
+is the right one, which is the leg's check 9. The arm block was re-run after that edit, thirty-two
+assertions, green.
+
 **Evidences:** TOOL-dDerivedDocket-54
 - AC1 — `tools/unattended/lib-unattended.sh` — over a fixture whose witness merge takes as its
   first parent a nested merge that resolves the run-state path back to BASE's content (asserted

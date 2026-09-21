@@ -386,6 +386,10 @@ read_run_commits() {  # endpoint · base · exclusion-tip…
 # answers a confident YES over the whole history. The two fail in OPPOSITE directions, which is why
 # one refusal in front of the walk covers both and neither is left to whatever the walk prints.
 #
+# IT CHECKS THAT BASE IS A COMMIT, NEVER THAT IT IS THE RIGHT ONE. A run-written BASE naming another
+# real commit moves the range, and this answers faithfully over the moved range; whether the record
+# pins the commit it should is the leg's check 9, not a question this predicate can ask.
+#
 # A SHALLOW CLONE CANNOT ANSWER. Both ends of the range are computed over grafted roots there: the
 # walk from COMMIT can stop short of a touching commit, and "not reachable from BASE" can hold for a
 # commit that is BASE's ancestor through history the clone does not have - a wrong answer of either
