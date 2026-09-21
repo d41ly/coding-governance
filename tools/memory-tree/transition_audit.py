@@ -75,7 +75,7 @@ class DeadProbe(Problem):
 def build_git_env() -> dict:
     """The environment every git call in this module runs under.
 
-    `GIT_GRAFT_FILE=/dev/null` is the spelling `tools/unattended/check-pass-order.sh` uses and it
+    `GIT_GRAFT_FILE=/dev/null` is the spelling the unattended kit's history leg uses and it
     works under Git for Windows, whose MSYS layer maps the name. A graft file re-parents commits, so
     without this pin every ancestry answer below could be honest about a sha and wrong about what
     that sha means.

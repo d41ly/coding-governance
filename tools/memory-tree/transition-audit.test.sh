@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # transition-audit.test.sh — the arms for hygiene check 25 and its commit-time carrier.
 #
-#   bash tools/memory-tree/transition-audit.test.sh     # "PASS (n assertions)" + exit 0 = good
+#   bash <tool-root>/memory-tree/transition-audit.test.sh   # "PASS (n assertions)" + exit 0 = good — <tool-root> is `tools` here
 #
 # WHAT IT GRADES. `transition_audit.py` classifies MERGES by lineage, computes the delta of the
 # shards-side parent, accounts each entry against a tree, and refuses. Every arm below builds a
@@ -56,11 +56,17 @@ has() { printf '%s' "$1" | grep -qF -- "$2"; }
 # ONE seeded template, copied per fixture. A `git init` is one process and a kit copy is fifty file
 # writes; doing both per arm is the cost this harness would otherwise be.
 SEED="$TMP/seed"
-mkdir -p "$SEED/tools" "$SEED/memory/backlog" "$SEED/memory/builds/aSeed" "$SEED/memory/project"
-cp -r "$KIT_MT" "$SEED/tools/memory-tree"
-cp -r "$KIT_MR" "$SEED/tools/memory-recall"
-cp -r "$KIT_LIB" "$SEED/tools/lib"
-rm -rf "$SEED/tools/memory-tree/__pycache__" "$SEED/tools/memory-recall/__pycache__"
+# THE FIXTURE MIRRORS THIS TREE'S OWN PREFIX, derived. A literal `tools/<kit>/` here would be
+# a carried install-prefix spelling in a file adopters receive, and it would be wrong in any
+# tree that installs the kits somewhere else.
+mkdir -p "$SEED/$TOOL_ROOT" "$SEED/memory/backlog" "$SEED/memory/builds/aSeed" "$SEED/memory/project"
+cp -r "$KIT_MT" "$SEED/$KIT_MT"
+cp -r "$KIT_MR" "$SEED/$KIT_MR"
+cp -r "$KIT_LIB" "$SEED/$KIT_LIB"
+rm -rf "$SEED/$KIT_MT/__pycache__" "$SEED/$KIT_MR/__pycache__"
+# The kit paths INSIDE a fixture, which every arm below runs the real checker through.
+MOD="$KIT_MT/transition_audit.py"
+ENGINE="$KIT_MT/check-memory-hygiene.sh"
 printf '# the seed build\n' > "$SEED/memory/builds/aSeed/README.md"
 printf '# decisions\n\n- TOOL-aSeed-9 - a decision\n' > "$SEED/memory/DECISIONS.md"
 
@@ -116,14 +122,14 @@ flip_to_builds() { # $1 = repo dir — the commit that switches the default bran
 
 audit() { # $1 = repo dir, rest = argv — the real checker, inside the fixture
   local d="$1"; shift
-  ( cd "$d" && "$PY" tools/memory-tree/transition_audit.py "$@" 2>&1 )
+  ( cd "$d" && "$PY" "$MOD" "$@" 2>&1 )
 }
 audit_rc() { # same, but the exit status
   local d="$1"; shift
-  ( cd "$d" && "$PY" tools/memory-tree/transition_audit.py "$@" >/dev/null 2>&1 ); echo $?
+  ( cd "$d" && "$PY" "$MOD" "$@" >/dev/null 2>&1 ); echo $?
 }
 engine() { # $1 = repo dir — the hygiene engine, inside the fixture
-  ( cd "$1" && bash tools/memory-tree/check-memory-hygiene.sh 2>&1 )
+  ( cd "$1" && bash "$ENGINE" 2>&1 )
 }
 
 # ====================================================================== F1 — straggler into builds
@@ -210,7 +216,7 @@ git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -qm "drop the accountin
 rout=$(audit "$F1" --expect-builds)
 has "$rout" "$F1_MERGE" || bad "AC13: a replace ref re-parenting the merge hid it from the audit"; ok
 printf '%s %s\n' "$F1_MERGE" "$(git -C "$F1" rev-parse "$F1_MERGE^1")" > "$TMP/grafts"
-gout=$( cd "$F1" && GIT_GRAFT_FILE="$TMP/grafts" "$PY" tools/memory-tree/transition_audit.py --expect-builds 2>&1 )
+gout=$( cd "$F1" && GIT_GRAFT_FILE="$TMP/grafts" "$PY" "$MOD" --expect-builds 2>&1 )
 has "$gout" "$F1_MERGE" || bad "AC13: an inherited GIT_GRAFT_FILE hid the merge from the audit"; ok
 # THE POSITIVE CONTROL. A graft file that git ignores makes the arm above pass for the wrong
 # reason, and grafts are deprecated, so the fixture proves it still re-parents before the pin
@@ -236,7 +242,7 @@ has "$noflag" "reader cross-check not run" || bad "AC12: --at without --expect-b
 
 # --- AC6 — the three DEAD PROBE refusals, each staged ---------------------------------------------
 B="$TMP/f1broken"; cp -r "$F1" "$B"
-"$PY" - "$B/tools/memory-tree/transition_audit.py" <<'PYEOF'
+"$PY" - "$B/$MOD" <<'PYEOF'
 import io, sys
 p = sys.argv[1]
 s = io.open(p, encoding="utf-8", newline="").read()
@@ -249,7 +255,7 @@ cout=$(audit "$B" --expect-builds)
   || bad "AC6: a conf reader that calls every blob shards did not refuse as a DEAD PROBE"; ok
 
 D="$TMP/f1noboundary"; cp -r "$F1" "$D"
-"$PY" - "$D/tools/memory-tree/transition_audit.py" <<'PYEOF'
+"$PY" - "$D/$MOD" <<'PYEOF'
 import io, sys
 p = sys.argv[1]
 s = io.open(p, encoding="utf-8", newline="").read()
@@ -272,10 +278,10 @@ else
 fi
 
 # --- AC15 — the memory-recall kit is a NAMED prerequisite, never a degraded mode -------------------
-NR="$TMP/f1norecall"; cp -r "$F1" "$NR"; rm -rf "$NR/tools/memory-recall"
+NR="$TMP/f1norecall"; cp -r "$F1" "$NR"; rm -rf "$NR/$KIT_MR"
 nout=$(audit "$NR" --expect-builds)
 { [ "$(audit_rc "$NR" --expect-builds)" = 1 ] && has "$nout" "memory-recall" \
-  && has "$nout" "install the memory-recall kit" && has "$nout" "tools/memory-recall"; } \
+  && has "$nout" "install the memory-recall kit" && has "$nout" "${KIT_MR##*/}"; } \
   || bad "AC15: an absent memory-recall kit did not refuse by name with the path and the remedy"; ok
 
 # ================================================================== F5 — a shards-mode tree is DARK
@@ -284,7 +290,7 @@ e5=$(engine "$F5")
 has "$e5" "memory-hygiene: check 25 is DORMANT" || bad "AC5: a shards-mode tree does not announce that check 25 is dormant"; ok
 printf '%s\n' "$e5" | grep -F 'memory-hygiene: check 25 ' | grep -qv 'is DORMANT' \
   && bad "AC5: a shards-mode tree printed a check 25 line other than the dormant announcement"; ok
-rm -rf "$F5/tools/memory-recall"
+rm -rf "$F5/$KIT_MR"
 [ "$(audit_rc "$F5")" = 0 ] || bad "AC15: a shards-mode tree with no memory-recall kit did not stay dormant at exit 0"; ok
 
 # ============================================================ F2/F3/F4 — what IS and IS NOT a merge
@@ -345,9 +351,9 @@ F7_A=$(git -C "$F7" rev-parse HEAD)
 git -C "$F7" checkout -q sideB
 git -C "$F7" merge -q --no-ff -m "B takes A" sideA 2>/dev/null || git -C "$F7" merge -q --no-ff -m "B takes A" "$F7_A"
 F7_B=$(git -C "$F7" rev-parse HEAD)
-xout=$( cd "$F7" && "$PY" - "$F7" "$F7_A" "$F7_B" <<'PYEOF'
+xout=$( cd "$F7" && "$PY" - "$F7" "$F7_A" "$F7_B" "$KIT_MT" <<'PYEOF'
 import sys
-sys.path.insert(0, "tools/memory-tree")
+sys.path.insert(0, sys.argv[4])
 import transition_audit as TA
 root, ours, theirs = sys.argv[1], sys.argv[2], sys.argv[3]
 print(" ".join(sorted(e["id"] for e in TA.delta(ours, theirs, root=root))) or "(none)")
@@ -431,9 +437,9 @@ F11_STRAG=$(git -C "$F11" rev-parse HEAD)
 git -C "$F11" checkout -q main
 flip_to_builds "$F11"
 F11_FLIP=$(git -C "$F11" rev-parse HEAD)
-before=$( cd "$F11" && "$PY" - "$F11" "$F11_STRAG" "$F11_FLIP" <<'PYEOF'
+before=$( cd "$F11" && "$PY" - "$F11" "$F11_STRAG" "$F11_FLIP" "$KIT_MT" <<'PYEOF'
 import sys
-sys.path.insert(0, "tools/memory-tree")
+sys.path.insert(0, sys.argv[4])
 import transition_audit as TA
 root, ours, theirs = sys.argv[1], sys.argv[2], sys.argv[3]
 for e in sorted(TA.delta(ours, theirs, root=root), key=lambda e: e["id"]):
@@ -452,9 +458,9 @@ F11_OK=$(git -C "$F11" rev-parse HEAD)
 F11_BAD=$(git -C "$F11" rev-parse HEAD^1)
 acct() { # $1 = the tip to account against, with HEAD checked out at $2
   git -C "$F11" checkout -q "$2"
-  ( cd "$F11" && "$PY" - "$F11" "$F11_STRAG" "$F11_FLIP" "$1" <<'PYEOF'
+  ( cd "$F11" && "$PY" - "$F11" "$F11_STRAG" "$F11_FLIP" "$1" "$KIT_MT" <<'PYEOF'
 import sys
-sys.path.insert(0, "tools/memory-tree")
+sys.path.insert(0, sys.argv[5])
 import transition_audit as TA
 root, ours, theirs, tip = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 entries = TA.delta(ours, theirs, root=root)
