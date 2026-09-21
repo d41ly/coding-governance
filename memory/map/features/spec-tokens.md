@@ -2,7 +2,7 @@
 
 ```toml
 feature = "spec-tokens"
-title = "Four joins that resolve a live spec's leg names, witness paths and line citations, and refuse a bar invocation as an observation"
+title = "Five joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, and owe a guarded leg its name"
 status = "shipped"
 streams = ["tooling"]
 decisions = []
@@ -46,7 +46,8 @@ an exact tracked path, because a bare word is prose. Citations are SCOPED to a t
 the house style cites a kit file by basename and most citations therefore name nothing `git ls-files`
 holds. Redding those is a disposition per row and the lint never lands; passing them silently is a
 could-not-fail arm over much of the corpus. So they are skipped AND COUNTED, and the count prints on
-every run. The fourth join, `bar`, reads the legs and paths populations rather than minting one.
+every run. The fourth join, `bar`, reads the legs and paths populations rather than minting one; the
+fifth, `guards`, reads the legs population plus one of its own, the declared write set.
 
 **A bar or a suite is not an acceptance observation (TOOL-aDeferredBar-2).** The `bar` join reds a
 live spec dated at or after `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf`, blank = off) whose acceptance
@@ -69,6 +70,24 @@ landing day it therefore grades zero tracked specs; the pre-cutoff carriers are 
 line and listed by `--list` as `NEAR`, so that zero is announced rather than silent. The bullet loop
 now finds the acceptance section by heading text, the read the Gates section already had, so a
 light-profile spec is graded where its criteria sit.
+
+**A path a spec declares it will touch owes the legs it trips (TOOL-aBlindedTrial-8).** The `guards`
+join reads every backticked path-shaped token under a live spec's §4 `### Files touched` sub-head,
+spelled with or without ` (estimate)`, and joins each to every `guard` list in `tools/gate-legs.json`
+with git-pathspec semantics: the exact path, or anything under the guard as a directory, never a
+bare prefix. A leg whose guard the write set trips must be a name on the §7 leg line, in a spec dated
+at or after `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`, blank = off; the same commit-date relation
+as `SPEC_DIRECT_CUTOFF`, asserted by one helper for both keys). The measured case: unit 4 of the
+aBlindedTrial build edited `tools/hooks/scratch-guard.js` and omitted `scratch-guard self-test`, and
+closing review round 1 found it as F7 where no gate did. ONE-SEGMENT guards (`tools/`, `memory/`)
+are excluded from the join and listed by `--list` as `NEAR`: eleven legs guard bare `tools/`, so
+naming them adds nothing and buries the specific one. The hit token is the composite
+`<leg> <- <path>`, one per missing leg naming the first path that trips it, so a `[leg]` waiver row
+keyed on the bare leg name cannot swallow it. The join reads the ESTIMATE as written, not the write
+set the build made, and reads no path named in prose outside the sub-head. The report carries a
+`guards join` line on every run: declared paths examined in how many graded specs, pre-cutoff
+carriers of a missing leg counted and not graded, and specs with no sub-head counted apart. On the
+landing day the graded figures read zero by the relation, and the carriers are the announced skip.
 
 **Terminal specs are outside the population by construction.** This repo cites a landed decision
 verbatim and never rewrites one, so grading a CLOSED spec would demand editing a frozen record to

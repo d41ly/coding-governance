@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # check-spec-tokens.test.sh — red/green arms for tools/check-spec-tokens.py (TOOL-dRetiredFork-20).
+# TOOL-aBlindedTrial-8 added the guards-join arms: a §4 files-touched path that trips a leg's guard
+# owes that leg's name on the §7 leg line.
 #
 # HERMETIC: every arm runs in a scratch repo under mktemp -d — its own, or one of the two the bar
 # arms share and reset between edits — and never touches the real tree, so the suite is safe beside
@@ -13,12 +15,17 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=42
+FLOOR_ASSERTIONS=55
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
 # RAISED 38 -> 42 at closing round 2, by the count of `arm`/`pass=` lines its diff added: two
 # leg-line cutoff refusals (R7, R11), the `py` launcher hit (R12) and the parity accounting (R3).
+# RAISED 42 -> 55 at TOOL-aBlindedTrial-8, by the count of `arm`/`pass=` lines its diff added: the
+# guards join's hit and clean pair, the pre-cutoff carrier, the blank key, the non-path token, the
+# short sub-head spelling, the absent sub-head, the one-segment near-miss (rc and `--list`), the
+# composite waiver and the bare-leg row that does not consume it, and the two refusals (non-ISO,
+# relation).
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -354,6 +361,115 @@ printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
 sed -i 's|`tools/gate-legs.json` exists|`py tools/govkit/selftest.py` is green|' "$spec"   # gov:literal-python — a fixture TOKEN the checker grades, never run
 git -C "$d" add -A >/dev/null
 arm "a whole-suite selftest.py behind the py launcher REDS as [bar]" 1 "$d" '[bar] `py tools/govkit/selftest.py`'   # gov:literal-python — the expected hit line, never run
+git -C "$d" reset -q --hard "$clean"
+
+# ---- TOOL-aBlindedTrial-8: the guards join, over the same shared repo and reset the same way. A
+#      §4 `### Files touched` path that trips a leg's `guard` in the manifest owes that leg's name on
+#      the §7 leg line. Each arm is observed RED-first on the checker at 987c5bec, which read no
+#      sub-head and no guard: the hit arms graded clean, the report arms printed no guards line, and
+#      the refusal arms never read the key. The fixture spec carries no `## 4.`, so each arm inserts
+#      one above the acceptance heading; the manifest gains one leg guarded on `tools/x/`.
+GUARD_LEGS='[{"name":"real leg"},{"name":"guarded leg","guard":["tools/x/"]}]'
+write_files_touched() {   # $1 = the sub-head line · $2 = the line under it (backticked tokens)
+  sed -i "s|^## 6. Acceptance criteria\$|## 4. Design\n\n$1\n\n$2\n\n## 6. Acceptance criteria|" "$spec"
+}
+
+# AC2 — a post-cutoff spec declaring `tools/x/thing.sh` whose leg line omits `guarded leg` REDS as
+#       [guards], naming the spec, the leg and the path in one composite token.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff spec whose files-touched trips a guard the leg line omits REDS as [guards]" 1 "$d" '-spec-TOOL-tOne-1.md [guards] `guarded leg <- tools/x/thing.sh` — §4 files-touched names tools/x/thing.sh, which trips the guard of leg '"'"'guarded leg'"'"', absent from the §7 leg line'
+# ...and the same tree with the leg NAMED is green, and the guards line reports what it examined.
+sed -i 's|^`real leg`\.|`real leg` · `guarded leg`.|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "the same tree with the guarded leg named on the leg line is green and counted as examined" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s) at/after SPEC_GUARD_LEGS_CUTOFF 2026-09-01"
+git -C "$d" reset -q --hard "$clean"
+
+# AC6 — the PRE-cutoff twin is green, and COUNTED on the guards line rather than silently skipped.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" mv "$spec" "$d/memory/builds/tOne/spec/2026-08-30-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a PRE-cutoff spec missing a guarded leg is green, counted and not graded" 0 "$d" "1 pre-cutoff live spec(s) carry a missing guarded leg and are not graded"
+git -C "$d" reset -q --hard "$clean"
+
+# AC1 — a BLANK key turns the join off over the AC2 tree, announces it, and still counts the carrier.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF=""\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a blank SPEC_GUARD_LEGS_CUTOFF turns the join off and still counts the carrier" 0 "$d" "guards join · SPEC_GUARD_LEGS_CUTOFF blank (arm off) · 1 live spec(s) carry a missing guarded leg"
+git -C "$d" reset -q --hard "$clean"
+
+# S2 — a token under the sub-head that is not path-shaped (`$KIT`, a deploy-time token) declares
+#      nothing: zero paths examined, no hit, no carrier.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`$KIT` · `last-audit`'
+git -C "$d" add -A >/dev/null
+arm "a non-path token under the sub-head declares no path" 0 "$d" "guards join · 0 declared path(s) examined in 1 live spec(s)"
+git -C "$d" reset -q --hard "$clean"
+
+# AC3 — the sub-head spelled WITHOUT the parenthetical is read the same way.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "the short sub-head spelling is read and REDS the same omission" 1 "$d" '[guards] `guarded leg <- tools/x/thing.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# S2 — no sub-head at all is SILENT, and counted in its own field: nothing declared, nothing joined.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff spec with no Files touched sub-head is silent and counted apart" 0 "$d" "1 carry no Files touched sub-head"
+git -C "$d" reset -q --hard "$clean"
+
+# AC4 — a path under a ONE-SEGMENT guard only (`tools/`) is excluded from the join: green, and
+#       `--list` prints it as NEAR so the exclusion announces itself.
+printf '[{"name":"real leg"},{"name":"broad leg","guard":["tools/"]}]\n' > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a path matching only a one-segment guard is no hit" 0 "$d" "guards join · 1 declared path(s) examined"
+out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: tools/x/thing.sh — matches only the one-segment guard(s) tools/'; then
+  echo "arm ok    --list prints the one-segment match as NEAR [guards]"; pass=$((pass+1))
+else
+  echo "arm FAIL  --list — expected a NEAR [guards] row for tools/x/thing.sh naming the one-segment guard"
+  printf '%s\n' "$out" | grep -F 'NEAR' | head -3; fail=$((fail+1))
+fi
+git -C "$d" reset -q --hard "$clean"
+
+# AC5 — a waiver row keyed on the COMPOSITE token clears the hit and is counted; a bare row keyed
+#       on the leg name alone does not consume it, so the hit stays live and the row reds as stale.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+printf 'guarded leg <- tools/x/thing.sh\t[guards] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "a [guards] waiver row keyed on the composite token clears the hit and is counted" 0 "$d" "1 waiver(s)"
+sed -i 's|^guarded leg <- tools/x/thing.sh\t|guarded leg\t|' "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "a waiver row keyed on the bare leg name does not consume a guards hit" 1 "$d" '[guards] `guarded leg <- tools/x/thing.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# closing review F10's rule, for the new key — a non-ISO value is REFUSED, never armed.
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-9-8"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "a non-ISO SPEC_GUARD_LEGS_CUTOFF is REFUSED like the other cutoff keys" 1 "$d" "REFUSING — SPEC_GUARD_LEGS_CUTOFF 2026-9-8 is not an ISO date"
+git -C "$d" reset -q --hard "$clean"
+
+# AC17's relation, for the new key — a COMMITTED value not strictly past its own commit day is
+# REFUSED before grading. The relation block is one helper for both keys, so this observes the
+# second caller rather than trusting the first.
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-02"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm guardcutoff --no-verify
+day=$(git -C "$d" log -1 --format=%cs)
+arm "a committed SPEC_GUARD_LEGS_CUTOFF not strictly past its own commit day is REFUSED" 1 "$d" "REFUSING — SPEC_GUARD_LEGS_CUTOFF 2026-09-02 is not strictly past $day"
 git -C "$d" reset -q --hard "$clean"
 
 # The WAIVER family: its committed clean state IS the AC1 fixture, and the commit is dated the day

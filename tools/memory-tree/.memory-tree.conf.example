@@ -139,6 +139,16 @@ SPEC_LEGLINE_CUTOFF=""
 # hand for the same reason as the row above: the example-parity arm cannot see this key.
 SPEC_DIRECT_CUTOFF=""
 
+# Guarded-leg ratchet, read by the spec-tokens checker rather than by the hygiene engine: from this
+# date a LIVE spec's §7 leg line must name every leg in your gate manifest whose `guard` any
+# backticked path under the spec's §4 `### Files touched` sub-head trips (the exact path, or under
+# the guard as a directory). One-segment guards such as `tools/` are excluded and listed by `--list`
+# as near-misses; a leg with no `guard` key is never owed. Set it strictly past your corpus as with
+# the two above; the checker refuses a committed value not strictly past the day it was committed.
+# Blank = never required, and the report line then counts the live specs carrying such an omission.
+# Declared here by hand for the same reason as the rows above: the example-parity arm cannot see it.
+SPEC_GUARD_LEGS_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.
