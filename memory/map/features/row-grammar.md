@@ -63,6 +63,12 @@ amendment is not a member; a row answers "what is on this line", where it is.
   build their id patterns from, so neither copies the other.
 - `check-memory-hygiene.sh` — delegates check 20 the way it delegates 13-19, so the check costs no
   new gate leg of its own; only its selftest is a leg.
+- `BACKLOG_MODE` — `row_stems()` narrows the row-document set by the declared layout, reading the key
+  through `backlog.read_conf` rather than spelling a second reader. Under `builds` the set is
+  `DECISIONS.md` and its own archives alone: a family file is then a generated view whose rows are
+  link-wrapped renderings, so grading one as a row document would report a mis-segmented grammar
+  against text no author wrote. Check 24 follows the same set out, which is why a family archive is
+  check 9's archive guard's there and not a second finding here. `TOOL-dDerivedDocket-8`.
 - The vacuity precondition uses a family-INDEPENDENT id shape on purpose. Deriving it from the
   declared families would assert one value against another the same call derives, which is the
   tautology that let the wrong-families arm pass by finding nothing.

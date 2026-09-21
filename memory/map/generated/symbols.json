@@ -303,6 +303,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "backlog_module",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
       "id": "blob_at",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -3073,6 +3078,16 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_backlog_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "read_backlog_mode",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "read_bindings",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4056,6 +4071,11 @@
       "id": "row_ids",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "row_stems",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "rrf",

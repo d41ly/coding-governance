@@ -2449,6 +2449,160 @@ case "$o" in
   *) echo "FAIL PROJECT_REGISTRY_EXTRA accepted a file it does not name — check 3 is disabled"; st=1 ;;
 esac
 
+# ---- TOOL-dDerivedDocket-8: THE DECLARED BACKLOG LAYOUT ------------------------------------------
+# ONE FIXTURE, TWO CONFS, TWO RUNS, in the shape the project-key arms above use (TOOL-aLeakedHandle-8
+# gave them that shape and aRatifiedRulings built it): everything graded here is in the tree for BOTH
+# runs and only the declared mode moves. A tree per mode would let an absent fixture read as a
+# correct verdict in exactly the half that matters — the `builds` half, where almost every assertion
+# is that something is NOT named.
+#
+# WHAT EACH FILE IS FOR, because a fixture nobody can read is a fixture nobody maintains:
+#   backlog/ARCH.md    over the index cap AND carrying one 320-character row. Under `shards` it is
+#                      an authored shard and check 6 names it; under `builds` it is a GENERATED view
+#                      that leaves check 6 and STAYS in check 7, which is the pair D3 decided.
+#   backlog/BRAND.md   over the index cap, every row short, and the ONLY row in curation-debt.txt.
+#                      Under `shards` the row earns check 6; under `builds` it earns nothing and the
+#                      stale-ENTRY guard reds it — the red the switch-over clears by deleting it.
+#   builds/tAsk/       a build with a README and a BACKLOG.md that is over the cap and carries one
+#                      500-character ask row: check 4's admission, check 6's never-rotate branch and
+#                      check 7's exemption, all on one file.
+#   builds/tHome/      a FILING HOME: a build folder holding nothing but BACKLOG.md.
+#   archive/ARCH...    a family archive referenced from no preamble.
+BM=$TMP/bmode
+mkdir -p "$BM"
+bm_set() {   # $1 = the BACKLOG_MODE line, or empty for a conf that never declares the key
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture brand"\nFAMILIES="architecture:ARCH brand:BRAND"\n' > "$BM/.memory-tree.conf"
+  [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$BM/.memory-tree.conf"
+  return 0
+}
+( cd "$BM" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  bm_set ""
+  mkdir -p memory/backlog memory/project memory/archive memory/builds/tAsk memory/builds/tHome
+  printf '# r\n' > memory/README.md
+  printf '# d\n\n- ARCH-tOne-1 · a decision\n' > memory/DECISIONS.md
+  for r in legacy-files.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt stale-header-waiver.txt; do : > "memory/project/$r"; done
+  printf 'memory/backlog/BRAND.md\n' > memory/project/curation-debt.txt
+  # ONE seq, reused, for the reason the check-6 cap fixtures above give: building each line with its
+  # own command substitution costs this suite minutes.
+  BMR=$(printf 'y%.0s' $(seq 1 230))
+  BMW=$(printf 'w%.0s' $(seq 1 294))
+  BMA=$(printf 'a%.0s' $(seq 1 463))
+  { printf '# ARCH asks\n\n'
+    i=1; while [ "$i" -le 100 ]; do printf -- '- ARCH-tRow%d-1 · OPEN · %s\n' "$i" "$BMR"; i=$((i+1)); done
+    printf -- '- ARCH-tWide-1 · OPEN · %s\n' "$BMW"; } > memory/backlog/ARCH.md
+  { printf '# BRAND asks\n\n'
+    i=1; while [ "$i" -le 100 ]; do printf -- '- BRAND-tRow%d-1 · OPEN · %s\n' "$i" "$BMR"; i=$((i+1)); done
+  } > memory/backlog/BRAND.md
+  printf -- '---\nslug: tAsk\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tAsk-1\n---\n\n# tAsk\n' > memory/builds/tAsk/README.md
+  { printf '# tAsk asks\n\n## Asks\n\n'
+    printf -- '- ARCH-tAsk-1 · filed 2026-08-01 · %s\n' "$BMA"
+    i=2; while [ "$i" -le 100 ]; do printf -- '- ARCH-tAsk%d-1 · filed 2026-08-01 · %s\n' "$i" "$BMR"; i=$((i+1)); done
+  } > memory/builds/tAsk/BACKLOG.md
+  printf '# tHome asks\n\n## Asks\n\n- ARCH-tHome-1 · filed 2026-08-01 · a build folder that is nothing but a filing home\n' > memory/builds/tHome/BACKLOG.md
+  printf -- '- ARCH-tGone-1 · CLOSED · a rotated ask nobody announced\n' > memory/archive/ARCH.2026-01-01.md
+  git add -A && git commit -q -m bmode --no-verify ) >/dev/null 2>&1
+
+bm_run() {   # $1 = the BACKLOG_MODE line; leaves $out set and asserts the gate actually RAN
+  bm_set "${1:-}"
+  out=$(cd "$BM" && bash "$SCRIPT" 2>/dev/null); bmrc=$?
+  n=$((n+1))
+  [ "$bmrc" != 2 ] || { echo "FAIL backlog-mode '$1' aborted the gate (status 2); every arm below would prove nothing"; st=1; }
+}
+
+# --- SHARDS. The whole point of this half is that it is byte-for-byte what the engine did before
+# --- this unit, so every `builds` assertion below has a control that is not merely "silence".
+bm_run 'BACKLOG_MODE="shards"'
+chit 4 'memory/builds/tAsk/BACKLOG.md'
+chit 4 'memory/builds/tHome/BACKLOG.md'
+chit 6 'memory/backlog/ARCH.md'
+chit 7 'memory/backlog/ARCH.md'
+cnot 7 'memory/builds/tAsk/BACKLOG.md'
+chit 10 'memory/archive/ARCH.2026-01-01.md'
+cnot 6 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived'
+n=$((n+1))
+grep -qF 'memory-hygiene: check 8 graded' <<<"$out" \
+  || { echo "FAIL under shards check 8 did not print its graded-row line"; st=1; }
+n=$((n+1))
+grep -qF 'check 8: backlog layout builds' <<<"$out" \
+  && { echo "FAIL under shards check 8 printed the builds-mode retirement line"; st=1; }
+n=$((n+1))
+cblock "$out" 6 | grep -qF 'rotate to archive/' \
+  || { echo "FAIL under shards an oversized shard was not named with the ROTATE remedy"; st=1; }
+
+# --- BUILDS. Each arm's pair above is what makes it an observation rather than a silence.
+bm_run 'BACKLOG_MODE="builds"'
+cnot 4 'memory/builds/tAsk/BACKLOG.md'
+cnot 4 'memory/builds/tHome/BACKLOG.md'
+cnot 6 'memory/backlog/ARCH.md'
+chit 6 'memory/builds/tAsk/BACKLOG.md'
+n=$((n+1))
+cblock "$out" 6 | grep -qF "a build's BACKLOG.md over cap — move detail into a build/ recording; never rotate" \
+  || { echo "FAIL under builds an oversized BACKLOG.md was not named on the never-rotate branch"; st=1; }
+# ...and it is a SEPARATE branch, not the rotate message widened: a BACKLOG.md author told to rotate
+# is told to do the one thing the per-build layout forbids.
+n=$((n+1))
+cblock "$out" 6 | grep -F 'rotate to archive/' | grep -qF 'BACKLOG.md' \
+  && { echo "FAIL under builds the BACKLOG.md finding rode the ROTATE message"; st=1; }
+chit 7 'memory/backlog/ARCH.md'
+cnot 7 'memory/builds/tAsk/BACKLOG.md'
+n=$((n+1))
+grep -qF 'memory-hygiene: check 8: backlog layout builds — graded by check 9' <<<"$out" \
+  || { echo "FAIL under builds check 8 did not announce its retirement"; st=1; }
+n=$((n+1))
+grep -qF 'HYGIENE check 8 FAILED' <<<"$out" \
+  && { echo "FAIL under builds check 8 reported a finding from a check that is retired"; st=1; }
+n=$((n+1))
+grep -qF 'memory-hygiene: check 8 graded' <<<"$out" \
+  && { echo "FAIL under builds check 8 printed its graded-row line as well as the retirement line"; st=1; }
+# The POPULATION GUARD is the half that would have fired on its own: its precondition counts
+# BACKLOG.md files, which under `builds` are exactly the files check 8 no longer grades.
+n=$((n+1))
+grep -qF 'no backlog shard under memory/backlog/' <<<"$out" \
+  && { echo "FAIL under builds check 8's empty-population guard fired over a check that is retired"; st=1; }
+cnot 10 'memory/archive/ARCH.2026-01-01.md'
+n=$((n+1))
+grep -qF "memory-hygiene: check 10: 1 family archive(s) left to check 9's archive guard" <<<"$out" \
+  || { echo "FAIL under builds check 10 did not count the archive it left to check 9"; st=1; }
+chit 6 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived'
+chit 6 'memory/backlog/BRAND.md'
+
+# --- AC9: the shell reader and the Python reader agree over EVERY value, and a typo ABORTS.
+# --- The shell's reading is observable only through its print mode: the project-key stderr line
+# --- prints a value that was SET, so an absent key and a blank one are both silence there.
+cat > "$TMP/readmode.py" <<'BMPY'
+import os
+import sys
+
+sys.path.insert(0, os.environ["KITDIR"])
+import backlog
+import corpus_ids
+
+print(backlog.read_conf(corpus_ids.load_conf(".")).mode)
+BMPY
+for bmpair in 'absent:' 'blank:BACKLOG_MODE=""' 'shards:BACKLOG_MODE="shards"' 'builds:BACKLOG_MODE="builds"'; do
+  bm_set "${bmpair#*:}"
+  bmsh=$(cd "$BM" && bash "$SCRIPT" --print-backlog-mode 2>/dev/null)
+  bmpy=$(cd "$BM" && KITDIR="$HERE" "$_PY" "$TMP/readmode.py" 2>&1)
+  n=$((n+1))
+  [ "$bmsh" = "$bmpy" ] || { echo "FAIL BACKLOG_MODE ${bmpair%%:*}: the shell read '$bmsh' and the python reader read '$bmpy'"; st=1; }
+  n=$((n+1))
+  [ -n "$bmsh" ] || { echo "FAIL BACKLOG_MODE ${bmpair%%:*}: the shell print mode returned nothing, so the agreement arm above compared two empty strings"; st=1; }
+done
+# Case matters, and the near-miss is the arm worth having: a value the shell read as `shards` while
+# the python reader refused it would half-migrate a tree, quietly.
+for bmbad in buildz Builds ' builds'; do
+  bm_set "BACKLOG_MODE=\"$bmbad\""
+  o=$(cd "$BM" && bash "$SCRIPT" 2>&1); r=$?
+  n=$((n+1))
+  case "$r:$o" in
+    2:*BACKLOG_MODE*) echo "ok   BACKLOG_MODE='$bmbad' ABORTS naming the key" ;;
+    *) echo "FAIL BACKLOG_MODE='$bmbad' did not abort (rc=$r)"; st=1 ;;
+  esac
+  n=$((n+1))
+  printf '%s\n' "$o" | grep -qF 'not one of: shards builds' \
+    || { echo "FAIL the BACKLOG_MODE abort did not name its legal values"; st=1; }
+done
+
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
 # 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
 # shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
@@ -2457,7 +2611,12 @@ esac
 # (TOOL-aRatifiedRulings-3): it used to be graded BEFORE the project-key section, so it read `n`
 # thirteen short of what the PASS line prints, and a pin read off that line would have redded
 # the suite on its first run. The pinned number is now the printed number, exactly.
-FLOOR_ASSERTIONS=374
+# RAISED 374 -> 416 by TOOL-dDerivedDocket-8, which adds 42 executed assertions: 28 outside its two
+# loops (16 chit/cnot, 10 written out, 2 inside `bm_run`) plus 4x2 and 3x2 inside them. DERIVED from
+# the block rather than read off a PASS line, because that suite run is a held leg the unit's pass
+# does not make. The figure is one-sided: this is a `-ge` floor, so an undercount still passes and
+# still catches a block stranded past an exit, which is what the pin is for.
+FLOOR_ASSERTIONS=416
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

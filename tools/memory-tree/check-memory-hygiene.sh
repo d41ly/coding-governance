@@ -110,6 +110,13 @@ ENTRY_CAP_UNIT=""             # blank = today's locale-decided counting; or `cha
 ROTATION_MODE=""              # blank = UNDECLARED; or `cut` / `snapshot`. PRESET for `set -u`: the
                               # observability loop below reads it unguarded, so a conf predating the
                               # key would abort the engine rather than run it.
+BACKLOG_MODE=""               # blank = `shards` (gov's current behaviour); or `shards` / `builds`.
+                              # WHERE an ask lives, and therefore which file each of checks 4, 6, 7,
+                              # 8, 10, 13, 15, 20 and 24 grades. PRESET for `set -u` for the reason
+                              # above. Blank resolves to `shards` rather than being UNDECLARED —
+                              # unlike ROTATION_MODE, which grades nothing until it is declared,
+                              # every check below must pick a layout for every tree, so there is no
+                              # third answer to resolve forward to.
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 : "${SPEC10_CUTOFF:=$_SPEC10_SHIPPED}"   # see the declaration above: blank resolves forward, never off
 # The caps are validated HERE, once, before anything reads them — ahead of the print modes below, so
@@ -181,7 +188,20 @@ case "${ROTATION_MODE:-}" in
   ""|cut|snapshot) ;;
   *) _cfgbad="$_cfgbad ROTATION_MODE='$ROTATION_MODE' (not one of: cut snapshot)" ;;
 esac
+# BACKLOG_MODE is the same CLOSED-set shape, with one difference stated where it is decided: blank
+# RESOLVES to `shards` rather than staying UNDECLARED. Every check below has to grade some layout, so
+# there is no ungraded third state for a blank to mean, and `shards` is what a conf predating the key
+# describes. An unrecognised value still ABORTS — `buildz` must not read as `shards`, because a
+# migration that half-happened is worse than one that refused (the parser module says the same thing
+# on its own side, and the two readers are joined by an arm rather than by this comment).
+case "${BACKLOG_MODE:-}" in
+  ""|shards|builds) ;;
+  *) _cfgbad="$_cfgbad BACKLOG_MODE='$BACKLOG_MODE' (not one of: shards builds)" ;;
+esac
 [ -n "$_cfgbad" ] && { echo "HYGIENE — cannot run: project key(s) declared in .memory-tree.conf are unusable:$_cfgbad"; exit 2; }
+# THE RESOLVED value, derived once. Every check below reads BMODE and never BACKLOG_MODE, so the
+# blank-resolves-to-shards rule is written in exactly one place.
+BMODE="${BACKLOG_MODE:-}"; [ -n "$BMODE" ] || BMODE=shards
 
 # OBSERVABILITY: a divergent configuration is visible without opening the conf.
 # ON STDERR, and that is load-bearing rather than tidy. The PRINT MODES below write one VALUE to
@@ -192,7 +212,7 @@ esac
 # `memory/archive/…`, so the append-only exemption had been silently dead for as long as any project
 # key was set. A print mode that prepends prose to its value is a delegate answering a question it
 # was not asked, and the consumer cannot tell. Found by the Tier-2 review of TOOL-cSpliceWarden.
-for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF ENTRY_CAP_UNIT ROTATION_MODE; do
+for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF ENTRY_CAP_UNIT ROTATION_MODE BACKLOG_MODE; do
   eval "_dv=\${$_dk}"
   [ -n "$_dv" ] && echo "memory-hygiene: project key $_dk='$_dv' (gov's default is blank)" >&2
 done
@@ -269,6 +289,13 @@ ROTATED_ARCHIVE_ERE="^$M/archive/(DECISIONS|$FAM_ALT)\.[0-9]{4}-[0-9]{2}-[0-9]{2
 case "${1:-}" in
   --print-append-only-ere) printf '%s\n' "$APPEND_ONLY_ERE"; exit 0 ;;
   --print-rotated-archive-ere) printf '%s\n' "$ROTATED_ARCHIVE_ERE"; exit 0 ;;
+  # THE RESOLVED backlog mode, one word on stdout. Not a set this script owns — the conf owns the
+  # key — but the RESOLUTION is this script's, and without a way to ask, "blank reads `shards`" is a
+  # claim nothing can check: the observability line above prints only a value that was SET, so a
+  # blank and an absent key are both silence. The Python side resolves the same key through the
+  # parser module, and the arm that compares the two readers over absent, blank, `shards` and
+  # `builds` reads this. An unrecognised value never reaches here: it aborted at exit 2 above.
+  --print-backlog-mode) printf '%s\n' "$BMODE"; exit 0 ;;
 esac
 LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
 DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
@@ -580,7 +607,7 @@ pop_guard 4 "no build folder under $M/builds/" "$BUILD_N" "$PRE_ANYBUILD"
 # over every tracked file under builds/, and a per-file `in_legacy` call would trade one awk
 # for thousands of subshells.
 bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
-  | LC_ALL=C awk -F/ -v m="$M" -v famalt="$FAM_ALT" -v slugre="$BUILD_SLUG_RE" -v legacy="$LEGACY" '
+  | LC_ALL=C awk -F/ -v m="$M" -v famalt="$FAM_ALT" -v slugre="$BUILD_SLUG_RE" -v legacy="$LEGACY" -v bmode="$BMODE" '
       BEGIN {
         n_m = split(m, _seg, "/"); fidx = n_m + 2    # <m>/builds/<folder>
         # S1 — the slug pattern is a PROJECT value now. Blank keeps the gov default. Any override was
@@ -609,6 +636,12 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
         for (i=2;i<=n;i++){ tmp=keys[i]; j=i-1; while(j>=1 && keys[j]>tmp){keys[j+1]=keys[j];j--} keys[j+1]=tmp }
         for (i=1;i<=n;i++){ k=keys[i]; type=substr(k,1,1); name=substr(k,3)
           if (k=="F:README.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
+          # A build`s own BACKLOG.md, admitted ONLY under the `builds` layout. Conditional and not
+          # unconditional: under `shards` an ask lives in the family shard, so a BACKLOG.md at a
+          # build root is a stray file and naming it is this check`s job. A folder holding nothing
+          # ELSE is legal here too — a build whose only content is a filed ask is a FILING HOME, and
+          # nothing in this loop demands a README.
+          if (bmode=="builds" && k=="F:BACKLOG.md") continue
           if (type=="F" && name ~ arre) continue
           if (type=="F"){ if (name !~ rre) print m "/builds/" folder "/" name }
           else print m "/builds/" folder "/" name }
@@ -655,7 +688,17 @@ index_set() {
       echo "$M/$MAP_SUB/README.md"; echo "$M/$MAP_SUB/FOUNDATION.md"
       printf '%s\n' "$FILES" | grep -E "^$M/$MAP_SUB/features/[^/]+\.md$"   # dossiers: size caps, entry-budget exempt
     fi
-    printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"
+    # WHERE THE ASKS ARE. Under `shards` the family shard is the authored row document and carries
+    # the index cap. Under `builds` the file at that path is a GENERATED family view — re-rendered,
+    # never reconciled — so capping it would put a hard ceiling on the number of live asks a family
+    # may hold, which is the option owner ruling D3 refused; the per-build `BACKLOG.md` takes its
+    # place in the population. The views do not leave the engine: check 7 still grades their entry
+    # width, through VIEW_SET below.
+    if [ "$BMODE" = builds ]; then
+      printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/BACKLOG\.md$"
+    else
+      printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"
+    fi
     printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"
     # A BUILD README is ROWS, not prose — TOOL-aWidenedGuide-1 split the cap by CLASS on exactly that
     # distinction, and after the generated surface landed this file is four rendered regions plus one
@@ -677,6 +720,13 @@ index_set() {
   } | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done
 }
 INDEX_SET=$(index_set)   # compute ONCE; checks 6 and 7 both read it (was recomputed per check)
+# THE FAMILY VIEWS, and they exist only under `builds`. Check 7's population used to be DERIVED from
+# check 6's by subtracting the exemptions; under `builds` the two sets differ by these files, so the
+# derivation becomes check 6's set PLUS this one, minus the exemptions. One expression per mode and
+# no second spelling of the base selector — the `ex7` rule recorded below.
+VIEW_SET=""
+[ "$BMODE" = builds ] && VIEW_SET=$(printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$" \
+  | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done)
 case "${1:-}" in --print-index-set) printf '%s\n' "$INDEX_SET"; exit 0 ;; esac   # see the PRINT MODES note above
 
 # 6 — index size caps (grandfather: curation-debt.txt).
@@ -733,8 +783,20 @@ if [ -n "$sel6" ]; then
   ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines"))
 fi
 derive_waived 6 "$bad6"; bad6="$_UNWAIVED"
+# TWO BRANCHES, because the two classes have DIFFERENT remedies and a message is the only thing a
+# reader acts on. The remedy below is "rotate"; a per-build BACKLOG.md must never rotate, because an
+# ask is filed exactly once in its own build's folder and a rotation would move it somewhere the
+# family view cannot link to. Extending the message with a second clause was rejected: it changes
+# this branch's signature and still tells a BACKLOG.md author to do the one thing the layout forbids.
+bad6b=""
+if [ "$BMODE" = builds ] && [ -n "$bad6" ]; then
+  bad6b=$(printf '%s\n' "$bad6" | grep -E "^$M/builds/[^/]+/BACKLOG\.md " || true)
+  bad6=$(printf '%s\n' "$bad6" | grep -vE "^$M/builds/[^/]+/BACKLOG\.md " || true)
+fi
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
 $bad6"
+[ -n "$bad6b" ] && fail 6 "a build's BACKLOG.md over cap — move detail into a build/ recording; never rotate:
+$bad6b"
 # TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out 5/20`. Eight sibling checks already
 # carry this; check 6 reported a clean zero over an empty population instead of refusing.
 pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, map dossiers)" \
@@ -750,6 +812,11 @@ pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, ma
 # of one expression is the two-answers-to-one-question class, and this is how it fired.
 ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$'
 [ -n "$MAP_SUB" ] && ex7="$ex7|/$MAP_SUB/FOUNDATION\.md\$|/$MAP_SUB/features/[^/]+\.md\$"
+# A build's BACKLOG.md is EXEMPT under `builds`, appended the same way: the ask IS the record, its
+# text is free prose on one line, and an entry budget would force a record into a 300-character
+# summary it was designed to outgrow. The generated family views are NOT exempt — their rows are
+# short by construction and the budget is what keeps them so.
+[ "$BMODE" = builds ] && ex7="$ex7|/builds/[^/]+/BACKLOG\.md\$"
 # ONE awk over the whole selected set (was `_unfenced | awk` = 2 forks per file; measured 7.86s here,
 # TOOL-aBatchedLintel-1). `uln` counts the UNFENCED stream, which is what the old `FNR` counted — the
 # piped `_unfenced` output WAS the record source, so the reported line number was never the file line
@@ -760,7 +827,10 @@ ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$'
 # locale; pinning it would silently re-decide the cap on any adopter whose awk counts characters
 # today. Check 8 at the batched `LC_ALL=C xargs -r awk` seventeen lines below is NOT the pattern to
 # copy here — it sorts, it does not measure.
-sel7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
+_sel7src="$INDEX_SET"
+[ -n "$VIEW_SET" ] && _sel7src="$INDEX_SET
+$VIEW_SET"
+sel7=$(printf '%s\n' "$_sel7src" | grep -vE "$ex7" | while IFS= read -r f; do
   in_scope "$f" || continue; printf '%s\n' "$f"
 done)
 bad7=""
@@ -825,47 +895,59 @@ $bad7"
 # following delimiter. uln counts the UNFENCED stream (== the old grep -n numbering). The two `·` in
 # the patterns are the LITERAL middot byte. Validated per-row against grep over the upstream inCMS
 # tree's 589 real rows — 0 mismatches (PERF-eThriftyBellows-1).
-pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)
-pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
-files8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | while IFS= read -r f; do
-  [ -f "$f" ] || continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
-bad8=""; rows8=0; shards8=0
-if [ -n "$files8" ]; then
-  out8=$(printf '%s\n' "$files8" | LC_ALL=C xargs -r awk '
-    function nmatch(s,   c,first,nc,ok) { c=0; first=1
-      while (length(s)>0) {
-        if (first) ok=match(s,/([·|]|^[[:space:]]*-)[[:space:]]*(OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO)/)
-        else       ok=match(s,/[·|][[:space:]]*(OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO)/)
-        if (!ok) break
-        nc=substr(s,RSTART+RLENGTH,1)
-        if (nc=="" || nc !~ /[A-Za-z0-9_]/) { c++; s=substr(s,RSTART+RLENGTH); first=0 }
-        else { s=substr(s,RSTART+1); first=0 }
-      } return c }
-    FNR==1 { uln=0; fence=""; shards++ }
-    { line=$0; sub(/\r$/,"",line)
-      if (line ~ /^[[:space:]]*(```|~~~)/) { m=(line ~ /^[[:space:]]*```/)?"```":"~~~"
-        if (fence=="") { fence=m; next }
-        if (m==fence) { fence=""; next } }
-      if (fence!="") next
-      uln++
-      if (line ~ /^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]/) { rows++
-        if (nmatch(line)!=1) print FILENAME ":" uln }
-    }
-    # The GRADED-ROW population, on a sentinel line stripped below. `pop_guard` counts shard FILES,
-    # which is why a waiver over 438 of 499 rows read as a green check and printed no number at all.
-    # Emitted here rather than counted in a second pass: a second predicate over the same question
-    # is the class this engine keeps being bitten by. `#` cannot open a finding, which always
-    # leads with a path, and the two counts are SUMMED below because a long file list makes `xargs`
-    # invoke awk more than once and each invocation runs its own END.
-    END { printf "#rows %d %d\n", rows+0, shards+0 }')
-  rows8=$(printf '%s\n' "$out8" | awk '/^#rows /{r+=$2} END{printf "%d", r+0}')
-  shards8=$(printf '%s\n' "$out8" | awk '/^#rows /{s+=$3} END{printf "%d", s+0}')
-  bad8=$(printf '%s\n' "$out8" | grep -v '^#rows ' || true)
-fi
-derive_waived 8 "$bad8"; bad8="$_UNWAIVED"
-[ -n "$bad8" ] && fail 8 "backlog rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
+# THE LAYOUT DECIDES WHETHER THIS CHECK EXISTS. Under `builds` an ask carries no status token at
+# all: its status is FOLDED from disposition rows and spec header verbs, and check 9 grades that
+# fold by re-rendering the views. Grading a vocabulary nobody writes would be a check with no
+# reachable failure, so this one RETIRES rather than emptying — and it says so on every run, in
+# place of the graded-row line, because a check that prints nothing is indistinguishable from a
+# check that found nothing. Its population guard is inside the branch for the same reason it
+# would otherwise fire: the guard`s precondition already counts BACKLOG.md files, so under
+# `builds` it would see a non-empty precondition over an empty population and red.
+if [ "$BMODE" = builds ]; then
+  [ "$STAGED" = 1 ] || printf 'memory-hygiene: check 8: backlog layout builds — graded by check 9\n'
+else
+  pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)
+  pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
+  files8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | while IFS= read -r f; do
+    [ -f "$f" ] || continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
+  bad8=""; rows8=0; shards8=0
+  if [ -n "$files8" ]; then
+    out8=$(printf '%s\n' "$files8" | LC_ALL=C xargs -r awk '
+      function nmatch(s,   c,first,nc,ok) { c=0; first=1
+        while (length(s)>0) {
+          if (first) ok=match(s,/([·|]|^[[:space:]]*-)[[:space:]]*(OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO)/)
+          else       ok=match(s,/[·|][[:space:]]*(OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO)/)
+          if (!ok) break
+          nc=substr(s,RSTART+RLENGTH,1)
+          if (nc=="" || nc !~ /[A-Za-z0-9_]/) { c++; s=substr(s,RSTART+RLENGTH); first=0 }
+          else { s=substr(s,RSTART+1); first=0 }
+        } return c }
+      FNR==1 { uln=0; fence=""; shards++ }
+      { line=$0; sub(/\r$/,"",line)
+        if (line ~ /^[[:space:]]*(```|~~~)/) { m=(line ~ /^[[:space:]]*```/)?"```":"~~~"
+          if (fence=="") { fence=m; next }
+          if (m==fence) { fence=""; next } }
+        if (fence!="") next
+        uln++
+        if (line ~ /^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]/) { rows++
+          if (nmatch(line)!=1) print FILENAME ":" uln }
+      }
+      # The GRADED-ROW population, on a sentinel line stripped below. `pop_guard` counts shard FILES,
+      # which is why a waiver over 438 of 499 rows read as a green check and printed no number at all.
+      # Emitted here rather than counted in a second pass: a second predicate over the same question
+      # is the class this engine keeps being bitten by. `#` cannot open a finding, which always
+      # leads with a path, and the two counts are SUMMED below because a long file list makes `xargs`
+      # invoke awk more than once and each invocation runs its own END.
+      END { printf "#rows %d %d\n", rows+0, shards+0 }')
+    rows8=$(printf '%s\n' "$out8" | awk '/^#rows /{r+=$2} END{printf "%d", r+0}')
+    shards8=$(printf '%s\n' "$out8" | awk '/^#rows /{s+=$3} END{printf "%d", s+0}')
+    bad8=$(printf '%s\n' "$out8" | grep -v '^#rows ' || true)
+  fi
+  derive_waived 8 "$bad8"; bad8="$_UNWAIVED"
+  [ -n "$bad8" ] && fail 8 "backlog rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
 $bad8"
-[ "$STAGED" = 1 ] || printf 'memory-hygiene: check 8 graded %s backlog row(s) across %s shard(s)\n' "$rows8" "$shards8"
+  [ "$STAGED" = 1 ] || printf 'memory-hygiene: check 8 graded %s backlog row(s) across %s shard(s)\n' "$rows8" "$shards8"
+fi
 
 # 9 — build-index drift (delegates to the sibling generator). The retired directory listing carried
 # PATHS, which git already prints better; this carries STATUS, which git does not — and the status is
@@ -1075,6 +1157,16 @@ fi
 # are joined by an arm in the row-grammar self-test, not by this comment.
 bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= read -r a; do
     base=${a##*/}; stem=${base%%.*}
+    # UNDER `builds` A FAMILY-STEM ARCHIVE IS NOT THIS CHECK'S. The file at $M/backlog/<FAMILY>.md is
+    # then a GENERATED view, which could never reference an archive from a preamble it does not
+    # author — so asking it to is a finding whose only remedy is to hand-edit a file the next render
+    # overwrites. Check 9's archive guard owns that archive, and reporting it here too would be two
+    # answers to one question. Counted rather than skipped: the count line below is what keeps the
+    # deferral visible, because a silent `continue` here is exactly how this check went inert once.
+    # `!= DECISIONS` IS the family test: this loop's population is $ROTATED_ARCHIVE_ERE, whose stem
+    # alternation is exactly `DECISIONS|$FAM_ALT`, so re-deriving the family list here would be a
+    # second spelling of a set two lines of this file already agree on.
+    if [ "$BMODE" = builds ] && [ "$stem" != DECISIONS ]; then printf '#left\n'; continue; fi
     idx=$(printf '%s\n' "$FILES" | grep -v "^$M/archive/" | while IFS= read -r f; do
         [ "${f##*/}" = "$stem.md" ] && printf '%s\n' "$f"
       done)
@@ -1086,8 +1178,17 @@ bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= rea
     awk 'NR <= 3 { print; next } /^[[:space:]]*[-*][[:space:]]/ { exit } { print }' "$idx" |
       grep -qF "$base" || echo "$a (not referenced in the preamble of $idx)"
   done)
+left10=$(printf '%s\n' "$bad10" | grep -cx '#left' || true)
+bad10=$(printf '%s\n' "$bad10" | grep -vx '#left' || true)
+bad10=$(printf '%s\n' "$bad10" | grep . || true)
 [ -n "$bad10" ] && fail 10 "rotated archives not referenced from their live index preamble:
 $bad10"
+# THE DEFERRAL, SAID OUT LOUD. Printed on every `builds` run, zero included: a count of nothing is
+# the answer when a tree has not rotated a family yet, and staying silent then would make the line
+# evidence of a rotation rather than evidence that this check ran.
+if [ "$BMODE" = builds ] && [ "$STAGED" = 0 ]; then
+  printf "memory-hygiene: check 10: %s family archive(s) left to check 9's archive guard (backlog layout builds)\\n" "$left10"
+fi
 
 # 24 — the declared ROTATION_MODE is HONOURED. Delegated to row_grammar.py for the reason 13-20 are:
 # the assertion is a corpus walk over ROW DOCUMENTS, and this file must not spell a second row

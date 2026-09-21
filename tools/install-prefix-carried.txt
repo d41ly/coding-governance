@@ -50,7 +50,7 @@ tools/hooks/agent-cap.js	7	(loose),hooks,workflows
 tools/hooks/agent-cap.test.sh	3	hooks,workflows
 tools/hooks/scratch-guard.js	1	run-gates
 tools/hooks/scratch-guard.test.sh	2	hooks,run-gates
-tools/install-prefix-waivers.txt	10	(loose),codebase-map,memory-tree
+tools/install-prefix-waivers.txt	8	(loose),codebase-map,memory-tree	LOWERED 10 -> 8 BY HAND, TOOL-dDerivedDocket-8: the two position-keyed tools/memory-tree/corpus_ids.py rows became in-line gov:root-fixture markers and left this registry, so two literals went with them. A shrink, which --write-ratchet is the remedy for, except that it refuses to write at all while an unrelated ROSE row stands.
 tools/lexicon/LEXICON.md	2	lexicon
 tools/lexicon/README.md	10	codebase-map,drift-audit,lexicon
 tools/lexicon/SKILL.template.md	1	lexicon

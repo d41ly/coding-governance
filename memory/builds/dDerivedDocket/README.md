@@ -124,7 +124,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [TOOL-dDerivedDocket-37 — a hands-off's payload tokens are named by the sibling it names](spec/2026-09-14-spec-TOOL-dDerivedDocket-37.md) | 6 | 2 | CLOSED | rev-5 | 2026-09-21 |
 | [TOOL-dDerivedDocket-6 — ask parser and status fold](spec/2026-09-14-spec-TOOL-dDerivedDocket-6.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-7 — generated family view](spec/2026-09-14-spec-TOOL-dDerivedDocket-7.md) | 7 | 2 | CLOSED | rev-6 | 2026-09-21 |
-| [TOOL-dDerivedDocket-8 — hygiene engine in builds mode](spec/2026-09-14-spec-TOOL-dDerivedDocket-8.md) | 8 | 2 | SPECCED | rev-5 | 2026-09-20 |
+| [TOOL-dDerivedDocket-8 — hygiene engine in builds mode](spec/2026-09-14-spec-TOOL-dDerivedDocket-8.md) | 8 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-9 — transition-merge audit over history and at commit time](spec/2026-09-14-spec-TOOL-dDerivedDocket-9.md) | 9 | 2 | SPECCED | rev-6 | 2026-09-20 |
 | [TOOL-dDerivedDocket-10 — driver refuses shard-into-view](spec/2026-09-14-spec-TOOL-dDerivedDocket-10.md) | 10 | 2 | SPECCED | rev-5 | 2026-09-20 |
 | [TOOL-dDerivedDocket-11 — migration planner](spec/2026-09-14-spec-TOOL-dDerivedDocket-11.md) | 11 | 2 | SPECCED | rev-5 | 2026-09-20 |
@@ -164,7 +164,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 38 | 1 | SPECCED | rev-5 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 28 bound to this build, across 4 record folder(s).
+Records: 29 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

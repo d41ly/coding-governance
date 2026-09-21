@@ -284,6 +284,40 @@ def grammar(root: str):
     return extract.grammar_for(root)
 
 
+def backlog_module():
+    """The parser kit-mate, imported LAZILY and for one reason: it owns the backlog layout.
+
+    Lazy, and not a module-level import, because `row_grammar.py` imports `parse_conf` from THIS
+    module and the parser module is where the two of them would meet — a module-level import each
+    way is a cycle one edit away. Importing inside the accessor also keeps the cost off every caller
+    that never asks: `--print-defined-ids` and check 16 do not read the backlog layout at all.
+
+    `HERE` on the path rather than a package-relative import, because this kit is copy-installed as
+    a flat directory and is run as a script from an arbitrary cwd.
+    """
+    if str(HERE) not in sys.path:
+        sys.path.insert(0, str(HERE))
+    import backlog  # noqa: E402  (deliberately late: see above)
+
+    return backlog
+
+
+def read_backlog_conf(conf: dict):
+    """`BACKLOG_MODE` and `ASK_CUTOFF`, through the parser module's ONE reader.
+
+    NOT a second reader. An unrecognised mode must RAISE on both sides — the shell engine aborts at
+    exit 2 before it ever delegates here, and this module refuses the same value when it is run
+    standalone, so a typo cannot half-migrate a tree by reaching one reader and not the other. The
+    parser's own exception is re-raised as this module's, because `main()` promises a named line and
+    never a traceback, and `except Problem` here would not catch a class from over there.
+    """
+    bk = backlog_module()
+    try:
+        return bk.read_conf(conf)
+    except bk.Problem as exc:
+        raise Problem(f"corpus_ids: {exc}") from None
+
+
 def resolve_bash() -> str:
     """The bash that shares THIS filesystem — not whatever the name `bash` resolves to.
 
@@ -370,10 +404,27 @@ def walk(root: str, conf: dict) -> dict:
 
     append_only = re.compile(ask_shell("--print-append-only-ere", root).strip() or r"(?!)")
     excluded = tuple(x for x in conf.get("DEAD_PATH_EXCLUDE", "").split() if x)
-    present = re.compile(
-        r"^" + re.escape(m) + r"/(?:DECISIONS\.md|README\.md|HYGIENE\.md|TEMPLATE-SPEC\.md"
-        r"|LIVE\.md|backlog/|ledger/|project/|guides/)"
-    )
+    bconf = read_backlog_conf(conf)
+    builds_mode = bconf.mode == "builds"
+    # THE PRESENT-TENSE CORPUS, one list and one substitution. Under `builds` the file at
+    # `backlog/<FAMILY>.md` is a GENERATED view whose every path token is derived text — grading it
+    # would red a citation no author wrote and no author can repair — while the ask itself, with the
+    # paths it cites, moves into `builds/<slug>/BACKLOG.md`. So the member is REPLACED IN PLACE
+    # rather than dropped: dropping it alone would silently take every graded ask path token out of
+    # check 15, which is a check losing its subject and reporting green (owner ruling D9).
+    _present = [r"DECISIONS\.md", r"README\.md", r"HYGIENE\.md", r"TEMPLATE-SPEC\.md", r"LIVE\.md",
+                "backlog/", "ledger/", "project/", "guides/"]
+    if builds_mode:
+        _present[_present.index("backlog/")] = r"builds/[^/]+/BACKLOG\.md"
+    present = re.compile(r"^" + re.escape(m) + r"/(?:" + "|".join(_present) + r")")
+
+    # CHECK 13's SKIP, armed only under `builds`. The grammar is the PARSER module's, built from the
+    # family tokens the id grammar above already derived — never a second derivation, and never a
+    # second spelling of the ask row.
+    bk = backlog_module() if builds_mode else None
+    ask_grammar = bk.build_grammar(E.families) if builds_mode else None
+    cutoff_armed = bk.check_cutoff_armed(bconf) if builds_mode else False
+    unarmed_asks = 0
 
     defs: dict = {}          # id -> set(paths)
     def_builds: dict = {}    # id -> set(build slugs)
@@ -383,6 +434,10 @@ def walk(root: str, conf: dict) -> dict:
     for p in corpus:
         text = read(os.path.join(root, p))
         b = build_re.match(p)
+        # A build's own ask file, and only under `builds`. Its rows are the one anchored line in this
+        # corpus that is a FILING rather than a CLAIM, and the test is the whole path so a
+        # `BACKLOG.md` somewhere else is untouched.
+        asks_here = bool(b) and builds_mode and p.rsplit("/", 1)[-1] == "BACKLOG.md"
         for lineno, line in enumerate(text.split("\n"), 1):
             anchor = _anchor(E, line)
             if anchor is None:
@@ -390,7 +445,27 @@ def walk(root: str, conf: dict) -> dict:
                 anchor = h.group(1) if h else None
             if anchor:
                 defs.setdefault(anchor, set()).add(p)
-                if b:
+                claims = bool(b)
+                # AN ASK FILED BEFORE THE CUTOFF IS NOT ITS FOLDER'S CLAIM ON THE ID (owner ruling
+                # D12-g). Migrated rows carry ids whose records already live in another build's
+                # folder, so counting the ask as a second claim would red every one of them; an ask
+                # filed on or after the cutoff DOES claim, so a new foreign anchor is still a
+                # collision. The row stays in `defs` either way, so no legacy ask becomes an orphan
+                # under check 14 — this touches `def_builds` and nothing else.
+                if claims and asks_here:
+                    row = bk.extract_row(line, ask_grammar)
+                    if row is not None and row.cls == "ask":
+                        if not cutoff_armed:
+                            # V15 (blank) or V16 (not a DATE): a string compare against an unusable
+                            # cutoff is not a date compare, so EVERY ask row is skipped and the note
+                            # below names the verdict. Comparing anyway would read a blank cutoff as
+                            # the empty string, under which every ask is "filed after it" and the
+                            # legacy foreign anchors red for one misconfiguration that is already red.
+                            claims = False
+                            unarmed_asks += 1
+                        elif row.value < bconf.cutoff:
+                            claims = False
+                if claims:
                     def_builds.setdefault(anchor, set()).add(b.group(1))
             for mm in E.ID_RE.finditer(line):
                 cites.setdefault(mm.group(0), set()).add(p)
@@ -451,9 +526,16 @@ def walk(root: str, conf: dict) -> dict:
                 else:
                     dead[key] = [1, lineno]
 
+    # ONE LINE, NAMING THE VERDICT, and only when the skip actually fired over a real population. A
+    # gate that silently stops grading is the shape this kit refuses; a count of zero would be noise
+    # on every `shards` tree, so the note exists exactly where coverage was lost.
+    notes = []
+    if unarmed_asks:
+        v = bconf.verdicts[0]
+        notes.append(f"corpus_ids: check 13 skipped {unarmed_asks} ask row(s) — V{v.code}: {v.text}")
     return {
         "tracked": tracked_set, "corpus": corpus, "defs": defs, "def_builds": def_builds,
-        "cites": cites, "dead": dead, "root": root, "conf": conf, "m": m,
+        "cites": cites, "dead": dead, "root": root, "conf": conf, "m": m, "notes": notes,
     }
 
 
@@ -688,6 +770,8 @@ def cmd_report(root: str, conf: dict) -> int:
     print(f"orphan ids       : {len(orphans)}  {orphans}")
     print(f"build collisions : {len(coll)}  {coll}")
     print(f"dead path cites  : {len(w['dead'])}")
+    for note in w["notes"]:
+        print(note)
     for k, v in sorted(w["dead"].items()):
         print(f"    {k[0]}:{v[1]} -> {k[1]} (x{v[0]})")
     try:
@@ -899,6 +983,85 @@ def cmd_selftest() -> int:
         arm("check 13 catches one id in two build folders", "claimed by 2 build folders",
             lambda: "\n".join(checks(walk(t2, c2))))
 
+        # ---- 13 and 15 UNDER `builds` (TOOL-dDerivedDocket-8). ONE corpus, five confs: an ask filed
+        # ---- AFTER the cutoff and an ask filed BEFORE it, each anchored in a second build folder,
+        # ---- plus a dead path cited from an ask and the same token cited from a family view. The
+        # ---- one tree is what makes each verdict an observation: the pre-cutoff arm's silence is
+        # ---- read beside the post-cutoff arm's finding over the same shape, so "raised nothing"
+        # ---- cannot mean "found nothing to look at".
+        tB = os.path.join(base, "bmode"); os.makedirs(tB)
+        cB = _scratch(tB, extra={
+            "memory/builds/tNew/BACKLOG.md":
+                "# tNew\n\n## Asks\n\n"
+                "- ARCH-tNew-1 · filed 2026-09-05 · an ask filed after the cutoff\n"
+                "- ARCH-tOld-1 · filed 2026-08-05 · an ask migrated from the shard, filed before it\n"
+                "- ARCH-tCite-1 · filed 2026-09-05 · cites `memory/gone/never-filed.md`, which is dead\n",
+            # THE FOREIGN ANCHORS. Each id's records live in ANOTHER build's folder, which is what
+            # every migrated legacy row looks like; the post-cutoff one is a collision and the
+            # pre-cutoff one is the state D12-g exists to keep quiet.
+            "memory/builds/tTwo/README.md":
+                "---\nslug: tTwo\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\n"
+                "ids: ARCH-tNew-1\nstatus: OPEN\n---\n\n# tTwo\n",
+            "memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md":
+                "# ARCH-tNew-1 — the foreign anchor of a post-cutoff ask\n\nbody\n",
+            "memory/builds/tTwo/spec/2026-08-01-spec-tTwo-2.md":
+                "# ARCH-tOld-1 — the foreign anchor of a pre-cutoff ask\n\nbody\n",
+            # The SAME dead token, cited from the family view. Under `builds` that file is generated
+            # text, so it leaves the present-tense corpus and its citation is not graded.
+            "memory/backlog/ARCH.md":
+                "# ARCH — live asks\n\nSee `memory/gone/never-viewed.md` for detail.\n",
+        })
+        cB["BACKLOG_MODE"] = "builds"
+        cB["ASK_CUTOFF"] = "2026-09-01"
+        arm("under `builds` an ask filed AFTER the cutoff still claims its id, so a foreign anchor "
+            "is a check 13 collision", "ARCH-tNew-1 is claimed by 2 build folders",
+            lambda: "\n".join(checks(walk(tB, cB))))
+        arm("...and the SAME shape filed BEFORE the cutoff claims nothing, so the migrated legacy "
+            "anchors stay quiet", "ABSENT",
+            lambda: "PRESENT" if "ARCH-tOld-1 is claimed" in "\n".join(checks(walk(tB, cB)))
+            else "ABSENT")
+        # The row still DEFINES the id, so nothing the skip silences becomes an orphan one check
+        # along. Without this arm the skip could have been written as "do not record it at all".
+        arm("...and the pre-cutoff id is still DEFINED, so check 14 does not report it as an orphan",
+            "ABSENT",
+            lambda: "PRESENT" if "ARCH-tOld-1 is cited but never defined"
+            in "\n".join(checks(walk(tB, cB))) else "ABSENT")
+        # V16 — a cutoff that is not zero-padded. `"2026-10-01" < "2026-9-30"` is TRUE, so comparing
+        # it as a raw string would silently pass every October ask through the skip.
+        cB16 = dict(cB); cB16["ASK_CUTOFF"] = "2026-9-30"
+        arm("a malformed cutoff skips EVERY ask row rather than comparing against it",
+            "ABSENT",
+            lambda: "PRESENT" if "ARCH-tNew-1 is claimed" in "\n".join(checks(walk(tB, cB16)))
+            else "ABSENT")
+        arm("...and says so once, naming V16", "V16: ASK_CUTOFF='2026-9-30' is not a zero-padded",
+            lambda: "\n".join(walk(tB, cB16)["notes"]))
+        # V15 — a blank cutoff. Compared as the empty string every ask reads as filed AFTER it, which
+        # reds every migrated anchor at once: F2's rejected option (a).
+        cB15 = dict(cB); cB15["ASK_CUTOFF"] = ""
+        arm("a blank cutoff skips every ask row rather than reading as the empty string",
+            "ABSENT",
+            lambda: "PRESENT" if "ARCH-tNew-1 is claimed" in "\n".join(checks(walk(tB, cB15)))
+            else "ABSENT")
+        arm("...and says so once, naming V15", "V15: ASK_CUTOFF is blank while BACKLOG_MODE is",
+            lambda: "\n".join(walk(tB, cB15)["notes"]))
+        # 15 — the present-tense corpus swaps one member for another. BOTH halves, because dropping
+        # `backlog/` without adding `BACKLOG.md` takes every graded ask path token out of the check
+        # and reports green (owner ruling D9).
+        arm("under `builds` a dead path cited from an ask IS graded",
+            "memory/gone/never-filed.md", lambda: "\n".join(checks(walk(tB, cB))))
+        arm("...and the same token cited from a generated family view is NOT", "ABSENT",
+            lambda: "PRESENT" if "never-viewed.md" in "\n".join(checks(walk(tB, cB)))
+            else "ABSENT")
+        # THE SHARDS CONTROL, over the same tree: the view is an authored shard there and its dead
+        # citation is named, while the build folder's file is a record of a moment and is not.
+        cBs = dict(cB); cBs["BACKLOG_MODE"] = "shards"
+        arm("under `shards` the dead path in the family shard is still named",
+            "memory/gone/never-viewed.md", lambda: "\n".join(checks(walk(tB, cBs))))
+        arm("...and under `shards` the build folder's own file is outside the present corpus",
+            "ABSENT",
+            lambda: "PRESENT" if "never-filed.md" in "\n".join(checks(walk(tB, cBs)))
+            else "ABSENT")
+
         # 14 — orphan, waiver, stale waiver, pin.
         t3 = os.path.join(base, "orph"); os.makedirs(t3)
         # PROSE, not a list row: `- <id> ·` IS an anchor, so a backlog row DEFINES its id rather than
@@ -994,11 +1157,11 @@ def cmd_selftest() -> int:
         tP = os.path.join(base, "prefix"); os.makedirs(tP)
         cP = _scratch(tP, extra={
             "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
-            "memory/HYGIENE.md": "sentinel\n\nRun `memory-tree/check-memory-hygiene.sh` to lint.\n",
+            "memory/HYGIENE.md": "sentinel\n\nRun `memory-tree/check-memory-hygiene.sh` to lint.\n",  # gov:root-fixture — the wrong-prefix citation check 15 is proved on; spelled correctly it proves nothing
         })
         cP["DEAD_PATH_PIN"] = "0"
         arm("check 15 catches a kit path written at the WRONG PREFIX",
-            "memory-tree/check-memory-hygiene.sh",
+            "memory-tree/check-memory-hygiene.sh",  # gov:root-fixture — the substring the arm asserts, which is that same wrong-prefix citation
             lambda: "\n".join(checks(walk(tP, cP))))
         # ...and the same citation spelled correctly is silent. Without this half the arm above would
         # also pass on a rule that reds every token whose first segment is not a top-level directory.
@@ -1244,7 +1407,9 @@ def main(argv: list) -> int:
         # when they are blank — the cross-kit dependency is still conditional.
         bad, notes = check_read_path(root, conf)
         if armed(conf):
-            bad += checks(walk(root, conf))
+            w = walk(root, conf)
+            notes += w["notes"]     # non-gating, and printed through the same channel as check 16's
+            bad += checks(w)
         for line in notes:
             print("HYGIENE " + line)
         for line in bad:

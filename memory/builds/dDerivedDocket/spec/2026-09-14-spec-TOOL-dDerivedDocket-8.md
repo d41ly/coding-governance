@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-8 — hygiene engine in builds mode
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 8
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-8-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-8-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
@@ -157,6 +158,9 @@ each way would be a cycle. No third conf reader is written.
 | `BACKLOG_MODE` preset and validation | shell block in the engine | none; mirrors `ROTATION_MODE` |
 | the check 6 `BACKLOG.md` branch | a new `fail 6` call | the check-arms signature, armed in the engine's self-test |
 | the check 8 and check 10 announcement lines | stdout lines | none |
+| `--print-backlog-mode` | a print mode in the engine, beside its two siblings | none; one word on stdout |
+| `backlog_module` · `read_backlog_conf` | module-level accessors in `corpus_ids.py` | python, tool |
+| `read_backlog_mode` · `row_stems` | module-level accessors in `row_grammar.py` | python, tool |
 
 ### Files touched (estimate)
 
@@ -453,6 +457,35 @@ New arm: `tools/memory-tree/row_grammar.py` `--selftest` · a builds-mode tree w
   list were written as a bare `:1622` immediately after `memory/TEMPLATE-SPEC.md`, which reads
   as a line of that file — 430 lines long — rather than of the engine. Each now spells
   `tools/memory-tree/check-memory-hygiene.sh:1622` in full. No claim moved.
+
+- rev-6 · 2026-09-21 · §4 · S1 · S13 · AC9 · AC13 · the build pass, and four things it had to decide
+  that rev-5 did not say.
+  §4 Inventory gains the four identifiers the build actually minted: the engine's
+  `--print-backlog-mode` print mode and the two lazy accessors in each Python module. The print mode
+  is what AC9's second half reads: the project-key stderr line prints only a value that was SET, so
+  an ABSENT key and a BLANK one are both silence there and "blank resolves to `shards`" would have
+  been a claim nothing could check. S1 said the shell "names a set value on stderr with the other
+  project keys", which it does, and that is not an observable for the agreement arm.
+  S13 and AC13: `ARMS_FLOORS` for the engine moves 27:27 -> 32:32, which is the MEASURED count after
+  this unit's branch and not 27+1. Measured at this unit's parent: 31 branches, all armed, against a
+  floor of 27. A +1 move to 28:28 satisfies the letter of "moves by the branches added" and leaves
+  AC13's Red-when unreachable — with five branches of slack, deleting the new arm keeps the leg
+  green, which is exactly the "floor that does not bite" this repo reads as coverage. The floor is
+  one-sided upward, so raising it to the measurement lowers nothing and tightens five other branches
+  as a side effect. Observed both ways in the pass, through `check-arms.branches` and
+  `armed_signatures` over the real files rather than the leg's own argv.
+  The engine suite's `FLOOR_ASSERTIONS` moves 374 -> 416, DERIVED from the new block rather than read
+  off a PASS line, because that suite run is the held leg AC1's permission line defers.
+  `KIT_MEMORY_TREE_VERSION` is NOT bumped, and that is a decision rather than an omission. The build
+  brief holds a kit's version to where a spec says it moves, and `check-verdict-epoch.sh`'s rule is
+  topological: the bump must sit at or after the LAST behaviour-bearing engine change in the range.
+  Units 9 and 34 both move this engine after this unit, so a bump here would be superseded and red
+  anyway. The obligation belongs to the last such unit, and the range is already short one bump for
+  units 6 and 7's delegate edits — named to the main loop rather than absorbed here.
+  Also recorded: `tools/install-prefix-carried.txt`'s row for `tools/install-prefix-waivers.txt` is
+  LOWERED 10 -> 8 by hand, because S14's two departing rows took two carried literals with them and
+  `--write-ratchet`, which is that verdict's own remedy, refuses to write at all while an unrelated
+  ROSE row from another unit stands.
 
 ## 10. Reuse audit
 

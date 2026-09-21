@@ -74,6 +74,11 @@ an absent region cannot be told from a spec nobody has recorded against.
   value. See the cutoff section above for when it becomes mandatory.
 - The tail holds POINTERS and DECLARED VERBS only — a review workflow id, `ratified <date>`,
   `order <n>` — never prose.
+- `closes <id>` and `advances <id>` are the two BACKLOG verbs, legal ONLY where
+  `.memory-tree.conf` declares `BACKLOG_MODE=builds`. They join a spec to an ask in a
+  `builds/<slug>/BACKLOG.md`: `closes` says this unit resolves that ask, `advances` says it moves it
+  without finishing it. Under `shards` an ask carries its own status token and neither verb has
+  anything to say, so writing one there is a refusal rather than a no-op.
 - `order <n>` is the BUILD-ORDER verb: a positive integer, at most once, declaring this unit's step
   within its build. Units sharing a value are the parallel group; gaps are permitted, because a gap
   is how a retired unit leaves an order without renumbering the rest. It is PERMITTED, never

@@ -173,8 +173,39 @@ GENERIC_ID = re.compile(r"[A-Z][A-Z0-9]{1,9}-[A-Za-z0-9]+-[0-9]+[a-z]*")
 # catch, and it missed this one because its fixture held no such name — so the fixture now does.
 # Built from the declared stems so it is the same conjunction the shell spells, in the same order.
 def build_rotated_re(conf):
-    stems = "|".join(re.escape(x) for x in ["DECISIONS"] + derive_families(conf))
+    stems = "|".join(re.escape(x) for x in ["DECISIONS"] + row_stems(conf))
     return re.compile(r"(?:" + stems + r")\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md\Z")
+
+
+def read_backlog_mode(conf):
+    """The declared backlog layout, through the PARSER module's one reader — never a second one.
+
+    Lazily imported inside the function: this module imports `corpus_ids.parse_conf` at module
+    scope, the parser module reads its conf through that same parser, and a module-level import each
+    way is a cycle one edit away. The parser's exception becomes this module's, because every
+    failure here is a named line and never a traceback.
+    """
+    _here = os.path.dirname(os.path.abspath(__file__))
+    if _here not in sys.path:
+        sys.path.insert(0, _here)
+    import backlog  # noqa: E402  (deliberately late: see above)
+
+    try:
+        return backlog.read_conf(conf).mode
+    except backlog.Problem as exc:
+        raise Problem(f"row-grammar: {exc}") from None
+
+
+def row_stems(conf):
+    """The family stems that name a ROW DOCUMENT in this tree's declared layout.
+
+    Under `shards` every family has an authored shard, so every family is a stem. Under `builds` the
+    file at `backlog/<FAMILY>.md` is a GENERATED view: its rows are link-wrapped renderings of asks
+    filed elsewhere, so reading one as a row document would count a rendering as a keyed row and
+    report a mis-segmented grammar against text no author wrote. A family ARCHIVE follows its live
+    document out — check 9's archive guard owns it there, and check 10 says so in a count line.
+    """
+    return [] if read_backlog_mode(conf) == "builds" else derive_families(conf)
 
 
 def row_docs(root, m, conf):
@@ -197,13 +228,19 @@ def row_docs(root, m, conf):
     archives from the scan, which is the vacuity class this module exists to avoid. Check 10 DOES
     resolve, because its question is "which index should name this"; this one's question is "is this
     a row document", and a declared answer cannot narrow behind your back.
+
+    THE DECLARED LAYOUT NARROWS IT, and that is a declaration too rather than a resolution. Under
+    `builds` the set is `DECISIONS.md` and its own archives, nothing else: the family files are
+    generated views, ask uniqueness is the fold's corpus-wide verdict rather than a per-file one,
+    and the per-build ask files hold one row per id by construction.
     """
     tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
     rot = build_rotated_re(conf)
+    shards = read_backlog_mode(conf) != "builds"
     keep = []
     for p in tracked:
         base = os.path.basename(p)
-        if p == f"{m}/DECISIONS.md" or p.startswith(f"{m}/backlog/"):
+        if p == f"{m}/DECISIONS.md" or (shards and p.startswith(f"{m}/backlog/")):
             keep.append(p)
         elif p.startswith(f"{m}/archive/") and "/" not in p[len(f"{m}/archive/"):]:
             if rot.match(base):
@@ -763,6 +800,50 @@ def cmd_selftest():
         _c24f = dict(c24f); _c24f["ROTATION_MODE"] = "cut"
         arm("`cut` with NO rotated archive says it graded nothing rather than reporting clean",
             "graded NOTHING", lambda: cap(t24f, _c24f, cmd_check_rotation))
+
+        # ---- THE DECLARED BACKLOG LAYOUT (TOOL-dDerivedDocket-8). ONE FIXTURE, BOTH MODES, so no
+        # ---- arm here can pass because the tree happened to hold nothing: the same duplicated id
+        # ---- sits in the decision log, in the family file and in a family archive, and what moves
+        # ---- between the two runs is only the declared mode. Under `builds` the family file is a
+        # ---- GENERATED view whose rows are renderings of asks filed elsewhere, so reading one as a
+        # ---- row document would report a mis-segmented grammar against text no author wrote.
+        tBM = os.path.join(base, "backlogmode"); os.makedirs(tBM)
+        cBM = _tree(tBM, "- ARCH-tDec-1 · one\n- ARCH-tDec-1 · the same id twice\n", pin="0",
+                    shards={"ARCH.md": "- ARCH-tView-1 · OPEN · a live row\n"
+                                       "- ARCH-tView-1 · OPEN · the same id twice\n"},
+                    archives={"DECISIONS.2026-01-01.md": "- ARCH-tDrot-1 · a rotated decision\n",
+                              "ARCH.2026-01-01.md": "- ARCH-tArch-1 · CLOSED · a rotated ask\n"})
+        _cBMs = dict(cBM); _cBMs["BACKLOG_MODE"] = "shards"; _cBMs["ROTATION_MODE"] = "cut"
+        _cBMb = dict(cBM); _cBMb["BACKLOG_MODE"] = "builds"; _cBMb["ROTATION_MODE"] = "cut"
+        arm("under `shards` the family file IS a row document, and its duplicate is named",
+            "memory/backlog/ARCH.md: ARCH-tView-1 at lines 1, 2", lambda: cap(tBM, _cBMs))
+        arm("under `builds` the decision log's own duplicate still fails check 20",
+            "memory/DECISIONS.md: ARCH-tDec-1 at lines 1, 2", lambda: cap(tBM, _cBMb))
+        arm("under `builds` the family view is NOT a row document, so its duplicate is not named",
+            "ABSENT",
+            lambda: "PRESENT" if "backlog/ARCH.md" in cap(tBM, _cBMb) else "ABSENT")
+        # The ROW COUNT is the positive half: "not named" alone would also hold if the whole scan
+        # had stopped reading. Three keyed rows under `builds` — the decision log's two plus its
+        # archive's one — against six under `shards`, over one unchanged tree.
+        arm("under `builds` the scan still reads the decision log and its archive, and says so",
+            "rows keyed   : 3",
+            lambda: cap(tBM, _cBMb, cmd_report))
+        arm("under `shards` the same tree gives the scan twice as many keyed rows",
+            "rows keyed   : 6",
+            lambda: cap(tBM, _cBMs, cmd_report))
+        # CHECK 24 follows `row_docs` out: under `builds` the family archive is check 9's archive
+        # guard's, and check 10 prints the count it left. Grading it here too would be three findings
+        # for one fact, and the exclusivity half would name a generated view as its "live index".
+        arm("under `builds` check 24 grades exactly the decision-log archive",
+            "1 rotated archive(s)", lambda: cap(tBM, _cBMb, cmd_check_rotation))
+        arm("under `shards` the same tree gives check 24 both archives",
+            "2 rotated archive(s)", lambda: cap(tBM, _cBMs, cmd_check_rotation))
+        # An unrecognised mode RAISES on this side too. The shell engine aborts at exit 2 before it
+        # ever delegates here, and a module that shrugged where the shell refused is how a typo
+        # half-migrates a tree.
+        _cBMx = dict(cBM); _cBMx["BACKLOG_MODE"] = "buildz"
+        arm("an unrecognised BACKLOG_MODE refuses by name rather than reading as `shards`",
+            "BACKLOG_MODE='buildz' is not one of", lambda: cap(tBM, _cBMx))
 
         # THE ARM THE FIRST CUT DID NOT HAVE. Every arm above passes an explicit root, so none of
         # them executes the resolver — which is exactly how this module shipped a review blocker:

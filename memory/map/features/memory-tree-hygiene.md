@@ -122,6 +122,13 @@ derives its baseline floor from that constant, and a stale one put the floor bef
 - `KIT_MEMORY_TREE_VERSION` — read by `check-verdict-epoch.sh`, `check-kit-versions.sh` and
   `hygiene-parity.test.sh`, and mirrored as a `gov:kit memory-tree@<v>` marker in every shipped
   template. One constant, four consumers.
+- `BACKLOG_MODE` — the declared layout of an ask, and therefore the population of checks 4, 6, 7, 8,
+  10, 13, 15, 20 and 24. The engine resolves it ONCE into `BMODE` (blank reads `shards`) and every
+  check reads that; the Python modules read the same key through `backlog.read_conf`, lazily
+  imported, so there is no second reader and an unrecognised value refuses on both sides. The
+  engine's reading is observable through `--print-backlog-mode`, which exists because the
+  project-key stderr line prints only a value that was SET — without it, "blank reads `shards`" is a
+  claim nothing can check. `TOOL-dDerivedDocket-8`.
 
 ## Reuse affordance
 
