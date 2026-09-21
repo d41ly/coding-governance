@@ -677,9 +677,16 @@ SIBLINGS
 # IS THIS RECORD GRADED by the landed fact-set arm. Status 0 graded · 1 grandfathered · 2 the arm is
 # OFF because the cutoff is blank. A record with no committed history is graded: nothing that has
 # not been committed yet can predate a cutoff that has.
+#
+# THE LAST COMMIT FIRST, because it is one cheap walk and the first-commit read is a `--follow` walk
+# per record: a path nothing wrote to at or after the cutoff cannot have begun after it, and on this
+# repo that answers almost every record. Its stated limit is a history whose commit DATES run
+# backwards along its parents, where the shortcut can grandfather a record the full read would grade.
 check_landed_facts_due() { # record path · cutoff -> 0 graded · 1 grandfathered · 2 off
-  local _ld_d
+  local _ld_d _ld_l
   [ -n "${2:-}" ] || return 2
+  _ld_l=$(GIT log -1 --format=%cs -- "$1" 2>/dev/null)
+  [ -n "$_ld_l" ] && [[ "$_ld_l" < "$2" ]] && return 1
   _ld_d=$(read_first_commit_date "$1")
   [ -z "$_ld_d" ] && return 0
   [[ "$_ld_d" < "$2" ]] && return 1
