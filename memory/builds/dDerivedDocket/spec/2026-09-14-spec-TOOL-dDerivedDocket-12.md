@@ -513,7 +513,7 @@ line for the new modes, if unit 11 created one.
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `testsuite counts (every bar self-test prints one)` · `codebase-map coverage + freshness` · `build-index selftest` · `row-keyed merge driver replay`
 
-New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixture per classification row, the all-or-nothing refusal, the confirmation refusal, the three DEAD PROBE cases, two refs at one straggler tip and a fork, `--dry-run` over a writable plan and over an empty one, the recipe parity, every row of §4's entry-path table, the landing form's in-progress and concluded-merge states and its refusals, the straggler form of `--ingest` from a shards-mode HEAD, the two policy sets over one shared hold fixture, the per-class disposition home, the landing form's replacement of the migration's own record and its NEEDS-HUMAN twin · the selftest's assertion floor
+New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixture per classification row, the all-or-nothing refusal, the confirmation refusal, both DEAD PROBE cases S8 names, two refs at one straggler tip and a fork, `--dry-run` over a writable plan and over an empty one, the recipe parity, every row of §4's entry-path table, the landing form's in-progress and concluded-merge states and its refusals, the straggler form of `--ingest` from a shards-mode HEAD, the two policy sets over one shared hold fixture, the per-class disposition home, the landing form's replacement of the migration's own record and its NEEDS-HUMAN twin · the selftest's assertion floor
 
 ## 8. Open questions
 
@@ -708,6 +708,13 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
   variable of the inner record loop instead of its verdict's id, so an entry writing no record — a
   dropped row, a live flip — produced two `RELOCATED` rows for the previous id and none for its
   own, which unit 9 reads as a duplicate beside an unaccounted entry.
+  Gotchas fold, same pass and rev: the rotated-family archive predicate had TWO spellings inside
+  the module, one keyed on the basename for the census and one on the path for the restore; they
+  are now one derivation both call. Six new functions were renamed to lead with a verb
+  `.lexicon.conf` declares, each checked with `lexicon.py --suggest` before the rename. The arms
+  drop this machine's own `GOV_DEFAULT_BRANCH` for the whole block and put it back, because every
+  fixture that resolves a default branch cross-checks the observed one against it. §7's arm line
+  said three DEAD PROBE cases where S8 and AC6 both name two.
 
 ## 10. Reuse audit
 
