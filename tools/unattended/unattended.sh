@@ -1234,6 +1234,14 @@ AUTH_RECORDS=""
 # owner commits the line, every verb below reads it, and property P6 refuses a run that re-reads a
 # changed one. Empty is the ordinary case and means today's path, unchanged.
 AUTH_ASKS=""
+# TOOL-dDerivedDocket-19 - the `may:` GRANT line, out of that same scan. It lifts the build method's
+# veto 2 for the paths and decisions it names, and ruling D12-j honours it from exactly one place: a
+# `slug`-mode README the owner committed at the default-branch anchor. PRESENCE is its own fact,
+# because a key written under a mode that admits the second anchor is refused whatever it says, and an
+# empty value is a malformed grant rather than an absent one. After the scan AUTH_MAY holds the
+# NORMALISED grants, or `none`.
+AUTH_MAY=""
+AUTH_MAY_SET=0
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -1948,7 +1956,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -1980,7 +1988,8 @@ check_authorization() { # slug · base
     /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "mode=" v; next }
     /^playbook:/ { v = $0; sub(/^playbook:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "playbook=" v; next }
     /^pieces:/ { v = $0; sub(/^pieces:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "pieces=" v; next }
-    /^asks:/ { v = $0; sub(/^asks:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "asks=" v; next }')
+    /^asks:/ { v = $0; sub(/^asks:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "asks=" v; next }
+    /^may:/ { v = $0; sub(/^may:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "may=" v; next }')
   fmslug=$(printf '%s\n' "$_fm" | sed -n 's/^slug=//p' | head -1)
   AUTH_MODE=$(printf '%s\n' "$_fm" | sed -n 's/^mode=//p' | head -1)
   # out of the SAME scan. The `No second GIT show` rule above bounds THAT
@@ -1992,6 +2001,12 @@ check_authorization() { # slug · base
   # mandate surviving into a build that never declared one is the shape every other value here is
   # pinned against.
   AUTH_ASKS=$(printf '%s\n' "$_fm" | sed -n 's/^asks=//p' | head -1)
+  # TOOL-dDerivedDocket-19 S1 - the grant, off that same scan and ASSIGNED UNCONDITIONALLY for the
+  # reason the mandate above is. The FIRST `may:` line is the one read, as for every key here, and the
+  # leg's own parse takes the first too, so a README carrying two agrees with itself on both sides.
+  AUTH_MAY=$(printf '%s\n' "$_fm" | sed -n 's/^may=//p' | head -1)
+  AUTH_MAY_SET=0
+  case $'\n'"$_fm" in *$'\n'may=*) AUTH_MAY_SET=1 ;; esac
   # ABSENT is `slug` - every build README in every adopter's tree today declares nothing, and that
   # is the ordinary case, not a defect. A value OUTSIDE the closed set is a refusal rather than a
   # default: defaulting an unrecognised mode to either member lets a typo select a discipline
@@ -2045,6 +2060,28 @@ check_authorization() { # slug · base
   if [ -n "$AUTH_ASKS" ] && [ -z "${ASKS_CMD:-}" ]; then
     fail 70 "the build README declares an asks: mandate and this project declares no ASKS_CMD, so nothing here can say whether any of those asks is executable and pinning the set would make every check keyed on it pass over an ungraded list: declare ASKS_CMD in .unattended.conf, or drop the asks: key"
     return 1
+  fi
+  # TOOL-dDerivedDocket-19 S2 - A GRANT UNDER A MODE THAT ADMITS THE SECOND ANCHOR IS REFUSED, whatever
+  # it names and even when it says `none`. Such a README can resolve at a tip this run pushed, so its
+  # grant is one the run could have written - the self-grant ruling D12-j closes. Refused rather than
+  # ignored: ignoring it pins `none` and carries on, which leaves the attempt invisible in every record.
+  # The test is the MODE and not `prompt` alone, so a `recipe` README is refused by the same branch.
+  if [ "$AUTH_MAY_SET" = 1 ] && [ "$AUTH_MODE" != slug ]; then
+    fail 78 "the build README carries a may: grant under an authorization mode that resolves at the second anchor, so the run could have written the grant it would be acting under - ruling D12-j honours a grant only from a slug-mode README the owner committed at the default-branch anchor: mode $AUTH_MODE, may: [$AUTH_MAY]"
+    return 1
+  fi
+  # TOOL-dDerivedDocket-19 S3 - THE GRANT GRAMMAR, as a typo guard. One library function normalises the
+  # value, the one the leg re-runs over the same line, so a backticked grant and a bare one pin the
+  # same bytes. A token that is neither a decision id nor a repo-relative path is refused NAMING it:
+  # pinned, it would be a grant nobody can read, and the leg's comparison would agree with it.
+  if [ "$AUTH_MAY_SET" = 1 ]; then
+    if ! _mg=$(parse_grants "$AUTH_MAY"); then
+      fail 79 "the build README's may: line carries a token that is neither a decision id nor a repo-relative path with no leading slash, no .. segment and no backslash, holding a / or a file extension - a grant nobody can read is refused rather than pinned: refused token [${_mg:-the value is empty}] in may: [$AUTH_MAY]"
+      return 1
+    fi
+    AUTH_MAY=$_mg
+  else
+    AUTH_MAY=none
   fi
   if [ "$AUTH_MODE" = recipe ]; then
     if [ -z "$AUTH_PLAYBOOK" ]; then
@@ -4541,6 +4578,12 @@ verb_preflight() { # slug · keepalive-id
   # global empty, and preflight has already refused by then - the default never reaches disk on a
   # run that got here without the read.
   [ -n "$(fact "$rel" mode)" ] || set_fact "$rel" mode "${AUTH_MODE:-slug}" || return 1
+  # TOOL-dDerivedDocket-19 S1 - THE GRANT, PINNED ONCE for the reason the mode is. Only a `slug` README
+  # can reach here carrying one, because the check above refuses the key under every other mode, so
+  # every other run pins `none` - and so does a `slug` README that declares nothing, which is every
+  # README in this tree today. Printed, because the leg re-reads it and a reader should not have to.
+  [ -n "$(fact "$rel" may)" ] || set_fact "$rel" may "${AUTH_MAY:-none}" || return 1
+  echo "unattended: preflight — grant pinned as may: $(fact "$rel" may)"
   # TOOL-dDerivedDocket-16 S3 - THE THREE ASK FACTS, pinned ONCE for the reason `base` and the anchor
   # triple are: a re-preflight that rewrote them would re-point the mandate, the tree it was asserted
   # against and its grades at whatever today says, while the base they are evidence beside stayed

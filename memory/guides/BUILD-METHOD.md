@@ -78,6 +78,7 @@ resolved before it, a decision.
 **What is delegated.** A standing mandate delegates the owner's resolver authority for the named build only —
 the forks its specs state, AND that build's own scope by M2's AMEND acts. Two bounds: the README's GOAL statement is what a run may not amend (under a canon it IS the immutable description slot, folded there because two slots that must agree are one fact twice), and the delegation does not reach veto 2's governance-carrier clause,
 M1's own budget included. Vetoes 1 and 3 stand. A fork the goal cannot survive is still not yours — park it.
+A `may:` grant in an owner-committed README lifts veto 2 for what it names; protocol §1 is the rule.
 With no mandate, forks go to the owner and this is preparation.
 
 **Ratify the most FEATURE-RICH option** — most stated acceptance criteria satisfied, fewest follow-ups left open —
@@ -106,10 +107,7 @@ puts code before the fork is resolved — a rewrite, not a decision.
 vacuous-selector class, and a probe cannot tell "satisfied" from "matched nothing". A real fork here was resolved
 AGAINST the better measurement for that reason, so a testing rule without this exception gets it wrong.
 
-**Mark it in place** per `memory/TEMPLATE-SPEC.md` §8, naming resolver and authority, never `(owner, …)` for a
-decision the owner did not make. The mark must be the documented SHAPE — the word, then
-`(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each item: with any
-item present ONLY a conforming mark resolves it, the first line does not vote, and §8 says what that cannot see.
+**Mark it in place**, in the shape `memory/TEMPLATE-SPEC.md` §8 states with what its readers grade.
 
 ## M4 — The spec audit — review every unreviewed spec before its code
 

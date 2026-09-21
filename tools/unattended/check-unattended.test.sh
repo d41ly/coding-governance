@@ -4161,6 +4161,224 @@ hit "$(sed -n '/THE WALK IS UNSIMPLIFIED ON PURPOSE/,+4p' "$TMP/$KIT_REL/lib-una
 hit "$(sed -n '/THE WALK IS UNSIMPLIFIED ON PURPOSE/,+4p' "$TMP/$KIT_REL/lib-unattended.sh")" "EXISTENCE only, never which commit"
 
 rm -rf "$tc_root"
+# ==== TOOL-dDerivedDocket-19: THE GRANT, SECOND-OPINIONED ========================================
+# Three arms of check 19 over the `may:` fact. The first two compare the fact against the README at
+# the recorded BASE and against the recorded mode; the third walks each run's OWN commits for a
+# commit that writes a `may:` line into any build README.
+#
+# THE THIRD ARM IS WHY THESE ARE SEVERAL REPOSITORIES. It reads a record's range off the SHAPE of
+# the history behind its witness - a prepared merge, a plain reconcile, a primary landing merge, a
+# fix commit on top of one, push-main's own reconcile - and the scratch tree above is one linear
+# history `reset_tree` rewinds. Each group builds its own repository with a bare origin, from ONE
+# builder, so every graph starts from the same BASE and differs only in what it is testing.
+#
+# EVERY GRAPH CARRIES BOTH SIDES OF THE QUESTION. An OWNER commit on the default branch, made after
+# BASE, adds a grant to `tOther` - the channel ruling D12-j keeps open, which must never red - and
+# the RUN's own commit adds one to `tOther2`, which must always red. An arm asserting only the red
+# half would pass a walk over `base..HEAD`, and one asserting only the quiet half would pass a walk
+# over nothing. `--skip 28` on every run, for the reason the ask block above gives.
+reset_tree
+ma_root=$(mktemp -d)
+ma_leg() { ( cd "$1" && GOV_UNATTENDED_REPORT=1 bash "$KIT_REL/check-unattended.sh" --skip 28 2>&1 ); }
+ma_commit() { ( cd "$1" && git add -A >/dev/null && git commit -q -m "$2" --no-verify ) }
+ma_sha() { git -C "$1" rev-parse "$2" 2>/dev/null; }
+# BASE is the commit named `second`, found by subject so a moved `main` can never re-point it.
+ma_base() { git -C "$1" log --format=%H --grep='^second$' -1; }
+ma_readme() { # dir · slug · [extra front-matter line]
+  mkdir -p "$1/memory/builds/$2"
+  printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: TOOL\nids: TOOL-%s-1\n%s---\n\n# %s\n\n<!-- gen:build-index -->\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n' \
+    "$2" "$2" "${3:+$3
+}" "$2" > "$1/memory/builds/$2/README.md"
+}
+ma_run() { # dir · slug -> an empty record; ma_facts fills it
+  printf '# %s - run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: WITNESS\nbase: BASE\nmode: slug\nmay: none\n' \
+    "$2" > "$1/memory/builds/$2/RUN.md"
+}
+ma_facts() { # dir · slug · phase · witness-rev · base-rev
+  sed -i "s|^phase: .*|phase: $3|; s|^witness: .*|witness: $(ma_sha "$1" "$4")|; s|^base: .*|base: $(ma_sha "$1" "$5")|" \
+    "$1/memory/builds/$2/RUN.md"
+}
+ma_grant() { # dir · slug · value -> a `may:` line added to that build's README front matter
+  sed -i "/^slug: $2\$/a may: $3" "$1/memory/builds/$2/README.md"
+}
+# THE BUILDER. BASE is `second` on main; the run branch `unit` opens with the record's first commit
+# (its facts), then the RUN'S grant to tOther2, then ordinary work; main then takes the OWNER'S grant
+# to tOther and is pushed. What each group does after that is the thing it tests.
+ma_init() { # name -> $ma_root/<name>, built to the shape above
+  local d="$ma_root/$1"
+  mkdir -p "$d/$KIT_REL" "$d/memory/guides"
+  cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_REL/lib-unattended.sh" \
+     "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
+     "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
+     "$TMP/$KIT_REL/.unattended.conf.example" "$d/$KIT_REL/"
+  cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$d/memory/guides/UNATTENDED-PROTOCOL.md"
+  cp "$TMP/$KIT_REL/VERBS.template.md" "$d/memory/guides/UNATTENDED-VERBS.md"
+  cp "$TMP/.unattended.conf" "$d/.unattended.conf"
+  ma_readme "$d" tRun; ma_readme "$d" tOther; ma_readme "$d" tOther2; ma_readme "$d" tOther3
+  ma_run "$d" tRun
+  ( cd "$d" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+    git add -A >/dev/null && git commit -q -m base --no-verify
+    printf 'second\n' > second.txt; git add -A >/dev/null && git commit -q -m second --no-verify
+    git init -q --bare "$d.git" && git --git-dir="$d.git" symbolic-ref HEAD refs/heads/main
+    git remote add origin "$d.git" && git push -q origin main
+    git checkout -q -b unit ) >/dev/null 2>&1
+  ma_facts "$d" tRun RUNNING main "$(ma_base "$d")"; ma_commit "$d" facts
+  ma_grant "$d" tOther2 tools/run-granted.sh; ma_commit "$d" "run grants"
+  ( cd "$d" && git commit -q --allow-empty -m "unit work" --no-verify )
+  ( cd "$d" && git checkout -q main ) >/dev/null 2>&1
+  ma_grant "$d" tOther tools/owner-granted.sh; ma_commit "$d" "owner grants"
+  ( cd "$d" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
+}
+MA_RUN_RD="in memory/builds/tOther2/README.md, run memory/builds/tRun/RUN.md"
+MA_OWN_RD="in memory/builds/tOther/README.md, run"
+MA_WRITES="a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow:"
+
+# ---- G0: THE FACT AGAINST THE README AT BASE (AC4), THE MODE (AC5), AND THE TWO SPELLINGS (AC3). Four
+# ---- records in one tree, each named in every message, so one run grades all four at once.
+ma0="$ma_root/g0"
+mkdir -p "$ma0/$KIT_REL" "$ma0/memory/guides"
+cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_REL/lib-unattended.sh" \
+   "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
+   "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
+   "$TMP/$KIT_REL/.unattended.conf.example" "$ma0/$KIT_REL/"
+cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ma0/memory/guides/UNATTENDED-PROTOCOL.md"
+cp "$TMP/$KIT_REL/VERBS.template.md" "$ma0/memory/guides/UNATTENDED-VERBS.md"
+cp "$TMP/.unattended.conf" "$ma0/.unattended.conf"
+ma_readme "$ma0" tRun
+ma_readme "$ma0" tTick 'may: `tools/push-main.sh`'
+ma_readme "$ma0" tBare 'may: tools/push-main.sh'
+ma_readme "$ma0" tPrompt 'authorized-by: prompt'
+for ma_s in tRun tTick tBare tPrompt; do ma_run "$ma0" "$ma_s"; done
+sed -i 's/^mode: slug$/mode: prompt/' "$ma0/memory/builds/tPrompt/RUN.md"
+sed -i 's/^may: none$/may: tools\/push-main.sh/' "$ma0/memory/builds/tTick/RUN.md" "$ma0/memory/builds/tBare/RUN.md"
+( cd "$ma0" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  git init -q --bare "$ma0.git" && git --git-dir="$ma0.git" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$ma0.git" && git push -q origin main
+  git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify ) >/dev/null 2>&1
+for ma_s in tRun tTick tBare tPrompt; do ma_facts "$ma0" "$ma_s" RUNNING unit main; done
+ma_commit "$ma0" facts
+MA0_PRISTINE=$(ma_sha "$ma0" HEAD)
+n=$((n+1)); { [ -n "$MA0_PRISTINE" ] && grep -q '^may: tools/push-main.sh$' "$ma0/memory/builds/tTick/RUN.md" \
+  && grep -q '^may: `tools/push-main.sh`$' "$ma0/memory/builds/tTick/README.md"; } \
+  || { echo "FAIL the TOOL-dDerivedDocket-19 G0 fixture did not build its four records, so every arm below would grade a missing one"; st=1; }
+ma0_reset() { ( cd "$ma0" && git reset -q --hard "$MA0_PRISTINE" && git clean -qfd ); }
+
+# control: the backticked and the bare README both agree with a bare fact (AC3's leg half), and the
+# honest `none` records fire nothing
+out=$(ma_leg "$ma0")
+miss "$out" "pins a may: grant the build README at its own recorded BASE does not declare"
+miss "$out" "pins a may: grant while recording an authorization mode that resolves at the second anchor"
+miss "$out" "$MA_WRITES"
+hit  "$out" "the ask-mandate second opinions (checks 19, 15 and 37) are VACUOUS on this tree"
+# AC4: a fact that differs from the README's line at BASE reds, naming both values
+ma0_reset; sed -i 's/^may: none$/may: tools\/push-main.sh/' "$ma0/memory/builds/tRun/RUN.md"; ma_commit "$ma0" forged
+out=$(ma_leg "$ma0")
+hit "$out" "a run-state file pins a may: grant the build README at its own recorded BASE does not declare, so the authority the run says its owner committed is not the authority that README carries - pinned against declared follow: ["
+hit "$out" "pinned against declared follow: [tools/push-main.sh] against [none] in memory/builds/tRun/RUN.md"
+# ...and against BASE, never HEAD: the README edited on the run branch to match the fact still reds
+ma_grant "$ma0" tRun tools/push-main.sh; ma_commit "$ma0" "matched at head"
+out=$(ma_leg "$ma0")
+hit "$out" "pinned against declared follow: [tools/push-main.sh] against [none] in memory/builds/tRun/RUN.md"
+# AC5: a `prompt` record carrying a grant reds by its mode, whatever its README says
+ma0_reset; sed -i 's/^may: none$/may: tools\/push-main.sh/' "$ma0/memory/builds/tPrompt/RUN.md"; ma_commit "$ma0" "prompt grant"
+out=$(ma_leg "$ma0")
+hit "$out" "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [prompt], may: [tools/push-main.sh] in memory/builds/tPrompt/RUN.md"
+
+# ---- G1: A LIVE RECORD, AND AN IN-PLACE TERMINAL ONE, over unit 2's prepared merge T - first parent
+# ---- the advertised tip, which carries the owner's grant, second parent the run branch.
+ma_init g1; ma1="$ma_root/g1"
+( cd "$ma1" && git checkout -q --detach main && git merge -q --no-ff --no-edit -m "merge: tRun — land onto main" unit \
+    && git checkout -q -B unit ) >/dev/null 2>&1
+ma_facts "$ma1" tRun RUNNING HEAD "$(ma_base "$ma1")"; ma_commit "$ma1" "record on the prepared merge"
+MA_RUN=$(git -C "$ma1" log --format=%H --grep='^run grants$' -1)
+MA_OWN=$(git -C "$ma1" log --format=%H --grep='^owner grants$' -1)
+n=$((n+1)); { [ -n "$MA_RUN" ] && [ -n "$MA_OWN" ] && [ -n "$(ma_sha "$ma1" 'HEAD~1^2')" ]; } \
+  || { echo "FAIL the TOOL-dDerivedDocket-19 G1 fixture built no prepared merge over both grants"; st=1; }
+out=$(ma_leg "$ma1")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+# the in-place close: a single-parent commit on T is the witness of a terminal record
+ma_facts "$ma1" tRun LANDED HEAD "$(ma_base "$ma1")"
+printf 'landed-anchor: local\n' >> "$ma1/memory/builds/tRun/RUN.md"; ma_commit "$ma1" "the close"
+out=$(ma_leg "$ma1")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+
+# ---- G2: THE PRIMARY LANDER'S --no-ff LANDING MERGE L as the witness, unpushed and then pushed, and
+# ---- then a single-parent fix commit on the pushed L. L's run side is its SECOND parent.
+ma_init g2; ma2="$ma_root/g2"
+( cd "$ma2" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
+MA_L=$(ma_sha "$ma2" HEAD)
+ma_facts "$ma2" tRun LANDED "$MA_L" "$(ma_base "$ma2")"
+printf 'landed-anchor: remote\n' >> "$ma2/memory/builds/tRun/RUN.md"; ma_commit "$ma2" "landed record"
+MA_RUN=$(git -C "$ma2" log --format=%H --grep='^run grants$' -1)
+same "fixture: the landing merge's first parent is the owner's grant" \
+  "$(git -C "$ma2" log -1 --format=%s "$MA_L^1")" "owner grants"
+out=$(ma_leg "$ma2")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+( cd "$ma2" && git push -q origin main ) >/dev/null 2>&1
+out=$(ma_leg "$ma2")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+# a fix commit on the pushed landing merge, pushed, is the witness
+printf 'fix\n' > "$ma2/fix.txt"; ma_commit "$ma2" "fix after landing"
+ma_facts "$ma2" tRun LANDED HEAD "$(ma_base "$ma2")"; ma_commit "$ma2" "record the fix"
+( cd "$ma2" && git push -q origin main ) >/dev/null 2>&1
+out=$(ma_leg "$ma2")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+
+# ---- G4: PUSH-MAIN'S OWN RECONCILE as the witness. L is made locally and NOT pushed; another node
+# ---- pushes a SECOND owner grant onto the remote meanwhile, and the lander merges the remote in.
+# ---- The reconcile's run side is its FIRST parent, the one holding L, and the walk goes on to L.
+ma_init g4; ma4="$ma_root/g4"
+( cd "$ma4" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
+( git clone -q "$ma4.git" "$ma_root/g4-other" && cd "$ma_root/g4-other" \
+    && git config user.email o@t.test && git config user.name o \
+    && sed -i '/^slug: tOther3$/a may: tools/other-node.sh' memory/builds/tOther3/README.md \
+    && git commit -qam "other node grants" --no-verify && git push -q origin main ) >/dev/null 2>&1
+( cd "$ma4" && git fetch -q origin && git merge -q --no-ff --no-edit -m "reconcile origin/main" origin/main ) >/dev/null 2>&1
+MA_M=$(ma_sha "$ma4" HEAD)
+MA_RUN=$(git -C "$ma4" log --format=%H --grep='^run grants$' -1)
+same "fixture: push-main's reconcile takes the other node's grant as its second parent" \
+  "$(git -C "$ma4" log -1 --format=%s "$MA_M^2")" "other node grants"
+same "fixture: ...and the landing merge as its first" "$(git -C "$ma4" log -1 --format=%s "$MA_M^1")" "land tRun"
+ma_facts "$ma4" tRun LANDED "$MA_M" "$(ma_base "$ma4")"
+printf 'landed-anchor: remote\n' >> "$ma4/memory/builds/tRun/RUN.md"; ma_commit "$ma4" "record the reconcile"
+( cd "$ma4" && git push -q origin main ) >/dev/null 2>&1
+out=$(ma_leg "$ma4")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+miss "$out" "in memory/builds/tOther3/README.md, run"
+
+# ---- G3: A RUN ABORTED BEFORE --prepare, after a PLAIN reconcile R brought the owner's grant in.
+# ---- Graded live, then terminal with R as the witness, then with a single-parent commit after R.
+ma_init g3; ma3="$ma_root/g3"
+( cd "$ma3" && git merge -q --no-edit main ) >/dev/null 2>&1
+MA_R=$(ma_sha "$ma3" HEAD)
+MA_RUN=$(git -C "$ma3" log --format=%H --grep='^run grants$' -1)
+same "fixture: the plain reconcile takes the owner's grant as its SECOND parent" \
+  "$(git -C "$ma3" log -1 --format=%s "$MA_R^2")" "owner grants"
+ma_facts "$ma3" tRun RUNNING "$MA_R" "$(ma_base "$ma3")"; ma_commit "$ma3" "live after the reconcile"
+out=$(ma_leg "$ma3")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+ma_facts "$ma3" tRun ABORTED "$MA_R" "$(ma_base "$ma3")"; ma_commit "$ma3" "aborted at the reconcile"
+out=$(ma_leg "$ma3")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+printf 'after\n' > "$ma3/after.txt"; ma_commit "$ma3" "work after the reconcile"
+ma_facts "$ma3" tRun ABORTED HEAD "$(ma_base "$ma3")"; ma_commit "$ma3" "aborted after the reconcile"
+out=$(ma_leg "$ma3")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+
+rm -rf "$ma_root"
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
@@ -4216,7 +4434,10 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- thirty-two executed assertions over its one fixture repository, all at the END of region
 # ---- two, so FLOOR_SHARD_2 carries the same +32 and FLOOR_SHARD_1 is untouched. COUNTED by
 # ---- executing the block standalone in a replica of this prologue, for the reason above.
-FLOOR_ASSERTIONS=549
+# ---- RAISED 549 -> 582 by exactly the arm, TOOL-dDerivedDocket-19: the grant block's 33
+# ---- assertions, all in region two, so FLOOR_SHARD_2 moves by the same 33. Measured by running the
+# ---- block alone behind this suite's prologue by hand, n 0 -> 33; this pass runs no suite.
+FLOOR_ASSERTIONS=582
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -4242,7 +4463,7 @@ FLOOR_ASSERTIONS=549
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=91
-FLOOR_SHARD_2=458
+FLOOR_SHARD_2=491
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

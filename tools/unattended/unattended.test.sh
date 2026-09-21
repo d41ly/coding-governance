@@ -105,6 +105,10 @@ cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
 
+# NO BACKTICKS INSIDE THE HEREDOC BELOW. It is UNQUOTED, so a backticked word is a COMMAND: two
+# comments here once quoted the run helper that way, and every mkconf after that helper existed
+# ran the driver and wrote its stderr into the conf - a dirty tree every preflight arm then
+# refused. Found by TOOL-dDerivedDocket-19, hand-running its own arms over this prologue.
 mkconf() { # wiring · gate
   cat > .unattended.conf <<EOF
 MEMORY_ROOT=memory
@@ -112,7 +116,7 @@ UNITS_REGION_CUTOFF="${3-2026-08-19}"
 SPEC_THIN_CUTOFF="${5-}"
 LANDER="echo land"
 # DECLARED, so the shared fixture keeps BASE's output byte for byte: a blank LANDER_MODE
-# announces its default on stderr, `run` merges stderr into what every arm reads, and the two
+# announces its default on stderr, the run helper merges stderr into what every arm reads, and the two
 # arms that compare WHOLE --status output would then be comparing against an extra line. The
 # blank and in-place values are exercised where they belong, in their own fixtures.
 LANDER_MODE="primary"
@@ -125,7 +129,7 @@ WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
 # DECLARED for the reason the comment above it gives for LANDER_MODE: a blank switch and two
-# blank bounds announce their defaults on stderr, `run` merges stderr into what every arm reads,
+# blank bounds announce their defaults on stderr, the run helper merges stderr into what every arm reads,
 # and the arms that compare WHOLE --status output would be comparing against three extra lines.
 # The two bounds are positional so the streak arms can pin a limit they can actually reach.
 RESUME_SCHEDULE="on"
@@ -7614,6 +7618,88 @@ same "...and wrote no freeze line" \
 askmode ok
 dispreset
 
+# ========================================================== TOOL-dDerivedDocket-19 — THE GRANT ====
+# A `may:` line is honoured from ONE place, a `slug`-mode README at the default-branch anchor, and
+# everything else about it is a refusal. Every README lives on MAIN for the reason the mandate's do:
+# the grant is read from the README at BASE, so one authored on the unit branch would test the
+# authorization refusal instead of the grant.
+#
+# THE BACKSLASH TOKEN IS BUILT, NOT TYPED. A backslash inside a `sed a` text or an `awk -v` value is
+# an escape to both, so the fixture line is handed to awk through ENVIRON - the one channel that
+# passes it through untouched - and `printf '\134'` spells the byte without a backslash pair a
+# heredoc or a shell layer could halve.
+MAY_BS=$(printf '\134')
+maysetup() {
+  git checkout -qf main
+  readme tMaySlug; mutate memory/builds/tMaySlug/README.md '/^slug: tMaySlug$/a may: `tools/push-main.sh` TOOL-aStandingWrit-1'
+  readme tMayNone
+  readme tMayTick; mutate memory/builds/tMayTick/README.md '/^slug: tMayTick$/a may: `tools/push-main.sh`'
+  readme tMayBare; mutate memory/builds/tMayBare/README.md '/^slug: tMayBare$/a may: tools/push-main.sh'
+  readme tMayP;    mutate memory/builds/tMayP/README.md '/^slug: tMayP$/a authorized-by: prompt\nmay: tools/push-main.sh'
+  readme tMayR;    mutate memory/builds/tMayR/README.md '/^slug: tMayR$/a authorized-by: recipe\nmay: none'
+  readme tMayId;   mutate memory/builds/tMayId/README.md '/^slug: tMayId$/a may: EXMP-aFoo3'
+  readme tMayAbs;  mutate memory/builds/tMayAbs/README.md '/^slug: tMayAbs$/a may: /tools/push-main.sh'
+  readme tMayDots; mutate memory/builds/tMayDots/README.md '/^slug: tMayDots$/a may: ../tools/push-main.sh'
+  readme tMayLeaf; mutate memory/builds/tMayLeaf/README.md '/^slug: tMayLeaf$/a may: pushmain'
+  readme tMaySlash
+  MAY_LINE="may: tools${MAY_BS}push-main.sh" awk '{ print } /^slug: tMaySlash$/ { print ENVIRON["MAY_LINE"] }' \
+    memory/builds/tMaySlash/README.md > memory/builds/tMaySlash/README.tmp \
+    && mv memory/builds/tMaySlash/README.tmp memory/builds/tMaySlash/README.md
+  git add -A >/dev/null && git commit -q -m may-fixture --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  MAYP=$(git rev-parse HEAD)
+}
+mayreset() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$MAYP"; git clean -qfd; mkconf; }
+maypin() { sed -n 's/^may: //p' "memory/builds/$1/RUN.md" 2>/dev/null; }
+maysetup
+# THE BACKSLASH FIXTURE MUST CARRY ITS BYTE, or the backslash arm below grades a README that is
+# simply missing the key.
+same "fixture: the backslash README carries the byte it is named for" \
+  "$(grep -c "^may: tools${MAY_BS}${MAY_BS}push-main.sh$" memory/builds/tMaySlash/README.md)" "1"
+
+# ---- AC1: a `slug` README's grants are pinned, normalised and in order; no key pins `none`.
+mayreset
+out=$(run --preflight tMaySlug --keepalive-id KA-1)
+hit "$out" "grant pinned as may: tools/push-main.sh TOOL-aStandingWrit-1"
+same "a slug README's grants are pinned bare, in the order written" "$(maypin tMaySlug)" \
+  "tools/push-main.sh TOOL-aStandingWrit-1"
+mayreset
+out=$(run --preflight tMayNone --keepalive-id KA-1)
+hit "$out" "grant pinned as may: none"
+same "a README with no may: key pins none" "$(maypin tMayNone)" "none"
+
+# ---- AC3, the positive half: the backticked and the bare spelling pin ONE fact.
+mayreset
+run --preflight tMayTick --keepalive-id KA-1 >/dev/null
+same "the backticked spelling pins the bare path" "$(maypin tMayTick)" "tools/push-main.sh"
+mayreset
+run --preflight tMayBare --keepalive-id KA-1 >/dev/null
+same "the bare spelling pins the same bytes" "$(maypin tMayBare)" "tools/push-main.sh"
+
+# ---- AC2: a grant under `prompt`, and under `recipe` even saying `none`, is refused and pins nothing.
+mayreset
+out=$(run --preflight tMayP --keepalive-id KA-1)
+hit "$out" "the build README carries a may: grant under an authorization mode that resolves at the second anchor, so the run could have written the grant it would be acting under - ruling D12-j honours a grant only from a slug-mode README the owner committed at the default-branch anchor: mode prompt"
+miss "$out" "grant pinned as may:"
+same "a prompt-mode grant writes nothing" "$(git status --porcelain | grep -c . || true)" "0"
+mayreset
+out=$(run --preflight tMayR --keepalive-id KA-1)
+hit "$out" "the build README carries a may: grant under an authorization mode that resolves at the second anchor, so the run could have written the grant it would be acting under - ruling D12-j honours a grant only from a slug-mode README the owner committed at the default-branch anchor: mode recipe"
+same "a recipe-mode grant writes nothing" "$(git status --porcelain | grep -c . || true)" "0"
+
+# ---- AC3, the negative half: ONE fixture per refusal shape S3 declares, each naming its token. The
+# ---- shapes are an id prefix failing the id grammar, a leading `/`, a `..` segment, a backslash,
+# ---- and a bare token with neither a `/` nor a file extension - five, the number S3 declares.
+for may_case in "tMayId EXMP-aFoo3" "tMayAbs /tools/push-main.sh" "tMayDots ../tools/push-main.sh" \
+                "tMaySlash tools${MAY_BS}push-main.sh" "tMayLeaf pushmain"; do
+  may_slug=${may_case%% *}; may_tok=${may_case#* }
+  mayreset
+  out=$(run --preflight "$may_slug" --keepalive-id KA-1)
+  hit "$out" "the build README's may: line carries a token that is neither a decision id nor a repo-relative path with no leading slash, no .. segment and no backslash, holding a / or a file extension - a grant nobody can read is refused rather than pinned: refused token [$may_tok]"
+  same "a refused grant on $may_slug writes nothing" "$(git status --porcelain | grep -c . || true)" "0"
+done
+reset_tree
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
@@ -7670,7 +7756,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # diff — DISCOUNTED to +43 for the reason every figure here is discounted, and for the one unit 16
 # adds: this pass ran no suite either, observing each refusal by hand against a scratch fixture, so
 # a 1:1 pin would assert a number nobody has watched a runner produce.
-FLOOR_ASSERTIONS=977
+# RAISED 977 -> 1008 by TOOL-dDerivedDocket-19, the grant arms: 31 assertions, all in region
+# two, so FLOOR_SHARD_2 carries the same +31 and FLOOR_SHARD_1 is untouched. MEASURED, not typed:
+# the block was run alone behind this suite's own prologue by hand, n 20 -> 51, because this pass
+# runs no suite; the figure is the block's own and keeps the headroom declared above.
+FLOOR_ASSERTIONS=1008
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -7714,7 +7804,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=781
+FLOOR_SHARD_2=812
+# +31 for the TOOL-dDerivedDocket-19 grant arms, all in region two - see FLOOR_ASSERTIONS.
 # +43 for the TOOL-dDerivedDocket-17 asks-disposed and freeze arms, all in region two — see
 # FLOOR_ASSERTIONS. `dispsetup`'s one `mutate` lives in that block too, not in the prologue, so
 # FLOOR_SHARD_1 does not move.

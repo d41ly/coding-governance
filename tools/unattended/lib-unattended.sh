@@ -439,6 +439,116 @@ check_touching_commit_reachable() { # commit · base · path -> status 0 yes · 
   return 1
 }
 
+# ------------------------------------------------------------------------ the grant grammar
+# TOOL-dDerivedDocket-19 S3. A build README may carry ONE front-matter key, `may:`, whose value is one
+# physical line of space-separated GRANTS or the single word `none`. A grant is a decision id in the
+# grammar `expand_id_runs` reads, or a repo-relative PATH: no leading `/`, no `..` segment, no
+# backslash, and a `/` or a file extension somewhere in it. Either may be bare or wrapped in
+# backticks, the form an ask row's `may` clause uses, so an owner copying a proposal verbatim and one
+# typing it bare pin the SAME bytes.
+#
+# ONE FUNCTION, TWO CALLERS, and that is why it is here. `--preflight` normalises the README's line
+# into the pinned `may:` fact and the leg normalises the same line again to compare against that
+# fact. Two spellings would make the comparison depend on how the owner copied the grant, and the leg
+# would then red an honest record or pass a forged one according to a backtick.
+#
+# STATUS 0 prints the grants, backticks stripped and one space apart, or `none`. STATUS 1 prints the
+# ONE token it refused, as written, so the refusal can name it — nothing when the value is empty.
+# `none` beside a grant is refused like any other token that is neither an id nor a path: a value
+# that says both "nothing" and "this" has no honest reading.
+#
+# WHAT IT DOES NOT CHECK: that an id RESOLVES in the decision log, or that a path EXISTS. It is a typo
+# guard over shape, and whether a grant covers a given change is the run's M3 judgement, which no
+# code here observes. Split by `read -a`, never by an unquoted expansion, so a token that happens to
+# be a glob is refused as the token it is rather than expanded into file names.
+parse_grants() { # may: value -> status 0 the grants (or `none`) · status 1 the refused token
+  local _pg_w _pg_t _pg_s _pg_out=""
+  read -r -a _pg_w <<<"$1"
+  [ "${#_pg_w[@]}" -gt 0 ] || return 1
+  if [ "${#_pg_w[@]}" = 1 ] && [ "${_pg_w[0]}" = none ]; then printf 'none'; return 0; fi
+  for _pg_t in "${_pg_w[@]}"; do
+    _pg_s=$_pg_t
+    case $_pg_s in \`?*\`) _pg_s=${_pg_s#\`}; _pg_s=${_pg_s%\`} ;; esac
+    if ! [[ $_pg_s =~ ^[A-Z]+-[A-Za-z0-9]+-[0-9]+$ ]]; then
+      case $_pg_s in
+        /*|*\\*|*\`*|..|../*|*/..|*/../*) printf '%s' "$_pg_t"; return 1 ;;
+        */*|*?.?*) ;;
+        *) printf '%s' "$_pg_t"; return 1 ;;
+      esac
+    fi
+    _pg_out="$_pg_out${_pg_out:+ }$_pg_s"
+  done
+  printf '%s' "$_pg_out"
+}
+
+# ------------------------------------------- the terminal record's exclusions, read by content
+# TOOL-dDerivedDocket-19 section 4 and section 8 F8. Given a terminal record's WITNESS, its BASE and
+# its RUN-STATE PATH: the tips `read_run_commits` must exclude so that what is left is the commits the
+# run itself made. Unit 22's S17 applies the same function to a landing commit.
+#
+# THE RUN SIDE OF A MERGE IS READ BY CONTENT, never by parent order and never from a default-branch
+# tip. At every two-parent commit on the witness's tail, the witness included, the parent from which
+# a commit since BASE touching the run-state path is reachable is the run's side: the other parent is
+# printed as an exclusion and the walk descends the run side, so nested merges are read in turn. That
+# one rule reads unit 2's prepared merge, a plain reconcile on the run branch, the primary lander's
+# `--no-ff` landing merge and push-main's own reconcile on the default branch, whichever parent each
+# puts the run on. A single-parent commit passes the walk to its parent.
+#
+# THE RUN-STATE PATH IS THE BUILD FOLDER'S `RUN.md`, even for an archived record: every record commit
+# the run made touched that path, and rotation happens after them.
+#
+# IT STOPS, ADDING NOTHING, where it cannot tell — the fail-closed direction, because an exclusion
+# nobody earned removes a run commit from the arm's range. That is a merge where neither parent or
+# both reach such a commit, a commit BASE holds, a root, and a commit with more than two parents.
+# The walk is bounded by the witness's history since BASE, read ONCE with `rev-list --parents` into
+# this shell rather than one git call per step.
+#
+# STATUS 0 is a completed walk; the exclusions are on stdout, one per line. STATUS 2 is CANNOT
+# ANSWER: the witness or BASE does not resolve, or a reachability probe could not answer — its own
+# reason line is on stderr — and whatever was printed before that point stands, fewer exclusions
+# rather than invented ones. It makes no remote observation, so a stale tip moves no terminal range.
+#
+# STATED RESIDUAL: it tells a merge's sides by where the record's commits are, not by who made the
+# other commits. A side carrying run commits but no commit touching the run-state path since BASE
+# reads as default-branch content, and only a branch forked outside the run's history has that shape.
+read_run_exclusions() { # witness · base · run-state path -> the exclusion tips, one per line · status 0 read · 2 cannot answer
+  local _re_w="${1:-}" _re_b="${2:-}" _re_p="${3:-}" _re_ws _re_bs _re_map _re_cur _re_par _re_p1 _re_p2 _re_rest _re_r1 _re_r2
+  _re_ws=$(GIT rev-parse --verify --quiet "$_re_w^{commit}" 2>/dev/null) || _re_ws=""
+  _re_bs=$(GIT rev-parse --verify --quiet "$_re_b^{commit}" 2>/dev/null) || _re_bs=""
+  if [ -z "$_re_w" ] || [ -z "$_re_b" ] || [ -z "$_re_ws" ] || [ -z "$_re_bs" ]; then
+    printf 'lib-unattended: read_run_exclusions cannot answer for witness [%s] and base [%s]: one of them does not resolve to a commit\n' "$_re_w" "$_re_b" >&2
+    return 2
+  fi
+  _re_map=$(GIT rev-list --parents "$_re_ws" "^$_re_bs" 2>/dev/null) || {
+    printf 'lib-unattended: read_run_exclusions cannot answer for witness [%s]: the walk of its history since BASE failed\n' "$_re_w" >&2
+    return 2
+  }
+  _re_map=$'\n'"$_re_map"$'\n'
+  _re_cur=$_re_ws
+  while :; do
+    # A COMMIT OUTSIDE THE MAP IS ONE BASE HOLDS, because the map is exactly the witness's history
+    # not reachable from BASE. The line is `<commit> <parent>…`, so a match on "\n<commit>" is a
+    # match at the start of that commit's own line and never inside another's parent list.
+    case $_re_map in *$'\n'"$_re_cur"*) ;; *) break ;; esac
+    _re_par=${_re_map#*$'\n'"$_re_cur"}
+    _re_par=${_re_par%%$'\n'*}
+    read -r _re_p1 _re_p2 _re_rest <<<"$_re_par"
+    if [ -z "$_re_p1" ] || [ -n "$_re_rest" ]; then break; fi
+    if [ -z "$_re_p2" ]; then _re_cur=$_re_p1; continue; fi
+    check_touching_commit_reachable "$_re_p1" "$_re_bs" "$_re_p"; _re_r1=$?
+    check_touching_commit_reachable "$_re_p2" "$_re_bs" "$_re_p"; _re_r2=$?
+    if [ "$_re_r1" = 2 ] || [ "$_re_r2" = 2 ]; then return 2; fi
+    if [ "$_re_r1" = 0 ] && [ "$_re_r2" = 1 ]; then
+      printf '%s\n' "$_re_p2"; _re_cur=$_re_p1
+    elif [ "$_re_r1" = 1 ] && [ "$_re_r2" = 0 ]; then
+      printf '%s\n' "$_re_p1"; _re_cur=$_re_p2
+    else
+      break
+    fi
+  done
+  return 0
+}
+
 # THE NEXT ANCHOR for a unit after <anchor>, or empty when this is the unit's last row. Chosen by
 # ANCESTRY rather than by the order rows appear in the file: the record is append-only and a run may
 # park rows in any order, so file order is not history order. The earliest strict descendant wins,

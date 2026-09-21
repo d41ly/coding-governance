@@ -1437,6 +1437,65 @@ read_asks_of() { # README blob text -> the asks: value, or nothing
     /^asks:/ { v = $0; sub(/^asks:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }'
 }
 
+# ---- TOOL-dDerivedDocket-19 - THE GRANT LINE, read the way `read_asks_of` reads the mandate: an
+# ---- independent parse of the same blob, first line of the key, front matter only. It returns
+# ---- `may=<value>` rather than the bare value, because PRESENCE is the fact the grant arms turn on:
+# ---- an absent key means `none` and an empty one is a malformed grant, and a bare empty string
+# ---- cannot tell them apart.
+read_may_of() { # README blob text -> `may=<value>` when the front matter carries the key, or nothing
+  printf '%s\n' "$1" | awk '
+    NR == 1 { if ($0 !~ /^---[[:space:]]*\r?$/) exit; next }
+    /^---[[:space:]]*\r?$/ { exit }
+    /^may:/ { v = $0; sub(/^may:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "may=" v; exit }'
+}
+
+# ---- TOOL-dDerivedDocket-19 S4, the cross-run arm's reader. Given a run's OWN commits on stdin, one
+# ---- per line: every commit that WRITES a `may:` front-matter line into a build README, printed as
+# ---- `<commit> <README>`. ANY build README, the run's own included: a README a run lands on the
+# ---- default branch is one the NEXT run is authorized by, so a grant there is a grant between runs.
+# ----
+# ---- A TWO-PARENT COMMIT ANSWERS ONLY FOR THE LINES NEITHER PARENT HOLDS. Its first-parent diff
+# ---- carries everything the other parent brought in, which for a reconcile is default-branch
+# ---- content - an owner's hand-typed grant among it, the one channel ruling D12-j keeps open. So a
+# ---- merge is read by its COMBINED diff, and a line counts only where every prefix column is `+`;
+# ---- each parent's own commits in the range are graded where they were made.
+# ----
+# ---- TWO STAGES, and the second is what makes the first safe to be generous. ONE `diff-tree --stdin`
+# ---- over the whole list, restricted to README paths, names the candidates; each is then settled by
+# ---- reading the key out of the FRONT MATTER at the commit and at every parent, and it is a write
+# ---- only when the key is present at the commit and differs from what every parent carries. A body
+# ---- line that happens to start `may:` is therefore no grant, and a merge that took one side's line
+# ---- verbatim wrote nothing. The comparison is RAW: rewriting a grant's spelling is a write.
+# ----
+# ---- WHAT IT DOES NOT SEE: a README under a path other than `<MEMORY_ROOT>/builds/<slug>/README.md`,
+# ---- and a grant a run carries in some other file. Neither is a place the driver reads a grant from.
+scan_grant_writes() { # stdin: commit ids -> `<commit> <README>` per commit that writes a may: line into one
+  local _sg_c _sg_p _sg_new _sg_par _sg_hit
+  GIT diff-tree --stdin -r -p --cc --no-renames --no-ext-diff --no-textconv --format='commit %H %P' \
+      -- "$M/builds/*/README.md" 2>/dev/null \
+    | awk -v pre="$M/builds/" '
+        /^commit [0-9a-f]+/ { c = $2; np = NF - 2; f = ""; inh = 0; next }
+        /^diff --git / { f = $NF; sub(/^b\//, "", f); inh = 0; next }
+        /^diff --(cc|combined) / { f = $NF; inh = 0; next }
+        /^@@/ { inh = 1; next }
+        inh == 1 {
+          w = (np > 1) ? np : 1
+          lead = substr($0, 1, w); body = substr($0, w + 1)
+          if (body ~ /^may:/ && lead !~ /[^+]/ && index(f, pre) == 1 \
+              && substr(f, length(pre) + 1) ~ /^[^\/]+\/README\.md$/) print c " " f
+        }' | sort -u \
+    | while read -r _sg_c _sg_p; do
+        [ -n "$_sg_p" ] || continue
+        _sg_new=$(read_may_of "$(GIT show "$_sg_c:$_sg_p" 2>/dev/null)")
+        [ -n "$_sg_new" ] || continue
+        _sg_hit=1
+        for _sg_par in $(GIT rev-list --parents -n 1 "$_sg_c" 2>/dev/null | cut -d' ' -f2-); do
+          [ "$(read_may_of "$(GIT show "$_sg_par:$_sg_p" 2>/dev/null)")" = "$_sg_new" ] && _sg_hit=0
+        done
+        [ "$_sg_hit" = 1 ] && printf '%s %s\n' "$_sg_c" "$_sg_p"
+      done
+}
+
 # ---- THE DECLARED PRODUCER, RUN BOUNDED. S8 re-runs the driver's own two call shapes —
 # ---- `<ASKS_CMD> --tsv --ready <ids> --target <slug> --at <rev>` — over the inputs a record pinned.
 # ---- `$ASKS_CMD` IS UNQUOTED, exactly as `$WIRING_CHECK`, `$LANDER` and `$GATE_CMD` are in the
@@ -1969,8 +2028,108 @@ while IFS= read -r f; do
           [ "$recn" = "$dn" ] || fail 19 "a run-state file records a piece count the build README at its own recorded BASE does not declare, so the number the run will be measured against is not the number it was asked for - recorded against declared follow: $recn against $dn"
         fi
       fi
+
+      # ---- 19: THE GRANT, re-derived here rather than believed - TOOL-dDerivedDocket-19 S4. The
+      # ---- driver pins `may:` from the README at BASE, normalised by the library's `parse_grants`;
+      # ---- this re-reads that same blob with its own parse and normalises it with the SAME function,
+      # ---- so a backticked grant and a bare one agree and the comparison does not turn on how the
+      # ---- owner copied it. AT BASE, never at HEAD: a README the run edited after its preflight is
+      # ---- not the authorization it ran under.
+      # ----
+      # ---- PRESENCE-GUARDED in the direction check 19's mode arm is: a record written before this
+      # ---- unit carries no `may:` fact, and over a README declaring nothing that is an honest
+      # ---- absence. A record carrying no fact while its README at BASE DOES declare a grant is not
+      # ---- one, and reds - the pin the driver writes for that README is not there.
+      # ----
+      # ---- ...and a `may:` other than `none` on a record whose mode is not `slug` reds whatever its
+      # ---- README says: the driver refuses the key under every other mode, so such a record was
+      # ---- written around it, and a grant a second-anchor run pinned is one it could have authored.
+      recmay=$(fact_of "$f" may)
+      dmayl=$(read_may_of "$bb")
+      if [ -z "$dmayl" ]; then
+        dmay=none
+      elif ! dmay=$(parse_grants "${dmayl#may=}"); then
+        dmay="refused by the grant grammar at token ${dmay:-(an empty value)}"
+      fi
+      if [ -n "$recmay" ] || [ "$dmay" != none ]; then
+        [ "$recmay" = "$dmay" ] || fail 19 "a run-state file pins a may: grant the build README at its own recorded BASE does not declare, so the authority the run says its owner committed is not the authority that README carries - pinned against declared follow: [${recmay:-(no may: fact)}] against [$dmay] in $f"
+      fi
+      if [ -n "$recmay" ] && [ "$recmay" != none ] && [ "${recmode:-$dmode}" != slug ]; then
+        fail 19 "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [${recmode:-$dmode}], may: [$recmay] in $f"
+      fi
     else
       fail 13 "no build README at a run's recorded BASE, so nothing committed before that run branched authorizes it: $rb in $bre"
+    fi
+
+    # ---- 19: NO RUN COMMIT WRITES A GRANT INTO ANY BUILD README - TOOL-dDerivedDocket-19 S4, the
+    # ---- cross-run arm. A README a run lands on the default branch authorizes the next run, so
+    # ---- without this one run could grant another (TOOL-aStandingWrit-1). It reads each run's OWN
+    # ---- commits, never `base..HEAD` or `base..witness`: both hold every default-branch commit
+    # ---- landed since BASE, so the owner's hand-typed grant - the channel ruling D12-j keeps open -
+    # ---- would red the run that then could not land, and once archived would red the bar for ever.
+    # ----
+    # ---- THE RANGE PER RECORDED STATE. A working, HELD or LANDING record walks to HEAD and excludes
+    # ---- the advertised default-branch tip, the one check 7 observes; with that tip absent from this
+    # ---- clone, the local ref of the advertised name, announced as the weaker reading. A terminal
+    # ---- record walks from its WITNESS and excludes what `read_run_exclusions` reads off the merges
+    # ---- on that witness's tail - by which parent reaches the record's own commits, never by parent
+    # ---- order and never from a tip - so a landed or aborted record keeps one range for ever. A
+    # ---- derived-LANDED record's endpoint is unit 22's, and until it lands a LANDING record reads as
+    # ---- live, which is the more complete of the two readings (section 8 F7).
+    # ----
+    # ---- A SKIP ANNOUNCES ITSELF. A terminal record with no witness, a witness this clone cannot
+    # ---- resolve, or a live one with no tip to exclude is named on the report channel, never passed.
+    # ---- A TERMINAL RECORD IS SCANNED OVER `base..witness` FIRST, and walked only on a hit. That range
+    # ---- is a SUPERSET of the run's own commits, so a superset writing no grant settles the subset
+    # ---- with no walk at all - the ordinary case, since no build README in this tree has ever carried
+    # ---- the key. Measured before this was added: the walk over every terminal record here cost some
+    # ---- twenty seconds a bar to reach the same empty answer the one superset scan reaches.
+    mayend=""; mayex=""; maywhy=""; maywalk=0
+    case " $PHASES_TERMINAL " in
+      *" $ph "*)
+        if [ -z "$w" ]; then
+          maywhy="it is $ph and names no witness, so there is no endpoint to walk its own commits from"
+        elif ! check_rev "$w"; then
+          maywhy="its witness $w does not resolve to a commit in this clone"
+        else
+          mayend=$w; maywalk=1
+        fi ;;
+      *)
+        mayend=HEAD
+        if [ "$ADV_HEAD_OK" = 1 ]; then
+          mayex=$ADV_HEAD
+        elif [ -n "$ADV_NAME" ] && GIT rev-parse --verify --quiet "refs/heads/$ADV_NAME^{commit}" >/dev/null 2>&1; then
+          mayex="refs/heads/$ADV_NAME"
+          report "check 19 excludes the LOCAL ref $ADV_NAME from the own commits of $f - the advertised default-branch tip is not in this clone, and a local ref is the weaker reading: a run that merged into it hides its own commits from the grant-write arm"
+        else
+          maywhy="it is live and neither the advertised default-branch tip nor a local ref of the advertised name can be read, so its own commits cannot be told from the default branch's"
+        fi ;;
+    esac
+    if [ -n "$maywhy" ]; then
+      report "check 19 SKIPPED the grant-write arm for $f - $maywhy"
+    elif ! maycs=$(read_run_commits "$mayend" "$rb" $mayex); then
+      report "check 19 SKIPPED the grant-write arm for $f - its own commits could not be enumerated from $mayend over base $rb, and an empty list here would read as a run that wrote nothing"
+    else
+      maywr=$(printf '%s\n' "$maycs" | scan_grant_writes)
+      if [ -n "$maywr" ] && [ "$maywalk" = 1 ]; then
+        mayex=$(read_run_exclusions "$w" "$rb" "$M/builds/$bslug/RUN.md" 2>/dev/null)
+        [ $? = 0 ] || report "check 19 read the terminal exclusions of $f only in part - the walk or a reachability probe could not answer, so its range keeps commits an exclusion would have removed, which is the fail-closed direction"
+        if maycs=$(read_run_commits "$mayend" "$rb" $mayex); then
+          maywr=$(printf '%s\n' "$maycs" | scan_grant_writes)
+        else
+          report "check 19 graded the WHOLE base..witness range of $f - its own commits could not be enumerated past the exclusions the walk read, and the superset is the fail-closed reading"
+        fi
+      fi
+      # AN EMPTY RANGE IS SAID OUT LOUD. It is honest for a run that has committed nothing past its
+      # BASE, and it is also what a LANDING record whose work already reached the advertised tip
+      # reads as until unit 22 supplies its landing commit - a skip that looks like a pass otherwise.
+      [ -n "$maycs" ] || report "check 19's grant-write arm examined NO own commit of $f - the range from $mayend over base $rb past its exclusions is empty"
+      while read -r maysha mayrd; do
+        [ -n "$maysha" ] || continue
+        fail 19 "a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow: $maysha in $mayrd, run $f"
+      done <<MAYWRITES
+$maywr
+MAYWRITES
     fi
   fi
 

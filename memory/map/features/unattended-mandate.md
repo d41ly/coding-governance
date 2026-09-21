@@ -5,7 +5,7 @@ feature = "unattended-mandate"
 title = "The unattended run's authorization: the observed anchor and the ask mandate"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aStandingWrit-2", "TOOL-dNarrowedAnchor-1"]
+decisions = ["TOOL-aStandingWrit-2", "TOOL-dNarrowedAnchor-1", "TOOL-dDerivedDocket-19"]
 
 [claims]
 gate-legs = []
@@ -74,6 +74,18 @@ pinned `anchor-sha:` and HEAD at preflight, never `base:`. Check 37 bans a forei
 run's folder by the recall kit's own `anchor_at`, reached through `RECALL_CLI`. `asks-ready:` and
 the freeze are re-derived by re-running `ASKS_CMD` until the record is published.
 
+**A grant is honoured from ONE place, an owner-committed `slug` README.** A `may:` front-matter line
+lifts the build method's veto 2 for what it names (`TOOL-dDerivedDocket-19`, ruling D12-j).
+`check_authorization` reads it in the same scan and refuses it under check 78 when the mode is not
+`slug`, even as `none`, and a token that is neither a decision id nor a repo-relative path under
+check 79. The library's `parse_grants` strips backticks for the driver and the leg alike, so the two
+spellings pin one fact; preflight pins `may:`, `none` when absent. Check 19's three grant arms compare
+that fact against the README at BASE, red a grant on a non-`slug` record, and walk each run's OWN
+commits for one writing a `may:` line into any build README: a live record to HEAD past the
+advertised tip, a terminal one from its witness past what `read_run_exclusions` reads off the merges
+behind it, a merge answering only for the lines neither parent holds. An ask-row `may` is a proposal
+the owner copies by hand, and a `SCOPE`-row one is V13.
+
 ## Shared seams
 
 - `ASKS_CMD` — the declared producer of an ask's readiness and disposal. The driver and the leg both
@@ -93,6 +105,10 @@ seam: `asks:` — reuse for pointing a run at filed asks rather than a roster it
   default tip is never re-derived. Both are in the leg's header. Re-derived 2026-09-21: the two
   check-9 rows this replaced are closed — the leg reads no local ref on the BASE path any more, and
   an unobserved remote fails check 9 closed by name.
+
+- **A derived-LANDED record has no grant-write range yet.** It reads as live, so once its work is
+  on the advertised tip the range is empty and the leg announces that; `TOOL-dDerivedDocket-22`'s
+  `landing_commit_of` supplies the endpoint.
 
 - **The mandate is inert in gov until `ASKS_CMD` is declared.** This repo's `.unattended.conf`
   declares none, so an `asks:` line here refuses under check 70, and the one criterion that needs the

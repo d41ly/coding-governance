@@ -1189,16 +1189,24 @@ def _scan_clause_grammar(corpus: Corpus, asks: dict) -> list:
     `out`, `accept`, `verify` and `data` are FREE TEXT and the only way they fail is by being
     empty. That is not a formality: an empty value is exactly what a TEXT colliding with a label
     produces, so it is the finding that makes the collision loud instead of silent.
+
+    A `SCOPE` ROW MAY NOT CARRY `may` AT ALL (TOOL-dDerivedDocket-19 S5, owner ruling D12-j). A grant
+    is honoured only from an owner-committed build README; a SCOPE row's writer is a triager adding
+    clauses to somebody else's ask, so the LABEL is the finding, whatever the value says - `none`
+    included - and its grammar is not graded on top of it, because a clause that may not exist has
+    no shape worth reporting. An ASK row's `may` stays a PROPOSAL an owner may copy by hand, graded
+    below exactly as before.
     """
     out: list = []
 
     def add(path: str, lineno: int, why: str) -> None:
         out.append(Verdict(13, f"{path}:{lineno}: {why}", (path,)))
 
-    carriers = [(a.path, a.line, f"ask {a.id}", a.clauses) for p in corpus.files for a in p.asks]
-    carriers += [(r.path, r.line, f"{SCOPE_VERB} row for {r.target}", r.extra["clauses"])
+    carriers = [(a.path, a.line, f"ask {a.id}", a.clauses, False)
+                for p in corpus.files for a in p.asks]
+    carriers += [(r.path, r.line, f"{SCOPE_VERB} row for {r.target}", r.extra["clauses"], True)
                  for p in corpus.files for r in p.rows if r.cls == "scope"]
-    for path, lineno, who, pairs in sorted(carriers):
+    for path, lineno, who, pairs, scoped in sorted(carriers):
         for label in CLAUSE_LABELS:
             if len(read_clause_values(pairs, label)) > 1:
                 add(path, lineno, f"{who} writes the `{label}` clause more than once on one row, so "
@@ -1214,6 +1222,11 @@ def _scan_clause_grammar(corpus: Corpus, asks: dict) -> list:
                 seen = parse_seen(value)
                 if seen.why:
                     add(path, lineno, f"{who} carries `seen {value}`, and {seen.why}")
+            elif label == "may" and scoped:
+                add(path, lineno, f"{who} carries a `may` clause, and a {SCOPE_VERB} row honours no "
+                                  f"grant: authority comes only from a build README the owner "
+                                  f"committed, and a {SCOPE_VERB} row is written about somebody "
+                                  f"else's ask")
             elif label == "may":
                 grants, why = extract_grants(value)
                 if why:
@@ -2148,6 +2161,23 @@ def run_arms(report: bool = True) -> list:
     arm("V12 — a post-cutoff ask with no SEV row anywhere", "[12]",
         lambda: str(_read_codes([_parse_fixture(
             "aFoo", asks=[render_ask_row("EXMP-aFoo-1", "2026-06-01", "x", clauses=_CLAUSE_OK)])])))
+    # TOOL-dDerivedDocket-19 S5 — a SCOPE row's `may` is V13 whatever it says, and the same row with no
+    # grant is the control that says the label is the finding and not the row.
+    def build_scope_fixture(*clauses):
+        return [_parse_fixture("aFoo", asks=[clean_ask],
+                               rows=[render_sev_row("EXMP-aFoo-1", "LOW", "w"),
+                                     render_scope_row("EXMP-aFoo-1", clauses)])]
+
+    arm("V13 — a SCOPE row carrying a `may` grant", "[13]",
+        lambda: str(_read_codes(build_scope_fixture(("may", "`tools/push-main.sh`")))))
+    arm("V13 — a SCOPE row carrying `may none` is the same finding", "[13]",
+        lambda: str(_read_codes(build_scope_fixture(("may", GRANT_NONE)))))
+    arm("V13 names the SCOPE row and the label it may not carry",
+        "SCOPE row for EXMP-aFoo-1 carries a `may` clause, and a SCOPE row honours no grant",
+        lambda: str([v.text for v in derive_verdicts(build_corpus(
+            build_scope_fixture(("may", "`tools/push-main.sh`"))), _CLEAN_CONF) if v.code == 13]))
+    arm("a SCOPE row carrying no `may` is not V13", "[]",
+        lambda: str(_read_codes(build_scope_fixture(("accept", "cured from outside")))))
     arm("V15 — a blank cutoff under `builds`", "[15]",
         lambda: str(_read_codes(clean, conf=read_conf({MODE_KEY: "builds", CUTOFF_KEY: ""}))))
     arm("V16 — an unpadded cutoff under `builds`", "[16]",

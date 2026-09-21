@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-19 — authority only from an owner-committed README
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 19
+**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-19-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-19-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-20 |
@@ -25,7 +26,7 @@ add to it, and the leg says so when something tries.
 
 ## 2. Scope (IN)
 
-- **S1** The authorization scan (`tools/unattended/unattended.sh:1465-1471`) reads a `may:`
+- **S1** The authorization scan (`tools/unattended/unattended.sh:1984-1992`) reads a `may:`
   front-matter line from the same blob it already parses. Preflight pins it as the run fact `may:`
   ONLY when the resolved mode is `slug`, and pins `may: none` when the key is absent. Observed by
   AC1.
@@ -131,7 +132,7 @@ add to it, and the leg says so when something tries.
 | the scaffold's output | never emitted | a generated README carries no authored authority |
 
 `slug` mode implies the default-branch anchor because the second anchor admits only
-`SECOND_ANCHOR_MODES="prompt recipe"` (`tools/unattended/unattended.sh:580`), and leg check 29
+`SECOND_ANCHOR_MODES="prompt recipe"` (`tools/unattended/unattended.sh:768`), and leg check 29
 already reds a `slug` record whose BASE came from the second anchor.
 
 ### What a grant lifts
@@ -225,7 +226,8 @@ unobserved tip changes no terminal range.
 
 The S2 and S3 refusals take new driver codes, and the S4 arms report under the leg's check 19 beside
 the mode arms they extend. New numbers are allocated at build time as the next free integer, because
-other units of this build allocate codes concurrently.
+other units of this build allocate codes concurrently. Allocated at build: 78 for S2's refusal
+and 79 for S3's.
 
 ### Rollout
 
@@ -256,7 +258,7 @@ Any new shell function is named through `python tools/lexicon/lexicon.py --sugge
 `tools/unattended/VERBS.template.md` and `memory/guides/UNATTENDED-VERBS.md`, and
 `tools/memory-tree/SPEC-TEMPLATE.template.md` and `memory/TEMPLATE-SPEC.md`, the two pairs S7's
 moved passages land in ·
-`tools/memory-tree/backlog.py` and its selftest · `tools/memory-tree/gen_build_index.py`'s selftest ·
+`tools/memory-tree/backlog.py` and its selftest ·
 `memory/DECISIONS.md` · `.memory-tree.conf` for `ARMS_FLOORS`.
 
 ### Budgets
@@ -638,10 +640,27 @@ New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt
   The fold verifier corrected this entry's own count: S3 declares five refusal shapes, not four,
   and AC3's arm count follows S3 rather than the record's tally.
 
+- rev-7 · 2026-09-21 · S1 S6 · §4 · §7 · AC8 · the build pass. S1 re-cites the scan at
+  `tools/unattended/unattended.sh:1984-1992` and §4 `SECOND_ANCHOR_MODES` at `:768`, both moved by
+  the units built before this one with their shapes unchanged. §4 Fail codes records the two
+  allocated numbers, 78 and 79. S6 was already met when this unit started: unit 15's generator
+  selftest carries the arm scaffolding a README over a granted ask and asserting no `may:` line,
+  which is AC8's own observation, so §4 Files touched drops the generator, and `--dispatch` refuses
+  declaring it beside the index it renders in any case; AC8 is observed directly over a scratch
+  fixture instead. §4's cross-run arm reads a two-parent commit by its combined diff as written,
+  and the pass settles each candidate by the FRONT-MATTER `may:` value at the commit against every
+  parent's, so a body line starting `may:` is no grant and a merge taking one side's line verbatim
+  wrote nothing. A terminal record is scanned over `base..witness` first and walked only on a hit,
+  because that range is a superset of the run's own commits and the walk cost about twenty seconds
+  a bar to reach the empty answer the superset gives. §7's arm lines are unchanged; the driver pair of `ARMS_FLOORS` is raised to the
+  measured count rather than by two, the tightening direction. One defect outside the design is
+  fixed on the way: the driver suite's `mkconf` heredoc quoted its run helper in backticks, so every
+  conf written after that helper existed ran the driver into the file and left the tree dirty.
+
 ## 10. Reuse audit
 
 The seam is the authorization scan's single `awk` over the README blob at BASE
-(`tools/unattended/unattended.sh:1465-1471`), which unit 16 extends with `asks:` and this unit with
+(`tools/unattended/unattended.sh:1984-1992`), which unit 16 extends with `asks:` and this unit with
 `may:`, plus leg check 19's re-parse of the same blob. `reuse_lookup.py "authority grant honoured
 only from an owner committed record"` returns the `unattended` dossier's `.unattended.conf` seam and
 generic record helpers; no seam in the lookup grades authority, and its scan reports `.sh` unscanned.

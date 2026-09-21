@@ -381,6 +381,12 @@ recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick
 RESOLVED (agent, <date>, delegated): <pick> under a mandate. Write `none`
 when clear.
 
+**Mark it in place**, naming resolver and authority, never `(owner, …)` for a decision the owner
+did not make. The mark must be the documented SHAPE — the word, then
+`(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each
+item: with any item present ONLY a conforming mark resolves it, the first line does not vote, and
+the paragraphs below say what that cannot see.
+
 **The mark is a SHAPE a machine reads.** Two readers grade it — the
 hygiene gate for a spec at a terminal status, and the planning verb for a live build — and both
 require the word followed by a parenthesised attribution whose first field is `owner` or `agent`,

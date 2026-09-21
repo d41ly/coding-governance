@@ -20,7 +20,12 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   hand-editing an artifact this kit calls generated.
 - `--park` — writes a decision the run REFUSED to take: the question, the options seen, the reason.
   Refused on a terminal record, and with no run-state file: a park minted for a run that never
-  started records nothing about a run.
+  started records nothing about a run. **A fork with no delegated resolver is parked THROUGH THE
+  VERB, and the run continues.** Not noted in prose, not left for the wrap-up to notice: `--park` is
+  what a gate reads. The run then carries on with the units that do not depend on that fork. Only
+  when EVERY remaining unit depends on it does the run halt, with the fork-unresolvable code — a run
+  that can still make progress on something else is not stuck, and stopping early spends an owner
+  turn that was not needed.
 - `--brief` — records WHAT a build pass was handed: the unit, and the hash of a TRACKED brief file,
   through `park()` as a `history` kind. `--status` reads it, grading each unit's LATEST row.
 - `--propose` — writes a PROPOSAL: an amendment a run would make to the playbook it is following,

@@ -109,11 +109,10 @@ PREREQUISITE: halt with the external-prerequisite code, NOT the scope-approval o
 turns, and conflating them tells a returning owner to approve a scope when the blocker is outside the
 repository.
 
-**A fork with no delegated resolver is parked THROUGH THE VERB, and the run continues.** Not noted in
-prose, not left for the wrap-up to notice: `--park` is what a gate reads. The run then carries on with
-the units that do not depend on that fork. Only when EVERY remaining unit depends on it does the run
-halt, with the fork-unresolvable code — a run that can still make progress on something else is not
-stuck, and stopping early spends an owner turn that was not needed.
+A may: grant is honoured only from an owner-committed `slug` README at the default-branch anchor,
+and lifts the build method's veto 2 only; an ask-row or `SCOPE`-row `may` clause honours nothing.
+Preflight pins it as `may:`, absent reading `none`, and refuses it under any other mode; the bar reds
+a run commit writing one into any build README.
 
 **The build method is a RUN-TIME dependency of this kit.** Every directive (§10) points into a
 section of it, so `--preflight` refuses a tree where `<MEMORY_ROOT>/guides/BUILD-METHOD.md` is absent
