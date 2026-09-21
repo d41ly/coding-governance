@@ -1040,7 +1040,8 @@ def _build_authored_row_re(families) -> "re.Pattern":
     return re.compile(r"^\s*[-*]\s+[\[`*]*(?:" + alt + r")-[A-Za-z0-9]+-\d+\b")
 
 
-def scan_view_guard(root: str, rel: str, family: str, conf: dict, kit: str) -> tuple:
+def scan_view_guard(root: str, rel: str, family: str, conf: dict, kit: str,
+                    families: tuple) -> tuple:
     """Read whatever sits at a view path and answer whether `--write` may render over it.
 
     THE FILE IS READ WHETHER OR NOT IT IS A VIEW, and the view predicate is never consulted here
@@ -1060,8 +1061,11 @@ def scan_view_guard(root: str, rel: str, family: str, conf: dict, kit: str) -> t
     if text is None:
         return [f"{rel}: {why}"], False
     grammar_lines = backlog.read_view_grammar_lines(family, conf["MEMORY_ROOT"], kit, GEN_HEADER)
-    authored = _build_authored_row_re(
-        [p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p])
+    # THE FAMILIES ARE PASSED IN, ALREADY VALIDATED. Re-splitting them out of the raw conf here
+    # would be a second derivation of a value `backlog.build_grammar` has already refused on, and
+    # these tokens go into a REGEX — where a quoted value matches nothing and a value carrying a
+    # pipe swallows a subtree, both in silence.
+    authored = _build_authored_row_re(families)
     lines = text.split("\n")
     offending, conflicted = [], False
     n = 0
@@ -1105,7 +1109,8 @@ def render_views(root: str, conf: dict, reading: dict) -> tuple:
     views, guarded = {}, {}
     for family in reading["families"]:
         rel = f"{m}/backlog/{family}.md"
-        offending, conflicted = scan_view_guard(root, rel, family, conf, kit)
+        offending, conflicted = scan_view_guard(root, rel, family, conf, kit,
+                                                reading["families"])
         if offending:
             guarded[rel] = offending
             continue
@@ -2403,7 +2408,7 @@ def cmd_asks(root: str, conf: dict, args: dict) -> int:
 BL_FAMILIES = ("EXMP", "OTHR", "THRD", "FRTH")
 
 
-def _backlog_conf_text(mode: str, cutoff: str, excerpt: str) -> str:
+def _render_backlog_conf(mode: str, cutoff: str, excerpt: str) -> str:
     rows = ["MEMORY_ROOT=memory", 'DISCIPLINES="tool"',
             'FAMILIES="tool:EXMP other:OTHR third:THRD fourth:FRTH"',
             f'BACKLOG_MODE="{mode}"', f'ASK_CUTOFF="{cutoff}"']
@@ -2412,18 +2417,18 @@ def _backlog_conf_text(mode: str, cutoff: str, excerpt: str) -> str:
     return "\n".join(rows) + "\n"
 
 
-def _backlog_readme(slug: str) -> str:
+def _render_backlog_readme(slug: str) -> str:
     return ("---\nslug: " + slug + "\nnode: a\nopened: 2026-09-01\nstreams: tool\n"
             "roster: EXMP\nids: EXMP-" + slug + "-1\n---\n\n# " + slug + "\n\n"
             + MARK_OPEN + "\n" + MARK_CLOSE + "\n")
 
 
-def _backlog_spec(spec_id: str, status: str = "SPECCED", tail: str = "") -> str:
+def _render_backlog_spec(spec_id: str, status: str = "SPECCED", tail: str = "") -> str:
     return (f"# {spec_id} — a unit\n\n**Status:** {status} · rev-1 · 2026-09-01 · node a · "
             f"Tier-2 · base 0123abcd{tail}\n")
 
 
-def _backlog_file(slug: str, asks=(), rows=()) -> str:
+def _render_backlog_file(slug: str, asks=(), rows=()) -> str:
     """A build's BACKLOG.md, always through `backlog.py`'s own renderers, so no fixture below
     spells a row by hand and drifts from the grammar the parser reads."""
     body = ([f"# {slug} — asks", "", backlog.H_ASKS] + list(asks)
@@ -2431,7 +2436,7 @@ def _backlog_file(slug: str, asks=(), rows=()) -> str:
     return "\n".join(body) + "\n"
 
 
-def _backlog_fixture(tmp: str, files: dict, *, mode: str = "builds", cutoff: str = "2099-01-01",
+def _build_backlog_fixture(tmp: str, files: dict, *, mode: str = "builds", cutoff: str = "2099-01-01",
                      excerpt: str = "") -> dict:
     """A fixture repo whose memory tree is REPLACED, not added to, on every call.
 
@@ -2445,7 +2450,7 @@ def _backlog_fixture(tmp: str, files: dict, *, mode: str = "builds", cutoff: str
         run("git", "config", "user.email", "t@t.test", cwd=tmp)
         run("git", "config", "user.name", "t", cwd=tmp)
     shutil.rmtree(os.path.join(tmp, "memory"), ignore_errors=True)
-    write_text(os.path.join(tmp, ".memory-tree.conf"), _backlog_conf_text(mode, cutoff, excerpt))
+    write_text(os.path.join(tmp, ".memory-tree.conf"), _render_backlog_conf(mode, cutoff, excerpt))
     write_text(os.path.join(tmp, "memory", STALE_HEADER_WAIVER), "# empty\n")
     for rel, text in files.items():
         write_text(os.path.join(tmp, rel), text)
@@ -3348,7 +3353,7 @@ def cmd_selftest() -> int:
             lambda: _read_verbs(" · closes · streams tooling"))
 
         # ------------------------------------------- TOOL-dDerivedDocket-7 — the family view
-        # ONE fixture repo for every arm below. `_backlog_fixture` wipes and restages its memory
+        # ONE fixture repo for every arm below. `_build_backlog_fixture` wipes and restages its memory
         # tree per call, so the arms are order-independent even though the `.git` is shared.
         bt = os.path.join(base, "backlogview"); os.makedirs(bt)
         ask2 = backlog.render_ask_row("EXMP-aFoo-2", "2026-09-01", "the second ask")
@@ -3362,21 +3367,21 @@ def cmd_selftest() -> int:
         spec_rel = "memory/builds/aFoo/spec/2026-09-01-spec-aFoo-1.md"
         foo_rel = "memory/builds/aFoo/BACKLOG.md"
         CORE = {
-            "memory/builds/aFoo/README.md": _backlog_readme("aFoo"),
-            spec_rel: _backlog_spec("EXMP-aFoo-1"),
-            foo_rel: _backlog_file("aFoo", [ask2, ask10, ask3, wide], [closed3]),
-            "memory/builds/aBar/README.md": _backlog_readme("aBar"),
-            "memory/builds/aBar/spec/2026-09-01-spec-aBar-1.md": _backlog_spec("EXMP-aBar-1"),
-            "memory/builds/aBar/BACKLOG.md": _backlog_file(
+            "memory/builds/aFoo/README.md": _render_backlog_readme("aFoo"),
+            spec_rel: _render_backlog_spec("EXMP-aFoo-1"),
+            foo_rel: _render_backlog_file("aFoo", [ask2, ask10, ask3, wide], [closed3]),
+            "memory/builds/aBar/README.md": _render_backlog_readme("aBar"),
+            "memory/builds/aBar/spec/2026-09-01-spec-aBar-1.md": _render_backlog_spec("EXMP-aBar-1"),
+            "memory/builds/aBar/BACKLOG.md": _render_backlog_file(
                 "aBar", [backlog.render_ask_row("EXMP-aBar-5", "2026-09-01", "a bar ask")]),
             # THE FILING HOME: one tracked file, no README, and not a build.
-            "memory/builds/aHome/BACKLOG.md": _backlog_file(
+            "memory/builds/aHome/BACKLOG.md": _render_backlog_file(
                 "aHome", [backlog.render_ask_row("OTHR-aHome-1", "2026-09-01", "a home ask")]),
         }
         NOHOME = {k: v for k, v in CORE.items() if "/aHome/" not in k}
 
         # AC1 — one view per declared family, and the empty ones say so.
-        conf_b = _backlog_fixture(bt, CORE)
+        conf_b = _build_backlog_fixture(bt, CORE)
         arts = plan(bt, conf_b)[0]
         arm("builds mode renders one view per DECLARED family",
             "['memory/backlog/EXMP.md', 'memory/backlog/FRTH.md', 'memory/backlog/OTHR.md', "
@@ -3440,42 +3445,42 @@ def cmd_selftest() -> int:
         def _build_code_tree(code):
             files, cutoff = dict(CORE), "2099-01-01"
             if code == 1:
-                files[foo_rel] = _backlog_file("aFoo", [backlog.render_ask_row(
+                files[foo_rel] = _render_backlog_file("aFoo", [backlog.render_ask_row(
                     "EXMP-aBar-7", "2026-09-01", "filed in the wrong folder")])
             elif code == 2:
-                files[foo_rel] = _backlog_file("aFoo", [ask2, "- matches no declared row shape"])
+                files[foo_rel] = _render_backlog_file("aFoo", [ask2, "- matches no declared row shape"])
             elif code == 3:
-                files[foo_rel] = _backlog_file("aFoo", [ask2, ask2])
+                files[foo_rel] = _render_backlog_file("aFoo", [ask2, ask2])
             elif code == 4:
-                files[foo_rel] = _backlog_file("aFoo", [ask2], [
+                files[foo_rel] = _render_backlog_file("aFoo", [ask2], [
                     backlog.render_status_row("KEEP", "EXMP-aFoo-2", "one"),
                     backlog.render_status_row("KEEP", "EXMP-aFoo-2", "and another")])
             elif code == 5:
-                files[foo_rel] = _backlog_file("aFoo", [ask2],
+                files[foo_rel] = _render_backlog_file("aFoo", [ask2],
                                                ["- SPECCED · EXMP-aFoo-2 · a derived token"])
             elif code == 6:
-                files[foo_rel] = _backlog_file("aFoo", [ask2], [backlog.render_status_row(
+                files[foo_rel] = _render_backlog_file("aFoo", [ask2], [backlog.render_status_row(
                     "BLOCKED", "EXMP-aFoo-2", "on itself", value="EXMP-aFoo-2")])
             elif code == 7:
-                files[foo_rel] = _backlog_file("aFoo", [ask2], [backlog.render_status_row(
+                files[foo_rel] = _render_backlog_file("aFoo", [ask2], [backlog.render_status_row(
                     "KEEP", "EXMP-aFoo-9", "nobody filed it")])
             elif code == 8:
-                files[foo_rel] = _backlog_file("aFoo", [ask2], [backlog.render_status_row(
+                files[foo_rel] = _render_backlog_file("aFoo", [ask2], [backlog.render_status_row(
                     "CLOSED", "EXMP-aFoo-2", "by nothing", value="EXMP-aFoo-88")])
             elif code == 9:
                 cutoff = "2026-01-01"
-                files[foo_rel] = _backlog_file(
+                files[foo_rel] = _render_backlog_file(
                     "aFoo", [backlog.render_ask_row("EXMP-aFoo-1", "2026-09-01", "a spec H1 too")],
                     [backlog.render_sev_row("EXMP-aFoo-1", "LOW", "graded")])
             elif code == 10:
-                files[spec_rel] = _backlog_spec("EXMP-aFoo-1", "CLOSED")
-                files[foo_rel] = _backlog_file("aFoo", [ask2])
+                files[spec_rel] = _render_backlog_spec("EXMP-aFoo-1", "CLOSED")
+                files[foo_rel] = _render_backlog_file("aFoo", [ask2])
             elif code == 11:
-                files[foo_rel] = _backlog_file("aFoo", [ask2], [backlog.render_status_row(
+                files[foo_rel] = _render_backlog_file("aFoo", [ask2], [backlog.render_status_row(
                     "REOPEN", "EXMP-aFoo-2", "of nothing that closes it", value="EXMP-aFoo-1")])
             elif code == 12:
                 cutoff = "2026-01-01"
-                files[foo_rel] = _backlog_file("aFoo", [backlog.render_ask_row(
+                files[foo_rel] = _render_backlog_file("aFoo", [backlog.render_ask_row(
                     "EXMP-aFoo-2", "2026-09-01", "no severity row anywhere")])
             elif code == 15:
                 cutoff = ""
@@ -3485,7 +3490,7 @@ def cmd_selftest() -> int:
 
         for _code in backlog.VERDICT_CODES:
             _files, _cut = _build_code_tree(_code)
-            _c = _backlog_fixture(bt, _files, cutoff=_cut)
+            _c = _build_backlog_fixture(bt, _files, cutoff=_cut)
             _rc_check, _out_check = _read_mode(cmd_check, bt, _c)
             _rc_write, _out_write = _read_mode(cmd_write, bt, _c)
             # THE FAILURE MESSAGE MUST NOT CONTAIN THE WANTED STRING. It did: the first spelling
@@ -3503,7 +3508,7 @@ def cmd_selftest() -> int:
                     lambda o=_out_check: o)
 
         # AC5 and AC3's second half — the data-loss guard over an APPENDED authored row.
-        _guard_conf = _backlog_fixture(bt, CORE)
+        _guard_conf = _build_backlog_fixture(bt, CORE)
         _read_mode(cmd_write, bt, _guard_conf)
         _vpath = os.path.join(bt, "memory", "backlog", "EXMP.md")
         _fresh = read_text(_vpath)
@@ -3557,15 +3562,15 @@ def cmd_selftest() -> int:
         arm("the guard names the shard's id-leading line", "EXMP-aBar-9", lambda: _out_s)
 
         # AC6 — the mode guard, from both of its sides.
-        _sh = _backlog_fixture(bt, NOHOME, mode="shards")
+        _sh = _build_backlog_fixture(bt, NOHOME, mode="shards")
         _rc_sh, _out_sh = _read_mode(cmd_check, bt, _sh)
         arm("a tracked BACKLOG.md under shards is a mode verdict", f"V{GUARD_MODE}",
             lambda: _out_sh)
         arm("the mode verdict names the file", "memory/builds/aFoo/BACKLOG.md", lambda: _out_sh)
         arm("--check exits 1 on the mode guard", "rc=1", lambda: f"rc={_rc_sh}")
         _sh2files = {k: v for k, v in NOHOME.items() if not k.endswith("/BACKLOG.md")}
-        _sh2files[spec_rel] = _backlog_spec("EXMP-aFoo-1", tail=" · closes EXMP-aBar-5")
-        _sh2 = _backlog_fixture(bt, _sh2files, mode="shards")
+        _sh2files[spec_rel] = _render_backlog_spec("EXMP-aFoo-1", tail=" · closes EXMP-aBar-5")
+        _sh2 = _build_backlog_fixture(bt, _sh2files, mode="shards")
         _rc_sh2, _out_sh2 = _read_mode(cmd_check, bt, _sh2)
         arm("a `closes` header under shards is the same half-migration, seen from the spec side",
             f"V{GUARD_MODE}", lambda: _out_sh2)
@@ -3576,7 +3581,7 @@ def cmd_selftest() -> int:
         _a7 = dict(CORE)
         _a7["memory/archive/EXMP.2026-01.md"] = "# a rotated family shard\n"
         _a7["memory/archive/DECISIONS.2026-01.md"] = "# a rotated decision log\n"
-        _rc_a, _out_a = _read_mode(cmd_check, bt, _backlog_fixture(bt, _a7))
+        _rc_a, _out_a = _read_mode(cmd_check, bt, _build_backlog_fixture(bt, _a7))
         arm("a rotated backlog archive under builds is a verdict", f"V{GUARD_ARCHIVE}",
             lambda: _out_a)
         arm("the archive verdict names the file", "memory/archive/EXMP.2026-01.md",
@@ -3585,7 +3590,7 @@ def cmd_selftest() -> int:
             lambda: str("DECISIONS.2026-01.md" in _out_a))
 
         # AC8 — the filing home, and the refusal it must not retire for shards adopters.
-        _c8 = _backlog_fixture(bt, CORE)
+        _c8 = _build_backlog_fixture(bt, CORE)
         _arts8 = plan(bt, _c8)[0]
         arm("a filing home's asks are collected", "OTHR-aHome-1",
             lambda: _arts8["memory/backlog/OTHR.md"])
@@ -3593,7 +3598,7 @@ def cmd_selftest() -> int:
             lambda: str("aHome" in _arts8["memory/LIVE.md"]))
         arm("a filing home reaches no ledger row", "False",
             lambda: str("aHome" in _arts8["memory/ledger/2026-09.md"]))
-        _c8s = _backlog_fixture(bt, CORE, mode="shards")
+        _c8s = _build_backlog_fixture(bt, CORE, mode="shards")
         arm("the same folder under SHARDS still raises the no-README refusal",
             "no tracked README.md", lambda: plan(bt, _c8s))
 
@@ -3601,7 +3606,7 @@ def cmd_selftest() -> int:
         _f9 = dict(NOHOME)
         _f9["memory/backlog/EXMP.md"] = ("# the authored shard\n\n"
                                          "- EXMP-aBar-99 · OPEN · an id only this file names\n")
-        _backlog_fixture(bt, _f9)
+        _build_backlog_fixture(bt, _f9)
         _tracked9 = [p for p in run("git", "ls-files", "--", "memory/", cwd=bt).split("\n") if p]
         arm("the builds-mode roster scan reads no file under the backlog directory", "False",
             lambda: str(any("EXMP-aBar-99" in v for v in
@@ -3610,8 +3615,8 @@ def cmd_selftest() -> int:
         arm("the shards-mode roster scan still reads it — the control", "True",
             lambda: str(any("EXMP-aBar-99" in v for v in
                             rosters(bt, _tracked9, "memory", set(BL_FAMILIES)).values())))
-        _ids_b = plan(bt, _backlog_fixture(bt, NOHOME))[0]
-        _ids_s = plan(bt, _backlog_fixture(bt, NOHOME, mode="shards"))[0]
+        _ids_b = plan(bt, _build_backlog_fixture(bt, NOHOME))[0]
+        _ids_s = plan(bt, _build_backlog_fixture(bt, NOHOME, mode="shards"))[0]
         arm("every build README's ids: renders identically in both modes", "True",
             lambda: str(all([x for x in _ids_b[k].split("\n") if x.startswith("ids:")]
                             == [x for x in _ids_s[k].split("\n") if x.startswith("ids:")]
@@ -3620,16 +3625,16 @@ def cmd_selftest() -> int:
             lambda: str(sorted(k for k in _ids_s if k.startswith("memory/backlog/"))))
 
         # AC10 — the liveness line, every figure of it DERIVED from the fixture.
-        _rc10, _out10 = _read_mode(cmd_check, bt, _backlog_fixture(bt, CORE))
+        _rc10, _out10 = _read_mode(cmd_check, bt, _build_backlog_fixture(bt, CORE))
         arm("the backlog liveness line prints counts that match the fixture",
             "backlog 6 ask(s) · 1 row(s) · 0 link(s) in 3 file(s) · 5 live · 0 verdict(s)",
             lambda: _out10)
-        _rc10s, _out10s = _read_mode(cmd_check, bt, _backlog_fixture(bt, NOHOME, mode="shards"))
+        _rc10s, _out10s = _read_mode(cmd_check, bt, _build_backlog_fixture(bt, NOHOME, mode="shards"))
         arm("a shards tree ANNOUNCES its layout instead of printing a clean zero",
             "backlog layout is `shards`", lambda: _out10s)
 
         # AC11 and AC17 — the print modes.
-        _c11 = _backlog_fixture(bt, CORE)
+        _c11 = _build_backlog_fixture(bt, CORE)
         _rc, _so, _se = _read_asks_run(bt, _c11, ["EXMP-aFoo-3"])
         arm("--asks <id> answers for a TERMINAL ask", "CLOSED", lambda: _so)
         arm("--asks <id> names the evidence that decided it", "abc1234", lambda: _so)
@@ -3653,9 +3658,9 @@ def cmd_selftest() -> int:
         arm("--asks --build filters to one filing home", "rows=1 bar=True",
             lambda: f"rows={_read_row_count(_so)} bar={'EXMP-aBar-5' in _so}")
         _f11 = dict(CORE)
-        _f11[foo_rel] = _backlog_file("aFoo", [ask2, ask10], [backlog.render_status_row(
+        _f11[foo_rel] = _render_backlog_file("aFoo", [ask2, ask10], [backlog.render_status_row(
             "BLOCKED", "EXMP-aFoo-2", "waiting on the other one", value="EXMP-aFoo-10")])
-        _c11b = _backlog_fixture(bt, _f11)
+        _c11b = _build_backlog_fixture(bt, _f11)
         _rc, _so, _se = _read_asks_run(bt, _c11b, ["EXMP", "--status", "BLOCKED"])
         arm("--status prints only the matching row, at exit 0", "rows=1 blocked=True rc=0",
             lambda: f"rows={_read_row_count(_so)} blocked={'BLOCKED' in _so} rc={_rc}")
@@ -3666,13 +3671,13 @@ def cmd_selftest() -> int:
         # A verdict-carrying tree, because the mode built to EXPLAIN a verdict must run while one
         # stands. And a refused tree, where there is no value to print at all.
         _f17 = dict(CORE)
-        _f17[foo_rel] = _backlog_file("aFoo", [ask2, "- matches no declared row shape"])
+        _f17[foo_rel] = _render_backlog_file("aFoo", [ask2, "- matches no declared row shape"])
         _f17["memory/" + STALE_HEADER_WAIVER] = \
             "memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n"
         _f17["memory/builds/aBar/README.md"] = ("---\nslug: aBar\nthis line has no colon\n---\n"
                                                 "\n# aBar\n\n" + MARK_OPEN + "\n"
                                                 + MARK_CLOSE + "\n")
-        _rc, _so, _se = _read_asks_run(bt, _backlog_fixture(bt, _f17), ["EXMP", "--all", "--json"])
+        _rc, _so, _se = _read_asks_run(bt, _build_backlog_fixture(bt, _f17), ["EXMP", "--all", "--json"])
         arm("a tolerated header and a fold verdict leave stdout decodable whole", "True",
             lambda: str(isinstance(json.loads(_so), dict)))
         arm("the tolerated-header line went to stderr, not to stdout", "True",
@@ -3680,19 +3685,19 @@ def cmd_selftest() -> int:
         arm("--asks exits 0 while a fold verdict stands", "rc=0", lambda: f"rc={_rc}")
         _f17b = dict(CORE)
         _f17b["memory/builds/aBar/README.md"] = "not front matter at all\n"
-        _rc, _so, _se = _read_asks_run(bt, _backlog_fixture(bt, _f17b), ["EXMP", "--json"])
+        _rc, _so, _se = _read_asks_run(bt, _build_backlog_fixture(bt, _f17b), ["EXMP", "--json"])
         arm("a collect() REFUSAL exits 1 with nothing on stdout", "rc=1 out=''",
             lambda: f"rc={_rc} out='{_so}'")
         arm("the refusal itself is on stderr", "no front matter", lambda: _se)
 
         # AC12 — the excerpt key.
         arm("BACKLOG_EXCERPT_CHARS=0 refuses by name", "BACKLOG_EXCERPT_CHARS='0'",
-            lambda: plan(bt, _backlog_fixture(bt, CORE, excerpt="0")))
+            lambda: plan(bt, _build_backlog_fixture(bt, CORE, excerpt="0")))
         arm("BACKLOG_EXCERPT_CHARS=abc refuses by name", "BACKLOG_EXCERPT_CHARS='abc'",
-            lambda: plan(bt, _backlog_fixture(bt, CORE, excerpt="abc")))
+            lambda: plan(bt, _build_backlog_fixture(bt, CORE, excerpt="abc")))
         arm("a DECLARED excerpt re-cuts the summary",
             "| a / pipe, a deep/path/to/a/file.py… |",
-            lambda: [x for x in plan(bt, _backlog_fixture(bt, CORE, excerpt="40"))[0]
+            lambda: [x for x in plan(bt, _build_backlog_fixture(bt, CORE, excerpt="40"))[0]
                      ["memory/backlog/EXMP.md"].split("\n") if "EXMP-aFoo-4" in x][0])
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
