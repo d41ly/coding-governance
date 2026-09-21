@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-35 — arming and the real-tree staged reds
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 35
+**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 32
 
 <!-- gen:spec-records -->
 
@@ -569,6 +569,9 @@ observes them on real content.
   that shorthand resolves to nothing, leaving a reader unable to tell which mechanism the fixture is
   waiting on. Both clauses now name the unit ids, with the record provenance kept beside them. No
   criterion's assertions change, no carrier accounting moves, and §7 does not move.
+- rev-6 · 2026-09-21 · order re-declared from 35 to 32 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 32, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

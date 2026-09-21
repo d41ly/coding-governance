@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 36
+**Status:** SPECCED · rev-4 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 34
 
 <!-- gen:spec-records -->
 
@@ -479,6 +479,9 @@ is `subject = repo` and runs on any bar.
   one-of-four read the could-not-fail shape one level up. The byte and line reads stay on
   `memory/guides/BUILD-METHOD.md` alone, which is the only capped carrier among the four, so no
   figure, cap or net-zero claim moved. Base and header date unchanged, rev kept.
+- rev-4 · 2026-09-21 · order re-declared from 36 to 34 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 34, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

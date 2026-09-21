@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-24 — inherited-red policy
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
+**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
@@ -744,6 +744,9 @@ New arm: tools/govkit/selftest.py · a shipped fixture path carrying `INHERITED_
   `New arm:` row still listed only the fixture shapes AC13 held before this fold, so it now names the
   `tree_clean no` and `tree_moved yes` records the two new refusal arms need; its third field is
   unchanged.
+- rev-6 · 2026-09-21 · order re-declared from 24 to 26 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 26, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

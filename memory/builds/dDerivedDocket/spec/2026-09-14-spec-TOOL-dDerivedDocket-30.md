@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-30 — checker defects from the stop census
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 30
+**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
@@ -519,6 +519,9 @@ New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--skip
   text that has read VERIFYING since the rev-4 extension; the sentence now says what those say and
   keeps the report-to-the-orchestrator clause and the aDeferredBar and aProbedUnit provenance. No
   criterion's permission line moved and no carrier figure changed.
+- rev-6 · 2026-09-21 · order re-declared from 30 to 24 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 24, beside TOOL-dDerivedDocket-25. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

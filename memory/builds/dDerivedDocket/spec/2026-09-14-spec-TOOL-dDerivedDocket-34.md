@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 34
+**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 31
 
 <!-- gen:spec-records -->
 
@@ -1233,6 +1233,9 @@ its guard names the four renders step 6 re-renders, so the merge commit triggers
   Nothing binds the table to the registry today; the durable form is a bidirectional join in the
   `drift-audit selftest` leg, which is reported rather than specced here. S10's `Observed by` list
   already names AC10 and does not move. No carrier accounting moves and §7 does not move.
+- rev-7 · 2026-09-21 · order re-declared from 34 to 31 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 31, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

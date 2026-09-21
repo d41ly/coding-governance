@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-32 — remote CI on every push
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 32
+**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
@@ -675,6 +675,9 @@ its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
   `tools/install-prefix-carried.txt`; AC8 reads that zero and names the ROSE in its Red when; §7
   gains `install-prefix (shipped surface)`, the unguarded repo-subject leg that grades it. Base and
   header date unchanged, rev kept.
+- rev-5 · 2026-09-21 · order re-declared from 32 to 30 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 30, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-25 — runner scratch hygiene and a tree-moved exit
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 25
+**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
@@ -352,6 +352,9 @@ New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside
   else moved: §7 gains no leg, because both readings are tracked-file reads in the pass, and the
   carrier accounting is untouched — `memory/guides/SESSION-KICKOFF.md` still has 41383 of its 61440
   free, so the scoped net-zero rule still does not bind it and AC9 stays voluntarily stricter.
+- rev-5 · 2026-09-21 · order re-declared from 25 to 24 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 24, beside TOOL-dDerivedDocket-30. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

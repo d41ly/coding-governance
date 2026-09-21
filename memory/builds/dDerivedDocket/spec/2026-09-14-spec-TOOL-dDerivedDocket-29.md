@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-29 — review durability across a dead fan
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 29
+**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
@@ -545,6 +545,9 @@ New arm: `tools/unattended/unattended.test.sh` · `--hold --pending-run` with a 
   write. §7's first `New arm:` row names the added assertions and keeps its third field. Nothing
   else moved: the protocol carrier's 700-byte pricing, the corrected 18500-byte reading of its
   headroom and every `permission:` line stand as the closing pass left them.
+- rev-6 · 2026-09-21 · order re-declared from 29 to 23 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 23, beside TOOL-dDerivedDocket-23. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

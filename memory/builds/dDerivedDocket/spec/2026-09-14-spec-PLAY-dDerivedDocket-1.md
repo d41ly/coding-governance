@@ -1,6 +1,6 @@
 # PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams playbook · order 37
+**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams playbook · order 33
 
 <!-- gen:spec-records -->
 
@@ -486,6 +486,9 @@ an observation made once in the unit pass. The bar runs once, after every unit i
   than a byte claim, so no stated delta is owed and AC8 already reads that line against its
   parent's. `memory/DECISIONS.md` is the other class-capped write and AC7 already holds its one row
   to the 300-character entry budget. Nothing moved.
+- rev-5 · 2026-09-21 · order re-declared from 37 to 33 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 33, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

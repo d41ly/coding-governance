@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-26 — honest verdicts under contention
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 26
+**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -578,6 +578,9 @@ New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record, a
   Verified in the same round and corrected in place, at no further rev bump: §4's Inventory named
   `GATE_SPAWN_CMD` and the verdict-write seam and not the third seam this pass added, so
   `GATE_SPAWN_FLOOR` now sits beside them, marked an arm seam and not a conf key.
+- rev-7 · 2026-09-21 · order re-declared from 26 to 27 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 27, beside TOOL-dDerivedDocket-28. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

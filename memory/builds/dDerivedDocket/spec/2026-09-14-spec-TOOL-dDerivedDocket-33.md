@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-33 — delegated signing of the same-id and triage tables
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 33
+**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -480,6 +480,9 @@ this unit's pass and again by the flip before it applies the records.
   `tools/gate-legs.json` at HEAD gives none of §7's three legs `subject = kit` or
   `chunk = selftests`, so no HELD leg is named here and no deferral needs the verifying run's
   flags. The header date already reads 2026-09-20 and the rev is kept.
+- rev-5 · 2026-09-21 · order re-declared from 33 to 25 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 25, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

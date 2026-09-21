@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-28 — run-owned process ledger
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
+**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -425,6 +425,9 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
   re-scoped to what THIS unit changes, and a consumes-from edge names `TOOL-dDerivedDocket-48`,
   which splits that capture at an earlier order, 15 against this unit's 28. The ledger, the
   identity record and the reaping are untouched.
+- rev-6 · 2026-09-21 · order re-declared from 28 to 27 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 27, beside TOOL-dDerivedDocket-26. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

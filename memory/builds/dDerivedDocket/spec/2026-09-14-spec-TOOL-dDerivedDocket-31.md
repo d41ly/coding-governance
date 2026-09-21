@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-31 — fork items and delegated-pass carriers
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 31
+**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 29
 
 <!-- gen:spec-records -->
 
@@ -595,6 +595,9 @@ New arm: `tools/memory-tree/marker-contract.test.sh` · every plan_state call si
   S5's first sentence, §4's adopter-default paragraph and AC2's new blank arm require to resolve off.
   The refusal is now scoped to an assignment the reader's own pattern does not MATCH, and a matched
   empty assignment is stated as the off state in S5, §4 and AC15, so the three read one rule.
+- rev-5 · 2026-09-21 · order re-declared from 31 to 29 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 29, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
+**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -576,6 +576,9 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
   - Round-3 fold verifier, same pass and rev: AC14's first Red-when still called the widened
     `GATE_CMD` cell "the new row", which the same criterion's last arm reds on. It reads "the
     widened cell" now. No arm moved.
+- rev-7 · 2026-09-21 · order re-declared from 27 to 28 in the status header only, derived from the §3 edges. The remaining
+  units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
+  one order, and this unit runs at order 28, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 
