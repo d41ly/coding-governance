@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-21T06:25:55+03:00 @ 4cf0944dbdce94714870f26760936bc5edabc64e
+last-audit: 2026-09-21T13:10:03+03:00 @ 48d7a13c53c71c12dcb96e9c149d61e231a70b47
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 189d7ccd5d45e1c17e47fc893b7b52d343effea0
+last-body-change: 48d7a13c53c71c12dcb96e9c149d61e231a70b47
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -118,7 +118,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 - **`tools/unattended/check-unattended.sh` carries four RAW CR BYTES** inside `sub(/<CR>$/,"")` awk
   regexes, and any text-mode read destroys all four — Python's universal-newline translation turns a
-  lone `` into `
+  lone `
+` into `
 `, which leaves `sub(/` with a newline inside the regex and silently breaks the
   checks that use it. Rewrite that file in BYTES. Hit during the 2026-09-21 reconcile; the class is
   `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already registered and not read.
