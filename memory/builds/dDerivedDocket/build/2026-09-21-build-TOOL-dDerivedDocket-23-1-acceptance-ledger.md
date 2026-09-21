@@ -16,15 +16,21 @@ ran in this pass. What ran instead, from the scratch root outside the tree:
   fixed R's offender and added two. A second fixture under an 8 s wall read its R run DEAD PROBE
   `cut by the wall` and returned near the wall rather than after the 60 s R sleep.
 - the canary's new section 7, extracted with the canary's own variables set and its signature loop
-  pointed at a scratch manifest: 37 assertions, green, over the final runner.
+  pointed at a scratch manifest: 37 assertions, green, over the final runner. The AC12 block as it
+  landed, with the shipped staged break the checklist fold added, driven alone over three staged
+  signatures: green on a well-shaped one, RED on a `--list` sibling that prints keys, and RED on a
+  signature that prints a line locator.
 - the edited pre-push hook driven directly with a hand-fed stdin line: the runner saw the remote sha,
   the hook exited the runner's 3, and an all-zero remote sha exported nothing.
 - the lifted normaliser against the inline one it replaced, extracted from HEAD: the same sed program
   byte for byte, over a Windows root with a space and a POSIX root.
 - each `--offenders` mode over its own suite's fixture: the exact key set, the ordinal on a repeat,
   keys unmoved by an unrelated insertion, no cut past 40, and the default mode's output and exit
-  byte-identical to the pre-change checker's over the same fixture (lexicon against BASE, hygiene,
-  install-prefix and the drift report against HEAD's copy).
+  byte-identical to the pre-change checker's over the same fixture (lexicon against BASE, hygiene
+  and install-prefix against HEAD's copy). The drift report's default and `--check` runs match
+  HEAD's copy in exit and in every line but one: `source_cited_ids_resolving_to_no_record`, a
+  report-only signal, counts 23 cited ids where HEAD's copy counts 22, because the fixture carries
+  the kit's own source and the new function's docstring cites this unit's id.
 
 Every criterion carries a `permission:` line deferring its observation to the build's post-build
 bar, `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, so none gets a line here; the
