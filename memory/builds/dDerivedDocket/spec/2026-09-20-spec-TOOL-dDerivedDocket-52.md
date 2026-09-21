@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-52 — the introducing commit of a pinned record line, across the rotation rename
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 17
+**Status:** CLOSED · rev-2 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 17
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dDerivedDocket-52-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-52-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 |
 
 <!-- /gen:spec-records -->
@@ -30,10 +31,15 @@ clean.
   line. It reads the record's own path and, where that path is an archived name, the live `RUN.md`
   beside it, derived from the archive rule rather than matched by a rename heuristic (§4). The walk
   is FLOORED at the start of the queried record's own tenancy of that path, so a search cannot cross
-  into an earlier run's copy at the same path (§4). Observed by AC1 and AC8.
+  into an earlier run's copy at the same path (§4). BOTH ends of that window are resolved by a
+  path's FIRST TOUCH and never by `--diff-filter=A`, which answers nothing at all where the rotation
+  landed inside a merge (§4). Observed by AC1 and AC8.
 - **S2** The walk is UNSIMPLIFIED. The candidate enumeration passes `--full-history`, because a
-  path-restricted walk drops a commit TREESAME with a parent and a rotation that lands inside a merge
-  is exactly that shape. Observed by AC4.
+  path-restricted walk drops a commit TREESAME with a parent: a merge that resolves the record to its
+  FIRST parent's side prunes the whole branch that touched it, and the introducing commit with it.
+  rev-1 named a rotation inside a merge as that shape and it is not — §4 measures both — so the flag
+  is kept for the shape that does prune, and the merge case is answered by the first-touch
+  resolution instead. Observed by AC4.
 - **S3** The answer is VERIFIED before it is returned: the candidate's own copy of the record carries
   the line, and its FIRST PARENT's copy of the record does not, which is what "introduced" means. A
   candidate failing either test is passed over. The floor commit of S1 is the ONE exception, and it is
@@ -41,7 +47,9 @@ clean.
   comparing them is the collision the floor exists to close, and the floor verifies on its own copy
   alone. Observed by AC2 and AC8.
 - **S4** An unresolved search returns EMPTY with one line naming the record and the reason, never a
-  sha and never silence. Four reasons are distinguished by name: the walk was truncated at its cap,
+  sha and never silence. The line rides STDERR, the channel `pass_commit` already uses for a named
+  refusal from a library function, so this leg's "exit 0 and no output is clean" stdout contract
+  keeps its meaning and gains no fourth exception. Four reasons are distinguished by name: the walk was truncated at its cap,
   no candidate verified, the range could not be resolved, and the record's own tenancy floor could not
   be resolved. Observed by AC3, AC6 and AC8.
 - **S5** The enumeration is BOUNDED by a cap, applied to the traversal and not only to the loop body,
@@ -63,9 +71,12 @@ clean.
 - **S6** The function's own header states what it does NOT answer: it answers only inside the queried
   record's own tenancy of the path and says nothing about an earlier run's copy at that same path, and
   it does not follow a record moved out of its build folder. Observed by AC7.
-- **S7** Arms for every branch above in `tools/unattended/check-unattended.test.sh`, and the suite's
-  executed-assertion floor for `tools/unattended/check-unattended.sh` moves in the same commit.
-  Observed by AC5.
+- **S7** Arms for every branch above in `tools/unattended/check-unattended.test.sh`, and that
+  SUITE's own executed-assertion floor — `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, which live in that
+  file — moves in the same commit. `.memory-tree.conf`'s `ARMS_FLOORS` does NOT move, and rev-1 was
+  wrong to name it: `tools/memory-tree/check-arms.py` keys its branch population on `fail <n> "` call
+  sites, so both of its figures count `fail` branches and their arms, and §4's Fail codes row already
+  records that this unit adds none. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -157,6 +168,17 @@ it answers the FIRST run's add instead: on `memory/builds/aBoundedVerdict/RUN.md
 answers `e8be30e9` (2026-08-19, "preflight — the run is live"), while the record living at that path
 today was written at `9ea808cf` (2026-08-20, "fresh run record, prior ABORTED retired").
 
+And where a rotation lands inside a MERGE commit, an add search does not answer late — it does not
+answer at all. Measured in a scratch repo on 2026-09-21, with the merge itself performing the `git
+mv` and writing the fresh record: `--diff-filter=A` over the archived path returns EMPTY under the
+plain spelling AND under `--full-history`, because git computes no diff for a merge commit. That is
+the class `tools/memory-tree/row_grammar.py:335-340` records for two of this repo's own archives,
+and rev-1 read it as a history-simplification problem `--full-history` would fix. It is not. So
+BOTH ends of the window are resolved by a path's first TOUCH, which a merge cannot hide, and the
+flag earns its place elsewhere: measured the same day with an `-s ours` merge, a simplified walk
+loses the commit that introduced the line entirely and answers nothing, while the unsimplified walk
+keeps it. That is the shape S2 now cites and AC4 now grades.
+
 ### The tenancy floor
 
 A live `RUN.md`'s boundaries are its own first add, plus every commit that ADDED an archived sibling
@@ -188,6 +210,12 @@ S3's verification does not catch the unfloored answer and cannot: `e8be30e9`'s f
 no `RUN.md` at all, so "the parent does not have the line" is true of a commit made the day before
 the queried record existed. The floor closes this, not the verification step.
 
+A boundary is therefore the FIRST TOUCH of the live record and of every archived sibling beside it,
+and the queried path is excluded from that set only when it is itself archived. Keying the exclusion
+on "its first touch IS the ceiling" instead reads any record whose only touch is the tip as having no
+floor at all — which is every record in a shallow clone, measured on the AC3 fixture during this
+unit's build pass, and it turned that fixture's unresolved RANGE into an unresolved FLOOR.
+
 Whether the floor itself resolves is a real question, answered by S4 rather than assumed. At HEAD
 every tracked `memory/builds/*/RUN*.md` path resolves a first add under both the plain and the
 `--full-history` spellings; two of the twelve files under `memory/archive/` resolve none under
@@ -208,11 +236,11 @@ The function takes a run-state path and a literal line, and answers in five step
    cannot be resolved is a named empty under S4 and ends the call there.
 3. **The candidate walk.** `rev-list --full-history` over that window, limited to the path set, read
    oldest-first and capped. `--full-history` is not a flourish: a path-restricted walk drops a commit
-   TREESAME with a parent, so a rotation landing inside a MERGE is pruned and the search answers
-   empty. That is not hypothetical here — `tools/memory-tree/row_grammar.py:335-340` records the
-   measurement that a first-add search returns EMPTY for two of this repo's four archives for exactly
-   that reason, and `tools/drift-audit/drift_report.py:806-818` carries the same lesson for the same
-   flag. The cap is S5's, and its direction matters more than its value: the window is read oldest
+   TREESAME with a parent, so a merge that resolves the record to its first parent's side prunes the
+   branch that touched it — measured above, and the same lesson
+   `tools/drift-audit/drift_report.py:806-818` carries for the same flag. It does NOT rescue an add
+   search inside a merge, which is why neither end of the window is resolved by one. The cap is S5's,
+   and its direction matters more than its value: the window is read oldest
    first because the answer lives at that end, and `--max-count` discards that end, so the cap detects
    a window too deep instead of choosing one. The detection is settled before the first candidate is
    graded, for the reason S5 gives.
@@ -223,7 +251,7 @@ The function takes a run-state path and a literal line, and answers in five step
    test is not applied (S3), because the parent's copy there is another run's record. A candidate
    failing an applicable test is passed over, so a mis-resolved path costs a rejected candidate rather
    than a wrong sha.
-5. **The named empty.** Four outcomes return nothing and print one line each: the walk hit its cap, so
+5. **The named empty.** Four outcomes return nothing and print one line each, on stderr: the walk hit its cap, so
    the answer is unknown rather than absent; the walk completed and no candidate verified; the range
    or the path set could not be resolved, as in a shallow clone; and the tenancy floor could not be
    resolved. The caller reads the empty and takes unit 18's announced ancestry fallback, which is the
@@ -283,8 +311,9 @@ tree: no tracked record carries an `asks:` fact until unit 35 arms gov.
 ### Inventory
 
 One shell function in `tools/unattended/check-unattended.sh`, its floor step, and one reason-line
-prefix carrying the named empties of S4 apart, whose count and wording stay in S4. No new conf key,
-no new fact, no new verb, no new leg code. The identifier is RECORDED here rather than left for the
+prefix carrying the named empties of S4 apart, whose count and wording stay in S4. The cap F4 settles
+lives INSIDE that function, as `${INTRODUCING_WALK_CAP:-400}`, with no declaration beside it and no
+conf key. No new conf key, no new fact, no new verb, no new leg code. The identifier is RECORDED here rather than left for the
 build pass to invent, so the naming leg and `spec tokens (a spec's own names resolve)` both have a
 name to grade before the function exists. On 2026-09-20,
 `python tools/lexicon/lexicon.py --suggest resolve_introducing_commit --as sh.function` answered OK.
@@ -300,8 +329,9 @@ whether or not the spec claims the leg. §7 now claims it.
 
 ### Files touched (estimate)
 
-`tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
-`.memory-tree.conf` for the suite's executed-assertion floor.
+`tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh`, whose own
+`FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` carry the executed-assertion floor. NOT `.memory-tree.conf`:
+see S7.
 
 ### Alternatives rejected
 
@@ -323,8 +353,9 @@ whether or not the spec claims the leg. §7 now claims it.
 - security — this resolver reads history and writes nothing. It is a second opinion the run cannot
   move, which is the property it exists to preserve: every input is the commit graph and a tracked
   blob, never a fact the run recorded.
-- perf / scale — one floor resolution and one bounded `rev-list` per record, plus one blob read per
-  candidate until the first verifies. The floor is what makes the window small before the cap has to
+- perf / scale — one floor resolution — a first-touch walk per `RUN*.md` in the record's own folder,
+  plus one `rev-list --count` each to order them — and one bounded `rev-list` per record, plus one
+  blob read per candidate until the first verifies. The floor is what makes the window small before the cap has to
   bound anything: on `memory/builds/aBoundedVerdict/RUN.md` it takes the walk from 40 commits to 24,
   and the deepest floored window on this tree is 60. The cap bounds the traversal and reports
   truncation, per S5. The profile note at `tools/unattended/lib-unattended.sh:169-171` prices a
@@ -368,6 +399,13 @@ whether or not the spec claims the leg. §7 now claims it.
   the line that candidate is passed over rather than returned.
   Red when: the first candidate of the walk is returned unverified, so a path the walk resolved
   wrongly is indistinguishable from a correct one.
+  fixture: the pass-over is only OBSERVABLE where the floor is not itself a candidate, because
+  oldest-first the first carrier is otherwise the introduction by construction. The arm therefore
+  files an archived sibling in a commit of its own — a boundary that never touched the live record —
+  and then touches the record without changing the line. Passed over, the window holds no
+  introduction and S4's no-candidate empty is what the resolver prints; returned unverified, the
+  resolver answers a commit that introduced nothing. The arm asserts the empty AND its reason line,
+  with a control in the same fixture where a genuine introduction IS answered.
 - **AC3** — When the resolver in `tools/unattended/check-unattended.sh` runs over a shallow-clone
   fixture in which the introducing commit is not present, it returns empty AND prints one line naming
   the record and the unresolved-range reason, and the arm asserts the line was printed rather than
@@ -377,21 +415,31 @@ whether or not the spec claims the leg. §7 now claims it.
   `tools/memory-tree/row_grammar.py:335-340` already records for a rotation baseline.
   permission: that the caller then takes unit 18's announced ancestry reading is observed at unit 18's
   commit, for the reason AC1 gives; this criterion asserts only what the resolver returns and prints.
-- **AC4** — When the fixture's rotation lands inside a MERGE commit, the resolver in
-  `tools/unattended/check-unattended.sh` still answers the preflight commit; the same fixture graded
-  with the simplified spelling answers nothing, and that contrast is asserted in the arm.
-  Red when: the enumeration drops `--full-history`, so a rotation TREESAME to one parent for the
-  record's path is pruned, the resolver answers nothing for a record it could have resolved, and it
-  does so with no reason line — an absent answer wearing the face of a clean one.
+- **AC4** — TWO fixtures, because rev-1 asked one to carry two different measurements and only one
+  of them held. (a) When the fixture's rotation lands inside a MERGE commit, the resolver in
+  `tools/unattended/check-unattended.sh` still answers the preflight commit, while the obvious
+  add-search spelling over the archived path answers NOTHING under the plain spelling and under
+  `--full-history` alike — both asserted in the arm, because that measurement is why neither end of
+  the window is resolved by an add. (b) When a merge resolves the record to its FIRST parent's side
+  (the `-s ours` shape), the resolver answers the pruned side-branch commit that introduced the line,
+  and the same fixture graded with the simplified spelling answers nothing at all; that contrast is
+  asserted in the arm.
+  Red when: the enumeration drops `--full-history`, so a commit TREESAME to the followed parent for
+  the record's path is pruned, the resolver answers nothing for a record it could have resolved, and
+  it does so with no reason line — an absent answer wearing the face of a clean one.
   new arm: staged RED first. The arm is not allowed to pass until it has been SEEN RED with the
   simplified spelling in place.
-- **AC5** — When the arms of S7 land, `.memory-tree.conf`'s executed-assertion floor for
-  `tools/unattended/check-unattended.sh` reads a higher armed count at this unit's commit than at its
-  parent, read with `git show` at both.
+- **AC5** — When the arms of S7 land, `tools/unattended/check-unattended.test.sh`'s own
+  `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` read higher at this unit's commit than at its parent, read
+  with `git show` at both, and `FLOOR_SHARD_1` is unchanged because every new assertion sits in
+  region two.
   Red when: arms land and the floor holds, so a later deletion of them is invisible.
   figure: DERIVED at observation time from the two commits; no count is written into this spec.
-  permission: the floor is graded by the harness-arms leg over the real tree, which this run may not
-  execute; the observation is made at the build's one post-build bar.
+  The RAISE is counted rather than measured, because this unit's pass may run no suite: it is the
+  block's own assertion-helper call sites, and the block was executed once standalone in a replica of
+  the suite prologue to confirm the count.
+  permission: that the suite still passes AT the raised floor is observed only by running it, which
+  this pass may not do; that observation is the build's one post-build bar.
 - **AC6** — When the resolver in `tools/unattended/check-unattended.sh` walks a fixture whose tenancy
   window is DEEPER than the declared cap and whose line was introduced at the oldest end of it, it
   returns empty and names truncation, the reason is textually distinct from the no-candidate-verified
@@ -434,11 +482,12 @@ whether or not the spec claims the leg. §7 now claims it.
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/check-unattended.test.sh` · a rotated mandated record, a record whose
-rotation and preflight commits both carry the line, a rotation landing inside a merge, a shallow
-clone with the introducing commit absent, two tenancies at one path sharing a byte-identical line, a
-folder whose tenancy floor cannot be resolved, a tenancy window deeper than the cap, and one deeper
-than the cap whose line is re-introduced among the retained newest commits · the leg
-suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
+rotation and preflight commits both carry the line, a rotation landing inside a merge, a merge that
+prunes the introducing commit from a simplified walk, a shallow clone with the introducing commit
+absent, two tenancies at one path sharing a byte-identical line, a folder whose tenancy floor cannot
+be resolved, a tenancy window deeper than the cap, and one deeper than the cap whose line is
+re-introduced among the retained newest commits · that suite's own `FLOOR_ASSERTIONS` and
+`FLOOR_SHARD_2`. NOT `ARMS_FLOORS`, for S7's reason.
 
 ## 8. Open questions
 
@@ -479,6 +528,15 @@ suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-
   number one caller reads. Left OPEN for the build pass to settle against that constant when it reads
   it, with the 60-commit measurement as the floor under any value it picks. S5 binds either way,
   because it fixes the direction and the sentinel, and S4 requires truncation to announce itself.
+  RESOLVED (agent, 2026-09-21, delegated): 400, the sibling bound's own default
+  (`PASS_ORDER_PREANCHOR_CAP` in `tools/unattended/check-pass-order.sh`), declared INSIDE the
+  function as `${INTRODUCING_WALK_CAP:-400}` rather than beside it. The placement is an ARMING
+  decision and not a style one: AC1 requires the arms to extract this function with `sed` and source
+  it, so a constant one line above the signature would have to be re-declared by the suite — and the
+  truncation arms would then grade a cap they wrote themselves, which is the double-you-wrote-it
+  shape §4's verification step refuses one level down. The env name is what lets an arm exercise a
+  4-commit window without a 400-commit fixture. Not a conf key, for the reason the fork already
+  gives: a new inventory key for a number one caller reads.
 
 ## 9. Revision log
 
@@ -507,6 +565,35 @@ suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-
   `.lexicon.conf:23` declares `sh` a `parser` mode and `.lexicon.conf:422` a live `sh.function` cell,
   so this unit's new shell function is graded by `lexicon naming predicates` whatever §7 said. §7 now
   lists that leg and §4 records the identifier with its `--suggest` answer.
+- rev-2 · 2026-09-21 · S1 · S2 · S4 · S7 · §4 · §5 · AC2 · AC4 · AC5 · §7 · F4 · the building pass,
+  against the tree and against scratch fixtures rather than against the base. Four things did not
+  hold, and each was measured before it was rewritten.
+  (1) **The floor S7 named cannot move.** `ARMS_FLOORS` is not an executed-assertion floor at all:
+  `tools/memory-tree/check-arms.py` discovers its population with `fail (\d+) "` and both of its
+  figures count `fail` branches and the arms naming their message text. This unit adds no `fail`
+  branch — §4's Fail codes row said so from rev-1 — so that pin is unmovable here, and raising it
+  would have meant inventing a branch to pin. The floor that DOES move is the suite's own
+  `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`. S7, AC5, §4's Files-touched and §7 now name it, and
+  `.memory-tree.conf` leaves this unit's write set.
+  (2) **`--full-history` does not rescue an add search inside a merge.** Measured in a scratch repo
+  on 2026-09-21, with the merge itself performing the rotation: `--diff-filter=A` over the archived
+  path returns EMPTY under the plain spelling AND under `--full-history`, because git computes no
+  diff for a merge. rev-1 read `tools/memory-tree/row_grammar.py:335-340` as a simplification
+  problem that flag would fix. So both ends of the window are now resolved by a path's first TOUCH,
+  which a merge cannot hide, and the flag is kept for the shape that genuinely prunes — measured the
+  same day, an `-s ours` merge, where the simplified walk loses the introducing commit entirely and
+  answers nothing. AC4 now grades both measurements, as two fixtures rather than one.
+  (3) **The boundary exclusion had to be keyed on the PATH, not on the ceiling.** Keying it on "this
+  boundary's first touch IS the ceiling" reads any record whose only touch is the tip as having no
+  floor — which is every record in a shallow clone, and it turned AC3's fixture into an unresolved
+  FLOOR rather than the unresolved RANGE that criterion asserts. Caught by the AC3 fixture on its
+  first run and recorded in §4.
+  (4) **The pass-over of AC2 is not observable oldest-first** unless the floor is itself outside the
+  candidate set, because the first carrier is otherwise the introduction by construction. AC2 now
+  states the fixture that makes it visible — an archived sibling filed in a commit of its own — and
+  what the resolver prints when it fires, which is S4's no-candidate empty and not a different sha.
+  Also settled here: F4's cap, at 400 and INSIDE the function for the arming reason F4 now gives;
+  and S4's reason-line CHANNEL, stderr, so the leg's stdout contract gains no fourth exception.
 
 ## 10. Reuse audit
 

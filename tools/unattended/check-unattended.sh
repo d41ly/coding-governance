@@ -1126,6 +1126,183 @@ is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a 
   return 1
 }
 
+# ------------------------------------------ which commit INTRODUCED a line in a run-state record
+# TOOL-dDerivedDocket-52. Unit 18's S2 re-derives a run's `m-base:` from the commit that first
+# recorded it, and its S8 does the same for `asks-at-landing:`. Both need ONE answer to "which
+# commit introduced this line in this record", and both need to be told when there is no answer
+# rather than handed a plausible wrong one.
+#
+# WHAT THIS DOES NOT ANSWER, first, because a resolver read as a guarantee is worse than none: it
+# answers only inside the queried record's own tenancy of that path, says nothing about an earlier
+# run's copy at the same path, and does not follow a record moved out of its build folder.
+#
+# WHY A PATH-SCOPED SEARCH IS NOT THE ANSWER. `--preflight` retires a terminal record by renaming it
+# INSIDE its own folder and writing a fresh live record in the same commit, so the archived path
+# exists and a search scoped to it answers with the ROTATION commit - a wrong sha, not a missing one.
+# Measured on this tree 2026-09-20 over `RUN.LANDED.a1fd98d8.md`: the archived path alone answers the
+# rotation (2026-08-20), the two paths together answer the run's own preflight (2026-08-18).
+#
+# WHY NOT `--diff-filter=A`, the obvious spelling for both ends of the window. A rotation is not a
+# rename and not a delete-and-add to git - it records `A` the archived record and `M` the live one -
+# so the newest ADD at a path is the FIRST run's add and not the current tenant's. Worse, and
+# measured in a scratch repo on 2026-09-21: when the rotation lands inside a MERGE commit, an add
+# search over the archived path answers NOTHING, under the plain spelling AND under
+# `--full-history`, because git computes no diff for a merge. That is the class
+# `tools/memory-tree/row_grammar.py:335-340` records for two of this repo's own archives. Both ends
+# of the window are therefore resolved by FIRST TOUCH, which a merge cannot hide.
+#
+# WHY `--full-history` EVERYWHERE. A path-restricted walk drops a commit TREESAME with a parent, and
+# a merge that resolves the record to its first parent's side prunes the whole branch that touched
+# it. Measured in a scratch repo on 2026-09-21 with an `-s ours` merge: the plain walk loses the
+# commit that introduced the line and answers nothing at all; the unsimplified walk keeps it.
+# `tools/drift-audit/drift_report.py:806-818` reproduced the same class for the same flag.
+#
+# THE TENANCY FLOOR IS THE MECHANISM, not a refinement. Two runs share one path, and their records
+# share whole lines - `memory/builds/aBoundedVerdict/RUN.md` and its ABORTED sibling carry thirteen
+# identical non-blank lines today. Unfloored, a search for one of them answers the FIRST run's
+# preflight (`e8be30e9`, 40 commits walked) instead of the queried record's own (`9ea808cf`, 24).
+# The verification below cannot catch that and is not asked to: `e8be30e9`'s first parent carries no
+# record at all, so "the parent does not have the line" is true of a commit made the day before the
+# queried record existed. A boundary is where one run's tenancy of a path ends and the next begins -
+# the first touch of the live record, and the first touch of every archived sibling beside it.
+#
+# THE CAP DETECTS A WINDOW, it never SELECTS one, and the direction is why. The answer sits at the
+# OLDEST end, while `--max-count` applies during a newest-first traversal - so `--reverse
+# --max-count=N` keeps the N NEWEST commits and discards the only end that can hold the answer. That
+# is the defect `tools/unattended/lib-unattended.sh:266-279` records against its own sibling walk.
+# So `cap+1` is FETCHED, the verdict is reached from the whole emitted list BEFORE any candidate is
+# graded, and a window deeper than the cap is announced rather than answered. A sentinel met
+# mid-walk would return a RE-introduction among the retained newest commits, which is a wrong sha
+# wearing the face of an answer.
+#
+# THE CAP LIVES IN THIS FUNCTION, not beside it, and that is an arming decision: the bound arms
+# extract this function with `sed` and source it, so a constant one line up would have to be
+# re-declared by the suite, and the arms would then grade a cap they wrote themselves. 400 is the
+# sibling bound's own default (`PASS_ORDER_PREANCHOR_CAP`, in this kit's pass-order leg). The floor
+# under any value is measured: the deepest floored window on this tree at HEAD is 60 commits, on
+# `memory/builds/dRetiredFork/RUN.md`, so a cap at or below that announces on this repo's own
+# deepest record.
+#
+# A NAMED EMPTY, NEVER SILENCE. Four reasons are distinguished by text, on stderr - the channel
+# `pass_commit` already uses for the same shape, and the one that leaves this leg's "exit 0 and no
+# output is clean" contract on stdout untouched. An empty answer is the caller's cue to take the
+# weaker ancestry reading; an empty answer with no reason is indistinguishable from a clean one.
+resolve_introducing_commit() { # run-state path · literal line -> the introducing sha, or a NAMED empty
+  local _rel=$1 _line=$2
+  local _cap=${INTRODUCING_WALK_CAP:-400}
+  local _why="unattended-check: resolve_introducing_commit cannot name the commit that introduced a line in"
+  local _dir _base _tip _ceil _floor _sib _b _bn _bestn _p _par _c _own _phas _n _i
+  local _paths=() _all=()
+
+  _tip=$(GIT rev-parse --verify --quiet 'HEAD^{commit}' 2>/dev/null) || _tip=""
+  if [ -z "$_tip" ]; then
+    printf '%s %s: the range could not be resolved - this checkout has no HEAD commit to walk back from\n' "$_why" "$_rel" >&2
+    return 1
+  fi
+  case $_rel in */*) _dir=${_rel%/*} ;; *) _dir=. ;; esac
+  _base=${_rel##*/}
+
+  # ---- THE PATH SET. The record's own path, plus - where that path is an archived name - the live
+  # ---- record beside it, DERIVED the way the rotation builds its name (the record's own folder,
+  # ---- then the live basename) rather than by re-spelling the archived name's grammar.
+  if [ "$_base" = RUN.md ]; then _paths=("$_rel"); else _paths=("$_rel" "$_dir/RUN.md"); fi
+
+  # ---- THE CEILING. For the live record it is HEAD. For an archived one it is that path's own first
+  # ---- touch - the rotation - because the record's bytes lived at the live path for exactly the
+  # ---- span ending there, and everything after it at that path belongs to the next run.
+  if [ "$_base" = RUN.md ]; then
+    _ceil=$_tip
+  else
+    _ceil=$(GIT rev-list --full-history "$_tip" -- "$_rel" 2>/dev/null | tail -1)
+    if [ -z "$_ceil" ]; then
+      printf '%s %s: the range could not be resolved - no commit reachable from HEAD touches this archived record\n' "$_why" "$_rel" >&2
+      return 1
+    fi
+  fi
+
+  # ---- THE FLOOR: the NEWEST tenancy boundary at or before the ceiling. Distance to the ceiling
+  # ---- decides which is newest, because a boundary's ancestor set is what orders it - commit dates
+  # ---- do not, and this repo's own nodes disagree about the clock.
+  _floor=""; _bestn=""
+  for _sib in $(GIT ls-tree --name-only "$_ceil" "$_dir/" 2>/dev/null); do
+    case ${_sib##*/} in RUN*.md) ;; *) continue ;; esac
+    # THE QUERIED ARCHIVED PATH IS NOT ITS OWN BOUNDARY - its first touch IS the ceiling, and a
+    # window cannot be floored at its own top. The LIVE record must NOT take this branch: its own
+    # first touch is a boundary, and in a folder that has never rotated it is the only one. Keying
+    # this on `first touch == ceiling` instead read a record whose only touch is the tip as having
+    # no floor at all, which is every record in a shallow clone - measured 2026-09-21, and the
+    # reason that spelling is written down here rather than left as a diff.
+    if [ "$_base" != RUN.md ] && [ "$_sib" = "$_rel" ]; then continue; fi
+    _b=$(GIT rev-list --full-history "$_ceil" -- "$_sib" 2>/dev/null | tail -1)
+    [ -n "$_b" ] || continue
+    _bn=$(GIT rev-list --count "$_b..$_ceil" 2>/dev/null) || continue
+    case ${_bn:-x} in ''|*[!0-9]*) continue ;; esac
+    if [ -z "$_bestn" ] || [ "$_bn" -lt "$_bestn" ]; then _bestn=$_bn; _floor=$_b; fi
+  done
+  if [ -z "$_floor" ]; then
+    printf '%s %s: the tenancy floor could not be resolved, so the only walk left would cross into an earlier run copy of this path\n' "$_why" "$_rel" >&2
+    return 1
+  fi
+
+  # ---- A GRAFTED OLDEST END IS NOT AN OLDEST END. In a shallow clone the boundary commit has no
+  # ---- parents present, so every file in it reads as introduced there - measured 2026-09-21, an
+  # ---- add search in a `--depth 2` clone answers the graft commit for a record created long before
+  # ---- it. The floor is exactly where this function stops applying the parent test, so a graft at
+  # ---- the floor turns the one unverified candidate into a confident wrong answer.
+  for _p in $(GIT cat-file commit "$_floor" 2>/dev/null | sed -n '/^$/q; s/^parent //p'); do
+    GIT cat-file -e "$_p^{commit}" 2>/dev/null && continue
+    printf '%s %s: the range could not be resolved - the oldest end of the window names a parent this repository does not have, which is a shallow or grafted history\n' "$_why" "$_rel" >&2
+    return 1
+  done
+
+  # ---- THE CANDIDATES, newest-first and bounded at cap+1 so the traversal is bounded and the
+  # ---- truncation verdict is EXACT: with `--max-count=$_cap` a complete walk of an exactly-cap-deep
+  # ---- window is indistinguishable from a truncated one. `--not <floor>^@` includes the floor
+  # ---- itself, which `<floor>..<ceiling>` would drop - and the floor is usually the preflight
+  # ---- commit the search is looking for.
+  _all=( $(GIT rev-list --full-history --max-count=$((_cap + 1)) "$_ceil" --not "$_floor^@" -- "${_paths[@]}" 2>/dev/null) )
+  _n=${#_all[@]}
+  if [ "$_n" -gt "$_cap" ]; then
+    printf '%s %s: the tenancy window is deeper than the %s-commit walk cap, so its oldest end - where an introduction lives - was never fetched and the answer is UNKNOWN rather than absent\n' "$_why" "$_rel" "$_cap" >&2
+    return 1
+  fi
+
+  # ---- GRADED OLDEST FIRST, over the list reversed HERE rather than by `--reverse`, which reverses
+  # ---- after the cap has already discarded the oldest end.
+  _i=$((_n - 1))
+  while [ "$_i" -ge 0 ]; do
+    _c=${_all[$_i]}
+    _i=$((_i - 1))
+    # The record at this commit, read at the first path of the set that exists there: the queried
+    # path where it is already the record's home, the live path before the rotation moved it.
+    _own=""
+    for _p in "${_paths[@]}"; do
+      GIT cat-file -e "$_c:$_p" 2>/dev/null || continue
+      GIT show "$_c:$_p" 2>/dev/null | tr -d '\r' | grep -qxF -- "$_line" && _own=1
+      break
+    done
+    [ -n "$_own" ] || continue
+    # AT THE FLOOR THE PARENT TEST IS NOT APPLIED, and this is the one exception rather than an
+    # escape hatch: the parent's copy there is ANOTHER run's record at the same path, so comparing
+    # them is the collision the floor exists to close. Everywhere else, "introduced" means the first
+    # parent's copy did NOT carry the line - including the case where the record does not exist at
+    # the first parent, which is what a preflight commit looks like.
+    if [ "$_c" = "$_floor" ]; then printf '%s' "$_c"; return 0; fi
+    _par=$(GIT rev-parse --verify --quiet "$_c^1^{commit}" 2>/dev/null) || _par=""
+    if [ -z "$_par" ]; then printf '%s' "$_c"; return 0; fi
+    _phas=""
+    for _p in "${_paths[@]}"; do
+      GIT cat-file -e "$_par:$_p" 2>/dev/null || continue
+      GIT show "$_par:$_p" 2>/dev/null | tr -d '\r' | grep -qxF -- "$_line" && _phas=1
+      break
+    done
+    [ -n "$_phas" ] && continue
+    printf '%s' "$_c"; return 0
+  done
+  printf '%s %s: the whole tenancy window was walked and no commit in it introduced that line\n' "$_why" "$_rel" >&2
+  return 1
+}
+
 live=""; nlive=0
 while IFS= read -r f; do
   [ -n "$f" ] || continue

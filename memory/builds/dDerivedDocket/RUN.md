@@ -204,3 +204,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T10:56:13Z dispatch · item 0614e3b9 TOOL-dDerivedDocket-17 · reason tools/unattended/unattended.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md .unattended.conf tools/unattended/.unattended.conf.example .memory-tree.conf tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/features/unattended.md memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-17.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md
 
 2026-09-21T10:56:17Z brief · item TOOL-dDerivedDocket-17 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T12:14:17Z dispatch · item 6af11b57 TOOL-dDerivedDocket-52 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-52.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T12:14:22Z brief · item TOOL-dDerivedDocket-52 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md

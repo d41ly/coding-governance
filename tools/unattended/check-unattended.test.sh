@@ -3520,6 +3520,218 @@ lmrestore tools/unattended/unattended.sh
 
 rm -rf "$lm_dir"
 
+# ==== TOOL-dDerivedDocket-52: resolve_introducing_commit, over scratch fixtures ==================
+# THE FUNCTION IS EXTRACTED AND SOURCED, the way the driver suite's bound arms grade `run_bounded`:
+# nothing calls this resolver at its own commit — unit 18's S2 is its first caller, at a later order
+# — so a suite that ran the leg would grade a code path no check reaches yet. An EMPTY extraction is
+# a refusal rather than a silent skip, because a sourced empty file defines no function and every
+# assertion below would then grade the shell's "command not found".
+#
+# EVERY FIXTURE IS ITS OWN REPOSITORY, outside the scratch tree: the arms need rotations, merges,
+# shallow clones and windows deeper than a cap, and none of those may be staged in the tree whose
+# cleanliness the controls above depend on. `reset_tree` would delete them anyway.
+#
+# NO ARM READS THE REAL TREE. No tracked record carries the facts these arms grade until unit 35
+# arms gov, so a real-tree assertion here would be an assertion about nothing.
+# PRISTINE FIRST. Every arm above that mutates the fixture's copy of the kit restores it, but the
+# extraction below reads that copy, and an arm that graded a leg some earlier block left mutated
+# would be grading someone else's break. This costs a reset and removes the question.
+reset_tree
+ric_fn=$(mktemp)
+sed -n '/^resolve_introducing_commit() {/,/^}$/p' "$SCRIPT" > "$ric_fn"
+[ -s "$ric_fn" ] || { echo "FAIL could not extract resolve_introducing_commit from $SCRIPT — every arm below would grade nothing"; st=1; }
+ric_root=$(mktemp -d)
+ric_d=memory/builds/b
+# ONE CALL, IN A SUBSHELL, so the `cd` and the sourced kit library cannot reach the arms that follow
+# — and the assertions stay in THIS shell, where `n` and `st` live. A subshell that ran the
+# assertions too would lose every failure it found.
+ric() { # fixture dir · record path · literal line · [cap]
+  ( cd "$1" || exit 2
+    INTRODUCING_WALK_CAP=${4:-400}; export INTRODUCING_WALK_CAP
+    # shellcheck disable=SC1091
+    . "$TMP/$KIT_REL/lib-unattended.sh"
+    # shellcheck disable=SC1090
+    . "$ric_fn"
+    resolve_introducing_commit "$2" "$3" )
+}
+ric_init() { # dir -> a fresh repository with one seed commit
+  mkdir -p "$1/$ric_d"; ( cd "$1" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false
+    echo seed > seed.txt; git add seed.txt; git commit -qm seed ) >/dev/null 2>&1
+}
+
+# ---- FIXTURE A: a record rotated by a later run's preflight, the shape `--preflight` actually
+# ---- writes — a staged `git mv` inside the folder plus a fresh live record in the same commit.
+ric_a=$ric_root/a; ric_init "$ric_a"
+( cd "$ric_a" || exit 2
+  printf 'phase: LANDED\nm-base: AAAA\nanchor-kind: default-branch\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  echo x >> seed.txt; git add seed.txt; git commit -qm "body one"
+  git mv $ric_d/RUN.md $ric_d/RUN.LANDED.deadbeef.md
+  printf 'phase: BUILDING\nm-base: BBBB\nanchor-kind: default-branch\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md $ric_d/RUN.LANDED.deadbeef.md
+  git commit -qm "run two preflight, prior LANDED retired"
+  echo y >> seed.txt; git add seed.txt; git commit -qm "body two" ) >/dev/null 2>&1
+ric_a_pre=$(git -C "$ric_a" log --format=%H --grep='run one preflight')
+ric_a_rot=$(git -C "$ric_a" log --format=%H --grep='run two preflight')
+
+# ---- AC1: the archived record grades against the value ITS OWN run recorded. A path-scoped search
+# ---- answers the rotation here, which is a wrong sha and not a missing one.
+ric_out=$(ric "$ric_a" "$ric_d/RUN.LANDED.deadbeef.md" "m-base: AAAA" 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC1 a rotated record answers its own preflight commit" "$ric_out" "$ric_a_pre"
+same "AC1 an answer prints no reason line" "$ric_err" ""
+n=$((n+1)); [ "$ric_out" != "$ric_a_rot" ] || { echo "FAIL AC1 the resolver answered the ROTATION commit, so a caller would re-derive a base nobody wrote"; st=1; }
+
+# ---- AC8: two tenancies at ONE path, sharing a line byte for byte. The floor is what separates
+# ---- them; the verification step cannot and is not asked to.
+ric_out=$(ric "$ric_a" "$ric_d/RUN.md" "anchor-kind: default-branch" 2>"$ric_root/err")
+same "AC8 the live record answers the SECOND tenancy's own preflight" "$ric_out" "$ric_a_rot"
+ric_unfloored=$(git -C "$ric_a" rev-list --full-history --reverse HEAD -- $ric_d/RUN.md | head -1)
+same "AC8 control: the UNFLOORED walk answers the first run's commit instead" "$ric_unfloored" "$ric_a_pre"
+ric_out=$(ric "$ric_a" "$ric_d/RUN.md" "m-base: BBBB" 2>"$ric_root/err")
+same "AC2 the second tenancy's own line is introduced at its own preflight" "$ric_out" "$ric_a_rot"
+
+# ---- FIXTURE B: the rotation lands inside a MERGE commit. The obvious spelling for either end of
+# ---- the window — the newest `--diff-filter=A` at the path — answers NOTHING here under both
+# ---- spellings, because git computes no diff for a merge. Both ends are resolved by first TOUCH.
+ric_b=$ric_root/b; ric_init "$ric_b"
+( cd "$ric_b" || exit 2
+  printf 'phase: LANDED\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  git checkout -qb side; echo s > side.txt; git add side.txt; git commit -qm "side work"
+  git checkout -q main; echo m > main.txt; git add main.txt; git commit -qm "main work"
+  git merge -q --no-commit --no-ff side
+  git mv $ric_d/RUN.md $ric_d/RUN.LANDED.deadbeef.md
+  printf 'phase: BUILDING\nm-base: BBBB\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md $ric_d/RUN.LANDED.deadbeef.md
+  git commit -qm "merge side; run two preflight"
+  echo z >> main.txt; git add main.txt; git commit -qm after ) >/dev/null 2>&1
+ric_b_pre=$(git -C "$ric_b" log --format=%H --grep='run one preflight')
+ric_out=$(ric "$ric_b" "$ric_d/RUN.LANDED.deadbeef.md" "m-base: AAAA" 2>"$ric_root/err")
+same "AC4 a rotation inside a merge still answers the preflight commit" "$ric_out" "$ric_b_pre"
+same "AC4 control: the add search answers nothing there, plain" \
+  "$(git -C "$ric_b" log --diff-filter=A --format=%H -- $ric_d/RUN.LANDED.deadbeef.md)" ""
+same "AC4 control: and nothing with --full-history either" \
+  "$(git -C "$ric_b" log --full-history --diff-filter=A --format=%H -- $ric_d/RUN.LANDED.deadbeef.md)" ""
+
+# ---- FIXTURE C: an `-s ours` merge, the shape `tools/drift-audit/drift_report.py` reproduced for
+# ---- this same flag. The commit that introduced the line is TREESAME-pruned out of a simplified
+# ---- walk, so the simplified spelling answers nothing at all — an absent answer wearing the face
+# ---- of a clean one.
+ric_c=$ric_root/c; ric_init "$ric_c"
+( cd "$ric_c" || exit 2
+  printf 'phase: BUILDING\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  git checkout -qb side
+  printf 'phase: BUILDING\nm-base: AAAA\nasks-at-landing: 3\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "side touches the record"
+  git checkout -q main; echo m > main.txt; git add main.txt; git commit -qm "main work"
+  git merge -q -s ours --no-ff side -m "merge side, ours"
+  echo z >> main.txt; git add main.txt; git commit -qm after ) >/dev/null 2>&1
+ric_c_side=$(git -C "$ric_c" log --all --format=%H --grep='side touches the record')
+ric_out=$(ric "$ric_c" "$ric_d/RUN.md" "asks-at-landing: 3" 2>"$ric_root/err")
+same "AC4 the unsimplified walk reaches the pruned commit that introduced the line" "$ric_out" "$ric_c_side"
+same "AC4 control: a simplified walk cannot see that commit at all" \
+  "$(git -C "$ric_c" rev-list HEAD -- $ric_d/RUN.md | grep -cF "$ric_c_side")" "0"
+
+# ---- FIXTURE D: a shallow clone. Every file in a graft commit reads as INTRODUCED there, so the
+# ---- floor — the one place this resolver stops applying the parent test — would hand back a
+# ---- confident wrong sha. It refuses instead, and says which refusal it is.
+ric_dd=$ric_root/d; ric_init "$ric_dd"
+( cd "$ric_dd" || exit 2
+  printf 'phase: BUILDING\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  printf 'phase: BUILDING\nm-base: AAAA\nwitness: c0ffee\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "witness recorded"
+  printf 'phase: LANDING\nm-base: AAAA\nwitness: c0ffee\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm landing ) >/dev/null 2>&1
+git clone -q --depth 1 --no-local "file://$ric_dd" "$ric_root/d-shallow" >/dev/null 2>&1
+ric_out=$(ric "$ric_root/d-shallow" "$ric_d/RUN.md" "m-base: AAAA" 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC3 a shallow clone answers nothing" "$ric_out" ""
+hit "$ric_err" "the range could not be resolved - the oldest end of the window names a parent this repository does not have"
+
+# ---- FIXTURE E: a record with no committed history at all — the tenancy floor cannot be resolved,
+# ---- which is a DIFFERENT unknown from "the window held no introduction" and says so.
+ric_e=$ric_root/e; ric_init "$ric_e"
+printf 'phase: BUILDING\nm-base: AAAA\n' > "$ric_e/$ric_d/RUN.md"
+ric_out=$(ric "$ric_e" "$ric_d/RUN.md" "m-base: AAAA" 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC8 an unresolvable tenancy floor answers nothing" "$ric_out" ""
+hit  "$ric_err" "the tenancy floor could not be resolved"
+miss "$ric_err" "the whole tenancy window was walked"
+
+# ---- FIXTURE F: a tenancy window DEEPER than the cap, with the line introduced at its oldest end.
+# ---- `--max-count` applies during a newest-first traversal, so a capped walk keeps the wrong end;
+# ---- the cap therefore detects the window rather than selecting one.
+ric_f=$ric_root/f; ric_init "$ric_f"
+( cd "$ric_f" || exit 2
+  printf 'phase: BUILDING\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  i=0; while [ $i -lt 8 ]; do i=$((i+1))
+    printf 'phase: BUILDING\nm-base: AAAA\npass: %s\n' "$i" > $ric_d/RUN.md
+    git add $ric_d/RUN.md; git commit -qm "pass $i"
+  done ) >/dev/null 2>&1
+ric_f_pre=$(git -C "$ric_f" log --format=%H --grep='run one preflight')
+ric_out=$(ric "$ric_f" "$ric_d/RUN.md" "m-base: AAAA" 4 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC6 a window deeper than the cap answers nothing" "$ric_out" ""
+hit  "$ric_err" "the tenancy window is deeper than the 4-commit walk cap"
+miss "$ric_err" "the whole tenancy window was walked"
+ric_out=$(ric "$ric_f" "$ric_d/RUN.md" "m-base: AAAA" 400 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC6 the same fixture answers once the cap is raised past the window" "$ric_out" "$ric_f_pre"
+same "AC6 and that answer prints no reason line" "$ric_err" ""
+
+# ---- FIXTURE G: deeper than the cap AND carrying an introduce-remove-re-introduce shape inside the
+# ---- window. A window that merely lacks its answer cannot tell a walk that ANNOUNCES from one that
+# ---- answers wrongly: here a sentinel met mid-walk returns the RE-introduction, with no reason
+# ---- line at all, which is a wrong sha wearing the face of an answer.
+ric_g=$ric_root/g; ric_init "$ric_g"
+( cd "$ric_g" || exit 2
+  printf 'phase: BUILDING\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  i=0; while [ $i -lt 4 ]; do i=$((i+1))
+    printf 'phase: BUILDING\npass: %s\n' "$i" > $ric_d/RUN.md
+    git add $ric_d/RUN.md; git commit -qm "pass $i, the line removed"
+  done
+  i=0; while [ $i -lt 3 ]; do i=$((i+1))
+    printf 'phase: BUILDING\nm-base: AAAA\nlate: %s\n' "$i" > $ric_d/RUN.md
+    git add $ric_d/RUN.md; git commit -qm "late $i, the line back"
+  done ) >/dev/null 2>&1
+ric_g_pre=$(git -C "$ric_g" log --format=%H --grep='run one preflight')
+ric_g_re=$(git -C "$ric_g" log --format=%H --grep='late 1, the line back')
+ric_out=$(ric "$ric_g" "$ric_d/RUN.md" "m-base: AAAA" 4 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC6 the re-introduction fixture answers nothing at a cap below its window" "$ric_out" ""
+hit  "$ric_err" "the tenancy window is deeper than the 4-commit walk cap"
+n=$((n+1)); [ "$ric_out" != "$ric_g_re" ] || { echo "FAIL AC6 the truncated walk returned the RE-introduction among its retained newest commits"; st=1; }
+ric_out=$(ric "$ric_g" "$ric_d/RUN.md" "m-base: AAAA" 400 2>"$ric_root/err")
+same "AC6 control: uncapped, the same fixture answers the FIRST introduction" "$ric_out" "$ric_g_pre"
+
+# ---- FIXTURE H: a candidate whose FIRST PARENT already carries the line. The boundary here is an
+# ---- archived sibling filed on its own, so the floor is not itself a candidate and the oldest
+# ---- candidate is not an introduction. Returned unverified it would be a wrong sha; passed over it
+# ---- leaves the window with no introduction in it, which is the truth and is announced as such.
+ric_h=$ric_root/h; ric_init "$ric_h"
+( cd "$ric_h" || exit 2
+  printf 'phase: LANDED\nm-base: AAAA\nanchor-kind: default-branch\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  printf 'phase: LANDED\nm-base: AAAA\nanchor-kind: default-branch\n' > $ric_d/RUN.ABORTED.cafebabe.md
+  git add $ric_d/RUN.ABORTED.cafebabe.md; git commit -qm "an archived sibling filed on its own"
+  printf 'phase: LANDED\nm-base: AAAA\nanchor-kind: default-branch\nwitness: c0ffee\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "the record is touched, the line unchanged" ) >/dev/null 2>&1
+ric_out=$(ric "$ric_h" "$ric_d/RUN.md" "m-base: AAAA" 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC2 a candidate whose first parent carries the line is passed over" "$ric_out" ""
+hit  "$ric_err" "the whole tenancy window was walked and no commit in it introduced that line"
+ric_out=$(ric "$ric_h" "$ric_d/RUN.md" "witness: c0ffee" 2>"$ric_root/err")
+same "AC2 control: a genuine introduction inside the same window IS answered" \
+  "$ric_out" "$(git -C "$ric_h" rev-parse HEAD)"
+
+# ---- AC7: the header states what the resolver does NOT answer, in ONE sentence naming BOTH limits.
+# ---- A header that states only what a function does is how a resolution gets read as a guarantee.
+same "AC7 the resolver's header names both limits, once" \
+  "$(grep -cF "answers only inside the queried record's own tenancy of that path, says nothing about an earlier" "$SCRIPT")" "1"
+hit "$(sed -n '/answers only inside the queried/,+2p' "$SCRIPT")" "does not follow a record moved out of its build folder"
+
+rm -f "$ric_fn"; rm -rf "$ric_root"
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
@@ -3559,7 +3771,14 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- RAISED 410 -> 419 by TOOL-dDerivedDocket-5: check 36's nine arms, all in the LANDER_MODE
 # ---- fixture block inside region two, so FLOOR_SHARD_2 carries the same +9 and FLOOR_SHARD_1
 # ---- is untouched.
-FLOOR_ASSERTIONS=419
+# ---- RAISED 419 -> 449 by exactly the arm, TOOL-dDerivedDocket-52: the resolver's thirty
+# ---- assertions over its eight scratch fixtures, all in the block at the END of region two, so
+# ---- FLOOR_SHARD_2 carries the same +30 and FLOOR_SHARD_1 is untouched. COUNTED, not measured
+# ---- through a suite run: this unit's pass may run no suite, so the figure is the block's own
+# ---- `hit`/`same`/`miss` calls plus its two bare `n=$((n+1))` sites, and the block was executed
+# ---- once standalone in a replica of this prologue to confirm it -- thirty assertions, green, and
+# ---- red under each of six staged breaks.
+FLOOR_ASSERTIONS=449
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -3585,7 +3804,7 @@ FLOOR_ASSERTIONS=419
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=91
-FLOOR_SHARD_2=328
+FLOOR_SHARD_2=358
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
