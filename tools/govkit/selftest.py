@@ -222,7 +222,11 @@ def check_rollback_orders(root: pathlib.Path, where: str, floor: int) -> None:
     check(f"[-18] S4 LIVENESS the sweep found rollback orders to grade at all over {where} — "
           "over an empty population it would report a reassuring zero indistinguishable from a "
           "clean run", len(orders) >= floor, f"{len(orders)} order(s) under the scratch root")
-    verbs = ("NOT restored ", "left alone ", "restored ", "removed ")
+    # `left alone` is NOT graded: the order spells it for a path this run never wrote, and a path
+    # gov never wrote can be absent from the receipt while the target holds it — that is the
+    # operator's own untracked file at a refused rename destination (`v14-occupied-t`), which the
+    # `-14` arm above requires to SURVIVE. The first sweep to see that fixture flagged it.
+    verbs = ("NOT restored ", "restored ", "removed ")
     loss: list[str] = []
     skip: list[str] = []
     for o in orders:
@@ -249,7 +253,7 @@ def check_rollback_orders(root: pathlib.Path, where: str, floor: int) -> None:
             in_index = subprocess.run(["git", "-C", str(tg), "ls-files", "--", fs[0]],
                                       capture_output=True, text=True).stdout.strip()
             if (tg / fs[0]).exists() or in_index:
-                loss.append(f"{tg.name}/{o.name}: {fs[0]}")
+                loss.append(f"{tg.parent.name}/{tg.name}/{o.name}: {ln}")
     check(f"[-18] AC4 over EVERY rollback order under {where}, no path that order names ends "
           "absent from the receipt while the target still holds it in the worktree or the index",
           not loss, "; ".join(loss[:8]))
