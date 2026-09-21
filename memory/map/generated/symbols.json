@@ -403,6 +403,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "build_ask_row",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "build_ask_sort_key",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "build_backlog_rows_outliving_specs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -803,6 +813,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_family_view",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "check_fences",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -973,6 +988,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_view_line",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "checks",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -1051,6 +1071,11 @@
       "id": "cmd_apply",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "cmd_asks",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "cmd_bump",
@@ -1416,6 +1441,11 @@
       "id": "derive_default_branch",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_evidence",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "derive_ext",
@@ -2843,6 +2873,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "print_verdicts",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "profile_symbols",
       "kind": "function",
       "file": "tools/govkit/census.py"
@@ -3028,6 +3063,16 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_asks_args",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_backlog",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_bindings",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3101,6 +3146,11 @@
       "id": "read_evidence",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "read_excerpt_chars",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "read_expand_rows",
@@ -3338,6 +3388,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_view_grammar_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "read_waivers",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -3543,9 +3598,19 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_ask_detail",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "render_ask_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "render_asks_table",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "render_baseline",
@@ -3571,6 +3636,11 @@
       "id": "render_empty_spine_diagnosis",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "render_family_view",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "render_inventories_json",
@@ -3628,6 +3698,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "render_relocation_recipe",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "render_report",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -3663,6 +3738,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "render_summary_cell",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "render_swapped_name",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -3676,6 +3756,11 @@
       "id": "render_symbols_json",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_views",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "repo_root",
@@ -4223,6 +4308,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "scan_archive_guard",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "scan_artifacts",
       "kind": "function",
       "file": "tools/codebase-map/check_gate_coverage.py"
@@ -4271,6 +4361,11 @@
       "id": "scan_js_definitions",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "scan_mode_guard",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "scan_module_constants",
@@ -4336,6 +4431,11 @@
       "id": "scan_verdicts",
       "kind": "function",
       "file": "tools/process-monitor/classify.py"
+    },
+    {
+      "id": "scan_view_guard",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "scan_written_destinations",

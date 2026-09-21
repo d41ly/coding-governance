@@ -18,12 +18,15 @@ It replaces the retired directory-listing generator. A listing carried paths, wh
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
 its units' statuses, so nothing here is authored and nothing rots.
 
-THREE SOURCES, NOTHING ELSE
+FOUR SOURCES, NOTHING ELSE
   * each build's README front matter (slug node opened streams roster [status])
   * every `**Status:**` header under that build's spec/, at any depth
   * for the ROSTER only, every tracked file under the memory root EXCEPT this field's own outputs —
     the build's own README and the generated index and shards. `ids` is therefore an OUTPUT, not a
     source: `--write` overwrites whatever was authored there.
+  * under `BACKLOG_MODE=builds` ONLY, every tracked `builds/<slug>/BACKLOG.md`, read through
+    `backlog.py`'s grammar and folded into the family views. Under `shards` that source does not
+    exist and not one branch below it is reached, which is what keeps this change dark.
 No git history and no mtimes. A source the renderer does not read cannot make the render drift; a
 source the renderer WRITES must not also be read, or a wrong value defends itself forever.
 
@@ -43,9 +46,13 @@ THE THREE BLIND SPOTS THIS CLOSES (each armed in --selftest)
 """
 from __future__ import annotations
 
+import contextlib
+import io
+import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -686,7 +693,8 @@ def _roster_sort_key(i: str):
     return (i.split("-", 1)[0], int(i.rsplit("-", 1)[1]))
 
 
-def rosters(root: str, tracked: list, m: str, families: set) -> dict:
+def rosters(root: str, tracked: list, m: str, families: set,
+            skip_backlog: bool = False) -> dict:
     """slug -> sorted ids belonging to that build, from the id's own slug component.
 
     An id spells its build: family-slug-sequence. So a build's roster needs no side table and no
@@ -708,6 +716,13 @@ def rosters(root: str, tracked: list, m: str, families: set) -> dict:
     out: dict = {}
     for p in tracked:
         if p == f"{m}/LIVE.md" or p.startswith(f"{m}/ledger/"):
+            continue
+        # UNDER `builds` THE FAMILY VIEWS JOIN THAT OUTPUT SET, and under `shards` they must not.
+        # The family shards are an INPUT in that mode — a roster legitimately names an id that
+        # appears in its shard and nowhere else — so an UNCONDITIONAL skip here would move rosters
+        # in every shards adopter on upgrade, for a mode they have not adopted. Measured on this
+        # corpus when the unconditional form was tried: 31 of 107 rosters changed.
+        if skip_backlog and p.startswith(f"{m}/backlog/"):
             continue
         text, _why = read_text_or_none(os.path.join(root, p))
         if text is None:
@@ -762,9 +777,17 @@ def read_stale_header_waiver(root: str, m: str, tracked: list) -> dict:
     return rows
 
 
-def collect(root: str, conf: dict) -> list:
+def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
+    """Every indexed build. `backlog_out`, when passed, is FILLED with this run's backlog reading.
+
+    AN OUT-PARAMETER RATHER THAN A SECOND RETURN VALUE. The render path is the only caller that
+    wants the backlog; widening the return to a tuple would move every other call site and every
+    selftest arm that indexes this list, for a value none of them reads. The dict it fills carries
+    `mode`, `conf`, `corpus`, `fold`, `families`, `excerpt`, `verdicts` and `line`.
+    """
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
+    bconf = _read_backlog_conf(conf)
     stale_waived = read_stale_header_waiver(root, m, tracked)
     tolerated: list = []
     slugs = sorted({p.split("/")[2] for p in tracked if p.startswith(m + "/builds/") and p.count("/") >= 3})
@@ -774,7 +797,8 @@ def collect(root: str, conf: dict) -> list:
     # scan recognised anything at all; the per-build POPULATION asks whether this build did. Without
     # the first, a families list bound to the wrong tree renders every roster empty — and an empty
     # classification is exactly what a clean corpus yields, so the failure would look like success.
-    roster_by_slug = rosters(root, tracked, m, families)
+    roster_by_slug = rosters(root, tracked, m, families,
+                             skip_backlog=bconf.mode == "builds")
     # NO EMPTINESS PRECONDITION HERE, deliberately. The wrong-root class says an unrecognising
     # grammar yields the same empty result a clean corpus does, so a guard is wanted — but every
     # signal available HERE is one this function derives from the same conf, which makes the
@@ -784,9 +808,23 @@ def collect(root: str, conf: dict) -> list:
     # build's authored `roster:` value must be a declared family, so a FAMILIES list bound to the
     # wrong tree reds there, by name, before any roster is rendered.
     builds = []
+    spec_index: dict = {}
     for slug in slugs:
         readme = f"{m}/builds/{slug}/README.md"
         if readme not in tracked:
+            # A FILING HOME, under `builds` ONLY. A folder holding one tracked `BACKLOG.md` and
+            # nothing else is where a straggler's relocated asks land before any build claims them.
+            # It has no front matter because it is not a build, and it must reach neither LIVE.md
+            # nor a ledger shard — which is exactly what skipping it here achieves, since both are
+            # rendered from this list. The asks in it are still read: the backlog walk below reads
+            # every tracked `BACKLOG.md`, not only the ones sitting beside a README.
+            #
+            # The tolerance is NARROW (one file, that name) and MODE-SCOPED. A shards adopter's
+            # README-less build folder is still the silent departure this refusal was written for,
+            # and widening it for them would retire a live refusal to buy a mode they never set.
+            own = [p for p in tracked if p.startswith(f"{m}/builds/{slug}/")]
+            if bconf.mode == "builds" and own == [f"{m}/builds/{slug}/BACKLOG.md"]:
+                continue
             raise Problem(
                 f"{m}/builds/{slug}/: no tracked README.md — a build with no front matter cannot be "
                 f"indexed, and an unindexed build is a silent departure from the universe"
@@ -813,6 +851,15 @@ def collect(root: str, conf: dict) -> list:
                 raise Problem(f"{readme}: roster value '{value.strip()}' is outside the FAMILIES set")
         specs = sorted(p for p in tracked if p.startswith(f"{m}/builds/{slug}/spec/") and p.endswith(".md"))
         units = [parse_spec(os.path.join(root, p), _id_alternation(conf)) for p in specs]
+        # THE SPEC INDEX THE FOLD READS, built from the parse this loop already performs and keyed
+        # by the spec's H1 id. The path stored is the REPO-RELATIVE one, not `parse_spec`'s
+        # absolute argument: every verdict message names it, and an absolute Windows path in a
+        # verdict is a string no reader can grep for and no other node can resolve.
+        for rel, unit in zip(specs, units):
+            if unit:
+                spec_index[unit["id"]] = backlog.Spec(unit["id"], rel, unit["status"],
+                                                      tuple(unit["closes"]),
+                                                      tuple(unit["advances"]))
         # BOOTSTRAP, not failure. A build whose ids appear nowhere but its own README is young, not
         # broken, and there is nothing to correct the authored value against — so it stands. The
         # anti-self-reference property still holds where it can bite: the moment any independent
@@ -845,7 +892,252 @@ def collect(root: str, conf: dict) -> list:
     # would be indistinguishable from a check that never consulted the registry at all, and a
     # tolerance that grows silently is the failure this whole mechanism exists to prevent.
     print(f"build-index: {len(tolerated)} header(s) tolerated by waiver")
+    reading = read_backlog(root, conf, tracked, {b["slug"]: b["status"] for b in builds},
+                           spec_index, bconf, tuple(sorted(families)))
+    # ON EVERY RUN, INCLUDING THE SHARDS ONE, which says the layout is shards and that no view was
+    # rendered. A builds-mode tree whose `BACKLOG.md` files parse to nothing would otherwise print
+    # nothing here, and an absent line reads exactly like an empty clean backlog — the reassuring
+    # zero a liveness assertion exists to refuse.
+    print(reading["line"])
+    if backlog_out is not None:
+        backlog_out.update(reading)
     return builds
+
+
+# ------------------------------------------------------------------------------- the backlog
+# THREE CODES THIS FILE ADDS to the ones `backlog.py` exports. They continue that module's ONE
+# sequence past V16 rather than opening a namespace of their own: the docs unit's drift arm reads
+# the codes as one list, and a second sequence starting at 1 would collide with it on every number.
+# None of the three is a CONTENT verdict — each is a property of the POPULATION this generator
+# walks, which is why they are computed here and not in a module that never reads a tree.
+GUARD_DATA_LOSS = 17
+GUARD_MODE = 18
+GUARD_ARCHIVE = 19
+GUARD_CODES = (GUARD_DATA_LOSS, GUARD_MODE, GUARD_ARCHIVE)
+
+#: The markers a three-way merge leaves behind. Matched as a PREFIX, because git writes the branch
+#: name after the marker and a full-line compare would miss every real one.
+CONFLICT_MARKS = ("<<<<<<<", "=======", ">>>>>>>")
+
+
+def _read_backlog_conf(conf: dict):
+    """`backlog.read_conf`, with its refusal re-raised as this file's own named failure.
+
+    The same seam `_read_backlog_verbs` already draws, and for the same reason: `collect()` is
+    reached by every mode through one call site, and an unfamiliar exception class there is a
+    traceback rather than the named failure this file's blind-spot-3 rule promises.
+    """
+    try:
+        return backlog.read_conf(conf)
+    except backlog.Problem as exc:
+        raise Problem(str(exc)) from None
+
+
+def _read_excerpt(conf: dict) -> int:
+    try:
+        return backlog.read_excerpt_chars(conf)
+    except backlog.Problem as exc:
+        raise Problem(str(exc)) from None
+
+
+def scan_mode_guard(tracked: list, specs: dict, m: str) -> list:
+    """Under `shards`: the half-migration shape, from both of its sides.
+
+    A tracked `BACKLOG.md` under `shards` is asks nobody reads — the fold is not running. A spec
+    header carrying `closes` or `advances` under `shards` is the same half-migration seen from the
+    spec side: a verb that links to asks no tree holds. Both are silent without this, because
+    neither is malformed; they are simply inert, and an inert record looks exactly like a clean one.
+    """
+    out = []
+    for rel in sorted(p for p in tracked
+                      if p.startswith(f"{m}/builds/") and p.endswith("/BACKLOG.md")):
+        out.append(backlog.Verdict(
+            GUARD_MODE,
+            f"{rel}: a tracked BACKLOG.md while {backlog.MODE_KEY} is `shards`, so every ask in it "
+            f"is read by nothing and disposed of by nothing — set the key or remove the file",
+            (rel,)))
+    for spec in sorted(specs.values()):
+        if spec.closes or spec.advances:
+            named = " ".join(sorted(set(spec.closes) | set(spec.advances)))
+            out.append(backlog.Verdict(
+                GUARD_MODE,
+                f"{spec.path}: the status header links {named} while {backlog.MODE_KEY} is "
+                f"`shards`, so the verb names asks no tracked file files",
+                (spec.path,)))
+    return out
+
+
+def scan_archive_guard(tracked: list, m: str, families) -> list:
+    """Under `builds`: a rotated backlog archive, which the per-build model does not have.
+
+    THE PREDICATE IS THE STEM, NOT THE DIRECTORY. Every archive lives under the same folder and the
+    decision log rotates into it too, so a rule matching every name there would red
+    `DECISIONS.<date>.md` on every run — the innocent-file class a candidate predicate is supposed
+    to be run over the real tree to catch.
+    """
+    fams = set(families)
+    out = []
+    for rel in sorted(p for p in tracked if p.startswith(f"{m}/archive/")):
+        stem = os.path.basename(rel).split(".")[0]
+        if stem in fams:
+            out.append(backlog.Verdict(
+                GUARD_ARCHIVE,
+                f"{rel}: a rotated `{stem}` backlog archive while {backlog.MODE_KEY} is `builds`, "
+                f"where an ask is never rotated out of its build — its rows belong in the build "
+                f"folders the ids name",
+                (rel,)))
+    return out
+
+
+def read_backlog(root: str, conf: dict, tracked: list, statuses: dict, specs: dict,
+                 bconf, families: tuple) -> dict:
+    """Everything the backlog model contributes to one run, read ONCE, by `collect()`.
+
+    CONTENT NEVER RAISES HERE either. An unreadable `BACKLOG.md` becomes a V2 naming it, on the
+    same grounds the parser gives: one bad file in one build must not refuse every artifact this
+    generator renders.
+    """
+    m = conf["MEMORY_ROOT"]
+    out = {"mode": bconf.mode, "conf": bconf, "corpus": None, "fold": None, "families": families,
+           "excerpt": backlog.EXCERPT_DEFAULT, "verdicts": [], "line": ""}
+    if bconf.mode != "builds":
+        out["verdicts"] = scan_mode_guard(tracked, specs, m)
+        out["line"] = (f"build-index: backlog layout is `shards` — asks live in {m}/backlog/, no "
+                       f"family view is rendered and {len(out['verdicts'])} mode verdict(s) stand")
+        return out
+    out["excerpt"] = _read_excerpt(conf)
+    grammar = backlog.build_grammar(families)
+    files, verdicts = [], []
+    for rel in sorted(p for p in tracked
+                      if p.startswith(f"{m}/builds/") and p.endswith("/BACKLOG.md")
+                      and p.count("/") == 3):
+        text, why = read_text_or_none(os.path.join(root, rel))
+        if text is None:
+            verdicts.append(backlog.Verdict(2, f"{rel}: {why}", (rel,)))
+            continue
+        files.append(backlog.parse_file(rel, text, grammar))
+    corpus = backlog.build_corpus(files, specs, statuses)
+    fold = backlog.derive_statuses(corpus)
+    verdicts += backlog.derive_verdicts(corpus, bconf)
+    verdicts += scan_archive_guard(tracked, m, families)
+    c = fold.counts
+    out.update(corpus=corpus, fold=fold, verdicts=verdicts,
+               line=(f"build-index: backlog {c['asks']} ask(s) · {c['rows']} row(s) · "
+                     f"{c['links']} link(s) in {c['files']} file(s) · {c['live']} live · "
+                     f"{len(verdicts)} verdict(s)"))
+    return out
+
+
+def _build_authored_row_re(families) -> "re.Pattern":
+    """A list row leading with an id — the one shape the view grammar never emits.
+
+    That is the whole test for authored content, and it is deliberately narrow. Every authored
+    backlog shard this corpus has ever held keys its rows on an id after a list marker, and the
+    view's own first cell is link-wrapped precisely so this pattern cannot match it. A looser
+    predicate would red a view over its own prose.
+    """
+    alt = "|".join(sorted(re.escape(f) for f in families)) or "(?!)"
+    return re.compile(r"^\s*[-*]\s+[\[`*]*(?:" + alt + r")-[A-Za-z0-9]+-\d+\b")
+
+
+def scan_view_guard(root: str, rel: str, family: str, conf: dict, kit: str) -> tuple:
+    """Read whatever sits at a view path and answer whether `--write` may render over it.
+
+    THE FILE IS READ WHETHER OR NOT IT IS A VIEW, and the view predicate is never consulted here
+    (fork F6). A pre-flip shard left in place, and a view whose conflict somebody resolved by
+    taking the authored side, both carry the generator's header on neither line one nor line two —
+    so a guard that only read files the predicate recognises would hand `--write` exactly the two
+    files it must never overwrite.
+
+    Returns `(offending_lines, conflicted)`. `conflicted` says a conflict region was found whose
+    two sides hold only lines the view grammar emits: that is a view merged with a view, the render
+    repairs it, and refusing it would point a lander at a straggler recipe where no straggler is.
+    """
+    path = os.path.join(root, rel)
+    if not os.path.isfile(path):
+        return [], False
+    text, why = read_text_or_none(path)
+    if text is None:
+        return [f"{rel}: {why}"], False
+    grammar_lines = backlog.read_view_grammar_lines(family, conf["MEMORY_ROOT"], kit, GEN_HEADER)
+    authored = _build_authored_row_re(
+        [p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p])
+    lines = text.split("\n")
+    offending, conflicted = [], False
+    n = 0
+    while n < len(lines):
+        line = lines[n]
+        if line.startswith(CONFLICT_MARKS[0]):
+            end = n + 1
+            while end < len(lines) and not lines[end].startswith(CONFLICT_MARKS[2]):
+                end += 1
+            if end >= len(lines):
+                offending.append(f"{rel}:{n + 1}: a conflict marker with nothing closing it")
+                break
+            sides = [x for x in lines[n + 1:end] if not x.startswith(CONFLICT_MARKS[1])]
+            bad = [x for x in sides if not backlog.check_view_line(x, grammar_lines)]
+            if bad:
+                offending.append(f"{rel}:{n + 1}: a conflict region carrying {len(bad)} line(s) "
+                                 f"the view grammar never emits, the first being: {bad[0].strip()}")
+            else:
+                conflicted = True
+            n = end + 1
+            continue
+        if line.startswith(CONFLICT_MARKS[1]) or line.startswith(CONFLICT_MARKS[2]):
+            offending.append(f"{rel}:{n + 1}: a conflict marker with no `{CONFLICT_MARKS[0]}` "
+                             f"opening it")
+        elif authored.match(line):
+            offending.append(f"{rel}:{n + 1}: {line.strip()}")
+        n += 1
+    return offending, conflicted
+
+
+def render_views(root: str, conf: dict, reading: dict) -> tuple:
+    """One view per DECLARED family, and the set of view paths `--write` must not touch.
+
+    EVERY DECLARED FAMILY GETS A FILE, including the ones with no live ask. An absent view and an
+    empty family are otherwise the same byte on disk, and a reader who finds no file cannot tell
+    "nothing is open" from "the render never ran".
+    """
+    m = conf["MEMORY_ROOT"]
+    kit = kit_rel()
+    asks = [a for parsed in reading["corpus"].files for a in parsed.asks]
+    views, guarded = {}, {}
+    for family in reading["families"]:
+        rel = f"{m}/backlog/{family}.md"
+        offending, conflicted = scan_view_guard(root, rel, family, conf, kit)
+        if offending:
+            guarded[rel] = offending
+            continue
+        if conflicted:
+            print(f"build-index: re-rendered over a view conflict: {rel}")
+        views[rel] = backlog.render_family_view(family, asks, reading["fold"], m, kit, GEN_HEADER,
+                                                reading["excerpt"])
+    return views, guarded
+
+
+def print_verdicts(verdicts: list, guarded: dict, conf: dict) -> int:
+    """The VERDICT list, separate from the DRIFT list and carrying a code on every row.
+
+    SEPARATE BECAUSE THE REMEDIES DIFFER, and one shared header would name the wrong one. Drift is
+    repaired by `--write`. A verdict is repaired by editing the record it names. And a GUARDED VIEW
+    is repaired by the relocation recipe — never by `--write`, which is the one action that would
+    destroy the rows the guard is standing in front of. That remedy line is why this function
+    exists: `--check`'s single `--write` remedy is what made the data-loss path reachable.
+    """
+    if not verdicts and not guarded:
+        return 0
+    print("build-index VERDICT — records the backlog fold read and disagrees with")
+    for v in sorted(verdicts, key=lambda x: (x.code, x.text)):
+        print(f"    V{v.code} {v.text}")
+    for rel, lines in sorted(guarded.items()):
+        print(f"    V{GUARD_DATA_LOSS} {rel} carries content the view grammar never emits, so "
+              f"--write leaves this file byte-unchanged and renders every other artifact:")
+        for line in lines:
+            print("        " + line)
+        for line in backlog.render_relocation_recipe(kit_rel(), conf["MEMORY_ROOT"]):
+            print("        " + line)
+    return 1
 
 
 # ---------------------------------------------------------------------------------------- rendering
@@ -1660,7 +1952,8 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
     of every unit that registers a region, and is the outcome S1c exists to forbid.
     """
     m = conf["MEMORY_ROOT"]
-    builds = collect(root, conf)
+    reading: dict = {}
+    builds = collect(root, conf, backlog_out=reading)
     # DERIVE the child set by inverting `parents:`. Authoring both directions would put two answers
     # to one question in two files with no gate on this bar able to reconcile them — the defect
     # TOOL-aMouldedFolio-1 recorded one relation over, when it refused a front-matter schema.
@@ -1755,12 +2048,20 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
         if p in artifacts:
             continue
         (orphans if SHARD_RE.match(os.path.basename(p)) and p.count("/") == 2 else unmanaged).append(p)
-    return artifacts, sorted(orphans), sorted(unmanaged)
+    # THE VIEWS ARE RENDERED AFTER THE ORPHAN SCAN, whose population is the ledger directory alone:
+    # a view is neither a build README nor a month shard, and adding it to that scan's input would
+    # have it reported as an unmanaged file on the first run that wrote one.
+    verdicts = list(reading.get("verdicts") or ())
+    guarded: dict = {}
+    if reading.get("mode") == "builds":
+        views, guarded = render_views(root, conf, reading)
+        artifacts.update(views)
+    return artifacts, sorted(orphans), sorted(unmanaged), verdicts, guarded
 
 
 # -------------------------------------------------------------------------------------------- modes
 def cmd_check(root: str, conf: dict) -> int:
-    artifacts, orphans, unmanaged = plan(root, conf)
+    artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf)
     bad = []
     for rel, want in sorted(artifacts.items()):
         path = os.path.join(root, rel)
@@ -1772,13 +2073,18 @@ def cmd_check(root: str, conf: dict) -> int:
         bad.append(f"{p} (orphaned ledger shard — no build opened in that month; --write deletes it)")
     for p in unmanaged:
         bad.append(f"{p} (unmanaged file under ledger/ — not a month shard; --write LEAVES IT ALONE)")
+    rc = 0
     if bad:
         print(f"build-index DRIFT — run: python {kit_rel()}/gen_build_index.py --write")
         for line in bad:
             print("    " + line)
-        return 1
-    print(f"build-index: clean ({len(artifacts)} artifact(s))")
-    return 0
+        rc = 1
+    # A GUARDED VIEW IS NEVER IN `bad`: it is not in `artifacts` at all, so the remedy above cannot
+    # be printed against it. That is the whole point — the line it would have printed is `--write`.
+    rc = print_verdicts(verdicts, guarded, conf) or rc
+    if rc == 0:
+        print(f"build-index: clean ({len(artifacts)} artifact(s))")
+    return rc
 
 
 def cmd_check_format(root: str, conf: dict) -> int:
@@ -1920,7 +2226,7 @@ def cmd_survey(root: str, conf: dict) -> int:
 
 
 def cmd_write(root: str, conf: dict) -> int:
-    artifacts, orphans, unmanaged = plan(root, conf, create_missing=True)
+    artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf, create_missing=True)
     for rel, text in sorted(artifacts.items()):
         write_text(os.path.join(root, rel), text)
     for p in orphans:
@@ -1929,10 +2235,252 @@ def cmd_write(root: str, conf: dict) -> int:
     for p in unmanaged:
         print(f"build-index: WARNING unmanaged file under ledger/ left in place: {p}")
     print(f"build-index: wrote {len(artifacts)} artifact(s)")
-    return 0
+    # A RENDER IS NOT A VERDICT (fork F1). One unparseable ask row must not leave a whole tree
+    # unrendered — that is the shape this file's own docstring forbids — so every verdict is
+    # PRINTED here and the refusal belongs to `--check`. The data-loss guard is the one exception,
+    # and it earns it: the view it names is the only artifact this verb did NOT write, and exiting
+    # 0 after skipping a write would read as a successful render of it.
+    print_verdicts(verdicts, guarded, conf)
+    return 1 if guarded else 0
 
 
 # ----------------------------------------------------------------------------------------- selftest
+# ----------------------------------------------------------------------------- the print modes
+#: The tokens `--status` accepts. The seven the fold can derive, plus the placeholder it renders
+#: when a hold target names nothing — a reader asking "what is UNRESOLVED right now" is asking the
+#: same question as one asking what is BLOCKED, and leaving it out would make that question
+#: unanswerable by the one mode built to answer it.
+ASK_STATUS_TOKENS = STATUS_TOKENS + (backlog.UNRESOLVED,)
+ASK_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+$")
+ASK_USAGE = "usage: gen_build_index.py --asks [FAMILY|ID] [--all] [--status <token>] " \
+            "[--build <slug>] [--json]"
+
+
+def read_asks_args(argv: list) -> dict:
+    """`--asks`'s own argument parse. One positional, four options, and no silent tolerance."""
+    out = {"target": "", "all": False, "status": "", "build": "", "json": False}
+    rest = list(argv)
+    while rest:
+        token = rest.pop(0)
+        if token in ("--all", "--json"):
+            out[token[2:]] = True
+        elif token in ("--status", "--build"):
+            if not rest:
+                raise Problem(f"{token} takes a value. {ASK_USAGE}")
+            out[token[2:]] = rest.pop(0)
+        elif token.startswith("--"):
+            raise Problem(f"--asks: unknown option {token}. {ASK_USAGE}")
+        elif out["target"]:
+            raise Problem(f"--asks takes at most one FAMILY or ID, and was given `{out['target']}` "
+                          f"and `{token}`. {ASK_USAGE}")
+        else:
+            out["target"] = token
+    return out
+
+
+def build_ask_row(ask, fold, evidence: dict) -> dict:
+    """One ask's PINNED projection. These field names are a contract, not a convenience.
+
+    The switch-over's drift signals read `closing`, `declining`, `live_specs` and `sev` by name, and
+    the agent carriers read the rest. Renaming one is a breaking change to a consumer this file
+    cannot see, which is why they are listed in the spec and asserted by an arm.
+    """
+    return {
+        "id": ask.id,
+        "home": ask.slug,
+        "file": ask.path,
+        "line": ask.line,
+        "filed": ask.filed,
+        "unit": bool(ask.unit),
+        "status": fold.statuses.get(ask.id, backlog.UNRESOLVED),
+        "decided_by": fold.decided.get(ask.id, ""),
+        "sev": fold.severities.get(ask.id, backlog.UNLABELLED),
+        "closing": list(evidence.get("closing", ())),
+        "declining": list(evidence.get("declining", ())),
+        "holds": list(evidence.get("holds", ())),
+        "live_specs": list(evidence.get("live_specs", ())),
+    }
+
+
+def render_asks_table(picked: list, excerpt: int) -> str:
+    """The human form. Header and separator ALWAYS, so an empty result is a visible empty set."""
+    out = ["| Ask | Status | Sev | Decided by | Filed | Home | Summary |",
+           "|---|---|---|---|---|---|---|"]
+    for ask, row in picked:
+        out.append(f"| {row['id']} | {row['status']} | {row['sev']} | "
+                   f"{row['decided_by'] or backlog.VIEW_NONE} | {row['filed']} | {row['home']} | "
+                   f"{backlog.render_summary_cell(ask.text, excerpt)} |")
+    return "\n".join(out)
+
+
+def render_ask_detail(ask, row: dict) -> str:
+    """One ask, and EVERYTHING that decided it — which is what the view header promises.
+
+    A terminal ask leaves every view, so this is the only place its story is told; printing the
+    status without the evidence would answer "what" and leave "why" to a grep of four files.
+    """
+    out = [f"{row['id']} · {row['status']} · sev {row['sev']} · filed {row['filed']} · "
+           f"home {row['home']} · {row['file']}:{row['line']}"]
+    for label, value in (("decided by", row["decided_by"]),
+                         ("closing", " ".join(row["closing"])),
+                         ("declining", " ".join(row["declining"])),
+                         ("held on", " ".join(row["holds"])),
+                         ("live specs", " ".join(row["live_specs"]))):
+        out.append(f"  {label:<11} {value or backlog.VIEW_NONE}")
+    out.append(f"  {'text':<11} {ask.text}")
+    return "\n".join(out)
+
+
+def cmd_asks(root: str, conf: dict, args: dict) -> int:
+    """The print modes. They write no file, and stdout carries the mode's VALUE and nothing else.
+
+    THE REDIRECT IS AROUND THE WHOLE READ, not around the two notices this file happens to print
+    today. `collect()` prints a tolerated-header line and a liveness line on every run, and a JSON
+    consumer handed either of them ahead of the object gets a decode error — the class the hygiene
+    engine's own ON STDERR note records. Redirecting the read wholesale means a notice added to any
+    callee later is on stderr by construction rather than by somebody remembering this rule.
+
+    EXIT 0 ON A FOLD VERDICT (fork F8). The one tool built to explain a verdict must not refuse to
+    run while one exists. A `collect()` REFUSAL is the opposite case and exits 1 with nothing on
+    stdout: the tree could not be read, so there is no value to print and a partial one would be
+    worse than none.
+    """
+    if args["status"] and args["status"] not in ASK_STATUS_TOKENS:
+        print(f"build-index: --status {args['status']} is not a derived status token; the set is "
+              f"{' '.join(ASK_STATUS_TOKENS)}", file=sys.stderr)
+        return 2
+    reading: dict = {}
+    with contextlib.redirect_stdout(sys.stderr):
+        try:
+            collect(root, conf, backlog_out=reading)
+        except Problem as exc:
+            print(f"build-index: {exc}", file=sys.stderr)
+            return 1
+    corpus, fold = reading.get("corpus"), reading.get("fold")
+    target = args["target"]
+    one = bool(target) and bool(ASK_ID_RE.match(target))
+    if target and not one and target not in reading.get("families", ()):
+        print(f"build-index: --asks {target} is neither an id nor a declared family; the families "
+              f"are {' '.join(reading.get('families', ()))}", file=sys.stderr)
+        return 2
+    evidence = backlog.derive_evidence(corpus) if corpus else {}
+    picked = []
+    for ask in sorted((a for p in (corpus.files if corpus else ()) for a in p.asks),
+                      key=backlog.build_ask_sort_key):
+        if one and ask.id != target:
+            continue
+        if target and not one and ask.id.split("-")[0] != target:
+            continue
+        if args["build"] and ask.slug != args["build"]:
+            continue
+        row = build_ask_row(ask, fold, evidence.get(ask.id, {}))
+        # AN ID ARGUMENT IGNORES BOTH FILTERS ON LIVENESS. The header of every view tells a reader
+        # that an id it does not list is terminal and that this mode says what decided it, so a
+        # terminal id must answer here or that sentence is false.
+        if not one and not args["all"] and row["status"] in backlog.TERMINAL:
+            continue
+        if args["status"] and row["status"] != args["status"]:
+            continue
+        picked.append((ask, row))
+    if args["json"]:
+        print(json.dumps({"mode": reading.get("mode", ""),
+                          "examined": len(corpus.files) if corpus else 0,
+                          "asks": [row for _ask, row in picked]}, indent=2, sort_keys=True))
+        return 0
+    if one:
+        if not picked:
+            print(f"build-index: {target} is filed in no tracked BACKLOG.md", file=sys.stderr)
+            return 0
+        print(render_ask_detail(*picked[0]))
+        return 0
+    print(render_asks_table(picked, reading.get("excerpt", backlog.EXCERPT_DEFAULT)))
+    return 0
+
+
+# --------------------------------------------------------------- the backlog fixture helpers
+#: The fixture corpus declares FOUR families and fills TWO, so "a family with no live ask renders a
+#: file" is observable at all. A declaration nothing exercises is a rule with no population.
+BL_FAMILIES = ("EXMP", "OTHR", "THRD", "FRTH")
+
+
+def _backlog_conf_text(mode: str, cutoff: str, excerpt: str) -> str:
+    rows = ["MEMORY_ROOT=memory", 'DISCIPLINES="tool"',
+            'FAMILIES="tool:EXMP other:OTHR third:THRD fourth:FRTH"',
+            f'BACKLOG_MODE="{mode}"', f'ASK_CUTOFF="{cutoff}"']
+    if excerpt != "":
+        rows.append(f'BACKLOG_EXCERPT_CHARS="{excerpt}"')
+    return "\n".join(rows) + "\n"
+
+
+def _backlog_readme(slug: str) -> str:
+    return ("---\nslug: " + slug + "\nnode: a\nopened: 2026-09-01\nstreams: tool\n"
+            "roster: EXMP\nids: EXMP-" + slug + "-1\n---\n\n# " + slug + "\n\n"
+            + MARK_OPEN + "\n" + MARK_CLOSE + "\n")
+
+
+def _backlog_spec(spec_id: str, status: str = "SPECCED", tail: str = "") -> str:
+    return (f"# {spec_id} — a unit\n\n**Status:** {status} · rev-1 · 2026-09-01 · node a · "
+            f"Tier-2 · base 0123abcd{tail}\n")
+
+
+def _backlog_file(slug: str, asks=(), rows=()) -> str:
+    """A build's BACKLOG.md, always through `backlog.py`'s own renderers, so no fixture below
+    spells a row by hand and drifts from the grammar the parser reads."""
+    body = ([f"# {slug} — asks", "", backlog.H_ASKS] + list(asks)
+            + ["", backlog.H_DISPOSITIONS] + list(rows))
+    return "\n".join(body) + "\n"
+
+
+def _backlog_fixture(tmp: str, files: dict, *, mode: str = "builds", cutoff: str = "2099-01-01",
+                     excerpt: str = "") -> dict:
+    """A fixture repo whose memory tree is REPLACED, not added to, on every call.
+
+    Replaced, so no arm can inherit a file — or a rendered view — from the arm before it; and ONE
+    `git init` serves every arm below, because `git ls-files` reads the INDEX and a single
+    `git add -A` restages a whole tree. Thirty arms at four processes each was the alternative, on
+    a node whose own memory note prices process creation as the dominant cost of a suite.
+    """
+    if not os.path.isdir(os.path.join(tmp, ".git")):
+        run("git", "init", "-q", ".", cwd=tmp)
+        run("git", "config", "user.email", "t@t.test", cwd=tmp)
+        run("git", "config", "user.name", "t", cwd=tmp)
+    shutil.rmtree(os.path.join(tmp, "memory"), ignore_errors=True)
+    write_text(os.path.join(tmp, ".memory-tree.conf"), _backlog_conf_text(mode, cutoff, excerpt))
+    write_text(os.path.join(tmp, "memory", STALE_HEADER_WAIVER), "# empty\n")
+    for rel, text in files.items():
+        write_text(os.path.join(tmp, rel), text)
+    run("git", "add", "-A", cwd=tmp)
+    return load_conf(tmp)
+
+
+def _read_mode(fn, *args) -> tuple:
+    """(rc, stdout) for a mode function, with `main()`'s own Problem handling reproduced.
+
+    Reproduced rather than called, because `main()` resolves the root with `git rev-parse` in the
+    PROCESS's cwd and every fixture here lives somewhere else.
+    """
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        try:
+            rc = fn(*args)
+        except Problem as exc:
+            return 1, buf.getvalue() + f"build-index: {exc}"
+    return rc, buf.getvalue()
+
+
+def _read_asks_run(root: str, conf: dict, argv: list) -> tuple:
+    """(rc, stdout, stderr) for `--asks`. The two streams are captured SEPARATELY, which is the
+    whole property under test: stdout is the value and every notice is on the other one."""
+    out, err = io.StringIO(), io.StringIO()
+    with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+        try:
+            rc = cmd_asks(root, conf, read_asks_args(argv))
+        except Problem as exc:
+            print(f"build-index: {exc}", file=sys.stderr)
+            rc = 2
+    return rc, out.getvalue(), err.getvalue()
+
+
 def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status="INPROGRESS"):
     run("git", "init", "-q", ".", cwd=tmp)
     run("git", "config", "user.email", "t@t.test", cwd=tmp)
@@ -2799,6 +3347,354 @@ def cmd_selftest() -> int:
         arm("a `closes` with no value REFUSES", "carries `closes` with no value",
             lambda: _read_verbs(" · closes · streams tooling"))
 
+        # ------------------------------------------- TOOL-dDerivedDocket-7 — the family view
+        # ONE fixture repo for every arm below. `_backlog_fixture` wipes and restages its memory
+        # tree per call, so the arms are order-independent even though the `.git` is shared.
+        bt = os.path.join(base, "backlogview"); os.makedirs(bt)
+        ask2 = backlog.render_ask_row("EXMP-aFoo-2", "2026-09-01", "the second ask")
+        ask10 = backlog.render_ask_row("EXMP-aFoo-10", "2026-09-01", "the tenth ask")
+        ask3 = backlog.render_ask_row("EXMP-aFoo-3", "2026-09-02", "the terminal ask")
+        wide = backlog.render_ask_row(
+            "EXMP-aFoo-4", "2026-09-03",
+            "a | pipe, a `deep/path/to/a/file.py` token and a [linked thing](../x.md) followed by "
+            "enough prose to run past the excerpt cap with room to spare")
+        closed3 = backlog.render_status_row("CLOSED", "EXMP-aFoo-3", "done", value="abc1234")
+        spec_rel = "memory/builds/aFoo/spec/2026-09-01-spec-aFoo-1.md"
+        foo_rel = "memory/builds/aFoo/BACKLOG.md"
+        CORE = {
+            "memory/builds/aFoo/README.md": _backlog_readme("aFoo"),
+            spec_rel: _backlog_spec("EXMP-aFoo-1"),
+            foo_rel: _backlog_file("aFoo", [ask2, ask10, ask3, wide], [closed3]),
+            "memory/builds/aBar/README.md": _backlog_readme("aBar"),
+            "memory/builds/aBar/spec/2026-09-01-spec-aBar-1.md": _backlog_spec("EXMP-aBar-1"),
+            "memory/builds/aBar/BACKLOG.md": _backlog_file(
+                "aBar", [backlog.render_ask_row("EXMP-aBar-5", "2026-09-01", "a bar ask")]),
+            # THE FILING HOME: one tracked file, no README, and not a build.
+            "memory/builds/aHome/BACKLOG.md": _backlog_file(
+                "aHome", [backlog.render_ask_row("OTHR-aHome-1", "2026-09-01", "a home ask")]),
+        }
+        NOHOME = {k: v for k, v in CORE.items() if "/aHome/" not in k}
+
+        # AC1 — one view per declared family, and the empty ones say so.
+        conf_b = _backlog_fixture(bt, CORE)
+        arts = plan(bt, conf_b)[0]
+        arm("builds mode renders one view per DECLARED family",
+            "['memory/backlog/EXMP.md', 'memory/backlog/FRTH.md', 'memory/backlog/OTHR.md', "
+            "'memory/backlog/THRD.md']",
+            lambda: str(sorted(k for k in arts if k.startswith("memory/backlog/"))))
+        arm("a family with no live ask renders the EXPLICIT empty case, not an absent file",
+            "*No live ask.*", lambda: arts["memory/backlog/THRD.md"])
+        arm("every live ask appears exactly ONCE across the rendered views", "1 1 1 1 1",
+            lambda: " ".join(str(sum(v.count(f"[{i}]") for k, v in arts.items()
+                                     if k.startswith("memory/backlog/")))
+                             for i in ("EXMP-aFoo-2", "EXMP-aFoo-4", "EXMP-aFoo-10",
+                                       "EXMP-aBar-5", "OTHR-aHome-1")))
+
+        # AC18 — the sort, the terminal exclusion and the summary cell, byte for byte.
+        view = arts["memory/backlog/EXMP.md"]
+        arm("the view sorts `-2` before `-10`, by NUMBER and not as a string", "True",
+            lambda: str(view.index("[EXMP-aFoo-2]") < view.index("[EXMP-aFoo-10]")))
+        arm("a TERMINAL ask is not listed, which is what the header promises", "False",
+            lambda: str("[EXMP-aFoo-3]" in view))
+        arm("the summary cell is reduced and cut at a space",
+            "| a / pipe, a deep/path/to/a/file.py token and a linked thing followed by… |",
+            lambda: [x for x in view.split("\n") if "EXMP-aFoo-4" in x][0])
+
+        # AC2 — the anchor property, against the REAL grammar, with its own control.
+        _anchor_at, _real_g, _why = backlog._resolve_anchor_at()
+        if _anchor_at is None:
+            print(f"arm SKIP  the view's anchor arms did not run — {_why}")
+            fails.append("the anchor arms were SKIPPED, so the anchor property is unobserved")
+        else:
+            import extract as _anchor_kit  # noqa: PLC0415 — deferred exactly as backlog.py's is
+            # THE GRAMMAR IS BOUND TO THE FIXTURE, not to this repo. Bound to this repo it would
+            # recognise none of the fixture's families, return nothing for every line, and pass by
+            # finding nothing — the empty-classification shape this kit has measured twice.
+            _g = _anchor_kit.grammar_for(bt)
+            _view_lines = [x for k, v in arts.items() if k.startswith("memory/backlog/")
+                           for x in v.split("\n")]
+            arm("no line of any rendered view ANCHORS an id", "[]",
+                lambda: str([x for x in _view_lines if _anchor_at(x, _g)]))
+            arm("the same grammar DOES anchor a bare-id first cell — the control", "EXMP-aFoo-2",
+                lambda: str(_anchor_at("| EXMP-aFoo-2 | OPEN | — | — | 2026-09-01 | x |", _g)))
+            arm("no view line opens with a list marker", "[]",
+                lambda: str([x for x in _view_lines if x.lstrip().startswith(("- ", "* "))]))
+
+        # AC3 — one recipe constant, rendered into the header with the CALLER's prefix.
+        _synth = "<!-- generated by KIT/HERE/gen_build_index.py --write — do not hand-edit -->"
+        _probe = backlog.render_family_view("EXMP", (), backlog.Fold({}, {}, {}, {}), "memory",
+                                            "KIT/HERE", _synth)
+        arm("the view header quotes the recipe constant line for line", "True",
+            lambda: str(all(("> " + line) in _probe.split("\n")
+                            for line in backlog.render_relocation_recipe("KIT/HERE", "memory"))))
+        arm("the view header spells no kit literal of its own", "False",
+            lambda: str("tools/memory-tree/" in _probe))
+        arm("an empty kit prefix REFUSES rather than rendering a command that cannot run",
+            "empty derivation", lambda: backlog.render_relocation_recipe("", "memory"))
+        arm("the view predicate's header SHAPE matches this install's own GEN_HEADER", "True",
+            lambda: str(bool(backlog.VIEW_HEADER_RE.match(GEN_HEADER))))
+
+        # AC4 and AC15 — every code `backlog.py` EXPORTS, staged one at a time. The loop iterates
+        # that tuple rather than a list typed here, so a code added there with no reporting arm
+        # reds this leg instead of disappearing from a check that still looks green.
+        def _build_code_tree(code):
+            files, cutoff = dict(CORE), "2099-01-01"
+            if code == 1:
+                files[foo_rel] = _backlog_file("aFoo", [backlog.render_ask_row(
+                    "EXMP-aBar-7", "2026-09-01", "filed in the wrong folder")])
+            elif code == 2:
+                files[foo_rel] = _backlog_file("aFoo", [ask2, "- matches no declared row shape"])
+            elif code == 3:
+                files[foo_rel] = _backlog_file("aFoo", [ask2, ask2])
+            elif code == 4:
+                files[foo_rel] = _backlog_file("aFoo", [ask2], [
+                    backlog.render_status_row("KEEP", "EXMP-aFoo-2", "one"),
+                    backlog.render_status_row("KEEP", "EXMP-aFoo-2", "and another")])
+            elif code == 5:
+                files[foo_rel] = _backlog_file("aFoo", [ask2],
+                                               ["- SPECCED · EXMP-aFoo-2 · a derived token"])
+            elif code == 6:
+                files[foo_rel] = _backlog_file("aFoo", [ask2], [backlog.render_status_row(
+                    "BLOCKED", "EXMP-aFoo-2", "on itself", value="EXMP-aFoo-2")])
+            elif code == 7:
+                files[foo_rel] = _backlog_file("aFoo", [ask2], [backlog.render_status_row(
+                    "KEEP", "EXMP-aFoo-9", "nobody filed it")])
+            elif code == 8:
+                files[foo_rel] = _backlog_file("aFoo", [ask2], [backlog.render_status_row(
+                    "CLOSED", "EXMP-aFoo-2", "by nothing", value="EXMP-aFoo-88")])
+            elif code == 9:
+                cutoff = "2026-01-01"
+                files[foo_rel] = _backlog_file(
+                    "aFoo", [backlog.render_ask_row("EXMP-aFoo-1", "2026-09-01", "a spec H1 too")],
+                    [backlog.render_sev_row("EXMP-aFoo-1", "LOW", "graded")])
+            elif code == 10:
+                files[spec_rel] = _backlog_spec("EXMP-aFoo-1", "CLOSED")
+                files[foo_rel] = _backlog_file("aFoo", [ask2])
+            elif code == 11:
+                files[foo_rel] = _backlog_file("aFoo", [ask2], [backlog.render_status_row(
+                    "REOPEN", "EXMP-aFoo-2", "of nothing that closes it", value="EXMP-aFoo-1")])
+            elif code == 12:
+                cutoff = "2026-01-01"
+                files[foo_rel] = _backlog_file("aFoo", [backlog.render_ask_row(
+                    "EXMP-aFoo-2", "2026-09-01", "no severity row anywhere")])
+            elif code == 15:
+                cutoff = ""
+            elif code == 16:
+                cutoff = "2026-9-30"
+            return files, cutoff
+
+        for _code in backlog.VERDICT_CODES:
+            _files, _cut = _build_code_tree(_code)
+            _c = _backlog_fixture(bt, _files, cutoff=_cut)
+            _rc_check, _out_check = _read_mode(cmd_check, bt, _c)
+            _rc_write, _out_write = _read_mode(cmd_write, bt, _c)
+            # THE FAILURE MESSAGE MUST NOT CONTAIN THE WANTED STRING. It did: the first spelling
+            # returned `NO ARM FOR V7 rc=1 :: ...` on a miss, which CONTAINS `V7 rc=1`, so the arm
+            # passed on the exact tree it was written to refuse. Staging the break — dropping one
+            # code from the report — is what found it, which is the whole reason the break is staged.
+            arm(f"--check reports V{_code} with its code and exits 1", f"V{_code} rc=1",
+                lambda o=_out_check, r=_rc_check, k=_code:
+                    (f"V{k} rc={r}" if f"    V{k} " in o
+                     else f"that code reached no reporting arm · exit {r} :: {o}"))
+            arm(f"--write renders every artifact over a V{_code} tree and exits 0", "rc=0",
+                lambda r=_rc_write, o=_out_write: f"rc={r}" if r == 0 else f"rc={r} :: {o}")
+            if _code in (15, 16):
+                arm(f"V{_code} names the conf key it disarms", backlog.CUTOFF_KEY,
+                    lambda o=_out_check: o)
+
+        # AC5 and AC3's second half — the data-loss guard over an APPENDED authored row.
+        _guard_conf = _backlog_fixture(bt, CORE)
+        _read_mode(cmd_write, bt, _guard_conf)
+        _vpath = os.path.join(bt, "memory", "backlog", "EXMP.md")
+        _fresh = read_text(_vpath)
+        _straggler = "- EXMP-aBar-9 · OPEN · a row a straggler merged in\n"
+        write_text(_vpath, _fresh + _straggler)
+        _rc_g, _out_g = _read_mode(cmd_write, bt, _guard_conf)
+        arm("--write refuses a view carrying an authored row and exits 1", "rc=1",
+            lambda: f"rc={_rc_g}")
+        arm("the guarded view is left BYTE-unchanged", "True",
+            lambda: str(read_text(_vpath) == _fresh + _straggler))
+        arm("every OTHER artifact is still written", "True",
+            lambda: str(os.path.isfile(os.path.join(bt, "memory", "backlog", "OTHR.md"))))
+        arm("the guard names the offending line", "EXMP-aBar-9", lambda: _out_g)
+        arm("the guard names all three recipe entry points", "True",
+            lambda: str(all(v in _out_g for v in ("--relocate", "--repair", "--ingest"))))
+        arm("the guard's message quotes the recipe constant byte for byte", "True",
+            lambda: str(all(line in _out_g for line in
+                            backlog.render_relocation_recipe(kit_rel(), "memory"))))
+        _rc_gc, _out_gc = _read_mode(cmd_check, bt, _guard_conf)
+        arm("--check names the same line", "EXMP-aBar-9", lambda: _out_gc)
+        arm("--check does NOT offer --write as the remedy for a guarded view", "False",
+            lambda: str("build-index DRIFT" in _out_gc))
+
+        # AC16 — a conflict region whose two sides are both view rows is RE-RENDERED over.
+        _rows = [x for x in _fresh.split("\n") if x.startswith("| [EXMP-")]
+        write_text(_vpath, _fresh.rstrip("\n") + "\n<<<<<<< ours\n" + _rows[0]
+                   + "\n=======\n" + _rows[1] + "\n>>>>>>> theirs\n")
+        _rc_v, _out_v = _read_mode(cmd_write, bt, _guard_conf)
+        arm("a view-against-view conflict is re-rendered over, at exit 0", "rc=0",
+            lambda: f"rc={_rc_v}" if _rc_v == 0 else f"rc={_rc_v} :: {_out_v}")
+        arm("the re-render announces itself rather than repairing in silence",
+            "re-rendered over a view conflict", lambda: _out_v)
+        arm("the re-rendered view equals a fresh render", "True",
+            lambda: str(read_text(_vpath) == _fresh))
+        write_text(_vpath, _fresh.rstrip("\n") + "\n<<<<<<< ours\n" + _rows[0]
+                   + "\n=======\n" + _straggler.rstrip("\n") + "\n>>>>>>> theirs\n")
+        _rc_m, _out_m = _read_mode(cmd_write, bt, _guard_conf)
+        arm("a conflict region holding ONE id-leading row still trips the guard", "rc=1",
+            lambda: f"rc={_rc_m}")
+        arm("that guard names the line the grammar never emits", "EXMP-aBar-9", lambda: _out_m)
+
+        # AC14 — an authored shard at a view path, carrying no generator header at all.
+        write_text(_vpath, "# memory/backlog/EXMP.md — the old authored shard\n\n"
+                           "- EXMP-aBar-9 · OPEN · a row nobody relocated\n")
+        _shard = read_text(_vpath)
+        _rc_s, _out_s = _read_mode(cmd_write, bt, _guard_conf)
+        arm("an authored shard with NO generator header still trips the guard", "rc=1",
+            lambda: f"rc={_rc_s}")
+        arm("the take-theirs shard is left byte-unchanged", "True",
+            lambda: str(read_text(_vpath) == _shard))
+        arm("the guard names the shard's id-leading line", "EXMP-aBar-9", lambda: _out_s)
+
+        # AC6 — the mode guard, from both of its sides.
+        _sh = _backlog_fixture(bt, NOHOME, mode="shards")
+        _rc_sh, _out_sh = _read_mode(cmd_check, bt, _sh)
+        arm("a tracked BACKLOG.md under shards is a mode verdict", f"V{GUARD_MODE}",
+            lambda: _out_sh)
+        arm("the mode verdict names the file", "memory/builds/aFoo/BACKLOG.md", lambda: _out_sh)
+        arm("--check exits 1 on the mode guard", "rc=1", lambda: f"rc={_rc_sh}")
+        _sh2files = {k: v for k, v in NOHOME.items() if not k.endswith("/BACKLOG.md")}
+        _sh2files[spec_rel] = _backlog_spec("EXMP-aFoo-1", tail=" · closes EXMP-aBar-5")
+        _sh2 = _backlog_fixture(bt, _sh2files, mode="shards")
+        _rc_sh2, _out_sh2 = _read_mode(cmd_check, bt, _sh2)
+        arm("a `closes` header under shards is the same half-migration, seen from the spec side",
+            f"V{GUARD_MODE}", lambda: _out_sh2)
+        arm("it names the spec that carries the verb", "2026-09-01-spec-aFoo-1.md",
+            lambda: _out_sh2)
+
+        # AC7 — the archive guard, with the innocent neighbour it must not red.
+        _a7 = dict(CORE)
+        _a7["memory/archive/EXMP.2026-01.md"] = "# a rotated family shard\n"
+        _a7["memory/archive/DECISIONS.2026-01.md"] = "# a rotated decision log\n"
+        _rc_a, _out_a = _read_mode(cmd_check, bt, _backlog_fixture(bt, _a7))
+        arm("a rotated backlog archive under builds is a verdict", f"V{GUARD_ARCHIVE}",
+            lambda: _out_a)
+        arm("the archive verdict names the file", "memory/archive/EXMP.2026-01.md",
+            lambda: _out_a)
+        arm("a rotated DECISION LOG archive raises nothing", "False",
+            lambda: str("DECISIONS.2026-01.md" in _out_a))
+
+        # AC8 — the filing home, and the refusal it must not retire for shards adopters.
+        _c8 = _backlog_fixture(bt, CORE)
+        _arts8 = plan(bt, _c8)[0]
+        arm("a filing home's asks are collected", "OTHR-aHome-1",
+            lambda: _arts8["memory/backlog/OTHR.md"])
+        arm("a filing home reaches no LIVE.md row", "False",
+            lambda: str("aHome" in _arts8["memory/LIVE.md"]))
+        arm("a filing home reaches no ledger row", "False",
+            lambda: str("aHome" in _arts8["memory/ledger/2026-09.md"]))
+        _c8s = _backlog_fixture(bt, CORE, mode="shards")
+        arm("the same folder under SHARDS still raises the no-README refusal",
+            "no tracked README.md", lambda: plan(bt, _c8s))
+
+        # AC9 — the roster scan, both modes, over one corpus.
+        _f9 = dict(NOHOME)
+        _f9["memory/backlog/EXMP.md"] = ("# the authored shard\n\n"
+                                         "- EXMP-aBar-99 · OPEN · an id only this file names\n")
+        _backlog_fixture(bt, _f9)
+        _tracked9 = [p for p in run("git", "ls-files", "--", "memory/", cwd=bt).split("\n") if p]
+        arm("the builds-mode roster scan reads no file under the backlog directory", "False",
+            lambda: str(any("EXMP-aBar-99" in v for v in
+                            rosters(bt, _tracked9, "memory", set(BL_FAMILIES),
+                                    skip_backlog=True).values())))
+        arm("the shards-mode roster scan still reads it — the control", "True",
+            lambda: str(any("EXMP-aBar-99" in v for v in
+                            rosters(bt, _tracked9, "memory", set(BL_FAMILIES)).values())))
+        _ids_b = plan(bt, _backlog_fixture(bt, NOHOME))[0]
+        _ids_s = plan(bt, _backlog_fixture(bt, NOHOME, mode="shards"))[0]
+        arm("every build README's ids: renders identically in both modes", "True",
+            lambda: str(all([x for x in _ids_b[k].split("\n") if x.startswith("ids:")]
+                            == [x for x in _ids_s[k].split("\n") if x.startswith("ids:")]
+                            for k in _ids_b if k.endswith("README.md"))))
+        arm("a shards render produces no view artifact at all", "[]",
+            lambda: str(sorted(k for k in _ids_s if k.startswith("memory/backlog/"))))
+
+        # AC10 — the liveness line, every figure of it DERIVED from the fixture.
+        _rc10, _out10 = _read_mode(cmd_check, bt, _backlog_fixture(bt, CORE))
+        arm("the backlog liveness line prints counts that match the fixture",
+            "backlog 6 ask(s) · 1 row(s) · 0 link(s) in 3 file(s) · 5 live · 0 verdict(s)",
+            lambda: _out10)
+        _rc10s, _out10s = _read_mode(cmd_check, bt, _backlog_fixture(bt, NOHOME, mode="shards"))
+        arm("a shards tree ANNOUNCES its layout instead of printing a clean zero",
+            "backlog layout is `shards`", lambda: _out10s)
+
+        # AC11 and AC17 — the print modes.
+        _c11 = _backlog_fixture(bt, CORE)
+        _rc, _so, _se = _read_asks_run(bt, _c11, ["EXMP-aFoo-3"])
+        arm("--asks <id> answers for a TERMINAL ask", "CLOSED", lambda: _so)
+        arm("--asks <id> names the evidence that decided it", "abc1234", lambda: _so)
+        arm("--asks exits 0 and its notices are on stderr", "rc=0 stderr=True",
+            lambda: f"rc={_rc} stderr={'build-index: backlog' in _se}")
+        _rc, _so, _se = _read_asks_run(bt, _c11, ["EXMP", "--all", "--json"])
+        arm("--asks --json decodes as a WHOLE, with the pinned fields", "True",
+            lambda: str(all(k in json.loads(_so)["asks"][0] for k in
+                            ("id", "home", "file", "line", "filed", "unit", "status", "decided_by",
+                             "sev", "closing", "declining", "holds", "live_specs"))))
+        arm("--asks --json carries mode and examined", "builds 3",
+            lambda: f"{json.loads(_so)['mode']} {json.loads(_so)['examined']}")
+        arm("--asks --all lists the terminal ask too", "True",
+            lambda: str(any(r["id"] == "EXMP-aFoo-3" for r in json.loads(_so)["asks"])))
+        _rc, _so, _se = _read_asks_run(bt, _c11, ["--build", "aBar"])
+        # ROWS, not cells. `count("| EXMP-")` counted the Decided-by cell as well, which made
+        # a one-row answer read as two — and would have made a two-row answer read as one.
+        def _read_row_count(text):
+            return sum(1 for x in text.split("\n") if x.startswith("| EXMP-"))
+
+        arm("--asks --build filters to one filing home", "rows=1 bar=True",
+            lambda: f"rows={_read_row_count(_so)} bar={'EXMP-aBar-5' in _so}")
+        _f11 = dict(CORE)
+        _f11[foo_rel] = _backlog_file("aFoo", [ask2, ask10], [backlog.render_status_row(
+            "BLOCKED", "EXMP-aFoo-2", "waiting on the other one", value="EXMP-aFoo-10")])
+        _c11b = _backlog_fixture(bt, _f11)
+        _rc, _so, _se = _read_asks_run(bt, _c11b, ["EXMP", "--status", "BLOCKED"])
+        arm("--status prints only the matching row, at exit 0", "rows=1 blocked=True rc=0",
+            lambda: f"rows={_read_row_count(_so)} blocked={'BLOCKED' in _so} rc={_rc}")
+        _rc, _so, _se = _read_asks_run(bt, _c11b, ["EXMP", "--status", "NOPE"])
+        arm("an unrecognised --status token refuses BY NAME on stderr and prints nothing",
+            "rc=2 out='' named=True",
+            lambda: f"rc={_rc} out='{_so}' named={'NOPE' in _se}")
+        # A verdict-carrying tree, because the mode built to EXPLAIN a verdict must run while one
+        # stands. And a refused tree, where there is no value to print at all.
+        _f17 = dict(CORE)
+        _f17[foo_rel] = _backlog_file("aFoo", [ask2, "- matches no declared row shape"])
+        _f17["memory/" + STALE_HEADER_WAIVER] = \
+            "memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n"
+        _f17["memory/builds/aBar/README.md"] = ("---\nslug: aBar\nthis line has no colon\n---\n"
+                                                "\n# aBar\n\n" + MARK_OPEN + "\n"
+                                                + MARK_CLOSE + "\n")
+        _rc, _so, _se = _read_asks_run(bt, _backlog_fixture(bt, _f17), ["EXMP", "--all", "--json"])
+        arm("a tolerated header and a fold verdict leave stdout decodable whole", "True",
+            lambda: str(isinstance(json.loads(_so), dict)))
+        arm("the tolerated-header line went to stderr, not to stdout", "True",
+            lambda: str("tolerated by waiver" in _se and "tolerated by waiver" not in _so))
+        arm("--asks exits 0 while a fold verdict stands", "rc=0", lambda: f"rc={_rc}")
+        _f17b = dict(CORE)
+        _f17b["memory/builds/aBar/README.md"] = "not front matter at all\n"
+        _rc, _so, _se = _read_asks_run(bt, _backlog_fixture(bt, _f17b), ["EXMP", "--json"])
+        arm("a collect() REFUSAL exits 1 with nothing on stdout", "rc=1 out=''",
+            lambda: f"rc={_rc} out='{_so}'")
+        arm("the refusal itself is on stderr", "no front matter", lambda: _se)
+
+        # AC12 — the excerpt key.
+        arm("BACKLOG_EXCERPT_CHARS=0 refuses by name", "BACKLOG_EXCERPT_CHARS='0'",
+            lambda: plan(bt, _backlog_fixture(bt, CORE, excerpt="0")))
+        arm("BACKLOG_EXCERPT_CHARS=abc refuses by name", "BACKLOG_EXCERPT_CHARS='abc'",
+            lambda: plan(bt, _backlog_fixture(bt, CORE, excerpt="abc")))
+        arm("a DECLARED excerpt re-cuts the summary",
+            "| a / pipe, a deep/path/to/a/file.py… |",
+            lambda: [x for x in plan(bt, _backlog_fixture(bt, CORE, excerpt="40"))[0]
+                     ["memory/backlog/EXMP.md"].split("\n") if "EXMP-aFoo-4" in x][0])
+
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
     # would be one more row in the manifest for a file this one already imports. Its arms print
@@ -2817,10 +3713,10 @@ def main(argv: list) -> int:
     if mode == "--selftest":
         return cmd_selftest()
     if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
-                    "--report", "--bump"):
+                    "--report", "--bump", "--asks"):
         print("usage: gen_build_index.py "
               "[--check|--write|--check-format|--survey|--report|--bump|"
-              "--print-bindings|--selftest]")
+              "--print-bindings|--asks|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -2830,6 +3726,17 @@ def main(argv: list) -> int:
     conf = load_conf(root)
     if mode == "--print-bindings":
         return cmd_print_bindings(root, conf)
+    # `--asks` IS DISPATCHED OUTSIDE THE HANDLER BELOW, which prints its message to stdout. That is
+    # right for every other mode and wrong for this one, whose stdout is a value a program parses:
+    # a refusal printed there is a decode error rather than a refusal. `cmd_asks` owns all of its
+    # own error paths and puts every one of them on stderr.
+    if mode == "--asks":
+        try:
+            args = read_asks_args(argv[2:])
+        except Problem as exc:
+            print(f"build-index: {exc}", file=sys.stderr)
+            return 2
+        return cmd_asks(root, conf, args)
     try:
         if mode == "--check-format":
             return cmd_check_format(root, conf)

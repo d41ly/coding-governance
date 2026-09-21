@@ -309,3 +309,13 @@ BACKLOG_MODE=""
 # an October ask would fall outside a September cutoff and the forward-only verdicts would go quiet
 # on exactly the asks they were armed for. Either verdict DISARMS them and says so.
 ASK_CUTOFF=""
+
+# BACKLOG_EXCERPT_CHARS — how many characters of an ask's text the family view's Summary column
+# carries, read ONLY while BACKLOG_MODE is `builds`. Blank or absent reads 72, which the design
+# measured the widest view row at 186 characters against the 300-character entry budget the hygiene
+# engine grades — so the default has slack and raising this key spends it.
+#
+# A NON-POSITIVE OR NON-NUMERIC VALUE REFUSES BY NAME rather than falling back. The cut applies to
+# every row in every view, so a silent fallback lands a corpus-wide re-render nobody asked for and
+# nobody can explain — and the value that caused it is still sitting in the conf looking deliberate.
+BACKLOG_EXCERPT_CHARS=""

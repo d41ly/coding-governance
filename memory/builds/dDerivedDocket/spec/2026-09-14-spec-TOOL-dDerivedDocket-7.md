@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-7 — generated family view
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 7
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-7-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-7-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
@@ -204,7 +205,12 @@ DEAD PROBE. stdout holds that object and nothing else.
 
 | Identifier | Kind | Cell |
 |---|---|---|
-| the view renderer, the view predicate and the recipe constant | functions and a constant in `backlog.py` | lexicon python function cell |
+| `render_family_view`, `check_family_view`, `render_relocation_recipe` and `RELOCATION_RECIPE` | the renderer, the predicate and the recipe constant, in `backlog.py` | lexicon python function cell; screaming snake for the constant |
+| `render_summary_cell`, `read_view_grammar_lines`, `check_view_line`, `read_excerpt_chars`, `build_ask_sort_key` | the renderer's and the guard's own parts, in `backlog.py` | lexicon python function cell |
+| `VERDICT_CODES` | the export S7 iterates, in `backlog.py` | screaming snake |
+| `derive_evidence` | the one computation behind `closing`, `declining`, `holds` and `live_specs`, in `backlog.py`, read by stratum 1 of the fold as well | lexicon python function cell |
+| `read_backlog`, `render_views`, `scan_view_guard`, `scan_mode_guard`, `scan_archive_guard`, `print_verdicts`, `cmd_asks`, `read_asks_args`, `build_ask_row`, `render_asks_table`, `render_ask_detail` | the generator's own additions | lexicon python function cell |
+| `GUARD_DATA_LOSS`, `GUARD_MODE`, `GUARD_ARCHIVE`, `GUARD_CODES`, `ASK_STATUS_TOKENS` | the three guard codes and the `--status` set, in the generator | screaming snake |
 | `--asks` and its four options | CLI mode of the generator | a flag, not a function |
 | `BACKLOG_EXCERPT_CHARS` | conf key | screaming snake |
 
@@ -431,6 +437,27 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · builds-mode fixt
   leg — the `build-index selftest` leg is held, but this unit's flag run of it stays in the pass and
   is observed there. The header date is the last-change date; the rev
   is unchanged, this being the same consolidation.
+- rev-6 · 2026-09-21 · BUILT. Four divergences, recorded here before the code was written.
+  (1) §4's Inventory widens from three names to the surface actually landed. Every addition is
+  demanded by a line rev-5 already carried and could not satisfy with three: `VERDICT_CODES` is the
+  export S7 iterates, and the parser module had none, so "every verdict code the parser unit's
+  module exports" named nothing; `derive_evidence` is the one computation behind §4's `closing`,
+  `declining`, `holds` and `live_specs`, and stratum 1 of the fold now reads it rather than
+  re-deriving two of those sets; `build_ask_sort_key` is §4's merge-stable order, made public
+  because the print modes must sort as the view does; the rest are the renderer's and the guard's
+  own parts. No scope moves: not one of them is reachable under `shards`.
+  (2) The view predicate is `check_family_view`, not the `is_family_view` `TOOL-dDerivedDocket-10`
+  §4 sketches. `.lexicon.conf` declares no `is` verb and this module's own predicates lead with
+  `check` (`check_id`, `check_cutoff_armed`). That unit consumes the name, not the sketch.
+  (3) AC11 and AC17 name `TOOL` as the fixture's family while AC11's own id argument is
+  `EXMP-aFoo-3`. The arms use `EXMP` throughout and observe exactly what those criteria state; the
+  family token was a stand-in and the fixture declares four families, two of them filled.
+  (4) AC10's second half and AC13 are observed where a pass may observe them. `--write` over this
+  repo is the pass's own mandated regeneration step: it printed the shards announcement and rewrote
+  773 artifacts while changing no tracked byte, which is AC10's shards half and AC13's dark half
+  together. AC13's `--check` over this repo is a gate leg's command run over the real tree, so it
+  defers to the `VERIFYING` bar under the build-wide rule rev-4 folded, and the acceptance ledger's
+  AC13 line names that half as owed there rather than claiming it.
 - rev-5 · 2026-09-20 · spec-audit round 3 fold. G2 M3 (3): AC11 runs the `--status` filter S12
   declares — one BLOCKED row printed from a fixture holding one BLOCKED and one OPEN ask at exit 0,
   and an unrecognised token refused by name on stderr — and its Red-when names the silent-accept

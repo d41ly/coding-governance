@@ -8,9 +8,15 @@ status drifts from the records that decide it. This module is the model that rep
 grammar for a build's own `BACKLOG.md`, the two spec-header verbs `closes` and `advances`, and an
 ORDER-FREE fold that derives every ask's status from SETS of records.
 
-THE MODULE SHIPS DARK. Nothing here reads the tree, renders a view, or is wired into a check; the
-view unit does that. `BACKLOG_MODE` defaults to `shards`, no spec header in this corpus carries
-either verb, and a header that carries neither parses byte-identically to how it parsed before.
+THE MODULE SHIPS DARK. Nothing here reads the tree, runs a command or is wired into a check.
+`BACKLOG_MODE` defaults to `shards`, no spec header in this corpus carries either verb, and a
+header that carries neither parses byte-identically to how it parsed before.
+
+THE FAMILY VIEW LIVES HERE TOO (TOOL-dDerivedDocket-7): the renderer, the predicate that
+RECOGNISES a view, and the relocation recipe every banner and message quotes. All three are
+pure text functions — the generator hands them records and hands them its own install prefix,
+and the row driver and the relocation engine read the same three rather than holding copies.
+One constant, three renderings, and no second spelling to drift.
 
 THE FILE GRAMMAR, in one place and nowhere else:
 
@@ -74,6 +80,12 @@ NON_VERBS = ("SPECCED", "INPROGRESS", "OPEN", "WITHDRAWN")
 MODES = ("shards", "builds")
 MODE_KEY = "BACKLOG_MODE"
 CUTOFF_KEY = "ASK_CUTOFF"
+# The view's summary column, in characters. A CAP and not a target: every other cell is a
+# bounded token, so this key alone decides whether a view row fits the entry budget the hygiene
+# engine grades. It is read with `read_excerpt_chars`, which REFUSES an unusable value rather
+# than falling back — a silent fallback re-cuts every summary in the tree and says nothing.
+EXCERPT_KEY = "BACKLOG_EXCERPT_CHARS"
+EXCERPT_DEFAULT = 72
 
 TERMINAL = ("CLOSED", "WONTDO")
 UNRESOLVED = "UNRESOLVED"
@@ -565,6 +577,49 @@ def _read_links(corpus: Corpus, asks: dict) -> tuple:
 
 
 # ---------------------------------------------------------------------------------------- the fold
+def derive_evidence(corpus: Corpus) -> dict:
+    """Per ask: what closes it, what declines it, what it is held on, and which live specs link it.
+
+    ONE computation with TWO readers. Stratum 1 of the fold reads `closing` and `declining` to
+    decide terminality; the view unit's `--asks --json` projection publishes all four, and the
+    switch-over's drift signals read `closing`, `declining` and `live_specs` by name. Deriving them
+    twice would be two answers to one question, and the second copy is the one that rots.
+
+    A NON-`unit` CLOSING SPEC READING WONTDO CONTRIBUTES NOTHING to `declining`. That spec was one
+    ATTEMPT at the ask; abandoning the attempt does not decline the ask, and treating it as a
+    decline is how a live ask silently disappears.
+
+    Nothing here reads a date, a file order or a row order: every value is the sorted form of a set,
+    so a permutation of the corpus returns identical bytes.
+    """
+    asks = _read_asks(corpus)
+    drows = _read_rows(corpus, "status")
+    closing_specs, advancing_specs = _read_links(corpus, asks)
+    out: dict = {}
+    for ask_id, ask in asks.items():
+        cancelled = {r.value for r in drows.get(ask_id, []) if r.verb == "REOPEN"}
+        closing = sorted(s for s in closing_specs.get(ask_id, [])
+                         if s in corpus.specs and corpus.specs[s].status == "CLOSED"
+                         and s not in cancelled)
+        closing += sorted(r.value for r in drows.get(ask_id, [])
+                          if r.verb == "CLOSED" and r.value not in cancelled)
+        declining = sorted(r.slug for r in drows.get(ask_id, [])
+                           if r.verb == "WONTDO" and r.slug not in cancelled)
+        if (ask.unit and ask_id in corpus.specs and corpus.specs[ask_id].status == "WONTDO"
+                and ask_id not in cancelled):
+            declining.append(ask_id)
+        linked = sorted(set(closing_specs.get(ask_id, [])) | set(advancing_specs.get(ask_id, [])))
+        out[ask_id] = {
+            "closing": closing,
+            "declining": declining,
+            "holds": sorted({r.value for r in drows.get(ask_id, [])
+                             if r.verb in ("BLOCKED", "DEFERRED")}),
+            "live_specs": [s for s in linked
+                           if s in corpus.specs and corpus.specs[s].status not in TERMINAL],
+        }
+    return out
+
+
 def derive_statuses(corpus: Corpus, verdicts=None) -> Fold:
     """Every ask's status, its Decided-by, and its severity — a function of SETS and nothing else.
 
@@ -582,30 +637,21 @@ def derive_statuses(corpus: Corpus, verdicts=None) -> Fold:
     drows = _read_rows(corpus, "status")
     sevrows = _read_rows(corpus, "severity")
     closing_specs, advancing_specs = _read_links(corpus, asks)
+    evidence = derive_evidence(corpus)
 
     statuses: dict = {}
     decided: dict = {}
 
-    # ---- stratum 1: terminality, reading no holds
-    for ask_id, ask in asks.items():
-        cancelled = {r.value for r in drows.get(ask_id, []) if r.verb == "REOPEN"}
-        closers = sorted(s for s in closing_specs.get(ask_id, [])
-                         if s in corpus.specs and corpus.specs[s].status == "CLOSED"
-                         and s not in cancelled)
-        closers += sorted(r.value for r in drows.get(ask_id, [])
-                          if r.verb == "CLOSED" and r.value not in cancelled)
+    # ---- stratum 1: terminality, reading no holds. The two SETS are `derive_evidence`'s, which the
+    # view unit's print modes also read. Computing them a second time here would be two answers to
+    # the one question "what closed this ask", and the copy is always the one that rots.
+    for ask_id in asks:
+        closers = evidence[ask_id]["closing"]
         if closers:
             statuses[ask_id] = "CLOSED"
             decided[ask_id] = sorted(closers)[0]
             continue
-        # A NON-`unit` CLOSING SPEC READING WONTDO CONTRIBUTES NOTHING. That spec was one ATTEMPT at
-        # the ask; abandoning the attempt does not decline the ask, and treating it as a decline is
-        # how a live ask silently disappears.
-        decliners = sorted(r.slug for r in drows.get(ask_id, [])
-                           if r.verb == "WONTDO" and r.slug not in cancelled)
-        if (ask.unit and ask_id in corpus.specs and corpus.specs[ask_id].status == "WONTDO"
-                and ask_id not in cancelled):
-            decliners.append(ask_id)
+        decliners = evidence[ask_id]["declining"]
         if decliners:
             statuses[ask_id] = "WONTDO"
             decided[ask_id] = sorted(decliners)[0]
@@ -683,6 +729,14 @@ def derive_statuses(corpus: Corpus, verdicts=None) -> Fold:
 
 
 # ------------------------------------------------------------------------------------- the verdicts
+# EVERY CODE THIS MODULE CAN PRODUCE, DECLARED AS DATA. A consumer reports verdicts by
+# ITERATING this tuple, never by retyping the list into a chain of branches: a code added below
+# with no reporting arm then reds the view unit's selftest instead of vanishing from a check
+# that looks green. V13 and V14 are the envelope unit's and are deliberately absent; the two
+# conf-reader codes are present, because `derive_verdicts` returns them with the rest.
+VERDICT_CODES = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16)
+
+
 def derive_verdicts(corpus: Corpus, conf: Conf) -> list:
     """V1 to V12, V15 and V16, as DATA. None of them raises and none of them is a status.
 
@@ -867,6 +921,200 @@ def render_sev_row(target: str, level: str, why: str) -> str:
 
 def render_relocated_row(target: str, sha: str, disposal: str, why: str) -> str:
     return f"- {PROVENANCE_VERB}{SEP}{target}{SEP}by {sha}{SEP}{disposal}: {why}"
+
+
+# ------------------------------------------------------------------------------------- the view
+# THE RECIPE, ONE CONSTANT AND THREE RENDERINGS. The view header quotes it, this unit's data-loss
+# guard prints it, the relocation engine's `--recipe` prints it, and the row driver's refusal banner
+# prints it. A reader who meets any of the four meets the same bytes, which is the whole point:
+# design layer L4 is an instruction an operator reads inside a merge conflict, and an instruction
+# that differs between the places it appears is one nobody trusts.
+#
+# THE KIT PREFIX IS A PARAMETER, never a literal. This file is COPY-INSTALLED into adopting repos at
+# whatever path they choose, so a spelled `tools/<kit>/` here lands a dead command in their tree and
+# the byte-compare that guards these artifacts happily agrees with it. The caller derives its own
+# install location and hands it in; an empty derivation REFUSES below rather than rendering
+# `python /migrate_backlog.py`.
+RELOCATION_RECIPE = (
+    "This branch predates the per-build backlog. Its edits to {m}/backlog/<F>.md must be "
+    "relocated, not merged.",
+    "  git merge <default>       # MERGE, never rebase or squash: those leave no merge to audit",
+    "  python {kit}/migrate_backlog.py --relocate --as <your-slug>",
+    "  git add {m}/ && git commit",
+    "Already landed without this? Any node:  python {kit}/migrate_backlog.py --repair <merge-sha>",
+    "A branch nobody will revisit? From the default branch:  "
+    "python {kit}/migrate_backlog.py --ingest <ref>",
+)
+
+VIEW_H1 = "# {m}/backlog/{family}.md — live asks, family {family}"
+VIEW_PROSE = (
+    "Derived, never authored. Each ask is filed once in builds/<slug>/BACKLOG.md; its status is",
+    "computed from that file, the specs that close or advance it, and disposition rows. An id NOT",
+    "listed here is terminal: `python {kit}/gen_build_index.py --asks <id>` prints what decided it.",
+    "Cite ids, never line numbers.",
+)
+VIEW_BANNER = ("> If your branch edits this file as an authored shard, it predates the per-build "
+               "backlog.")
+VIEW_COLUMNS = ("Ask", "Status", "Sev", "Decided by", "Filed", "Summary")
+VIEW_EMPTY = "*No live ask.*"
+VIEW_NONE = "—"
+
+# THE HEADER SHAPE, WITH ANY KIT PREFIX. The generator's own `GEN_HEADER` is bound to THIS install's
+# location and cannot answer "is this text a view", because the text in front of the reader may have
+# been rendered in an adopter's tree at a different prefix. So the predicate matches the SHAPE. The
+# two spellings are held together by a parity arm in the generator's selftest, which is the only
+# thing that stops this regex rotting when that constant moves.
+VIEW_HEADER_RE = re.compile(
+    r"^<!-- generated by \S+/gen_build_index\.py --write — do not hand-edit -->$")
+VIEW_H1_RE = re.compile(
+    r"^# \S+/backlog/([A-Za-z][A-Za-z0-9]*)\.md — live asks, family \1$")
+# A rendered DATA row, recognised by its LINK-WRAPPED first cell. That wrapper is what keeps the
+# table-anchor shape off the row, so the row that the anchor grammar refuses to claim is exactly the
+# row this pattern accepts — one property, asserted from both sides.
+VIEW_ROW_RE = re.compile(
+    r"^\| \[[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+\]\(\.\./builds/[A-Za-z0-9]+/BACKLOG\.md\) \|.*\|$")
+_LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+
+
+def render_relocation_recipe(kit: str, memory_root: str = "memory") -> list:
+    """The recipe's lines, with the caller's install prefix and memory root filled in.
+
+    REFUSES an empty prefix. A recipe is a command an operator will paste, and `python
+    /migrate_backlog.py` is worse than no instruction at all: it looks like one.
+    """
+    if not kit or not memory_root:
+        raise Problem("the relocation recipe needs a kit prefix and a memory root, both DERIVED by "
+                      "the caller from its own install location; an empty derivation would render "
+                      "a command that cannot run and reads as though it can")
+    return [line.format(kit=kit, m=memory_root) for line in RELOCATION_RECIPE]
+
+
+def check_family_view(text: str) -> bool:
+    """Is this text a rendered family view? Shape, not bytes, and only the first two lines.
+
+    Two lines and no more, because the row driver calls this on `%A` and `%B` mid-merge, where the
+    rest of the file may legitimately be a conflict. The header alone is not enough — every artifact
+    this generator writes carries it — so the family H1 is the second half of the test.
+    """
+    lines = text.split("\n")
+    if len(lines) < 2:
+        return False
+    if not VIEW_HEADER_RE.match(lines[0].rstrip("\r")):
+        return False
+    return bool(VIEW_H1_RE.match(lines[1].rstrip("\r")))
+
+
+def render_summary_cell(text: str, cap: int = EXCERPT_DEFAULT) -> str:
+    """One ask's TEXT as the view's last cell.
+
+    Four reductions, in this order, each for a stated reason. The pointer tail goes because the
+    view cites ids and never paths. A link is reduced to its text and a backtick is dropped so the
+    cell carries no path token the hygiene engine's path check could grade — a generated cell that
+    reds a path check is a file nobody can land. A `|` becomes `/` because it would otherwise split
+    the row into cells that are not there. And the cut is at a space, so the excerpt ends on a word.
+    """
+    body = text.split(ARROW)[0]
+    body = _LINK_RE.sub(r"\1", body).replace("`", "").replace("|", "/").strip()
+    if len(body) <= cap:
+        return body
+    cut = body[:cap]
+    space = cut.rfind(" ")
+    if space > 0:
+        cut = cut[:space]
+    return cut.rstrip() + "…"
+
+
+def build_ask_sort_key(ask: Ask):
+    """Slug, then the sequence as a NUMBER, so `-10` sorts after `-2` and a merge stays stable.
+
+    PUBLIC because the view and the print modes must agree on it: a table whose order differs from the
+    view it explains is two answers to the question "where is this ask in the list".
+    """
+    parts = ask.id.split("-")
+    slug = parts[1] if len(parts) > 2 else ""
+    seq = int(parts[2]) if len(parts) > 2 and parts[2].isdigit() else 0
+    return (slug, seq, ask.id)
+
+
+def render_family_view(family: str, asks, fold: Fold, memory_root: str, kit: str,
+                       gen_header: str, excerpt: int = EXCERPT_DEFAULT) -> str:
+    """One family's view: every LIVE ask of that family, filed once, cited by id.
+
+    `gen_header` is the generator's own first line, passed IN rather than rebuilt here: it names the
+    install prefix and there must be exactly one place that decides what it says.
+
+    NO COUNT, NO TOTAL AND NO PER-STATUS SECTION anywhere in the output (owner ruling D3). Every one
+    of those is a value two branches touching one family would both change, so every merge of them
+    would conflict on a number neither side authored — and the whole point of a generated view is
+    that a merge of it is re-rendered rather than reconciled.
+    """
+    rows = [a for a in asks
+            if a.id.split("-")[0] == family and fold.statuses.get(a.id) not in TERMINAL]
+    rows.sort(key=build_ask_sort_key)
+    out = [gen_header, VIEW_H1.format(m=memory_root, family=family), ""]
+    out += [line.format(kit=kit) for line in VIEW_PROSE]
+    out += ["", VIEW_BANNER]
+    out += ["> " + line for line in render_relocation_recipe(kit, memory_root)]
+    out.append("")
+    if rows:
+        out.append("| " + " | ".join(VIEW_COLUMNS) + " |")
+        out.append("|" + "---|" * len(VIEW_COLUMNS))
+        for ask in rows:
+            sev = fold.severities.get(ask.id, UNLABELLED)
+            out.append(
+                f"| [{ask.id}](../builds/{ask.slug}/BACKLOG.md) "
+                f"| {fold.statuses.get(ask.id, UNRESOLVED)} "
+                f"| {VIEW_NONE if sev == UNLABELLED else sev} "
+                f"| {fold.decided.get(ask.id) or VIEW_NONE} "
+                f"| {ask.filed} "
+                f"| {render_summary_cell(ask.text, excerpt)} |")
+    else:
+        out.append(VIEW_EMPTY)
+    return "\n".join(out) + "\n"
+
+
+def read_view_grammar_lines(family: str, memory_root: str, kit: str, gen_header: str) -> set:
+    """Every FIXED line the view grammar can emit, derived by rendering an empty view.
+
+    Derived rather than listed, so a header line added to the renderer cannot be missing here. The
+    two table lines are added because an empty view carries neither.
+    """
+    empty = render_family_view(family, (), Fold({}, {}, {}, {}), memory_root, kit, gen_header)
+    return set(empty.split("\n")) | {
+        "| " + " | ".join(VIEW_COLUMNS) + " |",
+        "|" + "---|" * len(VIEW_COLUMNS),
+    }
+
+
+def check_view_line(line: str, grammar_lines: set) -> bool:
+    """Could the view grammar have emitted this line? Blank, a data row, or one of the fixed lines.
+
+    WHAT THIS DOES NOT DECIDE: whether the line is CURRENT. A data row for an ask nobody files any
+    more is still a line the grammar emits, and re-rendering over it is the right answer. The
+    question here is only "is this authored content", which is what the data-loss guard asks.
+    """
+    stripped = line.rstrip("\r")
+    if not stripped.strip():
+        return True
+    if VIEW_ROW_RE.match(stripped):
+        return True
+    return stripped in grammar_lines
+
+
+def read_excerpt_chars(conf: dict) -> int:
+    """`BACKLOG_EXCERPT_CHARS`, or its default. An unusable value REFUSES and says which.
+
+    A silent fallback here re-cuts every summary in the tree on the next render and reports nothing,
+    so a typo would land as a corpus-wide diff nobody asked for and nobody can explain.
+    """
+    raw = (conf.get(EXCERPT_KEY) or "").strip()
+    if not raw:
+        return EXCERPT_DEFAULT
+    if not raw.isdigit() or int(raw) <= 0:
+        raise Problem(f"{EXCERPT_KEY}='{raw}' is not a positive whole number of characters; the "
+                      f"view's summary column is cut to it, so an unusable value would silently "
+                      f"re-cut every row rather than name itself")
+    return int(raw)
 
 
 # ---------------------------------------------------------------------------------------- selftest
