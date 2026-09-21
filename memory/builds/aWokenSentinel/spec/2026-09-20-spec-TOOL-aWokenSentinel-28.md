@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 830c46e8 · streams tooling · order 28
+**Status:** CLOSED · rev-2 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-28-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-28-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-28-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-28-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -27,10 +28,11 @@ line removed, with spec 23's near-miss beside them, and the suite arm carries al
 ## 2. Scope (IN)
 
 - **S1** — Two more staged lines in the arm spec 23 S4 adds to
-  `tools/unattended/check-unattended.test.sh`, each appended inside a function body of the suite
-  copy in turn: `_x=$(echo "$_o" | wc -l)` and `_x=$(wc -l <<< "$_o")`. For each, the copied
-  checker prints unit 23's `fail` sentence naming the copy's basename and the line, and exits 1;
-  with the line removed it prints no failure for that check. Observed by AC1.
+  `tools/unattended/check-unattended.test.sh`, each spliced inside a function body of a fresh
+  suite copy in turn, by the splice spec 23's arm uses: `_x=$(echo "$_o" | wc -l)` and
+  `_x=$(wc -l <<< "$_o")`. For each, the copied checker prints unit 23's `fail` sentence naming
+  the copy's basename and the line, and exits 1; with the line deleted from that copy it prints
+  no failure for that check. Observed by AC1.
 - **S2** — The three staged lines are assembled in the arm from fragments — the command word, the
   variable and the pipe joined at run time — so the suite's own bytes never match the predicate
   and the population exclusion spec 23 rev-2 names for this suite is belt beside braces, not the
@@ -38,8 +40,9 @@ line removed, with spec 23's near-miss beside them, and the suite arm carries al
 - **S3** — The two readings are observed RED at the pass, before the arm is committed, over the
   scratch kit dir spec 23 §4 describes, with the `echo` line and then the here-string line
   appended to the suite copy; and GREEN with each removed. Observed by AC1.
-- **S4** — `FLOOR_ASSERTIONS` at `check-unattended.test.sh:3252` and the floor of the shard the
-  arm joins rise by the two readings' executed count. Observed by AC3.
+- **S4** — `FLOOR_ASSERTIONS` (the `^FLOOR_ASSERTIONS=` line of `check-unattended.test.sh`) and
+  the floor of the shard the arm joins rise by the readings' executed count, `mutate` calls
+  included. Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -67,38 +70,50 @@ line removed, with spec 23's near-miss beside them, and the suite arm carries al
 
 ```
 # ECHO — the first group's other spelling. Assembled, so this file's own bytes are not a hit.
-_lc_cmd="ec""ho"; _lc_line="_x=\$($_lc_cmd \"\$_o\" | wc -l)"
-printf '%s\n' "$_lc_line" >> "$_lc_copy"
-hit "$(run_check)" "counts a captured variable's lines by adding a newline first"
-sed -i '$d' "$_lc_copy"
-miss "$(run_check)" "counts a captured variable's lines by adding a newline first"
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_cmd="ec""ho"; _lc_line="  _x=\$($_lc_cmd \"\$_o\" | wc -l)"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+out=$(run)
+hit "$out" "counts a captured variable's lines by adding a newline first"
+hit "$out" "hits: unattended.test.sh:$_lc_at:"
+mutate $KIT_REL/unattended.test.sh '/^check_status_one_line() {/{n;d;}'
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
 # HERE-STRING — the second top-level alternation: the variable sits AFTER wc -l, not before it.
-_lc_line="_x=\$(wc -l <<""< \"\$_o\")"
-printf '%s\n' "$_lc_line" >> "$_lc_copy"
-hit "$(run_check)" "counts a captured variable's lines by adding a newline first"
-sed -i '$d' "$_lc_copy"
-miss "$(run_check)" "counts a captured variable's lines by adding a newline first"
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_line="  _x=\$(wc -l <<""< \"\$_o\")"
+… the same six lines …
 ```
 
-`run_check` is whatever spec 23's arm names for the copied checker over the scratch kit; the
-pass reads it there and does not rename it. The split literals `"ec""ho"` and `<<""<` are joined by
-the shell at run time and never appear contiguous in this file, so unit 23's `^[^#]*` predicate
-over `check-unattended.test.sh` finds no hit here even without the population exclusion. The
-`printf '%s\n' "$_lc_line" >> file` that writes the staged line is a write to a file and not a
+The copy and the splice are spec 23's arm as it stands: the copy is `$KIT_REL/unattended.test.sh`
+(spec 23 names no `_lc_copy`), the checker runs as `run`, and the staged line goes INSIDE
+`check_status_one_line() {` by the suite's `mutate` with sed `r` over a file — the one shape that
+puts the line inside a function body, as S1 says, rather than after the suite's last line, which
+is inside no function. `_lc_at` is the opener's line number plus one, read from the copy by
+`grep -n` once, so each RED reading asserts the line the refusal names and not only the basename.
+The line is REMOVED by a second `mutate` deleting the line after the opener, so the removal is
+asserted a change by the same no-op guard the splice is, and the GREEN that follows reads the
+shipped bytes without a fresh copy — a fresh copy is spec 23's restored-copy reading and would be a
+duplicate of it. The split literals `"ec""ho"` and `<<""<` are joined by the shell at run time and
+never appear contiguous in this file, so unit 23's `^[^#]*` predicate over
+`check-unattended.test.sh` finds no hit here even without the population exclusion. The
+`printf '%s\n' "$_lc_line" > file` that writes the staged line is a write to a file and not a
 pipe into `wc -l`, and is outside the predicate.
 
 ### The near-miss stays where it is
 
 Spec 23's `_x=$(printf '%s' "$_o" | wc -l)` reading is the control for the first group; the
 here-string group's control is a here-string that is not a count, `read -r _y <<< "$_o"`, which
-the arm appends and reads GREEN once, so a `<<<` branch escaped too loosely — matching every
-here-string — is seen.
+the arm splices into a fresh copy by the same `mutate` and reads GREEN once, so a `<<<` branch
+escaped too loosely — matching every here-string — is seen.
 
 ### Inventory
 
 | identifier | kind | cell |
 |---|---|---|
-| `_lc_line`, `_lc_cmd`, `_lc_copy` | locals in one suite arm, the `_lc_` prefix unit 23's check uses | no cell; not functions |
+| `_lc_line`, `_lc_cmd`, `_lc_at` | locals in one suite arm, the `_lc_` prefix unit 23's check uses | no cell; not functions |
 
 No function, key, verb or file is minted.
 
@@ -126,8 +141,9 @@ No function, key, verb or file is minted.
 - perf / scale — two more kit-gate runs on the scratch copy per suite run and one control,
   199 s each on node `a` by the ledger spec 11 read on 2026-09-20; the suite's budget row moves if
   the first reading says so.
-- error / empty / loading states — a `sed -i '$d'` on a copy with no appended line deletes a real
-  line and the `miss` reads a different refusal; the arm appends before it deletes, in that order.
+- error / empty / loading states — a delete of the line after the opener on a copy with no
+  spliced line deletes a real line of the copy and the `miss` reads a different refusal; the arm
+  splices before it deletes, in that order, and both edits are `mutate` calls that red on a no-op.
 - observability — each `hit` prints the checker's sentence with the file and line it named.
 - risks — a fourth spelling of the same defect still passes; unit 23's header says so.
 - testing — §6; the two staged lines and the control at the pass, the arm at the close.
@@ -173,7 +189,7 @@ These run once at `--close`. The pass runs none of them: it verifies with the fi
 AC1 over the scratch kit dir and the greps of AC2 and AC3. Under `harness arms`, unit 23's `fail`
 branch was armed by its own arm; this unit adds readings and moves no branch's verdict.
 
-New arm: `tools/unattended/check-unattended.test.sh` · the `echo` and here-string staged lines in the suite copy, each RED then removed, and the non-counting here-string control · `FLOOR_ASSERTIONS` at `check-unattended.test.sh:3252` and the shard floor rise by the readings' executed count
+New arm: `tools/unattended/check-unattended.test.sh` · the `echo` and here-string staged lines in the suite copy, each RED then removed, and the non-counting here-string control · `FLOOR_ASSERTIONS` and the shard floor rise by the readings' executed count
 
 ## 8. Open questions
 
@@ -181,6 +197,15 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-21 · S1 · S4 · §4 · §5 · §7 · folded at the pass before the code, from reading
+  spec 23's arm at source: §4's sketch appended the staged line to the copy's END with `>>` and
+  deleted it with `sed -i '$d'`, which is outside every function body and disagrees with S1 and
+  AC1 ("inside a function body"); the design is now spec 23's own splice — a fresh copy, the
+  fragment file, `mutate` with sed `r` after `check_status_one_line() {` — and a second `mutate`
+  deleting the line after the opener for the GREEN, with `_lc_at` asserting the line the refusal
+  names. `run_check` is `run` and `_lc_copy` is `$KIT_REL/unattended.test.sh`, the names spec 23's
+  arm has; the `:3252` line reference for `FLOOR_ASSERTIONS` is dropped for the `^FLOOR_ASSERTIONS=`
+  anchor, since sibling units had already moved it.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 4 as the
   promotion of H6 (raw id 2): the fragment assembly and the population exclusion are spec 23's
   rev-2 fold, and the two spellings' arms are this unit.

@@ -82,12 +82,12 @@ research record under `build/`.
 | 25 | `TOOL-aWokenSentinel-25` | CLOSED | `check-arms.py` names a STRANDED prefix beside its UNARMED row, in `--report` and in `--check`'s refusal, and prints the whole signature instead of 72 characters of it, so an arm that stops short of a long message is diagnosed with its line rather than read as absent (audit round 4 H1) |
 | 26 | `TOOL-aWokenSentinel-26` | CLOSED | the marker region's accepting arm asserts its own entry state before it runs — a committed `LANDING` record, a clean tree, HEAD advertised on `origin main` — so an arm inserted above it that lands the record reds there naming the property that moved (audit round 4 H2) |
 | 27 | `TOOL-aWokenSentinel-27` | CLOSED | unit 21's leg enrolled in the three meta-gates that grade a manifest leg: the `PASS ($n assertions)` line, the `gate-legs` dossier claim with the map re-rendered, and the GENERATED `subject-pins.tsv` row (audit round 4 H3, H4, H5) |
-| 28 | `TOOL-aWokenSentinel-28` | PLANNED | the `echo` and here-string spellings unit 23's fixture does not stage get their own staged lines and RED readings in the kit gate's suite, over the same suite copy, so every top-level branch of the added-newline predicate has been seen to fail (audit round 4 H6) |
+| 28 | `TOOL-aWokenSentinel-28` | CLOSED | the `echo` and here-string spellings unit 23's fixture does not stage get their own staged lines and RED readings in the kit gate's suite, over the same suite copy, so every top-level branch of the added-newline predicate has been seen to fail (audit round 4 H6) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 28 unit(s) · node a · opened 2026-09-16 · streams tooling
+**Build status:** CLOSED · 28 unit(s) · node a · opened 2026-09-16 · streams tooling
 ids TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13
 ids TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25
 ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aWokenSentinel-29 TOOL-aWokenSentinel-30
@@ -122,10 +122,10 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-25 — `check-arms.py` names a STRANDED prefix beside its UNARMED row and prints the whole signature, so an arm that stops short of a long message is diagnosed rather than read as absent](spec/2026-09-20-spec-TOOL-aWokenSentinel-25.md) | 25 | 2 | CLOSED | rev-3 | 2026-09-21 |
 | [TOOL-aWokenSentinel-26 — the marker region's accepting arm asserts its entry state before it runs: a committed `LANDING` record, a clean tree and HEAD advertised on `origin main`](spec/2026-09-20-spec-TOOL-aWokenSentinel-26.md) | 26 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-aWokenSentinel-27 — unit 21's leg satisfies the three meta-gates that grade a manifest leg: the `PASS` count line, the `gate-legs` dossier claim with the map re-rendered, and the `subject-pins.tsv` row](spec/2026-09-20-spec-TOOL-aWokenSentinel-27.md) | 27 | 2 | CLOSED | rev-1 | 2026-09-21 |
-| [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | CLOSED | rev-2 | 2026-09-21 |
 <!-- /gen:build-units -->
 
-Records: 62 bound to this build, across 4 record folder(s).
+Records: 63 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

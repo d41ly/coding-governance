@@ -213,3 +213,7 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-21T00:34:42Z dispatch · item b7a1f062 TOOL-aWokenSentinel-27 · reason tools/workflows/unattended-build.test.sh memory/map/features/review-harnesses.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json tools/govkit/subject-pins.tsv memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-27.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-27-1-acceptance-ledger.md
 
 2026-09-21T00:34:47Z brief · item TOOL-aWokenSentinel-27 · reason 249a4610ecba memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-27-1-build-brief.md
+
+2026-09-21T00:43:49Z dispatch · item 07d595d2 TOOL-aWokenSentinel-28 · reason tools/unattended/check-unattended.test.sh memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-28-1-acceptance-ledger.md
+
+2026-09-21T00:43:55Z brief · item TOOL-aWokenSentinel-28 · reason 1c2c84db67eb memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-28-1-build-brief.md

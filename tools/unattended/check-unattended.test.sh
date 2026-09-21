@@ -1962,6 +1962,44 @@ reset_tree
 cp "$HERE/unattended.test.sh" $KIT_REL/
 miss "$(run)" "check 33"
 reset_tree
+# ---- 33, THE OTHER TWO SPELLINGS (TOOL-aWokenSentinel-28): the predicate has three branches and the
+# ---- arm above stages only `printf '%s\n'`. The `echo` spelling shares the first group and the
+# ---- here-string is a separate top-level alternation with the variable AFTER `wc -l`, so a
+# ---- mis-escaped `<<<` branch passed every reading above. Each is staged here by the same
+# ---- fragment-assembled splice, read RED naming the copy's basename AND line, then DELETED from
+# ---- that copy by a second `mutate` and read GREEN — a fresh copy would be the restored reading
+# ---- above, and would not say the red was this line. `_lc_at` is the line the splice lands on.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_at=$(( $(grep -n '^check_status_one_line() {' $KIT_REL/unattended.test.sh | cut -d: -f1) + 1 ))
+_lc_cmd="ec""ho"
+_lc_line="  _x=\$($_lc_cmd \"\$_o\" | wc -l)"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+out=$(run)
+hit "$out" "counts a captured variable's lines by adding a newline first"
+hit "$out" "hits: unattended.test.sh:$_lc_at:"
+mutate $KIT_REL/unattended.test.sh '/^check_status_one_line() {/{n;d;}'
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
+# ...the HERE-STRING, the second top-level alternation. `<<""<` joins to `<<<` at run time.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_line="  _x=\$(wc -l <<""< \"\$_o\")"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+out=$(run)
+hit "$out" "counts a captured variable's lines by adding a newline first"
+hit "$out" "hits: unattended.test.sh:$_lc_at:"
+mutate $KIT_REL/unattended.test.sh '/^check_status_one_line() {/{n;d;}'
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
+# ...and the here-string CONTROL: a here-string that is not a count. Without it the arm above is
+# equally consistent with a `<<<` branch escaped so loosely it bans every here-string in the kit.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+printf '%s\n' '  read -r _y <<< "$_o"' > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
+reset_tree
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
 # ---- README. The corpus is clean, so a check with no red fixture here proves nothing - it would be
@@ -3313,7 +3351,12 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- FLOOR_SHARD_1 is untouched. Both breach-line reads are in that unit's acceptance ledger.
 # ---- RAISED by exactly the arm, 2026-09-14, node a (closing diff review of aRatifiedRulings, finding
 # ---- 7): fixture F executes one assertion, in region two, so both floors below carry +1.
-FLOOR_ASSERTIONS=422
+FLOOR_ASSERTIONS=434
+# ---- RAISED 422 -> 434 by TOOL-aWokenSentinel-28: the check-33 readings of the `echo` and
+# ---- here-string spellings and the here-string control execute twelve assertions (five `mutate`,
+# ---- four `hit`, three `miss`, measured by running the block alone from the sourced preamble:
+# ---- n=12 st=0), all in region two beside the check-33 `printf` arms, so FLOOR_SHARD_2 carries
+# ---- the same +12 and FLOOR_SHARD_1 is untouched.
 # ---- RAISED 416 -> 422 by TOOL-aWokenSentinel-23: the three check-33 arms execute six assertions
 # ---- (two `mutate`, two `hit`, two `miss`), all in region two beside the check-32 arms, so
 # ---- FLOOR_SHARD_2 carries the same +6 and FLOOR_SHARD_1 is untouched.
@@ -3345,7 +3388,7 @@ FLOOR_ASSERTIONS=422
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=91
-FLOOR_SHARD_2=331
+FLOOR_SHARD_2=343
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
