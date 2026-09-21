@@ -955,11 +955,14 @@ def test_live_tree_dies_completely():
         print("  SKIP test_live_tree_dies_completely (no candidate answered as a POSIX shell the "
               "census can see; RAN %s)" % (", ".join(ran) or "nothing"))
         return
-    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    roots = scope.load_conf(read_root_dir())
     marker = "procmon-selftest-tree"
+    # THE ROOT TOKEN IS THE SHIPPED CONF'S FIRST ROOT, not this checkout's path: a clone of this
+    # repo anywhere else is outside the fence the conf declares, and the tree then staged under
+    # `cd <checkout>` read "not in scope" for a reaper nothing was wrong with. `:` because the
+    # directory need not exist — the token on the command line is what the fence admits.
     body = (
-        "cd '" + root_dir + "' ; "
+        ": '" + roots[0].rstrip("/") + "/" + marker + "' ; "
         "bash -c 'bash -c \"sleep 613\" & sleep 613' & "
         "python -c 'import time; time.sleep(613)' & "
         "sleep 613"
@@ -983,8 +986,7 @@ def test_live_tree_dies_completely():
                   "census, so the arm could not run — a skip here is indistinguishable from "
                   "coverage)", file=sys.stderr)
             return
-        sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
-                                   scope.build_self_chain(rows, os.getpid()))
+        sc, _ = scope.derive_scope(rows, roots, scope.build_self_chain(rows, os.getpid()))
         if target not in sc:
             FAIL.append("test_live_tree_dies_completely")
             print("  FAIL test_live_tree_dies_completely (the staged tree is not in scope; the "
