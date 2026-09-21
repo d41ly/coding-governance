@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-27 — unit 21's leg satisfies the three meta-gates that grade a manifest leg: the `PASS` count line, the `gate-legs` dossier claim with the map re-rendered, and the `subject-pins.tsv` row
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 830c46e8 · streams tooling · order 27
+**Status:** CLOSED · rev-1 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-27-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-27-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-27-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-27-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

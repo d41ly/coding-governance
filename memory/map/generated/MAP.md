@@ -111,7 +111,7 @@ Inventories: gate-legs: 107 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `tier2-review self-test` | review-harnesses |
 | `unattended kit gate` | unattended |
 | `unattended skill wiring` | unattended |
-| `unattended-build self-test` | UNCLAIMED |
+| `unattended-build self-test` | review-harnesses |
 | `verdict epoch (kit version dates the engine)` | memory-tree-hygiene |
 | `verdict-epoch self-test` | memory-tree-hygiene |
 | `verifier fan-out` | agent-cap |

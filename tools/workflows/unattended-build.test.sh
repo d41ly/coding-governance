@@ -1293,4 +1293,5 @@ FLOOR_ASSERTIONS=293
 [ "$(sed -n '/^exit \$st$/,$p' "$0" | grep -cvE '^\s*(#|$)')" = 1 ] || { echo "FAIL a line follows the terminal exit and can never run"; st=1; }
 
 echo "--- $n arms, exit $st"
+[ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit $st
