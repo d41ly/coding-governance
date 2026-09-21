@@ -2,6 +2,12 @@
 
 **Status:** SPECCED · rev-2 · 2026-09-20 · node d · Tier-2 · base fcbfba5f · streams tooling · order 4
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `memory/guides/BUILD-METHOD.md` M4 gains one sentence bounding the spec-audit PROMOTION chain by

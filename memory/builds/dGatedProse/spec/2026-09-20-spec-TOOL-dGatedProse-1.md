@@ -2,6 +2,12 @@
 
 **Status:** SPECCED · rev-2 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 1
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 A spec scope item that retires a name, a row kind or a vocabulary member must carry a `**Readers:**`

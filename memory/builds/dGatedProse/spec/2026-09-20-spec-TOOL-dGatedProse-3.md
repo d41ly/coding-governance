@@ -2,6 +2,12 @@
 
 **Status:** SPECCED · rev-2 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 3
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Raise both declared guide-size caps together so the class has real headroom again, delete the debt row

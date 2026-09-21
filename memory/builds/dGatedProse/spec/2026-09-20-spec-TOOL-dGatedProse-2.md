@@ -2,6 +2,12 @@
 
 **Status:** SPECCED · rev-2 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 2
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 A spec sentence saying a codebase-map dossier claims a Python symbol, a path or a glob books a grader
