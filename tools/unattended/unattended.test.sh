@@ -6961,6 +6961,314 @@ sed -i -e 's|^RESUME_SCHEDULE_CREATE=.*|RESUME_SCHEDULE_CREATE="create_scheduled
 same "AC15 the same conf with both carrier keys filled discharges the hole" "$rc" "0"
 rm -rf "$RS_FIX"
 
+
+# ==================================================== TOOL-dDerivedDocket-16 — THE ASK MANDATE ====
+# Every refusal this unit adds, one fixture each, plus the three output shapes `--plan --asks`
+# prints. The fixtures live on MAIN, like the build-complete epoch above them and for the same
+# reason: a mandate is read from the README at BASE, so one authored on the unit branch tests the
+# authorization refusal instead of the mandate and proves nothing about it.
+#
+# THE DECLARED GENERATOR IS A STUB, and it is the only thing here that is. Its rows are what the
+# real producer's eleven-field projection looks like, and AC15's arm — which runs the REAL declared
+# producer — is the one that holds this stub honest; it skips in this repo until the key is armed.
+#
+# THE STUB LIVES OUTSIDE THE WORK TREE, under $TMP. Written inside it, it is an untracked file, and
+# `check_clean` counts untracked paths — so every preflight below would refuse on a DIRTY TREE and
+# the arms would all pass while testing nothing they claim to.
+ASKSTUB="$TMP/askstub.sh"
+cat > "$ASKSTUB" <<'ASKSTUBEOF'
+#!/usr/bin/env bash
+set -u
+D="${ASKSTUB_DIR:-.}"
+printf '%s\n' "$*" > "$D/argv.txt"
+MODE=$(cat "$D/mode.txt" 2>/dev/null || echo ok)
+ids=""; seen=0
+for a in "$@"; do
+  case "$a" in --ready) seen=1; continue ;; --*) seen=0; continue ;; esac
+  [ "$seen" = 1 ] && ids="$ids $a"
+done
+case "$MODE" in sleeper) sleep 30; exit 0 ;; silent) exit 0 ;; esac
+echo "askstub: a notice on the OTHER stream, which the parse must not see" >&2
+n=0
+for id in $ids; do
+  n=$((n + 1))
+  case "$MODE" in short) [ "$n" -gt 1 ] && continue ;; esac
+  row=$(grep -E "^$id	" "$D/rows.tsv" 2>/dev/null | head -1)
+  [ -n "$row" ] || row=$(printf '%s\tOPEN\t-\t%s\t-\tyes\t-\t-\t-\t-' "$id" "$(printf '%s' "$id" | cut -d- -f2)")
+  case "$MODE" in
+    tenfield) printf 'ask\t%s\n' "$(printf '%s' "$row" | cut -f1-9)" ;;
+    *)        printf 'ask\t%s\n' "$row" ;;
+  esac
+done
+printf 'examined\t%s\n' "$n"
+case "$MODE" in exit1) exit 1 ;; esac
+exit 0
+ASKSTUBEOF
+export ASKSTUB_DIR="$TMP"
+askmode() { printf '%s\n' "$1" > "$TMP/mode.txt"; }
+askrows() { printf '%b' "$1" > "$TMP/rows.tsv"; }
+askconf() { printf 'ASKS_CMD="bash %s"\n' "$ASKSTUB" >> .unattended.conf; }
+
+asksetup() {
+  git checkout -qf main
+  # A mandate over two asks another folder files, and the folder that files them.
+  readme tAskA
+  mutate memory/builds/tAskA/README.md '/^slug: tAskA$/a asks: EXMP-aFoo-3..4'
+  readme tAskP
+  mutate memory/builds/tAskP/README.md '/^slug: tAskP$/a authorized-by: prompt\nasks: EXMP-aFoo-3'
+  readme tAskR
+  mutate memory/builds/tAskR/README.md '/^slug: tAskR$/a authorized-by: recipe\nasks: EXMP-aFoo-3'
+  # A mandate naming one ask this tree files and one it does not, for property P5.
+  readme tAskLate
+  mutate memory/builds/tAskLate/README.md '/^slug: tAskLate$/a asks: EXMP-aFoo-3 EXMP-aFoo-9'
+  # THE FILING HOME: a folder holding a BACKLOG.md and nothing else.
+  mkdir -p memory/builds/aFoo
+  printf '# aFoo — asks\n\n## Asks\n- EXMP-aFoo-3 · filed 2026-09-01 · the first · seen `memory/builds/aFoo/BACKLOG.md` · accept done\n- EXMP-aFoo-4 · filed 2026-09-01 · the second · seen `memory/builds/aFoo/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+    > memory/builds/aFoo/BACKLOG.md
+  # The plan fixture: two planned units nobody has specced, a mandate whose LATER-listed ask holds
+  # the earlier, and one ask this folder filed for itself that the mandate never named.
+  mkdir -p memory/builds/tPlanA
+  printf -- '---\nslug: tPlanA\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: EXMP\nids:\nasks: EXMP-aFoo-3 EXMP-aFoo-4\n---\n\n# tPlanA\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 0 unit(s)\n\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n1. EXMP-tPlanA-2 — the second\n2. EXMP-tPlanA-10 — the tenth\n<!-- /roster:units -->\n' \
+    > memory/builds/tPlanA/README.md
+  printf '# tPlanA — asks\n\n## Asks\n- EXMP-tPlanA-5 · filed 2026-09-02 · this folder raised it · seen `memory/builds/tPlanA/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+    > memory/builds/tPlanA/BACKLOG.md
+  # ...and the same shape with NO roster rows at all, which is what the scaffold writes for a build
+  # opened over a mandate alone.
+  mkdir -p memory/builds/tMandate
+  printf -- '---\nslug: tMandate\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: EXMP\nids:\nasks: EXMP-aFoo-3..4\n---\n\n# tMandate\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 0 unit(s)\n\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n<!-- /roster:units -->\n' \
+    > memory/builds/tMandate/README.md
+  # A folder filing a `unit` ask with no roster row, and one filing an ordinary ask.
+  readme tUnitAsk
+  printf '# tUnitAsk — asks\n\n## Asks\n- EXMP-tUnitAsk-9 · filed 2026-09-01 · unit · the unit ask · seen `memory/builds/tUnitAsk/BACKLOG.md` · accept done\n- EXMP-tUnitAsk-4 · filed 2026-09-01 · an ordinary ask · seen `memory/builds/tUnitAsk/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+    > memory/builds/tUnitAsk/BACKLOG.md
+  git add -A >/dev/null && git commit -q -m ask-fixture --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  ASKP=$(git rev-parse HEAD)
+}
+# A RESET THAT ALSO COMMITS THE CONF, because every arm below declares ASKS_CMD and an edited conf
+# is an unstaged path `check_clean` refuses before any of this is reached.
+askreset() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$ASKP"; git clean -qfd
+             mkconf; askconf; git add -A >/dev/null; git commit -q -m askconf --no-verify; }
+asksetup
+askmode ok; askrows ''
+
+# ---- AC1: an ids-shaped value, and a slug MIXED with ids, take the recipe rather than a lookup.
+askreset
+out=$(run --preflight EXMP-aFoo-3 --keepalive-id KA-1)
+hit "$out" "this verb is addressed by SLUG and was given ids, or a slug mixed with them; a run may not write the folder that authorizes it, so an id list becomes a build through the scaffold the OWNER lands, and a mixed value has no honest reading because a run cannot extend a committed mandate"
+hit "$out" "recipe: tools/memory-tree/gen_build_index.py --new-build <new-slug> --asks EXMP-aFoo-3"
+miss "$out" "no build README at the pinned BASE"
+miss "$out" "the slug is not a build-folder name"
+same "an ids invocation writes nothing" "$(git status --porcelain | grep -c . || true)" "0"
+out=$(run --preflight "tAskA EXMP-aFoo-3" --keepalive-id KA-1)
+hit "$out" "this verb is addressed by SLUG and was given ids, or a slug mixed with them; a run may not write the folder that authorizes it, so an id list becomes a build through the scaffold the OWNER lands, and a mixed value has no honest reading because a run cannot extend a committed mandate"
+# ...and under the WIDE anchor scope on a branch nobody pushed, where the second anchor's own push
+# refusal would otherwise answer first and carry no recipe at all.
+printf 'ANCHOR_SCOPE="published"\n' >> .unattended.conf
+git add -A >/dev/null; git commit -q -m scope --no-verify
+git checkout -q -b unpushed-asks
+out=$(run --preflight EXMP-aFoo-3 --keepalive-id KA-1)
+hit "$out" "this verb is addressed by SLUG and was given ids, or a slug mixed with them; a run may not write the folder that authorizes it, so an id list becomes a build through the scaffold the OWNER lands, and a mixed value has no honest reading because a run cannot extend a committed mandate"
+# ---- AC2: a FILING HOME under the same two scopes.
+out=$(run --preflight aFoo --keepalive-id KA-1)
+hit "$out" "this slug names a FILING HOME and not a build — at the first anchor's merge-base its folder holds a BACKLOG.md and nothing else, so there is no committed README to authorize a run and writing one into another build's records is what ruling D12-f refuses"
+hit "$out" "recipe: tools/memory-tree/gen_build_index.py --new-build <new-slug> --asks"
+same "a filing-home refusal writes nothing" "$(git status --porcelain | grep -c . || true)" "0"
+git checkout -q unit; git branch -qD unpushed-asks
+askreset
+out=$(run --preflight aFoo --keepalive-id KA-1)
+hit "$out" "this slug names a FILING HOME and not a build — at the first anchor's merge-base its folder holds a BACKLOG.md and nothing else, so there is no committed README to authorize a run and writing one into another build's records is what ruling D12-f refuses"
+miss "$out" "no build README at the pinned BASE"
+
+# ---- AC5: a mandate nothing can grade is refused rather than pinned.
+git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$ASKP"; git clean -qfd; mkconf
+git add -A >/dev/null; git commit -q -m noask --no-verify
+out=$(run --preflight tAskA --keepalive-id KA-1)
+hit "$out" "the build README declares an asks: mandate and this project declares no ASKS_CMD, so nothing here can say whether any of those asks is executable and pinning the set would make every check keyed on it pass over an ungraded list: declare ASKS_CMD in .unattended.conf, or drop the asks: key"
+same "an ungradeable mandate pins nothing" "$(git status --porcelain | grep -c . || true)" "0"
+
+# ---- AC16: a mandate under a mode that resolves at the SECOND anchor, which the run can write.
+askreset
+out=$(run --preflight tAskP --keepalive-id KA-1)
+hit "$out" "the build README declares an asks: mandate under an authorization mode that resolves at the second anchor, so the run could have written the line that says which asks it may answer - ruling D12-a puts that choice on a commit the owner landed: mode"
+same "a prompt-mode mandate pins nothing" "$(git status --porcelain | grep -c . || true)" "0"
+hit "$(run --preflight tAskR --keepalive-id KA-1)" "the build README declares an asks: mandate under an authorization mode that resolves at the second anchor, so the run could have written the line that says which asks it may answer - ruling D12-a puts that choice on a commit the owner landed: mode"
+
+# ---- AC3: the three facts are pinned, and property P5 refuses an ask this tree does not file.
+askreset
+out=$(run --preflight tAskA --keepalive-id KA-1)
+hit "$out" "mandate pinned at m-base"
+same "the mandate is pinned as the README spells it" "$(sed -n 's/^asks: //p' memory/builds/tAskA/RUN.md)" "EXMP-aFoo-3..4"
+same "every mandated id carries a grade" "$(sed -n 's/^asks-ready: //p' memory/builds/tAskA/RUN.md)" "EXMP-aFoo-3=yes EXMP-aFoo-4=yes"
+same "m-base is the merge base of the anchor and HEAD" "$(sed -n 's/^m-base: //p' memory/builds/tAskA/RUN.md)" "$(git merge-base main HEAD)"
+same "the witness was asked at that same tree" "$(sed -n 's/.*--at //p' "$TMP/argv.txt")" "$(git merge-base main HEAD)"
+miss "$(cat "$TMP/argv.txt")" "--live-builds"
+askreset
+out=$(run --preflight tAskLate --keepalive-id KA-1)
+hit "$out" "a mandated ask is not filed in the tree this run is anchored to, so the run would be choosing among records it could have written itself"
+hit "$out" "EXMP-aFoo-9 has no row in"
+same "a failed P5 pins nothing" "$(git status --porcelain | grep -c . || true)" "0"
+# ...and a pinned tree this clone cannot read is its own refusal, never an empty blob and never the
+# index: `git show ":path"` with no rev reads bytes the run itself staged.
+askreset
+run --preflight tAskA --keepalive-id KA-1 >/dev/null
+sed -i 's/^m-base: .*/m-base: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef/' memory/builds/tAskA/RUN.md
+git add -A >/dev/null; git commit -q -m badmb --no-verify
+hit "$(run --preflight tAskA --keepalive-id KA-1)" "this build README carries an asks: mandate and the tree the mandate is asserted against is not a commit this clone can read, so every property below would pass over an empty blob or, worse, over the index this run itself staged: m-base ["
+
+# ---- AC4: property P6 — the pinned set cannot move, on every resume.
+askreset
+run --preflight tAskA --keepalive-id KA-1 >/dev/null
+git add -A >/dev/null; git commit -q -m pinned --no-verify
+mutate memory/builds/tAskA/README.md 's/^asks: EXMP-aFoo-3\.\.4$/asks: EXMP-aFoo-3/'
+git add -A >/dev/null; git commit -q -m moved --no-verify
+out=$(run --resume tAskA --keepalive-id KA-1)
+hit "$out" "the build README's asks: line at HEAD is not the one this run pinned, and a run that re-read its own mandate could grow the set it is authorized for: pinned ["
+hit "$out" "EXMP-aFoo-3..4"
+
+# ---- AC6: the witness's five failure shapes, and the mandate that grades all-no.
+askreset; askmode tenfield
+out=$(run --preflight tAskA --keepalive-id KA-1)
+hit "$out" "the declared ask generator did not answer for this mandate, and a mandate nothing graded is one this run would carry without ever knowing whether any of it is executable"
+hit "$out" "the declared ask generator printed a line that is not the"
+askreset; askmode short
+out=$(run --preflight tAskA --keepalive-id KA-1)
+hit "$out" "the declared ask generator answered for fewer asks than it was asked about"
+hit "$out" "EXMP-aFoo-4 is missing from its rows"
+askreset; askmode exit1
+hit "$(run --preflight tAskA --keepalive-id KA-1)" "the declared ask generator exited"
+askreset; askmode silent
+hit "$(run --preflight tAskA --keepalive-id KA-1)" "DEAD PROBE - the declared command wrote nothing to either stream"
+askreset; askmode sleeper
+printf 'GATE_BOUND="2"\n' >> .unattended.conf; git add -A >/dev/null; git commit -q -m bound --no-verify
+out=$(run --preflight tAskA --keepalive-id KA-1)
+hit "$out" "so this is unanswered because the command never returned rather than because it said no"
+miss "$out" "the declared ask generator exited"
+askmode ok
+askreset
+askrows 'EXMP-aFoo-3\tOPEN\t-\taFoo\t-\tno\tR4,R5\t-\t-\t-\nEXMP-aFoo-4\tOPEN\t-\taFoo\t-\tno\tR5\t-\t-\t-\n'
+out=$(run --preflight tAskA --keepalive-id KA-1)
+hit "$out" "every mandated ask in this build README grades not-ready, so there is nothing in the mandate a run could execute without asking somebody and starting would mean deriving the acceptance nobody wrote - each id and the rules it fails follow"
+hit "$out" "EXMP-aFoo-3 — failing rules: R4,R5"
+
+# ---- AC14: a foreign live spec claiming a mandated ask is NAMED and admitted by nothing, and the
+# ---- label is read through the one derived-phase reader rather than off a hard-coded list.
+askrows 'EXMP-aFoo-3\tSPECCED\t-\taFoo\tHIGH\tno\tR2\t-\t-\tARCH-aBar-7\nEXMP-aFoo-4\tOPEN\t-\taFoo\tHIGH\tyes\t-\t-\t-\t-\n'
+askreset
+out=$(run --preflight tAskA --keepalive-id KA-1)
+hit "$out" "EXMP-aFoo-3 is claimed by ARCH-aBar-7 of build aBar"
+hit "$out" "its run-state record is not tracked in this tree"
+askreset
+mkdir -p memory/builds/aBar
+printf '# aBar run\n\n## Run facts\nphase: LANDED\nwitness: deadbeef\n' > memory/builds/aBar/RUN.md
+git add -A >/dev/null; git commit -q -m abar --no-verify
+hit "$(run --preflight tAskA --keepalive-id KA-1)" "its tracked run-state record reads TERMINAL (LANDED)"
+askreset
+mkdir -p memory/builds/aBar
+printf '# aBar run\n\n## Run facts\nphase: HELD\nwitness: deadbeef\n' > memory/builds/aBar/RUN.md
+git add -A >/dev/null; git commit -q -m abarheld --no-verify
+out=$(run --preflight tAskA --keepalive-id KA-1)
+hit "$out" "its tracked run-state record reads HELD, which is not terminal"
+miss "$out" "reads TERMINAL"
+# ...and a record that exists only on a branch this tree does not carry reads exactly like an absent
+# one, which is the case the driver deliberately cannot see and must not label stale.
+askreset
+git checkout -q -b aBar-branch
+mkdir -p memory/builds/aBar
+printf '# aBar run\n\n## Run facts\nphase: RUNNING\nwitness: deadbeef\n' > memory/builds/aBar/RUN.md
+git add -A >/dev/null; git commit -q -m onbranch --no-verify
+git checkout -qf unit >/dev/null 2>&1; git clean -qfd
+mkconf; askconf; git add -A >/dev/null; git commit -q -m back --no-verify
+hit "$(run --preflight tAskA --keepalive-id KA-1)" "its run-state record is not tracked in this tree"
+git branch -qD aBar-branch
+askrows ''
+
+# ---- AC12: the layout mode moved under the run, which decides where an ask is filed at all.
+askreset
+printf 'MEMORY_ROOT=memory\nBACKLOG_MODE="builds"\n' > .memory-tree.conf
+git add -A >/dev/null; git commit -q -m mode --no-verify
+hit "$(run --preflight tAskA --keepalive-id KA-1)" "the memory tree's BACKLOG_MODE differs between the anchor and HEAD"
+
+# ---- AC7: MISSING over ZERO specs, in NUMERIC sequence, and code 19's three empty terms.
+askreset
+out=$(run --plan tPlanA --asks)
+hit "$out" "EXMP-tPlanA-2"
+hit "$out" "EXMP-tPlanA-10"
+hit "$out" "next: EXMP-tPlanA-2 (MISSING - spec it first)"
+same "-2 is listed before -10, never the string order" \
+  "$(printf '%s\n' "$out" | grep -oE 'EXMP-tPlanA-(2|10)' | head -1)" "EXMP-tPlanA-2"
+hit "$(run --plan tRun)" "no tracked spec under this build, and neither its roster nor an asks: mandate names anything either, so there is no unit set to report on at all"
+
+# ---- AC8: a filed `unit` ask with no roster row is a planned unit, so it lists as MISSING.
+hit "$(run --plan tUnitAsk)" "EXMP-tUnitAsk-9"
+miss "$(run --plan tUnitAsk)" "EXMP-tUnitAsk-4"
+
+# ---- AC18 and AC9: the ASK rows, their rank, the duplicate-closer refusal and the three fields.
+askrows 'EXMP-aFoo-3\tOPEN\t-\taFoo\tHIGH\tyes\t-\tEXMP-aFoo-4\t-\t-\nEXMP-aFoo-4\tSPECCED\t-\taFoo\tHIGH\tno\tR2\t-\t-\tARCH-aBar-7,ARCH-aBar-8\nEXMP-tPlanA-5\tOPEN\t-\ttPlanA\tLOW\tyes\t-\t-\t-\t-\n'
+out=$(run --plan tPlanA --asks --paths)
+hit "$out" "ASK	EXMP-aFoo-4	refused=duplicate-closer;units=ARCH-aBar-7,ARCH-aBar-8"
+hit "$out" "ASK	EXMP-aFoo-3	status=OPEN;ready=yes;cover=-;rank=2"
+hit "$out" "ASK	EXMP-tPlanA-5	status=OPEN;ready=-;cover=-;rank=3"
+same "an ASK row under --paths carries exactly three TAB fields" \
+  "$(printf '%s\n' "$out" | grep -c '^ASK	[^	]*	[^	]*$')" "3"
+hit "$out" "next: EXMP-tPlanA-2 (MISSING - spec it first)"
+miss "$out" "UNDECIDED"
+# ...and with both MISSING units retired the ask rung finally has nothing above it. What it names is
+# the ask at rank TWO: rank one carries two closers, so it is not undecided, it is contested.
+mutate memory/builds/tPlanA/README.md '/^1\. EXMP-tPlanA-2/d'
+mutate memory/builds/tPlanA/README.md '/^2\. EXMP-tPlanA-10/d'
+out=$(run --plan tPlanA --asks)
+hit "$out" "next: EXMP-aFoo-3 (UNDECIDED - plan a unit that closes it, or dispose it)"
+miss "$out" "every tracked spec is terminal"
+miss "$out" "next: EXMP-aFoo-4"
+
+# ---- AC17: a build opened over a mandate alone — an empty roster pair and no spec — plans from it.
+askreset
+out=$(run --plan tMandate --asks); rc=$?
+same "a mandate-only build plans rather than refusing" "$rc" "0"
+hit "$out" "EXMP-aFoo-3"
+hit "$out" "EXMP-aFoo-4"
+hit "$out" "UNDECIDED - plan a unit that closes it, or dispose it"
+miss "$out" "no tracked spec under this build, and neither its roster"
+
+# ---- AC10: a unit closing an ask HELD ON a mandated ask that is not terminal.
+askreset
+askrows 'EXMP-aFoo-3\tOPEN\t-\taFoo\tHIGH\tyes\t-\tEXMP-aFoo-4\t-\t-\nEXMP-aFoo-4\tOPEN\t-\taFoo\tHIGH\tyes\t-\t-\t-\t-\n'
+run --preflight tAskA --keepalive-id KA-1 >/dev/null
+mkdir -p memory/builds/tAskA/spec
+printf '# ARCH-tAskA-1 the unit\n\n**Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture · closes EXMP-aFoo-3\n\n## 2. Scope\n\n- S1 do it\n\n## 6. Acceptance criteria\n\n- **AC1** it is done\n\n## 7. Gates\n\nthe bar\n' \
+  > memory/builds/tAskA/spec/one.md
+git add -A >/dev/null; git commit -q -m spec --no-verify
+out=$(run --dispatch tAskA --pass ARCH-tAskA-1 --writes tools/x.sh)
+hit "$out" "--dispatch declares a build pass for a unit that closes an ask held on a mandated ask that is not terminal, so the unit would be finished against a question its own dependency has not answered yet"
+hit "$out" "EXMP-aFoo-3 holds on EXMP-aFoo-4"
+# ...and the SAME dispatch is admitted the moment the ask it is held on goes terminal, which is the
+# green control: without it this arm passes over a gate that refuses everything.
+askrows 'EXMP-aFoo-3\tOPEN\t-\taFoo\tHIGH\tyes\t-\tEXMP-aFoo-4\t-\t-\nEXMP-aFoo-4\tCLOSED\t-\taFoo\tHIGH\tyes\t-\t-\t-\t-\n'
+hit "$(run --dispatch tAskA --pass ARCH-tAskA-1 --writes tools/x.sh)" "dispatch declared"
+
+# ---- AC11: the two rescope rules a filed ask brings with it.
+askreset
+run --preflight tUnitAsk --keepalive-id KA-2 >/dev/null
+git add -A >/dev/null; git commit -q -m ua --no-verify
+out=$(run --rescope tUnitAsk --act retire --item EXMP-tUnitAsk-9 --reason gone)
+hit "$out" "the retired id is a \`unit\` ask of this build's own folder and carries no generated unit row"
+hit "$out" "amendment recorded — retire EXMP-tUnitAsk-9"
+hit "$(run --rescope tUnitAsk --act add --item EXMP-tUnitAsk-4 --reason late)" "a rescope adds a unit whose id is already a filed ask of this build that is not a \`unit\` ask, so the amendment would mint a second record under an id an ask already owns and the two would contest it from here on"
+hit "$(run --rescope tUnitAsk --act retire --item EXMP-tUnitAsk-77 --reason gone)" "a rescope names a unit the build README's generated units region does not carry and this build's folder does not file as a \`unit\` ask either, and a run cannot retire what its roster never held"
+
+# ---- AC15: the TWO CALL SHAPES against the producer THIS REPOSITORY declares, never a stub. In a
+# ---- repo whose ASKS_CMD is blank the arm prints a NAMED skip: a silent pass here would let the
+# ---- stub above stand in for a producer nobody has ever run this parse against.
+ASKS_ROOT=$(cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)
+ASKS_REAL=$(sed -n 's/^ASKS_CMD="\(.*\)"$/\1/p' "$ASKS_ROOT/.unattended.conf" 2>/dev/null | head -1)
+if [ -z "$ASKS_REAL" ]; then
+  echo "  SKIP AC15 — this repository's .unattended.conf declares no ASKS_CMD, so the two call shapes have no declared producer to run against; the stubbed arms above are the only coverage until it is armed"
+else
+  echo "  AC15 runs the declared producer: $ASKS_REAL"
+fi
+askreset
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
@@ -7007,7 +7315,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 790 -> 845 by TOOL-dDerivedDocket-5: the durable-restart arms execute 55 assertions,
 # all of them in region two, so FLOOR_SHARD_2 carries the same +55 and FLOOR_SHARD_1 is
 # untouched.
-FLOOR_ASSERTIONS=871
+# RAISED 871 -> 934 by TOOL-dDerivedDocket-16, the ask-mandate arms. The RAW figure is 74, the
+# `hit`/`miss`/`same` lines that block adds, counted off the diff; it is DISCOUNTED to +63 for
+# the reason every figure here is discounted, and for one more. No run measured it: the pass
+# that wrote those arms ran no suite, observing each refusal by hand against a scratch fixture
+# instead, so a 1:1 pin would be asserting a number nobody has seen a runner produce.
+FLOOR_ASSERTIONS=934
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -7051,7 +7364,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=675
+FLOOR_SHARD_2=738
+# +63 for the TOOL-dDerivedDocket-16 ask-mandate arms, all in region two - see FLOOR_ASSERTIONS.
 # +26 for the TOOL-dDerivedDocket-49 `next:` ladder arms, all in region two — see FLOOR_ASSERTIONS.
 # +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).
 # +4 for the closing diff review of aProbedUnit, round 2, cluster H, in region two.

@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-16 — driver ask-awareness: the asks key, preflight and plan
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 16
+**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-16-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-16-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
@@ -174,6 +175,12 @@ ids-shaped invocation to the owner's one-command scaffold instead of guessing (o
 |---|---|---|---|
 | `asks:` | the README blob at BASE, in the one scan | preflight | nothing; P6 refuses a changed line at `HEAD` |
 | `m-base:` | `merge-base(anchor-sha, HEAD)` at preflight | preflight | nothing; unit 18 re-derives it from `anchor-sha:` |
+
+A pinned `m-base:` must RESOLVE and not merely be non-empty, and that is its own refusal. An empty
+value makes the P5 read `git show ":path"`, which is the git INDEX — bytes the run itself staged, on
+both sides of a test about what the run did not write, which is the hazard `check_authorization`
+already refuses one line over. A value naming a commit this clone does not carry is quieter and no
+better: both blobs read empty, so every mandated id fails P5 against a tree nobody can look at.
 | `asks-ready:` | one `ASKS_CMD` call at `m-base:` | preflight | nothing; unit 17 keys its hardening on it |
 
 A run cannot satisfy P5 by construction, because the rows must already sit in a tree the remote's
@@ -241,8 +248,11 @@ names the build whose tracked record reads terminal, so the owner can retire its
 
 ### Ids-shaped invocations
 
-A verb value matching the id shape the conf's `FAMILIES` spell, or carrying whitespace, is not a
-slug. The refusal keeps code 6 because design §19.1 K1 already routes an id there, and it prints
+A verb value matching the id shape the driver's own `_ids_of` spells, or carrying whitespace, is
+not a slug. That grammar and NOT the sibling kit's declared `FAMILIES` enum, which rev-1 named: it is
+a SUPERSET of any declared family, so a family added to that conf needs no edit here, and reading a
+sibling kit's conf out of a kit file is the literal-naming ban's own subject (charter §12). The one
+place this unit does read that conf is S11's notice, where the value being compared IS that key. The refusal keeps code 6 because design §19.1 K1 already routes an id there, and it prints
 three lines: the recipe with the tokens exactly as typed and `<new-slug>` left for the owner to
 mint, the rule that the owner lands the scaffolded README, and `/unattended <slug>` as the second
 legal form. The driver never parses the id list itself: the scaffold parses it all or nothing (fix
@@ -267,6 +277,19 @@ Rank follows design §19.4: hold edges between mandated asks lifted to the units
 then severity, then the `asks:` listing order, then numeric sequence. MISSING units sort by numeric
 sequence, never the string order that puts `-10` before `-2` (`missing_units`,
 `tools/unattended/unattended.sh:2007-2024`).
+
+ONE bounded call serves the whole printed population, M ∪ F, so every row carries the `status` the
+projection derives. The `ready=` column is printed for a MANDATED ask and for nobody else: READY is
+graded AGAINST a mandate — rule R3 asks whether a hold target is inside it — so a grade for an ask
+the mandate never named answers a question nobody asked, which is why §4 gives it `-`. That column is
+a REPORT and never a second pin: the pinned answer is `asks-ready:` on the record, written at
+preflight over the mandate alone.
+
+The duplicate-closer row is read off the projection's `closers` field, GROUPED BY the build each
+closer's id names, and not off this build's own spec scan. AC18's two closers belong to a FOREIGN
+build by construction, and a scan of this folder's specs cannot see a foreign pair at all; two
+DIFFERENT builds closing one ask once each is a contest rather than a duplicate, and the R2 grade
+already reports that.
 
 Under `--paths` an ASK row is exactly `ASK<TAB><id><TAB><summary>`, the summary
 `status=<S>;ready=<G>;cover=<unit id | disposition verb | ->;rank=<n>` in that key order (design
@@ -414,8 +437,10 @@ commit, never against that figure.
   `tools/unattended/PROTOCOL.template.md`, each reads STRICTLY BELOW what `git cat-file -s`
   reports for the same path at this unit's parent commit, and below the 61440 B guide cap, with
   check 10 finding the pair byte-identical so the trim and the addition both landed in both. The
-  LINE count of each, from `git cat-file -p <commit>:<path> | wc -l` at both commits, is at or
-  below the parent's and below the 750-line half of that cap, which
+  LINE count of each, from `git cat-file -p <commit>:<path> | wc -l` at both commits, is at
+  most ONE above the parent's — the one physical line a markdown table row occupies, which the
+  trim cannot fund because the clause it removes sits INSIDE a row and frees no line at all —
+  and below the 750-line half of that cap, which
   `tools/memory-tree/check-memory-hygiene.sh:84` declares beside the byte half. And the trim is
   witnessed by its own phrase, not by size alone:
   `git grep -c 'The checker gov declares is gov-internal'` over `memory/guides/UNATTENDED-PROTOCOL.md`
@@ -677,6 +702,32 @@ New arm: `tools/unattended/unattended.test.sh` · one fixture per refusal and ou
   before the `asks:` listing order, so the fixture now pins that ask at the lowest severity and it
   ranks behind both mandated asks. §4's rank paragraph is unchanged, and no rule that mandated asks
   outrank filed ones is asserted anywhere.
+
+- rev-7 · 2026-09-21 · the BUILD pass · §2 S4 · §4 · §6 AC13 · §7. Five divergences, each changed
+  here before the code was written, and none of them moves what a criterion ASSERTS.
+  AC13's LINE half was unsatisfiable as rev-5 wrote it: the §8 row costs one physical line and the
+  `SPEC_TOKENS_CLI` trim frees none, because the clause it removes sits inside a table row. The byte
+  half is untouched and still STRICTLY below the parent — measured 60036 B → 59827 B in each copy,
+  a 209 B fall — and the line half now admits exactly the row's own line. The phrase witness, which
+  is the half that cannot pass vacuously, does not move.
+  §4's id-shape test spells the DRIVER's own `_ids_of` grammar rather than the sibling kit's
+  `FAMILIES` enum: a superset of any declared family, and it keeps a kit file from reading another
+  kit's conf for a question the driver can already answer. S11's notice still reads that conf,
+  because the value it compares IS that key.
+  §4 gains the `m-base:` resolve guard: an empty pin makes the P5 read the git INDEX, and an
+  unresolvable one makes both blobs read empty, so the tree the mandate is asserted against is
+  verified to be a commit this clone can read. It is a new `fail` branch and carries an arm.
+  S8 states what the ONE call covers: M ∪ F, so every row has a status, with `ready=` printed only
+  for a mandated ask, which is what §4 already said the unmandated one shows. And the
+  duplicate-closer row is read off the projection's `closers` field grouped by build, because
+  AC18's own fixture puts both closers in a FOREIGN build that this folder's spec scan cannot see.
+  S4's P6 is split into its own predicate and called ABOVE `--resume`'s matrix. Placed after the
+  authorization block, as rev-1 had it, it fired only on a take-over: the row an agent actually runs
+  after a compaction — the holder refreshing its own lease — returns several rows earlier. P6 needs
+  only the record and HEAD, so it sits where every row passes through, and AC4 is red without it.
+  §7's `ARMS_FLOORS` pin moves `tools/unattended/unattended.sh` from `104:101` to `115:112`, the
+  eleven new `fail` branches and their eleven arms, and the suite's own executed-assertion floors
+  move with it.
 
 ## 10. Reuse audit
 

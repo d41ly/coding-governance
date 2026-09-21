@@ -3,7 +3,7 @@
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   unattended.sh --preflight <slug> --keepalive-id <id>   # assert, pin, record, render
-#   unattended.sh --plan <slug> [--paths]                  # per-unit state, and the next unit
+#   unattended.sh --plan <slug> [--paths] [--asks]         # per-unit state, and the next unit
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
@@ -441,6 +441,10 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
+# TOOL-dDerivedDocket-16 - the ASK GENERATOR, in RECALL_CLI's register: optional, blank is "not
+# adopted" and is ANNOUNCED. A build README carrying an `asks:` key while this is blank REFUSES at
+# preflight rather than pinning a mandate nothing in the project can grade.
+ASKS_CMD=""
 # The HOLD vocabulary's project half, and its shrink-only floor. Spelled beside the halt keys and
 # never merged with them: a halt code ENDS a run and a hold code PAUSES one, and one list would let
 # a pause be recorded as an ending.
@@ -540,6 +544,10 @@ HALT_CODE=""
 # verb to three carriers, so a new one would owe a header line, a VERBS entry and a Skill invocation
 # for a change that swaps one printf. Empty is the padded human table; `paths` is the TSV.
 PLAN_PATHS=""
+# ...and its sibling, on the same argument and for the same reason. `--asks` prints the ASK rows
+# beside the unit rows; the UNDECIDED `next:` input is derived either way, because that is an
+# input to the rung ladder rather than a property of this output mode.
+PLAN_ASKS=""
 RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
@@ -1216,6 +1224,11 @@ AUTH_PIECES=""
 AUTH_OUTPUTS=""
 AUTH_GRAIN=""
 AUTH_RECORDS=""
+# TOOL-dDerivedDocket-16 - the `asks:` line as the README at BASE spells it, out of the SAME scan
+# that reads the mode. It is the run's MANDATE and the one thing here the run may not write: the
+# owner commits the line, every verb below reads it, and property P6 refuses a run that re-reads a
+# changed one. Empty is the ordinary case and means today's path, unchanged.
+AUTH_ASKS=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -1961,13 +1974,19 @@ check_authorization() { # slug · base
     /^slug:/ { v = $0; sub(/^slug:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "slug=" v; next }
     /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "mode=" v; next }
     /^playbook:/ { v = $0; sub(/^playbook:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "playbook=" v; next }
-    /^pieces:/ { v = $0; sub(/^pieces:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "pieces=" v; next }')
+    /^pieces:/ { v = $0; sub(/^pieces:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "pieces=" v; next }
+    /^asks:/ { v = $0; sub(/^asks:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "asks=" v; next }')
   fmslug=$(printf '%s\n' "$_fm" | sed -n 's/^slug=//p' | head -1)
   AUTH_MODE=$(printf '%s\n' "$_fm" | sed -n 's/^mode=//p' | head -1)
   # out of the SAME scan. The `No second GIT show` rule above bounds THAT
   # front-matter parse and is not a rule against reading a second FILE, which S2b does.
   AUTH_PLAYBOOK=$(printf '%s\n' "$_fm" | sed -n 's/^playbook=//p' | head -1)
   AUTH_PIECES=$(printf '%s\n' "$_fm" | sed -n 's/^pieces=//p' | head -1)
+  # TOOL-dDerivedDocket-16 - the mandate, off that same scan. ASSIGNED UNCONDITIONALLY so a second
+  # call over a README with no key clears what a first call read: this is a global, and a stale
+  # mandate surviving into a build that never declared one is the shape every other value here is
+  # pinned against.
+  AUTH_ASKS=$(printf '%s\n' "$_fm" | sed -n 's/^asks=//p' | head -1)
   # ABSENT is `slug` - every build README in every adopter's tree today declares nothing, and that
   # is the ordinary case, not a defect. A value OUTSIDE the closed set is a refusal rather than a
   # default: defaulting an unrecognised mode to either member lets a typo select a discipline
@@ -2005,6 +2024,23 @@ check_authorization() { # slug · base
   # Each refusal is its own message: a single ANDed verdict would send a reader to diff a parse
   # against a path, which is the defect the Definition-of-Done evaluation already fixed once by
   # splitting its terms.
+  # TOOL-dDerivedDocket-16 S2 - THE MANDATE'S TWO PRECONDITIONS, evaluated where the mode exists
+  # and BEFORE the recipe block below, so a `recipe`-mode README carrying `asks:` is answered by the
+  # refusal that is about the mandate rather than by one about a playbook it also lacks.
+  #
+  # A NON-`slug` MODE CANNOT CARRY A MANDATE. `prompt` and `recipe` resolve at the SECOND anchor, a
+  # tip this run pushed, so a README reachable only there is one the run could have written - and
+  # choosing WHICH filed asks a run answers is exactly what ruling D12-a took away from the run.
+  if [ -n "$AUTH_ASKS" ] && [ "$AUTH_MODE" != slug ]; then
+    fail 71 "the build README declares an asks: mandate under an authorization mode that resolves at the second anchor, so the run could have written the line that says which asks it may answer - ruling D12-a puts that choice on a commit the owner landed: mode $AUTH_MODE, admissible for a mandate is slug"
+    return 1
+  fi
+  # ...and a mandate nothing can GRADE is worse than no mandate at all: every later item keyed on it
+  # would be met vacuously, by a set nobody ever read.
+  if [ -n "$AUTH_ASKS" ] && [ -z "${ASKS_CMD:-}" ]; then
+    fail 70 "the build README declares an asks: mandate and this project declares no ASKS_CMD, so nothing here can say whether any of those asks is executable and pinning the set would make every check keyed on it pass over an ungraded list: declare ASKS_CMD in .unattended.conf, or drop the asks: key"
+    return 1
+  fi
   if [ "$AUTH_MODE" = recipe ]; then
     if [ -z "$AUTH_PLAYBOOK" ]; then
       fail 46 "a recipe-mode build README declares no playbook, and the mode is the discipline of FOLLOWING one, so there is nothing for this run to follow - add a playbook: key naming a repo-relative path at BASE"
@@ -2379,11 +2415,25 @@ roster_ids() { # slug -> ids the AUTHORED plan names, which may include unspecce
   # well-formed but EMPTY pair is LEGAL - it means the build plans exactly its specced units - and
   # `grep -oE` exits 1 on no match, so `set -o pipefail` would turn the legal case into a refusal.
   # The status is tested on `region` ALONE instead.
-  local slug="$1" rel _reg; rel=$(readme_of "$slug")
+  local slug="$1" rel _reg _unit; rel=$(readme_of "$slug")
   [ -f "$rel" ] || return 0
-  grep -qF -- "$ROSTER_OPEN" "$rel" || return 0
-  _reg=$(region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null) || return 3
-  printf '%s\n' "$_reg" | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
+  # TOOL-dDerivedDocket-16 S7 - THE ROSTER IS THE AUTHORED TABLE TOGETHER WITH THIS FOLDER'S OWN
+  # `unit` ASKS. Design section 19.4: a `unit` ask IS a planned unit of the build whose folder files
+  # it, filed so it stays visible in the family view beyond this run. Read only here, so `--plan`'s
+  # MISSING listing and `--close`'s build-complete term take the same answer from one reader.
+  #
+  # SCOPED TO $slug ON BOTH HALVES. A folder may file an ask whose id names ANOTHER build - that is
+  # a dependency, not a unit of this one - and admitting it would put a foreign id into a roster
+  # this build can never satisfy.
+  _unit=$(asks_unit_in "$(backlog_text_of "$slug")" | grep -E "^[A-Z]+-$slug-[0-9]+$" || true)
+  # THE ABSENT PAIR NO LONGER RETURNS EARLY, because the asks half must still be read on a build that
+  # has no authored table at all - which is every build a mandate-only scaffold opens.
+  _reg=""
+  if grep -qF -- "$ROSTER_OPEN" "$rel"; then
+    _reg=$(region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null) || return 3
+  fi
+  { printf '%s\n' "$_reg" | grep -oE "[A-Z]+-$slug-[0-9]+" || true
+    printf '%s\n' "$_unit"; } | grep -E '.' | sort -u
 }
 # The GENERATED region's ids - what a build's units actually ARE. `build-complete`'s non-empty term
 # uses this rather than the authored plan, so the term is meetable on a build nobody hand-wrapped.
@@ -2621,6 +2671,554 @@ units_refusal() { # build README path
   printf 'the build README carries no single well-formed %s pair, so the unit list cannot be read (absent, duplicated or transposed): %s\n  repair: the --write mode of tools/memory-tree/gen_build_index.py\n' "$UNITS_OPEN" "$1"
 }
 
+# ====================================================== THE ASK MANDATE — TOOL-dDerivedDocket-16
+# WHAT AN ASK MANDATE IS. A build README may carry one front-matter key, `asks:`, naming the filed
+# asks this build exists to answer. The OWNER commits that line; the run ASSERTS it and can neither
+# write it nor grow it. Every verb below reads it and none writes it, which is ruling D12-a stated
+# as code rather than as a paragraph.
+#
+# THIS SECTION GRADES NOTHING. Whether an ask is executable is the declared generator's answer, read
+# through `ASKS_CMD` in the shapes the companion guide lists. The driver pins what it was told,
+# refuses what it cannot read, and re-prints the generator's own fields. A second fold here would be
+# two answers to one question, and the one that rots is always the copy.
+#
+# BLANK `ASKS_CMD` IS "NOT ADOPTED", announced and never silent — `RECALL_CLI`'s register, which is
+# the register every optional declared command in this kit is already in.
+
+# The producer's projection, DECLARED here because the parse below REFUSES anything else rather
+# than skipping it. Eleven TAB fields led by `ask`, then an `examined` line and a count. A column
+# added or moved in the producer therefore reads as a parse refusal and never as a pass — which is
+# the whole reason a positional read is admissible at all.
+ASK_TSV_HEAD="ask"
+ASK_TSV_FIELDS=11
+ASK_TSV_EXAMINED="examined"
+
+# The `asks:` VALUE out of a build README blob's front matter.
+#
+# ITS OWN SCAN, and not `check_authorization`'s. That function's "no second GIT show" rule bounds
+# the parse of ONE blob; this reads a DIFFERENT VERSION of the same file — the one at HEAD, which
+# is the whole of property P6 — so there is no blob here read twice.
+#
+# FRONT MATTER ONLY, closing on the first `---` after line 1, for the reason that parse gives: `---`
+# is also a horizontal rule, so a scan running to the end of the file could take an `asks:` line out
+# of the body and read a sentence as a mandate.
+read_asks_key() { # README blob text -> the asks: value, or nothing
+  printf '%s\n' "$1" | awk '
+    NR == 1 { next }
+    /^---[[:space:]]*\r?$/ { exit }
+    /^asks:/ { v = $0; sub(/^asks:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }'
+}
+# The mandated ids, ranges expanded, IN THE OWNER'S OWN LISTING ORDER — which is rank step 3, so the
+# order is data and not an artefact of a sort. `expand_id_runs` is the kit's one expander and is
+# already what the record-binding join reads, so `EXMP-aFoo-3..4` means here exactly what it means
+# there. Nothing is sorted and nothing is deduplicated: a duplicate in a mandate is the owner's own
+# line, and collapsing it silently would make the pinned fact disagree with the README it came from.
+asks_ids_of() { # asks: value -> the mandated ids, one per line
+  printf '%s\n' "$1" | expand_id_runs
+}
+# The build folder an ask is FILED in: the slug segment of its own id. An id nobody filed still
+# names its home this way, which is what lets the P5 refusal say WHERE to go and look.
+ask_home_of() { # ask id -> the slug segment
+  local _t="${1#*-}"; printf '%s' "${_t%-*}"
+}
+# The two BACKLOG verbs off a spec's status header, read with the memory kit's own tolerant
+# separator and its anchored value. `order_verb_of` reads the third verb the same way and for the
+# same recorded reason: a bespoke reader disagreed with the generator on a doubled separator space
+# and read EMPTY, which skips the join silently while reporting nothing.
+spec_ask_verbs() { # spec file · closes|advances -> the ids that verb names, one per line
+  local hdr
+  hdr=$(grep -m1 '^\*\*Status:\*\*' "$1" 2>/dev/null) || return 0
+  printf '%s' "$hdr" | SAV_V="$2" awk '
+    BEGIN { v = ENVIRON["SAV_V"] }
+    {
+      n = split($0, f, "·")
+      for (i = 1; i <= n; i++) {
+        t = f[i]
+        gsub(/^[ \t]+|[ \t]+$/, "", t)
+        if (substr(t, 1, length(v) + 1) == v " ") print substr(t, length(v) + 2)
+      }
+    }' | expand_id_runs
+}
+# A disposition row's VERB for one ask, out of a build's own `BACKLOG.md`. The row shape is
+# `- <VERB> · <id> · <slot> <value> · <why>`, so the verb is the first field and the id the second;
+# nothing here decides whether the disposition is HONEST, which is the fold's job and not this one's.
+ask_disposition_of() { # BACKLOG.md text · ask id -> the first disposition verb naming it, or nothing
+  printf '%s\n' "$1" | ADO_ID="$2" awk '
+    BEGIN { id = ENVIRON["ADO_ID"] }
+    /^- [A-Z][A-Z]* · / {
+      n = split($0, f, " · ")
+      if (n >= 2 && f[2] == id) { v = substr(f[1], 3); print v; exit }
+    }'
+}
+
+# ---------------------------------------------------------------------------- the bounded witness
+# ONE call, in call shape 1 or 2: `<ASKS_CMD> --tsv --ready <ids> --target <slug> --at <rev>`.
+# `ASKS_CMD` is UNQUOTED, exactly as `$WIRING_CHECK`, `$LANDER` and `$GATE_CMD` are, so a project may
+# declare a launcher and a script rather than one word.
+#
+# NO `--live-builds`, EVER, and that is a decision rather than an omission (section 8 F2). No tree
+# this driver can read holds every run in flight — a run's record lives only on its own branch until
+# it lands — so a set derived from tracked records would admit exactly the double claim the option
+# exists to stop. Every foreign live spec is therefore a CLAIM here, and a stale one is NAMED by the
+# report-only line below rather than admitted.
+#
+# IT READS `RB_STDOUT`, NEVER `RB_OUT`. TOOL-dDerivedDocket-48 split the capture for this parse:
+# every notice the producer writes — the tolerated-header line, the liveness line, the pinned-conf
+# line — is on stderr, and a parse that refuses any line not leading with `ask` would have read a
+# HEALTHY producer as a dead probe.
+#
+# THE MANDATE IS ITERATED, NEVER THE ROWS. A loop over what came back can only confirm what came
+# back: a producer that dropped an id would be graded on the ids it did return and the missing one
+# would never be mentioned at all.
+AW_ROWS=""; AW_WHY=""
+run_ask_witness() { # target slug · rev · ids… -> 0 and AW_ROWS, or 1 and AW_WHY
+  local _tgt="$1" _rev="$2" _rc _id _bad
+  shift 2
+  AW_ROWS=""; AW_WHY=""
+  if [ -z "${ASKS_CMD:-}" ]; then
+    AW_WHY="this project declares no ASKS_CMD, so nothing here can grade a mandated ask"
+    return 1
+  fi
+  run_bounded $ASKS_CMD --tsv --ready "$@" --target "$_tgt" --at "$_rev"; _rc=$?
+  # AN EMPTY ROW STREAM IS THREE DIFFERENT FACTS and the shared verdict helper is what tells them
+  # apart: never answered within the bound, answered entirely on the other stream, or a dead probe
+  # that wrote nothing at all. A bound breach is reported as UNANSWERED and never as a red, because
+  # "this ask is not ready" and "nobody asked" are not the same claim.
+  if [ -z "$RB_STDOUT" ]; then
+    AW_WHY=$(derive_stream_verdict "$_rc")
+    return 1
+  fi
+  if [ "$_rc" != 0 ]; then
+    AW_WHY="the declared ask generator exited $_rc after ${RB_TOOK}s, so the rows it printed are not an answer this run may pin — its first stderr line: $(printf '%s\n' "$RB_ERR" | head -1)"
+    return 1
+  fi
+  # ONE AWK over the whole stream. A row of the declared width is projected down to the seven fields
+  # every caller here reads; anything else emits a `BAD` line and stops, so the refusal can quote the
+  # line it refused rather than reporting a count nobody can act on.
+  AW_ROWS=$(printf '%s\n' "$RB_STDOUT" \
+    | ASK_HEAD="$ASK_TSV_HEAD" ASK_EX="$ASK_TSV_EXAMINED" ASK_N="$ASK_TSV_FIELDS" awk -F'\t' '
+        BEGIN { h = ENVIRON["ASK_HEAD"]; ex = ENVIRON["ASK_EX"]; want = ENVIRON["ASK_N"] + 0 }
+        $0 == "" { next }
+        $1 == ex { next }
+        $1 == h && NF == want { print $2 "\t" $3 "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $11; next }
+        { print "BAD\t" $0; exit }')
+  _bad=$(printf '%s\n' "$AW_ROWS" | sed -n 's/^BAD\t//p' | head -1)
+  if [ -n "$_bad" ]; then
+    AW_ROWS=""
+    AW_WHY="the declared ask generator printed a line that is not the $ASK_TSV_FIELDS-field $ASK_TSV_HEAD projection, so a positional read of it would report fields nobody printed — the line: $_bad"
+    return 1
+  fi
+  for _id in "$@"; do
+    printf '%s\n' "$AW_ROWS" | cut -f1 | grep -qxF -- "$_id" && continue
+    AW_ROWS=""
+    AW_WHY="DEAD PROBE — the declared ask generator answered for fewer asks than it was asked about, and an id it never graded is an id nothing here can report on: $_id is missing from its rows"
+    return 1
+  done
+  return 0
+}
+# One row's field, BY NAME. The projection's own order is declared above and read once, in the awk
+# that projects it; this reads the seven columns that awk kept, so no caller anywhere counts tabs.
+ask_field() { # ask id · id|status|sev|ready|missing|holds|closers -> the value, or nothing
+  local _n
+  case "$2" in
+    id) _n=1 ;; status) _n=2 ;; sev) _n=3 ;; ready) _n=4 ;;
+    missing) _n=5 ;; holds) _n=6 ;; closers) _n=7 ;; *) return 0 ;;
+  esac
+  printf '%s\n' "$AW_ROWS" | awk -F'\t' -v i="$1" -v n="$_n" '$1 == i { print $n; exit }'
+}
+
+# ------------------------------------------------------------------------------------ the RANK
+# Design section 19.4's four steps, in order: hold edges first, then severity, then the owner's own
+# listing order, then numeric sequence.
+#
+# THE SEVERITY LADDER IS SPELLED AS AN ORDER rather than as a set, so a label outside it sorts LAST
+# rather than disappearing. `-` is what the projection prints for an unlabelled ask and it is the
+# bottom rung by construction, never by a branch.
+ASK_SEV_ORDER="BLOCKER HIGH MED LOW"
+ask_sev_rank() { # severity label -> its rung, lower sorts first
+  local _s _i=1
+  for _s in $ASK_SEV_ORDER; do
+    [ "$_s" = "$1" ] && { printf '%s' "$_i"; return 0; }
+    _i=$((_i + 1))
+  done
+  printf '%s' "9"
+}
+# THE LISTING POSITION OF AN ASK NOBODY MANDATED IS A TOTALITY CHOICE AND NOT A PRECEDENCE RULE.
+# Step 3 is "position in the pinned asks: fact", and an ask filed in this folder that the mandate
+# never named has no such position — so it is given one past the last mandated id, purely so the
+# sort is total. Nothing here asserts that a mandated ask outranks a filed one: where two asks must
+# be separated, severity separates them, which is step 2 and is the step that carries meaning.
+ASK_POSITIONS=""
+# Steps 2, 3 and 4 as ONE fixed-width string, so the compare below is a single string compare and
+# no caller can apply the three steps in the wrong order.
+ask_sort_key() { # ask id -> "<sev>-<pos>-<seq>", every field fixed width
+  local _pos _seq
+  _pos=$(printf '%s\n' "$ASK_POSITIONS" | awk -F'\t' -v i="$1" '$1 == i { print $2; exit }')
+  [ -n "$_pos" ] || _pos=999
+  _seq="${1##*-}"
+  case "$_seq" in *[!0-9]*|"") _seq=0 ;; esac
+  printf '%s-%04d-%06d' "$(ask_sev_rank "$(ask_field "$1" sev)")" "$_pos" "$_seq"
+}
+# THE TOPOLOGICAL PASS IS A SELECTION SORT, not a graph library, because the population is a
+# mandate and a mandate is small: emit the best-ranked ask whose live holds inside the population
+# are all already emitted, and repeat. A CYCLE cannot starve it — when nothing is emittable the
+# best-ranked remainder goes next — so the order stays total and the cycle stays the declared
+# generator's V6 to report rather than a second verdict invented here.
+ask_rank_order() { # ids… -> those ids in rank order, space separated
+  local _left="$*" _out="" _id _h _blocked _best _bestkey _key
+  while [ -n "$(printf '%s' "$_left" | tr -d ' ')" ]; do
+    _best=""; _bestkey=""
+    for _id in $_left; do
+      _blocked=0
+      for _h in $(ask_field "$_id" holds | tr ',' ' '); do
+        [ -n "$_h" ] && [ "$_h" != "-" ] || continue
+        case " $_left " in *" $_h "*) _blocked=1 ;; esac
+      done
+      [ "$_blocked" = 0 ] || continue
+      _key=$(ask_sort_key "$_id")
+      if [ -z "$_bestkey" ] || [ "$_key" \< "$_bestkey" ]; then _best="$_id"; _bestkey="$_key"; fi
+    done
+    if [ -z "$_best" ]; then
+      for _id in $_left; do
+        _key=$(ask_sort_key "$_id")
+        if [ -z "$_bestkey" ] || [ "$_key" \< "$_bestkey" ]; then _best="$_id"; _bestkey="$_key"; fi
+      done
+    fi
+    _out="$_out $_best"
+    _left=" $_left "; _left="${_left/ $_best / }"
+  done
+  printf '%s' "${_out# }"
+}
+
+# ----------------------------------------------------------------- the mandate, read and pinned
+# `asks:` as this run must treat it: the pinned fact where one exists, the README's own key
+# otherwise. Property P6 makes the two equal for the whole life of a live run, so the order is a
+# preference and not a choice between two answers — the PINNED value is what the run was authorized
+# by, and a README edited mid-run is refused by P6 rather than read here.
+mandate_of() { # slug -> the asks: value this run is under, or nothing
+  local _rel _v
+  _rel=$(runmd_of "$1")
+  if [ -f "$_rel" ]; then
+    _v=$(fact "$_rel" asks)
+    [ -z "$_v" ] || { printf '%s' "$_v"; return 0; }
+  fi
+  read_asks_key "$(cat "$(readme_of "$1")" 2>/dev/null)"
+}
+# A build's own filed asks, from its own folder's `BACKLOG.md` in the WORKING TREE. `--plan` reports
+# on the tree an agent is looking at; the PINNED half of this question is P5's, which reads the blob
+# at `m-base:` and is the only half a provenance property may rest on.
+backlog_text_of() { # slug -> that build's BACKLOG.md text, or nothing
+  cat "$M/builds/$1/BACKLOG.md" 2>/dev/null
+}
+
+# ------------------------------------------------------- the two refusals an ids-shaped value takes
+# Ruling D12-a: an owner's id list becomes a build folder through the SCAFFOLD, which the owner then
+# lands. A run may not write the folder that authorizes it, so a verb handed ids has exactly one
+# honest answer — the recipe, printed with the owner's own tokens, and nothing written.
+#
+# THE ID SHAPE IS THE DRIVER'S OWN, `_ids_of`, and not the sibling kit's declared family enum. Two
+# reasons, and neither is convenience. The driver's grammar is a SUPERSET of any declared family, so
+# every id a project could file is caught and a family added to that conf needs no edit here; and
+# reading a sibling kit's conf from a kit file is the literal-naming ban's own subject.
+#
+# WHITESPACE ALONE IS ENOUGH TO REFUSE. A slug carries none (`check_slug`), so a value with a space
+# is either an id list or a slug MIXED with ids, and a mixed invocation has no honest reading: a run
+# cannot extend a committed mandate, so there is nothing for the second half to mean.
+is_ids_value() { # value -> 0 when it is id-shaped, or carries whitespace
+  local _v="$1" _s
+  case "$_v" in *[[:space:]]*) return 0 ;; esac
+  _s=$(printf '%s\n' "$_v" | _ids_of)
+  [ -n "$_s" ] && [ "$_s" = "$_v" ]
+}
+# The three lines the refusal prints, written once because both refusals below print them: the
+# recipe carrying the tokens EXACTLY as typed, the rule about who lands what it writes, and the
+# second legal form. `<new-slug>` is left standing on purpose — minting a slug is section 2's act
+# and belongs to the session that will own the ids, not to a refusal message.
+print_scaffold_recipe() { # the tokens, verbatim
+  printf '  recipe: tools/memory-tree/gen_build_index.py --new-build <new-slug> --asks %s\n' "$1"
+  printf '  the scaffold writes the folder and stages it; the OWNER commits and lands it, which is what makes it an authorization rather than something this run wrote for itself\n'
+  printf '  then the second legal form: --preflight <slug> naming that landed folder\n'
+}
+# The filing home. A slug whose folder at the FIRST anchor's merge-base holds a `BACKLOG.md` and
+# nothing else is not a build — it is where asks are filed — and pointing a run at it would ask this
+# run to write a README into somebody else's records, which ruling D12-f forbids.
+#
+# AGAINST `merge-base(ASHA, HEAD)` AND BEFORE `trusted_base`, deliberately. Under
+# `ANCHOR_SCOPE=published` a README absent at that merge-base widens to the second anchor, and an
+# unpushed branch is then refused with a push instruction that carries no recipe and, once followed,
+# writes to the remote.
+check_filing_home() { # slug -> 1 and a printed refusal when the slug names a filing home
+  local _mb _ls _home
+  [ -n "${ASHA:-}" ] || return 0
+  _mb=$(GIT merge-base "$ASHA" HEAD 2>/dev/null) || return 0
+  [ -n "$_mb" ] || return 0
+  _ls=$(GIT ls-tree --name-only "$_mb" "$M/builds/$1/" 2>/dev/null)
+  [ "$_ls" = "$M/builds/$1/BACKLOG.md" ] || return 0
+  _home="$1"
+  fail 6 "this slug names a FILING HOME and not a build — at the first anchor's merge-base its folder holds a BACKLOG.md and nothing else, so there is no committed README to authorize a run and writing one into another build's records is what ruling D12-f refuses: $M/builds/$_home at $_mb"
+  print_scaffold_recipe "<the ids of that folder you mean to answer>"
+  if [ -n "${ASKS_CMD:-}" ]; then
+    run_bounded $ASKS_CMD --build "$_home" --at "$_mb" || true
+    printf '%s\n' "$RB_OUT"
+  else
+    printf '  ASKS_CMD is blank in this project, so this refusal cannot list the live asks of that folder; run the generator in its --asks --build %s form by hand and pick from what it prints\n' "$_home"
+  fi
+  return 1
+}
+
+# ------------------------------------------------- the mandate's preconditions, checked at preflight
+# P5, P6 and READY, in that order, and ALL of them BEFORE the write gate. A verb that pins a fact and
+# then discovers a refusal has already changed the state the refusal was about.
+# PROPERTY P6, ON ITS OWN, because it needs NOTHING that the other two need — no anchor, no base,
+# no authorization read. `--resume` has rows that return before any of those exist, and the ask set
+# growing across a hold is the one thing about a mandate a run may never do, so the cheap half is
+# asked on every one of them.
+#
+# READ AT HEAD, which is what the property says and what a run can actually edit. A README absent at
+# HEAD reads as an EMPTY line and differs, which is this same refusal rather than a second branch.
+check_asks_pinned() { # slug · run-state file -> 1 with its own refusal printed
+  local _pin _now
+  [ -f "$2" ] || return 0
+  _pin=$(fact "$2" asks 2>/dev/null)
+  [ -n "$_pin" ] || return 0
+  _now=$(read_asks_key "$(GIT show "HEAD:$(readme_of "$1")" 2>/dev/null)")
+  [ "$_pin" != "$_now" ] || return 0
+  fail 73 "the build README's asks: line at HEAD is not the one this run pinned, and a run that re-read its own mandate could grow the set it is authorized for: pinned [$_pin] · at HEAD [$_now]"
+  return 1
+}
+PF_MBASE=""; PF_ASKS_READY=""
+check_ask_mandate() { # slug · run-state file -> 1 with its own refusal printed
+  local slug="$1" rel="$2" _mb _ids _id _home _blob _pin _now _g _grades="" _allno=1 _sp _sslug
+  PF_MBASE=""; PF_ASKS_READY=""
+  [ -n "${AUTH_ASKS:-}" ] || return 0
+  # PINNED ONCE, READ BACK. A re-preflight must grade the SAME tree the first one graded, or the
+  # facts beside `m-base:` describe a merge base that has moved underneath them — the drift the
+  # anchor triple was frozen to stop, one key over.
+  _mb=$(fact "$rel" m-base 2>/dev/null)
+  if [ -z "$_mb" ]; then
+    _mb=$(GIT merge-base "${ASHA:-}" HEAD 2>/dev/null) || _mb=""
+  fi
+  # IT MUST RESOLVE, not merely be non-empty. A pinned `m-base:` naming a commit this clone does not
+  # carry would make the two `git show` reads below answer EMPTY, and an empty blob files no ask -
+  # so the provenance property would refuse every mandated id while naming a tree nobody can look at.
+  # An empty value is worse still: `git show ":path"` reads the INDEX, which is bytes the run itself
+  # staged, on both sides of a test about what the run did NOT write.
+  if [ -z "$_mb" ] || ! GIT rev-parse --verify --quiet "$_mb^{commit}" >/dev/null 2>&1; then
+    fail 72 "this build README carries an asks: mandate and the tree the mandate is asserted against is not a commit this clone can read, so every property below would pass over an empty blob or, worse, over the index this run itself staged: m-base [${_mb:-(none)}], anchor ${ASHA:-(none)}"
+    return 1
+  fi
+  _ids=$(asks_ids_of "$AUTH_ASKS")
+  check_asks_pinned "$slug" "$rel" || return 1
+  # P5 — EVERY MANDATED ASK IS A RECORD THE RUN DID NOT CREATE. One `git show` per HOME folder, and
+  # the line match is the kit library's, shared with the leg that re-derives this. Reading the
+  # WORKING TREE instead would let a row filed after the run began satisfy a property about
+  # provenance, which is the whole of what it is for.
+  for _home in $(printf '%s\n' "$_ids" | sed -n 's/^[A-Z][A-Z]*-\([A-Za-z0-9][A-Za-z0-9]*\)-[0-9][0-9]*$/\1/p' | sort -u); do
+    _blob=$(GIT show "$_mb:$M/builds/$_home/BACKLOG.md" 2>/dev/null || true)
+    for _id in $_ids; do
+      [ "$(ask_home_of "$_id")" = "$_home" ] || continue
+      ask_filed_in "$_blob" "$_id" && continue
+      fail 72 "a mandated ask is not filed in the tree this run is anchored to, so the run would be choosing among records it could have written itself: $_id has no row in $M/builds/$_home/BACKLOG.md at $_mb"
+      return 1
+    done
+  done
+  # READY, at `m-base:` and through ONE bounded call. Its row count must equal the mandate's or the
+  # witness is a DEAD PROBE: a loop over the rows that came back can only ever confirm them.
+  if ! run_ask_witness "$slug" "$_mb" $_ids; then
+    fail 74 "the declared ask generator did not answer for this mandate, and a mandate nothing graded is one this run would carry without ever knowing whether any of it is executable: $AW_WHY"
+    return 1
+  fi
+  for _id in $_ids; do
+    _g=$(ask_field "$_id" ready)
+    _grades="$_grades $_id=$_g"
+    [ "$_g" = no ] || _allno=0
+  done
+  if [ "$_allno" = 1 ]; then
+    fail 75 "every mandated ask in this build README grades not-ready, so there is nothing in the mandate a run could execute without asking somebody and starting would mean deriving the acceptance nobody wrote - each id and the rules it fails follow"
+    for _id in $_ids; do
+      printf '  %s — failing rules: %s\n' "$_id" "$(ask_field "$_id" missing)"
+    done
+    return 1
+  fi
+  # THE REPORT-ONLY LINE. A foreign live spec closing a mandated ask is a CLAIM, admitted by
+  # nothing: this run passes no live-build set, so it cannot tell a live claim from a stale one and
+  # must not pretend to. What it CAN do is name the claim and say whether that build's tracked
+  # run-state record reads terminal, which is a fact an owner can act on. It pins nothing.
+  for _id in $_ids; do
+    [ "$(ask_field "$_id" ready)" = no ] || continue
+    case ",$(ask_field "$_id" missing)," in *,R2,*) ;; *) continue ;; esac
+    for _sp in $(ask_field "$_id" closers | tr ',' ' '); do
+      [ -n "$_sp" ] && [ "$_sp" != "-" ] || continue
+      _sslug=$(ask_home_of "$_sp")
+      [ "$_sslug" != "$slug" ] || continue
+      echo "unattended: preflight — $_id is claimed by $_sp of build $_sslug: $(describe_foreign_run "$_sslug"). This line pins nothing and admits nothing; the ask still grades no."
+    done
+  done
+  PF_MBASE="$_mb"
+  PF_ASKS_READY="${_grades# }"
+  return 0
+}
+# Whether a claiming build's own tracked record reads terminal, through the ONE derived-phase reader.
+# ABSENT IS NOT TERMINAL and is not a synonym for it: a run in flight keeps its record on its own
+# branch until it lands, so "no record here" is exactly the case this driver cannot see and must not
+# label. Said in those words, so a reader of the line is not invited to read absence as staleness.
+describe_foreign_run() { # slug -> one clause about that build's run-state record
+  local _r
+  _r=$(runmd_of "$1")
+  if ! GIT ls-files --error-unmatch -- "$_r" >/dev/null 2>&1; then
+    printf 'its run-state record is not tracked in this tree, which is also what a run still on its own branch looks like, so nothing here can say whether that claim is live'
+    return 0
+  fi
+  read_derived_phase "$_r"
+  if is_terminal "$DP_PHASE"; then
+    printf 'its tracked run-state record reads TERMINAL (%s), so that spec may be a stale claim the owner can retire' "$DP_PHASE"
+  else
+    printf 'its tracked run-state record reads %s, which is not terminal' "${DP_PHASE:-(no phase)}"
+  fi
+}
+# S11 — THE LAYOUT MODE, COMPARED ACROSS THE TWO TREES AND ANNOUNCED. Which mode the memory tree is
+# in decides whether a build folder files asks at all, so a run whose anchor predates the switch is
+# planning against asks its own BASE never filed. A NOTICE and not a refusal: the change is legal,
+# and what it costs is exactly the silence this line removes.
+check_backlog_mode_shift() { # -> prints at most one line
+  local _a _h
+  [ -n "${ASHA:-}" ] || return 0
+  _a=$(GIT show "$ASHA:.memory-tree.conf" 2>/dev/null | sed -n 's/^BACKLOG_MODE=\"*\([A-Za-z]*\)\"*.*/\1/p' | head -1)
+  _h=$(GIT show "HEAD:.memory-tree.conf" 2>/dev/null | sed -n 's/^BACKLOG_MODE=\"*\([A-Za-z]*\)\"*.*/\1/p' | head -1)
+  [ "$_a" != "$_h" ] || return 0
+  echo "unattended: preflight — the memory tree's BACKLOG_MODE differs between the anchor and HEAD: [${_a:-(undeclared)}] at the anchor, [${_h:-(undeclared)}] at HEAD. Where a build files its asks moved under this run, so an ask visible at one of those trees may be invisible at the other."
+}
+
+# A projection field, or `-` where the witness never answered. An EMPTY field and an ABSENT
+# row are two different silences and both print the same dash here, on purpose: the reason the
+# witness gave is printed once, as its own line, rather than left to be guessed from a column.
+ask_field_or_dash() { # ask id · field -> the value, or `-`
+  local _v; _v=$(ask_field "$1" "$2"); printf '%s' "${_v:--}"
+}
+# ------------------------------------------------------------------------ `--plan`'s ASK rows
+# AN OUTPUT MODE, the way `--paths` is, and not a verb: a new verb owes three carriers under the
+# sibling checker's verb join, for a change that swaps one printf.
+#
+# THREE TAB FIELDS UNDER `--paths`, never four. Every existing caller of that projection skips a
+# line with fewer than four fields, which is what stops a harness dispatching an ask as though it
+# were a unit — so the field count is the contract and the summary is one field, not three.
+ask_row() { # id · summary
+  if [ -n "$PLAN_PATHS" ]; then printf 'ASK\t%s\t%s\n' "$1" "$2"
+  else printf '%-34s %-11s %s\n' "$1" "ASK" "$2"; fi
+}
+# THE POPULATION IS THE MANDATE PLUS THIS FOLDER'S OWN FILED ASKS, and both halves are needed.
+# The mandate alone misses an ask this build filed for itself and never planned; the folder alone
+# misses every mandated ask filed somewhere else, which under an ids-mode run is all of them.
+#
+# EVERY FILED ASK GETS A ROW, terminal ones included. Which asks are terminal is the declared
+# generator's fold, and its answer arrives in each row's own `status=` field — dropping rows on it
+# would make this verb re-decide a question it deliberately does not hold.
+#
+# THE UNDECIDED PICK IS DERIVED HERE AND ON EVERY `--plan`, with or without `--asks`, because it is
+# an INPUT to the `next:` ladder rather than a property of this output mode. Where the population is
+# empty — every build in a tree that files no asks — nothing below runs, no bounded call is made,
+# and the ladder prints byte for byte what it printed before this unit.
+ASK_PLAN_ROWS=""; ASK_PLAN_NEXT=""; ASK_PLAN_WHY=""
+build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT, ASK_PLAN_WHY
+  local slug="$1"; shift
+  local _m _mids _bl _fids _pop="" _mset="" _id _i=0 _rev _rel _sp _spid _live _cover _disp
+  local _n=0 _sum _rdy _dup
+  ASK_PLAN_ROWS=""; ASK_PLAN_NEXT=""; ASK_PLAN_WHY=""; ASK_POSITIONS=""; AW_ROWS=""
+  _m=$(mandate_of "$slug")
+  _mids=$(asks_ids_of "$_m")
+  _bl=$(backlog_text_of "$slug")
+  _fids=$(asks_filed_in "$_bl")
+  for _id in $_mids; do
+    case " $_pop " in *" $_id "*) continue ;; esac
+    _pop="$_pop $_id"; _mset="$_mset $_id"; _i=$((_i + 1))
+    ASK_POSITIONS="$ASK_POSITIONS$_id	$_i
+"
+  done
+  for _id in $_fids; do
+    case " $_pop " in *" $_id "*) continue ;; esac
+    _pop="$_pop $_id"
+  done
+  _pop="${_pop# }"
+  [ -n "$_pop" ] || return 0
+  # THE REV IS THE PINNED `m-base:` WHERE ONE EXISTS, so `--plan` grades the same tree preflight
+  # pinned and its answer is a pure function of pinned inputs. With no run-state record — a build
+  # nobody has preflighted, which is what a freshly scaffolded mandate-only build IS — the rev is
+  # HEAD, and the call shape does not change.
+  _rel=$(runmd_of "$slug")
+  _rev=""
+  [ -f "$_rel" ] && _rev=$(fact "$_rel" m-base 2>/dev/null)
+  [ -n "$_rev" ] || _rev=$(GIT rev-parse HEAD 2>/dev/null)
+  if ! run_ask_witness "$slug" "$_rev" $_pop; then
+    # A WITNESS THAT DID NOT ANSWER DOES NOT SILENCE THIS VERB. `--plan` reports; it pins nothing
+    # and refuses nothing, so an ungraded population still prints its rows with `-` in the fields
+    # the generator would have filled, and the reason is named rather than left as a blank column.
+    ASK_PLAN_WHY="$AW_WHY"
+  fi
+  _pop=$(ask_rank_order $_pop)
+  for _id in $_pop; do
+    _n=$((_n + 1))
+    _live=""; _cover=""
+    # THIS BUILD'S OWN SPECS FIRST, read off their status headers, because a spec that has ALREADY
+    # closed an ask still covers it and the projection's closers field lists LIVE specs only.
+    for _sp in "$@"; do
+      spec_ask_verbs "$_sp" closes | grep -qxF -- "$_id" || {
+        spec_ask_verbs "$_sp" advances | grep -qxF -- "$_id" || continue; }
+      _spid="${SPEC_ID[$_sp]:-}"
+      [ -n "$_spid" ] || continue
+      [ -n "$_cover" ] || _cover="$_spid"
+      case "${SPEC_ST[$_sp]:-}" in CLOSED|WONTDO) continue ;; esac
+      _live="$_live${_live:+,}$_spid"
+    done
+    # TWO LIVE UNITS OF ONE BUILD CLOSING ONE ASK is a planning error and not a status: the ask has
+    # two answers and neither of them is the one. It prints as a refusal row, still three fields, so
+    # a reader and a harness both see it in the projection they already parse.
+    #
+    # READ OFF THE PROJECTION'S CLOSERS AND NOT OFF THIS BUILD'S SPECS ALONE. The closers field spans
+    # every build, and the build doing the double-claiming is usually not this one - a scan of this
+    # folder's own specs cannot see a foreign pair at all. GROUPED BY THE BUILD each closer's own id
+    # names, so two DIFFERENT builds closing it once each is a contest, which is a different thing
+    # and is what the R2 grade already reports.
+    _dup=$(ask_field "$_id" closers | tr ',' '\n' | sed 's/^stale://' \
+      | grep -E '^[A-Z]+-[A-Za-z0-9]+-[0-9]+$' \
+      | awk '{ b = $0; sub(/^[A-Z]+-/, "", b); sub(/-[0-9]+$/, "", b)
+               c[b]++; s[b] = s[b] (s[b] == "" ? "" : ",") $0 }
+             END { for (b in c) if (c[b] > 1) { print s[b]; exit } }')
+    if [ -n "$_dup" ]; then
+      ASK_PLAN_ROWS="$ASK_PLAN_ROWS$_id	refused=duplicate-closer;units=$_dup
+"
+      continue
+    fi
+    case "$_live" in
+      *,*) ASK_PLAN_ROWS="$ASK_PLAN_ROWS$_id	refused=duplicate-closer;units=$_live
+"
+           continue ;;
+    esac
+    # A LIVE CLOSER OF THIS BUILD covers the ask too, and it may have no spec here yet - a unit whose
+    # header names the ask can exist in a tree this folder's spec list has not caught up with.
+    if [ -z "$_cover" ]; then
+      _cover=$(ask_field "$_id" closers | tr ',' '\n' | sed 's/^stale://' \
+        | grep -E "^[A-Z]+-$slug-[0-9]+$" | head -1)
+    fi
+    _disp=$(ask_disposition_of "$_bl" "$_id")
+    [ -n "$_cover" ] || _cover="$_disp"
+    [ -n "$_cover" ] || _cover="-"
+    # THE GRADE IS PRINTED FOR A MANDATED ASK AND FOR NOBODY ELSE. READY is graded AGAINST a mandate
+    # - rule R3 asks whether a hold target is inside it - so a grade for an ask the mandate never
+    # named answers a question nobody asked, and section 4 gives it a dash for exactly that reason.
+    # The one call above passes the whole printed population so every row has a STATUS; the PINNED
+    # answer for the mandate is `asks-ready:` on the record, written at preflight over the mandate
+    # alone, and this column is a report beside it rather than a second pin.
+    _rdy="-"
+    case " $_mset " in *" $_id "*) _rdy=$(ask_field_or_dash "$_id" ready) ;; esac
+    _sum="status=$(ask_field_or_dash "$_id" status);ready=$_rdy;cover=$_cover;rank=$_n"
+    ASK_PLAN_ROWS="$ASK_PLAN_ROWS$_id	$_sum
+"
+    [ "$_cover" = "-" ] || continue
+    [ -n "$ASK_PLAN_NEXT" ] || ASK_PLAN_NEXT="$_id"
+  done
+  return 0
+}
+
 # ONE EMITTER FOR EVERY ROW THAT NAMES A UNIT ID, so the two modes cannot disagree about which rows
 # are units. PATHS mode swaps the shape and nothing else: four TAB-separated fields, id, status,
 # state and the spec's repo-relative path, the fourth EMPTY for a unit no tracked spec defines. A
@@ -2715,7 +3313,7 @@ derive_next_shape() { # live-unit shape . first MISSING id . undecided-ask shape
 }
 
 verb_plan() { # slug
-  local slug="$1" dir specs spec id st state miss nmiss=0
+  local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum
   # THE LADDER'S INPUTS, collected by the two loops below and read ONCE at the bottom. They
   # are not the line: `_live` and `_miss1` are first-wins captures of data each loop already
   # has, `_ask1` is the undecided-ask rung's input and stays EMPTY here until
@@ -2754,13 +3352,20 @@ verb_plan() { # slug
     return 1
   fi
   specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null | drop_working_specs)
-  if [ -z "$specs" ]; then
-    fail 19 "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against: $dir/spec"
+  # TOOL-dDerivedDocket-16 S7 - THREE EMPTY TERMS, not one. This refused on "no tracked spec" alone,
+  # which is design section 19.1's K4: a build whose roster names two planned units and whose specs
+  # nobody has written yet is exactly the state `--plan` exists to report, and refusing it told the
+  # agent nothing about the units it was about to spec. It fires now only where there is nothing at
+  # all to list - no roster id, no spec and no mandated ask.
+  if [ -z "$specs" ] && [ -z "$_rids" ] && [ -z "$(mandate_of "$slug")" ]; then
+    fail 19 "no tracked spec under this build, and neither its roster nor an asks: mandate names anything either, so there is no unit set to report on at all: $dir/spec"
     return 1
   fi
   # ONE read of every spec, before any per-spec question below is asked. UNQUOTED on purpose:
   # `$specs` is the newline-separated `git ls-files` output that every loop below already
   # word-splits, so this adds no assumption the surrounding code does not already make.
+  # GUARDED, because the roster may now name units over a build with no spec at all. The maps are
+  # cleared by that call and a skipped call would leave whatever a previous frame put in them.
   load_spec_facts $specs
   # S6 - THE TWO `NOT A UNIT` DIAGNOSTICS, reported FIRST and from the spec files, because the region
   # cannot carry them: `render_region` emits rows only for specs whose status header parsed, so a file
@@ -2868,11 +3473,36 @@ verb_plan() { # slug
   done
   # The planned units nobody has specced. These are what M2 calls MISSING, and until this
   # unit they were simply absent from the listing rather than reported.
-  for miss in $(missing_units "$slug" "$dir"); do
+  # TOOL-dDerivedDocket-16 S7 - NUMERIC SEQUENCE, never the string order `comm` hands back. `-10`
+  # sorts before `-2` as a string, so the first MISSING id - which is the one the `next:` ladder
+  # names - was whichever unit happened to sort first, and a build with ten planned units was told
+  # to spec its tenth. `missing_units` keeps its lexical contract because `comm` requires it; the
+  # ORDER a reader sees is decided here, once.
+  for miss in $(missing_units "$slug" "$dir" | sort -t- -k1,1 -k2,2 -k3,3n); do
     plan_row "$miss" "-" "MISSING" ""
     nmiss=$((nmiss + 1))
     [ -n "$_miss1" ] || _miss1="$miss"
   done
+  # TOOL-dDerivedDocket-16 S8 - THE ASK ROWS, after every unit row and before the roster line, so
+  # the unit projection is byte-identical to what it was for a build that files no asks and declares
+  # no mandate. `build_ask_plan` returns without reading anything where the population is empty,
+  # which is every build in a tree that has not adopted the ask envelope.
+  build_ask_plan "$slug" $specs
+  if [ -n "$ASK_PLAN_ROWS" ]; then
+    if [ -n "$PLAN_ASKS" ]; then
+      [ -z "$ASK_PLAN_WHY" ] || echo "unattended: --plan --asks — the ask rows below carry \`-\` where the declared generator would have graded them: $ASK_PLAN_WHY"
+      while IFS=$'\t' read -r _ar_id _ar_sum; do
+        [ -n "$_ar_id" ] || continue
+        ask_row "$_ar_id" "$_ar_sum"
+      done <<ASKROWS
+$ASK_PLAN_ROWS
+ASKROWS
+    fi
+    # THE UNDECIDED SHAPE'S WORDS ARE THIS UNIT'S and the rung's POSITION is the ladder's, which is
+    # why the table carries a bare `<id>` for it. Supplied whether or not `--asks` printed the rows:
+    # the false "every tracked spec is terminal" is a lie about the BUILD, not about an output mode.
+    [ -z "$ASK_PLAN_NEXT" ] || _ask1="$ASK_PLAN_NEXT (UNDECIDED - plan a unit that closes it, or dispose it)"
+  fi
   # The value resolved at the top of this verb, not re-derived. R2-M3: two `$( )` calls here meant two
   # discarded exit-3s, and the guard that replaced them still sat AFTER the listing.
   if [ -n "$_rids" ]; then
@@ -3540,6 +4170,15 @@ run_hold() { # slug · code · until · reason · reaped · unreachable
 
 verb_preflight() { # slug · keepalive-id
   local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka
+  # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
+  # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
+  # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
+  # about a missing README, which tells an owner nothing about the form that would have worked.
+  if is_ids_value "$slug"; then
+    fail 6 "this verb is addressed by SLUG and was given ids, or a slug mixed with them; a run may not write the folder that authorizes it, so an id list becomes a build through the scaffold the OWNER lands, and a mixed value has no honest reading because a run cannot extend a committed mandate: $slug"
+    print_scaffold_recipe "$slug"
+    return 1
+  fi
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   # ROTATION, HALF ONE: the TEST. A terminal record is not a reason to refuse a NEW run — it is a
@@ -3601,6 +4240,11 @@ verb_preflight() { # slug · keepalive-id
   # failed observation leaves ASHA empty and the base block below is skipped entirely, so the
   # operator reads why the observation failed rather than a second, unrelated merge-base complaint.
   observe_anchor || true
+  # S6's second half, HERE because it needs the anchor and must still run before `trusted_base`:
+  # under `ANCHOR_SCOPE=published` a README absent at the first anchor's merge-base widens to the
+  # second anchor, and an unpushed branch is then refused with a push instruction that carries no
+  # recipe and, once followed, writes to the remote.
+  check_filing_home "$slug" || true
   check_clean || true
   check_branch || true
   check_wiring || true
@@ -3651,6 +4295,12 @@ verb_preflight() { # slug · keepalive-id
   # refuse a scoped waiver rather than grant it, and those two spellings differ exactly when the
   # authorization read failed - which is the moment a silent grant would matter most.
   check_waiver_scope || true
+  # TOOL-dDerivedDocket-16 S3, S4, S5 and S11 - THE MANDATE'S OWN PRECONDITIONS, evaluated here and
+  # not one line lower. Everything they pin is written AFTER the gate below; everything they refuse
+  # is refused while the tree is still untouched, which is what lets a refused preflight say the
+  # run-state file is unchanged and be telling the truth.
+  check_ask_mandate "$slug" "$rel" || true
+  check_backlog_mode_shift || true
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
   [ "$status" = 0 ] || { echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
@@ -3754,6 +4404,17 @@ verb_preflight() { # slug · keepalive-id
   # global empty, and preflight has already refused by then - the default never reaches disk on a
   # run that got here without the read.
   [ -n "$(fact "$rel" mode)" ] || set_fact "$rel" mode "${AUTH_MODE:-slug}" || return 1
+  # TOOL-dDerivedDocket-16 S3 - THE THREE ASK FACTS, pinned ONCE for the reason `base` and the anchor
+  # triple are: a re-preflight that rewrote them would re-point the mandate, the tree it was asserted
+  # against and its grades at whatever today says, while the base they are evidence beside stayed
+  # pinned - and evidence for a pinned value that moves is evidence for nothing. Written only where
+  # the README carries a mandate, because a blank key reads as configured while carrying nothing.
+  if [ -n "${AUTH_ASKS:-}" ]; then
+    [ -n "$(fact "$rel" m-base)" ]     || set_fact "$rel" m-base "$PF_MBASE"          || return 1
+    [ -n "$(fact "$rel" asks)" ]       || set_fact "$rel" asks "$AUTH_ASKS"           || return 1
+    [ -n "$(fact "$rel" asks-ready)" ] || set_fact "$rel" asks-ready "$PF_ASKS_READY" || return 1
+    echo "unattended: preflight — mandate pinned at m-base $(fact "$rel" m-base) · asks $(fact "$rel" asks) · ready $(fact "$rel" asks-ready)"
+  fi
   # the resolved binding, recorded so a later reader can tell WHICH
   # playbook bound the run without re-deriving it, and so the leg has a recorded answer to
   # SECOND-OPINION rather than a value only the driver ever saw. Recorded only in recipe mode:
@@ -4104,6 +4765,12 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
   observe_anchor || return 1
   trusted_base "$rel" allow-degenerate || return 1
   check_authorization "$slug" "$TB" || return 1
+  # TOOL-dDerivedDocket-16 S4 - PROPERTY P6 AT EVERY RESUME. The mandate was pinned at preflight and
+  # the README is a file this run can edit, so a resume that did not re-read it would let the ask set
+  # grow across a hold - which is the one thing about a mandate a run may never do. P5 and the READY
+  # witness are re-run beside it, against the PINNED `m-base:`, so the answer is the same function of
+  # the same tree that preflight evaluated.
+  check_ask_mandate "$slug" "$rel" || return 1
   print_interrupted_acts
   write_lease_taken "$slug" "$kid" || { fail 57 "cannot write this slug's lease file, and an unwritten lease leaves the run readable as undriven by the next session that asks: $LEASE_FILE"; return 1; }
   # THE SEAM the process-ledger unit fills: the run's own orphaned processes are reaped HERE, after
@@ -4145,6 +4812,11 @@ verb_resume() { # slug
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
   read_derived_phase "$rel"; p="$DP_PHASE"
   [ -n "$p" ] || { fail 10 "the run-state file declares no phase, and a run with no phase is not resumable: $rel"; return 1; }
+  # TOOL-dDerivedDocket-16 S4 - PROPERTY P6, ABOVE THE MATRIX. Several rows below return without ever
+  # reaching the authorization block — the holder refreshing its own lease is the common one — so a
+  # check placed there would fire on a take-over and never on the resume an agent actually runs after
+  # a compaction. This needs only the record and HEAD, so it can sit where every row passes through.
+  check_asks_pinned "$slug" "$rel" || return 1
   # TOOL-dDerivedDocket-5 - THE SCHEDULED RESTART'S FOUR REFUSALS, evaluated in section 4's order
   # and BEFORE every row of the matrix below, so a restart filed by a durable task writes nothing at
   # all unless the exact hold it was filed for is still this record's state. A schedule outlives the
@@ -6152,7 +6824,7 @@ verb_record_piece() { # slug · piece · leg · verdict
 # PYTHON function in a different kit, each kit is copy-installed standalone, and check 10's own
 # header records that an adopter may hold one and not the other.
 verb_rescope() { # slug · act · unit · successor · reason
-  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" rel want pl ids shaped
+  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" rel want pl ids shaped _rs_bl
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 48 "no run-state file, so there is no run to record an amendment against: $rel"; return 1; }
@@ -6206,8 +6878,27 @@ RESCOPED
   ids=$(unit_ids_of "$slug")
   case "$act" in
     retire|supersede)
-      printf '%s\n' "$ids" | grep -qxF -- "$unit" || { fail 48 "a rescope names a unit the build README's generated units region does not carry, and a run cannot retire what its roster never held: $unit"; return 1; } ;;
+      # TOOL-dDerivedDocket-16 S10 - A `unit` ASK IS ROSTER. Design section 19.4 makes a filed
+      # `unit` ask a planned unit of the build whose folder files it, and such a unit may have no
+      # spec and therefore no generated row - which is exactly the unit a run most often needs to
+      # retire. Refusing it left the roster carrying a unit nothing could remove, and `--close`'s
+      # build-complete term then demanded it forever.
+      if ! printf '%s\n' "$ids" | grep -qxF -- "$unit"; then
+        if ! asks_unit_in "$(backlog_text_of "$slug")" | grep -qxF -- "$unit"; then
+          fail 48 "a rescope names a unit the build README's generated units region does not carry and this build's folder does not file as a \`unit\` ask either, and a run cannot retire what its roster never held: $unit"; return 1
+        fi
+        echo "unattended: the retired id is a \`unit\` ask of this build's own folder and carries no generated unit row — the roster half design section 19.4 adds"
+      fi ;;
     add)
+      # TOOL-dDerivedDocket-16 S10 - AN ADD MAY NOT NAME A FILED ASK THAT IS NOT A UNIT. The two
+      # populations share one id grammar, so a mistyped amendment can silently mint a "unit" whose
+      # id already belongs to somebody's ask - and from then on the two records contest the id, which
+      # is the collision section 2's whole slug discipline exists to make impossible. A `unit` ask is
+      # the sanctioned overlap and is admitted; anything else filed is refused by name.
+      _rs_bl=$(backlog_text_of "$slug")
+      if ask_filed_in "$_rs_bl" "$unit" && ! asks_unit_in "$_rs_bl" | grep -qxF -- "$unit"; then
+        fail 76 "a rescope adds a unit whose id is already a filed ask of this build that is not a \`unit\` ask, so the amendment would mint a second record under an id an ask already owns and the two would contest it from here on: $unit"; return 1
+      fi
       # THE QUESTION IS NOT "is it in the region NOW". It is "was it in the roster this run STARTED
       # with", which is the question check 24 asks and the only one that separates a fabricated row
       # from a late one. Asking the current region instead made the two checks unsatisfiable
@@ -6384,6 +7075,41 @@ verb_dispatch() { # slug · unit · writes...
   if [ -n "$_blockers" ]; then
     fail 49 "--dispatch declares a build pass out of the build's own declared order: $unit is at order $_d_ord and an earlier step still holds a unit that is neither terminal nor dispatched:$_blockers"
     return 1
+  fi
+  # -------------------------------------------------- TOOL-dDerivedDocket-16 S9, THE HOLD GATE
+  # The order gate above enforces DECLARED orders and nothing else, so a unit whose spec closes an
+  # ask that is BLOCKED on another mandated ask sails through it whenever nobody typed an `order`
+  # verb. The hold is the dependency the design cares about - `order` expresses sequence, a hold
+  # expresses that one ask cannot be finished until another is - and it is data the owner filed
+  # rather than a number a run wrote.
+  #
+  # BESIDE code 49, not under a new one: this is the same question the gate above asks (may this
+  # pass start yet) over a second source of the same edge, and one question answered under two codes
+  # makes a reader work out whether they are looking at one refusal or two.
+  #
+  # MANDATE-CONDITIONAL, so a build with no `asks:` fact makes no bounded call and behaves exactly
+  # as it did. The witness runs at the PINNED `m-base:`, which is the tree the hold edges were
+  # asserted in; grading HEAD would let a hold filed after the run began block a dispatch.
+  local _dh_mandate _dh_ids _dh_a _dh_b _dh_block="" _dh_st
+  _dh_mandate=$(fact "$rel" asks)
+  if [ -n "$_dh_mandate" ]; then
+    _dh_ids=$(asks_ids_of "$_dh_mandate")
+    _dh_a=$(spec_ask_verbs "$_d_spec" closes)
+    if [ -n "$_dh_a" ] && run_ask_witness "$slug" "$(fact "$rel" m-base)" $_dh_ids; then
+      for _o_id in $_dh_a; do
+        for _dh_b in $(ask_field "$_o_id" holds | tr ',' ' '); do
+          [ -n "$_dh_b" ] && [ "$_dh_b" != "-" ] || continue
+          printf '%s\n' "$_dh_ids" | grep -qxF -- "$_dh_b" || continue
+          _dh_st=$(ask_field "$_dh_b" status)
+          case "$_dh_st" in CLOSED|WONTDO) continue ;; esac
+          _dh_block="$_dh_block $_o_id holds on $_dh_b ($_dh_st)"
+        done
+      done
+    fi
+    if [ -n "$_dh_block" ]; then
+      fail 49 "--dispatch declares a build pass for a unit that closes an ask held on a mandated ask that is not terminal, so the unit would be finished against a question its own dependency has not answered yet:$_dh_block"
+      return 1
+    fi
   fi
   # EACH --writes IS ONE PATH. A space-joined value cannot carry the whitespace refusal below: the
   # path has already become two tokens by the time this verb sees it, and nothing recovers that.
@@ -6639,10 +7365,11 @@ while [ $# -gt 0 ]; do
                     # subshell gives the same isolation a separate process gave, at a fork instead of
                     # an exec. The per-slug rc is emitted rather than accumulated, because the caller
                     # skips a build whose plan REFUSES and cannot recover that from a summary status.
-                    PLAN_PATHS=""; _pl_slugs=""; _pl_framed=""
+                    PLAN_PATHS=""; PLAN_ASKS=""; _pl_slugs=""; _pl_framed=""
                     while [ $# -gt 0 ]; do
                       case "${1:-}" in
                         --paths)  PLAN_PATHS=paths; shift ;;
+                        --asks)   PLAN_ASKS=asks; shift ;;
                         --framed) _pl_framed=1; shift ;;
                         --*)     break ;;
                         "")      shift ;;

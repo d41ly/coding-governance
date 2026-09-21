@@ -481,3 +481,43 @@ baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [f
   fi
   printf '%s\n' "$_bu_was"
 }
+
+# ------------------------------------------------------------------------- the ask FILING match
+# TOOL-dDerivedDocket-16 S4. Property P5 asks one question of a `BACKLOG.md` blob: does this ask
+# have a row there. The DRIVER asks it at preflight, over the blob at `m-base:`; the gate leg asks
+# it again over the same blob when it re-derives the pinned facts. Two spellings of one grammar is
+# the class this whole file exists for, so the match lives here and neither caller writes its own.
+#
+# FILING IS NOT STATUS, and that is the whole reason this can live in a shell library at all. A row
+# says the ask EXISTS in a tree the run did not write; what its derived status IS comes from the
+# declared generator's fold, which this kit neither carries nor re-implements.
+#
+# ANCHORED AT COLUMN 1 BY `index(...) == 1`, not by a regex, because the id is a value a caller
+# supplies: a regex would give `.` and `*` in a malformed argument meaning they do not have, and a
+# substring test would let a `SCOPE` row or a prose mention answer for a filing.
+#
+# THE PREFIX IS `- <ID> · filed `, the ask row's own opening as the memory kit's grammar spells it.
+# A row whose separator or date field differs is not a filed ask and must not answer as one.
+#
+# ENVIRON RATHER THAN `awk -v`: a -v assignment expands backslash sequences, and the id is a caller's
+# bytes. Same rule the sibling suite's fixture writer already states for its row bodies.
+ask_filed_in() { # BACKLOG.md text · ask id -> 0 when that text FILES the ask
+  printf '%s\n' "$1" | AFI_ID="$2" awk '
+    BEGIN { p = "- " ENVIRON["AFI_ID"] " · filed " }
+    index($0, p) == 1 { f = 1 }
+    END { exit !f }'
+}
+# THE SAME GRAMMAR READ THE OTHER WAY: every id a blob files, in file order. `--plan --asks` needs
+# the SET (the asks filed in a build's own folder), and deriving it by calling the match above once
+# per candidate id would need a candidate list, which is the thing this answers.
+asks_filed_in() { # BACKLOG.md text -> every filed ask id, one per line, in file order
+  printf '%s\n' "$1" \
+    | sed -n 's/^- \([A-Z][A-Z]*-[A-Za-z0-9][A-Za-z0-9]*-[0-9][0-9]*\) · filed .*/\1/p'
+}
+# ...and the `unit` SUBSET. `- <ID> · filed <DATE> · unit · <TEXT>` is an ask that IS a unit of the
+# build whose folder files it, so design section 19.4 makes it roster. `unit` is recognised as the
+# WHOLE field after the date and never as a prefix of the text, which is the memory kit's own rule.
+asks_unit_in() { # BACKLOG.md text -> every filed `unit` ask id, one per line, in file order
+  printf '%s\n' "$1" \
+    | sed -n 's/^- \([A-Z][A-Z]*-[A-Za-z0-9][A-Za-z0-9]*-[0-9][0-9]*\) · filed [0-9][0-9-]* · unit · .*/\1/p'
+}

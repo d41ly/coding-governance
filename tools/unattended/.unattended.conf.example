@@ -155,6 +155,16 @@ MAP_CLI=""
 # so the dispatch is the one point that sees a spec while it can still be changed.
 SPEC_TOKENS_CLI=""
 
+# OPTIONAL, the same shape again, and the one key an ASK-DRIVEN run needs. The generator the driver
+# calls to grade whether a mandated ask can be executed without asking anybody, and to list a filing
+# home's live asks in a refusal. The driver appends its own arguments; the call shapes are listed in
+# the companion guide beside this kit's protocol and are not restated here.
+#
+# BLANK IS THE KIT DEFAULT and means the ask envelope is NOT adopted: a build README carrying an
+# `asks:` key then REFUSES at preflight naming this key, rather than pinning a mandate nothing can
+# grade. A repo with no `asks:` key anywhere takes today's path unchanged and is told so on stdout.
+ASKS_CMD=""
+
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
 # interactive exits that engine resolves without an owner turn — MEASURE it against your own engine,
