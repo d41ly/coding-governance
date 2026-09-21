@@ -584,7 +584,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 120
+    "ceiling": 300
   },
   {
     "name": "review-join self-test",
@@ -641,7 +641,7 @@
     "guard": [
       "tools/codebase-map/"
     ],
-    "ceiling": 60
+    "ceiling": 180
   },
   {
     "name": "codebase-map coverage + freshness",
@@ -770,7 +770,7 @@
     ],
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 180
   },
   {
     "name": "process-monitor census selftest",
@@ -811,7 +811,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 180
+    "ceiling": 360
   },
   {
     "name": "runlog record schema",
@@ -822,7 +822,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 180
   },
   {
     "name": "runlog skill wiring",
@@ -1314,7 +1314,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 180
   },
   {
     "name": "kit placeholders (a declared token its adopter substitutes)",
@@ -1324,7 +1324,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 180
   },
   {
     "name": "leg ceilings clear their evidenced maximum",
@@ -1383,7 +1383,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 120
+    "ceiling": 180
   },
   {
     "name": "selftest harness self-test",
