@@ -144,12 +144,18 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   repo under any other MSYS mount (`/tmp/…`) is not folded — it is denied by name, since Node cannot
   place it. A subject that is absolute or `~`-rooted is denied too: a direct spec-audit subject is
   repo-relative by the harness's contract, and a same-slug `builds/` folder in a second checkout is
-  otherwise indistinguishable from this one. TWO LIMITS, stated
+  otherwise indistinguishable from this one. A PROJECT-WIDE DEFAULT (`TOOL-aBlindedTrial-7`): when
+  the README is readable and carries NO key, the hook reads `SPEC_AUDIT_DEFAULT` from
+  `<args.repo>/.unattended.conf` — the worktree copy, last assignment wins, both quote styles and a
+  trailing `# comment` read as the shell would — and a date admits, a non-date denies by name, a
+  missing file or a blank is no default. The README key wins whatever it says, so a malformed key
+  never falls back to the default. TWO LIMITS, stated
   rather than implied. The `workflow()` a running harness calls from INSIDE its script is a runtime
   call and not a tool call, so the programmatic route is the unattended driver's to refuse
-  (`TOOL-aBlindedTrial-3`); and this hook reads the WORKTREE README while that driver reads BASE, so
-  the two can disagree for exactly one uncommitted edit. An `args` string that does not parse shows
-  the hook no `kind` and is admitted here; the harness itself throws on it, so no audit runs.
+  (`TOOL-aBlindedTrial-3`); and this hook reads the WORKTREE README and conf while that driver reads
+  both at BASE, so the two can disagree for exactly one uncommitted edit. An `args` string that does
+  not parse shows the hook no `kind` and is admitted here; the harness itself throws on it, so no
+  audit runs.
 
 ## Running ONE rule
 

@@ -41,7 +41,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.26   # gov:kit unattended@1.26 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.28   # gov:kit unattended@1.28 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -338,13 +338,16 @@ MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
-DISPOSITION_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
 # is a declared key and defaults here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so
 # it is copied BEFORE the conf is sourced: a tracked file the run commits itself must not be what
 # turns that run's own log off. RESUME_ATTEMPTS, RESUME_TURNS and DISPOSITION_CUTOFF default here
 # for the same reader: the tick and check 2 clause 3 read them, and the driver's --status names them.
+# SPEC_AUDIT_DEFAULT (TOOL-aBlindedTrial-7) is defaulted here like its neighbours so the source-level
+# arm sees it, but the value THIS source binds decides nothing: check_authorization re-reads the key
+# from the conf blob at the pinned BASE, because a run could blank its working copy to opt out.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -458,7 +461,9 @@ DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 # carrying no name, no reason and no record. DIRECTIVES_EXTRA is where a project ADDS.
 # TOOL-aBlindedTrial-6 (owner, 2026-09-20) supersedes that ruling for ONE member: the spec-audit pair
 # (`specs-reviewed` here, `specs-audited` in DOD_CORE) is opt-in per build, declared by a dated
-# `spec-audit:` key in the build README at BASE; both members stay in the core sets so no adopter's
+# `spec-audit:` key in the build README at BASE, or by a project-wide SPEC_AUDIT_DEFAULT in
+# .unattended.conf at BASE (TOOL-aBlindedTrial-7 - the ADD the ruling allows, a README key winning);
+# both members stay in the core sets so no adopter's
 # floor moves, and the evidence is the trial report under memory/builds/aBlindedTrial/build/.
 #
 # Two handles may cite one section - the section is the carrier, not the rule.
@@ -780,10 +785,15 @@ AUTH_RECORDS=""
 # the same provenance property: a run cannot opt itself in or out by editing its working copy.
 # Empty is the ordinary case and means the pre-code audit is not owed by this build. That empty is
 # ALSO the value before check_authorization has run at all, so `AUTH_SPEC_AUDIT_DERIVED` says which
-# (round 2, R3): set to 1 on the line after the derivation, and a grader that finds it empty refuses
+# (round 2, R3): set to 1 after BOTH halves of the derivation - README key, then conf default - so
+# a refusal in either half leaves it blank, and a grader that finds it empty refuses
 # as NOT GRADABLE rather than printing a sentence about a README nobody read.
+# TOOL-aBlindedTrial-7 - a SECOND source at the SAME BASE: the README key when it carries one, else
+# SPEC_AUDIT_DEFAULT from .unattended.conf at that base. `AUTH_SPEC_AUDIT_FROM` names which
+# (`readme` | `project`) so the preflight line can say so without a second pinned fact.
 AUTH_SPEC_AUDIT=""
 AUTH_SPEC_AUDIT_DERIVED=""
+AUTH_SPEC_AUDIT_FROM=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -1453,7 +1463,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb _sa_shown
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _sa_shown _cf _sad
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -1498,7 +1508,6 @@ check_authorization() { # slug · base
   # silent opt-out the sentence above forbids, one value narrower. Present-and-empty is shown as
   # `(empty)` so it takes the refusal; a README with no such line still falls through as not owed.
   AUTH_SPEC_AUDIT=$(printf '%s\n' "$_fm" | sed -n 's/^spec-audit=//p' | head -1)
-  AUTH_SPEC_AUDIT_DERIVED=1
   _sa_shown="$AUTH_SPEC_AUDIT"
   if [ -z "$AUTH_SPEC_AUDIT" ] && printf '%s\n' "$_fm" | grep -q '^spec-audit='; then _sa_shown="(empty)"; fi
   case "$_sa_shown" in
@@ -1506,6 +1515,52 @@ check_authorization() { # slug · base
     *) fail 52 "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: $_sa_shown"
        return 1 ;;
   esac
+  AUTH_SPEC_AUDIT_FROM=""
+  [ -n "$AUTH_SPEC_AUDIT" ] && AUTH_SPEC_AUDIT_FROM=readme
+  # TOOL-aBlindedTrial-7 - the PROJECT default, consulted only when the README carries NO
+  # `spec-audit:` line at all: a key that is present, even malformed, has already decided above, so
+  # a typo never falls back to the default (that would be the read-as-absent opt-out fail 52 refuses).
+  # Read from the conf blob at the SAME BASE, the `_pb` idiom below, so a run cannot blank its
+  # working copy to escape; an absent blob is no default. The blob is read the file's OWN way -
+  # evaluated in a subshell, never a sed pipeline, which reads `KEY='v'`, `KEY="v" # note` and a
+  # last-wins pair differently from the shell (gotcha two-readers-of-one-config-one-re-derived). The
+  # variable is BLANKED first so a BASE conf that predates the key cannot inherit the working copy's
+  # value through the environment. THE BLOB PROVES IT WAS READ TO THE END (closing review of units
+  # 7/8, R2 and round 2 R6): the sentinel is printed FROM INSIDE the eval'd text, appended after a
+  # newline on a descriptor the blob's own redirect does not cover, so it appears iff evaluation
+  # reached the end WHATEVER the last statement's status - a trailing `false` or `[ -n "${OPT:-}" ]`
+  # is an ordinary conf and reads as the date, as the startup source and the hook read it. A blob
+  # that ends before the read - a `return` (legal at the top of a sourced file, and the SAME bytes
+  # read as the date at startup), an `exit`, an unbound reference under this file's set -u, a
+  # syntax error - prints no sentinel and is fail 55, never "no default": unknown is not absent,
+  # and reading it as absent was the opt-out fail 52 and fail 54 exist to refuse, through the one
+  # path they did not cover. The TWO newlines of glue matter (round 2 R6, round 3 R1): without the
+  # first, a blob ending in a comment line swallows the printf; without the second, a blob whose
+  # LAST line ends in a backslash continuation - `SPEC_AUDIT_DEFAULT="<date>" \`, and $(GIT show)
+  # strips the newline after it - joins the sentinel onto that line as a temp-env PREFIX of the
+  # printf, whose argument had already expanded from the blanked variable, so a declared default
+  # read as `OK ` and therefore as absent. The continuation consumes the first newline; the
+  # sentinel starts its own line. A non-date is fail 54 on fail 52's reasoning, one file over.
+  if [ -z "$AUTH_SPEC_AUDIT" ] && ! printf '%s\n' "$_fm" | grep -q '^spec-audit=' \
+     && _cf=$(GIT show "$base:.unattended.conf" 2>/dev/null); then
+    _sad=$( SPEC_AUDIT_DEFAULT=""; exec 3>&1
+            eval "$_cf"$'\n\n''printf "OK %s" "${SPEC_AUDIT_DEFAULT:-}" >&3' >/dev/null 2>&1 )
+    case "$_sad" in
+      "OK "*) _sad=${_sad#OK } ;;
+      *) fail 55 "the project conf at the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
+         return 1 ;;
+    esac
+    case "$_sad" in
+      "") ;;
+      [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) AUTH_SPEC_AUDIT="$_sad"; AUTH_SPEC_AUDIT_FROM=project ;;
+      *) fail 54 "the project conf at the pinned BASE declares SPEC_AUDIT_DEFAULT with a value that is not a YYYY-MM-DD date, and a project-wide opt-in is a dated declaration or not at all - declared: $_sad"
+         return 1 ;;
+    esac
+  fi
+  # Set AFTER BOTH halves (round 2, R2): a refusing return above - fail 52, 54 or 55 - leaves it
+  # blank, so the specs-audited grader lands on its NOT GRADABLE branch instead of printing the
+  # absence the refusal just declined to assert.
+  AUTH_SPEC_AUDIT_DERIVED=1
   # out of the SAME scan. The `No second GIT show` rule above bounds THAT
   # front-matter parse and is not a rule against reading a second FILE, which S2b does.
   AUTH_PLAYBOOK=$(printf '%s\n' "$_fm" | sed -n 's/^playbook=//p' | head -1)
@@ -2983,7 +3038,9 @@ verb_preflight() { # slug · keepalive-id
   # TOOL-aBlindedTrial-2 - the opt-in, pinned once and only when DECLARED, on the recipe facts'
   # terms: a blank fact would be a key that reads as configured while carrying nothing, and the
   # `specs-audited` grader compares the fact against the BASE derivation as evidence (fail 53 on a
-  # presence disagreement).
+  # presence disagreement). Since TOOL-aBlindedTrial-7 the value may come from the project's
+  # SPEC_AUDIT_DEFAULT at the same BASE; check_authorization folded it into AUTH_SPEC_AUDIT, so
+  # the same line pins it and no second fact exists to disagree with the first.
   if [ -n "${AUTH_SPEC_AUDIT:-}" ]; then
     [ -n "$(fact "$rel" spec-audit)" ] || set_fact "$rel" spec-audit "$AUTH_SPEC_AUDIT" || return 1
   fi
@@ -3021,7 +3078,10 @@ verb_preflight() { # slug · keepalive-id
 
 # TOOL-aBlindedTrial-2 - the ONE line a reader learns the opt-in state from at the start of a run;
 # the other is the `specs-audited` item's own at --close. Reads the PINNED fact; at --close the
-# grader re-derives from BASE and refuses (fail 53) if the two disagree on presence. Silent-at-zero
+# grader re-derives from BASE and refuses (fail 53) if the two disagree on presence. THREE
+# spellings, and the Skill quotes all three: the source rides `AUTH_SPEC_AUDIT_FROM`, set by
+# check_authorization in this same shell, so `project` (TOOL-aBlindedTrial-7) names the conf key
+# rather than a README line the build never wrote. Silent-at-zero
 # is the house rule for the
 # recommendation clause: a one-unit build with no open fork is what the trial measured the audit
 # buying nothing on, so the clause rides only where the build has two or more units in its
@@ -3030,7 +3090,11 @@ print_spec_audit_line() { # slug · run-state file
   local sa why="" n=0 _sp
   sa=$(fact "$2" spec-audit)
   if [ -n "$sa" ]; then
-    echo "unattended: spec-audit — opted in by README spec-audit: $sa"
+    if [ "${AUTH_SPEC_AUDIT_FROM:-}" = project ]; then
+      echo "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: $sa"
+    else
+      echo "unattended: spec-audit — opted in by README spec-audit: $sa"
+    fi
     return 0
   fi
   n=$(unit_rows "$(readme_of "$1")" 2>/dev/null | row_ids_of | grep -c .)
@@ -4159,7 +4223,9 @@ $_bcnon"
     specs-audited)
       # OWED ONLY WHEN DECLARED (TOOL-aBlindedTrial-2, on the owner's ruling TOOL-aBlindedTrial-6):
       # the pre-code spec audit is opt-in per build, and the build opts in with a dated `spec-audit:`
-      # key in its README at BASE, read by `authorization-reachable` into `AUTH_SPEC_AUDIT` in this
+      # key in its README at BASE - or, since TOOL-aBlindedTrial-7, its project does with a dated
+      # SPEC_AUDIT_DEFAULT in .unattended.conf at the same BASE, the README key winning when present
+      # - read by `authorization-reachable` into `AUTH_SPEC_AUDIT` in this
       # same shell. Term zero below keys on THAT; the `spec-audit` fact --preflight pins is EVIDENCE
       # compared against it, and a presence disagreement is fail 53. Derived absent, the item is MET
       # and announces that nothing was owed. The item stays in DOD_CORE so no adopter's CORE_FLOOR
@@ -4189,21 +4255,24 @@ $_bcnon"
       # it takes the same cure: the recorded fact is EVIDENCE compared against the derivation, never
       # the input, and a disagreement on PRESENCE is a refusal. Never the worktree README either.
       #
-      # NOT GRADABLE when the derivation never ran (round 2, R3): `authorization-reachable` returns
-      # early on an unreachable anchor or a missing README, the DoD loop grades every item regardless,
-      # and the global's "never set" and "derived absent" are the same bytes. The fail-53 sentence is
-      # printed only over a derivation that happened; this branch says the anchor is the cause.
+      # NOT GRADABLE when the derivation never finished (round 2, R3; the causes widened at units 7/8
+      # round 3, R2): `authorization-reachable` returns early on an unreachable anchor, a missing
+      # README, or a REFUSED spec-audit read - fail 52, 54 or 55 - the DoD loop grades every item
+      # regardless, and the global's "never set" and "derived absent" are the same bytes. The fail-53
+      # sentence is printed only over a derivation that happened; this branch names the three causes
+      # rather than the anchor alone, because under fail 55 the README half completed and the conf
+      # blob was refused three lines up in the same output.
       if [ -z "${AUTH_SPEC_AUDIT_DERIVED:-}" ]; then
-        DOD_OUT="specs-audited — not gradable: the README at BASE was not derived in this shell (authorization-reachable is unmet above), so whether this build opted in is unknown here"
+        DOD_OUT="specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read), so whether this build opted in is unknown here"
         return 1
       fi
       _sa_fact=$(fact "$rel" spec-audit)
       if [ "${AUTH_SPEC_AUDIT:+1}" != "${_sa_fact:+1}" ]; then
-        fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
+        fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README, or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
         return 1
       fi
       if [ -z "${AUTH_SPEC_AUDIT:-}" ]; then
-        DOD_OUT="specs-audited — not owed: the spec audit is opt-in and the build README at BASE declares no spec-audit: key, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
+        DOD_OUT="specs-audited — not owed: the spec audit is opt-in, the build README at BASE declares no spec-audit: key and the project conf at BASE declares no SPEC_AUDIT_DEFAULT, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
         return 0
       fi
       if ! _sa_rows=$(unit_rows "$(readme_of "$slug")"); then
@@ -4237,7 +4306,9 @@ $_bcnon"
       done
       if [ -n "$_sa_miss" ]; then
         if [ -z "${_sa_named//[[:space:]]/}" ]; then
-          DOD_OUT="no TRACKED record under this build carries a spec-audit binding line at all, so the pre-code review pass this build opted into with its spec-audit: key left no evidence; units closed without one:$_sa_miss"
+          # The SOURCE is named, not assumed (closing review of units 7/8, R10): under a project
+          # default there is no README key for the operator to go looking for.
+          DOD_OUT="no TRACKED record under this build carries a spec-audit binding line at all, so the pre-code review pass this build owes (spec-audit $AUTH_SPEC_AUDIT, from ${AUTH_SPEC_AUDIT_FROM:-readme}) left no evidence; units closed without one:$_sa_miss"
         else
           DOD_OUT="a CLOSED unit is named by no tracked spec-audit record, so its spec was never audited before its code was written:$_sa_miss"
         fi
@@ -5348,7 +5419,30 @@ RESCOPED
 # already (it counted the declaration commit). Openness comes from `pass_commit` in the kit library,
 # which the gate leg calls too.
 check_pass_open() { # grp · unit · run-state file · declared set (space-separated)
-  local _g="$1" _u="$2" _rel="$3" _decl="$4" _pcommit _wrote _hit _dp _wp
+  local _g="$1" _u="$2" _rel="$3" _decl="$4" _pcommit _wrote _hit _dp _wp _rows _r _n _at
+  # A SUPERSEDED ROW IS NOT AN OPEN PASS (TOOL-cMendedVintage-10). `--writes` is repeatable and the
+  # record is append-only, so a unit that re-declares — NARROWING, because it discovered it needs
+  # fewer files — leaves earlier rows naming paths no commit of its will ever write. Deciding on the
+  # commit alone reserves those paths forever and refuses every later unit declaring one, which
+  # rewards a pass for writing everything it declared and punishes one for finding it needs less.
+  # The live instance wedged this build: one unit's first row named an engine file it correctly never
+  # touched, and the next unit's declaration of that file was refused against a pass long finished.
+  #
+  # THE LAST ROW CARRYING THIS SET, not the first: a unit may re-declare an IDENTICAL set and those
+  # two rows supersede nothing. A set matching NO row is `--audit`'s union of a unit's same-anchor
+  # rows, which already spans through the last of them and is superseded by nothing — so an unmatched
+  # set falls through to the commit test unchanged. That is what keeps the stall clock reading the
+  # union it built rather than grading every re-declaring unit closed and never reporting it STALLED.
+  _rows=$(grep -F -- " dispatch · item $_g $_u · reason " "$_rel" 2>/dev/null || true)
+  _n=0; _at=0
+  while IFS= read -r _r; do
+    [ -n "$_r" ] || continue
+    _n=$((_n + 1))
+    [ "${_r#* · reason }" = "$_decl" ] && _at=$_n
+  done <<CPOROWS
+$_rows
+CPOROWS
+  [ "$_at" -gt 0 ] && [ "$_at" -lt "$_n" ] && return 1
   # An anchor this clone cannot resolve leaves the pass OPEN — `pass_commit` returns 1 for it.
   # Conservative by choice: the failure of a disjointness proof must be a refusal, never a pass.
   _pcommit=$(pass_commit "$_g" "$_u" "$_rel" || true)

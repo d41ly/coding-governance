@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.26 -->
+<!-- gov:kit unattended@1.28 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -17,9 +17,10 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 | the verb carrier | copied from `VERBS.template.md` |
 | the playbook template | copied from `PLAYBOOK-TEMPLATE.template.md` |
 | the playbook **fixture** | **rendered** from `playbook.fixture.template.md` |
+| the fixture **records** | **rendered** from `fixture-record-one.template.md` and its sibling |
 
 Copied artifacts carry no placeholder, so rendering them would be a second spelling of `cat`. The
-two rendered ones do carry placeholders, and for them a render is the only correct install.
+rendered ones do carry placeholders, and for them a render is the only correct install.
 
 **One Skill placeholder is probed rather than read.** The Skill tells a run to execute the
 memory-tree kit's bug-class checklist, so it names that kit's `gotchas.py` by path. An adopter may
@@ -45,10 +46,13 @@ under this kit's own directory, so one token covers every one of them. `TOOL_ROO
 declared here and must not be: only the memory-tree kit's adopter computes that value, so declaring
 it would ship an unresolved `{{TOOL_ROOT}}` brace to every adopter of this one.
 
-**The fixture RECORDS move with it.** Each is named for the piece it describes with `/` written as
-`~`, so the prefix lives in their filenames as well as their bodies. The adopter repaths both.
-Renaming without rewriting leaves each record describing a piece that does not exist, which
-`check-playbook.sh` reports as an orphan record — coverage nobody has.
+**The fixture RECORDS are rendered with it.** Each is named for the piece it describes with `/`
+written as `~`, so the prefix lives in their filenames as well as their bodies, and the adopter
+derives both from the same value it renders the body with. This kit's own two copies are withheld
+from every install, so nothing arrives under a foreign prefix and nothing is renamed over anything —
+which is what the rename this replaced did to a target's own copy on every update. A record whose
+body names a piece the tree does not hold is an orphan record to `check-playbook.sh` — coverage
+nobody has.
 
 **An unresolved token is a refusal, and no file is written.** Catching it at `--check` time alone
 would still leave a rendered artifact on disk carrying a literal brace, and something reads that
@@ -126,7 +130,7 @@ never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
 ## Running the kit's own checks
 
 ```
-adopt-unattended.sh --check      # the five artifacts are installed and in sync, the hook wired
+adopt-unattended.sh --check      # the installed artifacts are in sync, the hook wired
 check-unattended.sh              # the kit gate
 check-playbook.sh                # playbook validity, including the fixture
 check-pass-order.sh              # refuses a unit built before it was specced

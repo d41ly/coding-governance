@@ -169,11 +169,16 @@ read_stub_log() {
 # exists. The NOTE-path liveness read (TOOL-aWokenSentinel-13): an empty path, the specced defect's
 # own signature, counts for nothing, and so does a NOTE that never printed.
 measure_note_files() {
-  local n=0 p paths
-  # The substitution lands in a variable FIRST: a loop fed by a here-string holding a command
-  # substitution is the shape the shell-hygiene leg gates (it reads until an EOF that may never come).
-  paths=$(printf '%s\n' "$1" | sed -n 's/.*Declare one in \(.*\) to change it.*/\1/p')
-  while IFS= read -r p; do [ -n "$p" ] && [ -f "$p" ] && n=$((n+1)); done <<<"$paths"
+  local n=0 p pathf
+  # A SCRATCH FILE. Landing the substitution in a variable first was the earlier shape here, and
+  # its comment claimed that satisfied the shell-hygiene leg -- it satisfied only the NARROW
+  # predicate. TOOL-cMendedVintage-12 widened the leg to follow one assignment, because a loop fed
+  # by a here-string over a variable assigned from a command substitution is the same defect one
+  # hop away, and this site is what that widening found on arrival.
+  pathf=$(mktemp) || { echo "resume-tick.test: cannot create a scratch file for the NOTE-path read" >&2; return 1; }
+  printf '%s\n' "$1" | sed -n 's/.*Declare one in \(.*\) to change it.*/\1/p' >"$pathf"
+  while IFS= read -r p; do [ -n "$p" ] && [ -f "$p" ] && n=$((n+1)); done <"$pathf"
+  rm -f "$pathf"
   printf '%s' "$n"
 }
 # seed_log <n> <utc> [slug] [sidecar] — n attempt lines in the sidecar, all stamped <utc>; tRun in

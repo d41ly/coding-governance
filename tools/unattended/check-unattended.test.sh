@@ -103,6 +103,7 @@ DIRECTIVES_EXTRA_TABLE=""
 # 50-minute suite run to find, which is the only reason it is this loud.
 HALT_CODES_EXTRA=""
 HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
+UNDECLARED_WRITE_CEILING="${UWC_OVERRIDE:-0}"
 EOF
 }
 
@@ -2986,14 +2987,14 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # ...and a pass that commits OUTSIDE it is the disjointness proof failing where it can be checked
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # ---- THE WIDENING REPAIR, AND THE POST-HOC REWRITE THAT WEARS ITS CLOTHES (closing review F3/F4).
 # ---- `--dispatch`'s widening supersedes an OPEN pass's row and parks the replacement AT THE SAME
@@ -3013,7 +3014,7 @@ reset_tree
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # B: ...and the superseding row is still GRADED. Without this arm the fix above is indistinguishable
 # from switching the check off for any pass that ever re-declared, which is a larger hole.
@@ -3021,7 +3022,7 @@ reset_tree
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # C: THE POST-HOC REWRITE. Narrow row, the offending commit, THEN a widened row at a later anchor.
 # The finding must survive: a declaration cannot be rewritten to cover a write already made. The
@@ -3031,7 +3032,7 @@ drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 drow ARCH-tRun-1 "work/one.txt work/stray.txt"
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # D: SEVERAL PASSES OF ONE UNIT are legal — M6 defines five pass kinds and a unit may be dispatched
 # once per kind. Each row governs its own pass. Folding them together graded pass one's commit
@@ -3043,7 +3044,7 @@ git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
 printf 'b\n' > work/build.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # E: ...and the SECOND pass is graded too. The fold left it unlooked-at entirely, so a stray write in
 # pass two exited 0 — the same fixture as D with one extra file, and the difference is the point.
@@ -3054,7 +3055,7 @@ git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
 printf 'b\n' > work/build.txt && printf 'x\n' > work/STRAY.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # F: BOTH IDS IN ONE DISPATCH GROUP, which is the whole of this arm and is what the first two
 # versions of it missed. The ambiguity loop only pairs siblings sharing an anchor, so a fixture that
@@ -3074,7 +3075,7 @@ mkdir -p work && printf 'b\n' > work/ten.txt
 git add -A && git commit -q -m "ARCH-tRun-10 builds its lane" --no-verify
 out=$(run)
 miss "$out" "unattended: check 23 — one commit names two passes of the same dispatch group"
-miss "$out" "unattended: check 23 —"
+miss "$out" "check 23 FAILED"
 # ...and the positive control, so this arm cannot pass by finding nothing: ONE commit that genuinely
 # names both passes IS ambiguous, and the refusal must fire.
 reset_tree
@@ -3088,7 +3089,7 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # ---- THE NO-COMMIT CASE IS SPLIT. A pass that produced no change commits nothing and that is legal;
 # ---- the same silence with the declared paths MOVED is the join being dodged.
@@ -3096,7 +3097,7 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit "$out" "no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
@@ -3130,7 +3131,7 @@ mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 printf 'folded\n' > work/later.txt
 git add -A && git commit -q -m "ARCH-tRun-1 folds a review fix" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
 # ---- default run must still print nothing.
@@ -3139,7 +3140,7 @@ out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit "$out" "this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
 out=$(run)
 miss "$out" "check 23 skipped"
-miss "$out" "unattended: check 23 —"
+miss "$out" "check 23 FAILED"
 
 reset_tree
 printf '\n2026-08-21T00:00:00Z dispatch · item deadbeef ARCH-tRun-1 · reason work/one.txt\n' >> memory/builds/tRun/RUN.md
@@ -3159,14 +3160,14 @@ reset_tree
 drow ARCH-tRun-1 "work/sub/"
 mkdir -p work/sub && printf 'a\n' > work/sub/x.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 # ...and the positive control on the same shape, so the arm cannot pass by the check being silent:
 # a commit genuinely outside the declared lane still reports.
 reset_tree
 drow ARCH-tRun-1 "work/sub/"
 mkdir -p work/sub && printf 'a\n' > work/sub/x.txt && printf 'b\n' > work/elsewhere.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # ---- THE BRIEF ROW'S PATH LEAVES THE POPULATION (TOOL-aLeakedHandle-7, TOOL-aRatifiedRulings-2).
 # ---- `--brief` stages only the run-state file and the brief is already tracked, so the pass's one
@@ -3188,7 +3189,7 @@ mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && print
 printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
   "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "check 23 excluded $BRIEF for ARCH-tRun-1 in memory/builds/tRun/RUN.md"
 # B: ...and a stray file beside it still reports, minus the brief. The exclusion is the one path.
 reset_tree
@@ -3227,7 +3228,7 @@ mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && print
 printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s ./%s\n' \
   "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 # F: THE BOOKKEEPING COMMIT IS NOT THE PASS COMMIT (closing diff review, finding 7). The ordinary
 # shape: `--brief` requires the brief tracked and stages the run-state file, so the run commits
 # `{brief, brief row}` first, naming the unit, and the pass's real commit follows. With the brief
@@ -3244,17 +3245,61 @@ printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
 
-# ---- THE COMPARISON NEVER FAILS THE LEG (spec 23 S1 / AC9). Both halves, because a check that is
-# ---- silent AND exits 0 is indistinguishable from one that is working, and that is the shape this
-# ---- whole mechanism spent four rounds in. The fixture is the one that produced a finding above.
+# ---- THE COMPARISON NOW FAILS THE LEG, ABOVE ITS CEILING (TOOL-cMendedVintage-14). This arm used
+# ---- to assert the opposite - spec 23 S1 / AC9 pinned "reports without failing" - and that pin is
+# ---- SUPERSEDED rather than deleted quietly, because it is the whole of what the ruling changed:
+# ---- a comparison that can only report is a declaration enforced in one direction. The fixture is
+# ---- the one that produced a finding above, graded against the adopter's ceiling of 0.
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(run); rc=$?
-same "check 23 reports without failing the leg, exit code" "$rc" "0"
-hit  "$out" "unattended: check 23 — a dispatched pass committed a path outside"
-miss "$out" "FAILED"
+same "check 23 fails the leg above its ceiling, exit code" "$rc" "1"
+hit  "$out" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
+hit  "$out" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+
+# ---- ...AND THE CEILING IS A CEILING. Same fixture, one instance, a pin of 1: clean. Without this
+# ---- control the arm above is satisfied by a check that reds on everything.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="1"/'
+out=$(run); rc=$?
+same "check 23 is clean at its ceiling, exit code" "$rc" "0"
+miss "$out" "check 23 FAILED"
+# ...and the per-instance detail survives on the report channel, so a green run has not gone dark.
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+
+# ---- A FALL IS ANNOUNCED, NOT RED. One instance against a pin of 2. The announcement is the only
+# ---- thing that can make the pin fall, since nothing re-stamps it.
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="2"/'
+out=$(run); rc=$?
+same "check 23 does not red on a fall, exit code" "$rc" "0"
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the undeclared-write count sits BELOW its ceiling, 1 against 2"
+reset_tree
+
+# ---- THE PIN IS MANDATORY, in the shape its three siblings already take: undeclared or malformed is
+# ---- a refusal and never a defaulted value.
+reset_tree
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING=""/'
+hit "$(run)" "UNDECLARED_WRITE_CEILING is undeclared in .unattended.conf, and with no ceiling a pass that wrote outside its declared set is reported and never graded - which is the state this ratchet exists to end"
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="several"/'
+hit "$(run)" "UNDECLARED_WRITE_CEILING is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name"
+reset_tree
+
+# ---- THE LIVENESS HALF. A ceiling above zero says instances exist; grading NO dispatched pass at
+# ---- all and then reporting zero of them is a probe that died, not a tree that is clean. The
+# ---- fixture declares no dispatch, so the loop above takes its skip branch and grades nothing.
+reset_tree
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="1"/'
+hit "$(run)" "the declared ceiling on undeclared writes is above zero while NO dispatched pass was graded at all, so the comparison below would report a reassuring zero for a probe that died rather than for a tree that is clean"
+# ...and the control: at a ceiling of 0 the same tree is clean, so the arm above is not just
+# asserting that an undeclared-dispatch fixture reds.
+reset_tree
+miss "$(run)" "check 23 FAILED"
+reset_tree
 
 # ---- check 15 (TOOL-dUnstalledConvoy-2): the ancestry half now branches on the RECORDED anchor kind.
 # ---- A `local` record is a claim about ONE clone — the protocol calls it a record of a merge rather

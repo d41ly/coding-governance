@@ -802,6 +802,24 @@ check_eq "AC3 the refused ids wrote nothing under orientation/" "$before" "$(ls 
 [ "$got" = 0 ] && [ -f "$CARD_HOME/$NONCE-t2.md" ] && { echo "ok   AC3 the session id is read from the hook's JSON on stdin"; pass=$((pass+1)); } \
   || { echo "FAIL AC3 the session id is read from the hook's JSON on stdin (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 
+# TOOL-cMendedVintage-9 — stdin held OPEN across the call. `run_card` cannot serve: it feeds
+# /dev/null, and a stdin that is already at EOF is the case that passed before the fix. A fifo
+# opened READ-WRITE never reports EOF and needs no holder process, so a `sleep` that outlives the
+# bound does not charge its own wall to every green run. The liveness arm is first and is not
+# decoration: if the fifo is not open the verb returns for the wrong reason and the arm below
+# certifies the fix while observing nothing.
+mkfifo "$TMP/openstdin" 2>/dev/null
+exec 9<>"$TMP/openstdin"
+timeout 2 cat <&9 >/dev/null 2>&1; got=$?
+[ "$got" = 124 ] && { echo "ok   S4 liveness: the held stdin reports no EOF, so the arm below can fail"; pass=$((pass+1)); } \
+  || { echo "FAIL S4 liveness: the held stdin returned $got, not 124 — it is NOT open (no fifo support?), and the arm below would pass by finding nothing"; fail=$((fail+1)); }
+t0=$(date +%s)
+(cd "$CWT" && timeout 10 bash "$CHECK" --card --path --session "$NONCE-t9s" <&9 > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 0 ] && grep -qF -- "/orientation/$NONCE-t9s.md" "$CARD_OUT" \
+  && { echo "ok   S4 --session returns with stdin held open (wall $(($(date +%s)-t0))s)"; pass=$((pass+1)); } \
+  || { echo "FAIL S4 --session blocked on an open stdin (exit $got; 124 = the bound fired) — read_session_id read stdin although --session had answered"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+exec 9>&-; rm -f "$TMP/openstdin"
+
 # AC4 — the node cell: the real registry at HEAD, then the two fixtures, then no key at all.
 if [ "$CUSER" = daily-agent ]; then
   check_eq "AC4 node — resolves this node from the real AGENTS.md" "node — a · daily-agent" "$(read_cell node "$NONCE-t1")"
@@ -1030,6 +1048,24 @@ check_eq "K2 AC5 a second append without a READY line leaves the real one, last"
 check_eq "K2 AC5 ...before which the new body sits" '- parked: `AGENTS.md:2`' "$(tail -2 "$K2BCARD" | head -1)"
 check_eq "K2 AC5 ...and the card still holds one READY line and one task section" "1 1" "$(grep -c '^READY — ' "$K2BCARD") $(grep -c '^## task' "$K2BCARD")"
 
+# TOOL-cMendedVintage-16 — the charter-conformant READY line. §16 R1 makes an emitted micro-format
+# a markdown list item, so the form a kickoff actually writes carries a leading `- `. Before the
+# anchor was widened all four arms below failed: the body read as carrying NO READY line, so the
+# append took the no-READY branch, left the sentinel last, skipped the `tree —` re-render, and
+# `--card --check` then saw no real READY line and never demanded the `## task` section. A WIDENING,
+# not a swap — the bare form the AC5 block above exercises is every card already on disk.
+K2R="$NONCE-k2r"; K2RCARD="$CARD_HOME/$K2R.md"
+run_card "K2 R1 setup: a fresh card with the sentinel" "$CWT" 0 - --card --write --session "$K2R"
+printf '## task\n- `AGENTS.md:1`\n- %s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2R" > "$CARD_OUT" 2>&1); got=$?
+check_eq "K2 R1 a list-item READY line appends" "0" "$got"
+check_eq "K2 R1 ...replaces the sentinel, which is gone" "0" "$(grep -c 'READY — none yet' "$K2RCARD")"
+check_eq "K2 R1 ...and is the card's last line" "- $(render_ready_line "$wt_head")" "$(tail -1 "$K2RCARD")"
+printf '## open\n- parked: `AGENTS.md:2`\n' | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2R" > "$CARD_OUT" 2>&1)
+check_eq "K2 R1 a later bodiless-READY append still moves it last, not duplicated" "1 - $(render_ready_line "$wt_head")" \
+  "$(grep -c 'READY — ' "$K2RCARD") $(tail -1 "$K2RCARD")"
+sed -i 's/^## task$/## tsk/' "$K2RCARD"
+run_card "K2 R1 --card --check counts it as a REAL READY line and demands ## task" "$CWT" 1 "carries a real READY line and no '## task' section" --card --check --session "$K2R"
+
 # AC11 — a real READY line with no `## task` beneath it.
 sed -i 's/^## task$/## tsk/' "$K2BCARD"
 run_card "K2 AC11 --card --check refuses a real READY line with no ## task section" "$CWT" 1 "carries a real READY line and no '## task' section" --card --check --session "$K2B"
@@ -1104,6 +1140,20 @@ run_card "K2 S1 --card --check with no reader announces the skip and is DEAD PRO
 grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 S7 --card --check over a token-free card is DEAD PROBE"; pass=$((pass+1)); } \
   || { echo "FAIL K2 S7 --card --check over a token-free card is DEAD PROBE"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 
+# C12 — the manifest carries no CR byte. Round 3's M1: the §B bullet ABOUT raw CR bytes had its own
+# CR eaten twice by text-mode rewrites, leaving a sentence that said a newline becomes a newline.
+# BOTH directions, because a check that has only ever been seen pass is an assertion about nothing,
+# and this one was first written with `grep -q "$(printf ...)"` — which MSYS strips to an empty
+# pattern that matches every line, so it red on a clean manifest and looked like it worked.
+mkrepo c12a; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+run "C12 a clean manifest carries no CR and passes" "$R" 0 -
+
+mkrepo c12b; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+printf 'a lone CR (0x0D) here:%bX
+' "$(printf '\r')" >> "$R/memory/guides/SESSION-KICKOFF.md"
+commit_all "$R" "embed a CR"
+run "C12 a CR byte in the manifest is named" "$R" 1 "the manifest carries a CR byte (0x0D), and a text-mode rewrite silently converts it --"
+
 # AC11 — this repository's REAL common dir holds no card the suite wrote.
 real_common=$(cd "$(git -C "$GOVROOT" rev-parse --git-common-dir)" && pwd)
 leaked=$(ls "$real_common/orientation" 2>/dev/null | grep -c "^$NONCE-" || true)
@@ -1116,8 +1166,12 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # exact tag against the real AGENTS.md, which the spec words as "on this node"); it announces its
 # skip elsewhere, and a floor that counted it would red the suite on b, c and d for an arm that is
 # not theirs to reach. KICK-aReplayedCard-1 (109), then the 56 append and check arms of
-# KICK-aReplayedCard-2, then the 9 arms of the closing review's round-1 fold (F1, F7, F8, F9).
-FLOOR_ASSERTIONS=174
+# KICK-aReplayedCard-2, then the 9 arms of the closing review's round-1 fold (F1, F7, F8, F9), then
+# the 2 arms of TOOL-cMendedVintage-9 (the held-open stdin and its liveness probe). RAISED in the
+# same commit as those arms: this floor and check-testsuite-counts.sh are both shrink-only, so an
+# unraised floor is the one thing that lets a later edit delete the arms and red nothing.
+# +2: C12's pair, the CR-byte check's green and red cases (round 3 M1's left-shift).
+FLOOR_ASSERTIONS=178
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

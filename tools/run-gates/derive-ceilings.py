@@ -22,6 +22,32 @@ node-local -- measured, 46 rows in one worktree against 96 in the primary -- so 
 depended on them would give the same tree different answers on different machines. `--write` distils
 them into `ceiling-evidence.txt`, which IS tracked, and `--check` compares that against
 `gate-legs.json` and nothing else. Charter section 12's committed-artifact-plus-parity shape.
+
+A READING TAKEN OUTSIDE THE RUNNER IS ADMISSIBLE, AND HAS TO BE (TOOL-cMendedVintage-17). The
+mechanism above raises a row from the evidence of a COMPLETED run, and a leg killed at its ceiling
+never completes one: the retained record holds the kill row, that row enters at the ceiling, and the
+ceiling therefore holds a floor under itself. The mechanism cannot reach exactly the legs that most
+need it. It was broken by hand twice -- two healthy legs measured quiet, two ceilings edited from
+numbers nothing in the tree recorded -- and a hand-edit is what `--observed` replaces.
+
+  GOV_NODE=<tag> ... --write --observed '<leg>=<seconds>' --how '<how it was taken>'
+
+A FLAG, not a second tracked file and not a forged run row. A run row would make the reading
+indistinguishable from one the runner saw, which is the exact failure the margin file's header
+names; a second tracked file would be a new artifact to keep in step with this one, plus its own
+registry row, to hold what one command already writes. The flag leaves the claim in the same
+tracked artifact, in a commit, beside the rows it has to be told apart from.
+
+WHICH IT IS, IN THE ARTIFACT: a sixth column carrying the SOURCE. An in-band row spells the literal
+`runner`; an out-of-band row spells the operator's own `--how` text, so the provenance travels with
+the number rather than beside it. `--check` names those legs separately for the same reason. The
+node is REFUSED rather than defaulted here, because a reading whose stated node is wrong is worse
+evidence than no reading.
+
+`--report` is untouched and still reads the retained runs alone, so a leg raised by `--observed`
+shows there whatever its RUN record says -- REACHED where the kill row is still retained, UNBACKED
+where nothing is. That is the truth about the run record and it stays that. The number the gate
+consumes is the tracked one, and `--check` is the reader that reports it.
 """
 import argparse
 import glob
@@ -59,6 +85,12 @@ MARGIN_FILE = HERE / "ceiling-margin.txt"
 # beside a comment saying "5 plus 30" is two answers to one question, and the comment is the copy
 # that rots.
 CEILING_WINDOW_S = 5 + 30
+
+# The SOURCE column's value for a row this tool derived from the runner's own record. Anything else
+# in that column is the `--how` text of a reading taken outside it, which is what makes the two
+# tellable apart by a reader with no access to the run record. A row written before the column
+# existed reads as this value, because every one of them was runner-derived.
+RUNNER_SOURCE = "runner"
 
 
 def resolve_repo_root() -> pathlib.Path:
@@ -255,8 +287,14 @@ def remove_reset_rows(gd: pathlib.Path, reset) -> int:
 
 
 def read_evidence() -> dict:
-    """The tracked artifact: {name: (max_seconds, readings, node, date)}."""
-    out: dict[str, tuple[float, int, str, str]] = {}
+    """The tracked artifact: {name: (max_seconds, readings, node, date, source)}.
+
+    A FIVE-FIELD ROW READS AS `runner`, which is a fact about the corpus rather than a default
+    chosen for convenience: the source column arrives with `--observed` and every row written
+    before it was derived from the run record. Refusing a short row instead would empty the
+    artifact on the upgrade commit and red the gate for a reason that is not a ceiling's.
+    """
+    out: dict[str, tuple[float, int, str, str, str]] = {}
     if not EVIDENCE.is_file():
         return out
     for line in EVIDENCE.read_text(encoding="utf-8").splitlines():
@@ -266,10 +304,43 @@ def read_evidence() -> dict:
         if len(f) < 5:
             continue
         try:
-            out[f[0]] = (float(f[1]), int(f[2]), f[3], f[4])
+            out[f[0]] = (float(f[1]), int(f[2]), f[3], f[4],
+                         f[5] if len(f) >= 6 and f[5].strip() else RUNNER_SOURCE)
         except ValueError:
             continue
     return out
+
+
+def parse_observed(spec: str, how: str, legs: dict) -> tuple[str, float]:
+    """`<leg>=<seconds>` plus the conditions it was taken under. Every refusal here is a REFUSAL.
+
+    Nothing below defaults. A reading admitted with a leg name nobody checked, a duration that is
+    not one, or an empty account of how it was taken is a number in a tracked file with no claim
+    attached, which is the hand-edit this verb exists to replace wearing a command's clothes.
+
+    THE TAB AND THE NEWLINE ARE STRUCTURE, not taste: the artifact is tab-separated and the `--how`
+    text is the last field on its row, so either byte inside it forges a column or a row.
+    """
+    name, sep, raw = spec.partition("=")
+    name = name.strip()
+    if not sep or not name:
+        sys.exit(f"derive-ceilings: --observed wants '<leg>=<seconds>', got {spec!r}")
+    try:
+        secs = float(raw.strip())
+    except ValueError:
+        sys.exit(f"derive-ceilings: --observed seconds {raw.strip()!r} is not a number")
+    if secs <= 0:
+        sys.exit(f"derive-ceilings: --observed seconds {secs} is not a duration")
+    if name not in legs:
+        sys.exit(f"derive-ceilings: --observed names '{name}', which the leg manifest does not "
+                 f"carry — a reading for a leg that does not exist backs nothing")
+    if not how or not how.strip():
+        sys.exit("derive-ceilings: --observed needs --how '<how the reading was taken>' — a "
+                 "reading with no stated conditions is the hand-edit this flag replaces")
+    if "\t" in how or "\n" in how:
+        sys.exit("derive-ceilings: --how may not carry a tab or a newline — the artifact is "
+                 "tab-separated and this text is a field in it")
+    return name, secs
 
 
 def cmd_report(root, gd, args) -> int:
@@ -337,7 +408,12 @@ def cmd_write(root, gd, args) -> int:
     # return fired forty lines above the drop path documented below, so the run exited 2 saying
     # nothing was measured — of readings it had just excluded itself — and the stale row survived.
     live = read_runs(gd, legs, ())
-    if not live:
+    # AN `--observed` READING IS ITSELF A READING, so it satisfies liveness on its own. The state
+    # this flag exists for is a run record holding nothing admissible for the leg being raised — a
+    # leg killed at its ceiling contributes only that ceiling back — and on a fresh worktree it
+    # holds nothing at all. A DEAD PROBE return above the flag would refuse the one case it was
+    # built for, which is the shape `read_runs`'s own liveness split was already repaired once for.
+    if not live and not args.observed:
         print("derive-ceilings: DEAD PROBE — no readings to write.", file=sys.stderr)
         return 2
     # THE DISCARD IS PERSISTED BEFORE THE READ, so nothing downstream can re-admit it. `read_runs`
@@ -361,7 +437,7 @@ def cmd_write(root, gd, args) -> int:
             rows[name] = prev
             held += 1
         else:
-            rows[name] = (mx, len(vals), node, date)
+            rows[name] = (mx, len(vals), node, date, RUNNER_SOURCE)
             # TALLIED ON MOVEMENT, never on which branch got here. A reset leg whose re-derived
             # maximum EQUALS the stored one lands in this branch because `name not in reset` forced
             # it out of the hold, and the old `elif prev` then reported `1 raised` for a row that
@@ -387,6 +463,32 @@ def cmd_write(root, gd, args) -> int:
                 dropped += 1                            # a reset leg that kept `ok` readings was
             continue                                    # re-derived, not dropped
         rows.setdefault(name, prev)
+    observed = 0
+    if args.observed:
+        # THE NODE IS REFUSED RATHER THAN DEFAULTED, and only here. A runner-derived row's node is
+        # a statement about the machine that just ran the bar, and `GOV_NODE or "a"` is wrong there
+        # at worst by a tag. An out-of-band row's node is half of what makes the number evidence —
+        # the reading was taken somewhere, under conditions that machine had — so a defaulted tag
+        # is a false claim about provenance, which is worse than having no row.
+        obs_node = os.environ.get("GOV_NODE")
+        if not obs_node:
+            print("derive-ceilings: --observed needs GOV_NODE set to the node the reading was "
+                  "taken on. The node is evidence here and is not defaulted.", file=sys.stderr)
+            return 1
+        obs_name, obs_secs = parse_observed(args.observed, args.how or "", legs)
+        prev = rows.get(obs_name)
+        # MONOTONE STILL, and the refusal is the point of saying so. A reading at or under the
+        # stored maximum moves nothing, so admitting it quietly would answer the operator's gesture
+        # with a fresh row and an unchanged number — the silent no-op this artifact is arranged
+        # against. NOTHING IS WRITTEN on this path, because what was asked for did not happen.
+        if prev and prev[0] >= obs_secs:
+            print(f"derive-ceilings: --observed {obs_secs:.1f}s for '{obs_name}' does not raise "
+                  f"its recorded maximum {prev[0]:.1f}s (source: {prev[4]}), and this file is "
+                  f"MONOTONE. Nothing was written. Lowering one is "
+                  f"`--write --reset {obs_name}`.", file=sys.stderr)
+            return 1
+        rows[obs_name] = (obs_secs, 1, obs_node, date, args.how.strip())
+        observed = 1
     lines = [
         "# ceiling-evidence.txt — the recorded maximum per gate leg, TRACKED so a gate can read it.",
         "#",
@@ -400,11 +502,18 @@ def cmd_write(root, gd, args) -> int:
         "# untracked run record, so no later write can hand the value back — which is what a",
         "# decision somebody made has to mean here.",
         "#",
-        "# <leg>\t<max seconds>\t<readings>\t<node>\t<date>",
+        "# THE SOURCE COLUMN tells a reading this tool derived from the run record apart from one",
+        "# taken outside the runner and fed in with `--write --observed '<leg>=<seconds>' --how",
+        f"# '<how>'`. In-band rows spell `{RUNNER_SOURCE}`; an out-of-band row spells the operator's",
+        "# own account of how the number was taken, beside the node it was taken on. A leg killed",
+        "# at its ceiling can produce no in-band reading above that ceiling, which is why the",
+        "# out-of-band path exists — and why it is never allowed to look like the in-band one.",
+        "#",
+        "# <leg>\t<max seconds>\t<readings>\t<node>\t<date>\t<source>",
     ]
     for name in sorted(rows):
-        mx, n, nd, dt = rows[name]
-        lines.append(f"{name}\t{mx:.1f}\t{n}\t{nd}\t{dt}")
+        mx, n, nd, dt, src = rows[name]
+        lines.append(f"{name}\t{mx:.1f}\t{n}\t{nd}\t{dt}\t{src}")
     EVIDENCE.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     # `removed` IS THE LIVENESS HALF OF THIS LINE. `lowered` and `dropped` say the artifact moved;
     # only this says the scratch reading that would have restored it is gone, which is the property
@@ -413,6 +522,7 @@ def cmd_write(root, gd, args) -> int:
     print(f"derive-ceilings: wrote {len(rows)} row(s) to {EVIDENCE.name} "
           f"({raised} raised, {lowered} lowered by --reset, {dropped} dropped by --reset, "
           f"{removed} killed reading(s) removed by --reset, "
+          f"{observed} raised by --observed, "
           f"{held} held at a previous maximum)")
     return 0
 
@@ -444,7 +554,16 @@ def cmd_check(root, gd, args) -> int:
         # the evidenced maximum, and a reading AT a ceiling is a lower bound on the work rather
         # than its cost. Derived at check time from the two tracked files, so there is no stored
         # flag to keep fresh and no way for the message to disagree with the row.
-        if row[0] >= ceiling:
+        #
+        # IT IS A CLAIM ABOUT PROVENANCE, so it holds only for a runner-derived row, and finding
+        # that out cost an arm (TOOL-cMendedVintage-17). "REACHED in a recorded run", "a LOWER
+        # BOUND on the work", "do not size a new ceiling from it" are all true of a reading this
+        # tool watched `timeout` stop, and all three are FALSE of one an operator measured to
+        # completion elsewhere and typed in. Said over an out-of-band row the sentence withdraws
+        # the invitation in the one case the flag was built to extend it: raising a bound from a
+        # quiet measurement is the whole gesture. An out-of-band row falls to the headroom branch
+        # below instead, which already prints the floor such a ceiling has to clear.
+        if row[0] >= ceiling and row[4] == RUNNER_SOURCE:
             bad.append(f"{name}: ceiling {ceiling}s was REACHED in a recorded run at "
                        f"{row[0]:.1f}s — that reading is a LOWER BOUND on the work and not its "
                        f"duration, so do not size a new ceiling from it")
@@ -464,12 +583,26 @@ def cmd_check(root, gd, args) -> int:
         print(f"derive-ceilings: {len(unbacked)} of {len(legs)} leg(s) have no evidence row — their "
               f"ceilings are unbacked, which is REPORTED and not a failure: a leg that has never "
               f"run has nothing to be measured against.", file=sys.stderr)
+    # THREE STATES, THREE SENTENCES, and this line is the third (TOOL-cMendedVintage-17). UNBACKED
+    # stays reported-and-not-a-failure: a leg that has never run still has nothing to be measured
+    # against, and a way to type a reading in does not change that. What DID need changing is the
+    # word "backed", which now covers two different claims — a duration this tool watched the
+    # runner produce, and one an operator measured elsewhere and typed. Naming the second kind with
+    # its own stated conditions is what stops a scanner reading them as the same evidence. Derived
+    # from the source column at check time, so there is no second thing to keep fresh.
+    oob = sorted(n for n, r in ev.items() if n in legs and r[4] != RUNNER_SOURCE)
+    if oob:
+        print(f"derive-ceilings: {len(oob)} ceiling(s) backed by a reading taken OUTSIDE the "
+              f"runner — a number an operator measured and typed, not one this tool watched: "
+              + "; ".join(f"{n} {ev[n][0]:.1f}s on node {ev[n][2]}, {ev[n][4]}" for n in oob),
+              file=sys.stderr)
     if bad:
         for b in bad:
             print(f"CEILING-EVIDENCE FAILED — {b}", file=sys.stderr)
         return 1
-    print(f"ceiling-evidence: {len(legs) - len(unbacked)} of {len(legs)} leg(s) backed, every one "
-          f"clearing its evidenced maximum by max({floor}s, {frac} x max)")
+    print(f"ceiling-evidence: {len(legs) - len(unbacked)} of {len(legs)} leg(s) backed "
+          f"({len(oob)} of them out-of-band), every one clearing its evidenced maximum by "
+          f"max({floor}s, {frac} x max)")
     return 0
 
 
@@ -485,7 +618,23 @@ def main() -> int:
                          "monotone hold, DELETES those killed readings from the untracked run "
                          "record so a later write cannot restore them, and drops the row entirely "
                          "when no `ok` reading remains")
+    ap.add_argument("--observed", metavar="LEG=SECONDS",
+                    help="with --write: admit a reading taken OUTSIDE the runner, so a leg killed "
+                         "at its own ceiling can be raised from evidence instead of by hand. "
+                         "Needs --how and GOV_NODE; the row is marked with its source and is "
+                         "monotone like any other")
+    ap.add_argument("--how", metavar="TEXT",
+                    help="the conditions an --observed reading was taken under; recorded verbatim "
+                         "as that row's source")
     args = ap.parse_args()
+    # REFUSED RATHER THAN IGNORED on the read-only verbs. An operator who typed a measurement onto
+    # a `--check` or `--report` line and got the ordinary output back would read it as accepted,
+    # and the reading would exist nowhere. `--how` alone is the same gesture half-made.
+    if (args.observed or args.how) and not args.write:
+        sys.exit("derive-ceilings: --observed/--how are writes and belong to --write; "
+                 "--report and --check read the tracked files and admit nothing")
+    if args.how and not args.observed:
+        sys.exit("derive-ceilings: --how describes an --observed reading and there is none")
     root = resolve_repo_root()
     gd = resolve_git_dir(root)
     if not gd.is_absolute():

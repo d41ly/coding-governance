@@ -17,7 +17,8 @@ or a suite named in prose.
 Each of those is the ACT, and the act is refused by the hook of TOOL-aDeferredBar-3, not here.
 
 THE JOINS KEEP THEIR POPULATIONS APART, the correction rev-2 folded from round 3. The fourth join,
-`bar`, reads two of the three rather than minting a fourth.
+`bar`, reads two of the three rather than minting a fourth; the fifth, `guards`, reads the legs
+population plus one of its own, the declared write set.
 
   legs   backticked tokens on a `## 7. Gates` LINE THAT IS THE LIST -> a `name` in the manifest.
          A section 7 line carrying prose is not graded: measured, that predicate produced 270
@@ -46,13 +47,44 @@ THE JOINS KEEP THEIR POPULATIONS APART, the correction rev-2 folded from round 3
          day-one zero cannot hide what they skip. A set key that is not strictly past the day it
          was committed is REFUSED before grading: the register's rule is a relation to the fleet
          working day, and a value carried across a day boundary is stale by construction.
+  guards every backticked PATH-SHAPED token under a spec's `### Files touched` sub-head — spelled
+         with or without ` (estimate)`, the declared write set — joined to every `guard` list in
+         the manifest with git-pathspec semantics (`p == g` or `p` under `g/`, never a bare prefix,
+         so an exact-file guard does not trip on `x.sh.bak`): a leg whose guard the write set
+         trips must be a name on the section 7 leg line, in a LIVE spec dated at or after
+         SPEC_GUARD_LEGS_CUTOFF (blank = off) -> a hit whose token is the composite
+         `<leg> <- <path>` (TOOL-aBlindedTrial-8). A DIRECTORY token under the sub-head — one
+         ending in `/` and of TWO OR MORE segments, `tools/run-gates/` — is a declared PREFIX and
+         trips SYMMETRICALLY: a guard it equals or sits under, and a guard that sits under it
+         (closing review round 1, R3; writing the folder instead of the files was a clean pass
+         before). A ONE-segment token, `tools/`, is a ROOT and declares nothing: it is how prose
+         names a tree ("No file under `tools/` is touched"), and --list names it as NEAR (round
+         2, R1). The residual, stated in BOTH directions (round 3, R4): a two-segment directory
+         named in prose is still read as declared, and a one-segment directory that is itself a
+         joined guard, `.githooks/`, declared wholesale declares nothing - name its files or a
+         two-segment child. The join grades only a spec that CARRIES a Gates heading, the legline arm's own
+         precondition: a Tier-1 spec under the light profile may omit the section, and one that
+         does is COUNTED on the guards line rather than joined or examined, its tripping paths
+         listed as NEAR (R4, round 2 R8). BROAD guards are EXCLUDED from the join and listed by
+         --list as NEAR, and broad is BREADTH, not depth (R1): a guard carried by MORE than
+         BROAD_LEG_FLOOR LEGS (a guard listed twice in one row is one leg), whatever its depth,
+         because a guard many legs share adds no information when named and buries the specific
+         one. The excluded set is printed WITH its per-guard leg counts on the guards line of every
+         run, so the exclusion announces itself and no count of it lives in prose. A leg without a
+         `guard` key is not joined; a spec without the sub-head declares nothing and is counted
+         apart. The join reads the ESTIMATE as written, not the write set the build actually made;
+         it reads no path named in prose outside the sub-head; and it reads a guard as a directory
+         or an exact file, never as git pathspec magic. The motivating case: a unit that edited
+         `tools/hooks/scratch-guard.js` and omitted `scratch-guard self-test`, found by a closing
+         review and not by a gate.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
 one the tree now tracks, refuses — a stale exception cannot hide a live hit. A cutoff the tree's own
 history dates at or after itself refuses, and so does EVERY cutoff key this file reads whose value
-is not a real ISO date, SPEC_LEGLINE_CUTOFF included: the comparisons are string comparisons, and a
-malformed value would report the join as set while it graded nothing.
+is not a real ISO date, SPEC_LEGLINE_CUTOFF and SPEC_GUARD_LEGS_CUTOFF included, because all of
+them pass through `read_cutoff_key`: the comparisons are string comparisons, and a malformed value
+would report the join as set while it graded nothing.
 
   python tools/check-spec-tokens.py            # assert; exit 1 on an unwaived hit
   python tools/check-spec-tokens.py --list     # every hit and near-miss, authoring aid, exit 0
@@ -64,7 +96,7 @@ import re
 import subprocess
 import sys
 
-KIT_SPEC_TOKENS_VERSION = "1.0"  # gov:kit spec-tokens@1.0 — the deployer's read
+KIT_SPEC_TOKENS_VERSION = "1.1"  # gov:kit spec-tokens@1.1 — the deployer's read
 
 WAIVERS = "memory/project/spec-token-waivers.txt"
 SPEC_GLOB = "memory/builds/*/spec/*.md"
@@ -102,6 +134,17 @@ LEGLINE_KEY = "SPEC_LEGLINE_CUTOFF"
 SPEC_DATE = re.compile(r"/([0-9]{4}-[0-9]{2}-[0-9]{2})-spec-")
 # TOOL-aDeferredBar-2: the bar join's key, heading pattern and predicate. Blank or absent is OFF.
 DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
+# TOOL-aBlindedTrial-8: the guards join's key and the sub-head it reads. The corpus spells the
+# sub-head both ways (437 with the parenthetical, 21 without at 987c5bec), so the suffix is optional.
+# The section body ends at the NEXT heading of any depth, because the sub-head has siblings.
+GUARDS_KEY = "SPEC_GUARD_LEGS_CUTOFF"
+FILES_HEAD = re.compile(r"^### Files touched( \(estimate\))?[ \t]*$", re.M)
+# A guard carried by MORE than this many legs is BROAD and leaves the guards join (closing review
+# round 1, R1). Measured on the manifest at 144cd1fb: 5 keeps `tools/hooks/` (5 legs, the motivating
+# case) and `.githooks/` (5) joined and drops `tools/lib/` (30), `tools/` (11), `tools/memory-tree/`
+# (9) and `tools/run-gates/` (6). The figures live here as the reason for the floor, dated; the set
+# the floor excludes TODAY is derived and printed on every run, never typed.
+BROAD_LEG_FLOOR = 5
 # The acceptance section by HEADING TEXT, the shape GATES_HEAD already has and for the same reason:
 # a light-profile spec drops `## 5.` and the ordinal read grades whatever sits sixth.
 AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
@@ -178,6 +221,131 @@ def extract_acceptance(text):
     rest = text[m.end():]
     nxt = re.search(r"^## ", rest, re.M)
     return rest[:nxt.start()] if nxt else rest
+
+
+def extract_files_touched(text, files):
+    """The declared write set and the roots it mentions, as `(paths, roots)`. `paths` is every
+    path-shaped word inside backticks under the `### Files touched` sub-head, in order and without
+    repeats, PLUS every directory-shaped one kept with its trailing `/` so the join can read it as a
+    prefix (closing review round 1, R3 — the trailing-slash rule of `check_path_shaped` is right for
+    the paths and cites joins and wrong here, where `tools/x/` declares everything under it). `roots`
+    is every ONE-segment directory token — `tools/`, `memory/` — which declares NOTHING (round 2,
+    R1, measured at 315201b0: a one-segment `tools/` token appeared 14 times over every spec, every
+    one prose such as "No file under `tools/` is touched", and reading it as declared owed 34 legs);
+    they are returned so `--list` can name the skip. None when the spec carries no such sub-head, which the report counts apart from a
+    sub-head declaring nothing (TOOL-aBlindedTrial-8). The body closes at the next heading of ANY
+    depth, unlike the section readers above, because the sub-head has siblings inside section 4.
+    """
+    m = FILES_HEAD.search(text)
+    if not m:
+        return None
+    rest = text[m.end():]
+    nxt = re.search(r"^##+ ", rest, re.M)
+    body = rest[:nxt.start()] if nxt else rest
+    paths, roots = [], []
+    for tok in TICK.findall(body):
+        for word in tok.split():
+            if len(derive_dir_segments(word)) == 1:
+                if word not in roots:
+                    roots.append(word)
+            elif (check_path_shaped(word, files) or check_dir_shaped(word)) and word not in paths:
+                paths.append(word)
+    return paths, roots
+
+
+def derive_dir_segments(tok):
+    """The REAL segments of a `/`-terminated token this join could read, or `[]` for anything else:
+    a token that is not `/`-terminated, opens like a deploy-time token, carries a glob or a space, or
+    has a segment that is empty, `.` or `..` — so `./`, `../` and `tools/./` are nothing, not a path
+    (round 2, R8). `tools/` -> `['tools']`; `tools/run-gates/` -> `['tools', 'run-gates']`."""
+    if NOT_A_TOKEN.match(tok) or " " in tok or "*" in tok or "?" in tok or not tok.endswith("/"):
+        return []
+    parts = tok.rstrip("/").split("/")
+    return [] if any(x in ("", ".", "..") for x in parts) else parts
+
+
+def check_dir_shaped(tok):
+    """A declared PREFIX: a directory token of TWO OR MORE real segments. A one-segment token is a
+    ROOT (`tools/`), which is how prose names a tree and declares nothing (round 2, R1); round 1's
+    fold kept it and owed every non-broad leg under it. The residual, both directions (round 3,
+    R4): a two-segment directory named in prose is still read as declared, and a one-segment
+    directory that is itself a joined guard (`.githooks/`) declared wholesale declares nothing -
+    its files, or a two-segment child, must be named."""
+    return len(derive_dir_segments(tok)) >= 2
+
+
+def check_guard_trips(path, guard):
+    """Git-pathspec semantics for a manifest guard: the exact path, or anything under it as a
+    directory. Never a bare prefix, so `tools/x.sh` does not trip on `tools/x.sh.bak`. A declared
+    DIRECTORY (its trailing `/` kept by `extract_files_touched`, two or more segments — a root never
+    reaches here) trips symmetrically: it also trips a guard that sits under it, an exact-file guard
+    included, because `tools/x/` declares `tools/x/y.sh` (R3)."""
+    p, g = path.rstrip("/"), guard.rstrip("/")
+    if p == g or p.startswith(g + "/"):
+        return True
+    return path.endswith("/") and g.startswith(p + "/")
+
+
+def derive_guarded_legs(rows):
+    """The manifest's guarded legs, split by guard BREADTH. Returns `(joined, broad)`: `broad` is
+    `{guard: legs}` for every guard carried by MORE than BROAD_LEG_FLOOR legs over the whole
+    manifest, whatever its depth, which the join excludes, prints with its counts and --list reports
+    as NEAR; `joined` is `(name, [guards])` for every leg carrying at least one guard that is not
+    broad, with the broad ones dropped from its list. A leg with no `guard` key is absent from both
+    (fixture manifests omit it). rev-1 split on DEPTH — one segment or more — and on the real
+    manifest that joined `tools/lib/` (30 legs) and excluded `.githooks/` (5); the count is the
+    property the exclusion was written for (closing review round 1, R1)."""
+    count = {}
+    for r in rows:
+        for g in set(r.get("guard") or []):   # LEGS, not entries: a guard listed twice in one row is one leg (round 2, R7)
+            count[g] = count.get(g, 0) + 1
+    broad = {g: n for g, n in count.items() if n > BROAD_LEG_FLOOR}
+    joined = []
+    for r in rows:
+        keep = [g for g in (r.get("guard") or []) if g not in broad]
+        if keep:
+            joined.append((r["name"], keep))
+    return joined, broad
+
+
+def render_broad(broad):
+    """The excluded set as the report prints it, count-descending then by name; `none` when empty."""
+    return " ".join(f"{g} ({n})" for g, n in sorted(broad.items(), key=lambda kv: (-kv[1], kv[0]))) or "none"
+
+
+def check_cutoff_relation(root, key, value):
+    """THE RELATION, ASSERTED (TOOL-aDeferredBar-2, Date gate; one helper for every cutoff key that
+    carries it since TOOL-aBlindedTrial-8). The register's rule puts a new cutoff strictly past the
+    day it is set, so a value the tree's own history dates at or after itself was carried across a
+    day boundary instead of re-derived. It is compared to the SETTING COMMIT's date and not to the
+    newest spec date on the tree: from the day after landing, that comparison refuses exactly the
+    population the join exists to grade. A value not yet in history cannot be checked and is
+    announced, never refused or passed. Returns the report-line suffix, or None after printing the
+    refusal.
+
+    PICKAXE `-S`, NOT `-G` (closing review F4): `-G` matches any hunk that adds OR removes the line,
+    so a block move, a requote or a whitespace cleanup re-dated the "setting commit" to that later
+    day and the gate refused a value nobody re-set. `-S` matches a change in the line's OCCURRENCE
+    COUNT, which a move or a requote leaves at one.
+    """
+    q = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs", "--pickaxe-regex",
+                        f'-S^{key}="?{value}"?$', "--", ".memory-tree.conf"],
+                       capture_output=True, text=True)
+    if q.returncode:
+        # A delegate whose status is discarded reads a query that never ran as "not yet committed"
+        # — the announced skip with the wrong reason, which the next reader trusts.
+        print(f"spec-tokens: REFUSING — the history query for {key} {value} failed, so the "
+              f"relation cannot be asserted: {q.stderr.strip() or 'git exited ' + str(q.returncode)}")
+        return None
+    set_on = q.stdout.strip()
+    if not set_on:
+        return " · relation unchecked: value not yet committed"
+    if value <= set_on:
+        print(f"spec-tokens: REFUSING — {key} {value} is not strictly past {set_on}, the day the "
+              "value was committed; the register's rule is the day AFTER the later of the newest "
+              "spec filename date on any ref and the setting commit's own date")
+        return None
+    return ""
 
 
 def read_conf_key(root, key):
@@ -272,7 +440,9 @@ def main(argv):
         print(f"spec-tokens: REFUSING — {LEGS} is missing, so the leg join cannot run")
         return 1
     try:
-        legs = {r["name"] for r in json.loads(legs_path.read_bytes().decode("utf-8"))}
+        rows = json.loads(legs_path.read_bytes().decode("utf-8"))
+        legs = {r["name"] for r in rows}
+        guarded, broad = derive_guarded_legs(rows)
     except Exception as exc:  # noqa: BLE001 - a malformed manifest is a refusal, not a pass
         print(f"spec-tokens: REFUSING — {LEGS} did not parse: {exc}")
         return 1
@@ -288,44 +458,23 @@ def main(argv):
 
     legline_cut = read_cutoff_key(root, LEGLINE_KEY)
     direct_cut = read_cutoff_key(root, DIRECT_KEY)
-    if legline_cut is None or direct_cut is None:
+    guards_cut = read_cutoff_key(root, GUARDS_KEY)
+    if legline_cut is None or direct_cut is None or guards_cut is None:
         return 1
-    relation = ""
-    if direct_cut:
-        # THE RELATION, ASSERTED (TOOL-aDeferredBar-2, Date gate). The register's rule puts a new
-        # cutoff strictly past the day it is set, so a value the tree's own history dates at or after
-        # itself was carried across a day boundary instead of re-derived. It is compared to the
-        # SETTING COMMIT's date and not to the newest spec date on the tree: from the day after
-        # landing, that comparison refuses exactly the population the join exists to grade. A value
-        # not yet in history cannot be checked and is announced, never refused or passed.
-        # PICKAXE `-S`, NOT `-G` (closing review F4): `-G` matches any hunk that adds OR removes the
-        # line, so a block move, a requote or a whitespace cleanup re-dated the "setting commit" to
-        # that later day and the gate refused a value nobody re-set. `-S` matches a change in the
-        # line's OCCURRENCE COUNT, which a move or a requote leaves at one.
-        q = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs", "--pickaxe-regex",
-                            f'-S^{DIRECT_KEY}="?{direct_cut}"?$', "--", ".memory-tree.conf"],
-                           capture_output=True, text=True)
-        if q.returncode:
-            # A delegate whose status is discarded reads a query that never ran as "not yet
-            # committed" — the announced skip with the wrong reason, which the next reader trusts.
-            print(f"spec-tokens: REFUSING — the history query for {DIRECT_KEY} {direct_cut} failed, "
-                  f"so the relation cannot be asserted: {q.stderr.strip() or 'git exited ' + str(q.returncode)}")
-            return 1
-        set_on = q.stdout.strip()
-        if not set_on:
-            relation = " · relation unchecked: value not yet committed"
-        elif direct_cut <= set_on:
-            print(f"spec-tokens: REFUSING — {DIRECT_KEY} {direct_cut} is not strictly past {set_on}, "
-                  "the day the value was committed; the register's rule is the day AFTER the later "
-                  "of the newest spec filename date on any ref and the setting commit's own date")
-            return 1
+    relation = check_cutoff_relation(root, DIRECT_KEY, direct_cut) if direct_cut else ""
+    grelation = check_cutoff_relation(root, GUARDS_KEY, guards_cut) if guards_cut else ""
+    if relation is None or grelation is None:
+        return 1
     hits, skipped, graded, seen_waived = [], 0, 0, set()
     ungraded, noheading = 0, 0
     bar_examined, bar_specs, bar_carriers, near = 0, 0, 0, []
+    g_examined, g_specs, g_carriers, g_nosubhead, g_nogates = 0, 0, 0, 0, 0
     for f in specs:
         text = (root / f).read_bytes().decode("utf-8", "replace")
         m = SPEC_DATE.search("/" + f)
         armed = bool(direct_cut) and bool(m) and m.group(1) >= direct_cut
+        g_armed = bool(guards_cut) and bool(m) and m.group(1) >= guards_cut
+        named = set()                 # the manifest names the leg line contributes
         pop_toks, bar_toks = [], []   # every graded-population token · the BAR matches among them
         gates = extract_gates(text)
         if gates is None:
@@ -359,6 +508,8 @@ def main(argv):
                 contributed += 1
                 if tok not in legs:
                     hits.append((f, "leg", tok, f"not a name in {LEGS}"))
+                else:
+                    named.add(tok)
         if not contributed and extract_gates(text) is not None:
             ungraded += 1
             if legline_cut:
@@ -389,10 +540,57 @@ def main(argv):
             # indistinguishable from coverage, and the OFF state hides the most.
             bar_carriers += 1
             where = f"predates {DIRECT_KEY} {direct_cut}" if direct_cut else f"{DIRECT_KEY} blank (arm off)"
-            near += [(f, tok, where) for tok in bar_toks]
+            near += [(f, "bar", tok, where) for tok in bar_toks]
         graded_set = set(pop_toks)
-        near += [(f, tok, "outside the graded population")
+        near += [(f, "bar", tok, "outside the graded population")
                  for tok in TICK.findall(text) if BAR.search(tok) and tok not in graded_set]
+        # THE GUARDS JOIN (TOOL-aBlindedTrial-8): the declared write set against every guarded leg.
+        # One hit per MISSING leg, its token naming the first declared path that trips it — the
+        # composite keeps a `[leg]` waiver row keyed on the bare leg name from swallowing it.
+        touched = extract_files_touched(text, files)
+        if touched is None:
+            g_nosubhead += 1
+            touched = ([], [])
+        declared, roots = touched
+        # A one-segment ROOT under the sub-head declares nothing (round 2, R1), and says so.
+        near += [(f, "guards", p, "a one-segment root declares nothing, not joined - name the files or "
+                                  "a directory of two or more segments") for p in roots]
+        missing = []
+        # The legline arm's precondition, mirrored (R4): a spec with NO Gates heading is the light
+        # profile's legal shape and is not joined — counted, NOT examined, and every path it declares
+        # that would have tripped a joined guard is named as NEAR, so the skip has a size and a name
+        # (round 2, R8).
+        if declared and extract_gates(text) is None:
+            g_nogates += 1
+            near += [(f, "guards", p, "no Gates heading, not joined") for p in declared
+                     if any(check_guard_trips(p, g) for _, gs in guarded for g in gs)]
+        elif extract_gates(text) is not None:
+            if g_armed:
+                g_specs += 1
+                g_examined += len(declared)
+            for leg, gs in guarded:
+                if leg in named:
+                    continue
+                path = next((p for p in declared if any(check_guard_trips(p, g) for g in gs)), None)
+                if path is not None:
+                    missing.append((leg, path))
+        if g_armed:
+            hits += [(f, "guards", f"{leg} <- {path}",
+                      f"§4 files-touched names {path}, which trips the guard of leg {leg!r}, "
+                      "absent from the §7 leg line") for leg, path in missing]
+        elif missing:
+            g_carriers += 1
+            where = f"predates {GUARDS_KEY} {guards_cut}" if guards_cut else f"{GUARDS_KEY} blank (arm off)"
+            near += [(f, "guards", f"{leg} <- {path}", where) for leg, path in missing]
+        # A path whose only guard matches are BROAD is EXCLUDED, and says so under --list, count and all.
+        for p in declared:
+            if any(check_guard_trips(p, g) for _, gs in guarded for g in gs):
+                continue
+            hit = [g for g in broad if check_guard_trips(p, g)]
+            if hit:
+                near.append((f, "guards", p, "matches only the broad guard(s) "
+                             + " ".join(f"{g} ({broad[g]} legs)" for g in hit)
+                             + ", excluded from the join"))
         for path, line in CITE.findall(text):
             if path not in files:
                 skipped += 1
@@ -417,8 +615,8 @@ def main(argv):
     if listing:
         for f, kind, tok, why in hits:
             print(f"spec-tokens: {'WAIVED' if tok in waivers else 'HIT   '} [{kind}] {f} :: {tok} — {why}")
-        for f, tok, where in near:
-            print(f"spec-tokens: NEAR   [bar] {f} :: {tok} — {where}")
+        for f, kind, tok, where in near:
+            print(f"spec-tokens: NEAR   [{kind}] {f} :: {tok} — {where}")
 
     print(f"spec-tokens: {len(specs)} live spec(s) · {frozen} terminal spec(s) not graded · "
           f"{graded} token(s) graded · {skipped} citation(s) skipped (untracked path) · "
@@ -433,6 +631,20 @@ def main(argv):
     else:
         print(f"spec-tokens: bar join · {DIRECT_KEY} blank (arm off) · {bar_carriers} live spec(s) "
               "carry a bar token")
+    # The guards join's line, the same shape for the same reason: what it examined, what it counted
+    # and skipped, how many specs declared nothing it could read or carried no Gates heading to join
+    # against, and the guards the breadth floor excluded WITH their leg counts — the derived figure
+    # that no prose restates (R1, R11).
+    g_tail = (f" · {g_nosubhead} carry no Files touched sub-head · {g_nogates} declare a path and carry "
+              f"no Gates heading, not joined · excluded as broad (carried by more than {BROAD_LEG_FLOOR} "
+              f"legs): {render_broad(broad)}")
+    if guards_cut:
+        print(f"spec-tokens: guards join · {g_examined} declared path(s) examined in {g_specs} live "
+              f"spec(s) at/after {GUARDS_KEY} {guards_cut} · {g_carriers} pre-cutoff live spec(s) carry "
+              f"a missing guarded leg and are not graded{g_tail}{grelation}")
+    else:
+        print(f"spec-tokens: guards join · {GUARDS_KEY} blank (arm off) · {g_carriers} live spec(s) "
+              f"carry a missing guarded leg{g_tail}")
     # THE UNGRADED POPULATION, which the report used to leave out entirely. A leg join that reads N
     # specs and grades a leg name in far fewer of them looks identical to one that graded them all
     # and found nothing wrong. These two numbers are what separate the cases, and they are kept

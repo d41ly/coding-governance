@@ -515,38 +515,45 @@ else
 fi
 rm -f "$FTMP"
 
-# THE FIXTURE RECORDS CARRY THE PREFIX IN THEIR FILENAMES, not in their bytes. Each is named for the
-# piece it describes with `/` written as `~`, so a record for `tools/unattended/fixture-pieces/one/
-# piece.md` is `tools~unattended~fixture-pieces~one~piece.md.md`. Rendering the fixture alone leaves
-# those names pointing at a tree that does not exist, and `check-playbook.sh` reports every one as an
-# ORPHAN RECORD -- coverage nobody has. Renaming them is therefore part of the same render, not a
-# separate tidy-up; inCMS had already done it by hand, which is what its two `engine`-declared
-# fixture-record forks actually were.
+# THE FIXTURE RECORDS CARRY THE PREFIX IN THEIR FILENAMES as well as in their bodies. Each is named
+# for the piece it describes with `/` written as `~`, so the name this install needs is derived from
+# `KIT_REL` exactly as the body is -- and both come out of the SAME render, from templates that
+# carry the token and nothing else. A record whose body names a piece this tree does not hold is an
+# ORPHAN RECORD to `check-playbook.sh`, coverage nobody has, so the pair is written together.
+#
+# THIS USED TO BE A RENAME LOOP over the copies gov shipped, and the rename is what made it a DATA
+# LOSS: gov's descriptor landed its own spelling at every prefix, the loop moved that file over the
+# target's own copy, and the next `update` restored gov's spelling so the move ran again. The
+# descriptor now declares the rendered destination and ships gov's spelling to nobody, so there is
+# nothing left to move. DEPL-cMendedVintage-6.
 _fx_want=$(printf '%s' "$KIT_REL" | tr '/' '~')
-if [ -d "$KIT_DIR/fixture-records" ]; then
-  for _r in "$KIT_DIR"/fixture-records/*~fixture-pieces~*.md; do
-    [ -e "$_r" ] || continue
-    _base=$(basename "$_r")
-    _tail=${_base#*~fixture-pieces~}
-    _new="${_fx_want}~fixture-pieces~${_tail}"
-    # THE BODY CARRIES THE PATH TOO, and fixing only the name leaves the record describing a piece
-    # that does not exist -- `check-playbook.sh` then reports it as an ORPHAN RECORD, which is
-    # coverage nobody has. The old prefix is recovered from the record's OWN name rather than
-    # assumed, so a record already at the right prefix is rewritten to itself and a record from any
-    # other prefix is still corrected.
-    _old_pref=$(printf '%s' "${_base%%~fixture-pieces~*}" | tr '~' '/')
-    if [ "$_old_pref" != "$KIT_REL" ]; then
-      _body=$( cat "$_r" || exit 1; printf X ) || exit 1
-      _body=${_body%X}
-      _body=${_body//"$_old_pref/fixture-pieces/"/"$KIT_REL/fixture-pieces/"}
-      printf '%s' "$_body" > "$_r"
+mkdir -p "$KIT_DIR/fixture-records"
+for _fx_n in one two; do
+  _fx_tpl="$KIT_DIR/fixture-record-$_fx_n.template.md"
+  _fx_rel="$KIT_REL/fixture-records/${_fx_want}~fixture-pieces~${_fx_n}~piece.md.md"
+  _fx_out="$KIT_DIR/fixture-records/${_fx_want}~fixture-pieces~${_fx_n}~piece.md.md"
+  # A MISSING TEMPLATE IS A REFUSAL, not a skip: the records are the fixture playbook's only
+  # coverage, and a silently unwritten one reads downstream as a piece nobody ever checked.
+  [ -f "$_fx_tpl" ] || { echo "unattended: $KIT_REL/fixture-record-$_fx_n.template.md is missing from the kit, so the fixture record it renders cannot be written -- re-copy the kit" >&2; exit 1; }
+  RTMP=$(mktemp) || exit 2
+  if render "$_fx_tpl" > "$RTMP" && [ -s "$RTMP" ]; then
+    # The same refusal the fixture render above makes, and for its reason: an unresolved token must
+    # never reach disk, because `check-playbook.sh` reads these files before anything runs --check.
+    if grep -qE '[{][{][A-Z_]+[}][}]' "$RTMP"; then
+      echo "unattended: the fixture-record render left an unfilled placeholder -- refusing to write $_fx_rel" >&2
+      grep -nE '[{][{][A-Z_]+[}][}]' "$RTMP" | head -5 | sed 's/^/    /' >&2
+      rm -f "$RTMP"; exit 1
     fi
-    if [ "$_base" != "$_new" ]; then
-      mv "$_r" "$KIT_DIR/fixture-records/$_new"
-      echo "unattended: repathed fixture record $_base -> $_new"
+    if [ ! -f "$_fx_out" ] || ! diff -q <(tr -d '\r' < "$_fx_out") "$RTMP" >/dev/null 2>&1; then
+      cp "$RTMP" "$_fx_out"
+      echo "unattended: rendered $_fx_rel"
     fi
-  done
-fi
+  else
+    echo "unattended: the fixture-record render FAILED or was empty -- refusing to write $_fx_rel" >&2
+    rm -f "$RTMP"; exit 1
+  fi
+  rm -f "$RTMP"
+done
 mkdir -p "$SKILL_DIR"
 TMPW=$(mktemp) || exit 2
 render > "$TMPW" || { rm -f "$TMPW"; echo "unattended: the render FAILED — the template could not be read; the Skill is unchanged"; exit 1; }

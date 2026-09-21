@@ -61,11 +61,22 @@ required_keys_render = ["MEMORY_ROOT", "FAMILIES"]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
 mutates_index = false
 
-# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. `--scaffold` is the render here and the
-# adopter's own closing instruction already says so — "re-run --scaffold after any FAMILIES or
-# MEMORY_ROOT edit; --check reds until you do" — so a template that moved under the adopter needs
-# the same re-run and nothing else. `--with-hook` is deliberately NOT passed: wiring a hook is a
-# posture flip, and a refresh does not make one (TOOL-dRetiredFork-29).
+# THE RE-RENDER an `update` runs by default; GOVKIT_RERENDER=0 declines it. It rewrites what the
+# `rendered` rule above declares, from `SKILL.template.md` plus the shared memory-tree conf — content derived
+# from the adopting tree rather than copied from gov's, which is what makes it go stale.
+#
+# `--scaffold` IS THE RENDER MODE HERE, unlike the sibling kit whose scaffold refuses once a
+# declaration exists: this one owns no conf of its own, reads the memory-tree kit's, and renders
+# unconditionally every time it is run. The optional hook wiring is a separate flag that this argv
+# does not pass, so re-running writes that one destination and nothing else.
+#
+# NO `[[outcome]]` PAIR, deliberately. This argv exits 1 when the shared conf is unreadable, and the
+# `[adopt]` argv above exits 1 on the same state — so declaring it an accepted stop would also change
+# what `apply` accepts, for a state no unit has re-adjudicated. It stays a loud failure naming this
+# kit, which is what the same exit already does at adopt time.
+# WHY THE BLOCK EXISTS AT ALL: TOOL-dRetiredFork-29 — a kit that ships a rendered artifact and
+# declares no regenerate leaves that artifact one vintage stale on every update, whatever
+# GOVKIT_RERENDER is set to, because the flag runs a block and there was none.
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
 

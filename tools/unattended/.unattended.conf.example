@@ -219,6 +219,16 @@ UNITS_REGION_CUTOFF=""
 # passing silently. Set to the day this landed.
 SPEC_THIN_CUTOFF=""
 
+# TOOL-aBlindedTrial-7 - a PROJECT-WIDE opt-in to the pre-code spec audit: a YYYY-MM-DD date
+# recording the day the project ruled audits on. Any dated value opts EVERY build in whose README
+# declares no `spec-audit:` key, for every run whose BASE carries it; the date is a record, not a
+# threshold, and is compared to nothing - unlike the cutoffs above, which grade a date. Read at the
+# pinned BASE by check_authorization, never from the working copy, so a run cannot blank it to
+# escape; a README key wins whatever it says; a non-date is a refusal, and so is a BASE conf whose
+# evaluation does not reach the end. BLANK or absent keeps the
+# per-build opt-in - a per-adopter fact, like every cutoff above, so the example ships it blank.
+SPEC_AUDIT_DEFAULT=""
+
 PHASES_EXTRA=""
 DOD_EXTRA=""
 
@@ -228,6 +238,18 @@ DOD_EXTRA=""
 # because a pin that quietly defaults is a pin nobody set.
 HALT_CODES_EXTRA=""
 HALT_FLOOR="7"
+
+# The UNDECLARED-WRITE CEILING. A concurrently dispatched pass declares its write set before it
+# starts, and that declaration is the disjointness proof two passes rest on. Check 23 compares the
+# declaration against what the pass actually committed and grades the COUNT against this pin, which
+# is shrink-only: it may fall and never rise. Undeclared or malformed is a refusal, not a defaulted
+# value, for the reason the floor above gives.
+#
+# 0 is the value a repo adopting this kit wants, and it means what it says: a pass that writes
+# outside its declaration reds the bar. Raise it ONLY to grandfather instances that already exist in
+# append-only history, MEASURED over your own tree rather than guessed, with the date and the reason
+# written here beside it - then lower it as they close.
+UNDECLARED_WRITE_CEILING="0"
 
 # The LANDER MARKER. A BARE NAME, resolved by the lander AND by `--landed` against
 # `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in

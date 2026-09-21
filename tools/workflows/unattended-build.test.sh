@@ -103,7 +103,7 @@ SPEC_OK='{"authored":["A-tB-1"],"alreadyPresent":["A-tB-2","A-tB-3"],"refused":[
 # TOOL-aHoistedPass-6 - the BUILD double is gone with the stage. What a terminal verdict now
 # reaches is the DISPOSAL stage, and past it the roster hand-out, which is a return rather than an
 # agent. `returns` takes an optional THIRD argument so an arm can hand back a FAILED disposal.
-DISPOSE_OK='{"disposed":true,"standing":[],"promoted":0,"folded":0,"promotedIds":[],"summary":"ok"}'
+DISPOSE_OK='{"disposed":true,"standing":[],"promoted":0,"folded":0,"promotedIds":[],"edges":[],"placements":[],"summary":"ok"}'
 # THE DOUBLE RETURNS THE CALLEE'S REAL KEYS, and the first version of it did not. It invented
 # `verdict` and `reportPath`, so all 28 arms passed on two fields `tier2-review.js` has never
 # returned — the harness and its callee had never met. Its actual returns carry `blockers`,
@@ -122,8 +122,12 @@ rec() { printf '{"token":"%s","exitCode":0}' "$1"; }
 # `promoted` equal to the blockers, `folded` 0, and one `promotedIds` entry whenever it promoted —
 # so the arms that pair `NON-CONVERGENT 2` with it still reconcile against the reconciling guard,
 # in sum and in severity split, and still receive the full roster.
-returns() { local dflt ids='[]'; [ "${2:-0}" -gt 0 ] && ids='["A-tB-p"]'
-  dflt=$(printf '{"disposed":true,"standing":[],"promoted":%s,"folded":0,"promotedIds":%s,"summary":"ok"}' "${2:-0}" "$ids")
+returns() { local dflt ids='[]' places='[]'
+  # A PROMOTING DEFAULT PLACES ITS UNIT, because TOOL-cMendedVintage-19 refuses a promotion that
+  # declares no placement. `A-tB-3` is the last unit of `$UNITS` at order 2, so a repair of it sits
+  # at 3 — one above, the rule's own arithmetic rather than a number picked to pass.
+  [ "${2:-0}" -gt 0 ] && { ids='["A-tB-p"]'; places='[{"unit":"A-tB-p","repairs":"A-tB-3","order":3}]'; }
+  dflt=$(printf '{"disposed":true,"standing":[],"promoted":%s,"folded":0,"promotedIds":%s,"edges":[],"placements":%s,"summary":"ok"}' "${2:-0}" "$ids" "$places")
   printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
   "$SPEC_OK" "$(review_out "${2:-0}")" "$(rec "$1")" "${3:-$dflt}"; }
 audit() { printf '%s' "$1"; }
@@ -539,7 +543,7 @@ has    "V2 zero confirmed: the hand-out carries promoted 0 and folded 0 out loud
 # ---- V1: CONVERGED with four confirmed, one of them HIGH, RUNS the stage, announces the severity
 # ---- rule, spells the promotion verb with --reason, and hands out the roster with both counts.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 4 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":3,"promotedIds":["A-tB-4"],"summary":"d"}')")
+    "$SPEC_OK" "$(review_out 0 4 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":3,"promotedIds":["A-tB-4"],"edges":[],"placements":[{"unit":"A-tB-4","repairs":"A-tB-3","order":3}],"summary":"d"}')")
 has "V1 CONVERGED with confirmed findings: the disposal agent RUNS" "$o" "agent:dispose:tB"
 has "V1 ...and the log says the rule, on CONVERGED too" "$o" "disposing by severity, on CONVERGED too"
 has "V1 ...and the prompt names the one high" "$o" "1 at HIGH"
@@ -570,7 +574,7 @@ hasnt_ "V4 blockers above confirmed: the stage is never reached" "$o" "phase:Dis
 # ---- V5: ATTENDED mode reaches the stage at zero blockers with two confirmed, and its prompt
 # ---- promotes through the README's roster table, never through --rescope, which fail 48s with no
 # ---- run-state file. The RESULT is the attended MAIN return, since A_UNITS is READY.
-o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":2,"highs":0,"unverified":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"promoted":0,"folded":2,"summary":"d"}}')
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":2,"highs":0,"unverified":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"promoted":0,"folded":2,"edges":[],"placements":[],"summary":"d"}}')
 has    "V5 attended with confirmed findings: the disposal agent RUNS" "$o" "agent:dispose:tB"
 has    "V5 attended: the prompt promotes through the README roster" "$o" "authored Units table"
 hasnt_ "V5 attended: the prompt never orders --rescope" "$o" "--rescope tB"
@@ -893,11 +897,11 @@ has    "B ...and asks for promotedIds" "$p" 'name every promoted unit id in `pro
 # ---- C (harness end): `--disposition promote` rides the record command at a CONVERGED exit with
 # ---- highs, so the merge bar demands the units the highs became.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 4 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":3,"promotedIds":["A-tB-4"],"summary":"d"}')")
+    "$SPEC_OK" "$(review_out 0 4 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":3,"promotedIds":["A-tB-4"],"edges":[],"placements":[{"unit":"A-tB-4","repairs":"A-tB-3","order":3}],"summary":"d"}')")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')
 has    "C zero blockers with a high: the record command appends --disposition promote" "$p" "--blockers 0 --disposition promote"
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 0)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":3,"promotedIds":[],"summary":"d"}')")
+    "$SPEC_OK" "$(review_out 0 3 0)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":3,"promotedIds":[],"edges":[],"placements":[],"summary":"d"}')")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')
 hasnt_ "C zero blockers, no high: the first command carries no disposition" "$p" "--blockers 0 --disposition promote"
 has    "C ...but the retry instruction for a terminal refusal stays" "$p" "run the SAME command once more with --disposition promote"
@@ -915,6 +919,77 @@ o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"disp
     "$SPEC_OK" "$(review_out 1 1 0)" "$(rec BOUNDED)" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":[],"summary":"x"}')")
 has    "D a promotion naming no unit is REFUSED" "$o" 'promoted 1 beside promotedIds []'
 has    "D ...with an empty roster" "$o" '"roster":[]'
+
+# ---- P (TOOL-cMendedVintage-19): AN EDGE IS A PAIR, AND A REPAIR SITS BESIDE WHAT IT REPAIRS.
+# The round-1 audit of `cMendedVintage` promoted seven findings into units, appended every one past
+# the whole roster, and wrote consumes-from bullets whose reciprocals the hygiene join then named.
+# Two orders and seven bullets were repaired by hand. Both halves are now the stage's own return and
+# both refuse the hand-out, so the arms below stage each break and watch it red.
+#
+# `$UNITS` is A-tB-1 and A-tB-2 at order 1 and A-tB-3 at order 2, so a repair of A-tB-1 belongs at
+# order 2 and the end of this roster is anything above 2. Those two numbers are what make the
+# beside-it case and the past-the-end case distinguishable at all; picking a repair target at the
+# END of the roster would have made them the same integer and graded nothing.
+build_dispose() { # edges-json · placements-json
+  printf '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":["A-tB-4"],"edges":%s,"placements":%s,"summary":"d"}' "$1" "$2"
+}
+PAIRED='[{"from":"A-tB-4","verb":"consumes-from","to":"A-tB-1"},{"from":"A-tB-1","verb":"hands-off","to":"A-tB-4"}]'
+ONEWAY='[{"from":"A-tB-4","verb":"consumes-from","to":"A-tB-1"}]'
+BESIDE='[{"unit":"A-tB-4","repairs":"A-tB-1","order":2}]'
+run_dispose() { # dispose-json -> the trace and the RESULT
+  run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(review_out 0 1 1)" "$(rec CONVERGED)" "$1")"
+}
+
+# THE PASSING CASE FIRST, so every refusal below is known to differ from it by one field.
+o=$(run_dispose "$(build_dispose "$PAIRED" "$BESIDE")")
+has "P paired edge + a repair at one above its target: the roster is handed out" "$o" '"roster":[{'
+has "P ...and the log names the pairing and the placement" "$o" "edges 2 paired · placed A-tB-4 at order 2"
+
+# ONE END ONLY. The mirror is dropped and nothing else changes.
+o=$(run_dispose "$(build_dispose "$ONEWAY" "$BESIDE")")
+has "P a one-way §3 edge: the roster is EMPTY" "$o" '"roster":[]'
+has "P ...and the note NAMES the unpaired bullet" "$o" 'A-tB-4 **consumes-from** A-tB-1'
+has "P ...and the disposal is NOT done" "$o" "disposal: NOT done"
+# A MALFORMED BULLET JOINS THE SAME BUCKET, because an edge naming no verb is unpaired in the only
+# sense this stage can see.
+o=$(run_dispose "$(build_dispose '[{"from":"A-tB-4","verb":"depends-on","to":"A-tB-1"}]' "$BESIDE")")
+has "P an edge carrying a verb outside the two: the roster is EMPTY" "$o" '"roster":[]'
+# ASSERTED ON THE NOTE'S OWN PAYLOAD, never on the phrase alone: the prompt two screens up carries
+# the words "written at one end only" verbatim, so an arm matching those bytes passes while the
+# guard is disarmed — the gate-satisfied-by-its-own-prose class, in a test file.
+has "P ...and it is reported as written at one end only" "$o" 'A-tB-4 **depends-on** A-tB-1'
+# AN ABSENT LIST IS NOT A DECLARED EMPTY ONE.
+o=$(run_dispose '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":["A-tB-4"],"placements":'"$BESIDE"',"summary":"d"}')
+has "P no edges key at all: the roster is EMPTY" "$o" '"roster":[]'
+has "P ...and the note says the list itself is missing" "$o" 'returned no `edges` list'
+
+# THE PLACEMENT HALF. Same fixture, only the order moves.
+o=$(run_dispose "$(build_dispose "$PAIRED" '[{"unit":"A-tB-4","repairs":"A-tB-1","order":3}]')")
+has "P a repair appended PAST the roster end: the roster is EMPTY" "$o" '"roster":[]'
+has "P ...and the note names the unit, its order and its target" "$o" 'A-tB-4 at order 3 repairing "A-tB-1"'
+# SHARING the target's own order is not "after" it — units at one order are a parallel group.
+o=$(run_dispose "$(build_dispose "$PAIRED" '[{"unit":"A-tB-4","repairs":"A-tB-1","order":1}]')")
+has "P a repair sharing its target's order is REFUSED" "$o" 'not placed beside the unit it repairs'
+# `none` IS THE ONLY ROUTE PAST THE END, and it has to actually be past it.
+o=$(run_dispose "$(build_dispose "$PAIRED" '[{"unit":"A-tB-4","repairs":"none","order":3}]')")
+has "P a promotion repairing none, above every unit: the roster is handed out" "$o" '"roster":[{'
+o=$(run_dispose "$(build_dispose "$PAIRED" '[{"unit":"A-tB-4","repairs":"none","order":2}]')")
+has "P ...but one repairing none INSIDE the roster is REFUSED" "$o" '"roster":[]'
+# A TARGET THIS ROSTER DOES NOT CARRY is the `auditIds` stray, one stage later.
+o=$(run_dispose "$(build_dispose "$PAIRED" '[{"unit":"A-tB-4","repairs":"A-tB-99","order":2}]')")
+has "P a repairs naming no unit of this roster is REFUSED" "$o" 'A-tB-4 at order 2 repairing "A-tB-99"'
+# AND THE TWO LISTS NAME THE SAME UNITS, in both directions.
+o=$(run_dispose "$(build_dispose "$PAIRED" '[{"unit":"A-tB-5","repairs":"none","order":3}]')")
+has "P promotedIds and placements naming different units: REFUSED" "$o" 'name different units (A-tB-4, A-tB-5)'
+
+# THE INSTRUCTION, not just the guard. A stage told nothing about either rule would return a
+# compliant-looking answer only by accident, and the guard alone would grade the accident.
+p=$(printf '%s\n' "$o" | grep '^prompt:dispose:tB:')
+has "P the disposal prompt carries the placement rule" "$p" "IMMEDIATELY AFTER THE UNIT IT REPAIRS"
+has "P ...and names the append-past-the-end default for a promotion repairing nothing" "$p" "ABOVE EVERY unit in this build"
+has "P the disposal prompt carries the both-ends rule" "$p" "EVERY §3 EDGE YOU WRITE GETS BOTH OF ITS ENDS"
+has "P ...and asks for both lists back" "$p" "Return in \`placements\` one \`{unit, repairs, order}\` per promoted unit"
 
 # ---- E (id 11): BOUNDED is a by-design exit, not a degradation.
 o=$(run_wf "$UNITS" "$(returns BOUNDED 1)")
@@ -972,14 +1047,14 @@ o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":n
 has    "F all-refuted beside a dead lens: THROWS" "$o" "non-integer blocker count"
 # id 14: unverified findings are OUTSTANDING and run the stage.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":2,"promotedIds":[],"summary":"d"}')")
+    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":2,"promotedIds":[],"edges":[],"placements":[],"summary":"d"}')")
 has    "F 0 confirmed + 2 unverified: the disposal agent RUNS" "$o" "agent:dispose:tB"
 has    "F ...and the prompt hands it the unverified population" "$o" "and 2 unverified. Open the report"
 has    "F ...and says an unverified finding is OUTSTANDING, not cleared" "$o" "OUTSTANDING, not cleared"
 has    "F ...and the hand-out carries unverified 2" "$o" '"unverified":2'
 has    "F ...and the roster is handed out" "$o" '"roster":[{'
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 1 1 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":1,"promotedIds":["A-tB-4"],"summary":"d"}')")
+    "$SPEC_OK" "$(review_out 0 1 1 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":1,"promotedIds":["A-tB-4"],"edges":[],"placements":[{"unit":"A-tB-4","repairs":"A-tB-3","order":3}],"summary":"d"}')")
 has    "F confirmed 1 + unverified 1: reconciles against their sum" "$o" '"roster":[{'
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
     "$SPEC_OK" "$(review_out 0 1 1 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":["A-tB-4"],"summary":"d"}')")
@@ -1000,7 +1075,7 @@ hasnt_ "F ...and the stage is never reached" "$o" "phase:Disposal"
 # ---- demanding nothing. At zero blockers with something outstanding the DISPOSAL stage now runs
 # ---- FIRST and the record carries `promote` iff `promotedIds` is non-empty.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":1,"promotedIds":["A-tB-9"],"summary":"d"}')")
+    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":1,"promotedIds":["A-tB-9"],"edges":[],"placements":[{"unit":"A-tB-9","repairs":"A-tB-3","order":3}],"summary":"d"}')")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')
 has    "R2-B zero blockers, zero highs, a promoted UNVERIFIED finding: the record carries --disposition promote" "$p" "--blockers 0 --disposition promote"
 ag=$(printf '%s\n' "$o" | grep '^agent:' | tr '\n' ' ')
@@ -1071,7 +1146,7 @@ hasnt_ "WS15 ...and not as a dirty tree" "$o" "Commit the fold"
 # ---- F (id 16): an UNVERIFIED finding the stage judges not a defect has a route. `refuted` is
 # ---- optional, bounded by `unverified`, in the sum, and the severity floors stand.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 2 0 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":2,"refuted":1,"promotedIds":[],"summary":"r1 refuted: not reachable"}')")
+    "$SPEC_OK" "$(review_out 0 2 0 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":2,"refuted":1,"promotedIds":[],"edges":[],"placements":[],"summary":"r1 refuted: not reachable"}')")
 has    "R2-F promoted 0 + folded 2 + refuted 1 over confirmed 2 + unverified 1: the roster is handed out" "$o" '"roster":[{'
 has    "R2-F ...and refuted travels out" "$o" '"folded":2,"refuted":1'
 has    "R2-F ...and the log counts it" "$o" "promoted 0 · folded 2 · refuted 1"
@@ -1342,7 +1417,7 @@ has "PV-F3 a drifted protocol still reds in that install" "$o" "DRIFT"
 has "PV-F3 ...at exit 1" "$o" "rc=1"
 
 # ---- ROUND 2 R2-3: THE REGENERATE REFRESHES AN INSTALL, IT NEVER CREATES ONE. govkit runs the argv
-# ---- `kit.toml` declares on every update with GOVKIT_RERENDER=1, captures its output and prints one
+# ---- `kit.toml` declares on every update unless GOVKIT_RERENDER=0, captures its output and prints one
 # ---- line, and rows nothing it writes. So a render mode that creates a missing live copy put a
 # ---- second review protocol into a consumer that keeps its own extract on purpose, and nothing named
 # ---- the file. The argv is read out of `kit.toml` and run exactly as declared, because a mode this

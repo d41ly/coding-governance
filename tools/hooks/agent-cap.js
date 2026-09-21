@@ -28,11 +28,13 @@
  *
  * ONE RULE HERE IS NOT A FAN-OUT BOUND. RULE 0 (TOOL-aBlindedTrial-6) denies a `Workflow` call whose
  * structured `args` carry `kind: "spec-audit"` unless the build README under `args.repo` declares
- * `spec-audit: <YYYY-MM-DD>` in its front matter. What it does NOT see, said here rather than
+ * `spec-audit: <YYYY-MM-DD>` in its front matter, or (TOOL-aBlindedTrial-7) that README carries no
+ * key and `<args.repo>/.unattended.conf` declares `SPEC_AUDIT_DEFAULT="<YYYY-MM-DD>"`. What it does
+ * NOT see, said here rather than
  * implied: the `workflow()` a running harness calls from INSIDE its script is a runtime call and not
  * a tool call, so the programmatic route is the driver's to refuse (TOOL-aBlindedTrial-3); an `args`
- * string that does not parse shows it no `kind`; and it reads the WORKTREE README while the
- * unattended driver reads BASE, so the two can disagree for exactly one uncommitted edit.
+ * string that does not parse shows it no `kind`; and it reads the WORKTREE README and conf while the
+ * unattended driver reads both at BASE, so the two can disagree for exactly one uncommitted edit.
  *
  * CAP: 5, a FILE CONSTANT and not overridable. This guard RESOLVES the number
  * wherever a bound is written — the helper CALL SITE, the helper's own DEFAULT
@@ -71,7 +73,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.16' // gov:kit agent-cap@1.16 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.18' // gov:kit agent-cap@1.18 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -1732,6 +1734,22 @@ function scanJoinFindings(script) {
 // it lands. F5: `repo` is folded from MSYS spelling before `path.resolve` — on win32 a leading `/` is
 // root-relative to the cwd's DRIVE, so `/c/projects/x` became `C:\c\projects\x` and a DECLARED build
 // was denied with ENOENT. No lowercasing: an fs read must not.
+//
+// A PROJECT-WIDE DEFAULT (TOOL-aBlindedTrial-7). When the README is readable and carries NO key,
+// `<args.repo>/.unattended.conf` is read for `SPEC_AUDIT_DEFAULT`: a date admits, a non-date DENIES
+// by name (armed, never read as absent), a missing file or a blank value is no default and the
+// README deny stands. Node cannot source shell, so `readSpecAuditDefault` is the deliberate second
+// reader the two-readers gotcha warns of, kept honest by taking the three spellings the shell does
+// — both quote styles, a trailing `# comment`, and last-assignment-wins — each pinned by an arm. The
+// README wins whatever it says: a present-but-malformed key is the not-a-date deny and the conf is
+// never consulted, because a typo falling back to the default is the silent opt-out the driver's
+// fail 52 exists to refuse. An unreadable README is still the fail-closed deny with no conf read.
+// Stated limit: a BARE `spec-audit:` line has no value for `readFrontMatterKey` and reads as
+// absent here, so it falls to the conf, where the driver instead refuses it (fail 52) — the
+// disagreement admits an audit, which is the safe direction. Second limit, the same direction: a
+// `;`-joined line (`SPEC_AUDIT_DEFAULT="<date>"; X=1`) is no assignment to this reader and the
+// README deny stands, while the shell reads the date. Worktree here, BASE there: this hook
+// guards a session with an owner present; the BASE read is the one that binds an unattended run.
 
 // The `builds/<slug>` a repo-relative path sits under, or null: no `builds` segment, any `..`
 // segment, or a spelling that is not repo-relative at all — absolute (`/…`, `X:…`) or `~`-rooted
@@ -1748,12 +1766,29 @@ function extractBuildSlug(p) {
   return i === -1 || !parts[i + 1] ? null : parts[i + 1]
 }
 
+// The LAST `SPEC_AUDIT_DEFAULT=` assignment's value in a shell-style conf, as the shell would read
+// it: double- or single-quoted or bare, an optional `export`, a trailing `# comment` allowed after
+// the value ONLY behind whitespace — a `#` glued to a bare word is part of the word to the shell
+// (`2026-09-21#c` is the driver's fail 54), and rev-1 stopped the word there and admitted the date
+// (closing review of units 7/8, R8). null when no assignment exists. The value is returned RAW; the
+// caller decides whether it is a date, so a blank and a non-date are both visible to it.
+function readSpecAuditDefault(bytes) {
+  let v = null
+  for (const line of String(bytes || '').split(/\r?\n/)) {
+    const m = /^\s*(?:export\s+)?SPEC_AUDIT_DEFAULT=(?:"([^"]*)"|'([^']*)'|(\S*))(?:\s+#.*)?\s*$/.exec(line)
+    if (m) v = m[1] !== undefined ? m[1] : m[2] !== undefined ? m[2] : m[3]
+  }
+  return v
+}
+
 function checkSpecAuditDeclared(data) {
   const ID = 'TOOL-aBlindedTrial-6'
   const renderDeny = (why) =>
     `BLOCKED by agent-cap: ${why} A pre-code spec audit is OPT-IN (${ID}): to run one, the build ` +
     `README's FRONT MATTER carries \`spec-audit: <YYYY-MM-DD>\` (the owner's date; a value that is ` +
-    `not a date, or the key inside the body, reads as absent). This rule reads the Workflow call's ` +
+    `not a date, or the key inside the body, reads as absent), or the project's .unattended.conf ` +
+    `declares \`SPEC_AUDIT_DEFAULT="<YYYY-MM-DD>"\` for every build whose README declares no key ` +
+    `(TOOL-aBlindedTrial-7). This rule reads the Workflow call's ` +
     `structured args only, never the script text.\n`
   let readme = '(unplaced)'
   try {
@@ -1793,6 +1828,20 @@ function checkSpecAuditDeclared(data) {
     const { readFrontMatterKey } = require(path.join(__dirname, 'scratch-guard.js'))
     const v = readFrontMatterKey(bytes, 'spec-audit')
     if (v !== null && /^\d{4}-\d{2}-\d{2}$/.test(v)) return null
+    if (v === null) {
+      // README silent: the project default, from the WORKTREE conf. ENOENT is no default; any other
+      // read failure is a deny naming the conf, on the fail-closed rule above.
+      const conf = path.join(root, '.unattended.conf').split(path.sep).join('/')
+      let cbytes = null
+      try { cbytes = require('fs').readFileSync(conf, 'utf8') } catch (e) {
+        if (!e || e.code !== 'ENOENT') return renderDeny(`${conf} could not be read for its \`SPEC_AUDIT_DEFAULT\` key (${(e && e.code) || (e && e.message) || e}), and a conf this hook cannot read is not one it may approve from.`)
+      }
+      const d = cbytes === null ? null : readSpecAuditDefault(cbytes)
+      if (d !== null && d !== '') {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return null
+        return renderDeny(`${readme} declares no \`spec-audit:\` key, and the project's ${conf} declares \`SPEC_AUDIT_DEFAULT="${d}"\`, which is not a date — a project-wide opt-in is dated or it is not one.`)
+      }
+    }
     return renderDeny(
       `${readme} declares no \`spec-audit:\` date in its front matter` +
         (v === null ? '' : ` (it reads \`spec-audit: ${v}\`, which is not a date)`) + `.`,

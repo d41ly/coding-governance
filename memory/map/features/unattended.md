@@ -42,8 +42,8 @@ globs = [
 **The checkpoint is replaced, not removed.** Every other kit makes a rule enforceable. This one
 removes a rule — the explicit ask before a merge and a push — and its burden is to put
 something machine-checkable in the vacated slot. That is why the mandate is ASSERTED rather than
-written by the run, and why reachability from the pinned BASE is part of the contract: a run that can
-author its own authorization has none, and every gate downstream would certify it.
+written by the run, and why reachability from the pinned BASE is part of the contract: a run that
+can author its own authorization has none.
 
 **THE HARNESS BUYS STAGE ORDER AND CANNOT BUY ENFORCEMENT.** `tools/workflows/unattended-build.js`
 runs SPEC then AUDIT then DISPOSAL and hands the run an ordered ROSTER it dispatches one `Workflow`
@@ -55,15 +55,15 @@ filesystem, so every observation is a claim its own agent returned; the refusals
 SHAPES ARE FORCED BY `agent-cap.js` (`TOOL-dFoldedVerdict-4`): DISPOSAL is ONE agent over the whole
 set, and the convergence LOOP sits in the caller while the harness holds the GATE.
 
-**PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor
-— never build a MISSING or THIN unit — was carried entirely by an agent's memory. `plan_state`, the
+**PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor — never build
+a MISSING or THIN unit — was carried by an agent's memory alone. `plan_state`, the
 M2 classifier, ran at two sites that cannot catch it: `--plan` only reports, and `build-complete`
 runs after every commit has landed, by which point a run that built first and specced afterwards has
 a spec that is neither missing nor thin. `--dispatch` now REFUSES such a pass at the moment of the
 act and is bypassed by not calling the verb; the `pass-order history` leg reads the COMMIT GRAPH,
 asserting each CLOSED unit's build commit had a conforming, non-THIN spec at its FIRST PARENT. Only
-the graph remembers ORDER, which is why the second exists. The first parent and not the pinned BASE:
-the method REQUIRES a run to author a missing spec, so what this refuses is authoring it AFTERWARDS.
+the graph remembers ORDER, which is why the second exists. The first parent, not the pinned BASE:
+the method REQUIRES a run to author a missing spec; what this refuses is authoring it AFTERWARDS.
 `PASS_ORDER_CUTOFF` grandfathers earlier builds, and the leg's liveness line names all three
 populations it walks rather than only the two it grades. `--dispatch` also runs the spec-token
 checker declared as `SPEC_TOKENS_CLI` over the live tree first: this harness closes each unit spec
@@ -80,12 +80,12 @@ that can only refuse. Both routes are inert, not detected: neither value is read
 sha resolves to and a graft file rewrites the commit graph, both at a perfectly honest anchor, so
 neither is closed by any amount of anchor hardening. Every read that turns a sha into bytes or into
 ancestry goes through a wrapper pinning `core.useReplaceRefs=false` with `GIT_GRAFT_FILE` pointed
-away from the repo. The two suppressions are not interchangeable and only the second stops a graft;
-measured, not assumed.
+away from the repo. The two suppressions are not interchangeable; only the second stops a graft,
+measured.
 
 **The boundary is stated rather than implied.** A design panel broke four independent anchor
-mechanisms and converged on the reduction that a check under the run's own uid cannot
-constitute authorization. The protocol's §9 enumerates what remains reachable — editing the kit,
+mechanisms and converged on one reduction: a check under the run's own uid cannot constitute
+authorization. The protocol's §9 enumerates what remains reachable — editing the kit,
 shimming its tools, skipping the hook layer, relaying through a seeded endpoint, or never creating a
 run-state file at all — and names the only control that binds: re-running the same leg in a clone the
 run never touched.
@@ -103,8 +103,8 @@ the leg READ them; a phase token or a DoD item spelled into a script is a defect
 in the same file and is read by NEITHER: it is consumed once, by `adopt-unattended.sh`, at render
 time, and its value reaches an agent only through the rendered Skill. The kit owns the
 CORE of both sets and the project may only EXTEND them, asserted against a shrink-only floor —
-without that floor, deleting an item is a silent, reason-free override of everything keyed on it,
-and the fleet has a recorded case of a pin RAISE indistinguishable from a drain.
+without it, deleting an item is a silent, reason-free override of everything keyed on it, and the
+fleet has a recorded pin RAISE indistinguishable from a drain.
 
 **The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
 contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on
@@ -175,16 +175,17 @@ returns. The `http.lowSpeed*` and
 authenticates, stalls mid-transfer, and speaks ssh, and no fixture here has one.
 
 **The kit reads the evidence it already records, from `TOOL-aGradedMandate`.** Four Definition-of-Done
-terms were added or tightened, and every one of them consumes a fact the driver was already writing
-and nothing was reading. `closing-review-recorded` gained a second term: the LAST `--review` round
+terms were added or tightened, each consuming a fact the driver already wrote and nothing read. `closing-review-recorded` gained a second term: the LAST `--review` round
 whose subject is the build slug must carry a terminal token, and `CONVERGED` must name zero blockers.
 Two runs in this tree had reached `LANDED` with that item MET while their closing loop stopped at
-BLOCKED with blockers standing, and the incentive was inverted — recording one more round could oblige
-a run to promote every blocker into a built unit, while recording nothing owed nothing. `specs-audited`
-is an eleventh core item joining every CLOSED unit to a tracked `spec-audit` binding line, whole-token
-and expanding the `N..M` range form eighteen tracked records use. Since `TOOL-aBlindedTrial-2` it is
-owed only when the README at BASE declares `spec-audit: <date>`; absent, a term zero announces
-`not owed` and the item stays in `DOD_CORE`. `build-complete` gained a sixth term
+BLOCKED with blockers standing, and the incentive was inverted: one more round could oblige a run
+to promote every blocker, while recording nothing owed nothing. `specs-audited` is an eleventh core
+item joining every CLOSED unit to a tracked `spec-audit` binding line, whole-token and expanding the
+`N..M` range form eighteen tracked records use. Since `TOOL-aBlindedTrial-2` it is owed only when
+the README at BASE declares `spec-audit: <date>`, or (`TOOL-aBlindedTrial-7`) the conf at that BASE
+declares `SPEC_AUDIT_DEFAULT` and the README no key — sourced in a subshell, never a sed pipeline; a
+non-date is fail 54 — else a term zero announces `not owed` and the item stays in `DOD_CORE`.
+`build-complete` gained a sixth term
 over `plan_state`'s THIN grade, which `verb_plan` used to compute and overwrite one line later.
 
 **The parked split has TWO axes and the history side subtracts both.** `PARK_ACTS_OWED` names the acts

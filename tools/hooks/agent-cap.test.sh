@@ -696,7 +696,10 @@ print(json.dumps({"tool_name":"Workflow","tool_input":{"scriptPath":g,"args":arg
       # Split on `;;` alone — a needle may carry spaces ("not a date"), so no word-splitting here.
       # Fed from a scratch FILE, never a here-string holding a command substitution: the
       # shell-hygiene leg reds that shape because a failed substitution leaves the read at EOF.
-      printf '%s' "$needles" | sed 's/;;/\n/g' > "$TMP/needles"
+      # WITH a trailing newline (TOOL-aBlindedTrial-7): `read` returns non-zero on the final
+      # unterminated line, so `printf '%s'` left every arm's LAST needle unchecked and a
+      # single-needle arm checking nothing - observed when a needle absent from the deny passed.
+      printf '%s\n' "$needles" | sed 's/;;/\n/g' > "$TMP/needles"
       while IFS= read -r n; do
         [ -n "$n" ] && ! grep -qF -- "$n" "$TMP/err" && miss="$miss [$n]"
       done < "$TMP/needles"
@@ -831,6 +834,60 @@ if [ "$(node -p process.platform)" = win32 ]; then
 else
   echo "skip rule0: MSYS-mount deny arm — not win32 (the fold and its residual are win32-only); the arm did NOT run"
 fi
+# TOOL-aBlindedTrial-7 — a PROJECT-WIDE default. When the README carries NO key, the hook reads
+# `SPEC_AUDIT_DEFAULT` from `<repo>/.unattended.conf` (the WORKTREE copy — this hook guards a session
+# with an owner present; the driver reads BASE). Node cannot source shell, so the read is a deliberate
+# re-parse, and the three spellings the two-readers gotcha names are each an arm: single quotes, a
+# trailing comment, and a last-wins pair. The value is ARMED: a non-date DENIES by name rather than
+# reading as absent. The README, present with any value, wins — a malformed key beside a dated
+# default is still the not-a-date deny, never a silent fall-back.
+printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
+SACONF="$SAREPO/.unattended.conf"
+printf 'SPEC_AUDIT_DEFAULT="2026-09-21"\n' > "$SACONF"
+check_spec_audit "rule0/U7: README without the key, conf SPEC_AUDIT_DEFAULT=\"<date>\" → allow by project default" 0 "" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf "SPEC_AUDIT_DEFAULT='2026-09-21'\n" > "$SACONF"
+check_spec_audit "rule0/U7: the single-quoted spelling → allow" 0 "" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf 'SPEC_AUDIT_DEFAULT="2026-09-21" # the day the owner ruled\n' > "$SACONF"
+check_spec_audit "rule0/U7: a trailing comment after the value → allow" 0 "" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# closing review of units 7/8, R8 — a `#` GLUED to a bare word is part of the word to the shell, not a
+# comment: `2026-09-21#c` is fail 54 in the driver, and rev-1's regex stopped the word at `#` and
+# admitted the date. Observed RED-first on that hook. Its sibling, the `;`-joined line, reads as NO
+# assignment here (the README deny, the safe direction) while the shell reads the date — a stated
+# limit of this reader, pinned so it cannot drift into the permissive direction unnoticed.
+printf 'SPEC_AUDIT_DEFAULT=2026-09-21#note\n' > "$SACONF"
+check_spec_audit "rule0/U7: a glued #note on a bare value is part of the value → deny, not a date" 2 "SPEC_AUDIT_DEFAULT;;not a date" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf 'SPEC_AUDIT_DEFAULT="2026-09-21"; X=1\n' > "$SACONF"
+check_spec_audit "rule0/U7: a ;-joined second command reads as no assignment → the README deny (documented limit)" 2 "TOOL-aBlindedTrial-6;;spec-audit:;;builds/tSA/README.md" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf 'SPEC_AUDIT_DEFAULT="yes"\nSPEC_AUDIT_DEFAULT="2026-09-21"\n' > "$SACONF"
+check_spec_audit "rule0/U7: two assignments, the LAST a date → allow (last wins, as the shell reads it)" 0 "" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf 'SPEC_AUDIT_DEFAULT="2026-09-21"\nSPEC_AUDIT_DEFAULT="yes"\n' > "$SACONF"
+check_spec_audit "rule0/U7: two assignments, the LAST a non-date → deny naming the key" 2 "SPEC_AUDIT_DEFAULT;;not a date" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf 'SPEC_AUDIT_DEFAULT="yes"\n' > "$SACONF"
+check_spec_audit "rule0/U7: conf SPEC_AUDIT_DEFAULT=\"yes\" → deny naming the key, not a date" 2 "SPEC_AUDIT_DEFAULT;;not a date" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf 'SPEC_AUDIT_DEFAULT=""\n' > "$SACONF"
+check_spec_audit "rule0/U7: conf SPEC_AUDIT_DEFAULT=\"\" (blank) → the README deny, unchanged" 2 "TOOL-aBlindedTrial-6;;spec-audit:;;builds/tSA/README.md" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# ...the deny's REMEDY names both routes, so an adopter learns the project-wide one from the refusal.
+check_spec_audit "rule0/U7: the README deny names SPEC_AUDIT_DEFAULT as the other remedy" 2 "SPEC_AUDIT_DEFAULT" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf 'SPEC_AUDIT_DEFAULT="2026-09-21"\n' > "$SACONF"
+printf -- '---\nslug: tSA\nspec-audit: yes\n---\n' > "$SAREADME"
+check_spec_audit "rule0/U7: README spec-audit: yes beside a dated default → deny, not a date (README wins)" 2 "not a date;;spec-audit: yes" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+check_spec_audit "rule0/U7: dated conf, README absent → still could-not-be-read (fail-closed unchanged)" 2 "builds/tNone/README.md;;could not be read" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tNone/reviews\"}"
+printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
+rm -f "$SACONF"
+check_spec_audit "rule0/U7: conf removed, README without the key → deny (no conf is no default)" 2 "TOOL-aBlindedTrial-6;;spec-audit:" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
 
 # ---- rule 3: the hook READS THE BOUND ------------------------------------------------------------
 # EVERY ARM HERE ASSERTS ITS OWN MESSAGE, never the exit code. All three rules exit 2, so an arm

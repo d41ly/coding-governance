@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.26 -->
+<!-- gov:kit unattended@1.28 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -123,13 +123,13 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   two of that condition's three clauses — the intersection test, and the shared-record refusal in
   BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
   is refused. The third clause is a judgement about meaning and is refused as undecidable rather than
-  faked. A re-declaration of a pass still OPEN widens or no-ops; it never narrows. Once that pass has
-  COMMITTED, a further declaration of the same unit is a new pass — M6 sanctions several pass kinds
-  per unit — recorded as its own row rather than judged against the previous one. The driver
-  distinguishes them by OVERLAP: a narrowing is a strict subset and always overlaps, so it stays
-  refused; a disjoint set is a new pass. One that PARTLY overlaps is read as
-  a narrowing and refused, which is the conservative direction and is stated here rather than
-  discovered. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  faked. A DECLARATION IS APPEND-ONLY: every call parks its own row at the current
+  anchor and nothing rewrites, supersedes or retracts an earlier one, so a re-declaration of the same
+  unit is ACCEPTED whatever its relation to the row before it — wider, NARROWER, or disjoint. A pass
+  that discovers it needs fewer paths than it declared says so, and both rows stand. M6 sanctions
+  several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
+  REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
+  one thing here that is unchanged; a unit's own rows are never siblings of each other. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
   an unattended build closes each unit spec in its own build commit, and this verb is the one point
   that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,

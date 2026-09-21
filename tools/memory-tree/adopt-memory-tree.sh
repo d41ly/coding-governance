@@ -3,7 +3,8 @@
 # For a NEW project. (A project MIGRATING an existing docs tree does that once as its own landing —
 # see README.md "Adopting into an existing tree"; the tree shape below is the target either way.)
 #
-#   tools/memory-tree/adopt-memory-tree.sh --scaffold
+#   tools/memory-tree/adopt-memory-tree.sh --scaffold   # a NEW tree: dirs, registries, renders, index
+#                                          --render     # an ADOPTED tree: the four rendered docs, nothing else
 set -eu
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
@@ -41,15 +42,17 @@ DISCIPLINES="architecture deployment blocks design performance"   # demo default
 FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performance:PERF"
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 
-# `--render` EXISTS BECAUSE `--scaffold` CANNOT DO THIS JOB, and TOOL-dRetiredFork-29 is the
-# measurement: on an adopted tree the converge guard below prints "already scaffolded" and exits 0,
-# so every `rendered` row this kit owns went one vintage stale on every `govkit update` — with
-# GOVKIT_RERENDER=1 as much as without it, because that flag runs a `[[regenerate]]` block and this
-# kit declared none — and the adopter's own parity gate reds on it. A regenerate argv needs a narrow
-# entrypoint with no adoption guard to trip over; this is that entrypoint, and `[[regenerate]]` in
-# kit.toml is what runs it.
+# WHY THE MODE EXISTS: TOOL-dRetiredFork-29 measured it. On an adopted tree the converge guard
+# prints "already scaffolded" and exits 0, so every `rendered` row this kit owns went one vintage
+# stale on every `govkit update`, with GOVKIT_RERENDER unset as much as set, because the flag
+# runs a `[[regenerate]]` block and this kit declared none — and the adopter's own parity gate
+# reds on it. A regenerate argv needs a narrow entrypoint
+# with no adoption guard to trip over; this is that entrypoint.
+# The mode is REQUIRED and stays required: a bare invocation was a usage refusal before `--render`
+# existed and still is, because defaulting a missing word to the verb that creates a tree is a
+# widening nobody asked for.
 MODE="${1:-}"
-case "$MODE" in --scaffold|--render) ;; *) echo "usage: $0 --scaffold | --render"; exit 2 ;; esac
+case "$MODE" in --scaffold|--render) ;; *) echo "usage: $0 --scaffold|--render"; exit 2 ;; esac
 
 # .memory-tree.conf is REQUIRED — never silently scaffold the built-in DEMO disciplines into a real repo.
 if [ ! -f "$ROOT/.memory-tree.conf" ]; then
@@ -88,25 +91,7 @@ if [ -z "$READINESS_ROWS" ]; then
 fi
 M="$MEMORY_ROOT"
 
-# Idempotent converge: a tree already scaffolded by this kit (marker present) is a clean no-op; a
-# foreign/half-scaffolded memory/ is refused with a recovery hint; otherwise fall through and scaffold.
-#
-# SCAFFOLD ONLY. `--render` reaches here having already proved the marker is present, and its whole
-# job is the refresh this no-op would skip — so running the converge for it would make the mode a
-# silent success that rendered nothing, which is the shape the render was added to end.
-if [ "$MODE" = "--scaffold" ] && [ -d "$M" ]; then
-  if [ -f "$M/HYGIENE.md" ] && grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"; then
-    echo "$M/ already scaffolded by memory-tree — nothing to do."; exit 0
-  fi
-  echo "$M/ exists without a memory-tree marker — refusing to overwrite. If a prior scaffold crashed, 'rm -rf $M' and re-run; otherwise migrate manually (README: Adopting into an existing tree)." >&2
-  exit 1
-fi
-
-# `project/` still needs creating even though it now holds only files: the registry printf
-# redirects below cannot create their own directory.
-mkdir -p "$M/project" "$M/builds" "$M/backlog" "$M/guides"
-# root index + rules
-# RENDERED, not copied: these two land in the adopter's tree as their committed rule set, so a
+# RENDERED, not copied: these land in the adopter's tree as their committed rule set, so a
 # verbatim copy would stamp whatever prefix the SHIPPING repo used into a document the adopter now
 # owns. Every kit path in them is a placeholder; `render_doc` is what the parity gate grades.
 # >>> render_doc — canonical copy: tools/lib/render-doc.sh (byte-identical; gated)
@@ -134,21 +119,84 @@ render_doc() {
   printf '%s' "$out"
 }
 # <<< render_doc
-if [ -f "$HERE/HYGIENE.template.md" ]; then render_doc "$HERE/HYGIENE.template.md" > "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
-if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then render_doc "$HERE/SPEC-TEMPLATE.template.md" > "$M/TEMPLATE-SPEC.md"; fi
-# The build method joins the same rendered set: an adopter that receives the spec format and the
-# hygiene rules but not the method for using them has been handed two thirds of one contract.
-if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.template.md" > "$M/guides/BUILD-METHOD.md"; fi
-# The annotation-style guide rides the same seam. It is a WRITING convention for comments that cite
-# a record: nothing grades it, which is why it is a rendered guide and not a gate.
-if [ -f "$HERE/ANNOTATION-STYLE.template.md" ]; then render_doc "$HERE/ANNOTATION-STYLE.template.md" > "$M/guides/ANNOTATION-STYLE.md"; fi
-# THE RENDER IS THE WHOLE OF `--render`. Everything below this line writes the tree's AUTHORED
-# files — indexes, registries, backlog shards — which an adopted tree owns and a refresh must never
-# touch. Stopping here is what keeps this mode a refresh instead of a second scaffolder.
-if [ "$MODE" = "--render" ]; then
-  echo "memory-tree: re-rendered $M/HYGIENE.md, $M/TEMPLATE-SPEC.md, $M/guides/BUILD-METHOD.md, $M/guides/ANNOTATION-STYLE.md from $KIT_REL"
+
+# THE RENDER SET, WRITTEN ONCE AND CONSUMED BY BOTH MODES. Spelled twice it drifts: one verb
+# refreshes three rows and the other four, and the row nobody refreshes goes stale while every run
+# reports success. The rows here are the `role = "rendered"` rows of this kit's descriptor.
+#
+# THE `else` IS A SCAFFOLD-ONLY FALLBACK, and that is the whole point of the mode test. On a NEW
+# tree an absent HYGIENE.template.md leaves nothing behind, so a one-line placeholder is better than
+# no rule file at all. On an ADOPTED tree the destination already holds the adopter's committed rule
+# set and the `gov:kit memory-tree@` marker the branch below reads, so the same fallback would
+# DESTROY a file the target owns — from the verb whose only job is refreshing it — and wedge the
+# tree in both directions: --render then stops at the accepted exit 3 for a missing marker and
+# refreshes nothing, and --scaffold refuses because the root exists without one. Under --render a missing template is a refusal instead, and
+# it refuses BEFORE the first write so a partial set is never left on disk.
+render_all() {
+  local pairs pair src dst missing=""
+  pairs="HYGIENE.template.md:HYGIENE.md
+SPEC-TEMPLATE.template.md:TEMPLATE-SPEC.md
+BUILD-METHOD.template.md:guides/BUILD-METHOD.md
+ANNOTATION-STYLE.template.md:guides/ANNOTATION-STYLE.md"
+  if [ "$MODE" = --render ]; then
+    for pair in $pairs; do
+      [ -f "$HERE/${pair%%:*}" ] || missing="$missing ${pair%%:*}"
+    done
+    if [ -n "$missing" ]; then
+      echo "adopt-memory-tree: REFUSING --render — this kit directory ships no:$missing" >&2
+      echo "adopt-memory-tree: so the render set is incomplete. Refusing before the first write: the" >&2
+      echo "adopt-memory-tree: destinations already hold the rules this tree runs on, and a render" >&2
+      echo "adopt-memory-tree: that cannot produce all of them must not replace any of them. Restore" >&2
+      echo "adopt-memory-tree: the template(s) in this kit directory, then re-run." >&2
+      return 1
+    fi
+  fi
+  for pair in $pairs; do
+    src="$HERE/${pair%%:*}"; dst="$M/${pair#*:}"
+    if [ ! -f "$src" ]; then
+      # --scaffold only, by the refusal above.
+      if [ "${pair%%:*}" = HYGIENE.template.md ]; then echo "# ${M}/ retention & hygiene" > "$dst"; fi
+      continue
+    fi
+    mkdir -p "$(dirname "$dst")"
+    render_doc "$src" > "$dst.rendered" || { rm -f "$dst.rendered"; return 1; }
+    if [ -f "$dst" ] && cmp -s "$dst.rendered" "$dst"; then
+      rm -f "$dst.rendered"
+    else
+      mv "$dst.rendered" "$dst"
+      if [ "$MODE" = --render ]; then echo "adopt-memory-tree: re-rendered $dst"; fi
+    fi
+  done
+}
+
+# --render: the narrow verb. It sits AFTER the conf and READINESS_ROWS refusals, which it needs, and
+# BEFORE the adoption guard, which exits 0 on the very trees this mode exists for. It creates no
+# directory beyond a destination's own parent, writes no registry, seeds no conf and re-renders
+# nothing outside the set above.
+#
+# THE MARKER IS ALREADY DECIDED, up at the `--render` gate that exits 3. This block used to repeat
+# that exact condition and refuse with exit 1, which the reconcile of 2026-09-21 made unreachable —
+# two answers to one question, and the surviving one is the better of the two: a tree that renders
+# its own docs is a legitimate steady state that `kit.toml` declares ACCEPTED, not a failure.
+if [ "$MODE" = --render ]; then
+  render_all || exit 1
   exit 0
 fi
+
+# Idempotent converge: a tree already scaffolded by this kit (marker present) is a clean no-op; a
+# foreign/half-scaffolded memory/ is refused with a recovery hint; otherwise fall through and scaffold.
+if [ -d "$M" ]; then
+  if [ -f "$M/HYGIENE.md" ] && grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"; then
+    echo "$M/ already scaffolded by memory-tree — nothing to do."; exit 0
+  fi
+  echo "$M/ exists without a memory-tree marker — refusing to overwrite. If a prior scaffold crashed, 'rm -rf $M' and re-run; otherwise migrate manually (README: Adopting into an existing tree)." >&2
+  exit 1
+fi
+
+# `project/` still needs creating even though it now holds only files: the registry printf
+# redirects below cannot create their own directory.
+mkdir -p "$M/project" "$M/builds" "$M/backlog" "$M/guides"
+render_all
 { echo "# $M/ — project memory index"; echo
   echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md)."
   echo "Generated index: [LIVE.md](LIVE.md) + \`ledger/<month>.md\` shards ($KIT_REL/gen_build_index.py)."; echo

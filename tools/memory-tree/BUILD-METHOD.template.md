@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.80 -->
+<!-- gov:kit memory-tree@2.82 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -111,11 +111,12 @@ decision the owner did not make. The mark must be the documented SHAPE — the w
 `(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each item: with any
 item present ONLY a conforming mark resolves it, the first line does not vote, and §8 says what that cannot see.
 
-## M4 — The spec audit — owed only where the build declares it
+## M4 — The spec audit — owed only where the build or its project declares it
 
-**When**, and `specs-reviewed` is owed only then: the build README's front matter carries `spec-audit: <date>`. Undeclared,
-none is owed, and the tooling says so instead of running one. Recommended, never owed, for two or more specs or an unresolved
-§8 fork. **Which**, once declared: every spec with no review record naming it; a spec whose rev moved since its last review —
+**When**, and `specs-reviewed` is owed only then: the build README's front matter carries `spec-audit: <date>`, or the
+project's `.unattended.conf` at BASE declares a dated `SPEC_AUDIT_DEFAULT` and the README declares no key
+(TOOL-aBlindedTrial-7). Under neither, none is owed, and the tooling says so instead of running one. Recommended, never
+owed, for two or more specs or an unresolved §8 fork. **Which**, once declared: every spec with no review record naming it; a spec whose rev moved since its last review —
 by anything but that review's own fold — or that you authored this run, is unreviewed.
 
 **The harness needs a DECLARED subject.** `tier2-review.js` audits a spec only when the call names the spec kind,
@@ -125,18 +126,18 @@ reviewed by that run is false.
 **Run it as a `Workflow` script, not as direct `Agent` spawns.** The direct-spawn budget is keyed per PROMPT TURN
 and an unattended run has no next prompt to reset it: three specs audited directly exhaust it mid-set and the rest
 are refused with nobody reading. Agents inside a `Workflow` sidechain are not counted. Shape and caps:
-`memory/guides/REVIEW-PROTOCOL.md`, **read there and not repeated here.**
+`memory/guides/REVIEW-PROTOCOL.md`, **read there.**
 
 **Lenses: 3–5, primed with the mandate, the overview and the spec format.** The catalogue —
 underspecification, contradiction, unstated assumption, prior art — with what each hunts, is in
 `{{KIT_DIR}}/README.md`.
 
 **Record it** under `memory/builds/<slug>/reviews/` per `memory/HYGIENE.md` check 5's filename grammar, opening with
-the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Older records lack the verdict line;
-write it, because M9 derives from it. **Carry the binding line** check 21 requires —
-`**Serves:** spec-audit <the ids you reviewed>` — what makes "unreviewed" answerable from the tree, not memory.
-Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9 line), then **STOP**:
-once a synthesis pass calls the design clean, stop reviewing that spec.
+the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Older records lack it; write it, M9
+derives from it. **Carry the binding line** check 21 requires —
+`**Serves:** spec-audit <the ids you reviewed>` — what makes "unreviewed" answerable from the tree.
+Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9 line), then **STOP** once
+a synthesis pass calls the design clean.
 
 **A BLOCKED verdict has a disposition.** A SPEC subject takes `REVIEW_ROUNDS` rounds (protocol §8) and exits BOUNDED; the DIFF review converges: a round re-arms only on a count STRICTLY SMALLER than the round before, never merely "changed" (2, 1, 2 satisfies that forever). **At the exit every CONFIRMED finding is DISPOSED BY SEVERITY, on CONVERGED too**: a BLOCKER or HIGH is PROMOTED to a unit whose mechanism closes it, audited as a SPEC; a MEDIUM or LOW is FOLDED into its spec as a rev-N bump with a §9 line; never parked, waived, retired or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README's BUILD-LEVEL RULES slot.
 

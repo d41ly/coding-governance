@@ -130,11 +130,12 @@ cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
 
-mkconf() { # wiring · gate
+mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · SPEC_AUDIT_DEFAULT
   cat > .unattended.conf <<EOF
 MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="${3-2026-08-19}"
 SPEC_THIN_CUTOFF="${5-}"
+SPEC_AUDIT_DEFAULT="${8-}"
 LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
@@ -6262,7 +6263,7 @@ rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
 out=$(run --close tRun $bcov)
 hit "$out" "specs-audited"
 hit "$out" "ARCH-tRun-1"
-hit "$out" "the pre-code review pass this build opted into with its spec-audit: key left no evidence"
+hit "$out" "the pre-code review pass this build owes (spec-audit 2026-09-20, from readme) left no evidence"
 miss "$out" "close OK"
 
 # ---- AC2: a tracked record whose binding line names the id satisfies it.
@@ -6306,7 +6307,7 @@ rm -f memory/builds/tRun/reviews/a4.md
 bcopen; crfix
 mutate memory/builds/tRun/RUN.md '/^spec-audit: /d'; git add -A >/dev/null
 out=$(run --close tRun $bcov)
-hit "$out" "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-20; recorded: (none)"
+hit "$out" "the spec-audit fact in the run-state file and the spec-audit: key in the build README, or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-20; recorded: (none)"
 hit "$out" "so --close blocks: specs-audited"
 miss "$out" "declares no spec-audit: key"
 miss "$out" "close OK"
@@ -6319,7 +6320,7 @@ bcopen; crfix; git add -A >/dev/null
 git remote set-url origin "$ORIGIN_DIR/nope.git"
 out=$(run --close tRun $bcov)
 git remote set-url origin "$ORIGIN"
-hit "$out" "specs-audited — not gradable: the README at BASE was not derived in this shell (authorization-reachable is unmet above)"
+hit "$out" "specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read)"
 miss "$out" "at BASE: (none)"
 miss "$out" "declares no spec-audit: key"
 miss "$out" "close OK"
@@ -6386,6 +6387,194 @@ out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: (empty)"
 miss "$out" "not owed (opt-in)"
 miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- TOOL-aBlindedTrial-7 — a PROJECT-WIDE default: `SPEC_AUDIT_DEFAULT="<date>"` in .unattended.conf
+# ---- at BASE opts every build in whose README declares no key. The conf is TRACKED in this fixture
+# ---- and `mkconf` rewrites it on every reset, so inside this epoch every reset calls mkconf with the
+# ---- SAME eight positionals the BASE commit used — one byte off and preflight refuses on a dirty
+# ---- tree before authorization is ever reached, which is a fixture answering the wrong question.
+init_sa_tree() { git reset -q --hard "$BCP"; git clean -qfd; mkconf true true "" 3600 "" 1800 7 2026-09-21; }
+init_sa_run() { init_sa_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+             printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+             printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' \
+               >> memory/builds/tRun/RUN.md; }
+bcreset; git checkout -qf main
+mkconf true true "" 3600 "" 1800 7 2026-09-21
+git add -A >/dev/null && git commit -q -m sa-default --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+BCP=$(git rev-parse HEAD)
+
+# ---- AC1 (unit 7): README silent, conf default at BASE — the THIRD preflight spelling, the fact
+# ---- pinned from the conf's date, and --status carrying it like a README-declared one.
+init_sa_tree
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
+miss "$out" "opted in by README"
+miss "$out" "not owed (opt-in)"
+same "the spec-audit fact is pinned from the conf default at BASE" "$(sed -n 's/^spec-audit: //p' memory/builds/tRun/RUN.md)" "2026-09-21"
+hit "$(run --status tRun)" "spec-audit 2026-09-21"
+
+# ---- AC4 (unit 7): the default makes the audit OWED — a CLOSED unit with no record blocks --close by id...
+init_sa_run; crfix; git rm -q --cached memory/builds/tRun/reviews/audit.md >/dev/null
+rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited"
+hit "$out" "ARCH-tRun-1"
+# ---- ...naming the SOURCE the audit is owed through (closing review of units 7/8, R10): rev-1 told
+# ---- the operator to look for a README key this build does not have.
+hit "$out" "the pre-code review pass this build owes (spec-audit 2026-09-21, from project) left no evidence"
+miss "$out" "specs-audited — not owed"
+miss "$out" "close OK"
+# ---- ...and the tracked record satisfies it, so the default is honoured in both directions.
+init_sa_run; crfix; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+miss "$out" "specs-audited"
+# ---- ...and fail 53 compares the fact against the derivation whichever source filled it: the fact
+# ---- deleted from RUN.md under a project default reads `at BASE: <the conf's date>`.
+init_sa_run; crfix
+mutate memory/builds/tRun/RUN.md '/^spec-audit: /d'; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-21; recorded: (none)"
+miss "$out" "close OK"
+
+# ---- closing review of units 7/8, round 2, R2 — a REFUSED read leaves the grader NOT GRADABLE. The
+# ---- fold's fail 55 (and fail 52, fail 54) returned with AUTH_SPEC_AUDIT_DERIVED already set from the
+# ---- README half, so `specs-audited` printed the very absence the refusal had declined to assert:
+# ---- `at BASE: (none)` under a pinned fact, `not owed … declares no SPEC_AUDIT_DEFAULT` without one.
+# ---- Fixture: a run pinned on the dated BASE, then main gains a blob that dies before the read and the
+# ---- run branch merges it, so the merge-base --close derives IS the dying blob while the pinned base
+# ---- stays its ancestor. Observed RED-first on the round-1 driver: fail 53 with `at BASE: (none)`.
+_sa_main7=$(git rev-parse main)
+init_sa_run; crfix; git add -A >/dev/null; git commit -q -m sa-run-pinned --no-verify
+git checkout -qf main; printf 'return 0\n' >> .unattended.conf
+git add -A >/dev/null; git commit -q -m sa-base-dies-after-preflight --no-verify; git push -q -f origin main
+git checkout -qf unit; git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --close tRun $bcov)
+hit "$out" "the project conf at the pinned BASE could not be evaluated to the end"
+hit "$out" "specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read)"
+miss "$out" "at BASE: (none)"
+miss "$out" "specs-audited — not owed"
+miss "$out" "close OK"
+git checkout -qf main; git reset -q --hard "$_sa_main7"; git push -q -f origin main
+git checkout -qf unit; init_sa_tree
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; BCP=$_sa_bcp0; bcreset
+
+# ---- AC2 (unit 7): the default committed on the RUN BRANCH only is not at BASE, so it opts nothing in.
+bcreset
+mkconf true true "" 3600 "" 1800 7 2026-09-21
+git add -A >/dev/null; git commit -q -m "default on the branch" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+same "a default committed on the run branch pins no fact" "$(sed -n 's/^spec-audit: //p' memory/builds/tRun/RUN.md)" ""
+
+# ---- ...and the same with a BASE conf that PREDATES the key entirely. The blob is evaluated in a
+# ---- subshell that inherits the driver's environment, where the WORKING copy's value already sits
+# ---- from the `. "$CONF"` at startup; a read that does not blank the variable first would report
+# ---- the branch's date as the project's. The first cut of the read had exactly that hole.
+bcreset; git checkout -qf main
+mutate .unattended.conf '/^SPEC_AUDIT_DEFAULT=/d'
+git add -A >/dev/null && git commit -q -m sa-conf-predates-key --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+mkconf true true "" 3600 "" 1800 7 2026-09-21
+git add -A >/dev/null; git commit -q -m "default on the branch, none at base" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+miss "$out" "opted in by project default"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- AC3 (unit 7), first half: a non-date default at BASE is fail 54 — never read as absent.
+bcreset; git checkout -qf main
+mkconf true true "" 3600 "" 1800 7 later
+git add -A >/dev/null && git commit -q -m sa-default-malformed --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "the project conf at the pinned BASE declares SPEC_AUDIT_DEFAULT with a value that is not a YYYY-MM-DD date, and a project-wide opt-in is a dated declaration or not at all - declared: later"
+miss "$out" "not owed (opt-in)"
+miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- AC3, second half: a malformed README key beside a VALID default is still fail 52 — the README
+# ---- wins whatever it says, because a typo falling back to the default is the silent opt-out class.
+bcreset; git checkout -qf main
+mkconf true true "" 3600 "" 1800 7 2026-09-21
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: later'
+git add -A >/dev/null && git commit -q -m sa-readme-over-default --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: later"
+miss "$out" "opted in by project default"
+miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- closing review of units 7/8, R2 — the BASE-conf eval must PROVE it finished. rev-1 discarded
+# ---- the eval's status and read the variable regardless, so a blob that ends before the read printed
+# ---- nothing and graded as "no default": the read-as-absent opt-out fail 52 and fail 54 refuse,
+# ---- through the one path they left ungraded. Four shapes, each a dated conf at BASE with one line
+# ---- appended. `return 0` needs NO divergence — a top-level return in a sourced file is legal, so the
+# ---- SAME bytes read as the date at the driver's startup source and as nothing at the BASE read; the
+# ---- other three would kill that startup source, so the run branch carries a repaired conf and BASE
+# ---- alone holds the broken one. Observed RED-first on the rev-1 driver: every shape said not owed.
+init_sa_base_ending_early() {   # $1 = the line added to a dated conf at BASE, after the key, or BEFORE it when
+                                # spelled `^<line>` · $2 = repair the branch (1) or not
+  bcreset; git checkout -qf main
+  mkconf true true "" 3600 "" 1800 7 2026-09-21
+  case "$1" in
+    ^*) { printf '%s\n' "${1#^}"; cat .unattended.conf; } > .unattended.conf.new; mv .unattended.conf.new .unattended.conf ;;
+    *)  printf '%s\n' "$1" >> .unattended.conf ;;
+  esac
+  git add -A >/dev/null && git commit -q -m sa-base-ends-early --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  if [ "$2" = 1 ]; then mkconf true true "" 3600 "" 1800 7 2026-09-21
+    git add -A >/dev/null; git commit -q -m sa-branch-repaired --no-verify; fi
+}
+# The syntax error sits ABOVE the key: bash executes an eval's assignments before its parse fails at
+# EOF, so one appended below the key let rev-1 read the DATE out of a blob that never finished — a
+# different wrong answer from the same defect, and the fold refuses both.
+for _sa_shape in 'return 0|0' 'exit 0|1' 'X="$UNSET_IN_THIS_FIXTURE"|1' '^if|1'; do
+  init_sa_base_ending_early "${_sa_shape%|*}" "${_sa_shape#*|}"
+  out=$(run --preflight tRun --keepalive-id KA-1234)
+  hit "$out" "the project conf at the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
+  miss "$out" "not owed (opt-in)"
+  miss "$out" "opted in by project default"
+  miss "$out" "preflight OK"
+  git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+  git checkout -qf unit; bcreset
+done
+
+# ---- round 2, R6 — a blob read to its END is the date whatever its LAST statement's status. The
+# ---- round-1 sentinel was gated on the eval's exit status, so a conf ending in `false` — or the
+# ---- ordinary `[ -n "${OPT:-}" ] && Y=1` idiom with OPT unset — was refused as "could not be
+# ---- evaluated to the end" while the startup source and the hook both read the date. The sentinel
+# ---- now prints from inside the eval'd text; same bytes on the branch, so no repair. Observed
+# ---- RED-first on the round-1 driver: fail 55.
+init_sa_base_ending_early 'false' 0
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
+miss "$out" "could not be evaluated to the end"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- round 3, R1 — a TRAILING LINE CONTINUATION on the key line, as the conf's LAST statement. The
+# ---- round-2 sentinel was glued to the blob with ONE newline, so `SPEC_AUDIT_DEFAULT="<date>" \` at
+# ---- the end turned the assignment into a temp-env prefix of the sentinel printf, whose argument had
+# ---- already expanded from the blanked variable: `OK ` — a DECLARED default read as absent, the
+# ---- opt-out fail 52/54/55 exist to refuse. Its own conf, NOT init_sa_base_ending_early: that
+# ---- helper's mkconf already writes the date and the sentinel expands from it, so the break needs a
+# ---- BLANK default above the continuation line. Observed RED-first on the round-2 driver: not owed.
+bcreset; git checkout -qf main
+mkconf true true "" 3600 "" 1800 7 ""
+printf '%s\n' 'SPEC_AUDIT_DEFAULT="2026-09-21" \' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m sa-continuation --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
+miss "$out" "not owed (opt-in)"
 git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
 git checkout -qf unit; bcreset
 
