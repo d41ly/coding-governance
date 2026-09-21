@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads
 
-**Status:** SPECCED · rev-4 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 2
+**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -33,14 +33,16 @@ here is S14, which verifies that and clauses whatever entered the population in 
   discover. Observed by AC12 and AC13.
 - **S2** — the TRIGGER, per §2 scope item, built over the HOISTED item accumulator of S11. An item
   triggers when a verb from the closed retirement list governs it AND the same item carries a
-  backticked token of one of five identifier shapes, none of the five shape EXCLUSIONS applying; or,
+  backticked token of one of five identifier shapes, none of the three shape EXCLUSIONS applying; or,
   where it carries no such token, when a backticked bare word sits beside a declared kind noun.
-  The verb match is CASE-INSENSITIVE over every member of the closed list, the strict phrases and
-  the four stems alike, by the owner's ruling of 2026-09-21: this corpus capitalises a retirement
-  verb for emphasis and at the head of an imperative item, and a case-sensitive match misses those
-  items silently. The fold is `tolower()` over a COPY of the item, which the verb and kind-noun
-  tests read; the identifier shapes read the item as written.
-  Observed by AC1, AC7, AC8, AC9, AC10, AC11 and AC24.
+  The list carries the PAST TENSE beside the present and the imperative, by the owner's O5 ruling of
+  2026-09-21, and no identifier shape sets a markdown path apart, by the O6 ruling of the same day.
+  The verb match is CASE-INSENSITIVE over every member of the closed list, the strict phrases, the
+  four stems and the five past-tense forms alike, by the owner's ruling of 2026-09-21: this corpus
+  capitalises a retirement verb for emphasis and at the head of an imperative item, and a
+  case-sensitive match misses those items silently. The fold is `tolower()` over a COPY of the item,
+  which the verb and kind-noun tests read; the identifier shapes read the item as written.
+  Observed by AC1, AC7, AC8, AC9, AC10, AC11, AC24 and AC25.
 - **S3** — the KIND-NOUN set, six phrases, as ONE literal in the arm immediately beside the verb
   list, because a verb table and a noun table in two carriers can disagree and no refusal can make
   them agree. `memory/HYGIENE.md`'s catalog entry POINTS at that literal and does not restate it.
@@ -74,15 +76,22 @@ here is S14, which verifies that and clauses whatever entered the population in 
 - **S8** — check 25's catalog entry, authored in `tools/memory-tree/HYGIENE.template.md` and
   re-rendered into `memory/HYGIENE.md`, whose own header states WHICH HALF IS GRADED HOW — the
   by-value half by presence, the by-name half by resolution, neither by completeness — and carries
-  the control that proves why, that an escape is taken on trust, and that the verb match ignores
-  case. The check-count sentence at `tools/memory-tree/README.md:18` moves with it, because the unit
+  the control that proves why, that an escape is taken on trust, that the verb match ignores case
+  and reaches the past tense, and that a markdown path counts as an identifier. The same header
+  names BOTH classes of verb-bearing item the trigger never reaches, each with the reason it sits
+  outside: an item whose backticked tokens hold no identifier shape, and an item that carries no
+  backticked token at all. At `67bec01a` the first is 4 live items and the second is 8, so a header
+  naming only the first is silent on the wider class and reads as coverage of it. The header states
+  the two classes and not their sizes, because a count of a live population typed into a shipped
+  doc is wrong on the next commit that writes a §2 item. The check-count
+  sentence at `tools/memory-tree/README.md:18` moves with it, because the unit
   that changes the number of checks is the unit that owes the count.
   Observed by AC18.
-- **S9** — the fifteen-fixture block `tFixture-200` through `tFixture-214` in the gate's sibling
+- **S9** — the sixteen-fixture block `tFixture-200` through `tFixture-215` in the gate's sibling
   fixture suite, with the positive arm that arms the new branch, the three GREEN fixtures that pin
-  the false-positive classes the skeptic found, the two that pin rev-3's own two, the one that pins
-  the liveness filter and the one that pins the case fold. Observed by AC1 through AC12, AC23 and
-  AC24.
+  the false-positive classes the three exclusions answer, the one that pins the liveness filter, the
+  one that pins the case fold, and the two RED fixtures that pin the owner's O5 and O6 rulings.
+  Observed by AC1 through AC12 and AC23 through AC25.
 - **S10** — the DECLARED dependency, written into the catalog entry and the arm's own comment and
   then observed rather than asserted: check 25's population is check 12's SELECTION, so a blank
   `SPEC_FORMAT_CUTOFF` disarms check 25 whatever else is true. That is the WHOLE inherited set after
@@ -101,7 +110,8 @@ here is S14, which verifies that and clauses whatever entered the population in 
   `tools/memory-tree/SPEC-TEMPLATE.template.md:268`, beside the `SCOPE_JOIN_CUTOFF` paragraph that
   already sits there, and then re-rendered into `memory/TEMPLATE-SPEC.md`. Observed by AC20.
 - **S14** — the CORPUS, VERIFIED here and written by `TOOL-dGatedProse-5`. Under S1 the arm grades
-  every live spec, and the trigger fires on 23 items across 14 specs at `32f2eb71`. The owner ruled
+  every live spec, and the trigger fires on 38 items across 20 specs at `67bec01a`, the figure §4
+  derives for unit 5's census to match. The owner ruled
   on 2026-09-21 that those clauses are written now, and unit 5 writes every one of them at order 1,
   on every node, before this arm exists. This unit's build pass runs the arm over the tree it lands
   on. Any item it names entered the population after unit 5's pass, and it gains its clause in this
@@ -122,6 +132,22 @@ here is S14, which verifies that and clauses whatever entered the population in 
   the CODE the retired name flows into and computes what depends on its value. That is a different
   check, in a different carrier, and it is a fresh owner ruling rather than a follow-up this unit
   opens. §4 measures the control against the O4 rule to show the gap is still there.
+- **Two classes of verb-bearing item stay outside the trigger, and this unit closes neither.** Of
+  the 50 live verb-bearing §2 items at `67bec01a`, 38 trigger and 12 do not. Four are the NAMED GAP
+  §4 measures: backticked tokens, none of them identifier-shaped. The other EIGHT, across six specs,
+  five items on node `a` and three on node `d`, carry no backticked token at all, and over the
+  641-spec selection that class is 59 items across 48 specs. An item with no token gives a shape
+  nothing to test and a by-name half nothing to resolve, so its author is never asked either
+  question. It stays out because reaching it takes a trigger that reads prose rather than a
+  backticked token, whose plain form is the verb alone — the reading the identifier conjunct exists
+  to refuse, since the dry run's raw vocabulary flagged 19 of 24 live specs before a backticked NAME
+  was required — and no ruling asks for it.
+  Measured, a verb-only trigger would add all twelve untriggered live items and 126 over the
+  selection, and read at item level the live eight hold ONE withdrawal with a reader:
+  `TOOL-dGatedProse-4` S2, which deletes 450 bytes of guide prose that
+  `tools/check-template-size.sh` reads by size. §4 enumerates the eight and reads each. The class
+  is named here and in check 25's own header by S8, so a reader of the gate does not take its
+  silence on a token-less item for coverage.
 - **NO KIT-VERSION BUMP AND NO MARKER RE-STAMP, and the reason is topological rather than a
   deferral.** `tools/memory-tree/check-verdict-epoch.sh` requires the newest commit in `<base>..HEAD`
   that moves a behaviour-bearing line of its scan set to be an ancestor of, or equal to, the newest
@@ -152,9 +178,11 @@ here is S14, which verifies that and clauses whatever entered the population in 
   a corpus its own predicate passes and S14 is a verification plus whatever delta the population
   gained in between. Two specifics cross here. The TRIGGER is this spec's and that unit consumes it
   as a specification: a change to the verb list, the shapes, the exclusions, the kind nouns or the
-  case rule after that pass moves the population under a corpus already written, which is why F9 and
-  F10 are the owner's before either unit builds. And the per-item record is that unit's census;
-  this spec carries the population figure and the rule, and no table of items.
+  case rule after that pass moves the population under a corpus already written. The owner's O5 and
+  O6 rulings of 2026-09-21 are such a change, made before that pass, and §4 derives the combined
+  population as ONE figure, 38 items across 20 specs at `67bec01a`, with the chain that reaches it,
+  for that unit's census to match. And the per-item record is that unit's census; this spec carries
+  the population figure and the rule, and no table of items.
 - **hands-off** `TOOL-dGatedProse-2` — `tools/memory-tree/SPEC-TEMPLATE.template.md`, where S13
   writes this check's author-facing line, and `memory/TEMPLATE-SPEC.md`, which this unit re-renders
   from it. Unit 2 edits both carriers for its own dossier-claims rule, must write into the TEMPLATE
@@ -163,7 +191,7 @@ here is S14, which verifies that and clauses whatever entered the population in 
   is unit 3's.
 - **hands-off** `TOOL-dGatedProse-3` — `tools/memory-tree/check-memory-hygiene.sh` and its fixture
   suite, which this unit leaves with one new `fail 25` branch, the S11 hoist, a `\004` tag split, a
-  zero-population notice, a fifteen-fixture block and a RAISED `FLOOR_ASSERTIONS`. Four specifics,
+  zero-population notice, a sixteen-fixture block and a RAISED `FLOOR_ASSERTIONS`. Four specifics,
   because "read the state I left" is not actionable on its own. **THE `*_CUTOFF` CLUSTER DOES NOT
   MOVE**: rev-2 inserted a preset line above `tools/memory-tree/check-memory-hygiene.sh:84` and rev-3
   deletes that key entirely under the owner's O2 ruling, so the `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES`
@@ -218,55 +246,93 @@ reaches, `dScaffoldedMirror-9`, and unit 5's census counts it.
 
 **THE MEASUREMENT, OWN-PROBE, 2026-09-21.** The probes are `probe_final_rev3.py` and
 `probe_cost_rev3.py`, re-run at rev-4 against `32f2eb71` as `probe_u1_rev4.py` and its siblings,
-all written to this session's scratchpad. They are UNTRACKED, so nothing in the
+and at rev-5 against `67bec01a` and `32f2eb71` as `probe_u1_rev5.py` and its siblings, and at rev-6
+as `probe_u1_rev6_tokenless.py` over the same two commits, all written to this session's scratchpad. They are UNTRACKED, so nothing in the
 tree resolves them and a later reader cannot re-open them — which is why every figure below is
-stated with what it is a count OF.
+stated with what it is a count OF. The table reads `32f2eb71`; the next section carries the same
+chain at `67bec01a`.
 
 | population | size | derivation |
 |---|---|---|
 | tracked spec-shaped files | 642 | the engine's own check-12 path regex |
 | at/after `SPEC_FORMAT_CUTOFF` 2026-07-15 | 640 | check 12's selection, which check 25 inherits |
 | LIVE within that selection | 37 | the `:1385` liveness test |
-| triggered items | 23 across 14 specs | the shipped trigger below, case-insensitive |
+| triggered items | 38 across 20 specs | the shipped trigger below: case-insensitive, past tense included, no `.md` exclusion |
 | the accumulator's union population | 120 | live 37 ∪ the 89 at/after `SCOPE_JOIN_CUTOFF` |
 
 The dry-run journal reports a different pair over a different set — "the raw verb vocabulary flagged
 19 of 24 live specs, requiring a backticked NAME brought it to 14" — and those are SPECS, over a
-24-spec reading of liveness. The 23 here are ITEMS, over 37. Do not conflate them; the corpus grew
+24-spec reading of liveness. The 38 here are ITEMS, over 37. Do not conflate them; the corpus grew
 and the liveness test is now the engine's rather than the journal's.
 
-### 23 against 22 — one population, reconciled
+### 38 — the combined population, and the chain that derives it
 
-rev-3 printed 22 items across 13 specs and `TOOL-dGatedProse-5` prints 23 across 14. Each is right
-about the tree it read, and the difference is ONE item, re-derived as a set difference rather than
-taken from either spec. At `85f1d6d8` this trigger fires on 22 items across 13 specs; at `32f2eb71`
-on 23 across 14. The item that entered is `TOOL-dGatedProse-3` S8, on the strict phrase
-`is replaced by`, which `c7750bf8` wrote into that file — the same commit that published rev-3's 22.
-So 23 is the figure and this spec carries it. The other 22 agree label for label, and so does the
-node split: 15 items across 10 node-`a` specs, 2 in one node-`b` spec, and 6 across 3 node-`d`
-specs.
+The owner's two rulings of 2026-09-21 on F9 and F10 move the population together, and the two moves
+do not add. So the figure is derived over the combined rule rather than summed from either ruling's
+own measurement, at `67bec01a`, the commit both unit specs are folded from:
 
-Every figure in this spec is case-INSENSITIVE, by the owner's ruling, and a second 22 exists that is
-not rev-3's. With the strict list matched case-sensitively and the stems folded, the trigger fires on
-22 items across 14 specs, and the item it loses is `dPolishedVitrine-1` S5, whose verb is `DROPS`.
-rev-3's text stated the case of the stems alone, so that 22 was one builder's reading away. The case
-section below prices each reading.
+| step | count | what is counted |
+|---|---|---|
+| tracked spec-shaped files | 643 | the engine's check-12 path regex |
+| at/after `SPEC_FORMAT_CUTOFF` 2026-07-15 | 641 | check 12's selection |
+| LIVE | 38 | the `:1385` test; every one carries a `## N. Scope (IN)` heading |
+| §2 items | 325 | column-0 bullets under that heading, continuations joined, fenced lines excluded |
+| verb-bearing | 50 | the closed list below, folded |
+| **triggered** | **38 items across 20 specs** | an identifier-shaped token, or a bare word beside a kind noun |
+
+The same rule reads 38 across 20 at `32f2eb71`, through 642, 640, 37, 316 and 51. Between the two
+commits `TOOL-dGatedProse-5` entered the live set with nine §2 items and triggers on none of them,
+and this spec's own S14 left the verb-bearing set. The node split is 27 items across 14 node-`a`
+specs, 3 in one node-`b` spec and 8 across 5 node-`d` specs.
+
+The twelve verb-bearing items that do not trigger split four and eight, and the chain accounts for
+every one: four are the named gap, backticked tokens with no identifier shape, and eight carry no
+backticked token at all. Both classes are measured in "The NAMED GAP that remains" below. At
+`32f2eb71` the thirteen split five and eight.
+
+**Why the two figures do not add.** Every one of rev-4's 23 survives. O5 alone adds 8 items and O6
+alone adds 4, and 3 more need BOTH, a past-tense verb and a markdown path as the item's only
+identifier: `aMendedLedger-2-u1` S6, `aPacedTurnstile-14` S9 and `dPolishedVitrine-14` S2. So
+23 + 8 + 4 + 3 = 38. O5 alone gives 31 and O6 alone 27, and 31 + 27 − 23 is 35: the three items each
+ruling needs the other for are in neither ruling's own figure.
+
+**O6 alone is 27, not the 25 rev-4's F10 printed, because the exclusion had two spellings.** rev-4
+measured the drop by lifting the global `.md` test and left the dot shape's "other than `md`" clause
+standing, so a markdown path with no slash stayed out. That reading admits `memory/README.md` and
+refuses `README.md`, one file with two verdicts by how its author spelled the directory, and it is
+not what O6 says. rev-5 deletes both clauses. The two items the second deletion adds are
+`aMendedLedger-6-u6` S1 and S5, on `parallel-coding-governance.template.md` and
+`WIRE-INTO-PROJECT.md`. Under the slash-only reading the combined rule would give 34 across 18; the
+figure is 38.
+
+**One label is not unique.** `aTunedCompass-9`'s item `S5c-i` enters on `removed`, and the label
+derivation the arm reuses at `tools/memory-tree/check-memory-hygiene.sh:1332` cuts it to `S5c`,
+which two sibling items of that spec share. A check-25 row for it names `S5c`, so unit 5's census
+anchors that clause on the item's visible label, `S5c-i`. The count is unaffected: the probe counts
+items, not labels.
 
 ### The trigger, and every figure it rests on
 
-The VERB list is closed, and it is the strict list the dry run stated literally: `retires`,
-`is replaced by`, `are replaced by`, `removes`, `deletes`, `drops`, `no longer exists`,
+The VERB list is closed, and it starts from the strict list the dry run stated literally:
+`retires`, `is replaced by`, `are replaced by`, `removes`, `deletes`, `drops`, `no longer exists`,
 `no longer carries`, `no longer reads`, `stops being`, `ceases`, `goes away`, and
 `leaves the` followed by `layouts`, `set` or `vocabulary`. To that list this unit ADDS the four bare
 imperative stems `retire`, `delete`, `remove` and `drop`, matched at a word boundary, and the
-addition is the single most consequential decision in this spec. EVERY member of the list is matched
+addition is the single most consequential decision in this spec. By the owner's O5 ruling of
+2026-09-21 the list also carries the five past-tense forms `retired`, `replaced`, `removed`,
+`deleted` and `dropped`, each matched at a word boundary on BOTH sides, like the stems. The boundary
+is measured rather than tidy: as bare substrings the past forms match inside the camel-case slug
+`dRetiredFork`, and at `67bec01a` that reading pulls two items of `DEPL-dRetiredFork-2` into the
+population, neither of which retires anything. EVERY member of the list is matched
 case-insensitively, and the section "Case, by ruling" below states the ruling and what it measures.
 
-Measured over the 37 live specs at `32f2eb71`, OWN-PROBE and case-insensitive: the strict list alone
-triggers 15 items across 10 specs; adding the imperative stems gives 25 across 15; applying rev-3's
-two new shape exclusions brings the shipped rule to 23 across 14. The stems therefore add 10 items
-and 5 specs — the delta rev-3 measured at `85f1d6d8`, and the one three independent readings of the
-rule produced at rev-2 over a smaller corpus — so the decision does not rest on a number that moves.
+Measured over the 38 live specs at `67bec01a` under the shipped shapes, OWN-PROBE and
+case-insensitive: the strict list alone triggers 15 items across 10 specs; adding the imperative
+stems gives 27 across 15; adding the past tense gives the shipped 38 across 20. The stems add 5
+specs, the figure rev-3 measured at `85f1d6d8` and three independent readings produced at rev-2 over
+a smaller corpus; their item delta is 12 here against the 10 rev-4 measured under the shapes it then
+carried. The past tense is no substitute for the stems: the strict list plus the past tense reaches
+none of the three items named below, and the strict list plus the stems reaches all three.
 
 The items the stems add include every one of the three the dry run named as a real, uninventoried
 retirement that a whole-spec predicate could not red — `aMendedLedger-3-u2` S6, where
@@ -289,46 +355,39 @@ The IDENTIFIER test is a closed set of five shapes, and a bare word is not one o
 | shape | admitted because | measured instance |
 |---|---|---|
 | contains an underscore | snake case and shouted constants | `split_regions`, `SHARD_ARITY` |
-| contains a slash, and does not end in `.md` | a code-file path | `tools/check-kit-versions.sh` |
-| contains a dot whose tail segment is word characters other than `md` | a qualified symbol or a script | `merge.conflictStyle`, `inventories.json` |
+| contains a slash | a path, to code or to a document | `tools/check-kit-versions.sh`, `memory/archive/ledger/{a,b,c}.md` |
+| contains a dot whose tail segment is word characters | a qualified symbol, a script or a document | `merge.conflictStyle`, `inventories.json`, `WIRE-INTO-PROJECT.md` |
 | carries an internal case transition, a lowercase letter immediately followed by an uppercase one | camel and Pascal identifiers | `conflictStyle` |
 | two dashes then a letter | a long option | `--write-ratchet` |
 
-FIVE token classes are EXCLUDED by shape, three from rev-2 and two found by rev-3's own
-re-derivation, and each exclusion answers a measured finding:
+THREE token classes are EXCLUDED by shape, and one normalisation precedes every shape test. Each
+exclusion answers a measured finding, and each is re-derived at `67bec01a` under the shipped list:
 
-- **A `.md` path is never an identifier.** Measured at `32f2eb71`, the exclusion's whole live effect
-  is two items. It keeps out `aMendedLedger-1` S2, a genuine retirement and the NAMED GAP's measured
-  member, and `TOOL-dGatedProse-4` S3, which widens a pointer and retires nothing; over the 640-spec
-  selection it keeps 16 items out. It trades one missed retirement for one avoided false trigger
-  today. It stays at rev-4 so that this spec and the corpus pass count one population, and F10 asks
-  the owner whether it should.
 - **A family-slug-seq id is never an identifier.** Measured: one backticked id sits inside a
   verb-bearing live item, `PLAY-aPrunedCeremony-5` in `aMendedLedger-1` S7, whose item closes a
-  decision row and retires no name.
+  decision row and retires no name; over the 641-spec selection the exclusion keeps 14 items out.
 - **A token that is only dashes and digits is never an identifier.** This is the skeptic's
   elided-slug class. §2 of the charter sanctions family-plus-seq shorthand in prose, so the pair
   `TOOL-dLoggedFlight-21` and `-24` puts a bare `-24` in backticks, and a flag-shaped test reads it
   as a retired name. Measured over the live population: ZERO such tokens sit inside a verb-bearing
   item, so the exclusion changes no verdict today and is a forward guard.
-- **A token carrying a SPACE is never an identifier.** NEW at rev-3, and the only new exclusion that
-  changes a verdict today. A backticked CODE FRAGMENT or config line is not a name: measured, it
-  drops exactly two items whose only identifier-shaped token was one — `aBatchedLintel-1` S3, whose
-  token is `body=$(_unfenced "$f")`, and `aMendedLedger-6-u6` S5, whose token is a `.gitattributes`
-  line. Both are innocent under the eye, both would have cost a real clause under O2, and the
-  exclusion costs nothing else: no live item triggers on a space-bearing token and nothing else.
-- **A `:<line>` tail is stripped before the `.md` test.** NEW at rev-3, and a 0-verdict forward guard
-  of the same kind as the dashes-and-digits one. `…template-v-2-1.md:9` is an `.md` path wearing a
-  citation tail, and without the strip it passes the slash shape and reads as a code file. Measured:
-  one live verb-bearing item carries such a token and it triggers on a different identifier anyway,
-  so the verdict count is unchanged. The precedent is `tools/check-spec-tokens.py`'s own `CITE_TAIL`
-  at `:76`, which exists for the same reason one file over, and S5 applies the same strip before
-  resolution.
+- **A token carrying a SPACE is never an identifier.** NEW at rev-3. A backticked CODE FRAGMENT or
+  config line is not a name: measured, the exclusion keeps exactly one live item out,
+  `aBatchedLintel-1` S3, whose only candidate token is `body=$(_unfenced "$f")`, and 7 over the
+  selection. The item is innocent under the eye and would otherwise cost a real clause.
+- **A `:<line>` tail is stripped before every shape test.** The normalisation, and not an exclusion.
+  A shape judges the NAME, and a citation tail is not part of it: `check-spec-tokens.py:76` has a
+  dot whose tail segment is `py:76`, which is not word characters, so without the strip a cited
+  script or document with no slash would read as a bare word. Measured, the strip changes no live
+  verdict today. It is specified anyway because S5 applies the same strip before resolution, and
+  one token view for both questions is one spelling rather than two. The precedent is
+  `tools/check-spec-tokens.py`'s own `CITE_TAIL` at `:76`, which exists for the same reason one file
+  over.
 
-A sixth exposure was looked for and is absent: a bare version token such as `2.79` would pass the
-dotted-tail shape, and ZERO verb-bearing live items carry one. It is recorded rather than guarded,
-because a guard against a class the corpus does not produce is a clause no fixture can observe
-honestly.
+A further exposure was looked for and is absent: a bare version token such as `2.79` would pass the
+dotted-tail shape, and ZERO verb-bearing live items carry one, re-derived at `67bec01a` under the
+shipped list. It is recorded rather than guarded, because a guard against a class the corpus does
+not produce is a clause no fixture can observe honestly.
 
 ### Shape 6 — the bare word, admitted beside a kind noun
 
@@ -362,9 +421,12 @@ so there is one text and no copy to drift.
 containing the single word `marker` fired on one item over the 640-spec selection —
 `memory/builds/dLoggedFlight/spec/2026-09-13-spec-TOOL-dLoggedFlight-4.md:48` S4, whose verb comes
 from the decision token `skip-delete` and whose "marker" is a clean-exit marker in behaviour prose.
-That item retires nothing. The six-phrase set fires on ZERO items over the live population AND zero
-over all 640 selected specs, which is the property the owner's ruling rests on and for which the
-fixture `tFixture-207` is the whole coverage.
+Under the shipped list at `67bec01a`, `marker` beside the six phrases fires on a second item,
+`aBatchedTribunal-6` S1b, whose marker is a build lock written before the first read and cleared in
+a `finally`. Neither item retires anything. The six-phrase set fires on ZERO items over the live
+population AND zero over all 641 selected specs, re-derived at `67bec01a` under the shipped list,
+which is the property the owner's ruling rests on and for which the fixture `tFixture-207` is the
+whole coverage.
 
 ### Case, by ruling — and what the fold does not reach
 
@@ -374,19 +436,23 @@ both on the items that matter most. A case-sensitive trigger misses those silent
 false-pass direction a shape check exists to close; a case-insensitive one costs, at worst, a clause
 on an item that retires nothing.
 
-Measured at `32f2eb71`, OWN-PROBE, three readings over the same 37 live specs:
+Measured at `67bec01a` under the shipped list and shapes, OWN-PROBE, four readings over the same 38
+live specs:
 
 | reading | triggered | what it loses against the ruling |
 |---|---|---|
-| every member folded, the ruling | 23 items across 14 specs | nothing |
-| strict list exact, stems folded, rev-3's text read literally | 22 across 14 | `dPolishedVitrine-1` S5 and its `DROPS` |
-| everything exact | 17 across 13 | six items |
+| every member folded, the ruling | 38 items across 20 specs | nothing |
+| strict list exact, the rest folded | 37 across 20 | `dPolishedVitrine-1` S5 and its `DROPS` |
+| past tense exact, the rest folded | 36 across 20 | `aMendedLedger-2-u1` S6 and `aMendedLedger-6-u6` S6, both on `RETIRED` |
+| everything exact | 29 across 20 | nine items |
 
-The six are not a random sample. Five open with a capitalised imperative stem: `aMendedLedger-2-u1`
+The nine are not a random sample. Six open with a capitalised imperative stem: `aMendedLedger-2-u1`
 S5 and `aMendedLedger-3-u2` S2 with `Delete`, `aMendedLedger-3-u2` S6 with `Remove`,
-`aMendedLedger-4-u3` S3 with `Drop`, and `aMendedLedger-4-u3` S7 with `Retire`. The sixth is the
-`DROPS` above. The corpus pass's census reads all six as GENUINE retirements, and two of them are
-among the three the dry run named as the reason this class was ruled gateable at all.
+`aMendedLedger-4-u3` S3 with `Drop`, and `aMendedLedger-1` S2 and `aMendedLedger-4-u3` S7 with
+`Retire`. The seventh is the `DROPS` above, and the last two are the `RETIRED` pair, the ruling's own
+example. The corpus pass's census reads the six rev-4 carried as GENUINE retirements, two of them
+among the three the dry run named as the reason this class was ruled gateable at all; the three the
+rulings add are read in the precision section below.
 
 **How it is built.** The arm folds a COPY of the accumulated item through `tolower()` and runs the
 verb and kind-noun tests over that copy. That is POSIX awk, and it is the idiom the engine already
@@ -401,59 +467,114 @@ silently, on exactly the interpreter the engine's portability note at `:1156` na
 - The MARKERS and the two escape spellings stay exact bytes. A case slip there is a false RED whose
   message prints the spelling that answers it, which is the safe direction; a case slip in the
   trigger is a silent false pass. The ruling closes the second, and the first needs no closing.
-- The fold reaches CASE and not INFLECTION. `RETIRED` matches nothing in any case, because the closed
-  list carries no past-tense form, and F9 measures what adding the past tense would cost.
+- The fold reaches CASE, and INFLECTION only where the list names it. Since O5 the list names the
+  third-person present, the imperative and the past; a gerund is none of them, so `retiring` or
+  `dropping` matches in no case. Measured at `67bec01a`, the five gerunds would add 2 live items. No
+  ruling asks for them and none is added.
 
 ### The NAMED GAP that remains, measured
 
-**Pinned rather than implied away.** A retirement whose only backticked token is a bare word with no
-kind noun beside it, a hyphenated bare word such as `check-brief-recorded`, an `.md` path, or a
-space-bearing fragment is NOT triggered, so its author is never asked the by-value question.
+**Pinned rather than implied away.** A retirement whose backticked tokens hold no identifier shape —
+a bare word with no kind noun beside it, `run()` included, a hyphenated bare word such as
+`check-brief-recorded`, a family-slug-seq id, or a space-bearing fragment — is NOT triggered, so its
+author is never asked the by-value question.
 
-Measured over the live population, OWN-PROBE: 8 items, enumerated rather than counted so a later
-reader can re-judge each — `aBatchedLintel-1` S3, `aGradedDoorway-7` S4 on `run()`,
-`aMendedLedger-1` S2 and S7, `aMendedLedger-6-u6` S1, S3 and S5, and `TOOL-dGatedProse-4` S3, this
-build's own sibling. Over the whole 640-spec selection it is 54 items. Two of the eight are outside
-the population only because of the `.md` exclusion, `aMendedLedger-1` S2 and `TOOL-dGatedProse-4`
-S3, and F10 carries whether that exclusion stays. The dry run's
-`aMendedLedger-1` S2 — "Retire the authored session ledger to `memory/archive/ledger/{a,b,c}.md`" —
-is a genuine retirement inside that gap, and it is the member that matters: shape 6 does not reach
-it, because the item carries no kind noun and inventing one to satisfy a gate is the mirror this
-repo forbids elsewhere.
+Measured over the live population at `67bec01a` under the shipped list and shapes, OWN-PROBE: 4
+items, enumerated rather than counted so a later reader can re-judge each — `aBatchedLintel-1` S3,
+`aGradedDoorway-7` S4 on `run()`, `aMendedLedger-1` S7, and `aMendedLedger-6-u6` S3. Over the whole
+641-spec selection it is 67 items against rev-4's 54, because across the landed corpus the past
+tense makes more items verb-bearing than O6 lets out of the gap. Read at item level, none of the
+four live members retires a name: two describe behaviour, one closes a decision row, and one sweeps
+a word out of prose. So the live gap holds no retirement today, and that is a measurement of this
+corpus rather than a property of the rule. Shape 6 still reaches no bare word that lacks a kind
+noun, because inventing one to satisfy a gate is the mirror this repo forbids elsewhere.
+
+**A SECOND unreached class, which the gap figure does not count.** The 4 above carry backticked
+tokens and none of an identifier shape. An item that carries NO backticked token is outside the
+trigger for a more basic reason: there is no token for a shape to test, no bare word for shape 6 to
+admit, and no name for a by-name half to resolve. It sits in neither the 38 nor the 4, and rev-5
+named only the 4, which let the smaller class read as the whole of what the trigger misses.
+Measured at `67bec01a` under the shipped list and shapes, OWN-PROBE: 8 live items across 6 specs,
+five on node `a` and three on node `d`, which with the 38 and the 4 accounts for all 50 verb-bearing
+items; over the 641-spec selection, 59 items across 48 specs. Enumerated so a later reader can
+re-judge each — `aMendedLedger-1` S6, `aMendedLedger-8-u9` S3, `aTunedCompass-3` S5,
+`aTunedCompass-9` S3 and S5c-ii, `TOOL-dGatedProse-3` S4 and S6, and `TOOL-dGatedProse-4` S2. The
+engine's label derivation would cut S5c-ii to `S5c`, as §4 already records for its sibling S5c-i.
+
+Read at item level, and unlike the named gap, this class holds a withdrawal with a reader:
+
+- **four describe behaviour and retire nothing.** `aMendedLedger-8-u9` S3's verb is a driver that
+  must never lose a row, `aTunedCompass-3` S5's an id no longer reported missing, `aTunedCompass-9`
+  S3's a sampling method that takes out an authorship bias, and S5c-ii's the green-by-absence shape
+  its build exists to refuse.
+- **one points at a retirement its siblings carry.** `aMendedLedger-1` S6 re-trues the docs the
+  ledger's retirement falsifies, and that retirement's own named items, the same spec's S1 and S2,
+  are in the 38.
+- **two move spellings of a value.** `TOOL-dGatedProse-3` S4 and S6 carry the prose and fixture
+  spellings of the guide cap pair whose value that spec's S1 moves by path. S1 carries no
+  retirement verb, so the move is outside the trigger at its source, and these two name no token,
+  so they are outside it at the spellings too.
+- **one is a withdrawal with a by-value reader, and check 25 asks nothing of it.**
+  `TOOL-dGatedProse-4` S2 deletes four spans of guide prose, 450 bytes, from a file whose size
+  `tools/check-template-size.sh` grades against the row at `tools/template-size-limits.txt:86`.
+  Its author would name that reader if asked, and the trigger never asks, because the item names
+  the file it edits only in prose.
+
+**Why the class stays out.** Reaching an item with no token takes a trigger that reads prose rather
+than a backticked token, and the plain form of that is the verb alone, which is the reading the
+identifier conjunct exists to refuse: the dry run's raw vocabulary flagged 19 of 24 live specs
+before a backticked NAME was required. Measured here, a
+verb-only trigger adds all twelve untriggered live items, the gap's 4 and these 8, and 126 over the
+selection, for one withdrawal with a reader among the live eight. No ruling asks for it and none is
+added. What this unit does is SAY so: S8 puts both classes in check 25's own header, AC18 observes
+the sentence, and an author's remedy is the one the named gap has — name the withdrawn thing in
+backticks, and the item then triggers.
 
 ### The trigger's measured precision, reconciled with the corpus pass's census
 
-Over the live population the shipped trigger fires on 23 items across 14 specs. The item-by-item
-verdict is `TOOL-dGatedProse-5`'s census, which read each item against code and whose skeptic re-read
-it. This section asks that census one narrower question: did the trigger fire on a RETIREMENT, a
-name, row kind or vocabulary member leaving the tree? The answer splits three ways.
+Over the live population the shipped trigger fires on 38 items across 20 specs. The item-by-item
+verdict is `TOOL-dGatedProse-5`'s census, which read rev-4's 23 against code and whose skeptic
+re-read them. The 15 the owner's O5 and O6 rulings add were read HERE, at item level and not against
+code, so their share of the split below is provisional until that census re-reads them. This
+section asks one narrower question: did the trigger fire on a RETIREMENT, a name, row kind or
+vocabulary member leaving the tree? The answer splits three ways.
 
-- **13 are retirements.** They are the census's twelve GENUINE items at its rev-1, less
+- **18 are retirements.** Thirteen are rev-4's: the census's twelve GENUINE items at its rev-1, less
   `TOOL-dGatedProse-3` S8, which moves a value and sits in the next row; plus
   `bConvergentLodestar-1` S3, whose retired file lives in another repo and is exactly what the
   by-name escape exists for; plus `aMendedLedger-1` S1. That last one fires on the wrong token, the
   slug `bThriftyBellows`, but the item does retire three named paths: `memory/project/MEMORY.md`,
   `IN-FLIGHT.md` and `project/README.md`, per that spec's own migration table. The engine's comment
-  at `tools/memory-tree/check-memory-hygiene.sh:497`-`:498` still spells all three.
-- **3 move a value and retire no name.** `aGradedDoorway-7` S2 raises `SHARD_ARITY`,
-  `TOOL-dGatedProse-3` S8 moves `KIT_MEMORY_TREE_VERSION`, and `aMendedLedger-8-u9` S11 neutralises
-  `merge.conflictStyle`. None is a retirement by the owner's taxonomy, and none may answer its
+  at `tools/memory-tree/check-memory-hygiene.sh:497`-`:498` still spells all three. Five are new:
+  `aMendedLedger-1` S2, the authored ledger moved to the archive; `aMendedLedger-6-u6` S1, which
+  deletes the charter template's ledger lines, and S6, which records the ledger's retirement for
+  adopters; `aQuarriedLantern-1` S5, whose fork of `query.py` withdraws a node-registry lookup; and
+  `aTunedCompass-3` S2, which deletes `check-recall.py`'s two copied tuples.
+- **4 move a value and retire no name.** Three are rev-4's: `aGradedDoorway-7` S2 raises
+  `SHARD_ARITY`, `TOOL-dGatedProse-3` S8 moves `KIT_MEMORY_TREE_VERSION`, and `aMendedLedger-8-u9`
+  S11 neutralises `merge.conflictStyle`. The fourth is `aTunedCompass-9` S5c-i, which moves the set
+  an audit grades in from a pin to a per-fixture declaration and names `test_audit_green` as a
+  reader in its own text. None is a retirement by the owner's taxonomy, and none may answer its
   by-value half with the escape either, because each value has a reader.
   `tools/unattended/check-unattended.test.sh:46` compares a shard count against `SHARD_ARITY`; S8's
   own clause names the version's readers; and `tools/memory-tree/merge-rows.test.sh:1209` loops two
-  conflict styles through the driver. One rule decides all three, and the clause section states it.
-- **7 are false triggers**, whose verb sits in behaviour or failure-mode prose and whose item changes
-  nothing another file reads: `aQuarriedLantern-1` S6, `aMendedLedger-5-u5` S5,
-  `aMendedLedger-7-u8` S5, `bConvergentLodestar-1` S2, `dPolishedVitrine-1` S10, and
-  `dScaffoldedMirror-9` S6 and S7. The census escapes all seven, and its skeptic read each escape as
-  honest.
+  conflict styles through the driver. One rule decides all four, and the clause section states it.
+- **16 are false triggers**, whose verb sits in behaviour, correction or creation prose and whose
+  item changes nothing another file reads. Seven are rev-4's: `aQuarriedLantern-1` S6,
+  `aMendedLedger-5-u5` S5, `aMendedLedger-7-u8` S5, `bConvergentLodestar-1` S2, `dPolishedVitrine-1`
+  S10, and `dScaffoldedMirror-9` S6 and S7; the census escapes all seven, and its skeptic read each
+  escape as honest. Nine are new: `aMendedLedger-2-u1` S4 and S6, `aMendedLedger-6-u6` S5,
+  `aPacedTurnstile-14` S9, `aTunedCompass-9` S2b, `aWalkedCorpus-2` S5, `bConvergentLodestar-1` S4,
+  `dPolishedVitrine-14` S2, and `TOOL-dGatedProse-4` S3, which widens a pointer.
 
-So precision is 13 of 23 counted as retirements, and 16 of 23 counted as items whose clause has
-something true to list: between a half and seven in ten.
+So precision is 18 of 38 counted as retirements, and 22 of 38 counted as items whose clause has
+something true to list: just under a half to just under six in ten, against rev-4's half to seven in
+ten over 23.
 
 A false trigger costs the author one line. That asymmetry is why a trigger at this precision is
-wireable when the refuted predicate at precision 0.00 was not, and the owner's case ruling rests on
-the same asymmetry read the other way: a missed retirement costs a gate that cannot fail.
+wireable when the refuted predicate at precision 0.00 was not, and the owner's case, past-tense and
+`.md` rulings rest on the same asymmetry read the other way: a missed retirement costs a gate that
+cannot fail.
 
 ### The clause, and exactly what is graded
 
@@ -485,7 +606,7 @@ NOT GRADED: completeness, on either half, for the reason the next sub-section me
 that nothing reads the value of what the item changes. An item the trigger fires on that retires no
 name but moves a value — a pin raised, a constant's value replaced, a config neutralised — answers
 its by-value half with that value's readers, and the escape there is false even though the item is
-not a retirement. That is the one rule for the three value-move items of the precision section, and
+not a retirement. That is the one rule for the four value-move items of the precision section, and
 it settles the pair the corpus pass's skeptic found sorted two ways. The arm grades presence, so it
 cannot tell a true escape from a false one, and once written a false one passes for good; the
 catalog entry says so in terms (AC18). `READER NOT IN TREE` on a by-name half that lists no names
@@ -521,16 +642,18 @@ Three further properties keep the second escape from becoming a hole:
   message prints the unresolved token AND the spelling `READER NOT IN TREE`, so the fix is one edit
   and needs no reading of the gate.
 
-**The resolution predicate's false-red rate is measured, not hoped.** OWN-PROBE at `32f2eb71` over
-the tokens a by-name half draws from: every identifier-shaped token in the live specs' §2 items,
-paths included, 496 occurrences and 336 distinct. 44 of the distinct carry a `:<line>` tail, the form
-the corpus pass cites readers in. Resolved as written, 50 fail, and 34 of those are tail-bearing, so
-a join without S5's normalisation would red most cited readers. With it, 15 fail, which is 4.5%:
+**The resolution predicate's false-red rate is measured, not hoped.** OWN-PROBE at `67bec01a` over
+the tokens a by-name half draws from: every identifier-shaped token in the live specs' §2 items under
+the shipped shapes, markdown paths included, 626 occurrences and 419 distinct. 62 of the distinct
+carry a `:<line>` tail, the form the corpus pass cites readers in. Resolved as written, 64 fail, and
+44 of those are tail-bearing, so a join without S5's normalisation would red most cited readers.
+With it, 19 fail, which is 4.5%, the rate rev-4 measured over the narrower shapes:
 
-- five are names their builds had not yet written or members spelled as prose compositions —
-  `optIn`, `roster_refusal`, `union.SETS`, `union.snippet_bytes`, and `READER_INVENTORY_CUTOFF`,
-  rev-2's invented key;
-- two are the fixture names this unit mints, and three are files already retired, which fail because
+- eight are names their builds had not yet written or members spelled as prose compositions —
+  `optIn`, `roster_refusal`, `union.SETS`, `union.snippet_bytes`, `READER_INVENTORY_CUTOFF`,
+  rev-2's invented key, the two labels `F:IN-FLIGHT.md` and `F:MEMORY.md`, and a report path
+  written relative to its build folder;
+- two are the fixture names this unit mints, and four are files already retired, which fail because
   they are retired NAMES rather than readers;
 - one is `reuse-discovery.js`, a file in another repo, and one is a shell assignment with no space;
 - three are `path::symbol` node ids, and they are the one shape that IS a false red: the reader
@@ -662,7 +785,7 @@ that observation.
   tokens against `git ls-files`, already owns a waiver registry at
   `memory/project/spec-token-waivers.txt`, and already refuses a stale waiver — a real candidate, and
   the one O4's half most resembles. Rejected because the POPULATION is the trigger: that checker
-  would have to re-spell the verb list, the five shapes, the five exclusions and the kind-noun set to
+  would have to re-spell the verb list, the five shapes, the three exclusions and the kind-noun set to
   know which items own a clause, which is the second-spelling cost one paragraph up, paid across two
   languages. The waiver registry was the attractive half; rev-3's F8 offered it for the residual
   red, and the owner ruled the corpus pass instead, so the clause stays in the spec, beside the
@@ -705,7 +828,10 @@ unit's build pass runs the arm over the tree it lands on, and every item it name
 this unit's commit, in unit 5's clause forms and under unit 5's collision protocol: the item label is
 the anchor, a terminal spec is never edited, and a clause another session wrote first is reconciled
 additively. Writing into another node's live spec is authorised by the owner's ruling, for unit 5's
-pass and for this delta alike.
+pass and for this delta alike. The rev rule is unit 5's as well, settled on its F1 on 2026-09-21: a
+clause moves the edited spec's rev, with its §9 line, only where `REV_SCOPE_CUTOFF` binds by
+filename date, and which specs those are is derived at the pass from that key's value, never read
+from a list here.
 
 ### The codebase map — what this unit owes it, and why that is not silence
 
@@ -737,7 +863,7 @@ lines in one file rather than a contested region.
 | `READER NOT IN TREE` | the arm's by-name resolution half, and `tFixture-209` |
 | `**Readers:**`, `by name:`, `by value:` | the arm's three marker tests |
 | the six kind nouns | the arm's own literal, and `tFixture-207` |
-| `tFixture-200` … `tFixture-214` | the fixture block's own `hit` and `miss` rows |
+| `tFixture-200` … `tFixture-215` | the fixture block's own `hit` and `miss` rows |
 | `\004` | the tag split, beside the `\002` and `\003` splits it copies |
 
 Check numbers 1 through 24 are all claimed: 1 to 12 plus 21, 22 and 23 carry `fail <n>` call sites in
@@ -758,7 +884,7 @@ migration is the corpus pass, a different animal from a schema change, and it is
 | file | change |
 |---|---|
 | `tools/memory-tree/check-memory-hygiene.sh` | the S11 hoist, the arm with the verb list and the kind-noun literal, the `\004` split, the batched resolution post-pass, `fail 25` and the zero-population notice — about 110 lines |
-| `tools/memory-tree/check-memory-hygiene.test.sh` | the fifteen-fixture block, its `hit` and `miss` rows, the positive arm, the dependency arms, the S11 regression arm, the RAISED `FLOOR_ASSERTIONS` — about 180 lines |
+| `tools/memory-tree/check-memory-hygiene.test.sh` | the sixteen-fixture block, its `hit` and `miss` rows, the positive arm, the dependency arms, the S11 regression arm, the RAISED `FLOOR_ASSERTIONS` — about 180 lines |
 | `tools/memory-tree/HYGIENE.template.md` | check 25's catalog entry — about 26 lines |
 | `memory/HYGIENE.md` | REGENERATED, never hand-edited |
 | `tools/memory-tree/README.md` | the check-count sentence, 23 to 25 with 24 enumerated — 1 line |
@@ -787,7 +913,7 @@ delta row above, because the corpus pass is unit 5's.
   ACCUMULATOR population is the union of check 12's 89 and that 37, which is 120 — up from 88 at
   rev-2 and still 18.75% of the 640 a disjunct-free hoist would have walked. The RESOLUTION
   population is the by-name tokens of triggered items, 0 at the pinned base and after unit 5's pass
-  whatever its twenty-three clauses list, at a measured 0.602 s for one batched `-l` grep of 498
+  whatever its thirty-eight clauses list, at a measured 0.602 s for one batched `-l` grep of 498
   tokens against 138.4 s for the line-printing form and 0.047 s per token for a loop. The leg's last
   recorded run is 33.3 s and its declared ceiling is 12720 s, which is why the ceiling is not the
   protection and the shape is.
@@ -799,19 +925,22 @@ delta row above, because the corpus pass is unit 5's.
   unresolved name, and the escape spelling that answers it, so a red row is actionable without
   reading the gate. Every name accepted under the by-name escape is printed. The zero-population
   notice names the liveness test.
-- risks — five. First, precision is between a half and seven in ten by §4's reading, so an author
-  will often write a clause on an item that retires nothing; the cost is one line, and seven of the
-  23 live items are exactly that case. Second, the NAMED GAP is 8 live items wide and shape 6 does
-  not reach its measured member. Third, the corpus is claused by unit 5 before this arm lands, so
+- risks — five. First, precision is just under a half to just under six in ten by §4's reading, so
+  an author will often write a clause on an item that retires nothing; the cost is one line, and
+  sixteen of the 38 live items are exactly that case. Second, the trigger leaves two classes
+  unreached: the NAMED GAP, 4 live items and 67 over the selection, none of which shape 6 reaches,
+  and the token-less class beside it, 8 live and 59 over the selection, which holds one withdrawal
+  with a by-value reader; S8 names both in check 25's header, and neither is closed. Third, the corpus is claused by unit 5 before this arm lands, so
   what reaches this unit is the delta since that pass, which S14 owes and AC21 observes. Fourth, the
   declared dependency on `SPEC_FORMAT_CUTOFF` means an adopter can get nothing from this arm without
   a key it does not own. Fifth, S11 edits a LIVE arm
   of check 12 rather than only adding beside it; the hoist is behaviour-preserving by construction,
   and AC15 is the check that exercises that claim over the seven existing scope-join fixtures.
 - testing — the failing case is staged and observed RED before the branch lands, per the charter. The
-  fifteen-fixture block carries seven RED fixtures and eight GREEN ones, five of the GREEN ones
-  existing only to pin false-positive classes so that a later widening of the identifier test reds
-  rather than passing quietly.
+  sixteen-fixture block carries nine RED fixtures and seven GREEN ones. Three of the GREEN ones
+  exist only to pin false-positive classes, so that a later widening of the identifier test reds
+  rather than passing quietly, and two of the RED ones exist only to pin the owner's two widenings,
+  so that a later narrowing reds too.
 - migration — none of the mechanical kind, per §4; the corpus pass is unit 5's and S14 verifies it.
 - user docs — N/A. Nothing here is user-facing; `memory/HYGIENE.md` is the governance carrier and S8
   updates it.
@@ -832,7 +961,8 @@ delta row above, because the corpus pass is unit 5's.
   `tFixture-201`.
   Red when: the arm reds a conforming clause, which would make the remedy unreachable; or it reds
   either written form, which is the join taking a citation tail or a call suffix for part of the
-  name — measured, that reading fails 34 of the 44 distinct tail-bearing tokens in live §2 items.
+  name — measured at `67bec01a`, that reading fails 44 of the 62 distinct tail-bearing tokens in
+  live §2 items.
 - **AC3** — When the by-value half reads `NO VALUE READERS` followed by a reason the run is silent
   for `tFixture-202`; when `tFixture-203` writes a `by value:` half holding neither a backticked
   token nor the escape — the bare escape with no reason after it is that case — the run names it.
@@ -844,8 +974,8 @@ delta row above, because the corpus pass is unit 5's.
   Red when: an unresolvable name passes, which is the half O4 exists to grade; or the message omits
   the escape spelling, which leaves a false red with no remedy but reading the gate.
   figure: the resolution corpus is DERIVED at observation time by `git ls-files` minus the spec
-  glob, never pinned. Measured base rate over live specs' §2 identifier tokens at `32f2eb71`, after
-  S5's normalisation: 15 of 336 distinct unresolved.
+  glob, never pinned. Measured base rate over live specs' §2 identifier tokens at `67bec01a`, under
+  the shipped shapes and after S5's normalisation: 19 of 419 distinct unresolved.
 - **AC5** — When `tFixture-209` carries that same unresolvable name plus `READER NOT IN TREE` and a
   reason, the run is silent for it AND stdout carries a line naming the covered name.
   Red when: the escape silences the arm without naming what it covered, which is a skip that looks
@@ -867,12 +997,22 @@ delta row above, because the corpus pass is unit 5's.
   whole coverage.
 - **AC9** — When a triggered-looking item's only backticked token carries a space — the fixture uses
   a shell fragment of the `body=$(_unfenced "$f")` shape — the run is silent for `tFixture-211`.
-  Red when: a backticked code fragment is read as a retired name, which cost two real items of the
-  live corpus a clause each before this exclusion was written.
-- **AC10** — When a triggered-looking item's only backticked token is an `.md` path wearing a
-  `:<line>` citation tail, the run is silent for `tFixture-212`.
-  Red when: the `.md` exclusion is applied before the tail is stripped, which turns every cited
-  document into a code path.
+  Red when: a backticked code fragment is read as a retired name, which measured at `67bec01a`
+  would charge one live item a clause, `aBatchedLintel-1` S3, and seven over the selection.
+- **AC10** — When `tFixture-212` carries two LIVE §2 items, each opening with an imperative
+  retirement stem and neither carrying a `**Readers:**` clause — S1, whose only backticked token is
+  a path with a slash that ends in `.md`, and S2, whose only backticked token is a markdown filename
+  with no slash, written with a `:<line>` citation tail — the run names `tFixture-212` with BOTH
+  labels. The fixture's two tokens are named in the suite and not here, because a path-shaped token
+  inside a criterion is graded against the tracked tree by `tools/check-spec-tokens.py`.
+  Red when: S1 is absent, which is the slash shape still refusing a path that ends in `.md`, the
+  exclusion the owner's O6 ruling deleted and the reading that kept `aMendedLedger-1` S2, one of the
+  rule's motivating cases, out of the population; or S2 alone is absent, which is either the dot
+  shape still refusing an `md` tail, the exclusion's second spelling, or the dot shape reading the
+  token before its tail is stripped, so that a cited document with no slash reads as a bare word.
+  figure: DERIVED at observation time from the fixture. The corpus witnesses the ruling too, O6
+  alone moving the live population from 23 to 27 items at `67bec01a`, but the fixture is what
+  binds.
 - **AC11** — When `tFixture-207` carries a retirement verb, a backticked bare word and a declared
   kind noun and no clause, the run NAMES it; and a grep for each of the six noun phrases over
   `tools/memory-tree/check-memory-hygiene.sh` returns one line each, all six adjacent and
@@ -880,8 +1020,9 @@ delta row above, because the corpus pass is unit 5's.
   `tools/memory-tree/.memory-tree.conf.example` returns nothing.
   Red when: the shape does not fire, which leaves the owner's O3 closure unbuilt; or the noun set
   exists in two carriers, which is the disagreement the single literal exists to prevent.
-  figure: the set fires on 0 items of the live corpus and 0 of the 640-spec selection, DERIVED, so
-  the fixture is its whole coverage and the corpus cannot witness it.
+  figure: the set fires on 0 items of the live corpus and 0 of the 641-spec selection at
+  `67bec01a` under the shipped list, DERIVED, so the fixture is its whole coverage and the corpus
+  cannot witness it.
 - **AC12** — When `tFixture-210` carries the identical defect as `tFixture-200` under a `CLOSED`
   status header, the run is silent for it while still naming `tFixture-200` in the same run.
   Red when: the arm grades a terminal spec, which would demand rewriting a frozen record to clear a
@@ -921,14 +1062,22 @@ delta row above, because the corpus pass is unit 5's.
   entry numbered 25; that entry contains the words "presence", "resolution" and "completeness" in
   the sentences stating what each half is graded by, names the control `TOOL-dLoggedFlight-22`,
   states the kind-noun COUNT without listing the nouns, carries the words "on trust" in a sentence
-  about the escapes and "case" in the sentence about the verb match, and
+  about the escapes, "case" and "past tense" in the sentence about the verb match, ".md" in a
+  sentence stating that a markdown path counts as an identifier, and "identifier shape" and "no
+  backticked token" in the sentence or sentences naming the two classes of item the trigger does
+  not reach, with no size printed for either, and
   `tools/memory-tree/README.md` line 18's check sentence names 25 and enumerates 24 beside 20 under
   `row_grammar.py`.
   Red when: the entry lands without the per-half grading sentence, which is how a reader concludes
   the inventory is checked; or without the trust sentence, which is how a false escape reads as a
   verified one; or it restates the noun set, which is the second copy S3 exists to
-  prevent; or the README keeps a count its own enumeration contradicts, which it does today at 23
-  against 24 checks.
+  prevent; or it names neither the past tense nor the markdown path, which is how an author reads
+  the trigger narrower than the arm and leaves a required clause unwritten; or it names one
+  unreached class and is silent on the other, which is how a reader takes the silent class for
+  graded — at `67bec01a` a header naming only the named gap would be silent on 8 live items against
+  the 4 it names; or it prints a size for either class, which is a count of a live population in a
+  shipped doc; or the README keeps a
+  count its own enumeration contradicts, which it does today at 23 against 24 checks.
   fixture: `memory/HYGIENE.md` is a render of `tools/memory-tree/HYGIENE.template.md`, so the
   observation is made after the re-render and the template carries the authored text.
 - **AC19** — When `grep -n '^FLOOR_ASSERTIONS=' tools/memory-tree/check-memory-hygiene.test.sh` runs,
@@ -957,7 +1106,7 @@ delta row above, because the corpus pass is unit 5's.
   Red when: an item is named, which means unit 5's pass missed one, or the population moved between
   that pass and this one and this unit's pass did not clause the delta — the case S14 exists for,
   since one item already moved between rev-3's figure and the commit that published it.
-  figure: DERIVED at observation time. The 23 items across 14 specs at `32f2eb71` are a measurement
+  figure: DERIVED at observation time. The 38 items across 20 specs at `67bec01a` are a measurement
   and are expected to move.
 - **AC22** — When this unit's diff is read, it carries no change to `KIT_MEMORY_TREE_VERSION`, no
   edit to any `gov:kit memory-tree@` marker, and for each of the four rendered pairs `head -1` of the
@@ -980,11 +1129,23 @@ delta row above, because the corpus pass is unit 5's.
   Red when: S1 is absent, which is the strict list matched case-sensitively — no stem reaches
   `DROPS`, because a stem needs a word boundary after it, so S1 isolates the strict list, and under
   that reading `dPolishedVitrine-1` S5 leaves the population silently; or S2 is absent, which is
-  either a case-sensitive stem match, losing five live retirements that open with a capital, or a
+  either a case-sensitive stem match, losing six live retirements that open with a capital, or a
   fold over the whole item, erasing shape 4; or `IGNORECASE` carries the fold, which mawk reads as an
   unset variable, so the arm is case-sensitive there and nothing says so.
-  figure: DERIVED at observation time from the fixture. The corpus witnesses the ruling too, 23
-  items case-insensitive against 17 exact at `32f2eb71`, but the fixture is what binds.
+  figure: DERIVED at observation time from the fixture. The corpus witnesses the ruling too, 38
+  items case-insensitive against 29 exact at `67bec01a`, but the fixture is what binds.
+- **AC25** — When `tFixture-215` carries six LIVE §2 items and no `**Readers:**` clause — S1 to S5
+  each with a backticked underscore identifier and exactly one retirement verb, in turn `RETIRED`,
+  `replaced`, `removed`, `deleted` and `dropped`, none of them inside a strict phrase; and S6 with a
+  backticked underscore identifier, no retirement verb, and the backticked camel-case slug
+  `dRetiredFork-9` — the run names `tFixture-215` with S1 through S5 and does not name S6.
+  Red when: any of S1 to S5 is absent, which is the closed list without that past-tense form — the
+  owner's O5 ruling unbuilt for it, and for S1 the ruling's own `RETIRED` example still matching in
+  no case; or S6 is named, which is a past form matched as a bare substring, the reading that pulls
+  two items of `DEPL-dRetiredFork-2` into the live population although neither retires anything.
+  figure: DERIVED at observation time from the fixture. The corpus witnesses the ruling too, O5
+  alone moving the live population from 23 to 31 items at `67bec01a`, but the fixture is what
+  binds.
 
 ## 7. Gates
 
@@ -1009,7 +1170,7 @@ four templates and lands through their renders.
 
 **`memory-hygiene self-test` IS HELD BY DEFAULT, and this unit's entire S9 lives in it.** It is
 subject `kit`, chunk `selftests`, guarded on `tools/lib/` and `tools/memory-tree/`, so a green bar
-without `GATE_FULL=1 GATE_SELFTESTS=1` exercises none of the fifteen fixtures. That is why every
+without `GATE_FULL=1 GATE_SELFTESTS=1` exercises none of the sixteen fixtures. That is why every
 criterion above observes the engine, the checker or the grep DIRECTLY rather than naming the suite.
 This unit's Definition of Done is kit work, so it owes the total run.
 
@@ -1068,7 +1229,8 @@ here, where it would read as an observation.
   RESOLUTION and not by completeness. Each name the half lists must resolve in the tracked tree
   outside the spec corpus, with `READER NOT IN TREE` plus a reason as the escape. Measured before
   being built, and re-measured at rev-4 with paths included and S5's normalisation applied: 15 of
-  336 distinct candidate tokens fail to resolve, 4.5%, each named by class in §4. What the ruling
+  336 distinct candidate tokens fail to resolve, 4.5%; at rev-5, under the widened shapes, 19 of 419,
+  the same rate, each named by class in §4. What the ruling
   explicitly does NOT buy is the control revision: `TOOL-dLoggedFlight-22` rev-3 lists three
   readers fewer than it has and every name it does list resolves, so it still passes.
 - **F6 — should the NAMED GAP be closed by declaring a kind-noun vocabulary?** RESOLVED (owner,
@@ -1087,28 +1249,32 @@ here, where it would read as an observation.
   passes, so no bar is red on check 25 at any commit of the build. The other two options rev-3 stated
   — land red and carry it, or ship a drainable handoff registry — were not taken, and nothing here
   builds either.
-- **F9 — OWNER'S, new at rev-4. The case ruling folds CASE, not INFLECTION.** The ruling's own
+- **F9 — OWNER'S, raised at rev-4. The case ruling folds CASE, not INFLECTION.** The ruling's own
   examples are `DROPS`, `RETIRED` and `REPLACED`. The first matches under the fold, and `REPLACED`
-  matches inside `is REPLACED by`, but the closed list carries no past-tense form, so `RETIRED` on
-  its own matches in no case at all. Measured at `aMendedLedger-6-u6` S6, whose sentence says the
-  sharded ledger "is RETIRED" and which the trigger does not reach. Adding the five past-tense forms
-  `retired`, `replaced`, `removed`, `deleted` and `dropped` would add 8 live items across 7 specs at
-  `32f2eb71`. The eight were read only at their openings, which is not a verdict: one is the
-  `RETIRED` sentence above, and another describes a markdown link "removed" by a fold. Either answer
-  moves unit 5's population as well, so it is decided before unit 5's pass or not at all.
-  RECOMMENDATION: keep the list at rev-4's members and record `RETIRED` as outside it, because a
-  widening read only at its openings is not one to make under a corpus pass that has to count the
-  same population. Not measured: a per-item reading of all eight.
-- **F10 — OWNER'S, new at rev-4. Does the `.md` exclusion stay?** Its rev-1 rationale did not
+  matches inside `is REPLACED by`, but the closed list carried no past-tense form, so `RETIRED` on
+  its own matched in no case — measured at `aMendedLedger-6-u6` S6, whose sentence says the sharded
+  ledger "is RETIRED". RESOLVED (owner, 2026-09-21): ADD THE PAST TENSE. `retired`, `replaced`,
+  `removed`, `deleted` and `dropped` join the list, folded like the rest; this spec matches each at
+  a word boundary on both sides, like the stems, because as bare substrings they match inside the
+  slug `dRetiredFork`. Measured at `67bec01a`, O5 alone adds 8 live items across 7 specs, 31 across
+  17 in all, and read item by item in §4 they are three retirements, one value move and four false
+  triggers. With O6, §4 derives the combined 38 across 20. AC25 and `tFixture-215` pin it.
+- **F10 — OWNER'S, raised at rev-4. Does the `.md` exclusion stay?** Its rev-1 rationale did not
   survive re-derivation: the item it cited fires on a slug whatever the exclusion says, and the three
-  stubs that item deletes are named paths with readers. Measured at `32f2eb71`, its whole live effect
-  is two items — it keeps out `aMendedLedger-1` S2, a genuine retirement and the NAMED GAP's measured
-  member, and `TOOL-dGatedProse-4` S3, which retires nothing — and over the 640-spec selection it
-  keeps 16 items out. Dropping it makes the population 25 items across 15 specs and moves unit 5's
-  census with it, which is why rev-4 keeps the exclusion and asks rather than dropping it alone.
-  RECOMMENDATION: drop it, in both units together before unit 5's pass. It trades one missed
-  retirement for one avoided false trigger today, and the owner's case ruling already says which of
-  those two errors this check exists to close.
+  stubs that item deletes are named paths with readers. RESOLVED (owner, 2026-09-21): DROP IT. The
+  exclusion goes in both of its spellings, the global `.md` test and the dot shape's "other than
+  `md`" clause, so a markdown path is an identifier with or without a slash. Measured at
+  `67bec01a`, O6 alone moves the live population from 23 to 27 items across 15 specs; rev-4's 25
+  lifted the first spelling only. Its four items are two retirements, `aMendedLedger-1` S2 — one of
+  the rule's motivating cases — and `aMendedLedger-6-u6` S1, and two false triggers,
+  `aMendedLedger-6-u6` S5 and `TOOL-dGatedProse-4` S3. With O5, §4 derives the combined 38 across
+  20. AC10 and `tFixture-212` pin it.
+  Which reading of the drop this text states is the fork `TOOL-dGatedProse-5`'s F7 put to it.
+  RESOLVED (agent, 2026-09-21): reading B, both spellings, as rev-5 already wrote. The main loop
+  settled it from the owner's own words rather than by a new choice: the ruling was to drop the
+  exclusion, and the slash-only reading keeps half of it, so one markdown file would pass or fail by
+  whether its author spelled a directory. Under reading B the population is 38 items across 20 specs
+  at `67bec01a`; the slash-only reading would give 34 across 18.
 
 ## 9. Revision log
 
@@ -1205,6 +1371,53 @@ here, where it would read as an observation.
   forms in this revision, because either moves unit 5's population and the two specs must count one
   — both are the owner's, as F9 and F10. The migration skeptic's findings about unit 5's own table,
   collision plan and edge payload are that spec's to fold, not this one's.
+- rev-5 · 2026-09-21 · the owner's two further rulings of 2026-09-21, on the forks rev-4 raised, and
+  the population the two make together. **O5 — the past tense.** F9 is RESOLVED: `retired`,
+  `replaced`, `removed`, `deleted` and `dropped` join the closed list, folded like the rest, and
+  this spec matches each at a word boundary on both sides because the substring reading pulls two
+  items of `DEPL-dRetiredFork-2` in on the slug. S2 and S8 state it; §4's trigger section lists
+  the five and re-stages the list; the case table gains a past-tense row and becomes four readings;
+  the inflection bullet is re-stated; and AC25 with `tFixture-215` is new, red on any missing form
+  and on the substring reading. rev-4's recommendation to keep the list is overruled and deleted.
+  **O6 — no `.md` exclusion.** F10 is RESOLVED: the exclusion is deleted in BOTH of its spellings,
+  the global test and the dot shape's `md` clause, which rev-4's own measurement had left standing,
+  so O6 alone reaches 27 items and not the 25 rev-4 printed. The exclusion bullet is deleted, the
+  shape table loses both `.md` clauses, the five exclusions become three plus the `:<line>` strip,
+  re-stated as a normalisation, and AC10 is INVERTED with `tFixture-212`: the fixture that had to stay
+  silent on a cited `.md` path now has to be named on a slash-bearing one and a bare one, which the
+  criterion describes rather than spells because a path-shaped token in a criterion is graded
+  against the tracked tree.
+  **POPULATION.** The combined figure is derived rather than summed: 38 items across 20 specs at
+  `67bec01a` and at `32f2eb71`, super-additive because three items need both rulings. The "23
+  against 22" section is replaced by the chain from 643 spec-shaped files; S14, the §3 unit-5 edge
+  and AC21 carry 38; and one engine label that is not unique, `aTunedCompass-9` S5c-i cut to `S5c`,
+  is stated for unit 5's anchoring. Re-derived with it: the named gap, 8 to 4 live items and 54 to 67
+  over the selection; precision, 13, 3 and 7 of 23 to 18, 4 and 16 of 38, with the 15 new items read
+  at item level and marked provisional; the resolution false-red rate, 15 of 336 to 19 of 419, still
+  4.5%, with AC2, AC4 and F5; each surviving exclusion's effect, AC9 with it; shape 6's zero and the
+  `marker` variant's second innocent hit; AC11, AC18, AC24 and the §5 rows; and the fixture block,
+  sixteen with nine RED, in S9, §5, §7, Inventory, Files touched and the unit-3 edge. The rev-4
+  entry above is left as written. REFUSED: nothing.
+- rev-6 · 2026-09-21 · the skeptic's finding against the migration round where it lands on this
+  spec, and the main loop's settlement of the reading fork. **THE TOKEN-LESS CLASS.** rev-5's
+  named gap counted only verb-bearing items that carry a backticked token, so the items that carry
+  none — neither triggered nor inside the gap figure — went unnamed, and a header listing one gap
+  reads as coverage of the other. Re-derived here by `probe_u1_rev6_tokenless.py`, which reproduces
+  the skeptic's eight label for label: 8 live items across 6 specs at `67bec01a`, the 50
+  verb-bearing items accounted for as 38, 4 and 8, and 59 across 48 specs over the selection. S8
+  now requires check 25's header to name both unreached classes and not their sizes, and AC18
+  observes it; §3 gains a non-goal carrying the figure and the reason the class is out; §4's chain
+  and named-gap sections enumerate the eight and read each — four behaviour, one pointer at a
+  retirement already in the population, two value spellings, and `TOOL-dGatedProse-4` S2, a
+  deletion with a by-value reader that check 25 asks nothing of; and §5's risk row carries both
+  classes. **READING B.** F10 marks the fork unit 5's F7 raised as settled: both spellings go, as
+  rev-5 wrote, 38 across 20. **THE REV RULE.** §4's corpus-pass section points at unit 5's F1,
+  settled the same day, for when a delta clause moves another spec's rev. Also: rev-5's fold wrote
+  the §9 and §10 headings twice each, and one of each is gone. The rev-5 entry above is left as
+  written. REFUSED: widening the trigger to reach the token-less class, which no ruling asks for
+  and which buys 12 live items and 126 over the selection for one withdrawal with a reader; and
+  re-sorting §4's precision split against unit 5's census, which this finding did not reach and
+  which that section already marks provisional.
 
 ## 10. Reuse audit
 
@@ -1224,7 +1437,7 @@ shell resolves the whole batch in one process — which is what S5's resolution 
 One candidate was read and NOT taken, and the reason is the population rather than the mechanism.
 `tools/check-spec-tokens.py` already resolves backticked tokens against `git ls-files`, already owns
 `memory/project/spec-token-waivers.txt`, and already refuses a stale waiver row — three of the four
-things O4 needs. Taking it would have meant re-spelling the verb list, the five shapes, the five
+things O4 needs. Taking it would have meant re-spelling the verb list, the five shapes, the three
 exclusions and the kind-noun set in a second language to know which items own a clause, which is the
 second-spelling cost check 24's history already priced in this tree. The waiver mechanism was the
 attractive half; rev-3's F8 offered it for the residual red, and the owner ruled the corpus pass
