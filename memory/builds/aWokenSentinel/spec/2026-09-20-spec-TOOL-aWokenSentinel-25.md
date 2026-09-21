@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-25 — `check-arms.py` names a STRANDED prefix beside its UNARMED row and prints the whole signature, so an arm that stops short of a long message is diagnosed rather than read as absent
 
-**Status:** CLOSED · rev-2 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 25
+**Status:** CLOSED · rev-3 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -37,19 +37,21 @@ that nothing arms the branch.
   nothing else in the row changes. Observed by AC1.
 - **S2** — `classify()` records, for every branch that is not armed, the first non-comment,
   non-negative line of the test file that contains the signature's first `STRAND_MIN` characters
-  (24, a module constant beside `NEGATIVE_RE`) but not the whole signature, as the branch's
-  `stranded` line number, or `None`. A signature shorter than `STRAND_MIN` cannot strand by prefix,
-  because a line containing all of it arms the branch. Observed by AC2 and AC3.
+  (24, a module constant beside `NEGATIVE_RE`) but not the whole signature, and that arms no
+  branch of the same gate (rev-3, the §4 exclusion stated here too), as the branch's `stranded`
+  line number, or `None`. A signature shorter than `STRAND_MIN` cannot strand by prefix, because a
+  line containing all of it arms the branch. Observed by AC2 and AC3.
 - **S3** — `cmd_check()`'s unarmed refusal, the sentence at `:255` beginning `has no POSITIVE
   assertion naming its own failure text`, gains the clause ` — a STRANDED prefix at <test>:<line>
   stops short of the signature; copy the whole row --report prints` when `stranded` is set, and is
   unchanged otherwise. `--report` prints `STRANDED <test>:<line>` at the end of the row for the same
   branches. Observed by AC2.
-- **S4** — `cmd_selftest()` gains three arms over its scratch repo: a gate whose message is over 72
-  characters and whose test quotes the first 40 of them reads UNARMED with `STRANDED` naming the
-  test line in `--check` and in `--report`; the same gate with the test quoting the whole
-  signature reads ARMED, which is the control; and the `--report` row for that gate contains the
-  signature to its last character. Observed by AC3.
+- **S4** — `cmd_selftest()` gains three arms over its scratch repo: a gate whose first branch's
+  message is over 72 characters, with a second branch opening the same way (rev-3, as §4 says),
+  and whose test quotes the first 40 of them reads UNARMED with `STRANDED` naming the test line in
+  `--check` and in `--report`; the same gate with the test quoting the whole signature reads
+  ARMED with no `STRANDED` token, which is the control; and the `--report` row for that gate
+  contains the signature to its last character. Observed by AC3.
 - **S5** — The docstring of `signature()` and the gotcha's remedy sentence say what is now true:
   `--report` prints the row whole, and a stranded prefix is named as such. The gotcha's body keeps
   its anchors and its `gated by` sentence; only the remedy paragraph moves. Observed by AC4.
@@ -244,6 +246,9 @@ none
   same 24 characters (§4 block, §4 selftest paragraph, §5 risks). The selftest's gate-c gains a
   second branch opening like the first, so the control arm is also the exclusion's arm; the arm
   count AC3 derives does not move. Status CLOSED.
+- rev-3 · 2026-09-21 · the bug-class checklist on the pass commit, amendment-leaves-its-other-half-standing:
+  S2 and S4 still described the rev-1 read and a one-branch gate, so each now states the
+  sibling exclusion §4 carries; no code moved. Status CLOSED.
 
 ## 10. Reuse audit
 
