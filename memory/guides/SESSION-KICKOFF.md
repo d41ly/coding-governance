@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-20T20:58:10+03:00 @ 4cf0944dbdce94714870f26760936bc5edabc64e
+last-audit: 2026-09-21T06:25:55+03:00 @ 4cf0944dbdce94714870f26760936bc5edabc64e
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 286b62d1422a4996973784639c02520d6c90be17
@@ -113,6 +113,15 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
+
+- **A LIVE run-state file is outside check 6 by CLASS** (`TOOL-cMendedVintage-13`). `RUN.md` at a
+  build root is append-only by design and cannot satisfy a cap measured for authored index rows; a
+  36-unit run reached 71 KB against 61,440. A RETIRED record is a rename and stays capped.
+
+- **The orientation card's READY anchor accepts BOTH spellings** (`TOOL-cMendedVintage-16`). A card
+  body written in the charter's §16 R1 list-item form used to be read as carrying no ready line,
+  leaving the sentinel in place and the scratch-guard then blocking the next commit. The writer and
+  the hook both widened; the charter did not move.
 
 ### Pointer map (load the row(s) the task touches)
 
