@@ -84,6 +84,8 @@ that is not what the tree holds — and the take-over would re-verify a mandate 
    otherwise — because a holder that replaced its own job records the new id in the lease first.
 4. The tree must be clean and committed.
 5. Under `ANCHOR_SCOPE=published`, the branch tip must be on its remote.
+6. An optional `--pending-run <runId>` must be 1 to 64 letters, digits, `_` and `-`. It becomes a fact
+   and a checkpoint line, and a separator or a newline inside it would forge a second of either.
 
 ### The unpublished-tip exception
 
@@ -111,6 +113,7 @@ take-over prints the push as its first act. Work that exists on one node only is
 | `hold-unpushed` | HEAD's sha, only where the exception above fired; absent otherwise |
 | `resume-owed` | `<name> · fire <UTC instant>`, or `none · off`, `none · owner`, `none · limit`, `none · no carrier` |
 | `hold-streak` | `<n> · at <sha8>` — consecutive holds between which nothing but this run's own records changed |
+| `hold-run` | the Workflow runId `--pending-run` named — the review a second `deferred-platform` held on — or EMPTY, rewritten by every hold so none inherits an earlier stop's run |
 
 and one history-class parked row, `hold · item <code> · reason until <cond> · reaped <id> · resume <name>`,
 or `· unreachable <node>` in place of the reaped field and `none(<why>)` in place of the name.
@@ -128,8 +131,11 @@ empty, so it would block the close it exists to lead to.
 held · code <c> · until <cond> · since <iso> · from <phase>
 checkpoint · witness <sha8> · next <unit> · last bar <path> · parked <n>[ · unpushed <sha8>]
 resume · <resume-owed> · streak <n · at sha8>
+pending run <runId>
 reason · "<hold-reason>"
 ```
+
+The `pending run` line is printed only while `hold-run` is set, and only on a HELD record.
 
 **Every gate claim in it is a POINTER at a run record.** `last bar` is a PATH and never a verdict
 word. The reason sits on its own line, quoted, and is never parsed — a prose reason on a checkpoint
@@ -210,7 +216,9 @@ lease is taken, so a refused take-over writes nothing at all:
 5. the lease is taken, naming the new id;
 6. the run's own orphaned processes are reaped;
 7. the new id is recorded in the `keepalive` fact;
-8. a HELD record returns to its `held-from` phase.
+8. a HELD record returns to its `held-from` phase, and one carrying `hold-run` prints the relaunch of
+   that deferred review FIRST: re-run it with identical args, which reuses every lens and skeptic
+   file it wrote and dispatches only what did not return.
 
 **The reap ordering, which used to live in the protocol's keepalive section.** A resumed session did
 not schedule the job the run-state file names and cannot assume it died with the process that did.

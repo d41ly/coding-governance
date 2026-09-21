@@ -438,6 +438,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "buildKeyedSchema",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
       "id": "buildOpts",
       "kind": "function",
       "file": "tools/workflows/orient-counterfactual.js"
@@ -1723,6 +1728,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "deriveFnv1a",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
       "id": "deriveLiveness",
       "kind": "function",
       "file": "tools/workflows/drift-audit-code.js"
@@ -1731,6 +1741,16 @@
       "id": "deriveLiveness",
       "kind": "function",
       "file": "tools/workflows/drift-audit-state.js"
+    },
+    {
+      "id": "deriveReviewKey",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveSubjectPair",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
     },
     {
       "id": "derive_ancestors",
@@ -4311,6 +4331,11 @@
       "id": "renderBlankedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderCanonical",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
     },
     {
       "id": "renderCloses",

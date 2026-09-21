@@ -56,6 +56,16 @@ marker comment, and a trailing semicolon on a bound constant declaration defeats
 that runs its own lenses. That capability is absent rather than policed, which is why the fan-out
 decision has to be made in the orchestrator.
 
+**`tier2-review.js` survives a dead fan (`TOOL-dDerivedDocket-29`).** Every lens and skeptic batch
+writes its result under `<git-common-dir>/review-lenses/<key>/` before it returns, and `path` is
+required on all three agent schemas. The key is the kind, the round, the pinned subject (the
+RESOLVED base and head for a diff review) and a print of `context`, `byDesign` and `priorFindings`.
+One probe agent reads the directory first, because the script has no filesystem, and a file is
+reused only when its own `key` field matches; a verify file also needs its batch's claim print. Any
+null agent makes the return `exit: 'deferred-platform'` with the `pending` labels and no blocker
+count, and the build harness returns that deferral instead of throwing. The drift-audit siblings
+keep the all-or-nothing fan. Nothing prunes old key directories.
+
 ## Shared seams
 
 `tools/workflows/check-review-join.sh` scans every `*.js` under `tools/` with NO marker filter, so a

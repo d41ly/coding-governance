@@ -752,6 +752,48 @@ if (!auRaw || typeof auRaw !== 'object' ||
       'token is the only thing between this harness and building on an unreviewed spec set.',
   )
 }
+// ======================== TOOL-dDerivedDocket-29 S6 — A PLATFORM DEATH IS A DEFERRAL, NOT A DEGRADED RUN
+// `tier2-review.js` returns `exit: 'deferred-platform'` whenever a lens, a skeptic batch or its
+// synthesis came back null, with `blockers: null` and the `pending` labels a re-run will dispatch.
+// Tested HERE, ahead of the clean-round test and the non-integer refusal below: that refusal read
+// the same null as DEGRADED and THREW, so a session limit killed the run and the re-run paid for
+// every lens again. Every result that did come back is on disk under the callee's review key, so the
+// remedy is cheap and it is not this script's to take - a workflow script has no clock and cannot
+// wait out a limit. The caller re-runs this workflow ONCE with identical args, and holds on a second
+// deferral. No review round is recorded: nothing was adjudicated. `roster: []`, as on every other
+// non-throwing exit, so `roster.length === 0` stays the caller's whole stop condition.
+if (auRaw.exit === 'deferred-platform') {
+  const pending = Array.isArray(auRaw.pending) ? auRaw.pending : []
+  log('audit round ' + roundNo + ': DEFERRED by the platform — ' + (pending.length ? pending.join(', ') : 'no label named') +
+    ' did not return; no round recorded, no unit built')
+  return {
+    slug: slug,
+    mode: mode,
+    base: base,
+    stage: 'Audit',
+    exit: 'deferred-platform',
+    round: roundNo,
+    pending: pending,
+    key: typeof auRaw.key === 'string' ? auRaw.key : '',
+    units: ordered.length,
+    specced: speccedCount,
+    specRefused: specRefused,
+    subjectRound: subjectRound,
+    auditIds: auditIds,
+    roster: [],
+    next:
+      'Re-run this workflow ONCE with identical args: the review reuses every lens and skeptic batch that ' +
+      'returned and dispatches only ' + (pending.length ? pending.join(', ') : 'what is missing') + '. ' +
+      (attended
+        ? 'On a second deferred-platform, stop and report it to the owner: an attended run has no driver to hold.'
+        : 'On a second deferred-platform, hold: ' + DRIVER + ' --hold ' + slug + ' --code platform-limit ' +
+          '--until "after <reset UTC>" when the Workflow result names a usage or session limit, and --code ' +
+          'platform-unavailable --until "probe api" otherwise, each with --pending-run <that Workflow runId> ' +
+          'beside the --reason and --reaped that the hold step of the unattended Skill names.'),
+    note: 'DEFERRED AT AUDIT — ' + pending.length + ' review agent(s) did not return, so the round is unrecorded and no unit was built' +
+      (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
+  }
+}
 // THE CALLEE'S EARLY RETURNS CARRY `confirmed: []` AND `blockers: null`, and they are NOT all
 // degraded (closing review round 1, cluster F). `tier2-review.js` returns that pairing on four
 // paths: every lens dead; no lens raised a finding; every finding refuted; and, with `confirmed` an
