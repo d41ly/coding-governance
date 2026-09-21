@@ -122,7 +122,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-25 — `check-arms.py` names a STRANDED prefix beside its UNARMED row and prints the whole signature, so an arm that stops short of a long message is diagnosed rather than read as absent](spec/2026-09-20-spec-TOOL-aWokenSentinel-25.md) | 25 | 2 | CLOSED | rev-3 | 2026-09-21 |
 | [TOOL-aWokenSentinel-26 — the marker region's accepting arm asserts its entry state before it runs: a committed `LANDING` record, a clean tree and HEAD advertised on `origin main`](spec/2026-09-20-spec-TOOL-aWokenSentinel-26.md) | 26 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-aWokenSentinel-27 — unit 21's leg satisfies the three meta-gates that grade a manifest leg: the `PASS` count line, the `gate-legs` dossier claim with the map re-rendered, and the `subject-pins.tsv` row](spec/2026-09-20-spec-TOOL-aWokenSentinel-27.md) | 27 | 2 | CLOSED | rev-1 | 2026-09-21 |
-| [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | CLOSED | rev-2 | 2026-09-21 |
+| [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | CLOSED | rev-3 | 2026-09-21 |
 <!-- /gen:build-units -->
 
 Records: 63 bound to this build, across 4 record folder(s).

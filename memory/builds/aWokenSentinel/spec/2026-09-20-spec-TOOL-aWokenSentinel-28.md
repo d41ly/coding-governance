@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail
 
-**Status:** CLOSED · rev-2 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 28
+**Status:** CLOSED · rev-3 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -39,7 +39,7 @@ line removed, with spec 23's near-miss beside them, and the suite arm carries al
   only thing keeping the close green. Observed by AC2.
 - **S3** — The two readings are observed RED at the pass, before the arm is committed, over the
   scratch kit dir spec 23 §4 describes, with the `echo` line and then the here-string line
-  appended to the suite copy; and GREEN with each removed. Observed by AC1.
+  spliced into the suite copy; and GREEN with each deleted from it. Observed by AC1.
 - **S4** — `FLOOR_ASSERTIONS` (the `^FLOOR_ASSERTIONS=` line of `check-unattended.test.sh`) and
   the floor of the shard the arm joins rise by the readings' executed count, `mutate` calls
   included. Observed by AC3.
@@ -84,7 +84,7 @@ miss "$(run)" "counts a captured variable's lines by adding a newline first"
 reset_tree
 cp "$HERE/unattended.test.sh" $KIT_REL/
 _lc_line="  _x=\$(wc -l <<""< \"\$_o\")"
-… the same six lines …
+… the same lines from `printf` on …
 ```
 
 The copy and the splice are spec 23's arm as it stands: the copy is `$KIT_REL/unattended.test.sh`
@@ -156,10 +156,10 @@ The fixture is spec 23's scratch kit dir under a short `%TEMP%` path, seeded as 
 holding the suite copy its rev-2 adds; never this worktree.
 
 - **AC1** — When the copied checker runs over the suite copy with `_x=$(echo "$_o" | wc -l)`
-  appended inside a function, it prints `UNATTENDED check <n> FAILED` with `adding a newline
+  spliced inside a function, it prints `UNATTENDED check <n> FAILED` with `adding a newline
   first` naming the copy's basename and that line, and exits 1; with `_x=$(wc -l <<< "$_o")`
-  appended instead, the same; with each line removed, no failure for that check; with
-  `read -r _y <<< "$_o"` appended, no failure for that check.
+  spliced instead, the same; with each line deleted from its copy, no failure for that check;
+  with `read -r _y <<< "$_o"` spliced, no failure for that check.
   Red when: either spelling passes, which is a branch of the predicate never seen to fail; or the
   here-string control reds, which bans every here-string rather than the counting one.
   fixture: the scratch kit dir with the suite copy.
@@ -197,6 +197,11 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-21 · S3 · AC1 · §4 · §10 · the bug-class checklist on the pass commit,
+  amendment-leaves-its-other-half-standing: rev-2 moved the design to a splice and a delete but
+  left S3, AC1 and §10 saying `appended` and `removed`, and the §4 sketch counting `the same six
+  lines`, a count the code owns; one vocabulary now, `spliced` and `deleted`, and no count. No
+  code moved; folded in the follow-up commit.
 - rev-2 · 2026-09-21 · S1 · S4 · §4 · §5 · §7 · folded at the pass before the code, from reading
   spec 23's arm at source: §4's sketch appended the staged line to the copy's END with `>>` and
   deleted it with `sed -i '$d'`, which is outside every function body and disagrees with S1 and
@@ -224,6 +229,7 @@ which is the shape this unit copies into shell. The recall probe returned
 `TOOL-dPolishedVitrine-10` (a suite whose arms went green with a variable unset — a fixture
 that never staged its break), this build's round-4 audit at the H6 paragraph, and
 `TOOL-cGradedDebt-4` (a meta-check whose staged break was a second copy appended to the file — the
-append-then-read shape S1 uses); no prior record stages these two spellings.
+write-then-read shape S1 uses, spliced rather than appended); no prior record stages these two
+spellings.
 
 Recall terms used: `staged break alternation regex predicate RED observed failing case near-miss kit gate check-unattended arm suite copy fixture`
