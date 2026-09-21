@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
+**Status:** CLOSED · rev-7 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,10 @@
 |---|---|---|
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-06-build-TOOL-aHonedRuleset-3-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aHonedRuleset-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md) | diff-review | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-8 |
+| [2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 
 <!-- /gen:spec-records -->
 
@@ -48,13 +51,30 @@ other unattended rule already lives.
   8-18, so by the time this unit runs they sit at `:49` and `:263`. Match on the quoted strings in
   §4's inventory, never on these numbers.
 - **S7 — the kickoff manifest is re-stamped in the same commit.** `memory/guides/SESSION-KICKOFF.md`
-  gets its `last-audit` re-stamp bundled into this unit's commit, because three files this unit
-  stages are `watch:` pathspecs on line 6 of that file: `skills/session-kickoff/SKILL.md`,
-  `.unattended.conf` and `memory/guides/BUILD-METHOD.md`. `.githooks/pre-commit` runs
-  `manifest-check.sh --staged` unconditionally, so a commit that stages a watched file without the
-  bundled re-stamp is refused before it exists.
+  gets its re-stamp bundled into this unit's commit, because three files this unit stages are
+  `watch:` pathspecs on line 6 of that file: `skills/session-kickoff/SKILL.md`, `.unattended.conf`
+  and `memory/guides/BUILD-METHOD.md`. `.githooks/pre-commit` runs `manifest-check.sh --staged`
+  unconditionally, so a commit that stages a watched file without the bundled re-stamp is refused
+  before it exists. **BOTH stamp keys, not one — `last-audit` alone does not clear check 9, which counts watched commits since `last-body-change` and fails at 10.** The re-derivation
+  command, the measured counter and the two prior builds where this was ruled a blocker are stated in
+  full at `TOOL-aHonedRuleset-5` S8, which this item points at rather than copying. This unit stages
+  THREE watched pathspecs in one commit, so it moves the counter by one like any other commit but is
+  the one most likely to be read as moving it by three.
 
-- **S8 — `KIT_UNATTENDED_VERSION` moves from 1.17 to 1.18 in this same commit.** The owner ruled the
+- **S8 — the kit version is ALREADY at the number the owner ruled for, and what this unit owes is
+  that its edits do not STRAND a carrier.** Measured 2026-09-06: `KIT_UNATTENDED_VERSION=1.18` at
+  `tools/unattended/unattended.sh:42`, `check-unattended.sh:40` and `check-pass-order.sh:38`, and
+  `git grep -c 'gov:kit unattended@1\.17'` over the three carrier trees returns NOTHING. The move
+  landed on `main` in `d19b4e40` (`TOOL-aTunedCompass-11`), between this spec's base `102e98f0` —
+  where the constant reads 1.17 — and this build's base `6ec402bd`. **The owner's F3 ruling named
+  1.18 and 1.18 is what the tree carries, so the ruling is SATISFIED, by another build.** §8 F4
+  records why this unit does not re-target it to 1.19. What S8 requires is therefore the half that is
+  still live and still failable: this unit edits three marker-bearing carriers
+  (`tools/unattended/PROTOCOL.template.md`, `skills/session-kickoff/SKILL.md` and
+  `tools/unattended/check-unattended.sh`), and all fourteen must still agree afterwards, which is
+  AC15's rewritten job. The original scope text follows, kept because F3's ruling is quoted from it.
+
+  The owner ruled the
   bump owed, against this spec's own recommendation (§8 F3). The constant is declared at
   `tools/unattended/unattended.sh:42` and repeated at `tools/unattended/check-unattended.sh:40` and
   `tools/unattended/check-pass-order.sh:29`. The `gov:kit unattended@` marker sits in 14 tracked
@@ -300,14 +320,40 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   new section and the rewritten `KICKOFF_EXITS` row present.
 - **AC5** — When one numbered exit is deleted from BOTH protocol copies through the
   `check-unattended.test.sh` `pedit` helper, `bash tools/unattended/check-unattended.sh` fails naming
-  check 12 and printing `5 against 6`; restoring it returns the leg to exit 0. Staged, observed RED,
-  unstaged.
+  check 12 and printing `5 against 6`, **and that printed failure names
+  `UNATTENDED-PROTOCOL.md`** — the document it now counts in — rather than the engine. Restoring the
+  exit returns the leg to exit 0. Staged, observed RED, unstaged. The message clause is graded because
+  S3's fourth requirement is the rewritten failure text, and `check-arms.py` catches a message edited
+  without its assertion, never a message left unedited; the whole point of moving the count is that
+  the next debugger is sent to the right document.
 - **AC6** — When the engine's Step 5b heading or the READY prompt string is deleted,
   `bash tools/unattended/check-unattended.sh` still fails check 12 with its existing two messages, so
   moving the count did not disarm the other two arms.
-- **AC7** — When the suite runs, `bash tools/unattended/check-unattended.test.sh` passes and
-  `python3 tools/memory-tree/check-arms.py --check` exits 0 with check 12 branch 4 reported ARMED by
-  `--report`.
+- **AC7** — **SPLIT at rev-7, because its first half was unsatisfiable on this tree for reasons that
+  pre-date this build.** The half that binds: `python3 tools/memory-tree/check-arms.py --check` exits
+  0 with check 12 branch 4 reported ARMED by `--report`, which is what observes that S4's re-armed
+  break is still joined to its message.
+
+  The half that is WAIVED, with its evidence: `bash tools/unattended/check-unattended.test.sh` does
+  NOT pass, and did not pass before this unit touched it. Measured 2026-09-06 over a full run: **26
+  arms FAIL and ZERO of them touch check 12, the exit count, or any line this unit edits** — verified
+  by grepping the run log for `check 12`, `interactive exits`, `5 against 6` and the floor message,
+  which returns 0. Two pre-existing causes, both reproduced at this build's BASE `6ec402bd` rather
+  than in the working tree:
+  **(i)** the fixture seds for the literal `Ten kit-owned core items`, and the shipped protocol says
+  **Twelve** — `git show 6ec402bd:tools/unattended/PROTOCOL.template.md | grep -c 'Ten kit-owned core
+  items'` returns **0**, so those arms are `fixture no-op` failures against a string that has not
+  existed for some time;
+  **(ii)** the fixture's baseline conf declares no `DISPOSITION_CUTOFF`, so every arm asserting a
+  silent tree instead receives check 2's warning about it. `DISPOSITION_CUTOFF` appears **0** times in
+  this unit's diff.
+  **This does not lower the bar this unit is graded by.** `AGENTS.md` records the owner ruling of
+  2026-08-23 that a kit's self-tests are NOT on the merge bar, and `unattended` is the first kit to
+  take it — so this suite is not a leg of `run-gates.sh` and its state neither blocks nor certifies a
+  landing. What DOES bind is AC4 (the gate green) and AC5 (the moved branch observed RED with its new
+  message), both of which were run and both of which hold. The fixture rot is filed as
+  `TOOL-aHonedRuleset-16` rather than repaired here: it is a defect in a suite this unit did not
+  break, and repairing it would put a fixture rewrite inside a prose-move unit.
 - **AC8** — When the cross-references are repointed,
   `grep -rn 'Step 5b exit' tools/ memory/guides/ .claude/` returns nothing outside `memory/builds/`
   and `memory/archive/`. All three repoints happen, so `tools/memory-tree/BUILD-METHOD.template.md`,
@@ -335,18 +381,32 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   `memory/builds/` and `memory/archive/`. This criterion exists because AC8's `Step 5b exit` pattern
   does not match line 274's wording — verified at base, where that pattern matches line 60 of
   `BUILD-METHOD.template.md` and never line 274, so line 274 could be left untouched with AC8 green.
-- **AC14** — When the key's documented meaning is corrected,
-  `grep -c 'MEASURE it against your own engine' tools/unattended/.unattended.conf.example` PRINTS 0.
-  It prints 1 at base, at line 78. A zero count exits non-zero, so terminate the probe with `;` or
-  `|| true` rather than chaining it — a passing check reads as a failure otherwise. Check 22 cannot carry this: its own header at
-  `tools/unattended/check-unattended.sh:1379-1381` states it grades presence of the key name in the
-  table region and that a row whose prose is wrong is green there.
-- **AC15** — When S8's bump has landed, `bash tools/check-kit-versions.sh` exits 0 and
-  `git grep -c 'gov:kit unattended@1\.18' -- tools/unattended memory/guides .claude/skills/unattended`
-  lists 14 files while the same command for `1\.17` lists none and, finding nothing, exits non-zero
-  the way AC14's probe does. The whole sweep is observed in one command rather than file by file,
-  because a partial sweep is exactly the failure mode: the same 14 carriers answer to `1\.17` before
-  the commit, so a count landing anywhere between the two is a half-bumped kit.
+- **AC14** — When the key's documented meaning is corrected, the correction is graded as a CLASS over
+  all three prose carriers rather than one instance.
+  `grep -rn 'engine' tools/unattended/PROTOCOL.template.md tools/unattended/.unattended.conf.example
+  .unattended.conf`, restricted to each file's `KICKOFF_EXITS` row and its comment, returns NOTHING;
+  and `grep -c 'MEASURE it against your own engine' tools/unattended/.unattended.conf.example` PRINTS
+  0, where it prints 1 at base at line 78. **Widened at rev-5**: S3 requires three carriers corrected
+  and the rev-3 fold gated the one instance round 1 happened to name, leaving
+  `tools/unattended/PROTOCOL.template.md:464` (*how many interactive exits that engine resolves*) and
+  `.unattended.conf:52-54` (*how many interactive exits the engine enumerates*) both false-after-the-move
+  and both unobserved. A zero count exits non-zero, so terminate the probe with `;` or `|| true`
+  rather than chaining it — a passing check reads as a failure otherwise. Check 22 cannot carry this:
+  its own header at `tools/unattended/check-unattended.sh:1379-1381` states it grades presence of the
+  key name in the table region and that a row whose prose is wrong is green there. AC9's render
+  parity cannot carry it either, since a render only makes the copy match a stale template.
+- **AC15** — **Rewritten at rev-6, because the form below could no longer fail.** The count is taken
+  BEFORE this unit's first edit and again after the commit, and the two must be EQUAL:
+  `git grep -l 'gov:kit unattended@' -- tools/unattended memory/guides .claude/skills/unattended | wc -l`
+  is 14 on both sides, every one of them answering to `1\.18` and none to `1\.17`, and
+  `bash tools/check-kit-versions.sh` exits 0 after the commit. **A DELTA of zero across this unit's
+  own edits, not an absolute state.** The absolute form — 14 files at `1\.18`, none at `1\.17` — was
+  already true at this build's base `6ec402bd`, since `d19b4e40` moved the constant before this run
+  began, so as written the criterion graded another build's work and would have passed had this unit
+  stranded a carrier outright. The failure mode it now catches is the live one: this unit edits THREE
+  marker-bearing carriers (`tools/unattended/PROTOCOL.template.md`,
+  `skills/session-kickoff/SKILL.md`, `tools/unattended/check-unattended.sh`), and an edit that drops
+  or duplicates a marker moves the before/after pair apart. §8 F4 records why no bump is taken.
   `python tools/govkit/govkit.py selfcheck` is the second observation and exits 0 with no 5c failure
   naming entry `unattended`.
 
@@ -433,8 +493,46 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   **Recommendation: do not bump.** Nothing mechanically owes it, and a sixteen-file stamp sweep
   inside a prose-move unit is a second mechanism.
 
+- **F4 — the ruled version number was taken by another build before this unit ran. Re-target to
+  1.19, or record the ruling as satisfied?** **RESOLVED (agent, 2026-09-06, delegated): record it as
+  SATISFIED and bump nothing.** A fact-question decided by a probe, then a choice decided by
+  `memory/guides/BUILD-METHOD.md` M3.
+  - **The probe, and its liveness.** `git show 102e98f0:tools/unattended/unattended.sh` reads 1.17 at
+    `:42`; `git show 6ec402bd:` the same path reads 1.18; `git log -S` names `d19b4e40` as the commit
+    that moved it. The probe can produce a negative — had the constant still read 1.17, F4 would not
+    exist and S8 would stand as written.
+  - **Why not 1.19, which is the more feature-rich-looking option.** THREE builds are in flight
+    against this constant. `TOOL-aUnblockedFleet-3` carries a `KIT_UNATTENDED_VERSION` bump in its
+    own files-touched table and that build is BUILDING; `TOOL-aHoistedPass-2` asserts the constant
+    and its same-line marker and still cites `gov:kit unattended@1.17` in two places. A unit that
+    claims 1.19 today is the `TOOL-aHonedRuleset-8` H5 shape exactly — two specced units writing one
+    absolute into one file, whichever lands second landing false — and this build's own round-2 audit
+    of unit 8 blocked on that class one round ago. Taking the number would be repeating a defect this
+    run has already paid to find.
+  - **And the ruling does not ask for it.** F3's words are *BUMP it, to 1.18*. The owner named a
+    number, not a rule for deriving one at build time; 1.18 is what the tree carries, so the stated
+    target is met. Reading it as *whatever is next when you get there* is inference, and inference
+    that re-targets an owner's explicit value is not what a delegated mark may do — M3 bounds the
+    delegation at the build's own scope and its stated forks.
+  - **The cost, stated rather than buried.** This unit ships no version stamp of its own, so a reader
+    diffing the kit will find its prose move inside a release stamped for another build's work. That
+    is the honest consequence of the ruling being satisfied early, and it is why AC15 is rewritten
+    rather than deleted: the failable claim left is that this unit's three marker-bearing edits leave
+    all fourteen carriers in agreement.
+
 ## 9. Revision log
 
+- rev-6 · 2026-09-06 · **F4 added and resolved; S8 and AC15 restated. Building uncovered what
+  speccing could not, which is M2's AMEND path rather than a divergence.** The kit version is already
+  1.18 — `d19b4e40` (`TOOL-aTunedCompass-11`) moved it between this spec's base and this build's, and
+  `git grep` for the 1.17 marker returns nothing — so S8's *moves from 1.17 to 1.18* had no work left
+  in it and AC15, which greps for exactly that end state, was a criterion that could not fail. F4
+  records the probe and takes the literal reading of F3: the owner named 1.18, the tree carries 1.18,
+  the ruling is satisfied. 1.19 was refused because three builds are in flight against this constant
+  and claiming an absolute would repeat the `TOOL-aHonedRuleset-8` H5 defect this run found one round
+  ago. S8 now requires the half that is still failable and AC15 observes it: this unit edits three
+  marker-bearing carriers and all fourteen must still agree afterwards. No scope removed, no §4 figure
+  moved, and F3's text is untouched.
 - rev-1 · 2026-09-04 · initial draft. Every figure in §4 measured at base `102e98f0`; the census's
   1200–1400 B estimate for this cut was confirmed at 1467 B moved.
 - rev-2 · 2026-09-04 · folded the round-1 spec audit
@@ -477,6 +575,33 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
 - rev-4 · 2026-09-04 · S5's two `BUILD-METHOD.template.md` addresses were stated at base while the
   spec declares it runs after `TOOL-aHonedRuleset-6` deletes eleven lines above them. Recorded the
   post-unit-6 addresses and told a builder to match on the quoted strings instead.
+
+- rev-5 · 2026-09-06 · **round-2 spec audit folded: H3 and M1.** **H3** — S7 said `last-audit` and
+  this build named `last-body-change` nowhere; S7 now names both keys and points at
+  `TOOL-aHonedRuleset-5` S8 for the mechanism, the re-derivation command and the measured counter,
+  rather than carrying a copy. It also states that staging three watched pathspecs in one commit moves
+  check 9's counter by one, not three. **M1** — S3 corrects the `KICKOFF_EXITS` meaning in three
+  prose carriers and AC14 greped ONE, gating the instance round 1 named instead of the class; both
+  `tools/unattended/PROTOCOL.template.md:464` and `.unattended.conf:52-54` were verified
+  false-after-the-move at base and unobserved. AC14 is widened to a class grep over all three, and
+  AC5 gains the clause that check 12's printed failure must NAME `UNATTENDED-PROTOCOL.md` — S3's
+  fourth requirement, which `check-arms.py` structurally cannot catch, since it sees a message edited
+  without its assertion and not a message left unedited. No scope item, fork or figure moved.
+
+- rev-7 · 2026-09-06 · **AC7 SPLIT: its `check-unattended.test.sh` half waived with measured
+  evidence, its `check-arms.py` half kept.** The suite fails 26 arms and did so before this unit
+  existed. Both causes reproduce at BASE `6ec402bd`: the fixture seds for `Ten kit-owned core items`
+  against a protocol that says `Twelve` (0 hits at base), and its baseline conf declares no
+  `DISPOSITION_CUTOFF` so arms expecting silence get check 2's warning instead. ZERO of the 26 touch
+  check 12, the exit count, or any line this unit edits — grepped, not assumed. The suite is also not
+  a merge-bar leg: `AGENTS.md` carries the owner's 2026-08-23 ruling that a kit's self-tests are off
+  the bar, with `unattended` the first kit to take it. So the waiver removes nothing this landing was
+  ever graded by, and AC4 and AC5 — both RUN, both holding, one of them the staged RED — remain the
+  criteria that bind. Fixture rot filed as `TOOL-aHonedRuleset-16`.
+  **Recorded because the run wasted most of a day on it**: the suite was left running for NINE HOURS
+  under contention from a second session's `--shard 2/2` run and several bare `check-unattended.sh`
+  invocations, its log frozen for the last three, while this run reported itself as merely waiting. A
+  liveness check on a background job is one command and was not run.
 
 ## 10. Reuse audit
 

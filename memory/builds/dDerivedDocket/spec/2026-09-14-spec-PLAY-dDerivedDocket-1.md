@@ -1,6 +1,6 @@
 # PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception
 
-**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams playbook · order 33
+**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams playbook · order 33
 
 <!-- gen:spec-records -->
 
@@ -118,7 +118,7 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
 | `AGENTS.md:70`-`:71`, the node-registry paragraph | "backlogs shard per family at `memory/backlog/<FAMILY>.md`" | asks filed per build, and the family file their generated view |
 | `AGENTS.md:36`-`:38`, the `unattended/` entry under What ships here | "a committed standing mandate it ASSERTS and cannot have written" | "a committed standing mandate, §1 Landing's one substitute" (S8) |
 | `AGENTS.md:558`-`:559`, the protocol bullet under Two protocols are BINDING | the same clause | the same replacement (S8) |
-| `AGENTS.md:581`-`:582`, the Conventions bullet on merging and pushing | "— or a committed build folder the run did not create" | "— or §1 Landing's one substitute" (S8) |
+| `AGENTS.md:575`-`:576`, the Conventions bullet on merging and pushing | "— or a committed build folder the run did not create" | "— or §1 Landing's one substitute" (S8) |
 | `memory/DECISIONS.md`, `## PLAY — playbook` | one row | a second row, this unit's |
 | `memory/guides/SESSION-KICKOFF.md` audit block | the switch-over's stamp | re-stamped |
 
@@ -347,7 +347,7 @@ selects it, so gov's region keeps the exception.
   prints 0.
   Red when: the bullet keeps "a committed build folder the run did not create" unqualified, which is
   false for every run the second anchor authorizes, this build's own prompt-mode run among them; or
-  the Conventions bullet keeps restating it, which the grep finds at `fb07ca25`'s `AGENTS.md:582`; or the
+  the Conventions bullet keeps restating it, which the grep finds at `AGENTS.md:576`; or the
   `unattended/` entry or the protocol bullet keeps "a committed standing mandate it ASSERTS and
   cannot have written", which the last grep finds at `fb07ca25`'s `AGENTS.md:38` and `:559`.
 
@@ -443,7 +443,7 @@ an observation made once in the unit pass. The bar runs once, after every unit i
   scratch fixture; §7 adds no arm, so no `New arm:` third field exists to price; and every phrase
   this unit asserts to zero was RUN against HEAD and counts non-zero there — `kit-conditional — drop
   this block` in the template, `status updated in place` in both files, `backlogs shard per family`
-  in `AGENTS.md`, `folder the run did not create` outside the rendered region at `AGENTS.md:582` and
+  in `AGENTS.md`, `folder the run did not create` outside the rendered region at `AGENTS.md:576` and
   `cannot have written` twice — so none is the already-green class. AC10's zero is a forward ban on
   words this unit must not write, not a retired phrase, and is left as it stands.
   Extended again 2026-09-20 by the closing consolidation. The capped-carrier rule tightened from a
@@ -489,6 +489,9 @@ an observation made once in the unit pass. The bar runs once, after every unit i
 - rev-5 · 2026-09-21 · order re-declared from 37 to 33 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 33, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
+- rev-6 · 2026-09-21 · §4 §6 citations re-pointed after origin/main merged into this build at
+  `663a0dec`: `AGENTS.md` fell to 578 lines and the Conventions bullet on merging and pushing now
+  sits at lines 575 and 576, not 581 and 582. The bullet's text is unchanged, so no claim moved.
 
 ## 10. Reuse audit
 

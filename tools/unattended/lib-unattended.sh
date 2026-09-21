@@ -17,6 +17,13 @@
 #
 # The lesson is not "be more careful". Two spellings of one rule is [[two-answers-to-one-question]],
 # and the fix for it is one spelling, which is this file.
+#
+# WHAT IT HOLDS: `GIT` and its two pins; `resolve_sidecar_dir`, the one derivation of the sidecar
+# root the driver and the resume tick both read; `read_bound_key`, the one reader of a bound conf
+# key both of them call; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
+# of "which node, which process" the lease writer and both pid probes share; the anchored id tests;
+# path containment; and "has this pass committed yet". The same rule admits the resume tick as a
+# third sourcer.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -43,6 +50,154 @@ GIT_PIN_GRAFTADV=advice.graftFileDeprecated=false
 # loops, which is what `is_published` now does, rather than caching a wrapper that is mostly
 # called from subshells.
 GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
+
+# THE SIDECAR ROOT, derived ONCE, HERE and nowhere else: `<git-dir>/unattended`, the WORKTREE's git
+# dir — where `gate-logs/` already lives — never the common dir, because a run lives in one
+# worktree and one sidecar per worktree is the whole point. Every reader of a sidecar file (the
+# stall log at `--liveness`, the stop log at `--landed`, the resume log in the tick) calls this
+# rather than respelling it; the driver and the tick both source this file, so a second spelling in
+# either would be two answers to one question, and the kit gate counts the literal on exactly one
+# code line across the three. An empty answer is a DEAD PROBE for the caller, never a path composed
+# from an empty root — the caller refuses, it does not default. Moved from the driver, where unit 2
+# defined it, by TOOL-aWokenSentinel-20; the body is unit 2's, unchanged.
+resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir cannot be derived
+  local g; g=$(GIT rev-parse --git-dir 2>/dev/null) || g=""
+  [ -n "$g" ] || return 1
+  printf '%s/unattended\n' "$g"
+}
+
+# ------------------------------------------------------------------------------ bounds, once
+# MOVED from the driver by TOOL-aWokenSentinel-5, body unchanged: the resume tick reads its two
+# knobs through this function, and the driver its four, so it lives where both source it. THE
+# CALLING-SHELL CONTRACT, on the function line and ASSERTED by its first line (TOOL-aWokenSentinel-18):
+# `${!name}` reads the calling shell, and the NOTE interpolates `$CONF`, so a caller that named no
+# conf would be handed a default announced with nowhere to change it — `Declare one in  to change
+# it`, the empty path — or, under `set -u`, a shell error naming neither contract nor remedy. That
+# is a refusal here, in the one function every caller shares, so the next script that sources this
+# library from an unsourced shell refuses on its first run instead of taking the defaults silently.
+# A BOUND KEY: DEFAULTED, VALIDATED, AND ANNOUNCED. TOOL-aBoundedCeiling-6, hoisted at its second
+# instance by TOOL-aProbedUnit-3 — the charter's section 12 extracts the shared contract when the
+# second caller arrives, and the third (`REVIEW_ROUNDS`) is a call, never a third `case`.
+#
+# A conf that declares nothing still gets a bound, because the population that produced the observed
+# 3h19m hang is exactly the one that never edits this key. What it does NOT get is silence: the line
+# below says which number is in force and where it came from, so a defaulted pin is never invisible.
+#
+# A malformed value is a REFUSAL rather than a silent fallback. "0" would mean no bound at all to
+# `timeout`, so accepting junk and coercing it would unbound the one project whose declaration was
+# wrong -- the failure landing on whoever tried hardest to configure it.
+#
+# <UNIT> is an argument because a caller may count rounds rather than seconds, and a refusal that
+# says `seconds` about a round count is a false sentence. No `fail` branch here: this runs before
+# `fail()` exists and refuses with exit 2, the misconfiguration code, exactly as the block it replaces.
+read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the conf into THIS shell and named it in CONF
+  [ -n "${CONF:-}" ] && [ -f "$CONF" ] || {
+    echo "unattended: REFUSING - read_bound_key was called with CONF unset or naming no file, so its NOTE could name nowhere to declare the key and a default would be taken from nowhere; set CONF to the sourced conf before the call" >&2
+    RUNLOG_CLEAN=1; exit 2; }
+  local _bk_name="$1" _bk_default="$2" _bk_unit="$3" _bk_note="$4" _bk_val
+  _bk_val="${!_bk_name:-}"
+  case "$_bk_val" in
+    "") printf -v "$_bk_name" '%s' "$_bk_default"
+        echo "unattended: NOTE - this project declares no $_bk_name, so $_bk_note. Declare one in $CONF to change it." >&2 ;;
+    *[!0-9]*|0)
+        echo "unattended: REFUSING - $_bk_name is declared as '$_bk_val', which is not a positive integer of $_bk_unit. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
+        RUNLOG_CLEAN=1; exit 2 ;;
+  esac
+}
+
+# --------------------------------------------------------------------------- processes, once
+# THE LEASE NAMES A PROCESS, NOT A NUMBER (TOOL-aWokenSentinel-5, folding the closing review's id 2).
+# A pid alone proves that SOME process holds the number: a reboot mid-run — a recorded event on
+# this fleet — recycles it to whatever the owner starts next, and a run branch checked out on a
+# second node carries the first node's pid into the second's process table. So the lease records
+# the node and the image beside the pid, and the aliveness probe matches all it was given — the
+# image, and the lease's own UTC as a bound the holder's start time may not pass. Four functions,
+# in the library because the driver WRITES the facts and the resume tick READS the launched pid
+# back through the same probe; a spelling in each would be two answers to one question.
+
+# THE NODE, one spelling: `COMPUTERNAME` where Windows sets it, `hostname` elsewhere, LOWERCASED
+# because the two disagree on case for one machine (measured on node `a`, 2026-09-21: `COMPUTERNAME`
+# upper, `hostname` lower). Empty when neither answers; the caller records `absent` for that.
+read_host_name() { # -> the node's name, lowercased, or nothing
+  local h="${COMPUTERNAME:-}"
+  [ -n "$h" ] || h=$(hostname 2>/dev/null) || h=""
+  [ -n "$h" ] || return 1
+  printf '%s\n' "$h" | tr '[:upper:]' '[:lower:]'
+}
+
+# THE IMAGE HOLDING A PID. Prints the image name and returns 0 when a process holds the pid; 1 when
+# none does; 2 when the probe could not look — an absent or non-numeric pid, a missing tool, a tool
+# that exited non-zero — because a tool that answered nothing is not a `no`. Under MSYS the probe is
+# `tasklist` and its OUTPUT decides: MEASURED on node `a`, 2026-09-16, it exits 0 for a live pid AND
+# for a dead one (printing `INFO: No tasks are running`), so the exit code decides nothing; and
+# `kill -0` on a live Windows pid reports `No such process` there, so the POSIX arm alone would read
+# every live run on this fleet as dead. The row is `<image> <pid> <session> <session#> <mem>`, and
+# the image is every field BEFORE the one equal to the pid, so an image with a space survives.
+# Elsewhere `kill -0` decides existence and `ps -o comm=` names the image, UNVERIFIED (no registered
+# node is POSIX).
+read_pid_image() { # pid -> image on stdout; 0 held · 1 no such process · 2 the probe answered nothing
+  local pid="$1" out img
+  case "$pid" in ""|absent|*[!0-9]*) return 2 ;; esac
+  case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*)
+      command -v tasklist >/dev/null 2>&1 || return 2
+      out=$(tasklist //FI "PID eq $pid" //NH 2>/dev/null) || return 2
+      img=$(printf '%s\n' "$out" | tr -s '\r\t ' '   ' | awk -v p="$pid" '{ for (i = 2; i <= NF; i++) if ($i == p) { s = $1; for (j = 2; j < i; j++) s = s " " $j; print s; exit } }')
+      [ -n "$img" ] || return 1
+      printf '%s\n' "$img" ;;
+    *)
+      kill -0 "$pid" 2>/dev/null || return 1
+      img=$(ps -o comm= -p "$pid" 2>/dev/null | sed 's/^ *//; s/ *$//'); printf '%s\n' "${img:-unknown}" ;;
+  esac
+}
+
+# WHEN THE HOLDER OF A PID STARTED, as a UTC stamp at second precision. Under MSYS a PowerShell
+# `Get-CimInstance Win32_Process` read (`wmic` is gone from this fleet's Windows 11; `Get-Process`
+# hands back a null `StartTime` for a process it cannot open, `System` included), invariant `s`
+# format so no culture's time separator leaks in; MEASURED on node `a`, 2026-09-21: 300-450 ms a
+# call, and a pid nothing holds prints nothing. Elsewhere `ps -o lstart=` re-read by `date -u`,
+# UNVERIFIED (no registered node is POSIX). Returns 2 and prints nothing when the probe answered
+# nothing, because a start time nobody read is not a start time.
+read_pid_start() { # pid -> the holder's start as a UTC stamp on stdout; 0 read · 2 the probe answered nothing
+  local pid="$1" out=""
+  case "$pid" in ""|absent|*[!0-9]*) return 2 ;; esac
+  case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*)
+      command -v powershell.exe >/dev/null 2>&1 || return 2
+      out=$(powershell.exe -NoProfile -NonInteractive -Command "(Get-CimInstance Win32_Process -Filter 'ProcessId=$pid').CreationDate.ToUniversalTime().ToString('s')" </dev/null 2>/dev/null | tr -d '\r')
+      [ -z "$out" ] || out="${out}Z" ;;
+    *)
+      out=$(ps -o lstart= -p "$pid" 2>/dev/null) && [ -n "$out" ] && out=$(date -u -d "$out" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null) ;;
+  esac
+  case "$out" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z) printf '%s\n' "$out" ;;
+    *) return 2 ;;
+  esac
+}
+
+# DOES THE RECORDED PID EXIST, AND IS IT THE RECORDED PROCESS. `yes`, `no` or `unknown`: `unknown`
+# when the probe could not look; `no` when nothing holds the pid, OR when something does and the
+# recorded image does not match it — the recycled-pid case, and a tree kill aimed there lands on the
+# owner's new interactive session, an IDE, or `explorer.exe` and every child — OR when the holder
+# STARTED AFTER the stamp the caller recorded it under (the closing review's round 2, defect E): a
+# same-image recycle — a second `claude.exe` on a node whose job is running them, a second
+# `bash.exe` on a bash-heavy one — passes the image and fails this, because the process that wrote
+# a lease, or that a launch recorded, existed before the stamp, and any later holder of its number
+# started after it. An image of `absent` or none at all matches anything, and so does an absent
+# stamp: a lease written before either was recorded, or by a harness whose pid the probe could not
+# see, keeps the pid-only reading it always had, and the header says so rather than pretending that
+# lease is guarded. A start time the probe cannot read keeps the image reading — the compare is
+# additive, never a `no` manufactured from a dead probe. Existence is not progress: a hung process
+# is `yes`. MOVED from the driver by TOOL-aWokenSentinel-5's fold of the closing review; the pid half
+# is unit 2's, unchanged in its verdicts.
+check_pid_alive() { # pid · [image] · [not-after-utc] -> yes | no | unknown
+  local img rc st
+  img=$(read_pid_image "$1"); rc=$?
+  case "$rc" in 2) echo unknown; return 0 ;; 1) echo no; return 0 ;; esac
+  case "${2:-}" in ""|absent|"$img") ;; *) echo no; return 0 ;; esac
+  case "${3:-}" in ""|absent) ;; *) if st=$(read_pid_start "$1") && [ "$st" \> "$3" ]; then echo no; return 0; fi ;; esac
+  echo yes
+}
 
 # ------------------------------------------------------------------------------- ids, anchored
 # An id compared as a SUBSTRING joins `-1` to `-10`, and the joined pair is always the wrong one:
@@ -177,17 +332,41 @@ scan_shared_index_overlaps() { # shared-records · generated-indexes -> the over
 # construction, which is what keeps a post-hoc `--brief` from excusing a stray write. Selected on
 # the whole field with both separators, so `-1` is not a prefix of `-10`; parsed with
 # `check-brief-recorded.sh`'s own expansions, so a grammar change breaks every reader the same way.
-# The blob lands in a VARIABLE and the loop reads the variable through a heredoc: a substitution in
-# the heredoc body is the class `pass_commit` deadlocked on.
+# A FILE, NEVER A COMMAND SUBSTITUTION, for the reason `pass_commit`'s header states in full twenty
+# lines below. The blob used to land in a VARIABLE the loop then read through a heredoc, and the
+# variable was assigned from `$(GIT show …)`: a substitution reads until EOF, EOF arrives when the
+# LAST inherited write end closes, and `GIT` is a shell FUNCTION — so the substitution forks a
+# subshell which forks `git`, and the reader waits on a grandchild's write end. Same class, same
+# file, one function apart. `pass_commit` calls this once per commit in its window, so `--dispatch`
+# on this build's run inherited it a hundred-odd times per row and stopped completing at all: four
+# runs died without writing a row, the last on a one-hour bound at 11350 s. The walk therefore runs
+# in the CURRENT shell with its stdout redirected to a scratch file and the loop reads that file by
+# redirect. No pipe exists, so no EOF has to arrive.
+# `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` is the class. TOOL-cMendedVintage-12.
+#
+# WHY THE GATE DID NOT SEE IT, which is the half worth carrying: the `shell hygiene` leg refuses a
+# loop fed by a substitution repo-wide, and this loop was fed by a heredoc over a VARIABLE assigned
+# from one on the line above. The predicate did not follow the assignment, so the instance sat in
+# the blind spot of the check written to catch it. That predicate now follows one assignment.
+#
+# A SCRATCH FILE THAT CANNOT BE CREATED IS A NAMED REFUSAL, `pass_commit`'s rule for its reason: an
+# empty answer here MEANS "this pass declared no brief paths", which is a legitimate and common
+# state, so a broken TMPDIR answered with silence would read as a correct answer and forgive a write
+# nothing declared. The stderr line is the only thing that makes it visible.
 read_brief_paths() {  # commit · unit · run-state-path
-  _rb_run=$(GIT show "$1:$3" 2>/dev/null || true)
-  while IFS= read -r _rb_r; do
+  _rb_f=$(mktemp) || { printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
+  GIT show "$1:$3" >"$_rb_f" 2>/dev/null || :
+  # THE `|| [ -n … ]` REPLACES A GUARANTEE THE HEREDOC GAVE FREE. Command substitution stripped the
+  # trailing newlines and the heredoc put exactly one back, so every line was terminated; a FILE may
+  # end without one, and a bare `read` drops that last line. Without this the repair would silently
+  # return a smaller path set than the shape it replaced — which is the one way this change could
+  # move a disjointness verdict while claiming to fix a stall.
+  while IFS= read -r _rb_r || [ -n "$_rb_r" ]; do
     case "$_rb_r" in *" brief · item $2 · reason "*) ;; *) continue ;; esac
     _rb_r=${_rb_r#* · reason }; _rb_r=${_rb_r#* }
     normpath "$_rb_r"; printf '\n'
-  done <<RBP
-$_rb_run
-RBP
+  done <"$_rb_f"
+  rm -f "$_rb_f"
 }
 
 # ------------------------------------------------------------- has this pass committed yet, once

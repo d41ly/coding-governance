@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling · order 1 · ratified 2026-09-04
+**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 1 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,10 @@
 |---|---|---|
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
+| [2026-09-06-build-TOOL-aHonedRuleset-6-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aHonedRuleset-6-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
+| [2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md) | diff-review | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-8 |
+| [2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
 
 <!-- /gen:spec-records -->
 
@@ -25,14 +28,21 @@ have.
 Three items, all selected by the §8 F1 ruling and none of them conditional on anything.
 
 - **S1** — delete lines 8 through 18 of `tools/memory-tree/BUILD-METHOD.template.md`, the whole
-  budget passage: the `**Budget: ≤24 KB, ≤350 lines**` declaration and its reason, the three raises
+  budget passage, **AND the two sentences elsewhere in the file that only made sense while it stood**
+  — M3's `M1's own budget included` clause and M7's `It is capped so this stays cheap`. Added at
+  rev-6, found by the M6 bug-class checklist on the build commit rather than by re-reading: leaving a
+  document asserting a cap it no longer declares is `amendment-leaves-its-other-half-standing`, and
+  completing the deletion is doing S1 rather than diverging from it. Neither removal relocates
+  anything or writes a replacement pointer. The passage itself is: the `**Budget: ≤24 KB, ≤350 lines**` declaration and its reason, the three raises
   and the argument for each, the `**The BYTE half binds first**` sentence, and the
   `No gate enforces the pair` admission. Nothing is relocated and no replacement pointer is written.
 - **S2** — re-render `memory/guides/BUILD-METHOD.md` from the edited template in the same commit,
   via the kit's own render path rather than by hand-editing the copy.
-- **S3** — `memory/guides/SESSION-KICKOFF.md` gets its `last-audit` re-stamp bundled into the same
-  commit, §B re-verified first. S2 stages `memory/guides/BUILD-METHOD.md`, which is the tenth
-  `watch:` entry on line 6 of that manifest, so the obligation fires on this commit.
+- **S3** — `memory/guides/SESSION-KICKOFF.md` gets its re-stamp bundled into the same commit, §B
+  re-verified first. S2 stages `memory/guides/BUILD-METHOD.md`, which is the tenth `watch:` entry on
+  line 6 of that manifest, so the obligation fires on this commit. **BOTH stamp keys, not one — `last-audit` alone does not clear check 9, which counts watched commits since `last-body-change` and fails at 10.** The re-derivation command, the measured counter and the two prior builds
+  where this was ruled a blocker are stated in full at `TOOL-aHonedRuleset-5` S8, which this item
+  points at rather than copying.
 
 ## 3. Non-goals (OUT)
 
@@ -210,15 +220,22 @@ because the product of this ruling is that nothing measures this file.
 - **AC6** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs, check 6 passes on the
   re-rendered `memory/guides/BUILD-METHOD.md`.
 - **AC7** — When `wc -c tools/memory-tree/BUILD-METHOD.template.md` is run after the cut it reports
-  23463, exactly 1101 below the base measurement of 24564, and `wc -l` reports 306 against a base of
-  317. Both are exact rather than a floor, because one branch now exists and its recovery is the
-  measured weight of the deleted passage.
+  **23403**, exactly 1161 below the base measurement of 24564, and `wc -l` reports **306** against a
+  base of 317 — the LINE count is unchanged by S1's second half, because both sentences were removed
+  from within lines rather than as lines. Both are exact rather than a floor, because one branch now exists and its recovery is
+  the measured weight of what is deleted. **The figures moved at rev-6 with S1's second half**: the
+  budget passage alone is 1101 bytes over 11 lines and was observed at exactly 23463 / 306 before the
+  two dangling sentences went, which is what rev-5 recorded and what a reader comparing revisions
+  should expect to see. Only the BYTE figure moved. Updating the criterion in the same pass as the code is the point — fixing the
+  file and leaving the number is the same class the checklist just caught, one level up.
 - **AC8** — When `grep -n 'No gate enforces the pair' tools/memory-tree/BUILD-METHOD.template.md`
   runs it returns no hit, and `grep -n 'Budget:'` on the same file returns no hit either. Both halves
   of the claim are gone, not one.
-- **AC9** — When `bash skills/session-kickoff/manifest-check.sh` runs after the commit, it exits 0,
-  proving the S3 `last-audit` re-stamp landed in the same commit as `memory/guides/BUILD-METHOD.md`,
-  the watched pathspec this unit stages.
+- **AC9** — When `bash skills/session-kickoff/manifest-check.sh` runs after the commit, it exits 0
+  **with no check-9 failure**, proving the S3 re-stamp landed in the same commit as
+  `memory/guides/BUILD-METHOD.md`, the watched pathspec this unit stages, and that S3's both-keys
+  clause was honoured. Check 9 is excluded from the staged pre-commit leg, so this unstaged run is
+  where it binds.
 
 ## 7. Gates
 
@@ -344,6 +361,25 @@ at half the size, and the file's own measurement says the line half never binds.
 - rev-4 · 2026-09-04 · restored the measured premise under F2's MOOT mark. Inserting the mark
   had deleted the three sentences establishing that no seam could enforce `≤350 lines`, while the
   mark itself claimed the analysis was kept — found by the ratification verify pass.
+
+- rev-5 · 2026-09-06 · **round-2 spec audit folded: H3, the set-wide finding, and nothing else** —
+  no finding in that round addressed this spec's own text, and its four absence-asserting criteria
+  survived the audit unchanged. S3 said `last-audit`, and `grep -rn last-body-change` over the whole
+  build returned zero. S3 now names both keys and points at `TOOL-aHonedRuleset-5` S8 for the
+  mechanism, the re-derivation command and the measured counter; AC9 gains the explicit no-check-9-
+  failure clause, since check 9 is excluded from the staged pre-commit leg and this unstaged run is
+  the only place in this unit where it binds.
+
+- rev-6 · 2026-09-06 · **S1 gains its second half and AC7 its new figures, both from the M6
+  bug-class checklist run on this unit's own build commit.** The checklist selected
+  `amendment-leaves-its-other-half-standing` and the class was live: with the budget passage deleted,
+  M3 still read "the delegation does not reach veto 2's governance-carrier clause, M1's own budget
+  included" and M7 still read "**This file, whole.** It is capped so this stays cheap" — two sentences
+  asserting a cap the file no longer declares. Both removed, the guide re-rendered, and AC7's exact
+  byte figure moved 23463 to 23403 in the same pass (the line count is unchanged at 306, since both
+  sentences came out from within lines), because fixing the file and leaving the
+  criterion is that same class one level up. §3's ban on giving the template a ceiling elsewhere is
+  untouched and nothing was relocated: this is the deletion finished, not widened.
 
 ## 10. Reuse audit
 

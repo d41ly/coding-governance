@@ -108,11 +108,14 @@ def load_conf(root: pathlib.Path) -> dict[str, str]:
         k = k.strip().removeprefix("export ").strip()
         v = v.strip().strip("\r")
         # Bash sourcing semantics for the restricted grammar the conf documents: a quoted value
-        # keeps everything inside the quotes; an UNQUOTED value ends at whitespace, so a trailing
-        # inline comment cannot leak into it. Both rules are `map_lib.load_conf`'s and both were
-        # missing here — see the docstring.
-        if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
-            v = v[1:-1]
+        # is the text up to its MATCHING quote, whatever follows it; an UNQUOTED value ends at
+        # whitespace, so a trailing inline comment cannot leak into it. Both rules are
+        # `map_lib.load_conf`'s and both were missing here — see the docstring. The quoted rule
+        # first tested whether the value's first and last characters matched, so
+        # `KEY="v"  # note` kept its quotes (TOOL-dLoggedFlight-13, closing review round 2 R2-L5).
+        close = v.find(v[0], 1) if v[:1] in ("'", '"') else -1
+        if close >= 0:
+            v = v[1:close]
         else:
             v = v.split()[0] if v.split() else ""
         conf[k] = v
@@ -1881,6 +1884,265 @@ def build_backlog_stragglers(ctx) -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------------
+# Signal — run records left non-terminal after their build merged (TOOL-dLoggedFlight-13)
+#
+# THE HALF NOBODY READ. An unattended run's record keeps saying LANDING or BUILDING long after its
+# work reached the default branch, so "did it land?" cannot be answered from the record, and every
+# later run's concurrency report carries the stale ones as though they were live. When this signal
+# was specced, several tracked records did exactly that and had been found by accident.
+#
+# REPORT-ONLY, because nobody is at fault. A sanctioned worktree landing moves the default branch
+# past a run's witness before any verb can stamp the record terminal, so a gate here would red every
+# bar on every node the moment such a landing merged. The project layer's pin makes a RISE visible in
+# the table instead.
+#
+# WHAT IT COUNTS, from the record at HEAD and never from the working tree:
+#   - its phase is not terminal;
+#   - its witness is an ancestor of the base ref;
+#   - its witness is neither equal to nor an ancestor of the record's own `base:`.
+# The third is the one that needs saying. The witness is HEAD at the last verb that writes one, and
+# `--close` writes none, so a run that went from preflight to close leaves its witness AT its base
+# even when its own commits merged. That record is UNJUDGEABLE: counted apart with its reason, never
+# scored clean and never counted, because judging it needs the run's own commits, which three git
+# calls do not read. The run model reads them.
+#
+# THREE GIT CALLS, whatever the record count: one `ls-tree` to enumerate, one `rev-list --parents`
+# of the base ref, and one `cat-file --batch` HELD OPEN, because the witnesses are only known once the
+# records it returns are read. `cat-file` flushes after every object, so one question and one answer
+# at a time cannot deadlock on a buffer. The witness-to-base order is walked on the parent graph the
+# rev-list printed: the SET of reachable commits alone cannot order two of its members.
+#
+# WHAT IT DOES NOT SEE, said here because a structural count reads as a semantic one. A refused
+# landing leaves no tracked row, so no sub-class can name one, and the detail says so on every run.
+# A shallow clone truncates the rev-list, which can drop a record from the count and never add one.
+# --------------------------------------------------------------------------------------------
+
+# The driver's own declarations, SPELLED HERE because this kit is copy-installed and must run in a
+# tree with no unattended kit. Not a second vocabulary by stealth: the self-test extracts the driver's
+# PHASES_TERMINAL, PARK_KINDS, PARK_KINDS_OWED and PARK_ACTS_OWED wherever the driver is present and
+# holds each set here to its source in both directions.
+_RUN_PHASES_TERMINAL = frozenset({"LANDED", "ABORTED"})
+_RUN_PARK_KINDS = frozenset({"decision", "abort", "override", "waiver", "proposal", "rescope",
+                             "dispatch", "review", "brief", "hold", "resume"})
+# `hold` and `resume` joined the driver's PARK_KINDS in TOOL-dDerivedDocket-5 (auto-resume from
+# HELD). Neither is owed, so a record whose last row is one reads `other`.
+_RUN_PARK_KINDS_OWED = frozenset({"decision", "abort", "override", "waiver"})
+_RUN_PARK_ACTS_OWED = frozenset({"retire", "supersede"})
+# A parked row as the driver's `park` appends it: `<utc> <kind> · item <item>[ · step <n>] · reason
+# <why>`, the timestamp in the shape the driver's own counters grep for. The act of a `rescope` row is
+# the FIRST word of its item and only the first, so an addition whose second word happens to be
+# `retire` stays an addition.
+_RUN_ROW = re.compile(r"^[0-9][0-9-]*T[0-9:]*Z ([a-z]+) \u00b7 item (\S*)")
+# SHA-SHAPED before anything resolves it, for the reason the driver's own admission check gives: the
+# run being graded authors its witness, and a witness reading `main` resolves and is an ancestor of the
+# base ref by construction.
+_RUN_SHA = re.compile(r"^[0-9a-f]{7,40}$")
+_RUN_STALE = "witness not re-written since preflight"
+_RUN_REFUSED_NOTE = ("note — a refused landing is not recorded in tracked bytes, so no sub-class here "
+                     "can name one")
+
+
+def _parse_run_record(text: str) -> dict:
+    """The three facts and the last parked row of one run-state file.
+
+    Read the way the driver's `fact` reads them: the FIRST line starting `<key>:`, one trailing CR
+    dropped, leading blanks trimmed. Split on LF alone, because `splitlines` also breaks on a lone CR
+    and on form feeds, and either would end a row early inside a reason field.
+    """
+    facts: dict = {}
+    last = None
+    for line in text.split("\n"):
+        if line.endswith("\r"):
+            line = line[:-1]
+        for key in ("phase", "witness", "base"):
+            if key not in facts and line.startswith(key + ":"):
+                facts[key] = line[len(key) + 1:].lstrip(" ")
+        row = _RUN_ROW.match(line)
+        # A row whose kind the driver does not declare is not a parked row, so it cannot be the last
+        # one. That is what makes the PARK_KINDS comparison in the self-test load-bearing.
+        if row and row.group(1) in _RUN_PARK_KINDS:
+            last = (row.group(1), row.group(2))
+    return {"phase": facts.get("phase", ""), "witness": facts.get("witness", ""),
+            "base": facts.get("base", ""), "last": last}
+
+
+def _derive_run_subclass(last) -> str:
+    """Why a counted record stopped, from its LAST parked row: the table in TOOL-dLoggedFlight-13 S3,
+    first match wins. Retirement is matched before the owed kinds because it is the more specific
+    cause."""
+    if last is None:
+        return "no-rows"
+    kind, act = last
+    if kind == "rescope" and act in _RUN_PARK_ACTS_OWED:
+        return "retired-unit"
+    if kind in _RUN_PARK_KINDS_OWED:
+        return "surfaced-park"
+    return "other"
+
+
+def _check_run_ancestor(parents: dict, older: str, newer: str) -> bool:
+    """Is `older` reachable from `newer` through the parent graph `rev-list --parents` printed?"""
+    seen, todo = set(), [newer]
+    while todo:
+        sha = todo.pop()
+        if sha == older:
+            return True
+        if sha in seen:
+            continue
+        seen.add(sha)
+        todo.extend(parents.get(sha, ()))
+    return False
+
+
+def _build_run_dead(name: str, of: int, note: str) -> dict:
+    """DEAD with the stage that could not answer named, never a clean zero."""
+    return {"signal": name, "value": 0, "of": of, "tolerance": 0, "gateable": False,
+            "live": False, "unjudgeable": 0, "detail": [note]}
+
+
+# NAMED `build_`, for the reason spelled above build_live_backlog_rows.
+def build_nonterminal_merged_runs(ctx) -> dict:
+    """Run records whose phase is still live although their witness is on the base ref."""
+    name = "run_records_nonterminal_but_merged"
+    builds = f"{ctx.memory_root}/builds/"
+
+    # CALL 1 — the population, at HEAD. Both globs the driver's own single-live check reads: the live
+    # `RUN.md` and every rotated `RUN.<phase>.<blob8>.md`, since an archive hand-edited back to a live
+    # phase is the case that check exists for.
+    listing = ctx.git.run("ls-tree", "-r", "-z", "HEAD", "--", builds)
+    if listing.returncode != 0:
+        return _build_run_dead(name, 0, "DEAD PROBE — `git ls-tree HEAD` failed, so no run record was read")
+    shape = re.compile("^" + re.escape(builds) + r"[^/]+/RUN(?:\.[^/]+)?\.md$")
+    records = []
+    for entry in listing.stdout.split("\0"):
+        meta, _, path = entry.partition("\t")
+        bits = meta.split()
+        if len(bits) >= 3 and bits[1] == "blob" and shape.match(path):
+            records.append((path, bits[2]))
+    if not records:
+        # NOT ASKED where nothing here adopts what this reads, and DEAD where something does: a repo
+        # carrying the kit's conf and no record is a repo whose population may have gone blind.
+        if not (ctx.root / ".unattended.conf").exists():
+            return _build_not_asked(name, "no tracked run-state file and no .unattended.conf at the repo "
+                                          "root; the unattended kit is not adopted")
+        return _build_run_dead(name, 0, "DEAD PROBE — .unattended.conf is present and no run-state file "
+                                        "is tracked under the build folders")
+
+    # CALL 2 — one conversation with one `cat-file --batch`: every record's blob first, then each
+    # witness and base of a live record as `<sha>^{commit}`, which also expands an abbreviation.
+    try:
+        proc = subprocess.Popen(["git", "-C", str(ctx.root), "cat-file", "--batch"],
+                                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL)
+    except OSError:
+        return _build_run_dead(name, len(records), "DEAD PROBE — `git cat-file --batch` did not start")
+
+    def read_object(spec: str):
+        proc.stdin.write(spec.encode("utf-8") + b"\n")
+        proc.stdin.flush()
+        head = proc.stdout.readline().split()
+        if len(head) != 3:
+            return None, b""                  # `<spec> missing` or `<spec> ambiguous`
+        size = int(head[2])
+        body = proc.stdout.read(size)
+        proc.stdout.read(1)                   # the LF cat-file writes after every object
+        return head[0].decode("ascii", errors="replace"), body
+
+    parsed = []
+    resolved: dict = {}
+    try:
+        for path, blob in records:
+            got, body = read_object(blob)
+            if got is None:
+                raise ValueError(path)
+            parsed.append((path, _parse_run_record(body.decode("utf-8", errors="replace"))))
+        for _path, rec in parsed:
+            if rec["phase"] in _RUN_PHASES_TERMINAL:
+                continue
+            for key in ("witness", "base"):
+                val = rec[key]
+                if val and _RUN_SHA.match(val) and val not in resolved:
+                    resolved[val] = read_object(val + "^{commit}")[0]
+        proc.stdin.close()
+        proc.stdout.close()
+        proc.wait()
+    except (OSError, ValueError):
+        proc.kill()
+        proc.wait()
+        return _build_run_dead(name, len(records), "DEAD PROBE — `git cat-file --batch` stopped "
+                                                   "answering before every record was read")
+
+    # CALL 3 — the base ref's history WITH its parent edges, which is what orders a witness against
+    # the record's own base without a git call per record.
+    walk = ctx.git.run("rev-list", "--parents", ctx.git.base_ref, "--")
+    if walk.returncode != 0 or not walk.stdout.strip():
+        return _build_run_dead(name, len(records), f"DEAD PROBE — `git rev-list {ctx.git.base_ref}` "
+                                                   "returned nothing, so no witness could be placed")
+    parents: dict = {}
+    for line in walk.stdout.split("\n"):
+        shas = line.split()
+        if shas:
+            parents[shas[0]] = shas[1:]
+
+    counted, stale, detail = 0, 0, []
+    for path, rec in parsed:
+        phase = rec["phase"]
+        if phase in _RUN_PHASES_TERMINAL:
+            continue
+        w_in, b_in = rec["witness"], rec["base"]
+        why, rel = None, "unknown"
+        # THE WITNESS IS READ FIRST: until it is placed, nothing says whether the record merged.
+        if not phase:
+            why = "no phase: fact"
+        elif not w_in:
+            why = "no witness: fact"
+        elif not _RUN_SHA.match(w_in):
+            why = "witness is not a sha"
+        elif resolved.get(w_in) is None:
+            why = "witness does not resolve in this object store"
+        else:
+            w = resolved[w_in]
+            if w not in parents:
+                continue                      # not merged: neither counted nor unjudgeable
+            b = resolved.get(b_in) if (b_in and _RUN_SHA.match(b_in)) else None
+            if not b_in:
+                why = "no base: fact"
+            elif b is None:
+                why = "base does not resolve in this object store"
+            elif b == w:
+                rel, why = "equal", _RUN_STALE
+            elif b not in parents:
+                # Not reachable from the base ref while the witness is, so the witness cannot descend
+                # from it — but whether it is BEHIND it needs the base's own history, which is outside
+                # the one walk this signal takes.
+                why = f"base is not on {ctx.git.base_ref}, so one rev-list cannot relate it to the witness"
+            elif _check_run_ancestor(parents, w, b):
+                rel, why = "behind", _RUN_STALE
+            else:
+                rel = "ahead"
+        if why:
+            stale += 1
+            detail.append(f"{path} {phase or '-'} {w_in[:8] or '-'} {rel} unjudgeable — {why}")
+            continue
+        counted += 1
+        detail.append(f"{path} {phase} {w_in[:8]} {rel} {_derive_run_subclass(rec['last'])}")
+    detail.append(_RUN_REFUSED_NOTE)
+    return {
+        "signal": name,
+        "value": counted,
+        "of": len(records),
+        "tolerance": 0,
+        # REPORT ONLY — see the head of this section. `--check` never reads a report-only signal.
+        "gateable": False,
+        # LIVE over the population the value is drawn from: every tracked record was read above, and
+        # an empty population returned NOT ASKED or DEAD before reaching this line.
+        "live": bool(parsed),
+        "unjudgeable": stale,
+        "detail": detail,
+    }
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
@@ -1889,7 +2151,8 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_readme_mechanism_drift,
            build_backlog_rows_outliving_specs,
            build_source_cited_ids_with_no_record,
-           build_backlog_stragglers]
+           build_backlog_stragglers,
+           build_nonterminal_merged_runs]
 
 
 # --------------------------------------------------------------------------------------------

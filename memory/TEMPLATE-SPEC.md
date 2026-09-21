@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.78 -->
+<!-- gov:kit memory-tree@2.82 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -192,6 +192,19 @@ requirement rather than only a reading rule — and the heading precondition is 
 Tier-1 accommodation, so the only spec this can red is one that wrote a Gates section and named no
 leg in it.
 
+Once a spec's filename date reaches `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`; blank turns it
+off), the leg line must also name every leg in `tools/gate-legs.json` whose `guard` any
+backticked path under §4 `### Files touched (estimate)` trips — the exact path, or anything under
+the guard as a directory; a directory token of two or more segments declares everything under it
+and trips symmetrically, while a one-segment root such as `tools/` is prose and declares nothing.
+The join reads the ESTIMATE as written and the leg's guard pathspecs, nothing else: a path named in
+prose outside that sub-head is not read, a spec with no Gates heading is not joined, and a BROAD
+guard — one carried by more legs than the checker's floor, as the printed set shows (a rule that
+owes a shared guard's every leg per spec is obeyed by paste) — is excluded, the set printed with
+its counts on every run. The hit names the leg and the path together, `<leg> <- <path>`, and a
+waiver row must carry that whole token. The checker is a repo-root tool of the shipping repo; an
+adopter receives this paragraph and the blank key in the example conf.
+
 **Where a new arm lives.** When a unit adds or moves a gate arm, §7 carries one line per arm:
 
 ```
@@ -298,7 +311,9 @@ Or the single word `none`. Rules: the §3 section above this skeleton.
 
 The mechanism: data shapes, contracts, flows. Use the canonical ### sub-heads (Data model ·
 Inventory · Migration · Rollout · Files touched (estimate) · Alternatives rejected) as needed.
-Review corrections fold in here; bump the header rev and log it in §9.
+The backticked paths under `### Files touched (estimate)` are machine-read: each is joined to the
+gate manifest's guards, and a guarded leg they trip is owed on the §7 leg line (the §7 section
+above this skeleton). Review corrections fold in here; bump the header rev and log it in §9.
 
 ## 5. Production-readiness checklist
 
@@ -378,7 +393,8 @@ carries no fields at all — the common case. Nothing grades these lines.
 The named gate legs this unit must keep green, plus any new gate it adds. Put the names on a
 line of their own carrying nothing but backticked names and separators — that line is what the
 leg join reads, and from `SPEC_LEGLINE_CUTOFF` onward a spec with this heading must have one.
-Add `New arm: <suite path> · <what stages its failing case> · <floor to move, or none>` per arm
+From `SPEC_GUARD_LEGS_CUTOFF` onward that line must also name every leg whose manifest `guard`
+a path under §4 `### Files touched (estimate)` trips. Add `New arm: <suite path> · <what stages its failing case> · <floor to move, or none>` per arm
 this unit adds or moves. The rules are the §7 section above this skeleton.
 
 ## 8. Open questions

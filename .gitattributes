@@ -120,6 +120,9 @@ skills/session-kickoff/SKILL.md text eol=lf
 # core.autocrlf smudged every unpinned path on the way out.
 tools/hooks/*.js text eol=lf
 tools/workflows/*.js text eol=lf
+# The unattended kit's hooks and their shared module, pinned for the same reason as the two lines
+# above: they run under node from a settings.json command, and the index already holds them LF.
+tools/unattended/*.js text eol=lf
 
 # codebase-map determinism (this repo dogfoods the kit). The gate's freshness leg BYTE-COMPARES the
 # generated artifacts against a fresh LF render, so an unpinned generated file on a Windows checkout
@@ -214,3 +217,19 @@ tools/run-gates/*.txt text eol=lf
 # process-monitor kit (TOOL-aReapedSpinner-6): the shell and the conf are execution-sensitive.
 tools/process-monitor/*.sh text eol=lf
 .process-monitor.conf text eol=lf
+
+# runlog kit (TOOL-dLoggedFlight-1). The fixtures are journal lines whose bytes ARE the test: TAB
+# separators, LF terminators, and one file whose final line deliberately has no LF. A CRLF
+# smudge would turn every fixture line into one the reader refuses for its unescaped CR.
+tools/runlog/*.py text eol=lf
+tools/runlog/fixtures/* text eol=lf
+# The redaction table (TOOL-dLoggedFlight-5) is read with a TAB split, and the kit's scan of its own
+# files reads bytes. The loader tolerates a CRLF checkout; this pin keeps gov's own copy from needing it.
+tools/runlog/*.tsv text eol=lf
+# The runlog Skill (TOOL-dLoggedFlight-12), pinned for the reason the three rendered Skills above are:
+# `adopt-runlog.sh --check` byte-compares the rendered copy against a fresh LF render. It strips CR
+# from the working copy first, so the pin keeps the committed bytes deterministic rather than holding
+# the leg up. The template is pinned beside it, since the adopter reads it and the kit's self-test
+# renders from it independently.
+.claude/skills/runlog/SKILL.md text eol=lf
+tools/runlog/SKILL.template.md text eol=lf

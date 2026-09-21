@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.78 -->
+<!-- gov:kit memory-tree@2.82 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -145,6 +145,9 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
   one TAB-separated row per `(citing-file, cited-path)`. Shrink-only against `DEAD_PATH_PIN`.
 - **`unarmed-branches.txt`** — `fail` branches no assertion reaches (the harness meta-gate below).
   Shrink-only, and EMPTY is its working state rather than its retirement.
+- **`substitution-fed-loops.txt`** — the sites `gate-lint`'s shell scan grades, shipped by that kit
+  as an EMPTY seed the repo then owns. Rows are this tree's own; gov's would name paths you do not
+  have.
 - `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
   `guides/BUILD-METHOD.md`, one `<path> · <why>` row each, read by
   `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit
@@ -168,12 +171,12 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a
    build folder only `README.md RUN.md prompts/ spec/ build/ reviews/` plus loose
    recording-named `.md`; non-md only in `build/`. `RUN.md` is the UNATTENDED run-state file: one
-   generated region plus an authored one, present only while a run is or was live. It is capped by
-   rule 6, exempt from rule 7 (the standing mandate is verbatim prose), and deliberately OUTSIDE
-   rule 8 — a run phase is not a slot status, and no token in that vocabulary means "built and
-   reviewed, not yet landed". Under `BACKLOG_MODE=builds` a `BACKLOG.md` is admitted at a build
-   root too, including in a folder that holds nothing else; under `shards` it is a stray file and
-   is named.
+   generated region plus an authored one, present only while a run is or was live. It is in NO size
+   check — see rule 6 — and deliberately OUTSIDE rule 8, because a run phase is not a slot status
+   and no token in that vocabulary means "built and reviewed, not yet landed". The RETIRED form
+   `RUN.<PHASE>.<8 hex>.md` is admitted here by grammar and IS capped by rule 6. Under
+   `BACKLOG_MODE=builds` a `BACKLOG.md` is admitted at a build root too, including in a folder that
+   holds nothing else; under `shards` it is a stray file and is named.
 5. **recording-file naming** — files under the four subfolders, AT ANY DEPTH, match
    `<date>-<kind>[-<FAMILY>]-<slug>-<seq>[-<unit-tail>].md`. The kind comes from the SUBFOLDER, not
    from the file's immediate parent — `spec/units/x.md` is a spec. The family is the closed
@@ -195,9 +198,11 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    proxy for the byte cap beside it. There is no longer a SUMMED read-path budget behind these:
    `READ_PATH_CEILING` was retired in 2.42, and these per-class caps ARE the bound a guide has.
    Entry-budget exempt (check 7's `ex7`) — a
-   guide is prose, not index rows. `builds/*/RUN.md` is a ROW document on both counts: it is designed
-   to GROW, so the cap is the bound the protocol spills against (oldest parked entries move to the
-   build's own `build/` folder as a dated recording).
+   guide is prose, not index rows. A LIVE `builds/*/RUN.md` is exempt from this rule BY CLASS: it is
+   append-only by construction, the driver writes a row per verb and removes none, so no compliant
+   state exists and the remedy this rule names is unreachable while the record is still being read.
+   The class is the RESERVED NAME, which rule 4 lets only the run-state file hold, and retirement is
+   a rename — so the frozen `RUN.<PHASE>.<8 hex>.md` stays capped and keeps the `ex7` exemption.
 
    **A row class may retire its line axis, and this repo has.** `TOOL-aRelaxedShard-1` declares
    `INDEX_CAP_LINES=0` after the owner ratified it, reversing what `TOOL-aWidenedGuide-1` refused. It

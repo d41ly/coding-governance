@@ -56,3 +56,5 @@ tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"tools/lexicon/lexicon-layer
 tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"scripts/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
 tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"path": "scripts/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
 tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"source": "tools/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
+tools/govkit/matrix.py	1	+ "[[files]]" + NL + 'include = ["moved.template.txt"]' + NL	fixture literal: the arm WRITES this name into a scratch descriptor it builds, so no reader follows it to a deleted file
+tools/govkit/matrix.py	1	_aged_rr = {"kept.txt": ROLE_V2, "moved.txt": ROLE_V2, "moved.template.txt": "<<BODY>>" + NL}	fixture literal: the same scratch name, as the aged receipt the role-move arm grades

@@ -2,7 +2,7 @@
 
 ```toml
 feature = "spec-tokens"
-title = "Five joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, and hold a hands-off edge to the sibling it names"
+title = "Six joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, owe a guarded leg its name, and hold a hands-off edge to the sibling it names"
 status = "shipped"
 streams = ["tooling"]
 decisions = []
@@ -46,8 +46,9 @@ an exact tracked path, because a bare word is prose. Citations are SCOPED to a t
 the house style cites a kit file by basename and most citations therefore name nothing `git ls-files`
 holds. Redding those is a disposition per row and the lint never lands; passing them silently is a
 could-not-fail arm over much of the corpus. So they are skipped AND COUNTED, and the count prints on
-every run. The fourth join, `bar`, reads the legs and paths populations rather than minting one. The
-fifth, `handoff`, is the one that mints a fourth population of its own.
+every run. The fourth join, `bar`, reads the legs and paths populations rather than minting one; the
+fifth, `guards`, reads the legs population plus one of its own, the declared write set. The sixth,
+`handoff`, mints a fifth population of its own, the payloads of a spec's hands-off bullets.
 
 **A bar or a suite is not an acceptance observation (TOOL-aDeferredBar-2).** The `bar` join reds a
 live spec dated at or after `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf`, blank = off) whose acceptance
@@ -71,6 +72,35 @@ line and listed by `--list` as `NEAR`, so that zero is announced rather than sil
 now finds the acceptance section by heading text, the read the Gates section already had, so a
 light-profile spec is graded where its criteria sit.
 
+**A path a spec declares it will touch owes the legs it trips (TOOL-aBlindedTrial-8).** The `guards`
+join reads every backticked path-shaped token under a live spec's §4 `### Files touched` sub-head,
+spelled with or without ` (estimate)`, and joins each to every `guard` list in `tools/gate-legs.json`
+with git-pathspec semantics: the exact path, or anything under the guard as a directory, never a
+bare prefix. A leg whose guard the write set trips must be a name on the §7 leg line, in a spec dated
+at or after `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`, blank = off; the same commit-date relation
+as `SPEC_DIRECT_CUTOFF`, asserted by one helper for both keys). The measured case: unit 4 of the
+aBlindedTrial build edited `tools/hooks/scratch-guard.js` and omitted `scratch-guard self-test`, and
+closing review round 1 found it as F7 where no gate did. BROAD guards are excluded from the join and
+listed by `--list` as `NEAR`, and broad is BREADTH: a guard carried by more than `BROAD_LEG_FLOOR`
+legs (a file constant of the checker; a guard listed twice in one row is one leg), whatever its
+depth — a guard many legs share adds nothing when named and buries the specific one. The set the
+floor excludes is derived and printed with its per-guard counts on the guards line of every run,
+never typed in prose (the closing review of units 7/8, R1 and R11: the first cut split on depth,
+which joined `tools/lib/` and excluded `.githooks/`). A directory token of two or more segments
+under the sub-head is a declared PREFIX and trips symmetrically — a guard it equals or sits under,
+and a guard under it, an exact-file guard included (R3); a one-segment ROOT (`tools/`) is how prose
+names a tree, declares nothing, and is listed as NEAR so the skip has a name (round 2, R1). A spec
+with no Gates heading is not joined and is counted, not examined, its tripping paths listed as
+NEAR — the legline arm's own precondition (R4, round 2 R8). The hit token is the composite
+`<leg> <- <path>`, one per missing leg naming the first path
+that trips it, so a `[leg]` waiver row keyed on the bare leg name cannot swallow it. The join reads
+the ESTIMATE as written, not the write set the build made, and reads no path named in prose outside
+the sub-head. The report carries a `guards join` line on every run: declared paths examined in how
+many graded specs, pre-cutoff carriers of a missing leg counted and not graded, specs with no
+sub-head counted apart, no-Gates declarers counted apart, and the excluded broad set with counts. On
+the landing day the graded figures read zero by the relation, and the carriers are the announced
+skip.
+
 **A hands-off edge is a promise, and the sibling has to name what it was promised
 (TOOL-dDerivedDocket-37).** The `handoff` join reds a live spec dated at or after
 `SPEC_HANDOFF_CUTOFF` (`.memory-tree.conf`, blank = off) whose `**hands-off**` bullet, in the
@@ -89,7 +119,7 @@ graded at all: measured over the adopting build, grading them produced twelve mi
 one. Absence is not disagreement — a target naming no live spec in the build is terminal or Tier-1,
 and a source whose H1 carries no uid has no key to report a hit under — so both are skipped AND
 COUNTED on the report line, which prints its bullet, token and silent counts whether the arm is on
-or off. Like its two dated siblings the key is a RELATION and not a constant, re-derived at the
+or off. Like its three dated siblings the key is a RELATION and not a constant, re-derived at the
 build commit and again at landing, so it grades zero tracked specs on its landing day.
 
 **Terminal specs are outside the population by construction.** This repo cites a landed decision

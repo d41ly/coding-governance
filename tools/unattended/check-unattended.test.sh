@@ -109,6 +109,7 @@ HALT_CODES_EXTRA=""
 HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
 HOLD_CODES_EXTRA=""
 HOLD_FLOOR="${HDFLOOR_OVERRIDE:-$HOLD_FLOOR_DERIVED}"
+UNDECLARED_WRITE_CEILING="${UWC_OVERRIDE:-0}"
 EOF
 }
 
@@ -1148,12 +1149,48 @@ sed -i "/Ready — say go/d" skills/session-kickoff/SKILL.md
 hit "$(run)" "the kickoff engine no longer carries the READY prompt string, so the DEFAULT stop is gone and every attended kickoff would run on unasked"
 
 # ...an exit dropped from the enumeration: the count is the only thing that notices a run silently
-# regaining a place to stop.
+# regaining a place to stop. TOOL-aHonedRuleset-3 MOVED that enumeration out of the engine and into
+# the contract, so the break is staged in the PROTOCOL PAIR -- template and installed copy, the way
+# pedit does it below -- and no longer in the synthetic engine fixture, which does not carry the
+# exits any more. `mutate` fails loudly on a no-op, so an arm that stopped reaching its subject
+# reports as a broken fixture rather than as a passing check.
 git checkout -q -- skills/session-kickoff/SKILL.md
-sed -i '/^4\. \*\*Step 2/d' skills/session-kickoff/SKILL.md
+mutate $KIT_REL/PROTOCOL.template.md '/^4\. \*\*Step 2/d'
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^4\. \*\*Step 2/d'
 out=$(run)
-hit "$out" "the kickoff engine enumerates fewer interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop"
+hit "$out" "the installed protocol enumerates fewer of the kickoff engine's interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop"
 hit "$out" "5 against 6"
+
+# ...and the floor declared with no installed protocol to count in. Without this arm the move above
+# turns a missing contract into a zero count, which reads exactly like a dropped exit.
+#
+# NOT `reset_tree` HERE. PRISTINE is pinned long before this section's own fixture commit (the
+# synthetic engine plus KICKOFF_ENGINE/KICKOFF_EXITS, committed above), so resetting to it does
+# not clean the tree -- it DESTROYS the fixture, check 12 is then skipped for want of a declared
+# engine, and every arm below reads green while testing nothing. `checkout -- .` keeps the commit.
+git checkout -q -- .
+rm -f memory/guides/UNATTENDED-PROTOCOL.md
+hit "$(run)" "KICKOFF_EXITS declares a floor on the kickoff engine's interactive exits, which now live in the installed protocol, and there is no protocol at"
+# Put the deleted half BACK. Check 10 compares the protocol pair unconditionally and returns 2 on
+# a missing half, so leaving it deleted makes every later run() emit and the blank-engine arm
+# below -- which asserts byte-empty output -- could never pass for the right reason.
+git checkout -q -- memory/guides/UNATTENDED-PROTOCOL.md
+
+# ...and the protocol present but carrying NO section 13. The count is declared section-scoped, so a
+# protocol without that heading must refuse by name rather than count zero and read as six dropped.
+mutate memory/guides/UNATTENDED-PROTOCOL.md 's/^## 13[.] /## 13x /'
+hit "$(run)" "KICKOFF_EXITS declares a floor counted in section 13 of the installed protocol, and there is no section 13 heading in"
+git checkout -q -- memory/guides/UNATTENDED-PROTOCOL.md
+
+# ...an exit dropped from a `**Step ` item OUTSIDE section 13 must NOT satisfy the floor. The
+# count is declared section-scoped in three places; before this arm it ran over the whole file,
+# so one such item anywhere could mask a real drop from section 13.
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^## 12[.] /a 9. **Step X** -- a decoy outside section 13.'
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^4\. \*\*Step 2/d'
+out=$(run)
+hit "$out" "the installed protocol enumerates fewer of the kickoff engine's interactive exits than the floor"
+hit "$out" "5 against 6"
+git checkout -q -- memory/guides/UNATTENDED-PROTOCOL.md
 
 # ...and a declared engine that is not there. Without this the whole check is skipped by a typo.
 git checkout -q -- skills/session-kickoff/SKILL.md
@@ -1944,6 +1981,108 @@ _bm31 "$_c31_route"
 _mkskill "$_c31_route"
 mkdir -p "$_c31_dir" && : > "$_c31_route"
 miss "$(GOV_UNATTENDED_REPORT=1 run)" "check 31"
+reset_tree
+
+# ---- 32 (TOOL-aWokenSentinel-11): the kit holds ONE derivation of the sidecar root, on a CODE
+# ---- line of the library, and the driver reads every sidecar through it. The fixture's driver and
+# ---- library are copies of the shipped pair, so the pristine tree counts one spelling in the lib,
+# ---- none in the driver and one caller, and the arms below move exactly one of those three.
+# ---- The break is the shape the spec-audit finding named: a second `$(GIT rev-parse --git-dir)`
+# ---- spelled inline inside `verb_status`, which is where one spec of that build had put it.
+# ---- The arm carries the ENTIRE literal signature up to the first interpolation plus the count
+# ---- the refusal prints, so it reads the refusal's number and not only its sentence.
+reset_tree
+mutate $KIT_REL/unattended.sh '/^verb_status() {/a\  _x=$(GIT rev-parse --git-dir)/unattended'
+hit "$(run)" "the kit must hold ONE derivation of the sidecar root — resolve_sidecar_dir, in lib-unattended.sh — and the driver must read every sidecar through it; a second 'rev-parse --git-dir' on a code line of the driver, the lib or the tick is a second spelling that drifts from the first, and zero is a reader with no derivation. code-line count: 2"
+# ...the NEAR-MISS, and it is a control on the predicate rather than a second break: the same line
+# as a COMMENT is not a spelling, because the driver's idiom is a prose header beside every function
+# and a header that names the rule is right. The check's own header says a commented-out second
+# derivation passes until the edit that uncomments it, and this arm is that sentence, observed.
+reset_tree
+mutate $KIT_REL/unattended.sh '/^verb_status() {/a\  # _x=$(GIT rev-parse --git-dir)/unattended'
+miss "$(run)" "check 32"
+# ...and ZERO CALLERS is the other direction of the same refusal: a derivation nothing calls is a
+# function that exists for the grep. The one call site is deleted and the count the refusal prints
+# is read, so an `at most one` predicate — which would pass this copy — cannot pass this arm.
+reset_tree
+mutate $KIT_REL/unattended.sh '/^[^#]*\$(resolve_sidecar_dir)/d'
+hit "$(run)" "driver callers: 0"
+reset_tree
+
+# ---- 33 (TOOL-aWokenSentinel-23): no shell file in the kit counts a captured variable's lines by
+# ---- adding a newline before the count. The fixture's kit holds no suite, so the arm copies the
+# ---- DRIVER SUITE in — the file the instance lived in, and the one the check's own population must
+# ---- read where KIT_SH does not — and stages the banned count inside a function body. THE STAGED
+# ---- LINE IS ASSEMBLED FROM FRAGMENTS: the command word split and the variable joined at run time,
+# ---- written to a file and spliced in by sed's `r`, so this suite never carries the banned bytes
+# ---- contiguously on a code line and the checker's by-name exclusion of this file is a second guard
+# ---- rather than the only one. (A quoted heredoc would put those exact bytes on a code line the
+# ---- `^[^#]*` predicate matches, and sed's `a` processes escapes, so `\n` in the text would become a
+# ---- newline — `r` copies the file verbatim.) The arm carries the ENTIRE literal signature up to
+# ---- the first interpolation, and reads the file the refusal names.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_cmd="pri""ntf"; _lc_var='"$_o"'
+_lc_line="  _x=\$($_lc_cmd '%s\\n' $_lc_var | wc -l)"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+out=$(run)
+hit "$out" "a shell file in this kit counts a captured variable's lines by adding a newline first — printf '%s\n', echo or a here-string into wc -l — which reads an EMPTY capture as one line, so an assertion on the count passes on a command that wrote nothing; count with printf '%s' \"\$x\" | grep -c '' instead, which reads empty as 0. hits: unattended.test.sh:"
+hit "$out" "UNATTENDED check 33 FAILED"
+# ...the NEAR-MISS, a control on the predicate rather than a second break: the same count WITHOUT the
+# added newline is the driver's own idiom — it counts embedded newlines and reads an empty capture
+# as 0 — and the check's header says it is not a hit. This arm is that sentence,
+# observed; without it the arm above is equally consistent with a ban on every `| wc -l`.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_line="  _x=\$($_lc_cmd '%s' $_lc_var | wc -l)"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+miss "$(run)" "check 33"
+# ...and the RESTORED copy: the shipped driver suite, unmodified, in the population. This is the
+# reading that says spec 17's `grep -c ''` fold actually landed — a suite still carrying the
+# instance would red here, on every bar, naming its own line.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+miss "$(run)" "check 33"
+reset_tree
+# ---- 33, THE OTHER TWO SPELLINGS (TOOL-aWokenSentinel-28): the predicate has three branches and the
+# ---- arm above stages only `printf '%s\n'`. The `echo` spelling shares the first group and the
+# ---- here-string is a separate top-level alternation with the variable AFTER `wc -l`, so a
+# ---- mis-escaped `<<<` branch passed every reading above. Each is staged here by the same
+# ---- fragment-assembled splice, read RED naming the copy's basename AND line, then DELETED from
+# ---- that copy by a second `mutate` and read GREEN — a fresh copy would be the restored reading
+# ---- above, and would not say the red was this line. `_lc_at` is the line the splice lands on.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_at=$(( $(grep -n '^check_status_one_line() {' $KIT_REL/unattended.test.sh | cut -d: -f1) + 1 ))
+_lc_cmd="ec""ho"
+_lc_line="  _x=\$($_lc_cmd \"\$_o\" | wc -l)"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+out=$(run)
+hit "$out" "counts a captured variable's lines by adding a newline first"
+hit "$out" "hits: unattended.test.sh:$_lc_at:"
+mutate $KIT_REL/unattended.test.sh '/^check_status_one_line() {/{n;d;}'
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
+# ...the HERE-STRING, the second top-level alternation. `<<""<` joins to `<<<` at run time.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_line="  _x=\$(wc -l <<""< \"\$_o\")"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+out=$(run)
+hit "$out" "counts a captured variable's lines by adding a newline first"
+hit "$out" "hits: unattended.test.sh:$_lc_at:"
+mutate $KIT_REL/unattended.test.sh '/^check_status_one_line() {/{n;d;}'
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
+# ...and the here-string CONTROL: a here-string that is not a count. Without it the arm above is
+# equally consistent with a `<<<` branch escaped so loosely it bans every here-string in the kit.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+printf '%s\n' '  read -r _y <<< "$_o"' > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
 reset_tree
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
@@ -2922,14 +3061,14 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # ...and a pass that commits OUTSIDE it is the disjointness proof failing where it can be checked
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # ---- THE WIDENING REPAIR, AND THE POST-HOC REWRITE THAT WEARS ITS CLOTHES (closing review F3/F4).
 # ---- `--dispatch`'s widening supersedes an OPEN pass's row and parks the replacement AT THE SAME
@@ -2949,7 +3088,7 @@ reset_tree
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # B: ...and the superseding row is still GRADED. Without this arm the fix above is indistinguishable
 # from switching the check off for any pass that ever re-declared, which is a larger hole.
@@ -2957,7 +3096,7 @@ reset_tree
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # C: THE POST-HOC REWRITE. Narrow row, the offending commit, THEN a widened row at a later anchor.
 # The finding must survive: a declaration cannot be rewritten to cover a write already made. The
@@ -2967,7 +3106,7 @@ drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 drow ARCH-tRun-1 "work/one.txt work/stray.txt"
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # D: SEVERAL PASSES OF ONE UNIT are legal — M6 defines five pass kinds and a unit may be dispatched
 # once per kind. Each row governs its own pass. Folding them together graded pass one's commit
@@ -2979,7 +3118,7 @@ git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
 printf 'b\n' > work/build.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # E: ...and the SECOND pass is graded too. The fold left it unlooked-at entirely, so a stray write in
 # pass two exited 0 — the same fixture as D with one extra file, and the difference is the point.
@@ -2990,7 +3129,7 @@ git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
 printf 'b\n' > work/build.txt && printf 'x\n' > work/STRAY.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # F: BOTH IDS IN ONE DISPATCH GROUP, which is the whole of this arm and is what the first two
 # versions of it missed. The ambiguity loop only pairs siblings sharing an anchor, so a fixture that
@@ -3010,7 +3149,7 @@ mkdir -p work && printf 'b\n' > work/ten.txt
 git add -A && git commit -q -m "ARCH-tRun-10 builds its lane" --no-verify
 out=$(run)
 miss "$out" "unattended: check 23 — one commit names two passes of the same dispatch group"
-miss "$out" "unattended: check 23 —"
+miss "$out" "check 23 FAILED"
 # ...and the positive control, so this arm cannot pass by finding nothing: ONE commit that genuinely
 # names both passes IS ambiguous, and the refusal must fire.
 reset_tree
@@ -3024,7 +3163,7 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # ---- THE NO-COMMIT CASE IS SPLIT. A pass that produced no change commits nothing and that is legal;
 # ---- the same silence with the declared paths MOVED is the join being dodged.
@@ -3032,7 +3171,7 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit "$out" "no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
@@ -3066,7 +3205,7 @@ mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 printf 'folded\n' > work/later.txt
 git add -A && git commit -q -m "ARCH-tRun-1 folds a review fix" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
 # ---- default run must still print nothing.
@@ -3075,7 +3214,7 @@ out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit "$out" "this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
 out=$(run)
 miss "$out" "check 23 skipped"
-miss "$out" "unattended: check 23 —"
+miss "$out" "check 23 FAILED"
 
 reset_tree
 printf '\n2026-08-21T00:00:00Z dispatch · item deadbeef ARCH-tRun-1 · reason work/one.txt\n' >> memory/builds/tRun/RUN.md
@@ -3095,14 +3234,14 @@ reset_tree
 drow ARCH-tRun-1 "work/sub/"
 mkdir -p work/sub && printf 'a\n' > work/sub/x.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 # ...and the positive control on the same shape, so the arm cannot pass by the check being silent:
 # a commit genuinely outside the declared lane still reports.
 reset_tree
 drow ARCH-tRun-1 "work/sub/"
 mkdir -p work/sub && printf 'a\n' > work/sub/x.txt && printf 'b\n' > work/elsewhere.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # ---- THE BRIEF ROW'S PATH LEAVES THE POPULATION (TOOL-aLeakedHandle-7, TOOL-aRatifiedRulings-2).
 # ---- `--brief` stages only the run-state file and the brief is already tracked, so the pass's one
@@ -3124,7 +3263,7 @@ mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && print
 printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
   "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "check 23 excluded $BRIEF for ARCH-tRun-1 in memory/builds/tRun/RUN.md"
 # B: ...and a stray file beside it still reports, minus the brief. The exclusion is the one path.
 reset_tree
@@ -3163,7 +3302,7 @@ mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && print
 printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s ./%s\n' \
   "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 # F: THE BOOKKEEPING COMMIT IS NOT THE PASS COMMIT (closing diff review, finding 7). The ordinary
 # shape: `--brief` requires the brief tracked and stages the run-state file, so the run commits
 # `{brief, brief row}` first, naming the unit, and the pass's real commit follows. With the brief
@@ -3180,17 +3319,61 @@ printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
 
-# ---- THE COMPARISON NEVER FAILS THE LEG (spec 23 S1 / AC9). Both halves, because a check that is
-# ---- silent AND exits 0 is indistinguishable from one that is working, and that is the shape this
-# ---- whole mechanism spent four rounds in. The fixture is the one that produced a finding above.
+# ---- THE COMPARISON NOW FAILS THE LEG, ABOVE ITS CEILING (TOOL-cMendedVintage-14). This arm used
+# ---- to assert the opposite - spec 23 S1 / AC9 pinned "reports without failing" - and that pin is
+# ---- SUPERSEDED rather than deleted quietly, because it is the whole of what the ruling changed:
+# ---- a comparison that can only report is a declaration enforced in one direction. The fixture is
+# ---- the one that produced a finding above, graded against the adopter's ceiling of 0.
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(run); rc=$?
-same "check 23 reports without failing the leg, exit code" "$rc" "0"
-hit  "$out" "unattended: check 23 — a dispatched pass committed a path outside"
-miss "$out" "FAILED"
+same "check 23 fails the leg above its ceiling, exit code" "$rc" "1"
+hit  "$out" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
+hit  "$out" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+
+# ---- ...AND THE CEILING IS A CEILING. Same fixture, one instance, a pin of 1: clean. Without this
+# ---- control the arm above is satisfied by a check that reds on everything.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="1"/'
+out=$(run); rc=$?
+same "check 23 is clean at its ceiling, exit code" "$rc" "0"
+miss "$out" "check 23 FAILED"
+# ...and the per-instance detail survives on the report channel, so a green run has not gone dark.
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+
+# ---- A FALL IS ANNOUNCED, NOT RED. One instance against a pin of 2. The announcement is the only
+# ---- thing that can make the pin fall, since nothing re-stamps it.
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="2"/'
+out=$(run); rc=$?
+same "check 23 does not red on a fall, exit code" "$rc" "0"
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the undeclared-write count sits BELOW its ceiling, 1 against 2"
+reset_tree
+
+# ---- THE PIN IS MANDATORY, in the shape its three siblings already take: undeclared or malformed is
+# ---- a refusal and never a defaulted value.
+reset_tree
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING=""/'
+hit "$(run)" "UNDECLARED_WRITE_CEILING is undeclared in .unattended.conf, and with no ceiling a pass that wrote outside its declared set is reported and never graded - which is the state this ratchet exists to end"
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="several"/'
+hit "$(run)" "UNDECLARED_WRITE_CEILING is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name"
+reset_tree
+
+# ---- THE LIVENESS HALF. A ceiling above zero says instances exist; grading NO dispatched pass at
+# ---- all and then reporting zero of them is a probe that died, not a tree that is clean. The
+# ---- fixture declares no dispatch, so the loop above takes its skip branch and grades nothing.
+reset_tree
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="1"/'
+hit "$(run)" "the declared ceiling on undeclared writes is above zero while NO dispatched pass was graded at all, so the comparison below would report a reassuring zero for a probe that died rather than for a tree that is clean"
+# ...and the control: at a ceiling of 0 the same tree is clean, so the arm above is not just
+# asserting that an undeclared-dispatch fixture reds.
+reset_tree
+miss "$(run)" "check 23 FAILED"
+reset_tree
 
 # ---- check 15 (TOOL-dUnstalledConvoy-2): the ancestry half now branches on the RECORDED anchor kind.
 # ---- A `local` record is a claim about ONE clone — the protocol calls it a record of a merge rather
@@ -3289,12 +3472,14 @@ reset_tree
 # ---- carried over, because a floor inherited across a merge is a number, not a floor.
 
 # ============== TOOL-dDerivedDocket-4: the phase-read routing, the core floor, --phase ============
+# CHECKS 39 AND 40 here are the pair this unit's spec calls 32 and 33: main numbered its own 32 and
+# 33 first, and the reconcile merge kept main's numbers and moved this pair.
 # Every arm below grades a DRIVER COPY in the fixture, which is the only place the sets and the call
 # sites live. The re-stage before each edit is load-bearing for the reason the parked-kind arms
 # above already record: `reset_tree`'s `git clean -qfd` removes the copied kit, and without it the
 # sed edits nothing, the grep finds nothing, and the arm passes by finding nothing.
 
-# ---- CHECK 32, arm one: a direct read of the phase fact in a function that is neither reader.
+# ---- CHECK 39, arm one: a direct read of the phase fact in a function that is neither reader.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"; w=$(fact "$rel" witness)$|  p=$(fact "$rel" phase); w=$(fact "$rel" witness)|'
@@ -3302,7 +3487,7 @@ out=$(run)
 hit "$out" "the phase fact is read outside the two readers, or the recorded-phase allow-list disagrees with the source, so the effective phase and the recorded one can differ at a call site nobody classified"
 hit "$out" "reads the phase fact directly inside verb_status()"
 
-# ---- CHECK 32, arm two: the same read inside a function that also WRITES the phase. The exemption
+# ---- CHECK 39, arm two: the same read inside a function that also WRITES the phase. The exemption
 # ---- is a LINE and never a function, so `verb_preflight`'s rotation test is graded although the
 # ---- same function carries the `set_fact … phase RUNNING` guard the exemption covers. This is the
 # ---- one live instance at BASE, and a function-wide exemption would cover five of the ten rows.
@@ -3312,22 +3497,22 @@ mutate $KIT_REL/unattended.sh 's|^  if \[ -f "$rel" \] \&\& is_terminal "$DP_PHA
 out=$(run)
 hit "$out" "reads the phase fact directly inside verb_preflight()"
 
-# ---- CHECK 32, arm three: a `read_recorded_phase` call in a function the allow-list does not name.
+# ---- CHECK 39, arm three: a `read_recorded_phase` call in a function the allow-list does not name.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"$|  p=$(read_recorded_phase "$rel")|'
 out=$(run)
 hit "$out" "calls read_recorded_phase() inside verb_resume(), which the allow-list does not name"
 
-# ---- CHECK 32, arm four: a STALE allow-list row. A row naming a function that no longer reads the
+# ---- CHECK 39, arm four: a STALE allow-list row. A row naming a function that no longer reads the
 # ---- phase silently widens the very set it was written to narrow, so the join runs both ways.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
-mutate $KIT_REL/check-unattended.sh 's|^PHASE_RECORDED_FNS=.*|PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed ghostfn"|'
+mutate $KIT_REL/check-unattended.sh 's|^PHASE_RECORDED_FNS=.*|PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness ghostfn"|'
 out=$(run)
 hit "$out" "the allow-list names ghostfn(), which no longer calls read_recorded_phase()"
 
-# ---- CHECK 32, the CONTROL: the shipped driver and the shipped allow-list are silent. Without it
+# ---- CHECK 39, the CONTROL: the shipped driver and the shipped allow-list are silent. Without it
 # ---- every arm above could be passing because the check reds on anything at all.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
@@ -3366,11 +3551,11 @@ hit "$out" "HOLD_FLOOR is not a single integer, so the shrink-only comparison be
 # ---- parity arm keeps reading the list it already spells and a run held from BUILDING is refused
 # ---- the flagged bar and the suites. Read off the shipped driver, never off a copy of the list.
 n=$((n+1))
-c32_tail=$(sed -n 's/^PHASES_CORE="\(.*\)"/\1/p' "$HERE/unattended.sh" | grep -o 'VERIFYING.*')
-[ "$c32_tail" = "VERIFYING LANDING LANDED ABORTED" ] \
-  || { echo "FAIL the driver's phase tail from VERIFYING is [$c32_tail], which is not the list gate-guard.js spells in PHASES_ALLOW"; st=1; }
+c39_tail=$(sed -n 's/^PHASES_CORE="\(.*\)"/\1/p' "$HERE/unattended.sh" | grep -o 'VERIFYING.*')
+[ "$c39_tail" = "VERIFYING LANDING LANDED ABORTED" ] \
+  || { echo "FAIL the driver's phase tail from VERIFYING is [$c39_tail], which is not the list gate-guard.js spells in PHASES_ALLOW"; st=1; }
 
-# ---- CHECK 33: a phase another verb PRODUCES is not reachable through --phase. Dropping HELD's
+# ---- CHECK 40: a phase another verb PRODUCES is not reachable through --phase. Dropping HELD's
 # ---- guard makes one phase move write a HELD record with no held-at, hold-until, hold-code or
 # ---- held-from — a pause nothing can evaluate and --resume cannot release.
 reset_tree
@@ -3380,7 +3565,7 @@ out=$(run)
 hit "$out" "a phase another verb PRODUCES is reachable through --phase, so one phase move would write that phase with none of the facts its producer writes beside it, and the verb that releases it would have nothing to read"
 hit "$out" "HELD"
 
-# ---- ...and CHECK 33's CONTROL, for arm four's reason.
+# ---- ...and CHECK 40's CONTROL, for arm four's reason.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 out=$(run)
@@ -3396,7 +3581,7 @@ mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_CORE=.*/HOLD_CODES_CORE=""/'
 out=$(run)
 hit "$out" "the driver declares no HOLD_CODES_CORE vocabulary, so the hold verb would validate against an empty set and record a pause under any word at all"
 
-# ---- ...and check 32's own liveness refusal. A driver this leg cannot read is a population of no
+# ---- ...and check 39's own liveness refusal. A driver this leg cannot read is a population of no
 # ---- lines, and grading no lines is how a structural arm passes by finding nothing.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
@@ -4697,7 +4882,25 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- terminal block at its END - so FLOOR_SHARD_2 carries the same +40 and FLOOR_SHARD_1 is
 # ---- untouched. MEASURED by running the three blocks behind a replica of this prologue by hand,
 # ---- n 0 -> 40 and green, and red under eight staged breaks; this pass runs no suite.
-FLOOR_ASSERTIONS=633
+# ---- RAISED 422 -> 434 by TOOL-aWokenSentinel-28: the check-33 readings of the `echo` and
+# ---- here-string spellings and the here-string control execute twelve assertions (five `mutate`,
+# ---- four `hit`, three `miss`, measured by running the block alone from the sourced preamble:
+# ---- n=12 st=0), all in region two beside the check-33 `printf` arms, so FLOOR_SHARD_2 carries
+# ---- the same +12 and FLOOR_SHARD_1 is untouched.
+# ---- RAISED 416 -> 422 by TOOL-aWokenSentinel-23: the three check-33 arms execute six assertions
+# ---- (two `mutate`, two `hit`, two `miss`), all in region two beside the check-32 arms, so
+# ---- FLOOR_SHARD_2 carries the same +6 and FLOOR_SHARD_1 is untouched.
+# ---- RAISED 410 -> 416 by TOOL-aWokenSentinel-11: the three check-32 arms execute six assertions
+# ---- (three `mutate`, two `hit`, one `miss`), all in region two beside the check-31 arms, so
+# ---- FLOOR_SHARD_2 carries the same +6 and FLOOR_SHARD_1 is untouched.
+# ---- MERGED 2026-09-21 at the reconcile of origin/main into dDerivedDocket: both sides raised all
+# ---- three floors from one base - the dDerivedDocket and aWokenSentinel raise lines above - so
+# ---- each constant is base + ours + theirs. FLOOR_ASSERTIONS 410 + 223 + 24 = 657; FLOOR_SHARD_1
+# ---- 91 + 11 + 0 = 102; FLOOR_SHARD_2 319 + 212 + 24 = 555. COUNTED off the two sides' own raise
+# ---- lines, not measured through a suite run: the merge runs no suite. main's check-32 and
+# ---- check-33 arms keep main's numbers; this build's phase-routing pair, which its own spec
+# ---- calls 32 and 33, is checks 39 and 40 in the merged leg.
+FLOOR_ASSERTIONS=657
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -4723,7 +4926,7 @@ FLOOR_ASSERTIONS=633
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=102
-FLOOR_SHARD_2=531
+FLOOR_SHARD_2=555
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

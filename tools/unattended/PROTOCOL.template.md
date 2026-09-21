@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.25 -->
+<!-- gov:kit unattended@1.29 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -222,20 +222,26 @@ belonging here:
     advertised and is absent on a default-branch run, so a reader keying on it alone sees no branch
     for the protocol's primary anchor. This is the fact the `gate-guard` hook keys a live run to the
     branch a tool call is made on; a record written before it existed is keyed by fact 10 instead.
+14. **The session id** holding the run, from `CLAUDE_CODE_SESSION_ID` at `--preflight`, re-recorded
+    by `--resume --keepalive-id`, the literal `absent` where the harness exposes none. With fact 2
+    and fact 15 it is the LEASE: what an out-of-session actor binds to.
+15. **The pid** of the process holding the run, from `CLAUDE_PID`, on the same terms as fact 14.
+16. **The host**, **the pid's image** and **the lease UTC**, derived beside fact 15, each `absent`
+    where underivable: which node holds the run, which image held the pid, and since when — so a
+    foreign tick stands off, a recycled pid reads dead, and `--landed` grades no stop line older
+    than the lease.
 
-Facts 10, 11 and 12 are ABSENT on a run that did not reach the condition each records — a
-default-branch run for the first two, a run that did not abort for the third. That is legal: the
-"nothing else" clause bounds what may appear, not what must. Fact 9 is always written, and fact 13
-whenever `HEAD` names a branch at preflight; a detached preflight writes nothing there.
+Facts 10, 11 and 12 are ABSENT on a run that never reached the condition each records; the
+"nothing else" clause bounds what may appear, not what must. Fact 9 is always written, fact 13
+whenever `HEAD` names a branch at preflight. Facts 14 to 16 are always WRITTEN: `absent` is a value,
+not a missing line — no line was never asked, `absent` was asked and answered no.
 
 **A `<key>-source:` line is ADMITTED beside a fact no verb could write**, and its value states why
 none could plus what independently verifies the value. A hand-reconstructed fact carrying no such
-line sits outside the "nothing else" clause; a labelled one is inside it. The form exists because
-repairs happen — a record whose key predates the verb that would write it, or whose verb refuses a
-terminal record, is correctable only by hand — and an UNLABELLED hand edit is indistinguishable from
-a value the run earned. Nothing reads these lines and no verb writes one: the label is for the
-reader, and writing it is an owner-authorized repair rather than something a run does to its own
-history.
+line sits outside the "nothing else" clause; a labelled one is inside it. Repairs happen — a key
+that predates its verb, a verb that refuses a terminal record — and an UNLABELLED hand edit reads as
+a value the run earned. Nothing reads these lines and no verb writes one: the label is an
+owner-authorized repair, never something a run does to its own history.
 
 Facts 5-7 and 9-11 are EVIDENCE and are never read back as inputs — fact 9 emphatically so.
 
@@ -260,6 +266,14 @@ preflight they are permanently the oldest, so the rule would evict them first, a
 check grading them passes by finding nothing. Crossing the cap mid-flight reds the gates, which
 blocks `--close`, which leaves the override as the only exit: the spill exists so that never
 happens.
+
+**The run log is not this file, and nothing reads it back.** Every driver call but `--version` and
+`--plan` appends a START line and, from an EXIT trap, an END line to `runlog/driver.log` in the git
+COMMON dir: the driver's own exit code, `exit=clean` or `exit=unclean`, the refused checks and the
+phase after the verb. It is machine-local EVIDENCE as facts 5-7 are: no verb or gate branches on
+it, and a failed append prints one stderr line. `GOV_RUNLOG=0` turns it off, and
+`RUNLOG_SESSION_VARS` (§8) names the session. The committed record of a run is rendered from it by
+the Skill, never by a verb.
 
 ## 3. The phase vocabulary
 
@@ -337,9 +351,9 @@ something no machine could have checked:
 | `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures TWO things and neither is a judgement about the review's content: that a review of what shipped exists and is bound to THIS run, and that the run's own `--review` loop for the build slug reached a declared exit, with `CONVERGED` implying zero blockers. A review record is a document; a loop that never ended is a run that stopped reviewing, and only the second is readable |
 | `pieces-complete` | machine | this run produced the number of pieces its build README asked for at the pinned BASE, each joined to a record by content hash and each recording a PASS for every declared per-piece leg. SCOPED to recipe-mode runs: term zero meets it and announces the skip for any other mode, because `--close` evaluates this set for every run and an item only one mode can satisfy would block the rest of the fleet |
 | `set-checks-recorded` | machine | every set-scoped check the playbook declares recorded a PASS for THIS run's set. It reads the VERDICT and not merely its existence — a set check is a declared leg with a binary anchored verdict, unlike the prose review `closing-review-recorded` can only assert the existence of. Same mode scoping |
-| `specs-audited` | machine | every unit the generated region carries as CLOSED is named by a TRACKED record under this build whose first twelve unfenced lines carry a `**Serves:**` line of kind `spec-audit`. The id join is WHOLE-TOKEN and expands the `N..M` range the binding grammar admits: a substring join lets `TOOL-x-19` satisfy `TOOL-x-1`, and an unexpanded one blocks a unit that WAS audited. It measures that the pre-code pass left evidence; it does not read what the audit found, whether it ran at the unit's current rev, or whether a WONTDO unit was audited — a LOWER bound, safe as a refusal and useless as a certificate |
+| `specs-audited` | machine | OWED ONLY WHEN the build README at BASE declares `spec-audit: <date>`, or the project conf at BASE declares `SPEC_AUDIT_DEFAULT` and the README declares no key, which `--preflight` pins as the `spec-audit` fact; absent on both, MET with an announced `not owed` — the pre-code audit is opt-in per build (owner, 2026-09-20). When owed: every CLOSED unit in the generated region is named by a TRACKED record under this build whose first twelve unfenced lines carry a `**Serves:**` line of kind `spec-audit`, the id joined WHOLE-TOKEN with the `N..M` range form expanded. A LOWER bound: that evidence exists, not what it found, at which rev, or whether a WONTDO unit was audited — safe as a refusal, useless as a certificate |
 | `reuse-probed` | machine | a reuse probe actually RAN in this run's tree — the liveness half of `reuse-first`, whose tracked half is whatever the memory kit demands of a spec's reuse section. It reads EVERY declared probe log: `RECALL_CLI`'s query log and `MAP_CLI`'s lookup log, which are the build method's M5 pair, and the count it reports names each half. Five outcomes, three of them MET: the directive was WAIVED, and the item reports the waiver and its reason, which is what stops a waiver being silent; NEITHER CLI is declared or readable, an announced skip, because a core item no adopter without those kits could meet would block every close in their fleet; or rows are recorded, and the per-log counts ride the message. A log counts only where its own CLI is declared, so an undeclared kit's stray log is never mistaken for evidence. UNMET splits the two facts an operator must not confuse: every declared log is ABSENT, so the item cannot answer, versus a log exists and holds nothing for this tree, so the probe was not run. It is NOT a merge-bar leg and cannot be one — these logs live in the git common dir, are neither tracked nor pushed, and a leg reading them in a fresh clone could only report DEAD PROBE. What it does not observe: that the probe was run FOR this build rather than earlier in the same worktree |
-| `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
+| `keepalive-reaped` | agent-attested | the idle-wake was deleted — written by `--attest <slug> --item keepalive-reaped`, and READ BACK: checked at --landed against the stop-guard's newest listing, refused while the id is still listed, announced `unchecked` where no record exists |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one. **The value MAY carry a count** via `--value`, and then `--close` refuses unless it equals the number of `surfaced`-class parked lines — "I surfaced them" becomes "I surfaced N, and the record holds N". Still agent-attested: no machine observes a wrap-up. Omitting the count keeps the old behaviour, so an older record is not retroactively red. The overrides this same `--close` is about to write are excluded, because the DoD is evaluated before they land |
 | `asks-disposed` | machine | every mandated ask, and every ask this build filed itself, reached an end the owner can accept: derived terminal, held by this build's own `BLOCKED`/`DEFERRED` row, or `KEEP` after a CLOSED unit that `advances` it. Status is the `ASKS_CMD` witness's and never a second fold here. Term zero meets it and ANNOUNCES the skip |
 
@@ -360,43 +374,46 @@ verb refuses the pair rather than recording it. There is no waiver, no attestati
 project escape: an item the kit will not let a run override is the one item whose absence would make
 every other check decorative.
 
-## 5. The keepalive — an AGENT obligation
+## 5. The idle-wake and the keepalive — three actors
 
-The scheduling store is in-memory and session-scoped, and deleting a job removes it from that same store.
-**No script can reach it.** So the obligation splits by actor, and the split is not a convenience:
+A mechanism counts as a keepalive only where it does not share the stalled session's process, event
+loop or account: a guard that shares a variable with the thing it guards is not a guard. The
+scheduled job shares all three, so it is demoted, not fixed.
 
-**What this section does NOT say, because it said it for four kit versions and it is measured false:
-that the job dies when the agent process exits.** It may not. `TOOL-aPromptedMandate-11` records a run
-asserting exactly that about two jobs, twice, while the scheduler's own listing showed both still
-firing. Treat a job you did not schedule as ALIVE until a delete says otherwise. The consequence is
-section 5's resume rule below, and the reason the reap is an obligation rather than a formality: the
-failure mode of assuming death is a keepalive firing forever under a green `keepalive-reaped`
-attestation. A hold may owe a DURABLE restart too; `UNATTENDED-STOPS.md` carries that contract.
+**The IDLE-WAKE** is that job. The AGENT schedules it as the run's first act, before orienting, on
+every start path, and reaps it last — a run that never starts still owns it. It is recorded under
+the `keepalive` fact and attested as `keepalive-reaped`; that fact, that DoD item, `--keepalive-id`
+and the `KEEPALIVE_*` keys keep their names: each has readers. Its limits, 2026-09-13: it fires
+only while the session is idle (documented) and, owner-reported, unmeasured, stays silent while a
+background task is pending. Its prompt is `--resume --keepalive-id` with its own id, refreshing the
+lease, then `--audit`. Presume a job you did not schedule ALIVE until a delete says so
+(`TOOL-aPromptedMandate-11`: two asserted dead fired). A hold may owe a DURABLE restart too;
+`UNATTENDED-STOPS.md` carries that contract.
 
-- The **agent** schedules the keepalive as the run's **FIRST act**, before any orientation and
-  before `--preflight`, on **every** start path — and reaps it before the run reaches a terminal
-  phase. It uses the tool calls its own project layer declares — `KEEPALIVE_CREATE` and
-  `KEEPALIVE_DELETE` in `.unattended.conf`, because an adopter's harness exposes a different
-  scheduler and a kit that hardcodes one repo's spelling is wrong everywhere else.
-- **"First act" replaces "before the run leaves `PREFLIGHT`", which was this sentence for four kit
-  versions and is the weaker claim.** A run enters `PREFLIGHT` only when `--preflight` writes that
-  phase, so the old wording was satisfied by scheduling at preflight time — and two of the four start
-  paths do their longest unattended work BEFORE that instant. A prompt-authorized run orients from
-  prose, runs the research-then-test loop its `prompt`-scoped directives oblige, writes a build
-  folder and pushes a branch, all before its first verb. That stretch is where a run is most likely
-  to stall and was the one stretch nothing could wake it from.
-- **A run that never STARTS still owns the job it created.** Where a start path refuses — a `--prompt`
-  value that does not resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s
-  refusals — the agent reaps the keepalive before it stops. The store is session-scoped, so a job
-  left behind by a run that never began is orphaned in exactly the way one left by a run that ended
-  is, and there is no run-state file for a later reader to find it through.
-- The **driver** RECORDS the id the agent hands it, and later ASSERTS that a reap was recorded. It
-  never schedules and never deletes, and it labels the item agent-attested wherever it reports.
+**The KEEPALIVE** is what wakes a run from outside its own turn: the stop-guard refuses a turn end
+while the run is non-terminal, writing `stop`; the stall-recorder writes an API-error end to
+`stall`; the resume-tick, an OS-scheduled task, resumes from another process a run `--liveness`
+reads `STALE`, or `FINISHED-UNSTAMPED` with `stale: yes`, writing `resume` — three sidecar kinds
+under `<git-dir>/unattended/`. Registering the tick is the owner's, one line per OS in the kit
+README; `--check` reports it as INFO. The tick acts only on a lease the INDEX holds, on the node
+that took it.
 
-A driver verb that claimed to schedule or reap would be claiming an effect it cannot produce.
+**The actors.** The AGENT schedules and reaps the idle-wake and, on resume, runs
+`--resume <slug> --keepalive-id <id>`, re-recording the lease. The DRIVER records the lease (§2,
+facts 14 to 16), grades liveness (`--liveness`, the one predicate every reader takes), and checks
+the reap at `--landed` against the harness's own listing. The HOOKS and the TICK refuse, record
+and resume.
 
-A take-over records the new id, and a holder replacing its own job records it with
-`--replaces`, so `keepalive` names the live job the close attests.
+**The absent-owner default.** A session bound to a non-terminal run never ends its turn by asking:
+it runs `--plan` and builds the next READY unit, or aborts with a code. A resumed session never
+parks a question the protocol lets it decide: it takes the option that makes no measured observable
+worse and records why. The tick's CONTINUE payload is this rule and nothing more; its text lives
+there.
+
+**RESUME.** A take-over reaps the recorded id first, reads the result back, schedules the
+replacement and records it with `--resume --keepalive-id`; the reverse order leaves two jobs and a
+record naming neither. A holder replacing its own job records it with `--replaces`, so `keepalive`
+names the live job the close attests.
 
 ## 6. Landing
 
@@ -446,6 +463,10 @@ where this document says it may:
 | `GATE_CMD` | the full merge bar, for `gates-green` |
 | `GATE_BOUND` | the wall-clock bound, in seconds, on `GATE_CMD` and `WIRING_CHECK`. OPTIONAL: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |
 | `UNIT_STALL_BOUND` | the idle bound, in seconds, `--audit` measures a dispatched-and-open unit against: STALLED when both the newest write in the tree and the newest commit are older than it. OPTIONAL, on `GATE_BOUND`'s terms: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |
+| `RESUME_STALE_BOUND` | the bound, in seconds, `--liveness` reads a RUN as STALE past: when none of the last commit, the newest dirty write, the newest gate log and the session transcript has moved within it. OPTIONAL, on `GATE_BOUND`'s terms: absent takes the DERIVED default `GATE_BOUND + UNIT_STALL_BOUND` and says so on stderr; non-numeric or zero is a refusal; a value below that sum is accepted with a NOTE, because under it a full bar's silence reads STALE |
+| `STOP_GUARD_BLOCKS` | the cap on stop-guard blocks per run and session, kit default 6. OPTIONAL, on `GATE_BOUND`'s terms for absence: the hook says so on stderr; a malformed value ALLOWS the stop with `knob-malformed` on the sidecar line, because for a Stop hook a refusal is a block |
+| `RESUME_ATTEMPTS` | the cap on CONSECUTIVE fruitless launches per run the resume tick makes — the sidecar lines newer than the run's last move — kit default 6, then it prints `ATTEMPTS EXHAUSTED` and launches nothing. Read from the ROOT conf by the tick, so one repo has one cap. OPTIONAL, on `UNIT_STALL_BOUND`'s terms: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |
+| `RESUME_TURNS` | the `--max-turns` a resumed session gets from the resume tick, kit default 40; a run that needs more is resumed again by the next tick. Read from the ROOT conf by the tick. OPTIONAL, on `UNIT_STALL_BOUND`'s terms: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |
 | `REVIEW_ROUNDS` | the round bound a spec-audit subject — any `--review` subject that is not the build slug — takes before it exits `BOUNDED`; the build slug is the closing diff review and keeps the runaway ceiling. OPTIONAL, on `GATE_BOUND`'s terms: absent takes the kit default of 1 and says so on stderr; non-numeric or zero is a refusal, and so is a value at or above the runaway ceiling, because the ceiling would fire first and the declared bound could never be reached |
 | `WIRING_CHECK` | the non-repairing wiring check `--preflight` delegates to |
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
@@ -458,18 +479,20 @@ where this document says it may:
 | `PHASES_EXTRA` | project phase members, appended to the core set |
 | `DOD_EXTRA` | project DoD items, appended to the core set |
 | `KICKOFF_ENGINE` | the kickoff engine whose hand-back the gate reads; BLANK turns that check off |
-| `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
+| `KICKOFF_EXITS` | a shrink-only floor on the interactive exits section 13 of THIS contract enumerates |
 | `HALT_CODES_EXTRA` | project halt codes, appended to the core set |
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `HOLD_CODES_EXTRA` | project hold codes, appended to the core set |
 | `HOLD_FLOOR` | the shrink-only SIZE of the kit's core hold-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `LEASE_STALE_AFTER` | seconds a lease may go unrefreshed before a take-over; the bound is the larger of it and `GATE_BOUND`. OPTIONAL |
+| `UNDECLARED_WRITE_CEILING` | the shrink-only CEILING on dispatched passes that committed outside the set they declared before dispatch. MANDATORY: undeclared or malformed is a refusal, for the reason `CORE_FLOOR` is. The count may FALL and never RISE, and a fall is ANNOUNCED rather than red — this population is derived from history reachability, not from a file listing, so a clone that cannot reach a group anchor legitimately grades fewer rows. Lowering the pin is a hand edit; an adopter's value is 0 |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
 | `PASS_ORDER_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT predates a conforming spec reds the `pass-order history` leg. Graded on the README's `opened:` date. BLANK turns the term OFF and the leg announces it |
 | `PASS_ORDER_WAIVER` | where that leg's waiver registry lives, repo-relative. BLANK keeps `<MEMORY_ROOT>/project/pass-order-waiver.txt`; a DECLARED path must be tracked at HEAD or the leg refuses |
 | `BRIEF_RECORDED_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT carries no usable `brief · item <id>` row reds the `brief-recorded` leg — usable meaning the LAST such row's twelve-hex hash still joins to a tracked file at that same commit. Graded on the README's `opened:` date. The anchor is the build commit and NOT its first parent, unlike the sibling above: `--brief` STAGES its row, so the row lands in the same commit as the pass, and a first-parent anchor would red the CONFORMING runs. The two terms are jointly satisfiable — a spec in an earlier commit, the brief row alongside the code. Only a unit built while its run was LIVE is graded: one whose build commit carries a run-state record already in a terminal phase was built outside any run, and is announced by id and not graded, provided HEAD still carries that record's base, phase and witness and no later commit naming the unit and touching a path outside the record surface was made while a run was live, where the unit is graded instead. BLANK turns the term OFF and the leg announces it |
 | `SPEC_THIN_CUTOFF` | the date from which a CLOSED unit whose spec grades THIN — an empty scope, acceptance or gates section — blocks `build-complete`. Graded on the spec's FILENAME date, so no landed spec goes retroactively red. BLANK or absent turns the term OFF and `--close` announces that it did |
+| `SPEC_AUDIT_DEFAULT` | OPTIONAL: a YYYY-MM-DD date recording the day the project ruled audits on. Any dated value opts EVERY build in whose README declares no key, for every run whose BASE carries it; the date is a record, not a threshold, and is compared to nothing - unlike the cutoff rows above, which name the `opened:` or filename date they grade. Read at the pinned BASE by `check_authorization` beside the README key, the README key winning whatever it says, so a run cannot blank its working copy to opt out; pinned as the same `spec-audit` fact, and the preflight line names the source. Blank or absent keeps the per-build opt-in; a non-date is a refusal (fail 54), never read as absent; a BASE conf whose evaluation does not reach the end is a refusal too (fail 55), because unknown is not absent. The fan-out hook honours the same key from the WORKTREE conf, since it guards a session where the owner is present |
 | `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
 | `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. |
 | `MAP_CLI` | the repo-relative path to the codebase-map probe whose lookup log `reuse-probed` also reads — the other half of the build method's M5 pair. OPTIONAL, on exactly `RECALL_CLI`'s terms: blank or absent means that kit is not adopted, and the item announces a skip only when NEITHER is declared. |
@@ -481,6 +504,7 @@ where this document says it may:
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 | `LANDED_FACTS_CUTOFF` | from this date a landed record carries its verb's facts. Blank is off |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
+| `RUNLOG_SESSION_VARS` | the environment variable NAMES, space-separated and eight at most, whose values each run-log START records as `sess.<NAME>=` (§2); a value outside `[A-Za-z0-9_.:-]{1,128}` is written empty and flagged. OPTIONAL: blank records none |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.
@@ -508,29 +532,28 @@ act was taken. It does not prevent one.
 
 **What it closes.** Two one-command offline forgeries that used to pass every check silently: a
 rewritten remote-tracking ref, and a default-branch name supplied through the environment. Both are
-now inert rather than detected — neither value is read at all. Two more are neutralised for this
-kit's own reads and named where they sit: an object-substitution ref and a graft file, either of
-which rewrites what a sha MEANS at a perfectly honest anchor — and both are ALSO refused by their
-mere PRESENCE, because suppressing them makes only THIS kit's reads honest and binds no other tool
-reading the same objects.
+now inert rather than detected — neither value is read at all. An untracked run-state file left
+under a worktree: the resume tick reads leases from the index alone. Two more are neutralised for
+this kit's own reads and named where they sit: an object-substitution ref and a graft file, either
+of which rewrites what a sha MEANS at a perfectly honest anchor — and both are ALSO refused by
+their mere PRESENCE, because suppressing them makes only THIS kit's reads honest and binds no other
+tool reading the same objects.
 
 **What the second anchor changes here.** It opens no new class — §1 cost 4 already granted
-successor-authorization. It lowers that price to two commands and widens the leg's BASE check for
-every adopter. Neither is closed; what survives is what survived before, the leg re-run in a clone
-the run never touched.
+successor-authorization — but lowers that price to two commands and widens the leg's BASE check for
+every adopter. Neither is closed; what survives is the leg re-run in a clone the run never touched.
 
 **What it does not close, stated so no reader has to discover it.** A run that edits this kit and
-commits it — nothing binds the executing code to code an owner approved. A run that shims the
+commits it: nothing binds the executing code to code an owner approved. A run that shims the
 ordinary tools this kit calls. A run that skips the hook layer, by `--no-verify`, by pointing
 `core.hooksPath` at an empty directory, or by overriding the gate command. A run that relays through
 an endpoint it seeded, which satisfies every URL comparison with one URL and one config source. A
 run that simply never creates a run-state file, since every leg check iterates over the tracked ones.
 And a run that gets one push past all of that, after which the remote's advertisement is genuine.
-And a run that rewrites the harness child's prompt between dispatches, which the fan-out guard's
-re-read does not reach: it feeds the burst rules and the join rule and nothing else, so a second
-`agent()` carrying any prompt admits. And a run that never calls `--dispatch` or `--brief` at all,
-since both are acts a run performs rather than gates a run meets, and the history legs that grade
-them afterwards grade only what a CLOSED unit's build commit carries. And a run that stops early
+And a run that rewrites the harness child's prompt between dispatches: the fan-out guard's re-read
+feeds the burst and join rules alone, so a second `agent()` carrying any prompt admits. And a run
+that never calls `--dispatch` or `--brief`: both are acts a run performs, not gates it meets, and
+the history legs grade only what a CLOSED unit's build commit carries. And a run that stops early
 with units unbuilt, since completeness rests on `build-complete` at `--close` alone and its escape
 is a recorded `--override`.
 
@@ -664,3 +687,20 @@ and the run-state file joins the two halves.
 answer on disk, **and is DECLARED through `--dispatch`**, which makes the refusal reachable on a
 sequential pass and not only a concurrent one — a rule enforced only where two passes race misses
 every ordinary build.
+
+## 13. The kickoff engine's interactive exits
+
+Moved from the engine's Step 5b (`TOOL-aHonedRuleset-3`); the engine keeps a pointer.
+**A run that still stops at any of these is not unattended, it is stuck:**
+
+1. **Step 0 · ambiguous worktree parent** → the checkout holding the default branch; still
+   ambiguous → ABORT and record why.
+2. **Step 0 · no git anywhere** → ABORT: there is nothing to land into.
+3. **Step 1 · the STOP conditions** (foreign `MERGE_HEAD`/`UU`, a failed ff-merge, a branch violating
+   conventions) → ABORT and record the condition verbatim; continuing is how a run destroys work.
+4. **Step 2 · no manifest, offer to scaffold** → do NOT scaffold; proceed generically and park the
+   offer for the owner's wrap-up.
+5. **Step 3 · a field that cannot be derived** → park the question, options and reason; proceed on
+   the most conservative reading; ACCEPTANCE or GATES unfillable → ABORT: not Ready, and an unattended
+   run cannot split it.
+6. **Step 5 · the READY stop** → replaced by the hand-back, the ONLY replacement the mandate buys.

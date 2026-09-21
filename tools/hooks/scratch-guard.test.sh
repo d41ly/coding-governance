@@ -435,6 +435,14 @@ write_card sgtest-b1 "$SG_TOP_WT" write 'READY — none yet'
 run_card "AC2 --write card holding the sentinel only -> deny naming the card path, sentinel, /session-kickoff" 2 "any;;$SG_CARD_FIX/sgtest-b1.md;;sentinel;;/session-kickoff" 'git commit -m x' session_id=sgtest-b1 "cwd=$SG_CWD_WT"
 write_card sgtest-b1 "$SG_TOP_WT" write "$SG_READY"
 run_card "AC2 real READY line, matching tree cell -> allow, stderr EMPTY" 0 empty 'git commit -m x' session_id=sgtest-b1 "cwd=$SG_CWD_WT"
+# TOOL-cMendedVintage-16 — the same line in the charter's §16 R1 form, a markdown list item. This
+# hook is the SECOND reader of the card, and a bare-only anchor here denies the commit of a session
+# that did kick off, whatever the writer accepts. Observed RED before the widening: a deny naming
+# the sentinel. The bare arm directly above is the other half — both forms, not one.
+write_card sgtest-b2 "$SG_TOP_WT" write "- $SG_READY"
+run_card "AC2 the READY line as a §16 R1 list item -> allow, stderr EMPTY" 0 empty 'git commit -m x' session_id=sgtest-b2 "cwd=$SG_CWD_WT"
+write_card sgtest-b3 "$SG_TOP_WT" write "- READY — none yet"
+run_card "AC2 the sentinel as a list item is still the sentinel -> deny naming it" 2 "any;;$SG_CARD_FIX/sgtest-b3.md;;sentinel" 'git commit -m x' session_id=sgtest-b3 "cwd=$SG_CWD_WT"
 
 # ---- AC3: the card names tree A, the payload comes from linked worktree B through its .git FILE ---
 write_card sgtest-c1 "$SG_TOP_FIX" write "$SG_READY"
@@ -492,7 +500,11 @@ run_card "AC7 tool_use_id absent, session_id and cwd present, sentinel card -> d
 # The population is EXTRACTED from the engine file at run time, so a command the engine adds to its
 # orientation batch is fed here without anyone remembering to add an arm. The floor is PINNED at the
 # base measurement; an empty extraction is REFUSED rather than passed, the green-by-absence class.
-SG_SPAN_FLOOR=8   # measured 2026-09-14 at base c95fe32a: eight spans between `## Step 0` and `## Step 5`
+SG_SPAN_FLOOR=7   # 7 at main b7dee206 (was 8 at c95fe32a, 2026-09-14) — re-pin note below
+# RE-PINNED 8 -> 7 on 2026-09-20 (closing review of aBlindedTrial units 2–5, F7): `KICK-aReplayedCard-3`
+# restructured the engine's Steps and the count has read 7 at main b7dee206 and every commit since, so
+# this arm was red before that build opened and on `main` itself — a pre-existing red, not a lost
+# command. Re-measured on the tree it lands in, never predicted.
 extract_git_spans() { # <engine-file> → the spans, one per line; exit 1 naming the empty population
   local spans
   spans=$(awk '/^## Step 0/{f=1} /^## Step 5/{f=0} f' "$1" | grep -o '`git [^`]*`' | tr -d '`')

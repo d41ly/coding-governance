@@ -1,0 +1,252 @@
+# TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD
+
+**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 5
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-14-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-14-1-acceptance-ledger.md) | journal | — |
+| [2026-09-20-prompt-TOOL-aWokenSentinel-14-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-14-1-build-brief.md) | journal | — |
+| [2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 |
+| [2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md](../reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md) | diff-review | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 |
+| [2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round2.md](../reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round2.md) | diff-review | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+Close audit finding H6 (round 1, raw id 32): both real-driver integration arms —
+`TOOL-aWokenSentinel-3` AC11 and `TOOL-aWokenSentinel-4` AC10 — run `--liveness fx` in a `git init`
+fixture "seeded the way `adopt-unattended.test.sh`'s `seed()` builds one". That seed
+(`tools/unattended/adopt-unattended.test.sh:38` to `:80`) `git add`s one stub and never commits;
+`print_audit`'s clock block, which unit 2 moves verbatim into `read_tree_clocks`, marks
+`git log -1 --format=%ct` DEAD on the empty answer an unborn HEAD gives, and unit 2 makes a dead
+probe a `fail 52` refusal with no verdict line. The hook then reads `liveness-unreadable` and
+allows, so spec 3 AC11 ("the invocation blocks") can never go green and spec 4 AC10's `last-stall:`
+line never prints — both arms red for a reason unrelated to the hooks they test. This unit gives
+`seed()` its one commit, so every present and future borrower inherits a born HEAD, and
+left-shifts the class — a fixture built from another suite's seed inherits that seed's HEAD state —
+into `memory/gotchas/`.
+
+## 2. Scope (IN)
+
+- **S1** — `seed()` in `tools/unattended/adopt-unattended.test.sh` ends with one commit over
+  everything it staged, under null global and system git config — the kit's own seed idiom at
+  `tools/unattended/check-playbook.test.sh:33` to `:53`, hermetic against the machine's
+  `commit.gpgsign` and hooks — and a commit that fails is the seed's own refusal, printed and exit
+  2, never a silent subshell exit. The fixture's `user.email` and `user.name` are already set by
+  the function. Every arm of the adopter suite then runs over a repo whose HEAD names a commit.
+  Observed by AC1 and AC2.
+- **S2** — The adopter suite's own arms keep their assertions: none reads HEAD, none asserts an
+  empty log, and the fixture-gone arms move files the commit does not track differently. Observed
+  by AC5, at the close and not in the pass: the close's `run-unattended-gates.sh` run executes the
+  suite under the `unattended adopter e2e` row of `tools/run-gates/selftest-budgets.txt:111`, and
+  `TOOL-aWokenSentinel-19`'s floor makes its green a count.
+- **S3** — Specs 3 and 4 are folded at their rev-2 so each real-driver fixture paragraph and each
+  `fixture:` line says "seeded by `seed()`, which commits once, so HEAD is born and the driver's
+  `git log` probe is live" and cites this unit; the arms themselves are those units' to build.
+  Observed by AC3.
+- **S4** — A new class in `memory/gotchas/`, `borrowed-seed-inherits-its-head-state.md`: a fixture
+  built from another suite's seed inherits that seed's HEAD state, and a probe that reads HEAD is
+  dead on an unborn one; anchored by the paths it cites, naming its gate with the phrase check 18
+  reads, and `memory/gotchas/INDEX.md` regenerated by `gotchas.py --write` in the same commit for
+  check 17. Observed by AC4.
+
+## 3. Non-goals (OUT)
+
+- **No change to `unattended.sh`.** The dead-probe refusal is correct: a probe that answered
+  nothing must say so. The fixture is wrong, not the refusal. Unit 2's `fail 52` on a dead
+  `git log` probe is the behaviour this fixture stops triggering; that is a non-goal and not an
+  edge, because unit 2 is ordered before this unit and hands it nothing.
+- **No change to the driver suite's own seed.** `unattended.test.sh` builds its fixture with
+  commits already; it is the adopter suite's seed the hooks borrow.
+- **No content in the commit beyond what `seed()` stages.** The stub checklist, the kit copy, the
+  settings file and the conf; the commit is the act, not a fixture of its own.
+
+### Edges
+
+- **consumes-from** external — `tools/unattended/adopt-unattended.test.sh`'s `seed()` at base,
+  the function two later units borrow.
+- **hands-off** `TOOL-aWokenSentinel-3` — AC11's real-driver fixture, seeded by the committed
+  `seed()`; spec 3's fixture paragraph and `fixture:` line cite this unit at rev-2.
+- **hands-off** `TOOL-aWokenSentinel-4` — AC10's real-driver fixture, on the same terms.
+- **hands-off** `TOOL-aWokenSentinel-19` — the shrink-only `FLOOR_ASSERTIONS` on the adopter
+  suite, and the close's kit-gate run named as the observer of every arm this seed feeds.
+
+## 4. Design
+
+### The commit
+
+The last statement of `seed()`:
+
+```
+( cd "$1" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+    && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git commit -q -m seed ) \
+  || { echo "FAIL seed: the fixture commit did not land in $1"; exit 2; }
+```
+
+Null global and system config, not `--no-verify`: a nested `git init` is its own repository and
+never consults the enclosing checkout's `.git/config`, so the real tree's `core.hooksPath` cannot
+reach the fixture and the rev-2 reason for `--no-verify` misread config resolution. What DOES reach
+a fixture is the machine's GLOBAL config — `commit.gpgsign=true` on a developer's node fails the
+commit outright, and `--no-verify` covers hooks and nothing else — which is this repo's own
+`memory/gotchas/fixture-inherits-ambient-machine-state.md`, and the kit's playbook suite already
+seeds under exactly this pair at `check-playbook.test.sh:33` to `:53`. A third seed idiom in one
+kit dir is what charter §12 says to refuse at the second, so the shape is copied and the ambient
+keys it nulls are named here: every global and system key, `commit.gpgsign`, `core.hooksPath` and
+`core.autocrlf` among them; the function sets the three it needs itself at `:40` and `:41`.
+`-q` because the suite's output is its assertions; the `|| { …; exit 2; }` because a subshell that
+fails quietly leaves an unborn HEAD and every borrowing arm red for a reason it cannot name. `git
+add -A` takes what the function wrote beside what it staged; the arms that later move a fragment
+aside or delete a hook act on the working tree and the adopter's `--check` reads the working tree,
+so a tracked-versus-untracked difference changes no arm's observation.
+
+### The class, in `memory/gotchas/`
+
+Front matter `name: borrowed-seed-inherits-its-head-state`, a one-line `description`,
+`kind: class`; the body names the class, the instance — specs 3 and 4 borrowing
+`tools/unattended/adopt-unattended.test.sh`'s `seed()` for a fixture the driver's
+`git log -1 --format=%ct` probe at `tools/unattended/unattended.sh:3013` reads — and the remedy:
+a fixture that borrows a seed states the HEAD state it inherits, and a seed that a driver's clock
+will read commits once. The body names its gate in the phrase check 18 of `tools/memory-tree/gotchas.py`
+reads — `gated by` the real-driver arms of units 3 and 4, which red on an unborn HEAD — because a
+`kind: class` record that names no gate and does not say it has none reds `gotchas.py --check` at
+the close; and `memory/gotchas/INDEX.md`, the folder's render, is regenerated by `gotchas.py --write`
+in the same commit, or check 17 reds. Anchors are DERIVED from the backticked paths in the body, so
+a diff touching the adopter suite or the driver's clock block selects it.
+
+### Inventory
+
+| identifier | kind | cell |
+|---|---|---|
+| `memory/gotchas/borrowed-seed-inherits-its-head-state.md` | gotcha class | no cell; the folder's grammar |
+
+No function, key, verb or kit file is minted.
+
+### Files touched (estimate)
+
+| file | change |
+|---|---|
+| `tools/unattended/adopt-unattended.test.sh` | the commit at the end of `seed()`, under null global and system config, with its refusal |
+| `memory/gotchas/borrowed-seed-inherits-its-head-state.md` | new, naming its gate |
+| `memory/gotchas/INDEX.md` | regenerated by `gotchas.py --write` |
+
+### Alternatives rejected
+
+- **Have each borrowing arm commit after seeding.** Two copies of one line in two suites, and the
+  next borrower forgets; the seed is the one place.
+- **Have the arms assert the check-52 refusal instead.** That makes the arm observe the fixture's
+  defect rather than the hook, which is an arm about nothing.
+
+## 5. Production-readiness checklist
+
+- security — N/A; a commit inside a scratch fixture.
+- perf / scale — one `git commit` per seeded fixture, milliseconds; the adopter suite seeds a
+  handful.
+- error / empty / loading states — a commit that fails fails the seed loudly, which is the suite's
+  own refusal shape.
+- observability — `git log -1` inside any borrowed fixture answers.
+- risks — an arm in the adopter suite that silently depended on an unborn HEAD would change
+  behaviour; no criterion of this unit runs the suite, because the build-level rule forbids a suite
+  inside a pass, so the observer is the close's `run-unattended-gates.sh` run (AC5), which executes
+  every arm over the committed seed and whose green unit 19's floor makes a count. A machine with
+  `commit.gpgsign=true` globally would have failed the rev-2 commit; the null config closes it.
+- testing — §6.
+- migration — N/A.
+- user docs — none; the gotcha class.
+
+## 6. Acceptance criteria
+
+- **AC1** — When `seed()` is extracted from the adopter suite (the file §4 names) and run by hand
+  as one function over a scratch directory under a short `%TEMP%` path, `git -C <dir> log -1 --format=%ct`
+  prints one integer and exits 0; at this unit's base the same run prints nothing and exits
+  non-zero.
+  Red when: HEAD is still unborn, which is the commit line absent or failing quietly.
+  fixture: the function run by hand, as spec 3 AC15 already does; never the suite.
+- **AC2** — When the adopter's `--check` runs inside a fixture seeded by the committed `seed()`,
+  its exit and its output lines are what they are at this unit's base for the same fixture, read
+  by running `bash adopt-unattended.sh --check` once from each; `grep -c 'git commit'` over the
+  adopter suite file §4 names prints 1 and 0 at base; and `grep -c 'GIT_CONFIG_GLOBAL=/dev/null'`
+  over the same file prints at least 1 and 0 at base.
+  Red when: the commit changed what `--check` reports, which is an arm depending on tracked state;
+  or the count is 0, which is the line lost; or the commit runs under the machine's global config,
+  which is the ambient-state class.
+- **AC3** — When `grep -c 'HEAD is born'` runs over
+  `memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-3.md` and over
+  `memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-4.md`, each prints at
+  least 1.
+  Red when: a borrowing spec still describes the fixture without its HEAD state, which is the
+  class re-entering by prose.
+- **AC4** — When `python tools/memory-tree/gotchas.py --for-diff <base>..<tip>` runs over a
+  range touching the adopter suite file, its stdout names
+  `borrowed-seed-inherits-its-head-state`, the tool's report does not list the record as
+  unanchored, and `python tools/memory-tree/gotchas.py --check` exits 0 at the tip — check 17's
+  index freshness and check 18's gate sentence together.
+  Red when: the class reaches no path, which is a gotcha nobody is shown; or `--check` reds on a
+  stale `INDEX.md` or a class naming no gate, which the memory hygiene leg reds at the close for a
+  record built as rev-2 specced it.
+- **AC5** — When the close's kit-gate run executes the adopter suite over the committed seed, the
+  `unattended adopter e2e` row of that run's output reads `ok` — the row is the whole
+  observation, because the on-demand runner the kit-gate run delegates to writes each suite under
+  a `mktemp -d` its EXIT trap removes and surfaces neither a log for the suite nor its
+  `PASS (<n> assertions)` line; a suite that fails an arm or unit 19's floor exits non-zero and
+  the runner reds naming it instead of printing the row.
+  Red when: an arm that depended on an unborn HEAD now fails, or an arm was lost, which the floor
+  reads as fewer executed assertions and the runner reads as a non-zero exit.
+  permission: the suite runs at the close under the build-level rule, never in this unit's pass.
+  cost: 38 s on node `a` by the budgets row, at the close.
+
+## 7. Gates
+
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `install-prefix (shipped surface)` · `unattended kit gate`
+
+These run once at `--close`. The pass runs none of them: it verifies with the extracted `seed()`
+of AC1, the adopter's `--check` of AC2, and the greps of AC3 and AC4.
+
+New arm: none — the seed is a fixture, not an assertion; the arms it un-reds are units 3 and 4's.
+
+## 8. Open questions
+
+none
+
+## 9. Revision log
+
+- rev-4 · 2026-09-20 · AC5 · folded spec-audit round 3 M12 (raw 31), a sibling fold of spec 19
+  rev-2: AC5 read a log of the suite's run ending `PASS (<n> assertions)` that `run-selftests.sh` never
+  persists (`:492` to `:493`, `:664`), so it now reads the runner's `ok` row for the adopter suite,
+  which is what the close actually surfaces.
+- rev-3 · 2026-09-20 · S1 · S2 · S4 · §3 · §4 · §5 · AC2 · AC4 · AC5 · §10 · folded spec-audit
+  round 2: sibling agreement for the promoted `TOOL-aWokenSentinel-19` (H5, raw 5) — S2 and §5
+  name the close's kit-gate run as the observer of the suite the seed feeds, AC5 reads it from its
+  log, and §3 hands the floor off; M8 (raw 42) — the gotcha record as specced redded `gotchas.py
+  --check` 17 and 18, so the body names its gate, `INDEX.md` joins Files touched and AC4 runs
+  `--check`; M10 (raw 53) — the `--no-verify`-only commit misread config resolution and was a third
+  seed idiom, so §4 takes `check-playbook.test.sh`'s null-config shape with a loud refusal and §10
+  cites it with the ambient-state gotcha. Order 4 → 5 for unit 20's insertion.
+- rev-2 · 2026-09-20 · §3 · the `hands-off` bullet on unit 2 declared an absence, which check
+  12's edge join reads as an edge: no reciprocal in spec 2, and unit 2's `order` 2 is before
+  this unit's 4. Dropped, and the fact moved into the first non-goal. Observed by the full
+  `check-memory-hygiene.sh` run over the tree at 12513c25, where the `--staged` leg holds the
+  joins.
+- rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 1 as the
+  promotion of H6 (raw id 32).
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py "seed a fixture repository with one commit so HEAD is
+born"` ranked `seed_affordances` in the map kit and the run-gates `KITDIR`/`ROOTN` fixture seam,
+neither a git fixture seed, and reported `unscanned layers: .sh`; no existing seam fits. The seam,
+read at source: `seed()` at `tools/unattended/adopt-unattended.test.sh:38` to `:80`, which stages
+and never commits; the driver suite's own fixture, which commits and is why units 1, 2, 5, 7 and 9
+never met this; the clock probe at `tools/unattended/unattended.sh:3013` that reads HEAD; and the
+kit's two existing seed idioms the rev-2 draft did not read — `check-playbook.test.sh:33` to `:53`,
+which commits under `GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null` citing
+`memory/gotchas/fixture-inherits-ambient-machine-state.md`, and the kit-gate suite's
+`-c commit.gpgsign=false --no-verify` at `check-unattended.test.sh:446` — of which the first is
+taken, because it nulls every ambient key rather than the two somebody thought of. The
+recall probe returned `TOOL-aBoundedCeiling-12` (a killed bar's turnstile beacon, a different dead
+state), this build's audit at the H6 paragraph, and `DEPL-dRatifiedSeam-5`; no prior record names
+a borrowed seed's HEAD state, which is why the class is new.
+
+Recall terms used: `seed fixture git init unborn HEAD commit git log dead probe fail 52 liveness adopter suite borrow`

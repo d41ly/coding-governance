@@ -979,6 +979,51 @@ ck "hooks: an untracked hook announces a skip" \
 ck "hooks: a tracked-pre-commit-only adopter still exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
 cleanup
 
+# TOOL-cMendedVintage-3 — THE INSTALL PREFIX IS DERIVED, and the ROOT install was the one case the
+# derivation could not reach. The `.git` boundary walk appended `basename "$_p"` to KIT_REL BEFORE it
+# tested the PARENT for `.git`, so `$_p` was never tested as the repo root: a root install walked
+# past the repository to the filesystem root and handed every rung a prefix of directories ABOVE the
+# tree. Measured RED against base 859daa67 with these three arms — the probe path read
+# `at c/Temp/kw3/repo/hooks/`, and with the guard actually shipped the arm still printed
+# `skip — not adopted` over it. The two-segment arm is the CONTROL: it is the case every other rung
+# in the file already depends on, and the reorder had to leave it exactly where it was. It is green
+# on BOTH sides of the fix, which is what makes the other two mean something.
+newrepo
+cp "$SCRIPT" ./check-wiring.sh
+mkdir -p scripts/gov; cp "$SCRIPT" scripts/gov/check-wiring.sh
+git add -A; git commit -q -m "installs at the root and at a two-segment prefix"
+out=$(bash ./check-wiring.sh --check 2>&1)
+ck "prefix: a ROOT install probes agent-cap at 'hooks/', carrying no prefix segment" \
+   "$(printf '%s' "$out" | grep -q 'no agent-cap.js at hooks/ or' && echo 1 || echo 0)"
+out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
+ck "prefix: a two-segment install still carries both segments" \
+   "$(printf '%s' "$out" | grep -q 'no agent-cap.js at scripts/gov/hooks/ or' && echo 1 || echo 0)"
+# THE SECURITY SHAPE, which the path string on its own does not show: with the hook actually THERE, a
+# root install reported the fan-out guard as not adopted. A skip that reads as a pass, over the one
+# arm in this file where a false skip has a security shape.
+mkdir -p hooks; printf '// stub\n' > hooks/agent-cap.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+git add -A; git commit -q -m "ship agent-cap.js at the root install"
+out=$(bash ./check-wiring.sh --check 2>&1)
+ck "prefix: a ROOT install FINDS a shipped agent-cap.js instead of skipping it" \
+   "$(printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' && echo 1 || echo 0)"
+# TOOL-cMendedVintage-4 — AND THE REMEDY IT PRINTS HAS TO BE RUNNABLE WHERE IT IS PRINTED. `SMERGE`
+# used to fall back to a hardcoded `tools/` prefix, so an install at any other prefix with no merger
+# beside it handed the operator a command naming a file their tree does not contain. The two-segment
+# install is the discriminating one: the old spelling and the new differ in both directions here, so
+# the second assertion is not a restatement of the first — it reds if the literal comes back beside
+# a derived one. No merger is installed anywhere in this fixture, which is the fallback's own case.
+# That second pattern deliberately stops before the extension: spelled whole it would be a carried
+# `tools/` literal in this file's own bytes and would RAISE the install-prefix row, which the ratchet
+# cannot absorb. Truncated it still matches the dead spelling and nothing else. Do not "complete" it.
+mkdir -p scripts/gov/hooks; printf '// stub\n' > scripts/gov/hooks/agent-cap.js
+git add -A; git commit -q -m "ship agent-cap.js at the two-segment install"
+out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
+ck "prefix: the agent-cap remedy names the INSTALL PREFIX's merger" \
+   "$(printf '%s' "$out" | grep -q 'scripts/gov/settings-merge.py' && echo 1 || echo 0)"
+ck "prefix: no remedy in that install still names the dead tools/ merger" \
+   "$(printf '%s' "$out" | grep -q 'tools/settings-merge' && echo 0 || echo 1)"
+cleanup
+
 # ---- Check T: local branches that still owe a backlog relocation (TOOL-dDerivedDocket-13) -------
 # The fixture below publishes a bare origin and observes `origin/HEAD`, so an ambient
 # GOV_DEFAULT_BRANCH is machine state that changes what it measures: the inventory's own

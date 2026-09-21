@@ -1,0 +1,635 @@
+# runlog — one line grammar for run logs, and one reader for them
+
+<!-- gov:kit runlog@1.0 -->
+
+Three producers append one line per act to a machine-local journal: the unattended driver, the gate
+runner and the pre-push hook. Several consumers read those lines. This kit gives all of them ONE
+grammar, stated here and implemented once in `runlog_lib.py`, so no producer invents a format and no
+consumer re-parses one. The kit writes no journal; it is the reader and the reference writer. It also
+carries the ONE redaction table that every consumer printing or classifying free text applies, and
+the transcript extractor, which writes structural extracts to a store under the user profile and
+never into a repository, the run model, which joins every one of those sources into one account
+of one run, the committed record, the one file of that account a repository tracks, and the Skill
+an agent answers the owner's questions about a run through.
+
+## The grammar
+
+One act is one line. A line is TAB-separated fields, every field is `key=value`, and the split is on
+the FIRST `=`, so a value may carry `=` and spaces.
+
+| rule | value |
+|---|---|
+| key | `[a-z][a-z0-9_]*`, with an optional `.` suffix of `[A-Za-z0-9_]+`. An all-digit suffix is an INDEX (`fail.1`, `ref.3`); any other is a name (`sess.CLAUDE_CODE_SESSION_ID`) |
+| escaping | `\` becomes `\\`, TAB `\t`, LF `\n`, CR `\r`, and nothing else is escaped. Any other byte after a backslash is refused |
+| field 1 | `v=1`, the grammar version. A reader refuses a line whose `v` it does not know |
+| required | `v`, `t` (epoch seconds, `.` radix, at most six fraction digits), `p` (the producer) and `ev` |
+| events | `start` and `end` pair on `n`, the nonce, keyed together with `p`. `once` is an unpaired act and is never an invocation |
+| terminator | every line ends in LF. A final line without one is torn and counts as bad |
+| length | at most 2048 bytes, not counting the LF |
+| unknown keys | kept. A reader never drops a line for an extra key |
+| duplicate keys | refused, because two lines run together look exactly like that |
+
+**Truncation, for a producer that would exceed the cap.** Drop WHOLE indexed fields, highest index
+first across every family, and count each family's drops into `<base>_more`, adding to any count the
+producer already wrote. Only when no indexed field is left, cut the longest non-required value from
+its end, never inside an escape. `render_line` is the reference implementation and the self-test runs
+it; a shell producer that truncates must produce what it produces.
+
+**Pairing duty.** Every `ev=end` line's nonce has an `ev=start` line in the same file. Each producer's
+own suite asserts that over its whole journal, through `build_invocations`: an `orphan-end` is the
+failure.
+
+## Where the journals live
+
+Under `runlog/` in the git COMMON dir: `driver.log`, `gates.log` and `pushes.log`. The common dir is
+shared by the primary tree and every linked worktree of one clone, so all of them write and read the
+same three files. It is a data location, not a kit path, it is never pushed, and nothing in it is
+tracked.
+
+`resolve_journal_root` finds it with ONE `git rev-parse --path-format=absolute --git-common-dir`.
+Both halves of that spelling matter: the bare `--git-common-dir` prints a RELATIVE `.git` in the
+primary tree, and `--git-dir` in a linked worktree names `.git/worktrees/<name>`, which would split one
+clone's journal in two.
+
+## The memory root
+
+`resolve_memory_root(root)` reads `MEMORY_ROOT` from `.memory-tree.conf` at the repository root, the
+way bash sourcing reads it, and strips its slashes. The reader is a copy of the memory-tree engine's
+own line reader, in its order, because kits install independently; its docstring states the rules,
+and the self-test holds the copy to that engine's reader and both to bash over a table of
+spellings. An absent key, or an absent conf, is the kit default `memory`. A value naming no directory refuses by name, and so does one that would leave the
+repository: a `..` segment, a drive colon or a backslash. Every consumer that addresses the memory
+tree goes through it, because an adopter's root need not be `memory`.
+
+## The command line
+
+```bash
+python <this kit>/runlog.py journal --producer driver     # or gates, or pushes
+```
+
+stdout carries one JSON object per good line, whose keys are exactly the line's keys. stderr carries
+the resolved path, `lines=<n> bad=<k>`, and the first few refusal reasons with their line numbers. The
+bad count is always printed for a file that exists, so a writer emitting garbage is loud. An absent
+file prints `runlog: <path> absent` and exits 0: no producer has written yet, which is a state and not
+an error. Exit 2 means no journal root resolved or the file could not be read.
+
+## The library
+
+| name | what it does |
+|---|---|
+| `parse_line(raw)` | one line, given without its LF, into a `JournalLine`; raises `ValueError` naming the broken rule |
+| `check_line(raw)` | the same verdict without the raise: `None` when the line conforms, else the reason |
+| `render_line(fields)` | the reference writer: escape, then truncate as above. No LF appended |
+| `read_journal(path)` | a whole file into a `Journal`: state `absent`, `empty`, `read` or `unreadable`, the good lines, and one refusal per bad line. Never raises |
+| `build_invocations(lines)` | `start`/`end` pairs as `Invocation`s whose state is `ended`, `killed-or-running` or `orphan-end` |
+| `resolve_journal_root(start)` | `<common dir>/runlog` for the clone holding `start` |
+| `resolve_memory_root(root)` | the memory tree's repo-relative root |
+| `load_rules(path)` | a redaction table, compiled: the kit's own when `path` is omitted. Raises `ValueError` naming the line of a malformed row |
+| `scan_secrets(text, rules)` | every secret value in `text` as a sorted `(start, end, rule_id)` span. The value itself never leaves the function |
+| `render_redacted(text, rules)` | `text` with each of those values replaced by the placeholder, keys and prefixes kept |
+
+Parsing is one split per line with no per-line process and no per-line regex compile. The self-test
+counts both over 100,000 lines by patching them, and prints the wall time as a report, never as a
+verdict.
+
+## The redaction table
+
+`redaction.tsv` beside the reader holds one row per secret class. Its own header states the columns,
+the hint grammar and the template tokens, and they are not restated here. The class ids are a closed
+list, `CLASS_IDS` in `runlog_lib.py`, and the self-test asserts the table against it in both
+directions, so a class cannot go missing and a row cannot arrive undeclared.
+
+The table is applied ONCE, on read, by a consumer that prints or classifies free text from a
+transcript. Nothing is redacted on write, because no producer writes free text. A value becomes
+`<redacted:<id>>` and what names it stays, as in `Authorization: Bearer <redacted:auth-header>`. Both
+functions take an optional `rules` sequence from `load_rules`, which is how the self-test counts the
+regex searches a scan makes.
+
+A rule's regex runs only when the lowercased text holds one of its hints, so most text never reaches
+a regex. Rules run in table order. A span overlapping one an earlier rule took is dropped, and a value
+that already reads as a placeholder is skipped, so rendering twice changes nothing. A non-string
+input raises `TypeError`, and the loader accepts a CRLF checkout of the table.
+
+Each positive is a template that only the self-test expands, and no committed file of this kit carries
+text the table flags outside that column. The self-test scans the kit's tracked files with the table
+to prove it, which is the property push protection needs in a public repository.
+
+## The transcript extractor
+
+The journals cover a small share of a run's calls. Everything else — every tool call, owner turn,
+compaction, limit and token — is recorded only in Claude Code's session transcripts on the machine
+that ran the build. `extract.py` is the Claude Code adapter that reads them. It keeps a STRUCTURAL
+event list and no free text: no command, no narration, no owner-turn text and no tool output.
+
+```bash
+python <this kit>/runlog.py extract --slug <slug>            # the sessions the driver journal names
+python <this kit>/runlog.py extract --session <sid>          # one session, attributed as given
+python <this kit>/runlog.py extract --discover [--slug <s>]  # runs with no journal: a heuristic
+python <this kit>/runlog.py extract --measure <projects dir>  # rate and peak memory, writes nothing
+python <this kit>/runlog.py narration --session <sid> --from <t> --to <t>
+```
+
+**Where it reads.** A session id is any UUID-shaped `sess.*` value on the slug's `start` lines,
+whatever the adopter called the variable. Nothing else reaches a path: an id is shape-checked first,
+and it becomes a session when one glob of `<projects root>/*/<sid>.jsonl` finds it. The projects root
+is `$CLAUDE_CONFIG_DIR/projects`, else the profile's `.claude/projects`, and `--transcripts` overrides
+both. The tree beside the main file is its `subagents/**/agent-*.jsonl` with their `.meta.json`, and
+its `workflows/wf_*.json`. A path resolving outside its root is refused or counted, never read.
+
+**Where it writes.** One JSON object per session, at `<store>/<repo key>/sessions/<sid>.json`. The
+store is `RUNLOG_STATE_DIR`, else `%LOCALAPPDATA%\runlog` on Windows,
+`~/Library/Application Support/runlog` on macOS and `${XDG_STATE_HOME:-~/.local/state}/runlog`
+elsewhere. A missing root
+refuses by name, and so does a relative `RUNLOG_STATE_DIR`, which would put extracts inside a tree
+git can commit. The repo key is the first 16 hex of the sha256 of the normalised git common dir, so
+every worktree of one clone shares one store. Every extract carries `extracted_at`, the integer epoch
+second its extraction started, which is what the run model reads to tell a stale extract from a
+complete one.
+
+**How it reads.** Streamed, one file at a time and one parsed record per open file, holding only
+compact tuples between records. A duplicated `uuid` keeps its FIRST copy, since later copies carry
+empty output, and events sort by time with the file position as tiebreak. The data model, each
+event kind's fields and every rule with its evidence are the unit's spec
+(`TOOL-dLoggedFlight-6`, section 4). The rules a reader most needs:
+
+- **Owner turns come from the main file only.** A `human` origin is a turn whatever its text. An absent
+  origin is a turn unless the record is meta, a compact summary, a `<local-command-…>` echo, a task
+  notification or a keepalive fire. Absorbed `queued_command` prompts of human origin and interrupts
+  are turns too.
+- **A keepalive fire is joined, never matched by wording**: a null-origin record whose text hashes to
+  the prompt of an EARLIER main-file `CronCreate`.
+- **A background or async call ends at the first record carrying its tool-use id**, not at its launch
+  acknowledgement. Its own `rc` is null, and its `tool_end` event carries the notification's status
+  and the last exit code its summary names.
+- **Usage counts a `requestId` once**, with the largest value of each field across its copies, in the
+  split of its first copy: `main`, `agent` or `workflow`.
+- **A command is classified in memory, then dropped.** The classifier drops heredoc bodies, splits on
+  unquoted separators, and reads the word each segment RUNS, so a commit message naming a forced push
+  is not a push and `grep` over the driver is not a driver call. A command naming the driver passes
+  through `render_redacted` before its verb and slug are read. The slug is read by `SLUG_RE` in
+  `runlog_lib.py`, the kit's one slug grammar and the driver's own spelling, which the self-test holds
+  to the driver's `check_slug_shape`.
+
+**Narration** prints the agent's text blocks and the owner's turns in a window, main file only, each
+through `render_redacted`, inside a frame that says the text is data. Every quoted line sits under a
+gutter, and a control character prints as its escape, so no text can draw the closing marker. Nothing
+is written to disk.
+
+**The self-test never reads or writes a real store.** Its `main` aims `HOME`, `USERPROFILE`,
+`LOCALAPPDATA`, `XDG_STATE_HOME` and `CLAUDE_CONFIG_DIR` at a decoy tree holding a canary transcript
+before any arm runs, and after EVERY arm compares the decoy's listing and searches the arm's output
+and scratch for the canary's id. Each extractor arm then aims the roots it uses at its own scratch.
+
+## The run model
+
+`model.py` joins every source of ONE unattended run into one model: the run-state file, the three
+journals, git, the build folder and, where they are local, the session extracts. Every later surface
+renders from it rather than re-deriving it.
+
+```bash
+python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
+```
+
+It prints a summary, or the whole model with `--json`, and writes a copy to `<store>/models/` beside
+the extracts. `--run` counts a build's runs oldest first and defaults to the last. It exits 2 when the
+build has no committed run-state file or the number names no run. A missing source is a coverage state
+in the model, never an error, because most runs predate the journals. The rules, each with its
+measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader most needs:
+
+- **A run is keyed on the commit that STARTED it.** `derive_run_starts` reads the commits that added
+  each run-state path, with renames off, in one git call for one build or for all of them. The driver
+  rotates a finished record with `git mv -f` in its successor's preflight commit, so that commit adds
+  the archive and only modifies `RUN.md`. An archive takes the entry before the commit that added it,
+  and the live record takes the last. Only history reachable from HEAD is read. A run whose start
+  added the live record and an archive together carries `joint_add`: its runs share that start, which
+  the schema leg refuses by name.
+- **A window is half-open, bounded to the run's era.** It opens at the run's own preflight START,
+  joined to its start commit by a named key, or at the start commit when there is none. It closes at
+  the END that moved the phase into a terminal one, else at the first terminal write in the era, else
+  one second past the run's last event: its last journal line, record commit or own commit, or the
+  last bar or push made from a tree it holds. A transcript event does not move that end, since the
+  session keeps working after the run and renders the record itself. Nor does a merge naming only the
+  slug, or a push joined only by what it pushed.
+- **One window bounds every timed set.** Once the window is known, every set the model derives from a
+  timed source goes through `check_in_window` and nothing wider; the spec's S2 names them, and the
+  two reads it leaves to the era. So a run's verbs after its end, an owner's `--status` once it has
+  landed say, are not its events, and a terminal run's closing phase write, which lies at or past its
+  end, is not on its timeline; `phases-walked` reads that phase at the end instead.
+- **A run's own commits** are the commits inside its window that descend from its start and name one
+  of its unit ids in the subject. Commits keep naming a unit id after a build lands, and one of them
+  must never become a landed run's last own commit. A push joins from a tree the run holds, or by
+  pushing the default branch to a sha carrying the last own commit made at or before the push's
+  START, which is how the landing push from the primary tree joins. A gate line joins through the
+  `gate_run` a joined push pinned, or from a tree the run holds, inside the window either way. A
+  subject names every id of a range it spells, `X-<slug>-1..13` naming all thirteen, the way the
+  memory-tree index generator reads a Serves range; `scan_unit_ids` is the one reader.
+- **Attribution reads every run's ENDs in a session.** A call inside the window takes the phase of
+  its session's most recent END and the unit of its most recent unit-bearing one. When that END is
+  another run's, of this build or another, the call is that run's work and is unattributed, and a unit
+  another run set is never this run's. The coverage block's call count is the model's tool calls.
+- **A run holds a tree from its first call there that claims it.** A preflight claims its tree, and
+  so does any other verb its START read before the close, except the verbs `TREE_BLIND_VERBS`
+  names. Those read the record only, so they run from any tree, the primary tree included, and
+  every run lands from the primary tree. The hold ends at another run's first claim there after the run's last one,
+  since a worktree outlives its run and is reused. So neither an owner's `--status` nor the run's own
+  `--landed` makes another run's bar in the primary tree this run's.
+- **A run's sessions are the ones its own ACTS named, never the ones its visitors did.** The verbs
+  `READ_ONLY_VERBS` names only read the record, so a session whose every call on the run is one of
+  those is not one of its sessions: its owner turns, usage and tool calls stay its own, it
+  contributes no attribution point, and it never moves a non-terminal window's end past itself. That
+  is a second constant beside `TREE_BLIND_VERBS`, and a proper subset of it, because naming a session
+  and claiming a tree are different questions — `--resume` continues the run and `--landed` lands it,
+  so both are the run's own acts, and neither claims the tree it ran in. A read IS the run's own when
+  it names a session one of the run's acts named, or names none at all, which is what the keepalive
+  tick's `--audit` records while `RUNLOG_SESSION_VARS` is unset; otherwise a stalled run's own
+  heartbeats would fall outside its window.
+- **A close is an END reading `rc=0` and `exit=clean`.** An unclean END's `rc` is whatever `$?` its
+  EXIT trap saw, often 0, so a `--close` killed mid-bar is no close. `green-at-close` is not judged at
+  it, and it splits no owner turns. Every rule that decides on an END's `rc` reads its `exit` beside
+  it, and a source arm of the self-test holds the model to that.
+- **A journal reads `dead` only on the run's own proof** that its producer owed a line: a parked row
+  for the driver, a LANDING write for the gates, and for the pushes the move into LANDED. That last
+  move is what closes a landed run's window, so it lies at the window's end and is read there, since
+  the half-open window never holds it.
+- **And only where this node saw the run.** Journals never leave their clone. So a journal the window
+  starts after, holding none of the run's lines, reads `not-local` when this node's driver journal
+  holds none of the run's own ACT lines either, over its whole segment: a run made on another node.
+  The key is the run's own lines, never any line naming its build, which an earlier run driven here
+  holds — and never a read-only visit, which places nothing whoever made it.
+- **Every inferred answer is named** in the model's `method` field.
+- **Git PROCESS cost is constant** whatever the run's size: the self-test counts the processes for a
+  run of 10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
+  The blob VOLUME of the one `cat-file --batch` is not constant: the spec-mark split asks for each
+  unit's spec at every record commit, because the window that chooses between them is derived from
+  blobs in that same batch. S12 carries the measured figures.
+- **The spec-mark split is taken at the window, not the era.** Each spec's section 8 marks at the
+  run's `start^` baseline are subtracted from its marks at the last record commit at or before the
+  window's end. For a build's last run the era runs to HEAD, so reading there made every later edit
+  of one of its specs a decision the run took.
+- **Every anomaly kind declares the sources its trigger reads**, in `ANOMALY_SOURCES` beside the
+  closed list, and a kind whose sources the model did not read could not fire at all. Two are the
+  transcripts' alone, so a run with no local transcript could never look for a `git reset --hard` or
+  a background bar that reported rc 0 over a RED gate line. The committed record's Coverage says how
+  many of the list were judged, so `anomalies 0` is never read as a clean run;
+  `check_anomaly_sources` grades the table in both directions, and a kind added to the list reds
+  until it is declared.
+- **The model names what the record reads.** `journal_lines` lists, per producer, the line numbers
+  of every journal line it attributed to the run; the extractor's workflow runs inside the window sit
+  on the timeline with their labels; and every anomaly carries `t`, the time of the event behind it.
+- **An idle gap is a stretch of `IDLE_GAP_S` or more that no event of any source covers.** A tool
+  call covers its whole span, so a long bar or a stretch of workflow calls is busy. An owner turn
+  covers nothing, since it is the owner's act and not the run's. Gaps are judged only when the
+  transcripts read `present`, because only then is every call seen and every owner turn known;
+  otherwise none is reported, and the coverage block's `idle` entry says it was not judged. A gap
+  with an owner turn inside it, or within `IDLE_OWNER_GUARD_S` of either end, is kept out and counted
+  there, because its endpoints would place that turn.
+- **A session's live transcript is read before its store extract.** Wherever `resolve_session_tree`
+  finds a session's transcript on this machine and its main file opens, the model extracts it in
+  memory; a store extract stands in only where none is local. The extract is a cache of the
+  transcript, and read first a stale one hid every owner turn and call made after it was cut, from
+  the counts and from the idle guard alike. A session discovered by slug in the store is read only
+  when it reaches the window, decided before anything is extracted: with its transcript local it is
+  dropped unread when every file of its tree was last modified before the window's start, and kept
+  once extracted only when an event lies inside the window; with none local, its store extract is
+  kept only when it holds an event inside the window. The store holds every past session of a
+  build, so without this a render would read the build's history, and an earlier run's extract that
+  is never refreshed would read `stale` forever. The sessions kept are the sessions read, for the
+  freshness test and for every count, and the Coverage `sessions` fact's extracted count is their
+  number. A session the journal names is never dropped.
+- **A store extract made before the window's end reads `stale`.** `check_extract_covers` passes an
+  extract only when its `extracted_at` is an integer at or after the window's end; a missing field or
+  any other value never passes, so an extract written before the field existed is stale until it is
+  extracted again. Every session read from the store is held to it, named or discovered, and one
+  extracted in memory from its local transcript covers by construction. One short session makes the
+  transcripts `stale`, which outranks `partial`, and the coverage note counts the short sessions
+  without naming them. A stale extract looks complete unless it says so, which is why it has a state
+  of its own rather than a flag beside `present`: the record withholds under it through the same
+  count test that withholds under `not-local`, and the model judges no idle gap under it.
+
+## The committed record
+
+A run's model is machine-local. `record.py` renders it into ONE tracked file in the build folder,
+under the declared memory root, that any node can read. The repository is public, so the record is
+structural only: every value in it comes from `RECORD_SCHEMA`, and nothing else reaches the file.
+
+```bash
+python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
+python <this kit>/runlog.py verify <record> [--journals <dir>]
+```
+
+**Where it goes.** `<memory root>/builds/<slug>/build/<date>-build-<lowest unit id>-runlog-<key>.md`,
+where the key is the first 8 hex of the commit that started the run, read from the model and never
+re-derived. A re-render finds the run's existing file by that key, whatever its date, so a run has one
+record. The head is `**Serves:** journal <ids>`: the units the run dispatched, or closed with a commit
+naming them, among those a spec in the build defines, in ranges where contiguous. A run that served no
+such unit gets a `no spec-defined unit` line and no file, because an unbound record moves a pin.
+
+**What it holds.** Eight sections in a fixed order: Summary, Timeline, Units, Decisions, Conformance,
+Anomalies, Coverage and Data. Each carries only the fact lines and tables `RECORD_SCHEMA` declares
+for it. A timeline row leads with its UTC time and every other row with its order or a 1-up ordinal,
+so no row leads with an id and the record defines none. Owner turns are counts per position and never
+clock times, so the timeline carries none. The `Data` block is the markdown re-encoded as JSON, every
+fact and every shown row, one row per line.
+
+**The Summary's window is the GIT-ONLY one.** The model keeps two. Its `window` is journal-bounded and
+bounds every timed set it derives; its `record_window` is the window the schema leg below derives, from
+the start commit and the record commits alone. The record renders the second, so every bound it states
+is a commit's own committer time — the start commit's, and the first terminal write's or, where none
+has come, the last record commit's — and a fresh clone derives the same window from git. The one second
+a half-open end adds is taken back off, since no public source shows that value, and `duration` is the
+two bounds' difference. A model carrying no `record_window` renders both facts `-`.
+
+**The closer names the write still to land.** `window opened by` and `window closed by` read that same
+`record_window`, so the bounds and the names of what set them are one derivation. `opened-by` is `git`
+alone. `closed-by` is one of three. `terminal-write`, where a record commit already carries a terminal
+phase: the bound is that commit's time and it is final. `last-activity`, where the run has not closed
+at all: the bound is its last record commit. And `terminal-pending`, where the run-state file is
+terminal but the commit carrying that write has not landed — which is EVERY record the Skill renders
+after `--landed` or `--abort`, because each render rides the commit that carries the run-state write
+the verb just staged. Such a record's closing bound is the last committed record commit, and the
+closer says so, instead of reading `last-activity` beside `terminal: yes`, which describes a run that
+stopped by going quiet. A re-render once that commit has landed reads `terminal-write` with the
+commit's own time. The lag is declared rather than hidden, and `window`, `duration` and `window closed
+by` are the only three facts it moves.
+
+**No journal or transcript time is committed** (owner, 2026-09-16). Every time the record carries is
+a commit's committer time or a run-state write's, so the Timeline holds the kinds `TIMELINE_EVENTS`
+names and no others. `RETIRED_EVENTS` beside it names the kinds a journal or a transcript timed,
+dropped before a row is built and NOT counted in `values withheld`, since a retired kind is not a
+value outside its class. The Timeline's `withheld rows` fact counts each of them in place of the
+rows. Both lists are the constants' own, in `record.py`, and not restated here.
+Anomalies carry no time and Coverage no `epoch` for the same reason. The local model keeps every one
+of them, which is what the Skill answers from. Owner turns stay counts per position, as always.
+
+**The rule is held per SOURCE, not per path.** `RECORD_SCHEMA["sources"]` declares, for every slot
+that renders a time — each placeholder of a `time_classes` class, each Timeline row layout's column
+and each column of any other table — the non-empty set of `TIME_SOURCES` its value may be read from,
+and `scan_time_slots` reads that population off the schema itself rather than off a list beside it.
+A slot's value is a SET because one slot can be filled from either source: the `elided` fact reads
+the UTC of the first and last row it omits, and that is a `commit` row or a `dispatch` row alike.
+`check_time_sources` refuses a slot with no entry, a source outside `TIME_SOURCES` and an entry keyed
+to no slot, so a fact or a column added to the schema reds until somebody says where its value comes
+from. The schema leg's `source` rule is the other half, over the rendered bytes. Five earlier rules
+withheld the values of one path each, and each was followed by an audit round finding a path it had
+not enumerated; a source either is already public in git or is not, which is decidable per slot.
+
+**One self-test arm reads the whole population back.** It renders a fixture whose every journal-
+and transcript-timed value carries a second no public source shows, and grades every token of a
+`time_classes` class against the commit and run-state times read off that fixture, every sum of a
+rendered time and a rendered duration against those seconds, and each of the three encodings one
+of them can take — its ISO form, its epoch second and its clock time — whatever class carries it.
+It asserts that every slot `scan_time_slots` returns rendered a token, so a slot the fixture never
+reached reds by name instead of passing with nothing to grade, and that no other shaped class
+matches a public time's rendered form or a difference of two.
+
+**One self-test arm mutates what the two shared fixture builders placed.** It renders each of their
+models once as a base, then once more per kind of event that model's timeline holds, with every event
+of that kind removed, and re-checks each expectation the record arms derive against the copy's own
+render. What it proves is that no expectation over those two builders is a typed literal: a derived
+one follows the copy, a typed one reds on the first swept kind carrying its carrier. What it does not
+prove is anything about any other fixture here, and it grades no derivation's correctness — only that
+each still tracks its input. Its swept set is the timeline's own kinds and never a retirement
+constant, since the retired kinds are dropped before a row is built and a sweep over those alone
+would remove nothing. A kind the renderer writes no row for and counts in no fact leaves the rendered
+bytes identical, so the liveness that a removal reached the render is asserted over the kinds a row
+is written for, and the partition of the timeline over all of them.
+
+**A fixture builder claiming a real history returns the state it used.** Saying in a docstring that
+three models are built from a history and never by editing a field grades nothing, so the builder
+returns beside each model the repository it was built from, the journal root, the commit its history
+was cut at and the run-state write staged or committed there. One self-test arm holds each of those
+against git, re-runs `build_run_model` over the state and compares the result with the returned model
+field for field — a model shortcut out of another placement's differs from the model its own claimed
+state produces, whatever field was edited, which a list of shortcut spellings cannot promise. The one
+thing a comparison cannot read is declared beside it with its reason: `cost.wall_s` measures the build
+rather than the repository, and a masked sub-key the model does not carry reds. Beside the
+re-derivation the builders named by `HISTORY_BUILT_BUILDERS` have their own source read and refused a
+keyword re-render or an assignment into a model field. That set is declared rather than swept, because
+the same predicate over the whole module refuses a score of functions that copy a plain dict and are
+each correct.
+
+**The schema is data.** Shaped classes are regexes a value matches whole: a UTC time, an integer, a
+duration, a sha, a sha256 digest, a phase token, one of the build's own unit ids, and a path under
+the build's own folder. The vocabularies are closed lists, the model's own wherever it owns one. A
+value outside its class is written `-`, the same as an absent one, and the summary's `values
+withheld` line counts them. So is a value carrying a shape `RECORD_SCHEMA["forbidden"]` lists, an
+absolute path or a UUID, whatever class it passed: a path class's file segment admits a lowercase
+UUID. The schema leg below validates committed bytes against the same data.
+
+**An unknown value is `-`, never the zero that reads clean.** WHICH source each count comes from is
+declared, one entry per `{int}` slot, in `RECORD_SCHEMA["count_sources"]`: the owner turns, the
+usage lines, the attributed calls, the Coverage session and journal-start counts, and every kind of
+the Timeline's `withheld rows`. The pairing is that declaration's own and is not copied here. A
+declared slot renders `-` unless its source's coverage state is `present` or `partial`. The model
+counts zero of what it never read, and an `in-window 0` would say the run never asked. A `stale`
+extract is not one of those states: its counts can be short by exactly the owner turns the run's
+last stretch held, and nothing in them says so. `idle` is the one entry naming a JUDGEMENT rather
+than a coverage state, and it is narrower by exactly that one: gaps are judged only where the
+transcripts read `present`, so an unjudged run's idle count would be a zero nobody measured.
+`check_count_sources` grades the declaration — a slot with no source, a source the model does not
+have, an entry keyed to no slot — and PRINTS every `{int}` slot outside it, so the counts that
+deliberately declare none are enumerated on every run rather than described by a sentence beside
+them. The five Summary facts READ that declaration, and no second hand-written test of the rule
+remains beside it: the `known` test that used to decide them is gone from the renderer, so the rule
+is stated once and has nowhere to drift to. `test_record_known_replaced` holds both halves — the
+replaced spelling absent from the renderer's own source, and a Summary fact whose declared source is
+RE-POINTED on a schema copy then following the new source's coverage state while its neighbours keep
+following the transcripts. The second half is what a criterion reading rendered values alone cannot
+observe: the two predicates agree on every model whose declaration names the transcripts.
+
+**The cap, `RECORD_CAP_BYTES`, holds for every input.** The timeline shows its first and last
+`TIMELINE_EDGE` events, and every other list aggregates by kind past `LIST_BOUND` rows, each elision
+stated where it happens. A record still over the cap halves the timeline's rows and then the lists'
+bound, in turn, until it fits. The figures are the constants' own, in `record.py`, and not restated.
+
+**The commitment** is the sha256 and the count of the journal lines the model attributed to the run,
+each hashed as its producer, a TAB and its raw bytes. NO TIME OF A JOURNAL LINE IS COMMITTED (owner,
+2026-09-16), so the count is the whole anchor: `verify` rebuilds the model, sorts its lines the same
+way and hashes the committed number of them from the START of that order. Exit 0 when the two agree or
+the record commits `none`, 1 when the journal changed after the render, naming the field that differs,
+2 when the record cannot be read or no journal of the run is on this machine. A line the run appended
+after the render sorts past the hashed prefix and is not an edit; an edit, a deletion, or a line of the
+run that lands EARLIER than a hashed one shifts the prefix and reads as a mismatch.
+
+**`record --write` prints what it cannot do itself**, on stdout: the build-index re-render, with the
+memory tree's `gen_build_index.py` found beside this kit by its file name, and a commit subject naming
+the slug and no unit id. Rendering makes no git call; the model's are the whole cost.
+
+## The schema leg
+
+```bash
+python <this kit>/runlog.py check-records
+```
+
+The record's second enforcement point, `TOOL-dLoggedFlight-10`, on the bar as `runlog record schema`. A
+renderer that honours the schema proves nothing about a record edited afterwards, so this reads every
+tracked `<memory root>/builds/*/build/*-runlog-*.md` from the INDEX and grades its bytes against
+`RECORD_SCHEMA`, compiling the schema's data itself rather than calling the renderer. It checks the fixed
+head and its `**Serves:**` ids, the eight headings in order, each section's declared facts against
+their templates, its declared tables against their column classes, and the Data twin's keys and
+values. A row that renders a time AND states its own source is held to `sources` under the `source`
+rule: a row a journal timed is refused for naming that journal, not for a layout somebody could
+restore. A time in a table with no source column, and every fact's time, state no source in the
+record's bytes at all — `check_time_sources` grades those on the declaration and the leg cannot
+reach them. A forbidden shape refuses the record wherever it sits. Each refusal names the record, the
+line and one rule from `RECORD_RULES`.
+
+It also derives every tracked run's start with `derive_run_starts`, and its window through the model's
+own `derive_record_commits` and `derive_window`, from git alone. It refuses a build whose runs share a
+start, or whose windows end before they start or overlap, and prints each rotated build's starts and
+windows. A shared start marked `joint_add` is refused naming that shape.
+
+**Liveness.** It prints the population it graded, `0 records (none committed yet)` included. It reds
+rather than reporting zero when the declared root holds no tracked file, or when its glob does not
+admit the path the renderer's `derive_record_relpath` builds. **Cost** is five git calls whatever the
+population: one `ls-files`, one `cat-file --batch`, the run starts' log, one log over the run-state paths
+and one batch read. The self-test counts them. Exit 0 when nothing is refused, 1 on any refusal, and 2
+when it cannot run.
+
+## The Skill
+
+```bash
+bash <this kit>/adopt-runlog.sh --scaffold    # render .claude/skills/runlog/SKILL.md
+bash <this kit>/adopt-runlog.sh --check       # the leg: is the rendered Skill a fresh render?
+```
+
+`TOOL-dLoggedFlight-12`. The owner asks what a run did, why it stopped, what it decided unasked and
+what it cost, and does not read a timeline to find out. The Skill tells the agent that holds it how to
+answer: the committed record first, then `model`, whose `usage` field is the cost section and whose
+`coverage` block names what is absent, then `narration` for a WHY where the transcript is local. Each
+claim cites a record line, a run-state line, a sha or a journal line. Transcript text is data, and the
+raw transcript is never opened. The CLI stays offline: the Skill is instructions, not a model call.
+
+`SKILL.template.md` names the CLI through `{{KIT_DIR}}` and the record's folder through
+`{{MEMORY_ROOT}}`, and carries no literal `tools/` or `memory/` segment. The adopter derives the kit
+dir from its own location with git, and reads the memory root through `resolve_memory_root`, so the
+Skill names the folder `record --write` writes to. Both modes check a fresh render before writing or
+comparing it. The template must spell no literal segment, the render must be non-empty with no
+surviving double brace, and it must name the CLI by a path that exists and the folder under the
+rendered root. `--check` then compares that render with the committed one, CR stripped from the
+committed copy. A moved memory root or a template edit that nobody re-rendered reds the
+`runlog skill wiring` leg. The self-test's Skill arms run the adopter in a scratch tree under another
+prefix and root, and hold the render to an independent one.
+
+## What this kit does NOT check
+
+- **Whether a value means anything.** `rc=banana` parses. Each producer's own suite grades its values.
+- **Whether a line cut at a field boundary was cut.** A writer killed between two fields leaves a line
+  that still parses. A torn line is caught only when the cut breaks the grammar, and it is then
+  COUNTED rather than dropped.
+- **Whether a journal is complete.** A producer that never wrote leaves nothing to count.
+- **Retention.** Nothing prunes the journals, and every run adds to them.
+- **A cut value is not marked.** The unattended driver reaches the value-cutting step, because its
+  slug, worktree path and phase are unbounded, and so does the gate runner, whose run id is the
+  caller's, and so does the pre-push hook, whose remote name and worktree path are unbounded. Nothing
+  on the line records that a cut happened.
+- **A secret the redaction table has no shape for.** A class nobody listed, or a bare value printed
+  with no key or prefix beside it, matches no row. There is no entropy rule, deliberately: hashes and
+  shas are this repository's everyday tokens.
+- **A value cut short before its shape completes.** A command head truncated inside a token's prefix,
+  or before the length a row requires, is not redacted.
+- **Text the table is never handed.** It reduces exposure in what a consumer prints or classifies,
+  and proves nothing about journal values or tool output it never sees.
+- **That a positive is realistic.** Each row is proven against its own template and a near miss, both
+  written by its author. A real credential in a shape no positive covers is a miss the suite cannot
+  see.
+- **That the transcript format still holds.** It is not a contract. An unknown record type is counted
+  by name in the extract's coverage block, but a renamed KEY reads as absent and yields nothing, and
+  the suite's fixtures are synthetic, written from measured shapes rather than copied.
+- **A call the classifier cannot see.** It is not a shell: `bash -c`, `eval`, a `$(…)` inside quotes,
+  an alias and a shell function are not descended into, so a call nested in one is `other`.
+- **Which repository a discovered session ran in.** `--discover` attributes a session to a slug
+  because one of its shell calls ran the driver's preflight for it, and says `heuristic`. Nor
+  whether a discovered session the model dropped was the run's: one whose transcript has left this
+  machine, and whose extract was made before it did anything inside the window, looks exactly like
+  an earlier run's session. With no other session kept the transcripts read `not-local`; with one,
+  the counts are short by that session.
+- **That a background call ended.** One whose notification never arrived keeps a null end.
+- **Whether the model's inferences are right.** The build commit, the owner's decision-log rows, an
+  unmet acceptance line, a close's head and a session's attribution are heuristics, and `method` says
+  so.
+- **Whether an extract made at or after the window's end is whole.** `extracted_at` says when the
+  extraction started, not that the transcript it read was complete. Its `tree_bytes` is not compared
+  with the transcript's size, which is unreadable exactly when no transcript is local.
+- **Idleness where a session's transcript is missing.** A run whose transcripts are not all local
+  reports no idle gap at all, and its coverage says idleness was not judged, rather than reading the
+  missing source as idle time.
+- **An owner turn more than `IDLE_OWNER_GUARD_S` from a gap.** A gap that opens after the work an
+  owner turn started has run longer than that is kept, and its start still says when that work ended.
+  The render's own check stops only a time in the turn's own second.
+- **A run whose record never reached HEAD's history.** The run starts are read from HEAD, so a run on
+  a branch this tree has not merged is invisible from here.
+- **A run history moved with its memory root or a build folder.** The starts are read under the
+  current root with renames off, so a move in one commit ADDS every record it carries, and a rotated
+  build's runs all start at it. The schema leg refuses that build under `run-start`, naming the
+  shape, on every bar from then on; `verify` looks for the pre-move key, and `record --write` writes
+  a second file. Nothing follows the path back past the move, and no waiver clears the refusal: the
+  unit's acceptance ledger parks that question.
+- **A visit made from a session nobody recorded.** A read is the run's own when it names a session
+  one of the run's acts named, or names NONE — and on the shipped default no call records one, so
+  every session-less read of the run's own slug inside its own journal segment is admitted. That is
+  the narrowest shared location left in this key, and it is deliberate: the alternative drops the
+  keepalive tick's own `--audit` and a stalled run can never fire. Recording a session
+  (`RUNLOG_SESSION_VARS`) closes it.
+- **A writer broken for the whole of a run made here.** With none of the run's own driver lines on
+  this node, the model cannot tell that from a run made on another node, and reads `not-local`.
+  A visit does not place a run: a `--status` or an `--audit` made here, inside or after another
+  node's run, is not one of that run's own lines. A `--resume` or a `--landed` is, and rightly so —
+  a node that resumed or landed a run saw it.
+- **A list that continues a unit id with bare numbers.** `X-<slug>-1..4, 6` names units 1 to 4, as the
+  memory-tree grammar reads it, and not unit 6.
+- **Who ran a bar at the same minute.** A gate line with no pinned id joins by the tree it ran in
+  alone. Two runs that claim one tree in the same stretch both hold it, so a bar there joins both.
+- **A tree the run worked in without claiming it.** A run whose only calls in a tree are the verbs
+  `TREE_BLIND_VERBS` names, or ones made after its close, holds no tree there, so a bar it ran there
+  joins only through a push that pinned it.
+- **Whether a record's values are TRUE.** The schema admits a value's shape, never its truth: a count
+  can be wrong and still be an integer.
+- **Which line of a shifted prefix moved.** A line of the run that lands earlier than a hashed one
+  changes the digest, and `verify` reports the digest, never the line: it holds the committed hash and
+  a count, so it can say the prefix is not the one committed and nothing about where it parted. The
+  case itself is no longer invisible, which is the one thing the retired time floor bought.
+- **Which SECOND a spec mark was made in.** The ledger splits each spec's section 8 marks between the
+  run's `start^` baseline and the last RECORD commit at or before its window's end, so the
+  granularity is a commit: a mark committed inside the window but after the run's last record commit
+  reads as neither before the run nor inside it. Reading a rev per mark would cost a second
+  `cat-file`, which the model's six-call bound does not have.
+- **A record verified on another node.** The commitment is checkable only where the journal is, and
+  `verify` elsewhere refuses rather than guessing.
+- **The lists the record copies, in a tree without their owners.** The spec template's status tokens
+  and check 22's review verdicts are held to those files by the withheld self-test, where the files
+  are present. A value outside a copy is withheld, never rendered.
+- **Whether a path the record names is tracked.** The renderer checks each path's shape and makes no
+  git call; the model reads its paths from git.
+- **Whether a record's two copies agree.** The schema leg grades the markdown and the Data twin each on
+  its own, for shapes, and never compares them.
+- **A window a clock skew moved.** The leg compares windows in commit time, so two nodes' clocks that
+  put a predecessor's terminal write after its successor's start move a window without redding it.
+- **Whether an answer given through the Skill is right.** The wiring leg proves the rendered Skill is a
+  fresh render, and the self-test proves its trigger words, its five steps and its safety rules are
+  there. Neither sees what an agent says with it, and the data framing reduces prompt injection through
+  quoted narration without removing it.
+- **A path in the Skill template spelled without a `tools/` or `memory/` segment.** The adopter's
+  literal scan reads those two segments, so a literal naming another layout passes it.
+
+## Running the self-test
+
+```bash
+python <this kit>/selftest.py
+```
+
+It builds scratch git trees under the system temp dir and never reads this repository's own journal,
+nor any real transcript or store. Three model arms read this tree, never write it: one models a
+tracked run record through the CLI, one reports the owner spellings over the tracked decision log,
+and one holds the model's copies of the driver's sets, and the record's owed ledger sources, to the
+driver's source. Each announces a skip where its subject is absent. The record arms render real
+models, lengthened by copying their own entries where a big one is needed, and grade names and
+anchors with copies typed from the documents that own those rules, never from the renderer. The
+schema-leg arms stage each refusal on a copy of a record the renderer produced, in a fixture index,
+and one of them runs the leg over this tree, read-only, for its rotated builds' starts and windows.
+Its redaction arms find the kit's files through `git ls-files`, so a new file is scanned once it is
+staged and not before. Its Skill arms run the adopter through the bash that shares this filesystem,
+found on PATH and seen to run, since a Windows loader resolves the bare name to another filesystem's
+shell first; a node with none announces the skip and falls under the floor.
+It and its fixtures are withheld from `govkit apply`: its subject is this directory's code, which an
+adopter does not edit.

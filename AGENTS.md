@@ -137,7 +137,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
 **Kickoff-manifest merge exception.**
 
-- The manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD on the default branch, the merge-base otherwise; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
+- The manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
 
 **Unattended runs** *(kit-conditional — drop this block if the project does not adopt the unattended-run kit).*
 
@@ -297,28 +297,23 @@ matched its target population.
 - Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `main`) — per-increment reviews re-scan overlapping code.
 - Default Tier-2 shape (ROI-tuned): a parallel fan of 3–6 primed finder lenses (security · correctness · data-integrity · dead-code · integration-seams) → a skeptic prompted to REFUTE each finding → one synthesis pass; drop any finding a skeptic refutes unless reachability + impact re-established.
 - **CONCURRENCY IS CAPPED, ALWAYS, and the verify-stage TOTAL is capped too — two rules, not one.**
-  A wide fan trips the SERVER rate limiter and kills whole phases for millions of tokens; a
-  harness auto-cap does NOT protect you. Concurrency bounds how many run together; the total
-  bounds how many exist. **CONSOLIDATE before you fan out:** batching grows the batch, never the
-  agent count — at most 5 verify agents TOTAL. Route Workflow fan-out through the bounded
-  helpers, inlined because scripts cannot import: `boundedParallel(thunks, 5)` and its pipeline
-  sibling. Enforce it mechanically at the tool call rather than inside the script, where no hook
-  reaches — the `agent-cap` hook denies a raw primitive and any fan-out over a receiver it
-  cannot PROVE bounded, and counts direct spawns, which is the only enforcement reaching a
-  fan-out made outside a workflow script. It resolves a bound wherever it is written and denies
-  any K it cannot resolve to an integer ≤5; an array LITERAL of ≤5 elements (the lens fan)
-  passes unmarked, and it fires on matcher `Workflow|Agent`, the exact pair — `Workflow` alone
-  leaves direct spawns unguarded. FIVE of these values are machine-compared against the sources
-  that own them by `tools/check-playbook-parity.sh`; retyping one wrong reds the bar rather than
-  drifting. The marker spellings and the full resolvable-bound grammar are the hook's own, in
-  `tools/hooks/README.md`; a ready harness ships beside it.
+  A wide fan trips the SERVER rate limiter and kills whole phases for millions of tokens; a harness
+  auto-cap does NOT protect you. Concurrency bounds how many run together; the total bounds how many
+  exist. **CONSOLIDATE before you fan out:** batching grows the batch, never the agent count —
+  at most 5 verify agents TOTAL. Route Workflow fan-out through the bounded helpers, inlined
+  because scripts cannot import: `boundedParallel(thunks, 5)` and its pipeline sibling. Enforcement
+  sits at the tool call, on matcher `Workflow|Agent` — the exact pair, since `Workflow` alone
+  leaves direct spawns unguarded. The hook denies any K it cannot resolve to an integer ≤5, and
+  an array LITERAL of ≤5 elements is a receiver it can size. FIVE of these values are
+  machine-compared against the sources that own them by `tools/check-playbook-parity.sh`; retyping
+  one wrong reds the bar rather than drifting. The marker spellings and the full resolvable-bound
+  grammar are the hook's own, in `tools/hooks/README.md`; a ready harness ships beside it.
 - Finders emit CONCRETE findings — `file:line` + repro/impact + proposed fix — so skeptics can actually verify them.
 - Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics; past ~25 agents returns diminish.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
 - Match intensity to target richness: heavy multi-lens earns its tokens on fresh/complex write paths; over hardened code it manufactures refuted noise — review light or skip.
 - Persist each Tier-2 run as an in-repo artifact folder (`memory/builds/<slug>/reviews/`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
-- Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet; the cap is enforced at the `Workflow` tool-call AND at the `Agent` one (both fire a main-loop `PreToolUse`), never inside the script.
-- A sidechain agent holds NEITHER tool, so it cannot fan out at all — the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
+- Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet. A sidechain agent holds NEITHER tool, so it cannot fan out at all: the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
 - Verify before "done": a check that exercises THIS change (its own/affected test, or the relevant gate) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
 - Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing is §1's rule, not restated here.
 
@@ -424,17 +419,16 @@ matched its target population.
 - Readable beats dense — brevity comes from OMITTING items, never compressing prose. Banned in work reports: `·`-chains outside micro-formats, parenthetical inventories (parens hold ≤3 items), multi-clause em-dash trains, one paragraph carrying multiple topics. Keep complete sentences, one idea each; >~5 items becomes a short bulleted list; the rest is omitted and lives in the linked doc. Test: a tired reader parses every line in ONE pass.
 - Micro-formats — MANDATORY, byte-stable, greppable shapes for these events; every other rule binds in substance but its formatting is advisory (wit lives in the freeform sentences, never inside).
 - **The grammar, one statement.** A shape is a HEAD, the joiner, and a TAIL. The head is one keyword
-  from the closed set below, with its case fixed per keyword. The joiner ` — ` appears exactly ONCE
-  and nothing but the head precedes it. Tail fields are separated by ` · ` and by nothing else. No
-  parentheses, except markdown-link syntax. No colon as a joiner or a label — a colon survives only
-  glued to a value, as a port. Placeholders are `<lowercase-name>`, and alternation inside one is the
-  ASCII `|`. A trailing field the shape may omit is wrapped in ASCII square brackets, `[ · <field>]`,
-  which is a notation of the DEFINITION and never appears in an emission. Five glyphs are pinned as
-  STRUCTURE: `—` (U+2014) · `·` (U+00B7) · `→` (U+2192) · `⏳` (U+23F3) · `…` (U+2026); the alternation
-  `|` is ASCII and is deliberately NOT one of them. The grammar binds shape SYNTAX and never value
-  BYTES: an opaque field such as `<subject>`, `<why>` or `<step>` keeps whatever characters it has, so
-  the bans do not reach inside one. A deploy-time `{{…}}` token inside a shape is a VALUE, not
-  structure — it is neither required nor forbidden, and it is not part of the keyword set.
+  from the closed set below, with its case fixed per keyword. Tail fields are separated by ` · ` and
+  by nothing else. Placeholders are `<lowercase-name>`, and alternation inside one is the ASCII `|`.
+  A gate holds the block's own syntax; what follows binds EMISSION, which no gate sees. A trailing
+  field the shape may omit is wrapped in ASCII square brackets, `[ · <field>]`, which is a notation
+  of the DEFINITION and never appears in an emission. Five glyphs are pinned as STRUCTURE: `—`
+  (U+2014) · `·` (U+00B7) · `→` (U+2192) · `⏳` (U+23F3) · `…` (U+2026); the alternation `|` is ASCII
+  and is deliberately NOT one of them. The grammar binds shape SYNTAX and never value BYTES: an
+  opaque field such as `<subject>`, `<why>` or `<step>` keeps whatever characters it has, so the
+  bans do not reach inside one. A deploy-time `{{…}}` token inside a shape is a VALUE, not structure
+  — it is neither required nor forbidden, and it is not part of the keyword set.
 - **R1 — an emitted micro-format is a markdown list item.** `- ` at column 0, then the shape's bytes.
   No backticks, no fence, no bold, no heading. Nothing before the marker and nothing after the last
   field, one shape per line. Two reasons, neither of them taste: backticks and fences defeat the

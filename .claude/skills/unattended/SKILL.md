@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.25 -->
+<!-- gov:kit unattended@1.29 -->
 
 # Unattended runs
 
@@ -16,7 +16,7 @@ merge and a push — it REPLACES it with something a machine can check. If the r
 checkable, the run is not unattended, it is unsupervised. Everything below exists to keep that
 distinction real.
 
-## Before any path — schedule the keepalive NOW
+## Before any path — schedule the idle-wake NOW
 
 **This is the run's first act, and it comes before you read anything else.** Not before preflight:
 before ORIENTING. Use `CronCreate`, at the cadence this project declares —
@@ -26,8 +26,11 @@ every 10 minutes (cron 3-59/10 * * * *) — and keep the id it returns, because 
 CronCreate  ->  keep the id
 ```
 
-**What the tick runs.** TWO acts, in order, and only once the run has a run-state file; before
-`--preflight` no slug exists and the tick does nothing. FIRST,
+**What the tick runs.** TWO acts, in order, and only once this session's `--preflight` has written
+the run's record; before that the tick does nothing. A slug can be known earlier, and a probe issued
+then refuses with check 51, or on a re-run build says the keepalive should have been reaped: both are
+expected before `--preflight`, and neither is a signal to reap the keepalive `--preflight` is about
+to need. FIRST,
 `bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <your own id>`. That is how this
 session's lease is refreshed: the driver cannot observe a harness tick, so the refresh has to
 arrive through a verb, and the matching-id row of the resume matrix is the one that does it
@@ -40,12 +43,17 @@ act: stop the unit's task, record why with `--park` or a brief note, then re-dis
 with a brief naming the stalled command and that it is skipped. The verb cannot see what the unit
 is doing or whether a process is stuck — its figures are the tree's, and the process side is the
 process-monitor kit's question, not this one's. Before this the tick fired every ten minutes
-while a `Workflow` ran in the background and did nothing with the turn.
+while a `Workflow` ran in the background and did nothing with the turn. On `STALLED` act, and
+never end the turn by asking: the owner is absent, and a session bound to a non-terminal run has
+a stop-guard that refuses the stop and says so. The probe is also the run's heartbeat: the driver
+journals `--audit` like every verb but `--version` and `--plan` (protocol section 2), so each tick
+leaves a line in the run log, and a run that stalled reads as a gap in that journal instead of as
+silence.
 
 **Why it is here and not inside a path.** It used to be step 3 of the slug path and nowhere else, so
 three of the four paths below never reached it: the two that start from prose or a playbook orient,
 research, choose a solution, write a build folder and push a branch BEFORE their first verb, and that
-is the longest unattended stretch a run has. A run that stalls in it has no keepalive, nothing wakes
+is the longest unattended stretch a run has. A run that stalls in it has no idle-wake, nothing wakes
 it, and nothing records why. A step written inside one path is a step the other three do not execute,
 which is why this one sits above the table instead.
 
@@ -60,6 +68,18 @@ resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s 
 is session-scoped, so a job left by a run that never began is orphaned exactly like one left by a run
 that ended, and there is no run-state file for a later reader to find it through. Delete it with
 `CronDelete` before you stop.
+
+## What wakes a stalled run
+
+The idle-wake above fires only while the session is idle, so it cannot wake a stalled one. Three
+actors outside the session's turn can, and all three read one predicate: the stop-guard refuses a
+turn end while the run is non-terminal, up to `STOP_GUARD_BLOCKS` times, and says what to run
+instead; the stall-recorder writes an API-error end to the `stall` sidecar; the resume-tick,
+registered by the owner on the OS scheduler, resumes a run from another process on the verdicts
+the protocol's section 5 names as acting — not `STALE` alone. The
+predicate is `bash tools/unattended/unattended.sh --liveness <slug>`, the one to run by hand when you
+want to know what they will see. The tick's registration line is in the kit README and is not
+restated here.
 
 ## Which path
 
@@ -89,7 +109,7 @@ Making a playbook and following one are two acts with two authorizations.
 **A fifth path exists and it is not on this list, because it is not a run**: producing pieces from a
 playbook ATTENDED, with an owner in the loop. It writes no run-state file and calls no driver verb.
 It is [below](#produce-pieces-attended), after the unattended paths it shares its records with.
-It schedules no keepalive, and the section above does not bind it: there is an owner in the loop.
+It schedules no idle-wake, and the section above does not bind it: there is an owner in the loop.
 
 ## Start a run
 
@@ -106,7 +126,7 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    | `minimal-prose` | the transcript rule under a mandate | M10 | all | D1 |
    | `sub-specced` | one mechanism per spec, and sub-spec agreement | M2 | all | D2 |
    | `forks-resolved` | when open questions are settled | M3 | all | D3 |
-   | `specs-reviewed` | the spec audit that precedes code | M4 | all | D4 |
+   | `specs-reviewed` | the spec audit that precedes code, when the build or its project declares it | M4 | all | D4 |
    | `reuse-first` | the recall and reuse obligation | M5 | all | D5 |
    | `parallel-when-disjoint` | the parallelism obligation | M6 | all | D6 |
    | `passes-committed` | the commit boundary | M6 | all | D8 |
@@ -191,7 +211,7 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    exists or the requested set matches the recorded one. So a later verb cannot take an answer, and
    a re-preflight after a compaction re-issues the recorded set rather than opening a new turn.
 
-3. **Preflight**, handing over the keepalive id you already hold and any waiver pairs step 2
+3. **Preflight**, handing over the idle-wake id you already hold and any waiver pairs step 2
    confirmed:
 
    ```bash
@@ -204,6 +224,18 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    advertises no default branch of its own. It writes nothing until every one of those
    passes. It does NOT refuse because another build is live — it announces the concurrent runs and
    continues. Read the refusal it prints — each one names itself.
+
+   One line before `preflight OK` states the spec-audit posture: `unattended: spec-audit — opted in
+   by README spec-audit: <date>` when the build README at BASE declares `spec-audit: <date>`,
+   `unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: <date>` when the README
+   declares no key and the project's `.unattended.conf` at BASE declares that date
+   (`TOOL-aBlindedTrial-7`; the README key wins whatever it says), or
+   `unattended: spec-audit — not owed (opt-in)` when neither does. The pre-code audit is OPT-IN per
+   build (owner ruling of 2026-09-20, `TOOL-aBlindedTrial-6`); both keys are read at BASE, so a
+   working-copy edit opts nothing in or out, and a value that is not a date is a refusal. The `not owed`
+   line carries a recommendation when the build has two or more units or a spec grades FORKED —
+   that is where the audit earned its cost in the trial. Keep the line: the harness call needs it.
+   After a compaction, `--status` carries the same fact as `· spec-audit <date>`.
 
 4. **If this project ships `/session-kickoff`, invoke it now — after preflight, never before.**
    The engine's unattended hand-back fires only when a run-state file already exists in a
@@ -317,7 +349,7 @@ rather than a claim in a transcript nobody reads.
 
    If ACCEPTANCE or GATES is still missing after the ask, **stop without writing anything**. No run
    has started, so there is no run to abort: `--abort` and `--park` both refuse with no run-state
-   file, and the kickoff engine's Step 5b exit 5 does not reach here — it is scoped to a run already
+   file, and the protocol's §13 exit 5 does not reach here — it is scoped to a run already
    started. Nothing staged, nothing committed, nothing to clean up.
 3. **Write the build folder.** `memory/builds/<slug>/README.md`. **Front matter needs ALL
    SIX required keys** — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus
@@ -480,7 +512,7 @@ needs no exception to say so.
 
 **Not a run, and this section is here because it shares the RECORDS with the paths above and nothing
 else.** An owner is in the loop, so there is no run to authorize, no run-state file, no phase, no
-keepalive and no Definition of Done. Every check in the kit gate that is keyed on a run-state file
+idle-wake and no Definition of Done. Every check in the kit gate that is keyed on a run-state file
 sees nothing here, and that is what "not the driver" means.
 
 **What the merge bar still sees is what you PRODUCED.** The per-piece records and the set record are
@@ -630,8 +662,13 @@ definition, so the absence is a decision and not an oversight.
   pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
   commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
 - **Drive the build as ONE program, and know exactly what that buys.** The harness is
-  `tools/workflows/unattended-build.js`, which runs SPEC, AUDIT and DISPOSAL as ordered stages
-  and hands back the ordered roster only on a terminal `--review` verdict; each unit is then built by
+  `tools/workflows/unattended-build.js`, which runs SPEC, then — only when the build or its
+  project declares the audit — AUDIT and DISPOSAL as ordered stages, and hands back the ordered roster on a
+  terminal `--review` verdict, or at SPEC completion when the audit is off by declaration. **Pass
+  `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>` or
+  `opted in by project default SPEC_AUDIT_DEFAULT: <date>`**, and
+  omit it when it read `not owed (opt-in)`; the harness owns the OFF branch and logs it. Each unit is
+  then built by
   `tools/workflows/unattended-unit.js`, one unit per call, holding that unit's brief and spec and
   nothing else. **Every call is made by `scriptPath` and never by `name`** — the fan-out guard's
   read-window narrowing is conditional on `scriptPath`, and a `name:` call exits it at zero.
@@ -685,6 +722,11 @@ definition, so the absence is a decision and not an oversight.
   their own build method names.)
 - Check yourself with `bash tools/unattended/unattended.sh --status <slug>`, and the units with
   `bash tools/unattended/unattended.sh --audit <slug>`.
+- The one predicate every OUT-OF-SESSION reader shares — key: value lines and one verdict:
+
+  ```bash
+  bash tools/unattended/unattended.sh --liveness <slug>
+  ```
 
 ## While the work runs
 
@@ -760,7 +802,9 @@ It answers with one of five states, and the state is what you act on:
   record names yet — under their own one-round bound. `auditIds` and `subjects` are never passed
   together: the harness refuses the pair by name, because a supplied subject set cannot be scoped to
   the promoted units. Skip that re-invocation and the promoted unit closes un-audited, which
-  `specs-audited` refuses at `--close`.
+  `specs-audited` refuses at `--close` on a build that declared `spec-audit:` or whose project declared
+  a `SPEC_AUDIT_DEFAULT`; a build under neither
+  owes no audit and the item announces `not owed` instead.
 - **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
   record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.
@@ -818,15 +862,22 @@ manual resume before an `after` hold's instant would otherwise delete the one th
 the run, while `--status` went on naming it.
 
 **On the take-over branch, REAP the recorded id before you schedule a replacement.** In that
-order, and the order is the whole point. The intuition is that a resumed session's keepalive died with its process because
+order, and the order is the whole point. The intuition is that a resumed session's idle-wake died with its process because
 the store is session-scoped — and that intuition is MEASURED FALSE: a run asserted it twice about two
 jobs and `CronCreate`'s own listing showed both still firing. So issue
 `CronDelete` against the `keepalive` id the run-state file already names, read the result
 back, and say what it returned. Assume a surviving job, not a dead one; the failure mode of assuming
-dead is a keepalive firing forever with a green `keepalive-reaped` attestation over it.
+dead is an idle-wake firing forever with a green `keepalive-reaped` attestation over it.
 
-Then schedule the new one. This is the only exception to "read the record first": read it, reap,
-schedule, resume, kick off, and then do the work.
+Then schedule the new one, with the stall-probe prompt the keepalive section gives: this run
+already has its slug and its run-state file. This is the only exception to "read the record
+first": read it, reap, schedule, resume, kick off, and then do the work.
+
+**Then record the new id, so the record names the session that now holds the run.** After the reap
+and the re-schedule, run `bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <id>` with
+the new id: it re-records `keepalive`, `session` and `pid`, prints what it replaced and stages the
+file, and the close attestation then covers one job. Re-preflighting is NOT the remedy: it refuses
+on a dirty tree and re-pins the anchor.
 
 **Then, if this project ships `/session-kickoff`, invoke it — after the `--resume` that neither
 refused nor printed `still held`, before the first pass.** Its unattended hand-back fires because the run-state file exists in a
@@ -874,10 +925,12 @@ be invisible. A bar that does not answer within it is KILLED, and
 FAILED. Those are different facts, and an operator who confuses them spends an hour hunting a
 failing leg that does not exist. The same bound covers the wiring check `--preflight` runs.
 
-It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest, because no script
-can observe them: that you reaped the keepalive (`CronDelete`), and that every parked
-decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the
-gate says so wherever it reports them.
+It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest: that you reaped
+the idle-wake (`CronDelete`), and that every parked decision reached the wrap-up. **One of
+them is READ BACK.** The stop-guard records the harness's own cron listing at every stop of a bound
+session, and `--landed` refuses while your recorded id is still in it — so attest the reap honestly,
+because the next verb checks it against evidence you did not write. The other has no observer;
+attestation is not a machine verdict, and the gate says so wherever it reports them.
 
 **TWO items have NO override, and this is where you will meet them: `authorization-reachable` and
 `pieces-complete`.** Neither can be overridden, waived or attested around. An override on the
@@ -924,6 +977,47 @@ two pairs in one invocation, and a reason belongs to the flag that precedes it. 
 you are the only reader, and neither way of getting it wrong is silent: a `--override` left without
 its own `--reason` is REFUSED before anything is written, and an item you never named at all simply
 keeps blocking the close. Nothing is recorded on a reason that was written about a different item.
+
+## Record the run
+
+**This section binds only where `tools/runlog/runlog.py` exists in this repository.** Test for
+it before the first render. Where it is absent, skip every step below and say so in the wrap-up: this
+repository has not taken the runlog kit, so there is nothing to render from and no record is owed.
+Nothing else in this Skill changes when you skip it.
+
+```bash
+test -f tools/runlog/runlog.py   # exit 0: the kit is here and this section binds; exit 1: skip it
+python tools/runlog/runlog.py record <slug> --write
+```
+
+**Why it is a step at all.** The journals a run writes are machine-local and never pushed, so a run
+nobody renders is a run no other node can read. The render writes ONE closed-schema record into the
+build folder and prints the two follow-ups it cannot run itself: re-render the build index, and commit
+under a subject naming the slug and no unit id. Run the index command it prints, stage the record and
+everything the index rewrote, and let them ride the commit named below. A run that served no
+spec-defined unit gets the command's own no-record line and no file. That line is the answer, not a
+failure.
+
+**Three placements, and each rides a commit the run already makes**, so no path gains a commit it did
+not have. Each is the commit that carries the run-state file the verb just staged:
+
+1. **After `--abort`**, in the ABORTED record commit. Render, re-index and stage before you commit it.
+2. **After `--close` and before the merge, on every run that lands**, in the close's records commit:
+   the one `--close` tells you to make before you land. The record then travels with the merge, and
+   the bar at the push boundary grades it.
+3. **After `--landed`**, in the LANDED record commit. Render AGAIN: `record --write` finds the run's
+   existing file by its run key, so it rewrites the SAME file rather than adding a second one. The
+   landing push joins this run by what it pushed, so the re-render adds that push and the landing
+   bar's verdict.
+
+**Never between the lander's push and `--landed`.** Where the project declares a lander marker, a
+commit there moves HEAD off the commit the marker names, and `--landed` refuses it at check 34 — the
+wedge the section on marking it landed warns about. That is why the third render waits for the verb
+rather than following the push.
+
+**A render that refuses blocks nothing.** It names why on stderr; say so in the wrap-up and go on. The
+record is evidence, never an input: no verb reads it, and the leg that grades a committed record
+cannot see one that was never written. A skipped render is caught by nothing, so you have to say it.
 
 ## Land
 
@@ -997,16 +1091,35 @@ that branch. What the weaker anchor does not buy is protocol section 9, and it i
 the tree, and refuses, numbered, when your landing commit is on no remote tip — not yet pushed, or
 merged only into the local default branch, which is not a landing in this mode.
 
-**Under `primary`, DO NOT COMMIT BETWEEN THE PUSH AND THIS VERB.** Where the project declares a
-lander marker, the lander writes the commit it pushed and this verb requires that commit to be on
-the tip the remote advertises, and the witness it validated to BE that commit or an ancestor of it.
-That is ancestry, so the `--no-ff` merge the lander pushes satisfies it, and a marker left by an
-EARLIER landing does not: your witness is not under that one. The refusal names both shas, the
-witness and what the marker holds. Then commit the record it writes and land that commit too; until
-it is, your committed record says `LANDING`, and a clone that cannot see the remote reads it as live.
+**Under `primary`, RUN IT FROM THE RUN WORKTREE, AFTER THE LANDER, AND DO NOT COMMIT BETWEEN THE
+PUSH AND THIS VERB.** Where the project declares a lander marker, the lander writes the commit it
+pushed and this verb reads CONTAINMENT, not equality: that commit must be on the tip the remote
+advertises, and the witness it validated must BE that commit or an ancestor of it. So the `--no-ff`
+merge the charter mandates stamps from your own branch, and a marker left by an EARLIER landing does
+not: your witness is not under that one. Each refusal names what it read — the witness and what the
+marker holds — so a stale marker, a marker this clone does not hold, and a moved remote are
+distinguishable. Then commit the record it writes and land that commit too; until it is, your
+committed record says `LANDING`, and a clone that cannot see the remote reads it as live.
+
+**That record commit is where the run record re-renders**, and never before this verb returns: the
+third placement in [Record the run](#record-the-run), which binds where the runlog kit is installed.
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
 Definition of Done was evaluated without evaluating it.
+
+**It reads the reap back, and it may tell you to END THE TURN.** Where the stop-guard is wired, the
+newest stop it recorded for this run carries the harness's cron listing. `--landed` reads that line:
+recorded in `LANDING` and free of your keepalive id, it prints `keepalive-reaped: checked` and
+stamps; still naming the id, it refuses — reap the job, end the turn so the stop-guard records the
+listing again, then re-run. A newest line from BEFORE the close is also a refusal, because the check
+could run and has not: end the turn ONCE, the stop-guard blocks that stop as `finished and unstamped`
+and continues you, and the re-run reads the post-close line. That works for the LEASED session
+alone — the stop-guard binds by the lease — so a session the record does not name is refused FIRST
+and told to run `--resume <slug> --keepalive-id <id>`; ending the turn there records nothing. A
+LANDING line older than the lease is the pre-close case too: it is the dead incarnation's. If no
+record ever appears for the leased session the hook is unwired and `adopt-unattended.sh --check`
+says so. With no sidecar at all — no hook — or a lease naming no session, the verb lands and prints
+`unchecked` with the reason, never silently.
 
 ## If it cannot continue YET — hold it
 
@@ -1062,10 +1175,15 @@ never says why. It is validated against a closed vocabulary, and the refusal nam
 you do not have to read source to find it. There is no catch-all member: if nothing fits, take the
 closest code and put the specifics in the reason, and say so — a mismatch worth a backlog row is
 better than a vocabulary with a hole in it. You still owe both attestations first — reap the
-keepalive and surface the parked decisions — since an aborted run orphans exactly the same job and
-leaves exactly the same decisions unseen. An abort does not merge and does not push.
+idle-wake (`keepalive-reaped`) and surface the parked decisions — since an aborted run orphans
+exactly the same job and leaves exactly the same decisions unseen. An abort does not merge and does
+not push.
+
+**Render the run record before you commit the ABORTED record**: the first placement in
+[Record the run](#record-the-run), which binds where the runlog kit is installed.
 
 ## Reap
 
-Delete the keepalive with `CronDelete` before you finish. Nothing else can: when your
-process exits, an unreaped job is orphaned in a store no later run can see.
+Delete the idle-wake with `CronDelete` before you finish, and attest `keepalive-reaped`.
+Nothing else can: when your process exits, an unreaped job is orphaned in a store no later run can
+see.

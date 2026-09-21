@@ -163,7 +163,7 @@ ids TOOL-dDerivedDocket-60
 | [TOOL-dDerivedDocket-32 — remote CI on every push](spec/2026-09-14-spec-TOOL-dDerivedDocket-32.md) | 30 | 2 | SPECCED | rev-5 | 2026-09-21 |
 | [TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered](spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md) | 31 | 2 | SPECCED | rev-7 | 2026-09-21 |
 | [TOOL-dDerivedDocket-35 — arming and the real-tree staged reds](spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md) | 32 | 2 | SPECCED | rev-6 | 2026-09-21 |
-| [PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception](spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md) | 33 | 2 | SPECCED | rev-5 | 2026-09-21 |
+| [PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception](spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md) | 33 | 2 | SPECCED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier](spec/2026-09-14-spec-TOOL-dDerivedDocket-36.md) | 34 | 2 | SPECCED | rev-4 | 2026-09-21 |
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 35 | 1 | SPECCED | rev-6 | 2026-09-21 |
 <!-- /gen:build-units -->
