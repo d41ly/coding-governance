@@ -71,6 +71,9 @@ mutates_index = false
 # unconditionally, and it seeds the project layer only when that file is absent, printing `already
 # present — left untouched` otherwise. So re-running it cannot reset a measured pin set, which is the
 # one thing a re-render must never do here.
+# WHY THE BLOCK EXISTS AT ALL: without one, the kit's `rendered` row went a vintage stale on
+# every update — GOVKIT_RERENDER set or not, because the flag runs a block and there was none
+# (TOOL-dRetiredFork-29).
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-drift-audit.sh"]
 

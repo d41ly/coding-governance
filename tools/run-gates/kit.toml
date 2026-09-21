@@ -37,7 +37,7 @@ role = "engine"
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
 [[files]]
-include = ["adopt-run-gates.test.sh", "profile_bar.test.sh", "run-gates.evidence.test.sh", "run-gates.test.sh", "run-gates.turnstile.test.sh", "run-selftests.test.sh"]
+include = ["adopt-run-gates.test.sh", "profile_bar.test.sh", "run-gates.evidence.test.sh", "run-gates.runlog.test.sh", "run-gates.test.sh", "run-gates.turnstile.test.sh", "run-selftests.test.sh"]
 role = "project-owned"
 
 # THE GOV-ONLY HARNESS IS WITHHELD. Its arms are keyed on THIS repo's corpus — gov's declared chunk

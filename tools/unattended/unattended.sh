@@ -40,7 +40,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.25   # gov:kit unattended@1.25 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.27   # gov:kit unattended@1.27 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -337,6 +337,10 @@ MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""
+# TOOL-dLoggedFlight-2 - the run log's two inputs. RUNLOG_SESSION_VARS is a declared key and defaults
+# here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so it is copied BEFORE the conf is
+# sourced: a tracked file the run commits itself must not be what turns that run's own log off.
+RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -387,7 +391,10 @@ M="$MEMORY_ROOT"
 [ "$SHARED_RECORDS" = "__kit-default__" ] && SHARED_RECORDS="$MEMORY_ROOT/DECISIONS.md $MEMORY_ROOT/backlog"
 
 status=0
-fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
+# TOOL-dLoggedFlight-2 - every refusal is also RECORDED, by number and in call order, for the run
+# log's END line. In a subshell the append is lost; that reaches only `--plan`, which is not journaled.
+RUNLOG_CHECKS=()
+fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; RUNLOG_CHECKS+=("$1"); }
 
 # ---------------------------------------------------------------- the kit-owned core declarations
 # CORE, in run order. A project EXTENDS via PHASES_EXTRA and deletes nothing: the gate leg asserts
@@ -456,6 +463,10 @@ DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 # Kit-owned, like the two sets above it, and for the same reason: the owner asked that these be
 # MUST-by-default. A conf key would let a project declare zero directives, which is a global waiver
 # carrying no name, no reason and no record. DIRECTIVES_EXTRA is where a project ADDS.
+# TOOL-aBlindedTrial-6 (owner, 2026-09-20) supersedes that ruling for ONE member: the spec-audit pair
+# (`specs-reviewed` here, `specs-audited` in DOD_CORE) is opt-in per build, declared by a dated
+# `spec-audit:` key in the build README at BASE; both members stay in the core sets so no adopter's
+# floor moves, and the evidence is the trial report under memory/builds/aBlindedTrial/build/.
 #
 # Two handles may cite one section - the section is the carrier, not the rule.
 # TOOL-aPromptedMandate-4 - an entry is `<handle>:<section>[:<scope>]`. The THIRD field is the
@@ -772,6 +783,14 @@ AUTH_PIECES=""
 AUTH_OUTPUTS=""
 AUTH_GRAIN=""
 AUTH_RECORDS=""
+# TOOL-aBlindedTrial-2 - the `spec-audit: <date>` declaration, read from the same BASE blob and for
+# the same provenance property: a run cannot opt itself in or out by editing its working copy.
+# Empty is the ordinary case and means the pre-code audit is not owed by this build. That empty is
+# ALSO the value before check_authorization has run at all, so `AUTH_SPEC_AUDIT_DERIVED` says which
+# (round 2, R3): set to 1 on the line after the derivation, and a grader that finds it empty refuses
+# as NOT GRADABLE rather than printing a sentence about a README nobody read.
+AUTH_SPEC_AUDIT=""
+AUTH_SPEC_AUDIT_DERIVED=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -1140,17 +1159,21 @@ trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
 # ------------------------------------------------------------------------------------ preconditions
 # The slug is validated against the SAME grammar hygiene check 4 enforces on a build folder, so a
 # traversal argument is refused by the rule that would have refused the folder — not by a second one.
+# The SHAPE is its own predicate because a second caller needs it with no refusal attached: the run
+# log's START records a slug only when it passes, and it runs before any verb could refuse. One
+# grammar, two callers, rather than a copy of the pattern that drifts. TOOL-dLoggedFlight-2.
+check_slug_shape() { # slug -> 0 when it is a build-folder name
+  case "$1" in *[!A-Za-z0-9-]* | "" | [!A-Za-z]*) return 1 ;; esac
+  return 0
+}
 check_slug() {
   # Bound to a NAME, not used as `$1`: check-arms reads `${?[A-Za-z_]…` as an interpolation and a
   # bare positional as literal text, so a `$1` in a message lands in the signature and nothing can
   # arm the branch. Same reason the value trails the sentence.
   local slug="$1"
-  case "$slug" in
-    *[!A-Za-z0-9-]* | "" | [!A-Za-z]*)
-      fail 1 "the slug is not a build-folder name; expected the slug alone, a letter then letters, digits or dashes: $slug"
-      return 1 ;;
-  esac
-  return 0
+  check_slug_shape "$slug" && return 0
+  fail 1 "the slug is not a build-folder name; expected the slug alone, a letter then letters, digits or dashes: $slug"
+  return 1
 }
 
 # THE DIRTY-AND-UNTRACKED LISTING, one path per line. `git status --porcelain` alone is NOT the
@@ -1437,7 +1460,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _sa_shown
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -1468,9 +1491,28 @@ check_authorization() { # slug · base
     /^slug:/ { v = $0; sub(/^slug:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "slug=" v; next }
     /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "mode=" v; next }
     /^playbook:/ { v = $0; sub(/^playbook:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "playbook=" v; next }
-    /^pieces:/ { v = $0; sub(/^pieces:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "pieces=" v; next }')
+    /^pieces:/ { v = $0; sub(/^pieces:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "pieces=" v; next }
+    /^spec-audit:/ { v = $0; sub(/^spec-audit:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "spec-audit=" v; next }')
   fmslug=$(printf '%s\n' "$_fm" | sed -n 's/^slug=//p' | head -1)
   AUTH_MODE=$(printf '%s\n' "$_fm" | sed -n 's/^mode=//p' | head -1)
+  # TOOL-aBlindedTrial-2 - the opt-in, out of the same scan. A present value that is not a date is
+  # a REFUSAL rather than a default in either direction: read as absent it would silently opt a
+  # build out that the owner meant to opt in, and pinned as-is it would carry a fact no reader can
+  # date. The shape is the front matter's own `opened:` shape and nothing looser.
+  #
+  # PRESENCE IS TESTED SEPARATELY FROM VALUE (closing review of units 2-5, F4). A bare `spec-audit:`
+  # line emits `spec-audit=` and an empty value, which the `""` arm below read as ABSENT - the exact
+  # silent opt-out the sentence above forbids, one value narrower. Present-and-empty is shown as
+  # `(empty)` so it takes the refusal; a README with no such line still falls through as not owed.
+  AUTH_SPEC_AUDIT=$(printf '%s\n' "$_fm" | sed -n 's/^spec-audit=//p' | head -1)
+  AUTH_SPEC_AUDIT_DERIVED=1
+  _sa_shown="$AUTH_SPEC_AUDIT"
+  if [ -z "$AUTH_SPEC_AUDIT" ] && printf '%s\n' "$_fm" | grep -q '^spec-audit='; then _sa_shown="(empty)"; fi
+  case "$_sa_shown" in
+    ""|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) fail 52 "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: $_sa_shown"
+       return 1 ;;
+  esac
   # out of the SAME scan. The `No second GIT show` rule above bounds THAT
   # front-matter parse and is not a rule against reading a second FILE, which S2b does.
   AUTH_PLAYBOOK=$(printf '%s\n' "$_fm" | sed -n 's/^playbook=//p' | head -1)
@@ -2839,6 +2881,13 @@ verb_preflight() { # slug · keepalive-id
     [ -n "$(fact "$rel" grain)" ]    || set_fact "$rel" grain    "$AUTH_GRAIN"    || return 1
     [ -n "$(fact "$rel" records)" ]  || set_fact "$rel" records  "$AUTH_RECORDS"  || return 1
   fi
+  # TOOL-aBlindedTrial-2 - the opt-in, pinned once and only when DECLARED, on the recipe facts'
+  # terms: a blank fact would be a key that reads as configured while carrying nothing, and the
+  # `specs-audited` grader compares the fact against the BASE derivation as evidence (fail 53 on a
+  # presence disagreement).
+  if [ -n "${AUTH_SPEC_AUDIT:-}" ]; then
+    [ -n "$(fact "$rel" spec-audit)" ] || set_fact "$rel" spec-audit "$AUTH_SPEC_AUDIT" || return 1
+  fi
   if [ -n "$BREF" ] && [ -z "$(fact "$rel" branch-ref)" ]; then
     set_fact "$rel" branch-ref "$BREF" || return 1
     set_fact "$rel" branch-sha "$BSHA" || return 1
@@ -2866,7 +2915,32 @@ verb_preflight() { # slug · keepalive-id
   # a second preflight $AREF/$ASHA hold what was just OBSERVED while the record holds what is pinned.
   # Printing the observation would be the same lie in the operator's face that the unconditional
   # base write was on disk, one field over.
+  print_spec_audit_line "$slug" "$rel"
   echo "unattended: preflight OK — base $base · anchor $(fact "$rel" anchor-ref) at $(fact "$rel" anchor-sha) · keepalive $kid · region copied from $src"
+  return 0
+}
+
+# TOOL-aBlindedTrial-2 - the ONE line a reader learns the opt-in state from at the start of a run;
+# the other is the `specs-audited` item's own at --close. Reads the PINNED fact; at --close the
+# grader re-derives from BASE and refuses (fail 53) if the two disagree on presence. Silent-at-zero
+# is the house rule for the
+# recommendation clause: a one-unit build with no open fork is what the trial measured the audit
+# buying nothing on, so the clause rides only where the build has two or more units in its
+# generated region or a tracked spec grades FORKED.
+print_spec_audit_line() { # slug · run-state file
+  local sa why="" n=0 _sp
+  sa=$(fact "$2" spec-audit)
+  if [ -n "$sa" ]; then
+    echo "unattended: spec-audit — opted in by README spec-audit: $sa"
+    return 0
+  fi
+  n=$(unit_rows "$(readme_of "$1")" 2>/dev/null | row_ids_of | grep -c .)
+  [ "${n:-0}" -ge 2 ] && why="$n units in the generated region"
+  for _sp in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
+    [ "$(plan_state "$_sp")" = FORKED ] || continue
+    why="${why:+$why, }a spec grading FORKED"; break
+  done
+  echo "unattended: spec-audit — not owed (opt-in)${why:+; recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: $why}"
   return 0
 }
 
@@ -2972,6 +3046,10 @@ BRIEFROWS
     # is decoration, and this kit says so about its own phase writer.
     local hc; hc=$(fact "$rel" halt-code)
     [ -n "$hc" ] && hc=" · halt-code $hc" || hc=""
+    # TOOL-aBlindedTrial-2 - the opt-in fact rides the status line when pinned, so a run resumed after
+    # a compaction can hand the harness its `specAudit` without the preflight line in its context.
+    local _sa; _sa=$(fact "$rel" spec-audit)
+    [ -n "$_sa" ] && hc="$hc · spec-audit $_sa"
   printf 'unattended: %s · phase %s · witness %s%s · next %s%s
 ' "$slug" "$p" "${w:-NONE}" "$hc" "$unit" "$parked"
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
@@ -3748,10 +3826,18 @@ $_bcnon"
       esac
       return 0 ;;
     specs-audited)
-      # The spec audit is an `all`-scoped DIRECTIVE that no machine anywhere observed, while the
-      # memory-tree index generator renders the exact gap into every build README and the run commits
-      # that line as part of its own work. This item reads the evidence instead of the rendered line,
-      # because that line is the memory-tree kit's and this kit copy-installs without it.
+      # OWED ONLY WHEN DECLARED (TOOL-aBlindedTrial-2, on the owner's ruling TOOL-aBlindedTrial-6):
+      # the pre-code spec audit is opt-in per build, and the build opts in with a dated `spec-audit:`
+      # key in its README at BASE, read by `authorization-reachable` into `AUTH_SPEC_AUDIT` in this
+      # same shell. Term zero below keys on THAT; the `spec-audit` fact --preflight pins is EVIDENCE
+      # compared against it, and a presence disagreement is fail 53. Derived absent, the item is MET
+      # and announces that nothing was owed. The item stays in DOD_CORE so no adopter's CORE_FLOOR
+      # moves, which is why this is a term and not a set edit.
+      #
+      # Where it IS owed: the spec audit is an `all`-scoped DIRECTIVE that no machine anywhere observed,
+      # while the memory-tree index generator renders the exact gap into every build README and the run
+      # commits that line as part of its own work. This item reads the evidence instead of the rendered
+      # line, because that line is the memory-tree kit's and this kit copy-installs without it.
       #
       # WHAT IT DOES NOT CHECK, per the charter's rule that a gate's own header says so: whether the
       # audit FOUND anything, whether it was performed at the unit's current rev, and whether a
@@ -3761,7 +3847,34 @@ $_bcnon"
       # OVERRIDABLE, deliberately, unlike `authorization-reachable`: a genuinely thin Tier-1 unit
       # becomes a recorded decision rather than an invisible skip.
       DOD_OUT=""
-      local _sa_rows _sa_ids _sa_id _sa_f _sa_named _sa_miss=""
+      local _sa_rows _sa_ids _sa_id _sa_f _sa_named _sa_fact _sa_miss=""
+      # TERM ZERO, the `pieces-complete` shape: MET, and it ANNOUNCES the skip, because a silent pass
+      # is indistinguishable from coverage. Keyed on the BASE-DERIVED value (closing review of units
+      # 2-5, F3): `authorization-reachable` is graded earlier in this same shell, is not overridable,
+      # and leaves `AUTH_SPEC_AUDIT` populated from the README blob at BASE. The first cut keyed on the
+      # pinned fact instead - the run-state file, which the run WRITES - so deleting one `spec-audit:`
+      # line from RUN.md turned an owed audit into "not owed" with a sentence about BASE that was
+      # false. That is the deleted-`base:`-line shape `trusted_base`'s header names, one key over, and
+      # it takes the same cure: the recorded fact is EVIDENCE compared against the derivation, never
+      # the input, and a disagreement on PRESENCE is a refusal. Never the worktree README either.
+      #
+      # NOT GRADABLE when the derivation never ran (round 2, R3): `authorization-reachable` returns
+      # early on an unreachable anchor or a missing README, the DoD loop grades every item regardless,
+      # and the global's "never set" and "derived absent" are the same bytes. The fail-53 sentence is
+      # printed only over a derivation that happened; this branch says the anchor is the cause.
+      if [ -z "${AUTH_SPEC_AUDIT_DERIVED:-}" ]; then
+        DOD_OUT="specs-audited — not gradable: the README at BASE was not derived in this shell (authorization-reachable is unmet above), so whether this build opted in is unknown here"
+        return 1
+      fi
+      _sa_fact=$(fact "$rel" spec-audit)
+      if [ "${AUTH_SPEC_AUDIT:+1}" != "${_sa_fact:+1}" ]; then
+        fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
+        return 1
+      fi
+      if [ -z "${AUTH_SPEC_AUDIT:-}" ]; then
+        DOD_OUT="specs-audited — not owed: the spec audit is opt-in and the build README at BASE declares no spec-audit: key, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
+        return 0
+      fi
       if ! _sa_rows=$(unit_rows "$(readme_of "$slug")"); then
         DOD_OUT="the build README carries no well-formed units marker pair, and this item reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
         return 1
@@ -3793,7 +3906,7 @@ $_bcnon"
       done
       if [ -n "$_sa_miss" ]; then
         if [ -z "${_sa_named//[[:space:]]/}" ]; then
-          DOD_OUT="no TRACKED record under this build carries a spec-audit binding line at all, so the pre-code review pass the build method makes MUST-by-default left no evidence; units closed without one:$_sa_miss"
+          DOD_OUT="no TRACKED record under this build carries a spec-audit binding line at all, so the pre-code review pass this build opted into with its spec-audit: key left no evidence; units closed without one:$_sa_miss"
         else
           DOD_OUT="a CLOSED unit is named by no tracked spec-audit record, so its spec was never audited before its code was written:$_sa_miss"
         fi
@@ -5199,6 +5312,255 @@ SIBS
   return 0
 }
 
+# ------------------------------------------------------------------------------------ the run log
+# TOOL-dLoggedFlight-2. Every journaled call leaves a START line, written just before the argument
+# loop, and an END line, written from an EXIT trap, in `driver.log` under `runlog/` in the git COMMON
+# dir - one file for the primary tree and every linked worktree of a clone. The grammar is the runlog
+# kit's, stated in its README; this block writes it and reads none of it. The pair holds what the
+# run-state file cannot: every refusal by check number, the phase read back from the file after the
+# verb, resumes, and calls that were killed.
+#
+# EVIDENCE, NEVER AN INPUT. No verb and no gate branches on a line - protocol section 2's rule for
+# facts 5-7. Logging never changes an exit status, stdout or signal behaviour: a failed write prints
+# ONE `unattended: run log` line on stderr and the verb goes on.
+#
+# NO SIGNAL TRAP, ON PURPOSE. A trapped TERM waits for the foreground child, and `--close` runs the
+# merge bar in the foreground under GATE_BOUND, so a TERM trap would hold a killed close for up to an
+# hour. Every exit the driver CHOOSES sets RUNLOG_CLEAN=1 immediately before it instead, and the EXIT
+# trap, which an untrapped TERM still runs, writes `exit=clean` or `exit=unclean`. A KILL runs nothing,
+# so a START with no END is the killed-call signature. An unclean END's `rc` is whatever `$?` the trap
+# saw, often 0: read `exit=` first. The runlog-writer suite enumerates every `exit` in this file and
+# the library and reds on one without the marker.
+#
+# ZERO SPAWNS on the hot path, counted from an xtrace by that suite: time, paths and phase in pure
+# bash, `-nt` for the out-of-band flag, a builtin `printf >>` for the append. The first call in a
+# clone pays one `mkdir`.
+#
+# WHAT THIS DOES NOT CATCH. The conf is sourced into this shell before the trap exists, so a conf
+# that `exit`s leaves no line at all, and one that redefines `builtin` or sets a DEBUG trap owns the
+# writer as it owns everything else here - `builtin trap` stops only a conf FUNCTION named `trap`. A
+# call whose first argument is not its verb is journaled with an empty verb and slug. `oob=1` fires
+# after ANY rewrite of RUN.md the driver did not make, a checkout or merge included: it means
+# "changed outside the driver since its last logged call", which is noise to read, not an accusation.
+RUNLOG_MAX_BYTES=2048    # the grammar's line cap, LF not counted
+RUNLOG_DIR=""; RUNLOG_GITDIR=""; RUNLOG_VERB=""; RUNLOG_SLUG=""; RUNLOG_N=""; RUNLOG_T0=""
+RUNLOG_CLEAN=""; RUNLOG_WARNED=""; RUNLOG_MKDIR=""
+
+# The two directories, with no `git` process: this worktree's git dir holds the out-of-band stamp,
+# and the COMMON dir holds the journal. `.git` is a directory in the primary tree and a `gitdir:` file
+# in a linked worktree, whose `commondir` names the common dir relative to it - `../..` is folded, so
+# a path this block prints is the one git would print. Never `.git/worktrees/<name>/runlog`, which
+# would split one clone's journal in two.
+resolve_runlog_dirs() { # -> sets RUNLOG_GITDIR and RUNLOG_DIR; rc 1 when no git dir resolves
+  local g="$ROOT/.git" l="" c=""
+  if [ -f "$g" ]; then
+    { IFS= read -r l < "$g"; } 2>/dev/null || [ -n "$l" ] || return 1
+    l=${l%$'\r'}
+    case "$l" in "gitdir: "?*) g=${l#gitdir: } ;; *) return 1 ;; esac
+    case "$g" in /*|[A-Za-z]:[/\\]*) ;; *) g="$ROOT/$g" ;; esac
+  elif [ ! -d "$g" ]; then
+    return 1
+  fi
+  RUNLOG_GITDIR=$g
+  if [ -f "$g/commondir" ]; then
+    { IFS= read -r c < "$g/commondir"; } 2>/dev/null || [ -n "$c" ] || return 1
+    c=${c%$'\r'}
+    case "$c" in
+      /*|[A-Za-z]:[/\\]*) ;;
+      *) while :; do
+           case "$c" in
+             ..)   g=${g%/*}; c=""; break ;;
+             ../*) g=${g%/*}; c=${c#../} ;;
+             *)    break ;;
+           esac
+         done
+         c="$g${c:+/$c}" ;;
+    esac
+  else
+    c=$g
+  fi
+  RUNLOG_DIR="$c/runlog"
+  return 0
+}
+
+# `fact`'s semantics - the first `phase:` line wins, the spaces after the colon and a trailing CR are
+# dropped - but INTO A VARIABLE, because `$(fact …)` is a fork and this runs twice on every call.
+read_phase_into() { # variable name · run-state file -> sets the variable to the phase, or empty
+  local _rp_l="" _rp_v=""
+  if [ -f "$2" ]; then
+    while IFS= read -r _rp_l || [ -n "$_rp_l" ]; do
+      _rp_l=${_rp_l%$'\r'}
+      case "$_rp_l" in
+        phase:*) _rp_v=${_rp_l#phase:}
+                 while [ "${_rp_v# }" != "$_rp_v" ]; do _rp_v=${_rp_v# }; done
+                 break ;;
+      esac
+    done 2>/dev/null < "$2"
+  fi
+  printf -v "$1" '%s' "$_rp_v"
+}
+
+# THE ONE APPEND, and it writes the grammar's bytes, not an approximation of them. Each value is
+# escaped backslash FIRST, then TAB, LF and CR, so the first pass cannot re-escape the others. A line
+# over the cap is fitted by the runlog kit's REFERENCE rule: the driver writes no indexed family, so
+# only its second step applies - cut the longest value outside `v n t p ev` from its end, never inside
+# an escape and never inside a UTF-8 character, and measure again. The suite compares the result with
+# the kit's own `render_line`. `LC_ALL=C` for this function alone, so `${#v}` counts BYTES, which is
+# what the cap counts.
+write_runlog_line() { # key value [key value ...] -> one line appended to the driver journal
+  local LC_ALL=C _wl_bs='\' _wl_tab=$'\t' _wl_line="" _wl_v _wl_i _wl_size=0 _wl_best _wl_blen
+  local _wl_cut _wl_b _wl_c _wl_need
+  local -a _wl_key=() _wl_val=()
+  while [ "$#" -ge 2 ]; do
+    _wl_v=${2//"$_wl_bs"/"$_wl_bs$_wl_bs"}; _wl_v=${_wl_v//$'\t'/'\t'}
+    _wl_v=${_wl_v//$'\n'/'\n'}; _wl_v=${_wl_v//$'\r'/'\r'}
+    _wl_key+=("$1"); _wl_val+=("$_wl_v"); shift 2
+  done
+  for _wl_i in "${!_wl_key[@]}"; do
+    _wl_size=$(( _wl_size + ${#_wl_key[_wl_i]} + ${#_wl_val[_wl_i]} + 2 ))
+  done
+  _wl_size=$(( _wl_size - 1 ))
+  while [ "$_wl_size" -gt "$RUNLOG_MAX_BYTES" ]; do
+    _wl_best=-1; _wl_blen=0
+    for _wl_i in "${!_wl_key[@]}"; do
+      case "${_wl_key[_wl_i]}" in v|n|t|p|ev|*_more) continue ;; esac
+      [ "${#_wl_val[_wl_i]}" -gt "$_wl_blen" ] && { _wl_best=$_wl_i; _wl_blen=${#_wl_val[_wl_i]}; }
+    done
+    [ "$_wl_best" -ge 0 ] || break
+    _wl_c=$(( _wl_blen - (_wl_size - RUNLOG_MAX_BYTES) )); [ "$_wl_c" -gt 0 ] || _wl_c=0
+    _wl_cut=${_wl_val[_wl_best]:0:_wl_c}
+    # A character cut in half is dropped whole, as the reference's decode drops it: count the
+    # continuation bytes that end the value, then ask the lead byte before them how many it needed.
+    _wl_c=0
+    while [ "$_wl_c" -lt "${#_wl_cut}" ] && [ "$_wl_c" -lt 3 ]; do
+      _wl_b=${_wl_cut:$(( ${#_wl_cut} - _wl_c - 1 )):1}
+      case "$_wl_b" in [$'\x80'-$'\xbf']) _wl_c=$(( _wl_c + 1 )) ;; *) break ;; esac
+    done
+    if [ "$_wl_c" -lt "${#_wl_cut}" ]; then
+      _wl_b=${_wl_cut:$(( ${#_wl_cut} - _wl_c - 1 )):1}
+      case "$_wl_b" in
+        [$'\xc0'-$'\xdf']) _wl_need=1 ;;
+        [$'\xe0'-$'\xef']) _wl_need=2 ;;
+        [$'\xf0'-$'\xf7']) _wl_need=3 ;;
+        *)                 _wl_need=0 ;;
+      esac
+      [ "$_wl_c" -lt "$_wl_need" ] && _wl_cut=${_wl_cut:0:$(( ${#_wl_cut} - _wl_c - 1 ))}
+    fi
+    # ...and an escape cut in half leaves an ODD run of trailing backslashes: drop one.
+    _wl_c=0
+    while [ "$_wl_c" -lt "${#_wl_cut}" ] \
+          && [ "${_wl_cut:$(( ${#_wl_cut} - _wl_c - 1 )):1}" = "$_wl_bs" ]; do _wl_c=$(( _wl_c + 1 )); done
+    [ $(( _wl_c % 2 )) -eq 1 ] && _wl_cut=${_wl_cut%?}
+    _wl_size=$(( _wl_size - _wl_blen + ${#_wl_cut} )); _wl_val[_wl_best]=$_wl_cut
+  done
+  for _wl_i in "${!_wl_key[@]}"; do
+    _wl_line+="${_wl_line:+$_wl_tab}${_wl_key[_wl_i]}=${_wl_val[_wl_i]}"
+  done
+  if [ -n "$RUNLOG_DIR" ] && [ ! -d "$RUNLOG_DIR" ] && [ -z "$RUNLOG_MKDIR" ]; then
+    RUNLOG_MKDIR=1; mkdir "$RUNLOG_DIR" 2>/dev/null
+  fi
+  [ -n "$RUNLOG_DIR" ] && { printf '%s\n' "$_wl_line" >> "$RUNLOG_DIR/driver.log"; } 2>/dev/null && return 0
+  if [ -z "$RUNLOG_WARNED" ]; then
+    RUNLOG_WARNED=1
+    printf 'unattended: run log — cannot append to %s, so this call is not recorded there; the verb, its output and its exit code are unaffected\n' "${RUNLOG_DIR:-(no git dir resolved)}/driver.log" >&2
+  fi
+  return 0
+}
+
+write_runlog_start() { # the caller's first argument · its second -> the START line, and what END reads
+  local t d oob="" pf="" runmd="" rest nm val nread=0 more=0 bad="" seen=" "
+  local -a f=()
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; d=${t//[!0-9]/}
+  else printf -v t '%(%s)T' -1; d="${t}000000"; fi
+  RUNLOG_T0=$d; RUNLOG_N="$$.$d"
+  case "$1" in
+    ""|*[[:space:]]*) ;;
+    *) case " $VERBS_SLUG $VERBS_INLINE " in *" $1 "*) RUNLOG_VERB=$1 ;; esac ;;
+  esac
+  [ -n "$RUNLOG_VERB" ] && check_slug_shape "$2" && RUNLOG_SLUG=$2
+  resolve_runlog_dirs || { RUNLOG_DIR=""; RUNLOG_GITDIR=""; }
+  if [ -n "$RUNLOG_SLUG" ]; then
+    runmd="$ROOT/$M/builds/$RUNLOG_SLUG/RUN.md"
+    read_phase_into pf "$runmd"
+    # `-nt` against a MISSING file is TRUE, so with no stamp yet a first call would read as an edit.
+    # No stamp, no key.
+    [ -n "$RUNLOG_GITDIR" ] && [ -e "$RUNLOG_GITDIR/runlog-stamp-$RUNLOG_SLUG" ] \
+      && [ "$runmd" -nt "$RUNLOG_GITDIR/runlog-stamp-$RUNLOG_SLUG" ] && oob=1
+  fi
+  f=(v 1 t "$t" p driver ev start n "$RUNLOG_N" verb "$RUNLOG_VERB" slug "$RUNLOG_SLUG" wt "$ROOT"
+     kit "$KIT_UNATTENDED_VERSION" pid "$$" phase_from "$pf")
+  [ -n "$oob" ] && f+=(oob 1)
+  # The session NAMES, split in pure bash so a `*` in the declaration cannot glob. A value becomes
+  # part of a line other tools parse, so it is shape-checked, and one that fails is written EMPTY and
+  # flagged rather than written raw. Unset is absence, not a refusal. Eight names at most, so the
+  # line stays a line; a repeated name is read once, because a duplicate key voids the whole line.
+  rest=$RUNLOG_SESSION_VARS
+  while :; do
+    rest=${rest#"${rest%%[![:space:]]*}"}
+    [ -n "$rest" ] || break
+    nm=${rest%%[[:space:]]*}; rest=${rest#"$nm"}
+    case "$seen" in *" $nm "*) continue ;; esac
+    seen="$seen$nm "
+    if [ "$nread" -ge 8 ]; then more=$(( more + 1 )); continue; fi
+    nread=$(( nread + 1 ))
+    case "$nm" in [!A-Za-z_]*|*[!A-Za-z0-9_]*) bad=1; continue ;; esac
+    val=${!nm:-}
+    [ -n "$val" ] || continue
+    case "$val" in
+      *[!A-Za-z0-9_.:-]*) f+=("sess.$nm" ""); bad=1 ;;
+      *) if [ "${#val}" -le 128 ]; then f+=("sess.$nm" "$val"); else f+=("sess.$nm" ""); bad=1; fi ;;
+    esac
+  done
+  [ -n "$bad" ] && f+=(sess_bad 1)
+  [ "$more" -gt 0 ] && f+=(sess_more "$more")
+  write_runlog_line "${f[@]}"
+}
+
+# Called by the EXIT trap and nothing else. EVERY read is defaulted: `set -u` holds inside a trap, and
+# a trap that aborts on an unset name writes nothing for exactly the call it exists to record.
+write_runlog_end() { # the status the EXIT trap saw -> the END line, then the out-of-band stamp
+  local rc="${1:-}" ex=unclean t d dur="" chk="" c u="" ub="" pt="" p1 p2 p3
+  local -a f=()
+  [ "${RUNLOG_CLEAN:-}" = 1 ] && ex=clean
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; d=${t//[!0-9]/}
+  else printf -v t '%(%s)T' -1; d="${t}000000"; fi
+  case "$d:${RUNLOG_T0:-}" in *[!0-9:]*|:*|*:) ;; *) dur=$(( 10#$d - 10#${RUNLOG_T0:-0} )) ;; esac
+  for c in ${RUNLOG_CHECKS[@]+"${RUNLOG_CHECKS[@]}"}; do chk="${chk:+$chk,}$c"; done
+  # The UNIT, from the variable its own verb parsed it into. `PK_ITEM` is ALSO the free-text item of
+  # --park, --propose and --attest, so it is read for the two verbs whose item is a unit and for no
+  # other: a free-text item never reaches the line. A value is written only in the unit-id shape.
+  case "${RUNLOG_VERB:-}" in
+    --brief)              u=${BR_UNIT:-} ;;
+    --dispatch|--rescope) u=${PK_ITEM:-} ;;
+    --review)             u=${RV_SUBJECT:-} ;;
+  esac
+  # `_ids_of`'s grammar, `[A-Z]+-[A-Za-z0-9]+-[0-9]+`, anchored, and asked of the three parts in
+  # turn rather than of a regex: `=~` ranges follow the locale, and these patterns are ASCII here.
+  if [ -n "$u" ]; then
+    p1=${u%%-*}; p3=${u##*-}; p2=${u#"$p1"-}; p2=${p2%-"$p3"}
+    case "$u" in *-*-*) ;; *) ub=1 ;; esac
+    case "$p1" in ""|*[!A-Z]*) ub=1 ;; esac
+    case "$p2" in ""|*[!A-Za-z0-9]*) ub=1 ;; esac
+    case "$p3" in ""|*[!0-9]*) ub=1 ;; esac
+    [ -n "$ub" ] && u=""
+  fi
+  [ -n "${RUNLOG_SLUG:-}" ] && read_phase_into pt "${ROOT:-.}/${M:-memory}/builds/$RUNLOG_SLUG/RUN.md"
+  f=(v 1 t "$t" p driver ev end n "${RUNLOG_N:-}" verb "${RUNLOG_VERB:-}" slug "${RUNLOG_SLUG:-}")
+  [ -n "$u" ] && f+=(unit "$u")
+  [ -n "$ub" ] && f+=(unit_bad 1)
+  f+=(rc "$rc" exit "$ex" checks "$chk" phase_to "$pt" dur_us "$dur")
+  write_runlog_line "${f[@]}"
+  # The stamp START compares RUN.md against, refreshed AFTER the verb wrote whatever it wrote.
+  if [ -n "${RUNLOG_SLUG:-}" ] && [ -n "${RUNLOG_GITDIR:-}" ]; then
+    { : > "$RUNLOG_GITDIR/runlog-stamp-$RUNLOG_SLUG"; } 2>/dev/null && return 0
+    if [ -z "${RUNLOG_WARNED:-}" ]; then
+      RUNLOG_WARNED=1
+      printf 'unattended: run log — cannot write the out-of-band stamp %s, so the next call cannot tell an outside edit from none; the verb, its output and its exit code are unaffected\n' "$RUNLOG_GITDIR/runlog-stamp-$RUNLOG_SLUG" >&2
+    fi
+  fi
+  return 0
+}
+
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
 # second occurrence overwrote the first and `verb_close` blocked on the second unmet item forever,
@@ -5219,6 +5581,21 @@ OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
 # separator inside it is an injection.
 WAIVE_ITEMS=(); WAIVE_REASONS=(); WV_PEND=""
+# THE RUN LOG'S INSTALL POINT, and each half of the placement is load-bearing. TOOL-dLoggedFlight-2.
+# BEFORE the argument loop, because --phase and --plan exit INSIDE it and a trap installed after the
+# loop never sees them; it is the last point where `$1` and `$2` are still the caller's. AFTER the conf
+# is sourced, so a conf that set its own EXIT trap is REPLACED rather than replacing this one, and
+# through `builtin`, so a conf FUNCTION named `trap` cannot catch the call. From here on every `exit`
+# sets RUNLOG_CLEAN=1 immediately before it - the runlog-writer suite enumerates them.
+# NOT JOURNALED: --version, whose contract is "touching no record", and --plan, a read-only verb the
+# merge bar calls on every run. GOV_RUNLOG=0 in the ENVIRONMENT turns every line off.
+if [ "${RUNLOG_SWITCH:-}" != 0 ]; then
+  case "${1:-}" in
+    --version|--plan) ;;
+    *) write_runlog_start "${1:-}" "${2:-}"
+       builtin trap 'write_runlog_end "$?"' EXIT ;;
+  esac
+fi
 # PRE-SCANNED, because --plan and --phase exit INSIDE the parse loop: at the moment those arms run,
 # a later --waive has not been consumed yet and the array is still empty. Asking argv directly is
 # the only form of the question that does not depend on where the answer is needed. The first cut
@@ -5272,7 +5649,7 @@ while [ $# -gt 0 ]; do
     --subject)      RV_SUBJECT="${2:-}"; shift 2 || shift ;;
     --blockers)     RV_BLOCKERS="${2:-}"; shift 2 || shift ;;
     --disposition)  RV_DISPOSITION="${2:-}"; shift 2 || shift ;;
-    --plan)         shift; refuse_waive_unless_preflight --plan || exit 1
+    --plan)         shift; refuse_waive_unless_preflight --plan || { RUNLOG_CLEAN=1; exit 1; }
                     # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
                     # what it always was — the framing below only appears when more than one slug is
                     # given, so no existing caller sees a new byte. TOOL-aQuenchedHarness-10.
@@ -5308,19 +5685,19 @@ while [ $# -gt 0 ]; do
                     # happened: `check-unattended.sh` check 30 red on every fixture holding a
                     # single build, while the real corpus always gave it several and looked fine.
                     # A caller that wants frames now SAYS so, and gets them at any arity.
-                    if [ $# -le 1 ] && [ -z "$_pl_framed" ]; then verb_plan "${1:-}"; exit $?; fi
+                    if [ $# -le 1 ] && [ -z "$_pl_framed" ]; then verb_plan "${1:-}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc"; fi
                     for _pl_s in "$@"; do
                       printf 'unattended-plan-open: %s\n' "$_pl_s"
                       ( verb_plan "$_pl_s" ); _pl_one=$?
                       printf 'unattended-plan-rc: %s %s\n' "$_pl_s" "$_pl_one"
                     done
-                    exit 0 ;;
+                    RUNLOG_CLEAN=1; exit 0 ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
-                    refuse_waive_unless_preflight --phase || exit 1
-                    verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
-    --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
+                    refuse_waive_unless_preflight --phase || { RUNLOG_CLEAN=1; exit 1; }
+                    verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it
     # falls through to refusal 14 and does not run at all. The arm sits LAST because every flag above
@@ -5331,15 +5708,15 @@ while [ $# -gt 0 ]; do
             # a branch's literal signature up to its first interpolation and does not treat $( ) as
             # one, so the inline form demanded a test arm quoting `$(verb_list)` verbatim - an arm
             # that would pass while the list it renders was empty.
-            fail 14 "unknown argument; the verbs are $vl: $arg"; exit 1; fi ;;
+            fail 14 "unknown argument; the verbs are $vl: $arg"; RUNLOG_CLEAN=1; exit 1; fi ;;
   esac
 done
 # S10, and then the verb-carrier unit, because S10's fix did not hold: the three spellings were
 # re-synchronised by hand and drifted again at the next verb. Both survivors now DERIVE - the refusal
 # above from VERBS_SLUG, this usage text from the header's own invocation lines - so there is nothing
 # left here to re-synchronise.
-case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { usage; exit 2; }
+case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || { RUNLOG_CLEAN=1; exit 1; } ;; esac
+[ -n "$VERB" ] || { usage; RUNLOG_CLEAN=1; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -5359,4 +5736,4 @@ case "$VERB" in
   --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
 esac
-exit "$status"
+RUNLOG_CLEAN=1; exit "$status"

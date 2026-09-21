@@ -74,6 +74,8 @@ mutates_index = false
 # `[adopt]` argv above exits 1 on the same state — so declaring it an accepted stop would also change
 # what `apply` accepts, for a state no unit has re-adjudicated. It stays a loud failure naming this
 # kit, which is what the same exit already does at adopt time.
+# WHY THE BLOCK EXISTS AT ALL: TOOL-dRetiredFork-29 — a kit that ships a rendered artifact and
+# declares no regenerate leaves that artifact one vintage stale on every update.
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
 

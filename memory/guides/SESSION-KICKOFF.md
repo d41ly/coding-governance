@@ -20,7 +20,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 - Every unit that changed what this file front-loads (a gate command, entrypoint, governing doc, a
   trap hit, a doc/memory claim found stale, or a fact re-derived it should have front-loaded) re-stamps
   `last-audit` with a delta line in the commit message; no delta → no touch.
-- Stamp rule: sha = `HEAD` on `main`, else `git merge-base origin/main HEAD`; datetime always advances.
+- Stamp rule: sha = `HEAD` on any branch; datetime always advances.
 - Dated entries carry a prune-when condition and are deleted once it holds.
 
 ## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)
@@ -159,8 +159,8 @@ python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints> 
 
 ### Tier rule
 
-Tier 2 (spec + adversarial review before building) for: a change to the governance template's rules,
-the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
+Tier 2 (a spec before building; the spec audit is opt-in, M4) for: a change to the governance template's
+rules, the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
 Tier 1 (gates + one focused self-review).
 
 ### ID + work-state protocol

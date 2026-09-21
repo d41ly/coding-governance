@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.25 -->
+<!-- gov:kit unattended@1.27 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -6,6 +6,9 @@ legs byte-compare it against the template it ships from. **They compare the two 
 other, so a claim FALSE IN BOTH is green** — a parity leg is a copy check, not a truth check, and
 only a reader grades a sentence against the code. This file was created by moving section 7 of the
 protocol verbatim, and one bullet arrived carrying a sentence the same build then measured false.*
+
+Every verb but `--version` and `--plan` also writes a START and an END line to the machine-local
+run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 
 - `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
   records the keepalive id the agent hands it, and accepts `--waive <handle> --reason <text>` where no

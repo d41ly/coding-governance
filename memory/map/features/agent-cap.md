@@ -127,7 +127,25 @@ a deny on either refused this build's own landing run, with a remedy it could no
 fold is `buildComparablePath`'s own step, applied to the `-C` target and `cwd` BEFORE the walk and
 to both toplevels before the compare; there is no second normaliser.
 
+**One rule in `agent-cap.js` is not a fan-out bound and reads the payload's ARGS, not the script**
+(`TOOL-aBlindedTrial-4`, for the ruling `TOOL-aBlindedTrial-6`). A `Workflow` call whose
+structured `args` carry `kind: "spec-audit"` is denied unless the build README at
+`<args.repo>/<parent of args.reviewDir>/README.md` declares `spec-audit: <YYYY-MM-DD>` in its front
+matter. It makes the pre-code spec audit FORBIDDEN in an attended session, not merely unowed. Three
+choices are load-bearing: it keys on `tool_input.args`, never on script text (both harnesses spell
+`spec-audit` in comments and would deny themselves); it sits ABOVE the script read in `main()`, so a
+`name:`-only invocation is judged too; and it fails CLOSED for this kind alone — an unplaceable call
+or a README it cannot read is a deny naming the field, and every throw is a deny, because a
+PreToolUse hook at exit 1 is non-blocking. The root is `args.repo`, never `gitCommonDir(cwd)`, which
+in a linked worktree is the primary tree's `.git`.
+
 ## Shared seams
+
+**`readFrontMatterKey` in `tools/hooks/scratch-guard.js` is the ONE front-matter reader for both
+hooks.** It returns the single-token value of a key between the opening `---` and the next `---`, or null;
+`checkAuthorizedReadme` reads `authorized-by:` through it and the spec-audit rule reads
+`spec-audit:`, required lazily inside the rule's try so a withdrawn sibling is a deny, not a crash. It takes bytes, not a path: the staged-blob caller has no file to name. One reader
+keeps "a fenced example in the body is not front matter" one answer (F10) for both keys.
 
 **Every declared hook path is asserted to SHIP, in both directions.** A fragment names a
 destination and an adopter script writes one, and neither is any use if the file it points at
@@ -196,7 +214,12 @@ turns the cap rules off with no diff.
   Bash command issued from inside one. Declared here and in the protocol rather than implied away; it
   is the reason the `Workflow` half is static.
 - **A `Workflow({name:'…'})` run supplies no source to the hook.** Covered second-hand by the
-  merge-bar leg over `tools/workflows/`, which is why that leg exists at all.
+  merge-bar leg over `tools/workflows/`, which is why that leg exists. The spec-audit rule needs no
+  source, so a name-only spec audit IS judged.
+- **The spec-audit rule has three stated limits.** A harness's nested `workflow()` is a runtime
+  call, not a tool call — that route is `TOOL-aBlindedTrial-3`'s. It reads the WORKTREE README
+  while the driver reads BASE, so one uncommitted edit can split them. An unparseable `args` string
+  shows it no `kind` and is admitted; the harness throws on it, so no audit runs unrefused.
 - **The runtime count does not distinguish a verifier from any other agent.** Keying on "is this a
   verify agent" needs a session-to-build binding no payload field provides. Accepted because the
   concurrency rule binds every fan-out to the same number anyway; the residual is a wide fan-out that

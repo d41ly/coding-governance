@@ -2,7 +2,7 @@
 /**
  * procmon-hook — put the process monitor's verdict where a session actually reads it.
  *
- * gov:kit process-monitor@0.1
+ * gov:kit process-monitor@0.2
  *
  * Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md
  *

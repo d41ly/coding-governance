@@ -1,0 +1,112 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/.
+# Contract: memory/builds/dLoggedFlight/spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md
+
+id = "runlog"
+home = "tools/runlog"
+scope = "repo"
+
+# Pinned at the reader module, which lands in the SAME unit as this descriptor, so the file the
+# pattern reads exists from the first commit. The process-monitor descriptor records the defect a
+# pin at a not-yet-landed file causes; this one cannot have it.
+version_from = { file = "runlog_lib.py", pattern = "^KIT_RUNLOG_VERSION = " }
+
+[[files]]
+include = "**"
+role = "engine"
+
+# THIS KIT'S SELF-TEST AND ITS FIXTURES ARE WITHHELD. TOOL-aQuenchedHarness-3: a suite whose subject
+# is the code in this directory has a job only when that code changes, and none in a tree that
+# copy-installs the kit and never edits it. Withheld by CLAIMING THE DESTINATION, the mechanism the
+# codebase-map descriptor explains: govkit has no `exclude` key, a `**` rule's pool drops only what
+# another rule owns, and `project-owned` is absent from LANDABLE_ROLES, so `apply` never writes it.
+# The fixtures go with the suite because nothing else reads them.
+#
+# The `runlog selftest` leg is NOT declared here. It is a leg on GOV's bar carried by an
+# [[exempt_leg]] row in the deployer's registry, for the reason recorded beside the run-gates gov
+# canary: a descriptor row naming a leg the target cannot carry is what reds the deployer.
+[[files]]
+include = ["selftest.py"]
+role = "project-owned"
+
+# EACH FIXTURE IS NAMED, because a LIST include claims literal paths only: govkit's `rule_sources`
+# drops any element carrying a glob character, so `fixtures/**` here claimed nothing and `plan` put
+# every fixture under `engine`. Measured with `govkit plan` into a scratch target before this list
+# replaced it. The self-test asserts this list equals the files under `fixtures/`, so a new fixture
+# reds there instead of shipping.
+[[files]]
+include = ["fixtures/driver-torn.txt", "fixtures/golden-lines.txt", "fixtures/invocations.txt",
+           "fixtures/journal-mixed.txt", "fixtures/tool-classes.json", "fixtures/transcripts.json"]
+role = "project-owned"
+
+# THE SKILL IS RENDERED (TOOL-dLoggedFlight-12). It names the CLI by where this kit is installed and
+# the committed record's folder by the memory root, two values that differ per repository, so the
+# adopter renders it and its `--check` re-renders and compares. Both tokens are substituted by the
+# adopter, which the kit-placeholders gate joins against this list.
+[[files]]
+include = ["SKILL.template.md"]
+role = "rendered"
+to = ".claude/skills/runlog/SKILL.md"
+placeholders = ["KIT_DIR", "MEMORY_ROOT"]
+
+# The memory root is read through `resolve_memory_root`, which defaults an absent key or an absent
+# conf to `memory`, so the key is optional and the kit requires no other kit. The conf is declared
+# because the render depends on it: a moved root is a re-render.
+[config]
+file = ".memory-tree.conf"
+owner = "memory-tree"
+optional_keys = ["MEMORY_ROOT"]
+
+[adopt]
+argv = ["bash", "{kit}/adopt-runlog.sh", "--scaffold"]
+mutates_index = false
+
+# THE RE-RENDER an update runs with GOVKIT_RERENDER=1, which govkit rule 3b-ii requires of a kit
+# shipping a `rendered` row — without it the rendered Skill goes a vintage stale in every adopter
+# tree on every update, and the kit's own `runlog skill wiring` leg then reds on a file the adopter
+# never edited. The argv is the adopter's `--scaffold` because that mode IS the re-render here: it
+# rewrites the Skill from the template and the target's conf whether or not one is already there.
+# The rule's message warns that an `[adopt]` argv is usually not a re-render, since it no-ops or
+# refuses on an adopted tree, so the claim was OBSERVED rather than assumed — a byte appended to the
+# rendered Skill made `--check` exit 1, `--scaffold` restored the shipped bytes exactly, and
+# `--check` came back 0. `memory-recall` declares the same pair for the same reason.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-runlog.sh", "--scaffold"]
+
+[check]
+argv = ["bash", "{kit}/adopt-runlog.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = ".claude/skills/runlog/SKILL.md" }
+means = "adopted"
+
+# THE SCHEMA LEG SHIPS (TOOL-dLoggedFlight-10). Its subject is the target's own committed run records
+# and run-state history, which go stale with nobody editing this kit, so a failure means the
+# REPOSITORY is wrong, not the kit. `history_depth = "full"` because the run starts are the commits
+# that ADDED each run-state path, and a shallow clone's boundary commit adds every one of them at
+# once, which would give every run of a build one start and red the leg on a history it cannot see.
+[[gate_leg]]
+name = "runlog record schema"
+subject = "repo"
+argv = ["python", "{kit}/runlog.py", "check-records"]
+guard = []
+history_depth = "full"
+
+# THE SKILL'S WIRING LEG SHIPS (TOOL-dLoggedFlight-12), for the reason the memory-recall kit's does:
+# its subject is the target's own rendered Skill, which goes stale when the target's memory root moves
+# or its template is edited, with nobody touching the adopter.
+[[gate_leg]]
+name = "runlog skill wiring"
+subject = "repo"
+argv = ["bash", "{kit}/adopt-runlog.sh", "--check"]
+guard = []
+
+# ONE [[lf_pin]], for the rendered Skill, which its own leg byte-compares; the leg strips CR from the
+# working copy too, so the pin keeps the committed bytes deterministic rather than holding the leg up.
+# The shipped sources need none: Python modules, a README, a template the adopter strips of CR, and
+# the redaction table, whose loader drops a CR that ends a line and whose self-test loads a CRLF copy
+# to prove it. The byte-exact files are the fixtures, which are withheld, so their pin is gov's own,
+# and so is the table's, which the kit's scan of itself reads as bytes.
+[[lf_pin]]
+pattern = ".claude/skills/runlog/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"

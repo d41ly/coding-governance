@@ -1379,6 +1379,65 @@ user_skills = "/tmp/gk-fake-skills"
         check("and how many entry scopes it checked against their derived value",
               "entry scope:" in ps.stdout, ps.stdout)
 
+        # ===== TOOL-aHonedRuleset-8: arms 7d and 7e, each observed RED =====
+        # Staged in a COPY of gov. Asserting only that selfcheck is green would prove neither arm
+        # can fire, which is the "gate satisfied by its own prose" shape the charter names by hand.
+        gcopy = tmp / "gov-arms"
+        shutil.copytree(HERE.parents[1], gcopy, ignore=shutil.ignore_patterns(".git"))
+        # selfcheck derives its surface from `git ls-files`, so the copy needs to BE a repo. Copying
+        # gov's own .git would drag its whole history; a fresh single commit is what the other
+        # scratch-gov arms in this file do and is what the surface walk actually needs.
+        git(gcopy, "init", "-q", "-b", "main")
+        git(gcopy, "config", "user.email", "t@e")
+        git(gcopy, "config", "user.name", "t")
+        git(gcopy, "add", "-A")
+        git(gcopy, "commit", "-qm", "arms")
+
+        def _run_selfcheck(root):
+            return subprocess.run(
+                [sys.executable, str(root / "tools" / "govkit" / "govkit.py"), "selfcheck"],
+                capture_output=True, text=True)
+
+        base = _run_selfcheck(gcopy)
+        check("the gov copy is green before either arm is provoked", base.returncode == 0,
+              base.stdout + base.stderr)
+
+        # --- 7d: a conditional entry whose why_conditional is removed.
+        d = gcopy / "tools" / "govkit" / "entries" / "check-placeholders.kit.toml"
+        keep = d.read_text(encoding="utf-8")
+        d.write_text("\n".join(l for l in keep.split("\n")
+                                if not l.startswith("why_conditional")), encoding="utf-8")
+        r7d = _run_selfcheck(gcopy)
+        check("7d reds a conditional entry with no why_conditional",
+              r7d.returncode != 0 and "carries no why_conditional" in (r7d.stdout + r7d.stderr),
+              r7d.stdout + r7d.stderr)
+        d.write_text(keep, encoding="utf-8")
+        check("and is green again once the reason is restored",
+              _run_selfcheck(gcopy).returncode == 0, "")
+
+        # --- 7e: an entry requiring a default-set member, reachable by no declared selection. This
+        #     is check-microformats' own state before TOOL-aHonedRuleset-8 moved it.
+        reg = gcopy / "tools" / "govkit" / "registry.toml"
+        rkeep = reg.read_text(encoding="utf-8")
+        reg.write_text(rkeep.replace('"run-gates",\n           "check-microformats"]',
+                                     '"run-gates"]', 1), encoding="utf-8")
+        cm = gcopy / "tools" / "govkit" / "entries" / "check-microformats.kit.toml"
+        ckeep = cm.read_text(encoding="utf-8")
+        cl = ckeep.split("\n")
+        ci = next(i for i, l in enumerate(cl) if l.startswith('requires = ["playbook"]'))
+        cl.insert(ci, 'why_conditional = "selftest fixture: 7e needs a conditional dependent"')
+        cl.insert(ci, 'selectable = "conditional"')
+        cm.write_text("\n".join(cl), encoding="utf-8")
+        r7e = _run_selfcheck(gcopy)
+        check("7e reds an entry that requires a default-set member and no selection reaches",
+              r7e.returncode != 0
+              and "requires a default-set member but is reached by no declared" in (r7e.stdout + r7e.stderr),
+              r7e.stdout + r7e.stderr)
+        reg.write_text(rkeep, encoding="utf-8")
+        cm.write_text(ckeep, encoding="utf-8")
+        check("and is green again once the entry rejoins the default selection",
+              _run_selfcheck(gcopy).returncode == 0, "")
+
         # ===== unit 4: the gate-runner declaration, end to end =====
         # The interpreter is spelled by PATH, never by name. A bare `python` inside the fixture's
         # bash resolves to nothing here — this repo's own resolver exists because that name lands on
@@ -3386,7 +3445,9 @@ user_skills = "/tmp/gk-fake-skills"
             # and run-gates' `run-gates.gov.test.sh`, withheld by the same mechanism for the same
             # stated reason — its arms are keyed on THIS repo's corpus, so in another tree they would
             # red on absence rather than on behaviour. Four, not three, because the run-gates kit
-            # landed; the count is a MEASUREMENT of this tree and moves when the tree does, which is
+            # landed. FIVE since TOOL-aHonedRuleset-8 put `check-microformats` in the default selection,
+            # which adds one rendered row and one project-owned row.
+            # The count is a MEASUREMENT of this tree and moves when the tree does, which is
             # what the paragraph below already says about this half of the arm.
             # This half of the arm is a TREE-STATE snapshot; the SEMANTIC invariant it used to carry
             # -- an un-covered `project-owned` rule derives ORDER -- moved to the scratch descriptor
@@ -3394,8 +3455,10 @@ user_skills = "/tmp/gk-fake-skills"
             # govkit has no kind meaning "in the kit dir, deliberately not in the payload", so the
             # ORDER row tells an adopter to supply a file gov does not want them to have. Recorded as
             # TOOL-aWalkedCorpus-6 rather than papered over here.
+            # 27 -> 28, TOOL-dLoggedFlight-3: run-gates withheld `run-gates.runlog.test.sh` by the same
+            # mechanism, the only row that build added to the default selection.
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed") == 3 and marks.get("ORDER|project-owned") == 27,
+                  marks.get("write|seed") == 3 and marks.get("ORDER|project-owned") == 28,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))

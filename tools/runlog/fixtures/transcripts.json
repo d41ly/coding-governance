@@ -1,0 +1,157 @@
+{
+  "about": "Synthetic Claude Code transcripts for the runlog extractor's self-test (TOOL-dLoggedFlight-6). Every record here was written for this file; none was copied from a real transcript. Each scenario's `main` is the session's own file; `agents`, `workflow_agents` and `workflows` are the files beside it. A record given as a string is written verbatim, which is how a torn line is planted. The self-test writes each scenario into a scratch projects root and never reads a real one.",
+  "scenarios": {
+    "order": {
+      "about": "AC2. A result's later copy, same uuid, carries empty output; a tool call's later copy, same uuid, would be a second call; two records sit out of timestamp order.",
+      "main": [
+        {"type": "assistant", "uuid": "o-a1", "timestamp": "2026-09-13T10:00:10.000Z", "version": "9.9.1", "requestId": "req-o1", "message": {"id": "msg-req-o1", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_order_a", "name": "Bash", "input": {"command": "bash fixture-exit.sh three", "description": "exit with status three"}}], "usage": {"input_tokens": 10, "output_tokens": 2, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "o-u1", "timestamp": "2026-09-13T10:00:11.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_order_a", "content": "Exit code 3\nthe fixture exited with status three", "is_error": true}]}, "toolUseResult": {"stdout": "the fixture exited with status three", "stderr": "", "interrupted": false, "isImage": false, "noOutputExpected": false}},
+        {"type": "user", "uuid": "o-u1", "timestamp": "2026-09-13T10:00:12.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_order_a", "content": "", "is_error": false}]}, "toolUseResult": {"stdout": "", "stderr": "", "interrupted": false, "isImage": false, "noOutputExpected": false}},
+        {"type": "assistant", "uuid": "o-a2", "timestamp": "2026-09-13T10:00:05.000Z", "version": "9.9.1", "requestId": "req-o2", "message": {"id": "msg-req-o2", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_order_b", "name": "Read", "input": {"file_path": "fixture-notes.txt"}}], "usage": {"input_tokens": 4, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "o-u2", "timestamp": "2026-09-13T10:00:06.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_order_b", "content": "one line of fixture notes"}]}},
+        {"type": "assistant", "uuid": "o-a2", "timestamp": "2026-09-13T10:00:13.000Z", "version": "9.9.1", "requestId": "req-o2", "message": {"id": "msg-req-o2", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_order_b", "name": "Read", "input": {"file_path": "fixture-notes.txt"}}], "usage": {"input_tokens": 4, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}}
+      ]
+    },
+    "owner": {
+      "about": "AC3. Four owner turns (a human record, a null-origin /compact, an absorbed queued prompt, an interrupt), one keepalive fire joined to its CronCreate, and near misses that are not turns.",
+      "main": [
+        {"type": "assistant", "uuid": "w-a1", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "requestId": "req-w1", "message": {"id": "msg-req-w1", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_cron_1", "name": "CronCreate", "input": {"cron": "*/5 * * * *", "prompt": "Fixture wake: report the phase and carry the pass forward.", "recurring": true}}], "usage": {"input_tokens": 5, "output_tokens": 5, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "w-u1", "timestamp": "2026-09-13T10:00:00.500Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_cron_1", "content": "Scheduled the fixture job."}]}, "toolUseResult": {"id": "fxjob1", "humanSchedule": "every five minutes", "recurring": true, "durable": false}},
+        {"type": "user", "uuid": "w-u2", "timestamp": "2026-09-13T10:01:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Please carry on with the fixture work now."}, "origin": {"kind": "human"}, "promptSource": "sdk"},
+        {"type": "user", "uuid": "w-u3", "timestamp": "2026-09-13T10:02:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "<command-name>/compact</command-name>\n<command-message>compact</command-message>\n<command-args></command-args>"}},
+        {"type": "user", "uuid": "w-u4", "timestamp": "2026-09-13T10:02:01.000Z", "version": "9.9.1", "message": {"role": "user", "content": "<local-command-stdout>Compacted the fixture conversation.</local-command-stdout>"}},
+        {"type": "user", "uuid": "w-u5", "timestamp": "2026-09-13T10:02:02.000Z", "version": "9.9.1", "message": {"role": "user", "content": "<local-command-caveat>Caveat: the fixture messages below were made locally.</local-command-caveat>"}, "isMeta": true},
+        {"type": "user", "uuid": "w-u6", "timestamp": "2026-09-13T10:02:03.000Z", "version": "9.9.1", "message": {"role": "user", "content": "This fixture session is being continued from an earlier conversation."}, "isCompactSummary": true, "isVisibleInTranscriptOnly": true},
+        {"type": "attachment", "uuid": "w-t1", "timestamp": "2026-09-13T10:03:00.000Z", "version": "9.9.1", "attachment": {"type": "queued_command", "commandMode": "prompt", "origin": {"kind": "human"}, "timestamp": "2026-09-13T10:03:00.000Z", "prompt": "Also look at the second fixture file please."}},
+        {"type": "user", "uuid": "w-u7", "timestamp": "2026-09-13T10:04:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "text", "text": "[Request interrupted by user]"}]}},
+        {"type": "user", "uuid": "w-u8", "timestamp": "2026-09-13T10:05:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Fixture wake: report the phase and carry the pass forward."}, "isMeta": true, "promptSource": "sdk"},
+        {"type": "user", "uuid": "w-u9", "timestamp": "2026-09-13T10:06:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "A peer session says the fixture is fine."}, "isMeta": true, "origin": {"kind": "peer", "from": "fixture-peer", "name": "peer"}},
+        {"type": "user", "uuid": "w-u10", "timestamp": "2026-09-13T10:07:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "<task-notification>\n<task-id>fxt1</task-id>\n<tool-use-id>toolu_nobody</tool-use-id>\n<output-file>fixture.out</output-file>\n<status>completed</status>\n<summary>Fixture task finished</summary>\n</task-notification>"}, "origin": {"kind": "task-notification"}}
+      ]
+    },
+    "background": {
+      "about": "AC4. Two background shell calls and one async agent, each ended by the FIRST record carrying its tool-use-id; notifications naming a foreground or unknown call end nothing.",
+      "main": [
+        {"type": "assistant", "uuid": "b-a1", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "requestId": "req-b1", "message": {"id": "msg-req-b1", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_bg_1", "name": "Bash", "input": {"command": "bash fixture-slow.sh", "description": "slow fixture", "run_in_background": true}}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "b-u1", "timestamp": "2026-09-13T10:00:00.100Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_bg_1", "content": "Command running in background with ID: fxbg1. Output goes to fixture.out"}]}, "toolUseResult": {"stdout": "", "stderr": "", "interrupted": false, "isImage": false, "noOutputExpected": false, "backgroundTaskId": "fxbg1"}},
+        {"type": "assistant", "uuid": "b-a2", "timestamp": "2026-09-13T10:00:10.000Z", "version": "9.9.1", "requestId": "req-b2", "message": {"id": "msg-req-b2", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_fg_1", "name": "Bash", "input": {"command": "git status"}}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "b-u2", "timestamp": "2026-09-13T10:00:10.500Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_fg_1", "content": "On branch main", "is_error": false}]}, "toolUseResult": {"stdout": "", "stderr": "", "interrupted": false, "isImage": false, "noOutputExpected": false}},
+        {"type": "assistant", "uuid": "b-a3", "timestamp": "2026-09-13T10:00:30.000Z", "version": "9.9.1", "requestId": "req-b3", "message": {"id": "msg-req-b3", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_bg_2", "name": "Bash", "input": {"command": "bash fixture-fail.sh", "run_in_background": true}}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "b-u3", "timestamp": "2026-09-13T10:00:30.100Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_bg_2", "content": "Command running in background with ID: fxbg2."}]}, "toolUseResult": {"stdout": "", "stderr": "", "interrupted": false, "isImage": false, "noOutputExpected": false, "backgroundTaskId": "fxbg2"}},
+        {"type": "assistant", "uuid": "b-a4", "timestamp": "2026-09-13T10:00:40.000Z", "version": "9.9.1", "requestId": "req-b4", "message": {"id": "msg-req-b4", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_ag_bg", "name": "Agent", "input": {"subagent_type": "fixture-lens", "description": "an async fixture lens", "prompt": "Look over the fixture quietly.", "run_in_background": true}}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "b-u4", "timestamp": "2026-09-13T10:00:40.200Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_ag_bg", "content": [{"type": "text", "text": "Async agent launched in the fixture."}]}]}, "toolUseResult": {"isAsync": true, "status": "async_launched", "agentId": "fxag1", "description": "an async fixture lens"}},
+        {"type": "queue-operation", "operation": "enqueue", "timestamp": "2026-09-13T10:01:00.000Z", "content": "<task-notification>\n<task-id>fxbg1</task-id>\n<tool-use-id>toolu_bg_1</tool-use-id>\n<output-file>fixture.out</output-file>\n<status>completed</status>\n<summary>Background command \"slow fixture\" completed (exit code 0)</summary>\n</task-notification>"},
+        {"type": "user", "uuid": "b-u5", "timestamp": "2026-09-13T10:01:05.000Z", "version": "9.9.1", "message": {"role": "user", "content": "<task-notification>\n<task-id>fxbg1</task-id>\n<tool-use-id>toolu_bg_1</tool-use-id>\n<output-file>fixture.out</output-file>\n<status>completed</status>\n<summary>Background command \"slow fixture\" completed (exit code 0)</summary>\n</task-notification>"}, "origin": {"kind": "task-notification"}},
+        {"type": "attachment", "uuid": "b-t1", "timestamp": "2026-09-13T10:02:00.000Z", "version": "9.9.1", "attachment": {"type": "queued_command", "commandMode": "task-notification", "timestamp": "2026-09-13T10:02:00.000Z", "prompt": "<task-notification>\n<task-id>fxbg2</task-id>\n<tool-use-id>toolu_bg_2</tool-use-id>\n<output-file>fixture.out</output-file>\n<status>failed</status>\n<summary>Background command \"fixture fail\" failed with exit code 1</summary>\n</task-notification>"}},
+        {"type": "queue-operation", "operation": "remove", "timestamp": "2026-09-13T10:02:01.000Z", "content": "<task-notification>\n<task-id>fxbg2</task-id>\n<tool-use-id>toolu_bg_2</tool-use-id>\n<output-file>fixture.out</output-file>\n<status>failed</status>\n<summary>Background command \"fixture fail\" failed with exit code 1</summary>\n</task-notification>"},
+        {"type": "queue-operation", "operation": "enqueue", "timestamp": "2026-09-13T10:03:00.000Z", "content": "<task-notification>\n<task-id>fxag1</task-id>\n<tool-use-id>toolu_ag_bg</tool-use-id>\n<output-file>fixture.out</output-file>\n<status>completed</status>\n<summary>Agent \"an async fixture lens\" completed</summary>\n</task-notification>"},
+        {"type": "queue-operation", "operation": "enqueue", "timestamp": "2026-09-13T10:03:30.000Z", "content": "<task-notification>\n<task-id>fxfg1</task-id>\n<tool-use-id>toolu_fg_1</tool-use-id>\n<output-file>fixture.out</output-file>\n<status>completed</status>\n<summary>A foreground call finished (exit code 7)</summary>\n</task-notification>\n<task-notification>\n<task-id>fxno1</task-id>\n<tool-use-id>toolu_nobody</tool-use-id>\n<output-file>fixture.out</output-file>\n<status>completed</status>\n<summary>Nothing (exit code 9)</summary>\n</task-notification>"}
+      ]
+    },
+    "usage": {
+      "about": "AC9. One request repeated across three records with a growing output count, usage in the main file, a direct agent file and a workflow agent file, one workflow run with its file and one without.",
+      "main": [
+        {"type": "assistant", "uuid": "u-a1", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "requestId": "req-u1", "message": {"id": "msg-req-u1", "role": "assistant", "model": "fixture-model", "content": [{"type": "thinking", "thinking": "private fixture thought", "signature": "fixture-signature"}], "usage": {"input_tokens": 100, "output_tokens": 10, "cache_read_input_tokens": 1000, "cache_creation_input_tokens": 50}}},
+        {"type": "assistant", "uuid": "u-a2", "timestamp": "2026-09-13T10:00:01.000Z", "version": "9.9.1", "requestId": "req-u1", "message": {"id": "msg-req-u1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Starting the fixture lens now."}], "usage": {"input_tokens": 100, "output_tokens": 20, "cache_read_input_tokens": 1000, "cache_creation_input_tokens": 50}}},
+        {"type": "assistant", "uuid": "u-a3", "timestamp": "2026-09-13T10:00:02.000Z", "version": "9.9.1", "requestId": "req-u1", "message": {"id": "msg-req-u1", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_us_ag", "name": "Agent", "input": {"subagent_type": "fixture-lens", "description": "a fixture lens", "prompt": "Review the fixture."}}], "usage": {"input_tokens": 100, "output_tokens": 30, "cache_read_input_tokens": 1000, "cache_creation_input_tokens": 50}}},
+        {"type": "user", "uuid": "u-u1", "timestamp": "2026-09-13T10:01:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_us_ag", "content": [{"type": "text", "text": "The fixture lens reported nothing."}]}]}, "toolUseResult": {"status": "completed", "agentId": "fxua1"}},
+        {"type": "assistant", "uuid": "u-a4", "timestamp": "2026-09-13T10:02:00.000Z", "version": "9.9.1", "requestId": "req-u2", "message": {"id": "msg-req-u2", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_us_wf", "name": "Workflow", "input": {"scriptPath": "fixture-review.js"}}], "usage": {"input_tokens": 7, "output_tokens": 5, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "u-u2", "timestamp": "2026-09-13T10:02:01.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_us_wf", "content": "Workflow launched in the fixture."}]}, "toolUseResult": {"runId": "wf_fixture1", "status": "async_launched", "taskType": "local_workflow", "workflowName": "fixture-review", "taskId": "wfx1", "scriptPath": "fixture-review.js", "summary": "the fixture review started"}},
+        {"type": "assistant", "uuid": "u-a5", "timestamp": "2026-09-13T10:03:00.000Z", "version": "9.9.1", "requestId": "req-u5", "message": {"id": "msg-req-u5", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_us_wf2", "name": "Workflow", "input": {"scriptPath": "fixture-review.js"}}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "u-u3", "timestamp": "2026-09-13T10:03:01.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_us_wf2", "content": "Workflow launched in the fixture."}]}, "toolUseResult": {"runId": "wf_fixture2", "status": "async_launched", "taskType": "local_workflow", "workflowName": "fixture-review", "taskId": "wfx2"}},
+        {"type": "queue-operation", "operation": "enqueue", "timestamp": "2026-09-13T10:04:00.000Z", "content": "<task-notification>\n<task-id>wfx1</task-id>\n<tool-use-id>toolu_us_wf</tool-use-id>\n<output-file>fixture.out</output-file>\n<status>completed</status>\n<summary>Workflow \"fixture-review\" completed</summary>\n</task-notification>"}
+      ],
+      "agents": {
+        "fxua1": {
+          "meta": {
+            "agentType": "fixture-lens",
+            "spawnDepth": 1,
+            "toolUseId": "toolu_us_ag",
+            "description": "a free text description of the fixture lens"
+          },
+          "records": [
+            {"type": "assistant", "uuid": "ua-a1", "timestamp": "2026-09-13T10:00:30.000Z", "version": "9.9.1", "requestId": "req-u3", "message": {"id": "msg-req-u3", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_ua_1", "name": "Bash", "input": {"command": "git status"}}], "usage": {"input_tokens": 11, "output_tokens": 12, "cache_read_input_tokens": 13, "cache_creation_input_tokens": 14}}, "isSidechain": true, "agentId": "fxua1"},
+            {"type": "user", "uuid": "ua-u1", "timestamp": "2026-09-13T10:00:31.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_ua_1", "content": "On branch main", "is_error": false}]}, "toolUseResult": {"stdout": "", "stderr": "", "interrupted": false, "isImage": false, "noOutputExpected": false}, "isSidechain": true, "agentId": "fxua1"}
+          ]
+        }
+      },
+      "workflow_agents": {
+        "wf_fixture1/fxuw1": {
+          "meta": {
+            "agentType": "general-purpose",
+            "spawnDepth": 1,
+            "workflowPhase": "review",
+            "description": "a free text description of the fixture phase"
+          },
+          "records": [
+            {"type": "user", "uuid": "uw-u1", "timestamp": "2026-09-13T10:02:10.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Review the fixture as a workflow agent."}, "isSidechain": true, "agentId": "fxuw1"},
+            {"type": "assistant", "uuid": "uw-a1", "timestamp": "2026-09-13T10:02:30.000Z", "version": "9.9.1", "requestId": "req-u4", "message": {"id": "msg-req-u4", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Reviewed the fixture."}], "usage": {"input_tokens": 21, "output_tokens": 22, "cache_read_input_tokens": 23, "cache_creation_input_tokens": 24}}, "isSidechain": true, "agentId": "fxuw1"}
+          ]
+        }
+      },
+      "workflows": {
+        "wf_fixture1": {
+          "runId": "wf_fixture1",
+          "workflowName": "fixture-review",
+          "status": "completed",
+          "startTime": 1789293721000,
+          "timestamp": "2026-09-13T10:04:00.000Z",
+          "durationMs": 42000,
+          "agentCount": 1,
+          "totalToolCalls": 3,
+          "totalTokens": 999,
+          "summary": "a free text summary of the fixture review",
+          "script": "export default async function fixture() {}"
+        }
+      }
+    },
+    "events": {
+      "about": "The remaining kinds: a compaction, an API error from a message and from a system record, a session limit, a hook denial and a user rejection; plus an unknown type, a torn line, a non-object line, an untimed record and a main-file sidechain record.",
+      "main": [
+        {"type": "system", "subtype": "compact_boundary", "level": "info", "uuid": "e-s1", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "content": "Conversation compacted", "compactMetadata": {"trigger": "auto", "preTokens": 150000, "postTokens": 12000, "durationMs": 3000}},
+        {"type": "user", "uuid": "e-u1", "timestamp": "2026-09-13T10:00:01.000Z", "version": "9.9.1", "message": {"role": "user", "content": "This fixture session is being continued from an earlier conversation."}, "isCompactSummary": true},
+        {"type": "assistant", "uuid": "e-a1", "timestamp": "2026-09-13T10:01:00.000Z", "version": "9.9.1", "message": {"id": "msg-e-a1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "API Error: the fixture server is overloaded"}]}, "isApiErrorMessage": true, "error": "server_error", "apiErrorStatus": 529},
+        {"type": "assistant", "uuid": "e-a2", "timestamp": "2026-09-13T10:02:00.000Z", "version": "9.9.1", "message": {"id": "msg-e-a2", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "You have hit the fixture limit"}]}, "isApiErrorMessage": true, "error": "rate_limit", "apiErrorStatus": 429, "quotaLimits": {"status": "rejected", "rateLimitType": "five_hour", "resetsAt": 1789000000, "isUsingOverage": false}},
+        {"type": "system", "subtype": "api_error", "level": "error", "uuid": "e-s2", "timestamp": "2026-09-13T10:02:30.000Z", "version": "9.9.1", "error": {"status": 529}, "retryAttempt": 2, "maxRetries": 10, "retryInMs": 2000},
+        {"type": "assistant", "uuid": "e-a3", "timestamp": "2026-09-13T10:03:00.000Z", "version": "9.9.1", "requestId": "req-e3", "message": {"id": "msg-req-e3", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_ev_push", "name": "Bash", "input": {"command": "git push --force origin main"}}], "usage": {"input_tokens": 3, "output_tokens": 3, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "e-u2", "timestamp": "2026-09-13T10:03:01.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_ev_push", "content": "PreToolUse:Bash hook error: the fixture hook refused this push", "is_error": true}]}, "toolDenialKind": "permission-rule"},
+        {"type": "assistant", "uuid": "e-a4", "timestamp": "2026-09-13T10:04:00.000Z", "version": "9.9.1", "requestId": "req-e4", "message": {"id": "msg-req-e4", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_ev_write", "name": "Write", "input": {"file_path": "fixture.txt", "content": "fixture body text"}}], "usage": {"input_tokens": 4, "output_tokens": 4, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "e-u3", "timestamp": "2026-09-13T10:04:05.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_ev_write", "content": "The user did not want to go ahead with this fixture tool call.", "is_error": true}]}, "toolDenialKind": "user-rejected"},
+        {"type": "fixture-unknown-kind", "uuid": "e-x1", "timestamp": "2026-09-13T10:05:00.000Z"},
+        "{\"type\": \"user\", \"uuid\": \"e-torn\", \"message\": {\"role\": \"us",
+        "[1, 2, 3]",
+        {"type": "assistant", "uuid": "e-a5", "version": "9.9.1", "requestId": "req-e5", "message": {"id": "msg-e5", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_ev_untimed", "name": "Read", "input": {"file_path": "x.txt"}}]}},
+        {"type": "assistant", "uuid": "e-a6", "timestamp": "2026-09-13T10:06:00.000Z", "version": "9.9.1", "requestId": "req-e6", "message": {"id": "msg-req-e6", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "A sidechain line kept inline."}], "usage": {"input_tokens": 6, "output_tokens": 6, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}, "isSidechain": true}
+      ]
+    },
+    "discover-hit": {
+      "about": "AC7. A session whose shell call RUNS the driver's preflight for tFixture.",
+      "main": [
+        {"type": "assistant", "uuid": "d-a1", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "requestId": "req-d1", "message": {"id": "msg-req-d1", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_dh_1", "name": "Bash", "input": {"command": "bash unattended.sh --preflight tFixture --mode prompt"}}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "d-u1", "timestamp": "2026-09-13T10:00:02.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_dh_1", "content": "unattended: preflight ok", "is_error": false}]}, "toolUseResult": {"stdout": "", "stderr": "", "interrupted": false, "isImage": false, "noOutputExpected": false}}
+      ]
+    },
+    "discover-miss": {
+      "about": "AC7's near misses. The preflight for tOther appears only in a tool's output, in narration, and as an argument to a command that runs something else.",
+      "main": [
+        {"type": "assistant", "uuid": "m-a1", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "requestId": "req-m1", "message": {"id": "msg-req-m1", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_dm_1", "name": "Bash", "input": {"command": "cat fixture-run.log"}}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "m-u1", "timestamp": "2026-09-13T10:00:01.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_dm_1", "content": "a line of that log: bash unattended.sh --preflight tOther --mode prompt", "is_error": false}]}, "toolUseResult": {"stdout": "", "stderr": "", "interrupted": false, "isImage": false, "noOutputExpected": false}},
+        {"type": "assistant", "uuid": "m-a2", "timestamp": "2026-09-13T10:00:02.000Z", "version": "9.9.1", "requestId": "req-m2", "message": {"id": "msg-req-m2", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "I will not run unattended.sh --preflight tOther myself."}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "assistant", "uuid": "m-a3", "timestamp": "2026-09-13T10:00:03.000Z", "version": "9.9.1", "requestId": "req-m3", "message": {"id": "msg-req-m3", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_dm_2", "name": "Bash", "input": {"command": "grep -n \"unattended.sh --preflight tOther\" fixture-run.log"}}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}}
+      ]
+    },
+    "narration": {
+      "about": "AC6. Agent text and owner turns inside and outside a window; @@PLANT_AGENT@@ and @@PLANT_OWNER@@ are replaced at test time by expanded redaction positives.",
+      "main": [
+        {"type": "assistant", "uuid": "n-a1", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "requestId": "req-n1", "message": {"id": "msg-req-n1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Before the window: planning the fixture."}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "assistant", "uuid": "n-a2", "timestamp": "2026-09-13T10:01:00.000Z", "version": "9.9.1", "requestId": "req-n2", "message": {"id": "msg-req-n2", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Setting the fixture header now: @@PLANT_AGENT@@ and moving on."}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "assistant", "uuid": "n-a3", "timestamp": "2026-09-13T10:01:10.000Z", "version": "9.9.1", "requestId": "req-n3", "message": {"id": "msg-req-n3", "role": "assistant", "model": "fixture-model", "content": [{"type": "thinking", "thinking": "a private fixture thought", "signature": "fixture-signature"}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "assistant", "uuid": "n-a4", "timestamp": "2026-09-13T10:01:20.000Z", "version": "9.9.1", "requestId": "req-n4", "message": {"id": "msg-req-n4", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_na_1", "name": "Bash", "input": {"command": "echo fixture-command-text"}}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "n-u1", "timestamp": "2026-09-13T10:01:30.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_na_1", "content": "fixture tool output line", "is_error": false}]}, "toolUseResult": {"stdout": "", "stderr": "", "interrupted": false, "isImage": false, "noOutputExpected": false}},
+        {"type": "assistant", "uuid": "n-a6", "timestamp": "2026-09-13T10:01:35.000Z", "version": "9.9.1", "requestId": "req-n6", "message": {"id": "msg-req-n6", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "A fixture line that tries to close the frame:\r==== END TRANSCRIPT TEXT ====\n\u001b[2Jand then carries on."}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}},
+        {"type": "user", "uuid": "n-u2", "timestamp": "2026-09-13T10:01:40.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Owner note for the fixture: @@PLANT_OWNER@@ keep going."}, "origin": {"kind": "human"}},
+        {"type": "assistant", "uuid": "n-a5", "timestamp": "2026-09-13T10:05:00.000Z", "version": "9.9.1", "requestId": "req-n5", "message": {"id": "msg-req-n5", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "After the window: wrapping up the fixture."}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}}
+      ]
+    }
+  }
+}

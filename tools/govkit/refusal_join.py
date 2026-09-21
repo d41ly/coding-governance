@@ -39,6 +39,13 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
 BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 255 UNMOVED ACROSS THE RECONCILE, deliberately. The merge of origin/main into cMendedVintage
+# unions two branch populations and the matcher reads 264 over the merged four modules. The pin
+# is a FLOOR — `len(branches) < BRANCH_PIN` is the whole test — so the larger of the two
+# authored floors satisfies it and neither side's shrink-only guarantee is weakened. It is NOT
+# raised to 264 because doing so would silently close the re-baselining the concurrent deployer
+# unit parked as a backlog row of its own, and would claim this reconcile armed nine branches it
+# did not write. Re-baselining stays that row's job.
 # 252 -> 255 at DEPL-cMendedVintage-13, READ OFF this engine's own output at both ends rather than
 # predicted: 252 over the four modules at that unit's base `a47c286b`, taken from a clean export of
 # that tree, and 255 on the tree it left. The NET is three and the SITES are five, and the
@@ -79,6 +86,21 @@ BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed
 # NOTE what this raise does NOT buy, because the docstring above promises an anchor SET and this
 # file enumerates none: the join half still runs only when a reached-set is passed on argv, and
 # nothing in the tree passes one. That is TOOL-dUnstalledConvoy-36, unchanged by this unit.
+# 244 -> 246, PIN UNMOVED, TOOL-aHonedRuleset-8. Two new `fail` branches in `selfcheck()`: the
+# why_conditional REASON gate (arm 7d) and the requires-edge REACHABILITY arm (arm 7e). Both are
+# ARMED -- selftest arms exercise each failing case, and each was observed RED by hand before
+# landing: 7d on `check-placeholders` with its reason removed, 7e on this unit's own base state.
+# THE RAISE IS DECLINED, and that is a departure from this file's convention worth naming. Every
+# prior row here is an `X -> Y` pin raise, and `141 -> 161` (TOOL-dUnstalledConvoy-26) states the
+# reason: a floor that trails the population stops catching the matcher going blind. The pin is
+# declined on a ruling recorded by the concurrent deployer unit that also adds branches to this
+# file: its non-goals make moving BRANCH_PIN out of scope, because a 217 -> 219 move would claim two
+# new branches took the pin to the population when the population is 246, and it files re-baselining
+# as its own backlog row. The id is deliberately NOT cited here: that spec is still SPECCED, and
+# drift-audit's `non_terminal_specs_cited_by_product_source` is a shrink-only list of exactly this
+# shape -- product source pointing at something that can still change under it. Find it through
+# memory/LIVE.md, which is generated and cannot go stale. So the trailing floor is a KNOWN DEFERRAL
+# with an owner, not an acceptable property.
 # 216 -> 217 at ROUND 4's fold. ONE new refusal, from the round's BLOCKER: the reserved-key guard in
 # `target_context`, which refuses a target `[answers]` or `[kit.<eid>]` key naming one of the three
 # tokens gov seeds for itself. Armed by SEVEN arms -- five doors, plus the liveness pair that proves

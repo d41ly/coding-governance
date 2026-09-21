@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-process-monitor.sh — wire the process-monitor kit into a project.
 #
-# gov:kit process-monitor@0.1
+# gov:kit process-monitor@0.2
 #
 # Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `tools/process-monitor/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is DERIVED
@@ -13,7 +13,9 @@
 # WHAT IT DOES NOT DO, said here because the header used to claim both: it does NOT create
 # `.process-monitor.conf` (the roots are yours and a placeholder root is worse than none), and it
 # does NOT write `.claude/settings.json`. It REPORTS whether the hook is wired; wiring it is
-# `python tools/settings-merge.py --fragment tools/process-monitor/procmon-hook.fragment.json`.
+# `python <tool-root>/settings-merge.py --fragment <kit-dir>/procmon-hook.fragment.json`, and both
+# halves are DERIVED below rather than spelled: this kit installs under whatever prefix the target
+# chose, and a header naming `tools/` strands every adopter that chose another one.
 #
 # `--check` is the merge-bar arm and it is deliberately non-repairing, the same split
 # `.unattended.conf` records for its own WIRING_CHECK: a repairing mode on a bar rewrites the thing
@@ -22,7 +24,7 @@
 #   Exit 0 = adopted / wired · 1 = unwired or refused · 2 = wrong invocation or not a repo.
 set -u
 
-KIT_PROCESS_MONITOR_VERSION="0.1"   # gov:kit process-monitor@0.1 — the deployer's read (kit.toml version_from)
+KIT_PROCESS_MONITOR_VERSION="0.2"   # gov:kit process-monitor@0.2 — the deployer's read (kit.toml version_from)
 
 # >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
 resolve_python() {
@@ -91,6 +93,12 @@ TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tool
 [ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
 
 PY=$(resolve_python "${GOV_PYTHON:-}" 2>/dev/null) || PY=""
+# The tool root this kit was installed under — `tools` in gov, `scripts` at an adopter that chose
+# that prefix, empty at a root install. DERIVED from KIT_REL, which is this kit's own directory
+# relative to the repo root, because the remedy below names a SIBLING file and a hardcoded `tools/`
+# there is an instruction pointing at a path the operator does not have.
+TOOL_ROOT="${KIT_REL%/*}"; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""
+SMERGE_REL="${TOOL_ROOT:+$TOOL_ROOT/}settings-merge.py"
 CONF="$ROOT/.process-monitor.conf"
 FAIL=0
 print_note() { printf 'process-monitor: %s\n' "$1"; }
@@ -223,7 +231,7 @@ if [ "$MODE" = "--check" ]; then
     _missing=""
     [ "$_hook_post" -eq 0 ] && _missing="$_missing PostToolUse (--fragment $KIT_REL/procmon-hook.fragment.json)"
     [ "$_hook_start" -eq 0 ] && _missing="$_missing SessionStart (--fragment $KIT_REL/procmon-session.fragment.json)"
-    add_problem "the engine is configured but the HOOK IS NOT WIRED for:$_missing — nothing will report a hung process on that event. Wire each with: $PY $ROOT/${TOOL_ROOT}settings-merge.py <that --fragment>"
+    add_problem "the engine is configured but the HOOK IS NOT WIRED for:$_missing — nothing will report a hung process on that event. Wire each with: $PY $SMERGE_REL <that --fragment>"
     print_note "wiring NOT ok — the hook is absent from .claude/settings.json for:$_missing"
     exit 1
   fi

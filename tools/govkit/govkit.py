@@ -1199,6 +1199,32 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                        f"({', '.join(sorted(ROLE_KINDS))}) — `plan` and `apply` both read that "
                        f"table, so an unlisted role has no defined outcome in either verb")
 
+    # ---- 3b-ii: A KIT SHIPPING A `rendered`/`generated` ROW DECLARES A `[[regenerate]]` ARGV.
+    #          `update` already REPORTS the gap, per kit, per run — and reporting it at the adopter
+    #          is reporting it to the one person who cannot fix it. TOOL-dRetiredFork-29 sat open
+    #          while six kits and twelve rows carried it, and what the adopters actually saw was
+    #          their own parity legs going red on artifacts a vintage stale, twice rolling the kit
+    #          back mid-update. Gated HERE because gov is where a descriptor is authored and a
+    #          missing declaration is a one-line fix; the class recurs the moment kit seven ships a
+    #          rendered row, which is precisely what an instance-level fix would not catch.
+    for eid, (d, _dpath) in sorted(descs.items()):
+        # `rendered` ONLY, and `generated` deliberately NOT: the same predicate `update`'s own
+        # decline uses. A `generated` row is a target-owned MEASUREMENT seeded empty — the two
+        # waiver registries and the carried-prefix ratchet say so in their own notes — and gov
+        # regenerating one would overwrite the adopter's rows with gov's. A first cut of this rule
+        # read both kinds and reported exactly those three as defects; they are the counter-example
+        # the predicate is narrowed against.
+        _rendered = [rule for rule in d.get("files", [])
+                     if rule.get("role") == "rendered"]
+        if _rendered and not (d.get("regenerate") or []):
+            r.fail(f"entry '{eid}' ships {len(_rendered)} `rendered` row(s) and "
+                   f"declares no `[[regenerate]]` argv, so `update` has nothing to run with "
+                   f"GOVKIT_RERENDER=1 and every one of them goes a vintage stale in every adopter "
+                   f"tree on every update — the "
+                   f"kit's own drift check then reds on a file the adopter never edited. Declare a "
+                   f"narrow re-render entrypoint; the adopter's `[adopt]` argv is NOT one, it "
+                   f"no-ops or refuses on an already-adopted tree")
+
     # ---- 3c: a `forked` rule declares BOTH of `FORK_RULE_KEYS`, and `direction` is drawn from the
     #          closed enum. DEPL-dCarriedReceipt-10 S5.
     #
@@ -1547,6 +1573,32 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                    and descs[e][0].get("selectable") != "conditional"]
     for e in unreachable:
         r.fail(f"entry '{e}' is reached by no selection and is not marked conditional")
+
+    # ---- 7d (TOOL-aHonedRuleset-8 S4): a conditional mark must carry a REASON a machine can grade.
+    #      `why_conditional` was free text NOTHING read: three descriptors carried it, no code path
+    #      and no gate looked at it. The one entry whose stated reason failed measurement was the one
+    #      that omitted the field entirely. This copies registry.toml's `[[exempt]]` discipline --
+    #      an empty reason is "an omission wearing a label" -- to the other escape hatch.
+    for e in sorted(descs):
+        d0 = descs[e][0]
+        if d0.get("selectable") == "conditional" and not str(d0.get("why_conditional", "")).strip():
+            r.fail(f"entry '{e}' is marked conditional and carries no why_conditional — a conditional "
+                   f"mark without a stated reason is an omission wearing a label, and this is the one "
+                   f"field that would have caught a mark whose argument had stopped being true")
+
+    # ---- 7e (TOOL-aHonedRuleset-8 S5): an entry whose `requires` names a default-set member must be
+    #      reachable by SOME declared selection. The quantifier is deliberate and was measured: read
+    #      as "default-reachable" the arm demands drift-audit, playbook-render and unattended join the
+    #      default set, which is the wrong arm; read as "reachable by some selection" the violating
+    #      set is exactly the entry this unit fixes. It sits BESIDE 7b, never modifying it -- 7b's
+    #      conditional escape is correct for the four entries that earn it, and this asks a different
+    #      question: not "is it reachable" but "is a DEPENDENT of the default set reachable at all".
+    _reachable = set(default_kits(reg)) | set(all_kits(descs))
+    for e in sorted(descs):
+        needs = descs[e][0].get("requires") or []
+        if any(dep in default_kits(reg) for dep in needs) and e not in _reachable:
+            r.fail(f"entry '{e}' requires a default-set member but is reached by no declared "
+                   f"selection, so the dependency is documented and the entry ships to nobody")
 
     # ---- 7c: every guard pathspec in gov's OWN manifest falls into exactly ONE declared class.
     #          A class table that does not partition its input is how the emitter gets a rule for the

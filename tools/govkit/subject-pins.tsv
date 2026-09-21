@@ -76,6 +76,7 @@ playbook placeholder catalogue	repo	product
 playbook render selftest	kit	selftests
 playbook render wiring	repo	wiring
 playbook validity gate	repo	declarations
+pre-push run-log line	repo	selftests
 pre-push self-test	repo	selftests
 process-monitor adopter selftest	kit	selftests
 process-monitor census selftest	kit	selftests
@@ -96,9 +97,13 @@ run-gates adopter e2e	kit	e2e
 run-gates canary	repo	selftests
 run-gates evidence	kit	selftests
 run-gates gov canary	repo	selftests
+run-gates run-log line	kit	selftests
 run-gates turnstile	kit	selftests
 run-gates wiring	repo	wiring
 run-selftests self-test	kit	selftests
+runlog record schema	repo	declarations
+runlog selftest	kit	selftests
+runlog skill wiring	repo	wiring
 scratch-guard self-test	kit	selftests
 selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests

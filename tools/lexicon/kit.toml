@@ -91,6 +91,10 @@ mutates_index = false
 # refresh anything. `--render` skips the derivation, reads the declaration already on disk and
 # re-runs `write_skill` over it. Safe to re-run for the same reason: it writes that one destination,
 # derives no table, measures no pin, and leaves the conf and both waiver registries untouched.
+# WHY THE BLOCK EXISTS AT ALL: `.claude/skills/lexicon/SKILL.md` is this kit's one `rendered`
+# row and its `--check` byte-compares it against a fresh render, so an update that moved the
+# template and ran no render left that check red at every adopter — measured at two, where it
+# rolled the whole kit back (TOOL-dRetiredFork-29).
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--render"]
 

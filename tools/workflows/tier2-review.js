@@ -563,33 +563,101 @@ const synth = await agent(
     `The report's FIRST line must be the record's binding line, exactly: **Serves:** ${kind} ` +
     `followed by every unit id ${isSpec ? 'the reviewed spec set defines' : 'in the diff'}, space-separated. A kind with no id is malformed under the ` +
     `project's record-binding grammar, so never emit the kind alone. ` +
-    // TOOL-dTieredTribunal-1 S5 - BOTH integers are defined, not just one. S1 makes both REQUIRED,
-    // so a definition for one and silence on the other ships a mandatory integer with no stated
-    // population. What this buys, stated exactly: ONE agent writes the record and returns the
-    // integers, from one adjudication, in one turn. Nothing re-counts the record, so the agreement
-    // is a property of this prompt and not of a mechanism.
-    `\`blockers\` is the number of CONFIRMED findings you classified at BLOCKER severity, and ` +
-    `\`highs\` the number at HIGH severity. In both cases the severity meant is the one YOU ` +
-    `adjudicated in this report, so the integers you return and the table you wrote agree. ` +
-    `Return JSON {path, blockers, highs, summary} with a FORWARD-SLASH path.`,
+    // TOOL-dMergedTally-1 - THE AGENT RETURNS IDS AND THIS FILE COUNTS THEM. TOOL-dTieredTribunal-1
+    // S5 defined `blockers` and `highs` as the CONFIRMED findings at each severity and had the agent
+    // type both integers, and its own note said the agreement was a property of this prompt and not
+    // of a mechanism. The prompt did not hold: a synthesis that MERGES several raw findings into one
+    // adjudicated item counts ITEMS, while `confirmed` counts RAW findings and the build harness's
+    // disposal guard subtracts one from the other. Measured on dLoggedFlight's round-1 spec audit of
+    // units 14 and 15: 13 confirmed merged into 10 items came back as blockers 1 and highs 5 against
+    // a raw split of 3 and 6, so the guard demanded 7 folds of 4 raw MEDIUMs and no honest disposal
+    // could pass. The sentence already said CONFIRMED findings, so rewording it is the fix that had
+    // already failed. The item list below carries the raw ids, and the counts are derived from it.
+    `Return \`items\`, one entry per item AS YOU ADJUDICATED IT in the report: \`severity\` is ` +
+    `BLOCKER, HIGH, MEDIUM or LOW, and \`ids\` lists the integer id of every CONFIRMED finding that ` +
+    `item covers. When you merge several findings into one item, that item lists all of their ids. ` +
+    `Every CONFIRMED id above appears in EXACTLY ONE item, the one whose severity it takes; an ` +
+    `UNVERIFIED id you list is not counted. The harness counts \`blockers\` and \`highs\` from these ` +
+    `ids, so both count RAW confirmed findings and never items, and a list that leaves a confirmed ` +
+    `id out or names one twice returns neither count. In the review shape, state the adjudicated ` +
+    `tally BOTH ways, by item and by raw confirmed finding, so the table you wrote and the ids you ` +
+    `return agree. ` +
+    `Return JSON {path, items, summary} with a FORWARD-SLASH path.`,
   {
     label: 'synth',
     phase: 'Synthesize',
     schema: {
       type: 'object',
-      // TOOL-dTieredTribunal-1 S1 - `blockers` and `highs` were requested and schemad from the
-      // start and were never required and never read. Requiring them is what makes a synthesis that
-      // omits one fail loudly at validation instead of returning a partial object nobody notices.
-      required: ['path', 'summary', 'blockers', 'highs'],
+      // TOOL-dTieredTribunal-1 S1 - the counts were requested and schemad from the start and were
+      // never required and never read. Requiring the field they come from is what makes a synthesis
+      // that omits it fail loudly at validation instead of returning a partial object nobody notices.
+      // TOOL-dMergedTally-1 - that field is `items` now; the two integers are derived below.
+      required: ['path', 'summary', 'items'],
       properties: {
         path: { type: 'string' },
-        blockers: { type: 'integer' },
-        highs: { type: 'integer' },
+        items: {
+          type: 'array',
+          items: {
+            type: 'object',
+            required: ['severity', 'ids'],
+            properties: {
+              severity: { type: 'string', enum: ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'] },
+              ids: { type: 'array', items: { type: 'integer' } },
+            },
+          },
+        },
         summary: { type: 'string' },
       },
     },
   },
 )
+
+// TOOL-dMergedTally-1 - THE COUNTS, DERIVED OVER RAW CONFIRMED IDS. Each confirmed id must sit in
+// exactly one item. A missing id or a repeated one leaves the synthesis's split unknowable, and
+// guessing it is an adjudication this file has no standing to make: taking the higher severity of a
+// repeat would promote a finding the report folded, and dropping a missing one would fold a finding
+// nobody graded. Both counts are then null, the stated absence the callers already refuse, and the
+// note below names the ids. An id that is not confirmed is ignored: the prompt permits UNVERIFIED
+// ones, and neither count is defined over anything else.
+let blockers = null
+let highs = null
+let tallyFault = ''
+if (synth) {
+  const confirmedIds = new Set(confirmed.map((f) => f.id))
+  const severityById = new Map()
+  const repeated = new Set()
+  const perItem = { BLOCKER: 0, HIGH: 0, MEDIUM: 0, LOW: 0 }
+  const perRaw = { BLOCKER: 0, HIGH: 0, MEDIUM: 0, LOW: 0 }
+  // The severity is tested against the closed list. An unknown one skips its item, so its ids surface
+  // as unplaced rather than counting as placed while moving neither count. Case is folded because the
+  // finders' own schema spells the same four words in lowercase.
+  for (const it of Array.isArray(synth.items) ? synth.items : []) {
+    const sev = it ? String(it.severity).toUpperCase() : ''
+    if (['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'].indexOf(sev) === -1) continue
+    let holdsConfirmed = false
+    for (const id of Array.isArray(it.ids) ? it.ids : []) {
+      if (!confirmedIds.has(id)) continue
+      holdsConfirmed = true
+      if (severityById.has(id)) repeated.add(id)
+      else severityById.set(id, sev)
+    }
+    if (holdsConfirmed) perItem[sev]++
+  }
+  const missing = [...confirmedIds].filter((id) => !severityById.has(id))
+  if (missing.length || repeated.size) {
+    tallyFault =
+      (missing.length ? `confirmed id(s) ${missing.join(', ')} sit in no item` : '') +
+      (missing.length && repeated.size ? '; ' : '') +
+      (repeated.size ? `confirmed id(s) ${[...repeated].join(', ')} sit in more than one item` : '')
+    log(`WARNING: the synthesis item list does not place every confirmed finding exactly once — ${tallyFault}. blockers and highs are NULL.`)
+  } else {
+    for (const sev of severityById.values()) perRaw[sev]++
+    blockers = perRaw.BLOCKER
+    highs = perRaw.HIGH
+    log(`adjudicated BLOCKER/HIGH/MEDIUM/LOW — by item ${perItem.BLOCKER}/${perItem.HIGH}/${perItem.MEDIUM}/${perItem.LOW}, ` +
+      `by raw confirmed finding ${perRaw.BLOCKER}/${perRaw.HIGH}/${perRaw.MEDIUM}/${perRaw.LOW}`)
+  }
+}
 
 // TOOL-aBoundedVerdict-14 S6 - the SYNTH-DEATH hole. Lens deaths and skeptic deaths are both counted
 // and reported; a dead synthesis was not, so `synth === null` returned report:null with a note reading
@@ -621,14 +689,11 @@ return {
   report: synth?.path || null,
   summary: synth?.summary || '',
   // TOOL-dTieredTribunal-1 S2/S3b - the counts the synthesis pass adjudicated, returned rather than
-  // dropped. The ternary is deliberate and none of the shorter spellings is correct here.
-  // `synth.blockers` THROWS on a dead synthesis. `synth?.blockers` yields `undefined`, which
-  // serializes as an absent key rather than as a stated absence. `synth?.blockers || 0` fabricates a
-  // clean bill on a dead synthesis, which is the false-clean class this file exists to refuse. And
-  // `synth?.blockers || null` maps a real adjudicated 0 to null, because after S1 the field is
-  // required and a returned 0 is a result. So: the value when a synthesis ran, null when none did.
-  blockers: synth ? synth.blockers : null,
-  highs: synth ? synth.highs : null,
+  // dropped: an integer when a synthesis ran, null when none did, never a fabricated 0 and never an
+  // absent key. TOOL-dMergedTally-1 - both are derived above from the item list, over RAW confirmed
+  // ids, and are null as well when that list does not place every confirmed id exactly once.
+  blockers,
+  highs,
   // TOOL-dTieredTribunal-1, closing-review D1 - a dead synthesis was tested LAST, so it was
   // reportable only when nothing else was degraded and the most serious note was the least reachable
   // one. Worst outcome first. Found by the closing review of the build that ported this ternary into
@@ -636,11 +701,13 @@ return {
   note:
     !synth
       ? `UNVERIFIED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log only`
-      : judged === 0
-        ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died) — the report lists them as outstanding`
-        : lensesDead || skepticsDead || unverified.length
-          ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
-          : 'complete',
+      : tallyFault
+        ? `UNVERIFIED: the report was written, but its item list does not place every confirmed finding exactly once (${tallyFault}), so blockers and highs are null`
+        : judged === 0
+          ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died) — the report lists them as outstanding`
+          : lensesDead || skepticsDead || unverified.length
+            ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
+            : 'complete',
   round,
   priorFindings: priorFindings.length,
 }

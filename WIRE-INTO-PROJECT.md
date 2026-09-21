@@ -79,7 +79,7 @@ placeholder from the target's own `deploy.toml` and drops the conditional blocks
 kit for. Run it rather than copying by hand.
 
 ```bash
-python <gov>/tools/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,…
+python <gov>/tools/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,check-microformats,…
 bash  <gov>/tools/playbook/adopt-playbook.sh --target <project>
 bash  <gov>/tools/playbook/adopt-playbook.sh --target <project> --check   # wire as a gate leg
 ```
@@ -146,6 +146,18 @@ Declaring one the adopter never computes ships an unresolved `{{TOKEN}}` brace i
 committed tree, and they can only fix it by forking the descriptor. `python
 tools/check-kit-placeholders.py` is the join and reds on it; a kit that legitimately has no adopter
 says so with `why_no_adopter` in its `[adopt]` block.
+
+<!-- govkit:entry check-microformats -->
+### 2a — The micro-format definition gate
+
+`check-microformats` arrives with the charter and grades the micro-format DEFINITION block inside
+it, so a target that renders the charter gets the gate that keeps that block honest. It is in the
+default selection; decline it by naming a selection that omits it.
+
+Wire the leg into your gate runner and CI as `micro-format definitions`, running
+`bash {prefix}/check-microformats.sh <playbook>` — the argv the descriptor declares, with
+`{prefix}` resolved to your install prefix. The token form is deliberate: a literal `tools/` path
+here would raise this file's carried-prefix count and red `install-prefix`.
 
 <!-- govkit:entry memory-tree -->
 ## 3 — Adopt the memory-tree kit (if chosen in §0)
@@ -534,9 +546,8 @@ from §2). Write the manifest to one of those paths so it resolves.
    where work state is READ from, e.g. the generated `memory/LIVE.md`) · the environment traps. Fill the
    **`manifest-audit` block** per the template's Customize notes: `watch` = the pathspecs the gate/layout
    claims derive FROM (never lockfiles; ≤~8); `verify-paths` = the 2–3 tracked anchors; stamp
-   `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha (HEAD on the
-   default branch, else `git merge-base <remote>/<default> HEAD`; no remote →
-   `git merge-base <local-default> HEAD`); `registry` = the repo-relative file whose first table
+   `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha per the stamp
+   rule those notes state; `registry` = the repo-relative file whose first table
    under `## Node registry` names the project's nodes (the charter from §2 when the playbook is
    adopted) — the checker's `--card` verbs resolve the session's node from its Machine/user
    column; tag claims whose truth lives in another repo

@@ -42,6 +42,11 @@ DISCIPLINES="architecture deployment blocks design performance"   # demo default
 FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performance:PERF"
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 
+# WHY THE MODE EXISTS: TOOL-dRetiredFork-29 measured it. On an adopted tree the converge guard
+# prints "already scaffolded" and exits 0, so every `rendered` row this kit owns went one vintage
+# stale on every `govkit update` — the flag runs a `[[regenerate]]` block and this kit declared
+# none — and the adopter's own parity gate reds on it. A regenerate argv needs a narrow entrypoint
+# with no adoption guard to trip over; this is that entrypoint.
 # The mode is REQUIRED and stays required: a bare invocation was a usage refusal before `--render`
 # existed and still is, because defaulting a missing word to the verb that creates a tree is a
 # widening nobody asked for.
@@ -60,6 +65,22 @@ fi
 # which is a reader that fails to RUN rather than one that fails.
 READINESS_ROWS="${READINESS_ROWS:-}"
 . "$ROOT/.memory-tree.conf"
+# `--render` ANSWERS "IS THIS TREE EVEN RENDERED FROM THIS KIT?" FIRST, and the order is the whole
+# point of the arm. A repo can claim these rows in its receipt while holding its own hand-authored
+# docs — one of the two adopters measured this week does exactly that — and for it the honest answer
+# is "nothing here renders from me", not the READINESS_ROWS misconfiguration below, which is what it
+# reported when this check sat lower and which stopped that repo's whole update with a message about
+# a key it does not need. `gov:kit memory-tree@` in the rendered HYGIENE.md is the discriminator: a
+# tree that renders from this kit carries it, a fork does not.
+#
+# EXIT 3, not 1, and `kit.toml` declares it ACCEPTED. A fork is a legitimate steady state rather than
+# a failure, and it must stay distinguishable from the two real exit-1 refusals below and beneath.
+if [ "$MODE" = "--render" ]; then
+  if [ ! -f "$MEMORY_ROOT/HYGIENE.md" ] || ! grep -q 'gov:kit memory-tree@' "$MEMORY_ROOT/HYGIENE.md"; then
+    echo "memory-tree: --render has nothing to refresh — $MEMORY_ROOT/HYGIENE.md carries no 'gov:kit memory-tree@' marker, so this tree does not render its docs from this kit. Not a failure; run --scaffold if you meant to adopt."
+    exit 3
+  fi
+fi
 # An armed render with no declared row set would write a §5 holding one empty bullet. There is
 # one literal row set and it is the conf, so a blank here is a misconfiguration to say out loud
 # rather than a default to fall back on.

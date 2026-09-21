@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds
 
-**Status:** SPECCED · rev-6 · 2026-09-05 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 1 · ratified 2026-09-04
+**Status:** CLOSED · rev-7 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 1 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,10 @@
 |---|---|---|
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-06-build-TOOL-aHonedRuleset-2-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aHonedRuleset-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md) | diff-review | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-8 |
+| [2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md) | spec-audit | TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 
 <!-- /gen:spec-records -->
 
@@ -32,14 +35,17 @@ charter, on a pair that is already gated.
   surviving sentence's words byte-identical. Only line breaks move.
 - **S4 — re-render `AGENTS.md`** with `bash tools/playbook/adopt-playbook.sh --target .`, because the
   rendered region is where a session actually reads this text.
-- **S5 — `memory/guides/SESSION-KICKOFF.md` gets its `last-audit` re-stamp in the same commit**,
+- **S5 — `memory/guides/SESSION-KICKOFF.md` gets its re-stamp in the same commit**,
   because `coding-governance-agents.template.md` is a watched pathspec on line 6 of that file
   (verified: the `watch:` list continues past `.memory-tree.conf` and names the template outright).
   The staged arm at `skills/session-kickoff/manifest-check.sh:412-421` fails check 5 whenever a
   watched file is staged and the staged manifest's block stamp still equals HEAD's, and
   `.githooks/pre-commit:53-55` runs that arm unconditionally — so the bundled re-stamp is the only
   green path at the commit boundary. Re-verify the §B claims the template feeds before stamping;
-  the mechanism is unit 5's S8, copied.
+  the mechanism is unit 5's S8, pointed at rather than copied. **BOTH stamp keys, not one — `last-audit` alone does not clear check 9, which counts watched commits since `last-body-change` and fails at 10.** The re-derivation command, the measured counter and the two prior
+  builds where this was ruled a blocker are stated in full there. This unit is `order 1`, so it is the
+  FIRST of this build's watched commits and the one with the most margin — which is exactly why the
+  rule is written into scope here rather than left for whichever unit hits the wall.
 
 ## 3. Non-goals (OUT)
 
@@ -393,6 +399,15 @@ removes is the one that script already holds.
   names the charter itself rather than a routing convention. Citation and paraphrase corrected in
   place. F3's RESOLVED line, the owner's pick and every option text are untouched, and no scope item,
   acceptance criterion or gate moved.
+
+- rev-7 · 2026-09-06 · **round-2 spec audit folded: H3, the set-wide finding, and nothing else** —
+  no finding in that round addressed this spec's own text. S5 said `last-audit`, and
+  `grep -rn last-body-change` over the whole build returned zero: no unit, criterion or record named
+  the second stamp key, while check 9 counts watched commits since it and fails at 10. S5 now names
+  both keys and points at `TOOL-aHonedRuleset-5` S8, which carries the mechanism, the re-derivation
+  command and the measured counter in one place instead of five. Being `order 1` this unit has the
+  most margin and the least need of the rule, which is the reason it is stated here rather than at the
+  unit that would have hit the wall.
 
 ## 10. Reuse audit
 
