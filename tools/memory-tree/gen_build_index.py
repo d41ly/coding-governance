@@ -47,6 +47,7 @@ THE THREE BLIND SPOTS THIS CLOSES (each armed in --selftest)
 from __future__ import annotations
 
 import contextlib
+import datetime
 import io
 import json
 import os
@@ -509,7 +510,17 @@ def _read_backlog_verbs(header: str, path: str, alt: str) -> dict:
 
 
 def parse_spec(path: str, alt: str = "(?!)") -> dict | None:
-    """Return the unit record, or None when the file carries no parseable status header.
+    """`parse_spec_text` over the file at `path`. The working-tree binding, and the only one the
+    render path uses."""
+    return parse_spec_text(read_text(path), path, alt)
+
+
+def parse_spec_text(text: str, path: str, alt: str = "(?!)") -> dict | None:
+    """Return the unit record, or None when the text carries no parseable status header.
+
+    SPLIT FROM `parse_spec` by TOOL-dDerivedDocket-15, because a read pinned at a rev holds the
+    spec's BYTES and has no file to hand a reader. One parser with two bindings, so a pinned grade
+    and a working-tree grade cannot disagree about what a status header says.
 
     A grandfathered recording legitimately has none; check 12 already rejects a post-cutoff spec
     that is missing one, so this file never has to defend against a malformed header.
@@ -519,7 +530,7 @@ def parse_spec(path: str, alt: str = "(?!)") -> dict | None:
     has no id grammar to offer, and admitting every token would be a grammar bound to the wrong tree
     — the shape whose empty classification reads exactly like a clean corpus.
     """
-    body = list(unfenced(read_text(path)))
+    body = list(unfenced(text))
     hdr = None
     for line in body[:5]:
         m = HDR_RE.match(line)
@@ -2340,29 +2351,56 @@ def cmd_write(root: str, conf: dict) -> int:
 #: unanswerable by the one mode built to answer it.
 ASK_STATUS_TOKENS = STATUS_TOKENS + (backlog.UNRESOLVED,)
 ASK_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+$")
-ASK_USAGE = "usage: gen_build_index.py --asks [FAMILY|ID] [--all] [--status <token>] " \
-            "[--build <slug>] [--json]"
+ASK_USAGE = ("usage: gen_build_index.py --asks [FAMILY|ID] [--all] [--status <token>] "
+             "[--build <slug>] [--json|--tsv] [--ready [IDLIST]] [--target <slug>] "
+             "[--live-builds <slug>…] [--at <rev>] [--probe <id>]")
+#: The options that take a LIST of bare words rather than one value. Their list ends at the next
+#: `--option` or at the end of argv, and NOT at the first token starting with `-`: an IDLIST
+#: continuation is spelled `-4`, so a one-dash stop would silently truncate every mandate that
+#: used the continuation form — the fix-F2 narrowing, reintroduced by the argument parser.
+ASK_LIST_OPTIONS = {"--ready": "ready", "--live-builds": "live_builds"}
+ASK_VALUE_OPTIONS = {"--status": "status", "--build": "build", "--target": "target",
+                     "--at": "at", "--probe": "probe"}
 
 
 def read_asks_args(argv: list) -> dict:
-    """`--asks`'s own argument parse. One positional, four options, and no silent tolerance."""
-    out = {"target": "", "all": False, "status": "", "build": "", "json": False}
+    """`--asks`'s own argument parse. One positional, ten options, and no silent tolerance.
+
+    The positional is `pick` and NOT `target`: `--target` is TOOL-dDerivedDocket-15's option naming
+    the build folder R2 admits a live closing spec from, and one key answering both questions is
+    how a filter silently becomes a grading input.
+    """
+    out = {"pick": "", "all": False, "status": "", "build": "", "json": False, "tsv": False,
+           "ready": None, "target": "", "live_builds": None, "at": "", "probe": ""}
     rest = list(argv)
     while rest:
         token = rest.pop(0)
-        if token in ("--all", "--json"):
+        if token in ("--all", "--json", "--tsv"):
             out[token[2:]] = True
-        elif token in ("--status", "--build"):
+        elif token in ASK_VALUE_OPTIONS:
             if not rest:
                 raise Problem(f"{token} takes a value. {ASK_USAGE}")
-            out[token[2:]] = rest.pop(0)
+            out[ASK_VALUE_OPTIONS[token]] = rest.pop(0)
+        elif token in ASK_LIST_OPTIONS:
+            got: list = []
+            while rest and not rest[0].startswith("--"):
+                got.append(rest.pop(0))
+            # AN EMPTY LIST IS ACCEPTED, not a usage error (S6). `--ready` with no id sets an EMPTY
+            # mandate and an EMPTY examined population, which is a legitimate answer — nothing was
+            # mandated, so nothing is graded — and refusing it would make a caller that assembles
+            # its list from a filter have to special-case the day the filter matches nothing.
+            out[ASK_LIST_OPTIONS[token]] = got
         elif token.startswith("--"):
             raise Problem(f"--asks: unknown option {token}. {ASK_USAGE}")
-        elif out["target"]:
-            raise Problem(f"--asks takes at most one FAMILY or ID, and was given `{out['target']}` "
+        elif out["pick"]:
+            raise Problem(f"--asks takes at most one FAMILY or ID, and was given `{out['pick']}` "
                           f"and `{token}`. {ASK_USAGE}")
         else:
-            out["target"] = token
+            out["pick"] = token
+    if out["json"] and out["tsv"]:
+        raise Problem("--asks: --json and --tsv are two projections of one answer, and a run that "
+                      "printed both would put a JSON object in a consumer's TAB stream. "
+                      f"{ASK_USAGE}")
     return out
 
 
@@ -2401,11 +2439,16 @@ def render_asks_table(picked: list, excerpt: int) -> str:
     return "\n".join(out)
 
 
-def render_ask_detail(ask, row: dict) -> str:
+def render_ask_detail(ask, row: dict, clauses: dict = None) -> str:
     """One ask, and EVERYTHING that decided it — which is what the view header promises.
 
     A terminal ask leaves every view, so this is the only place its story is told; printing the
     status without the evidence would answer "what" and leave "why" to a grep of four files.
+
+    THE MERGED CLAUSES PRINT ONE LINE PER VALUE, not one per label (TOOL-dDerivedDocket-15). A
+    label carrying two values — the ask row's and a SCOPE row's — is the normal case once a
+    non-filer may scope somebody else's ask, and folding them to one line would be the one-value
+    field recording a mixed outcome that this kit already keeps a gotcha about.
     """
     out = [f"{row['id']} · {row['status']} · sev {row['sev']} · filed {row['filed']} · "
            f"home {row['home']} · {row['file']}:{row['line']}"]
@@ -2415,8 +2458,412 @@ def render_ask_detail(ask, row: dict) -> str:
                          ("held on", " ".join(row["holds"])),
                          ("live specs", " ".join(row["live_specs"]))):
         out.append(f"  {label:<11} {value or backlog.VIEW_NONE}")
+    for label in backlog.CLAUSE_LABELS:
+        for value in (clauses or {}).get(label, ()):
+            out.append(f"  {label:<11} {value}")
     out.append(f"  {'text':<11} {ask.text}")
     return "\n".join(out)
+
+
+# ------------------------------------------------ TOOL-dDerivedDocket-15 — the ask ENVELOPE
+# An unattended run pointed at asks can only execute one that says what was seen, what done looks
+# like and where the work lives. The grammar and the predicate are `backlog.py`'s, because they are
+# pure text and a pure fold; everything HERE is the part that touches a tree: which paths exist,
+# which blobs a rev holds, which command a declaration admits, and what gets written.
+IDLIST_ELISIONS = ("...", "…")
+#: A bare `-N` or `-N..M` continuation: the family and slug of the id before it, a new sequence.
+IDLIST_CONT_RE = re.compile(r"^-(?P<lo>\d+)(?:\.\.(?P<hi>\d+))?$")
+
+#: Every empty field of the machine projection carries THIS, never nothing. The kit reads TAB
+#: records with a TAB-separated `read`, where a RUN of tabs collapses, so an empty field would
+#: shift every field after it left and a consumer parsing by position would misread a row that
+#: still carried the right number of separators.
+TSV_NONE = "-"
+ASK_TSV_HEAD = "ask"
+ASK_TSV_COUNT = 11
+ASK_TSV_EXAMINED = "examined"
+READY_COLUMNS = ("Ask", "Status", "Sev", "Ready", "Missing", "Holds", "Grant", "Closers")
+
+
+def read_idlist(tokens, alt: str) -> list:
+    """The IDLIST grammar of design §19.2, read ALL OR NOTHING (fix F2).
+
+    A token that fails REFUSES THE WHOLE LIST rather than being dropped, because a re-typed prompt
+    once silently narrowed six asks to two and the four it lost were simply never built. An elision
+    is refused BY NAME for the same reason: `…` is the one token a reader is sure of and a parser
+    cannot be, so it must never expand to "whatever the tool guessed".
+
+    Duplicates collapse, order is preserved, and the answer is the list a caller can iterate.
+    """
+    ids: list = []
+    bad: list = []
+    stem = ""
+    for token in tokens:
+        # AN ELISION IS MATCHED INSIDE A TOKEN, not only as one. `EXMP-aFoo-3...5` is the shape a
+        # re-typed prompt actually produced, and a whole-token test reported it as "not an id" —
+        # true, and useless to the reader, who then has to work out that the third dot is the
+        # whole story. The two-dot RANGE is unaffected, because `..` does not contain `...`.
+        hit = [e for e in IDLIST_ELISIONS if e in token]
+        if hit:
+            bad.append(f"`{token}` (carries `{hit[0]}`, and an elision names no id; write "
+                       f"every one, or a `lo..hi` range)")
+            continue
+        cont = IDLIST_CONT_RE.match(token)
+        if cont:
+            if not stem:
+                bad.append(f"`{token}` (a continuation with no id before it to continue)")
+                continue
+            lo = int(cont.group("lo"))
+            hi = int(cont.group("hi") or cont.group("lo"))
+            if hi < lo:
+                bad.append(f"`{token}` (a range that counts backwards)")
+                continue
+            ids += [f"{stem}-{n}" for n in range(lo, hi + 1)]
+            continue
+        got, wrong = _expand_ids(token, alt)
+        if wrong or not got:
+            bad.append(f"`{token}` (neither an id, an id range, nor a `-N` continuation)")
+            continue
+        ids += got
+        stem = got[-1].rsplit("-", 1)[0]
+    if bad:
+        raise Problem("the id list is read ALL or NOTHING, because a dropped token is a mandate "
+                      "that silently narrowed: " + "; ".join(bad))
+    return list(dict.fromkeys(ids))
+
+
+def read_tree_paths(root: str, rev: str) -> list:
+    """Every path in ONE pinned tree. `git ls-tree`, never `ls-files`, which reads the INDEX."""
+    return [p for p in run("git", "ls-tree", "-r", "--name-only", rev, cwd=root).split("\n") if p]
+
+
+def read_blobs_at_rev(root: str, rev: str, paths: list) -> dict:
+    """`path -> text`, or `None` per path the rev does not hold, in ONE `git cat-file --batch`.
+
+    ONE PROCESS FOR THE WHOLE READ. A corpus is a few hundred blobs, and this repo's own memory
+    note prices process creation as the dominant cost of a suite on the node that measured it.
+
+    BYTES, and deliberately not through `run()`. That helper decodes with the locale encoding and
+    universal-newlines the result; this reader must decode utf-8 and fold CRLF alone, exactly as
+    `read_text` does, or a pinned read and a working-tree read of one file would disagree about a
+    lone CR. It is the same split `read_conf_at_rev` records, for the same reason.
+    """
+    if not paths:
+        return {}
+    stdin = "".join(f"{rev}:{p}\n" for p in paths).encode("utf-8")
+    done = subprocess.run(("git", "cat-file", "--batch"), cwd=root, input=stdin,
+                          capture_output=True, check=True, env=_build_git_env())
+    out: dict = {}
+    data, at = done.stdout, 0
+    for path in paths:
+        end = data.find(b"\n", at)
+        if end < 0:
+            out[path] = None
+            continue
+        header = data[at:end].decode("utf-8", "replace").split()
+        at = end + 1
+        # `<sha> blob <size>`, or `<name> missing` with no body. A TREE under a path this walk
+        # selected is not a file either, so it is `None` for the same reason a missing object is.
+        if len(header) < 3 or header[1] != "blob":
+            out[path] = None
+            continue
+        size = int(header[2])
+        try:
+            out[path] = data[at:at + size].decode("utf-8").replace("\r\n", "\n")
+        except UnicodeDecodeError:
+            out[path] = None
+        at += size + 1
+    return out
+
+
+def build_path_probe(paths):
+    """`path -> bool` over a tracked path list, with every DIRECTORY prefix admitted too.
+
+    Directories are admitted because a POINTER legitimately names a folder — a kit's own directory
+    is where a reader is often being sent — and R4 asks whether the tree HOLDS the thing pointed
+    at, not whether it is a regular file.
+
+    The prefixes are precomputed rather than tested with a per-call prefix scan: the walk happens
+    once per RUN and the probe is called several times per ask, so the scan would otherwise be
+    quadratic in a corpus this mode already reads every blob of.
+    """
+    have = set(paths)
+    dirs: set = set()
+    for path in have:
+        parts = path.split("/")
+        for i in range(1, len(parts)):
+            dirs.add("/".join(parts[:i]))
+    return lambda path: bool(path) and (path in have or path in dirs)
+
+
+def read_backlog_at_rev(root: str, rev: str, conf: dict) -> dict:
+    """`read_backlog`'s reading, over a PINNED tree. The same keys, plus `tracked`.
+
+    **WHAT THIS DOES NOT READ**, because a structural reader reads as a semantic one to everybody
+    who did not write it. It reads the BACKLOG files and the spec headers at `<rev>` and nothing
+    else: no build README, so the build-status map is empty and V10 — the closeout join over
+    FINISHED builds — cannot fire here. That is right for a print mode and wrong for a merge bar,
+    which is why this is not the function `--check` calls. The conf is the CALLER's, and a caller
+    that means a pinned one reads it with `read_conf_at_rev`.
+    """
+    m = conf["MEMORY_ROOT"]
+    bconf = _read_backlog_conf(conf)
+    tracked = read_tree_paths(root, rev)
+    families = tuple(sorted({pair.split(":")[1] for pair in conf["FAMILIES"].split()
+                             if ":" in pair}))
+    out = {"mode": bconf.mode, "conf": bconf, "corpus": None, "fold": None, "families": families,
+           "excerpt": backlog.EXCERPT_DEFAULT, "verdicts": [], "line": "", "tracked": tracked}
+    if bconf.mode != "builds":
+        out["corpus"] = backlog.build_corpus([])
+        out["fold"] = backlog.derive_statuses(out["corpus"])
+        out["line"] = (f"build-index: backlog layout is `shards` at {rev} — no ask is filed per "
+                       f"build there, so every id in a mandate grades `no` on R1")
+        return out
+    out["excerpt"] = _read_excerpt(conf)
+    grammar = backlog.build_grammar(families)
+    rows = sorted(p for p in tracked if p.startswith(f"{m}/builds/")
+                  and p.endswith("/BACKLOG.md") and p.count("/") == 3)
+    spec_sel = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/spec/.*\.md$")
+    specs = sorted(p for p in tracked if spec_sel.match(p))
+    blobs = read_blobs_at_rev(root, rev, rows + specs)
+    files, verdicts = [], []
+    for rel in rows:
+        text = blobs.get(rel)
+        if text is None:
+            verdicts.append(backlog.Verdict(2, f"{rel}: unreadable at {rev}", (rel,)))
+            continue
+        files.append(backlog.parse_file(rel, text, grammar))
+    index: dict = {}
+    for rel in specs:
+        text = blobs.get(rel)
+        if text is None:
+            continue
+        try:
+            unit = parse_spec_text(text, rel, _id_alternation(conf))
+        except Problem:
+            # A MALFORMED HEADER AT A PINNED REV IS NOT THIS MODE'S REFUSAL. `--check` grades the
+            # working tree and owes that verdict there; a print mode asked about history must not
+            # refuse to answer because a spec somebody has since repaired was once wrong.
+            continue
+        if unit:
+            index[unit["id"]] = backlog.Spec(unit["id"], rel, unit["status"],
+                                             tuple(unit["closes"]), tuple(unit["advances"]))
+    corpus = backlog.build_corpus(files, index, {})
+    fold = backlog.derive_statuses(corpus)
+    verdicts += backlog.derive_verdicts(corpus, bconf)
+    counts = fold.counts
+    out.update(corpus=corpus, fold=fold, verdicts=verdicts,
+               line=(f"build-index: backlog at {rev} — {counts['asks']} ask(s) · "
+                     f"{counts['rows']} row(s) · {counts['links']} link(s) in "
+                     f"{counts['files']} file(s) · {counts['live']} live · "
+                     f"{len(verdicts)} verdict(s)"))
+    return out
+
+
+def build_grade_row(grader, deciders: dict, ask_id: str) -> dict:
+    """One ask's WHOLE answer, as the values both projections print. No field is ever empty.
+
+    The human table and the machine line are rendered from THIS dict and never computed twice: a
+    reader comparing a pasted table against a parsed row is entitled to find the same answer, and
+    two renderers each deriving their own is how those two stop agreeing.
+    """
+    rows = [a for p in grader.corpus.files for a in p.asks if a.id == ask_id]
+    ready = backlog.derive_ready(grader, ask_id)
+    sev = grader.fold.severities.get(ask_id, backlog.UNLABELLED)
+    # THE HOME IS NEVER EMPTY. A filed ask's home is the folder it is filed in; an id nobody filed
+    # still names its build in its own slug component, and printing THAT rather than a blank is
+    # what lets the reader of a `no · R1` row go and look in the right place.
+    home = rows[0].slug if len(rows) == 1 and rows[0].slug else (
+        ask_id.split("-")[1] if ask_id.count("-") >= 2 else ask_id)
+    return {
+        "id": ask_id,
+        "status": grader.fold.statuses.get(ask_id, backlog.UNRESOLVED),
+        "decided_by": ",".join(deciders.get(ask_id, ())) or TSV_NONE,
+        "home": home,
+        "sev": TSV_NONE if sev == backlog.UNLABELLED else sev,
+        "ready": ready.grade,
+        "missing": ",".join(ready.missing) or TSV_NONE,
+        "holds": ",".join(ready.holds) or TSV_NONE,
+        "grant": ",".join(ready.grant) or TSV_NONE,
+        "closers": ",".join(ready.closers) or TSV_NONE,
+        "file": rows[0].path if len(rows) == 1 else "",
+        "text": rows[0].text if rows else "",
+    }
+
+
+def render_grade_tsv(row: dict) -> str:
+    """The eleven-field machine line. The field ORDER is the contract; see this unit's §4."""
+    return "\t".join((ASK_TSV_HEAD, row["id"], row["status"], row["decided_by"], row["home"],
+                      row["sev"], row["ready"], row["missing"], row["holds"], row["grant"],
+                      row["closers"]))
+
+
+def render_ready_table(rows: list, m: str) -> str:
+    """The human form of the same data. Header and separator ALWAYS, so empty is a VISIBLE empty.
+
+    THE FIRST CELL IS LINK-WRAPPED, and that is not decoration. The sibling kit's anchor grammar
+    reads a bare-id first cell as a line DEFINING that record, so a pasted copy of such a table
+    would make every ask in it a second claimant under the id-corpus check. A backtick would not
+    help — the anchor pattern admits one. A markdown link does, because its bracket is outside the
+    character set that pattern allows in front of the id.
+    """
+    out = ["| " + " | ".join(READY_COLUMNS) + " |", "|" + "---|" * len(READY_COLUMNS)]
+    for row in rows:
+        link = row["file"] or f"{m}/builds/{row['home']}/BACKLOG.md"
+        out.append(f"| [{row['id']}]({link}) | {row['status']} | {row['sev']} | {row['ready']} "
+                   f"| {row['missing']} | {row['holds']} | {row['grant']} | {row['closers']} |")
+    return "\n".join(out)
+
+
+def render_ready_summary(rows: list, at: str) -> str:
+    """Every grade counted, and the tree the grades are about.
+
+    The counts are not derivable by a reader who would have to count rows, and `at` is the field a
+    stale paste is caught by — a table with no tree named is a claim about no particular day.
+    """
+    grades = [r["ready"] for r in rows]
+    return (f"asks: {len(rows)} examined · {grades.count('yes')} ready · "
+            f"{grades.count('legacy')} legacy · {grades.count('no')} not ready · "
+            f"at {at or 'the working tree'}")
+
+
+# ------------------------------------------------------------------------------- the probe runner
+#: The conf key that DECLARES which commands `--probe` may execute. Blank ships everywhere,
+#: including here (owner ruling D12-e): ask text is written by whoever filed the ask, so this is
+#: the one place in the kit that would execute a filer's bytes, and a tree that has not thought
+#: about that must not be able to do it by default.
+PROBE_ALLOW_KEY = "PROBE_ALLOW"
+#: Entries are separated by this and by nothing else, because an ENTRY is a sequence of argv tokens
+#: separated by whitespace — the two separators cannot be the same character or a two-token entry
+#: would be indistinguishable from two one-token ones.
+PROBE_ENTRY_SEP = "|"
+#: The bound, in seconds. A command that outlives it is KILLED and reported as never answered,
+#: which is a different outcome from a failure and is printed as one: a probe that hung tells you
+#: nothing about the ask, and reporting it as a red would be a claim the run cannot support.
+PROBE_TIMEOUT_SECONDS = 30
+#: How much of a probe's output is printed. The whole of it would land in a transcript.
+PROBE_TAIL_LINES = 20
+#: Refused BEFORE the command is split, never escaped. Every one of these means something to a
+#: shell, this runner starts no shell, and a token carrying one is therefore either a mistake or an
+#: attempt — and the two are indistinguishable from here, which is exactly why neither runs.
+PROBE_METACHARS = ";|&$<>()[]{}`\\'\"*?!#~\n\r\t"
+
+
+def read_probe_allow(conf: dict) -> tuple:
+    """`PROBE_ALLOW` as a tuple of entries, each a tuple of argv tokens. Blank is the empty tuple."""
+    raw = (conf.get(PROBE_ALLOW_KEY) or "").strip()
+    return tuple(tuple(entry.split()) for entry in raw.split(PROBE_ENTRY_SEP) if entry.split())
+
+
+def check_probe_command(command: str, entries: tuple) -> tuple:
+    """`(argv, why)` — the command's argv when a declared entry admits it, else the refusal.
+
+    THE MATCH IS TOKEN FOR TOKEN ON A PREFIX, never a string prefix (§8 F5). A string prefix admits
+    `python3x` under an entry reading `python3`, and `tools/../x` under one reading `tools/`; both
+    were the reason the string form was rejected rather than a hypothetical.
+
+    A SINGLE-TOKEN INTERPRETER ENTRY ADMITS ARBITRARY CODE — `python3` admits `python3 -c` followed
+    by anything a filer wrote. That is stated here and in the conf example rather than prevented,
+    because a tree may legitimately declare one; what it may not do is declare one unknowingly.
+    """
+    bad = [c for c in PROBE_METACHARS if c in command]
+    if bad:
+        shown = " ".join(repr(c) for c in bad)
+        return (), (f"the command carries {shown}, which mean something to a shell; this runner "
+                    f"starts no shell, so a command carrying one is refused before it is split "
+                    f"rather than escaped")
+    argv = tuple(command.split())
+    if not argv:
+        return (), "the command is empty"
+    if not entries:
+        return (), (f"{PROBE_ALLOW_KEY} is blank in this tree, so no command is admitted; the key "
+                    f"that would admit `{' '.join(argv)}` is {PROBE_ALLOW_KEY}")
+    for entry in entries:
+        if len(entry) <= len(argv) and all(a == b for a, b in zip(entry, argv)):
+            return argv, ""
+    declared = PROBE_ENTRY_SEP.join(" ".join(e) for e in entries)
+    return (), (f"no {PROBE_ALLOW_KEY} entry matches `{' '.join(argv)}` token for token; the tree "
+                f"declares: {declared}")
+
+
+def run_probe(root: str, argv: tuple, timeout: int) -> tuple:
+    """`(status, output, answered)` for one bounded run from the repo root, with NO shell.
+
+    `answered` is False when the bound killed it, and the caller prints that rather than a status:
+    a killed probe answered nothing, and reporting a synthesised non-zero would be a verdict the
+    run did not earn.
+    """
+    try:
+        done = subprocess.run(argv, cwd=root, capture_output=True, text=True, timeout=timeout,
+                              shell=False)
+    except subprocess.TimeoutExpired:
+        return None, "", False
+    except OSError as exc:
+        return None, f"{type(exc).__name__}: {exc}", True
+    return done.returncode, (done.stdout or "") + (done.stderr or ""), True
+
+
+def scan_run_commands(corpus, ask_id: str) -> list:
+    """`[(where, seen)]` — every merged `seen` carrying a `run`, WITH the row that wrote it.
+
+    The merge in `backlog.derive_clauses` answers "what do the clauses say"; this walk answers
+    "who said it", which is the question the ambiguity refusal has to answer. Two rows carrying a
+    command is a refusal naming BOTH, because running one of them would be running a second
+    writer's command for somebody else's ask and ignoring the other would be silent (§8 F7).
+    """
+    out = []
+    for parsed in corpus.files:
+        for ask in parsed.asks:
+            if ask.id != ask_id:
+                continue
+            for value in backlog.read_clause_values(ask.clauses, "seen"):
+                seen = backlog.parse_seen(value)
+                if seen.command:
+                    out.append((f"{ask.path}:{ask.line}", seen))
+        for row in parsed.rows:
+            if row.cls != "scope" or row.target != ask_id:
+                continue
+            for value in backlog.read_clause_values(row.extra["clauses"], "seen"):
+                seen = backlog.parse_seen(value)
+                if seen.command:
+                    out.append((f"{row.path}:{row.line}", seen))
+    return out
+
+
+def cmd_probe(root: str, conf: dict, corpus, ask_id: str) -> int:
+    """`--asks --probe <id>`: the ONE path in this kit that may execute a filer's bytes.
+
+    Everything it prints goes to STDOUT, because a probe's answer IS its value; the refusals go to
+    stderr with the rest of this mode's notices. It exits 0 when it ran and 2 when it refused,
+    which is the shape a caller can tell apart from the probed command's own status.
+    """
+    found = scan_run_commands(corpus, ask_id)
+    if not found:
+        print(f"build-index: {ask_id} carries no `seen … run` command in its merged clauses, so "
+              f"there is nothing to probe", file=sys.stderr)
+        return 2
+    if len(found) > 1:
+        rows = "; ".join(f"{where} runs `{seen.command}`" for where, seen in found)
+        print(f"build-index: {ask_id}'s merged clauses carry {len(found)} `seen … run` commands "
+              f"and which one answers it has more than one answer, so nothing ran — {rows}",
+              file=sys.stderr)
+        return 2
+    where, seen = found[0]
+    argv, why = check_probe_command(seen.command, read_probe_allow(conf))
+    print(f"probe {ask_id} · {where} · locator {seen.kind or 'unreadable'} {seen.path}")
+    if why:
+        print(f"probe {ask_id} · REFUSED · {why}")
+        return 2
+    status, output, answered = run_probe(root, argv, PROBE_TIMEOUT_SECONDS)
+    if not answered:
+        print(f"probe {ask_id} · NEVER ANSWERED · `{' '.join(argv)}` outlived the "
+              f"{PROBE_TIMEOUT_SECONDS}s bound and was killed, so it says nothing about this ask")
+        return 2
+    print(f"probe {ask_id} · RAN · `{' '.join(argv)}` · exit {status}")
+    tail = [line for line in output.split("\n") if line.strip()][-PROBE_TAIL_LINES:]
+    for line in tail:
+        print("    " + line)
+    return 0
 
 
 def cmd_asks(root: str, conf: dict, args: dict) -> int:
@@ -2426,38 +2873,60 @@ def cmd_asks(root: str, conf: dict, args: dict) -> int:
     today. `collect()` prints a tolerated-header line and a liveness line on every run, and a JSON
     consumer handed either of them ahead of the object gets a decode error — the class the hygiene
     engine's own ON STDERR note records. Redirecting the read wholesale means a notice added to any
-    callee later is on stderr by construction rather than by somebody remembering this rule.
+    callee later is on stderr by construction rather than by somebody remembering this rule. Under
+    `--tsv` the same rule is what leaves stdout holding the `ask` lines and the `examined` line and
+    nothing else, which is the whole reason a consumer may parse it by position.
 
     EXIT 0 ON A FOLD VERDICT (fork F8). The one tool built to explain a verdict must not refuse to
     run while one exists. A `collect()` REFUSAL is the opposite case and exits 1 with nothing on
     stdout: the tree could not be read, so there is no value to print and a partial one would be
-    worse than none.
+    worse than none. A GRADE NEVER DECIDES THE EXIT STATUS either — an all-`no` mandate is an
+    answer, printed in full, at 0; reported as a non-zero it would reach a caller's preflight as a
+    producer FAILURE naming an exit status instead of as the refusal that names each id's rules.
+
+    WHICH TREE. `--at <rev>` pins both the records and the DECLARATIONS: the conf is re-read at
+    that rev through `read_conf_at_rev`, because `ASK_CUTOFF` decides a `legacy` grade and a grade
+    mixing a pinned tree with evaluation-time declarations is not a function of the rev it names.
     """
     if args["status"] and args["status"] not in ASK_STATUS_TOKENS:
         print(f"build-index: --status {args['status']} is not a derived status token; the set is "
               f"{' '.join(ASK_STATUS_TOKENS)}", file=sys.stderr)
         return 2
+    at = args["at"]
     reading: dict = {}
+    tracked: list = []
     with contextlib.redirect_stdout(sys.stderr):
         try:
-            collect(root, conf, backlog_out=reading)
+            if at:
+                conf = read_conf_at_rev(root, at)
+                reading = read_backlog_at_rev(root, at, conf)
+                tracked = reading["tracked"]
+                print(reading["line"], file=sys.stderr)
+            else:
+                collect(root, conf, backlog_out=reading)
+                tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
         except Problem as exc:
             print(f"build-index: {exc}", file=sys.stderr)
             return 1
-    corpus, fold = reading.get("corpus"), reading.get("fold")
-    target = args["target"]
-    one = bool(target) and bool(ASK_ID_RE.match(target))
-    if target and not one and target not in reading.get("families", ()):
-        print(f"build-index: --asks {target} is neither an id nor a declared family; the families "
+    # AN EMPTY CORPUS RATHER THAN `None`, so every reader below is written once. Under `shards`
+    # there is no per-build ask at all, and the honest answer to "is this id ready" is then `no` on
+    # R1 for every id — which is what an empty corpus produces, with the layout line saying why.
+    corpus = reading.get("corpus") or backlog.build_corpus([])
+    fold = reading.get("fold") or backlog.derive_statuses(corpus)
+    if args["probe"]:
+        return cmd_probe(root, conf, corpus, args["probe"])
+    pick = args["pick"]
+    one = bool(pick) and bool(ASK_ID_RE.match(pick))
+    if pick and not one and pick not in reading.get("families", ()):
+        print(f"build-index: --asks {pick} is neither an id nor a declared family; the families "
               f"are {' '.join(reading.get('families', ()))}", file=sys.stderr)
         return 2
-    evidence = backlog.derive_evidence(corpus) if corpus else {}
+    evidence = backlog.derive_evidence(corpus)
     picked = []
-    for ask in sorted((a for p in (corpus.files if corpus else ()) for a in p.asks),
-                      key=backlog.build_ask_sort_key):
-        if one and ask.id != target:
+    for ask in sorted((a for p in corpus.files for a in p.asks), key=backlog.build_ask_sort_key):
+        if one and ask.id != pick:
             continue
-        if target and not one and ask.id.split("-")[0] != target:
+        if pick and not one and ask.id.split("-")[0] != pick:
             continue
         if args["build"] and ask.slug != args["build"]:
             continue
@@ -2472,17 +2941,281 @@ def cmd_asks(root: str, conf: dict, args: dict) -> int:
         picked.append((ask, row))
     if args["json"]:
         print(json.dumps({"mode": reading.get("mode", ""),
-                          "examined": len(corpus.files) if corpus else 0,
+                          "examined": len(corpus.files),
                           "asks": [row for _ask, row in picked]}, indent=2, sort_keys=True))
         return 0
+    # THE READY MODES. Asked for by `--tsv` or by any of the three options that only READY reads;
+    # asked for by none of them, this mode is byte-identical to what the view unit shipped.
+    if args["tsv"] or args["ready"] is not None or args["target"] or args["live_builds"] is not None:
+        return cmd_ready(root, conf, args, reading, corpus, fold, tracked,
+                         [ask.id for ask, _row in picked])
     if one:
         if not picked:
-            print(f"build-index: {target} is filed in no tracked BACKLOG.md", file=sys.stderr)
+            print(f"build-index: {pick} is filed in no tracked BACKLOG.md", file=sys.stderr)
             return 0
-        print(render_ask_detail(*picked[0]))
+        print(render_ask_detail(*picked[0], backlog.derive_clauses(corpus).get(pick, {})))
         return 0
     print(render_asks_table(picked, reading.get("excerpt", backlog.EXCERPT_DEFAULT)))
     return 0
+
+
+def cmd_ready(root: str, conf: dict, args: dict, reading: dict, corpus, fold, tracked: list,
+              filtered: list) -> int:
+    """The READY grades, in one of the two projections. Writes nothing, and exits 0 on any grade.
+
+    `--ready` SETS THE EXAMINED POPULATION to the ids its list names, and the mandate M to the same
+    set (S6). Without it the population is whatever the view unit's filters picked and each ask is
+    graded with M = {A}, which is the conservative reading: an ask held on something nobody
+    mandated is not ready, and a single-ask query has mandated exactly one thing.
+    """
+    try:
+        if args["ready"] is not None:
+            population = read_idlist(args["ready"], _id_alternation(conf))
+            mandate = frozenset(population)
+        else:
+            population, mandate = list(filtered), None
+        grader = backlog.build_grader(corpus, fold, reading["conf"],
+                                      build_path_probe(tracked),
+                                      mandate=mandate or (), target=args["target"],
+                                      live_builds=args["live_builds"])
+    except Problem as exc:
+        print(f"build-index: {exc}", file=sys.stderr)
+        return 2
+    except backlog.Problem as exc:
+        print(f"build-index: {exc}", file=sys.stderr)
+        return 2
+    deciders = backlog.derive_deciders(corpus, fold, grader.evidence)
+    rows = [build_grade_row(grader if mandate is not None
+                            else grader._replace(mandate=frozenset([ask_id])),
+                            deciders, ask_id)
+            for ask_id in population]
+    if args["tsv"]:
+        for row in rows:
+            print(render_grade_tsv(row))
+        print(f"{ASK_TSV_EXAMINED}\t{len(rows)}")
+        return 0
+    print(render_ready_table(rows, conf["MEMORY_ROOT"]))
+    print(render_ready_summary(rows, args["at"]))
+    return 0
+
+
+# ------------------------------------------------------------------------------- the scaffold
+NEW_BUILD_USAGE = "usage: gen_build_index.py --new-build <slug> --asks <IDLIST>"
+#: The front-matter key naming what a run may execute without asking anybody. `slug` says: the
+#: authority is this build folder, which an OWNER committed. The scaffold writes that value and no
+#: other, because owner ruling D12-a dropped the zero-commit start it was the alternative to.
+AUTHORIZED_BY_SLUG = "slug"
+#: The one-line key the mandate lives on. ONE PHYSICAL LINE, ranges collapsed, because a list whose
+#: rows each led with an id would make the new build a second claimant for every ask it names.
+ASKS_KEY = "asks"
+
+
+def read_new_build_args(argv: list) -> dict:
+    """`--new-build`'s own parse: one positional slug and one `--asks` list."""
+    out = {"slug": "", "asks": []}
+    rest = list(argv)
+    if rest and not rest[0].startswith("--"):
+        out["slug"] = rest.pop(0)
+    while rest:
+        token = rest.pop(0)
+        if token == "--asks":
+            while rest and not rest[0].startswith("--"):
+                out["asks"].append(rest.pop(0))
+        else:
+            raise Problem(f"--new-build: unknown option {token}. {NEW_BUILD_USAGE}")
+    if not out["slug"]:
+        raise Problem(f"--new-build takes a slug. {NEW_BUILD_USAGE}")
+    if not out["asks"]:
+        raise Problem(f"--new-build takes the asks it is opened for; a build answering no ask is "
+                      f"a folder. {NEW_BUILD_USAGE}")
+    return out
+
+
+def read_discipline_map(conf: dict) -> dict:
+    """`family -> discipline`, from the declared `FAMILIES` pairs and from nothing else."""
+    return {p.split(":", 1)[1]: p.split(":", 1)[0]
+            for p in conf.get("FAMILIES", "").split() if ":" in p}
+
+
+def read_git_lines(root: str, *argv: str) -> list:
+    """A git command's lines, tolerating the exit 1 that MEANS "no match" for the search verbs.
+
+    A no-match `git grep` exits non-zero and a caller chaining on it reads a PASSING zero-count
+    probe as a failure — the class this repo keeps a rule about. Anything above 1 is still a real
+    failure and raises, because "the command is broken" and "nothing matched" must not be one
+    answer.
+    """
+    done = subprocess.run(("git",) + argv, cwd=root, capture_output=True, text=True,
+                          env=_build_git_env())
+    if done.returncode > 1:
+        raise Problem(f"git {' '.join(argv)} failed ({done.returncode}): "
+                      f"{(done.stderr or '').strip()[:200]}")
+    return [line for line in done.stdout.split("\n") if line]
+
+
+def check_slug_claimed(root: str, conf: dict, slug: str) -> str:
+    """Why this slug is already taken, or "" when three probes all find nothing.
+
+    **WHAT THIS DOES NOT CHECK**, stated because a structural reader reads it as a semantic one. It
+    is not a content grep of every blob in history: that costs a full-tree grep per commit, and a
+    scaffold nobody can afford to run is a scaffold that gets bypassed. The three probes are the
+    ones that are cheap AND decisive for a BUILD slug — has any commit ever touched that build
+    folder, does any tracked file name the token today, and does any commit message name it. A slug
+    that slipped past all three is one that was never a build, never landed and was never
+    committed about, which is the residual §2's grep-then-re-roll rule already lives with.
+    """
+    m = conf["MEMORY_ROOT"]
+    ever = read_git_lines(root, "rev-list", "--all", "--max-count=1", "--",
+                          f"{m}/builds/{slug}")
+    if ever:
+        return (f"a commit ({ever[0][:12]}) has already touched {m}/builds/{slug}/, so that folder "
+                f"has existed on some ref and its ids are already minted")
+    named = read_git_lines(root, "grep", "-I", "-l", "--fixed-strings", "-e", slug, "--", ".")
+    if named:
+        return (f"{len(named)} tracked file(s) already name `{slug}`, the first being {named[0]}; "
+                f"a slug is minted ONCE and re-using one makes two records contest each other")
+    logged = read_git_lines(root, "log", "--all", "--max-count=1", "--format=%H",
+                            "--fixed-strings", f"--grep={slug}")
+    if logged:
+        return (f"a commit message ({logged[0][:12]}) already names `{slug}`, so a session has "
+                f"already minted it even if nothing it wrote survives in the tree")
+    return ""
+
+
+def render_new_build_readme(slug: str, conf: dict, ids: list, opened: str, at: str) -> str:
+    """The scaffolded README: front matter, a title, five GENERATED slot bodies, and the pairs.
+
+    NO AUTHORED PROSE ANYWHERE. Every line below is derived from the mandate, the conf and the
+    tree it was read at, so the file an owner lands says nothing a later reader has to verify by
+    hand — and the five canonical slots are filled rather than left empty, because three of them
+    may not be empty and a scaffold that produced a README the bar refuses is not a scaffold.
+
+    THE BODIES WRAP, through the generator's own id wrapper. A slot body naming one id per mandated
+    ask crosses the hygiene engine's per-line build-README entry cap at about a dozen ids, and the
+    remedy is never raising that cap: the population grows with every ask a mandate carries, so a
+    raise buys one build and reds the next.
+
+    THE PER-SLOT BYTE BUDGET IS A REAL BOUND ON A MANDATE'S SIZE, and it is stated rather than
+    discovered. Only the first slot names every id, so only it grows with the mandate; a mandate
+    large enough to pass that slot's declared ceiling REDS the budget leg by name, which is the
+    outcome a scaffold should have — not a README nobody may land.
+    """
+    families = sorted({i.split("-")[0] for i in ids})
+    disciplines = read_discipline_map(conf)
+    streams = sorted({disciplines[f] for f in families if f in disciplines})
+    head = [
+        "---",
+        f"slug: {slug}",
+        f"node: {slug[0]}",
+        f"opened: {opened}",
+        f"streams: {'+'.join(streams)}",
+        f"roster: {'+'.join(families)}",
+        "ids:",
+        "status: OPEN",
+        f"authorized-by: {AUTHORIZED_BY_SLUG}",
+        f"{ASKS_KEY}: {_render_id_ranges(ids)}",
+        "---",
+        "",
+        f"# {slug} — the {len(ids)} filed ask(s) this build carries",
+        "",
+    ]
+    body = [SLOT_CANON[0][0]]
+    body += _render_wrapped_ids(
+        f"Read at {at or 'the working tree'}, each ask below is filed and live in the build that "
+        f"raised it, and no build's roster claims it. This build is the one that answers them:",
+        ids)
+    body += [
+        "",
+        SLOT_CANON[1][0],
+        "- Every ask named above has ONE build answering it, so no second build claims one.",
+        "- What done means for each is read off its own clauses and is never re-decided here.",
+        "",
+        SLOT_CANON[2][0],
+        "- Each ask stays live in its home build with nothing carrying it to done.",
+        "- The next run pointed at this mandate grades it and stops, because no build claims it.",
+        "",
+        SLOT_CANON[3][0],
+        f"- Scaffolded from the `{ASKS_KEY}:` key above; the owner's commit of this folder IS the "
+        f"authorization a run asserts.",
+        "- This README carries no grant key, so it grants nothing that a spec does not.",
+        "",
+        SLOT_CANON[4][0],
+        "",
+        PLAN_OPEN,
+        PLAN_CLOSE,
+        "",
+        MARK_OPEN,
+        MARK_CLOSE,
+    ]
+    return "\n".join(head + body) + "\n"
+
+
+def add_contract_row(root: str, conf: dict, rel: str) -> None:
+    """Append `rel` to the registry as a BOUND row. The exempt list and its pin are NOT touched.
+
+    Bound and not exempt, because an exemption is not coverage and a brand-new README has no
+    history to be grandfathered for — it is written by this very function, to the canon's shape.
+    """
+    path = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
+    text = read_text(path)
+    if any(line.strip() == rel for line in text.split("\n")):
+        return
+    write_text(path, text.rstrip("\n") + "\n" + rel + "\n")
+
+
+def cmd_new_build(root: str, conf: dict, args: dict) -> int:
+    """Owner ruling D12-a: an owner's id list becomes a build README the OWNER lands.
+
+    THE READINESS TABLE PRINTS BEFORE ANYTHING IS WRITTEN, and a mandate whose every id grades
+    `no` stops there. That ordering is the whole ergonomics of the command: a refusal that printed
+    nothing would send the owner to a second command to find out why, and a write that happened
+    first would leave a folder behind after a refusal.
+
+    IT STAGES THE TWO FILES IT WROTE, and then renders. It has to: `collect()` reads `git
+    ls-files`, so an UNTRACKED README is invisible to the render and the generated regions this
+    command promises would never be filled. The staging is announced, the commit is still the
+    owner's, and nothing else in the index is touched.
+    """
+    m = conf["MEMORY_ROOT"]
+    slug = args["slug"]
+    if not backlog.SLUG_RE.match(slug) or not (slug[0].isalpha() and slug[0].islower()):
+        raise Problem(f"`{slug}` is not a build slug: a slug is the node's own lower-case tag "
+                      f"followed by a CamelCase adjective-noun, letters and digits only")
+    ids = read_idlist(args["asks"], _id_alternation(conf))
+    ids.sort(key=lambda i: (i.split("-")[1], i.split("-")[0], int(i.rsplit("-", 1)[1])))
+    claimed = check_slug_claimed(root, conf, slug)
+    if claimed:
+        raise Problem(f"--new-build {slug}: {claimed}")
+    reading: dict = {}
+    collect(root, conf, backlog_out=reading)
+    corpus = reading.get("corpus") or backlog.build_corpus([])
+    fold = reading.get("fold") or backlog.derive_statuses(corpus)
+    tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
+    grader = backlog.build_grader(corpus, fold, reading["conf"], build_path_probe(tracked),
+                                  mandate=ids, target=slug, live_builds=None)
+    deciders = backlog.derive_deciders(corpus, fold, grader.evidence)
+    rows = [build_grade_row(grader, deciders, i) for i in ids]
+    print(render_ready_table(rows, m))
+    print(render_ready_summary(rows, ""))
+    filed = {a.id for p in corpus.files for a in p.asks}
+    unfiled = [i for i in ids if i not in filed]
+    if unfiled:
+        raise Problem(f"--new-build {slug}: {' '.join(unfiled)} is filed by no tracked "
+                      f"{m}/builds/*/BACKLOG.md, so this build would open against an ask nobody "
+                      f"raised; nothing was written")
+    if all(row["ready"] == "no" for row in rows):
+        raise Problem(f"--new-build {slug}: every id in the mandate grades `no` — the table above "
+                      f"names each one's failing rules — so there is nothing a run could execute "
+                      f"unasked; nothing was written")
+    rel = f"{m}/builds/{slug}/README.md"
+    opened = datetime.date.today().isoformat()
+    write_text(os.path.join(root, rel), render_new_build_readme(slug, conf, ids, opened, ""))
+    registry = os.path.join(m, CONTRACT_REGISTRY).replace(os.sep, "/")
+    add_contract_row(root, conf, rel)
+    run("git", "add", "--", rel, registry, cwd=root)
+    print(f"build-index: wrote {rel} and its BOUND row in {registry}, and staged both so the "
+          f"render below can see them")
+    return cmd_write(root, conf)
 
 
 # --------------------------------------------------------------- the backlog fixture helpers
@@ -3593,6 +4326,16 @@ def cmd_selftest() -> int:
                 cutoff = "2026-01-01"
                 files[foo_rel] = _render_backlog_file("aFoo", [backlog.render_ask_row(
                     "EXMP-aFoo-2", "2026-09-01", "no severity row anywhere")])
+            elif code == 13:
+                # A `seen` pinning a LINE and no commit — fix F6's own subject, and the one V13
+                # case that needs no second row to stage.
+                files[foo_rel] = _render_backlog_file("aFoo", [backlog.render_ask_row(
+                    "EXMP-aFoo-2", "2026-09-01", "the second ask",
+                    clauses=(("seen", "`tools/x.py`:23"),))])
+            elif code == 14:
+                cutoff = "2026-01-01"
+                files[foo_rel] = _render_backlog_file(
+                    "aFoo", [ask2], [backlog.render_sev_row("EXMP-aFoo-2", "LOW", "graded")])
             elif code == 15:
                 cutoff = ""
             elif code == 16:
@@ -3810,6 +4553,612 @@ def cmd_selftest() -> int:
             "| a / pipe, a deep/path/to/a/file.py… |",
             lambda: [x for x in plan(bt, _build_backlog_fixture(bt, CORE, excerpt="40"))[0]
                      ["memory/backlog/EXMP.md"].split("\n") if "EXMP-aFoo-4" in x][0])
+
+    # ------------------------------------ TOOL-dDerivedDocket-15 — the ask envelope
+    # THE CLAUSE GRAMMAR IS GRADED THROUGH THIS FILE'S SELFTEST and not through `backlog.py`'s,
+    # because the criteria that own it ask what `--check`, `--asks --tsv` and `--new-build` do with
+    # a clause — and only this module has those. The parser arms below call into that module
+    # directly, so the grammar is still asserted where a reader of a fixture can see the row.
+    _g15 = backlog.build_grammar(BL_FAMILIES)
+    #: A locator whose path EXISTS in every fixture below, so R4 turns on the clause rather than on
+    #: which file a fixture happened to write.
+    _SEEN_HERE = ("seen", "`memory/builds/aFoo/README.md`@abc1234")
+    _ACCEPT = ("accept", "the row says what done looks like")
+
+    # AC1 — the tail, read right to left, with the collision that makes a misread LOUD.
+    _ac1_row = backlog.extract_row(backlog.render_ask_row(
+        "EXMP-aFoo-3", "2026-09-15", "push-main.sh reports a gate RED as a network failure",
+        pointer="`tools/push-main.sh`",
+        clauses=(("seen", "`tools/push-main.sh`@7484d8d7:23"),
+                 ("accept", "a RED bar prints GATE FAIL and exits non-zero"),
+                 ("out", "retry policy"))), _g15)
+    arm("the §4 example ask yields its three clauses, its pointer and its text",
+        "clauses=3 seen=['`tools/push-main.sh`@7484d8d7:23'] "
+        "pointer=`tools/push-main.sh` text=push-main.sh reports a gate RED as a network failure",
+        lambda: f"clauses={len(_ac1_row.extra['clauses'])} "
+                f"seen={backlog.read_clause_values(_ac1_row.extra['clauses'], 'seen')} "
+                f"pointer={_ac1_row.extra['pointer']} text={_ac1_row.why}")
+    # THE COLLISION FIXTURE: the ask TEXT itself ends ` · out `, ahead of the two real clauses. Read
+    # left to right, that `out` would swallow both of them and the ask would grade as carrying no
+    # acceptance — silently. Read right to left it costs the writer exactly one clause, and the
+    # empty value it leaves behind is what V13 names.
+    _ac1_collide = backlog.render_ask_row(
+        "EXMP-aFoo-4", "2026-09-15", "the real text · out",
+        clauses=(_SEEN_HERE, ("accept", "it works")))
+    _ac1_bad = backlog.extract_row(_ac1_collide, _g15)
+    arm("a TEXT ending in a clause label still yields the REAL seen and accept, read from the right",
+        "text=the real text seen=1 accept=['it works'] out=['']",
+        lambda: f"text={_ac1_bad.why} "
+                f"seen={len(backlog.read_clause_values(_ac1_bad.extra['clauses'], 'seen'))} "
+                f"accept={backlog.read_clause_values(_ac1_bad.extra['clauses'], 'accept')} "
+                f"out={backlog.read_clause_values(_ac1_bad.extra['clauses'], 'out')}")
+    _ac1_legacy = backlog.extract_row(
+        backlog.render_ask_row("EXMP-aFoo-6", "2026-01-01", "a legacy ask with no tail"), _g15)
+    arm("a clause-free legacy row yields the fields the view unit yielded, and no clause",
+        "cls=ask text=a legacy ask with no tail clauses=() pointer= unit=False",
+        lambda: f"cls={_ac1_legacy.cls} text={_ac1_legacy.why} "
+                f"clauses={_ac1_legacy.extra['clauses']} pointer={_ac1_legacy.extra['pointer']} "
+                f"unit={_ac1_legacy.extra['unit']}")
+
+    with tempfile.TemporaryDirectory() as envbase:
+        et = os.path.join(envbase, "envelope")
+        os.makedirs(et)
+
+        def _render_env_readme(slug):
+            """A fixture build README carrying the AUTHORED roster pair the slot contract makes
+            mandatory on every tracked build README, which `_render_backlog_readme` predates."""
+            return ("---\nslug: " + slug + "\nnode: a\nopened: 2026-09-01\nstreams: tool\n"
+                    "roster: EXMP\nids: EXMP-" + slug + "-1\n---\n\n# " + slug + "\n\n"
+                    + PLAN_OPEN + "\n" + PLAN_CLOSE + "\n\n" + MARK_OPEN + "\n" + MARK_CLOSE + "\n")
+
+        def _build_env_tree(foo_asks=(), foo_rows=(), bar_asks=(), bar_rows=(), bar_tail=""):
+            """The two-build corpus every arm below is graded over. ONE shape, so an arm that
+            changes a row cannot also be changing which files exist."""
+            return {
+                "memory/builds/aFoo/README.md": _render_env_readme("aFoo"),
+                "memory/builds/aFoo/spec/2026-09-01-spec-aFoo-90.md":
+                    _render_backlog_spec("EXMP-aFoo-90"),
+                "memory/builds/aFoo/BACKLOG.md": _render_backlog_file("aFoo", foo_asks, foo_rows),
+                "memory/builds/aBar/README.md": _render_env_readme("aBar"),
+                "memory/builds/aBar/spec/2026-09-01-spec-aBar-80.md":
+                    _render_backlog_spec("EXMP-aBar-80", tail=bar_tail),
+                "memory/builds/aBar/BACKLOG.md": _render_backlog_file("aBar", bar_asks, bar_rows),
+            }
+
+        # AC1's second half — the misread `out` value REACHES `--check` as V13, on the real tree.
+        _c1 = _build_backlog_fixture(et, _build_env_tree(foo_asks=[_ac1_collide]))
+        _rc1, _out1 = _read_mode(cmd_check, et, _c1)
+        arm("--check names V13 on the value the TEXT collision misread", "V13", lambda: _out1)
+        arm("and it names the label whose value came back empty", "`out` clause with no value",
+            lambda: _out1)
+
+        # AC2 — the SCOPE merge: it ADDS a clause and it MOVES no status.
+        _ac2_ask = backlog.render_ask_row("EXMP-aFoo-1", "2026-09-01", "seen but not accepted",
+                                          clauses=(_SEEN_HERE,))
+        _ac2_files = _build_env_tree(
+            foo_asks=[_ac2_ask],
+            foo_rows=[backlog.render_scope_row("EXMP-aFoo-1", (("accept", "cured from outside"),))])
+        _c2 = _build_backlog_fixture(et, _ac2_files)
+        _rc, _so, _se = _read_asks_run(et, _c2, ["--tsv", "--all"])
+        _ac2_row = [x for x in _so.split("\n") if x.startswith("ask\tEXMP-aFoo-1")][0].split("\t")
+        arm("a SCOPE row's `accept` cures an ask the ask row left unaccepted", "ready=yes missing=-",
+            lambda: f"ready={_ac2_row[6]} missing={_ac2_row[7]}")
+        arm("and the SCOPE row moves no status: the fold still says OPEN", "status=OPEN",
+            lambda: f"status={_ac2_row[2]}")
+        _ac2_filer, _ac2_scoper = "the filer rule", "the scoper rule"
+        _ac2b = _build_env_tree(
+            foo_asks=[backlog.render_ask_row("EXMP-aFoo-1", "2026-09-01", "accepted twice over",
+                                             clauses=(_SEEN_HERE, ("accept", _ac2_filer)))],
+            foo_rows=[backlog.render_scope_row("EXMP-aFoo-1", (("accept", _ac2_scoper),))])
+        _c2b = _build_backlog_fixture(et, _ac2b)
+        _rc, _so2, _se = _read_asks_run(et, _c2b, ["EXMP-aFoo-1"])
+        arm("--asks <id> prints BOTH merged `accept` values, never one picked",
+            "filer=True scoper=True",
+            lambda: f"filer={_ac2_filer in _so2} scoper={_ac2_scoper in _so2}")
+        _ac2c = _build_env_tree(
+            foo_asks=[backlog.render_ask_row(
+                "EXMP-aFoo-1", "2026-09-01", "granted",
+                clauses=(_SEEN_HERE, _ACCEPT, ("may", "`tools/push-main.sh`")))],
+            foo_rows=[backlog.render_scope_row("EXMP-aFoo-1", (("may", "none"),))])
+        _c2c = _build_backlog_fixture(et, _ac2c)
+        _rc, _so3, _se = _read_asks_run(et, _c2c, ["--tsv", "--all"])
+        # THE WHOLE FIELD, inside a terminator. `arm` matches a SUBSTRING, so an assertion naming
+        # only the grant passed over a field reading `<grant>,none` — measured, by staging the
+        # break that stops absorbing `none` and watching this arm stay green.
+        arm("a SCOPE row's `may none` is ABSORBED and leaves the ask's grant unchanged",
+            "grant=[`tools/push-main.sh`]",
+            lambda: "grant=[" + [x for x in _so3.split("\n")
+                                 if x.startswith("ask\t")][0].split("\t")[9] + "]")
+
+        # AC3 — V13's four findings in one tree, each naming its file and its row.
+        _ac3 = _build_env_tree(
+            foo_asks=[
+                backlog.render_ask_row("EXMP-aFoo-1", "2026-09-01", "a line that moves",
+                                       clauses=(("seen", "`tools/x.py`:23"),)),
+                backlog.render_ask_row("EXMP-aFoo-2", "2026-09-01", "said twice",
+                                       clauses=(("accept", "once"), ("accept", "and again"))),
+            ],
+            foo_rows=[
+                backlog.render_scope_row("EXMP-aFoo-88", (("accept", "nobody filed it"),)),
+                backlog.render_scope_row("EXMP-aFoo-1", (("verify", "the first row"),)),
+                backlog.render_scope_row("EXMP-aFoo-1", (("verify", "and a second one"),)),
+            ])
+        _rc3, _out3 = _read_mode(cmd_check, et, _build_backlog_fixture(et, _ac3))
+        _v13 = [x for x in _out3.split("\n") if "    V13 " in x]
+        arm("--check names V13 four times over one tree, and exits 1", "hits=4 rc=1",
+            lambda: f"hits={len(_v13)} rc={_rc3}")
+        arm("V13 names the bare line number as fix F6's own case, with the remedy",
+            "pins a line and no commit", lambda: _out3)
+        arm("V13 names the doubled label", "writes the `accept` clause more than once",
+            lambda: _out3)
+        arm("V13 names the SCOPE row nobody filed a target for", "targets EXMP-aFoo-88",
+            lambda: _out3)
+        arm("V13 names the second SCOPE row for one target in one file",
+            "a second SCOPE row for EXMP-aFoo-1 in this file", lambda: _out3)
+        arm("and V7 does NOT also report the unfiled SCOPE target — one finding, one code", "False",
+            lambda: str(any("V7 " in x and "EXMP-aFoo-88" in x for x in _out3.split("\n"))))
+
+
+        # AC4 — V14, FORWARD-ONLY, read off the MERGED clauses. Every ask below is filed ON the
+        # cutoff except the control, which is filed the day before: the boundary is the whole
+        # question, and a fixture filed a month either side of it would not ask it.
+        _cut = "2026-06-01"
+        _ac4 = _build_env_tree(
+            foo_asks=[
+                backlog.render_ask_row("EXMP-aFoo-1", _cut, "no clause at all"),
+                backlog.render_ask_row("EXMP-aFoo-2", _cut, "seen but never graded",
+                                       clauses=(_SEEN_HERE,)),
+                backlog.render_ask_row("EXMP-aFoo-3", _cut, "accepted", clauses=(_ACCEPT,)),
+                backlog.render_ask_row("EXMP-aFoo-4", _cut, "runnable", clauses=(
+                    ("seen", "`memory/builds/aFoo/README.md`@abc1234 run `git --version`"),)),
+                backlog.render_ask_row("EXMP-aFoo-5", _cut, "cured from outside"),
+                backlog.render_ask_row("EXMP-aFoo-6", "2026-05-31", "the day before, ungraded"),
+            ],
+            foo_rows=[backlog.render_scope_row("EXMP-aFoo-5", (("accept", "cured here"),))],
+            bar_asks=[backlog.render_ask_row("EXMP-aBar-9", "2026-05-01", "a legacy ask")])
+        _rc4, _out4 = _read_mode(cmd_check, et, _build_backlog_fixture(et, _ac4, cutoff=_cut))
+        _v14 = sorted(x.split(": ")[1].split(" ")[0] for x in _out4.split("\n") if "    V14 " in x)
+        arm("V14 names the ungraded asks filed ON the cutoff, and only those",
+            "['EXMP-aFoo-1', 'EXMP-aFoo-2']", lambda: str(_v14))
+        arm("V14 says which two clauses would have satisfied it",
+            "neither `accept` nor a `seen … run`", lambda: _out4)
+        _rc4b, _out4b = _read_mode(cmd_check, et, _build_backlog_fixture(
+            et, _ac4, cutoff="2026-06-02"))
+        arm("moving the cutoff PAST every ask disarms V14 entirely — the forward-only control",
+            "0", lambda: str(len([x for x in _out4b.split("\n") if "    V14 " in x])))
+
+        # AC5 — the six rules, one failing fixture each, graded over ONE mandate. The expected
+        # table is spelled row by row rather than summarised: a count would pass over two rows that
+        # swapped grades.
+        _ready_asks = [
+            backlog.render_ask_row("EXMP-aFoo-1", "2026-09-01", "open and acceptable",
+                                   clauses=(_SEEN_HERE, _ACCEPT)),
+            backlog.render_ask_row("EXMP-aFoo-2", "2026-09-01", "held outside the mandate",
+                                   clauses=(_SEEN_HERE, _ACCEPT)),
+            backlog.render_ask_row("EXMP-aFoo-3", "2026-09-01", "held inside the mandate",
+                                   clauses=(_SEEN_HERE, _ACCEPT)),
+            backlog.render_ask_row("EXMP-aFoo-4", "2026-09-01", "the hold target",
+                                   clauses=(_SEEN_HERE, _ACCEPT)),
+            backlog.render_ask_row("EXMP-aFoo-5", "2026-09-01", "filed twice over",
+                                   clauses=(_SEEN_HERE, _ACCEPT)),
+            backlog.render_ask_row("EXMP-aFoo-5", "2026-09-01", "filed twice over",
+                                   clauses=(_SEEN_HERE, _ACCEPT)),
+            backlog.render_ask_row("EXMP-aBar-7", "2026-09-01", "filed in a foreign folder",
+                                   clauses=(_SEEN_HERE, _ACCEPT)),
+            backlog.render_ask_row("EXMP-aFoo-8", "2026-09-01", "pointing at nothing",
+                                   clauses=(_ACCEPT,), pointer="`memory/nope/gone.md`"),
+            backlog.render_ask_row("EXMP-aFoo-9", "2026-09-01", "outside this repo, unbounded",
+                                   clauses=(("seen", "other:tools/x.py@abc1234"), _ACCEPT)),
+            backlog.render_ask_row("EXMP-aFoo-10", "2026-01-15", "pre-cutoff, located only",
+                                   pointer="`memory/builds/aFoo/README.md`"),
+            backlog.render_ask_row("EXMP-aFoo-11", "2026-01-15", "pre-cutoff, neither"),
+        ]
+        _ready_rows = [
+            backlog.render_status_row("BLOCKED", "EXMP-aFoo-2", "w", value="EXMP-aBar-5"),
+            backlog.render_status_row("BLOCKED", "EXMP-aFoo-3", "w", value="EXMP-aFoo-4"),
+        ]
+        _c5 = _build_backlog_fixture(et, _build_env_tree(
+            foo_asks=_ready_asks, foo_rows=_ready_rows,
+            bar_asks=[backlog.render_ask_row("EXMP-aBar-5", "2026-09-01", "the outside hold")]),
+            cutoff=_cut)
+        _MANDATE = ["EXMP-aFoo-1", "-2", "-3", "-4", "-5", "-6", "EXMP-aBar-7", "EXMP-aFoo-8",
+                    "-9", "-10", "-11"]
+        _rc5, _so5, _se5 = _read_asks_run(et, _c5, ["--tsv", "--all", "--ready"] + _MANDATE)
+
+        def _read_grades(text):
+            return "\n".join(" ".join((f[1], f[6], f[7]))
+                             for f in (x.split("\t") for x in text.rstrip("\n").split("\n"))
+                             if f[0] == ASK_TSV_HEAD)
+
+        arm("every READY rule is graded, one failing fixture each, over one mandate",
+            "EXMP-aFoo-1 yes -\nEXMP-aFoo-2 no R3\nEXMP-aFoo-3 yes -\nEXMP-aFoo-4 yes -\n"
+            "EXMP-aFoo-5 no R1\nEXMP-aFoo-6 no R1,R2,R4,R5\nEXMP-aBar-7 no R1\n"
+            "EXMP-aFoo-8 no R4\nEXMP-aFoo-9 no R6\nEXMP-aFoo-10 legacy R5\n"
+            "EXMP-aFoo-11 no R4,R5",
+            lambda: _read_grades(_so5))
+        arm("the `-N` continuation carried the mandate's family and slug", "examined\t11",
+            lambda: _so5)
+        arm("a pre-cutoff ask failing BOTH R4 and R5 is `no`, never `legacy` — fix F6's rule",
+            "EXMP-aFoo-11 no R4,R5", lambda: _read_grades(_so5))
+        arm("--ready over a mandate exits 0 whatever the grades are", "rc=0", lambda: f"rc={_rc5}")
+
+        # AC6 — R2, the one rule a caller's own knowledge changes.
+        _ac6 = _build_env_tree(
+            foo_asks=[
+                backlog.render_ask_row("EXMP-aFoo-20", "2026-09-01", "closed from another build",
+                                       clauses=(_SEEN_HERE, _ACCEPT)),
+                backlog.render_ask_row("EXMP-aFoo-21", "2026-09-01", "a unit of the target folder",
+                                       unit=True, clauses=(_SEEN_HERE, _ACCEPT)),
+                backlog.render_ask_row("EXMP-aFoo-22", "2026-09-01", "already answered",
+                                       clauses=(_SEEN_HERE, _ACCEPT)),
+            ],
+            foo_rows=[backlog.render_status_row("CLOSED", "EXMP-aFoo-22", "done", value="abc1234")],
+            bar_asks=[backlog.render_ask_row("EXMP-aBar-5", "2026-09-01", "an unrelated ask")],
+            bar_tail=" · closes EXMP-aFoo-20 EXMP-aFoo-21")
+        _c6 = _build_backlog_fixture(et, _ac6, cutoff=_cut)
+
+        def _read_grade(text, ask_id):
+            for line in text.rstrip("\n").split("\n"):
+                f = line.split("\t")
+                if f[0] == ASK_TSV_HEAD and f[1] == ask_id:
+                    return f"{f[6]} {f[7]} {f[10]}"
+            return "no such row"
+
+        _rc, _so6, _se = _read_asks_run(et, _c6, ["--tsv", "--all"])
+        arm("a live closing spec in ANOTHER build is a live claim, so R2 refuses",
+            "no R2 EXMP-aBar-80", lambda: _read_grade(_so6, "EXMP-aFoo-20"))
+        arm("a TERMINAL ask fails R2 and nothing else", "no R2 -",
+            lambda: _read_grade(_so6, "EXMP-aFoo-22"))
+        _rc, _so6b, _se = _read_asks_run(et, _c6, ["--tsv", "--all", "--live-builds", "aFoo"])
+        arm("--live-builds omitting that build admits the claim and names it STALE",
+            "yes - stale:EXMP-aBar-80", lambda: _read_grade(_so6b, "EXMP-aFoo-20"))
+        _rc, _so6c, _se = _read_asks_run(et, _c6, ["--tsv", "--all", "--target", "aBar"])
+        arm("--target naming that build admits its own spec, unprefixed",
+            "yes - EXMP-aBar-80", lambda: _read_grade(_so6c, "EXMP-aFoo-20"))
+        _rc, _so6d, _se = _read_asks_run(et, _c6, ["--tsv", "--all", "--target", "aFoo"])
+        arm("a `unit` ask of the --target folder is admitted although its closer is foreign",
+            "yes - EXMP-aBar-80", lambda: _read_grade(_so6d, "EXMP-aFoo-21"))
+        arm("and the SAME option leaves its non-`unit` neighbour refused — the control",
+            "no R2 EXMP-aBar-80", lambda: _read_grade(_so6d, "EXMP-aFoo-20"))
+
+
+        # AC7 — the machine projection, asserted POSITION BY POSITION. A row can carry eleven
+        # fields and still be wrong, and a consumer reading it by position would not notice: the
+        # arm therefore pins every cell of every row rather than counting tabs.
+        # A GRADE NEVER DECIDES THE EXIT STATUS. Reported as a non-zero, an all-`no` mandate would
+        # reach a caller's preflight as a PRODUCER FAILURE naming an exit status, instead of as the
+        # refusal that names each id's failing rules. Run over AC6's tree, REBUILT here rather than
+        # read from the conf that tree was built with: `_build_backlog_fixture` replaces the memory
+        # tree on every call, so a conf held from an earlier arm names a tree that is no longer on
+        # disk — which is how an arm silently grades the wrong fixture.
+        _rc7b, _so7b, _se7b = _read_asks_run(
+            et, _build_backlog_fixture(et, _ac6, cutoff=_cut), ["--tsv", "--all"])
+        arm("a fixture where every examined ask grades `no` still exits 0, rows and all",
+            "rc=0 grades={'no'} rows=4 closes-with=examined\t4",
+            lambda: f"rc={_rc7b} "
+                    f"grades={ {x.split(chr(9))[6] for x in _so7b.rstrip(chr(10)).split(chr(10)) if x.startswith(ASK_TSV_HEAD)} } "
+                    f"rows={len([x for x in _so7b.rstrip(chr(10)).split(chr(10)) if x.startswith(ASK_TSV_HEAD)])} "
+                    f"closes-with={_so7b.rstrip(chr(10)).split(chr(10))[-1]}")
+        _ac7_asks = [
+            backlog.render_ask_row("EXMP-aFoo-30", "2026-09-01", "unlabelled and open"),
+            backlog.render_ask_row("EXMP-aFoo-31", "2026-09-01", "answered twice over",
+                                   clauses=(_SEEN_HERE, _ACCEPT)),
+            backlog.render_ask_row("EXMP-aFoo-32", "2026-09-01", "blocked by its own spec",
+                                   clauses=(_SEEN_HERE, _ACCEPT)),
+        ]
+        _ac7_rows = [
+            backlog.render_status_row("CLOSED", "EXMP-aFoo-31", "done", value="abc1234"),
+            backlog.render_sev_row("EXMP-aFoo-31", "HIGH", "graded"),
+        ]
+        _ac7 = {
+            "memory/builds/aFoo/README.md": _render_env_readme("aFoo"),
+            "memory/builds/aFoo/spec/2026-09-01-spec-aFoo-70.md": _render_backlog_spec(
+                "EXMP-aFoo-70", status="CLOSED", tail=" · closes EXMP-aFoo-31"),
+            "memory/builds/aFoo/spec/2026-09-01-spec-aFoo-71.md": _render_backlog_spec(
+                "EXMP-aFoo-71", status="BLOCKED", tail=" · advances EXMP-aFoo-32"),
+            "memory/builds/aFoo/BACKLOG.md": _render_backlog_file("aFoo", _ac7_asks, _ac7_rows),
+            # A CORRUPT HEADER, TOLERATED BY WAIVER, so the notice `collect()` prints on every run
+            # has somewhere to land — and the arm can say it landed on stderr and not in the rows.
+            "memory/builds/aBar/README.md": "---\nslug: aBar\nthis line has no colon\n---\n",
+            "memory/" + STALE_HEADER_WAIVER:
+                "memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n",
+        }
+        _c7 = _build_backlog_fixture(et, _ac7, cutoff=_cut)
+        _rc7, _so7, _se7 = _read_asks_run(et, _c7, ["--all", "--tsv"])
+        arm("--tsv prints every field of every row, position by position, and nothing else",
+            "ask\tEXMP-aFoo-30\tOPEN\t-\taFoo\t-\tno\tR4,R5\t-\t-\t-\n"
+            "ask\tEXMP-aFoo-31\tCLOSED\tEXMP-aFoo-70,abc1234\taFoo\tHIGH\tno\tR2\t-\t-\t-\n"
+            "ask\tEXMP-aFoo-32\tBLOCKED\tEXMP-aFoo-71\taFoo\t-\tyes\t-\t-\t-\tEXMP-aFoo-71\n"
+            "examined\t3",
+            lambda: _so7.rstrip("\n"))
+        arm("every `ask` line carries exactly eleven TAB-separated fields", "[11, 11, 11]",
+            lambda: str([len(x.split("\t")) for x in _so7.rstrip("\n").split("\n")
+                         if x.startswith(ASK_TSV_HEAD + "\t")]))
+        arm("no field is EMPTY, which a run of tabs would collapse away", "False",
+            lambda: str(any(f == "" for x in _so7.rstrip("\n").split("\n") for f in x.split("\t"))))
+        arm("the waiver notice went to stderr and never into the row stream", "err=True out=False",
+            lambda: f"err={'tolerated by waiver' in _se7} "
+                    f"out={'tolerated by waiver' in _so7}")
+        arm("--tsv exits 0 over a tree carrying a fold verdict", "rc=0", lambda: f"rc={_rc7}")
+        _rc7c, _so7c, _se7c = _read_asks_run(et, _c7, ["--tsv", "--ready"])
+        arm("--ready naming NO id is an empty mandate and an empty population, at exit 0",
+            "rc=0 out=examined\t0", lambda: f"rc={_rc7c} out={_so7c.rstrip(chr(10))}")
+
+        # AC8 — the pinned read, and the tree it must leave alone. THE CONTROL RUNS FIRST and the
+        # porcelain is sampled AFTER it, because the control rebuilds the fixture and a sample
+        # taken before it would be measuring this arm's own setup as a write by the mode.
+        run("git", "add", "-A", cwd=et)
+        run("git", "commit", "-q", "-m", "pinned", "--no-verify", cwd=et)
+        _ac8 = dict(_ac7)
+        _ac8["memory/builds/aFoo/BACKLOG.md"] = _render_backlog_file(
+            "aFoo", _ac7_asks + [backlog.render_ask_row(
+                "EXMP-aFoo-33", "2026-09-02", "filed after the pin",
+                clauses=(_SEEN_HERE, _ACCEPT))], _ac7_rows)
+        _c8 = _build_backlog_fixture(et, _ac8, cutoff=_cut)
+        _rc, _so8ctl, _se = _read_asks_run(et, _c8, ["--tsv", "--all", "--ready", "EXMP-aFoo-33"])
+        arm("the id IS ready in the working tree — the control that says the pin did the work",
+            "EXMP-aFoo-33 yes -", lambda: _read_grades(_so8ctl))
+        _before = run("git", "status", "--porcelain", cwd=et)
+        _rc8, _so8, _se8 = _read_asks_run(et, _c8, ["--tsv", "--ready", "EXMP-aFoo-33", "--at",
+                                                    "HEAD"])
+        _after_at = run("git", "status", "--porcelain", cwd=et)
+        arm("--at grades the PINNED tree: a row filed after it is not filed there",
+            "EXMP-aFoo-33 no R1,R2,R4,R5", lambda: _read_grades(_so8))
+        arm("--at names the tree its declarations came from, on stderr", "conf pinned at HEAD",
+            lambda: _se8)
+        _rc8b, _so8b, _se8b = _read_asks_run(et, _c8, [
+            "--tsv", "--all", "--ready", "EXMP-aFoo-32", "--target", "aFoo",
+            "--live-builds", "aBar"])
+        arm("no print mode writes a byte: the porcelain is what it was before either run",
+            "at=True modes=True",
+            lambda: f"at={_after_at == _before} "
+                    f"modes={run('git', 'status', '--porcelain', cwd=et) == _before}")
+
+        # AC9 — `--probe`, the ONE path that may execute a filer's bytes.
+        def _build_probe_tree(allow, asks, rows=()):
+            conf = _build_backlog_fixture(et, _build_env_tree(foo_asks=asks, foo_rows=rows),
+                                          cutoff=_cut)
+            path = os.path.join(et, ".memory-tree.conf")
+            write_text(path, read_text(path) + 'PROBE_ALLOW="' + allow + '"\n')
+            run("git", "add", "-A", cwd=et)
+            return load_conf(et)
+
+        _RUNNABLE = "git --version"
+        _probe_ask = [backlog.render_ask_row(
+            "EXMP-aFoo-40", "2026-09-01", "answerable by a command",
+            clauses=(("seen", "`memory/builds/aFoo/README.md`@abc1234 run `" + _RUNNABLE + "`"),))]
+        _rc, _so9, _se9 = _read_asks_run(et, _build_probe_tree("", _probe_ask),
+                                         ["--probe", "EXMP-aFoo-40"])
+        arm("a BLANK PROBE_ALLOW refuses every command and names the key that would admit it",
+            "REFUSED · PROBE_ALLOW is blank", lambda: _so9)
+        _rc, _so9b, _se9b = _read_asks_run(et, _build_probe_tree("git status", _probe_ask),
+                                           ["--probe", "EXMP-aFoo-40"])
+        arm("a declared entry that does not match refuses, naming the key and what IS declared",
+            "no PROBE_ALLOW entry matches `git --version` token for token", lambda: _so9b)
+        _rc, _so9c, _se9c = _read_asks_run(et, _build_probe_tree(_RUNNABLE, _probe_ask),
+                                           ["--probe", "EXMP-aFoo-40"])
+        arm("the two-token entry admits exactly its command, which RUNS and reports its status",
+            "RAN · `git --version` · exit 0", lambda: _so9c)
+        arm("and the run prints the locator it answered for", "locator pinned", lambda: _so9c)
+        # THE MATCHING ARMS RUN NOTHING. They ask `check_probe_command` directly, because what is
+        # under test is the decision and a fixture that had to EXECUTE to ask it could only ever
+        # test the entries whose programs this node happens to have.
+        arm("the match is token EQUALITY, so `python3` never admits `python3x`",
+            "no PROBE_ALLOW entry matches",
+            lambda: check_probe_command("python3x -V", read_probe_allow(
+                {PROBE_ALLOW_KEY: "python3"}))[1])
+        arm("a two-token entry refuses the second script", "no PROBE_ALLOW entry matches",
+            lambda: check_probe_command("python3 q.py", read_probe_allow(
+                {PROBE_ALLOW_KEY: "python3 p.py"}))[1])
+        arm("and admits the one it declared", "('python3', 'p.py')",
+            lambda: str(check_probe_command("python3 p.py", read_probe_allow(
+                {PROBE_ALLOW_KEY: "python3 p.py"}))[0]))
+        arm("a path entry never admits a traversal out of it", "no PROBE_ALLOW entry matches",
+            lambda: check_probe_command("tools/../x", read_probe_allow(
+                {PROBE_ALLOW_KEY: "tools/"}))[1])
+        arm("a single-token interpreter entry DOES admit arbitrary code — the stated residual",
+            "('python3', '-c', 'anything')",
+            lambda: str(check_probe_command("python3 -c anything", read_probe_allow(
+                {PROBE_ALLOW_KEY: "python3"}))[0]))
+        arm("a shell metacharacter refuses BEFORE the command is split", "which mean something "
+            "to a shell",
+            lambda: check_probe_command("git --version ; rm -rf .", read_probe_allow(
+                {PROBE_ALLOW_KEY: "git"}))[1])
+        arm("a newline refuses on the same ground", "which mean something to a shell",
+            lambda: check_probe_command("git --version\nrm -rf .", read_probe_allow(
+                {PROBE_ALLOW_KEY: "git"}))[1])
+        # THE BOUND, over `run_probe` itself and with a SHORT one. The argv is passed as a tuple
+        # rather than parsed from a string, which is what lets this arm name an interpreter whose
+        # own path carries a space on some nodes and a banned byte on others.
+        _sleep = run_probe(et, (sys.executable, "-c", "import time; time.sleep(30)"), 1)
+        arm("a command that outlives the bound is killed and reported as NEVER ANSWERED",
+            "status=None answered=False", lambda: f"status={_sleep[0]} answered={_sleep[2]}")
+        arm("the declared default bound is a positive number of seconds", "True",
+            lambda: str(isinstance(PROBE_TIMEOUT_SECONDS, int) and PROBE_TIMEOUT_SECONDS > 0))
+        _rc9d, _so9d, _se9d = _read_asks_run(
+            et, _build_probe_tree(_RUNNABLE, _probe_ask, rows=[backlog.render_scope_row(
+                "EXMP-aFoo-40", (("seen", "`memory/builds/aBar/README.md`@abc1234 run `git log`"),))]),
+            ["--probe", "EXMP-aFoo-40"])
+        arm("two merged `run` values refuse as AMBIGUOUS and name both rows, running nothing",
+            "2 `seen … run` commands", lambda: _se9d)
+        arm("the ambiguity refusal names each row and its command", "runs `git log`",
+            lambda: _se9d)
+        arm("and it puts nothing on stdout", "rc=2 out=''",
+            lambda: f"rc={_rc9d} out='{_so9d}'")
+
+
+    # AC10, AC11 and AC13 — the scaffold, in a repository of its own. Its own, because the command
+    # STAGES what it wrote and runs the whole render: an arm sharing the envelope fixture above
+    # would leave every later arm grading a tree this one committed to.
+    with tempfile.TemporaryDirectory() as scbase:
+        sc = os.path.join(scbase, "scaffold")
+        os.makedirs(sc)
+        _SC_HOME = "memory/builds/aFoo/README.md"
+        _sc_cap = int(re.search(r"BUILD_README_ENTRY_CAP_CHARS=(\d+)", read_text(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "check-memory-hygiene.sh"))).group(1))
+
+        def _render_sc_readme(slug):
+            return ("---\nslug: " + slug + "\nnode: a\nopened: 2026-09-01\nstreams: tool\n"
+                    "roster: EXMP\nids: EXMP-" + slug + "-1\n---\n\n# " + slug + "\n\n"
+                    + PLAN_OPEN + "\n" + PLAN_CLOSE + "\n\n" + MARK_OPEN + "\n" + MARK_CLOSE + "\n")
+
+        def _build_sc_tree(asks):
+            """The home build every mandate below is filed in, plus the contract registry the
+            slot contract refuses to run without. The home README is EXEMPT and the scaffolded one
+            is BOUND, which is the whole point: the canon grades the file this command WRITES."""
+            return {
+                _SC_HOME: _render_sc_readme("aFoo"),
+                "memory/builds/aFoo/spec/2026-09-01-spec-aFoo-90.md":
+                    _render_backlog_spec("EXMP-aFoo-90"),
+                "memory/builds/aFoo/BACKLOG.md": _render_backlog_file("aFoo", asks),
+                "memory/" + CONTRACT_REGISTRY:
+                    "# the fixture registry\nexempt-pin: 1\n"
+                    "!" + _SC_HOME + " - a fixture home build with no authored half\n",
+            }
+
+        def _build_sc_ask(seq, text, clauses=(_SEEN_HERE, _ACCEPT), pointer=""):
+            return backlog.render_ask_row(f"EXMP-aFoo-{seq}", "2026-09-01", text,
+                                          clauses=clauses, pointer=pointer)
+
+        _sc_conf = _build_backlog_fixture(sc, _build_sc_tree(
+            [_build_sc_ask(3, "the first mandated ask"),
+             _build_sc_ask(4, "the second mandated ask")]))
+        run("git", "commit", "-q", "-m", "home", "--no-verify", cwd=sc)
+        _SC_SLUG = "zFreshDocket"
+        _rc10, _out10 = _read_mode(cmd_new_build, sc, _sc_conf,
+                                   {"slug": _SC_SLUG, "asks": ["EXMP-aFoo-3", "-4"]})
+        _sc_rel = f"memory/builds/{_SC_SLUG}/README.md"
+        _sc_text = read_text(os.path.join(sc, _sc_rel)) if os.path.isfile(
+            os.path.join(sc, _sc_rel)) else ""
+        _sc_fm = [x for x in _sc_text.split("\n---")[0].split("\n") if ":" in x]
+        arm("the scaffold writes its README and exits 0", "rc=0 wrote=True",
+            lambda: f"rc={_rc10} wrote={bool(_sc_text)}" if _rc10 == 0
+            else f"rc={_rc10} :: {_out10}")
+        arm("the mandate collapses to ONE physical `asks:` line, in the authoring notation",
+            "[asks: EXMP-aFoo-3..4]",
+            lambda: "[" + [x for x in _sc_fm if x.startswith("asks:")][0] + "]")
+        arm("the front matter carries the keys a run and the bar both read",
+            "['slug: zFreshDocket', 'node: z', 'streams: tool', 'roster: EXMP', 'ids:', "
+            "'status: OPEN', 'authorized-by: slug']",
+            lambda: str([x for x in _sc_fm if not x.startswith(("opened:", "asks:"))]))
+        arm("the `ids:` line is the RENDER's, which owns it — empty on a build no id names yet",
+            "[ids:]", lambda: "[" + [x for x in _sc_fm if x.startswith("ids:")][0] + "]")
+        arm("the README is BOUND by the contract registry, never exempted into it",
+            f"{_sc_rel}\n",
+            lambda: "\n".join(x for x in read_text(
+                os.path.join(sc, "memory", CONTRACT_REGISTRY)).split("\n")
+                if x.strip() == _sc_rel) + "\n")
+        arm("the scaffold writes no grant key, so the build it opens can grant nothing", "False",
+            lambda: str(any(x.startswith("may:") for x in _sc_text.split("\n"))))
+        _rc10c, _out10c = _read_mode(cmd_check, sc, load_conf(sc))
+        _rc10f, _out10f = _read_mode(cmd_check_format, sc, load_conf(sc))
+        arm("the tree the scaffold left behind passes BOTH bar verbs", "check=0 format=0",
+            lambda: f"check={_rc10c} format={_rc10f}" if _rc10c == 0 and _rc10f == 0
+            else f"check={_rc10c} format={_rc10f} :: {_out10c} :: {_out10f}")
+
+        # AC13 — the anchor property, through THIS kit's own route, bound to the tree the scaffold
+        # just wrote. A generated body naming one id per mandated ask is exactly the shape that
+        # would make the new build a SECOND claimant for every ask it was opened to answer.
+        import corpus_ids as _sc_cids  # noqa: PLC0415 — deferred exactly as the anchor arms above
+        try:
+            _sc_anchor = _sc_cids.resolve_anchor(sc)
+        except _sc_cids.Problem as _sc_why:
+            _sc_anchor = None
+            print(f"arm SKIP  the scaffold's anchor arms did not run — {_sc_why}")
+            fails.append("the scaffold anchor arms were SKIPPED, so no anchor property held")
+        if _sc_anchor is not None:
+            _sc_break = "- EXMP-aFoo-3 — the ask"
+            arm("no line the scaffold wrote ANCHORS an id, and the file HAS the ids",
+                "anchored=[] carries-the-ids=True",
+                lambda: f"anchored={[x for x in _sc_text.split(chr(10)) if _sc_anchor(x)]} "
+                        f"carries-the-ids={'EXMP-aFoo-3' in _sc_text}")
+            arm("the same predicate over the same root DOES answer the break line — the control",
+                "EXMP-aFoo-3", lambda: str(_sc_anchor(_sc_break)))
+
+        # AC10's second half — a mandate large enough that an UNWRAPPED body would cross the cap.
+        # The ceiling is read off the hygiene engine rather than typed here, because a number typed
+        # beside the thing it counts is wrong on the next commit and nobody notices.
+        # TWENTY-FIVE, and the number is MEASURED rather than picked: at fifteen the unwrapped
+        # body came to roughly 345 characters and slipped under the 350 the hygiene engine
+        # declares, so the break that removes the wrap stayed green and this arm proved nothing.
+        _sc_many = [str(n) for n in range(10, 35)]
+        _sc_conf2 = _build_backlog_fixture(sc, _build_sc_tree(
+            [_build_sc_ask(n, f"mandated ask {n}") for n in _sc_many]))
+        run("git", "commit", "-q", "-m", "wide", "--no-verify", cwd=sc)
+        _SC_WIDE = "zWideDocket"
+        _rc10w, _out10w = _read_mode(cmd_new_build, sc, _sc_conf2, {
+            "slug": _SC_WIDE, "asks": [f"EXMP-aFoo-{n}" for n in _sc_many]})
+        _sc_wide_text = read_text(os.path.join(sc, f"memory/builds/{_SC_WIDE}/README.md"))
+
+        def _measure_entry_lines(text):
+            """Every line check 7 would measure: unfenced, and outside the front-matter block."""
+            out, fence, inside = [], "", False
+            for n, line in enumerate(text.split("\n"), 1):
+                if n == 1 and line == "---":
+                    inside = True
+                    continue
+                if inside:
+                    inside = line != "---"
+                    continue
+                mark = "```" if line.lstrip().startswith("```") else (
+                    "~~~" if line.lstrip().startswith("~~~") else "")
+                if mark:
+                    fence = "" if fence == mark else (fence or mark)
+                    continue
+                if not fence and not line.startswith("#"):
+                    out.append(line)
+            return out
+
+        arm("a twenty-five-ask mandate scaffolds, and every measured line stays under the cap",
+            "rc=0 over=[]",
+            lambda: f"rc={_rc10w} over={[len(x) for x in _measure_entry_lines(_sc_wide_text) if len(x) > _sc_cap]}"
+            if _rc10w == 0 else f"rc={_rc10w} :: {_out10w}")
+        arm("and it WRAPPED: the body naming the asks is more than one line",
+            "True",
+            lambda: str(len([x for x in _sc_wide_text.split("\n")
+                             if x.startswith("EXMP-aFoo-") or "EXMP-aFoo-" in x]) > 2))
+
+        # AC11 — every refusal, each asserted to have written NOTHING.
+        def _read_refusal(slug, asks):
+            rc, out = _read_mode(cmd_new_build, sc, load_conf(sc), {"slug": slug, "asks": asks})
+            return f"rc={rc} folder={os.path.isdir(os.path.join(sc, 'memory', 'builds', slug))} "\
+                   f":: {out}"
+
+        arm("an elision is refused BY NAME and the whole list falls with it",
+            "rc=1 folder=False", lambda: _read_refusal("zElidedDocket", ["EXMP-aFoo-3...5"]))
+        arm("the elision refusal says what it wanted instead", "an elision names no id",
+            lambda: _read_refusal("zElidedDocket", ["EXMP-aFoo-3...5"]))
+        arm("an id nobody filed is refused, and nothing is written", "rc=1 folder=False",
+            lambda: _read_refusal("zUnfiledDocket", ["EXMP-aFoo-3", "EXMP-aFoo-77"]))
+        arm("that refusal names the id and the file it looked in", "EXMP-aFoo-77 is filed by no",
+            lambda: _read_refusal("zUnfiledDocket", ["EXMP-aFoo-3", "EXMP-aFoo-77"]))
+        arm("a slug the all-time probes find is refused", "rc=1",
+            lambda: _read_refusal("aFoo", ["EXMP-aFoo-3"]))
+        arm("and it says WHICH probe found it", "already touched memory/builds/aFoo/",
+            lambda: _read_refusal("aFoo", ["EXMP-aFoo-3"]))
+        _sc_conf3 = _build_backlog_fixture(sc, _build_sc_tree(
+            [_build_sc_ask(3, "ungradeable", clauses=()),
+             _build_sc_ask(4, "ungradeable too", clauses=())]))
+        run("git", "commit", "-q", "-m", "nogrades", "--no-verify", cwd=sc)
+        arm("a mandate whose every id grades `no` stops at the table, writing nothing",
+            "rc=1 folder=False",
+            lambda: _read_refusal("zUngradedDocket", ["EXMP-aFoo-3", "-4"]))
+        arm("and the readiness table printed BEFORE the refusal", "asks: 2 examined",
+            lambda: _read_refusal("zUngradedDocket", ["EXMP-aFoo-3", "-4"]))
+        _sc_conf4 = _build_backlog_fixture(sc, _build_sc_tree(
+            [_build_sc_ask(3, "granted", clauses=(_SEEN_HERE, _ACCEPT,
+                                                  ("may", "`tools/push-main.sh`")))]))
+        run("git", "commit", "-q", "-m", "granted", "--no-verify", cwd=sc)
+        _rc11, _out11 = _read_mode(cmd_new_build, sc, _sc_conf4,
+                                   {"slug": "zGrantedDocket", "asks": ["EXMP-aFoo-3"]})
+        arm("a mandate over a GRANTED ask still scaffolds a README with no grant key",
+            "rc=0 may=False",
+            lambda: f"rc={_rc11} may=" + str(any(
+                x.startswith("may:") for x in read_text(os.path.join(
+                    sc, "memory/builds/zGrantedDocket/README.md")).split("\n")))
+            if _rc11 == 0 else f"rc={_rc11} :: {_out11}")
+
 
     # ---------------------------------------------------- the example family (TOOL-dDerivedDocket-51)
     # DECLARED BY A SCRATCH CONF AND BY NOTHING TRACKED. The sibling kit's id grammar is an ALLOWLIST
@@ -4080,10 +5429,10 @@ def main(argv: list) -> int:
     if mode == "--selftest":
         return cmd_selftest()
     if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
-                    "--report", "--bump", "--asks"):
+                    "--report", "--bump", "--asks", "--new-build"):
         print("usage: gen_build_index.py "
               "[--check|--write|--check-format|--survey|--report|--bump|"
-              "--print-bindings|--asks|--selftest]")
+              "--print-bindings|--asks|--new-build|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -4105,6 +5454,8 @@ def main(argv: list) -> int:
             return 2
         return cmd_asks(root, conf, args)
     try:
+        if mode == "--new-build":
+            return cmd_new_build(root, conf, read_new_build_args(argv[2:]))
         if mode == "--check-format":
             return cmd_check_format(root, conf)
         if mode == "--survey":

@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-15 — ask envelope, READY predicate and new-build scaffold
 
-**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
+**Status:** CLOSED · rev-8 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-15-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-15-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
@@ -565,6 +566,75 @@ New arm: `python3 tools/memory-tree/gen_build_index.py --selftest` · one fixtur
   pins, which was observed RED there. Nothing else moves: the criterion's subject, its `Red when:` and
   its `fixture:` line are untouched, and no other criterion, scope item, edge or gate line changes.
 
+- rev-8 · 2026-09-21 · §4 · AC5 AC9 AC10 · §10 · written by this unit's own build pass, which is
+  where each of these was measured. Fourteen entries, every one a divergence the code forced:
+
+  1. **AC10's `ids:` reads as the RENDER's, not as non-empty.** "a filled `ids:`" cannot hold on a
+     fresh build: `rosters()` derives a build's roster from ids whose slug component is that build's
+     slug, and no id carries a slug minted one command ago. The arm asserts the key is PRESENT and
+     written by the `--write` render, which is what §4 meant by "written empty and filled by the
+     render" — the render owns the line, and on day one what it owns is empty.
+  2. **AC5's unfiled id is graded in full.** Its `missing` is `R1,R2,R4,R5` and not `R1` alone,
+     because §4's predicate grades all six rules and an ask nobody filed has no status, no locator
+     and no acceptance either. The criterion's other half is unchanged and is asserted exactly: the
+     id with TWO rows fails `R1` and nothing else, which is the case where the distinction bites.
+  3. **The scaffold STAGES the two files it wrote** before running the render. It has to:
+     `collect()` reads `git ls-files`, so an untracked README is invisible to the render and the
+     generated regions S8 promises would never be filled. The staging is announced on stdout, it
+     touches nothing else in the index, and the COMMIT is still the owner's — which is the property
+     ruling D12-a actually rests on.
+  4. **AC9's executing arm names `git --version`** rather than `python3 p.py`, and the bound arm
+     calls `run_probe` with an argv TUPLE. An interpreter resolved from this process carries a
+     backslash or a space on a Windows node, and both are refused by the metachar ban this unit
+     added — so an arm spelling one would be testing the ban rather than the bound. Every MATCHING
+     arm still names `python3`, `python3x`, `p.py` and `q.py`, through `check_probe_command`
+     directly, which is where the decision under test lives.
+  5. **V13 and V14 are implemented in `backlog.py`** and join its `VERDICT_CODES`; S3 and S4 said
+     "in `gen_build_index.py --check`", which is where they are REPORTED. Putting them beside the
+     grammar they grade is what lets that module's own code loop find them: a code added with no
+     reporting arm reds the leg rather than vanishing from a check that still looks green. It did —
+     both arrived red and stayed red until their fixtures were written.
+  6. **The unit 6 fixtures whose arms assert an exact verdict-code set gained an `accept` clause.**
+     They are filed after their fixture cutoff, so V14 grades them, and a fixture staging ONE
+     verdict must not stage two. The arms that read the fold alone were left untouched, and they are
+     the control saying the tail moves no status.
+  7. **V7 no longer reports a SCOPE row's unfiled target**; V13 owns it. Both would have named the
+     same target with the same remedy, and one finding under two codes makes a reader work out
+     whether they are looking at one mistake or two before they can fix either.
+  8. **The elision is matched INSIDE a token.** `EXMP-aFoo-3...5` is ONE token, which is the shape
+     AC11 names and the shape a re-typed prompt actually produced; a whole-token test reported it as
+     "not an id", which is true and useless. Measured by the arm, which stayed red until this
+     changed. The two-dot range is unaffected, because `..` does not contain `...`.
+  9. **`parse_spec` is split into `parse_spec_text`**, so the pinned read can parse a blob it
+     already holds rather than writing it to a file to read it back.
+  10. **`render_ask_detail` prints the merged clauses**, one line per VALUE and not per label.
+      AC2's "prints both values" has nowhere else to land, and folding two values into one line is
+      the one-value-field-records-a-mixed-outcome class this kit already keeps a gotcha about.
+  11. **Only the FIRST canonical slot names every id.** The declared per-slot byte budget is 500 B
+      for two of the five, and a body naming one id per mandated ask would cross it at a dozen asks
+      while the 900 B first slot has room. The bodies that are not the first are bounded by
+      construction. §4's wrap rule is unchanged and is what the first slot uses; the per-slot
+      ceiling is now a stated bound on how large a mandate one README may carry, and a mandate past
+      it REDS the budget leg by name rather than landing a README nobody may commit.
+  12. **`--at` pins the CONF as well as the records**, through `read_conf_at_rev`. §4 parked that
+      fork on `TOOL-dDerivedDocket-53`; that unit landed the reader, and this unit is its first
+      caller, so the grade at a rev is now a function of that rev.
+  13. **`--json` and `--tsv` together is a usage refusal**, and the positional argument's key became
+      `pick` so `--target` could own `target`. One key answering "which family did you ask for" and
+      "which folder does R2 admit" is how a filter silently becomes a grading input.
+  14. **AC13's fixture is the scaffold's own backlog fixture**, which declares the example family in
+      its scratch conf outright, rather than `_fixture(example_family=True)`. The property
+      `TOOL-dDerivedDocket-51` landed is the one being used — a scratch conf declaring the family so
+      the id is anchorable inside the fixture and inert in this repository — and the arm's control
+      was SEEN RED over that unit's own `- EXMP-aFoo-3 — the ask` break, staged into a generated
+      slot body.
+
+  Fifteen breaks were staged one at a time and every one went red, naming the arm written for it.
+  One of them found a defect in the ARMS rather than in the code: the `may none` absorption arm
+  matched a substring, so a field reading `<grant>,none` contained the value it asserted and the
+  arm stayed green over the break. It now brackets the whole field. Two more arms carried the same
+  weakness and were bracketed with it.
+
 ## 10. Reuse audit
 
 The seams are the generator's own: `_expand_ids` for ranges, the `--write` render for the scaffold's
@@ -595,6 +665,15 @@ file as the direct check.
 The anchor predicate AC13 asks for is NOT a seam this unit adds either: `TOOL-dDerivedDocket-50`
 landed `corpus_ids.resolve_anchor(root)` as the kit's one public route from a repository root to
 that predicate, so this spec extends that route rather than deriving a second one.
+
+Measured on the tree at build time, and not re-derived from the design: `read_conf_at_rev`,
+`parse_spec`, `_expand_ids`, `_render_id_ranges`, `_render_wrapped_ids`, `SLOT_CANON`, the
+readme-contract registry and unit 7's `--asks` filter were all extended rather than re-implemented,
+and the one function this unit split — `parse_spec` — kept its name and gained a text-taking
+sibling. `backlog.py`'s fold gained no second copy either: the hold-liveness test the fold spelled
+inline is now `_check_live`, bound once by the fold and once by READY, and the decided-by SET is
+derived beside the fold rather than inside it, with an arm holding its minimum equal to the value
+the fold already names.
 
 Recall terms used: `acceptance-underivable orientation ask row pointer observable cut-line resolution
 table ids-driven run`

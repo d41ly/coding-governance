@@ -327,3 +327,22 @@ ASK_CUTOFF=""
 # every row in every view, so a silent fallback lands a corpus-wide re-render nobody asked for and
 # nobody can explain — and the value that caused it is still sitting in the conf looking deliberate.
 BACKLOG_EXCERPT_CHARS=""
+
+# PROBE_ALLOW — which commands `gen_build_index.py --asks --probe <id>` may EXECUTE. Blank means
+# none, blank is what this kit ships, and blank is what gov itself declares: ask text is written by
+# whoever filed the ask, so `--probe` is the one place in this kit that runs a filer's bytes, and a
+# tree that has not thought about that must not be able to do it by default.
+#
+# ENTRIES ARE SEPARATED BY `|`. An entry is one or more whitespace-separated argv tokens, and it
+# admits a command only when each of its tokens EQUALS the command's token at the same position —
+# a PREFIX of whole tokens, never a string prefix. That is the whole security claim: a string
+# prefix would let an entry reading `python3` admit `python3x`, and one reading `tools/` admit
+# `tools/../x`. A command carrying a shell metacharacter or a newline is refused before it is
+# split, because nothing here starts a shell.
+#
+# A SINGLE-TOKEN INTERPRETER ENTRY ADMITS ARBITRARY CODE. `python3` admits `python3 -c` followed by
+# anything a filer wrote. That is stated rather than prevented — a tree may legitimately declare
+# one — so declare the SCRIPT, not the interpreter, unless you mean it.
+#
+#   PROBE_ALLOW="python3 tools/check-one-thing.py|git --version"
+PROBE_ALLOW=""

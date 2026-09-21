@@ -182,3 +182,9 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T07:41:04Z dispatch · item 4fce85ec TOOL-dDerivedDocket-53 · reason tools/memory-tree/gen_build_index.py memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-53.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/map/generated memory/map/features
 
 2026-09-21T07:41:08Z brief · item TOOL-dDerivedDocket-53 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T08:03:50Z dispatch · item 55fd961b TOOL-dDerivedDocket-15 · reason tools/memory-tree/backlog.py tools/memory-tree/gen_build_index.py tools/memory-tree/.memory-tree.conf.example tools/memory-tree/kit.toml .memory-tree.conf memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/map/features memory/map/generated
+
+2026-09-21T08:03:54Z brief · item TOOL-dDerivedDocket-15 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T08:52:47Z dispatch · item 55fd961b TOOL-dDerivedDocket-15 · reason memory/guides/SESSION-KICKOFF.md

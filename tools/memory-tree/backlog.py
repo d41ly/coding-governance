@@ -21,8 +21,15 @@ One constant, three renderings, and no second spelling to drift.
 THE FILE GRAMMAR, in one place and nowhere else:
 
     file       := H1 BLANK* QUOTE* [ "## Asks" (BLANK | ask)* ] [ "## Dispositions" (BLANK | verbrow)* ]
-    ask        := "- " ID " . filed " DATE [ " . unit" ] " . " TEXT [ " -> " POINTER ]
-    verbrow    := status | sev | provenance
+    ask        := "- " ID " . filed " DATE [ " . unit" ] " . " TEXT CLAUSE* [ " -> " POINTER ]
+    verbrow    := status | sev | scope | provenance
+    scope      := "- SCOPE . " ID CLAUSE+
+    CLAUSE     := " . " LABEL " " VALUE
+    LABEL      := "seen" | "accept" | "out" | "may" | "verify" | "data"
+    seen       := LOCATOR [ " run `" COMMAND "`" ]
+    LOCATOR    := "`" PATH "`@" SHA7+ [ ":" LINE ] | "`" PATH "` matching `" PATTERN "`"
+                | REPO ":" PATH "@" SHA7+
+    may        := "none" | GRANT ( " " GRANT )*      ; GRANT := "`" PATH "`" | decision ID
     status     := "- CLOSED . "   ID " . by "    (ID | SHA)        " . " WHY
                 | "- WONTDO . "   ID                               " . " WHY
                 | "- BLOCKED . "  ID " . on "    ID                " . " WHY
@@ -39,12 +46,16 @@ the copyable form, and the parser reads exactly what they write — that pairing
 
 WHAT THIS MODULE DOES NOT CHECK, said out loud because a structural reader reads as a semantic one
 to everybody who did not write it. It never touches the filesystem, git, the clock or a network: a
-caller hands it text and hands it a spec index. It does not decide whether a POINTER resolves,
-whether a WHY is true, or whether a `closes` verb is honest — an over-claiming `closes` closes its
+caller hands it text and hands it a spec index. It does not decide whether a WHY is true, or whether a `closes` verb is honest — an over-claiming `closes` closes its
 ask silently, and the only thing that shows it is the Decided-by value the fold returns beside the
-status. It does not read the clause tail (`seen`, `accept`, `out`, `may`, `verify`, `data`), `SCOPE`
-rows, or the READY rule; those are the envelope unit's and it leaves the ask TEXT's suffix alone. It
-joins no wrapped legacy row: `read_legacy_row` reads ONE physical line and says so.
+status. It does not read a wrapped legacy row: `read_legacy_row` reads ONE physical line and says so.
+
+THE CLAUSE TAIL, `SCOPE` ROWS AND THE READY PREDICATE LIVE HERE TOO (TOOL-dDerivedDocket-15), and
+they change none of the above. Whether a locator's PATH exists is still not this module's question:
+`build_grader` takes the tree probe as a CALLABLE, exactly as `read_header_verbs` takes its id
+expander, so a caller hands in the tree it means and this file still touches no filesystem. A clause
+is CONTENT, so a malformed one is verdict V13 and never an exception; V14 is forward-only, read off
+the MERGED clauses, and disarmed by the same two conf verdicts V9 and V12 are.
 
 CONTENT NEVER RAISES. Every unparseable line is a V2 verdict naming the file and the line, because
 one bad row in one build must not refuse every artifact this kit renders. The two things that DO
@@ -77,6 +88,21 @@ DISPOSALS = ("kept", "dropped", "amended")
 # read as prose. `WITHDRAWN` is in the same list for the same reason, and its remedy names WONTDO.
 NON_VERBS = ("SPECCED", "INPROGRESS", "OPEN", "WITHDRAWN")
 
+# TOOL-dDerivedDocket-15 — THE CLAUSE TAIL. Six labels, closed, and spelled once here so the ask
+# reader, the SCOPE reader, the merge and every verdict below read the same set. The order is the
+# grammar's own and carries no meaning: a tail is read RIGHT TO LEFT, so the written order of two
+# clauses never decides anything.
+CLAUSE_LABELS = ("seen", "accept", "out", "may", "verify", "data")
+# The disposition-file verb that adds clauses to somebody else's ask WITHOUT touching its home
+# folder. Upper case, as every verb in that section is. It derives no status, which is why it is a
+# row class of its own rather than a seventh `STATUS_VERBS` member — a reader that folds statuses
+# must not have to remember to skip it.
+SCOPE_VERB = "SCOPE"
+# THE `may` VALUE THAT IS NOT A GRANT. Spelled once because the merge ABSORBS it: a row saying
+# `may none` beside a row naming a path merges to the path, and two spellings of this token would
+# make one of those rows a grant nobody wrote.
+GRANT_NONE = "none"
+
 MODES = ("shards", "builds")
 MODE_KEY = "BACKLOG_MODE"
 CUTOFF_KEY = "ASK_CUTOFF"
@@ -102,9 +128,37 @@ SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
 # upper-case letter (the node tag plus a CamelCase adjective-noun) and a SHA carries none.
 SLUG_RE = re.compile(r"^(?=.*[A-Z])[A-Za-z0-9]+$")
 
+# THE THREE LOCATOR FORMS OF §4, and the one shape fix F6 forbids, each anchored at BOTH ends. A
+# locator is the whole value or it is not a locator: an unanchored form would read the first legal
+# prefix of a typo as a pinned path and report the ask located, which is the exact state F6 exists
+# to refuse.
+SEEN_PINNED_RE = re.compile(r"^`(?P<path>[^`]+)`@(?P<sha>[0-9a-f]{7,40})(?::(?P<line>\d+))?$")
+SEEN_MATCHING_RE = re.compile(r"^`(?P<path>[^`]+)` matching `(?P<pattern>[^`]+)`$")
+SEEN_EXTERNAL_RE = re.compile(
+    r"^(?P<repo>[A-Za-z0-9][A-Za-z0-9._-]*):(?P<path>[^`@\s]+)@(?P<sha>[0-9a-f]{7,40})$")
+#: FIX F6's whole subject: a path and a line with no pinned commit. Matched SEPARATELY so the
+#: verdict can say WHICH mistake was made — "not a locator" sends a reader looking for a typo, and
+#: the mistake is that a line number moves and the ask then points at nothing while still reading
+#: located.
+SEEN_BARE_LINE_RE = re.compile(r"^`(?P<path>[^`]+)`:(?P<line>\d+)$")
+#: The optional command tail. NON-GREEDY on the locator and anchored on the closing backtick, so a
+#: locator whose own path carries the word `run` keeps it.
+SEEN_RUN_RE = re.compile(r"^(?P<locator>.*\S) run `(?P<command>[^`]+)`$")
+
 Grammar = collections.namedtuple("Grammar", "families id_re")
 Row = collections.namedtuple("Row", "cls code verb target value why extra path slug line raw")
-Ask = collections.namedtuple("Ask", "id path slug filed unit text pointer line")
+#: `clauses` is the tuple of (label, value) pairs a row carried, in WRITTEN order, duplicates
+#: included — a duplicate is V13's finding and dropping it here would answer the verdict before it
+#: was asked. It defaults to empty, so every construction site that predates the tail is unchanged.
+Ask = collections.namedtuple("Ask", "id path slug filed unit text pointer line clauses",
+                             defaults=((),))
+#: One parsed `seen` value. `kind` is `pinned`, `matching` or `external`, or "" with `why` set —
+#: never an exception, because a `seen` is CONTENT and content never raises in this module.
+Seen = collections.namedtuple("Seen", "kind path sha line pattern command why")
+#: One ask's READY answer. `missing` is the failing rules in rule order; `closers` carries a foreign
+#: live spec R2 admitted under a `stale:` prefix, which is how a stale claim is named without a
+#: fourth grade (§8 F2).
+Ready = collections.namedtuple("Ready", "grade missing holds grant closers")
 Verdict = collections.namedtuple("Verdict", "code text files")
 Conf = collections.namedtuple("Conf", "mode cutoff verdicts")
 Legacy = collections.namedtuple("Legacy", "id status withdrawn body why")
@@ -214,6 +268,8 @@ def extract_row(line: str, grammar: Grammar) -> Row | None:
         return _extract_status(body, head, line, grammar)
     if head == SEV_VERB:
         return _extract_sev(body, line, grammar)
+    if head == SCOPE_VERB:
+        return _extract_scope(body, line, grammar)
     if head == PROVENANCE_VERB:
         return _extract_provenance(body, line, grammar)
     return blank._replace(why=f"leads with `{head}`, which is neither an id nor a declared verb")
@@ -240,11 +296,183 @@ def _extract_ask(body: str, ask_id: str, line: str) -> Row:
     text, arrow, pointer = rest.rpartition(ARROW)
     if not arrow:
         text, pointer = rest, ""
+    # THE TAIL IS READ BEFORE THE TEXT IS GRADED, and off the pointer-stripped remainder, because
+    # the grammar puts the pointer LAST: `TEXT CLAUSE* [" → " POINTER]`.
+    text, clauses = extract_clauses(text)
     if not text.strip():
         return blank._replace(why="the ask text is empty")
     if arrow and not pointer.strip():
         return blank._replace(why="the pointer after the arrow is empty")
-    return Row("ask", 0, "", ask_id, filed, text, {"unit": unit, "pointer": pointer}, "", "", 0, line)
+    return Row("ask", 0, "", ask_id, filed, text,
+               {"unit": unit, "pointer": pointer, "clauses": clauses}, "", "", 0, line)
+
+
+def extract_clauses(rest: str) -> tuple:
+    """`(text, clauses)` — the clause tail of a row body, read RIGHT TO LEFT.
+
+    RIGHT TO LEFT IS THE WHOLE RULE, and it is not a preference. Left to right, an ask TEXT that
+    happens to contain ` · out ` would swallow every real clause after it into one free-text value
+    and the row would grade as carrying no acceptance at all — silently, which is the one outcome
+    this grammar may not have. Read from the right, that TEXT costs the writer exactly the one
+    clause it collides with, and the misread lands as a clause whose value then fails its grammar
+    and is named by V13.
+
+    THE LAST SEGMENT IS ALWAYS TEXT. `TEXT` is mandatory in the grammar, so the walk stops with one
+    segment left however many of them look like labels — a row that is nothing but clauses keeps
+    its first as the text rather than parsing to an ask with no subject.
+
+    A SEGMENT WHOSE FIRST TOKEN IS A LABEL IS A CLAUSE EVEN WITH NO VALUE. `· out ·` is read as an
+    `out` clause carrying nothing, which V13 names; read as prose instead it would be TEXT, and the
+    two clauses beyond it would be swallowed exactly as the left-to-right reading swallows them.
+
+    DUPLICATES SURVIVE. The pairs come back in written order with nothing deduplicated, because
+    "this label is written twice" is a verdict somebody must be told about and a reader that folded
+    them here would answer it before it was asked.
+    """
+    parts = rest.split(SEP)
+    found: list = []
+    while len(parts) > 1:
+        head = parts[-1].split(" ", 1)
+        if head[0] not in CLAUSE_LABELS:
+            break
+        found.append((head[0], head[1].strip() if len(head) > 1 else ""))
+        parts.pop()
+    found.reverse()
+    return SEP.join(parts), tuple(found)
+
+
+def _extract_scope(body: str, line: str, grammar: Grammar) -> Row:
+    """`- SCOPE · <id> · <clause>+` — clauses added to an ask from OUTSIDE its home folder.
+
+    EVERY FIELD AFTER THE ID IS A CLAUSE, and one that is not REFUSES the row rather than being
+    read as prose: a SCOPE row has no TEXT slot for prose to land in, so admitting it would file an
+    unreadable field under a label nobody wrote.
+    """
+    parts = body.split(SEP)
+    blank = Row("unknown", 2, SCOPE_VERB, "", "", "", {}, "", "", 0, line)
+    if len(parts) < 3:
+        return blank._replace(why=f"a {SCOPE_VERB} row is `{SCOPE_VERB} . <id> . <label> <value>` "
+                                  f"and carries at least one clause")
+    if not check_id(parts[1], grammar):
+        return blank._replace(why=f"`{parts[1]}` is not a well-formed id")
+    blank = blank._replace(target=parts[1])
+    pairs = []
+    for field in parts[2:]:
+        head = field.split(" ", 1)
+        if head[0] not in CLAUSE_LABELS:
+            return blank._replace(why=f"the field `{field}` does not lead with a clause label; the "
+                                      f"labels are {' '.join(CLAUSE_LABELS)}")
+        pairs.append((head[0], head[1].strip() if len(head) > 1 else ""))
+    return Row("scope", 0, SCOPE_VERB, parts[1], "", "", {"clauses": tuple(pairs)}, "", "", 0, line)
+
+
+# ------------------------------------------------------------------- the clause VALUE grammars
+def read_clause_values(pairs, label: str) -> list:
+    """Every value written under one label, in order. The ONE accessor over a clause tuple."""
+    return [v for lab, v in pairs if lab == label]
+
+
+def parse_seen(value: str) -> Seen:
+    """One `seen` value as `Seen`. NEVER raises: an unreadable value comes back with `why` set.
+
+    THE COMMAND TAIL IS STRIPPED FIRST, because the locator forms are anchored at both ends and a
+    value carrying a command would otherwise match none of them and report as a malformed locator
+    when the locator was fine.
+
+    FIX F6 IS A NAMED CASE, not a fall-through. `` `path`:23 `` is recognised and refused with the
+    reason — a line number moves, and the ask then points at nothing while still reading located.
+    """
+    locator, command = value.strip(), ""
+    run = SEEN_RUN_RE.match(locator)
+    if run:
+        locator, command = run.group("locator"), run.group("command")
+    if not locator:
+        return Seen("", "", "", "", "", command, "carries no locator")
+    pin = SEEN_PINNED_RE.match(locator)
+    if pin:
+        return Seen("pinned", pin.group("path"), pin.group("sha"), pin.group("line") or "", "",
+                    command, "")
+    match = SEEN_MATCHING_RE.match(locator)
+    if match:
+        return Seen("matching", match.group("path"), "", "", match.group("pattern"), command, "")
+    ext = SEEN_EXTERNAL_RE.match(locator)
+    if ext:
+        return Seen("external", ext.group("path"), ext.group("sha"), "", "", command, "")
+    bare = SEEN_BARE_LINE_RE.match(locator)
+    if bare:
+        return Seen("", bare.group("path"), "", bare.group("line"), "", command,
+                    f"{locator} pins a line and no commit; a line MOVES, and the ask would then "
+                    f"point at nothing while still reading located — write "
+                    f"`` `path`@<sha>[:line] `` or `` `path` matching `pattern` ``")
+    return Seen("", "", "", "", "", command,
+                f"{locator} is none of the three locator forms: `` `path`@<sha>[:line] ``, "
+                f"`` `path` matching `pattern` ``, or `<repo>:<path>@<sha>`")
+
+
+def extract_grants(value: str) -> tuple:
+    """`(grants, why)` for one `may` value. `('none',)` is the absorbed token, never a grant.
+
+    TOKENISED RATHER THAN SPLIT, because a granted PATH is backticked and a backticked path may
+    carry a space. A bare `.split()` would shred one grant into two, and each half would then fail
+    the id test and report as two mistakes where the writer made none.
+    """
+    raw = value.strip()
+    if raw == GRANT_NONE:
+        return (GRANT_NONE,), ""
+    out, i = [], 0
+    while i < len(raw):
+        if raw[i] == " ":
+            i += 1
+            continue
+        if raw[i] == "`":
+            end = raw.find("`", i + 1)
+            if end < 0:
+                return (), f"`{raw}` carries a grant whose opening backtick is never closed"
+            out.append(raw[i:end + 1])
+            i = end + 1
+            if i < len(raw) and raw[i] != " ":
+                return (), f"`{raw}` runs a backticked grant straight into the next token"
+            continue
+        end = raw.find(" ", i)
+        end = len(raw) if end < 0 else end
+        out.append(raw[i:end])
+        i = end
+    if not out:
+        return (), "carries no grant"
+    if GRANT_NONE in out:
+        return (), (f"`{raw}` writes `{GRANT_NONE}` beside a grant; `{GRANT_NONE}` is the value "
+                    f"that grants NOTHING, and a row cannot say both")
+    return tuple(out), ""
+
+
+#: A GRANT's id half, graded by SHAPE and deliberately NOT against the declared family allowlist. A
+#: `may` names a DECISION id, and a decision family is not necessarily one of the families a
+#: build's asks are filed under — grading it against the backlog allowlist would refuse a
+#: legitimate grant on any tree whose two sets differ. Whether the id RESOLVES is the question the
+#: unit that HONOURS a grant asks, at the moment it honours one.
+GRANT_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+$")
+
+
+def check_grant(grant: str) -> bool:
+    """Is this token a GRANT? A backticked path, or an id-shaped token. See `GRANT_ID_RE`."""
+    return bool(grant.startswith("`") and grant.endswith("`") and len(grant) > 2) \
+        or bool(GRANT_ID_RE.match(grant))
+
+
+def derive_grants(values) -> tuple:
+    """Every `may` value merged: a UNION of grants in which `none` is ABSORBED.
+
+    `()` when no clause was written at all, `('none',)` when every clause said `none`, and the
+    sorted union otherwise. Absorbed rather than conflicting, because `none` is the value a writer
+    puts on a row to say THEIR row grants nothing — it was never a claim about anybody else's.
+    """
+    if not values:
+        return ()
+    grants: set = set()
+    for value in values:
+        got, _why = extract_grants(value)
+        grants.update(g for g in got if g != GRANT_NONE)
+    return tuple(sorted(grants)) if grants else (GRANT_NONE,)
 
 
 def _read_slot(field: str, keyword: str):
@@ -400,7 +628,7 @@ def parse_file(path: str, text: str, grammar: Grammar) -> Parsed:
             continue
         if row.cls == "ask":
             asks.append(Ask(row.target, path, slug, row.value, row.extra["unit"], row.why,
-                            row.extra["pointer"], n))
+                            row.extra["pointer"], n, row.extra["clauses"]))
         else:
             rows.append(row)
 
@@ -620,6 +848,58 @@ def derive_evidence(corpus: Corpus) -> dict:
     return out
 
 
+def _check_live(asks: dict, specs: dict, statuses: dict, target: str):
+    """Is this hold target live? None when it resolves to neither a filed ask nor a spec H1.
+
+    AN ASK WINS A TIE. A target that is both a filed ask and a spec H1 resolves to the ask, because
+    the ask is the thing a disposer was holding on when they wrote the row.
+
+    ONE IMPLEMENTATION, TWO BINDINGS. The fold calls it with the statuses stratum 1 has decided so
+    far; READY's R3 and the decided-by set call it with the finished fold. A second copy for the
+    later readers would be two answers to "is this hold released", and the copy is the one that
+    would keep an ask held after its target closed.
+    """
+    if target in asks:
+        return statuses.get(target) not in TERMINAL
+    if target in specs:
+        return specs[target].status not in TERMINAL
+    return None
+
+
+def check_hold_live(corpus: Corpus, fold: Fold, target: str):
+    """`_check_live` bound to a FINISHED fold — the binding every reader outside the fold uses."""
+    return _check_live(_read_asks(corpus), corpus.specs, fold.statuses, target)
+
+
+def derive_clauses(corpus: Corpus) -> dict:
+    """Per ask: `{label: (value, …)}`, merged over its ask row and every SCOPE row naming it.
+
+    ONE MERGE, READ BY THREE. V14 asks whether the merged clauses carry an acceptance, READY's R5
+    and R6 ask the same question, and `--probe` takes its command from here. A second merge
+    anywhere would let a non-filer cure an ask for one reader and not for another (§8 F6).
+
+    FIVE LABELS CONJOIN and `may` is a UNION with `none` absorbed, which is why `may` comes back
+    RAW here too: the absorbing fold is `derive_grants`, called by whoever prints or honours a
+    grant, so this function stays the one that merely collects.
+
+    ORDER IS THE ASK ROW FIRST, then the SCOPE rows by (path, line). Nothing below reads the order
+    — every consumer either asks "is there one" or iterates all of them — but a stable one means a
+    printed detail view returns identical bytes for a permuted corpus.
+    """
+    asks = _read_asks(corpus)
+    out: dict = {a: {} for a in asks}
+    rows = sorted((r for p in corpus.files for r in p.rows if r.cls == "scope"),
+                  key=lambda r: (r.path, r.line))
+    pairs: dict = {a: list(asks[a].clauses) for a in asks}
+    for row in rows:
+        if row.target in pairs:
+            pairs[row.target].extend(row.extra["clauses"])
+    for ask_id, got in pairs.items():
+        out[ask_id] = {lab: tuple(read_clause_values(got, lab)) for lab in CLAUSE_LABELS
+                       if read_clause_values(got, lab)}
+    return out
+
+
 def derive_statuses(corpus: Corpus, verdicts=None) -> Fold:
     """Every ask's status, its Decided-by, and its severity — a function of SETS and nothing else.
 
@@ -657,16 +937,8 @@ def derive_statuses(corpus: Corpus, verdicts=None) -> Fold:
             decided[ask_id] = sorted(decliners)[0]
 
     def check_live(target: str):
-        """Is this hold target live? None when it resolves to neither a filed ask nor a spec H1.
-
-        AN ASK WINS A TIE. A target that is both a filed ask and a spec H1 resolves to the ask,
-        because the ask is the thing a disposer was holding on when they wrote the row.
-        """
-        if target in asks:
-            return statuses.get(target) not in TERMINAL
-        if target in corpus.specs:
-            return corpus.specs[target].status not in TERMINAL
-        return None
+        """This fold's own binding of `_check_live`, over the statuses stratum 1 has decided."""
+        return _check_live(asks, corpus.specs, statuses, target)
 
     # ---- stratum 2: live asks only
     for ask_id in asks:
@@ -732,9 +1004,10 @@ def derive_statuses(corpus: Corpus, verdicts=None) -> Fold:
 # EVERY CODE THIS MODULE CAN PRODUCE, DECLARED AS DATA. A consumer reports verdicts by
 # ITERATING this tuple, never by retyping the list into a chain of branches: a code added below
 # with no reporting arm then reds the view unit's selftest instead of vanishing from a check
-# that looks green. V13 and V14 are the envelope unit's and are deliberately absent; the two
-# conf-reader codes are present, because `derive_verdicts` returns them with the rest.
-VERDICT_CODES = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16)
+# that looks green. V13 and V14 ARRIVED with the envelope unit (TOOL-dDerivedDocket-15) and join
+# this tuple rather than opening a list of their own; the two conf-reader codes are present,
+# because `derive_verdicts` returns them with the rest.
+VERDICT_CODES = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
 
 
 def derive_verdicts(corpus: Corpus, conf: Conf) -> list:
@@ -776,8 +1049,14 @@ def derive_verdicts(corpus: Corpus, conf: Conf) -> list:
                 seen[ask.id] = ask
 
     # V7 — a verb-row target, or a `closes`/`advances` id, that is no filed ask.
+    # A SCOPE ROW IS EXCLUDED, and V13 owns that case instead. Both verdicts would name the same
+    # unfiled target with the same remedy, and one finding reported under two codes is two answers
+    # to one question — the reader then has to work out whether they are looking at one mistake or
+    # two before they can fix either.
     for parsed in corpus.files:
         for row in parsed.rows:
+            if row.cls == "scope":
+                continue
             if row.target not in asks:
                 out.append(Verdict(7, f"{row.path}:{row.line}: the {row.verb} row targets "
                                       f"{row.target}, which no ask row in any of the "
@@ -856,6 +1135,31 @@ def derive_verdicts(corpus: Corpus, conf: Conf) -> list:
                                        f"with no status row in any of the {len(corpus.files)} "
                                        f"file(s) read", (ask.path,)))
 
+    # V13 — the clause tail's own grammar, over BOTH row kinds. Not forward-only: a malformed
+    # clause is a value nobody can read at any date, and a legacy row carries no clause at all, so
+    # arming this retroactively reds nothing that was written before the tail existed.
+    out.extend(_scan_clause_grammar(corpus, asks))
+
+    # V14 — owner ruling D12-d, FORWARD-ONLY and read off the MERGED clauses (§8 F6), so a SCOPE
+    # row written by a non-filer cures an ask exactly as READY's R5 says it does. Disarmed by
+    # either conf verdict, like V9 and V12, and for the same reason.
+    if check_cutoff_armed(conf):
+        merged = derive_clauses(corpus)
+        for parsed in corpus.files:
+            for ask in parsed.asks:
+                if ask.filed < conf.cutoff:
+                    continue
+                clauses = merged.get(ask.id, {})
+                if clauses.get("accept"):
+                    continue
+                if any(parse_seen(v).command for v in clauses.get("seen", ())):
+                    continue
+                out.append(Verdict(14, f"{ask.path}:{ask.line}: {ask.id} is filed on or after "
+                                       f"{conf.cutoff} and its merged clauses carry neither "
+                                       f"`accept` nor a `seen … run`, so nothing states what done "
+                                       f"MEANS for it and no run could execute it unasked",
+                                   (ask.path,)))
+
     # V9 and V12 — forward-only, and DISARMED by either conf verdict. They are reported as absent
     # rather than silently skipped: V15 or V16 is already in `out` saying why.
     if check_cutoff_armed(conf):
@@ -873,6 +1177,73 @@ def derive_verdicts(corpus: Corpus, conf: Conf) -> list:
                                            f"{conf.cutoff} with no SEV row in any of the "
                                            f"{len(corpus.files)} file(s) read", (ask.path,)))
     return sorted(out, key=lambda v: (v.code, v.text))
+
+
+def _scan_clause_grammar(corpus: Corpus, asks: dict) -> list:
+    """V13, over every clause-carrying row of both kinds. Five findings, each naming file and row.
+
+    THE ROW KINDS SHARE ONE VALUE WALK. An ask row and a SCOPE row disagree about everything except
+    what a clause MEANS, so grading them twice would be the second spelling this module's own
+    grammar docstring forbids — and the copy is always the one that stops matching.
+
+    `out`, `accept`, `verify` and `data` are FREE TEXT and the only way they fail is by being
+    empty. That is not a formality: an empty value is exactly what a TEXT colliding with a label
+    produces, so it is the finding that makes the collision loud instead of silent.
+    """
+    out: list = []
+
+    def add(path: str, lineno: int, why: str) -> None:
+        out.append(Verdict(13, f"{path}:{lineno}: {why}", (path,)))
+
+    carriers = [(a.path, a.line, f"ask {a.id}", a.clauses) for p in corpus.files for a in p.asks]
+    carriers += [(r.path, r.line, f"{SCOPE_VERB} row for {r.target}", r.extra["clauses"])
+                 for p in corpus.files for r in p.rows if r.cls == "scope"]
+    for path, lineno, who, pairs in sorted(carriers):
+        for label in CLAUSE_LABELS:
+            if len(read_clause_values(pairs, label)) > 1:
+                add(path, lineno, f"{who} writes the `{label}` clause more than once on one row, so "
+                                  f"which value it carries has two answers; a second value belongs "
+                                  f"on a {SCOPE_VERB} row, where the merge conjoins it")
+        for label, value in pairs:
+            if not value:
+                add(path, lineno, f"{who} carries a `{label}` clause with no value — a label with "
+                                  f"nothing after it is prose that collided with the tail, not a "
+                                  f"clause")
+                continue
+            if label == "seen":
+                seen = parse_seen(value)
+                if seen.why:
+                    add(path, lineno, f"{who} carries `seen {value}`, and {seen.why}")
+            elif label == "may":
+                grants, why = extract_grants(value)
+                if why:
+                    add(path, lineno, f"{who} carries `may {value}`, and {why}")
+                    continue
+                for grant in grants:
+                    if grant != GRANT_NONE and not check_grant(grant):
+                        add(path, lineno, f"{who} carries the grant `{grant}` under `may`, which is "
+                                          f"neither a backticked path nor an id")
+
+    # A SCOPE ROW WHOSE TARGET NOBODY FILED, and two of them for one target in one file. Both are
+    # per-file, and the second is per-file BY DESIGN: the merge conjoins across files, so two
+    # writers may each scope one ask — what nobody may do is state one label twice inside one file
+    # and leave a reader to guess which of their own two rows they meant.
+    for parsed in corpus.files:
+        first: dict = {}
+        for row in parsed.rows:
+            if row.cls != "scope":
+                continue
+            if row.target not in asks:
+                add(row.path, row.line, f"{SCOPE_VERB} row targets {row.target}, which no ask row "
+                                        f"in any of the {len(corpus.files)} file(s) read files")
+            if row.target in first:
+                add(row.path, row.line, f"a second {SCOPE_VERB} row for {row.target} in this file, "
+                                        f"the first at line {first[row.target]}; one file scopes "
+                                        f"one target once, and a writer adds a clause by editing "
+                                        f"their own row")
+            else:
+                first[row.target] = row.line
+    return out
 
 
 def _scan_cycles(edges: dict, fold: Fold) -> list:
@@ -899,14 +1270,226 @@ def _scan_cycles(edges: dict, fold: Fold) -> list:
     return [found[k] for k in sorted(found)]
 
 
+# ------------------------------------------------------------------- READY, and the decided-by set
+#: Everything one grading run holds fixed. Built once per run and handed to `derive_ready` per ask,
+#: because every field of it is a property of the RUN and re-deriving any of them per ask would let
+#: two asks in one answer be graded against two different trees.
+#:
+#: `mandate` is the set M. `target` is the build folder R2 admits a live closing spec from.
+#: `live_builds` is `None` for "every build is live", which is the CONSERVATIVE default and the
+#: reading the ask driver pins: no tree it reads shows every run in flight, so a caller that cannot
+#: observe one must not be able to claim a foreign claim is stale by saying nothing.
+#: `check_path` is the caller's tree probe, `path -> bool`. A CALLABLE and not a path list, so this
+#: module still reads no filesystem and a caller may probe a pinned tree, a working tree or a
+#: fixture with the same grader.
+Grader = collections.namedtuple(
+    "Grader", "corpus fold evidence merged conf mandate target live_builds check_path")
+
+READY_GRADES = ("yes", "legacy", "no")
+READY_RULES = ("R1", "R2", "R3", "R4", "R5", "R6")
+#: The statuses R2 admits with no question asked. A SPECCED or INPROGRESS ask is admitted only
+#: through the closing-spec test below, and a TERMINAL one never is.
+READY_LIVE_STATUSES = ("OPEN", "BLOCKED", "DEFERRED")
+_POINTER_LINK_RE = re.compile(r"^\[[^\]]*\]\((?P<target>[^)]+)\)$")
+
+
+def build_grader(corpus: Corpus, fold: Fold, conf: Conf, check_path, mandate=(), target: str = "",
+                 live_builds=None) -> Grader:
+    """One grading run's fixed inputs. `check_path` is REQUIRED and refusing it is the point.
+
+    A grader with no tree probe would answer R4 the same way for every ask — and the answer it
+    would give is `located`, because "no probe said no" and "the path is there" are the same
+    boolean. That is the reassuring-zero shape, so this raises instead.
+    """
+    if not callable(check_path):
+        raise Problem("a READY grader needs a tree probe: R4 asks whether a path is PRESENT, and a "
+                      "grader with nothing to ask would answer `located` for every ask alive")
+    return Grader(corpus, fold, derive_evidence(corpus), derive_clauses(corpus), conf,
+                  frozenset(mandate), target, None if live_builds is None else frozenset(live_builds),
+                  check_path)
+
+
+def read_build_slug(path: str) -> str:
+    """The build folder a record sits in: `<root>/builds/<slug>/…` -> `<slug>`, or ""."""
+    parts = path.replace("\\", "/").split("/")
+    return parts[parts.index("builds") + 1] if "builds" in parts[:-1] else ""
+
+
+def read_pointer_target(pointer: str) -> tuple:
+    """`(path, external)` for an ask's POINTER. `path` is "" when nothing path-shaped is in it.
+
+    A pointer is authored prose in three shapes this corpus already writes — a bare path, a
+    backticked one, and a markdown link — so it is NORMALISED here rather than grammar-checked.
+    R4 is the only reader, and the question it asks is whether the tree holds the thing; a pointer
+    that normalises to nothing simply fails that question, which is the honest answer for a pointer
+    nobody can follow.
+    """
+    raw = pointer.strip()
+    link = _POINTER_LINK_RE.match(raw)
+    if link:
+        raw = link.group("target").strip()
+    raw = raw.strip("`").strip()
+    ext = SEEN_EXTERNAL_RE.match(raw)
+    if ext:
+        return ext.group("path"), True
+    return raw, False
+
+
+def derive_ready(grader: Grader, ask_id: str) -> Ready:
+    """One ask's grade, its failing rules, its live holds, its merged grant and its live closers.
+
+    THE SIX RULES ARE GRADED IN FULL, always, and the grade is read off the failures afterwards.
+    Short-circuiting at the first failure would make `missing` a list of one, and a reader who
+    fixes that one only learns about the next on the following run — which is how a list of ten
+    asks takes ten runs to clear.
+
+    `legacy` IS NOT A THIRD KIND OF PASS. It says: this ask predates the envelope, it is well
+    formed in every rule the envelope did not add, and exactly ONE of "somebody can find it" and
+    "somebody can tell when it is done" is answered. Both missing is `no` — fix F6's rule, and the
+    reason is that an ask nobody can locate AND nobody can grade is not an ask, it is a note.
+    """
+    rows = [a for p in grader.corpus.files for a in p.asks if a.id == ask_id]
+    ask = rows[0] if rows else None
+    clauses = grader.merged.get(ask_id, {})
+    evidence = grader.evidence.get(ask_id, {})
+    status = grader.fold.statuses.get(ask_id, UNRESOLVED)
+    missing: list = []
+
+    # R1 — FILED. Exactly one row, in the folder the id's own slug names.
+    if len(rows) != 1 or rows[0].slug != (ask_id.split("-")[1] if ask_id.count("-") >= 2 else ""):
+        missing.append("R1")
+
+    # R2 — LIVE, and the closers field it produces on the way. A foreign live spec is a LIVE CLAIM
+    # unless the caller can say that build is not running, which only a caller observing every run
+    # in flight can say — hence `None` meaning "every build is live" rather than "none is".
+    closers: list = []
+    contested = False
+    for spec_id in evidence.get("live_specs", ()):
+        slug = read_build_slug(grader.corpus.specs[spec_id].path)
+        if slug and slug == grader.target:
+            closers.append(spec_id)
+        elif grader.live_builds is not None and slug not in grader.live_builds:
+            closers.append("stale:" + spec_id)
+        else:
+            closers.append(spec_id)
+            contested = True
+    live = status in READY_LIVE_STATUSES or (status in ("SPECCED", "INPROGRESS") and not contested)
+    if not live and ask is not None and ask.unit and ask.slug == grader.target \
+            and status not in TERMINAL:
+        live = True
+    if not live:
+        missing.append("R2")
+
+    # R3 — UNHELD. A hold on a target INSIDE the mandate is a hold this run will release itself.
+    holds = tuple(h for h in evidence.get("holds", ())
+                  if check_hold_live(grader.corpus, grader.fold, h) is not False)
+    if any(h not in grader.mandate for h in holds):
+        missing.append("R3")
+
+    # R4 and R6 — LOCATED and BOUNDED, walked together because both read the same locator set.
+    located, external = False, False
+    for value in clauses.get("seen", ()):
+        seen = parse_seen(value)
+        if seen.kind == "external":
+            located, external = True, True
+        elif seen.kind and grader.check_path(seen.path):
+            located = True
+    if ask is not None and ask.pointer:
+        path, is_external = read_pointer_target(ask.pointer)
+        if is_external:
+            located, external = True, True
+        elif path and grader.check_path(path):
+            located = True
+    if not located:
+        missing.append("R4")
+
+    # R5 — ACCEPTABLE. `accept` says what done looks like; a `seen … run` says a machine can ask.
+    if not (clauses.get("accept")
+            or any(parse_seen(v).command for v in clauses.get("seen", ()))):
+        missing.append("R5")
+
+    if external and not clauses.get("data"):
+        missing.append("R6")
+
+    failed = set(missing)
+    if not failed:
+        grade = "yes"
+    elif (not failed - {"R4", "R5"} and len(failed) == 1 and ask is not None
+          and check_filed_before_cutoff(grader.conf, ask.filed)):
+        grade = "legacy"
+    else:
+        grade = "no"
+    return Ready(grade, tuple(sorted(failed, key=READY_RULES.index)), holds,
+                 derive_grants(clauses.get("may", ())), tuple(closers))
+
+
+def check_filed_before_cutoff(conf: Conf, filed: str) -> bool:
+    """Was this ask filed BEFORE the declared cutoff? False whenever no usable cutoff is declared.
+
+    False and not True, because `legacy` is a grandfathering rule and a tree that declares no
+    cutoff has grandfathered nothing — it has merely said nothing, and reading silence as "every
+    ask is old" would grandfather every ask filed after the envelope shipped.
+    """
+    return bool(conf.cutoff) and DATE_RE.match(conf.cutoff) is not None and filed < conf.cutoff
+
+
+def derive_deciders(corpus: Corpus, fold: Fold, evidence: dict) -> dict:
+    """Per ask: EVERY member of the set that decided its status, sorted. Never one member picked.
+
+    The fold NAMES one member — the minimum of the set — because a table cell holds one value.
+    That is a lossy projection of a mixed outcome, and this repo has a gotcha for exactly it: a
+    one-value field recording a mixed outcome reads as a unanimous one. The machine projection
+    publishes the whole set, and a selftest arm holds `min(this set) == fold.decided` so the two
+    cannot drift into being two answers.
+
+    The rule numbers are UNIT 6's fold rules, not READY's: R1 CLOSED, R2 WONTDO, R3 INPROGRESS,
+    R4 SPECCED, R5 BLOCKED, R6 DEFERRED, R7 OPEN — and R7's set is empty by construction, because
+    OPEN is what is left when nothing decided anything.
+    """
+    asks = _read_asks(corpus)
+    drows = _read_rows(corpus, "status")
+    out: dict = {}
+    for ask_id in asks:
+        status = fold.statuses.get(ask_id)
+        ev = evidence.get(ask_id, {})
+        live = [s for s in ev.get("live_specs", ()) if s in corpus.specs]
+        if status == "CLOSED":
+            members = list(ev.get("closing", ()))
+        elif status == "WONTDO":
+            members = list(ev.get("declining", ()))
+        elif status in ("INPROGRESS", "SPECCED"):
+            rule = ("INPROGRESS",) if status == "INPROGRESS" else ("OPEN", "SPECCED")
+            members = [s for s in live if corpus.specs[s].status in rule]
+        elif status in ("BLOCKED", "DEFERRED"):
+            members = [s for s in live if corpus.specs[s].status == status]
+            members += [r.value for r in drows.get(ask_id, []) if r.verb == status
+                        and check_hold_live(corpus, fold, r.value) is True]
+        elif status == UNRESOLVED:
+            members = [fold.decided.get(ask_id, "")]
+        else:
+            members = []
+        out[ask_id] = tuple(sorted({m for m in members if m}))
+    return out
+
+
 # ------------------------------------------------------------------------------------- the renderers
 # ONE RENDERER PER SHAPE, BESIDE ITS PARSER. Every later writer — the triage sweep, the relocation
 # engine, the inherited-red auto-file — spells a row the ONE way `extract_row` reads it, and AC2
 # grades the pairing by parsing each renderer's own output back.
-def render_ask_row(ask_id: str, filed: str, text: str, unit: bool = False, pointer: str = "") -> str:
+def render_ask_row(ask_id: str, filed: str, text: str, unit: bool = False, pointer: str = "",
+                   clauses=()) -> str:
     marker = SEP + "unit" if unit else ""
     tail = ARROW + pointer if pointer else ""
-    return f"- {ask_id}{SEP}filed {filed}{marker}{SEP}{text}{tail}"
+    return f"- {ask_id}{SEP}filed {filed}{marker}{SEP}{text}{render_clauses(clauses)}{tail}"
+
+
+def render_clauses(clauses) -> str:
+    """The clause tail alone, for the two renderers that both end with one. `()` renders nothing."""
+    return "".join(f"{SEP}{label} {value}" for label, value in clauses)
+
+
+def render_scope_row(target: str, clauses) -> str:
+    return f"- {SCOPE_VERB}{SEP}{target}{render_clauses(clauses)}"
 
 
 def render_status_row(verb: str, target: str, why: str, value: str = "") -> str:
@@ -1142,6 +1725,13 @@ def _resolve_anchor_at():
 
 _G = build_grammar(("EXMP", "OTHR"))
 
+#: TOOL-dDerivedDocket-15 — what a POST-CUTOFF fixture ask now owes. V14 grades every ask filed on
+#: or after the declared cutoff, so a fixture written to stage ONE verdict must carry an acceptance
+#: or it stages two and no arm below can tell which one it was reading. Added to the fixtures whose
+#: arms assert an exact verdict-code set, and to no other: the arms that read the fold alone are
+#: the control saying the tail changes no status.
+_CLAUSE_OK = (("accept", "the fixture ask says what done looks like"),)
+
 
 def _build_spec(spec_id, status, closes=(), advances=()):
     return Spec(spec_id, f"spec/{spec_id}.md", status, tuple(closes), tuple(advances))
@@ -1311,7 +1901,7 @@ def run_arms(report: bool = True) -> list:
         fold, _c = _read_fold([_parse_fixture("aFoo", asks=asks, rows=rows)], specs)
         return f"{fold.statuses[want]} by {fold.decided[want]!r}"
 
-    one = [render_ask_row("EXMP-aFoo-1", "2026-02-01", "x")]
+    one = [render_ask_row("EXMP-aFoo-1", "2026-02-01", "x", clauses=_CLAUSE_OK)]
     arm("R1 CLOSED names its closing spec", "CLOSED by 'EXMP-aFoo-7'",
         lambda: read_rule(one, [], [_build_spec("EXMP-aFoo-7", "CLOSED", closes=["EXMP-aFoo-1"])]))
     arm("R2 WONTDO names the declining file's slug", "WONTDO by 'aFoo'",
@@ -1484,7 +2074,7 @@ def run_arms(report: bool = True) -> list:
         lambda: read_legacy("- TOOL-aOld-1" + SEP + "MAYBE" + SEP + "x"))
 
     # ---- AC10: each verdict staged into an otherwise clean fixture, and the clean control.
-    clean_ask = render_ask_row("EXMP-aFoo-1", "2026-02-01", "x")
+    clean_ask = render_ask_row("EXMP-aFoo-1", "2026-02-01", "x", clauses=_CLAUSE_OK)
     clean = [_parse_fixture("aFoo", asks=[clean_ask],
                             rows=[render_sev_row("EXMP-aFoo-1", "LOW", "w")])]
     arm("the clean fixture reports NO verdict", "[]", lambda: str(_read_codes(clean)))
@@ -1529,13 +2119,13 @@ def run_arms(report: bool = True) -> list:
                   render_status_row("CLOSED", "EXMP-aFoo-1", "w", "abc1234")])])))
     arm("V9 — a post-cutoff ask whose id is a spec H1 without the `unit` marker", "[9]",
         lambda: str(_read_codes([_parse_fixture(
-            "aFoo", asks=[render_ask_row("EXMP-aFoo-1", "2026-06-01", "x")],
+            "aFoo", asks=[render_ask_row("EXMP-aFoo-1", "2026-06-01", "x", clauses=_CLAUSE_OK)],
             rows=[render_sev_row("EXMP-aFoo-1", "LOW", "w")])],
             [_build_spec("EXMP-aFoo-1", "SPECCED")])))
     arm("V9 names the ask's file AND the spec's", "and a spec H1 carries the same id at "
                                                   "spec/EXMP-aFoo-1.md",
         lambda: str([v.text for v in derive_verdicts(build_corpus([_parse_fixture(
-            "aFoo", asks=[render_ask_row("EXMP-aFoo-1", "2026-06-01", "x")],
+            "aFoo", asks=[render_ask_row("EXMP-aFoo-1", "2026-06-01", "x", clauses=_CLAUSE_OK)],
             rows=[render_sev_row("EXMP-aFoo-1", "LOW", "w")])],
             {"EXMP-aFoo-1": _build_spec("EXMP-aFoo-1", "SPECCED")}), _CLEAN_CONF)
             if v.code == 9][0]))
@@ -1557,7 +2147,7 @@ def run_arms(report: bool = True) -> list:
                   render_status_row("REOPEN", "EXMP-aFoo-1", "w", "abc1234")])])))
     arm("V12 — a post-cutoff ask with no SEV row anywhere", "[12]",
         lambda: str(_read_codes([_parse_fixture(
-            "aFoo", asks=[render_ask_row("EXMP-aFoo-1", "2026-06-01", "x")])])))
+            "aFoo", asks=[render_ask_row("EXMP-aFoo-1", "2026-06-01", "x", clauses=_CLAUSE_OK)])])))
     arm("V15 — a blank cutoff under `builds`", "[15]",
         lambda: str(_read_codes(clean, conf=read_conf({MODE_KEY: "builds", CUTOFF_KEY: ""}))))
     arm("V16 — an unpadded cutoff under `builds`", "[16]",
