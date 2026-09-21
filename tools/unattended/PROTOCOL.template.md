@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.24 -->
+<!-- gov:kit unattended@1.26 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -265,6 +265,14 @@ check grading them passes by finding nothing. Crossing the cap mid-flight reds t
 blocks `--close`, which leaves the override as the only exit: the spill exists so that never
 happens.
 
+**The run log is not this file, and nothing reads it back.** Every driver call but `--version` and
+`--plan` appends a START line and, from an EXIT trap, an END line to `runlog/driver.log` in the git
+COMMON dir: the driver's own exit code, `exit=clean` or `exit=unclean`, the refused checks and the
+phase after the verb. It is machine-local EVIDENCE as facts 5-7 are: no verb or gate branches on
+it, and a failed append prints one stderr line. `GOV_RUNLOG=0` turns it off, and
+`RUNLOG_SESSION_VARS` (§8) names the session. The committed record of a run is rendered from it by
+the Skill, never by a verb.
+
 ## 3. The phase vocabulary
 
 Kit-owned core, in run order:
@@ -340,7 +348,7 @@ something no machine could have checked:
 | `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures TWO things and neither is a judgement about the review's content: that a review of what shipped exists and is bound to THIS run, and that the run's own `--review` loop for the build slug reached a declared exit, with `CONVERGED` implying zero blockers. A review record is a document; a loop that never ended is a run that stopped reviewing, and only the second is readable |
 | `pieces-complete` | machine | this run produced the number of pieces its build README asked for at the pinned BASE, each joined to a record by content hash and each recording a PASS for every declared per-piece leg. SCOPED to recipe-mode runs: term zero meets it and announces the skip for any other mode, because `--close` evaluates this set for every run and an item only one mode can satisfy would block the rest of the fleet |
 | `set-checks-recorded` | machine | every set-scoped check the playbook declares recorded a PASS for THIS run's set. It reads the VERDICT and not merely its existence — a set check is a declared leg with a binary anchored verdict, unlike the prose review `closing-review-recorded` can only assert the existence of. Same mode scoping |
-| `specs-audited` | machine | every unit the generated region carries as CLOSED is named by a TRACKED record under this build whose first twelve unfenced lines carry a `**Serves:**` line of kind `spec-audit`. The id join is WHOLE-TOKEN and expands the `N..M` range the binding grammar admits: a substring join lets `TOOL-x-19` satisfy `TOOL-x-1`, and an unexpanded one blocks a unit that WAS audited. It measures that the pre-code pass left evidence; it does not read what the audit found, whether it ran at the unit's current rev, or whether a WONTDO unit was audited — a LOWER bound, safe as a refusal and useless as a certificate |
+| `specs-audited` | machine | OWED ONLY WHEN the build README at BASE declares `spec-audit: <date>`, which `--preflight` pins as the `spec-audit` fact; absent, MET with an announced `not owed` — the pre-code audit is opt-in per build (owner, 2026-09-20). When owed: every CLOSED unit in the generated region is named by a TRACKED record under this build whose first twelve unfenced lines carry a `**Serves:**` line of kind `spec-audit`, the id joined WHOLE-TOKEN with the `N..M` range form expanded. A LOWER bound: that evidence exists, not what it found, at which rev, or whether a WONTDO unit was audited — safe as a refusal, useless as a certificate |
 | `reuse-probed` | machine | a reuse probe actually RAN in this run's tree — the liveness half of `reuse-first`, whose tracked half is whatever the memory kit demands of a spec's reuse section. It reads EVERY declared probe log: `RECALL_CLI`'s query log and `MAP_CLI`'s lookup log, which are the build method's M5 pair, and the count it reports names each half. Five outcomes, three of them MET: the directive was WAIVED, and the item reports the waiver and its reason, which is what stops a waiver being silent; NEITHER CLI is declared or readable, an announced skip, because a core item no adopter without those kits could meet would block every close in their fleet; or rows are recorded, and the per-log counts ride the message. A log counts only where its own CLI is declared, so an undeclared kit's stray log is never mistaken for evidence. UNMET splits the two facts an operator must not confuse: every declared log is ABSENT, so the item cannot answer, versus a log exists and holds nothing for this tree, so the probe was not run. It is NOT a merge-bar leg and cannot be one — these logs live in the git common dir, are neither tracked nor pushed, and a leg reading them in a fresh clone could only report DEAD PROBE. What it does not observe: that the probe was run FOR this build rather than earlier in the same worktree |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one. **The value MAY carry a count** via `--value`, and then `--close` refuses unless it equals the number of `surfaced`-class parked lines — "I surfaced them" becomes "I surfaced N, and the record holds N". Still agent-attested: no machine observes a wrap-up. Omitting the count keeps the old behaviour, so an older record is not retroactively red. The overrides this same `--close` is about to write are excluded, because the DoD is evaluated before they land |
@@ -486,6 +494,7 @@ where this document says it may:
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
+| `RUNLOG_SESSION_VARS` | the environment variable NAMES, space-separated and eight at most, whose values each run-log START records as `sess.<NAME>=` (§2); a value outside `[A-Za-z0-9_.:-]{1,128}` is written empty and flagged. OPTIONAL: blank records none |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.

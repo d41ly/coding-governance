@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-20T13:01:57+03:00 @ 58074d68e63144c50c473eababadcc1ca4a2a606
+last-audit: 2026-09-21T06:23:48+03:00 @ f883bbda8082239860b26fe0e4ea9bd7e13f11ba
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 58074d68e63144c50c473eababadcc1ca4a2a606
+last-body-change: 85d930a90b8d8c917454866b22a9d2e013fa82a7
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -150,8 +150,8 @@ python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints> 
 
 ### Tier rule
 
-Tier 2 (spec + adversarial review before building) for: a change to the governance template's rules,
-the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
+Tier 2 (a spec before building; the spec audit is opt-in, M4) for: a change to the governance template's
+rules, the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
 Tier 1 (gates + one focused self-review).
 
 ### ID + work-state protocol

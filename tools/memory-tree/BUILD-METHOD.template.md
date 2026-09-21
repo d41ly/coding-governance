@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.79 -->
+<!-- gov:kit memory-tree@2.80 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -24,7 +24,7 @@ stated anywhere else in this repo — every generic obligation is POINTED AT via
 and in an M11 carrier is a defect HERE. Drift resolves by deletion, not adjudication.
 
 **The loop.** Decompose and classify the spec set (M2) → ground it with the two probes (M5) → author MISSING,
-thicken THIN, resolve every fork (M2, M3) → review every unreviewed spec (M4) → build in passes, committing and
+thicken THIN, resolve every fork (M2, M3) → audit the set when `spec-audit:` is declared (M4) → build in passes, committing and
 regrounding at each boundary (M6, M7) → review the cumulative diff (M8) → derive the wrap-up (M9). Everything
 before "build in passes" precedes the first line of code, and a reground never re-runs it: re-running re-opens
 closed forks.
@@ -111,33 +111,34 @@ decision the owner did not make. The mark must be the documented SHAPE — the w
 `(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each item: with any
 item present ONLY a conforming mark resolves it, the first line does not vote, and §8 says what that cannot see.
 
-## M4 — The spec audit — review every unreviewed spec before its code
+## M4 — The spec audit — owed only where the build declares it
 
-**Which**, and this is what `specs-reviewed` measures. Every spec with no review record naming it. A spec whose rev moved since its last review — by anything but that review's own fold — or that you
-authored this run, is unreviewed.
+**When**, and `specs-reviewed` is owed only then: the build README's front matter carries `spec-audit: <date>`. Undeclared,
+none is owed, and the tooling says so instead of running one. Recommended, never owed, for two or more specs or an unresolved
+§8 fork. **Which**, once declared: every spec with no review record naming it; a spec whose rev moved since its last review —
+by anything but that review's own fold — or that you authored this run, is unreviewed.
 
-**The harness needs a DECLARED subject.** `tier2-review.js` audits a spec only when the call
-names the spec kind. Undeclared, it acquires a diff and primes code-shaped lenses, so calling
-a spec reviewed by that run is false. The spelling is in that file's own `args` header.
+**The harness needs a DECLARED subject.** `tier2-review.js` audits a spec only when the call names the spec kind,
+spelled in its own `args` header. Undeclared, it acquires a diff and primes code-shaped lenses, so calling a spec
+reviewed by that run is false.
 
 **Run it as a `Workflow` script, not as direct `Agent` spawns.** The direct-spawn budget is keyed per PROMPT TURN
-and an unattended run has no next user prompt to reset it: three specs audited by direct spawns exhaust it mid-set,
-and the remaining lenses are refused with nobody to read the refusal. Agents inside a `Workflow` sidechain are not
-counted against it. Shape: `memory/guides/REVIEW-PROTOCOL.md` — primed lenses → batched skeptics defaulting to
-REFUTE → one synthesis — **under its fan-out and concurrency caps, read there and not repeated here.**
+and an unattended run has no next prompt to reset it: three specs audited directly exhaust it mid-set and the rest
+are refused with nobody reading. Agents inside a `Workflow` sidechain are not counted. Shape and caps:
+`memory/guides/REVIEW-PROTOCOL.md`, **read there and not repeated here.**
 
 **Lenses: 3–5, primed with the mandate, the overview and the spec format.** The catalogue —
 underspecification, contradiction, unstated assumption, prior art — with what each hunts, is in
 `{{KIT_DIR}}/README.md`.
 
 **Record it** under `memory/builds/<slug>/reviews/` per `memory/HYGIENE.md` check 5's filename grammar, opening with
-the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Most existing review records carry no
-verdict line; write it anyway, because M9 derives from these records. **Carry the binding line** check 21 requires —
-`**Serves:** spec-audit <the ids you reviewed>` — which is what makes "every spec with no review record naming it"
-answerable from the tree instead of from memory. Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9
-line), then **STOP**: once a synthesis pass calls the design clean, stop reviewing that spec.
+the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Older records lack the verdict line;
+write it, because M9 derives from it. **Carry the binding line** check 21 requires —
+`**Serves:** spec-audit <the ids you reviewed>` — what makes "unreviewed" answerable from the tree, not memory.
+Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9 line), then **STOP**:
+once a synthesis pass calls the design clean, stop reviewing that spec.
 
-**A BLOCKED verdict has a disposition.** A SPEC subject takes `REVIEW_ROUNDS` rounds (protocol §8) and exits BOUNDED; the DIFF review converges: a round re-arms only on a count STRICTLY SMALLER than the round before, never merely "changed", which 2, 1, 2 satisfies forever. **At the exit every CONFIRMED finding is DISPOSED BY SEVERITY, on CONVERGED too**: a BLOCKER or HIGH is PROMOTED to a unit whose mechanism closes it, audited as a SPEC; a MEDIUM or LOW is FOLDED into its spec as a rev-N bump with a §9 line; never parked, waived, retired or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README's BUILD-LEVEL RULES slot.
+**A BLOCKED verdict has a disposition.** A SPEC subject takes `REVIEW_ROUNDS` rounds (protocol §8) and exits BOUNDED; the DIFF review converges: a round re-arms only on a count STRICTLY SMALLER than the round before, never merely "changed" (2, 1, 2 satisfies that forever). **At the exit every CONFIRMED finding is DISPOSED BY SEVERITY, on CONVERGED too**: a BLOCKER or HIGH is PROMOTED to a unit whose mechanism closes it, audited as a SPEC; a MEDIUM or LOW is FOLDED into its spec as a rev-N bump with a §9 line; never parked, waived, retired or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README's BUILD-LEVEL RULES slot.
 
 **CONVERGED is terminal for its subject, rev bumps included**: a blocker confirmed on it afterwards — in the
 fold text, say — takes the severity rule's disposition and never another round; `--review`
@@ -210,8 +211,8 @@ MUCH. Why clause 3 is worded as it is, and the vacuous form it replaced, is in t
 
 **`passes-harnessed` — the route, and what it does NOT buy.** A build may be driven as ONE program
 rather than as an agent's recollection across a context that compacts:
-`{{TOOL_ROOT}}workflows/unattended-build.js` runs SPEC, AUDIT and DISPOSAL as ordered stages and
-hands out the ordered roster only on a terminal `--review` verdict, and
+`{{TOOL_ROOT}}workflows/unattended-build.js` runs SPEC, then AUDIT and DISPOSAL where `specAudit` is
+declared, and hands out the ordered roster only on a terminal verdict or NOT-OWED, and
 `{{TOOL_ROOT}}workflows/unattended-unit.js` builds ONE unit from its brief and its spec. **What that
 buys is ORDER and not ENFORCEMENT.** Control flow is what makes the audit precede the first line of
 code; nothing in either script refuses a pass. What refuses is `--dispatch` at the moment of the act,
@@ -282,7 +283,7 @@ from, the line does not go in.**
 | item | derived from |
 |---|---|
 | build log and slug | `memory/builds/<slug>/` + generated `memory/LIVE.md` and `memory/ledger/<month>.md` |
-| decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted |
+| decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted + its commits' `Decided:` trailers (M10) |
 | problems resolved | each review record's `## Verdict` line and its blockers/highs (M4, M8) + the bug classes the checklist selected |
 | open / parked | every `surfaced`-class parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver. `history`-class entries — a review round, say — are append-only sequence, carry no question, and are not the owner's to adjudicate |
 | repo state | branch · shas · gate verdict · under a mandate the phase claim and its witness |
@@ -300,8 +301,11 @@ Three deltas, and no others. The contract — mandate, run state, phases, witnes
 - **Nobody reads the transcript**, which is `minimal-prose`. Speak only when it changes what happens
   next: a refusal, an abort, a park, the
   wrap-up. Anything you would have said goes to a file — a park to the run-state file, a decision to the spec, a
-  finding to a review record. **Never ask:** there is nobody to answer, so a question is a stall. The substitutes
-  are derive, ADOPT — `discoveries-adopted`, §11 — park and abort; the protocol's §13 says which one per exit.
+  finding to a review record, any other choice to a `Decided: <the choice> — <why>` line, one per choice, in the
+  commit's FINAL trailer block beside `Co-Authored-By:`, since git reads trailers nowhere else:
+  `Decided: ran two legs, not the bar — the push boundary runs it`. **Never ask:** there is nobody to answer,
+  so a question is a stall. The substitutes are derive, ADOPT — `discoveries-adopted`, §11 — park and abort;
+  the protocol's §13 says which one per exit.
 - **The keepalive is yours on both ends** — the store is in-memory and session-scoped, so no script can reach it.
   Create it FIRST, reap it before the wrap-up. Both halves: protocol §5.
 - **A directive recorded as waived at preflight is relaxed for that run only.** The vocabulary, the waiver act,
