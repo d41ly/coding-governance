@@ -1168,6 +1168,11 @@
       "file": "tools/unattended/stop-guard.js"
     },
     {
+      "id": "checkSpecAuditDeclared",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkStop",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
@@ -2501,6 +2506,11 @@
       "id": "extract",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extractBuildSlug",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "extractCommitTarget",
@@ -3893,6 +3903,11 @@
       "file": "tools/unattended/run-lease.js"
     },
     {
+      "id": "readFrontMatterKey",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "readHeadRef",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -4629,6 +4644,11 @@
     },
     {
       "id": "renderCodeView",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderDeny",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },

@@ -18,7 +18,7 @@
 # WHAT THIS DOES NOT CHECK, stated in the header because a structural check reads as a semantic one to
 # everybody who did not write it:
 #   - whether the spec was GOOD, whether it was reviewed, or whether the code followed it.
-#     `specs-audited` measures that a pre-code audit left evidence; this measures ORDER and nothing else.
+#     `specs-audited` measures that a pre-code audit left evidence, when the build declared one; this measures ORDER and nothing else.
 #   - whether a build pass was DISPATCHED. That is a different join over the same range.
 #   - anything about a unit that is not CLOSED. An OPEN unit legitimately has no build commit yet, so
 #     grading one would red mid-build on every run including the one that must land it.

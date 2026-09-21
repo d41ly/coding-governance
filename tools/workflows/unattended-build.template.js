@@ -2,10 +2,10 @@ export const meta = {
   name: 'unattended-build',
   version: '1.2', // gov:kit unattended-build@1.2 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
-    'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal.',
+    'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
     { title: 'Spec', detail: 'author every missing spec, in the declared order, no code' },
-    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit; record the round, after the disposal at zero blockers so the disposition field is what was promoted' },
+    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
     { title: 'Disposal', detail: 'dispose every confirmed and unverified finding by severity over the whole spec set, then hand out the roster, withheld on a clean round until its spec-audit record exists' },
   ],
 }
@@ -19,6 +19,12 @@ export const meta = {
 // JS control flow, not a rule anybody remembers, and it is the whole mechanism: a unit cannot be
 // dispatched before it is specced inside a harnessed run. It is the defect the owner's prompt reports — "build can run
 // BEFORE they are specced with spec written postfactum" — and the one this file closes.
+// THE AUDIT STAGE IS OPT-IN (TOOL-aBlindedTrial-3). It runs only when `args.specAudit` carries the
+// `spec-audit: <date>` override the driver's preflight read off the build README; absent, the stage
+// logs OFF by declaration, awaits nothing, and the hand-out follows SPEC. The owner's ruling of
+// 2026-09-20 is "forbidden unless overridden", so a default that audited when nobody asked would be
+// the behaviour being retired — and a runtime with no filesystem cannot read the README itself, so
+// the fact arrives as an argument like `runStateExists` does.
 //
 // IT CANNOT BUY ENFORCEMENT. A Workflow script has NO FILESYSTEM. Every observation it makes is a
 // claim its own agent returned, so nothing here can verify that a spec exists, that a gate passed, or
@@ -144,6 +150,9 @@ function chunk(a, n) {
 //            planState }],                         //   REQUIRED in attended mode, from --plan
 //   mode: "unattended" | "attended",              // DEFAULTS to "unattended"
 //   runStateExists: <bool>,                         // caller-supplied; this script cannot detect it
+//   specAudit: "<YYYY-MM-DD>",                      // the README front-matter `spec-audit:` override the
+//                                                   //   driver's preflight pinned; ABSENT = the audit is
+//                                                   //   OFF by declaration and the roster follows SPEC
 //   briefDir: "memory/builds/<slug>/prompts",
 //   reviewDir: "memory/builds/<slug>/reviews",
 //   round: <integer>,                               // which audit round this invocation is
@@ -233,10 +242,14 @@ if (!units.length) {
 // agent copying a log line produces — became the invocation round, which keys a FRESH subject on every
 // fold and resets the driver's sequence, so under `REVIEW_ROUNDS` > 1 BOUNDED and NON-CONVERGENT could
 // never fire; a string `auditIds` became the whole set, re-auditing the subject a terminal round closed.
+// `specAudit` joins the table (TOOL-aBlindedTrial-3): a truthy non-string — `true`, `1`, the
+// `"later"` a README typo produces — must refuse rather than switch the audit ON, and a string that is
+// not a date is the same class; the driver refuses the same shape at preflight.
 const TYPED = [
   ['round', Number.isInteger(a.round) && a.round > 0, 'a positive integer'],
   ['subjectRound', Number.isInteger(a.subjectRound) && a.subjectRound > 0, 'a positive integer'],
   ['auditIds', Array.isArray(a.auditIds), 'an array of unit ids'],
+  ['specAudit', typeof a.specAudit === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.specAudit), 'a YYYY-MM-DD date string'],
 ]
 for (const t of TYPED) {
   if (a[t[0]] !== undefined && !t[1]) {
@@ -251,6 +264,24 @@ const roundNo = a.round === undefined ? 1 : a.round
 const subjectRound = a.subjectRound === undefined ? roundNo : a.subjectRound
 const subject = slug + '-spec-set-r' + subjectRound
 const auditIds = a.auditIds === undefined ? [] : a.auditIds
+// THE AUDIT IS OPT-IN, and absent means OFF (TOOL-aBlindedTrial-3, F1 resolved). Every audit-shaped
+// argument beside no declaration is an IMPOSSIBLE PAIRING, refused by name like the others below: a
+// caller-pinned subject set, a post-disposal scope and a fold re-invoke each presuppose a round that,
+// with the audit off, never ran — so the shape is a re-invoke of an audit that did not happen, and a
+// runtime that cannot read the README cannot tell which half the caller meant. `round > 1` is the
+// fourth such argument (closing review of units 2–5, F6): the only paths that tell a caller to pass
+// it are audit re-invokes, so beside no declaration it names a round that never happened.
+const specAudit = a.specAudit !== undefined
+const auditShaped = ['subjects', 'auditIds', 'subjectRound'].filter(function (k) { return a[k] !== undefined })
+if (a.round !== undefined && a.round > 1) auditShaped.push('round')
+if (!specAudit && auditShaped.length) {
+  throw new Error(
+    'unattended-build: `' + auditShaped.join('` and `') + '` is present beside no `specAudit`. Those ' +
+      'arguments exist only for an audit round, and with the audit OFF by declaration none ran, so ' +
+      'this is a re-invoke of an audit that never happened. Drop them, or pass the build README\'s ' +
+      '`spec-audit: <date>` value as `specAudit` — the driver\'s preflight line names which the build declared.',
+  )
+}
 if (subjectRound > roundNo) {
   throw new Error(
     'unattended-build: `subjectRound` ' + subjectRound + ' is above `round` ' + roundNo + '. A subject ' +
@@ -604,6 +635,16 @@ if (specRefused.length) log('spec stage: ' + specRefused.length + ' unit(s) REFU
 // a degraded run is decided below on the callee's own `lensesDead` and `unverified` fields, never
 // by reading the null as 0.
 phase('Audit')
+// THE STAGE IS OPT-IN, AND OFF IS LOUD (TOOL-aBlindedTrial-3). The phase still opens, because a phase
+// that silently vanished would be indistinguishable from a harness that forgot it; what it does with
+// the audit off is announce that, once, and then every `specAudit &&` guard below keeps the resolver,
+// the sub-workflow, the adapter's refusals, the round record and the disposal agent from running. The
+// counts they would have produced are stated NULLS on the return, never zeros: nothing was counted.
+if (!specAudit) {
+  log('audit stage: OFF by declaration — no spec-audit: key on the build README (TOOL-aBlindedTrial-6); ' +
+    'the roster is handed out on SPEC completion. No sub-workflow is awaited, no round is recorded, and ' +
+    'the verdict below reads NOT-OWED rather than a clean bill nothing earned.')
+}
 // ============================ TOOL-dRatifiedSeam-1 S1 — THE SPAWN MOVED TO WHERE THE TOOL IS ====
 // WHAT WAS WRONG. This stage used to spawn an AGENT whose prompt said: run the shipped harness as
 // a Workflow, with `scriptPath: {{KIT_DIR}}/tier2-review.js`. That agent is a SIDECHAIN agent,
@@ -656,7 +697,7 @@ let subjects = Array.isArray(a.subjects) ? a.subjects : null
 const auditUnits = auditIds.length
   ? ordered.filter(function (u) { return auditIds.indexOf(u.id) !== -1 })
   : ordered
-if (!subjects) {
+if (specAudit && !subjects) {
   // LOGGED HERE, where the scoping is APPLIED, and not beside the filter above: the line used to fire
   // on `auditIds.length` alone and asserted a scoping a supplied `subjects` had bypassed. The pair is
   // refused at the args block now, so this branch is the only one `auditIds` can reach.
@@ -702,14 +743,14 @@ if (!subjects) {
 // REFUSED HERE RATHER THAN DOWNSTREAM. `tier2-review.js` would refuse an empty set too, but its
 // message is about its own arguments; this one can say which stage failed to produce them, which is
 // the difference between a diagnosable refusal and a puzzling one.
-if (!subjects.length) {
+if (specAudit && !subjects.length) {
   throw new Error(
     'unattended-build: no spec subjects could be pinned at round ' + roundNo + '. A spec-audit over ' +
       'an empty subject set would grade nothing and report it as a clean round, which is the exact ' +
       'shape this stage exists to prevent.',
   )
 }
-const badSubject = subjects.findIndex(function (s) {
+const badSubject = !specAudit ? -1 : subjects.findIndex(function (s) {
   return !s || typeof s.path !== 'string' || !s.path || !/^[0-9a-f]{7,40}$/.test(String(s.blob || ''))
 })
 if (badSubject !== -1) {
@@ -720,7 +761,10 @@ if (badSubject !== -1) {
   )
 }
 
-const auRaw = await workflow(
+// `null` WITH THE AUDIT OFF, and null is the right word: the adapter below reads `auRaw` as the callee's
+// return, and the callee was never called. Every check it runs is guarded on `specAudit`, so a null
+// here is never mistaken for the dead sub-workflow the first guard refuses.
+const auRaw = !specAudit ? null : await workflow(
   { scriptPath: '{{KIT_DIR}}/tier2-review.js' },
   {
     kind: 'spec-audit',
@@ -755,8 +799,8 @@ const auRaw = await workflow(
 // AN EMPTY OBJECT IS 'NOTHING', TOO. A dead sub-workflow yields `{}`, which is an object, so a
 // bare type test let it through to the blocker check and the operator got a message about an
 // integer when the real fact was that the stage produced nothing at all.
-if (!auRaw || typeof auRaw !== 'object' ||
-    (!Object.prototype.hasOwnProperty.call(auRaw, 'blockers') && !auRaw.report)) {
+if (specAudit && (!auRaw || typeof auRaw !== 'object' ||
+    (!Object.prototype.hasOwnProperty.call(auRaw, 'blockers') && !auRaw.report))) {
   throw new Error(
     'unattended-build: the AUDIT sub-workflow returned nothing at round ' + roundNo + '. That is a ' +
       'refusal and not a convergence: an absent verdict must never read as CONVERGED, because that ' +
@@ -772,7 +816,10 @@ if (!auRaw || typeof auRaw !== 'object' ||
 // used to halt it as "a DEGRADED run". `unverified` is absent on the zero-findings path, because no
 // verify phase ran to leave one, and `0` on the all-refuted path; both are read, and nothing else
 // is. A dead lens beside the same pairing is the one degraded shape, and it keeps the throw below.
-const cleanRound = Array.isArray(auRaw.confirmed) && auRaw.confirmed.length === 0 &&
+// AND A CLEAN ROUND NEEDS AN AUDIT TO HAVE RUN. With the audit off there is no callee return to read,
+// and `false` here is what keeps the OFF path off the clean-round log, the record-at-0 and the
+// withheld hand-out below: an audit that did not run is not a clean one.
+const cleanRound = specAudit && Array.isArray(auRaw.confirmed) && auRaw.confirmed.length === 0 &&
   auRaw.blockers === null && auRaw.lensesDead === 0 &&
   (auRaw.unverified === 0 || auRaw.unverified === undefined)
 if (cleanRound) {
@@ -783,7 +830,7 @@ if (cleanRound) {
 // by design — null, never 0, so a stated absence cannot be read as a clean bill. Reading a null as
 // 0 would make every degraded audit look clean, since 0 is the only count that converges. The throw
 // names the lens and skeptic deaths the callee counted, so the operator reads WHY and not only THAT.
-if (!cleanRound && !Number.isInteger(auRaw.blockers)) {
+if (specAudit && !cleanRound && !Number.isInteger(auRaw.blockers)) {
   throw new Error(
     'unattended-build: the AUDIT sub-workflow returned a non-integer blocker count (' +
       JSON.stringify(auRaw.blockers) + ') at round ' + roundNo + ' — lensesDead ' +
@@ -801,7 +848,7 @@ if (!cleanRound && !Number.isInteger(auRaw.blockers)) {
 // missing would skip the stage on every round — the false-clean shape this file refuses by name
 // three times over. One refusal for four conditions, because they have one remedy: the return
 // cannot be read as the contract it declares.
-if (!cleanRound && (!Number.isInteger(auRaw.confirmed) || !Number.isInteger(auRaw.highs) ||
+if (specAudit && !cleanRound && (!Number.isInteger(auRaw.confirmed) || !Number.isInteger(auRaw.highs) ||
     !Number.isInteger(auRaw.unverified) || auRaw.blockers + auRaw.highs > auRaw.confirmed)) {
   throw new Error(
     'unattended-build: the AUDIT sub-workflow returned confirmed ' + JSON.stringify(auRaw.confirmed) +
@@ -812,21 +859,23 @@ if (!cleanRound && (!Number.isInteger(auRaw.confirmed) || !Number.isInteger(auRa
       'cannot be read is a DEGRADED run and is never rounded to zero.',
   )
 }
-const lastReport = auRaw.report || ''
+const lastReport = specAudit ? (auRaw.report || '') : ''
 // `report`, NOT `reportPath` — the second name was mine and matched nothing, so `lastReport` was
 // always '' and every disposal instruction named an empty path. A CLEAN round has none to name and
 // nothing to fold from, so it is the one shape that passes here with an empty path.
-if (!lastReport && !cleanRound) {
+if (specAudit && !lastReport && !cleanRound) {
   throw new Error(
     'unattended-build: the AUDIT sub-workflow returned no report path at round ' + roundNo +
       '. The fold instruction the caller receives would name nothing to fold from.',
   )
 }
-// ONE SHAPE PAST THIS LINE. The clean round is folded into the integers every later line reads.
-const auBlockers = cleanRound ? 0 : auRaw.blockers
-const auConfirmed = cleanRound ? 0 : auRaw.confirmed
-const auHighs = cleanRound ? 0 : auRaw.highs
-const auUnverified = cleanRound ? 0 : auRaw.unverified
+// ONE SHAPE PAST THIS LINE. The clean round is folded into the integers every later line reads — and
+// the OFF path into NULLS, by this file's own rule three paragraphs up: a count nobody produced is a
+// stated absence, never a zero, because 0 is the one value that reads as a clean bill.
+const auBlockers = !specAudit ? null : cleanRound ? 0 : auRaw.blockers
+const auConfirmed = !specAudit ? null : cleanRound ? 0 : auRaw.confirmed
+const auHighs = !specAudit ? null : cleanRound ? 0 : auRaw.highs
+const auUnverified = !specAudit ? null : cleanRound ? 0 : auRaw.unverified
 
 // THE ROUND IS RECORDED BY THE DRIVER, and the driver's answer is the verdict. An agent runs it
 // because a workflow script has no shell; what the agent may NOT do is invent the token, so it is
@@ -931,11 +980,21 @@ const au = { blockers: auBlockers, confirmed: auConfirmed, highs: auHighs, unver
 // OUTSTANDING is the callee's word and covers two populations (see the DISPOSAL stage). It decides
 // the ORDER here: zero blockers with something to dispose records AFTER the disposal; every other
 // shape records first, because at a positive count only the driver knows whether the loop ended.
-const outstanding = au.confirmed + au.unverified
+const outstanding = specAudit ? au.confirmed + au.unverified : 0
 const disposeFirst = au.blockers === 0 && outstanding > 0
-const verdict = disposeFirst ? 'CONVERGED' : await writeRound('')
-log('audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers + ' · unverified ' + au.unverified +
-  (disposeFirst ? ' — the driver records this exit AFTER the disposal, so its disposition field is what was promoted' : ''))
+// `NOT-OWED` IS THE OFF PATH'S VERDICT, and it is deliberately NOT in `REVIEW_TOKENS`: the driver
+// never prints it, because no round was recorded for it to grade. It is a harness word for "no audit
+// was declared", distinct from every terminal token so nothing downstream can read it as CONVERGED.
+const verdict = !specAudit ? 'NOT-OWED' : disposeFirst ? 'CONVERGED' : await writeRound('')
+log(!specAudit
+  ? 'audit round ' + roundNo + ': NOT-OWED — off by declaration, so no round was recorded and no count exists'
+  : 'audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers + ' · unverified ' + au.unverified +
+    (disposeFirst ? ' — the driver records this exit AFTER the disposal, so its disposition field is what was promoted' : ''))
+// THE AUDIT OBJECT EVERY NON-THROWING RETURN CARRIES (TOOL-aBlindedTrial-3). `ran` is the fact the
+// top-level `verdict` and `blockers` used to leave implicit, and it is what a caller reads to tell a
+// declared audit from an undeclared one; the counts beside it are the callee's integers, or the
+// stated nulls of an audit that never ran. One object, built once, placed on every return.
+const audit = { ran: specAudit, verdict: verdict, blockers: au.blockers, highs: au.highs, unverified: au.unverified }
 
 // THE GATE. `CONVERGING` means the review loop has not ended, so the ROSTER IS EMPTY and this
 // returns to the caller with what it needs to fold and come back. Every terminal state admits the
@@ -956,6 +1015,7 @@ if (verdict === 'CONVERGING') {
     specced: speccedCount,
     specRefused: specRefused,
     verdict: verdict,
+    audit: audit,
     blockers: au.blockers,
     unverified: au.unverified,
     lastReport: lastReport,
@@ -1011,7 +1071,11 @@ phase('Disposal')
 // is the hoist's third rider: the units the promotions became, which the caller passes back as
 // `auditIds` so the next invocation audits them before anything builds them.
 let stood = [], promoted = 0, folded = 0, refuted = 0, promotedIds = []
-if (outstanding === 0) {
+// TWO SKIPS, TWO REASONS, said apart: "confirmed no finding" is a fact about a round that ran, and
+// saying it over a round that did not would be the audit-that-never-ran reading as a clean one.
+if (!specAudit) {
+  log('disposal: skipped — the spec audit is OFF by declaration, so nothing was audited to dispose')
+} else if (outstanding === 0) {
   log('disposal: skipped — round ' + roundNo + ' confirmed no finding and left none unverified, so nothing stands to dispose')
 } else {
   log('disposal: ' + au.confirmed + ' confirmed and ' + au.unverified + ' unverified finding(s) stand at a ' +
@@ -1121,7 +1185,7 @@ if (outstanding === 0) {
     log('disposal: NOT done — ' + why)
     return {
       slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
-      specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
+      specced: speccedCount, specRefused: specRefused, verdict: verdict, audit: audit, blockers: au.blockers,
       unverified: au.unverified,
       lastReport: lastReport, skippedTerminal: [],
       roster: [],
@@ -1235,7 +1299,7 @@ if (attended && !buildUnits.length) {
   log('attended mode: every unit is already terminal — nothing to build')
   return {
     slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
-    specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
+    specced: speccedCount, specRefused: specRefused, verdict: verdict, audit: audit, blockers: au.blockers,
     unverified: au.unverified,
     lastReport: lastReport, skippedTerminal: skippedDone, roster: [],
     // POST-DISPOSAL, so `stood` is in scope and the key belongs here for the same reason it belongs
@@ -1278,6 +1342,7 @@ const handOut = {
   specced: speccedCount,
   specRefused: specRefused,
   verdict: verdict,
+  audit: audit,
   blockers: au.blockers,
   unverified: au.unverified,
   lastReport: lastReport,
@@ -1332,20 +1397,26 @@ const handOut = {
   // exit whenever a blocker is confirmed at round 1 under the kit default, and labelling it DEGRADED
   // made a by-design exit unreadable from a dead writer. NON-CONVERGENT and CEILING stay: the
   // driver's own CEILING line calls it a defect.
+  // NOT-OWED IS NOT A DEGRADATION EITHER (TOOL-aBlindedTrial-3), and it is not clean: the audit was
+  // declared off, so the note says that in its own clause rather than either grading it. Without the
+  // exemption every undeclared run read DEGRADED; without the clause it read like one that reviewed.
   note:
-    (specRefused.length || (verdict !== 'CONVERGED' && verdict !== 'BOUNDED')
+    (specRefused.length || (verdict !== 'CONVERGED' && verdict !== 'BOUNDED' && verdict !== 'NOT-OWED')
       ? 'DEGRADED — ' + specRefused.length + ' spec(s) refused, verdict ' + verdict +
         (attended ? ' · ATTENDED, so no driver-side check ran' : '') + ' · '
       : attended
         ? 'ATTENDED mode — stage order held, and none of the five driver-side records or refusals ' +
           'ran; this is NOT the guarantee an unattended run gives · '
         : '') +
+    (specAudit ? '' : 'spec audit OFF by declaration — NOT-OWED, no round reviewed or recorded · ') +
     'prologue complete; ' + buildUnits.length + ' unit(s) to dispatch',
 }
 // A CLEAN ROUND LEAVES NO RECORD, AND THE ROSTER IS WITHHELD UNTIL ONE EXISTS (closing review round
 // 2, cluster D). `tier2-review.js` returns `report: null` on both clean paths — zero findings, every
 // finding refuted — and writes the `**Serves:** spec-audit` binding line only in the synthesis pass
-// those paths skip. `specs-audited` is a machine DoD term at `--close`: it joins every CLOSED unit id
+// those paths skip. `specs-audited` is a machine DoD term at `--close` WHEN THE BUILD DECLARED THE
+// AUDIT (opt-in since TOOL-aBlindedTrial-3; `cleanRound` is false with it off, so this block is never
+// entered then): it joins every CLOSED unit id
 // against a tracked record carrying that line, and with none at all refuses the whole build. So the
 // cleanest audit there is used to build every unit and then could not close, with nothing to point
 // the override at. This runtime cannot write the record — it has no filesystem — and cannot see

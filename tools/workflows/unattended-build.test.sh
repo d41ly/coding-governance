@@ -98,7 +98,7 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
   ' "${3:-$F}" "$1" "$2" 2>&1
 }
 
-UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
+UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
 SPEC_OK='{"authored":["A-tB-1"],"alreadyPresent":["A-tB-2","A-tB-3"],"refused":[],"summary":"ok"}'
 # TOOL-aHoistedPass-6 - the BUILD double is gone with the stage. What a terminal verdict now
 # reaches is the DISPOSAL stage, and past it the roster hand-out, which is a return rather than an
@@ -318,7 +318,7 @@ has  "default mode: the return names the child the caller dispatches" "$o" '"scr
 has  "default mode: hands out a roster" "$o" '"roster":[{'
 
 # ---- AC1: attended mode reaches BUILD and spawns NO recorder agent.
-A_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"READY"}]}'
+A_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"READY"}]}'
 o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 has   "attended: hands out a roster" "$o" '"roster":[{'
 hasnt_ "attended: no round is recorded through the driver" "$o" "agent:audit:record"
@@ -357,7 +357,7 @@ has  "attended, null blockers: names the degraded return" "$o" "DEGRADED"
 # ---- AC4: a FORKED unit refuses, and the message names both the id and the state. The bare token is
 # ---- supplied directly: --plan rewrites a terminal unit's grade to `DONE (FORKED)`, so a bare FORKED
 # ---- and a real closed build's roster are jointly unsatisfiable.
-F_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"FORKED"}]}'
+F_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"FORKED"}]}'
 o=$(run_wf "$F_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"}}')
 has  "attended, FORKED unit: refuses" "$o" "THROW"
 has  "attended, FORKED unit: names the id" "$o" "A-tB-1"
@@ -366,7 +366,7 @@ has  "attended, FORKED unit: names the state" "$o" "FORKED"
 # ---- AC11: the terminal-unit SKIP, with the vocabulary --plan actually emits. `DONE (FORKED)` is
 # ---- what a closed build reports for a unit whose underlying grade was not READY, and a five-token
 # ---- allow-list halts on it — round-1's halt-at-unit-one, for the third time.
-D_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE (FORKED)"},{"id":"A-tB-2","order":2,"specPath":"s2","planState":"READY"}]}'
+D_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE (FORKED)"},{"id":"A-tB-2","order":2,"specPath":"s2","planState":"READY"}]}'
 o=$(run_wf "$D_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"}}')
 has  "attended, DONE (FORKED): SKIPPED, not refused" "$o" "SKIPPING 1 terminal unit"
 has  "attended, terminal units: still hands out a roster" "$o" '"roster":[{'
@@ -383,14 +383,14 @@ has   "AC25: the skipped unit is still reported in skippedTerminal" "$o" '"skipp
 
 # ---- AC13: a state outside every arm refuses BY NAME. Neither building nor skipping an unknown state
 # ---- is safe, and this vocabulary has been mis-transcribed twice already.
-X_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"WOBBLE"}]}'
+X_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"WOBBLE"}]}'
 o=$(run_wf "$X_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"}}')
 has  "attended, unknown state: refuses" "$o" "THROW"
 has  "attended, unknown state: names the value it did not recognise" "$o" "WOBBLE"
 
 # ---- AC12: a missing planState refuses rather than defaulting. A defaulted state puts the refusal
 # ---- predicate to work on a value nobody supplied.
-M_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1"}]}'
+M_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1"}]}'
 o=$(run_wf "$M_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"}}')
 has  "attended, no planState: refuses" "$o" "THROW"
 has  "attended, no planState: names the field" "$o" "planState"
@@ -398,7 +398,7 @@ has  "attended, no planState: names the field" "$o" "planState"
 # ---- AC14: the FRESH-BUILD path. A unit stage 1 authors reports MISSING at entry — there is no point
 # ---- between the stages at which a caller could re-run --plan — so the entry-time value is stale by
 # ---- construction and the stage must not refuse the build it just specced.
-N_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"MISSING"}]}'
+N_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"MISSING"}]}'
 o=$(run_wf "$N_UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"}}')
 has  "attended, unit AUTHORED this invocation: rostered despite entry-time MISSING" "$o" '"roster":[{'
 # and the control: the same MISSING state, NOT specced by stage 1, must still refuse.
@@ -420,7 +420,7 @@ has  "bad mode: names the closed set" "$o" "unattended, attended"
 # ---- S7: the warning depends on a CALLER-SUPPLIED fact, because this script has no filesystem. A
 # ---- caller that supplies nothing gets no warning, which is a hole the header names rather than one
 # ---- a reader has to infer.
-W_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","runStateExists":true,"subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"READY"}]}'
+W_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","mode":"attended","runStateExists":true,"subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"READY"}]}'
 o=$(run_wf "$W_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"}}')
 has  "attended + run-state file: WARNS" "$o" "WARNING: attended mode was requested"
 has  "attended + run-state file: names the slug" "$o" "tB"
@@ -449,7 +449,7 @@ has "header: says the S7 warning is caller-supplied, not detected" "$HDR" "DEPEN
 
 # ---- AC1: three slices at a cap of five chunk to groups of ONE, so three writers spawn and the
 # ---- total never exceeds the cap.
-S3='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+S3='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
   {"id":"A-tB-1","order":1,"specPath":"s1","specBriefPath":"bf1"},
   {"id":"A-tB-2","order":2,"specPath":"s2","specBriefPath":"bf2"},
   {"id":"A-tB-3","order":3,"specPath":"s3","specBriefPath":"bf3"}]}'
@@ -468,7 +468,7 @@ hasnt_ "brief: writer 0 is NOT handed a third group's brief" "$o0" "bf3"
 # ---- writer legitimately holds MORE THAN ONE slice. AC1's three-slice case never leaves the regime
 # ---- where "one writer per slice" and "one writer per group" agree, so without this arm the shape
 # ---- that actually runs at the build sizes motivating the unit is untested.
-S7='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+S7='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
   {"id":"A-tB-1","order":1,"specPath":"s1"},{"id":"A-tB-2","order":2,"specPath":"s2"},
   {"id":"A-tB-3","order":3,"specPath":"s3"},{"id":"A-tB-4","order":4,"specPath":"s4"},
   {"id":"A-tB-5","order":5,"specPath":"s5"},{"id":"A-tB-6","order":6,"specPath":"s6"},
@@ -705,7 +705,7 @@ has "AC5b dead disposal stage: it says the stage returned nothing" "$o" "returne
 # ---- `roster.length` would have read a property of `undefined` and thrown.
 o=$(run_wf "$UNITS" "$(returns CONVERGING 3)")
 has "AC6 the CONVERGING exit carries an empty roster" "$o" '"roster":[]'
-T_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE"}]}'
+T_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE"}]}'
 o=$(run_wf "$T_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"}}')
 has "AC6 the attended every-unit-terminal exit carries an empty roster" "$o" '"roster":[]'
 has "R2F1 the attended every-unit-terminal exit says what stood" "$o" '"standing":'
@@ -1095,6 +1095,88 @@ has    "R2-G a string auditIds is REFUSED" "$o" '`auditIds` must be an array of 
 o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":"2",#')" "$(returns CONVERGED 0)")
 has    "R2-G a string round is REFUSED too — the same class, one guard" "$o" '`round` must be a positive integer when present, got "2"'
 hasnt_ "R2-G ...before any agent is spawned" "$o" "agent:"
+
+# ==================================== TOOL-aBlindedTrial-3 — THE SPEC AUDIT IS OPT-IN
+# The AUDIT stage runs only when `specAudit` is declared. Absent, the stage announces itself OFF by
+# declaration, awaits no sub-workflow, spawns no resolver and no disposal agent, and hands the roster
+# out on SPEC completion with a verdict that says NOT-OWED — never a zero it did not count and never a
+# clean bill. `UNITS` carries the key, so every arm above stays on the ON branch; the OFF fixture is
+# `UNITS` minus the key AND minus `subjects`, because a caller-pinned subject set beside no audit is
+# the re-invoke pairing AC5 refuses. Every OFF arm was observed RED against the pre-edit render.
+OFF_UNITS=$(printf '%s' "$UNITS" | sed 's#"specAudit":"2026-09-20",##; s#"subjects":\[[^]]*\],##')
+# ---- AC2: no `workflow` double at all, so a harness that still awaits the sub-workflow gets `{}`
+# ---- back and throws; the OFF harness never asks. A RESOLVER double IS supplied, on purpose: without
+# ---- one the pre-edit harness threw at the resolver before it could await the sub-workflow, and the
+# ---- `workflow:` absence arm passed over a harness that had not been reached — the vacuous pass,
+# ---- observed here. With subjects on offer, the pre-edit harness awaits and the arm reds.
+o=$(run_wf "$OFF_UNITS" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s1","blob":"abc1234"}]}}' "$SPEC_OK")")
+has    "BT3-AC2 OFF: the audit stage announces itself OFF by declaration" "$o" "log:audit stage: OFF by declaration"
+hasnt_ "BT3-AC2 OFF: the sub-workflow is never awaited" "$o" "workflow:"
+hasnt_ "BT3-AC2 OFF: ...and its args are never composed" "$o" "wargs:"
+hasnt_ "BT3-AC2 OFF: no subject resolver is spawned" "$o" "agent:audit:"
+# ---- AC3: the roster follows SPEC completion; DISPOSAL still runs, over nothing, and says why.
+has    "BT3-AC3 OFF: the run completes with a RESULT" "$o" "RESULT"
+has    "BT3-AC3 OFF: the roster is handed out" "$o" '"roster":[{'
+hasnt_ "BT3-AC3 OFF: the roster is not withheld for a spec-audit record" "$o" "HELD AT HAND-OUT"
+has    "BT3-AC3 OFF: the DISPOSAL phase still runs" "$o" "phase:Disposal"
+seq=$(printf '%s\n' "$o" | grep '^phase:' | tr '\n' ' ')
+same   "BT3-AC3 OFF: the stage order is unchanged" "$seq" "phase:Spec phase:Audit phase:Disposal "
+has    "BT3-AC3 OFF: the disposal skip names the real reason" "$o" "disposal: skipped — the spec audit is OFF by declaration"
+hasnt_ "BT3-AC3 OFF: no disposal agent is spawned" "$o" "agent:dispose:"
+# ---- AC4: the return says the audit was NOT OWED, with stated nulls, and the note reads neither
+# ---- DEGRADED nor clean.
+has    "BT3-AC4 OFF: the verdict is NOT-OWED" "$o" '"verdict":"NOT-OWED"'
+has    "BT3-AC4 OFF: the audit object says it did not run" "$o" '"audit":{"ran":false,"verdict":"NOT-OWED","blockers":null,"highs":null,"unverified":null}'
+has    "BT3-AC4 OFF: blockers travel out as a stated null" "$o" '"blockers":null'
+hasnt_ "BT3-AC4 OFF: never a blocker count of zero on a path that reviewed nothing" "$o" '"blockers":0'
+hasnt_ "BT3-AC4 OFF: never a clean round at 0 either" "$o" "a clean round at 0"
+nt=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"note":"//')
+hasnt_ "BT3-AC4 OFF: the note does not read DEGRADED" "$nt" "DEGRADED"
+has    "BT3-AC4 OFF: ...and does not read clean — it says the audit was off" "$nt" "spec audit OFF by declaration"
+has    "BT3-AC4 OFF: ...and still hands out the prologue" "$nt" "prologue complete"
+# ---- AC1: a present-but-wrong-typed `specAudit` refuses by name, with the date shape, before any
+# ---- agent runs. A truthy non-string must never switch the audit on.
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"specAudit":"2026-09-20"#"specAudit":1#')" "$(returns CONVERGED 0)")
+has    "BT3-AC1 specAudit 1: THROWS" "$o" "THROW"
+has    "BT3-AC1 ...naming the key and the date shape" "$o" '`specAudit` must be a YYYY-MM-DD date string when present, got 1'
+hasnt_ "BT3-AC1 ...before any agent is spawned" "$o" "agent:"
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"specAudit":"2026-09-20"#"specAudit":true#')" "$(returns CONVERGED 0)")
+has    "BT3-AC1 specAudit true: THROWS rather than switching the audit on" "$o" "THROW"
+hasnt_ "BT3-AC1 ...and the sub-workflow never ran" "$o" "wargs:"
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"specAudit":"2026-09-20"#"specAudit":"2026-9-1"#')" "$(returns CONVERGED 0)")
+has    "BT3-AC1 a malformed date string is refused by the same row" "$o" 'got "2026-9-1"'
+# ---- AC5: an audit-shaped argument beside no `specAudit` is a re-invoke of an audit that never
+# ---- ran, refused by name like every other impossible pairing in the file.
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"specAudit":"2026-09-20",##')" "$(returns CONVERGED 0)")
+has    "BT3-AC5 subjects beside no specAudit: THROWS" "$o" "THROW"
+has    "BT3-AC5 ...naming the pairing" "$o" '`subjects` is present beside no `specAudit`'
+hasnt_ "BT3-AC5 ...before any agent is spawned" "$o" "agent:"
+o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,"auditIds":["A-tB-3"],#')" "$(returns CONVERGED 0)")
+has    "BT3-AC5 auditIds beside no specAudit: THROWS by the same guard" "$o" '`auditIds` and `round` is present beside no `specAudit`'
+o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,"subjectRound":2,#')" "$(returns CONVERGED 0)")
+has    "BT3-AC5 subjectRound beside no specAudit: THROWS by the same guard" "$o" '`subjectRound` and `round` is present beside no `specAudit`'
+# ---- ...and `round > 1` ALONE (closing review of units 2–5, F6): the fourth audit-shaped argument.
+# ---- Only an audit re-invoke is ever told to pass it, so beside no declaration it names a round that
+# ---- never ran; before this arm the OFF path handed the roster out under `"round":2` without a word.
+o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,#')" "$(returns CONVERGED 0)")
+has    "BT3-AC5 round 2 beside no specAudit: THROWS by the same guard" "$o" "THROW"
+has    "BT3-AC5 ...naming round" "$o" '`round` is present beside no `specAudit`'
+hasnt_ "BT3-AC5 ...before any agent is spawned" "$o" "agent:"
+o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":1,#')" "$(returns CONVERGED 0)")
+hasnt_ "BT3-AC5 round 1 beside no specAudit is the first round and is NOT refused" "$o" "THROW"
+# ---- AC6: the DECLARED build keeps its audit exactly as before — the control for every arm above.
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
+has    "BT3-AC6 declared: the sub-workflow is awaited" "$o" "workflow:"
+has    "BT3-AC6 declared: ...as a spec-audit" "$o" '"kind":"spec-audit"'
+has    "BT3-AC6 declared: the audit object says it ran, with the counts it read" "$o" '"audit":{"ran":true,"verdict":"CONVERGED","blockers":0,"highs":0,"unverified":0}'
+hasnt_ "BT3-AC6 declared: nothing announces the audit off" "$o" "OFF by declaration"
+# The attended every-unit-terminal exit is the one other return the OFF path can reach, and it says so.
+o=$(run_wf "$(printf '%s' "$T_UNITS" | sed 's#"specAudit":"2026-09-20",##; s#"subjects":\[[^]]*\],##')" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"}}')
+has    "BT3 attended, OFF, every unit terminal: the exit carries the audit object" "$o" '"audit":{"ran":false,"verdict":"NOT-OWED"'
+has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
+# ---- AC7: both carriers read 1.2 — the render is byte-compared to the template by the parity leg,
+# ---- so the marker moving in one file and not the other reds there; this arm reads the render.
+has    "BT3-AC7 the render carries the engine version 1.2" "$(sed -n '3p' "$F")" "version: '1.2', // gov:kit unattended-build@1.2"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it

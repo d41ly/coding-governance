@@ -99,7 +99,10 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   category assertion nothing could falsify, and it reached that state by losing its mechanism clause
   in a deletion no record explains. The replacement is falsifiable: it names the missing input, so a
   reader can check whether the call carries it. The obligation is still the method's least
-  instrumented step, because nothing yet asserts that a spec audit HAPPENED.
+  instrumented step, because nothing yet asserts that a spec audit HAPPENED. Since
+  `TOOL-aBlindedTrial-6` it is also OPT-IN: M4 owes the audit only where the build README's front
+  matter declares `spec-audit: <date>`, and undeclared it says none is owed — the blinded trial
+  measured no quality the audit bought on one-context units at 12× the tokens.
 - **The `Decided:` trailer M10 routes a choice to is ungated, by design.** Whether a choice was made
   is not observable, so nothing refuses a run that left none. M10's own example went through git's
   trailer parser once, in the pass that wrote it (`TOOL-dLoggedFlight-7` AC3), and nothing grades a

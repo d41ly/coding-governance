@@ -48,12 +48,12 @@ author its own authorization has none, and every gate downstream would certify i
 **THE HARNESS BUYS STAGE ORDER AND CANNOT BUY ENFORCEMENT.** `tools/workflows/unattended-build.js`
 runs SPEC then AUDIT then DISPOSAL and hands the run an ordered ROSTER it dispatches one `Workflow`
 call per unit, so the hand-out is unreachable except through all three and on a TERMINAL `--review`
-verdict — control flow, not a rule an agent remembers. It verifies nothing: a Workflow script
-has no filesystem, so every observation is a claim its own agent returned; the refusals live below.
-TWO SHAPES ARE FORCED BY `agent-cap.js`, which denied an `agent()` in any loop body until
-`TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: DISPOSAL is ONE agent over the whole set, and
-the convergence LOOP sits in the caller while the harness holds the GATE, its iteration count being
-data-dependent and so unboundable.
+verdict — control flow, not a rule an agent remembers. AUDIT is opt-in since
+`TOOL-aBlindedTrial-3`: it runs only when the caller passes `specAudit`; absent, it logs OFF and hands
+out the roster after SPEC with `verdict: NOT-OWED`. It verifies nothing: a Workflow script has no
+filesystem, so every observation is a claim its own agent returned; the refusals live below. TWO
+SHAPES ARE FORCED BY `agent-cap.js` (`TOOL-dFoldedVerdict-4`): DISPOSAL is ONE agent over the whole
+set, and the convergence LOOP sits in the caller while the harness holds the GATE.
 
 **PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor
 — never build a MISSING or THIN unit — was carried entirely by an agent's memory. `plan_state`, the
@@ -182,7 +182,9 @@ Two runs in this tree had reached `LANDED` with that item MET while their closin
 BLOCKED with blockers standing, and the incentive was inverted — recording one more round could oblige
 a run to promote every blocker into a built unit, while recording nothing owed nothing. `specs-audited`
 is an eleventh core item joining every CLOSED unit to a tracked `spec-audit` binding line, whole-token
-and expanding the `N..M` range form eighteen tracked records use. `build-complete` gained a sixth term
+and expanding the `N..M` range form eighteen tracked records use. Since `TOOL-aBlindedTrial-2` it is
+owed only when the README at BASE declares `spec-audit: <date>`; absent, a term zero announces
+`not owed` and the item stays in `DOD_CORE`. `build-complete` gained a sixth term
 over `plan_state`'s THIN grade, which `verb_plan` used to compute and overwrite one line later.
 
 **The parked split has TWO axes and the history side subtracts both.** `PARK_ACTS_OWED` names the acts
@@ -201,13 +203,12 @@ as a note.
   mandatory. The kit names it through `LANDER`, never by hardcoded path.
 - `tools/check-wiring.sh --check` — the non-repairing wiring probe preflight delegates to. The
   repairing mode is deliberately out of reach.
-- `tools/memory-tree/check-memory-hygiene.sh` — supplies the run-state file's legality (check 4's
-  whitelist), its size cap (check 6 via `index_set`), its prose exemption (check 7's `ex7`) and,
-  by deliberate omission, leaves phase-vocabulary validation to this kit's own leg.
+- `tools/memory-tree/check-memory-hygiene.sh` — the run-state file's legality, size cap and prose
+  exemption (checks 4, 6, 7); phase-vocabulary validation stays this kit's own leg.
 - `tools/memory-tree/gen_build_index.py` `apply_region()` — the generated-region splice contract,
-  reused verbatim rather than re-implemented.
-- `tools/drift-audit/drift_report.py` — the judgeability discipline, reused for witness RESOLUTION
-  and deliberately NOT for witness PRESENCE, which is its own refusal here.
+  reused verbatim.
+- `tools/drift-audit/drift_report.py` — the judgeability discipline, reused for witness RESOLUTION,
+  not for witness PRESENCE (its own refusal here).
 - `tools/settings-merge.py --fragment` + `tools/check-hook-destinations.sh` — wire `gate-guard.js`,
   this kit's `PreToolUse` hook denying the flagged bar and every suite before `VERIFYING`, keyed to
   the branch by `run-branch:`. Its `buildCommandView` is COPIED from `tools/hooks/scratch-guard.js`:
@@ -261,11 +262,10 @@ silently; re-derive this section whenever the feature is touched.*
   the record has no committed blob.
 - **The DoD core is `CORE_FLOOR` in `.unattended.conf`, never a count typed here** — this row
   once said `10:8` and rotted. `closing-review-recorded` joins the pinned BASE to a tracked review
-  record. The base needle is SEVEN characters, not eight: git abbreviates to seven here, 29 of 48
-  tracked records spell it that way, and the eight-char form shipped briefly and matched none of
-  them — an item clearable only by an override the run wrote for itself.
+  record; the base needle is SEVEN characters (git abbreviates to seven here; the eight-char form
+  shipped briefly and matched nothing, an item clearable only by an override the run wrote).
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
-  commit them; the parity legs compare two files the same run can change together. This bounds every
+  commit them; the parity legs compare two files one run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.
 - **The reap is checked at `--landed`; the schedule is not.** With the stop-guard wired, it refuses
   while the newest harness listing names the recorded id. No script can schedule or reap for the

@@ -149,3 +149,4 @@ memory/builds/aDeferredBar/README.md
 memory/builds/aWokenSentinel/README.md
 memory/builds/dMergedTally/README.md
 memory/builds/aProbedToolkit/README.md
+memory/builds/aBlindedTrial/README.md
