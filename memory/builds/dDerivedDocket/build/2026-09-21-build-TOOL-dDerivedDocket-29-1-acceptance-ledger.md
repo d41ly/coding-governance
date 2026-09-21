@@ -15,16 +15,17 @@ name alone) flipping AC1 and AC3, and AC8's deferred double returning `exit: 'de
 where the same double without the field still throws.
 
 **Evidences:** TOOL-dDerivedDocket-29
-- AC9 — `--pending-run wf_0a1b2c3d-4e5` — run by hand in a scratch fixture built the way the driver
-  suite's prologue builds one: the hold wrote `hold-run: wf_0a1b2c3d-4e5`, `--status` printed
-  `pending run wf_0a1b2c3d-4e5` between the resume and reason lines, the `--resume` take-over printed
-  `relaunch the deferred review FIRST — pending run wf_0a1b2c3d-4e5`, and after a second `--hold`
+- AC9 — `--status` — run by hand in a scratch fixture built the way the driver suite's prologue
+  builds one: `--hold` with `--pending-run wf_0a1b2c3d-4e5` wrote `hold-run: wf_0a1b2c3d-4e5`,
+  `--status` printed `pending run wf_0a1b2c3d-4e5` between the resume and reason lines, the
+  `--resume` take-over printed `relaunch the deferred review FIRST — pending run wf_0a1b2c3d-4e5`,
+  and after a second `--hold`
   with no flag the fact read empty, `--status` printed no pending run and a later take-over printed
   no relaunch.
 - AC10 — `--pending-run` — in the same fixture a value carrying ` · `, one carrying a newline and a
-  65-character one each exited 1 on `UNATTENDED check 55 FAILED — --pending-run takes a workflow run
-  id of 1 to 64 letters, digits, underscores and dashes`, and `git hash-object` of the run-state file
-  was unchanged after each.
+  65-character one each exited 1 on the numbered refusal
+  `UNATTENDED check 55 FAILED — --pending-run takes a workflow run id of 1 to 64 letters`, and
+  `git hash-object` of the run-state file was unchanged after each.
 - AC11 — `bash tools/workflows/check-protocol-parity.test.sh --check` — after `--render`, the leg's
   read-only form printed `in parity — 2 rendered pair(s) match their templates`, with the durability
   paragraph in `memory/guides/REVIEW-PROTOCOL.md` and the deferred branch in both

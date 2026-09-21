@@ -462,6 +462,10 @@ const diffCmd = `git -C ${repo} diff ${baseSha}...${headSha}`
 const presentFinds = probeLive && Array.isArray(probe.finds) ? probe.finds : []
 const presentVerifies = probeLive && Array.isArray(probe.verifies) ? probe.verifies : []
 log(`review key ${reviewKey} — ${presentFinds.length} lens file(s) and ${presentVerifies.length} verify file(s) present`)
+// A file the probe could not re-emit under the schema is left out and NAMED, and its agent is
+// dispatched. Saying so here is what keeps a skipped file from reading as an absent one.
+if (probeLive && Array.isArray(probe.skipped) && probe.skipped.length)
+  log(`WARNING: the resume probe skipped ${probe.skipped.length} unreadable or malformed file(s), each dispatched rather than reused: ${probe.skipped.join(', ')}`)
 // REUSE COMPARES THE FILE'S OWN `key` FIELD with the string computed above, never the directory name
 // alone: the probe composed the directory, and a probe that composed it wrong must not turn a stale
 // file into a current answer.
