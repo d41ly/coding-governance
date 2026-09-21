@@ -42,8 +42,14 @@ newly written arms that stopped one word short of the signature.
 
 ## The fix
 
-Run `python tools/memory-tree/check-arms.py --report` and COPY the signature it prints. Do not retype
-the message into the arm from the code — the two look identical and differ at the tail.
+Run `python tools/memory-tree/check-arms.py --report` and COPY the signature it prints, which is the
+row WHOLE. Until `TOOL-aWokenSentinel-25` that row was cut at 72 characters, so for any longer
+message the row this paragraph told you to copy WAS a prefix, and copying it produced the defect it
+was the remedy for. An unarmed branch whose test holds a line carrying the signature's opening run
+but not the whole of it is now reported `STRANDED <test>:<line>` at the end of its report row and
+as a clause on the refusal `--check` prints, so the line to lengthen is named rather than the
+branch reading as one nothing arms. Do not retype the message into the arm from the code — the two
+look identical and differ at the tail.
 
 Treat any edit to a `fail` string as a two-file edit, the same way a protocol change is a two-carrier
 edit. The gate is reliable here, so the cost is one extra run, not a missed defect.

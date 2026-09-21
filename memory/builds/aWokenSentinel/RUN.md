@@ -201,3 +201,7 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-21T00:00:58Z dispatch · item 01f2d371 TOOL-aWokenSentinel-24 · reason tools/unattended/resume-tick.test.sh memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-24.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-24-1-acceptance-ledger.md
 
 2026-09-21T00:00:59Z brief · item TOOL-aWokenSentinel-24 · reason ef278970873a memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-24-1-build-brief.md
+
+2026-09-21T00:07:49Z dispatch · item fa2fff81 TOOL-aWokenSentinel-25 · reason tools/memory-tree/check-arms.py memory/gotchas/arm-literal-strands-on-message-edit.md memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-25.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-25-1-acceptance-ledger.md
+
+2026-09-21T00:07:54Z brief · item TOOL-aWokenSentinel-25 · reason 20597b5dbf4c memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-25-1-build-brief.md

@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-25 — `check-arms.py` names a STRANDED prefix beside its UNARMED row and prints the whole signature, so an arm that stops short of a long message is diagnosed rather than read as absent
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 830c46e8 · streams tooling · order 25
+**Status:** CLOSED · rev-2 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-25-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-25-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-25-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-25-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -87,11 +88,13 @@ that nothing arms the branch.
 ```
 for b in gb:
     b["armed"] = any(b["sig"] in l for l in lines)
+arms = {l for l in lines if any(b["sig"] in l for b in gb)}   # a line that arms SOME branch of this gate
+for b in gb:
     b["stranded"] = None
     if not b["armed"] and len(b["sig"]) >= STRAND_MIN:
         head = b["sig"][:STRAND_MIN]
         for no, l in numbered:            # (line number, text) for the same lines `armed_signatures` keeps
-            if head in l and b["sig"] not in l:
+            if head in l and l not in arms:
                 b["stranded"] = (test_rel, no)
                 break
 ```
@@ -101,7 +104,11 @@ the numbered pairs and derives the set from them at the one call site, or reads 
 beside it. Either way the population of lines the stranded read walks is EXACTLY the one the armed
 read walks — comments and `miss` lines excluded — so a comment quoting the message can no longer
 be reported as a stranded arm than it can be counted as one. `STRAND_MIN = 24` sits beside
-`NEGATIVE_RE` with the reason in its comment.
+`NEGATIVE_RE` with the reason in its comment. A line that ARMS a sibling branch of the same gate is
+that sibling's arm and never a stranded prefix of this one (rev-2): two messages of one gate that
+open with the same `STRAND_MIN` characters are common — `the driver declares no readable
+<KEY>` is one shape — and without the exclusion the diagnosis names a whole, working arm as the
+line to lengthen.
 
 ### The two outputs
 
@@ -115,11 +122,14 @@ was unarmed before and is unarmed after, with a better sentence.
 ### The selftest arms
 
 Three `arm()` calls after the existing ones, over the same scratch repo: a `tools/gate-c.sh` whose
-one branch message is 90 literal characters followed by `: $x`, and a `tools/gate-c.test.sh`
-quoting its first 40 characters. `--check` names `STRANDED` with `tools/gate-c.test.sh:1`;
-`--report` prints the same and its row holds the whole 90-character signature, asserted by
+first branch message is 90 literal characters followed by `: $x`, and whose second branch (rev-2)
+opens with the same 40 characters and ends differently, and a `tools/gate-c.test.sh` quoting the
+first 40 characters. `--check` names `STRANDED` with `tools/gate-c.test.sh:1` for the first
+branch; `--report` prints the same and its row holds the whole 90-character signature, asserted by
 containment of the full string; the test rewritten to quote the whole signature reads ARMED and no
-`STRANDED` token prints for that gate.
+`STRANDED` token prints for that gate — the sibling branch is still unarmed, its opening run is
+in the line, and the line is the first branch's arm, so the control is also the sibling
+exclusion's arm and reads RED with `b["sig"] not in l` in place of `l not in arms`.
 
 ### Inventory
 
@@ -159,7 +169,15 @@ No function, verb or file is minted.
 - observability — the refusal and the report both name the test file and line.
 - risks — a test line that quotes the opening of a message in a `same` label rather than a `hit`
   would be named STRANDED; the sentence says "copy the whole row", which is the right remedy for
-  that line too, and the branch was unarmed either way.
+  that line too, and the branch was unarmed either way. Measured at the pass (rev-2): with the
+  §4 block as rev-1 wrote it, three of this tree's pinned rows read STRANDED at a line that is a
+  SIBLING branch's whole arm, because the two messages share their first 24 characters; the
+  exclusion of every line that arms some branch of the gate takes that reading to one at the
+  pass: the row left names a line whose `hit` quotes a message COMPOSED into a shell variable and
+  passed as the tail of one `fail`, which the tool does not sign — the gotcha's recorded second
+  exclusion — so that line arms nothing this tool can see and shares its opening with the pinned
+  branch. That residual is the stated bound, not a defect; what the report prints on a later tree
+  is the report's to derive.
 - testing — §6; the three selftest arms and the report over the real tree.
 - migration — additive; no pin row moves, no signature changes.
 - user docs — the docstring and the gotcha's remedy.
@@ -220,6 +238,12 @@ none
   promotion of H1 (raw ids 12, 22, 33): the full-signature literals are spec 22's rev-2 fold, and
   the tool naming a stranded prefix, with its report row printed whole, is this unit. The `[:72]`
   truncation is this disposal's own reading of `cmd_report()`, not a report id.
+- rev-2 · 2026-09-21 · folded at the pass, before the code: the stranded read excludes every line
+  that arms some branch of the same gate, because the rev-1 block run over this tree named a
+  sibling's whole arm as the stranded prefix of three pinned branches whose messages open with the
+  same 24 characters (§4 block, §4 selftest paragraph, §5 risks). The selftest's gate-c gains a
+  second branch opening like the first, so the control arm is also the exclusion's arm; the arm
+  count AC3 derives does not move. Status CLOSED.
 
 ## 10. Reuse audit
 
