@@ -51,8 +51,11 @@ below say which form each one takes and why.
 - AC6 — `read_stderr_tail` — extracted and called directly. 500 stderr lines come back as 20 lines
   plus one line reading `read_stderr_tail: 480 of 500 stderr line(s) not shown`, inside 2000 bytes;
   twenty 501-byte lines, which the line pin cannot touch, come back inside 2000 bytes too; an empty
-  `RB_ERR` yields nothing at all. Staged RED by removing both cuts: 7944 bytes and 10071 bytes
-  respectively, and a drop count of 0 on a stream that dropped 480.
+  `RB_ERR` yields nothing at all. Staged RED four ways: both cuts removed, which gives 7944 and
+  10071 bytes and a drop count of 0 on a stream that dropped 480; the driver's line pin moved to 50,
+  which the arms catch because they source the pins from the driver rather than retyping them; and
+  one pin deleted from the driver, which the extraction arm names rather than silently falling back
+  to this file's own copy.
 - AC7 — `git cat-file -s` — `memory/map/features/unattended.md`,
   `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` are byte-equal
   and line-equal at this commit and at its parent, because this unit opens none of them. The

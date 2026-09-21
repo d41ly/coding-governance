@@ -5486,16 +5486,22 @@ fi   # ---- end the run_bounded host gate: the VERB arm needs it too, because wi
 # The three functions are SOURCED FROM THE SHIPPED FILE rather than retyped, the same idiom and for
 # the same reason as the bound arms above: an arm that proves a mechanism against a copy proves it
 # for the copy.
+# THE TAIL'S PINNED LITERALS ARE SOURCED TOO, never retyped here. Retyped, the helper would grade
+# against this file's copy of a figure the driver owns: raise the driver's line pin and these arms
+# keep cutting at the old one, green, which is `two-answers-to-one-question` wearing the costume of
+# a fixture. The assertions BELOW still spell 20 and 2000, and that is the point — they are the pin,
+# and they red when the driver's figure moves without anybody saying so.
 sp_fn=$(mktemp)
 sed -n '/^run_bounded() {/,/^}$/p'           "$SCRIPT" >  "$sp_fn"
 sed -n '/^read_stderr_tail() {/,/^}$/p'      "$SCRIPT" >> "$sp_fn"
 sed -n '/^derive_stream_verdict() {/,/^}$/p' "$SCRIPT" >> "$sp_fn"
+sed -n '/^RB_TAIL_LINES=/p;/^RB_TAIL_BYTES=/p;/^RB_TAIL_NOTE_ROOM=/p' "$SCRIPT" >> "$sp_fn"
 n=$((n+1))
 [ "$(grep -c '^}$' "$sp_fn")" = 3 ] \
   || { echo "FAIL could not extract all three capture helpers from $SCRIPT — the arms below would grade nothing"; st=1; }
-RB_TAIL_LINES=20
-RB_TAIL_BYTES=2000
-RB_TAIL_NOTE_ROOM=120
+n=$((n+1))
+[ "$(grep -c '^RB_TAIL_' "$sp_fn")" = 3 ] \
+  || { echo "FAIL could not extract the three RB_TAIL_ pins from $SCRIPT — the tail arms would grade this file's own copy of them"; st=1; }
 RB_LEASE_SLUG=""
 RB_LEASE_ID=""
 GATE_BOUND_LIVE=0

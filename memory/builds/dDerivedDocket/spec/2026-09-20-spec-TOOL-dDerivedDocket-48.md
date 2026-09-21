@@ -302,8 +302,11 @@ inert while its suite reads green is the shape this build files elsewhere.
 - risks — `RB_OUT` stops interleaving, which is the one observable delta and is pinned by AC3. A
   second risk is scope creep into the runner's bound, which §3 cuts explicitly.
 - testing — arms for the split, for both existing bound properties, for the three callers, for the
-  real producer's two streams, for the three stdout-empty verdicts, and for the tail bound. Each is
-  observed RED with its fix unstaged.
+  three stdout-empty verdicts, and for the tail bound, each observed RED with its fix unstaged. The
+  real producer's two streams are graded in the pass instead, over a rebuilt fixture, for AC4's
+  reason. The suite sources the `RB_TAIL_` pins from the driver rather than retyping them, and reds
+  when it cannot: retyped, the arms would cut at this file's copy of a figure the driver owns and
+  stay green when that figure moved.
 - migration — none. No file format, conf key or record field changes.
 - user docs — none owed. This unit writes no conf key, so leg check 22 asks for no protocol row, and
   the guide and Skill prose that describe refusal shapes are unit 20's.
@@ -423,7 +426,8 @@ inert while its suite reads green is the shape this build files elsewhere.
 
 New arm: `tools/unattended/unattended.test.sh` · restoring the merged redirect in either branch of
 `run_bounded`, and separately stubbing a producer that writes only to stderr · the driver suite's
-executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
+executed-assertion floor, which this unit raises and does not re-pin. `ARMS_FLOORS` is NOT touched:
+rev-2's S6 measured the `fail` branch count as unmoved, so the floor holds where it is.
 
 ## 8. Open questions
 
@@ -533,10 +537,21 @@ executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
   from 93 B to 13 B between the base and this parent, which does not move this unit's verdict
   because it opens no dossier, and would have moved it for any unit that did.
 
+  §5's testing row and §7's new-arm clause are amended with S6 and AC8 rather than left standing
+  under the old wording, which is the `amendment-leaves-its-other-half-standing` class the pass's
+  own checklist names.
+
   The pass ran no gate, no suite and no bar. Each new arm was observed RED against a staged break in
   a scratch copy of the driver, and AC4 over a rebuilt builds-mode fixture with the merged redirect
   restored in one branch. AC8's suite run, and AC3's two verb-level halves, are owed to the bar the
   main loop runs at VERIFYING.
+
+  Extended on the same pass, same base and rev · §5 · §7 · the checklist's fold. Two further classes
+  it names bit this diff and both are closed here rather than reported. The suite RETYPED the
+  driver's three `RB_TAIL_` pins beside the function it sources from it, so a raised line pin would
+  have left the tail arms cutting at 20 and green — `two-answers-to-one-question` inside a fixture.
+  The pins are now sourced with the functions and the suite reds when it cannot find all three;
+  observed RED two ways, with the driver's line pin moved to 50 and with one pin deleted.
 
 ## 10. Reuse audit
 
