@@ -848,6 +848,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_path_inside",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "check_path_match",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"

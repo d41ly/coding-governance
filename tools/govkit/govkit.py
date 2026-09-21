@@ -1130,9 +1130,20 @@ def scan_uncontained_writes(src: str) -> list[tuple[int, str, str]]:
             for ln in lines:
                 if node.lineno < ln < stop:
                     stop = ln
+        # THE WRITE SCAN'S UPPER BOUND IS NOT THE NARROWING LOOP'S, and folding them into one value
+        # made this predicate blind to the smallest write helper there is — join, write, end of
+        # function. A REBINDING line genuinely ends the previous binding's window, so that test
+        # stays exclusive; the function's LAST line does not, and an exclusive bound there skipped
+        # a mutating call sitting on it by exactly one. Round 2 H1: the arm that consumes this
+        # printed a clean count over a shape it had never looked at, and its own staged break only
+        # ever put the write mid-function, so nothing could see the gap. Re-measured over this
+        # engine's whole source with the inclusive bound: still no offender, so the widening cost
+        # no red on correct code.
+        stop_write = stop + 1 if stop == (fn.end_lineno or node.lineno) else stop
         writes, inline = False, False
         for n in ast.walk(fn):
-            if not (isinstance(n, ast.Call) and node.lineno <= getattr(n, "lineno", 0) < stop):
+            if not (isinstance(n, ast.Call)
+                    and node.lineno <= getattr(n, "lineno", 0) < stop_write):
                 continue
             f = n.func
             if isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) and f.value.id == name:
@@ -4633,6 +4644,24 @@ def git_pathspec(target: pathlib.Path, argv: list[str], paths: list[str],
         capture_output=True, check=False, text=text)
 
 
+def check_path_inside(path: str) -> bool:
+    """Does a repo-relative path stay inside the tree it is relative to? LEXICAL, never resolved.
+
+    DEPL-dSealedTally-4 S4's test, lifted out of `index_read` the day a SECOND batched reader turned
+    out to need exactly it and did not have it. Git paths are repo-relative, so one escapes exactly
+    when its normalised form climbs out or is absolute — and a drive letter counts as absolute,
+    which only `ntpath` knows and `os.path` is on this node.
+
+    A PREDICATE FOR A FILTER, NOT A REFUSAL, and that is the whole reason it returns a bool. A path
+    outside the repository is definitionally absent from that repository's index, which is an
+    ANSWER; raising here turns a graded containment refusal into a hard abort and changes the verb's
+    exit code. `demand_contained_dest` owns the refusal, and the callers' own liveness assertions
+    own everything else that can make a read fail.
+    """
+    norm = os.path.normpath(path).replace("\\", "/")
+    return not (os.path.isabs(norm) or norm == ".." or norm.startswith("../"))
+
+
 def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[str, str]], set[str]]:
     """The TARGET's index, batched: `(path -> (mode, oid))` at STAGE 0, and every path at ANY stage.
 
@@ -4666,14 +4695,9 @@ def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[
     # outside the tree resolved outside it and was filtered away -- reported absent from an index it
     # is really in, which is the same false-absent this whole unit exists to remove, reintroduced by
     # its own filter. The question here is about the PATH git was given, and git paths are
-    # repo-relative: one escapes when its normalised form climbs out or is absolute.
-    _inside: list[str] = []
-    for _p in paths:
-        _n = os.path.normpath(_p).replace("\\", "/")
-        if os.path.isabs(_n) or _n == ".." or _n.startswith("../"):
-            continue
-        _inside.append(_p)
-    paths = _inside
+    # repo-relative: one escapes when its normalised form climbs out or is absolute. The test
+    # itself now sits above, because the dirty-path precondition needs the same one.
+    paths = [p for p in paths if check_path_inside(p)]
 
     for i in range(0, len(paths), 400):
         chunk = paths[i:i + 400]
@@ -4917,6 +4941,8 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
     WHAT THE FOURTH DOES NOT BUY, because a structural carve-out reads as a semantic one to
     everybody who did not write it. It says nothing about the bytes INSIDE gov's region — gov
     rewrites those on every run, and an uncommitted edit there is not work this guard can preserve.
+    It does NOT reach a path whose worktree copy is gone: a deletion is not a vanished difference,
+    however little of the file was the operator's, and `check_region_only` refuses that side.
     It clears an operator whose only uncommitted change outside the region is a line ending, for the
     reason the fold below states. And it reaches only paths the caller named: a region-owned path
     the caller forgets to name is graded by the plain test, which is the safe direction.
@@ -4926,13 +4952,37 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
     about 22 ms whatever it does. The fifth read only happens when a carve-out could apply, and the
     region reads only for a path that the plain test has ALREADY flagged and the caller named.
     """
-    claimed = [c for c in dict.fromkeys(claimed) if c]
+    # OUT-OF-TREE PATHS COME OUT BEFORE THE READS, exactly as `index_read` takes them out and for a
+    # reason measured here too. Round 2's B1. All four reads below share ONE pathspec, so a single
+    # path outside the repository fails the WHOLE invocation — 128 from `ls-files`, 1 from `diff`,
+    # both with empty stdout — every claimed path then reads as absent from the index, takes the
+    # absent-from-the-index carve-out below, and this function returns the empty list that means a
+    # clean tree. One hand-edited row in the target's own committed receipt therefore turned off the
+    # guard standing in front of every write, and every containment refusal over receipt rows runs
+    # LATER than this one. The escaping row itself is a receipt defect and `demand_contained_dest`
+    # is what refuses it; here it is simply not a path this tree can be dirty at.
+    claimed = [c for c in dict.fromkeys(claimed) if c and check_path_inside(c)]
     if not claimed:
         return []
 
     def _names(*args: str) -> set[str]:
         out = subprocess.run(["git", "-C", str(target), *args, "--", *claimed],
                              capture_output=True, text=True)
+        # THE LIVENESS ASSERTION, and it is the second half of the same finding rather than a
+        # belt on top of it: the filter above removes the one input that was measured, and every
+        # OTHER way a read can fail still empties the population, which is the shape of a clean
+        # tree. Nothing reaching here is out of tree any more, so a non-zero exit means the
+        # repository or the invocation is broken and nothing else. The refusal says what the caller
+        # would OTHERWISE have concluded, because an operator who reads only "git failed" does not
+        # learn which decision was about to be taken on the strength of it.
+        if out.returncode != 0:
+            raise Refusal(
+                f"reading the target's tree failed: `git {' '.join(args)}` exited "
+                f"{out.returncode} over {len(claimed)} claimed path(s). Git said: "
+                f"{(out.stderr or '').strip() or '(nothing on stderr)'}. Refusing rather than "
+                f"reading the empty result as an answer: every claimed path would have been "
+                f"reported CLEAN, and clean is exactly what tells a writing verb it may overwrite "
+                f"them")
         return {n for n in out.stdout.split("\0") if n}
 
     in_index = _names("ls-files", "-z")
@@ -4961,9 +5011,14 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
 
         `None` says the region could NOT be located unambiguously — two marker pairs in one file, or
         a close before its open — and the caller reads that as "not eligible for the carve-out",
-        never as "clean". That is the same direction the write path takes for the same state. A side
-        that is absent altogether is the empty string: a file that is not there holds nothing
-        outside gov's region either.
+        never as "clean". That is the same direction the write path takes for the same state.
+
+        AN ABSENT SIDE IS THE EMPTY STRING, AND THAT FOLD ANSWERS FOR THE HEAD SIDE ALONE: gov
+        creating a file that never existed is the fresh-adopter shape, and the post-apply steady
+        state depends on HEAD's missing copy reading as holding nothing of the operator's. Applied
+        to the WORKTREE side the same sentence inverts — an uncommitted deletion is not an empty
+        region, it is the operator removing the file — so the caller refuses that side before it
+        gets here rather than this fold guessing which side it is on. Round 2 H2.
 
         A HEAD copy carrying a block under an older marker spelling strips to nothing, so that block
         counts as the operator's content and the path reads dirty rather than being guessed at.
@@ -5000,6 +5055,18 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
         index-versus-HEAD is unanswerable before the first commit, so the worktree-versus-index half
         is the half that answers there.
         """
+        # AN ABSENT WORKTREE COPY IS A DELETION, NOT AN EMPTY REGION, and it is the one absence the
+        # fold above must not swallow. Round 2 H2, reproduced on bytes: a `.gitattributes` gov made
+        # and nobody else wrote to strips to "" on every side once the operator deletes it, so the
+        # carve-out cleared the path, the pins arm read `is_file()` false, `write_block` recreated
+        # the file and `git add` staged it — and the run printed only that it wrote the lf-pin
+        # block. Nothing named the reverted deletion. Carve-out 1 above already calls a STAGED
+        # deletion an operator decision and reports it dirty; this is the unstaged one, and the
+        # asymmetry between them is what made this a hole rather than a policy. What the operator
+        # loses is the ACTION rather than unique content, since the bytes are gov's own — that is
+        # why it is not the refusal's job to explain them, only to stop.
+        if not (target / path).is_file():
+            return False
         idx_one, _ = index_read(target, [path])
         oid = (idx_one.get(path) or ("", ""))[1]
         data = index_blob(target, oid) if oid else None

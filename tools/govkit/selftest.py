@@ -2249,6 +2249,99 @@ user_skills = "/tmp/gk-fake-skills"
               "creating any, which no assertion about the target could ever have seen",
               _keep23path.read_text(encoding="utf-8") != _keep23, _staged23[-600:])
 
+        # ===== ROUND 2's B1 — ONE OUT-OF-TREE RECEIPT PATH TURNED THE DIRTY-PATH GUARD OFF =====
+        #
+        # `dirty_claimed_paths` batches four reads over ONE pathspec built from every claimed path
+        # and read nobody's exit status. A path outside the repository fails the whole invocation —
+        # 128 for `ls-files`, 1 for `diff` — so all four came back empty, every claimed path took an
+        # absent-from-the-index carve-out, and the guard standing in front of every write returned
+        # the empty list that means a clean tree. The input is the target's own receipt: committed,
+        # hand-editable, text-merged, and the artifact this build's threat model says gov distrusts.
+        #
+        # TWO TARGETS OF ONE RECIPE, and the assertion is that the escaping row changes NOTHING
+        # about how the legitimate dirty one is graded. A single fixture here would be satisfied by
+        # any refusal, and this verb has two other guards that refuse an escaping receipt for
+        # reasons of their own — both of them AFTER this one, which is why the guard could be
+        # switched off before anything graded the row that switched it off.
+        for _n_b1 in ("plain", "escaping"):
+            _t_b1 = build_graded_target("b1-" + _n_b1)
+            _rp_b1 = _t_b1 / ".governance" / "install.json"
+            _d_b1 = json.loads(_rp_b1.read_text(encoding="utf-8"))
+            if _n_b1 == "escaping":
+                for _f_b1 in _d_b1["files"]:
+                    if _f_b1.get("role") == "attributes":
+                        _f_b1["path"] = "../ESCAPED-b1"
+                _rp_b1.write_text(json.dumps(_d_b1, indent=2), encoding="utf-8", newline=NLp)
+            git(_t_b1, "add", "-A")
+            git(_t_b1, "commit", "-qm", "settled, receipt and all")
+            # THE DIRTIED ROW COMES OFF `derive_graded_rows`, never typed here, so a role move
+            # cannot leave this arm dirtying a path the guard's population does not carry. The
+            # attributes row is excluded because the two fixtures disagree about it BY DESIGN.
+            _gk_b1 = govkit_module()
+            _rows_b1 = [f.get("path") for f in _gk_b1.derive_graded_rows(_d_b1)]
+            _dp_b1 = next((p for p in sorted(x for x in _rows_b1 if x)
+                           if not p.startswith("..") and not p.endswith(".gitattributes")
+                           and (_t_b1 / p).is_file()), None)
+            check("[B1] LIVENESS the %s fixture carries a graded row on disk to dirty, and only "
+                  "the escaping variant carries the out-of-tree row" % _n_b1,
+                  _dp_b1 is not None
+                  and (("../ESCAPED-b1" in _rows_b1) == (_n_b1 == "escaping")),
+                  str(sorted(x for x in _rows_b1 if x)[:6]))
+            if _dp_b1 is None:
+                continue
+            (_t_b1 / _dp_b1).write_text(
+                (_t_b1 / _dp_b1).read_text(encoding="utf-8")
+                + "# the operator's uncommitted line" + NLp,
+                encoding="utf-8", newline=NLp)
+            _u_b1 = run("update", "--target", str(_t_b1), "--write")
+            _o_b1 = _u_b1.stdout + _u_b1.stderr
+            check("[B1] the dirty-path guard NAMES that row on the %s receipt — a row git cannot "
+                  "read is not an answer about the rest of the receipt" % _n_b1,
+                  "receipt claims are DIRTY" in _o_b1 and _dp_b1 in _o_b1,
+                  f"rc={_u_b1.returncode} " + _o_b1[-900:])
+            check("[B1] ...and it refused BEFORE any write on the %s receipt" % _n_b1,
+                  "wrote the lf-pin block" not in _o_b1, _o_b1[-700:])
+        # THE SECOND HALF, which the filter above does not buy on its own: a read that fails for
+        # ANY OTHER reason still empties the population, and an empty population is byte-for-byte
+        # the shape of a clean tree. Asked of a directory that is not a repository, because that is
+        # the cheapest input that makes all four reads fail at once.
+        _nb1 = tmp / "b1-not-a-repo"
+        _nb1.mkdir(parents=True, exist_ok=True)
+        (_nb1 / "owned.txt").write_text("x" + NLp, encoding="utf-8", newline=NLp)
+        _gkd_b1 = govkit_module()
+        try:
+            _dead_b1 = repr(_gkd_b1.dirty_claimed_paths(_nb1, ["owned.txt"]))
+        except _gkd_b1.Refusal as _e_b1:
+            _dead_b1 = "REFUSED: " + str(_e_b1)
+        check("[B1] a read that CANNOT answer refuses instead of reporting a clean tree, and the "
+              "refusal says what the caller would otherwise have concluded",
+              _dead_b1.startswith("REFUSED:") and "CLEAN" in _dead_b1, _dead_b1[:400])
+        # THE CLASS GATE, the half that outlives both fixes. Every `subprocess.run` inside the two
+        # batched readers must have an exit status read in the same function, or the next reader
+        # added beside them inherits the same silence. CRUDE ON PURPOSE AND IT SAYS SO: it grades
+        # PRESENCE and not that a status read belongs to the spawn beside it, so it is a ratchet
+        # against a new unchecked read rather than a proof that the checked ones are paired.
+        _src_b1 = GOVKIT.read_text(encoding="utf-8")
+        _cnt_b1: dict = {}
+        for _fn_b1 in _ast.walk(_ast.parse(_src_b1)):
+            if not isinstance(_fn_b1, _ast.FunctionDef) or _fn_b1.name not in (
+                    "dirty_claimed_paths", "index_read"):
+                continue
+            _cnt_b1[_fn_b1.name] = (
+                sum(1 for _x in _ast.walk(_fn_b1)
+                    if isinstance(_x, _ast.Call) and isinstance(_x.func, _ast.Attribute)
+                    and _x.func.attr == "run" and isinstance(_x.func.value, _ast.Name)
+                    and _x.func.value.id == "subprocess"),
+                sum(1 for _x in _ast.walk(_fn_b1)
+                    if isinstance(_x, _ast.Attribute) and _x.attr == "returncode"))
+        check("[B1] CLASS LIVENESS both batched readers are there to grade, or the arm below "
+              "counts nothing in two functions that were renamed out from under it",
+              sorted(_cnt_b1) == ["dirty_claimed_paths", "index_read"]
+              and all(_s > 0 for _s, _r in _cnt_b1.values()), str(_cnt_b1))
+        check("[B1] CLASS no git spawn in either batched reader outnumbers the exit statuses read "
+              "beside it — a new unchecked read reds here rather than reporting a clean tree",
+              all(_s <= _r for _s, _r in _cnt_b1.values()), str(_cnt_b1))
+
         # ---- AC4: the STRUCTURAL arm, the half that outlives the two calls above. Fed the engine's
         # ---- own source directly rather than through a scratch tree, because the predicate is a
         # ---- pure function of text and a fixture repo would only add ways for the arm to pass.
@@ -2284,6 +2377,37 @@ user_skills = "/tmp/gk-fake-skills"
               "the one join in this verb that already does the right thing is not reported",
               "dp" not in [h[1] for h in _gk23.scan_uncontained_writes(_src23)],
               str(_gk23.scan_uncontained_writes(_src23)))
+        # ROUND 2's H1. THE MINIMAL WRITE HELPER — join, write, end of function — and the arm above
+        # could not see it. The write window's upper bound was the function's last line, exclusive,
+        # so a mutating call ON that line fell outside its own binding's window by exactly one. The
+        # staged break above only ever puts the write mid-function, which is why the blind spot was
+        # invisible to the very arm that proves the predicate fires, while `r.note` printed a
+        # reassuring count over a shape it had never looked at.
+        _h1min = ("def f(target, row):" + NLp + '    dp = target / row["path"]' + NLp
+                  + '    dp.write_text("x")' + NLp)
+        check("[-23] H1 a write that is the LAST statement of its function is reported — the "
+              "smallest shape this predicate exists for",
+              [h[1:] for h in _gk23.scan_uncontained_writes(_h1min)] == [("dp", 'row["path"]')],
+              str(_gk23.scan_uncontained_writes(_h1min)))
+        check("[-23] H1 LIVENESS ...and the byte-identical source with one statement appended "
+              "reports the same row, so the arm above grades the BOUND and not the file's length",
+              _gk23.scan_uncontained_writes(_h1min + "    return None" + NLp)
+              == _gk23.scan_uncontained_writes(_h1min),
+              str(_gk23.scan_uncontained_writes(_h1min + "    return None" + NLp)))
+        check("[-23] H1 ...and an `unlink` on that same closing line is reported too — the window "
+              "moved, not one mutator's name",
+              [h[1] for h in _gk23.scan_uncontained_writes(
+                  _h1min.replace('dp.write_text("x")', "dp.unlink()"))] == ["dp"],
+              str(_gk23.scan_uncontained_writes(
+                  _h1min.replace('dp.write_text("x")', "dp.unlink()"))))
+        check("[-23] H1 RED-WHEN a GRADED join on the closing line stays unreported, so the wider "
+              "window did not buy its coverage with a red on correct code",
+              _gk23.scan_uncontained_writes(
+                  "def f(target, row):" + NLp
+                  + '    demand_contained_dest(row["path"], "the row")' + NLp
+                  + '    dp = target / row["path"]' + NLp
+                  + '    dp.write_text("x")' + NLp) == [],
+              "a graded join on a function's closing line is reported as an escape")
 
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)
@@ -8186,6 +8310,71 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-24] AC4 LIVENESS ...and that broken run really did write the block, so the tally "
               "fired on a write rather than on an empty set",
               "wrote the lf-pin block" in _o24x, _o24x[-1200:])
+
+        # ===== ROUND 2's H2 — AN ABSENT WORKTREE COPY READ AS "NOTHING OUTSIDE GOV'S REGION" =====
+        #
+        # Carve-out 4 folded a side it could not read to the empty string. That is right for the
+        # HEAD side — gov creating a file that never existed is what AC2 above depends on — and
+        # inverted for the worktree side. An operator's uncommitted `rm` of a `.gitattributes` gov
+        # made and nobody else wrote to strips to "" on EVERY side, so the carve-out cleared the
+        # path and the pins arm recreated and staged the file, printing only that it wrote the
+        # block. Nothing named the reverted deletion. Every arm above uses a file with operator
+        # content ALONGSIDE the block, which is the one shape that cannot reach this branch — so
+        # the arm set certified coverage it did not have.
+        #
+        # THE BYTES ARE THE ASSERTION, never the exit code, for AC2's reason one screen up: this
+        # fixture has other guards to clear and reading rc would make the arm hostage to them.
+        _t24d: dict[str, pathlib.Path] = {}
+        for _n24d in ("real", "broken"):
+            _tt = build_verify_target(_gp, "delattrs-" + _n24d, ["demo"])
+            _gg = _tt / ".gitattributes"
+            _tx24d = read_text14(_gg)
+            _sp24d = GK14.find_block(_tx24d, _om24, _cm24)
+            _out24d = ("" if _sp24d is None else NLp.join(
+                _tx24d.split(NLp)[:_sp24d[0]] + _tx24d.split(NLp)[_sp24d[1] + 1:]))
+            check("[H2] LIVENESS the %s fixture's .gitattributes holds gov's block and NOTHING "
+                  "outside it — the fresh-adopter shape `apply` creates, and the one shape every "
+                  "arm above avoids" % _n24d,
+                  _sp24d is not None and _out24d.strip() == "", repr(_tx24d))
+            _gg.unlink()
+            check("[H2] LIVENESS ...and the operator's deletion really registers as an unstaged "
+                  "one on the %s fixture, or the arms below grade some other state" % _n24d,
+                  gout(_tt, "status", "--porcelain").strip().startswith("D"),
+                  gout(_tt, "status", "--porcelain"))
+            _t24d[_n24d] = _tt
+        _to24d = gout(_gp, "rev-parse", "HEAD").strip()
+        _u24d = run_in_gov(_gp, "update", "--target", str(_t24d["real"]), "--to", _to24d, "--write")
+        _o24d = _u24d.stdout + _u24d.stderr
+        check("[H2] gov REFUSES rather than silently reverting an operator's uncommitted deletion, "
+              "and the dirty line names the path",
+              "receipt claims are DIRTY" in _o24d and ".gitattributes" in _o24d,
+              f"rc={_u24d.returncode} " + _o24d[-1200:])
+        check("[H2] ...and the file is STILL deleted afterwards, which is the assertion no exit "
+              "code makes",
+              not (_t24d["real"] / ".gitattributes").exists()
+              and "wrote the lf-pin block" not in _o24d, _o24d[-800:])
+        # THE LIVENESS HALF, staged into a COPY of the gov and never into this repository's engine,
+        # on a fixture the real run never touched.
+        _g24d = tmp / "v24-delattrs-gov-broken"
+        shutil.copytree(_gp, _g24d)
+        _eng24d = _g24d / "tools" / "govkit" / "govkit.py"
+        _src24d = _eng24d.read_text(encoding="utf-8")
+        _mark24d = ("        if not (target / path).is_file():" + NLp
+                    + "            return False" + NLp)
+        check("[H2] LIVENESS the guard is where the staged break expects it, or the run below "
+              "grades an engine this arm never broke",
+              _src24d.count(_mark24d) == 1, _mark24d)
+        _eng24d.write_text(_src24d.replace(_mark24d, "", 1), encoding="utf-8", newline=NLp)
+        _u24e = run_in_gov(_g24d, "update", "--target", str(_t24d["broken"]), "--to", _to24d,
+                           "--write")
+        _o24e = _u24e.stdout + _u24e.stderr
+        check("[H2] LIVENESS with that one guard staged out the same fixture is RECREATED and the "
+              "run says only that it wrote the block — the finding reproduced on bytes rather "
+              "than argued",
+              (_t24d["broken"] / ".gitattributes").is_file()
+              and "wrote the lf-pin block" in _o24e
+              and "receipt claims are DIRTY" not in _o24e,
+              f"rc={_u24e.returncode} " + _o24e[-1200:])
 
         # ===== DEPL-cMendedVintage-26 — THE TWO PREDICATES `-24` HANDED THE WRONG POPULATION =====
         #
