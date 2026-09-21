@@ -1177,9 +1177,10 @@ is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a 
 #
 # THE CAP LIVES IN THIS FUNCTION, not beside it, and that is an arming decision: the bound arms
 # extract this function with `sed` and source it, so a constant one line up would have to be
-# re-declared by the suite, and the arms would then grade a cap they wrote themselves. 400 is the
-# sibling bound's own default (`PASS_ORDER_PREANCHOR_CAP`, in this kit's pass-order leg). The floor
-# under any value is measured: the deepest floored window on this tree at HEAD is 60 commits, on
+# re-declared by the suite, and the arms would then grade a cap they wrote themselves. THE VALUE IS
+# NOT REPEATED IN THIS PARAGRAPH, it is the default two lines down: it is the sibling bound's own
+# (`PASS_ORDER_PREANCHOR_CAP`, in this kit's pass-order leg). The floor under any value is measured:
+# the deepest floored window on this tree at HEAD is 60 commits, on
 # `memory/builds/dRetiredFork/RUN.md`, so a cap at or below that announces on this repo's own
 # deepest record.
 #

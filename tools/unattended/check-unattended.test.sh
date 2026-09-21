@@ -3533,6 +3533,10 @@ rm -rf "$lm_dir"
 #
 # NO ARM READS THE REAL TREE. No tracked record carries the facts these arms grade until unit 35
 # arms gov, so a real-tree assertion here would be an assertion about nothing.
+#
+# COST: eight repositories, about sixty commits and forty resolver calls, measured at 13 s on node d
+# 2026-09-21 running this block standalone. Process creation is this suite's cost centre and its
+# budget row is in `tools/run-gates/selftest-budgets.txt`; 13 s against that row needs no raise.
 # PRISTINE FIRST. Every arm above that mutates the fixture's copy of the kit restores it, but the
 # extraction below reads that copy, and an arm that graded a leg some earlier block left mutated
 # would be grading someone else's break. This costs a reset and removes the question.
@@ -3553,6 +3557,13 @@ ric() { # fixture dir · record path · literal line · [cap]
     # shellcheck disable=SC1090
     . "$ric_fn"
     resolve_introducing_commit "$2" "$3" )
+}
+# A FIXTURE THAT DID NOT BUILD COMPARES TWO EMPTIES AND PASSES. Every sha below is derived from the
+# fixture by `git log --grep`, and an arm asserting an empty answer against an empty expectation is
+# the fixture-passes-by-finding-nothing class in its purest form — so each derivation is refused
+# before it is used.
+ric_want() { # label · derived sha
+  n=$((n+1)); [ -n "$2" ] || { echo "FAIL $1 derived no commit — the fixture did not build, and every assertion over it would compare two empties"; st=1; }
 }
 ric_init() { # dir -> a fresh repository with one seed commit
   mkdir -p "$1/$ric_d"; ( cd "$1" || exit 2
@@ -3575,6 +3586,8 @@ ric_a=$ric_root/a; ric_init "$ric_a"
   echo y >> seed.txt; git add seed.txt; git commit -qm "body two" ) >/dev/null 2>&1
 ric_a_pre=$(git -C "$ric_a" log --format=%H --grep='run one preflight')
 ric_a_rot=$(git -C "$ric_a" log --format=%H --grep='run two preflight')
+ric_want "fixture A's preflight commit" "$ric_a_pre"
+ric_want "fixture A's rotation commit" "$ric_a_rot"
 
 # ---- AC1: the archived record grades against the value ITS OWN run recorded. A path-scoped search
 # ---- answers the rotation here, which is a wrong sha and not a missing one.
@@ -3608,6 +3621,7 @@ ric_b=$ric_root/b; ric_init "$ric_b"
   git commit -qm "merge side; run two preflight"
   echo z >> main.txt; git add main.txt; git commit -qm after ) >/dev/null 2>&1
 ric_b_pre=$(git -C "$ric_b" log --format=%H --grep='run one preflight')
+ric_want "fixture B's preflight commit" "$ric_b_pre"
 ric_out=$(ric "$ric_b" "$ric_d/RUN.LANDED.deadbeef.md" "m-base: AAAA" 2>"$ric_root/err")
 same "AC4 a rotation inside a merge still answers the preflight commit" "$ric_out" "$ric_b_pre"
 same "AC4 control: the add search answers nothing there, plain" \
@@ -3630,6 +3644,7 @@ ric_c=$ric_root/c; ric_init "$ric_c"
   git merge -q -s ours --no-ff side -m "merge side, ours"
   echo z >> main.txt; git add main.txt; git commit -qm after ) >/dev/null 2>&1
 ric_c_side=$(git -C "$ric_c" log --all --format=%H --grep='side touches the record')
+ric_want "fixture C's pruned side commit" "$ric_c_side"
 ric_out=$(ric "$ric_c" "$ric_d/RUN.md" "asks-at-landing: 3" 2>"$ric_root/err")
 same "AC4 the unsimplified walk reaches the pruned commit that introduced the line" "$ric_out" "$ric_c_side"
 same "AC4 control: a simplified walk cannot see that commit at all" \
@@ -3672,6 +3687,7 @@ ric_f=$ric_root/f; ric_init "$ric_f"
     git add $ric_d/RUN.md; git commit -qm "pass $i"
   done ) >/dev/null 2>&1
 ric_f_pre=$(git -C "$ric_f" log --format=%H --grep='run one preflight')
+ric_want "fixture F's preflight commit" "$ric_f_pre"
 ric_out=$(ric "$ric_f" "$ric_d/RUN.md" "m-base: AAAA" 4 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
 same "AC6 a window deeper than the cap answers nothing" "$ric_out" ""
 hit  "$ric_err" "the tenancy window is deeper than the 4-commit walk cap"
@@ -3698,6 +3714,8 @@ ric_g=$ric_root/g; ric_init "$ric_g"
   done ) >/dev/null 2>&1
 ric_g_pre=$(git -C "$ric_g" log --format=%H --grep='run one preflight')
 ric_g_re=$(git -C "$ric_g" log --format=%H --grep='late 1, the line back')
+ric_want "fixture G's preflight commit" "$ric_g_pre"
+ric_want "fixture G's re-introduction commit" "$ric_g_re"
 ric_out=$(ric "$ric_g" "$ric_d/RUN.md" "m-base: AAAA" 4 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
 same "AC6 the re-introduction fixture answers nothing at a cap below its window" "$ric_out" ""
 hit  "$ric_err" "the tenancy window is deeper than the 4-commit walk cap"
@@ -3720,9 +3738,10 @@ ric_h=$ric_root/h; ric_init "$ric_h"
 ric_out=$(ric "$ric_h" "$ric_d/RUN.md" "m-base: AAAA" 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
 same "AC2 a candidate whose first parent carries the line is passed over" "$ric_out" ""
 hit  "$ric_err" "the whole tenancy window was walked and no commit in it introduced that line"
+ric_h_tip=$(git -C "$ric_h" rev-parse HEAD 2>/dev/null)
+ric_want "fixture H's tip" "$ric_h_tip"
 ric_out=$(ric "$ric_h" "$ric_d/RUN.md" "witness: c0ffee" 2>"$ric_root/err")
-same "AC2 control: a genuine introduction inside the same window IS answered" \
-  "$ric_out" "$(git -C "$ric_h" rev-parse HEAD)"
+same "AC2 control: a genuine introduction inside the same window IS answered" "$ric_out" "$ric_h_tip"
 
 # ---- AC7: the header states what the resolver does NOT answer, in ONE sentence naming BOTH limits.
 # ---- A header that states only what a function does is how a resolution gets read as a guarantee.
@@ -3771,14 +3790,14 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- RAISED 410 -> 419 by TOOL-dDerivedDocket-5: check 36's nine arms, all in the LANDER_MODE
 # ---- fixture block inside region two, so FLOOR_SHARD_2 carries the same +9 and FLOOR_SHARD_1
 # ---- is untouched.
-# ---- RAISED 419 -> 449 by exactly the arm, TOOL-dDerivedDocket-52: the resolver's thirty
+# ---- RAISED 419 -> 457 by exactly the arm, TOOL-dDerivedDocket-52: the resolver's thirty-eight
 # ---- assertions over its eight scratch fixtures, all in the block at the END of region two, so
-# ---- FLOOR_SHARD_2 carries the same +30 and FLOOR_SHARD_1 is untouched. COUNTED, not measured
+# ---- FLOOR_SHARD_2 carries the same +38 and FLOOR_SHARD_1 is untouched. COUNTED, not measured
 # ---- through a suite run: this unit's pass may run no suite, so the figure is the block's own
 # ---- `hit`/`same`/`miss` calls plus its two bare `n=$((n+1))` sites, and the block was executed
-# ---- once standalone in a replica of this prologue to confirm it -- thirty assertions, green, and
-# ---- red under each of six staged breaks.
-FLOOR_ASSERTIONS=449
+# ---- once standalone in a replica of this prologue to confirm it -- thirty-eight assertions,
+# ---- green, and red under each of six staged breaks.
+FLOOR_ASSERTIONS=457
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -3804,7 +3823,7 @@ FLOOR_ASSERTIONS=449
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=91
-FLOOR_SHARD_2=358
+FLOOR_SHARD_2=366
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

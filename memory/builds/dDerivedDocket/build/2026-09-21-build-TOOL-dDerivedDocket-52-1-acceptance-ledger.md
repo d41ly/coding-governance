@@ -7,10 +7,16 @@ record, across the rotation rename, floored at the record's own tenancy and anno
 empties instead of a plausible wrong sha. No merge bar, no gate leg and no `*.test.sh` suite was run
 in this pass. What was run instead: the resolver itself, extracted from the leg the way the arms
 extract it, over eight scratch git repositories; and the arm block itself, sliced out of the suite by
-its own markers and executed standalone in a replica of that suite's prologue — thirty assertions,
-green, and RED under each of six staged breaks (the floor removed, `--full-history` dropped, the cap
-spelled to keep the newest commits, the floor's parent-test exception deleted, the header sentence
-deleted, and the path set narrowed to the queried path alone).
+its own markers and executed standalone in a replica of that suite's prologue — thirty-eight
+assertions, green in 13 s, and RED under each of six staged breaks (the floor removed,
+`--full-history` dropped, the cap spelled to keep the newest commits, the floor's parent-test
+exception deleted, the header sentence deleted, and the path set narrowed to the queried path
+alone).
+
+Folded from `python tools/memory-tree/gotchas.py --for-diff fb07ca25..HEAD` after the first commit:
+each fixture's derived sha is now refused when empty, because an arm comparing an empty answer to an
+empty expectation is `fixture-passes-by-finding-nothing` in its purest form; and the cap paragraph no
+longer repeats the number the default two lines below it owns.
 
 **Evidences:** TOOL-dDerivedDocket-52
 - AC1 — `tools/unattended/check-unattended.sh` — over a fixture whose record was rotated by a later
@@ -41,9 +47,10 @@ deleted, and the path set narrowed to the queried path alone).
 - AC5 — amended rev-2 — `FLOOR_ASSERTIONS` — the floor rev-1 named cannot move. `ARMS_FLOORS` is not
   an executed-assertion floor: `tools/memory-tree/check-arms.py` discovers its population from
   `fail <n> "` call sites, and this unit adds no `fail` branch, which §4's Fail codes row already
-  said. The floor that moves is the suite's own: `FLOOR_ASSERTIONS` 419 → 449 and `FLOOR_SHARD_2`
-  328 → 358, both readable with `git show` at this commit and its parent, `FLOOR_SHARD_1` untouched
-  at 91 because every new assertion sits in region two. The raise is the block's thirty
+  said. The floor that moves is the suite's own: `FLOOR_ASSERTIONS` 419 → 457 and `FLOOR_SHARD_2`
+  328 → 366, both read with `git show` at `6af11b57` — the commit this unit starts from, since the
+  unit spans two commits — against the tree here, `FLOOR_SHARD_1` untouched at 91 because every new
+  assertion sits in region two. The raise is the block's thirty-eight
   assertion-helper call sites, counted and then confirmed by executing the block standalone. That the
   suite still passes AT the raised floor is the criterion's `permission:` line and belongs to the
   build's one post-build bar.
@@ -54,8 +61,8 @@ deleted, and the path set narrowed to the queried path alone).
   it answers the FIRST introduction. Staged RED: spelled `--max-count=$_cap` with the truncation test
   removed, the first fixture reports no-candidate and the second returns the RE-introduction.
 - AC7 — `git grep -c` — the header sentence naming both limits occurs exactly once in
-  `tools/unattended/check-unattended.sh` at this commit and zero times at its parent, where the
-  function does not exist; the arm asserts the count is 1 and that the same sentence carries the
+  `tools/unattended/check-unattended.sh` here and zero times at `6af11b57`, the commit this unit
+  starts from, where the function does not exist; the arm asserts the count is 1 and that the same sentence carries the
   moved-record limit two lines on. Staged RED: with that line deleted the arm reads 0.
 - AC8 — `tools/unattended/check-unattended.sh` — over a fixture whose live record shares
   `anchor-kind: default-branch` byte for byte with the record a previous run left at that path, the
