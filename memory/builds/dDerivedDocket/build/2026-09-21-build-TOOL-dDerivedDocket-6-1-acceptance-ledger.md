@@ -88,3 +88,8 @@ rev-5 revision entry records which.
 - **The AC3 flag run is the pass's most expensive direct check**, measured at 7.1 s on node d. That
   is well inside the per-command bound a pass holds, so rev-4's cost line stands as written and
   nothing was deferred for it.
+- **The bug-class checklist selected two classes this diff carries, and both are folded in at
+  rev-6** rather than argued away. `conf-value-interpolated-into-a-regex` reached `build_grammar`,
+  which splices the families list into a pattern; it now refuses a family that is not
+  `[A-Za-z][A-Za-z0-9]*`. `text-mode-read-eats-a-bare-cr` reached the file walk, whose CR contract
+  is now stated and armed both ways. Three arms were added and each was staged RED first.

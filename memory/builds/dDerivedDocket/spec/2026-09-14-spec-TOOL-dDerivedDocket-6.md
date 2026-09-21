@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-6 — ask parser and status fold
 
-**Status:** CLOSED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -458,6 +458,18 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · every shape, rul
   - **AC12 was observed both ways.** `--check` over this tree exits 0 at 773 artifacts with the
     module imported and neither verb in any header, and a `--write` over a scratch clone carrying
     this unit's code rewrote all 773 and changed no tracked file.
+
+- rev-6 · 2026-09-21 · S1 · AC1 · the bug-class checklist's fold, over `fb07ca25..HEAD`.
+  - **`build_grammar` REFUSES a family name that is not `[A-Za-z][A-Za-z0-9]*`.** S1 says stdlib
+    only and says nothing about the splice; the families list goes into a regex, and
+    `conf-value-interpolated-into-a-regex` is a class this repo has measured — escaping makes a
+    quoted value match nothing and passing it through lets a `|` swallow a subtree, both silently.
+    A refusal is the one outcome a reader can act on, and it joins S11's configuration-raises line
+    rather than the content-never-raises one.
+  - **AC1's walk now states its CR contract and arms it.** A CRLF copy of a file parses identically
+    to its LF copy, and a bare CR inside a field is REPORTED rather than silently re-read — every
+    shape test is anchored at both ends, so the field carrying it fails. Both arms were staged RED,
+    by keeping each line's trailing CR and by unanchoring the filed-date shape.
 
 ## 10. Reuse audit
 

@@ -106,6 +106,9 @@ class Problem(Exception):
     """A named, user-facing failure. Never a traceback, and never raised by CONTENT."""
 
 
+FAMILY_SHAPE = re.compile(r"^[A-Za-z][A-Za-z0-9]*$")
+
+
 def build_grammar(families) -> Grammar:
     """The id grammar bound to ONE families list.
 
@@ -114,8 +117,19 @@ def build_grammar(families) -> Grammar:
     looks exactly like success — the defect `corpus_ids.py` measured on its own first run. An empty
     list therefore compiles to `(?!)`, which matches nothing and says so at every call site rather
     than quietly admitting everything.
+
+    EVERY FAMILY IS VALIDATED, NOT ESCAPED. These tokens are spliced into a regex, and a conf value
+    reaching `re.compile` is a class this repo has measured: escaping it makes a quoted value match
+    nothing, and passing it through lets a `|` swallow a subtree — both silently, both looking like
+    a clean corpus. A family is `[A-Za-z][A-Za-z0-9]*` and anything else REFUSES by name, which is
+    the one outcome a reader can act on.
     """
     fams = [f for f in families if f]
+    bad = [f for f in fams if not FAMILY_SHAPE.match(f)]
+    if bad:
+        raise Problem(f"family name(s) {' '.join(sorted(bad))} are not [A-Za-z][A-Za-z0-9]*, and "
+                      f"these go into a regex, where a stray metacharacter silently re-scopes the "
+                      f"id grammar instead of failing")
     alt = "|".join(sorted(set(fams))) or "(?!)"
     return Grammar(tuple(sorted(set(fams))),
                    re.compile(r"^(?:" + alt + r")-[A-Za-z0-9]+-\d+$"))
@@ -306,6 +320,14 @@ def parse_file(path: str, text: str, grammar: Grammar) -> Parsed:
     THE WALK REPORTS EVERY LINE IT DID NOT UNDERSTAND. A parser that skips an unrecognised line
     makes a mis-segmented file read exactly like a clean one, which is the shape that lets a whole
     section fall out of a corpus at exit 0.
+
+    THE CALLER OPENS THE FILE WITH `newline=""`, and nothing here depends on its doing so. A CRLF
+    file splits on `\\n` and each line's ONE trailing CR is dropped, so a CRLF and an LF copy of one
+    file parse identically. A BARE CR mid-line stays inside the field it landed in; every shape test
+    is anchored at both ends, so that field fails its test and the line is REPORTED. Under a
+    universal-newlines read the same CR arrives as a line break and the row is reported too. Both
+    readings are loud, which is the property this note exists to pin — the kit has a gotcha for the
+    text-mode read that silently rewrites a bare CR, and this grammar must not be its next victim.
     """
     slug = os.path.basename(os.path.dirname(path.replace("\\", "/").rstrip("/"))) or ""
     asks: list = []
@@ -975,6 +997,17 @@ def run_arms(report: bool = True) -> list:
             rows=[render_status_row("KEEP", "EXMP-aFoo-1", "one"),
                   render_status_row("WONTDO", "EXMP-aFoo-1", "two")]).verdicts
             if v.code == 4][0]))
+    # THE TWO CLASSES THE BUG-CLASS CHECKLIST NAMED for this diff, armed rather than argued.
+    arm("a family carrying a regex metacharacter REFUSES instead of re-scoping the grammar",
+        "are not [A-Za-z][A-Za-z0-9]*", lambda: build_grammar(("EXMP|.*", "OTHR")))
+    arm("a CRLF copy of a file parses identically to its LF copy", "True",
+        lambda: (lambda lf: str(
+            parse_file("memory/builds/aFoo/BACKLOG.md", lf.replace("\n", "\r\n"), _G)
+            == parse_file("memory/builds/aFoo/BACKLOG.md", lf, _G)))(
+            _build_file("aFoo", [render_ask_row("EXMP-aFoo-1", "2026-02-01", "x")])[1]))
+    arm("a BARE CR inside a field is REPORTED, never silently re-read", "2",
+        lambda: str(_parse_fixture("aFoo", asks=[render_ask_row(
+            "EXMP-aFoo-1", "2026-02-01\rmore", "x")]).verdicts[0].code))
     arm("a status row and a SEV row for one ask are NOT V4", "[]",
         lambda: str([v.code for v in _parse_fixture(
             "aFoo",

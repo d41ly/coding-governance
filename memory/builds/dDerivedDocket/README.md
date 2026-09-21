@@ -122,7 +122,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [TOOL-dDerivedDocket-3 — the run's landing path](spec/2026-09-14-spec-TOOL-dDerivedDocket-3.md) | 4 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-5 — auto-resume from HELD](spec/2026-09-14-spec-TOOL-dDerivedDocket-5.md) | 5 | 2 | CLOSED | rev-7 | 2026-09-21 |
 | [TOOL-dDerivedDocket-37 — a hands-off's payload tokens are named by the sibling it names](spec/2026-09-14-spec-TOOL-dDerivedDocket-37.md) | 6 | 2 | CLOSED | rev-5 | 2026-09-21 |
-| [TOOL-dDerivedDocket-6 — ask parser and status fold](spec/2026-09-14-spec-TOOL-dDerivedDocket-6.md) | 6 | 2 | CLOSED | rev-5 | 2026-09-21 |
+| [TOOL-dDerivedDocket-6 — ask parser and status fold](spec/2026-09-14-spec-TOOL-dDerivedDocket-6.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-7 — generated family view](spec/2026-09-14-spec-TOOL-dDerivedDocket-7.md) | 7 | 2 | SPECCED | rev-5 | 2026-09-20 |
 | [TOOL-dDerivedDocket-8 — hygiene engine in builds mode](spec/2026-09-14-spec-TOOL-dDerivedDocket-8.md) | 8 | 2 | SPECCED | rev-5 | 2026-09-20 |
 | [TOOL-dDerivedDocket-9 — transition-merge audit over history and at commit time](spec/2026-09-14-spec-TOOL-dDerivedDocket-9.md) | 9 | 2 | SPECCED | rev-6 | 2026-09-20 |
