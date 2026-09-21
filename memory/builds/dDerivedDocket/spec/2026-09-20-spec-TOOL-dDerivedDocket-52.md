@@ -259,9 +259,11 @@ The function takes a run-state path and a literal line, and answers in five step
 
 Why rename following is not the chosen spelling, although the table in the first subsection shows the
 rename being findable: it is rename DETECTION, its answer depends on what else moved in the same
-commit, and it carries the same history simplification as the plain form, so the merge case that
-`tools/memory-tree/row_grammar.py:335-340` measured reaches it too. The path union needs no heuristic
-and is decidable by reading the two paths.
+commit, and — spelled as `--follow --diff-filter=A`, the only way it answers a first commit — it is
+an ADD search, so the merge blindness measured above reaches it whole: no diff is computed for a
+merge under any flag. That is the reading rev-2 corrected; rev-1 called it history simplification,
+which `--full-history` would have fixed and does not. The path union needs no heuristic and is
+decidable by reading the two paths.
 
 **Stated residual.** Two runs cannot share one tenancy window, so the shared-PATH collision above is
 closed by construction rather than by luck, and the earlier draft of this paragraph was wrong twice
@@ -337,8 +339,9 @@ see S7.
 
 - **Rename following as the resolution.** It answers correctly on this tree today, and the table
   above records that. It is still a heuristic whose result depends on what else moved in the rotation
-  commit, and it inherits the simplification that hides a rotation inside a merge. Kept as the
-  measurement that proves the plain form wrong, not as the mechanism.
+  commit, and as an add search it inherits the merge blindness that hides a rotation landing inside
+  a merge from every flag. Kept as the measurement that proves the plain form wrong, not as the
+  mechanism.
 - **Leaving the resolution in unit 18.** That is the state this finding came out of: one inline
   search, no verification, and a fallback sentence for a case the search never reaches. A resolver
   with no verification step cannot tell a right answer from a wrong one, which is why it is a unit
@@ -502,8 +505,9 @@ re-introduced among the retained newest commits · that suite's own `FLOOR_ASSER
 - **F2** — Rename following or the path union? Options: (a) follow the rename; (b) read the archived
   path and the live `RUN.md` together, unsimplified.
   RESOLVED (agent, 2026-09-20, delegated): (b). Both answer correctly on this tree, measured in §4,
-  and (a) is a heuristic that also inherits the simplification which hides a rotation inside a merge —
-  the case `tools/memory-tree/row_grammar.py:335-340` measured on this repo's own archives.
+  and (a) is a heuristic that, being an add search, also inherits the merge blindness which hides a
+  rotation landing inside a merge — the class `tools/memory-tree/row_grammar.py:335-340` measured on
+  this repo's own archives, re-measured under both spellings in §4.
   This ruling is about a SHA and does not overturn `--follow` where the answer is a DATE, which is why
   the build carries two resolvers and not one. A date is compared against a cutoff, so a heuristic
   that picks a neighbouring commit still grades correctly as long as it errs in a known direction —
@@ -594,6 +598,9 @@ re-introduced among the retained newest commits · that suite's own `FLOOR_ASSER
   what the resolver prints when it fires, which is S4's no-candidate empty and not a different sha.
   Also settled here: F4's cap, at 400 and INSIDE the function for the arming reason F4 now gives;
   and S4's reason-line CHANNEL, stderr, so the leg's stdout contract gains no fourth exception.
+  The correction's OTHER HALVES were swept in the same rev rather than left standing: §4's rename-
+  following paragraph, its Alternatives-rejected bullet and F2 each called the merge case history
+  simplification, which is the reading (2) disproves, and each now names it as add-search blindness.
 
 ## 10. Reuse audit
 
