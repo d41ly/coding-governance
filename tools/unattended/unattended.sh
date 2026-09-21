@@ -337,11 +337,14 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""
-# TOOL-dLoggedFlight-2 - the run log's two inputs. RUNLOG_SESSION_VARS is a declared key and defaults
-# here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so it is copied BEFORE the conf is
-# sourced: a tracked file the run commits itself must not be what turns that run's own log off.
-RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
+DISPOSITION_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+# TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
+# contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
+# is a declared key and defaults here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so
+# it is copied BEFORE the conf is sourced: a tracked file the run commits itself must not be what
+# turns that run's own log off. RESUME_ATTEMPTS, RESUME_TURNS and DISPOSITION_CUTOFF default here
+# for the same reader: the tick and check 2 clause 3 read them, and the driver's --status names them.
 # shellcheck disable=SC1090
 . "$CONF"
 

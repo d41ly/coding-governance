@@ -93,7 +93,7 @@ resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir c
 read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the conf into THIS shell and named it in CONF
   [ -n "${CONF:-}" ] && [ -f "$CONF" ] || {
     echo "unattended: REFUSING - read_bound_key was called with CONF unset or naming no file, so its NOTE could name nowhere to declare the key and a default would be taken from nowhere; set CONF to the sourced conf before the call" >&2
-    exit 2; }
+    RUNLOG_CLEAN=1; exit 2; }
   local _bk_name="$1" _bk_default="$2" _bk_unit="$3" _bk_note="$4" _bk_val
   _bk_val="${!_bk_name:-}"
   case "$_bk_val" in
@@ -101,7 +101,7 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the 
         echo "unattended: NOTE - this project declares no $_bk_name, so $_bk_note. Declare one in $CONF to change it." >&2 ;;
     *[!0-9]*|0)
         echo "unattended: REFUSING - $_bk_name is declared as '$_bk_val', which is not a positive integer of $_bk_unit. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
-        exit 2 ;;
+        RUNLOG_CLEAN=1; exit 2 ;;
   esac
 }
 
