@@ -197,6 +197,16 @@ subject = "kit"
 argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
 guard = ["{kit}/"]
 
+# The migration planner's suite. DECLARED HERE rather than exempted in the govkit registry (unit 11
+# fork F8): `migrate_backlog.py` ships to every memory-tree adopter and each of them runs `--plan` in
+# their own deployer build, so withholding the leg would ship the suite and not the check that runs
+# it. Held like its four siblings, by `subject = kit`.
+[[gate_leg]]
+name = "backlog migration selftest"
+subject = "kit"
+argv = ["python3", "{kit}/migrate_backlog.py", "--selftest"]
+guard = ["{kit}/"]
+
 [[gate_leg]]
 name = "marker contracts"
 subject = "repo"

@@ -15,6 +15,7 @@ agent-cap restatement self-test	kit	selftests
 agent-cap self-test	kit	selftests
 agent-instructions self-test	kit	selftests
 agent-instructions wiring	repo	wiring
+backlog migration selftest	kit	selftests
 branch-guard self-test	repo	selftests
 brief-recorded	repo	declarations
 build README slot contract	repo	records

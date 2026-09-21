@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = ["TOOL-aRelaxedShard-1", "TOOL-aWidenedGuide-1"]
 
 [claims]
-gate-legs = ["memory hygiene", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms"]
+gate-legs = ["memory hygiene", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest"]
 kits = ["memory-tree"]
 git-hooks = ["commit-msg"]
 workflow-scripts = []
@@ -38,7 +38,20 @@ One shell engine over the tracked contents of `<MEMORY_ROOT>/`, plus the epoch r
 verdicts datable. How many numbered checks it carries is derivable from the engine and is not
 written here, for the same reason the H1 stopped saying it. Several of them delegate to sibling
 Python modules (`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`, `transition_audit.py`);
-this dossier owns the engine, its self-test, the epoch and the transition audit, not the other modules. The self-test's project-key arms run the engine over
+this dossier owns the engine, its self-test, the epoch and the transition audit, not the other modules.
+
+**One leg here belongs to a module this dossier does NOT own**, and that is deliberate rather than
+an oversight to tidy away. `backlog migration selftest` runs `migrate_backlog.py --selftest`, the
+shards-to-builds migration planner's own suite. The leg is CLAIMED here because the planner is a
+memory-tree module with no dossier of its own and an unclaimed key reds the map's coverage gate; it
+is DECLARED in `tools/memory-tree/kit.toml` beside its four module-selftest siblings rather than
+exempted in the govkit registry, because the planner ships to every memory-tree adopter and each of
+them runs `--plan` in their own deployer build (`TOOL-dDerivedDocket-11` fork F8). It is held like
+those siblings, by `subject = kit`, so no plain bar executes it. Its ceiling is pinned at or under
+the direct-check bound the unattended kit's gate-guard suite grades every `--selftest` leg against,
+which is what keeps the flag form a check a unit pass may run by hand.
+
+The self-test's project-key arms run the engine over
 the suite's own scratch tree, one invocation per arm, never over an archive of this repository
 (`TOOL-aRatifiedRulings-3`), so a red in the live corpus cannot red an arm that grades a conf key.
 

@@ -8,6 +8,7 @@
       "agent-cap self-test",
       "agent-instructions self-test",
       "agent-instructions wiring",
+      "backlog migration selftest",
       "branch-guard self-test",
       "brief-recorded",
       "build README slot contract",

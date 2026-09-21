@@ -1,12 +1,17 @@
 # TOOL-dDerivedDocket-11 — migration planner
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 11
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-11-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-11-1-acceptance-ledger.md) | journal | — |
+| [2026-09-21-build-TOOL-dDerivedDocket-11-census.md](../build/2026-09-21-build-TOOL-dDerivedDocket-11-census.md) | journal | — |
+| [2026-09-21-build-TOOL-dDerivedDocket-11-same-id.tsv](../build/2026-09-21-build-TOOL-dDerivedDocket-11-same-id.tsv) | journal | — |
+| [2026-09-21-build-TOOL-dDerivedDocket-11-status.tsv](../build/2026-09-21-build-TOOL-dDerivedDocket-11-status.tsv) | journal | — |
+| [2026-09-21-build-TOOL-dDerivedDocket-11-triage.tsv](../build/2026-09-21-build-TOOL-dDerivedDocket-11-triage.tsv) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
@@ -61,7 +66,11 @@ per-id status prediction as records the delegated signer signs and the switch-ov
 - **S6** Proposals are selected, never decided. A proposal cites a spec other than the ask's same-id
   spec whose body carries a closing phrase naming the ask, a commit whose message names the ask and
   which neither filed the row nor touched only the memory tree, or a hold target the row's own text
-  names. An ask that `--design-named <id>` names, the option given once per id, and that no rule
+  names in a HOLD PHRASE — `blocked on`, `deferred until` and their kin — never in a bare mention,
+  because every row in this corpus cites its neighbours and a mention read as a hold puts most of
+  the triage under a BLOCKED proposal nobody wrote. Every id anywhere here is matched as a WHOLE
+  TOKEN: `-2` is a prefix of `-20`, and a substring test reads a spec closing the twentieth ask as
+  closing the second. An ask that `--design-named <id>` names, the option given once per id, and that no rule
   above selects, is proposed CLOSED with basis `design-named` and evidence `-`. Those ids come only
   from that option, never from a constant in the module, and an id it names outside the triage
   population refuses by name with no worksheet written. A same-id spec is NEVER proposed as closing
@@ -99,9 +108,14 @@ per-id status prediction as records the delegated signer signs and the switch-ov
   unattended kit's gate-guard suite grades every `--selftest` leg against (§8 F9), and a row in
   `tools/run-gates/selftest-budgets.txt` budgets it with its basis. Observed by AC10.
 - **S12** The unit's own product: `--plan` run over this repo in the unit's pass, with
-  `--design-named` given once for each id design §21.5 names, filing the records
+  `--design-named` given once for each id the design still names as a closure no rule can evidence,
+  filing the records
   into this build's `build/` folder as `TOOL-dDerivedDocket-11`, which is what the delegated signer
-  signs. Observed by AC11.
+  signs. At BASE that set is EMPTY and the run passes the option no id: the design's two named
+  closures are `TOOL-aStandingWrit-3` and `TOOL-cFinalBerth-3` (design §9 step 7, with §4.4's row),
+  and `TOOL-cSpliceWarden-4`'s archive reconcile has since re-derived both to live CLOSED rows, so
+  neither is in the triage population any more and naming either would take S6's refusal. Observed
+  by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -168,7 +182,9 @@ worksheet anchors an id.
 The signed records the prediction reads are the signer's markdown tables. The planner locates their
 columns by the header cells `Ask`, `Verdict` and, on the triage record, `Field`, and refuses a record
 whose header lacks one; §8 F4 records why these bytes are pinned here; the signer unit's §4 pins the
-same header rows.
+same header rows. The option names each record as `--signed <kind>=<path>`, kind being `same-id` or
+`triage`, because the KIND cannot be inferred from the header: a triage record missing `Field` would
+then be indistinguishable from a same-id record, and the refusal AC6 stages could not fire.
 
 ### Evidence, and what each class rests on
 
@@ -212,7 +228,7 @@ as that measurement; `--plan` re-derives every one of them and the switch-over r
 | Identifier | Kind | Cell |
 |---|---|---|
 | `migrate_backlog.py` and its public functions: parse legacy rows, choose a copy, build the census, build each worksheet, predict, prove conservation, write records | kit module | lexicon python function cell; names pass `lexicon.py --suggest` before they are written |
-| `--plan`, `--record`, `--record-as`, `--signed`, `--design-named`, `--selftest` | CLI mode and options | flags |
+| `--plan`, `--record`, `--record-as`, `--signed <kind>=<path>`, `--design-named`, `--selftest` | CLI mode and options | flags |
 | `TRIAGE-ASK` | placeholder in the triage and status worksheets | none; the switch-over's `--write --triage-ask <id>` files the minted id, and its AC3 substitutes it for this placeholder |
 | `backlog migration selftest` | gate leg | a gate-legs key, claimed by the memory-tree hygiene dossier |
 
@@ -393,8 +409,9 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the new `b
   status proof compares against "the planner's predicted status under the signed tables", which only
   (a) produces. RESOLVED (agent, 2026-09-14, delegated): (a). The signer spec names its columns in
   prose; the M2 interface cross-read pins `Ask`, `Verdict` and `Field` in both specs.
-- **F5** — What stands in for the design-named closures of design §21.5 when no rule finds evidence?
-  RESOLVED (agent, 2026-09-14, delegated): the three rows it names are listed with basis
+- **F5** — What stands in for the design-named closures of design §9 step 7 when no rule finds
+  evidence?
+  RESOLVED (agent, 2026-09-14, delegated): the rows it names are listed with basis
   `design-named` and no evidence, so the signer applies its own rules to a claim it can see rather
   than to a sha the planner invented.
 - **F6** — Where do the design-named ids come from? (a) A constant in `migrate_backlog.py`. (b) An
@@ -505,6 +522,21 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the new `b
   read it, while the hands-off to unit 34 makes the same figure load-bearing for that unit's fifth
   normalization. §7's `New arm:` middle field names the fixture row. The item's citation and
   wording are unchanged; only its observation is new.
+
+- rev-6 · 2026-09-21 · the build pass, and four corrections it could not make without changing the
+  design first. (1) S12 and §8 F5 cited "design §21.5" for the design-named closures; §21.5 is
+  *Reach, measured*, the unattended kit's stop-cause table, and it names no ask. The design names its
+  closures at §9 step 7 with §4.4's row, and it names TWO, not three: `TOOL-aStandingWrit-3` and
+  `TOOL-cFinalBerth-3`. Both are live CLOSED rows at BASE since `TOOL-cSpliceWarden-4`'s archive
+  reconcile, so neither is in the triage population and this repo's run passes the option no id at
+  all — which S12 now says, and which leaves AC4's refusal arm as the only place the option is
+  exercised. (2) S6's `row-names-hold` selector reads a hold PHRASE and not a bare mention: the
+  first real-tree run put 97 of 334 triage rows under a BLOCKED proposal, every one of them an
+  ordinary citation of a neighbouring id, and the tightened rule proposes none of them. (3) S6 also
+  states the whole-token id match, because the first cut's substring test read `EXMP-aBar-20`'s
+  closing phrase as closing `EXMP-aBar-2` — caught by AC4's own arm before it landed. (4) §4 pins
+  `--signed <kind>=<path>`: the kind cannot be inferred from a header that is missing the cell that
+  would identify it, which is exactly the record AC6 stages. No acceptance criterion moves.
 
 ## 10. Reuse audit
 

@@ -58,6 +58,7 @@
 agent-cap restatement self-test	520		worst of 11 readings 342s, x1.5
 agent-cap self-test	590		worst of 7 readings 389s, x1.5
 agent-instructions self-test	150		worst of 8 readings 96s, x1.5
+backlog migration selftest	60		measured 6s on node d 2026-09-21 by direct invocation, x1.5 floored at this file 60s minimum
 branch-guard self-test	60		worst of 8 readings 20s, x1.5
 build-index selftest	140		worst of 10 readings 88s, x1.5
 check-arms selftest	60		worst of 10 readings 17s, x1.5

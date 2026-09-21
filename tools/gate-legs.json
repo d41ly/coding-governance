@@ -428,6 +428,21 @@
     "ceiling": 300
   },
   {
+    "name": "backlog migration selftest",
+    "argv": [
+      "python3",
+      "tools/memory-tree/migrate_backlog.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/lib/",
+      "tools/memory-tree/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "harness arms (fail branches armed or pinned)",
     "argv": [
       "python3",

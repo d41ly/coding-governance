@@ -51,6 +51,11 @@ memory/**/*.md text eol=lf
 memory/**/*.py text eol=lf
 memory/**/*.toml text eol=lf
 memory/**/*.txt text eol=lf
+# A build record that a LATER unit re-computes and byte-compares. The migration planner's three
+# worksheets (`migrate_backlog.py --plan --record`) are the first of these: the switch-over's
+# staleness check re-derives the same worksheet over the same tree and compares, so a CRLF checkout
+# on one node would read as a stale record on that node alone. TOOL-dDerivedDocket-11.
+memory/**/*.tsv text eol=lf
 
 # The two AUTHORED indexes every node appends to. `merge=rows` routes a conflict through the
 # row-keyed driver (tools/memory-tree/merge-rows.py), which merges by record id: an append-collision

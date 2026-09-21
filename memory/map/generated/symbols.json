@@ -140,6 +140,11 @@
     {
       "id": "Problem",
       "kind": "class",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "Problem",
+      "kind": "class",
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
@@ -543,6 +548,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "build_id_sort_key",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "build_index",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -588,6 +598,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "build_plan",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "build_ps_w_fixture",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -623,6 +638,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "build_same_id_sheet",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "build_scope",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -633,9 +653,19 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "build_simulation",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "build_source_cited_ids_with_no_record",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "build_spec_index",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "build_spec_record_index",
@@ -643,9 +673,19 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "build_status_sheet",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "build_substitution",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "build_summary",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "build_tempdir",
@@ -656,6 +696,11 @@
       "id": "build_tree_rows",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "build_triage_sheet",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "build_ts_reader",
@@ -838,6 +883,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "check_conservation",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "check_contract_registry",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -896,6 +946,11 @@
       "id": "check_msys_addressable",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "check_names_id",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "check_ours",
@@ -1223,6 +1278,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "cmd_plan",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "cmd_print_bindings",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1281,6 +1341,11 @@
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "cmd_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "cmd_selftest",
@@ -1538,6 +1603,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_dispositions",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "derive_entries",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -1551,6 +1621,11 @@
       "id": "derive_ext",
       "kind": "function",
       "file": "tools/codebase-map/map_imports.py"
+    },
+    {
+      "id": "derive_families",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "derive_families",
@@ -1686,6 +1761,11 @@
       "id": "derive_status",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "derive_status_class",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "derive_statuses",
@@ -2106,6 +2186,11 @@
       "id": "inert_only",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "init_repo",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "insert_region",
@@ -2545,6 +2630,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
@@ -2673,6 +2763,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "measure_overlap",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "measure_pass",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -2716,6 +2811,11 @@
       "id": "measure_slot_sizes",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "measure_view_delta",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "measure_vocab_cells",
@@ -2913,6 +3013,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "parse_legacy_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "parse_pin",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
@@ -3031,6 +3136,11 @@
       "id": "print_pin_rows",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_plan",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "print_populations",
@@ -3248,6 +3358,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_args",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "read_asks_args",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3373,6 +3488,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "read_flag_value",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "read_gate_verdicts",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -3406,6 +3526,11 @@
       "id": "read_header_verbs",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "read_index",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "read_index_files",
@@ -3483,9 +3608,24 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "read_named_hold",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "read_oracle_answer",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_over_cap_findings",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_pointer",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "read_registry",
@@ -3508,6 +3648,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_row_hold",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "read_runs",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -3518,14 +3663,39 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_sheet_row",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_signed_record",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_signed_verdicts",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "read_slot_table",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_slug",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "read_spec_uids",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_spec_words",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "read_stale_header_waiver",
@@ -3551,6 +3721,11 @@
       "id": "read_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_text",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "read_text_or_none",
@@ -3853,6 +4028,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "render_ask_text",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "render_asks_table",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3863,9 +4043,19 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_census",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "render_command",
       "kind": "function",
       "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "render_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "render_convention",
@@ -3938,6 +4128,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "render_readme",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "render_refusal_recipe",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -3978,9 +4173,19 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "render_shard",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "render_shards",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_spec",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "render_spec_records",
@@ -4016,6 +4221,11 @@
       "id": "render_views",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_worksheet",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "repo_root",
@@ -4148,6 +4358,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "resolve_copy",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "resolve_declaration_paths",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -4250,12 +4465,22 @@
     {
       "id": "resolve_root",
       "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "resolve_root",
+      "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "resolve_root",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "resolve_row_docs",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "resolve_row_needles",
@@ -4425,6 +4650,11 @@
     {
       "id": "run",
       "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run",
+      "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
@@ -4461,6 +4691,11 @@
       "id": "run_check",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "run_commit",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "run_constant_control",
@@ -4521,6 +4756,16 @@
       "id": "run_kit_check",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "run_plan",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_plan_in",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "run_rm3",
@@ -4598,6 +4843,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "scan_archive_citations",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "scan_archive_guard",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4616,6 +4866,11 @@
       "id": "scan_claimed_paths",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_commit_messages",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "scan_corpus",
@@ -4683,6 +4938,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "scan_row_history",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "scan_shell_tokens",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -4691,6 +4951,11 @@
       "id": "scan_slot_budget",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_spec_adds",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "scan_substituted",
@@ -4766,6 +5031,11 @@
       "id": "seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "seed_corpus",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "selectable",
@@ -6143,6 +6413,16 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "write_file",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "write_fixture_records",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "write_lookup",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -6151,6 +6431,11 @@
       "id": "write_receipt_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "write_records",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "write_text",
