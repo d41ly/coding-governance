@@ -72,7 +72,11 @@ file = ".memory-tree.conf"
 owner = "memory-tree"
 required_keys_gate = ["MEMORY_ROOT", "DISCIPLINES", "FAMILIES"]
 required_keys_render = ["MEMORY_ROOT", "READINESS_ROWS"]
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF"]
+# BACKLOG_MODE and ASK_CUTOFF are TOOL-dDerivedDocket-6's, and both are optional because the model
+# they arm ships dark: blank or absent reads `shards`, which is what this kit has always rendered.
+# BACKLOG_MODE's spelling is frozen — the transition audit classifies commits by it — so it is
+# declared here as well as in the conf example, and a sibling unit's `requires_if` names this entry.
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "BACKLOG_MODE", "ASK_CUTOFF"]
 conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"]
 defaults = { MEMORY_ROOT = "memory" }
 

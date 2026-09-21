@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-6 — ask parser and status fold
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
+**Status:** CLOSED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-6-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-6-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
@@ -422,6 +423,41 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · every shape, rul
   leg — the `build-index selftest` leg is held, but this unit's flag run of it stays in the pass and
   is observed there. The header date is the last-change date; the rev
   is unchanged, this being the same consolidation.
+
+- rev-5 · 2026-09-21 · §5 · S10 · AC1 · AC7 · AC8 · the build pass, and what it moved.
+  - **The fold's `verdicts` count is `None` until somebody passes the verdicts.** §5 lists it among
+    the counts the fold returns, and the fold cannot compute it: the cross-file verdicts are
+    `derive_verdicts`' and it would have to call that to know. `derive_statuses(corpus, verdicts)`
+    therefore takes the list as an optional second argument and reports `len()` when it is given and
+    `None` when it is not. A `0` standing for "nobody asked" is the reassuring zero §7 forbids, and
+    the view unit's liveness line has both numbers in hand at the moment it prints.
+  - **`derive_verdicts` takes the `Conf` as a fourth input.** S10 names the parsed files, the spec
+    index and the caller's build statuses; those three are one `Corpus` value, and the conf is
+    passed beside it because V15 and V16 are ALREADY IN IT and because the cutoff arms V9 and V12.
+    Nothing new is read — this is where S11's "either one disarms V9 and V12" is executed.
+  - **Three arms were added because their absence was MEASURED, not guessed.** Each break below was
+    staged into the module and the suite run: AC8's fixture read `LOW` then `HIGH`, so a
+    last-row-wins severity passed it by coincidence of file order and only the permutation arm
+    caught it — the fixture now reads `HIGH` first, which a last-wins rule would discard. AC7's
+    permutation corpus closed one ask with ONE record, so naming `closers[-1]` instead of the sorted
+    minimum permuted identically; the corpus now carries two closing records in two files and a
+    direct arm names the minimum. And nothing covered fork F3's exclusion of provenance rows from
+    V4, so folding `RELOCATED` back into the per-class rule reds nothing; an arm now asserts that
+    two `RELOCATED` rows for one target in one file are NOT V4.
+  - **AC1 gained two arms of its own**, for the two V2 branches its four named cases do not reach: a
+    prose line inside a section, and the control that the clean fixture reports no verdict at all.
+    Without the control, a walk that emitted V2 for every line would have passed all four.
+  - **The AC1 fixture holds seven asks, not two.** One of every row shape with two asks put two
+    status rows on one target in one file, which is V4 — correctly. Each status verb now targets its
+    own ask, and the SEV and `RELOCATED` rows sit beside a status row on purpose, because that pair
+    is exactly what F3 keeps legal.
+  - **No kit version moved.** The generator is in `check-verdict-epoch.sh`'s delegate set, so this
+    build owes ONE bump of `KIT_MEMORY_TREE_VERSION` — and it is unit 34's, at or after the last
+    commit that moves the engine. A bump here would be the newest bump behind a newer change and
+    would red that gate rather than satisfy it.
+  - **AC12 was observed both ways.** `--check` over this tree exits 0 at 773 artifacts with the
+    module imported and neither verb in any header, and a `--write` over a scratch clone carrying
+    this unit's code rewrote all 773 and changed no tracked file.
 
 ## 10. Reuse audit
 

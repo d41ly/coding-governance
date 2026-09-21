@@ -110,6 +110,11 @@
     {
       "id": "Problem",
       "kind": "class",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "Problem",
+      "kind": "class",
       "file": "tools/memory-tree/check-arms.py"
     },
     {
@@ -430,6 +435,11 @@
     {
       "id": "build_corpus",
       "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "build_corpus",
+      "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },
     {
@@ -471,6 +481,11 @@
       "id": "build_graded",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "build_grammar",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "build_index",
@@ -773,6 +788,11 @@
       "file": "tools/lexicon/subtokens.py"
     },
     {
+      "id": "check_cutoff_armed",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "check_declaration",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
@@ -791,6 +811,11 @@
       "id": "check_guarded",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "check_id",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "check_is_root",
@@ -1146,6 +1171,11 @@
       "id": "cmd_report",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "cmd_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "cmd_selftest",
@@ -1508,6 +1538,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "derive_statuses",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "derive_targets",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -1521,6 +1556,11 @@
       "id": "derive_verdict",
       "kind": "function",
       "file": "tools/process-monitor/classify.py"
+    },
+    {
+      "id": "derive_verdicts",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "derive_width",
@@ -1726,6 +1766,11 @@
       "id": "extract_records",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_row",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "extract_section",
@@ -2300,6 +2345,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
     },
     {
@@ -2663,6 +2713,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "parse_file",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "parse_floors",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -2990,6 +3045,11 @@
     {
       "id": "read_conf",
       "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "read_conf",
+      "kind": "function",
       "file": "tools/playbook/render_playbook.py"
     },
     {
@@ -3083,6 +3143,11 @@
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
     },
     {
+      "id": "read_header_verbs",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "read_input",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -3096,6 +3161,11 @@
       "id": "read_lang_modes",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_legacy_row",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "read_legs",
@@ -3473,6 +3543,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_ask_row",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "render_baseline",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -3548,6 +3623,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_relocated_row",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "render_report",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -3563,6 +3643,11 @@
       "file": "tools/process-monitor/census.py"
     },
     {
+      "id": "render_sev_row",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "render_shards",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3571,6 +3656,11 @@
       "id": "render_spec_records",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_status_row",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "render_swapped_name",
@@ -3981,6 +4071,11 @@
       "id": "runGit",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "run_arms",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
     },
     {
       "id": "run_bounded",

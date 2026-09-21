@@ -282,6 +282,12 @@ def write_text(path: str, text: str) -> None:
 # section 4, against a backlog row that claimed reuse here was free.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from corpus_ids import parse_conf  # noqa: E402  the kit's ONE conf parser
+# TOOL-dDerivedDocket-6 -- the backlog grammar, the two status-header verbs and the status fold. The
+# DEPENDENCY RUNS ONE WAY: this module calls into that one and that one imports nothing from here,
+# so the two cannot deadlock at import and `backlog.py` stays usable by a reader that never renders
+# an index. The verbs it reads are PERMITTED and never required, so a header carrying neither parses
+# byte-identically to how it parsed before this import existed.
+import backlog  # noqa: E402  a sibling of this file, reached by the path insert above
 
 def load_conf(root: str) -> dict:
     conf = {"MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": ""}
@@ -405,11 +411,23 @@ def _parse_order(header: str, path: str):
     return None
 
 
-def parse_spec(path: str) -> dict | None:
+def _read_backlog_verbs(header: str, path: str, alt: str) -> dict:
+    try:
+        return backlog.read_header_verbs(header, path, lambda rest: _expand_ids(rest, alt))
+    except backlog.Problem as exc:
+        raise Problem(str(exc)) from None
+
+
+def parse_spec(path: str, alt: str = "(?!)") -> dict | None:
     """Return the unit record, or None when the file carries no parseable status header.
 
     A grandfathered recording legitimately has none; check 12 already rejects a post-cutoff spec
     that is missing one, so this file never has to defend against a malformed header.
+
+    `alt` is the caller's family alternation, used only to expand the two backlog verbs. It DEFAULTS
+    TO A NEVER-MATCHING PATTERN rather than to this repo's families: a caller that did not pass one
+    has no id grammar to offer, and admitting every token would be a grammar bound to the wrong tree
+    — the shape whose empty classification reads exactly like a clean corpus.
     """
     body = list(unfenced(read_text(path)))
     hdr = None
@@ -436,6 +454,13 @@ def parse_spec(path: str) -> dict | None:
         # PERMITTED, never required (fork 5). HDR_RE has no end anchor, so a header carrying this
         # verb parses identically with or without it and no landed spec goes retroactively red.
         "order": _parse_order(hdr.string, path),
+        # The two BACKLOG verbs, on the same terms as `order` and refusing on the same grounds. The
+        # reader is `backlog.py`'s, and the range expansion is this module's own `_expand_ids`,
+        # passed IN rather than imported there: the id alternation is derived from the caller's conf
+        # and that module must not grow a second one. `backlog.Problem` is re-raised as this file's
+        # own, because `collect()` is reached by --check and --write through one call site and an
+        # unfamiliar exception class there would be a traceback rather than a named failure.
+        **_read_backlog_verbs(hdr.string, path, alt),
         # Tier was captured by HDR_RE and discarded here, one line after the match. The roster now
         # renders it, which costs this key and one cell. It is MANDATORY in the header regex, so a
         # unit row always has a value and only the ORDER cell can be empty.
@@ -787,7 +812,7 @@ def collect(root: str, conf: dict) -> list:
             if families and value.strip() not in families:
                 raise Problem(f"{readme}: roster value '{value.strip()}' is outside the FAMILIES set")
         specs = sorted(p for p in tracked if p.startswith(f"{m}/builds/{slug}/spec/") and p.endswith(".md"))
-        units = [parse_spec(os.path.join(root, p)) for p in specs]
+        units = [parse_spec(os.path.join(root, p), _id_alternation(conf)) for p in specs]
         # BOOTSTRAP, not failure. A build whose ids appear nowhere but its own README is young, not
         # broken, and there is nothing to correct the authored value against — so it stands. The
         # anti-self-reference property still holds where it can bite: the moment any independent
@@ -2742,6 +2767,43 @@ def cmd_selftest() -> int:
         arm("a MISSING waiver registry REFUSES", "absent", lambda: _read_waiver(None))
         arm("a waiver row naming an untracked path REFUSES", "outlived",
             lambda: _read_waiver("memory/builds/ghost/README.md   gone\n"))
+
+        # TOOL-dDerivedDocket-6 — the two BACKLOG verbs, read through `backlog.py` and expanded by
+        # this module's own `_expand_ids`. THE DARK ARM IS FIRST and is the one that matters here: a
+        # header carrying NEITHER verb must parse exactly as it did before, or this unit moves the
+        # corpus it was built not to touch.
+        def _read_verbs(tail: str):
+            p = os.path.join(base, "hdr.md")
+            write_text(p, "# EXMP-aFoo-1 — a fixture spec\n\n"
+                          "**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · "
+                          "base abc12345" + tail + "\n")
+            got = parse_spec(p, "EXMP|OTHR")
+            return f"closes={got['closes']} advances={got['advances']}"
+
+        arm("a header carrying NEITHER verb parses with both lists empty", "closes=[] advances=[]",
+            lambda: _read_verbs(" · streams tooling"))
+        arm("a `closes` RANGE expands at parse time", "closes=['EXMP-aFoo-2', 'EXMP-aFoo-3', "
+                                                     "'EXMP-aFoo-4']",
+            lambda: _read_verbs(" · closes EXMP-aFoo-2..4"))
+        arm("`advances` carries its own list", "advances=['EXMP-cBaz-3']",
+            lambda: _read_verbs(" · closes EXMP-aFoo-2..4 · advances EXMP-cBaz-3"))
+        arm("a malformed value REFUSES naming the file", "hdr.md: status header carries "
+                                                         "`closes 2x`",
+            lambda: _read_verbs(" · closes 2x"))
+        arm("a SECOND `closes` REFUSES naming the file", "hdr.md: status header carries the "
+                                                         "`closes` verb 2 times",
+            lambda: _read_verbs(" · closes EXMP-aFoo-2 · closes EXMP-aFoo-3"))
+        arm("one id under BOTH verbs REFUSES naming the file",
+            "hdr.md: status header names EXMP-aFoo-2 under BOTH",
+            lambda: _read_verbs(" · closes EXMP-aFoo-2 · advances EXMP-aFoo-2"))
+        arm("a `closes` with no value REFUSES", "carries `closes` with no value",
+            lambda: _read_verbs(" · closes · streams tooling"))
+
+    # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
+    # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
+    # would be one more row in the manifest for a file this one already imports. Its arms print
+    # their own lines and hand back the labels that failed, so a red there is a red here, named.
+    fails += [f"backlog: {label}" for label in backlog.run_arms()]
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")

@@ -286,3 +286,26 @@ RECORD_SERVES_CUTOFF=""
 # default counts BYTES, so `chars` is the value that changes anything there — which is precisely the
 # platform-dependence this key exists to take out of the shadows.
 ENTRY_CAP_UNIT=""
+
+# ---------------------------------------------------------------------------------------------
+# BACKLOG_MODE — `shards`, `builds`, or blank. It selects WHERE asks live: `shards` is the
+# family-sharded backlog this kit has always rendered, `builds` is the per-build `BACKLOG.md`
+# whose grammar and status fold `backlog.py` owns. Blank and absent both read `shards`, so a tree
+# that never sets it keeps today's behaviour byte for byte. ANY OTHER VALUE IS A REFUSAL, naming
+# the legal set: defaulting a typo to `shards` would keep the old renderer alive after a tree had
+# migrated, and a migration that half-happened is worse than one that refused.
+#
+# THE KEY'S SPELLING IS FROZEN FOREVER. The transition audit classifies a commit by this key, so a
+# rename would make every commit written before it unclassifiable.
+BACKLOG_MODE=""
+
+# ASK_CUTOFF — a zero-padded YYYY-MM-DD date, read ONLY while BACKLOG_MODE is `builds`. It arms the
+# forward-only verdicts: an ask filed on or after it owes a severity row, and owes the `unit` marker
+# when its id is also a spec H1. Older asks are grandfathered, so adopting the model reds nothing
+# retroactively.
+#
+# BLANK UNDER `builds` IS REPORTED, NOT SILENT (verdict V15), and so is a value that is not
+# zero-padded (V16) — `2026-9-30` compares as a raw string, where "2026-10-01" sorts BEFORE it, so
+# an October ask would fall outside a September cutoff and the forward-only verdicts would go quiet
+# on exactly the asks they were armed for. Either verdict DISARMS them and says so.
+ASK_CUTOFF=""

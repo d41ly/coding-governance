@@ -128,3 +128,9 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-20T23:20:19Z dispatch · item de946d81 TOOL-dDerivedDocket-37 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec-tokens.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-37.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-37-1-acceptance-ledger.md
 
 2026-09-20T23:20:23Z brief · item TOOL-dDerivedDocket-37 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T23:43:51Z dispatch · item 82df05c9 TOOL-dDerivedDocket-6 · reason tools/memory-tree/backlog.py tools/memory-tree/gen_build_index.py tools/memory-tree/.memory-tree.conf.example tools/memory-tree/kit.toml memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-6.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-6-1-acceptance-ledger.md memory/map/features/memory-tree-backlog.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/inventories.json
+
+2026-09-20T23:44:15Z brief · item TOOL-dDerivedDocket-6 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T00:07:48Z dispatch · item 82df05c9 TOOL-dDerivedDocket-6 · reason tools/memory-tree/backlog.py tools/memory-tree/gen_build_index.py tools/memory-tree/.memory-tree.conf.example tools/memory-tree/kit.toml memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-6.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-6-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/map/generated/symbols.json
