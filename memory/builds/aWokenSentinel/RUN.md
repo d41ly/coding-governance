@@ -9,6 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes, 1 surfaced
+keepalive-reaped: yes
 lease-utc: 2026-09-21T04:22:27Z
 pid-image: claude.exe
 host: compeeto-agent

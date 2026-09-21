@@ -48,7 +48,8 @@ research record under `build/`.
 
 ## Parked decisions
 
-(none yet)
+- **guide-cap, unit 10 (2026-09-20):** the protocol render crossed `GUIDE_CAP_BYTES` by 193 B; raising the cap is veto 2, so the pass took the curation-debt escape and left raise-or-split to the owner.
+- Unit 6 then fit the render under the cap and drained that row, so the call is moot unless a later unit re-breaches.
 
 <!-- roster:units -->
 
