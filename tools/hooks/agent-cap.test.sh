@@ -694,9 +694,12 @@ print(json.dumps({"tool_name":"Workflow","tool_input":{"scriptPath":g,"args":arg
     miss=""
     if [ -n "$needles" ]; then
       # Split on `;;` alone — a needle may carry spaces ("not a date"), so no word-splitting here.
+      # Fed from a scratch FILE, never a here-string holding a command substitution: the
+      # shell-hygiene leg reds that shape because a failed substitution leaves the read at EOF.
+      printf '%s' "$needles" | sed 's/;;/\n/g' > "$TMP/needles"
       while IFS= read -r n; do
         [ -n "$n" ] && ! grep -qF -- "$n" "$TMP/err" && miss="$miss [$n]"
-      done <<< "$(printf '%s' "$needles" | sed 's/;;/\n/g')"
+      done < "$TMP/needles"
     fi
     # A deny that spells a kit-install path strands every adopter that installed the kit elsewhere
     # — the shipped-surface ratchet holds this hook at its current count, and this arm holds the text.
