@@ -1,4 +1,4 @@
-**Serves:** diff-review DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25 DEPL-cMendedVintage-26 DEPL-cMendedVintage-27 DEPL-cMendedVintage-28 DEPL-cMendedVintage-29 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 TOOL-cMendedVintage-10 TOOL-cMendedVintage-11 TOOL-cMendedVintage-12 TOOL-cMendedVintage-13 TOOL-cMendedVintage-14 TOOL-cMendedVintage-15 TOOL-cMendedVintage-16 TOOL-cMendedVintage-17 TOOL-cMendedVintage-18 TOOL-cMendedVintage-19
+**Serves:** diff-review DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25 DEPL-cMendedVintage-26 DEPL-cMendedVintage-27 DEPL-cMendedVintage-28 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 TOOL-cMendedVintage-10 TOOL-cMendedVintage-11 TOOL-cMendedVintage-12
 
 # cMendedVintage — closing diff review, ROUND 2
 
@@ -13,6 +13,15 @@ through -25, all built and closed — and **none of them is re-reported here**. 
 no review has seen: seventeen units and the direct repairs landed after `b6cc8f6f`, including the two
 regressions that -22 through -25 themselves shipped. Every citation a surviving finding rests on was
 re-opened in this worktree at `4877af81` before this record was written.*
+
+*Eight of the units this round read are NOT on the `Serves:` line above, and their absence is a fact
+rather than a gap in the reading: `DEPL-cMendedVintage-29` and `TOOL-cMendedVintage-13` through
+`-19` were built straight from the owner's rulings on eight parked decisions, so no spec in this
+tree defines them and a binding naming one resolves to nothing. `TOOL-cMendedVintage-17` is graded
+below as L1 and `TOOL-cMendedVintage-11` — which does have a spec — as M2, so the reading covered
+them whatever the binding line can express. Trimmed rather than left, because a record whose
+binding names an id nothing defines is the hygiene gate's own finding, and eight retro-specs written
+after the fact would be exactly the re-narration §5 bans.*
 
 **Reviewed range:** `859daa67e728ae273d5278536fb462c04077f16f...4877af81c05b54b1b995f44adf5396e947ccb73a`.
 
