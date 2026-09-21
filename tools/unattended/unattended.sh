@@ -3005,16 +3005,25 @@ read_ask_scope() { # slug · rev -> AD_SCOPE, the mandate then this build's own 
 # A BLANK `ASKS_CMD` FREEZES NOTHING, and that is the same answer `asks-disposed`'s term zero gives:
 # where the ask contract is NOT ADOPTED there is no derived status to freeze, and a record in a
 # project that never declared a generator must read exactly as it did before this existed.
-derive_ask_freeze() { # slug · rev -> the freeze value on stdout, or rc 1 and AW_WHY
+#
+# IT RETURNS THROUGH A GLOBAL AND NOT ON STDOUT, which is `trusted_base`'s own lesson one more time.
+# Read as `_v=$(derive_ask_freeze …)` the whole body runs in a SUBSHELL, so the `AW_WHY` the witness
+# sets there dies with it and the caller's refusal ends in an empty reason — a message written into
+# a channel nobody reads, and one whose arm still passes because the signature stops before the
+# interpolation. `memory/gotchas/status-set-in-a-subshell.md`.
+AD_FREEZE=""
+derive_ask_freeze() { # slug · rev -> 0 and AD_FREEZE, or 1 and AW_WHY
   local _id _st
+  AD_FREEZE=""
   [ -n "${ASKS_CMD:-}" ] || return 0
   read_ask_scope "$1" "$2"
   [ -n "$AD_SCOPE" ] || return 0
   run_ask_witness "$1" "$2" $AD_SCOPE || return 1
   for _id in $(printf '%s\n' $AD_SCOPE | sort -t- -k2,2 -k3,3n); do
     _st=$(ask_field "$_id" status)
-    printf '%s=%s ' "$_id" "${_st:--}"
+    AD_FREEZE="$AD_FREEZE$_id=${_st:--} "
   done
+  AD_FREEZE=${AD_FREEZE% }
 }
 
 # ------------------------------------------------------- the two refusals an ids-shaped value takes
@@ -3934,13 +3943,12 @@ WTS
   #
   # NO LINE FOR A RECORD WITH NO MANDATE AND NO FILING OF ITS OWN, so every record already in every
   # tree is byte-unchanged by this.
-  local _lf_asks
-  if ! _lf_asks=$(derive_ask_freeze "$slug" "$wit"); then
+  if ! derive_ask_freeze "$slug" "$wit"; then
     fail 77 "this run's asks cannot be read at the tree it is landing, so the record would go terminal carrying no answer to the question it was authorized by - and a landed record is the one thing no verb may repair: $AW_WHY"
     return 1
   fi
-  if [ -n "${_lf_asks// /}" ]; then
-    set_fact "$rel" asks-at-landing "${_lf_asks% }" || return 1
+  if [ -n "$AD_FREEZE" ]; then
+    set_fact "$rel" asks-at-landing "$AD_FREEZE" || return 1
   fi
   # TOOL-dSealedTally-1. THE TERMINAL WRITES SIT HERE, LAST, AND THE ORDERING IS LOAD-BEARING.
   # `phase LANDED` used to be written ~70 lines above, before the lander-marker gate that can
@@ -6193,7 +6201,12 @@ $_bcnon"
         esac
         # ---- From here the ask is MANDATED, and T3's three admitted end states apply.
         _ad_slot=$(ask_disposition_slot_of "$_ad_row")
-        _ad_grade=$(printf '%s\n' $(fact "$rel" asks-ready) | sed -n "s/^$_ad_id=//p" | head -1)
+        # THE GRADE, BY EXACT KEY. Through awk with the id in the ENVIRONMENT rather than a `sed`
+        # expression built around it: the id is a value out of a build README, and a caller's bytes
+        # spliced into an expression are that expression's metacharacters
+        # (`memory/gotchas/conf-value-interpolated-into-a-regex.md`).
+        _ad_grade=$(printf '%s\n' $(fact "$rel" asks-ready) \
+                    | ADG_ID="$_ad_id" awk -F= 'BEGIN { i = ENVIRON["ADG_ID"] } $1 == i { print $2; exit }')
         _ad_dec=$(id_rows "$(grep -E '^[0-9][0-9-]*T[0-9:]*Z decision · ' "$rel" 2>/dev/null || true)" "$_ad_id" | head -1)
         _ad_resc=$(id_rows "$(grep -E "^[0-9][0-9-]*T[0-9:]*Z rescope · item ($(kinds_re "$PARK_ACTS_OWED")) " "$rel" 2>/dev/null || true)" "$_ad_id" | head -1)
         case "$_ad_st" in

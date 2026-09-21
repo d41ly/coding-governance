@@ -7481,6 +7481,10 @@ askrows 'EXMP-aFoo-3\tCLOSED\tARCH-tDisp-1\taFoo\tHIGH\tyes\t-\t-\t-\t-\n'
 git add -A >/dev/null; git commit -q -m closedbyspec --no-verify
 run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
 out=$(run --close tDisp)
+# THE POSITIVE CONTROL COMES FIRST. Two `miss` arms over an output that never reached the DoD loop
+# pass by finding nothing, which is this repo's own named class; the line below is what says the
+# close actually evaluated the set these two then find silent on.
+hit "$out" "observing the anchor, then evaluating the Definition of Done"
 miss "$out" "asks-disposed"
 miss "$out" "having dropped scope it was authorized for"
 
@@ -7598,6 +7602,11 @@ git push -q -f origin HEAD:main
 askmode silent
 out=$(run --landed tDispF)
 hit "$out" "this run's asks cannot be read at the tree it is landing, so the record would go terminal carrying no answer to the question it was authorized by - and a landed record is the one thing no verb may repair"
+# ...and the refusal carries the WITNESS'S OWN reason, which is the half an arm anchored on the
+# signature cannot see: the message interpolates `AW_WHY`, and reading the freeze through a command
+# substitution would run the witness in a subshell and end every refusal in an empty reason while
+# this arm still passed (`memory/gotchas/status-set-in-a-subshell.md`).
+hit "$out" "DEAD PROBE - the declared command wrote nothing to either stream"
 same "the refused landing left the phase NON-TERMINAL" \
   "$(sed -n 's/^phase: //p' memory/builds/tDispF/RUN.md)" "LANDING"
 same "...and wrote no freeze line" \
@@ -7657,7 +7666,7 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # that wrote those arms ran no suite, observing each refusal by hand against a scratch fixture
 # instead, so a 1:1 pin would be asserting a number nobody has seen a runner produce.
 # RAISED 934 -> 977 by TOOL-dDerivedDocket-17, the `asks-disposed` and `asks-at-landing` arms.
-# The RAW figure is 51 — the `hit`/`miss`/`same`/`mutate` lines that block adds, counted off the
+# The RAW figure is 53 — the `hit`/`miss`/`same`/`mutate` lines that block adds, counted off the
 # diff — DISCOUNTED to +43 for the reason every figure here is discounted, and for the one unit 16
 # adds: this pass ran no suite either, observing each refusal by hand against a scratch fixture, so
 # a 1:1 pin would assert a number nobody has watched a runner produce.

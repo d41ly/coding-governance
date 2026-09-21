@@ -24,7 +24,7 @@ protocol copy here, with exactly the reverse at the parent.
 - AC2 — `skipped — asks-disposed` — `--close` on a fixture build with no `asks:` mandate and a blank
   `ASKS_CMD` reports the item MET and prints the NOT ADOPTED announcement. The second half of term
   zero is AC18's.
-- AC3 — `askmode short` — the fixture's declared generator answers for the first id of a two-id
+- AC3 — `ASKS_CMD` — the fixture's declared generator answers for the first id of a two-id
   scope. `--close` is UNMET, the message carries `DEAD PROBE`, and it names `EXMP-tDisp-7`, the id
   that never came back. The scope is two because the build files an ask of its own, which is the
   only way a one-ask mandate can be short-changed.
@@ -33,17 +33,17 @@ protocol copy here, with exactly the reverse at the parent.
   is still UNMET, because only this build's file admits anything; the same row in this build's file
   with no parked decision is UNMET under the F3 hardening; and with a `decision` park row whose
   reason spells `veto 2` the item is MET.
-- AC5 — `read_run_commits` — two fixtures. A mandated ask recorded CLOSED by a commit of this run
+- AC5 — `m-base:` — two fixtures. A mandated ask recorded CLOSED by a commit of this run
   that is not a CLOSED unit's build commit is UNMET and the message names that sha. A foreign
   build's commit landed on the fixture's default branch after `m-base:`, pushed to the fixture's
   origin and merged into the run branch, is NOT named by T4 — the advertised tip is excluded — and
   T5 names the ask instead.
-- AC6 — `KEEP` — three fixtures. A KEEP row with a CLOSED spec of this build carrying only
+- AC6 — `advances` — three fixtures. A KEEP row with a CLOSED spec of this build carrying only
   `order 1` is UNMET; the same row with that spec carrying `advances EXMP-aFoo-3` is MET; and the
   same verb on a SPECCED spec is UNMET again, which is the control that keeps CLOSED load-bearing.
   The in-range WONTDO half: a `yes` ask written off by a row this run added after its `m-base` is
   UNMET, and the same row carrying a `stale:` reason beside a parked decision is MET.
-- AC7 — `--override asks-disposed` — on a fixture whose run is landed and whose item fails T3, the
+- AC7 — `override` — on a fixture whose run is landed and whose item fails T3, the
   close reports `override recorded for 'asks-disposed'` and `close OK`, and the record afterwards
   holds exactly one `override · item asks-disposed · reason …` park row. The same call with no
   `--reason` is refused by check 12, and NOT by check 21 — the item is not in `DOD_NO_OVERRIDE`.
@@ -52,12 +52,14 @@ protocol copy here, with exactly the reverse at the parent.
   string sort reverses — and it sits on the line ABOVE `units-at-landing`, which is `set_fact`'s
   newest-first order. `--landed` on a record with no mandate and no filing of its own writes no such
   line. With the generator silenced the verb refuses, the record still reads `LANDING`, and it
-  carries no freeze line.
-- AC9 — `check-unattended.sh` — the leg's own command over a scratch copy of this tree carrying the
+  carries no freeze line — and that refusal carries the witness's own reason, which is the half
+  the gotchas checklist caught: read through a command substitution the witness runs in a
+  subshell, `AW_WHY` dies with it, and the arm anchored on the signature still passes.
+- AC9 — `DOD_CORE` — the leg's own command over a scratch copy of this tree carrying the
   break. With `asks-disposed` deleted from `DOD_CORE` and `.unattended.conf` declaring `13:13`,
   check 3 reds with `the kit's CORE Definition-of-Done set has shrunk below its floor … 12 against
   13`. The same copy unbroken exits 0 with no FAILED line at all, which is the control.
-- AC11 — `drift_report.py` — a fixture holding two `override … item asks-disposed` rows, one
+- AC11 — `asks_disposed_overrides` — a fixture holding two `override … item asks-disposed` rows, one
   `override … item gates-green` row and one `decision` row naming the same item reads
   `asks_disposed_overrides` = 2, `of` = 2, `live` true and `gateable` false, with a per-record
   detail row each. A third override raises it to 3. A fixture with no run-state file at all reads
@@ -65,7 +67,7 @@ protocol copy here, with exactly the reverse at the parent.
 - AC13 — `BACKLOG.md` — `--close` on a no-mandate fixture whose own folder files
   `EXMP-tDispF-1`, with `ASKS_CMD` set, is UNMET naming that ask and its derived `OPEN`. The same
   ask with a `KEEP` row in that file is admitted, which is the green control.
-- AC14 — `askmode short` — the same run as AC3. F is enumerated from the tree before the witness
+- AC14 — `ASKS_CMD` — the same run as AC3. F is enumerated from the tree before the witness
   runs, so the omitted F ask is named rather than silently dropped from the scope.
 - AC15 — `asks-at-landing` — `--landed` on a fixture with no mandate whose build filed one ask
   writes `EXMP-tDispF-1=CLOSED`, so a self-filed ask's answer is frozen on the same terms a
@@ -73,7 +75,7 @@ protocol copy here, with exactly the reverse at the parent.
 - AC16 — `closes` — a mandated ask derived CLOSED by a CLOSED spec of this build whose header
   `closes` it makes `--close` silent on `asks-disposed` entirely. Without this arm every arm above
   is satisfied by an item that reds everything.
-- AC17 — `build_commit` — the same fixture with the ask recorded `CLOSED · … · by <sha>` where the
+- AC17 — `closes` — the same fixture with the ask recorded `CLOSED · … · by <sha>` where the
   sha is the commit whose subject names the CLOSED unit and which touches a path outside the build
   folder. T4 does not name it. The neighbouring commit, `chore: something else entirely`, IS named,
   which is what says the exemption is the build commit and not any commit of the run.
