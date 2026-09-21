@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-21T18:31:27+03:00 @ f5b3aeae1e884f449ad569d949b6fbcca98c222c
+last-audit: 2026-09-21T23:39:42+03:00 @ c23d5701b56584722a27d60ffa5633383ae6fbdb
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 37ef8940b37ce1f8747941f3ccfbfd67772f623a
+last-body-change: c23d5701b56584722a27d60ffa5633383ae6fbdb
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -216,6 +216,10 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   leg's real cost and killed a healthy suite; a killed leg records no reading, so
   `derive-ceilings.py --write` can never raise exactly the ones that need it · prune when
   that checker accepts a reading taken outside the runner.
+- 2026-09-21 · the unattended kit read as having one lease and one restart path · after origin/main
+  merged into the dDerivedDocket branch, TWO coexist there: a per-slug lease file with a take-over
+  matrix and a scheduled restart from HELD, beside lease facts in RUN.md with `--liveness`, a resume
+  tick and a stop-guard, none of which knows HELD · prune when that build's lease reconciliation lands.
 
 
 ### Environment traps worth front-loading
