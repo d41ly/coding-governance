@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-4 — M4 bounds the spec-audit promotion chain by review precision
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node d · Tier-2 · base fcbfba5f · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -58,26 +58,91 @@ names as its source.
 
 ### Edges
 
-- **consumes-from** `TOOL-dGatedProse-1` — the kit version moves ONCE in this build and that unit
-  owns the move. It bumps `KIT_MEMORY_TREE_VERSION` 2.79 → 2.80 and re-stamps the whole
-  `gov:kit memory-tree@` marker population in the same commit, DERIVED by the marker grep rather than
-  listed. That population is nine tracked files today — verified, `git grep -lF "gov:kit
-  memory-tree@2.79"` returns the engine, four `tools/memory-tree/*.template.md` and the four docs
-  rendered from them — and it includes line 1 of BOTH files this unit edits. So by the time this unit
-  runs, its two paths are ALREADY stamped and it owes nothing: no bump, no re-stamp. Two things are
-  relied on and each is checkable. First, that unit 1 left `2.80` and not a wider string: the re-stamp
-  is byte-neutral only while the version stays four characters, and this unit's whole budget in §4 is
-  measured at base `fcbfba5f` where the marker still reads `2.79`. A five-character version would add
-  one byte to each file and this unit's figures would move with it. Second, that unit 1 left
-  `kit version markers` green, since that leg is unguarded and this unit's bar at order 4 is the last
-  one in the range.
-- **consumes-from** `TOOL-dGatedProse-3` — that unit raises the hygiene GUIDE class caps, which do
-  grade `memory/guides/BUILD-METHOD.md`: check 6's guide selector is the `memory/guides/` prefix
-  (`tools/memory-tree/check-memory-hygiene.sh:719`) and the pair it reads sits at `:84`. Nothing in
-  this unit depends on the raise. At 27569 bytes and 349 lines the file clears the retired 61440/750
-  and the ratified 81920/1000 alike; the cap that actually binds it is the far tighter per-subject
-  `27648` row in `tools/template-size-limits.txt:86`, read by a different checker. The edge exists so
-  the crossing is on the record as a NON-dependency rather than as silence.
+Each sibling bullet below is one END OF A PAIR, and the checker that makes it one is
+`tools/memory-tree/check-memory-hygiene.sh:1798-1800`: a **consumes-from** bullet reds unless the
+unit it names declares **hands-off** back, and `:1815` is the message a half-declared pair prints.
+It is stated here because all four specs of this build are folding in the same pass — deleting one
+end and leaving the other is a red on the bar, not a tidy-up. For the same reason the sibling cites
+below name a file and a bullet's verb rather than a line coordinate: a sibling's own fold moves its
+line numbers, and
+`tools/check-spec-tokens.py` resolves a citation's range without reading the cited line.
+
+- **consumes-from** `TOOL-dGatedProse-3` — the kit version moves ONCE in this build and, under the
+  main loop's R1-CORRECTED ruling of 2026-09-21, THAT unit owns the move: it bumps
+  `KIT_MEMORY_TREE_VERSION` 2.79 → 2.80 in its own commit and re-stamps every carrier of the retired
+  `gov:kit memory-tree@` marker with it, the population DERIVED by the marker grep rather than listed.
+  Both files this unit edits are in that population — verified, `git grep -nF "gov:kit
+  memory-tree@2.79"` puts the marker on line 1 of `memory/guides/BUILD-METHOD.md` and of
+  `tools/memory-tree/BUILD-METHOD.template.md` — so at order 4 this unit edits two ALREADY-STAMPED
+  files and owes nothing: no bump, no re-stamp.
+  Why order 3 and not order 1, re-derived at source rather than taken from the ruling:
+  `tools/memory-tree/check-verdict-epoch.sh:18` states the rule topologically — the NEWEST commit in
+  `base..HEAD` that moves a behaviour-bearing line of the engine must be an ancestor of, or equal to,
+  the newest commit that changes the constant — and `:179` is the `git merge-base --is-ancestor` that
+  tests it. The engine is `tools/memory-tree/check-memory-hygiene.sh` (`:68`) plus six named
+  delegates (`:69`), units 1 and 3 both move that engine, and unit 3 is the later of the two. A bump
+  at order 1 would therefore be OLDER than the last change it claims to date, and the leg reds — at
+  THIS unit's bar, the last in the range. rev-2 credited the move to `TOOL-dGatedProse-1` on the
+  superseded R1 and was wrong about it.
+  Two things are relied on and each is checkable. First, that the version the re-stamp leaves is FOUR
+  characters: the re-stamp is byte-neutral only while it is, and every byte figure in §4 is measured at
+  base `fcbfba5f` where the marker still reads `2.79`. Re-derived on this fold — `2.79` and `2.80` are
+  four bytes each and the carrier line is `<!-- gov:kit memory-tree@X -->` in both files, so the stamp
+  rides through this unit's write set at zero cost; a five-character version would add one byte to
+  each file and move §4's pair. Second, that unit 3 leaves `kit version markers` green, since that leg
+  is unguarded and this unit's bar is the last one that can catch it.
+  Two further crossings ride this same edge and neither is a dependency. That unit's render pass
+  rewrites `memory/guides/BUILD-METHOD.md` from the template, because the render loop iterates the
+  whole `PAIRS` list (`tools/memory-tree/kit-dogfood-parity.test.sh:58`, four pairs, looped at `:100`)
+  rather than the pair a unit edited — which is this unit's own direction of travel in S4, so it
+  reproduces rather than threatens it. And that unit raises the hygiene GUIDE class caps to the pair
+  the owner ruled on 2026-09-21: 81920 bytes and 1000 lines, against the `61440`/`750` at
+  `tools/memory-tree/check-memory-hygiene.sh:84` today, with check 6's guide selector being the
+  `memory/guides/` prefix at `:719`. At 27569 bytes and 349 lines this file clears both pairs, and the
+  cap that actually binds it is the far tighter per-subject `27648` row in
+  `tools/template-size-limits.txt:86`, read by a different checker.
+- **consumes-from** `TOOL-dGatedProse-1` — that unit's marker is NOT what this unit reads, and two
+  other things are. It edits the engine at order 1, which is one of the two behaviour-bearing moves
+  the epoch rule above ranges over, so a mis-placed bump in this build surfaces at this unit's bar
+  rather than at its own (§7). And its own S6 edits `tools/memory-tree/HYGIENE.template.md` and lands
+  through `memory/HYGIENE.md`, which the kit's render is the declared direction for — so its render
+  pass also rewrites this unit's guide from the template, byte-identically, because nothing in this
+  unit's write set has moved at order 1. `TOOL-dGatedProse-3`'s own fold reads that unit the same
+  way, naming the four dogfood pairs it leaves rendered and in sync from that catalog-entry edit,
+  which is a second reader reaching the same conclusion rather than this spec's own inference.
+  This end of the pair exists because that unit declares **hands-off** `TOOL-dGatedProse-4`, which
+  at the time of this fold it still did, on its rev-2 grounds. If its fold drops that bullet, this
+  one goes in the same commit — the rule at the head of this section reds whichever half is left
+  alone, and the version half of its rev-2 wording is already superseded.
+  Under the owner's O2 ruling of 2026-09-21 a third thing crosses, and it is a GRADING rather than a
+  write: that unit's new check 25 declares no `READER_INVENTORY_CUTOFF`, so it grades every live spec
+  from the commit that lands it, and THIS SPEC is one of them. Read against the trigger that unit
+  declares, no §2 item fires. The only item a retirement verb governs is S2 (`are deleted`, against
+  that unit's closed stem list), and S2 carries NO backticked token at all — so neither the five
+  declared identifier shapes nor the kind-noun shape the owner added in O3 can reach it, since both
+  of them test a backticked token and there is none to test. If a fold widens the trigger to an
+  unbackticked item, the remedy is in this file and is two lines: S2 gains a `**Readers:**` clause,
+  which is the false-positive cost that unit already prices at one line per item.
+- **consumes-from** `TOOL-dGatedProse-2` — declared at rev-3, and its absence at rev-2 was a LIVE RED
+  rather than an omission. Reproduced by running the gate on this tree, not inferred: at rev-2 check
+  12 printed that this spec is named **hands-off** by `TOOL-dGatedProse-2` and declares no matching
+  **consumes-from** back, under the heading "one author read the handoff and the other never saw it".
+  Re-run after this bullet landed, it passes.
+  That unit's own bullet says the crossing is "nothing" on the write side, and that is right — its
+  write set is disjoint from this unit's three paths — but the mirror is still owed, and
+  `memory hygiene` is on this unit's keep-green list in §7.
+  What does cross is the same O2 consequence: that unit's `claims` join declares no cutoff either, so
+  it grades every live spec from its landing commit, this one included. Read against the arms it
+  declares, this spec clears, and the reading is written down so a fold that widens an arm is checked
+  against it instead of re-derived. Two sentences here are claim-shaped. §4's inventory sentence
+  backticks `[paths] globs` and `build-method size`, and a token carrying a SPACE is exempt from all
+  three refusal classes before any other test. That same sentence also backticks the two BUILD-METHOD
+  paths, which WOULD refuse as PATH if an arm matched it — none does, because every arm is anchored on
+  a backticked dossier subject and needs a claim verb between that subject and the run of objects, and
+  there the dossier path is followed by an em dash and the run with no verb between them. AC8's
+  sentence is the other, and its verb is `is read`. If a fold widens the filler run or the verb set,
+  the remedy is again in this file and is prose: the inventory sentence is re-worded so the two paths
+  do not sit in a run behind a dossier subject.
 - **consumes-from** external — the precision figure this rule reads. It exists only as prose in a
   review record, written by the synthesis agent because `tools/workflows/tier2-review.js` interpolates
   it into that agent's prompt (`:506`). The run-state file carries the DISPOSITION this rule produces
@@ -245,10 +310,15 @@ Applied to scratch copies at base `fcbfba5f` on node d, 2026-09-20:
 weighing the result, after the cross-read found rev-1's pair one byte adrift. The byte is D1's
 separating space, priced in the row above; rev-1 carried 197 in that table and 27570 in this one, and
 only one of the two could be right. Deleting D3 instead of re-pricing D1 was the other way to close
-the gap and does NOT work: the payment falls to 342, the file lands at 27677, and the cap reds. The
-rule
-lands and the budget ends healthier than it started, which matters because `TOOL-dLoggedFlight-35`
-records an unresolved owner dispute over M1's budget passage and this unit must not lean on it.
+the gap and does NOT work: the payment falls to 342, the file lands at 27677, and the cap reds.
+RE-DERIVED A SECOND TIME on the rev-3 fold, by re-applying all six edits to fresh scratch copies:
+every figure in this table reproduced, the sentence measures 429 bytes and the pointer repair 18,
+and the long line is 1047 characters at 1053 bytes. The kit-version re-stamp this unit now takes
+from `TOOL-dGatedProse-3` rather than from unit 1 moves none of it, because `2.79` and `2.80` are
+four bytes each — so the payment closes against the same 76 bytes of real headroom whichever unit
+stamps the carrier. The rule lands and the budget ends healthier than it started, which matters
+because `TOOL-dLoggedFlight-35` records an unresolved owner dispute over M1's budget passage and
+this unit must not lean on it.
 
 ### The carrier — a render, not byte identity
 
@@ -438,14 +508,18 @@ The legs it must keep green:
 `kit/dogfood doc parity` is the leg this edit arms, and its guard does name this carrier: verified in
 `tools/gate-legs.json`, the guard is the six paths `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`,
 `memory/guides/BUILD-METHOD.md`, `memory/guides/ANNOTATION-STYLE.md`, `tools/lib/` and
-`tools/memory-tree/`. `TOOL-dGatedProse-3` §7 calls that leg unguarded; it is not, and this is the
-reading two cross-reads independently resolved in this unit's favour.
+`tools/memory-tree/`. `TOOL-dGatedProse-3` §7 called that leg unguarded at rev-2; it is not, and this
+is the reading two cross-reads independently resolved in this unit's favour. The tense is deliberate
+— that spec is folding in this same pass, so a present-tense claim about its text would be a guess.
 
 `verdict epoch (kit version dates the engine)` and `codebase-map coverage + freshness` were both
 missing from rev-1's list. Neither carries a guard, so both run on every bar, and the first matters to
 more than this unit: it judges the whole `base..HEAD` range topologically, so a mis-ordered
 kit-version bump anywhere in units 1 to 3 surfaces at THIS unit's bar, the last one in the range.
-This unit's own edit cannot arm it, for the population reason in F2.
+Under R1-CORRECTED the bump sits at order 3, which is also where the range's newest
+behaviour-bearing engine move sits, so the two commits are the same one or the engine move is its
+ancestor — which is what the leg asks for. This unit's own edit cannot arm it, for the population
+reason in F2.
 
 `unattended kit gate` is on that list for a reason worth stating: its check 16 body term requires M4
 to spell `specs-reviewed` in backticks outside every HTML comment, because the directive registry at
@@ -480,10 +554,14 @@ and the token verified present once on the scratch copies.
   AC5 required `kit version markers` to red with a marker reverted, and the verdict-epoch leg's own
   header records a measured red once `merge-rows.py` entered its scan set, so both probes can produce
   a positive. RESOLVED (agent, 2026-09-21): no bump of its own. The kit version moves ONCE in this
-  build and `TOOL-dGatedProse-1` owns the move, re-stamping the derived marker population at order 1,
-  which already includes both of this unit's files. This unit edits an already-stamped file and owes
-  nothing. Declared as the `consumes-from TOOL-dGatedProse-1` edge in §3. Rev-1 credited the bump to
-  `TOOL-dGatedProse-3`.
+  build and, under R1-CORRECTED, `TOOL-dGatedProse-3` owns the move at order 3 and re-stamps the
+  derived marker population with it, which includes both of this unit's files. This unit then edits an
+  already-stamped file at order 4 and owes nothing. Declared as the `consumes-from TOOL-dGatedProse-3`
+  edge in §3, which re-derives the placement from `tools/memory-tree/check-verdict-epoch.sh:18` and
+  `:179` rather than restating the ruling. The owner should know this answer has now named three
+  different units across three revisions — rev-1 said unit 3, rev-2 said unit 1 on R1, rev-3 says
+  unit 3 again on R1-CORRECTED — and that only rev-3's reading is derived from the epoch rule's own
+  source; the first two were read off a build convention.
 - **F3 — FACT-QUESTION · is the placeholder arithmetic in `tools/template-size-limits.txt:69-70`
   wrong?** It says four `{{KIT_DIR}}` grow by 6 each and five `{{TOOL_ROOT}}` shrink by 7 each, a net
   −11. Probe: count both placeholders in `tools/memory-tree/BUILD-METHOD.template.md` and compare the
@@ -495,12 +573,19 @@ and the token verified present once on the scratch copies.
   the same number. Follow-up owed as a backlog row at landing.
 - **F4 — should the advisory high-water in `tools/template-size-highwater.txt` be re-recorded?** It
   holds 26941 for this subject and therefore already warns today at 27572; after this edit it warns at
-  27569. PARKED, and it is the owner's rather than mine: the high-water is the instrument that PRICES
-  growth against a recorded past, a `--bump` re-bases that price, and re-basing it in the same commit
-  that spends the budget is the measurer moving its own baseline. It blocks nothing — the ratchet is
-  advisory and never changes the checker's exit code — so the unit lands either way. Options seen:
-  bump to the post-edit figure, leave it, or retire the row; refused to pick because none of the three
-  is decided by an observation.
+  27569. RESOLVED (agent, 2026-09-21): the row STAYS at 26941 and this unit does not `--bump` it. The
+  high-water is the instrument that PRICES growth against a recorded past, so re-basing it in the same
+  commit that spends the budget is the measurer moving its own baseline — and the growth the warning
+  exists to show is exactly this unit's. Re-derived on this fold rather than asserted. The row is
+  `tools/template-size-highwater.txt:3`, and the checker run named in AC6 prints
+  `TEMPLATE-SIZE WARN — BUILD-METHOD.md grew past its recorded high-water: 26941 -> 27572 (+631)`
+  above its `template-size OK` line, and exits 0 — the ratchet is advisory and never changes the
+  exit code, which `tools/check-template-size.sh:149` states and `:217` implements. After this edit
+  the same line reads `+628`, because 27569 is still above 26941.
+  **So that WARN is expected output of this unit's own landing, not a defect for a later reader to
+  chase.** A reader who wants it gone re-records the row deliberately, in a commit that spends no
+  budget. The options not taken: bump to the post-edit figure, which hides the growth, or retire the
+  row, which ends the pricing for every future edit of this file.
 
 ## 9. Revision log
 
@@ -555,6 +640,38 @@ and the token verified present once on the scratch copies.
   so the regen the sibling finding asks for would rewrite nothing. The leg belongs in §7 and the
   regen does not; AC8 now observes the claim block against base so that refusal can itself go red.
   Nothing else was refused.
+- rev-3 · 2026-09-21 · owner-ruling fold, the lightest of the four and not nothing. **R1-CORRECTED**,
+  the main loop's correction of its own R1 after unit 3's F2 caught it: the kit-version move belongs to
+  `TOOL-dGatedProse-3` at order 3, not to `TOOL-dGatedProse-1` at order 1, because
+  `tools/memory-tree/check-verdict-epoch.sh:18` requires the bump to sit at or after the range's
+  newest behaviour-bearing engine move and both units 1 and 3 move that engine. Verified at source
+  before folding, per the instruction not to take it on trust: `:68-69` is the scan set, `:129` finds
+  W, `:150` finds S, `:179` is the ancestor test. The `consumes-from` edge moves from unit 1 to unit 3,
+  the unit-1 edge is REWRITTEN to what still crosses rather than annotated with what no longer does,
+  §7's verdict-epoch note says why order 3 satisfies the leg, and F2's resolution is re-derived and now
+  discloses that this answer has named three units across three revisions with only this one read off
+  the checker. **A LIVE RED, found while folding and CLOSED by this fold.** `memory hygiene` check 12
+  was failing on this tree at rev-2: `TOOL-dGatedProse-2` declares **hands-off**
+  `TOOL-dGatedProse-4` and this spec declared no mirror **consumes-from**. It passes after this
+  fold, re-run to confirm. A third sibling edge is added, and the pair rule itself
+  (`tools/memory-tree/check-memory-hygiene.sh:1798-1800`) is now stated at the head of §3's Edges, so
+  no later fold deletes one end of a pair believing it is tidying up. **O2**, the no-cutoff ruling: it
+  adds no scope here and it does add a dependency, because both new predicates then grade THIS spec
+  from the commit that lands them. Both readings are written into the edges that own them — no §2 item
+  trips check 25, since the only retirement-verb item carries no backticked token at all, and the two
+  claim-shaped sentences clear the `claims` join on the space clause and on the absence of a claim verb
+  behind the dossier subject — each with the remedy named in case a sibling's fold widens its arm.
+  **O1**: the guide cap pair 81920/1000 is now cited as the owner's ruling of 2026-09-21 rather than as
+  a ratified figure of unknown provenance, and this file clears it either way. **O3 and O4 need nothing
+  here**, and that is stated rather than left as silence: O3 widens unit 1's trigger vocabulary, which
+  this spec's §2 still cannot trip for want of a backtick, and O4 grades the content of a
+  `**Readers:**` clause this spec does not carry and owes none of. **F4**, decided by the main loop
+  rather than the owner: the advisory high-water stays at 26941, the WARN it prints is expected output
+  of this unit's landing, and the checker's exit code is untouched — re-derived by running it.
+  **Both re-verifications the fold was asked for closed.** The payment arithmetic reproduces exactly
+  — 447 in, 450 out, 27572 → 27569 and 27597 → 27594 at 349 lines, headroom 76 → 79 — and it closes
+  against the same real headroom after unit 3's stamp rides through the write set, because `2.79` and
+  `2.80` are four bytes each. Nothing else in §4 moved.
 
 ## 10. Reuse audit
 
