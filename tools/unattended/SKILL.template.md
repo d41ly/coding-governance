@@ -878,9 +878,13 @@ recorded in `LANDING` and free of your keepalive id, it prints `keepalive-reaped
 stamps; still naming the id, it refuses — reap the job, end the turn so the stop-guard records the
 listing again, then re-run. A newest line from BEFORE the close is also a refusal, because the check
 could run and has not: end the turn ONCE, the stop-guard blocks that stop as `finished and unstamped`
-and continues you, and the re-run reads the post-close line. If no record ever appears the hook is
-unwired and `adopt-unattended.sh --check` says so. With no sidecar at all — no hook, or a session
-never bound — the verb lands and prints `unchecked` with the reason, never silently.
+and continues you, and the re-run reads the post-close line. That works for the LEASED session
+alone — the stop-guard binds by the lease — so a session the record does not name is refused FIRST
+and told to run `--resume <slug> --keepalive-id <id>`; ending the turn there records nothing. A
+LANDING line older than the lease is the pre-close case too: it is the dead incarnation's. If no
+record ever appears for the leased session the hook is unwired and `adopt-unattended.sh --check`
+says so. With no sidecar at all — no hook — or a lease naming no session, the verb lands and prints
+`unchecked` with the reason, never silently.
 
 ## If it cannot finish
 

@@ -227,3 +227,5 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-21T02:29:59Z dispatch · item 02648948 TOOL-aWokenSentinel-5 · reason memory/map/features/unattended.md memory/map/generated/MAP.md memory/map/generated/inventories.json
 
 2026-09-21T02:32:30Z dispatch · item 02648948 TOOL-aWokenSentinel-5 · reason memory/builds/aWokenSentinel/README.md
+
+2026-09-21T02:36:53Z dispatch · item 9808fe1d TOOL-aWokenSentinel-5 · reason tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md
