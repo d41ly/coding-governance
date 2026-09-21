@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-26 — the marker region's accepting arm asserts its entry state before it runs: a committed `LANDING` record, a clean tree and HEAD advertised on `origin main`
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 830c46e8 · streams tooling · order 26
+**Status:** CLOSED · rev-2 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-26-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-26-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-26-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-26-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -37,9 +38,10 @@ unrelated refusal.
   `same "accepting arm enters with HEAD advertised as origin main" "$(git rev-parse HEAD)"
   "$(git ls-remote -q origin refs/heads/main | cut -f1)"`. Observed by AC1 and AC2.
 - **S2** — The three lines are observed RED first, one property at a time, by evaluating them in
-  the fixture at the pass with the record `sed` to `LANDED`, then with one untracked file written,
-  then with `origin main` moved to a scratch commit by `git push -q -f origin <scratch>:main`,
-  each printing `FAIL accepting arm enters` naming its property; and GREEN with the region's own
+  the fixture at the pass with the record `sed` to `LANDED`, committed by `fixture` and pushed to
+  `origin main` so the record alone has moved, then with one untracked file written, then with
+  `origin main` moved to a scratch commit by `git push -q -f origin <scratch>:main`, each printing
+  `FAIL accepting arm enters` naming its property and no other; and GREEN with the region's own
   setup restored. Observed by AC2.
 - **S3** — The accepting arm's comment names the three properties as the arm's precondition and
   names spec 22's control as the write that first violated it, by id `TOOL-aWokenSentinel-22`.
@@ -97,7 +99,9 @@ unit 23's predicate by that fact.
 
 In the fixture clone at the accepting arm's position, before the guard is committed, the pass
 evaluates the three lines under each of three staged states: `sed -i 's/^phase: .*/phase: LANDED/'
-memory/builds/tRun/RUN.md` reds the first; `: > stray` reds the second; `git push -q -f origin
+memory/builds/tRun/RUN.md; fixture; git push -q -f origin HEAD:main` reds the first — the bare
+`sed` is an uncommitted edit, so it reds the clean-tree line as well, which the pass observed
+before this was folded (rev-2); `: > stray` reds the second; `git push -q -f origin
 <scratch>:main` where `<scratch>` is one `--allow-empty` commit on a branch off HEAD reds the
 third. Each prints the `FAIL accepting arm enters …` sentence of its own property and no other.
 The region's own setup — `sed` to `LANDING`, `rm stray`, `fixture`, `git push -q -f origin
@@ -155,9 +159,10 @@ control have run.
   Red when: the guard is absent or sits below the read it guards, which asserts nothing about
   entry.
   figure: the line numbers are DERIVED by `grep -n` at observation.
-- **AC2** — When the three `same` lines are evaluated in the fixture with the record at `LANDED`,
-  the output carries `FAIL accepting arm enters at a committed LANDING record: expected [1], got
-  [0]`; with one untracked file present, `FAIL accepting arm enters with a clean tree`; with
+- **AC2** — When the three `same` lines are evaluated in the fixture with the record committed
+  and advertised at `LANDED`, the output carries `FAIL accepting arm enters at a committed LANDING
+  record: expected [1], got [0]` and no other `FAIL` line; with one untracked file present, `FAIL
+  accepting arm enters with a clean tree`; with
   `origin main` moved by `git push -q -f origin` to a scratch commit, `FAIL accepting arm enters
   with HEAD advertised as origin main`; and with the region's setup restored, no `FAIL` line.
   Red when: a staged state passes its guard, which is a guard that cannot fail; or the restored
@@ -191,6 +196,11 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-21 · S2 · §4 · AC2 · folded at the pass from the RED-first reading: the bare
+  `sed` to `LANDED` that §4 named for the first staged state is an uncommitted edit, so it redded
+  the clean-tree line beside the record line (two `FAIL` sentences where §4 promised one); the
+  state is now the record `sed` to `LANDED`, committed by `fixture` and pushed to `origin main`,
+  which reds the record line alone, and AC2 says "and no other `FAIL` line" for it.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 4 as the
   promotion of H2 (raw ids 1, 23): the control's after-state restoration is spec 22's rev-2 fold,
   and the accepting arm's entry guard is this unit.

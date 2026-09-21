@@ -4827,6 +4827,15 @@ sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md; fixture; git pu
 # the anchor and `--landed` could never succeed here. Now that the marker gate is scoped to the
 # REMOTE arm the fixture pushes HEAD to the default branch, so the accepting path is reachable and is
 # asserted directly rather than inferred from which refusal came back.
+# THE ACCEPTING ARM ESTABLISHES NOTHING, so it asserts what it needs. Spec 22's pushed control
+# (TOOL-aWokenSentinel-22) landed the record and moved origin main above this line; every miss
+# below passes on ANY refusal, so an inherited LANDED record read as green here. Three properties,
+# each named when it is the one that moved — a committed LANDING record, a clean tree, and HEAD as
+# the commit origin advertises for main, read by `ls-remote` the way check 34 reads it. The remedy
+# is the region's own setup, never a rebuild here: a rebuild would hide the next insertion.
+same "accepting arm enters at a committed LANDING record" "$(grep -c '^phase: LANDING' memory/builds/tRun/RUN.md)" "1"
+same "accepting arm enters with a clean tree" "$(git status --porcelain | grep -c '')" "0"
+same "accepting arm enters with HEAD advertised as origin main" "$(git rev-parse HEAD)" "$(git ls-remote -q origin refs/heads/main | cut -f1)"
 printf 'landed main at %s by push-main
 ' "$(git rev-parse HEAD)" > "$GCD/tmarker"
 out=$(run --landed tRun)
@@ -6263,7 +6272,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=970
+FLOOR_ASSERTIONS=973
+# RAISED 970 -> 973 by TOOL-aWokenSentinel-26: the accepting marker arm's three entry-state
+# assertions (3), region two's lander-marker block, measured by running that block alone over the
+# sourced prologue: n 24 -> 27 on node `a`.
 # RAISED 961 -> 970 by TOOL-aWokenSentinel-22: the no-sha marker arm (3), the unpushed-commit
 # marker arm with its scratch-commit guard (4) and its pushed control (2), region two's
 # lander-marker block, measured by running that block alone over the sourced prologue: n 15 -> 24
@@ -6333,7 +6345,9 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=774
+FLOOR_SHARD_2=777
+# +3 for the TOOL-aWokenSentinel-26 entry-state assertions on the accepting marker arm, in region
+# two's lander-marker block below the TOOL-aWokenSentinel-22 pushed control.
 # +9 for the TOOL-aWokenSentinel-22 no-sha and unpushed-commit marker arms with the pushed control,
 # in region two's lander-marker block beside the TOOL-aWokenSentinel-16 arms.
 # +15 for the TOOL-aWokenSentinel-9 `--status` keepalive-field arms, in region two beside the
