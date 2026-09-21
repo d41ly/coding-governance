@@ -28,10 +28,14 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   rewrites the checklist it is graded by has no rules left. It reuses `--park`'s newline, separator,
   bypass and terminal refusals over the new step field, and its exact-line idempotence — with the
   step inside the identity, so one amendment at two steps is two rows.
-- `--attest` — writes one of the two agent-checked Definition-of-Done items, deriving the record key
-  so no operator spells one, and REFUSING a machine-checked item by reading its declared checker.
-  Before it existed those keys had no writer, and `--abort` — which requires both — was reachable
-  only by hand-editing a file this kit calls generated.
+- `--attest` — **the two agent-attested items have a VERB, and it is the only way to write one.**
+  `--attest <slug> --item <item> [--value <text>]` derives the record key so no operator spells
+  one, and REFUSES a machine-checked item by reading its declared CHECKER — so a project
+  declaring its own agent-attested extra gets the verb and one renaming a machine item gets the
+  refusal. Before it existed the keys had no writer, which made `--abort` — the sole documented exit
+  from a wedged run, requiring both — reachable only by hand-editing the authored region of a file
+  this kit calls generated. The verb removes the hand edit, not the trust assumption
+  `UNATTENDED-PROTOCOL.md` §9 states.
 - `--record-piece` — writes one leg's verdict for one PIECE into a tracked record joined to that
   piece by content hash. It reuses `--park`'s newline, separator and bypass refusals and its
   exact-line idempotence. The writer takes a records ROOT rather than a slug, and `--records-root`

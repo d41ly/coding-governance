@@ -328,7 +328,7 @@ wait is charged against the gate bound, so the second can fail `gates-green` for
 
 ## 4. The Definition of Done
 
-Twelve kit-owned core items. Each names its checker, because an override budget must not be spent on
+Thirteen kit-owned core items. Each names its checker, because an override budget must not be spent on
 something no machine could have checked:
 
 | Item | Checked by | Asserts |
@@ -345,6 +345,7 @@ something no machine could have checked:
 | `reuse-probed` | machine | a reuse probe actually RAN in this run's tree — the liveness half of `reuse-first`, whose tracked half is whatever the memory kit demands of a spec's reuse section. It reads EVERY declared probe log: `RECALL_CLI`'s query log and `MAP_CLI`'s lookup log, which are the build method's M5 pair, and the count it reports names each half. Five outcomes, three of them MET: the directive was WAIVED, and the item reports the waiver and its reason, which is what stops a waiver being silent; NEITHER CLI is declared or readable, an announced skip, because a core item no adopter without those kits could meet would block every close in their fleet; or rows are recorded, and the per-log counts ride the message. A log counts only where its own CLI is declared, so an undeclared kit's stray log is never mistaken for evidence. UNMET splits the two facts an operator must not confuse: every declared log is ABSENT, so the item cannot answer, versus a log exists and holds nothing for this tree, so the probe was not run. It is NOT a merge-bar leg and cannot be one — these logs live in the git common dir, are neither tracked nor pushed, and a leg reading them in a fresh clone could only report DEAD PROBE. What it does not observe: that the probe was run FOR this build rather than earlier in the same worktree |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one. **The value MAY carry a count** via `--value`, and then `--close` refuses unless it equals the number of `surfaced`-class parked lines — "I surfaced them" becomes "I surfaced N, and the record holds N". Still agent-attested: no machine observes a wrap-up. Omitting the count keeps the old behaviour, so an older record is not retroactively red. The overrides this same `--close` is about to write are excluded, because the DoD is evaluated before they land |
+| `asks-disposed` | machine | every mandated ask, and every ask this build filed itself, reached an end the owner can accept: derived terminal, held by this build's own `BLOCKED`/`DEFERRED` row, or `KEEP` after a CLOSED unit that `advances` it. Status is the `ASKS_CMD` witness's and never a second fold here. Term zero meets it and ANNOUNCES the skip |
 
 A project MAY append items via `DOD_EXTRA`. It may NOT delete a core item; the gate pins the core set's
 COUNT against the same shrink-only floor, for the reason §3 gives.
@@ -354,12 +355,7 @@ parked entry), and surfaced in the wrap-up. The two agent-attested items do **no
 override budget: attestation is not a machine verdict, and pretending otherwise makes an override
 look like a check that failed.
 
-**The two attested items have a VERB, the only way to write one.** `--attest <slug> --item <item>
-[--value <text>]` refuses a machine-checked item by reading its declared CHECKER, so a project
-declaring its own agent-attested extra gets the verb and one renaming a machine item gets the
-refusal. Before it existed the keys had no writer, which made `--abort` — the sole documented exit
-from a wedged run, requiring both — reachable only by hand-editing the authored region of a file this
-kit calls generated. The verb removes the hand edit, not the trust assumption §9 states.
+Both attested items are written by `--attest`, whose entry in `UNATTENDED-VERBS.md` carries the rest.
 
 **`authorization-reachable` has NO override, and this is where a close meets that.** §1 states it at
 run START, which is where the rule is decided and not where it is hit — an agent whose close refuses
@@ -434,7 +430,9 @@ distinction that matters most.
 
 The nineteen verb entries live in `UNATTENDED-VERBS.md`, installed beside this file from the kit's
 `VERBS.template.md` and byte-compared against it by the same leg that compares this pair. Read them
-there. Nothing about any verb changed in the move. The stop contract is `UNATTENDED-STOPS.md`, installed and compared the same way.
+there. Nothing about any verb changed in the move, and section 4's attested-item paragraph moved
+into `--attest` the same way. The stop contract is `UNATTENDED-STOPS.md`, installed and compared
+the same way.
 
 ## 8. What a project declares
 

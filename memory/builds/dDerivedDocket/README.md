@@ -138,7 +138,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [TOOL-dDerivedDocket-48 — the ask witness reads a stream the capture does not merge](spec/2026-09-20-spec-TOOL-dDerivedDocket-48.md) | 15 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-dDerivedDocket-49 — one declared ladder decides which next: shape the plan prints](spec/2026-09-20-spec-TOOL-dDerivedDocket-49.md) | 15 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-dDerivedDocket-16 — driver ask-awareness: the asks key, preflight and plan](spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md) | 16 | 2 | CLOSED | rev-7 | 2026-09-21 |
-| [TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze](spec/2026-09-14-spec-TOOL-dDerivedDocket-17.md) | 17 | 2 | SPECCED | rev-6 | 2026-09-20 |
+| [TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze](spec/2026-09-14-spec-TOOL-dDerivedDocket-17.md) | 17 | 2 | CLOSED | rev-7 | 2026-09-21 |
 | [TOOL-dDerivedDocket-52 — the introducing commit of a pinned record line, across the rotation rename](spec/2026-09-20-spec-TOOL-dDerivedDocket-52.md) | 17 | 2 | SPECCED | rev-1 | 2026-09-20 |
 | [TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate](spec/2026-09-14-spec-TOOL-dDerivedDocket-18.md) | 18 | 2 | SPECCED | rev-5 | 2026-09-20 |
 | [TOOL-dDerivedDocket-54 — the cross-run exclusion probe reads history unsimplified](spec/2026-09-20-spec-TOOL-dDerivedDocket-54.md) | 18 | 2 | SPECCED | rev-1 | 2026-09-20 |
@@ -164,7 +164,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 38 | 1 | SPECCED | rev-5 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 45 bound to this build, across 4 record folder(s).
+Records: 46 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

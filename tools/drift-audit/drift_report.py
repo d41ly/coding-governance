@@ -1374,6 +1374,55 @@ def build_live_backlog_rows(ctx) -> dict:
 
 
 # --------------------------------------------------------------------------------------------
+# TOOL-dDerivedDocket-17 — `--close --override asks-disposed`, counted
+#
+# Owner ruling D12-b made the `asks-disposed` Definition-of-Done item OVERRIDABLE with a recorded
+# reason, on the condition that the overrides are COUNTED. Without a count the ruling is an unbounded
+# escape: each override is a legitimate, reasoned row in one record, and nothing anywhere reads the
+# population. This is that reader, and it is REPORT-ONLY for `live_backlog_rows_per_shard`'s reason —
+# `drift-audit records` is an unguarded merge-bar leg, so gating a count that legitimately rises
+# turns a recorded owner decision into a scheduled refusal.
+#
+# NAMED `build_`, not `signal_`, for the reason its neighbour states: `signal` is a noun and not a
+# declared verb, and a new definition can be named right for free.
+_OVERRIDE_ASKS_ROW = re.compile(
+    r"^[0-9][0-9:\-T]*Z override · item asks-disposed · reason ")
+
+
+def build_asks_disposed_overrides(ctx) -> dict:
+    """Recorded `--close --override asks-disposed` rows, per tracked run-state file."""
+    tracked = [ln for ln in ctx.git.run(
+        "ls-files", f"{ctx.memory_root}/builds/*/RUN.md").stdout.splitlines() if ln.strip()]
+    rows = []
+    for rel in sorted(tracked):
+        try:
+            text = (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            # Tracked and absent from the worktree is a DIFFERENT fact from a record holding no
+            # override, so it is carried as its own row rather than counted as a clean zero.
+            rows.append({"record": rel, "overrides": None, "note": "tracked but not on disk"})
+            continue
+        rows.append({"record": rel,
+                     "overrides": sum(1 for ln in text.splitlines()
+                                      if _OVERRIDE_ASKS_ROW.match(ln))})
+    judgeable = [r for r in rows if r["overrides"] is not None]
+    return {
+        "signal": "asks_disposed_overrides",
+        # THE ITEM'S OWN ROWS AND NOBODY ELSE'S. A count over every `override` row would rise on a
+        # `gates-green` override and read as this item being bought, which is the one reading that
+        # would make the number worse than none.
+        "value": sum(r["overrides"] for r in judgeable),
+        "of": len(rows),
+        "tolerance": ctx.pins.get("asks_disposed_overrides", 0),
+        "gateable": False,
+        # A tree with no run-state file at all cannot move this signal, so it says DEAD PROBE rather
+        # than printing the 0 that reads as "nobody has ever overridden it".
+        "live": bool(judgeable),
+        "detail": rows,
+    }
+
+
+# --------------------------------------------------------------------------------------------
 # Signal 10 - a build README asserting a mechanism its own spec set has since revised
 # (TOOL-dScriptedRepeat-14)
 #
@@ -1836,7 +1885,8 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
-           build_live_backlog_rows, build_readme_mechanism_drift,
+           build_live_backlog_rows, build_asks_disposed_overrides,
+           build_readme_mechanism_drift,
            build_backlog_rows_outliving_specs,
            build_source_cited_ids_with_no_record,
            build_backlog_stragglers]

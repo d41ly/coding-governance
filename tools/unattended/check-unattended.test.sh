@@ -1996,6 +1996,33 @@ reset_tree; pedit 's/^Ten kit-owned core items\. //'
 hit "$(run)" "the protocol states no count of kit-owned core Definition-of-Done items, so the sentence that summarises the table cannot be joined to the table or to the driver"
 reset_tree
 
+# ---- E, THE COUNT WORD TABLE PAST TWELVE (TOOL-dDerivedDocket-17). The table stopped at `twelve`,
+# ---- which was exactly the size of the core set — so the FIRST correct sentence written after the
+# ---- thirteenth item landed mapped to -1 and red the leg for stating the right number.
+# ----
+# ---- THE WORD IS READ FROM THE SHIPPED CONTRACT, never typed into the arm. A locator spelling last
+# ---- month's count is a `mutate` no-op, and the two arms directly above this one are exactly that:
+# ---- they say `Ten` over a contract that has said `Twelve` and now says `Thirteen`. Deriving it is
+# ---- what keeps this arm from joining them the next time an item lands.
+reset_tree
+_c16cw=$(sed -n 's/^\([A-Za-z]*\) kit-owned core items\..*/\1/p' $KIT_REL/PROTOCOL.template.md | head -1)
+same "the shipped contract states a count word at all" \
+  "$(printf '%s\n' "$_c16cw" | grep -c '^[A-Za-z][A-Za-z]*$' || true)" "1"
+same "...and the word table READS that word rather than mapping it to -1" \
+  "$(run | grep -c 'stated count of core Definition-of-Done items disagrees' || true)" "0"
+# ...and the boundary still refuses a word the table cannot read, or the arm above is satisfied by a
+# table that maps everything to something.
+reset_tree; pedit "s/^$_c16cw kit-owned core items\./Thirtyone kit-owned core items./"
+hit "$(run)" "the protocol's stated count of core Definition-of-Done items disagrees with the set the driver enforces, and that sentence sits directly above the table it miscounts: says '"
+
+# ---- E, the new item's OWN row: the thirteenth item is enforced by --close, so a contract that
+# ---- does not publish it blocks a run on something nobody was told about.
+reset_tree; pedit '/^| `asks-disposed` |/d'
+out=$(run)
+hit "$out" "a CORE Definition-of-Done item is enforced by --close and absent from the protocol's table, so a run is blocked by an item the contract never told anyone about"
+hit "$out" "asks-disposed"
+reset_tree
+
 # ---- `mutate` itself, both ways. The failing direction runs in a SUBSHELL, or the FAIL it is
 # ---- supposed to emit would fail this suite instead of being observed by it.
 reset_tree

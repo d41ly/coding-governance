@@ -324,6 +324,39 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
   return 1
 }
 
+# ------------------------------------------------------------------- the run's OWN commits
+# TOOL-dDerivedDocket-17 S2/section 8 F5. The commits reachable from an ENDPOINT, not reachable from
+# a BASE, and not reachable from any of the one or more EXCLUSION TIPS it is handed.
+#
+# WHY THE EXCLUSIONS EXIST AT ALL, because `base..endpoint` looks like the whole answer. Under
+# `in-place` landing `--close` runs on a PREPARED MERGE whose first parent is the advertised tip, so
+# every default-branch commit landed since the base is reachable from the endpoint too — and a
+# foreign build's row landed in that window would be read as something this run wrote. Excluding the
+# advertised tip is what leaves exactly the run's own commits; the alternative that was rejected,
+# excluding the first parent of the first two-parent commit, misreads a run branch that merged the
+# default branch plainly.
+#
+# MORE THAN ONE TIP, because unit 19's terminal walk excludes one parent at each merge it reads. The
+# T4 caller passes exactly one and the arity costs it nothing.
+#
+# IT REFUSES RATHER THAN NARROWING. An endpoint or a base this clone cannot resolve would make
+# `rev-list` print nothing, and an empty list here reads as "this run wrote no commits" — the exact
+# reassuring zero a dead probe must never produce. An exclusion tip that does not resolve is refused
+# for the mirror reason: dropping it WIDENS the set silently, which is the direction that grades
+# somebody else's commit as this run's.
+read_run_commits() {  # endpoint · base · exclusion-tip…
+  _rrc_end=$1; _rrc_base=$2; shift 2
+  _rrc_ex=""
+  [ -n "$_rrc_end" ] && GIT rev-parse --verify --quiet "$_rrc_end^{commit}" >/dev/null 2>&1 || return 1
+  [ -n "$_rrc_base" ] && GIT rev-parse --verify --quiet "$_rrc_base^{commit}" >/dev/null 2>&1 || return 1
+  for _rrc_t in "$@"; do
+    [ -n "$_rrc_t" ] || continue
+    GIT rev-parse --verify --quiet "$_rrc_t^{commit}" >/dev/null 2>&1 || return 1
+    _rrc_ex="$_rrc_ex ^$_rrc_t"
+  done
+  GIT rev-list "$_rrc_end" "^$_rrc_base" $_rrc_ex 2>/dev/null
+}
+
 # THE NEXT ANCHOR for a unit after <anchor>, or empty when this is the unit's last row. Chosen by
 # ANCESTRY rather than by the order rows appear in the file: the record is append-only and a run may
 # park rows in any order, so file order is not history order. The earliest strict descendant wins,

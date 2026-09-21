@@ -122,7 +122,11 @@ RESUME_SCHEDULE_LIMIT="6"
 #
 # UPDATING TO THE KIT THAT ADDS `HELD`: the PHASE half moves 12 -> 13. `HELD` is the non-terminal
 # stop a run enters by `--hold` and leaves by `--resume`, and the floor is shrink-only.
-CORE_FLOOR="13:12"
+#
+# UPDATING TO THE KIT THAT ADDS `asks-disposed`: the DoD half moves 12 -> 13. The item grades whether
+# every mandated ask, and every ask the build filed itself, ended somewhere the owner can accept; it
+# is inert where `ASKS_CMD` is blank and the build files nothing, and it announces that skip.
+CORE_FLOOR="13:13"
 
 # The recall CLI whose query log the `reuse-probed` Definition-of-Done item reads. REPO-RELATIVE
 # path, and BLANK is the default and means "not adopted": the item then reports an announced SKIP

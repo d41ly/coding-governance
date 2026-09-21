@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 17
+**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 17
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-17-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-17-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
@@ -163,7 +164,7 @@ foreign build's file to decide anything.
 | T2 | the witness yields a row count or examined count that is not the scope size, or omits an id | UNMET as a DEAD PROBE naming the missing ids |
 | T3 | an ask in M in none of the admitted end states below, or an ask in F with no disposition row and not terminal | UNMET naming the ask |
 | T4 | an ask in M derived CLOSED by a sha among the run's own commits (below) that is not a CLOSED unit's build commit | UNMET naming the sha |
-| T5 | an ask in M not derived CLOSED by a CLOSED spec of this build, and named by no owed-class park row | UNMET naming the ask |
+| T5 | an ask in M DELIVERED by no CLOSED spec of this build — neither `closes` nor `advances` names it — and named by no owed-class park row | UNMET naming the ask |
 
 **The run's own commits.** One function in `tools/unattended/lib-unattended.sh`, named at build
 time through `lexicon.py --suggest`, lists the commits reachable from an endpoint, not reachable
@@ -568,6 +569,33 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with override rows for two
   correctly and reds the criterion. S5 now says the kept sentence does not reuse that clause, which
   makes the witness phrase unique to the destination by construction. AC1 does not move, and the
   false RED it could have produced cannot arise.
+
+- rev-7 · 2026-09-21 · §4 · the BUILD pass, four divergences found on the tree and changed here
+  before the code was written.
+  - **T5's first disjunct is DELIVERY, not derived-CLOSED.** The row read "not derived CLOSED by a
+    CLOSED spec of this build", which makes §6 AC6's MET case unreachable: a KEEP that T3 admits by
+    end state 3 is an ask a CLOSED unit ADVANCED and that is therefore not CLOSED, so the literal
+    term red it and the criterion demanding MET could not be met. The row now reads "delivered by no
+    CLOSED spec of this build — neither `closes` nor `advances` names it", which is the reading T3
+    end state 3 already assumes and which every one of AC4, AC6, AC16, AC17, AC19 and AC20 passes
+    under. No other term moves and the owed-class park row half is unchanged.
+  - **The witness's projection grows by one column, `decided-by`, and gains `AW_EXAMINED`.** §4 makes
+    T4 grade "derived CLOSED by a sha" and T2 compare the producer's own `examined` count, and unit
+    16's projection kept neither: it dropped field 4 and skipped the `examined` line. Both are added
+    to the ONE parse that already exists rather than to a second one, which is what §4's "never a
+    second parser" asks for. `decided-by` is appended at the END of the projection so no index in
+    `ask_field` moves.
+  - **T4's CLOSED units are read from the spec headers**, the same fact §4's `closes`/`advances`
+    scan already loaded, rather than from the generated units region. AC17 says "this build's CLOSED
+    unit spec", so this is the criterion's own source; reading the region instead would be a second
+    reader of one fact, and the two disagree exactly between a unit's commit and the next render of
+    the index.
+  - **A blank `ASKS_CMD` freezes nothing.** S3 keys the freeze on "a mandate or a non-empty F", and
+    this repo's own build folders file asks, so at the Rollout section's dark setting — `ASKS_CMD`
+    blank until unit 35 — every `--landed` here would have reached the witness, been refused, and
+    taken the new refusal code. The freeze now takes term zero's first answer: where the ask
+    contract is NOT ADOPTED there is no derived status to freeze. Rollout's "no record gains an
+    `asks-at-landing` line" is what this makes true.
 
 ## 10. Reuse audit
 

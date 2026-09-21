@@ -66,6 +66,13 @@ populations it walks rather than only the two it grades. `--dispatch` also runs 
 checker declared as `SPEC_TOKENS_CLI` over the live tree first: this harness closes each unit spec
 in its build commit, so no bar ever grades one (aDeferredBar F3).
 
+**THE DEFINITION OF DONE ASKS ONE QUESTION ABOUT THE WORK AND TWELVE ABOUT THE ARTEFACTS.**
+`asks-disposed` grades whether the QUESTIONS a run was pointed at ended somewhere the owner
+can accept; every other item grades what it PRODUCED. It folds nothing — status is the
+declared `ASKS_CMD` witness's, and what it reads off the tree is filing, a status ROW and a
+spec header VERB. Its scope is read BEFORE the witness runs, and its answer freezes into
+`asks-at-landing` because ruling D4 makes CLOSED non-absorbing.
+
 **The anchor is an OBSERVATION of the remote, and the kit no longer claims more than that.** Kit 1.0
 pinned BASE against `refs/remotes/origin/<default>` and justified it in a source comment claiming the
 ref could not move without a push. False — `git update-ref` moves it offline — and it was
@@ -260,12 +267,6 @@ silently; re-derive this section whenever the feature is touched.*
   source: the handle-membership test is skipped on a TERMINAL record, because a frozen waiver graded
   against a moving directive set is a red wedge no verb can repair, and the git join is silent when
   the record has no committed blob.
-- **Both Definition-of-Done items shipped.** `build-complete` is a five-term conjunction over the
-  authored roster and the run-state file's copied region; `closing-review-recorded` joins the pinned
-  BASE to a tracked review record. `CORE_FLOOR` is `10:8`. The base needle is SEVEN characters, not
-  eight: git abbreviates to seven here, 29 of 48 tracked records spell it that way, and the
-  eight-char form shipped briefly and matched none of them — an item clearable only by an override
-  the run wrote for itself.
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
   commit them; the parity legs compare two files the same run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.

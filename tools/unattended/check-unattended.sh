@@ -2225,6 +2225,13 @@ if [ -f "$proto" ]; then
       case "$(printf '%s' "$cw" | tr 'A-Z' 'a-z')" in
         one) cn=1 ;; two) cn=2 ;; three) cn=3 ;; four) cn=4 ;; five) cn=5 ;; six) cn=6 ;;
         seven) cn=7 ;; eight) cn=8 ;; nine) cn=9 ;; ten) cn=10 ;; eleven) cn=11 ;; twelve) cn=12 ;;
+        # THE TABLE RUNS PAST THE SET IT GRADES, deliberately. It used to stop at `twelve`, which is
+        # exactly where the core set stood - so the FIRST correct sentence written after the
+        # thirteenth item landed mapped to -1 and red the leg for naming the right number. A count
+        # word this table cannot read is indistinguishable from a miscount, and the cheap half of
+        # that is the table. TOOL-dDerivedDocket-17.
+        thirteen) cn=13 ;; fourteen) cn=14 ;; fifteen) cn=15 ;; sixteen) cn=16 ;;
+        seventeen) cn=17 ;; eighteen) cn=18 ;; nineteen) cn=19 ;; twenty) cn=20 ;;
         *) cn=-1 ;;
       esac
       ndod=$(printf '%s\n' "$dcore" | grep -c . || true)

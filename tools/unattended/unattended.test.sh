@@ -7000,6 +7000,7 @@ for id in $ids; do
     *)        printf 'ask\t%s\n' "$row" ;;
   esac
 done
+case "$MODE" in miscount) n=$((n + 1)) ;; esac
 printf 'examined\t%s\n' "$n"
 case "$MODE" in exit1) exit 1 ;; esac
 exit 0
@@ -7269,6 +7270,341 @@ else
 fi
 askreset
 
+
+# ============================== TOOL-dDerivedDocket-17 — asks-disposed AND THE FREEZE ============
+# Every term of the new Definition-of-Done item, one fixture each, plus the override, plus the
+# `asks-at-landing` freeze and the refusal that must fire BEFORE the terminal writes.
+#
+# THE FIXTURES CARRY A ONE-ASK MANDATE, not `tAskA`'s two. Every MET arm below has to dispose of
+# EVERY ask in the scope, and a second ask doubles the setup of each one while proving nothing the
+# first does not: T2's scope-size arms are where more than one id is load-bearing, and those use the
+# build's own filing to get it.
+dispsetup() {
+  git checkout -qf main
+  readme tDisp
+  mutate memory/builds/tDisp/README.md '/^slug: tDisp$/a asks: EXMP-aFoo-3'
+  # A build with NO mandate that files an ask of its own — the F half of the scope.
+  readme tDispF
+  printf '# tDispF — asks\n\n## Asks\n- EXMP-tDispF-1 · filed 2026-09-10 · this build raised it · seen `memory/builds/tDispF/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+    > memory/builds/tDispF/BACKLOG.md
+  # ...and one with neither, which is term zero's second half.
+  readme tDispN
+  git add -A >/dev/null && git commit -q -m disp-fixture --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  DISPP=$(git rev-parse HEAD); DISPMAIN=$(git rev-parse main)
+}
+# THE ANCHOR IS RESET TOO, and that is not tidiness. Several arms below push a commit to `origin
+# main` — the green close needs the run's work to be landed, and the exclusion arm needs a foreign
+# build's commit on the default branch — so an arm that only reset the WORK branch would leave every
+# later preflight refusing on a merge-base that equals HEAD, for a reason belonging to the arm
+# before it.
+dispreset() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$DISPP"; git clean -qfd
+              git branch -qf main "$DISPMAIN"; git push -q -f origin "$DISPMAIN":main
+              mkconf; askconf; git add -A >/dev/null; git commit -q -m dispconf --no-verify; }
+# This build's own `BACKLOG.md` at HEAD — the file every disposition row below lands in. It is THIS
+# build's and never the filing home's, which is what arm AC4-foreign proves.
+dispbacklog() { # slug · rows
+  printf '# %s — asks\n\n## Asks\n\n## Dispositions\n%b\n' "$1" "$2" > "memory/builds/$1/BACKLOG.md"
+}
+dispspec() { # slug · status · header-tail
+  mkdir -p "memory/builds/$1/spec"
+  printf '# ARCH-%s-1 the unit\n\n**Status:** %s · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture · %s\n\n## 2. Scope\n\n- S1 do it\n\n## 6. Acceptance criteria\n\n- **AC1** it is done\n\n## 7. Gates\n\nthe bar\n' \
+    "$1" "$2" "$3" > "memory/builds/$1/spec/one.md"
+}
+dispsetup
+
+# ---- AC2 / AC18 term zero, BOTH halves, and they are different facts. A run in a project with no
+# ---- ask contract at all, and a run in a project that HAS one over a build with nothing to grade.
+dispreset; askmode ok; askrows ''
+mkconf; git add -A >/dev/null; git commit -q -m noaskscmd --no-verify
+out=$(run --preflight tDispF --keepalive-id KD-1); git add -A >/dev/null; git commit -q -m pf --no-verify
+out=$(run --close tDispF)
+hit "$out" "skipped — asks-disposed: this build carries no asks: mandate and this project declares no ASKS_CMD, so the ask contract is NOT ADOPTED here and there is nothing this item could grade"
+dispreset
+run --preflight tDispN --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+out=$(run --close tDispN)
+hit "$out" "skipped — asks-disposed: nothing to dispose — this build carries no asks: mandate and its own folder files no ask under its own slug"
+miss "$out" "NOT ADOPTED"
+
+# ---- AC18 term 1: a mandate this project cannot grade. --preflight refuses it outright, so the
+# ---- item's job is to say that the refusal did not fire rather than to pass over an ungraded list.
+dispreset
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+mkconf; git add -A >/dev/null; git commit -q -m dropaskscmd --no-verify
+out=$(run --close tDisp)
+hit "$out" "this build README carries an asks: mandate and this project declares no ASKS_CMD, which --preflight refuses outright, so this run was authorized by a mandate nothing in the project can grade"
+
+# ---- AC3 and AC14, term 2: the witness answers for fewer asks than the SCOPE holds. The scope is
+# ---- two here — the mandate's ask and one this build filed — and the omitted one is the FILED one,
+# ---- which is the half a witness-derived F would have shrunk away.
+dispreset
+dispbacklog tDisp ''
+printf '# tDisp — asks\n\n## Asks\n- EXMP-tDisp-7 · filed 2026-09-10 · this build raised it · seen `memory/builds/tDisp/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+  > memory/builds/tDisp/BACKLOG.md
+git add -A >/dev/null; git commit -q -m ownask --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+askmode short
+out=$(run --close tDisp)
+hit "$out" "the ask witness did not answer for this build's scope, so no ask below is graded and any verdict here would be invented"
+hit "$out" "EXMP-tDisp-7 is missing from its rows"
+# ---- AC18 term 2, the OTHER shape: every row arrives and the producer's own `examined` count
+# ---- disagrees with the scope. Rows alone cannot see this, which is why both are compared.
+askmode miscount
+out=$(run --close tDisp)
+hit "$out" "DEAD PROBE - the declared ask generator disagrees with the scope this item enumerated from the tree, so an ask it disposed of and one it never looked at are indistinguishable here"
+# ---- AC18 term 2, the BOUND: a breach reads "never answered", never as a red. The two are
+# ---- different faults and reporting them alike is how an operator hunts a leg that does not exist.
+askmode sleeper
+printf 'GATE_BOUND="2"\n' >> .unattended.conf; git add -A >/dev/null; git commit -q -m bound --no-verify
+out=$(run --close tDisp)
+hit "$out" "so this is unanswered because the command never returned rather than because it said no"
+miss "$out" "DEAD PROBE - the declared ask generator disagrees"
+askmode ok
+
+# ---- AC13: this build filed an ask and left it neither disposed nor terminal. Graded off the
+# ---- SCOPE's membership, never off the witness's `home` field.
+dispreset
+printf '# tDispF — asks\n\n## Asks\n- EXMP-tDispF-1 · filed 2026-09-10 · this build raised it · seen `memory/builds/tDispF/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+  > memory/builds/tDispF/BACKLOG.md
+git add -A >/dev/null; git commit -q -m fask --no-verify
+run --preflight tDispF --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+out=$(run --close tDispF)
+hit "$out" "this build filed an ask and left it neither disposed nor terminal, so a question this run raised for itself is going out of the record unanswered"
+hit "$out" "EXMP-tDispF-1 reads OPEN"
+# ...and the same ask with a KEEP row in its own file is disposed of, which is the green control.
+dispbacklog tDispF '- KEEP · EXMP-tDispF-1 · still true\n'
+git add -A >/dev/null; git commit -q -m fkeep --no-verify
+miss "$(run --close tDispF)" "going out of the record unanswered"
+
+# ---- AC4: a mandated ask that derives OPEN with no hold at all.
+dispreset
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+out=$(run --close tDisp)
+hit "$out" "a mandated ask ended in none of the states this item admits - it is not derived terminal, and this build's own file holds no BLOCKED, DEFERRED or KEEP row for it"
+# ---- AC4, the FOREIGN-FILE arm: the hold row is real and sits in the FILING HOME's file rather
+# ---- than in this build's. A reader that took any file's row would admit it.
+printf '# aFoo — asks\n\n## Asks\n- EXMP-aFoo-3 · filed 2026-09-01 · the first · seen `memory/builds/aFoo/BACKLOG.md` · accept done\n- EXMP-aFoo-4 · filed 2026-09-01 · the second · seen `memory/builds/aFoo/BACKLOG.md` · accept done\n\n## Dispositions\n- BLOCKED · EXMP-aFoo-3 · on EXMP-aFoo-4 · somebody else says so\n' \
+  > memory/builds/aFoo/BACKLOG.md
+git add -A >/dev/null; git commit -q -m foreignhold --no-verify
+hit "$(run --close tDisp)" "a mandated ask ended in none of the states this item admits"
+# ---- AC4 and AC20, the F3 hardening on a READY ask: a hold, then a hold with the veto named.
+dispreset
+dispbacklog tDisp '- BLOCKED · EXMP-aFoo-3 · on EXMP-aFoo-4 · waiting\n'
+git add -A >/dev/null; git commit -q -m hold --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+out=$(run --close tDisp)
+hit "$out" "a mandated ask this run graded READY is held rather than answered, and no parked decision names the M3 veto that stopped it, so the hold is a choice nobody recorded"
+run --park tDisp --item "EXMP-aFoo-3 cannot be answered here" --reason "veto 2: it changes a carrier no unit of this build scopes" >/dev/null
+out=$(run --close tDisp)
+miss "$out" "no parked decision names the M3 veto"
+miss "$out" "a mandated ask was neither delivered by a CLOSED unit"
+# ---- AC20: the same READY ask held on something THIS RUN filed under its own slug.
+dispreset
+dispbacklog tDisp '- BLOCKED · EXMP-aFoo-3 · on EXMP-tDisp-9 · waiting on my own question\n'
+git add -A >/dev/null; git commit -q -m selfhold --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+run --park tDisp --item "EXMP-aFoo-3 is held" --reason "veto 3: it needs a value nobody declared" >/dev/null
+out=$(run --close tDisp)
+hit "$out" "a mandated ask this run graded READY is held on an owner-call ask this same run filed under its own slug, so the run deferred a question it was ready to answer behind one it raised itself"
+# ...and the same self-filed hold on an ask that was never READY is admitted.
+dispreset
+dispbacklog tDisp '- BLOCKED · EXMP-aFoo-3 · on EXMP-tDisp-9 · waiting on my own question\n'
+askrows 'EXMP-aFoo-3\tOPEN\t-\taFoo\tHIGH\tno\tR2\t-\t-\t-\n'
+git add -A >/dev/null; git commit -q -m selfholdno --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+run --park tDisp --item "EXMP-aFoo-3 is held" --reason "not ready, and the owner owns the call" >/dev/null
+out=$(run --close tDisp)
+miss "$out" "behind one it raised itself"
+miss "$out" "a mandated ask was neither delivered by a CLOSED unit"
+askrows ''
+
+# ---- AC19, term 5: a held ask nobody owes the owner an answer for is scope ABANDONED. M3
+# ---- delegates scope resolution and never scope abandonment, which is `PARK_ACTS_OWED`'s own
+# ---- argument and therefore this term's.
+dispreset
+dispbacklog tDisp '- BLOCKED · EXMP-aFoo-3 · on EXMP-aFoo-4 · waiting\n'
+askrows 'EXMP-aFoo-3\tOPEN\t-\taFoo\tHIGH\tlegacy\t-\t-\t-\t-\n'
+git add -A >/dev/null; git commit -q -m legacyhold --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+out=$(run --close tDisp)
+hit "$out" "a mandated ask was neither delivered by a CLOSED unit of this build nor answered to the owner, so this run is landing having dropped scope it was authorized for without recording that it did"
+# ...and the owed-class rescope row that answers it. Written by hand rather than through
+# `--rescope`, which refuses an id that is not a unit of this build's roster — the verb is about
+# roster amendments and this row is about an ask, so the fixture writes the row the reader reads.
+printf '\n2026-09-05T00:00:00Z rescope · item retire EXMP-aFoo-3 · reason the owner took it out of scope\n' \
+  >> memory/builds/tDisp/RUN.md
+out=$(run --close tDisp)
+miss "$out" "having dropped scope it was authorized for"
+askrows ''
+
+# ---- AC6, D12-c: KEEP is admitted only after a CLOSED unit of this build ADVANCES the ask.
+dispreset
+dispbacklog tDisp '- KEEP · EXMP-aFoo-3 · still live\n'
+dispspec tDisp CLOSED 'order 1'
+git add -A >/dev/null; git commit -q -m keepnoadv --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+out=$(run --close tDisp)
+hit "$out" "a mandated ask is KEPT live and no CLOSED unit of this build advances it, so the KEEP records a decision not to do the work rather than a partial that was delivered"
+dispspec tDisp CLOSED 'advances EXMP-aFoo-3'
+git add -A >/dev/null; git commit -q -m keepadv --no-verify
+out=$(run --close tDisp)
+miss "$out" "the KEEP records a decision not to do the work"
+miss "$out" "having dropped scope it was authorized for"
+# ...and a SPECCED spec carrying the same verb does not advance anything: the partial has to be
+# DELIVERED, which is what CLOSED means here.
+dispspec tDisp SPECCED 'advances EXMP-aFoo-3'
+git add -A >/dev/null; git commit -q -m keepadvopen --no-verify
+hit "$(run --close tDisp)" "a mandated ask is KEPT live and no CLOSED unit of this build advances it"
+
+# ---- AC6, the in-range WONTDO: a run may not meet this item by writing off the work as it goes.
+dispreset
+dispbacklog tDisp '- WONTDO · EXMP-aFoo-3 · turns out nobody needs it\n'
+askrows 'EXMP-aFoo-3\tWONTDO\t-\taFoo\tHIGH\tyes\t-\t-\t-\t-\n'
+git add -A >/dev/null; git commit -q -m wontdo --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+out=$(run --close tDisp)
+hit "$out" "a mandated ask this run graded READY was written off by a WONTDO row this same run added after its pinned m-base, so the run met this item by deciding the work was unnecessary"
+# ...admitted with a `stale:` reason AND a parked decision, which is the owner's turn and not the
+# run's own.
+dispbacklog tDisp '- WONTDO · EXMP-aFoo-3 · stale: the successor landed before BASE\n'
+git add -A >/dev/null; git commit -q -m wontdostale --no-verify
+run --park tDisp --item "EXMP-aFoo-3 is already answered" --reason "a landed successor covers it" >/dev/null
+out=$(run --close tDisp)
+miss "$out" "by deciding the work was unnecessary"
+askrows ''
+
+# ---- AC16: the SUCCESS path. Without it every arm above is satisfied by an item that reds
+# ---- everything, and an ask-driven run would need the override to land at all.
+dispreset
+dispspec tDisp CLOSED 'closes EXMP-aFoo-3'
+askrows 'EXMP-aFoo-3\tCLOSED\tARCH-tDisp-1\taFoo\tHIGH\tyes\t-\t-\t-\t-\n'
+git add -A >/dev/null; git commit -q -m closedbyspec --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+out=$(run --close tDisp)
+miss "$out" "asks-disposed"
+miss "$out" "having dropped scope it was authorized for"
+
+# ---- AC5 and AC17, term 4: a CLOSED recorded against a commit THIS RUN wrote.
+dispreset
+dispspec tDisp CLOSED 'closes EXMP-aFoo-3'
+git add -A >/dev/null; git commit -q -m spec --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+mkdir -p tools; printf 'not a record\n' > tools/x.sh
+git add -A >/dev/null; git commit -q -m "build(ARCH-tDisp-1): the unit" --no-verify
+DISPBC=$(git rev-parse HEAD)
+printf 'still not a record\n' > tools/y.sh
+git add -A >/dev/null; git commit -q -m "chore: something else entirely" --no-verify
+DISPOTHER=$(git rev-parse HEAD)
+# AC17 — the unit's OWN build commit is admitted, or a run cannot record its own evidence.
+askrows "EXMP-aFoo-3\tCLOSED\t$DISPBC\taFoo\tHIGH\tyes\t-\t-\t-\t-\n"
+dispbacklog tDisp "- CLOSED · EXMP-aFoo-3 · by $DISPBC · the unit closed it\n"
+git add -A >/dev/null; git commit -q -m closedbybuild --no-verify
+out=$(run --close tDisp)
+miss "$out" "is recorded CLOSED by a commit this run wrote"
+# AC5 — any OTHER commit of this run's is evidence minted outside the units it was reviewed on.
+askrows "EXMP-aFoo-3\tCLOSED\t$DISPOTHER\taFoo\tHIGH\tyes\t-\t-\t-\t-\n"
+out=$(run --close tDisp)
+hit "$out" "a mandated ask is recorded CLOSED by a commit this run wrote that is not any CLOSED unit's build commit, so the run closed an ask with evidence minted outside the units it was reviewed on"
+hit "$out" "$DISPOTHER"
+# ---- AC5, the EXCLUSION: a commit that reached this run through the DEFAULT BRANCH is not this
+# ---- run's own, whatever the range `m-base..HEAD` says. T4 must stay silent and T5 must speak.
+dispreset
+git checkout -qf main >/dev/null 2>&1
+mkdir -p tools; printf 'a foreign build landed this\n' > tools/z.sh
+git add -A >/dev/null; git commit -q -m "build(OTHR-aBar-4): somebody else's unit" --no-verify
+DISPFOREIGN=$(git rev-parse HEAD)
+git push -q -f origin main
+git checkout -qf unit >/dev/null 2>&1
+run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
+git merge -q --no-edit main >/dev/null 2>&1
+askrows "EXMP-aFoo-3\tCLOSED\t$DISPFOREIGN\taFoo\tHIGH\tyes\t-\t-\t-\t-\n"
+out=$(run --close tDisp)
+miss "$out" "is recorded CLOSED by a commit this run wrote"
+hit "$out" "a mandated ask was neither delivered by a CLOSED unit of this build nor answered to the owner"
+askrows ''
+
+# ---- AC7: the OVERRIDE. D12-b made this item overridable with a recorded reason, and the generic
+# ---- loop is what carries it — so the arms assert the loop's two outcomes on THIS item's name.
+dispreset
+run --preflight tDisp --keepalive-id KD-1 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tDisp/RUN.md
+git add -A >/dev/null; git commit -q -m pf --no-verify
+git push -q -f origin HEAD:main
+out=$(run --close tDisp --override asks-disposed --reason "the owner took the call in chat" --override build-complete --reason "fixture build is one OPEN unit" --override closing-review-recorded --reason "fixture build records no review")
+hit "$out" "override recorded for 'asks-disposed'"
+hit "$out" "close OK"
+miss "$out" "a mandated ask ended in none of the states this item admits"
+same "the override is PARKED, not merely accepted" \
+  "$(grep -c 'override · item asks-disposed · reason the owner took the call in chat' memory/builds/tDisp/RUN.md || true)" "1"
+dispreset
+out=$(run --preflight tDisp --keepalive-id KD-1; run --close tDisp --override asks-disposed)
+hit "$out" "--override requires --reason: an unrecorded override is indistinguishable from a passing check"
+miss "$out" "a Definition-of-Done item in the non-overridable set cannot be bought with --override"
+
+# ---- AC8 and AC15: the FREEZE. It is written in the same verb run as `units-at-landing`, BEFORE
+# ---- the terminal writes, and only for a record that has something to freeze.
+dispreset
+dispspec tDisp CLOSED 'closes EXMP-aFoo-3'
+printf '# tDisp — asks\n\n## Asks\n- EXMP-tDisp-10 · filed 2026-09-10 · the tenth · seen `memory/builds/tDisp/BACKLOG.md` · accept done\n- EXMP-tDisp-2 · filed 2026-09-10 · the second · seen `memory/builds/tDisp/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+  > memory/builds/tDisp/BACKLOG.md
+askrows 'EXMP-aFoo-3\tCLOSED\tARCH-tDisp-1\taFoo\tHIGH\tyes\t-\t-\t-\t-\nEXMP-tDisp-2\tWONTDO\t-\ttDisp\tLOW\tyes\t-\t-\t-\t-\nEXMP-tDisp-10\tOPEN\t-\ttDisp\tLOW\tyes\t-\t-\t-\t-\n'
+git add -A >/dev/null; git commit -q -m freezefix --no-verify
+run --preflight tDisp --keepalive-id KD-1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tDisp/RUN.md
+git add -A >/dev/null; git commit -q -m landing --no-verify
+git push -q -f origin HEAD:main
+out=$(run --landed tDisp)
+hit "$out" "phase LANDED"
+same "the freeze is written exactly once" \
+  "$(grep -c '^asks-at-landing: ' memory/builds/tDisp/RUN.md || true)" "1"
+same "it covers the mandate AND this build's own filings, by slug then NUMERIC sequence" \
+  "$(sed -n 's/^asks-at-landing: //p' memory/builds/tDisp/RUN.md)" \
+  "EXMP-aFoo-3=CLOSED EXMP-tDisp-2=WONTDO EXMP-tDisp-10=OPEN"
+same "it sits ABOVE units-at-landing, which is set_fact's newest-first order" \
+  "$(grep -n '^asks-at-landing: \|^units-at-landing: ' memory/builds/tDisp/RUN.md | head -1 | sed 's/.*:\(asks\|units\)-at-landing.*/\1/')" "asks"
+# ---- AC8: a record with no mandate and no filing of its own gains NO line, so every record
+# ---- already in every tree is byte-unchanged by this.
+dispreset
+run --preflight tDispN --keepalive-id KD-1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tDispN/RUN.md
+git add -A >/dev/null; git commit -q -m landingn --no-verify
+git push -q -f origin HEAD:main
+run --landed tDispN >/dev/null
+same "no mandate and no filing writes no freeze" \
+  "$(grep -c '^asks-at-landing: ' memory/builds/tDispN/RUN.md || true)" "0"
+# ---- AC15: a build with NO mandate that filed an ask of its own still has its answer frozen.
+dispreset
+printf '# tDispF — asks\n\n## Asks\n- EXMP-tDispF-1 · filed 2026-09-10 · this build raised it · seen `memory/builds/tDispF/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+  > memory/builds/tDispF/BACKLOG.md
+askrows 'EXMP-tDispF-1\tCLOSED\t-\ttDispF\tLOW\tyes\t-\t-\t-\t-\n'
+git add -A >/dev/null; git commit -q -m fonly --no-verify
+run --preflight tDispF --keepalive-id KD-1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tDispF/RUN.md
+git add -A >/dev/null; git commit -q -m landingf --no-verify
+git push -q -f origin HEAD:main
+run --landed tDispF >/dev/null
+same "a self-filed ask's answer is frozen too" \
+  "$(sed -n 's/^asks-at-landing: //p' memory/builds/tDispF/RUN.md)" "EXMP-tDispF-1=CLOSED"
+# ---- AC8, the REFUSAL: a witness that cannot answer at landing stops the verb BEFORE the terminal
+# ---- writes, which is the wedge TOOL-dSealedTally-1 removed and must not come back.
+dispreset
+printf '# tDispF — asks\n\n## Asks\n- EXMP-tDispF-1 · filed 2026-09-10 · this build raised it · seen `memory/builds/tDispF/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+  > memory/builds/tDispF/BACKLOG.md
+git add -A >/dev/null; git commit -q -m fonly2 --no-verify
+run --preflight tDispF --keepalive-id KD-1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tDispF/RUN.md
+git add -A >/dev/null; git commit -q -m landingf2 --no-verify
+git push -q -f origin HEAD:main
+askmode silent
+out=$(run --landed tDispF)
+hit "$out" "this run's asks cannot be read at the tree it is landing, so the record would go terminal carrying no answer to the question it was authorized by - and a landed record is the one thing no verb may repair"
+same "the refused landing left the phase NON-TERMINAL" \
+  "$(sed -n 's/^phase: //p' memory/builds/tDispF/RUN.md)" "LANDING"
+same "...and wrote no freeze line" \
+  "$(grep -c '^asks-at-landing: ' memory/builds/tDispF/RUN.md || true)" "0"
+askmode ok
+dispreset
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
@@ -7320,7 +7656,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # the reason every figure here is discounted, and for one more. No run measured it: the pass
 # that wrote those arms ran no suite, observing each refusal by hand against a scratch fixture
 # instead, so a 1:1 pin would be asserting a number nobody has seen a runner produce.
-FLOOR_ASSERTIONS=934
+# RAISED 934 -> 977 by TOOL-dDerivedDocket-17, the `asks-disposed` and `asks-at-landing` arms.
+# The RAW figure is 51 — the `hit`/`miss`/`same`/`mutate` lines that block adds, counted off the
+# diff — DISCOUNTED to +43 for the reason every figure here is discounted, and for the one unit 16
+# adds: this pass ran no suite either, observing each refusal by hand against a scratch fixture, so
+# a 1:1 pin would assert a number nobody has watched a runner produce.
+FLOOR_ASSERTIONS=977
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -7364,7 +7705,10 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=738
+FLOOR_SHARD_2=781
+# +43 for the TOOL-dDerivedDocket-17 asks-disposed and freeze arms, all in region two — see
+# FLOOR_ASSERTIONS. `dispsetup`'s one `mutate` lives in that block too, not in the prologue, so
+# FLOOR_SHARD_1 does not move.
 # +63 for the TOOL-dDerivedDocket-16 ask-mandate arms, all in region two - see FLOOR_ASSERTIONS.
 # +26 for the TOOL-dDerivedDocket-49 `next:` ladder arms, all in region two — see FLOOR_ASSERTIONS.
 # +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).

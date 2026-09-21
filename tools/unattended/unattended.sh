@@ -582,7 +582,12 @@ PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
-DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine specs-audited:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent reuse-probed:machine"
+# TOOL-dDerivedDocket-17 - `asks-disposed` is the THIRTEENTH, and it is NOT in `DOD_NO_OVERRIDE`:
+# owner ruling D12-b made it overridable with a recorded reason, on the condition that the overrides
+# are COUNTED, which the drift-audit signal `asks_disposed_overrides` does. `CORE_FLOOR`'s DoD half
+# moves with it, in the same commit, because the leg reds BOTH ways - a floor below the kit's own
+# count is a pin guarding nothing.
+DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine specs-audited:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent reuse-probed:machine asks-disposed:machine"
 
 # the proposal-kind unit - the PARKED KINDS, closed and kit-owned like the three sets above it, and
 # for the reason those are: a parked row whose kind is outside this set lands in a region every
@@ -2770,11 +2775,17 @@ ask_disposition_of() { # BACKLOG.md text · ask id -> the first disposition verb
 # THE MANDATE IS ITERATED, NEVER THE ROWS. A loop over what came back can only confirm what came
 # back: a producer that dropped an id would be graded on the ids it did return and the missing one
 # would never be mentioned at all.
-AW_ROWS=""; AW_WHY=""
-run_ask_witness() { # target slug · rev · ids… -> 0 and AW_ROWS, or 1 and AW_WHY
+#
+# `AW_EXAMINED` IS A SECOND ANSWER THE PRODUCER GIVES, and TOOL-dDerivedDocket-17's T2 needs it:
+# the row count says how many rows arrived, the `examined` line says how many the producer BELIEVES
+# it graded, and a producer that disagrees with itself is a dead probe however many rows it sent.
+# Kept here rather than re-parsed by the consumer, because a second parse of one stream is the
+# two-answers class this whole section refuses.
+AW_ROWS=""; AW_WHY=""; AW_EXAMINED=""
+run_ask_witness() { # target slug · rev · ids… -> 0, AW_ROWS and AW_EXAMINED, or 1 and AW_WHY
   local _tgt="$1" _rev="$2" _rc _id _bad
   shift 2
-  AW_ROWS=""; AW_WHY=""
+  AW_ROWS=""; AW_WHY=""; AW_EXAMINED=""
   if [ -z "${ASKS_CMD:-}" ]; then
     AW_WHY="this project declares no ASKS_CMD, so nothing here can grade a mandated ask"
     return 1
@@ -2792,15 +2803,22 @@ run_ask_witness() { # target slug · rev · ids… -> 0 and AW_ROWS, or 1 and AW
     AW_WHY="the declared ask generator exited $_rc after ${RB_TOOK}s, so the rows it printed are not an answer this run may pin — its first stderr line: $(printf '%s\n' "$RB_ERR" | head -1)"
     return 1
   fi
-  # ONE AWK over the whole stream. A row of the declared width is projected down to the seven fields
+  # ONE AWK over the whole stream. A row of the declared width is projected down to the eight fields
   # every caller here reads; anything else emits a `BAD` line and stops, so the refusal can quote the
   # line it refused rather than reporting a count nobody can act on.
+  #
+  # THE `examined` LINE IS CARRIED OUT ON ITS OWN `EX` LINE rather than skipped. It used to be
+  # dropped, which was right while preflight was the only consumer; T2 compares it, and recovering
+  # it with a second pass over the same stream would be a second parser of one projection.
+  # THE EIGHTH COLUMN IS `decided-by`, appended at the END of the projection deliberately: adding it
+  # in its source position would renumber every index in `ask_field` below, and the whole reason
+  # that function maps BY NAME is that no caller anywhere counts tabs.
   AW_ROWS=$(printf '%s\n' "$RB_STDOUT" \
     | ASK_HEAD="$ASK_TSV_HEAD" ASK_EX="$ASK_TSV_EXAMINED" ASK_N="$ASK_TSV_FIELDS" awk -F'\t' '
         BEGIN { h = ENVIRON["ASK_HEAD"]; ex = ENVIRON["ASK_EX"]; want = ENVIRON["ASK_N"] + 0 }
         $0 == "" { next }
-        $1 == ex { next }
-        $1 == h && NF == want { print $2 "\t" $3 "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $11; next }
+        $1 == ex { print "EX\t" $2; next }
+        $1 == h && NF == want { print $2 "\t" $3 "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $11 "\t" $4; next }
         { print "BAD\t" $0; exit }')
   _bad=$(printf '%s\n' "$AW_ROWS" | sed -n 's/^BAD\t//p' | head -1)
   if [ -n "$_bad" ]; then
@@ -2808,6 +2826,10 @@ run_ask_witness() { # target slug · rev · ids… -> 0 and AW_ROWS, or 1 and AW
     AW_WHY="the declared ask generator printed a line that is not the $ASK_TSV_FIELDS-field $ASK_TSV_HEAD projection, so a positional read of it would report fields nobody printed — the line: $_bad"
     return 1
   fi
+  # The `examined` value, LIFTED OFF the projection and removed from it, so every row-shaped reader
+  # below still sees rows and nothing else.
+  AW_EXAMINED=$(printf '%s\n' "$AW_ROWS" | sed -n 's/^EX\t//p' | head -1)
+  AW_ROWS=$(printf '%s\n' "$AW_ROWS" | grep -v '^EX	' || true)
   for _id in "$@"; do
     printf '%s\n' "$AW_ROWS" | cut -f1 | grep -qxF -- "$_id" && continue
     AW_ROWS=""
@@ -2818,11 +2840,11 @@ run_ask_witness() { # target slug · rev · ids… -> 0 and AW_ROWS, or 1 and AW
 }
 # One row's field, BY NAME. The projection's own order is declared above and read once, in the awk
 # that projects it; this reads the seven columns that awk kept, so no caller anywhere counts tabs.
-ask_field() { # ask id · id|status|sev|ready|missing|holds|closers -> the value, or nothing
+ask_field() { # ask id · id|status|sev|ready|missing|holds|closers|decided -> the value, or nothing
   local _n
   case "$2" in
     id) _n=1 ;; status) _n=2 ;; sev) _n=3 ;; ready) _n=4 ;;
-    missing) _n=5 ;; holds) _n=6 ;; closers) _n=7 ;; *) return 0 ;;
+    missing) _n=5 ;; holds) _n=6 ;; closers) _n=7 ;; decided) _n=8 ;; *) return 0 ;;
   esac
   printf '%s\n' "$AW_ROWS" | awk -F'\t' -v i="$1" -v n="$_n" '$1 == i { print $n; exit }'
 }
@@ -2909,6 +2931,90 @@ mandate_of() { # slug -> the asks: value this run is under, or nothing
 # at `m-base:` and is the only half a provenance property may rest on.
 backlog_text_of() { # slug -> that build's BACKLOG.md text, or nothing
   cat "$M/builds/$1/BACKLOG.md" 2>/dev/null
+}
+
+# ====================================== TOOL-dDerivedDocket-17 — WAS EVERY ASK DISPOSED OF ========
+# The DoD item below asks one question the other twelve cannot: did every ask this run was mandated
+# to answer, and every ask this build filed for itself, end somewhere the owner can accept. It reads
+# STATUS only from the `ASKS_CMD` witness and re-implements no fold; what it reads from the tree is
+# FILING, disposition ROWS and spec header VERBS, each of which is a line and not a verdict.
+
+# THE BLOB AT A REV, not the working tree. `--close` and `--landed` both grade a COMMIT; the
+# working-tree reader above answers `--plan`'s different question and the two must not be confused.
+backlog_blob_of() { # slug · rev -> that build's BACKLOG.md at that rev, or nothing
+  GIT show "$2:$M/builds/$1/BACKLOG.md" 2>/dev/null
+}
+# THIS BUILD'S OWN FILINGS — the `F` half of the scope. An ask filed in this folder under ANOTHER
+# build's slug is that build's ask sitting here for reference, so the slug segment is the filter and
+# not the folder.
+asks_filed_by() { # BACKLOG.md text · slug -> every ask id this build filed under its own slug
+  local _id
+  for _id in $(asks_filed_in "$1"); do
+    [ "$(ask_home_of "$_id")" = "$2" ] || continue
+    printf '%s\n' "$_id"
+  done
+}
+# A STATUS row, whole. `ask_disposition_of` above returns the VERB alone, and three of the six verbs
+# carry a slot the verb does not say — `CLOSED · <id> · by <sha>`, `BLOCKED · <id> · on <id>`,
+# `DEFERRED · <id> · until <id>`. A caller needing the slot would otherwise re-split a line that
+# function had already split, which is one grammar in two places.
+#
+# THE SIX STATUS VERBS AND NOTHING ELSE. `- SEV · <id> · HIGH · …` and `- SCOPE · <id> · …` are the
+# same row SHAPE and carry no disposition at all, so a reader keyed on the shape alone answers
+# "this ask was disposed of" for a severity label somebody filed beside it.
+ASK_STATUS_VERBS="CLOSED WONTDO BLOCKED DEFERRED KEEP REOPEN"
+ask_disposition_row_of() { # BACKLOG.md text · ask id -> the first status row naming it
+  printf '%s\n' "$1" | ADR_ID="$2" ADR_V=" $ASK_STATUS_VERBS " awk '
+    BEGIN { id = ENVIRON["ADR_ID"]; v = ENVIRON["ADR_V"] }
+    /^- [A-Z][A-Z]* · / {
+      n = split($0, f, " · ")
+      if (n < 2 || f[2] != id) next
+      w = substr(f[1], 3)
+      if (index(v, " " w " ") == 0) next
+      print; exit
+    }'
+}
+# One disposition row's SLOT value — the text after `by `, `on ` or `until ` in the third field.
+ask_disposition_slot_of() { # disposition row -> the slot value, or nothing
+  printf '%s\n' "$1" | awk -F' · ' '{ s = $3; sub(/^(by|on|until|of) /, "", s); print s; exit }'
+}
+# ONE ENUMERATION OF THE SCOPE, two callers: the `asks-disposed` item at `--close` and the
+# `asks-at-landing` freeze at `--landed`. A second spelling of "which asks is this run answerable
+# for" is the two-answers class this kit files by name, and the freeze must cover exactly what the
+# item graded or the landed record answers a different question from the one the close asked.
+#
+# ORDER IS THE MANDATE'S, then this build's own filings. Nothing is sorted here: the mandate's order
+# is the owner's own listing order and is rank step 3.
+AD_SCOPE=""
+read_ask_scope() { # slug · rev -> AD_SCOPE, the mandate then this build's own filings
+  local _id
+  AD_SCOPE=""
+  for _id in $(asks_ids_of "$(mandate_of "$1")") \
+             $(asks_filed_by "$(backlog_blob_of "$1" "$2")" "$1"); do
+    case " $AD_SCOPE " in *" $_id "*) continue ;; esac
+    AD_SCOPE="$AD_SCOPE $_id"
+  done
+  AD_SCOPE=${AD_SCOPE# }
+}
+# THE FREEZE LINE: `<id>=<STATUS>` pairs over the scope, at the tree the verb examines.
+#
+# SORTED BY SLUG THEN NUMERIC SEQUENCE, never as strings — `-2` before `-10`, which a string sort
+# reverses. The mandate's own order is deliberately NOT kept here: this is a terminal record read by
+# id, and a stable key is what makes two landed records comparable.
+#
+# A BLANK `ASKS_CMD` FREEZES NOTHING, and that is the same answer `asks-disposed`'s term zero gives:
+# where the ask contract is NOT ADOPTED there is no derived status to freeze, and a record in a
+# project that never declared a generator must read exactly as it did before this existed.
+derive_ask_freeze() { # slug · rev -> the freeze value on stdout, or rc 1 and AW_WHY
+  local _id _st
+  [ -n "${ASKS_CMD:-}" ] || return 0
+  read_ask_scope "$1" "$2"
+  [ -n "$AD_SCOPE" ] || return 0
+  run_ask_witness "$1" "$2" $AD_SCOPE || return 1
+  for _id in $(printf '%s\n' $AD_SCOPE | sort -t- -k2,2 -k3,3n); do
+    _st=$(ask_field "$_id" status)
+    printf '%s=%s ' "$_id" "${_st:--}"
+  done
 }
 
 # ------------------------------------------------------- the two refusals an ids-shaped value takes
@@ -3815,6 +3921,27 @@ WTS
   set_fact "$rel" units-at-landing \
     "$(unit_rows "$(readme_of "$slug")" \
        | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
+  # TOOL-dDerivedDocket-17 S3 - THE ASKS AT LANDING, frozen for the reason the roster above it is,
+  # plus one this record cannot express any other way. Owner ruling D4 makes CLOSED non-absorbing:
+  # a REOPEN on an ask this run disposed of would retroactively change what this landed record
+  # appears to have answered, so the answer is pinned at the moment of landing or it is not an
+  # answer about this run at all.
+  #
+  # AFTER `units-at-landing` AND BEFORE EVERY TERMINAL WRITE, which is `TOOL-dSealedTally-1`'s
+  # ordering and not a preference: a witness failure here leaves a record with a non-terminal phase,
+  # which `--landed` can be re-run against, where the same failure one line later would leave a
+  # terminal record no verb may repair.
+  #
+  # NO LINE FOR A RECORD WITH NO MANDATE AND NO FILING OF ITS OWN, so every record already in every
+  # tree is byte-unchanged by this.
+  local _lf_asks
+  if ! _lf_asks=$(derive_ask_freeze "$slug" "$wit"); then
+    fail 77 "this run's asks cannot be read at the tree it is landing, so the record would go terminal carrying no answer to the question it was authorized by - and a landed record is the one thing no verb may repair: $AW_WHY"
+    return 1
+  fi
+  if [ -n "${_lf_asks// /}" ]; then
+    set_fact "$rel" asks-at-landing "${_lf_asks% }" || return 1
+  fi
   # TOOL-dSealedTally-1. THE TERMINAL WRITES SIT HERE, LAST, AND THE ORDERING IS LOAD-BEARING.
   # `phase LANDED` used to be written ~70 lines above, before the lander-marker gate that can
   # refuse and before every fact write below. A refused `--landed` therefore exited 1 leaving a
@@ -5963,6 +6090,221 @@ $_bcnon"
         return 1
       fi
       DOD_OUT="$_tn probe row(s) recorded for this tree: ${_rn:-0} recall, ${_mn:-0} map"
+      return 0 ;;
+    asks-disposed)
+      # TOOL-dDerivedDocket-17. THE THIRTEENTH ITEM, and the only one that asks whether the run
+      # answered the QUESTIONS it was pointed at rather than whether it produced the artefacts.
+      #
+      # STATUS COMES FROM THE WITNESS AND FROM NOWHERE ELSE. The fold that turns rows into a derived
+      # status is the declared generator's, and a second fold here would be two answers to one
+      # question with the copy here as the one that rots. What this reads from the tree is FILING
+      # (does a row exist), a disposition ROW (which verb, which slot) and a spec header VERB - three
+      # line matches, none of them a verdict.
+      #
+      # THE SCOPE IS ENUMERATED BEFORE THE WITNESS RUNS. A loop over the rows that came back can only
+      # confirm what came back, so an id the producer dropped would never be mentioned
+      # (`memory/gotchas/inputs-inside-the-subjects-reach.md`). `read_ask_scope` reads the tree; T2
+      # compares the witness against THAT.
+      #
+      # OVERRIDABLE, by owner ruling D12-b, on the condition that overrides are counted - which the
+      # drift-audit signal `asks_disposed_overrides` does. It is deliberately NOT in
+      # `DOD_NO_OVERRIDE`: the design recommended non-overridable on the `pieces-complete` argument
+      # and the owner reversed it.
+      DOD_OUT=""
+      local _ad_m _ad_f _ad_rev _ad_mb _ad_now _ad_was _ad_n _ad_rn _ad_id _ad_st _ad_row _ad_verb
+      local _ad_slot _ad_by _ad_full _ad_isha _ad_grade _ad_closes _ad_adv _ad_sp _ad_u _ad_c
+      local _ad_own="" _ad_bc="" _ad_walked=0 _ad_dec _ad_resc _ad_wasrow _ad_specs
+      _ad_rev=$(GIT rev-parse HEAD 2>/dev/null)
+      _ad_m=$(mandate_of "$slug")
+      _ad_now=$(backlog_blob_of "$slug" "$_ad_rev")
+      _ad_f=$(asks_filed_by "$_ad_now" "$slug")
+      # ---- TERM 0, both halves. MET and ANNOUNCED, never silent: a skip that looks like a pass is
+      # ---- indistinguishable from coverage, and `pieces-complete` two arms up is the precedent.
+      # ---- The two halves are different facts - "this project has no ask contract" and "this build
+      # ---- has nothing to dispose" - and an operator who confuses them hunts the wrong thing.
+      if [ -z "$_ad_m" ] && [ -z "${ASKS_CMD:-}" ]; then
+        DOD_OUT="skipped — asks-disposed: this build carries no asks: mandate and this project declares no ASKS_CMD, so the ask contract is NOT ADOPTED here and there is nothing this item could grade"
+        return 0
+      fi
+      if [ -z "$_ad_m" ] && [ -z "${_ad_f//[[:space:]]/}" ]; then
+        DOD_OUT="skipped — asks-disposed: nothing to dispose — this build carries no asks: mandate and its own folder files no ask under its own slug"
+        return 0
+      fi
+      # ---- TERM 1: a mandate with no grader. `--preflight` refuses this outright, so reaching
+      # ---- `--close` in this state means the refusal did not fire - and every check keyed on the
+      # ---- pinned set has been passing over a list nothing graded ever since.
+      if [ -z "${ASKS_CMD:-}" ]; then
+        DOD_OUT="this build README carries an asks: mandate and this project declares no ASKS_CMD, which --preflight refuses outright, so this run was authorized by a mandate nothing in the project can grade: $_ad_m"
+        return 1
+      fi
+      # ---- TERM 2: the witness, against the scope READ FROM THE TREE.
+      read_ask_scope "$slug" "$_ad_rev"
+      _ad_n=$(printf '%s\n' $AD_SCOPE | grep -c . || true)
+      if ! run_ask_witness "$slug" "$_ad_rev" $AD_SCOPE; then
+        DOD_OUT="the ask witness did not answer for this build's scope, so no ask below is graded and any verdict here would be invented: $AW_WHY"
+        return 1
+      fi
+      _ad_rn=$(printf '%s\n' "$AW_ROWS" | grep -c . || true)
+      if [ "$_ad_rn" != "$_ad_n" ] || [ "${AW_EXAMINED:-}" != "$_ad_n" ]; then
+        DOD_OUT="DEAD PROBE - the declared ask generator disagrees with the scope this item enumerated from the tree, so an ask it disposed of and one it never looked at are indistinguishable here: scope $_ad_n · rows $_ad_rn · examined ${AW_EXAMINED:-(none)} · scope is $AD_SCOPE"
+        return 1
+      fi
+      # ---- THE THREE TREE READS the terms below share, taken ONCE.
+      _ad_mb=$(fact "$rel" m-base)
+      _ad_was=$(backlog_blob_of "$slug" "$_ad_mb")
+      _ad_specs=$(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null)
+      # A spec set this reader refuses is a REFUSAL and not an empty set: with the maps empty every
+      # ask below would grade "no CLOSED unit delivered it", which is the same sentence a genuinely
+      # abandoned scope earns. Same rule `build-complete` states one arm up.
+      if ! load_spec_facts $_ad_specs >/dev/null 2>&1; then
+        DOD_OUT="the spec-fact reader refused over this build's specs, so nothing here could tell an ask a CLOSED unit delivered from one this run abandoned: $M/builds/$slug/spec/"
+        return 1
+      fi
+      _ad_closes=" "; _ad_adv=" "
+      for _ad_sp in $_ad_specs; do
+        [ "${SPEC_ST[$_ad_sp]:-}" = CLOSED ] || continue
+        _ad_closes="$_ad_closes$(spec_ask_verbs "$_ad_sp" closes | tr '\n' ' ')"
+        _ad_adv="$_ad_adv$(spec_ask_verbs "$_ad_sp" advances | tr '\n' ' ')"
+      done
+      # THE MEMBERSHIP TEST IS A SPACE-PADDED STRING, built once. A `case` pattern asking for
+      # `*" $id "*` over a NEWLINE-separated list matches nothing, and matching nothing here reads
+      # as "not mandated" - the direction that skips the terms rather than firing them.
+      #
+      # ONE TEST AND NOT TWO: the scope IS M ∪ F, so "not in M" is exactly "in F" and a second
+      # membership string would be a second way to answer one question.
+      local _ad_mlist
+      _ad_mlist=" $(printf '%s ' $(asks_ids_of "$_ad_m"))"
+      for _ad_id in $AD_SCOPE; do
+        _ad_st=$(ask_field "$_ad_id" status)
+        _ad_row=$(ask_disposition_row_of "$_ad_now" "$_ad_id")
+        _ad_verb=$(printf '%s\n' "$_ad_row" | awk -F' · ' '{ sub(/^- /, "", $1); print $1; exit }')
+        # ---- TERM 3, the F half: an ask THIS build filed and neither disposed nor finished. It is
+        # ---- graded on the SCOPE's own membership, never on the witness's `home` field, so a
+        # ---- producer that declined to print it cannot shrink F to match itself.
+        case "$_ad_mlist" in
+          *" $_ad_id "*) ;;
+          *)
+            case "$_ad_st" in
+              CLOSED|WONTDO) continue ;;
+            esac
+            [ -n "$_ad_verb" ] && continue
+            DOD_OUT="this build filed an ask and left it neither disposed nor terminal, so a question this run raised for itself is going out of the record unanswered: $_ad_id reads ${_ad_st:--} and this build's own file carries no status row for it"
+            return 1 ;;
+        esac
+        # ---- From here the ask is MANDATED, and T3's three admitted end states apply.
+        _ad_slot=$(ask_disposition_slot_of "$_ad_row")
+        _ad_grade=$(printf '%s\n' $(fact "$rel" asks-ready) | sed -n "s/^$_ad_id=//p" | head -1)
+        _ad_dec=$(id_rows "$(grep -E '^[0-9][0-9-]*T[0-9:]*Z decision · ' "$rel" 2>/dev/null || true)" "$_ad_id" | head -1)
+        _ad_resc=$(id_rows "$(grep -E "^[0-9][0-9-]*T[0-9:]*Z rescope · item ($(kinds_re "$PARK_ACTS_OWED")) " "$rel" 2>/dev/null || true)" "$_ad_id" | head -1)
+        case "$_ad_st" in
+          CLOSED|WONTDO) ;;
+          *)
+            case "$_ad_verb" in
+              BLOCKED|DEFERRED)
+                # F3's first restriction: a READY ask held anyway owes the veto that stopped it.
+                # `--park`'s own M3 vocabulary is `veto 2` and `veto 3`; a hold with no veto named
+                # is a run choosing not to do work it had every input for.
+                if [ "$_ad_grade" = yes ] && ! printf '%s\n' "$_ad_dec" | grep -qE 'veto (2|3)'; then
+                  DOD_OUT="a mandated ask this run graded READY is held rather than answered, and no parked decision names the M3 veto that stopped it, so the hold is a choice nobody recorded: $_ad_id held by '$_ad_verb' on '${_ad_slot:-?}'"
+                  return 1
+                fi
+                # F3's second: a READY ask held on something THIS RUN filed is a run holding itself
+                # up on a question it raised, which is admitted only where the ask was never ready.
+                if [ "$_ad_grade" = yes ] && [ -n "$_ad_slot" ] \
+                   && [ "$(ask_home_of "$_ad_slot")" = "$slug" ]; then
+                  DOD_OUT="a mandated ask this run graded READY is held on an owner-call ask this same run filed under its own slug, so the run deferred a question it was ready to answer behind one it raised itself: $_ad_id held on $_ad_slot"
+                  return 1
+                fi ;;
+              KEEP)
+                # D12-c: KEEP after a DELIVERED partial, and never as a silent way not to do the
+                # work. The evidence is a CLOSED spec of this build carrying `advances <id>`.
+                case "$_ad_adv" in
+                  *" $_ad_id "*) ;;
+                  *) DOD_OUT="a mandated ask is KEPT live and no CLOSED unit of this build advances it, so the KEEP records a decision not to do the work rather than a partial that was delivered: $_ad_id"
+                     return 1 ;;
+                esac ;;
+              *)
+                DOD_OUT="a mandated ask ended in none of the states this item admits - it is not derived terminal, and this build's own file holds no BLOCKED, DEFERRED or KEEP row for it: $_ad_id reads ${_ad_st:--}"
+                return 1 ;;
+            esac ;;
+        esac
+        # ---- F3's third: a WONTDO this run itself wrote. A row present at HEAD and absent at
+        # ---- `m-base` was written by this run, and a run may not meet this item by declaring the
+        # ---- work unnecessary as it goes. The one admitted shape is a `stale:` reason WITH a
+        # ---- parked decision, which is the owner's turn rather than the run's own.
+        if [ "$_ad_st" = WONTDO ] && [ "$_ad_grade" = yes ] && [ "$_ad_verb" = WONTDO ]; then
+          _ad_wasrow=$(ask_disposition_row_of "$_ad_was" "$_ad_id")
+          if [ -z "$_ad_wasrow" ] \
+             && { ! printf '%s\n' "$_ad_row" | grep -qF 'stale:' || [ -z "$_ad_dec" ]; }; then
+            DOD_OUT="a mandated ask this run graded READY was written off by a WONTDO row this same run added after its pinned m-base, so the run met this item by deciding the work was unnecessary: $_ad_id"
+            return 1
+          fi
+        fi
+        # ---- TERM 4: CLOSED by a commit THIS RUN wrote that is not a CLOSED unit's build commit.
+        # ---- `read_run_commits` excludes the advertised tip, so a FOREIGN build's row landed on the
+        # ---- default branch since `m-base:` is not this run's - T5 already owns "closed with
+        # ---- somebody else's evidence" and the two must not both fire on one ask.
+        _ad_by=$(ask_field "$_ad_id" decided)
+        _ad_isha=0
+        case "$_ad_by" in
+          *[!0-9a-f]*) ;;
+          ???????*) _ad_isha=1 ;;
+        esac
+        if [ "$_ad_st" = CLOSED ] && [ "$_ad_isha" = 1 ]; then
+          if [ "$_ad_walked" = 0 ]; then
+            # THE EXCLUSION TIP IS REQUIRED, not optional. Without it `m-base..HEAD` counts every
+            # default-branch commit landed in the window as this run's own, which is the reading
+            # section 8 F5 rejected; refusing is the honest outcome and `authorization-reachable`
+            # has already spoken for an anchor nobody could observe.
+            if [ -z "${ASHA:-}" ]; then
+              DOD_OUT="a mandated ask is recorded CLOSED by a sha and no anchor was observed, so 'this run wrote it' could only be decided over a range that counts every commit landed on the default branch since m-base: $_ad_id by $_ad_by"
+              return 1
+            fi
+            if ! _ad_own=$(read_run_commits "$_ad_rev" "$_ad_mb" "$ASHA"); then
+              DOD_OUT="this run's own commits cannot be enumerated, so this term would pass by finding nothing: endpoint $_ad_rev · m-base ${_ad_mb:-(none)} · anchor $ASHA"
+              return 1
+            fi
+            # THE CLOSED UNITS COME FROM THE SPEC HEADERS, the same fact `_ad_closes` and `_ad_adv`
+            # were built from one screen up. The generated units region carries the same statuses
+            # and is rendered FROM these headers, so reading it here would be a second reader of one
+            # fact — and the two disagree exactly while a unit's status header has moved and the
+            # index has not been re-rendered, which is every unit pass between its commit and the
+            # generator's.
+            for _ad_u in $(for _ad_sp in $_ad_specs; do
+                             [ "${SPEC_ST[$_ad_sp]:-}" = CLOSED ] || continue
+                             printf '%s\n' "${SPEC_ID[$_ad_sp]:-}"
+                           done); do
+              [ -n "$_ad_u" ] || continue
+              _ad_c=$(build_commit "$_ad_mb..$_ad_rev" "$_ad_u" "$M/builds/$slug" "$GENERATED_INDEXES" "$SHARED_RECORDS" || true)
+              case "$_ad_c" in ''|TRUNCATED) continue ;; esac
+              _ad_bc="$_ad_bc$_ad_c
+"
+            done
+            _ad_walked=1
+          fi
+          _ad_full=$(GIT rev-parse --verify --quiet "$_ad_by^{commit}" 2>/dev/null)
+          # A sha this clone cannot resolve is not a commit this run wrote - nothing here could have
+          # written one it cannot read - so T4 says nothing about it and T5 below still grades the
+          # ask on whether a unit of this build delivered it.
+          if [ -n "$_ad_full" ] && printf '%s\n' "$_ad_own" | grep -qxF -- "$_ad_full" \
+             && ! printf '%s\n' "$_ad_bc" | grep -qxF -- "$_ad_full"; then
+            DOD_OUT="a mandated ask is recorded CLOSED by a commit this run wrote that is not any CLOSED unit's build commit, so the run closed an ask with evidence minted outside the units it was reviewed on: $_ad_id by $_ad_by"
+            return 1
+          fi
+        fi
+        # ---- TERM 5: SCOPE RESOLUTION, never scope abandonment. An ask a CLOSED unit of this build
+        # ---- delivered - `closes` it, or `advances` it under the KEEP T3 admitted - is resolved. An
+        # ---- ask nothing of this build delivered is resolved only where the run OWED the owner an
+        # ---- answer and wrote one: a parked decision, or a rescope whose act is in
+        # ---- `PARK_ACTS_OWED`. That constant's own argument is the whole of this term's.
+        case "$_ad_closes$_ad_adv" in
+          *" $_ad_id "*) continue ;;
+        esac
+        if [ -z "$_ad_dec" ] && [ -z "$_ad_resc" ]; then
+          DOD_OUT="a mandated ask was neither delivered by a CLOSED unit of this build nor answered to the owner, so this run is landing having dropped scope it was authorized for without recording that it did: $_ad_id reads ${_ad_st:--}"
+          return 1
+        fi
+      done
       return 0 ;;
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;

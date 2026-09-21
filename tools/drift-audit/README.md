@@ -115,6 +115,7 @@ Tier 2 needs the two workflow scripts from `tools/workflows/drift-audit-{code,st
 | `live_backlog_rows_per_shard` | is a shard’s live set approaching the floor rotation cannot clear? | no |
 | `readme_mechanism_drift` | does a build README still describe a mechanism its own spec set revised? | no |
 | `backlog_stragglers` | does a ref still carry backlog row changes unaccounted against the default branch? | no |
+| `asks_disposed_overrides` | how often did a run buy the `asks-disposed` Definition-of-Done item with an override? | no |
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's

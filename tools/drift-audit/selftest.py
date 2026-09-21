@@ -2241,6 +2241,62 @@ def test_evidence_globs_exclude_test_templates(tmp: pathlib.Path) -> None:
           ":(exclude)*.test-template.*" in globs,
           "the shipped EVIDENCE_GLOBS lost the exclusion the arm above only proves is honoured")
 
+def test_asks_disposed_overrides(tmp: pathlib.Path) -> None:
+    """TOOL-dDerivedDocket-17: the count that makes owner ruling D12-b's override BOUNDED.
+
+    The ruling allows `--close --override asks-disposed` with a recorded reason on the condition
+    that the overrides are counted. Each one is a legitimate row in one record; the population is
+    the thing nobody can see, and this is the reader of it.
+    """
+    print("asks-disposed overrides per run-state record")
+    sep = chr(0xB7)
+    r = make_repo(tmp, name="askoverrides")
+    builds = r / "memory" / "builds"
+    for slug, body in (
+        ("aOne",
+         f"2026-09-01T00:00:00Z override {sep} item asks-disposed {sep} reason the owner took the call\n"
+         f"2026-09-02T00:00:00Z override {sep} item gates-green {sep} reason the bar was run by hand\n"),
+        ("aTwo",
+         f"2026-09-03T00:00:00Z override {sep} item asks-disposed {sep} reason a second, also recorded\n"
+         f"2026-09-04T00:00:00Z decision {sep} item asks-disposed came up {sep} reason parked, never bought\n"),
+    ):
+        (builds / slug).mkdir(parents=True, exist_ok=True)
+        (builds / slug / "RUN.md").write_text(
+            f"# {slug} - run state\n\n## Run facts\nphase: LANDED\n\n## Parked\n{body}",
+            encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "run-state records", "--no-verify"], r)
+
+    got = report(r)["asks_disposed_overrides"]
+    # THE OTHER TWO ROWS ARE THE LOAD-BEARING HALF of this fixture. A count over every `override`
+    # row reads 4, and a count over every row naming the item reads 4 as well — so a fixture with
+    # only this item's overrides in it would pass under either mistake.
+    check("counts THIS item's overrides and nobody else's: 2", got["value"] == 2, f"got {got['value']}")
+    check("reports every tracked record, so a total cannot hide one growing inside another",
+          got["of"] == 2, f"got {got['of']}")
+    check("the probe is LIVE where run-state records exist", got["live"] is True)
+    check("report-only: an unguarded merge-bar leg must not turn a recorded ruling into a refusal",
+          got["gateable"] is False)
+    per = {d["record"]: d["overrides"] for d in got["detail"]}
+    check("each record carries its own count",
+          per == {"memory/builds/aOne/RUN.md": 1, "memory/builds/aTwo/RUN.md": 1}, f"got {per}")
+
+    # --- it MOVES when another run buys the item. That is the whole point of the signal. --------
+    p = builds / "aTwo" / "RUN.md"
+    p.write_text(p.read_text(encoding="utf-8")
+                 + f"2026-09-05T00:00:00Z override {sep} item asks-disposed {sep} reason a third\n",
+                 encoding="utf-8", newline="\n")
+    check("a further override raises the count",
+          report(r)["asks_disposed_overrides"]["value"] == 3,
+          "the signal does not track the variable it exists for")
+
+    # --- DEAD, not a reassuring 0, where no run-state record exists at all ----------------------
+    r2 = make_repo(tmp, name="norunstate")
+    dead = report(r2)["asks_disposed_overrides"]
+    check("no run-state record at all reports DEAD rather than 0",
+          dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -2251,6 +2307,7 @@ def main() -> int:
         test_lexicon_marginal_rate(tmp)
         test_no_signal_hardcodes_live(tmp)
         test_live_backlog_rows(tmp)
+        test_asks_disposed_overrides(tmp)
         test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)

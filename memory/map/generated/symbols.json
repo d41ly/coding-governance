@@ -463,6 +463,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "build_asks_disposed_overrides",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_backlog_rows_outliving_specs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -5756,6 +5761,11 @@
       "id": "test_already_gone_is_not_a_signal_error",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_asks_disposed_overrides",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_assignment_inside_a_dash_c_body_does_not_admit",
