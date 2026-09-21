@@ -164,7 +164,10 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   remote does not ANSWER, it accepts the unpublished tip and records it as `hold-unpushed`. In the
   SAME write it decides whether a DURABLE restart is owed and records `resume-owed` and
   `hold-streak`, printing the schedule name, its fire instant and the prompt for the agent to file.
-  The contract is `UNATTENDED-STOPS.md`.
+  An optional `--pending-run <runId>` names the Workflow run of a review that deferred twice; it is
+  recorded as `hold-run`, rewritten EMPTY by a hold without it, printed on the HELD checkpoint and
+  named by a take-over's relaunch line, and a value outside 1 to 64 letters, digits, `_` and `-` is
+  refused with the rest. The contract is `UNATTENDED-STOPS.md`.
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the keepalive is still

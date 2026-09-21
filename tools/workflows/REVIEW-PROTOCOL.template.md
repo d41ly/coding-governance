@@ -195,6 +195,14 @@ synthesis pass**; three phases, find → verify → synthesize. The ready-made h
 takes a structured `args` object and REFUSES a prose string, because defaulting the review root to
 the process cwd twice made it audit a repository nobody had briefed it on.
 
+**Results are durable.** Every lens and skeptic batch Writes its result to
+`<git-common-dir>/review-lenses/<key>/find-<lens>.json` or `verify-<first id>-<last id>.json`
+BEFORE it returns, and all three schemas require its `path`. The key is the kind, the round, the
+pinned subject and a print of the inputs, so a re-run with identical args reuses every file that
+carries it and dispatches only what is missing. A run where a lens, a batch or the synthesis
+returned nothing exits `deferred-platform`, naming the `pending` labels and no blocker count:
+re-run it once, and hold on a second.
+
 - **Precision — confirmed / (confirmed + refuted) — is the #1 token lever.** Below 0.5, tighten the
   scope before adding agents. Measured on the review that produced this document: 18 / 20.
 - **Match intensity to target richness.** Heavy multi-lens review earns its tokens on fresh, complex

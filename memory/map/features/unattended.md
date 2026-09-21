@@ -87,6 +87,8 @@ lease, then `--audit`, the unit stall probe.
 `--hold` with a code, a condition and a witness, left by `--resume` alone. A per-slug LEASE
 under the git common dir keys on the session-scoped keepalive id, so a resume tells orientation
 from take-over. Every `phase` read routes through `read_derived_phase` or `read_recorded_phase`.
+A hold on a review that deferred twice records its Workflow runId (`--pending-run`, fact
+`hold-run`), and the take-over prints the relaunch (`TOOL-dDerivedDocket-29`).
 See `UNATTENDED-STOPS.md`.
 
 **LANDED is DERIVED, not written after the push (TOOL-dDerivedDocket-22, ruling D12-i2).** A

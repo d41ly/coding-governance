@@ -6091,6 +6091,42 @@ git add -A >/dev/null && git commit -q -m extracode --no-verify
 out=$(run --hold tRun --code vendor-outage --until owner --reason "x" --reaped k1)
 hit "$out" "phase HELD · code vendor-outage"
 
+# ---- TOOL-dDerivedDocket-29 AC10: `--pending-run` is refused, numbered and before any write, unless it
+# ---- is 1 to 64 letters, digits, underscores and dashes. A separator or a newline inside it would forge
+# ---- a second fact or checkpoint row, so each shape is staged and the record and the lease are read.
+build_hold_fixture; before=$(sum); lb=$(read_lease_hash)
+out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 --pending-run "wf_0a1b2c3d-4e5 · forged: 1")
+hit "$out" "--pending-run takes a workflow run id of 1 to 64 letters, digits, underscores and dashes, because the value is written as a run fact and printed on the checkpoint, and a separator or a newline inside it would forge a second fact or row; nothing was written"
+same "AC10 a separator in the pending run wrote nothing" "$(sum)" "$before"
+same "AC10 ...and left the lease alone" "$(read_lease_hash)" "$lb"
+out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 --pending-run "$(printf 'wf_ok\nhold-code: forged')")
+hit "$out" "and a separator or a newline inside it would forge a second fact or row; nothing was written"
+same "AC10 a newline in the pending run wrote nothing" "$(sum)" "$before"
+out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 --pending-run "$(printf 'a%.0s' $(seq 1 65))")
+hit "$out" "--pending-run takes a workflow run id of 1 to 64 letters"
+same "AC10 a 65-character pending run wrote nothing" "$(sum)" "$before"
+
+# ---- TOOL-dDerivedDocket-29 AC9: the pending run is recorded, printed on the HELD checkpoint, named
+# ---- by the take-over's relaunch line, and CLEARED by a later hold that carries no flag — so a
+# ---- checkpoint never names a run from an earlier stop.
+build_hold_fixture
+out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 --pending-run wf_0a1b2c3d-4e5)
+hit "$out" "phase HELD · code platform-limit"
+n=$((n+1)); grep -q '^hold-run: wf_0a1b2c3d-4e5$' memory/builds/tRun/RUN.md || { echo "FAIL AC9 --hold did not record the hold-run fact"; st=1; }
+git add -A >/dev/null && git commit -q -m held --no-verify
+out=$(run --status tRun)
+hit "$out" "pending run wf_0a1b2c3d-4e5"
+out=$(run --resume tRun --keepalive-id k2)
+hit "$out" "relaunch the deferred review FIRST — pending run wf_0a1b2c3d-4e5"
+git add -A >/dev/null && git commit -q -m resumed --no-verify
+run --hold tRun --code platform-limit --until owner --reason "again" --reaped k2 >/dev/null
+git add -A >/dev/null && git commit -q -m held2 --no-verify
+out=$(run --status tRun)
+hit "$out" "unattended: tRun · phase HELD"
+miss "$out" "pending run"
+out=$(run --resume tRun --keepalive-id k3)
+miss "$out" "relaunch the deferred review"
+
 # ---- AC1: an unmet `after` prints `still held`, exits 0 and writes NOTHING — not the phase, and
 # ---- not the lease, which is the half a message assertion would never see.
 build_hold_fixture
@@ -8229,7 +8265,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # does not advertise, so FLOOR_SHARD_2 carries the same +88 and FLOOR_SHARD_1 is untouched. MEASURED,
 # not typed: the block was run alone behind a replica of this prologue by hand, n 0 -> 87 and green,
 # and red under each of seven staged breaks; this pass runs no suite.
-FLOOR_ASSERTIONS=1102
+# RAISED 1102 -> 1116 by TOOL-dDerivedDocket-29, the `--pending-run` arms: 14 assertions, all in
+# region two beside the other `--hold` arms, so FLOOR_SHARD_2 carries the same +14 and FLOOR_SHARD_1 is
+# untouched. COUNTED off the block's own `hit`/`miss`/`same` lines and its one `n=$((n+1))` guard, every
+# one unconditional; this pass runs no suite, and each case was observed by running the verb itself in
+# a scratch fixture built the way this prologue builds one.
+FLOOR_ASSERTIONS=1116
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -8273,7 +8314,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=906
+# +14 for the TOOL-dDerivedDocket-29 `--pending-run` arms, all in region two - see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=920
 # +88 for the TOOL-dDerivedDocket-22 derived-terminal arms, all in region two - see FLOOR_ASSERTIONS.
 # +6 for the TOOL-dDerivedDocket-20 two-key arms, all in region two - see FLOOR_ASSERTIONS.
 # +31 for the TOOL-dDerivedDocket-19 grant arms, all in region two - see FLOOR_ASSERTIONS.

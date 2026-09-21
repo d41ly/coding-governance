@@ -17,7 +17,7 @@
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
-#   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node>
+#   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
 #   unattended.sh --resume <slug> --scheduled <held-at> --keepalive-id <id>   # the restart a durable schedule files
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
@@ -4279,10 +4279,10 @@ print_interrupted_acts() {
 # a --hold that wrote the phase and then discovered a dirty tree would leave a HELD record standing
 # over uncommitted work, with a witness naming a commit that is not what the tree holds — and
 # --resume would then return that run to its working phase on a false premise.
-run_hold() { # slug · code · until · reason · reaped · unreachable
-  local slug="$1" code="$2" until="$3" reason="$4" reaped="$5" unreach="$6"
+run_hold() { # slug · code · until · reason · reaped · unreachable · pending run
+  local slug="$1" code="$2" until="$3" reason="$4" reaped="$5" unreach="$6" pendrun="${7-}"
   local rel cur ka head legal bt rc adv unpushed=""
-  local rsname heldat streak owed owedwhy rsrow
+  local rsname heldat streak owed owedwhy rsrow pendrun_bad=0
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to hold: $rel"; return 1; }
@@ -4324,6 +4324,21 @@ run_hold() { # slug · code · until · reason · reaped · unreachable
   if [ -n "$BYPASS_BAN" ] && printf '%s' "$reason" | grep -qF -- "$BYPASS_BAN"; then
     fail 55 "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar for as long as the hold lasts; say it without the literal flag: $BYPASS_BAN"
     return 1
+  fi
+  # TOOL-dDerivedDocket-29 S7 - THE PENDING RUN, optional, and validated here with the other arguments
+  # so a refusal writes nothing. It becomes the `hold-run` fact and a checkpoint line, and both are
+  # ` · `-separated rows a newline or a separator inside the value would forge a second field or row
+  # of. The platform owns the runId format (observed as `wf_` then 8 hex, a dash and 3 hex), so the
+  # grammar admits that shape without pinning it: 1 to 64 characters of letters, digits, `_` and `-`.
+  if [ -n "$pendrun" ]; then
+    case "$pendrun" in
+      *[!A-Za-z0-9_-]*) pendrun_bad=1 ;;
+      *) [ "${#pendrun}" -le 64 ] && pendrun_bad=0 || pendrun_bad=1 ;;
+    esac
+    if [ "$pendrun_bad" = 1 ]; then
+      fail 55 "--pending-run takes a workflow run id of 1 to 64 letters, digits, underscores and dashes, because the value is written as a run fact and printed on the checkpoint, and a separator or a newline inside it would forge a second fact or row; nothing was written: $pendrun"
+      return 1
+    fi
   fi
   if [ -n "$reaped" ] && [ -n "$unreach" ]; then
     fail 56 "--hold takes --reaped or --keepalive-unreachable and never both: one says the job was stopped and read back, the other says this node cannot reach the session holding it, and a record claiming both says neither"
@@ -4426,6 +4441,8 @@ run_hold() { # slug · code · until · reason · reaped · unreachable
   fi
   set_fact "$rel" hold-streak "$streak · at $(printf '%.8s' "$head")" || return 1
   if [ -n "$unpushed" ]; then set_fact "$rel" hold-unpushed "$unpushed" || return 1; fi
+  # WRITTEN ON EVERY HOLD, empty without the flag, so no later hold inherits an earlier stop's run.
+  set_fact "$rel" hold-run "$pendrun" || return 1
   # HISTORY-CLASS, in park()'s own row grammar so `--status` counts it as noted rather than owed and
   # check 27 can join the kind against the declared vocabulary. The free-text reason is NOT repeated
   # here: it has a fact of its own, which is the only place --status quotes it from.
@@ -4847,7 +4864,7 @@ set_fact() { # file · key · value
 
 verb_status() { # slug
   local slug="$1" rel p w unit nparked parked unowed nnoted
-  local _age _lrc _hcode _huntil _hsince _hfrom _hreason _hunp _wit8 _bar pshow
+  local _age _lrc _hcode _huntil _hsince _hfrom _hreason _hunp _wit8 _bar pshow _hrun
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to report on: $rel"; return 1; }
@@ -5003,6 +5020,10 @@ BRIEFROWS
       printf 'checkpoint · witness %s · next %s · last bar %s · parked %s\n' "$_wit8" "$unit" "$_bar" "${nparked:-0}"
     fi
     printf 'resume · %s · streak %s\n' "${_howed:-none · unrecorded}" "${_hstreak:-unrecorded}"
+    # TOOL-dDerivedDocket-29 S7 - the Workflow run a deferred review was holding on. Printed only
+    # while HELD, so a value left behind by an earlier stop misleads nobody after a resume.
+    _hrun=$(fact "$rel" hold-run)
+    if [ -n "$_hrun" ]; then printf 'pending run %s\n' "$_hrun"; fi
     printf 'reason · "%s"\n' "$_hreason"
   fi
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
@@ -5121,7 +5142,7 @@ print_resume_orientation() { # run-state file · phase
 # is taken, so a refused take-over writes nothing at all — not the lease, not the phase, not the id.
 # A take-over that half-wrote would leave the slug holding a lease for a session that then stopped.
 run_takeover() { # slug · run-state file · keepalive id · held|working · phase
-  local slug="$1" rel="$2" kid="$3" mode="$4" ph="$5" unp hf head how
+  local slug="$1" rel="$2" kid="$3" mode="$4" ph="$5" unp hf head how prun
   if [ -z "$kid" ]; then
     verb_status "$slug" || true
     fail 59 "a take-over is a change of driver and the new driver has to name itself, because the lease is keyed on the keepalive id and a blank one wedges the slug until the bound expires — the holder's own later resume would then meet the different-id refusal and --replaces cannot name a blank; nothing was written: pass --keepalive-id"
@@ -5167,6 +5188,13 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
     if [ -n "$unp" ]; then set_fact "$rel" hold-unpushed "" || return 1; fi
     stage_or_fail "$rel" || return 1
     echo "unattended: taken over — phase $hf · keepalive $kid · the hold is released and this session holds the lease"
+    # TOOL-dDerivedDocket-29 S7 - THE RELAUNCH. A hold taken on a second deferred review names the
+    # Workflow run it was waiting on, and a recorded runId nothing reads is a fact written for nobody.
+    # The lens and skeptic files that run wrote are reused either way; the runId is the bonus path.
+    prun=$(fact "$rel" hold-run)
+    if [ -n "$prun" ]; then
+      echo "unattended: relaunch the deferred review FIRST — pending run $prun: re-run that Workflow with identical args, resuming from run $prun where the platform offers it; the review reuses every lens and skeptic file the run wrote and dispatches only what did not return"
+    fi
     print_resume_orientation "$rel" "$hf"
   else
     stage_or_fail "$rel" || return 1
@@ -7903,10 +7931,10 @@ SIBS
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
-# --hold's own three, and --resume's one. Initialised here rather than in the conf-default block,
+# --hold's own four, and --resume's one. Initialised here rather than in the conf-default block,
 # for the reason PK_ITEM is: a tracked .unattended.conf could otherwise pre-set one and satisfy a
 # refusal nobody typed an argument for.
-HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; RS_REPLACES=""; RS_SCHEDULED=""
+HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_SCHEDULED=""
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
@@ -7955,6 +7983,7 @@ while [ $# -gt 0 ]; do
     --until)        HOLD_UNTIL="${2:-}"; shift 2 || shift ;;
     --reaped)       HOLD_REAPED="${2:-}"; shift 2 || shift ;;
     --keepalive-unreachable) HOLD_UNREACH="${2:-}"; shift 2 || shift ;;
+    --pending-run)  HOLD_RUN="${2:-}"; shift 2 || shift ;;
     --replaces)     RS_REPLACES="${2:-}"; shift 2 || shift ;;
     --scheduled)    RS_SCHEDULED="${2:-}"; shift 2 || shift ;;
     # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so the COUNTABLE
@@ -8051,7 +8080,7 @@ case "$VERB" in
   --close)     verb_close "$SLUG" ;;
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
-  --hold)      run_hold "$SLUG" "$HALT_CODE" "$HOLD_UNTIL" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" ;;
+  --hold)      run_hold "$SLUG" "$HALT_CODE" "$HOLD_UNTIL" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" "$HOLD_RUN" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;

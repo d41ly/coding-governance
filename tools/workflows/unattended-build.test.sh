@@ -991,6 +991,23 @@ has    "F every lens dead: still THROWS" "$o" "non-integer blocker count"
 has    "F ...naming the lens deaths" "$o" "lensesDead 4"
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":3,"lensesDead":1,"skepticsDead":0,"unverified":0,"note":"all findings refuted, but 1/4 lenses died"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "F all-refuted beside a dead lens: THROWS" "$o" "non-integer blocker count"
+# ---- TOOL-dDerivedDocket-29 AC8: a DEFERRED callee return is recognised BEFORE the clean-round test
+# ---- and the non-integer refusal. The two arms above keep a return that carries NO `exit` field on
+# ---- the throw, which is still how a callee predating the field reads. A deferral records no round,
+# ---- builds nothing, and tells the caller to re-run once and then hold with the Workflow runId.
+DEF='{"exit":"deferred-platform","key":"spec-audit-r1-x-y","pending":["find:security","find:seams"],"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":2,"lensesDead":2,"note":"DEFERRED: 2/4 lenses died"}'
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$DEF" "$(rec CONVERGED)" "$DISPOSE_OK")")
+has    "DP a deferred audit is a RESULT, not a throw" "$o" "RESULT"
+hasnt_ "DP ...and the non-integer refusal does not fire first" "$o" "non-integer blocker count"
+has    "DP ...returning exit deferred-platform" "$o" '"exit":"deferred-platform"'
+has    "DP ...naming the Audit stage" "$o" '"stage":"Audit"'
+has    "DP ...and the pending labels" "$o" '"pending":["find:security","find:seams"]'
+has    "DP ...with the empty roster every non-throwing exit carries" "$o" '"roster":[]'
+hasnt_ "DP ...and no review round is recorded" "$o" "agent:audit:record"
+hasnt_ "DP ...and the Disposal stage is not reached" "$o" "phase:Disposal"
+has    "DP ...and the next step re-runs once, then holds naming the runId" "$o" "--pending-run <that Workflow runId>"
+o=$(run_wf "$A_UNITS" "$(printf '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":%s}' "$DEF")")
+has    "DP attended: deferred too, and told to stop rather than hold" "$o" "an attended run has no driver to hold"
 # id 14: unverified findings are OUTSTANDING and run the stage.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
     "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":2,"promotedIds":[],"summary":"d"}')")

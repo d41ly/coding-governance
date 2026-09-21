@@ -1,11 +1,12 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.8', // gov:kit tier2-review@1.8 // gov:kit review-harness@1.8 — BOTH ids: the
+  version: '1.9', // gov:kit tier2-review@1.9 // gov:kit review-harness@1.9 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
     'Consolidated, concurrency-capped (≤5) Tier-2 adversarial review, ≤5 verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
+    { title: 'Resume', detail: 'one probe reads the key directory; a lens or batch whose file carries the key is reused' },
     { title: 'Find', detail: '4 finder lenses, one wave, ≤5 concurrent' },
     { title: 'Verify', detail: 'skeptics refute findings in ≤5 BATCHES — agent count fixed' },
     { title: 'Synthesize', detail: 'one pass → report file' },
@@ -24,6 +25,49 @@ function chunk(a, n) {
   const out = []
   for (let i = 0; i < a.length; i += n) out.push(a.slice(i, i + n))
   return out
+}
+
+// --- TOOL-dDerivedDocket-29 — the review KEY, derived from the inputs and nothing else ----------
+// A lens or a skeptic batch writes its result to `<git-common-dir>/review-lenses/<key>/` BEFORE it
+// returns, so a fan that dies on a session limit keeps every result that came back, and a re-run with
+// the same inputs dispatches only what is missing. The key is what makes "the same inputs" a test and
+// not a hope: a file is reused only when its own `key` field equals the string computed here.
+// FNV-1a over UTF-16 code units, with `Math.imul` because the script runtime refuses the clock and
+// randomness and nothing else; the human-readable prefix means a collision needs the same kind,
+// round and subject as well as a 32-bit match.
+function deriveFnv1a(text) {
+  let h = 0x811c9dc5
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i)
+    h = Math.imul(h, 0x01000193)
+  }
+  return (h >>> 0).toString(16).padStart(8, '0')
+}
+// Canonical JSON: object keys sorted at every depth, so two callers handing the same values in a
+// different key order get one fingerprint.
+function renderCanonical(v) {
+  if (Array.isArray(v)) return '[' + v.map(renderCanonical).join(',') + ']'
+  if (v && typeof v === 'object')
+    return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + renderCanonical(v[k])).join(',') + '}'
+  return v === undefined ? 'null' : JSON.stringify(v)
+}
+// A diff review's subject is the RESOLVED pair. A ref that did not resolve to a full sha gets a
+// subject no resolved run can ever produce, so its files are written and never reused: a moving ref
+// is exactly the input that must not answer a later question.
+const FULL_SHA = /^[0-9a-f]{40}([0-9a-f]{24})?$/
+function deriveSubjectPair(b, h) {
+  return FULL_SHA.test(String(b)) && FULL_SHA.test(String(h))
+    ? String(b).slice(0, 12) + '-' + String(h).slice(0, 12)
+    : 'unresolved-' + deriveFnv1a(String(b) + '...' + String(h))
+}
+// The probe's item schema is the lens or verdict schema plus the fields a FILE carries and a return
+// does not, so a malformed file fails validation instead of being trusted.
+function buildKeyedSchema(schema, extra) {
+  return {
+    type: 'object',
+    required: ['name', 'key'].concat(extra, schema.required),
+    properties: Object.assign({ name: { type: 'string' }, key: { type: 'string' }, batch: { type: 'string' } }, schema.properties),
+  }
 }
 
 // --- inputs (via Workflow `args`) ---------------------------------------
@@ -174,7 +218,7 @@ if (!baseLooksPinned) {
   log('WARNING: ' + why)
 }
 const reviewDir = a.reviewDir || 'reviews/'
-const diffCmd = `git -C ${repo} diff ${base}...${head}`
+// `diffCmd` is built AFTER the resume probe now, from the shas it resolves (TOOL-dDerivedDocket-29 S3).
 // H2/AC5, HONEST LIMIT: the harness CANNOT verify its own root. Workflow scripts have no
 // filesystem and no Node/Bun API, so there is no way to prove `repo` resolves to a git worktree
 // from in here — a probe was written, then removed rather than shipped unverified. What it can do
@@ -187,11 +231,17 @@ log(`review root (unverified — see note): ${repo} — ${kind} — ` +
 // the ABSENCE of a line, so it addresses a section; making `line` merely optional on a shared schema
 // would buy the spec kind an address by removing the diff kind's, and the charter requires a finder
 // to emit a concrete address on both.
+// TOOL-dDerivedDocket-29 S1 - `path` is REQUIRED on all three agent schemas: the file the agent wrote
+// its result to before returning. A required field is what makes an agent that skipped the write fail
+// validation loudly instead of returning cleanly with nothing on disk behind it. `key` is carried by
+// the FILE and optional on the return.
 const FINDING_SCHEMA = {
   type: 'object',
-  required: ['lens', 'findings'],
+  required: ['lens', 'path', 'findings'],
   properties: {
     lens: { type: 'string' },
+    path: { type: 'string' },
+    key: { type: 'string' },
     findings: {
       type: 'array',
       items: {
@@ -219,8 +269,11 @@ const FINDING_SCHEMA = {
 // integer cannot collide with another finding's.
 const VERDICT_SCHEMA = {
   type: 'object',
-  required: ['verdicts'],
+  required: ['path', 'verdicts'],
   properties: {
+    path: { type: 'string' },
+    key: { type: 'string' },
+    batch: { type: 'string' },
     verdicts: {
       type: 'array',
       items: {
@@ -240,9 +293,11 @@ const VERDICT_SCHEMA = {
 // machine-enforced on both kinds rather than relaxed on one.
 const SPEC_FINDING_SCHEMA = {
   type: 'object',
-  required: ['lens', 'findings'],
+  required: ['lens', 'path', 'findings'],
   properties: {
     lens: { type: 'string' },
+    path: { type: 'string' },
+    key: { type: 'string' },
     findings: {
       type: 'array',
       items: {
@@ -267,7 +322,7 @@ const SPEC_FINDING_SCHEMA = {
 // code fanned at neither six nor a spelled digit. No digit is written here now: the width is
 // whatever `boundedParallel`'s default parameter resolves to, which is the one place that owns
 // it. Closes TOOL-aDeclaredBound-6, whose own row cites the wrong line for this text.
-phase('Find')
+// The `phase('Find')` call moved below the resume probe (TOOL-dDerivedDocket-29 S3).
 const DIFF_LENSES = [
   {
     key: 'security',
@@ -322,9 +377,115 @@ const SPEC_LENSES = [
 // this line sits on to require EVERY value branch bounded, and both branches here are literals.
 const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
 
+// ---- TOOL-dDerivedDocket-29 S2/S3 — THE RESUME PROBE, one agent, before the Find phase ----------
+// WHY ONE AGENT. The script has no filesystem, so something with one has to read the key directory.
+// A reader per reused lens would spend a spawn per lens on a platform that has just been refusing
+// spawns, and a caller-supplied reuse list would put the burden on every caller, including the build
+// harness, which has no filesystem either. The probe re-emits each file's JSON under a schema whose
+// items ARE the lens and verdict schemas, so a malformed file fails validation instead of being
+// trusted. It is trusted exactly as far as a lens is: everything a reused lens returns still passes
+// through the skeptics.
+//
+// THE KEY: kind, round, the pinned subject, and a fingerprint over `context`, `byDesign` and
+// `priorFindings` - every input a lens prompt interpolates except `repo`, which is left out on
+// purpose: the common dir is shared by every worktree on the node, and a take-over from another
+// worktree of the same commits is exactly the re-run this exists for. A spec audit's subject is every
+// `path@blob` in the order given; a diff review's is the RESOLVED base and head (F5), so a review
+// commissioned against `origin/main` is pinned to the sha that ref named, and a moved ref is a
+// different key rather than a stale answer.
+const inputPrint = deriveFnv1a(renderCanonical({ context: context, byDesign: byDesign, priorFindings: priorFindings }))
+const specSubject = isSpec
+  ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
+  : ''
+function deriveReviewKey(b, h) {
+  return `${kind}-r${round}-${isSpec ? specSubject : deriveSubjectPair(b, h)}-${inputPrint}`
+}
+phase('Resume')
+const probe = await agent(
+  `You are the RESUME PROBE of a Tier-2 review. You read files and report them. You judge nothing, ` +
+    `review nothing and write nothing.\n\n` +
+    `1. Run \`git -C ${repo} rev-parse --git-common-dir\`. Turn the answer into an ABSOLUTE path with ` +
+    `forward slashes (a relative answer is relative to ${repo}) and return it as commonDir.\n` +
+    (isSpec
+      ? ''
+      : `2. Run \`git -C ${repo} rev-parse --verify ${base}^{commit}\` and \`git -C ${repo} rev-parse --verify ${head}^{commit}\` ` +
+        `and return the two FULL shas as base and head. Return an empty string for one that does not resolve.\n`) +
+    `3. The review directory is <commonDir>/review-lenses/` +
+    (isSpec
+      ? deriveReviewKey('', '')
+      : `${kind}-r${round}-<the first 12 hex of the base sha>-<the first 12 hex of the head sha>-${inputPrint}`) +
+    `/ . If it does not exist, return finds: [] and verifies: [] - that is the normal first run.\n` +
+    `4. Otherwise Read every file in it named find-<lens>.json or verify-<a>-<b>.json. Return each ` +
+    `find file's JSON in finds and each verify file's JSON in verifies, EXACTLY as it is on disk plus ` +
+    `a name field holding its file name. Do not repair, complete or re-judge anything: a file that ` +
+    `does not parse, or lacks a field the schema requires, is left out and its name listed in skipped.\n` +
+    `Return JSON {commonDir, ${isSpec ? '' : 'base, head, '}finds:[...], verifies:[...], skipped:[...]}.`,
+  {
+    label: 'resume:probe',
+    phase: 'Resume',
+    schema: {
+      type: 'object',
+      required: ['commonDir', 'finds', 'verifies'],
+      properties: {
+        commonDir: { type: 'string' },
+        base: { type: 'string' },
+        head: { type: 'string' },
+        finds: { type: 'array', items: buildKeyedSchema(isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA, []) },
+        verifies: { type: 'array', items: buildKeyedSchema(VERDICT_SCHEMA, ['batch']) },
+        skipped: { type: 'array', items: { type: 'string' } },
+      },
+    },
+  },
+)
+// A DEAD PROBE REUSES NOTHING, and says so. Reading a null as "every file present" would dispatch no
+// lens and return an empty review; reading it as "nothing present" costs a full re-run, which is
+// correct. The refs go to the lenses as given, and the key they write under is one no later resolved
+// run produces for a moving ref, so nothing written here answers a later, different question.
+const probeLive = !!(probe && typeof probe.commonDir === 'string' && probe.commonDir)
+let baseSha = base
+let headSha = head
+if (!isSpec && probeLive && FULL_SHA.test(String(probe.base)) && FULL_SHA.test(String(probe.head))) {
+  baseSha = String(probe.base)
+  headSha = String(probe.head)
+} else if (!isSpec && probeLive) {
+  log(`WARNING: the resume probe did not resolve ${base}...${head} to two full shas — nothing can be reused, and the lenses are handed the refs as given`)
+}
+if (!probeLive) log('WARNING: the resume probe died — nothing could be reused, so every lens is dispatched with the refs as given')
+const reviewKey = deriveReviewKey(baseSha, headSha)
+const keyDir = probeLive
+  ? `${String(probe.commonDir).replace(/\\/g, '/').replace(/\/+$/, '')}/review-lenses/${reviewKey}`
+  : `<common-dir>/review-lenses/${reviewKey}`
+const keyDirHow = probeLive
+  ? ''
+  : ` <common-dir> is the absolute, forward-slash form of what \`git -C ${repo} rev-parse --git-common-dir\` prints.`
+const diffCmd = `git -C ${repo} diff ${baseSha}...${headSha}`
+const presentFinds = probeLive && Array.isArray(probe.finds) ? probe.finds : []
+const presentVerifies = probeLive && Array.isArray(probe.verifies) ? probe.verifies : []
+log(`review key ${reviewKey} — ${presentFinds.length} lens file(s) and ${presentVerifies.length} verify file(s) present`)
+// A file the probe could not re-emit under the schema is left out and NAMED, and its agent is
+// dispatched. Saying so here is what keeps a skipped file from reading as an absent one.
+if (probeLive && Array.isArray(probe.skipped) && probe.skipped.length)
+  log(`WARNING: the resume probe skipped ${probe.skipped.length} unreadable or malformed file(s), each dispatched rather than reused: ${probe.skipped.join(', ')}`)
+// REUSE COMPARES THE FILE'S OWN `key` FIELD with the string computed above, never the directory name
+// alone: the probe composed the directory, and a probe that composed it wrong must not turn a stale
+// file into a current answer.
+const reusedLens = new Map()
+for (const L of LENSES) {
+  const file = presentFinds.find((f) => f && f.name === `find-${L.key}.json` && f.lens === L.key && Array.isArray(f.findings))
+  if (file && file.key === reviewKey) {
+    reusedLens.set(L.key, file)
+    log(`reused find:${L.key} from ${keyDir}/find-${L.key}.json — not dispatched`)
+  } else if (file) {
+    log(`find:${L.key}: a file is present under another key (${file.key}) — dispatched`)
+  }
+}
+
+phase('Find')
 const finderResults = await boundedParallel(
   LENSES.map((L) => () =>
-    agent(
+    reusedLens.has(L.key)
+      ? Promise.resolve(reusedLens.get(L.key))
+      : agent(
       (isSpec
         // S6 - the spec kind's acquire sentence. The lens holds a filesystem and the orchestrator does
         // not, so the BLOB COMPARISON happens here. Without it S5 is a string test any caller
@@ -347,12 +508,16 @@ const finderResults = await boundedParallel(
           : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.\n\n`) +
         `LENS: ${L.brief}\n\n` +
         (isSpec
-          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n` +
-            `Return JSON {lens:"${L.key}", findings:[{file,where,severity,claim,impact,fix}]}.`
-          : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n` +
-            `Return JSON {lens:"${L.key}", findings:[{file,line,severity,claim,impact,fix}]}.`),
-      { label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA },
-    ),
+          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n`
+          : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n`) +
+        // TOOL-dDerivedDocket-29 S1 - WRITE BEFORE RETURN. A fan that dies on a session limit loses
+        // every structured return with it; a file on disk survives, and the next run's probe reuses it.
+        `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n` +
+        (isSpec
+          ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix}]}.`
+          : `Return JSON {lens:"${L.key}", path, findings:[{file,line,severity,claim,impact,fix}]}.`),
+        { label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA },
+      ),
   ),
 )
 
@@ -362,27 +527,47 @@ const finderResults = await boundedParallel(
 // lines and zero `result` lines. Count what actually came back and never call absence cleanliness.
 const liveResults = finderResults.filter(Boolean)
 const lensesDead = LENSES.length - liveResults.length
+// TOOL-dDerivedDocket-29 S5 - the LABEL of every agent that did not return, so a caller can say what a
+// re-run will dispatch. The harness cannot tell a user's mid-run skip from a death, because both
+// return null, and both defer: an unjudged finding was never a result.
+const deadLensLabels = LENSES.filter((L, i) => !finderResults[i]).map((L) => `find:${L.key}`)
 // `ref` is DISPLAY ONLY from here on — it rides the prompts and the report lines and is never a map
 // key. `id` is assigned once, after every lens has returned, and is the only join key.
 const allFindings = liveResults
   .flatMap((r) => (r.findings || []).map((f) => ({ ...f, ref: `${f.file}:${isSpec ? f.where : f.line}` })))
   .map((f, i) => ({ ...f, id: i + 1 }))
 
+// ---- TOOL-dDerivedDocket-29 S5 — THE `exit` FIELD, on every return. `complete` when every agent
+// ---- returned, `deferred-platform` when any lens, skeptic batch or the synthesis came back null. A
+// ---- deferred return always carries `blockers: null`, the key, and `pending`: the labels a re-run
+// ---- with identical args will dispatch, everything else being reused from the key directory. The
+// ---- one null `blockers` that is NOT a death, the tally fault below, stays `complete`: a re-run
+// ---- cannot repair an adjudication, so that path keeps the refusal its callers already make.
 if (lensesDead === LENSES.length) {
-  log(`UNVERIFIED — all ${LENSES.length} lenses failed to return. Nothing was reviewed.`)
+  log(`UNVERIFIED — all ${LENSES.length} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
   return {
     // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
+    exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
-    note: `UNVERIFIED: no lens completed (${lensesDead}/${LENSES.length} died) — nothing was reviewed`,
+    lensesReused: reusedLens.size,
+    note: `DEFERRED: no lens completed (${lensesDead}/${LENSES.length} died) — nothing was reviewed; re-run with identical args`,
+    round, priorFindings: priorFindings.length,
   }
 }
 if (allFindings.length === 0) {
-  const note = lensesDead > 0
-    ? `partial: ${lensesDead}/${LENSES.length} lenses died, survivors found nothing`
+  // A ZERO FROM A PARTIAL FAN IS NOT A CLEAN BILL. It used to return `partial: … survivors found
+  // nothing`, which the build harness's clean-round test cannot tell from a result; it defers now.
+  const deferred = lensesDead > 0
+  const note = deferred
+    ? `DEFERRED: ${lensesDead}/${LENSES.length} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
     : 'clean: 0 findings'
   log(note)
   // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
-  return { confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead, note }
+  return {
+    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels,
+    confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
+    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length,
+  }
 }
 log(`${allFindings.length} raw findings across ${LENSES.length} lenses — verifying in batches.`)
 
@@ -396,10 +581,29 @@ phase('Verify')
 const MAX_VERIFIERS = 5
 const batches = chunk(allFindings, Math.ceil(allFindings.length / MAX_VERIFIERS)) // gov:fixed-verifiers
 log(`${allFindings.length} finding(s) -> ${batches.length} verifier(s) (cap ${MAX_VERIFIERS})`)
+// TOOL-dDerivedDocket-29 S4 - A BATCH IS REUSED ONLY FOR THE EXACT FINDINGS IT JUDGED. Its file must
+// carry the run's key AND a fingerprint over the batch's own ids and claims together. The id range
+// alone is not enough: when a dead lens is re-dispatched the ids after it shift, and an id-keyed
+// match would pair old verdicts with new findings. When every lens is reused the ids, the batches and
+// their prints come out identical, which is what lets a dead synthesis re-run alone.
+const batchPrints = batches.map((g) => deriveFnv1a(renderCanonical(g.map((f) => [f.id, String(f.claim)]))))
+const batchLabels = batches.map((g) => `verify:ids-${g[0].id}-${g[g.length - 1].id}`)
+const reusedBatch = batches.map((g, gi) => {
+  const name = `verify-${g[0].id}-${g[g.length - 1].id}.json`
+  const file = presentVerifies.find((v) => v && v.name === name && Array.isArray(v.verdicts))
+  if (file && file.key === reviewKey && file.batch === batchPrints[gi]) {
+    log(`reused ${batchLabels[gi]} from ${keyDir}/${name} — not dispatched`)
+    return file
+  }
+  if (file) log(`${batchLabels[gi]}: a file is present for another key or another set of claims — dispatched`)
+  return null
+})
 
 const verdictResults = await boundedParallel(
   batches.map((group, gi) => () =>
-    agent(
+    reusedBatch[gi]
+      ? Promise.resolve(reusedBatch[gi])
+      : agent(
       (isSpec
         ? `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — Read the cited spec at the cited section, and the siblings it names, and decide "confirmed" (real, and it makes the spec unbuildable or wrong) or "refuted" (asks for detail a non-goal withholds / cites a section that says what the finding claims it does not / is a style preference). Default to refuted when uncertain.\n\n`
         : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate). Default to refuted when uncertain.\n\n`) +
@@ -407,11 +611,14 @@ const verdictResults = await boundedParallel(
         group
           .map((f) => `id=${f.id} [${f.severity}] ${f.ref} — ${f.claim} | impact: ${f.impact}`)
           .join('\n') +
-        `\n\nReturn JSON {verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted", reason}]}. ` +
+        `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
+        `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
+        `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.` +
+        `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted", reason}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
         `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
-      { label: `verify:ids-${group[0].id}-${group[group.length - 1].id}`, phase: 'Verify', schema: VERDICT_SCHEMA },
-    ),
+        { label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA },
+      ),
   ),
 )
 
@@ -422,6 +629,8 @@ const verdictResults = await boundedParallel(
 // absence scored as a negative result. A finding nobody judged is UNVERIFIED, never refuted.
 const liveVerdicts = verdictResults.filter(Boolean)
 const skepticsDead = verdictResults.length - liveVerdicts.length
+const deadBatchLabels = batchLabels.filter((lbl, gi) => !verdictResults[gi])
+const batchesReused = reusedBatch.filter(Boolean).length
 // U6: a Map keyed on the assigned integer, populated ONLY for an id this run actually handed out.
 // Three degraded shapes get their own counter instead of silently rewriting a verdict:
 //   spurious   — an id nobody assigned (a hallucinated or renumbered verdict); ignored, counted.
@@ -471,17 +680,46 @@ log(
 // synthesized. Only a fully-adjudicated, fully-refuted run exits here.
 // S2: a refutation reached with dead skeptics is not a refutation. Carry the lens counts so a
 // caller can tell "every finding was refuted" from "the verify stage was degraded".
-if (confirmed.length + unverified.length === 0)
+// TOOL-dDerivedDocket-29 S5 - every agent label that did not return, lenses first, in dispatch order.
+const pendingLabels = deadLensLabels.concat(deadBatchLabels)
+if (confirmed.length + unverified.length === 0) {
+  // A REFUTATION OVER A PARTIAL FAN DEFERS. It used to return `… treat as partial` beside a null
+  // count, which a caller had to parse prose to tell from the clean result on the line below it.
+  const deferred = pendingLabels.length > 0
   return {
+    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: pendingLabels,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
     // no synthesis pass ran to adjudicate a blocker count, so there is none to report.
     confirmed: [], report: null, precision, root: repo, blockers: null, highs: null,
     lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0,
-    conflicts: conflicts.size, duplicates, spurious,
-    note: lensesDead > 0
-      ? `all findings refuted, but ${lensesDead}/${LENSES.length} lenses died — treat as partial`
+    conflicts: conflicts.size, duplicates, spurious, lensesReused: reusedLens.size, batchesReused,
+    note: deferred
+      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${LENSES.length} lenses died — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`
       : 'all findings adjudicated and refuted',
+    round, priorFindings: priorFindings.length,
   }
+}
+
+// TOOL-dDerivedDocket-29 S5 - THE SYNTHESIS IS NOT RUN ON A PARTIAL FAN. A dead lens means a finding
+// set that is incomplete, and a dead skeptic batch means findings nobody judged; either way the report
+// would be rewritten by the re-run, and a report over a half-judged set is the one document that must
+// not call the run finished. The BASE `PARTIAL` path returned an INTEGER `blockers` over exactly that
+// set. Every result that did come back is on disk under the key, so the re-run pays only for the dead.
+if (pendingLabels.length) {
+  log(`WARNING: ${pendingLabels.length} agent(s) did not return (${pendingLabels.join(', ')}) — DEFERRED, and no synthesis runs over a partial set. ` +
+    `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
+  for (const f of confirmed) log(`  CONFIRMED [${f.severity}] ${f.ref} - ${f.claim}`)
+  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
+  return {
+    exit: 'deferred-platform', key: reviewKey, pending: pendingLabels,
+    root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
+    unverified: unverified.length, conflicts: conflicts.size, duplicates, spurious, precision,
+    lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
+    report: null, summary: '', blockers: null, highs: null,
+    note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`,
+    round, priorFindings: priorFindings.length,
+  }
+}
 
 // --- Phase 3: SYNTHESIZE — one agent writes the report ------------------
 phase('Synthesize')
@@ -535,7 +773,7 @@ const synth = await agent(
       // makes "which rev was reviewed" answerable from the record instead of from recollection.
       ? `Open the report with a line naming each reviewed subject and the blob it was pinned at — ` +
         subjects.map((x) => `${x.path}@${x.blob}`).join(', ') + `, and state the ROUND as ${round}. `
-      : `Open the report with a line naming the reviewed range as ${base}...${head}, and state the ROUND as ${round}. `) +
+      : `Open the report with a line naming the reviewed range as ${baseSha}...${headSha}, and state the ROUND as ${round}. `) +
     // TOOL-dTieredTribunal-1 S4 - the record's opening ORDER. THREE sentences in this prompt each
     // claim the record's opening: the binding line below, the range line above, and the verdict
     // heading this unit adds. Instructing a second "first line" leaves the agent to resolve the
@@ -663,8 +901,10 @@ if (synth) {
 // and reported; a dead synthesis was not, so `synth === null` returned report:null with a note reading
 // `complete` and every confirmed finding was lost with nothing logged. The findings exist here in
 // memory - the only thing missing was saying so before the return threw them away.
+// TOOL-dDerivedDocket-29 - and the findings are ALSO on disk now: every lens and batch that returned
+// wrote its file under the key, so a re-run reuses all of them and dispatches the synthesis alone.
 if (!synth) {
-  log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below exist only in this log:`)
+  log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below are in this log and in ${keyDir}; a re-run with identical args dispatches only the synthesis:`)
   for (const f of confirmed)
     log(`  CONFIRMED [${f.severity}] ${f.ref} - ${f.claim} | fix: ${f.fix}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
@@ -672,7 +912,14 @@ if (!synth) {
 
 // H1: the SUCCESS return carries the same trust counts as the early ones. A caller that only ever
 // sees {confirmed, precision} cannot tell a full review from one where half the lenses died.
+// TOOL-dDerivedDocket-29 S5 - past the partial-fan return above, the synthesis is the only agent left
+// that can have died, so it alone decides `exit` here. The tally fault stays `complete`.
 return {
+  exit: synth ? 'complete' : 'deferred-platform',
+  key: reviewKey,
+  pending: synth ? [] : ['synth'],
+  lensesReused: reusedLens.size,
+  batchesReused,
   root: repo,
   raw: allFindings.length,
   confirmed: confirmed.length,
@@ -699,14 +946,16 @@ return {
   // one. Worst outcome first. Found by the closing review of the build that ported this ternary into
   // the two drift-audit siblings, where the same ordering had been copied.
   note:
+    // Lens and skeptic deaths never reach this return (TOOL-dDerivedDocket-29), so the last two arms
+    // speak of UNUSABLE verdicts: a batch that returned with an id missing, spurious or contradicted.
     !synth
-      ? `UNVERIFIED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log only`
+      ? `DEFERRED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log and on disk — re-run with identical args to dispatch only the synthesis`
       : tallyFault
         ? `UNVERIFIED: the report was written, but its item list does not place every confirmed finding exactly once (${tallyFault}), so blockers and highs are null`
         : judged === 0
-          ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died) — the report lists them as outstanding`
-          : lensesDead || skepticsDead || unverified.length
-            ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
+          ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged — no skeptic batch returned a usable verdict — the report lists them as outstanding`
+          : unverified.length
+            ? `PARTIAL: ${unverified.length} finding(s) came back with no usable verdict and are unverified`
             : 'complete',
   round,
   priorFindings: priorFindings.length,

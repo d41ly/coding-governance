@@ -645,6 +645,15 @@ definition, so the absence is a decision and not an oversight.
   system prompt names, never `$TMPDIR` — and refuses without it; every agent it spawns is told that
   is where temporary files go, and the child receives it in `dispatch.args` and refuses too, both
   without the key and with a `ground` that does not name it.
+  **A review the platform killed DEFERS, and you re-run it ONCE.** When the harness returns
+  `exit: 'deferred-platform'`, a lens, a skeptic batch or the synthesis of its AUDIT review returned
+  nothing: no round was recorded, nothing was built, and every agent that did return left its result
+  on disk under the review key. In this order:
+  1. re-run the harness ONCE with identical args — the review reuses what is on disk and dispatches
+     only its `pending` labels;
+  2. on a second `deferred-platform`, hold: `--code platform-limit --until "after <reset UTC>"` when
+     the Workflow tool result names a usage or session limit, `--code platform-unavailable --until
+     "probe api"` otherwise, each with `--pending-run <runId>` from that Workflow tool result.
 
   Between dispatches, re-read `bash tools/unattended/unattended.sh --plan <slug> --paths` rather than
   trusting a list you are holding, and branch on every shape it prints:
@@ -1017,7 +1026,9 @@ while the remote does not answer, which is the one stop whose own push fails too
 keepalive and name it with `--reaped <id>`, because a job still firing into a held run
 re-dispatches its units at the next tick; from another node, where you cannot reach that session's
 store, say `--keepalive-unreachable <node>` instead. The codes and the release-condition grammar
-are in `UNATTENDED-STOPS.md`, and the refusal names the legal set either way.
+are in `UNATTENDED-STOPS.md`, and the refusal names the legal set either way. A hold taken on a
+review that deferred twice adds `--pending-run <runId>`, and the take-over prints the relaunch
+naming it — run that relaunch before anything else.
 
 **Then file the restart it printed, if it printed one.** `--hold` prints `resume-owed` with a
 schedule name and a fire instant, or `none` and the reason there is none. On `none`, file nothing
