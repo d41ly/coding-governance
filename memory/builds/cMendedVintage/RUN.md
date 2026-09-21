@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-parked-surfaced: 17
+parked-surfaced: yes 17
 keepalive-reaped: yes
 witness: 17ff55b88b4842facee5c29eb03219f34806d6df
 phase: VERIFYING
@@ -389,3 +389,7 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-19T09:44:35Z dispatch · item aca91cea DEPL-cMendedVintage-28 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-19-spec-DEPL-cMendedVintage-28.md memory/builds/cMendedVintage/build/2026-09-19-build-DEPL-cMendedVintage-28-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-19T10:06:20Z dispatch · item aca91cea DEPL-cMendedVintage-28 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-19-spec-DEPL-cMendedVintage-28.md memory/builds/cMendedVintage/build/2026-09-19-build-DEPL-cMendedVintage-28-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-21T12:06:40Z review · item cMendedVintage · reason verdict BLOCKED · blockers 3
+
+2026-09-21T12:06:41Z review · item cMendedVintage · reason verdict BLOCKED · blockers 1
