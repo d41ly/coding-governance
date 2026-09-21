@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.1', // gov:kit unattended-build@1.1 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.2', // gov:kit unattended-build@1.2 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal.',
   phases: [

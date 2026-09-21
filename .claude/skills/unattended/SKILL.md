@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.24 -->
+<!-- gov:kit unattended@1.25 -->
 
 # Unattended runs
 
@@ -860,11 +860,12 @@ Two facts land in the record and you do not write either: `landed-anchor`, which
 Read the second before you believe the first — a local landing sits on top of whatever else is on
 that branch. What the weaker anchor does not buy is protocol section 9, and it is not repeated here.
 
-**AND DO NOT COMMIT BETWEEN THE PUSH AND THIS VERB.** Where the project declares a lander marker, the
-lander writes the commit it pushed and this verb requires the marker to name HEAD **exactly**. That is
-equality, not ancestry: one more commit after the push — even the record commit — and `--landed`
-refuses. The refusal names both shas, the one it wanted and the one the marker holds, so a stale
-marker and a moved HEAD are distinguishable. Then commit the record it writes and land that commit too; until it is
+**RUN IT FROM THE RUN WORKTREE, AFTER THE LANDER.** Where the project declares a lander marker, the
+lander writes the commit it pushed and this verb reads CONTAINMENT, not equality: the marker's
+commit must contain the run's witness, and the tip the remote advertises must reach the marker's
+commit — so the `--no-ff` merge the charter mandates stamps from your own branch, and a record
+commit after the push is not a refusal. Each of the four refusals names what it read, so a stale
+marker, a marker this clone does not hold, and a moved remote are distinguishable. Then commit the record it writes and land that commit too; until it is
 committed, every later run still counts yours as live — which no longer reds anyone's bar, but does
 put your unfinished run in every later run's concurrency report.
 

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.24 -->
+<!-- gov:kit unattended@1.25 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -90,8 +90,10 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
 - `--landed` — the sole producer of `LANDED`, an OBSERVATION rather than a claim. It accepts a record
   only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip the
-  remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker names HEAD
-  exactly — equality, not ancestry, so any commit between the push and this verb is a refusal. It does
+  remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker's commit
+  contains the run's witness and the advertised tip reaches that commit — containment, not
+  equality, so a `--no-ff` landing stamps from the run worktree and a record commit after the push
+  is not a refusal. It does
   not refuse the default branch: the mandated lander refuses every other one, so landing happens
   exactly where that guard would otherwise fire. It READS THE REAP BACK: the newest line of the
   stop-guard's sidecar carries the harness listing of the cron store, and the verb compares the
