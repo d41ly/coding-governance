@@ -802,12 +802,17 @@ while [ "$i22" -lt 240 ]; do
   sleep 0.5; i22=$((i22 + 1))
 done
 if [ -n "$w22" ]; then
-  ok "control: the first bar owns a gate-work dir and has swept, so the second has a live peer to spare"
   # THIS repository's common dir IN THE RUNNER'S OWN SPELLING, read from the live owner record. Under
   # MSYS one directory has two spellings (`/tmp/...` and `/c/Users/.../Temp/...`), so a spelling this
   # arm derived itself could differ from the runner's and red the control for a reason that is not
-  # the sweep's. The foreign arm below is what grades the comparison itself.
+  # the sweep's. What keeps that read from being the subject grading itself is an IDENTITY check on
+  # the directory, not on its spelling: the recorded dir must hold this repository's own
+  # `gate-run/current`, read through both paths. The foreign arm below grades the comparison itself.
   c22=$(cut -f2 "$w22/owner" 2>/dev/null)
+  { [ -n "$c22" ] && [ -n "$(cat "$R22/.git/gate-run/current" 2>/dev/null)" ] \
+      && [ "$(cat "$c22/gate-run/current" 2>/dev/null)" = "$(cat "$R22/.git/gate-run/current" 2>/dev/null)" ]; } \
+    && ok "control: the first bar owns a gate-work dir, has swept, and its owner names this repository's git dir" \
+    || nope "the first bar's owner record names '$c22', which is not this repository's git dir"
   mkdir -p "$A22/gate-work.deadmine"
   printf '999999\t%s\t0\n' "$c22" > "$A22/gate-work.deadmine/owner"
   ( cd "$R22" && env TMPDIR="$A22" GATE_FULL=1 GATE_TURNSTILE=0 GATE_WALL=0 GATE_LEGS="$tmp/quick22.json" \
