@@ -1,0 +1,27 @@
+# TOOL-aWokenSentinel-18 — acceptance ledger
+
+**Serves:** journal TOOL-aWokenSentinel-18
+
+Every leg-shaped half below reads `observed at --close`: this pass ran no gate leg, no bar and no
+suite, per the build README's rule three. The pass verified with the direct checks the spec's
+section 6 names: the new `U18` arm block of `tools/unattended/resume-tick.test.sh` and the re-read
+`U13` block, each run ALONE over the suite's sourced prologue from a runner assembled under the
+session scratchpad with `HERE` pointed first at a frozen copy of the kit at `e0334613` (the tip of
+order 13, the staged break: `read_bound_key` hoisted, no guard) and then at the kit under test, the
+`git init` fixture under `%TEMP%/rt18`; the driver's `--status` over a scratch repo whose conf
+declares no `GATE_BOUND`; the greps of AC3 and AC4; and `check-install-prefix.sh`,
+`lexicon.py --check` and `check-spec-tokens.py` each run ONCE as the checker, never as the bar.
+Those stand in for the `unattended kit gate`, `memory hygiene`, `spec tokens`, `lexicon naming
+predicates` and `install-prefix (shipped surface)` legs, which run once at the close. The spec
+took a rev-3 fold BEFORE the code: its rev-2 carried the BLOCK copy's reading at unit 13's order
+as two empty-path NOTEs and a launched attempt 1, and the pass's own RED run read exit 1 with
+`CONF: unbound variable` — the reading spec 13 rev-4 had already corrected and said this spec would
+inherit at its pass.
+
+**Evidences:** TOOL-aWokenSentinel-18
+- AC1 — the U18 block alone over the kit under test: `env -u CONF bash -c '. lib-unattended.sh; read_bound_key RESUME_ATTEMPTS 6 attempts n'` exited `2` with `unattended: REFUSING - read_bound_key was called with CONF unset or naming no file, so its NOTE could name nowhere to declare the key and a default would be taken from nowhere; set CONF to the sourced conf before the call` on stderr and no `Declare one in  to change it`; the same call with `CONF=/nonexistent/path` exported exited `2` with the same sentence and no `Declare one in /nonexistent/path`. RED against the frozen break: the unset call exited `0` with `Declare one in  to change it`, the empty path, and the nonexistent path exited `0` with `Declare one in /nonexistent/path to change it` — six red rows of the block's ten. OBSERVED; the suite whole is observed at --close.
+- AC2 — the U18 block's own BLOCK copy, made by `sed '/^CONF=/,/^\. "\$CONF"$/d'` over the tick in the scratch kit dir, `grep -c '^read_bound_key '` printing `2`, run as `bash resume-tick.sh --repo <fixture>` over a fresh fixture: `rc=2`, stderr carrying `read_bound_key was called with CONF unset`, zero `declares no` lines, zero launchers under the sidecar (`0 · 0`). RED against the frozen break: `rc=1`, stderr `<kit-block18>/lib-unattended.sh: line 92: CONF: unbound variable`, the sentence absent — two red rows, the copy's shape row green on both. The U13 block's two rows reading the same copy, re-read from exit 1 and the unbound-variable line to exit 2 and the sentence, ran alone: 27 green over the kit under test, and exactly those two red over the frozen break (`expected [2], got [1]`; the sentence missing in `CONF: unbound variable`) with the other 25 unchanged. OBSERVED.
+- AC3 — `bash tools/unattended/unattended.sh --status tRun` from a scratch repo under `%TEMP%/rt18/drv` whose conf is the driver suite's NOCONF shape (no `GATE_BOUND`), with a tRun README and a BUILDING run-state file committed: `rc=0`, stdout `unattended: tRun · phase BUILDING · witness abc · next ARCH-tRun-1 — the unit`, stderr's first line `declares no GATE_BOUND, so a declared command is bounded at the kit default of 3600s. Declare one in C:/Users/daily-agent/AppData/Local/Temp/rt18/drv/.unattended.conf to change it.`, four NOTEs in all and zero `REFUSING`. The greps: `grep -c 'CONF unset or naming no file'`, `grep -c 'sourced the conf into THIS shell'` and `grep -c '^read_bound_key() '` over `tools/unattended/lib-unattended.sh` printed `1 1 1` at the tip and `0 0 1` over `git show e0334613:tools/unattended/lib-unattended.sh`, the commit whose subject carries `TOOL-aWokenSentinel-13`. OBSERVED.
+- AC4 — `grep -c "sed '/^CONF=/"` and `grep -c 'red against the BLOCK copy'` over `memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-13.md` printed `3` and `3`, each at least 1. OBSERVED.
+- floor — the U18 block alone executed 10 assertions, green over the kit under test; the U13 block 27, unchanged in count. `FLOOR_ASSERTIONS` rises 84 → 94, the ten blocks' 104 executed at ~10% headroom, derivation in the pin's own comment. `grep -cE "sed '/\^CONF=/"` over the suite printed `2` at this tip, the count spec 24 AC3 expects here before its helper replaces both. The main loop's first green at VERIFYING confirms the executed count; observed at --close.
+- checkers — `bash tools/check-install-prefix.sh` printed `install-prefix: clean — 276 shipped files, 11 declared waiver(s), 25 marked fixture line(s), no undeclared root-install spelling` and `carried-prefix clean — 139 recorded file(s), 41 hand-justified, none rising`; `python tools/lexicon/lexicon.py --check` printed `lexicon OK — 2160 tracked file(s)`; `python tools/check-spec-tokens.py` exited 0 with the spec graded as live (status flipped to SPECCED for the run and back to CLOSED, since a terminal spec is not graded) and no line naming this unit. `bash -n` over the lib and the suite exited 0. OBSERVED; the legs are observed at --close.

@@ -373,6 +373,12 @@ gates gov's OWN product template at the repo root. An adopter's instantiated pla
 """
 
 [[exempt_leg]]
+name = "govkit runbook parity"
+why = """
+the deployer grading THIS repo's runbook against THIS repo's own registry. Both sides of the comparison are gov-side: the registry is the deployer's declaration and never travels, and the runbook is gov's instructions for wiring the chain INTO a target rather than anything a target keeps. An adopter receives neither file, so there is nothing in their tree for the leg to compare.
+"""
+
+[[exempt_leg]]
 name = "govkit refusal join"
 why = """
 a gov-internal harness over gov's OWN deployer, which is itself a registry exemption because it never travels into a target. An adopter receives neither the deployer nor this join, so there is nothing in their tree for it to enumerate. The asymmetry with the two self-tests the runbook DOES prescribe for copy is deliberate and is the reason this row carries a sentence rather than a shrug.
@@ -527,6 +533,10 @@ why = "it runs `check-verifier-fanout.test.sh`, which `tools/workflows/kit.toml`
 [[exempt_leg]]
 name = "tier2-review self-test"
 why = "it runs `tier2-review.test.sh`, which `tools/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+
+[[exempt_leg]]
+name = "unattended-build self-test"
+why = "it runs `unattended-build.test.sh`, which `tools/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "review-join self-test"

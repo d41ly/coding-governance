@@ -149,6 +149,15 @@ per the project's plan convention. When the project's memory kit ships a spec te
 follows it — the template states its own section count and the gate that enforces it; do not restate
 that number here, because it has already gone stale in three other carriers.
 
+**The spec audit is the owner's call, asked once.** When the DoR is a design pass AND the build method
+the manifest names makes the audit opt-in (`grep -q 'spec-audit:'` on that carrier; no carrier or no
+hit → skip, one clause), put ONE `AskUserQuestion`: "Declare `spec-audit:` for this build?" —
+recommend yes for two or more units or an open §8 fork, no otherwise; recommend, never decide. On
+yes, write `spec-audit: <today>` into the build README front matter BEFORE the spec pass (create the
+README first when the DoR authors it); on no, write nothing. Do NOT ask when the build README already
+carries `spec-audit:` (card `declared <date>`), else when `<repo>/.unattended.conf` declares a dated
+`SPEC_AUDIT_DEFAULT` (card `project default <date>`): a "no" could change nothing.
+
 If a field still can't be filled after you've DERIVED from the message/memory/code AND asked
 (`AskUserQuestion`) — acceptance + gates especially — say so plainly: it isn't Ready — split or clarify
 before any code.
@@ -195,7 +204,9 @@ slug per its rules and draft the ledger row for the user. No id scheme → skip 
 Echo a compact **READY card** — repo · remote/default branch · `## task` (the sealed fields:
 scope in/out · acceptance · gates · slug or "none") · `## manifest` (the audit delta line, when
 Step 2b ran a repair) · `## read` (governing docs + entrypoints) · `## records` (prior records +
-the `Recall terms used:` line) · `## classes` (the gotcha names) · `## open` (parked items) —
+the `Recall terms used:` line) · `## classes` (the gotcha names) · `## open` (parked items, plus
+Step 3's answer, or what answered for it: `spec audit: declared <date>`,
+`spec audit: not declared (owner)` or `spec audit: project default <date>`) —
 closed by the READY micro-format at branch + `base` = BASE. Pipe the six sections and that line
 into `bash <check-script> --card --append --session <sid>`, `<sid>` from the `orientation —`
 header in context; report a refusal on the card and still stop. Commit Step 2b's staged repair
@@ -217,7 +228,8 @@ as written, prompt string and all.
 Inside one: echo the READY card, append it as Step 5 does plus one line naming the build and its
 run-state file, commit the staged repair after that append, and **continue without halting**. The
 card is still emitted — an unattended run needs its scope on the record MORE, because nobody is
-going to ask.
+going to ask. Step 3's spec-audit question is never asked here: the README at BASE decides, and that
+kit's preflight line already states the posture.
 
 Before the first pass, load the project's build method if it ships one —
 `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, rendered by the memory-tree kit: the spec set, the fork

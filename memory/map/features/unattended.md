@@ -17,12 +17,14 @@ rendered-skills = ["unattended"]
 gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mode-read-eats-a-bare-cr.md",
   "assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
   "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
-  "bounded-through-a-pipe-is-unbounded.md",
+  "borrowed-seed-inherits-its-head-state.md", "bounded-through-a-pipe-is-unbounded.md",
   "status-set-in-a-subshell.md", "id-matched-as-a-substring.md", "containment-tested-one-way.md",
   "structured-record-split-on-whitespace.md", "staged-break-substitutes-a-synthetic-value.md",
   "spec-names-code-its-base-lacks.md", "two-guards-one-question-two-answers.md",
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
+  "destructive-step-before-its-precondition.md", "line-count-reads-empty-capture-as-one.md",
+  "guard-fed-the-value-it-supersedes.md", "witness-graded-against-a-fact-written-after-it.md"
 ]
 guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md"]
 backlog-shards = []
@@ -40,59 +42,60 @@ globs = [
 **The checkpoint is replaced, not removed.** Every other kit makes a rule enforceable. This one
 removes a rule — the explicit ask before a merge and a push — and its burden is to put
 something machine-checkable in the vacated slot. That is why the mandate is ASSERTED rather than
-written by the run, and why reachability from the pinned BASE is part of the contract: a run that can
-author its own authorization has none, and every gate downstream would certify it.
+written by the run, and why reachability from the pinned BASE is part of the contract: a run that
+can author its own authorization has none.
 
 **THE HARNESS BUYS STAGE ORDER AND CANNOT BUY ENFORCEMENT.** `tools/workflows/unattended-build.js`
 runs SPEC then AUDIT then DISPOSAL and hands the run an ordered ROSTER it dispatches one `Workflow`
 call per unit, so the hand-out is unreachable except through all three and on a TERMINAL `--review`
-verdict — control flow, not a rule an agent remembers. It verifies nothing: a Workflow script
-has no filesystem, so every observation is a claim its own agent returned; the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denied an
-`agent()` in any loop body until `TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: DISPOSAL is
-ONE agent over the whole set, and the convergence LOOP sits in the caller while the harness holds
-the GATE, its iteration count being data-dependent and so unboundable.
+verdict — control flow, not a rule an agent remembers. AUDIT is opt-in since
+`TOOL-aBlindedTrial-3`: it runs only when the caller passes `specAudit`; absent, it logs OFF and hands
+out the roster after SPEC with `verdict: NOT-OWED`. It verifies nothing: a Workflow script has no
+filesystem, so every observation is a claim its own agent returned; the refusals live below. TWO
+SHAPES ARE FORCED BY `agent-cap.js` (`TOOL-dFoldedVerdict-4`): DISPOSAL is ONE agent over the whole
+set, and the convergence LOOP sits in the caller while the harness holds the GATE.
 
-**PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor
-— never build a MISSING or THIN unit — was carried entirely by an agent's memory. `plan_state`, the
+**PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor — never build
+a MISSING or THIN unit — was carried by an agent's memory alone. `plan_state`, the
 M2 classifier, ran at two sites that cannot catch it: `--plan` only reports, and `build-complete`
 runs after every commit has landed, by which point a run that built first and specced afterwards has
 a spec that is neither missing nor thin. `--dispatch` now REFUSES such a pass at the moment of the
 act and is bypassed by not calling the verb; the `pass-order history` leg reads the COMMIT GRAPH,
 asserting each CLOSED unit's build commit had a conforming, non-THIN spec at its FIRST PARENT. Only
-the graph remembers ORDER, which is why the second exists. The first parent and not the pinned BASE:
-the method REQUIRES a run to author a missing spec, so what this refuses is authoring it AFTERWARDS.
+the graph remembers ORDER, which is why the second exists. The first parent, not the pinned BASE:
+the method REQUIRES a run to author a missing spec; what this refuses is authoring it AFTERWARDS.
 `PASS_ORDER_CUTOFF` grandfathers earlier builds, and the leg's liveness line names all three
 populations it walks rather than only the two it grades. `--dispatch` also runs the spec-token
 checker declared as `SPEC_TOKENS_CLI` over the live tree first: this harness closes each unit spec
 in its build commit, so no bar ever grades one (aDeferredBar F3).
 
 **The anchor is an OBSERVATION of the remote, and the kit no longer claims more than that.** Kit 1.0
-pinned BASE against `refs/remotes/origin/<default>` and justified it in a source comment claiming the
-ref could not move without a push. False — `git update-ref` moves it offline — and it was
-reproduced end to end: preflight printed OK over a base the run had authored, the leg agreed silently,
-and the push landed. The ref name and tip now come from what the remote advertises for its own HEAD,
-and `GOV_DEFAULT_BRANCH` is a cross-check that can only refuse. Both routes are inert, not detected:
-neither value is read at all.
+pinned BASE against `refs/remotes/origin/<default>`, claiming the ref could not move without a push.
+False — `git update-ref` moves it offline — and it was reproduced end to end: preflight printed OK
+over a base the run had authored, the leg agreed silently, and the push landed. The ref name and tip
+now come from what the remote advertises for its own HEAD, and `GOV_DEFAULT_BRANCH` is a cross-check
+that can only refuse. Both routes are inert, not detected: neither value is read at all.
 
 **A sha is a NAME, and the dereference is pinned separately.** `git replace` substitutes the object a
 sha resolves to and a graft file rewrites the commit graph, both at a perfectly honest anchor, so
 neither is closed by any amount of anchor hardening. Every read that turns a sha into bytes or into
 ancestry goes through a wrapper pinning `core.useReplaceRefs=false` with `GIT_GRAFT_FILE` pointed
-away from the repo. The two suppressions are not interchangeable and only the second stops a graft;
-measured, not assumed.
+away from the repo. The two suppressions are not interchangeable; only the second stops a graft,
+measured.
 
 **The boundary is stated rather than implied.** A design panel broke four independent anchor
-mechanisms and converged on the reduction that a check under the run's own uid cannot
-constitute authorization. The protocol's §9 enumerates what remains reachable — editing the kit,
+mechanisms and converged on one reduction: a check under the run's own uid cannot constitute
+authorization. The protocol's §9 enumerates what remains reachable — editing the kit,
 shimming its tools, skipping the hook layer, relaying through a seeded endpoint, or never creating a
 run-state file at all — and names the only control that binds: re-running the same leg in a clone the
 run never touched.
 
-**Nothing in a script can reach the scheduler.** The keepalive store is in-memory and session-scoped,
-so a driver verb claiming to schedule or reap it claims an effect it cannot produce. The obligation
-splits by actor — the agent schedules and reaps, the driver records an id and asserts a recorded
-reap — and the reaped item is labelled agent-attested wherever it is reported, so it never spends
-the `--close` override budget. The tick runs `--audit`, the unit stall probe.
+**Nothing in a script can reach the scheduler.** The job the agent schedules there is the IDLE-WAKE:
+it fires only while the session is idle, so it cannot wake a stalled one, and its `--audit` prompt
+is a unit stall probe. What wakes a run is the keepalive — the stop-guard at turn end, the
+stall-recorder at error end, the resume tick from the OS scheduler — three actors outside the
+session, reading one predicate, `--liveness`. The tick launches only on a lease the INDEX holds,
+on the node that took it; the reap is read back at `--landed` against the stop-guard's listing.
 
 **Declarations, not constants.** The phase vocabulary, the Definition-of-Done set, the lander, the
 bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and
@@ -100,18 +103,17 @@ the leg READ them; a phase token or a DoD item spelled into a script is a defect
 in the same file and is read by NEITHER: it is consumed once, by `adopt-unattended.sh`, at render
 time, and its value reaches an agent only through the rendered Skill. The kit owns the
 CORE of both sets and the project may only EXTEND them, asserted against a shrink-only floor —
-without that floor, deleting an item is a silent, reason-free override of everything keyed on it,
-and the fleet has a recorded case of a pin RAISE indistinguishable from a drain.
+without it, deleting an item is a silent, reason-free override of everything keyed on it, and the
+fleet has a recorded pin RAISE indistinguishable from a drain.
 
 **The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
 contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on
 every read, so "current" is the absence of a second answer rather than a comparison between two. It
 was once byte-compared against a fresh render, and that equality was unmaintainable in the ordinary
 case. The authored region holds only the facts nothing in the tree derives, enumerated in the
-protocol's own section 2 and deliberately not counted here — three carriers once held three different
-counts of them at the same time. The precedent is in this repo: one build's hand-kept status file still reads
-IN-PROGRESS while the generated region of the same build's README correctly reads CLOSED. The
-authored half rotted and the derived half did not.
+protocol's own section 2 and deliberately not counted here — three carriers once held three
+different counts of them at once. The precedent is in this repo: one build's hand-kept status file
+still reads IN-PROGRESS while the generated region of its README correctly reads CLOSED.
 
 **The template is byte-gated and this feature is kit-conditional.** The unattended rules first landed
 in the domain-rules companion (§1) to stay inside the byte ceiling; v3.0 converged that companion into
@@ -126,8 +128,7 @@ mention sits far under both.
 
 **A run is bound by a set of named directives, and each is a POINTER.** The count lives in the
 driver's `DIRECTIVES_CORE` and in nothing else here, because this sentence has already been wrong
-about it once. The set is a kit constant the
-project may extend but not delete; the rules live in the build method and the contract names zero
+about it once. The set is a kit constant the project may extend but not delete; the rules live in the build method and the contract names zero
 handles, because naming them twice is the drift the design exists to avoid. A waiver is the owner's,
 taken at preflight and nowhere else — enforced by one branch rather than promised, so a later verb
 cannot take an answer and a re-preflight re-issues the recorded set. A waiver relaxes the directive,
@@ -154,34 +155,37 @@ closes, and a surviving descendant holds the pipe while `timeout` reports 124 on
 on node `c` inside the suite that grades it — 8 s through a substitution against a declared 1 s
 bound, 0 s through a file. So the helper redirects to a file and reads it after `timeout` returns,
 with `-k` for the child that ignores SIGTERM. The gate runner carries the identical fix for the
-identical reason, discovered independently days apart, which is why the arm that proves it MEASURES
-elapsed time rather than asserting a message.
+identical reason, found independently, which is why the arm that proves it MEASURES elapsed time
+rather than asserting a message.
 
 Two consequences worth knowing before extending this. The helper cannot call the driver's own `GIT()`
 wrapper — `timeout` needs an external command and `GIT()` is a shell function — so the dereference
 pins live in named constants that both expand, and the arm checks the constants' VALUES as well as
 their expansion, because an indirection is otherwise a way to weaken a pin while a one-line grep
 stays green. And a transport failure is no longer reported as a semantic answer: the per-branch query
-used to collapse git's 128 into "the remote advertises no tip", so a network fault told the operator
-to push a branch that was already pushed.
+used to collapse git's 128 into "the remote advertises no tip", telling the operator to push a
+branch that was already pushed.
 
 **What the bound does NOT buy, stated so a green suite is not misread.** No arm drives a blackholed
 endpoint for the full declared bound — that would add the bound to the wall clock of the slowest leg
-on the bar, in a suite whose historical failure mode is a leg that takes too long — so the deadline is
-graded by the mechanism arm plus an elapsed assertion on the terminal-record path, and the refusal
-path is driven by a stub exiting the status `timeout` itself returns. The `http.lowSpeed*` and
+on the bar — so the deadline is graded by the mechanism arm plus an elapsed assertion on the
+terminal-record path, and the refusal path is driven by a stub exiting the status `timeout` itself
+returns. The `http.lowSpeed*` and
 `ConnectTimeout` options are asserted BY INSPECTION only: exercising them needs a server that
 authenticates, stalls mid-transfer, and speaks ssh, and no fixture here has one.
 
 **The kit reads the evidence it already records, from `TOOL-aGradedMandate`.** Four Definition-of-Done
-terms were added or tightened, and every one of them consumes a fact the driver was already writing
-and nothing was reading. `closing-review-recorded` gained a second term: the LAST `--review` round
+terms were added or tightened, each consuming a fact the driver already wrote and nothing read. `closing-review-recorded` gained a second term: the LAST `--review` round
 whose subject is the build slug must carry a terminal token, and `CONVERGED` must name zero blockers.
 Two runs in this tree had reached `LANDED` with that item MET while their closing loop stopped at
-BLOCKED with blockers standing, and the incentive was inverted — recording one more round could oblige
-a run to promote every blocker into a built unit, while recording nothing owed nothing. `specs-audited`
-is an eleventh core item joining every CLOSED unit to a tracked `spec-audit` binding line, whole-token
-and expanding the `N..M` range form eighteen tracked records use. `build-complete` gained a sixth term
+BLOCKED with blockers standing, and the incentive was inverted: one more round could oblige a run
+to promote every blocker, while recording nothing owed nothing. `specs-audited` is an eleventh core
+item joining every CLOSED unit to a tracked `spec-audit` binding line, whole-token and expanding the
+`N..M` range form eighteen tracked records use. Since `TOOL-aBlindedTrial-2` it is owed only when
+the README at BASE declares `spec-audit: <date>`, or (`TOOL-aBlindedTrial-7`) the conf at that BASE
+declares `SPEC_AUDIT_DEFAULT` and the README no key — sourced in a subshell, never a sed pipeline; a
+non-date is fail 54 — else a term zero announces `not owed` and the item stays in `DOD_CORE`.
+`build-complete` gained a sixth term
 over `plan_state`'s THIN grade, which `verb_plan` used to compute and overwrite one line later.
 
 **The parked split has TWO axes and the history side subtracts both.** `PARK_ACTS_OWED` names the acts
@@ -200,13 +204,12 @@ as a note.
   mandatory. The kit names it through `LANDER`, never by hardcoded path.
 - `tools/check-wiring.sh --check` — the non-repairing wiring probe preflight delegates to. The
   repairing mode is deliberately out of reach.
-- `tools/memory-tree/check-memory-hygiene.sh` — supplies the run-state file's legality (check 4's
-  whitelist), its size cap (check 6 via `index_set`), its prose exemption (check 7's `ex7`) and,
-  by deliberate omission, leaves phase-vocabulary validation to this kit's own leg.
+- `tools/memory-tree/check-memory-hygiene.sh` — the run-state file's legality, size cap and prose
+  exemption (checks 4, 6, 7); phase-vocabulary validation stays this kit's own leg.
 - `tools/memory-tree/gen_build_index.py` `apply_region()` — the generated-region splice contract,
-  reused verbatim rather than re-implemented.
-- `tools/drift-audit/drift_report.py` — the judgeability discipline, reused for witness RESOLUTION
-  and deliberately NOT for witness PRESENCE, which is its own refusal here.
+  reused verbatim.
+- `tools/drift-audit/drift_report.py` — the judgeability discipline, reused for witness RESOLUTION,
+  not for witness PRESENCE (its own refusal here).
 - `tools/settings-merge.py --fragment` + `tools/check-hook-destinations.sh` — wire `gate-guard.js`,
   this kit's `PreToolUse` hook denying the flagged bar and every suite before `VERIFYING`, keyed to
   the branch by `run-branch:`. Its `buildCommandView` is COPIED from `tools/hooks/scratch-guard.js`:
@@ -258,15 +261,13 @@ silently; re-derive this section whenever the feature is touched.*
   source: the handle-membership test is skipped on a TERMINAL record, because a frozen waiver graded
   against a moving directive set is a red wedge no verb can repair, and the git join is silent when
   the record has no committed blob.
-- **Both Definition-of-Done items shipped.** `build-complete` is a five-term conjunction over the
-  authored roster and the run-state file's copied region; `closing-review-recorded` joins the pinned
-  BASE to a tracked review record. `CORE_FLOOR` is `10:8`. The base needle is SEVEN characters, not
-  eight: git abbreviates to seven here, 29 of 48 tracked records spell it that way, and the
-  eight-char form shipped briefly and matched none of them — an item clearable only by an override
-  the run wrote for itself.
+- **The DoD core is `CORE_FLOOR` in `.unattended.conf`, never a count typed here** — this row
+  once said `10:8` and rotted. `closing-review-recorded` joins the pinned BASE to a tracked review
+  record; the base needle is SEVEN characters (git abbreviates to seven here; the eight-char form
+  shipped briefly and matched nothing, an item clearable only by an override the run wrote).
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
-  commit them; the parity legs compare two files the same run can change together. This bounds every
+  commit them; the parity legs compare two files one run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.
-- **The keepalive half is unenforceable by construction.** Two DoD items are agent-attested because
-  no script can reach the scheduling store. They are labelled everywhere they appear, and they are
-  still the softest part of the contract.
+- **The reap is checked at `--landed`; the schedule is not.** With the stop-guard wired, it refuses
+  while the newest harness listing names the recorded id. No script can schedule or reap for the
+  agent, so that half stays attested and softest.

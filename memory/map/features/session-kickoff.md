@@ -75,6 +75,14 @@ fast-forward and `rev-parse HEAD` as the BASE still run — and appends at Step 
 sections and the READY line through that verb before Step 2b's staged repair is committed
 (`KICK-aReplayedCard-3`), so the deny reads a READY line when the engine's own commit reaches it.
 
+The engine also puts the spec-audit question to the owner, once, at Step 3 (`KICK-aBlindedTrial-1`):
+only when the DoR is a design pass and the build method the manifest names makes `spec-audit:` opt-in,
+recommending yes for two or more units or an open §8 fork and no otherwise, because the owner decides
+and the engine may only recommend. A yes writes `spec-audit: <today>` into the build README front
+matter before the spec pass; either answer lands on the card's `## open` section as one line. The
+unattended hand-back never asks it — the README at BASE has already decided, and the unattended kit's
+preflight line states the posture.
+
 ## Gaps
 
 - **The third manifest location cannot be gated, by construction.** The engine honours a manifest at
