@@ -111,6 +111,18 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   sharing node tag `c`, for 13 conflicts at the landing. Neither time did anyone run it. §3's rule
   is own STREAMS not files, and a kit is the unit that rule is about.
 
+- **A finished or live unattended run ANSWERS QUESTIONS about itself** — `/runlog`, over the run's
+  committed record first, the local run model for anything time-shaped (the record carries no event
+  times), and the redacted narration where the transcript is on this machine. Came in with
+  `dLoggedFlight`. It is not a code search: a symbol, caller or filename is still a grep.
+
+- **`tools/unattended/check-unattended.sh` carries four RAW CR BYTES** inside `sub(/<CR>$/,"")` awk
+  regexes, and any text-mode read destroys all four — Python's universal-newline translation turns a
+  lone `` into `
+`, which leaves `sub(/` with a newline inside the regex and silently breaks the
+  checks that use it. Rewrite that file in BYTES. Hit during the 2026-09-21 reconcile; the class is
+  `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already registered and not read.
+
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
 
