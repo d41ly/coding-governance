@@ -129,8 +129,8 @@ render_doc() {
 # no rule file at all. On an ADOPTED tree the destination already holds the adopter's committed rule
 # set and the `gov:kit memory-tree@` marker the branch below reads, so the same fallback would
 # DESTROY a file the target owns — from the verb whose only job is refreshing it — and wedge the
-# tree in both directions: --render then refuses for a missing marker, and --scaffold refuses
-# because the root exists without one. Under --render a missing template is a refusal instead, and
+# tree in both directions: --render then stops at the accepted exit 3 for a missing marker and
+# refreshes nothing, and --scaffold refuses because the root exists without one. Under --render a missing template is a refusal instead, and
 # it refuses BEFORE the first write so a partial set is never left on disk.
 render_all() {
   local pairs pair src dst missing=""

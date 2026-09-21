@@ -880,4 +880,26 @@ $(printf '%s\n' "$sw" | sed 's/^/  /')
   fi
 fi
 
+# ---- 12: the manifest carries no CR byte -------------------------------------------------------
+# ROUND 3's M1, and the bullet it protects is the one about CR bytes. Twice the manifest was given a
+# sentence carrying a raw CR to SHOW the byte it names, and twice the next tool to rewrite the file
+# in text mode ate it -- leaving "turns a lone <LF> into <LF>", a sentence asserting that a newline
+# becomes a newline, with the one fact it existed to carry gone and nothing red. The manifest is the
+# document most likely to be rewritten by a text-mode tool, which is exactly why it is the one that
+# must not depend on a control byte surviving. Name the bytes (0x0D, 0x0A); never embed them.
+#
+# DERIVED, and it names no bullet: any CR anywhere in this file reds, so the rule outlives the
+# sentence that motivated it. Failing case observed before wiring -- a CR inserted into the manifest
+# reds this check, removed it passes.
+# THE BYTE IS BUILT INSIDE awk, and that is not style. `grep -q "$(printf ...)"` cannot work here:
+# MSYS command substitution STRIPS a trailing CR, so the pattern arrives EMPTY and matches every
+# line of every file -- the check then reds on a clean manifest, which is how this line was
+# written the first time. `sprintf("%c", 13)` needs no shell quoting and no escape, and it
+# catches a lone CR mid-line as well as a CRLF ending.
+if LC_ALL=C awk 'index($0, sprintf("%c", 13)) { hit = 1 } END { exit !hit }' "$MF" 2>/dev/null; then
+  fail 12 "the manifest carries a CR byte (0x0D), and a text-mode rewrite silently converts it --
+  which has twice destroyed the one fact a §B bullet existed to carry. Name a control byte by its
+  hex value instead of embedding it: $MF"
+fi
+
 exit "$status"

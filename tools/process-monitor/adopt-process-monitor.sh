@@ -84,19 +84,16 @@ KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix 2>/dev/null)"
 KIT_REL="${KIT_REL%/}"
 [ -n "$KIT_REL" ] || {
   echo "process-monitor: cannot derive this kit's directory relative to $ROOT" >&2; exit 2; }
-# THE TOOL ROOT, derived exactly as `adopt-unattended.sh` derives it and for the same reason: the
-# settings merger lives BESIDE this kit rather than inside it. The wiring remedy below used to spell
-# it under a hardcoded `$ROOT/tools/` prefix, which names nothing in a root install and disagreed
-# with the fragment paths on the two lines above it, which this same file already derives from
-# `KIT_REL`. One file, one route, two answers. TOOL-cMendedVintage-4.
-TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
-[ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
-
 PY=$(resolve_python "${GOV_PYTHON:-}" 2>/dev/null) || PY=""
 # The tool root this kit was installed under — `tools` in gov, `scripts` at an adopter that chose
 # that prefix, empty at a root install. DERIVED from KIT_REL, which is this kit's own directory
 # relative to the repo root, because the remedy below names a SIBLING file and a hardcoded `tools/`
-# there is an instruction pointing at a path the operator does not have.
+# there is an instruction pointing at a path the operator does not have. TOOL-cMendedVintage-4, whose
+# own subject was that the remedy used to spell `$ROOT/tools/` and disagreed with the fragment paths
+# two lines above it. ONE route, and that is load bearing: the 2026-09-21 reconcile kept both sides'
+# derivation and they disagreed about the trailing slash, so anything inserted between them would
+# have read a different value from anything after — with TOOL_ROOT="tools" the slash-less form
+# renders `toolssettings-merge.py`. The separator is supplied HERE, by SMERGE_REL, and nowhere else.
 TOOL_ROOT="${KIT_REL%/*}"; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""
 SMERGE_REL="${TOOL_ROOT:+$TOOL_ROOT/}settings-merge.py"
 CONF="$ROOT/.process-monitor.conf"

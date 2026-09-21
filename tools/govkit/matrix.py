@@ -162,6 +162,41 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
               "probe declares only %s, so a run that died before writing satisfies it"
               % sorted(probe))
 
+    # TWO ACCEPTED STOPS IN ONE DESCRIPTOR MUST NOT CONTRADICT EACH OTHER ABOUT ONE PATH. Round 3's
+    # H1: the exit-3 row was given `must_exist = "{memory_root}/HYGIENE.md"` while the sibling
+    # `seed-and-stop` row pins `must_not_exist` on that same path, so the two `ok = true` blocks
+    # disagreed and a target in the state one of them declares CORRECT matched neither. `update` then
+    # found no accepted outcome for the adopter's exit, left its writes staged, and told the operator
+    # to repair by hand a render that should never have run.
+    #
+    # THE CLASS, not the instance: a rule over every descriptor, so the next kit to declare a second
+    # accepted stop cannot reintroduce it. Run over the 27 shipped descriptors before wiring, it
+    # reported 0 hits and 1 near-miss pair, and it reds that same pair with the pre-fix probe staged
+    # back in -- both measured. A descriptor that legitimately discriminates two accepted stops by
+    # one file takes a named exemption here rather than a silent widening; none does today.
+    def _probe_paths(block, key):
+        spec = (block.get("probe") or {}).get(key) or []
+        return set(spec if isinstance(spec, list) else [spec])
+
+    _pairs = 0
+    for eid, (d, _p) in sorted(descs.items()):
+        _stops = [b for b in d.get("outcome", []) if b.get("ok")]
+        for _i, _a in enumerate(_stops):
+            for _b in _stops[_i + 1:]:
+                _pairs += 1
+                _clash = (_probe_paths(_a, "must_exist") & _probe_paths(_b, "must_not_exist")) |                          (_probe_paths(_a, "must_not_exist") & _probe_paths(_b, "must_exist"))
+                check("accepted stops: '%s' %r and %r agree about every path they both name"
+                      % (eid, _a.get("means"), _b.get("means")),
+                      not _clash,
+                      "both are ok = true yet one requires and the other forbids %s, so a target in "
+                      "the state one of them declares correct matches neither and its exit is "
+                      "unclassified" % sorted(_clash))
+    # The liveness half: over a corpus with no descriptor declaring two accepted stops, the loop
+    # above quantifies over nothing and prints no row at all, which reads exactly like agreement.
+    check("accepted stops: at least one descriptor declares two, so the agreement rule graded a pair",
+          _pairs > 0,
+          "no descriptor carries two ok = true blocks, so the contradiction rule above graded nothing")
+
     # AND THE ENGINE AGREES, over the shipped lexicon descriptor and the two states it has to
     # separate. Both have no `.lexicon.conf`; only one has the Skill the adopter renders beside it.
     g = tmp / "outcome-probe"

@@ -86,7 +86,8 @@ mutates_index = true
 # four `rendered` rows below — `{memory_root}/HYGIENE.md`, `{memory_root}/TEMPLATE-SPEC.md`,
 # `{memory_root}/guides/BUILD-METHOD.md` and `{memory_root}/guides/ANNOTATION-STYLE.md` — had no verb
 # able to refresh them, and went one vintage stale on every pull. `--render` skips the adoption guard,
-# requires the `gov:kit memory-tree@` marker instead, and writes those four and nothing else.
+# reads the `gov:kit memory-tree@` marker instead — and stops at the accepted exit 3 when it is
+# absent rather than refusing — then writes those four and nothing else.
 #
 # GATED BY `GOVKIT_RERENDER`, like every block of this kind: the step runs by default, and with
 # GOVKIT_RERENDER=0 exported a `govkit update` refreshes nothing here and still relabels each moved
@@ -97,9 +98,14 @@ mutates_index = true
 # already current byte-identical and unmentioned. It cannot reset a measured pin, because it never
 # touches a file that holds one.
 #
-# NO `[[outcome]]` PAIR. `--render` exits 1 only on a tree already carrying `{memory_root}/HYGIENE.md`
-# without the marker — the state `refused-foreign-tree` below already classifies — or on the missing
-# conf the `[adopt]` argv refuses on identically. Neither is re-adjudicated here.
+# NO `[[outcome]]` PAIR OF ITS OWN. The marker question `--render` used to answer with exit 1 is now
+# answered at exit 3 by the accepted `not-rendered-here` row below, so the only exit-1 states left
+# under `--render` are the blank-`READINESS_ROWS` refusal, which sits after the marker gate and which
+# an adopted tree does reach, and the incomplete-render-set refusal inside `render_all`. Both leave
+# `{memory_root}/HYGIENE.md` present, so the `code = 1` probe below matches and labels them
+# `refused-foreign-tree`, which is the wrong `means` for either: they stay failures, and the label is
+# misleading rather than wrong in effect. Stated here rather than given a row, because a second
+# `code = 1` row would have to discriminate on a file neither state distinguishes.
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-memory-tree.sh", "--render"]
 
@@ -129,7 +135,18 @@ means = "refused-foreign-tree"
 code = 3
 means = "not-rendered-here"
 ok = true
-probe = { must_exist = "{memory_root}/HYGIENE.md" }
+# THE CONF, NOT `{memory_root}/HYGIENE.md`, and the difference is the whole row. The adopter exits 3
+# on a DISJUNCTION -- no HYGIENE.md at all, OR one without the marker -- so a probe naming HYGIENE.md
+# matches the second half only, and the first half is this kit's own declared first-install steady
+# state: `seed-and-stop` above pins `must_not_exist = "{memory_root}/HYGIENE.md"` and its comment
+# says every correct first install ends there. Narrowed that way the descriptor held two `ok = true`
+# rows contradicting each other about one path, and an `update` over a seeded-and-stopped target
+# found no accepted outcome for exit 3, left its writes staged and told the operator to repair by
+# hand a render that should never have run -- verbatim the wedge this row exists to remove. The conf
+# is present on both halves, it cannot be satisfied by a run that died before writing (the adopter
+# refuses and seeds it long before the exit-3 gate), and a `must_exist` term is REQUIRED here by
+# DEPL-cMendedVintage-16's arm, so it cannot simply be dropped.
+probe = { must_exist = ".memory-tree.conf" }
 
 [[gate_leg]]
 name = "memory hygiene"

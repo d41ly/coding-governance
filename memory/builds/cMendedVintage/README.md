@@ -162,7 +162,7 @@ ids TOOL-cMendedVintage-10 TOOL-cMendedVintage-11 TOOL-cMendedVintage-12 TOOL-cM
 | [DEPL-cMendedVintage-28 — a receipt path that escapes is answered before an operator's untracked file](spec/2026-09-19-spec-DEPL-cMendedVintage-28.md) | 40 | 2 | CLOSED | rev-2 | 2026-09-19 |
 <!-- /gen:build-units -->
 
-Records: 85 bound to this build, across 4 record folder(s).
+Records: 86 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

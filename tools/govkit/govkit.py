@@ -5124,9 +5124,11 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
         data = index_blob(target, oid) if oid else None
         if data is None:
             return False
+        # NO `else None` ARM HERE. The guard above returns False on an absent worktree file, so the
+        # ternary this replaced could not reach its own fallback and only invited a reader to think
+        # the fold still covered a case the guard now refuses (round 3, L3).
         sides = [derive_outside_region(data, om, cm),
-                 derive_outside_region((target / path).read_bytes()
-                                       if (target / path).is_file() else None, om, cm)]
+                 derive_outside_region((target / path).read_bytes(), om, cm)]
         if has_head:
             sides.append(derive_outside_region(
                 blob_at(target, "HEAD", path) if path in in_head else None, om, cm))
