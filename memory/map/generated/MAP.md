@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 71 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 80 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -75,6 +75,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `playbook render selftest` | playbook |
 | `playbook render wiring` | playbook |
 | `playbook validity gate` | playbook-mode |
+| `pre-push run-log line` | runlog |
 | `pre-push self-test` | baseline |
 | `process-monitor adopter selftest` | process-monitor |
 | `process-monitor census selftest` | process-monitor |
@@ -94,9 +95,13 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `run-gates canary` | baseline |
 | `run-gates evidence` | foundation |
 | `run-gates gov canary` | run-gates |
+| `run-gates run-log line` | run-gates |
 | `run-gates turnstile` | run-gates |
 | `run-gates wiring` | run-gates |
 | `run-selftests self-test` | run-gates |
+| `runlog record schema` | runlog |
+| `runlog selftest` | runlog |
+| `runlog skill wiring` | runlog |
 | `scratch-guard self-test` | agent-cap |
 | `selftest harness self-test` | run-gates |
 | `settings-merge selftest` | baseline |
@@ -135,6 +140,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `process-monitor` | process-monitor |
 | `pytest-parallel-guardrails` | baseline |
 | `run-gates` | run-gates |
+| `runlog` | runlog |
 | `unattended` | unattended |
 | `workflows` | baseline |
 
@@ -173,6 +179,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `drift-audit` | baseline |
 | `lexicon` | lexicon |
 | `memory-recall` | memory-recall |
+| `runlog` | runlog |
 | `unattended` | unattended |
 
 ## gotcha-classes
@@ -189,6 +196,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `arm-literal-strands-on-message-edit.md` | testsuite-counts |
 | `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
+| `async-job-starts-with-sigint-ignored.md` | run-gates |
 | `bash-c-multiline-flattens-under-msys.md` | agent-cap |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `check-format-grades-two-populations.md` | build-readme-surface |
@@ -199,6 +207,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `degradation-known-but-unreported.md` | review-harnesses |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
 | `fallback-fabricates-the-passing-value.md` | unattended |
+| `fixed-sleep-does-not-place-a-signal.md` | runlog |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
 | `fixture-lacks-a-gate-the-consumer-has.md` | govkit |
 | `fixture-passes-by-finding-nothing.md` | baseline |
@@ -215,11 +224,13 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `inline-fence-swallows-the-rest-of-the-file.md` | memory-tree-hygiene |
 | `inline-marker-breaks-a-line-continuation.md` | install-prefix |
 | `inputs-inside-the-subjects-reach.md` | unattended |
+| `join-key-widened-by-a-shared-location.md` | runlog |
 | `ledger-token-wrapped-across-a-line-joins-nothing.md` | memory-tree-hygiene |
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
 | `msys-grep-counts-cr-on-every-line.md` | session-kickoff |
 | `naming-leg-grades-what-python-named.md` | lexicon |
 | `node-check-is-not-a-syntax-gate.md` | review-harnesses |
+| `nt-against-a-missing-file-is-true.md` | runlog |
 | `observation-before-the-last-fold-of-the-same-commit.md` | build-method |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `pin-copied-from-another-corpus.md` | baseline |
@@ -228,12 +239,15 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `record-citing-a-foreign-id-defines-or-orphans-it.md` | memory-tree-hygiene |
 | `record-without-serves-or-with-a-round-counter.md` | memory-tree-hygiene |
 | `reflowed-prompt-string-reads-as-a-deleted-stop.md` | unattended |
+| `retirement-inventory-misses-readers-by-value.md` | runlog |
 | `row-driver-emits-a-plausible-file-with-rows-missing.md` | memory-tree-merge-driver |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
 | `settings-edit-takes-effect-mid-session.md` | agent-cap |
 | `shipped-checker-edit-is-an-adopter-contract-change.md` | session-kickoff |
+| `signal-trap-runs-the-exit-handler-twice.md` | run-gates |
 | `sourced-conf-blank-overrides-the-default.md` | memory-tree-hygiene |
 | `spec-names-code-its-base-lacks.md` | unattended |
+| `staged-break-runs-stale-bytecode.md` | runlog |
 | `staged-break-substitutes-a-synthetic-value.md` | unattended |
 | `status-set-in-a-subshell.md` | unattended |
 | `structured-record-split-on-whitespace.md` | unattended |
@@ -244,11 +258,13 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
 | `trace-profile-measures-itself.md` | unattended |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |
+| `trapped-signal-waits-for-the-foreground-child.md` | runlog |
 | `two-answers-to-one-question.md` | baseline |
 | `two-guards-one-question-two-answers.md` | unattended |
 | `two-readers-of-one-config-one-re-derived.md` | unattended |
 | `vacuous-selector-empty-population.md` | baseline |
 | `waiver-row-that-hides-nothing-reds.md` | memory-tree-hygiene |
+| `withheld-value-recovered-from-a-derived-one.md` | runlog |
 | `worktree-crlf-outside-the-gated-population.md` | run-gates |
 
 ## guides
