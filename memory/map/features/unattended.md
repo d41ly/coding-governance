@@ -73,27 +73,8 @@ declared `ASKS_CMD` witness's, and what it reads off the tree is filing, a statu
 spec header VERB. Its scope is read BEFORE the witness runs, and its answer freezes into
 `asks-at-landing` because ruling D4 makes CLOSED non-absorbing.
 
-**The anchor is an OBSERVATION of the remote, and the kit no longer claims more than that.** Kit 1.0
-pinned BASE against `refs/remotes/origin/<default>` and justified it in a source comment claiming the
-ref could not move without a push. False — `git update-ref` moves it offline — and it was
-reproduced end to end: preflight printed OK over a base the run had authored, the leg agreed silently,
-and the push landed. The ref name and tip now come from what the remote advertises for its own HEAD,
-and `GOV_DEFAULT_BRANCH` is a cross-check that can only refuse. Both routes are inert, not detected:
-neither value is read at all.
-
-**A sha is a NAME, and the dereference is pinned separately.** `git replace` substitutes the object a
-sha resolves to and a graft file rewrites the commit graph, both at a perfectly honest anchor, so
-neither is closed by any amount of anchor hardening. Every read that turns a sha into bytes or into
-ancestry goes through a wrapper pinning `core.useReplaceRefs=false` with `GIT_GRAFT_FILE` pointed
-away from the repo. The two suppressions are not interchangeable and only the second stops a graft;
-measured, not assumed.
-
-**The boundary is stated rather than implied.** A design panel broke four independent anchor
-mechanisms and converged on the reduction that a check under the run's own uid cannot
-constitute authorization. The protocol's §9 enumerates what remains reachable — editing the kit,
-shimming its tools, skipping the hook layer, relaying through a seeded endpoint, or never creating a
-run-state file at all — and names the only control that binds: re-running the same leg in a clone the
-run never touched.
+**What authorizes a run has its own dossier.** The anchor observation, the pinned sha dereference,
+the stated boundary and the ask mandate are `unattended-mandate`.
 
 **Nothing in a script can reach the scheduler.** The keepalive store is in-memory and session-scoped,
 so a driver verb claiming to schedule or reap it claims an effect it cannot produce. The obligation
@@ -201,12 +182,6 @@ exist, because the act is a field of the reason. The history complement subtract
 without that a retire row matches both alternations and `--status` reports one row as a decision AND
 as a note.
 
-**The leg second-opinions the ask mandate from inputs the run cannot move.** `asks:` against the
-README at BASE, P5 from the home BACKLOG blob at `m-base:`, and `m-base:` as the merge-base of the
-pinned `anchor-sha:` and HEAD at preflight, never `base:`. Check 37 bans a foreign anchor in the
-run's folder by the recall kit's own `anchor_at`, reached through `RECALL_CLI`. `asks-ready:` and
-the freeze are re-derived by re-running `ASKS_CMD` until the record is published.
-
 ## Shared seams
 
 - `memory/guides/REVIEW-PROTOCOL.md` — the structural precedent for a BINDING guide: charter-cited,
@@ -249,13 +224,6 @@ silently; re-derive this section whenever the feature is touched.*
   `assertion-between-two-derived-values` was found here, in this kit's own leg, and the arm that
   proves it is this kit's. The class is general — any checker that composes both sides of a
   comparison has it — and nothing sweeps for it repo-wide.
-- **The ask-mandate second opinions (`TOOL-dDerivedDocket-18`) have two named holes.** A producer
-  that cannot run, breaches the bound or answers in a refused shape is UNANSWERED, so a forged
-  `asks-ready:` or freeze behind a broken `ASKS_CMD` passes; and a record already on the advertised
-  default tip is never re-derived. Both are in the leg's header. Re-derived 2026-09-21: the two
-  check-9 rows this replaced are closed — the leg reads no local ref on the BASE path any more, and
-  an unobserved remote fails check 9 closed by name.
-
 - **The DIRECTIVE LAYER is gated on both halves.** The registry is joined to the Skill's table in
   both directions by check 16, every cited method section resolves, and the protocol's own §3 phase
   list, §4 DoD table and the count sentence above it are joined to the driver's constants by arms D

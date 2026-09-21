@@ -58,7 +58,10 @@ strictly below the parent.
   refusal quoting the line; one row fewer than the mandate is a dead probe naming the missing id; a
   producer that exits 1 names the exit status; one that writes to neither stream is a dead probe; and
   one that outlives a two-second bound is reported as never answered rather than as a red. A mandate
-  whose every id grades not-ready refuses under check 75 and prints each id's failing rules.
+  whose every id grades not-ready refuses under check 75 and prints each id's failing rules. The
+  criterion's last clause, that the stub's recorded argv shows `--at` equal to the `m-base:` the
+  record pins, was NOT observed in this pass: its arm, "the witness was asked at that same tree",
+  is in the driver suite, and that run is owed to VERIFYING. Added by the orchestrator.
 - AC7 — `MISSING` — over a build whose roster plans `EXMP-tPlanA-2` and `EXMP-tPlanA-10` with no
   spec at all, `--plan` lists both, `-2` first, and closes with the MISSING shape naming `-2`. Check
   19 fires only where the roster, the specs and the mandate are all empty.
