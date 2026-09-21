@@ -413,6 +413,19 @@ predicate reads it. Prose and data formats are excluded, because a fenced code b
 an example rather than a definition, and counting those made a number that moved when somebody wrote
 documentation.
 
+### `--offenders` — the key set, and nothing else
+
+`python <kit>/lexicon.py --offenders` prints one `<path><TAB><rule><TAB><identifier>` line per
+offender of every predicate the verdict reads — the unwaived P1 and P2 offenders, every graded cell's
+convention violations, and each refusal as `-<TAB>problem<TAB><text>` — and exits exactly as the
+default mode does over the same tree. It exists for the merge bar's red attribution, which asks
+whether every offender on a branch was already an offender at its base, and a SET answers that where
+`--list` cannot: `--list` keys each offender by `path:line:`, so one function added above an inherited
+offender moves it, and it cuts its re-lists at 40, which can hide a new offender behind a fixed one.
+This mode carries no line number, no count and no cut; a key repeating inside one file carries
+`#<k>`, its occurrence ordinal there in line order, so two identical offenders stay two. The default
+mode's output is unchanged.
+
 ## Vacuity is armed on BOTH sides
 
 A predicate that selects an empty population passes green forever and tells you nothing. The

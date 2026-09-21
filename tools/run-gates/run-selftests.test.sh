@@ -57,6 +57,10 @@ build_repo() {
   git init -q . >/dev/null 2>&1 || return 2
   git config user.email t@t && git config user.name t || return 2
   cp "$RUNNER" tools/run-gates/run-selftests.sh || return 2
+  # THE SHARED NORMALISER TRAVELS WITH IT. `--attribute` sources it from beside the runner since
+  # TOOL-dDerivedDocket-23 S7, and every other mode runs without it; derived from the runner's own
+  # directory rather than spelled, for the install-prefix reason the paths above give.
+  cp "$(dirname -- "$RUNNER")/lib-attribute.sh" "$(dirname -- "$RUNNER_REL")/lib-attribute.sh" || return 2
 
   printf '#!/usr/bin/env bash\necho "suite ok"\nexit 0\n' > tools/suite-ok.sh
   printf '#!/usr/bin/env bash\necho "FAIL something"\nexit 1\n' > tools/suite-red.sh

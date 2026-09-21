@@ -2029,11 +2029,55 @@ def resolve_base_ref(root: pathlib.Path, explicit: str | None) -> str:
                      f"input this report used to grade instead of what landed.")
 
 
+def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
+    """`--offenders`: one `<signal>\t<detail key>` line per thing `--check` would red on.
+
+    THE SIGNATURE THE MERGE BAR GRADES THIS LEG WITH (TOOL-dDerivedDocket-23 S3). The bar's red
+    attribution asks whether every offender at the branch is an offender at the base, and only a SET
+    answers that. So each line is a KEY: every detail row of every gateable signal over its pin, every
+    gateable signal that is DEAD, and every weakened ratchet — the three things `--check` exits 1 on,
+    and nothing else. No count, no header, no cut: `--check` shows ten detail rows per signal, and a
+    set built from ten can hide the eleventh.
+
+    A detail row's key is its JSON with sorted keys and its LINE LOCATORS dropped — the `line` field,
+    and a trailing `:<digits>` on any string — because an unrelated edit above a finding moves its
+    line and would read as a new finding on every branch. A key repeating inside one signal carries
+    `#<k>`, its occurrence ordinal, so two identical rows stay two.
+    """
+    def extract_unlocated(v):
+        if isinstance(v, str):
+            return re.sub(r":\d+$", "", v)
+        if isinstance(v, list):
+            return [extract_unlocated(x) for x in v]
+        if isinstance(v, dict):
+            return {k: extract_unlocated(x) for k, x in v.items() if k not in ("line", "lines")}
+        return v
+
+    rows = []
+    for s in over:
+        for d in s["detail"]:
+            rows.append((s["signal"], json.dumps(extract_unlocated(d), sort_keys=True, ensure_ascii=False)))
+    for s in dead:
+        rows.append((s["signal"], "DEAD — gateable, and its judgeable population is empty"))
+    for r in ratchets:
+        rows.append(("ratchet", " ".join(str(r).split())))
+    seen: dict[str, int] = {}
+    out = []
+    for sig, key in rows:
+        line = f"{sig}\t{' '.join(key.split())}"
+        seen[line] = seen.get(line, 0) + 1
+        out.append(line if seen[line] == 1 else f"{line}#{seen[line]}")
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Report whether this repo's records still match reality.")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--check", action="store_true",
                     help="exit 1 if a GATEABLE signal is over its pin")
+    ap.add_argument("--offenders", action="store_true",
+                    help="print one <signal> TAB <detail key> per thing --check would red on, and "
+                         "nothing else; exits as --check does")
     ap.add_argument("--base-ref", default=None,
                     help="ref that 'landed' means, verbatim (default: refs/remotes/origin/<the "
                          "default branch>; a clone with no origin remote uses the local branch, "
@@ -2075,6 +2119,32 @@ def main(argv: list[str] | None = None) -> int:
     for s in out:
         s["pin"] = ctx.pins.get(s["signal"], s["tolerance"])
 
+    # THE THREE POPULATIONS `--check` reds on, computed ONCE for both modes that read them, so
+    # `--offenders` cannot disagree with `--check` about what is red. Neither function prints, so
+    # computing them above the table moves no line of `--check`'s output.
+    #
+    # A DEAD GATEABLE SIGNAL IS A FAILURE, not a skip. The old predicate required `live`, so a
+    # probe that had gone blind scored exactly like a probe that had found nothing — which is how
+    # a pre-flatten glob stayed green on the merge bar. This is the generic fix: it catches the
+    # next blind probe without anyone having to notice the next layout change.
+    #
+    # Except when a signal is EMPTY BY DECLARATION. `SHRINK_ONLY` ships empty on purpose, and a
+    # rule with no exception here would red every fresh adopter on their first run. The exception
+    # is enumerated in the project layer, never inferred.
+    ratchets, over, dead = [], [], []
+    if args.check or args.offenders:
+        declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
+        ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
+        ratchets += build_lang_mode_findings(ctx.git, root, lookback=lookback)
+        over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]
+        dead = [s for s in out if s["gateable"] and not s["live"] and s["signal"] not in declared]
+
+    if args.offenders:
+        # Stdout is keys and nothing else, and the exit is `--check`'s.
+        keys = render_drift_offenders(over, dead, ratchets)
+        sys.stdout.buffer.write("".join(k + "\n" for k in keys).encode("utf-8"))
+        return 1 if (over or dead or ratchets) else 0
+
     if args.json:
         print(json.dumps(out, indent=1))
     else:
@@ -2113,21 +2183,9 @@ def main(argv: list[str] | None = None) -> int:
         print("\n# detail: rerun with --json")
 
     if args.check:
-        # A DEAD GATEABLE SIGNAL IS A FAILURE, not a skip. The old predicate required `live`, so a
-        # probe that had gone blind scored exactly like a probe that had found nothing — which is how
-        # a pre-flatten glob stayed green on the merge bar. This is the generic fix: it catches the
-        # next blind probe without anyone having to notice the next layout change.
-        #
-        # Except when a signal is EMPTY BY DECLARATION. `SHRINK_ONLY` ships empty on purpose, and a
-        # rule with no exception here would red every fresh adopter on their first run. The exception
-        # is enumerated in the project layer, never inferred.
-        declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
-        ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
-        ratchets += build_lang_mode_findings(ctx.git, root, lookback=lookback)
+        # The populations are computed above, once, for this mode and `--offenders` alike.
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
-        over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]
-        dead = [s for s in out if s["gateable"] and not s["live"] and s["signal"] not in declared]
         for s in over:
             print(f"\ndrift-report: {s['signal']} = {s['value']} (pin {s['pin']}) — this list is shrink-only",
                   file=sys.stderr)

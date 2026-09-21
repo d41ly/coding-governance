@@ -660,6 +660,22 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     over = run([sys.executable, REPORT_REL, "--check"], r)
     check("--check reds while a gateable signal is over its (default 0) pin", over.returncode == 1,
           f"rc={over.returncode}")
+    # --- 3a — --offenders, the SIGNATURE the merge bar grades this leg with (TOOL-dDerivedDocket-23
+    # S3). The bar's red attribution compares two trees' offender SETS, so the mode is graded on what
+    # a set needs: its exit is --check's, every line is one TAB-separated key naming a signal --check
+    # reds on, and no key carries a line locator, which an unrelated edit above a finding would move.
+    offs = run([sys.executable, REPORT_REL, "--offenders"], r)
+    olines = offs.stdout.splitlines()
+    red_now = {k for k, v in report(r).items()
+               if v["gateable"] and v["live"] and v["value"] > v["pin"]}
+    check("--offenders exits as --check does over the same tree", offs.returncode == over.returncode,
+          f"--offenders {offs.returncode}, --check {over.returncode}")
+    check("--offenders prints one TAB-separated key per finding, each naming a signal --check reds on",
+          bool(olines) and all(ln.count("\t") == 1 and ln.split("\t")[0] in red_now | {"ratchet"}
+                               for ln in olines),
+          f"lines={olines[:5]} red={sorted(red_now)}")
+    check("--offenders carries no line locator in any key",
+          not any(re.search(r":\d+(:|$)", ln) or '"line"' in ln for ln in olines), f"{olines[:5]}")
     sig.write_text(sig.read_text(encoding="utf-8").replace(
         "PINS = {}", "PINS = {'non_terminal_specs_cited_by_product_source': 1}"),
         encoding="utf-8", newline="\n")

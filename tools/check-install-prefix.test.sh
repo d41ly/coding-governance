@@ -456,6 +456,32 @@ if [ "$BAN_ARMS" -ge 5 ]; then
 else
   bad "LIVENESS only $BAN_ARMS ban arm(s) reached the gate — the rest fell through or SKIPPED, so this section reports on arms that did not run"
 fi
+# --- --offenders: the SIGNATURE the merge bar grades this leg with (TOOL-dDerivedDocket-23 S3) ---
+# ONE KEY PER HIT AND NOTHING ELSE, because the bar's red attribution compares two trees' key SETS.
+# Graded on the three ways a set goes wrong: a key carrying its line number (it moves when an
+# unrelated line lands above it), two identical hits collapsing into one, and prose leaking into the
+# set. Its exit is `--check`'s, and the carried-prefix arm's failing files are keyed per literal.
+O="$TMP/offenders"; mkfix "$O" 'Run `bash memory-tree/check-memory-hygiene.sh` or `bash memory-tree/check-memory-hygiene.sh`.'  # gov:root-fixture — two identical root spellings on one line, for the ordinal arm
+_orm=$(git -C "$O" ls-files -- '*README.md' | head -1)
+_osp='memory-tree/check-memory-hygiene.sh'  # gov:root-fixture — the spelling the two keys above must carry
+_owant=$(printf '%s\troot\t%s\n%s\troot\t%s#2' "$_orm" "$_osp" "$_orm" "$_osp")
+oout=$(cd "$O" && bash "$GATE_REL" --offenders 2>/dev/null); orc=$?
+(cd "$O" && bash "$GATE_REL" >/dev/null 2>&1); ocrc=$?
+[ "$oout" = "$_owant" ] && good "--offenders prints exactly the two keys, the repeat carrying its ordinal" \
+  || { bad "--offenders printed a different key set"; printf '%s\n' "$oout" | sed 's/^/      /' | head -6; }
+{ [ "$orc" = "$ocrc" ] && [ "$orc" = 1 ]; } && good "--offenders exits as --check does (1)" \
+  || bad "--offenders exited $orc where --check exited $ocrc"
+{ printf 'an unrelated first line\n\n'; cat "$O/$_orm"; } > "$O/readme.tmp" && mv "$O/readme.tmp" "$O/$_orm"
+printf 'unrelated\n' > "$O/$(dirname -- "$_orm")/other.md"; git -C "$O" add -A >/dev/null 2>&1
+oout2=$(cd "$O" && bash "$GATE_REL" --offenders 2>/dev/null)
+[ "$oout2" = "$_owant" ] && good "--offenders keys do not move when an unrelated line and file land above them" \
+  || { bad "--offenders keys moved under an unrelated edit"; printf '%s\n' "$oout2" | sed 's/^/      /' | head -6; }
+rout=$(cd "$R" && bash "$GATE_REL" --offenders 2>/dev/null); rrc=$?
+_rn=$(printf '%s\n' "$rout" | awk -F'\t' 'NF == 3 && $2 == "carried" { n++ } END { print n + 0 }')
+{ [ "$rrc" = 1 ] && [ "$_rn" = 2 ] && [ "$(printf '%s\n' "$rout" | grep -c '#2$')" = 1 ]; } \
+  && good "--offenders keys a ROSE file once per carried literal, the repeat carrying its ordinal" \
+  || { bad "--offenders did not key the ROSE file per literal (rc $rrc, $_rn carried key(s))"; printf '%s\n' "$rout" | sed 's/^/      /' | head -6; }
+
 # --- THE LIVENESS ASSERTION ON THE SUITE ITSELF ------------------------------------------------
 # A self-test whose every fixture takes one branch is `fixture-passes-by-finding-nothing` applied to
 # the grader, and it needs the same treatment as any other probe that cannot move. This is the arm

@@ -3478,11 +3478,50 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     return exit_code
 
 
-def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
-    """The two modes, over ONE measurement. The mode branch is here and nowhere deeper."""
+def render_offender_keys(measured: dict) -> list[str]:
+    """`--offenders`: one `<path>\t<rule>\t<identifier>` line per offender of every predicate.
+
+    THE SIGNATURE THE MERGE BAR GRADES THIS LEG WITH (TOOL-dDerivedDocket-23 S3). Its red attribution
+    asks whether every offender at the branch is an offender at the base, and a SET answers that
+    where a count cannot: a fixed offender plus a new one nets to zero. So each line is a KEY and
+    nothing else — no line number, because one added function above an inherited offender would move
+    it; no count, summary or header line; and NO CUT, because a 40-row cut hides a new offender behind
+    a fixed one, which is the unsound direction. A key repeating inside one file carries `#<k>`, its
+    occurrence ordinal there in line order, so two identical offenders stay two.
+
+    Every predicate the verdict reads: the unwaived P1 and P2 offenders the scalar pins count, every
+    graded cell's convention violations, and each refusal in `problems` under the rule `problem`,
+    whitespace-collapsed, because a red caused by a refusal alone must not read as an empty set.
+    """
+    rows = []
+    for kind in KINDS:
+        for o in measured["unwaived"][kind]:
+            rows.append((o.path, o.line, kind, o.text))
+    for cell, row in measured["cells"].items():
+        if not row["graded"] or row["convention"] == "dark":
+            continue
+        for path, line, name, _verdict, _message in row["verdicts"]:
+            rows.append((path, line, f"{cell}.conv", name))
+    for problem in measured["problems"]:
+        rows.append(("-", 0, "problem", " ".join(str(problem).split())))
+    rows.sort(key=lambda r: (str(r[0]), str(r[2]), int(r[1] or 0), str(r[3])))
+    seen: dict[str, int] = {}
+    out = []
+    for path, _line, rule, ident in rows:
+        key = "\t".join(" ".join(str(f).split()) for f in (path, rule, ident))
+        seen[key] = seen.get(key, 0) + 1
+        out.append(key if seen[key] == 1 else f"{key}#{seen[key]}")
+    return out
+
+
+def run(root: Path, list_mode: bool = False, measure_mode: bool = False,
+        offenders_mode: bool = False) -> int:
+    """The modes, over ONE measurement. The mode branch is here and nowhere deeper."""
     kit = Path(__file__).resolve().parent
     conf_path = root / CONF_NAME
     if not conf_path.exists():
+        if offenders_mode:
+            return 0                  # the default mode's exit, and an inert kit has no offender
         print(f"lexicon: NOT ADOPTED — no {CONF_NAME} at the repo root; the kit is opt-in and inert without it")
         return 0
 
@@ -3495,11 +3534,16 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
         # traceback out of the corpus walk. TOOL-aSurfacedLexicon-11.
         clusters = canon.build_clusters(conf.get("CANON") or {})
     except (ConfError, ValueError) as e:
+        if offenders_mode:
+            sys.stdout.buffer.write(f"-\tproblem\t{' '.join(str(e).split())}\n".encode("utf-8"))
+            return 1
         print(f"lexicon: {e}")
         return 1
 
-    # ABOVE THE COUNTS, on every run, red and green alike (S4).
-    print_canon_posture(conf)
+    # ABOVE THE COUNTS, on every run, red and green alike (S4). Not in `--offenders`, whose stdout is
+    # keys and nothing else.
+    if not offenders_mode:
+        print_canon_posture(conf)
 
     measured = measure_pass(root, kit, conf, declared, clusters)
     problems = measured["problems"]
@@ -3527,6 +3571,21 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
             for p in problems:
                 print(f"#   {p}")
         return 1 if problems else 0
+
+    if offenders_mode:
+        # THE EXIT IS THE DEFAULT MODE'S, computed by the one verdict function with its prose
+        # swallowed, so the two modes cannot disagree about whether this tree is red. Swallowed by
+        # `sys.stdout = None`, under which `print` writes nothing, and NOT by an `io` import: the
+        # self-containment walk counts this module's imports, and a new one would move that count
+        # in the DEFAULT mode's own output, which this mode promised not to touch.
+        _saved, sys.stdout = sys.stdout, None
+        try:
+            code = check_pass(measured, False)
+        finally:
+            sys.stdout = _saved
+        keys = render_offender_keys(measured)
+        sys.stdout.buffer.write("".join(k + "\n" for k in keys).encode("utf-8"))
+        return code
 
     return check_pass(measured, list_mode)
 
@@ -4073,14 +4132,16 @@ def resolve_self_path() -> str:
 def main(argv: list[str]) -> int:
     me = resolve_self_path()
     mode = argv[1] if len(argv) > 1 else "--check"
-    if mode not in ("--check", "--list", "--measure", "--suggest", "--expand"):
+    if mode not in ("--check", "--list", "--measure", "--suggest", "--expand", "--offenders"):
         # THE USAGE BLOCK LIVES HERE AND NOWHERE ELSE. It moved out of the module docstring, whose
         # copy spelled the install prefix six times and reached every adopter unchanged.
         sys.stderr.write(
             f"usage: python {me} "
-            "[--check|--list|--measure|--suggest <name>|--expand]\n"
+            "[--check|--list|--offenders|--measure|--suggest <name>|--expand]\n"
             "  --check            assert; non-zero on an unwaived offender\n"
             "  --list             print every offender, waived or not (authoring aid)\n"
+            "  --offenders        one <path> TAB <rule> TAB <identifier> key per offender, no\n"
+            "                     locator, count or cut; exits as --check does\n"
             "  --measure          print the pins THIS conf produces; decide nothing\n"
             "  --suggest <name> --as <ext>.<surface>\n"
             "                     one line for ONE identifier, no corpus pass\n"
@@ -4128,7 +4189,8 @@ def main(argv: list[str]) -> int:
     # exit-code claim belongs. Round-2 review F8.
     if mode == "--expand":
         return run_expand(root)
-    return run(root, list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))
+    return run(root, list_mode=(mode == "--list"), measure_mode=(mode == "--measure"),
+               offenders_mode=(mode == "--offenders"))
 
 
 if __name__ == "__main__":

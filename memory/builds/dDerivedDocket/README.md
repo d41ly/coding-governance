@@ -150,7 +150,7 @@ ids TOOL-dDerivedDocket-60
 | [TOOL-dDerivedDocket-20 — unattended carriers and the two-key refusal](spec/2026-09-14-spec-TOOL-dDerivedDocket-20.md) | 20 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-21 — remote-relative bases and complete leg guards](spec/2026-09-14-spec-TOOL-dDerivedDocket-21.md) | 21 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-22 — LANDED derived from the tip](spec/2026-09-14-spec-TOOL-dDerivedDocket-22.md) | 22 | 2 | CLOSED | rev-7 | 2026-09-21 |
-| [TOOL-dDerivedDocket-23 — red attribution, report-only](spec/2026-09-14-spec-TOOL-dDerivedDocket-23.md) | 23 | 2 | SPECCED | rev-5 | 2026-09-20 |
+| [TOOL-dDerivedDocket-23 — red attribution, report-only](spec/2026-09-14-spec-TOOL-dDerivedDocket-23.md) | 23 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-29 — review durability across a dead fan](spec/2026-09-14-spec-TOOL-dDerivedDocket-29.md) | 23 | 2 | SPECCED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-25 — runner scratch hygiene and a tree-moved exit](spec/2026-09-14-spec-TOOL-dDerivedDocket-25.md) | 24 | 2 | SPECCED | rev-5 | 2026-09-21 |
 | [TOOL-dDerivedDocket-30 — checker defects from the stop census](spec/2026-09-14-spec-TOOL-dDerivedDocket-30.md) | 24 | 2 | SPECCED | rev-6 | 2026-09-21 |
@@ -168,7 +168,7 @@ ids TOOL-dDerivedDocket-60
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 35 | 1 | SPECCED | rev-6 | 2026-09-21 |
 <!-- /gen:build-units -->
 
-Records: 54 bound to this build, across 4 record folder(s).
+Records: 55 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

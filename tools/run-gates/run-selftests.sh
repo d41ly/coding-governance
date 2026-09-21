@@ -849,10 +849,21 @@ if [ -n "$ATTRIBUTE" ]; then
   ATTR_WT_PATH="$GCD/selftest-baseline-wt.$$"
   ATTR_WT=""
 
+  # THE NORMALISER AND THE WORKTREE RUNNER ARE SHARED with the merge bar's red attribution, so they
+  # live in one sourced kit file beside this runner (TOOL-dDerivedDocket-23 S7). Sourced HERE and
+  # nowhere earlier: every other mode of this runner runs without it, which is what keeps a copy of
+  # this file alone still byte-identical in its default mode. Derived from this script's own
+  # directory, never spelled — a kit file names nothing outside itself by literal.
+  if [ ! -f "$HERE/lib-attribute.sh" ] || ! . "$HERE/lib-attribute.sh"; then
+    echo "run-selftests: --attribute needs lib-attribute.sh beside this runner ($HERE), and it is" >&2
+    echo "run-selftests: missing or unreadable, so there is no normaliser to compare with. Refusing." >&2
+    exit 2
+  fi
+
   ATTR_TMP=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
   attr_cleanup() {
     if [ -n "$ATTR_WT" ]; then
-      git worktree remove --force "$ATTR_WT" >/dev/null 2>&1 \
+      remove_scratch_worktree "$ATTR_WT" \
         || echo "run-selftests: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2
     fi
     rm -rf "$ATTR_TMP" 2>/dev/null
@@ -864,7 +875,7 @@ if [ -n "$ATTRIBUTE" ]; then
 
   attr_worktree() {
     [ -z "$ATTR_WT" ] || return 0
-    if ! git worktree add --detach "$ATTR_WT_PATH" "$RSHA" >/dev/null 2>&1; then
+    if ! add_scratch_worktree "$ATTR_WT_PATH" "$RSHA"; then
       echo "run-selftests: could not create the R worktree at $ATTR_WT_PATH, so nothing can be" >&2
       echo "run-selftests: measured at $R8 and every failure here would read NEW. Refusing instead." >&2
       return 1
@@ -889,29 +900,10 @@ if [ -n "$ATTRIBUTE" ]; then
   # ---- is a FRESH checkout, so on this platform it lands CRLF on every path `.gitattributes` does
   # ---- not pin. A suite that reads such a file can differ between R and L for the line endings
   # ---- alone, and that difference reads NEW. It is the safe direction and it is still noise.
-  attr_rx() { printf '%s' "$1" | sed 's,[][(){}.*+?^$\\|],\\&,g'; }
-  attr_spellings() { # one absolute root -> forward-slash, backslash and MSYS /c/ spellings
-    local r=$1 d rest
-    printf '%s\n' "$r"
-    printf '%s\n' "$(printf '%s' "$r" | tr '/' '\\')"
-    case "$r" in
-      [A-Za-z]:/*)
-        d=$(printf '%s' "$r" | cut -c1 | tr 'A-Z' 'a-z'); rest=${r#?:}
-        printf '/%s%s\n' "$d" "$rest" ;;
-    esac
-  }
+  # ---- THE PROGRAM ITSELF IS `write_normaliser` in lib-attribute.sh, and this is its one call here.
   NORM_SED="$ATTR_TMP/normalise.sed"
-  : > "$NORM_SED"
-  for _aroot in "$ROOT" "$ATTR_WT_PATH"; do
-    attr_spellings "$_aroot" | while IFS= read -r _asp; do
-      [ -n "$_asp" ] || continue
-      printf 's|%s||g\n' "$(attr_rx "$_asp")" >> "$NORM_SED"
-    done
-  done
-  printf '%s\n' 's|tmp\.[A-Za-z0-9]+||g' >> "$NORM_SED"
-  printf '%s\n' 's|\b[0-9]+(\.[0-9]+)?m?s\b||g' >> "$NORM_SED"
-  printf '%s\n' 's|\r$||' >> "$NORM_SED"
-  printf '%s\n' 's|[[:space:]]+$||' >> "$NORM_SED"
+  write_normaliser "$NORM_SED" "$ROOT" "$ATTR_WT_PATH" \
+    || { echo "run-selftests: cannot write the normaliser into $ATTR_TMP" >&2; exit 2; }
 
   # THE WHOLE CAPTURED OUTPUT, not the four-line tail the no-flag mode prints: a tail is a display
   # convenience and a set built from one would call the fifth failure FIXED.

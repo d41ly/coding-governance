@@ -114,9 +114,10 @@ fi
 # Classify on the 3rd field (remote_ref) — `git push origin feat:refs/heads/main` updates the default
 # branch from a differently-named local ref. Read ALL lines here; run the gate ONCE after the loop.
 main_local=""
+main_remote=""
 _pushed=""
 while read -r _localref localsha remoteref _remotesha; do
-  [ "$remoteref" = "refs/heads/$def" ] && main_local=$localsha
+  [ "$remoteref" = "refs/heads/$def" ] && { main_local=$localsha; main_remote=$_remotesha; }
   _pushed="$_pushed$localsha $remoteref
 "
 done
@@ -368,6 +369,15 @@ if [ -n "$force" ]; then
 else
   echo "pre-push: scoped gate on $def push (${main_local:0:8}) — full green ${rec_sha:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG"
   export GATE_BASE="$rec_sha"
+fi
+# A RED AT THE PUSH BOUNDARY IS ATTRIBUTED against the sha the REMOTE holds for the default branch —
+# the one git fed this hook on stdin, which is the landing base and never this clone's own tip, so a
+# red is re-run against the tree the push would land on rather than against the tree that has it.
+# REPORT-ONLY: the runner changes no exit code for it, and this hook's exit is the runner's, as
+# before. An all-zero sha is a branch the remote does not have yet, so there is no base to name. A
+# runner older than the attribution ignores the variable. TOOL-dDerivedDocket-23.
+if [ -n "$main_remote" ] && [ -n "${main_remote//0/}" ]; then
+  export GATE_ATTRIBUTE="$main_remote"
 fi
 gate=${GOV_GATE_CMD:-bash $GOV_KITROOT/run-gates/run-gates.sh}
 $gate </dev/null
