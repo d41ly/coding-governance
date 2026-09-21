@@ -2407,6 +2407,21 @@ def cmd_asks(root: str, conf: dict, args: dict) -> int:
 #: file" is observable at all. A declaration nothing exercises is a rule with no population.
 BL_FAMILIES = ("EXMP", "OTHR", "THRD", "FRTH")
 
+#: The ONE `<discipline>:<FAMILY>` pair a scratch fixture of this kit may declare for the EXAMPLE
+#: ids this corpus writes (TOOL-dDerivedDocket-51 S1). One carrier and not two, because the pair is
+#: written into a scratch conf in two fields — `DISCIPLINES` takes the half before the colon,
+#: `FAMILIES` takes the row whole — and two spellings of one value is how those two fields stop
+#: agreeing: a fixture would declare a family under a discipline it never added, and the generator's
+#: streams refusal would hide the roster one it was built to reach.
+#:
+#: DELIBERATELY ABSENT from this repository's own `.memory-tree.conf`. The example family is outside
+#: the declared allowlist ON PURPOSE, which is what lets a tracked spec write `EXMP-aFoo-3` in prose
+#: and anchor, define and cite nothing; declaring it here would make every example id in every
+#: tracked record a real one and the id-corpus checks would start counting them. The declaration is
+#: local to a scratch tree by construction, because the sibling kit's `grammar_for(root)` re-reads
+#: the conf AT THE ROOT it is handed.
+EXAMPLE_ROW = "example:EXMP"
+
 
 def _render_backlog_conf(mode: str, cutoff: str, excerpt: str) -> str:
     rows = ["MEMORY_ROOT=memory", 'DISCIPLINES="tool"',
@@ -2486,12 +2501,25 @@ def _read_asks_run(root: str, conf: dict, argv: list) -> tuple:
     return rc, out.getvalue(), err.getvalue()
 
 
-def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status="INPROGRESS"):
+def _render_fixture_conf(example_family: bool = False) -> str:
+    """The scratch `.memory-tree.conf` every fixture below is graded against.
+
+    OFF is byte-identical to what this helper wrote before the keyword existed, and that is the
+    whole blast-radius answer: the widening is a property of the arms that ASK for it, and every
+    arm that does not is the control saying nothing else moved. Both halves of `EXAMPLE_ROW` move
+    together or neither does — see that constant for why one carrier.
+    """
+    disc = EXAMPLE_ROW.partition(":")[0]
+    return ('MEMORY_ROOT=memory\nDISCIPLINES="arch%s"\nFAMILIES="arch:ARCH%s"\n'
+            % ((" " + disc, " " + EXAMPLE_ROW) if example_family else ("", "")))
+
+
+def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status="INPROGRESS",
+             example_family=False):
     run("git", "init", "-q", ".", cwd=tmp)
     run("git", "config", "user.email", "t@t.test", cwd=tmp)
     run("git", "config", "user.name", "t", cwd=tmp)
-    write_text(os.path.join(tmp, ".memory-tree.conf"),
-               'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\n')
+    write_text(os.path.join(tmp, ".memory-tree.conf"), _render_fixture_conf(example_family))
     # The stale-header waiver registry, EMPTY, because `collect()` refuses without it
     # (TOOL-dRetiredFork-3, AC4) and every fixture below goes through `collect()`. Written here
     # rather than in fifteen fixtures: this helper is the one place they all pass through, and a
@@ -3699,6 +3727,125 @@ def cmd_selftest() -> int:
             "| a / pipe, a deep/path/to/a/file.py… |",
             lambda: [x for x in plan(bt, _build_backlog_fixture(bt, CORE, excerpt="40"))[0]
                      ["memory/backlog/EXMP.md"].split("\n") if "EXMP-aFoo-4" in x][0])
+
+    # ---------------------------------------------------- the example family (TOOL-dDerivedDocket-51)
+    # DECLARED BY A SCRATCH CONF AND BY NOTHING TRACKED. The sibling kit's id grammar is an ALLOWLIST
+    # of the conf's declared families, so before a fixture declared the example family an `EXMP` id
+    # anchored nothing anywhere — and a criterion asserting that a generated body anchors nothing was
+    # answered by the allowlist rather than by the generator, green before the generator wrote a line.
+    # These arms make that assertion reachable INSIDE a fixture while this repository's own corpus
+    # keeps the property the example family exists for: an example id in a tracked spec still anchors
+    # nothing, defines nothing and is cited by nobody.
+    with tempfile.TemporaryDirectory() as exbase:
+        _ex_disc, _, _ex_fam = EXAMPLE_ROW.partition(":")
+        _ex_id = f"{_ex_fam}-aFoo-3"
+        #: The staged break of the spec's §4, kept as a value so the control arm below and the RED
+        #: that was observed by hand are the SAME line and cannot drift apart.
+        _ex_break = f"- {_ex_id} — the ask"
+
+        def _example_build(root: str) -> dict:
+            """The build README `TOOL-dDerivedDocket-15`'s scaffold will write from example asks.
+
+            Written by hand here because that unit is order 15 and lands after this one. The shape
+            is the scaffold's and the point is the front matter: `streams` carries the pair's
+            discipline half and `roster` its family half, which is exactly the two declarations this
+            unit adds — so a fixture holding one of them trades one refusal for the other.
+            """
+            d = os.path.join(root, "memory", "builds", "aFoo")
+            os.makedirs(os.path.join(d, "spec"), exist_ok=True)
+            write_text(os.path.join(d, "spec", "2026-08-01-spec-aFoo-1.md"),
+                       f"# {_ex_id} — an ask\n\n**Status:** OPEN · rev-1 · 2026-08-01 · node a · "
+                       f"Tier-2 · base 0123abcd\n")
+            write_text(os.path.join(d, "README.md"), "\n".join(
+                ["---", "slug: aFoo", "node: a", "opened: 2026-08-01",
+                 f"streams: {_ex_disc}", f"roster: {_ex_fam}", f"ids: {_ex_id}", "---",
+                 "", "# aFoo", "", MARK_OPEN, MARK_CLOSE]) + "\n")
+            run("git", "add", "-A", cwd=root)
+            return load_conf(root)
+
+        # AC1 — ONE carrier, read back OFF DISK. The assertion never respells the pair: it splits the
+        # constant and looks for each half in the field the fixture wrote it into, so a second
+        # spelling at the writer reds HERE rather than surfacing three arms later as a refusal whose
+        # cause is two files away.
+        ex1 = os.path.join(exbase, "declared"); os.makedirs(ex1)
+        _fixture(ex1, spec_status="OPEN", example_family=True)
+        ex2 = os.path.join(exbase, "undeclared"); os.makedirs(ex2)
+        _fixture(ex2, spec_status="OPEN")
+        # BOTH CONFS ARE READ OFF DISK, from a real `_fixture` call, and never from the renderer
+        # they share. Reading the renderer graded the wrong carrier: a staged break that defaulted
+        # the FIXTURE HELPER's keyword ON left these two arms green, because the renderer's own
+        # default had not moved. The arm has to see what the helper actually wrote.
+        _ex_on = read_text(os.path.join(ex1, ".memory-tree.conf"))
+        _ex_off = read_text(os.path.join(ex2, ".memory-tree.conf"))
+        _ex_written: dict = {"DISCIPLINES": "", "FAMILIES": ""}
+        parse_conf(_ex_on, _ex_written)
+        arm("the opted-in fixture declares BOTH halves of EXAMPLE_ROW, read back off disk", "True",
+            lambda: str(_ex_disc in _ex_written["DISCIPLINES"].split()
+                        and EXAMPLE_ROW in _ex_written["FAMILIES"].split()))
+
+        # AC2 — the default is the control. OFF must be the bytes this helper wrote before the
+        # keyword existed, or every arm that never asked for the example family is silently graded
+        # by a different alternation than the one its assertions were written against.
+        arm("the keyword omitted writes the conf this helper wrote before it existed",
+            'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\n',
+            lambda: _ex_off)
+        arm("the example family reaches no fixture that did not ask for it", "False",
+            lambda: str(_ex_fam in _ex_off or _ex_disc in _ex_off))
+
+        # AC3 — what the declaration BUYS, as the three readers it unblocks. The order is the
+        # generator's own: streams is validated before roster, so the streams refusal HIDES the
+        # roster one until both halves are declared, and an arm asserting only that SOME refusal
+        # fired would pass over a fixture carrying half the pair with its real subject unreachable.
+        _ex_conf = _example_build(ex1)
+        _ex_rc_w, _ex_out_w = _read_mode(cmd_write, ex1, _ex_conf)
+        _ex_rc_c, _ex_out_c = _read_mode(cmd_check, ex1, _ex_conf)
+        arm("a build README filed under the example family renders and re-reads clean",
+            "write=0 check=0", lambda: f"write={_ex_rc_w} check={_ex_rc_c}")
+        _ex_rc2, _ex_out2 = _read_mode(cmd_check, ex2, _example_build(ex2))
+        arm("with the keyword omitted the STREAMS refusal fires, naming the value and the enum",
+            f"streams value '{_ex_disc}' is outside the DISCIPLINES enum", lambda: _ex_out2)
+        ex3 = os.path.join(exbase, "halfway"); os.makedirs(ex3)
+        _fixture(ex3, spec_status="OPEN")
+        write_text(os.path.join(ex3, ".memory-tree.conf"),
+                   f'MEMORY_ROOT=memory\nDISCIPLINES="arch {_ex_disc}"\nFAMILIES="arch:ARCH"\n')
+        _ex_rc3, _ex_out3 = _read_mode(cmd_check, ex3, _example_build(ex3))
+        arm("with the DISCIPLINE half alone the ROSTER refusal fires, naming the value and the set",
+            f"roster value '{_ex_fam}' is outside the FAMILIES set", lambda: _ex_out3)
+
+        # AC4 — the anchor property, through THIS kit's own route and bound to the fixture's root.
+        # `resolve_anchor` raises rather than returning None for an absent or outdated sibling kit,
+        # because None is also what a line that anchors nothing returns and every caller would then
+        # read an uninstalled kit as a clean corpus.
+        import corpus_ids as _cids  # noqa: PLC0415 — deferred exactly as the anchor arms above are
+        try:
+            _ex_anchor = _cids.resolve_anchor(ex1)
+            _ex_anchor_off = _cids.resolve_anchor(ex2)
+        except _cids.Problem as _ex_why:
+            _ex_anchor = _ex_anchor_off = None
+            print(f"arm SKIP  the example-family anchor arms did not run — {_ex_why}")
+            fails.append("the example-family anchor arms were SKIPPED, so no anchor property held")
+        if _ex_anchor is not None:
+            _ex_lines = read_text(
+                os.path.join(ex1, "memory", "builds", "aFoo", "README.md")).split("\n")
+            # THE POPULATION IS ASSERTED NON-EMPTY IN THE SAME VALUE. An empty line list yields the
+            # same `[]` a clean README does, which is the vacuous-selector shape this whole unit is
+            # about — so the arm also says the README CARRIES the id (its `ids:` line does), and the
+            # finding is then "the id is in this file and no line of it anchors" rather than "the
+            # scan found nothing", which is what an unrendered or unread file would also report.
+            arm("no line of the rendered example build README ANCHORS an id, and it HAS the id",
+                "anchored=[] carries-the-id=True",
+                lambda: f"anchored={[x for x in _ex_lines if _ex_anchor(x)]} "
+                        f"carries-the-id={any(_ex_id in x for x in _ex_lines)}")
+            # THE CONTROL, and the reason the arm above is evidence rather than a tautology: the
+            # same predicate over the same root DOES answer the break line. Observed RED once by
+            # hand with that line in the README body, per the spec's §4.
+            arm("the fixture's own grammar DOES anchor the break line — the control", _ex_id,
+                lambda: str(_ex_anchor(_ex_break)))
+            # AC7 in fixture form: a tree that never declared the family anchors nothing in the very
+            # line the declaring tree answers. That is the two-tree property this unit rests on, and
+            # it is asserted over a SECOND root rather than assumed from the tracked conf.
+            arm("a tree that did not declare the family anchors nothing in that same line", "None",
+                lambda: str(_ex_anchor_off(_ex_break)))
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it

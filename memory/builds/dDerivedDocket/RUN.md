@@ -174,3 +174,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T06:53:02Z dispatch · item b6b3f808 TOOL-dDerivedDocket-50 · reason tools/memory-tree/corpus_ids.py tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/.memory-tree.conf.example memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-50.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md memory/map/features/memory-tree-hygiene.md memory/map/generated memory/builds/dDerivedDocket/build memory/LIVE.md memory/ledger memory/builds/dDerivedDocket/README.md
 
 2026-09-21T06:53:07Z brief · item TOOL-dDerivedDocket-50 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T07:18:16Z dispatch · item a07ad49d TOOL-dDerivedDocket-51 · reason tools/memory-tree/gen_build_index.py memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-51.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/map/features memory/map/generated
+
+2026-09-21T07:18:20Z brief · item TOOL-dDerivedDocket-51 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md

@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-51 — an admitted example family for the kit's scratch fixtures
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 14
+**Status:** CLOSED · rev-2 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dDerivedDocket-51-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-51-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 |
 
 <!-- /gen:spec-records -->
@@ -25,13 +26,15 @@ that proves it.
   one `<discipline>:<FAMILY>` pair the kit's scratch fixtures may declare, and the matching
   discipline token. One carrier, because the pair is written into a conf in two fields and two
   spellings of one value is how they stop agreeing. Observed by AC1.
-- **S2** — the opt-in on the fixture helper. `_fixture` (`tools/memory-tree/gen_build_index.py:1911`)
+- **S2** — the opt-in on the fixture helper. `_fixture` (`tools/memory-tree/gen_build_index.py:2517`)
   takes a keyword argument, default OFF, that adds S1's pair to the `DISCIPLINES` and `FAMILIES`
-  values it writes into the scratch `.memory-tree.conf` (`:1915-1916`). Default OFF is the whole
+  values it writes into the scratch `.memory-tree.conf` (`:2522`), through the private renderer
+  `_render_fixture_conf` (`:2504`), so OFF and ON are ONE construction and the OFF bytes cannot
+  drift from the ON ones. Default OFF is the whole
   blast-radius answer: every arm that does not ask for it keeps the conf it has today, so no
   existing roster, alternation or enum verdict moves. Observed by AC2 and AC6.
 - **S3** — what the declaration buys, in one fixture, stated as the three readers it unblocks: the
-  roster refusal (`:788`) and the streams refusal (`:785`), which reject a scaffolded README whose
+  roster refusal (`:851`) and the streams refusal (`:848`), which reject a scaffolded README whose
   values are outside the declared sets, and the conf-bound id alternation, which is rebuilt per root
   by the accessor `TOOL-dDerivedDocket-50` routes to. Observed by AC3 and AC4.
 - **S4** — the staged RED, written into the criterion rather than only performed once. Unit 15's
@@ -57,7 +60,7 @@ that proves it.
   declared there would make every example id in every tracked spec an anchored record, which is the
   opposite of what the example family is for, and check 13 and check 14 would then count them.
 - **The other kits' scratch confs.** `corpus_ids.py`'s own `_scratch` writes its own conf
-  (`tools/memory-tree/corpus_ids.py:768`) and keeps it: its arms assert an exact defined-id set, and
+  (`tools/memory-tree/corpus_ids.py:950`) and keeps it: its arms assert an exact defined-id set, and
   widening the alternation under them would change what they measure while their assertions stayed
   still. The same holds for the memory-hygiene self-test's scratch trees.
 - **A general rule for every negative criterion.** The standing shape — a criterion asserting a
@@ -116,7 +119,7 @@ _fixture(tmp, example_family=True) writes, instead of today's two lines:
 
 Both fields move together, from S1's one constant. The discipline half is not decoration: a build
 README carries `streams` as well as `roster`, and the generator refuses a value outside either
-declared set — `streams` at `tools/memory-tree/gen_build_index.py:785` and `roster` at `:788`. A
+declared set — `streams` at `tools/memory-tree/gen_build_index.py:848` and `roster` at `:851`. A
 scaffold run over example-family asks writes both, so a fixture that declared the family and not the
 discipline would trade one refusal for the other and the criterion would still never reach its
 subject.
@@ -150,7 +153,7 @@ property S5 asserts and the reason the break has to live in the fixture.
 declaration and is order 15, and `TOOL-dDerivedDocket-50`, which this unit consumes, is order 13, so
 14 is the only step between them and every order from 1 to 38 is taken. Sharing is legal where it
 matters: check 12 reds a `consumes-from` target whose order is AFTER the unit naming it, never one
-below it (`tools/memory-tree/check-memory-hygiene.sh:1795`), and unit 50 at 13 is below. Disjointness
+below it (`tools/memory-tree/check-memory-hygiene.sh:1924`), and unit 50 at 13 is below. Disjointness
 is NOT claimed. Unit 14 is WONTDO and carries no pass, but `TOOL-dDerivedDocket-53` was promoted to
 this same step in the same pass and writes `tools/memory-tree/gen_build_index.py` and its selftest
 too, so M6 in `memory/guides/BUILD-METHOD.md` answers no on clause 1 — one file, two write sets —
@@ -162,8 +165,8 @@ either way; both need only to precede unit 15.
 
 1. The constant and the keyword, default OFF, with the existing arms untouched and the whole
    selftest green — that run is the control.
-2. The fixture opted in for the scaffold arms, the break of the block above staged, the arm observed
-   RED, the break unstaged.
+2. The fixture opted in for the arms that write the scaffold's README shape by hand, the break of
+   the block above staged, the arm observed RED, the break unstaged.
 3. Unit 15's AC13 `new arm:` clause and the rev entry, in this unit's commit.
 4. `memory/map/generated/` re-derived and staged with the `.py`, and confirmed byte-identical.
 
@@ -173,6 +176,7 @@ either way; both need only to precede unit 15.
 |---|---|---|
 | `EXAMPLE_ROW` | module constant in `gen_build_index.py` | no cell grades it: `.lexicon.conf` declares `js.function`, `py.function`, `py.type` and `sh.function`, and no constant row |
 | the `_fixture` keyword | keyword argument | no cell grades a parameter name |
+| `_render_fixture_conf` | private function in `gen_build_index.py` | `py.function`, led by the declared verb `render`, as its sibling `_render_backlog_conf` already is |
 
 ### Files touched (estimate)
 
@@ -232,17 +236,26 @@ either way; both need only to precede unit 15.
   is graded by a different alternation than the one it was written against.
   cost: one kit selftest run, whose declared ceiling on the `build-index selftest` row of
   `tools/gate-legs.json` is inside what a pass can hold.
-- **AC3** — When the scaffold arm writes a build README from example-family asks into an opted-in
-  fixture and `gen_build_index.py --check` runs over it, it exits 0; with the keyword omitted it
-  refuses naming the streams value and the `DISCIPLINES` enum, and over a fixture carrying the
-  discipline half alone it refuses naming the roster value and the `FAMILIES` set. The order is the
-  generator's own: `tools/memory-tree/gen_build_index.py:785` validates streams before `:788`
-  validates roster, so the streams refusal hides the roster one until both halves are declared.
+- **AC3** — When an arm writes a build README from example-family asks into an opted-in fixture —
+  the shape `TOOL-dDerivedDocket-15`'s scaffold will write, written by hand because that unit is
+  order 15 and lands after this one — and `--write` then renders that fixture and `--check` re-reads
+  it, both exit 0; with the keyword omitted the same run refuses naming the streams value and the
+  `DISCIPLINES` enum, and over a fixture carrying the discipline half alone it refuses naming the
+  roster value and the `FAMILIES` set. The order is the generator's own:
+  `tools/memory-tree/gen_build_index.py:848` validates streams before `:851` validates roster, so
+  the streams refusal hides the roster one until both halves are declared.
   Red when: the arm asserts only that SOME refusal fired, so a fixture carrying one half of the pair
-  passes it while the anchor assertion the arm exists to reach is still unreachable.
-- **AC4** — When the anchor predicate is resolved against the opted-in fixture's root and run over
-  every line the scaffold wrote, it returns no anchor; and when the body line of §4's staged break
-  is added to that README, the same run answers `EXMP-aFoo-3` and the arm reds naming it.
+  passes it while the anchor assertion the arm exists to reach is still unreachable; or `--check`
+  alone is asserted over a README no `--write` has rendered, which exits 1 on staleness and answers
+  a question about the region markers rather than about the declaration.
+- **AC4** — When the anchor predicate is resolved against the opted-in fixture's root through
+  `corpus_ids.resolve_anchor(root)` and run over every line of the README that fixture's `--write`
+  rendered, it returns no anchor; and when the body line of §4's staged break is added to that
+  README, the same run answers `EXMP-aFoo-3` and the arm reds naming it.
+  new arm: staged RED first. The negative arm may not pass until it has been SEEN RED with that body
+  line in the fixture's README, and a CONTROL arm asserting that the same predicate DOES answer that
+  same line stays armed afterwards, so the negative arm never reverts to a green that is not
+  evidence.
   Red when: the arm passes over a fixture whose ids could never have entered the population, which
   is the state this unit exists to leave — a green run that is not evidence.
   permission: the FLAG form `python3 tools/memory-tree/gen_build_index.py --selftest` is the direct
@@ -316,13 +329,32 @@ New arm: `tools/memory-tree/gen_build_index.py --selftest` · a fixture opted in
   `permission:` line. Both now assert the measured state — the artifacts do not move — and the
   criterion is a read rather than a run.
 
+- rev-2 · 2026-09-21 · S2 · §4 Rollout · §4 Inventory · AC3 · AC4 · §10 · written by this unit's own
+  build pass, which found five things the spec could not have known. FOUR ARE THE SPEC'S, one is a
+  measurement. (1) AC3 and AC4 named "the scaffold arm" as the writer of the fixture README, and that
+  arm is `TOOL-dDerivedDocket-15`'s at order 15, so it does not exist at this commit; the arms write
+  the same README shape by hand and the criteria say so. (2) AC3 asserted `--check` exits 0 over the
+  opted-in fixture, which is false for a README whose generated region has never been rendered —
+  `--check` exits 1 on staleness, a verdict about the markers and not about the declaration — so the
+  criterion now names `--write` then `--check` and asserts both. (3) Every `gen_build_index.py` line
+  citation had moved since the regrounding: `:1911` and `:1915-1916` are `:2517` and `:2522`, and the
+  streams and roster refusals are `:848` and `:851`, not `:785` and `:788`; `corpus_ids.py:768` is
+  `:950` and the hygiene order rule is `check-memory-hygiene.sh:1924`, not `:1795`. (4) AC4 gains the
+  `new arm:` clause this build's shape uses, because S4 required that clause of unit 15's AC13 and
+  this unit's own negative arm is the same could-not-fail shape. (5) The conf rendering is hoisted
+  into the private `_render_fixture_conf` so OFF and ON come from one construction — the divergence
+  that earned itself: written first as a renderer the AC2 arms READ, those arms stayed green under a
+  staged break that defaulted `_fixture`'s keyword ON, because the renderer's own default had not
+  moved. The arms now read both confs off disk from real `_fixture` calls, and that break reds them.
+  Nothing of §1, §3, §5, the forks or the other criteria moved.
+
 ## 10. Reuse audit
 
 No new mechanism fits here and none is built: the declaration route already exists and this unit
 uses it. `python tools/codebase-map/reuse_lookup.py "anchor_at grammar_for in-kit route"` ranks
 `grammar_for` a SEAM at fan-in 4 in `tools/memory-recall/extract.py`, and that accessor already
 re-resolves a conf at an explicit root, which is the entire mechanism this unit needs; the fixture
-helper `_fixture` at `tools/memory-tree/gen_build_index.py:1911` is the one place every arm's
+helper `_fixture` at `tools/memory-tree/gen_build_index.py:2517` is the one place every arm's
 scratch conf is written, so the opt-in has a single home. The pattern itself is this build's own
 prior art rather than an invention: `TOOL-dDerivedDocket-35` declares one extra example family in
 its scratch clone's conf so that its fixtures parse while this repository's id checks ignore them,

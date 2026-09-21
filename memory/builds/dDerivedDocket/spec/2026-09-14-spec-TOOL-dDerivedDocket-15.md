@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-15 — ask envelope, READY predicate and new-build scaffold
 
-**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
+**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
@@ -425,12 +425,16 @@ and refuses a stale or unstaged artifact (dUnstagedSymbol, `1a774fcd`).
   `corpus_ids.resolve_anchor(root)`, bound to the scratch tree the scaffold just wrote. An absent or
   outdated memory-recall kit raises that route's named `Problem`, which this arm catches and prints
   as a skip naming the arm and the kit — never a pass, and never a silent `None`.
-  ONE G3 round-2 finding against this criterion is still a unit of this build rather than an edit
-  here, and it keeps its text until that unit lands. H3 measured that `anchor_at` admits only the
-  conf's declared families, so an `EXMP` id anchors nothing before the scaffold writes a line and
-  this criterion's `Red when:` cannot fire; `TOOL-dDerivedDocket-51` picks the family the fixture
-  files under and pins the staged RED. Until it lands, a green run of this arm is not evidence that
-  a generated body anchors nothing.
+  new arm: staged RED first, over a generated body line the FIXTURE'S OWN grammar anchors. `anchor_at`
+  admits only the conf's declared families, so before `TOOL-dDerivedDocket-51` an `EXMP` id anchored
+  nothing anywhere, this criterion's `Red when:` could not fire, and a green run of the arm was not
+  evidence — the G3 round-2 H3 finding, measured by running the function rather than reading it.
+  That unit landed the declaration the fixture needs: `_fixture(tmp, example_family=True)` adds its
+  `EXAMPLE_ROW` pair to the scratch conf's `DISCIPLINES` and `FAMILIES`, so this arm's fixture asks
+  for the family it files its asks under and the id it writes is anchorable inside the fixture and
+  still inert in this repository. The arm is not allowed to pass until it has been SEEN RED with that
+  unit's §4 break — the `- EXMP-aFoo-3 — the ask` bullet — in the fixture's README, which was
+  observed RED in that unit's own pass, naming that id.
 
 ## 7. Gates
 
@@ -552,6 +556,14 @@ New arm: `python3 tools/memory-tree/gen_build_index.py --selftest` · one fixtur
   for ever. It now names `corpus_ids.resolve_anchor(root)`, the in-kit route unit 50 added, and the
   paragraph that parked H2 leaves with the key it parked. H3 and its `TOOL-dDerivedDocket-51`
   hand-off are untouched; no other criterion, scope item or gate line moves.
+
+- rev-7 · 2026-09-21 · AC13 · written by `TOOL-dDerivedDocket-51`'s own pass, in that unit's commit,
+  because that unit is what the parked H3 text was waiting for. AC13's closing paragraph said a green
+  run of the arm was not evidence and would keep saying so until the fixture could declare the example
+  family; it now does, so the paragraph becomes the `new arm:` clause this build writes everywhere
+  else — the arm may not pass until it has been SEEN RED over the generated body line that unit's §4
+  pins, which was observed RED there. Nothing else moves: the criterion's subject, its `Red when:` and
+  its `fixture:` line are untouched, and no other criterion, scope item, edge or gate line changes.
 
 ## 10. Reuse audit
 
