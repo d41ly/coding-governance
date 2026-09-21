@@ -25,13 +25,14 @@ next module reaching for a key the kit does not own.
 - **S1** — `resolve_anchor(root, E=None)` in `tools/memory-tree/corpus_ids.py`, the kit's ONE
   public route from a repository root to the anchor predicate. It returns a callable taking one line
   and answering the record id that line DEFINES, or `None`. It is composed from the two accessors
-  that already exist rather than from a second grammar: `grammar(root)`
-  (`tools/memory-tree/corpus_ids.py:259`), which binds the sibling kit's alternation to THAT root,
-  and `_anchor` (`:460`), which is the call into `extract.anchor_at`. `E` is a bundle the caller has
-  already resolved; omitted, the route resolves its own. It exists for the one in-kit caller that
-  holds one: `walk()` is re-pointed through the route at `:387` and passes the bundle it resolved at
-  the top of the same function (`:363`), so `_anchor` ends this unit with exactly ONE call site and
-  the walk pays no second conf resolve (§4). Observed by AC1 and AC2.
+  that already exist rather than from a second grammar: `grammar(root)`, which binds the sibling
+  kit's alternation to THAT root, and `_anchor`, which is the call into `anchor_at`. `E` is a bundle
+  the caller has already resolved; omitted, the route resolves its own. It exists for the one in-kit
+  caller that holds one: `walk()` binds the route once, on the line after the `grammar(root)` it
+  already makes, and hands it that bundle, so `_anchor` ends this unit with exactly ONE call site
+  and the walk pays no second conf resolve (§4). Line numbers are deliberately not cited: every one
+  this spec carried moved under the units that landed between its base and its build, and the two
+  accessors are findable by name. Observed by AC1 and AC2.
 - **S2** — the refusal, named, reachable, and TRUE for the caller that receives it. The
   installed-check hoists out of `grammar()` into
   `_check_grammar_installed(why, cure_absent, cure_outdated)`, one helper holding the module's raise
@@ -138,6 +139,12 @@ next module reaching for a key the kit does not own.
   caller of this unit is behind. This bullet is about the CAUSE sentence those two verbs inherit and
   never about the outdated-kit refusal's CURE, which S2 re-routes at both of `grammar()`'s refusal
   points.
+  Rev-2 WIDENS that inheritance by one message rather than narrowing it, and says so rather than
+  leaving the older sentence standing: `grammar()`'s outdated-point refusal now states the pin cause
+  where it previously stated no cause at all, so `--report` and `--measure` inherit the same
+  already-false sentence at a second point. The alternative was byte-identity there and NO
+  per-caller cause there, which is the defect this whole unit exists to close. The older verbs'
+  inherited cause is still another unit's question, and the CURE at that point is unchanged.
 - **The kit version.** This unit moves no version marker. `TOOL-dDerivedDocket-36` moves
   `KIT_MEMORY_TREE_VERSION` once for this build, and these bytes ride that move, the same way unit
   13's check-wiring bytes ride unit 9's.
@@ -217,8 +224,8 @@ resolve the conf at that root TWICE per walk, which is the cost this design exis
 passes the bundle it already holds instead. `root` is then unused, because the bundle IS a binding
 to a root: it records `families` and `memory_root` (`tools/memory-recall/extract.py:504-505`) and
 never the root it came from, so a mismatch is not checkable here at any price this unit is willing
-to pay, and the only caller that passes one resolved it at the top of that same function, twenty-four
-lines above the call site this unit re-points.
+to pay, and the only caller that passes one resolved it at the top of that same function, on the line
+before it binds the route.
 
 ### The parity arm
 
@@ -643,6 +650,13 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · the real kit direct
   (4) S8's mapping matches `ConfError` by NAME: the `sys.modules` form was built first and raised
   `KeyError` when the sibling kit refused during its own import, which is one of the very refusals
   being mapped. No criterion was dropped and no scope moved.
+- rev-2 · 2026-09-21 · S1 · §3 · §4 · the building pass's own checklist fold, same rev and same
+  commit range. `amendment-leaves-its-other-half-standing`: AC3's amendment made `grammar()`'s
+  outdated-point message state the pin cause, which the inherited-cause non-goal said this unit
+  would leave alone — the non-goal now records the widening and why the alternative was worse.
+  S1 and §4 also carried five line citations and one distance-in-lines claim that the units landed
+  since this spec's base had all moved; they are replaced by the names, per the charter's own rule
+  about a value stated beside the source that owns it.
 
 ## 10. Reuse audit
 
