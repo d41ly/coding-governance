@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-16 TOOL-cMendedVintage-1 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 TOOL-cMendedVintage-2 DEPL-cMendedVintage-9 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 DEPL-cMendedVintage-10 DEPL-cMendedVintage-15 TOOL-cMendedVintage-10 DEPL-cMendedVintage-17 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-21 DEPL-cMendedVintage-14 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25 TOOL-cMendedVintage-11 DEPL-cMendedVintage-26 DEPL-cMendedVintage-27 TOOL-cMendedVintage-12 DEPL-cMendedVintage-28
+unpushed-at-landing: 0
 parked-surfaced: yes 17
 keepalive-reaped: yes
-witness: 17ff55b88b4842facee5c29eb03219f34806d6df
-phase: LANDING
+witness: eae7d58cf952e9a9bffad8e809efe31a7e1e34b4
+phase: LANDED
 branch-sha: 859daa67e728ae273d5278536fb462c04077f16f
 branch-ref: refs/heads/branch/govkit-update-rollbacks-0502c4
 mode: prompt
