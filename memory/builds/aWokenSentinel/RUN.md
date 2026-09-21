@@ -9,6 +9,9 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28
+unpushed-at-landing: 0
 parked-surfaced: yes, 1 surfaced
 keepalive-reaped: yes
 lease-utc: 2026-09-21T04:22:27Z
@@ -16,8 +19,8 @@ pid-image: claude.exe
 host: compeeto-agent
 pid: 24068
 session: 2db85696-ae7f-456a-9d88-fffc3fe3482a
-witness: 91cbcf3ca34e14af7302df3b3f6e78dc095170b7
-phase: LANDING
+witness: 9850fd4e464f7fe1a6db679247efc7458e8b1922
+phase: LANDED
 branch-sha: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 branch-ref: refs/heads/branch/unattended-kit-keepalive-a29498
 mode: prompt
