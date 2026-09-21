@@ -1379,6 +1379,14 @@ def cmd_check(argv: list[str]) -> int:
     configured `merge.rows.driver` (`tools/check-wiring.sh` owns that, and it is the half a commit
     cannot break), whether a straggler branch's own OLD driver conflicts (it does not run here at
     all), and whether anyone later resolves a refused conflict by discarding rows.
+
+    AND THE LIMIT OF THE PROBE ITSELF, which is the more useful admission. The view it classifies is
+    rendered by the same module whose predicate classifies it, so a break on ONE side reds here — a
+    renderer that stopped emitting the header makes both sides read as shards and nothing is
+    refused — while a break that moves the renderer and the predicate TOGETHER passes. Holding those
+    two spellings to each other is the view unit's own parity arm and is deliberately not duplicated
+    here; what this probe buys is that the refusal is WIRED and reachable over this install's real
+    header, which no fixture copy of that header could tell you.
     """
     if argv:
         print(f"merge-rows: --check takes no arguments, got {' '.join(argv)!r}", file=sys.stderr)

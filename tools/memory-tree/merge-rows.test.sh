@@ -1713,6 +1713,12 @@ mkfixrepo() {  # $1 = a directory -> a git repo on `main` with this kit wired as
   git -C "$d" config user.name t
   git -C "$d" config core.autocrlf false
   git -C "$d" config merge.rows.driver "bash $mt/merge-rows.sh %O %A %B %P"
+  # HERMETIC AGAINST THE NODE, and not a tidy-up. `core.hooksPath` may be set in a node's GLOBAL
+  # config, and every group below COMMITS: a fixture that inherited it would run this repo's
+  # pre-commit hook inside a scratch tree, which is minutes of unrelated work and a verdict about
+  # another repository. Pointing it at a directory that does not exist is how git is told "no
+  # hooks" without depending on whether one was configured.
+  git -C "$d" config core.hooksPath "$d/.no-hooks"
 }
 
 # --- 50. WHERE THE REFUSAL REACHES: MERGE, SQUASH AND REBASE (AC2, design §18r.1) -----------------
