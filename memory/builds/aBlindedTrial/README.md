@@ -3,8 +3,8 @@ slug: aBlindedTrial
 node: a
 opened: 2026-09-20
 streams: tooling+playbook
-roster: TOOL
-ids: TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 TOOL-aBlindedTrial-6 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8
+roster: TOOL+KICK
+ids: KICK-aBlindedTrial-1 TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 TOOL-aBlindedTrial-6 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8
 authorized-by: prompt
 ---
 
@@ -18,7 +18,8 @@ building, that specs are abstract, and that nothing checks whether code follows 
 three are answerable from the tree; the third needs a controlled comparison, which has never been
 run. Part two, after the trial: the audit measured no quality at 12× the cost, so it becomes opt-in —
 owed only when a build README declares `spec-audit: <date>` — in the driver, the harness, the hook
-and the method text.
+and the method text. Part three: the two follow-ups the closing review parked and the owner's
+kickoff question — a project-wide default, a §7-versus-guards arm, and the engine asking at READY.
 
 ## Expected improvements
 - A measured answer to "spec-first or build-first", per token spent, on tasks shaped like this
@@ -58,11 +59,8 @@ and the method text.
   untested. Options: run the same three arms on one vague brief (≈60 agents), or accept the present
   verdict as bounded to explicit briefs. Not the run's to decide: it is the trial's scope, ratified
   at three tasks on 2026-09-20.
-- **A project-wide "audits owed by default" declaration.** The per-build `spec-audit:` key is the
-  owner's instrument; an adopter wanting today's rule on every build has no one-line way to say so.
-  Options: a conf key that pins the fact for every build, or nothing. Backlog `TOOL-aBlindedTrial-7`.
-- **A spec's §7 leg line versus the legs its files trip.** Round 1's F7: unit 4 omitted a leg whose
-  guard its own edit tripped. Both inputs are machine-readable. Backlog `TOOL-aBlindedTrial-8`.
+- **Both parked follow-ups became units 7 and 8 on 2026-09-21**, with the kickoff question as
+  `KICK-aBlindedTrial-1`; nothing of part three is parked.
 
 <!-- roster:units -->
 
@@ -73,18 +71,24 @@ and the method text.
 | 3 | `TOOL-aBlindedTrial-3` | 2 | the build harness runs its AUDIT stage only when `specAudit` is declared, and says NOT-OWED otherwise |
 | 4 | `TOOL-aBlindedTrial-4` | 2 | the fan-out hook denies a direct spec-audit Workflow call the build README did not declare |
 | 5 | `TOOL-aBlindedTrial-5` | 2 | M4 becomes the procedure for a declared audit; the tier rule and one decision row follow |
+| 6 | `TOOL-aBlindedTrial-7` | 2 | a project-wide `SPEC_AUDIT_DEFAULT` in the conf, read at BASE by the driver and from the worktree by the hook |
+| 7 | `TOOL-aBlindedTrial-8` | 2 | `check-spec-tokens.py` joins a spec's files-touched against gate guards deeper than one segment and reds an unnamed leg |
+| 8 | `KICK-aBlindedTrial-1` | 2 | the kickoff engine asks the owner the spec-audit question at READY and writes the key on a yes |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-09-20 · streams tooling+playbook
-ids TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 TOOL-aBlindedTrial-6 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8
+**Build status:** INPROGRESS · 8 unit(s) · node a · opened 2026-09-20 · streams tooling+playbook
+ids KICK-aBlindedTrial-1 TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 TOOL-aBlindedTrial-6 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
+| [KICK-aBlindedTrial-1 — the kickoff engine puts the spec-audit question to the owner at READY](spec/2026-09-21-spec-KICK-aBlindedTrial-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-09-21 |
 | [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aBlindedTrial-2 — the driver reads `spec-audit:` from the build README and owes the audit only when it is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-2.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-20 |
+| [TOOL-aBlindedTrial-7 — a project-wide spec-audit default, declared once in the conf and read at BASE](spec/2026-09-21-spec-TOOL-aBlindedTrial-7.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-09-21 |
+| [TOOL-aBlindedTrial-8 — a spec's §7 leg line must name every leg its files-touched trips](spec/2026-09-21-spec-TOOL-aBlindedTrial-8.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-09-21 |
 | [TOOL-aBlindedTrial-3 — the build harness runs its AUDIT stage only when `specAudit` is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-3.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aBlindedTrial-4 — the fan-out hook denies a direct spec-audit call the build README did not declare](spec/2026-09-20-spec-TOOL-aBlindedTrial-4.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-20 |
 | [TOOL-aBlindedTrial-5 — M4 becomes the procedure for a declared audit, and the ruling is recorded](spec/2026-09-20-spec-TOOL-aBlindedTrial-5.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-20 |
@@ -92,16 +96,16 @@ ids TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlinded
 
 Records: 5 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: KICK-aBlindedTrial-1 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8.
 
-Ids no `spec-audit` record has ever named: TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5.
+Ids no `spec-audit` record has ever named: TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 KICK-aBlindedTrial-1 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-aBlindedTrial-1`, `TOOL-aBlindedTrial-2` | yes |
+| 1 | `KICK-aBlindedTrial-1`, `TOOL-aBlindedTrial-1`, `TOOL-aBlindedTrial-2`, `TOOL-aBlindedTrial-7`, `TOOL-aBlindedTrial-8` | yes |
 | 2 | `TOOL-aBlindedTrial-3`, `TOOL-aBlindedTrial-4`, `TOOL-aBlindedTrial-5` | yes |
 <!-- /gen:build-order -->
 
