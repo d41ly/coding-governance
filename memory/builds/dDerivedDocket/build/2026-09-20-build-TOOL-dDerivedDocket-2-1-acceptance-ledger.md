@@ -15,7 +15,7 @@ none, and its own verdict is AC9's, owed to the VERIFYING run.
   reachable from it. Observed RED against break A, the push spelled as the local default branch the
   attended path pushes: arm 12b failed, the hook refusing a push whose ref is not this tree's HEAD.
 - AC2 — `--land` — fixture arm 13: the run branch merged local `main` carrying
-  `TOOL-zOther-4: another build unit again`; `--land` exited 1, named that sha and the build
+  a subject naming a unit of the fixture's other build; `--land` exited 1, named that sha and the build
   `zOther`, and the remote sha was byte-identical before and after. Observed RED against break B,
   the carry set computed as T minus local `main` (`comm -23` for `comm -12`): the refusal then named
   the merge commit instead of the foreign one and the arm failed.

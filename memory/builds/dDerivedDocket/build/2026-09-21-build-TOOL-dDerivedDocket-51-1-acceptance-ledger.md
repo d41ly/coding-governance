@@ -60,7 +60,8 @@ red), and emptying the line list the anchor scan walks (the liveness half of the
 - AC7 — `FAMILIES` — read out of this repository's `.memory-tree.conf` at this commit and at its
   parent with `parse_conf`, the value is the same four families and carries no example family. The
   anchor predicate resolved against this repository's own root answers `None` for the example-family
-  bullet, heading and table-row spellings of `EXMP-aFoo-3`, while the control `TOOL-aFoo-3` bullet is
+  bullet, heading and table-row spellings of an `EXMP`-family id, while the control bullet spelling the
+  same slug and sequence in the `TOOL` family is
   answered — so the id corpus this repository grades did not grow.
 - AC8 — `memory/map/generated/symbols.json` — `python tools/codebase-map/gen_map.py --write` re-derived
   all three artifacts and `git status --porcelain` reports none of them modified, so they are
