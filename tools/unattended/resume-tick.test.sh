@@ -39,6 +39,17 @@ print_bad()  { echo "FAIL $1"; fail=$((fail+1)); }
 check_same() { if [ "$2" = "$3" ]; then print_ok "$1"; else print_bad "$1: expected [$3], got [$2]"; fi; }
 check_hit()  { if grep -qF -- "$2" <<<"$1"; then print_ok "$3"; else print_bad "$3: missing [$2] in [$(printf '%s' "$1" | head -c 300)]"; fi; }
 check_miss() { if grep -qF -- "$2" <<<"$1"; then print_bad "$3: unexpected [$2]"; else print_ok "$3"; fi; }
+# build_tick_without_conf_block <tick> <out> -> the BLOCK copy: `CONF=` through `. "$CONF"` removed,
+# both read_bound_key calls kept. The range is anchored on the block's first and last lines, so the
+# shellcheck comment between them goes with it and the calls below the end anchor stay; the three
+# assertions are the copy's SHAPE, run on every copy, so an anchor that moves reds here naming
+# which count moved instead of silently changing what both arms stage (TOOL-aWokenSentinel-24).
+build_tick_without_conf_block() {
+  sed '/^CONF=/,/^\. "\$CONF"$/d' "$1" > "$2"
+  check_same "BLOCK copy keeps both read_bound_key calls" "$(grep -c '^read_bound_key ' "$2")" "2"
+  check_same "BLOCK copy holds no CONF= line" "$(grep -c '^CONF=' "$2")" "0"
+  check_same "BLOCK copy holds no source line" "$(grep -c '^\. "\$CONF"$' "$2")" "0"
+}
 
 # THE KIT COPY: the tick, the library it sources and the driver it calls, nothing else.
 KIT="$TMP/kit"; mkdir -p "$KIT"
@@ -380,7 +391,7 @@ check_miss "$ERR" "declares no RESUME_TURNS" "U13 a declared turns count prints 
 # AC2 — neither key declared: the two NOTEs print once each and every `Declare one in ` names a
 # file that exists; the two-space signature `Declare one in  to change it` is absent. Then the
 # BLOCK copy over a fresh fixture: the count of NOTEs naming a file is zero, which is the read
-# unit 18 keeps; how the copy gets there at this order is the three lines after it.
+# unit 18 keeps; the copy is the helper's, and the helper asserts its shape (unit 24).
 build_fixture 999999999
 run_tick_over "$TICK"
 check_same "U13 the NOTE for RESUME_ATTEMPTS prints once" "$(printf '%s\n' "$ERR" | grep -c 'declares no RESUME_ATTEMPTS')" "1"
@@ -388,8 +399,7 @@ check_same "U13 the NOTE for RESUME_TURNS prints once" "$(printf '%s\n' "$ERR" |
 check_same "U13 two NOTEs name a file that exists" "$(measure_note_files "$ERR")" "2"
 check_same "U13 no NOTE carries the empty-path signature" "$(printf '%s\n' "$ERR" | grep -c 'Declare one in  to change it')" "0"
 BLOCK="$TMP/kit-block"; mkdir -p "$BLOCK"; cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$BLOCK/"
-sed '/^CONF=/,/^\. "\$CONF"$/d' "$TICK" > "$BLOCK/resume-tick.sh"
-check_same "U13 the BLOCK copy keeps both read_bound_key calls" "$(grep -c '^read_bound_key ' "$BLOCK/resume-tick.sh")" "2"
+build_tick_without_conf_block "$TICK" "$BLOCK/resume-tick.sh"
 build_fixture 999999999
 run_tick_over "$BLOCK/resume-tick.sh"
 check_same "U13 the BLOCK copy names a file in no NOTE" "$(measure_note_files "$ERR")" "0"
@@ -447,11 +457,10 @@ check_same "U18 a bound read with CONF naming no file exits 2" "$LIB_RC" "2"
 check_hit "$LIB_ERR" "read_bound_key was called with CONF unset or naming no file" "U18 the missing-file refusal is the same sentence"
 check_miss "$LIB_ERR" "Declare one in /nonexistent/path" "U18 no NOTE names a file that does not exist"
 # AC2 — the BLOCK copy (the conf block gone, both calls kept) over a fresh fixture: exit 2, the
-# sentence, no NOTE, no launcher. Staged inline here as U13 stages its own, until unit 24's helper
-# makes the two one artifact.
+# sentence, no NOTE, no launcher. The copy is the same helper's as U13's, so the two arms stage one
+# break by name (unit 24).
 BLOCK18="$TMP/kit-block18"; mkdir -p "$BLOCK18"; cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$BLOCK18/"
-sed '/^CONF=/,/^\. "\$CONF"$/d' "$TICK" > "$BLOCK18/resume-tick.sh"
-check_same "U18 the BLOCK copy keeps both read_bound_key calls" "$(grep -c '^read_bound_key ' "$BLOCK18/resume-tick.sh")" "2"
+build_tick_without_conf_block "$TICK" "$BLOCK18/resume-tick.sh"
 build_fixture 999999999
 run_tick_over "$BLOCK18/resume-tick.sh"
 check_same "U18 a tick that named no conf exits 2" "$RC" "2"
@@ -462,9 +471,11 @@ n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Derived from
 # the ten arm blocks each run ALONE from the sourced prologue on node a, 2026-09-20/21 (the pass
 # that wrote this file may not run the suite): AC8 6, AC7 11, AC2 10, AC1 15, AC3 7, AC4 4, U12 6,
-# AC12 8, U13 27, U18 10 — 104 executed, pinned at ~10% headroom. The main loop's first green at
-# VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=94
+# AC12 8, U13 29, U18 12 — 108 executed, pinned at ~10% headroom; unit 24's helper adds three
+# shape assertions per BLOCK copy and each arm gave up its own calls-count line, net +2 per arm.
+# The main loop's first green at VERIFYING confirms the executed count against this floor. Lower
+# it in a reviewed diff or not at all.
+FLOOR_ASSERTIONS=97
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
