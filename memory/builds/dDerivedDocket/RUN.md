@@ -226,3 +226,5 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T15:36:39Z brief · item TOOL-dDerivedDocket-20 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-21T16:00:51Z dispatch · item a10e6d40 TOOL-dDerivedDocket-20 · reason tools/unattended/cross-component.test.sh
+
+2026-09-21T16:08:01Z dispatch · item 5da2c557 TOOL-dDerivedDocket-20 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/install-prefix-waivers.txt memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-20.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features memory/map/generated

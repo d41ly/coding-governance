@@ -134,7 +134,7 @@ RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 # a declared blank is the empty set, and `resolve_shared_records` in the kit library tells the two
 # apart for both readers. Initialised here and admitted by the allow-list below, or this leg would read
 # both keys at their defaults whatever the project declares.
-SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""
+SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""
 # TOOL-dDerivedDocket-18 - the two optional declared commands the ask-mandate second opinions read.
 # BOTH default to blank and blank means NOT ADOPTED, which is the register both keys already sit in
 # elsewhere in this kit. They are initialised HERE and admitted by the allow-list below, or the leg
@@ -227,24 +227,6 @@ M="$MEMORY_ROOT"
 # so the two readers cannot disagree about a conf that leaves the key out.
 SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
 
-# ---- 38: NO PATH IS BOTH A SHARED RECORD AND A GENERATED INDEX. TOOL-dDerivedDocket-20 S1. The two
-# ---- keys are condition 3's two halves and `--dispatch` answers each by its own rule, so one path
-# ---- under both is answered by whichever rule the verb reaches first and the other declaration means
-# ---- nothing. The driver refuses such a conf at load; this is the same library predicate on the bar,
-# ---- which is what reaches a conf no run has read yet. CONTAINMENT in either direction, never string
-# ---- equality, because `memory` beside a `memory/LIVE.md` index is the same contradiction.
-# ----
-# ---- WHAT THIS DOES NOT CHECK: that either key names the RIGHT paths. It compares the kit's own two
-# ---- keys with each other and nothing else - no memory-tree state, no index on disk - which is what
-# ---- lets it land unchanged in any adopter.
-_c38=$(scan_shared_index_overlaps "$SHARED_RECORDS" "$GENERATED_INDEXES")
-if [ -n "$_c38" ]; then
-  # Formatted OUTSIDE the message: the arm meta-gate reads a branch's signature up to the message's
-  # first closing quote, so a substitution quoting its own argument inside it would end the signature
-  # on shell source no assertion can emit.
-  _c38_pairs=$(printf '%s\n' "$_c38" | awk -F'\t' '{ printf "%sSHARED_RECORDS %s overlaps the index %s", (NR > 1 ? "; " : ""), $1, $2 }')
-  fail 38 "a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch answers it by whichever of condition 3's two rules it reaches first and the other declaration means nothing: $_c38_pairs"
-fi
 
 # ====================================================================== bulk git, warmed once
 # ---- THE SAME QUESTION, ABOUT THE SAME COMMIT, 127 TIMES. Measured on this tree with every git
@@ -942,6 +924,29 @@ phase_of() { fact_of "$1" phase; }
 # would notice this going quiet.
 REPORT=${GOV_UNATTENDED_REPORT:-0}
 report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0; }
+
+# ---- 38: NO PATH IS BOTH A SHARED RECORD AND A GENERATED INDEX. TOOL-dDerivedDocket-20 S1. The two
+# ---- keys are condition 3's two halves and `--dispatch` answers each by its own rule, so one path
+# ---- under both is answered by whichever rule the verb reaches first and the other declaration means
+# ---- nothing. The driver refuses such a conf at load; this is the same library predicate on the bar,
+# ---- which is what reaches a conf no run has read yet. CONTAINMENT in either direction, never string
+# ---- equality, because `memory` beside a `memory/LIVE.md` index is the same contradiction.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that either key names the RIGHT paths. It compares the kit's own two
+# ---- keys with each other and nothing else - no memory-tree state, no index on disk - which is what
+# ---- lets it land unchanged in any adopter.
+_c38=$(scan_shared_index_overlaps "$SHARED_RECORDS" "$GENERATED_INDEXES")
+# A PROBE THAT CANNOT MOVE SAYS SO: over an empty index set this comparison passes by finding
+# nothing, so the report channel names both populations it was handed.
+read -ra _c38_s <<<"$SHARED_RECORDS"; read -ra _c38_g <<<"$GENERATED_INDEXES"
+report "check 38 compared ${#_c38_s[@]} shared record(s) against ${#_c38_g[@]} index half(s)"
+if [ -n "$_c38" ]; then
+  # Formatted OUTSIDE the message: the arm meta-gate reads a branch's signature up to the message's
+  # first closing quote, so a substitution quoting its own argument inside it would end the signature
+  # on shell source no assertion can emit.
+  _c38_pairs=$(printf '%s\n' "$_c38" | awk -F'\t' '{ printf "%sSHARED_RECORDS %s overlaps the index %s", (NR > 1 ? "; " : ""), $1, $2 }')
+  fail 38 "a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch answers it by whichever of condition 3's two rules it reaches first and the other declaration means nothing: $_c38_pairs"
+fi
 
 # ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
 # ---- only a mechanism to suppress. The `GIT()` pin makes THIS leg's reads honest; nothing binds the

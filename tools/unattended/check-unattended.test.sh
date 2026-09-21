@@ -1097,6 +1097,9 @@ hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 10 byte-compared 3 of its 3 pairs: p
 C38_MSG="a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch answers it by whichever of condition 3's two rules it reaches first and the other declaration means nothing"
 reset_tree
 miss "$(run)" "$C38_MSG"
+# ...and the control is LIVE: the report channel names the two populations it compared, the kit
+# default's two records against an index set the fixture conf leaves empty.
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 38 compared 2 shared record(s) against 0 index half(s)"
 printf '\nSHARED_RECORDS="memory"\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
 out=$(run)
 hit "$out" "a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch answers it by whichever of condition 3's two rules it reaches first and the other declaration means nothing"
@@ -4489,8 +4492,9 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- RAISED 582 -> 592 by exactly the arm, TOOL-dDerivedDocket-20: the ask-guide pair's three
 # ---- check-10 arms, its pair-count report arm and check 38's six, ten unconditional `hit`/`miss`
 # ---- calls, all beside check 10 inside region one, so FLOOR_SHARD_1 carries the same +10 and
-# ---- FLOOR_SHARD_2 is untouched. COUNTED off the diff; this pass runs no suite.
-FLOOR_ASSERTIONS=592
+# ---- FLOOR_SHARD_2 is untouched. COUNTED off the diff; this pass runs no suite. Its checklist fold
+# ---- added check 38's report-channel liveness arm, one more in the same place: 592 -> 593.
+FLOOR_ASSERTIONS=593
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -4515,7 +4519,7 @@ FLOOR_ASSERTIONS=592
 # check asserting it, because the driver suite's own three constants cannot satisfy the same
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
-FLOOR_SHARD_1=101
+FLOOR_SHARD_1=102
 FLOOR_SHARD_2=491
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;

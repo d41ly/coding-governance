@@ -125,8 +125,11 @@ is_repo_root() {
 # than to blank. The driver used to resolve that default inline while the leg read the key as blank, so
 # a conf leaving it undeclared would have been refused by one reader and passed by the other — two
 # readers of one config, one of them re-deriving it (memory/gotchas/two-readers-of-one-config-one-re-derived.md).
+# The sentinel itself, spelled ONCE. Both callers initialise the key to it before the conf is read,
+# and a second spelling in either would be a sentinel this comparison never recognises.
+SHARED_RECORDS_UNDECLARED="__kit-default__"
 resolve_shared_records() { # declared value · memory root -> the effective set
-  if [ "$1" = "__kit-default__" ]; then
+  if [ "$1" = "$SHARED_RECORDS_UNDECLARED" ]; then
     printf '%s' "$2/DECISIONS.md $2/backlog"
   else
     printf '%s' "$1"
