@@ -83,6 +83,50 @@ necessarily carries unresolved braces, so grading one reds on a target that is n
 until render time. That second exclusion was widened from the first the moment a second template
 existed.
 
+## The resume tick — registration is the owner's
+
+`resume-tick.sh` is the one keepalive actor that does not share the session's process: an
+OS-scheduled task that walks every worktree, asks the driver `--liveness` about every run whose
+lease names a session, and on a verdict the protocol's section 5 names as acting kills the recorded
+pid's tree, appends an attempt line under `<git-dir>/unattended/resume.<slug>.log` and launches
+`claude -p --resume <session>` detached. It reads the lease from the INDEX, never the working copy
+— an untracked run-state file is announced and skipped, and so is a tracked one whose working copy
+differs from its index blob, because a file write must buy neither a skip-permissions session nor
+a kill aimed by hand — stands off a lease another node took, kills only a pid whose recorded image
+still holds it and whose holder started before the lease, and treats the pid it launched as in
+flight until the tree moves or the stale bound passes, after which it is killed as hung and the
+run is launched again. The kit never registers it — `schtasks /create` and
+`crontab` are the owner's acts, once per node, under the login whose CLI is authenticated — and
+until it is registered the tick is inert; the adopter's `--check` says which on an `INFO` line and
+reds on neither answer.
+
+Windows, from cmd or PowerShell (Git-Bash needs every `/` option doubled, `//create`, `//sc`, …):
+
+```
+schtasks /create /sc minute /mo 10 /tn gov-resume-tick /tr "\"<bash.exe>\" -lc \"<kit-dir>/resume-tick.sh --repo <root>\""
+```
+
+POSIX, one crontab line (the trailing comment names it the way the Windows task is named, and
+`--check` finds either spelling in the listing):
+
+```
+*/10 * * * * <kit-dir>/resume-tick.sh --repo <root>  # gov-resume-tick
+```
+
+`<kit-dir>/resume-tick.sh --repo <root> --dry-run` prints the decision a tick would take for every
+bound run and does nothing else — no kill, no launch, no attempt line, no login probe. The two knobs
+it reads, `RESUME_ATTEMPTS` and `RESUME_TURNS`, are the root `.unattended.conf`'s and are announced
+on stderr when absent.
+
+## The sidecar
+
+`<git-dir>/unattended/` is where the keepalive actors write, and it is the WORKTREE's git dir,
+never the common dir, because a run lives in one worktree. Three kinds, one file per run each:
+`stop.<slug>.log`, one JSON line per stop the stop-guard decided (unit 3); `stall.<slug>.log`, one
+line per API-error end the stall-recorder saw (unit 4); `resume.<slug>.log`, one attempt line per
+tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). Append-only and
+never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
+
 ## Running the kit's own checks
 
 ```

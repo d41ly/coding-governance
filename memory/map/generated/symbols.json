@@ -1168,9 +1168,19 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkSession",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "checkSpecAuditDeclared",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkStop",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "checkThrottled",
@@ -2028,6 +2038,11 @@
       "file": "tools/workflows/drift-audit-state.js"
     },
     {
+      "id": "deriveSidecarPath",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "derive_archive_name",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -2546,6 +2561,11 @@
       "id": "extractCommitTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "extractErrorClass",
+      "kind": "function",
+      "file": "tools/unattended/stall-recorder.js"
     },
     {
       "id": "extract_acceptance",
@@ -3308,6 +3328,16 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/stall-recorder.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "make_repo",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -3346,6 +3376,11 @@
       "id": "match_expr",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "measureBlocks",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "measureRun",
@@ -3576,6 +3611,11 @@
       "id": "parseBranches",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "parseLiveness",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "parse_affordance",
@@ -3893,14 +3933,34 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "read",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "readBoundKey",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "readCard",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readConfValue",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "readFact",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readFact",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "readFrontMatterKey",
@@ -3928,6 +3988,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readMemoryRoot",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "readMode",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3953,6 +4018,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readSidecarLines",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "readSpanEnd",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -3971,6 +4041,11 @@
       "id": "readStdin",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readStdin",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "readThrottleSeconds",
@@ -4638,6 +4713,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "renderBlock",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "renderCodeView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -4721,6 +4801,11 @@
       "id": "renderStrippedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderUtc",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "render_affordance_exempt",
@@ -5018,6 +5103,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveLease",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "resolveLiteralEnd",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -5026,6 +5116,11 @@
       "id": "resolveRealPath",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveRepo",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "resolveRepoRoot",
@@ -5453,6 +5548,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "runLiveness",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "run_adopter",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -5616,6 +5716,11 @@
       "id": "scanJoinFindings",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "scanLeases",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "scanSegments",
@@ -7771,6 +7876,11 @@
       "id": "writeRound",
       "kind": "function",
       "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "id": "writeSidecarLine",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "writeStamp",

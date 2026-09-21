@@ -80,7 +80,13 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
   the handles are written here — that is the drift the pointer design exists to avoid. Two invert
-  the reflex: a discovery is ADOPTED not parked; the keepalive precedes orienting. §11 and §5.
+  the reflex: a discovery is ADOPTED not parked; the idle-wake precedes orienting. §11 and §5.
+
+- **The idle-wake is not the keepalive.** The cron job wakes an idle session and nothing else; what
+  resumes a stalled run lives OUTSIDE its session — the stop-guard at every turn end, the
+  stall-recorder at every error end, the resume tick from the OS scheduler — reading the LEASE
+  (`session:`, `pid:`, `host:`, `pid-image:`, `lease-utc:`) the driver records and the verdict
+  `--liveness` derives. `RESUME_STALE_BOUND` is the bound they act on. Protocol §5; `aWokenSentinel`.
 
 - **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`; `GATE_REAP_BOUND` the
   teardown reap.** A breach is KILLED, and `gates-green` then says the bar never RETURNED

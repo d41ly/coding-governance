@@ -118,6 +118,7 @@ testsuite counts self-test	kit	selftests
 tier2-review self-test	kit	selftests
 unattended kit gate	repo	declarations
 unattended skill wiring	repo	wiring
+unattended-build self-test	kit	selftests
 verdict epoch (kit version dates the engine)	repo	declarations
 verdict-epoch self-test	kit	selftests
 verifier fan-out	repo	declarations

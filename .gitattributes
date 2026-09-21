@@ -113,6 +113,9 @@ skills/session-kickoff/SKILL.md text eol=lf
 # core.autocrlf smudged every unpinned path on the way out.
 tools/hooks/*.js text eol=lf
 tools/workflows/*.js text eol=lf
+# The unattended kit's hooks and their shared module, pinned for the same reason as the two lines
+# above: they run under node from a settings.json command, and the index already holds them LF.
+tools/unattended/*.js text eol=lf
 
 # codebase-map determinism (this repo dogfoods the kit). The gate's freshness leg BYTE-COMPARES the
 # generated artifacts against a fresh LF render, so an unpinned generated file on a Windows checkout
