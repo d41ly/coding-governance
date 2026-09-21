@@ -28,6 +28,7 @@ globs = [
   "tools/memory-tree/check-verdict-epoch.sh",
   "tools/memory-tree/transition_audit.py",
   "tools/memory-tree/transition-audit.test.sh",
+  "tools/memory-tree/migrate_backlog.py",
   ".githooks/commit-msg",
 ]
 ```
@@ -42,14 +43,26 @@ this dossier owns the engine, its self-test, the epoch and the transition audit,
 
 **One leg here belongs to a module this dossier does NOT own**, and that is deliberate rather than
 an oversight to tidy away. `backlog migration selftest` runs `migrate_backlog.py --selftest`, the
-shards-to-builds migration planner's own suite. The leg is CLAIMED here because the planner is a
-memory-tree module with no dossier of its own and an unclaimed key reds the map's coverage gate; it
-is DECLARED in `tools/memory-tree/kit.toml` beside its four module-selftest siblings rather than
-exempted in the govkit registry, because the planner ships to every memory-tree adopter and each of
-them runs `--plan` in their own deployer build (`TOOL-dDerivedDocket-11` fork F8). It is held like
-those siblings, by `subject = kit`, so no plain bar executes it. Its ceiling is pinned at or under
-the direct-check bound the unattended kit's gate-guard suite grades every `--selftest` leg against,
-which is what keeps the flag form a check a unit pass may run by hand.
+suite of the shards-to-builds migration PLANNER and of the relocation ENGINE that lives beside it in
+the same module. The leg is CLAIMED here because that module has no dossier of its own and an
+unclaimed key reds the map's coverage gate; it is DECLARED in `tools/memory-tree/kit.toml` beside
+its four module-selftest siblings rather than exempted in the govkit registry, because the module
+ships to every memory-tree adopter and each of them runs `--plan` in their own deployer build
+(`TOOL-dDerivedDocket-11` fork F8). It is held like those siblings, by `subject = kit`, so no plain
+bar executes it. Its ceiling is pinned at or under the direct-check bound the unattended kit's
+gate-guard suite grades every `--selftest` leg against, which is what keeps the flag form a check a
+unit pass may run by hand.
+
+**The engine's relationship to the transition audit this dossier DOES own is one direction only**
+(`TOOL-dDerivedDocket-12`). `migrate_backlog.py --relocate`, `--repair` and `--ingest` move a
+pre-flip branch's row changes into the per-build files and write the `RELOCATED` rows check 25
+reads; `--stragglers` lists the refs that still owe one and `--recipe` prints the one relocation
+recipe every carrier quotes. All three writing verbs CALL `transition_audit.delta` and
+`transition_audit.accounted` and spell no second transition rule, so the audit and the repair that
+answers it cannot disagree about what a row change is. That module's CLI resolves its repository
+from its own file location, which is why the engine's fixture arms call it in process against an
+explicit root — a subprocess launched inside a fixture audits THIS tree instead and returns a clean
+verdict about the wrong one.
 
 The self-test's project-key arms run the engine over
 the suite's own scratch tree, one invocation per arm, never over an archive of this repository

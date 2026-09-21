@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-12 — relocation tools for pre-flip branches
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 12
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-12-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-12-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
@@ -221,7 +222,11 @@ one file carries one status row per target (unit 6 V4). One exception, in the la
 `--ingest` only: when the existing status row equals, byte for byte, the record the migration set
 writes from the id's row version at every merge base the delta names — the switch-over's own
 transfer, unedited since — the planned record REPLACES it, and the table lists the replacement. The
-migration wrote that row, and a writer changes its mind by editing its own row (§8 F10). An entry
+migration wrote that row, and a writer changes its mind by editing its own row (§8 F10). A `CLOSED`
+merge-base row whose body names no closing id has no candidate line at all: `--write` fills that
+`by` slot from unit 11's history walk, which a delta cannot reproduce, so guessing it would compare
+against a row the migration never wrote. With no candidate the collision stays NEEDS-HUMAN, which
+is F10's own default and is never lab case e09b. An entry
 already accounted at the target tree plans nothing, which is what makes every verb idempotent.
 
 ### Confirmation, and which forms it binds
@@ -247,6 +252,14 @@ modify/delete conflict. S11 sets each `<MEMORY_ROOT>/backlog/<F>.md` and each pa
 engine's `--print-rotated-archive-ere` selects under the family alternation to the other side's
 blob, or removes it, in the worktree and the index. Only then does the generator run, so its
 data-loss guard reads a clean view. `--dry-run` does none of this.
+
+The restore and the render run on the WRITING path, after the plan is known to hold no NEEDS-HUMAN
+entry and no unconfirmed status change, and before the table prints. A refusal leaves the tree
+exactly as the merge left it (AC2), so a verb that repaired the views and then refused would hand
+the operator a half-acted tree while telling them nothing was written. The archive population is
+this module's own derivation of the rotated-family predicate, which selects the same names that
+print mode does under the family alternation — the decision log, which no family owns, is out of
+both.
 
 ### Straggler inventory
 
@@ -361,7 +374,8 @@ line for the new modes, if unit 11 created one.
   Red when: the repair or the ingest writes CLOSED over the reopen unconfirmed, which is lab case
   e09b.
 - **AC4** — When a fixture transition is committed with `--no-verify` and unaccounted,
-  `bash tools/memory-tree/check-memory-hygiene.sh` reds check 25; after `--repair` it passes; a
+  `transition_audit.py` — the module hygiene check 25 delegates to, called in process against an
+  explicit root — reds it; after `--repair` and its commit it passes; a
   second `--repair` plans zero records.
   Red when: the second run writes duplicate `RELOCATED` rows, which unit 9 reds as a duplicate.
 - **AC5** — When `migrate_backlog.py --ingest <ref> --as <slug>` runs on the default branch and its
@@ -675,6 +689,25 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
   Round-3 fold verifier, same pass and rev: the superset sentence had been spliced into the
   middle of §4's two-process sentence, leaving `and one git rev-list --parents` hanging after a
   full stop. The clause is restored as its own sentence; no wording of either claim moved.
+
+- rev-6 · 2026-09-21 · built. Three divergences found while writing the code, each changed here
+  first. AC4 named `bash tools/memory-tree/check-memory-hygiene.sh`; the arm now runs
+  `transition_audit.py`, the module that check delegates to, in process against an explicit root —
+  a Python kit selftest that shells out to bash cannot run where bash is absent, and the CLI entry
+  point resolves its repository from the MODULE's own location, so a subprocess launched with
+  `cwd=<fixture>` audits THIS repository and returns a verdict about the wrong tree. That was
+  measured: the first cut of those arms reported a clean fixture nothing had looked at.
+  §4's collision rule now states what §8 F10 left implicit — a `CLOSED` merge-base row naming no
+  closing id has no reproducible candidate line, so it never replaces and stays NEEDS-HUMAN.
+  §4's restore paragraph now says the restore and the render run on the WRITING path, which AC2
+  already required and the prose did not say.
+  Built: the engine, its three writing verbs, `--stragglers`, `--recipe`, `--dry-run` and both
+  policy sets in `tools/memory-tree/migrate_backlog.py`; the selftest's assertion floor moved 71 to
+  205 in the same commit, and the budget row from 60 to 80 seconds at 49 s measured. One live
+  defect the arms found rather than a break staged into them: the provenance row named the loop
+  variable of the inner record loop instead of its verdict's id, so an entry writing no record — a
+  dropped row, a live flip — produced two `RELOCATED` rows for the previous id and none for its
+  own, which unit 9 reads as a duplicate beside an unaccounted entry.
 
 ## 10. Reuse audit
 

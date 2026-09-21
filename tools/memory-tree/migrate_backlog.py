@@ -1,11 +1,30 @@
 #!/usr/bin/env python3
-"""migrate_backlog.py — the shards-to-builds backlog migration PLANNER. Read-only.
+"""migrate_backlog.py — the shards-to-builds backlog PLANNER and the relocation ENGINE.
 
-    python migrate_backlog.py --plan
+    python migrate_backlog.py --plan                             # read-only; the planner
     python migrate_backlog.py --plan --record <dir> --record-as <unit-id>
     python migrate_backlog.py --plan --signed same-id=<path> --signed triage=<path>
     python migrate_backlog.py --plan --design-named <id> [--design-named <id> …]
+    python migrate_backlog.py --relocate --as <slug> [--from <ref>]   # after merging the default
+    python migrate_backlog.py --repair <merge-sha> --as <slug>       # a transition already landed
+    python migrate_backlog.py --ingest <ref> --as <slug>             # a ref nobody will revisit
+    python migrate_backlog.py --stragglers [--local] [--tsv]         # who still owes a relocation
+    python migrate_backlog.py --recipe                               # the one relocation recipe
     python migrate_backlog.py --selftest
+
+Add `--dry-run` to any writing verb: it prints the plan and the conservation table and touches
+nothing. Exit 0 means the plan would write, 1 that the plan itself refuses and a human must answer
+it, and 2 that a condition or a form is missing — the switch-over's landing reconcile and the
+adopter runbook both re-run a rehearsal only when it did not exit 1, so those two codes are not
+interchangeable.
+
+WHAT THE RELOCATION ENGINE IS. A branch that forked before the flip and kept editing authored
+backlog shards carries row changes that no longer have a file to land in. The three writing verbs
+move every changed row into the per-build files, write one provenance row per delta entry, and
+refuse to finish while any change is unaccounted. The DELTA and the ACCOUNTING PREDICATE are
+`transition_audit.py`'s, called and never re-spelled; the row GRAMMARS and the status FOLD are
+`backlog.py`'s; the recipe is the ONE constant that unit keeps. What is this module's own is the
+classification table — which record each kind of change becomes, and in whose folder.
 
 WHAT THIS IS. Before any shard is rewritten somebody has to know exactly what the migration will do
 to every id: which copy of it survives, which legacy pairs are one subject, which open asks on
@@ -37,6 +56,7 @@ from __future__ import annotations
 import collections
 import io
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -48,6 +68,7 @@ if _HERE not in sys.path:
 
 import backlog                      # noqa: E402  — a sibling of this file, never a spelled path
 import gen_build_index as index     # noqa: E402
+import transition_audit as audit    # noqa: E402  — the delta and the accounting predicate
 
 # --------------------------------------------------------------------------------- the constants
 #: The `filed` value every simulated ask row carries. It is a PLACEHOLDER and is never written into
@@ -107,8 +128,10 @@ NORMALIZATIONS = ("status-slot-removed", "filed-inserted", "unit-inserted", "wra
 RECORD_KINDS = {"prompts": "prompt", "spec": "spec", "build": "build", "reviews": "review"}
 
 #: The self-test's executed-assertion floor. A block of arms stranded past an early return is
-#: exactly what a floor catches and a green line does not.
-FLOOR_ASSERTIONS = 71
+#: exactly what a floor catches and a green line does not. It moved from 71 to 205 when the
+#: relocation engine's arms landed; the figure is the count the suite executes, and it is RAISED in
+#: the same commit as the arms, because a floor left behind is a floor that stops measuring.
+FLOOR_ASSERTIONS = 205
 
 NEWLINE = chr(10)
 
@@ -119,11 +142,23 @@ class Problem(Exception):
     """A named, user-facing failure. Never a traceback, and never raised by row CONTENT."""
 
 
+class Refusal(Problem):
+    """A refusal that exits 2: a missing condition, a malformed value, a form not admitted.
+
+    DELIBERATELY DISTINCT FROM 1, which means "the plan itself refuses and a human must answer it".
+    The switch-over's landing reconcile and the adopter runbook both re-run a rehearsal WITHOUT
+    `--dry-run` only when it did not exit 1, so collapsing the two codes would park them on a
+    condition that is merely absent.
+    """
+
+    code = 2
+
+
 # ------------------------------------------------------------------------------- the process seam
-def run(*argv, cwd=None) -> str:
+def run(*argv, cwd=None, env=None) -> str:
     """One git call, counted. The liveness line prints the count, which is why it lives here."""
     _PROCESSES[0] += 1
-    proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True,
+    proc = subprocess.run(argv, cwd=cwd, env=env, capture_output=True, text=True,
                           encoding="utf-8", errors="replace")
     if proc.returncode != 0:
         raise Problem(f"migrate-backlog: `{' '.join(argv)}` failed: {proc.stderr.strip()}")
@@ -1130,6 +1165,1005 @@ def cmd_plan(root: str, args: dict) -> int:
     return 0
 
 
+# -------------------------------------------------------------------------- the relocation engine
+#: The two POLICY SETS of section 4. Not a mode, not a flag: a set of four policies the same engine
+#: runs under, so the switch-over's whole-corpus migration and a straggler's relocation are one
+#: planner rather than two that drift.
+STRAGGLER_SET = "straggler"
+MIGRATION_SET = "migration"
+
+#: The classification a planned entry lands in when no rule below fits. It is not a record: the
+#: whole plan refuses while one of these is in it, because a half-relocated tree is one
+#: `git add memory/` away from being committed (section 8 F2).
+HUMAN = "NEEDS-HUMAN"
+
+#: What a straggler-set hold naming no id becomes. The migration set's value is the triage ask id
+#: `--triage-ask` supplies; that is the whole of policy P3.
+UNNAMED_HOLD_STRAGGLER = HUMAN
+
+#: One planned row: the file it lands in, the section it sits under, its bytes, the id it is about,
+#: and the existing line it REPLACES (section 8 F10) or "" when it is an insertion.
+Record = collections.namedtuple("Record", "path section text ident replaces")
+
+#: One entry path to the writer, from section 4's table. The verb and the four policies it fixes,
+#: resolved ONCE at the CLI and passed down, so no function below re-decides which set it is in.
+Form = collections.namedtuple("Form", "verb name policy provenance confirm")
+
+#: The classification of one delta entry: what it is, what it writes, and the provenance kind.
+Verdict2 = collections.namedtuple("Verdict2", "ident kind classification records disposal why")
+
+Relocation = collections.namedtuple(
+    "Relocation", "form entries verdicts records human confirm before after cutoff table")
+
+
+def try_run(*argv, cwd=None) -> tuple:
+    """One git call whose NON-ZERO exit is an ANSWER, not a failure. Counted like every other.
+
+    `merge-base --is-ancestor` answers containment with its exit status and `rev-parse --verify`
+    answers existence with its own; routing either through `run` would turn a legitimate "no" into
+    a refusal naming a command the caller never asked about.
+    """
+    _PROCESSES[0] += 1
+    proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace")
+    # BOTH STREAMS, joined. A refusal this engine needs to read — the row driver's recipe banner,
+    # the generator's guarded-view remedy — goes to stderr, and a reader of stdout alone would see
+    # an empty string and report that the command said nothing.
+    return proc.returncode, proc.stdout + proc.stderr
+
+
+def read_rev(root: str, rev: str) -> str:
+    """`rev` as a 40-hex sha, or "" when this repository does not hold it."""
+    code, out = try_run("git", "rev-parse", "--verify", "--quiet", rev + "^{commit}", cwd=root)
+    return out.strip() if code == 0 else ""
+
+
+def check_contains(root: str, ancestor: str, descendant: str) -> bool:
+    """Is `ancestor` in `descendant`'s history? The containment every `--ingest` admission reads."""
+    code, _out = try_run("git", "merge-base", "--is-ancestor", ancestor, descendant, cwd=root)
+    return code == 0
+
+
+def read_conf_mode(root: str, rev: str) -> str:
+    """The backlog mode a rev's `.memory-tree.conf` BLOB declares, through unit 9's ONE reader.
+
+    Never this tree's live conf and never a second parse: a straggler that pulled the new conf
+    early has a tip that reads `builds` over a lineage that edited shards, which is the exact
+    misreading unit 9's own classifier refuses to make.
+    """
+    base = pathlib.Path(root)
+    return audit.read_modes(base, [rev], audit.derive_conf_rel(base)).get(rev, "shards")
+
+
+def read_recipe(root: str, conf=None) -> list:
+    """The relocation recipe, at THIS install's prefix and this tree's memory root.
+
+    ONE constant, four renderings (unit 7 section 8 F5). This function holds no copy of the text:
+    it fills the view layer's own constant, which is what makes the byte comparison in the selftest
+    a comparison rather than two spellings agreeing by luck.
+    """
+    if conf is None:
+        conf = read_index(index.load_conf, root)
+    return backlog.render_relocation_recipe(index.kit_rel(), conf["MEMORY_ROOT"])
+
+
+def refuse_with_recipe(root: str, why: str, conf=None):
+    """A `--relocate` refusal, which always carries the recipe: every banner that sent the operator
+    here printed one command, so a refusal that does not reprint it strands them mid-merge."""
+    return Refusal(why + NEWLINE + NEWLINE.join(read_recipe(root, conf)))
+
+
+def resolve_default_tip(root: str) -> tuple:
+    """`(name, sha)` for the default branch, as `.githooks/pre-push` resolves it.
+
+    THE OBSERVED `origin/HEAD` WINS and the environment only CROSS-CHECKS it. The recall hit
+    `TOOL-aStandingWrit-5` records an environment value that named the branch already checked out
+    and disabled a guard by doing so; a resolution that lets the environment SELECT repeats it.
+    """
+    code, out = try_run("git", "symbolic-ref", "--short", "refs/remotes/origin/HEAD", cwd=root)
+    observed = out.strip()[len("origin/"):] if code == 0 and out.strip() else ""
+    declared = os.environ.get("GOV_DEFAULT_BRANCH", "").strip()
+    if observed and declared and observed != declared:
+        raise Refusal(f"migrate-backlog: GOV_DEFAULT_BRANCH names `{declared}`, which this clone "
+                      f"does not observe as its default (`{observed}`). The straggler inventory is "
+                      f"keyed on that branch, so an unrecognised name would list every ref or none")
+    name = observed or declared
+    if not name:
+        raise Refusal("migrate-backlog: cannot determine the default branch — origin/HEAD is unset "
+                      "and GOV_DEFAULT_BRANCH is unset. Refusing to guess `main`: a wrong default "
+                      "makes every ref read as a straggler or none of them.\n"
+                      "  Fix once: git remote set-head origin -a")
+    sha = read_rev(root, f"refs/heads/{name}") or read_rev(root, f"refs/remotes/origin/{name}")
+    if not sha:
+        raise Refusal(f"migrate-backlog: the default branch resolves to `{name}`, which is no "
+                      f"branch in this clone, so every ref would be compared against nothing")
+    return name, sha
+
+
+# ------------------------------------------------------------------------------- side resolution
+def resolve_sides(root: str, args: dict) -> tuple:
+    """-> `(form, ours, theirs)`. WHICH SIDE IS THE STRAGGLER, per section 2 S1, S6 and S7.
+
+    Every verb ends at one call of unit 9's `delta(ours, theirs)` with no merge commit between
+    them, bound POSITIONALLY as that unit's S13 binds it. Nothing here re-derives a transition or a
+    row version; the only question this function answers is whose change is being relocated.
+    """
+    verb = args["mode"]
+    if verb == "--relocate":
+        return resolve_relocate_sides(root, args)
+    if verb == "--ingest":
+        return resolve_ingest_sides(root, args)
+    return resolve_repair_sides(root, args)
+
+
+def resolve_relocate_sides(root: str, args: dict) -> tuple:
+    """S1 — MERGE_HEAD, else a merge HEAD's parents, else `--from`, else exit 2 with the recipe."""
+    heads = audit.read_merge_heads(pathlib.Path(root))
+    head = read_rev(root, "HEAD")
+    if heads:
+        ours, theirs, name = head, heads, "relocate (MERGE_HEAD)"
+    else:
+        parents = [p for p in run("git", "rev-list", "--parents", "-n", "1", "HEAD",
+                                  cwd=root).split() if p][1:]
+        if len(parents) > 1:
+            ours, theirs, name = parents[0], parents[1:], "relocate (concluded merge)"
+        elif args["from"]:
+            ref = read_rev(root, args["from"])
+            if not ref:
+                raise Refusal(f"migrate-backlog: --from names `{args['from']}`, which is no commit "
+                              f"in this repository")
+            ours, theirs, name = ref, [head], "relocate (--from)"
+        else:
+            raise refuse_with_recipe(
+                root, "migrate-backlog: --relocate found no MERGE_HEAD, no merge HEAD and no "
+                      "--from, so it cannot tell which side is the straggler. Merge the default "
+                      "branch first, or name the straggler's tip with --from.")
+    for other in theirs:
+        if read_conf_mode(root, other) != "builds":
+            raise refuse_with_recipe(
+                root, f"migrate-backlog: --relocate needs the OTHER side to be in builds mode, and "
+                      f"{other[:12]}'s .memory-tree.conf reads shards — there is no per-build file "
+                      f"to relocate into, and writing one would be a half-migration.")
+    confirm = name == "relocate (--from)"
+    return Form("--relocate", name, STRAGGLER_SET, True, confirm), ours, theirs
+
+
+def resolve_ingest_sides(root: str, args: dict) -> tuple:
+    """S6 — the two forms of `--ingest`, and section 8 F9's admission once a merge is concluded."""
+    ref = read_rev(root, args["ref"])
+    if not ref:
+        raise Refusal(f"migrate-backlog: --ingest names `{args['ref']}`, which is no commit in "
+                      f"this repository")
+    head = read_rev(root, "HEAD")
+    head_mode = read_conf_mode(root, head)
+    landing = False
+    if head_mode == "builds" and read_conf_mode(root, ref) == "shards":
+        # A REPOSITORY WITH NO RESOLVABLE DEFAULT BRANCH IS SIMPLY NOT THE LANDING SHAPE. Letting
+        # that refusal escape here would make every straggler-form `--ingest` depend on a remote
+        # this verb never reads — the form is decided, not gated, by the question.
+        try:
+            _name, tip = resolve_default_tip(root)
+            landing = tip == ref
+        except Refusal:
+            landing = False
+    if not landing and head_mode != "builds":
+        raise refuse_with_recipe(
+            root, f"migrate-backlog: --ingest in its straggler form needs a builds-mode checkout, "
+                  f"and HEAD's .memory-tree.conf reads {head_mode}. Its landing form needs the "
+                  f"default tip in shards mode under a builds-mode HEAD, which this is not.")
+    form = (Form("--ingest", "ingest (landing)", MIGRATION_SET, True, True) if landing
+            else Form("--ingest", "ingest (straggler)", STRAGGLER_SET, True, True))
+    if not check_contains(root, ref, head):
+        # Before the merge, and DURING one: `git merge --no-ff --no-commit <tip>` leaves HEAD where
+        # it was, so the ref is still uncontained and the delta is the same one the pre-merge run
+        # would take. That is the state unit 34's landing reconcile ingests in.
+        return form, ref, [head]
+    parents = [p for p in run("git", "rev-list", "--parents", "-n", "1", head,
+                              cwd=root).split() if p][1:]
+    if (landing and len(parents) > 1 and parents[1] == ref
+            and not check_contains(root, ref, parents[0])):
+        return form, ref, [parents[0]]
+    raise Refusal(
+        f"migrate-backlog: HEAD already contains {args['ref']}, and this is not the one state "
+        f"--ingest is admitted in afterwards — a landing-form run on a concluded merge whose "
+        f"SECOND parent is that ref and whose first parent does not contain it. Use --repair "
+        f"<merge-sha> --as <slug> instead, which plans only what is still unaccounted.")
+
+
+def resolve_repair_sides(root: str, args: dict) -> tuple:
+    """S7 — the shards side of a transition merge, classified by unit 9 and never a second time."""
+    head = read_rev(root, "HEAD")
+    if read_conf_mode(root, head) != "builds":
+        raise refuse_with_recipe(
+            root, f"migrate-backlog: --repair writes per-build files and HEAD's "
+                  f"`.memory-tree.conf` reads shards, so its records would be a half-migration the "
+                  f"generator's own mode guard reds.")
+    merge = read_rev(root, args["ref"])
+    if not merge:
+        raise Refusal(f"migrate-backlog: --repair names `{args['ref']}`, which is no commit in "
+                      f"this repository")
+    walk = audit.Walk(pathlib.Path(root), [merge])
+    pair = audit.derive_transition(walk, merge)
+    if pair is None:
+        raise Refusal(f"migrate-backlog: {merge[:12]} is not a transition merge — no parent's "
+                      f"lineage edits authored shards under a builds-mode sibling — so there is "
+                      f"nothing for this verb to repair")
+    ours, theirs = pair
+    return Form("--repair", "repair", STRAGGLER_SET, True, True), ours, list(theirs)
+
+
+# --------------------------------------------------------------------------------- the tree reads
+def read_target_texts(root: str, conf: dict) -> dict:
+    """`{path: text}` for every tracked `<M>/builds/*/BACKLOG.md` IN THE WORKING TREE.
+
+    The worktree and not a rev: `--relocate` runs inside a merge whose index is the thing about to
+    be committed, and a fold read from a commit would grade a tree nobody is looking at.
+    """
+    m = conf["MEMORY_ROOT"]
+    tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
+    out = {}
+    for rel in sorted(p for p in tracked
+                      if p.startswith(f"{m}/builds/") and p.endswith("/BACKLOG.md")):
+        try:
+            out[rel] = read_text(os.path.join(root, rel))
+        except OSError:
+            continue
+    return out
+
+
+def read_target_specs(root: str, conf: dict) -> tuple:
+    """`(specs, build statuses)` — the fold's two non-row inputs, through the generator's collect."""
+    builds = read_index(index.collect, root, conf)
+    specs = {}
+    for build in builds:
+        for unit in build["units"]:
+            rel = os.path.relpath(unit["path"], root).replace("\\", "/")
+            specs[unit["id"]] = backlog.Spec(unit["id"], rel, unit["status"], (), ())
+    return specs, {b["slug"]: b["status"] for b in builds}
+
+
+def derive_fold(texts: dict, specs: dict, build_status: dict, grammar):
+    """The status fold over a set of per-build files, unit 6's and never re-derived here."""
+    files = [backlog.parse_file(rel, text, grammar) for rel, text in sorted(texts.items())]
+    return backlog.derive_statuses(backlog.build_corpus(files, specs, build_status))
+
+
+def read_slug_home(memory_root: str, slug: str) -> str:
+    return f"{memory_root}/builds/{slug}/BACKLOG.md"
+
+
+def insert_row(text: str, section: str, line: str, replaces: str, slug: str) -> str:
+    """One row into one file, under its section, REPLACING a named line where F10 says to.
+
+    Appends at the END of the section rather than sorting: a generated order would make every
+    concurrent relocation conflict on rows neither side authored, which is the property the view
+    layer exists to avoid.
+    """
+    body = text if text.strip() else f"# {slug} — asks{NEWLINE}"
+    lines = body.split(NEWLINE)
+    bare = [ln.rstrip(chr(13)) for ln in lines]
+    if replaces and replaces in bare:
+        lines[bare.index(replaces)] = line
+        return NEWLINE.join(lines).rstrip(NEWLINE) + NEWLINE
+    if section not in bare:
+        if section == backlog.H_ASKS and backlog.H_DISPOSITIONS in bare:
+            at = bare.index(backlog.H_DISPOSITIONS)
+            lines[at:at] = [section, "", line, ""]
+        else:
+            while lines and not lines[-1].strip():
+                lines.pop()
+            lines += ["", section, "", line]
+        return NEWLINE.join(lines).rstrip(NEWLINE) + NEWLINE
+    start = bare.index(section)
+    end = len(lines)
+    for n in range(start + 1, len(lines)):
+        if bare[n].startswith("## "):
+            end = n
+            break
+    while end > start + 1 and not lines[end - 1].strip():
+        end -= 1
+    lines[end:end] = [line]
+    return NEWLINE.join(lines).rstrip(NEWLINE) + NEWLINE
+
+
+def build_texts_with(texts: dict, records: list, memory_root: str) -> dict:
+    """The target tree's files with the planned records applied — the fold's `after` input."""
+    out = dict(texts)
+    for rec in records:
+        slug = rec.path.split("/")[-2]
+        out[rec.path] = insert_row(out.get(rec.path, ""), rec.section, rec.text, rec.replaces, slug)
+    return out
+
+
+# ------------------------------------------------------------------------------ the classifier
+def read_version_row(version, grammar):
+    """One delta version as `(token, body, line)`, or `(None, "", "")` when it holds no row.
+
+    A version anchored on SEVERAL lines of one rev keeps all of them (unit 9 reads it that way);
+    the FIRST is classified and the rest make the entry unreadable rather than a coin toss.
+    """
+    if not version:
+        return None, "", ""
+    lines = [ln for ln in version.split(NEWLINE) if ln.strip()]
+    if len(lines) != 1:
+        return None, "", lines[0] if lines else ""
+    leg = backlog.read_legacy_row(lines[0].strip(), grammar)
+    return leg.status, leg.body, lines[0].strip()
+
+
+def read_base_version(entry: dict):
+    """The row's version at the merge bases. The first non-empty one, by sorted base sha.
+
+    A criss-cross merge has several bases and unit 9 reports an entry only when the version differs
+    from EVERY one of them, so any base is an honest "before" — taking the sorted-first keeps two
+    runs over one tree byte-identical.
+    """
+    for sha in sorted(entry["bases"]):
+        if entry["bases"][sha]:
+            return entry["bases"][sha]
+    return None
+
+
+PATH_TOKEN_RE = re.compile(r"[A-Za-z0-9._-]*/[A-Za-z0-9._/#-]*")
+
+
+def check_path_repoint(old: str, new: str) -> bool:
+    """Is this text change confined to PATH tokens (owner ruling D9)?
+
+    Both sides with every slash-carrying token blanked out. Equal means the prose is untouched and
+    only a location moved, which is the one text change this engine may rewrite unattended.
+    """
+    if old == new:
+        return False
+    return PATH_TOKEN_RE.sub("", old) == PATH_TOKEN_RE.sub("", new)
+
+
+def check_names_hold(body: str, grammar, known) -> str:
+    """P3's names-an-id test, which is unit 11 S7's census semantics and not a second rule."""
+    return read_named_hold(body, grammar, known)
+
+
+def build_verdicts(entries: list, form: Form, grammar, known: set, drops: dict,
+                   triage_ask: str) -> list:
+    """Section 4's classification table, one row per delta entry. Decides, writes nothing."""
+    out = []
+    for entry in entries:
+        ident = entry["id"]
+        if ident in drops:
+            out.append(Verdict2(ident, entry["kind"], "dropped by hand", [], "dropped",
+                                drops[ident]))
+            continue
+        out.append(build_verdict(entry, form, grammar, known, triage_ask))
+    return out
+
+
+def build_verdict(entry: dict, form: Form, grammar, known: set, triage_ask: str) -> Verdict2:
+    """One delta entry's class, its record shapes and its provenance kind."""
+    ident = entry["id"]
+    kind = entry["kind"]
+    tok_new, body_new, _line_new = read_version_row(entry["ours"], grammar)
+    tok_old, body_old, line_old = read_version_row(read_base_version(entry), grammar)
+    if kind == audit.REMOVED:
+        if tok_old in backlog.TERMINAL:
+            return Verdict2(ident, kind, "removed, terminal at the base", [], "dropped",
+                            "terminal row removed")
+        return Verdict2(ident, kind, HUMAN, [], "",
+                        "a row that was live at the merge base was removed, and only a human can "
+                        "say whether that was a withdrawal or an accident")
+    if tok_new is None:
+        return Verdict2(ident, kind, HUMAN, [], "",
+                        "the row version at the straggler side is not one readable legacy row")
+    change = entry["change"]
+    if kind == audit.NEW:
+        records = [("ask", ident, body_new, "")]
+        disp = build_disposition_shape(ident, tok_new, body_new, grammar, known, form, triage_ask,
+                                       change)
+        if disp == HUMAN:
+            return Verdict2(ident, kind, HUMAN, [], "", build_unnamed_why(ident))
+        records += disp
+        return Verdict2(ident, kind, "new ask", records, "kept", "new ask")
+    if tok_old is None:
+        return Verdict2(ident, kind, HUMAN, [], "",
+                        "the row version at the merge base is not one readable legacy row")
+    if tok_new != tok_old:
+        if tok_new in backlog.TERMINAL and tok_old in backlog.TERMINAL:
+            pass
+        elif tok_new not in backlog.TERMINAL and tok_old in backlog.TERMINAL:
+            return Verdict2(ident, kind, HUMAN, [], "",
+                            f"a flip from the terminal `{tok_old}` back to `{tok_new}` is a "
+                            f"reopening, and the engine never reopens an ask on its own")
+        if tok_new in ("OPEN", "SPECCED", "INPROGRESS"):
+            if check_path_repoint(body_old, body_new) or body_old == body_new:
+                return Verdict2(ident, kind, "live flip, derived", [], "kept",
+                                "live flip, derived")
+            return Verdict2(ident, kind, HUMAN, [], "",
+                            f"the flip to `{tok_new}` is derived now, but the row's prose changed "
+                            f"with it and no record would carry that change")
+        disp = build_disposition_shape(ident, tok_new, body_new, grammar, known, form, triage_ask,
+                                       change,
+                                       replaces=build_replaced_line(ident, tok_old, body_old,
+                                                                    grammar, known, form,
+                                                                    triage_ask))
+        if disp == HUMAN:
+            return Verdict2(ident, kind, HUMAN, [], "", build_unnamed_why(ident))
+        label = {"CLOSED": "flip to CLOSED", "WONTDO": "flip to WONTDO"}.get(tok_new, "hold")
+        return Verdict2(ident, kind, label, disp, "kept", label)
+    if check_path_repoint(body_old, body_new):
+        return Verdict2(ident, kind, "path repoint", [("repoint", ident, body_new, "")], "amended",
+                        "path repoint")
+    return Verdict2(ident, kind, HUMAN, [], "",
+                    "the row's prose changed and only a human can say what the change means")
+
+
+def build_unnamed_why(ident: str) -> str:
+    return (f"{ident} is held on a target this corpus cannot resolve to an ask or a spec, so the "
+            f"hold would derive UNRESOLVED wherever it landed")
+
+
+def read_closing_evidence(body: str, grammar, known) -> str:
+    """The id a legacy `CLOSED by <id>` row names in its FIRST body field, or "".
+
+    Unit 11's `derive_dispositions` reads the same field for the same reason: the legacy grammar
+    puts the closing evidence there and the rest of the body is prose. That named id is the only
+    `by` value a DELTA can reproduce — the alternative unit 11 falls back to is a sha mined from a
+    history walk this engine does not make.
+    """
+    return read_named_hold(body.split(backlog.SEP)[0], grammar, known)
+
+
+def build_disposition_shape(ident: str, token: str, body: str, grammar, known, form: Form,
+                            triage_ask: str, change: str = "", replaces: str = "") -> list:
+    """The disposition rows a legacy token transfers into, or `HUMAN` for an unnamed hold.
+
+    P1 decides the FILE and this decides the ROW; the two are separate because the migration set
+    moves the same bytes into a different folder and nothing else about them changes.
+    """
+    why = body.strip() or ("withdrawn" if token == "WONTDO" else "relocated from a legacy row")
+    if token == "CLOSED":
+        value = read_closing_evidence(body, grammar, known) or change
+        if not value:
+            return HUMAN
+        return [("status", ident, ("CLOSED", value, why), replaces)]
+    if token == "WONTDO":
+        return [("status", ident, ("WONTDO", "", why), replaces)]
+    if token in ("BLOCKED", "DEFERRED"):
+        named = check_names_hold(body, grammar, known)
+        if not named:
+            if form.policy != MIGRATION_SET or not triage_ask:
+                return HUMAN
+            named = triage_ask
+        return [("status", ident, (token, named, why), replaces)]
+    return []
+
+
+def build_replaced_line(ident: str, token: str, body: str, grammar, known, form: Form,
+                        triage_ask: str) -> str:
+    """Section 8 F10 — the row the MIGRATION SET itself would have written from the BASE version.
+
+    Only that line may be replaced, and only in the landing form. The migration wrote it, a writer
+    changes its mind by editing its OWN row (unit 6 section 4), and any other existing row belongs
+    to whoever put it there — overwriting one is lab case e09b's class.
+    """
+    if form.name != "ingest (landing)":
+        return ""
+    # A `CLOSED` merge-base row whose body names no closing id is DELIBERATELY not reproducible
+    # here: `--write` fills that slot from a history walk (unit 11's `derive_dispositions`), and
+    # guessing it would compare against a row the migration never wrote. With no candidate line the
+    # collision stays NEEDS-HUMAN, which is F10's own default and never lab case e09b.
+    shape = build_disposition_shape(ident, token, body, grammar, known, form, triage_ask, "")
+    if shape == HUMAN or not shape:
+        return ""
+    verb, value, why = shape[0][2]
+    return backlog.render_status_row(verb, ident, why, value)
+
+
+# ------------------------------------------------------------------------------- the planner
+def build_relocation(root: str, form: Form, ours: str, theirs: list, args: dict,
+                     conf=None) -> Relocation:
+    """The whole read-only pass of the three writing verbs: plan, confirm, conserve. Writes nothing.
+
+    PLAN THEN WRITE, ALL OR NOTHING (section 8 F2). Everything here returns; the caller writes only
+    when the NEEDS-HUMAN and CONFIRM lists are both empty.
+    """
+    conf = conf or read_index(index.load_conf, root)
+    memory_root = conf["MEMORY_ROOT"]
+    grammar = backlog.build_grammar(derive_families(conf))
+    entries = audit.delta(ours, theirs, root) if args.get("entries") is None else args["entries"]
+    # S7 — AN ENTRY ALREADY ACCOUNTED AT `HEAD` PLANS NOTHING, which is what makes every verb
+    # idempotent: a second `--repair` over a tree whose records landed plans zero records rather
+    # than a second set of them, which unit 9 would then red as a DUPLICATE. The predicate is that
+    # unit's, bound to HEAD as S7 words it, and `plan.entries` keeps the FULL delta so the
+    # post-write re-read still grades every entry.
+    open_now = audit.accounted(entries, "HEAD", pathlib.Path(root))
+    planned = [e for i, e in enumerate(entries) if open_now.get(i) != "ok"]
+
+    texts = read_target_texts(root, conf)
+    specs, build_status = read_target_specs(root, conf)
+    before = derive_fold(texts, specs, build_status, grammar)
+
+    signed = {kind: read_signed_record(kind, path) for kind, path in args["signed"]}
+    units, signed_triage = read_signed_verdicts(signed)
+    if form.policy != MIGRATION_SET:
+        units, signed_triage = set(), {}
+
+    # P3's known set, and it is deliberately the UNION of three populations: an ask the target tree
+    # files, an ask THIS PLAN writes a row for, and a spec H1. Unit 11 S7's census semantics — a
+    # delta that files X and holds on X keeps that hold in every form.
+    filing = {e["id"] for e in planned if e["kind"] == audit.NEW}
+    known = set(before.statuses) | filing | set(specs)
+
+    drops = dict(args["drop"])
+    verdicts = build_verdicts(planned, form, grammar, known, drops, args["triage_ask"])
+    human = [(v.ident, v.why) for v in verdicts if v.classification == HUMAN]
+
+    new_ids = {v.ident for v in verdicts if any(r[0] == "ask" for r in v.records)}
+    filed = read_filed_days(root, ours, theirs, new_ids)
+    records = build_records(verdicts, form, args["as_slug"], memory_root, filed, units, texts,
+                            grammar, planned)
+    records += build_triage_records(signed_triage, texts, args["as_slug"], memory_root, grammar)
+    records, collisions = check_collisions(records, texts, grammar)
+    human += collisions
+
+    after = derive_fold(build_texts_with(texts, records, memory_root), specs, build_status, grammar)
+    confirm = []
+    if form.confirm:
+        for ident in sorted({r.ident for r in records}):
+            was, now = before.statuses.get(ident), after.statuses.get(ident)
+            if was is not None and was != now and ident not in args["confirm"]:
+                confirm.append((ident, was, now))
+    cutoff = build_cutoff(conf, filed, records) if form.name == "ingest (landing)" else ""
+    table = build_table(verdicts, records, before, after)
+    return Relocation(form, entries, verdicts, records, human, confirm, before, after, cutoff,
+                      table)
+
+
+def build_records(verdicts: list, form: Form, as_slug: str, memory_root: str, filed: dict,
+                  units: set, texts: dict, grammar, entries: list) -> list:
+    """P1 — every planned row, in the file its class sends it to.
+
+    A transferred legacy token goes to the `--as` folder under the straggler set and to the ask
+    OWNER's folder under the migration set; an ask row always goes to its id's own folder; a
+    provenance row always goes to the writer's, which is the `--as` folder (section 8 F3).
+    """
+    as_home = read_slug_home(memory_root, as_slug)
+    change = {e["id"]: e["change"] for e in entries}
+    out = []
+    for verdict in verdicts:
+        if verdict.classification == HUMAN:
+            continue
+        owner = read_slug_home(memory_root, read_slug(verdict.ident))
+        for shape in verdict.records:
+            cls, ident, value, replaces = shape
+            if cls == "ask":
+                out.append(Record(owner, backlog.H_ASKS, backlog.render_ask_row(
+                    ident, filed.get(ident, FILED_PLACEHOLDER), value, unit=ident in units),
+                    ident, ""))
+            elif cls == "status":
+                verb, slot, why = value
+                home = owner if form.policy == MIGRATION_SET else as_home
+                out.append(Record(home, backlog.H_DISPOSITIONS,
+                                  backlog.render_status_row(verb, ident, why, slot), ident,
+                                  replaces))
+            elif cls == "repoint":
+                out.append(build_repoint_record(owner, ident, value, texts, grammar))
+        if form.provenance:
+            # `verdict.ident` AND NEVER THE LOOP VARIABLE ABOVE. A verdict that writes no record —
+            # a dropped row, a live flip — leaves that name bound to the PREVIOUS entry's id, and
+            # the provenance row then names the wrong ask: two rows for one id, none for the other,
+            # which unit 9 reads as a duplicate beside an unaccounted entry. Measured, not feared.
+            out.append(Record(as_home, backlog.H_DISPOSITIONS, backlog.render_relocated_row(
+                verdict.ident, change.get(verdict.ident, ""), verdict.disposal, verdict.why),
+                verdict.ident, ""))
+    return [r for r in out if r is not None]
+
+
+def build_repoint_record(owner: str, ident: str, body: str, texts: dict, grammar):
+    """D9's path repoint: the ask row in its home file, rewritten to the straggler's text.
+
+    A REPLACEMENT and never an insertion — a second ask row for one id is what V3 reds, and the
+    whole point of this class is that the ask already lives where it belongs.
+    """
+    for raw in texts.get(owner, "").split(NEWLINE):
+        line = raw.rstrip(chr(13))
+        row = backlog.extract_row(line, grammar)
+        if row is not None and row.cls == "ask" and row.target == ident:
+            return Record(owner, backlog.H_ASKS, backlog.render_ask_row(
+                ident, row.value, body, unit=row.extra["unit"]), ident, line)
+    return None
+
+
+def build_triage_records(signed_triage: dict, texts: dict, as_slug: str, memory_root: str,
+                         grammar) -> list:
+    """P4 — the signed triage verdict, in the `--as` folder under EITHER policy set.
+
+    An id the target tree already disposes in any file plans nothing, which is what makes the verb
+    idempotent: a second run over a written tree writes a second time nothing.
+    """
+    disposed = read_disposed(texts, grammar)
+    out = []
+    for ident, disp in sorted(signed_triage.items()):
+        if ident in disposed:
+            continue
+        out.append(Record(read_slug_home(memory_root, as_slug), backlog.H_DISPOSITIONS,
+                          backlog.render_status_row(disp.verb, ident, disp.why, disp.value),
+                          ident, ""))
+    return out
+
+
+def read_disposed(texts: dict, grammar) -> dict:
+    """`{id: [path]}` — every target that any file already carries a STATUS row for."""
+    out: dict = collections.defaultdict(list)
+    for rel, text in sorted(texts.items()):
+        for raw in text.split(NEWLINE):
+            row = backlog.extract_row(raw.rstrip(chr(13)), grammar)
+            if row is not None and row.cls == "status":
+                out[row.target].append(rel)
+    return out
+
+
+def check_collisions(records: list, texts: dict, grammar) -> tuple:
+    """V4 — one file states one status per target. A planned collision is NEEDS-HUMAN (F10).
+
+    The landing form's REPLACEMENT is already carried on the record, so a record that names the row
+    it replaces is not a collision: it IS the edit unit 6 section 4 sanctions.
+    """
+    disposed = read_disposed(texts, grammar)
+    kept, bad = [], []
+    for rec in records:
+        # A `replaces` the file does NOT hold is not a replacement — it is an insertion whose
+        # candidate row the receiving branch edited (section 8 F10's own exclusion). Treating it as
+        # a replacement would land a second status row beside the edited one and red V4 at the
+        # reconcile's `--check`, which is the collision this function exists to refuse.
+        here = [ln.rstrip(chr(13)) for ln in texts.get(rec.path, "").split(NEWLINE)]
+        present = bool(rec.replaces) and rec.replaces in here
+        if rec.section != backlog.H_DISPOSITIONS or present:
+            kept.append(rec)
+            continue
+        row = backlog.extract_row(rec.text, grammar)
+        if row is not None and row.cls == "status" and rec.path in disposed.get(rec.ident, []):
+            bad.append((rec.ident, f"{rec.path} already states a status for {rec.ident}, and one "
+                                   f"file carries one status row per target"))
+            continue
+        kept.append(rec)
+    dead = {ident for ident, _why in bad}
+    return [r for r in kept if r.ident not in dead], bad
+
+
+def build_cutoff(conf: dict, filed: dict, records: list) -> str:
+    """`ASK_CUTOFF` after a landing: the LATER of the current value and the day after every `filed`.
+
+    Never simply the day after the newest ask. A landing that LOWERED the cutoff would re-arm V9
+    and V12 over every ask the switch-over already migrated, which only a fixture carrying a later
+    current value can see.
+    """
+    import datetime
+    current = backlog.read_conf(conf).cutoff or ""
+    wrote = sorted({filed[r.ident] for r in records
+                    if r.section == backlog.H_ASKS and r.ident in filed})
+    if not wrote:
+        return current
+    newest = datetime.date.fromisoformat(wrote[-1]) + datetime.timedelta(days=1)
+    return max(current, newest.isoformat())
+
+
+def read_filed_days(root: str, ours: str, theirs: list, ids: set) -> dict:
+    """`{id: YYYY-MM-DD}` — the author day of the OLDEST lineage commit whose blob holds the id.
+
+    NOT the merge's day and not today's. An ask filed in March and relocated in September was
+    asked for in March, and a `filed` value taken from the relocation run re-dates the whole corpus
+    against `ASK_CUTOFF`. The walk is unit 9's own — its lineage, its watched paths and its anchor
+    grammar — so the commits read here are exactly the commits the delta read.
+    """
+    if not ids:
+        return {}
+    base = pathlib.Path(root)
+    walk = audit.Walk(base, [ours, *theirs])
+    anchor, grammar = walk.resolve_grammar()
+    lineage, _bases = audit.derive_lineage(walk.parents, ours, list(theirs), walk.anc)
+    mine = sorted(lineage & walk.touching, key=lambda s: walk.pos.get(s, 0), reverse=True)
+    if not mine:
+        return {}
+    versions = audit.read_versions(base, mine, walk.paths, anchor, grammar)
+    days = {}
+    for line in run("git", "log", "--no-walk", "--format=%H %ad", "--date=format:%Y-%m-%d",
+                    *mine, cwd=root).split(NEWLINE):
+        bits = line.split()
+        if len(bits) == 2:
+            days[bits[0]] = bits[1]
+    filed: dict = {}
+    for sha in mine:
+        rows = versions.get(sha, {})
+        for ident in ids:
+            if ident not in filed and ident in rows and days.get(sha):
+                filed[ident] = days[sha]
+    return filed
+
+
+def build_table(verdicts: list, records: list, before, after) -> list:
+    """The conservation table: id, kind, classification, records, file, status before and after."""
+    by_id: dict = collections.defaultdict(list)
+    for rec in records:
+        by_id[rec.ident].append(rec.path)
+    rows = []
+    for verdict in verdicts:
+        paths = sorted(set(by_id.get(verdict.ident, []))) or ["-"]
+        rows.append(f"  {verdict.ident} · {verdict.kind} · {verdict.classification} · "
+                    f"{len(by_id.get(verdict.ident, []))} record(s) · {' '.join(paths)} · "
+                    f"{before.statuses.get(verdict.ident) or '-'}"
+                    f"{backlog.ARROW}{after.statuses.get(verdict.ident) or '-'}")
+    return rows
+
+
+# --------------------------------------------------------------------------------- the writer
+def restore_other_side(root: str, conf: dict, theirs: list) -> list:
+    """S11 — every view path and every family backlog archive set to the OTHER side's version.
+
+    After a transition merge a view carries conflict markers or authored rows and an archive
+    carries a modify/delete conflict; the generator's data-loss guard reads both and refuses. The
+    archive population is `resolve_row_docs`' own derivation of the rotated-family predicate — the
+    same names the hygiene engine's `--print-rotated-archive-ere` selects under the family
+    alternation, minus the decision log, which no family owns.
+    """
+    m = conf["MEMORY_ROOT"]
+    families = derive_families(conf)
+    stems = "|".join(re.escape(f) for f in families)
+    rot = re.compile(re.escape(m) + r"/archive/(?:" + stems + r")"
+                     r"\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md\Z")
+    other = theirs[0]
+    wanted = {f"{m}/backlog/{f}.md" for f in families}
+    for rev in [other, "HEAD"]:
+        for rel in run("git", "ls-tree", "-r", "--name-only", rev, "--", f"{m}/archive/",
+                       cwd=root).split(NEWLINE):
+            if rel.strip() and rot.fullmatch(rel.strip()):
+                wanted.add(rel.strip())
+    at_other = {rel.strip() for rel in run("git", "ls-tree", "-r", "--name-only", other, "--",
+                                           f"{m}/", cwd=root).split(NEWLINE) if rel.strip()}
+    touched = []
+    for rel in sorted(wanted):
+        if rel in at_other:
+            run("git", "checkout", other, "--", rel, cwd=root)
+        else:
+            code, _out = try_run("git", "rm", "-q", "-f", "--ignore-unmatch", "--", rel, cwd=root)
+            if code != 0:
+                continue
+        touched.append(rel)
+    return touched
+
+
+def render_views(root: str) -> None:
+    """`gen_build_index.py --write`, as a PROCESS and not an import.
+
+    The generator resolves its root from the working directory and this engine may be planning a
+    tree that is not the module's own; a subprocess with an explicit `cwd` is the only invocation
+    that cannot pick up the wrong one.
+    """
+    code, out = try_run(sys.executable, os.path.join(_HERE, "gen_build_index.py"), "--write",
+                        cwd=root)
+    if code != 0:
+        raise Problem(f"migrate-backlog: the view render refused, so the relocation stops before "
+                      f"writing a row into a tree whose views are unreadable:{NEWLINE}{out}")
+
+
+def write_relocation(root: str, plan: Relocation, conf: dict) -> list:
+    """Every planned record onto disk and into the index, then nothing else."""
+    memory_root = conf["MEMORY_ROOT"]
+    texts = read_target_texts(root, conf)
+    final = build_texts_with(texts, plan.records, memory_root)
+    written = sorted({r.path for r in plan.records})
+    for rel in written:
+        write_file(os.path.join(root, rel), final[rel])
+    if written:
+        run("git", "add", "--", *written, cwd=root)
+    return written
+
+
+def check_accounted(root: str, plan: Relocation, conf: dict) -> list:
+    """S3 — re-read the tree through unit 9's accounting predicate. One row per entry, or refuse.
+
+    THE PREDICATE IS UNIT 9's and is not re-implemented here. What this asserts is that the rows
+    this verb just wrote are the rows that unit's audit will read at the commit — the same
+    question, asked by the same function, before the operator finds out from a hook.
+    """
+    verdicts = audit.accounted(plan.entries, audit.INDEX, pathlib.Path(root))
+    bad = []
+    for idx, entry in enumerate(plan.entries):
+        got = verdicts.get(idx)
+        if got != "ok":
+            bad.append(f"  {entry['id']} ({entry['kind']}, changed by {entry['change'][:12]}): "
+                       f"{'no RELOCATED row names it' if got == 'none' else 'named by ' + str(got)}")
+    return bad
+
+
+# ----------------------------------------------------------------------------------- the verbs
+def print_plan_lines(plan: Relocation, root: str, args: dict) -> None:
+    print(f"migrate-backlog: {plan.form.name} · policy set {plan.form.policy} · "
+          f"{len(plan.entries)} delta entr(ies) · {len(plan.records)} record(s)")
+    for line in plan.table:
+        print(line)
+    for rec in plan.records:
+        print(f"  + {rec.path} · {rec.text}")
+    for ident, why in plan.human:
+        print(f"  {HUMAN} {ident}: {why}")
+    for ident, was, now in plan.confirm:
+        print(f"  CONFIRM {ident}: {was}{backlog.ARROW}{now} — pass --confirm {ident}")
+    if plan.cutoff:
+        print(f"ASK_CUTOFF={plan.cutoff}")
+
+
+def build_rerun(args: dict, plan: Relocation) -> str:
+    """The exact command that re-runs this plan with every refusal answered."""
+    head = f"python {index.kit_rel()}/migrate_backlog.py {args['mode']}"
+    if args["ref"]:
+        head += f" {args['ref']}"
+    if args["from"]:
+        head += f" --from {args['from']}"
+    head += f" --as {args['as_slug']}"
+    for ident, _why in plan.human:
+        head += f" --drop {ident}=<why>"
+    for ident, _was, _now in plan.confirm:
+        head += f" --confirm {ident}"
+    return head
+
+
+def cmd_relocate(root: str, args: dict) -> int:
+    """The three writing verbs, which differ only in how their sides resolve and what they confirm.
+
+    THE TREE IS TOUCHED ONLY ON THE WRITING PATH. S11's restore and the render run AFTER the plan
+    is known to be clean and BEFORE the table prints, because a refusal must leave `git status`
+    exactly as the merge left it (AC2) — a verb that repaired the views and then refused would hand
+    the operator a half-acted tree and tell them nothing was written.
+    """
+    conf = read_index(index.load_conf, root)
+    if not backlog.SLUG_RE.match(args["as_slug"] or ""):
+        raise Refusal(f"migrate-backlog: --as takes a build slug — a node tag and a CamelCase "
+                      f"adjective-noun, `[A-Za-z0-9]` with at least one capital — not "
+                      f"'{args['as_slug']}'")
+    form, ours, theirs = resolve_sides(root, args)
+    if form.policy != MIGRATION_SET and (args["signed"] or args["triage_ask"]):
+        raise Refusal(f"migrate-backlog: --signed and --triage-ask belong to the migration policy "
+                      f"set, which only --write and the landing form of --ingest run. This is "
+                      f"{form.name}.")
+    plan = build_relocation(root, form, ours, theirs, args, conf)
+    if args["dry_run"] or plan.human or plan.confirm:
+        print_plan_lines(plan, root, args)
+    if args["dry_run"]:
+        if plan.human or plan.confirm:
+            print(f"migrate-backlog: DRY RUN — this plan refuses. Re-run: {build_rerun(args, plan)}")
+            return 1
+        if not plan.records:
+            print("migrate-backlog: DRY RUN — the plan is EMPTY: every delta entry is already "
+                  "accounted at this tree, so a write would write nothing. This is exit 2 and not "
+                  "1 deliberately, so a caller that re-runs unless the rehearsal refused still "
+                  "re-runs.")
+            return 2
+        print("migrate-backlog: DRY RUN — nothing written; this plan would write "
+              f"{len(plan.records)} record(s)")
+        return 0
+    if plan.human or plan.confirm:
+        print(f"migrate-backlog: REFUSED — nothing written. Re-run: {build_rerun(args, plan)}")
+        return 1
+    if form.verb == "--relocate":
+        touched = restore_other_side(root, conf, theirs)
+        render_views(root)
+        # RE-STAGED AFTER THE RENDER, not before it. The restore stages the other side's blob and
+        # the render then rewrites the same file, so a run that staged only the restore would leave
+        # every view `MM` — staged at one content, on disk at another — which is the state an
+        # operator reads as "the relocation half-finished".
+        alive = [rel for rel in touched if os.path.isfile(os.path.join(root, rel))]
+        if alive:
+            run("git", "add", "--", *alive, cwd=root)
+    written = write_relocation(root, plan, conf)
+    bad = check_accounted(root, plan, conf)
+    if bad:
+        print("migrate-backlog: the records are written but the accounting re-read does not "
+              "accept them, so this merge would still red check 25:")
+        print(NEWLINE.join(bad))
+        return 1
+    print_plan_lines(plan, root, args)
+    print(f"migrate-backlog: wrote {len(plan.records)} record(s) into "
+          f"{len(written)} file(s) — {' '.join(written) if written else 'none'}")
+    return 0
+
+
+def cmd_stragglers(root: str, args: dict) -> int:
+    """S8 — every ref still carrying an unaccounted row change against the default branch."""
+    if run("git", "rev-parse", "--is-shallow-repository", cwd=root).strip() == "true":
+        print("migrate-backlog: DEAD PROBE — this is a shallow clone, so a ref's history is "
+              "truncated and every delta would be computed against a graft the walk cannot see")
+        return 1
+    scope = ["refs/heads"] if args["local"] else ["refs/heads", "refs/remotes"]
+    refs = []
+    for line in run("git", "for-each-ref", "--format=%(refname)", *scope, cwd=root).split(NEWLINE):
+        ref = line.strip()
+        if ref and not ref.endswith("/HEAD"):
+            refs.append(ref)
+    # THE REF POPULATION IS READ BEFORE THE DEFAULT BRANCH. A repository holding no ref holds no
+    # default branch either, and resolving that first would report the missing branch — a REFUSAL,
+    # exit 2 — where the honest answer is that this probe examined nothing.
+    if not refs:
+        print(f"migrate-backlog: DEAD PROBE — {' and '.join(scope)} hold no ref at all, so this "
+              f"inventory would report zero stragglers without examining anything")
+        return 1
+    name, tip = resolve_default_tip(root)
+    flagged, graph = scan_candidates(root, refs, tip)
+    conf = read_index(index.load_conf, root)
+    listed = []
+    for ref in refs:
+        sha = read_rev(root, ref)
+        if not sha or sha == tip or not check_reaches(graph, sha, flagged):
+            continue
+        entries = audit.delta(sha, tip, root)
+        if not entries:
+            continue
+        verdicts = audit.accounted(entries, tip, pathlib.Path(root))
+        open_ones = [e for i, e in enumerate(entries) if verdicts.get(i) != "ok"]
+        if open_ones:
+            listed.append((ref, sha, len(open_ones), open_ones[0]["change"]))
+    for ref, sha, count, change in listed:
+        if args["tsv"]:
+            print(f"straggler\t{ref}\t{sha}\t{count}\t{change}")
+        else:
+            print(f"straggler — {ref} · {sha[:12]} · {count} unaccounted · "
+                  f"first change {change[:12]}")
+    if args["tsv"]:
+        print(f"examined\t{len(refs)}")
+    else:
+        print(f"migrate-backlog: examined {len(refs)} ref(s) against {name} at {tip[:12]} · "
+              f"{len(listed)} straggler(s) · {_PROCESSES[0]} git process(es)")
+    if not args["tsv"]:
+        for line in read_recipe(root, conf):
+            print("  " + line)
+    return 0
+
+
+def scan_candidates(root: str, refs: list, tip: str) -> tuple:
+    """`(flagged commits, parent graph)` — two processes for every ref together (section 8 F11).
+
+    THE WATCHED PATHS HERE ARE A DELIBERATE SUPERSET of unit 9's, which exclude every archive that
+    is not family-named. One broad `git log` beats one pathspec per family, and a candidate whose
+    delta turns out empty is simply not listed — the delta is unit 9's and this walk only decides
+    whom to ask.
+
+    `--source` is NOT used: it labels each commit with the first ref that reached it, so a pushed
+    copy or a fork of a straggler would never be a candidate.
+    """
+    conf = read_index(index.load_conf, root)
+    m = conf["MEMORY_ROOT"]
+    flagged = {line.strip() for line in run(
+        "git", "log", "--format=%H", *refs, "--not", tip, "--",
+        f"{m}/backlog/", f"{m}/archive/", cwd=root).split(NEWLINE) if line.strip()}
+    graph: dict = {}
+    for line in run("git", "rev-list", "--parents", *refs, cwd=root).split(NEWLINE):
+        bits = line.split()
+        if bits:
+            graph[bits[0]] = bits[1:]
+    return flagged, graph
+
+
+def check_reaches(graph: dict, tip: str, flagged: set) -> bool:
+    """Does this tip reach a flagged commit? Computed IN MEMORY over the one parent graph, so a ref
+    with no such commit costs no delta at all and two refs sharing a straggler are both candidates."""
+    if not flagged:
+        return False
+    seen, stack = {tip}, [tip]
+    while stack:
+        sha = stack.pop()
+        if sha in flagged:
+            return True
+        for parent in graph.get(sha, ()):
+            if parent not in seen:
+                seen.add(parent)
+                stack.append(parent)
+    return False
+
+
+def cmd_recipe(root: str) -> int:
+    """S10 — the recipe, from the ONE constant unit 7 keeps, holding no copy of its own."""
+    for line in read_recipe(root):
+        print(line)
+    return 0
+
+
 # ----------------------------------------------------------------------------------- the self-test
 def write_file(path: str, text: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -1189,18 +2223,243 @@ def render_shard(family: str, rows: list) -> str:
     return _SHARD_HEAD.format(family=family) + "\n".join(rows) + "\n"
 
 
+# ------------------------------------------------------- the relocation engine's own fixtures
+#: The four hold rows AC12 grades under BOTH policy sets. Shared with `seed_corpus` below rather
+#: than copied into it: the planner's census and this engine's classifier answer the same question
+#: about these four rows, and two spellings of one corpus is how they would come to disagree.
+HOLD_ROWS = (
+    "- EXMP-aFoo-2 · OPEN · an ask nothing in this corpus closes",
+    "- EXMP-aFoo-3 · BLOCKED · held until EXMP-aFoo-2 lands, and then it can move",
+    "- EXMP-aFoo-5 · DEFERRED · only on the owner's word, naming nothing",
+    "- EXMP-aFoo-8 · BLOCKED · blocked on EXMP-dRuling-9, a decision id nothing files",
+)
+
+#: The transition fixture's three days, DISTINCT by construction. `filed` is mined from the oldest
+#: lineage commit holding the row, so a fixture whose commits shared a day could not tell the right
+#: source from the merge day or from the relocation run's own.
+DAY_SEED, DAY_STRAG, DAY_LATER, DAY_HEAD = ("2026-03-01", "2026-04-02", "2026-04-20",
+                                             "2026-05-03")
+
+FX_SEED_ROWS = (
+    "- EXMP-aFoo-1 · OPEN · the first ask, which the straggler closes",
+    "- EXMP-aFoo-2 · OPEN · the second ask, pointing at memory/gone/old.md",
+)
+FX_STRAG_ROWS = (
+    "- EXMP-aFoo-1 · CLOSED · the first ask, which the straggler closes",
+    "- EXMP-aFoo-2 · OPEN · the second ask, pointing at memory/here/new.md",
+    "- EXMP-aFoo-3 · OPEN · a brand new ask the straggler filed",
+)
+FX_HEAD_ASKS = (
+    "- EXMP-aFoo-1 · filed 2026-03-01 · the first ask, which the straggler closes",
+    "- EXMP-aFoo-2 · filed 2026-03-01 · the second ask, pointing at memory/gone/old.md",
+)
+
+
+def render_transition_conf(mode: str = "shards", cutoff: str = "") -> str:
+    """The fixture conf. `ROTATION_MODE` is declared because section 4 reads shard and archive as
+    ONE population under cut-mode rotation, which AC11 stages."""
+    out = (render_conf() + 'ROTATION_MODE="cut"' + NEWLINE
+           + f'{backlog.MODE_KEY}="{mode}"' + NEWLINE)
+    if cutoff:
+        out += f'{backlog.CUTOFF_KEY}="{cutoff}"' + NEWLINE
+    return out
+
+
+def read_kit_root() -> str:
+    """The repository THIS MODULE is installed in — the fixtures' source, never their subject.
+
+    Deliberately not `resolve_root()`, which answers "which repo is being planned": the arms below
+    seed scratch repositories and need the tree the kit itself lives in to copy its sibling out of.
+    """
+    return run("git", "rev-parse", "--show-toplevel", cwd=_HERE).strip()
+
+
+def seed_recall_kit(tree: str) -> None:
+    """The memory-recall sibling, inside the fixture, because unit 9 keys every row through it.
+
+    The SOURCE is resolved by that unit's own resolver from this repository's root, so nothing here
+    spells a sibling kit's install path; the destination is its own basename at the fixture root,
+    which is the second layout that resolver accepts.
+    """
+    import shutil
+    src = audit.resolve_recall_kit(pathlib.Path(read_kit_root()))
+    dst = os.path.join(tree, src.name)
+    os.makedirs(dst, exist_ok=True)
+    for name in ("extract.py", "recall_conf.py"):
+        shutil.copyfile(str(src / name), os.path.join(dst, name))
+
+
+def run_commit_on(tree: str, message: str, files: dict, day: str = "",
+                  removals=()) -> str:
+    """One dated fixture commit. The date is the AUTHOR date `filed` is mined from."""
+    for rel in removals:
+        path = os.path.join(tree, rel)
+        if os.path.isfile(path):
+            os.remove(path)
+    for rel, text in files.items():
+        write_file(os.path.join(tree, rel), text)
+    env = dict(os.environ)
+    if day:
+        env["GIT_AUTHOR_DATE"] = day + "T12:00:00 +0000"
+        env["GIT_COMMITTER_DATE"] = day + "T12:00:00 +0000"
+    run("git", "add", "-A", cwd=tree)
+    run("git", "commit", "-q", "-m", message, "--no-verify", cwd=tree, env=env)
+    return run("git", "rev-parse", "HEAD", cwd=tree).strip()
+
+
+def render_build_backlog(slug: str, asks=(), rows=()) -> str:
+    body = [f"# {slug} — asks"]
+    if asks:
+        body += ["", backlog.H_ASKS, ""] + list(asks)
+    if rows:
+        body += ["", backlog.H_DISPOSITIONS, ""] + list(rows)
+    return NEWLINE.join(body) + NEWLINE
+
+
+def seed_shards_base(tree: str, rows, slugs=("aFoo", "aWho"), conf_text: str = "",
+                     extra=None) -> str:
+    """The pre-flip seed both fixture shapes start from: one shards-mode tree with one shard."""
+    init_repo(tree)
+    seed_recall_kit(tree)
+    files = {
+        ".memory-tree.conf": conf_text or render_transition_conf("shards"),
+        "README.md": "fixture" + NEWLINE,
+        "memory/backlog/EXMP.md": render_shard("EXMP", list(rows)),
+        "memory/backlog/OTHR.md": render_shard("OTHR", []),
+        "memory/project/stale-header-waiver.txt": WAIVER,
+    }
+    for slug in slugs:
+        files[f"memory/builds/{slug}/README.md"] = render_readme(slug, status="OPEN")
+    files.update(extra or {})
+    return run_commit_on(tree, "seed: the pre-flip corpus", files, day=DAY_SEED)
+
+
+def seed_transition(base: str, name: str, seed_rows=FX_SEED_ROWS, strag_rows=FX_STRAG_ROWS,
+                    head_asks=FX_HEAD_ASKS, head_rows=(), slugs=("aFoo", "aWho"),
+                    strag_files=None, strag_removals=(), head_files=None,
+                    head_slug: str = "aFoo", seed_extra=None) -> tuple:
+    """The straggler shape: a shards-mode seed, a branch that kept editing the shard, and a default
+    branch that switched over. -> `(tree, seed sha, straggler sha, default sha)`."""
+    tree = os.path.join(base, name)
+    b0 = seed_shards_base(tree, seed_rows, slugs, extra=seed_extra)
+    run("git", "checkout", "-q", "-b", "strag", cwd=tree)
+    files = {"memory/backlog/EXMP.md": render_shard("EXMP", list(strag_rows))}
+    files.update(strag_files or {})
+    s1 = run_commit_on(tree, "strag: the rows this branch kept editing", files, day=DAY_STRAG,
+                       removals=strag_removals)
+    # A SECOND, LATER COMMIT THAT TOUCHES THE SHARD AND CHANGES NO ROW. Without it the straggler's
+    # lineage holds ONE commit touching the watched paths, the oldest and the newest are the same
+    # commit, and an arm grading `filed` cannot tell the two apart — a fixture that certifies
+    # coverage it does not have.
+    run_commit_on(tree, "strag: a later commit that edits the shard's prose alone",
+                  {"memory/backlog/EXMP.md": render_shard("EXMP", list(strag_rows)).replace(
+                      "> Mutable.", "> Mutable. Edited later, changing no row.")},
+                  day=DAY_LATER)
+    run("git", "checkout", "-q", "main", cwd=tree)
+    files = {".memory-tree.conf": render_transition_conf("builds"),
+             f"memory/builds/{head_slug}/BACKLOG.md": render_build_backlog(
+                 head_slug, head_asks, head_rows)}
+    files.update(head_files or {})
+    for rel, text in files.items():
+        write_file(os.path.join(tree, rel), text)
+    for rel in ("memory/backlog/EXMP.md", "memory/backlog/OTHR.md"):
+        path = os.path.join(tree, rel)
+        if os.path.isfile(path):
+            os.remove(path)
+    render_views(tree)
+    m1 = run_commit_on(tree, "main: the switch-over", {}, day=DAY_HEAD)
+    return tree, b0, s1, m1
+
+
+def seed_landing(base: str, name: str, tip_rows, seed_rows=FX_SEED_ROWS,
+                 head_asks=FX_HEAD_ASKS, head_rows=(), cutoff: str = "",
+                 slugs=("aFoo", "aWho"), head_slug: str = "aFoo") -> tuple:
+    """The LANDING shape (S6): a shards-mode default tip under a builds-mode HEAD.
+
+    `origin/HEAD` is written into the fixture, because the landing form admits a ref only when it
+    IS the default tip and that resolution is the pre-push hook's — observed first, environment
+    only as a cross-check.
+    """
+    tree = os.path.join(base, name)
+    seed_shards_base(tree, seed_rows, slugs)
+    run("git", "checkout", "-q", "-b", "flip", cwd=tree)
+    files = {".memory-tree.conf": render_transition_conf("builds", cutoff),
+             f"memory/builds/{head_slug}/BACKLOG.md": render_build_backlog(
+                 head_slug, head_asks, head_rows)}
+    for rel, text in files.items():
+        write_file(os.path.join(tree, rel), text)
+    for rel in ("memory/backlog/EXMP.md", "memory/backlog/OTHR.md"):
+        os.remove(os.path.join(tree, rel))
+    render_views(tree)
+    flip = run_commit_on(tree, "flip: the switch-over", {}, day=DAY_HEAD)
+    run("git", "checkout", "-q", "main", cwd=tree)
+    tip = run_commit_on(tree, "main: the rows the default branch kept editing",
+                        {"memory/backlog/EXMP.md": render_shard("EXMP", list(tip_rows))},
+                        day=DAY_STRAG)
+    run("git", "update-ref", "refs/remotes/origin/main", tip, cwd=tree)
+    run("git", "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main", cwd=tree)
+    run("git", "checkout", "-q", "flip", cwd=tree)
+    return tree, flip, tip
+
+
+def read_backlogs(tree: str) -> dict:
+    """`{slug: text}` for every per-build backlog file on disk. The arms' comparison unit."""
+    out = {}
+    root = os.path.join(tree, "memory", "builds")
+    for slug in sorted(os.listdir(root)) if os.path.isdir(root) else []:
+        path = os.path.join(root, slug, "BACKLOG.md")
+        if os.path.isfile(path):
+            out[slug] = read_text(path)
+    return out
+
+
+def drive_engine(tree: str, argv: list) -> tuple:
+    """One CLI run of the relocation engine, in-process. -> `(exit code, everything it printed)`."""
+    buf = io.StringIO()
+    code = 0
+    try:
+        args = read_args(argv)
+        with redirect_stdout(buf):
+            if args["mode"] == "--stragglers":
+                code = cmd_stragglers(tree, args)
+            elif args["mode"] == "--recipe":
+                code = cmd_recipe(tree)
+            else:
+                code = cmd_relocate(tree, args)
+    except Problem as exc:
+        return getattr(exc, "code", 1), buf.getvalue() + str(exc)
+    return code, buf.getvalue()
+
+
+def run_audit(tree: str, staged: bool = False) -> int:
+    """Hygiene check 25's own module over a fixture, IN PROCESS and against an explicit root.
+
+    NOT the CLI. That entry point resolves its repository from the module's own location, so a
+    subprocess launched with `cwd=<fixture>` would audit THIS repository instead and return a
+    verdict about the wrong tree — which reads exactly like a passing arm. Measured: the first cut
+    of these arms reported a clean fixture that had never been looked at.
+    """
+    root = pathlib.Path(tree)
+    buf = io.StringIO()
+    with redirect_stdout(buf):
+        if staged:
+            return audit.cmd_staged(root)
+        tip = run("git", "rev-parse", "HEAD", cwd=tree).strip()
+        return audit.print_report(audit.scan_history(root, [tip], False, tip), False)
+
+
 def seed_corpus(tmp: str) -> None:
     """The shared fixture: one repo with real history, holding one case per selector and refusal."""
     init_repo(tmp)
     seed_rows = [
         "- EXMP-aFoo-1 · OPEN · a planner module that reads legacy rows and reports evidence",
-        "- EXMP-aFoo-2 · OPEN · an ask nothing in this corpus closes",
-        "- EXMP-aFoo-3 · BLOCKED · held until EXMP-aFoo-2 lands, and then it can move",
+        HOLD_ROWS[0],
+        HOLD_ROWS[1],
         "- EXMP-aFoo-4 · BLOCKED · blocked on -4 and -11, shorthand the corpus cannot resolve",
-        "- EXMP-aFoo-5 · DEFERRED · only on the owner's word, naming nothing",
+        HOLD_ROWS[2],
         "- EXMP-aFoo-6 · CLOSED · a terminal row carrying its own reason",
         "- EXMP-aFoo-7 · WONTDO · declined, and here is the reason it was declined",
-        "- EXMP-aFoo-8 · BLOCKED · blocked on EXMP-dRuling-9, a decision id nothing files",
+        HOLD_ROWS[3],
         "- EXMP-aFoo-9 · OPEN · a row whose text wraps",
         "  across a second physical line",
         "- EXMP-aBar-1 · OPEN · a bowl of custard needing a sibling spec to absorb it",
@@ -1558,6 +2817,572 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
             "30 row copies", lambda: run_plan_in(side).summary["corpus"][0])
         arm("so the tree the CALL was made in decided the census, not the module's own",
             len(plan.census) - 1, lambda: len(run_plan_in(side).census))
+        # ============================================== the relocation engine (unit 12)
+        # ---- AC1: the three side resolutions, one delta, records that agree byte for byte.
+        fa, _fa0, fa_change, _fa1 = seed_transition(base, "rel_merge_head")
+        run("git", "checkout", "-q", "strag", cwd=fa)
+        try_run("git", "merge", "--no-commit", "--no-ff", "main", cwd=fa)
+        rc_a, out_a = drive_engine(fa, ["--relocate", "--as", "aWho"])
+        books_a = read_backlogs(fa)
+        arm("--relocate over a fresh transition merge exits 0", 0, lambda: rc_a)
+        arm("the relocated new ask is filed in ITS OWN id's build folder",
+            "- EXMP-aFoo-3 · filed " + DAY_STRAG, lambda: books_a.get("aFoo", ""))
+        arm("its filed is the day the row was first added, not the merge's day",
+            False, lambda: DAY_HEAD in books_a.get("aFoo", ""))
+        arm("and not the day of the LATER lineage commit that also held the row",
+            False, lambda: DAY_LATER in books_a.get("aFoo", ""))
+        arm("the CLOSED disposition cites the CHANGE commit, never the merge",
+            f"- CLOSED · EXMP-aFoo-1 · by {fa_change}", lambda: books_a.get("aWho", ""))
+        arm("the repointed ask text carries the straggler's new path",
+            "memory/here/new.md", lambda: books_a.get("aFoo", ""))
+        arm("and no longer carries the old one",
+            False, lambda: "memory/gone/old.md" in books_a.get("aFoo", ""))
+        arm("every delta entry gets exactly one RELOCATED row",
+            3, lambda: books_a.get("aWho", "").count("- RELOCATED · "))
+        arm("each one in the --as folder, which is the writer's own",
+            0, lambda: books_a.get("aFoo", "").count("- RELOCATED · "))
+        run("git", "add", "-A", cwd=fa)
+        arm("the pending merge then passes the transition audit against the index",
+            0, lambda: run_audit(fa, staged=True))
+
+        fb, _fb0, _fb1, _fb2 = seed_transition(base, "rel_concluded")
+        run("git", "checkout", "-q", "strag", cwd=fb)
+        try_run("git", "merge", "--no-commit", "--no-ff", "main", cwd=fb)
+        run("git", "checkout", "main", "--", "memory/backlog/EXMP.md", cwd=fb)
+        run("git", "commit", "-q", "-m", "merge the default branch", "--no-verify", cwd=fb)
+        rc_b, _out_b = drive_engine(fb, ["--relocate", "--as", "aWho"])
+        arm("the concluded-merge form resolves the same two sides and exits 0", 0, lambda: rc_b)
+        arm("and its records are byte-identical to the MERGE_HEAD run's",
+            True, lambda: read_backlogs(fb) == books_a)
+
+        fc, _fc0, _fc1, _fc2 = seed_transition(base, "rel_from")
+        rc_c0, out_c0 = drive_engine(fc, ["--relocate", "--from", "strag", "--as", "aWho"])
+        arm("--relocate --from takes S5's confirmation, so an unconfirmed flip refuses",
+            1, lambda: rc_c0)
+        arm("naming the id and the option that answers it",
+            "CONFIRM EXMP-aFoo-1: OPEN → CLOSED — pass --confirm EXMP-aFoo-1", lambda: out_c0)
+        rc_c, _out_c = drive_engine(fc, ["--relocate", "--from", "strag", "--as", "aWho",
+                                         "--confirm", "EXMP-aFoo-1"])
+        arm("the --from form writes once its status change is confirmed", 0, lambda: rc_c)
+        arm("and its records are byte-identical to the other two forms'",
+            True, lambda: read_backlogs(fc) == books_a)
+
+        # ---- AC2: one unclassifiable prose change refuses the WHOLE plan, and --drop answers it.
+        amend_seed = list(FX_SEED_ROWS) + [
+            "- EXMP-aFoo-4 · OPEN · the fourth ask, whose prose this branch rewrites"]
+        amend_strag = list(FX_STRAG_ROWS) + [
+            "- EXMP-aFoo-4 · OPEN · a wholly different sentence about marmalade windmills"]
+        amend_head = list(FX_HEAD_ASKS) + [
+            "- EXMP-aFoo-4 · filed 2026-03-01 · the fourth ask, whose prose this branch rewrites"]
+        fd, _fd0, _fd1, _fd2 = seed_transition(base, "rel_amended", seed_rows=amend_seed,
+                                               strag_rows=amend_strag, head_asks=amend_head)
+        run("git", "checkout", "-q", "strag", cwd=fd)
+        try_run("git", "merge", "--no-commit", "--no-ff", "main", cwd=fd)
+        before_status = run("git", "status", "--porcelain", cwd=fd)
+        books_before = read_backlogs(fd)
+        rc_d, out_d = drive_engine(fd, ["--relocate", "--as", "aWho"])
+        arm("an unclassifiable prose change refuses the whole plan", 1, lambda: rc_d)
+        arm("naming the id under NEEDS-HUMAN", "NEEDS-HUMAN EXMP-aFoo-4", lambda: out_d)
+        arm("and printing the exact --drop re-run", "--drop EXMP-aFoo-4=<why>", lambda: out_d)
+        arm("the refusal writes NOTHING: every record file is exactly as it was",
+            True, lambda: read_backlogs(fd) == books_before)
+        arm("and the tree is exactly as the merge left it",
+            True, lambda: run("git", "status", "--porcelain", cwd=fd) == before_status)
+        rc_d2, _out_d2 = drive_engine(fd, ["--relocate", "--as", "aWho",
+                                           "--drop", "EXMP-aFoo-4=a human read it and let it go"])
+        arm("re-run with --drop it exits 0", 0, lambda: rc_d2)
+        arm("and writes one dropped row for that id, and no other record for it",
+            1, lambda: read_backlogs(fd).get("aWho", "").count(
+                "- RELOCATED · EXMP-aFoo-4 · by "))
+        arm("that row is the dropped disposal carrying the human's reason",
+            "dropped: a human read it and let it go", lambda: read_backlogs(fd).get("aWho", ""))
+
+        # ---- AC3 and AC15: lab case e09b, through --repair, --ingest and --relocate --from.
+        reopen_row = "- REOPEN · EXMP-aFoo-1 · of aFoo · the default branch reopened this on purpose"
+        fe, _fe0, _fe1, _fe2 = seed_transition(base, "rel_reopen", head_rows=(reopen_row,))
+        run("git", "checkout", "-q", "strag", cwd=fe)
+        try_run("git", "merge", "--no-commit", "--no-ff", "main", cwd=fe)
+        run("git", "checkout", "main", "--", "memory/backlog/EXMP.md", cwd=fe)
+        run("git", "commit", "-q", "-m", "merge the default branch", "--no-verify", cwd=fe)
+        fe_merge = run("git", "rev-parse", "HEAD", cwd=fe).strip()
+        rc_e0, out_e0 = drive_engine(fe, ["--repair", fe_merge, "--as", "aWho"])
+        arm("--repair refuses a status-changing record over a deliberate reopen", 1, lambda: rc_e0)
+        arm("naming the id, the status before and after, and --confirm",
+            "CONFIRM EXMP-aFoo-1: OPEN → CLOSED — pass --confirm EXMP-aFoo-1", lambda: out_e0)
+        arm("while the uncontested new ask is not held for confirmation",
+            False, lambda: "CONFIRM EXMP-aFoo-3" in out_e0)
+        rc_e1, _out_e1 = drive_engine(fe, ["--repair", fe_merge, "--as", "aWho",
+                                           "--confirm", "EXMP-aFoo-1"])
+        arm("--repair writes once the id is confirmed", 0, lambda: rc_e1)
+        arm("including the uncontested new ask, which needed no confirmation",
+            "- EXMP-aFoo-3 · filed ", lambda: read_backlogs(fe).get("aFoo", ""))
+
+        ff, _ff0, _ff1, _ff2 = seed_transition(base, "rel_reopen_ingest", head_rows=(reopen_row,))
+        rc_f0, out_f0 = drive_engine(ff, ["--ingest", "strag", "--as", "aWho"])
+        arm("the straggler form of --ingest refuses the same contested id", 1, lambda: rc_f0)
+        arm("naming it and --confirm too",
+            "CONFIRM EXMP-aFoo-1: OPEN → CLOSED — pass --confirm EXMP-aFoo-1", lambda: out_f0)
+        rc_f1, out_f1 = drive_engine(ff, ["--relocate", "--from", "strag", "--as", "aWho"])
+        arm("AC15: --relocate --from refuses it through the sibling write path", 1, lambda: rc_f1)
+        arm("with the same id, statuses and option named",
+            "CONFIRM EXMP-aFoo-1: OPEN → CLOSED — pass --confirm EXMP-aFoo-1", lambda: out_f1)
+        rc_f2, _out_f2 = drive_engine(ff, ["--relocate", "--from", "strag", "--as", "aWho",
+                                           "--confirm", "EXMP-aFoo-1"])
+        arm("and writes once confirmed", 0, lambda: rc_f2)
+
+        # ---- AC4: an unaccounted transition, the repair that closes it, and its idempotence.
+        fg, _fg0, _fg1, _fg2 = seed_transition(base, "rel_unaccounted")
+        run("git", "checkout", "-q", "strag", cwd=fg)
+        try_run("git", "merge", "--no-commit", "--no-ff", "main", cwd=fg)
+        run("git", "checkout", "main", "--", "memory/backlog/EXMP.md", cwd=fg)
+        run("git", "commit", "-q", "-m", "merge the default branch", "--no-verify", cwd=fg)
+        fg_merge = run("git", "rev-parse", "HEAD", cwd=fg).strip()
+        arm("a transition committed unaccounted reds check 25's own module",
+            1, lambda: run_audit(fg))
+        rc_g, _out_g = drive_engine(fg, ["--repair", fg_merge, "--as", "aWho",
+                                         "--confirm", "EXMP-aFoo-1"])
+        arm("--repair writes the records it names", 0, lambda: rc_g)
+        run("git", "add", "-A", cwd=fg)
+        run("git", "commit", "-q", "-m", "records: the repair", "--no-verify", cwd=fg)
+        arm("after which the audit accepts the same transition", 0, lambda: run_audit(fg))
+        rc_g2, out_g2 = drive_engine(fg, ["--repair", fg_merge, "--as", "aWho", "--dry-run"])
+        arm("a second --repair plans ZERO records, because every entry is accounted",
+            "the plan is EMPTY", lambda: out_g2)
+        arm("and says so with exit 2 rather than 1 (AC7)", 2, lambda: rc_g2)
+
+        # ---- AC5: an ingested ref stops being listed while it is still unmerged.
+        fh, _fh0, _fh1, _fh2 = seed_transition(base, "rel_ingest")
+        os.environ["GOV_DEFAULT_BRANCH"] = "main"
+        try:
+            _rc, out_h0 = drive_engine(fh, ["--stragglers"])
+            arm("the inventory lists the unmerged straggler before it is ingested",
+                "straggler — refs/heads/strag", lambda: out_h0)
+            rc_h, _out_h = drive_engine(fh, ["--ingest", "strag", "--as", "aWho",
+                                             "--confirm", "EXMP-aFoo-1"])
+            arm("--ingest on the default branch writes its records", 0, lambda: rc_h)
+            run("git", "add", "-A", cwd=fh)
+            run("git", "commit", "-q", "-m", "records: the ingest", "--no-verify", cwd=fh)
+            _rc, out_h1 = drive_engine(fh, ["--stragglers"])
+            arm("once they are committed the ref stops being listed, still unmerged",
+                False, lambda: "straggler — refs/heads/strag" in out_h1)
+            arm("which is a judgement about CONTENT, so the ref is still not an ancestor",
+                False, lambda: check_contains(fh, read_rev(fh, "strag"), "HEAD"))
+        finally:
+            os.environ.pop("GOV_DEFAULT_BRANCH", None)
+        try_run("git", "merge", "--no-commit", "--no-ff", "strag", cwd=fh)
+        run("git", "checkout", "HEAD", "--", "memory/backlog/EXMP.md", cwd=fh)
+        run("git", "commit", "-q", "-m", "merge the straggler", "--no-verify", cwd=fh)
+        arm("and the later merge passes the audit with no further record", 0, lambda: run_audit(fh))
+
+        # ---- AC6: the straggler inventory, its two scopes, its fork case and its DEAD PROBES.
+        os.environ["GOV_DEFAULT_BRANCH"] = "main"
+        try:
+            fi = os.path.join(base, "inv_three")
+            seed_shards_base(fi, FX_SEED_ROWS)
+            run("git", "checkout", "-q", "-b", "strag", cwd=fi)
+            run_commit_on(fi, "strag: a row change the default branch lacks",
+                          {"memory/backlog/EXMP.md": render_shard("EXMP", list(FX_STRAG_ROWS))},
+                          day=DAY_STRAG)
+            far = run("git", "rev-parse", "HEAD", cwd=fi).strip()
+            run("git", "checkout", "-q", "main", cwd=fi)
+            run("git", "update-ref", "refs/remotes/origin/far", far, cwd=fi)
+            _rc, out_i = drive_engine(fi, ["--stragglers"])
+            arm("the inventory examines every local AND remote-tracking ref",
+                "examined 3 ref(s)", lambda: out_i)
+            arm("and lists both stragglers", 2, lambda: out_i.count("straggler — "))
+            arm("including the remote-tracking one, which is another node's pushed copy",
+                "straggler — refs/remotes/origin/far", lambda: out_i)
+            _rc, out_i2 = drive_engine(fi, ["--stragglers", "--local"])
+            arm("--local narrows it to refs/heads", 1, lambda: out_i2.count("straggler — "))
+            _rc, out_i3 = drive_engine(fi, ["--stragglers", "--tsv"])
+            arm("--tsv prints the machine-readable row", f"straggler\trefs/heads/strag\t",
+                lambda: out_i3)
+            arm("and its own liveness count", "examined\t3", lambda: out_i3)
+
+            fj = os.path.join(base, "inv_fork")
+            seed_shards_base(fj, FX_SEED_ROWS)
+            run("git", "checkout", "-q", "-b", "strag", cwd=fj)
+            run_commit_on(fj, "strag: a row change the default branch lacks",
+                          {"memory/backlog/EXMP.md": render_shard("EXMP", list(FX_STRAG_ROWS))},
+                          day=DAY_STRAG)
+            run("git", "branch", "twin", cwd=fj)
+            run("git", "checkout", "-q", "-b", "forked", cwd=fj)
+            run_commit_on(fj, "forked: a commit touching no backlog row",
+                          {"README.md": "forked" + NEWLINE}, day=DAY_HEAD)
+            run("git", "checkout", "-q", "main", cwd=fj)
+            _rc, out_j = drive_engine(fj, ["--stragglers"])
+            arm("two refs at one straggler tip and a fork above it are ALL candidates",
+                3, lambda: out_j.count("straggler — "))
+
+            empty = os.path.join(base, "inv_empty")
+            os.makedirs(empty, exist_ok=True)
+            run("git", "init", "-q", "-b", "main", ".", cwd=empty)
+            rc_k, out_k = drive_engine(empty, ["--stragglers"])
+            arm("a repository holding no ref is a DEAD PROBE, not a clean inventory",
+                "DEAD PROBE", lambda: out_k)
+            arm("and exits 1", 1, lambda: rc_k)
+
+            shallow = os.path.join(base, "inv_shallow")
+            run("git", "clone", "-q", "--depth", "1",
+                "file:///" + os.path.abspath(fi).replace(chr(92), "/"), shallow, cwd=base)
+            rc_l, out_l = drive_engine(shallow, ["--stragglers"])
+            arm("a shallow clone is a DEAD PROBE too, because its history is truncated",
+                "DEAD PROBE", lambda: out_l)
+            arm("and exits 1 as well", 1, lambda: rc_l)
+        finally:
+            os.environ.pop("GOV_DEFAULT_BRANCH", None)
+
+        # ---- AC7: --dry-run's three outcomes, and that it touches nothing.
+        fm, _fm0, _fm1, _fm2 = seed_transition(base, "rel_dry")
+        run("git", "checkout", "-q", "strag", cwd=fm)
+        try_run("git", "merge", "--no-commit", "--no-ff", "main", cwd=fm)
+        dry_before = run("git", "status", "--porcelain", cwd=fm)
+        rc_m, out_m = drive_engine(fm, ["--relocate", "--as", "aWho", "--dry-run"])
+        arm("a dry run over a writable plan exits 0", 0, lambda: rc_m)
+        arm("printing the plan and its conservation table",
+            "EXMP-aFoo-1 · changed · flip to CLOSED", lambda: out_m)
+        arm("and touching neither the worktree nor the index",
+            True, lambda: run("git", "status", "--porcelain", cwd=fm) == dry_before)
+        arm("not even by creating the file it would have written into",
+            False, lambda: os.path.isfile(os.path.join(fm, "memory/builds/aWho/BACKLOG.md")))
+        rc_m2, _out_m2 = drive_engine(fd, ["--relocate", "--as", "aWho", "--dry-run"])
+        arm("a dry run over a plan holding a NEEDS-HUMAN entry exits 1", 1, lambda: rc_m2)
+
+        # ---- S2: the classification rows AC1 and AC2 do not reach — a removal on either side of
+        # ---- the terminal line, a decline, and a flip the fold now derives for itself.
+        cls_seed = [
+            "- EXMP-aFoo-1 · CLOSED · a terminal row this branch rotates out of the shard",
+            "- EXMP-aFoo-2 · OPEN · a live row this branch deletes outright",
+            "- EXMP-aFoo-3 · OPEN · a row this branch declines",
+            "- EXMP-aFoo-4 · OPEN · a row this branch marks as specced",
+        ]
+        cls_strag = [
+            "- EXMP-aFoo-3 · WONTDO · a row this branch declines",
+            "- EXMP-aFoo-4 · SPECCED · a row this branch marks as specced",
+        ]
+        cls_head = ["- EXMP-aFoo-%d · filed 2026-03-01 · %s" % (n, row.split(" · ", 2)[2])
+                    for n, row in enumerate(cls_seed, 1)]
+        fcl, _fcl0, _fcl1, _fcl2 = seed_transition(base, "rel_classes", seed_rows=cls_seed,
+                                                   strag_rows=cls_strag, head_asks=cls_head)
+        run("git", "checkout", "-q", "strag", cwd=fcl)
+        try_run("git", "merge", "--no-commit", "--no-ff", "main", cwd=fcl)
+        rc_cl0, out_cl0 = drive_engine(fcl, ["--relocate", "--as", "aWho"])
+        arm("a row that was LIVE at the merge base and is gone is NEEDS-HUMAN",
+            "NEEDS-HUMAN EXMP-aFoo-2", lambda: out_cl0)
+        arm("and it alone refuses the plan", 1, lambda: rc_cl0)
+        rc_cl, out_cl = drive_engine(fcl, ["--relocate", "--as", "aWho",
+                                           "--drop", "EXMP-aFoo-2=a human checked: deliberate"])
+        books_cl = read_backlogs(fcl)
+        arm("a row that was TERMINAL at the merge base and is gone drops mechanically",
+            "- RELOCATED · EXMP-aFoo-1 · by ", lambda: books_cl.get("aWho", ""))
+        arm("with the dropped disposal and no status row of its own",
+            "dropped: terminal row removed", lambda: books_cl.get("aWho", ""))
+        arm("a flip to WONTDO carries the row's own reason",
+            "- WONTDO · EXMP-aFoo-3 · a row this branch declines",
+            lambda: books_cl.get("aWho", ""))
+        arm("a flip between LIVE tokens writes no record, the fold deriving it now",
+            "kept: live flip, derived", lambda: books_cl.get("aWho", ""))
+        arm("so that id gets its provenance row and nothing else", 0,
+            lambda: books_cl.get("aWho", "").count("· EXMP-aFoo-4 · a row this branch"))
+        arm("and all four entries are accounted exactly once", 0, lambda: rc_cl)
+
+        # ---- AC8: the recipe, one constant and three renderings.
+        kit_root = read_kit_root()
+        want_recipe = read_recipe(kit_root)
+        view_block = NEWLINE.join("> " + line for line in want_recipe)
+        arm("the rendered family view quotes the recipe --recipe prints, byte for byte",
+            True, lambda: view_block in read_text(os.path.join(fa, "memory/backlog/EXMP.md")))
+        shard_path = os.path.join(base, "mr_shard.md")
+        view_path = os.path.join(base, "mr_view.md")
+        empty_path = os.path.join(base, "mr_base.md")
+        write_file(view_path, backlog.render_family_view(
+            "EXMP", (), backlog.Fold({}, {}, {}, {}), "memory", index.kit_rel(),
+            index.GEN_HEADER))
+        write_file(shard_path, render_shard("EXMP", ["- EXMP-aFoo-1 · OPEN · an authored row"]))
+        write_file(empty_path, "")
+        _rc, mr_out = try_run(sys.executable, os.path.join(_HERE, "merge-rows.py"), empty_path,
+                              view_path, shard_path, "memory/backlog/EXMP.md", cwd=kit_root)
+        arm("the row driver's shard-into-view banner carries the same bytes",
+            True, lambda: NEWLINE.join(want_recipe) in mr_out)
+
+        # ---- AC9: every refusal that is a missing CONDITION rather than an unanswered question.
+        fn, _fn0, _fn1, _fn2 = seed_transition(base, "rel_refuse")
+        rc_n0, out_n0 = drive_engine(fn, ["--relocate", "--as", "aWho"])
+        arm("--relocate with no MERGE_HEAD, no merge HEAD and no --from exits 2",
+            2, lambda: rc_n0)
+        arm("naming the missing condition", "found no MERGE_HEAD", lambda: out_n0)
+        arm("and reprinting the recipe that sent the operator here",
+            want_recipe[0], lambda: out_n0)
+        run("git", "checkout", "-q", "strag", cwd=fn)
+        rc_n1, out_n1 = drive_engine(fn, ["--relocate", "--from", "main", "--as", "aWho"])
+        arm("--relocate refuses a shards-mode OTHER side, which has no file to relocate into",
+            2, lambda: rc_n1)
+        arm("naming that side's mode", "reads shards", lambda: out_n1)
+        rc_n2, out_n2 = drive_engine(fn, ["--repair", "HEAD", "--as", "aWho"])
+        arm("--repair from a shards-mode checkout exits 2 naming HEAD's mode", 2, lambda: rc_n2)
+        arm("because its records would be a half-migration",
+            "`.memory-tree.conf` reads shards", lambda: out_n2)
+        rc_n3, out_n3 = drive_engine(fn, ["--ingest", "main", "--as", "aWho"])
+        arm("and so does the straggler form of --ingest from that checkout", 2, lambda: rc_n3)
+        arm("which is the straggler form, the landing form needing a builds-mode HEAD",
+            "straggler form needs a builds-mode checkout", lambda: out_n3)
+        rc_n4, out_n4 = drive_engine(fn, ["--relocate", "--as", "not a slug"])
+        arm("an --as value outside the slug shape exits 2", 2, lambda: rc_n4)
+        arm("naming the shape it wanted", "takes a build slug", lambda: out_n4)
+
+        # ---- AC11: a flip rotated into a backlog archive is ONE change, and the archive goes.
+        arch_rel = "memory/archive/EXMP.2026-04-02.md"
+        fo, _fo0, fo_change, _fo2 = seed_transition(
+            base, "rel_archive",
+            strag_rows=[FX_STRAG_ROWS[1], FX_STRAG_ROWS[2]],
+            strag_files={arch_rel: render_shard("EXMP", [FX_STRAG_ROWS[0]])})
+        run("git", "checkout", "-q", "strag", cwd=fo)
+        try_run("git", "merge", "--no-commit", "--no-ff", "main", cwd=fo)
+        rc_o, _out_o = drive_engine(fo, ["--relocate", "--as", "aWho"])
+        arm("a flip rotated into a family archive relocates like any other", 0, lambda: rc_o)
+        arm("accounted exactly once, as one population and not two",
+            1, lambda: read_backlogs(fo).get("aWho", "").count("RELOCATED · EXMP-aFoo-1 · "))
+        arm("and the archive the default side does not carry is removed from the worktree",
+            False, lambda: os.path.isfile(os.path.join(fo, arch_rel)))
+        arm("and from the index, where a tracked archive reds the post-flip verdict",
+            False, lambda: arch_rel in run("git", "ls-files", "--", arch_rel, cwd=fo))
+
+        # ---- AC12: one hold corpus, two policy sets, three different answers.
+        hold_seed = ["- EXMP-aFoo-1 · OPEN · the row the seed already carries"]
+        hold_strag = hold_seed + list(HOLD_ROWS)
+        hold_head = ["- EXMP-aFoo-1 · filed 2026-03-01 · the row the seed already carries"]
+        fp, _fp0, _fp1, _fp2 = seed_transition(base, "hold_straggler", seed_rows=hold_seed,
+                                               strag_rows=hold_strag, head_asks=hold_head)
+        run("git", "checkout", "-q", "strag", cwd=fp)
+        try_run("git", "merge", "--no-commit", "--no-ff", "main", cwd=fp)
+        books_fp = read_backlogs(fp)
+        rc_p, out_p = drive_engine(fp, ["--relocate", "--as", "aWho"])
+        arm("under the straggler set a hold naming nothing is NEEDS-HUMAN",
+            "NEEDS-HUMAN EXMP-aFoo-5", lambda: out_p)
+        arm("and so is a hold naming a decision id nothing files",
+            "NEEDS-HUMAN EXMP-aFoo-8", lambda: out_p)
+        arm("while a hold on an ask the SAME plan files names an id and is planned",
+            "- BLOCKED · EXMP-aFoo-3 · on EXMP-aFoo-2", lambda: out_p)
+        arm("that ask is never NEEDS-HUMAN", False, lambda: "NEEDS-HUMAN EXMP-aFoo-3" in out_p)
+        arm("and the plan holding a NEEDS-HUMAN entry writes nothing at all",
+            True, lambda: read_backlogs(fp) == books_fp)
+        arm("refusing with exit 1", 1, lambda: rc_p)
+
+        fq = os.path.join(base, "hold_migration")
+        seed_shards_base(fq, hold_seed)
+        fq_base = run("git", "rev-parse", "HEAD", cwd=fq).strip()
+        fq_tip = run_commit_on(fq, "records: the hold rows arrive",
+                               {"memory/backlog/EXMP.md": render_shard("EXMP", hold_strag)},
+                               day=DAY_STRAG)
+        mig_form = Form("--write", "write", MIGRATION_SET, False, False)
+        mig_args = dict(read_args([]))
+        mig_args.update({"as_slug": "aWho", "triage_ask": "EXMP-aFoo-9",
+                         "entries": audit.delta(fq_tip, fq_base, fq)})
+        mig_plan = build_relocation(fq, mig_form, fq_tip, [fq_base], mig_args)
+        mig_rows = {r.text for r in mig_plan.records}
+        arm("under the migration set a hold naming nothing holds on the triage ask",
+            True, lambda: any(r.startswith("- DEFERRED · EXMP-aFoo-5 · until EXMP-aFoo-9 · ")
+                              for r in mig_rows))
+        arm("and so does one naming a decision id", True,
+            lambda: any(r.startswith("- BLOCKED · EXMP-aFoo-8 · on EXMP-aFoo-9 · ")
+                        for r in mig_rows))
+        arm("while the hold on an ask the plan itself files is kept verbatim", True,
+            lambda: any(r.startswith("- BLOCKED · EXMP-aFoo-3 · on EXMP-aFoo-2 · ")
+                        for r in mig_rows))
+        arm("each in the ask OWNER's folder, which is P1's migration value", True,
+            lambda: all(r.path == "memory/builds/aFoo/BACKLOG.md" for r in mig_plan.records
+                        if r.section == backlog.H_DISPOSITIONS))
+        arm("and that set runs over a shards-mode HEAD, which no mode guard refuses",
+            "shards", lambda: read_conf_mode(fq, fq_tip))
+        arm("a straggler-set verb meeting --triage-ask exits 2 naming the form",
+            2, lambda: drive_engine(fp, ["--relocate", "--as", "aWho",
+                                         "--triage-ask", "EXMP-aFoo-9"])[0])
+        arm("no provenance under --write, because a linear switch-over is no transition",
+            0, lambda: sum(1 for r in mig_plan.records if "RELOCATED" in r.text))
+
+        # ---- AC13: the migration set's per-class disposition home, and its idempotence.
+        fr = os.path.join(base, "mig_signed")
+        seed_shards_base(fr, ["- EXMP-aFoo-1 · OPEN · the ask this corpus closes later",
+                              "- EXMP-aBar-1 · OPEN · an open ask on a finished build",
+                              "- EXMP-aBar-2 · OPEN · an ask the target already disposes"],
+                         slugs=("aFoo", "aBar", "aWho"))
+        fr_base = run("git", "rev-parse", "HEAD", cwd=fr).strip()
+        fr_tip = run_commit_on(fr, "records: the legacy flip", {
+            "memory/backlog/EXMP.md": render_shard("EXMP", [
+                "- EXMP-aFoo-1 · CLOSED · the ask this corpus closes later",
+                "- EXMP-aBar-1 · OPEN · an open ask on a finished build",
+                "- EXMP-aBar-2 · OPEN · an ask the target already disposes"]),
+            "memory/builds/aBar/BACKLOG.md": render_build_backlog(
+                "aBar", (), ("- WONTDO · EXMP-aBar-2 · the target disposed this one already",)),
+        }, day=DAY_STRAG)
+        signed_path = os.path.join(base, "signed-triage.md")
+        write_file(signed_path, NEWLINE.join((
+            "# the signed triage record", "",
+            "| Ask | Verdict | Field |",
+            "|---|---|---|",
+            "| EXMP-aBar-1 | CLOSED | 1234abc |",
+            "| EXMP-aBar-2 | CLOSED | 1234abc |", "")))
+        mig2_args = dict(read_args([]))
+        mig2_args.update({"as_slug": "aWho", "signed": [("triage", signed_path)],
+                          "entries": audit.delta(fr_tip, fr_base, fr)})
+        mig2 = build_relocation(fr, Form("--write", "write", MIGRATION_SET, False, False),
+                                fr_tip, [fr_base], mig2_args)
+        homes = {r.text.split(backlog.SEP)[1]: r.path for r in mig2.records}
+        arm("the transferred legacy CLOSED lands in the ask owner's folder",
+            "memory/builds/aFoo/BACKLOG.md", lambda: homes.get("EXMP-aFoo-1"))
+        arm("the signed triage verdict lands in the --as folder, the one-writer rule",
+            "memory/builds/aWho/BACKLOG.md", lambda: homes.get("EXMP-aBar-1"))
+        arm("and an id the target tree already disposes plans nothing",
+            False, lambda: "EXMP-aBar-2" in homes)
+
+        # ---- AC14, AC16 and AC17: the landing form of --ingest.
+        land_tip_rows = [
+            "- EXMP-aFoo-1 · CLOSED · the first ask, which the straggler closes",
+            "- EXMP-aFoo-2 · OPEN · the second ask, pointing at memory/gone/old.md",
+            "- EXMP-aBar-1 · OPEN · a new ask on a finished build",
+            "- EXMP-aBar-2 · BLOCKED · held until EXMP-aBar-1 lands, and then it can move",
+        ]
+        amended_tip = land_tip_rows + [
+            "- EXMP-aFoo-9 · OPEN · a sentence nothing in the base corpus ever said"]
+        fs, fs_flip, fs_tip = seed_landing(
+            base, "land_dry", amended_tip,
+            seed_rows=list(FX_SEED_ROWS) + [
+                "- EXMP-aFoo-9 · OPEN · the sentence the base corpus actually carries"],
+            slugs=("aFoo", "aBar", "aWho"))
+        books_fs = read_backlogs(fs)
+        rc_s, out_s = drive_engine(fs, ["--ingest", "main", "--as", "aWho",
+                                        "--signed", "triage=" + signed_path, "--dry-run"])
+        arm("the landing form lists both new asks", "EXMP-aBar-1 · new · new ask", lambda: out_s)
+        arm("holds the flip for confirmation", "CONFIRM EXMP-aFoo-1", lambda: out_s)
+        arm("puts the amendment under NEEDS-HUMAN", "NEEDS-HUMAN EXMP-aFoo-9", lambda: out_s)
+        arm("prints the re-derived cutoff", "ASK_CUTOFF=", lambda: out_s)
+        arm("exits 1 and writes nothing", 1, lambda: rc_s)
+        arm("literally nothing: every record file is exactly as it was",
+            True, lambda: read_backlogs(fs) == books_fs)
+
+        ft, ft_flip, ft_tip = seed_landing(base, "land_write", land_tip_rows,
+                                           slugs=("aFoo", "aBar", "aWho"))
+        rc_t, out_t = drive_engine(ft, ["--ingest", "main", "--as", "aWho",
+                                        "--signed", "triage=" + signed_path,
+                                        "--confirm", "EXMP-aFoo-1"])
+        books_t = read_backlogs(ft)
+        arm("with the amendment gone and the flip confirmed, the landing form writes", 0,
+            lambda: rc_t)
+        arm("each new ask in its own slug folder", "- EXMP-aBar-1 · filed ",
+            lambda: books_t.get("aBar", ""))
+        arm("the hold on the ask this same delta files, verbatim",
+            "- BLOCKED · EXMP-aBar-2 · on EXMP-aBar-1 · ", lambda: books_t.get("aBar", ""))
+        arm("the flip in the ask owner's folder, which is the migration set's home",
+            "- CLOSED · EXMP-aFoo-1 · by ", lambda: books_t.get("aFoo", ""))
+        arm("the signed triage verdict in the --as folder", "- CLOSED · EXMP-aBar-1 · by 1234abc",
+            lambda: books_t.get("aWho", ""))
+        arm("and one RELOCATED row per delta entry in the --as folder",
+            3, lambda: books_t.get("aWho", "").count("- RELOCATED · "))
+        arm("printing the cutoff as the day after the newest filed ask",
+            "ASK_CUTOFF=2026-04-03", lambda: out_t)
+
+        fu, _fu_flip, _fu_tip = seed_landing(base, "land_cutoff", land_tip_rows,
+                                             cutoff="2027-01-01", slugs=("aFoo", "aBar", "aWho"))
+        _rc, out_u = drive_engine(fu, ["--ingest", "main", "--as", "aWho",
+                                       "--signed", "triage=" + signed_path,
+                                       "--confirm", "EXMP-aFoo-1"])
+        arm("a current cutoff LATER than that day is printed unchanged, never lowered",
+            "ASK_CUTOFF=2027-01-01", lambda: out_u)
+
+        fv, _fv_flip, _fv_tip = seed_landing(base, "land_builds_tip", land_tip_rows,
+                                             slugs=("aFoo", "aBar", "aWho"))
+        run("git", "checkout", "-q", "-b", "sibling", cwd=fv)
+        run_commit_on(fv, "sibling: a builds-mode ref that is not the default tip",
+                      {"README.md": "a sibling" + NEWLINE})
+        run("git", "checkout", "-q", "flip", cwd=fv)
+        rc_v, out_v = drive_engine(fv, ["--ingest", "sibling", "--as", "aWho",
+                                        "--signed", "triage=" + signed_path])
+        arm("the same command against a BUILDS-mode tip is not the landing form", 2, lambda: rc_v)
+        arm("so --signed exits 2 naming the form it was given",
+            "belong to the migration policy set", lambda: out_v)
+
+        # AC16 — the in-progress merge and the concluded merge write the same bytes.
+        fw, _fw_flip, _fw_tip = seed_landing(base, "land_inprogress", land_tip_rows,
+                                             slugs=("aFoo", "aBar", "aWho"))
+        try_run("git", "merge", "--no-ff", "--no-commit", "main", cwd=fw)
+        run("git", "checkout", "HEAD", "--", "memory/backlog/EXMP.md", cwd=fw)
+        rc_w, _out_w = drive_engine(fw, ["--ingest", "main", "--as", "aWho",
+                                         "--signed", "triage=" + signed_path,
+                                         "--confirm", "EXMP-aFoo-1"])
+        arm("the landing form runs INSIDE the reconcile merge, the state unit 34 ingests in",
+            0, lambda: rc_w)
+        arm("writing the same bytes as the run before any merge",
+            True, lambda: read_backlogs(fw) == books_t)
+
+        fx, _fx_flip, _fx_tip = seed_landing(base, "land_concluded", land_tip_rows,
+                                             slugs=("aFoo", "aBar", "aWho"))
+        try_run("git", "merge", "--no-ff", "--no-commit", "main", cwd=fx)
+        run("git", "checkout", "HEAD", "--", "memory/backlog/EXMP.md", cwd=fx)
+        run("git", "commit", "-q", "-m", "reconcile the landing", "--no-verify", cwd=fx)
+        rc_x, _out_x = drive_engine(fx, ["--ingest", "main", "--as", "aWho",
+                                         "--signed", "triage=" + signed_path,
+                                         "--confirm", "EXMP-aFoo-1"])
+        arm("and so does a run on the concluded merge, against its FIRST parent", 0, lambda: rc_x)
+        arm("byte for byte", True, lambda: read_backlogs(fx) == books_t)
+        run("git", "checkout", "-q", "--", ".", cwd=fx)
+        run("git", "clean", "-qfd", "--", "memory", cwd=fx)
+        run_commit_on(fx, "one more commit on top of the concluded merge",
+                      {"README.md": "moved on" + NEWLINE})
+        rc_x2, out_x2 = drive_engine(fx, ["--ingest", "main", "--as", "aWho",
+                                          "--signed", "triage=" + signed_path])
+        arm("one commit further on, the form is no longer admitted", 2, lambda: rc_x2)
+        arm("and the refusal names --repair", "Use --repair", lambda: out_x2)
+
+        fy, fy_flip, fy_tip = seed_landing(base, "land_firstparent", land_tip_rows,
+                                           slugs=("aFoo", "aBar", "aWho"))
+        run("git", "checkout", "-q", "main", cwd=fy)
+        try_run("git", "merge", "--no-ff", "--no-commit", "flip", cwd=fy)
+        run("git", "checkout", fy_flip, "--", "memory/backlog/EXMP.md", cwd=fy)
+        run("git", "commit", "-q", "-m", "merge the other way round", "--no-verify", cwd=fy)
+        rc_y, out_y = drive_engine(fy, ["--ingest", "main", "--as", "aWho",
+                                        "--signed", "triage=" + signed_path])
+        arm("a merge whose FIRST parent is the tip is not that state either", 2, lambda: rc_y)
+        arm("and is sent to --repair as well", "Use --repair", lambda: out_y)
+        rc_y2, out_y2 = drive_engine(fh, ["--ingest", "strag", "--as", "aWho"])
+        arm("the straggler form over a HEAD that already contains its ref exits 2 the same way",
+            2, lambda: rc_y2)
+        arm("naming --repair", "Use --repair", lambda: out_y2)
+
+        # AC17 — the landing form replaces the migration's OWN unedited record, and nothing else.
+        hold_line = backlog.render_status_row(
+            "BLOCKED", "EXMP-aFoo-1", "the first ask, which the straggler closes", "EXMP-aFoo-9")
+        fz, _fz_flip, _fz_tip = seed_landing(
+            base, "land_replace", land_tip_rows,
+            seed_rows=[FX_SEED_ROWS[0].replace("· OPEN ·", "· BLOCKED ·"), FX_SEED_ROWS[1]],
+            head_rows=(hold_line,), slugs=("aFoo", "aBar", "aWho"))
+        rc_z, _out_z = drive_engine(fz, ["--ingest", "main", "--as", "aWho",
+                                         "--signed", "triage=" + signed_path,
+                                         "--triage-ask", "EXMP-aFoo-9",
+                                         "--confirm", "EXMP-aFoo-1"])
+        arm("the landing form replaces the hold the migration itself wrote", 0, lambda: rc_z)
+        arm("with the flip, in the same file", "- CLOSED · EXMP-aFoo-1 · by ",
+            lambda: read_backlogs(fz).get("aFoo", ""))
+        arm("leaving ONE status row for that id, which is what V4 counts",
+            False, lambda: hold_line in read_backlogs(fz).get("aFoo", ""))
+        _rc, check_out = try_run(sys.executable, os.path.join(_HERE, "gen_build_index.py"),
+                                 "--check", cwd=fz)
+        arm("and the generator names no V4 over the result",
+            False, lambda: "V4 " in check_out)
+
+        fza, _fza_flip, _fza_tip = seed_landing(
+            base, "land_replace_edited", land_tip_rows,
+            seed_rows=[FX_SEED_ROWS[0].replace("· OPEN ·", "· BLOCKED ·"), FX_SEED_ROWS[1]],
+            head_rows=(hold_line + ", and the receiving branch edited this wording",),
+            slugs=("aFoo", "aBar", "aWho"))
+        rc_za, out_za = drive_engine(fza, ["--ingest", "main", "--as", "aWho",
+                                           "--signed", "triage=" + signed_path,
+                                           "--triage-ask", "EXMP-aFoo-9",
+                                           "--confirm", "EXMP-aFoo-1"])
+        arm("a row the receiving branch EDITED is never replaced", 1, lambda: rc_za)
+        arm("it is listed under NEEDS-HUMAN instead", "NEEDS-HUMAN EXMP-aFoo-1", lambda: out_za)
+        arm("and nothing is written", True,
+            lambda: hold_line + ", and the receiving branch edited this wording"
+            in read_backlogs(fza).get("aFoo", ""))
     finally:
         shutil.rmtree(base, ignore_errors=True)
 
@@ -1614,16 +3439,56 @@ def measure_view_delta(base: str, main_tree: str, row: str) -> int:
 
 # ------------------------------------------------------------------------------------------- CLI
 USAGE = ("usage: migrate_backlog.py --plan [--record <dir> --record-as <unit-id>] "
-         "[--signed <same-id|triage>=<path>] [--design-named <id>] … | --selftest")
+         "[--signed <same-id|triage>=<path>] [--design-named <id>] …\n"
+         "       migrate_backlog.py --relocate --as <slug> [--from <ref>] [--drop <id>=<why>] "
+         "[--confirm <id>] [--dry-run]\n"
+         "       migrate_backlog.py --ingest <ref> --as <slug> [--signed <kind>=<path>] "
+         "[--triage-ask <id>] [--confirm <id>] [--drop <id>=<why>] [--dry-run]\n"
+         "       migrate_backlog.py --repair <merge-sha> --as <slug> [--confirm <id>] "
+         "[--drop <id>=<why>] [--dry-run]\n"
+         "       migrate_backlog.py --stragglers [--local] [--tsv] | --recipe | --selftest")
+
+#: The three WRITING verbs of the relocation engine. `--write`, the switch-over's whole-corpus
+#: migration, is a thin driver over the same engine and is NOT a mode of this file.
+WRITING_MODES = ("--relocate", "--ingest", "--repair")
+#: The two verbs that take a positional value straight after them.
+VALUED_MODES = ("--ingest", "--repair")
 
 
 def read_args(argv: list) -> dict:
-    args = {"mode": "", "record": "", "record_as": "", "signed": [], "design_named": []}
+    args = {"mode": "", "record": "", "record_as": "", "signed": [], "design_named": [],
+            "ref": "", "as_slug": "", "from": "", "drop": [], "confirm": [], "triage_ask": "",
+            "dry_run": False, "local": False, "tsv": False}
     rest = list(argv)
     while rest:
         token = rest.pop(0)
-        if token in ("--plan", "--selftest"):
+        if token in ("--plan", "--selftest", "--relocate", "--stragglers", "--recipe"):
             args["mode"] = token
+        elif token in VALUED_MODES:
+            args["mode"] = token
+            args["ref"] = read_flag_value(rest, token)
+        elif token == "--as":
+            args["as_slug"] = read_flag_value(rest, token)
+        elif token == "--from":
+            args["from"] = read_flag_value(rest, token)
+        elif token == "--triage-ask":
+            args["triage_ask"] = read_flag_value(rest, token)
+        elif token == "--confirm":
+            args["confirm"].append(read_flag_value(rest, token))
+        elif token == "--drop":
+            value = read_flag_value(rest, token)
+            ident, sep, why = value.partition("=")
+            if not sep or not ident or not why.strip():
+                raise Problem(f"migrate-backlog: --drop takes <id>=<why>, and a drop with no "
+                              f"stated reason is a row lost with a record saying nothing: "
+                              f"'{value}'")
+            args["drop"].append((ident, why.strip()))
+        elif token == "--dry-run":
+            args["dry_run"] = True
+        elif token == "--local":
+            args["local"] = True
+        elif token == "--tsv":
+            args["tsv"] = True
         elif token == "--record":
             args["record"] = read_flag_value(rest, token)
         elif token == "--record-as":
@@ -1652,6 +3517,12 @@ def main(argv: list) -> int:
     args = read_args(argv[1:])
     if args["mode"] == "--selftest":
         return cmd_selftest()
+    if args["mode"] == "--recipe":
+        return cmd_recipe(resolve_root())
+    if args["mode"] == "--stragglers":
+        return cmd_stragglers(resolve_root(), args)
+    if args["mode"] in WRITING_MODES:
+        return cmd_relocate(resolve_root(), args)
     if args["mode"] != "--plan":
         print(USAGE)
         return 2
@@ -1663,4 +3534,6 @@ if __name__ == "__main__":
         sys.exit(main(sys.argv))
     except Problem as exc:
         print(str(exc))
-        sys.exit(1)
+        # THE CODE IS THE EXCEPTION'S, defaulting to 1. `Refusal` carries 2, and the distinction is
+        # read by the switch-over's landing reconcile and by the adopter runbook.
+        sys.exit(getattr(exc, "code", 1))

@@ -160,3 +160,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T03:13:39Z brief · item TOOL-dDerivedDocket-11 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-21T04:07:10Z dispatch · item b8a77337 TOOL-dDerivedDocket-11 · reason tools/memory-tree/migrate_backlog.py tools/gate-legs.json tools/memory-tree/kit.toml tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt memory/map/features/memory-tree-hygiene.md memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-11.md memory/builds/dDerivedDocket/build memory/guides/SESSION-KICKOFF.md .gitattributes memory/LIVE.md memory/ledger
+
+2026-09-21T04:32:24Z dispatch · item b8dc6a23 TOOL-dDerivedDocket-12 · reason tools/memory-tree/migrate_backlog.py memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-12.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-12-1-acceptance-ledger.md memory/map/features/memory-tree-hygiene.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/LIVE.md memory/ledger/2026-09.md memory/builds/dDerivedDocket/README.md tools/run-gates/selftest-budgets.txt
+
+2026-09-21T04:32:28Z brief · item TOOL-dDerivedDocket-12 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
