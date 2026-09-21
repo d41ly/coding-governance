@@ -916,8 +916,8 @@ all three siblings declare **consumes-from** this unit, so all three **hands-off
 load-bearing rather than courtesy — deleting one reds
 `tools/memory-tree/check-memory-hygiene.sh:1800`'s half-declared-pair message on the sibling's file
 rather than on this one. And the four dogfood copies are regenerated rather than hand-stamped, which
-is a command to run and not a diff to write:
-`bash tools/memory-tree/kit-dogfood-parity.test.sh --render`.
+is a command to run and not a diff to write: the parity script's own render mode, whose spelling is
+in that script's usage header rather than copied here, where it would read as an observation.
 
 ## 8. Open questions
 
