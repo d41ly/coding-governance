@@ -99,7 +99,12 @@ control fixture built no `skills/` tree, so the one pair `TOOL-aHonedRuleset-5` 
 `tools/check-wiring.fragment.json` at a commit a month before `TOOL-aReplayedCard-2` put it in the
 kit, recording the EMPTY blob as its identity, which govkit refuses. None of the four named the
 unit that broke it, and each was green in that unit's own bar because the self-test legs are held
-by default.
+by default. Behind the govkit refusal sat five more of the same shape, invisible until it cleared:
+two `2/2` counts typed beside a kit that had grown to three, a text arm naming a binding
+`DEPL-cMendedVintage-13` had inlined away, a staged break that removed one guard after round 3
+had removed the fallback the break relied on, and the `-18` sweep sitting past the exit of the
+scratch it swept — grading 2 orders of the suite's 9 and, once moved, flagging a fixture the
+`-14` arm requires.
 
 **The check:** a unit that changes a contract another suite's fixture copies runs
 `GATE_SELFTESTS=1` over the kits whose fixtures FEED the changed surface, not only the kit it
