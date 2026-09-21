@@ -135,7 +135,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [TOOL-dDerivedDocket-51 — an admitted example family for the kit's scratch fixtures](spec/2026-09-20-spec-TOOL-dDerivedDocket-51.md) | 14 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-dDerivedDocket-53 — a pinned read pins its conf too](spec/2026-09-20-spec-TOOL-dDerivedDocket-53.md) | 14 | 2 | CLOSED | rev-1 | 2026-09-20 |
 | [TOOL-dDerivedDocket-15 — ask envelope, READY predicate and new-build scaffold](spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md) | 15 | 2 | CLOSED | rev-8 | 2026-09-21 |
-| [TOOL-dDerivedDocket-48 — the ask witness reads a stream the capture does not merge](spec/2026-09-20-spec-TOOL-dDerivedDocket-48.md) | 15 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-dDerivedDocket-48 — the ask witness reads a stream the capture does not merge](spec/2026-09-20-spec-TOOL-dDerivedDocket-48.md) | 15 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-dDerivedDocket-49 — one declared ladder decides which next: shape the plan prints](spec/2026-09-20-spec-TOOL-dDerivedDocket-49.md) | 15 | 2 | SPECCED | rev-1 | 2026-09-20 |
 | [TOOL-dDerivedDocket-16 — driver ask-awareness: the asks key, preflight and plan](spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md) | 16 | 2 | SPECCED | rev-6 | 2026-09-20 |
 | [TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze](spec/2026-09-14-spec-TOOL-dDerivedDocket-17.md) | 17 | 2 | SPECCED | rev-6 | 2026-09-20 |
@@ -164,7 +164,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 38 | 1 | SPECCED | rev-5 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 42 bound to this build, across 4 record folder(s).
+Records: 43 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

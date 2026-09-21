@@ -4209,10 +4209,20 @@ if [ -f "$STC" ]; then
   sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="tools/gone.py"|' .unattended.conf
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
   n=$((n+1)); case "$o" in *"--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing"*) echo "ok   dispatch: a declared checker that is not there is refused" ;; *) echo "FAIL dispatch: a missing declared checker was not refused -- $o"; st=1 ;; esac
+  # ...and a checker whose WHOLE diagnosis is on stderr still refuses with a reason. Its stdout is
+  # empty, so the `spec-tokens:` grep finds nothing and the refusal falls back to `head -1` of
+  # RB_OUT -- which names the producer's first STDERR line only because RB_OUT is the concatenation
+  # of both capture files. Built from stdout alone, or joined to it with a separator, this refusal
+  # names an empty string and the run reports a failure nobody can read. TOOL-dDerivedDocket-48 AC3.
+  printf 'import sys\nsys.stderr.write("TOKENS-DIED-ON-STDERR\\n")\nsys.exit(1)\n' > tools/stub-tokens.py
+  sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="tools/stub-tokens.py"|' .unattended.conf
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+  hit "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
+  hit "$o" "first line: TOKENS-DIED-ON-STDERR"
   # Restore the fixture the brief arms below read: the undated spec name, no extras.
   sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
   git mv memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tRun/spec/one.md
-  rm -f tools/check-spec-tokens.py tools/gate-legs.json memory/project/spec-token-waivers.txt .memory-tree.conf
+  rm -f tools/check-spec-tokens.py tools/stub-tokens.py tools/gate-legs.json memory/project/spec-token-waivers.txt .memory-tree.conf
 else
   echo "FAIL dispatch: the spec-token checker is not beside this kit at $STC, so the F3 arms have no subject"; st=1
 fi
@@ -5465,6 +5475,134 @@ reset_tree
 fi   # ---- end the run_bounded host gate: the VERB arm needs it too, because with the bound INERT
      # ---- the wiring sleeper runs to completion, the check PASSES, and both assertions above red
      # ---- for a property of the box rather than a defect in the code.
+
+# ---- TOOL-dDerivedDocket-48: the capture is TWO streams, and three helpers read them -------------
+# NO HOST GATE HERE, deliberately. These arms grade string handling and never a bound, so they run
+# on a box with no runnable `timeout` too -- and a bound the arm never reaches cannot skip them.
+# GATE_BOUND_LIVE and GATE_BOUND are assigned on their OWN LINES for the reason the block above
+# records: a prefix assignment on `.` does not persist outside POSIX mode, the sourced function then
+# sees them UNSET, and `set -u` kills the suite with the diagnostic swallowed by a redirect.
+#
+# The three functions are SOURCED FROM THE SHIPPED FILE rather than retyped, the same idiom and for
+# the same reason as the bound arms above: an arm that proves a mechanism against a copy proves it
+# for the copy.
+sp_fn=$(mktemp)
+sed -n '/^run_bounded() {/,/^}$/p'           "$SCRIPT" >  "$sp_fn"
+sed -n '/^read_stderr_tail() {/,/^}$/p'      "$SCRIPT" >> "$sp_fn"
+sed -n '/^derive_stream_verdict() {/,/^}$/p' "$SCRIPT" >> "$sp_fn"
+n=$((n+1))
+[ "$(grep -c '^}$' "$sp_fn")" = 3 ] \
+  || { echo "FAIL could not extract all three capture helpers from $SCRIPT — the arms below would grade nothing"; st=1; }
+RB_TAIL_LINES=20
+RB_TAIL_BYTES=2000
+RB_TAIL_NOTE_ROOM=120
+RB_LEASE_SLUG=""
+RB_LEASE_ID=""
+GATE_BOUND_LIVE=0
+GATE_BOUND=0
+write_lease_refreshed() { :; }
+# shellcheck disable=SC1090
+. "$sp_fn"
+
+# ...the split itself: one known line to each stream, and each value holds its own.
+run_bounded bash -c 'echo ROWLINE; echo NOTICELINE >&2'
+same "the row stream is the command's stdout alone" "$RB_STDOUT" "ROWLINE"
+same "the notice stream is its stderr alone"        "$RB_ERR"    "NOTICELINE"
+same "RB_OUT still holds every byte, stdout first"  "$RB_OUT"    "$(printf 'ROWLINE\nNOTICELINE')"
+
+# ...and a producer that wrote ONLY to stderr leaves RB_OUT opening on its FIRST stderr line, which
+# is what the --dispatch refusal's `head -1` reads. Joining the two VALUES with a separator would
+# open it on a blank line and name nothing there, with every byte still present.
+run_bounded bash -c 'echo ONLY-ON-STDERR >&2'
+same "RB_OUT opens on the stderr line when stdout is empty" \
+  "$(printf '%s\n' "$RB_OUT" | head -1)" "ONLY-ON-STDERR"
+
+# ...the capture-directory refusal. RB_TOOK is SEEDED with a sentinel immediately before the call:
+# the driver computes it in whole seconds from `date +%s`, so a stub that returns inside one second
+# leaves it reading 0 already and the zeroing assertion would pass whether or not the branch zeroes
+# anything.
+RB_TOOK=99
+mktemp() { return 1; }
+run_bounded bash -c 'echo unreachable'; _sprc=$?
+unset -f mktemp
+same "a capture directory that cannot be made returns 1" "$_sprc" "1"
+same "and KEEPS RB_OUT's sentence, which is that branch's only diagnostic" \
+  "$RB_OUT" "run_bounded: cannot create a capture file"
+same "and empties the row stream"    "$RB_STDOUT" ""
+same "and empties the notice stream" "$RB_ERR"    ""
+same "and zeroes the seeded RB_TOOK rather than reporting a time it never measured" "$RB_TOOK" "0"
+
+# ...the three verdicts a stdout-empty call can carry, each returned by a DIRECT call. Both helpers
+# are dark at this order -- the witness that consumes them is a later unit's -- so no caller's
+# output can grade them and they would otherwise have no failing case at all.
+run_bounded bash -c 'echo TALKING >&2'
+sp_err=$(derive_stream_verdict 0)
+run_bounded bash -c 'exit 0'
+sp_dead=$(derive_stream_verdict 0)
+GATE_BOUND_LIVE=1
+GATE_BOUND=2
+run_bounded bash -c 'exit 0'
+sp_bound=$(derive_stream_verdict 124)
+GATE_BOUND_LIVE=0
+GATE_BOUND=0
+hit "$sp_err"   "put its whole diagnosis on stderr"
+hit "$sp_err"   "TALKING"
+hit "$sp_dead"  "DEAD PROBE"
+hit "$sp_bound" "did not answer within the declared"
+n=$((n+1))
+{ [ "$sp_err" != "$sp_dead" ] && [ "$sp_dead" != "$sp_bound" ] && [ "$sp_err" != "$sp_bound" ]; } \
+  || { echo "FAIL two of the three stream verdicts are one string, so a caller printing them cannot tell the states apart"; st=1; }
+# ...and a verdict asked for while the row stream HOLDS rows is a question this helper has no string
+# for. It refuses rather than reporting a producer that is plainly talking as one of the three.
+RB_STDOUT="rows are here"
+RB_ERR=""
+derive_stream_verdict 0 >/dev/null; _sprc=$?
+same "a verdict asked for over a NON-empty row stream refuses rather than inventing one" "$_sprc" "1"
+RB_STDOUT=""
+
+# ...the stderr tail is BOUNDED in both directions, because a refusal quotes it and one chatty
+# producer would otherwise fill a park row with a refusal nobody can read.
+run_bounded bash -c 'i=1; while [ $i -le 500 ]; do echo "stderr line $i" >&2; i=$((i+1)); done'
+sp_tail=$(read_stderr_tail)
+same "500 stderr lines are cut to the 20-line pin plus the line that reports the cut" \
+  "$(printf '%s\n' "$sp_tail" | wc -l | tr -d ' ')" "21"
+same "and that line names how many were dropped, of how many there were" \
+  "$(printf '%s\n' "$sp_tail" | tail -1)" "read_stderr_tail: 480 of 500 stderr line(s) not shown"
+n=$((n+1))
+[ "$(printf '%s\n' "$sp_tail" | wc -c)" -le 2000 ] \
+  || { echo "FAIL the stderr tail ran past its 2000-byte pin, at $(printf '%s\n' "$sp_tail" | wc -c) bytes"; st=1; }
+# ...and the BYTE pin bites where the LINE pin cannot: twenty lines is inside the line pin already.
+run_bounded bash -c 'i=1; while [ $i -le 20 ]; do printf "%0500d\n" "$i" >&2; i=$((i+1)); done'
+sp_fat=$(read_stderr_tail)
+n=$((n+1))
+[ "$(printf '%s\n' "$sp_fat" | wc -c)" -le 2000 ] \
+  || { echo "FAIL twenty FAT stderr lines ran past the 2000-byte pin, at $(printf '%s\n' "$sp_fat" | wc -c) bytes"; st=1; }
+RB_ERR=""
+same "an empty notice stream yields no tail at all, not a bare header" "$(read_stderr_tail)" ""
+rm -f "$sp_fn"
+
+# ---- ...and the two-stream capture reaches the CALLERS that print it whole. TOOL-dDerivedDocket-48
+# ---- AC3. Each stub writes one known line to each stream and each refusal must quote BOTH: RB_OUT
+# ---- is the concatenation, so a caller that loses a stream here is the split having eaten one, and
+# ---- a checker whose whole diagnosis is on stderr would refuse with an empty reason.
+reset_tree
+printf '#!/usr/bin/env bash\necho WIRE-ON-STDOUT\necho WIRE-ON-STDERR >&2\nexit 1\n' > twowire.sh
+mkconf "bash twowire.sh --check"
+fixture
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "the declared wiring check failed"
+hit "$out" "WIRE-ON-STDOUT"
+hit "$out" "WIRE-ON-STDERR"
+
+reset_tree
+printf '#!/usr/bin/env bash\necho BAR-ON-STDOUT\necho BAR-ON-STDERR >&2\nexit 1\n' > twogate.sh
+mkconf "true" "bash twogate.sh"
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null 2>&1
+out=$(run --close tRun)
+hit "$out" "BAR-ON-STDOUT"
+hit "$out" "BAR-ON-STDERR"
+reset_tree
 
 # ...and a MALFORMED bound is a refusal rather than a silent fallback, because 0 means no bound at
 # all to `timeout` and a value nobody can parse is a value nobody set.

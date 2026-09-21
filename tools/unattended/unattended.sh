@@ -178,32 +178,117 @@ GATE_BOUND_LIVE=$REMOTE_BOUND_LIVE
 # 62s against the same 60s sleeper. memory/gotchas/bounded-through-a-pipe-is-unbounded.md names this
 # file as one of the two places the class has already bitten.
 #
-# Sets RB_OUT (the command output) and RB_TOOK (elapsed seconds). Returns the command status, or
-# 124/137 when the bound fired -- the caller decides what that means, because a DoD item and a
-# preflight refusal say different things about it.
-RB_OUT=""; RB_TOOK=0
+# Sets RB_OUT (both streams, stdout then stderr), RB_STDOUT (the command's stdout alone), RB_ERR
+# (its stderr alone) and RB_TOOK (elapsed seconds). Returns the command status, or 124/137 when the
+# bound fired -- the caller decides what that means, because a DoD item and a preflight refusal say
+# different things about it.
+#
+# TWO CAPTURE FILES AND NOT ONE, which is the whole of TOOL-dDerivedDocket-48. `2>&1` merged every
+# notice a producer writes into the same buffer as its rows, in front of a parse that refuses any
+# line not leading with `ask` -- so a HEALTHY producer read as a DEAD PROBE. The row stream and the
+# notice stream have to reach the caller as two values, or no consumer can tell a broken redirect
+# from a dead command. Both files sit under ONE `mktemp -d`, under the same `timeout -k 5s` wrapper
+# and the same `</dev/null`, so nothing the block above promises moves.
+#
+# RB_OUT IS ONE SUBSTITUTION OVER BOTH FILES, never a join of the two VALUES with a separator, and
+# that is not a matter of style. `cat` over an empty file contributes nothing, so a call that wrote
+# only to stderr still leaves RB_OUT opening on the producer's FIRST stderr line -- where a join
+# would open it on a blank line, and the --dispatch refusal below prints `head -1` of RB_OUT on
+# exactly that input, naming nothing. The one behaviour delta is INTERLEAVING: RB_OUT is stdout
+# then stderr rather than the two in arrival order. No byte is lost, which is why every caller that
+# prints it whole needs no edit.
+RB_OUT=""; RB_TOOK=0; RB_STDOUT=""; RB_ERR=""
 # THE LEASE THIS BOUNDED RUN ACTS FOR. Set by a verb that HOLDS or is taking a lease, cleared
 # otherwise. A bounded command is the long silence the refresh source exists for — `--close` runs
 # the whole bar through here, before its own write gate — and the two names are what let the
 # refresh obey the calling verb's identity rather than renewing whatever lease it finds.
 RB_LEASE_SLUG=""; RB_LEASE_ID=""
 run_bounded() { # argv...
-  local _s _e _rc _f
+  local _s _e _rc _d
   write_lease_refreshed "$RB_LEASE_SLUG" "$RB_LEASE_ID"
-  _f=$(mktemp) || { RB_OUT="run_bounded: cannot create a capture file"; return 1; }
+  # THE REFUSAL BRANCH KEEPS RB_OUT'S SENTENCE and empties only the two NEW values. That sentence
+  # is this branch's ONLY diagnostic -- it is SET here and the function returns before RB_TOOK is
+  # computed below, so it is the freshest thing a caller gets -- and check_wiring, the gates-green
+  # item and --dispatch all print it. Emptying it would make a failed capture refuse with no reason
+  # at all. RB_TOOK is the value that genuinely carries over from a previous call and --dispatch
+  # prints it beside the sentence, so it is zeroed rather than left reading a time this call never
+  # measured.
+  _d=$(mktemp -d) \
+    || { RB_OUT="run_bounded: cannot create a capture file"; RB_STDOUT=""; RB_ERR=""; RB_TOOK=0; return 1; }
   _s=$(date +%s)
   # GATE_BOUND_LIVE is REMOTE_BOUND_LIVE's sibling and is probed the same way: by RUNNING timeout,
   # never by testing for the binary. With no runnable timeout the command still RUNS, unbounded --
   # a bound may cost speed and may turn a hang into a verdict; it may never turn a check into a skip.
   if [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
-    timeout -k 5s "$GATE_BOUND" "$@" </dev/null >"$_f" 2>&1; _rc=$?
+    timeout -k 5s "$GATE_BOUND" "$@" </dev/null >"$_d/out" 2>"$_d/err"; _rc=$?
   else
-    "$@" </dev/null >"$_f" 2>&1; _rc=$?
+    "$@" </dev/null >"$_d/out" 2>"$_d/err"; _rc=$?
   fi
   _e=$(date +%s); RB_TOOK=$(( _e - _s ))
-  RB_OUT=$(cat "$_f" 2>/dev/null)
-  rm -f "$_f" 2>/dev/null
+  RB_STDOUT=$(cat "$_d/out" 2>/dev/null)
+  RB_ERR=$(cat "$_d/err" 2>/dev/null)
+  RB_OUT=$(cat "$_d/out" "$_d/err" 2>/dev/null)
+  rm -rf "$_d" 2>/dev/null
   return "$_rc"
+}
+
+# ---- THE TWO READERS OF A SPLIT CAPTURE. TOOL-dDerivedDocket-48 S4 and S5.
+#
+# Both are DARK at this order: the witness that consumes them is a later unit's, and that is why
+# each is graded by a DIRECT call over a stub rather than through a caller's output. A helper with
+# no live caller has no failing case otherwise, and a layer that stays inert while its suite reads
+# green is the shape this repository files as a defect elsewhere.
+#
+# THE TWO BOUNDS BELOW ARE PINNED LITERALS, chosen rather than measured, and a later session reading
+# them should know that. A refusal quotes a producer's stderr so a checker whose whole diagnosis is
+# on that stream is never reported with an empty reason; unbounded, one chatty producer fills a park
+# row and replaces a readable refusal with an unreadable one. They are literals and not conf keys
+# because a new key owes a protocol key-table row, and spending a capped carrier's bytes is the one
+# thing this unit set out not to do.
+RB_TAIL_LINES=20
+RB_TAIL_BYTES=2000
+# NOT A THIRD BOUND. The closing line below is part of what RB_TAIL_BYTES caps, so its own worst-case
+# width is reserved out of that figure before the body is cut -- otherwise the total overruns the cap
+# by exactly the length of the sentence that reports the cut.
+RB_TAIL_NOTE_ROOM=120
+read_stderr_tail() { # -> a bounded tail of RB_ERR on stdout; nothing at all when RB_ERR is empty
+  local _tot _kept _drop _body _room
+  [ -n "$RB_ERR" ] || return 0
+  _tot=$(printf '%s\n' "$RB_ERR" | wc -l); _tot=$(( _tot + 0 ))
+  _room=$(( RB_TAIL_BYTES - RB_TAIL_NOTE_ROOM ))
+  _body=$(printf '%s\n' "$RB_ERR" | head -n "$RB_TAIL_LINES" | head -c "$_room")
+  # COUNTED AFTER THE CUT, not before it. A byte cut can end mid-line, so a drop figure derived from
+  # the line cap alone would under-report by every line the byte cap also took.
+  _kept=$(printf '%s\n' "$_body" | wc -l); _kept=$(( _kept + 0 ))
+  _drop=$(( _tot - _kept )); [ "$_drop" -gt 0 ] || _drop=0
+  printf '%s\n' "$_body"
+  # PRINTED EVEN AT ZERO. A tail that reports a drop only when there is one is indistinguishable
+  # from a whole stream, and a reader then cannot tell a short producer from a truncated one.
+  printf 'read_stderr_tail: %s of %s stderr line(s) not shown\n' "$_drop" "$_tot"
+}
+
+# THE THREE VERDICTS A STDOUT-EMPTY BOUNDED CALL CAN CARRY, written once. Today they are one fact:
+# a consumer that finds no rows reports a dead probe whether the producer was silent, talking on the
+# other stream, or never answered at all -- and a green-looking zero from a broken redirect is
+# indistinguishable from a clean run.
+#
+# ITS PRECONDITION IS THE CALLER'S: ask it only where RB_STDOUT is EMPTY. The row that says "parse
+# the rows" belongs to the consumer and this helper has no string for it, so a call made with rows
+# in hand is a question this function cannot answer -- it returns 1 and prints nothing rather than
+# returning a verdict about a stream that is not empty.
+derive_stream_verdict() { # bounded-call status -> one of three distinct strings on stdout
+  local _rc="${1:-0}"
+  [ -z "$RB_STDOUT" ] || return 1
+  if { [ "$_rc" = 124 ] || [ "$_rc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
+    printf '%s\n' "the declared command did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so this is unanswered because the command never returned rather than because it said no"
+    return 0
+  fi
+  if [ -n "$RB_ERR" ]; then
+    printf '%s\n' "the declared command wrote nothing to stdout and put its whole diagnosis on stderr, so it ANSWERED and the row stream is empty for a reason this run can quote:"
+    read_stderr_tail
+    return 0
+  fi
+  printf '%s\n' "DEAD PROBE - the declared command wrote nothing to either stream, so nothing here can tell a producer that is working from one that is not, and a zero read off it would report as an answer"
 }
 
 # THE PYTHON RESOLVER, INLINE (aDeferredBar closing round 2, R2 and R8). --dispatch runs the

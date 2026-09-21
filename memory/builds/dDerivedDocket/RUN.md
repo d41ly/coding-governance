@@ -188,3 +188,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T08:03:54Z brief · item TOOL-dDerivedDocket-15 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-21T08:52:47Z dispatch · item 55fd961b TOOL-dDerivedDocket-15 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-09-21T09:04:30Z dispatch · item a36d5994 TOOL-dDerivedDocket-48 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-48.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-48-1-acceptance-ledger.md
+
+2026-09-21T09:04:35Z brief · item TOOL-dDerivedDocket-48 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
