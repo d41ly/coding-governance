@@ -662,8 +662,11 @@ check_ac9_worktree() {
   l=$(measure_lines)
   check "AC9 the primary tree writes the same file" "$(read_field "$l" run)" from-primary
   check "AC9 and names itself" "$(read_field "$l" wt)" "$(git rev-parse --show-toplevel)"
+  # `-ef`, not a string compare: on a Windows node whose TEMP carries an 8.3 short name (`DAILY-~1`)
+  # `mktemp -d` and `pwd` keep that spelling while git's absolute answer is the long one, so the
+  # two spellings of ONE directory compared unequal and this arm was red on that node alone.
   check "AC9 the journal is the one under the common dir" \
-    "$([ "$(cd "$(git rev-parse --path-format=absolute --git-common-dir)/runlog" && pwd)" = "$(cd "$REPO/.git/runlog" && pwd)" ] && echo yes)" yes
+    "$([ "$(git rev-parse --path-format=absolute --git-common-dir)/runlog" -ef "$REPO/.git/runlog" ] && echo yes)" yes
   git worktree remove --force "$wt" >/dev/null 2>&1
   check_journal AC9
 }

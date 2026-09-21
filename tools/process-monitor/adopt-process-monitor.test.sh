@@ -229,8 +229,19 @@ _pmdir="$WORK/flagged"; mkdir -p "$_pmdir/$(dirname "$KIT_REL")"
 cp -r "$KIT_DIR" "$_pmdir/$KIT_REL"
 git -C "$_pmdir" init -q 2>/dev/null
 sed 's|^PROCMON_AGE_CEILING=.*|PROCMON_AGE_CEILING="1"|' "$ROOT/.process-monitor.conf" > "$_pmdir/.process-monitor.conf"
+# THE FLAGGED ROW IS PLANTED: a child carrying the shipped conf's first root as a plain argv token,
+# older than the 1s ceiling by the time the census reads it. Without one the arm asserted that
+# SOMETHING live carried the repo path, which is a claim about how the box was launched: a bar
+# started from a Claude session inherits its cwd and spells no path, so this arm read <silence> on
+# that node and passed under a pre-push hook, whose argv is absolute. The census self-test plants
+# the same witness for the same reason.
+_root0=$(sed -n 's/^PROCMON_ROOTS="\{0,1\}\([^" ]*\).*/\1/p' "$ROOT/.process-monitor.conf")
+"$TESTPY" -c 'import time; time.sleep(300)' "${_root0%/}/procmon-witness" >/dev/null 2>&1 &
+_witness=$!
+sleep 2
 rm -f "$GD/procmon-stamp" 2>/dev/null
 _out=$(printf '%s' '{"hook_event_name":"SessionStart"}' | CLAUDE_PROJECT_DIR="$_pmdir" node "$HOOK" 2>&1)
+kill "$_witness" 2>/dev/null; wait "$_witness" 2>/dev/null
 case "$_out" in
   *"past the declared ceiling"*) add_pass "test_hook_reports_a_flagged_row" ;;
   *) add_fail "test_hook_reports_a_flagged_row (got: ${_out:-<silence>})" ;;

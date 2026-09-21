@@ -2066,8 +2066,8 @@ def build_runstate(slug):
     return (f"# {slug} - run state\n\n"
             "Created by `unattended.sh --preflight`. The unit list is NOT copied here — it is DERIVED\n"
             "from the build README on every read, so it cannot go stale between them. This file holds\n"
-            "only what nothing else does: the phase and its witness, the keepalive id, the pinned BASE\n"
-            "with its anchor evidence, and the parked decisions.\n\n"
+            "only what nothing else does: the phase and its witness, the keepalive id and the lease — the\n"
+            "session and pid holding the run — the pinned BASE with its anchor evidence, and the parked decisions.\n\n"
             "<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\n\n## Parked\n")
 
 

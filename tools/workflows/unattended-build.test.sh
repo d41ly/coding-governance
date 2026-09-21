@@ -617,7 +617,9 @@ build_merged_returns() {
 }
 # The measured record's two merges are B1 (14, 26, 40) and H2 (16, 4); every other item holds one id.
 MT_MERGED='[{"severity":"BLOCKER","ids":[14,26,40]},{"severity":"HIGH","ids":[1]},{"severity":"HIGH","ids":[16,4]},{"severity":"HIGH","ids":[7]},{"severity":"HIGH","ids":[9]},{"severity":"HIGH","ids":[11]},{"severity":"MEDIUM","ids":[20]},{"severity":"MEDIUM","ids":[22]},{"severity":"MEDIUM","ids":[30]},{"severity":"MEDIUM","ids":[33]}]'
-MT_DISPOSE='{"disposed":true,"standing":[],"promoted":9,"folded":4,"refuted":0,"promotedIds":["A-tB-16","A-tB-17","A-tB-18","A-tB-19"],"summary":"9 promoted into 4 units, 4 folded"}'
+# Every promoted unit is PLACED (TOOL-cMendedVintage-19): `A-tB-3` is the last roster unit at order 2,
+# so a repair of it sits at 3 — the doubles below were written before that rule and never re-fed it.
+MT_DISPOSE='{"disposed":true,"standing":[],"promoted":9,"folded":4,"refuted":0,"promotedIds":["A-tB-16","A-tB-17","A-tB-18","A-tB-19"],"edges":[],"placements":[{"unit":"A-tB-16","repairs":"A-tB-3","order":3},{"unit":"A-tB-17","repairs":"A-tB-3","order":3},{"unit":"A-tB-18","repairs":"A-tB-3","order":3},{"unit":"A-tB-19","repairs":"A-tB-3","order":3}],"summary":"9 promoted into 4 units, 4 folded"}'
 run_merged_review() { RUN_WF_SCHEMA=strict run_wf "$MT_ARGS" "$1" "$MT_T2"; }
 run_merged_build() { # callee RESULT json · [driver token] · [disposal double] -> the build harness run over it
   run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
@@ -679,7 +681,7 @@ t2=$(run_merged_review "$(build_merged_returns '[]' 0)")
 au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
 has    "MT zero confirmed and 48 unverified reaches the synthesis" "$au" '"confirmed":0,"refuted":0,"unverified":48'
 has    "MT ...and an empty item list counts 0 and 0, not null" "$au" '"blockers":0,"highs":0'
-o=$(run_merged_build "$au" CONVERGED '{"disposed":true,"standing":[],"promoted":0,"folded":48,"refuted":0,"promotedIds":[],"summary":"s"}')
+o=$(run_merged_build "$au" CONVERGED '{"disposed":true,"standing":[],"promoted":0,"folded":48,"refuted":0,"promotedIds":[],"edges":[],"placements":[],"summary":"s"}')
 has    "MT ...and the harness disposes the unverified population" "$o" "disposal: done — promoted 0 · folded 48"
 
 # ---- AC5: a disposal that did NOT finish hands out NO roster. There is no partial hand-out: a

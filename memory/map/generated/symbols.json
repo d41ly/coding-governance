@@ -3838,6 +3838,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "plant_witness",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "population",
       "kind": "function",
       "file": "tools/govkit/refusal_join.py"
@@ -4416,6 +4421,11 @@
       "id": "read_review_records",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "read_root_dir",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "read_roots",
