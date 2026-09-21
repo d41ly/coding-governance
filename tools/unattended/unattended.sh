@@ -1532,11 +1532,21 @@ check_authorization() { # slug · base
   # evaluated in a subshell, never a sed pipeline, which reads `KEY='v'`, `KEY="v" # note` and a
   # last-wins pair differently from the shell (gotcha two-readers-of-one-config-one-re-derived). The
   # variable is BLANKED first so a BASE conf that predates the key cannot inherit the working copy's
-  # value through the environment, and an `exit` inside the conf ends the subshell before the read,
-  # which reads as no default. A non-date is fail 54 on fail 52's reasoning, one file over.
+  # value through the environment. THE SUBSHELL PROVES IT FINISHED (closing review of units 7/8,
+  # R2): the eval's status gates a sentinel printed after it, so a blob that ends before the read -
+  # a `return` (legal at the top of a sourced file, and the SAME bytes read as the date at startup),
+  # an `exit`, an unbound reference under this file's set -u, a syntax error - prints no sentinel
+  # and is fail 55, never "no default": unknown is not absent, and reading it as absent was the
+  # opt-out fail 52 and fail 54 exist to refuse, through the one path they did not cover. A
+  # non-date is fail 54 on fail 52's reasoning, one file over.
   if [ -z "$AUTH_SPEC_AUDIT" ] && ! printf '%s\n' "$_fm" | grep -q '^spec-audit=' \
      && _cf=$(GIT show "$base:.unattended.conf" 2>/dev/null); then
-    _sad=$( SPEC_AUDIT_DEFAULT=""; eval "$_cf" >/dev/null 2>&1; printf '%s' "${SPEC_AUDIT_DEFAULT:-}" )
+    _sad=$( SPEC_AUDIT_DEFAULT=""; eval "$_cf" >/dev/null 2>&1 && printf 'OK %s' "${SPEC_AUDIT_DEFAULT:-}" )
+    case "$_sad" in
+      "OK "*) _sad=${_sad#OK } ;;
+      *) fail 55 "the project conf at the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
+         return 1 ;;
+    esac
     case "$_sad" in
       "") ;;
       [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) AUTH_SPEC_AUDIT="$_sad"; AUTH_SPEC_AUDIT_FROM=project ;;
@@ -3948,7 +3958,9 @@ $_bcnon"
       done
       if [ -n "$_sa_miss" ]; then
         if [ -z "${_sa_named//[[:space:]]/}" ]; then
-          DOD_OUT="no TRACKED record under this build carries a spec-audit binding line at all, so the pre-code review pass this build opted into with its spec-audit: key left no evidence; units closed without one:$_sa_miss"
+          # The SOURCE is named, not assumed (closing review of units 7/8, R10): under a project
+          # default there is no README key for the operator to go looking for.
+          DOD_OUT="no TRACKED record under this build carries a spec-audit binding line at all, so the pre-code review pass this build owes (spec-audit $AUTH_SPEC_AUDIT, from ${AUTH_SPEC_AUDIT_FROM:-readme}) left no evidence; units closed without one:$_sa_miss"
         else
           DOD_OUT="a CLOSED unit is named by no tracked spec-audit record, so its spec was never audited before its code was written:$_sa_miss"
         fi

@@ -1,10 +1,12 @@
 # TOOL-aBlindedTrial-7 — a project-wide spec-audit default, declared once in the conf and read at BASE
 
-**Status:** INPROGRESS · rev-1 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
+**Status:** INPROGRESS · rev-2 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-8 KICK-aBlindedTrial-1 |
 
 <!-- /gen:spec-records -->
 
@@ -22,8 +24,9 @@ line.
   `spec-audit=` line at all, read `.unattended.conf` at BASE (`GIT show "$base:.unattended.conf"`, the
   `:1562` idiom), source the blob in a subshell and take `SPEC_AUDIT_DEFAULT`; a `<date>` value sets
   `AUTH_SPEC_AUDIT` with a new global `AUTH_SPEC_AUDIT_FROM=project`; a non-date is a new `fail 54`; an
-  absent blob or blank key falls through as undeclared. A README key, even malformed, wins (`fail 52`
-  unchanged). Observed by AC1, AC2, AC3.
+  absent blob or blank key falls through as undeclared; a blob whose evaluation does not reach the end
+  — a `return`, an `exit`, an unbound reference, a syntax error — is `fail 55`, never read as absent
+  (rev-2). A README key, even malformed, wins (`fail 52` unchanged). Observed by AC1, AC2, AC3.
 - S2 — `print_spec_audit_line` gains a third spelling for `AUTH_SPEC_AUDIT_FROM=project`: `unattended:
   spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: <date>`; the two existing spellings keep
   their bytes. The `fail 53` sentence and the not-owed `DOD_OUT` name both sources; the driver suite's
@@ -38,8 +41,9 @@ line.
   admits, a non-date denies by name, a missing file is no default. The asymmetry (hook worktree,
   driver BASE) is stated in the hook header and `tools/hooks/README.md`. Observed by AC6, AC7.
 - S5 — prose: the MUST-by-default comment (`unattended.sh:466-469`) gains the project-default clause;
-  `SKILL.template.md` and the protocol name the key beside the README key; the `unattended` dossier.
-  Observed by AC8.
+  `SKILL.template.md` and the protocol name the key beside the README key; the `unattended` dossier;
+  the build method's M4 **When** sentence (`BUILD-METHOD.template.md` and its render), which the kickoff
+  engine greps to decide whether the question is worth asking (rev-2). Observed by AC8.
 - S6 — versions: `KIT_UNATTENDED_VERSION` 1.26 → 1.27 in every paired carrier, `agent-cap@` 1.16 →
   1.17 in both halves. Observed by AC8.
 
@@ -134,7 +138,7 @@ decides; README silent → the conf decides; both silent → not owed.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `agent-cap self-test` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `kickoff-manifest ratchet`
+`unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `kickoff-manifest ratchet`
 
 New arm: `tools/unattended/unattended.test.sh` · the `specs-audited` block, conf default at BASE then on the branch only · none
 New arm: `tools/hooks/agent-cap.test.sh` · a conf beside the fixture README, dated then malformed then absent · none
@@ -148,6 +152,12 @@ New arm: `tools/hooks/agent-cap.test.sh` · a conf beside the fixture README, da
 ## 9. Revision log
 
 - rev-1 · 2026-09-21 · initial draft from the scout of the driver, conf carriers and hook at 0e61932d.
+- rev-2 · 2026-09-21 · §7 · S1 · S5 · closing diff review round 1 folded. R6: the leg line names every
+  leg the §4 files-touched trips under the guards join at the fold — the four `tools/hooks/` self-tests,
+  `check-wiring self-test` (`.claude/`) and the two `memory/` recall legs. R2: S1 states `fail 55` for a
+  BASE conf whose evaluation does not finish; the sanctioned `exit` case of rev-1's comment is that
+  refusal now. R5: S5 lists the build method as a carrier. R8, R9, R10 are wording in the hook header,
+  the three conf carriers and the unevidenced-audit sentence; no criterion changed.
 
 ## 10. Reuse audit
 

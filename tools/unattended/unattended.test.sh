@@ -5598,7 +5598,7 @@ rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
 out=$(run --close tRun $bcov)
 hit "$out" "specs-audited"
 hit "$out" "ARCH-tRun-1"
-hit "$out" "the pre-code review pass this build opted into with its spec-audit: key left no evidence"
+hit "$out" "the pre-code review pass this build owes (spec-audit 2026-09-20, from readme) left no evidence"
 miss "$out" "close OK"
 
 # ---- AC2: a tracked record whose binding line names the id satisfies it.
@@ -5757,6 +5757,9 @@ rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
 out=$(run --close tRun $bcov)
 hit "$out" "specs-audited"
 hit "$out" "ARCH-tRun-1"
+# ---- ...naming the SOURCE the audit is owed through (closing review of units 7/8, R10): rev-1 told
+# ---- the operator to look for a README key this build does not have.
+hit "$out" "the pre-code review pass this build owes (spec-audit 2026-09-21, from project) left no evidence"
 miss "$out" "specs-audited — not owed"
 miss "$out" "close OK"
 # ---- ...and the tracked record satisfies it, so the default is honoured in both directions.
@@ -5822,6 +5825,41 @@ miss "$out" "opted in by project default"
 miss "$out" "preflight OK"
 git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
 git checkout -qf unit; bcreset
+
+# ---- closing review of units 7/8, R2 — the BASE-conf eval must PROVE it finished. rev-1 discarded
+# ---- the eval's status and read the variable regardless, so a blob that ends before the read printed
+# ---- nothing and graded as "no default": the read-as-absent opt-out fail 52 and fail 54 refuse,
+# ---- through the one path they left ungraded. Four shapes, each a dated conf at BASE with one line
+# ---- appended. `return 0` needs NO divergence — a top-level return in a sourced file is legal, so the
+# ---- SAME bytes read as the date at the driver's startup source and as nothing at the BASE read; the
+# ---- other three would kill that startup source, so the run branch carries a repaired conf and BASE
+# ---- alone holds the broken one. Observed RED-first on the rev-1 driver: every shape said not owed.
+init_sa_base_ending_early() {   # $1 = the line added to a dated conf at BASE, after the key, or BEFORE it when
+                                # spelled `^<line>` · $2 = repair the branch (1) or not
+  bcreset; git checkout -qf main
+  mkconf true true "" 3600 "" 1800 7 2026-09-21
+  case "$1" in
+    ^*) { printf '%s\n' "${1#^}"; cat .unattended.conf; } > .unattended.conf.new; mv .unattended.conf.new .unattended.conf ;;
+    *)  printf '%s\n' "$1" >> .unattended.conf ;;
+  esac
+  git add -A >/dev/null && git commit -q -m sa-base-ends-early --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  if [ "$2" = 1 ]; then mkconf true true "" 3600 "" 1800 7 2026-09-21
+    git add -A >/dev/null; git commit -q -m sa-branch-repaired --no-verify; fi
+}
+# The syntax error sits ABOVE the key: bash executes an eval's assignments before its parse fails at
+# EOF, so one appended below the key let rev-1 read the DATE out of a blob that never finished — a
+# different wrong answer from the same defect, and the fold refuses both.
+for _sa_shape in 'return 0|0' 'exit 0|1' 'X="$UNSET_IN_THIS_FIXTURE"|1' '^if|1'; do
+  init_sa_base_ending_early "${_sa_shape%|*}" "${_sa_shape#*|}"
+  out=$(run --preflight tRun --keepalive-id KA-1234)
+  hit "$out" "the project conf at the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
+  miss "$out" "not owed (opt-in)"
+  miss "$out" "opted in by project default"
+  miss "$out" "preflight OK"
+  git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+  git checkout -qf unit; bcreset
+done
 
 # ==================================================================================================
 # TOOL-aGradedMandate-5 / -10 — the parked split, on BOTH axes.

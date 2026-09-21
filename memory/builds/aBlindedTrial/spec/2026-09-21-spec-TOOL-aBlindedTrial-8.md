@@ -1,10 +1,12 @@
 # TOOL-aBlindedTrial-8 — a spec's §7 leg line must name every leg its files-touched trips
 
-**Status:** INPROGRESS · rev-1 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
+**Status:** INPROGRESS · rev-2 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-7 KICK-aBlindedTrial-1 |
 
 <!-- /gen:spec-records -->
 
@@ -123,7 +125,7 @@ the checker · `memory/map/generated/symbols.json` (regen).
 
 ## 7. Gates
 
-`spec tokens (a spec's own names resolve)` · `kit/dogfood doc parity` · `kit version markers` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `kickoff-manifest ratchet`
+`spec tokens (a spec's own names resolve)` · `kit/dogfood doc parity` · `kit version markers` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms`
 
 New arm: `tools/check-spec-tokens.test.sh` · a post-cutoff fixture spec with and without the guarded leg named · `FLOOR_ASSERTIONS` raised per arm
 
@@ -136,6 +138,17 @@ New arm: `tools/check-spec-tokens.test.sh` · a post-cutoff fixture spec with an
 ## 9. Revision log
 
 - rev-1 · 2026-09-21 · initial draft from the scout of the checker, its suite and the manifest at 0e61932d.
+- rev-2 · 2026-09-21 · S3 · §7 · §8 · closing diff review round 1 folded. R1: the exclusion is BREADTH,
+  not the depth S3 and F1 describe — a guard carried by more than `BROAD_LEG_FLOOR` (5) legs leaves the
+  join whatever its depth, because on the real manifest the depth predicate joined `tools/lib/` (30 legs)
+  and excluded `.githooks/` (5). `--list` at the fold, over the live corpus: excluded `tools/lib/ (30)`,
+  `tools/ (11)`, `tools/memory-tree/ (9)`, `tools/run-gates/ (6)`; joined among the former one-segment
+  set `.githooks/` (5), `memory/` (2), `.claude/` (2). The report line prints that set with counts on
+  every run, and the five carriers that typed "eleven" say "several" (R11). R3: a directory token under
+  the sub-head is a declared prefix and trips symmetrically. R4: a spec with no Gates heading is not
+  joined, counted apart. R12: the exact-file guard arm pair. R6: this leg line names the two `memory/`
+  legs `memory/TEMPLATE-SPEC.md` trips; the eight `tools/memory-tree/` legs rev-1 omitted left the join
+  with the floor. `FLOOR_ASSERTIONS` 55 -> 62.
 
 ## 10. Reuse audit
 

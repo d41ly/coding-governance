@@ -852,6 +852,17 @@ check_spec_audit "rule0/U7: the single-quoted spelling → allow" 0 "" \
 printf 'SPEC_AUDIT_DEFAULT="2026-09-21" # the day the owner ruled\n' > "$SACONF"
 check_spec_audit "rule0/U7: a trailing comment after the value → allow" 0 "" \
   "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# closing review of units 7/8, R8 — a `#` GLUED to a bare word is part of the word to the shell, not a
+# comment: `2026-09-21#c` is fail 54 in the driver, and rev-1's regex stopped the word at `#` and
+# admitted the date. Observed RED-first on that hook. Its sibling, the `;`-joined line, reads as NO
+# assignment here (the README deny, the safe direction) while the shell reads the date — a stated
+# limit of this reader, pinned so it cannot drift into the permissive direction unnoticed.
+printf 'SPEC_AUDIT_DEFAULT=2026-09-21#note\n' > "$SACONF"
+check_spec_audit "rule0/U7: a glued #note on a bare value is part of the value → deny, not a date" 2 "SPEC_AUDIT_DEFAULT;;not a date" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf 'SPEC_AUDIT_DEFAULT="2026-09-21"; X=1\n' > "$SACONF"
+check_spec_audit "rule0/U7: a ;-joined second command reads as no assignment → the README deny (documented limit)" 2 "TOOL-aBlindedTrial-6;;spec-audit:;;builds/tSA/README.md" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
 printf 'SPEC_AUDIT_DEFAULT="yes"\nSPEC_AUDIT_DEFAULT="2026-09-21"\n' > "$SACONF"
 check_spec_audit "rule0/U7: two assignments, the LAST a date → allow (last wins, as the shell reads it)" 0 "" \
   "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"

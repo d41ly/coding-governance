@@ -154,7 +154,9 @@ the manifest names makes the audit opt-in (`grep -q 'spec-audit:'` on that carri
 hit → skip, one clause), put ONE `AskUserQuestion`: "Declare `spec-audit:` for this build?" —
 recommend yes when the roster holds two or more units or a spec carries an open §8 fork, no otherwise;
 recommend, never decide. On yes, write `spec-audit: <today>` into the build README front matter
-BEFORE the spec pass (create the README first when the DoR authors it); on no, write nothing.
+BEFORE the spec pass (create the README first when the DoR authors it); on no, write nothing. Do NOT
+ask when `<repo>/.unattended.conf` declares a dated `SPEC_AUDIT_DEFAULT`: the project opted every
+build in and a "no" changes nothing; record it on the card (Step 5).
 
 If a field still can't be filled after you've DERIVED from the message/memory/code AND asked
 (`AskUserQuestion`) — acceptance + gates especially — say so plainly: it isn't Ready — split or clarify
@@ -203,7 +205,8 @@ Echo a compact **READY card** — repo · remote/default branch · `## task` (th
 scope in/out · acceptance · gates · slug or "none") · `## manifest` (the audit delta line, when
 Step 2b ran a repair) · `## read` (governing docs + entrypoints) · `## records` (prior records +
 the `Recall terms used:` line) · `## classes` (the gotcha names) · `## open` (parked items, plus
-Step 3's answer when it asked: `spec audit: declared <date>` or `spec audit: not declared (owner)`) —
+Step 3's answer when it asked: `spec audit: declared <date>` or `spec audit: not declared (owner)`, or
+`spec audit: project default <date>` when the conf answered) —
 closed by the READY micro-format at branch + `base` = BASE. Pipe the six sections and that line
 into `bash <check-script> --card --append --session <sid>`, `<sid>` from the `orientation —`
 header in context; report a refusal on the card and still stop. Commit Step 2b's staged repair

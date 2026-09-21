@@ -97,7 +97,7 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    | `minimal-prose` | the transcript rule under a mandate | M10 | all | D1 |
    | `sub-specced` | one mechanism per spec, and sub-spec agreement | M2 | all | D2 |
    | `forks-resolved` | when open questions are settled | M3 | all | D3 |
-   | `specs-reviewed` | the spec audit that precedes code, when the build declares it | M4 | all | D4 |
+   | `specs-reviewed` | the spec audit that precedes code, when the build or its project declares it | M4 | all | D4 |
    | `reuse-first` | the recall and reuse obligation | M5 | all | D5 |
    | `parallel-when-disjoint` | the parallelism obligation | M6 | all | D6 |
    | `passes-committed` | the commit boundary | M6 | all | D8 |

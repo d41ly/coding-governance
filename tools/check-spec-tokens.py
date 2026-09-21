@@ -53,13 +53,22 @@ population plus one of its own, the declared write set.
          so an exact-file guard does not trip on `x.sh.bak`): a leg whose guard the write set
          trips must be a name on the section 7 leg line, in a LIVE spec dated at or after
          SPEC_GUARD_LEGS_CUTOFF (blank = off) -> a hit whose token is the composite
-         `<leg> <- <path>` (TOOL-aBlindedTrial-8). ONE-SEGMENT guards (`tools/`, `memory/`) are
-         EXCLUDED from the join and listed by --list as NEAR: eleven legs guard bare `tools/`, so
-         naming them adds no information and buries the specific one. A leg without a `guard` key
-         is not joined; a spec without the sub-head declares nothing and is counted apart. The
-         join reads the ESTIMATE as written, not the write set the build actually made; it reads
-         no path named in prose outside the sub-head; and it reads a guard as a directory or an
-         exact file, never as git pathspec magic. The motivating case: a unit that edited
+         `<leg> <- <path>` (TOOL-aBlindedTrial-8). A DIRECTORY token under the sub-head — one
+         ending in `/`, `tools/` and `tools/run-gates/` alike — is a declared PREFIX and trips
+         SYMMETRICALLY: a guard it equals or sits under, and a guard that sits under it (closing
+         review round 1, R3; writing the folder instead of the files was a clean pass before). The
+         join grades only a spec that CARRIES a Gates heading, the legline arm's own precondition:
+         a Tier-1 spec under the light profile may omit the section, and one that does is COUNTED
+         on the guards line rather than joined (R4). BROAD guards are EXCLUDED from the join and
+         listed by --list as NEAR, and broad is BREADTH, not depth (R1): a guard carried by MORE
+         than BROAD_LEG_FLOOR legs, whatever its depth, because several legs guard bare `tools/`
+         and thirty guard `tools/lib/`, so naming them adds no information and buries the specific
+         one. The excluded set is printed WITH its per-guard leg counts on the guards line of every
+         run, so the exclusion announces itself and no count of it lives in prose. A leg without a
+         `guard` key is not joined; a spec without the sub-head declares nothing and is counted
+         apart. The join reads the ESTIMATE as written, not the write set the build actually made;
+         it reads no path named in prose outside the sub-head; and it reads a guard as a directory
+         or an exact file, never as git pathspec magic. The motivating case: a unit that edited
          `tools/hooks/scratch-guard.js` and omitted `scratch-guard self-test`, found by a closing
          review and not by a gate.
 
@@ -124,6 +133,12 @@ DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
 # The section body ends at the NEXT heading of any depth, because the sub-head has siblings.
 GUARDS_KEY = "SPEC_GUARD_LEGS_CUTOFF"
 FILES_HEAD = re.compile(r"^### Files touched( \(estimate\))?[ \t]*$", re.M)
+# A guard carried by MORE than this many legs is BROAD and leaves the guards join (closing review
+# round 1, R1). Measured on the manifest at 144cd1fb: 5 keeps `tools/hooks/` (5 legs, the motivating
+# case) and `.githooks/` (5) joined and drops `tools/lib/` (30), `tools/` (11), `tools/memory-tree/`
+# (9) and `tools/run-gates/` (6). The figures live here as the reason for the floor, dated; the set
+# the floor excludes TODAY is derived and printed on every run, never typed.
+BROAD_LEG_FLOOR = 5
 # The acceptance section by HEADING TEXT, the shape GATES_HEAD already has and for the same reason:
 # a light-profile spec drops `## 5.` and the ordinal read grades whatever sits sixth.
 AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
@@ -204,10 +219,13 @@ def extract_acceptance(text):
 
 def extract_files_touched(text, files):
     """The declared write set: every path-shaped word inside backticks under the `### Files touched`
-    sub-head, in order and without repeats. None when the spec carries no such sub-head, which the
-    report counts apart from a sub-head declaring nothing (TOOL-aBlindedTrial-8). The body closes at
-    the next heading of ANY depth, unlike the section readers above, because the sub-head has
-    siblings inside section 4.
+    sub-head, in order and without repeats, PLUS every directory-shaped one kept with its trailing
+    `/` so the join can read it as a prefix (closing review round 1, R3 — the trailing-slash rule of
+    `check_path_shaped` is right for the paths and cites joins and wrong here, where `tools/x/`
+    declares everything under it). None when the spec carries no such sub-head, which the report
+    counts apart from a sub-head declaring nothing (TOOL-aBlindedTrial-8). The body closes at the
+    next heading of ANY depth, unlike the section readers above, because the sub-head has siblings
+    inside section 4.
     """
     m = FILES_HEAD.search(text)
     if not m:
@@ -218,34 +236,56 @@ def extract_files_touched(text, files):
     paths = []
     for tok in TICK.findall(body):
         for word in tok.split():
-            if check_path_shaped(word, files) and word not in paths:
+            if (check_path_shaped(word, files) or check_dir_shaped(word)) and word not in paths:
                 paths.append(word)
     return paths
 
 
+def check_dir_shaped(tok):
+    """A declared PREFIX: a token ending in `/` that is otherwise a token this join could read — no
+    deploy-time opener, glob or whitespace, and something before the slash. `tools/` and
+    `tools/run-gates/` both are; a bare `/` and a `$KIT/` are not."""
+    if NOT_A_TOKEN.match(tok) or " " in tok or "*" in tok or "?" in tok:
+        return False
+    return tok.endswith("/") and tok.rstrip("/") != ""
+
+
 def check_guard_trips(path, guard):
     """Git-pathspec semantics for a manifest guard: the exact path, or anything under it as a
-    directory. Never a bare prefix, so `tools/x.sh` does not trip on `tools/x.sh.bak`."""
-    return path == guard or path.startswith(guard.rstrip("/") + "/")
+    directory. Never a bare prefix, so `tools/x.sh` does not trip on `tools/x.sh.bak`. A declared
+    DIRECTORY (its trailing `/` kept by `extract_files_touched`) trips symmetrically: it also trips
+    a guard that sits under it, because `tools/` declares `tools/x/` (R3)."""
+    p, g = path.rstrip("/"), guard.rstrip("/")
+    if p == g or p.startswith(g + "/"):
+        return True
+    return path.endswith("/") and g.startswith(p + "/")
 
 
 def derive_guarded_legs(rows):
-    """The manifest's guarded legs, split by guard depth. Returns `(joined, broad)`: `joined` is
-    `(name, [guards])` for every leg carrying at least one guard deeper than one segment, with the
-    one-segment guards dropped from its list; `broad` is the sorted set of one-segment guards over
-    the whole manifest, which the join excludes and --list reports as NEAR. A leg with no `guard`
-    key is absent from both (fixture manifests omit it)."""
-    joined, broad = [], set()
+    """The manifest's guarded legs, split by guard BREADTH. Returns `(joined, broad)`: `broad` is
+    `{guard: legs}` for every guard carried by MORE than BROAD_LEG_FLOOR legs over the whole
+    manifest, whatever its depth, which the join excludes, prints with its counts and --list reports
+    as NEAR; `joined` is `(name, [guards])` for every leg carrying at least one guard that is not
+    broad, with the broad ones dropped from its list. A leg with no `guard` key is absent from both
+    (fixture manifests omit it). rev-1 split on DEPTH — one segment or more — and on the real
+    manifest that joined `tools/lib/` (30 legs) and excluded `.githooks/` (5); the count is the
+    property the exclusion was written for (closing review round 1, R1)."""
+    count = {}
     for r in rows:
-        deep = []
         for g in r.get("guard") or []:
-            if g.rstrip("/").count("/") == 0:
-                broad.add(g)
-            else:
-                deep.append(g)
-        if deep:
-            joined.append((r["name"], deep))
-    return joined, sorted(broad)
+            count[g] = count.get(g, 0) + 1
+    broad = {g: n for g, n in count.items() if n > BROAD_LEG_FLOOR}
+    joined = []
+    for r in rows:
+        keep = [g for g in (r.get("guard") or []) if g not in broad]
+        if keep:
+            joined.append((r["name"], keep))
+    return joined, broad
+
+
+def render_broad(broad):
+    """The excluded set as the report prints it, count-descending then by name; `none` when empty."""
+    return " ".join(f"{g} ({n})" for g, n in sorted(broad.items(), key=lambda kv: (-kv[1], kv[0]))) or "none"
 
 
 def check_cutoff_relation(root, key, value):
@@ -403,7 +443,7 @@ def main(argv):
     hits, skipped, graded, seen_waived = [], 0, 0, set()
     ungraded, noheading = 0, 0
     bar_examined, bar_specs, bar_carriers, near = 0, 0, 0, []
-    g_examined, g_specs, g_carriers, g_nosubhead = 0, 0, 0, 0
+    g_examined, g_specs, g_carriers, g_nosubhead, g_nogates = 0, 0, 0, 0, 0
     for f in specs:
         text = (root / f).read_bytes().decode("utf-8", "replace")
         m = SPEC_DATE.search("/" + f)
@@ -487,12 +527,17 @@ def main(argv):
             g_nosubhead += 1
             declared = []
         missing = []
-        for leg, gs in guarded:
-            if leg in named:
-                continue
-            path = next((p for p in declared if any(check_guard_trips(p, g) for g in gs)), None)
-            if path is not None:
-                missing.append((leg, path))
+        # The legline arm's precondition, mirrored (R4): a spec with NO Gates heading is the light
+        # profile's legal shape and is not joined — counted, so the skip has a size.
+        if declared and extract_gates(text) is None:
+            g_nogates += 1
+        elif extract_gates(text) is not None:
+            for leg, gs in guarded:
+                if leg in named:
+                    continue
+                path = next((p for p in declared if any(check_guard_trips(p, g) for g in gs)), None)
+                if path is not None:
+                    missing.append((leg, path))
         if g_armed:
             g_specs += 1
             g_examined += len(declared)
@@ -503,14 +548,15 @@ def main(argv):
             g_carriers += 1
             where = f"predates {GUARDS_KEY} {guards_cut}" if guards_cut else f"{GUARDS_KEY} blank (arm off)"
             near += [(f, "guards", f"{leg} <- {path}", where) for leg, path in missing]
-        # A path whose only guard matches are one-segment is EXCLUDED, and says so under --list.
+        # A path whose only guard matches are BROAD is EXCLUDED, and says so under --list, count and all.
         for p in declared:
             if any(check_guard_trips(p, g) for _, gs in guarded for g in gs):
                 continue
             hit = [g for g in broad if check_guard_trips(p, g)]
             if hit:
-                near.append((f, "guards", p, "matches only the one-segment guard(s) "
-                             + " ".join(hit) + ", excluded from the join"))
+                near.append((f, "guards", p, "matches only the broad guard(s) "
+                             + " ".join(f"{g} ({broad[g]} legs)" for g in hit)
+                             + ", excluded from the join"))
         for path, line in CITE.findall(text):
             if path not in files:
                 skipped += 1
@@ -552,15 +598,19 @@ def main(argv):
         print(f"spec-tokens: bar join · {DIRECT_KEY} blank (arm off) · {bar_carriers} live spec(s) "
               "carry a bar token")
     # The guards join's line, the same shape for the same reason: what it examined, what it counted
-    # and skipped, and how many specs declared nothing it could read.
+    # and skipped, how many specs declared nothing it could read or carried no Gates heading to join
+    # against, and the guards the breadth floor excluded WITH their leg counts — the derived figure
+    # that no prose restates (R1, R11).
+    g_tail = (f" · {g_nosubhead} carry no Files touched sub-head · {g_nogates} declare a path and carry "
+              f"no Gates heading, not joined · excluded as broad (carried by more than {BROAD_LEG_FLOOR} "
+              f"legs): {render_broad(broad)}")
     if guards_cut:
         print(f"spec-tokens: guards join · {g_examined} declared path(s) examined in {g_specs} live "
               f"spec(s) at/after {GUARDS_KEY} {guards_cut} · {g_carriers} pre-cutoff live spec(s) carry "
-              f"a missing guarded leg and are not graded · {g_nosubhead} carry no Files touched "
-              f"sub-head{grelation}")
+              f"a missing guarded leg and are not graded{g_tail}{grelation}")
     else:
         print(f"spec-tokens: guards join · {GUARDS_KEY} blank (arm off) · {g_carriers} live spec(s) "
-              f"carry a missing guarded leg · {g_nosubhead} carry no Files touched sub-head")
+              f"carry a missing guarded leg{g_tail}")
     # THE UNGRADED POPULATION, which the report used to leave out entirely. A leg join that reads N
     # specs and grades a leg name in far fewer of them looks identical to one that graded them all
     # and found nothing wrong. These two numbers are what separate the cases, and they are kept

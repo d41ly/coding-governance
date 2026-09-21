@@ -15,7 +15,7 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=55
+FLOOR_ASSERTIONS=62
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
@@ -26,6 +26,9 @@ FLOOR_ASSERTIONS=55
 # short sub-head spelling, the absent sub-head, the one-segment near-miss (rc and `--list`), the
 # composite waiver and the bare-leg row that does not consume it, and the two refusals (non-ISO,
 # relation).
+# RAISED 55 -> 62 at the closing diff review of TOOL-aBlindedTrial-7/8 (round 1), by the count of
+# `arm` lines its diff added: the breadth pair (R1), the declared-prefix pair (R3), the no-Gates
+# precondition (R4) and the exact-file guard pair (R12).
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -428,20 +431,79 @@ git -C "$d" add -A >/dev/null
 arm "a post-cutoff spec with no Files touched sub-head is silent and counted apart" 0 "$d" "1 carry no Files touched sub-head"
 git -C "$d" reset -q --hard "$clean"
 
-# AC4 — a path under a ONE-SEGMENT guard only (`tools/`) is excluded from the join: green, and
-#       `--list` prints it as NEAR so the exclusion announces itself.
-printf '[{"name":"real leg"},{"name":"broad leg","guard":["tools/"]}]\n' > "$d/tools/gate-legs.json"
+# AC4 — a path under a BROAD guard only is excluded from the join: green, the report line prints the
+#       excluded guard with its leg count, and `--list` prints the path as NEAR so the exclusion
+#       announces itself. Broad is BREADTH (closing review round 1, R1): a guard carried by more than
+#       BROAD_LEG_FLOOR legs, whatever its depth. The fixture is floor+1 legs sharing bare `tools/`;
+#       one leg on `tools/` was the rev-1 fixture, and it is a HIT below now.
+BROAD_LEGS='[{"name":"real leg"},{"name":"b1","guard":["tools/"]},{"name":"b2","guard":["tools/"]},{"name":"b3","guard":["tools/"]},{"name":"b4","guard":["tools/"]},{"name":"b5","guard":["tools/"]},{"name":"b6","guard":["tools/"]}]'
+printf '%s\n' "$BROAD_LEGS" > "$d/tools/gate-legs.json"
 printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
 write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
 git -C "$d" add -A >/dev/null
-arm "a path matching only a one-segment guard is no hit" 0 "$d" "guards join · 1 declared path(s) examined"
+arm "a path matching only a broad guard (floor+1 legs on tools/) is no hit, and the exclusion is printed with its count" 0 "$d" "excluded as broad (carried by more than 5 legs): tools/ (6)"
 out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
-if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: tools/x/thing.sh — matches only the one-segment guard(s) tools/'; then
-  echo "arm ok    --list prints the one-segment match as NEAR [guards]"; pass=$((pass+1))
+if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: tools/x/thing.sh — matches only the broad guard(s) tools/ (6 legs)'; then
+  echo "arm ok    --list prints the broad-guard match as NEAR [guards]"; pass=$((pass+1))
 else
-  echo "arm FAIL  --list — expected a NEAR [guards] row for tools/x/thing.sh naming the one-segment guard"
+  echo "arm FAIL  --list — expected a NEAR [guards] row for tools/x/thing.sh naming the broad guard and its count"
   printf '%s\n' "$out" | grep -F 'NEAR' | head -3; fail=$((fail+1))
 fi
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 1, R1 — the exclusion is BREADTH, not depth. rev-1's predicate read the guard's
+# slash count, so on the real manifest `tools/lib/` (30 legs) was joined and `.githooks/` (5 legs)
+# was excluded. Two arms, observed RED-first on that checker: a TWO-segment guard carried by floor+1
+# legs is excluded (rev-1 redded it), and a ONE-segment guard carried by one leg is joined and hits
+# (rev-1 passed it).
+printf '[{"name":"real leg"},{"name":"d1","guard":["tools/x/"]},{"name":"d2","guard":["tools/x/"]},{"name":"d3","guard":["tools/x/"]},{"name":"d4","guard":["tools/x/"]},{"name":"d5","guard":["tools/x/"]},{"name":"d6","guard":["tools/x/"]}]\n' > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a two-segment guard carried by floor+1 legs is excluded by breadth, whatever its depth" 0 "$d" "excluded as broad (carried by more than 5 legs): tools/x/ (6)"
+printf '[{"name":"real leg"},{"name":"broad leg","guard":["tools/"]}]\n' > "$d/tools/gate-legs.json"
+git -C "$d" add -A >/dev/null
+arm "a one-segment guard carried by ONE leg is joined and REDS" 1 "$d" '[guards] `broad leg <- tools/x/thing.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 1, R3 — a DIRECTORY token under the sub-head is a declared PREFIX, not prose.
+# rev-1 dropped every trailing-slash token before the join, so writing the folder instead of the
+# files was a clean pass with no NEAR row. Symmetric: the declared prefix trips a guard it equals or
+# sits under, AND a guard that sits under it. Observed RED-first on the rev-1 checker, both arms.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/`'
+git -C "$d" add -A >/dev/null
+arm "a declared directory equal to the guard trips it and REDS" 1 "$d" '[guards] `guarded leg <- tools/x/`'
+sed -i 's|^`tools/x/`$|`tools/`|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "a declared root that CONTAINS the guard trips it and REDS" 1 "$d" '[guards] `guarded leg <- tools/`'
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 1, R4 — the join grades only a spec that CARRIES a Gates heading, the legline
+# arm's own precondition: a Tier-1 spec under the light profile may omit the section, and rev-1 gave
+# it one hit per tripped leg while the same run counted it as "no Gates heading to grade". Observed
+# RED-first on the rev-1 checker: exit 1 with two [guards] rows.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+awk '/^## 7[.] Gates$/{exit} {print}' "$spec" > "$d/.tmp.md"; mv "$d/.tmp.md" "$spec"
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff spec with NO Gates heading is not joined, and is counted on the guards line" 0 "$d" "1 declare a path and carry no Gates heading, not joined"
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 1, R12 — the EXACT-FILE branch of check_guard_trips, seen to fail. Every arm
+# above uses the directory guard, so `path == guard` and the docstring's `x.sh.bak` non-prefix claim
+# were asserted by prose alone; the live manifest carries exact-file guards. The `.bak` sibling is
+# path-shaped (a slash and an extension) and untracked, which the guards join does not grade.
+printf '[{"name":"real leg"},{"name":"exact leg","guard":["tools/x/thing.sh"]}]\n' > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh.bak`'
+git -C "$d" add -A >/dev/null
+arm "an exact-file guard does not trip on a .bak sibling" 0 "$d" "guards join · 1 declared path(s) examined"
+sed -i 's|^`tools/x/thing.sh.bak`$|`tools/x/thing.sh`|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "an exact-file guard trips on the file itself and REDS" 1 "$d" '[guards] `exact leg <- tools/x/thing.sh`'
 git -C "$d" reset -q --hard "$clean"
 
 # AC5 — a waiver row keyed on the COMPOSITE token clears the hit and is counted; a bare row keyed

@@ -190,12 +190,14 @@ leg in it.
 Once a spec's filename date reaches `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`; blank turns it
 off), the leg line must also name every leg in `{{TOOL_ROOT}}gate-legs.json` whose `guard` any
 backticked path under §4 `### Files touched (estimate)` trips — the exact path, or anything under
-the guard as a directory. The join reads the ESTIMATE as written and the leg's guard pathspecs,
-nothing else: a path named in prose outside that sub-head is not read, and a one-segment guard such
-as `tools/` is excluded (eleven legs carry it; a rule that owes eleven names per spec is obeyed by
-paste). The hit names the leg and the path together, `<leg> <- <path>`, and a waiver row must carry
-that whole token. The checker is a repo-root tool of the shipping repo; an adopter receives this
-paragraph and the blank key in the example conf.
+the guard as a directory; a directory token declares everything under it and trips symmetrically.
+The join reads the ESTIMATE as written and the leg's guard pathspecs, nothing else: a path named in
+prose outside that sub-head is not read, a spec with no Gates heading is not joined, and a BROAD
+guard — one carried by more legs than the checker's floor, `tools/` among them (several legs carry
+it; a rule that owes that many names per spec is obeyed by paste) — is excluded, the set printed
+with its counts on every run. The hit names the leg and the path together, `<leg> <- <path>`, and a
+waiver row must carry that whole token. The checker is a repo-root tool of the shipping repo; an
+adopter receives this paragraph and the blank key in the example conf.
 
 **Where a new arm lives.** When a unit adds or moves a gate arm, §7 carries one line per arm:
 

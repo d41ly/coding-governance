@@ -1746,7 +1746,9 @@ function scanJoinFindings(script) {
 // fail 52 exists to refuse. An unreadable README is still the fail-closed deny with no conf read.
 // Stated limit: a BARE `spec-audit:` line has no value for `readFrontMatterKey` and reads as
 // absent here, so it falls to the conf, where the driver instead refuses it (fail 52) — the
-// disagreement admits an audit, which is the safe direction. Worktree here, BASE there: this hook
+// disagreement admits an audit, which is the safe direction. Second limit, the same direction: a
+// `;`-joined line (`SPEC_AUDIT_DEFAULT="<date>"; X=1`) is no assignment to this reader and the
+// README deny stands, while the shell reads the date. Worktree here, BASE there: this hook
 // guards a session with an owner present; the BASE read is the one that binds an unattended run.
 
 // The `builds/<slug>` a repo-relative path sits under, or null: no `builds` segment, any `..`
@@ -1766,12 +1768,14 @@ function extractBuildSlug(p) {
 
 // The LAST `SPEC_AUDIT_DEFAULT=` assignment's value in a shell-style conf, as the shell would read
 // it: double- or single-quoted or bare, an optional `export`, a trailing `# comment` allowed after
-// the value. null when no assignment exists. The value is returned RAW; the caller decides whether
-// it is a date, so a blank and a non-date are both visible to it.
+// the value ONLY behind whitespace — a `#` glued to a bare word is part of the word to the shell
+// (`2026-09-21#c` is the driver's fail 54), and rev-1 stopped the word there and admitted the date
+// (closing review of units 7/8, R8). null when no assignment exists. The value is returned RAW; the
+// caller decides whether it is a date, so a blank and a non-date are both visible to it.
 function readSpecAuditDefault(bytes) {
   let v = null
   for (const line of String(bytes || '').split(/\r?\n/)) {
-    const m = /^\s*(?:export\s+)?SPEC_AUDIT_DEFAULT=(?:"([^"]*)"|'([^']*)'|([^\s#]*))\s*(?:#.*)?$/.exec(line)
+    const m = /^\s*(?:export\s+)?SPEC_AUDIT_DEFAULT=(?:"([^"]*)"|'([^']*)'|(\S*))(?:\s+#.*)?\s*$/.exec(line)
     if (m) v = m[1] !== undefined ? m[1] : m[2] !== undefined ? m[2] : m[3]
   }
   return v

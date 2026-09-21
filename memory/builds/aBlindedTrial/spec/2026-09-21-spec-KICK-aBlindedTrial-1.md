@@ -1,10 +1,12 @@
 # KICK-aBlindedTrial-1 — the kickoff engine puts the spec-audit question to the owner at READY
 
-**Status:** INPROGRESS · rev-1 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams kickoff · order 1 · ratified 2026-09-21
+**Status:** INPROGRESS · rev-2 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams kickoff · order 1 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
 
 <!-- /gen:spec-records -->
 
@@ -82,8 +84,10 @@ shape the trial could not measure, and writes the line on a yes.
   (the project's method names `spec-audit:` as opt-in) and the skip when it does not.
   Red when: a project without the opt-in is asked.
 - **AC3** — When `grep -n 'spec audit:' skills/session-kickoff/SKILL.md` runs, it names the `## open`
-  line in Step 5 in both spellings.
-  Red when: the card carries no record of the answer.
+  line in Step 5 in all three spellings: `declared <date>`, `not declared (owner)` and
+  `project default <date>` — the third written when `.unattended.conf` declares a dated
+  `SPEC_AUDIT_DEFAULT` and Step 3 therefore does not ask (rev-2).
+  Red when: the card carries no record of the answer, or asks under a project default.
 - **AC4** — When `grep -n 'never ask' skills/session-kickoff/SKILL.md` runs, it lands inside Step 5b.
   Red when: an unattended run could put a question to nobody.
 - **AC5** — When `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` prints
@@ -93,7 +97,7 @@ shape the trial could not measure, and writes the line on a yes.
 
 ## 7. Gates
 
-`kickoff engine size <=18KiB` · `kickoff-manifest ratchet` · `memory hygiene`
+`kickoff engine size <=18KiB` · `kickoff-manifest ratchet` · `memory hygiene` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
 
 ## 8. Open questions
 
@@ -104,6 +108,11 @@ shape the trial could not measure, and writes the line on a yes.
 ## 9. Revision log
 
 - rev-1 · 2026-09-21 · initial draft from the engine at 0e61932d.
+- rev-2 · 2026-09-21 · §6 · §7 · closing diff review round 1 folded. R7: Step 3 does not ask when the
+  conf declares a dated `SPEC_AUDIT_DEFAULT` — a "no" there could change nothing and the card misrecorded
+  it — and Step 5 gains the third `## open` spelling, which AC3 now names. R6: the leg line names every
+  leg the §4 files-touched trips under the guards join at the fold — the three `skills/session-kickoff/`
+  legs and the two `memory/` recall legs.
 
 ## 10. Reuse audit
 
