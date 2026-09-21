@@ -52,8 +52,20 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
       // that refuse without a run-state file, and no gate downstream of here reads a prompt. A double
       // recording only labels cannot see the difference between the two modes at all.
       trace.push("prompt:" + label + ":" + String(prompt).replace(/\n/g, " "))
-      for (const k of Object.keys(returns)) if (label.indexOf(k) === 0) return returns[k]
+      for (const k of Object.keys(returns)) if (label.indexOf(k) === 0) return schemaShaped(returns[k], opts && opts.schema)
       return null
+    }
+    // TOOL-dMergedTally-1 - `RUN_WF_SCHEMA=strict` makes the double answer AS ITS SCHEMA ALLOWS: a
+    // value missing a key the schema requires comes back null, which is how a validation failure in
+    // the runtime reaches a script, and a top-level key the schema does not declare is dropped. Without
+    // it a double returns a field the callee never asked for, and an arm passes over a schema that
+    // was reverted (closing review, T1). Opt-in, because older fixtures predate the schemas they meet.
+    const schemaShaped = (v, schema) => {
+      if (process.env.RUN_WF_SCHEMA !== "strict" || !schema || !v || typeof v !== "object") return v
+      if ((schema.required || []).some((k) => !(k in v))) return null
+      const out = {}
+      for (const k of Object.keys(v)) if (schema.properties && k in schema.properties) out[k] = v[k]
+      return out
     }
     const phase = (t) => trace.push("phase:" + t)
     const log = (m) => trace.push("log:" + m)
@@ -563,6 +575,108 @@ has    "V5 attended with confirmed findings: the disposal agent RUNS" "$o" "agen
 has    "V5 attended: the prompt promotes through the README roster" "$o" "authored Units table"
 hasnt_ "V5 attended: the prompt never orders --rescope" "$o" "--rescope tB"
 has    "V5 attended: the main return carries the stage's counts" "$o" '"promoted":0,"folded":2'
+
+# ======================= TOOL-dMergedTally-1 — THE SEVERITY SPLIT IS COUNTED IN THE UNIT `confirmed` IS
+# The guard computes `mustFold = confirmed - (blockers + highs)`. `confirmed` counts RAW findings, and
+# the synthesis typed `blockers` and `highs` over the ITEMS it merged raw findings into. Measured on
+# dLoggedFlight's round-1 spec audit of units 14 and 15: 48 raw, 13 confirmed, merged into 10 items —
+# 1 BLOCKER and 5 HIGH by item, 3 and 6 by raw finding, 4 MEDIUM either way. The harness got blockers
+# 1 and highs 5, demanded 7 folds of 4 MEDIUMs, and refused the only honest disposal, 9 promoted and
+# 4 folded. Every `review_out` fixture above hands the harness integers it chose, which is why no arm
+# could see this: the two numbers were never produced by the callee. So these arms RUN the callee,
+# with only its agents doubled, and feed the harness the callee's own RESULT line. The SYNTHESIS
+# double merges the way the measured one did and carries both halves of what it could return: the
+# two integers the old schema demanded, as the measured synthesis typed them, and the item list the
+# new one demands. One fixture therefore runs against either revision — observed RED on every arm
+# below against the unchanged render and callee, GREEN after.
+MT_T2="$HERE/tier2-review.js"
+MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"s1","blob":"abc1234"}],"round":1,"reviewDir":"r/"}'
+# `build_merged_returns <items-json|absent> [judged]`: four lenses of twelve findings each are ids 1-48;
+# the skeptic double judges ids 1 to `judged` (default 48), confirming the thirteen below and refuting
+# the rest, so an id above `judged` comes back UNVERIFIED; the synthesis double returns the given
+# items, or no `items` key at all for `absent`.
+# `run_merged_review <returns>` runs the callee with its doubles answering as their SCHEMAS allow, so
+# a synthesis schema that stopped requiring `items` drops the key and reds the counting arms.
+build_merged_returns() {
+  node -e '
+    const confirmed = new Set([1, 4, 7, 9, 11, 14, 16, 20, 22, 26, 30, 33, 40])
+    const finding = { file: "s1", where: "section 2", severity: "high", claim: "c", impact: "i", fix: "f" }
+    const verdicts = Array.from({ length: Number(process.argv[2]) }, (_, i) =>
+      ({ id: i + 1, verdict: confirmed.has(i + 1) ? "confirmed" : "refuted", reason: "r" }))
+    console.log(JSON.stringify({
+      "find:": { lens: "l", findings: Array.from({ length: 12 }, () => finding) },
+      "verify:": { verdicts },
+      synth: { path: "r/merged.md", summary: "13 confirmed in 10 items", blockers: 1, highs: 5,
+        items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]) },
+    }))
+  ' "$1" "${2:-48}"
+}
+# The measured record's two merges are B1 (14, 26, 40) and H2 (16, 4); every other item holds one id.
+MT_MERGED='[{"severity":"BLOCKER","ids":[14,26,40]},{"severity":"HIGH","ids":[1]},{"severity":"HIGH","ids":[16,4]},{"severity":"HIGH","ids":[7]},{"severity":"HIGH","ids":[9]},{"severity":"HIGH","ids":[11]},{"severity":"MEDIUM","ids":[20]},{"severity":"MEDIUM","ids":[22]},{"severity":"MEDIUM","ids":[30]},{"severity":"MEDIUM","ids":[33]}]'
+MT_DISPOSE='{"disposed":true,"standing":[],"promoted":9,"folded":4,"refuted":0,"promotedIds":["A-tB-16","A-tB-17","A-tB-18","A-tB-19"],"summary":"9 promoted into 4 units, 4 folded"}'
+run_merged_review() { RUN_WF_SCHEMA=strict run_wf "$MT_ARGS" "$1" "$MT_T2"; }
+run_merged_build() { # callee RESULT json · [driver token] · [disposal double] -> the build harness run over it
+  run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "${1:-null}" "$(rec "${2:-BOUNDED}")" "${3:-$MT_DISPOSE}")"
+}
+t2=$(run_merged_review "$(build_merged_returns "$MT_MERGED")")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+# LIVENESS FIRST. Without it a fixture that broke into an empty review would skip the disposal stage
+# and hand out a roster, and the roster arm below would pass over a stage that never ran.
+has    "MT the callee ran over the measured shape — 48 raw, 13 confirmed" "$au" '"raw":48,"confirmed":13'
+has    "MT the callee counts blockers and highs over RAW confirmed findings, not over items" "$au" '"blockers":3,"highs":6'
+o=$(run_merged_build "$au")
+has    "MT the disposal stage RAN over the callee's counts" "$o" "agent:dispose:tB"
+has    "MT promoted 9 and folded 4, by raw id, is ACCEPTED" "$o" "disposal: done — promoted 9 · folded 4"
+hasnt_ "MT ...and is not refused as a bad severity split" "$o" "do not split by severity"
+has    "MT ...and the roster is handed out" "$o" '"roster":[{'
+# THE REFUSAL, both ways. A confirmed id the item list places nowhere, or in two items, leaves the
+# raw split unknowable; the callee returns NEITHER count and names the id, and the harness refuses
+# the null as a degraded run rather than reading it as zero.
+t2=$(run_merged_review "$(build_merged_returns "$(printf '%s' "$MT_MERGED" | sed 's/,{"severity":"MEDIUM","ids":\[33\]}//')")")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+has    "MT a confirmed id in NO item returns neither count" "$au" '"blockers":null,"highs":null'
+has    "MT ...and the note names the id" "$au" "confirmed id(s) 33 sit in no item"
+t2=$(run_merged_review "$(build_merged_returns "$(printf '%s' "$MT_MERGED" | sed 's/"ids":\[20\]/"ids":[20,4]/')")")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+has    "MT a confirmed id in TWO items returns neither count" "$au" '"blockers":null,"highs":null'
+has    "MT ...and the note names the id" "$au" "confirmed id(s) 4 sit in more than one item"
+o=$(run_merged_build "$au")
+has    "MT the harness REFUSES the null count" "$o" "non-integer blocker count"
+hasnt_ "MT ...before the disposal stage" "$o" "phase:Disposal"
+# AND ONLY CONFIRMED IDS ARE COUNTED. The prompt lets the synthesis list an UNVERIFIED id, which the
+# disposal stage adjudicates itself, so id 48 left unjudged and listed at BLOCKER moves neither count.
+t2=$(run_merged_review "$(build_merged_returns "$(printf '%s' "$MT_MERGED" | sed 's/\[14,26,40\]/[14,26,40,48]/')" 47)")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+has    "MT an UNVERIFIED id listed in an item is left uncounted" "$au" '"unverified":1,'
+has    "MT ...so the raw counts stay 3 and 6" "$au" '"blockers":3,"highs":6'
+# A SEVERITY OUTSIDE THE CLOSED FOUR places nothing, and a lowercase one is the same word: the
+# finders' schema spells all four that way.
+t2=$(run_merged_review "$(build_merged_returns "$(printf '%s' "$MT_MERGED" | sed 's/"MEDIUM","ids":\[33\]/"CRITICAL","ids":[33]/')")")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+has    "MT a severity outside the closed four leaves its ids unplaced" "$au" "confirmed id(s) 33 sit in no item"
+t2=$(run_merged_review "$(build_merged_returns "$(printf '%s' "$MT_MERGED" | sed 's/"HIGH","ids":\[1\]/"high","ids":[1]/')")")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+has    "MT a lowercase severity is the same word" "$au" '"blockers":3,"highs":6'
+# THE SCHEMA IS ASKED FOR, and the strict runner is live (closing review T1). The synthesis prompt
+# names `items`, and a synthesis double with no `items` key is refused the way the runtime refuses a
+# return missing a required key: the callee reads a dead synthesis, so neither count is invented.
+t2=$(run_merged_review "$(build_merged_returns "$MT_MERGED")")
+has    "MT the synthesis prompt asks for the item list" "$(printf '%s\n' "$t2" | grep '^prompt:synth:')" 'Return JSON {path, items, summary}'
+t2=$(run_merged_review "$(build_merged_returns absent)")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+has    "MT a synthesis return without items is refused by its schema" "$au" 'the synthesis agent died'
+has    "MT ...and neither count is invented" "$au" '"blockers":null,"highs":null'
+# NOTHING CONFIRMED, EVERYTHING UNVERIFIED (closing review T3). The counts are derived here too, and
+# an empty item list over an empty confirmed set is a RESULT at 0, never a fault: the harness must
+# reach the disposal stage for the 48 findings no skeptic judged, record the round after it, and
+# accept a disposal that folds them all.
+t2=$(run_merged_review "$(build_merged_returns '[]' 0)")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+has    "MT zero confirmed and 48 unverified reaches the synthesis" "$au" '"confirmed":0,"refuted":0,"unverified":48'
+has    "MT ...and an empty item list counts 0 and 0, not null" "$au" '"blockers":0,"highs":0'
+o=$(run_merged_build "$au" CONVERGED '{"disposed":true,"standing":[],"promoted":0,"folded":48,"refuted":0,"promotedIds":[],"summary":"s"}')
+has    "MT ...and the harness disposes the unverified population" "$o" "disposal: done — promoted 0 · folded 48"
 
 # ---- AC5: a disposal that did NOT finish hands out NO roster. There is no partial hand-out: a
 # ---- roster minus the units a blocker touches is a judgement this runtime cannot make, having no

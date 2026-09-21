@@ -3,7 +3,7 @@
  * stall-recorder — a `StopFailure` hook that writes an API-error stall of a session bound to an
  * unattended run to disk, at zero API cost, after the turn the API refused.
  *
- * gov:kit unattended@1.25 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.26 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aWokenSentinel-4 under the build folder of that slug.

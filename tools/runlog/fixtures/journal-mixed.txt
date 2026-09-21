@@ -1,0 +1,5 @@
+v=1	t=1757770000	p=driver	ev=once	verb=--status
+v=1	t=1757770001.25	p=dri
+v=2	t=1757770002	p=driver	ev=once	verb=--status
+v=1	t=1757770003.5	p=driver	ev=start	n=77.1757770003500000	sess.CLAUDE_CODE_SESSION_ID=00000000-0000-4000-8000-000000000000	fail.3=a leg	zz_unknown=kept	ref.12=a b=c
+v=1	t=1757770004	p=driver	ev=end	n=77.1757770003500000	rc=0	exit=clean

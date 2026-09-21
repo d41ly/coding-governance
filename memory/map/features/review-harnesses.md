@@ -117,6 +117,13 @@ files.
   remains a gap is the other two harnesses, which still know only their own subject, and the fact
   that a kind is a parameter rather than a profile: adding a third would mean a third branch at each
   of the six sites, and the enforcement hook admits no registry that would collapse them.
+- **`blockers` and `highs` are COUNTED from ids, but the severities are still the synthesis's word.**
+  `TOOL-dMergedTally-1` stopped the synthesis agent typing the two integers: it returns `items`, each
+  a severity and the raw confirmed ids it merged, and the harness counts over raw ids and returns
+  null when an id sits in no item or in two. The typed integers had counted ITEMS against a
+  `confirmed` that counts raw findings, and the build harness's disposal guard subtracts one from the
+  other. What stays a prompt property is that the item list matches the table the same agent wrote
+  into the report: nothing re-reads the record.
 - **The two enforcement points AGREE now, and the modality gap is closed for one rule.**
   `TOOL-dTieredTribunal-14` lifted the ref-keyed-join ban into `tools/hooks/agent-cap.js` as its fifth
   rule and made `check-review-join.sh` delegate through `--only=join`, so both entry points share one

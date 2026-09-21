@@ -1027,7 +1027,9 @@ if (outstanding === 0) {
       lastReport + '` — the audit exited ' + verdict + ' with ' + au.confirmed + ' confirmed, ' +
       au.blockers + ' at BLOCKER and ' + au.highs + ' at HIGH, and ' + au.unverified +
       ' unverified. Open the report and take each confirmed finding at the severity the report ' +
-      'gives it; an UNVERIFIED finding came back with no usable skeptic verdict and is OUTSTANDING, ' +
+      'gives it. Every count above is of RAW findings by report id and never of the items a report ' +
+      'may merge them into, so a finding merged into an item takes that item\'s severity and still ' +
+      'counts once, by its own id. An UNVERIFIED finding came back with no usable skeptic verdict and is OUTSTANDING, ' +
       'not cleared — read the code yourself and take it at the severity you adjudicate. ' +
       'BUILD-METHOD M4 disposes BY SEVERITY and admits no third ' +
       'route. PROMOTE every BLOCKER and every HIGH: ' +
@@ -1086,6 +1088,12 @@ if (outstanding === 0) {
   folded = counted ? d.folded : null
   refuted = d && d.refuted !== undefined ? d.refuted : 0
   promotedIds = Array.isArray(d && d.promotedIds) ? d.promotedIds : []
+  // ONE UNIT ON BOTH SIDES OF THE SUBTRACTION (TOOL-dMergedTally-1). `confirmed` counts RAW findings,
+  // so `blockers` and `highs` must too, or `mustFold` is raw minus items and demands more folds than
+  // the MEDIUM and LOW findings exist to fill. The synthesis used to type both integers and counted
+  // the ITEMS it merged raw findings into: 13 confirmed in 10 items read blockers 1, highs 5 against a
+  // raw 3 and 6, and no honest disposal passed. `tier2-review.js` now derives both from the raw ids
+  // each item lists, and returns null when an id is placed in no item or in two.
   const mustPromote = au.blockers + au.highs
   const mustFold = au.confirmed - mustPromote
   const refutedOk = Number.isInteger(refuted) && refuted >= 0 && refuted <= au.unverified

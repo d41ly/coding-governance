@@ -28,8 +28,13 @@ role = "engine"
 # copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
+#
+# `runlog-writer.test.sh` joined it with TOOL-dLoggedFlight-2 for the same reason: its subject is the
+# driver's run-log writer in THIS directory, so an adopter who never edits the driver gains nothing
+# from it. It is not a gate leg either. `run-unattended-gates.sh` picks it up from its budget row with
+# the rest, and it also runs alone, which is how a build holding the siblings back runs it.
 [[files]]
-include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh", "unattended.test.sh"]
+include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh", "unattended.test.sh"]
 role = "project-owned"
 
 # `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's

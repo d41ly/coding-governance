@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.10
+gov:kit drift-audit@1.11
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -303,6 +303,13 @@ PINS: dict[str, int] = {
     # decorative. A drain target from the first commit.
     "source_cited_ids_resolving_to_no_record": 2,
     "lexicon_ratified_older_than_language_surface": 0,
+    # MEASURED at the unit that added the signal, TOOL-dLoggedFlight-13, against local `main`.
+    # Report-only, and it carries NO RATCHETS row on purpose: a sanctioned worktree landing raises
+    # this count through nobody's fault, so a raise needs no reason and holding the pin proves
+    # nothing. What the pin buys is the status column, which reads `ok` at the measured value and
+    # `over pin` once it rises. The records are not named here, for the reason the non-terminal-specs
+    # pin above gives: read the signal's own `detail`.
+    "run_records_nonterminal_but_merged": 5,
 }
 
 # --------------------------------------------------------------------------------------------

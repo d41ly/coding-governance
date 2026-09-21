@@ -176,9 +176,10 @@ see the "Codebase-map interop" section the HYGIENE template ships. No conf keys 
 
 ## The build method's displaced sections
 
-`memory/guides/BUILD-METHOD.md` holds itself to a budget DECLARED ON ITS OWN LINE 8 - a LOCAL constraint and NOT
-rule 6's, which gives a guide far more and no longer caps lines outside `guides/` at all. Read the pair there;
-both figures were retyped here once and both were stale within a build, which is the argument against retyping
+`memory/guides/BUILD-METHOD.md` DECLARES NO BUDGET OF ITS OWN. It held one until `TOOL-aHonedRuleset-6`
+deleted the passage on an owner ruling, taking with it the admission that no gate enforced the pair; the
+file is capped now only by the hygiene class cap for `guides/`. The two figures were retyped into this
+README once and both were stale within a build, which is the argument against retyping
 them. It is re-read WHOLE at every pass boundary, so it grows only by displacement. The sections below live here
 because they are EXPLANATION: nothing below changes what an agent does next, and the rules that do stayed in the
 method.
@@ -222,8 +223,8 @@ wrote the other's path, so clauses 1 and 2 both pass, and the loss surfaces late
 Read these, do not restate them — a rule appearing both in the method and in one of these is a defect in the
 method.
 
-- `skills/session-kickoff/SKILL.md` + `memory/guides/SESSION-KICKOFF.md` — starting a unit, closed scope, the tier rule,
-  the six interactive exits.
+- `skills/session-kickoff/SKILL.md` + `memory/guides/SESSION-KICKOFF.md` — starting a unit, closed scope,
+  the tier rule. The six interactive exits moved to the unattended protocol's §13 (`TOOL-aHonedRuleset-3`).
 - `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
 - `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.
 - `memory/HYGIENE.md` — record placement, filename grammar, size budgets, the status vocabulary.

@@ -125,8 +125,9 @@ SPEC_TOKENS_CLI=""
 
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
-# interactive exits that engine resolves without an owner turn — MEASURE it against your own engine,
-# because the count is a property of that document and not of this kit.
+# of that skill's interactive exits the INSTALLED PROTOCOL enumerates a no-owner-turn resolution for
+# — it counts in <MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md section 13, so MEASURE it against your
+# own installed protocol, because the count is a property of that document and not of this kit.
 KICKOFF_ENGINE=""
 KICKOFF_EXITS=""
 
@@ -299,3 +300,11 @@ DISPOSITION_CUTOFF=""
 # back-catalogue from a day their tree knows nothing about. Blank turns the term OFF and the leg
 # announces that it did.
 BRIEF_RECORDED_CUTOFF=""
+
+# RUNLOG_SESSION_VARS - the NAMES of environment variables whose values each run-log START line
+# records as `sess.<NAME>=`, space-separated, eight at most. The run log is the driver's own
+# machine-local journal (protocol section 2); this key only says which session wrote a line. A value
+# is shape-checked first, letters, digits and `_ . : -` up to 128 characters, because it becomes part
+# of a line other tools parse: one that fails is written EMPTY and flagged, and an unset one writes
+# nothing. BLANK records no session.
+RUNLOG_SESSION_VARS=""

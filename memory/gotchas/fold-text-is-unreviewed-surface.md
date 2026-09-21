@@ -38,6 +38,10 @@ answered. A fold deletes three stale numbers, asserts none remain, and leaves a 
 fold narrates a revision history that never happened, to justify an edit. And a fold widens one
 carrier of a rule while leaving its two siblings governing the old shape.
 
+A merge resolution is fold text too. On `dLoggedFlight` the resolution of a conflict in the unattended
+Skill kept one side's sentence and the other side's mechanism, and dropped a guard neither side meant
+to drop. No round read it until the closing diff review named the reconcile in its scope (R2-L3).
+
 ## The fix
 
 **No machine gate**, and this is a documented check rather than an unwritten one. Nothing static can

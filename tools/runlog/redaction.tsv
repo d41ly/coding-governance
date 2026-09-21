@@ -1,0 +1,41 @@
+# redaction.tsv — the runlog kit's redaction table. One row per secret class, applied once on read.
+#
+# The columns, TAB-separated, follow the header row below.
+#   id        one id of the closed class list the reader module declares. The self-test asserts
+#             the table against that list in both directions, so a row cannot go missing quietly.
+#   hint      one or more lowercase substrings joined by `|`. A rule's regex runs only on text whose
+#             lowercased form holds at least one of them, which keeps most strings off the regex path.
+#   pattern   a Python regex, compiled on its own so no rule's inline flags reach another. Its named
+#             group `v` is the secret VALUE. What sits outside `v` is the key or prefix that names the
+#             secret, and the render keeps it.
+#   positive  a TEMPLATE the rule must redact, never a literal credential. `{A36}` is 36 random
+#             alphanumerics, expanded by the self-test alone. The classes are A alphanumeric, U
+#             uppercase or digit, L letter, a lowercase or digit, D digit, H hex, B base64 and S
+#             URL-safe, and `{NL}` is a newline. At most 196 characters once expanded.
+#   negative  a near miss the WHOLE table leaves unchanged, not only its own rule.
+#
+# Rules run in this order, and a span an earlier rule took is not matched again. The first rule to
+# claim a positive must be that positive's own. No committed file of this kit carries text this table
+# flags outside the positive column: the self-test scans the kit with the table to prove it, which is
+# what keeps a public repository clear of push protection. A new class is one id in the reader
+# module, one row here, and its positive and negative.
+id	hint	pattern	positive	negative
+url-userinfo	://	(?i)\b[a-z][a-z0-9+.-]*://(?P<v>[^\s/?#@:'"<>]+:[^\s/?#@'"<>]*|[^\s/?#@:'"<>]{16,})@	git push https://oauth2:{A40}@example.com/o/r.git	git clone ssh://git@github.com/o/r.git && open https://example.com/a/@b
+auth-header	authorization	(?i)\bauthorization["']?[ \t]*[:=][ \t]*["']?(?:bearer|basic|token)[ \t]+(?P<v>[A-Za-z0-9._~+/=-]+)	curl -H "Authorization: Bearer {S40}" https://api.example.com/v1	grep -c "Authorization: Bearer" access.log
+bearer-token	bearer	(?i)(?<![A-Za-z0-9_-])bearer[ \t]+(?P<v>[A-Za-z0-9._~+/=-]{20,})	curl -H "X-Upstream-Auth: Bearer {S40}" https://api.example.com/v1	WWW-Authenticate: Bearer realm="example", error="invalid_token" and curl -H "X-Auth: Bearer $TOKEN"
+github-token	ghp_|gho_|ghu_|ghs_|ghr_|github_pat_	(?<![A-Za-z0-9_])(?:gh[pousr]_|github_pat_)(?P<v>[A-Za-z0-9_]{20,})	echo ghp_{A36} | gh auth login --with-token	sighs_{a30} and ghp_short
+sk-key	sk-	(?<![A-Za-z0-9_-])(?:sk-ant-|sk-)(?P<v>[A-Za-z0-9_-]{20,})	curl -H "x-api-key: sk-ant-api03-{S40}" https://api.example.com/v1	ran task-{a24} and sk-short
+aws-key	akia	(?<![A-Za-z0-9])AKIA(?P<v>[A-Z0-9]{16})(?![A-Za-z0-9])	aws configure set aws_access_key_id AKIA{U16}	the AKIAEXAMPLE prefix, and akia{U16} in lowercase
+aws-sts-key	asia	(?<![A-Za-z0-9])ASIA(?P<v>[A-Z0-9]{16})(?![A-Za-z0-9])	aws configure set aws_access_key_id ASIA{U16}	the ASIAEXAMPLE prefix, and asia{U16} in lowercase
+pem-block	private key	-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----(?P<v>[\s\S]+?)(?:-----END (?:[A-Z0-9]+ )*PRIVATE KEY-----|\Z)	-----BEGIN RSA PRIVATE KEY-----{NL}{B64}{NL}{B40}={NL}-----END RSA PRIVATE KEY-----	-----BEGIN PUBLIC KEY-----{NL}{B64}{NL}-----END PUBLIC KEY-----{NL}grep -l "BEGIN RSA PRIVATE KEY" keys/id_rsa
+env-assign	_token=|_secret=|_key=|_password=	(?<![A-Za-z0-9_])[A-Z][A-Z0-9_]*_(?:TOKEN|SECRET|KEY|PASSWORD)=(?P<q>["'])?(?P<v>(?(q)[^"'\r\n]+|[^\s"'`;&|<>]+))	export DEPLOY_KEY="{A24} {A12}"; GH_TOKEN={A40} gh pr list	PIN_KEY = {D6}; pin_key={D6}; unset NOT_A_TOKEN; MAX_TOKENS=4096
+env-table	token|secret|key|password	(?m)^[ \t]*(?:[A-Z0-9_]*_)?(?:TOKEN|SECRET|KEY|PASSWORD)[ \t]{2,}(?P<v>\S[^\r\n]*?)[ \t]*\r?$	Name                           Value{NL}DEPLOY_TOKEN                   {A40}	OS                             Windows_NT{NL}TURNKEY                        {a12}{NL}echo DEPLOY_TOKEN is set
+jwt	eyj	(?<![A-Za-z0-9_-])(?P<v>eyJ[A-Za-z0-9_-]{8,}\.eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]*)	jwt eyJ{S20}.eyJ{S40}.{S43}	header eyJ{S20} and eyJfoo.bar.baz
+cookie	cookie:	(?im)\b(?:set-)?cookie[:] *(?P<v>[^\s"'][^\r\n"']*)	curl -H "Cookie: session={A32}; theme=dark" https://example.com/	the Set-Cookie header, and an empty "Cookie:" header
+json-secret	"token"|"password"|"secret"|"api_key"	(?i)"(?:token|password|secret|api_key)"\s*:\s*"(?P<v>(?:[^"\\\r\n]|\\.)+)"	{"user": "ci", "token": "{A32}"}	{"token": null, "tokens": 12, "password": ""}
+conn-password	password|pwd	(?im)(?:^|[;"'])[ \t]*(?:password|pwd)[ \t]*[=][ \t]*(?P<v>[^;\r\n"'<>]+)	Server=db.example.com;Database=app;User Id=sa;Password={A24};	Server=db;PasswordPolicy=strict;Password is required
+azure-key	accountkey=|sig=	(?:(?i:accountkey)=|[?&]sig=)(?P<v>[A-Za-z0-9%+/=]{16,})	AccountName=acct;AccountKey={B44}==;EndpointSuffix=core.windows.net ?sv=2022-11-02&sig={A30}%3D	https://example.com/p?design={a20}&sigma=1 AccountKey=unset
+vendor-key	xox|aiza|sk_live_|npm_|glpat-|hf_|pypi-	(?<![A-Za-z0-9_-])(?:xox[a-z]-|AIza|sk_live_|glpat-|pypi-|npm_(?=[A-Za-z0-9]{20})|hf_(?=[A-Za-z]{20}))(?P<v>[A-Za-z0-9_-]{20,})	xoxb-{D8}-{A12} AIza{S20} sk_live_{A20} npm_{A20} glpat-{S20} hf_{L20} pypi-{S20}	npm_config_global_prefix=/usr/local hf_hub_download xoxo
+flag-secret	--password|--token|--api-key|--secret	(?<![A-Za-z0-9-])--(?:password|token|api-key|secret)(?:=| +)(?P<q>["'])?(?P<v>(?(q)[^"'\r\n]+|[^\s"'`;&|<>]+))	deploy --api-key {A32} --region eu	docker login --password-stdin; gh auth login --with-token
+lower-assign	token=|secret=|api_key=|password=	(?<![A-Za-z0-9_])(?:token|secret|api_key|password)=(?P<q>["'])?(?P<v>(?(q)[^"'\r\n]+|[^\s"'`;&|<>]+))	curl "https://api.example.com/v1/items?token={A32}&page=2"	max_token=512 n_tokens=3 password= (unset)
+named-token	claude_code_messaging_token	CLAUDE_CODE_MESSAGING_TOKEN["']?[ \t]*[:=][ \t]*(?P<q>["'])?(?P<v>(?(q)[^"'\r\n]+|[^\s"'`;&|<>]+))	$env:CLAUDE_CODE_MESSAGING_TOKEN = "{A40}"	if ($env:CLAUDE_CODE_MESSAGING_TOKEN) { "set" }

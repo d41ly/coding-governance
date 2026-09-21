@@ -5,14 +5,14 @@ feature = "run-gates"
 title = "The gate runner, its harnesses, and the adopter that keeps a target's verdict reader honest"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2", "TOOL-aPacedTurnstile-4", "TOOL-aPacedTurnstile-5", "TOOL-aPacedTurnstile-6", "TOOL-aPacedTurnstile-3", "TOOL-aPacedTurnstile-7", "TOOL-aPacedTurnstile-16"]
+decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2", "TOOL-aPacedTurnstile-4", "TOOL-aPacedTurnstile-5", "TOOL-aPacedTurnstile-6", "TOOL-aPacedTurnstile-3", "TOOL-aPacedTurnstile-7", "TOOL-aPacedTurnstile-16", "TOOL-dLoggedFlight-3"]
 
 [claims]
 gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring",
   "profile-bar selftest", "run-gates turnstile",
   "every held leg is budgeted, every budget row resolves", "run-selftests self-test",
   "selftest harness self-test", "extract-arms self-test",
-  "leg ceilings clear their evidenced maximum"]
+  "leg ceilings clear their evidenced maximum", "run-gates run-log line"]
 kits = ["run-gates"]
 git-hooks = []
 workflow-scripts = []
@@ -26,7 +26,9 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "fixture-removes-the-path-under-test.md",
   "format-derived-from-arity.md",
   "worktree-crlf-outside-the-gated-population.md",
-  "a-new-leg-trips-a-growing-set-of-meta-gates.md"]
+  "a-new-leg-trips-a-growing-set-of-meta-gates.md",
+  "signal-trap-runs-the-exit-handler-twice.md",
+  "async-job-starts-with-sigint-ignored.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -50,6 +52,7 @@ globs = [
   "tools/run-gates/gate-profiles.txt",
   "tools/run-gates/gate-fingerprint.sh",
   "tools/run-gates/run-gates.turnstile.test.sh",
+  "tools/run-gates/run-gates.runlog.test.sh",
 ]
 ```
 
@@ -64,7 +67,18 @@ asked for it to move into the record and its own reasoning argued the other way;
 disagreement. A scratch name nothing outside the process can predict cannot be planted, while a run
 directory has a nameable path and the runner accepts a pinned id through `GATE_RUN_ID`. Measured:
 with the suppressor in the record, a planted `<i>.rc` suppressed its leg and the run reported the
-plant's verdict as the leg's own.
+plant's verdict as the leg's own. A pin names ONE run: the runner drops `GATE_RUN_ID` from its
+environment once read, because the pre-push hook exports one and every leg would otherwise inherit
+it, and a nested runner a leg starts would reuse one directory for every bar (TOOL-dLoggedFlight-4).
+
+**Every bar leaves one run-log line, from the EXIT trap and from nowhere else.** `cleanup` appends one
+`ev=once` line to `runlog/gates.log` under the git common dir, every value read back from the run
+record so the line cannot disagree with it. A guard makes it once per process: each signal trap runs
+`cleanup` and then exits into the EXIT trap, which runs it again, the class
+`signal-trap-runs-the-exit-handler-twice`. The line is evidence and never an input, so a failed write
+is one stderr line that moves neither the exit code nor stdout, and `GOV_RUNLOG=0` turns it off. Its
+suite launches the INT bar through `timeout`, because an `&` job starts with SIGINT ignored and bash
+cannot trap it, the class `async-job-starts-with-sigint-ignored`. `TOOL-dLoggedFlight-3`.
 
 **One store, because the second reader was the one that would have broken.** `gate-ledger.tsv`
 REPLACED `gate-timings.tsv` rather than sitting beside it, and field 2 is still the duration so the
@@ -194,6 +208,8 @@ time; extend by adding keys the deployer resolves, leaving runner-side placehold
 - `adopt-run-gates.sh` has no WRITE path today: the `[gate_runner]` declaration is emitted by
   `govkit intake` from this kit's `[gate_runner_seed]`, because a declaration written at configure
   time cannot reach the same run's leg-emission step. The adopt verb exists for `--check`.
+- A refusal between the EXIT trap and the header writes a run-log line with the header's keys empty,
+  `wt` among them, so the run model can join it to a run by time and never by worktree.
 - The descriptor's declared `[[gate_leg]]` guards and gov's manifest rows for the same leg names are
   joined by NAME only — `govkit selfcheck` never compares the two guards, so they can diverge with
   every gate green. `TOOL-aPacedTurnstile-12`.

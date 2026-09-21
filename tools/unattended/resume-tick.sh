@@ -358,14 +358,14 @@ scan_worktrees() {
     # records first, each one line; then `<file>:session: <value>` and `<file>:host: <value>` off
     # the INDEX, and the split is on the first `:session:` / `:host:`, which a drive letter's colon
     # precedes but never contains. The first `session:` per file is the one `set_fact` rewrites.
-    stray=$(git -C "$wt" ls-files --others -- "$mr/builds/*/RUN.md" 2>/dev/null)
+    stray=$(GIT -C "$wt" ls-files --others -- "$mr/builds/*/RUN.md" 2>/dev/null)
     while IFS= read -r -u 8 f; do
       [ -n "$f" ] || continue
       slug=${f%/RUN.md}; slug=${slug##*/}
       ncand=$((ncand + 1))
       print_decision "$slug" "$wt" "skip · RUN.md is not tracked, and the tick launches only on a lease the index holds"
     done 8<<<"$stray"
-    hits=$(git -C "$wt" grep --cached -H -E '^(session|host): ' -- "$mr/builds/*/RUN.md" 2>/dev/null)
+    hits=$(GIT -C "$wt" grep --cached -H -E '^(session|host): ' -- "$mr/builds/*/RUN.md" 2>/dev/null)
     seen=""
     while IFS= read -r -u 8 line; do
       case "$line" in *:session:*) ;; *) continue ;; esac
@@ -380,7 +380,7 @@ scan_worktrees() {
       # file on disk, so a rewritten copy would aim the kill and pick the phase while the index
       # picked the session (round 2, defect B). One spawn; a legitimate record equals its blob
       # except inside one verb's set-then-stage window, where the tick skips once and says so.
-      if ! git -C "$wt" diff --quiet -- "$f" 2>/dev/null; then
+      if ! GIT -C "$wt" diff --quiet -- "$f" 2>/dev/null; then
         print_decision "$slug" "$wt" "skip · RUN.md differs from the index, and the tick acts only on the lease the index holds"; continue
       fi
       run_tick "$wt" "$slug" "$sid" "$host"

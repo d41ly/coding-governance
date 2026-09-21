@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.25 -->
+<!-- gov:kit unattended@1.26 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -271,6 +271,14 @@ check grading them passes by finding nothing. Crossing the cap mid-flight reds t
 blocks `--close`, which leaves the override as the only exit: the spill exists so that never
 happens.
 
+**The run log is not this file, and nothing reads it back.** Every driver call but `--version` and
+`--plan` appends a START line and, from an EXIT trap, an END line to `runlog/driver.log` in the git
+COMMON dir: the driver's own exit code, `exit=clean` or `exit=unclean`, the refused checks and the
+phase after the verb. It is machine-local EVIDENCE as facts 5-7 are: no verb or gate branches on
+it, and a failed append prints one stderr line. `GOV_RUNLOG=0` turns it off, and
+`RUNLOG_SESSION_VARS` (§8) names the session. The committed record of a run is rendered from it by
+the Skill, never by a verb.
+
 ## 3. The phase vocabulary
 
 Kit-owned core, in run order:
@@ -471,7 +479,7 @@ where this document says it may:
 | `PHASES_EXTRA` | project phase members, appended to the core set |
 | `DOD_EXTRA` | project DoD items, appended to the core set |
 | `KICKOFF_ENGINE` | the kickoff engine whose hand-back the gate reads; BLANK turns that check off |
-| `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
+| `KICKOFF_EXITS` | a shrink-only floor on the interactive exits section 13 of THIS contract enumerates |
 | `HALT_CODES_EXTRA` | project halt codes, appended to the core set |
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
@@ -488,6 +496,7 @@ where this document says it may:
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
+| `RUNLOG_SESSION_VARS` | the environment variable NAMES, space-separated and eight at most, whose values each run-log START records as `sess.<NAME>=` (§2); a value outside `[A-Za-z0-9_.:-]{1,128}` is written empty and flagged. OPTIONAL: blank records none |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.
@@ -674,3 +683,20 @@ and the run-state file joins the two halves.
 answer on disk, **and is DECLARED through `--dispatch`**, which makes the refusal reachable on a
 sequential pass and not only a concurrent one — a rule enforced only where two passes race misses
 every ordinary build.
+
+## 13. The kickoff engine's interactive exits
+
+Moved from the engine's Step 5b (`TOOL-aHonedRuleset-3`); the engine keeps a pointer.
+**A run that still stops at any of these is not unattended, it is stuck:**
+
+1. **Step 0 · ambiguous worktree parent** → the checkout holding the default branch; still
+   ambiguous → ABORT and record why.
+2. **Step 0 · no git anywhere** → ABORT: there is nothing to land into.
+3. **Step 1 · the STOP conditions** (foreign `MERGE_HEAD`/`UU`, a failed ff-merge, a branch violating
+   conventions) → ABORT and record the condition verbatim; continuing is how a run destroys work.
+4. **Step 2 · no manifest, offer to scaffold** → do NOT scaffold; proceed generically and park the
+   offer for the owner's wrap-up.
+5. **Step 3 · a field that cannot be derived** → park the question, options and reason; proceed on
+   the most conservative reading; ACCEPTANCE or GATES unfillable → ABORT: not Ready, and an unattended
+   run cannot split it.
+6. **Step 5 · the READY stop** → replaced by the hand-back, the ONLY replacement the mandate buys.

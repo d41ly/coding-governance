@@ -1,0 +1,208 @@
+# Acceptance ledger — TOOL-dLoggedFlight-9
+
+**Serves:** journal TOOL-dLoggedFlight-9
+
+Tier-2 · node d · 2026-09-14 · the build pass of the committed record, against spec rev-5. The pass
+bumped the spec from rev-4 to rev-5 in its own commit before any code, and its section 9 line names
+each change. Every criterion line is OBSERVED, and what a gate leg observes is written as owed.
+`<suite>` is `tools/runlog/selftest.py`, run directly and never through the gate runner. Its three
+timed runs at the build commit printed `902 passed, 0 failed (902 assertions, floor 902)` in 26.5 to
+26.6 s, and after the checklist's fold it printed `908 passed, 0 failed (908 assertions, floor 908)`
+in 26.7 s. No gate leg was run, per the owner's instruction of 2026-09-13, and no suite that existed under
+`tools/unattended/` before this build ran. Every history an arm reads is a scratch repository built
+through one `git fast-import`, and every journal, extract and store is scratch. Every fixture model is
+a real `build_run_model` over a scratch history, or one such model lengthened by copying its own
+entries. The closing diff review's round-1 fold of B1 bumped the spec to rev-6 and added AC9, whose
+line below that fold observed. Its fold of M6 and M3's render half bumped the spec to rev-7 and
+added AC10, whose line below that fold observed.
+
+## The criteria
+
+**Evidences:** TOOL-dLoggedFlight-9
+
+- AC1 — `write_record` (`test_record_ac1_names`) — a build rotated the way the driver rotates, whose
+  first run dispatched unit 1 and aborted with no journal line and whose live run dispatched unit 2
+  under a driver journal of its own, wrote two records on one date. Each name ended in the run key
+  `derive_run_starts` gave that run, and the two keys differ. The journal-less record commits `none`.
+  Each name passed the check 5 grammar and the check 21 projection, both typed from the hygiene doc,
+  and each graded near miss failed: a name with no family, a name claiming an unserved id and a free
+  name. A garbled record re-rendered on a later date was rewritten in place, and the folder still held
+  two records. A never-committed run-state file exited 2 with a line naming it. With
+  `MEMORY_ROOT=docs/mem` the record landed under `docs/mem/builds/` and nothing under the default
+  root. RED seen with the key dropped from the name, with the lookup keyed on the date, with the root
+  spelled `memory`, and with the refusal's exit swallowed. The real gate's verdict over a committed
+  record is OWED to the `memory hygiene` leg of the bar that grades this run's own record, which
+  `TOOL-dLoggedFlight-11` renders.
+  STILL OWED after the post-build run. `memory hygiene` is GREEN there in 29.1 s, but that bar
+  graded no record of this run: `memory/builds/dLoggedFlight/` carries `RUN.md` and no rendered
+  record, and `check-records` names this build nowhere. What still owes this line is the bar that
+  runs once `TOOL-dLoggedFlight-11`'s orchestrator has rendered and committed the record.
+- AC2 — `derive_serves` (`test_record_ac2_serves`) — a run that dispatched units 2, 3 and 5 of a build
+  whose specs define 1 to 5, and an undefined 9, served `X-xFixtureRun-2..3 X-xFixtureRun-5`, and the
+  head bound exactly those three as check 21 reads it. A unit closed and named by the run's own commit
+  was served, one closed with no commit of the run naming it was not. A run whose one dispatched id no
+  spec defines exited 0 with a `no spec-defined unit` line and wrote nothing. RED seen with dispatched
+  ids read off the parked rows, which served 9, with closed units ignored, and with the unbound run
+  given an id.
+- AC3 — `render_record` (`test_record_ac3_shape`) — the landed run's record carried S3's eight headings
+  in order. Every table row led with a UTC time or an ordinal, over a population holding both. No line
+  matched any of the four id-anchor shapes typed from the recall kit's extractor, and a row led by a
+  unit id fails both graders. The twin's facts and tables equalled the markdown read back by line
+  shape. RED seen with the units row led by its id, and with the twin dropping a row of every table.
+- AC4 — `RECORD_SCHEMA` (`test_record_ac4_classes`) — a real model given one value of every shaped
+  class and every member of every closed vocabulary a table carries rendered each of them, and the
+  window's openers and closers each reached the file on their own render. Four intruders sat in fields
+  the renderer reads: a command in a verb, a session id in a unit, an absolute path in a ledger ref and
+  free text in a workflow label. None reached the file, raw or escaped, and the summary counted
+  `values withheld: 4`. Free text in the evidence, the sessions, the worktrees and the facts never
+  reached it either, and an owner turn's clock time appears nowhere. A vocabulary short one member
+  withholds that value, which the arm counts. The driver-source arm found the first six ledger
+  sources equal to the driver's owed kinds and acts in both directions. RED seen with cells rendered
+  unvalidated, with owner turns kept on the timeline, and with the ledger sources reordered.
+- AC5 — `python tools/runlog/runlog.py verify` (`test_record_ac5_verify`) — the live run's record
+  commits its six journal lines, never nothing. `verify` exited 0 on the untouched journal, and 0 again
+  after the run appended two lines, which the rebuilt model does attribute, so the committed count is
+  what kept it green. After one attributed line's `rc` was edited it exited 1 naming the `sha256`
+  mismatch. On the journal-less record it read `commitment=none` and exited 0 with its
+  nothing-to-verify line. With no journal of the run on the machine it exited 2. RED seen with the
+  digest left out of the comparison, with every current line hashed, with `none` reported as a
+  mismatch, and with the commitment computed over no line.
+- AC6 — `render_record` (`test_record_ac6_cap`) — 500 timeline rows, 60 units, 200 anomalies and 300
+  ledger entries rendered 16,474 bytes, stating `500 · shown 60 · elided 440` and each aggregation. All
+  twelve anomaly kinds were kept with their 200 counted. The `Data` twin carried the same facts and the
+  same rows, and a row from the elided middle, present in the model, is in neither copy. The widest
+  model, every list at its bound with its widest values, measured 36,139 bytes at the nominal bounds
+  and fitted after halving, saying how many rows it now shows. RED seen with the halving removed, with
+  an anomaly kind dropped from its aggregate, and with the twin carrying each row twice.
+- AC7 — `record --write` (`test_record_ac7_cli`) — without `--write` the command printed the record and
+  wrote nothing. With it the command exited 0, wrote one record, and printed on stdout the
+  `gen_build_index.py --write` command it found beside the kit and the subject
+  `records(xFixtureRun): the run record`, which carries no unit id, and its wall time as report-only.
+  RED seen with the index line removed.
+- AC8 — `subprocess` patched (`test_record_ac8_cost`) — rendering the 500-row model made no subprocess
+  call, and the patched counter saw the one git call made under it afterwards. The render took 0.003 s,
+  printed and not graded. RED seen with one git call added to the render.
+- AC9 — `render_record` (`test_record_ac9_owner_times`) — added at rev-6 by the closing diff review's
+  round-1 fold of B1, and observed by that fold. A real model, its session made by the real extractor
+  from a transcript with owner turns beside three silences, rendered one idle row. No UTC in its text,
+  and no idle row's start plus its duration or the second after, fell in an owner turn's second, and
+  Coverage read `judged yes · near an owner turn 3`. Idle rows added to that model starting in an owner
+  turn's second, ending in one, and ending the second before one under truncation each refused, with
+  a line naming no time. Each moved three seconds further away rendered. With either list of owner
+  turns removed the other still refused, and `write_record` refused and wrote nothing. An idle row
+  ending on a turn was found in the markdown copy alone and in the Data twin's alone. RED seen with the
+  refusal switched off, with the second-after comparison dropped, which lets the truncated end
+  through, and with either copy's row reader dropped.
+- AC10 — `render_record` (`test_record_ac10_unknown_counts`) — added at rev-7 by the closing diff
+  review's round-1 fold of M6 and M3's render half, and observed by that fold. The landed run with
+  no transcript on the machine read `not-local`, its model holding zeros, and every owner-turn, usage
+  and attributed-calls count in its record read `-`. With its session's extract, made by the real
+  extractor, those counts read as the model's own integers, one in-window owner turn among them, and
+  with a second session named and not local they read as integers under `partial`. A `--close` END
+  reading `rc=0` and `exit=unclean` rendered `-` in its Timeline `rc` cell, and `0` when it read
+  `exit=clean`. RED seen with the counts rendered whatever the transcripts read, with `partial` taken
+  as unknown, and with the Timeline `rc` rendered whatever the exit. The class model behind AC4 gave
+  its added push and verb events the `exit` the model copies from each END, so their `rc` cells still
+  exercise the `int` class.
+
+- AC11 — `render_record` (`test_record_ac11_anomaly_sources`) — added at rev-12 by the render half of
+  the fold of R2-M2 of the closing diff review, round 2, and observed by it over the landed fixture
+  read both ways: with no local transcript the Coverage fact read `judged 9 of 12` beside
+  `anomalies 0`, the clean-looking zero the marker exists to mark, and with the session's extract
+  present it read `judged 12 of 12`. The kinds the local transcript adds are exactly those declaring
+  the transcripts or the idle judgement. The post-build suite run at `4a2d32c9` refuted this
+  criterion's LIVENESS, which had asked both renders to fall short of the closed list: spec rev-13
+  holds the not-local render short instead, and the arm then ran GREEN, 1543 passed, 0 failed.
+
+## What else the pass carried
+
+- **Three model fields, each through `build_run_model`** (`test_record_model_fields`). `journal_lines`
+  equalled the line numbers read off the journal files by bytes, leaving out another slug's lines and
+  another worktree's bar. A workflow run inside the window reached the timeline with its label and one
+  outside it did not. An out-of-band edit carried its START's time, and the record showed both. RED
+  seen with the workflow runs dropped, with their window test dropped, with a joined bar's line and a
+  joined push's lines left out, with the driver's lines taken for every slug, and with the time left
+  off.
+- **The CLI's source resolution** moved out of `cmd_model` into `resolve_model_sources`, which `record`
+  shares, so the two commands resolve journals, store and transcripts one way.
+- **Three copied lists held to their owners** (`test_record_copied_sets`), added by the checklist's
+  fold: the pre-push hook's decisions, the spec template's status tokens and check 22's review
+  verdicts, each compared both ways and each read without a carried path literal. RED seen with one
+  member dropped from each copy.
+
+## Staged RED
+
+Thirty breaks, each an edit applied to the file by a harness kept outside the tree, run against the
+arm that owns it and restored byte for byte. Each turned red on the very check it aims at, matched by
+that check's text and not by the exit status, and the restored file passed. The whole set was run a
+second time with the module's bytecode cache cleared before each run and none written, after a stale
+cache made one break fail a neighbour's check; that trap is now a gotcha record. One further break,
+dropping `derive_serves`'s intersection with the defined ids, stayed green: the model's unit list holds
+only spec-defined ids, so the intersection cannot change the answer. It was replaced by the break that
+reads dispatched ids off the parked rows, which serves the undefined id and turned the arm red. The
+breaks are named per criterion above. The fold of M6 and M3's render half staged three more breaks
+of `record.py` the same way, with the cache cleared before each, each run against
+`test_record_ac10_unknown_counts`, and each redded its check.
+
+## The checklist over the build commit
+
+`gotchas.py --for-diff HEAD~1..HEAD` named ten classes after the build commit.
+
+- `two-answers-to-one-question` was violated, and the fold fixes it. The kit README and the dossier
+  restated the bounds and the cap that `record.py` owns, and now name the constants. The record's
+  copies of three lists another file owns are now held to those files.
+- `staged-break-substitutes-a-synthetic-value`: each break edits the code, and the one arm that edits a
+  constant drops a real member from the real list.
+- `fixture-passes-by-finding-nothing`: every arm carries a liveness check its fixture must trip, and
+  the staged-RED match is on each break's own check, which is how the stale-bytecode trap surfaced.
+- `heredoc-escape-reaches-the-regex` hit the first staging harness, whose two join patterns lost an
+  escape level and matched nothing. Both breaks were rewritten from a file and seen red; no tracked
+  file was written through a heredoc.
+- `naming-leg-grades-what-python-named`: every new function, nested helpers included, was asked of
+  the lexicon, and a nested `dump` was renamed `render_json`. The map was regenerated in each commit.
+- `fold-text-is-unreviewed-surface`: rev-5 and this fold are text no review has read. The closing diff
+  review of the build reads them.
+- `amendment-leaves-its-other-half-standing`: AC1's hygiene clause and S6's bounds were amended, and
+  their neighbours, the gates, the scope joins and the sibling specs' references, were re-read.
+- `inline-fence-swallows-the-rest-of-the-file`, `empty-field-collapses-unless-it-is-last` and
+  `suite-invalidated-by-a-commit-under-it`: the record's one fence is on lines of its own, no shell was
+  written, and no commit ran under a timed suite.
+
+## Owed to the post-build gate run
+
+Every leg of the spec's section 7, and the run records each verdict after it:
+
+- `memory hygiene`, including AC1's check 5 and check 21 over this run's own committed record;
+- `lexicon naming predicates`, `install-prefix (shipped surface)` and `govkit selfcheck`;
+- `codebase-map coverage + freshness`;
+- `runlog selftest`, the leg that runs `<suite>`, and
+  `every held leg is budgeted, every budget row resolves`, whose row this pass re-measured.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN: `memory hygiene` in 29.1 s,
+`lexicon naming predicates`, `install-prefix (shipped surface)`, `govkit selfcheck`,
+`codebase-map coverage + freshness`, the budget-population leg, and `runlog selftest` printed
+`1543 passed, 0 failed (1543 assertions, floor 1543)`, this unit's floor of 908 having risen with
+the units after it. The run's one RED, `govkit selftest`, is on none of these legs: its 30 failing
+assertions are the IDENTICAL set `origin/main` carries, pre-existing, untouched by this build and
+being fixed in a separate session. It is not called green here.
+
+## Residue
+
+- The gate verdicts are the spec's own list. The runner writes GREEN, RED and NONE and never REFUSED,
+  so they are held to no source, and a verdict outside the list is withheld and counted.
+- The build commit's second `Decided:` trailer, that the status tokens go unheld for want of a carried
+  literal, was reversed by the fold, which reads them through the declared memory root instead.
+- The record's timeline carries idle gaps, whose end is an event's time, and that event can be an owner
+  turn. The kit README names it. CLOSED by the closing diff review's round-1 fold of B1, which found
+  the README line an unratified narrowing of S4 and struck it: the model keeps a gap beside an owner
+  turn out, and the render refuses any time in an owner turn's second.
+- `verify` cannot see a line inserted before the committed first time. The model attributes none there
+  except a bar a joined push pinned, and the kit README names it.
+- The schema leg does not grade a transcript-derived count against the same record's Coverage row,
+  the left-shift the closing review preferred for M6. `TOOL-dLoggedFlight-10` §3 keeps content truth
+  out of the leg, and spec 9's rev-7 line says so, so a zero hand-edited into a committed record
+  passes the leg. The renderer is where the rule binds, and AC10 grades it.
+- The runlog kit stays at 1.0, as the brief sets it, and no leg, fixture file or pin moved. The budget
+  row reads 27 s, still under the 60 s floor.

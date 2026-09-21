@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.7` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.8` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `tools/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -62,6 +62,7 @@ file that had one, byte-identically, under the markers `tools/lib/resolve-python
 | `run-gates.gov.test.sh` | the GOV-ONLY arms, withheld from the payload; see below |
 | `run-gates.evidence.test.sh` | the durability arm: a red leg's output survives on disk |
 | `run-gates.turnstile.test.sh` | the turnstile arms: peak occupancy, reaping, FIFO order, release on every signal |
+| `run-gates.runlog.test.sh` | the run-log arms: one line per bar on every exit path after the trap and on every caught signal, withheld from the payload |
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
 | `kit.toml` | this entry, declared as data |
@@ -112,6 +113,28 @@ run itself — can find it. The `header` is written before the first leg dispatc
 row and one redacted `<i>.out` copy land per leg; the `verdict` is written last, and ITS ABSENCE is
 the crash signal. `GATE_RUN_KEEP` run directories are kept, swept after the verdict and never before
 dispatch, so a crashed run's record survives the next few ordinary runs.
+
+A caller may pin the run id with `GATE_RUN_ID`, and the pre-push hook does, so its push line joins
+this run's line exactly. The runner reads the pin and then REMOVES it from its environment before any
+leg starts: left set, every leg would inherit it, and a leg that drives a nested runner, as this
+kit's own suites do in scratch clones, would reuse one run directory for every nested bar. A pin
+names ONE run.
+
+**Every bar also leaves one line in the run log.** From its EXIT trap the runner appends one
+`ev=once` line to `runlog/gates.log` under the git COMMON dir, in the runlog kit's grammar, so the
+primary tree and every linked worktree of a clone write one file, and a run that ran the bar
+seventeen times keeps seventeen verdicts rather than the last five records of one worktree. Every
+value is read back from this record rather than recomputed: the run id, the header's worktree,
+`head`, `started` and `full`, the verdict and its counts, `rc`, and the first twenty failing legs in
+manifest order as `fail.1` onward, with `fail_more` counting the rest. A bar killed by INT, TERM or
+HUP has no verdict file, so its line reads `verdict=NONE` with 130, 143 or 129, written once although
+the signal runs the handler twice. A refusal between the trap and the header reads
+`stage=pre-header` with the header's keys empty. An exit above the trap, `--print-profile` or a
+refused profile table among them, writes nothing.
+
+The line is evidence and never an input. A failed append prints one `run-gates: run log` line on
+stderr and changes neither the exit code nor stdout, `GOV_RUNLOG=0` turns the line off, and writing
+it costs no process beyond the one `mkdir` a clone's first bar pays for the journal directory.
 
 `<git-dir>/gate-ledger.tsv` is the cross-run store: one row per leg, with the duration in field 2 —
 which is what lets the runner read it as a dispatch hint and `profile_bar.py` read it as a
