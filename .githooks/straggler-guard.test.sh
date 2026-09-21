@@ -37,6 +37,10 @@ set -u
 # SOURCE — inside a tree the arms then check out into a linked worktree, where the untracked `.pyc`
 # files abort the checkout. Measured, in this unit's own scratch fixture.
 export PYTHONDONTWRITEBYTECODE=1
+# THE FIXTURES OBSERVE `origin/HEAD`, so an ambient GOV_DEFAULT_BRANCH is machine state that
+# changes what they measure: the library cross-checks it and prints, and the relocation
+# inventory's own resolver REFUSES when it disagrees with the observed default.
+unset GOV_DEFAULT_BRANCH
 
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
@@ -83,9 +87,12 @@ FLOOR_ASSERTIONS=57
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
 n=0; st=0
-ok()  { n=$((n+1)); }
-bad() { echo "FAIL $1"; st=1; n=$((n+1)); }
-has() { printf '%s' "$1" | grep -qF -- "$2"; }
+# NAMED FOR THE DECLARED VERB TABLE, not for brevity. `.lexicon.conf` pins the count of shell
+# definitions leading with an undeclared verb, so a three-helper harness spelled `ok`/`bad`/`has`
+# would move that pin and red a leg nothing in this file is about.
+add_arm()        { n=$((n+1)); }
+print_failure()  { echo "FAIL $1"; st=1; }
+check_contains() { printf '%s' "$1" | grep -qF -- "$2"; }
 
 # ------------------------------------------------------------------------------ fixture machinery
 # The fixture's own kit prefix. `scripts` rather than this tree's, for the reason the header gives.
@@ -189,20 +196,20 @@ WT=$(add_topology_worktree "$F1" strag)
 printf -- '- TOOL-aSeed-3 \xc2\xb7 filed 2026-03-01 \xc2\xb7 a late ask\n' >> "$WT/memory/backlog/TOOL.md"
 git -C "$WT" add memory/backlog/TOOL.md
 out=$(run_in "$WT" git commit -m "the straggler stages a shard edit"); rc=$?
-[ "$rc" != 0 ] || bad "AC1: a staged shard edit on a pre-flip branch was COMMITTED (rc=$rc)"; ok
-has "$out" "migrate_backlog.py --relocate --as <your-slug>" \
-  || bad "AC1: the refusal does not print the relocation recipe"; ok
+[ "$rc" != 0 ] || print_failure "AC1: a staged shard edit on a pre-flip branch was COMMITTED (rc=$rc)"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC1: the refusal does not print the relocation recipe"; add_arm
 out=$(run_in "$WT" git commit --no-verify -m "the straggler stages a shard edit"); rc=$?
-[ "$rc" = 0 ] || bad "AC1: --no-verify did not override the refusal (rc=$rc): $out"; ok
+[ "$rc" = 0 ] || print_failure "AC1: --no-verify did not override the refusal (rc=$rc): $out"; add_arm
 
 # ---- AC2 — a non-backlog commit gets ONE notice and is never refused -----------------------------
 printf 'more\n' >> "$WT/README.md"
 git -C "$WT" add README.md
 out=$(run_in "$WT" git commit -m "a non-backlog commit"); rc=$?
-[ "$rc" = 0 ] || bad "AC2: a non-backlog commit on a pre-flip branch was refused (rc=$rc): $out"; ok
+[ "$rc" = 0 ] || print_failure "AC2: a non-backlog commit on a pre-flip branch was refused (rc=$rc): $out"; add_arm
 notices=$(printf '%s\n' "$out" | grep -c '^pre-commit: note — ')
-[ "$notices" = 1 ] || bad "AC2: a non-backlog commit printed $notices notice lines, not exactly one"; ok
-has "$out" "still owes a relocation" || bad "AC2: the notice does not say the branch owes a relocation"; ok
+[ "$notices" = 1 ] || print_failure "AC2: a non-backlog commit printed $notices notice lines, not exactly one"; add_arm
+check_contains "$out" "still owes a relocation" || print_failure "AC2: the notice does not say the branch owes a relocation"; add_arm
 
 # ---- AC1/AC2 — the RELOCATION MERGE stages watched paths and is NOT refused ----------------------
 run_in "$WT" git merge --no-ff --no-commit --no-edit main >/dev/null 2>&1
@@ -210,21 +217,21 @@ write_shard "$WT" "the first ask, as the RESTORED view renders it"
 write_relocated "$WT" TOOL-aSeed-1 "$F1_STRAG"
 git -C "$WT" add memory/ >/dev/null 2>&1
 out=$(run_in "$WT" git commit -m "conclude the relocation merge"); rc=$?
-[ "$rc" = 0 ] || bad "AC2: the relocation merge — watched paths staged under a builds-mode MERGE_HEAD — was REFUSED, so the recipe's own last step cannot complete (rc=$rc): $out"; ok
-has "$out" "REFUSING" && bad "AC2: the relocation merge drew the straggler refusal"; ok
+[ "$rc" = 0 ] || print_failure "AC2: the relocation merge — watched paths staged under a builds-mode MERGE_HEAD — was REFUSED, so the recipe's own last step cannot complete (rc=$rc): $out"; add_arm
+check_contains "$out" "REFUSING" && print_failure "AC2: the relocation merge drew the straggler refusal"; add_arm
 
 # ============================================== F2 — the rebase arms, on an un-merged straggler ----
 git -C "$F1" branch -q strag2 "$F1_STRAG"
 WT2=$(add_topology_worktree "$F1" strag2)
 out=$(run_in "$WT2" git rebase main); rc=$?
-[ "$rc" != 0 ] || bad "AC3: a rebase of a HAS-DELTA pre-flip branch onto the builds-mode default was allowed"; ok
-has "$out" "migrate_backlog.py --relocate --as <your-slug>" \
-  || bad "AC3: the rebase refusal does not print the relocation recipe"; ok
-has "$out" "MERGE, never rebase or squash" || bad "AC3: the recipe's first step does not say merge and never rebase"; ok
+[ "$rc" != 0 ] || print_failure "AC3: a rebase of a HAS-DELTA pre-flip branch onto the builds-mode default was allowed"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC3: the rebase refusal does not print the relocation recipe"; add_arm
+check_contains "$out" "MERGE, never rebase or squash" || print_failure "AC3: the recipe's first step does not say merge and never rebase"; add_arm
 out=$(run_in "$WT2" git pull --rebase origin main); rc=$?
-[ "$rc" != 0 ] || bad "AC3: 'git pull --rebase' passes no branch argument and rebased the straggler anyway"; ok
+[ "$rc" != 0 ] || print_failure "AC3: 'git pull --rebase' passes no branch argument and rebased the straggler anyway"; add_arm
 out=$(run_in "$WT2" git rebase --no-verify main); rc=$?
-[ "$rc" = 0 ] || bad "AC3: 'git rebase --no-verify' did not bypass the hook (rc=$rc): $out"; ok
+[ "$rc" = 0 ] || print_failure "AC3: 'git rebase --no-verify' did not bypass the hook (rc=$rc): $out"; add_arm
 
 # ---- AC3 — a DECISION-LOG rotation is not a backlog delta ----------------------------------------
 # The archive population is the FAMILY-named one. A branch that only rotated the decision log has
@@ -234,23 +241,23 @@ WT3=$(add_topology_worktree "$F1" rot)
 printf '# rotated decisions\n\n- TOOL-aSeed-9 - a decision\n' > "$WT3/memory/archive/DECISIONS.2026-05-01.md"
 git -C "$WT3" add memory/archive >/dev/null 2>&1
 out=$(run_in "$WT3" git commit -m "rotate the decision log"); rc=$?
-[ "$rc" = 0 ] || bad "AC3: a decision-log rotation on a pre-flip branch was refused (rc=$rc): $out"; ok
-has "$out" "merge it before filing a new ask" \
-  || bad "AC3: a branch with no backlog delta did not draw the merge-first notice: $out"; ok
-has "$out" "migrate_backlog.py --relocate" && bad "AC3: a decision-log rotation drew the relocation recipe"; ok
+[ "$rc" = 0 ] || print_failure "AC3: a decision-log rotation on a pre-flip branch was refused (rc=$rc): $out"; add_arm
+check_contains "$out" "merge it before filing a new ask" \
+  || print_failure "AC3: a branch with no backlog delta did not draw the merge-first notice: $out"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate" && print_failure "AC3: a decision-log rotation drew the relocation recipe"; add_arm
 out=$(run_in "$WT3" git rebase main); rc=$?
-[ "$rc" = 0 ] || bad "AC3: a branch whose only archive change is a decision-log rotation was refused a rebase (rc=$rc): $out"; ok
+[ "$rc" = 0 ] || print_failure "AC3: a branch whose only archive change is a decision-log rotation was refused a rebase (rc=$rc): $out"; add_arm
 
 # ---- AC4 — a PRE-FLIP, HAS-DELTA feature push gets the recipe and LANDS --------------------------
 # Its OWN branch: AC3 rebased strag2 past the flip, so pushing that one would measure the
 # other row of the table.
 git -C "$F1" branch -q strag4 "$F1_STRAG"
 out=$(run_in "$F1" git push origin strag4); rc=$?
-[ "$rc" = 0 ] || bad "AC4: a pre-flip feature push was refused, which strands the straggler's only off-node copy (rc=$rc): $out"; ok
-has "$out" "migrate_backlog.py --relocate --as <your-slug>" \
-  || bad "AC4: the feature push printed no relocation recipe"; ok
+[ "$rc" = 0 ] || print_failure "AC4: a pre-flip feature push was refused, which strands the straggler's only off-node copy (rc=$rc): $out"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC4: the feature push printed no relocation recipe"; add_arm
 git -C "$F1.git" rev-parse --verify --quiet refs/heads/strag4 >/dev/null \
-  || bad "AC4: the pre-flip feature branch did not reach the remote"; ok
+  || print_failure "AC4: the pre-flip feature branch did not reach the remote"; add_arm
 
 # ---- AC10 — the recipe is the ONE canonical text ------------------------------------------------
 # CR-normalised on both sides: the engine prints through python, whose text-mode stdout emits CRLF
@@ -258,17 +265,17 @@ git -C "$F1.git" rev-parse --verify --quiet refs/heads/strag4 >/dev/null \
 # comparison that reds on a platform's newline is a comparison nobody can keep.
 canon=$(run_in "$F1" "$PY" "$FX_MT/migrate_backlog.py" --recipe | tr -d '\r')
 mine=$(read_lib_recipe "$F1" hk)
-[ -n "$canon" ] || bad "AC10: the relocation engine printed no recipe, so the parity arm would compare two empty strings"; ok
-[ "$canon" = "$mine" ] || bad "AC10: the library's recipe differs from the engine's --recipe:
+[ -n "$canon" ] || print_failure "AC10: the relocation engine printed no recipe, so the parity arm would compare two empty strings"; add_arm
+[ "$canon" = "$mine" ] || print_failure "AC10: the library's recipe differs from the engine's --recipe:
 --- engine ---
 $canon
 --- library ---
-$mine"; ok
+$mine"; add_arm
 # The one-byte flip: a copy of the library with a single character changed must NOT compare equal.
 mkdir -p "$F1/hkflip"; cp "$F1/hk/straggler-guard.sh" "$F1/hkflip/straggler-guard.sh"
 sed -i 's/never rebase or squash/never rebase or squashh/' "$F1/hkflip/straggler-guard.sh"
 flipped=$(read_lib_recipe "$F1" hkflip)
-[ "$canon" != "$flipped" ] || bad "AC10: a one-byte change to the library's recipe still compared equal to the engine's, so the parity arm grades nothing"; ok
+[ "$canon" != "$flipped" ] || print_failure "AC10: a one-byte change to the library's recipe still compared equal to the engine's, so the parity arm grades nothing"; add_arm
 
 # ============================== F3 — a tip that has INTEGRATED the flip, pushed to a bare remote ---
 git -C "$F1" checkout -q -b feat "$F1_STRAG"
@@ -276,16 +283,16 @@ git -C "$F1" merge -q --no-ff --no-verify -m "merge the flipped default" main
 F3_MERGE=$(git -C "$F1" rev-parse HEAD)
 git -C "$F1" checkout -q main
 out=$(run_in "$F1" git push origin feat); rc=$?
-[ "$rc" != 0 ] || bad "AC5: a feature branch holding an UNACCOUNTED transition merge was pushed (rc=$rc)"; ok
-has "$out" "$F3_MERGE" || bad "AC5: the push refusal does not name the transition merge sha"; ok
-has "$out" "--repair" || bad "AC5: the push refusal does not name the repair verb"; ok
+[ "$rc" != 0 ] || print_failure "AC5: a feature branch holding an UNACCOUNTED transition merge was pushed (rc=$rc)"; add_arm
+check_contains "$out" "$F3_MERGE" || print_failure "AC5: the push refusal does not name the transition merge sha"; add_arm
+check_contains "$out" "--repair" || print_failure "AC5: the push refusal does not name the repair verb"; add_arm
 
 git -C "$F1" checkout -q feat
 write_relocated "$F1" TOOL-aSeed-1 "$F1_STRAG"
 git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -q --no-verify -m "account for the relocation"
 git -C "$F1" checkout -q main
 out=$(run_in "$F1" git push origin feat); rc=$?
-[ "$rc" = 0 ] || bad "AC5: a feature branch whose RELOCATED rows are committed was still refused (rc=$rc): $out"; ok
+[ "$rc" = 0 ] || print_failure "AC5: a feature branch whose RELOCATED rows are committed was still refused (rc=$rc): $out"; add_arm
 
 # The audit module ABSENT from both trees: one skip line naming the ref, and the push lands.
 git -C "$F1" checkout -q feat
@@ -295,9 +302,9 @@ git -C "$F1" checkout -q main
 mv "$F1/$FX_MT/transition_audit.py" "$TMP/ta.bak"
 out=$(run_in "$F1" git push origin feat); rc=$?
 mv "$TMP/ta.bak" "$F1/$FX_MT/transition_audit.py"
-[ "$rc" = 0 ] || bad "AC5: an unresolvable audit module refused the push instead of announcing a skip (rc=$rc): $out"; ok
-{ has "$out" "refs/heads/feat" && has "$out" "did NOT run"; } \
-  || bad "AC5: an unresolvable audit module printed no skip line naming the ref: $out"; ok
+[ "$rc" = 0 ] || print_failure "AC5: an unresolvable audit module refused the push instead of announcing a skip (rc=$rc): $out"; add_arm
+{ check_contains "$out" "refs/heads/feat" && check_contains "$out" "did NOT run"; } \
+  || print_failure "AC5: an unresolvable audit module printed no skip line naming the ref: $out"; add_arm
 
 # The module's conf reader BROKEN: a DEAD PROBE line naming the ref, and the push lands.
 git -C "$F1" checkout -q feat
@@ -308,9 +315,9 @@ cp "$F1/$FX_MT/transition_audit.py" "$TMP/ta.orig"
 sed -i 's/^def read_mode(/def read_mode_BROKEN(/' "$F1/$FX_MT/transition_audit.py"
 out=$(run_in "$F1" git push origin feat); rc=$?
 cp "$TMP/ta.orig" "$F1/$FX_MT/transition_audit.py"
-[ "$rc" = 0 ] || bad "AC5: a DEAD PROBE refused a feature push, stranding its only off-node copy (rc=$rc): $out"; ok
-{ has "$out" "DEAD PROBE" && has "$out" "refs/heads/feat"; } \
-  || bad "AC5: a dead audit printed no DEAD PROBE line naming the ref: $out"; ok
+[ "$rc" = 0 ] || print_failure "AC5: a DEAD PROBE refused a feature push, stranding its only off-node copy (rc=$rc): $out"; add_arm
+{ check_contains "$out" "DEAD PROBE" && check_contains "$out" "refs/heads/feat"; } \
+  || print_failure "AC5: a dead audit printed no DEAD PROBE line naming the ref: $out"; add_arm
 
 # ============================================== AC12 — the two hooks-path values, one topology -----
 # Under the RELATIVE value `check-wiring.sh --fix` writes, the linked worktree runs its OWN pre-flip
@@ -323,21 +330,21 @@ WT4=$(add_topology_worktree "$F1" wt12)
 printf -- '- TOOL-aSeed-8 \xc2\xb7 filed 2026-07-01 \xc2\xb7 an ask under the relative value\n' >> "$WT4/memory/backlog/TOOL.md"
 git -C "$WT4" add memory/backlog/TOOL.md
 out=$(run_in "$WT4" git commit -m "a shard edit under the relative hooks path"); rc=$?
-[ "$rc" = 0 ] || bad "AC12: under the relative core.hooksPath the worktree's own pre-flip hooks did not run, so the arm measured the primary tree's (rc=$rc): $out"; ok
-has "$out" "REFUSING" && bad "AC12: the documented inert case was refused"; ok
+[ "$rc" = 0 ] || print_failure "AC12: under the relative core.hooksPath the worktree's own pre-flip hooks did not run, so the arm measured the primary tree's (rc=$rc): $out"; add_arm
+check_contains "$out" "REFUSING" && print_failure "AC12: the documented inert case was refused"; add_arm
 sess=$(run_in "$F1" bash "$FX_ROOT/check-wiring.sh" --session); rc=$?
-[ "$rc" = 0 ] || bad "AC12: check-wiring --session exited $rc on a tree holding a straggler"; ok
+[ "$rc" = 0 ] || print_failure "AC12: check-wiring --session exited $rc on a tree holding a straggler"; add_arm
 line=$(printf '%s\n' "$sess" | grep '^note     straggler')
-has "$line" "refs/heads/wt12" || bad "AC12: the session note does not name the local straggler: $sess"; ok
-has "$line" "hooks own-tree" || bad "AC12: the session note does not mark a straggler whose worktree runs its own hooks: $line"; ok
+check_contains "$line" "refs/heads/wt12" || print_failure "AC12: the session note does not name the local straggler: $sess"; add_arm
+check_contains "$line" "hooks own-tree" || print_failure "AC12: the session note does not mark a straggler whose worktree runs its own hooks: $line"; add_arm
 # And under an ABSOLUTE value naming the primary tree's post-flip hooks, the same worktree IS refused.
 git -C "$F1" config core.hooksPath "$F1/hk"
 printf -- '- TOOL-aSeed-9 \xc2\xb7 filed 2026-07-02 \xc2\xb7 an ask under the absolute value\n' >> "$WT4/memory/backlog/TOOL.md"
 git -C "$WT4" add memory/backlog/TOOL.md
 out=$(run_in "$WT4" git commit -m "a shard edit under the absolute hooks path"); rc=$?
-[ "$rc" != 0 ] || bad "AC12: under an absolute core.hooksPath naming the primary tree's hooks the shard edit was committed"; ok
-has "$out" "migrate_backlog.py --relocate --as <your-slug>" \
-  || bad "AC12: the absolute-value refusal does not print the recipe"; ok
+[ "$rc" != 0 ] || print_failure "AC12: under an absolute core.hooksPath naming the primary tree's hooks the shard edit was committed"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC12: the absolute-value refusal does not print the recipe"; add_arm
 
 # ================================================== AC11 — where the default branch is READ from ---
 # The REMOTE default carries the flip while the local branch is still in shards mode: a node whose
@@ -348,9 +355,9 @@ WT5=$(add_topology_worktree "$F1" rs)
 printf -- '- TOOL-aSeed-7 \xc2\xb7 filed 2026-06-01 \xc2\xb7 a late ask\n' >> "$WT5/memory/backlog/TOOL.md"
 git -C "$WT5" add memory/backlog/TOOL.md
 out=$(run_in "$WT5" git commit -m "a shard edit while the local default is still shards"); rc=$?
-[ "$rc" != 0 ] || bad "AC11: with origin/HEAD in builds mode and the local default still in shards, the shard edit was committed"; ok
-has "$out" "migrate_backlog.py --relocate --as <your-slug>" \
-  || bad "AC11: the remote-default refusal does not print the recipe"; ok
+[ "$rc" != 0 ] || print_failure "AC11: with origin/HEAD in builds mode and the local default still in shards, the shard edit was committed"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC11: the remote-default refusal does not print the recipe"; add_arm
 
 # No default branch this clone can resolve at all: a NAMED line, and the commit proceeds.
 U="$TMP/nodef"
@@ -367,9 +374,9 @@ UW=$(git -C "$U" worktree add -q -b side "$U-wt" >/dev/null 2>&1; printf '%s' "$
 printf -- '- TOOL-x-2 - another row\n' >> "$UW/memory/backlog/TOOL.md"
 git -C "$UW" add memory/backlog/TOOL.md
 out=$(run_in "$UW" git commit -m "a commit with no default branch anywhere"); rc=$?
-[ "$rc" = 0 ] || bad "AC11: an unresolvable default branch REFUSED a commit (rc=$rc): $out"; ok
-has "$out" "observes no default branch" \
-  || bad "AC11: an unresolvable default branch printed no named line, so the layer is silently off: $out"; ok
+[ "$rc" = 0 ] || print_failure "AC11: an unresolvable default branch REFUSED a commit (rc=$rc): $out"; add_arm
+check_contains "$out" "observes no default branch" \
+  || print_failure "AC11: an unresolvable default branch printed no named line, so the layer is silently off: $out"; add_arm
 
 # ================================================== AC7 — dormancy, and the library-absent adopter -
 S="$TMP/shards"
@@ -387,16 +394,16 @@ add_origin_head "$S"
 printf -- '- TOOL-x-2 - another row\n' >> "$S/memory/backlog/TOOL.md"
 git -C "$S" add memory/backlog/TOOL.md
 out=$(run_in "$S" git commit -m "a shard edit on a shards-mode default"); rc=$?
-[ "$rc" = 0 ] || bad "AC7: a shards-mode default refused a shard edit (rc=$rc): $out"; ok
+[ "$rc" = 0 ] || print_failure "AC7: a shards-mode default refused a shard edit (rc=$rc): $out"; add_arm
 printf '%s' "$out" | grep -q 'straggler-guard\|pre-commit: note\|pre-commit: REFUSING' \
-  && bad "AC7: the dormant path printed a line in a repository that has not flipped: $out"; ok
+  && print_failure "AC7: the dormant path printed a line in a repository that has not flipped: $out"; add_arm
 git -C "$S" checkout -q -b featshards
 printf -- '- TOOL-x-3 - a third row\n' >> "$S/memory/backlog/TOOL.md"
 git -C "$S" commit -q --no-verify -am "a feature commit"
 out=$(run_in "$S" git push origin featshards); rc=$?
-[ "$rc" = 0 ] || bad "AC7: a shards-mode default refused a feature push (rc=$rc): $out"; ok
+[ "$rc" = 0 ] || print_failure "AC7: a shards-mode default refused a feature push (rc=$rc): $out"; add_arm
 printf '%s' "$out" | grep -q 'pre-push: note\|pre-push: REFUSING\|straggler-guard' \
-  && bad "AC7: the dormant push path printed a line in a repository that has not flipped: $out"; ok
+  && print_failure "AC7: the dormant push path printed a line in a repository that has not flipped: $out"; add_arm
 
 # The library ABSENT beside a shipped pre-push, on a builds-mode default: the block is inert, the
 # push lands, and the hook's exit is BASE's 0 for a feature ref. This is every adopter that took the
@@ -414,16 +421,16 @@ git -C "$N" config core.hooksPath "$N/hk"
 git -C "$N" add -A >/dev/null 2>&1; git -C "$N" commit -q --no-verify -m base
 git init -q --bare -b main "$N.git"; git -C "$N" remote add origin "$N.git"
 add_origin_head "$N"
-[ -f "$N/hk/straggler-guard.sh" ] && bad "AC7: the library-absent fixture carries the library, so its arm proves nothing"; ok
+[ -f "$N/hk/straggler-guard.sh" ] && print_failure "AC7: the library-absent fixture carries the library, so its arm proves nothing"; add_arm
 git -C "$N" checkout -q -b featn
 printf -- '- TOOL-x-9 - a feature row\n' >> "$N/memory/backlog/TOOL.md"
 git -C "$N" commit -q --no-verify -am "a feature commit"
 out=$(run_in "$N" git push origin featn); rc=$?
-[ "$rc" = 0 ] || bad "AC7: with no straggler-guard.sh beside it the shipped pre-push refused a feature push — every push-main adopter (rc=$rc): $out"; ok
+[ "$rc" = 0 ] || print_failure "AC7: with no straggler-guard.sh beside it the shipped pre-push refused a feature push — every push-main adopter (rc=$rc): $out"; add_arm
 printf '%s' "$out" | grep -q 'pre-push:' \
-  && bad "AC7: the library-absent block printed a line: $out"; ok
+  && print_failure "AC7: the library-absent block printed a line: $out"; add_arm
 git -C "$N.git" rev-parse --verify --quiet refs/heads/featn >/dev/null \
-  || bad "AC7: the library-absent feature push did not reach the remote"; ok
+  || print_failure "AC7: the library-absent feature push did not reach the remote"; add_arm
 
 # ================================================== AC14 — the topology helper is ONE definition ---
 T="$TMP/topo"
@@ -432,14 +439,14 @@ git -C "$T" branch -q side
 before=$(git -C "$T" config --get core.hooksPath || true)
 tout=$(bash "$SELF" --topology "$T" side); trc=$?
 after=$(git -C "$T" config --get core.hooksPath || true)
-[ "$trc" = 0 ] || bad "AC14: --topology exited $trc"; ok
-[ "$(printf '%s\n' "$tout" | grep -c .)" = 1 ] || bad "AC14: --topology printed more or fewer than one line: $tout"; ok
-git -C "$T" worktree list | grep -qF "$tout" || bad "AC14: the path --topology printed is not a worktree of the fixture: $tout"; ok
-printf '%s' "$tout" | grep -q PASS && bad "AC14: --topology printed a PASS line, so the mode reads as a suite run"; ok
-[ "$before" = "$after" ] || bad "AC14: --topology changed core.hooksPath from '$before' to '$after'"; ok
+[ "$trc" = 0 ] || print_failure "AC14: --topology exited $trc"; add_arm
+[ "$(printf '%s\n' "$tout" | grep -c .)" = 1 ] || print_failure "AC14: --topology printed more or fewer than one line: $tout"; add_arm
+git -C "$T" worktree list | grep -qF "$tout" || print_failure "AC14: the path --topology printed is not a worktree of the fixture: $tout"; add_arm
+printf '%s' "$tout" | grep -q PASS && print_failure "AC14: --topology printed a PASS line, so the mode reads as a suite run"; add_arm
+[ "$before" = "$after" ] || print_failure "AC14: --topology changed core.hooksPath from '$before' to '$after'"; add_arm
 hits=$(grep -c 'add_topology_worktree' "$SELF")
-[ "$hits" -ge 3 ] || bad "AC14: the topology helper is named $hits times in this suite, so its definition, the mode's dispatch and AC12's call are not all routed through it"; ok
-grep -qE '^add_topology_worktree\(\) \{' "$SELF" || bad "AC14: the topology helper has no definition line in this suite"; ok
+[ "$hits" -ge 3 ] || print_failure "AC14: the topology helper is named $hits times in this suite, so its definition, the mode's dispatch and AC12's call are not all routed through it"; add_arm
+grep -qE '^add_topology_worktree\(\) \{' "$SELF" || print_failure "AC14: the topology helper has no definition line in this suite"; add_arm
 
 # ---------------------------------------------------------------------------------------- verdict
 if [ "$n" -lt "$FLOOR_ASSERTIONS" ]; then

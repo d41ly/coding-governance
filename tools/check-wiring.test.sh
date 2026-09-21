@@ -980,15 +980,19 @@ ck "hooks: a tracked-pre-commit-only adopter still exits 0" "$([ "$rc" = 0 ] && 
 cleanup
 
 # ---- Check T: local branches that still owe a backlog relocation (TOOL-dDerivedDocket-13) -------
+# The fixture below publishes a bare origin and observes `origin/HEAD`, so an ambient
+# GOV_DEFAULT_BRANCH is machine state that changes what it measures: the inventory's own
+# resolver REFUSES when the declared name disagrees with the observed default.
+unset GOV_DEFAULT_BRANCH
 # The step is REPORT-ONLY by construction: `unwired` decides this script's exit code and
 # `.unattended.conf` makes `--check` an unattended run's precondition, so a straggler reported as
 # UNWIRED would refuse every unattended run on this node for a branch somebody else owns. These arms
 # hold that severity, the mode gate in front of it, and the fact that it names the branch at all.
-install_relocation_kit() { # $1 = install prefix ("" here, the copy-installed adopter layout)
+seed_relocation_kit() { # $1 = install prefix ("" here, the copy-installed adopter layout)
   local p="$1" rel src
   for rel in memory-tree memory-recall lib; do
     src=$(src_of "$rel")
-    [ -n "$src" ] || { ck "install_relocation_kit: $rel is not installed in $REPO" 0; return 1; }
+    [ -n "$src" ] || { ck "seed_relocation_kit: $rel is not installed in $REPO" 0; return 1; }
     cp -r "$src" "${p}${rel}"
   done
   rm -rf "${p}memory-tree/__pycache__" "${p}memory-recall/__pycache__"
@@ -1000,7 +1004,7 @@ install_relocation_kit() { # $1 = install prefix ("" here, the copy-installed ad
 }
 # A SHARDS-mode tree first: the step must be silent about stragglers where no branch can be one.
 newrepo
-install_relocation_kit "" || true
+seed_relocation_kit "" || true
 mkdir -p memory/backlog memory/builds/aSeed
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\nBACKLOG_MODE="shards"\n' > .memory-tree.conf
 printf '# the seed build\n' > memory/builds/aSeed/README.md
