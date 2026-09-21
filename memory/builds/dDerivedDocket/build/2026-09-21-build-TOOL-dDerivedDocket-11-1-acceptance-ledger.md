@@ -68,7 +68,9 @@ BLOCKED for 97 of 334 triage rows — and is folded as rev-6.
   renderer and the parser disagree about — exits 1 as a difference no declared normalization
   explains. The five normalizations are counted on every run and printed.
 - AC7 — `BACKLOG.md` — under a fixture cap of 400 bytes the census names the over-cap prospective
-  ask file with its size; the six README-less slugs of this repo and the fixture's one are listed as
+  ask file with its size, and under a BLANK cap it prints DEAD PROBE naming the key instead of
+  reporting zero slugs (the fold of `sourced-conf-blank-overrides-the-default`, which the checklist
+  selected against this diff); the six README-less slugs of this repo and the fixture's one are listed as
   filing homes; the EXMP view's prospective size grows when the fixture gains one live ask and does
   not move when it gains a terminal one; and the fixture row backticking a family-archive path is
   named with its file and line, with the citation count on the finding's own heading.

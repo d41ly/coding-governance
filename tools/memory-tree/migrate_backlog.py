@@ -108,7 +108,7 @@ RECORD_KINDS = {"prompts": "prompt", "spec": "spec", "build": "build", "reviews"
 
 #: The self-test's executed-assertion floor. A block of arms stranded past an early return is
 #: exactly what a floor catches and a green line does not.
-FLOOR_ASSERTIONS = 70
+FLOOR_ASSERTIONS = 71
 
 NEWLINE = chr(10)
 
@@ -149,7 +149,17 @@ def resolve_root(start=None) -> str:
 
 
 def derive_families(conf: dict) -> tuple:
-    """The DECLARED family tokens, sorted. One derivation, read by the grammar and by the docs."""
+    """The DECLARED family tokens, sorted. One derivation, read by the grammar and by the docs.
+
+    THE THIRD READER OF `FAMILIES` IN THIS KIT, and that is stated rather than hidden: the
+    generator splits the same key inside `collect`, and `row_grammar.derive_families` spells a
+    third. They are one expression apart and can only disagree on a MALFORMED token, which is why
+    this one refuses the pair shape here and hands the tokens straight to
+    `backlog.build_grammar` — that function validates each family against `[A-Za-z][A-Za-z0-9]*`
+    and refuses by name, and it is called before any of these tokens reaches a regex. Escaping
+    instead of refusing is the shape the kit has already measured: a quoted value matches nothing
+    and a value carrying a pipe swallows a subtree, both in silence.
+    """
     fams = []
     for pair in conf.get("FAMILIES", "").split():
         head, sep, tail = pair.partition(":")
@@ -1023,8 +1033,12 @@ def build_summary(conf, chosen, live_paths, archive_names, archive_count, copies
     tracked = set(run("git", "ls-files", "--", memory_root + "/", cwd=root).split("\n"))
     slugs = sorted({read_slug(i) for i in chosen})
     homeless = [s for s in slugs if f"{memory_root}/builds/{s}/README.md" not in tracked]
-    cap = conf.get("INDEX_CAP_BYTES", "").strip()
-    cap = int(cap) if cap.isdigit() else 0
+    # A BLANK OR UNUSABLE CAP DISARMS THIS PROBE, so it says so rather than reporting zero. A
+    # cap of "" read as 0 makes every comparison false and the finding prints `none`, which is the
+    # same bytes a tree with nothing over cap prints — a reassuring zero from a signal that cannot
+    # move. The hygiene engine REFUSES on the same value; this is a report, so it reports.
+    cap_raw = (conf.get("INDEX_CAP_BYTES") or "").strip()
+    cap = int(cap_raw) if cap_raw.isdigit() and int(cap_raw) > 0 else 0
     sizes = {}
     for rel, text in texts.items():
         sizes[rel] = len(text.encode("utf-8"))
@@ -1063,7 +1077,10 @@ def build_summary(conf, chosen, live_paths, archive_names, archive_count, copies
     ]
     findings = [
         ("Prospective ask files over the declared row cap",
-         [f"{rel} would be {n} bytes against INDEX_CAP_BYTES of {cap}" for rel, n in over]),
+         [f"{rel} would be {n} bytes against INDEX_CAP_BYTES of {cap}" for rel, n in over]
+         if cap else
+         [f"DEAD PROBE — INDEX_CAP_BYTES is '{cap_raw}', not a positive whole number, so no "
+          f"prospective ask file can be over cap and this finding's silence means nothing"]),
         ("Slugs owning rows with no build README — the prospective filing homes",
          [f"slug {s} owns rows and has no tracked README" for s in homeless]),
         (f"Rows whose text cites a backlog archive the switch-over deletes — "
@@ -1157,6 +1174,10 @@ def init_repo(tmp: str) -> None:
     run("git", "config", "user.email", "t@t.test", cwd=tmp)
     run("git", "config", "user.name", "t", cwd=tmp)
     run("git", "config", "commit.gpgsign", "false", cwd=tmp)
+    # HERMETIC AGAINST THIS MACHINE'S GLOBAL CONFIG. `core.autocrlf` is a user-global setting on
+    # every Windows node here, and it decides what the fixture's own shards look like on disk —
+    # so an arm counting rows would be grading the checkout convention rather than the parser.
+    run("git", "config", "core.autocrlf", "false", cwd=tmp)
 
 
 WAIVER = "# no waived header" + chr(10)
@@ -1496,6 +1517,8 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
         arm("a slug whose prospective ask file exceeds the declared cap is named with its size",
             "memory/builds/aBar/BACKLOG.md",
             lambda: read_over_cap_findings(base, main_tree))
+        arm("a blank row cap says the probe cannot move instead of reporting zero",
+            "DEAD PROBE", lambda: read_over_cap_findings(base, main_tree, cap=""))
         arm("the README-less slugs are listed as filing homes",
             "slug aLoose", lambda: plan.summary["findings"][1][1][0])
         arm("a row citing a family archive by path is named with its file and line",
@@ -1561,13 +1584,18 @@ def run_plan_in(tree: str):
     return run_plan(resolve_root(tree))
 
 
-def read_over_cap_findings(base: str, main_tree: str) -> str:
-    """The same corpus under a cap small enough that a real slug breaches it."""
+def read_over_cap_findings(base: str, main_tree: str, cap: str = "400") -> str:
+    """The same corpus under a declared cap the caller chooses.
+
+    A cap small enough that a real slug breaches it, or a BLANK one — the value that used to
+    make the probe report zero slugs and read exactly like a tree with nothing over cap.
+    """
     import shutil
-    tiny = os.path.join(base, "tiny")
+    tiny = os.path.join(base, "cap" + (cap or "blank"))
     if not os.path.isdir(tiny):
         shutil.copytree(main_tree, tiny)
-        run_commit(tiny, "records: a cap a real slug breaches", {".memory-tree.conf": render_conf("400")})
+        run_commit(tiny, "records: a declared cap this corpus is graded against",
+                   {".memory-tree.conf": render_conf(cap)})
     findings = run_plan(tiny).summary["findings"][0][1]
     return "\n".join(findings)
 

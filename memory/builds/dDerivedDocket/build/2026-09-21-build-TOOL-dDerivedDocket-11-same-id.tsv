@@ -1,5 +1,5 @@
 # **Serves:** journal TOOL-dDerivedDocket-11
-# same-id worksheet · computed at b8a773375bf26c48004a06c303d2968963370bc3 · signed none · design-named none
+# same-id worksheet · computed at e21fa86f4f129ca1a5000946d895ef6c646d9a0d · signed none · design-named none
 id	spec	legacy	evidence	sha	low_overlap	overlap
 DEPL-dCarriedReceipt-1	memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-1.md	CLOSED	born-in-spec-commit	30ffcb28df7d1c6fcdb3695f96756c997d44d490	no	0.810
 DEPL-dCarriedReceipt-2	memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-2.md	CLOSED	born-in-spec-commit	30ffcb28df7d1c6fcdb3695f96756c997d44d490	no	0.625
