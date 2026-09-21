@@ -11,12 +11,13 @@ not one tracked byte.
 The direct check for every line below is the FLAG form
 `python3 tools/memory-tree/gen_build_index.py --selftest`, which AC12's `permission:` line names as
 the check this pass may make; what that line defers to the VERIFYING bar is the identical argv's run
-as a HELD `chunk = selftests` LEG, not the criterion. The suite went from 342 arms to 417, all
+as a HELD `chunk = selftests` LEG, not the criterion. The suite went from 342 arms to 420, all
 green, and `backlog.py --selftest` is green beside it. No merge bar, no gate leg and no `*.test.sh`
 suite ran in this pass.
 
-Fifteen breaks were staged one at a time, each into the source rather than into a fixture, and every
-one went red naming the arm written for it. One of them found a defect in the ARMS: the `may none`
+Eighteen breaks were staged one at a time, each into the source rather than into a fixture, and
+every one went red naming the arm written for it. The last three came out of the recurring-bug-class
+checklist fold and are recorded in the fold's own commit. One of them found a defect in the ARMS: the `may none`
 absorption arm matched a substring, so a field reading `<grant>,none` contained the value it
 asserted and the arm stayed green over its own break. Three arms were bracketed to assert a whole
 field after that.
@@ -52,11 +53,15 @@ field after that.
 - AC7 — `examined` — the whole of stdout over the three-ask fixture is three eleven-field rows and
   the closing line, every cell pinned position by position, with the waiver notice on stderr; an
   all-`no` fixture and an empty `--ready` both exit 0. Break B9 (one field emitted empty) redded
-  eight arms.
+  eight arms. The decided-by SET's minimum is asserted equal to the one value the fold itself names,
+  over a population the same arm reports as carrying a mixed member set; breaks B16 and B17 redded
+  it.
 - AC8 — `git status --porcelain` — a row filed after the pin is not filed at the pin, the same id is
   ready in the working tree, the conf is pinned too, and the porcelain is unchanged across both the
   `--at` run and a `--tsv --ready --target --live-builds` one. Break B10 (`--at` reading the working
-  tree) redded two.
+  tree) redded two. The pinned read's one degradation — a spec header it refuses, which moves R2 for
+  every ask that spec closes — is NAMED on stderr and the run still answers at 0; break B18 swallowed
+  the notice and redded it.
 - AC9 — `PROBE_ALLOW` — blank refuses and names the key; a declared entry that does not match
   refuses and prints what IS declared; token equality refuses `python3x` under `python3` and
   `tools/../x` under `tools/`; a two-token entry admits its own command and refuses the other
@@ -78,8 +83,8 @@ field after that.
   mandate each exit non-zero with no build folder written, and the readiness table prints before the
   refusal; a mandate over a granted ask still scaffolds a README with no `may:` line. Break B15
   (matching the elision only as a whole token) redded it.
-- AC12 — `python3 tools/memory-tree/gen_build_index.py --selftest` — 417 arms, all green, with the
-  fifteen staged REDs above. Its run as a HELD gate leg is the VERIFYING bar's and is not this
+- AC12 — `python3 tools/memory-tree/gen_build_index.py --selftest` — 420 arms, all green, with the
+  eighteen staged REDs above. Its run as a HELD gate leg is the VERIFYING bar's and is not this
   pass's.
 - AC13 — `corpus_ids.resolve_anchor(root)` — no line the scaffold wrote anchors an id, over a tree
   that HAS those ids, through this kit's own route bound to the scratch root; the same predicate

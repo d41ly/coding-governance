@@ -2640,10 +2640,18 @@ def read_backlog_at_rev(root: str, rev: str, conf: dict) -> dict:
             continue
         try:
             unit = parse_spec_text(text, rel, _id_alternation(conf))
-        except Problem:
+        except Problem as exc:
             # A MALFORMED HEADER AT A PINNED REV IS NOT THIS MODE'S REFUSAL. `--check` grades the
             # working tree and owes that verdict there; a print mode asked about history must not
             # refuse to answer because a spec somebody has since repaired was once wrong.
+            #
+            # IT IS STILL A DEGRADATION, AND IT SAYS SO. A spec dropped here is a spec absent from
+            # the index, which moves the status of every ask it closes and therefore moves R2 —
+            # so a run that swallowed it would hand back a grade computed over a corpus it never
+            # mentioned. The notice is on stderr, with the rest of this mode's notices.
+            print(f"build-index: at {rev}, {rel} carries a header this reader refuses, so it is "
+                  f"absent from the pinned spec index and any ask it closes grades without it: "
+                  f"{exc}", file=sys.stderr)
             continue
         if unit:
             index[unit["id"]] = backlog.Spec(unit["id"], rel, unit["status"],
@@ -4883,6 +4891,26 @@ def cmd_selftest() -> int:
         _rc7c, _so7c, _se7c = _read_asks_run(et, _c7, ["--tsv", "--ready"])
         arm("--ready naming NO id is an empty mandate and an empty population, at exit 0",
             "rc=0 out=examined\t0", lambda: f"rc={_rc7c} out={_so7c.rstrip(chr(10))}")
+        # THE DECIDED-BY SET AGAINST THE ONE VALUE THE FOLD NAMES. Two computations over one
+        # corpus, and this arm is the only thing holding them to one answer: the fold picks the
+        # MINIMUM of the set for a field that holds one value, so a set that stopped containing
+        # that minimum would mean the projection and the table had started describing different
+        # records. WHAT IT DOES NOT BUY, said plainly: both are derived here from the same corpus,
+        # so this is a consistency check between two implementations and never evidence that
+        # either of them names the right records — that is what the fixture's own pinned cells
+        # above are for, and the `mixed` count is what says the population was not all singletons.
+        _dec_reading: dict = {}
+        with contextlib.redirect_stdout(io.StringIO()):
+            collect(et, _c7, backlog_out=_dec_reading)
+        _dec_corpus, _dec_fold = _dec_reading["corpus"], _dec_reading["fold"]
+        _dec = backlog.derive_deciders(_dec_corpus, _dec_fold,
+                                       backlog.derive_evidence(_dec_corpus))
+        arm("the decided-by SET's minimum is the value the fold itself names, for every ask",
+            "mismatch=[] asks=3 mixed=1",
+            lambda: "mismatch=%s asks=%d mixed=%d" % (
+                [a for a, m in _dec.items()
+                 if (min(m) if m else "") != _dec_fold.decided.get(a, "")],
+                len(_dec), len([a for a, m in _dec.items() if len(m) > 1])))
 
         # AC8 — the pinned read, and the tree it must leave alone. THE CONTROL RUNS FIRST and the
         # porcelain is sampled AFTER it, because the control rebuilds the fixture and a sample
@@ -4913,6 +4941,25 @@ def cmd_selftest() -> int:
             "at=True modes=True",
             lambda: f"at={_after_at == _before} "
                     f"modes={run('git', 'status', '--porcelain', cwd=et) == _before}")
+
+        # THE PINNED READ'S ONE DEGRADATION, REPORTED. A spec whose header this reader refuses at
+        # `<rev>` is absent from the pinned index, and an absent spec moves the status of every ask
+        # it closes and therefore moves R2 — so a run that dropped it in silence would hand back a
+        # grade over a corpus it never mentioned. The arm exists because a report nobody has ever
+        # seen fire is a branch, not a report.
+        _bad_spec = dict(_ac8)
+        _bad_spec["memory/builds/aBar/spec/2026-09-01-spec-aBar-80.md"] = _render_backlog_spec(
+            "EXMP-aBar-80", tail=" · order 0x2")
+        _c8d = _build_backlog_fixture(et, _bad_spec, cutoff=_cut)
+        run("git", "add", "-A", cwd=et)
+        run("git", "commit", "-q", "-m", "bad header", "--no-verify", cwd=et)
+        _rc8d, _so8d, _se8d = _read_asks_run(et, _c8d, ["--tsv", "--ready", "EXMP-aFoo-32",
+                                                        "--at", "HEAD"])
+        arm("a spec header the pinned reader refuses is NAMED on stderr, not dropped in silence",
+            "absent from the pinned spec index", lambda: _se8d)
+        arm("and the run still answers, at exit 0 — a print mode does not refuse over history",
+            "rc=0 rows=1", lambda: f"rc={_rc8d} rows="
+                                   f"{len([x for x in _so8d.split(chr(10)) if x.startswith(ASK_TSV_HEAD)])}")
 
         # AC9 — `--probe`, the ONE path that may execute a filer's bytes.
         def _build_probe_tree(allow, asks, rows=()):
