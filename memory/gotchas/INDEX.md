@@ -33,7 +33,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [containment-tested-one-way](containment-tested-one-way.md) | class | 5 |  | a guard asking only "is this path under the protected one" refuses the narrow declarations and admits the one that claims everything |
 | [criterion-asserts-what-its-own-command-cannot-show](criterion-asserts-what-its-own-command-cannot-show.md) | class | 1 |  | an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, or a state that holds when the scope item is skipped |
 | [degradation-known-but-unreported](degradation-known-but-unreported.md) | class | 5 |  | a pipeline computes how badly its own run degraded and then fails to say so where it matters, so a degraded run produces a clean bill |
-| [destructive-step-before-its-precondition](destructive-step-before-its-precondition.md) | class | 4 |  | a destructive step ordered before the probe for the precondition that makes it useful runs on exactly the case where nothing can follow it, so the harm lands and the benefit never does |
+| [destructive-step-before-its-precondition](destructive-step-before-its-precondition.md) | class | 5 |  | a destructive step ordered before the probe for the precondition that makes it useful runs on exactly the case where nothing can follow it, so the harm lands and the benefit never does |
 | [empty-field-collapses-unless-it-is-last](empty-field-collapses-unless-it-is-last.md) | class | 4 |  | `IFS=$'\t' read -r a b c d` collapses a run of tabs because tab is IFS whitespace, so a field that can be empty silently shifts every field after it and the branch reading them is dead |
 | [fallback-fabricates-the-passing-value](fallback-fabricates-the-passing-value.md) | class | 1 |  | a degraded-mode substitute spelled with the value some assertion reads as clean turns a broken subject into a silent green |
 | [fixture-inherits-ambient-machine-state](fixture-inherits-ambient-machine-state.md) | class | 4 |  | a hermetic-looking fixture silently reads machine-global config, so it passes everywhere it was written and fails where it was not |
@@ -45,6 +45,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [gate-green-by-accident-on-generated-bytes](gate-green-by-accident-on-generated-bytes.md) | class | 2 |  | a byte-compare gate over a generated file is CRLF-red on Windows and green only right after a render |
 | [git-rm-cached-refuses-a-diverged-index-blob](git-rm-cached-refuses-a-diverged-index-blob.md) | class | 2 |  | `git rm --cached` refuses a path whose index blob differs from both HEAD and the worktree, so a fixture cleanup without `-f` silently leaves the file staged and the next arm measures the wrong fixture |
 | [grammar-bound-to-the-wrong-root](grammar-bound-to-the-wrong-root.md) | class | 2 |  | a module-level grammar resolved at import describes the repo the KIT lives in, not the tree being classified |
+| [guard-fed-the-value-it-supersedes](guard-fed-the-value-it-supersedes.md) | class | 2 |  | a guard on a relaunch reads only the pid the launch it guards was meant to replace, so the process the launch itself created is invisible to the next launch and the guard never sees the duplicate it exists to stop |
 | [heredoc-escape-reaches-the-regex](heredoc-escape-reaches-the-regex.md) | class | 0 | yes | source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem |
 | [hookspath-resolves-into-another-checkout](hookspath-resolves-into-another-checkout.md) | class | 5 |  | core.hooksPath is repo-global and absolute, so in a multi-worktree layout every push is gated by whatever the primary tree currently has checked out |
 | [id-matched-as-a-substring](id-matched-as-a-substring.md) | class | 3 |  | every id ending in a 1-up sequence is a prefix of nine others, so an unanchored match joins the wrong record |
@@ -86,8 +87,9 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 | [waiver-row-that-hides-nothing-reds](waiver-row-that-hides-nothing-reds.md) | class | 3 |  | a curation-debt row whose file would pass unwaived is itself a failure, and check 8's population is the backlog shards alone — so a row listed for a fault it does not earn reds instead of protecting |
+| [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-73 record(s): 73 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+75 record(s): 75 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

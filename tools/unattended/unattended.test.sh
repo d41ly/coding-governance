@@ -12,6 +12,11 @@ KIT_REL="${KIT_REL:-tools}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/unattended.sh"
+# The library is sourced for `read_host_name` and `read_pid_image`: the lease arms compare what
+# `--preflight` recorded against the kit's own probe of this node and this shell's pid, never a
+# second spelling of `COMPUTERNAME` or `tasklist`. It defines functions and nothing else.
+# shellcheck source=lib-unattended.sh
+. "$HERE/lib-unattended.sh"
 
 # ---- THE SHARD CONTRACT (TOOL-aShardedFloor-2) ---------------------------------------------------
 # This suite IS the merge bar's floor: one leg exceeding leg-seconds / width sets the whole bar's
@@ -2655,14 +2660,17 @@ remove_landed_fixture() { git checkout -q unit; git branch -f main "$BASE"; git 
 STOP7="$(git rev-parse --git-dir)/unattended/stop.tRun.log"; mkdir -p "${STOP7%/*}"
 # ---- AC1: the NEWEST line is post-close and still names the id — refused, naming id and utc, and the
 # ---- record untouched. The older line would pass, so this also proves the reader takes the last one.
-build_landed_fixture; rm -f "$STOP7"
+# STAMPED AT OR AFTER THE LEASE: `write_lease` records `lease-utc` at preflight, and --landed grades
+# only a line the CURRENT lease's incarnation could have produced (closing review id 15, AC16 below);
+# a post-close line dated before the lease is the pre-close refusal. The older `[]` line stays old.
+build_landed_fixture; rm -f "$STOP7"; STOP_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 printf '%s\n' '{"utc":"2026-09-16T11:00:00Z","phase":"LANDING","session_crons":[]}' \
-  '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
+  "{\"utc\":\"$STOP_UTC\",\"phase\":\"LANDING\",\"session_crons\":[{\"id\":\"k1\"}]}" > "$STOP7"
 check_status_one_line tRun > "$ORIGIN_DIR/s7.line"   # AC5 — --status is untouched by this unit: one line
 before=$(sum)
 out=$(run --landed tRun)
 hit "$out" "the keepalive attestation is contradicted by the harness's own listing: the stop-guard recorded the cron store after the close and it still names the recorded keepalive id, so the job was not reaped — reap it, END THE TURN so the stop-guard records the listing again, then re-run --landed"
-hit "$out" "k1 listed at 2026-09-16T12:00:00Z"
+hit "$out" "k1 listed at $STOP_UTC"
 miss "$out" "phase LANDED"
 same "AC1 the contradicted --landed wrote nothing" "$(sum)" "$before"
 # ---- AC2: the newest line is PRE-CLOSE — refused as a check that could run and did not, naming utc
@@ -2681,10 +2689,10 @@ same "AC2 the unreadable --landed wrote nothing" "$(sum)" "$before"
 # ---- AC3: post-close and the id is ABSENT — one `checked` line naming id and utc, then LANDED on
 # ---- the remote arm. A silent pass is what this unit forbids.
 rm -f "$STOP7"
-printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[]}' > "$STOP7"
+printf '%s\n' "{\"utc\":\"$STOP_UTC\",\"phase\":\"LANDING\",\"session_crons\":[]}" > "$STOP7"
 check_status_one_line tRun > "$ORIGIN_DIR/s7.line"
 out=$(run --landed tRun)
-hit "$out" "keepalive-reaped: checked — k1 absent from the harness listing at 2026-09-16T12:00:00Z"
+hit "$out" "keepalive-reaped: checked — k1 absent from the harness listing at $STOP_UTC"
 hit "$out" "phase LANDED"
 same "AC3 the checked landing records the remote anchor" "$(sed -n 's/^landed-anchor: //p' memory/builds/tRun/RUN.md)" "remote"
 remove_landed_fixture
@@ -2725,6 +2733,52 @@ hit "$_last7" '"session_crons":[{"id":"other-job"}]'
 out=$(run --landed tRun)
 hit "$out" "keepalive-reaped: checked — k1 absent from the harness listing at"
 hit "$out" "phase LANDED"
+remove_landed_fixture; rm -f "$STOP7"
+# ---- AC15 (closing review ids 7 and 11): a session the lease does NOT name is refused BEFORE the
+# ---- sidecar read, naming the mismatch and `--resume <slug> --keepalive-id` as the step that binds
+# ---- it — never END THE TURN, which the stop-guard would ignore for an unbound session. Same with
+# ---- no session id in the environment at all. A lease reading `absent` (the harness exposed none)
+# ---- is `unchecked` and lands, sidecar or not. RED against a driver copy with the `fail 55` line
+# ---- commented out: the pre-close line then fires 54 and END THE TURN prints.
+build_landed_fixture; rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"BUILDING","session_crons":[]}' > "$STOP7"
+before=$(sum)
+out=$(CLAUDE_CODE_SESSION_ID=some-other-session bash "$SCRIPT" --landed tRun 2>&1); rc=$?
+same "AC15 an unbound session's --landed exits 1" "$rc" "1"
+hit  "$out" "the stop-guard binds by the lease and this session is not the one the record names, so no stop of this session is ever recorded and ending the turn cannot help — run --resume tRun --keepalive-id"
+hit  "$out" "lease session fixture-session, this session some-other-session"
+miss "$out" "END THE TURN"
+same "AC15 the unbound --landed wrote nothing" "$(sum)" "$before"
+out=$(env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --landed tRun 2>&1)
+hit  "$out" "UNATTENDED check 55 FAILED"
+hit  "$out" "this session unset"
+miss "$out" "END THE TURN"
+remove_landed_fixture
+build_landed_fixture 's/^session: .*/session: absent/'; rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"BUILDING","session_crons":[]}' > "$STOP7"
+out=$(run --landed tRun)
+hit  "$out" "keepalive-reaped: attested, unchecked — the lease names no session (the harness exposed none), so the stop-guard never bound this run and recorded no stop of it"
+hit  "$out" "phase LANDED"
+miss "$out" "UNATTENDED check 5"
+remove_landed_fixture; rm -f "$STOP7"
+# ---- AC16 (closing review id 15): a LANDING line the DEAD incarnation wrote does not pass for the
+# ---- new one. The line is stamped now, the lease is then REPLACED one second later by
+# ---- `--resume --keepalive-id` (which writes `lease-utc`), and --landed reads the line as older
+# ---- than the lease: the pre-close refusal, naming the lease it lost to. RED against a driver copy
+# ---- without the `lease-utc` compare: the line passes as `checked` and the record lands.
+build_landed_fixture; rm -f "$STOP7"; STOP_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+printf '%s\n' "{\"utc\":\"$STOP_UTC\",\"phase\":\"LANDING\",\"session_crons\":[]}" > "$STOP7"
+sleep 1
+out=$(run --resume tRun --keepalive-id k2); hit "$out" "lease replaced · keepalive k1 -> k2"
+LEASE_UTC=$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)
+same "AC16 the replaced lease is stamped after the stop line" "$([ "$STOP_UTC" \< "$LEASE_UTC" ] && echo after || echo "not after: $STOP_UTC vs $LEASE_UTC")" "after"
+fixture; git push -q -f origin HEAD:main
+before=$(sum)
+out=$(run --landed tRun)
+hit  "$out" "UNATTENDED check 54 FAILED"
+hit  "$out" "newest stop-guard record $STOP_UTC in phase LANDING, older than the lease taken at $LEASE_UTC"
+miss "$out" "phase LANDED"
+same "AC16 the dead incarnation's line landed nothing" "$(sum)" "$before"
 remove_landed_fixture; rm -f "$STOP7"
 
 # ==================================================================================================
@@ -5539,6 +5593,27 @@ same "AC1 session recorded verbatim" "$(grep -c '^session: abc$' memory/builds/t
 same "AC1 pid recorded verbatim" "$(grep -c '^pid: 4242$' memory/builds/tRun/RUN.md)" "1"
 same "AC1 the moved keepalive line still lands" "$(grep -c '^keepalive: k1$' memory/builds/tRun/RUN.md)" "1"
 miss "$out" "NOTE - this harness exposes no"
+# AC10 (closing review ids 2 and 15) — the three DERIVED facts ride beside the pid: `host` is this
+# node's name as `read_host_name` spells it; `pid-image` is `absent` for 4242, a pid nothing holds;
+# `lease-utc` is a UTC stamp. Then a lease on the suite's OWN pid records the image `tasklist`
+# reports for it (`ps -o comm=` elsewhere), and a harness exposing no pid records `absent` there.
+same "AC10 host recorded as this node" "$(sed -n 's/^host: //p' memory/builds/tRun/RUN.md)" "$(read_host_name)"
+same "AC10 pid-image absent for a pid nothing holds" "$(grep -c '^pid-image: absent$' memory/builds/tRun/RUN.md)" "1"
+same "AC10 lease-utc is a UTC stamp" "$(grep -cE '^lease-utc: [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) OWN_PID=$(ps -p $$ | awk -v p=$$ 'NR>1 && $1==p {print $4}') ;;
+  *) OWN_PID=$$ ;;
+esac
+n=$((n+1)); [ -n "$OWN_PID" ] || { echo "FAIL fixture: no pid for this shell, so the image arm would probe an empty value and prove nothing"; st=1; }
+CLAUDE_CODE_SESSION_ID=abc CLAUDE_PID=$OWN_PID bash "$SCRIPT" --preflight tRun --keepalive-id k1 >/dev/null 2>&1
+same "AC10 pid-image names the image holding the pid" "$(sed -n 's/^pid-image: //p' memory/builds/tRun/RUN.md)" "$(read_pid_image "$OWN_PID")"
+miss "$(sed -n 's/^pid-image: //p' memory/builds/tRun/RUN.md)" "absent"
+reset_tree
+CLAUDE_CODE_SESSION_ID=abc env -u CLAUDE_PID bash "$SCRIPT" --preflight tRun --keepalive-id k1 >/dev/null 2>&1
+same "AC10 pid-image absent when the harness exposes no pid" "$(grep -c '^pid-image: absent$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+out=$(CLAUDE_CODE_SESSION_ID=abc CLAUDE_PID=4242 bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
 # AC3 — on the record AC1 left, the resumed session replaces the lease: old values read BEFORE the
 # write, the file staged, exit 0. Then the plain form is byte-identical to before and rewrites nothing.
 out=$(CLAUDE_CODE_SESSION_ID=def CLAUDE_PID=9 bash "$SCRIPT" --resume tRun --keepalive-id zzz 2>&1); rc=$?
@@ -5661,6 +5736,19 @@ n=$((n+1)); [ -n "$WPID" ] || { echo "FAIL fixture: no pid for the background sl
 mutate memory/builds/tRun/RUN.md "s/^pid: .*/pid: $WPID/"
 out=$(run --liveness tRun)
 hit "$out" "pid: $WPID"
+hit "$out" "pid-alive: yes"
+# ...AC11 (closing review id 2): the IMAGE decides too. The suite's own sleep leased under a recorded
+# `pid-image: claude.exe` is the recycled-pid shape — some process holds the number and it is not the
+# leased one — and reads `no`; under the image the probe reports for it, `yes`; under `absent`, the
+# pid-only reading. RED against a lib copy whose `check_pid_alive` ignores its second argument.
+mutate memory/builds/tRun/RUN.md 's/^pid-image: .*/pid-image: claude.exe/'
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: no"
+mutate memory/builds/tRun/RUN.md "s/^pid-image: .*/pid-image: $(read_pid_image "$WPID")/"
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: yes"
+mutate memory/builds/tRun/RUN.md 's/^pid-image: .*/pid-image: absent/'
+out=$(run --liveness tRun)
 hit "$out" "pid-alive: yes"
 kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null
 out=$(run --liveness tRun)
@@ -6272,7 +6360,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=973
+FLOOR_ASSERTIONS=1000
+# RAISED 973 -> 1000 by TOOL-aWokenSentinel-5's fold of the closing review: the `--landed`
+# unbound-session and dead-incarnation arms (17), the lease's three derived facts (7) and the
+# pid-image liveness arm (3), all region two, each block measured alone over the sourced prologue
+# on node `a`: unit 7's block n 48 -> 65, unit 1's 54 -> 61, unit 2's 98 -> 101.
 # RAISED 970 -> 973 by TOOL-aWokenSentinel-26: the accepting marker arm's three entry-state
 # assertions (3), region two's lander-marker block, measured by running that block alone over the
 # sourced prologue: n 24 -> 27 on node `a`.
@@ -6345,7 +6437,10 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=777
+FLOOR_SHARD_2=804
+# +27 for TOOL-aWokenSentinel-5's fold of the closing review: the `--landed` unbound-session and
+# dead-incarnation arms (17), the lease's derived facts (7) and the pid-image liveness arm (3),
+# region two beside the `keepalive-reaped`, lease and `--liveness` blocks.
 # +3 for the TOOL-aWokenSentinel-26 entry-state assertions on the accepting marker arm, in region
 # two's lander-marker block below the TOOL-aWokenSentinel-22 pushed control.
 # +9 for the TOOL-aWokenSentinel-22 no-sha and unpushed-commit marker arms with the pushed control,

@@ -186,6 +186,7 @@
       "gate-green-by-accident-on-generated-bytes.md",
       "git-rm-cached-refuses-a-diverged-index-blob.md",
       "grammar-bound-to-the-wrong-root.md",
+      "guard-fed-the-value-it-supersedes.md",
       "heredoc-escape-reaches-the-regex.md",
       "hookspath-resolves-into-another-checkout.md",
       "id-matched-as-a-substring.md",
@@ -227,6 +228,7 @@
       "two-readers-of-one-config-one-re-derived.md",
       "vacuous-selector-empty-population.md",
       "waiver-row-that-hides-nothing-reds.md",
+      "witness-graded-against-a-fact-written-after-it.md",
       "worktree-crlf-outside-the-gated-population.md"
     ],
     "guides": [

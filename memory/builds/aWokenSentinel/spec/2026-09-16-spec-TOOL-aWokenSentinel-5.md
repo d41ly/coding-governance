@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-5 — `resume-tick.sh`, the OS-scheduled out-of-process resumer
 
-**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 11 · ratified 2026-09-16
+**Status:** CLOSED · rev-5 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 11 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
@@ -32,10 +32,12 @@ and on `STALE` kills the recorded pid's tree, appends an attempt line and launch
   `git worktree list --porcelain`. It sources `lib-unattended.sh` beside itself and calls the
   driver beside itself, and it spells no path outside its own directory. Observed by AC1, AC2 and
   AC8.
-- **S2** — Per worktree, for each `<MEMORY_ROOT>/builds/*/RUN.md` whose `session:` fact is
-  present and not `absent`, the tick runs `unattended.sh --liveness <slug>` with that worktree as
-  cwd and decides from its `verdict`, `pid`, `pid-alive` and `last-move` lines. The decision
-  table is section 4. Observed by AC1, AC2, AC3 and AC4.
+- **S2** — Per worktree, for each `<MEMORY_ROOT>/builds/*/RUN.md` IN THE INDEX whose `session:`
+  fact, read off the index blob, is present and not `absent`, the tick runs `unattended.sh
+  --liveness <slug>` with that worktree as cwd and decides from its `verdict`, `stale`, `pid`,
+  `pid-alive` and `last-move` lines; a run-state file on disk and not in the index is announced
+  and skipped, and a lease whose `host:` names another node is skipped before the probe. The
+  decision table is section 4. Observed by AC1, AC2, AC3, AC4, AC14, AC15 and AC16.
 - **S3** — `RESUME_ATTEMPTS` (kit default 6) and `RESUME_TURNS` (kit default 40) are read through
   `read_bound_key`, which this unit HOISTS verbatim from `tools/unattended/unattended.sh` into
   `tools/unattended/lib-unattended.sh` so the tick and the driver read a bound the same way — and
@@ -53,7 +55,10 @@ and on `STALE` kills the recorded pid's tree, appends an attempt line and launch
 - **S5** — On `pid-alive: yes` the tick kills the recorded pid's TREE before launching — and
   only AFTER the login row has answered logged-in, so a kill happens only where a launch will
   follow, which is `TOOL-aWokenSentinel-12`'s order and that unit's arm observes it: `taskkill
-  //PID <pid> //T //F` under MSYS, `kill -- -<pgid>` elsewhere. Observed by AC4.
+  //PID <pid> //T //F` under MSYS, `kill -- -<pgid>` elsewhere. `pid-alive` is `--liveness`'s and
+  from rev-5 matches the lease's recorded image too, so a recycled pid reads `no` and is not
+  killed. A launched pid (S13) still alive after the tree moved is killed beside it. Observed by
+  AC4 and AC13.
 - **S6** — `claude auth status` is consulted before every launch; a CLI that is not logged in is an
   ANNOUNCED skip line and exit 0, never a pass and never a launch. Observed by AC2.
 - **S7** — The launch is DETACHED through a launcher file the tick writes under the sidecar dir:
@@ -77,6 +82,11 @@ and on `STALE` kills the recorded pid's tree, appends an attempt line and launch
 - **S11** — `.unattended.conf` is on the kickoff manifest's `watch:` line, so the same commit
   re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md` with a delta line in the subject.
   Observed by AC6.
+- **S13** — The pid the tick launched is written onto the attempt line as a trailing
+  `launched <pid>` field and read back by the next tick through the library's `check_pid_alive`:
+  alive with the tree unmoved since the line, the run is IN-FLIGHT and skipped; alive with the
+  tree moved since, the resumed session hung and its tree is killed beside the recorded pid's.
+  Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -90,6 +100,12 @@ and on `STALE` kills the recorded pid's tree, appends an attempt line and launch
 - **No liveness of its own.** The tick decides from `--liveness`'s lines and never re-derives
   `stale`, `pid-alive` or the terminal predicate; a second spelling of any of them is the
   two-answers class unit 2 exists to remove. What `--liveness` cannot see, the tick cannot either.
+  The one probe the tick runs itself, on the pid IT launched (S13), is the library's
+  `check_pid_alive` — the same function `--liveness` calls, not a second spelling.
+- **No mandate check beyond the index.** The tick launches only on a lease the INDEX holds
+  (S2), which closes the FILE-WRITE attacker — an `acceptEdits` session, a sub-agent or an
+  injected edit dropping a `RUN.md` under a worktree. An actor who can STAGE is the shell-access
+  case protocol section 9 concedes, and the remote-BASE check stays `--preflight`'s.
 - **No driver verb.** A verb the agent never runs would still owe a header line, a VERBS entry and
   a Skill invocation under check 26, and the driver's preamble refuses a cwd outside a repo, which
   is exactly where a scheduler starts a task. The tick is a sibling script that takes `--repo`.
@@ -172,27 +188,47 @@ and the NOTE names that file. The two knobs are root-scoped: one repo, one pair 
 `git -C "$ROOT" worktree list --porcelain` gives one `worktree <path>` line per tree. Per tree: skip
 with one line when `<path>/.unattended.conf` is absent (a checkout predating the kit); otherwise
 `MEMORY_ROOT` is read by sourcing that conf in a subshell, default `memory`, and every
-`<path>/<MEMORY_ROOT>/builds/*/RUN.md` whose `^session: ` line is present and not `absent` is a
-candidate. That grep is the only read the tick makes of a record directly; everything else is
+`<MEMORY_ROOT>/builds/*/RUN.md` IN THE INDEX whose `session:` fact, read off the index blob by one
+`git -C <tree> grep --cached -H -E '^(session|host): '`, is present and not `absent` is a
+candidate, with its `host:` fact taken from the same read (rev-5). A record `git ls-files --others`
+lists — on disk, not in the index — prints `skip · RUN.md is not tracked, and the tick launches
+only on a lease the index holds` and is never probed: the index is what `stage_or_fail` writes at
+`--preflight` and at `--resume --keepalive-id`, and the working copy is what anything with a file
+handle writes. That read is the only read the tick makes of a record directly; everything else is
 `--liveness`'s. Zero candidates across every tree prints `resume-tick: no bound run in <n>
 worktree(s)` and exits 0 — an announced nothing, never a silent one.
 
-Per candidate, with cwd set to the worktree so the driver reads that tree's conf:
+Per candidate, first the node: a `host:` fact naming a node other than `read_host_name`'s answer
+prints `skip · leased on <host>, not this node <me>` and nothing is probed, killed or launched —
+its pid is a number in another process table; `absent` or no fact at all is judged as before.
+Then, with cwd set to the worktree so the driver reads that tree's conf:
 `bash "$DRIVER" --liveness <slug>`. A non-zero exit — unit 2's `fail 52` dead-probe refusal
-included — prints `resume-tick: <slug> · liveness probe failed: <its first line>` and skips: a run
-whose liveness cannot be measured is never resumed, because the alternative reads a dead probe as a
-verdict. The four values are read off the `key: value` lines by `sed -n 's/^verdict: //p'` and its
+included — prints `resume-tick: <slug> · liveness probe failed: <line>` and skips, where `<line>`
+is the driver's `UNATTENDED check` sentence when one printed, else the first line that is not a
+`unattended: NOTE`, else the first line (rev-5: the driver NOTEs every undeclared bound on stderr
+at source time, so an adopter on a kit default logged the NOTE instead of the check): a run whose
+liveness cannot be measured is never resumed, because the alternative reads a dead probe as a
+verdict. The five values are read off the `key: value` lines by `sed -n 's/^verdict: //p'` and its
 siblings.
 
 ### The decision, per run
 
 | `verdict` | attempts | `pid-alive` | login | act |
 |---|---|---|---|---|
-| not `STALE` | — | — | — | `skip · verdict <V>` |
+| — (RUN.md not in the index) | — | — | — | `skip · RUN.md is not tracked, and the tick launches only on a lease the index holds` |
+| — (`host:` names another node) | — | — | — | `skip · leased on <host>, not this node <me>` |
+| not `STALE`, and not `FINISHED-UNSTAMPED` with `stale: yes` | — | — | — | `skip · verdict <V>` |
 | `STALE` | `RESUME_ATTEMPTS` or more since the last move | — | — | `skip · ATTEMPTS EXHAUSTED · last <utc> · out <path>` |
+| `STALE` | newest line's `launched <pid>` alive AND the line newer than the last move | — | — | `skip · IN-FLIGHT · launched <pid> alive since <utc>` |
 | `STALE` | under the cap | any | not logged in | `SKIP — the CLI is not logged in on this node; nothing can resume <slug>` — nothing killed, nothing written |
-| `STALE` | under the cap | `yes` | logged in | kill the tree, then the row below |
+| `STALE` | under the cap | `yes` | logged in | kill the tree — the recorded pid's, and a launched pid still alive after the tree moved — then the row below |
 | `STALE` | under the cap | any | logged in | append the attempt line, launch detached, `resumed · attempt <n> · out <path>` |
+
+`STALE` in the rows below the first three reads as "`STALE`, or `FINISHED-UNSTAMPED` with
+`stale: yes`" (rev-5): a session that dies between the lander's push and `--landed` outranks
+`STALE` in `--liveness`'s verdict order and nothing else stamps it — the B1 wedge for a dead
+session, which unit 8 covered for the live one — and the payload's "continue from the phase the
+run-state file names" is `--landed` there.
 
 The login row precedes the kill row, and the order is the point: a kill is useful only where a
 launch will follow, so the probe that decides whether one can happen runs first, and a logged-out
@@ -203,15 +239,19 @@ Every act prints exactly one line, `resume-tick: <slug> · <worktree> · <act>`,
 prints the line it WOULD act on with ` (dry-run)` appended and does nothing else — no kill, no
 attempt line, no launch, no login probe.
 
-There is no in-flight guard, and the reason is measured rather than assumed. A resumed session
-writes its transcript on its first turn, and the transcript is one of `--liveness`'s four signals,
-so the next tick reads `LIVE` and skips; a launch that never produced a turn — a withdrawn flag, a
-lockout — leaves the tree unmoved, the next tick launches again, and the cap ends it. The one
-window left is a resumer throttled before its first turn while the next tick fires, and the
-research measured that harm as duplicated work rather than a corrupted record. `ponytail:` no
-in-flight guard; add one keyed on the newest `.out` file's age if two `.out` files ever overlap
-in a sidecar. The tick reads no `RESUME_STALE_BOUND`: that is `--liveness`'s number, and a second
-reader of it in the tick would be a second copy of its default.
+The in-flight guard is the LAUNCHED PID (S13, rev-5; rev-4 had none and reasoned only about a
+launch that produced no turn). `run_detached` writes the pid it started to a file — `Start-Process
+-PassThru`'s `.Id` under MSYS, `$!` elsewhere — never through `$( )`, and the tick appends
+` launched <pid>` to the attempt line it wrote before the launch. `derive_attempts` reads it back
+from the newest line: alive with that line NEWER than the run's last move, the resumer has not
+produced its first turn — throttled, or still starting — and a second launch would put two
+skip-permissions agents on one tree, so the tick prints the IN-FLIGHT skip; alive with the line
+OLDER than the last move, the resumed session ran, moved the tree and hung, which is the case the
+tree kill exists for, so it joins the kill and the run is relaunched. A resumed session that ran
+`--resume --keepalive-id` is the recorded pid and takes the ordinary row. `ponytail:` the launched
+pid is the launcher shell and the CLI is its child, so the tree kill reaches it; record the child
+if a launcher ever exits while its child lives. The tick reads no `RESUME_STALE_BOUND`: that is
+`--liveness`'s number, and a second reader of it in the tick would be a second copy of its default.
 
 ### Attempts (S4)
 
@@ -223,8 +263,12 @@ One space-separated line per launch, appended before the launch so a tick that d
 still counts:
 
 ```
-<utc> attempt <n> session <sid> pid <pid> pid-alive <yes|no|unknown> out <out-path>
+<utc> attempt <n> session <sid> pid <pid> pid-alive <yes|no|unknown> out <out-path>[ launched <pid>]
 ```
+
+The `launched` field is appended AFTER the launch by `sed -i` on the last line, because the pid
+exists only then; a tick that dies between the two leaves a line without it, which the next tick
+reads as it read every line before rev-5. `out` is cut at ` launched ` wherever the line is parsed.
 
 The count against the cap is the number of lines whose `<utc>` is newer than the run's last move,
 where the last-move instant is `now - last-move` from the `--liveness` line, so a resume that
@@ -234,6 +278,15 @@ owner reading the sidecar sees both. `ponytail:` a transcript-only move resets t
 `RESUME_TURNS` and unit 3's block cap bound; count commits alone if that proves too generous.
 
 ### The tree kill (S5)
+
+The kill is aimed at the recorded PROCESS, not the number (rev-5): `write_lease` records `host`,
+`pid-image` and `lease-utc` beside `pid` (unit 1), the library's `check_pid_alive <pid> [image]`
+reads `no` when something holds the pid and the recorded image does not match it (unit 2), and
+`--liveness` passes the record's `pid-image` to it — so a pid a reboot recycled to the owner's next
+process is `pid-alive: no` here and never killed. An image of `absent`, or none, is the pid-only
+reading a pre-rev-5 lease always had. `read_host_name`, `read_pid_image` and `check_pid_alive` live
+in `lib-unattended.sh`, moved there from the driver, because the driver writes the facts, `--liveness`
+probes the recorded pid and the tick probes the launched one, and a spelling in each is two answers.
 
 Under `uname -s` matching `MINGW*|MSYS*|CYGWIN*`: `taskkill //PID "$pid" //T //F`. Measured on node
 `a` 2026-09-16: a bash-started `ping` child, killed by its Windows pid this way, is gone from
@@ -342,6 +395,7 @@ in the protocol's section 8 table on `UNIT_STALL_BOUND`'s terms.
 |---|---|---|
 | `resume-tick.sh` | kit file | no cell |
 | `run_tick`, `scan_worktrees`, `read_liveness`, `check_login`, `run_kill_tree`, `run_detached`, `print_decision`, `derive_attempts` | function | `sh.function`, each leading with a declared verb; `python tools/lexicon/lexicon.py --suggest <name> --as sh.function` answers OK for each |
+| `read_host_name`, `read_pid_image`, `check_pid_alive` | function, in `lib-unattended.sh` (rev-5; the last MOVED from the driver) | `sh.function`, `--suggest` answers OK for each |
 | `resume.<slug>.log`, `resume.<slug>.<utc>.sh`, `resume.<slug>.<utc>.out` | sidecar files | no cell |
 | `RESUME_ATTEMPTS`, `RESUME_TURNS` | conf keys | no cell, conf is dark |
 | `gov-resume-tick` | task name | no cell |
@@ -354,7 +408,7 @@ in the protocol's section 8 table on `UNIT_STALL_BOUND`'s terms.
 |---|---|
 | `tools/unattended/resume-tick.sh` | new |
 | `tools/unattended/resume-tick.test.sh` | new |
-| `tools/unattended/lib-unattended.sh` | `read_bound_key` moved in, verbatim with its header comment |
+| `tools/unattended/lib-unattended.sh` | `read_bound_key` moved in, verbatim with its header comment; rev-5: `read_host_name`, `read_pid_image`, `check_pid_alive` |
 | `tools/unattended/unattended.sh` | `read_bound_key` definition removed; the `--status` field |
 | `tools/unattended/unattended.test.sh` | the `--status` field arm, region two |
 | `tools/unattended/adopt-unattended.sh` | the INFO line |
@@ -378,8 +432,11 @@ in the protocol's section 8 table on `UNIT_STALL_BOUND`'s terms.
 ## 5. Production-readiness checklist
 
 - security — the tick launches `claude` with `--dangerously-skip-permissions` under the owner's
-  own login, on a session id read from a tracked record; a forged `session:` fact can only resume
-  a session the owner's CLI can already open. The payload is a fixed string plus the slug and a
+  own login, on a session id read from the INDEX blob of a tracked record (rev-5; rev-4 read the
+  working copy of any file the glob found, so one file write bought a skip-permissions session
+  ninety minutes later — closing review id 1, the blocker); a forged `session:` fact staged by an
+  actor with shell access can only resume a session the owner's CLI can already open, and that
+  actor is protocol section 9's concession. The payload is a fixed string plus the slug and a
   derived path; no record text is interpolated into it.
 - perf / scale — one `git worktree list`, one grep per record, one driver run per bound record,
   every ten minutes; seconds. The launch is detached, so the task's own wall is the tick's.
@@ -508,13 +565,49 @@ and a stub `claude` first on `PATH` that writes its argv and its own pid to `stu
   adopters because `project-owned` does not name it.
   figure: 983 and 6 are DERIVED from `.lexicon.conf` at observation and PINNED here as read on
   2026-09-16.
-- **AC12** — When the fixture's driver is shadowed by a stub that exits 1 on `--liveness`, the
-  tick prints `liveness probe failed:` with the stub's first line, launches nothing and writes no
-  attempt line; and when the fixture gains a second worktree by `git worktree add` with no
-  `.unattended.conf` in it, the tick prints one skip line naming that tree and still prints its
+- **AC12** — When the fixture's driver is shadowed by a stub that prints a `unattended: NOTE`
+  line on stderr and then exits 1 on `--liveness` with an `UNATTENDED check 52 FAILED` line, the
+  tick prints `liveness probe failed:` with the CHECK line and not the NOTE, launches nothing and
+  writes no attempt line; and when the fixture gains a second worktree by `git worktree add` with
+  no `.unattended.conf` in it, the tick prints one skip line naming that tree and still prints its
   decision line for the first tree's run.
   Red when: a dead probe is read as a verdict and launches, which is the alternative §4 refuses;
-  or a conf-less tree ends the walk early, which is a skip that skips everything after it.
+  the diagnostic is the NOTE, which is rev-4's first-merged-line read; or a conf-less tree ends the
+  walk early, which is a skip that skips everything after it.
+- **AC13** — When AC1's launch has returned, the sidecar line ends `launched <pid>` with `<pid>`
+  alive by `check_pid_alive`, and a second tick over the unmoved fixture prints one line ending
+  `skip · IN-FLIGHT · launched <pid> alive since <utc>`, invokes nothing and writes no second
+  line; and when the sidecar is seeded with one line stamped two hours ago carrying
+  `launched <the WINPID of the arm's own sleep 300>`, the tick prints `resumed · attempt 2`, and
+  `tasklist //FI "PID eq <pid>"` afterwards prints its `No tasks are running` line.
+  Red when: the line carries no launched pid, which means the launch reported none; a second tick
+  launches attempt 2 while the first is alive, which is rev-4's duplicate; or the sleep survives,
+  which means a hung resumed session is never killed.
+- **AC14** — When the fixture's tracked record reads `session: absent` and an UNTRACKED
+  `memory/builds/tDrop/RUN.md` carrying a live session id and an hour-old mtime is dropped beside
+  it, the tick prints exactly one line, `tDrop · <fixture> · skip · RUN.md is not tracked, and the
+  tick launches only on a lease the index holds`, invokes nothing and writes no attempt line and no
+  launcher; after `git add` of that record the same tick prints `tDrop · … · resumed · attempt 1`;
+  and when the tracked `tRun` record's `session:` is rewritten ON DISK to a second id (mtime an
+  hour old) the launcher carries the index's id and not the disk's.
+  Red when: the untracked drop launches, which is rev-4's filesystem glob and the closing review's
+  blocker; the staged record is skipped, which means the index read fails; or the launcher carries
+  the working copy's id, which means the fact was read off the disk after all.
+- **AC15** — When the fixture's record carries `pid: <the WINPID of the arm's own sleep>` and
+  `host: some-other-node`, committed an hour old, the tick prints `skip · leased on
+  some-other-node, not this node <read_host_name>`, exits 0, the sleep is still listed by
+  `tasklist` afterwards, the stub saw nothing and no attempt line exists; with `host:` rewritten to
+  this node's own name the same fixture prints `resumed · attempt 1` under `--dry-run`.
+  Red when: the foreign lease is probed, killed or launched, which is a pid aimed at another node's
+  process table; or this node's own name is refused, which means the writer and the reader spell
+  the host differently.
+- **AC16** — When the fixture's record is at `LANDING` with `witness: <the first commit's sha>`,
+  committed an hour old with `GOV_DEFAULT_BRANCH=main` in the tick's environment, the driver reads
+  `verdict: FINISHED-UNSTAMPED` and the tick prints `resumed · attempt 1`, writes the attempt line
+  and the launcher; with a gate log touched five minutes ahead the same record prints `skip ·
+  verdict FINISHED-UNSTAMPED`.
+  Red when: the dead LANDING run is skipped by verdict, which is rev-4 and leaves the record
+  unstamped forever; or a live one is resumed, which is `stale` ignored.
 
 ## 7. Gates
 
@@ -526,9 +619,10 @@ invocations section 6 names over a scratch repo, `python tools/lexicon/lexicon.p
 the join this unit moves.
 
 New arm: `tools/unattended/resume-tick.test.sh` · every decision of section 4's table staged by
-fixture — AC1 to AC4, AC7, AC8 and the two announced skips of AC12 — each observed red against the tick with the graded line
-commented out before the arm is trusted · a `FLOOR_ASSERTIONS` pin authored from the executed
-count of the first green run, the shape `gate-guard.test.sh` carries.
+fixture — AC1 to AC4, AC7, AC8, the two announced skips of AC12, and from rev-5 AC13 to AC16 —
+each observed red against the tick with the graded line commented out before the arm is trusted ·
+a `FLOOR_ASSERTIONS` pin authored from the executed count of the first green run, the shape
+`gate-guard.test.sh` carries.
 
 New arm: `tools/unattended/unattended.test.sh` · the `--status` field with and without the sidecar,
 AC9, region two beside the `--status` arms · the suite's executed-assertion floors rise by this
@@ -561,6 +655,20 @@ arm's assertions, read off the floor-breach line with the floor over-pinned.
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-21 · S2 · S5 · S13 · §3 · §4 · §5 · AC12 · AC13 · AC14 · AC15 · AC16 · §7 ·
+  folded the closing diff review round 1
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md`), ids 1, 2, 3, 5 and
+  16: id 1 (BLOCKER) — the tick globbed `RUN.md` off the worktree and honoured an untracked lease,
+  so the walk reads `session:` and `host:` off the INDEX blob, announces an untracked record and
+  launches nothing (S2, AC14; §3 names the file-write attacker closed and the staging attacker as
+  section 9's concession); id 2 (HIGH) — the kill was aimed at a pid, so `--liveness` passes the
+  lease's `pid-image` to the library's `check_pid_alive` and the tick stands off a foreign
+  `host:` (S5, AC15; the facts are unit 1's rev-5, the match unit 2's rev-5, the reboot case unit
+  12's record); id 3 — the launched pid rides on the attempt line and the next tick reads it back
+  as in-flight or hung (S13, AC13; class `guard-fed-the-value-it-supersedes`); id 5 —
+  `FINISHED-UNSTAMPED` with `stale: yes` acts (§4 table, AC16; spec 8 §3 points here for the dead
+  half); id 16 — the dead-probe line is the driver's check sentence, never a NOTE (§4, AC12).
+  Status unchanged, CLOSED.
 - rev-4 · 2026-09-20 · §4 · the build pass: the launcher and `.out` file names carry the
   basic-format UTC stamp (no colons), because NTFS refuses `:` in a name and the launcher's path
   crosses into PowerShell; the attempt line's stamp is unchanged. Status CLOSED. Two readings

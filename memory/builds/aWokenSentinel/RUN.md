@@ -219,3 +219,11 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-21T00:43:55Z brief · item TOOL-aWokenSentinel-28 · reason 1c2c84db67eb memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-28-1-build-brief.md
 
 2026-09-21T01:33:35Z review · item aWokenSentinel · reason verdict BLOCKED · blockers 1
+
+2026-09-21T01:46:11Z dispatch · item 02648948 TOOL-aWokenSentinel-5 · reason tools/unattended/resume-tick.sh tools/unattended/resume-tick.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/README.md memory/gotchas/guard-fed-the-value-it-supersedes.md memory/gotchas/witness-graded-against-a-fact-written-after-it.md memory/gotchas/destructive-step-before-its-precondition.md memory/gotchas/INDEX.md memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-1.md memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-7.md memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-8.md memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-12.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-1-1-acceptance-ledger.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-2-1-acceptance-ledger.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-5-1-acceptance-ledger.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-7-1-acceptance-ledger.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-12-1-acceptance-ledger.md
+
+2026-09-21T01:46:16Z brief · item TOOL-aWokenSentinel-5 · reason cbd5839bfab4 memory/builds/aWokenSentinel/prompts/2026-09-21-prompt-TOOL-aWokenSentinel-5-2-fold-brief.md
+
+2026-09-21T02:29:59Z dispatch · item 02648948 TOOL-aWokenSentinel-5 · reason memory/map/features/unattended.md memory/map/generated/MAP.md memory/map/generated/inventories.json
+
+2026-09-21T02:32:30Z dispatch · item 02648948 TOOL-aWokenSentinel-5 · reason memory/builds/aWokenSentinel/README.md

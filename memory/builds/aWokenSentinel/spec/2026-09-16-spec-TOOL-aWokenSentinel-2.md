@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares
 
-**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -57,8 +57,9 @@ themselves. Tier 2: a new verb is a change to the kit's contract.
   declared value below that sum is announced on stderr, because under it the driver's own bar
   reads dead. Observed by AC6.
 - **S6** — `pid-alive` is `yes`, `no` or `unknown`, probed by `tasklist` under MSYS and `kill -0`
-  elsewhere, `unknown` when the fact is `absent`, non-numeric, or the probe tool is missing.
-  Observed by AC4.
+  elsewhere, `unknown` when the fact is `absent`, non-numeric, or the probe tool is missing; from
+  rev-5 `no` also when something holds the pid and the record's `pid-image` (unit 1) does not
+  match it, `absent` or no image matching anything. Observed by AC4 and AC11.
 - **S7** — `last-stall` is the last line of `<git-dir>/unattended/stall.<slug>.log` when that
   file exists, else `none`; this unit only READS it. Observed by AC7.
 - **S8** — Two refusals under one new `fail` number, each with an arm: no run-state file; a clock
@@ -217,8 +218,14 @@ is also the fixture's seam: the arms point it at a scratch directory rather than
 
 ### pid-alive (S6)
 
-`check_pid_alive <pid>` prints `yes`, `no` or `unknown`. `absent` or a value with a non-digit is
-`unknown`. Under `uname -s` matching `MINGW*|MSYS*|CYGWIN*`: `tasklist //FI "PID eq <pid>" //NH`,
+`check_pid_alive <pid> [image]` prints `yes`, `no` or `unknown`; from rev-5 it lives in
+`lib-unattended.sh` over `read_pid_image`, which prints the image holding a pid and returns 0 held,
+1 nobody, 2 the probe answered nothing — the driver's `write_lease` records the image through it,
+`--liveness` passes the record's `pid-image` fact here, and the resume tick probes the pid it
+launched through the same function. A recorded image that is not the one holding the pid is `no`:
+a reboot recycles the number, and a tree kill aimed at it lands on the owner's next process
+(closing review id 2). `absent`, or none, matches anything — the pid-only reading every earlier
+lease had. `absent` or a value with a non-digit is `unknown`. Under `uname -s` matching `MINGW*|MSYS*|CYGWIN*`: `tasklist //FI "PID eq <pid>" //NH`,
 `unknown` when `tasklist` is not on `PATH` or exits non-zero — a tool that answered nothing is not a
 `no` — and otherwise `yes` when its output carries ` <pid> ` as a whole field, `no` when it does not.
 Elsewhere: `kill -0 <pid>` exit 0 is `yes`, else `no`. Measured on node `a` on
@@ -308,7 +315,7 @@ at base — the sixth and seventh positionals' precedent. The unit's arms, in a 
 | `print_liveness` | shell function | `sh.function`, verb `print` |
 | `read_tree_clocks` | shell function | `sh.function`, verb `read` |
 | `resolve_transcript_path` | shell function | `sh.function`, verb `resolve` |
-| `check_pid_alive` | shell function | `sh.function`, verb `check` |
+| `check_pid_alive` | shell function, in `lib-unattended.sh` from rev-5 (moved from the driver), beside `read_pid_image` | `sh.function`, verb `check` |
 | `resolve_sidecar_dir` | shell function | `sh.function`, verb `resolve` |
 | `RESUME_STALE_BOUND` | conf key | `read_bound_key`; not a naming cell |
 | `TC_NOW`, `TC_LASTC`, `TC_LASTW`, `TC_DEAD` | shell globals | the driver's upper-case convention for shared state |
@@ -425,6 +432,11 @@ graded line removed.
   which is `tasklist`'s exit code trusted over its output; or `absent` is probed.
   fixture: the arm's own `sleep`, killed by the arm; `ps` with a `WINPID` column, measured present
   in this node's Git Bash on 2026-09-16.
+- **AC11** — When, on AC4's live-sleep fixture, `pid-image:` is rewritten to `claude.exe`, the
+  verb prints `pid-alive: no`; rewritten to what `read_pid_image` prints for that pid, `yes`; and
+  rewritten to `absent`, `yes`.
+  Red when: the mismatch reads `yes`, which is the image ignored and the recycled-pid kill left
+  open; or `absent` reads `no`, which reds every lease written before the image existed.
 - **AC5** — When the fixture conf carries `RESUME_STALE_BOUND=60` through `mkconf`'s eighth
   positional, the fixture commit is an hour old by `GIT_COMMITTER_DATE`, the tree is clean, the
   fixture git dir holds no `gate-logs` directory and `CLAUDE_CONFIG_DIR` points at an empty
@@ -525,6 +537,12 @@ none
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-21 · S6 · §4 · AC11 · inventory · folded the closing diff review round 1
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md`), id 2 (HIGH): `pid-alive: yes` proved
+  that SOME process held the pid, and the tick's tree kill then ran on whatever that was after a
+  reboot recycled the number. `check_pid_alive` takes the lease's recorded image (unit 1's rev-5)
+  and prints `no` on a mismatch; it moved to the library with `read_pid_image` because the writer,
+  this verb and the tick's launched-pid probe are three callers. Status unchanged, CLOSED.
 - rev-4 · 2026-09-20 · §4 fixture 6 · AC10 · the build pass, before its code: the arm's transcript
   root moved from `$TMP/cfg` to `$ORIGIN_DIR/cfg`, because `$TMP` is the fixture's work tree and a
   directory under it is an untracked write that ties the transcript's mtime and wins the source

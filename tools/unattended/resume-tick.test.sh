@@ -55,6 +55,11 @@ build_tick_without_conf_block() {
 KIT="$TMP/kit"; mkdir -p "$KIT"
 cp "$HERE/resume-tick.sh" "$HERE/lib-unattended.sh" "$HERE/unattended.sh" "$KIT/"
 TICK="$KIT/resume-tick.sh"
+# The library is sourced HERE too, for `check_pid_alive` and `read_host_name`: the arms that grade a
+# launched pid's aliveness and a foreign host read them through the kit's own probe rather than a
+# second spelling of `tasklist` / `kill -0` / `COMPUTERNAME`. It defines functions and nothing else.
+# shellcheck source=lib-unattended.sh
+. "$KIT/lib-unattended.sh"
 SID="11111111-2222-3333-4444-555555555555"
 # THE TRANSCRIPT ROOT is pointed at an empty scratch directory for the whole suite, so the box's
 # real transcripts are never one of `--liveness`'s four signals and `HOME` is untouched.
@@ -276,8 +281,20 @@ check_same "AC1 the sidecar line starts with a UTC stamp" "$(grep -cE "$UTC_RE" 
 check_hit "$(cat "$SIDECAR/resume.tRun.log")" " attempt 1 session $SID pid 999999999 pid-alive no out $SIDECAR/resume.tRun." "AC1 the sidecar line's fields"
 check_same "AC1 the launcher exists beside the log" "$(ls "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "1"
 check_same "AC1 the launcher records the argv" "$(grep -c -- '--dangerously-skip-permissions --max-turns 40' "$SIDECAR"/resume.tRun.*.sh)" "1"
-OUT_PATH=$(sed -n 's/.* out //p' "$SIDECAR/resume.tRun.log" | head -n 1)
+OUT_PATH=$(sed -n 's/.* out //p' "$SIDECAR/resume.tRun.log" | head -n 1); OUT_PATH=${OUT_PATH%% launched *}
 check_same "AC1 the .out the line names is the one the launcher writes" "$(grep -c -- ">$OUT_PATH" "$SIDECAR"/resume.tRun.*.sh)" "1"
+# ...AC13, the LAUNCHED PID (closing review id 3): the line ends `launched <pid>` and that pid is
+# alive — the launcher shell, whose child is the stub still sleeping — so a second STALE tick with
+# the tree unmoved is the announced IN-FLIGHT skip, one line, no second launch, no second attempt
+# line. RED against a tick copy with the in-flight branch removed: attempt 2 launches, two lines.
+LAUNCHED=$(sed -n 's/.* launched //p' "$SIDECAR/resume.tRun.log" | head -n 1)
+check_same "AC13 the attempt line carries the launched pid" "$(printf '%s' "$LAUNCHED" | grep -cE '^[0-9]+$')" "1"
+check_same "AC13 the launched pid is alive after the tick returned" "$(check_pid_alive "$LAUNCHED")" "yes"
+run_tick_over "$TICK"
+check_same "AC13 a second STALE tick exits 0" "$RC" "0"
+check_hit "$OUT" "resume-tick: tRun · $FX · skip · IN-FLIGHT · launched $LAUNCHED alive since " "AC13 the second tick reads the launch as in flight"
+check_same "AC13 the second tick launched nothing" "$(grep -c 'argv -p' "$STUB_LOG")" "1"
+check_same "AC13 the second tick wrote no attempt line" "$(grep -c '' "$SIDECAR/resume.tRun.log")" "1"
 
 # ---- AC3: the cap is CONSECUTIVE, not lifetime. Six lines newer than the last move (the hour-old
 # ---- commit) exhaust it and invoke nothing; six lines OLDER than it launch attempt 7, because a
@@ -339,16 +356,127 @@ else
 fi
 kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
 
+# ---- AC13, the HUNG half (closing review id 3): the newest attempt line is OLDER than the run's
+# ---- last move and its launched pid is alive — a resumed session that ran, moved the tree, then
+# ---- hung — so the tick kills that pid's tree beside the recorded pid's and launches attempt 2.
+# ---- RED against a tick copy without the launched-pid kill: the sleep survives.
+sleep 300 & SLEEP_PID=$!
+WPID=$(derive_winpid "$SLEEP_PID")
+if [ -n "$WPID" ]; then
+  build_fixture 999999999; seed_log 1 "$OLD_UTC"
+  sed -i "\$ s/\$/ launched $WPID/" "$SIDECAR/resume.tRun.log"
+  run_tick_over "$TICK"
+  check_hit "$OUT" "· resumed · attempt 2 · out " "AC13 a hung launched session is relaunched"
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the hung launched pid is gone from tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'No tasks are running')" "1" ;;
+    *) check_same "AC13 the hung launched pid is gone" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "gone" ;;
+  esac
+else
+  print_bad "AC13 fixture: no pid for the background sleep, so the hung-launcher arm would probe an empty value and prove nothing"
+fi
+kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
+
+# ---- AC14 (closing review id 1, the BLOCKER): an UNTRACKED RUN.md carrying a live session id in
+# ---- a tree older than the bound is announced and SKIPPED — no liveness probe, no attempt line,
+# ---- no launcher, nothing invoked — and `git add` of the same file makes the same tick launch.
+# ---- The lease is read from the INDEX blob, so the working copy's bytes decide nothing: with the
+# ---- tracked record's session rewritten on disk to a second id, the launch still names the index's.
+# ---- RED against a tick copy globbing the filesystem: the untracked drop launches.
+build_fixture 999999999 absent
+mkdir -p "$FX/memory/builds/tDrop"
+printf -- '---\nslug: tDrop\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tDrop-1\n---\n\n# tDrop\n' > "$FX/memory/builds/tDrop/README.md"
+printf '# tDrop — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: 999999999\n\n## Parked\n' "$SID" > "$FX/memory/builds/tDrop/RUN.md"
+touch -d '-1 hour' "$FX/memory/builds/tDrop/README.md" "$FX/memory/builds/tDrop/RUN.md"
+run_tick_over "$TICK"
+check_same "AC14 an untracked record exits 0" "$RC" "0"
+check_hit "$OUT" "resume-tick: tDrop · $FX · skip · RUN.md is not tracked, and the tick launches only on a lease the index holds" "AC14 the untracked record is announced and skipped"
+check_same "AC14 the untracked record invokes nothing" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
+check_same "AC14 the untracked record writes no attempt line and no launcher" "$([ -s "$SIDECAR/resume.tDrop.log" ] && echo written || echo none) · $(ls "$SIDECAR"/resume.tDrop.*.sh 2>/dev/null | grep -c '')" "none · 0"
+check_same "AC14 one line, the skip, and no bound-run line for the tracked absent record" "$(printf '%s\n' "$OUT" | grep -c '')" "1"
+( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add memory/builds/tDrop )
+run_tick_over "$TICK"
+check_hit "$OUT" "resume-tick: tDrop · $FX · resumed · attempt 1 · out " "AC14 the same record staged is launched by the same tick"
+check_same "AC14 the staged record's line landed" "$(grep -c ' attempt 1 session ' "$SIDECAR/resume.tDrop.log")" "1"
+# ...the index blob, not the working copy: a session id rewritten ON DISK after staging is not the
+# one launched. The launcher names the index's; the tree's newest write is the edit, so the sidecar
+# and tree are rebuilt old first.
+build_fixture 999999999
+sed -i "s/^session: .*/session: 99999999-aaaa-bbbb-cccc-dddddddddddd/" "$FX/memory/builds/tRun/RUN.md"
+touch -d '-1 hour' "$FX/memory/builds/tRun/RUN.md"
+run_tick_over "$TICK"
+check_hit "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1 · out " "AC14 a tracked record with a rewritten working copy still resumes"
+check_same "AC14 the launched session is the INDEX's, not the working copy's" "$(grep -c -- "--resume $SID " "$SIDECAR"/resume.tRun.*.sh)" "1"
+check_same "AC14 the working copy's id reached no launcher" "$(grep -c -- '99999999-aaaa' "$SIDECAR"/resume.tRun.*.sh)" "0"
+
+# ---- AC15 (closing review id 2): a lease whose `host:` names ANOTHER node is skipped by name — no
+# ---- probe, no kill, no launch — with a live recorded pid still listed afterwards; the tick's own
+# ---- node's name, `read_host_name`, is the one it recognises. RED against a tick copy without the
+# ---- host row: the sleep is gone and attempt 1 launches.
+sleep 300 & SLEEP_PID=$!
+WPID=$(derive_winpid "$SLEEP_PID")
+if [ -n "$WPID" ]; then
+  build_fixture "$WPID"
+  sed -i "s/^pid: .*/pid: $WPID\nhost: some-other-node/" "$FX/memory/builds/tRun/RUN.md"
+  touch -d '-1 hour' "$FX/memory/builds/tRun/RUN.md"
+  ( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+      && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m host )
+  run_tick_over "$TICK"
+  check_same "AC15 a foreign host exits 0" "$RC" "0"
+  check_hit "$OUT" "resume-tick: tRun · $FX · skip · leased on some-other-node, not this node $(read_host_name)" "AC15 the foreign lease is skipped naming both nodes"
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) check_same "AC15 the foreign lease's pid is still listed by tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'sleep.exe')" "1" ;;
+    *) check_same "AC15 the foreign lease's pid is still alive" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "alive" ;;
+  esac
+  check_same "AC15 a foreign lease invokes nothing" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
+  check_same "AC15 a foreign lease writes no attempt line" "$([ -e "$SIDECAR/resume.tRun.log" ] && echo written || echo none)" "none"
+  # ...and this node's own name, recorded as the lease writer records it, is walked as before.
+  sed -i "s/^host: .*/host: $(read_host_name)/" "$FX/memory/builds/tRun/RUN.md"
+  touch -d '-1 hour' "$FX/memory/builds/tRun/RUN.md"
+  ( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+      && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m host2 )
+  run_tick_over "$TICK" --dry-run
+  check_hit "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "AC15 this node's own name is walked"
+else
+  print_bad "AC15 fixture: no pid for the background sleep, so the foreign-host arm would probe an empty value and prove nothing"
+fi
+kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
+
+# ---- AC16 (closing review id 5): FINISHED-UNSTAMPED with `stale: yes` ACTS. A record at LANDING
+# ---- whose witness is an ancestor of the default branch, session set, HEAD older than the bound —
+# ---- a session that died between the lander's push and --landed — gets an attempt line and a
+# ---- launcher, where the tip before this fold skipped it as `verdict FINISHED-UNSTAMPED` forever.
+# ---- `GOV_DEFAULT_BRANCH` names the branch for the driver, since the fixture has no remote.
+build_fixture 999999999
+FIRST=$( cd "$FX" && git rev-parse HEAD )
+sed -i "s/^phase: .*/phase: LANDING/; s/^witness: .*/witness: $FIRST/" "$FX/memory/builds/tRun/RUN.md"
+touch -d '-1 hour' "$FX/memory/builds/tRun/RUN.md"
+( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+    && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m landing )
+GOV_DEFAULT_BRANCH=main run_tick_over "$TICK"
+check_same "AC16 a dead LANDING run exits 0" "$RC" "0"
+check_same "AC16 the driver reads it FINISHED-UNSTAMPED" "$( cd "$FX" && GOV_DEFAULT_BRANCH=main bash "$KIT/unattended.sh" --liveness tRun 2>/dev/null | sed -n 's/^verdict: //p')" "FINISHED-UNSTAMPED"
+check_hit "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1 · out " "AC16 a dead LANDING run with its work on main is resumed"
+check_same "AC16 the attempt line landed" "$(grep -c ' attempt 1 session ' "$SIDECAR/resume.tRun.log")" "1"
+check_same "AC16 the launcher exists" "$(ls "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "1"
+# ...and a LANDING record whose HEAD moved within the bound is still `skip · verdict FINISHED-UNSTAMPED`.
+mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/leg.log"; remove_stubs
+GOV_DEFAULT_BRANCH=main run_tick_over "$TICK"
+check_hit "$OUT" "resume-tick: tRun · $FX · skip · verdict FINISHED-UNSTAMPED" "AC16 a live FINISHED-UNSTAMPED record is still skipped"
+
 # ---- AC12: the two announced skips of the walk. A driver whose --liveness exits non-zero is a dead
 # ---- probe: the run is skipped naming its first line, nothing launches, no line is written. A
 # ---- second worktree with no conf is skipped by name while the first tree's run still gets its
 # ---- decision line.
 KIT2="$TMP/kit2"; mkdir -p "$KIT2"; cp "$TICK" "$KIT/lib-unattended.sh" "$KIT2/"
-printf '#!/bin/sh\necho "UNATTENDED check 52 FAILED — the liveness cannot be measured on this node (stubbed)"\nexit 1\n' > "$KIT2/unattended.sh"
+# The stub NOTEs on stderr BEFORE it refuses, as the real driver does for every undeclared bound at
+# source time: the tick's line must name check 52 and not the NOTE (closing review id 16). RED
+# against a tick taking the first merged line.
+printf '#!/bin/sh\necho "unattended: NOTE - this project declares no GATE_BOUND, so a declared command is bounded at the kit default (stubbed)" >&2\necho "UNATTENDED check 52 FAILED — the liveness cannot be measured on this node (stubbed)"\nexit 1\n' > "$KIT2/unattended.sh"
 build_fixture 999999999
 run_tick_over "$KIT2/resume-tick.sh"
 check_same "AC12 a dead probe exits 0" "$RC" "0"
-check_hit "$OUT" "resume-tick: tRun · $FX · liveness probe failed: UNATTENDED check 52 FAILED — the liveness cannot be measured on this node (stubbed)" "AC12 the dead probe is announced with its first line"
+check_hit "$OUT" "resume-tick: tRun · $FX · liveness probe failed: UNATTENDED check 52 FAILED — the liveness cannot be measured on this node (stubbed)" "AC12 the dead probe is announced with its check line, not the NOTE before it"
+check_miss "$OUT" "declares no GATE_BOUND" "AC12 the stub's NOTE is not the diagnostic"
 check_same "AC12 a dead probe launches nothing" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
 check_same "AC12 a dead probe writes no line" "$([ -s "$SIDECAR/resume.tRun.log" ] && echo written || echo none)" "none"
 build_fixture 999999999
@@ -419,6 +547,9 @@ mkdir -p "$WT4/mem2/builds/tWt"
 printf -- '---\nslug: tWt\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tWt-1\n---\n\n# tWt\n' > "$WT4/mem2/builds/tWt/README.md"
 printf '# tWt — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: 999999999\n\n## Parked\n' "$SID" > "$WT4/mem2/builds/tWt/RUN.md"
 touch -d '-1 hour' "$WT4/.unattended.conf" "$WT4/mem2/builds/tWt/README.md" "$WT4/mem2/builds/tWt/RUN.md"
+# STAGED, because the tick reads a lease from the index and announces an untracked record without
+# probing it (AC14); staging leaves the mtimes alone, so the tree still reads an hour old.
+( cd "$WT4" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add mem2 )
 SIDECAR4="$( cd "$WT4" && git rev-parse --absolute-git-dir )/unattended"
 seed_log 2 "$NOW_UTC" tWt "$SIDECAR4"
 run_tick_over "$TICK"
@@ -475,7 +606,10 @@ n=$((pass+fail))
 # shape assertions per BLOCK copy and each arm gave up its own calls-count line, net +2 per arm.
 # The main loop's first green at VERIFYING confirms the executed count against this floor. Lower
 # it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=97
+# RAISED 97 -> 125 by TOOL-aWokenSentinel-5's fold of the closing review, the blocks again run
+# alone on node a, 2026-09-21: AC1 15 -> 21 (the in-flight half of AC13), AC13's hung half 2,
+# AC14 10, AC15 6, AC16 6, AC12 8 -> 9 — 139 executed, pinned at ~10% headroom.
+FLOOR_ASSERTIONS=125
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

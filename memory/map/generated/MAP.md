@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 107 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 73 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 107 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 75 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -211,6 +211,7 @@ Inventories: gate-legs: 107 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
+| `guard-fed-the-value-it-supersedes.md` | unattended |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
 | `id-matched-as-a-substring.md` | unattended |
@@ -252,6 +253,7 @@ Inventories: gate-legs: 107 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `two-readers-of-one-config-one-re-derived.md` | unattended |
 | `vacuous-selector-empty-population.md` | baseline |
 | `waiver-row-that-hides-nothing-reds.md` | memory-tree-hygiene |
+| `witness-graded-against-a-fact-written-after-it.md` | unattended |
 | `worktree-crlf-outside-the-gated-population.md` | run-gates |
 
 ## guides

@@ -20,3 +20,13 @@ which run once at the close.
 - AC4 — `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` (a range touching `resume-tick.sh`) printed `- [ ] destructive-step-before-its-precondition` under `8 class(es) selected by an anchor`; `--for-paths tools/unattended/resume-tick.sh` printed the same; `--report` printed `unanchored : 0` and the record's row `class 4 anchor(s) destructive-step-before-its-precondition`; `--write` wrote `memory/gotchas/INDEX.md (72 record(s))` and `--check` exited 0 afterwards, which is check 17 and check 18 together; the front matter parsed under the folder's grammar on every one of those runs. OBSERVED; the `memory hygiene` leg is observed at --close.
 - S3 — `grep -n 'A logged-out node kills nothing'` over spec 5 lists its section 5 risk row at line 391 already reading `A logged-out node kills nothing: the login row precedes the kill row`, written at spec 5's rev-2 by the round-1 disposal; this pass changed nothing there. OBSERVED.
 - checkers — `bash tools/check-install-prefix.sh` printed `install-prefix: clean — 276 shipped files, 11 declared waiver(s), 25 marked fixture line(s), no undeclared root-install spelling` and `carried-prefix clean — 139 recorded file(s), 41 hand-justified, none rising`; `python tools/lexicon/lexicon.py --check` printed `lexicon OK — 2157 tracked file(s)` with `derive_winpid` graded and no new offender; `python tools/check-spec-tokens.py` over this spec exited 0. OBSERVED; the legs are observed at --close.
+
+
+## The rev-3 fold, 2026-09-21
+
+No criterion of this unit moved. The closing diff review's id 2 was a second instance of the class
+this unit left-shifted — the tree kill aimed at a pid a reboot can recycle — so
+`memory/gotchas/destructive-step-before-its-precondition.md` gained the reboot case and names the
+arms that gate it (`resume-tick.test.sh` AC15, `unattended.test.sh` AC11); `gotchas.py --check`
+exited 0 and `--for-paths tools/unattended/resume-tick.sh` still selects the class, which is AC4's
+observation re-taken on 2026-09-21. The code is units 1, 2 and 5's at their rev-5.

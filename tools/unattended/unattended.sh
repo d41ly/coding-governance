@@ -2408,19 +2408,34 @@ WTS
   # rather than passing unchecked: the ordinary landing runs close, lander and this verb in one turn,
   # so a pass there would check only the landings where a turn happened to end in between (spec 7
   # §8, B2); the stop-guard's landing-unstamped row (TOOL-aWokenSentinel-8) continues the session
-  # after the turn the remedy asks for. The refusal fires only where the sidecar already exists, so
-  # an adopter without the hook, or a session never bound, reads `unchecked` and is never wedged.
+  # after the turn the remedy asks for. That remedy works for the LEASED session alone, because the
+  # stop-guard binds by the lease (run-lease.js `resolveLease`): a session the record does not name
+  # appends nothing however many turns it ends, so it is refused FIRST with the step that binds it,
+  # `--resume <slug> --keepalive-id <id>` (closing review ids 7 and 11 — the header used to claim an
+  # unbound session is never wedged, and it was, on a false "the hook is unwired" diagnosis). A
+  # lease naming no session at all reads `unchecked`: the harness exposed none, so no stop of this
+  # run was ever recorded and none can be. And the newest line must be YOUNGER than the lease: the
+  # hook writes a LANDING line on every stop at LANDING, blocked or allowed, so a dead incarnation's
+  # line outlives its lease and would pass check 53 against the id the new lease replaced (id 15);
+  # `lease-utc` is written by `write_lease`, and a line older than it is the pre-close case.
   # NOT CHECKED: whether the id named by `keepalive` was ever the run's job, whether a job under
   # another id still fires, or anything about a stop the hook did not record — one line the harness
-  # populated, one id, one substring test.
-  local _kid _sl _su _sp _sc
-  _kid=$(fact "$rel" keepalive)
+  # populated, one id, one substring test. A record with no `lease-utc` (written before it existed)
+  # takes the newest line whoever wrote it, which is the reading it always had.
+  local _kid _sl _su _sp _sc _sid _lu _me
+  _kid=$(fact "$rel" keepalive); _sid=$(fact "$rel" session); _lu=$(fact "$rel" lease-utc); _me="${CLAUDE_CODE_SESSION_ID:-}"
   if [ -z "$_kid" ]; then
     echo "unattended: keepalive-reaped: attested, unchecked — the record names no keepalive id"
+  elif [ -z "$_sid" ] || [ "$_sid" = absent ]; then
+    echo "unattended: keepalive-reaped: attested, unchecked — the lease names no session (the harness exposed none), so the stop-guard never bound this run and recorded no stop of it"
+  elif [ "$_me" != "$_sid" ]; then
+    fail 55 "the stop-guard binds by the lease and this session is not the one the record names, so no stop of this session is ever recorded and ending the turn cannot help — run --resume $slug --keepalive-id <the idle-wake id you schedule now> so the lease names this session and the stop-guard records it, then re-run --landed: lease session $_sid, this session ${_me:-unset}"
+    return 1
   elif ! _sl=$(read_stop_listing "$slug"); then
     echo "unattended: keepalive-reaped: attested, unchecked — no stop-guard record for this run (the hook is not wired, or the session was never bound)"
   else
     _su=$(printf '%s\n' "$_sl" | sed -n 1p); _sp=$(printf '%s\n' "$_sl" | sed -n 2p); _sc=$(printf '%s\n' "$_sl" | sed -n '3,$p')
+    if [ -n "$_lu" ] && [ "$_lu" != absent ] && [ "$_su" \< "$_lu" ]; then _sp="$_sp, older than the lease taken at $_lu"; fi
     if [ "$_sp" != LANDING ]; then
       fail 54 "the stop-guard records this session and no stop after the close exists to check the reap against, so the attestation could be checked and was not — END THE TURN once (the stop-guard records the listing and continues you), then re-run --landed; if no record appears afterwards the hook is unwired and adopt-unattended.sh --check says so: newest stop-guard record $_su in phase $_sp"
       return 1
@@ -2976,14 +2991,28 @@ set_fact() { # file · key · value
 # LITERAL `absent`, not omitted: a missing line and a pre-lease record are the same bytes, and "never
 # asked" is a different fact from "asked and answered no". ONE stderr NOTE per call names which was
 # withheld; a harness that exposes no id is a fact about the harness and the run still starts.
+#
+# THREE DERIVED FACTS RIDE BESIDE THE PID (the closing review's ids 2 and 15): `host`, the node the
+# lease was written on, so a tick on another node — a run branch checked out there carries this
+# record — neither kills nor launches; `pid-image`, the image holding the pid AT LEASE TIME, so a
+# number a reboot recycled reads `pid-alive: no` instead of aiming a tree kill at the owner's next
+# process; and `lease-utc`, when this incarnation took the run, so `--landed` grades only a stop the
+# CURRENT incarnation's session produced and never a dead one's LANDING line. Each is `absent` when
+# it cannot be derived — a harness exposing no pid has no image — and every reader treats `absent`
+# as "not recorded", which is the pid-only reading the record had before these existed.
 write_lease() { # run-state file · keepalive-id
-  local rel="$1" kid="$2" sid="${CLAUDE_CODE_SESSION_ID:-}" pid="${CLAUDE_PID:-}" gone=""
+  local rel="$1" kid="$2" sid="${CLAUDE_CODE_SESSION_ID:-}" pid="${CLAUDE_PID:-}" gone="" host img
   set_fact "$rel" keepalive "$kid" || return 1
   if [ -z "$sid" ] && [ -z "$pid" ]; then gone="session id or pid"
   elif [ -z "$sid" ]; then gone="session id"
   elif [ -z "$pid" ]; then gone="pid"; fi
   set_fact "$rel" session "${sid:-absent}" || return 1
   set_fact "$rel" pid "${pid:-absent}" || return 1
+  host=$(read_host_name) || host=""
+  img=$(read_pid_image "${pid:-absent}") || img=""
+  set_fact "$rel" host "${host:-absent}" || return 1
+  set_fact "$rel" pid-image "${img:-absent}" || return 1
+  set_fact "$rel" lease-utc "$(date -u +%Y-%m-%dT%H:%M:%SZ)" || return 1
   [ -z "$gone" ] || printf 'unattended: NOTE - this harness exposes no %s, so no out-of-session resumer can find this run; the lease records absent and the hooks and the tick report it UNBOUND rather than guess.\n' "$gone" >&2
   return 0
 }
@@ -3241,24 +3270,12 @@ resolve_transcript_path() { # session -> the transcript path when it exists, or 
   printf '%s\n' "$f"
 }
 
-# DOES THE RECORDED PID EXIST. `yes`, `no` or `unknown` — `unknown` for `absent`, for a non-numeric
-# value, and for a probe tool that answered nothing, because a tool that could not look is not a
-# `no`. Under MSYS the probe is `tasklist` and its OUTPUT decides: MEASURED on node `a`, 2026-09-16,
-# it exits 0 for a live pid AND for a dead one (printing `INFO: No tasks are running`), so the exit
-# code decides nothing; and `kill -0` on a live Windows pid reports `No such process` there, so the
-# POSIX arm alone would read every live run on this fleet as dead. The recorded pid is `claude.exe`'s
-# Windows pid, which is the one `tasklist` knows. Existence is not progress: a hung process is `yes`.
-check_pid_alive() { # pid -> yes | no | unknown
-  local pid="$1" out
-  case "$pid" in ""|absent|*[!0-9]*) echo unknown; return 0 ;; esac
-  case "$(uname -s 2>/dev/null)" in
-    MINGW*|MSYS*|CYGWIN*)
-      command -v tasklist >/dev/null 2>&1 || { echo unknown; return 0; }
-      out=$(tasklist //FI "PID eq $pid" //NH 2>/dev/null) || { echo unknown; return 0; }
-      case " $(printf '%s' "$out" | tr -s '\r\t ' '    ') " in *" $pid "*) echo yes ;; *) echo no ;; esac ;;
-    *) if kill -0 "$pid" 2>/dev/null; then echo yes; else echo no; fi ;;
-  esac
-}
+# DOES THE RECORDED PID EXIST, AND IS IT THE RECORDED PROCESS — `check_pid_alive` lives in
+# `lib-unattended.sh` beside `read_pid_image` and `read_host_name`: the resume tick reads a launched
+# pid back through the same probe, and `write_lease` records the image through the same reader, so
+# the function sits where all three source it (TOOL-aWokenSentinel-5's fold of the closing review's
+# id 2; the pid half is unit 2's). The recorded pid is `claude.exe`'s Windows pid, which is the one
+# `tasklist` knows, and the recorded image is what a recycled pid fails to match.
 
 # --liveness: THE ONE PREDICATE EVERY OUT-OF-SESSION READER SHARES. TOOL-aWokenSentinel-2. "Is this
 # run alive" had no single answer: `--status` is prose for a human, `--audit` grades dispatched
@@ -3320,7 +3337,9 @@ print_liveness() { # slug
   sid=$(fact "$rel" session); [ -n "$sid" ] || sid=absent
   pid=$(fact "$rel" pid); [ -n "$pid" ] || pid=absent
   kid=$(fact "$rel" keepalive); [ -n "$kid" ] || kid=absent
-  alive=$(check_pid_alive "$pid")
+  # The recorded IMAGE rides with the pid: a number a reboot recycled reads `no` here rather than
+  # `yes`, and the tick's kill is not aimed at the owner's next process (closing review id 2).
+  alive=$(check_pid_alive "$pid" "$(fact "$rel" pid-image)")
   # THE FOUR SIGNALS. The two tree clocks are `read_tree_clocks`; the gate-log clock and the
   # transcript clock are this verb's own. An ABSENT gate-logs directory contributes nothing and is
   # not a dead probe — a repo that has never run the bar has none — but a file under it that `stat`

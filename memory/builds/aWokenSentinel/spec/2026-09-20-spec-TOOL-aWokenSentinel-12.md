@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-12 — the resume tick consults login BEFORE it kills: a logged-out node kills nothing
 
-**Status:** CLOSED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 12
+**Status:** CLOSED · rev-3 · 2026-09-21 · node a · Tier-2 · base 12b3701d · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -114,6 +114,14 @@ in `tools/unattended/unattended.sh` — and `--for-diff` prints the class over a
 one of them. A kill written in a file the body does not name is not selected, which the record
 says in its own text: the catalogue anchors by path and cannot read a verb.
 
+From rev-3 the record carries a SECOND INSTANCE of the class (closing review id 2): the kill's
+target was a pid, and `pid-alive: yes` proved only that some process held the number — after a
+reboot, a recorded event on this fleet, the owner's next process; on a second node, whatever holds
+that number there. The precondition the kill needs, that the number IS the run's process, was
+never probed. The record names the remedy the fold built — the lease's `host` and `pid-image`
+facts (unit 1), the image match in `check_pid_alive` (unit 2) and the tick's foreign-host stand-off
+(unit 5) — and its Gating paragraph names the arms that observe it beside this unit's own.
+
 ### Inventory
 
 | identifier | kind | cell |
@@ -204,6 +212,12 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-21 · §4 · folded the closing diff review round 1
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md`), id 2 (HIGH): the class this
+  unit left-shifted had a second instance in the same tick — the tree kill aimed at a pid rather
+  than at the leased process, on a fleet with a recorded reboot — so the gotcha record gains the
+  reboot case and the arms that gate it; the code is units 1, 2 and 5's at their rev-5. Status
+  unchanged, CLOSED.
 - rev-2 · 2026-09-20 · S4 · S5 · §3 · §4 · AC2 · AC4 · folded spec-audit round 2: M4 (raw
   24) — AC2 grepped a tick header sentence neither spec wrote on the expected path, so S5 makes it
   this unit's unconditional edit and AC2 reads 0 at base; M5 (raw 25) — the `consumes-from` on

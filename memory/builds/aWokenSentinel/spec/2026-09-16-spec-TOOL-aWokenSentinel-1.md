@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-1 — the run-state file records the LEASE: `session:` and `pid:` at preflight, and `--resume --keepalive-id` replaces it
 
-**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -32,7 +32,10 @@ the run-state file is the kit's contract and this changes what it carries.
 - **S1** — `verb_preflight` records the lease directly after `set_fact "$rel" keepalive "$kid"`:
   `session: <CLAUDE_CODE_SESSION_ID>` and `pid: <CLAUDE_PID>`, each the literal `absent` when its
   variable is unset or empty, with ONE stderr NOTE naming which is absent and that no out-of-session
-  resumer can find this run. Observed by AC1 and AC2.
+  resumer can find this run; and from rev-5 three DERIVED facts beside them — `host:` (the node,
+  `read_host_name`), `pid-image:` (the image holding the pid at lease time, `read_pid_image`) and
+  `lease-utc:` (when this incarnation took the run) — each `absent` where underivable. Observed by
+  AC1, AC2 and AC10.
 - **S2** — `--resume <slug> --keepalive-id <id>`: on a non-terminal record the driver re-records
   `keepalive`, `session` and `pid` through the same function S1 writes with, prints one line naming
   each old and new value, and stages the file through `stage_or_fail`; on a terminal record it
@@ -44,8 +47,8 @@ the run-state file is the kit's contract and this changes what it carries.
   prints into every new record names the lease; the driver's own comment in `verb_resume` that says
   the region "carries twelve facts" stops stating a count; section 2 of
   `tools/unattended/PROTOCOL.template.md` gains the two facts as items 14 and 15 of its numbered
-  list, and its render `memory/guides/UNATTENDED-PROTOCOL.md` is re-made in the same commit.
-  Observed by AC6.
+  list, and its render `memory/guides/UNATTENDED-PROTOCOL.md` is re-made in the same commit; rev-5
+  adds item 16 for the three derived facts, rendered the same way. Observed by AC6.
 - **S5** — The verb carriers for the widened `--resume`: the driver's header line reads
   `#   unattended.sh --resume <slug> [--keepalive-id <id>]`, the `--resume` bullet of
   `tools/unattended/VERBS.template.md` names the option and what it replaces, and the render
@@ -130,6 +133,14 @@ answers OK, so the lexicon offender pin does not move. Body:
    <session id|pid|session id or pid>, so no out-of-session resumer can find this run; the lease
    records absent and the hooks and the tick report it UNBOUND rather than guess.` The
    alternation is filled by which was empty; the sentence is emitted once per call.
+5. (rev-5, closing review ids 2 and 15) `set_fact "$rel" host "$(read_host_name)"`,
+   `set_fact "$rel" pid-image "$(read_pid_image "$pid")"` and
+   `set_fact "$rel" lease-utc "$(date -u +%Y-%m-%dT%H:%M:%SZ)"`, each `absent` when the reader
+   answers nothing — a harness exposing no pid has no image. The two readers live in
+   `lib-unattended.sh` beside `check_pid_alive`, which matches the image on every probe (unit 2);
+   the tick stands off a `host:` that is not this node (unit 5); `--landed` refuses a stop line
+   older than `lease-utc` (unit 7). The `lease replaced` line of `--resume --keepalive-id` keeps
+   its three fields: the derived facts are not the lease's identity.
 
 `verb_preflight` at `:2805` calls `write_lease "$rel" "$kid"` in place of its `set_fact` line. The
 `absent` literal rather than an omitted key: a reader keyed on the KEY's presence would read a
@@ -364,6 +375,15 @@ the same invocation.
   id and unit 2's `fixture-session` transcript arm fails on a defect this unit never observed; or
   the arm block was never written and the suite has no `fail` branch for the harness-arms leg to
   count.
+- **AC10** — When AC1's preflight has run, `sed -n 's/^host: //p'` over the run-state file prints
+  what `read_host_name` prints in the suite's own shell, `grep -c '^pid-image: absent$'` prints
+  `1` (4242 is a pid nothing holds) and `grep -cE '^lease-utc: <the UTC regex>$'` prints `1`; when
+  the preflight runs with `CLAUDE_PID` set to the suite's own shell's Windows pid, `pid-image:`
+  reads what `read_pid_image` prints for it and not `absent`; and with `CLAUDE_PID` unset,
+  `pid-image: absent`.
+  Red when: any of the three lines is missing, which is the write not made; the host is spelled
+  differently by the writer and the reader; or a live pid records `absent`, which is the probe
+  answering nothing.
 
 ## 7. Gates
 
@@ -388,6 +408,13 @@ none
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-21 · S1 · S4 · §4 step 5 · AC10 · folded the closing diff review round 1
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md`), ids 2 and 15: the lease named a NUMBER, and a
+  number a reboot recycles or a second node's checkout carries is not the process (id 2); the stop
+  sidecar outlives the lease, so a dead incarnation's LANDING line passed for the new one (id 15).
+  `write_lease` records `host`, `pid-image` and `lease-utc` beside `pid`, protocol section 2 gains
+  item 16 with its render, and AC10 observes the three facts and their `absent` forms. Status
+  unchanged, CLOSED.
 - rev-4 · 2026-09-20 · §4 arm 4 · AC4 · at the build pass: AC4 asked `--keepalive-id zzz` on the
   terminal record and then `grep -c '^keepalive: zzz$'` to print `0`, but arm 3 has just written
   `zzz` to that same record, so the literal could never be observed; the terminal arm now sends

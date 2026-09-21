@@ -35,6 +35,22 @@ FAILING with the destructive target STILL ALIVE: start a live process, record it
 run the procedure with the precondition stubbed to fail, and assert the process is listed afterwards.
 An arm that only asserts the announced skip is satisfied by the swapped order.
 
+## The second instance: the kill's target is a NUMBER, not the process
+
+The same tick, at the closing review of `TOOL-aWokenSentinel` (id 2): `pid-alive: yes` proved that
+SOME process held the recorded pid, and the tree kill ran on whatever that was. A reboot mid-run —
+a recorded event on this fleet, and the research record's stall class C — recycles the pid to
+whatever the owner starts next; every liveness signal predates the reboot, so the first tick past
+the bound read STALE, `pid-alive: yes`, and would force-kill the owner's new interactive session, an
+IDE, or `explorer.exe` and every child, then launch a resume, and again the next cycle. A run branch
+checked out on a second node carries the first node's pid into the second's process table, the same
+shape by a longer route. The precondition the kill needs — that the number IS the run's process —
+was never probed. The remedy is the lease recording what it names: `host` and `pid-image` beside
+`pid`, the probe matching pid AND image and reading `no` on a mismatch, and the tick standing off a
+lease another node took.
+
+## Where this repo's killers live
+
 ## Where this repo's killers live
 
 The catalogue anchors by PATH and cannot read a verb, so this record names the files where an
@@ -52,6 +68,11 @@ A kill written in a file this list does not name is not selected; add the path h
 Gated by `tools/unattended/resume-tick.test.sh`, the `U12` arm: a background `sleep` recorded as the
 run's pid, the stub CLI answering logged-out, the tick asserted to print the SKIP line with the sleep
 still listed by `tasklist` (`kill -0` elsewhere), `auth status` logged and no `-p`, no sidecar log.
-Observed RED against a tick copy with the login call and the kill call swapped. The class itself is
-gated for the tick alone; the reaper and the driver's bound carry no precondition-ordering arm, and
-the anchors above are what puts this record in front of the diff that would add one.
+Observed RED against a tick copy with the login call and the kill call swapped. The second instance
+is gated by that suite's `AC15` arm (a lease whose `host:` names another node: the sleep still
+listed, nothing invoked, no attempt line; RED against a tick copy without the host row) and by
+`tools/unattended/unattended.test.sh`'s `AC11` liveness arm (the suite's own `sleep` leased under
+`pid-image: claude.exe` reads `pid-alive: no`; RED against a library copy that ignores the image).
+The class itself is gated for the tick alone; the reaper and the driver's bound carry no
+precondition-ordering arm, and the anchors above are what puts this record in front of the diff
+that would add one.

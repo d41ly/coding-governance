@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing
 
-**Status:** CLOSED · rev-5 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 17 · ratified 2026-09-16
+**Status:** CLOSED · rev-6 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 17 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
@@ -39,8 +39,17 @@ item nothing could contradict becomes a check against evidence the agent did not
   (audit B1). Observed by AC2 and AC14.
 - **S3** — When the newest line was recorded in `LANDING` and does not name the id, `verb_landed`
   proceeds to the anchor observation and prints one `checked` line naming the id and the utc; when
-  no sidecar exists, or the record names no `keepalive` id, it proceeds and prints one `unchecked`
-  line saying why. A pass is never silent. Observed by AC3 and AC4.
+  no sidecar exists, or the record names no `keepalive` id, or (rev-6) the lease names no session,
+  it proceeds and prints one `unchecked` line saying why. A pass is never silent. Observed by AC3
+  and AC4.
+- **S11** — (rev-6) BEFORE the sidecar read, `verb_landed` compares `CLAUDE_CODE_SESSION_ID` with
+  the record's `session:` fact: a mismatch, or no id in the environment, refuses through a third
+  `fail` branch naming both and `--resume <slug> --keepalive-id <id>` as the step that binds this
+  session, never END THE TURN — the stop-guard binds by the lease and records nothing for any
+  other session. Observed by AC15.
+- **S12** — (rev-6) A newest line whose `utc` is older than the record's `lease-utc` (unit 1) is
+  the pre-close case, whatever its phase: a LANDING line the dead incarnation wrote does not pass
+  for the one that replaced the lease. Observed by AC16.
 - **S4** — RETIRED at rev-2. The recorded keepalive id and what the newest stop-guard line says
   about it is `TOOL-aWokenSentinel-9`'s FIELD on `verb_status`'s existing line, omitted when
   unrecorded; this unit prints no second line and edits `verb_status` not at all, because a second
@@ -158,7 +167,10 @@ The verb then decides, in this order, with `kid=$(fact "$rel" keepalive)`:
 | state | outcome |
 |---|---|
 | `kid` empty | proceed; print `unattended: keepalive-reaped: attested, unchecked — the record names no keepalive id` |
+| `session` fact empty or `absent` (rev-6) | proceed; print `unattended: keepalive-reaped: attested, unchecked — the lease names no session (the harness exposed none), so the stop-guard never bound this run and recorded no stop of it` |
+| `CLAUDE_CODE_SESSION_ID` is not the `session` fact (rev-6) | refuse, `fail 55` |
 | no sidecar, or empty | proceed; print `unattended: keepalive-reaped: attested, unchecked — no stop-guard record for this run (the hook is not wired, or the session was never bound)` |
+| newest line's `utc` older than `lease-utc` (rev-6) | the phase reads `<phase>, older than the lease taken at <lease-utc>` and takes the row below |
 | newest line's phase is not `LANDING` | refuse, second new `fail` number |
 | newest line's listing contains `kid` (`grep -qF`) | refuse, first new `fail` number |
 | newest line's listing does not contain `kid` | proceed; print `unattended: keepalive-reaped: checked — <kid> absent from the harness listing at <utc>` |
@@ -187,7 +199,12 @@ The two refusal texts, literal head first so `check-arms.py` can arm them, `<…
 The `fail` numbers are the next two free in the driver at build time, read with
 `grep -oE 'fail [0-9]+' tools/unattended/unattended.sh | sort -k2 -n | tail -1`; the high-water is 51
 at base 5f9648d6 and units 1 to 5 take numbers before this one runs, so no number is pinned here.
-Taken at the build, high-water 52: **53** for the listed id and **54** for the pre-close line.
+Taken at the build, high-water 52: **53** for the listed id and **54** for the pre-close line. The
+rev-6 fold took **55** for the unbound session, derived the same way at high-water 54:
+`the stop-guard binds by the lease and this session is not the one the record names, so no stop of
+this session is ever recorded and ending the turn cannot help — run --resume <slug> --keepalive-id
+<the idle-wake id you schedule now> so the lease names this session and the stop-guard records it,
+then re-run --landed: lease session <sid>, this session <id|unset>`.
 
 Why the second refusal exists rather than the brief's `unchecked` pass: the Skill never mandates a
 turn boundary between `--close` and `--landed`, and the ordinary landing runs attest, close, commit,
@@ -206,7 +223,11 @@ are §8; AC14 is the arm.
 
 What it does NOT check, said in the verb's header comment: whether the job named by `keepalive`
 was ever the run's job, whether a job under another id is still firing, or anything about a stop
-the hook did not record. It reads one line the harness populated and compares one id.
+the hook did not record. It reads one line the harness populated and compares one id. What it DOES
+check from rev-6, because the header used to claim the opposite: that the session running the verb
+is the leased one (the header said "a session never bound … is never wedged", and it was, on a
+false "the hook is unwired" diagnosis — closing review ids 7 and 11), and that the newest line is
+younger than the lease (id 15). A record with no `lease-utc` takes the newest line whoever wrote it.
 
 ### `--status` and `--close`
 
@@ -336,9 +357,10 @@ log written by `printf` under the fixture's git dir as §4 shows, removed with `
 after.
 
 - **AC1** — When the newest stop line reads phase `LANDING` and its `session_crons` contains `k1`,
-  `run --landed tRun` prints a line beginning `the keepalive attestation is contradicted by the
-  harness's own listing` and ending `k1 listed at 2026-09-16T12:00:00Z`, the phase stays
-  `LANDING`, and `sum` is unchanged.
+  stamped at or after the record's `lease-utc` (rev-6; a stamp older than the lease is AC16's
+  refusal), `run --landed tRun` prints a line beginning `the keepalive attestation is contradicted
+  by the harness's own listing` and ending `k1 listed at <that stamp>`, the phase stays `LANDING`,
+  and `sum` is unchanged.
   Red when: the verb reaches `phase LANDED`, which means the read was skipped or the listing cut
   missed the key; or the refusal names no id or no utc.
   fixture: the suite's own scratch repo and a hand-written stop line; no live fixture in this tree.
@@ -349,8 +371,9 @@ after.
   Red when: the verb lands, which means an older line was read as post-close; or the unreadable
   line passes, which means a line the reader cannot parse was treated as evidence.
 - **AC3** — When the newest stop line reads phase `LANDING` and its `session_crons` is `[]`,
-  `run --landed tRun` prints `keepalive-reaped: checked — k1 absent from the harness listing at
-  2026-09-16T12:00:00Z` and then `phase LANDED`, and the record's `landed-anchor` reads `remote`.
+  stamped at or after `lease-utc` (rev-6), `run --landed tRun` prints `keepalive-reaped: checked
+  — k1 absent from the harness listing at <that stamp>` and then `phase LANDED`, and the record's
+  `landed-anchor` reads `remote`.
   Red when: no `checked` line prints while the phase still moves, which is the silent pass this
   unit forbids; or the check refuses on an empty listing.
 - **AC4** — When no stop log exists for the slug, `run --landed tRun` prints `keepalive-reaped:
@@ -446,6 +469,21 @@ after.
   fixture: the suite's `--landed` success fixture with the prologue's `fixture-session` lease from
   unit 1 and the fixture `origin`; `node` on `PATH`, as `gate-guard.js` already requires.
   cost: one driver spawn from inside the hook, seconds.
+- **AC15** — When the `--landed` fixture holds a pre-close `BUILDING` stop line and the verb runs
+  with `CLAUDE_CODE_SESSION_ID=some-other-session`, it exits 1 printing a line beginning `the
+  stop-guard binds by the lease and this session is not the one the record names` and ending
+  `lease session fixture-session, this session some-other-session`, with no `END THE TURN` and
+  `sum` unchanged; with the variable unset the same refusal ends `this session unset`; and with
+  the record's `session:` rewritten to `absent` the verb prints `keepalive-reaped: attested,
+  unchecked — the lease names no session (the harness exposed none)` and lands.
+  Red when: the unbound session reaches check 54 and END THE TURN, which is the loop a takeover
+  session sat in; or an `absent` lease is refused, which wedges every harness exposing no id.
+- **AC16** — When the `--landed` fixture holds a LANDING `[]` stop line stamped now, the lease is
+  replaced one second later by `--resume tRun --keepalive-id k2` and committed, `run --landed
+  tRun` refuses through check 54 with `newest stop-guard record <that stamp> in phase LANDING,
+  older than the lease taken at <lease-utc>`, no `phase LANDED`, `sum` unchanged.
+  Red when: the line passes as `checked` and the record lands, which is the dead incarnation's
+  witness graded for the new one.
 
 ## 7. Gates
 
@@ -487,6 +525,15 @@ reverted as its break · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the exec
 
 ## 9. Revision log
 
+- rev-6 · 2026-09-21 · S3 · S11 · S12 · §4 · AC1 · AC3 · AC15 · AC16 · folded the closing diff review round 1
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md`), ids 7, 11 and 15: fail 54's remedy
+  assumed the running session was the leased one, so an unbound takeover session looped on END
+  THE TURN with a false "hook is unwired" diagnosis (7 and 11, one defect) — `fail 55` refuses it
+  first with `--resume --keepalive-id` as the step; and `read_stop_listing` took the newest line
+  whoever wrote it, so a dead incarnation's LANDING line passed check 53 against the id the new
+  lease replaced (15) — a line older than `lease-utc` is the pre-close case. The header sentence
+  that claimed an unbound session is never wedged is corrected; the NOT CHECKED list names what is
+  now checked. Class `witness-graded-against-a-fact-written-after-it`. Status unchanged, CLOSED.
 - rev-5 · 2026-09-21 · §4 · §3 · status · the build pass: the two `fail` numbers taken (53, 54); the
   `session_crons` match rule marked UNVERIFIED with AC13's deferral, since no bound run existed at
   build time. Two carrier edits diverged from §4's table for BYTE CAPS the table did not price: the

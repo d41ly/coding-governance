@@ -229,28 +229,28 @@ belonging here:
     by `--resume --keepalive-id`, the literal `absent` where the harness exposes none. With fact 2
     and fact 15 it is the LEASE: what an out-of-session actor binds to.
 15. **The pid** of the process holding the run, from `CLAUDE_PID`, on the same terms as fact 14.
+16. **The host**, **the pid's image** and **the lease UTC**, derived beside fact 15, each `absent`
+    where underivable: which node holds the run, which image held the pid, and since when — so a
+    foreign tick stands off, a recycled pid reads dead, and `--landed` grades no stop line older
+    than the lease.
 
-Facts 10, 11 and 12 are ABSENT on a run that did not reach the condition each records — a
-default-branch run for the first two, a run that did not abort for the third. That is legal: the
-"nothing else" clause bounds what may appear, not what must. Fact 9 is always written, and fact 13
-whenever `HEAD` names a branch at preflight; a detached preflight writes nothing there. Facts 14
-and 15 are always WRITTEN, and the literal `absent` is a value, not a missing line: a record with no
-such line was never asked, one carrying `absent` was asked and answered no.
+Facts 10, 11 and 12 are ABSENT on a run that never reached the condition each records; the
+"nothing else" clause bounds what may appear, not what must. Fact 9 is always written, fact 13
+whenever `HEAD` names a branch at preflight. Facts 14 to 16 are always WRITTEN: `absent` is a value,
+not a missing line — no line was never asked, `absent` was asked and answered no.
 
 **A `<key>-source:` line is ADMITTED beside a fact no verb could write**, and its value states why
 none could plus what independently verifies the value. A hand-reconstructed fact carrying no such
-line sits outside the "nothing else" clause; a labelled one is inside it. The form exists because
-repairs happen — a record whose key predates the verb that would write it, or whose verb refuses a
-terminal record, is correctable only by hand — and an UNLABELLED hand edit is indistinguishable from
-a value the run earned. Nothing reads these lines and no verb writes one: the label is for the
-reader, and writing it is an owner-authorized repair rather than something a run does to its own
-history.
+line sits outside the "nothing else" clause; a labelled one is inside it. Repairs happen — a key
+that predates its verb, a verb that refuses a terminal record — and an UNLABELLED hand edit reads as
+a value the run earned. Nothing reads these lines and no verb writes one: the label is an
+owner-authorized repair, never something a run does to its own history.
 
 Facts 5-7 and 9-11 are EVIDENCE and are never read back as inputs — fact 9 emphatically so. A verb
 branching on the recorded anchor kind would take a security decision from a value its subject wrote,
-the class this kit has been burned by three times; the derivation is monotone instead. They exist
-so a party outside this process can re-derive the pin without trusting a byte the run wrote, which is
-the only form of verification §9 concludes actually binds.
+the class this kit has been burned by three times; the derivation is monotone instead. They exist so
+a party outside this process can re-derive the pin without trusting a byte the run wrote, the only
+verification §9 concludes actually binds.
 
 The authored half never restates a derivable fact — not a unit status, not a per-unit spec base.
 Restating the run's own BASE is not possible, because nothing else holds it.
@@ -391,11 +391,12 @@ showed firing.
 while the run is non-terminal, writing `stop`; the stall-recorder writes an API-error end to
 `stall`; the resume-tick, an OS-scheduled task, resumes a `STALE` run from another process, writing
 `resume` — three sidecar kinds under `<git-dir>/unattended/`. Registering the tick is the owner's,
-one line per OS in the kit README; `--check` reports it as INFO.
+one line per OS in the kit README; `--check` reports it as INFO. The tick launches only on a lease
+the INDEX holds and only on the node that took it.
 
 **The actors.** The AGENT schedules and reaps the idle-wake and, on resume, runs
 `--resume <slug> --keepalive-id <id>` so the lease is re-recorded. The DRIVER records the lease
-(`session:` and `pid:`), grades liveness (`--liveness`, the one predicate every reader takes), and
+(§2, facts 14 to 16), grades liveness (`--liveness`, the one predicate every reader takes), and
 checks the reap at `--landed` against the harness's own listing. The HOOKS and the TICK refuse,
 record and resume.
 
@@ -515,29 +516,28 @@ act was taken. It does not prevent one.
 
 **What it closes.** Two one-command offline forgeries that used to pass every check silently: a
 rewritten remote-tracking ref, and a default-branch name supplied through the environment. Both are
-now inert rather than detected — neither value is read at all. Two more are neutralised for this
-kit's own reads and named where they sit: an object-substitution ref and a graft file, either of
-which rewrites what a sha MEANS at a perfectly honest anchor — and both are ALSO refused by their
-mere PRESENCE, because suppressing them makes only THIS kit's reads honest and binds no other tool
-reading the same objects.
+now inert rather than detected — neither value is read at all. An untracked run-state file left
+under a worktree: the resume tick reads leases from the index alone. Two more are neutralised for
+this kit's own reads and named where they sit: an object-substitution ref and a graft file, either
+of which rewrites what a sha MEANS at a perfectly honest anchor — and both are ALSO refused by
+their mere PRESENCE, because suppressing them makes only THIS kit's reads honest and binds no other
+tool reading the same objects.
 
 **What the second anchor changes here.** It opens no new class — §1 cost 4 already granted
-successor-authorization. It lowers that price to two commands and widens the leg's BASE check for
-every adopter. Neither is closed; what survives is what survived before, the leg re-run in a clone
-the run never touched.
+successor-authorization — but lowers that price to two commands and widens the leg's BASE check for
+every adopter. Neither is closed; what survives is the leg re-run in a clone the run never touched.
 
 **What it does not close, stated so no reader has to discover it.** A run that edits this kit and
-commits it — nothing binds the executing code to code an owner approved. A run that shims the
+commits it: nothing binds the executing code to code an owner approved. A run that shims the
 ordinary tools this kit calls. A run that skips the hook layer, by `--no-verify`, by pointing
 `core.hooksPath` at an empty directory, or by overriding the gate command. A run that relays through
 an endpoint it seeded, which satisfies every URL comparison with one URL and one config source. A
 run that simply never creates a run-state file, since every leg check iterates over the tracked ones.
 And a run that gets one push past all of that, after which the remote's advertisement is genuine.
-And a run that rewrites the harness child's prompt between dispatches, which the fan-out guard's
-re-read does not reach: it feeds the burst rules and the join rule and nothing else, so a second
-`agent()` carrying any prompt admits. And a run that never calls `--dispatch` or `--brief` at all,
-since both are acts a run performs rather than gates a run meets, and the history legs that grade
-them afterwards grade only what a CLOSED unit's build commit carries. And a run that stops early
+And a run that rewrites the harness child's prompt between dispatches: the fan-out guard's re-read
+feeds the burst and join rules alone, so a second `agent()` carrying any prompt admits. And a run
+that never calls `--dispatch` or `--brief`: both are acts a run performs, not gates it meets, and
+the history legs grade only what a CLOSED unit's build commit carries. And a run that stops early
 with units unbuilt, since completeness rests on `build-complete` at `--close` alone and its escape
 is a recorded `--override`.
 

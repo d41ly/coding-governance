@@ -20,8 +20,10 @@
 #
 # WHAT IT HOLDS: `GIT` and its two pins; `resolve_sidecar_dir`, the one derivation of the sidecar
 # root the driver and the resume tick both read; `read_bound_key`, the one reader of a bound conf
-# key both of them call; the anchored id tests; path containment; and "has this pass committed
-# yet". The same rule admits the resume tick as a third sourcer.
+# key both of them call; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
+# of "which node, which process" the lease writer and both pid probes share; the anchored id tests;
+# path containment; and "has this pass committed yet". The same rule admits the resume tick as a
+# third sourcer.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -101,6 +103,67 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the 
         echo "unattended: REFUSING - $_bk_name is declared as '$_bk_val', which is not a positive integer of $_bk_unit. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
         exit 2 ;;
   esac
+}
+
+# --------------------------------------------------------------------------- processes, once
+# THE LEASE NAMES A PROCESS, NOT A NUMBER (TOOL-aWokenSentinel-5, folding the closing review's id 2).
+# A pid alone proves that SOME process holds the number: a reboot mid-run — a recorded event on
+# this fleet — recycles it to whatever the owner starts next, and a run branch checked out on a
+# second node carries the first node's pid into the second's process table. So the lease records
+# the node and the image beside the pid, and the aliveness probe matches all it was given. Three
+# functions, in the library because the driver WRITES the facts and the resume tick READS the
+# launched pid back through the same probe; a spelling in each would be two answers to one question.
+
+# THE NODE, one spelling: `COMPUTERNAME` where Windows sets it, `hostname` elsewhere, LOWERCASED
+# because the two disagree on case for one machine (measured on node `a`, 2026-09-21: `COMPUTERNAME`
+# upper, `hostname` lower). Empty when neither answers; the caller records `absent` for that.
+read_host_name() { # -> the node's name, lowercased, or nothing
+  local h="${COMPUTERNAME:-}"
+  [ -n "$h" ] || h=$(hostname 2>/dev/null) || h=""
+  [ -n "$h" ] || return 1
+  printf '%s\n' "$h" | tr '[:upper:]' '[:lower:]'
+}
+
+# THE IMAGE HOLDING A PID. Prints the image name and returns 0 when a process holds the pid; 1 when
+# none does; 2 when the probe could not look — an absent or non-numeric pid, a missing tool, a tool
+# that exited non-zero — because a tool that answered nothing is not a `no`. Under MSYS the probe is
+# `tasklist` and its OUTPUT decides: MEASURED on node `a`, 2026-09-16, it exits 0 for a live pid AND
+# for a dead one (printing `INFO: No tasks are running`), so the exit code decides nothing; and
+# `kill -0` on a live Windows pid reports `No such process` there, so the POSIX arm alone would read
+# every live run on this fleet as dead. The row is `<image> <pid> <session> <session#> <mem>`, and
+# the image is every field BEFORE the one equal to the pid, so an image with a space survives.
+# Elsewhere `kill -0` decides existence and `ps -o comm=` names the image, UNVERIFIED (no registered
+# node is POSIX).
+read_pid_image() { # pid -> image on stdout; 0 held · 1 no such process · 2 the probe answered nothing
+  local pid="$1" out img
+  case "$pid" in ""|absent|*[!0-9]*) return 2 ;; esac
+  case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*)
+      command -v tasklist >/dev/null 2>&1 || return 2
+      out=$(tasklist //FI "PID eq $pid" //NH 2>/dev/null) || return 2
+      img=$(printf '%s\n' "$out" | tr -s '\r\t ' '   ' | awk -v p="$pid" '{ for (i = 2; i <= NF; i++) if ($i == p) { s = $1; for (j = 2; j < i; j++) s = s " " $j; print s; exit } }')
+      [ -n "$img" ] || return 1
+      printf '%s\n' "$img" ;;
+    *)
+      kill -0 "$pid" 2>/dev/null || return 1
+      img=$(ps -o comm= -p "$pid" 2>/dev/null | sed 's/^ *//; s/ *$//'); printf '%s\n' "${img:-unknown}" ;;
+  esac
+}
+
+# DOES THE RECORDED PID EXIST, AND IS IT THE RECORDED PROCESS. `yes`, `no` or `unknown`: `unknown`
+# when the probe could not look; `no` when nothing holds the pid, OR when something does and the
+# recorded image does not match it — the recycled-pid case, and a tree kill aimed there lands on the
+# owner's new interactive session, an IDE, or `explorer.exe` and every child. An image of `absent`
+# or none at all matches anything: a lease written before the image was recorded, or by a harness
+# whose pid the probe could not see, keeps the pid-only reading it always had, and the header says
+# so rather than pretending that lease is guarded. Existence is not progress: a hung process is `yes`.
+# MOVED from the driver by TOOL-aWokenSentinel-5's fold of the closing review; the pid half is unit
+# 2's, unchanged in its verdicts.
+check_pid_alive() { # pid · [image] -> yes | no | unknown
+  local img rc
+  img=$(read_pid_image "$1"); rc=$?
+  case "$rc" in 2) echo unknown; return 0 ;; 1) echo no; return 0 ;; esac
+  case "${2:-}" in ""|absent|"$img") echo yes ;; *) echo no ;; esac
 }
 
 # ------------------------------------------------------------------------------- ids, anchored

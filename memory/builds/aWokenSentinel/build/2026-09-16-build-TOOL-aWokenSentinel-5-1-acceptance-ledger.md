@@ -29,6 +29,11 @@ the close.
 - AC10 — `bash tools/unattended/adopt-unattended.sh --check` on node `a` printed `unattended: INFO — no scheduled task named gov-resume-tick on this node; the resume tick is unregistered (the kit README has the line)` before `in sync`, `rc=0`; `schtasks //query //tn gov-resume-tick` answered `ERROR: The system cannot find the file specified.`; with a stub `schtasks` exiting 0 first on PATH the line read `INFO — the resume tick is registered as gov-resume-tick`, `rc=0`; `grep -c 'gov-resume-tick' tools/unattended/README.md` printed `2`. OBSERVED.
 - AC11 — `python tools/lexicon/lexicon.py --check` printed `P1 verb graded=2309 offenders=983`, the `VERB_OFFENDER_PIN`, and `sh.function.conv 6 of 788` — twenty functions added, none an offender; `grep -c 'resume-tick' tools/run-gates/selftest-budgets.txt` printed `1` and `grep -c 'resume-tick.test.sh' tools/unattended/kit.toml` printed `1`, both `0` at base. OBSERVED.
 - AC12 — the AC12 block alone printed `pass=8 fail=0`: a kit copy whose `unattended.sh` printed one line and exited 1 read `liveness probe failed: UNATTENDED check 52 FAILED — …(stubbed)`, launched nothing, wrote no line; a second worktree added without its conf read `resume-tick: <wt2> · skipped: no .unattended.conf in this worktree` beside the first tree's decision line, two lines in all. RED against a copy returning 0 from `read_liveness` regardless (`skip · verdict ` printed instead) and against one with the conf-less skip removed. OBSERVED.
+- AC12 — amended rev-5 — the stub driver now NOTEs on stderr before its refusal and the criterion asks for the CHECK line, not the first merged one; the AC12 block alone printed `pass=9 fail=0`, `liveness probe failed: UNATTENDED check 52 FAILED — …(stubbed)` with `declares no GATE_BOUND` absent from the tick's stdout. RED against a tick copy taking the first merged line (`missing [… UNATTENDED check 52 …]`, `unexpected [declares no GATE_BOUND]`). OBSERVED, 2026-09-21.
+- AC13 — the AC1 block alone printed `pass=21 fail=0`: the sidecar line ended `launched <pid>`, `check_pid_alive` read it `yes`, and a second tick printed one line `skip · IN-FLIGHT · launched <pid> alive since <utc>` with one `argv -p` in the stub log and one sidecar line; the hung half alone printed `pass=2 fail=0`: a seeded two-hour-old line carrying `launched <the sleep's WINPID>` read `resumed · attempt 2` and `tasklist` printed `No tasks are running` for the sleep. RED against a copy without the in-flight branch (`resumed · attempt 2`, two lines) and one without the launched-pid kill (`the hung launched pid is gone from tasklist: expected [1], got [0]`). OBSERVED, 2026-09-21.
+- AC14 — the AC14 block alone printed `pass=10 fail=0`: an untracked `tDrop/RUN.md` with a live session read one line `skip · RUN.md is not tracked, and the tick launches only on a lease the index holds`, no stub log, no attempt line, no launcher; after `git add` the same tick read `tDrop · … · resumed · attempt 1`; with `tRun`'s working copy rewritten to `99999999-aaaa…` the launcher carried `--resume 11111111-…` and the disk id nowhere. RED against a tick copy globbing the filesystem (`the untracked record invokes nothing: expected [nothing], got [invoked]` and four more). OBSERVED, 2026-09-21.
+- AC15 — the AC15 block alone printed `pass=6 fail=0`: `host: some-other-node` read `skip · leased on some-other-node, not this node compeeto-agent` at exit 0 with the sleep still listed, no stub log, no attempt line; `host:` set to `read_host_name`'s answer read `resumed · attempt 1` under `--dry-run`. RED against a tick copy without the host row (`resumed · attempt 1`, the sleep gone, the stub invoked). OBSERVED, 2026-09-21.
+- AC16 — the AC16 block alone printed `pass=6 fail=0`: the LANDING record with `witness: <first commit>` under `GOV_DEFAULT_BRANCH=main` read `verdict: FINISHED-UNSTAMPED` from the driver and `resumed · attempt 1` from the tick, one attempt line, one launcher; with a gate log five minutes ahead, `skip · verdict FINISHED-UNSTAMPED`. RED against a tick copy acting on `STALE` alone (`skip · verdict FINISHED-UNSTAMPED`, no log, no launcher). OBSERVED, 2026-09-21.
 
 ## What this ledger does not evidence
 
@@ -42,3 +47,14 @@ kill and the detach are UNVERIFIED (no registered node is POSIX). The `--dispatc
 omitted `memory/LIVE.md` and `memory/ledger/2026-09.md`, which the brief says to declare: the verb
 refused the first declaration because unit 16's row on `memory/LIVE.md` is still open, as unit 4's
 ledger already records, and this pass writes neither.
+
+
+## The rev-5 fold, 2026-09-21
+
+The rows dated 2026-09-21 are the closing diff review's round 1 folded into this unit (ids 1, 2,
+3, 5 and 16), every arm run ALONE from the suite's sourced prologue with `HERE` pointed at the
+kit under test or at a scratch copy carrying one staged break, the fixture under `%TEMP%/rt5`.
+The pre-existing blocks were re-run the same way after the fold: AC8 6, AC7 11, AC2 10, AC3 7,
+AC4 4, U12 6, U18 12 unchanged, U13 29 after its worktree record was STAGED (an unstaged one is
+now the AC14 skip, which is the fold working). `FLOOR_ASSERTIONS` 97 -> 125 from 139 executed.
+No suite ran whole; the close observes the floors.

@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-8 — the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is blocked and told to run `--landed`
 
-**Status:** CLOSED · rev-3 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 8 · ratified 2026-09-20
+**Status:** CLOSED · rev-4 · 2026-09-21 · node a · Tier-2 · base 12b3701d · streams tooling · order 8 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
@@ -60,7 +60,10 @@ remedy promises is then a row the table performs.
 - **No change to `--liveness`.** `FINISHED-UNSTAMPED` keeps unit 2's offline definition: phase
   `LANDING` and a sha-shaped witness that is an ancestor of the local `refs/remotes/origin/<d>`
   where that ref exists. A lander's push moves that ref, which is why the verdict is what a stop
-  after the lander reads.
+  after the lander reads. This row covers the LIVE half of that state — a bound session that can
+  still be blocked; the DEAD half, a session gone between the lander's push and `--landed`, is
+  unit 5's from its rev-5: the tick acts on `FINISHED-UNSTAMPED` with `stale: yes` (closing
+  review id 5).
 - **No new knob.** The block is bounded by `STOP_GUARD_BLOCKS`; a run whose reap cannot happen is
   blocked at most that many times and then allowed with `blocks-exhausted`, announced on the line,
   which is the same ceiling every other block has.
@@ -272,6 +275,12 @@ New arm: tools/unattended/stop-guard.test.sh · the `FINISHED-UNSTAMPED` payload
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-21 · §3 · folded the closing diff review round 1
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md`), id 5: this unit handled the live
+  half of `FINISHED-UNSTAMPED` and the dead half stood — `print_liveness` ranks it above `STALE`
+  and the tick acted on `STALE` alone, so a session dead at LANDING with its work on main was
+  skipped forever (class `amendment-leaves-its-other-half-standing`). One sentence in §3 points at
+  unit 5's rev-5, which owns the fix. Status unchanged, CLOSED.
 - rev-3 · 2026-09-20 · S6 · §3 · §4 · §5 · AC4 · AC5 · folded spec-audit round 2: sibling
   agreement for the promoted `TOOL-aWokenSentinel-16` (H1, raw 48) — the loop trace names the
   `--no-ff` landing shape, unit 16's check-34 predicate and the two OPEN rows
