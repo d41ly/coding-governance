@@ -5,9 +5,11 @@
 #
 # Drift note: the ACTIVE hook is the TRACKED .githooks/ dir (core.hooksPath), and check-wiring.sh
 # auto-wires an unset core.hooksPath. That is NOT the same as "tracked == active by construction",
-# which this note used to claim: `core.hooksPath` is repo-global and ABSOLUTE, so in a multi-worktree
-# layout it resolves into whatever the PRIMARY tree has checked out. The hook that gates YOUR push
-# comes from that checkout, not from the tree you are pushing. Measured at TOOL-dUnstalledConvoy-26's
+# which this note used to claim. The shared `core.hooksPath` applies unless a worktree's config.worktree sets its own,
+# and the value in effect decides which hook files run: an ABSOLUTE value runs the hooks of the
+# checkout it names, the relative `.githooks` check-wiring writes runs each worktree's own — so under
+# an absolute value the hook that gates YOUR push comes from the checkout it names, not from the tree
+# you are pushing, and seven of nine live worktrees on node `d` carry such an override. Measured at TOOL-dUnstalledConvoy-26's
 # landing: the primary tree was on a contrib branch, so the push ran that branch's pre-push — no
 # gate-env sourcing, no predicate 8, and the boundary's coverage check absent. Nothing wrong shipped,
 # because a separate full bar had verified the pushed tree; the BOUNDARY was not the one that shipped.
@@ -112,9 +114,87 @@ fi
 # Classify on the 3rd field (remote_ref) — `git push origin feat:refs/heads/main` updates the default
 # branch from a differently-named local ref. Read ALL lines here; run the gate ONCE after the loop.
 main_local=""
+_pushed=""
 while read -r _localref localsha remoteref _remotesha; do
   [ "$remoteref" = "refs/heads/$def" ] && main_local=$localsha
+  _pushed="$_pushed$localsha $remoteref
+"
 done
+
+# ---- the shards-to-builds STRAGGLER layer, PER PUSHED REF (TOOL-dDerivedDocket-13) ---------------
+# ABOVE the "nothing to gate" exits, and the placement is the whole of it: those exits fire on every
+# feature-branch push, so a block below them would never run for the refs this one is about.
+#
+# INERT WITHOUT THE LIBRARY. `straggler-guard.sh` is gov-only; this hook ships VERBATIM through the
+# push-main kit, so in every adopter that took the hook and not the library nothing below runs. The
+# source is guarded and the entry point is checked by name for that reason: an unguarded source, or
+# a predicate called with the library's functions undefined, would refuse every push in every one of
+# those trees — a path this hook positively asserts is inert.
+#
+# WHAT IT DOES, per pushed ref that is not the default branch and not a delete:
+#   * A PRE-FLIP tip that still owes a relocation gets the recipe as a NOTICE and is NEVER blocked.
+#     Refusing a feature push would strand the straggler's only off-node copy, which is worse than
+#     the merge it is being warned about.
+#   * A tip that has INTEGRATED the flip and still carries shards-mode row changes is handed to the
+#     memory-tree kit's transition audit AT THAT SHA — never over HEAD, since a push may name any
+#     ref — because a squash on the far side can erase the transition this is the last boundary able
+#     to see. Exit 1 refuses and names the merge and the repair verb; exit 2 is a DEAD PROBE, which
+#     PRINTS and allows, because these layers instruct and the merge bar is what guarantees.
+#   * Neither the module nor a launcher resolving prints one skip line naming the ref, never silence.
+_sg="$(cd "$(dirname "$0")" && pwd)/straggler-guard.sh"
+if [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 &&
+   init_straggler_guard; then
+  # The kit directory as a VALUE, and the kit ROOT from this hook's own probe above. The fallback is
+  # the hook directory's own tree: under an absolute `core.hooksPath` the hook that runs comes from
+  # another checkout, and that checkout is where a kit this tree lacks may still be.
+  _sg_kit=memory-tree
+  _sg_hooktree=$(cd "$(dirname "$0")/.." && pwd)
+  _sg_module=""
+  for _c in "$top/$GOV_KITROOT/$_sg_kit/transition_audit.py" \
+            "$_sg_hooktree/$GOV_KITROOT/$_sg_kit/transition_audit.py"; do
+    if [ -f "$_c" ]; then _sg_module="$_c"; break; fi
+  done
+  _sg_py=""
+  for _c in "$top/$GOV_KITROOT/lib/resolve-python.sh" \
+            "$_sg_hooktree/$GOV_KITROOT/lib/resolve-python.sh"; do
+    if [ -f "$_c" ]; then
+      # shellcheck source=/dev/null
+      . "$_c" && _sg_py=$(resolve_python 2>/dev/null || true)
+      break
+    fi
+  done
+  while read -r _sha _ref; do
+    [ -n "$_ref" ] || continue
+    [ "$_ref" = "refs/heads/$def" ] && continue
+    [ -z "${_sha//0/}" ] && continue
+    check_has_delta "$_sha" || continue
+    if check_preflip "$_sha"; then
+      echo "pre-push: note — $_ref predates the per-build backlog and still owes a relocation of its"
+      echo "  backlog rows. This push is NOT blocked; relocate before it merges:"
+      print_recipe "  "
+      continue
+    fi
+    if [ -z "$_sg_module" ]; then
+      echo "pre-push: the transition audit did NOT run over $_ref — the memory-tree kit is installed neither under '$top' nor beside this hook, so the straggler question was not asked. Check 25 still binds at the merge bar."
+      continue
+    fi
+    if [ -z "$_sg_py" ]; then
+      echo "pre-push: the transition audit did NOT run over $_ref — no usable python launcher resolved, so the straggler question was not asked. Check 25 still binds at the merge bar."
+      continue
+    fi
+    _sg_out=$("$_sg_py" "$_sg_module" --at "$_sha" --expect-builds 2>&1); _sg_rc=$?
+    if [ "$_sg_rc" = 2 ]; then
+      echo "pre-push: DEAD PROBE — the transition audit could not answer for $_ref, so this push is ALLOWED on a signal that did not measure:"
+      printf '%s\n' "$_sg_out" | sed 's/^/  /'
+    elif [ "$_sg_rc" != 0 ]; then
+      echo "pre-push: REFUSING — $_ref carries a transition merge whose row changes are unaccounted:"
+      printf '%s\n' "$_sg_out" | sed 's/^/  /'
+      echo "  Repair it forward with the '--repair <merge-sha>' the lines above name, then push again."
+      echo "  Deliberate override, as always: git push --no-verify"
+      exit 1
+    fi
+  done <<< "$_pushed"
+fi
 
 [ -z "$main_local" ] && exit 0                       # no push to the default branch → nothing to gate
 [ -z "${main_local//0/}" ] && exit 0                 # all-zero local sha = a delete → nothing to gate

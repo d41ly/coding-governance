@@ -463,6 +463,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_backlog_stragglers",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_banned_index",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -5581,6 +5586,11 @@
       "id": "test_backlog_path_is_outside_the_worktree",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_backlog_stragglers",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_baseline_green",

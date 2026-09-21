@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# pre-rebase — refuse to REBASE a straggler onto a branch that has already flipped to the per-build
+# backlog. TOOL-dDerivedDocket-13. Gov-only: an adopter wires its own carrier per the runbook.
+#
+# WHY A REBASE AND NOT ONLY A MERGE. The transition audit reads MERGES. A rebase, a squash or a
+# cherry-pick that drops a row leaves no merge commit behind and is invisible to it — a hole that
+# record states rather than closes. This hook is the one moment a rebase of a straggler is visible
+# to anything at all, so the recipe it prints leads with "merge, never rebase".
+#
+# git calls this hook as `pre-rebase <upstream> [<branch>]`, and the SECOND argument is absent when
+# the current branch is the one being rebased — which is every `git pull --rebase`. Reading only
+# `$2` would therefore let exactly the common case through, so the subject falls back to HEAD.
+#
+# WHAT THIS DOES NOT CHECK. It sees `git rebase`. It does not see a squash-merge made elsewhere, a
+# cherry-pick, or a rebase run with `--no-verify`, which is the deliberate bypass. It decides
+# nothing about whether a row is accounted: that is hygiene check 25's judgement at the merge bar,
+# which is what GUARANTEES while these layers instruct.
+set -u
+
+if ! top=$(git rev-parse --show-toplevel 2>/dev/null); then
+  echo "pre-rebase: cannot resolve this repository's work tree, so the straggler question was NOT" >&2
+  echo "  asked about this rebase. The transition audit still binds at the merge bar." >&2
+  exit 0
+fi
+cd "$top" || exit 0
+
+_sg="$(cd "$(dirname "$0")" && pwd)/straggler-guard.sh"
+[ -f "$_sg" ] || exit 0
+# shellcheck source=/dev/null
+. "$_sg" || exit 0
+command -v init_straggler_guard >/dev/null 2>&1 || exit 0
+init_straggler_guard || exit 0
+
+_upstream=${1:-}
+_branch=${2:-}
+_up_sha=$(git rev-parse --verify --quiet "${_upstream}^{commit}" 2>/dev/null || true)
+if [ -z "$_branch" ]; then
+  _sub_sha=$(git rev-parse --verify --quiet HEAD 2>/dev/null || true)
+else
+  _sub_sha=$(git rev-parse --verify --quiet "${_branch}^{commit}" 2>/dev/null || true)
+fi
+if [ -z "$_up_sha" ] || [ -z "$_sub_sha" ]; then
+  echo "pre-rebase: could not resolve '${_upstream:-(no upstream)}' or '${_branch:-HEAD}' to a commit, so the"
+  echo "  straggler question was NOT asked about this rebase."
+  exit 0
+fi
+
+# THE UPSTREAM'S OWN MODE decides whether this rebase would cross the boundary at all. Rebasing a
+# straggler onto another shards-mode branch moves nothing across it.
+_up_mode=shards
+for _m in $(read_conf_modes "$_up_sha"); do
+  [ "$_m" = builds ] && _up_mode=builds
+done
+[ "$_up_mode" = builds ] || exit 0
+
+check_preflip "$_sub_sha" || exit 0
+check_has_delta "$_sub_sha" "$_up_sha" || exit 0
+
+echo "pre-rebase: REFUSING — '${_branch:-HEAD}' still edits the authored backlog shards and"
+echo "  '${_upstream}' has already flipped to the per-build backlog. A rebase leaves no merge for the"
+echo "  transition audit to read, so the row changes on this branch would be dropped with nothing"
+echo "  able to say which. Relocate them instead:"
+print_recipe "  "
+echo "  Deliberate override, as always: git rebase --no-verify"
+exit 1

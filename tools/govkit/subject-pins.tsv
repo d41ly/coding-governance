@@ -106,6 +106,7 @@ shell hygiene (a loop fed by a command substitution)	repo	product
 shell-hygiene selftest	kit	selftests
 spec tokens (a spec's own names resolve)	repo	declarations
 spec-tokens self-test	kit	selftests
+straggler-guard arms	repo	declarations
 template size <=48KiB	repo	product
 template size gate selftest	kit	selftests
 testsuite counts (every bar self-test prints one)	repo	declarations

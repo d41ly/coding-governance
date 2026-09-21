@@ -8,9 +8,9 @@ streams = ["tooling"]
 decisions = ["TOOL-aRelaxedShard-1", "TOOL-aWidenedGuide-1"]
 
 [claims]
-gate-legs = ["memory hygiene", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest"]
+gate-legs = ["memory hygiene", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest", "straggler-guard arms"]
 kits = ["memory-tree"]
-git-hooks = ["commit-msg"]
+git-hooks = ["commit-msg", "pre-rebase", "straggler-guard.sh"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -30,6 +30,9 @@ globs = [
   "tools/memory-tree/transition-audit.test.sh",
   "tools/memory-tree/migrate_backlog.py",
   ".githooks/commit-msg",
+  ".githooks/pre-rebase",
+  ".githooks/straggler-guard.sh",
+  ".githooks/straggler-guard.test.sh",
 ]
 ```
 
@@ -202,6 +205,28 @@ The commit-time carrier is the tracked `commit-msg` hook, which is the one hook 
 and a conflicted merge concluded by `git commit` both reach — `pre-commit` never fires on the clean
 one, measured with git 2.54. It derives every path it uses and announces a skip rather than blocking
 a commit when the kit or a python launcher is missing.
+
+## The straggler layer — instructing a branch before its merge
+
+Check 25 finds a lost row AFTER a pre-flip branch has merged. `.githooks/straggler-guard.sh` is the
+layer that reaches that branch beforehand, sourced by `pre-commit`, the new `pre-rebase` and
+`pre-push` through the CALLING HOOK's own directory rather than through the committing tree — a
+pre-flip branch carries the old kit, so a rule resolved through `$top` could never reach it. It
+reads git objects only and decides three predicates: FLIPPED (the default branch's committed conf
+declares `builds`), PRE-FLIP (every merge base with the default is still in shards mode, never the
+subject's own tip conf, for the reason check 25 above states), and HAS-DELTA (the lineage holds a
+shards-mode commit touching the backlog shards or a family-named archive — the same watched
+population check 25 reads, so the two layers are not two answers). It carries the relocation recipe
+rendered at the tree's own derived prefix, and `straggler-guard.test.sh` grades that rendering
+against the bytes `migrate_backlog.py --recipe` prints.
+
+**WHICH HOOK FILES RUN is the limit of the whole layer.** The shared `core.hooksPath` applies unless
+a worktree's config.worktree sets its own, and only an ABSOLUTE value makes a linked worktree run
+another checkout's hooks. Under the relative `.githooks` that `check-wiring.sh` writes, a straggler
+in a linked worktree runs its OWN pre-flip hook files and none of these refusals fire there. That
+case is documented rather than closed: `check-wiring.sh`'s session step marks such a branch
+`hooks own-tree`, the drift signal `backlog_stragglers` lists it from any node's run, and check 25
+at the merge bar is what guarantees. These layers instruct; the bar decides.
 
 ## Gaps
 

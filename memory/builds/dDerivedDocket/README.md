@@ -129,7 +129,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [TOOL-dDerivedDocket-10 — driver refuses shard-into-view](spec/2026-09-14-spec-TOOL-dDerivedDocket-10.md) | 10 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-11 — migration planner](spec/2026-09-14-spec-TOOL-dDerivedDocket-11.md) | 11 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-12 — relocation tools for pre-flip branches](spec/2026-09-14-spec-TOOL-dDerivedDocket-12.md) | 12 | 2 | CLOSED | rev-6 | 2026-09-21 |
-| [TOOL-dDerivedDocket-13 — straggler hook bodies and the fleet inventory](spec/2026-09-14-spec-TOOL-dDerivedDocket-13.md) | 13 | 2 | SPECCED | rev-6 | 2026-09-20 |
+| [TOOL-dDerivedDocket-13 — straggler hook bodies and the fleet inventory](spec/2026-09-14-spec-TOOL-dDerivedDocket-13.md) | 13 | 2 | CLOSED | rev-7 | 2026-09-21 |
 | [TOOL-dDerivedDocket-50 — the kit's own route to the anchor grammar](spec/2026-09-20-spec-TOOL-dDerivedDocket-50.md) | 13 | 2 | SPECCED | rev-1 | 2026-09-20 |
 | [TOOL-dDerivedDocket-14 — rotation-note check for shards-mode archives](spec/2026-09-14-spec-TOOL-dDerivedDocket-14.md) | 14 | 1 | WONTDO | rev-1 | 2026-09-14 |
 | [TOOL-dDerivedDocket-51 — an admitted example family for the kit's scratch fixtures](spec/2026-09-20-spec-TOOL-dDerivedDocket-51.md) | 14 | 2 | SPECCED | rev-1 | 2026-09-20 |
@@ -164,7 +164,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 38 | 1 | SPECCED | rev-5 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 37 bound to this build, across 4 record folder(s).
+Records: 38 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -915,7 +915,10 @@ ck "S4 a declared path that is absent does NOT fall back to the rung" \
 rm -rf "$OOTS"; cleanup
 
 # ---- TOOL-aWeldedTribunal-7: WHICH HOOK WILL ACTUALLY RUN --------------------------------------
-# `core.hooksPath` is repo-global and absolute, so a sibling worktree supplies the hook that gates
+# The shared `core.hooksPath` applies unless a worktree's config.worktree sets its own, and the
+# value in effect decides which hook files run: an ABSOLUTE value runs the hooks of the checkout it
+# names, the relative `.githooks` check-wiring writes runs each worktree's own — so under an
+# absolute value a sibling checkout supplies the hook that gates
 # your push. The check REPORTS that as a `note` and must never gate on it: `unwired` decides this
 # script's exit code and `.unattended.conf` makes `--check` an unattended run's precondition, so an
 # UNWIRED line would refuse every unattended run whenever another checkout moved.
@@ -974,6 +977,69 @@ out=$(bash "$SCRIPT" --check 2>&1); rc=$?
 ck "hooks: an untracked hook announces a skip" \
    "$(printf '%s' "$out" | grep -q 'pre-push is not tracked here' && echo 1 || echo 0)"
 ck "hooks: a tracked-pre-commit-only adopter still exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+cleanup
+
+# ---- Check T: local branches that still owe a backlog relocation (TOOL-dDerivedDocket-13) -------
+# The step is REPORT-ONLY by construction: `unwired` decides this script's exit code and
+# `.unattended.conf` makes `--check` an unattended run's precondition, so a straggler reported as
+# UNWIRED would refuse every unattended run on this node for a branch somebody else owns. These arms
+# hold that severity, the mode gate in front of it, and the fact that it names the branch at all.
+install_relocation_kit() { # $1 = install prefix ("" here, the copy-installed adopter layout)
+  local p="$1" rel src
+  for rel in memory-tree memory-recall lib; do
+    src=$(src_of "$rel")
+    [ -n "$src" ] || { ck "install_relocation_kit: $rel is not installed in $REPO" 0; return 1; }
+    cp -r "$src" "${p}${rel}"
+  done
+  rm -rf "${p}memory-tree/__pycache__" "${p}memory-recall/__pycache__"
+  # The recall-opened OPT-IN pair is dropped on purpose. It is not a dependency of the straggler
+  # inventory, and leaving it here makes check R report UNWIRED over a fixture with no settings.json
+  # — which would decide this script's exit code and make the `--check` arm below assert nothing
+  # about the straggler severity it exists to hold.
+  rm -f "${p}memory-recall/recall-opened.js" "${p}memory-recall/recall-opened.fragment.json"
+}
+# A SHARDS-mode tree first: the step must be silent about stragglers where no branch can be one.
+newrepo
+install_relocation_kit "" || true
+mkdir -p memory/backlog memory/builds/aSeed
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\nBACKLOG_MODE="shards"\n' > .memory-tree.conf
+printf '# the seed build\n' > memory/builds/aSeed/README.md
+printf '# decisions\n\n- TOOL-aSeed-9 - a decision\n' > memory/DECISIONS.md
+printf '# TOOL backlog\n\n- TOOL-aSeed-1 - the first ask\n' > memory/backlog/TOOL.md
+printf '__pycache__/\n' > .gitignore
+git add -A; git commit -q -m "a shards-mode memory tree"
+out=$(chke --session)
+ck "straggler: a shards-mode tree reports no straggler line" \
+   "$(printf '%s' "$out" | grep -q '^note     straggler' && echo 0 || echo 1)"
+ck "straggler: and says which condition held it back" \
+   "$(printf '%s' "$out" | grep -q "^skip     straggler — BACKLOG_MODE is not 'builds'" && echo 1 || echo 0)"
+# Now the flip, a bare origin so the default branch is OBSERVABLE, and one local straggler.
+git checkout -q -b strag
+printf '# TOOL backlog\n\n- TOOL-aSeed-1 - the first ask, REWORDED by the straggler\n' > memory/backlog/TOOL.md
+git commit -q -am "the straggler edits a row"
+git checkout -q main
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\nBACKLOG_MODE="builds"\n' > .memory-tree.conf
+mkdir -p memory/builds/aFlip
+printf '# aFlip\n\n## Asks\n\n## Dispositions\n' > memory/builds/aFlip/BACKLOG.md
+git add -A; git commit -q -m "flip to builds"
+OOT=$(mktemp -d); git init -q --bare -b main "$OOT/origin.git"
+git remote add origin "$OOT/origin.git"; git push -q origin main
+git remote set-head origin -a >/dev/null 2>&1
+out=$(chke --session); rc=$?
+ck "straggler: --session exits 0 over a tree holding one" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+ck "straggler: exactly one note line" \
+   "$([ "$(printf '%s\n' "$out" | grep -c '^note     straggler')" = 1 ] && echo 1 || echo 0)"
+ck "straggler: and it names the branch" \
+   "$(printf '%s' "$out" | grep -q 'refs/heads/strag' && echo 1 || echo 0)"
+# UNDER --check THE SEVERITY IS UNCHANGED AND THE EXIT IGNORES IT. This is the load-bearing arm:
+# anything reading a non-zero exit as a refusal must not learn about stragglers that way.
+out=$(chke --check); rc=$?
+ck "straggler: --check reports it at note severity, never UNWIRED" \
+   "$(printf '%s' "$out" | grep -q '^UNWIRED  straggler' && echo 0 || echo 1)"
+ck "straggler: --check still names it" \
+   "$(printf '%s' "$out" | grep -q '^note     straggler' && echo 1 || echo 0)"
+ck "straggler: and the straggler alone does not decide the exit" \
+   "$([ "$rc" = 0 ] && echo 1 || echo 0)"
 cleanup
 
 echo "---- $pass passed, $fail failed ----"

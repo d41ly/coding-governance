@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.10
+gov:kit drift-audit@1.12
 
     python <kit>/selftest.py
 
@@ -1051,6 +1051,100 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
               got["live"] is False and "shallow" in str(got["detail"]).lower(), f"{got}")
     else:
         skip("shallow-clone arm", "the fixture clone did not materialise on this platform")
+
+
+# ---------------------------------------------------------------------------------------------
+# 5 - backlog_stragglers: the fleet-wide half of the shards-to-builds transition
+# ---------------------------------------------------------------------------------------------
+
+
+def test_backlog_stragglers(tmp: pathlib.Path) -> None:
+    """The straggler inventory, in the three states it can report.
+
+    THE REMOTE-TRACKING HALF IS THE LOAD-BEARING ARM. The hooks beside `.githooks/` reach a
+    straggler only on the node that owns it, and `check-wiring.sh` names the LOCAL ones. A signal
+    that walked `refs/heads` alone would read a pushed straggler from another node as none, which is
+    the reassuring zero this kit exists to refuse - so the fixture plants one that exists ONLY as a
+    remote-tracking ref and the arm names it.
+    """
+    print("backlog stragglers (not asked without the relocation engine; falsifiable with it)")
+    r = make_repo(tmp, name="stragglers")
+
+    s = report(r)["backlog_stragglers"]
+    check("no memory-tree kit: backlog_stragglers is NOT ASKED, not a clean zero",
+          s.get("not_asked") is True and s["value"] == 0, f"{s}")
+    check("no memory-tree kit: and it says why",
+          "memory-tree" in str(s["detail"]), f"{s['detail']}")
+
+    kit_root = KIT.parent
+    missing = [n for n in ("memory-tree", "memory-recall", "lib") if not (kit_root / n).is_dir()]
+    if missing:
+        skip("backlog_stragglers: the live arms",
+             f"the sibling kits are not installed beside this one: {', '.join(missing)}")
+        return
+    for name in ("memory-tree", "memory-recall", "lib"):
+        shutil.copytree(kit_root / name, r / name,
+                        ignore=shutil.ignore_patterns("__pycache__"))
+    (r / ".memory-tree.conf").write_text(
+        "MEMORY_ROOT=memory\nDISCIPLINES=\"tooling\"\nFAMILIES=\"tooling:TOOL\"\n"
+        "ROTATION_MODE=\"cut\"\nBACKLOG_MODE=\"shards\"\n",
+        encoding="utf-8", newline="\n")
+    (r / ".gitignore").write_text("__pycache__/\n", encoding="utf-8", newline="\n")
+    bl = r / "memory" / "backlog"
+    bl.mkdir(parents=True, exist_ok=True)
+    (bl / "TOOL.md").write_text("# TOOL backlog\n\n- TOOL-aSeed-1 - the first ask\n",
+                                encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "a shards-mode backlog and the kits", "--no-verify"], r)
+
+    # One LOCAL straggler, and one that exists only as a REMOTE-TRACKING ref - the branch another
+    # node pushed. `update-ref` rather than a real remote on purpose: a remote would make
+    # `origin/HEAD` observable and change which branch the inventory keys on, which is a different
+    # question from the one this arm asks.
+    for branch, text in (("strag", "REWORDED by the local straggler"),
+                         ("elsewhere", "REWORDED by another node")):
+        run(["git", "checkout", "-q", "-b", branch, "main"], r)
+        (bl / "TOOL.md").write_text(f"# TOOL backlog\n\n- TOOL-aSeed-1 - {text}\n",
+                                    encoding="utf-8", newline="\n")
+        run(["git", "commit", "-q", "-am", f"the {branch} straggler edits a row", "--no-verify"], r)
+    far = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    run(["git", "checkout", "-q", "main"], r)
+    run(["git", "branch", "-q", "-D", "elsewhere"], r)
+    run(["git", "update-ref", "refs/remotes/origin/elsewhere", far], r)
+
+    (r / ".memory-tree.conf").write_text(
+        "MEMORY_ROOT=memory\nDISCIPLINES=\"tooling\"\nFAMILIES=\"tooling:TOOL\"\n"
+        "ROTATION_MODE=\"cut\"\nBACKLOG_MODE=\"builds\"\n",
+        encoding="utf-8", newline="\n")
+    flip = r / "memory" / "builds" / "aFlip"
+    flip.mkdir(parents=True, exist_ok=True)
+    (flip / "BACKLOG.md").write_text("# aFlip\n\n## Asks\n\n## Dispositions\n",
+                                     encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "flip to builds", "--no-verify"], r)
+
+    s = report(r)["backlog_stragglers"]
+    check("two stragglers: the signal counts both", s["value"] == 2, f"{s}")
+    check("two stragglers: and reports how many refs it examined", s["of"] >= 3, f"of={s['of']}")
+    check("two stragglers: the probe is live", s["live"] is True, f"{s}")
+    check("two stragglers: and it is never gateable", s["gateable"] is False, f"{s}")
+    refs = [d.get("ref", "") for d in s["detail"]]
+    check("two stragglers: the LOCAL one is named", any("refs/heads/strag" in x for x in refs), f"{refs}")
+    check("two stragglers: the REMOTE-TRACKING one is named too",
+          any("refs/remotes/origin/elsewhere" in x for x in refs), f"{refs}")
+
+    # Nothing to examine: the inventory refuses rather than reporting a clean zero, and the signal
+    # carries that through as NOT LIVE. A ref walk that examined nothing is a fact about the clone.
+    tip = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    run(["git", "checkout", "-q", "--detach"], r)
+    for branch in ("main", "strag", "sidework"):
+        run(["git", "branch", "-q", "-D", branch], r)
+    run(["git", "update-ref", "-d", "refs/remotes/origin/elsewhere"], r)
+    s = report(r, "--base-ref", tip)["backlog_stragglers"]
+    check("no ref to examine: the signal reports NOT LIVE, never a clean zero",
+          s["live"] is False and s["value"] == 0, f"{s}")
+    check("no ref to examine: and it carries the reason",
+          "DEAD PROBE" in str(s["detail"]), f"{s['detail']}")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -2157,6 +2251,7 @@ def main() -> int:
         test_lexicon_marginal_rate(tmp)
         test_no_signal_hardcodes_live(tmp)
         test_live_backlog_rows(tmp)
+        test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)

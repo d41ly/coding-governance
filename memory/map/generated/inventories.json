@@ -99,6 +99,7 @@
       "shell-hygiene selftest",
       "spec tokens (a spec's own names resolve)",
       "spec-tokens self-test",
+      "straggler-guard arms",
       "template size <=48KiB",
       "template size gate selftest",
       "testsuite counts (every bar self-test prints one)",
@@ -135,7 +136,9 @@
       "commit-msg",
       "gate-env.sh",
       "pre-commit",
-      "pre-push"
+      "pre-push",
+      "pre-rebase",
+      "straggler-guard.sh"
     ],
     "workflow-scripts": [
       "check-workflow-syntax.js",

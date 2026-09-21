@@ -28,6 +28,7 @@ tools/run-gates/gate-profiles.txt text eol=lf
 .githooks/commit-msg text eol=lf
 .githooks/pre-commit text eol=lf
 .githooks/pre-push text eol=lf
+.githooks/pre-rebase text eol=lf
 
 # memory-tree determinism (this repo dogfoods the kit). THREE gates read these bytes, and all three
 # are byte- or char-exact:

@@ -1167,6 +1167,23 @@
     "ceiling": 900
   },
   {
+    "name": "straggler-guard arms",
+    "argv": [
+      "bash",
+      ".githooks/straggler-guard.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/check-wiring.sh",
+      "tools/lib/",
+      "tools/memory-recall/",
+      "tools/memory-tree/"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "marker contracts",
     "argv": [
       "bash",

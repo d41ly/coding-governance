@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.10
+gov:kit drift-audit@1.12
 
     python tools/drift-audit/drift_report.py            # human table, always exits 0
     python tools/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -48,7 +48,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
-KIT_DRIFT_AUDIT_VERSION = "1.10"
+KIT_DRIFT_AUDIT_VERSION = "1.12"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -1746,13 +1746,100 @@ def build_source_cited_ids_with_no_record(ctx) -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------------
+# Signal - refs that still owe a backlog relocation (TOOL-dDerivedDocket-13)
+#
+# THE FLEET-WIDE HALF. The hooks beside `.githooks/` instruct a straggler at the moment its own node
+# can see it, and `check-wiring.sh` names the LOCAL ones from a session tree. Neither reaches a
+# branch pushed from another node, or a branch whose worktree runs its own pre-flip hook files. This
+# walks the remote-tracking refs as well as the local ones, so a straggler is reported from ANY
+# node's drift run until its changes are accounted on the default branch.
+#
+# REPORT-ONLY. `gateable: False`, so `--check` never reds on it: a straggler is a normal state of a
+# transition and its remedy is a relocation somebody has to perform, not a merge to block. Before
+# the flip it reports the whole migration inventory; after it, the stragglers left, until zero.
+#
+# IT DECIDES NOTHING. The judgement of what is accounted belongs to the relocation engine and the
+# transition audit; this signal runs the engine's own `--stragglers` inventory and counts its rows.
+# Two readers of one question would be two answers to it.
+# --------------------------------------------------------------------------------------------
+
+
+def _resolve_relocation_engine():
+    """The memory-tree kit's relocation engine, by a directory BESIDE this one.
+
+    The resolution `_resolve_ident` makes for the recall kit, for the same reason: the kit that owns
+    the answer is a sibling of this one at whatever prefix a tree installs them at, and the sibling
+    is optional. Returns None rather than raising — `main()` evaluates every signal in one unguarded
+    comprehension, so a raise here takes the whole report down.
+    """
+    engine = pathlib.Path(__file__).resolve().parent.parent / "memory-tree" / "migrate_backlog.py"
+    return engine if engine.is_file() else None
+
+
+def build_backlog_stragglers(ctx) -> dict:
+    """Refs whose backlog row changes are unaccounted against the default branch."""
+    name = "backlog_stragglers"
+    engine = _resolve_relocation_engine()
+    if engine is None:
+        return _build_not_asked(name, "the memory-tree kit is not installed beside this one")
+    try:
+        source = engine.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        return _build_not_asked(name, f"the relocation engine could not be read: {exc}")
+    # THE MODE, not the module. A kit copy that predates the inventory answers a different question
+    # or none at all, and running it would report a zero that means "this argument was rejected".
+    if "--stragglers" not in source:
+        return _build_not_asked(
+            name, "the installed memory-tree kit predates the straggler inventory (--stragglers)")
+    try:
+        out = subprocess.run(
+            [sys.executable, str(engine), "--stragglers", "--tsv"],
+            cwd=str(ctx.root), capture_output=True, text=True,
+            encoding="utf-8", errors="replace", timeout=600)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return _build_not_asked(name, f"the straggler inventory could not be run: {exc}")
+
+    rows, examined = [], 0
+    for line in (out.stdout or "").splitlines():
+        bits = line.rstrip("\r").split("\t")
+        if bits[0] == "straggler" and len(bits) >= 5:
+            rows.append({"ref": bits[1], "tip": bits[2][:12],
+                         "unaccounted": bits[3], "first_change": bits[4][:12]})
+        elif bits[0] == "examined" and len(bits) >= 2 and bits[1].strip().isdigit():
+            examined = int(bits[1].strip())
+    detail = rows[:20]
+    if out.returncode != 0:
+        # The inventory refuses rather than guessing on a shallow clone or an empty ref set, and it
+        # says which. Carried through as the DETAIL of a probe that reports itself not live, never
+        # flattened into a reassuring zero.
+        said = (out.stdout or "").strip() or (out.stderr or "").strip()
+        detail = [{"note": said.splitlines()[0][:300] if said else
+                   f"the straggler inventory exited {out.returncode} and printed nothing"}]
+        examined = 0
+    return {
+        "signal": name,
+        "value": len(rows),
+        # LIVENESS FROM WHAT WAS EXAMINED. A repository whose ref walk examined nothing reports DEAD
+        # rather than a clean 0 — a clone with no refs and a fleet with no stragglers are different
+        # facts and only one of them is good news.
+        "of": examined,
+        "tolerance": 0,
+        "gateable": False,
+        "live": examined > 0,
+        "unjudgeable": 0,
+        "detail": detail,
+    }
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
            build_live_backlog_rows, build_readme_mechanism_drift,
            build_backlog_rows_outliving_specs,
-           build_source_cited_ids_with_no_record]
+           build_source_cited_ids_with_no_record,
+           build_backlog_stragglers]
 
 
 # --------------------------------------------------------------------------------------------

@@ -238,9 +238,9 @@ else
   PY=python3   # gov:literal-python — printed in a remedy string, never executed; the resolver is not installed beside this script
 fi
 
-# TOOL-aWeldedTribunal-7 — WHICH HOOK WILL ACTUALLY RUN. `core.hooksPath` is repo-global and
-# absolute, so in a multi-worktree layout the hooks that gate a commit and a push come from whatever
-# the PRIMARY tree has checked out, NOT from the tree being worked in. Measured at
+# TOOL-aWeldedTribunal-7 — WHICH HOOK WILL ACTUALLY RUN. The shared `core.hooksPath` applies unless a worktree's config.worktree sets its own,
+# and the value in effect decides which hook files run: an ABSOLUTE value runs the hooks of the
+# checkout it names, the relative `.githooks` this script writes runs each worktree's own. Measured at
 # `TOOL-dUnstalledConvoy-26`'s landing: the primary tree sat on `contrib/incms-memory-recall`, so the
 # push ran that branch's `pre-push` — no gate-env sourcing, no predicate 8, and the boundary's own
 # coverage check simply absent. Nothing wrong shipped, because a separate full bar had verified the
@@ -259,7 +259,7 @@ fi
 # bypassed. The severity carries the whole fork resolution.
 #
 # WRITTEN OVER A LIST, so a third hook is one row rather than a third copy of the comparison.
-GOV_WIRING_HOOKS="commit-msg pre-commit pre-push"
+GOV_WIRING_HOOKS="commit-msg pre-commit pre-push pre-rebase"
 check_hook_blobs() { # $1 = resolved hooks dir, $2 = the configured value as written
   local dir="$1" shown="$2" hook resolved tracked otherbranch
   for hook in $GOV_WIRING_HOOKS; do
@@ -284,7 +284,7 @@ check_hook_blobs() { # $1 = resolved hooks dir, $2 = the configured value as wri
     otherbranch=$(git -C "$(dirname "$dir")" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
     echo "note     hooks     — $hook DIVERGES: the hook that will run is $resolved from $shown"
     echo "note     hooks       (checkout on '${otherbranch:-unknown}'), this tree tracks $tracked."
-    echo "note     hooks       core.hooksPath is repo-global, so a sibling worktree supplies it."
+    echo "note     hooks       the core.hooksPath value in effect names another checkout, which supplies the hook."
   done
 }
 
@@ -944,6 +944,99 @@ check_skill_install() {
   echo "ok       skill     — the installed /session-kickoff engine matches tracked"
 }
 
+# --- Check T: local branches that still owe a backlog relocation (TOOL-dDerivedDocket-13) ---------
+# REPORT-ONLY, ALWAYS. `note`, never `UNWIRED`: `unwired` is what this script's last line turns into
+# its exit code and `.unattended.conf` makes `--check` an unattended run's precondition, so redding
+# here would refuse every run on this node for a branch somebody else owns. A straggler is a normal
+# state of a transition, and a gate that reds on a normal state is a gate that gets bypassed.
+#
+# WHY EVERY SESSION TREE AND NOT THE PRIMARY ONE. The ref set is repository-wide, and this project's
+# sessions routinely open in a linked worktree — a primary-tree-only step would reach almost none of
+# them. The inventory is the relocation engine's `--stragglers --local`, which is its one narrowing
+# walk over `refs/heads` and nothing else.
+#
+# `hooks own-tree` IS THE LOAD-BEARING HALF. A straggler checked out in a linked worktree whose
+# effective `core.hooksPath` resolves INSIDE that worktree runs its own pre-flip hook files, so the
+# commit, rebase and push refusals never fire there at all. This note, the drift signal and the
+# merge bar's transition audit are the only layers that reach it, and a reader who does not know
+# that will read the absence of a refusal as an absence of a problem.
+#
+# EVERY PATH IS DERIVED. This file ships verbatim, so the kit directory and the engine's basename
+# are VALUES joined to `KIT_REL` at run time rather than a spelled path that resolves to nothing at
+# another prefix.
+#
+# WHAT THIS DOES NOT CHECK: it does not decide whether a row change is accounted — it prints the
+# engine's count and names the refs. It reads `refs/heads` only, so a straggler that exists on
+# another node and not here is invisible to it; the drift-audit signal walks the remote-tracking
+# refs for exactly that reason.
+check_backlog_stragglers() {
+  local conf mode kit eng path py out rc refs ref names="" wt wtabs hp eff mark
+  conf=$(first_of .memory-tree.conf)
+  if [ -z "$conf" ]; then
+    echo "skip     straggler — no .memory-tree.conf here, so this repo declares no backlog mode"
+    return
+  fi
+  mode=$(sed -n 's/^[[:space:]]*BACKLOG_MODE[[:space:]]*=[[:space:]]*//p' "$conf" | tail -n 1 |
+         tr -d "\"'\r" | sed 's/[[:space:]]*$//')
+  if [ "$mode" != builds ]; then
+    echo "skip     straggler — BACKLOG_MODE is not 'builds' here, so no branch can be a straggler yet"
+    return
+  fi
+  kit=memory-tree; eng=migrate_backlog.py
+  path=$(first_of "${KIT_REL:+$KIT_REL/}$kit/$eng" "$kit/$eng")
+  if [ -z "$path" ]; then
+    echo "skip     straggler — the memory-tree kit's $eng is not installed here, so no inventory ran"
+    return
+  fi
+  if ! command -v resolve_python >/dev/null 2>&1 || ! py=$(resolve_python 2>/dev/null); then
+    echo "note     straggler — no usable python launcher resolved, so the straggler inventory did NOT run and this line is not an all-clear"
+    return
+  fi
+  # BOUNDED. The walk is one process per ref pair plus a delta per candidate, and this runs at
+  # SessionStart: a repository with hundreds of refs must cost a bounded wait, not an unbounded one.
+  # A bound that fires is announced, because a silent timeout is a clean-looking zero.
+  if command -v timeout >/dev/null 2>&1; then
+    out=$(timeout 60 "$py" "$path" --stragglers --local --tsv 2>/dev/null); rc=$?
+  else
+    out=$("$py" "$path" --stragglers --local --tsv 2>/dev/null); rc=$?
+  fi
+  if [ "$rc" != 0 ]; then
+    echo "note     straggler — the straggler inventory exited $rc and reported nothing usable, so this line is not an all-clear"
+    return
+  fi
+  refs=$(printf '%s\n' "$out" | awk -F'\t' '$1=="straggler"{print $2}')
+  for ref in $refs; do
+    mark=""
+    wt=$(git worktree list --porcelain 2>/dev/null |
+         awk -v want="$ref" '/^worktree /{p=substr($0,10)} /^branch /{if (substr($0,8)==want) print p}')
+    if [ -n "$wt" ]; then
+      wtabs=$(abspath "$wt")
+      hp=$(git -C "$wt" config --get core.hooksPath 2>/dev/null || true)
+      eff=""
+      if [ -n "$hp" ]; then
+        case "$hp" in
+          /*|[A-Za-z]:[\\/]*) eff=$(abspath "$hp") ;;
+          *)                  eff=$(abspath "$wt/$hp") ;;
+        esac
+      fi
+      if [ -z "$eff" ] || [ -z "$wtabs" ]; then
+        mark=" (hooks own-tree)"
+      else
+        case "$eff" in "$wtabs"|"$wtabs"/*) mark=" (hooks own-tree)" ;; esac
+      fi
+    fi
+    names="$names $ref$mark ·"
+  done
+  if [ -n "$names" ]; then
+    # THE MARK IS NOT IN THIS PROSE, deliberately. A sentence that always carries the marker's own
+    # words makes any arm grepping for it pass over a run where nothing was marked — the same
+    # could-not-fail shape the charter's §7 names, one level up from the code.
+    echo "note     straggler —${names% ·} still edit the authored backlog shards and owe a relocation before they merge; a marked branch runs its own pre-flip hook files, so only this note, the drift signal and the merge bar reach it. Detail: $py $path --stragglers"
+  else
+    echo "ok       straggler — no local branch still owes a backlog relocation"
+  fi
+}
+
 check_hooks
 check_agentcap
 check_scratch_guard
@@ -952,6 +1045,7 @@ check_card
 check_merge_rows
 check_eol
 check_skill_install
+check_backlog_stragglers
 
 [ "$MODE" = session ] && exit 0
 [ "$unwired" = 0 ] && exit 0 || exit 1

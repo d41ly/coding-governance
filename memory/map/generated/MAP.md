@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 109 · kits: 16 · git-hooks: 4 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 71 · guides: 8 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 110 · kits: 16 · git-hooks: 6 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 71 · guides: 8 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -106,6 +106,7 @@ Inventories: gate-legs: 109 · kits: 16 · git-hooks: 4 · workflow-scripts: 8 �
 | `shell-hygiene selftest` | gate-lint |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |
 | `spec-tokens self-test` | spec-tokens |
+| `straggler-guard arms` | memory-tree-hygiene |
 | `template size <=48KiB` | baseline |
 | `template size gate selftest` | playbook |
 | `testsuite counts (every bar self-test prints one)` | testsuite-counts |
@@ -149,6 +150,8 @@ Inventories: gate-legs: 109 · kits: 16 · git-hooks: 4 · workflow-scripts: 8 �
 | `gate-env.sh` | foundation |
 | `pre-commit` | baseline |
 | `pre-push` | baseline |
+| `pre-rebase` | memory-tree-hygiene |
+| `straggler-guard.sh` | memory-tree-hygiene |
 
 ## workflow-scripts
 
