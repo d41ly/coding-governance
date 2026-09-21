@@ -414,9 +414,14 @@ const SUBJECTS_SCHEMA = {
         type: 'object',
         properties: {
           path: { type: 'string' },
-          blob: { type: 'string', pattern: '^[0-9a-f]{7,40}$' },
+          // BOTH FULL 40-HEX OBJECT NAMES (TOOL-aWokenSentinel-15). `blob` is `git rev-parse
+          // HEAD:<path>`, `tree` is `git hash-object <path>`, and the pre-flight below compares them
+          // by string equality, so an abbreviated side would read as dirty with a remedy that is
+          // false for a clean tree. The supplied-subject contract stays `{7,40}` at `badSubject`.
+          blob: { type: 'string', pattern: '^[0-9a-f]{40}$' },
+          tree: { type: 'string', pattern: '^[0-9a-f]{40}$' },
         },
-        required: ['path', 'blob'],
+        required: ['path', 'blob', 'tree'],
       },
     },
   },
@@ -445,9 +450,26 @@ const SUBJECTS_SCHEMA = {
 // in for the skeptic a dead batch never ran, and a skeptic's one verdict the severity rule cannot
 // supply is "not a defect" — without it a false positive had to become a unit, a false rev-N line,
 // or a standing item that stalled the run. The guard bounds it by `unverified`.
+//
+// `edges` AND `placements` ARE THE TWO FIELDS THE STAGE'S OWN WORK IS GRADED THROUGH
+// (TOOL-cMendedVintage-19). A §3 edge is a PAIR and never a bullet: one author's **consumes-from**
+// is the other's **hands-off**, and the hygiene join exists because writing the second line is what
+// forces the second author to read the handoff. The round-1 audit of `cMendedVintage` wrote seven
+// consumes-from bullets with no reciprocal and the other ends were added by hand afterwards. So the
+// stage REPORTS every edge it wrote, the mirror as its own entry, and a bullet with no mirror in
+// that list refuses the hand-out. `placements` carries the other half: one entry per promoted unit
+// naming the unit it repairs and the `order` it was given, because a repair appended past the
+// roster end leaves the defect it closes standing for the whole build — measured at thirteen units
+// on that same round, against the one unit the rule below produces.
+//
+// WHAT THIS PAIR DOES NOT CHECK, said here rather than discovered later: this runtime has no
+// filesystem, so both fields bind what the stage SAYS it wrote and nothing else. An edge written
+// into a spec and left out of `edges` is invisible here and is caught at the push boundary by the
+// hygiene join, which reads the specs themselves. The value bought here is that the pair is what
+// the stage must produce to get a roster at all.
 const DISPOSAL_SCHEMA = {
   type: 'object',
-  required: ['disposed', 'standing', 'promoted', 'folded', 'promotedIds', 'summary'],
+  required: ['disposed', 'standing', 'promoted', 'folded', 'promotedIds', 'edges', 'placements', 'summary'],
   additionalProperties: true,
   properties: {
     disposed: { type: 'boolean' },
@@ -456,6 +478,30 @@ const DISPOSAL_SCHEMA = {
     folded: { type: 'integer', minimum: 0 },
     refuted: { type: 'integer', minimum: 0 },
     promotedIds: { type: 'array', items: { type: 'string' } },
+    edges: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['from', 'verb', 'to'],
+        properties: {
+          from: { type: 'string' },
+          verb: { type: 'string', enum: ['consumes-from', 'hands-off'] },
+          to: { type: 'string' },
+        },
+      },
+    },
+    placements: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['unit', 'repairs', 'order'],
+        properties: {
+          unit: { type: 'string' },
+          repairs: { type: 'string' },
+          order: { type: 'integer', minimum: 1 },
+        },
+      },
+    },
     summary: { type: 'string' },
   },
 }
@@ -673,6 +719,18 @@ if (!specAudit) {
 // A CALLER-SUPPLIED SET WINS. `--plan` already knows the spec set, so a caller that pinned the
 // blobs itself is authoritative and the resolver stage is skipped rather than run for a second
 // opinion about the same files.
+//
+// THE RESOLVER PINS AT A BLOB AND THE LENSES READ THE TREE (TOOL-aWokenSentinel-15). Round 2 of
+// this build's own spec audit pinned two specs at `git rev-parse HEAD:<path>` while the working
+// tree held uncommitted folds of both, and every lens read the tree: a disposition recorded against
+// a pin nobody could open. So the resolver returns each subject's committed `blob` AND its
+// working-tree hash from `git hash-object <path>`, and the script REFUSES to dispatch a lens while
+// any subject differs between the two, naming every such path with both hashes and the one remedy,
+// which is to commit the fold and re-invoke. WHAT THAT DOES NOT PROVE: that the committed blob is
+// the text the lenses read is a property of a clean tree AT DISPATCH TIME, and a fold written by a
+// concurrent session after the check passes is outside it — a workflow script has no filesystem
+// and cannot watch the file between the check and the read. A caller-supplied set never enters
+// the branch and carries no `tree`, so the compare cannot read it; `badSubject` below grades both.
 let subjects = Array.isArray(a.subjects) ? a.subjects : null
 // SCOPED AFTER A DISPOSAL. With `auditIds` the resolver sees only the promoted units, so the audit
 // reads the specs no spec-audit record names yet and not the whole set a terminal round already
@@ -689,13 +747,39 @@ if (specAudit && !subjects) {
     GROUND +
       'Resolve the blob of every spec in this build so an audit can be pinned at immutable bytes.\n' +
       renderRoster(auditUnits, slug, briefDir) + '\n\n' +
-      'For each unit above that HAS a spec path, run `git rev-parse HEAD:<specPath>` in ' + repo +
-      ' and return one entry per spec. Return ONLY units whose spec exists and whose blob resolves; ' +
-      'an unspecced unit is not a subject and must be omitted rather than given an invented blob. ' +
-      'Paths are repo-relative and forward-slashed.',
+      'For each unit above that HAS a spec path, run `git rev-parse HEAD:<specPath>` and ' +
+      '`git hash-object <specPath>` in ' + repo + ' and return both as the full 40-character object ' +
+      'names — `blob` and `tree` respectively, one entry per spec. Return ONLY units whose spec ' +
+      'exists and whose blob resolves; an unspecced unit is omitted rather than given an invented ' +
+      'hash. Paths are repo-relative and forward-slashed.',
     { label: 'audit:subjects:r' + roundNo, phase: 'Audit', schema: SUBJECTS_SCHEMA },
   )
   subjects = (res && Array.isArray(res.subjects)) ? res.subjects : []
+  // THE PRE-FLIGHT, INSIDE THE BRANCH so a supplied `{path, blob}` set never reads as dirty. The
+  // field refusal comes first and is distinct from the dirty verdict: the suite's runner evaluates
+  // no schema, so a resolver that omits `tree` or abbreviates a side is refused NAMING THE FIELD,
+  // never read as a dirty tree with a remedy that is false for a clean one.
+  const badResolved = subjects.findIndex(function (s) {
+    return !s || !/^[0-9a-f]{40}$/.test(String(s.blob || '')) || !/^[0-9a-f]{40}$/.test(String(s.tree || ''))
+  })
+  if (badResolved !== -1) {
+    throw new Error(
+      'unattended-build: resolved subject ' + badResolved + ' does not carry a 40-hex blob and a 40-hex tree: ' +
+        JSON.stringify(subjects[badResolved]) + '. The resolver returns both full object names or the ' +
+        'pre-flight cannot compare them.',
+    )
+  }
+  const dirty = subjects.filter(function (s) { return s.tree !== s.blob })
+  if (dirty.length) {
+    throw new Error(
+      'unattended-build: ' + dirty.length + ' subject(s) differ between HEAD and the working tree, so a lens ' +
+        'would read text the pin does not name: ' +
+        dirty.map(function (s) { return s.path + ' HEAD ' + s.blob + ' tree ' + s.tree }).join('; ') +
+        '. Commit the fold, then re-invoke with the same arguments; an audit is pinned at bytes history holds.',
+    )
+  }
+  // `tier2-review.js` takes `{path, blob}` and that contract is not this stage's to widen.
+  subjects = subjects.map(function (s) { return { path: s.path, blob: s.blob } })
 }
 // REFUSED HERE RATHER THAN DOWNSTREAM. `tier2-review.js` would refuse an empty set too, but its
 // message is about its own arguments; this one can say which stage failed to produce them, which is
@@ -1061,14 +1145,35 @@ if (!specAudit) {
           'reason being the report id and severity of the finding it closes, ') +
       'then author its spec at its tier with a mechanism that CLOSES the finding — the change to the ' +
       'design and the artifact that proves it — so the next invocation of this harness audits it ' +
-      'as a spec, under `auditIds`, before it is built like any other. FOLD every MEDIUM and every ' +
+      'as a spec, under `auditIds`, before it is built like any other. ' +
+      'GIVE THAT SPEC AN `order` VERB THAT PLACES IT IMMEDIATELY AFTER THE UNIT IT REPAIRS: one ' +
+      'above that unit\'s own order, so the defect is closed at the next step rather than after the ' +
+      'whole roster. Units sharing an order are a parallel group and do not block each other, so a ' +
+      'tie with whatever already sits at that number is the intended shape and NOTHING DOWNSTREAM ' +
+      'IS RENUMBERED. A promotion that repairs no unit in particular takes an order ABOVE EVERY ' +
+      'unit in this build — the honest append-past-the-end default, and the only case in which a ' +
+      'promotion may land there. Never guess a position for one. ' +
+      'FOLD every MEDIUM and every ' +
       'LOW into the spec it belongs to, as a rev-N bump with its ' +
-      'section 9 line. You may REFUTE an UNVERIFIED finding — never a CONFIRMED one — where your ' +
+      'section 9 line. ' +
+      'EVERY §3 EDGE YOU WRITE GETS BOTH OF ITS ENDS, in the same pass: a **consumes-from** `X` in ' +
+      'one spec is a **hands-off** back in X\'s own §3, amended there as a rev-N bump with its ' +
+      'section 9 line. A bullet written at one end only reds the hygiene gate\'s §3 edge join and ' +
+      'leaves the other author having never read the handoff, which is the whole reason that join ' +
+      'exists. ' +
+      'You may REFUTE an UNVERIFIED finding — never a CONFIRMED one — where your ' +
       'own reading finds no defect, with a one-line reason per refuted finding in `summary`, and ' +
       'count it in `refuted`. Never parked, never waived, never retired, never re-reviewed. Return ' +
       '`promoted`, `folded` and `refuted` as counts of FINDINGS by report id, each id counted exactly once ' +
       'across the three and `standing`; name every promoted unit id in `promotedIds` and in ' +
-      '`summary`; and NAME in `standing` every finding you did NOT dispose.',
+      '`summary`; and NAME in `standing` every finding you did NOT dispose. ' +
+      'Return in `edges` EVERY §3 edge bullet you wrote or amended, one entry per BULLET as ' +
+      '`{from, verb, to}`, `verb` spelled exactly `consumes-from` or `hands-off` and both ends a ' +
+      'unit id — the mirror is its own entry, so a correctly paired edge appears there twice. ' +
+      'Return in `placements` one `{unit, repairs, order}` per promoted unit: `repairs` names the ' +
+      'unit that promotion repairs, or the bare string `none`, and `order` is the integer you ' +
+      'wrote into its status header. Both fields are REQUIRED, and `edges: []` is a declared ' +
+      'absence rather than a missing key.',
     { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA },
   )
   // NO PARTIAL HAND-OUT. Deciding which units a standing finding touches needs the tree, which this
@@ -1109,6 +1214,51 @@ if (!specAudit) {
   folded = counted ? d.folded : null
   refuted = d && d.refuted !== undefined ? d.refuted : 0
   promotedIds = Array.isArray(d && d.promotedIds) ? d.promotedIds : []
+  // AN EDGE IS A PAIR AND A REPAIR SITS BESIDE WHAT IT REPAIRS (TOOL-cMendedVintage-19). A bullet
+  // whose mirror is missing from the stage's OWN list is a bullet it wrote at one end; the malformed
+  // entry joins that bucket rather than getting a bucket of its own, because an edge naming no verb
+  // or no end is unpaired in the only sense that matters here.
+  const edges = Array.isArray(d && d.edges) ? d.edges : null
+  const oneWay = (edges || []).filter(function (e) {
+    if (!e || !e.from || !e.to || (e.verb !== 'consumes-from' && e.verb !== 'hands-off')) return true
+    const mirror = e.verb === 'hands-off' ? 'consumes-from' : 'hands-off'
+    return !edges.some(function (m) {
+      return m && m.verb === mirror && m.from === e.to && m.to === e.from
+    })
+  }).map(function (e) {
+    return (e && e.from ? e.from : '?') + ' **' + (e && e.verb ? e.verb : '?') + '** ' + (e && e.to ? e.to : '?')
+  })
+  // THE ORDER VERBS COME FROM THE ROSTER THIS INVOCATION WAS HANDED, the only sequence this runtime
+  // can see. A roster unit carrying no integer order can place nothing, and a placement onto one is
+  // SILENT for the reason the hygiene join is silent outside its graded population: absence is not
+  // disagreement. A `repairs` naming no unit of this roster is not that case at all — it is the
+  // `auditIds` stray this file refuses at entry, arriving one stage later.
+  const orderById = {}
+  let maxOrder = null
+  ordered.forEach(function (u) {
+    if (!Number.isInteger(u.order)) return
+    orderById[u.id] = u.order
+    if (maxOrder === null || u.order > maxOrder) maxOrder = u.order
+  })
+  const placements = Array.isArray(d && d.placements) ? d.placements : []
+  const placedIds = placements.map(function (p) { return p && p.unit })
+  const unplaced = promotedIds
+    .filter(function (id) { return placedIds.indexOf(id) === -1 })
+    .concat(placedIds.filter(function (id) { return promotedIds.indexOf(id) === -1 }))
+  const misplaced = placements.filter(function (p) {
+    if (!p || !Number.isInteger(p.order) || typeof p.repairs !== 'string' || !p.repairs) return true
+    // THE APPEND-PAST-THE-END DEFAULT IS LEGAL AND IS THE ONLY WAY TO REACH THE END. `none` is what
+    // a promotion repairing nothing in particular declares, and guessing a position for one would be
+    // worse than the defect this closes. A roster with no integer order anywhere has no end to be
+    // past, so there is nothing to compare and the entry stands.
+    if (p.repairs === 'none') return maxOrder !== null && p.order <= maxOrder
+    if (!ordered.some(function (u) { return u.id === p.repairs })) return true
+    if (!Object.prototype.hasOwnProperty.call(orderById, p.repairs)) return false
+    return p.order !== orderById[p.repairs] + 1
+  }).map(function (p) {
+    return (p && p.unit ? p.unit : '?') + ' at order ' + JSON.stringify(p && p.order) +
+      ' repairing ' + JSON.stringify(p && p.repairs)
+  })
   // ONE UNIT ON BOTH SIDES OF THE SUBTRACTION (TOOL-dMergedTally-1). `confirmed` counts RAW findings,
   // so `blockers` and `highs` must too, or `mustFold` is raw minus items and demands more folds than
   // the MEDIUM and LOW findings exist to fill. The synthesis used to type both integers and counted
@@ -1121,7 +1271,8 @@ if (!specAudit) {
   if (!d || d.disposed !== true || stood.length || !counted || !refutedOk ||
       d.promoted + d.folded + refuted + stood.length !== outstanding ||
       d.promoted < mustPromote || d.folded < mustFold ||
-      (d.promoted > 0) !== (promotedIds.length > 0)) {
+      (d.promoted > 0) !== (promotedIds.length > 0) ||
+      edges === null || oneWay.length || unplaced.length || misplaced.length) {
     const why = !d ? 'the disposal stage returned nothing at all'
       : stood.length ? stood.join(', ')
       : !counted ? 'the stage returned no integer promoted/folded counts'
@@ -1137,8 +1288,21 @@ if (!specAudit) {
         ? 'the counts do not split by severity — promoted ' + d.promoted + ' is below blockers ' +
           au.blockers + ' + highs ' + au.highs + ', or folded ' + d.folded + ' is below the ' +
           mustFold + ' confirmed at MEDIUM or LOW'
-      : 'promoted ' + d.promoted + ' beside promotedIds ' + JSON.stringify(promotedIds) +
-        ' — a promotion names the unit it became, and a unit names the finding that made it'
+      : (d.promoted > 0) !== (promotedIds.length > 0)
+        ? 'promoted ' + d.promoted + ' beside promotedIds ' + JSON.stringify(promotedIds) +
+          ' — a promotion names the unit it became, and a unit names the finding that made it'
+      : edges === null
+        ? 'the stage returned no `edges` list — a §3 edge is a PAIR, and an absent list and a ' +
+          'declared empty one are different answers'
+      : oneWay.length
+        ? 'a §3 edge was written at one end only: ' + oneWay.join('; ') + ' — the mirror is its own ' +
+          'entry, so a **consumes-from** here is a **hands-off** back there and both go in `edges`'
+      : unplaced.length
+        ? 'promotedIds and placements name different units (' + unplaced.join(', ') + ') — every ' +
+          'promoted unit declares where it was placed, and nothing else may declare a placement'
+      : 'a promoted repair was not placed beside the unit it repairs: ' + misplaced.join('; ') +
+        ' — a repair takes one order above the unit it repairs, and only a promotion repairing ' +
+        '`none` may sit above every unit in this build'
     log('disposal: NOT done — ' + why)
     return {
       slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
@@ -1172,7 +1336,11 @@ if (!specAudit) {
     }
   }
   log('disposal: done — promoted ' + promoted + ' · folded ' + folded + ' · refuted ' + refuted +
-    (promotedIds.length ? ' · units ' + promotedIds.join(', ') : '') + ' — ' +
+    (promotedIds.length ? ' · units ' + promotedIds.join(', ') : '') +
+    ' · edges ' + (edges.length ? edges.length + ' paired' : 'none declared') +
+    (placements.length
+      ? ' · placed ' + placements.map(function (p) { return p.unit + ' at order ' + p.order }).join(', ')
+      : '') + ' — ' +
     (typeof d.summary === 'string' ? d.summary : ''))
 }
 // THE RECORD FOLLOWS THE DISPOSAL AT ZERO BLOCKERS (cluster B, above): the field is derived from what

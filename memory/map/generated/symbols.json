@@ -828,6 +828,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "build_role_pair",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "build_rotated_re",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -1163,9 +1168,19 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkSession",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "checkSpecAuditDeclared",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkStop",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "checkThrottled",
@@ -1258,6 +1273,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_engine_rows",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
       "id": "check_entry_producer",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1276,6 +1296,16 @@
       "id": "check_fences",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_fixtures",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "check_git_split_parses",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_guard_trips",
@@ -1338,6 +1368,11 @@
       "file": "tools/settings-merge.py"
     },
     {
+      "id": "check_outcome_probes",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "check_owner_row",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -1351,6 +1386,11 @@
       "id": "check_pass",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "check_path_inside",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "check_path_match",
@@ -1426,6 +1466,16 @@
       "id": "check_registry",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_retired_flags",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_role_move",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
     },
     {
       "id": "check_root_shape",
@@ -2003,6 +2053,11 @@
       "file": "tools/workflows/drift-audit-state.js"
     },
     {
+      "id": "deriveSidecarPath",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "derive_archive_name",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -2101,6 +2156,11 @@
       "id": "derive_gate_runner",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_graded_rows",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_guarded_legs",
@@ -2526,6 +2586,11 @@
       "id": "extractCommitTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "extractErrorClass",
+      "kind": "function",
+      "file": "tools/unattended/stall-recorder.js"
     },
     {
       "id": "extract_acceptance",
@@ -3260,6 +3325,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
@@ -3286,6 +3356,16 @@
       "id": "main",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/stall-recorder.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "make_repo",
@@ -3326,6 +3406,11 @@
       "id": "match_expr",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "measureBlocks",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "measureRun",
@@ -3558,6 +3643,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "parseLiveness",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "parse_affordance",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -3641,6 +3731,11 @@
       "id": "parse_line",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "parse_observed",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
     },
     {
       "id": "parse_pin",
@@ -3778,6 +3873,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "print_unattributed",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
       "id": "profile_symbols",
       "kind": "function",
       "file": "tools/govkit/census.py"
@@ -3863,14 +3963,34 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "read",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "readBoundKey",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "readCard",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readConfValue",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "readFact",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readFact",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "readFrontMatterKey",
@@ -3898,6 +4018,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readMemoryRoot",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "readMode",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3923,6 +4048,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readSidecarLines",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "readSpanEnd",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -3946,6 +4076,11 @@
       "id": "readStdin",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readStdin",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "readThrottleSeconds",
@@ -4138,6 +4273,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "read_inert_kits",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_input",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -4236,6 +4376,11 @@
       "id": "read_public_times",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_receipt",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "read_record_cells",
@@ -4468,6 +4613,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "read_verdict",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "read_visit_facts",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4598,6 +4748,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "renderBlock",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "renderCodeView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -4681,6 +4836,11 @@
       "id": "renderStrippedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderUtc",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "render_affordance_exempt",
@@ -4816,6 +4976,11 @@
       "id": "render_order",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_order_slug",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "render_pin_rows",
@@ -4978,6 +5143,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveLease",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "resolveLiteralEnd",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -4986,6 +5156,11 @@
       "id": "resolveRealPath",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveRepo",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "resolveRepoRoot",
@@ -5051,6 +5226,11 @@
       "id": "resolve_class_drift",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "resolve_declaration",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "resolve_declaration_paths",
@@ -5136,6 +5316,11 @@
       "id": "resolve_kit_homes",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
+    },
+    {
+      "id": "resolve_launcher",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "resolve_measurer_currency",
@@ -5403,6 +5588,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "runLiveness",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "run_adopter",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -5483,6 +5673,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "run_in_gov",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "run_kill",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -5561,6 +5756,11 @@
       "id": "scanJoinFindings",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "scanLeases",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
     },
     {
       "id": "scanSegments",
@@ -5791,6 +5991,11 @@
       "id": "scan_unarmed_slots",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_uncontained_writes",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "scan_unit_ids",
@@ -6346,6 +6551,11 @@
       "id": "test_empty_graded_set_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_empty_live_scope_exits_three_not_one",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_empty_read_refuses_rather_than_reporting_zero",
@@ -7708,9 +7918,19 @@
       "file": "tools/workflows/unattended-build.template.js"
     },
     {
+      "id": "writeSidecarLine",
+      "kind": "function",
+      "file": "tools/unattended/run-lease.js"
+    },
+    {
       "id": "writeStamp",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "write_atomic",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "write_block",
@@ -7721,6 +7941,16 @@
       "id": "write_extract",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_fixture",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "write_gate_legs",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "write_journals",

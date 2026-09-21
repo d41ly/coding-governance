@@ -12,7 +12,8 @@ gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring"
   "profile-bar selftest", "run-gates turnstile",
   "every held leg is budgeted, every budget row resolves", "run-selftests self-test",
   "selftest harness self-test", "extract-arms self-test",
-  "leg ceilings clear their evidenced maximum", "run-gates run-log line"]
+  "leg ceilings clear their evidenced maximum", "run-gates run-log line",
+  "receipt sync (installed files match the receipt)"]
 kits = ["run-gates"]
 git-hooks = []
 workflow-scripts = []
@@ -108,6 +109,15 @@ computed from the runner's own location. A hardcoded `tools/gate-legs.json` reso
 other install prefix, and this is a kit whose whole point is that it installs somewhere else.
 `GATE_LEGS` outranks the derivation, and that seam is what both harnesses drive so a nested run never
 re-enters the real bar.
+
+**One leg here grades the DEPLOYER's work rather than the runner's.** `receipt sync` reads
+`.governance/install.json` and reds when an engine row's file is missing or no longer hashes to its
+recorded sha256. It lives in this kit because that is the kit every adopter installs, and it exists
+because the reader that already answers this question needs a gov checkout beside the target and so
+can never run on an adopter's own bar. It is the INTEGRITY arm alone — no `source`, `commit` or
+`gov_oid`, which resolve only against gov's blobs, and no `seed`, `merged`, `attributes` or `forked`
+row. In THIS repository it always takes its announced-skip path, because there is no receipt here, so
+its four built-in fixture arms are the only part of it any gov bar grades. TOOL-cMendedVintage-6.
 
 **The manifest does NOT travel, and the canary that grades it splits in two.** A target's leg list is
 emitted from the selected kits' `[[gate_leg]]` blocks; seeding an adopter with gov's leg names is

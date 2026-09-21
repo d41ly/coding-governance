@@ -70,7 +70,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.17 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.18 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -704,7 +704,11 @@ function checkOriented(cmd, data) {
   if (card.text === null) return { witness: `orientation card absent — ${card.shown}; the session started before the writer was wired, or is not a kickoff-kit session` }
   const lines = card.text.split(/\r?\n/)
   if (/--card --replay(\s|$)/.test(lines[0])) return { witness: `orientation card replay-written — ${card.shown}; the session started before the writer was wired` }
-  const ready = lines.some((l) => l.startsWith('READY — ') && l.trim() !== SENTINEL)
+  // The optional leading `- ` is the charter's §16 R1: an emitted micro-format is a markdown list
+  // item, while the writer's sentinel and every card already on disk are bare. Both forms are read
+  // here for the same reason the writer reads both — a card that OBEYS the charter must not look
+  // like one that never kicked off (TOOL-cMendedVintage-16).
+  const ready = lines.some((l) => { const s = l.replace(/^- /, ''); return s.startsWith('READY — ') && s.trim() !== SENTINEL })
   const treeLine = lines.find((l) => l.startsWith('tree — '))
   const cardTree = treeLine ? treeLine.slice('tree — '.length).split(' · ')[0] : ''
   const here = buildComparablePath(hit.toplevel)

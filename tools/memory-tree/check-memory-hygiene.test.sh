@@ -570,10 +570,13 @@ C7L=$(printf 'x%.0s' $(seq 1 340))
 
 # ---- RUN.md (2.3): the unattended run-state file, admitted at a build-folder root. Two hosts,
 # ---- because every one of these contracts is silent-by-absence on its own.
-# ---- tRunBig carries ALL THREE positive contracts in ONE file: check 6 names it (which is the only
-# ---- proof RUN.md entered index_set at all), check 7 must NOT (the ex7 exemption, asserted on the
-# ---- very file check 6 named — so it cannot be satisfied by a RUN.md that never joined the
-# ---- population), and check 13 files its dash-row anchor under the owning build folder.
+# ---- tRunBig carries the size contracts, and TOOL-cMendedVintage-13 SPLIT them by class: the LIVE
+# ---- record is over cap and check 6 must NOT name it, while the RETIRED record beside it is over
+# ---- the same cap and check 6 must. Both in one build folder, because an exemption asserted where
+# ---- nothing was capped anyway is satisfied by a checker that caps nothing at all. Check 7 must
+# ---- stay silent on the retired one (the ex7 exemption, asserted on the very file check 6 named,
+# ---- so it cannot be satisfied by a record that never joined the population). tRunBig/RUN.md also
+# ---- files its dash-row anchor under the owning build folder for check 13.
 # ---- tRunOk is the under-cap control AND the check-13 control: it cites the same id INLINE IN
 # ---- PROSE, which anchors nothing, so the collision arm is not merely "check 13 said something".
 # ---- RUNSTATE.md is AC1's negative: a name matching NEITHER the whitelist NOR the dated-recording
@@ -602,15 +605,22 @@ printf '# retired run\n' > memory/builds/tRunOk/RUN.ABORTED.g1b2c3d4.md  # 'g' i
 # ---- `*.bak`, so `git ls-files` never sees it and check 4's population is the index. An arm that
 # ---- passes because its fixture was never staged is this repo's fixture-passes-by-finding-nothing
 # ---- class, and it would have read as coverage of an anchor it does not test.
-# ---- tRunBig is over cap on BYTES, not lines. It used to be 265 lines / ~3 KB, and lines were its
-# ---- only over-cap axis — which stopped being an axis when TOOL-aRelaxedShard-1 retired the row
-# ---- class's line bound. THREE contracts are asserted THROUGH check 6 naming this file: that RUN.md
-# ---- enters index_set at all, that check 7 EXEMPTS it, and the per-class scoping control. Letting it
-# ---- fall silent would have vacated all three while every arm still passed.
-{ printf '# run\n\n- ARCH-tFixture-1 · parked, and this dash row ANCHORS the id\n\n%s\n' "$C7L"
-  RP=$(printf 'p%.0s' $(seq 1 80))
-  i=1; while [ "$i" -le 260 ]; do printf -- '- note %d %s\n' "$i" "$RP"; i=$((i+1)); done; } \
-  > memory/builds/tRunBig/RUN.md                                    # ~24 KB -> RED on 6 (BYTES); 340-char row -> silent on 7
+# ---- BOTH tRunBig records are over cap on BYTES, not lines, and they are byte-identical in shape
+# ---- so the ONLY thing separating the verdicts is the name. That is the whole claim of
+# ---- TOOL-cMendedVintage-13: the live record is append-only by construction and can reach no
+# ---- compliant state, the retired one is frozen and its size is a finished fact.
+# ---- THREE contracts are asserted THROUGH check 6 naming the retired record: that the retired form
+# ---- enters index_set at all, that check 7 EXEMPTS it, and the per-class scoping control (at 265
+# ---- lines it sits over the row-document line cap and well under the guide cap, so it proves the
+# ---- guide widening did not leak into the row documents). Letting it fall silent would vacate all
+# ---- three while every arm still passed.
+RP=$(printf 'p%.0s' $(seq 1 80))
+RUNBODY=$(printf '%s\n' "$C7L"
+  i=1; while [ "$i" -le 260 ]; do printf -- '- note %d %s\n' "$i" "$RP"; i=$((i+1)); done)
+printf '# run\n\n- ARCH-tFixture-1 · parked, and this dash row ANCHORS the id\n\n%s\n' "$RUNBODY" \
+  > memory/builds/tRunBig/RUN.md                                    # ~24 KB -> SILENT on 6 (live: exempt by class)
+printf '# retired run\n\n%s\n' "$RUNBODY" \
+  > memory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md                    # ~24 KB -> RED on 6 (BYTES); 340-char row -> silent on 7
 
 
 # ---- acceptance-ledger fixtures (TOOL-dUnstalledConvoy-12). The cutoff sits between the eras, so the
@@ -1157,20 +1167,26 @@ cnot 4 'memory/builds/tRunOk/RUN.ABORTED.a1b2c3d4.md'
 chit 4 'memory/builds/tRunOk/RUN.notes.md'
 chit 4 'memory/builds/tRunOk/RUN.ABORTED.a1b2c3.md'
 chit 4 'memory/builds/tRunOk/RUN.ABORTED.g1b2c3d4.md'
-# ---- (b) check 6 CAPS it. This is the load-bearing arm of the pair: a RUN.md that never entered
-# ----     index_set is silent here for the same reason a compliant one is, so the green control
-# ----     below proves nothing without it.
-# ----     It is ALSO the scoping control for the per-class cap: at 265 lines it sits over the ROW
-# ----     document cap and well under the guide cap, so it proves the widening did not leak out of
-# ----     `guides/` into the row documents.
-chit 6 'memory/builds/tRunBig/RUN.md'
-cnot 6 'memory/builds/tRunOk/RUN.md'
-# ---- (c) check 7 EXEMPTS it — asserted on the SAME file check 6 just named, so membership is
-# ----     already established and only the exemption is under test. The file carries a 340-char
-# ----     unfenced row: without the ex7 alternative this line fires.
+# ---- (b) check 6 CAPS the RETIRED record and EXEMPTS the live one (TOOL-cMendedVintage-13). BOTH
+# ----     halves, over the same cap, in the same build folder, differing only in name — the
+# ----     exemption must not widen into the class it was carved out of, and the `chit` is what
+# ----     proves it did not. A RUN record that never entered index_set is silent here for the same
+# ----     reason an exempt one is, so the `cnot` proves nothing without the `chit` beside it.
+# ----     The `chit` is ALSO the scoping control for the per-class cap: at 265 lines it sits over
+# ----     the ROW document cap and well under the guide cap, so it proves the widening did not leak
+# ----     out of `guides/` into the row documents.
+chit 6 'memory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md'
+cnot 6 'memory/builds/tRunBig/RUN.md'
+# ---- ...and the under-cap control for the capped half, so `chit` above is not satisfied by a
+# ----     checker that names every retired record whatever its size.
+cnot 6 'memory/builds/tRunOk/RUN.ABORTED.a1b2c3d4.md'
+# ---- (c) check 7 EXEMPTS the retired record — asserted on the SAME file check 6 just named, so
+# ----     membership is already established and only the exemption is under test. The file carries
+# ----     a 340-char unfenced row: without the ex7 alternative this line fires. The LIVE record is
+# ----     outside INDEX_SET entirely, so the same assertion on it would be vacuous and is not made.
 n=$((n+1))
-cblock "$out" 7 | grep -qF 'memory/builds/tRunBig/RUN.md' \
-  && { echo "FAIL check 7 reported the run-state file's 340-char row — RUN.md lost its ex7 exemption"; st=1; }
+cblock "$out" 7 | grep -qF 'memory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md' \
+  && { echo "FAIL check 7 reported the retired run record's 340-char row — it lost its ex7 exemption"; st=1; }
 # ---- (d) check 8 does NOT grow a RUN.md population. The run-phase vocabulary is deliberately not
 # ----     the seven-token slot vocabulary — no token in it means "built and reviewed, not yet
 # ----     landed" — and the unattended leg owns validating it. The dash row asserted on carries an
@@ -1484,13 +1500,15 @@ cblock "$outst" 6 \
 # ---- row still hides anything.
 # ---- TWO subjects, because a guard with only a positive is indistinguishable from "the registry is
 # ---- non-empty". `tRunOk/README.md` is tracked, in the index set, and compliant on all three, so
-# ---- listing it buys nothing and must RED. `tRunBig/RUN.md` is the file check 6 already names three
-# ---- hundred lines up (`chit 6`), so listing it buys a real silence and must NOT be named.
+# ---- listing it buys nothing and must RED. `tRunBig/RUN.LANDED.b2c3d4e5.md` is the file check 6
+# ---- already names three hundred lines up (`chit 6`), so listing it buys a real silence and must
+# ---- NOT be named. The LIVE `RUN.md` cannot serve here since TOOL-cMendedVintage-13: it is outside
+# ---- all three checks, so a row naming it would earn nothing and be the OTHER subject.
 # ---- NEITHER subject is `ARCH.md`, deliberately: the assertion above it grades that check 6 stays
 # ---- SILENT on a listed ARCH.md, which is equally true of a file earning nothing, so resting this
 # ---- arm on it would rest it on a property that arm never established. Measured: it earns none.
 n=$((n+1))
-printf '# debt\nmemory/builds/tRunBig/RUN.md\nmemory/builds/tRunOk/README.md\n' > memory/project/curation-debt.txt
+printf '# debt\nmemory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md\nmemory/builds/tRunOk/README.md\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m stalerow --no-verify
 outsr=$(bash "$SCRIPT" 2>/dev/null)
 # THE WHOLE LITERAL SIGNATURE, not a readable prefix. `check-arms.py` reads a branch's signature up
@@ -1502,16 +1520,16 @@ n=$((n+1))
 cblock "$outsr" 6 | grep -qF 'memory/builds/tRunOk/README.md' \
   || { echo "FAIL the curation-debt stale-ENTRY guard did not name the row that hides nothing"; st=1; }
 n=$((n+1))
-cblock "$outsr" 6 | grep -qF 'memory/builds/tRunBig/RUN.md' \
+cblock "$outsr" 6 | grep -qF 'memory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md' \
   && { echo "FAIL the stale-ENTRY guard named a row that is still earning its listing"; st=1; }
 # the PER-ROW report names what the EARNING row earns, which is the half that makes an over-wide
 # waiver visible: this row is waived from three checks and buys one.
 n=$((n+1))
-# BOTH HALVES, and the denominator is the half that shipped wrong. `RUN.md` is in check 6's
-# population, exempt from 7 by `ex7`, and structurally outside 8 — so its applicable set is `6`
+# BOTH HALVES, and the denominator is the half that shipped wrong. A RETIRED run record is in check
+# 6's population, exempt from 7 by `ex7`, and structurally outside 8 — so its applicable set is `6`
 # ALONE, and this row's waiver is exactly as wide as its fault. A constant `6 7 8` denominator
 # reported it as two checks over-wide, which inverts the signal the report exists to send.
-grep -qF 'memory-hygiene: curation-debt.txt — memory/builds/tRunBig/RUN.md earns check(s) 6 of the 6 it is waived from' <<<"$outsr" \
+grep -qF 'memory-hygiene: curation-debt.txt — memory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md earns check(s) 6 of the 6 it is waived from' <<<"$outsr" \
   || { echo "FAIL the curation-debt per-row report did not name what the earning row earns, over its APPLICABLE checks"; st=1
        printf '%s\n' "$outsr" | grep -F 'memory-hygiene: curation-debt.txt' | sed 's/^/     DUMP /'; }
 # the GRADED-ROW population of check 8. `pop_guard` counts shard FILES, so a waiver over most of the
@@ -1531,16 +1549,16 @@ grep -qF '#rows ' <<<"$outsr" \
 # ---- The stale-LINE guard must stay silent too: the path IS still tracked, so neither guard owns
 # ---- this state and a run that names it under either one is naming the wrong defect.
 n=$((n+1))
-printf '# debt\nmemory/builds/tRunBig/RUN.md\n' > memory/project/curation-debt.txt
+printf '# debt\nmemory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m debtworktree --no-verify
-rm memory/builds/tRunBig/RUN.md                      # NOT `git rm` — still in the index
+rm memory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md      # NOT `git rm` — still in the index
 outwt=$(bash "$SCRIPT" 2>/dev/null)
 grep -qF 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived' <<<"$outwt" \
   && { echo "FAIL the stale-ENTRY guard fired on a listed path that is merely ABSENT from the worktree, so its remedy would drain a load-bearing row"; st=1; }
 n=$((n+1))
 grep -qF 'curation-debt.txt lists paths that no longer exist' <<<"$outwt" \
   && { echo "FAIL the stale-LINE guard fired on a listed path git still tracks"; st=1; }
-git checkout -q -- memory/builds/tRunBig/RUN.md
+git checkout -q -- memory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md
 printf '# legacy\n' > memory/project/legacy-files.txt
 printf '# debt\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m unstale --no-verify

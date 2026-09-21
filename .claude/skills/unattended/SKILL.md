@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.27 -->
+<!-- gov:kit unattended@1.28 -->
 
 # Unattended runs
 
@@ -16,7 +16,7 @@ merge and a push — it REPLACES it with something a machine can check. If the r
 checkable, the run is not unattended, it is unsupervised. Everything below exists to keep that
 distinction real.
 
-## Before any path — schedule the keepalive NOW
+## Before any path — schedule the idle-wake NOW
 
 **This is the run's first act, and it comes before you read anything else.** Not before preflight:
 before ORIENTING. Use `CronCreate`, at the cadence this project declares —
@@ -36,14 +36,17 @@ act: stop the unit's task, record why with `--park` or a brief note, then re-dis
 with a brief naming the stalled command and that it is skipped. The verb cannot see what the unit
 is doing or whether a process is stuck — its figures are the tree's, and the process side is the
 process-monitor kit's question, not this one's. Before this the tick fired every ten minutes
-while a `Workflow` ran in the background and did nothing with the turn. The probe is also the run's heartbeat: the driver journals `--audit` like every verb but
-`--version` and `--plan` (protocol section 2), so each tick leaves a line in the run log, and a
-run that stalled reads as a gap in that journal instead of as silence.
+while a `Workflow` ran in the background and did nothing with the turn. On `STALLED` act, and
+never end the turn by asking: the owner is absent, and a session bound to a non-terminal run has
+a stop-guard that refuses the stop and says so. The probe is also the run's heartbeat: the driver
+journals `--audit` like every verb but `--version` and `--plan` (protocol section 2), so each tick
+leaves a line in the run log, and a run that stalled reads as a gap in that journal instead of as
+silence.
 
 **Why it is here and not inside a path.** It used to be step 3 of the slug path and nowhere else, so
 three of the four paths below never reached it: the two that start from prose or a playbook orient,
 research, choose a solution, write a build folder and push a branch BEFORE their first verb, and that
-is the longest unattended stretch a run has. A run that stalls in it has no keepalive, nothing wakes
+is the longest unattended stretch a run has. A run that stalls in it has no idle-wake, nothing wakes
 it, and nothing records why. A step written inside one path is a step the other three do not execute,
 which is why this one sits above the table instead.
 
@@ -58,6 +61,18 @@ resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s 
 is session-scoped, so a job left by a run that never began is orphaned exactly like one left by a run
 that ended, and there is no run-state file for a later reader to find it through. Delete it with
 `CronDelete` before you stop.
+
+## What wakes a stalled run
+
+The idle-wake above fires only while the session is idle, so it cannot wake a stalled one. Three
+actors outside the session's turn can, and all three read one predicate: the stop-guard refuses a
+turn end while the run is non-terminal, up to `STOP_GUARD_BLOCKS` times, and says what to run
+instead; the stall-recorder writes an API-error end to the `stall` sidecar; the resume-tick,
+registered by the owner on the OS scheduler, resumes a run from another process on the verdicts
+the protocol's section 5 names as acting — not `STALE` alone. The
+predicate is `bash tools/unattended/unattended.sh --liveness <slug>`, the one to run by hand when you
+want to know what they will see. The tick's registration line is in the kit README and is not
+restated here.
 
 ## Which path
 
@@ -80,7 +95,7 @@ Making a playbook and following one are two acts with two authorizations.
 **A fifth path exists and it is not on this list, because it is not a run**: producing pieces from a
 playbook ATTENDED, with an owner in the loop. It writes no run-state file and calls no driver verb.
 It is [below](#produce-pieces-attended), after the unattended paths it shares its records with.
-It schedules no keepalive, and the section above does not bind it: there is an owner in the loop.
+It schedules no idle-wake, and the section above does not bind it: there is an owner in the loop.
 
 ## Start a run
 
@@ -182,7 +197,7 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    exists or the requested set matches the recorded one. So a later verb cannot take an answer, and
    a re-preflight after a compaction re-issues the recorded set rather than opening a new turn.
 
-3. **Preflight**, handing over the keepalive id you already hold and any waiver pairs step 2
+3. **Preflight**, handing over the idle-wake id you already hold and any waiver pairs step 2
    confirmed:
 
    ```bash
@@ -444,7 +459,7 @@ needs no exception to say so.
 
 **Not a run, and this section is here because it shares the RECORDS with the paths above and nothing
 else.** An owner is in the loop, so there is no run to authorize, no run-state file, no phase, no
-keepalive and no Definition of Done. Every check in the kit gate that is keyed on a run-state file
+idle-wake and no Definition of Done. Every check in the kit gate that is keyed on a run-state file
 sees nothing here, and that is what "not the driver" means.
 
 **What the merge bar still sees is what you PRODUCED.** The per-piece records and the set record are
@@ -640,6 +655,11 @@ definition, so the absence is a decision and not an oversight.
   their own build method names.)
 - Check yourself with `bash tools/unattended/unattended.sh --status <slug>`, and the units with
   `bash tools/unattended/unattended.sh --audit <slug>`.
+- The one predicate every OUT-OF-SESSION reader shares — key: value lines and one verdict:
+
+  ```bash
+  bash tools/unattended/unattended.sh --liveness <slug>
+  ```
 
 ## While the work runs
 
@@ -744,23 +764,22 @@ Read the run-state file before doing anything else. It survived compaction and p
 context did not.
 
 **Then REAP the recorded id, and only then schedule a replacement.** In that order, and the order is
-the whole point. The intuition is that a resumed session's keepalive died with its process because
+the whole point. The intuition is that a resumed session's idle-wake died with its process because
 the store is session-scoped — and that intuition is MEASURED FALSE: a run asserted it twice about two
 jobs and `CronCreate`'s own listing showed both still firing. So issue
 `CronDelete` against the `keepalive` id the run-state file already names, read the result
 back, and say what it returned. Assume a surviving job, not a dead one; the failure mode of assuming
-dead is a keepalive firing forever with a green `keepalive-reaped` attestation over it.
+dead is an idle-wake firing forever with a green `keepalive-reaped` attestation over it.
 
 Then schedule the new one, with the stall-probe prompt the keepalive section gives: this run
 already has its slug and its run-state file. This is the only exception to "read the record
 first": read it, reap, schedule, kick off, and then do the work.
 
-**The record cannot be corrected in place, and you must know that rather than discover it.**
-`--keepalive-id` is accepted by `--preflight` alone, so a resumed session has nowhere to write the
-new id. The `keepalive` fact keeps naming the old job, so your `keepalive-reaped` attestation at close
-covers BOTH — the one you deleted here and the one you scheduled — and the wrap-up says so, with what
-the delete returned. Re-preflighting to record the new id is NOT the remedy: it refuses on a dirty
-tree and re-pins the anchor, which costs more than the stale field does.
+**Then record the new id, so the record names the session that now holds the run.** After the reap
+and the re-schedule, run `bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <id>` with
+the new id: it re-records `keepalive`, `session` and `pid`, prints what it replaced and stages the
+file, and the close attestation then covers one job. Re-preflighting is NOT the remedy: it refuses
+on a dirty tree and re-pins the anchor.
 
 **Then, if this project ships `/session-kickoff`, invoke it — after the reap and the re-schedule,
 before the first pass.** Its unattended hand-back fires because the run-state file exists in a
@@ -785,10 +804,12 @@ be invisible. A bar that does not answer within it is KILLED, and
 FAILED. Those are different facts, and an operator who confuses them spends an hour hunting a
 failing leg that does not exist. The same bound covers the wiring check `--preflight` runs.
 
-It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest, because no script
-can observe them: that you reaped the keepalive (`CronDelete`), and that every parked
-decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the
-gate says so wherever it reports them.
+It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest: that you reaped
+the idle-wake (`CronDelete`), and that every parked decision reached the wrap-up. **One of
+them is READ BACK.** The stop-guard records the harness's own cron listing at every stop of a bound
+session, and `--landed` refuses while your recorded id is still in it — so attest the reap honestly,
+because the next verb checks it against evidence you did not write. The other has no observer;
+attestation is not a machine verdict, and the gate says so wherever it reports them.
 
 **TWO items have NO override, and this is where you will meet them: `authorization-reachable` and
 `pieces-complete`.** Neither can be overridden, waived or attested around. An override on the
@@ -906,11 +927,12 @@ Two facts land in the record and you do not write either: `landed-anchor`, which
 Read the second before you believe the first — a local landing sits on top of whatever else is on
 that branch. What the weaker anchor does not buy is protocol section 9, and it is not repeated here.
 
-**AND DO NOT COMMIT BETWEEN THE PUSH AND THIS VERB.** Where the project declares a lander marker, the
-lander writes the commit it pushed and this verb requires the marker to name HEAD **exactly**. That is
-equality, not ancestry: one more commit after the push — even the record commit — and `--landed`
-refuses. The refusal names both shas, the one it wanted and the one the marker holds, so a stale
-marker and a moved HEAD are distinguishable. Then commit the record it writes and land that commit too; until it is
+**RUN IT FROM THE RUN WORKTREE, AFTER THE LANDER.** Where the project declares a lander marker, the
+lander writes the commit it pushed and this verb reads CONTAINMENT, not equality: the marker's
+commit must contain the run's witness, and the tip the remote advertises must reach the marker's
+commit — so the `--no-ff` merge the charter mandates stamps from your own branch, and a record
+commit after the push is not a refusal. Each of the four refusals names what it read, so a stale
+marker, a marker this clone does not hold, and a moved remote are distinguishable. Then commit the record it writes and land that commit too; until it is
 committed, every later run still counts yours as live — which no longer reds anyone's bar, but does
 put your unfinished run in every later run's concurrency report.
 
@@ -919,6 +941,20 @@ third placement in [Record the run](#record-the-run), which binds where the runl
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
 Definition of Done was evaluated without evaluating it.
+
+**It reads the reap back, and it may tell you to END THE TURN.** Where the stop-guard is wired, the
+newest stop it recorded for this run carries the harness's cron listing. `--landed` reads that line:
+recorded in `LANDING` and free of your keepalive id, it prints `keepalive-reaped: checked` and
+stamps; still naming the id, it refuses — reap the job, end the turn so the stop-guard records the
+listing again, then re-run. A newest line from BEFORE the close is also a refusal, because the check
+could run and has not: end the turn ONCE, the stop-guard blocks that stop as `finished and unstamped`
+and continues you, and the re-run reads the post-close line. That works for the LEASED session
+alone — the stop-guard binds by the lease — so a session the record does not name is refused FIRST
+and told to run `--resume <slug> --keepalive-id <id>`; ending the turn there records nothing. A
+LANDING line older than the lease is the pre-close case too: it is the dead incarnation's. If no
+record ever appears for the leased session the hook is unwired and `adopt-unattended.sh --check`
+says so. With no sidecar at all — no hook — or a lease naming no session, the verb lands and prints
+`unchecked` with the reason, never silently.
 
 ## If it cannot finish
 
@@ -934,13 +970,15 @@ never says why. It is validated against a closed vocabulary, and the refusal nam
 you do not have to read source to find it. There is no catch-all member: if nothing fits, take the
 closest code and put the specifics in the reason, and say so — a mismatch worth a backlog row is
 better than a vocabulary with a hole in it. You still owe both attestations first — reap the
-keepalive and surface the parked decisions — since an aborted run orphans exactly the same job and
-leaves exactly the same decisions unseen. An abort does not merge and does not push.
+idle-wake (`keepalive-reaped`) and surface the parked decisions — since an aborted run orphans
+exactly the same job and leaves exactly the same decisions unseen. An abort does not merge and does
+not push.
 
 **Render the run record before you commit the ABORTED record**: the first placement in
 [Record the run](#record-the-run), which binds where the runlog kit is installed.
 
 ## Reap
 
-Delete the keepalive with `CronDelete` before you finish. Nothing else can: when your
-process exits, an unreaped job is orphaned in a store no later run can see.
+Delete the idle-wake with `CronDelete` before you finish, and attest `keepalive-reaped`.
+Nothing else can: when your process exits, an unreaped job is orphaned in a store no later run can
+see.

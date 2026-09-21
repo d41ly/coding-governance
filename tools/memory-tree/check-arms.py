@@ -55,6 +55,12 @@ HELPER_RE = re.compile(r"^\s*fail\(\)\s*\{")
 INTERP_RE = re.compile(r'\$\{?[A-Za-z_][A-Za-z0-9_]*\}?')
 # A NEGATIVE assertion. `miss` is this kit's absence helper; the `&&` form is the inline one.
 NEGATIVE_RE = re.compile(r"^\s*(miss\b|.*grep -qF .* <<<.*\s&&\s)")
+# A STRANDED prefix: an unarmed branch whose test holds a line carrying the signature's first
+# STRAND_MIN characters but not the whole of it. It is a DIAGNOSIS beside the refusal, never an
+# arm — a prefix that armed would let any fragment satisfy the leg. A shorter quote is
+# indistinguishable from prose about the message, so below this bound nothing is named; a signature
+# shorter than this cannot strand by prefix, because a line holding all of it arms the branch.
+STRAND_MIN = 24
 
 
 class Problem(Exception):
@@ -113,8 +119,10 @@ def signature(message: str) -> str:
     FOR THE ARM AUTHOR: the run does not stop where the sentence does. A message ending
     `"... is not the remedy: refs/heads/$cur"` has the signature `... is not the remedy: refs/heads/`,
     trailing path fragment and all, because that text precedes the first interpolation. Only ':', '"'
-    and spaces are trimmed. An arm that stops at the last WORD reads as unarmed with no hint why;
-    run --report and copy the row it prints.
+    and spaces are trimmed. An arm that stops at the last WORD reads as UNARMED, and both --check's
+    refusal and --report name it STRANDED at its test line; --report prints every row's signature
+    WHOLE (it once cut rows at 72 characters, so the row it told the author to copy WAS the prefix
+    that stranded the arm — TOOL-aWokenSentinel-25), so copy that row rather than the source.
     """
     parts = [p.strip() for p in INTERP_RE.split(message)]
     parts = [p.rstrip(':" ').strip() for p in parts]
@@ -167,26 +175,28 @@ def branches(root: str, gate_rel: str) -> list:
     return out
 
 
-def armed_signatures(root: str, test_rel: str) -> set:
-    """Lines of the test file that could carry a POSITIVE assertion.
+def armed_signatures(root: str, test_rel: str) -> list:
+    """(line number, text) for every line of the test file that could carry a POSITIVE assertion.
 
     A COMMENT is not an arm. The test file's prose explains what each arm covers and naturally quotes
     the messages, so a comment-blind scan would let a branch read as armed on the strength of a
     sentence describing it — the same shape as the bare-`check N` mention and the absence assertion
     this function already refuses. All three are "something mentions it", not "something exercises
-    it".
+    it". The numbers are kept so a STRANDED prefix can be named at its line, over EXACTLY the
+    population the armed read walks: a comment quoting a message can no more be reported stranded
+    than it can be counted as an arm.
     """
     path = os.path.join(root, test_rel)
     if not os.path.isfile(path):
         raise Problem(f"check-arms: {test_rel} is missing, but its gate has `fail` branches — with no "
                       f"test file EVERY branch is unarmed and there is nothing to arm them with")
-    out = set()
-    for line in read(path).split("\n"):
+    out = []
+    for no, line in enumerate(read(path).split("\n"), 1):
         if line.lstrip().startswith("#"):
             continue
         if NEGATIVE_RE.match(line):
             continue
-        out.add(line)
+        out.append((no, line))
     return out
 
 
@@ -227,12 +237,27 @@ def classify(root: str, conf: dict, pairs=None) -> dict:
         # and both floors would go unchecked, and a second regression could land under cover.
         try:
             gb = branches(root, gate_rel)
-            lines = armed_signatures(root, test_rel)
+            numbered = armed_signatures(root, test_rel)
         except Problem as exc:
             errors.append(str(exc))
             continue
+        lines = {l for _, l in numbered}
         for b in gb:
             b["armed"] = any(b["sig"] in l for l in lines)
+        # A STRANDED prefix: the first arm-shaped line holding the signature's opening run but not
+        # the whole of it. Diagnosis only — the branch stays unarmed (TOOL-aWokenSentinel-25). A line
+        # that arms SOME branch of this gate is that branch's arm, never a sibling's stranded prefix:
+        # two messages of one gate opening with the same STRAND_MIN characters is a common shape, and
+        # without this exclusion the row names a whole, working arm as the line to lengthen.
+        arms = {l for l in lines if any(b["sig"] in l for b in gb)}
+        for b in gb:
+            b["stranded"] = None
+            if not b["armed"] and len(b["sig"]) >= STRAND_MIN:
+                head = b["sig"][:STRAND_MIN]
+                for no, l in numbered:
+                    if head in l and l not in arms:
+                        b["stranded"] = (test_rel, no)
+                        break
         brs.extend(gb)
     return {"branches": brs, "pinned": parse_pin(root, m), "errors": errors,
             "pairs": pairs, "m": m}
@@ -252,9 +277,11 @@ def cmd_check(root: str, conf: dict) -> int:
                            f"(the pin is shrink-only)")
             continue
         if key not in pin_keys:
+            hint = (f" — a STRANDED prefix at {b['stranded'][0]}:{b['stranded'][1]} stops short of "
+                    f"the signature; copy the whole row --report prints") if b["stranded"] else ""
             bad.append(f"check-arms: {b['gate']}:{b['line']} check {b['num']} branch {b['ord']} has "
                        f"no POSITIVE assertion naming its own failure text ({b['sig']!r}) and is not "
-                       f"pinned in {m}/{PIN}")
+                       f"pinned in {m}/{PIN}{hint}")
         elif pin_keys[key][3] != b["sig"]:
             bad.append(f"check-arms: {m}/{PIN}:{pin_keys[key][4]} pins {b['gate']} check {b['num']} "
                        f"branch {b['ord']} with a stale signature — the message was reworded")
@@ -307,8 +334,11 @@ def cmd_report(root: str, conf: dict) -> int:
         print(f"    branches {len(gb):>3} (floor {want[0]})   armed "
               f"{sum(1 for b in gb if b['armed']):>3} (floor {want[1]})")
         for b in gb:
+            # The signature prints WHOLE: this row is what the arm author copies, and a row cut at
+            # 72 characters was itself the prefix that stranded every arm over a long message.
+            tail = f"  STRANDED {b['stranded'][0]}:{b['stranded'][1]}" if b["stranded"] else ""
             print(f"      check {b['num']:>2} branch {b['ord']}  line {b['line']:>4}  "
-                  f"{'ARMED ' if b['armed'] else '      '} {b['sig'][:72]}")
+                  f"{'ARMED ' if b['armed'] else '      '} {b['sig']}{tail}")
     print(f"pinned rows   : {len(st['pinned'])}")
     for e in st["errors"]:
         print("ERROR " + e)
@@ -500,6 +530,36 @@ def cmd_selftest() -> int:
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "x", "--no-verify", cwd=root)
         arm("a message with no literal run is named", "no literal run long enough",
             lambda: cmd_check(root, conf))
+
+        # A STRANDED prefix. `signature()` runs past the sentence to the first interpolation, so a
+        # test quoting the readable head of a long message reads UNARMED with nothing saying the
+        # line is there and short; --check and --report now name that line. The verdict does not
+        # move, and the report row holds the signature to its last character — a row cut at 72 was
+        # the prefix the gotcha told the author to copy (TOOL-aWokenSentinel-25).
+        LONG = ("epsilon branch message here runs long enough that a readable prefix of it "
+                "strands its arms")
+        # The second branch opens with the first's 40 characters: once the test arms branch 1 with
+        # the whole signature, that line holds branch 2's opening run and is NOT its stranded prefix.
+        _w(os.path.join(root, "tools", "gate-c.sh"),
+           HELPER + f'[ -n "$e" ] && fail 1 "{LONG}: $x"\n'
+           f'[ -n "$f" ] && fail 2 "{LONG[:40]} but this sibling ends another way: $y"\n')
+        _w(os.path.join(root, "tools", "gate-c.test.sh"), f"hit '{LONG[:40]}'\n")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "s", "--no-verify", cwd=root)
+        arm("a test quoting a prefix of a long message is named STRANDED at its line",
+            "STRANDED prefix at tools/gate-c.test.sh:1 stops short of the signature; copy the whole row",
+            lambda: cmd_check(root, conf))
+        arm("...and --report prints that row's signature whole, with the STRANDED line",
+            f"{LONG}  STRANDED tools/gate-c.test.sh:1",
+            lambda: cmd_report(root, conf))
+        # the CONTROL: the same test quoting the whole signature arms it, and nothing says STRANDED
+        _w(os.path.join(root, "tools", "gate-c.test.sh"), f"hit '{LONG}'\n")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "w", "--no-verify", cwd=root)
+        outs = []
+        _capture(cmd_report, root, conf, outs)
+        arm("...and the same test quoting the whole signature reads ARMED with no STRANDED token",
+            "[rc=0]",
+            lambda: 0 if any("ARMED " in l and l.rstrip().endswith(LONG) for l in outs)
+            and not any("STRANDED" in l and "gate-c" in l for l in outs) else 1)
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")

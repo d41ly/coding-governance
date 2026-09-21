@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.27   # gov:kit unattended@1.27 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.28   # gov:kit unattended@1.28 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -118,7 +118,7 @@ MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 DISPOSITION_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""; UNDECLARED_WRITE_CEILING=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
 # ---- and the second is why the guard is now structural rather than a probe.
 # ----
@@ -182,7 +182,7 @@ while IFS= read -r -d '' _ck; do
     MEMORY_ROOT|LANDER|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
     PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
-    HALT_FLOOR|UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
+    HALT_FLOOR|UNDECLARED_WRITE_CEILING|UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
     # gov:conf-allow-end
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
@@ -2310,6 +2310,11 @@ done
 # ---- NOTHING: `brief-recorded` grades CLOSED units only, at the BUILD commit and not the pass
 # ---- commit, reads the LAST row per unit where this check takes the union, and proves only that the
 # ---- row's hash still names the blob at that path. Nothing asserts the path was a brief.
+# THE RATCHET'S THREE ACCUMULATORS (TOOL-cMendedVintage-14), declared where `set -u` can see them
+# before the loop that fills them. `ds_graded` is the LIVENESS half and counts rows that REACHED
+# the subset test, not rows that failed it: a hit count of zero is a clean tree, a GRADED count of
+# zero under a non-zero ceiling is a probe that died.
+ds_over=""; ds_over_n=0; ds_graded=0
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
@@ -2423,6 +2428,7 @@ DSSIBS
     dsnl=$'\n'; dsbrief="$dsnl$(read_brief_paths "$dshit" "$dsunit" "$f")$dsnl"
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
     # declaration is the defect.
+    ds_graded=$((ds_graded + 1))
     dsout=""
     for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
       # EXACT membership, deliberately not `covers`: that is a containment test, and a row naming a
@@ -2440,11 +2446,59 @@ DSSIBS
       done
       [ "$dsok" = 1 ] || dsout="$dsout $dsq"
     done
-    [ -z "$dsout" ] || printf 'unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch: %s at %s wrote%s in %s\n' "$dsunit" "$dshit" "$dsout" "$f"
+    # THE FINDING NO LONGER PRINTS ITSELF ON STDOUT. It is COUNTED, and the ratchet below decides
+    # the verdict; the per-instance detail goes to the report channel, so a green run keeps this
+    # file's "exit 0 + no output = clean" contract true instead of quietly widening it.
+    if [ -n "$dsout" ]; then
+      ds_over_n=$((ds_over_n + 1))
+      ds_line="$dsunit at $dshit wrote$dsout in $f"
+      ds_over="$ds_over
+  $ds_line"
+      report "check 23 — a dispatched pass committed a path outside the set it declared before dispatch: $ds_line"
+    fi
   done <<DSROWS
 $dsrows
 DSROWS
 done
+
+# ---- 23's RATCHET (TOOL-cMendedVintage-14). The subset test above used to print one line per
+# ---- offending pass and leave the exit status alone, which is a REPORT wearing a gate's number. The
+# ---- declaration was therefore enforced in one direction only: declaring too much wedges the run,
+# ---- declaring too little was a line nobody had to read. It was reported honestly by a builder and
+# ---- no verb, hook or gate raised it.
+# ----
+# ---- SHRINK-ONLY RATHER THAN A PLAIN REFUSAL, and the reason is the tree rather than taste. The
+# ---- instances live in landed history, which is append-only, so a refusal reds builds nobody is
+# ---- going to re-declare. The count may FALL and never RISE. The pin is declared in
+# ---- `.unattended.conf` beside this kit's other shrink-only pins, and undeclared or malformed is a
+# ---- refusal there for their reason too: a pin that quietly defaults is a pin nobody set. An
+# ---- adopter's ceiling is 0 and its whole ratchet is the first sentence of this paragraph.
+# ----
+# ---- WHAT THIS DOES NOT CHECK, because a gate's own header owes its gaps:
+# ----   - A FALL IS NOT A FAILURE HERE, where the carried-prefix ratchet this repo already runs reds
+# ----     on one and tells you to re-stamp. That population is a file listing; THIS one is derived
+# ----     from history REACHABILITY, and a clone that cannot resolve a group anchor legitimately
+# ----     grades fewer rows and takes the skip branches above. Redding on a fall would be a false red
+# ----     on that clone rather than a finding. The fall is announced on the report channel instead
+# ----     and the pin is lowered by hand, which means a ceiling nobody lowers stays slack.
+# ----   - A SWAP IS INVISIBLE. One instance repaired and one introduced holds the count, and only the
+# ----     per-instance report lines show it. The pin is a count, not a row set.
+# ----   - NOTHING HERE MAKES THE DECLARATION HONEST. The limitation this check's own header states is
+# ----     unchanged: both artifacts are the run's, so a run may still declare the wider set up front.
+# ----   - THE OTHER TWO check-23 FINDINGS ARE STILL BARE PRINTS. The dodged-join and ambiguous-
+# ----     attribution branches keep the shape this ruling took off the subset test, deliberately:
+# ----     the ruling named this message and this one only.
+if [ -z "$UNDECLARED_WRITE_CEILING" ]; then
+  fail 23 "UNDECLARED_WRITE_CEILING is undeclared in .unattended.conf, and with no ceiling a pass that wrote outside its declared set is reported and never graded - which is the state this ratchet exists to end"
+elif ! printf '%s' "$UNDECLARED_WRITE_CEILING" | grep -qE '^[0-9]+$'; then
+  fail 23 "UNDECLARED_WRITE_CEILING is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name: $UNDECLARED_WRITE_CEILING"
+elif [ "$UNDECLARED_WRITE_CEILING" -gt 0 ] && [ "$ds_graded" = 0 ]; then
+  fail 23 "the declared ceiling on undeclared writes is above zero while NO dispatched pass was graded at all, so the comparison below would report a reassuring zero for a probe that died rather than for a tree that is clean: $UNDECLARED_WRITE_CEILING against a graded population of $ds_graded"
+elif [ "$ds_over_n" -gt "$UNDECLARED_WRITE_CEILING" ]; then
+  fail 23 "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on: $ds_over_n against $UNDECLARED_WRITE_CEILING$ds_over"
+elif [ "$ds_over_n" -lt "$UNDECLARED_WRITE_CEILING" ]; then
+  report "check 23 - the undeclared-write count sits BELOW its ceiling, $ds_over_n against $UNDECLARED_WRITE_CEILING. Lower the pin in .unattended.conf and say in the commit message what closed; a ceiling nobody lowers stops being a ratchet"
+fi
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
 # ---- `gen:build-units` pair. The driver reads its unit list from that region for four questions -
@@ -3533,5 +3587,92 @@ else
     _c31_hit "$_c31_bm" $_c31_paths
   fi
 fi
+
+
+# ---- check 32 - the kit holds ONE derivation of the sidecar root. TOOL-aWokenSentinel-11, the
+# left-shift of a spec-audit finding: two specs in one build were about to spell
+# `<git-dir>/unattended` twice, once as `resolve_sidecar_dir` and once inline, and a per-unit
+# acceptance criterion pinning the count binds one pass of one unit and cannot say whose line made
+# it two. The count belongs here, where it binds every unit and every later edit.
+#
+# THE POPULATION IS THREE NAMED FILES beside this checker, never a glob: the driver, the library
+# and the resume tick where it exists (it contributes zero where it does not, so this is the same
+# check before and after that file lands). This checker's own source spells the literal inside its
+# grep and the suites spell it in their fixtures, which is why the population is named. The
+# derivation's ONE home is the library — the file the driver and the tick both source, ratified as
+# the home of any rule two scripts must answer identically — so the library is asserted to hold
+# exactly one and the driver is asserted to CALL it. Zero is a refusal too: a population that reads
+# sidecars with no derivation is spelling the root some other way, and `at most one` would pass it,
+# which is the vacuous-selector class.
+#
+# CODE LINES ONLY — `^[^#]*` — because the driver's idiom is a prose header beside every function,
+# and a header naming the rule beside the one function that holds it is right, not a second
+# spelling. `grep -c` counts LINES, never occurrences: a line carrying the literal twice counts once,
+# which is the intended unit for a check about spellings.
+#
+# What this check does NOT check, because a structural check reads as a semantic one to everybody
+# who did not write it: a second derivation spelled WITHOUT the literal — `rev-parse --git-common-dir`,
+# a `$GIT_DIR` read, a path composed from `.git` by hand — is invisible here; the check binds the one
+# literal this build's specs spelled. The two hooks, `stop-guard.js` and `stall-recorder.js`, are
+# outside the population by design: they derive the git dir in JavaScript through `deriveSidecarPath`,
+# and a shell function cannot be their spelling. A spelling on a COMMENT line is not counted, so a
+# commented-out second derivation passes until the edit that uncomments it, which is the edit this
+# check reds. And whether the one derivation is CORRECT — the worktree's git dir, never the common
+# dir — is the driver suite's fixture, not this count.
+_sd_lib="$_LIB_DIR/lib-unattended.sh"
+_sd_n=0
+for _sd_f in "$DRIVER" "$_sd_lib" "$HERE/resume-tick.sh"; do
+  [ -f "$_sd_f" ] || continue
+  _sd_n=$((_sd_n + $(grep -cE '^[^#]*rev-parse --git-dir' "$_sd_f" || true)))
+done
+_sd_in_lib=$(grep -cE '^[^#]*rev-parse --git-dir' "$_sd_lib" || true)
+_sd_calls=$(grep -cE '^[^#]*\$\(resolve_sidecar_dir\)' "$DRIVER" || true)
+[ "$_sd_n" -eq 1 ] && [ "$_sd_in_lib" -eq 1 ] && [ "$_sd_calls" -ge 1 ] \
+  || fail 32 "the kit must hold ONE derivation of the sidecar root — resolve_sidecar_dir, in lib-unattended.sh — and the driver must read every sidecar through it; a second 'rev-parse --git-dir' on a code line of the driver, the lib or the tick is a second spelling that drifts from the first, and zero is a reader with no derivation. code-line count: $_sd_n (lib: $_sd_in_lib), driver callers: $_sd_calls"
+
+
+# ---- check 33 - no shell file in this kit counts a captured variable's lines by adding a newline
+# first. TOOL-aWokenSentinel-23, the left-shift of a spec-audit finding: a suite helper counted a
+# verb's stdout with `printf '%s\n' "$_o" | wc -l`, and `printf '%s\n'` on an EMPTY capture prints
+# one newline, so `wc -l` read 1 for a verb that wrote nothing and the one-line assertion could not
+# fail on the empty case it existed to catch — green by absence, one helper down. The instance was
+# folded to `printf '%s' "$_o" | grep -c ''` (reads empty as 0, and counts a final unterminated line
+# `wc -l` misses); this check is the CLASS, so the next helper cannot repeat the shape.
+#
+# THE PREDICATE IS THREE SPELLINGS AND NOTHING WIDER — the three that add a newline before the
+# count: `printf '%s\n' "$x" | wc -l`, `echo "$x" | wc -l`, and `wc -l <<< "$x"`, any whitespace
+# around the pipe and the here-string, on a CODE line (`^[^#]*`).
+#
+# POPULATION: this check's OWN, not KIT_SH — every *.sh beside this checker INCLUDING the suites,
+# because the instance lived in a suite helper and a population that skips `*.test.sh` (which KIT_SH
+# does, TOOL-aDeferredBar-4 records why) cannot see the next one. Two files out by NAME: this checker,
+# whose grep carries the pattern, and check-unattended.test.sh, whose arm stages the banned bytes
+# into a suite copy — a self-hit there would red the close on the very suite that proves this check.
+# That arm assembles its staged line from fragments besides, so the exclusion is a second guard and
+# not the only one. Zero hits is the pass: a kit with no such line is the state this exists to keep,
+# and a positive-population floor is unreachable here for the same reason KIT_SH's is.
+#
+# What this check does NOT check, because a structural check reads as a semantic one to everybody
+# who did not write it: `printf '%s' "$x" | wc -l` with NO newline is correct — it counts embedded
+# newlines and reads an empty capture as 0 — and is the driver's own idiom (count them with the
+# near-miss grep, never here), so it is not a hit. A count through an intermediate command (`printf '%s\n' "$x" | grep -o … | wc -l`, the
+# driver suite's dir-count) is not read: the newline reaches grep, not wc. A `wc -l` over a file or
+# a `$(…)` is outside the predicate. A fourth spelling of the same defect — `"${x}"` with braces, or
+# a variable not immediately quoted — passes; the class is recorded under memory/gotchas/ by NAME
+# rather than by spelling for that reason. A COMMENT line is not counted, so a commented-out count
+# passes until the edit that uncomments it, which is the edit this reds. And any `*.sh` outside this
+# kit's directory is outside the population: the repo-wide scanner is the gate-lint kit's
+# `sh_hygiene.py` (its path is not spelled here — the carried-prefix ratchet is shrink-only), and
+# this class is not a CLASSES row there (spec 23 §4 says why).
+_lc_re="^[^#]*((printf '%s\\\\n'|echo) \"\\\$[A-Za-z_][A-Za-z0-9_]*\"[[:space:]]*\\|[[:space:]]*wc -l|wc -l[[:space:]]*<<<[[:space:]]*\"\\\$[A-Za-z_][A-Za-z0-9_]*\")"
+_lc_hits=""
+for _lc_f in "$HERE"/*.sh; do
+  [ -f "$_lc_f" ] || continue
+  case "$(basename "$_lc_f")" in "$(basename "$0")"|check-unattended.test.sh) continue ;; esac
+  _lc_h=$(grep -nE "$_lc_re" "$_lc_f" | sed "s|^|$(basename "$_lc_f"):|")
+  [ -z "$_lc_h" ] || _lc_hits="$_lc_hits$_lc_h"$'\n'
+done
+_lc_hits=${_lc_hits%$'\n'}
+[ -z "$_lc_hits" ] || fail 33 "a shell file in this kit counts a captured variable's lines by adding a newline first — printf '%s\n', echo or a here-string into wc -l — which reads an EMPTY capture as one line, so an assertion on the count passes on a command that wrote nothing; count with printf '%s' \"\$x\" | grep -c '' instead, which reads empty as 0. hits: $_lc_hits"
 
 exit "$status"

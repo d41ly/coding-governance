@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-21T17:47:21+03:00 @ 312213ec8ad94f196229f3043adb2a48bc92049a
+last-audit: 2026-09-21T16:59:54+03:00 @ 41479c7415d455f5a2fcc3820d04842e94eb6f16
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 315201b0cf4c5654afc03c556f286018d1f72593
+last-body-change: 0ab9f70815603b7616bbcf1b5252eb6865e07aa3
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -80,7 +80,13 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
   the handles are written here — that is the drift the pointer design exists to avoid. Two invert
-  the reflex: a discovery is ADOPTED not parked; the keepalive precedes orienting. §11 and §5.
+  the reflex: a discovery is ADOPTED not parked; the idle-wake precedes orienting. §11 and §5.
+
+- **The idle-wake is not the keepalive.** The cron job wakes an idle session and nothing else; what
+  resumes a stalled run lives OUTSIDE its session — the stop-guard at every turn end, the
+  stall-recorder at every error end, the resume tick from the OS scheduler — reading the LEASE
+  (`session:`, `pid:`, `host:`, `pid-image:`, `lease-utc:`) the driver records and the verdict
+  `--liveness` derives. `RESUME_STALE_BOUND` is the bound they act on. Protocol §5; `aWokenSentinel`.
 
 - **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`; `GATE_REAP_BOUND` the
   teardown reap.** A breach is KILLED, and `gates-green` then says the bar never RETURNED
@@ -121,8 +127,32 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   sharing node tag `c`, for 13 conflicts at the landing. Neither time did anyone run it. §3's rule
   is own STREAMS not files, and a kit is the unit that rule is about.
 
+- **A finished or live unattended run ANSWERS QUESTIONS about itself** — `/runlog`, over the run's
+  committed record first, the local run model for anything time-shaped (the record carries no event
+  times), and the redacted narration where the transcript is on this machine. Came in with
+  `dLoggedFlight`. It is not a code search: a symbol, caller or filename is still a grep.
+
+- **`tools/unattended/check-unattended.sh` carries four RAW CR BYTES** inside its `sub(...)` awk
+  regexes and one `tr -d`, and any text-mode read destroys all four. Python's universal-newline
+  translation turns a lone CR (0x0D) into LF (0x0A), which leaves the regex holding a newline and
+  silently breaks the checks that use it. Rewrite that file in BYTES. Hit during the 2026-09-21
+  reconcile; the class is `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already
+  registered and not read.
+  THE BYTES ARE NAMED RATHER THAN SHOWN, deliberately. Two earlier attempts at this sentence put a
+  raw CR in it and both were eaten by the next tool that rewrote the file -- the manifest is the
+  document most likely to be rewritten in text mode, which is the bullet's own subject.
+
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
+
+- **A LIVE run-state file is outside check 6 by CLASS** (`TOOL-cMendedVintage-13`). `RUN.md` at a
+  build root is append-only by design and cannot satisfy a cap measured for authored index rows; a
+  36-unit run reached 71 KB against 61,440. A RETIRED record is a rename and stays capped.
+
+- **The orientation card's READY anchor accepts BOTH spellings** (`TOOL-cMendedVintage-16`). A card
+  body written in the charter's §16 R1 list-item form used to be read as carrying no ready line,
+  leaving the sentinel in place and the scratch-guard then blocking the next commit. The writer and
+  the hook both widened; the charter did not move.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -181,6 +211,10 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests` only when they ask · prune when a bar runs them automatically.
+- 2026-09-17 · a leg ceiling read as a bound somebody measured · on node `c` two were BELOW the
+  leg's real cost and killed a healthy suite; a killed leg records no reading, so
+  `derive-ceilings.py --write` can never raise exactly the ones that need it · prune when
+  that checker accepts a reading taken outside the runner.
 
 
 ### Environment traps worth front-loading

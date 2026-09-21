@@ -146,6 +146,8 @@ memory/builds/cWidenedNet/README.md
 memory/builds/aRatifiedRulings/README.md
 memory/builds/aProbedUnit/README.md
 memory/builds/aDeferredBar/README.md
+memory/builds/aWokenSentinel/README.md
 memory/builds/dMergedTally/README.md
 memory/builds/aProbedToolkit/README.md
 memory/builds/aBlindedTrial/README.md
+memory/builds/cMendedVintage/README.md

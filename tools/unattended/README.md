@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.27 -->
+<!-- gov:kit unattended@1.28 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -17,9 +17,10 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 | the verb carrier | copied from `VERBS.template.md` |
 | the playbook template | copied from `PLAYBOOK-TEMPLATE.template.md` |
 | the playbook **fixture** | **rendered** from `playbook.fixture.template.md` |
+| the fixture **records** | **rendered** from `fixture-record-one.template.md` and its sibling |
 
 Copied artifacts carry no placeholder, so rendering them would be a second spelling of `cat`. The
-two rendered ones do carry placeholders, and for them a render is the only correct install.
+rendered ones do carry placeholders, and for them a render is the only correct install.
 
 **One Skill placeholder is probed rather than read.** The Skill tells a run to execute the
 memory-tree kit's bug-class checklist, so it names that kit's `gotchas.py` by path. An adopter may
@@ -45,10 +46,13 @@ under this kit's own directory, so one token covers every one of them. `TOOL_ROO
 declared here and must not be: only the memory-tree kit's adopter computes that value, so declaring
 it would ship an unresolved `{{TOOL_ROOT}}` brace to every adopter of this one.
 
-**The fixture RECORDS move with it.** Each is named for the piece it describes with `/` written as
-`~`, so the prefix lives in their filenames as well as their bodies. The adopter repaths both.
-Renaming without rewriting leaves each record describing a piece that does not exist, which
-`check-playbook.sh` reports as an orphan record — coverage nobody has.
+**The fixture RECORDS are rendered with it.** Each is named for the piece it describes with `/`
+written as `~`, so the prefix lives in their filenames as well as their bodies, and the adopter
+derives both from the same value it renders the body with. This kit's own two copies are withheld
+from every install, so nothing arrives under a foreign prefix and nothing is renamed over anything —
+which is what the rename this replaced did to a target's own copy on every update. A record whose
+body names a piece the tree does not hold is an orphan record to `check-playbook.sh` — coverage
+nobody has.
 
 **An unresolved token is a refusal, and no file is written.** Catching it at `--check` time alone
 would still leave a rendered artifact on disk carrying a literal brace, and something reads that
@@ -79,10 +83,54 @@ necessarily carries unresolved braces, so grading one reds on a target that is n
 until render time. That second exclusion was widened from the first the moment a second template
 existed.
 
+## The resume tick — registration is the owner's
+
+`resume-tick.sh` is the one keepalive actor that does not share the session's process: an
+OS-scheduled task that walks every worktree, asks the driver `--liveness` about every run whose
+lease names a session, and on a verdict the protocol's section 5 names as acting kills the recorded
+pid's tree, appends an attempt line under `<git-dir>/unattended/resume.<slug>.log` and launches
+`claude -p --resume <session>` detached. It reads the lease from the INDEX, never the working copy
+— an untracked run-state file is announced and skipped, and so is a tracked one whose working copy
+differs from its index blob, because a file write must buy neither a skip-permissions session nor
+a kill aimed by hand — stands off a lease another node took, kills only a pid whose recorded image
+still holds it and whose holder started before the lease, and treats the pid it launched as in
+flight until the tree moves or the stale bound passes, after which it is killed as hung and the
+run is launched again. The kit never registers it — `schtasks /create` and
+`crontab` are the owner's acts, once per node, under the login whose CLI is authenticated — and
+until it is registered the tick is inert; the adopter's `--check` says which on an `INFO` line and
+reds on neither answer.
+
+Windows, from cmd or PowerShell (Git-Bash needs every `/` option doubled, `//create`, `//sc`, …):
+
+```
+schtasks /create /sc minute /mo 10 /tn gov-resume-tick /tr "\"<bash.exe>\" -lc \"<kit-dir>/resume-tick.sh --repo <root>\""
+```
+
+POSIX, one crontab line (the trailing comment names it the way the Windows task is named, and
+`--check` finds either spelling in the listing):
+
+```
+*/10 * * * * <kit-dir>/resume-tick.sh --repo <root>  # gov-resume-tick
+```
+
+`<kit-dir>/resume-tick.sh --repo <root> --dry-run` prints the decision a tick would take for every
+bound run and does nothing else — no kill, no launch, no attempt line, no login probe. The two knobs
+it reads, `RESUME_ATTEMPTS` and `RESUME_TURNS`, are the root `.unattended.conf`'s and are announced
+on stderr when absent.
+
+## The sidecar
+
+`<git-dir>/unattended/` is where the keepalive actors write, and it is the WORKTREE's git dir,
+never the common dir, because a run lives in one worktree. Three kinds, one file per run each:
+`stop.<slug>.log`, one JSON line per stop the stop-guard decided (unit 3); `stall.<slug>.log`, one
+line per API-error end the stall-recorder saw (unit 4); `resume.<slug>.log`, one attempt line per
+tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). Append-only and
+never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
+
 ## Running the kit's own checks
 
 ```
-adopt-unattended.sh --check      # the five artifacts are installed and in sync, the hook wired
+adopt-unattended.sh --check      # the installed artifacts are in sync, the hook wired
 check-unattended.sh              # the kit gate
 check-playbook.sh                # playbook validity, including the fixture
 check-pass-order.sh              # refuses a unit built before it was specced

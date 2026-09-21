@@ -275,18 +275,27 @@ scan_exit_sites() { # file... -> one TAB-separated row per shell exit
 # The exits that run BEFORE the trap exists, named by their TEXT: this unit's own insertions moved
 # their line numbers, and a text that matches twice is a second exit nobody exempted. The sixth is
 # the REVIEW_ROUNDS ceiling refusal main added before the install, found by this enumeration at the
-# second origin/main reconcile (2026-09-16).
+# second origin/main reconcile (2026-09-16). `read_bound_key`'s refusal (`exit 2 ;;`) left this list
+# at the aWokenSentinel reconcile (2026-09-21): that build moved the function into the library, where
+# its two exits carry the marker and no exemption reaches.
 EXEMPT_EXITS='exit 2
 ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
 cd "$ROOT" || exit 2
 echo "unattended: project-specific value from there and restates none of them."; exit 2; }
-exit 2 ;;
 [ "$REVIEW_ROUNDS" -lt "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, at or above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }'
 
 check_exit_rows() { # label · driver · library -> UNMARKED (unexempted unmarked rows), EXEMPTED count
-  local label="$1" drv="$2" lib="$3" install rows row f ln mk tx ex cnt
+  local label="$1" drv="$2" lib="$3" install rowf row f ln mk tx ex cnt
   install=$(grep -n "builtin trap 'write_runlog_end" "$drv" | head -1 | cut -d: -f1)
-  rows=$(scan_exit_sites "$drv" "$lib")
+  # A SCRATCH FILE, NEVER A COMMAND SUBSTITUTION. `scan_exit_sites` is a shell FUNCTION, so `$( )`
+  # forks a subshell which forks awk, and the reader then waits on a GRANDCHILD's write end -- the
+  # 63-minute zero-CPU stall `pass_commit` in lib-unattended.sh carries the full account of, and
+  # the class the `shell hygiene (a loop fed by a command substitution)` leg gates. That leg could
+  # not see this site until TOOL-cMendedVintage-12 widened its predicate to follow one assignment,
+  # which is how it surfaced at the 2026-09-21 origin/main reconcile. Class:
+  # `memory/gotchas/bounded-through-a-pipe-is-unbounded.md`.
+  rowf=$(mktemp) || { printf 'runlog-writer.test: cannot create a scratch file for the exit scan\n' >&2; return 1; }
+  scan_exit_sites "$drv" "$lib" >"$rowf"
   UNMARKED=""; EXEMPTED=0
   while IFS= read -r row; do
     [ -n "$row" ] || continue
@@ -297,15 +306,16 @@ check_exit_rows() { # label · driver · library -> UNMARKED (unexempted unmarke
       while IFS= read -r e; do [ "$tx" = "$e" ] && ex=1; done <<<"$EXEMPT_EXITS"
     fi
     if [ "$ex" = 1 ]; then EXEMPTED=$((EXEMPTED + 1)); else UNMARKED="$UNMARKED ${f##*/}:$ln"; fi
-  done <<<"$rows"
+  done <"$rowf"
   # Each exempt text matches EXACTLY one site, in the driver, above the install.
   EXEMPT_OK=1
   while IFS= read -r e; do
-    cnt=$(printf '%s\n' "$rows" | awk -F'\t' -v e="$e" '$4 == e' | grep -c . || true)
+    cnt=$(awk -F'\t' -v e="$e" '$4 == e' "$rowf" | grep -c . || true)
     [ "$cnt" = 1 ] || EXEMPT_OK=0
   done <<<"$EXEMPT_EXITS"
-  ALL_ROWS=$(printf '%s\n' "$rows" | grep -c . || true)
+  ALL_ROWS=$(grep -c . "$rowf" || true)
   INSTALL_LINE=$install
+  rm -f "$rowf"
 }
 
 check_ac2_exits() {
