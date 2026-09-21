@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-25 — runner scratch hygiene and a tree-moved exit
 
-**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
+**Status:** CLOSED · rev-6 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-22-build-TOOL-dDerivedDocket-25-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dDerivedDocket-25-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
@@ -144,8 +145,9 @@ both lead with a declared verb. No new leg, no new conf key, no new file outside
 ### Files touched (estimate)
 
 `tools/run-gates/run-gates.sh`, `tools/run-gates/run-gates.test.sh`,
-`tools/run-gates/run-gates.turnstile.test.sh`, `tools/run-gates/README.md`,
-`memory/guides/SESSION-KICKOFF.md`, `memory/map/features/run-gates.md` (prose refresh on touch).
+`tools/run-gates/run-gates.turnstile.test.sh`, `tools/run-gates/run-gates.runlog.test.sh`,
+`tools/run-gates/README.md`, `memory/guides/SESSION-KICKOFF.md`, `memory/map/features/run-gates.md`
+(prose refresh on touch).
 
 ### Alternatives rejected
 
@@ -256,12 +258,13 @@ both lead with a declared verb. No new leg, no new conf key, no new file outside
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates turnstile` · `template size gate selftest` · `kit version markers` · `kickoff-manifest ratchet` · `memory hygiene`
+`run-gates canary` · `run-gates turnstile` · `run-gates run-log line` · `template size gate selftest` · `kit version markers` · `kickoff-manifest ratchet` · `memory hygiene`
 
 New arm: tools/run-gates/run-gates.test.sh · a leg that edits a tracked file mid-bar · the canary's executed-assertion floor
 New arm: tools/run-gates/run-gates.test.sh · a failing leg beside a leg that edits a tracked file mid-bar · the canary's executed-assertion floor
 New arm: tools/run-gates/run-gates.test.sh · two bars killed by signal 9 with scratch held · the canary's executed-assertion floor
 New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside a running first · the turnstile suite's executed-assertion floor
+New arm: tools/run-gates/run-gates.runlog.test.sh · a leg that edits a tracked file mid-bar, joined to the run-log exit table · the run-log suite's executed-assertion floor
 
 ## 8. Open questions
 
@@ -355,6 +358,22 @@ New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside
 - rev-5 · 2026-09-21 · order re-declared from 25 to 24 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 24, beside TOOL-dDerivedDocket-30. No criterion, design or edge moved.
+- rev-6 · 2026-09-22 · the build pass, on the tree at 5c33fd5a (origin/main merged in at c23d5701), where
+  every §2 citation had moved down about 600 lines and still named the code it describes. Three
+  divergences, each found by reading a consumer the design did not list. (1) The run-log suite
+  enumerates every `exit` below the runner's `cleanup` trap and reds one with no arm or exemption,
+  so S5's exit 3 needs an arm there: an AC2 bar over a moved tree, joined to that table, which puts
+  `tools/run-gates/run-gates.runlog.test.sh` in Files touched and its leg on §7. Its exit text is the
+  whole `echo "gates TREE MOVED — …"; exit 3` line and never a bare `exit 3`, which the suite's own
+  staged break plants as the unarmed exit it must catch. (2) S3's line counts a directory other legs
+  write into concurrently, and two readers compare whole bar outputs: the canary's width arm, which
+  now filters `TMPDIR entries` the way it filters the profile line and checks its presence, and the
+  run-log suite's failed-append arm, whose bars now run over a private ambient `TMPDIR`. (3) The
+  `$WORK/tmp` refusal of §5 sits ABOVE the `cleanup` trap beside the `mktemp -d` it extends, removes
+  `WORK` itself and needs no run-log arm; the sweep removes a dead dir's `owner` record LAST, so a
+  sweep that fails part-way leaves a dir the next bar can still prove dead. S4's re-exec also skips a
+  `$0` naming no file beside the kit dir and carries `-x`. The canary's arms are its section 8,
+  section 7 being the red attribution's. No criterion moved.
 
 ## 10. Reuse audit
 

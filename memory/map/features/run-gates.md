@@ -97,6 +97,16 @@ recorded digest then has a non-empty porcelain component that the at-a-rev finge
 reproduce at any sha, which forces the full bar forever while printing that the record describes a
 different tree. Safe, permanent, and it reads as caution.
 
+**The runner owns its scratch, and a moved tree is its own exit.** `WORK` is a named `gate-work.*`
+dir under the ambient `TMPDIR` with an `owner` record (pid, common dir, epoch), and every leg's
+`TMPDIR` points into it, so a SIGKILLed bar's leak is swept by the next bar once its pid is dead —
+only this repository's, and never a dir whose owner it cannot read. `TMPDIR entries <n>` prints the
+ambient count once per bar. A relatively started runner re-execs through its absolute path so the
+process-monitor fence can attribute it. A bar over a tree that moved exits 3, `TREE MOVED`, unless a
+leg failed, which stays RED and names the move. Two readers compare whole outputs, the canary's width
+arm and the run-log suite's failed-append arm, so both keep the new count line stable.
+`TOOL-dDerivedDocket-25`.
+
 **Exactly one leg is impure, and it is the gate rather than a self-test.** Seven of the 86 legs name
 a network verb in their own script; six build their origin under `mktemp -d`. The seventh,
 `unattended kit gate`, runs `ls-remote` against the real remote and fails closed, so its verdict is a

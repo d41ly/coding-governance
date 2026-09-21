@@ -31,7 +31,9 @@ bad=0
 # Raised from 42 to 62 by TOOL-aReapedTicket-3, which adds arms 15-21 — the QUEUE side, which this
 # suite had no arm for at all. The 20 they contribute were counted by running them, not derived on
 # paper: 11 of the 20 are RED against the runner at that build's BASE and all 20 green after it.
-FLOOR_ASSERTIONS=66
+# Raised from 66 to 71 by TOOL-dDerivedDocket-25, which adds arm 22: five assertions, the same five
+# counted on the branch where the first bar never establishes (one FAIL and four SKIPs).
+FLOOR_ASSERTIONS=71
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -764,6 +766,73 @@ wl=$(grep -n '^  while \[ -n "\$TS_TICKET" \]' "$rgs" | head -1 | cut -d: -f1)
 { [ -n "$tl" ] && [ -n "$pl" ] && [ -n "$wl" ] && [ "$tl" -lt "$pl" ] && [ "$pl" -lt "$wl" ]; } \
   && ok "the ticket's own trap is armed after the ticket exists and before the acquire loop" \
   || nope "the ticket trap is not between the ticket creation and the loop (ticket=$tl trap=$pl loop=$wl)"
+
+# ---- 22: the scratch sweep spares a LIVE bar and a FOREIGN repository (TOOL-dDerivedDocket-25) -----
+# The sweep deletes directories, so what it must NOT delete is the whole of its safety. Two bars
+# against one repository with the turnstile OFF, so the second starts while the first still runs:
+# the first bar's owned scratch must survive the second and its verdict must be unchanged, and a
+# scratch dir whose owner names ANOTHER common dir, with a dead pid, must survive too. THE CONTROL is
+# a dir THIS repository's dead bar owns, planted only after the first bar has swept, which the second
+# bar MUST remove: without it both survivals pass on a runner that never sweeps anything. The ambient
+# `TMPDIR` is private to the arm, and the first bar holds on a go-file rather than a clock, so a slow
+# second bar cannot outlive it and read as a sweep.
+R22=$tmp/sweep; mk_repo "$R22"
+printf '#!/usr/bin/env bash\ni=0; while [ ! -e "${TS_GO:?}" ] && [ "$i" -lt 1800 ]; do sleep 0.1; i=$((i + 1)); done\nexit 0\n' > "$R22/fx/wait.sh"
+( cd "$R22" && git add -A && git commit -qm wait ) >/dev/null 2>&1
+A22=$tmp/ambient22; mkdir -p "$A22"
+mkdir -p "$A22/gate-work.foreign"
+printf '999999\t%s\t0\n' "/nowhere/else/.git" > "$A22/gate-work.foreign/owner"
+printf '%s\n' '[ {"name": "waiter", "argv": ["bash", "fx/wait.sh"]} ]' > "$tmp/wait22.json"
+printf '%s\n' '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]' > "$tmp/quick22.json"
+( cd "$R22" && env TMPDIR="$A22" TS_GO="$tmp/go22" GATE_FULL=1 GATE_TURNSTILE=0 GATE_WALL=0 \
+    GATE_LEGS="$tmp/wait22.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out22a" 2>&1 &
+h22=$!
+# The first bar has SWEPT once its header carries the ambient count: the sweep runs before the count
+# and the header is written after both. Its own dir is the one with an owner that is not planted here.
+w22=""; i22=0
+while [ "$i22" -lt 240 ]; do
+  if [ -n "$(hdrkey "$R22" tmpdir_entries)" ]; then
+    for d22 in "$A22"/gate-work.*; do
+      [ "${d22##*/}" = gate-work.foreign ] && continue
+      [ -f "$d22/owner" ] && w22=$d22
+    done
+  fi
+  [ -n "$w22" ] && break
+  kill -0 "$h22" 2>/dev/null || break
+  sleep 0.5; i22=$((i22 + 1))
+done
+if [ -n "$w22" ]; then
+  ok "control: the first bar owns a gate-work dir and has swept, so the second has a live peer to spare"
+  # THIS repository's common dir IN THE RUNNER'S OWN SPELLING, read from the live owner record. Under
+  # MSYS one directory has two spellings (`/tmp/...` and `/c/Users/.../Temp/...`), so a spelling this
+  # arm derived itself could differ from the runner's and red the control for a reason that is not
+  # the sweep's. The foreign arm below is what grades the comparison itself.
+  c22=$(cut -f2 "$w22/owner" 2>/dev/null)
+  mkdir -p "$A22/gate-work.deadmine"
+  printf '999999\t%s\t0\n' "$c22" > "$A22/gate-work.deadmine/owner"
+  ( cd "$R22" && env TMPDIR="$A22" GATE_FULL=1 GATE_TURNSTILE=0 GATE_WALL=0 GATE_LEGS="$tmp/quick22.json" \
+      bash $KIT_REL/run-gates.sh ) >"$tmp/out22b" 2>&1
+  { [ ! -e "$A22/gate-work.deadmine" ] && grep -q 'sweeping the scratch of a dead bar (pid 999999)' "$tmp/out22b"; } \
+    && ok "control: the second bar swept, and announced, a dead bar of THIS repository's scratch" \
+    || { nope "the second bar did not sweep a dead bar's scratch, so the two survivals below prove nothing"; tail -4 "$tmp/out22b" | sed 's/^/      /'; }
+  [ -d "$w22" ] && [ -f "$w22/owner" ] \
+    && ok "a LIVE bar's scratch survived a second bar's sweep" \
+    || nope "a second bar removed the scratch of a bar that was still running"
+  [ -f "$A22/gate-work.foreign/owner" ] \
+    && ok "a dead bar's scratch whose owner names ANOTHER repository survived" \
+    || nope "the sweep removed scratch owned by another repository"
+  : > "$tmp/go22"; wait "$h22"; rc22=$?
+  { [ "$rc22" = 0 ] && grep -q '^gates GREEN — ' "$tmp/out22a"; } \
+    && ok "the first bar's verdict is unchanged by the second bar's sweep (rc 0, GREEN)" \
+    || { nope "the first bar's verdict changed after a second bar ran beside it (rc $rc22)"; tail -4 "$tmp/out22a" | sed 's/^/      /'; }
+else
+  : > "$tmp/go22"; wait "$h22" 2>/dev/null
+  nope "the first bar never showed an owned, swept gate-work dir under its ambient TMPDIR, so the live-bar arm has no subject"
+  skipped "the dead-owner control: the first bar never established"
+  skipped "the live bar's survival: the first bar never established"
+  skipped "the foreign owner's survival: the first bar never established"
+  skipped "the first bar's verdict: the first bar never established"
+fi
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "turnstile: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
