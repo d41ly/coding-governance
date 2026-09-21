@@ -1140,6 +1140,20 @@ run_card "K2 S1 --card --check with no reader announces the skip and is DEAD PRO
 grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 S7 --card --check over a token-free card is DEAD PROBE"; pass=$((pass+1)); } \
   || { echo "FAIL K2 S7 --card --check over a token-free card is DEAD PROBE"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 
+# C12 — the manifest carries no CR byte. Round 3's M1: the §B bullet ABOUT raw CR bytes had its own
+# CR eaten twice by text-mode rewrites, leaving a sentence that said a newline becomes a newline.
+# BOTH directions, because a check that has only ever been seen pass is an assertion about nothing,
+# and this one was first written with `grep -q "$(printf ...)"` — which MSYS strips to an empty
+# pattern that matches every line, so it red on a clean manifest and looked like it worked.
+mkrepo c12a; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+run "C12 a clean manifest carries no CR and passes" "$R" 0 -
+
+mkrepo c12b; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
+printf 'a lone CR (0x0D) here:%bX
+' "$(printf '\r')" >> "$R/memory/guides/SESSION-KICKOFF.md"
+commit_all "$R" "embed a CR"
+run "C12 a CR byte in the manifest is named" "$R" 1 "the manifest carries a CR byte (0x0D), and a text-mode rewrite silently converts it --"
+
 # AC11 — this repository's REAL common dir holds no card the suite wrote.
 real_common=$(cd "$(git -C "$GOVROOT" rev-parse --git-common-dir)" && pwd)
 leaked=$(ls "$real_common/orientation" 2>/dev/null | grep -c "^$NONCE-" || true)
@@ -1156,7 +1170,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # the 2 arms of TOOL-cMendedVintage-9 (the held-open stdin and its liveness probe). RAISED in the
 # same commit as those arms: this floor and check-testsuite-counts.sh are both shrink-only, so an
 # unraised floor is the one thing that lets a later edit delete the arms and red nothing.
-FLOOR_ASSERTIONS=176
+# +2: C12's pair, the CR-byte check's green and red cases (round 3 M1's left-shift).
+FLOOR_ASSERTIONS=178
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes 17
 keepalive-reaped: yes
 witness: 17ff55b88b4842facee5c29eb03219f34806d6df
-phase: VERIFYING
+phase: LANDING
 branch-sha: 859daa67e728ae273d5278536fb462c04077f16f
 branch-ref: refs/heads/branch/govkit-update-rollbacks-0502c4
 mode: prompt

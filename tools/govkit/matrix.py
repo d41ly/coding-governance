@@ -174,7 +174,7 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     # reported 0 hits and 1 near-miss pair, and it reds that same pair with the pre-fix probe staged
     # back in -- both measured. A descriptor that legitimately discriminates two accepted stops by
     # one file takes a named exemption here rather than a silent widening; none does today.
-    def _probe_paths(block, key):
+    def derive_probe_paths(block, key):
         spec = (block.get("probe") or {}).get(key) or []
         return set(spec if isinstance(spec, list) else [spec])
 
@@ -184,7 +184,7 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
         for _i, _a in enumerate(_stops):
             for _b in _stops[_i + 1:]:
                 _pairs += 1
-                _clash = (_probe_paths(_a, "must_exist") & _probe_paths(_b, "must_not_exist")) |                          (_probe_paths(_a, "must_not_exist") & _probe_paths(_b, "must_exist"))
+                _clash = (derive_probe_paths(_a, "must_exist") & derive_probe_paths(_b, "must_not_exist")) |                          (derive_probe_paths(_a, "must_not_exist") & derive_probe_paths(_b, "must_exist"))
                 check("accepted stops: '%s' %r and %r agree about every path they both name"
                       % (eid, _a.get("means"), _b.get("means")),
                       not _clash,
