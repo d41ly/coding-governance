@@ -110,9 +110,10 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the 
 # A pid alone proves that SOME process holds the number: a reboot mid-run — a recorded event on
 # this fleet — recycles it to whatever the owner starts next, and a run branch checked out on a
 # second node carries the first node's pid into the second's process table. So the lease records
-# the node and the image beside the pid, and the aliveness probe matches all it was given. Three
-# functions, in the library because the driver WRITES the facts and the resume tick READS the
-# launched pid back through the same probe; a spelling in each would be two answers to one question.
+# the node and the image beside the pid, and the aliveness probe matches all it was given — the
+# image, and the lease's own UTC as a bound the holder's start time may not pass. Four functions,
+# in the library because the driver WRITES the facts and the resume tick READS the launched pid
+# back through the same probe; a spelling in each would be two answers to one question.
 
 # THE NODE, one spelling: `COMPUTERNAME` where Windows sets it, `hostname` elsewhere, LOWERCASED
 # because the two disagree on case for one machine (measured on node `a`, 2026-09-21: `COMPUTERNAME`
@@ -150,20 +151,52 @@ read_pid_image() { # pid -> image on stdout; 0 held · 1 no such process · 2 th
   esac
 }
 
+# WHEN THE HOLDER OF A PID STARTED, as a UTC stamp at second precision. Under MSYS a PowerShell
+# `Get-CimInstance Win32_Process` read (`wmic` is gone from this fleet's Windows 11; `Get-Process`
+# hands back a null `StartTime` for a process it cannot open, `System` included), invariant `s`
+# format so no culture's time separator leaks in; MEASURED on node `a`, 2026-09-21: 300-450 ms a
+# call, and a pid nothing holds prints nothing. Elsewhere `ps -o lstart=` re-read by `date -u`,
+# UNVERIFIED (no registered node is POSIX). Returns 2 and prints nothing when the probe answered
+# nothing, because a start time nobody read is not a start time.
+read_pid_start() { # pid -> the holder's start as a UTC stamp on stdout; 0 read · 2 the probe answered nothing
+  local pid="$1" out=""
+  case "$pid" in ""|absent|*[!0-9]*) return 2 ;; esac
+  case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*)
+      command -v powershell.exe >/dev/null 2>&1 || return 2
+      out=$(powershell.exe -NoProfile -NonInteractive -Command "(Get-CimInstance Win32_Process -Filter 'ProcessId=$pid').CreationDate.ToUniversalTime().ToString('s')" </dev/null 2>/dev/null | tr -d '\r')
+      [ -z "$out" ] || out="${out}Z" ;;
+    *)
+      out=$(ps -o lstart= -p "$pid" 2>/dev/null) && [ -n "$out" ] && out=$(date -u -d "$out" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null) ;;
+  esac
+  case "$out" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z) printf '%s\n' "$out" ;;
+    *) return 2 ;;
+  esac
+}
+
 # DOES THE RECORDED PID EXIST, AND IS IT THE RECORDED PROCESS. `yes`, `no` or `unknown`: `unknown`
 # when the probe could not look; `no` when nothing holds the pid, OR when something does and the
 # recorded image does not match it — the recycled-pid case, and a tree kill aimed there lands on the
-# owner's new interactive session, an IDE, or `explorer.exe` and every child. An image of `absent`
-# or none at all matches anything: a lease written before the image was recorded, or by a harness
-# whose pid the probe could not see, keeps the pid-only reading it always had, and the header says
-# so rather than pretending that lease is guarded. Existence is not progress: a hung process is `yes`.
-# MOVED from the driver by TOOL-aWokenSentinel-5's fold of the closing review; the pid half is unit
-# 2's, unchanged in its verdicts.
-check_pid_alive() { # pid · [image] -> yes | no | unknown
-  local img rc
+# owner's new interactive session, an IDE, or `explorer.exe` and every child — OR when the holder
+# STARTED AFTER the stamp the caller recorded it under (the closing review's round 2, defect E): a
+# same-image recycle — a second `claude.exe` on a node whose job is running them, a second
+# `bash.exe` on a bash-heavy one — passes the image and fails this, because the process that wrote
+# a lease, or that a launch recorded, existed before the stamp, and any later holder of its number
+# started after it. An image of `absent` or none at all matches anything, and so does an absent
+# stamp: a lease written before either was recorded, or by a harness whose pid the probe could not
+# see, keeps the pid-only reading it always had, and the header says so rather than pretending that
+# lease is guarded. A start time the probe cannot read keeps the image reading — the compare is
+# additive, never a `no` manufactured from a dead probe. Existence is not progress: a hung process
+# is `yes`. MOVED from the driver by TOOL-aWokenSentinel-5's fold of the closing review; the pid half
+# is unit 2's, unchanged in its verdicts.
+check_pid_alive() { # pid · [image] · [not-after-utc] -> yes | no | unknown
+  local img rc st
   img=$(read_pid_image "$1"); rc=$?
   case "$rc" in 2) echo unknown; return 0 ;; 1) echo no; return 0 ;; esac
-  case "${2:-}" in ""|absent|"$img") echo yes ;; *) echo no ;; esac
+  case "${2:-}" in ""|absent|"$img") ;; *) echo no; return 0 ;; esac
+  case "${3:-}" in ""|absent) ;; *) if st=$(read_pid_start "$1") && [ "$st" \> "$3" ]; then echo no; return 0; fi ;; esac
+  echo yes
 }
 
 # ------------------------------------------------------------------------------- ids, anchored

@@ -2997,7 +2997,9 @@ set_fact() { # file · key · value
 # record — neither kills nor launches; `pid-image`, the image holding the pid AT LEASE TIME, so a
 # number a reboot recycled reads `pid-alive: no` instead of aiming a tree kill at the owner's next
 # process; and `lease-utc`, when this incarnation took the run, so `--landed` grades only a stop the
-# CURRENT incarnation's session produced and never a dead one's LANDING line. Each is `absent` when
+# CURRENT incarnation's session produced and never a dead one's LANDING line, and so a holder of
+# the pid that STARTED after it — a same-image recycle, which the image alone cannot see — reads
+# `pid-alive: no` too (the closing review's round 2, defect E). Each is `absent` when
 # it cannot be derived — a harness exposing no pid has no image — and every reader treats `absent`
 # as "not recorded", which is the pid-only reading the record had before these existed.
 write_lease() { # run-state file · keepalive-id
@@ -3293,13 +3295,14 @@ resolve_transcript_path() { # session -> the transcript path when it exists, or 
 # process-monitor kit's.
 #
 #   phase · state · default-branch · session · pid · keepalive · pid-alive · last-move ·
-#   last-move-source · transcript · last-stall · stale · verdict
+#   last-move-source · transcript · last-stall · stale · verdict · stale-bound
 #
 # `state` is `terminal`, `finished-unstamped` or `live`. `last-move` is the seconds since the NEWEST
 # of four signals — the last commit, the newest dirty or untracked write, the newest gate log under
 # `<git-dir>/gate-logs/`, and the session transcript when its path derives — because during a
 # healthy 26-minute bar neither the transcript nor the commit moves and the per-leg logs do. `stale`
-# is `last-move` over RESUME_STALE_BOUND. The verdict is the first that holds: TERMINAL,
+# is `last-move` over RESUME_STALE_BOUND, and `stale-bound` is that number, printed so the tick
+# bounds its own reads by it. The verdict is the first that holds: TERMINAL,
 # FINISHED-UNSTAMPED, UNBOUND (no session to bind to), STALE, LIVE. Every key prints on every run
 # that reaches the verdict, a terminal record included, so a reader never has to know which keys a
 # state omits. A terminal phase, an absent session and an unresolvable default branch are VALUES;
@@ -3337,9 +3340,10 @@ print_liveness() { # slug
   sid=$(fact "$rel" session); [ -n "$sid" ] || sid=absent
   pid=$(fact "$rel" pid); [ -n "$pid" ] || pid=absent
   kid=$(fact "$rel" keepalive); [ -n "$kid" ] || kid=absent
-  # The recorded IMAGE rides with the pid: a number a reboot recycled reads `no` here rather than
-  # `yes`, and the tick's kill is not aimed at the owner's next process (closing review id 2).
-  alive=$(check_pid_alive "$pid" "$(fact "$rel" pid-image)")
+  # The recorded IMAGE rides with the pid, and the lease's own UTC bounds the holder's START: a
+  # number a reboot recycled reads `no` here rather than `yes` whatever image took it, and the
+  # tick's kill is not aimed at the owner's next process (closing review id 2; round 2, defect E).
+  alive=$(check_pid_alive "$pid" "$(fact "$rel" pid-image)" "$(fact "$rel" lease-utc)")
   # THE FOUR SIGNALS. The two tree clocks are `read_tree_clocks`; the gate-log clock and the
   # transcript clock are this verb's own. An ABSENT gate-logs directory contributes nothing and is
   # not a dead probe — a repo that has never run the bar has none — but a file under it that `stat`
@@ -3376,8 +3380,11 @@ print_liveness() { # slug
   elif [ "$sid" = absent ]; then verdict=UNBOUND
   elif [ "$stale" = yes ]; then verdict=STALE
   else verdict=LIVE; fi
-  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\n' \
-    "$ph" "$state" "$dref" "$sid" "$pid" "$kid" "$alive" "$((TC_NOW - newest))" "$src" "${tp:-absent}" "$last" "$stale" "$verdict"
+  # `stale-bound` LAST, after the verdict: the number `stale` was graded against, printed so the
+  # resume tick bounds its in-flight skip by THIS reader's bound instead of reading the key itself
+  # — a second reader would be a second copy of its default (closing review round 2, defect D).
+  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\nstale-bound: %s\n' \
+    "$ph" "$state" "$dref" "$sid" "$pid" "$kid" "$alive" "$((TC_NOW - newest))" "$src" "${tp:-absent}" "$last" "$stale" "$verdict" "$RESUME_STALE_BOUND"
   return 0
 }
 

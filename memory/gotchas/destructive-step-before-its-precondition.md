@@ -49,7 +49,15 @@ was never probed. The remedy is the lease recording what it names: `host` and `p
 `pid`, the probe matching pid AND image and reading `no` on a mismatch, and the tick standing off a
 lease another node took.
 
-## Where this repo's killers live
+The image alone left two residuals, both found by the closing review's round 2 and both closed the
+same way: a pid recycled to the SAME image passed the match, and the pid the tick itself launched
+was probed and killed by number, with no image at all — the fold that guarded the recorded pid
+shipped a second kill target unguarded. The closure is the third thing the probe matches, the
+holder's START TIME against the stamp the pid was recorded under: the lease's own `lease-utc` for
+the recorded pid, the `launched <pid> <utc> <image>` field's stamp for the launched one. A process
+that wrote its lease, or that a launch recorded, existed before the stamp, so any later holder of
+its number started after it, whatever its image. `read_pid_start` in `tools/unattended/lib-unattended.sh`
+reads it and `check_pid_alive` compares it; a start the probe cannot read keeps the image reading.
 
 ## Where this repo's killers live
 
@@ -73,6 +81,11 @@ is gated by that suite's `AC15` arm (a lease whose `host:` names another node: t
 listed, nothing invoked, no attempt line; RED against a tick copy without the host row) and by
 `tools/unattended/unattended.test.sh`'s `AC11` liveness arm (the suite's own `sleep` leased under
 `pid-image: claude.exe` reads `pid-alive: no`; RED against a library copy that ignores the image).
+The two residuals are gated by that same `AC11` arm's start-time half (the sleep under its own
+image but a `lease-utc` older than its start reads `no`; RED against a library copy without the
+compare) and by the tick suite's `AC13` image-and-start block (a seeded `launched` field naming the
+sleep under `claude.exe`, or under its own image with a stamp older than its start: the sleep
+survives and attempt 2 launches; RED against a tick copy probing the launched pid by number).
 The class itself is gated for the tick alone; the reaper and the driver's bound carry no
 precondition-ordering arm, and the anchors above are what puts this record in front of the diff
 that would add one.

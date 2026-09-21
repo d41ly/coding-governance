@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-6 — the contract: protocol section 5, the Skill, the README, the conf prose and the dossier, with the cron job demoted to the idle-wake
 
-**Status:** CLOSED · rev-4 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 15 · ratified 2026-09-16
+**Status:** CLOSED · rev-5 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 15 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
@@ -147,7 +147,10 @@ trigger:
    task is pending. Its prompt is `--audit`.
 3. The KEEPALIVE: what wakes a run from outside its own turn — the stop-guard at every turn end,
    the stall-recorder at every error end, the resume tick from the OS scheduler. One sentence each
-   with its trigger and its sidecar kind under `<git-dir>/unattended/`; registration of the tick is
+   with its trigger and its sidecar kind under `<git-dir>/unattended/`; the tick's sentence states
+   its ACTING SET once — a run `--liveness` reads `STALE`, or `FINISHED-UNSTAMPED` with
+   `stale: yes` — and the README and the Skill point at it rather than restating `STALE` alone
+   (rev-5: three carriers said `STALE` after the tick had gained the second arm); registration of the tick is
    the owner's, one line per OS in the kit README, and `--check` reports it as INFO.
 4. The actors. The AGENT schedules and reaps the idle-wake and, on resume, runs
    `--resume <slug> --keepalive-id <id>` so the lease is re-recorded. The DRIVER records the lease
@@ -187,8 +190,9 @@ with the noun changed.
 A new `## What wakes a stalled run` section, placed directly after it and before `## Which path`,
 of at most twelve lines: the stop-guard refuses a turn end while the run is non-terminal, up to
 `STOP_GUARD_BLOCKS` times; the stall-recorder writes an API-error end to the `stall` sidecar; the
-resume tick, registered by the owner on the OS scheduler, resumes a `STALE` run from another
-process; `--liveness <slug>` is the one predicate all three read and the one to run by hand; the
+resume tick, registered by the owner on the OS scheduler, resumes a run from another process on
+the verdicts the protocol's section 5 names as acting (rev-5: not `STALE` alone); `--liveness
+<slug>` is the one predicate all three read and the one to run by hand; the
 registration line is in the kit README and is not restated here. It names neither `--preflight`
 nor `/session-kickoff`, so check 18's ordering does not move.
 
@@ -296,12 +300,16 @@ The base for the "0 at base" figures is this unit's own pass base, read by `git 
   both; the section 5 region cut by `awk '/^## 5[.] /{f=1;next} f&&/^## /{f=0} f'` carries
   `stop-guard`, `stall-recorder`, `resume-tick`, `--liveness` and `--resume` each at least once,
   `never ends its turn by asking` exactly once (item 5, the one-copy rule every pointer targets),
-  `AGENT` and `DRIVER` each at least once (item 4, the actors), each of those three 0 at base, and
+  `AGENT` and `DRIVER` each at least once (item 4, the actors), each of those three 0 at base,
+  `FINISHED-UNSTAMPED` at least once (rev-5: the tick's acting set, stated here and pointed at by
+  the README and the Skill, whose `## What wakes a stalled run` region and registration paragraph
+  each carry `section 5 names as acting` at least once, 0 at base), and
   `for four kit versions` zero times.
   Red when: the opening sentence is absent, which means the rule was paraphrased instead of stated;
   a mechanism name is missing, which means an actor was left out; the one-copy rule is absent,
-  which leaves the Skill, the stop-guard reason and the tick payload pointing at nothing; or the
-  narration survived.
+  which leaves the Skill, the stop-guard reason and the tick payload pointing at nothing; the
+  acting set is absent or restated, which is the two-answers class an owner reading
+  `FINISHED-UNSTAMPED` off `--liveness` paid for; or the narration survived.
 - **AC2** — When `grep -c 'cannot be corrected in place'` runs over `tools/unattended/SKILL.template.md`
   and `.claude/skills/unattended/SKILL.md`, each prints 0 and prints 1 at base; the `## Resume`
   region cut by `awk '/^## Resume/{f=1;next} f&&/^## /{f=0} f'` carries `--resume <slug> --keepalive-id`
@@ -388,6 +396,17 @@ cap checks.
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-21 · §4 · AC1 · folded the closing diff review round 2
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round2.md`), the CONVERGED exit,
+  defect F (LOW): protocol section 5, the README and the Skill still said the tick resumes a
+  `STALE` run after unit 5's rev-5 made it act on `FINISHED-UNSTAMPED` with `stale: yes` too, so
+  an owner reading that verdict off `--liveness` concluded the tick would not touch the run. The
+  acting set is now stated once in the protocol's section 5 sentence and the two other carriers
+  point at it; both renders moved in the same commit, and section 5 traded bytes inside itself to
+  keep the render under the 61440 B guide cap (61434 after the fold). Defect E's protocol fact 16
+  (`a recycled pid reads dead`) is left as written: the start-time compare unit 2's rev-6 adds
+  makes it true for a same-image recycle too, so the sentence that overclaimed now claims what
+  the code does. Status unchanged, CLOSED.
 - rev-4 · 2026-09-21 · §3 · AC2 · at the build pass: the sweep at the pass base c8aaeb90 found 35
   `keepalive` carriers against the 30 measured at the spec base: the kit README (S3's, edited here)
   and four code and test files units 3 and 5 landed after 2026-09-16, and §3 also lacked a line

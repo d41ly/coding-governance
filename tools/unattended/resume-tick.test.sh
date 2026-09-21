@@ -263,8 +263,10 @@ check_same "AC2 the tick did not wait for the CLI's orphan" "$([ "$SECS" -le 8 ]
 # ---- AC1: the STALE fixture with a dead recorded pid is RESUMED: one line ending in the .out path,
 # ---- the tick back within 5 s while the stub still sleeps (the launch is DETACHED), the argv
 # ---- carrying the session, the flag, the turns and the payload's first instruction, the sidecar
-# ---- line stamped and counted, the launcher beside it.
-build_fixture 999999999
+# ---- line stamped and counted, the launcher beside it. The bound is 1800 s here, not the suite's
+# ---- 1: the hour-old commit still reads STALE, and the in-flight read-back below needs the launch
+# ---- line INSIDE the bound when the second tick runs seconds later (round 2, defect D).
+CONF_EXTRA='RESUME_STALE_BOUND="1800"' build_fixture 999999999
 run_tick_over "$TICK"
 check_same "AC1 exits 0" "$RC" "0"
 check_same "AC1 one decision line" "$(printf '%s\n' "$OUT" | grep -c '')" "1"
@@ -283,11 +285,15 @@ check_same "AC1 the launcher exists beside the log" "$(ls "$SIDECAR"/resume.tRun
 check_same "AC1 the launcher records the argv" "$(grep -c -- '--dangerously-skip-permissions --max-turns 40' "$SIDECAR"/resume.tRun.*.sh)" "1"
 OUT_PATH=$(sed -n 's/.* out //p' "$SIDECAR/resume.tRun.log" | head -n 1); OUT_PATH=${OUT_PATH%% launched *}
 check_same "AC1 the .out the line names is the one the launcher writes" "$(grep -c -- ">$OUT_PATH" "$SIDECAR"/resume.tRun.*.sh)" "1"
-# ...AC13, the LAUNCHED PID (closing review id 3): the line ends `launched <pid>` and that pid is
-# alive — the launcher shell, whose child is the stub still sleeping — so a second STALE tick with
-# the tree unmoved is the announced IN-FLIGHT skip, one line, no second launch, no second attempt
-# line. RED against a tick copy with the in-flight branch removed: attempt 2 launches, two lines.
+# ...AC13, the LAUNCHED PID (closing review id 3): the line ends `launched <pid> <utc> <image>` —
+# the pid, the stamp taken once the launch returned, the image holding it (round 2, defect A) —
+# and that pid is alive under all three: the launcher shell, whose child is the stub still
+# sleeping. So a second STALE tick with the tree unmoved is the announced IN-FLIGHT skip, one line,
+# no second launch, no second attempt line. RED against a tick copy with the in-flight branch
+# removed: attempt 2 launches, two lines.
 LAUNCHED=$(sed -n 's/.* launched //p' "$SIDECAR/resume.tRun.log" | head -n 1)
+check_same "AC13 the launched field is the pid, a UTC stamp and an image" "$(printf '%s' "$LAUNCHED" | grep -cE '^[0-9]+ [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z [^ ]')" "1"
+LAUNCHED=${LAUNCHED%% *}
 check_same "AC13 the attempt line carries the launched pid" "$(printf '%s' "$LAUNCHED" | grep -cE '^[0-9]+$')" "1"
 check_same "AC13 the launched pid is alive after the tick returned" "$(check_pid_alive "$LAUNCHED")" "yes"
 run_tick_over "$TICK"
@@ -376,6 +382,99 @@ else
 fi
 kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
 
+# ---- AC13, the launched pid's IMAGE and START (round 2, defect A): the attempt line carries
+# ---- `launched <pid> <utc> <image>` and the next tick probes all three, so a number some other
+# ---- process now holds is not the launch. Seeded with the suite's own sleep under `claude.exe`:
+# ---- older than the last move, the sleep SURVIVES and attempt 2 launches; newer than the last
+# ---- move, it must not read IN-FLIGHT. Then under the sleep's own image but a stamp older than
+# ---- its start — the same-image recycle — the sleep survives too. RED against a tick copy probing
+# ---- the launched pid by number: the sleep is gone, then IN-FLIGHT.
+sleep 300 & SLEEP_PID=$!
+WPID=$(derive_winpid "$SLEEP_PID")
+if [ -n "$WPID" ]; then
+  build_fixture 999999999; seed_log 1 "$OLD_UTC"
+  sed -i "\$ s/\$/ launched $WPID $OLD_UTC claude.exe/" "$SIDECAR/resume.tRun.log"
+  run_tick_over "$TICK"
+  check_hit "$OUT" "· resumed · attempt 2 · out " "AC13 a launched number under a foreign image is relaunched"
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) check_same "AC13 a launched number under a foreign image is not killed" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'sleep.exe')" "1" ;;
+    *) check_same "AC13 a launched number under a foreign image is not killed" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "alive" ;;
+  esac
+  # ...the sleep must still be alive here, or the next seed reads `no` for the wrong reason.
+  check_same "AC13 fixture: the sleep is alive before the newer seed" "$(check_pid_alive "$WPID")" "yes"
+  build_fixture 999999999; seed_log 1 "$NOW_UTC"
+  sed -i "\$ s/\$/ launched $WPID $NOW_UTC claude.exe/" "$SIDECAR/resume.tRun.log"
+  run_tick_over "$TICK"
+  check_miss "$OUT" "IN-FLIGHT" "AC13 a newer line under a foreign image does not read IN-FLIGHT"
+  check_hit "$OUT" "· resumed · attempt 2 · out " "AC13 a newer line under a foreign image is relaunched"
+  build_fixture 999999999; seed_log 1 "$OLD_UTC"
+  sed -i "\$ s/\$/ launched $WPID $OLD_UTC $(read_pid_image "$WPID")/" "$SIDECAR/resume.tRun.log"
+  run_tick_over "$TICK"
+  check_hit "$OUT" "· resumed · attempt 2 · out " "AC13 a same-image number started after its launch stamp is relaunched"
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) check_same "AC13 a same-image number started after its launch stamp is not killed" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'sleep.exe')" "1" ;;
+    *) check_same "AC13 a same-image number started after its launch stamp is not killed" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "alive" ;;
+  esac
+else
+  print_bad "AC13 fixture: no pid for the background sleep, so the launched-image arm would probe an empty value and prove nothing"
+fi
+kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
+# ...and the CLASS, not the instance: this defect was the second call of one function with half its
+# contract, so no kit file may call `check_pid_alive` with the pid alone. The suites are excluded —
+# their own pid-only assertions above are deliberate. Read 2 at the tip before the fold.
+check_same "AC13 no kit call site probes a pid without its image and stamp" "$(grep -cE 'check_pid_alive "\$[A-Za-z_]+"( *\)|$)' "$HERE/resume-tick.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" | awk -F: '{s+=$2} END{print s+0}')" "0"
+
+# ---- AC13, the in-flight BOUND (round 2, defect D): a launched line newer than the last move with
+# ---- a live launcher is the skip only while the line is inside `--liveness`'s `stale-bound`; past
+# ---- it the resumer is HUNG before its first turn, takes the kill row and counts against the cap —
+# ---- attempt 2 launches and the sleep is gone. Bound 1800 s over the hour-old commit: a line
+# ---- stamped now is inside it, one stamped 45 minutes back is newer than the commit and past it.
+# ---- The `launched` stamp is taken AFTER the sleep starts, so its start-time compare reads it as
+# ---- the launch. RED against a tick copy with no bound: the second seed reads IN-FLIGHT forever.
+sleep 300 & SLEEP_PID=$!
+WPID=$(derive_winpid "$SLEEP_PID")
+LAUNCH_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+MID_UTC=$(date -u -d "@$(( $(date -u +%s) - 2700 ))" +%Y-%m-%dT%H:%M:%SZ)
+if [ -n "$WPID" ]; then
+  CONF_EXTRA='RESUME_STALE_BOUND="1800"' build_fixture 999999999; seed_log 1 "$LAUNCH_UTC"
+  sed -i "\$ s/\$/ launched $WPID $LAUNCH_UTC $(read_pid_image "$WPID")/" "$SIDECAR/resume.tRun.log"
+  run_tick_over "$TICK"
+  check_hit "$OUT" "resume-tick: tRun · $FX · skip · IN-FLIGHT · launched $WPID alive since $LAUNCH_UTC" "AC13 a launched line inside the bound with a live launcher is the skip"
+  check_same "AC13 the in-flight skip invokes nothing" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
+  CONF_EXTRA='RESUME_STALE_BOUND="1800"' build_fixture 999999999; seed_log 1 "$MID_UTC"
+  sed -i "\$ s/\$/ launched $WPID $LAUNCH_UTC $(read_pid_image "$WPID")/" "$SIDECAR/resume.tRun.log"
+  run_tick_over "$TICK"
+  check_hit "$OUT" "· resumed · attempt 2 · out " "AC13 a launched line past the bound is hung and relaunched"
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the launcher hung past the bound is gone from tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'No tasks are running')" "1" ;;
+    *) check_same "AC13 the launcher hung past the bound is gone" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "gone" ;;
+  esac
+else
+  print_bad "AC13 fixture: no pid for the background sleep, so the in-flight-bound arm would probe an empty value and prove nothing"
+fi
+kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
+
+# ---- AC17 (round 2, defect C): a launch that FAILS is announced as one. `cygpath` stubbed to name a
+# ---- bash that does not exist makes `Start-Process` fail, and the pid file then holds an error text
+# ---- rather than a number: no `launched` token on the attempt line, `launch failed: <first line>`
+# ---- instead of `resumed`, and the line still counts toward the cap. MSYS only — the POSIX detach
+# ---- always has a `$!` — and the arm says so where it cannot run. RED against a tick copy sieving
+# ---- every digit of the pid file: `launched 12` and `resumed`.
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    mkdir -p "$TMP/stubcp"; printf '#!/bin/sh\necho /nonexistent/bash.exe\n' > "$TMP/stubcp/cygpath"; chmod +x "$TMP/stubcp/cygpath"
+    build_fixture 999999999
+    PATH="$TMP/stubcp:$PATH" run_tick_over "$TICK"
+    check_same "AC17 a failed launch exits 0" "$RC" "0"
+    check_hit "$OUT" "resume-tick: tRun · $FX · launch failed: Start-Process : This command cannot be run due to the error: The system cannot find the file specified." "AC17 a failed launch is announced with the launcher's first line"
+    check_miss "$OUT" "resumed" "AC17 a failed launch is not reported as resumed"
+    check_same "AC17 the attempt line carries no launched token" "$(grep -c ' launched ' "$SIDECAR/resume.tRun.log")" "0"
+    check_same "AC17 the attempt line still counts" "$(grep -c ' attempt 1 session ' "$SIDECAR/resume.tRun.log")" "1"
+    check_same "AC17 the stub was not launched" "$(grep -c 'argv -p' "$STUB_LOG")" "0"
+    rm -rf "$TMP/stubcp" ;;
+  *) echo "skip AC17 · the POSIX detach records \$! and cannot fail the way Start-Process does; the arm runs under MSYS only" ;;
+esac
+
 # ---- AC14 (closing review id 1, the BLOCKER): an UNTRACKED RUN.md carrying a live session id in
 # ---- a tree older than the bound is announced and SKIPPED — no liveness probe, no attempt line,
 # ---- no launcher, nothing invoked — and `git add` of the same file makes the same tick launch.
@@ -397,16 +496,39 @@ check_same "AC14 one line, the skip, and no bound-run line for the tracked absen
 run_tick_over "$TICK"
 check_hit "$OUT" "resume-tick: tDrop · $FX · resumed · attempt 1 · out " "AC14 the same record staged is launched by the same tick"
 check_same "AC14 the staged record's line landed" "$(grep -c ' attempt 1 session ' "$SIDECAR/resume.tDrop.log")" "1"
-# ...the index blob, not the working copy: a session id rewritten ON DISK after staging is not the
-# one launched. The launcher names the index's; the tree's newest write is the edit, so the sidecar
-# and tree are rebuilt old first.
+# ...the working copy may not DRIFT from the index blob either (round 2, defect B): the verdict and
+# the kill target are `--liveness`'s reads of the file ON DISK, so a tracked record whose working
+# copy differs from its index blob is announced and skipped before the probe — no launcher, no
+# attempt line, nothing invoked. RED against a tick copy without the `diff --quiet` gate: attempt 1
+# launches on the index's id.
 build_fixture 999999999
 sed -i "s/^session: .*/session: 99999999-aaaa-bbbb-cccc-dddddddddddd/" "$FX/memory/builds/tRun/RUN.md"
 touch -d '-1 hour' "$FX/memory/builds/tRun/RUN.md"
 run_tick_over "$TICK"
-check_hit "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1 · out " "AC14 a tracked record with a rewritten working copy still resumes"
-check_same "AC14 the launched session is the INDEX's, not the working copy's" "$(grep -c -- "--resume $SID " "$SIDECAR"/resume.tRun.*.sh)" "1"
-check_same "AC14 the working copy's id reached no launcher" "$(grep -c -- '99999999-aaaa' "$SIDECAR"/resume.tRun.*.sh)" "0"
+check_same "AC14 a drifted working copy exits 0" "$RC" "0"
+check_hit "$OUT" "resume-tick: tRun · $FX · skip · RUN.md differs from the index, and the tick acts only on the lease the index holds" "AC14 a tracked record whose working copy drifted from the index is announced and skipped"
+check_same "AC14 the drifted record invokes nothing" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
+check_same "AC14 the drifted record writes no attempt line and no launcher" "$([ -s "$SIDECAR/resume.tRun.log" ] && echo written || echo none) · $(ls "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "none · 0"
+check_same "AC14 the working copy's id reached no launcher" "$(grep -l -- '99999999-aaaa' "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "0"
+# ...and a working copy that AIMS the kill — `pid:` rewritten on disk to the suite's own sleep under
+# `pid-image: absent`, the index still naming a dead number — kills nothing and prints the same skip.
+sleep 300 & SLEEP_PID=$!
+WPID=$(derive_winpid "$SLEEP_PID")
+if [ -n "$WPID" ]; then
+  build_fixture 999999999
+  sed -i "s/^pid: .*/pid: $WPID\npid-image: absent/" "$FX/memory/builds/tRun/RUN.md"
+  touch -d '-1 hour' "$FX/memory/builds/tRun/RUN.md"
+  run_tick_over "$TICK"
+  check_hit "$OUT" "resume-tick: tRun · $FX · skip · RUN.md differs from the index, and the tick acts only on the lease the index holds" "AC14 a working copy aiming the kill at a live pid is skipped"
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) check_same "AC14 the pid the working copy aimed at is still listed by tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'sleep.exe')" "1" ;;
+    *) check_same "AC14 the pid the working copy aimed at is still alive" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "alive" ;;
+  esac
+  check_same "AC14 the aimed kill invokes nothing" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
+else
+  print_bad "AC14 fixture: no pid for the background sleep, so the aimed-kill arm would probe an empty value and prove nothing"
+fi
+kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
 
 # ---- AC15 (closing review id 2): a lease whose `host:` names ANOTHER node is skipped by name — no
 # ---- probe, no kill, no launch — with a live recorded pid still listed afterwards; the tick's own
@@ -609,7 +731,12 @@ n=$((pass+fail))
 # RAISED 97 -> 125 by TOOL-aWokenSentinel-5's fold of the closing review, the blocks again run
 # alone on node a, 2026-09-21: AC1 15 -> 21 (the in-flight half of AC13), AC13's hung half 2,
 # AC14 10, AC15 6, AC16 6, AC12 8 -> 9 — 139 executed, pinned at ~10% headroom.
-FLOOR_ASSERTIONS=125
+# RAISED 125 -> 145 by the same unit's fold of the closing review's round 2, every block again run
+# alone on node a, 2026-09-21: AC1 21 -> 22 (the launched field's shape), AC13's image-and-start
+# block 8 (its last row the class arm over the kit's call sites), AC13's in-flight-bound block 4,
+# AC17 6, AC14 10 -> 15 (the drifted working copy and the aimed kill) — 163 executed, pinned at ~10% headroom. AC17 is MSYS-only and announces its
+# skip elsewhere, so a POSIX run reaches 157 against the same floor.
+FLOOR_ASSERTIONS=145
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

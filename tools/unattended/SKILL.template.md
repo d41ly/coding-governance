@@ -63,7 +63,8 @@ The idle-wake above fires only while the session is idle, so it cannot wake a st
 actors outside the session's turn can, and all three read one predicate: the stop-guard refuses a
 turn end while the run is non-terminal, up to `STOP_GUARD_BLOCKS` times, and says what to run
 instead; the stall-recorder writes an API-error end to the `stall` sidecar; the resume-tick,
-registered by the owner on the OS scheduler, resumes a `STALE` run from another process. The
+registered by the owner on the OS scheduler, resumes a run from another process on the verdicts
+the protocol's section 5 names as acting — not `STALE` alone. The
 predicate is `bash {{KIT_DIR}}/unattended.sh --liveness <slug>`, the one to run by hand when you
 want to know what they will see. The tick's registration line is in the kit README and is not
 restated here.

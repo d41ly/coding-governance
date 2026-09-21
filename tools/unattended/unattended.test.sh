@@ -5663,7 +5663,7 @@ same "AC2 the withheld pid is absent" "$(grep -c '^pid: absent$' memory/builds/t
 reset_tree
 
 # ---- TOOL-aWokenSentinel-2: `--liveness`, the one predicate every out-of-session reader shares.
-# ---- Thirteen `key: value` lines and ONE verdict over the run-state file, the tree's clocks, the
+# ---- Fourteen `key: value` lines and ONE verdict over the run-state file, the tree's clocks, the
 # ---- gate logs, the transcript and the recorded pid. Every arm is the driver over the `--audit`
 # ---- fixture; the stale bound rides mkconf's EIGHTH positional, at the derived default so no
 # ---- fixture above sees a NOTE it did not see before. The transcript root is pointed at a scratch
@@ -5679,10 +5679,15 @@ out=$(run --liveness tRun); rc=$?
 same "AC2 a TERMINAL verdict exits 0" "$rc" "0"
 hit "$out" "state: terminal"
 hit "$out" "verdict: TERMINAL"
-same "AC2 thirteen key: value lines on a terminal record" "$(printf '%s\n' "$out" | grep -c ':')" "13"
+same "AC2 fourteen key: value lines on a terminal record" "$(printf '%s\n' "$out" | grep -c ':')" "14"
 same "AC2 no line that is not key: value" "$(printf '%s\n' "$out" | grep -cvE '^[a-z-]+: ')" "0"
-same "AC2 the keys in S2's order" "$(printf '%s\n' "$out" | sed 's/:.*//' | tr '\n' ' ')" "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict "
-# ...and the same thirteen on a BUILDING record, so a reader never learns which state omits what.
+same "AC2 the keys in S2's order" "$(printf '%s\n' "$out" | sed 's/:.*//' | tr '\n' ' ')" "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict stale-bound "
+# ...the fourteenth line is the bound the verdict was graded against (closing review round 2,
+# defect D): the fixture's declared 5400, printed so the resume tick bounds its in-flight skip by
+# the driver's number and never reads RESUME_STALE_BOUND itself. RED against a driver copy
+# printing thirteen lines.
+same "AC2 the fourteenth line prints the declared stale bound" "$(printf '%s\n' "$out" | sed -n '14p')" "stale-bound: 5400"
+# ...and the same fourteen on a BUILDING record, so a reader never learns which state omits what.
 build_audit_fixture
 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: BUILDING/'
 out=$(run --liveness tRun); rc=$?
@@ -5691,7 +5696,7 @@ hit "$out" "state: live"
 hit "$out" "session: fixture-session"
 hit "$out" "keepalive: k1"
 hit "$out" "verdict: LIVE"
-same "AC2 thirteen key: value lines on a BUILDING record" "$(printf '%s\n' "$out" | grep -c ':')" "13"
+same "AC2 fourteen key: value lines on a BUILDING record" "$(printf '%s\n' "$out" | grep -c ':')" "14"
 # AC3 — FINISHED-UNSTAMPED: LANDING with a witness on the fixture's main, offline, against the
 # remote-tracking ref; the witness moved to the unit branch's HEAD reads live; and with no
 # GOV_DEFAULT_BRANCH and no origin/HEAD the ref is announced `unresolved` rather than fabricated.
@@ -5733,7 +5738,11 @@ case "$(uname -s)" in
   *) WPID=$SLEEP_PID ;;
 esac
 n=$((n+1)); [ -n "$WPID" ] || { echo "FAIL fixture: no pid for the background sleep, so the live-pid arm below would probe an empty value and prove nothing"; st=1; }
+# LEASED AFTER IT STARTED: the fixture's `lease-utc` predates the sleep, and a holder that started
+# after the lease is a recycled number by the start-time compare below, so the lease is re-stamped
+# now — the shape a real lease has, since a process writes its lease after it exists.
 mutate memory/builds/tRun/RUN.md "s/^pid: .*/pid: $WPID/"
+mutate memory/builds/tRun/RUN.md "s/^lease-utc: .*/lease-utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)/"
 out=$(run --liveness tRun)
 hit "$out" "pid: $WPID"
 hit "$out" "pid-alive: yes"
@@ -5748,6 +5757,20 @@ mutate memory/builds/tRun/RUN.md "s/^pid-image: .*/pid-image: $(read_pid_image "
 out=$(run --liveness tRun)
 hit "$out" "pid-alive: yes"
 mutate memory/builds/tRun/RUN.md 's/^pid-image: .*/pid-image: absent/'
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: yes"
+# ...and the START TIME decides last (closing review round 2, defect E): under the matching image,
+# a `lease-utc` older than the sleep's start is a same-image recycle — the number was freed and
+# taken again by the same kind of process — and reads `no`; re-stamped after the start it reads
+# `yes` again; and `absent` keeps the image reading. RED against a lib copy without the compare.
+mutate memory/builds/tRun/RUN.md "s/^pid-image: .*/pid-image: $(read_pid_image "$WPID")/"
+mutate memory/builds/tRun/RUN.md 's/^lease-utc: .*/lease-utc: 2026-01-01T00:00:00Z/'
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: no"
+mutate memory/builds/tRun/RUN.md "s/^lease-utc: .*/lease-utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)/"
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: yes"
+mutate memory/builds/tRun/RUN.md 's/^lease-utc: .*/lease-utc: absent/'
 out=$(run --liveness tRun)
 hit "$out" "pid-alive: yes"
 kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null
@@ -6360,7 +6383,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=1000
+FLOOR_ASSERTIONS=1004
+# RAISED 1000 -> 1004 by TOOL-aWokenSentinel-5's fold of the closing review's round 2: the
+# fourteenth `--liveness` line, `stale-bound` (1), and the start-time half of the liveness arm (3),
+# region two, the `--liveness` block measured alone over the sourced prologue on node `a`: n 110
+# with the four, st=0.
 # RAISED 973 -> 1000 by TOOL-aWokenSentinel-5's fold of the closing review: the `--landed`
 # unbound-session and dead-incarnation arms (17), the lease's three derived facts (7) and the
 # pid-image liveness arm (3), all region two, each block measured alone over the sourced prologue
@@ -6437,7 +6464,9 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=804
+FLOOR_SHARD_2=808
+# +4 for TOOL-aWokenSentinel-5's fold of the closing review's round 2: the fourteenth `--liveness`
+# line and the start-time half of the liveness arm, region two's `--liveness` block.
 # +27 for TOOL-aWokenSentinel-5's fold of the closing review: the `--landed` unbound-session and
 # dead-incarnation arms (17), the lease's derived facts (7) and the pid-image liveness arm (3),
 # region two beside the `keepalive-reaped`, lease and `--liveness` blocks.

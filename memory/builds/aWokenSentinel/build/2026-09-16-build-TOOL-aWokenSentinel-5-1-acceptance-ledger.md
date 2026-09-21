@@ -34,6 +34,9 @@ the close.
 - AC14 — the AC14 block alone printed `pass=10 fail=0`: an untracked `tDrop/RUN.md` with a live session read one line `skip · RUN.md is not tracked, and the tick launches only on a lease the index holds`, no stub log, no attempt line, no launcher; after `git add` the same tick read `tDrop · … · resumed · attempt 1`; with `tRun`'s working copy rewritten to `99999999-aaaa…` the launcher carried `--resume 11111111-…` and the disk id nowhere. RED against a tick copy globbing the filesystem (`the untracked record invokes nothing: expected [nothing], got [invoked]` and four more). OBSERVED, 2026-09-21.
 - AC15 — the AC15 block alone printed `pass=6 fail=0`: `host: some-other-node` read `skip · leased on some-other-node, not this node compeeto-agent` at exit 0 with the sleep still listed, no stub log, no attempt line; `host:` set to `read_host_name`'s answer read `resumed · attempt 1` under `--dry-run`. RED against a tick copy without the host row (`resumed · attempt 1`, the sleep gone, the stub invoked). OBSERVED, 2026-09-21.
 - AC16 — the AC16 block alone printed `pass=6 fail=0`: the LANDING record with `witness: <first commit>` under `GOV_DEFAULT_BRANCH=main` read `verdict: FINISHED-UNSTAMPED` from the driver and `resumed · attempt 1` from the tick, one attempt line, one launcher; with a gate log five minutes ahead, `skip · verdict FINISHED-UNSTAMPED`. RED against a tick copy acting on `STALE` alone (`skip · verdict FINISHED-UNSTAMPED`, no log, no launcher). OBSERVED, 2026-09-21.
+- AC13 — amended rev-6 — the launched field is `launched <pid> <utc> <image>`, probed under all three and bounded by `stale-bound` (round 2, defects A and D). The AC1 block alone, under its new 1800 s fixture bound, printed `pass=21 fail=1`: the field matched `^[0-9]+ <UTC> [^ ]`, the pid read `yes`, the second tick printed the IN-FLIGHT skip with one `argv -p` and one line; the one FAIL is the 5 s detach wall, which read 7 to 10 s across three runs while another worktree ran a full merge bar on this node (45 to 54 `run-gates.sh` processes by `ps -ef`), and the HEAD kit's own AC1 block read 8 to 9 s under the same load, so the wall is the node's and not this fold's. The image-and-start block alone printed `pass=8 fail=0`: the sleep under `launched <WINPID> <two hours ago> claude.exe` survived and attempt 2 launched, the same seed stamped now did not read IN-FLIGHT and launched attempt 2, and the sleep under its own image with a stamp two hours before its start survived, and the class arm — `grep -cE` for a one-argument `check_pid_alive` call over the three kit files — read `0`; RED against the tip before the fold (`a launched number under a foreign image is not killed: expected [1], got [0]`, twice, and the class arm `expected [0], got [2]`). The in-flight-bound block alone printed `pass=4 fail=0`: a line stamped now under a 1800 s bound was the IN-FLIGHT skip with nothing invoked, the same field on a line stamped 45 minutes back read `resumed · attempt 2` with the sleep gone; RED against the tip before the fold (`skip · IN-FLIGHT · launched <pid> alive since <45 minutes ago>`). The hung half alone printed `pass=2 fail=0` unchanged, its pid-only seed reading as before. OBSERVED, 2026-09-21.
+- AC14 — amended rev-6 — a tracked record whose working copy differs from its index blob is skipped before the probe (round 2, defect B). The AC14 block alone printed `pass=15 fail=0`: the untracked drop and its staged twin as before; `session:` rewritten on disk read `skip · RUN.md differs from the index, and the tick acts only on the lease the index holds` with nothing invoked, no attempt line, no launcher and the disk id nowhere; `pid:` rewritten on disk to the arm's own sleep under `pid-image: absent` read the same skip with the sleep still listed by `tasklist` and nothing invoked. RED against the tip before the fold: the rewritten copy read `resumed · attempt 1`, the launcher was written, and the sleep was GONE (`the pid the working copy aimed at is still listed by tasklist: expected [1], got [0]`) — the kill aimed by one file write, reproduced. OBSERVED, 2026-09-21.
+- AC17 — the AC17 block alone printed `pass=6 fail=0`: with `cygpath` stubbed to print `/nonexistent/bash.exe`, the tick read `launch failed: Start-Process : This command cannot be run due to the error: The system cannot find the file specified.` at exit 0, no `resumed`, the attempt line present with ` attempt 1 session ` and no ` launched ` field, and no `argv -p` in the stub log. RED against the tip before the fold (`resumed · attempt 1`, `unexpected [resumed]`, `the attempt line carries no launched token: expected [0], got [1]` — the sieve's `launched 12`). MSYS only; a POSIX run prints its skip line. OBSERVED, 2026-09-21.
 
 ## What this ledger does not evidence
 
@@ -58,3 +61,23 @@ The pre-existing blocks were re-run the same way after the fold: AC8 6, AC7 11, 
 AC4 4, U12 6, U18 12 unchanged, U13 29 after its worktree record was STAGED (an unstaged one is
 now the AC14 skip, which is the fold working). `FLOOR_ASSERTIONS` 97 -> 125 from 139 executed.
 No suite ran whole; the close observes the floors.
+
+## The rev-6 fold, 2026-09-21
+
+The rows AC13, AC14 and AC17 marked rev-6 are the closing diff review's round 2 folded into this
+unit (defects A, B, C and D; E's library half is unit 2's ledger, F unit 6's, G unit 12's). Every
+block of the suite was split out by its `# ----` marker and run ALONE from the sourced prologue,
+`HERE` pointed at the kit under test, the scratch under the session scratchpad and the fixture
+under `%TEMP%/rt5`: AC8 6, AC7 11, AC2 10, AC1 22 (one FAIL, the contended 5 s wall above), AC3 7,
+AC4 4, U12 6, AC13 hung 2, AC13 image-and-start 8, AC13 in-flight-bound 4, AC17 6, AC14 15, AC15 6,
+AC16 6, AC12 9, U13 29, U18 12 — 163 executed, `FLOOR_ASSERTIONS` 125 -> 145. Each new arm was
+observed RED against the tip before the fold from the same runner before the code moved. The
+driver suite's `--liveness` block alone read `n=110 st=0` after its four new assertions. Two
+checkers ran as the criteria name them: `python tools/lexicon/lexicon.py --check` printed
+`P1 verb graded=2320 offenders=983` and `sh.function.conv 6 of 799` (`read_pid_start` leads with a
+declared verb; `--suggest read_pid_start --as sh.function` answered OK), and
+`bash tools/check-install-prefix.sh --list` lists no row for `resume-tick.sh`. That checker's
+whole verdict is RED on a row this pass did not touch — `ROSE tools/govkit/registry.toml 70 -> 71`,
+raised by unit 21's commit `98c3d290` with no re-justified row in `tools/install-prefix-carried.txt`
+— which the close's `install-prefix (shipped surface)` leg will name. No suite ran whole; the close
+observes the floors.

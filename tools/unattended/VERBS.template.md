@@ -79,10 +79,13 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree.
 - `--liveness` — key: value lines and one verdict for an OUT-OF-SESSION reader: the phase, the
-  lease, whether the recorded pid exists, seconds since anything moved, the last recorded stall,
-  and `TERMINAL`, `FINISHED-UNSTAMPED`, `UNBOUND`, `STALE` or `LIVE`. Read-only; the stop-guard, the
-  stall-recorder's readers and the resume tick call it rather than deciding for themselves. It
-  cannot see what the session is doing or whether a process is hung — existence is not progress.
+  lease, whether the recorded pid exists AND is the leased process (image and start time, not the
+  number alone), seconds since anything moved, the last recorded stall, `TERMINAL`,
+  `FINISHED-UNSTAMPED`, `UNBOUND`, `STALE` or `LIVE`, and last the `stale-bound` the verdict was
+  graded against, so the tick bounds its own reads by this reader's number. Read-only; the
+  stop-guard, the stall-recorder's readers and the resume tick call it rather than deciding for
+  themselves. It cannot see what the session is doing or whether a process is hung — existence is
+  not progress.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`. With
   `--keepalive-id <id>` it REPLACES the lease — keepalive, session, pid — so a resumed session's
   record names the session that now holds it; refused on a terminal record.

@@ -381,24 +381,24 @@ scheduled job shares all three, so it is demoted, not fixed.
 **The IDLE-WAKE** is that job. The AGENT schedules it as the run's first act, before orienting, on
 every start path, and reaps it last — a run that never starts still owns it. It is recorded under
 the `keepalive` fact and attested as `keepalive-reaped`; that fact, that DoD item, `--keepalive-id`
-and the `KEEPALIVE_*` keys keep their names because each has readers. Its limits, 2026-09-13: it
-fires only while the session is idle (documented) and, owner-reported and unmeasured, stays silent
-while a background task is pending. Its prompt is `--audit`. Presume a job you did not schedule
-ALIVE until a delete says so: `TOOL-aPromptedMandate-11` records two asserted dead the listing
-showed firing.
+and the `KEEPALIVE_*` keys keep their names: each has readers. Its limits, 2026-09-13: it fires
+only while the session is idle (documented) and, owner-reported, unmeasured, stays silent while a
+background task is pending. Its prompt is `--audit`. Presume a job you did not schedule ALIVE until
+a delete says so (`TOOL-aPromptedMandate-11`: two asserted dead fired).
 
 **The KEEPALIVE** is what wakes a run from outside its own turn: the stop-guard refuses a turn end
 while the run is non-terminal, writing `stop`; the stall-recorder writes an API-error end to
-`stall`; the resume-tick, an OS-scheduled task, resumes a `STALE` run from another process, writing
-`resume` — three sidecar kinds under `<git-dir>/unattended/`. Registering the tick is the owner's,
-one line per OS in the kit README; `--check` reports it as INFO. The tick launches only on a lease
-the INDEX holds and only on the node that took it.
+`stall`; the resume-tick, an OS-scheduled task, resumes from another process a run `--liveness`
+reads `STALE`, or `FINISHED-UNSTAMPED` with `stale: yes`, writing `resume` — three sidecar kinds
+under `<git-dir>/unattended/`. Registering the tick is the owner's, one line per OS in the kit
+README; `--check` reports it as INFO. The tick acts only on a lease the INDEX holds, on the node
+that took it.
 
 **The actors.** The AGENT schedules and reaps the idle-wake and, on resume, runs
-`--resume <slug> --keepalive-id <id>` so the lease is re-recorded. The DRIVER records the lease
-(§2, facts 14 to 16), grades liveness (`--liveness`, the one predicate every reader takes), and
-checks the reap at `--landed` against the harness's own listing. The HOOKS and the TICK refuse,
-record and resume.
+`--resume <slug> --keepalive-id <id>`, re-recording the lease. The DRIVER records the lease (§2,
+facts 14 to 16), grades liveness (`--liveness`, the one predicate every reader takes), and checks
+the reap at `--landed` against the harness's own listing. The HOOKS and the TICK refuse, record
+and resume.
 
 **The absent-owner default.** A session bound to a non-terminal run never ends its turn by asking:
 it runs `--plan` and builds the next READY unit, or aborts with a code. A resumed session never
@@ -407,8 +407,7 @@ worse and records why. The tick's CONTINUE payload is this rule and nothing more
 there.
 
 **RESUME.** Reap the recorded id first, read the result back, schedule the replacement, record it
-with `--resume --keepalive-id`. Reap, then schedule: the reverse leaves two jobs and a record naming
-neither.
+with `--resume --keepalive-id`; the reverse order leaves two jobs and a record naming neither.
 
 ## 6. Landing
 

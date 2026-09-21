@@ -83,12 +83,15 @@ existed.
 
 `resume-tick.sh` is the one keepalive actor that does not share the session's process: an
 OS-scheduled task that walks every worktree, asks the driver `--liveness` about every run whose
-lease names a session, and on `STALE` kills the recorded pid's tree, appends an attempt line under
-`<git-dir>/unattended/resume.<slug>.log` and launches `claude -p --resume <session>` detached. It
-reads the lease from the INDEX, never the working copy — an untracked run-state file is announced
-and skipped, because a file write must not buy a skip-permissions session — stands off a lease
-another node took, kills only a pid whose recorded image still holds it, and treats the pid it
-launched as in flight until the tree moves. The kit never registers it — `schtasks /create` and
+lease names a session, and on a verdict the protocol's section 5 names as acting kills the recorded
+pid's tree, appends an attempt line under `<git-dir>/unattended/resume.<slug>.log` and launches
+`claude -p --resume <session>` detached. It reads the lease from the INDEX, never the working copy
+— an untracked run-state file is announced and skipped, and so is a tracked one whose working copy
+differs from its index blob, because a file write must buy neither a skip-permissions session nor
+a kill aimed by hand — stands off a lease another node took, kills only a pid whose recorded image
+still holds it and whose holder started before the lease, and treats the pid it launched as in
+flight until the tree moves or the stale bound passes, after which it is killed as hung and the
+run is launched again. The kit never registers it — `schtasks /create` and
 `crontab` are the owner's acts, once per node, under the login whose CLI is authenticated — and
 until it is registered the tick is inert; the adopter's `--check` says which on an `INFO` line and
 reds on neither answer.

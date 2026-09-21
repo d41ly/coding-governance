@@ -18,17 +18,19 @@
 #
 # THE DECISION, per bound run — one line each, `resume-tick: <slug> · <worktree> · <act>`:
 #   RUN.md not in the index               -> skip · RUN.md is not tracked (nothing probed, nothing launched)
+#   RUN.md on disk differs from the index -> skip · RUN.md differs from the index (nothing probed, nothing launched)
 #   host: names another node              -> skip · leased on <host>, not this node <me>
 #   verdict not STALE, and not            -> skip · verdict <V>
 #     FINISHED-UNSTAMPED with stale: yes
 #   STALE, RESUME_ATTEMPTS or more since  -> skip · ATTEMPTS EXHAUSTED · last <utc> · out <path>
 #     the run's last move
 #   STALE, newest attempt's launched pid  -> skip · IN-FLIGHT · launched <pid> alive since <utc>
-#     alive AND the line newer than the run's last move
+#     alive AND the line newer than the run's last move AND the line inside the stale bound
 #   STALE, under the cap, not logged in   -> SKIP — the CLI is not logged in ... (kills nothing, writes nothing)
 #   STALE, under the cap, pid-alive yes   -> kill the tree — the recorded pid's, and a launched pid still
-#     alive after the run moved (a resumed session that hung) — then the row below
+#     alive after the run moved or past the stale bound (a resumed session that hung) — then the row below
 #   STALE, under the cap, logged in       -> append the attempt line, launch detached, resumed · attempt <n> · out <path>
+#   ...and the launch reported no pid     -> launch failed: <the launcher's first line> (the line stays and counts)
 # The login row PRECEDES the kill row and the order is the point: a kill is useful only where a
 # launch will follow, so the probe that decides whether one can happen runs first, and
 # a logged-out node kills nothing (TOOL-aWokenSentinel-12 owns that ordering's proof). `--dry-run`
@@ -40,8 +42,12 @@
 # must be one the owner's act put in the index — `stage_or_fail` writes it there at --preflight and
 # at --resume --keepalive-id — never a file an `acceptEdits` session, a sub-agent or an injected edit
 # dropped under a worktree. So the lease is read from the INDEX BLOB (`git grep --cached`), an
-# untracked RUN.md is announced and skipped, and the working copy's bytes decide nothing. What this
-# does NOT close: an actor who can stage is the shell-access case protocol section 9 concedes.
+# untracked RUN.md is announced and skipped, and a tracked one whose working copy differs from its
+# blob is announced and skipped BEFORE the probe — `--liveness` reads the file on disk, so without
+# that gate a rewritten copy aimed the kill and picked the phase while the index picked the session
+# (the closing review's round 2, defect B). The working copy's bytes therefore decide nothing: what
+# is acted on equals what the owner's act staged. What this does NOT close: an actor who can stage
+# is the shell-access case protocol section 9 concedes.
 #
 # THE ATTEMPT CAP IS CONSECUTIVE, NOT LIFETIME. Only the sidecar lines newer than the run's last move
 # count against RESUME_ATTEMPTS, so a resume that produced a commit, a write or a transcript entry
@@ -49,13 +55,18 @@
 # the sidecar sees both. ponytail: a transcript-only move resets the count too, which RESUME_TURNS
 # and the stop-guard's block cap bound; count commits alone if that proves too generous.
 #
-# THE IN-FLIGHT GUARD IS THE LAUNCHED PID (the closing review's id 3). The pid the tick launched is
-# written onto the attempt line as `launched <pid>` and read back by the next tick: alive with the
-# tree unmoved since the launch, the resumer has not produced its first turn yet — throttled, or
+# THE IN-FLIGHT GUARD IS THE LAUNCHED PID (the closing review's id 3), BOUNDED (round 2, defect D).
+# The pid the tick launched is written onto the attempt line as `launched <pid> <utc> <image>` and
+# read back by the next tick through the library's `check_pid_alive` with all three — a number some
+# later process took is not the launch, whatever its image, because it started after the stamp
+# (round 2, defect A). Alive with the tree unmoved since the launch and the line inside
+# `--liveness`'s `stale-bound`, the resumer has not produced its first turn yet — throttled, or
 # still starting — and a second launch would put two skip-permissions agents on one tree, so the
-# tick skips; alive with the tree moved since, the resumed session ran and then hung, which is the
-# case the tree kill exists for, so its tree is killed beside the recorded pid's and the run is
-# relaunched. A resumed session that ran `--resume --keepalive-id` is the recorded pid and takes the
+# tick skips; alive with the tree moved since, the resumed session ran and then hung; alive with the
+# line past the bound and the tree still unmoved, it hung before its first turn. Both hung cases are
+# what the tree kill exists for, so its tree is killed beside the recorded pid's, the run is
+# relaunched and the line counts toward the cap, which is what ends a resumer that hangs every
+# time. A resumed session that ran `--resume --keepalive-id` is the recorded pid and takes the
 # ordinary row. ponytail: the launched pid is `bash.exe` running the launcher, and the resumed CLI is
 # its child, so the tree kill reaches it; if a launcher ever exits while its child lives, record
 # the child instead.
@@ -63,7 +74,8 @@
 # THE TWO KNOBS are ROOT-SCOPED: this file sources the root's `.unattended.conf` into its own shell
 # and reads RESUME_ATTEMPTS and RESUME_TURNS through the library's `read_bound_key`, exactly as the
 # driver reads its four — one repo, one pair of bounds, and a NOTE that names the file
-# (TOOL-aWokenSentinel-13). RESUME_STALE_BOUND is `--liveness`'s number and is not read here.
+# (TOOL-aWokenSentinel-13). RESUME_STALE_BOUND is `--liveness`'s number and is not read here: the
+# driver prints it as `stale-bound`, and the in-flight read is bounded by that line.
 #
 # WHAT THIS FILE DOES NOT DO, said where it is read: it defines no `fail()` helper and has no
 # numbered checks, so it joins no population the harness meta-gate discovers — its refusal lines are
@@ -164,18 +176,22 @@ run_kill_tree() { # pid
 # launcher path rides in double quotes inside the single-quoted argument list, so a repo path with
 # a space still arrives as one argument. THE LAUNCHED PID GOES TO A FILE (`-PassThru`'s `.Id`; `$!`
 # elsewhere), never through `$( )` — the same rule as the login probe — and `RD_PID` carries it,
-# empty when the launch reported none.
-RD_PID=""
+# EMPTY WHEN THE LAUNCH REPORTED NONE: the file holds stdout AND stderr, and only a WHOLE line that
+# is an integer is a pid — a failed `Start-Process` writes `At line:1 char:2` and the argv echo, and
+# a digit sieve read that as pid 12 and reported it `resumed` (the closing review's round 2, defect
+# C). `RD_FIRST` is the file's first line, the failure's own sentence when there was one.
+RD_PID=""; RD_FIRST=""
 run_detached() { # launcher · pid-file
   local b l
-  RD_PID=""
+  RD_PID=""; RD_FIRST=""
   case "$(uname -s 2>/dev/null)" in
     MINGW*|MSYS*|CYGWIN*)
       b=$(cygpath -m "$(command -v bash)"); l=$(cygpath -m "$1")
       powershell.exe -NoProfile -NonInteractive -Command "(Start-Process -WindowStyle Hidden -FilePath '$b' -ArgumentList '\"$l\"' -PassThru).Id" </dev/null >"$2" 2>&1 ;;
     *) setsid nohup bash "$1" </dev/null >/dev/null 2>&1 & printf '%s\n' "$!" > "$2" ;;
   esac
-  RD_PID=$(tr -dc '0-9' < "$2" 2>/dev/null)
+  RD_PID=$(tr -d '\r' < "$2" 2>/dev/null | grep -m 1 -xE '[0-9]+')
+  RD_FIRST=$(head -n 1 -- "$2" 2>/dev/null | tr -d '\r')
   rm -f -- "$2"
   return 0
 }
@@ -183,29 +199,39 @@ run_detached() { # launcher · pid-file
 # ATTEMPTS SINCE THE LAST MOVE: the sidecar lines whose UTC stamp is newer than `now - last-move`.
 # ISO-8601 stamps compare as strings, so awk's `>` is the whole comparison. Sets RT_TOTAL (every
 # line, the lifetime count), RT_SINCE (the lines that count against the cap), RT_LAST (the last
-# line, or empty), RT_LAUNCHED (the last line's `launched <pid>`, or empty for a line that carries
-# none) — globals, because a `$( )` capture would lose all but one.
-RT_TOTAL=0; RT_SINCE=0; RT_LAST=""; RT_LAUNCHED=""
+# line, or empty), and off the last line's `launched <pid> <utc> <image>` field RT_LAUNCHED, RT_LUTC
+# and RT_LIMG — the pid, the stamp taken once the launch had returned, and the image holding the pid
+# then, the image LAST because it may carry spaces; each empty for a line that carries none, and the
+# stamp and image empty for a line written before they existed, which then keeps the pid-only
+# reading it always had (the closing review's round 2, defect A) — globals, because a `$( )` capture
+# would lose all but one.
+RT_TOTAL=0; RT_SINCE=0; RT_LAST=""; RT_LAUNCHED=""; RT_LUTC=""; RT_LIMG=""
 derive_attempts() { # log · last-move-seconds
-  local cutoff
-  RT_TOTAL=0; RT_SINCE=0; RT_LAST=""; RT_LAUNCHED=""
+  local cutoff rest
+  RT_TOTAL=0; RT_SINCE=0; RT_LAST=""; RT_LAUNCHED=""; RT_LUTC=""; RT_LIMG=""
   [ -s "$1" ] || return 0
   cutoff=$(date -u -d "@$(( $(date -u +%s) - $2 ))" +%Y-%m-%dT%H:%M:%SZ)
   RT_TOTAL=$(grep -c '' "$1")
   RT_SINCE=$(awk -v t="$cutoff" '$1 > t { c++ } END { print c + 0 }' "$1")
   RT_LAST=$(tail -n 1 -- "$1"); RT_LAST=${RT_LAST%$'\r'}
-  case "$RT_LAST" in *" launched "*) RT_LAUNCHED=${RT_LAST##* launched }; RT_LAUNCHED=${RT_LAUNCHED%% *} ;; esac
+  case "$RT_LAST" in *" launched "*)
+    rest=${RT_LAST##* launched }; RT_LAUNCHED=${rest%% *}
+    rest=${rest#"$RT_LAUNCHED"}; rest=${rest# }; RT_LUTC=${rest%% *}
+    rest=${rest#"$RT_LUTC"}; RT_LIMG=${rest# } ;;
+  esac
   case "$RT_LAUNCHED" in *[!0-9]*) RT_LAUNCHED="" ;; esac
 }
 
-# THE FIVE VALUES, off the driver's `key: value` lines. RL_RC is the driver's exit; a non-zero one —
+# THE SIX VALUES, off the driver's `key: value` lines. RL_RC is the driver's exit; a non-zero one —
 # the `fail 52` dead-probe refusal included — means no verdict is answerable and the run is skipped,
 # because the alternative reads a dead probe as a verdict. RL_FIRST is the line for that skip: the
 # driver's `UNATTENDED check` sentence when one printed, else the first line that is not a NOTE,
 # else the first line — because the driver NOTEs every undeclared bound on stderr at source time,
 # so for an adopter on a kit default the first merged line was `NOTE - this project declares no …`
-# and the scheduler log kept that instead of the check (the closing review's id 16).
-RL_RC=0; RL_FIRST=""; RL_VERDICT=""; RL_PID=""; RL_ALIVE=""; RL_MOVE=""; RL_STALE=""
+# and the scheduler log kept that instead of the check (the closing review's id 16). RL_BOUND is
+# the driver's `stale-bound`, the seconds `stale` was graded against; a verdict with no bound
+# beside it is a driver this tick cannot bound its own reads by, and is skipped naming that.
+RL_RC=0; RL_FIRST=""; RL_VERDICT=""; RL_PID=""; RL_ALIVE=""; RL_MOVE=""; RL_STALE=""; RL_BOUND=""
 read_liveness() { # worktree · slug
   local out
   out=$(cd "$1" && bash "$DRIVER" --liveness "$2" 2>&1 </dev/null); RL_RC=$?
@@ -217,7 +243,9 @@ read_liveness() { # worktree · slug
   RL_ALIVE=$(printf '%s\n' "$out" | sed -n 's/^pid-alive: //p' | head -n 1)
   RL_MOVE=$(printf '%s\n' "$out" | sed -n 's/^last-move: //p' | head -n 1)
   RL_STALE=$(printf '%s\n' "$out" | sed -n 's/^stale: //p' | head -n 1)
+  RL_BOUND=$(printf '%s\n' "$out" | sed -n 's/^stale-bound: //p' | head -n 1)
   [ "$RL_RC" = 0 ] && [ -n "$RL_VERDICT" ] || { [ "$RL_RC" = 0 ] && RL_RC=1; return 1; }
+  case "$RL_BOUND" in ""|*[!0-9]*) RL_RC=1; RL_FIRST="the driver printed a verdict and no stale-bound line, so the in-flight read cannot be bounded"; return 1 ;; esac
   return 0
 }
 
@@ -225,7 +253,7 @@ read_liveness() { # worktree · slug
 # with cwd in the worktree so it answers THAT tree's git dir, made absolute because the main
 # worktree's answer is the relative `.git`.
 run_tick() { # worktree · slug · session · host
-  local wt="$1" slug="$2" sid="$3" host="$4" me sidecar log utc stamp launcher out n payload kitrel lastutc lastout
+  local wt="$1" slug="$2" sid="$3" host="$4" me sidecar log utc stamp launcher out n payload kitrel lastutc lastout boundcut lalive limg lutc
   # THE NODE FIRST: a record leased on another node is not this tick's to probe, kill or launch —
   # its pid is a number in another process table (closing review id 2). A lease with no host
   # recorded (`absent`, or written before the fact existed) is judged as it always was.
@@ -247,10 +275,18 @@ run_tick() { # worktree · slug · session · host
   if [ "$RT_SINCE" -ge "$RESUME_ATTEMPTS" ]; then
     print_decision "$slug" "$wt" "skip · ATTEMPTS EXHAUSTED · last $lastutc · out $lastout"; return 0
   fi
-  # THE LAUNCHED PID, read back: alive and the tree unmoved since its line, the resumer is still
-  # starting and a second launch would be a second agent on this tree; alive and the tree moved
-  # since, it ran and hung, and joins the kill below.
-  if [ -n "$RT_LAUNCHED" ] && [ "$RT_SINCE" -gt 0 ] && [ "$(check_pid_alive "$RT_LAUNCHED")" = yes ]; then
+  # THE LAUNCHED PID, read back through the same probe as the recorded one — pid, image AND the
+  # stamp the launch was recorded under, so a number some later process took is not the launch
+  # (round 2, defect A). Alive with the tree unmoved since its line AND the line inside the stale
+  # bound, the resumer is still starting and a second launch would be a second agent on this tree;
+  # alive with the tree moved since, it ran and hung; alive with its line OLDER than the bound and
+  # the tree still unmoved, it hung before its first turn — an auth loop, an MCP init that never
+  # returns — and nothing else would ever end it (round 2, defect D). Both hung cases join the kill
+  # below and count against the cap. The bound is `--liveness`'s own number, read off its line.
+  lalive=no
+  [ -z "$RT_LAUNCHED" ] || lalive=$(check_pid_alive "$RT_LAUNCHED" "$RT_LIMG" "$RT_LUTC")
+  boundcut=$(date -u -d "@$(( $(date -u +%s) - RL_BOUND ))" +%Y-%m-%dT%H:%M:%SZ)
+  if [ "$lalive" = yes ] && [ "$RT_SINCE" -gt 0 ] && [ "$lastutc" \> "$boundcut" ]; then
     print_decision "$slug" "$wt" "skip · IN-FLIGHT · launched $RT_LAUNCHED alive since $lastutc"; return 0
   fi
   n=$((RT_TOTAL + 1))
@@ -264,7 +300,7 @@ run_tick() { # worktree · slug · session · host
     echo "resume-tick: $slug · $wt · SKIP — the CLI is not logged in on this node; nothing can resume $slug"; return 0
   fi
   [ "$RL_ALIVE" = yes ] && run_kill_tree "$RL_PID"
-  [ -n "$RT_LAUNCHED" ] && [ "$(check_pid_alive "$RT_LAUNCHED")" = yes ] && run_kill_tree "$RT_LAUNCHED"
+  [ "$lalive" = yes ] && run_kill_tree "$RT_LAUNCHED"
   # THE CONTINUE PAYLOAD, one string. The kit's repo-relative path is derived, never spelled; a kit
   # outside the root keeps its absolute path, which still runs.
   kitrel=${KIT_DIR#"$ROOT"/}
@@ -283,16 +319,28 @@ run_tick() { # worktree · slug · session · host
     printf 'claude -p --resume %q --dangerously-skip-permissions --max-turns %q %q </dev/null >%q 2>&1\n' "$sid" "$RESUME_TURNS" "$payload" "$out"
   } > "$launcher"
   run_detached "$launcher" "$sidecar/resume.$slug.$stamp.pid"
-  [ -z "$RD_PID" ] || sed -i "\$ s/\$/ launched $RD_PID/" "$log"
+  # A launch that reported no pid is announced as a failure, never as `resumed`; its line stays and
+  # counts, because the cap is what ends a launch that fails every time (round 2, defect C).
+  if [ -z "$RD_PID" ]; then print_decision "$slug" "$wt" "launch failed: $RD_FIRST"; return 0; fi
+  # THE LAUNCHED FIELD: the pid, the stamp taken now that the launch has returned — the process
+  # existed before it, so a holder that started after it is not the launch — and the image holding
+  # the pid, LAST because `System Idle Process` has spaces. `absent` where a probe answered nothing.
+  # ponytail: the image rides through sed unescaped; a `&` in an image name would garble it into a
+  # mismatch that reads `no`, the safe side. `|` is the delimiter because an image may not carry it.
+  lutc=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  limg=$(read_pid_image "$RD_PID") || limg=absent
+  sed -i "\$ s|\$| launched $RD_PID $lutc ${limg:-absent}|" "$log"
   print_decision "$slug" "$wt" "resumed · attempt $n · out $out"
   return 0
 }
 
 # THE WALK: every worktree of the root, every run-state file IN THE INDEX whose `session:` fact is
 # present and not `absent`. That read — one `git grep --cached` per tree, the lease's `session:`
-# and `host:` off the index blob — is the only read this file makes of a record; everything else is
-# `--liveness`'s. A RUN.md on disk and not in the index is announced and skipped: the index is what
-# the owner's act wrote, the working copy is what anything with a file handle wrote. A tree without
+# and `host:` off the index blob — is the only read this file makes of a record; the `diff --quiet`
+# per candidate compares the working copy to that blob and reads no value; everything else is
+# `--liveness`'s. A RUN.md on disk and not in the index is announced and skipped, and so is one
+# whose working copy differs from the index: the index is what the owner's act wrote, the working
+# copy is what anything with a file handle wrote. A tree without
 # `.unattended.conf` is a checkout predating the kit: announced and skipped while the other trees
 # are still walked. Zero candidates is an announced nothing.
 scan_worktrees() {
@@ -328,6 +376,13 @@ scan_worktrees() {
       case $'\n'"$hits" in *$'\n'"$f:host:"*) host=${hits#*"$f:host:"}; host=${host%%$'\n'*}; host=${host#"${host%%[![:space:]]*}"}; host=${host%$'\r'} ;; esac
       slug=${f%/RUN.md}; slug=${slug##*/}
       ncand=$((ncand + 1))
+      # THE WORKING COPY MUST EQUAL THE INDEX BLOB, or nothing is acted on: `--liveness` reads the
+      # file on disk, so a rewritten copy would aim the kill and pick the phase while the index
+      # picked the session (round 2, defect B). One spawn; a legitimate record equals its blob
+      # except inside one verb's set-then-stage window, where the tick skips once and says so.
+      if ! git -C "$wt" diff --quiet -- "$f" 2>/dev/null; then
+        print_decision "$slug" "$wt" "skip · RUN.md differs from the index, and the tick acts only on the lease the index holds"; continue
+      fi
       run_tick "$wt" "$slug" "$sid" "$host"
     done 8<<<"$hits"
   done 9<<<"$wts"

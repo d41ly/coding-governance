@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-12 — the resume tick consults login BEFORE it kills: a logged-out node kills nothing
 
-**Status:** CLOSED · rev-3 · 2026-09-21 · node a · Tier-2 · base 12b3701d · streams tooling · order 12
+**Status:** CLOSED · rev-4 · 2026-09-21 · node a · Tier-2 · base 12b3701d · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -124,6 +124,17 @@ never probed. The record names the remedy the fold built — the lease's `host` 
 facts (unit 1), the image match in `check_pid_alive` (unit 2) and the tick's foreign-host stand-off
 (unit 5) — and its Gating paragraph names the arms that observe it beside this unit's own.
 
+From rev-4 the record states the two residuals the image left and their one closure (closing
+review round 2, defects A and E): a pid recycled to the SAME image passed the match, and the pid
+the tick launched was probed and killed by number with no image at all — the fold that guarded
+the recorded pid shipped a second kill target unguarded, the class one level up. The closure is
+the third thing the probe matches, the holder's START TIME against the stamp the pid was recorded
+under — `lease-utc` for the recorded pid, the `launched <pid> <utc> <image>` field's stamp for the
+launched one — read by `read_pid_start` in the library (unit 2's rev-6) and applied by the tick
+(unit 5's rev-6); the record names the arms that gate both. The record carries exactly ONE
+`## Where this repo's killers live` heading (rev-4: the rev-3 fold left an empty duplicate above
+the real one, and a heading-keyed reader resolved to the empty one — defect G).
+
 ### Inventory
 
 | identifier | kind | cell |
@@ -193,11 +204,16 @@ its `WINPID` recorded as `pid:`.
   range that touches the tick, `resume-tick.sh`, its stdout names
   `destructive-step-before-its-precondition`; the same tool's report mode does not list the record
   as unanchored; `python tools/memory-tree/gotchas.py --check` exits 0 at the tip, which is check
-  17's index freshness and check 18's gate sentence together; and the file's front matter parses
-  under the folder's grammar so `memory hygiene` reads it.
+  17's index freshness and check 18's gate sentence together; the file's front matter parses
+  under the folder's grammar so `memory hygiene` reads it; and from rev-4 `grep -c '^## Where
+  this repo.s killers live'` over the record prints 1 (2 at the rev-3 tip), and its `## Gating`
+  region names `AC13` at least once, the tick suite's block that gates the launched-pid instance,
+  0 at the rev-3 tip.
   Red when: the class is written but reaches no path, which the tool reports as unanchored and is
-  a gotcha nobody is shown; or `--check` reds on a stale `INDEX.md` or a class naming no gate,
-  which the memory hygiene leg reds at the close for a record built as rev-1 specced it.
+  a gotcha nobody is shown; `--check` reds on a stale `INDEX.md` or a class naming no gate,
+  which the memory hygiene leg reds at the close for a record built as rev-1 specced it; the
+  duplicate heading stands, which a heading-keyed reader resolves to nothing; or the launched-pid
+  instance is stated with no arm named, which is a class the record says is gated and is not.
 
 ## 7. Gates
 
@@ -214,6 +230,14 @@ none
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-21 · §4 · AC4 · folded the closing diff review round 2
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round2.md`), the CONVERGED exit,
+  defects E and G and the class half of A: the record gains the two residuals the image match
+  left — a same-image recycle, and the launched pid probed by number — with their one closure,
+  the start-time compare against the stamp the pid was recorded under, and the arms that gate it
+  (unit 2's AC11 start half, unit 5's AC13 image-and-start block); the duplicate empty
+  `## Where this repo's killers live` heading is deleted; `INDEX.md` is regenerated, the record
+  now anchoring `tools/unattended/lib-unattended.sh` too. Status unchanged, CLOSED.
 - rev-3 · 2026-09-21 · §4 · folded the closing diff review round 1
   (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md`), id 2 (HIGH): the class this
   unit left-shifted had a second instance in the same tick — the tree kill aimed at a pid rather

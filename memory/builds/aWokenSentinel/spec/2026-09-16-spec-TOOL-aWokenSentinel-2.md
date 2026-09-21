@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares
 
-**Status:** CLOSED · rev-5 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -37,8 +37,10 @@ themselves. Tier 2: a new verb is a change to the kit's contract.
   carriers check 26 of the kit gate joins. Observed by AC1 and AC9.
 - **S2** — The verb prints, in this order and nothing else on stdout: `phase`, `state`,
   `default-branch`, `session`, `pid`, `keepalive`, `pid-alive`, `last-move`, `last-move-source`,
-  `transcript`, `last-stall`, `stale`, `verdict` — section 4's step order, which AC2 cites. Each
-  value's vocabulary is section 4's. It exits 0 on any run-state file whose probes answer; a dead
+  `transcript`, `last-stall`, `stale`, `verdict`, and from rev-6 `stale-bound` — section 4's step
+  order, which AC2 cites, the bound last because it is the number the verdict was graded against,
+  printed so the tick bounds its in-flight read by this reader's number rather than reading the
+  key itself. Each value's vocabulary is section 4's. It exits 0 on any run-state file whose probes answer; a dead
   probe is the check-52 refusal of S8, exit 1 with no verdict line. Observed by AC2 to AC7.
 - **S3** — `state` is one of `terminal`, `finished-unstamped` and `live`, where
   `finished-unstamped` is the OFFLINE half of `check_single_live`'s predicate: phase `LANDING` and
@@ -61,7 +63,9 @@ themselves. Tier 2: a new verb is a change to the kit's contract.
 - **S6** — `pid-alive` is `yes`, `no` or `unknown`, probed by `tasklist` under MSYS and `kill -0`
   elsewhere, `unknown` when the fact is `absent`, non-numeric, or the probe tool is missing; from
   rev-5 `no` also when something holds the pid and the record's `pid-image` (unit 1) does not
-  match it, `absent` or no image matching anything. Observed by AC4 and AC11.
+  match it, `absent` or no image matching anything; from rev-6 `no` also when the holder STARTED
+  after the record's `lease-utc` — a same-image recycle — `absent` or no stamp keeping the image
+  reading, and a start the probe cannot read keeping it too. Observed by AC4 and AC11.
 - **S7** — `last-stall` is the last line of `<git-dir>/unattended/stall.<slug>.log` when that
   file exists, else `none`; this unit only READS it. Observed by AC7.
 - **S8** — Two refusals under one new `fail` number, each with an arm: no run-state file; a clock
@@ -220,13 +224,22 @@ is also the fixture's seam: the arms point it at a scratch directory rather than
 
 ### pid-alive (S6)
 
-`check_pid_alive <pid> [image]` prints `yes`, `no` or `unknown`; from rev-5 it lives in
-`lib-unattended.sh` over `read_pid_image`, which prints the image holding a pid and returns 0 held,
-1 nobody, 2 the probe answered nothing — the driver's `write_lease` records the image through it,
-`--liveness` passes the record's `pid-image` fact here, and the resume tick probes the pid it
+`check_pid_alive <pid> [image] [not-after-utc]` prints `yes`, `no` or `unknown`; from rev-5 it lives
+in `lib-unattended.sh` over `read_pid_image`, which prints the image holding a pid and returns 0
+held, 1 nobody, 2 the probe answered nothing — the driver's `write_lease` records the image through
+it, `--liveness` passes the record's `pid-image` fact here, and the resume tick probes the pid it
 launched through the same function. A recorded image that is not the one holding the pid is `no`:
 a reboot recycles the number, and a tree kill aimed at it lands on the owner's next process
-(closing review id 2). `absent`, or none, matches anything — the pid-only reading every earlier
+(closing review id 2). From rev-6 a holder whose START TIME is later than the third argument is
+`no` too — `--liveness` passes the record's `lease-utc`, the tick the stamp on its `launched`
+field — because the process that wrote a lease existed before the lease, so any later holder of
+its number started after it, whatever its image; that closes the same-image recycle the image
+left open (closing review round 2, defect E). The start time is `read_pid_start`, beside
+`read_pid_image` in the library: PowerShell `Get-CimInstance Win32_Process` under MSYS (`wmic` is
+gone from this fleet's Windows 11, and `Get-Process` hands back null for a process it cannot open;
+measured 300-450 ms a call on node `a`, 2026-09-21), `ps -o lstart=` elsewhere, UNVERIFIED; a start
+the probe cannot read keeps the image reading — the compare is additive, never a `no` from a dead
+probe. `absent`, or none, in either argument matches anything — the pid-only reading every earlier
 lease had. `absent` or a value with a non-digit is `unknown`. Under `uname -s` matching `MINGW*|MSYS*|CYGWIN*`: `tasklist //FI "PID eq <pid>" //NH`,
 `unknown` when `tasklist` is not on `PATH` or exits non-zero — a tool that answered nothing is not a
 `no` — and otherwise `yes` when its output carries ` <pid> ` as a whole field, `no` when it does not.
@@ -318,6 +331,7 @@ at base — the sixth and seventh positionals' precedent. The unit's arms, in a 
 | `read_tree_clocks` | shell function | `sh.function`, verb `read` |
 | `resolve_transcript_path` | shell function | `sh.function`, verb `resolve` |
 | `check_pid_alive` | shell function, in `lib-unattended.sh` from rev-5 (moved from the driver), beside `read_pid_image` | `sh.function`, verb `check` |
+| `read_pid_start` | shell function, in `lib-unattended.sh` from rev-6, beside `read_pid_image` | `sh.function`, verb `read` |
 | `resolve_sidecar_dir` | shell function | `sh.function`, verb `resolve` |
 | `RESUME_STALE_BOUND` | conf key | `read_bound_key`; not a naming cell |
 | `TC_NOW`, `TC_LASTC`, `TC_LASTW`, `TC_DEAD` | shell globals | the driver's upper-case convention for shared state |
@@ -409,13 +423,14 @@ graded line removed.
   Red when: the verb prints a verdict over a missing file; or the sentence differs from the arm's,
   which `python3 tools/memory-tree/check-arms.py --report` shows as a `check 52` branch not `ARMED`.
 - **AC2** — When the fixture's phase is `LANDED`, `bash tools/unattended/unattended.sh --liveness tRun`
-  prints `state: terminal` and `verdict: TERMINAL`, exits 0, and prints thirteen `key: value` lines
-  and nothing else on stdout, the thirteen keys in S2's order, which is section 4's step order
-  with `keepalive` before `pid-alive`; and every key prints again on a `BUILDING` fixture, so
-  `grep -c ':'` over stdout is `13` in both.
+  prints `state: terminal` and `verdict: TERMINAL`, exits 0, and prints fourteen `key: value` lines
+  and nothing else on stdout, the fourteen keys in S2's order, which is section 4's step order
+  with `keepalive` before `pid-alive` and `stale-bound` last; the fourteenth line is
+  `stale-bound: 5400`, the fixture's declared value (rev-6); and every key prints again on a
+  `BUILDING` fixture, so `grep -c ':'` over stdout is `14` in both.
   Red when: a terminal record omits a key, so a reader must know which state prints what; a line
   prints that is not `key: value`; or the exit is non-zero.
-  figure: thirteen is DERIVED from S2's list at observation time.
+  figure: fourteen is DERIVED from S2's list at observation time.
 - **AC3** — When the fixture's phase is `LANDING` and its witness is `$BASE`, the fixture commit
   on the fixture's `main`, the verb prints `state: finished-unstamped`,
   `default-branch: refs/remotes/origin/main` and `verdict: FINISHED-UNSTAMPED`; when the witness
@@ -434,11 +449,17 @@ graded line removed.
   which is `tasklist`'s exit code trusted over its output; or `absent` is probed.
   fixture: the arm's own `sleep`, killed by the arm; `ps` with a `WINPID` column, measured present
   in this node's Git Bash on 2026-09-16.
-- **AC11** — When, on AC4's live-sleep fixture, `pid-image:` is rewritten to `claude.exe`, the
-  verb prints `pid-alive: no`; rewritten to what `read_pid_image` prints for that pid, `yes`; and
-  rewritten to `absent`, `yes`.
+- **AC11** — When, on AC4's live-sleep fixture with its `lease-utc:` re-stamped after the sleep
+  started, `pid-image:` is rewritten to `claude.exe`, the verb prints `pid-alive: no`; rewritten
+  to what `read_pid_image` prints for that pid, `yes`; and rewritten to `absent`, `yes`; and under
+  the matching image, `lease-utc:` rewritten to `2026-01-01T00:00:00Z` prints `pid-alive: no`,
+  re-stamped now `yes`, and `absent` `yes` (rev-6).
   Red when: the mismatch reads `yes`, which is the image ignored and the recycled-pid kill left
-  open; or `absent` reads `no`, which reds every lease written before the image existed.
+  open; `absent` reads `no`, which reds every lease written before the image existed; or the
+  sleep under a lease older than its start reads `yes`, which is the same-image recycle left open
+  (closing review round 2, defect E).
+  fixture: the AC4 sleep, leased AFTER it started — the fixture's own `lease-utc` predates the
+  sleep, which is exactly the shape the compare reads as recycled.
 - **AC5** — When the fixture conf carries `RESUME_STALE_BOUND=60` through `mkconf`'s eighth
   positional, the fixture commit is an hour old by `GIT_COMMITTER_DATE`, the tree is clean, the
   fixture git dir holds no `gate-logs` directory and `CLAUDE_CONFIG_DIR` points at an empty
@@ -539,6 +560,16 @@ none
 
 ## 9. Revision log
 
+- rev-6 · 2026-09-21 · S2 · S6 · §4 · AC2 · AC11 · inventory · folded the closing diff review
+  round 2 (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round2.md`), the CONVERGED
+  exit, defects D and E: D (MEDIUM) — the tick's in-flight skip had no bound and the tick may not
+  read `RESUME_STALE_BOUND` itself, so the verb prints the number it graded `stale` against as a
+  fourteenth line, `stale-bound`, and the tick bounds its read by it (S2, AC2). E (LOW) — a pid
+  recycled to the SAME image passed the image match, so `check_pid_alive` takes a third argument,
+  a stamp the holder's start time may not pass, and the verb passes the record's `lease-utc`
+  (S6, §4, AC11; `read_pid_start` joins the library). No `pid-start:` lease fact is written — the
+  bound is a stamp the record already carries — which is the one divergence from the fold brief,
+  reasoned in spec 5's rev-6 line. Status unchanged, CLOSED.
 - rev-5 · 2026-09-21 · S6 · §4 · AC11 · inventory · folded the closing diff review round 1
   (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md`), id 2 (HIGH): `pid-alive: yes` proved
   that SOME process held the pid, and the tick's tree kill then ran on whatever that was after a
