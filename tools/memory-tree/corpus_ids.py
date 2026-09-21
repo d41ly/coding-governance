@@ -256,7 +256,52 @@ def armed(conf: dict) -> bool:
     return any(conf.get(k) for k in ("DEAD_PATH_PIN", "ORPHAN_ID_PIN"))
 
 
-def grammar(root: str):
+# ------------------------------------------------------ the sibling kit's grammar, and its refusal
+# THE CAUSE AND THE CURE BELONG TO THE CALLER; the kit-state sentence belongs here. `grammar()`'s own
+# pair is true for the callers the pins gate and false for the anchor route, which no conf value of
+# this kit turns off: a refusal that prescribes blanking two pins the caller never set is a no-op
+# wearing the shape of a remedy, and a reader asking only that A remedy be named certifies it as
+# correct. Both of the module's refusal points take the pair, because re-causing only the first would
+# leave the pin cure alive on the second — the path a STALE sibling kit takes.
+_PIN_WHY = "a pin is set in .memory-tree.conf"
+_PIN_CURE_ABSENT = ("Either adopt that kit or blank DEAD_PATH_PIN / ORPHAN_ID_PIN to turn "
+                    "checks 13-15 off.")
+_PIN_CURE_OUTDATED = "update it, or blank the pins to turn checks 13-15 off"
+_ROUTE_WHY = "the anchor route was asked for"
+_ROUTE_CURE_ABSENT = ("Install the memory-recall kit beside this one; no conf value of this kit "
+                      "turns the anchor route off.")
+_ROUTE_CURE_OUTDATED = ("update that kit beside this one, because no conf value of this kit turns "
+                        "the anchor route off")
+
+
+def _check_grammar_installed(why: str, cure_absent: str, cure_outdated: str):
+    """The module's ONE raise for a memory-recall kit that is absent or too old, and its import.
+
+    Two refusal points and TWO remedies, because the remedies genuinely differ — adopt that kit
+    versus update it — and one string reused at both would be wrong at one of them. The cause is the
+    caller's at both.
+
+    Returns the imported module, so exactly one site puts GRAMMAR_DIR on `sys.path` and a caller
+    that needs `grammar_for` has it without a second import.
+    """
+    if not (GRAMMAR_DIR / "extract.py").is_file():
+        raise Problem(
+            "corpus_ids: %s, but the id grammar lives in the "
+            "memory-recall kit and %s/extract.py is not installed. %s"
+            % (why, GRAMMAR_DIR, cure_absent)
+        )
+    if str(GRAMMAR_DIR) not in sys.path:
+        sys.path.insert(0, str(GRAMMAR_DIR))
+    import extract  # noqa: E402  (deliberately late: see the module docstring)
+
+    if not hasattr(extract, "grammar_for"):
+        raise Problem("corpus_ids: %s, but the installed memory-recall kit predates "
+                      "grammar_for(root); %s" % (why, cure_outdated))
+    return extract
+
+
+def grammar(root: str, why: str = _PIN_WHY, cure_absent: str = _PIN_CURE_ABSENT,
+            cure_outdated: str = _PIN_CURE_OUTDATED):
     """The sibling kit's id + anchor grammar, BOUND TO THIS ROOT — or a named error naming the kit.
 
     `extract.repo_root()` anchors on the kit's own file, so the module-level constants describe the
@@ -267,21 +312,66 @@ def grammar(root: str):
     first selftest run here reported a clean scratch corpus while using this repo's family list.
     `grammar_for(root)` is the accessor added to the grammar module for exactly this, so there is
     still only ONE grammar.
-    """
-    if not (GRAMMAR_DIR / "extract.py").is_file():
-        raise Problem(
-            "corpus_ids: a pin is set in .memory-tree.conf, but the id grammar lives in the "
-            "memory-recall kit and %s/extract.py is not installed. Either adopt that kit or blank "
-            "DEAD_PATH_PIN / ORPHAN_ID_PIN to turn checks 13-15 off." % GRAMMAR_DIR
-        )
-    if str(GRAMMAR_DIR) not in sys.path:
-        sys.path.insert(0, str(GRAMMAR_DIR))
-    import extract  # noqa: E402  (deliberately late: see the module docstring)
 
-    if not hasattr(extract, "grammar_for"):
-        raise Problem("corpus_ids: the installed memory-recall kit predates grammar_for(root); "
-                      "update it, or blank the pins to turn checks 13-15 off")
-    return extract.grammar_for(root)
+    The cause and the two cures DEFAULT to the ones the pins make true, and a caller the pins do not
+    gate passes its own — `resolve_anchor` below is that caller, and inheriting these would tell it
+    to blank two pins it never set.
+    """
+    return _check_grammar_installed(why, cure_absent, cure_outdated).grammar_for(root)
+
+
+def resolve_anchor(root: str, E=None):
+    """The kit's ONE public route from a repository root to the anchor predicate.
+
+    Returns a callable taking ONE line and answering the record id that line DEFINES, or `None`.
+    Composed from the two accessors that already exist — `grammar(root)` for the bundle and
+    `_anchor` for the call into the sibling kit's `anchor_at` — so this kit still declares no second
+    grammar, and no caller has to import a private name or re-type the bundle-to-answer step.
+
+    `root` is explicit and has no default. The sibling kit's module-level grammar binds to the repo
+    the KIT is installed in, which is the measured wrong-root class both modules' docstrings record,
+    and a default here would put it straight back.
+
+    `E` is a bundle the caller has ALREADY resolved; omitted, the route resolves its own. It exists
+    for the one in-kit caller that holds one: `grammar(root)` re-reads the conf at that root on
+    every call, so a walk handing over no bundle would pay a second resolve per walk, and a resolve
+    inside the returned callable would pay one per LINE of a README. The bundle IS the binding to a
+    root — it records `families` and `memory_root`, never the root it came from — so `root` goes
+    unused when one is passed, and a mismatch is not checkable here at any price this route will pay.
+
+    THE SIBLING KIT'S OWN REFUSAL IS MAPPED, never leaked. `grammar_for(root)` resolves the conf AT
+    THAT ROOT and raises `ConfError` — a `RuntimeError` subclass and NOT this kit's `Problem` — when
+    the root carries no `.memory-tree.conf`, declares no `MEMORY_ROOT`, or declares no usable
+    `FAMILIES`. None of this module's `except Problem` handlers catches that, so it escaped as a
+    traceback out of a module whose own docstring forbids one. An arbitrary target root is the ONE
+    input this route exists to accept, and those three declarations are exactly what a tree this kit
+    did not write may lack.
+
+    Never `None` for an absent kit: `None` is also what a line that anchors nothing returns, so
+    every caller would read an uninstalled kit as a clean corpus. A caller that wants a SKIP rather
+    than a refusal catches `Problem` and prints one naming the arm and the kit.
+    """
+    if E is None:
+        try:
+            E = grammar(root, why=_ROUTE_WHY, cure_absent=_ROUTE_CURE_ABSENT,
+                        cure_outdated=_ROUTE_CURE_OUTDATED)
+        except Problem:
+            raise
+        except RuntimeError as exc:
+            # `ConfError` is matched BY NAME, and the obvious alternative was measured and rejected:
+            # reaching the class through `sys.modules["extract"].recall_conf` raises KeyError when
+            # `extract.py` refused DURING its own import — it resolves a conf at module scope, so the
+            # kit can fail to import for exactly the reason this clause exists to map, and the
+            # look-up that was supposed to catch it becomes a second traceback. A RuntimeError that
+            # is NOT that class is re-raised untouched rather than re-labelled with a cause it does
+            # not have.
+            if type(exc).__name__ != "ConfError":
+                raise
+            raise Problem(
+                "corpus_ids: %s over %s, and the id grammar refused that root: %s"
+                % (_ROUTE_WHY, root, str(exc).split("\n")[0])
+            ) from None
+    return lambda line: _anchor(E, line)
 
 
 def load_backlog():
@@ -395,6 +485,11 @@ def ask_shell(flag: str, root: str) -> str:
 # ------------------------------------------------------------------------------------ the one walk
 def walk(root: str, conf: dict) -> dict:
     E = grammar(root)
+    # The kit's one route from a bundle to an answer, HANDED the bundle this function already holds.
+    # `resolve_anchor(root)` with no bundle would re-resolve the conf at that root a second time per
+    # walk, and both resolves would answer the same — the cost the route's optional bundle exists to
+    # avoid. `E` is kept because two further uses below need the bundle itself, not the predicate.
+    anchor_of = resolve_anchor(root, E)
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
     tracked_set = set(tracked)
@@ -439,7 +534,7 @@ def walk(root: str, conf: dict) -> dict:
         # `BACKLOG.md` somewhere else is untouched.
         asks_here = bool(b) and builds_mode and p.rsplit("/", 1)[-1] == "BACKLOG.md"
         for lineno, line in enumerate(text.split("\n"), 1):
-            anchor = _anchor(E, line)
+            anchor = anchor_of(line)
             if anchor is None:
                 h = h1_re.match(line)
                 anchor = h.group(1) if h else None
@@ -952,6 +1047,143 @@ def cmd_selftest() -> int:
             return f"rc={rc} lines={len(buf.getvalue().splitlines())} {buf.getvalue().strip()}"
         arm("--print-defined-ids with no memory-recall kit exits 3 with one line naming the kit",
             "rc=3 lines=1 corpus_ids: no id set — the id grammar lives in the memory-recall kit", _check_degraded)
+
+        # ---- TOOL-dDerivedDocket-50: the kit's ONE public route to the anchor grammar.
+        # ---- BOUND TO THE ROOT IT IS GIVEN, and the fixture's family (`arch:ARCH`) is one this
+        # ---- repository does not declare — so a route bound to the repo the kit is INSTALLED in
+        # ---- answers None on all three lines and this arm reds, which is the whole point of it.
+        # ---- Without a discriminating family, an unrecognising grammar and a clean corpus are the
+        # ---- same empty answer.
+        _at = resolve_anchor(t)
+        arm("resolve_anchor answers the GIVEN root's own id on a heading and a table row, None on a citation",
+            "['ARCH-tOne-1', 'ARCH-tOne-1', None]",
+            lambda: [_at("## ARCH-tOne-1 — a unit"),
+                     _at("| ARCH-tOne-1 | a row |"),
+                     _at("context lives in ARCH-tOne-1 upstream")])
+
+        # ---- THE CALL GRAPH, derived from this module's own source in the idiom `_walk_continues`
+        # ---- uses. A second bundle-to-answer site would take a change to the grammar's calling
+        # ---- convention in one place and not the other; a `walk()` that reached the route with no
+        # ---- bundle while keeping its own would resolve the conf at that root twice per walk, and
+        # ---- both resolves would answer the same, so nothing behavioural could ever see it.
+        def _graph():
+            import ast as _ast
+            _tree = _ast.parse(read(os.path.abspath(__file__)))
+            _named, _callers, _in_walk, _route_args = 0, set(), 0, []
+            for _fn in _tree.body:
+                if not isinstance(_fn, _ast.FunctionDef):
+                    continue
+                for _n in _ast.walk(_fn):
+                    if not isinstance(_n, _ast.Call):
+                        continue
+                    _f = _n.func
+                    # `anchor_at` reached through ANY expression counts, not only through the name
+                    # `extract`: measured, a staged break written as `__import__("extract").anchor_at`
+                    # is invisible to a receiver-anchored test, which is the same could-not-fail
+                    # shape this whole unit is about.
+                    if isinstance(_f, _ast.Attribute) and _f.attr == "anchor_at":
+                        _named += 1
+                    if isinstance(_f, _ast.Name) and _f.id == "_anchor":
+                        _callers.add(_fn.name)
+                    if isinstance(_f, _ast.Name) and _f.id == "grammar" and _fn.name == "walk":
+                        _in_walk += 1
+                    if (isinstance(_f, _ast.Name) and _f.id == "resolve_anchor"
+                            and _fn.name == "walk"):
+                        _route_args.append(len(_n.args) + len(_n.keywords))
+            return "anchor_at=%d _anchor callers=%r grammar( in walk=%d route args in walk=%r" % (
+                _named, sorted(_callers), _in_walk, _route_args)
+        arm("anchor_at is named ONCE, _anchor's only caller is the route, walk() resolves one bundle "
+            "and hands it over",
+            "anchor_at=1 _anchor callers=['resolve_anchor'] grammar( in walk=1 "
+            "route args in walk=[2]", _graph)
+
+        # ---- THE ROUTE'S OWN REFUSAL, at BOTH of the installed-check's points, and `grammar()`'s
+        # ---- beside it. The second fixture needs `extract` out of sys.modules or the real module
+        # ---- answers `hasattr(grammar_for)` and the outdated point is never reached — the arm would
+        # ---- pass by exercising nothing.
+        def _under_grammar_dir(d, fn):
+            saved_dir, saved_path = globals()["GRAMMAR_DIR"], list(sys.path)
+            saved_mod = sys.modules.pop("extract", None)
+            globals()["GRAMMAR_DIR"] = d
+            try:
+                return fn()
+            finally:
+                globals()["GRAMMAR_DIR"] = saved_dir
+                sys.path[:] = saved_path
+                sys.modules.pop("extract", None)
+                if saved_mod is not None:
+                    sys.modules["extract"] = saved_mod
+
+        def _refusals(d):
+            def _say(f):
+                try:
+                    f()
+                    return "NO REFUSAL"
+                except Problem as exc:
+                    return str(exc)
+                except Exception as exc:  # noqa: BLE001 — a foreign type escaping IS the finding
+                    return f"UNEXPECTED {type(exc).__name__}: {exc}"
+            return _under_grammar_dir(
+                d, lambda: (_say(lambda: resolve_anchor(t)), _say(lambda: grammar(t))))
+
+        for _sub, _body, _state, _cure, _pincure in (
+            ("nowhere",
+             None,
+             "the id grammar lives in the memory-recall kit and %s/extract.py is not installed.",
+             "Install the memory-recall kit beside this one; no conf value of this kit turns the "
+             "anchor route off.",
+             "Either adopt that kit or blank DEAD_PATH_PIN / ORPHAN_ID_PIN to turn checks 13-15 off."),
+            ("oldkit",
+             "# a memory-recall kit that predates grammar_for(root)\n",
+             "the installed memory-recall kit predates grammar_for(root);",
+             "update that kit beside this one, because no conf value of this kit turns the anchor "
+             "route off",
+             "update it, or blank the pins to turn checks 13-15 off"),
+        ):
+            _d = pathlib.Path(base) / _sub
+            if _body is not None:
+                _w(base, _sub + "/extract.py", _body)
+            _state_text = _state % _d if "%s" in _state else _state
+            _route, _pin = _refusals(_d)
+            n_label = "the anchor route's refusal (%s) states ITS cause and ITS cure" % _sub
+            arm(n_label, "corpus_ids: the anchor route was asked for, but " + _state_text + " " + _cure,
+                lambda _r=_route: _r)
+            arm("the anchor route's refusal (%s) names neither pin" % _sub, "clean",
+                lambda _r=_route: "clean" if "DEAD_PATH_PIN" not in _r and "ORPHAN_ID_PIN" not in _r
+                else _r)
+            # The pin caller's cure is VERBATIM from this unit's parent commit, re-typed here rather
+            # than read off the constant it grades; only the cause clause is new at the second point.
+            arm("grammar()'s own refusal (%s) keeps the pin cause and the parent's cure" % _sub,
+                "corpus_ids: a pin is set in .memory-tree.conf, but " + _state_text + " " + _pincure,
+                lambda _p=_pin: _p)
+
+        # ---- THE TARGET ROOT'S OWN DECLARATIONS. `grammar_for(root)` refuses with the SIBLING
+        # ---- kit's ConfError, a RuntimeError and not this kit's Problem, so before the route
+        # ---- mapped it an arbitrary target root answered with a traceback past three
+        # ---- `except Problem` handlers. Three roots, because the resolver distinguishes three and
+        # ---- one collapsed sentence cannot tell an absent file from a conf declaring no families.
+        for _sub, _confbody, _want in (
+            ("root-noconf", None, "no .memory-tree.conf"),
+            ("root-nomem", 'FAMILIES="arch:ARCH"\n', "declares no MEMORY_ROOT"),
+            ("root-nofam", 'MEMORY_ROOT=memory\n', "declares no usable FAMILIES"),
+        ):
+            _r = os.path.join(base, _sub)
+            os.makedirs(_r, exist_ok=True)
+            if _confbody is not None:
+                _w(_r, ".memory-tree.conf", _confbody)
+
+            def _undeclared(_root=_r):
+                try:
+                    resolve_anchor(_root)
+                    return "NO REFUSAL"
+                except Problem as exc:
+                    return str(exc)
+                except Exception as exc:  # noqa: BLE001 — ConfError reaching here IS the finding
+                    return f"UNEXPECTED {type(exc).__name__}: {exc}"
+            arm("an undeclared target root (%s) raises this kit's Problem, naming the root" % _sub,
+                "corpus_ids: the anchor route was asked for over %s, and the id grammar refused "
+                "that root: refused: " % _r, _undeclared)
+            arm("that refusal names WHICH declaration was missing (%s)" % _sub, _want, _undeclared)
 
         # ---- TOOL-aWeldedTribunal-5: the conf parser, graded against BASH rather than asserted.
         # ---- bash is the reference because bash is what the format IS; the python half is the copy,

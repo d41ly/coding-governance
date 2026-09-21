@@ -70,6 +70,15 @@ verdict about the wrong one.
 The self-test's project-key arms run the engine over
 the suite's own scratch tree, one invocation per arm, never over an archive of this repository
 (`TOOL-aRatifiedRulings-3`), so a red in the live corpus cannot red an arm that grades a conf key.
+Three arms in that block grade the SHIPPED `.memory-tree.conf.example` instead, and they are
+parity rather than behaviour: every key the engine validates, every bare `*_CUTOFF` it presets, and
+— since `TOOL-dDerivedDocket-50` — every key the kit's PYTHON modules read out of a dict must be
+declared there, or named on that arm's own exemption list, which is asserted in both directions so a
+name nothing reads any more reds too. The python arm's receiver is deliberately UNCONSTRAINED: a
+module reaching for a SECOND kit's conf cannot bind it to `conf`, that name being taken by its own,
+so a `conf`-anchored derivation is blind to exactly the cross-kit read the arm exists to catch. Its
+population is derived from the module text and REFUSES when it finds no key at all, and a fixture
+directory holding two deliberately undeclared keys is what proves both halves fire.
 
 The engine is COPY-INSTALLED as a standalone directory, so it carries the python resolver inline and
 derives its own prefix. It never reads its identity from a project conf: `KIT_MEMORY_TREE_VERSION` is

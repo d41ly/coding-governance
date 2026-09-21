@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-15 — ask envelope, READY predicate and new-build scaffold
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
+**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
@@ -88,9 +88,9 @@ list into a build README the owner lands, so authority stays with the owner's co
 - **consumes-from** `TOOL-dDerivedDocket-7` — the `--asks` print mode S6 extends, its link-wrapped
   first cell, and the `--write` render the scaffold runs.
 - **consumes-from** `TOOL-dDerivedDocket-50` — the in-kit seam this kit reaches `anchor_at` through.
-  The G3 round-2 record's H2 measured that AC13's `fixture:` line routes through `RECALL_CLI`, a key
-  the memory-tree kit does not declare; that unit decides the route and this spec keeps AC13 as
-  written meanwhile.
+  The G3 round-2 record's H2 measured that AC13's `fixture:` line routed through a conf key the
+  memory-tree kit does not declare; that unit landed `resolve_anchor(root, E=None)` in
+  `tools/memory-tree/corpus_ids.py`, and AC13 names it.
 - **consumes-from** `TOOL-dDerivedDocket-51` — the id family AC13's fixture files its asks under. The
   same record's H3 measured that `anchor_at` admits only the conf's declared families, so an `EXMP`
   id anchors nothing before the scaffold writes a line; that unit picks the family and pins the
@@ -421,17 +421,16 @@ and refuses a stale or unstaged artifact (dUnstagedSymbol, `1a774fcd`).
   AC10's fixture, it returns no anchor.
   Red when: a generated bullet reads `- EXMP-aFoo-3 — …`, which anchors a foreign id under the new
   build.
-  fixture: the selftest reaches `anchor_at` through the declared route unit 18 S3 uses,
-  `RECALL_CLI`, and a blank key is a named skip of this arm, never a pass.
-  Two G3 round-2 findings against this criterion are units of this build rather than edits here, and
-  it keeps its text until they land. H2 measured that `RECALL_CLI` is declared in the unattended
-  kit's conf alone, so this arm reaches `anchor_at` through a key the memory-tree kit does not carry
-  and takes its named skip on any tree without that kit; `TOOL-dDerivedDocket-50` decides the in-kit
-  seam and rewrites this `fixture:` line. H3 measured that `anchor_at` admits only the conf's
-  declared families, so an `EXMP` id anchors nothing before the scaffold writes a line and this
-  criterion's `Red when:` cannot fire; `TOOL-dDerivedDocket-51` picks the family the fixture files
-  under and pins the staged RED. Until both land, a green run of this arm is not evidence that a
-  generated body anchors nothing.
+  fixture: the selftest reaches `anchor_at` through this kit's OWN route,
+  `corpus_ids.resolve_anchor(root)`, bound to the scratch tree the scaffold just wrote. An absent or
+  outdated memory-recall kit raises that route's named `Problem`, which this arm catches and prints
+  as a skip naming the arm and the kit — never a pass, and never a silent `None`.
+  ONE G3 round-2 finding against this criterion is still a unit of this build rather than an edit
+  here, and it keeps its text until that unit lands. H3 measured that `anchor_at` admits only the
+  conf's declared families, so an `EXMP` id anchors nothing before the scaffold writes a line and
+  this criterion's `Red when:` cannot fire; `TOOL-dDerivedDocket-51` picks the family the fixture
+  files under and pins the staged RED. Until it lands, a green run of this arm is not evidence that
+  a generated body anchors nothing.
 
 ## 7. Gates
 
@@ -546,6 +545,13 @@ New arm: `python3 tools/memory-tree/gen_build_index.py --selftest` · one fixtur
   within a shared order and the id tiebreak runs 15, then 48, then 49, so the sequence is the
   guarantee and no disjointness is claimed here. Nothing else moves: S6, §4's READY block, §5's
   cost line and AC13 keep the text the round-3 fold left them.
+- rev-6 · 2026-09-21 · §3 Edges · AC13 · §10 · written by `TOOL-dDerivedDocket-50`'s own pass, in that
+  unit's commit, because that unit is what the parked text was waiting for. AC13's `fixture:` line
+  routed through `RECALL_CLI`, a conf key the unattended kit declares and the memory-tree kit does
+  not, so on any tree that adopted this kit without that one the arm would have taken its named skip
+  for ever. It now names `corpus_ids.resolve_anchor(root)`, the in-kit route unit 50 added, and the
+  paragraph that parked H2 leaves with the key it parked. H3 and its `TOOL-dDerivedDocket-51`
+  hand-off are untouched; no other criterion, scope item or gate line moves.
 
 ## 10. Reuse audit
 
@@ -573,6 +579,10 @@ prompt, which AC12's `permission:` line already follows; and the pre-commit code
 dUnstagedSymbol, which Files touched now names. AC12's `--selftest` flag form is not a match for the
 spec-token `bar` join or for `tools/unattended/gate-guard.js`, both of which read a flag on another
 file as the direct check.
+
+The anchor predicate AC13 asks for is NOT a seam this unit adds either: `TOOL-dDerivedDocket-50`
+landed `corpus_ids.resolve_anchor(root)` as the kit's one public route from a repository root to
+that predicate, so this spec extends that route rather than deriving a second one.
 
 Recall terms used: `acceptance-underivable orientation ask row pointer observable cut-line resolution
 table ids-driven run`

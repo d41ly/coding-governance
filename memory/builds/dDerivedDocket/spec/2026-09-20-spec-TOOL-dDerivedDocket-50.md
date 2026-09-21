@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-50 — the kit's own route to the anchor grammar
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 13
+**Status:** CLOSED · rev-2 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dDerivedDocket-50-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-50-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 |
 
 <!-- /gen:spec-records -->
@@ -32,14 +33,20 @@ next module reaching for a key the kit does not own.
   the top of the same function (`:363`), so `_anchor` ends this unit with exactly ONE call site and
   the walk pays no second conf resolve (§4). Observed by AC1 and AC2.
 - **S2** — the refusal, named, reachable, and TRUE for the caller that receives it. The
-  installed-check hoists out of `grammar()` into `_check_grammar_installed(why, cure)`, one helper
-  holding the module's raise and taking the CAUSE and the REMEDY from its caller. `grammar()` has
+  installed-check hoists out of `grammar()` into
+  `_check_grammar_installed(why, cure_absent, cure_outdated)`, one helper holding the module's raise
+  and taking the CAUSE and the two REMEDIES from its caller. `grammar()` has
   TWO refusal points and both route through that helper: the absent-`extract.py` raise
-  (`tools/memory-tree/corpus_ids.py:271-276`) and the outdated-kit raise (`:281-283`), whose message
+  and the outdated-kit raise, whose message
   today tells every caller to blank the pins to turn checks 13-15 off. Both callers share the
-  kit-state sentence at each point and neither inherits the other's cure. `grammar()` passes the
-  cause and cure it writes today at both, so its two messages stay byte-identical
-  (`tools/memory-tree/corpus_ids.py:272` and `:282`); `resolve_anchor` passes its own at both —
+  kit-state sentence at each point and neither inherits the other's cure. TWO cures and not one,
+  because the remedies genuinely DIFFER — adopt that kit versus update it — and one string reused at
+  both points is wrong at one of them. `grammar()` passes the cause and the two cures it writes
+  today, so its ABSENT-point message stays byte-identical and its OUTDATED-point message gains the
+  cause clause it never carried while keeping its cure verbatim. Byte-identity at BOTH points and a
+  per-caller cause at BOTH points are not jointly satisfiable: today's second message states no
+  cause at all, and a template cannot produce one from nothing without re-typing the whole message
+  in each caller, which is the hoist undone. `resolve_anchor` passes its own at both —
   an anchor route was requested, and the remedy is to install or update the memory-recall kit beside
   this one, because no conf value of this kit turns the call off. Re-causing only the first point
   would leave the pin cure alive on the second, which is the defect this item declares it closes,
@@ -49,20 +56,23 @@ next module reaching for a key the kit does not own.
   are the same value otherwise. Observed by AC3.
 - **S3** — the example-conf parity arm, widened from one engine to the kit's Python modules. The
   memory-hygiene self-test derives every key `tools/memory-tree/*.py` reads out of a dict — the
-  `<receiver>.get("KEY")` and `<receiver>["KEY"]` forms over `[A-Z][A-Z0-9_]{2,}`, with the RECEIVER
-  UNCONSTRAINED — and asserts each one is declared in
+  `<receiver>.get("KEY")` and `<receiver>["KEY"]` forms over `[A-Z][A-Z0-9_]{2,}`, in either quote
+  style, with the RECEIVER UNCONSTRAINED but REQUIRED — and asserts each one is declared in
   `tools/memory-tree/.memory-tree.conf.example`, minus a DECLARED exemption list asserted in BOTH
   directions — an exempt name no module reads reds too. The receiver is unconstrained because a
   module reading a SECOND kit's conf cannot bind it to `conf`, that name being taken by the kit's
   own, so a `conf`-anchored derivation is blind to exactly the shape this unit exists to catch
   (§4, measured both ways). The exemption list absorbs what the widening pulls in, which on this
-  tree is the `os.environ` reads and nothing else. The derivation REFUSES when it finds no key at
+  tree is TEN names: seven read through `os.environ`, two module constants reached through
+  `globals()` by the modules' own selftest arms, and one fixture VIEW key (§4, re-measured at this
+  unit's commit). The derivation REFUSES when it finds no key at
   all, so the arm cannot pass by scanning nothing. It is written in the idiom the same file already
   uses for the shell engine's two populations
   (`tools/memory-tree/check-memory-hygiene.test.sh:2101-2167`), beside them, reading the same
   `EX` example-conf handle (`:2106`). Observed by AC4 and AC5.
 - **S4** — `ARMS_FLOORS` declared in `tools/memory-tree/.memory-tree.conf.example`, blank, with a
-  header comment in that file's idiom. It is the ONE miss S3's arm finds on this tree (§4, measured),
+  header comment in that file's idiom. It is the ONE miss S3's arm finds on this tree that is a conf key at all (§4, re-measured at
+  this unit's commit),
   it is read by a gate the kit's own descriptor ships (`tools/memory-tree/kit.toml:202`), and an
   adopter cannot discover it today. Blank is the OFF value the reader already honours
   (`tools/memory-tree/check-arms.py:82` and `:212`). Observed by AC6.
@@ -89,7 +99,12 @@ next module reaching for a key the kit does not own.
   (`tools/memory-recall/recall_conf.py:249`), declares no `MEMORY_ROOT` (`:253`), or declares no
   usable `FAMILIES` (`:262`). `resolve_anchor` catches that ONE type and re-raises `Problem`, naming
   the root it was given and which of the three declarations was missing, because the resolver
-  already distinguishes them. Measured at HEAD: `ConfError` occurs zero times in
+  already distinguishes them. It matches the type BY NAME on a `RuntimeError` and re-raises anything
+  else untouched. Reaching the class through `sys.modules["extract"].recall_conf` was written first
+  and MEASURED WRONG: `extract.py` resolves a conf at module scope, so the sibling kit can refuse
+  during its OWN import for exactly the reason this clause exists to map, `extract` then never lands
+  in `sys.modules`, and the look-up meant to catch the refusal raises `KeyError` as a second
+  traceback — observed on a copied kit outside a git repository. Measured at HEAD: `ConfError` occurs zero times in
   `tools/memory-tree/corpus_ids.py`, so none of that module's three `except Problem` handlers
   (`tools/memory-tree/corpus_ids.py:699`, `:835` and `:1253`) catches it. Observed by AC9.
 
@@ -185,6 +200,14 @@ the caller did not build. So S8 maps the type at the route rather than letting t
 entry point leak a foreign exception past the ban its own docstring writes
 (`tools/memory-tree/corpus_ids.py:24`).
 
+**The mapping matches the class by NAME**, which is a smell with a measurement behind it. The
+obvious form — `except sys.modules["extract"].recall_conf.ConfError` — was written, staged and run
+first: `extract.py` resolves a conf at module scope, so the kit can refuse during its own import for
+precisely the reason the clause exists to map, `extract` is then absent from `sys.modules`, and
+EVALUATING the except clause raises `KeyError` — a second traceback where the first was being
+removed. A `RuntimeError` whose class is not that one is re-raised untouched rather than re-labelled
+with a cause it does not have.
+
 The OPTIONAL bundle is what lets `_anchor` keep exactly one call site, and without it AC2 asserts a
 call graph this unit does not reach. At HEAD `_anchor`'s only caller is `walk()`
 (`tools/memory-tree/corpus_ids.py:387`), which resolved the bundle at `:363` and keeps it for two
@@ -209,25 +232,43 @@ at `tools/memory-tree/check-memory-hygiene.test.sh:2114` and `:2156`.
 override at all binds it to a dict called `conf` — five of the six, `merge-rows.py` reading none and
 reaching the sibling kit's accessor instead. They share one parser
 (`tools/memory-tree/corpus_ids.py:170`) and each module's defaults dict names its own keys, so
-anchoring the derivation on that spelling reads every key the kit owns and CANNOT read the one shape
-this unit exists to stop. A module reaching for a second kit's conf has the name `conf` already
+anchoring the derivation on that spelling reads MOST of what the kit owns and CANNOT read the one
+shape this unit exists to stop. A module reaching for a second kit's conf has the name `conf` already
 taken by its own, so the line it writes is `ucfg["RECALL_CLI"]`, or any other receiver, and a
-`conf`-anchored arm stays green through it. Measured both ways over `tools/memory-tree/*.py` at HEAD
-on 2026-09-20: the narrow form yields eleven names, the wide form yields those same eleven plus
-three, and none is lost.
+`conf`-anchored arm stays green through it. Measured both ways over `tools/memory-tree/*.py` at this
+unit's commit: the narrow form yields TWELVE names, the wide form TWENTY-FOUR, and none is lost.
 
-The three are environment reads rather than conf keys, and they go on the DECLARED exemption list:
-`GOV_BASH` (`tools/memory-tree/corpus_ids.py:309`, `tools/memory-tree/gotchas.py:541`,
-`tools/memory-tree/row_grammar.py:647`), `PATH` (`tools/memory-tree/corpus_ids.py:317`) and
-`GIT_DIR` (`tools/memory-tree/gen_build_index.py:2666`). Each is read through `os.environ`, which is
-a dict like any other and which text cannot tell from a conf — the same reason the sibling list at
-`:2154` carries `GOV_PYTHON`, and the reason that list is asserted in both directions.
+The narrow form does not even cover the kit's own keys. `ASK_CUTOFF` and `BACKLOG_MODE` are read
+through a receiver that is not called `conf`, are declared in the shipped example, and are invisible
+to the narrow derivation — so the spelling is wrong for this population even before the cross-kit
+shape is considered.
+
+TEN of the twenty-four are not conf keys, and each goes on the DECLARED exemption list with its
+reason. Seven are environment: `GOV_BASH`, `GOV_DEFAULT_BRANCH`, `PATH`, `GIT_DIR`,
+`GIT_GRAFT_FILE`, `GIT_AUTHOR_DATE` and `GIT_COMMITTER_DATE`, each read or set through `os.environ`,
+which is a dict like any other and which text cannot tell from a conf — the same reason the sibling
+list at `:2154` carries `GOV_PYTHON`, and the reason that list is asserted in both directions. Two
+are this module's OWN module-level constants, `GRAMMAR_DIR` and `READ_PATH_RULES_GATE`, reached
+through `globals()` by selftest arms that save and restore them. One, `EXMP`, is a fixture
+discipline's view key inside a migration summary. This is a longer list than the rev-1 measurement
+recorded, and the earlier reading was simply wrong rather than stale: re-run at the spec's own base
+`fb07ca25`, the wide form already returned six names beyond the narrow one, not three.
+
+A RECEIVER IS REQUIRED, which the rev-1 form left implicit and which costs one class of false
+positive: a bare list literal such as `["DECISIONS"]` (`tools/memory-tree/row_grammar.py:176`) is a
+subscript minus its receiver and nothing else. Both quote styles are read, because one module writes
+`conf.get('UNIVERSAL_BUDGET')` (`tools/memory-tree/gotchas.py:318`) and a double-quote-only pattern
+drops it silently.
+
+COMMENTS ARE NOT STRIPPED, unlike the two sibling arms. Theirs matched bare `${NAME}` shapes that
+prose can produce by accident; this pattern is a whole dict read, which prose reaches only by
+spelling the form out. Over-reading reds by NAME and is fixed in one line; under-reading is the
+shape that passes by finding nothing.
 
 The widened receiver also reaches the modules' OWN selftest fixture dicts, including a subscript
-write such as `c5b["DEAD_PATH_PIN"] = "1"` (`tools/memory-tree/corpus_ids.py:932`). Measured, every
-key those carry is already declared, so the population does not move today; a fixture that invents
-a key later reds until it is declared or exempted, which is the direction of error an arm of this
-kind should have.
+write such as `c5b["DEAD_PATH_PIN"] = "1"`. Measured, every key those carry is already declared or
+exempt, so the population does not move today; a fixture that invents a key later reds until it is
+declared or exempted, which is the direction of error an arm of this kind should have.
 
 The block takes the module directory and the example-conf path as parameters, defaulting to its own
 two, so one arm can point it at a scratch directory holding one module and one deliberately
@@ -236,33 +277,39 @@ grading something it did not build — the reason `tools/check-kit-placeholders.
 flag and states it in the same words.
 
 The same run that measured the two receiver forms is the candidate-predicate run the charter asks
-for, made before this arm was written. Its CONF half is the table below — eleven keys, exactly one
-of them missing from the shipped example. The three environment names above are the remainder of
-what the wide form returns, and they are exempt rather than declared.
+for, made before this arm was written and RE-MADE at this unit's commit. Its CONF half is the table
+below — fourteen keys, exactly one of them missing from the shipped example. The ten exempt names
+above are the remainder of what the wide form returns.
 
-| Key | Read by | In the shipped example |
-|---|---|---|
-| `ARMS_FLOORS` | `check-arms.py` | no |
-| `CHARTER` | `corpus_ids.py` | yes |
-| `DEAD_PATH_EXCLUDE` | `corpus_ids.py` | yes |
-| `DEAD_PATH_PIN` | `corpus_ids.py` | yes |
-| `DISCIPLINES` | `gen_build_index.py` | yes |
-| `FAMILIES` | `gen_build_index.py`, `row_grammar.py` | yes |
-| `MEMORY_ROOT` | five modules | yes |
-| `ORPHAN_ID_PIN` | `corpus_ids.py` | yes |
-| `READ_PATH_WAIVER` | `corpus_ids.py` | yes |
-| `ROTATION_MODE` | `row_grammar.py` | yes |
-| `UNIVERSAL_BUDGET` | `gotchas.py` | yes |
+| Key | In the shipped example |
+|---|---|
+| `ARMS_FLOORS` | no, until this unit |
+| `ASK_CUTOFF` | yes |
+| `BACKLOG_MODE` | yes |
+| `CHARTER` | yes |
+| `DEAD_PATH_EXCLUDE` | yes |
+| `DEAD_PATH_PIN` | yes |
+| `DISCIPLINES` | yes |
+| `FAMILIES` | yes |
+| `INDEX_CAP_BYTES` | yes |
+| `MEMORY_ROOT` | yes |
+| `ORPHAN_ID_PIN` | yes |
+| `READ_PATH_WAIVER` | yes |
+| `ROTATION_MODE` | yes |
+| `UNIVERSAL_BUDGET` | yes |
 
 The figure is DERIVED at observation time by AC4 and AC5 and is pinned here only as the measurement
-that justified the scope: it is a reading of this tree on 2026-09-20 at HEAD, not a constant the
+that justified the scope: it is a reading of this tree at this unit's commit, not a constant the
 build carries. What the arm buys is the defect this unit exists for: a `RECALL_CLI` read from any
 module in that directory enters the derivation WHATEVER dict the module binds it to, is a key no row
 of that table carries and no exemption names, so it reds, by name, in the suite that grades the kit.
 
-The exemption list ships with those three environment names and nothing else. It is asserted in
+The exemption list ships with those ten names and nothing else. It is asserted in
 both directions, so an exemption naming a key no module reads reds — the rule the sibling list at
-`:2154` already states, and the reason a stale exemption is worse than none.
+`:2154` already states, and the reason a stale exemption is worse than none. That second direction
+is not decoration here: narrowing the receiver back to `conf` reds the arm through EIGHT stale
+exemptions as well as through the cross-kit fixture, which is how a future narrowing announces
+itself twice.
 
 ### The one miss
 
@@ -310,7 +357,7 @@ and needs only to precede unit 15.
 | Identifier | Kind | Cell |
 |---|---|---|
 | `resolve_anchor` | module function in `corpus_ids.py` | `py.function`; leads with the declared verb `resolve`, checked with `lexicon.py --suggest` |
-| `_check_grammar_installed` | module function in `corpus_ids.py` | `py.function`; leads with the declared verb `check`, checked with `lexicon.py --suggest`. `require` is not a row of the table, which is why the helper is not called that. It serves BOTH of `grammar()`'s refusal points, so `installed` reads as installed-and-usable rather than as the file-exists half alone |
+| `_check_grammar_installed` | module function in `corpus_ids.py` | `py.function`; leads with the declared verb `check`, checked with `lexicon.py --suggest`. `require` is not a row of the table, which is why the helper is not called that. It serves BOTH of `grammar()`'s refusal points, so `installed` reads as installed-and-usable rather than as the file-exists half alone. It takes the cause and ONE cure per point, and returns the imported module so exactly one site puts the kit on `sys.path` |
 | the derived key list and the exemption list | shell locals in the self-test | `sh.function` grades function names; a local is graded by no cell |
 
 ### Files touched (estimate)
@@ -379,14 +426,20 @@ marker moves here; see §3.
   in `tools/gate-legs.json`, so its run belongs to the orchestrator's VERIFYING bar and not to this
   pass. Each new arm's RED is observed by hand before it is allowed to pass.
 - **AC2** — When the same selftest asserts this module's own call graph, derived from its own source
-  in the idiom `_walk_continues` already uses (`tools/memory-tree/corpus_ids.py:797`),
-  `corpus_ids.py` names `extract.anchor_at` exactly once, at `_anchor`; `_anchor`'s only caller is
-  `resolve_anchor`; and `walk()` names `grammar(` exactly once, the bundle it hands to the route.
+  in the idiom `_walk_continues` already uses,
+  `corpus_ids.py` calls `anchor_at` exactly once, at `_anchor`; `_anchor`'s only caller is
+  `resolve_anchor`; `walk()` names `grammar(` exactly once; and `walk()`'s ONE call to
+  `resolve_anchor` passes TWO arguments, which is the bundle actually being handed over. The
+  `anchor_at` half counts the attribute however it is reached rather than only through the name
+  `extract`: measured, a staged second call site written `__import__("extract").anchor_at` is
+  invisible to a receiver-anchored test, which is this unit's own defect class inside its own arm.
   Red when: a second call site inside this module re-types the bundle-to-answer step, so a change to
   the grammar's calling convention lands in one of them and not the other; or `walk()` reaches the
   route as `resolve_anchor(root)` with no bundle while keeping its own, so the conf at that root is
   resolved twice per walk (`tools/memory-recall/extract.py:478-505`) — the cost §4 gives as the
-  reason the bundle is closed over, paid twice and invisible, because both resolves answer the same.
+  reason the bundle is closed over, paid twice and invisible, because both resolves answer the same,
+  and invisible to a `grammar(` count too, which is why the argument count is asserted and not the
+  call.
   permission: as AC1 — the same held leg, run at VERIFYING.
 - **AC3** — When `GRAMMAR_DIR` is pointed at a directory that does not exist and `resolve_anchor` is
   called, in the same arm shape the module already uses for its exit-3 degradation
@@ -398,7 +451,10 @@ marker moves here; see §3.
   other refusal point (`tools/memory-tree/corpus_ids.py:281-283`), and makes the same assertions
   there: the message names the kit, gives the cause as the anchor route, prescribes UPDATING that
   kit beside this one, and names neither pin. In each fixture `grammar()` raises too, and ITS
-  message is byte-identical to the one at this unit's parent commit.
+  message is byte-identical to the one at this unit's parent commit at the ABSENT point, and at the
+  OUTDATED point carries that commit's cure verbatim behind the pin cause it never stated — the one
+  byte that moves for `grammar()`, and §4 gives the reason a template cannot hold both halves at
+  once.
   Red when: the new caller inherits `grammar()`'s message and is told to blank two pins that are not
   set and do not gate this call, so the refusal states a cause the caller does not have and
   prescribes a cure that is a no-op — which a criterion asking only that A remedy be named certifies
@@ -425,8 +481,9 @@ marker moves here; see §3.
   commit — the arm's own `sed` and `grep` scan, executed by hand over `tools/memory-tree/*.py`
   rather than through the suite that will carry it — every key it derives is declared in
   `tools/memory-tree/.memory-tree.conf.example` or is on the exemption list, and every exemption
-  names a key some module still reads, the `os.environ` names the unconstrained receiver pulls in
-  included, graded in that second direction like any other. And when `FLOOR_ASSERTIONS`, declared at
+  names a key some module still reads — the `os.environ` names the unconstrained receiver pulls in
+  included, and the `globals()` and fixture-view names beside them, graded in that second direction
+  like any other. And when `FLOOR_ASSERTIONS`, declared at
   `tools/memory-tree/check-memory-hygiene.test.sh:2460`, is read with `git show` at this unit's
   commit and at its parent, the number at the commit is HIGHER.
   Red when: the exemption list carries a name no module reads any more, so a stale exemption widens
@@ -569,6 +626,23 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · the real kit direct
   `memory-hygiene self-test` leg already sits held. The suite stays named on §7's `New arm:` line,
   which the join does not grade. Every assertion this criterion made is still made, by a reader that
   does not need the suite to have run.
+- rev-2 · 2026-09-21 · S2 · S3 · S4 · S8 · §4 · AC2 · AC3 · AC5 · Inventory · the building pass,
+  against the tree rather than against the base. Four things did not hold. (1) The parity
+  measurement was wrong, not stale: re-run at `fb07ca25` the wide form already returned six names
+  beyond the narrow one, and at this unit's commit it returns twelve and twenty-four. The exemption
+  list is ten names with three reasons, the table is fourteen keys, and `ARMS_FLOORS` is still the
+  one miss that is a conf key at all. The derivation also requires a RECEIVER, which keeps a bare
+  list literal out, and reads both quote styles, without which one live key was dropped. (2)
+  Byte-identity at BOTH of `grammar()`'s refusal points and a per-caller cause at both are not
+  jointly satisfiable, because the outdated-point message states no cause today; the helper takes
+  one cure per point, the absent point stays byte-identical, and the outdated point gains the cause
+  clause while keeping its cure verbatim. AC3 says so. (3) AC2's call-graph assertion could not see
+  its own second red-when: a `walk()` reaching the route with no bundle still names `grammar(` once,
+  so the argument COUNT is asserted, and the `anchor_at` half no longer anchors on the receiver
+  name, because a staged break spelled `__import__("extract").anchor_at` walked straight past it.
+  (4) S8's mapping matches `ConfError` by NAME: the `sys.modules` form was built first and raised
+  `KeyError` when the sibling kit refused during its own import, which is one of the very refusals
+  being mapped. No criterion was dropped and no scope moved.
 
 ## 10. Reuse audit
 

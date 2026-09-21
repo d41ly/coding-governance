@@ -2166,6 +2166,98 @@ for _k in $_engreads; do
     || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, which the engine reads as an override, so an adopter cannot discover it"; st=1; }
 done
 
+# ---- ...and the kit's PYTHON modules, which the two arms above cannot see AT ALL: both derive from
+# ---- the shell engine's own text, and every key below is read by a `.py` file sitting beside it.
+# ---- THE RECEIVER IS UNCONSTRAINED, and that is the load-bearing half (TOOL-dDerivedDocket-50).
+# ---- Every module that reads an override at all binds it to a dict called `conf`, so a derivation
+# ---- anchored on that spelling reads every key this kit OWNS and cannot read the one shape this
+# ---- arm exists to catch: a module reaching for a SECOND kit's conf has the name `conf` taken by
+# ---- its own, so the line it writes is `ucfg["RECALL_CLI"]` — any receiver but that one — and a
+# ---- narrow arm stays green straight through it. Measured both ways over this directory: the
+# ---- narrow form loses nothing and gains nothing the wide form misses.
+# ---- A RECEIVER IS REQUIRED, which is what keeps a bare list literal such as `["DECISIONS"]` out:
+# ---- a list literal and a subscript are the same characters minus the receiver.
+# ---- BOTH QUOTE STYLES, because one module reads `conf.get('UNIVERSAL_BUDGET')` and a
+# ---- double-quote-only pattern would silently drop it.
+# ---- COMMENTS ARE NOT STRIPPED, unlike the two arms above. Their pattern matched bare `${NAME}`
+# ---- shapes that prose could produce by accident; this one is a whole dict read, which prose
+# ---- reaches only by spelling the form out. Over-reading reds by NAME and is fixed in one line;
+# ---- under-reading is the shape that passes by finding nothing.
+_pykeys() {  # $1 module directory. A PARAMETER, so a fixture arm grades a tree it built itself.
+  cat "$1"/*.py 2>/dev/null \
+    | grep -oE "[]A-Za-z0-9_)](\.get\(|\[)[\"'][A-Z][A-Z0-9_]{2,}[\"']" \
+    | sed "s/.*[\"']\([A-Z][A-Z0-9_]*\)[\"']\$/\1/" \
+    | sort -u
+}
+# The grading, parameterised the same way and in BOTH directions. Prints one line per finding;
+# silence is the pass. An EMPTY derivation is a finding rather than a pass — the shape both sibling
+# arms above were each written to prevent, one level up.
+_pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
+  _pk=$(_pykeys "$1")
+  if [ -z "$_pk" ]; then
+    echo "the python parity derivation found NO key in $1/*.py, so this arm would pass by scanning nothing"
+    return 0
+  fi
+  for _x in $3; do
+    printf '%s\n' "$_pk" | grep -qx "$_x" \
+      || echo "the python exemption names $_x, which no module in $1 reads any more — a stale exemption widens the surface it was written to narrow"
+  done
+  for _x in $_pk; do
+    case " $3 " in *" $_x "*) continue ;; esac
+    grep -qE "^$_x=" "$2" \
+      || echo "$2 does not declare $_x, which a module in $1 reads out of a dict, so an adopter cannot discover it"
+  done
+}
+# NOT conf keys, and the list says why for each. Everything here is read out of a dict that is not a
+# conf and text alone cannot tell apart from one — `os.environ` and `globals()` are dicts like any
+# other — plus one fixture VIEW key. Same rule as `_engexempt` above, asserted in both directions.
+#   GOV_BASH GOV_DEFAULT_BRANCH PATH GIT_DIR GIT_GRAFT_FILE GIT_AUTHOR_DATE GIT_COMMITTER_DATE
+#     — environment, read or set through os.environ by the engine and by its own fixtures.
+#   GRAMMAR_DIR READ_PATH_RULES_GATE — this module's OWN module-level constants, reached through
+#     globals() by selftest arms that save and restore them.
+#   EXMP — a fixture DISCIPLINE's view key inside a migration summary, not an override.
+_pyexempt="EXMP GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GOV_BASH GOV_DEFAULT_BRANCH GRAMMAR_DIR PATH READ_PATH_RULES_GATE"
+_pk_real=$(_pykeys "$HERE")
+n=$((n+1))
+[ -n "$_pk_real" ] || { echo "FAIL could not derive a single conf key from $HERE/*.py; the python example-conf arms below would pass by finding nothing"; st=1; }
+n=$((n+1))
+printf '%s\n' "$_pk_real" | grep -qx MEMORY_ROOT \
+  || { echo "FAIL the python key derivation does not see MEMORY_ROOT, which five modules read — the population is not what it claims to be"; st=1; }
+n=$((n+1))
+printf '%s\n' "$_pk_real" | grep -qx ROTATION_MODE \
+  || { echo "FAIL the python key derivation does not see ROTATION_MODE, which row_grammar.py reads — the population is not what it claims to be"; st=1; }
+n=$((n+1))
+_pyout=$(_pyparity "$HERE" "$EX" "$_pyexempt")
+[ -z "$_pyout" ] || { printf '%s\n' "$_pyout" | sed 's/^/FAIL /'; st=1; }
+
+# ---- THE FIXTURE, which is what makes the unconstrained receiver a claim rather than a comment.
+# ---- Two modules: one reads an undeclared key through a dict named `conf`, the other reads a
+# ---- SECOND kit's key through a dict named anything else while keeping a `conf` of its own — the
+# ---- only spelling a cross-kit conf read can take. A `conf`-anchored derivation reds on the first
+# ---- and passes on the second, which is this unit's own defect class one level up. The third arm
+# ---- is the negative control: the fixture's DECLARED key must not be reported.
+PY=$TMP/pyparity
+mkdir -p "$PY/mod" "$PY/none"
+printf 'MEMORY_ROOT=memory\n' > "$PY/example.conf"
+printf 'def f(conf):\n    return conf.get("FIXTURE_OWN_KEY")\n' > "$PY/mod/a.py"
+printf 'def g(conf, ucfg):\n    return conf["MEMORY_ROOT"], ucfg["RECALL_CLI"]\n' > "$PY/mod/b.py"
+_fx=$(_pyparity "$PY/mod" "$PY/example.conf" "")
+n=$((n+1))
+printf '%s\n' "$_fx" | grep -q 'does not declare FIXTURE_OWN_KEY' \
+  || { echo "FAIL the python parity arm did not red on an undeclared key read through a dict named conf"; st=1; }
+n=$((n+1))
+printf '%s\n' "$_fx" | grep -q 'does not declare RECALL_CLI' \
+  || { echo "FAIL the python parity arm is anchored on the receiver spelling conf, so a module reading a SECOND kit's conf key through any other dict passes — the one shape this arm exists to catch"; st=1; }
+n=$((n+1))
+printf '%s\n' "$_fx" | grep -q 'does not declare MEMORY_ROOT' \
+  && { echo "FAIL the python parity arm reported the fixture's DECLARED key as missing"; st=1; }
+n=$((n+1))
+_pyparity "$PY/none" "$PY/example.conf" "" | grep -q 'found NO key' \
+  || { echo "FAIL the python parity derivation does not refuse an EMPTY population, so every arm above could pass by scanning nothing"; st=1; }
+n=$((n+1))
+_pyparity "$PY/mod" "$PY/example.conf" "NOBODY_READS_THIS" | grep -q 'stale exemption' \
+  || { echo "FAIL the python exemption list is not asserted in the second direction, so a name no module reads any more silently widens the surface"; st=1; }
+
 # ---- SPEC10_CUTOFF is a CONF DECLARATION, and the environment no longer reaches it
 # ---- (TOOL-aDeclaredBound-2). Four runs over ONE nine-section spec dated 2026-08-01, which is
 # ---- BEFORE the shipped 2026-08-04: absent, declared-early, declared-blank, and hostile-env.
@@ -2616,7 +2708,7 @@ done
 # the block rather than read off a PASS line, because that suite run is a held leg the unit's pass
 # does not make. The figure is one-sided: this is a `-ge` floor, so an undercount still passes and
 # still catches a block stranded past an exit, which is what the pin is for.
-FLOOR_ASSERTIONS=416
+FLOOR_ASSERTIONS=425
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

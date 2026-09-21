@@ -235,6 +235,14 @@ UNIVERSAL_BUDGET="3"
 # BLANK = uncapped.
 RECALL_CACHE_BUDGET_MB="512"
 
+# check-arms.py: the per-gate floors on armed fail branches, space-separated, each
+# `<gate>:<branches>:<armed>` and each one-sided UPWARD. BLANK = no floors at all, which is the state
+# every tree that never declared it is already in — so nothing changes until you measure your own.
+# The gate ships with this kit's descriptor, so an adopter receives a leg that reads this key and
+# could not discover it anywhere else. `<kit>/check-arms.py` prints the measured pair for a tree
+# that already has gates.
+ARMS_FLOORS=""
+
 # Check 20 — ids duplicated INSIDE one row document. A POLICY refusal, not a measured-blank
 # pin: ship it with a value. `row_grammar.py --emit-pin` prints the measured count for a tree
 # that already has content.
