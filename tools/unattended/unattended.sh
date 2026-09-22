@@ -5885,6 +5885,11 @@ verb_resume() { # slug
 #
 # WHAT THIS DOES NOT DECIDE: whether a red is inherited. That is the runner's attribution, read here
 # from the run record of a bar whose id this driver pinned, and never re-derived.
+#
+# TWO COPIES OF THIS PARSER, BYTE-IDENTICAL, and the second is the pre-push hook's. The hook ships
+# verbatim through another kit and cannot source this one, so the parse is spelled twice; the two
+# readers of one policy must never disagree about a line, which is why neither copy may be edited
+# alone.
 read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleaned; nothing when none assigns it
   local line v="" hit=""
   while IFS= read -r line || [ -n "$line" ]; do
@@ -6176,6 +6181,12 @@ write_inherited_asks() { # slug · R · run dir
 # runs no bar — the item is skipped — so the record is always an EARLIER one, and those three fields
 # are what tie it to the tree being closed: an all-INHERITED record from before the run committed its
 # own red, from a dirty tree, or from a bar whose tree moved describes some other tree.
+#
+# WHAT IT DOES NOT BUY, said here because a structural check reads as a semantic one. The fact lives
+# in the run's own record and the run record under the git dir, and the run writes both under its own
+# uid, so a run set on forging them can plant an all-INHERITED record and point the fact at it. What
+# this closes is the SENTENCE — "not mine", asserted with nothing behind it — and what remains is a
+# forgery, the limit protocol section 9 states for every check that runs beside the thing it grades.
 check_inherited_override() { # run-state file · the verb as the refusal names it -> 0 when admitted
   local rel=$1 verb=$2 f id gd head d hh htc tm why="" n=0 leg ver
   f=$(fact "$rel" gates-run); id=${f%% *}

@@ -544,7 +544,9 @@ _gate_env="$(git rev-parse --show-toplevel 2>/dev/null)/.githooks/gate-env.sh"
 #
 # THE RELATIVE PATH IS DERIVED from the one the source reads, so this hook spells the file once. The
 # four names are cleared so neither a sourced assignment nor the caller's environment reaches the
-# runner under a name only this block may set.
+# runner under a name only this block may set. `read_policy_key` below is byte-identical to the
+# unattended driver's copy: this hook ships verbatim and sources no kit, so the one parse of this
+# policy is spelled twice, and the two readers must never disagree about a line.
 _gate_env_rel=${_gate_env#"$(git rev-parse --show-toplevel 2>/dev/null)"/}
 unset INHERITED_RED INHERITED_RED_MAX_AGE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE
 
