@@ -9,8 +9,16 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: c1b4d8274f4aa46bcce3290797cf8298aa0cde69
-phase: BUILDING
+hold-run: 
+hold-streak: 1 · at 4c842945
+resume-owed: none · owner
+held-at: 2026-09-22T09:24:20Z
+hold-reason: Paused at the owner's instruction near the weekly usage limit, after wave 6 merged at 4c842945; 38 of 50 units built. The recorded keepalive 00c7d786 belonged to a session that ended long ago and its store is unreachable; the live job b5b0b444 was reaped with CronDelete before this hold. Next: fold unit 27's AC9 and section 3 wording, review the G9 fold text in 61 to 64, then wave 7 (31), wave 8 (32), then 61 to 65 serially, then 34, 35, PLAY-1, 36 and DEPL-1, then VERIFYING.
+hold-until: owner
+hold-code: platform-limit
+held-from: BUILDING
+witness: 4c84294518a8096daa1f52fde86375a0a7a5df96
+phase: HELD
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
@@ -286,3 +294,5 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-22T08:02:35Z brief · item TOOL-dDerivedDocket-27 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-22T08:38:20Z rescope · item add TOOL-dDerivedDocket-65 · reason Promoted at the G9 converged exit (H1): once unit 61 records this session, a session waiting on its own sub-agents is not on the liveness clock, so a long wave reads STALE in the run worktree; this unit adds a sub-agent transcript term to derive_last_move.
+
+2026-09-22T09:24:22Z hold · item platform-limit · reason until owner · unreachable d · resume none(owner)
