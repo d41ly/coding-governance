@@ -541,12 +541,12 @@ printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the 
 # ---- this file carries no other assertion, so growing it past 250 lines trips exactly one branch and
 # ---- nothing else. It is entry-budget exempt (check 7), which the codebase-map tree below pins from
 # ---- the other side: that exemption is the alternative the MAP_SUB branch used to overwrite.
-{ printf '# tfixture guide\n'; i=1; while [ "$i" -le 760 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
+{ printf '# tfixture guide\n'; i=1; while [ "$i" -le 1210 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
   > memory/guides/tfixture.md
 # ---- ...and its GREEN counterpart, which is the arm that proves the guide cap actually widened.
-# ---- 400 lines is OVER the row-document cap of 250 and UNDER the guide cap of 750, so it is named
+# ---- 400 lines is OVER the row-document cap of 250 and UNDER the guide cap of 1200, so it is named
 # ---- by neither. Without this file the widening is unobservable: `tfixture.md` above would red at
-# ---- 760 lines whether the guide cap were 750 or the original 250.
+# ---- 1210 lines whether the guide cap were 1200 or the original 250.
 { printf '# twide guide\n'; i=1; while [ "$i" -le 400 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
   > memory/guides/twide.md
 
@@ -843,6 +843,110 @@ write_base_spec 190 26 OPEN 1 0123abcd
 write_base_spec 192 26 CLOSED 2 0123abcd
 # 193 — PRE-cutoff twin of 190. Nothing landed goes retroactively red.
 write_base_spec 193 10 OPEN 2 0123abcd
+
+# ---- TOOL-dGatedProse-1: CHECK 25's fixtures, from tFixture-200 upward. Every one is
+# ---- Tier-1, dated 2026-08-25 and carries NO acceptance heading: past every check-12 rule cutoff the
+# ---- shared conf declares and before BASE_RESOLVE_CUTOFF, with check 12's scope-join arm silent on
+# ---- each by construction, so a red here can only be check 25. All LIVE except 210, the CLOSED twin
+# ---- of 200, the later ones the closing review's reds included, and all carry the section-8 none a terminal status needs. They sit ABOVE the commit for
+# ---- the reason check 22's do: the engine selects by `git ls-files`, so an untracked fixture is graded
+# ---- by nothing. The assertions are one block further down, after the conf-shaped observations.
+write_readers_spec() { # $1 = num, $2 = status, $3 = the section-2 body
+  { printf '# t%s\n\n**Status:** %s · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n%s\n\n' "$1" "$2" "$3"
+    printf '## 8. Open questions\n\nnone\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · initial draft.\n\n## 10. Reuse audit\n\nNothing here.\n'
+  } > "$D/spec/2026-08-25-spec-tFixture-$1.md"; }
+# The READER the green fixtures resolve against: a guide is a reader by class. Nothing else in this
+# tree spells either of its two tokens, and its path is what 201 names by identity, with a line tail.
+printf '# treaders guide\n\nThe shard reader is `count_shard_rows`, which compares a row count against the pin.\nThis guide is the one file in the tree that spells `tSpelledInGuide`.\nIts last line spells `tRerunAll` and the flag `--dry-run`, and nothing shorter.\n' > memory/guides/treaders.md
+# 200 -- a retirement verb and an underscore identifier, no clause -> RED, named by its S label
+write_readers_spec 200 SPECCED '- **S1** — retire the `shard_arity` pin and the rows it carried.'
+# 201 -- a conforming clause: a tracked path cited with a line tail and a symbol written with a call
+#        suffix both resolve, and a backticked `:12` and `()` standing alone are prose -> silent
+write_readers_spec 201 SPECCED '- **S1** — retire the `shard_arity` pin and the rows it carried.
+  - **Readers:** by name: `memory/guides/treaders.md:3` reads the pin and `count_shard_rows()` spells
+    it, where `:12` and `()` alone are prose. by value: `count_shard_rows` compares against it.'
+# 202 -- the by-value escape WITH a reason -> silent
+write_readers_spec 202 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `count_shard_rows` spells it. by value: NO VALUE READERS — the pin was
+    only ever printed, never compared.'
+# 203 -- the bare escape with nothing after it answers nothing -> RED
+write_readers_spec 203 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `count_shard_rows` spells it. by value: NO VALUE READERS'
+# 204 -- the only tokens are bare words and no kind noun is near -> silent
+write_readers_spec 204 SPECCED '- **S1** — retire the `phase` and `commit` columns from the report.'
+# 205 -- a family-slug-seq id and an elided `-24` are never identifiers -> silent
+write_readers_spec 205 SPECCED '- **S1** — retire what `TOOL-dLoggedFlight-21` and `-24` recorded.'
+# 206 -- a clause with a by-name half and no by-value marker at all -> RED, naming the missing half
+write_readers_spec 206 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `count_shard_rows` spells it.'
+# 207 -- a bare word beside a declared kind noun is the sixth shape -> RED
+write_readers_spec 207 SPECCED '- **S1** — retire the `drafted` status value from the lifecycle.'
+# 208 -- a by-name token no reader spells and no tracked path is -> RED, printing the escape spelling
+write_readers_spec 208 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `tAbsentReader` spells it. by value: `count_shard_rows` compares against it.'
+# 209 -- the same token under READER NOT IN TREE and a reason -> silent, and the covered name PRINTED
+write_readers_spec 209 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `tAbsentReader` spells it, READER NOT IN TREE because it lives in an adopter
+    tree. by value: `count_shard_rows` compares against it.'
+# 210 -- 200 under a CLOSED header: a frozen record is not graded -> silent
+write_readers_spec 210 CLOSED '- **S1** — retire the `shard_arity` pin and the rows it carried.'
+# 211 -- the only candidate token carries a space, a code fragment and not a name -> silent
+write_readers_spec 211 SPECCED '- **S1** — retire the `body=$(_unfenced "$f")` line from the loop.'
+# 212 -- the owner's O6: a markdown path with a slash, and a bare markdown name behind a line tail
+write_readers_spec 212 SPECCED '- **S1** — remove the paragraph `notes/ledger.md` carried.
+- **S2** — drop the table `WIRE-NOTES.md:14` held.'
+# 213 -- a clause on an item the trigger does NOT fire on is graded all the same -> RED
+write_readers_spec 213 SPECCED '- **S1** — build the `shard_arity` report.
+  - **Readers:** by name: `count_shard_rows` spells it. by value: nothing reads it.'
+# 214 -- the case ruling: a strict phrase in capitals, and a stem opening an imperative
+write_readers_spec 214 SPECCED '- **S1** — the report DROPS the `shard_arity` column.
+- **S2** — Retire the `shardArity` alias.'
+# 215 -- the owner's O5: each past form alone, and a slug that holds one only as a substring
+write_readers_spec 215 SPECCED '- **S1** — the `shard_arity` pin is RETIRED.
+- **S2** — the `shard_arity` pin was replaced last week.
+- **S3** — the `shard_arity` pin was removed from the conf.
+- **S4** — the `shard_arity` pin was deleted outright.
+- **S5** — the `shard_arity` pin was dropped quietly.
+- **S6** — the `shard_arity` pin is described in `dRetiredFork-9`.'
+# 216 -- the reader corpus against every record class: six names only a RECORD spells, one a guide
+#        spells, and the bare filename of a tracked file that nothing spells
+write_readers_spec 216 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `tQuotedInReview`, `tQuotedInArchive`, `tQuotedInDecisions`,
+    `tQuotedInBacklog`, `tQuotedInGotcha`, `tQuotedInWaiver`, `tSpelledInGuide` and
+    `DECISIONS.2026-08-01.md`. by value: `count_shard_rows` compares against it.'
+# ...and the six records, each legal under checks 3 and 5 and each the one place its name is spelled:
+# a conforming review, the referenced archive, the decision log, the backlog shard below its numbered
+# rows, a gotcha note with its index rendered, and a waiver registry, as a comment line.
+mkdir -p "$D/reviews" memory/gotchas
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: CLEAN\n\nQuoted here and nowhere else: `tQuotedInReview`.\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-7.md"
+printf '\nQuoted here and nowhere else: `tQuotedInArchive`.\n' >> memory/archive/DECISIONS.2026-08-02.md
+printf '\nQuoted here and nowhere else: `tQuotedInDecisions`.\n' >> memory/DECISIONS.md
+printf '\nQuoted here and nowhere else: `tQuotedInBacklog`.\n' >> memory/backlog/ARCH.md
+printf -- '---\nname: treader-quote\ndescription: a fixture note that quotes one name\nkind: note\n---\n\nQuoted here and nowhere else: `tQuotedInGotcha`.\n' \
+  > memory/gotchas/treader-quote.md
+printf '# quoted here and nowhere else: tQuotedInWaiver\n' >> memory/project/id-orphan-waiver.txt
+"$_PY" "$HERE/gotchas.py" --write >/dev/null 2>&1
+# 217 -- a strict phrase and a kind noun, each wrapped across a line inside one item
+write_readers_spec 217 SPECCED '- **S1** — the `shard_arity` pin no longer
+  exists anywhere a reader looks.
+- **S2** — the report retires `drafted`, the vocabulary
+  member nobody uses.'
+# 218 -- the closing review's R2: a name a reader spells only INSIDE a longer identifier does not
+#        resolve, so a deleted helper whose longer sibling survives still reds -> RED
+write_readers_spec 218 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `count_shard` spells it. by value: `count_shard_rows` compares against it.'
+# 219 -- ...and the same after the call-suffix strip, where the short name is the whole risk -> RED
+write_readers_spec 219 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `tRerun()` spells it. by value: `count_shard_rows` compares against it.'
+# 220 -- round 2's F4: the LEADING boundary, a name the reader spells only as the tail of a longer
+#        identifier -> RED. 218 and 219 fail on the trailing byte, so neither can see this half.
+write_readers_spec 220 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `shard_rows` spells it. by value: `count_shard_rows` compares against it.'
+# 221 -- round 2's F2: a hyphenated name counts the hyphen as a word character, so a flag the reader
+#        spells only inside a longer flag does not resolve -> RED
+write_readers_spec 221 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `--dry` spells it. by value: `count_shard_rows` compares against it.'
 
 git add -A && git commit -q -m fixtures --no-verify
 # 191 — the green twin, and it can only be written HERE: its base must name a commit that exists,
@@ -1146,7 +1250,7 @@ cnot 6 'memory/backlog/ARCH.md'
 # ---- BOTH figures. The likeliest slip in the per-class message is dropping the line half from the
 # ---- shared format for every class, which would name a guide for a LINE breach while printing only a
 # ---- byte count under its own byte cap. TOOL-aRelaxedShard-1.
-chit 6 '761L > 61440B/750L'
+chit 6 '1211L > 98304B/1200L'
 # ---- THE TWO HALVES OF THE PER-CLASS CAP. A guide between the row cap and the guide cap is silent;
 # ---- a guide past the guide cap is named. Asserting only the second would pass identically under
 # ---- one shared 250-line cap, which is the state this change moved away from.
@@ -1449,6 +1553,92 @@ out6d=$(bash "$SCRIPT" 2>/dev/null)
 if grep -qE 'ARCH-tFixture-140/AC9|ARCH-tFixture-142/AC1' <<<"$out6d"; then echo "FAIL: a ledger-join arm fired with ACCEPTANCE_LEDGER_CUTOFF blank — the arms are not nested in check 23"; st=1; fi
 n=$((n+1))
 if grep -qF 'HYGIENE check 23' <<<"$out6d"; then echo "FAIL: check 23 ran at all with a blank ACCEPTANCE_LEDGER_CUTOFF"; st=1; fi
+
+# ---- TOOL-dGatedProse-1: CHECK 25's arms, ONE block, and every assertion in it is a helper call, so
+# ---- the FLOOR_ASSERTIONS raise below is the count of hit, miss, hitl, chit and cnot calls between
+# ---- this line and the end marker, read rather than guessed. The fixtures are above the commit.
+# The branch's own failure text, which is what the harness meta-gate signs it with, and the tag byte,
+# which must never reach the output.
+hit  '§2 scope items of LIVE specs that retire a named thing, and every **Readers:** clause, must answer by name: with names a reader spells and by value: with a reader or NO VALUE READERS and a reason'
+miss $'\004'
+# AC1 and AC14: named with its S label and the escape spelling, while check 12's scope-join arm, which
+# reads only a spec carrying an Acceptance heading, stays silent on the same file.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-200.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1'
+miss 'tFixture-200.md (scope items naming neither'
+# AC2, AC3, AC7, AC8, AC9 and AC12: the silent six. Global, because a check-25 finding, a by-name
+# finding and a covered-name notice all name the file.
+miss 'tFixture-201'
+miss 'tFixture-202'
+miss 'tFixture-204'
+miss 'tFixture-205'
+miss 'tFixture-211'
+miss 'tFixture-210'
+# AC3, AC6, AC23: the halves.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-203.md (§2 items whose **Readers:** by value: half names no backticked reader and carries no NO VALUE READERS followed by a reason): S1'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-206.md (§2 items whose **Readers:** clause carries no by value: half after its by name:; write by value: and the readers of the value, or NO VALUE READERS and a reason): S1'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-213.md (§2 items whose **Readers:** by value: half names no backticked reader and carries no NO VALUE READERS followed by a reason): S1'
+# AC11: the sixth shape.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-207.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1'
+# AC4 and AC5: an unresolved name reds with its remedy; the same name under the escape is PRINTED.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-208.md (§2 item S1: by name: lists `tAbsentReader`, which no reader spells and no tracked path is or ends with; name a reader that spells it, or write READER NOT IN TREE and a reason on that half)'
+cnot 25 'tFixture-209'
+hitl 'memory-hygiene: check 25 did not grade `tAbsentReader` — READER NOT IN TREE covers it, on '"$D"'/spec/2026-08-25-spec-tFixture-209.md S1'
+# AC10, AC24, AC25, AC27: exact LINES, so an extra label reds as surely as a missing one.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-212.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1, S2'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-214.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1, S2'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-215.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1, S2, S3, S4, S5'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-217.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1, S2'
+# AC26: six names only a record spells red; the guide's name and the bare filename do not.
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInReview`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInArchive`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInDecisions`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInBacklog`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInGotcha`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInWaiver`'
+cnot 25 'tSpelledInGuide'
+cnot 25 'DECISIONS.2026-08-01.md'
+# R2 of the closing review: resolution is a WHOLE-WORD spelling at each identifier end, so neither a
+# prefix of a longer name nor a short name inside a longer word resolves.
+chit 25 'tFixture-218.md (§2 item S1: by name: lists `count_shard`, which no reader spells'
+chit 25 'tFixture-219.md (§2 item S1: by name: lists `tRerun`, which no reader spells'
+chit 25 'tFixture-220.md (§2 item S1: by name: lists `shard_rows`, which no reader spells'
+chit 25 'tFixture-221.md (§2 item S1: by name: lists `--dry`, which no reader spells'
+# AC13: the declared dependency is ONE key. Blank SPEC_FORMAT_CUTOFF: nothing is named and exactly one
+# line says so, without the failure prefix. Armed, with SCOPE_JOIN_CUTOFF BLANK: 200 is named, which is
+# the arm proving check 25 is in the accumulator's union guard, and the disarmed line is gone.
+_out25=$out
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+out=$(bash "$SCRIPT" 2>/dev/null)
+miss 'tFixture-200'
+hitl 'memory-hygiene: check 25, the §2 reader-inventory arm, is DISARMED — SPEC_FORMAT_CUTOFF is blank, and check 25 grades check 12'\''s selection, so it graded nothing. Declare SPEC_FORMAT_CUTOFF in .memory-tree.conf to arm it.'
+out="lines naming check 25 and the key: $(grep -F 'check 25' <<<"$out" | grep -cF 'SPEC_FORMAT_CUTOFF')"
+hitl 'lines naming check 25 and the key: 1'
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
+out=$(bash "$SCRIPT" 2>/dev/null)
+chit 25 'tFixture-200.md ('
+miss 'reader-inventory arm, is DISARMED'
+# AC16: a tree whose one spec is CLOSED says the arm graded nothing, and exits 0. Its item WOULD red
+# were the liveness filter gone, so the notice is not the only thing this tree can show.
+RT=$TMP/readersclosed
+mkdir -p "$RT"
+( cd "$RT" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
+  mkdir -p memory/backlog memory/project memory/builds/tDone/spec
+  printf '# r\n' > memory/README.md
+  printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
+  for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  printf -- '---\nslug: tDone\nnode: a\nopened: 2026-08-25\nstreams: architecture\nroster: ARCH\nids: ARCH-tDone-1\n---\n\n# tDone\n' > memory/builds/tDone/README.md
+  printf '# ARCH-tDone-1 — a landed unit\n\n**Status:** CLOSED · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n- **S1** — retire the `shard_arity` pin.\n\n## 8. Open questions\n\nnone\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · initial draft.\n' \
+    > memory/builds/tDone/spec/2026-08-25-spec-tDone-1.md
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
+  git commit -q -m readersclosed --no-verify )
+out=$(cd "$RT" && bash "$SCRIPT" 2>/dev/null; echo "exit=$?")
+hit  'memory-hygiene: the §2 reader-inventory arm, check 25, graded NO spec — no spec in check 12'\''s selection is LIVE by its test, a status header that is not CLOSED|WONTDO.'
+cnot 25 'tDone'
+hitl 'exit=0'
+out=$_out25
+# ---- end of TOOL-dGatedProse-1's check-25 arms.
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 
 # ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector
@@ -2276,12 +2466,14 @@ n=$((n+1))
 # ---- the thing it counts is exactly the shape no check ever looks at.
 #
 # ---- The population is every site that can EMIT a check id: `fail <n>` in the shell, `check <n>:`
-# ---- in the two delegated pythons, and row_grammar's `CHECK = <n>` module constant, which is the
-# ---- one spelling the other two greps miss and the reason check 20 was invisible.
+# ---- in the two delegated pythons, and row_grammar's `CHECK = <n>` and `ROTATION_CHECK = <n>`
+# ---- module constants, the spelling the other two greps miss. It hid check 20 first, and then
+# ---- check 24, whose `ROTATION_CHECK` the first anchor `^CHECK =` could not see: the README said
+# ---- 23 over 24 checks and this arm agreed, until check 25 made the README true and the arm red.
 n=$((n+1))
 _hy_ids=$( { grep -oE 'fail [0-9]+' "$HERE/check-memory-hygiene.sh" | grep -oE '[0-9]+'
              grep -rhoE 'check [0-9]+:' "$HERE/corpus_ids.py" "$HERE/gotchas.py" | grep -oE '[0-9]+'
-             grep -oE '^CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
+             grep -oE '^[A-Z_]*CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
 _hy_derived=$(printf '%s\n' "$_hy_ids" | grep -c .)
 
 
@@ -2475,7 +2667,13 @@ esac
 # (TOOL-aRatifiedRulings-3): it used to be graded BEFORE the project-key section, so it read `n`
 # thirteen short of what the PASS line prints, and a pin read off that line would have redded
 # the suite on its first run. The pinned number is now the printed number, exactly.
-FLOOR_ASSERTIONS=374
+# TOOL-dGatedProse-1 RAISED this by 37, from 374: the hit, miss, hitl, chit and cnot calls in its
+# check-25 block, counted between that block's two marker comments. Every one runs at top level,
+# never in a subshell, so each is one increment of `n` and the pin stays the printed number.
+# RAISED 411 -> 434 at the closing diff review of dGatedProse, round 1, to the PRINTED count again:
+# its two R2 chit calls, and the arms the reconcile with main brought in without a raise.
+# RAISED 434 -> 436 at round 2 of that review: the chit calls for fixtures 220 and 221.
+FLOOR_ASSERTIONS=436
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

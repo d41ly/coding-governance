@@ -151,3 +151,5 @@ memory/builds/dMergedTally/README.md
 memory/builds/aProbedToolkit/README.md
 memory/builds/aBlindedTrial/README.md
 memory/builds/cMendedVintage/README.md
+memory/builds/dGatedProse/README.md
+memory/builds/dPinnedHandoff/README.md

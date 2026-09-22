@@ -191,8 +191,8 @@ DEAD_PATH_PIN=""
 # every file in its class, which reads as a misconfiguration rather than an intent.
 INDEX_CAP_BYTES="20480"         # a row document: an index a curation sweep prunes
 INDEX_CAP_LINES="250"
-GUIDE_CAP_BYTES="61440"         # a guide: prose the charter points a session at, read end to end
-GUIDE_CAP_LINES="750"
+GUIDE_CAP_BYTES="98304"         # a guide: prose the charter points a session at, read end to end
+GUIDE_CAP_LINES="1200"
 BUILD_README_CAP_BYTES="25600"  # a build README: generated regions plus one bounded authored block
 BUILD_README_CAP_LINES="0"
 # Codebase-map dossiers, when that kit is adopted under this tree. Kept TIGHTER than the row cap on
