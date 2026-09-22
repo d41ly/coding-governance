@@ -201,6 +201,8 @@ runner, the fingerprint helper, the pre-push hook or that file reads every red O
 pre-push hook exports the REMOTE sha as R, because a "not mine" claim measured against a base the
 world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDocket-23`.
 
+**An INHERITED leg is aged and owned, and a landable red is stamped apart.** Under `GATE_INHERITED_RED_MAX_AGE=<n>` each INHERITED leg runs once more at R~n and, when not red there, a first-parent bisection names the landing that introduced it; the three columns go before the reason. Under an exported `land` with every red leg aged inside the bound, `gate-inherited-green` records R and `max_age` and never touches `gate-full-green`. The pre-push hook reads the policy at the remote sha, trusts that stamp only at the same R and bound, and lands an inherited-only red on an unmoved tree. `TOOL-dDerivedDocket-24`.
+
 ## Shared seams
 
 **The inlined `resolve_python` block.** Between the `>>> resolve_python` / `<<< resolve_python`

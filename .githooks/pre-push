@@ -530,10 +530,71 @@ _gate_env="$(git rev-parse --show-toplevel 2>/dev/null)/.githooks/gate-env.sh"
 # shellcheck source=/dev/null
 [ -f "$_gate_env" ] && . "$_gate_env"
 
+# ---- THE INHERITED-RED POLICY, READ AT R AND NEVER FROM THE PUSHED TREE — TOOL-dDerivedDocket-24 ---
+# Two keys in that same file decide whether a push may land over a red the remote's own tip already
+# carries: `INHERITED_RED=park|land` and `INHERITED_RED_MAX_AGE=<n>`, the second counted in
+# first-parent landings. They are the one pair the source above does NOT supply. A branch that
+# commits `INHERITED_RED=land` into its own copy would otherwise enable its own landing, so both are
+# PARSED out of the file as committed at the remote sha git fed this hook — R, the landing base, which
+# only a gated push can move — and R's bytes are never executed: one anchored match per key, a
+# trailing comment and one pair of quotes stripped, then validated against `park land` or a positive
+# integer. Absent, blank or malformed reads `park`, and so does `land` with no positive bound; the
+# policy line below ANNOUNCES which, on every gated push. An adopter with no such file reads `park`,
+# which is exactly the behaviour this hook had before the two keys existed.
+#
+# THE RELATIVE PATH IS DERIVED from the one the source reads, so this hook spells the file once. The
+# four names are cleared so neither a sourced assignment nor the caller's environment reaches the
+# runner under a name only this block may set. `read_policy_key` below is byte-identical to the
+# unattended driver's copy: this hook ships verbatim and sources no kit, so the one parse of this
+# policy is spelled twice, and the two readers must never disagree about a line.
+_gate_env_rel=${_gate_env#"$(git rev-parse --show-toplevel 2>/dev/null)"/}
+unset INHERITED_RED INHERITED_RED_MAX_AGE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE
+
+read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleaned; nothing when none assigns it
+  local line v="" hit=""
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line%$'\r'}
+    case "$line" in "$2="*) v=${line#"$2="}; hit=1 ;; esac
+  done <<< "$1"
+  [ -n "$hit" ] || return 0
+  v=${v%%[[:space:]]#*}
+  while [ "${v% }" != "$v" ] || [ "${v%$'\t'}" != "$v" ]; do v=${v%?}; done
+  while [ "${v# }" != "$v" ]; do v=${v# }; done
+  case "$v" in
+    \"*\") v=${v#\"}; v=${v%\"} ;;
+    \'*\') v=${v#\'}; v=${v%\'} ;;
+  esac
+  printf '%s' "$v"
+}
+
+read_policy_at() { # sha -> PP_POLICY (park|land), PP_MAX_AGE (set under land only) and PP_WHY
+  local sha=$1 blob pol age
+  PP_POLICY=park; PP_MAX_AGE=""; PP_WHY=""
+  if [ -z "$sha" ] || [ -z "${sha//0/}" ]; then
+    PP_WHY="the remote holds no tip for $def yet, so there is no R to read a policy at"; return 0
+  fi
+  if ! blob=$(git show "$sha:$_gate_env_rel" 2>/dev/null); then
+    PP_WHY="$_gate_env_rel is absent at ${sha:0:8}, so no policy is adopted there"; return 0
+  fi
+  pol=$(read_policy_key "$blob" INHERITED_RED)
+  age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
+  case "$age" in ''|0*|*[!0-9]*) age="" ;; esac
+  case "$pol" in
+    land) if [ -n "$age" ]; then
+            PP_POLICY=land; PP_MAX_AGE=$age; PP_WHY="declared, with an age bound of $age first-parent landings"
+          else
+            PP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it, which reads park"
+          fi ;;
+    park) PP_WHY="declared" ;;
+    '')   PP_WHY="no INHERITED_RED is declared in $_gate_env_rel there" ;;
+    *)    PP_WHY="INHERITED_RED is '$pol' there, outside 'park land', which reads park" ;;
+  esac
+}
+
 gd=$(git rev-parse --git-dir 2>/dev/null)
 kitfp="$top/$GOV_KITROOT/run-gates/gate-fingerprint.sh"
 rec="$gd/gate-full-green"
-force=""
+force=""; lag=0
 rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
 if [ -f "$rec" ]; then
   rec_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$rec" 2>/dev/null)
@@ -545,76 +606,122 @@ if [ -f "$rec" ]; then
   rec_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$rec" 2>/dev/null)
 fi
 
+# PREDICATES 2 TO 8, ONE FUNCTION, TWO RECORDS (TOOL-dDerivedDocket-24). They were inline and read
+# the full green's fields; the inherited green below must pass exactly the same seven, so the seven
+# became one function over a record's four fields rather than a second copy of them. The label is the
+# only thing that differs, and it is spelled `full green` for the full green, so every message that
+# record printed before is byte-identical. Sets `force` to the first predicate the record fails, or
+# empty, and `lag` to its distance behind the tip.
+check_green_record() { # sha · fingerprint · manifest blob · selftests · label
+  local r_sha=$1 r_fp=$2 r_blob=$3 r_st=$4 label=$5 p2 fresh now_blob
+  force=""; lag=0
+  # 2. the recorded green is not an ancestor of what is being pushed, so it describes another line of
+  #    history entirely.
+  if ! git merge-base --is-ancestor "$r_sha" "$main_local" 2>/dev/null; then
+    force="the recorded $label ${r_sha:0:8} is not an ancestor of the pushed tip"; return 0
+  fi
+  # 3. the recorded green is further behind the tip than the bound allows.
+  lag=$(git rev-list --count "$r_sha..$main_local" 2>/dev/null || echo 0)
+  if [ "${lag:-0}" -gt "$GATE_FULL_MAX_LAG" ]; then
+    force="the recorded $label is $lag commits behind the tip (bound $GATE_FULL_MAX_LAG)"; return 0
+  fi
+  # 4. the record's TREE fingerprint does not reproduce AT THE SHA IT NAMES.
+  #    AT THE RECORDED SHA, never at the tip. The digest is taken over the committed tree object, so
+  #    it moves on every commit; joining it against a fresh fingerprint of the PUSHED TIP would fire
+  #    on every push whose tree had moved, which is exactly the population predicates 2 and 3 already
+  #    admit — it would force full forever while reading as caution. The helper is CALLED, never
+  #    reimplemented: two implementations of one digest disagree silently and then force forever.
+  if [ -n "$r_fp" ] && [ -x "$kitfp" ]; then
+    fresh=$(bash "$kitfp" "$r_sha" 2>/dev/null)
+    if [ -n "$fresh" ] && [ "$fresh" != "$r_fp" ]; then
+      force="the recorded tree fingerprint does not reproduce at ${r_sha:0:8}"; return 0
+    fi
+  fi
+  # 5. the pushed tip is a MERGE whose second parent the record cannot speak for. Every build lands
+  #    on the default branch here as a merge commit, so this row fires on any first-attempt landing
+  #    whose recorded green was not earned on that exact second parent — not only on a retry. Kept at
+  #    that width deliberately: a merge tip the record does not cover is precisely the case the record
+  #    cannot speak for.
+  p2=$(git rev-parse -q --verify "$main_local^2" 2>/dev/null || true)
+  if [ -n "$p2" ] && ! git merge-base --is-ancestor "$p2" "$r_sha" 2>/dev/null; then
+    force="the pushed tip is a merge whose second parent ${p2:0:8} the recorded green does not cover"; return 0
+  fi
+  # 6. the diff touches the LEG MANIFEST, so the scoping decision itself has changed. A guard added,
+  #    widened or removed in this very push cannot be trusted to scope this very push.
+  if ! git diff --quiet "$r_sha" "$main_local" -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null; then
+    force="the pushed diff touches the leg manifest, so the scoping rules themselves moved"; return 0
+  fi
+  # 7. the recorded manifest blob differs from the one this tree holds — the same concern as 6, from
+  #    the record's side, and it catches an uncommitted or differently-resolved manifest that a diff
+  #    between two commits cannot see.
+  if [ -n "$r_blob" ]; then
+    now_blob=$(git hash-object -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null)
+    if [ -n "$now_blob" ] && [ "$now_blob" != "$r_blob" ]; then
+      force="the leg manifest differs from the one the recorded green was earned on"; return 0
+    fi
+  fi
+  # 8. the recorded green was earned with the KIT-SUBJECT legs HELD, and this push would run them.
+  #    COVERAGE, not equality. A record earned with the self-tests ON is strictly stronger evidence
+  #    than a switch-off push needs, so it satisfies one — forcing there would cost every adopter the
+  #    whole saving TOOL-dUnstalledConvoy-26 exists to give, at the one boundary it was measured for.
+  #    The relation only bites in the other direction: a weaker record offered for a stronger push.
+  #    Without this predicate the `selftests` field the stamp writes is a byte nobody consults, and
+  #    the boundary trusts a partial bar as a whole one. TOOL-dUnstalledConvoy-27.
+  if [ -n "${GATE_SELFTESTS:-}" ] && [ "$r_st" != "1" ]; then
+    force="this push runs the kit self-tests and the recorded $label was earned with them HELD"; return 0
+  fi
+  return 0
+}
+
 # 1. no record at all — nothing has ever proven this bar here.
 [ -n "$rec_sha" ] || force="no recorded full green"
+[ -z "$force" ] && check_green_record "$rec_sha" "$rec_fp" "$rec_blob" "$rec_st" "full green"
 
-# 2. the recorded green is not an ancestor of what is being pushed, so it describes another line of
-#    history entirely.
-[ -z "$force" ] && ! git merge-base --is-ancestor "$rec_sha" "$main_local" 2>/dev/null \
-  && force="the recorded full green ${rec_sha:0:8} is not an ancestor of the pushed tip"
+# THE POLICY AT R, announced on every gated push whatever it reads, because the difference between
+# the two answers is whether an inherited red lands.
+read_policy_at "$main_remote"
+echo "pre-push: inherited-red policy at ${main_remote:0:8} reads $PP_POLICY — $PP_WHY (read from $_gate_env_rel at that sha, never from the pushed tree)"
 
-# 3. the recorded green is further behind the tip than the bound allows.
-if [ -z "$force" ]; then
-  lag=$(git rev-list --count "$rec_sha..$main_local" 2>/dev/null || echo 0)
-  [ "${lag:-0}" -gt "$GATE_FULL_MAX_LAG" ] \
-    && force="the recorded full green is $lag commits behind the tip (bound $GATE_FULL_MAX_LAG)"
-fi
-
-# 4. the record's TREE fingerprint does not reproduce AT THE SHA IT NAMES.
-#    AT THE RECORDED SHA, never at the tip. The digest is taken over the committed tree object, so
-#    it moves on every commit; joining it against a fresh fingerprint of the PUSHED TIP would fire
-#    on every push whose tree had moved, which is exactly the population predicates 2 and 3 already
-#    admit — it would force full forever while reading as caution. The helper is CALLED, never
-#    reimplemented: two implementations of one digest disagree silently and then force forever.
-if [ -z "$force" ] && [ -n "$rec_fp" ] && [ -x "$kitfp" ]; then
-  fresh=$(bash "$kitfp" "$rec_sha" 2>/dev/null)
-  [ -n "$fresh" ] && [ "$fresh" != "$rec_fp" ] \
-    && force="the recorded tree fingerprint does not reproduce at ${rec_sha:0:8}"
-fi
-
-# 5. the pushed tip is a MERGE whose second parent the record cannot speak for. Every build lands
-#    on the default branch here as a merge commit, so this row fires on any first-attempt landing
-#    whose recorded green was not earned on that exact second parent — not only on a retry. Kept at
-#    that width deliberately: a merge tip the record does not cover is precisely the case the record
-#    cannot speak for.
-if [ -z "$force" ]; then
-  p2=$(git rev-parse -q --verify "$main_local^2" 2>/dev/null || true)
-  [ -n "$p2" ] && ! git merge-base --is-ancestor "$p2" "$rec_sha" 2>/dev/null \
-    && force="the pushed tip is a merge whose second parent ${p2:0:8} the recorded green does not cover"
-fi
-
-# 6. the diff touches the LEG MANIFEST, so the scoping decision itself has changed. A guard added,
-#    widened or removed in this very push cannot be trusted to scope this very push.
-if [ -z "$force" ]; then
-  git diff --quiet "$rec_sha" "$main_local" -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null \
-    || force="the pushed diff touches the leg manifest, so the scoping rules themselves moved"
-fi
-
-# 7. the recorded manifest blob differs from the one this tree holds — the same concern as 6, from
-#    the record's side, and it catches an uncommitted or differently-resolved manifest that a diff
-#    between two commits cannot see.
-if [ -z "$force" ] && [ -n "$rec_blob" ]; then
-  now_blob=$(git hash-object -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null)
-  [ -n "$now_blob" ] && [ "$now_blob" != "$rec_blob" ] \
-    && force="the leg manifest differs from the one the recorded green was earned on"
-fi
-
-# 8. the recorded green was earned with the KIT-SUBJECT legs HELD, and this push would run them.
-#    COVERAGE, not equality. A record earned with the self-tests ON is strictly stronger evidence
-#    than a switch-off push needs, so it satisfies one — forcing there would cost every adopter the
-#    whole saving TOOL-dUnstalledConvoy-26 exists to give, at the one boundary it was measured for.
-#    The relation only bites in the other direction: a weaker record offered for a stronger push.
-#    Without this predicate the `selftests` field the stamp writes is a byte nobody consults, and
-#    the boundary trusts a partial bar as a whole one. TOOL-dUnstalledConvoy-27.
-if [ -z "$force" ] && [ -n "${GATE_SELFTESTS:-}" ] && [ "$rec_st" != "1" ]; then
-  force="this push runs the kit self-tests and the recorded full green was earned with them HELD"
+# THE INHERITED GREEN (KF2), looked for WHENEVER predicates 1 to 8 would force FULL: the full green
+# absent, or present and refused by any of 2 to 8. Reading it only when the full green is ABSENT would
+# force a FULL bar on every push from a git dir that ever earned a full green, for as long as the
+# default branch holds an inherited red. It selects the scoped gate only when the policy at R is
+# `land`, its `base` IS the remote sha on this hook's stdin, its `max_age` IS the bound parsed at that
+# sha, and its `sha` passes predicates 2 to 8 exactly as a full green would. It never satisfies
+# predicate 1 in the full green's place: it is a different file, read in a different branch, and a
+# FULL force it does not lift still names why it was not used.
+inh_sha=""; inh_why=""
+if [ -n "$force" ] && [ -f "$gd/gate-inherited-green" ]; then
+  _ig="$gd/gate-inherited-green"
+  ig_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$_ig" 2>/dev/null)
+  ig_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$_ig" 2>/dev/null)
+  ig_blob=$(awk -F'\t' '$1=="manifest_blob"{print $2}' "$_ig" 2>/dev/null)
+  ig_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$_ig" 2>/dev/null)
+  ig_base=$(awk -F'\t' '$1=="base"{print $2}' "$_ig" 2>/dev/null)
+  ig_age=$(awk -F'\t' '$1=="max_age"{print $2}' "$_ig" 2>/dev/null)
+  full_force=$force
+  if [ "$PP_POLICY" != land ]; then
+    inh_why="an inherited green is not read while the policy at R reads $PP_POLICY"
+  elif [ -z "$ig_sha" ] || [ "$ig_base" != "$main_remote" ]; then
+    inh_why="the inherited green was earned against base ${ig_base:0:8} and the remote holds ${main_remote:0:8}"
+  elif [ "$ig_age" != "$PP_MAX_AGE" ]; then
+    inh_why="the inherited green was written under max_age ${ig_age:-none} and the bound at ${main_remote:0:8} is $PP_MAX_AGE"
+  else
+    check_green_record "$ig_sha" "$ig_fp" "$ig_blob" "$ig_st" "inherited green"
+    if [ -z "$force" ]; then inh_sha=$ig_sha; else inh_why="the inherited green ${ig_sha:0:8} is refused too: $force"; fi
+  fi
+  [ -n "$inh_sha" ] || force=$full_force
 fi
 
 # THE DECISION AND ITS REASON, on one line, always. A boundary that silently chooses the cheap path
 # is indistinguishable from one that is broken, and this line is the only place the choice is
 # visible to the person whose push it is.
-if [ -n "$force" ]; then
-  echo "pre-push: FULL gate on $def push (${main_local:0:8}) — $force"
+if [ -n "$inh_sha" ]; then
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) — inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force"
+  export GATE_BASE="$inh_sha"
+  RUNLOG_DECISION=scoped
+elif [ -n "$force" ]; then
+  echo "pre-push: FULL gate on $def push (${main_local:0:8}) — $force${inh_why:+; $inh_why}"
   export GATE_FULL=1
   RUNLOG_DECISION=full
 else
@@ -624,20 +731,82 @@ else
 fi
 # THE BAR'S RUN ID, pinned so this push's END joins the bar's own run-log line by id. Set BEFORE the
 # bar, like the decision, so a push killed mid-bar still names the bar it was waiting on.
-if [ -n "${EPOCHREALTIME:-}" ]; then RUNLOG_GATE_RUN="push-${EPOCHREALTIME//[!0-9]/}-$$"
-else printf -v RUNLOG_GATE_RUN 'push-%(%s)T-%s' -1 "$$"; fi
+# UNPREDICTABLE AND CLEARED FIRST (TOOL-dDerivedDocket-24, in the spelling the honest-verdicts unit
+# specifies for its own pin): the id carries `$$` and `$RANDOM`, and any directory of that name under
+# the run root is removed before the bar starts, because this hook READS that run's record after the
+# bar and a record the runner never wrote must not be mistaken for one it did. `$RANDOM` rides the
+# digit run, so the id keeps the `push-<digits>-<pid>` shape the run log joins on.
+if [ -n "${EPOCHREALTIME:-}" ]; then RUNLOG_GATE_RUN="push-${EPOCHREALTIME//[!0-9]/}${RANDOM}-$$"
+else printf -v RUNLOG_GATE_RUN 'push-%(%s)T%s-%s' -1 "$RANDOM" "$$"; fi
+[ -n "$gd" ] && rm -rf "$gd/gate-run/$RUNLOG_GATE_RUN" 2>/dev/null
 export GATE_RUN_ID="$RUNLOG_GATE_RUN"
 # A RED AT THE PUSH BOUNDARY IS ATTRIBUTED against the sha the REMOTE holds for the default branch —
 # the one git fed this hook on stdin, which is the landing base and never this clone's own tip, so a
 # red is re-run against the tree the push would land on rather than against the tree that has it.
-# REPORT-ONLY: the runner changes no exit code for it, and this hook's exit is the runner's, as
-# before. An all-zero sha is a branch the remote does not have yet, so there is no base to name. A
-# runner older than the attribution ignores the variable. TOOL-dDerivedDocket-23.
+# An all-zero sha is a branch the remote does not have yet, so there is no base to name. A runner
+# older than the attribution ignores the variable. TOOL-dDerivedDocket-23. The policy read at R rides
+# with it, and the age bound only under `land`, the one policy that reads the age.
 if [ -n "$main_remote" ] && [ -n "${main_remote//0/}" ]; then
   export GATE_ATTRIBUTE="$main_remote"
+  export GATE_INHERITED_RED="$PP_POLICY"
+  [ -n "$PP_MAX_AGE" ] && export GATE_INHERITED_RED_MAX_AGE="$PP_MAX_AGE"
 fi
+
+# check_inherited_verdict <run dir> — rc 0 when THAT bar's own record reads RED on an UNMOVED tree,
+# its wall unfired, and every failed leg INHERITED with a proven age inside the bound, attributed
+# against the remote's own sha, one attribution row per failed leg. Sets PP_LEGS, or PP_NOT naming
+# the first condition that failed. It reads the record of the run id pinned above and no other.
+check_inherited_verdict() {
+  local d=$1 v tm fl wb n=0 bad="" leg ver rsha age
+  PP_LEGS=""; PP_NOT=""
+  if [ ! -f "$d/verdict" ]; then
+    PP_NOT="the bar left no verdict in its run record, so nothing says which legs failed"; return 1
+  fi
+  v=$(awk -F'\t' '$1=="verdict"{print $2}' "$d/verdict" 2>/dev/null)
+  tm=$(awk -F'\t' '$1=="tree_moved"{print $2}' "$d/verdict" 2>/dev/null)
+  fl=$(awk -F'\t' '$1=="failed"{print $2}' "$d/verdict" 2>/dev/null)
+  wb=$(awk -F'\t' '$1=="wall_breach"{print $2}' "$d/verdict" 2>/dev/null)
+  if [ "$tm" = yes ]; then
+    PP_NOT="the tree moved while the bar ran, so no verdict describes the pushed commit"; return 1
+  fi
+  if [ -n "$wb" ]; then PP_NOT="the bar's wall fired, so a leg it killed was never graded"; return 1; fi
+  if [ "$v" != RED ] || [ "$tm" != no ]; then
+    PP_NOT="the bar's verdict reads '${v:-none}' with tree_moved '${tm:-none}', not a RED on an unmoved tree"; return 1
+  fi
+  if [ ! -f "$d/attribution" ]; then
+    PP_NOT="the bar wrote no attribution record, so no red leg is shown to be inherited"; return 1
+  fi
+  while IFS=$'\t' read -r leg ver _ _ rsha age _; do
+    [ -n "$leg" ] || continue
+    n=$((n + 1))
+    PP_LEGS="$PP_LEGS${PP_LEGS:+, }$leg"
+    if [ "$ver" != INHERITED ]; then bad="$leg reads $ver"; break; fi
+    case "$age" in
+      ''|-|*[!0-9]*) bad="$leg reads INHERITED with age '${age:-none}', not a proven age inside the bound"; break ;;
+    esac
+    if [ "$rsha" != "$main_remote" ]; then bad="$leg was attributed against ${rsha:0:8}, not the remote's ${main_remote:0:8}"; break; fi
+  done < "$d/attribution"
+  if [ -n "$bad" ]; then PP_NOT=$bad; return 1; fi
+  if [ "$n" = 0 ] || [ "$n" != "${fl:-}" ]; then
+    PP_NOT="the attribution names $n red leg(s) and the verdict counts ${fl:-none} failed"; return 1
+  fi
+  return 0
+}
+
 gate=${GOV_GATE_CMD:-bash $GOV_KITROOT/run-gates/run-gates.sh}
 $gate </dev/null
 rc=$?
+# A RED ON INHERITED LEGS ONLY LANDS UNDER `land`, and nowhere else (D12-i4). The exit that follows is
+# still this hook's one exit, so the run log's decision stays the gate decision above; the landing is
+# the printed line. An attended push lands over it too: `land` is this repository's policy for every
+# push, not an unattended exception, and the line says so.
+if [ "$rc" -ne 0 ] && [ "$PP_POLICY" = land ]; then
+  if check_inherited_verdict "$gd/gate-run/$RUNLOG_GATE_RUN"; then
+    echo "pre-push: red on inherited legs only — landing under INHERITED_RED=land: $PP_LEGS"
+    rc=0
+  else
+    echo "pre-push: this red does not land under INHERITED_RED=land — $PP_NOT"
+  fi
+fi
 [ "$rc" -eq 0 ] || echo "pre-push: gate RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."
 RUNLOG_CLEAN=1; exit "$rc"

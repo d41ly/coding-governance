@@ -117,6 +117,7 @@
 - **TOOL-dDerivedDocket-5** — **auto-resume ships ON, in the kit and here**: the owner ruled it on everywhere, overriding charter §9's default-off gate for standing configuration for this feature alone; adopters opt out with `RESUME_SCHEDULE="off"`. Contract `guides/UNATTENDED-STOPS.md` §11.
 - **TOOL-dDerivedDocket-19** — **a `may:` grant is honoured only from an owner-committed `slug` README and lifts veto 2 only** (D12-j): an ask-row `may` is a proposal, a `SCOPE`-row one is V13, no run commit may write one. Contract `guides/UNATTENDED-PROTOCOL.md` §1.
 - **TOOL-dDerivedDocket-33** — **D2 and D6 signed by rule, under delegation**: `builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signed-same-id.md`, `builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signed-triage.md`; the rules are its spec's §4.
+- **TOOL-dDerivedDocket-24** — **gov lands over an inherited-only red** (D12-i4, bound 10 landings; the kit default parks): departs from the charter's 'blocks a red one' and 'green at the push boundary' and from the protocol's `gates-green`. Contract `guides/UNATTENDED-STOPS.md` §13.
 
 ## DEPL — deployer
 

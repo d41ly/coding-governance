@@ -439,3 +439,45 @@ carries `units-at-landing`. Under `primary`, a committed `LANDING` the remote al
 REPORTED naming `--landed` and never graded, since that is the verb that completes it. Each record is
 dated by its FIRST commit read with `--follow`, floored at a rotated folder's newest archive, so a
 rotation does not re-date it. Blank turns the arm off, announced.
+
+## 13. The inherited red — land, park, or absorb
+
+*`TOOL-dDerivedDocket-24`, by owner rulings D12-i4 and D12-i5. The hold code is §2's.*
+
+**The bar says whose a red is, and a policy says what happens next.** `gates-green` attributes a
+red against R, the tip `observe_anchor` saw the remote advertise, and ages each INHERITED leg against
+R's last `INHERITED_RED_MAX_AGE` first-parent landings: red with the same offenders at the far end
+is `aged`, and otherwise a bisection names the landing that introduced it. The policy is the pair of
+keys in the file `GATE_POLICY_FILE` names, both read at R and parsed, never sourced. Blank or
+malformed reads `park`, and so does `land` with no positive bound; the item announces which.
+
+- **`land`, every red INHERITED within the bound, on a bar whose verdict reads `tree_moved no`:**
+  MET, and the record gains `gates-inherited: <R8> <legs>`. The pre-push hook reads the same policy
+  at the same R and lands the push, printing the legs. An attended push lands over it too.
+- **`park`, the kit default, or any inherited red aged:** UNMET, printing
+  `hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`.
+  Take that hold in this order: commit the staged records, push the branch, reap the keepalive, then
+  `--hold` with that code, condition and reason and `--reaped`. It refuses a dirty tree otherwise.
+- **Any leg OWN, MIXED, DEAD PROBE or CONTENDED, or a moved tree:** UNMET with the attribution
+  lines. That red is the run's, and so is every red on a bar whose diff edited its own grader (KF3).
+
+**Every inherited leg gets an owner on the record.** Once `ASKS_CMD` is declared, the item files one
+ask per INHERITED leg in the build's `BACKLOG.md`: a `seen` locator pinned at R with the leg's `run`
+command, an `accept` clause, a SEV HIGH row and a KEEP row, staged and read back through `ASKS_CMD`.
+Rows the generator does not read back as one OPEN ask are removed and named. An OPEN ask this build
+already filed for the same leg at the same R is reused and named, so a repeated hold files nothing
+twice. With `ASKS_CMD` blank the item prints the rows it would file and writes nothing.
+
+**The two escape routes are backed or refused.** `--close --override gates-green` and
+`--abort --code gate-red-out-of-scope` are refused, numbered, unless the record the `gates-run` fact
+names reads every red leg INHERITED, on a bar whose header shows `head` equal to HEAD and
+`tree_clean yes` and whose verdict shows `tree_moved no`. The refusal names the condition that
+failed, and the remedy is `gates-green` on HEAD first.
+
+**ABSORB — the red fixed in-run.** An inherited red may be fixed beyond the declared write set when
+all FOUR hold: the attribution names its owner; no M3 veto is tripped; the fix is its OWN commit,
+subject `absorb(<slug>): <leg> inherited at <R8>`, naming no unit id; and the fix is recorded CLOSED
+against the ask filed for that leg. KF3 still binds, so a fix that edits the grader makes every red
+OWN. The gate leg's check 23 reads that subject as an ABSORB, reports the commit's paths on an
+`ABSORB` line, and counts it as neither a dodged join nor an undeclared write; the same paths under a
+subject that names a unit id are still the anomaly.

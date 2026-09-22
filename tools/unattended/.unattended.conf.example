@@ -177,6 +177,13 @@ MAP_CLI=""
 # so the dispatch is the one point that sees a spec while it can still be changed.
 SPEC_TOKENS_CLI=""
 
+# OPTIONAL. The repo-relative GATE POLICY FILE `gates-green` reads `INHERITED_RED=park|land` and
+# `INHERITED_RED_MAX_AGE=<n>` from, when the bar is red only on legs the landing base already carries.
+# Both this key and the file it names are read AS COMMITTED AT the tip the remote advertises and are
+# PARSED, never sourced, so a run cannot grant itself a landing by editing either. BLANK means no
+# policy is adopted and every inherited red PARKS as a hold, announced, which is the kit default.
+GATE_POLICY_FILE=""
+
 # OPTIONAL, the same shape again, and the one key an ASK-DRIVEN run needs. The generator the driver
 # calls to grade whether a mandated ask can be executed without asking anybody, and to list a filing
 # home's live asks in a refusal. The driver appends its own arguments; the call shapes are listed in

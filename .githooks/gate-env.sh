@@ -42,3 +42,16 @@
 #
 # The `export` line is DELETED rather than commented out. A commented assignment is a line somebody
 # uncomments without reading the paragraph above it.
+
+# ---- THE INHERITED-RED POLICY, by owner ruling D12-i4 (2026-09-13). TOOL-dDerivedDocket-24 -------
+# Gov LANDS over a red its default branch already carries, when every red leg reads INHERITED against
+# the remote's own tip and arrived within the last ten first-parent landings; a red older than that,
+# or one the run worsened, still blocks. The kit default is `park`, and no kit ships this path, so the
+# choice stays gov's for the reason the paragraphs above give for GATE_SELFTESTS.
+#
+# THESE TWO LINES ARE DATA, NOT SHELL, to both of their readers. `.githooks/pre-push` and the
+# unattended driver each PARSE them out of this file as committed at the remote's tip - never out of
+# the pushed tree and never by sourcing - so a branch that edits them here enables nothing until a
+# gated push has landed the edit. The source above still sets them as variables; nothing reads those.
+INHERITED_RED=land
+INHERITED_RED_MAX_AGE=10

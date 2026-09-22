@@ -333,9 +333,6 @@ bar does not echo. Neither fails on the count. It replaced an at-most-one-live-r
 **A build folder still carries at most one live record** — one `RUN.md`, and the leg refuses an
 ARCHIVED record in a non-terminal phase. That is now the only check grading a phase for it.
 
-**One residual:** two runs CLOSING together in one clone contend on the bar's turnstile, whose queue
-wait is charged against the gate bound, so the second can fail `gates-green` for contention.
-
 ## 4. The Definition of Done
 
 Thirteen kit-owned core items. Each names its checker, because an override budget must not be spent on
@@ -497,6 +494,7 @@ where this document says it may:
 | `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. |
 | `MAP_CLI` | the repo-relative path to the codebase-map probe whose lookup log `reuse-probed` also reads — the other half of the build method's M5 pair. OPTIONAL, on exactly `RECALL_CLI`'s terms: blank or absent means that kit is not adopted, and the item announces a skip only when NEITHER is declared. |
 | `SPEC_TOKENS_CLI` | the repo-relative path to the spec-token checker `--dispatch` runs over the live tree BEFORE it admits a build pass, refusing the dispatch on a non-zero exit. OPTIONAL, on `RECALL_CLI`'s terms: blank or absent means no spec-token checker is carried, and the verb announces the skip on stdout rather than passing over it. |
+| `GATE_POLICY_FILE` | the file `INHERITED_RED` and its age bound are read from, at R and never sourced. OPTIONAL: blank reads `park`, announced. `UNATTENDED-STOPS.md` |
 | `ASKS_CMD` | the ask generator the driver calls, in the shapes `UNATTENDED-ASKS.md` lists. OPTIONAL: blank or absent means not adopted, and the skip is announced |
 | `RESUME_SCHEDULE` · `RESUME_SCHEDULE_CREATE` · `RESUME_SCHEDULE_DELETE` · `RESUME_SCHEDULE_DELAY` · `RESUME_SCHEDULE_LIMIT` | the durable restart a hold owes. `UNATTENDED-STOPS.md` |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set. No path may sit under both keys |

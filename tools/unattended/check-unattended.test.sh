@@ -3070,6 +3070,40 @@ mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
+# ---- ABSORB (TOOL-dDerivedDocket-24 S9, AC8). The pass declared one path; a commit of its own, whose
+# ---- subject is the absorb grammar and names no unit id, fixed an inherited red at another path. It
+# ---- is reported on an ABSORB line and reaches neither anomaly branch. The CONTROL is the same paths
+# ---- under a subject that also names the unit: that commit IS the pass commit, and the path is an
+# ---- undeclared write whatever the subject starts with.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+mkdir -p fix && printf 'f\n' > fix/leg.txt
+git add -A && git commit -q -m "absorb(tRun): memory hygiene inherited at 0123abcd" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit  "$out" "check 23 ABSORB"
+hit  "$out" "'absorb(tRun): memory hygiene inherited at 0123abcd' wrote fix/leg.txt; an inherited red fixed in its own commit, graded as neither a dodged join nor an undeclared write"
+miss "$out" "check 23 FAILED"
+miss "$out" "the only join this check has was dodged"
+# ...and an absorb commit moving a DECLARED path while no commit names the pass is not a dodged join.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "absorb(tRun): memory hygiene inherited at 0123abcd" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit  "$out" "check 23 ABSORB"
+miss "$out" "the only join this check has was dodged"
+miss "$out" "check 23 FAILED"
+# CONTROL: the same paths with a unit id in the subject are the pass commit, graded and anomalous.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work fix && printf 'a\n' > work/one.txt && printf 'f\n' > fix/leg.txt
+git add -A && git commit -q -m "absorb(tRun): memory hygiene inherited at 0123abcd ARCH-tRun-1" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "check 23 ABSORB"
+hit  "$out" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
+
 # ---- THE WIDENING REPAIR, AND THE POST-HOC REWRITE THAT WEARS ITS CLOTHES (closing review F3/F4).
 # ---- `--dispatch`'s widening supersedes an OPEN pass's row and parks the replacement AT THE SAME
 # ---- ANCHOR, so a widened declaration is two rows under one key and the later binds. A widening

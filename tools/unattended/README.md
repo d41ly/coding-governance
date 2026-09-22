@@ -162,6 +162,17 @@ line per API-error end the stall-recorder saw (unit 4); `resume.<slug>.log`, one
 tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). Append-only and
 never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
 
+## The bar `--close` runs
+
+`gates-green` runs `GATE_CMD` under a run id the driver pins, attributes a red against the tip the
+remote advertises, and hands the bar the inherited-red policy it read at that tip. It then reads that
+bar's own run record: an inherited-only red within its age bound is met under `land`, parks as the
+`inherited-red` hold under `park`, and files an ask for each inherited leg once `ASKS_CMD` is
+declared. The contract is `UNATTENDED-STOPS.md`. One residual moved here from the protocol's §3 when
+that arm grew its decision table (`TOOL-dDerivedDocket-24`): two runs CLOSING together in one clone
+contend on the bar's turnstile, whose queue wait is charged against the gate bound, so the second can
+fail `gates-green` for contention.
+
 ## Running the kit's own checks
 
 ```

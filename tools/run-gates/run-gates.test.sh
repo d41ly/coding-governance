@@ -45,12 +45,14 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=205
+FLOOR_ASSERTIONS=211
 # RAISED 149 -> 188 by TOOL-dDerivedDocket-23: the `signature` key-set control and section 7's
 # thirty-eight red-attribution assertions, every one counted on a host with no `timeout` as well.
 # RAISED 188 -> 205 by TOOL-dDerivedDocket-25: arm 3a's `TMPDIR entries` presence check and the
 # sixteen owned-scratch assertions of section 8 (8a-8e), each counted whether it passes, fails or,
 # for 8e on a host with no `/proc`, announces its skip.
+# RAISED 205 -> 211 by TOOL-dDerivedDocket-24: section 7's six age-and-owner assertions (AC3, AC4,
+# AC17), none of them host-conditional.
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -1891,15 +1893,16 @@ else
   echo "canary: SKIP the three ceiling arms of section 7 — this host has no runnable 'timeout -k', so no ceiling can fire and a CONTENDED verdict cannot be staged here"
 fi
 # AC3's record — one TAB row per red leg, in the declared column order, the full R sha, reason LAST.
+# Nine columns since TOOL-dDerivedDocket-24 inserted age, owner sha8 and owner id before the reason.
 n=$((n+1))
 _a1rec=$(ls -1d "$A1"/.git/gate-run/*/ 2>/dev/null | tail -1)
 _a1sha=$(git -C "$A1" rev-parse HEAD)
 _a1red=$(printf '%s\n' "$a1out" | grep -c '^GATE FAIL  ')
 if [ -f "${_a1rec}attribution" ]; then
   awk -F'\t' -v sha="$_a1sha" -v m="$_a1red" '
-    NF != 6 || $5 != sha || $2 !~ /^(OWN|INHERITED|MIXED|CONTENDED|DEAD PROBE)$/ { bad = 1 }
+    NF != 9 || $5 != sha || $2 !~ /^(OWN|INHERITED|MIXED|CONTENDED|DEAD PROBE)$/ { bad = 1 }
     END { exit (bad || NR != m) }' "${_a1rec}attribution" \
-    || { echo "canary: attribution — AC3 the run record's attribution file is not one leg·verdict·inherited·own·R-sha·reason row per red leg"; head -3 "${_a1rec}attribution" | sed 's/^/    /'; fail=1; }
+    || { echo "canary: attribution — AC3 the run record's attribution file is not one leg·verdict·inherited·own·R-sha·age·owner·owner-id·reason row per red leg"; head -3 "${_a1rec}attribution" | sed 's/^/    /'; fail=1; }
 else
   echo "canary: attribution — AC3 the runner printed its GATE attr lines and wrote no attribution record"; fail=1
 fi
@@ -1990,6 +1993,59 @@ printf '%s\n' "$awout" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{
 n=$((n+1))
 { [ "$awrc" = 1 ] && [ "$_awel" -lt 100 ]; } \
   || { echo "canary: attribution — AC15 the runner outlived its own wall: exit $awrc after ${_awel}s against an 8s wall and a 120s R run"; fail=1; }
+# AC3 and AC17 of TOOL-dDerivedDocket-24 — AGE AND OWNER. A twelve-landing first-parent line whose one
+# leg goes red at a chosen landing and stays red; L is one unrelated commit past R. Under
+# `GATE_INHERITED_RED_MAX_AGE=10` a red that arrived inside the window reads INHERITED with its age and
+# the landing that introduced it, the record's row carries the three age columns before the reason,
+# and under `land` the inherited-green stamp names R, the bound and the leg while no full green is
+# written. The same leg red already at R~10 reads `aged`, and no inherited-green stamp is written.
+build_age_fixture() { # dir · the landing (1..12) the red arrives in -> sets AGE_R
+  local d=$1 at=$2 i
+  mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
+  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
+      && git config core.autocrlf false ) >/dev/null 2>&1
+  printf '#!/usr/bin/env bash\nif [ -s data/red.txt ]; then cat data/red.txt; exit 1; fi\nexit 0\n' > "$d/fx/r.sh"
+  printf '[\n  {"name": "aged leg", "argv": ["bash", "fx/r.sh"]}\n]\n' > "$d/tools/gate-legs.json"
+  : > "$d/data/red.txt"
+  ( cd "$d" && git add -A && git commit -qm "landing 0" ) >/dev/null 2>&1
+  for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+    [ "$i" = "$at" ] && printf 'FAIL offender\n' > "$d/data/red.txt"
+    printf '%s\n' "$i" > "$d/data/n.txt"
+    ( cd "$d" && git add -A && git commit -qm "merge: AGE-tFix-$i lands" ) >/dev/null 2>&1
+  done
+  AGE_R=$(git -C "$d" rev-parse HEAD)
+  printf 'L\n' > "$d/data/l.txt"
+  ( cd "$d" && git add -A && git commit -qm "L, past R" ) >/dev/null 2>&1
+}
+AG="$AT/ag"; build_age_fixture "$AG" 4
+_ag_own=$(git -C "$AG" log --format='%H %s' | awk '/AGE-tFix-4 lands/ { print substr($1, 1, 8); exit }')
+agout=$(run_attr_bar "$AG" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
+check_attr_line "$agout" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · age 8 · owner $_ag_own AGE-tFix-4" \
+  "AC3 a red that arrived inside the window names the landing that introduced it"
+n=$((n+1))
+_agrec=$(ls -1d "$AG"/.git/gate-run/*/ 2>/dev/null | tail -1)
+awk -F'\t' -v sha="$AGE_R" -v own="$_ag_own" '
+    NF != 9 || $2 != "INHERITED" || $5 != sha || $6 != "8" || $7 != own || $8 != "AGE-tFix-4" { bad = 1 }
+    END { exit (bad || NR != 1) }' "${_agrec}attribution" 2>/dev/null \
+  || { echo "canary: attribution — AC3 the row does not carry age 8, the owner and its id before the reason"; head -2 "${_agrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+{ [ -f "$AG/.git/gate-inherited-green" ] \
+    && [ "$(awk -F'\t' '$1=="base"{print $2}' "$AG/.git/gate-inherited-green")" = "$AGE_R" ] \
+    && [ "$(awk -F'\t' '$1=="max_age"{print $2}' "$AG/.git/gate-inherited-green")" = 10 ] \
+    && [ "$(awk -F'\t' '$1=="legs"{print $2}' "$AG/.git/gate-inherited-green")" = "aged leg" ]; } \
+  || { echo "canary: attribution — AC4 an inherited-only bar under land wrote no gate-inherited-green naming R, the bound and the leg"; fail=1; }
+n=$((n+1))
+[ ! -f "$AG/.git/gate-full-green" ] \
+  || { echo "canary: attribution — AC4 an inherited-only red bar wrote gate-full-green, which a later push would read as green"; fail=1; }
+AH="$AT/ah"; build_age_fixture "$AH" 1
+ahout=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
+check_attr_line "$ahout" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · aged at R~10" \
+  "AC3 a red already present at R~10 reads aged"
+n=$((n+1))
+[ ! -f "$AH/.git/gate-inherited-green" ] \
+  || { echo "canary: attribution — AC17 an aged leg still wrote gate-inherited-green, so a red past the bound would land"; fail=1; }
 rm -rf "$AT" 2>/dev/null || true
 
 # AC12 — EVERY DECLARED SIGNATURE, RUN ON THE TREE THIS CANARY GRADES, PRINTS KEYS AND NOTHING ELSE:

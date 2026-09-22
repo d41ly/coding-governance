@@ -3557,10 +3557,27 @@ done
 # before the loop that fills them. `ds_graded` is the LIVENESS half and counts rows that REACHED
 # the subset test, not rows that failed it: a hit count of zero is a clean tree, a GRADED count of
 # zero under a non-zero ceiling is a probe that died.
+# ---- ABSORB (TOOL-dDerivedDocket-24 S9, owner ruling D12-i5). A run may FIX a red it inherited,
+# ---- beyond its declared write set, in a commit of its own whose subject is exactly
+# ---- `absorb(<slug>): <leg> inherited at <R8>` and names NO unit id. Such a commit is classified
+# ---- ABSORB: its paths are reported on an `ABSORB` line, and it is kept out of BOTH anomaly
+# ---- branches — the dodged-join scan does not count it as a declared path moving, and it can never
+# ---- be a pass commit, because the join is a unit id its grammar forbids. A subject carrying a unit
+# ---- id is NOT an absorb, whatever it starts with, and stays graded as that unit's pass.
+# ---- WHAT THIS DOES NOT CHECK: that the leg named was inherited, that the fix touched only what the
+# ---- red needed, or that the ask it answers exists. Those are the Skill's four conditions, and this
+# ---- check reads a subject, which is the run's own sentence about its commit.
+check_absorb_subject() { # subject · slug -> 0 when it is an absorb subject for that slug
+  case "$1" in "absorb($2): "?*" inherited at "????????) ;; *) return 1 ;; esac
+  printf '%s' "${1##* inherited at }" | grep -qE '^[0-9a-f]{8}$' || return 1
+  printf '%s' "$1" | grep -qE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' && return 1
+  return 0
+}
 ds_over=""; ds_over_n=0; ds_graded=0
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
+  dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""
   ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
   # ONE ROW PER (anchor, unit), AND ITS PATHS ARE THE UNION OF EVERY ROW UNDER THAT KEY. The key
   # already carries the anchor, so rows at DIFFERENT anchors stay separate — they are different passes
@@ -3620,6 +3637,15 @@ for f in $RUNS; do
     dstop=$(next_anchor "$dsgrp" "$dsanchors")
     [ -n "$dstop" ] || dstop=HEAD
     dshit=$(pass_commit "$dsgrp" "$dsunit" "$f" "$dstop" || true)
+    # ABSORB commits inside this window, each reported ONCE per run however many windows hold it.
+    while IFS=$'\t' read -r dsah dsas; do
+      [ -n "$dsah" ] || continue
+      check_absorb_subject "$dsas" "$dsslug" || continue
+      case " $ds_absorbed " in *" $dsah "*) continue ;; esac
+      ds_absorbed="$ds_absorbed $dsah"
+      dsap=$(GIT diff-tree --no-commit-id --name-only -r "$dsah" 2>/dev/null | grep -v -x -F "$f" | tr '\n' ' ')
+      report "check 23 ABSORB ${dsah:0:8} in $f — '$dsas' wrote ${dsap% }; an inherited red fixed in its own commit, graded as neither a dodged join nor an undeclared write"
+    done < <(GIT log --format='%H%x09%s' "$dsgrp".."$dstop" 2>/dev/null)
     if [ -z "$dshit" ]; then
       # NO COMMIT NAMES THE PASS. Legal when the pass produced no change - M6 says a pass that
       # changed nothing commits nothing. NOT legal when the declared paths moved anyway: that is the
@@ -3630,7 +3656,13 @@ for f in $RUNS; do
       for dsp in $dsdecl; do
         # S4 — THE SAME UPPER BOUND. This scan asks whether a declared path moved while no commit
         # named the pass; unbounded it sees the NEXT pass's writes and reports them against this row.
-        GIT log --format=%H "$dsgrp".."$dstop" -- "$dsp" 2>/dev/null | grep -q . && dsmoved="$dsmoved $dsp"
+        # ...and an ABSORB commit moving a declared path is not the join being dodged (S9).
+        dsmv=0
+        while IFS= read -r dssub; do
+          [ -n "$dssub" ] || continue
+          check_absorb_subject "$dssub" "$dsslug" || { dsmv=1; break; }
+        done < <(GIT log --format=%s "$dsgrp".."$dstop" -- "$dsp" 2>/dev/null)
+        [ "$dsmv" = 1 ] && dsmoved="$dsmoved $dsp"
       done
       # ...and the run-state file is excluded from the OUTSIDE test too, for the same reason.
       if [ -n "$dsmoved" ]; then
