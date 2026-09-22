@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-21T18:31:27+03:00 @ f5b3aeae1e884f449ad569d949b6fbcca98c222c
+last-audit: 2026-09-22T10:15:14+03:00 @ 83129cd9b6986b87002e51227542a4b67986157d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 0ab9f70815603b7616bbcf1b5252eb6865e07aa3
+last-body-change: 83129cd9b6986b87002e51227542a4b67986157d
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -105,6 +105,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   `memory/HYGIENE.md` under "Acceptance ledger" and the gate reads shape and coverage only. The
   cutoff is a `.memory-tree.conf` date, so units that closed before the grammar existed are outside
   it; anything this session closes is inside it.
+
+- **A LIVE spec's §2 item that retires a named thing owes a `**Readers:**` clause**: `by name:` with
+  names a reader spells, then `by value:` with a reader or `NO VALUE READERS` and a reason. Hygiene
+  check 25, with no cutoff. The trigger, both escapes and what counts as a reader are
+  `memory/HYGIENE.md` item 25; the author's line is in the spec template's §2. `TOOL-dGatedProse-1`.
 
 - **A CLOSED unit whose spec grades THIN blocks `build-complete`** — an empty Scope, Acceptance
   criteria or Gates section, keyed on the heading TITLE and NOT the ordinal, which on a Tier-1 spec

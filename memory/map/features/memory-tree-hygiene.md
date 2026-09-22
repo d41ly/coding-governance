@@ -1,4 +1,4 @@
-# memory-tree hygiene engine — the 21-check gate over the memory tree
+# memory-tree hygiene engine — the gate over the memory tree
 
 ```toml
 feature = "memory-tree-hygiene"
@@ -31,8 +31,8 @@ globs = [
 
 ## What it is
 
-One shell engine over the tracked contents of `<MEMORY_ROOT>/`, 22 checks, plus the epoch rule that
-makes its verdicts datable. Checks 9 and 13-21 delegate to sibling Python modules
+One shell engine over the tracked contents of `<MEMORY_ROOT>/`, plus the epoch rule that
+makes its verdicts datable. Checks 9, 13-21 and 24 delegate to sibling Python modules
 (`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`); this dossier owns the engine,
 its self-test and the epoch, not those modules. The self-test's project-key arms run the engine over
 the suite's own scratch tree, one invocation per arm, never over an archive of this repository

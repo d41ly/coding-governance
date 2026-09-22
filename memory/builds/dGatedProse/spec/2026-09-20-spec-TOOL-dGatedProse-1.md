@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads
 
-**Status:** SPECCED · rev-9 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
+**Status:** SPECCED · rev-10 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -1214,16 +1214,19 @@ delta row above, because the corpus pass is unit 5's.
   `tools/memory-tree/check-memory-hygiene.sh` returns ONE line that this unit's diff adds, the same
   line for all six, immediately beside the verb list, and otherwise only lines the file carried at
   this unit's base, none of which holds a second phrase of the set; while the same grep over
-  `.memory-tree.conf` and `tools/memory-tree/.memory-tree.conf.example` returns nothing.
+  `.memory-tree.conf` and `tools/memory-tree/.memory-tree.conf.example` returns no line this unit
+  adds and no line holding a second phrase of the set, so neither conf declares it.
   Red when: the shape does not fire, which leaves the owner's O3 closure unbuilt; or the noun set
   exists in two carriers, which is the disagreement the single literal exists to prevent; or a line
   the diff adds, other than the literal, spells a phrase of the set, which is a second copy inside
   the one carrier.
   figure: the set fires on 0 items of the live corpus and 0 of the 641-spec selection at
   `67bec01a` under the shipped list, DERIVED, so the fixture is its whole coverage and the corpus
-  cannot witness it. The base line is DERIVED at observation time by the same grep over the base
-  blob: at `9749b43e` it is one, the phrase `status token` inside check 8's failure message about
-  backlog rows, which names that check's vocabulary and not this set.
+  cannot witness it. The base lines are DERIVED at observation time by the same greps over the base
+  blobs. At `9749b43e` the engine carries two: `enum value` in the comment that documents
+  `FAMILIES`, and `status token` in check 8's failure message about backlog rows. Each conf carries
+  one, `enum value`, in its own comment documenting `FAMILIES`. Each is a single phrase naming
+  another rule's vocabulary, and none is this set.
 - **AC12** — When `tFixture-210` carries the identical defect as `tFixture-200` under a `CLOSED`
   status header, the run is silent for it while still naming `tFixture-200` in the same run.
   Red when: the arm grades a terminal spec, which would demand rewriting a frozen record to clear a
@@ -1770,6 +1773,15 @@ here, where it would read as an observation.
   image blob would resolve by content through a file nothing reads as text. Every token unit 5's
   census resolved by content resolved through a text file, so no census row moves.
   REFUSED: nothing.
+- rev-10 · 2026-09-22 · §6 AC11 · §9 · the build pass, before the code commit. rev-9 derived one
+  base line and there are more: the engine's own comment documenting `FAMILIES` spells
+  `enum value`, and so does the matching comment in `.memory-tree.conf` and in the conf example,
+  which made rev-9's "the same grep over the two confs returns nothing" false at the base as well.
+  Found by the build pass running AC11's greps over the engine it was writing, which also caught one
+  of its own new comment lines spelling `status value`; that line was reworded before the commit.
+  AC11 now asks the confs for what the criterion protects, that neither DECLARES the set: no line the
+  unit adds, and no line holding a second phrase of it. The figure names every base line. rev-9's
+  entry above is left as written. REFUSED: nothing.
 
 ## 10. Reuse audit
 

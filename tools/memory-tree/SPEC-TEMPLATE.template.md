@@ -291,6 +291,16 @@ spec carries BOTH this heading and an Acceptance criteria heading, found by head
 by number, so a Tier-1 spec that legitimately writes no acceptance section is untouched. SHAPE only:
 it asserts the item names a label, never that the criterion so named actually observes it.
 
+An item that retires a name, a row kind or a vocabulary member answers for its readers, on its own
+lines: `**Readers:**`, then `by name:` and the readers that spell the name, then `by value:` and the
+readers that compare, count or derive from its value. One escape per half, each with a reason:
+`NO VALUE READERS` on the by-value half, and `READER NOT IN TREE` on the by-name half for a name that
+lives outside this tree. Hygiene check 25 asks it of every LIVE spec, with no cutoff: an item
+triggers when a retirement verb, matched ignoring case and in the past tense too, sits beside a
+backticked identifier, a markdown path included, and a clause is graded wherever it appears. Each
+name the by-name half lists must be spelled by a reader, not merely quoted by a record. SHAPE and
+RESOLUTION only: nothing asks whether the list is complete, which is the author's question to answer.
+
 ## 3. Non-goals (OUT)
 
 The explicit cut-line: what an eager builder might include but must not. Name follow-ups.
