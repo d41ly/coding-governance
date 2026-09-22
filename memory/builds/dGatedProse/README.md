@@ -64,7 +64,7 @@ ids TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dGatedProse-5 — the corpus answers for its readers before the check that asks](spec/2026-09-21-spec-TOOL-dGatedProse-5.md) | 1 | 2 | CLOSED | rev-8 | 2026-09-22 |
-| [TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads](spec/2026-09-20-spec-TOOL-dGatedProse-1.md) | 2 | 2 | SPECCED | rev-8 | 2026-09-22 |
+| [TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads](spec/2026-09-20-spec-TOOL-dGatedProse-1.md) | 2 | 2 | SPECCED | rev-9 | 2026-09-22 |
 | [TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold](spec/2026-09-20-spec-TOOL-dGatedProse-2.md) | 3 | 2 | SPECCED | rev-6 | 2026-09-22 |
 | [TOOL-dGatedProse-3 — the guide cap rises on both axes, with the reason recorded beside the figure](spec/2026-09-20-spec-TOOL-dGatedProse-3.md) | 4 | 2 | SPECCED | rev-5 | 2026-09-21 |
 | [TOOL-dGatedProse-4 — M4 bounds the spec-audit promotion chain by review precision](spec/2026-09-20-spec-TOOL-dGatedProse-4.md) | 5 | 2 | SPECCED | rev-7 | 2026-09-22 |

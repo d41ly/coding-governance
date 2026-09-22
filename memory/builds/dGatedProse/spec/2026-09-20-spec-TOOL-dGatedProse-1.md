@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
+**Status:** SPECCED · rev-9 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -73,9 +73,9 @@ here is S14, which verifies that and clauses whatever entered the population in 
   RECORD, which quotes a name and so resolves nothing by content. By IDENTITY, when the token equals
   a tracked path or the part of one after a `/`, tested against the WHOLE tracked set, records
   included, because a path proves the file exists wherever it lives. ONE batched
-  `git grep -l -F -f` narrows the tree to candidate files, the reader rule is applied as a FILTER
-  over that path list and never as a pathspec, and an awk pass over the surviving files attributes
-  each token. §4 gives each class its reason and measures the rate. The escape's every covered name
+  `git grep -I -l -F -f` narrows the tree to candidate text files, the reader rule is applied as a
+  FILTER over that path list and never as a pathspec, and an awk pass over the surviving files
+  attributes each token. §4 gives each class its reason and measures the rate. The escape's every covered name
   is PRINTED, so a skip announces itself. Observed by AC2, AC4, AC5, AC17 and AC26.
 - **S6** — one `fail 25` branch, split out of the check-12 awk on its own control-character tag,
   whose message names the file, the offending item label, which half is missing or which name is
@@ -1211,14 +1211,19 @@ delta row above, because the corpus pass is unit 5's.
   binds.
 - **AC11** — When `tFixture-207` carries a retirement verb, a backticked bare word and a declared
   kind noun and no clause, the run NAMES it; and a grep for each of the six noun phrases over
-  `tools/memory-tree/check-memory-hygiene.sh` returns one line each, all six adjacent and
-  immediately beside the verb list, while the same grep over `.memory-tree.conf` and
-  `tools/memory-tree/.memory-tree.conf.example` returns nothing.
+  `tools/memory-tree/check-memory-hygiene.sh` returns ONE line that this unit's diff adds, the same
+  line for all six, immediately beside the verb list, and otherwise only lines the file carried at
+  this unit's base, none of which holds a second phrase of the set; while the same grep over
+  `.memory-tree.conf` and `tools/memory-tree/.memory-tree.conf.example` returns nothing.
   Red when: the shape does not fire, which leaves the owner's O3 closure unbuilt; or the noun set
-  exists in two carriers, which is the disagreement the single literal exists to prevent.
+  exists in two carriers, which is the disagreement the single literal exists to prevent; or a line
+  the diff adds, other than the literal, spells a phrase of the set, which is a second copy inside
+  the one carrier.
   figure: the set fires on 0 items of the live corpus and 0 of the 641-spec selection at
   `67bec01a` under the shipped list, DERIVED, so the fixture is its whole coverage and the corpus
-  cannot witness it.
+  cannot witness it. The base line is DERIVED at observation time by the same grep over the base
+  blob: at `9749b43e` it is one, the phrase `status token` inside check 8's failure message about
+  backlog rows, which names that check's vocabulary and not this set.
 - **AC12** — When `tFixture-210` carries the identical defect as `tFixture-200` under a `CLOSED`
   status header, the run is silent for it while still naming `tFixture-200` in the same run.
   Red when: the arm grades a terminal spec, which would demand rewriting a frozen record to clear a
@@ -1753,6 +1758,17 @@ here, where it would read as an observation.
   and 1200 lines, and on the build method's line half rising with its byte cap move no figure here:
   this spec states neither cap, and its render of `memory/guides/BUILD-METHOD.md` at order 2 is
   byte-identical and precedes unit 4's edit. The rev-7 entry is otherwise left as written.
+  REFUSED: nothing.
+- rev-9 · 2026-09-22 · §2 S5 · §6 AC11 · §9 · the build pass, before any code. **AC11's grep.** It
+  required each noun phrase to return one line over the engine, and the engine already carries one
+  of the six at the pass base `9749b43e`: `status token`, inside check 8's failure message about
+  backlog rows. That line names check 8's vocabulary and is no copy of the set, and rewording a
+  failure message check 8's arm is signed with would move a sibling check to satisfy a criterion
+  about this one. So AC11 now counts the lines this unit's DIFF adds, which must be the one literal,
+  and derives the base line rather than pinning it; the property the criterion protects, one copy of
+  the set, is unchanged. **S5's grep skips binary files**, `-I`: a short token matched inside an
+  image blob would resolve by content through a file nothing reads as text. Every token unit 5's
+  census resolved by content resolved through a text file, so no census row moves.
   REFUSED: nothing.
 
 ## 10. Reuse audit
