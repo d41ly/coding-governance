@@ -9,6 +9,11 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+lease-utc: 2026-09-22T18:31:27Z
+pid-image: claude.exe
+host: compeeto
+pid: 22380
+session: 2588f719-5358-4984-93bc-1f908a71e0ab
 hold-run: 
 hold-streak: 1 · at 4c842945
 resume-owed: none · owner
@@ -17,13 +22,13 @@ hold-reason: Paused at the owner's instruction near the weekly usage limit, afte
 hold-until: owner
 hold-code: platform-limit
 held-from: BUILDING
-witness: 4c84294518a8096daa1f52fde86375a0a7a5df96
-phase: HELD
+witness: e0c5f470d692ab78d2997484296e2bcfb7b36bad
+phase: BUILDING
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
 anchor-kind: run-branch
-keepalive: 00c7d786
+keepalive: 3575a45e
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 7484d8d7b107c0357943345e11d9b1d9bc337bea
 anchor-ref: refs/heads/main
@@ -296,3 +301,5 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-22T08:38:20Z rescope · item add TOOL-dDerivedDocket-65 · reason Promoted at the G9 converged exit (H1): once unit 61 records this session, a session waiting on its own sub-agents is not on the liveness clock, so a long wave reads STALE in the run worktree; this unit adds a sub-agent transcript term to derive_last_move.
 
 2026-09-22T09:24:22Z hold · item platform-limit · reason until owner · unreachable d · resume none(owner)
+
+2026-09-22T18:31:27Z resume · item dDerivedDocket · reason held · keepalive 3575a45e · manual
