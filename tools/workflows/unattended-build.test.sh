@@ -595,25 +595,31 @@ has    "V5 attended: the main return carries the stage's counts" "$o" '"promoted
 # below against the unchanged render and callee, GREEN after.
 MT_T2="$HERE/tier2-review.js"
 MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"s1","blob":"abc1234"}],"round":1,"reviewDir":"r/"}'
-# `build_merged_returns <items-json|absent> [judged]`: four lenses of twelve findings each are ids 1-48;
-# the skeptic double judges ids 1 to `judged` (default 48), confirming the thirteen below and refuting
-# the rest, so an id above `judged` comes back UNVERIFIED; the synthesis double returns the given
-# items, or no `items` key at all for `absent`.
+# `build_merged_returns <items-json|absent> [judged] [shape-json]`: four lenses of twelve findings each
+# are ids 1-48; the skeptic double judges ids 1 to `judged` (default 48), confirming the thirteen below
+# and refuting the rest, so an id above `judged` comes back UNVERIFIED; the synthesis double returns
+# the given items, or no `items` key at all for `absent`. `shape` replaces the measured audit the
+# double replays: `confirmed` ids, `lenses` as label prefix to finding count in the order the double
+# matches them, `typed` as the blockers and highs that audit's synthesis typed, and its `summary`.
 # `run_merged_review <returns>` runs the callee with its doubles answering as their SCHEMAS allow, so
 # a synthesis schema that stopped requiring `items` drops the key and reds the counting arms.
 build_merged_returns() {
   node -e '
-    const confirmed = new Set([1, 4, 7, 9, 11, 14, 16, 20, 22, 26, 30, 33, 40])
+    const shape = process.argv[3] ? JSON.parse(process.argv[3]) : {
+      confirmed: [1, 4, 7, 9, 11, 14, 16, 20, 22, 26, 30, 33, 40],
+      lenses: { "find:": 12 }, typed: [1, 5], summary: "13 confirmed in 10 items" }
+    const confirmed = new Set(shape.confirmed)
     const finding = { file: "s1", where: "section 2", severity: "high", claim: "c", impact: "i", fix: "f" }
     const verdicts = Array.from({ length: Number(process.argv[2]) }, (_, i) =>
       ({ id: i + 1, verdict: confirmed.has(i + 1) ? "confirmed" : "refuted", reason: "r" }))
-    console.log(JSON.stringify({
-      "find:": { lens: "l", findings: Array.from({ length: 12 }, () => finding) },
-      "verify:": { verdicts },
-      synth: { path: "r/merged.md", summary: "13 confirmed in 10 items", blockers: 1, highs: 5,
-        items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]) },
-    }))
-  ' "$1" "${2:-48}"
+    const out = {}
+    for (const [prefix, count] of Object.entries(shape.lenses))
+      out[prefix] = { lens: "l", findings: Array.from({ length: count }, () => finding) }
+    out["verify:"] = { verdicts }
+    out.synth = { path: "r/merged.md", summary: shape.summary, blockers: shape.typed[0], highs: shape.typed[1],
+      items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]) }
+    console.log(JSON.stringify(out))
+  ' "$1" "${2:-48}" "${3:-}"
 }
 # The measured record's two merges are B1 (14, 26, 40) and H2 (16, 4); every other item holds one id.
 MT_MERGED='[{"severity":"BLOCKER","ids":[14,26,40]},{"severity":"HIGH","ids":[1]},{"severity":"HIGH","ids":[16,4]},{"severity":"HIGH","ids":[7]},{"severity":"HIGH","ids":[9]},{"severity":"HIGH","ids":[11]},{"severity":"MEDIUM","ids":[20]},{"severity":"MEDIUM","ids":[22]},{"severity":"MEDIUM","ids":[30]},{"severity":"MEDIUM","ids":[33]}]'
@@ -683,6 +689,39 @@ has    "MT zero confirmed and 48 unverified reaches the synthesis" "$au" '"confi
 has    "MT ...and an empty item list counts 0 and 0, not null" "$au" '"blockers":0,"highs":0'
 o=$(run_merged_build "$au" CONVERGED '{"disposed":true,"standing":[],"promoted":0,"folded":48,"refuted":0,"promotedIds":[],"edges":[],"placements":[],"summary":"s"}')
 has    "MT ...and the harness disposes the unverified population" "$o" "disposal: done — promoted 0 · folded 48"
+# THE SECOND MEASURED AUDIT, dLoggedFlight's round-1 spec audit of units 14, 16 and 20, ran on the
+# unfixed harness and failed the same way with a wider gap. 46 raw, 16 confirmed, merged into 9 items:
+# 2 BLOCKER, 3 HIGH, 3 MEDIUM and 1 LOW by item, 4, 6, 5 and 1 by raw finding. The synthesis typed
+# blockers 2 and highs 3, so the guard demanded 11 folds where only 6 raw findings sit at MEDIUM or
+# LOW, and no honest disposal passed, by raw id (10 and 6) or by item (5 and 4). The arms below replay
+# that record's own merges, B1 (38, 29), B2 (39, 30), H1 (1, 20, 43), H3 (40, 31), M1 (25, 9) and
+# M2 (41, 6), with H2, M3 and L1 one id each. One lens returns 10 findings and three return 12.
+MT20_SHAPE='{"confirmed":[1,2,6,9,10,16,20,25,29,30,31,38,39,40,41,43],"lenses":{"find:underspecification":10,"find:":12},"typed":[2,3],"summary":"16 confirmed in 9 items"}'
+MT20_MERGED='[{"severity":"BLOCKER","ids":[38,29]},{"severity":"BLOCKER","ids":[39,30]},{"severity":"HIGH","ids":[1,20,43]},{"severity":"HIGH","ids":[2]},{"severity":"HIGH","ids":[40,31]},{"severity":"MEDIUM","ids":[25,9]},{"severity":"MEDIUM","ids":[41,6]},{"severity":"MEDIUM","ids":[16]},{"severity":"LOW","ids":[10]}]'
+MT20_DISPOSE='{"disposed":true,"standing":[],"promoted":10,"folded":6,"refuted":0,"promotedIds":["A-tB-21","A-tB-22","A-tB-23","A-tB-24"],"summary":"10 promoted into 4 units, 6 folded"}'
+t2=$(run_merged_review "$(build_merged_returns "$MT20_MERGED" 46 "$MT20_SHAPE")")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+# LIVENESS, and the MERGE is part of it: a double that put one id in each item would count 4 and 6
+# too, and would reproduce nothing the record measured.
+has    "MT20 the callee ran over the measured shape — 46 raw, 16 confirmed, 30 refuted" "$au" '"raw":46,"confirmed":16,"refuted":30,"unverified":0'
+has    "MT20 ...over nine items that split differently by item and by raw finding" "$t2" "by item 2/3/3/1, by raw confirmed finding 4/6/5/1"
+has    "MT20 the callee counts blockers and highs over RAW confirmed findings, not over items" "$au" '"blockers":4,"highs":6'
+# THE MEASURED REFUSAL, reproduced as a control: the same RESULT carrying the integers that audit's
+# synthesis typed refuses the raw-id disposal, so the arms after it can tell the counts apart.
+o=$(run_merged_build "$(printf '%s' "$au" | sed 's/"blockers":4,"highs":6/"blockers":2,"highs":3/')" BOUNDED "$MT20_DISPOSE")
+has    "MT20 control: item-typed counts refuse the raw-id disposal, as measured" "$o" "folded 6 is below the 11 confirmed at MEDIUM or LOW"
+o=$(run_merged_build "$au" BOUNDED "$MT20_DISPOSE")
+has    "MT20 the disposal stage RAN over the callee's counts" "$o" "agent:dispose:tB"
+has    "MT20 promoted 10 and folded 6, by raw id, is ACCEPTED" "$o" "disposal: done — promoted 10 · folded 6"
+hasnt_ "MT20 ...and is not refused as a bad severity split" "$o" "do not split by severity"
+has    "MT20 ...and the roster is handed out" "$o" '"roster":[{'
+# ONE BASIS BOTH WAYS. A disposal counted by ITEM no longer reconciles, and one that promotes the item
+# count while folding the rest has folded raw HIGH or BLOCKER findings into prose.
+o=$(run_merged_build "$au" BOUNDED '{"disposed":true,"standing":[],"promoted":5,"folded":4,"refuted":0,"promotedIds":["A-tB-21"],"summary":"by item"}')
+has    "MT20 a disposal counted by item is REFUSED" "$o" "promoted 5 + folded 4 + refuted 0 + standing 0 is not confirmed 16 + unverified 0"
+o=$(run_merged_build "$au" BOUNDED '{"disposed":true,"standing":[],"promoted":5,"folded":11,"refuted":0,"promotedIds":["A-tB-21"],"summary":"item promotions"}')
+has    "MT20 promoting only the item count is REFUSED by the raw floor" "$o" "promoted 5 is below blockers 4 + highs 6"
+hasnt_ "MT20 ...and hands out no roster" "$o" '"roster":[{'
 
 # ---- AC5: a disposal that did NOT finish hands out NO roster. There is no partial hand-out: a
 # ---- roster minus the units a blocker touches is a judgement this runtime cannot make, having no
