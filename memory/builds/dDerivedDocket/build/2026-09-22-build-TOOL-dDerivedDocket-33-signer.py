@@ -24,7 +24,8 @@ WHAT IT READS, AND WHERE.
 WHAT IT DOES NOT CHECK, said out loud because a signature reads as a judgment to everybody who did
 not write it. It does not decide whether a commit or a spec ANSWERS an ask; it decides whether the
 evidence names the ask in the one place the rule accepts (a spec header's `closes` verb, a commit
-subject). A commit whose subject names an ask and answers half of it signs CLOSED, and D4's REOPEN
+subject, a row's status slot or opening word). A commit whose subject names an ask and answers half
+of it signs CLOSED, and D4's REOPEN
 is the repair. It never originates a hold: T5 signs one only when the row's own author wrote the
 target. It assigns no severity. It writes no BACKLOG.md: the switch-over applies these records.
 
@@ -72,6 +73,11 @@ T1_EXCLUDED = {"TOOL-aWeighedCompass-3": "the flip disposes it as WONTDO, supers
 
 #: The planner unit whose worksheets are signed by default.
 PLANNER_UNIT = "TOOL-dDerivedDocket-11"
+
+#: T4's second declared place: a row whose TEXT OPENS with the token. The first is the status slot.
+#: A withdrawal word anywhere else is prose — over unit 11's worksheet 45 rows carry one, every one
+#: with an OPEN or SPECCED slot and none opening its text with it — and prose is never read as one.
+WITHDRAWAL_LEAD = re.compile(r"^(WITHDRAWN|WONTDO)\b")
 
 TAILS = ("landing", "switch")
 PROPOSALS = ("none", "CLOSED", "WONTDO", "BLOCKED", "DEFERRED")
@@ -435,9 +441,12 @@ def derive_triage_verdict(row: dict, ctx: dict, sheet_sha: str, commits: dict, c
     elif own.withdrawn or own.status == "WONTDO":
         word = "WITHDRAWN" if own.withdrawn else "WONTDO"
         return ("T4", "WONTDO", "-", f"{loc} reads {word} in the row's own status slot")
+    elif WITHDRAWAL_LEAD.match(own.body):
+        word = WITHDRAWAL_LEAD.match(own.body).group(1)
+        return ("T4", "WONTDO", "-", f"{loc}: the row's own text opens with {word}")
     if prop == "WONTDO":
-        refused.append(("T4", unreadable or f"{loc} reads {own.status}, not a withdrawal; prose "
-                                            f"is never read as one"))
+        refused.append(("T4", unreadable or f"{loc} reads {own.status} and its text opens with "
+                                            f"no withdrawal; prose is never read as one"))
     if prop in ("BLOCKED", "DEFERRED"):
         why = ""
         if unreadable:
@@ -573,8 +582,10 @@ def render_triage_record(root: str, s: dict) -> str:
     out += ["Evaluated T1 to T6; the first rule that matches decides, and a row no rule decides is "
             "KEEP with the reason naming the rule it came closest to. CLOSED is signed only from a "
             "spec header's `closes` verb or a commit SUBJECT, re-read here; a commit that names an "
-            "ask only in its body is a citation. A commit whose subject names an ask and answers "
-            "half of it would sign a wrong CLOSED, which D4's REOPEN repairs.", "",
+            "ask only in its body is a citation. WONTDO is signed only from the row's own status "
+            "slot or its text's opening word, read at the worksheet's sha; a withdrawal word "
+            "further in is prose. A commit whose subject names an ask and answers half of it "
+            "would sign a wrong CLOSED, which D4's REOPEN repairs.", "",
             f"Severity: every row reads `unlabelled`. Census at the worksheet's sha: {hits} of "
             f"{rows} legacy row(s) carry an upper-case level word, so no mechanical rule could label "
             f"one without inventing it (spec F2; D7 is forward-only).", "",

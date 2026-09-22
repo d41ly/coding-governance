@@ -10,7 +10,7 @@ Written by `memory/builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDoc
 - the triage worksheet: `memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-11-triage.tsv` · blob `e642ed8d91d65fb5fd6f6dfeea35e0a9aa19804c` · computed at `e21fa86f4f129ca1a5000946d895ef6c646d9a0d`
 - the counts: same-id 153 pair(s): unit 66, not-unit 87 (U1 82, U2 4, U3 1, U4 0) · triage 334 ask(s): KEEP 333, CLOSED 0, WONTDO 0, BLOCKED 0, DEFERRED 0, excluded 1 · level words 0 of 590 legacy row(s) at e21fa86f
 
-Evaluated T1 to T6; the first rule that matches decides, and a row no rule decides is KEEP with the reason naming the rule it came closest to. CLOSED is signed only from a spec header's `closes` verb or a commit SUBJECT, re-read here; a commit that names an ask only in its body is a citation. A commit whose subject names an ask and answers half of it would sign a wrong CLOSED, which D4's REOPEN repairs.
+Evaluated T1 to T6; the first rule that matches decides, and a row no rule decides is KEEP with the reason naming the rule it came closest to. CLOSED is signed only from a spec header's `closes` verb or a commit SUBJECT, re-read here; a commit that names an ask only in its body is a citation. WONTDO is signed only from the row's own status slot or its text's opening word, read at the worksheet's sha; a withdrawal word further in is prose. A commit whose subject names an ask and answers half of it would sign a wrong CLOSED, which D4's REOPEN repairs.
 
 Severity: every row reads `unlabelled`. Census at the worksheet's sha: 0 of 590 legacy row(s) carry an upper-case level word, so no mechanical rule could label one without inventing it (spec F2; D7 is forward-only).
 
