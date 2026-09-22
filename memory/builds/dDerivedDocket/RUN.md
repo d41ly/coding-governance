@@ -252,3 +252,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T20:41:38Z brief · item TOOL-dDerivedDocket-25 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-21T20:41:38Z brief · item TOOL-dDerivedDocket-30 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-22T04:06:08Z dispatch · item c361e347 TOOL-dDerivedDocket-33 · reason memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-33.md memory/builds/dDerivedDocket/build
+
+2026-09-22T04:06:09Z brief · item TOOL-dDerivedDocket-33 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
