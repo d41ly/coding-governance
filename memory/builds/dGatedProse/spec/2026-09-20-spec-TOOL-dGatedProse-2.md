@@ -1,11 +1,12 @@
 # TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold
 
-**Status:** SPECCED · rev-3 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 3
+**Status:** SPECCED · rev-6 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md](../build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md) | research | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 
 <!-- /gen:spec-records -->
@@ -16,51 +17,65 @@ A spec sentence saying a codebase-map dossier claims a Python symbol, a path or 
 that does not exist. The round-1 spec audit of `dLoggedFlight` units 25 and 27 found it by hand as one
 MEDIUM finding across three sites in the two specs
 (`memory/builds/dLoggedFlight/reviews/2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md:299`).
-Add a fifth join to `tools/check-spec-tokens.py` that refuses the shapes the map's own contract
-cannot gate, with its rule authored in `tools/memory-tree/SPEC-TEMPLATE.template.md`, so the sentence
+Add a `claims` join to `tools/check-spec-tokens.py`, beside the joins it already carries, that
+refuses the shapes the map's own contract cannot gate, with its rule authored in `tools/memory-tree/SPEC-TEMPLATE.template.md`, so the sentence
 is graded at the spec commit instead of remembered.
 
 ## 2. Scope (IN)
 
 - S1. `tools/check-spec-tokens.py` gains a `claims` join over its existing live-spec population
-  (`tools/check-spec-tokens.py:87` owns the live/terminal split, `:258` the population regex). It
-  reads the spec text the loop has already decoded, outside fenced blocks, matches four grammar arms
-  case-insensitively, and tests every backticked object in the matched run against the refusal set of
-  S2. Observed by AC1 and AC2.
+  (`tools/check-spec-tokens.py:119` owns the live/terminal pattern and `:426` the population regex).
+  It reads the spec text the loop has already decoded, outside fenced blocks, matches four grammar
+  arms case-insensitively, tests every backticked object in the matched run against the refusal set
+  of S2, and reports for every matched run each arm that matched it, so a run two arms reach is one
+  hit carrying both. Observed by AC1, AC2 and AC12.
 - S2. The refusal set is three classes, one shared clause, and no key lookup. **A token carrying a
   SPACE is never refused, whatever else it carries.** Past that clause: a token carrying `/` is a
-  PATH; a token carrying `*` or `?` is a GLOB; a token that is a snake_case identifier, or carries a
-  parenthesis, is a CODE SYMBOL. Each class cites the sentence of the map's contract that makes it
-  ungateable, and nothing else is refused. Observed by AC3 and AC4.
-- S3. A startup CANARY asserts the join can move IN BOTH DIRECTIONS: one module-level string
-  exhibiting one refused claim per class plus one claim naming the live parenthesised key
-  `spec tokens (a spec's own names resolve)`, run through the scan before the population loop, and a
-  result other than exactly three refusals and one clear is a REFUSAL naming the canary. The clear
-  half is what pins S2's space clause structurally rather than by comment. Observed by AC6.
+  PATH; a token carrying `*` or `?` is a GLOB; a token carrying an underscore between two letters or
+  digits, in EITHER case, or carrying a parenthesis, is a CODE SYMBOL, so a SHOUTED constant refuses
+  as a snake_case function name does. Each class cites the sentence of the map's contract that makes
+  it ungateable, and nothing else is refused. Observed by AC3, AC4 and AC12.
+- S3. A startup CANARY asserts the join can move IN BOTH DIRECTIONS and on EVERY ARM. `CLAIM_CANARY`
+  is a module-level list of entries, each a sentence with the arm it is written for and its expected
+  verdict: one refused claim per arm of `CLAIM_ARMS`, whose objects between them cover all three
+  classes of S2 and whose claim verbs are all spelled in UPPERCASE, so the case fold is load-bearing
+  on every arm, plus one claim naming the live parenthesised key
+  `spec tokens (a spec's own names resolve)`, which must clear. It runs through the scan before the
+  population loop, and the test is structural rather than a typed total: every arm of `CLAIM_ARMS` is
+  the designated arm of a refused entry, every class appears, a clearing entry exists, and each
+  entry's result carries its designated arm among the arms reported and its expected verdict. Any
+  other result is a REFUSAL naming the canary, so an arm added without an entry refuses at startup.
+  The clear half is what pins S2's space clause structurally rather than by comment. Observed by AC6.
 - S4. Fenced blocks are excluded from the scan, so a SPEC may exhibit the refused sentence as a
   worked example without redding itself. Observed by AC7.
 - S5. The join prints its own report line on EVERY run — sentences examined, live specs carrying one,
-  objects cleared — and `--list` prints each cleared object as a `NEAR   [claims]` row beside the
-  `bar` join's (`tools/check-spec-tokens.py:421` owns that row's shape). Unconditionally, which is
-  where this join departs from its sibling: `bar`'s report line is printed inside `if direct_cut:`
-  (`:429`), so it vanishes with its key, and this join has no key to vanish with. Observed by AC8.
+  objects cleared — and `--list` prints each cleared object as a `NEAR   [claims]` row through the
+  shared near-miss printer (`tools/check-spec-tokens.py:619` owns that row's shape). Every run is
+  the siblings' convention, which this join follows: the `bar` join prints a line on both branches of
+  `if direct_cut:` (`:627`), and the `guards` join TOOL-aBlindedTrial-8 landed prints one on both
+  branches of its own key test (`:641`), so neither line vanishes with its key. This join has no key,
+  so its line takes no branch at all. Observed by AC8.
 - S6. `tools/memory-tree/SPEC-TEMPLATE.template.md` — the AUTHORED template — gains a rule section
   in its `## Writing rules` list, beside "Verify every claim about existing code against source at
   writing time" (`memory/TEMPLATE-SPEC.md:100` in the render), stating what a dossier can claim, the
-  three refused shapes with their citations, and the five limits of S7. `memory/TEMPLATE-SPEC.md` is
+  three refused shapes with their citations, and the six limits of S7. `memory/TEMPLATE-SPEC.md` is
   then REGENERATED by `bash tools/memory-tree/kit-dogfood-parity.test.sh --render`, never hand-edited,
   and both land in the same commit. Observed by AC5.
 - S7. The join's own docstring gains a row in the join table and a paragraph in the WHAT IT DOES NOT
-  CHECK block naming its five limits: an unbackticked dossier subject, a claim inside a fence, a
+  CHECK block naming its six limits: an unbackticked dossier subject, an unbackticked claimed object,
+  a claim inside a fence, a
   key-shaped object that is not a key, a claim in the wrong dossier, and a filler run longer than the
   closed arm admits. Observed by AC5.
 - S8. `tools/check-spec-tokens.test.sh` gains the red, green, refusal and report arms AC1 to AC10
-  name, and `FLOOR_ASSERTIONS` (`tools/check-spec-tokens.test.sh:16`) is raised from 42 by the static
-  count of assertions those arms add, with a RAISED comment naming this unit, in the same commit.
-  The raise is DERIVED at build time from the arms actually written; pinning a number here would be a
-  figure measured against code that does not exist. Observed by AC9.
+  and AC12 name, and `FLOOR_ASSERTIONS` (`tools/check-spec-tokens.test.sh:18`) is raised from the
+  value it carries at this unit's base by EXACTLY the count of assertion calls those arms add,
+  counted as AC9 counts them, with a RAISED comment naming this unit and both values, in the same
+  commit. The suite compares one way only (`tools/check-spec-tokens.test.sh:684` reds on a total
+  BELOW the floor), so an under-raise passes the suite and the bar, and AC9 is what grades the
+  equality. The raise is DERIVED at build time from the arms actually written; pinning the delta here
+  would be a figure measured against code that does not exist. Observed by AC9.
 - S9. No inventory key moves, and the reason is not silence. The join adds no gate leg, no kit, no git
-  hook and no workflow script — it is a fifth ARM inside the existing
+  hook and no workflow script — it is one more join inside the existing
   `spec tokens (a spec's own names resolve)` leg — so no `[claims]` table gains or loses a key and
   `memory/map/generated/` is not regenerated. Both code files this unit edits are already named by
   `memory/map/features/spec-tokens.md`'s `[paths].globs` (`:23` and `:24`), so the both-directions
@@ -68,11 +83,13 @@ is graded at the spec commit instead of remembered.
   S10. Observed by AC11 for the prose half; for the key half the
   `codebase-map coverage + freshness` leg is the observation, and §7 lists it.
 - S10. `memory/map/features/spec-tokens.md` has its join COUNT refreshed at the two sites that carry
-  one: the `title` field (`:5`, "Four joins that resolve…") and the body sentence at `:49` ("The
-  fourth join, `bar`, reads the legs and paths populations rather than minting one."). The sentence at
-  `:137`, "The three joins prove a name resolves", stays exactly as written — this join resolves
-  nothing, so three is still the right number there, and editing it would introduce the error the
-  other two fix. Observed by AC11.
+  one: the `title` field (`:5`) and the body sentence at `:49`-`:50`, which names each join after the
+  third by ordinal. The count written there is the one AC11 DERIVES from the checker at observation
+  time and never a number typed in this spec: TOOL-aBlindedTrial-8 moved that count once while this
+  spec was being written, which is how rev-3's criterion came to pass over a wrong count with no edit.
+  The sentence at `:167`, "The three joins prove a name resolves", stays exactly as written — this
+  join resolves nothing, so the resolving-join count there does not move, and editing it would
+  introduce the error the other two fix. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -93,14 +110,14 @@ is a LIVE spec carrying "`memory/map/features/agent-cap.md` — the new leg name
 `gate-legs`", and no arm matches it: four words sit between the subject and the verb where the noun arm
 admits three. Measured 2026-09-21 on node d: widening the noun arm's verb set from `claims?` to the
 full inflection set changes the corpus reading not at all — 0 hits and 3 clears over all 645 tracked
-specs either way — because the filler run, not the verb, is what excludes it. Loosening a closed set
+specs of the tree rev-3 measured, either way — because the filler run, not the verb, is what excludes it. Loosening a closed set
 to reach one sentence whose object (`gate-legs`, an inventory id) clears anyway is how the closed sets
 become `\w+` slack. Declined, and declared as S7's fifth limit instead.
 
 No retrofit of a landed record. The one corpus sentence the harness's brief called a live spec this
 unit must fix is `memory/builds/cKeyedLaunchpad/spec/2026-08-13-spec-cKeyedLaunchpad-2.md:39`-`:40`,
 and it is CLOSED (verified in its own status header, rev-3, 2026-08-20). It sits outside the graded
-population by `tools/check-spec-tokens.py:87`, this repo does not rewrite a frozen record to clear a
+population by `tools/check-spec-tokens.py:119`, this repo does not rewrite a frozen record to clear a
 hit, and under this unit's refusal set it is not a hit at all — its object is
 `guides = ["SESSION-KICKOFF.md"]`, which carries spaces. It becomes a GREEN fixture instead, which
 AC2 names.
@@ -127,44 +144,74 @@ it with no owner. It is refused, with the ruling as the reason.
 
 ### Edges
 
+- **consumes-from** `TOOL-dGatedProse-5` — the live corpus that unit's pass leaves at order 1. The
+  pass writes readers clauses into live specs outside this build, and those clauses carry bare `.md`
+  basenames, which are this join's own dossier-subject anchor (§4 Data model). This join lands at
+  order 3 with no cutoff (§8 F2), so it grades every clause unit 5 wrote from its landing day. §4's
+  Migration figure predates that pass, and AC10 is what re-derives it over the whole live population
+  at landing. rev-3 declared no edge here because it was written before unit 5 existed. The mirror
+  is that unit's **hands-off** `TOOL-dGatedProse-2`, declared at its rev-6, which also states that
+  no clause its pass writes puts a claim verb beside a dossier name; AC10 reads the clauses rather
+  than that statement.
 - **consumes-from** `TOOL-dGatedProse-1` — the template file, and nothing else now. That unit writes
-  its own check-25 pointer into `tools/memory-tree/SPEC-TEMPLATE.template.md` at order 1, so this
+  its own check-25 pointer into `tools/memory-tree/SPEC-TEMPLATE.template.md` at order 2, so this
   unit edits that file after unit 1 has left its line in it. The kit version NO LONGER crosses here:
-  the build's R1 ruling put the single bump in unit 1's commit at order 1, the owner corrected that on
-  2026-09-21, and `TOOL-dGatedProse-3` owns the move at order 3. Verified at source rather than taken
-  on the correction's word. `tools/memory-tree/check-verdict-epoch.sh:16` states the rule
-  topologically and `:179` implements it as `git merge-base --is-ancestor` over W and S, where W is
-  the newest commit in `<base>..HEAD` moving a behaviour-bearing line of the scan set declared at
-  `:68`-`:69` and S is the newest that CHANGES the constant's value. Unit 1 and unit 3 both move
-  `tools/memory-tree/check-memory-hygiene.sh`, which is that scan set's head, and unit 3 sits at
-  order 3 — so a bump at order 1 leaves W a descendant of S and reds the `verdict epoch` leg from
-  unit 3's commit through the build's tip. Unit 3's own F2 raised this; the rule reads the same way
-  from its source.
+  the build's R1 ruling put the single bump in unit 1's commit, the owner corrected that on
+  2026-09-21, and `TOOL-dGatedProse-3` owns the move at order 4. Verified at source rather than taken
+  on the correction's word, and re-read on the merged tree. `tools/memory-tree/check-verdict-epoch.sh:16`
+  states the rule topologically and `:179` implements it as `git merge-base --is-ancestor` over W and
+  S, where W is the newest commit in `<base>..HEAD` moving a behaviour-bearing line of the scan set
+  declared at `:68`-`:69` and S is the newest that CHANGES the constant's value. Unit 1 and unit 3
+  both move `tools/memory-tree/check-memory-hygiene.sh`, which is that scan set's head, and unit 3
+  lands after unit 1 — so a bump in unit 1's commit leaves W a descendant of S and reds the
+  `verdict epoch` leg from unit 3's commit through the build's tip. Unit 3's own F2 raised this; the
+  rule reads the same way from its source.
 - **hands-off** `TOOL-dGatedProse-3` — `memory/TEMPLATE-SPEC.md`, which that unit regenerates at
-  order 3 as one of the four dogfood copies its S2 names. This unit's section is authored in the
+  order 4 as one of the dogfood copies its S2 names. This unit's section is authored in the
   template, per the build's R4 ruling, so that re-render reproduces it rather than deleting it. The
-  kit version crosses HERE and not at order 1: unit 3 owns the single move together with the re-stamp
-  of every carrier of the retired marker, a population derived by the marker grep, and BOTH of this
-  unit's doc carriers are in it. Each of them carries `gov:kit memory-tree@2.79` today, the value
-  `KIT_MEMORY_TREE_VERSION` holds at `tools/memory-tree/check-memory-hygiene.sh:20`. So this unit
-  edits two files still at the OLD stamp, moves no marker itself, and is re-stamped from behind at
-  order 3. That ordering is what keeps `kit version markers` green across this unit's commit, and §7
-  states the mechanism.
+  kit version crosses HERE and not in unit 1's commit: unit 3 owns the single move together with the
+  re-stamp of every carrier of the retired marker, a population derived by the marker grep, and BOTH
+  of this unit's doc carriers are in it. Each carries the marker equal to `KIT_MEMORY_TREE_VERSION`
+  at `tools/memory-tree/check-memory-hygiene.sh:20`, read there and not typed here: rev-3 typed the
+  value, and the merge of `origin/main` moved it under this spec. So this unit edits two files still
+  at the inherited stamp, moves no marker itself, and is re-stamped from behind at order 4. That
+  ordering is what keeps `kit version markers` green across this unit's commit, and §7 states the
+  mechanism.
 - **hands-off** `TOOL-dGatedProse-4` — nothing, stated rather than omitted. That unit's write set is
-  the two BUILD-METHOD carriers and `memory/map/features/build-method.md`; this unit's is disjoint from
-  all three.
-- **hands-off** external — the backlog row `TOOL-dLoggedFlight-32` (`memory/backlog/TOOL.md:547`),
+  its own `### Files touched`, read there rather than restated here, and no path in this unit's is in
+  it.
+- **hands-off** external — the backlog row `TOOL-dLoggedFlight-32` (`memory/backlog/TOOL.md:559`),
   which specifies this check as "a `claims X` naming no inventory key of the codebase map". That is
   the resolution mechanism §8 F1 declines. The row is RE-WORDED at landing to name the refusal set,
   because a row still specifying a mechanism the build rejected is a record that disagrees with the
   tree. The build README records the owner dropping this row's checks A and B and records no
   re-ruling of C's mechanism, so the divergence is this unit's to disclose and the re-wording is this
-  unit's to make.
-- **hands-off** external — the five limits S7 declares stay a reader's job. Closing the unbackticked
-  subject needs a look-back window over prose, which the stage-1 dry run measured at precision 0.00
-  over this corpus, so it is not deferred work but a declined mechanism.
-- **consumes-from** external — the dry-run workflow of 2026-09-20 and its skeptic, whose measurements
-  §4 and §8 cite. Without them the refusal set is a preference rather than a finding.
+  unit's to make, which is why `memory/backlog/TOOL.md` is in its Files touched. The same landing edit
+  CLOSES the row, citing this unit for check C and the README's ruling for checks A and B, since
+  nothing of it is left open once this unit lands.
+- **hands-off** external — the left-shift round 1 attached to its finding H1: a codebase-map
+  freshness arm that derives the join count from `tools/check-spec-tokens.py`'s docstring join table
+  and compares it with the count the dossier types at the two sites S10 refreshes. That arm belongs
+  to the codebase-map kit, outside this build's write set, so AC11 carries the comparison as a
+  documented check, and the build routes the arm at landing to a new row of `memory/backlog/TOOL.md`,
+  written in the edit that re-words `TOOL-dLoggedFlight-32`, with its id minted by the landing
+  session rather than here.
+- **hands-off** external — the six limits S7 declares stay a reader's job. Closing the unbackticked
+  subject needs a look-back window over prose, which stage 1's broad predicate was, and the dry run
+  scored it at precision 0.00 over this corpus (research record `:256`), so it is not deferred work
+  but a declined mechanism.
+- **consumes-from** external — the dry run of 2026-09-20 and its skeptic, as recorded at
+  `memory/builds/dGatedProse/build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md`, the
+  research record this spec cites by line, and never the session-local journal that record copies.
+  Its Strand 4 carries every dry-run figure used here: stage 1's broad predicate, its seven innocent
+  hits and their shapes at `:256`-`:259`; the skeptic's six, and the 96 `[paths]` entries against
+  stage 1's 17, at `:273`-`:275`; the skeptic's one narrowed hit at `:275`-`:277`; the thirteen
+  re-spellings and the narrowed form's two at `:279`-`:282`; the conjunction at `:283`; the 37
+  uppercase claim-verb tokens at `:286`-`:287`; the glob asymmetry at `:288`-`:291`; the 22-minute
+  window at `:292`-`:294`; the working-tree split and the kit coupling at `:295`-`:296`; the ratchet
+  that already fails a dead key at `:297`-`:298`; and the unverified cost at `:300`. Without them the
+  refusal set is a preference rather than a finding, and this spec keeps no private copy of any of
+  them.
 
 ## 4. Design
 
@@ -187,11 +234,15 @@ skeptic found: a spec listing several claimed keys is the normal way to write on
 | fronted | the run, an optional relativiser, subject, an optional `dossier`, the verb | the object-fronted relative clause |
 
 The filler sets are CLOSED word lists, not `\w+` slack. An open filler is what let the stage-1 broad
-predicate walk out of one clause and into the next, which produced two of its false positives by
-grabbing a token from a following conjunct or the next table row.
+predicate walk out of one clause and into the next, which produced two of the false positives the
+research record lists at `:256`-`:257`, a that-clause and a table row flattened into its neighbour,
+each graded on a token outside the clause its verb sat in.
 
 The verb match is case-insensitive. The skeptic measured 37 uppercase claim-verb tokens across the
-corpus, and stage 1's own near-miss list carried one its case-sensitive pass could not have seen.
+641 specs of its corpus and found that neither stage 1's rule text nor its predicate said whether
+case matters (research record `:286`-`:287`).
+Every canary entry of S3 spells its verb in uppercase and AC12 carries an uppercase fixture, so the
+fold is observed on each arm rather than assumed from one flag.
 
 The refusal set, and the sentence of the map's contract each class rests on:
 
@@ -200,23 +251,32 @@ The refusal set, and the sentence of the map's contract each class rests on:
 | — | **no space anywhere in the token** — the gate on all three | see the paragraph below |
 | PATH | contains `/` | `memory/map/README.md:28` and `tools/codebase-map/gen_map.py:119` — path globs are digest-only, never gated |
 | GLOB | contains `*` or `?` | the same sentence |
-| CODE SYMBOL | snake_case, or carries a parenthesis | `tools/codebase-map/map_extractors.py:170` — the symbol tier feeds `generated/symbols.json` only and never the ratchet |
+| CODE SYMBOL | an underscore between two letters or digits, in either case, or a parenthesis | `tools/codebase-map/map_extractors.py:170` — the symbol tier feeds `generated/symbols.json` only and never the ratchet |
 
 **The space clause is the whole safety of the refusal set, and rev-1 had it on one class instead of
-three.** Measured on node d, 2026-09-21, by importing the extractor set: 260 keys over 10
-inventories, 255 distinct, ZERO carrying an underscore, ZERO carrying a glob character, exactly ONE
-carrying a slash (`kit/dogfood doc parity`), and THIRTEEN carrying a parenthesis — every one a
-gate-leg name, and `review-protocol parity (kit vs dogfood)` is claimed in the claims plane today at
-`memory/map/features/agent-cap.md:16`. Under rev-1's predicate all thirteen refused as CODE SYMBOL,
-so a correct sentence claiming a real, ratchet-gated key would have redded. Every one of the
-fourteen punctuation-carrying keys also carries a space, and no key in the set is spaceless and
-punctuated. Lifting the clause out of the PATH row and applying it to all three therefore makes the
-refusal set DISJOINT from the live key set as a measured property rather than a hope, and it costs
-the staged break nothing: `derive_window_closer`, `check_count_sources` and the call spelling
-`derive_window_closer()` all still refuse. figure PINNED — node d, 2026-09-21, and re-derived
-unchanged at this revision: 10 inventories, 260 keys, 255 distinct, 0 underscore, 0 glob, 1 slash,
-13 parenthesised, 0 spaceless-and-punctuated, 0 refused. AC4 is what re-derives it on every
-self-test run.
+three.** Measured on node d, 2026-09-21, by importing the extractor set on the merged tree at
+`bd44d3ff`: 270 keys over 10 inventories, 265 distinct, ZERO carrying an underscore, ZERO carrying a
+glob character, exactly ONE carrying a slash (`kit/dogfood doc parity`), and FOURTEEN carrying a
+parenthesis — every one a gate-leg name, and `review-protocol parity (kit vs dogfood)` is claimed in
+the claims plane today at `memory/map/features/agent-cap.md:16`. Under rev-1's predicate every
+parenthesised key refused as CODE SYMBOL, so a correct sentence claiming a real, ratchet-gated key
+would have redded. Every punctuation-carrying key also carries a space, and no key in the set is
+spaceless and punctuated. Lifting the clause out of the PATH row and applying it to all three
+therefore makes the refusal set DISJOINT from the live key set as a measured property rather than a
+hope, and it costs the staged break nothing: `derive_window_closer`, `check_count_sources` and the
+call spelling `derive_window_closer()` all still refuse. figure PINNED — node d, 2026-09-21, at
+`bd44d3ff`: 10 inventories, 270 keys, 265 distinct, 0 underscore, 0 glob, 1 slash, 14 parenthesised,
+0 spaceless-and-punctuated, 0 refused. rev-3 pinned 260, 255 and 13 on the pre-merge tree; the
+merge grew the key set and left the property standing, which is the case for AC4 re-deriving it on
+every self-test run rather than trusting a pin.
+
+The underscore test reads EITHER case, which rev-5 states and rev-4 left open. A constant such as
+`KIT_MEMORY_TREE_VERSION` is a symbol the map cannot hold as surely as `derive_window_closer` is, and
+`TOOL-dGatedProse-3` §3 already reads this join as refusing a SHOUTED object beside a dossier subject.
+The key set carries no underscore in either case, so the disjointness above is untouched. Every
+figure before rev-5 was measured with a lowercase-only test; re-run both ways at rev-5, over 722
+tracked specs and this build's five, the two readings return identical hits and clears (§4
+Migration). figure PINNED — node d, 2026-09-22, and the probe is untracked.
 
 What the clause gives up is a call whose ARGUMENT LIST carries a space, which is how this repo
 actually spells one: `boundedParallel(thunks, 5)` at `AGENTS.md:304`. rev-2 named the spaceless
@@ -224,7 +284,7 @@ actually spells one: `boundedParallel(thunks, 5)` at `AGENTS.md:304`. rev-2 name
 no space, so the parenthesis clause still refuses it. Re-derived on node d 2026-09-21 by running the
 predicate over both spellings: the spaced one clears, the spaceless one refuses as CODE SYMBOL.
 Nothing in the motivating corpus claims a dossier key spelled either way, and the alternative reds
-thirteen real keys, so the trade is one-sided.
+every parenthesised real key, so the trade is one-sided.
 
 Both glob spellings refuse identically. The skeptic's asymmetry — an exact globs-list entry passing
 while a file covered by the same dossier's wildcard entry redded — was an artifact of resolving
@@ -234,21 +294,30 @@ The scan runs over the spec text with fenced blocks blanked, a line-level toggle
 marker. The reason is a SPEC that exhibits the refused sentence as a worked example: a spec is in the
 graded population and its fenced examples are not prose. The rule's own carrier needs no such
 protection, because `memory/TEMPLATE-SPEC.md` is not under `memory/builds/*/spec/` and the population
-regex at `:258` never reads it — rev-1 conflated the two. The class is nonetheless the one
-`memory/TEMPLATE-SPEC.md:203` records one level up, where a rule body "necessarily contains the words
+regex at `:426` never reads it — rev-1 conflated the two. The class is nonetheless the one
+`memory/TEMPLATE-SPEC.md:217` records one level up, where a rule body "necessarily contains the words
 that satisfy it". The cost is that a real claim written inside a fence is invisible, and S7 declares
 it.
 
 The canary is the liveness assertion §7 of the charter requires. A zero from this join is the
-measured normal state, so a broken arm regex would report exactly what a clean corpus reports. Three
-refusals AND one clear, asserted before the loop, catch the two failure directions separately: a dead
-arm loses a refusal, and a space clause lost in a refactor loses the clear.
+measured normal state, so a broken arm regex would report exactly what a clean corpus reports. One
+refusal per arm AND one clear, each checked against the arm it was written for and asserted before
+the loop, catch the failure directions separately: a dead arm, or one that lost the case fold, loses
+its own entry even while another arm still reaches the same sentence, and a space clause lost in a
+refactor loses the clear. A canary asserting only a total, as rev-3's three-and-one did, stays green
+with three arms dead whenever one surviving arm reaches all three of its refused sentences.
 
 ### What the four arms buy, measured against the skeptic's own enumeration
 
-The skeptic's record enumerates eleven re-spellings of the same defect and reports stage 1's narrowed
-form catching two of them; the same record names two further defects, the conjunction and the
-object-fronted relative clause, outside that eleven. Run over all thirteen on node d, 2026-09-21:
+The skeptic reported thirteen re-spellings of the same defect and stage 1's narrowed form catching
+two of them, the staged break and the same sentence wrapped. The research record carries that count,
+those two and five of the nine shapes the narrowed form is invisible to, at `:279`-`:282`. The other
+four, the unbackticked dossier subject, the determiner, the possessive and the periphrasis, are the
+skeptic's too, and the record condenses them away, so this spec names them itself, in the `closes`
+column of the arm table above and in S7's first limit; those are the eleven. The record names two further defects,
+the conjunction at `:283` and the object-fronted relative clause among stage 1's own false positives
+at `:257`-`:258`, and this spec's thirteen are the eleven plus those two. Run over all thirteen on
+node d, 2026-09-21:
 
 | arms | red on the 11 enumerated | red on all 13 |
 |---|---|---|
@@ -259,38 +328,58 @@ object-fronted relative clause, outside that eleven. Run over all thirteen on no
 
 The one of the eleven that stays invisible is the unbackticked dossier subject, §3's declined
 mechanism. The fronted arm adds no enumerated spelling and is still worth its regex: it closes the
-shape stage 1 reported as its own largest false-positive source, which is live in this corpus at
+shape stage 1 listed among its own false positives (research record `:257`-`:258`), which is live
+in this corpus at
 `memory/builds/dPolishedVitrine/spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md:231` and
 `memory/builds/aTunedCompass/spec/2026-09-04-spec-TOOL-aTunedCompass-2.md:55`. Under a refusal set it
 reads the correct token, because the object it fronts is the one being claimed. figure PINNED — node
 d, 2026-09-21. rev-1 stated a sixteen-spelling set with 15 and 12 splits and located the probe
-nowhere; that set was this spec's own and is deleted rather than re-cited, because the journal's
-eleven are re-derivable by anyone and a private sixteen is not.
+nowhere; that set was this spec's own and is deleted rather than re-cited. The eleven are the
+skeptic's shapes, seven of them in the research record and all eleven named in this spec, and a set
+only this spec's author ever held has no record to cite.
 
 ### Inventory
 
 New identifiers, all inside `tools/check-spec-tokens.py`, and this repo declares no naming cell for
 Python module constants in this file: `CLAIM_ARMS` (the four compiled arms), `CLAIM_REFUSALS` (the
 three-class predicate and its shared space clause), `CLAIM_CANARY`, `CLAIMS_WHY` (the message, beside
-the existing `BAR_WHY`), and `claims_scan` (the function both the canary and the loop call). The hit
-kind on the report is `claims`, beside `leg`, `path`, `cite` and `bar`.
+the existing `BAR_WHY`), and `claims_scan` (the function both the canary and the loop call, which
+returns each hit with the arms that matched it). The hit kind on the report is `claims`, beside the
+kinds the report already emits at `bd44d3ff`: `leg`, `legline`, `path`, `cite`, `bar` and `guards`.
 
 ### Migration
 
-None for the corpus, and this is the figure the owner's no-cutoff ruling makes load-bearing, since
-with no phase-in the arm grades the whole live population on its landing day. Re-measured on node d
-2026-09-21, over the tree as it stands with this build's four spec files already tracked and live:
-645 tracked specs, 28 of them LIVE by `tools/check-spec-tokens.py:87`, and the four arms yield 0 hits
+None for the corpus as measured, and this is the figure the owner's no-cutoff ruling makes
+load-bearing, since with no phase-in the arm grades the whole live population on its landing day.
+Measured on node d 2026-09-21, on the tree rev-3 measured, before unit 5's spec was tracked: 645
+tracked specs, 28 of them LIVE by `tools/check-spec-tokens.py:119`, and the four arms yield 0 hits
 over the live population, 0 hits over all 645, 0 clears over the live population and 3 clears over
 all 645. The three clears are the sentences AC2 copies.
+
+What that measurement still covers on the merged tree, and what it does not. The live specs outside
+this build are byte-identical between the old base `fcbfba5f` and `bd44d3ff` — `git diff` over them
+is empty, re-run for rev-4 — so its 0 over them stands; the merge added only terminal specs, which
+are not graded. Re-run at rev-5 on node d, 2026-09-22, over the working tree this reconcile finds,
+where those live specs are still byte-identical to `bd44d3ff`: 722 tracked specs, 29 live, 0 hits
+and 0 clears over the live population, and 0 hits and 4 clears over all 722. The fourth clear came
+in with the merge, in a CLOSED spec, at
+`memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-27.md:41`, and its object is a
+leg name carrying a space. The same run reads this build's five spec files as they stand, 0 hits and
+0 clears, and every figure is the same under S2's either-case underscore test as under the
+lowercase-only test the earlier revisions used. figure PINNED — the probe is untracked. What no
+reading covers is the readers clauses `TOOL-dGatedProse-5`'s pass writes into live specs at order
+1, which carry bare `.md` basenames and so sit on this join's subject anchor, or any later fold of
+this build's specs. Both change before this unit lands, so AC10 re-derives the figure over the whole
+live population at the landing commit, and that reading, not this one, is what the ruling's zero
+rests on.
 
 The broad diagnostic ran beside it, because a zero from a narrow predicate is worth nothing without
 one. Every live-spec claim verb within 200 characters of a backticked dossier subject printed 41
 windows and no arm matches any of them. The closest is
 `memory/builds/aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-5-u5-merge-driver.md:488`,
 whose "the new leg name claimed by `memory/map/features/memory-tree-merge-driver.md`" is the passive
-arm's shape with an UNBACKTICKED object — S7's first declared limit, not a missed hit, and its object
-would clear anyway. figure DERIVED.
+arm's shape with an UNBACKTICKED object, which no arm reads because every arm grades a run of
+backticked objects, so it is not a missed hit, and its object would clear anyway. figure DERIVED.
 
 For the two docs, the rule section is authored once in the template and the live copy is regenerated,
 both in the same commit, because the parity leg compares them.
@@ -302,16 +391,17 @@ both in the same commit, because the parity leg compares them.
 | `tools/check-spec-tokens.py` | the join, the refusal set, the canary, the fence blanker, the report line, the docstring rows |
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | the rule section, authored |
 | `memory/TEMPLATE-SPEC.md` | REGENERATED from the template; never hand-edited |
-| `tools/check-spec-tokens.test.sh` | the arms of AC1 to AC10, and the floor raise |
-| `memory/map/features/spec-tokens.md` | the join count at `:5` and `:49` |
+| `tools/check-spec-tokens.test.sh` | the arms of AC1 to AC10 and AC12, and the floor raise |
+| `memory/map/features/spec-tokens.md` | the join count at `:5` and `:49`-`:50` |
+| `memory/backlog/TOOL.md` | at landing: the `TOOL-dLoggedFlight-32` row re-worded to name the refusal set and closed, and one new row routing H1's left-shift (§3 Edges); units 3 and 4 write their own rows of this file at the same landing, so every edit here is row-disjoint and reconciles additively |
 
 ### Alternatives rejected
 
 Resolving the object against the live key set, which is what `TOOL-dLoggedFlight-32` was ruled as and
 what stage 1 specified. Rejected on the skeptic's measurement, recorded in §8 F1.
 
-Dropping the parenthesis clause outright, which is the remedy the thirteen-key false-positive
-population most obviously suggests. Rejected: the space clause clears all thirteen while keeping
+Dropping the parenthesis clause outright, which is the remedy the parenthesised-key false-positive
+population most obviously suggests. Rejected: the space clause clears every one of them while keeping
 `derive_window_closer()` refusable, and both readings were measured rather than reasoned about.
 
 A dated cutoff key, on the sibling idiom of `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf:276`). REJECTED
@@ -320,17 +410,19 @@ the arm grades every live spec from the commit that lands it. §8 F2 carries the
 
 A look-back window admitting an unbackticked dossier subject, which is stage 1's broad predicate.
 Rejected: it scored 7 hits over the live corpus by stage 1's own count, of which the skeptic
-reproduced 6, and every one was innocent either way.
+reproduced 6, and every one was innocent either way (research record `:256` and `:273`-`:275`).
 
 ## 5. Production-readiness checklist
 
 - security — N/A — a read-only lint over tracked text, adding no import, no subprocess and no
   filesystem read the checker did not already make. The one import of
   `tools/codebase-map/map_extractors.py` this unit introduces lives in the SELF-TEST, per §3.
-- perf / scale — 16.6 ms for the four arms over the live population, best of five on node d,
-  2026-09-21, with three further repeats at 17.1, 17.2 and 16.2 ms. That population is no longer a
-  forecast: this build's four spec files are tracked and live, so it is 28 specs, 1007350 BYTES and
-  1001794 decoded CHARACTERS, zero CRLF pairs. The checker decodes before matching
+- perf / scale — 16.6 ms for the four arms over the live population of the tree rev-3 measured,
+  best of five on node d, 2026-09-21, with three further repeats at 17.1, 17.2 and 16.2 ms. That
+  population was 28 specs, 1007350 BYTES and 1001794 decoded CHARACTERS, zero CRLF pairs. On the
+  merged tree at `bd44d3ff`, before this fold, it is 29 live specs, unit 5's being the difference, at
+  1180015 bytes and 1173797 characters, still zero CRLF. The timing was not re-run over it; about 17%
+  more input cannot move the order of magnitude, which is all the pin buys. The checker decodes before matching
   (`read_bytes().decode("utf-8", "replace")`), so the arms run over the character figure. The leg's
   declared ceiling is 60 s in `tools/gate-legs.json`, which leaves three orders of magnitude. figure
   PINNED — node d, 2026-09-21. It SUPERSEDES rev-2's 20.5 ms over 24 live specs and its 22.1 ms
@@ -338,14 +430,14 @@ reproduced 6, and every one was innocent either way.
   over a LARGER population. Both figures measure a reconstruction of §4's grammar and not a shipped
   join, which does not exist yet, so neither is a claim about `claims_scan`; what the pin buys is the
   order of magnitude, and that has not moved. The whole-leg total is UNVERIFIED, and deliberately:
-  measuring it means running the leg, which a pass may not do, and the dry run's skeptic refused to
-  certify its predecessor's cost figures for exactly that reason.
+  measuring it means running the leg, which a pass may not do, and the dry run's skeptic left its
+  predecessor's cost figures unverified for exactly that reason (research record `:300`).
 - error / empty / loading states — a corpus with no dossier-claim sentence is the measured normal
   state and prints a zero rather than refusing; the canary of S3 is what separates that zero from a
   broken arm, and the report line of S5 is what keeps it from reading as coverage.
 - observability — each hit names the file, the refusal class, the object and the contract sentence;
   each clear is a `NEAR   [claims]` row under `--list`.
-- risks — the five limits of S7 are real coverage lost, not hypothetical, and two of the five are
+- risks — the six limits of S7 are real coverage lost, not hypothetical, and two of the six are
   live in this corpus today: the unbackticked-subject spelling at
   `memory/builds/dPolishedVitrine/spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md:59` and the
   over-long filler run at
@@ -353,14 +445,16 @@ reproduced 6, and every one was innocent either way.
   correct prose. A fleet risk remains, because a spec on another node's unpushed branch could carry
   the refused shape and red at its merge; the remedy is the existing shrink-only waiver registry
   `memory/project/spec-token-waivers.txt`, one row with a reason.
-- testing — AC1 stages RED from the two historical blobs at `9f43bb26^`, AC6 from a broken arm and
-  from a dropped space clause, AC7 from an unfenced copy of a fenced example. AC2, AC3 and AC4 are
+- testing — AC1 stages RED from the two historical blobs at `9f43bb26^`, AC6 from each arm broken in
+  turn, from a dropped case fold and from a dropped space clause, AC7 from an unfenced copy of a
+  fenced example, and AC12 from one fixture per arm plus one uppercase verb and one SHOUTED object.
+  AC2, AC3 and AC4 are
   the green side. **The suite carrying all of them is HELD:** `spec-tokens self-test` is subject
   `kit`, chunk `selftests`, guard `tools/` in `tools/gate-legs.json`, so a default bar runs none of
   S8 and this unit's Definition of Done owes
-  `GATE_FULL=1 GATE_SELFTESTS=1`. The compensating check is that AC1, AC6, AC7 and AC10 each observe
-  `claims_scan` or the checker process directly rather than through the suite, so the evidence exists
-  before the held leg ever runs.
+  `GATE_FULL=1 GATE_SELFTESTS=1`. The compensating check is that AC1, AC6, AC7, AC10 and AC12 each
+  observe `claims_scan` or the checker process directly rather than through the suite, and AC9 is
+  read statically, so the evidence exists before the held leg ever runs.
 - migration — N/A — see the Migration sub-head above.
 - user docs — the rule section of S6 is the user-facing page; this repo ships no `help/` tree.
 
@@ -389,20 +483,21 @@ reproduced 6, and every one was innocent either way.
   nowhere in the tree, it yields zero hits.
   Red when: the fixture reds. This is the forward-looking case: a spec is authored before its code,
   and the skeptic measured 22 minutes between a spec commit and the commit creating the key its
-  dossier prose named. A criterion that cannot be satisfied by a predicate resolving against present
+  dossier prose named (research record `:292`-`:294`). A criterion that cannot be satisfied by a predicate resolving against present
   state is the point.
 - **AC4** — When the self-test imports `tools/codebase-map/map_extractors.py`, enumerates every key
   of every ratchet inventory, and passes each one through `CLAIM_REFUSALS`, zero keys are refused,
   and the arm prints the count of keys it examined and the count carrying a parenthesis.
   Red when: any live key is refused, or the examined count is a literal rather than a count of what
-  the run enumerated. This is the arm rev-1 did not have, and it is why the thirteen parenthesised
-  keys were a measurement taken once instead of a property the suite holds. It asserts DISJOINTNESS,
+  the run enumerated. This is the arm rev-1 did not have, and without it the parenthesised keys would
+  be a measurement taken once instead of a property the suite holds; the merge already grew them by
+  one (§4). It asserts DISJOINTNESS,
   not resolution — the shipped join still never imports that module (§3).
   figure: DERIVED — both counts come from the enumeration.
 - **AC5** — When the rule section of `tools/memory-tree/SPEC-TEMPLATE.template.md` is rendered by
   `render_doc` and the result is compared to `memory/TEMPLATE-SPEC.md`, the two agree byte for byte,
   and the section names the three refused shapes, the space clause, their three contract citations,
-  and the five limits; the join's own docstring names the same five.
+  and the six limits; the join's own docstring names the same six.
   Red when: the pair disagrees anywhere, either carrier omits a class, the clause, a citation or a
   limit, or the docstring and the rule section disagree on the limit set. The substitution set is
   `{{KIT_DIR}}`, `{{TOOL_ROOT}}` and `{{READINESS_ROWS}}` and nothing else
@@ -411,13 +506,17 @@ reproduced 6, and every one was innocent either way.
   `render_doc` does not touch and which both carriers therefore hold identically. rev-1 graded the
   pair as differing "only in the memory-root token"; there is no such token, and that acceptance
   would have passed a state the `kit/dogfood doc parity` leg refuses.
-- **AC6** — When one arm's compiled pattern is replaced by one that matches nothing, and separately
-  when the space clause is removed, the checker exits non-zero with a message naming `CLAIM_CANARY`
-  and does not print a hit count of zero for the join.
-  Red when: either broken build reports a clean claims line. A signal with no liveness assertion
-  reports a reassuring zero when it is broken, which is indistinguishable from this corpus's normal
-  state; the second arm is here because the space clause is the one part of S2 whose loss makes the
-  join LOUDER rather than quieter, and a canary that only catches silence would miss it.
+- **AC6** — When each arm's compiled pattern in turn is replaced by one that matches nothing, when
+  the arms are compiled without the case-insensitive flag, and when the space clause is removed —
+  one broken build per arm plus those two — the checker exits non-zero on every broken build with a
+  message naming `CLAIM_CANARY`, and does not print a hit count of zero for the join.
+  Red when: any broken build exits zero or reports a clean claims line. A signal with no liveness
+  assertion reports a reassuring zero when it is broken, which is indistinguishable from this
+  corpus's normal state. One break per ARM rather than one per gate is the point, because a single
+  unnamed arm break leaves the other arms unexercised. The case-fold break is here because §4
+  cites the skeptic's 37 uppercase claim-verb tokens and no other break reaches the flag. The space-clause break
+  is here because the space clause is the one part of S2 whose loss makes the join LOUDER rather
+  than quieter, and a canary that only catches silence would miss it.
 - **AC7** — When a fixture carries one refused sentence inside a triple-backtick fence and the same
   sentence outside it, `claims_scan` yields exactly one hit, and its line number is the unfenced one.
   Red when: the count is two, or zero, or the hit names the fenced line.
@@ -427,62 +526,102 @@ reproduced 6, and every one was innocent either way.
   Red when: the line is absent, any of the three figures is a literal rather than a count of what the
   run saw, a cleared object appears as a hit, or the line is printed conditionally on any key.
   figure: DERIVED — all three are counted during the run.
-- **AC9** — When `FLOOR_ASSERTIONS` is read in the spec-tokens self-test module after S8, its newest
-  RAISED comment names `TOOL-dGatedProse-2` and its arithmetic from 42 reaches the declared value.
-  The module is named by path in S8 and on this spec's `New arm:` line, and deliberately not here.
-  Red when: the floor moves with no comment naming this unit, or the comment's arithmetic does not
-  reach the value beside it. The suite run that grades the printed count against the pin is this
-  spec's `New arm:` line, not this criterion. The reason for naming no suite inside a criterion is
-  sharper than caution, and it is now a present fact rather than a forecast: of the 28 live specs
-  exactly FOUR are dated at or after `SPEC_DIRECT_CUTOFF` 2026-09-15, and they are this build's own
-  four, every other live spec predating the cutoff with the newest at 2026-09-13. These are the first
-  spec files this repo has put inside the `bar` join's ARMED population, so a suite path written into
-  a criterion bullet here would be graded rather than skipped. Re-derived on node d 2026-09-21 by
-  running that join's own predicate over its own two populations: all four specs are clean, 11 graded
-  tokens in this one and 0 BAR matches. rev-2 said "zero of the 24", which was true before the spec
-  files were committed and is not now. figure DERIVED.
-- **AC10** — When `claims_scan` runs over the four spec files of `memory/builds/dGatedProse/spec/` as
-  they stand at the landing commit, it yields zero hits.
-  Red when: any sibling spec reds. This criterion exists because the OWNER ruled the join takes no
-  cutoff (§8 F2), so the four spec files are live tracked specs the moment they are committed — they
-  already are — and this arm grades them from its own landing day. Measured on node d 2026-09-21 over
-  all four at rev-2: zero hits and zero clears. The criterion re-runs it at landing because the
-  siblings are still being folded, and unit 3's S7 puts a glob-shaped `guides/*.md` token in the same
-  sentence as a backticked dossier path
-  (`memory/builds/dGatedProse/spec/2026-09-20-spec-TOOL-dGatedProse-3.md:42`) — a refused shape one
-  verb away from a hit. rev-2 cited that item as S8 and unit 3's own rev-2 renumbered it, which is
-  why a fold re-derives a sibling's citation instead of carrying it.
+- **AC9** — When `FLOOR_ASSERTIONS` is read in the spec-tokens self-test module after S8, its value
+  MINUS the value that module carried at this unit's base equals the number of assertion calls
+  inside the arms this unit adds, counted at observation time as the `arm` calls plus the inline
+  `pass=$((pass+1))` increments inside those arms' own line range — the unit the module's existing
+  RAISED comments already count by — and the newest RAISED comment names `TOOL-dGatedProse-2` with
+  both values. The module is named by path in S8 and on this spec's `New arm:` line, and
+  deliberately not here. Observed statically, by grep and arithmetic, so it needs no suite run.
+  Red when: the delta and the added arms' own call count disagree, which a raise of one over a dozen
+  new assertions does and which the suite's one-way comparison cited in S8 passes silently; or the
+  floor moves with no comment naming this unit. This is the form `TOOL-dGatedProse-1`'s AC19 already
+  has for its own floor, and rev-3's form, which read only the comment's arithmetic, was not.
+  figure: both terms are DERIVED at observation time. The base value is read, not assumed: 67 at
+  `bd44d3ff`, where the same count reproduces it exactly, 60 `arm` calls plus 7 inline increments,
+  so the counting rule is shown to measure the pin before it is trusted to grade a raise. rev-3 typed
+  42, the value at `fcbfba5f`; TOOL-aBlindedTrial-8 and its review rounds raised it on `origin/main`.
+  Why no suite is named inside this criterion, read at observation time rather than typed: the live
+  specs the `bar` join ARMS are those whose filename date is at or after `SPEC_DIRECT_CUTOFF`, and at
+  `bd44d3ff` that population is exactly this build's own spec files, the newest live spec outside it
+  dated 2026-09-13. A suite path written into a criterion bullet here is therefore graded rather than
+  skipped.
+- **AC10** — When `claims_scan` runs at the landing commit over every tracked spec file under
+  `memory/builds/dGatedProse/spec/`, listed at observation time rather than counted here, and over
+  every live spec the checker's own population yields at that commit, it yields zero hits.
+  Red when: any spec in either population reds. This criterion exists because the OWNER ruled the
+  join takes no cutoff (§8 F2), so every live spec is graded from this arm's landing day, this
+  build's own among them. Two things move that population between §4's measurement and landing, and
+  both are why the population is read at landing rather than carried: the readers clauses
+  `TOOL-dGatedProse-5`'s pass writes at order 1 into live specs outside this build, whose bare `.md`
+  basenames are this join's subject anchor, and the folds of this build's own specs, unit 5's
+  included. Two near-misses are known, both one step from a hit: unit 5's census prose names a
+  dossier path beside a claim verb (review item M5 of round 1), and unit 3's S7 puts a glob-shaped
+  `guides/*.md` token in the same sentence as a backticked dossier path. Measured on node d
+  2026-09-21 over the build's four spec files at rev-2, and on 2026-09-22 over all five as this
+  reconcile finds them, unit 5's included: zero hits and zero clears both times. No measurement
+  covers unit 5's pass or a later fold, and this criterion is what does.
   figure: DERIVED — the arm counts what it scans.
-- **AC11** — When `memory/map/features/spec-tokens.md` is read after S10, no sentence in it counts
-  the joins as four, the `title` field and the `:49` body sentence each name five, and the sentence
-  naming three RESOLVING joins is unchanged.
-  Red when: either count site still says four, or the resolving-join sentence was edited. Nothing
-  machine-grades dossier prose — `codebase-map coverage + freshness` grades claims, and this unit
-  moves none — so this is a documented check, stated as one rather than implied to be a gate.
+- **AC11** — When `memory/map/features/spec-tokens.md` is read after S10, its `title` field and its
+  ordinal body sentence at `:49`-`:50` each state the join count DERIVED at observation time from
+  `tools/check-spec-tokens.py`: the number of rows in its docstring's join table, the two-space
+  indented join names between the `THE JOINS KEEP THEIR POPULATIONS APART` paragraph and the
+  `REFUSALS` paragraph, which S7 extends by this join's row. No other sentence in the dossier counts
+  all the joins, and the sentence naming three RESOLVING joins is unchanged.
+  Red when: either count site disagrees with the derived count, still carries the count it held at
+  this unit's base, or the resolving-join sentence was edited. Nothing machine-grades dossier prose —
+  `codebase-map coverage + freshness` grades claims, and this unit moves none — so this is a
+  documented check, stated as one rather than implied to be a gate, until the freshness arm §3
+  routes to a backlog row exists. The count is derived and never typed here because rev-3 typed it:
+  its "name five" became true on the merged tree with no edit at all, once TOOL-aBlindedTrial-8 had
+  landed the `guards` join.
+  figure: DERIVED — read from the checker's docstring at observation time.
+- **AC12** — When `claims_scan` runs over four fixtures, each carrying one refused claim spelled in
+  the shape of exactly one arm of §4's table — active, passive, noun and fronted, one fixture each —
+  over a fifth carrying the active arm's claim with its verb in UPPERCASE, and over a sixth carrying
+  the active arm's claim with a SHOUTED constant as its only object, each fixture yields exactly one
+  hit, the arms reported for that hit include the arm its fixture was written for, and the sixth
+  fixture's hit is CODE SYMBOL.
+  Red when: any fixture yields no hit or more than one, a hit's reported arms omit its designated
+  arm, the uppercase fixture yields no hit, or the SHOUTED fixture yields none, which is S2's
+  underscore test read as lowercase only. Every sentence AC1 and AC2 use is shaped for the
+  active arm, so without this criterion the passive, noun and fronted arms could each be dead, or
+  case-sensitive, with every other criterion green. S3's canary is the startup half of the same
+  observation; this criterion reads `claims_scan` directly on spec-shaped input, so the evidence
+  exists before the held suite ever runs.
+  fixture: the six sentences are the fixtures' own, not corpus quotations; §4's arm table fixes
+  each shape.
 
 ## 7. Gates
 
-`spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `memory hygiene` · `kit/dogfood doc parity` · `kit version markers` · `testsuite counts (every bar self-test prints one)` · `codebase-map coverage + freshness`
+`spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `memory hygiene` · `kit/dogfood doc parity` · `kit version markers` · `testsuite counts (every bar self-test prints one)` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms`
 
 Of those, `kit/dogfood doc parity` is the one this unit ARMS: its guard names `memory/TEMPLATE-SPEC.md`
-and `tools/memory-tree/` and this unit edits both sides of that pair. `spec-tokens self-test` is
-subject `kit`, chunk `selftests`, guard `tools/` — held by default, and §5's testing bullet states the
-Definition of Done that reaches it. `kit version markers` is listed because this unit edits a file in
-its population: that leg's memory-tree half derives its carrier set as
-`git ls-files 'tools/memory-tree/*.template.md'` (`tools/check-kit-versions.sh:135`), which holds
-`tools/memory-tree/SPEC-TEMPLATE.template.md` and NOT `memory/TEMPLATE-SPEC.md`. It asserts marker
-EQUALS constant and this unit moves neither — both sit at 2.79 across this unit's commit, and
-`TOOL-dGatedProse-3` moves them together at order 3 — so it is a watch and not an obligation. The other four are unguarded, subject `repo`, and run on every bar.
-Every name above resolves against `tools/gate-legs.json`.
+and `tools/memory-tree/` and this unit edits both sides of that pair. `recall floor` and
+`recall floor arms` are listed because both carry the guard `memory/`, which every `memory/` path in
+this unit's Files touched sits under, `memory/backlog/TOOL.md` among them. On the merged tree that
+is the rule the guards join of TOOL-aBlindedTrial-8 states; the join does not grade this spec,
+whose filename date predates `SPEC_GUARD_LEGS_CUTOFF`, so the two are named as the rule's content
+and not to clear a hit. `spec-tokens self-test` is subject `kit`, chunk
+`selftests`, guard `tools/` — held by default, and §5's testing bullet states the Definition of Done
+that reaches it; `recall floor arms` is chunk `selftests` too and is held the same way.
+`kit version markers` is listed because this unit edits a file in its population: that leg's
+memory-tree half derives its carrier set as `git ls-files 'tools/memory-tree/*.template.md'`
+(`tools/check-kit-versions.sh:135`), which holds `tools/memory-tree/SPEC-TEMPLATE.template.md` and
+NOT `memory/TEMPLATE-SPEC.md`. It asserts marker EQUALS constant and this unit moves neither — both
+sit at the inherited value across this unit's commit, and `TOOL-dGatedProse-3` moves them together
+at order 4 — so it is a watch and not an obligation. `spec tokens (a spec's own names resolve)`,
+`memory hygiene`, `testsuite counts (every bar self-test prints one)` and
+`codebase-map coverage + freshness` carry no guard, are subject `repo`, and run on every bar. Every
+name above resolves against `tools/gate-legs.json`.
 
 This unit's landing commit moves this spec's own status header, which `gen_build_index.py` reads, so
 the generated `memory/LIVE.md` and the current `memory/ledger/<month>.md` shard are re-rendered in
-that same commit. The build's four spec files land together in the build's spec commit, where unit 1's
-§7 already carries that re-render; this unit adds no spec file of its own.
+that same commit. This unit adds no spec file of its own.
 
 New arm: `tools/check-spec-tokens.test.sh` · AC1's two blob-derived sentences, AC4's live-key
-enumeration, AC6's nothing-matching arm pattern and its clause-removed variant, AC7's unfenced copy ·
-floor moved by S8, read by AC9
+enumeration, AC6's per-arm nothing-matching patterns with its case-fold and space-clause variants,
+AC7's unfenced copy, AC12's per-arm, uppercase and SHOUTED fixtures · floor moved by S8, read by AC9
 
 ## 8. Open questions
 
@@ -514,8 +653,8 @@ WHAT THE RESOLUTION GIVES UP, priced rather than implied away: a key-shaped obje
 key, a typo, and a claim in the wrong dossier all pass. That residual is already gated one layer
 down — `tools/codebase-map/map_lib.py:10` records that a claim naming a dead key fails too — so this
 join shortens the loop from the dossier edit to the spec commit and buys nothing the ratchet does not
-eventually catch. The skeptic priced it as a second copy of an existing verdict, and that pricing is
-accepted rather than argued with.
+eventually catch. The skeptic priced it as shortening a loop rather than closing a hole (research
+record `:297`-`:298`), and that pricing is accepted rather than argued with.
 
 **F2 — is a dated cutoff key declared for this arm, or does it grade every live spec at once?**
 Both sibling rule arms in this checker took one, `SPEC_LEGLINE_CUTOFF` and `SPEC_DIRECT_CUTOFF`
@@ -525,14 +664,15 @@ on a zero, which BUILD-METHOD M3 refuses as a fork resolver.
 RESOLVED (owner, 2026-09-21): NO cutoff. `SPEC_CLAIMS_CUTOFF` is not declared at all, and the arm
 grades every live spec from the commit that lands it. The ruling covers unit 1's predicate in the
 same breath, so the two spec-prose phase-in questions of this build are answered together rather
-than one at order 1 and a fork at order 2 — which is what rev-2 asked for. The consequence was
+than one in unit 1's commit and a fork in this unit's — which is what rev-2 asked for. The consequence was
 stated to the owner and accepted with it: corpus work, no phase-in for work in flight, and this arm
 grading its own sibling specs on its landing day.
 
-What the ruling costs THIS unit is measured and it is nothing. §4's Migration paragraph derives 0
-hits over the 28 live specs and over all 645 tracked ones, with 41 near-miss windows printed and none
-matching an arm, so the corpus work the ruling prices is another unit's rather than this one's. AC10
-is the observation, and it re-runs at landing because the siblings are still being folded.
+What the ruling costs THIS unit was measured at nothing on the corpus §4's Migration paragraph
+read, with its near-miss print beside it, and that paragraph states what the reading does not yet
+cover: unit 5's pass and this build's own folds. So the corpus work the ruling prices is another
+unit's rather than this one's as far as it was measured, and AC10 is the observation that extends it
+to the population the arm actually meets on its landing day.
 
 The residual the ruling leaves is the fleet, unchanged from rev-2: a spec on another node's unpushed
 branch could carry the refused shape and red at its merge, and the remedy is one row in the
@@ -546,13 +686,15 @@ correction so nothing is lost.
 re-spellings, the noun arm takes it to 11, and the fronted arm to 12.
 
 RESOLVED (agent, 2026-09-20; re-measured 2026-09-21): four. FACT-QUESTION · the probe is the same
-scan run in each configuration over all 645 tracked specs and over the thirteen re-spellings the dry
-run's skeptic enumerated. The deciding observation is the coverage gain, and the constraint it had to
+scan run in each configuration over all 645 tracked specs and over §4's thirteen re-spellings, whose
+sources §4 states. The deciding observation is the coverage gain, and the constraint it had to
 respect is that the corpus hit count does not move: measured 0 hits under every configuration, with
-3 clears over the full corpus and 0 over the live 28, identical throughout — re-run once more at this
-revision, over the grown population, with every figure unchanged. The two added arms are
-the shapes stage 1 reported as its own false-positive sources, which is why they were worth measuring
-rather than assuming: under a refusal set they read the correct token, because the object they front
+3 clears over the full corpus and 0 over the live 28, identical throughout — re-run once more at
+rev-3, over the tree rev-3 measured, with every figure unchanged. Not re-run per configuration at
+rev-4 or rev-5; the four-arm configuration was re-run at rev-5 over 722 tracked specs, 0 hits and 4
+clears (§4 Migration), and AC10 covers what changes after. The two added arms are the shapes stage 1
+reported as its own false-positive sources, which is why they were worth measuring rather than
+assuming: under a refusal set they read the correct token, because the object they front
 is the one being claimed. The spelling that stays out is the unbackticked dossier subject, §3's
 declined mechanism. figure PINNED — node d, 2026-09-21.
 
@@ -625,6 +767,85 @@ declined mechanism. figure PINNED — node d, 2026-09-21.
   §3 gains the ownership-line fact rev-2 omitted: the one sentence the briefs keep calling a live hit
   is node `c`'s, is CLOSED, and is not a hit under the refusal set — so the conditional about another
   node's owner is evaluated and does not fire.
+- rev-4 · 2026-09-21 · §1 · §2 S1 S3 S5 S8 S9 S10 · §3 · §4 · §5 · §6 AC4 AC6 AC9 AC10 AC11 AC12 · §7
+  · §8 F2 F3 · §10 · the fold of spec audit round 1, onto the merged tree.
+  DISPOSED BY SEVERITY under BUILD-METHOD M4. `REVIEW_ROUNDS` is 1, so this fold is the exit and no
+  round 2 follows. The base moves from `fcbfba5f` to `bd44d3ff`, the commit merging `origin/main`, and
+  every anchor this revision cites into the checker, its self-test, the dossier,
+  `memory/TEMPLATE-SPEC.md` and `memory/backlog/TOOL.md` was re-read there.
+  H1, HIGH, CLOSED by this unit's own mechanism, so no unit is minted. The join is no longer counted
+  in this spec's prose: §1 and S9 stop calling it the fifth, and S10 and AC11 derive the dossier's
+  count from the checker's docstring join table at observation time, because the `guards` join of
+  TOOL-aBlindedTrial-8 made rev-3's "name five" true with no edit. S8 and AC9 read the floor base
+  from the file, 67 at `bd44d3ff` against rev-3's 42. S5 cites the `bar` and `guards` report lines as
+  precedent, since both print on every run, and the departure rev-3 claimed is deleted there and in
+  §10. §4's hit-kind list gains `legline` and `guards`. The anchors `:87`, `:258`, `:421` and `:429`
+  are now `:119`, `:426`, `:619` and `:627`.
+  M5 FOLDED. AC10 reads every spec file of the build's folder, listed at observation time, and every
+  live spec at landing. Edges gains consumes-from `TOOL-dGatedProse-5`. The orders are restated as
+  unit 5 at 1, unit 1 at 2, this unit at 3 and unit 3 at 4. AC9's typed counts become populations
+  read at observation time. §4 Migration says what its measurement covers on the merged tree and
+  what it does not, and §8 F2 points there instead of restating it. §7's pointer into unit 1's §7 is
+  deleted.
+  M6, filed here with its fix in the README, FOLDED as far as this spec reaches: the external edge
+  and §4 cite the build's research record, and the untracked journal is no longer cited.
+  M7 FOLDED. S3's canary carries one refused claim per arm, each with an uppercase verb, and is
+  checked per arm rather than by total. AC6 breaks each arm in turn, then the case fold, then the
+  space clause. The new AC12 gives each arm, and the uppercase verb, a fixture of its own.
+  M8 FOLDED. AC9 takes the form of `TOOL-dGatedProse-1`'s AC19: the delta equals the counted `arm`
+  calls and inline increments of the added arms, and the same rule reproduces the base pin exactly,
+  60 plus 7 against 67.
+  RE-DERIVED, because the merge moved them under this spec. §4's key-set figures are now 270 keys,
+  265 distinct and 14 parenthesised, and the disjointness property stands. The kit-version value is
+  no longer typed. §5 states the population for both trees. §7 adds `recall floor` and
+  `recall floor arms`, whose `memory/` guard two of this unit's paths trip.
+  NOT TAKEN HERE, and returned to the owner. H1's left-shift, a map freshness arm comparing the
+  dossier's count with the checker, belongs to the codebase-map kit, and AC11 carries the derivation
+  as a documented check until it exists. The new edge needs unit 5 to declare hands-off
+  `TOOL-dGatedProse-2` back, or check 12's reciprocity join reds.
+- rev-5 · 2026-09-22 · §2 S2 · §3 · §4 · §5 · §6 AC3 AC6 AC10 AC11 AC12 · §7 · §8 F1 F3 · the
+  cross-spec reconcile of the round-1 folds, run one unit at a time, this unit after units 4, 3 and
+  5. Every figure and anchor this entry touches was re-derived on the working tree over `bd44d3ff`,
+  where the checker, its suite, the dossier and the backlog are unchanged since rev-4.
+  M6 CLOSED here. The dry-run edge names
+  `memory/builds/dGatedProse/build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md` by path,
+  with the line of every dry-run figure this spec rests on, and §4, §5, AC3 and F1 cite those lines
+  where they use one. Two statements that record does not carry are DELETED rather than kept on the
+  journal's word: that stage 1's near-miss list held an uppercase verb its own pass could not see,
+  and that the fronted clause was stage 1's LARGEST false-positive source. F1 quotes the skeptic's
+  pricing as the record words it. The four-arm paragraph says what the record holds: thirteen
+  re-spellings counted, seven of the eleven shapes named there, and the other four named here. F3
+  and AC6 stop attributing the thirteen and the 37 to anyone but their sources.
+  THE UNDERSCORE TEST, STATED IN EITHER CASE, reconciled against `TOOL-dGatedProse-3` §3, which reads
+  this join as refusing a SHOUTED object beside a dossier subject, while S2 said only snake_case and
+  every probe here tested lowercase. S2 and §4's refusal table now say either case, which the class
+  needs, since a constant is a symbol the map cannot hold. No key carries an underscore, so AC4's
+  disjointness is untouched, and AC12 gains a SHOUTED fixture so the reading is observed. Re-run both
+  ways over the 722 tracked specs, the 29 live and this build's five: identical, 0 hits.
+  RE-MEASURED. §4 Migration carries the all-tracked figure at rev-5, 0 hits and 4 clears, the fourth
+  brought in by the merge in a CLOSED spec, on a leg name carrying a space. AC10 records the five
+  spec files at 0 hits and 0 clears, and F3 says which configuration was re-run.
+  ROUTED. H1's left-shift, the codebase-map freshness arm, is a hands-off external edge the build
+  routes at landing to a new `memory/backlog/TOOL.md` row, and AC11 points at it. That file joins
+  Files touched for that row and for `TOOL-dLoggedFlight-32`, which the same landing edit now
+  re-words AND closes. Units 3 and 4 write other rows of that file at landing, so the edits are
+  row-disjoint. §7's recall-floor sentence reads the `memory/` paths instead of counting them.
+  VERIFIED, and nothing moved. Unit 5's rev-6 declares the mirroring hands-off `TOOL-dGatedProse-2`
+  that rev-4 asked for, and the unit-5 edge now names it. The owner's rulings of 2026-09-21 on the
+  guide cap pair, now 98304 and 1200, and on the build method's line half move no figure this spec
+  carries. Unit 4's reused S3 label reaches nothing here either, because this spec cites none of that
+  unit's items.
+  CORRECTED in passing, a rev-3 sentence this fold re-read: §4's broad-diagnostic paragraph called an
+  unbackticked OBJECT S7's first limit, which is the unbackticked SUBJECT. It now says no arm reads an
+  unbackticked object. Whether S7 declares that as a limit of its own is returned, not folded.
+  NOT TAKEN HERE. The left-shifts round 1 attached to M7 and M8, a staged break per alternation and a
+  diff of sibling criteria, are spec-audit checklist entries rather than this unit's code, and they
+  stay with the build's closing, which routes every confirmed finding.
+- rev-6 · 2026-09-22 · §2 S7 · §3 · §5 · §6 AC5 · the owner ruled on 2026-09-22 the question rev-5
+  returned rather than folded: an unbackticked claimed OBJECT is S7's sixth declared limit, named in
+  the join's WHAT IT DOES NOT CHECK block beside the other five, so a green is never read as covering
+  it. No predicate reaches it, as none reaches the unbackticked subject: the dry run scored that look-back
+  window at precision 0.00 over this corpus.
 
 ## 10. Reuse audit
 
@@ -637,11 +858,11 @@ reuse `map_extractors.all_inventories()`, in the held self-test, which is the on
 costs nothing. The seam this unit DOES extend is in the checker it joins and the probe does not index
 it, because the lookup's scan coverage names `.sh` as its unscanned layer and ranks Python symbols by
 name fan-in rather than by call site: `tools/check-spec-tokens.py` already owns the live-spec
-population (`:87`), the tracked file set (`:140`), the per-spec text decode and the hit, near and
-waiver plumbing (`:322`), and this unit adds a fifth entry to those lists rather than a new reader.
-Verified against source at writing time; the `bar` join at `:125` is the template followed, including
-its skip-and-count report line — with one deliberate departure, which S5 names: that line is printed
-inside `if direct_cut:` and this join's is unconditional.
+population (`:119`), the tracked file set (`:182`), the per-spec text decode and the hit, near and
+waiver plumbing (`:468`), and this unit adds one entry to those lists rather than a new reader.
+Re-verified against source on the merged tree at `bd44d3ff`; the `bar` join (`BAR` at `:168`) and
+the `guards` join of TOOL-aBlindedTrial-8 are the templates followed, including the report line each
+prints on every run, which S5 cites as precedent.
 Three places where a record and the tree disagreed. The harness brief called the skeptic's single hit
 a live spec, and the file's own status header reads CLOSED and node `c`, so §3 records the correction
 instead of acting on the brief — twice now, because the brief opening the rev-3 fold repeated the

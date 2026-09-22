@@ -1,11 +1,12 @@
 # TOOL-dGatedProse-5 — the corpus answers for its readers before the check that asks
 
-**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 1
+**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base bd44d3ff · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md](../build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md) | research | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 |
 
 <!-- /gen:spec-records -->
@@ -35,25 +36,24 @@ of those specs are INPROGRESS under their owners' hands; section 4 names which.
   difference against the section-4 census: items that entered the population since 2026-09-21 and
   items that left it. The census records which reading of the two rulings that text carries, and the
   write set is the DERIVED set. Observed by AC1 and AC14.
-- **S2** — the CLAUSE on every derived item, with all three markers present and exactly one clause
-  per item. A second clause on one item is a defect rather than redundancy, because both halves are
-  then graded twice with two different answers. Where F1's derivation binds the edited spec, the
-  same edit bumps its rev and adds the section 9 entry carrying the item's scope token, and no other
-  spec's header moves. Observed by AC2, AC6 and AC9.
-- **S3** — the RESOLUTION of every by-name token the pass writes, against the tracked tree outside
-  `memory/builds/*/spec/`, with the exclusion pathspec verified rather than trusted. Unit 1 measured
-  that trap: the pathspec it wrote returned 2072 files against 1556 tracked non-spec files, and an
-  exclusion that silently fails makes every name resolve against the spec corpus that named it.
-  Observed by AC3.
+- **S2** — the CLAUSE on every derived item, with all three markers present in their order and
+  exactly one clause per item. A second clause on one item is a defect rather than redundancy,
+  because both halves are then graded twice with two different answers. Where F1's derivation binds
+  the edited spec, the same edit bumps its rev by one and adds the section 9 entry carrying the
+  item's scope token, and no other spec's header moves. Observed by AC2, AC6, AC9, AC16 and AC17.
+- **S3** — the RESOLUTION of every token the pass writes, by `TOOL-dGatedProse-1`'s S5 resolver as
+  that S-item stands at the pass's base. This spec points at S5 and does not restate it: a
+  paraphrase of a sibling's contract is the copy that rots, and rev-5's did. The pass runs it and
+  records its output before the census record is committed, and a token that is a RECORD's path
+  resolves there by identity while reading nothing, so no clause carries one. Observed by AC3.
 - **S4** — the GENUINE set. Section 4 names every item where something the item withdraws is read in
-  this tree, found by reading the code, and each of those items receives the readers named there, by
-  bare path or symbol. Three of them are the items the original dry run named, and they are the
-  reason this class was ruled gateable at all. Three more are items rev-1 answered with an escape
-  that a skeptic showed to have readers, which is the direction no shape check can catch afterwards,
-  and four of the items rev-3 adds are ones an escape would be the easy wrong answer for. Two more
-  are rev-3 escapes that rev-4 reverses from the code, `aWalkedCorpus-2` S5 and
-  `TOOL-dGatedProse-4` S3, and a third is one rev-5 reverses, `aPacedTurnstile-14` S9. Observed by
-  AC5, AC12, AC13 and AC15.
+  this tree, found by reading the code, and its token table records the readers each clause carries
+  on each half, by bare path or symbol. Every item the census marks GENUINE receives them, and none
+  answers its by-value half with `NO VALUE READERS` except the one item section 4 names, whose
+  withdrawn thing had names and no value. The criteria quantify over the census's GENUINE set and
+  never over named samples, because every census round so far found its errors in one direction, an
+  escape written over real readers, and a sample leaves the rest of the set unobserved. Observed by
+  AC5 and AC12.
 - **S5** — the ESCAPED set. Section 4 names every item whose honest answer is an escape spelling,
   and each receives that spelling followed by its reason on the same half. The reason is a claim
   about the tree, never about the sentence. A bare escape is a refusal, not an answer. Observed by
@@ -65,27 +65,31 @@ of those specs are INPROGRESS under their owners' hands; section 4 names which.
   follows rather than a hope. An item whose label has gone, whose text no longer fires, or whose
   spec has reached a terminal status leaves the write set and is recorded as left out. Observed by
   AC1 and AC8.
-- **S8** — the CENSUS record under this build's `build/` folder: the probe's output, the reading of
-  the rulings it ran under, the per-item verdict, the reader evidence by path, and the two-way
-  difference of S1. It is the provenance for every clause a reviewer will read as an assertion.
-  Observed by AC1, AC6 and AC14.
-- **S9** — the RECIPROCAL edge, VERIFIED. The order re-stamp was made at spec time, when the main
-  loop renumbered the build on 2026-09-21, so no sibling header is this unit's edit. The mirror this
-  unit's own **hands-off** needs, one **consumes-from** `TOOL-dGatedProse-5` bullet on unit 1's
-  file, is present at 67bec01a. The pass reads unit 1's edges section at its base and writes that
-  bullet, with the revision entry recording it, in the node-`d` commit only if a later fold has
-  taken it out. Observed by AC10 and AC11.
+- **S8** — the CENSUS record under this build's `build/` folder: the trigger's output, the reading of
+  the rulings it ran under, the per-item verdict, one row per item carrying the tokens its clause
+  holds on each half, the reader evidence by path, the resolver's output, and the two-way difference
+  of S1. The token rows are copied from section 4's table and changed only for an item S1's
+  difference moves, with the reason, so AC5 and AC12 are a mechanical diff of the written clauses
+  against them. It is the provenance for every clause a reviewer will read as an assertion, and it
+  lands under `memory/builds/`, so under `TOOL-dGatedProse-1`'s S5 it resolves nothing by content.
+  Observed by AC1, AC3, AC5, AC12 and AC14.
+- **S9** — the RECIPROCAL edges, VERIFIED. The order re-stamp was made at spec time, when the main
+  loop renumbered the build on 2026-09-21, so no sibling header is this unit's edit. Three siblings
+  declare **consumes-from** `TOOL-dGatedProse-5`: unit 1, and units 2 and 4 from their rev-4 folds.
+  This spec carries the three mirroring **hands-off** bullets, the last two from rev-6. The pass reads the three
+  sibling edge sections at its base and writes a missing bullet, with the revision entry recording
+  it, in the node-`d` commit only if a later fold has taken one out. Observed by AC10 and AC11.
 
 ## 3. Non-goals (OUT)
 
 - **No check, no arm, no fixture, no engine edit.** Check 25, its `fail 25` branch, the hoist, the
-  fourteen fixtures and the catalog entry are unit 1's whole scope. This unit writes markdown into
-  spec files and touches no executable.
+  fixture block of unit 1's S9 and the catalog entry are unit 1's whole scope. This unit writes
+  markdown into spec files and touches no executable.
 - **No completeness claim.** A clause this unit writes names the readers it FOUND. It never asserts
   the list is exhaustive, and section 4 measures why: the control revision `TOOL-dLoggedFlight-22`
   listed three readers fewer than it had and every name it did list resolved, so a resolution-graded
   clause passes a spec with the defect this whole strand exists to catch.
-- **The NAMED GAP that remains is not closed.** Under the combined trigger at 67bec01a it is four
+- **The NAMED GAP that remains is not closed.** Under the combined trigger at `bd44d3ff` it is four
   live items under reading B of O6, the reading F7 settled, and section 4 names them; reading A
   would have left eight. The genuine retirement unit 1 measured inside it, `aMendedLedger-1` S2, has
   left it for the population under either reading. A second class sits outside that figure: eight
@@ -112,12 +116,35 @@ of those specs are INPROGRESS under their owners' hands; section 4 names which.
   shapes with their exclusions, the six kind nouns, and the clause grammar with its two escapes — as
   the owner's rulings of 2026-09-21 leave it: every verb matched case-insensitively, the five
   past-tense forms added under O5, and the `.md` exclusion gone under O6. Declaring those in the
-  trigger is that unit's fold, and F7 settled the two readings its text had to choose. The text exists
+  trigger is that unit's fold, and F7 settled the two readings its text had to choose. The RESOLVER
+  crosses too: AC3 implements that unit's S5 exactly and does not restate it. The text exists
   before either unit is built, so the relation is this hand-off to a later order and not a
   **consumes-from**, whose target would run after this one. The reciprocity join prints on the
-  DECLARING file at `tools/memory-tree/check-memory-hygiene.sh:1800`, and unit 1 carries the
-  mirroring **consumes-from** `TOOL-dGatedProse-5` at 67bec01a, so the join is closed; S9 keeps it
-  so.
+  DECLARING file at `tools/memory-tree/check-memory-hygiene.sh:1815`, and unit 1 carries the
+  mirroring **consumes-from** `TOOL-dGatedProse-5`, so the join is closed; S9 keeps it so. What
+  crosses back is this census, which that unit's precision split and its S14 read. The census
+  answers 37 items across 19 specs over the tree the reconcile leaves, and 38 across 20 only in the
+  commits `67bec01a` and `bd44d3ff`, where unit 4's spec was still at rev-3. Unit 1 writes its split
+  out item by item, so a verdict that moves here reaches it only through its own fold; where the two
+  differ, section 4 states this census's verdict and the code behind it for that fold, which runs
+  after this one.
+- **hands-off** `TOOL-dGatedProse-2` — the clauses this pass writes, which that unit's `claims`
+  join grades from order 3 with no cutoff. A by-name half here names a dossier by its bare
+  basename, `unattended.md` on `aPacedTurnstile-14` S9 for one, which is that join's own
+  dossier-subject anchor, so no clause puts a claim verb beside a dossier name. That unit's AC10
+  re-derives its hit count over every live spec at landing, these clauses included. The mirror is
+  its **consumes-from** `TOOL-dGatedProse-5`, declared at its rev-4.
+- **hands-off** `TOOL-dGatedProse-4` — its spec, which this pass edits only where the trigger
+  fires. The one item of that file the trigger fired on was rev-3's S3, the pointer repair to the
+  review protocol, which carried the strict-list verb `removes` beside a backticked guide path and
+  which the census rated GENUINE. Unit 4's rev-4 fold deleted that item and gave its label to the
+  method's budget raise, which carries no verb from the list, so a sentence saying unit 4's S3 fires
+  means the deleted pointer repair and never today's S3. Re-derived over the tree the reconcile
+  leaves, unit 4 at rev-5, no item of that file fires. Its S2 carries `deleted` and no backticked
+  token, so it sits in the token-less class section 4 names, with the reader it has, and gets no
+  clause here. The pass writes nothing in that file unless S1's derivation at the pass finds an
+  item, and then it writes the clause and F1's rev bump in the node-`d` commit. The mirror is its
+  **consumes-from** `TOOL-dGatedProse-5`, declared at its rev-4 and carried at its rev-5.
 - **hands-off** external — the items of the named gap that remains, and the completeness half no
   predicate in this build grades. Both are recorded as open classes rather than work.
 
@@ -127,34 +154,39 @@ of those specs are INPROGRESS under their owners' hands; section 4 names which.
 
 Three populations nest, and the outer two are unit 1's inheritance rather than this unit's choice:
 check 25 grades check 12's selection, filtered to LIVE. Liveness is the engine's own negative test
-at `tools/memory-tree/check-memory-hygiene.sh:1385`, `hdr !~ /^\*\*Status:\*\* (CLOSED|WONTDO)/`,
-and not the positive whitelist at `tools/check-spec-tokens.py:87`, which excludes `DEFERRED` and
+at `tools/memory-tree/check-memory-hygiene.sh:1400`, `hdr !~ /^\*\*Status:\*\* (CLOSED|WONTDO)/`,
+and not the positive whitelist at `tools/check-spec-tokens.py:119`, which excludes `DEFERRED` and
 would drop `dScaffoldedMirror-9` out of this pass.
 
-**OWN-PROBE, 2026-09-21, at 67bec01a**, the commit this spec landed in. The probe is
-`probe_pop_rev3.py`, written to this session's scratchpad and UNTRACKED, so nothing in the tree
-resolves it and the figures below are PINNED to that commit. It reads every file out of the commit
-through `git show` and never out of the worktree, so a sibling fold in progress cannot leak into a
-count. A second implementation, unit 1's own `probe_u1_rev4.py` patched for the two rulings by
-`probe_cross_rev3.py`, returns the same item set under every variant below, label for label. Every
-figure is re-derived at the build pass under S1.
+**OWN-PROBE, 2026-09-21, rev-6, at `bd44d3ff`**, the merge of `origin/main` this revision is folded
+on. The probe is `probe_u5_rev6_pop.py`, written to this session's scratchpad and UNTRACKED, so
+nothing in the tree resolves it and the figures below are PINNED. It implements unit 1's trigger as
+unit 1's rev-7 text states it, the whitespace squeeze on the verb copy included. Read out of the
+commit through `git show`, it returns 38 items across 20 specs, the same item set it returns at
+`67bec01a`, label for label: the merge brought 76 spec-shaped files and no live one. Read over the
+working tree that round 1's folds of units 1 to 4 leave, it returns 37 across 19, and re-run at
+rev-7 over the tree the reconcile has left so far, units 3 and 4 at rev-5, it returns the same item
+set. The one item that left is rev-3's S3 of `TOOL-dGatedProse-4`, the pointer repair to the review
+protocol, which that spec's rev-4 fold deleted before giving the label to a budget raise that fires
+nothing. The census answers the 37. rev-3 to rev-5 measured at `67bec01a` with
+`probe_pop_rev3.py`, which a second implementation matched label for label. Every figure is
+re-derived at the build pass under S1.
 
 | population | size | derivation |
 |---|---|---|
-| tracked spec-shaped files | 643 | check 12's own path regex |
-| at or after `SPEC_FORMAT_CUTOFF` 2026-07-15 | 641 | check 12's selection, inherited whole |
-| LIVE within that selection | 38 | the `:1385` liveness test |
-| triggered items, both rulings, reading B | 38 across 20 specs | the trigger as O5 and O6 leave it |
-| triggered items, both rulings, reading A | 34 across 18 specs | the same, the dotted-tail shape still refusing `md` |
-| node `a`, reading B | 27 items across 14 specs | the status header's own `node` field |
-| node `b`, reading B | 3 items across 1 spec | the same |
-| node `d`, reading B | 8 items across 5 specs | the same |
+| tracked spec-shaped files | 719 | check 12's own path regex, at `bd44d3ff` |
+| at or after `SPEC_FORMAT_CUTOFF` 2026-07-15 | 717 | check 12's selection, inherited whole |
+| LIVE within that selection | 38 | the `:1400` liveness test |
+| triggered items, both rulings, reading B | 37 across 19 specs | the trigger as O5 and O6 leave it, over the folded tree |
+| node `a` | 27 items across 14 specs | the status header's own `node` field |
+| node `b` | 3 items across 1 spec | the same |
+| node `d` | 7 items across 4 specs | the same |
 
-Under reading A node `a` holds 24 items across 13 specs and node `d` 7 across 4, and node `b` is
-unchanged. The spec-shaped, selected and live counts each moved by one since rev-2 because this spec
-entered the tree at 67bec01a, and it carries no triggered item, which AC9 re-derives.
+Reading A, which F7 set aside, is 33 items across 17 specs over the same tree; the four `B only`
+rows of the rev-3 table are the difference. This spec and unit 1's carry no triggered item, which
+AC9 re-derives for this one.
 
-**The trigger before the two rulings still fires on 23 items across 14 specs at 67bec01a**, the
+**The trigger before the two rulings still fires on 23 items across 14 specs at 67bec01a and at `bd44d3ff`**, the
 figure rev-1 pinned at fcbfba5f and rev-2 re-derived at 32f2eb71. Nothing between 32f2eb71 and
 67bec01a touched a triggered item: the only spec edits in that range are this build's own, units 2
 to 4 took header re-stamps and nothing else, and unit 1 carries no triggered item under any variant
@@ -175,6 +207,9 @@ because its rationale had died and it hid `aMendedLedger-1` S2, one of the rule'
 Unit 1 measured each alone at 32f2eb71, 8 items across 7 specs for O5 and 25 items across 15 specs
 for O6, and both reproduce here exactly. The combined figure is neither their sum nor their sum less
 an overlap: the two deltas are DISJOINT, and the combination adds items neither ruling adds alone.
+Every figure in this section is at `67bec01a`, and each reproduces at `bd44d3ff`; unit 4's spec is
+at rev-3 in both commits, and its S3 there, the pointer repair since deleted, fires in both, so the
+combined figure here is 38 and not the 37 the folded tree gives.
 
 | delta over the 23 | reading A | reading B |
 |---|---|---|
@@ -252,7 +287,7 @@ its readers wherever readers exist.
 | `aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-4-u3-hygiene-gate.md` | a | SPECCED | S7 | the session machinery of the scaffolder | GENUINE |
 | `aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-5-u5-merge-driver.md` | a | SPECCED | S5 | nothing — a merge case names the verb | ESCAPE |
 | `aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md` | a | SPECCED | S11 | a playbook version marker and one sentence | GENUINE |
-| `aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md` | a | SPECCED | S5 | nothing — two test arms name the verb | ESCAPE |
+| `aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md` | a | SPECCED | S5 | the separator-bearing unkeyable fixture row the suite's arms assert the driver cannot key | GENUINE |
 | `aMendedLedger/spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md` | a | SPECCED | S2 | `split_regions` and its three companions | GENUINE |
 | `aMendedLedger/spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md` | a | SPECCED | S11 | the reach of a node-local `merge.conflictStyle` value | GENUINE |
 | `bConvergentLodestar/spec/2026-07-22-spec-bConvergentLodestar-1.md` | b | SPECCED | S2 | nothing — an artifact churn condition | ESCAPE |
@@ -267,20 +302,22 @@ its readers wherever readers exist.
 Paths are relative to `memory/builds/`, because the full ones do not fit a table cell at this width
 and the prefix is the same for every row of this table and the next.
 
-Of these 23, fifteen are GENUINE and eight ESCAPE. The difference from unit 1's reading runs in both
+Of these 23, sixteen are GENUINE and seven ESCAPE. The difference from unit 1's reading runs in both
 directions and is not a disagreement about the trigger. Three items unit 1 called innocent or
 borderline — `aGradedDoorway-7` S2, `aMendedLedger-1` S1 and `aMendedLedger-8-u9` S11 — have
 readers that resolve, so an escape on any of them would be a false statement check 25 passes
-forever. Two items
-unit 1 did not name among its innocents — `aMendedLedger-5-u5` S5 and `aMendedLedger-7-u8` S5 —
-fire on a verb that names a git merge case and two test arms, and withdraw nothing. Unit 1 was
-counting sentences a reader would call false positives; this pass records what each item's honest
-ANSWER is, which is a claim about the tree. One GENUINE item, `aMendedLedger-8-u9` S2, still answers
-its by-value half with `NO VALUE READERS`, because what it withdraws had names and no value.
+forever. `aMendedLedger-5-u5` S5, which unit 1 did not name among its innocents, fires on a verb
+that names a git merge case in an item that creates a suite, and withdraws nothing.
+`aMendedLedger-7-u8` S5 fires on the name of two test arms, and rev-1 to rev-5 escaped it on that
+ground, which is a claim about the sentence; rev-6 read the code, and the fixture row it re-points
+has a reader, named in the genuine set below. Unit 1 was counting sentences a reader would call
+false positives; this pass records what each item's honest ANSWER is, which is a claim about the
+tree. One GENUINE item, `aMendedLedger-8-u9` S2, still answers its by-value half with
+`NO VALUE READERS`, because what it withdraws had names and no value.
 
 ### The items rev-3 adds, every one, with its verdict
 
-These fifteen rows are NEW in rev-3 and are the ones a skeptic should attack. The ruling
+These rows are NEW in rev-3 and are the ones a skeptic should attack. The ruling
 column names what brings each item in: `O5`, `O6`, or `both` for an item neither ruling reaches
 alone. `B only` marks the four rows that enter under reading B of O6 and not under reading A. F7
 settled reading B, so the pass writes those four, and S1 still takes the write set from the text
@@ -299,53 +336,91 @@ unit 1 lands.
 | `aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md` | a | SPECCED | S1 | O6, B only | the charter's shard rule, row shape and status vocabulary | GENUINE |
 | `aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md` | a | SPECCED | S5 | O6, B only | ten runbook claims that the sharded ledger ships | GENUINE |
 | `aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md` | a | SPECCED | S6 | O5 | the sharded authored ledger, in the runbook's migration section | GENUINE |
-| `aPacedTurnstile/spec/2026-08-20-spec-TOOL-aPacedTurnstile-14.md` | a | SPECCED | S9 | both, B only | three dossier claims and one typed figure | ESCAPE |
+| `aPacedTurnstile/spec/2026-08-20-spec-TOOL-aPacedTurnstile-14.md` | a | SPECCED | S9 | both, B only | the dossier's byte count against `DOSSIER_CAP_BYTES` | GENUINE |
 | `bConvergentLodestar/spec/2026-07-22-spec-bConvergentLodestar-1.md` | b | SPECCED | S4 | O5 | a touched dossier's row in the affordance-exempt list | GENUINE |
-| `dGatedProse/spec/2026-09-20-spec-TOOL-dGatedProse-4.md` | d | SPECCED | S3 | O6 | the guide's byte count, which its 18 bytes move against a declared cap | GENUINE |
 | `dPolishedVitrine/spec/2026-09-13-spec-TOOL-dPolishedVitrine-14.md` | d | INPROGRESS | S2 | both, B only | nothing — `retired` names a record the item reads | ESCAPE |
 
 `aTunedCompass-9` S5c is the label the trigger extracts, and it extracts the same label from the
 neighbouring items that open `S5c` and `S5c-ii`. The item that fires is the one opening `S5c-i`, the
 only one of the three carrying a past-tense verb and an identifier, and the clause sits under it and
-no other. Thirteen are GENUINE and two ESCAPE under reading B, ten and one under reading A. Rev-3
-had two of these as escapes and rev-4 a third, and section 4 names the code that reverses each.
-Across the whole population that is 28 GENUINE and 10 ESCAPE under reading B, and 25 and 9 under
-reading A.
+no other. Twelve are GENUINE and two ESCAPE under reading B, nine and one under reading A. Two of
+the GENUINE rows were escapes at an earlier revision, `aWalkedCorpus-2` S5 and
+`aPacedTurnstile-14` S9, and section 4 names the code that reverses each. Across the whole
+population that is 28 GENUINE and 9 ESCAPE under reading B, and 25 and 8 under reading A, every
+figure counted from the rows as written at rev-6 and recounted at rev-7. Rev-3's
+`TOOL-dGatedProse-4` S3, the pointer repair to the review protocol, was a row of this table through
+rev-5, rated GENUINE; unit 4's rev-4 fold deleted it, and the census drops it. That spec's label S3
+now names a budget raise that fires nothing, so the old row describes no item of its present text.
 
-**Where this census and unit 1's precision split disagree, and why the census answers.** Unit 1's
-rev-5, folded beside rev-3 of this spec, reads seven of these thirteen GENUINE items as false
-triggers — `aMendedLedger-2-u1` S4 and S6, `aMendedLedger-6-u6` S5, `bConvergentLodestar-1` S4,
-`aWalkedCorpus-2` S5, `TOOL-dGatedProse-4` S3 and `aPacedTurnstile-14` S9 — and says
-its reading of the fifteen was at item level, not against code, and provisional until this census
-read them. The two readings answer different questions. Unit 1 asks whether an item retires a name,
-row kind or vocabulary member. A clause answers whether anything the item withdraws is read, and for
-each of the four the code below shows a reader: a link resolver, a dead-path check and a hygiene
-ban on the retired name, a drift probe over the paths the claims promised, and a presence check that
-reads the exempt list row by row. An escape on any of them would be the false statement check 25
-passes on every run after, which is the direction the previous round's skeptic caught three times.
+**Where this census and unit 1's precision split disagree, and why the census answers.** Unit 1
+takes each verdict of its three-way split from this census but writes the split out item by item in
+its own section 4, so a verdict that moves here moves there only when that unit folds it. Its rev-5
+read seven of the rev-3 GENUINE items as false triggers, provisionally until this census read them
+against code, and its rev-7 took the census's verdict on all seven. Two differences remained as unit
+1's rev-7 stood at this reconcile, each stated below with the code that decides it. Unit 1's rev-8,
+folded after this one, took both, so the two readings now agree.
 
-The named gap that remains, measured by `probe_gap_rev3.py` at 67bec01a, is four live items under
-reading B — `aBatchedLintel-1` S3, `aGradedDoorway-7` S4, `aMendedLedger-1` S7 and
+- `aMendedLedger-7-u8` S5 is GENUINE, and unit 1's rev-7 lists it among its nine false triggers.
+  The census moved it at rev-6, a fold made beside unit 1's rev-7 rather than before it. What the
+  item withdraws is a value, the unkeyable fixture rows the suite's arms relied on, which the
+  widened era grammar keys. `tools/memory-tree/merge-rows.test.sh:313`-`:318` records the move to a
+  separator-less row. Case 0d then asks the driver itself: `keys` at `:332` loads `key()`, defined
+  at `tools/memory-tree/merge-rows.py:213`, and `:350`-`:353` red if the driver keys the
+  separator-less row or fails to key its separator-bearing twin. The row at `:716` is an unkeyable
+  correction row the delete-adjacent arms assert survives an honoured delete once. No name leaves
+  the tree, so in unit 1's taxonomy the item is a value move and not a retirement. The genuine-set
+  paragraph below carries the full reading.
+- Rev-3's `TOOL-dGatedProse-4` S3, the pointer repair to the review protocol, is no longer in the
+  population, and unit 1's rev-7 counts it among its eleven value moves. Unit 4's rev-4 fold deleted
+  it. The label S3 in that spec now names the method's budget raise, which carries no verb from the
+  list, so no clause is owed there and this pass writes none.
+
+Read into unit 1's three rows, the census's verdicts give 18 retirements, 11 value moves and 8 false
+triggers over 37 items. That is unit 1's 18, 11 and 9 over 38, less the pointer repair from the
+second row and with `aMendedLedger-7-u8` S5 moved from the third to the second. It agrees with the
+census's own 28 GENUINE and 9 ESCAPE, because unit 1 counts `bConvergentLodestar-1` S3, an ESCAPE
+here, as a retirement whose readers live in another repo. For each of the six other rev-3 items
+unit 1's rev-7 already reads as value moves on this census's evidence, the code below shows a
+reader, and an escape on any of them would be the false statement check 25 passes on every run
+after:
+
+- `aMendedLedger-2-u1` S4, check 2's link resolver in `tools/memory-tree/check-memory-hygiene.sh`;
+- `aMendedLedger-2-u1` S6, `tools/check-dead-paths.sh` and check 3's ban on the retired name;
+- `aMendedLedger-6-u6` S5, `tools/check-dead-paths.sh` by name and `signal_ledger` over the paths
+  the claims promised;
+- `bConvergentLodestar-1` S4, `affordance_offenders`, which reads the exempt list row by row;
+- `aWalkedCorpus-2` S5, the per-id red and the ceiling `measure_run` computes;
+- `aPacedTurnstile-14` S9, check 6's byte cap on the dossier it corrects.
+
+The named gap that remains, measured by `probe_u5_rev6_gap.py` at `bd44d3ff` and over the folded
+tree alike, is four live items under reading B — `aBatchedLintel-1` S3, `aGradedDoorway-7` S4, `aMendedLedger-1` S7 and
 `aMendedLedger-6-u6` S3 — and eight under reading A, which adds `aMendedLedger-6-u6` S1 and S5,
 `aPacedTurnstile-14` S9 and `dPolishedVitrine-14` S2. Those four are the `B only` rows above: under
 reading A they sit in the gap and get no clause, which is section 3's rule, and under reading B they
 are the population, which is where F7 puts them.
 
 **The gap figure counts only verb-bearing items that carry a backticked token, and a second class
-sits outside it.** A skeptic's `sk_gap.py`, re-run for rev-4 at 67bec01a, finds 50 live items that
-carry a verb from the list. Eight of them carry no backticked token at all, so no identifier shape
-can fire on them under either reading: `aMendedLedger-1` S6, `aMendedLedger-8-u9` S3,
-`aTunedCompass-3` S5, `aTunedCompass-9` S3 and its plain `S5c` item, `TOOL-dGatedProse-3` S4 and S6,
-and `TOOL-dGatedProse-4` S2. The last is a real retirement — four spans, 450 bytes, deleted from M4
-— and the clause on `TOOL-dGatedProse-4` S3 below is the nearest one to it. The class gets no clause
-here, for section 3's reason, and its size is recorded so that four is not read as the whole gap.
+sits outside it.** The same probe finds 49 live items that carry a verb from the list over the
+folded tree and again over the reconcile, and 50 at `bd44d3ff`, where unit 4's rev-3 pointer repair
+still stands. Eight of them carry no backticked token at
+all, so no identifier shape can fire on them under either reading: `aMendedLedger-1` S6,
+`aMendedLedger-8-u9` S3, `aTunedCompass-3` S5, `aTunedCompass-9` S3 and its plain `S5c` item,
+`TOOL-dGatedProse-3` S4 and S6, and `TOOL-dGatedProse-4` S2. The last is a real withdrawal with a
+reader: at unit 4's rev-5, as at its rev-4, it deletes one 197-byte span from M4, the span that
+spec's section 4 writes verbatim, from a guide whose bytes `tools/check-template-size.sh` compares
+against its row, and no clause reaches it. The class gets no
+clause here, for section 3's reason, and its size is recorded so that four is not read as the whole
+gap.
 
 ### The genuine set, and the readers found by reading the code
 
 Each row was verified against source at writing time, and rev-2 re-verified at 32f2eb71 every
-citation it touched. No tracked file outside `memory/` moved between 32f2eb71 and 67bec01a, so every
-one of those citations stands at 67bec01a too. Where a retirement has already landed, the
-readers are the sites that survived it, which is what makes them findable at all.
+citation it touched. The merge at `bd44d3ff` moved many of the cited files, so rev-6 re-derived every
+line anchor in this section and the next two there, by the text of the line each named and never by
+offset: `probe_u5_rev6_remap.py`. An anchor into a file the merge left byte-identical stands, and
+every other one below is the line that text sits on at `bd44d3ff`. Where a retirement has already
+landed, the readers are the sites that survived it, which is what makes them findable at all. The
+tokens each clause carries are section 4's token table, after the escaped set; the prose is their evidence.
 
 **`aMendedLedger-1` S1, `aMendedLedger-2-u1` S5 and `aMendedLedger-3-u2` S2 — the `memory/project/`
 drain.** S1 and u1 S5 are one retirement written at two levels. The master's "three `.md` stubs"
@@ -354,23 +429,28 @@ to `:172`, `MEMORY.md`, `IN-FLIGHT.md` and `project/README.md` under `memory/pro
 files u1 S5 deletes by path, so the two items get one answer. The trigger firing on S1's build slug,
 and under reading B of O6 on the bare extension `.md` as well, rather than on the stubs decides where
 a clause is required, not what it says. By name:
-`tools/memory-tree/check-memory-hygiene.sh:497`-`:498` is check 3's own comment and enumerates
-exactly the retired members; `:502` classifies every `project/` entry as a file or a directory, and
+`tools/memory-tree/check-memory-hygiene.sh:500`-`:501` is check 3's own comment and enumerates
+exactly the retired members; `:505` classifies every `project/` entry as a file or a directory, and
 the directory classification is what u2 S2's keeper file was holding open; the closed case opening
-at `:510` names none of them, so a tree still carrying one reds.
-`tools/memory-tree/check-memory-hygiene.test.sh:1855` asserts the scaffolder writes none of the five
-retired names, and `memory/archive/ledger/README.md:12` and `WIRE-INTO-PROJECT.md:315` name
-`IN-FLIGHT.md`. By value, for the three stubs: their CONTENT moved and is read where it landed.
-`WIRE-INTO-PROJECT.md:321` tells an adopter to fold `IN-FLIGHT.md`'s protocol prose into the archive
-README, which carries it under its own heading, and
-`memory/builds/bThriftyBellows/build/2026-07-16-build-bThriftyBellows-1.md:5` carries the index
-digest folded there when `MEMORY.md` retired. By value, for u2 S2's directory:
-`tools/drift-audit/drift_report.py:2031` reads the rows under `project/in-flight/`, and
+at `:513` names none of them, so a tree still carrying one reds.
+`tools/memory-tree/check-memory-hygiene.test.sh:1873` asserts the scaffolder writes none of the five
+retired names, and `WIRE-INTO-PROJECT.md:315` names `IN-FLIGHT.md`. `memory/archive/ledger/README.md:12`
+names it too, and is cited here as provenance and not written as a token, because it is a record:
+it resolves by identity under unit 1's S5 and reads nothing. By value, for the three stubs: their
+CONTENT moved and is read where it landed. `WIRE-INTO-PROJECT.md:321` tells an adopter to fold
+`IN-FLIGHT.md`'s protocol prose into the archive README, which carries it under its own heading, and
+`memory/builds/bThriftyBellows/build/2026-07-16-build-bThriftyBellows-1.md:5`, a record cited on the
+same terms, carries the index digest folded there when `MEMORY.md` retired. By value, for u2 S2's
+directory: `tools/drift-audit/drift_report.py:2031` reads the rows under `project/in-flight/`, and
 `tools/drift-audit/drift_signals.py:133`-`:139` declares that probe's population empty because the
 directory is gone.
 
-**`aMendedLedger-3-u2` S3 — `signal_ledger`'s pin of 4.** One of the three the dry run named. By
-name: `tools/drift-audit/drift_signals.py:139` carries the signal in `DECLARED_EMPTY` and
+**`aMendedLedger-3-u2` S3 — `signal_ledger`'s pin of 4.** Its spec is one of the five the dry
+run's first strand found PARTIAL, one retirement inventoried and another not, which this build's
+research record carries at
+`memory/builds/dGatedProse/build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md:72`-`:74`.
+That record names specs and not items, so the item-level reading here is this census's, from code.
+By name: `tools/drift-audit/drift_signals.py:139` carries the signal in `DECLARED_EMPTY` and
 `tools/drift-audit/drift_signals.py:201` opens the `PINS` table whose comment records that this
 signal now carries no pin; `tools/drift-audit/drift_report.py:2156` and
 `tools/drift-audit/drift_report.py:2189` both read `DECLARED_EMPTY`, and
@@ -380,53 +460,56 @@ signal now carries no pin; `tools/drift-audit/drift_report.py:2156` and
 absent from `PINS` falls back to the bare tolerance, so the comparison a run makes changes VALUE and
 not merely label — `tools/drift-audit/drift_report.py:1364` states that fallback in terms.
 
-**`aMendedLedger-3-u2` S6 — the ledger lens of `tools/workflows/drift-audit-state.js`.** One of the
-three. By name: `skills/session-kickoff/SKILL.md` is not its reader, but four others are —
+**`aMendedLedger-3-u2` S6 — the ledger lens of `tools/workflows/drift-audit-state.js`.** The same
+PARTIAL spec. By name: `skills/session-kickoff/SKILL.md` is not its reader, but four others are —
 `tools/drift-audit/SKILL.template.md:62` and the rendered `.claude/skills/drift-audit/SKILL.md:62`
 both tell a session to narrow that harness's lens list, `tools/check-kit-versions.sh:221` asserts its
-`meta.version`, and `memory/map/features/review-harnesses.md:22` claims it in the map with
-`memory/map/generated/inventories.json:145` carrying the generated key. By value:
+`meta.version`, and `memory/map/features/review-harnesses.md:23` records it in the map with
+`memory/map/generated/inventories.json:148` carrying the generated key. By value:
 `tools/drift-audit/README.md:27` records that the return key stopped being an ARRAY of lens slugs and
 became an INTEGER count of lenses, which is a reader of the very lens set this item re-keys.
 
-**`aMendedLedger-4-u3` S3 — two session-ledger lines out of `index_set()`.** One of the three, and
-the dry run's description of it is exact. By name: `tools/memory-tree/check-memory-hygiene.sh:657`
-defines it, `:686` computes `INDEX_SET` once for checks 6 and 7, the print mode on the following line
-publishes it, `tools/memory-tree/corpus_ids.py:563` and `tools/memory-tree/corpus_ids.py:1105` both
-reason about what it filters, `tools/memory-tree/hygiene-parity.test.sh:246` asserts a check-7 row
-inside a real member, and two dossiers claim the behaviour at
-`memory/map/features/memory-tree-hygiene.md:101` and `memory/map/features/unattended.md:204`. By
-value: check 6's per-class caps and check 7's exemption are both computed over that membership, so
-which files are capped IS the value; the selector that consumes it is at
-`tools/memory-tree/check-memory-hygiene.sh:770`.
+**`aMendedLedger-4-u3` S3 — two session-ledger lines out of `index_set()`.** Its spec is another of
+those five PARTIAL specs, at the same lines of the research record. By name:
+`tools/memory-tree/check-memory-hygiene.sh:662` defines it, `:700` computes `INDEX_SET` once for
+checks 6 and 7, the print mode on the following line publishes it,
+`tools/memory-tree/corpus_ids.py:563` and `tools/memory-tree/corpus_ids.py:1105` both reason about
+what it filters, `tools/memory-tree/hygiene-parity.test.sh:246` asserts a check-7 row inside a real
+member, and `memory/map/features/memory-tree-hygiene.md:101` records the behaviour in the map. Rev-2
+cited a second dossier line, in `memory/map/features/unattended.md`; at `bd44d3ff` that dossier
+names checks 6 and 7 at `:207` and no longer spells `index_set`, so it is not a by-name reader and
+the clause drops it. By value: check 6's per-class caps and check 7's exemption are both computed
+over that membership, so which files are capped IS the value; the selector that consumes it is at
+`tools/memory-tree/check-memory-hygiene.sh:785`.
 
 **`aMendedLedger-4-u3` S4 — the `ex7` alternatives.** By name:
-`tools/memory-tree/check-memory-hygiene.sh:758` is the selector and `:759` is the second spelling the
+`tools/memory-tree/check-memory-hygiene.sh:773` is the selector and `:774` is the second spelling the
 item names, which today APPENDS rather than rewriting. By value:
-`tools/memory-tree/check-memory-hygiene.sh:770` filters `INDEX_SET` through that regex, so its value
+`tools/memory-tree/check-memory-hygiene.sh:785` filters `INDEX_SET` through that regex, so its value
 decides check 7's population outright.
 
 **`aMendedLedger-4-u3` S7 — the session machinery of the scaffolder.** By name:
 `tools/memory-tree/adopt-memory-tree.sh` is named by `WIRE-INTO-PROJECT.md`, by `README.md`, by
 `memory/HYGIENE.md` and by `memory/map/features/annotation-style.md`. By value: what the scaffolder
 writes is what check 3 then grades, so the registries it writes feed the count of `project/*.txt`
-files at `tools/memory-tree/check-memory-hygiene.sh:509`, and the scaffolder's own comment block
+files at `tools/memory-tree/check-memory-hygiene.sh:512`, and the scaffolder's own comment block
 warns that a number written beside the thing it counts is how one registry shipped missing.
 
 **`aMendedLedger-6-u6` S11 — the playbook version marker and the sentence it carried.** By name:
-`skills/session-kickoff/SKILL.md:85` greps the repo for that marker, `WIRE-INTO-PROJECT.md:1563`
+`skills/session-kickoff/SKILL.md:85` greps the repo for that marker, `WIRE-INTO-PROJECT.md:1732`
 tells an adopter to re-pull by diffing against its version, and two dossiers record the marker's
-lockstep history. By value: the re-pull decision compares the adopter's version against upstream's,
-which reads the marker's value and nothing else. The file the item names is gone from the live
-tree: the template was renamed to `coding-governance-agents.template.md`, and the old name survives
-as a file only in the versioned snapshots under `memory/archive/`. The clause therefore lists the
-four live readers and carries the rename in its by-name prose rather than the old name as a token.
-That token still RESOLVES, because review records outside the spec corpus spell it, so listing it
-would pass the resolution test while pointing at no live reader.
+lockstep history, `memory/map/features/lexicon.md:152` and `memory/map/features/session-kickoff.md:97`.
+By value: the re-pull decision compares the adopter's version against upstream's, which reads the
+marker's value and nothing else. The file the item names is gone from the live tree: the template
+was renamed to `coding-governance-agents.template.md`, and the old name survives as a file only in
+the versioned snapshots under `memory/archive/`. The clause therefore lists the four live readers
+and carries the rename in its by-name prose rather than the old name as a token. Under unit 1's S5
+that token resolves by neither test, since only records spell it and no tracked path ends with it,
+so writing it would red check 25 on a name that is honestly gone.
 
 **`aMendedLedger-8-u9` S2 — `split_regions` and its companions.** By name: the symbol is gone from
 `tools/memory-tree/merge-rows.py` already, and two sites survived it —
-`tools/check-wiring.sh:765` describes what it did to three unkeyable lines, and
+`tools/check-wiring.sh:768` describes what it did to three unkeyable lines, and
 `memory/map/features/memory-tree-merge-driver.md:196` records the withdrawn seam and what replaced
 it. By value: `NO VALUE READERS`, and the reason is in that dossier line — the three-region model
 was the seam's whole content, so nothing read a number out of it.
@@ -443,15 +526,31 @@ this unit's own fork F8, asserts at `:1206`-`:1208` that `diff3` changes the reg
 `:1209`-`:1222` sets the config to each of `diff3` and `zdiff3` and asserts the exit code, the heading
 count, the row count and zero markers under each — a reader of the config's VALUE.
 
+**`aMendedLedger-7-u8` S5 — the fixture row the suite's arms assert the driver cannot key.** NEW at
+rev-6, which re-read the code behind every escape and found this one written over readers. The item
+fired on the name of the two delete arms, and rev-1 to rev-5 escaped it because the verb names a
+test case, which is a claim about the sentence and not about the tree. What the item withdraws is a
+VALUE: the unkeyable fixture row those arms and case 0d lean on, which the widened era grammar
+would key. It landed in `390a87e7`, and the readers are the sites that survived it.
+`tools/memory-tree/merge-rows.test.sh:313`-`:318` records the move, from a separator-bearing row the
+widening made keyable to a separator-less one no anchor pattern matches. Case 0d then asks the
+driver itself: `keys` at `:332` loads `key()` from `tools/memory-tree/merge-rows.py:213`, which
+reads a line through the anchor grammar `anchors()` returns, and `:350`-`:353` red if the driver
+keys the unkeyable row or fails to key its separator-bearing twin. The delete-adjacent arms carry an unkeyable correction row of the same
+shape at `:716` and assert it survives an honoured delete exactly once. By name: no name leaves the
+tree, since the arms keep their names and the fixture keeps its id, so that half is prose. By value:
+`tools/memory-tree/merge-rows.test.sh` and `tools/memory-tree/merge-rows.py`, the arms that compare
+the fixture's keyed-ness and the grammar that decides it.
+
 **`aGradedDoorway-7` S2 — `SHARD_ARITY`'s value of 2.** The item raises it to 8, so the value 2 is
 what it withdraws, and that value has readers. By name: the two suites declare it, at
-`tools/unattended/check-unattended.test.sh:29` and `tools/unattended/unattended.test.sh:32`, and
+`tools/unattended/check-unattended.test.sh:29` and `tools/unattended/unattended.test.sh:37`, and
 `tools/run-gates/run-gates.gov.test.sh:395`-`:400` reads each script's declaration against the
 manifest's `--shard` callers. By value: the arity check
 at `tools/unattended/check-unattended.test.sh:46`-`:48` compares a caller's shard count against the
-value and bounds the index by it, and the per-shard floor case at `:3315`-`:3319` carries exactly two
+value and bounds the index by it, and the per-shard floor case at `:3473`-`:3477` carries exactly two
 shard arms, so at 8 every shard from 3 upward falls to the unsharded floor and grades against the
-whole suite's count. `tools/unattended/unattended.test.sh:49`-`:51` and `:5771`-`:5775` repeat both.
+whole suite's count. `tools/unattended/unattended.test.sh:54`-`:56` and `:6813`-`:6817` repeat both.
 Those are the sites "fix what breaks" will meet.
 
 **`TOOL-dGatedProse-3` S8 — the kit-version constant's value.** Already claused, verified not
@@ -464,26 +563,30 @@ GENUINE and both answer with those sites. A `NO VALUE READERS` on the pin would 
 of readers the code shows.
 
 **`dPolishedVitrine-1` S5 — two rows of the carried-prefix registry.** By name:
-`tools/check-install-prefix.sh:82` declares the mode, `tools/check-install-prefix.sh:461` is the
+`tools/check-install-prefix.sh:82` declares the mode, `tools/check-install-prefix.sh:479` is the
 write path, and `tools/check-install-prefix.sh:348` is the comment that made the arm a ban;
 `memory/gotchas/line-keyed-registry-reds-on-a-file-that-grew.md:35` records the refusal the remedy
 prints. By value: each row is a path with a COUNT, and `--check` compares that count against a live
-one — `memory/backlog/TOOL.md:314` records a live defect that exists only because the comparison
-reads the number.
+one — `memory/backlog/TOOL.md:316` records a live defect that exists only because the comparison
+reads the number. The gotcha and the backlog row are records, cited as provenance and not written
+as tokens, so both halves of the clause carry `tools/check-install-prefix.sh`.
 
 **`dScaffoldedMirror-9` S5 — the three `*_OFFENDER_PIN` keys.** By name:
-`tools/lexicon/lexicon.py:120` maps both key names, `tools/lexicon/kit.toml:138` is the declared
+`tools/lexicon/lexicon.py:120` maps both key names, `tools/lexicon/kit.toml:177` is the declared
 hole, and `tools/drift-audit/drift_signals.py:270` with
 `tools/drift-audit/drift_signals.py:305` are the ratchet rows the item also takes out. By value:
 `tools/lexicon/lexicon.py:3280` is `if len(unwaived) > pin`, so the pin's NUMBER is compared on every
-run, and `tools/lexicon/lexicon.py:3352` prints the moved pair.
+run, and `tools/lexicon/lexicon.py:3352` prints the moved pair. The clause writes those paths and
+never the glob `*_OFFENDER_PIN`, a composition no file spells, which unit 1's section 4 counts among
+its false reds.
 
 ### The genuine items rev-3 adds, and the readers found by reading the code
 
-NEW in rev-3. Each was read at source at 67bec01a, and every token a clause will carry was
-resolved there by `probe_u5_resolve.py`, a content match over the 1556 tracked files outside the
-spec corpus after the exclusion pathspec was checked against `git ls-files` and found to return
-exactly that many.
+NEW in rev-3. Each was read at source at 67bec01a, and its anchors were re-derived at `bd44d3ff`
+by rev-6. Rev-3 resolved its tokens by a content match over the tracked files outside the spec
+corpus, which is the corpus unit 1's round-1 audit found resolving names by quotation; rev-6
+resolves every token of the table below by unit 1's S5 as it now stands, `probe_u5_rev6_resolve.py`
+at `bd44d3ff`.
 
 **`aTunedCompass-3` S2 — `check-recall.py`'s own copies of `SETS` and `SUBS`.** The unit is BLOCKED
 and unbuilt, so both copies are live at `tools/memory-recall/check-recall.py:73`-`:74`, beside the
@@ -499,7 +602,7 @@ withdraws is live. By name: `measure_run` at `tools/memory-recall/check-recall.p
 `check_audit` at `:248`, and `test_audit_green` at `tools/memory-recall/test_recall_floor.py:309`,
 the arm the item says a widened audit would red without this clause. By value: `measure_run` loads the set the pin
 names, `bench.load(data, pin["set"])` at `:183`, so the set field of `RECALL_FLOOR` at
-`.memory-tree.conf:575` decides which set every audit grades, and `check_audit` reds a question that
+`.memory-tree.conf:620` decides which set every audit grades, and `check_audit` reds a question that
 resolves no target in that set at `:262`-`:266`.
 
 **`aQuarriedLantern-1` S5 — upstream's node-registry lookup behind `--export`.** Landed at the port:
@@ -509,8 +612,10 @@ its place, refuses `--export` without `--tag` at `:1179`-`:1187`; `tools/memory-
 and `tools/memory-recall/SKILL.template.md:85` document the pair. The unit's own build record says
 the lookup was deleted, at
 `memory/builds/aQuarriedLantern/build/2026-08-03-build-TOOL-aQuarriedLantern-1-1.md:78`, and that
-path is cited here and NOT written as a clause token, because no tracked file outside the spec corpus
-spells it, so it does not resolve. By value: what the lookup produced was the node tag, and the tag
+path is cited here and NOT written as a clause token. Rev-3 to rev-5 gave the reason that it does
+not resolve, which was wrong: under unit 1's S5 it resolves by identity, being a tracked path. It
+stays out because it is a record of the deletion and not a reader of the lookup, and a by-name half
+names readers. By value: what the lookup produced was the node tag, and the tag
 is still read — from `--tag` now, refused when empty or not one letter at `:1181`-`:1187`.
 `export` names the per-node file by it at `:1096`, which is the read whose result depends on the
 tag. `build_cutoff` at `:177`-`:179` also keys on it, but `BUILD_QID_CUTOFF` is empty at `:174`, so
@@ -524,11 +629,11 @@ SPECCED and its S4a is built. By name: `memory/map/affordance-exempt.toml` is th
 and `:403`-`:404`; `tools/codebase-map/map_lib.py` reads the list in `load_affordance_exempt` at
 `:1217`, writes it in `render_affordance_exempt` at `:1235` and states the rule as
 `drop_touched_exemptions` at `:1268`; `test_affordance_exemption_drop` at
-`tools/codebase-map/selftest.py:820` arms it; and `tools/memory-tree/check-memory-hygiene.sh:553`
+`tools/codebase-map/selftest.py:820` arms it; and `tools/memory-tree/check-memory-hygiene.sh:556`
 sanctions the file in the map tree. By value: `test_dossier_affordance_present_or_graced` passes the
 list to `affordance_offenders` at `tools/codebase-map/test_codebase_map.py:128`, so whether a
 dossier's row is present decides whether the presence check grades that dossier at all. The list is
-empty at 67bec01a, so no row is left to take out in this repo; the readers stand for every adopter
+empty at `bd44d3ff`, so no row is left to take out in this repo; the readers stand for every adopter
 whose list is not.
 
 **`aMendedLedger-1` S2 — the authored session ledger's three shards.** In through O6, on
@@ -536,17 +641,18 @@ whose list is not.
 `aMendedLedger-3-u2` S2's retirement seen from the master, so it takes that item's readers, read
 again here. By name: `tools/drift-audit/drift_report.py:2031` still sets the ledger directory to
 `project/in-flight` for adopters who keep a ledger, `tools/drift-audit/drift_signals.py:133`-`:139`
-declares `ledger_rows_contradicting_git` empty because the shards moved, `memory/archive/ledger/README.md`
-names where they came from, and `WIRE-INTO-PROJECT.md:315` and `:321` name the old location and the
-new one. By value: `signal_ledger` at `tools/drift-audit/drift_report.py:381`-`:415` reads every row
+declares `ledger_rows_contradicting_git` empty because the shards moved, and `WIRE-INTO-PROJECT.md:315`
+and `:321` name the old location and the new one. `memory/archive/ledger/README.md` names where the
+shards came from, and is provenance rather than a token, being a record. By value: `signal_ledger` at `tools/drift-audit/drift_report.py:381`-`:415` reads every row
 of every shard and compares its claim against git, and `tools/drift-audit/selftest.py:1376`-`:1404`
 drains a fixture ledger and asserts that the declared-empty probe goes dead.
 
 **`aMendedLedger-6-u6` S6 — the sharded authored ledger, in the runbook's migration section.**
 Landed as `WIRE-INTO-PROJECT.md` section 3a, from `:311`. What that section retires is the ledger
 `aMendedLedger-1` S2 moves, so the readers are that item's: by name
-`tools/drift-audit/drift_report.py`, `tools/drift-audit/drift_signals.py` and
-`memory/archive/ledger/README.md`, and by value `signal_ledger` and the selftest arm that drains it.
+`tools/drift-audit/drift_report.py` and `tools/drift-audit/drift_signals.py`, and by value
+`signal_ledger` and the selftest arm that drains it. Rev-3 to rev-5 also listed the archive README,
+a record that reads nothing, and the clause drops it.
 The two version markers the section writes, playbook v2.4 and memory-tree kit 1.8, are values it
 ADDS rather than withdraws, so they are not this clause's.
 
@@ -585,9 +691,10 @@ self-prune rule's own predicate read by a program.
 `journal/2026-07-16-bThriftyBellows.md` under `memory/project/`. By name:
 `memory/archive/DECISIONS.2026-08-10.md:19` still points at that `journal/` location, and
 `memory/builds/bThriftyBellows/build/2026-07-16-build-bThriftyBellows-1.md:5` carries the digest the
-link sat on, as prose. By value: check 2 of `tools/memory-tree/check-memory-hygiene.sh` extracts
-every inline link whose target carries `.md` at `:460` and resolves it against the citing file's own
-directory at `:473`. That is the read the link's target value was subject to, and the reason u1
+link sat on, as prose. Both are records, and no reader spells the old target, so the by-name half is
+prose naming the two as provenance and carrying no token. By value: check 2 of
+`tools/memory-tree/check-memory-hygiene.sh` extracts every inline link whose target carries `.md` at
+`:463` and resolves it against the citing file's own directory at `:476`. That is the read the link's target value was subject to, and the reason u1
 wrote the digest without one.
 
 **`aMendedLedger-2-u1` S6 — the pointer stub's protocol prose, marked RETIRED.** In only when both
@@ -601,19 +708,21 @@ By name: `tools/check-dead-paths.sh` derives `IN-FLIGHT.md` as a needle from git
 and reds any tracked file outside `memory/` that spells it, and `tools/dead-path-waivers.txt:47`-`:48`
 waives the runbook's two spellings by line text. Check 3 of
 `tools/memory-tree/check-memory-hygiene.sh` lists `IN-FLIGHT.md` and `in-flight/` among the retired
-members at `:497`-`:498` and classifies every `project/` entry at `:502` for a closed case that
+members at `:500`-`:501` and classifies every `project/` entry at `:505` for a closed case that
 admits neither, so a tree still carrying the file reds. By value: the protocol's self-prune rule,
 that a `merged:<sha>` row goes once its sha is an ancestor of `main`, is read by a program.
 `signal_ledger` in `tools/drift-audit/drift_report.py` matches such a row with `_TERMINAL_SHA` at
 `:378` and tests its ancestry at `:396`.
 
-### The two escapes rev-4 reverses, and the code that reverses them
+### The escapes earlier revisions reversed, and the code that reverses them
 
-Rev-3 answered both with `NO VALUE READERS`. A skeptic read the code behind each at 67bec01a, and
-this revision re-read it there before either verdict moved. An escape over live readers is the
-direction check 25 passes on every run after, so both are GENUINE now. Every token below resolves by
-content outside the spec corpus under `probe_u5_resolve_rev4.py`, untracked like the others, with the
-exclusion pathspec verified at 1556 files.
+Rev-3 answered `aWalkedCorpus-2` S5 with `NO VALUE READERS` and rev-4 answered `aPacedTurnstile-14`
+S9 the same way. A skeptic read the code behind the first at 67bec01a and rev-4 re-read it there
+before the verdict moved; rev-5 applied the rule for a withdrawn value to the second. An escape over
+live readers is the direction check 25 passes on every run after, so both are GENUINE. Every token
+below resolves under unit 1's S5 at `bd44d3ff`. Rev-4 reversed a third, rev-3's
+`TOOL-dGatedProse-4` S3, the pointer repair to the review protocol, which left the population when
+that spec's rev-4 fold deleted it, and its paragraph left with it.
 
 **`aWalkedCorpus-2` S5 — the red a dropped fixture record raises, and the ceiling that tells it
 apart.** Rev-3's reason was that the tree gates no ceiling, and it cited the pin's metric vocabulary
@@ -631,56 +740,63 @@ is what `:350`-`:355` already do. By name: `measure_run`. By value:
 `tools/memory-recall/check-recall.py` and `tools/memory-recall/test_recall_floor.py`. The census now
 holds this item to the standard it holds `aTunedCompass-3` S2 to: unbuilt, but its target is live.
 
-**`TOOL-dGatedProse-4` S3 — the 18 bytes the widened pointer adds to a capped guide.** Rev-3 read
-"widens a pointer and withdraws nothing" as no value readers, and those are two different claims.
-The first is true: S3 withdraws no name, row or vocabulary member, and the stop rule that S2's
-fourth deletion takes out of M4 stays stated in the review protocol the pointer names. The second is
-false. S3 moves the byte count of the rendered `memory/guides/BUILD-METHOD.md`, and that count is
-read twice: `tools/check-template-size.sh` compares the guide's bytes against its 27648 row at
-`tools/template-size-limits.txt:86` and prices growth against `tools/template-size-highwater.txt`,
-and check 6 of `tools/memory-tree/check-memory-hygiene.sh` caps it as a guide. The template's own
-count is read by nothing: `tools/memory-tree/kit-dogfood-parity.test.sh` compares the template's
-CONTENT against the render through the pair at `:58`, not its size. Unit 4's own section 4
-prices these 18 bytes, inside the 447 its edit adds, against the 76 bytes of headroom that cap left.
-This is the one rule for a withdrawn value again: the count before the edit is what the edit
-withdraws, and the comparisons against the cap are its readers. By name: nothing, said in prose with
-no token, which passes by vacuity. By value: `tools/check-template-size.sh`,
-`tools/template-size-limits.txt` and `tools/memory-tree/check-memory-hygiene.sh`.
-
 **`aPacedTurnstile-14` S9 — the byte count of the dossier it corrects.** In only when both rulings
-apply. Rev-4 escaped it as dossier prose nothing grades, and the rule rev-4 applied to
-`TOOL-dGatedProse-4` S3 refutes that. S9 corrects claims in `memory/map/features/unattended.md` and
-deletes a figure there, and that dossier is 20387 bytes at 67bec01a against `DOSSIER_CAP_BYTES` of
-20480 at `.memory-tree.conf:404`, which check 6 of `tools/memory-tree/check-memory-hygiene.sh`
-compares on every run. The count before the edit is what the edit withdraws, and 93 bytes of
-headroom leaves the comparison live. By name: `unattended.md` and `build-readme-surface.md`, which
-resolve in 42 and 13 tracked non-spec files. By value: `tools/memory-tree/check-memory-hygiene.sh`
+apply. Rev-4 escaped it as dossier prose nothing grades, and the rule for a withdrawn value refutes
+that: the count before the edit is what the edit withdraws, and the comparisons against a cap are its
+readers. S9 corrects claims in `memory/map/features/unattended.md` and deletes a figure there, and
+that dossier is 20460 bytes at `bd44d3ff` against `DOSSIER_CAP_BYTES` of 20480 at
+`.memory-tree.conf:441`, which check 6 of `tools/memory-tree/check-memory-hygiene.sh` compares on
+every run. 20 bytes of headroom leaves the comparison live; it was 93 at 67bec01a. By name:
+`unattended.md` and `build-readme-surface.md`, the item's own spellings, which resolve by identity
+under unit 1's S5 as the tails of `memory/map/features/unattended.md` and
+`memory/map/features/build-readme-surface.md`. By value: `tools/memory-tree/check-memory-hygiene.sh`
 and `.memory-tree.conf`.
 
 ### The escaped set, and the reason each escape is honest
 
 | item | escape spellings | the reason the clause carries |
 |---|---|---|
-| `aQuarriedLantern-1` S6 | `NO VALUE READERS` | runtime eviction of cache directories, not a retirement of any name |
-| `aMendedLedger-5-u5` S5 | `NO VALUE READERS` | the verb names a git merge interaction the new suite must cover |
-| `aMendedLedger-7-u8` S5 | `NO VALUE READERS` | the verb names two existing test arms being re-pointed |
-| `bConvergentLodestar-1` S2 | `NO VALUE READERS` | the verb sits in the condition under which a generated artifact churns |
+| `aQuarriedLantern-1` S6 | `NO VALUE READERS` | the evicted directories are untracked caches whose recorded worktree is gone, and nothing tracked reads one |
+| `aMendedLedger-5-u5` S5 | `NO VALUE READERS` | the item creates the merge suite, and nothing leaves the tree |
+| `bConvergentLodestar-1` S2 | `NO VALUE READERS` | the item creates a generated artifact, and nothing leaves the tree |
 | `bConvergentLodestar-1` S3 | both | the retired file and its readers are the inCMS repo's, absent here |
-| `dPolishedVitrine-1` S10 | `NO VALUE READERS` | a runbook block cleans up its own pins when it finishes |
-| `dScaffoldedMirror-9` S6 | `NO VALUE READERS` | 70 lines of comment archaeology; comments have no readers to inventory |
-| `dScaffoldedMirror-9` S7 | `NO VALUE READERS` | the item ADDS two verbs; the verb that fires is one of their behaviours |
+| `dPolishedVitrine-1` S10 | `NO VALUE READERS` | the deleted pins are block 2's untracked output, read by block 3 alone before it deletes them |
+| `dScaffoldedMirror-9` S6 | `NO VALUE READERS` | every program reader of the conf skips its comment lines, and the one arm reading its comment text reads other rows |
+| `dScaffoldedMirror-9` S7 | `NO VALUE READERS` | the item ADDS two verbs the tree does not carry, and what the drain verb deletes waives nothing by its own predicate |
 | `aTunedCompass-9` S2b | `NO VALUE READERS` | nothing under the recall kit samples questions, so the half the item deletes never reached code |
 | `dPolishedVitrine-14` S2 | `NO VALUE READERS` | `retired` names a run-state record the driver's preflight renames and this item reads |
 
-The last two rows are NEW in rev-3, and each reason is a claim the tree can refute, checked at
-67bec01a before it was written. Rev-3 had two more here and rev-4 a third, and the section above
-names the code that refuted each.
+Every reason is a claim about the tree the tree can refute, never about the sentence. Rev-6 re-read
+each row against the code at `bd44d3ff`, because every census round so far found its errors in one
+direction, an escape written over readers, and the round-1 audit named this table as the place a
+second round would earn its cost. One row moved: `aMendedLedger-7-u8` S5, whose rev-5 reason, that
+the verb names two test arms, was about the sentence, and whose fixture row has readers the genuine
+set now names. What was checked for the nine that stand:
 
-- `aTunedCompass-9` S2b: `git grep -i sampl` over `tools/memory-recall/` returns nothing, and the
-  records-side half was the spec's own rev-3 design, deleted by its rev-4 fold. `expected_by_target`
-  is real, at `tools/memory-recall/bench.py:350`, but the item cites it as the reason the half cannot
-  reject anything, not as something it withdraws.
-- `dPolishedVitrine-14` S2: `tools/unattended/SKILL.template.md:156` has preflight retire a finished
+- `aQuarriedLantern-1` S6: `evict_dead_siblings` at `tools/memory-recall/query.py:418` deletes a
+  sibling cache whose recorded `worktree` is gone. The caches are untracked, and the `worktree`
+  field the predicate reads is one the same item adds.
+- `aMendedLedger-5-u5` S5: `tools/memory-tree/merge-rows.test.sh` was first added in `a08c2f3d`, and
+  `delete` names the delete/modify merge case the new suite covers.
+- `bConvergentLodestar-1` S2: the item creates the generated `symbols.json`, now at
+  `memory/map/generated/symbols.json`, and `remove` names the symbol churn that regenerates it.
+- `bConvergentLodestar-1` S3: `reuse-discovery.js` resolves under neither of unit 1's S5 tests at
+  `bd44d3ff`, because it is a file of the inCMS repo, which retires it on re-adoption.
+- `dPolishedVitrine-1` S10: that spec's own rollout steps have block 3 re-adopt twice with the pins
+  block 2 derived and then delete them, so no read follows the deletion.
+- `dScaffoldedMirror-9` S6: every program that reads `.lexicon.conf` goes through
+  `tools/lexicon/lexicon_conf.py`, whose reader skips `#` lines, or greps one `KEY=` line; that holds
+  for `tools/lexicon/adopt-lexicon.sh`, `tools/drift-audit/drift_report.py` and
+  `tools/codebase-map/map_extractors.py`. The one arm that reads its comment text, AC5 of
+  `tools/lexicon/selftest.py`, reads the `py.constant` readings rows, which are not pin history, and
+  skips itself while that cell is un-armed, as it is at `bd44d3ff`. No byte cap covers the file.
+- `dScaffoldedMirror-9` S7: `tools/lexicon/lexicon.py` carries neither `--freeze` nor `--drain` at
+  `bd44d3ff`, and `--drain` deletes only a grandfathered key that is no longer an offender.
+- `aTunedCompass-9` S2b: `git grep -i sampl` over `tools/memory-recall/` returns nothing at
+  `bd44d3ff`, and the records-side half was the spec's own rev-3 design, deleted by its rev-4 fold.
+  `expected_by_target` is real, at `tools/memory-recall/bench.py:350`, but the item cites it as the
+  reason the half cannot reject anything, not as something it withdraws.
+- `dPolishedVitrine-14` S2: `tools/unattended/SKILL.template.md:171` has preflight retire a finished
   record to that name, and `tools/unattended/check-brief-recorded.sh:58`-`:63` is the built S2,
   reading those records as corroboration. The item adds a condition and withdraws nothing.
 
@@ -690,10 +806,56 @@ than by escape: a half that lists no name leaves `READER NOT IN TREE` nothing to
 does not write it there.
 
 `bConvergentLodestar-1` S3 is the by-name escape's designed constituency and the only item that
-carries it. `reuse-discovery.js` resolves nowhere in the tracked tree outside the spec corpus,
-verified, because it is a file in the upstream product repo. That is a reason, not a defect, and it
-is precisely what `READER NOT IN TREE` exists to say; its by-value half carries `NO VALUE READERS`
-for the same reason.
+carries it. Its by-name half writes `reuse-discovery.js` and then `READER NOT IN TREE` with the
+reason, so the escape covers one named token and unit 1's arm prints it, rather than covering
+nothing. That is a reason, not a defect, and it is precisely what the escape exists to say; its
+by-value half carries `NO VALUE READERS` for the same reason. It is also AC3's proof that the
+resolver can fail: the one token section 4 expects to come out unresolved.
+
+### The token table — what each GENUINE clause carries on each half
+
+The census record copies this table as its per-item token rows (S8), and AC5 and AC12 diff the
+written clauses against those rows, so an escape over a reader the census names reds at order 1
+rather than passing check 25 for good. It is DATA drawn from the prose above, which is its
+evidence; where the two disagree the prose is re-read at source and both are corrected. Every
+token resolves under unit 1's S5 at `bd44d3ff`, `probe_u5_rev6_resolve.py`, and none is a record's
+path. "prose" means the half names no token and passes by vacuity.
+
+| item | by name | by value |
+|---|---|---|
+| `aGradedDoorway-7` S2 | `tools/unattended/check-unattended.test.sh`, `tools/unattended/unattended.test.sh`, `tools/run-gates/run-gates.gov.test.sh` | `tools/unattended/check-unattended.test.sh`, `tools/unattended/unattended.test.sh` |
+| `aMendedLedger-1` S1 | `tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/check-memory-hygiene.test.sh`, `WIRE-INTO-PROJECT.md` | `WIRE-INTO-PROJECT.md` |
+| `aMendedLedger-2-u1` S5 | `tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/check-memory-hygiene.test.sh`, `WIRE-INTO-PROJECT.md` | `WIRE-INTO-PROJECT.md` |
+| `aMendedLedger-3-u2` S2 | `tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/check-memory-hygiene.test.sh` | `tools/drift-audit/drift_report.py`, `tools/drift-audit/drift_signals.py` |
+| `aMendedLedger-3-u2` S3 | `tools/drift-audit/drift_signals.py`, `tools/drift-audit/drift_report.py`, `tools/drift-audit/selftest.py`, `DECLARED_EMPTY` | `tools/drift-audit/drift_report.py` |
+| `aMendedLedger-3-u2` S6 | `tools/drift-audit/SKILL.template.md`, `.claude/skills/drift-audit/SKILL.md`, `tools/check-kit-versions.sh`, `memory/map/features/review-harnesses.md`, `memory/map/generated/inventories.json` | `tools/drift-audit/README.md` |
+| `aMendedLedger-4-u3` S3 | `tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/corpus_ids.py`, `tools/memory-tree/hygiene-parity.test.sh`, `memory/map/features/memory-tree-hygiene.md` | `tools/memory-tree/check-memory-hygiene.sh` |
+| `aMendedLedger-4-u3` S4 | `tools/memory-tree/check-memory-hygiene.sh` | `tools/memory-tree/check-memory-hygiene.sh` |
+| `aMendedLedger-4-u3` S7 | `WIRE-INTO-PROJECT.md`, `README.md`, `memory/HYGIENE.md`, `memory/map/features/annotation-style.md` | `tools/memory-tree/check-memory-hygiene.sh` |
+| `aMendedLedger-6-u6` S11 | `skills/session-kickoff/SKILL.md`, `WIRE-INTO-PROJECT.md`, `memory/map/features/lexicon.md`, `memory/map/features/session-kickoff.md` | `WIRE-INTO-PROJECT.md` |
+| `aMendedLedger-7-u8` S5 | prose | `tools/memory-tree/merge-rows.test.sh`, `tools/memory-tree/merge-rows.py` |
+| `aMendedLedger-8-u9` S2 | `tools/check-wiring.sh`, `memory/map/features/memory-tree-merge-driver.md` | `NO VALUE READERS`, the one sanctioned escape on a GENUINE item |
+| `aMendedLedger-8-u9` S11 | `tools/memory-tree/merge-rows.py`, `tools/memory-tree/merge-rows.test.sh`, `memory/map/features/memory-tree-merge-driver.md`, `merge.conflictStyle` | `tools/memory-tree/merge-rows.test.sh` |
+| `dGatedProse-3` S8 | the clause as that spec carries it at the pass, verified by AC7 and never retyped here | the same |
+| `dPolishedVitrine-1` S5 | `tools/check-install-prefix.sh` | `tools/check-install-prefix.sh` |
+| `dScaffoldedMirror-9` S5 | `tools/lexicon/lexicon.py`, `tools/lexicon/kit.toml`, `tools/drift-audit/drift_signals.py` | `tools/lexicon/lexicon.py` |
+| `aTunedCompass-3` S2 | `tools/memory-recall/check-recall.py` | `tools/memory-recall/check-recall.py`, `tools/memory-recall/test_recall_floor.py`, `test_out_of_vocabulary_pin_reds` |
+| `aTunedCompass-9` S5c-i | `measure_run`, `check_audit`, `test_audit_green` | `tools/memory-recall/check-recall.py` |
+| `aWalkedCorpus-2` S5 | `measure_run` | `tools/memory-recall/check-recall.py`, `tools/memory-recall/test_recall_floor.py` |
+| `aQuarriedLantern-1` S5 | `tools/memory-recall/query.py`, `tools/memory-recall/README.md`, `tools/memory-recall/SKILL.template.md` | `tools/memory-recall/query.py`, `build_cutoff` |
+| `aMendedLedger-1` S2 | `tools/drift-audit/drift_report.py`, `tools/drift-audit/drift_signals.py`, `WIRE-INTO-PROJECT.md` | `signal_ledger`, `tools/drift-audit/selftest.py` |
+| `aMendedLedger-2-u1` S4 | prose, naming the two records that spell the old target | `tools/memory-tree/check-memory-hygiene.sh` |
+| `aMendedLedger-2-u1` S6 | `tools/check-dead-paths.sh`, `tools/dead-path-waivers.txt`, `tools/memory-tree/check-memory-hygiene.sh` | `signal_ledger`, `tools/drift-audit/drift_report.py` |
+| `aMendedLedger-6-u6` S1 | `tools/drift-audit/drift_report.py`, `_TERMINAL_SHA` | `signal_ledger` |
+| `aMendedLedger-6-u6` S5 | `tools/drift-audit/drift_report.py`, `WIRE-INTO-PROJECT.md`, `tools/check-dead-paths.sh`, `tools/dead-path-waivers.txt` | `signal_ledger` |
+| `aMendedLedger-6-u6` S6 | `tools/drift-audit/drift_report.py`, `tools/drift-audit/drift_signals.py` | `signal_ledger`, `tools/drift-audit/selftest.py` |
+| `aPacedTurnstile-14` S9 | `unattended.md`, `build-readme-surface.md` | `tools/memory-tree/check-memory-hygiene.sh`, `.memory-tree.conf` |
+| `bConvergentLodestar-1` S4 | `memory/map/affordance-exempt.toml`, `tools/codebase-map/map_diff.py`, `tools/codebase-map/map_lib.py`, `tools/codebase-map/selftest.py`, `tools/memory-tree/check-memory-hygiene.sh` | `tools/codebase-map/test_codebase_map.py`, `affordance_offenders` |
+
+The one escaped item whose by-name half carries a token is `bConvergentLodestar-1` S3, which writes
+`reuse-discovery.js` under `READER NOT IN TREE`. Every other escaped item carries the escaped
+table's reason after `NO VALUE READERS` on its by-value half, and prose with no backticked token on
+its by-name half, since a token there would be graded by resolution.
 
 ### The clause forms this unit writes
 
@@ -719,22 +881,20 @@ item is a continuation of that item.
     product repo's, and nothing here reads either. by value: NO VALUE READERS — same reason.
 ```
 
-**Every token a clause carries is a bare path or a bare symbol, never a path with a line number.**
-Unit 1's resolution join is a content match — one batched `git grep -l -F -f` over the tracked tree
-outside the spec corpus — and unit 1 states its citation-tail strip for the shape test only.
-Measured at 32f2eb71 by this session's `probe_resolve_fold.py`:
-`tools/memory-tree/check-memory-hygiene.sh` resolves, and the same token with `:497` appended does
-not. The line numbers section 4 cites are provenance and belong in the census record, and
-`TOOL-dGatedProse-3` S8's existing clause already has this shape. The same content match means a
-token resolves when another tracked file SPELLS it, not when a file of that name exists, which is
-why AC3 resolves every written token rather than trusting a path's existence.
+**Every token a clause carries is a bare path or a bare symbol, never a path with a line number,
+and never a record's path.** Both are HOUSE STYLE, not a description of check 25. How a token
+resolves is `TOOL-dGatedProse-1`'s S5, read there and implemented exactly by AC3; this spec does not
+restate it, because rev-2 to rev-5 did and restated it wrong. A line number is provenance and belongs
+in the census record, and `TOOL-dGatedProse-3` S8's existing clause already has this shape. A
+record's path, a build record, the archive, a gotcha or a backlog, would resolve and read nothing,
+and a by-name half names readers.
 
 ### The collision plan, because these are other sessions' live files
 
 Four of the specs are INPROGRESS under reading B — `aGradedDoorway-7`, `aQuarriedLantern-1`,
 `dPolishedVitrine-1`, and `dPolishedVitrine-14`, which enters only under that reading — and one has
 already moved under this measurement: `dPolishedVitrine-1` was rev-8 when unit 1 wrote its census
-and is rev-10 at 67bec01a. One more is BLOCKED, `aTunedCompass-3`, and two are DEFERRED,
+and is rev-10 at 67bec01a and at `bd44d3ff`. One more is BLOCKED, `aTunedCompass-3`, and two are DEFERRED,
 `aWalkedCorpus-2` and `dScaffoldedMirror-9`; all three are live by the engine's test and are
 written. That is the risk arriving before the pass does, and it is why S1 derives rather than
 reads.
@@ -742,15 +902,20 @@ reads.
 The pass, in order:
 
 1. Pin BASE with `git rev-parse` against an immutable sha, never a moving ref.
-2. Run the probe and write its output into the census record. This is the write set.
+2. Run the pass's own implementation of unit 1's trigger, AC1's, and write its output into the
+   census record. This is the write set.
 3. Print the two-way difference against the tables above, both directions, and record both. An item
-   that entered the population is written; an item that left is recorded with the reason.
-4. Write clauses one commit per OWNING NODE, node `d` last. A conflict is then confined to one
-   node's files and revertible without touching the others. The node-`d` commit carries the clause
-   on `TOOL-dGatedProse-4` S3, a sibling unit of this build, and S9's bullet if it is owed. It also
-   carries every rev bump F1 owes, because every spec F1's derivation binds at 67bec01a is node
-   `d`'s.
-5. Re-run the probe over the edited tree and confirm every derived item carries a clause.
+   that entered the population is written; an item that left is recorded with the reason. Copy the
+   token table into the census record's per-item rows, changed only for an item the difference
+   moves.
+4. Resolve every token of those rows by AC3 and record the output in the census record BEFORE that
+   record is committed.
+5. Write clauses one commit per OWNING NODE, node `d` last. A conflict is then confined to one
+   node's files and revertible without touching the others. The node-`d` commit carries the clauses
+   on `dPolishedVitrine-1`, `dPolishedVitrine-14` and `dScaffoldedMirror-9`, the verification of
+   `TOOL-dGatedProse-3` S8, and any of S9's bullets that is owed. It also carries every rev bump F1
+   owes, because every spec F1's derivation binds at `bd44d3ff` is node `d`'s.
+6. Re-run the trigger over the edited tree, then AC2, AC5, AC12 and AC16 over the written clauses.
 
 What the pass does if a file moved under it. The ITEM LABEL is the anchor, never a line number: every
 citation in the tables above is a label, and the probe re-locates it; where the derived label is
@@ -771,16 +936,24 @@ F2 recommended, so no two units share an order and no sibling header is this uni
 
 The edges arm joins orders as well as verbs: a **consumes-from** whose target sits at a LATER order
 reds, and a **hands-off** whose target sits at an EARLIER one reds. Checked against every sibling
-edge at the new numbering: unit 1 at order 2 hands off to units 2, 3 and 4; unit 2 at order 3
-consumes from unit 1 and hands off to units 3 and 4; unit 3 at order 4 consumes from units 1 and 2
-and hands off to unit 4; unit 4 at order 5 consumes from units 1, 2 and 3; and this unit at order 1
-hands off to unit 1. Every order join is green. The trigger this unit writes against is a text and
-not a build output, which is why a hand-off to a later order carries the relation.
+edge at the new numbering, as the sibling specs stand at this reconcile, units 3 and 4 at rev-5 and
+units 1 and 2 as round 1's folds left them: unit 1 at order 2
+consumes from this unit and hands off to units 2, 3 and 4; unit 2 at order 3 consumes from this unit
+and unit 1 and hands off to units 3 and 4; unit 3 at order 4 consumes from units 1 and 2 and hands
+off to unit 4; unit 4 at order 5 consumes from units 1, 2, 3 and this one; and this unit at order 1
+hands off to units 1, 2 and 4. Every order join is green. The trigger this unit writes against is a
+text and not a build output, which is why a hand-off to a later order carries the relation.
 
-RECIPROCITY is closed at 67bec01a. This spec's **hands-off** `TOOL-dGatedProse-1` is mirrored by the
-**consumes-from** `TOOL-dGatedProse-5` bullet that unit 1's own fold wrote, which is the carrier
-rev-2 named, and the join at `tools/memory-tree/check-memory-hygiene.sh:1798`-`:1800` looks for
-exactly that pair. S9 keeps it so.
+RECIPROCITY is closed with rev-6. Each of this spec's three **hands-off** bullets mirrors a
+**consumes-from** `TOOL-dGatedProse-5` bullet on the sibling it names: unit 1's, which is the carrier
+rev-2 named, and units 2's and 4's, which their rev-4 folds declared and which reds check 12 on their
+files until this spec answers them. The join at
+`tools/memory-tree/check-memory-hygiene.sh:1813`-`:1815` looks for exactly those pairs. S9 keeps
+them so. Re-checked at rev-7 by a probe implementing that join, the order join beneath it at
+`:1816`-`:1820` and the external-payload arm, over the five specs on disk at this reconcile: 30
+edges, every pair closed and every order held. Its liveness arm deletes either of the two bullets
+rev-6 added, in memory, and the join names the sibling left unmirrored, so the reconcile adds no
+bullet here.
 
 ### Inventory
 
@@ -805,9 +978,9 @@ about adopters would read as though this pass covered them.
 | file | change |
 |---|---|
 | fifteen node-`a` and node-`b` live specs under reading B, the reading F7 settled | one clause per derived item, additive, no header touched — about 65 lines |
-| four node-`d` live specs | one clause per derived item but the one already claused, additive, and on the three F1 binds a rev bump with its section 9 entry — about 25 lines |
-| `memory/builds/dGatedProse/spec/2026-09-20-spec-TOOL-dGatedProse-1.md` | nothing expected: the reciprocal bullet is present at 67bec01a, and the pass writes it with its revision entry only if a later fold took it out — 2 lines at most |
-| the census record under this build's `build/` folder | new, the probe output and the per-item verdict |
+| three node-`d` live specs, `dPolishedVitrine-1`, `dPolishedVitrine-14` and `dScaffoldedMirror-9` | one clause per derived item, additive, and on the two F1 binds a rev bump with its section 9 entry — about 25 lines; `TOOL-dGatedProse-3`, the fourth node-`d` spec with an item, is verified and not edited |
+| the three sibling specs that declare **consumes-from** `TOOL-dGatedProse-5`, units 1, 2 and 4 | nothing expected: each bullet is present, and the pass writes a missing one with its revision entry only if a later fold took it out — 2 lines each at most |
+| the census record under this build's `build/` folder | new: the trigger's output, the per-item verdict, the per-item token rows and the resolver's output |
 | `memory/builds/dGatedProse/README.md` | REGENERATED, never hand-edited |
 
 The per-file clause count is DERIVED at the pass and the 65 and 25 above are estimates from the
@@ -831,7 +1004,8 @@ and any error in a clause reds the same bar that the new arm reds, with no way t
 
 - security — N/A. Additive prose into tracked markdown, no execution surface, no input from outside
   the tree.
-- perf / scale — the probe walks 641 files and reads each once; seconds. The pass itself is an edit.
+- perf / scale — the trigger walks check 12's selection, 717 files at `bd44d3ff`, and reads each
+  once; the resolver batch-reads the tracked tree once. Seconds. The pass itself is an edit.
 - error / empty / loading states — the one real state is an EMPTY derived population, which would
   mean the trigger or the corpus moved out from under this spec. The pass then writes no clause and
   records the zero rather than reporting a silent success, because a zero that looks like a pass is
@@ -849,38 +1023,47 @@ and any error in a clause reds the same bar that the new arm reds, with no way t
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the build pass re-runs `probe_pop_rev3.py`, or its own re-implementation of the
-  trigger unit 1's text then states, against the base it pinned with `git rev-parse`, the census
-  record carries the probe's item set AND the two-way difference against section 4's tables, both
-  directions, and the write set equals the derived set.
-  figure: DERIVED — the item count in the record is the probe's output at the pass, never a figure
+- **AC1** — When the build pass runs its own implementation of the trigger S2 of
+  `TOOL-dGatedProse-1` then states, against the base it pinned with `git rev-parse`, the census
+  record carries the trigger's item set AND the two-way difference against section 4's tables, both
+  directions, and the write set equals the derived set. The spec author's probes are untracked, so
+  they are provenance for section 4's figures and never the instrument this criterion names.
+  figure: DERIVED — the item count in the record is the trigger's output at the pass, never a figure
   pinned here.
-  Red when: the record states a count from this spec with no probe output beneath it, so an item
+  Red when: the record states a count from this spec with no trigger output beneath it, so an item
   that entered the population after 2026-09-21 ships unclaused.
-- **AC2** — When `git grep -c 'Readers:'` runs over each edited spec, every file's count equals the
-  number of items the census attributes to that file — not merely at least it, because a duplicate
-  clause on one item is a defect.
-  Red when: a count is low, meaning a derived item was missed, or high, meaning one item carries two
-  clauses whose halves answer differently.
-- **AC3** — When every by-name token the pass wrote is resolved against the tracked tree outside the
-  spec corpus, each one either resolves or carries the by-name escape with a reason, and the
-  exclusion pathspec is verified against `git ls-files` for the spec glob before the resolution is
-  believed.
-  Red when: the pathspec silently fails and returns more files than the tree tracks outside the spec
-  corpus, so every name resolves against the specs that named it and the arm cannot fail.
+- **AC2** — When the pass's diff against its pinned BASE is read per edited spec, the number of added
+  lines carrying `**Readers:**` equals the number of write-set items the census attributes to that
+  file, and each write-set item, gathered as `TOOL-dGatedProse-1`'s S11 accumulator gathers it,
+  carries `**Readers:**` exactly once. The counts are of ADDED marker lines and of markers inside one
+  item, never a whole-file count, because prose outside section 2 spells the marker too: unit 4's
+  spec spells it twice outside its section 2 at `bd44d3ff`, and unit 1's many times.
+  Red when: a file's added count is low, so a derived item was missed, or high, so a clause landed
+  outside its item or twice; or one item carries two clauses whose halves answer differently.
+- **AC3** — When every token the census record's token rows list, and every backticked token the
+  pass wrote on a by-name half, is resolved by the pass's own implementation of
+  `TOOL-dGatedProse-1`'s S5, exactly as that S-item stands at the pass's base, and the output is
+  recorded in the census record BEFORE that record is committed: each resolves, or stands on a
+  by-name half covered by `READER NOT IN TREE` with a reason; no token is a path in one of S5's
+  record classes; the reader set is derived from `git ls-files` at the base and its size printed;
+  and `reuse-discovery.js`, the one token section 4 expects unresolved, comes out unresolved.
+  Red when: the resolver content-matches a record — a review, a build record, the archive or the
+  census record this unit commits — so a token resolves by being quoted, the guard sharing a
+  variable with what it guards; a record's path is written as a token, resolving by identity while
+  reading nothing; or `reuse-discovery.js` resolves, which says the resolver cannot fail.
 - **AC4** — When each escaped item the census lists is read, its `NO VALUE READERS` or
   `READER NOT IN TREE` spelling is followed by at least one further non-space character on the same
   half.
   Red when: an item carries a bare escape, which is a blank being filled rather than a question
   being answered.
-- **AC5** — When S3 and S6 of
-  `memory/builds/aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-3-u2-ledger-retirement.md`
-  and S3 of
-  `memory/builds/aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-4-u3-hygiene-gate.md` are
-  read, each carries the readers section 4 names for it, by path, on its by-name half. Those three
-  are the items the original dry run named.
-  Red when: any of the three answers its by-name half with an escape, because the readers for all
-  three were found in code and an escape there would be false.
+- **AC5** — When every item the census record marks GENUINE is read, its by-name half carries every
+  token that item's census row lists for that half and no `READER NOT IN TREE`, and an item whose
+  row reads prose carries no token there. The population is the census record's GENUINE set at the
+  pass, derived and never a list typed here, and the observation is a diff of the written halves
+  against the rows.
+  Red when: a GENUINE item's by-name half drops a reader the census found in code, or answers with
+  the escape, so a clause lists fewer readers than the census it cites, and check 25, which grades
+  only the names present, passes it for good.
 - **AC6** — When `git diff --unified=0` is read hunk by hunk over every edited spec other than unit
   1's, every hunk is an addition, except the header line of a spec F1's derivation binds, where the
   rev and the date move.
@@ -893,8 +1076,9 @@ and any error in a clause reds the same bar that the new arm reds, with no way t
 - **AC8** — When a spec named in section 4's table carries `CLOSED` or `WONTDO` at write time, the
   census records it as left out and its file is absent from the diff.
   Red when: a frozen record gains a clause, which no liveness test would ever have asked for.
-- **AC9** — When `probe_pop_rev3.py` runs over this spec file itself, every item it fires on carries a
-  clause, and the census states that count.
+- **AC9** — When the pass's own implementation of the trigger, the one AC1 runs, is run over this
+  spec file itself at `memory/builds/dGatedProse/spec/2026-09-21-spec-TOOL-dGatedProse-5.md`, every
+  item it fires on carries a clause, and the census states that count.
   figure: DERIVED — the count comes from the probe over this file, not from an assertion here that
   it is zero.
   Red when: this spec ships a triggered item with no clause, so the unit that brings the corpus into
@@ -903,30 +1087,23 @@ and any error in a clause reds the same bar that the new arm reds, with no way t
   reports no stale region for this build, and the README's roster names five ids.
   Red when: the roster still names four, so the generated build-order region contradicts the header
   this spec carries.
-- **AC11** — When `memory/builds/dGatedProse/spec/2026-09-20-spec-TOOL-dGatedProse-1.md` is read
-  after the pass, its header carries `order 2` and its edges section carries the reciprocal
-  **consumes-from** bullet naming this unit, whichever commit wrote it.
-  Red when: the bullet is absent, so the half-declared pair reds on THIS spec's file and the remedy
-  is not where the message points.
-- **AC12** — When S2 of
-  `memory/builds/aGradedDoorway/spec/2026-08-29-spec-TOOL-aGradedDoorway-7.md`, S1 of
-  `memory/builds/aMendedLedger/spec/2026-08-09-spec-aMendedLedger-1.md` and S11 of
-  `memory/builds/aMendedLedger/spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md`
-  are read, each clause's by-value half names at least one of the readers section 4 found for it,
-  and none of the three carries `NO VALUE READERS`.
-  Red when: any of the three carries that escape, which asserts no by-value reader where resolvable
-  ones exist, and check 25 would pass the false statement on every run after.
-- **AC13** — When S5 of
-  `memory/builds/aQuarriedLantern/spec/2026-08-03-spec-aQuarriedLantern-1.md`, S4 of
-  `memory/builds/aMendedLedger/spec/units/2026-08-09-spec-aMendedLedger-2-u1-journal-relocation.md`,
-  S4 of `memory/builds/bConvergentLodestar/spec/2026-07-22-spec-bConvergentLodestar-1.md` and the
-  item opening S5c-i in `memory/builds/aTunedCompass/spec/2026-09-04-spec-TOOL-aTunedCompass-9.md`
-  are read, each clause's by-value half names at least one of the readers section 4 found for it,
-  and none of the four carries `NO VALUE READERS`.
-  Red when: any of the four carries that escape. Each is an item where the escape is the easy answer
-  — a lookup that never reached this repo, a link already gone, a list that is empty here, a unit
-  nobody has built — and each has a value reader in the code, so the escape would be a false
-  statement check 25 passes on every run after.
+- **AC11** — When the edges sections of
+  `memory/builds/dGatedProse/spec/2026-09-20-spec-TOOL-dGatedProse-1.md`,
+  `memory/builds/dGatedProse/spec/2026-09-20-spec-TOOL-dGatedProse-2.md` and
+  `memory/builds/dGatedProse/spec/2026-09-20-spec-TOOL-dGatedProse-4.md` are read after the pass,
+  each carries a **consumes-from** `TOOL-dGatedProse-5` bullet and this spec carries the three
+  mirroring **hands-off** bullets, whichever commit wrote each, and unit 1's header carries
+  `order 2`.
+  Red when: a pair is half-declared, so check 12's reciprocity join reds on whichever file declares
+  the unmirrored half, and the remedy may be in the other file.
+- **AC12** — When every item the census record marks GENUINE is read, its by-value half carries every
+  token that item's census row lists for that half and does not carry `NO VALUE READERS`, with ONE
+  exception, `aMendedLedger-8-u9` S2, whose row is that escape and which carries it followed by its
+  reason. The population is the census record's GENUINE set at the pass, derived and never a list
+  typed here, and the observation is a diff of the written halves against the rows.
+  Red when: any GENUINE item but that one carries `NO VALUE READERS`, or drops a by-value reader its
+  row lists. That is the escape-over-readers direction every census round found, and check 25
+  grades this half by presence, so it would pass the false statement on every run after.
 - **AC14** — When the census record is read, it names the reading of O6 that unit 1's text carries at
   the pass's base, which F7 settled as B, and the boundary it matches the past-tense forms at, which
   F7 settled as the word boundary, and the write set holds S1 and
@@ -936,14 +1113,17 @@ and any error in a clause reds the same bar that the new arm reds, with no way t
   that reading is B.
   Red when: the four are written under reading A, buying graded obligations with no refusal behind
   them, or left out under reading B, so check 25 reds four items at order 2.
-- **AC15** — When S5 of `memory/builds/aWalkedCorpus/spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md`,
-  S3 of `memory/builds/dGatedProse/spec/2026-09-20-spec-TOOL-dGatedProse-4.md` and S9 of
-  `memory/builds/aPacedTurnstile/spec/2026-08-20-spec-TOOL-aPacedTurnstile-14.md` are read, each
-  clause's by-value half names at least one of the readers section 4 found for it, and none carries
-  `NO VALUE READERS`.
-  Red when: any carries that escape, which an earlier rev wrote and the code refutes — a per-id red
-  in one case and a declared byte cap in the other two — so check 25 would pass the false statement
-  on every run after.
+- **AC16** — When every clause the pass wrote is read, it carries `**Readers:**`, then `by name:`,
+  then `by value:`, in that order and each once, inside the item it answers, which is the clause
+  shape S4 of `TOOL-dGatedProse-1` states, implemented by the pass at order 1.
+  Red when: a clause misses a half marker or orders them otherwise, which no other criterion here
+  reads and which check 25 would first red at order 2, as another unit's defect.
+- **AC17** — When each edited spec F1's derivation binds is read, its header's `rev-N` is its value
+  at the pass's base plus one, and its section 9 carries an entry at that rev naming the item's scope
+  label; every edited spec F1 does not bind keeps its header, which AC6 reads.
+  Red when: a bound spec is left at its base rev, which reds nothing on the bar, since check 12's
+  test that the header rev appears in section 9 passes an unbumped header; or its new entry names no
+  scope label.
 
 ## 7. Gates
 
@@ -971,12 +1151,14 @@ version move.
   RESOLVED (agent, 2026-09-21): bump ONLY where `REV_SCOPE_CUTOFF` binds, settled by the main loop
   from rulings the owner already made. The set is derived, not listed: the edited specs whose
   FILENAME date is on or after the `REV_SCOPE_CUTOFF` value in `.memory-tree.conf`, 2026-09-08 at
-  67bec01a. `probe_f1_revscope.py` reads that value and the reading-B population and finds four bound
-  specs, all in the `dGatedProse` and `dPolishedVitrine` builds. The latest filename date among the
-  other sixteen is 2026-09-04, so no node-`a` or node-`b` spec is bound, and neither is node `d`'s
-  `dScaffoldedMirror-9`. One of the four, `TOOL-dGatedProse-3`, takes no edit under S6, so the pass
-  bumps three at 67bec01a, each with a section 9 entry carrying the item's scope token, which is what
-  `REV_SCOPE_CUTOFF` grades there. Bumping the older specs on other nodes is churn no gate asks for,
+  67bec01a and at `bd44d3ff`. Over the folded tree three specs with an item are bound,
+  `TOOL-dGatedProse-3`, `TOOL-dPolishedVitrine-1` and `TOOL-dPolishedVitrine-14`; unit 4's spec was a
+  fourth until its rev-4 fold deleted the pointer repair that fired there. The latest filename date
+  among the other sixteen is
+  2026-09-04, so no node-`a` or node-`b` spec is bound, and neither is node `d`'s
+  `dScaffoldedMirror-9`. `TOOL-dGatedProse-3` takes no edit under S6, so the pass bumps two, each with
+  a section 9 entry carrying the item's scope token, which is what `REV_SCOPE_CUTOFF` grades there
+  and AC17 observes. Bumping the older specs on other nodes is churn no gate asks for,
   since not bumping reds nothing, and one house style does not pay for a header conflict on another
   session's live file.
 - **F2 — the minimal re-stamp, or the whole tail?** The owner's re-ordering names one pair: this unit
@@ -988,7 +1170,7 @@ version move.
 - **F3 — is `aMendedLedger-8-u9` S11 genuine after all?** Unit 1 called it borderline, on the ground
   that what is neutralised is a config's reachability and no name leaves the tree.
   RESOLVED (agent, 2026-09-21): GENUINE, decided by reading the code rather than the sentence. The
-  config key has three resolvable carriers outside the spec corpus, and section 32 of
+  config key has three carriers among unit 1's S5 readers, and section 32 of
   `tools/memory-tree/merge-rows.test.sh` sets it to each of `diff3` and `zdiff3` and asserts what
   the driver does under each, which is a reader of its value. None of those readers is invented to
   satisfy a marker; the escape was the false statement. Section 4 names them.
@@ -1025,7 +1207,8 @@ version move.
   RESOLVED (agent, 2026-09-21): reading B, and the word boundary. The `.md` exclusion is dropped
   everywhere, the dotted-tail shape's "other than `md`" clause included, because the owner ruled the
   exclusion dropped and the slash-only reading keeps half of it. 38 items across 20 specs is the
-  figure under both choices together, and it is the population this census answers.
+  figure under both choices together at 67bec01a and at `bd44d3ff`, and 37 across 19 over the tree
+  round 1's folds leave, which is the population this census answers.
 
 ## 9. Revision log
 
@@ -1087,6 +1270,58 @@ version move.
   `aWalkedCorpus-2` S5 sentence claiming the ceiling is withdrawn, the claim that `build_cutoff` is
   the stronger reader, and the claim that the template's byte count is read are each corrected at
   source. Unit 1's disagreement is seven items, not four. F7's heading no longer contradicts AC14.
+- rev-6 · 2026-09-21 · S2 S3 S4 S8 S9 · §3 · §4 · §5 · §6 · §8 · AC1 AC2 AC3 AC5 AC9 AC11 AC12 AC16
+  AC17 · the fold of the round-1 spec audit, which is the whole disposition BUILD-METHOD M4 gives a
+  run that exits bounded after one round. Every figure, token and line anchor this entry touches was
+  re-derived at `bd44d3ff`, the merge of `origin/main`, and the base moves there. HIGH H2 is CLOSED by
+  this unit's census mechanism: AC5 and AC12 now quantify over every item the census marks GENUINE
+  and diff each written half against that item's token row, which section 4's new token table seeds
+  and S8's census record carries, so the sixteen items no criterion observed are observed with the
+  rest. AC13 and AC15, named samples of the same set, are deleted and their ids are not reused. HIGH
+  H3 is CLOSED: the `aPacedTurnstile-14` S9 row reads GENUINE against the dossier's byte count, every
+  row of both verdict tables was re-read against the prose, the totals under them are counted from
+  the rows, and each of the seven items unit 1 once read as false triggers is paired with its reader
+  or recorded as gone. HIGH H4, this unit's half, is CLOSED: S3 and AC3 point at `TOOL-dGatedProse-1`'s
+  S5 as its rev-7 states it, readers by content and the whole tracked set by identity, run and
+  recorded before the census record is committed, with a known-unresolved token as the proof the
+  resolver can fail. Every planned token was re-resolved there, none resolved only by quotation, and
+  every record path left the clauses as provenance. M1: AC2 counts added marker lines and markers per
+  item. M2: AC16 grades the clause shape and AC17 the F1 bump. M4: the clause-forms paragraph points
+  at unit 1's S5 instead of restating it, the reason a build-record path stays out of
+  `aQuarriedLantern-1` S5's clause is corrected, and AC1 and AC9 name the pass's own trigger rather
+  than an untracked probe. L6: the non-goal points at unit 1's S9. Two sibling folds moved this spec
+  too. Unit 4's rev-4 took its S3 out of the population, so the census answers 37 items across 19
+  specs and F1 binds two edits. Units 2 and 4 declared consumes-from this unit at their rev-4, so the
+  edges carry the two mirroring hands-off bullets, the edge the audit's disposition of M3 assigned
+  here. Last, the re-read of every escape against the code that the audit asked of a round 2 moved
+  `aMendedLedger-7-u8` S5 to GENUINE: its fixture row is read by case 0d and the driver's `key()`.
+  The census is 28 GENUINE and 9 ESCAPE under reading B.
+- rev-7 · 2026-09-21 · §3 · §4 · §8 · the cross-spec reconcile of the round-1 folds, run one unit
+  at a time, this unit after units 4 and 3 at their rev-5 and before unit 1. Every figure and anchor
+  this entry touches was re-derived at `bd44d3ff` or over the reconciled tree. **Unit 4's reused
+  label, stated by content.** Unit 4's rev-4 deleted rev-3's S3, the pointer repair to the review
+  protocol that carried `removes`, and gave the label to its budget raise. Every sentence here that
+  named the deleted item by label now names it by content, and the unit-4 edge says that today's S3
+  fires nothing. **The disagreement with unit 1, corrected.** Rev-6 said unit 1's rev-7 and the
+  census now disagree on none, while the same fold moved `aMendedLedger-7-u8` S5 to GENUINE, which
+  unit 1 still lists as a false trigger, and unit 1 still counts the deleted pointer repair among
+  its value moves. Unit 1 writes its split out item by item, so a verdict moved here reaches it only
+  through its own fold; section 4 now states both verdicts with their code for that fold, and reads
+  the census into unit 1's three rows as 18, 11 and 8 over 37. The unit-1 edge says what crosses
+  back and at which population. **Reciprocity, verified rather than re-added.** The hands-off
+  bullets mirroring units 2's and 4's consumes-from edges have stood since rev-6. A probe
+  implementing check 12's edge joins over the five reconciled specs closes every pair and every
+  order, and its liveness arm reds on either bullet deleted, so nothing is added and section 4
+  records the check. **The population, re-derived over the reconcile**: 37 items across 19 specs,
+  the same set as rev-6, with the named gap at four and the token-less class at eight; unit 4's S2
+  there deletes one 197-byte span at its rev-5 as at its rev-4. **The research record, M6.** The
+  genuine-set paragraphs that credited the dry run with naming their items now cite
+  `memory/builds/dGatedProse/build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md` at the
+  lines naming their specs among the five PARTIAL ones. The sentence calling the dry run's
+  description of one item exact is deleted, because that record names specs and not items and no
+  tracked text supports it. The owner's two cap rulings of 2026-09-21, the guide pair at 98304 bytes
+  and 1200 lines and the build method's line half rising with its byte cap, move no figure here,
+  because this spec states no cap either ruling moves.
 
 ## 10. Reuse audit
 

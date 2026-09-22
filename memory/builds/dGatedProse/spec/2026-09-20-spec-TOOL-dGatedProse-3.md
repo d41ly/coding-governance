@@ -1,11 +1,12 @@
 # TOOL-dGatedProse-3 — the guide cap rises on both axes, with the reason recorded beside the figure
 
-**Status:** SPECCED · rev-3 · 2026-09-21 · node d · Tier-2 · base fcbfba5f · streams tooling · order 4 · ratified 2026-09-21
+**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base bd44d3ff · streams tooling · order 4 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md](../build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md) | research | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 
 <!-- /gen:spec-records -->
@@ -16,27 +17,30 @@ Raise both declared guide-size caps together so the class has real headroom agai
 that records the breach the raise removes, record the reason where a reader of the constant finds it,
 and move the kit version once for the whole build, because the epoch rule puts that move here. The
 owner ruled the raise on 2026-09-20 at `TOOL-dLoggedFlight-33` and named ONE key; the dry run measured
-that moving that key alone is a raise in name only, because the line axis reds first. Moving two where
-the row names one is a divergence this unit discloses rather than absorbs: the row's own wording is
-corrected at landing, by the route section 3 names. The owner ratified the pair on 2026-09-21 —
-81920 bytes and 1000 lines — so section 8's first fork is closed by a decision and not by this unit's
-recommendation.
+that moving that key alone is a raise in name only, because the line axis reds first, and this
+build's research record carries that measurement at
+`memory/builds/dGatedProse/build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md:334`. Moving
+two where the row names one is a divergence this unit discloses rather than absorbs: the row's own
+wording is corrected at landing, by the route section 3 names. The owner ruled the pair on 2026-09-21
+at 98304 bytes and 1200 lines, superseding the 81920 and 1000 ratified earlier that day once the
+merged tree showed that pair buying about 32 days where about 49 had been weighed, so section 8's
+first fork is closed by a decision and not by this unit's recommendation.
 
 ## 2. Scope (IN)
 
 - **S1** — At `tools/memory-tree/check-memory-hygiene.sh:84`, both cap constants move together to the
-  ratified pair of 81920 bytes and 1000 lines, with a dated reason block immediately above them
-  naming the ruling, the measured growth rate and the headroom the figure buys. Observed by AC1 and
-  AC2.
+  ratified pair of 98304 bytes and 1200 lines, with a dated reason block immediately above them
+  naming the rulings, the measured growth rate and the headroom the figure buys. Observed by AC1,
+  AC2 and AC14.
 - **S2** — The four dogfood copies are REGENERATED from their templates and never hand-edited, after
   this unit's template edit in S4. The render is all-or-nothing over the four pairs, so this unit
   rewrites three live copies it has no edit in. Observed by AC4.
-- **S3** — `tools/memory-tree/.memory-tree.conf.example:180` and the line below it move to the same
+- **S3** — `tools/memory-tree/.memory-tree.conf.example:194` and the line below it move to the same
   pair as the engine, so a future adoption copies a conf that agrees with the default it overrides.
-  Observed by AC5.
+  Observed by AC5, on both keys.
 - **S4** — Every live prose ASSERTION of the retired pair moves, by the route its record type allows.
   A template is edited and re-rendered. A mutable OPEN backlog row is corrected in place. The
-  append-only decision rows, the CLOSED backlog row and the one OPEN row that RECORDS a past
+  append-only decision rows, the CLOSED backlog rows and the one OPEN row that RECORDS a past
   measurement are left verbatim and superseded by one new decision row. Observed by AC6 and AC7.
 - **S5** — `memory/project/curation-debt.txt` loses the `memory/guides/UNATTENDED-PROTOCOL.md` block
   at lines 55 to 69, and its header gains a drain line naming this unit and the new figure. Observed
@@ -50,7 +54,8 @@ recommendation.
 - **S8** — The kit version. The value of `KIT_MEMORY_TREE_VERSION` at
   `tools/memory-tree/check-memory-hygiene.sh:20` is replaced by the next increment, ONCE for the whole
   build, in a commit of this unit's that lands at or after its engine commit — the placement the
-  epoch rule requires and the reason this move is here rather than at order 1. The marker
+  epoch rule requires and the reason this move is here rather than at order 2, in
+  `TOOL-dGatedProse-1`. The marker
   `gov:kit memory-tree@` on that same line moves with it, as does every other carrier of the
   retired marker value, the population DERIVED by the grep in section 4 rather than listed. The four
   shipped templates are stamped on their line 1; the four dogfood copies are REGENERATED and never
@@ -77,19 +82,21 @@ rev-2: that sentence counts CHECKS, the marker grep never returns that file, and
 the number of checks is the unit that owes the count. This unit adds no check, so it does not touch
 it.
 
-**No re-wording of the ruling row by this unit's code.** `memory/backlog/TOOL.md:548` is
+**No re-wording of the ruling row by this unit's code.** `memory/backlog/TOOL.md:560` is
 `TOOL-dLoggedFlight-33` and reads that `GUIDE_CAP_BYTES` is raised — one key, where this unit moves
 two, and the Alternatives table below calls the one-key version the raise in name only. The row is a
 mutable record whose status moves when the raise lands, so its correction is a build-level backlog
 write at landing, in the same commit that closes it, and not a code change this unit makes. The
-correction to write: both keys moved together, because the line axis binds first. Unit 4 declares its
-own superseded row the same way, and this is that declaration.
+correction to write: both keys moved together, to 98304 and 1200, because the line axis binds first.
+Unit 4 declares its own superseded row the same way, and this is that declaration.
 
 **No rewrite of a landed or past-tense record.** `memory/DECISIONS.md:62` and `memory/DECISIONS.md:132`
-are append-only. `memory/backlog/TOOL.md:366` is CLOSED, and both of its mentions narrate the state at
-closure. `memory/backlog/TOOL.md:54` is OPEN but past-tense: it records what three carriers measured
-when the pattern was found, which is the evidence the row exists to carry. Rewriting any of the four
-would rewrite a record rather than a claim, which is the discipline S4 is built on.
+are append-only. `memory/backlog/TOOL.md:368` is CLOSED, and both of its mentions narrate the state at
+closure; `memory/backlog/TOOL.md:296` is CLOSED too, and narrates the guides' caps at the retired byte
+value as they stood when it closed. `memory/backlog/TOOL.md:56` is OPEN but past-tense: it records what
+three carriers measured when the pattern was found, which is the evidence the row exists to carry.
+Rewriting any of them would rewrite a record rather than a claim, which is the discipline S4 is built
+on.
 
 **No repair of the dossier's own check-count disagreement.** `memory/map/features/memory-tree-hygiene.md:1`
 calls the engine a 21-check gate and `:34` says 22 checks; both are wrong or one is, at base, before
@@ -105,10 +112,10 @@ stopgap the owner chose over them.
 
 No split and no trim. The owner ruled against both on 2026-09-20. Trimming was never a local edit
 anyway: `tools/unattended/adopt-unattended.sh:333` byte-compares the live guide against
-`tools/unattended/PROTOCOL.template.md` and `:443` re-copies it, so cutting a sentence from the guide
+`tools/unattended/PROTOCOL.template.md` and `:481` re-copies it, so cutting a sentence from the guide
 means cutting it from the shipped kit.
 
-No adopter migration. `tools/memory-tree/adopt-memory-tree.sh:56` copies the conf example verbatim, so
+No adopter migration. `tools/memory-tree/adopt-memory-tree.sh:59` copies the conf example verbatim, so
 every EXISTING adopter's live conf already carries an explicit retired value and stays red after this
 lands until they edit it themselves. S3 reaches future adoptions only. A release note or a conf
 migration is owed and is not built here; it needs a backlog row of its own.
@@ -127,24 +134,24 @@ governing a backticked SHOUTED object, and rev-1 put the two in exactly that rel
 
 ### Edges
 
-- **consumes-from** `TOOL-dGatedProse-1` — that unit lands first and edits the same engine file and
-  the same self-test. What it LEAVES this unit is four things, none of them asserted here. **The new
-  check 25, live and grading this spec**, because the owner declared no `READER_INVENTORY_CUTOFF` on
-  2026-09-21, so its population is every live spec from that unit's commit; S8 carries a
-  `**Readers:**` clause for that reason and section 7 lists the leg that grades it. **The suite's
-  assertion floor**, raised by the count of assertions that unit ADDS, which AC10 reads rather than
-  pins. **The four dogfood pairs already rendered and in sync**, from its own catalog-entry edit, at
-  the marker value of the pinned base. And **the line offsets**: that unit adds a preset to the
-  engine's `*_CUTOFF` cluster, a blank declaration to the conf example above line 180, and a fixture
-  block to the self-test, all of which sit ABOVE coordinates this spec cites. Every `path:line` here
-  is a base-`fcbfba5f` coordinate and is re-resolved by grepping its anchor string before the edit.
-  Nothing gates that: `tools/check-spec-tokens.py:396` resolves a citation against the file's line
-  COUNT and reds at `:402` only when the number is out of range, so a citation that slid four lines
-  passes, which is the class section 10 records five prior instances of.
-  What that unit NO LONGER does is the version move and the marker re-stamp: they were its rev-2 S9
-  and are this unit's S8, because the epoch rule is topological and that unit's commit is not the
-  last one in this build to move a behaviour-bearing engine line. The constant it leaves therefore
-  still reads the base value, which S8 moves and AC3 observes.
+- **consumes-from** `TOOL-dGatedProse-1` — that unit lands at order 2, before this one, and edits
+  the same engine file and the same self-test. What it LEAVES this unit is four things, none of them
+  asserted here. **The new check 25, live and grading this spec**, because the owner declared no
+  `READER_INVENTORY_CUTOFF` on 2026-09-21, so its population is every live spec from that unit's
+  commit; S8 carries a `**Readers:**` clause for that reason and section 7 lists the leg that grades
+  it. **The suite's assertion floor**, raised by the count of assertions that unit ADDS, which AC10
+  reads rather than pins. **The four dogfood pairs already rendered and in sync**, from its own
+  catalog-entry edit, at the marker value of the pinned base. And **the line offsets**: that unit
+  adds a fixture block to the self-test and its check-25 branches to the engine, and either can sit
+  ABOVE coordinates this spec cites. Every `path:line` here is a base-`bd44d3ff` coordinate and is
+  re-resolved by grepping its anchor string before the edit. Nothing gates that:
+  `tools/check-spec-tokens.py:594` resolves a citation against the file's line COUNT and reds at
+  `:600` only when the number is out of range, so a citation that slid four lines passes, which is
+  the class section 10 records five prior instances of. What that unit NO LONGER does is the version
+  move and the marker re-stamp: they were its rev-2 S9 and are this unit's S8, because the epoch
+  rule is topological and that unit's commit is not the last one in this build to move a
+  behaviour-bearing engine line. The constant it leaves therefore still reads the base value, which
+  S8 moves and AC3 observes.
 - **consumes-from** `TOOL-dGatedProse-2` — that unit changes `memory/TEMPLATE-SPEC.md`, which is one
   of the four dogfood copies S2 and S8 regenerate. Its change must live in
   `tools/memory-tree/SPEC-TEMPLATE.template.md`, or the render deletes it. This is not advice: the
@@ -156,13 +163,29 @@ governing a backticked SHOUTED object, and rev-1 put the two in exactly that rel
   edit goes through the template, and it renders again after its own edit. The re-stamp half of that
   render is byte-neutral, and the arithmetic is now this unit's to state rather than a sibling's: both
   version spellings are four bytes, so S8 spends none of the headroom that guide has against its
-  `tools/template-size-limits.txt:86` row.
-- **consumes-from** external — the owner's rulings of 2026-09-20 and 2026-09-21 and the dry-run
-  measurement recorded in this build's research record. The first authorizes the raise and the row
-  removal, the second ratifies the pair; this unit grants itself neither.
+  `tools/template-size-limits.txt:86` row. Two size bounds grade that guide, and neither couples the
+  two units. This unit's guide-class pair is the loose one: the file is 27641 B and 352 lines at
+  base, 28.1% and 29.3% of the ratified pair, and that unit's own figures after its edit, 27936 B and
+  352 lines, stay under 30% of both halves. The per-subject row is the tight one, and it moves in
+  that unit's budget raise, on the owner's ruling of 2026-09-21, together with M1's line figure,
+  whose rise the owner ruled the same day. That raise is named here by what it does and not by its
+  scope label, because at that unit's rev-3 the same label named a different item, the pointer
+  repair to the review protocol that its rev-4 deleted. One file is written by both units: each
+  appends one row to `memory/DECISIONS.md`, which is row-keyed and append-only, so the two rows land
+  additively and neither supersedes the other.
+- **consumes-from** external — the owner's rulings of 2026-09-20 and 2026-09-21, and the dry-run
+  measurement recorded at
+  `memory/builds/dGatedProse/build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md`, whose
+  Strand 5 carries every dry-run figure this spec cites: the growth rate at `:331`, the narrowing at
+  `:334` and the two candidate pairs at `:337` to `:339`. The 2026-09-20 ruling authorizes the raise
+  and the row removal. On 2026-09-21 the owner ratified 81920 and 1000 and, the same day, re-ruled
+  the pair to 98304 and 1200, for the reason section 8 records; this unit grants itself neither
+  figure. Both 2026-09-21 rulings reached this spec as the main loop's relay of the owner's own
+  conversation, and no decision record carries either yet: the row AC7 reads, which the build pass
+  writes citing both, is their first.
 - **hands-off** external — three writes this unit does not make: the adopter migration and the
   prose-parity gate named above, each owed a backlog row this unit does not mint, and the re-wording
-  of `memory/backlog/TOOL.md:548` at landing. One consequence it does not repair either: after S8,
+  of `memory/backlog/TOOL.md:560` at landing. One consequence it does not repair either: after S8,
   `tools/memory-tree/hygiene-parity.test.sh` has no legal baseline until the next engine rewrite, and
   section 4 records that its own header declares this.
 
@@ -175,47 +198,50 @@ Two constants on one line, and nothing else decides the verdict. Check 6 compare
 
 | key | retired | ratified | why |
 |---|---|---|---|
-| `GUIDE_CAP_BYTES` | 61440 | 81920 | 80 KiB; 19650 B of headroom, which is 48.9 days at the measured rate |
-| `GUIDE_CAP_LINES` | 750 | 1000 | 81920 divided by 81.92, so the per-line allowance is preserved exactly |
+| `GUIDE_CAP_BYTES` | 61440 | 98304 | 96 KiB; 33365 B of headroom, which is 62.3 days at the measured rate |
+| `GUIDE_CAP_LINES` | 750 | 1200 | 98304 divided by 81.92, so the per-line allowance is preserved exactly |
 
-**Where the two figures come from.** 81920 is 80 KiB, and it is also exactly four thirds of the
-retired 61440; 1000 is exactly four thirds of 750. The ratified pair is therefore the retired pair
+**Where the two figures come from.** 98304 is 96 KiB, and it is also exactly eight fifths of the
+retired 61440; 1200 is exactly eight fifths of 750. The ratified pair is therefore the retired pair
 under ONE scalar, which is why the allowance below survives by construction rather than by a second
-calculation. The owner ratified this pair on 2026-09-21 over the conservative alternative, so the
-figures are a decision and the arithmetic is only the derivation.
+calculation. The pair the owner first ratified, 81920 and 1000, is the same construction at four
+thirds. The owner ruled this pair on 2026-09-21 over both that one and the conservative alternative,
+so the figures are a decision and the arithmetic is only the derivation.
 
-**The headroom each axis buys, at the measured rate.** 81920 minus the file's 62270 B leaves 19650 B,
-which is 48.9 days at 402 B per day. 1000 minus its 701 lines leaves 299, which is 112.8 days at 2.65
-lines per day. The byte axis therefore stays the binding one by a factor of about 2.3, which is what
-the design wants: one axis should decide, and it should be the one whose remedy is
+**The headroom each axis buys, at the measured rate.** 98304 minus the file's 64939 B leaves 33365 B,
+which is 62.3 days at 535.4 B per day. 1200 minus its 704 lines leaves 496, which is 177.1 days at
+2.80 lines per day. The byte axis therefore stays the binding one by a factor of about 2.8, which is
+what the design wants: one axis should decide, and it should be the one whose remedy is
 prose rather than reformatting.
 
 **Where the rate comes from, and the rate that is deliberately not used.** Measured over this file's
-own history: the last intervention is `dc9431f8` on 2026-09-01, which left it at 54231 B and 648
-lines, and on 2026-09-21 it is 62270 B and 701 lines. That is 20 days, 8039 B and 53 lines, so 402 B
-per day and 2.65 lines per day. The all-history rate over the same probe is 1239 B per day, and it is
-NOT the basis: it spans the guide's authoring era, where a contract was being written rather than
+own history on the rebased base: the last intervention is `dc9431f8` on 2026-09-01, which left it at
+54231 B and 648 lines, and on 2026-09-21 it is 64939 B and 704 lines. That is 20 days, 10708 B and
+56 lines, so 535.4 B per day and 2.80 lines per day. Part of that growth arrived through the
+reconcile merge rather than on this branch, which is how this file has always grown: the debt row
+itself records a merge-induced overflow. The all-history rate over the same probe is 1303 B per day,
+and it is NOT the basis: it spans the guide's authoring era, where a contract was being written rather than
 maintained. The post-intervention refill rate is the defensible one for a stopgap, because what this
 figure has to survive is refilling, and it is the more conservative of the two for a raise as well.
 
-**Why both.** Measured on this tree, `memory/guides/UNATTENDED-PROTOCOL.md` is 62270 B and 701 lines.
-Against the retired pair that is 830 B over on bytes and 49 lines free on lines. Those 49 lines are
-the whole of the line axis's remaining life: at the measured 2.65 lines per day they are spent in 18
+**Why both.** Measured on this tree, `memory/guides/UNATTENDED-PROTOCOL.md` is 64939 B and 704 lines.
+Against the retired pair that is 3499 B over on bytes and 46 lines free on lines. Those 46 lines are
+the whole of the line axis's remaining life: at the measured 2.80 lines per day they are spent in 16
 days, whatever the byte figure says. A byte-only raise therefore expires inside one build, which is
 the failure it was meant to prevent. Where exactly it stops paying depends on which density you
-assume, and the two defensible bases disagree by about 3 KB: at the file's average 88.83 B per line
-the 49 lines cost 4353 B and the break-even is 66623 B, while at the marginal 151.7 B per line
-observed over the growth window they cost 7433 B and it is near 69700 B. The choice between those
+assume, and the two defensible bases disagree by about 4.5 KB: at the file's average 92.24 B per line
+the 46 lines cost 4243 B and the break-even is 69182 B, while at the marginal 191.2 B per line
+observed over the growth window they cost 8796 B and it is near 73700 B. The choice between those
 bases does not change the conclusion, so this spec states the range rather than picking one.
 
-**Why the allowance is preserved.** 61440 divided by 750 is 81.92, and 81920 divided by 1000 is 81.92.
+**Why the allowance is preserved.** 61440 divided by 750 is 81.92, and 98304 divided by 1200 is 81.92.
 Moving one key without the other silently re-decides how many bytes a line of a guide may carry, and
 the engine's own comment above these constants warns that an unvalidated change here reds everything
 or nothing with no message.
 
-**The cap still binds something.** Six of the seven guides sit between 7.8% and 44.9% of the retired
+**The cap still binds something.** Six of the seven guides sit between 7.8% and 45.0% of the retired
 byte cap, so this cap has only ever bound one file. At the ratified figure the second-largest guide
-moves to 33.7%. The raise does not relax a constraint any other guide was under, and it consumes none
+moves to 28.1%. The raise does not relax a constraint any other guide was under, and it consumes none
 of the headroom it grants: no guide gains a byte.
 
 ### Inventory, and the codebase-map obligation
@@ -245,12 +271,18 @@ an ancestor of, or equal to, S. The scan set is declared at `:68` and `:69` — 
 delegate modules — and accumulated at `:71`; W is walked newest-first at `:129` over that whole set,
 while S is searched at `:150` over the engine alone.
 
-Verified against the build's four write sets: S1 moves two non-comment lines of the engine at order 3,
-`TOOL-dGatedProse-1` moves many more at order 1, and NEITHER of the other two units touches any file
-in the scan set — unit 2's set is `tools/check-spec-tokens.py` with its own suite, template and
-dossier, and unit 4's is the build-method template, its render and its dossier. So this unit's engine
-commit is the LAST behaviour-bearing scan-set change in the build, and every legal S is at or after
-it. A single move at order 1 makes W a descendant of S, the ancestry test at `:179` fails, and the leg
+Verified against the build's five write sets, each read from that spec's own Files touched: S1 moves
+two non-comment lines of the engine at order 4, `TOOL-dGatedProse-1` moves many more at order 2, and
+NONE of the other three units touches any file in the scan set. Unit 5's set is the live specs it
+writes clauses into, its census record under this build's build folder and the regenerated build
+README. Unit 2's is `tools/check-spec-tokens.py` and its suite, the spec template
+`tools/memory-tree/SPEC-TEMPLATE.template.md` with its render `memory/TEMPLATE-SPEC.md`, its
+dossier, and `memory/backlog/TOOL.md`, whose row its landing re-words. Unit 4's is five paths: the build-method template and its render,
+`tools/template-size-limits.txt`, the dossier `memory/map/features/build-method.md` and one appended
+row in `memory/DECISIONS.md`. None of those is the engine or one of the six delegates named at
+`tools/memory-tree/check-verdict-epoch.sh:69`. So this unit's engine commit is the LAST
+behaviour-bearing scan-set change in the build, and every legal S is at or after it. A single move
+at order 2 makes W a descendant of S, the ancestry test at `:179` fails, and the leg
 — subject `repo`, guard `None`, so on every bar — reds from this unit's commit through the build's
 tip. That is what the earlier ruling would have produced and it is why the move is here.
 
@@ -263,14 +295,15 @@ rule, and the ruling's own-commit shape is the one specified here.
 ### The marker population, and why it is derived and not listed
 
 The population is `git grep -lF "gov:kit memory-tree@$OLD"` with `$OLD` read from the constant at the
-commit's parent, never a written list. Measured at rev-3 it returned TEN tracked files and the tenth
-was the finding: nine carriers — the engine, the four shipped `tools/memory-tree/*.template.md` templates and
-the four rendered copies `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`,
-`memory/guides/ANNOTATION-STYLE.md` and `memory/guides/BUILD-METHOD.md` — plus one build record, a
-sibling spec that spells the literal marker in its own prose. So the population is tracked files
-OUTSIDE the build-record class, for the same reason the cap passes below exclude it: a spec is not a
-carrier, and a landed one is never rewritten. Ten is what that grep returned once, not a figure to
-carry: the exclusion is the rule and the build re-derives the set at the commit. This spec
+commit's parent, never a written list. At the retired base it returned the carriers — the engine,
+the four shipped `tools/memory-tree/*.template.md` templates and the four rendered copies
+`memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`, `memory/guides/ANNOTATION-STYLE.md` and
+`memory/guides/BUILD-METHOD.md` — plus one build record, a sibling spec that spells the literal
+marker in its own prose. At the rebased base, where the constant reads 2.82, it returns the same
+carriers and no build record, because that spec spells a value the grep no longer asks for. So the
+population is tracked files OUTSIDE the build-record class, for the same reason the cap passes below
+exclude it: a spec is not a carrier, and a landed one is never rewritten. The two readings differ,
+which is the argument: the exclusion is the rule and the build re-derives the set at the commit. This spec
 deliberately does not spell that literal string, which is how a spec joins its own population.
 
 Two shapes inside the population, each costing a step if missed. The constant and the marker share
@@ -334,8 +367,8 @@ git grep -nE '(^|[^0-9])(61440|750)([^0-9]|$)' -- $(
 The fourth pass is SCOPED to the files the first three return, and it is scoped both ways. Run not at
 all it misses two live carriers inside a file this unit edits. Run tree-wide it returns the
 `INDEX_CAP_BYTES` carriers the fourth non-goal keeps out. Even scoped it OVER-returns, by
-construction — measured on this tree, eight lines that spell one of the two bare numbers about
-something else — and those are routed below rather than left for the observer to re-judge. The
+construction — lines that spell one of the two bare numbers about something else — and those are
+routed below rather than left for the observer to re-judge. The
 exclusions on the first three are the frozen classes: `memory/archive/` is exempt from check 6 by
 class, and a landed build record is never rewritten.
 
@@ -346,28 +379,33 @@ indistinguishable from an unnoticed one:
 | carrier | route |
 |---|---|
 | `tools/memory-tree/check-memory-hygiene.sh:84` | the owner of the figure; edited |
-| `tools/memory-tree/.memory-tree.conf.example:180` and `:181` | edited, both keys |
+| `tools/memory-tree/.memory-tree.conf.example:194` and `:195` | edited, both keys |
 | `tools/memory-tree/HYGIENE.template.md:70` and `:164` | edited, then rendered through |
 | `memory/HYGIENE.md:70` and `:164` | never hand-edited; produced by S2's render |
 | `memory/map/features/memory-tree-hygiene.md:51` | edited |
-| `memory/backlog/TOOL.md:231` | OPEN row asserting the line bound; corrected in place, with its comparative |
-| `memory/backlog/TOOL.md:352` | OPEN row asserting a live percentage of the byte cap; re-measured in place |
-| `memory/backlog/TOOL.md:548` | the ruling row; re-worded and closed at landing, not by this unit |
-| `memory/backlog/TOOL.md:54` | OPEN row RECORDING a past measurement; left verbatim |
-| `memory/backlog/TOOL.md:366` | CLOSED row; left verbatim |
+| `memory/backlog/TOOL.md:233` | OPEN row asserting the line bound; corrected in place, with its comparative |
+| `memory/backlog/TOOL.md:354` | OPEN row asserting a live percentage of the byte cap; re-measured in place |
+| `memory/backlog/TOOL.md:560` | the ruling row; re-worded and closed at landing, not by this unit |
+| `memory/backlog/TOOL.md:56` | OPEN row RECORDING a past measurement; left verbatim |
+| `memory/backlog/TOOL.md:368` and `:296` | CLOSED rows; left verbatim |
 | `memory/DECISIONS.md:62` and `:132` | append-only; left verbatim and superseded |
-| `memory/project/curation-debt.txt:56` and `:57` | inside the block S5 deletes |
-| `tools/memory-tree/check-memory-hygiene.test.sh:1139` | an expected string; repaired with its arm |
+| `memory/project/curation-debt.txt:56`, `:57` and `:67` | inside the block S5 deletes |
+| `tools/memory-tree/check-memory-hygiene.test.sh:1149` | an expected string; repaired with its arm |
 | `tools/memory-tree/check-memory-hygiene.test.sh:547` and `:549` | fixture comments; moved with the fixture |
-| `tools/memory-tree/check-memory-hygiene.sh:121` and `:719` | the key NAMES, no figure; nothing to move |
-| `tools/memory-tree/check-memory-hygiene.test.sh:2039` and `:2085` | regions declaring their OWN caps; nothing to move |
+| `tools/memory-tree/check-memory-hygiene.sh:121` and `:733` | the key NAMES, no figure; nothing to move |
+| `tools/memory-tree/check-memory-hygiene.test.sh:2057` and `:2103` | regions declaring their OWN caps; nothing to move |
 | pass 4's over-returns | `INDEX_CAP_BYTES` carriers, per-fixture conf declarations and one unrelated count of 750 things; nothing to move, and the reason pass 4 is scoped |
 
-**One carrier needs more than its figure changed.** `memory/backlog/TOOL.md:231` reads that the
-hygiene cap for a guide is 750 lines, "ten times looser" than the 250 the build-method guide declares
-for itself. The multiplier is already wrong at base — 750 against 250 is three times — and at 1000 it
-becomes four. Changing the number and leaving the comparative would ship a corrected figure inside a
-sentence that is still false, so both move, in the same clause and the same edit.
+**One carrier needs more than its figure changed.** `memory/backlog/TOOL.md:233` reads that the
+hygiene cap for a guide is 750 lines, "ten times looser" than the 250 the build-method guide declared
+for itself when the row was written. The multiplier is already wrong at base — 750 against 250 is
+three times — and no multiplier survives this build. M1 states 350 lines at base, at
+`memory/guides/BUILD-METHOD.md:8`, not 250, and `TOOL-dGatedProse-4` moves that figure to 370 at
+order 5, one unit after this edit, on the owner's ruling of 2026-09-21 that the method's line half
+rises with its byte cap. So the clause takes the figure 1200 and a comparative with no number in it,
+far looser than the method's own line figure, which stays true across both moves. Changing the
+number and leaving "ten times" would ship a corrected figure inside a sentence that is still false,
+so both move, in the same clause and the same edit.
 
 **The union is still incomplete, and the gap is worth naming rather than discovering.** The pair grep
 misses `memory/map/features/memory-tree-hygiene.md:51` because that row is a markdown table cell whose
@@ -383,10 +421,11 @@ a claim of coverage.
 Three homes, three different readers, and the primary one is beside the figure.
 
 1. **Beside the figure.** A dated comment block immediately above
-   `tools/memory-tree/check-memory-hygiene.sh:84`, naming the ruling, the merge-induced overflow, the
+   `tools/memory-tree/check-memory-hygiene.sh:84`, naming the rulings, the merge-induced overflow, the
    measured growth rate, the headroom in days, and the fact that BOTH keys moved and why a byte-only
    raise would have been short-lived. This is what a reader of the constant sees, it ships to every
-   adopter, and the sibling constants in the same block already carry their reasons this way.
+   adopter, and the sibling constants in the same block already carry their reasons this way. AC14
+   reads it.
 2. **The corpus answer to why.** One appended row in `memory/DECISIONS.md`. Both prior movements of
    this value are recorded there, at `memory/DECISIONS.md:62` and `:132`, and the second of those is
    itself a re-argument of the first. A third movement absent from that file leaves
@@ -400,24 +439,24 @@ Three homes, three different readers, and the primary one is beside the figure.
 `memory/project/curation-debt.txt:69` lists the protocol today, so `derive_waived` moves the finding
 out of the failing set and check 6 PASSES on this tree right now. The raise is not clearing a red; it
 is exchanging a recorded waiver for a raised cap, and the row's deletion is the raise's only visible
-effect on this tree. The stale-entry guard at `tools/memory-tree/check-memory-hygiene.sh:1929` then
+effect on this tree. The stale-entry guard at `tools/memory-tree/check-memory-hygiene.sh:1944` then
 reverses the obligation: a listed path that passes checks 6, 7 and 8 unwaived is a row that hides
-nothing, and line 1940 fails check 6 telling you to delete the row rather than re-justify it. The
+nothing, and line 1955 fails check 6 telling you to delete the row rather than re-justify it. The
 registry's own header declares this condition, and the row's last line at `:67` names its drain as
 "the contract is split again or the cap is re-argued".
 
-**One timing trap.** That guard is held under the staged selection by the condition at line 1929, so a
+**One timing trap.** That guard is held under the staged selection by the condition at line 1944, so a
 pre-commit run is green with the stale row still present while the full-tree run reds. A clean commit
 is not clearance for this edit.
 
 ### The two self-test arms, and the floor they do not move
 
 The suite builds a 761-line guide fixture at `tools/memory-tree/check-memory-hygiene.test.sh:544` and
-asserts two things about it. Line 1133 asserts check 6 NAMES it; line 1139 asserts the message spells
-both halves of the bound. At a 1000-line cap that fixture is silent, so both arms fail — the fixture
+asserts two things about it. Line 1143 asserts check 6 NAMES it; line 1149 asserts the message spells
+both halves of the bound. At a 1200-line cap that fixture is silent, so both arms fail — the fixture
 must be regrown past the new line cap and the expected string rewritten to the new pair. Its two
 explanatory comments at `:547` and `:549` restate the retired cap in prose and move with it. The rest
-of the check-6 arms survive: the region at `:2039` declares its own cap explicitly rather than reading
+of the check-6 arms survive: the region at `:2057` declares its own cap explicitly rather than reading
 the default, and the green counterpart fixture at `:551` is 401 lines and stays between the two class
 caps, which is the comparison that arm exists to make.
 
@@ -436,12 +475,13 @@ fixture directly instead of trusting the suite's verdict.
 
 | option | why not |
 |---|---|
-| move `GUIDE_CAP_BYTES` alone, as the ruling row's wording says | inert within about 18 days; the line axis reds first at 701 of 750 |
+| move `GUIDE_CAP_BYTES` alone, as the ruling row's wording says | inert within about 16 days; the line axis reds first at 704 of 750 |
 | a per-repo override in this repo's `.memory-tree.conf` | `tools/unattended/adopt-unattended.sh` installs a byte-identical protocol into every adopter of both kits, so a local override fixes this tree and leaves them red on install day |
 | raise `INDEX_CAP_BYTES`, which is also 61440 | the wrong key; it gates row documents and not this file, and `TOOL-dBriefedPass-8` records this exact confusion surviving a full reading |
-| 73728 and 900, the conservative pair | inside the owner's bracket and buys 11458 B, which is 28.5 days; refused by the ruling of 2026-09-21, and section 8 records both candidates with their figures |
+| 81920 and 1000, the pair first ratified | buys 16981 B, which is 31.7 days on the merged tree against the 48.9 weighed at the old base; superseded by the owner's re-ruling of 2026-09-21, and section 8 keeps it with both measurements |
+| 73728 and 900, the conservative pair | buys 8789 B, which is 16.4 days on the merged tree; refused by the owner on 2026-09-21, and section 8 records it with the figures the first ruling weighed and their re-measurement |
 | cap the bytes at the break-even and leave the lines | buys the shorter of the two lives and re-decides the per-line allowance by accident |
-| the single version move at order 1, one per build but placed first | topologically illegal: W is then a descendant of S, the ancestry test at `tools/memory-tree/check-verdict-epoch.sh:179` fails, and an unguarded `repo` leg reds from this unit's commit through the tip |
+| the single version move at order 2, in `TOOL-dGatedProse-1`, one per build but placed before this unit | topologically illegal: W is then a descendant of S, the ancestry test at `tools/memory-tree/check-verdict-epoch.sh:179` fails, and an unguarded `repo` leg reds from this unit's commit through the tip |
 
 ### Files touched
 
@@ -459,9 +499,9 @@ build time; a count written beside a derived population is wrong on the next com
   file is newly read, no process is newly spawned, no leg is added.
 - error / empty / loading states — N/A for a constant. The engine already refuses a malformed or zero
   byte cap and validates each binding before awk sees it, and the arms for that live at
-  `tools/memory-tree/check-memory-hygiene.test.sh:2085`.
+  `tools/memory-tree/check-memory-hygiene.test.sh:2103`.
 - observability — the reason block at the constant and the drain line in the registry are the whole of
-  it. A later reader who asks why the figure is 81920 finds the answer on the line above it.
+  it. A later reader who asks why the figure is 98304 finds the answer on the line above it.
 - risks — four, and each is named where it bites. The version move must land at or after this unit's
   engine commit or `verdict epoch` reds through the build's tip, which AC12 observes and section 4
   derives from source. The render rewrites three live copies this unit has no edit in, so a sibling
@@ -480,13 +520,14 @@ build time; a count written beside a derived population is wrong on the next com
 
 - **AC1** — When `tools/memory-tree/check-memory-hygiene.sh` runs over this tree with the protocol's
   debt block already deleted, check 6 names no file under the guides directory.
-  Red when: the block is deleted and either cap key keeps its retired value, so check 6 names
-  `memory/guides/UNATTENDED-PROTOCOL.md` at 62270 B against 61440 B.
+  Red when: the block is deleted and the byte key keeps its retired value, so check 6 names
+  `memory/guides/UNATTENDED-PROTOCOL.md` at its measured size against 61440 B. The line key is
+  observed by AC5, whose fixture sits above the retired line cap.
   figure: DERIVED — the file's size is read at observation time, not taken from this spec.
 - **AC2** — When the two constants at `tools/memory-tree/check-memory-hygiene.sh:84` are read and
   divided, the quotient is 81.92, the same per-line allowance the retired pair carried.
   Red when: one key moved and the other did not, which is the byte-only raise the ruling row's
-  wording would have produced; the quotient then reads 109.23 or 61.44.
+  wording would have produced; the quotient then reads 131.07 or 51.2.
   figure: DERIVED — both constants are read from that line at observation time.
 - **AC3** — When `grep -n 'KIT_MEMORY_TREE_VERSION=' tools/memory-tree/check-memory-hygiene.sh` runs
   at the build's tip, the value differs from the value at the pinned base, and a grep of that same
@@ -508,18 +549,23 @@ build time; a count written beside a derived population is wrong on the next com
   an observation.
 - **AC5** — When `tools/memory-tree/check-memory-hygiene.sh` runs in a scratch tree whose
   `.memory-tree.conf` is a verbatim copy of `tools/memory-tree/.memory-tree.conf.example` and whose
-  guides directory holds a 62270-byte, 701-line fixture, check 6 is silent.
-  Red when: the example keeps the retired byte value, so a copied conf overrides the raised engine
-  default back down and a fresh adopter of both kits reds on install day.
+  guides directory holds a fixture of 1100 lines and 90000 bytes, check 6 is silent.
+  Red when: the example keeps EITHER retired value, or either half of the 81920 and 1000 the
+  re-ruling superseded, so a copied conf overrides the raised engine default back down on that axis.
+  The fixture sits above both stale pairs and within the ratified one, 1100 lines against 750, 1000
+  and 1200 and 90000 B against 61440, 81920 and 98304, so each key alone reds it at either stale
+  value. On the protocol itself, a retired byte key reds a fresh adopter of both kits on install day
+  and a retired line key reds it at line 751.
   fixture: the scratch tree is built by the observation; this tree holds no such fixture today.
   cost: seconds.
 - **AC6** — When the four passes of section 4 are re-run over tracked files outside the archive and
-  build-record classes, every line that ASSERTS a current guide bound spells the ratified pair. The
-  lines that RECORD a past measurement or a superseded ruling are unchanged and are exactly these
-  four: `memory/DECISIONS.md:62`, `memory/DECISIONS.md:132`, `memory/backlog/TOOL.md:54` and
-  `memory/backlog/TOOL.md:366`.
-  Red when: a live assertion is missed — or the exemption is stretched to cover
-  `memory/backlog/TOOL.md:352`, which asserts a PRESENT-tense percentage of the byte cap, is already
+  build-record classes, every line that ASSERTS a current guide bound spells the ratified pair of
+  98304 and 1200. The lines that RECORD a past measurement or a superseded ruling are unchanged and
+  are exactly these: `memory/DECISIONS.md:62`, `memory/DECISIONS.md:132`,
+  `memory/backlog/TOOL.md:56`, `memory/backlog/TOOL.md:296` and `memory/backlog/TOOL.md:368`.
+  Red when: a live assertion is missed, or spells the 81920 and 1000 the re-ruling superseded, which
+  pass 1 returns on every key-name line — or the exemption is stretched to cover
+  `memory/backlog/TOOL.md:354`, which asserts a PRESENT-tense percentage of the byte cap, is already
   wrong at base, and so is a second stale claim rather than a preserved record. Red also when the
   four passes are replaced by a bare tree-wide search for the value, which reports `INDEX_CAP_BYTES`
   lines as carriers and reads the dossier's split table cell as clean.
@@ -528,9 +574,11 @@ build time; a count written beside a derived population is wrong on the next com
   over-return row and not as a finding list; an `INDEX_CAP_BYTES` carrier surfacing there is the
   derivation working, not a miss.
 - **AC7** — When `memory/DECISIONS.md` is read, exactly one new row names this unit, the ratified
-  pair, the measured growth rate and the headroom in days.
+  pair, the measured growth rate and the headroom in days, and cites the owner's rulings of
+  2026-09-21 that ratified a pair and then re-ruled it.
   Red when: the raise is recorded only in the engine comment, so the value's third movement is absent
-  from the file carrying its first two and `TOOL-dSpentCeiling-3` stays the newest word on it.
+  from the file carrying its first two and `TOOL-dSpentCeiling-3` stays the newest word on it; or the
+  row states the superseded 81920 and 1000 as the pair.
 - **AC8** — When `tools/memory-tree/check-memory-hygiene.sh` runs in full-tree mode, its curation-debt
   stale-entry guard names no path, and `memory/project/curation-debt.txt` holds four path rows and a
   header line naming this unit as the drain.
@@ -541,22 +589,22 @@ build time; a count written beside a derived population is wrong on the next com
   builds at `tools/memory-tree/check-memory-hygiene.test.sh:544`, it names that fixture and prints
   both halves of the ratified pair.
   Red when: the fixture is left at its current row count, so at the raised line cap check 6 is silent
-  and the arm at `tools/memory-tree/check-memory-hygiene.test.sh:1139` asserts a string the engine
+  and the arm at `tools/memory-tree/check-memory-hygiene.test.sh:1149` asserts a string the engine
   never prints.
 - **AC10** — When the diff is read, it adds no assertion to the memory-hygiene fixture suite —
   written unbackticked here on purpose, because a bare suite path inside an acceptance bullet is what
   the bar join refuses — and the floor at
-  `tools/memory-tree/check-memory-hygiene.test.sh:2460` is unchanged from the value
+  `tools/memory-tree/check-memory-hygiene.test.sh:2478` is unchanged from the value
   `TOOL-dGatedProse-1` left.
   Red when: an arm is deleted rather than repaired and the floor is lowered to match, which is the
   green-by-absence shape that floor exists to catch.
   figure: DERIVED — the floor is READ from that line after unit 1 lands, never pinned here. It
-  measured 374 at base `fcbfba5f`, and the build's convention raises it only by the count of
+  measured 374 at base `bd44d3ff`, and the build's convention raises it only by the count of
   assertions a unit ADDS, so unit 1's raise is the one movement it sees and this unit owes none.
 - **AC11** — When `memory/map/features/memory-tree-hygiene.md:51` is read, its `guides/*.md` row
   spells the ratified byte and line bounds and no longer calls the byte bound hardcoded.
   Red when: the figures are corrected and the word stays, which asserts the conf cannot override a key
-  that `tools/memory-tree/.memory-tree.conf.example:180` declares.
+  that `tools/memory-tree/.memory-tree.conf.example:194` declares.
 - **AC12** — When the marker grep of section 4 is re-run at the build's tip for the RETIRED value, it
   returns no tracked file outside the build-record class; and
   `bash tools/memory-tree/check-verdict-epoch.sh <the build's base>` exits 0 there.
@@ -581,6 +629,16 @@ build time; a count written beside a derived population is wrong on the next com
   permission: the standing observation is `TOOL-dGatedProse-1`'s check 25 on the `memory hygiene`
   leg, which grades this spec's own §2 items from that unit's commit because the owner declared no
   cutoff on 2026-09-21. This criterion is the author-time reading of the same clause.
+- **AC14** — When the comment lines immediately above the `GUIDE_CAP_BYTES=` line of
+  `tools/memory-tree/check-memory-hygiene.sh` are read, contiguous up to the first non-comment line,
+  they form one block that carries a date, names `TOOL-dLoggedFlight-33`, names both
+  `GUIDE_CAP_BYTES` and `GUIDE_CAP_LINES` as moved, and states a growth rate in bytes per day and the
+  headroom the raise buys in days.
+  Red when: the constants move with no block above them, or with a block that omits the ruling, names
+  one key, or states no rate or no headroom. AC1, AC2, AC7 and AC8 all stay green on each of those,
+  which is how the primary home of the reason went unobserved at rev-3.
+  figure: DERIVED — the rate and the headroom are section 4's method re-run at the build's commit,
+  not this spec's readings, because the file keeps growing between the two.
 
 ## 7. Gates
 
@@ -605,7 +663,7 @@ manifest spells it.
 One of those legs grades this SPEC and not only this unit's code. With no
 `READER_INVENTORY_CUTOFF` and no `SPEC_CLAIMS_CUTOFF` declared, unit 1's check 25 and unit 2's
 `claims` join both take every live spec as their population from their own commits, so this file is
-inside both from order 1 and order 2 onwards. S8's `**Readers:**` clause is written for the first and
+inside both from order 2 and order 3 onwards. S8's `**Readers:**` clause is written for the first and
 AC13 reads it; the second is why the dead-key non-goal above keeps a dossier path and a SHOUTED key
 out of a subject-verb-object relation.
 
@@ -619,10 +677,17 @@ with it. If `codebase-map coverage + freshness` disagrees, `python tools/codebas
 
 ## 8. Open questions
 
-**F1 — the ratified figure. RESOLVED (owner, 2026-09-21): 81920 and 1000.** The owner ruled the ACT
-on 2026-09-20 and named no number; the pair was ratified on 2026-09-21, taking this unit's
-recommendation. Both candidates and every figure either needed are kept below, because the record of
-what was weighed is the reason the resolved figure can be re-argued later:
+**F1 — the ratified figure. RESOLVED (owner, 2026-09-21): 98304 and 1200.** The owner ruled the ACT
+on 2026-09-20 and named no number. On 2026-09-21 the owner first ratified 81920 and 1000, taking this
+unit's recommendation, and re-ruled the pair the same day to 98304 and 1200, once the re-measurement
+below showed the first pair buying 31.7 days on the merged tree where 48.9 had been weighed. Every
+candidate and every figure each needed is kept below as it was weighed, because the record of what
+was weighed is the reason the resolved figure can be re-argued later.
+
+The first ruling weighed these two, measured at the retired base `fcbfba5f` from the dry run's
+figures, which this build's research record carries: the rate at
+`memory/builds/dGatedProse/build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md:331` and
+both pairs at `:337` to `:339`.
 
 | pair | byte headroom | days at 402 B/day | line headroom | days at 2.65 L/day |
 |---|---:|---:|---:|---:|
@@ -637,14 +702,31 @@ taken, because "roughly twice the split's lifetime" is a judgment about how long
 and not an arithmetic result — 29 days against 49 is exactly the size of the judgment, and it was the
 owner's to make.
 
+**Re-measured at rev-4 on the rebased base `bd44d3ff`, and re-ruled.** The reconcile brought the
+protocol to 64939 B and 704 lines and the refill rate to 535.4 B and 2.80 lines per day, so the two
+pairs the first ruling weighed, and the pair the owner then ruled, buy:
+
+| pair | byte headroom | days at 535.4 B/day | line headroom | days at 2.80 L/day |
+|---|---:|---:|---:|---:|
+| 98304 and 1200 | 33365 B | 62.3 | 496 | 177.1 |
+| 81920 and 1000 | 16981 B | 31.7 | 296 | 105.7 |
+| 73728 and 900 | 8789 B | 16.4 | 196 | 70.0 |
+
+The first ruling's premise moved: 31.7 days is under the forty, roughly twice the split's twenty,
+that the argument above rested on, and under the 48.9 the first table weighed. The owner raised the
+pair to restore that headroom. 98304 and 1200 buy 62.3 days at the merged tree's rate and keep the
+construction: eight fifths of the retired pair, the 81.92 allowance intact, and bytes binding by a
+factor of about 2.8.
+
 **F2 — where the build's single kit-version move has to SIT. RESOLVED (owner, 2026-09-21): here, in
 this unit.** Re-derived from source and not from the ruling, per the instruction to verify it:
 `tools/memory-tree/check-verdict-epoch.sh:16` states the rule topologically and `:179` implements it
 as an ancestry test — W, the newest commit in `<base>..HEAD` moving a behaviour-bearing line of the
 scan set declared at `:68` and `:69`, must be an ancestor of or equal to S, the newest commit that
-CHANGES the constant's value. S1 moves two non-comment lines of that scan set at order 3, and neither
-unit 2 nor unit 4 touches any file in it, so this unit's engine commit is the last W the build has.
-The move at order 1 would therefore have made W a descendant of S and redded an unguarded `repo` leg
+CHANGES the constant's value. S1 moves two non-comment lines of that scan set at order 4, and none of
+units 2, 4 and 5 touches any file in it, so this unit's engine commit is the last W the build has.
+The move at order 2, in `TOOL-dGatedProse-1`, would therefore have made W a descendant of S and
+redded an unguarded `repo` leg
 from this unit's commit through the build's tip. The resolution keeps the move singular and gives it
 to this unit, in its own commit at or after the engine commit; section 4 records what was verified,
 AC12 observes the verdict and carries the liveness assertion, and S8 carries the work.
@@ -738,6 +820,64 @@ AC12 observes the verdict and carries the liveness assertion, and S8 carries the
   and 701 lines, the 81.92 quotient, the four passes' carrier set and the self-test coordinates at
   544, 547, 549, 551, 1133, 1139 and 2460 — and all of them reproduce, so nothing else in sections 4
   and 6 was churned.
+- rev-4 · 2026-09-21 · folded the round-1 spec audit's four items against this unit, recorded at
+  `memory/builds/dGatedProse/reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md`, and
+  re-derived every coordinate and measured figure on the rebased base `bd44d3ff`, the merge of
+  `origin/main` into this build. **M9:** new AC14 reads the comment block immediately above the
+  `GUIDE_CAP_BYTES=` line for a date, `TOOL-dLoggedFlight-33`, both keys named as moved, a rate and a
+  headroom, with the figures derived at the build rather than pinned; S1 and the first reason home
+  name it. **M10:** AC5's fixture is 800 lines and 65000 B, above both retired values and within both
+  ratified ones, so either retired key in the example reds it and S3 says so; AC1's red-when names the
+  byte key only and points at AC5 for the line key. The value-parity arm the record proposes is the
+  candidate the prose-parity non-goal already routes to a row. **L3:** the unit-1 edge's claim that
+  unit 1 adds a preset to the engine's cutoff cluster and a conf-example line is deleted; the offsets
+  it names are the self-test fixture block and the engine's check-25 branches. **L4:** orders restated
+  as unit 5 at 1, unit 1 at 2, unit 2 at 3, this unit at 4 and unit 4 at 5, in S8, the unit-1 edge,
+  the epoch derivation, the Alternatives row, section 7 and F2; the derivation counts five write sets
+  and names unit 5's as touching no scan-set file. **The rebase:** the base moves from `fcbfba5f` to
+  `bd44d3ff`, which also stops AC3 passing on the merge's own movement of the constant. Engine anchors
+  re-grepped: the check-6 awk binding is now `:733` and the stale-entry guard `:1944` and `:1955`,
+  while `:20`, `:84` and `:121` hold. The self-test, conf-example, backlog, spec-tokens and adopter
+  anchors are re-resolved in place. The protocol measures 64939 B and 704 lines there and the refill
+  rate 535.4 B and 2.80 lines per day, so the Data-model figures and the Alternatives rows move with
+  them and F1 gains a re-measurement beside the figures the ruling weighed; the ruled pair does not
+  move, and the moved premise goes to the owner. The marker grep, re-run with the constant at 2.82,
+  returns the carriers and no build record. Re-running the four passes found two lines the route table
+  never accounted for, both present at the old base: the CLOSED row at `memory/backlog/TOOL.md:296`,
+  which narrates the guide cap at closure and had been counted among pass 4's unrelated
+  over-returns, now a left-verbatim record in the route table, a non-goal, S4 and AC6; and
+  `memory/project/curation-debt.txt:67`, inside the block S5 deletes. The over-return count is deleted
+  rather than corrected.
+- rev-5 · 2026-09-21 · the cross-spec reconcile of the round-1 folds, run one unit at a time, this
+  unit after unit 4's rev-5; every figure and anchor this entry touches was re-derived at `bd44d3ff`.
+  **The owner's re-ruling of the guide cap pair, 2026-09-21:** 98304 bytes and 1200 lines replace the
+  81920 and 1000 ratified earlier that day. The Goal, S1, the Data-model table, the derivation of the
+  figures, the headroom paragraph, the allowance quotient, the observability line and the landing
+  correction the `memory/backlog/TOOL.md:560` non-goal names all carry it. The pair is eight fifths
+  of the retired one, where the first pair was four thirds, so 81.92 survives. On the merged tree it
+  leaves 33365 B, 62.3 days at 535.4 B per day, and 496 lines, 177.1 days at 2.80, so bytes bind by
+  a factor of about 2.8; the second-largest guide sits at 28.1% of the new byte cap. AC2's one-key
+  quotients become 131.07 and 51.2. AC5's fixture moves from 800 lines and 65000 B to 1100 lines and
+  90000 B, so it sits above the superseded pair as well as the retired one: a conf example left at
+  81920 or 1000 reds it, which the old fixture could not see. AC6 and AC7 name the superseded pair as
+  a red. F1 is RESOLVED at the new pair; the first ruling's table stays as weighed, the
+  re-measurement table gains the ruled pair's row, and rev-4's sentences returning the moved premise
+  to the owner are deleted, because the owner has ruled on it. The Alternatives table gains the
+  first-ratified pair as a superseded row, and its conservative row loses "inside the owner's
+  bracket", a bracket this spec stopped defining at rev-3. **Unit 4's write set, corrected:** rev-4's
+  epoch derivation named three of its paths, and its Files touched lists five, adding
+  `tools/template-size-limits.txt` and `memory/DECISIONS.md`. Neither is in the scan set, so the
+  conclusion holds. Each sibling's set is now read from its own Files touched, and unit 2's names its
+  template and render. **The `memory/backlog/TOOL.md:233` comparative:** M1 states 350 lines at base,
+  not the 250 the row names, and unit 4 moves it to 370 at order 5 on the owner's line-half ruling of
+  the same day, so the corrected clause carries no multiplier. **The unit-4 edge** names that unit's
+  budget raise by what it does rather than by the label its rev-4 reused, places the guide under the
+  new pair, and records that both units append one row to `memory/DECISIONS.md`. **The research
+  record, M6:** the Goal, the external edge and F1 cite
+  `memory/builds/dGatedProse/build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md` by path
+  and line, and the external edge names both 2026-09-21 rulings as the main loop's relay, with AC7's
+  row as their first record. S8 and its clause are untouched, which unit 5's AC7 grades; the trigger
+  re-run over this file fires on S8 alone, and S4 and S6 still carry no backticked token.
 
 ## 10. Reuse audit
 
@@ -754,7 +894,7 @@ constant, its marker, the epoch checker and the kit-versions leg all exist, and 
 change inside them. Two recall hits were STALE against
 source and are recorded as such: `TOOL-dBriefedPass-8` and the `dFoldedVerdict` specs both cite the
 constants at `tools/memory-tree/check-memory-hygiene.sh:63`, and they now sit at line 84 — which is
-also why the consumes-from edge treats every coordinate here as a base-`fcbfba5f` reading to be
+also why the consumes-from edge treats every coordinate here as a base-`bd44d3ff` reading to be
 re-resolved rather than copied.
 
 Recall terms used: `guide cap GUIDE_CAP_BYTES GUIDE_CAP_LINES check 6 curation-debt raise headroom
