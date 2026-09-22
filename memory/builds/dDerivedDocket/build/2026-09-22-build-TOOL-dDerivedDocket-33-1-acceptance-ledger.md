@@ -55,7 +55,9 @@ nothing defines.
   record differed in those two header lines only.
 - AC11 — `--check` — an empty same-id worksheet and a triage copy with an 8-cell row each exited 2,
   under the signing run and `--check` alike. The messages named `empty.tsv:1` and
-  `bad-triage.tsv:11`, and both default records were left byte-identical.
+  `bad-triage.tsv:11`, and both default records were left byte-identical. A third refusal was
+  staged too, from the gotchas pass. A triage copy whose `#` line names a sha that resolves to
+  nothing exits 2 under both runs, naming its line 2, rather than reading every row as absent.
 - AC12 — amended rev-6 — `unit-inserted`: the criterion now uses the planner's option spelling and
   what the planner actually prints. `migrate_backlog.py --plan --signed same-id=… --signed triage=…`,
   run from `tools/memory-tree/`, exited 0 after 3m43s with `unit-inserted: 66`, where unit 11's

@@ -318,13 +318,12 @@ def extract_row_text(lines, num: int) -> str | None:
 def build_hold_check(root: str, ctx: dict):
     """Is a hold target live at the signing tree? -> True, False, or None (no such target).
 
-    One rule per layout. Under `builds` it is backlog.py's own `check_hold_live` over the fold the
-    build index derived. Under `shards` asks live in the legacy shards, so an ask is live when its
-    surviving copy's token is not terminal. In both, an ask wins a tie with a spec H1 and a spec is
-    live when its status is not terminal — `_check_live`'s rule, not a second one.
+    ONE RULE, backlog.py's `_check_live`, bound per layout. Under `builds` it is `check_hold_live`
+    over the fold the build index derived. Under `shards` the asks live in the legacy shards, so the
+    statuses it reads are each surviving copy's token, chosen by the planner's `resolve_copy`. Either
+    way an ask wins a tie with a spec H1, and a spec is live when its status is not terminal.
     """
     b, planner = ctx["backlog"], ctx["planner"]
-    specs = ctx["specs"]
     mode = b.read_conf(ctx["conf"]).mode
     if mode == "builds":
         corpus, fold = ctx["backlog_out"].get("corpus"), ctx["backlog_out"].get("fold")
@@ -335,14 +334,8 @@ def build_hold_check(root: str, ctx: dict):
     for copy in copies:
         by_id[copy.id].append(copy)
     tokens = {i: planner.resolve_copy(cs)[0].token for i, cs in by_id.items()}
-
-    def check_live(target):
-        if target in tokens:
-            return tokens[target] not in b.TERMINAL
-        if target in specs:
-            return specs[target]["status"] not in b.TERMINAL
-        return None
-    return check_live
+    specs = {i: b.Spec(i, s["path"], s["status"], s["closes"], ()) for i, s in ctx["specs"].items()}
+    return lambda target: b._check_live(tokens, specs, tokens, target)
 
 
 def measure_level_words(root: str, sha: str, ctx: dict, cache: dict) -> tuple:
@@ -493,6 +486,11 @@ def build_signing(root: str, same_path: str, triage_path: str) -> dict:
     for row in sorted(same["rows"], key=lambda r: order(r["id"])):
         rule, verdict, why = derive_same_id_verdict(root, row, ctx)
         same_rows.append((rule, row["id"], row["spec"], verdict, why))
+    probe = subprocess.run(("git", "cat-file", "-e", f"{tri['sha']}^{{commit}}"), cwd=root,
+                           capture_output=True)
+    if probe.returncode != 0:
+        raise Refusal(f"signer: {tri['path']}:2: the worksheet was computed at {tri['sha']}, which "
+                      f"resolves to no commit here, so T4 and T5 would read every row as absent")
     cache: dict = {}
     read_shard_lines(root, tri["sha"], [r["source"].rpartition(":")[0] for r in tri["rows"]], cache)
     commits = read_commit_messages(root, [r["evidence"] for r in tri["rows"]
