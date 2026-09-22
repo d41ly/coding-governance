@@ -1483,6 +1483,11 @@
       "file": "tools/govkit/matrix.py"
     },
     {
+      "id": "check_rollback_orders",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_root_shape",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -4423,6 +4428,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "read_root_dir",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "read_roots",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -6046,6 +6056,11 @@
       "id": "seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "seed_witness",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "selectable",

@@ -313,6 +313,25 @@ import scope  # noqa: E402
 ROOTS = ["/c/projects/gov"]
 
 
+def seed_witness(root):
+    """A child whose argv carries `root` as a plain token, for the LIVE arms to find in scope.
+
+    Planted one line before the census that grades it. The live arms used to assert that the
+    shipped roots admitted SOMETHING, which is a claim about how the box was launched and not
+    about the declaration: a bar started from a Claude session inherits its cwd and no command
+    line on the machine spells the repo path, so those arms were red on that node and green under
+    a pre-push hook, whose argv is absolute — and green in a wide bar only when a sibling leg
+    happened to spawn an absolute path at the right moment. The caller kills it.
+    """
+    return subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)",
+                             root.rstrip("/") + "/procmon-witness"])
+
+
+def read_root_dir():
+    return os.environ.get("PROCMON_ROOT") or subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+
+
 def build_row(winpid, win_ppid, command, age=100.0, msys_pid=None, msys_ppid=None, cpu=1.0):
     return {"winpid": winpid, "msys_pid": msys_pid, "win_ppid": win_ppid,
             "msys_ppid": msys_ppid, "kind": "msys" if msys_pid else "native",
@@ -451,16 +470,18 @@ def test_live_scope_is_not_empty():
     if not sys.platform.startswith("win"):
         print("  SKIP test_live_scope_is_not_empty (windows-join backend only)")
         return
-    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True,
-        text=True).stdout.strip()
-    rows = read_live_census()
-    if rows is None:
-        return
-    sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
-                               scope.build_self_chain(rows, os.getpid()))
-    check_true("test_live_scope_is_not_empty", len(sc) > 0,
-               "(the shipped conf admits NOTHING on this machine)")
+    roots = scope.load_conf(read_root_dir())
+    witness = seed_witness(roots[0])
+    try:
+        rows = read_live_census()
+        if rows is None:
+            return
+        sc, _ = scope.derive_scope(rows, roots, scope.build_self_chain(rows, os.getpid()))
+        check_true("test_live_scope_is_not_empty", witness.pid in sc,
+                   "(the shipped conf admits NOTHING on this machine, the planted witness included)")
+    finally:
+        witness.kill()
+        witness.wait()
 
 
 def test_empty_live_scope_exits_three_not_one():
@@ -803,19 +824,25 @@ def test_explain_answers_one_row():
 
 
 def test_shipped_conf_admits_this_repo():
-    """`--check-conf`'s subject: the shipped declaration must admit live work here."""
+    """`--check-conf`'s subject: the shipped declaration admits a process carrying its root, and
+    grades it KILLABLE — a child, not a self-chain member."""
     if not sys.platform.startswith("win"):
         print("  SKIP test_shipped_conf_admits_this_repo (windows-join backend only)")
         return
-    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
-    rows = read_live_census()
-    if rows is None:
-        return
-    sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
-                               scope.build_self_chain(rows, os.getpid()))
-    check_true("test_shipped_conf_admits_this_repo", len(sc) > 0,
-               "(the shipped roots admit nothing live on this machine)")
+    roots = scope.load_conf(read_root_dir())
+    witness = seed_witness(roots[0])
+    try:
+        rows = read_live_census()
+        if rows is None:
+            return
+        sc, _ = scope.derive_scope(rows, roots, scope.build_self_chain(rows, os.getpid()))
+        check_true("test_shipped_conf_admits_this_repo",
+                   sc.get(witness.pid, {}).get("killable"),
+                   "(a child carrying %r on its argv is not in scope under the shipped roots)"
+                   % roots[0])
+    finally:
+        witness.kill()
+        witness.wait()
 
 
 def test_mixed_namespace_tree_dies_completely():
@@ -928,11 +955,14 @@ def test_live_tree_dies_completely():
         print("  SKIP test_live_tree_dies_completely (no candidate answered as a POSIX shell the "
               "census can see; RAN %s)" % (", ".join(ran) or "nothing"))
         return
-    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    roots = scope.load_conf(read_root_dir())
     marker = "procmon-selftest-tree"
+    # THE ROOT TOKEN IS THE SHIPPED CONF'S FIRST ROOT, not this checkout's path: a clone of this
+    # repo anywhere else is outside the fence the conf declares, and the tree then staged under
+    # `cd <checkout>` read "not in scope" for a reaper nothing was wrong with. `:` because the
+    # directory need not exist — the token on the command line is what the fence admits.
     body = (
-        "cd '" + root_dir + "' ; "
+        ": '" + roots[0].rstrip("/") + "/" + marker + "' ; "
         "bash -c 'bash -c \"sleep 613\" & sleep 613' & "
         "python -c 'import time; time.sleep(613)' & "
         "sleep 613"
@@ -944,16 +974,19 @@ def test_live_tree_dies_completely():
         rows = read_live_census()
         if rows is None:
             return
+        # OUR launcher by pid, never the first row carrying the marker: a stray from an earlier
+        # run — one staged under a clone the roots do not admit, measured — is found first and
+        # reads as "not in scope" for a tree that is.
         target = next((r["winpid"] for r in rows
-                       if r.get("command") and marker in r["command"]), None)
+                       if r["winpid"] == launched.pid and r.get("command")
+                       and marker in r["command"]), None)
         if target is None:
             FAIL.append("test_live_tree_dies_completely")
             print("  FAIL test_live_tree_dies_completely (the staged tree was not found in the "
                   "census, so the arm could not run — a skip here is indistinguishable from "
                   "coverage)", file=sys.stderr)
             return
-        sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
-                                   scope.build_self_chain(rows, os.getpid()))
+        sc, _ = scope.derive_scope(rows, roots, scope.build_self_chain(rows, os.getpid()))
         if target not in sc:
             FAIL.append("test_live_tree_dies_completely")
             print("  FAIL test_live_tree_dies_completely (the staged tree is not in scope; the "

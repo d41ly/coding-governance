@@ -396,11 +396,14 @@ run_arm "S1 ...and the same sidecar at the declared prefix is clean" "no undecla
 # `tools/`, and its waiver registry sits beside it. A gate still spelling `tools/…` finds no waiver
 # registry, so the waived hit reds — which is the defect, visible as a failing arm rather than as a
 # wrong verdict nobody sees.
+# The WHOLE kit tree moves, not the gate alone: since the kit walk derives its prefix too, a gate at
+# `vendor/gov/` enumerates `vendor/gov/*/` and a fixture that left its kits under `tools/` handed it
+# an empty population — the refusal, not a verdict. Two segments on purpose: one segment is the
+# shape the walk was first written for and would not have caught the pinned field.
 P="$TMP/prefix"; mkfix "$P" 'Run `bash memory-tree/check-memory-hygiene.sh` to lint.'   # gov:root-fixture — the fixture's own hit, waived below
-mkdir -p "$P/vendor/gov"
-mv "$P/tools/check-install-prefix.sh" "$P/vendor/gov/check-install-prefix.sh"
-printf 'tools/memory-tree/README.md:1  the fixture hit this arm waives\n' > "$P/vendor/gov/install-prefix-waivers.txt"
-rm -f "$P/tools/install-prefix-waivers.txt"
+mkdir -p "$P/vendor"
+git -C "$P" mv tools vendor/gov
+printf 'vendor/gov/memory-tree/README.md:1  the fixture hit this arm waives\n' > "$P/vendor/gov/install-prefix-waivers.txt"
 git -C "$P" add -A >/dev/null 2>&1
 pout=$(cd "$P" && bash vendor/gov/check-install-prefix.sh 2>&1); prc=$?
 if [ "$prc" != 0 ]; then

@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-22T12:44:25+03:00 @ bbabce16c9dd5138bd7eccb128ee84d878ba0fc7
+last-audit: 2026-09-22T15:11:54+03:00 @ 52a442d7a24d975397ea4b7f6b6ec81c29240a19
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 83129cd9b6986b87002e51227542a4b67986157d
@@ -216,10 +216,6 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests` only when they ask · prune when a bar runs them automatically.
-- 2026-09-17 · a leg ceiling read as a bound somebody measured · on node `c` two were BELOW the
-  leg's real cost and killed a healthy suite; a killed leg records no reading, so
-  `derive-ceilings.py --write` can never raise exactly the ones that need it · prune when
-  that checker accepts a reading taken outside the runner.
 
 
 ### Environment traps worth front-loading
