@@ -67,7 +67,7 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
   files; a second full spelling of it is how the `guides/` half went missing once.
 - **File caps:** index and generated files are capped BY CLASS, and every cap is declared in
   `.memory-tree.conf` (`INDEX_CAP_*`, `GUIDE_CAP_*`, `BUILD_README_CAP_*`, `DOSSIER_CAP_*`). The shipped
-  defaults are 20 KB / 250 lines for a row document, 60 KB / 750 lines for a guide, 25 KB with no line
+  defaults are 20 KB / 250 lines for a row document, 96 KB / 1200 lines for a guide, 25 KB with no line
   cap for a build README, and 20 KB with no line cap for a codebase-map dossier. `archive/` is wholly
   exempt. A LINE cap of 0 means no independent line cap for that class, which is how a project retires
   the line axis — this repo has, for row documents.
@@ -161,7 +161,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 6. **index size caps** — FOUR classes, because prose, rows, a generated surface and a map dossier
    fail for different reasons. Row
    documents ≤ `INDEX_CAP_BYTES` / `INDEX_CAP_LINES` (20 KB / 250 by default); `guides/*.md` ≤
-   `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (60 KB / 750); a build `README.md` ≤
+   `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (96 KB / 1200); a build `README.md` ≤
    `BUILD_README_CAP_BYTES` (25 KB) with `BUILD_README_CAP_LINES` at 0, which means NO independent
    line cap for that class; and a codebase-map dossier ≤ `DOSSIER_CAP_BYTES` (20 KB) with no line cap,
    reached only where a map is adopted and guarded on a non-empty prefix, because an unguarded selector

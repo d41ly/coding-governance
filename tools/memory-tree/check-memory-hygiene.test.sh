@@ -541,12 +541,12 @@ printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the 
 # ---- this file carries no other assertion, so growing it past 250 lines trips exactly one branch and
 # ---- nothing else. It is entry-budget exempt (check 7), which the codebase-map tree below pins from
 # ---- the other side: that exemption is the alternative the MAP_SUB branch used to overwrite.
-{ printf '# tfixture guide\n'; i=1; while [ "$i" -le 760 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
+{ printf '# tfixture guide\n'; i=1; while [ "$i" -le 1210 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
   > memory/guides/tfixture.md
 # ---- ...and its GREEN counterpart, which is the arm that proves the guide cap actually widened.
-# ---- 400 lines is OVER the row-document cap of 250 and UNDER the guide cap of 750, so it is named
+# ---- 400 lines is OVER the row-document cap of 250 and UNDER the guide cap of 1200, so it is named
 # ---- by neither. Without this file the widening is unobservable: `tfixture.md` above would red at
-# ---- 760 lines whether the guide cap were 750 or the original 250.
+# ---- 1210 lines whether the guide cap were 1200 or the original 250.
 { printf '# twide guide\n'; i=1; while [ "$i" -le 400 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
   > memory/guides/twide.md
 
@@ -1235,7 +1235,7 @@ cnot 6 'memory/backlog/ARCH.md'
 # ---- BOTH figures. The likeliest slip in the per-class message is dropping the line half from the
 # ---- shared format for every class, which would name a guide for a LINE breach while printing only a
 # ---- byte count under its own byte cap. TOOL-aRelaxedShard-1.
-chit 6 '761L > 61440B/750L'
+chit 6 '1211L > 98304B/1200L'
 # ---- THE TWO HALVES OF THE PER-CLASS CAP. A guide between the row cap and the guide cap is silent;
 # ---- a guide past the guide cap is named. Asserting only the second would pass identically under
 # ---- one shared 250-line cap, which is the state this change moved away from.

@@ -17,6 +17,11 @@
 # generated bindings row once a build passes about eleven units, because the row must spell every id
 # it serves and the binding grammar expands a range at authoring time. There is no bindings row now.
 #
+# ONE ROW DRAINED AT TOOL-dGatedProse-3, which raised the guide cap to 98304 B / 1200 lines on the
+# owner's rulings (TOOL-dLoggedFlight-33 on 2026-09-20, and the pair on 2026-09-21). Drained: the
+# unattended protocol guide, a merge-induced overflow standing at 64939 B against the retired 61440.
+# Under the raised pair it passes checks 6, 7 and 8 unwaived, and a row left behind would red as stale.
+#
 # WHAT IS LEFT is authored prose over an authored cap, which is what this registry was always for.
 
 # memory/builds/aBoundedVerdict/README.md - 38261 B against a 25600 cap, and five AUTHORED lines over
@@ -52,18 +57,3 @@ memory/builds/aUnmannedHelm/README.md
 # reads as a delimiter. All six are fixed, so the row now earns checks 6 and 7 only. Drains when the
 # TOOL index is split or its rows are shortened.
 memory/backlog/TOOL.md
-# memory/guides/UNATTENDED-PROTOCOL.md - a MERGE-INDUCED overflow, the same shape as the TOOL.md row
-# above and the second of its kind. Both parents were legal and within a hair of GUIDE_CAP_BYTES:
-# dLoggedFlight left it at 61189 B and origin/main at 61405 B, against 61440. Neither added a rule the
-# other made redundant - one added the run-log paragraph to section 2, the other added section 13 -
-# so the additive union is 62270 B and nothing was droppable. Dropping either side's rule to fit is
-# the failure TOOL-dFoldedVerdict-7 names, where a cap silently becomes the editor, so the breach is
-# RECORDED here instead of paid for by a rule nobody decided to delete.
-# BLAST RADIUS: this silences checks 6, 7 and 8 on the contract. Check 7 exempts guides/*.md by class
-# already and check 8 grades backlog shards only, so the live effect is the byte cap alone - but the
-# row is wider than its fault, as every row here is.
-# THE REMEDY IS NOT ROTATION, which is wrong for a contract every run reads whole (TOOL-dBriefedPass-8
-# states that, and it is the row that last fixed this same file - by SPLITTING section 7 out into
-# memory/guides/UNATTENDED-VERBS.md, taking it from 61440 B to 54231 B). Drains when the contract is
-# split again or the cap is re-argued; the owner call on which lives at TOOL-dFoldedVerdict-7.
-memory/guides/UNATTENDED-PROTOCOL.md
