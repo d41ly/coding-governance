@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.83 -->
+<!-- gov:kit memory-tree@2.84 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -105,17 +105,20 @@ an absent region cannot be told from a spec nobody has recorded against.
   answers it.
 - A codebase-map dossier claims EXACT inventory keys, so a sentence saying a dossier claims a path,
   a glob or a code symbol books a grader that does not exist. `tools/check-spec-tokens.py`
-  refuses three shapes as the object of such a sentence in every LIVE spec, each for the reason the
-  map's own contract gives. A PATH carries `/` and a GLOB carries `*` or `?`, and the map rules path
+  refuses three shapes as the object of such a sentence in every spec that is OPEN, SPECCED,
+  INPROGRESS or BLOCKED, each for the reason the map's own contract gives. A DEFERRED spec is not
+  graded by this join, though check 25 below grades it. A PATH carries `/` and a GLOB carries `*` or `?`, and the map rules path
   globs digest-only and never gated (`<MEMORY_ROOT>/map/README.md`, rendered by
   `tools/codebase-map/gen_map.py`). A CODE SYMBOL carries an underscore between two letters or
-  digits in either case, or a parenthesis, and the symbol tier feeds `generated/symbols.json` only and
-  never the ratchet (`tools/codebase-map/map_extractors.py`). The space clause: a token
+  digits in either case, or a parenthesis, and the symbol tier feeds
+  `<MEMORY_ROOT>/map/generated/symbols.json` only and never the ratchet
+  (`tools/codebase-map/map_extractors.py`). The space clause: a token
   carrying a space is never refused, because every live key carrying punctuation also carries one.
   The check grades SHAPE, and six things are invisible to it: an unbackticked dossier subject, an
   unbackticked claimed object, a claim inside a fenced block, a key-shaped object that is not a key,
   a claim in the wrong dossier, and a filler run longer than the closed arm admits. Name the key the
-  dossier will claim, or describe the thing in prose.
+  dossier will claim, or describe the thing in prose. A refusal is waived by the token
+  `claims <- <object>`, so a waiver on the bare string answers only the path join.
 - A section that genuinely doesn't apply keeps its heading with the single line `N/A — <why>`.
   Headings never disappear, and empty bodies are machine-rejected: an absent or hollow section is
   indistinguishable from a forgotten one.
@@ -308,7 +311,8 @@ An item that retires a name, a row kind or a vocabulary member answers for its r
 lines: `**Readers:**`, then `by name:` and the readers that spell the name, then `by value:` and the
 readers that compare, count or derive from its value. One escape per half, each with a reason:
 `NO VALUE READERS` on the by-value half, and `READER NOT IN TREE` on the by-name half for a name that
-lives outside this tree. Hygiene check 25 asks it of every LIVE spec, with no cutoff: an item
+lives outside this tree. Hygiene check 25 asks it of every spec that is not CLOSED or WONTDO, with
+no cutoff: an item
 triggers when a retirement verb, matched ignoring case and in the past tense too, sits beside a
 backticked identifier, a markdown path included, and a clause is graded wherever it appears. Each
 name the by-name half lists must be spelled by a reader, not merely quoted by a record. SHAPE and

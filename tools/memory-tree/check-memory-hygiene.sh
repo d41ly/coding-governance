@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.83   # gov:kit memory-tree@2.83 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.84   # gov:kit memory-tree@2.84 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -1991,7 +1991,13 @@ $bad12"
 # ---- the tree to candidate files, and one awk pass attributes each token. The same grep printing
 # ---- LINES was measured at 138 s against 0.6 s for this one, on a leg that runs on every bar, so the
 # ---- shape is the protection here and the leg ceiling is not.
-# ---- A token resolves by CONTENT where a READER spells it. A reader is a tracked file whose text
+# ---- A token resolves by CONTENT where a READER spells it AS A WHOLE WORD: at each end of the token
+# ---- that is a letter, digit or underscore, the byte beside it in the reader must be none of those.
+# ---- As a bare substring a deleted helper resolved inside its surviving longer sibling, and a short
+# ---- name after the call-suffix strip resolved inside almost any word (closing review, round 1, R2).
+# ---- An end that is punctuation, a path's slash or a dot, is already its own boundary. The grep below
+# ---- stays a substring SUPERSET, and the word test runs only on the files it returns.
+# ---- A reader is a tracked file whose text
 # ---- something consumes: every tracked file outside the memory root, plus guides/, map/ and the
 # ---- three rendered carriers HYGIENE.md, TEMPLATE-SPEC.md and README.md inside it. Every other file
 # ---- under the root is a RECORD, which quotes a name and so resolves nothing by content: a corpus
@@ -2016,6 +2022,18 @@ if [ -n "$_rdtok" ]; then
   _rdres=$( { printf '%s\n' "$_rdtok"
               git -c core.quotePath=false ls-files | awk '{ print "P\t" $0 }'
               printf '%s\n' "$_rdhit" | awk 'NF { print "C\t" $0 }'; } | awk -F'\t' -v m="$M" '
+    function test_whole_token(s, w,    q, p, hb, ha, b, a) {
+      hb = (substr(w, 1, 1) ~ /[A-Za-z0-9_]/); ha = (substr(w, length(w), 1) ~ /[A-Za-z0-9_]/)
+      q = 0
+      while ((p = index(substr(s, q + 1), w)) > 0) {
+        p += q
+        b = (p > 1) ? substr(s, p - 1, 1) : ""
+        a = substr(s, p + length(w), 1)
+        if ((!hb || b !~ /[A-Za-z0-9_]/) && (!ha || a !~ /[A-Za-z0-9_]/)) return 1
+        q = p
+      }
+      return 0
+    }
     $1 == "\004" { nt++; tf[nt] = $3; tl[nt] = $4; te[nt] = $5; tt[nt] = $6; next }
     $1 == "P" { idn[$2] = 1; p = $2; while ((j = index(p, "/")) > 0) { p = substr(p, j + 1); idn[p] = 1 }; next }
     $1 == "C" {
@@ -2029,7 +2047,7 @@ if [ -n "$_rdtok" ]; then
       left = np
       for (c = 1; c <= nr && left > 0; c++) {
         while (left > 0 && (getline ln < rdr[c]) > 0)
-          for (i = 1; i <= np; i++) if (!(pl[i] in got) && index(ln, pl[i]) > 0) { got[pl[i]] = 1; left-- }
+          for (i = 1; i <= np; i++) if (!(pl[i] in got) && test_whole_token(ln, pl[i])) { got[pl[i]] = 1; left-- }
         close(rdr[c])
       }
       for (k = 1; k <= nt; k++) {

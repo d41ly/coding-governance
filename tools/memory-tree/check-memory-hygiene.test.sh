@@ -857,7 +857,7 @@ write_readers_spec() { # $1 = num, $2 = status, $3 = the section-2 body
   } > "$D/spec/2026-08-25-spec-tFixture-$1.md"; }
 # The READER the green fixtures resolve against: a guide is a reader by class. Nothing else in this
 # tree spells either of its two tokens, and its path is what 201 names by identity, with a line tail.
-printf '# treaders guide\n\nThe shard reader is `count_shard_rows`, which compares a row count against the pin.\nThis guide is the one file in the tree that spells `tSpelledInGuide`.\n' > memory/guides/treaders.md
+printf '# treaders guide\n\nThe shard reader is `count_shard_rows`, which compares a row count against the pin.\nThis guide is the one file in the tree that spells `tSpelledInGuide`.\nIts last line spells `tRerunAll` and nothing shorter.\n' > memory/guides/treaders.md
 # 200 -- a retirement verb and an underscore identifier, no clause -> RED, named by its S label
 write_readers_spec 200 SPECCED '- **S1** — retire the `shard_arity` pin and the rows it carried.'
 # 201 -- a conforming clause: a tracked path cited with a line tail and a symbol written with a call
@@ -932,6 +932,13 @@ write_readers_spec 217 SPECCED '- **S1** — the `shard_arity` pin no longer
   exists anywhere a reader looks.
 - **S2** — the report retires `drafted`, the vocabulary
   member nobody uses.'
+# 218 -- the closing review's R2: a name a reader spells only INSIDE a longer identifier does not
+#        resolve, so a deleted helper whose longer sibling survives still reds -> RED
+write_readers_spec 218 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `count_shard` spells it. by value: `count_shard_rows` compares against it.'
+# 219 -- ...and the same after the call-suffix strip, where the short name is the whole risk -> RED
+write_readers_spec 219 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `tRerun()` spells it. by value: `count_shard_rows` compares against it.'
 
 git add -A && git commit -q -m fixtures --no-verify
 # 191 — the green twin, and it can only be written HERE: its base must name a commit that exists,
@@ -1582,6 +1589,10 @@ chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInGotcha`'
 chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInWaiver`'
 cnot 25 'tSpelledInGuide'
 cnot 25 'DECISIONS.2026-08-01.md'
+# R2 of the closing review: resolution is a WHOLE-WORD spelling at each identifier end, so neither a
+# prefix of a longer name nor a short name inside a longer word resolves.
+chit 25 'tFixture-218.md (§2 item S1: by name: lists `count_shard`, which no reader spells'
+chit 25 'tFixture-219.md (§2 item S1: by name: lists `tRerun`, which no reader spells'
 # AC13: the declared dependency is ONE key. Blank SPEC_FORMAT_CUTOFF: nothing is named and exactly one
 # line says so, without the failure prefix. Armed, with SCOPE_JOIN_CUTOFF BLANK: 200 is named, which is
 # the arm proving check 25 is in the accumulator's union guard, and the disarmed line is gone.
@@ -2445,12 +2456,14 @@ n=$((n+1))
 # ---- the thing it counts is exactly the shape no check ever looks at.
 #
 # ---- The population is every site that can EMIT a check id: `fail <n>` in the shell, `check <n>:`
-# ---- in the two delegated pythons, and row_grammar's `CHECK = <n>` module constant, which is the
-# ---- one spelling the other two greps miss and the reason check 20 was invisible.
+# ---- in the two delegated pythons, and row_grammar's `CHECK = <n>` and `ROTATION_CHECK = <n>`
+# ---- module constants, the spelling the other two greps miss. It hid check 20 first, and then
+# ---- check 24, whose `ROTATION_CHECK` the first anchor `^CHECK =` could not see: the README said
+# ---- 23 over 24 checks and this arm agreed, until check 25 made the README true and the arm red.
 n=$((n+1))
 _hy_ids=$( { grep -oE 'fail [0-9]+' "$HERE/check-memory-hygiene.sh" | grep -oE '[0-9]+'
              grep -rhoE 'check [0-9]+:' "$HERE/corpus_ids.py" "$HERE/gotchas.py" | grep -oE '[0-9]+'
-             grep -oE '^CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
+             grep -oE '^[A-Z_]*CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
 _hy_derived=$(printf '%s\n' "$_hy_ids" | grep -c .)
 
 
@@ -2647,7 +2660,9 @@ esac
 # TOOL-dGatedProse-1 RAISED this by 37, from 374: the hit, miss, hitl, chit and cnot calls in its
 # check-25 block, counted between that block's two marker comments. Every one runs at top level,
 # never in a subshell, so each is one increment of `n` and the pin stays the printed number.
-FLOOR_ASSERTIONS=411
+# RAISED 411 -> 434 at the closing diff review of dGatedProse, round 1, to the PRINTED count again:
+# its two R2 chit calls, and the arms the reconcile with main brought in without a raise.
+FLOOR_ASSERTIONS=434
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

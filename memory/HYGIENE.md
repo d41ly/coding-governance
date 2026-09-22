@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.83 -->
+<!-- gov:kit memory-tree@2.84 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -353,13 +353,15 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     escapes are taken on trust: the check cannot tell a true escape from a false one, and once
     written a false one passes for good. A clause is graded wherever it appears, not only where the
     trigger fired.
-    **What a name resolves against.** A name resolves where a reader spells it, and never where a
-    record merely quotes it. A reader is every tracked file outside the memory root, plus `guides/`,
+    **What a name resolves against.** A name resolves where a reader spells it as a whole word, and
+    never where a record merely quotes it. A reader is every tracked file outside the memory root, plus `guides/`,
     `map/`, `HYGIENE.md`, `TEMPLATE-SPEC.md` and `README.md` inside it. Every other file under the
     root is a record, such as a build record, the archive, the decision log, a backlog, a gotcha note
     or a waiver registry, which quotes a name and so resolves nothing by content. A name also resolves when it is a tracked path, or the part of
     one after a `/`, anywhere in the tree. A `:<line>` tail and a trailing `()` are stripped before
-    either test.
+    either test. A whole word means that at each end of the name that is a letter, digit or
+    underscore, the character beside it in the reader is none of those, so a name spelled only
+    inside a longer identifier resolves nothing.
     **Not reached, and named rather than implied away:** a retirement whose backticked tokens hold no
     identifier shape, and a retirement carrying no backticked token at all. The author of either is
     never asked, and the remedy is to name the withdrawn thing in backticks.

@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold
 
-**Status:** CLOSED · rev-9 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 3
+**Status:** CLOSED · rev-10 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md](../build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md) | research | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 | [2026-09-22-build-TOOL-dGatedProse-2-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dGatedProse-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
+| [2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md](../reviews/2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md) | diff-review | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 
 <!-- /gen:spec-records -->
 
@@ -475,7 +476,8 @@ reproduced 6, and every one was innocent either way (research record `:256` and 
   `memory/builds/aTetheredScratch/spec/2026-08-20-spec-TOOL-aTetheredScratch-1.md:46`. Both are
   correct prose. A fleet risk remains, because a spec on another node's unpushed branch could carry
   the refused shape and red at its merge; the remedy is the existing shrink-only waiver registry
-  `memory/project/spec-token-waivers.txt`, one row with a reason.
+  `memory/project/spec-token-waivers.txt`, one row with a reason, keyed on the hit's own token
+  `claims <- <object>` so that it waives nothing the path join reports.
 - testing — AC1 stages RED from the two historical blobs at `9f43bb26^`, AC6 from each arm broken in
   turn, from a dropped case fold and from a dropped space clause, AC7 from an unfenced copy of a
   fenced example, and AC12 from one fixture per arm plus one uppercase verb and one SHOUTED object.
@@ -904,6 +906,17 @@ declined mechanism. figure PINNED — node d, 2026-09-21.
   bold paragraphs, because the hygiene engine counts a §8 item as a bullet or a `###` sub-head, and a
   terminal spec whose §8 holds neither refuses as hollow. The pre-commit run of the closing commit
   refused this spec on exactly that. No fork's question, resolution, resolver or date moves.
+- rev-10 · 2026-09-22 · S4 · S7 · §5 · the closing diff review, round 1, folded three findings.
+  R1 (MEDIUM): a claims hit's token is `claims <- <object>`, the guards join's composite spelling,
+  so a `[path]` waiver keyed on the same bare string neither swallows a claims refusal nor is kept
+  from reading stale by one, and §5's fleet remedy names that token. R3 (LOW): the fence blanker is
+  the engine's `_unfenced` machine, a backtick or tilde marker opening a fence that only the same
+  marker closes, where the boolean toggle read a tilde fence the other way round in both directions;
+  limit (3) says backtick or tilde. R4 (LOW): the checker's header and the spec template spell this
+  join's population as OPEN, SPECCED, INPROGRESS or BLOCKED and say a DEFERRED spec is not graded
+  by it. Grading on the engine's negative test instead is a behaviour change to a shared population
+  and goes to a backlog row. Four arms observe R1 and R3, each observed RED against the join as
+  built, and the suite's floor moves from 91 to 95.
 
 ## 10. Reuse audit
 

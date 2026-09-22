@@ -15,7 +15,7 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=91
+FLOOR_ASSERTIONS=95
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
@@ -39,6 +39,9 @@ FLOOR_ASSERTIONS=91
 # blob sentences, the three closed specs' clears, the unwritten key, the fenced copy, the six
 # per-arm, uppercase and shouted fixtures, and the live-key disjointness; its process half is ten —
 # the six staged breaks, the report line twice, the --list rows and the hit as the report prints it.
+# RAISED 91 -> 95 at the closing diff review of dGatedProse (round 1), by the count of `arm`/`pass=`
+# lines its fold added: 2 `arm` calls for R1's composite claims token and 2 inline increments for
+# R3's tilde fences, each observed RED against the checker before the fold.
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -744,6 +747,13 @@ check_one_hit("AC12 noun", "`memory/map/features/runlog.md` makes a claim on `to
 check_one_hit("AC12 fronted", "`check_count_sources`, which `runlog.md` now claims, stays.", "check_count_sources", "CODE SYMBOL", "fronted")
 check_one_hit("AC12 uppercase verb", "`memory/map/features/runlog.md` CLAIMS `derive_window_closer`.", "derive_window_closer", "CODE SYMBOL", "active")
 check_one_hit("AC12 shouted constant", "`memory/map/features/runlog.md` claims `KIT_MEMORY_TREE_VERSION`.", "KIT_MEMORY_TREE_VERSION", "CODE SYMBOL", "active")
+# R3 (closing review, round 1) -- the fence machine is the engine's `_unfenced`. A tilde fence holding
+# a lone backtick line closes on its OWN marker, so the claim after it is graded; a claim inside a
+# tilde fence is blanked. The boolean toggle this replaced read both of these the other way round.
+runs, hits, clears = m.scan_claims("prose\n~~~\n```\n~~~\n" + s + "\n")
+print_verdict("R3 tilde fence closes on its own marker", len(hits) == 1 and hits[0][0] == 5, [(h[0], h[1]) for h in hits])
+runs, hits, clears = m.scan_claims("prose\n~~~\n" + s + "\n~~~\n")
+print_verdict("R3 a claim inside a tilde fence is blanked", not hits, [(h[0], h[1]) for h in hits])
 # AC4 -- DISJOINTNESS over the live key set, never resolution: every key of every ratchet inventory,
 # enumerated from the real tree by the map's own extractors, through the real scan. Both counts are
 # the enumeration's, printed rather than typed.
@@ -776,6 +786,8 @@ if check_claims_verdict "AC12 noun"; then echo "arm ok    AC12 the noun arm reac
 if check_claims_verdict "AC12 fronted"; then echo "arm ok    AC12 the fronted arm reaches its own fixture"; pass=$((pass+1)); else echo "arm FAIL  AC12 fronted"; print_claims_detail "AC12 fronted"; fail=$((fail+1)); fi
 if check_claims_verdict "AC12 uppercase verb"; then echo "arm ok    AC12 an UPPERCASE verb is folded"; pass=$((pass+1)); else echo "arm FAIL  AC12 uppercase verb"; print_claims_detail "AC12 uppercase"; fail=$((fail+1)); fi
 if check_claims_verdict "AC12 shouted constant"; then echo "arm ok    AC12 a SHOUTED constant refuses as CODE SYMBOL"; pass=$((pass+1)); else echo "arm FAIL  AC12 shouted constant"; print_claims_detail "AC12 shouted"; fail=$((fail+1)); fi
+if check_claims_verdict "R3 tilde fence closes on its own marker"; then echo "arm ok    R3 a tilde fence holding a lone backtick line closes on its own marker: one hit, on the unfenced line"; pass=$((pass+1)); else echo "arm FAIL  R3 tilde fence closes on its own marker"; print_claims_detail "R3 tilde fence"; fail=$((fail+1)); fi
+if check_claims_verdict "R3 a claim inside a tilde fence is blanked"; then echo "arm ok    R3 a refused claim inside a tilde fence is blanked: no hit"; pass=$((pass+1)); else echo "arm FAIL  R3 a claim inside a tilde fence is blanked"; print_claims_detail "R3 a claim inside"; fail=$((fail+1)); fi
 if check_claims_verdict "AC4 live keys"; then echo "arm ok    AC4 no key of any ratchet inventory is refused, over the population printed above"; pass=$((pass+1)); else echo "arm FAIL  AC4 live keys"; print_claims_detail "AC4"; fail=$((fail+1)); fi
 
 # The PROCESS half, over one scratch repo reset between fixtures.
@@ -844,11 +856,11 @@ git -C "$d" add -A >/dev/null
 arm "four clearing sentences and five objects in one of two live specs are COUNTED on the claims line" 0 "$d" "claims join · 4 dossier-claim sentence(s) examined · 1 live spec(s) carry one · 5 object(s) cleared"
 out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
 if [ "$(printf '%s\n' "$out" | grep -c 'NEAR   \[claims\]')" = 5 ] \
-   && [ "$(printf '%s\n' "$out" | grep -cF ':: guides = ["SESSION-KICKOFF.md"] — ')" = 1 ] \
-   && [ "$(printf '%s\n' "$out" | grep -cF ':: unattended-unit.js — ')" = 1 ] \
-   && [ "$(printf '%s\n' "$out" | grep -cF ':: kits — ')" = 1 ] \
-   && [ "$(printf '%s\n' "$out" | grep -cF ':: tUnwrittenLeg-a — ')" = 1 ] \
-   && [ "$(printf '%s\n' "$out" | grep -cF ':: tUnwrittenLeg-b — ')" = 1 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- guides = ["SESSION-KICKOFF.md"] — ')" = 1 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- unattended-unit.js — ')" = 1 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- kits — ')" = 1 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- tUnwrittenLeg-a — ')" = 1 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- tUnwrittenLeg-b — ')" = 1 ] \
    && ! printf '%s\n' "$out" | grep -q 'HIT    \[claims\]'; then
   echo "arm ok    --list prints each cleared object once as NEAR [claims], and none as a hit"; pass=$((pass+1))
 else
@@ -861,7 +873,24 @@ git -C "$d" reset -q --hard "$clean"
 #      class, the arm and the contract sentence.
 sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n  and `memory/map/features/runlog.md` claims `derive_window_closer`. NOT OBSERVED: prose, and the map'"'"'s\n\n## 6. Acceptance criteria|' "$spec"
 git -C "$d" add -A >/dev/null
-arm "the unit-25 sentence in a live spec REDS as [claims], naming the class, the arm and the contract" 1 "$d" '-spec-TOOL-tOne-1.md [claims] `derive_window_closer` — CODE SYMBOL at line 7, arm(s) active — a codebase-map dossier claims EXACT inventory keys and no key is a CODE SYMBOL: the symbol tier feeds generated/symbols.json only'
+arm "the unit-25 sentence in a live spec REDS as [claims], naming the class, the arm and the contract" 1 "$d" '-spec-TOOL-tOne-1.md [claims] `claims <- derive_window_closer` — CODE SYMBOL at line 7, arm(s) active — a codebase-map dossier claims EXACT inventory keys and no key is a CODE SYMBOL: the symbol tier feeds generated/symbols.json only'
+git -C "$d" reset -q --hard "$clean"
+
+# R1 (closing review, round 1) — a claims hit answers to its OWN composite token. A `[path]` waiver
+#      on the bare string, used by the path hit, must not also swallow the claims refusal of it.
+sed -i 's|`tools/gate-legs.json` exists|`tools/nope.sh` exists|' "$spec"
+sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlog.md` claims `tools/nope.sh`.\n\n## 6. Acceptance criteria|' "$spec"
+printf 'tools/nope.sh\t[path] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "R1 a [path] waiver on the bare string does not swallow a claims refusal of it" 1 "$d" '[claims] `claims <- tools/nope.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# R1 — ...and a claims hit keeps no `[path]` row alive: with the path hit gone, the row reads stale
+#      while a claims sentence still names the string, under a row of its own that waives it.
+sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlog.md` claims `tools/nope.sh`.\n\n## 6. Acceptance criteria|' "$spec"
+printf 'tools/nope.sh\t[path] no path hit is left\nclaims <- tools/nope.sh\t[claims] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "R1 a [path] row whose path hit is gone reads stale though a claims sentence names the string" 1 "$d" 'STALE WAIVER `tools/nope.sh` — no spec produces this hit any more'
 git -C "$d" reset -q --hard "$clean"
 
 total=$((pass+fail))

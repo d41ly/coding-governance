@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads
 
-**Status:** CLOSED · rev-11 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
+**Status:** CLOSED · rev-12 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md](../build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md) | research | TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 | [2026-09-22-build-TOOL-dGatedProse-1-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dGatedProse-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
+| [2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md](../reviews/2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md) | diff-review | TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 
 <!-- /gen:spec-records -->
 
@@ -1793,6 +1794,17 @@ here, where it would read as an observation.
   adds a finding under the same branch, so no second arm is owed; a staged break of the pass printed
   the finding. §5's empty-states row carries the sentence. REFUSED: a second `fail 25` branch, which
   would need a fixture that breaks awk inside the suite to be armed.
+- rev-12 · 2026-09-22 · S5 · the closing diff review, round 1, folded its R2 (MEDIUM). A by-name
+  token resolves by content only where a reader spells it as a whole word: at each end of the token
+  that is a letter, digit or underscore, the character beside it must be none of those. The
+  substring test let a name resolve inside a longer identifier, so a withdrawn helper resolved in
+  its surviving longer sibling and a short name resolved after the call-suffix strip. Fixtures 218
+  and 219 observe it, each observed RED against the substring engine first, and HYGIENE item 25 says
+  whole word. Over the live corpus the change reds no clause. The engine edit lands after unit 3's
+  version move, so the epoch rule moves `KIT_MEMORY_TREE_VERSION` again, 2.83 to 2.84, in the same
+  commit: unit 3's S8 moved it once for the build as built, and this fold is the second move. The
+  same round's R4 (LOW) is folded in part here: the spec template names check 25's population as
+  every spec that is not CLOSED or WONTDO.
 
 ## 10. Reuse audit
 

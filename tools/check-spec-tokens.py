@@ -20,7 +20,7 @@ The claims join (TOOL-dGatedProse-2) grades the SHAPE of a claimed object and re
 six things are invisible to it by construction: (1) an unbackticked dossier subject, because the
 look-back window that would read one scored precision 0.00 over this corpus; (2) an unbackticked
 claimed object, because every arm grades a run of backticked objects; (3) a claim inside a fenced
-block, blanked so a spec may exhibit the refused sentence as a worked example; (4) a key-shaped
+block, backtick or tilde, blanked so a spec may exhibit the refused sentence as a worked example; (4) a key-shaped
 object that is not a key, a typo included, which the map's own both-directions ratchet fails once a
 dossier claims it; (5) a claim in the wrong dossier, because no dossier's claims table is read; and
 (6) a filler run longer than the closed arm admits, such as four words between the subject and the
@@ -101,6 +101,11 @@ being a grammar over the spec's own prose outside its fenced blocks.
          every live key carrying punctuation also carries a space, and that clause is what keeps
          the refusal set disjoint from the key set. Every cleared object is listed by --list as
          NEAR, and the join's line prints on every run, because it has no key to branch on.
+         LIVE here is `LIVE` below, OPEN, SPECCED, INPROGRESS or BLOCKED, so a DEFERRED spec is
+         counted terminal and not graded, where hygiene check 25 grades every spec that is not
+         CLOSED or WONTDO. A hit's token is `claims <- <object>`, the guards join's composite
+         spelling, so a `[path]` waiver row keyed on the same bare string neither swallows a
+         claims refusal nor is kept from reading stale by one; waive a claim by that token.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
@@ -496,14 +501,21 @@ def scan_claims(text):
     `runs` counts the distinct matched runs, each hit is `(line, object, class, arms, cite)` and each
     clear is `(line, object, arms, why)`, where `arms` names every arm that reached the object's run,
     so a run two arms reach is ONE run carrying both. Fenced blocks are blanked line for line first,
-    by the same line-level toggle the hygiene engine reads a spec with, so a spec may exhibit the
-    refused sentence as a worked example and every line number still holds.
+    by the machine the hygiene engine's `_unfenced` reads a spec with: a backtick or a tilde marker
+    opens a fence, only the marker that opened it closes it, and the other marker inside is content.
+    A spec may therefore exhibit the refused sentence as a worked example, in either fence, and every
+    line number still holds. A private boolean toggle was the first spelling, and it answered the
+    fence question differently from the engine in both directions (closing review, round 1, R3).
     """
-    lines, inside = [], False
+    lines, fence = [], ""
     for ln in text.split("\n"):
-        fence = ln.lstrip().startswith("```")
-        lines.append("" if inside or fence else ln)
-        inside = inside != fence
+        head = ln.rstrip("\r").lstrip()
+        mark = "```" if head.startswith("```") else "~~~" if head.startswith("~~~") else ""
+        if mark and (not fence or mark == fence):
+            fence = "" if fence else mark
+            lines.append("")
+            continue
+        lines.append("" if fence else ln)
     body = "\n".join(lines)
     starts = [m.start() for m in TICK.finditer(body)]
     found = {}
@@ -778,9 +790,11 @@ def main(argv):
         c_runs += runs
         c_specs += 1 if runs else 0
         c_cleared += len(c_clears)
-        hits += [(f, "claims", obj, f"{cls} at line {line}, arm(s) {'+'.join(arms)} — "
+        # The composite token keeps a `[path]` waiver on the bare string out of this join's key space
+        # in both directions, as the guards join's does (closing review, round 1, R1).
+        hits += [(f, "claims", f"claims <- {obj}", f"{cls} at line {line}, arm(s) {'+'.join(arms)} — "
                   + CLAIMS_WHY.format(cls=cls, cite=cite)) for line, obj, cls, arms, cite in c_hits]
-        near += [(f, "claims", obj, f"line {line}, arm(s) {'+'.join(arms)} — {why}")
+        near += [(f, "claims", f"claims <- {obj}", f"line {line}, arm(s) {'+'.join(arms)} — {why}")
                  for line, obj, arms, why in c_clears]
 
     live = [h for h in hits if h[2] not in waivers]
