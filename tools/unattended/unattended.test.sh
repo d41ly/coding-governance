@@ -419,6 +419,18 @@ run() { bash "$SCRIPT" "$@" 2>&1; }
 # dirty fixture still arms the message arms — but it never reaches the write phase, which is where
 # checks 9 and 17 live. Those arms have to commit.
 fixture() { git add -A >/dev/null && git commit -q -m fixture --no-verify; }
+# TOOL-dDerivedDocket-24 S7: `--close --override gates-green` and `--abort --code gate-red-out-of-scope`
+# are backed by the attribution record the `gates-run` fact names, or refused. The arms that are about
+# the OVERRIDE or the ABORT PATH, and not about S7, plant the one record S7 admits: every red leg
+# INHERITED, at HEAD, on a clean tree that did not move. S7's own refusals are graded in its block.
+seed_gates_run() {
+  local d id; id="plant-$RANDOM$RANDOM"; d="$(git rev-parse --git-dir)/gate-run/$id"; mkdir -p "$d"
+  printf 'head\t%s\ntree_clean\tyes\n' "$(git rev-parse HEAD)" > "$d/header"
+  printf 'verdict\tRED\nfailed\t1\ntree_moved\tno\n' > "$d/verdict"
+  printf 'x\tINHERITED\t1\t0\t-\t3\t-\t-\tplanted\n' > "$d/attribution"
+  sed -i '/^gates-run: /d' memory/builds/tRun/RUN.md
+  printf 'gates-run: %s %s\n' "$id" "$(git rev-parse --short=8 HEAD)" >> memory/builds/tRun/RUN.md
+}
 sum() { git hash-object memory/builds/tRun/RUN.md; }
 
 # ---- HOISTED FOR THE SHARD CONTRACT ---------------------------------------------------------------
@@ -1121,6 +1133,7 @@ hit "$out" "gates-green"
 
 # ---- the override PATH, end to end: the blocked item is overridden, the run closes, and the reason
 # ---- is written as a parked entry. A blocking gate with an override nobody can read is not a gate.
+seed_gates_run
 out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "the bar was run by hand at the pinned base")
 hit "$out" "close OK"
 hit "$(cat memory/builds/tRun/RUN.md)" "the bar was run by hand at the pinned base"
@@ -1132,6 +1145,7 @@ same "the phase advanced to LANDING" \
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
 mkconf "false" "false"
+seed_gates_run
 out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "bar run by hand" --override records-current --reason "index re-rendered by hand")
 hit "$out" "close OK"
 hit "$out" "override recorded for 'gates-green'"
@@ -4809,6 +4823,7 @@ bcopen
 printf 'keepalive-reaped: yes
 parked-surfaced: yes
 ' >> memory/builds/tRun/RUN.md
+seed_gates_run
 out=$(run --abort tRun --reason "stopped for a stated reason" --code gate-red-out-of-scope)
 hit "$out" "halt-code gate-red-out-of-scope"
 same "the code is an authored FACT, not a substring of the reason" "$(grep -c '^halt-code: gate-red-out-of-scope' memory/builds/tRun/RUN.md)" "1"
@@ -9206,6 +9221,354 @@ same "the primary close freezes no asks" "$(grep -c '^asks-at-landing:' "$dl_dir
 
 cd "$TMP" || exit 2
 rm -rf "$dl_dir" "$dl_out" "$dl_oroot"
+# ---- TOOL-dDerivedDocket-24 — THE INHERITED-RED POLICY at gates-green, the two escape routes and the
+# ---- auto-file. SELF-CONTAINED, for the in-place block's reason: every arm needs a remote tip R whose
+# ---- COMMITTED policy file can differ from the working tree's, and a stub bar that writes the run
+# ---- record a real runner writes — header, verdict and the nine-column attribution — under the id
+# ---- the driver pins. The stub's knobs are the record's fields; the real runner's own arm is AC19's.
+ih_dir=$(mktemp -d); ih_oroot=$(mktemp -d); ih_origin="$ih_oroot/origin.git"; ih_out=$(mktemp -d)
+(
+  cd "$ih_dir" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  git init -q --bare "$ih_origin"
+  git --git-dir="$ih_origin" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$ih_origin"
+  mkdir -p bin fx .githooks memory/guides memory/builds/tRun tools
+  printf '# build method\n' > memory/guides/BUILD-METHOD.md
+  # RED ONLY ONCE `fx/red` EXISTS, which only AC19's commit adds: that arm ages the leg against
+  # this fixture's first-parent line, and a leg red since the root would read aged there.
+  printf '#!/usr/bin/env bash\n[ -f fx/red ] || exit 0\necho "FAIL x"\nexit 1\n' > fx/x.sh
+  printf '[\n  {"name": "x leg", "argv": ["bash", "fx/x.sh"]}\n]\n' > tools/gate-legs.json
+  printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n' > .githooks/gate-env.sh
+  cat > bin/bar.sh <<'IHB'
+#!/usr/bin/env bash
+{ printf 'GATE_ATTRIBUTE=%s\n' "${GATE_ATTRIBUTE-<unset>}"
+  printf 'GATE_INHERITED_RED=%s\n' "${GATE_INHERITED_RED-<unset>}"
+  printf 'GATE_INHERITED_RED_MAX_AGE=%s\n' "${GATE_INHERITED_RED_MAX_AGE-<unset>}"
+  printf 'GATE_RUN_ID=%s\n' "${GATE_RUN_ID-<unset>}"; } > "$IHOUT/barenv.txt"
+[ "${IH_RC:-1}" = 0 ] && exit 0
+d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
+printf 'head\t%s\ntree_clean\t%s\nmanifest\ttools/gate-legs.json\n' "$(git rev-parse HEAD)" "${IH_CLEAN:-yes}" > "$d/header"
+printf 'verdict\tRED\nfailed\t1\ntree_moved\t%s\n' "${IH_MOVED:-no}" > "$d/verdict"
+printf 'x leg\t%s\t1\t0\t%s\t%s\t%s\t%s\tstub\n' "${IH_VERDICT:-INHERITED}" "${GATE_ATTRIBUTE:--}" \
+  "${IH_AGE:-3}" "${IH_OWN8:-0badc0de}" "${IH_OWNID:--}" > "$d/attribution"
+echo "GATE FAIL  x leg  (exit 1)"
+echo "GATE attr  x leg  ${IH_VERDICT:-INHERITED} · stub"
+exit 1
+IHB
+  cat > bin/asks.sh <<'IHA'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$IHOUT/asks-calls.txt"
+ids=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --ready) shift; while [ $# -gt 0 ] && [ "${1#--}" = "$1" ]; do ids="$ids $1"; shift; done; continue ;;
+  esac
+  shift
+done
+[ "${IH_ASK_EMPTY:-0}" = 1 ] && { printf 'examined\t0\n'; exit 0; }
+c=0
+for id in $ids; do
+  h=${id#*-}; h=${h%-*}; s=OPEN
+  case " ${IH_ASK_CLOSED:-} " in *" $id "*) s=CLOSED ;; esac
+  printf 'ask\t%s\t%s\t-\t%s\t%s\t-\t-\t-\t-\t-\n' "$id" "$s" "$h" "${IH_ASK_SEV:-HIGH}"; c=$((c + 1))
+done
+printf 'examined\t%s\n' "$c"
+IHA
+  cat > .unattended.conf <<'IHC'
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="echo land"
+LANDER_MODE="primary"
+BYPASS_BAN="--no-verify"
+GATE_CMD="bash bin/bar.sh"
+GATE_BOUND="600"
+UNIT_STALL_BOUND="1800"
+LEASE_STALE_AFTER="7200"
+REVIEW_ROUNDS="7"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+GATE_POLICY_FILE=".githooks/gate-env.sh"
+IHC
+  cat > memory/builds/tRun/README.md <<'IHR'
+---
+slug: tRun
+node: a
+opened: 2026-08-01
+streams: architecture
+roster: ARCH
+ids: ARCH-tRun-1
+---
+
+# tRun
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 1 unit(s)
+
+<!-- gen:build-units -->
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-tRun-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |
+<!-- /gen:build-units -->
+<!-- /gen:build-index -->
+IHR
+  cat > memory/builds/tRun/RUN.md <<'IHS'
+# tRun — run state
+
+<!-- run:generated -->
+<!-- /run:generated -->
+
+## Mandate
+<!-- run:mandate -->
+The owner authorizes build tRun to merge to main and to push.
+<!-- /run:mandate -->
+
+## Run facts
+
+## Parked
+IHS
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  git push -q origin main
+) >/dev/null 2>&1
+run_ih() { ( cd "$ih_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_ih_repo() { git -C "$ih_dir" "$@"; }
+IHOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
+# R's policy body on main, pushed; a fresh unit branch on top of it, preflighted and attested; sets
+# IH_R to the tip the remote now advertises. An optional second body lands on the UNIT branch only.
+build_ih_policy() { # R's gate-env body (printf %b) · [the unit branch's own body]
+  run_ih_repo reset -q --hard; run_ih_repo clean -qfd
+  run_ih_repo checkout -q main
+  printf '%b' "$1" > "$ih_dir/.githooks/gate-env.sh"
+  run_ih_repo add -A >/dev/null; run_ih_repo commit -q --allow-empty -m "policy at R" --no-verify
+  run_ih_repo push -q -f origin main
+  IH_R=$(run_ih_repo rev-parse main)
+  run_ih_repo checkout -q -B unit main
+  if [ -n "${2:-}" ]; then printf '%b' "$2" > "$ih_dir/.githooks/gate-env.sh"; run_ih_repo add -A >/dev/null; fi
+  run_ih_repo commit -q --allow-empty -m "unit work" --no-verify
+  run_ih --preflight tRun --keepalive-id k1 >/dev/null
+  printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> "$ih_dir/memory/builds/tRun/RUN.md"
+  run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m fixture --no-verify
+}
+write_ih_asks() { printf 'ASKS_CMD="bash bin/asks.sh"\n' >> "$ih_dir/.unattended.conf"; run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m asks --no-verify; }
+read_ih_facts() { cat "$ih_dir/memory/builds/tRun/RUN.md"; }
+IH_LAND='INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n'
+IH_PARK='INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n'
+
+# AC5 and AC18: under land at R an inherited-only bar is MET and the record gains gates-inherited; the
+# bar is attributed against the tip the remote ADVERTISES and handed the policy read there.
+build_ih_policy "$IH_LAND"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads land: INHERITED_RED=land with an age bound of 10 first-parent landings, read from .githooks/gate-env.sh at ${IH_R:0:8}"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED within the 10-landing age bound"
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+hit  "$(read_ih_facts)" "gates-inherited: ${IH_R:0:8} x leg"
+hit  "$(read_ih_facts)" "gates-run: unattended-"
+same "AC18 the bar is attributed against the advertised tip" "$(grep '^GATE_ATTRIBUTE=' "$ih_out/barenv.txt")" "GATE_ATTRIBUTE=$IH_R"
+same "AC5 the bar is handed the policy read at R" "$(grep '^GATE_INHERITED_RED=' "$ih_out/barenv.txt")" "GATE_INHERITED_RED=land"
+same "AC5 the bar is handed the bound read at R" "$(grep '^GATE_INHERITED_RED_MAX_AGE=' "$ih_out/barenv.txt")" "GATE_INHERITED_RED_MAX_AGE=10"
+# AC9, the dark half on that same MET close: the three rows are printed and the BACKLOG is untouched.
+hit  "$out" "gates-green: ASKS_CMD is blank, so the auto-file is DARK and writes nothing; it would have filed, in memory/builds/tRun/BACKLOG.md:"
+hit  "$out" "· inherited red: leg x leg red at ${IH_R:0:8}, introduced by 0badc0de · seen \`fx/x.sh\`@${IH_R:0:8} run \`bash fx/x.sh\` · accept the leg is green at the default branch's tip → 0badc0de"
+hit  "$out" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
+hit  "$out" "- KEEP · ARCH-tRun-2 · filed by an unattended run for the owning build; outside this build's goal"
+same "AC9 a dark auto-file writes no BACKLOG" "$(run_ih_repo status --porcelain -- memory/builds/tRun/BACKLOG.md)" ""
+
+# AC5 and AC1, the driver's half: R says park and the branch commits land into its OWN copy. The item
+# reads R's park and prints the hold line; a working-tree reader would have read land and MET.
+build_ih_policy "$IH_PARK" "$IH_LAND"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads park: INHERITED_RED=park, read from .githooks/gate-env.sh at ${IH_R:0:8}"
+hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+miss "$out" "gates-green MET over an inherited-only red"
+
+# AC18: local main carries a commit the remote lacks, setting land and introducing the red. R is the
+# ADVERTISED tip, so the item reads park; a local-main R would read the run's own land.
+build_ih_policy "$IH_PARK"
+run_ih_repo checkout -q main
+printf '%b' "$IH_LAND" > "$ih_dir/.githooks/gate-env.sh"
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "local main grants land" --no-verify
+run_ih_repo checkout -q unit; run_ih_repo merge -q --no-ff main -m "take local main" >/dev/null
+out=$(run_ih --close tRun $IHOVR)
+same "AC18 GATE_ATTRIBUTE is the advertised tip, never local main" "$(grep '^GATE_ATTRIBUTE=' "$ih_out/barenv.txt")" "GATE_ATTRIBUTE=$IH_R"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+
+# AC17: under land an aged row parks as the hold, and land beside a blank, zero or non-numeric bound
+# reads park, announced.
+build_ih_policy "$IH_LAND"
+out=$(IH_AGE=aged run_ih --close tRun $IHOVR)
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=land"
+hit  "$out" "1 INHERITED leg(s) read aged or unproven past the age bound, which never lands"
+for _b in "" 0 ten; do
+  build_ih_policy "INHERITED_RED=land\nINHERITED_RED_MAX_AGE=$_b\n"
+  out=$(run_ih --close tRun $IHOVR)
+  hit "$out" "gates-green — the inherited-red policy reads park: INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in .githooks/gate-env.sh at ${IH_R:0:8}, which reads park"
+done
+
+# AC15: the same inherited-only record on a bar whose verdict reads tree_moved yes is UNMET, naming it.
+build_ih_policy "$IH_LAND"
+out=$(IH_MOVED=yes run_ih --close tRun $IHOVR)
+hit  "$out" "the bar's verdict reads tree_moved yes: the tree moved while it ran, so no verdict describes the commit being closed, whatever its attribution says"
+miss "$out" "gates-green MET over an inherited-only red"
+
+# AC6: the replayed aStagedLane override over an OWN attribution is refused, numbered; over an
+# attribution whose every red is INHERITED it proceeds and writes its override park row.
+IH_STAGED="One leg red and it is not this build's: 'lexicon naming predicates' reports 463 verb offenders over a pin of 461. Measured PRE-EXISTING"
+build_ih_policy "$IH_PARK"
+IH_VERDICT=OWN run_ih --close tRun $IHOVR >/dev/null
+out=$(run_ih --close tRun $IHOVR --override gates-green --reason "$IH_STAGED")
+hit  "$out" "--close --override gates-green is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: its attribution reads x leg OWN"
+miss "$(read_ih_facts)" "override · item gates-green"
+run_ih --close tRun $IHOVR >/dev/null
+out=$(run_ih --close tRun $IHOVR --override gates-green --reason "$IH_STAGED")
+hit  "$out" "override recorded for 'gates-green'"
+hit  "$(read_ih_facts)" "override · item gates-green · reason One leg red and it is not this build's"
+
+# AC7: the out-of-scope abort over a MIXED attribution refuses; over an inherited-only one it proceeds.
+build_ih_policy "$IH_PARK"
+IH_VERDICT=MIXED run_ih --close tRun $IHOVR >/dev/null
+out=$(run_ih --abort tRun --reason "the red is not ours" --code gate-red-out-of-scope)
+hit  "$out" "--abort --code gate-red-out-of-scope is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: its attribution reads x leg MIXED"
+run_ih --close tRun $IHOVR >/dev/null
+out=$(run_ih --abort tRun --reason "the red is not ours" --code gate-red-out-of-scope)
+hit  "$out" "phase ABORTED"
+
+# AC13: each of S7's three conditions held false ALONE, both verbs each time, then all three together.
+build_ih_policy "$IH_PARK"
+run_ih --close tRun $IHOVR >/dev/null
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "the run commits after its bar" --no-verify
+out=$(run_ih --close tRun $IHOVR --override gates-green --reason r)
+hit  "$out" "the condition that failed: the bar it names ran at"
+hit  "$out" "and HEAD is now $(run_ih_repo rev-parse --short=8 HEAD), so its record describes another commit"
+out=$(run_ih --abort tRun --reason r --code gate-red-out-of-scope)
+hit  "$out" "and HEAD is now $(run_ih_repo rev-parse --short=8 HEAD), so its record describes another commit"
+IH_CLEAN=no run_ih --close tRun $IHOVR >/dev/null
+out=$(run_ih --close tRun $IHOVR --override gates-green --reason r)
+hit  "$out" "the condition that failed: the bar it names ran on a tree whose header reads tree_clean no"
+out=$(run_ih --abort tRun --reason r --code gate-red-out-of-scope)
+hit  "$out" "the condition that failed: the bar it names ran on a tree whose header reads tree_clean no"
+IH_MOVED=yes run_ih --close tRun $IHOVR >/dev/null
+out=$(run_ih --close tRun $IHOVR --override gates-green --reason r)
+hit  "$out" "the condition that failed: the bar it names reads tree_moved yes"
+out=$(run_ih --abort tRun --reason r --code gate-red-out-of-scope)
+hit  "$out" "the condition that failed: the bar it names reads tree_moved yes"
+run_ih --close tRun $IHOVR >/dev/null
+out=$(run_ih --close tRun $IHOVR --override gates-green --reason r)
+hit  "$out" "override recorded for 'gates-green'"
+build_ih_policy "$IH_PARK"
+run_ih --close tRun $IHOVR >/dev/null
+out=$(run_ih --abort tRun --reason r --code gate-red-out-of-scope)
+hit  "$out" "phase ABORTED"
+
+# AC9, the armed halves on the MET path: a witness that reads the ask back files it, staged, with seen
+# and accept; a witness that returns no row gets the rows REMOVED and named.
+build_ih_policy "$IH_LAND"; write_ih_asks
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, staged in memory/builds/tRun/BACKLOG.md"
+hit  "$(run_ih_repo diff --cached -- memory/builds/tRun/BACKLOG.md)" "+- ARCH-tRun-2 · filed "
+hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" " · seen \`fx/x.sh\`@${IH_R:0:8} run \`bash fx/x.sh\` · accept the leg is green at the default branch's tip"
+hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
+hit  "$(tail -1 "$ih_out/asks-calls.txt")" "--tsv --ready ARCH-tRun-2 --target tRun"
+miss "$(tail -1 "$ih_out/asks-calls.txt")" "--at"
+build_ih_policy "$IH_LAND"; write_ih_asks
+out=$(IH_ASK_EMPTY=1 run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green: the rows for leg x leg were REMOVED — the declared ask generator did not read ARCH-tRun-2 back as one OPEN HIGH ask homed at tRun"
+n=$((n+1)); [ ! -f "$ih_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL AC9 the rows the witness did not read back were kept"; st=1; }
+
+# AC21 and AC23: under park with the witness set, the rows are staged beside the hold line; commit,
+# push, reap and hold as the line says, and the hold is accepted. Resumed and closed again over the
+# same leg at the same R, the second close REUSES the OPEN ask and stages nothing, and the second
+# hold is accepted too; the BACKLOG holds one ask, one SEV and one KEEP for that leg and R.
+build_ih_policy "$IH_PARK"; write_ih_asks
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}"
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "records: the staged rows and the gates-run fact" --no-verify
+run_ih_repo push -q origin unit
+out=$(run_ih --hold tRun --code inherited-red --until "probe gate" --reason "x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park" --reaped k1)
+hit  "$out" "phase HELD · code inherited-red · until probe gate"
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m held --no-verify
+run_ih --resume tRun --keepalive-id k2 >/dev/null
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m resumed --no-verify
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green: ask ARCH-tRun-2 already OPEN for leg x leg at ${IH_R:0:8} · reused"
+same "AC23 the reuse staged no BACKLOG row" "$(run_ih_repo diff --cached --name-only -- memory/builds/tRun/BACKLOG.md)" ""
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "records again" --no-verify
+out=$(run_ih --hold tRun --code inherited-red --until "probe gate" --reason "x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park" --reaped k2)
+hit  "$out" "phase HELD · code inherited-red · until probe gate"
+ih_bl="$ih_dir/memory/builds/tRun/BACKLOG.md"
+same "AC23 one ask for the leg at R" "$(grep -c "inherited red: leg x leg red at ${IH_R:0:8}," "$ih_bl")" "1"
+same "AC23 one SEV row for it" "$(grep -c '^- SEV · ARCH-tRun-2 · ' "$ih_bl")" "1"
+same "AC23 one KEEP row for it" "$(grep -c '^- KEEP · ARCH-tRun-2 · ' "$ih_bl")" "1"
+# ...an ask the witness reads back CLOSED is not reused: a second ask is filed.
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m held2 --no-verify
+run_ih --resume tRun --keepalive-id k3 >/dev/null
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m resumed2 --no-verify
+out=$(IH_ASK_CLOSED=ARCH-tRun-2 run_ih --close tRun $IHOVR)
+miss "$out" "already OPEN for leg x leg"
+hit  "$out" "gates-green: filed ask ARCH-tRun-3 for leg x leg red at ${IH_R:0:8}"
+# ...and the same red at a NEW R files a second ask, because the first one's locator pins the old R.
+build_ih_policy "$IH_PARK"; write_ih_asks
+run_ih --close tRun $IHOVR >/dev/null
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "first ask at the first R" --no-verify
+ih_r1=$IH_R
+run_ih_repo checkout -q main; run_ih_repo commit -q --allow-empty -m "R moves" --no-verify; run_ih_repo push -q origin main
+IH_R=$(run_ih_repo rev-parse main); run_ih_repo checkout -q unit
+out=$(run_ih --close tRun $IHOVR)
+miss "$out" "already OPEN for leg x leg at ${ih_r1:0:8}"
+hit  "$out" "gates-green: filed ask ARCH-tRun-3 for leg x leg red at ${IH_R:0:8}"
+
+# AC19: the REAL runner as GATE_CMD, its one leg red at L and identically red at R, under land at R.
+# The item is MET reading the attribution file THAT runner wrote, and the row carries the age and
+# owner columns before the reason. The runner's path is DERIVED from this repository's own declared
+# GATE_CMD and installed at the same relative path in the fixture, so no kit path is spelled here;
+# it is committed at R too, because a diff against R that touches the runner reads every red OWN.
+ih_top=$(git -C "$HERE" rev-parse --show-toplevel)
+ih_rg=$(sed -n 's/^GATE_CMD="bash \(.*\)"$/\1/p' "$ih_top/.unattended.conf" | head -1)
+if [ -n "$ih_rg" ] && [ -f "$ih_top/$ih_rg" ]; then
+  run_ih_repo reset -q --hard; run_ih_repo clean -qfd; run_ih_repo checkout -q main
+  mkdir -p "$ih_dir/${ih_rg%/*}"
+  for _f in "${ih_rg##*/}" lib-attribute.sh gate-profiles.txt gate-fingerprint.sh; do
+    cp "$ih_top/${ih_rg%/*}/$_f" "$ih_dir/${ih_rg%/*}/$_f" 2>/dev/null
+  done
+  sed -i "s|^GATE_CMD=.*|GATE_CMD=\"bash $ih_rg\"|" "$ih_dir/.unattended.conf"
+  # THE RED ARRIVES WITH THIS COMMIT, one landing before R, so the age probe finds it inside the bound.
+  printf 'red\n' > "$ih_dir/fx/red"
+  run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "the real runner, at R too" --no-verify
+  build_ih_policy "$IH_LAND"
+  out=$(run_ih --close tRun $IHOVR)
+  hit "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}"
+  _ih_rec=$(ls -1td "$ih_dir"/.git/gate-run/unattended-*/ 2>/dev/null | head -1)
+  n=$((n+1))
+  awk -F'\t' -v r="$IH_R" 'NF != 9 || $1 != "x leg" || $2 != "INHERITED" || $5 != r || $6 !~ /^[0-9]+$/ || $7 !~ /^[0-9a-f]{8}$/ { bad = 1 }
+      END { exit (bad || NR != 1) }' "${_ih_rec}attribution" 2>/dev/null \
+    || { echo "FAIL AC19 the real runner's attribution row does not carry the age and owner columns before the reason"; head -2 "${_ih_rec}attribution" 2>/dev/null; st=1; }
+  run_ih_repo reset -q --hard; run_ih_repo clean -qfd; run_ih_repo checkout -q main
+  sed -i 's|^GATE_CMD=.*|GATE_CMD="bash bin/bar.sh"|' "$ih_dir/.unattended.conf"
+  run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "the stub bar again" --no-verify
+else
+  n=$((n+2)); echo "  (AC19 skipped: this repository declares no 'bash <path>' GATE_CMD whose script exists, so there is no real runner to install; the arm is unexercised here)"
+fi
+
+# AC11, the driver's half: its own reader, sliced out of the SHIPPED driver and run over the
+# repository this suite lives in at HEAD, resolves land with an age bound of 10.
+slice_fn read_policy_key; slice_fn read_gate_policy
+_o=$( cd "$(git -C "$HERE" rev-parse --show-toplevel)" && CONF=".unattended.conf" \
+      && read_gate_policy "$(git rev-parse HEAD)" && printf '%s %s' "$GP_POLICY" "$GP_MAX_AGE" )
+same "AC11 this repository at HEAD reads land with a bound of 10" "$_o" "land 10"
+
+cd "$TMP" || exit 2
+rm -rf "$ih_dir" "$ih_oroot" "$ih_out"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
@@ -9250,7 +9613,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1352 -> 1357 by exactly the arm, TOOL-dDerivedDocket-30: the `--framed` and `--version`
 # arms beside the `--plan --paths` block, five assertions, all in region two. COUNTED by executing
 # them behind a replica of this prologue by hand; this pass runs no suite.
-FLOOR_ASSERTIONS=1357
+# RAISED 1357 -> 1423 by exactly the arm, TOOL-dDerivedDocket-24: the inherited-red block at the foot
+# of region two executes 66 assertions, COUNTED by running that block behind a replica of this
+# prologue by hand over its own fixture; this pass runs no suite.
+FLOOR_ASSERTIONS=1423
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -9374,7 +9740,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=1161
+FLOOR_SHARD_2=1227
+# +66 for the TOOL-dDerivedDocket-24 inherited-red arms, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the TOOL-dDerivedDocket-30 `--framed` and `--version` arms, in region two - see FLOOR_ASSERTIONS.
 # 1156 at the dDerivedDocket reconcile of origin/main: base 594 + this branch's +326 (to 920) +
 # origin/main's +236 (to 830), both enumerated below - see FLOOR_ASSERTIONS.

@@ -47,6 +47,13 @@ KIT_GOVKIT_VERSION = "1.12"  # gov:kit govkit@1.12 — kit identity; set HERE, n
 
 RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
 
+# The REPO-LOCAL GATE POLICY keys, one tuple that check 7h3's predicate compiles its alternation from
+# (TOOL-dDerivedDocket-24 S14). `GATE_SELFTESTS` is TOOL-dUnstalledConvoy-28's; `INHERITED_RED` and
+# `INHERITED_RED_MAX_AGE` are the inherited-red policy, whose gov value is `land` — a choice no
+# adopter may inherit by a kit copying the file that makes it. A key typed into the pattern instead
+# would be a second list of what a policy is, and the one a new key forgets.
+POLICY_KEYS = ("GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE")
+
 # The hard order's step ids, RESERVED here in one ordered tuple — including the steps this engine
 # does not perform yet. A step id is data, not a print: the ordering criterion is an assertion about
 # ORDER, and before this there was nothing stable to order. Later units FILL steps and may never
@@ -2135,9 +2142,14 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # thinking: a trailing comment (`export GATE_SELFTESTS=1  # gov only`) and the shell default
     # form (`: ${GATE_SELFTESTS:=1}`), which assigns exactly as hard as `=`. Re-run over the tracked
     # tree after widening: still one hit, still no invocation matched.
+    # THE KEYS ARE `POLICY_KEYS`, compiled into one alternation (TOOL-dDerivedDocket-24 S14), so the
+    # inherited-red pair is caught in every spelling `GATE_SELFTESTS` is. Re-run over the tracked tree
+    # after widening: one policy file, `.githooks/gate-env.sh`, now assigning two of the three keys,
+    # and still no invocation matched. The first capture that matched names the key in the refusal.
+    _pk = "|".join(re.escape(k) for k in POLICY_KEYS)
     policy_re = re.compile(
         r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
-        r"(?:GATE_SELFTESTS=\S*|\$\{GATE_SELFTESTS:?=[^}]*\})"
+        r"(?:(" + _pk + r")=\S*|\$\{(" + _pk + r"):?=[^}]*\})"
         r"[ \t]*(?:#.*)?$")
     # THE SHIPPED SET, resolved the way `apply` resolves it. `claims` covers only 13 of 58 file
     # rules in this tree, so deriving from that key alone would have quantified over a third of the
@@ -2158,6 +2170,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             for _c in list(_paths) + [str(c) for c in (rule.get("claims") or [])]:
                 shipped_owner.setdefault(_c, eid)
     policy_files = []
+    policy_key: dict[str, str] = {}
     for f in _all_tracked:
         if not f or f.startswith("memory/") or f.endswith(".md"):
             continue
@@ -2165,15 +2178,19 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             txt = (root / f).read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        if any(policy_re.match(ln) for ln in txt.split("\n")):
-            policy_files.append(f)
+        for ln in txt.split("\n"):
+            _pm = policy_re.match(ln)
+            if _pm:
+                policy_files.append(f)
+                policy_key[f] = _pm.group(1) or _pm.group(2)
+                break
     for f in sorted(set(policy_files) & set(shipped_owner)):
         owner = shipped_owner[f]
-        r.fail(f"'{f}' carries a bare GATE_SELFTESTS assignment AND is shipped by kit '{owner}' — "
+        r.fail(f"'{f}' carries a bare {policy_key[f]} assignment AND is shipped by kit '{owner}' — "
                f"a repo-local gate policy written into a file a kit copies is a policy every adopter "
                f"inherits without choosing it. Move the assignment to a path no kit claims; the "
                f"mechanism that reads it may travel, the choice may not")
-    r.note(f"gate policy: {len(policy_files)} file(s) assign GATE_SELFTESTS · "
+    r.note(f"gate policy: {len(policy_files)} file(s) assign a key of {' '.join(POLICY_KEYS)} · "
            f"{len(shipped_owner)} shipped path(s) derived from the descriptors")
 
     # ---- DEPL-dCarriedReceipt-6 S4. THE GOV-SIDE ARM, and this is where the class is actually

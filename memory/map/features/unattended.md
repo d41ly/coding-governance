@@ -204,6 +204,8 @@ exist, because the act is a field of the reason. The history complement subtract
 without that a retire row matches both alternations and `--status` reports one row as a decision AND
 as a note.
 
+**An inherited red is a policy read at R.** `gates-green` maps its pinned bar's record by `GATE_POLICY_FILE` at the advertised tip, and S7 backs the two escapes. `TOOL-dDerivedDocket-24`.
+
 ## Shared seams
 
 - `memory/guides/REVIEW-PROTOCOL.md` — the structural precedent for a BINDING guide: charter-cited,

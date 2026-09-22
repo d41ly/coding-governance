@@ -963,6 +963,19 @@ because the Definition of Done is evaluated before they land.
 It derives the record KEY, which is not always the item name, and stages what it wrote. It refuses a
 machine-checked item, so it cannot be used to certify anything the driver checks itself.
 
+**A red the bar reads as INHERITED is not yours to override.** `gates-green` reads the inherited-red
+policy at the tip the remote advertises and attributes the red there. Under `land` an inherited-only
+red within its age bound is met. Under `park`, or past the bound, the item prints the hold for an
+inherited red, a line of the shape
+`hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`,
+and that line is your next step, in this order: commit the staged records, which carry the
+`gates-run` fact and any ask the item filed; push the branch; reap the keepalive; then run the
+`--hold` it names, `--code inherited-red --until "probe gate"` with its reason and `--reaped <id>`.
+`--hold` refuses a dirty tree, so it comes last. `--override gates-green` and
+`--abort --code gate-red-out-of-scope` are both refused unless that bar's record reads every red leg
+INHERITED at HEAD. You may instead ABSORB the red, on the four conditions `UNATTENDED-STOPS.md` §13
+states, in a commit of its own.
+
 If you must override a blocked item, name it and give a reason:
 
 ```bash

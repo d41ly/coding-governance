@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-24 — inherited-red policy
 
-**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 26
+**Status:** CLOSED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-22-build-TOOL-dDerivedDocket-24-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dDerivedDocket-24-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
@@ -67,7 +68,9 @@ absorb rule, and files an ask for every inherited leg so the red has an owner on
 - **S6** `gates-green` exports `GATE_ATTRIBUTE` set to the advertised tip `observe_anchor` reads —
   never local main or any other local ref, which the run can write — and the policy read at R, pins
   `GATE_RUN_ID` so it can read that bar's attribution record, records that id and HEAD as a
-  `gates-run` fact after every bar, and maps the outcome. Under `land`, an inherited-only red on a
+  `gates-run` fact after every bar — on a MET bar with the close's other writes, after the carry
+  check; on an UNMET one at once, when the bar left a record under that id or an earlier fact
+  exists — and maps the outcome. Under `land`, an inherited-only red on a
   bar whose verdict reads `tree_moved no` is MET and writes a `gates-inherited` fact. Under `park`,
   or with any red aged, it is UNMET and prints
   `hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`,
@@ -211,8 +214,9 @@ leg's age unproven, which never lands, and the pass says so.
 | any OWN, MIXED, DEAD PROBE or CONTENDED | either | UNMET, attribution lines | block |
 | no attribution record | either | UNMET as at BASE | block as at BASE |
 
-The first matching row decides. `tree_moved` is the one verdict-file field the table reads besides
-attribution: a red on a tree that moved mid-bar describes no commit, the hazard the scratch-hygiene
+The first matching row decides, and the fourth reads 'every red INHERITED, any aged', so a run's
+own red always reaches the attribution lines; an age the probe could not prove reads as aged.
+`tree_moved` is the one verdict-file field the table reads besides attribution: a red on a tree that moved mid-bar describes no commit, the hazard the scratch-hygiene
 unit closes for a green bar.
 
 KF3's forced OWN lands in the fifth row, so a run that edited the grader can never reach `land`:
@@ -747,6 +751,18 @@ New arm: tools/govkit/selftest.py · a shipped fixture path carrying `INHERITED_
 - rev-6 · 2026-09-21 · order re-declared from 24 to 26 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 26, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
+- rev-7 · 2026-09-22 · the build pass, and every change here is one the code needed. §2 S6: the
+  `gates-run` fact on a MET bar is written with the close's other writes, after the in-place carry
+  check, because that check promises a refusal writes nothing; on an UNMET bar it is written at once,
+  and only when the bar left a record under the pinned id or an earlier fact exists, so a stub bar in
+  a project that never ran the runner records nothing and an older record never answers for a newer
+  bar. §4 The two readers' decisions: row four reads inside the all-INHERITED rows and an unproven
+  age reads as aged, so a mixed bar is never a hold no resume can clear. Unchanged in substance and
+  said here so no reader re-derives them: the hook exports the age bound under `land` alone, the one
+  policy that reads it, while the driver exports any declared bound under `park` too, so the auto-
+  filed ask can name the owner; the hook's pinned id reads `push-<digits><RANDOM>-<pid>`, `$RANDOM`
+  riding the digit run so the run log's `push-<digits>-<pid>` join still parses; and the ask's `run`
+  command is read at R from the manifest the bar's own header names. No criterion moved.
 
 ## 10. Reuse audit
 

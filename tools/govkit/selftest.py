@@ -3125,6 +3125,19 @@ user_skills = "/tmp/gk-fake-skills"
               in _pol.stdout, _pol.stdout + _pol.stderr)
         check("AC2: and the refusal names the file and the kit that would ship it",
               "'tools/demo/policy.sh'" in _pol.stdout and "kit 'demo'" in _pol.stdout, _pol.stdout)
+        # TOOL-dDerivedDocket-24 AC22: the inherited-red pair rides the same predicate. Gov's value is
+        # `land`, and a kit that copied the file carrying it would land every adopter over its reds.
+        # The trailing-comment spelling is the evasion the first predicate admitted for GATE_SELFTESTS.
+        for _line, _key in (("INHERITED_RED=land", "INHERITED_RED"),
+                            ("export INHERITED_RED_MAX_AGE=10  # gov only", "INHERITED_RED_MAX_AGE")):
+            (pg / "tools" / "demo" / "policy.sh").write_text(
+                "#!/usr/bin/env sh\n" + _line + "\n", encoding="utf-8", newline="\n")
+            git(pg, "add", "-A")
+            git(pg, "commit", "-qm", f"{_key} in the payload")
+            _irp = run_in(pg)
+            check(f"AC22: a bare {_key} assignment inside a kit's payload REDS, naming the file",
+                  _irp.returncode == 1 and f"carries a bare {_key} assignment AND is shipped" in _irp.stdout
+                  and "'tools/demo/policy.sh'" in _irp.stdout, _irp.stdout + _irp.stderr)
 
         # ITS CONTROL, and it is the arm that stops this being a ban on the variable. The same line
         # in a path no kit claims is the SANCTIONED shape — that is where gov keeps its own — and a
@@ -3366,19 +3379,30 @@ user_skills = "/tmp/gk-fake-skills"
         # default form, which assigns exactly as hard as `=`. The INVOCATION control is the half
         # that keeps the predicate from redding on its own source — `GATE_SELFTESTS=1 bash ...`
         # appears dozens of times across this tree in docs, arms and refusal strings.
+        # THE KEYS ARE govkit's OWN `POLICY_KEYS` (TOOL-dDerivedDocket-24 S14), imported rather than
+        # restated, so this arm grades the alternation the engine compiles and not a copy of it.
+        sys.path.insert(0, str(HERE))
+        import govkit as _gk_mod  # noqa: E402
+        _pk = "|".join(_re.escape(k) for k in _gk_mod.POLICY_KEYS)
         _pol_re = _re.compile(
             r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
-            r"(?:GATE_SELFTESTS=\S*|\$\{GATE_SELFTESTS:?=[^}]*\})"
+            r"(?:(" + _pk + r")=\S*|\$\{(" + _pk + r"):?=[^}]*\})"
             r"[ \t]*(?:#.*)?$")
         _gk_src = (HERE / "govkit.py").read_text(encoding="utf-8")
         check("M5: the predicate this arm grades is the one govkit.py actually compiles",
-              "GATE_SELFTESTS=\\S*|" in _gk_src or "GATE_SELFTESTS=" in _gk_src, "")
+              '"|".join(re.escape(k) for k in POLICY_KEYS)' in _gk_src, "")
+        check("M5: POLICY_KEYS names the self-test switch and both inherited-red keys",
+              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE"},
+              repr(_gk_mod.POLICY_KEYS))
         for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
-                   "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}"):
+                   "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}",
+                   "INHERITED_RED=land", "export INHERITED_RED_MAX_AGE=10  # gov only",
+                   ": ${INHERITED_RED:=land}"):
             check(f"M5: a policy line is caught — {_s!r}", bool(_pol_re.match(_s)), _s)
         for _s in ("GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh",
                    'if [ -n "${GATE_SELFTESTS:-}" ]; then',
-                   'echo "set GATE_SELFTESTS=1 to run"'):
+                   'echo "set GATE_SELFTESTS=1 to run"',
+                   "INHERITED_RED=land bash .githooks/pre-push"):
             check(f"M5 control: an invocation is NOT a policy — {_s[:38]!r}",
                   not _pol_re.match(_s), _s)
 

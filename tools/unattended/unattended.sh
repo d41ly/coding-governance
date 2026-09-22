@@ -444,7 +444,7 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""
+ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; LEASE_STALE_AFTER=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
@@ -1594,6 +1594,11 @@ DOD_OUT=""
 # override there would land exactly that. `verb_close` reads this the moment `dod_met` returns and
 # ends the verb, so no later item can bury the refusal and no override loop can reach it.
 GG_HARD=""
+# TOOL-dDerivedDocket-24 - THE TWO FACTS A MET `gates-green` OWES, held until the close's other
+# writes: `gates-run` names the bar and the HEAD it graded, `gates-inherited` the R and the legs a
+# landing over an inherited-only red rests on. Written after the carry check, so a refusal there
+# still writes nothing; `verb_close` clears both on entry.
+GG_RUN_FACT=""; GG_INH_FACT=""
 trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
@@ -4364,6 +4369,12 @@ verb_abort() { # slug · reason · code
     fail 33 "--abort names a halt code that is not in the effective vocabulary, and an unvalidated code is free text wearing a field name; declare it in HALT_CODES_EXTRA or use one of these: $legal"
     return 1
   fi
+  # TOOL-dDerivedDocket-24 S7 - "the red is outside the mandate" is the same claim an override on
+  # `gates-green` makes, and it is backed by the same record or refused: every red leg INHERITED, on
+  # a bar that ran at HEAD over a clean tree that did not move.
+  if [ "$code" = gate-red-out-of-scope ]; then
+    check_inherited_override "$rel" "--abort --code gate-red-out-of-scope" || return 1
+  fi
   # BOTH agent-attested items, read back from the record exactly as --close reads them. This is an
   # ATTESTATION and not a machine verdict, and the message says so wherever it reports - counting an
   # attestation as a verdict is what makes an override look like a check that failed.
@@ -5855,6 +5866,351 @@ verb_resume() { # slug
   return 1
 }
 
+# ========================================================== THE INHERITED-RED POLICY — TOOL-dDerivedDocket-24
+# A red the landing base already carries used to leave a run two answers, both bad: override
+# `gates-green`, which spends the one check between an unattended run and its landing, or abort. This
+# section is the third, and it is a POLICY rather than a judgment the run makes about itself.
+#
+# THE POLICY IS READ AT R AND NEVER FROM THE TREE. R is the tip `observe_anchor` saw the remote
+# advertise — never local main and never any other local ref, both of which the run can write. The
+# conf key `GATE_POLICY_FILE` is read from the project conf AS COMMITTED AT R, and the two keys
+# `INHERITED_RED=park|land` and `INHERITED_RED_MAX_AGE=<n>` from the file it names, AS COMMITTED AT R.
+# Both reads PARSE and never execute: one anchored match per key, the value's trailing comment and one
+# pair of quotes stripped. A run that commits `land` into its own copy therefore enables nothing, and
+# a run that re-points the conf key moves nothing until a gated push has landed it.
+#
+# BLANK IS `park`, AND IT SAYS SO. Absent, blank or malformed reads `park`, and so does `land` with no
+# positive age bound beside it; every one of those is announced on the policy line, because the
+# difference between the two readings is whether an inherited red lands.
+#
+# WHAT THIS DOES NOT DECIDE: whether a red is inherited. That is the runner's attribution, read here
+# from the run record of a bar whose id this driver pinned, and never re-derived.
+read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleaned; nothing when none assigns it
+  local line v="" hit=""
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line%$'\r'}
+    case "$line" in "$2="*) v=${line#"$2="}; hit=1 ;; esac
+  done <<< "$1"
+  [ -n "$hit" ] || return 0
+  v=${v%%[[:space:]]#*}
+  while [ "${v% }" != "$v" ] || [ "${v%$'\t'}" != "$v" ]; do v=${v%?}; done
+  while [ "${v# }" != "$v" ]; do v=${v# }; done
+  case "$v" in
+    \"*\") v=${v#\"}; v=${v%\"} ;;
+    \'*\') v=${v#\'}; v=${v%\'} ;;
+  esac
+  printf '%s' "$v"
+}
+
+GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
+read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty) and GP_WHY
+  local r=$1 conf path blob pol age
+  GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
+  if [ -z "$r" ]; then
+    GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at"; return 0
+  fi
+  # THE CONF'S OWN NAME, derived from the path this driver sourced, so the file is spelled once.
+  if ! conf=$(GIT show "$r:${CONF##*/}" 2>/dev/null); then
+    GP_WHY="the project conf is absent at ${r:0:8}, so no gate policy is adopted there"; return 0
+  fi
+  path=$(read_policy_key "$conf" GATE_POLICY_FILE)
+  if [ -z "$path" ]; then
+    GP_WHY="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}, so no gate policy is adopted"; return 0
+  fi
+  case "$path" in
+    /*|[A-Za-z]:*|..|../*|*/..|*/../*)
+      GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree: $path"; return 0 ;;
+  esac
+  if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
+    GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}"; return 0
+  fi
+  pol=$(read_policy_key "$blob" INHERITED_RED)
+  age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
+  case "$age" in ''|0*|*[!0-9]*) age="" ;; esac
+  case "$pol" in
+    land) if [ -n "$age" ]; then
+            GP_POLICY=land; GP_MAX_AGE=$age
+            GP_WHY="INHERITED_RED=land with an age bound of $age first-parent landings, read from $path at ${r:0:8}"
+          else
+            GP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in $path at ${r:0:8}, which reads park"
+          fi ;;
+    # UNDER `park` THE BOUND STILL TRAVELS when one is declared: the runner ages and owns each
+    # INHERITED leg with it, and the auto-filed ask names that owner. Nothing lands on it.
+    park) GP_MAX_AGE=$age; GP_WHY="INHERITED_RED=park, read from $path at ${r:0:8}" ;;
+    '')   GP_WHY="$path at ${r:0:8} declares no INHERITED_RED" ;;
+    *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land'" ;;
+  esac
+}
+
+# THE RECORD OF ONE BAR, read by the decision table `gates-green` applies to a red exit. The first
+# matching row decides, in this order:
+#
+#   the verdict reads tree_moved yes                  moved   UNMET, naming the move
+#   no usable record (see below)                      none    UNMET exactly as before this unit
+#   every red INHERITED, none aged, policy land       land    MET, a gates-inherited fact
+#   every red INHERITED, policy park or any aged      hold    UNMET, the hold line
+#   any OWN, MIXED, DEAD PROBE or CONTENDED           other   UNMET, the attribution lines
+#
+# A USABLE RECORD is a RED verdict with no wall breach and `tree_moved no`, beside an attribution
+# with one row per failed leg. A wall that fired left the legs it killed out of the attribution, so a
+# partial record is not an all-INHERITED one. An UNPROVEN age reads as aged: it never lands. "Any
+# aged" is read inside the all-INHERITED rows, so a run's own red always reaches the attribution
+# lines rather than a hold that no resume can clear.
+GR_STATE=none; GR_LEGS=""; GR_WHY=""
+read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS (the red legs, comma-joined) and GR_WHY
+  local d=$1 pol=$2 v tm fl wb n=0 inh=0 aged=0 leg ver age
+  GR_STATE=none; GR_LEGS=""; GR_WHY=""
+  if [ -z "$d" ] || [ ! -f "$d/verdict" ]; then
+    GR_WHY="the bar left no run record under the id this driver pinned"; return 0
+  fi
+  v=$(awk -F'\t' '$1=="verdict"{print $2; exit}' "$d/verdict" 2>/dev/null)
+  tm=$(awk -F'\t' '$1=="tree_moved"{print $2; exit}' "$d/verdict" 2>/dev/null)
+  fl=$(awk -F'\t' '$1=="failed"{print $2; exit}' "$d/verdict" 2>/dev/null)
+  wb=$(awk -F'\t' '$1=="wall_breach"{print $2; exit}' "$d/verdict" 2>/dev/null)
+  if [ "$tm" = yes ]; then
+    GR_STATE=moved
+    GR_WHY="the bar's verdict reads tree_moved yes: the tree moved while it ran, so no verdict describes the commit being closed, whatever its attribution says"
+    return 0
+  fi
+  if [ "$v" != RED ] || [ "$tm" != no ] || [ -n "$wb" ] || [ ! -f "$d/attribution" ]; then
+    GR_WHY="the bar's record is not a RED verdict on an unmoved tree beside an attribution record"; return 0
+  fi
+  while IFS=$'\t' read -r leg ver _ _ _ age _; do
+    [ -n "$leg" ] || continue
+    n=$((n + 1)); GR_LEGS="$GR_LEGS${GR_LEGS:+,}$leg"
+    [ "$ver" = INHERITED ] || continue
+    inh=$((inh + 1))
+    case "$age" in ''|-|*[!0-9]*) aged=$((aged + 1)) ;; esac
+  done < "$d/attribution"
+  if [ "$n" = 0 ] || [ "$n" != "${fl:-}" ]; then
+    GR_WHY="the attribution names $n red leg(s) and the verdict counts ${fl:-none} failed"; return 0
+  fi
+  if [ "$inh" != "$n" ]; then
+    GR_STATE=other; GR_WHY="a red leg reads OWN, MIXED, DEAD PROBE or CONTENDED, so this red is the run's to fix"; return 0
+  fi
+  if [ "$pol" = land ] && [ "$aged" = 0 ]; then GR_STATE=land; return 0; fi
+  GR_STATE=hold
+  [ "$aged" -gt 0 ] && GR_WHY="$aged INHERITED leg(s) read aged or unproven past the age bound, which never lands"
+  return 0
+}
+
+# ---- THE AUTO-FILE, DARK UNTIL `ASKS_CMD` IS DECLARED. S10.
+# Every INHERITED leg gets an OWNER ON THE RECORD: one ask in the build's own `BACKLOG.md`, a SEV row
+# and a KEEP row, in the grammar the memory-tree kit's parser reads. This driver is shell and has no
+# declared route to that kit's Python renderers, so it writes the rows in their grammar and has the
+# parser, reached through `ASKS_CMD` in call shape 1 with no `--at` (the rows are staged and exist at
+# no rev), read each new id back. One `ask` row, status OPEN, SEV HIGH and this slug as its home is
+# the only acceptance; anything else REMOVES the rows and prints the witness, so a grammar drift
+# between this writer and that parser is caught at write time rather than by the next reader.
+#
+# REUSED BEFORE IT IS FILED. An ask this build already filed for the SAME leg red at the SAME R, read
+# back OPEN, is named and nothing is written: each resume of a held run reruns this item over the same
+# inherited red, and a second HIGH ask per hold is noise an owner has to dispose of. The match needs R
+# as well as the leg, because the ask's `seen` locator and `run` command pin R.
+#
+# STAGED, NEVER COMMITTED: no driver verb commits. On the MET path the rows ride the close's records
+# commit; on a path that prints a `hold ·` line the Skill's Close sequence commits them before `--hold`.
+# With `ASKS_CMD` blank the rows are PRINTED and nothing is written, so the auto-file cannot arm itself
+# before the project adopts the ask contract.
+read_leg_argv() { # run dir · R · leg name -> that leg's argv in R's manifest, space-joined; rc 1 unreadable
+  local d=$1 r=$2 m rel py
+  m=$(awk -F'\t' '$1=="manifest"{print $2; exit}' "$d/header" 2>/dev/null)
+  [ -n "$m" ] || return 1
+  rel=$(GIT ls-files --full-name -- "$m" 2>/dev/null | head -1)
+  [ -n "$rel" ] || return 1
+  py=$(resolve_python 2>/dev/null) || return 1
+  GIT show "$r:$rel" 2>/dev/null | RLA_LEG="$3" "$py" -c '
+import json, os, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(1)
+for row in (data if isinstance(data, list) else []):
+    if isinstance(row, dict) and row.get("name") == os.environ["RLA_LEG"]:
+        argv = [str(a) for a in (row.get("argv") or [])]
+        if not argv:
+            sys.exit(1)
+        sys.stdout.write(" ".join(argv))
+        sys.exit(0)
+sys.exit(1)
+'
+}
+
+derive_ask_seq() { # family · slug -> one past the highest <family>-<slug>-<n> in the tracked and working trees
+  local f=$1 s=$2 hi=0 v
+  while IFS= read -r v; do
+    v=${v##*-}
+    case "$v" in ''|*[!0-9]*) continue ;; esac
+    [ "$((10#$v))" -gt "$hi" ] && hi=$((10#$v))
+  done < <( { GIT grep -h -o -w -I -E --untracked "$f-$s-[0-9]+" 2>/dev/null
+              GIT grep -h -o -w -I -E "$f-$s-[0-9]+" HEAD 2>/dev/null; } )
+  printf '%s' "$((hi + 1))"
+}
+
+write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP row
+  local f=$1 tmp
+  tmp=$(mktemp) || return 1
+  if [ ! -f "$f" ]; then
+    printf '# %s — asks\n\n## Asks\n%s\n\n## Dispositions\n%s\n%s\n' "$2" "$3" "$4" "$5" > "$tmp"
+  else
+    WBR_A="$3" WBR_S="$4" WBR_K="$5" awk '
+      { l = $0; sub(/\r$/, "", l); line[++n] = l }
+      END {
+        a = ENVIRON["WBR_A"]; s = ENVIRON["WBR_S"]; k = ENVIRON["WBR_K"]
+        for (i = 1; i <= n; i++) {
+          if (line[i] == "## Asks" && !ai) ai = i
+          if (line[i] == "## Dispositions" && !di) di = i
+        }
+        if (ai) { stop = di > ai ? di : n + 1; at = ai
+                  for (i = ai + 1; i < stop; i++) if (line[i] ~ /[^ \t]/) at = i }
+        if (di) { dl = di; for (i = di + 1; i <= n; i++) if (line[i] ~ /[^ \t]/) dl = i }
+        for (i = 1; i <= n; i++) {
+          if (!ai && di && i == di) { print "## Asks"; print a; print "" }
+          print line[i]
+          if (ai && i == at) print a
+          if (di && i == dl) { print s; print k }
+        }
+        if (!ai && !di) { print ""; print "## Asks"; print a; print ""; print "## Dispositions"; print s; print k }
+        else if (!di)   { print ""; print "## Dispositions"; print s; print k }
+      }' "$f" > "$tmp"
+  fi
+  mv "$tmp" "$f"
+}
+
+read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN HIGH ask homed at slug; AB_WHY
+  local id=$1 slug=$2 rc rows n
+  AB_WHY=""
+  run_bounded $ASKS_CMD --tsv --ready "$id" --target "$slug"; rc=$?
+  if [ -z "$RB_STDOUT" ]; then AB_WHY=$(derive_stream_verdict "$rc"); return 1; fi
+  if [ "$rc" != 0 ]; then AB_WHY="the declared ask generator exited $rc after ${RB_TOOK}s"; return 1; fi
+  rows=$(printf '%s\n' "$RB_STDOUT" \
+    | ASK_HEAD="$ASK_TSV_HEAD" ASK_EX="$ASK_TSV_EXAMINED" ASK_N="$ASK_TSV_FIELDS" awk -F'\t' '
+        BEGIN { h = ENVIRON["ASK_HEAD"]; ex = ENVIRON["ASK_EX"]; want = ENVIRON["ASK_N"] + 0 }
+        $0 == "" || $1 == ex { next }
+        $1 == h && NF == want { print $2 "\t" $3 "\t" $5 "\t" $6; next }
+        { print "BAD\t" $0 }')
+  n=$(printf '%s\n' "$rows" | awk 'NF' | wc -l | tr -d ' ')
+  if [ "$n" != 1 ]; then AB_WHY="the declared ask generator returned $n row(s) for $id, and one is the only answer"; return 1; fi
+  case "$rows" in
+    "$id	OPEN	$slug	HIGH") return 0 ;;
+  esac
+  AB_WHY="the declared ask generator read $id back as: $rows"
+  return 1
+}
+
+write_inherited_asks() { # slug · R · run dir
+  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had
+  local r8=${2:0:8} today
+  bl="$M/builds/$slug/BACKLOG.md"
+  today=$(date -u +%Y-%m-%d)
+  [ -f "$d/attribution" ] || return 0
+  while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid _; do
+    [ "$ver" = INHERITED ] || continue
+    # REUSE FIRST, over this build's own filings for the same leg AND the same R.
+    reused=""
+    if [ -f "$bl" ] && [ -n "${ASKS_CMD:-}" ]; then
+      while IFS= read -r cand; do
+        [ -n "$cand" ] || continue
+        if read_ask_back "$cand" "$slug"; then
+          echo "gates-green: ask $cand already OPEN for leg $leg at $r8 · reused"; reused=1; break
+        fi
+      done < <(grep -F -- "inherited red: leg $leg red at $r8," "$bl" 2>/dev/null \
+                 | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
+    fi
+    [ -z "$reused" ] || continue
+    # THE ID, minted under this run's slug: the owner id's family when the age probe named one, else
+    # the first family of the build README's roster.
+    fam=""
+    case "$ownid" in [A-Z]*-*) fam=${ownid%%-*} ;; esac
+    if [ -z "$fam" ]; then
+      fam=$(awk 'NR == 1 { next } /^---/ { exit } /^roster:/ { v = $0; sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
+              "$(readme_of "$slug")" 2>/dev/null | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$')
+    fi
+    if [ -z "$fam" ]; then
+      echo "gates-green: no ask filed for leg $leg — the build README names no roster family and the age probe named no owner id, so there is no family to mint the id in"
+      continue
+    fi
+    if ! argv=$(read_leg_argv "$d" "$r" "$leg") || [ -z "$argv" ]; then
+      echo "gates-green: no ask filed for leg $leg — its argv at $r8 could not be read from the manifest the bar's header names, so the ask would carry no runnable command"
+      continue
+    fi
+    file=""
+    for tok in ${argv#* }; do case "$tok" in -*) ;; *) file=$tok; break ;; esac; done
+    [ -n "$file" ] || file=${argv%% *}
+    seq=$(derive_ask_seq "$fam" "$slug")
+    id="$fam-$slug-$seq"
+    if [ "$own8" != - ] && [ -n "$own8" ]; then
+      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
+    else
+      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+    fi
+    s="- SEV · $id · HIGH · a merge-bar leg is red on the default branch"
+    k="- KEEP · $id · filed by an unattended run for the owning build; outside this build's goal"
+    if [ -z "${ASKS_CMD:-}" ]; then
+      echo "gates-green: ASKS_CMD is blank, so the auto-file is DARK and writes nothing; it would have filed, in $bl:"
+      printf '    %s\n' "$a" "$s" "$k"
+      continue
+    fi
+    had=0; prior=""
+    if [ -f "$bl" ]; then had=1; prior=$(mktemp) && cp -- "$bl" "$prior"; fi
+    mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$a" "$s" "$k" && GIT add -- "$bl" 2>/dev/null
+    if read_ask_back "$id" "$slug"; then
+      echo "gates-green: filed ask $id for leg $leg red at $r8, staged in $bl"
+    else
+      # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
+      # every later reader would read differently from this writer.
+      if [ "$had" = 1 ] && [ -n "$prior" ]; then cp -- "$prior" "$bl"; GIT add -- "$bl" 2>/dev/null
+      else GIT rm -q --cached -f -- "$bl" >/dev/null 2>&1; rm -f -- "$bl"; fi
+      echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+      [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+    fi
+    [ -z "$prior" ] || rm -f -- "$prior"
+  done < "$d/attribution"
+}
+
+# ---- S7: THE TWO ESCAPE ROUTES, BACKED BY THE ATTRIBUTION OR REFUSED.
+# `--close --override gates-green` and `--abort --code gate-red-out-of-scope` are the two ways a run
+# can say "that red is not mine" without the bar agreeing. Both are refused unless the attribution
+# record the `gates-run` fact names reads EVERY red leg INHERITED, and it counts only when its header
+# shows `head` equal to HEAD and `tree_clean yes` and its verdict shows `tree_moved no`. An override
+# runs no bar — the item is skipped — so the record is always an EARLIER one, and those three fields
+# are what tie it to the tree being closed: an all-INHERITED record from before the run committed its
+# own red, from a dirty tree, or from a bar whose tree moved describes some other tree.
+check_inherited_override() { # run-state file · the verb as the refusal names it -> 0 when admitted
+  local rel=$1 verb=$2 f id gd head d hh htc tm why="" n=0 leg ver
+  f=$(fact "$rel" gates-run); id=${f%% *}
+  gd=$(GIT rev-parse --git-dir 2>/dev/null); head=$(GIT rev-parse HEAD 2>/dev/null)
+  d="$gd/gate-run/$id"
+  if [ -z "$f" ]; then
+    why="no gates-run fact in this record names a bar"
+  elif [ -z "$gd" ] || [ ! -f "$d/header" ]; then
+    why="the bar the gates-run fact names, $id, left no run record header in this clone"
+  else
+    hh=$(awk -F'\t' '$1=="head"{print $2; exit}' "$d/header" 2>/dev/null)
+    htc=$(awk -F'\t' '$1=="tree_clean"{print $2; exit}' "$d/header" 2>/dev/null)
+    tm=$(awk -F'\t' '$1=="tree_moved"{print $2; exit}' "$d/verdict" 2>/dev/null)
+    if [ "$hh" != "$head" ]; then
+      why="the bar it names ran at ${hh:0:8} and HEAD is now ${head:0:8}, so its record describes another commit"
+    elif [ "$htc" != yes ]; then
+      why="the bar it names ran on a tree whose header reads tree_clean ${htc:-none}, so its record may grade edits HEAD does not carry"
+    elif [ "$tm" != no ]; then
+      why="the bar it names reads tree_moved ${tm:-none}, so no verdict describes the tree it graded"
+    elif [ ! -f "$d/attribution" ]; then
+      why="the bar it names wrote no attribution record, so no red leg is shown to be inherited"
+    else
+      while IFS=$'\t' read -r leg ver _; do
+        [ -n "$leg" ] || continue
+        n=$((n + 1))
+        [ "$ver" = INHERITED ] || { why="its attribution reads $leg $ver"; break; }
+      done < "$d/attribution"
+      [ -n "$why" ] || [ "$n" -gt 0 ] || why="its attribution record names no red leg"
+    fi
+  fi
+  [ -z "$why" ] && return 0
+  fail 83 "$verb is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: $why"
+  return 1
+}
+
 # TOOL-cBriefedPilot-1 - EVERY accumulated override is validated, skipped and parked, not just the
 # last one. The override pairs arrive in the OV_ITEMS / OV_REASONS globals rather than as positionals,
 # because an array cannot be passed as one argument and splitting it back out of a string is the
@@ -5986,6 +6342,7 @@ write_close_commit() { # slug · run-state file
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   local slug="$1" rel item ck unmet=0 i=0 n ov reason _why
   n=${#OV_ITEMS[@]}
+  GG_RUN_FACT=""; GG_INH_FACT=""
   check_slug "$slug" || return 1
   # THE FREE REFUSALS COME FIRST, and the ordering is the point rather than tidiness. This function
   # used to open with a network round-trip and only then discover that the record was already
@@ -6055,6 +6412,13 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     esac
     i=$((i + 1))
   done
+  # TOOL-dDerivedDocket-24 S7 - AN OVERRIDE ON `gates-green` IS BACKED BY THE ATTRIBUTION OR REFUSED,
+  # after every pair has been validated, so a malformed pair still reports as itself. The override
+  # recorded at aStagedLane's close - a red declared "not this build's" by a stash-and-rerun nobody
+  # else could see - is the path this closes: the claim now has to be the bar's own reading.
+  if is_overridden gates-green; then
+    check_inherited_override "$rel" "--close --override gates-green" || return 1
+  fi
   # TOOL-dDerivedDocket-5 - S9, the sibling of --abort's line. Printed BEFORE the set is evaluated,
   # because the agent-attested `keepalive-reaped` item is read back from the record and the list is
   # what the attestation is made over.
@@ -6135,6 +6499,9 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
       return 1
     fi
   fi
+  # TOOL-dDerivedDocket-24 - THE BAR'S FACTS, with the close's other writes and after the carry check.
+  if [ -n "$GG_RUN_FACT" ]; then set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1; fi
+  if [ -n "$GG_INH_FACT" ]; then set_fact "$rel" gates-inherited "$GG_INH_FACT" || return 1; fi
   i=0
   while [ "$i" -lt "$n" ]; do
     ov=${OV_ITEMS[$i]}
@@ -6207,7 +6574,25 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      local _grc
+      local _grc _gr _gid _ggd _gh _gdir _gout _hold
+      local -a _genv
+      # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
+      # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
+      # ref: a run's own commit on local main carrying `land` and its own red would sit at R, read
+      # INHERITED and land - the local-ref base the protocol records as a reproduced bypass. The run
+      # id is PINNED, unpredictable and cleared first, because this arm reads THAT bar's record after
+      # it and a record the runner never wrote must not be mistaken for one it did.
+      _gr=${ASHA:-}
+      read_gate_policy "$_gr"
+      echo "unattended: gates-green — the inherited-red policy reads $GP_POLICY: $GP_WHY"
+      _ggd=$(GIT rev-parse --git-dir 2>/dev/null)
+      if [ -n "${EPOCHREALTIME:-}" ]; then _gid="unattended-${EPOCHREALTIME//[!0-9]/}${RANDOM}-$$"
+      else _gid="unattended-$(date -u +%Y%m%d%H%M%S)${RANDOM}-$$"; fi
+      _gdir=""
+      if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
+      _genv=(GATE_RUN_ID="$_gid" GATE_INHERITED_RED="$GP_POLICY")
+      [ -n "$_gr" ] && _genv+=(GATE_ATTRIBUTE="$_gr")
+      [ -n "$GP_MAX_AGE" ] && _genv+=(GATE_INHERITED_RED_MAX_AGE="$GP_MAX_AGE")
       # TOOL-dDerivedDocket-3 S3 - UNDER `in-place` THE BAR GRADES THE MERGE, and two preconditions
       # stand between it and running at all. `GATE_FULL=1` is exported through `env` rather than as
       # a bare assignment prefix, because this kit's own guard is that the bar must not be scoped by
@@ -6218,22 +6603,60 @@ dod_met() { # slug · run-state file · item · checker
         check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
         print_selftests_owed
         # shellcheck disable=SC2086
-        run_bounded env GATE_FULL=1 $GATE_CMD && { DOD_OUT=""; return 0; }
-        _grc=$?
+        run_bounded env GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$?
       else
         # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
         # was: the project declares a command line, not a path.
         # shellcheck disable=SC2086
-        run_bounded $GATE_CMD && { DOD_OUT=""; return 0; }
-        _grc=$?
+        run_bounded env "${_genv[@]}" $GATE_CMD; _grc=$?
       fi
+      # THE `gates-run` FACT, naming this bar's id and the HEAD it graded - the record S7's two
+      # refusals consult. On a MET bar it is written with the close's other writes, after the carry
+      # check, so a refusal there still writes nothing; on an UNMET one it is written HERE, because
+      # the close returns before any later write. A bar that left no record under the pinned id is
+      # recorded only over an earlier fact, so a stub bar in a project that never ran the runner
+      # writes nothing new and an older record can never answer for a newer bar.
+      _gh=$(GIT rev-parse HEAD 2>/dev/null)
+      GG_RUN_FACT="$_gid ${_gh:0:8}"
+      if [ "$_grc" = 0 ]; then DOD_OUT=""; return 0; fi
+      if { [ -n "$_gdir" ] && [ -d "$_gdir" ]; } || [ -n "$(fact "$rel" gates-run)" ]; then
+        set_fact "$rel" gates-run "$GG_RUN_FACT" && stage_or_fail "$rel"
+      fi
+      GG_RUN_FACT=""
       DOD_OUT=$RB_OUT
       # A BREACH IS NOT A RED BAR, and the difference is the whole information this adds. A red bar
       # says a check ran and said no; a breach says the bar never answered. Reporting them the same
       # way is how an operator spends an hour looking for a failing leg that does not exist.
       if { [ "$_grc" = 124 ] || [ "$_grc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
         DOD_OUT="the merge bar did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so this item is unmet because the bar never returned rather than because a leg failed: $GATE_CMD"
+        return 1
       fi
+      # S6 - THE DECISION TABLE over this bar's own record; `read_gates_record` states it, first
+      # matching row wins. Every red leg INHERITED within its age under `land` is MET; the same
+      # under `park`, or with an age past the bound, is UNMET and prints the hold line the Skill
+      # acts on; anything else is UNMET with the attribution lines exactly as before this unit.
+      read_gates_record "$_gdir" "$GP_POLICY"
+      _gout=$(printf '%s\n' "$RB_OUT" | grep -vE '^(GATE (ok|skip) )')
+      case "$GR_STATE" in
+        moved)
+          DOD_OUT="$GR_WHY"$'\n'"$_gout" ;;
+        land|hold|other)
+          # S10 - an owner on the record for every INHERITED leg, on every path whose record is usable.
+          write_inherited_asks "$slug" "$_gr" "$_gdir"
+          if [ "$GR_STATE" = land ]; then
+            GG_RUN_FACT="$_gid ${_gh:0:8}"
+            GG_INH_FACT="${_gr:0:8} $GR_LEGS"
+            DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED within the ${GP_MAX_AGE}-landing age bound"
+            return 0
+          fi
+          if [ "$GR_STATE" = hold ]; then
+            _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
+            DOD_OUT="hold · inherited-red · until probe gate · $_hold"
+            [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
+            DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code inherited-red --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+            DOD_OUT="$DOD_OUT"$'\n'"$_gout"
+          fi ;;
+      esac
       return 1 ;;
     records-current)
       # The unit list is DERIVED from the build README, so "current" is not a comparison between two
