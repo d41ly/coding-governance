@@ -528,7 +528,17 @@ if [ "$MODE" = sweep ]; then
 fi
 export SELFTEST_INNER_WIDTH=$(( W / OUTER )); [ "$SELFTEST_INNER_WIDTH" -ge 1 ] || SELFTEST_INNER_WIDTH=1
 
+# FED FROM FILES, NOT FROM A HEREDOC OVER A VARIABLE. Six loops here used to read their rows
+# from a heredoc holding
+# `$POP` and `$EV_TEXT`, both assigned from command substitutions, which is the shape the
+# shell-hygiene leg gates: such a loop can read until an EOF that never arrives. Its registry is
+# set-equality with shrink-only counts, so a build that adds a site cannot declare one. The text
+# is written once and every loop reads the file; the registry row for this file goes with them.
+RS_SCRATCH=$(mktemp -d) || { echo "run-selftests: cannot create a scratch dir" >&2; exit 2; }
+trap 'rm -rf "$RS_SCRATCH" 2>/dev/null' EXIT
+POP_FILE="$RS_SCRATCH/population"; EV_FILE="$RS_SCRATCH/evidence"
 POP=$(read_population)
+printf '%s\n' "$POP" > "$POP_FILE"
 NROWS=$(printf '%s' "$POP" | grep -c . || true)
 
 # ---- --check: the gate. BOTH DIRECTIONS, because one alone cannot fail usefully -----------------
@@ -578,9 +588,7 @@ PY
                || { echo "run-selftests: row '$name' names '$tok', which git does not track" >&2; fails=1; } ;;
       esac
     done
-  done <<EOF
-$POP
-EOF
+  done < "$POP_FILE"
   # ---- THE SHARD JOIN, ported from the gov canary's shard contract (run-gates.gov.test.sh, the
   # ---- text `shard contract`) to this file's row format. TOOL-aBatchedArm-3 S4. FORWARD HALF ONLY:
   # ---- a script any row calls with `--shard i/n` is called at ONE arity, and its indices 1..n are
@@ -633,6 +641,7 @@ EOF
     # substitution is the shape the shell-hygiene leg gates (a loop that can wait for an EOF that
     # never arrives), and the population loops feed from $POP the same way.
     EV_TEXT=$(read_evidence)
+    printf '%s\n' "$EV_TEXT" > "$EV_FILE"
     while IFS=$'\t' read -r kind a b c _rest; do
       [ -n "${kind:-}" ] || continue
       case "$kind" in
@@ -652,9 +661,7 @@ EOF
             ev_faults="$ev_faults"$'\n'"  row '$a' under $b is an ORPHAN — the declaration carries no row of that name, so its evidence bounds nothing"
           fi ;;
       esac
-    done <<EOF
-$EV_TEXT
-EOF
+    done < "$EV_FILE"
     if [ -n "$ev_faults" ]; then
       echo "run-selftests: the pooled evidence at $EVIDENCE is malformed — every row is nine tab fields (row, condition, node, seconds, rc, fails, executed, readings, date), keyed once, on a registry tag, naming a declared row:" >&2
       printf '%s\n' "$ev_faults" | grep . >&2
@@ -687,9 +694,7 @@ EOF
         elif ! grep -vE '^[[:space:]]*#' "$tr_script" | grep -E "$SWEEP_TRAILER_RX" | grep -qvE '^[[:space:]]*\[ "\$[A-Za-z_]+" = 0 \] &&'; then
           tr_faults="$tr_faults"$'\n'"  row '$name': $tr_script prints no trailer outside a [ \"\$<var>\" = 0 ] && guard, so a red-but-complete run is UNTRAILED under --pooled and writes no reading"
         fi
-      done <<EOF
-$POP
-EOF
+      done < "$POP_FILE"
       if [ -n "$tr_faults" ]; then
         echo "run-selftests: the trailer rule fails under pooled-kit$ev_kits — every row's script must print a trailer ($SWEEP_TRAILER_RX) unconditionally, or be declared no-trailer in $EVIDENCE:" >&2
         printf '%s\n' "$tr_faults" | grep . >&2
@@ -808,6 +813,7 @@ if [ "$MODE" = sweep ]; then
   declare -A EV_SECS=() EV_RC=() EV_FAILS=() EV_EXEC=() EV_READINGS=() EV_DATE=() EV_NOTRAILER=()
   ev_bad=""
   EV_TEXT=$(read_evidence)   # read once, fed as a variable: the shell-hygiene leg's rule
+  printf '%s\n' "$EV_TEXT" > "$EV_FILE"
   while IFS=$'\t' read -r kind a b c d e f g h i; do
     [ -n "${kind:-}" ] || continue
     case "$kind" in
@@ -817,9 +823,7 @@ if [ "$MODE" = sweep ]; then
            EV_SECS["$k"]=$d; EV_RC["$k"]=$e; EV_FAILS["$k"]=$f; EV_EXEC["$k"]=$g
            EV_READINGS["$k"]=$h; EV_DATE["$k"]=$i ;;
     esac
-  done <<EOF
-$EV_TEXT
-EOF
+  done < "$EV_FILE"
   if [ -n "$ev_bad" ]; then
     echo "run-selftests: the pooled evidence at $EVIDENCE will not parse, and a bound read past a" >&2
     echo "run-selftests: malformed row is a number nobody wrote. Run --check for the shape; nothing was run." >&2
@@ -847,6 +851,7 @@ EOF
       _rs_narrow="$_rs_narrow"$'\n'"$(printf '%s\n' "$POP" | awk -F'\t' -v n="$_r" '$2 == n')"
     done
     POP=$(printf '%s\n' "$_rs_narrow" | grep . | awk '!seen[$0]++')
+    printf '%s\n' "$POP" > "$POP_FILE"
     echo "run-selftests: --reset narrows this calibrate to ${#RESETS[@]} row(s): ${RESETS[*]}"
   fi
 
@@ -882,9 +887,7 @@ EOF
       fi
     fi
     SW_BOUND+=("$b"); SW_TERM+=("$term")
-  done <<EOF
-$POP
-EOF
+  done < "$POP_FILE"
   if [ -n "$sw_missing" ]; then
     echo "run-selftests: these row(s) have NO pooled reading under $SWEEP_CONDITION on node $SWEEP_NODE in" >&2
     echo "run-selftests: $EVIDENCE, so no hang bound can be derived for them and nothing was run:" >&2
@@ -1472,9 +1475,7 @@ while IFS=$'\t' read -r state name budget argv; do
     st=1; over=$((over + 1))
     printf '      OVER BUDGET  %s took %ss against a declared %ss — fix it, or re-declare it with a reason beside the number\n' "$name" "$took" "$budget"
   fi
-done <<EOF
-$POP
-EOF
+done < "$POP_FILE"
 
 echo "----"
 if [ "$st" -eq 0 ]; then

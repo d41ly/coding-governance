@@ -44,7 +44,6 @@ tools/memory-tree/merge-rows.test.sh	EOF	1	surfaced by the one-hop widening, TOO
 tools/run-gates/adopt-run-gates.sh	EOF	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/run-gates/run-gates.sh	<<<	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/run-gates/run-gates.test.sh	<<<	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
-tools/run-gates/run-selftests.sh	EOF	3	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/unattended/check-playbook.sh	CANONEOF	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/unattended/check-playbook.sh	EOF	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/unattended/check-unattended.sh	<<<	2	surfaced by the one-hop widening, TOOL-cMendedVintage-12

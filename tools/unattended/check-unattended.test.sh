@@ -100,26 +100,34 @@ check_emitted() { # signatures · output
     echo "FAIL check_emitted: expected set not yet observed — owed at the final pass · call at line ${BASH_LINENO[0]}"; st=1
     grep '^UNATTENDED check [0-9]* FAILED ' <<<"$2" | sed 's/^/    observed: /'; return
   fi
+  # FED FROM FILES. The four loops below read `$_exp`, `$2` and `$_skips`, each assigned from a
+  # command substitution, which is the shape the shell-hygiene leg gates -- such a loop can read
+  # until an EOF that never arrives. The registry carrying the pre-existing sites is shrink-only,
+  # so a new one cannot be declared: the texts go to a scratch dir and the loops read those.
+  local _ced; _ced=$(mktemp -d) || { echo "FAIL check_emitted: no scratch dir"; st=1; return; }
   _exp=$(printf '%s\n' "$1" | tr '|' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -v '^$' || true)
-  [ -n "$_exp" ] || { echo "FAIL check_emitted: no signature given, so the set it would grade is empty and every run would satisfy it"; st=1; return; }
+  printf '%s\n' "$_exp" > "$_ced/exp"; printf '%s\n' "$2" > "$_ced/out"
+  [ -n "$_exp" ] || { echo "FAIL check_emitted: no signature given, so the set it would grade is empty and every run would satisfy it"; st=1; rm -rf "$_ced"; return; }
   while IFS= read -r _s; do
     grep -qF -- "$_s" <<<"$2" || _miss="$_miss [$_s]"
-  done <<<"$_exp"
+  done < "$_ced/exp"
   while IFS= read -r _l; do
     case "$_l" in "UNATTENDED check "*" FAILED "*) ;; *) continue ;; esac
     _num=${_l#UNATTENDED check }; _num=${_num%% *}; _ok=0
     while IFS= read -r _s; do
       case "$_l" in *"$_s"*) _ok=1; _nums="$_nums$_num "; break ;; esac
-    done <<<"$_exp"
+    done < "$_ced/exp"
     [ "$_ok" = 1 ] || _extra="$_extra [$_l]"
-  done <<<"$2"
+  done < "$_ced/out"
   _skips=$(grep '^unattended-report: ' <<<"$2" || true)
+  printf '%s\n' "$_skips" > "$_ced/skips"
   while IFS= read -r _l; do
     [ -n "$_l" ] || continue
     _num=${_l#*check }; _num=${_num%%[!0-9]*}
     [ -n "$_num" ] || continue
     case "$_nums" in *" $_num "*) _dark="$_dark [$_l]" ;; esac
-  done <<<"$_skips"
+  done < "$_ced/skips"
+  rm -rf "$_ced"
   [ -z "$_miss$_extra$_dark" ] \
     || { echo "FAIL check_emitted: expected [$(printf '%s' "$_exp" | tr '\n' '|')] · missing:$_miss · unexplained:$_extra · dark:$_dark · skips: $_skips"; st=1; }
 }
