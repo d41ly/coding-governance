@@ -111,7 +111,9 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the 
 # key/value lines, and two readers need three of those keys: the driver bounds its bar by `wall`
 # plus `queue`, and both the driver's `--preflight` and the gate leg compare the effective wall with
 # `ceiling_max`. One parse and one comparison here, because a threshold spelled in both callers is
-# two answers to one question, and the leg is the second opinion on a number the driver acts on.
+# two answers to one question. SHARING IT IS DELIBERATE, and it means the leg is NOT a second opinion
+# on the driver's arithmetic: it grades the same declaration on the bar, before any run reaches it,
+# and a defect in this predicate reads green in both. Its own arms, staged against it, are the check.
 #
 # THE KEYS ARE READ, NEVER GUESSED. A key the profile did not print, or printed as anything but a
 # plain integer, is MISSING and named in GPF_MISSING, so a caller can say which one it lacked. A

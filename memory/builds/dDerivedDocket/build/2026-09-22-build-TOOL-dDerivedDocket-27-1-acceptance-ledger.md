@@ -57,8 +57,8 @@ runs above; their lines are the orchestrator's.
 **Evidences:** TOOL-dDerivedDocket-27
 - AC2 — `probe gate` — a stub bar that never printed the acquire line, under a backstop of 3 pinned
   as `3 (wall 1 + queue 1 + margin 1)` by the margin seam, was killed and `gates-green` was UNMET
-  printing `hold · host-degraded · until probe gate · the bar was killed at its backstop before it
-  acquired the repository` and the `--hold` it names, and no never-returned text.
+  printing the `host-degraded` hold line released by `probe gate`, reason "the bar was killed at its
+  backstop before it acquired the repository", and the `--hold` it names, and no never-returned text.
 - AC4 — `--preflight` — over a fixture declaring `GATE_WALL="10"` under a profile printing wall 40,
   queue 20 and ceiling_max 30, `--preflight` refused as check 85 naming 10s and 30s, printed that the
   run-state file is unchanged, and left the record byte-identical and the tree clean; at a wall of 30
@@ -69,8 +69,8 @@ runs above; their lines are the orchestrator's.
 - AC9 — amended rev-8 — withdrawn with S11, as `TOOL-dDerivedDocket-61` deletes the lease bound
   it graded; rev-9 names what that unit carries of the property and what it does not.
 - AC11 — `gate queue: acquired` — a stub bar that printed the acquire line and then hung past the
-  same 3 s backstop left `gates-green` UNMET with `the merge bar did not answer within its 3s
-  backstop (wall 1 + queue 1 + margin 1) and was killed after`, and no `hold ·` line.
+  same 3 s backstop left `gates-green` UNMET with "the merge bar did not answer within its 3s
+  backstop (wall 1 + queue 1 + margin 1) and was killed after", and no `hold ·` line.
 - AC12 — `GATE_WALL=7` — under `GATE_WALL="7"` the stub bar recorded `GATE_WALL=7` and the backstop
   read `wall 7`; under a blank wall, with `GATE_WALL=99` exported to the driver, it recorded
   `GATE_WALL=<unset>` and the driver printed the NOTE that the unattended bar runs under the gate

@@ -5178,6 +5178,7 @@ else
     # shellcheck disable=SC2086
     env -u GATE_WALL timeout -k 5s "$_c42_b" $GATE_PROFILE_CMD </dev/null >"$_c42_d/out" 2>/dev/null; _c42_rc=$?
   else
+    report "check 42 runs the declared GATE_PROFILE_CMD UNBOUNDED: this host has no runnable 'timeout -k', or no bound could be read from the conf or the driver"
     # shellcheck disable=SC2086
     env -u GATE_WALL $GATE_PROFILE_CMD </dev/null >"$_c42_d/out" 2>/dev/null; _c42_rc=$?
   fi
