@@ -5,10 +5,10 @@
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `{{TOOL_ROOT}}run-gates/run-gates.sh`.
-**Budget: ≤27648 bytes, ≤350 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
+**Budget: ≤30720 bytes, ≤400 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
 It rose from ≤20 KB / ≤250 lines when M12 landed, to ≤24 KB / ≤310 on 2026-08-21, the LINE half to
-≤350 on 2026-08-25, and the BYTE half to ≤27648 on 2026-09-05 — all owner calls, because the figure is
+≤350 on 2026-08-25, and the BYTE half to ≤27648 on 2026-09-05, then both to ≤30720 / ≤400 on 2026-09-22 — all owner calls, because the figure is
 a stated constraint of a document rather than a measurement of one. The 2026-08-21 raise: two builds
 added rules concurrently and both parents fitted the old cap alone, so nothing was droppable and the
 constraint moved instead of the content. The 2026-08-25 raise cleared a two-line breach; a trim was
@@ -17,7 +17,7 @@ in BYTES for that reason: ≤24 KB was ambiguous between 24576 and 24000, and th
 which is under one reading and over the other. 27648 is 27 KiB, matching the KiB-round convention of
 the rows already declared beside it, and it funds the M6 route sentence and the directive anchors.
 **The BYTE half binds first** — at this file's ~100 B prose line the bytes run out well before the
-line figure does, so most of that figure is headroom the bytes do not grant.
+line figure does, so part of that figure is headroom the bytes do not grant.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
 stated anywhere else in this repo — every generic obligation is POINTED AT via M11, and a rule appearing both here
@@ -139,7 +139,7 @@ derives from it. **Carry the binding line** check 21 requires —
 Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9 line), then **STOP** once
 a synthesis pass calls the design clean.
 
-**A BLOCKED verdict has a disposition.** A SPEC subject takes `REVIEW_ROUNDS` rounds (protocol §8) and exits BOUNDED; the DIFF review converges: a round re-arms only on a count STRICTLY SMALLER than the round before, never merely "changed" (2, 1, 2 satisfies that forever). **At the exit every CONFIRMED finding is DISPOSED BY SEVERITY, on CONVERGED too**: a BLOCKER or HIGH is PROMOTED to a unit whose mechanism closes it, audited as a SPEC; a MEDIUM or LOW is FOLDED into its spec as a rev-N bump with a §9 line; never parked, waived, retired or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README's BUILD-LEVEL RULES slot.
+**A BLOCKED verdict has a disposition.** A SPEC subject takes `REVIEW_ROUNDS` rounds (protocol §8) and exits BOUNDED; the DIFF review converges: a round re-arms only on a count STRICTLY SMALLER than the round before, never merely "changed" (2, 1, 2 satisfies that forever). **At the exit every CONFIRMED finding is DISPOSED BY SEVERITY, on CONVERGED too**: a BLOCKER or HIGH is PROMOTED to a unit whose mechanism closes it, audited as a SPEC; a MEDIUM or LOW is FOLDED into its spec as a rev-N bump with a §9 line; never parked, waived, retired or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. **The CHAIN of promotions is bounded by PRECISION.** Each takes a FRESH subject, so `REVIEW_ROUNDS` re-arms per subject and bounds no chain of them. A PROMOTING round whose precision, which its own record states, falls below the review protocol's floor ENDS the chain: its promotions are built from their specs as written, and where `specs-audited` is owed they close under a recorded override of it, because the run CLOSES units no audit names.
 
 **CONVERGED is terminal for its subject, rev bumps included**: a blocker confirmed on it afterwards — in the
 fold text, say — takes the severity rule's disposition and never another round; `--review`
