@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier
 
-**Status:** SPECCED · rev-5 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 38
+**Status:** SPECCED · rev-6 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 39
 
 <!-- gen:spec-records -->
 
@@ -485,6 +485,9 @@ is `subject = repo` and runs on any bar.
 - rev-5 · 2026-09-22 · order re-declared from 34 to 38 in the status header only, derived
   from the §3 edges: the G8 bounded exit promoted TOOL-dDerivedDocket-62, -63 and -64 to run
   after TOOL-dDerivedDocket-61, so this unit runs at order 38, alone. No criterion, design or edge moved.
+- rev-6 · 2026-09-22 · order re-declared from 38 to 39 in the status header only, derived from the §3
+  edges: the G9 exit promoted TOOL-dDerivedDocket-65 to run at 35, after 64. No criterion, design or
+  edge moved.
 
 ## 10. Reuse audit
 

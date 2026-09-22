@@ -1,6 +1,6 @@
 # PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception
 
-**Status:** SPECCED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams playbook · order 37
+**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams playbook · order 38
 
 <!-- gen:spec-records -->
 
@@ -495,6 +495,9 @@ an observation made once in the unit pass. The bar runs once, after every unit i
 - rev-7 · 2026-09-22 · order re-declared from 33 to 37 in the status header only, derived
   from the §3 edges: the G8 bounded exit promoted TOOL-dDerivedDocket-62, -63 and -64 to run
   after TOOL-dDerivedDocket-61, so this unit runs at order 37, alone. No criterion, design or edge moved.
+- rev-8 · 2026-09-22 · order re-declared from 37 to 38 in the status header only, derived from the §3
+  edges: the G9 exit promoted TOOL-dDerivedDocket-65 to run at 35, after 64. No criterion, design or
+  edge moved.
 
 ## 10. Reuse audit
 

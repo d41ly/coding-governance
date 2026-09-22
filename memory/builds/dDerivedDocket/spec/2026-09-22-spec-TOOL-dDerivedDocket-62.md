@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE
 
-**Status:** SPECCED · rev-3 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 32
+**Status:** SPECCED · rev-5 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 32
 
 <!-- gen:spec-records -->
 
@@ -19,11 +19,13 @@ record carried by two worktrees is resumed twice, and the stale sibling is resum
 own worktree reads LIVE. Give each slug ONE answer per node: only the worktree whose checked-out
 branch is the record's run branch acts, and every other copy reads the named verdict `ELSEWHERE`.
 There the tick prints a named skip and kills nothing, and the resume matrix's HELD and working rows
-refuse, numbered, naming the run's branch. This is route (a) of finding B1 in the G8 round-1 audit
-of unit 61. That audit's M5 is not this unit's: unit 61's rev-3 folded it into that unit's own
-pushed-landing re-bind row, which prints nothing to resume and writes nothing off the branches
-where that landing's own `--landed` runs, so this unit leaves that row to unit 61 and guards the
-rows after it (§8 F9).
+refuse, numbered, naming the run's branch, for a record that carries a lease; a record carrying
+none keeps unit 61's no-lease rows from any worktree (§8 F10). This is route (a) of finding B1 in
+the G8 round-1 audit of unit 61. That audit's M5 is not this unit's: unit 61's rev-3 folded it into
+that unit's own pushed-landing re-bind row, which prints nothing to resume and writes nothing off
+the branches where that landing's own `--landed` runs, bar a record naming neither branch fact,
+which it re-binds from any branch and announces as not scoped (its S8). So this unit leaves that row
+to unit 61 and guards the rows after it (§8 F9).
 
 ## 2. Scope (IN)
 
@@ -36,19 +38,22 @@ rows after it (§8 F9).
 - **S2** `--liveness` reads `verdict: ELSEWHERE` on a return of 1, second in the verdict order after
   `TERMINAL`, and prints a fifteenth key, `holder-ref`, after `stale-bound`: the ref, or `absent`, on
   every run that reaches a verdict. An `unreadable` HEAD is the verb's existing dead probe and
-  refuses at `fail 52`. Observed by AC1 and AC8.
+  refuses at `fail 52`. Observed by AC1, AC8 and AC13.
 - **S3** `tools/unattended/resume-tick.sh` reads `holder-ref` and prints two named skips that kill
   and launch nothing: `skip · ELSEWHERE` on that verdict, and `skip · NO RUN BRANCH` where a verdict
   that would act meets `holder-ref: absent`. Its header's decision table gains both rows. Observed by
-  AC2, AC3 and AC8.
-- **S4** The resume matrix's HELD and working rows refuse outside the holder worktree.
-  `check_holder_worktree <slug> <run-state file>` holds the one new `fail 58` branch, which names
-  the run's branch, the worktree that has it checked out or that none does, and this worktree's
-  HEAD, after the `--status` block when no id was passed. On a record naming no branch it announces
-  that and lets the call through. `verb_resume` calls it once, directly after unit 61's
-  observed-landing row and ahead of the first HELD row, and nowhere else, so it reaches no row of
-  the derived-terminal branch, whose re-bind row keeps unit 61's own branch scope (§8 F9).
-  Observed by AC4, AC5, AC6 and AC8.
+  AC2, AC3, AC8 and AC13.
+- **S4** The resume matrix's HELD and working rows refuse outside the holder worktree, for a record
+  that carries `lease-utc`. `check_holder_worktree <slug> <run-state file>` holds the one new
+  `fail 58` branch, which names the run's branch; the worktree that has it checked out, or that none
+  does, or that no branch of that name exists on this node; and this worktree's HEAD, after the
+  `--status` block when no id was passed. On a record naming no branch it announces that and lets
+  the call through. `verb_resume` calls it once, directly after unit 61's observed-landing row and
+  ahead of the first HELD row, only for a record carrying `lease-utc`, and nowhere else. So it
+  reaches no row of the derived-terminal branch, whose re-bind row keeps unit 61's own branch scope
+  (§8 F9), and no row a record without `lease-utc` reaches, HELD or working, whose working rows are
+  unit 61's no-lease rows on unit 4 §8 F8's build-folder clock (§8 F10). Observed by AC4, its HELD
+  arm included, AC5, AC6, AC8 and AC14.
 - **S5** `tools/unattended/stop-guard.js` ALLOWS a stop whose verdict is `ELSEWHERE`, with reason
   `elsewhere`, directly after unit 61's `held` row; `REASONS` and the header's decision table gain
   it. Observed by AC7.
@@ -62,12 +67,14 @@ rows after it (§8 F9).
 - **S8** The suite arms follow the code. The new arms §7 names are written and each is staged RED;
   `add_sibling_worktree` sits beside the tick suite's `build_fixture`, which now writes
   `run-branch: refs/heads/main`; the driver suite's three `--liveness` key-count and key-order arms
-  expect fifteen keys; and every existing arm that reaches a guarded row off the record's branch is
-  retargeted onto that branch at the same commit, one for one, which moves no floor. Each suite's
-  executed-assertion floor rises by exactly the assertions its new arms carry, counted off their
-  blocks and never read off a run: the driver suite's `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, its
-  new arms written in region two beside the arms they extend, and the resume-tick and
-  stop-guard suites' `FLOOR_ASSERTIONS`. Observed by AC11.
+  expect fifteen keys; and every existing arm that reaches a guarded row, or reads a `--liveness`,
+  stop-guard or tick verdict that ELSEWHERE now changes, off the record's branch is retargeted onto
+  that branch at the same commit, one for one, which moves no floor. Unit 61's AC10 is not among
+  them: it reads its later LANDING record in the linked worktree on the run branch and owns that
+  arm (§4). Each suite's executed-assertion floor rises by exactly the assertions its new arms
+  carry, counted off their blocks and never read off a run: the driver suite's `FLOOR_ASSERTIONS`
+  and `FLOOR_SHARD_2`, its new arms written in region two beside the arms they extend, and the
+  resume-tick and stop-guard suites' `FLOOR_ASSERTIONS`. Observed by AC11.
 - **S9** The unit's hygiene: no kit version moves, no kit file gains a kit-path literal, every new
   function name passes the lexicon, the new `fail` branch is armed, and no pinned row of
   `memory/project/unarmed-branches.txt` moves. Observed by AC12.
@@ -87,9 +94,11 @@ rows after it (§8 F9).
   reaches a verdict, and skipping the reads is a follow-up.
 - A linked worktree in every tick fixture, the audit's left-shift as written. §8 F8.
 - Detecting one branch forced into two worktrees. §5 risk (4).
+- A guard on a record carrying no lease. §8 F10.
 - The audit's M5, whole. Unit 61's rev-3 folded it: off the branches where a pushed landing's own
   `--landed` runs, its re-bind row prints nothing to resume, names the run branch and writes nothing
-  (its S8, §4 and AC23), and the Skill keeps its check-51 sentence (its S11 and AC13). This unit's
+  (its S8, §4 and AC23), bar a record naming neither branch fact, and the Skill keeps its check-51
+  sentence (its S11 and AC13). This unit's
   guard does not reach that row (§8 F9). M3's clock scoping is unit 61's own fold too, and H1 and H2
   are promoted to units of their own.
 - A `memory/DECISIONS.md` row. The rule lands in the stop contract's §8, a binding carrier, and the
@@ -99,7 +108,8 @@ rows after it (§8 F9).
 ### Edges
 
 - **consumes-from** `TOOL-dDerivedDocket-61` — the re-keyed resume matrix, whose observed-landing
-  row places this unit's one call site, ahead of the HELD and working rows it guards, and whose
+  row places this unit's one call site, ahead of the HELD and working rows it guards on a record
+  carrying a lease, whose no-lease rows it leaves as that unit specifies them (§8 F10), and whose
   re-bind row inside the derived-terminal branch keeps the branch scope that unit's S8 gives it and
   its AC23 observes, which this unit leaves unguarded (§8 F9); `--liveness`'s HELD verdict and
   verdict order, into which ELSEWHERE goes second; the tick's named HELD arm and the stop-guard's
@@ -109,10 +119,17 @@ rows after it (§8 F9).
   reap on the `--resume` rows that hold the lease. AC4 reads that ledger byte-unchanged after a
   refused call from a sibling worktree, and §4 states what that unit's prune-race argument rests on
   now.
+- **hands-off** `TOOL-dDerivedDocket-64` — the tick's `skip · NO RUN BRANCH` row, which a verdict
+  that would act meets on `holder-ref: absent`, so that unit's fixtures that feed the tick carry a
+  `run-branch` fact naming the branch their HEAD has checked out; and the rule that only the
+  worktree on the run's branch acts, which is where the clock that unit extends is read.
 - **hands-off** external — the gotcha record for the class the audit names: state moved from the git
   common dir into a tracked file becomes one copy per worktree, and every actor that walks worktrees
   must join on the slug. In this kit the class is gated by the arms S8 adds; the record, with the
   dossier claim a new gotcha owes, is a follow-up outside this build.
+- **hands-off** `TOOL-dDerivedDocket-65` — the per-worktree scope of `derive_last_move`, which that
+  unit keeps by reaching the recorded session's `subagents/` directory through the derived
+  transcript path rather than a common-dir scan.
 
 ## 4. Design
 
@@ -165,9 +182,10 @@ ELSEWHERE second.
   log unit 61 writes, so every copy that carries either reads the same, and acting on it is nothing.
 - ELSEWHERE precedes FINISHED-UNSTAMPED. Under in-place landing the primary tree carries the
   unobserved LANDING record too once it fast-forwards, and two copies reading an acting verdict is
-  the measured shape above.
+  the measured shape above. AC13 makes both true at once and is staged RED by the swap.
 - ELSEWHERE precedes HELD. A sibling copy holds whatever phase the record had when that worktree
-  branched, so it cannot tell a held run from a working one.
+  branched, so it cannot tell a held run from a working one. AC4's HELD arm reads a HELD sibling
+  copy as ELSEWHERE.
 
 The fifteenth key, `holder-ref`, prints `HW_REF` or `absent` after `stale-bound`, on every run that
 reaches a verdict. The clock keys are still measured and printed in an ELSEWHERE copy; they describe
@@ -196,39 +214,53 @@ On 2 it prints `unattended: this record names no run branch (neither run-branch 
 which worktree drives it cannot be shown and this worktree's copy is graded on its own clocks` and
 returns 0. On 1 it prints the `--status` block first when no `--keepalive-id` was passed, as every
 no-id row does under the stop contract's §8. It then reads the worktree whose `branch` line equals
-`HW_REF` from `GIT worktree list --porcelain`, the listing `verb_landed` already walks at `:3980`,
-and refuses once:
+`HW_REF` from `GIT worktree list --porcelain`, the listing `verb_landed` already walks at `:3980`.
+When no worktree has it checked out, `GIT rev-parse --verify -q` on `HW_REF` decides between the
+last two variants below, so the remedy names re-creating a branch only where none exists and never
+names a checkout that cannot be made (§8 F10). It refuses once:
 
 ```
 fail 58 "this worktree is not on the run's branch, so its copy of the record is not the run's, and
 resuming or taking over from it would drive one slug from a stale copy; the run is
 driven from the worktree that has <ref> checked out: <path | no worktree on this node has it
-checked out, so check it out first>. Nothing was written. This worktree: <ref | a detached HEAD |
-an unreadable HEAD>"
+checked out, so check it out first | no branch of that name exists on this node, so create it at a
+commit that carries this record and check it out>. Nothing was written. This worktree: <ref | a
+detached HEAD | an unreadable HEAD>"
 ```
 
 Nothing is written, reaped or pruned, and it returns 1. `verb_resume` calls it at one site, with
-`|| return 1`: directly after unit 61's observed-landing row and ahead of the first HELD row, so it
-guards every HELD row and every working row, on every clock, with an id and without.
+`|| return 1`, when the record carries `lease-utc`: directly after unit 61's observed-landing row
+and ahead of the first HELD row, so it guards every HELD row and every working row of a leased
+record, on every clock, with an id and without. A record carrying no `lease-utc` passes that site
+unguarded and meets unit 61's rows as that unit specifies them, its working rows on the build
+folder's clock (§8 F10).
 
 Unguarded, and unchanged: `check_asks_pinned`, the `--scheduled` refusals, `refuse_if_terminal
 --recorded` with an id at `:5745`, every row of unit 61's derived-terminal branch at `:5746`, and
 the observed landing. All but one write nothing, and each of those is the answer every copy that
 carries the record gives (§8 F5). The one that writes is unit 61's re-bind, and that unit already
 confines it to a branch where the landing's own `--landed` runs, the run branch or, under
-`primary`, the default branch, printing nothing to resume from any other (its S8 and AC23). This
-unit leaves that scope as unit 61 states it, so each behaviour of that row has one owner (§8 F9). A
-durable restart's prompt names the worktree `--hold` ran in, and the tick relaunches in the worktree
-it read, so both land in the holder worktree and pass.
+`primary`, the default branch, printing nothing to resume from any other, except on a record naming
+neither branch fact, which it re-binds from any branch and announces as not scoped (its S8 and
+AC23). This unit leaves that scope as unit 61 states it, so each behaviour of that row has one
+owner (§8 F9). A durable restart's prompt names the worktree `--hold` ran in, and the tick
+relaunches in the worktree it read, so both land in the holder worktree and pass.
 
 Measured by an awk scan of each call's nearest preceding checkout (PINNED, `07997375`): two of the
 driver suite's `--resume` and `--liveness` calls run off the record's branch. The no-id resume on a
 landed fixture checked out as `main` (`tools/unattended/unattended.test.sh:2992`) is the unguarded
 derived-terminal row. The `--scheduled` resume on a detached HEAD (`:7977`) meets check 60 before
 the matrix. Both keep their output. The builder re-runs the scan at the pass's parent, because unit
-61's arms join the population first, and S8 retargets whatever it finds in a guarded row. The arm
-of unit 61's AC23, which calls the re-bind row from a new branch and from the default branch, joins
-it in an unguarded row and keeps its output unchanged.
+61's arms join the population first, and S8 retargets whatever it finds in a guarded row. The re-run
+covers the stop-guard and tick suites' verdict readings too, because ELSEWHERE changes a verdict and
+not only a row, and S8 retargets any reading it newly changes. Unit 61's AC10 arm is the known
+member of that population, and it is not retargeted: its readings from its detached second
+worktree are of an observed landing, which TERMINAL answers ahead of ELSEWHERE, and its
+later-record reading is taken in its first linked worktree, on the run branch, where no ELSEWHERE
+reaches (its AC10, G9 M5). So that arm has one owner, unit 61. The arm of unit 61's AC23, which
+calls the re-bind row from a new branch and from the default branch, joins it in an unguarded row
+and keeps its output unchanged, and so do unit 61's arms over a record carrying no lease, whatever
+branch they run on (§8 F10).
 
 ### The stop-guard
 
@@ -248,15 +280,19 @@ is decided on the calling worktree's copy and clocks, so two worktrees can each 
 for one slug, and the argument has no single holder under it: B1's third case.
 
 With this unit, the `--resume` half rests on `check_holder_worktree`. The take-over and holder rows
-unit 28 reaps on are reached only in the one worktree whose HEAD is the run's branch, git lets no
-second worktree check it out, and a refused call from any other worktree reaps, prunes and writes
-nothing, which AC4 reads back. The other three reaping verbs, `--preflight`, `gates-green` inside
+unit 28 reaps on are reached, for a record carrying a lease, only in the one worktree whose HEAD is
+the run's branch; git lets no second worktree check it out, and a refused call from any other
+worktree reaps, prunes and writes nothing, which AC4 reads back. The other three reaping verbs,
+`--preflight`, `gates-green` inside
 `--close`, and `--hold`, are not matrix rows, and this unit does not guard them. That each runs only
 in the holder's worktree rests, as it did under unit 4's lease file, on the contract that a session
 drives its run from the run's worktree. `--preflight` re-admits only the recorded keepalive (check
 82, `:4769`) and `--hold` refuses a `--reaped` naming another id (check 56); those are identity
-checks and not worktree checks. A record naming no run branch keeps the per-copy reading, so for
-that population the argument rests on nothing mechanical, and that population is measured empty.
+checks and not worktree checks. A record naming no run branch keeps the per-copy reading, and so
+does a record carrying no lease (§8 F10), so for those populations the argument rests on nothing
+mechanical. The first is measured empty. The second is the two abandoned BUILDING records of §4
+Migration, whose branches exist nowhere, and any copy of this build's own record made before unit
+61's Rollout recorded its lease facts.
 
 ### Where the text goes
 
@@ -270,16 +306,17 @@ and the whole of §8, so the pass re-measures at its parent.
 | protocol | "The tick acts only on a lease the INDEX holds, on the node that took it" gains ", in the worktree on the run's branch" | +37 | 0 |
 | protocol | "Registering the tick is the owner's, one line per OS in the kit README; `--check` reports it as INFO." is removed: the kit README's registration section carries both facts | −102 | 0 |
 | verb carrier, template and render | the `--liveness` entry at `tools/unattended/VERBS.template.md:93` gains `ELSEWHERE`, and its closing clause becomes "then the `stale-bound` it was graded against and the `holder-ref` a worktree must have checked out" | −4 | 0 |
-| stop contract, template and render | §8 gains one row and one sentence | +286 | derived |
+| stop contract, template and render | §8 gains one row and one sentence | +305 | derived |
 | stop contract | §9's history sentence beginning "What changed is the sentence that followed it" is removed | −195 | derived |
 | stop contract | §10's placement sentence beginning "It is here rather than there because the protocol is at its cap" is removed | −124 | derived |
 
-The protocol nets −32 bytes, the verb carrier −4 and the stop contract −33, and neither the protocol
-paragraph nor the verb entry re-wraps to more lines. The stop contract's §8 row reads `| any other |
-from a worktree not on the run's branch | refuses, numbered, naming the branch and its worktree;
-writes nothing |`. It sits directly above the first HELD row, below every row unit 61's table gives
-the recorded terminal, the derived terminal and the observed landing, the re-bind row and its
-off-branch row included, so no row of unit 61's table moves. The sentence joins the first paragraph
+The protocol nets −32 bytes, the verb carrier −4 and the stop contract −14, and neither the protocol
+paragraph nor the verb entry re-wraps to more lines. The stop contract's §8 row reads `| any other
+carrying lease-utc | from a worktree not on the run's branch | refuses, numbered, naming the branch
+and its worktree; writes nothing |`, whose record cell's 19 bytes the G9 fold added (§8 F10). It
+sits directly above the first HELD row, below every row unit 61's table gives the recorded
+terminal, the derived terminal and the observed landing, the re-bind row and its off-branch row
+included, so no row of unit 61's table moves. The sentence joins the first paragraph
 below the table, so it adds no blank line: "The run's branch is `run-branch`, else `branch-ref`, and
 git checks a branch out in one worktree at most; a record naming neither is graded where it is
 read." Its line delta is derived at the build commit against the two trims, which free about three
@@ -287,13 +324,13 @@ lines.
 
 The Skill carries no size row. Its tick paragraph at `tools/unattended/SKILL.template.md:29`, in the
 list of refusals unit 61 writes as expected before `--preflight`, gains "or check 58 naming another
-branch, where this worktree's copy is a HELD or working record and this worktree is not on its run
-branch". Unit 61's check-51 sentence for an in-place previous record stands as that unit writes it,
-because this unit's guard does not reach the derived-terminal branch. The Skill's what-wakes
-paragraph at `:75` has the stop-guard, reading the run's own worktree, refuse a turn end. Its Resume
-section at `:835` gains, after the refused-resume sentence: "A check-58 refusal that names the run's
-branch means this worktree is not the run's: reap only the job you just scheduled, and resume from
-the worktree the refusal names."
+branch, where this worktree's copy is a HELD or working record carrying a lease and this worktree is
+not on its run branch". Unit 61's check-51 sentence for an in-place previous record stands as that
+unit writes it, because this unit's guard does not reach the derived-terminal branch. The Skill's
+what-wakes paragraph at `:75` has the stop-guard, reading the run's own worktree, refuse a turn
+end. Its Resume section at `:835` gains, after the refused-resume sentence: "A check-58 refusal
+that names the run's branch means this worktree is not the run's: reap only the job you just
+scheduled, and resume from the worktree the refusal names."
 
 ### Inventory
 
@@ -336,10 +373,13 @@ worktree whose HEAD carries a record with a `session` fact. Measured on node `d`
 - This build's record carries `branch-ref` and no `run-branch`. It was preflighted at `e7da7bf5`,
   whose driver had no fact-13 writer, since `7e9bbeff` is not its ancestor, so it is keyed by fact
   10, which names the local branch exactly.
-- The two other BUILDING records, `aClosedDocket` and `aUnblockedFleet`, name branches that do not
-  exist locally on node `d`, so no worktree here holds either. Their `--resume` refuses at 58 naming
-  that branch, where under unit 61 alone it would claim a live session drives them. That is the
-  audit's M3 population, and taking one over now starts by checking its branch out.
+- The two other BUILDING records, `aClosedDocket` and `aUnblockedFleet`, carry `keepalive` and no
+  `lease-utc`, and name branches that no ref names on node `d`, local or remote-tracking; their
+  build folders were last committed on 2026-09-05 and 2026-08-31. Re-measured at `67d2ccfc` for the
+  G9 audit's M4, against unit 61 at its rev-7: under that unit both meet its no-lease rows and, past
+  the bound, are taken over from any worktree, announced as records with no lease, as unit 4 §8 F8
+  decided. This unit's guard does not reach them (§8 F10), so that answer is unchanged, and AC14
+  reads it for a run branch that exists nowhere.
 
 ### Rollout
 
@@ -349,7 +389,9 @@ run branch, every wave worktree branched after it carries a session-bearing copy
 the matrix would grade per worktree. That window is inert on node `d`, as measured: no tick is
 registered there, a sidechain agent's stop is not a `Stop` event the hook grades, and
 `tools/workflows/unattended-unit.js` and `unattended-build.js` name neither `--resume` nor a
-keepalive id. Registering the tick is the owner's act, and it should wait for this unit. Rollback is
+keepalive id. Registering the tick is the owner's act, and it should wait for this unit and for
+`TOOL-dDerivedDocket-65`, promoted from the G9 audit's H1: while the orchestrator waits on a
+Workflow, the run worktree, the one copy this unit lets act, can read STALE (§8 F1). Rollback is
 a revert of the build commit, after which every copy is graded per worktree again, with nothing on
 disk to undo.
 
@@ -386,7 +428,8 @@ disk to undo.
   PINNED, node `d` 2026-09-22: `--liveness` averaged 0.71 s over the fixture. An ELSEWHERE copy still
   pays the whole clock: a tick over two worktrees took 2.69 s against 1.57 s over one.
 - error / empty / loading states — A record naming no branch prints `holder-ref: absent`, the tick
-  skips it by name, and the matrix announces the per-copy reading. An unreadable HEAD is `fail 52`.
+  skips it by name, and the matrix announces the per-copy reading. A record carrying no lease meets
+  unit 61's rows unguarded (§8 F10). An unreadable HEAD is `fail 52`.
   `tools/push-main.sh` detaches the run worktree for the seconds of a `--prepare` (`:380`), and in
   that window every copy reads ELSEWHERE, so nothing acts, which is the safe direction.
 - observability — `verdict: ELSEWHERE` and the `holder-ref` key; the tick's `skip · ELSEWHERE` and
@@ -399,14 +442,22 @@ disk to undo.
   re-bind there, which this unit does not guard (§8 F9), while `--liveness` in that tree reads
   ELSEWHERE, so the stop-guard allows a stop there before the landing is stamped: its
   `landing-unstamped` block binds only in the run's worktree (§8 F7). (3) A re-run on a new branch
-  meets unit 61's off-branch answer, which writes nothing; one started on its predecessor's own
-  branch still reaches unit 61's re-bind row before its `--preflight`, which then refuses at
-  check 2: unit 61's §5 risk (4), which this unit neither closes nor widens.
+  meets unit 61's off-branch answer, which writes nothing, unless the record names neither branch
+  fact, which unit 61 re-binds from any branch and announces as not scoped (its S8); one started
+  on its predecessor's own branch still reaches unit 61's re-bind row before its `--preflight`,
+  which then refuses at check 2: unit 61's §5 risk (4), which this unit neither closes nor widens.
   (4) `git worktree add -f` or
   `git checkout --ignore-other-worktrees` puts one branch in two worktrees, and both then hold and
   each grades its own copy. (5) A run whose worktree was removed, or left detached by the lander's
-  failure at `tools/push-main.sh:407`, is acted on by no copy until its branch is checked out again.
-  (6) A run branch renamed mid-run leaves the record naming the old ref, with the same effect.
+  failure at `tools/push-main.sh:407`, is acted on by no copy until its branch is checked out again,
+  and one whose branch was deleted is refused with the remedy of re-creating it (§4). (6) A run
+  branch renamed mid-run leaves the record naming the old ref, with the same effect. (7) A record
+  carrying no lease is answered per copy by the matrix from any worktree, HELD or working, as under
+  unit 61 alone: its no-lease rows grade the run's build folder rather than the calling worktree's
+  clocks, and `--liveness` grades it UNBOUND in every copy, so the tick acts on none (§8 F10).
+  Measured at `67d2ccfc`, that population is the two abandoned BUILDING records of §4 Migration, no
+  HELD record is tracked, and a copy of this build's own record made before unit 61's Rollout joins
+  it for as long as that copy's worktree stands.
 - testing — The arms §7 names, each staged RED in the pass and executed once at VERIFYING under
   attribution; the direct observations in §6 are fixture runs of the driver, the tick and the hook.
 - migration — §4 Migration: no fact or file is added, and the population a new skip or refusal
@@ -452,19 +503,31 @@ disk to undo.
   either worktree, and unit 28's `tRun.procs` ledger in the common dir's `unattended` directory is
   byte-unchanged. With every commit aged past `RESUME_STALE_BOUND`, the id call still refuses in the
   linked worktree, and run in the run worktree it prints `presumed-stopped` and takes the run over.
+  HELD arm: with the record moved to `HELD` with its condition met and committed on `unit` before
+  the linked worktree is added on `wave`, `--liveness tRun` in the linked worktree prints
+  `verdict: ELSEWHERE`; `CLAUDE_CODE_SESSION_ID=T` `--resume tRun --keepalive-id C` there refuses at
+  check 58 naming `refs/heads/unit`, after which `git status --porcelain` prints nothing in either
+  worktree; and the same call in the run worktree takes the run over, as unit 61's AC12 reads. That
+  arm is staged RED by a driver copy that calls `check_holder_worktree` only inside the working
+  branch, under which the linked call takes the run over.
   Red when: a sibling copy reaches the matrix and is graded on that worktree's clocks, so a second
   session takes the slug over while its holder is live elsewhere, B1's second case; or a refused call
-  reaps or prunes the shared ledger, the race unit 28's argument excludes.
+  reaps or prunes the shared ledger, the race unit 28's argument excludes; or the guard sits after
+  the HELD rows, so a sibling copy reading HELD with its condition met takes the run over through
+  `run_takeover` (G9 M2).
   fixture: an authorized record at a pinned BASE over a local bare remote, committed on `unit` at a
   working phase with lease facts naming session `S` and keepalive `k1`, the shape the driver suite's
   prologue builds, plus unit 28's ledger holding one record; the tree holds none outside that suite.
 - **AC5** — When AC4's id call runs in the linked worktree after `git checkout --detach` there, its
   check-58 message names `a detached HEAD`. When the run worktree is first moved off `unit` with
   `git checkout -b parked`, the message names `refs/heads/unit` and says that no worktree on this
-  node has it checked out. Once `unit` is checked out in the run worktree again, the same call run
-  there reaches the matrix rows unit 61 specifies.
-  Red when: the refusal names no branch or no place, so its remedy is a guess; or a worktree regains
-  the run by any act but checking the run's branch out.
+  node has it checked out. With `unit` then deleted by `git branch -D unit`, the message says that
+  no branch of that name exists on this node and names re-creating it at a commit that carries the
+  record. Once `unit` is re-created at `parked` and checked out in the run worktree again, the same
+  call run there reaches the matrix rows unit 61 specifies.
+  Red when: the refusal names no branch or no place, so its remedy is a guess; or it tells an
+  operator to check out a branch that exists nowhere, a remedy that cannot be followed (G9 M4); or a
+  worktree regains the run by any act but checking the run's branch out.
 - **AC6** — Under `LANDER_MODE="in-place"`, take a fixture whose committed LANDING record names
   `run-branch: refs/heads/unit` and is pushed to a local bare `origin`, so `--status` prints
   `phase LANDED (derived:`, and check out a new branch `rerun` at that commit: a re-run build's
@@ -519,8 +582,9 @@ disk to undo.
   Red when: an addition lands without its trim, so the protocol, already over its cap under a
   curation-debt waiver, grows; or the reading is taken against this spec's figures instead of the
   parent commit.
-  figure: the −32, −4 and −33 bytes of §4 are PINNED at `07997375` against that base's text; the
-  not-greater test is derived at the build commit.
+  figure: the −32 and −4 bytes of §4 are PINNED at `07997375` against that base's text, and the
+  stop contract's −14 is that base's −33 plus the 19 bytes the G9 fold added to the row's record
+  cell; the not-greater test is derived at the build commit.
 - **AC11** — When the orchestrator's attributed run reads `verdict clean` over the driver,
   resume-tick and stop-guard suites at VERIFYING, the arms §7 names are among the
   executed ones, with the driver suite's three `--liveness` key arms expecting fifteen keys ending in
@@ -545,13 +609,51 @@ disk to undo.
   permission: the verdicts are the `lexicon naming predicates`, `harness arms (fail branches armed or
   pinned)`, `kit version markers` and `install-prefix (shipped surface)` legs, observed at the
   VERIFYING bar.
+- **AC13** — Take AC1's fixture with its record rewritten to an in-place `LANDING` whose `witness`
+  is a commit the default branch contains, so it derives LANDED, with no landed-log line naming it,
+  committed on `run` dated past the bound before the linked worktree is added on `wave`.
+  `--liveness tRun` prints `verdict: ELSEWHERE` in the linked worktree and
+  `verdict: FINISHED-UNSTAMPED` in the run worktree, and `resume-tick.sh --dry-run` prints exactly
+  one `resumed · attempt 1`, for the run worktree, and `skip · ELSEWHERE` for the linked worktree.
+  The arm is staged RED by a driver copy whose verdict chain places ELSEWHERE after
+  FINISHED-UNSTAMPED, under which both worktrees read FINISHED-UNSTAMPED and the tick decides two
+  resumes.
+  Red when: a landing session that died between the in-place push and `--landed` is killed and
+  relaunched from a sibling copy as well as from the run worktree, B1's double drive reached through
+  the one acting verdict other than STALE; or the run's own relaunch is suppressed.
+  fixture: AC1's, the record rewritten to LANDING by hand and committed with `GIT_COMMITTER_DATE`,
+  so no landing runs; the tree holds none.
+  permission: the dry-run decisions are this pass's direct check; the arm that repeats them over
+  `add_sibling_worktree` lives in the resume-tick suite, a held kit suite on no bar leg, executed
+  in the orchestrator's attributed VERIFYING run.
+- **AC14** — Take AC4's authorized record made leaseless as unit 61's S13 makes it, keeping
+  `keepalive` `k1` and none of `session`, `pid`, `host`, `pid-image` and `lease-utc`, with its
+  `run-branch` rewritten to `refs/heads/gone`, a branch no ref of the fixture names, committed on
+  `unit` dated past `RESUME_STALE_BOUND` with `GIT_COMMITTER_DATE`. In the run worktree, which is
+  on `unit` and so not on the record's run branch, `--resume tRun --keepalive-id C` announces
+  `presumed-stopped` as a record with no lease and prints no
+  `this worktree is not on the run's branch`; with the commit dated inside the bound instead,
+  `--resume tRun` with no id prints the status block and refuses at check 59, unit 61's no-lease
+  text. Each call's output and `git status --porcelain` match the same call's over a driver copy
+  whose `check_holder_worktree` always returns 0, each run from the same fixture state. The arm is
+  staged RED by a driver copy that calls `check_holder_worktree` for every record, the previous
+  revision's placement, under which both calls refuse at check 58 naming `refs/heads/gone`.
+  Red when: the guard reaches a record carrying no lease, so an abandoned pre-lease run whose branch
+  exists nowhere is refused with a remedy no operator can follow and loses the take-over past the
+  bound that unit 4 §8 F8 decided, the no-override refusal `TOOL-aReapedTicket-5` records
+  (§8 F10).
+  fixture: AC4's, its five lease facts other than `keepalive` removed and its `run-branch`
+  rewritten; the tree holds none outside the driver suite.
+  permission: the direct fixture runs are this pass's check; the arm that repeats them is written
+  and staged RED in the pass, and the driver suite that executes it is a held kit suite on no bar
+  leg, so it runs in the orchestrator's attributed VERIFYING run.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · a linked worktree added on `wave` after the record commit, with the take-over and no-id calls refused there and the ledger read back, the detached and no-holder message variants, and the no-run-branch announcement, staged RED by a driver copy whose `check_holder_worktree` always returns 0; and the derived-terminal branch and the observed landing left to unit 61, on a new branch under `in-place` with and without the observation and on the default branch under `primary`, staged RED by a driver copy that also calls `check_holder_worktree` at the head of the derived-terminal branch · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks
-New arm: `tools/unattended/resume-tick.test.sh` · `add_sibling_worktree` over a live run, a stale run, a HELD run beside a stale BUILDING copy whose recorded pid is a live `sleep`, and a record naming no run branch; staged RED by a driver copy whose verdict chain drops the ELSEWHERE row · `FLOOR_ASSERTIONS`, raised by exactly the new arms' assertions, counted off their blocks
+New arm: `tools/unattended/unattended.test.sh` · a linked worktree added on `wave` after the record commit, with the take-over and no-id calls refused there and the ledger read back, the detached, no-holder and no-such-branch message variants, and the no-run-branch announcement, staged RED by a driver copy whose `check_holder_worktree` always returns 0; a HELD copy committed before the linked worktree is added, refused there, staged RED by a driver copy that calls `check_holder_worktree` only inside the working branch; a record with no lease whose run branch exists nowhere, answered as unit 61 answers it, staged RED by a driver copy that calls the guard for every record; and the derived-terminal branch and the observed landing left to unit 61, on a new branch under `in-place` with and without the observation and on the default branch under `primary`, staged RED by a driver copy that also calls `check_holder_worktree` at the head of the derived-terminal branch · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks
+New arm: `tools/unattended/resume-tick.test.sh` · `add_sibling_worktree` over a live run, a stale run, a HELD run beside a stale BUILDING copy whose recorded pid is a live `sleep`, and a record naming no run branch, staged RED by a driver copy whose verdict chain drops the ELSEWHERE row; and an unobserved in-place LANDING record aged past the bound beside a sibling copy, staged RED by a driver copy whose verdict chain places ELSEWHERE after FINISHED-UNSTAMPED · `FLOOR_ASSERTIONS`, raised by exactly the new arms' assertions, counted off their blocks
 New arm: `tools/unattended/stop-guard.test.sh` · a stubbed `verdict: ELSEWHERE` bound to the payload's session; staged RED by a hook copy without the `elsewhere` row · `FLOOR_ASSERTIONS`, raised by exactly the new arm's assertions, counted off its block
 
 The driver suite's key arms at `tools/unattended/unattended.test.sh:5880`, `:5882` and `:5897`
@@ -575,7 +677,12 @@ read off a run, which this pass does not make. The driver's new arms are written
   each kill and relaunch, because the tick's in-flight and attempt state is per worktree. It also
   costs one clock per carrying worktree on every `--liveness` call, which the tick makes once per
   worktree, and a sibling's unrelated commit would keep a dead holder fresh, widening the audit's M3.
-  (a) needs no new clock, and the uniqueness it rests on is git's.
+  (a) needs no new clock, and the uniqueness it rests on is git's. That weighing names one side of
+  the joined clock only. Its other side, that (a) also leaves unread the moves a run's unit agents
+  make in wave worktrees and the transcripts a Workflow's sub-agents write under the session's own
+  directory, so the one worktree this unit lets act can read STALE while its holder waits on a
+  Workflow, is G9 H1, promoted at the G9 exit to `TOOL-dDerivedDocket-65`; this fork is not
+  re-opened here.
 - **F2 — which fact names the run's branch.** Options: (a) `branch-ref` alone, as the audit wrote it;
   (b) `run-branch`, else `branch-ref`. RESOLVED (agent, 2026-09-22, delegated): (b). Fact 10 is
   written only where the second anchor fired, so a default-branch run carries none, by the driver's
@@ -602,7 +709,9 @@ read off a run, which this pass does not make. The driver's new arms are written
   nothing, and each of those is the answer every copy carrying the record gives, which is the
   one-answer property itself: a recorded terminal is frozen, and the observation sits in the
   common-dir log. The re-bind writes, and unit 61 scopes it to the branches where that landing's own
-  `--landed` runs, which §8 F9 leaves to it; the previous revision's (b) guarded that row as well.
+  `--landed` runs, bar a record naming neither branch fact, which it re-binds from any branch,
+  announced (its S8), and §8 F9 leaves that scope to it; the previous revision's (b) guarded that
+  row as well. §8 F10 narrows (b) to a record carrying a lease.
   (a) would turn a landed record's nothing-to-resume into a refusal from the primary tree, and it
   changes the arm at `tools/unattended/unattended.test.sh:2992`.
   Both options keep the `--scheduled` refusals ahead of the matrix, so the detached-HEAD arm at
@@ -626,10 +735,12 @@ read off a run, which this pass does not make. The driver's new arms are written
   over two worktrees took 2.69 s against 1.57 s over one, so (a) adds about 1.1 s to each of the
   suite's 39 tick runs, about 44 s, for arms whose properties are not the walk. The class stays
   gated: every actor the verdict reaches has an arm over two copies, and a new tick row can reach
-  the walk only through `--liveness`, whose verdict order AC1 observes.
+  the walk only through `--liveness`, whose verdict order AC1 observes against a BUILDING copy and
+  AC13 against a FINISHED-UNSTAMPED one, the latter staged RED by the swap.
 - **F9 — which unit owns the pushed-landing re-bind row off the run's branch.** Options: (a) unit
   61's own branch scope governs that row, which already prints nothing to resume and writes nothing
-  off the branches where the landing's own `--landed` runs, and this unit's guard sits after the
+  off the branches where the landing's own `--landed` runs, bar a record naming neither branch fact
+  (its S8), and this unit's guard sits after the
   derived-terminal branch and the observed landing, ahead of the HELD and working rows; (b) this
   unit's guard at the head of the re-bind row, as the previous revision placed it when unit 61 was
   at its rev-2, pre-empting that scope with a check-58 refusal.
@@ -639,9 +750,34 @@ read off a run, which this pass does not make. The driver's new arms are written
   unit 61 re-binds on the default branch, where that mode's lander runs and `fail 55` fires, while
   (b) refuses there with check 58, which would red unit 61's AC23 the moment this unit lands. (a)
   gives each behaviour one owner. The re-bind row and its scope are unit 61's, observed by its
-  AC23; the guard over the HELD and working rows is this unit's, observed by AC4, AC5 and AC8; and
+  AC23; the guard over the HELD and working rows is this unit's, observed over the HELD rows by
+  AC4's HELD arm and over the working rows by AC4, AC5 and AC8; and
   the guard's absence from the derived-terminal branch and the observed landing is this unit's too,
   observed by AC6. The cost is §5 risk (2).
+- **F10 — whether the guard reaches a record carrying no lease.** Unit 61 keeps unit 4 §8 F8's
+  no-lease rows, graded by the age of the newest commit touching the run's build folder: past the
+  bound a take-over, announced, and never a refusal outside it, per TOOL-aUnblockedFleet-1 (unit 61
+  §8 F13, folding G8 M3). The previous revision called the guard ahead of every HELD and working
+  row, so it reached those rows and superseded F8 with no record; its Migration read the two
+  leaseless BUILDING records against unit 61's rev-2; and its check-58 remedy, to check the branch
+  out, cannot be followed for those records, whose branches no ref on node `d` names. Options: (a)
+  call `check_holder_worktree` only for a record carrying `lease-utc`, leaving every row a record
+  without one reaches, HELD or working, as unit 61 specifies it from any worktree; (b) keep the
+  guard over every HELD and working row, superseding unit 4 F8 and unit 61 F13 for callers off the
+  run's branch, and for a run branch that resolves to no local ref either name its re-creation in
+  the check-58 text or let the call through, announced. RESOLVED (agent, 2026-09-22, delegated),
+  in the G9 fold of M4 under the delegated M3 rule: (a). Both options satisfy every criterion this
+  spec writes. The hazard the guard exists for is a stale copy acted on through a session, and a
+  record carrying no lease carries no `session`, so `--liveness` grades it UNBOUND in every copy,
+  the tick acts on none, and its no-lease rows grade the run's build folder rather than the calling
+  worktree's clocks. (b) supersedes a decision of an earlier unit of this build, against the
+  no-override refusal the backlog row `TOOL-aReapedTicket-5` records, and of its two sub-options
+  one sends an operator to fabricate a branch for an abandoned run while the other gives (a)'s
+  answer by a longer route for the measured population; (a) also leaves fewer open questions, M3's
+  tie-break. The cost is §5 risk (7), and AC14 observes the choice. A leased record whose run
+  branch exists nowhere still meets the guard, and its refusal says so and names re-creating the
+  branch at a commit that carries the record (§4, AC5), so no check-58 text names a checkout that
+  cannot be made.
 
 ## 9. Revision log
 
@@ -670,6 +806,32 @@ read off a run, which this pass does not make. The driver's new arms are written
   `fail 55`'s remedy now runs, and §7's driver arm line names the second RED copy. The stop
   contract's new row sits above the first HELD row, so no row of unit 61's table moves. No figure,
   order or other criterion moved.
+- rev-4 · 2026-09-22 · §1 · §2 S2 S3 S4 S8 · §3 · §4 · §5 · §6 AC4 AC5 AC10 AC13 AC14 · §7 · §8 F1
+  F5 F8 F9 F10 · G9 spec audit round 1 fold of M1, M2 and M4, and of this spec's halves of M5, M6
+  and L3. H1 is not folded here: F1 and the Rollout name it as promoted at the G9 exit to
+  `TOOL-dDerivedDocket-65`.
+  - M1: new AC13 reads an unobserved in-place LANDING copy as ELSEWHERE in a sibling and as
+    FINISHED-UNSTAMPED in the run worktree, with one tick resume, staged RED by the swap; §4, §7
+    and F8 name it.
+  - M2: AC4 gains a HELD arm committed before the linked worktree is added, staged RED by a guard
+    placed inside the working branch, and F9 says which arm observes which rows.
+  - M4: new F10 resolves the guard's reach as a fork: only a record carrying `lease-utc` is
+    guarded, so unit 4 §8 F8 and unit 61 §8 F13 stand. S4, §1, §3, §4's matrix, prune-race and
+    Migration text, §5 and new AC14 follow; the Migration bullet is re-measured at `67d2ccfc`
+    against unit 61's rev-7 and no longer credits this unit with the G8 audit's M3. The check-58
+    text gains a variant for a run branch that exists nowhere, observed by AC5, and the stop
+    contract row's record cell names lease-utc, which moves §4's and AC10's contract figure from
+    −33 to −14.
+  - M5: S8 and §4's scan paragraph say unit 61 owns its AC10 arm, whose later-record reading is
+    taken on the run branch, and that this unit retargets any other verdict reading ELSEWHERE
+    newly changes.
+  - M6: §3 gains the hands-off to `TOOL-dDerivedDocket-64` that answers that unit's new
+    consumes-from.
+  - L3: §1, §3, §4, §5 risk (3), F5 and F9 cite unit 61's neither-branch-fact exception to its
+    re-bind scope.
+  No order or other edge moved.
+- rev-5 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-65`, answering that unit's
+  consumes-from. Edges only; nothing this unit specifies moved.
 
 ## 10. Reuse audit
 

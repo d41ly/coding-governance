@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix
 
-**Status:** SPECCED · rev-3 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 33
+**Status:** SPECCED · rev-4 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 33
 
 <!-- gen:spec-records -->
 
@@ -31,7 +31,8 @@ pid its prologue exports.
   "clock fresh" alone, which under this order would leave an unknown-clock `--replaces` from the
   recorded session matching no row. The row names the clock, so only a record carrying `lease-utc`
   reaches it; a record with no lease keeps unit 61's no-lease `--replaces` row, which enters the
-  same block and keeps that entry when the block moves (§4). Observed by AC1, AC2 and AC4.
+  same block and keeps that entry when the block moves (§4). Observed by AC1, AC2 and AC4 at a fresh
+  clock, and by AC7 at an unknown one.
 - **S2** The same-session row admits only a caller whose pid the record does not name. When
   `CLAUDE_PID` is set, the `pid` fact is present and is not `absent`, and the two are equal, the
   caller is the recorded process and not a restart. It then meets the rows below the same-session
@@ -40,12 +41,13 @@ pid its prologue exports.
   clock the announced `presumed-stopped` take-over. The catch-all is reached with no new branch, so
   no `fail` call is added. Observed by AC3.
 - **S3** New driver-suite arms, each staged RED in the pass. They are the recorded session's
-  `--replaces` naming the recorded keepalive under the recorded pid and under another dead pid; the
-  same naming another id; the recorded session's new id with no `--replaces` under the recorded pid
-  dead, under a live one, and with the clock aged past the bound; and the relaunch control under
-  another pid. The driver suite's `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` each rise by exactly the
-  assertions these arms carry, counted off their blocks, because they are written in region two
-  beside unit 4's lease arms. Observed by AC1, AC2, AC3 and AC4.
+  `--replaces` naming the recorded keepalive under the recorded pid and under another dead pid, at a
+  fresh clock and again at an unknown one; the same naming another id; the recorded session's new id
+  with no `--replaces` under the recorded pid dead, under a live one, and with the clock aged past
+  the bound; and the relaunch control under another pid. The driver suite's `FLOOR_ASSERTIONS` and
+  `FLOOR_SHARD_2` each rise by exactly the assertions these arms carry, counted off their blocks,
+  because they are written in region two beside unit 4's lease arms. Observed by AC1, AC2, AC3, AC4
+  and AC7.
 - **S4** The existing second-driver arms keep their verdicts under the prologue's single exported
   `CLAUDE_CODE_SESSION_ID=fixture-session` and `CLAUDE_PID=999999999`, and none is given a session of
   its own. The three arms H1 names and unit 28's AC9 id refusal keep the assertions they carry, bar
@@ -412,15 +414,18 @@ carries no lease, meets N2 or N4, which neither order changes either.
 - **AC5** — At the build commit, `grep -n 'fresh or unknown | a new id with' tools/unattended/STOPS.template.md`
   prints a smaller line number than `grep -n 'process restarted' tools/unattended/STOPS.template.md`;
   `grep -c 'a pid the record does not name' tools/unattended/STOPS.template.md` prints 1;
-  `grep -c 'a new id, another session' tools/unattended/STOPS.template.md` prints 0;
+  `grep -c 'a new id, another session' tools/unattended/STOPS.template.md` prints 0 at the build
+  commit and 1 at its first parent;
   `grep -c 'block of the leased row above' tools/unattended/STOPS.template.md` prints 1 and
-  `grep -c 'block of the leased row below' tools/unattended/STOPS.template.md` prints 0;
+  `grep -c 'block of the leased row below' tools/unattended/STOPS.template.md` prints 0 at the build
+  commit and 1 at its first parent;
   `cmp tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md` prints nothing; and
   `git cat-file -s` and `wc -l` over both files are not greater than at the first parent.
   Red when: the contract keeps unit 61's order, so a reader following it believes the holder's
   `--replaces` is a take-over; or the no-lease `--replaces` row still points below, at a block whose
   row now sits above it; or the edit is written without the trims that fund it, so a capped carrier
-  grows.
+  grows; or a zero-count reads 0 before this unit acts, because unit 61's pass never wrote the row
+  it retires, and so passes unmoved (G9 M7).
   permission: the render's byte identity, as a verdict, is the `unattended kit gate` and
   `unattended skill wiring` legs at the VERIFYING bar; `cmp` is this pass's direct check.
   figure: the −15 bytes is PINNED against unit 61 §4's rows at `07997375`, which its rev-3 left
@@ -439,12 +444,30 @@ carries no lease, meets N2 or N4, which neither order changes either.
   permission: the verdicts are the `harness arms (fail branches armed or pinned)`,
   `kit version markers` and `install-prefix (shipped surface)` legs at VERIFYING; the greps are this
   pass's direct check.
+- **AC7** — On AC1's fixture, put first on `PATH` a `date` stub that exits 1 when its arguments
+  carry `+%s`, the clock probe `read_tree_clocks` runs, and hands every other call to the real
+  `date`, so `check_lease_fresh` returns 2 while `write_lease` can still stamp `lease-utc`. Then
+  `--resume tRun --keepalive-id kB --replaces k1` prints unit 61's UNKNOWN announcement,
+  `the lease age is UNKNOWN on this node`, and `keepalive replaced`, and prints no `taken over`; it
+  records `keepalive: kB` and a `lease-utc` that is a well-formed ISO-8601 UTC instant ending `Z`, stages the record,
+  and leaves the count of `grep -c ' resume · item tRun · '` over the record unchanged. Both hold
+  under the prologue's pid and under `CLAUDE_PID=999999998`.
+  Red when: the moved block is conditioned on a fresh return alone, as unit 61's row text reads, so
+  at an unknown clock the holder's `--replaces` under a restarted pid reaches row 3 and is taken
+  over through `run_takeover`, G8 H1 returning under a dead probe, and under the recorded pid it
+  reaches row 4, whose check-58 text tells a caller who passed `--replaces` to pass it (G9 M3).
+  fixture: AC1's. The stub is scoped to the clock probe because unit 61's AC21 stub, which answers
+  nothing to any call, would leave `write_lease` stamping an empty `lease-utc`, so a pass that
+  wrote a broken record could still print `keepalive replaced`.
+  permission: the arm is written and staged RED in the pass, against a driver copy whose moved
+  block tests the fresh return alone; the driver suite that executes it is a held kit suite on no
+  bar leg, so it runs in the orchestrator's attributed VERIFYING run and never in this pass.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · the recorded session's `--replaces` naming the recorded keepalive under the recorded pid and under another dead pid, and naming another id under both; the recorded session's new id with no `--replaces` under the recorded pid dead, under a live one, and with the clock aged; the relaunch control under another pid; unit 61's same-session relaunch call moved to a pid the record does not name, its assertions untouched · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks; the relaunch call's pid moves neither
+New arm: `tools/unattended/unattended.test.sh` · the recorded session's `--replaces` naming the recorded keepalive under the recorded pid and under another dead pid, and naming another id under both; the recorded session's new id with no `--replaces` under the recorded pid dead, under a live one, and with the clock aged; the same `--replaces` at an unknown clock under both pids, staged RED by a driver copy whose moved block tests the fresh return alone; the relaunch control under another pid; unit 61's same-session relaunch call moved to a pid the record does not name, its assertions untouched · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks; the relaunch call's pid moves neither
 
 Both floors follow this build's practice, set by the CLOSED units 25, 30, 49 and 54: a unit raises
 its suite's executed-assertion floor by exactly the arms it adds, derived from the blocks rather than
@@ -500,6 +523,13 @@ guard the estimate trips is broad and leaves the join.
   sits directly above the first HELD row and moves no row: the non-goal, the table note and the
   stop-contract size paragraph say so. Every call here still runs on the record's own branch, so no
   criterion moved.
+- rev-4 · 2026-09-22 · §2 S1 S3 · §6 AC5 AC7 · §7 · G9 spec audit round 1 fold of M3, and of this
+  spec's half of M7. M3: new AC7 runs the moved `--replaces` row at an unknown clock, under a
+  `date` stub scoped to the `+%s` probe so that `write_lease` still stamps `lease-utc`, where the
+  finding's fix named unit 61's AC21 stub, which answers nothing to any call; it is staged RED by a
+  block that tests the fresh return alone, and S1, S3 and §7 name it. M7: AC5's two zero-counts
+  also read 1 at the first parent, so neither is green before this unit acts, beside the positive
+  witnesses unit 61's AC13 now carries for the rows this unit edits. No row, order or edge moved.
 
 ## 10. Reuse audit
 

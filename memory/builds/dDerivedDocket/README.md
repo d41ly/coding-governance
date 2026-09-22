@@ -5,7 +5,7 @@ opened: 2026-09-14
 streams: tooling+playbook+deployer
 roster: TOOL+PLAY+DEPL
 authorized-by: prompt
-ids: DEPL-dDerivedDocket-1 PLAY-dDerivedDocket-1 TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 TOOL-dDerivedDocket-38 TOOL-dDerivedDocket-39 TOOL-dDerivedDocket-40 TOOL-dDerivedDocket-41 TOOL-dDerivedDocket-42 TOOL-dDerivedDocket-43 TOOL-dDerivedDocket-44 TOOL-dDerivedDocket-45 TOOL-dDerivedDocket-46 TOOL-dDerivedDocket-47 TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 TOOL-dDerivedDocket-55 TOOL-dDerivedDocket-56 TOOL-dDerivedDocket-57 TOOL-dDerivedDocket-58 TOOL-dDerivedDocket-59 TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64
+ids: DEPL-dDerivedDocket-1 PLAY-dDerivedDocket-1 TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 TOOL-dDerivedDocket-38 TOOL-dDerivedDocket-39 TOOL-dDerivedDocket-40 TOOL-dDerivedDocket-41 TOOL-dDerivedDocket-42 TOOL-dDerivedDocket-43 TOOL-dDerivedDocket-44 TOOL-dDerivedDocket-45 TOOL-dDerivedDocket-46 TOOL-dDerivedDocket-47 TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 TOOL-dDerivedDocket-55 TOOL-dDerivedDocket-56 TOOL-dDerivedDocket-57 TOOL-dDerivedDocket-58 TOOL-dDerivedDocket-59 TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64 TOOL-dDerivedDocket-65
 ---
 
 # dDerivedDocket — backlog asks filed per build, status derived, and unattended runs pointed at them
@@ -109,13 +109,13 @@ recorded stop causes.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 50 unit(s) · node d · opened 2026-09-14 · streams tooling+playbook+deployer
+**Build status:** SPECCED · 51 unit(s) · node d · opened 2026-09-14 · streams tooling+playbook+deployer
 ids DEPL-dDerivedDocket-1 PLAY-dDerivedDocket-1 TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11
 ids TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23
 ids TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35
 ids TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 TOOL-dDerivedDocket-38 TOOL-dDerivedDocket-39 TOOL-dDerivedDocket-40 TOOL-dDerivedDocket-41 TOOL-dDerivedDocket-42 TOOL-dDerivedDocket-43 TOOL-dDerivedDocket-44 TOOL-dDerivedDocket-45 TOOL-dDerivedDocket-46 TOOL-dDerivedDocket-47
 ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 TOOL-dDerivedDocket-55 TOOL-dDerivedDocket-56 TOOL-dDerivedDocket-57 TOOL-dDerivedDocket-58 TOOL-dDerivedDocket-59
-ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64
+ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64 TOOL-dDerivedDocket-65
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -161,22 +161,23 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [TOOL-dDerivedDocket-27 — declared gate wall](spec/2026-09-14-spec-TOOL-dDerivedDocket-27.md) | 28 | 2 | SPECCED | rev-9 | 2026-09-22 |
 | [TOOL-dDerivedDocket-31 — fork items and delegated-pass carriers](spec/2026-09-14-spec-TOOL-dDerivedDocket-31.md) | 29 | 2 | SPECCED | rev-5 | 2026-09-21 |
 | [TOOL-dDerivedDocket-32 — remote CI on every push](spec/2026-09-14-spec-TOOL-dDerivedDocket-32.md) | 30 | 2 | SPECCED | rev-5 | 2026-09-21 |
-| [TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor](spec/2026-09-22-spec-TOOL-dDerivedDocket-61.md) | 31 | 2 | SPECCED | rev-6 | 2026-09-22 |
-| [TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE](spec/2026-09-22-spec-TOOL-dDerivedDocket-62.md) | 32 | 2 | SPECCED | rev-3 | 2026-09-22 |
-| [TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix](spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md) | 33 | 2 | SPECCED | rev-3 | 2026-09-22 |
-| [TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-64.md) | 34 | 2 | SPECCED | rev-2 | 2026-09-22 |
-| [TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered](spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md) | 35 | 2 | SPECCED | rev-8 | 2026-09-22 |
-| [TOOL-dDerivedDocket-35 — arming and the real-tree staged reds](spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md) | 36 | 2 | SPECCED | rev-7 | 2026-09-22 |
-| [PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception](spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md) | 37 | 2 | SPECCED | rev-7 | 2026-09-22 |
-| [TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier](spec/2026-09-14-spec-TOOL-dDerivedDocket-36.md) | 38 | 2 | SPECCED | rev-5 | 2026-09-22 |
-| [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 39 | 1 | SPECCED | rev-7 | 2026-09-22 |
+| [TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor](spec/2026-09-22-spec-TOOL-dDerivedDocket-61.md) | 31 | 2 | SPECCED | rev-8 | 2026-09-22 |
+| [TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE](spec/2026-09-22-spec-TOOL-dDerivedDocket-62.md) | 32 | 2 | SPECCED | rev-5 | 2026-09-22 |
+| [TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix](spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md) | 33 | 2 | SPECCED | rev-4 | 2026-09-22 |
+| [TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-64.md) | 34 | 2 | SPECCED | rev-4 | 2026-09-22 |
+| [TOOL-dDerivedDocket-65 — a session waiting on its own sub-agents, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-65.md) | 35 | 2 | SPECCED | rev-1 | 2026-09-22 |
+| [TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered](spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md) | 36 | 2 | SPECCED | rev-9 | 2026-09-22 |
+| [TOOL-dDerivedDocket-35 — arming and the real-tree staged reds](spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md) | 37 | 2 | SPECCED | rev-8 | 2026-09-22 |
+| [PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception](spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md) | 38 | 2 | SPECCED | rev-8 | 2026-09-22 |
+| [TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier](spec/2026-09-14-spec-TOOL-dDerivedDocket-36.md) | 39 | 2 | SPECCED | rev-6 | 2026-09-22 |
+| [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 40 | 1 | SPECCED | rev-8 | 2026-09-22 |
 <!-- /gen:build-units -->
 
 Records: 67 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dDerivedDocket-65.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dDerivedDocket-65.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -217,11 +218,12 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 | 32 | `TOOL-dDerivedDocket-62` | no |
 | 33 | `TOOL-dDerivedDocket-63` | no |
 | 34 | `TOOL-dDerivedDocket-64` | no |
-| 35 | `TOOL-dDerivedDocket-34` | no |
-| 36 | `TOOL-dDerivedDocket-35` | no |
-| 37 | `PLAY-dDerivedDocket-1` | no |
-| 38 | `TOOL-dDerivedDocket-36` | no |
-| 39 | `DEPL-dDerivedDocket-1` | no |
+| 35 | `TOOL-dDerivedDocket-65` | no |
+| 36 | `TOOL-dDerivedDocket-34` | no |
+| 37 | `TOOL-dDerivedDocket-35` | no |
+| 38 | `PLAY-dDerivedDocket-1` | no |
+| 39 | `TOOL-dDerivedDocket-36` | no |
+| 40 | `DEPL-dDerivedDocket-1` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

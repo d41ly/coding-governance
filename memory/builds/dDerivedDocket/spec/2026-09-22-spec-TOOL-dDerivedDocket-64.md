@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees
 
-**Status:** SPECCED · rev-2 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 34
+**Status:** SPECCED · rev-4 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 34
 
 <!-- gen:spec-records -->
 
@@ -76,8 +76,13 @@ Here the waiter writes a per-worktree heartbeat on every tick it does not acquir
   extracts it with, the clock joined across worktrees being that unit's rejected §8 F1 option (b).
   This term reads the directory the gate-log term reads, so its scope is per worktree too, and a
   run's queued close writes its heartbeat in the worktree its own `gates-green` runs from, which by
-  that unit's contract is the one it lets act. No edge to that unit is declared, because this unit
-  extends nothing that unit writes and builds against unit 61's clock alone.
+  that unit's contract is the one it lets act. This unit extends nothing that unit writes, but its
+  criteria run the tick that unit changes: on that unit's driver a verdict that would act meets
+  `holder-ref: absent` as `skip · NO RUN BRANCH`, so every fixture here that feeds the tick carries
+  a `run-branch` fact naming the branch its HEAD has checked out, and the consumes-from edge below
+  says so. A holder waiting on a Workflow, whose sub-agents and wave-worktree units move nothing
+  the run worktree's clock reads, is not this unit's either: it is G9 H1, promoted to
+  `TOOL-dDerivedDocket-65`.
 - `--audit`'s unit stall probe, which stays on `read_tree_clocks`.
 - A `--liveness` key saying whether the queue term is live.
 - Rewording unit 27's AC9, §3 non-goal and rev-8 entry to cite this unit for the queued-bar half.
@@ -92,10 +97,17 @@ Here the waiter writes a per-worktree heartbeat on every tick it does not acquir
   re-keyed resume matrix, whose check-58 refusal on a fresh clock AC2 reads; and its AC20 fixture,
   which AC2 reuses with the heartbeat in place of the gate log. Without it the term reaches
   `--liveness` alone, and the matrix keeps grading the retired lease file's clock.
+- **consumes-from** `TOOL-dDerivedDocket-62` — the tick's `skip · NO RUN BRANCH` row, which a
+  verdict that would act meets on `holder-ref: absent`, and its rule that only the worktree whose
+  checked-out branch is the record's run branch acts, every other copy reading `ELSEWHERE`. AC1's
+  and AC3's fixture carries a `run-branch` fact because of the first, and §5 risk (4) rests on the
+  second.
 - **hands-off** external — making a running bar beat as a queued one now does, through the holder's
   ticker; pricing `RESUME_STALE_BOUND` against the largest leg ceiling in the stale-bound NOTE; and a
   gotcha for the class, that a clock built on completion-time artefacts goes dark while a process
   waits or runs one long step. No unit in this build carries them.
+- **hands-off** `TOOL-dDerivedDocket-65` — the term-per-signal shape of `derive_last_move`, after
+  which that unit's sub-agent term is placed, last, beside `LM_TRANSCRIPT`.
 
 ## 4. Design
 
@@ -114,6 +126,11 @@ committed BUILDING run-state file carrying the six lease facts with `host: absen
 | one gate log touched under `gate-logs/` | `last-move-source: gate-log`, `stale: no`, `verdict: LIVE` |
 | `resume-tick.sh --dry-run`, the heartbeat fresh | `resumed · attempt 1`: the tick would kill and relaunch |
 | `resume-tick.sh --dry-run`, the gate log fresh | `skip · verdict LIVE` |
+
+The criteria below run that fixture with one fact more, a `run-branch` naming the branch its HEAD
+has checked out. No driver at `07997375` reads it, so the measurement stands, and on
+`TOOL-dDerivedDocket-62`'s driver it is what lets the tick act on that worktree's copy rather than
+print `skip · NO RUN BRANCH` (G9 M6).
 
 Read at `07997375`, nothing the runner writes during a wait moves a signal `--liveness` reads:
 
@@ -208,6 +225,10 @@ but four `hit` arms of the driver suite, from `tools/unattended/unattended.test.
 - A record carrying no lease. Unit 61 keeps its matrix rows on `build_folder_age` rather than on
   this clock (its §8 F13), and `--liveness` grades it UNBOUND, so the tick never acts on it and the
   heartbeat changes no answer the matrix gives it.
+- A holder waiting on a background Workflow with no commit of its own. Its sub-agents write under
+  the session's own transcript directory and its units in wave worktrees, neither of which this
+  clock reads, so the run worktree can read STALE while it waits; the heartbeat beats only while a
+  bar queues. That is G9 H1, promoted to `TOOL-dDerivedDocket-65`.
 
 ### Inventory
 
@@ -310,7 +331,8 @@ queue, and a default-off flag would switch the kill of a healthy queued bar back
   `07997375`, so the tick kills a queued close; or a heartbeat older than the bound keeps a dead run
   LIVE, which a presence test would do; or an undatable heartbeat reads as absent. The fresh reading
   is staged RED by a copy of `derive_last_move` with the queue term removed.
-  fixture: the scratch repository of §4's measurement, with the file planted by hand, so no bar runs.
+  fixture: the scratch repository of §4's measurement, its record carrying a `run-branch` fact that
+  names the branch its HEAD has checked out, with the file planted by hand, so no bar runs.
 - **AC2** — Take `TOOL-dDerivedDocket-61` AC20's fixture with its commit and transcript aged past
   `RESUME_STALE_BOUND`, and plant `gate-queue-heartbeat` dated inside the bound in place of that
   criterion's gate log. `--status` prints no `presumed-stopped`, and `--resume --keepalive-id C` from
@@ -328,7 +350,12 @@ queue, and a default-off flag would switch the kill of a healthy queued bar back
   `resumed ·` decision; with the heartbeat dated past the bound it prints `resumed · attempt 1`.
   Red when: the tick decides `resumed · attempt 1` for a record whose only fresh signal is the
   heartbeat, as measured at `07997375`, which on a live node kills the recorded pid's tree and
-  relaunches a close that was waiting in the queue.
+  relaunches a close that was waiting in the queue; or the aged half is made to pass by bending the
+  tick to act on a record naming no run branch, which undoes `TOOL-dDerivedDocket-62`'s skip.
+  fixture: AC1's, whose `run-branch` fact names the branch its HEAD has checked out, so on
+  `TOOL-dDerivedDocket-62`'s driver the worktree holds the slug and the aged half reaches
+  `resumed · attempt 1` rather than `skip · NO RUN BRANCH`; the resume-tick suite's arm runs over
+  its `build_fixture`, which that unit makes write `run-branch: refs/heads/main`.
   permission: the fixture run is this pass's direct check; the arm that keeps it lives in the
   resume-tick suite, a held kit suite, executed at VERIFYING beside AC2's.
 - **AC4** — When the `run-gates turnstile` leg runs its position fixture, where a planted live holder
@@ -397,7 +424,7 @@ queue, and a default-off flag would switch the kill of a healthy queued bar back
 `run-gates turnstile` · `run-gates canary` · `run-gates gov canary` · `unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `recall floor` · `recall floor arms` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/unattended.test.sh` · a driver copy whose `derive_last_move` lacks the queue term, under which the signals block's fresh heartbeat reads `stale: yes` and unit 61's AC20 fixture with a fresh heartbeat is taken over · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks
-New arm: `tools/unattended/resume-tick.test.sh` · the same driver copy, under which a BUILDING record with a fresh heartbeat decides `resumed · attempt 1` · `FLOOR_ASSERTIONS`, raised by exactly the new arm's assertions, counted off its block
+New arm: `tools/unattended/resume-tick.test.sh` · the same driver copy, under which a BUILDING record with a fresh heartbeat, over the suite's `build_fixture` and the `run-branch` fact it writes, decides `resumed · attempt 1` · `FLOOR_ASSERTIONS`, raised by exactly the new arm's assertions, counted off its block
 New arm: `tools/run-gates/run-gates.turnstile.test.sh` · a runner copy with the heartbeat write deleted, and one removing the file beside `gate-queue-status` · `FLOOR_ASSERTIONS`, raised by exactly the new arm's assertions, counted off its block
 
 Every floor follows this build's practice, set by the CLOSED units 25, 30, 49 and 54: a unit raises
@@ -450,6 +477,17 @@ suite carries AC4's arm, and both canaries run the edited runner.
   carrying one. S6, AC8 and §7 name the driver suite's `FLOOR_SHARD_2` beside `FLOOR_ASSERTIONS`,
   each raised by exactly the new arms and counted off their blocks. Unit 61 now answers this unit's
   consumes-from with a hands-off line. No design, other criterion, edge or order moved.
+- rev-3 · 2026-09-22 · §3 · §4 · §6 AC1 AC3 · §7 · G9 spec audit round 1 fold of M6, and of this
+  spec's halves of M8 and H1. M6: AC1's and AC3's fixture carries a `run-branch` fact naming the
+  branch its HEAD has checked out, so AC3's aged half reaches `resumed · attempt 1` on
+  `TOOL-dDerivedDocket-62`'s driver rather than `skip · NO RUN BRANCH`, and §4 says why the
+  measurement did not need one. §3 now declares a consumes-from edge to that unit, which answers
+  it with a hands-off line, and its non-goal no longer says no edge is owed. M8: unit 61's F1, AC20
+  and §5 risk (2) now agree with §3 and F5 here that a leg silent past the bound is carried by no
+  unit and handed off external, so nothing here moved for it. H1 is not folded: §3 and §4 name a
+  holder waiting on a Workflow as G9 H1, promoted to `TOOL-dDerivedDocket-65`. No order moved.
+- rev-4 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-65`, answering that unit's
+  consumes-from. Edges only; nothing this unit specifies moved.
 
 ## 10. Reuse audit
 

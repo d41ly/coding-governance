@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 35
+**Status:** SPECCED · rev-9 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 36
 
 <!-- gen:spec-records -->
 
@@ -1239,6 +1239,9 @@ its guard names the four renders step 6 re-renders, so the merge commit triggers
 - rev-8 · 2026-09-22 · order re-declared from 31 to 35 in the status header only, derived
   from the §3 edges: the G8 bounded exit promoted TOOL-dDerivedDocket-62, -63 and -64 to run
   after TOOL-dDerivedDocket-61, so this unit runs at order 35, alone. No criterion, design or edge moved.
+- rev-9 · 2026-09-22 · order re-declared from 35 to 36 in the status header only, derived from the §3
+  edges: the G9 exit promoted TOOL-dDerivedDocket-65 to run at 35, after 64. No criterion, design or
+  edge moved.
 
 ## 10. Reuse audit
 

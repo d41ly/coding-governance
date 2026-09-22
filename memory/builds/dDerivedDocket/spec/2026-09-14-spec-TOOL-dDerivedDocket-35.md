@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-35 — arming and the real-tree staged reds
 
-**Status:** SPECCED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 36
+**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 37
 
 <!-- gen:spec-records -->
 
@@ -575,6 +575,9 @@ observes them on real content.
 - rev-7 · 2026-09-22 · order re-declared from 32 to 36 in the status header only, derived
   from the §3 edges: the G8 bounded exit promoted TOOL-dDerivedDocket-62, -63 and -64 to run
   after TOOL-dDerivedDocket-61, so this unit runs at order 36, alone. No criterion, design or edge moved.
+- rev-8 · 2026-09-22 · order re-declared from 36 to 37 in the status header only, derived from the §3
+  edges: the G9 exit promoted TOOL-dDerivedDocket-65 to run at 35, after 64. No criterion, design or
+  edge moved.
 
 ## 10. Reuse audit
 
