@@ -57,7 +57,7 @@ items B finds, and the corpus does not use the vocabulary the ruling named.
 build method's size budget stands and moves, and on 2026-09-22 set it at 30720 bytes and 400 lines.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node d · opened 2026-09-20 · streams tooling
+**Build status:** CLOSED · 5 unit(s) · node d · opened 2026-09-20 · streams tooling
 ids TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5
 
 <!-- gen:build-units -->
@@ -67,10 +67,10 @@ ids TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 
 | [TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads](spec/2026-09-20-spec-TOOL-dGatedProse-1.md) | 2 | 2 | CLOSED | rev-11 | 2026-09-22 |
 | [TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold](spec/2026-09-20-spec-TOOL-dGatedProse-2.md) | 3 | 2 | CLOSED | rev-9 | 2026-09-22 |
 | [TOOL-dGatedProse-3 — the guide cap rises on both axes, with the reason recorded beside the figure](spec/2026-09-20-spec-TOOL-dGatedProse-3.md) | 4 | 2 | CLOSED | rev-6 | 2026-09-22 |
-| [TOOL-dGatedProse-4 — M4 bounds the spec-audit promotion chain by review precision](spec/2026-09-20-spec-TOOL-dGatedProse-4.md) | 5 | 2 | SPECCED | rev-7 | 2026-09-22 |
+| [TOOL-dGatedProse-4 — M4 bounds the spec-audit promotion chain by review precision](spec/2026-09-20-spec-TOOL-dGatedProse-4.md) | 5 | 2 | CLOSED | rev-7 | 2026-09-22 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
