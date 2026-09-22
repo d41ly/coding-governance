@@ -130,12 +130,16 @@ cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
 
-mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · SPEC_AUDIT_DEFAULT
+mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · RESUME_STALE_BOUND · SPEC_AUDIT_DEFAULT
+  # NINE SLOTS, NOT EIGHT. `RESUME_STALE_BOUND` and `SPEC_AUDIT_DEFAULT` both read ${8-}: the
+  # liveness arms pass a seconds bound there and the spec-audit arms a DATE, so those arms set
+  # RESUME_STALE_BOUND to a date and the driver refused at exit 2 before any verb ran. One slot
+  # per key, and the call sites that meant the date now spell it ninth.
   cat > .unattended.conf <<EOF
 MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="${3-2026-08-19}"
 SPEC_THIN_CUTOFF="${5-}"
-SPEC_AUDIT_DEFAULT="${8-}"
+SPEC_AUDIT_DEFAULT="${9-}"
 LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
@@ -4512,6 +4516,10 @@ echo "MARK brief" >&2
 # ---- prose left no trace. These arms grade the four things that make the row a RECORD rather than
 # ---- a note - the roster join, the tracked-path refusal, the park() grammar, and the staleness
 # ---- reader that is the only thing making the recorded hash more than decoration.
+# SELF-CONTAINED, like every other region here: these arms used to inherit whatever run-state the
+# dispatch arms above left, and once `--status` grew its no-phase refusal (check 10) the three
+# aggregate arms below were answered by that instead of by a status line.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 mkdir -p memory/builds/tRun/prompts
 printf 'the brief for unit one\n' > memory/builds/tRun/prompts/brief-1.md
 git add memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
@@ -5206,9 +5214,7 @@ dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 # here for TWO reasons and the next arm separates them by declaring the key.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
 dspec_reset
-printf '
-GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
-' >> .unattended.conf
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$KIT_REL" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 # ...DECLARED, the index ALONE is still accepted — that is the retraction M6 earned.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
@@ -5217,9 +5223,7 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $
 # ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
 # rather than about one declaration.
 dspec_reset
-printf '
-GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
-' >> .unattended.conf
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$KIT_REL" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes $KIT_REL/memory-tree/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
@@ -5438,11 +5442,15 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes '')" "--dispatch was give
 UNBORN=$(mktemp -d)
 git -C "$UNBORN" init -q
 cp .unattended.conf "$UNBORN/"
-mkdir -p "$UNBORN/memory/builds/tRun"
+mkdir -p "$UNBORN/memory/builds/tRun/spec"
 printf 'phase: BUILDING
 witness: x
 base: y
 ' > "$UNBORN/memory/builds/tRun/RUN.md"
+# A STAGED spec, or the pass is refused as M2's MISSING before the HEAD resolution this arm is
+# about: `ls-files` reads the index, which an unborn repository has, and HEAD still answers nothing.
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' > "$UNBORN/memory/builds/tRun/spec/u1.md"
+git -C "$UNBORN" add -A >/dev/null 2>&1
 hit "$(cd "$UNBORN" && bash "$SCRIPT" --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh 2>&1)" "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share:"
 rm -rf "$UNBORN"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'has--no-verify.sh')" "--dispatch was given a --writes path spelling the declared bypass flag, and the gate greps this file whole for it:"
@@ -5731,11 +5739,18 @@ same "AC3 a FINISHED-UNSTAMPED verdict exits 0" "$rc" "0"
 hit "$out" "state: finished-unstamped"
 hit "$out" "default-branch: refs/remotes/origin/main"
 hit "$out" "verdict: FINISHED-UNSTAMPED"
+# A COMMIT THE DEFAULT BRANCH CANNOT CARRY, made here rather than assumed of HEAD: the property
+# under test is a witness that has NOT landed, and whether the fixture's HEAD is one depends on
+# what the arms above left behind.
+git commit -q --allow-empty -m "a commit origin/main does not carry" --no-verify
 mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $(git rev-parse HEAD)/"
 out=$(run --liveness tRun)
 hit "$out" "state: live"
 miss "$out" "verdict: FINISHED-UNSTAMPED"
 mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $BASE/"
+# ...and NO origin/HEAD either, which is the other half of the sentence above this block. The
+# env var alone leaves the remote's own symref to resolve from, and an arm above may have set it.
+git remote set-head origin -d >/dev/null 2>&1 || true
 out=$(env -u GOV_DEFAULT_BRANCH bash "$SCRIPT" --liveness tRun 2>&1); rc=$?
 same "AC3 an unresolvable default branch exits 0" "$rc" "0"
 hit "$out" "default-branch: unresolved"
@@ -6416,13 +6431,13 @@ git checkout -qf unit; bcreset
 # ---- and `mkconf` rewrites it on every reset, so inside this epoch every reset calls mkconf with the
 # ---- SAME eight positionals the BASE commit used — one byte off and preflight refuses on a dirty
 # ---- tree before authorization is ever reached, which is a fixture answering the wrong question.
-init_sa_tree() { git reset -q --hard "$BCP"; git clean -qfd; mkconf true true "" 3600 "" 1800 7 2026-09-21; }
+init_sa_tree() { git reset -q --hard "$BCP"; git clean -qfd; mkconf true true "" 3600 "" 1800 7 5400 2026-09-21; }
 init_sa_run() { init_sa_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
              printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
              printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' \
                >> memory/builds/tRun/RUN.md; }
 bcreset; git checkout -qf main
-mkconf true true "" 3600 "" 1800 7 2026-09-21
+mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
 git add -A >/dev/null && git commit -q -m sa-default --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
 BCP=$(git rev-parse HEAD)
@@ -6485,7 +6500,7 @@ git checkout -qf unit; BCP=$_sa_bcp0; bcreset
 
 # ---- AC2 (unit 7): the default committed on the RUN BRANCH only is not at BASE, so it opts nothing in.
 bcreset
-mkconf true true "" 3600 "" 1800 7 2026-09-21
+mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
 git add -A >/dev/null; git commit -q -m "default on the branch" --no-verify
 out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "unattended: spec-audit — not owed (opt-in)"
@@ -6499,7 +6514,7 @@ bcreset; git checkout -qf main
 mutate .unattended.conf '/^SPEC_AUDIT_DEFAULT=/d'
 git add -A >/dev/null && git commit -q -m sa-conf-predates-key --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
-mkconf true true "" 3600 "" 1800 7 2026-09-21
+mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
 git add -A >/dev/null; git commit -q -m "default on the branch, none at base" --no-verify
 out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "unattended: spec-audit — not owed (opt-in)"
@@ -6522,7 +6537,7 @@ git checkout -qf unit; bcreset
 # ---- AC3, second half: a malformed README key beside a VALID default is still fail 52 — the README
 # ---- wins whatever it says, because a typo falling back to the default is the silent opt-out class.
 bcreset; git checkout -qf main
-mkconf true true "" 3600 "" 1800 7 2026-09-21
+mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
 mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: later'
 git add -A >/dev/null && git commit -q -m sa-readme-over-default --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
@@ -6544,14 +6559,14 @@ git checkout -qf unit; bcreset
 init_sa_base_ending_early() {   # $1 = the line added to a dated conf at BASE, after the key, or BEFORE it when
                                 # spelled `^<line>` · $2 = repair the branch (1) or not
   bcreset; git checkout -qf main
-  mkconf true true "" 3600 "" 1800 7 2026-09-21
+  mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
   case "$1" in
     ^*) { printf '%s\n' "${1#^}"; cat .unattended.conf; } > .unattended.conf.new; mv .unattended.conf.new .unattended.conf ;;
     *)  printf '%s\n' "$1" >> .unattended.conf ;;
   esac
   git add -A >/dev/null && git commit -q -m sa-base-ends-early --no-verify && git push -q -f origin main
   git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
-  if [ "$2" = 1 ]; then mkconf true true "" 3600 "" 1800 7 2026-09-21
+  if [ "$2" = 1 ]; then mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
     git add -A >/dev/null; git commit -q -m sa-branch-repaired --no-verify; fi
 }
 # The syntax error sits ABOVE the key: bash executes an eval's assignments before its parse fails at

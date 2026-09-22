@@ -5021,6 +5021,17 @@ verb_brief() { # slug · unit-id · path
   [ -n "$unit" ] || { fail 49 "--brief requires --unit, because a brief naming no unit records what SOME agent was handed and joins to nothing"; return 1; }
   [ -n "$path" ] || { fail 49 "--brief requires --path, because the brief is the FILE and a row with no path records that one existed"; return 1; }
   # THE UNIT MUST BE ON THE ROSTER. A brief naming a unit this build does not carry records nothing
+  # SHAPE BEFORE JOIN. These three refusals read the value the caller handed in, and every value
+  # they refuse is also off the roster — so behind the roster check they were unreachable through
+  # --unit and their three arms had been red since that check was added. A forgery is refused for
+  # BEING a forgery, not for failing to name a unit.
+  if [ "$(printf '%s%s' "$unit$path" | wc -l)" -ne 0 ]; then
+    fail 49 "a brief unit or path contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
+  fi
+  case "$unit$path" in *" · "*) fail 49 "a brief unit or path spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $unit at $path"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s' "$unit" "$path" | grep -qF -- "$BYPASS_BAN"; then
+    fail 49 "a brief unit or path spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite: $BYPASS_BAN"; return 1
+  fi
   # about this build, and the units region is the same source --plan and --status take their set
   # from, so the three cannot disagree about what a unit IS.
   readme=$(readme_of "$slug")
@@ -5038,13 +5049,6 @@ verb_brief() { # slug · unit-id · path
   # the same derivation the piece records and the record-rotation name both use, rather than a third.
   h=$(GIT hash-object "$path" 2>/dev/null) || { fail 49 "cannot hash the brief, so the row would carry no join: $path"; return 1; }
   h=$(printf '%s' "$h" | cut -c1-12)
-  if [ "$(printf '%s%s' "$unit$path" | wc -l)" -ne 0 ]; then
-    fail 49 "a brief unit or path contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
-  fi
-  case "$unit$path" in *" · "*) fail 49 "a brief unit or path spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $unit at $path"; return 1 ;; esac
-  if [ -n "$BYPASS_BAN" ] && printf '%s%s' "$unit" "$path" | grep -qF -- "$BYPASS_BAN"; then
-    fail 49 "a brief unit or path spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite: $BYPASS_BAN"; return 1
-  fi
   refuse_if_terminal "$rel" --brief || return 1
   # EXACT LINE COMPARE, verb_propose's rule and for its reason: the reason is line-final, so a
   # prefix match would call a DIFFERENT brief already-recorded and write nothing while reporting
