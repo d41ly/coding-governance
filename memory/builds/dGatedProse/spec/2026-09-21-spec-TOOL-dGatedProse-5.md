@@ -1,12 +1,13 @@
 # TOOL-dGatedProse-5 — the corpus answers for its readers before the check that asks
 
-**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base bd44d3ff · streams tooling · order 1
+**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md](../build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md) | research | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 |
+| [2026-09-22-build-TOOL-dGatedProse-5-corpus-census.md](../build/2026-09-22-build-TOOL-dGatedProse-5-corpus-census.md) | journal | — |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 |
 
 <!-- /gen:spec-records -->
@@ -572,9 +573,17 @@ reads the number. The gotcha and the backlog row are records, cited as provenanc
 as tokens, so both halves of the clause carry `tools/check-install-prefix.sh`.
 
 **`dScaffoldedMirror-9` S5 — the three `*_OFFENDER_PIN` keys.** By name:
-`tools/lexicon/lexicon.py:120` maps both key names, `tools/lexicon/kit.toml:177` is the declared
-hole, and `tools/drift-audit/drift_signals.py:270` with
-`tools/drift-audit/drift_signals.py:305` are the ratchet rows the item also takes out. By value:
+`tools/lexicon/lexicon.py:120` maps both live key names, `tools/lexicon/kit.toml:177` is the declared
+hole, and `tools/lexicon/selftest.py:1320`-`:1327` asserts every key of that table is scaffolded and
+the dead one is not. `tools/drift-audit/selftest.py:784`, `:918` and `:1026` write the verb and
+suffix pins into fixture confs, and four files spell the keys in prose: `tools/lexicon/README.md:516`
+and `:593`, `tools/lexicon/LEXICON.md:175`, `tools/lexicon/adopt-lexicon.sh:454`, and
+`tools/drift-audit/drift_report.py:1193` and `:1331`. Rev-1 to rev-7 cited
+`tools/drift-audit/drift_signals.py:270` and `:305` as the ratchet rows the item also takes out, and
+the build pass re-read them at source: they are two `PINS` rows of lexicon signals the item does not
+name, and the three `RATCHETS` rows it does name were never written, because
+`TOOL-dScaffoldedMirror-5`, the unit that proposed them, is WONTDO. That file reads nothing the item
+withdraws, so the clause drops it. By value:
 `tools/lexicon/lexicon.py:3280` is `if len(unwaived) > pin`, so the pin's NUMBER is compared on every
 run, and `tools/lexicon/lexicon.py:3352` prints the moved pair. The clause writes those paths and
 never the glob `*_OFFENDER_PIN`, a composition no file spells, which unit 1's section 4 counts among
@@ -838,7 +847,7 @@ path. "prose" means the half names no token and passes by vacuity.
 | `aMendedLedger-8-u9` S11 | `tools/memory-tree/merge-rows.py`, `tools/memory-tree/merge-rows.test.sh`, `memory/map/features/memory-tree-merge-driver.md`, `merge.conflictStyle` | `tools/memory-tree/merge-rows.test.sh` |
 | `dGatedProse-3` S8 | the clause as that spec carries it at the pass, verified by AC7 and never retyped here | the same |
 | `dPolishedVitrine-1` S5 | `tools/check-install-prefix.sh` | `tools/check-install-prefix.sh` |
-| `dScaffoldedMirror-9` S5 | `tools/lexicon/lexicon.py`, `tools/lexicon/kit.toml`, `tools/drift-audit/drift_signals.py` | `tools/lexicon/lexicon.py` |
+| `dScaffoldedMirror-9` S5 | `tools/lexicon/lexicon.py`, `tools/lexicon/kit.toml`, `tools/lexicon/selftest.py`, `tools/drift-audit/selftest.py`, `tools/lexicon/README.md`, `tools/lexicon/LEXICON.md`, `tools/lexicon/adopt-lexicon.sh`, `tools/drift-audit/drift_report.py` | `tools/lexicon/lexicon.py` |
 | `aTunedCompass-3` S2 | `tools/memory-recall/check-recall.py` | `tools/memory-recall/check-recall.py`, `tools/memory-recall/test_recall_floor.py`, `test_out_of_vocabulary_pin_reds` |
 | `aTunedCompass-9` S5c-i | `measure_run`, `check_audit`, `test_audit_green` | `tools/memory-recall/check-recall.py` |
 | `aWalkedCorpus-2` S5 | `measure_run` | `tools/memory-recall/check-recall.py`, `tools/memory-recall/test_recall_floor.py` |
@@ -1322,6 +1331,17 @@ version move.
   tracked text supports it. The owner's two cap rulings of 2026-09-21, the guide pair at 98304 bytes
   and 1200 lines and the build method's line half rising with its byte cap, move no figure here,
   because this spec states no cap either ruling moves.
+- rev-8 · 2026-09-22 · S4 · S8 · §4 · AC5 · the build pass's re-read of the census against code,
+  folded before any clause is written, at the pass's pinned base `e61b1cea`, where the reader files
+  are byte-identical to `bd44d3ff`. The population re-derived there is the census's 37 items across
+  19 specs, label for label, with nothing entering or leaving. One token row was wrong at source:
+  `dScaffoldedMirror-9` S5 named `tools/drift-audit/drift_signals.py` as the carrier of the three
+  `RATCHETS` rows the item takes out, and those rows were never written, because the unit that
+  proposed them is WONTDO; the two lines rev-1 cited are `PINS` rows of lexicon signals the item
+  does not name. The row drops that file and gains the six readers the pass found spelling the
+  withdrawn keys or their table, so AC5 diffs the clause against the corrected row. It is a false
+  reader rather than an escape over readers, the opposite direction to the class the earlier rounds
+  hunted, and a resolution-graded half passes both, since the path it named exists.
 
 ## 10. Reuse audit
 
