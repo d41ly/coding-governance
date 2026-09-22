@@ -42,7 +42,9 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # 192 -> 197, TOOL-dDerivedDocket-25: AC2's moved-tree bar, five checks.
-FLOOR_ASSERTIONS=197
+# 197 -> 210, TOOL-dDerivedDocket-26: AC2's HOST bar and its two new refusals, four checks each, and
+# AC5's check that both bars printed the acquire line its stdout comparison filters.
+FLOOR_ASSERTIONS=210
 # Where the scratch clone installs the runner: a FIXTURE-INTERNAL path, bound once, never gov's prefix.
 KR=kit/run-gates
 n=0; st=0
@@ -297,6 +299,45 @@ check_ac2_paths() {
   check_journal AC2
 }
 
+# THE HONEST-VERDICT EXITS, TOOL-dDerivedDocket-26: a bar whose only failed leg timed out twice while a
+# spawn cost more than the HOST ratio times the clone's floor exits 4; a bar that reported no leg line
+# and a green whose verdict file was not written each exit 2. The fixture scripts live OUTSIDE the
+# scratch clone, so none of these bars dirties the tree the later arms compare.
+check_ac2_honest() {
+  local l0 l hv="$WORK/fx-hv"
+  mkdir -p "$hv"
+  printf '#!/usr/bin/env bash\nsleep 30\n' > "$hv/hang.sh"
+  printf '#!/usr/bin/env bash\nsleep 0.05\n' > "$hv/slow50.sh"
+  printf '1.000\t2026-01-01T00:00:00Z\n' > "$hv/one-ms"
+  write_legs ac2-host "[{\"name\": \"hang\", \"argv\": [\"bash\", \"$hv/hang.sh\"], \"ceiling\": 1}]"
+  l0=$(measure_lines)
+  run_bar GATE_LEGS="$WORK/ac2-host.json" GATE_SPAWN_FLOOR="$hv/one-ms" GATE_SPAWN_CMD="bash $hv/slow50.sh"
+  l=$(measure_lines)
+  check "AC2 a HOST-only bar exits 4" "$RC" 4
+  check "AC2 host bar, one line" "$l" "$((l0 + 1))"
+  check "AC2 host verdict" "$(read_field "$l" verdict)" HOST
+  check "AC2 host rc" "$(read_field "$l" rc)" 4
+  [ "$l" = "$((l0 + 1))" ] && [ "$(read_field "$l" verdict)" = HOST ] && add_arm_seen "AC2 host"
+  write_legs ac2-empty '[]'
+  l0=$(measure_lines)
+  run_bar GATE_LEGS="$WORK/ac2-empty.json"
+  l=$(measure_lines)
+  check "AC2 an empty manifest is refused" "$RC" 2
+  check "AC2 empty bar, one line" "$l" "$((l0 + 1))"
+  check "AC2 empty verdict" "$(read_field "$l" verdict)" REFUSED
+  check "AC2 empty rc" "$(read_field "$l" rc)" 2
+  [ "$l" = "$((l0 + 1))" ] && [ "$(read_field "$l" verdict)" = REFUSED ] && add_arm_seen "AC2 refused-empty"
+  l0=$(measure_lines)
+  run_bar GATE_LEGS="$WORK/one.json" GATE_VERDICT_FAULT=1
+  l=$(measure_lines)
+  check "AC2 a green whose verdict file was not written is refused" "$RC" 2
+  check "AC2 unwritten-verdict bar, one line" "$l" "$((l0 + 1))"
+  check "AC2 unwritten-verdict line reads NONE, since no verdict file exists" "$(read_field "$l" verdict)" NONE
+  check "AC2 unwritten-verdict rc" "$(read_field "$l" rc)" 2
+  [ "$l" = "$((l0 + 1))" ] && [ "$RC" = 2 ] && [ "$(read_field "$l" verdict)" = NONE ] && add_arm_seen "AC2 refused-verdict"
+  check_journal AC2-honest
+}
+
 # ------------------------------------------------------------------------------------------ AC3
 # THE SIGNAL IS SENT ONLY ONCE THE LEG IS PROVABLY RUNNING, and it is sent to the RUNNER. The leg
 # writes the ready file as its first act, so the runner is past its header and waiting on it. The
@@ -458,7 +499,12 @@ check_ac5_write_failure() {
   check "AC5 the switch-off bar is green, so rc and stdout are compared between two bars that ran" "$rc_off" 0
   run_bar GATE_LEGS="$WORK/ac5.json"
   check "AC5 a failed append leaves rc alone" "$RC" "$rc_off"
-  check "AC5 a failed append leaves stdout alone" "$OUT" "$out_off"
+  # THE ACQUIRE LINE names the instant each bar acquired (TOOL-dDerivedDocket-26), which two bars never
+  # share, so it is filtered from the comparison and its presence checked on both sides instead.
+  check "AC5 both bars print one acquire line" \
+    "$(printf '%s\n' "$OUT" | grep -c '^gate queue: acquired ')|$(printf '%s\n' "$out_off" | grep -c '^gate queue: acquired ')" "1|1"
+  check "AC5 a failed append leaves stdout alone" \
+    "$(printf '%s\n' "$OUT" | grep -v '^gate queue: acquired ')" "$(printf '%s\n' "$out_off" | grep -v '^gate queue: acquired ')"
   check "AC5 stderr carries ONE run-log line" "$(printf '%s\n' "$ERR" | grep -c '^run-gates: run log')" 1
   check "AC5 that line names the file it could not write" "$(printf '%s\n' "$ERR" | grep '^run-gates: run log' | grep -c 'runlog/gates.log')" 1
   check "AC5 and nothing else new on stderr" "$(printf '%s\n' "$ERR" | grep -v '^run-gates: run log')" "$err_off"
@@ -611,6 +657,9 @@ exit 1	2	AC2 wall|AC1 red
 exit 2	1	AC2 refused
 echo "gates GREEN — $ran/$ran legs passed$skipnote"; exit 0	1	AC2 green
 echo "gates TREE MOVED — the tree changed while the bar ran, so no verdict describes it"; exit 3	1	AC2 moved
+echo "$HOST_LINE"; exit 4	1	AC2 host
+echo "gates REFUSED — no leg line was reported, so this run has no verdict to give"; exit 2	1	AC2 refused-empty
+echo "gates REFUSED — every leg that ran passed, but the verdict file ${RUNDIR:-<no run record>}/verdict was not written, so nothing can confirm this green"; exit 2	1	AC2 refused-verdict
 EXITS
 
 check_exit_table() { # runner -> EXIT_TRAP, EXIT_SITES, EXIT_UNKNOWN, EXIT_MISCOUNT, EXIT_STALE
@@ -744,6 +793,7 @@ build_scratch || { echo "FAIL the scratch clone could not be built"; exit 1; }
 
 check_selected AC1 && check_ac1_red
 check_selected AC2 && check_ac2_paths
+check_selected AC2 && check_ac2_honest
 check_selected AC3 && check_ac3_signals
 check_selected AC4 && check_ac4_spawns
 check_selected AC5 && check_ac5_write_failure

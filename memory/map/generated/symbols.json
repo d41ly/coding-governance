@@ -4028,6 +4028,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "measure_legs_retried_after_timeout",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "measure_orphans",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -8221,6 +8226,11 @@
       "id": "test_legacy_note_is_silent_when_it_would_name_its_own_destination",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_legs_retried_after_timeout",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_lexicon_marginal_rate",

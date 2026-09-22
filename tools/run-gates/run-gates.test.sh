@@ -45,7 +45,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=211
+FLOOR_ASSERTIONS=258
 # RAISED 149 -> 188 by TOOL-dDerivedDocket-23: the `signature` key-set control and section 7's
 # thirty-eight red-attribution assertions, every one counted on a host with no `timeout` as well.
 # RAISED 188 -> 205 by TOOL-dDerivedDocket-25: arm 3a's `TMPDIR entries` presence check and the
@@ -53,6 +53,9 @@ FLOOR_ASSERTIONS=211
 # for 8e on a host with no `/proc`, announces its skip.
 # RAISED 205 -> 211 by TOOL-dDerivedDocket-24: section 7's six age-and-owner assertions (AC3, AC4,
 # AC17), none of them host-conditional.
+# RAISED 211 -> 258 by TOOL-dDerivedDocket-26: arm 3a's acquire-line presence check, arm 4h-kill's
+# no-retry assertion, and section 9's forty-five honest-verdict assertions, thirty of them behind the
+# `timeout` gate and counted on a host without one as well.
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -393,12 +396,18 @@ s4=$(run_scratch 4); peaks4=$(peaks_now); n4=$(npeaks_now)
 # THE AMBIENT COUNT IS FILTERED TOO (TOOL-dDerivedDocket-25): `TMPDIR entries <n>` counts a
 # directory other legs of an outer bar write into concurrently, so two runs legitimately disagree
 # about it. The presence check right below is what keeps this filter from hiding its disappearance.
-f1=$(printf '%s\n' "$s1" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ')
-f4=$(printf '%s\n' "$s4" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ')
+# THE ACQUIRE LINE IS FILTERED TOO (TOOL-dDerivedDocket-26): it names the instant the bar acquired,
+# which two runs never share. The second presence check below keeps the filter from hiding it.
+f1=$(printf '%s\n' "$s1" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ' | grep -v '^gate queue: acquired ')
+f4=$(printf '%s\n' "$s4" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ' | grep -v '^gate queue: acquired ')
 n=$((n+1))
 { [ "$(printf '%s\n' "$s1" | grep -c '^TMPDIR entries [0-9][0-9]*$')" = 1 ] \
   && [ "$(printf '%s\n' "$s4" | grep -c '^TMPDIR entries [0-9][0-9]*$')" = 1 ]; } \
   || { echo "canary: a bar did not print exactly one 'TMPDIR entries <n>' line, so arm 3a's filter is hiding its absence rather than its count"; fail=1; }
+n=$((n+1))
+{ [ "$(printf '%s\n' "$s1" | grep -c '^gate queue: acquired [0-9TZ:-]* from [a-z]*$')" = 1 ] \
+  && [ "$(printf '%s\n' "$s4" | grep -c '^gate queue: acquired [0-9TZ:-]* from [a-z]*$')" = 1 ]; } \
+  || { echo "canary: a bar did not print exactly one 'gate queue: acquired <instant> from <state>' line, so arm 3a's filter is hiding its absence rather than its instant"; fail=1; }
 n=$((n+1))
 if [ "$f1" != "$f4" ]; then
   echo "canary: GATE_JOBS=1 and GATE_JOBS=4 disagree — concurrency changed the report"
@@ -1152,13 +1161,20 @@ n=$((n+1))
 n=$((n+1))
 n=$((n+1))
 n=$((n+1))
+n=$((n+1))   # AC9's no-retry assertion beside them (TOOL-dDerivedDocket-26)
+# THE SERIAL RETRY'S TAILS (TOOL-dDerivedDocket-26). A leg whose ceiling fired is now deferred and
+# run once more alone, so arms 4h and stubborn pin the tail of that SECOND timeout. Each bar points
+# `GATE_SPAWN_FLOOR` at a path that does not exist, so the floor as read is absent and the tail names
+# the missing calibration on every host: with a floor this clone recorded, a loaded outer bar could
+# read HOST and exit 4, and the arm would grade the node instead of the runner.
+_nf4=$(mktemp -d) || { echo "canary: cannot create a scratch dir for arm 4h's floor"; exit 2; }
 # tbl-loose is written OUTSIDE the guard for the same reason: the no-ceiling arm below the `fi`
 # names this profile on every host, and a file written only inside the guard leaves that arm running
 # under the runner's silent built-in fallback on a timeout-less box while claiming the profile. 4h
 # still reads it from inside the guard, byte-identical. TOOL-aRatifiedRulings-4.
 printf 'loose\t0\t0\twidth=2,timeout=0\n' > "$P/fx/tbl-loose.txt"
 if [ "$HAVE_TIMEOUT" = 1 ]; then
-  o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
+  rm -f "$_nf4/floor"; o=$(runp GATE_PROFILES=fx/tbl-tight.txt GATE_SPAWN_FLOOR="$_nf4/floor")
   # THE LEG'S CLOCK, NOT THE PROCESS TREE'S. The first spelling subtracted two WHOLE-RUN wall clocks,
   # so the runner's fixed startup — measured at 19 s on node `a`, against a 17 s signal — sat inside
   # both terms along with its jitter. Three sequential pairs of this very fixture gave differences of
@@ -1170,7 +1186,7 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   # two runs — the control overwrites the row. Signal against measured constant is now ~20 s to ~0 s
   # rather than 17 s to 19 s; that ratio is the number to re-check before shortening the fixture.
   t_timed=$(leg_secs sleeper)
-  printf '%s\n' "$o" | grep -q '^GATE FAIL  sleeper  (timed out after 3s)$' \
+  printf '%s\n' "$o" | grep -q '^GATE FAIL  sleeper  (timed out after 3s, again on its serial retry; no spawn floor is recorded for this clone, so HOST was not measured)$' \
     || { echo "canary: a leg that outlived the per-leg timeout was not reported FAILED with a timeout tail"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^gates RED' \
     || { echo "canary: a timed-out leg did not make the run RED — a timeout must never read as a skip or a pass"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
@@ -1191,13 +1207,13 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
 ]
 JSON
 n=$((n+1))
-  o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
+  rm -f "$_nf4/floor"; o=$(runp GATE_PROFILES=fx/tbl-tight.txt GATE_SPAWN_FLOOR="$_nf4/floor")
   # THE TAIL MOVED WITH TOOL-aLeakedHandle-3 and this assertion accepts either signal winning, as it
   # always has — which one wins is the host's business. TERM winning still says `timed out after 3s`;
   # KILL winning now says `killed after <n>s, ceiling 3s`, and that is more honest about this very
   # path, because the leg ran the bound PLUS the five-second kill-after and the old line's `3s` was
   # already wrong by 5 s.
-  printf '%s\n' "$o" | grep -qE '^GATE FAIL  stubborn  [(](timed out after 3s|killed after [0-9][0-9.]*s, ceiling 3s)[)]$' \
+  printf '%s\n' "$o" | grep -qE '^GATE FAIL  stubborn  [(](timed out after 3s|killed after [0-9][0-9.]*s, ceiling 3s), again on its serial retry; no spawn floor is recorded for this clone, so HOST was not measured[)]$' \
     || { echo "canary: a leg that IGNORES SIGTERM was not reported with a timeout tail — the kill-after escalates to SIGKILL and that path exits 137, not 124, so it is the one case -k exists for"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 
   # 4h-kill. A KILLED LEG REPORTS THE SECONDS IT RAN, NOT THE CEILING IT NEVER REACHED. The class is
@@ -1227,6 +1243,10 @@ JSON
   case "$kt" in
     *"timed out"*) echo "canary: a leg killed at ${ks:-?}s under a declared ceiling of 600 was reported as having TIMED OUT. The ceiling never fired; rc=137 is what an operator, an OOM killer or a CI cancel produces too, and the verb may not claim a bound it cannot know about. Got: $kt"; fail=1 ;;
   esac
+  # AC9 (TOOL-dDerivedDocket-26). The same kill is never DEFERRED: a 137 short of its bound did not have
+  # its ceiling fire, so it is not retried, not printed as timed out, and never counted green on a retry.
+  printf '%s\n' "$o" | grep -q '^GATE retry  selfkilled  ' \
+    && { echo "canary: a leg SIGKILLed about 2 s into a 600 s ceiling was deferred for a serial retry — only a fired ceiling is retried: $(printf '%s\n' "$o" | grep '^GATE retry')"; fail=1; }
 
   cat > "$P/tools/gate-legs.json" <<'JSON'
 [
@@ -2277,6 +2297,241 @@ else
     || { echo "canary: absolute argv — the runner's argv carries no absolute path to its own script, so the fence cannot attribute it:"; printf '%s\n' "$_acmd" | sed 's/^/    /'; fail=1; }
 fi
 rm -rf "$OS" 2>/dev/null || true
+rm -rf "$_nf4" 2>/dev/null || true
+
+# ================================================================================================
+# 9. HONEST VERDICTS UNDER CONTENTION. TOOL-dDerivedDocket-26. A leg whose OWN ceiling fired is
+#    deferred and run once more alone after the pool drains; a pass counts green, a second timeout is
+#    a failure, and HOST when a spawn then costs more than GATE_HOST_RATIO times this clone's floor.
+#    The runner never exits 0 without a leg line and a written verdict file. Every arm drives the REAL
+#    runner over a scratch repository of its own, cwd and all, with the ambient knobs cleared.
+#
+#    THE FLOOR IS STAGED THROUGH `GATE_SPAWN_FLOOR` AND A DIRECTORY, never through `chmod`: on these
+#    Git-Bash trees a `chmod 000` on a file the caller owns is frequently a no-op, and an arm staged
+#    that way runs the ordinary path and passes over a branch nothing entered.
+#
+#    COUNTED EITHER WAY. The arms that need a live ceiling run only where `timeout -k` does, and their
+#    increments sit outside that gate for the reason arm 4h states in its own skip.
+HV=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the honest-verdict arms"; exit 2; }
+build_hv_repo() { # dir — a scratch repository carrying this runner and its siblings, one commit
+  local d=$1
+  mkdir -p "$d/$KIT_REL" "$d/fx"
+  cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$d/fx/ok.sh"
+  printf '#!/usr/bin/env bash\necho "FAIL an assertion"\nexit 1\n' > "$d/fx/red.sh"
+  printf '#!/usr/bin/env bash\nsleep 60\n' > "$d/fx/hang.sh"
+  printf 'seed\n' > "$d/fx/target.txt"
+  printf '#!/usr/bin/env bash\necho moved >> fx/target.txt\nexit 0\n' > "$d/fx/move.sh"
+  ( cd "$d" && git init -q -b main . && git config user.email h@t.invalid && git config user.name h \
+      && git config core.autocrlf false && git add -A && git commit -qm base ) >/dev/null 2>&1
+}
+run_hv_bar() { # dir · manifest · VAR=value… -> HV_OUT (stdout and stderr) and HV_RC
+  local d=$1 m=$2; shift 2
+  HV_OUT=$( cd "$d" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
+      GATE_INHERITED_RED= GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_JOBS=4 GATE_PROFILE=minimal \
+      GATE_TURNSTILE=0 GATE_LEGS="$m" "$@" bash $KIT_REL/run-gates.sh 2>&1 ); HV_RC=$?
+}
+check_hv_line() { # label · pattern -> one counted assertion that some line of HV_OUT matches the ERE
+  n=$((n+1))
+  printf '%s\n' "$HV_OUT" | grep -qE -- "$2" \
+    || { echo "canary: honest verdicts — $1: no line matched /$2/ in:"; printf '%s\n' "$HV_OUT" | sed 's/^/    /'; fail=1; }
+}
+check_hv_value() { # label · got · want -> one counted assertion
+  n=$((n+1))
+  [ "$2" = "$3" ] || { echo "canary: honest verdicts — $1: got [$2], wanted [$3]"; fail=1; }
+}
+read_hv_record() { # dir · key -> that key of the newest run record's verdict file
+  local r; r=$(ls -1td "$1"/.git/gate-run/*/ 2>/dev/null | head -1)
+  awk -F'\t' -v k="$2" '$1 == k { print $2 }' "${r}verdict" 2>/dev/null
+}
+printf '#!/usr/bin/env bash\nsleep 0.05\n' > "$HV/slow50.sh"
+printf '#!/usr/bin/env bash\nsleep 0.2\n' > "$HV/dear.sh"
+printf '1.000\t2026-01-01T00:00:00Z\n' > "$HV/one-ms"
+
+# 9a. AC12 — NO LEG LINE, NO VERDICT FILE, NO EXIT 0. Neither needs a ceiling.
+H12="$HV/r12"; build_hv_repo "$H12"
+printf '[]\n' > "$HV/empty.json"
+run_hv_bar "$H12" "$HV/empty.json"
+check_hv_value "AC12 an empty manifest exits 2" "$HV_RC" 2
+check_hv_line "AC12 an empty manifest is REFUSED naming the missing leg lines" '^gates REFUSED — no leg line was reported'
+printf '[{"name": "fine", "argv": ["bash", "fx/ok.sh"]}]\n' > "$HV/fine.json"
+run_hv_bar "$H12" "$HV/fine.json" GATE_VERDICT_FAULT=1
+check_hv_value "AC12 a green whose verdict file was not written exits 2" "$HV_RC" 2
+check_hv_line "AC12 and the refusal names the verdict file" '^gates REFUSED — .*the verdict file .*/verdict was not written'
+run_hv_bar "$H12" "$HV/fine.json"
+check_hv_value "AC12 control: the same bar with its record written exits 0" "$HV_RC" 0
+
+# 9b. AC3 — THE ACQUIRE LINE, after a queue behind a planted LIVE holder that releases three seconds in.
+H3="$HV/r3"; build_hv_repo "$H3"
+mkdir -p "$H3/.git/gate-bar-beacon"
+sleep 300 & _hvholder=$!
+printf '%s' "$(date +%s)" > "$H3/.git/gate-bar-beacon/heartbeat"
+printf '%s' "$_hvholder" > "$H3/.git/gate-bar-beacon/pid"
+printf 'planted' > "$H3/.git/gate-bar-beacon/nonce"
+( sleep 3; rm -rf "$H3/.git/gate-bar-beacon" ) &
+_hvrel=$!
+run_hv_bar "$H3" "$HV/fine.json" GATE_TURNSTILE=1 GATE_TURNSTILE_TICK=1
+wait "$_hvrel" 2>/dev/null; kill "$_hvholder" 2>/dev/null; wait "$_hvholder" 2>/dev/null
+_hvw=$(printf '%s\n' "$HV_OUT" | grep -n '^gate queue: waited ' | head -1)
+_hva=$(printf '%s\n' "$HV_OUT" | grep -n '^gate queue: acquired ' | head -1)
+check_hv_value "AC3 the bar actually queued" "$(printf '%s' "$_hvw" | sed -n 's/^[0-9]*:gate queue: waited \([0-9]*\)s$/\1/p' | awk '{ print ($1 > 0) ? "queued" : "did not queue" }')" queued
+_hvwn=${_hvw%%:*}; _hvan=${_hva%%:*}; _hvd=none
+case "$_hvwn$_hvan" in ''|*[!0-9]*) ;; *) _hvd=$(( _hvan - _hvwn )) ;; esac
+check_hv_value "AC3 the acquire line follows the wait line directly" "$_hvd" 1
+_hvts=$(printf '%s' "$_hva" | sed -n 's/^[0-9]*:gate queue: acquired \([0-9TZ:-]*\) from held$/\1/p')
+check_hv_value "AC3 it names an instant and the held state" "$([ -n "$_hvts" ] && echo named)" named
+_hvhdr=$(ls -1td "$H3"/.git/gate-run/*/ 2>/dev/null | head -1)
+check_hv_value "AC3 the run record's header carries the same instant" "$(awk -F'\t' '$1 == "acquired" { print $2 }' "${_hvhdr}header" 2>/dev/null)" "$_hvts"
+
+# 9c. AC5 — A BEACON NAMING A DEAD PID is reaped, and the bar still gives a verdict and writes it.
+H5="$HV/r5"; build_hv_repo "$H5"
+mkdir -p "$H5/.git/gate-bar-beacon"
+printf '%s' "$(date +%s)" > "$H5/.git/gate-bar-beacon/heartbeat"
+printf '999999' > "$H5/.git/gate-bar-beacon/pid"
+printf 'dead' > "$H5/.git/gate-bar-beacon/nonce"
+run_hv_bar "$H5" "$HV/fine.json" GATE_TURNSTILE=1 GATE_TURNSTILE_TICK=1
+check_hv_line "AC5 a dead holder's bar still prints its verdict line" '^gates GREEN — '
+check_hv_value "AC5 and writes its verdict file" "$(read_hv_record "$H5" verdict)" GREEN
+
+# 9d. AC6 — A LEDGER ROW READING `retried` IS NEVER REUSED. The control first: the same row reading
+#     `ok` IS reused, so the key the arm edits is the one the reuse predicate matched.
+H6="$HV/r6"; build_hv_repo "$H6"
+printf '[{"name": "cached", "argv": ["bash", "fx/ok.sh"]}]\n' > "$HV/cached.json"
+run_hv_bar "$H6" "$HV/cached.json"
+run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
+check_hv_line "AC6 control: an ok row with a matching key is reused" '^GATE reuse cached  '
+awk -F'\t' 'BEGIN { OFS = "\t" } $1 == "cached" { $3 = "retried" } { print }' "$H6/.git/gate-ledger.tsv" > "$HV/ledger.tmp" \
+  && cp "$HV/ledger.tmp" "$H6/.git/gate-ledger.tsv"
+run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
+check_hv_line "AC6 a retried row runs its leg" '^GATE ok    cached$'
+
+# 9e. AC11's second arm — THE WALK DIES ON A DEAD ROOT. `run_leg_reap`, sliced out of the runner, run
+#     against a root that has ALREADY exited leaves its orphan ALIVE; the same reap against a LIVE root
+#     reaches it. This is the measurement that rules out placing the reap after the pool drains.
+awk '/^scan_descendants\(\) \{/,/^}/; /^remove_descendants\(\) \{/,/^}/; /^run_leg_reap\(\) \{/,/^}/' \
+  "$KITDIR/run-gates.sh" > "$HV/reap.sh"
+bash -c '( trap "" TERM; while :; do sleep 1; done ) & echo $! > "$1"; exit 0' _ "$HV/gc.dead" &
+_hvroot=$!; wait "$_hvroot" 2>/dev/null
+_i=0; while [ ! -s "$HV/gc.dead" ] && [ "$_i" -lt 100 ]; do sleep 0.1; _i=$((_i + 1)); done
+_hvgc=$(cat "$HV/gc.dead" 2>/dev/null)
+( PROCMON_OK=0; . "$HV/reap.sh"; run_leg_reap "$_hvroot" ) >/dev/null 2>&1
+check_hv_value "AC11 a reap rooted at an EXITED pid leaves its orphan alive" "$(kill -0 "$_hvgc" 2>/dev/null && echo alive || echo dead)" alive
+[ -n "$_hvgc" ] && kill -9 "$_hvgc" 2>/dev/null
+bash -c '( trap "" TERM; while :; do sleep 1; done ) & echo $! > "$1"; sleep 60' _ "$HV/gc.live" &
+_hvroot=$!
+_i=0; while [ ! -s "$HV/gc.live" ] && [ "$_i" -lt 100 ]; do sleep 0.1; _i=$((_i + 1)); done
+_hvgc=$(cat "$HV/gc.live" 2>/dev/null)
+( PROCMON_OK=0; . "$HV/reap.sh"; run_leg_reap "$_hvroot" ) >/dev/null 2>&1
+wait "$_hvroot" 2>/dev/null
+check_hv_value "AC11 the same reap rooted at a LIVE pid reaches it" "$(kill -0 "$_hvgc" 2>/dev/null && echo alive || echo dead)" dead
+[ -n "$_hvgc" ] && kill -9 "$_hvgc" 2>/dev/null
+
+if [ "$HAVE_TIMEOUT" = 1 ]; then
+  # 9f. AC1 and AC2 — A LEG THAT TIMES OUT ONLY BESIDE A SPINNER. The contended leg waits for the
+  #     spinner to start, hangs while its flag stands, and passes once the spinner has finished, so
+  #     its first attempt times out beside one neighbour and its serial retry, alone, is green.
+  H1="$HV/r1"; build_hv_repo "$H1"
+  export HV_FLAG="$HV/spinner"
+  printf '#!/usr/bin/env bash\n: > "$HV_FLAG"\nsleep 4\nrm -f "$HV_FLAG"\n: > "$HV_FLAG.done"\n' > "$H1/fx/spin.sh"
+  printf '#!/usr/bin/env bash\nwhile [ ! -f "$HV_FLAG" ] && [ ! -f "$HV_FLAG.done" ]; do sleep 0.1; done\n[ -f "$HV_FLAG" ] && sleep 60\nexit 0\n' > "$H1/fx/contended.sh"
+  printf '[{"name": "spinner", "argv": ["bash", "fx/spin.sh"]},\n {"name": "contended", "argv": ["bash", "fx/contended.sh"], "ceiling": 2}]\n' > "$HV/contended.json"
+  ( cd "$H1" && git add -A && git commit -qm legs ) >/dev/null 2>&1
+  rm -f "$HV_FLAG" "$HV_FLAG.done"
+  run_hv_bar "$H1" "$HV/contended.json"
+  check_hv_value "AC1 the contended bar exits 0" "$HV_RC" 0
+  check_hv_line "AC1 its first timeout is deferred beside ONE neighbour" '^GATE retry  contended  \(timed out after 2s beside 1 neighbours; one serial retry after the pool drains\)$'
+  check_hv_line "AC1 its serial retry passes" '^GATE ok    contended  \(retried after timeout\)$'
+  check_hv_value "AC1 the run record counts it" "$(read_hv_record "$H1" retried)" 1
+  check_hv_line "AC2 its chunk closes pending, never green" '^---- chunk default: pending  '
+  check_hv_line "AC2 the retry line carries the final verdict" '^---- retry: green  \(1 retried, 0 failed\)$'
+  check_hv_value "S2 its ledger row reads retried, which reuse never accepts" \
+    "$(awk -F'\t' '$1 == "contended" { print $3 }' "$H1/.git/gate-ledger.tsv" 2>/dev/null)" retried
+  unset HV_FLAG
+  # ...and a leg that hangs ALONE, with no floor for this clone: zero neighbours, FAIL on its retry.
+  printf '[{"name": "lone", "argv": ["bash", "fx/hang.sh"], "ceiling": 1}]\n' > "$HV/lone.json"
+  rm -f "$HV/nofloor"
+  run_hv_bar "$H1" "$HV/lone.json" GATE_SPAWN_FLOOR="$HV/nofloor"
+  check_hv_value "AC1 the lone hang exits 1" "$HV_RC" 1
+  check_hv_line "AC1 its first timeout names ZERO neighbours" '^GATE retry  lone  \(timed out after 1s beside 0 neighbours; '
+  check_hv_line "AC4 its second timeout is FAIL naming the missing calibration" '^GATE FAIL  lone  \(timed out after 1s, again on its serial retry; no spawn floor is recorded for this clone, so HOST was not measured\)$'
+
+  # 9g. AC4 — HOST. A planted 1 ms floor and a spawn seamed to cost 50 ms: a leg that times out twice
+  #     is HOST and the bar exits 4.
+  H4="$HV/r4"; build_hv_repo "$H4"
+  run_hv_bar "$H4" "$HV/lone.json" GATE_SPAWN_FLOOR="$HV/one-ms" GATE_SPAWN_CMD="bash $HV/slow50.sh"
+  check_hv_value "AC4 a double timeout over a 1 ms floor exits 4" "$HV_RC" 4
+  check_hv_line "AC4 its tail reads HOST with the ratio it measured" '^GATE FAIL  lone  \(timed out after 1s, again on its serial retry; HOST: a spawn cost [0-9]+\.[0-9]x this clone.s floor\)$'
+  check_hv_line "AC4 the bar says the verdict is about the host" '^gates HOST — 1 leg\(s\) timed out twice while a spawn cost [0-9]+\.[0-9]x this clone.s floor; the verdict is about the host, not the subject$'
+  check_hv_value "AC4 its record reads HOST" "$(read_hv_record "$H4" verdict)" HOST
+  check_hv_value "AC4 a HOST bar stamps no full green" "$([ -f "$H4/.git/gate-full-green" ] && echo stamped || echo none)" none
+
+  # 9h. AC4's WRITER, read directly: a bar in a clone with NO floor file writes one line; a CHEAPER
+  #     seamed spawn lowers it; a DEARER one does not raise it. Each bar carries a bounded leg, because
+  #     a bar with none measures nothing.
+  H4W="$HV/r4w"; build_hv_repo "$H4W"
+  printf '[{"name": "bounded", "argv": ["bash", "fx/ok.sh"], "ceiling": 60}]\n' > "$HV/bounded.json"
+  _hvf="$H4W/.git/gate-spawn-floor"
+  run_hv_bar "$H4W" "$HV/bounded.json" GATE_SPAWN_CMD="bash $HV/dear.sh"
+  check_hv_value "AC4 a clone's first bar writes its floor file" "$([ -f "$_hvf" ] && echo written)" written
+  _hvtab=$(printf '\t')
+  check_hv_value "AC4 holding exactly one <per-spawn-ms><TAB><iso-utc> line" \
+    "$(grep -c . "$_hvf" 2>/dev/null)|$(grep -cE "^[0-9]+\.[0-9]{3}${_hvtab}[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\$" "$_hvf" 2>/dev/null)" "1|1"
+  _hvf1=$(cut -f1 "$_hvf" 2>/dev/null)
+  run_hv_bar "$H4W" "$HV/bounded.json" GATE_SPAWN_CMD="$(type -P true)"
+  _hvf2=$(cut -f1 "$_hvf" 2>/dev/null)
+  check_hv_value "AC4 a cheaper spawn lowers the floor" \
+    "$(awk -v a="${_hvf1:-0}" -v b="${_hvf2:-0}" 'BEGIN { print (b + 0 < a + 0) ? "lower" : "not lower" }')" lower
+  cp "$_hvf" "$HV/floor.before"
+  run_hv_bar "$H4W" "$HV/bounded.json" GATE_SPAWN_CMD="bash $HV/dear.sh"
+  check_hv_value "AC4 a dearer spawn leaves the line byte-identical" "$(cmp -s "$_hvf" "$HV/floor.before" && echo same)" same
+  # ...a floor path staged as a DIRECTORY is announced unreadable and read as absent...
+  mkdir -p "$HV/floor-dir"
+  run_hv_bar "$H4W" "$HV/lone.json" GATE_SPAWN_FLOOR="$HV/floor-dir" GATE_SPAWN_CMD="bash $HV/slow50.sh"
+  check_hv_line "AC4 a directory at the floor path is announced unreadable" '^run-gates: the spawn floor at .*floor-dir cannot be read, so it is treated as absent'
+  check_hv_line "AC4 and a double timeout under it reads no HOST" '^GATE FAIL  lone  \(timed out after 1s, again on its serial retry; the spawn floor could not be read, so HOST was not measured\)$'
+  # ...and a temp path staged as a DIRECTORY fails the write, announced, the held line untouched.
+  printf '9999.000\t2026-01-01T00:00:00Z\n' > "$HV/held"; cp "$HV/held" "$HV/held.keep"; mkdir -p "$HV/held.tmp"
+  run_hv_bar "$H4W" "$HV/bounded.json" GATE_SPAWN_FLOOR="$HV/held"
+  check_hv_line "AC4 an unwritable floor is announced" '^run-gates: the spawn floor at .*held could not be written, so the floor it held stays in force$'
+  check_hv_value "AC4 and the line it held survives byte-identical" "$(cmp -s "$HV/held" "$HV/held.keep" && echo same)" same
+
+  # 9i. AC10 — THE EXIT PRECEDENCE. The only failed leg is HOST while another leg moves a tracked
+  #     file: exit 4, the HOST line naming the move. With a third leg failing an assertion: exit 1,
+  #     the RED line naming the move and the HOST leg.
+  H10="$HV/r10"; build_hv_repo "$H10"
+  printf '[{"name": "lone", "argv": ["bash", "fx/hang.sh"], "ceiling": 1},\n {"name": "mover", "argv": ["bash", "fx/move.sh"]}]\n' > "$HV/moved.json"
+  run_hv_bar "$H10" "$HV/moved.json" GATE_SPAWN_FLOOR="$HV/one-ms" GATE_SPAWN_CMD="bash $HV/slow50.sh"
+  git -C "$H10" checkout -q -- fx/target.txt
+  check_hv_value "AC10 a HOST-only bar over a moved tree exits 4" "$HV_RC" 4
+  check_hv_line "AC10 and its HOST line names the move" '^gates HOST — .*\(the tree moved while the bar ran\)$'
+  printf '[{"name": "lone", "argv": ["bash", "fx/hang.sh"], "ceiling": 1},\n {"name": "mover", "argv": ["bash", "fx/move.sh"]},\n {"name": "asserts", "argv": ["bash", "fx/red.sh"]}]\n' > "$HV/moved-red.json"
+  run_hv_bar "$H10" "$HV/moved-red.json" GATE_SPAWN_FLOOR="$HV/one-ms" GATE_SPAWN_CMD="bash $HV/slow50.sh"
+  git -C "$H10" checkout -q -- fx/target.txt
+  check_hv_value "AC10 one assertion failure beside it makes the bar exit 1" "$HV_RC" 1
+  check_hv_line "AC10 the RED line names the move and the HOST leg" '^gates RED — 2/3 legs failed \(the tree moved while the bar ran\) \(1 HOST: lone\)$'
+
+  # 9j. AC11's first and third arms — THE ATTEMPT'S RESIDUE IS GONE BEFORE ITS RETRY, AND THE WORKER
+  #     SURVIVED THE REAP. The leg's first attempt leaves a TERM-ignoring grandchild that keeps
+  #     spawning and has written its pid; its retry reads that pid's liveness as its own first act.
+  H11="$HV/r11"; build_hv_repo "$H11"
+  export HV_GC="$HV/gc.pid"
+  printf '#!/usr/bin/env bash\nif [ -f "$HV_GC" ]; then\n  if kill -0 "$(cat "$HV_GC")" 2>/dev/null; then echo alive > "$HV_GC.at-retry"; else echo dead > "$HV_GC.at-retry"; fi\n  exit 0\nfi\n( trap "" TERM; while :; do sleep 1; done ) &\necho $! > "$HV_GC"\nsleep 60\n' > "$H11/fx/gc.sh"
+  ( cd "$H11" && git add -A && git commit -qm legs ) >/dev/null 2>&1
+  printf '[{"name": "residue", "argv": ["bash", "fx/gc.sh"], "ceiling": 2}]\n' > "$HV/gc.json"
+  rm -f "$HV_GC" "$HV_GC.at-retry"
+  run_hv_bar "$H11" "$HV/gc.json"
+  check_hv_value "AC11 the grandchild is dead when the serial retry starts" "$(cat "$HV_GC.at-retry" 2>/dev/null)" dead
+  _hvgc=$(cat "$HV_GC" 2>/dev/null); [ -n "$_hvgc" ] && kill -9 "$_hvgc" 2>/dev/null
+  check_hv_line "AC11 the pool reported the timed-out leg rather than leaving it outstanding" '^GATE retry  residue  '
+  _hvrec=$(ls -1td "$H11"/.git/gate-run/*/ 2>/dev/null | head -1)
+  check_hv_value "AC11 the worker survived to write the first attempt's row, seconds and all" \
+    "$(awk -F'\t' '$2 == "timeout" && $4 ~ /^[0-9]+\.[0-9]+$/ { print "written" }' "${_hvrec}0.leg" 2>/dev/null)" written
+  unset HV_GC
+else
+  n=$((n+30))
+  echo "canary: SKIP the ceiling arms of section 9 — this host has no runnable 'timeout -k', so no ceiling can fire and nothing can be deferred, retried or read HOST here"
+fi
+rm -rf "$HV" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
