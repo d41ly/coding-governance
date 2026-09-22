@@ -76,8 +76,8 @@ ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 T
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-10 | 2026-09-14 |
-| [TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live](spec/2026-09-13-spec-TOOL-dPolishedVitrine-14.md) | — | 2 | INPROGRESS | rev-4 | 2026-09-14 |
+| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-11 | 2026-09-22 |
+| [TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live](spec/2026-09-13-spec-TOOL-dPolishedVitrine-14.md) | — | 2 | INPROGRESS | rev-5 | 2026-09-22 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 4 record folder(s).

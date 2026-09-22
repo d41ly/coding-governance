@@ -1,12 +1,13 @@
 # TOOL-dGatedProse-5 — the corpus answers for its readers before the check that asks
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 1
+**Status:** CLOSED · rev-8 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md](../build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md) | research | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 |
+| [2026-09-22-build-TOOL-dGatedProse-5-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dGatedProse-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-22-build-TOOL-dGatedProse-5-corpus-census.md](../build/2026-09-22-build-TOOL-dGatedProse-5-corpus-census.md) | journal | — |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 |
 
