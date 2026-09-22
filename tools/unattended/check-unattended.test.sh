@@ -4904,7 +4904,7 @@ reset_tree
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --only 28 2>&1); rc=$?
 same "--only 28 exits 0 once the conf is read above the scope guard" "$rc" "0"
 miss "$out" "unbound variable"
-for o28 in 30 31 32 33 39 40 15 41; do
+for o28 in 30 31 32 33 39 40 15 41 42 43; do
   hit "$out" "check $o28 skipped under --only 28 — this run asked for the 28 region alone"
 done
 out=$(bash "$SCRIPT" --only 28 2>&1); rc=$?
@@ -4999,6 +4999,83 @@ out=$(GOV_UNATTENDED_REPORT=1 run)
 hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 41 FAILED')" "/SKILL.template.md"
 hit  "$out" "check 41 did not grade"
 hit  "$out" "check 41 graded 1 of 2 carriers of the process-ledger rule"
+reset_tree
+
+# ==== TOOL-dDerivedDocket-27 S6 and S7: CHECK 42, the unattended bar's wall, and CHECK 43, the hold routing
+# ---- Check 42 runs the project's declared GATE_PROFILE_CMD, so a STUB profile is written after every
+# ---- reset: it prints `wall`, `queue` and `ceiling_max` from C42_WALL, C42_QUEUE and C42_CMAX, each only
+# ---- when set, and exits C42_RC. The shared fixture's conf declares no GATE_* key, which is the state
+# ---- every adopter starts in and the first arm's subject.
+seed_c42() {
+  cat > c42-profile.sh <<'C42P'
+#!/usr/bin/env bash
+printf 'name\tstub\n'
+if [ -n "${C42_WALL:-}" ]; then printf 'wall\t%s\n' "$C42_WALL"; fi
+if [ -n "${C42_QUEUE:-}" ]; then printf 'queue\t%s\n' "$C42_QUEUE"; fi
+if [ -n "${C42_CMAX:-}" ]; then printf 'ceiling_max\t%s\n' "$C42_CMAX"; fi
+exit "${C42_RC:-0}"
+C42P
+}
+# ...and the two keys appended to the working conf, the later spelling winning when it is sourced.
+write_c42_conf() { # GATE_WALL · GATE_PROFILE_CMD
+  printf 'GATE_WALL="%s"\nGATE_PROFILE_CMD="%s"\n' "$1" "$2" >> .unattended.conf
+}
+# AC15, the leg's half: a BLANK profile command is announced on the report channel and never reds.
+reset_tree; seed_c42
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: this project declares no GATE_PROFILE_CMD, so there is no profile to read ceiling_max from"
+miss "$out" "UNATTENDED check 42 FAILED"
+# ...and a declared profile printing neither queue nor wall is announced naming the key it lacked,
+# as is one printing no ceiling_max under a declared wall.
+write_c42_conf "" "bash c42-profile.sh"
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: GATE_WALL is blank and the profile printed no usable wall, so there is no wall to compare with the largest leg ceiling"
+miss "$out" "UNATTENDED check 42 FAILED"
+write_c42_conf "40" "bash c42-profile.sh"
+hit  "$(GOV_UNATTENDED_REPORT=1 run)" "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: the profile printed no usable ceiling_max, so the 40s wall cannot be compared with the largest leg ceiling"
+# AC4, the leg's half: a declared wall below the profile's largest ceiling reds, naming both numbers,
+# although the profile's OWN wall clears it. RED against a comparison with that wall.
+write_c42_conf "10" "bash c42-profile.sh"
+out=$(C42_WALL=40 C42_QUEUE=20 C42_CMAX=30 run)
+hit  "$out" "the unattended bar's wall is below the largest declared leg ceiling, so a healthy bar that dispatches that leg is killed by its own wall and every unattended close reads red over a bound nobody chose"
+hit  "$out" "the effective wall, the declared GATE_WALL, is 10s, below the largest declared leg ceiling of 30s"
+# ...the GREEN control: a wall equal to the ceiling clears it, and the report channel says so.
+write_c42_conf "30" "bash c42-profile.sh"
+out=$(GOV_UNATTENDED_REPORT=1 C42_WALL=40 C42_QUEUE=20 C42_CMAX=30 run)
+hit  "$out" "check 42 graded the unattended bar's wall: the effective wall, the declared GATE_WALL, is 30s and clears the largest declared leg ceiling of 30s"
+miss "$out" "UNATTENDED check 42 FAILED"
+# ...a BLANK wall is the profile's own, graded the same way.
+write_c42_conf "" "bash c42-profile.sh"
+hit  "$(C42_WALL=5 C42_QUEUE=20 C42_CMAX=30 run)" "the effective wall, the profile's own wall, GATE_WALL being blank, is 5s, below the largest declared leg ceiling of 30s"
+# ...a wall the driver would refuse at conf load is a red: no verb of any run is reachable under it.
+write_c42_conf "ten" "bash c42-profile.sh"
+hit  "$(run)" "', which is not a positive integer of seconds, so the driver refuses at conf load and no verb of any unattended run in this project is reachable"
+# ...a profile command that fails, and one reporting no ceiling at all, are announced and never red.
+write_c42_conf "30" "bash c42-profile.sh"
+out=$(GOV_UNATTENDED_REPORT=1 C42_RC=3 run)
+hit  "$out" "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: the declared GATE_PROFILE_CMD exited 3: bash c42-profile.sh"
+miss "$out" "UNATTENDED check 42 FAILED"
+hit  "$(GOV_UNATTENDED_REPORT=1 C42_WALL=40 C42_QUEUE=20 C42_CMAX=- run)" "the profile reports that no leg declares a ceiling, so the 30s wall has no ceiling to clear"
+# CHECK 43, the GREEN control first: the kit's own Skill template routes a hold line correctly.
+reset_tree
+miss "$(run)" "UNATTENDED check 43 FAILED"
+# ...the hold lead gone is a red, because a paragraph this cannot find would pass by finding nothing.
+mutate $KIT_REL/SKILL.template.md 's/^\*\*A `hold ·` line from `gates-green` is your next step/**A hold line is next/'
+hit  "$(run)" "the Skill template's Close section carries no paragraph opening with the hold lead, so nothing tells a run what to do with the hold line gates-green prints, and this check would pass by finding nothing"
+# ...--hold named before the commit is a red, which the HELD unit's clean-tree precondition refuses.
+reset_tree
+mutate $KIT_REL/SKILL.template.md 's/Take it in this order: commit the staged records/Take it in this order: run --hold, then commit the staged records/'
+out=$(run)
+hit  "$out" "the Skill's hold paragraph does not name the commit of the staged records, the branch push, the keepalive reap and --hold in that order, and --hold refuses a dirty tree and, under ANCHOR_SCOPE=published, an unpublished tip; the first step missing or out of order"
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 43 FAILED')" "the first step missing or out of order: --hold"
+# ...no platform-unavailable hold for a push the remote does not answer is a red.
+reset_tree
+mutate $KIT_REL/SKILL.template.md 's/take the hold as `platform-unavailable` instead/take another hold instead/'
+hit  "$(run)" "the Skill's hold paragraph names no platform-unavailable hold for a branch push the remote does not answer, so under ANCHOR_SCOPE=published the run's only documented ending is refused"
+# ...and a hold line routed to an override is a red, which spends the one check on a host fault.
+reset_tree
+mutate $KIT_REL/SKILL.template.md 's/then run `--hold` with the code/then run `--close --override gates-green` or `--hold` with the code/'
+hit  "$(run)" "the Skill's hold paragraph routes a hold line to an override, which spends the one check between a run and its landing on a fault that is not the run's"
 reset_tree
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
@@ -5096,7 +5173,12 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- `--only 28` announcement loop one more for check 41, so FLOOR_SHARD_2 carries the same +10 and
 # ---- FLOOR_SHARD_1 is untouched. COUNTED off the diff; this pass runs no suite, and the check's
 # ---- block was run sliced out of the leg over the kit and its staged breaks.
-FLOOR_ASSERTIONS=710
+# ---- RAISED 710 -> 736 by exactly the arm, TOOL-dDerivedDocket-27: the check-42 and check-43 block at
+# ---- the END of region two executes twenty-four assertions (four `mutate`, fifteen `hit`, five
+# ---- `miss`) and the `--only 28` announcement loop two more, so FLOOR_SHARD_2 carries the same +26
+# ---- and FLOOR_SHARD_1 is untouched. COUNTED by running the block behind a replica of this prologue
+# ---- by hand, n 0 -> 24 and green, and red under four staged breaks; this pass runs no suite.
+FLOOR_ASSERTIONS=736
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -5122,7 +5204,7 @@ FLOOR_ASSERTIONS=710
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=102
-FLOOR_SHARD_2=608
+FLOOR_SHARD_2=634
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

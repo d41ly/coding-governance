@@ -45,7 +45,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=258
+FLOOR_ASSERTIONS=264
 # RAISED 149 -> 188 by TOOL-dDerivedDocket-23: the `signature` key-set control and section 7's
 # thirty-eight red-attribution assertions, every one counted on a host with no `timeout` as well.
 # RAISED 188 -> 205 by TOOL-dDerivedDocket-25: arm 3a's `TMPDIR entries` presence check and the
@@ -56,6 +56,8 @@ FLOOR_ASSERTIONS=258
 # RAISED 211 -> 258 by TOOL-dDerivedDocket-26: arm 3a's acquire-line presence check, arm 4h-kill's
 # no-retry assertion, and section 9's forty-five honest-verdict assertions, thirty of them behind the
 # `timeout` gate and counted on a host without one as well.
+# RAISED 258 -> 264 by TOOL-dDerivedDocket-27: section 10's six profile-key assertions, none of them
+# host-conditional. COUNTED off the section's own calls; this pass runs no suite.
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -2538,6 +2540,37 @@ else
   echo "canary: SKIP the ceiling arms of section 9 — this host has no runnable 'timeout -k', so no ceiling can fire and nothing can be deferred, retried or read HOST here"
 fi
 rm -rf "$HV" 2>/dev/null || true
+
+# ================================================================================================
+# 10. THE PROFILE'S TWO BACKSTOP KEYS. TOOL-dDerivedDocket-27 S3. `--print-profile` prints `queue`, the
+#     turnstile's bounded wait, and `ceiling_max`, the largest positive leg ceiling in the resolved
+#     manifest, or `-` when no leg declares one, and no `ceiling_max` line at all when the manifest does
+#     not parse. The TTL is pinned, so the expected queue is that TTL times the multiple the runner's
+#     own source declares, read from the source rather than retyped. RED against a queue printed before
+#     the TTL is resolved, which reads 0; the verb exits before the turnstile, so no bar runs here.
+PP=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the profile-key arms"; exit 2; }
+build_hv_repo "$PP/r"
+printf '[{"name": "a", "argv": ["bash", "fx/ok.sh"], "ceiling": 5},\n {"name": "b", "argv": ["bash", "fx/ok.sh"], "ceiling": 30},\n {"name": "c", "argv": ["bash", "fx/ok.sh"], "ceiling": "99"},\n {"name": "d", "argv": ["bash", "fx/ok.sh"], "ceiling": 0},\n {"name": "e", "argv": ["bash", "fx/ok.sh"], "ceiling": true}]\n' > "$PP/ceilings.json"
+printf '[{"name": "a", "argv": ["bash", "fx/ok.sh"]}]\n' > "$PP/bare.json"
+printf 'not json\n' > "$PP/broken.json"
+read_pp_key() { # manifest · key -> that key's value on the profile the runner prints, the TTL pinned at 25 s
+  ( cd "$PP/r" && env GATE_WALL= GATE_JOBS= GATE_PROFILES= GATE_PROFILE=minimal GATE_TURNSTILE_TTL=25 GATE_LEGS="$1" \
+      bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null ) | awk -F'\t' -v k="$2" '$1 == k { print $2 }'
+}
+check_pp_value() { # label · got · want -> one counted assertion
+  n=$((n+1))
+  [ "$2" = "$3" ] || { echo "canary: profile keys — $1: got [$2], wanted [$3]"; fail=1; }
+}
+_ppx=$(sed -n 's/^TS_MAXWAIT=\$(( TS_TTL \* \([0-9][0-9]*\) ))$/\1/p' "$KITDIR/run-gates.sh" | head -1)
+check_pp_value "S3 the queue multiple is readable from the runner's source" "$([ -n "$_ppx" ] && echo read)" read
+check_pp_value "S3 queue is the declared multiple of the resolved TTL" "$(read_pp_key "$PP/ceilings.json" queue)" "$(( 25 * ${_ppx:-0} ))"
+check_pp_value "S3 queue is never 0 once the TTL resolves" "$([ "$(read_pp_key "$PP/ceilings.json" queue)" != 0 ] && echo nonzero)" nonzero
+check_pp_value "S3 ceiling_max is the largest positive integer ceiling" "$(read_pp_key "$PP/ceilings.json" ceiling_max)" 30
+check_pp_value "S3 a manifest declaring no ceiling reads -" "$(read_pp_key "$PP/bare.json" ceiling_max)" -
+check_pp_value "S3 a manifest that does not parse prints no ceiling_max line" \
+  "$( ( cd "$PP/r" && env GATE_WALL= GATE_JOBS= GATE_PROFILES= GATE_PROFILE=minimal GATE_LEGS="$PP/broken.json" \
+        bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null ) | grep -c '^ceiling_max' )" 0
+rm -rf "$PP" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

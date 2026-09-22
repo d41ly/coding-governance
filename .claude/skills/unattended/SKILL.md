@@ -923,12 +923,17 @@ It also ANNOUNCES, on an in-place close, when the landing range touches a path
 verb does not run and does not set the flag for. You run that one by hand at `VERIFYING` and name
 the command in the run's record.
 
-**The bar it runs is BOUNDED.** `GATE_BOUND` seconds, declared by the project or defaulted by the
-kit — and when it is the DEFAULT, said so on stderr, because a bound nobody set should not
-be invisible. A bar that does not answer within it is KILLED, and
-`gates-green` is then unmet with a message saying the bar never RETURNED rather than that a leg
-FAILED. Those are different facts, and an operator who confuses them spends an hour hunting a
-failing leg that does not exist. The same bound covers the wiring check `--preflight` runs.
+**The bar it runs is BOUNDED, by its BACKSTOP where the project declares a profile.** `--preflight`
+asks `GATE_PROFILE_CMD` for the runner's resolved profile and pins the bar's bound as the
+`gate-backstop` fact: the runner's wall, which is `GATE_WALL` or the profile's own when that is
+blank, plus the turnstile's queue bound, plus a fixed margin, all three printed. Without a profile,
+or with one that answers no wall or no queue, the bar stays at `GATE_BOUND` seconds, announced, and
+the queue is charged to that bound. `GATE_BOUND` also covers the wiring check `--preflight` runs and
+every other command the project declares. A bar that does not answer within its bound is KILLED.
+Killed after it acquired the repository, `gates-green` is unmet with a message saying the bar never
+RETURNED rather than that a leg FAILED. Those are different facts, and an operator who confuses them
+spends an hour hunting a failing leg that does not exist. `--preflight` refuses a wall below the
+largest leg ceiling the profile reports, because that wall kills a healthy bar.
 
 It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest: that you reaped
 the idle-wake (`CronDelete`), and that every parked decision reached the wrap-up. **One of
@@ -968,15 +973,27 @@ because the Definition of Done is evaluated before they land.
 It derives the record KEY, which is not always the item name, and stages what it wrote. It refuses a
 machine-checked item, so it cannot be used to certify anything the driver checks itself.
 
+**A `hold ·` line from `gates-green` is your next step, whatever its code.** The item prints one
+when the bar ended for a reason that is not this run's to fix: `host-degraded` until `probe gate`
+when the bar was killed at its backstop before it acquired the repository, `host-degraded` until
+`probe host` when the runner exited HOST, and `inherited-red` until `probe gate` for an inherited red
+the policy parks. Take it in this order: commit the staged records, which carry the `gates-run` fact
+and any ask the item filed; push the branch; reap the keepalive; then run `--hold` with the code and
+the condition the line names, its reason, and `--reaped <id>`. `--hold` refuses a dirty tree, and
+under `ANCHOR_SCOPE=published` an unpublished tip, so it comes last. When that branch push fails
+because the remote answers nothing at all, take the hold as `platform-unavailable` instead, the one
+code `--hold` accepts over an unpublished tip.
+
+A bar that exits 3, TREE MOVED, is run once more by the item itself, which says so; a second TREE
+MOVED is unmet, naming the move, and prints no hold, because something writing to your tree mid-bar
+is yours to find.
+
 **A red the bar reads as INHERITED is not yours to override.** `gates-green` reads the inherited-red
 policy at the tip the remote advertises and attributes the red there. Under `land` an inherited-only
 red within its age bound is met. Under `park`, or past the bound, the item prints the hold for an
 inherited red, a line of the shape
-`hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`,
-and that line is your next step, in this order: commit the staged records, which carry the
-`gates-run` fact and any ask the item filed; push the branch; reap the keepalive; then run the
-`--hold` it names, `--code inherited-red --until "probe gate"` with its reason and `--reaped <id>`.
-`--hold` refuses a dirty tree, so it comes last. `--override gates-green` and
+`hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`.
+`--override gates-green` and
 `--abort --code gate-red-out-of-scope` are both refused unless that bar's record reads every red leg
 INHERITED at HEAD. You may instead ABSORB the red, on the four conditions `UNATTENDED-STOPS.md` §13
 states, in a commit of its own.

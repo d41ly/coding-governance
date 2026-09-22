@@ -599,6 +599,39 @@ if [ "$CEILINGS_LIVE" != 1 ]; then
 fi
 PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w; $PROF_TAG)"
 
+# HOISTED ABOVE `--print-profile`, TOOL-dDerivedDocket-27 S3. That verb reports the queue bound,
+# and a queue printed before the TTL is resolved reads 0, which is a bound on nothing. Deriving it
+# takes no beacon, runs no leg and writes nothing, so the verb still exits before the turnstile.
+# THE TTL IS DERIVED, never a wall clock copied out of a timing cache. What has to be outlasted is
+# the gap between two heartbeat refreshes — and since TOOL-aQuenchedHarness-8 that gap is
+# `TS_TICK_EVERY`, a TIMER, not "how long can one leg take". The distinction is the whole unit:
+# liveness is a property of the PROCESS and is cheap to assert often; progress is a property of the
+# WORK and is what the per-leg ceiling and the whole-bar wall are for. The reaper wants the first.
+#
+# WHAT THIS REPLACED, recorded because the cliff was real and measured. `ts_hb` used to be called at
+# exactly ONE site — a leg COMPLETING — so the TTL had to outlast a whole leg. Every shipped profile
+# row sets `timeout=0`, so every real run used the 1800 s fallback, while the longest recorded leg
+# was 3837 s. A bar therefore went stale mid-leg on every full run, the next bar reaped its beacon as
+# "stalled", and both ran. Reproduced in a scratch repo with this file unmodified: bar B printed
+# `reaping the beacon of a stalled holder (heartbeat 13s old, ttl 6s)` while bar A was alive and
+# working, and both exited 0. The old note here said the fix was to set `timeout=` on a profile row;
+# it is not, because that value would have to exceed the longest leg, which puts TS_TTL at three
+# times it and TS_MAXWAIT — a declared TS_TTL * 4 — near thirteen hours.
+#
+# A BACKGROUND TICKER WAS REJECTED ONCE, in `memory/builds/aPacedTurnstile/spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md`,
+# on two premises. The second — "a leg-sized TTL makes it unnecessary" — is refuted by the two
+# numbers above. The first — one more process on a spawn-bound machine — survives and is PRICED: at
+# `TS_TTL / 6` a 4000 s bar ticks about 13 times, two spawns each, at the 319 ms per-spawn cost
+# measured on node `a`; roughly 8 s against a bar that makes tens of thousands. That is the
+# supersession `AGENTS.md` §6 requires, written where the reversal happens.
+if [ "${PROF_TIMEOUT:-0}" -gt 0 ]; then TS_TTL=$(( PROF_TIMEOUT * 3 ))
+else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
+# The bounded wait is a DECLARED MULTIPLE OF THE TTL, so it moves with the one number this unit
+# derives and is never sized against a bar's wall clock. Four: long enough that a queue three deep
+# behind a stalled holder still drains rather than stampeding, short enough that a wedged node
+# releases within an hour.
+TS_MAXWAIT=$(( TS_TTL * 4 ))
+
 # ---- `--print-profile`: ONE RESOLVER, TWO READERS. TOOL-aQuenchedHarness-4 S11 ------------------
 # Profile selection -- the hardware detection, the table walk, the clamp, the GATE_JOBS override --
 # is 200 lines and lives inline here, so any second script wanting the width had to re-implement it.
@@ -612,11 +645,33 @@ PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t,
 #
 # TAB-SEPARATED KEY/VALUE, because the caller is a shell script and `read -r k v` is the cheapest
 # correct parse there. Adding a key is safe; a reader takes the keys it knows.
+#
+# TWO KEYS FOR THE UNATTENDED DRIVER'S BACKSTOP, TOOL-dDerivedDocket-27 S3. `queue` is TS_MAXWAIT, the
+# longest the turnstile waits before it fails open, which the driver adds to the wall because the
+# wall is armed only after the queue. `ceiling_max` is the largest positive `ceiling` in the resolved
+# manifest, read with the parse's own predicate, or `-` when no leg declares one; a wall below it
+# fires on a healthy bar that dispatches that leg. A manifest that does not parse prints NO
+# `ceiling_max` line, because "none declared" and "could not read" are two answers, and a reader
+# names the key it did not get.
 if [ "${1:-}" = "--print-profile" ]; then
+  PROF_CEILING_MAX=$("$PYBIN" -c '
+import json, sys
+try:
+    data = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception:
+    sys.exit(1)
+if not isinstance(data, list):
+    sys.exit(1)
+c = [l["ceiling"] for l in data if isinstance(l, dict) and isinstance(l.get("ceiling"), int)
+     and not isinstance(l.get("ceiling"), bool) and l["ceiling"] > 0]
+sys.stdout.write(str(max(c)) if c else "-")
+' "$LEGS_FILE" 2>/dev/null) || PROF_CEILING_MAX=""
   printf 'name\t%s\n'      "$PROF_NAME"
   printf 'width\t%s\n'     "$JOBS"
   printf 'timeout\t%s\n'   "$PROF_TIMEOUT"
   printf 'wall\t%s\n'      "$WALL"
+  printf 'queue\t%s\n'     "$TS_MAXWAIT"
+  [ -n "$PROF_CEILING_MAX" ] && printf 'ceiling_max\t%s\n' "$PROF_CEILING_MAX"
   printf 'ceilings\t%s\n'  "$CEILINGS_LIVE"
   printf 'line\t%s\n'      "$PROF_LINE"
   exit 0
@@ -674,35 +729,6 @@ if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
 fi
 
-# THE TTL IS DERIVED, never a wall clock copied out of a timing cache. What has to be outlasted is
-# the gap between two heartbeat refreshes — and since TOOL-aQuenchedHarness-8 that gap is
-# `TS_TICK_EVERY`, a TIMER, not "how long can one leg take". The distinction is the whole unit:
-# liveness is a property of the PROCESS and is cheap to assert often; progress is a property of the
-# WORK and is what the per-leg ceiling and the whole-bar wall are for. The reaper wants the first.
-#
-# WHAT THIS REPLACED, recorded because the cliff was real and measured. `ts_hb` used to be called at
-# exactly ONE site — a leg COMPLETING — so the TTL had to outlast a whole leg. Every shipped profile
-# row sets `timeout=0`, so every real run used the 1800 s fallback, while the longest recorded leg
-# was 3837 s. A bar therefore went stale mid-leg on every full run, the next bar reaped its beacon as
-# "stalled", and both ran. Reproduced in a scratch repo with this file unmodified: bar B printed
-# `reaping the beacon of a stalled holder (heartbeat 13s old, ttl 6s)` while bar A was alive and
-# working, and both exited 0. The old note here said the fix was to set `timeout=` on a profile row;
-# it is not, because that value would have to exceed the longest leg, which puts TS_TTL at three
-# times it and TS_MAXWAIT — a declared TS_TTL * 4 — near thirteen hours.
-#
-# A BACKGROUND TICKER WAS REJECTED ONCE, in `memory/builds/aPacedTurnstile/spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md`,
-# on two premises. The second — "a leg-sized TTL makes it unnecessary" — is refuted by the two
-# numbers above. The first — one more process on a spawn-bound machine — survives and is PRICED: at
-# `TS_TTL / 6` a 4000 s bar ticks about 13 times, two spawns each, at the 319 ms per-spawn cost
-# measured on node `a`; roughly 8 s against a bar that makes tens of thousands. That is the
-# supersession `AGENTS.md` §6 requires, written where the reversal happens.
-if [ "${PROF_TIMEOUT:-0}" -gt 0 ]; then TS_TTL=$(( PROF_TIMEOUT * 3 ))
-else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
-# The bounded wait is a DECLARED MULTIPLE OF THE TTL, so it moves with the one number this unit
-# derives and is never sized against a bar's wall clock. Four: long enough that a queue three deep
-# behind a stalled holder still drains rather than stampeding, short enough that a wedged node
-# releases within an hour.
-TS_MAXWAIT=$(( TS_TTL * 4 ))
 TS_TICK=${GATE_TURNSTILE_TICK:-2}
 # The heartbeat cadence is DERIVED from the TTL and declared nowhere else, so the pair cannot drift —
 # the same rule TS_MAXWAIT above already follows. Six, so a single missed tick cannot trip the reap.

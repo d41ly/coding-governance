@@ -191,8 +191,51 @@ bar's own run record: an inherited-only red within its age bound is met under `l
 `inherited-red` hold under `park`, and files an ask for each inherited leg once `ASKS_CMD` is
 declared. The contract is `UNATTENDED-STOPS.md`. One residual moved here from the protocol's §3 when
 that arm grew its decision table (`TOOL-dDerivedDocket-24`): two runs CLOSING together in one clone
-contend on the bar's turnstile, whose queue wait is charged against the gate bound, so the second can
-fail `gates-green` for contention.
+contend on the bar's turnstile. Where the project declares a profile, the queue wait has its own term
+in the bar's backstop and the second run waits it out; where it does not, the wait is charged
+against `GATE_BOUND`, so the second can fail `gates-green` for contention.
+
+## The bar's bound — wall, queue and margin
+
+`TOOL-dDerivedDocket-27`, under owner ruling D12-i7. The unattended bar has ONE declared number,
+`GATE_WALL`, the runner's whole-run wall, and `GATE_PROFILE_CMD` is the command that prints the
+runner's resolved profile. `--preflight` runs that command under `GATE_BOUND` and pins the bar's
+bound as the `gate-backstop` fact: the wall, plus the turnstile's queue bound, plus a margin that
+is a source constant of the driver. The runner arms its wall only after the queue, so a bound that
+charged the queue to `GATE_BOUND` killed a close for contention with its bar never started.
+
+- **Blank `GATE_PROFILE_CMD` is where every adopter starts.** The bar has no backstop and stays at
+  `GATE_BOUND`, announced at `--preflight` and at every `gates-green`. A profile that answers without
+  a usable `wall` or `queue` falls back the same way and names the key it lacked. Probing
+  `$GATE_CMD --print-profile` instead would guess that the declared gate is this repository's
+  runner, and a gate that ignores its arguments would run a whole bar at preflight.
+- **Blank `GATE_WALL` leaves the profile's own wall in force**, and the driver's NOTE says so. A value
+  that is not a positive integer refuses at conf load, on `GATE_BOUND`'s terms. The driver hands a
+  declared wall to `$GATE_CMD` and to no other command, so the push-boundary bar keeps the profile's.
+- **A wall below the largest leg ceiling is refused**, by `--preflight` and by the kit gate, naming
+  both numbers: it fires on a healthy bar that dispatches that leg. Where the profile cannot answer,
+  the kit gate announces on its report channel that it cannot compare, and does not red.
+
+`gates-green` then reads how the bar ended. An exit 3, TREE MOVED, runs it once more; an exit 4,
+HOST, prints a `host-degraded` hold released by `probe host`. A kill at the backstop before the bar
+printed `gate queue: acquired` prints a `host-degraded` hold released by `probe gate`. A kill after
+that line is the bar never returning, which no hold fits.
+
+## Two restatements moved out of the protocol's key table
+
+`TOOL-dDerivedDocket-27` widened the key table's `GATE_CMD` cell to carry the two keys above and
+funded the bytes by moving one RESTATEMENT and one ARGUMENT here. Both RULES stay in the table:
+`UNIT_STALL_BOUND` is OPTIONAL on `GATE_BOUND`'s terms, and `REVIEW_ROUNDS` also refuses a value at
+or above the runaway ceiling.
+
+**What `GATE_BOUND`'s terms are, for `UNIT_STALL_BOUND`.** The row keeps the pointer, and the sibling
+`GATE_BOUND` row states the terms in full. Spelled out, on one line so a reader can grep for the
+passage the row gave up:
+absent takes the kit default and says so on stderr; non-numeric or zero is a refusal.
+
+**Why `REVIEW_ROUNDS` refuses a value at or above the runaway ceiling.** The row keeps the refusal;
+this is its reason:
+because the ceiling would fire first and the declared bound could never be reached.
 
 ## Running the kit's own checks
 

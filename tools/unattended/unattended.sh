@@ -199,6 +199,11 @@ GATE_BOUND_LIVE=$REMOTE_BOUND_LIVE
 # then stderr rather than the two in arrival order. No byte is lost, which is why every caller that
 # prints it whole needs no edit.
 RB_OUT=""; RB_TOOK=0; RB_STDOUT=""; RB_ERR=""
+# THE BOUND THIS ONE CALL TAKES, when it is not GATE_BOUND - TOOL-dDerivedDocket-27 S4. Empty means
+# GATE_BOUND, which is every caller but one. The `gates-green` arm sets it to the bar's backstop for
+# the call that runs `$GATE_CMD` and clears it on the next line, so the wiring check, the lander
+# probes, the ask generator and the profile command itself all keep the declared bound.
+RB_BOUND=""
 # THE LEASE THIS BOUNDED RUN ACTS FOR. Set by a verb that HOLDS or is taking a lease, cleared
 # otherwise. A bounded command is the long silence the refresh source exists for — `--close` runs
 # the whole bar through here, before its own write gate — and the two names are what let the
@@ -223,7 +228,7 @@ RB_LEASE_SLUG=""; RB_LEASE_ID=""
 # On the UNBOUNDED path, a host with no runnable `timeout`, the command now ignores INT, so a Ctrl-C
 # ends the driver alone and leaves the command running — as a recorded orphan the next reap finds.
 run_bounded() { # argv...
-  local _s _e _rc _d _p
+  local _s _e _rc _d _p _b=${RB_BOUND:-${GATE_BOUND:-0}}
   write_lease_refreshed "$RB_LEASE_SLUG" "$RB_LEASE_ID"
   # THE REFUSAL BRANCH KEEPS RB_OUT'S SENTENCE and empties only the two NEW values. That sentence
   # is this branch's ONLY diagnostic -- it is SET here and the function returns before RB_TOOK is
@@ -238,8 +243,8 @@ run_bounded() { # argv...
   # GATE_BOUND_LIVE is REMOTE_BOUND_LIVE's sibling and is probed the same way: by RUNNING timeout,
   # never by testing for the binary. With no runnable timeout the command still RUNS, unbounded --
   # a bound may cost speed and may turn a hang into a verdict; it may never turn a check into a skip.
-  if [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
-    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" timeout -k 5s "$GATE_BOUND" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
+  if [ "$GATE_BOUND_LIVE" = 1 ] && [ "$_b" -gt 0 ]; then
+    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   else
     "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   fi
@@ -387,6 +392,18 @@ LEASE_STALE_AFTER_DEFAULT=7200
 # TOOL-dDerivedDocket-5.
 RESUME_SCHEDULE_DELAY_DEFAULT=1800
 RESUME_SCHEDULE_LIMIT_DEFAULT=6
+# TOOL-dDerivedDocket-27 S4 - THE BACKSTOP'S MARGIN, the third term of the bar's bound: what a bar may
+# still take AFTER its own wall fired - the wall watcher's poll, at most 30 s, the kill of each leg's
+# tree and the verdict render. 600 s is twenty of those polls, PINNED 2026-09-14 from that one bound,
+# and every backstop line prints it beside the other two terms, so the sum re-derives on every run.
+# A SOURCE CONSTANT with an arm seam of the same name, which the suite shrinks to reach a kill in
+# seconds; it is not a conf key, because D12-i7 ruled ONE declared number and that number is the wall.
+GATE_BACKSTOP_MARGIN=${GATE_BACKSTOP_MARGIN:-600}
+case "$GATE_BACKSTOP_MARGIN" in
+  *[!0-9]*) echo "unattended: REFUSING - the GATE_BACKSTOP_MARGIN seam is '$GATE_BACKSTOP_MARGIN', which is not a whole number of seconds, so the merge bar's backstop cannot be summed." >&2
+            RUNLOG_CLEAN=1; exit 2 ;;
+esac
+GATE_BACKSTOP_MARGIN=$((10#$GATE_BACKSTOP_MARGIN))
 
 # LIVENESS, and spec-6 S5. The sibling notice above names the REMOTE bound only, so on a host with no
 # runnable `timeout -k` an operator was told the remote observation was inert while $GATE_CMD and
@@ -467,7 +484,7 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTI
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
-GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; LEASE_STALE_AFTER=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
+GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; LEASE_STALE_AFTER=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
@@ -497,6 +514,10 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWI
 #     would red. Blank turns both halves off.
 #   * PROCMON_CMD (TOOL-dDerivedDocket-28 S5) - the REAPER a recorded orphan goes through, called
 #     `<cmd> --kill-msys <pid>`. Blank turns reaping OFF, announced, and orphans are still counted.
+#   * GATE_WALL and GATE_PROFILE_CMD (TOOL-dDerivedDocket-27 S1 and S2) - the unattended bar's
+#     whole-run wall, read below through `read_bound_key` with an empty default, and the command that
+#     prints the runner's resolved profile. Blank wall: the profile's wall stays in force. Blank
+#     profile command: the bar has no backstop and stays bounded at GATE_BOUND. Both announced.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -554,6 +575,13 @@ esac
 read_bound_key RESUME_SCHEDULE_DELAY "$RESUME_SCHEDULE_DELAY_DEFAULT" seconds "a probe hold fires its restart at the kit default of ${RESUME_SCHEDULE_DELAY_DEFAULT}s after it was taken"
 read_bound_key RESUME_SCHEDULE_LIMIT "$RESUME_SCHEDULE_LIMIT_DEFAULT" holds "a run that cannot move stops owing restarts after the kit default of $RESUME_SCHEDULE_LIMIT_DEFAULT consecutive holds"
 read_bound_key GATE_BOUND "$GATE_BOUND_DEFAULT" seconds "a declared command is bounded at the kit default of ${GATE_BOUND_DEFAULT}s"
+# TOOL-dDerivedDocket-27 S1 - THE UNATTENDED BAR'S WALL, the one number owner ruling D12-i7 lets a
+# project declare for it: a call, never a new `case`, and an EMPTY default, so a malformed value
+# refuses here and a blank one stays blank with the reader's NOTE. UNEXPORTED on the next line, so
+# the value reaches `$GATE_CMD` only through the environment the `gates-green` arm hands its bar:
+# the lander's push-boundary bar and every other declared command keep the runner's profile wall.
+read_bound_key GATE_WALL "" seconds "the unattended bar runs under the gate runner's own profile wall"
+export -n GATE_WALL GATE_PROFILE_CMD 2>/dev/null
 read_bound_key UNIT_STALL_BOUND "$UNIT_STALL_BOUND_DEFAULT" seconds "a dispatched unit reads STALLED after the kit default of ${UNIT_STALL_BOUND_DEFAULT}s with no write and no commit"
 read_bound_key LEASE_STALE_AFTER "$LEASE_STALE_AFTER_DEFAULT" seconds "a per-slug lease reads stale after the kit default of ${LEASE_STALE_AFTER_DEFAULT}s, or after GATE_BOUND, whichever is longer"
 # THE STALE BOUND FOR A RUN (TOOL-aWokenSentinel-2), the one caller whose default is DERIVED from
@@ -4930,7 +4958,7 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt=""
   # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
   # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
   # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
@@ -5051,6 +5079,15 @@ verb_preflight() { # slug · keepalive-id
   # used. It joins the other preconditions through `status` rather than returning, so an operator
   # reads every unmet precondition in one pass.
   check_lander_mode "$slug" || true
+  # TOOL-dDerivedDocket-27 S4 and S6 - THE BAR'S BACKSTOP, derived through the declared profile
+  # command, and the conf check on that same answer. A wall below the largest leg ceiling fires on a
+  # healthy bar that dispatches that leg, so it refuses HERE, while the tree is untouched. A profile
+  # that cannot answer refuses nothing, because that is where every adopter starts, and it says so.
+  derive_gate_backstop || true
+  case "$GB_CMP" in
+    1) fail 85 "the unattended bar's wall is below the largest declared leg ceiling, so a healthy bar that dispatches that leg is killed by its own wall and every close reads red over a bound nobody chose: $GW_WHY. Raise GATE_WALL in $CONF to at least that ceiling" ;;
+    2) echo "unattended: preflight — the wall is not compared with the largest leg ceiling: $GW_WHY" ;;
+  esac
   # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about which
   # commit they are measuring against. `trusted_base` names its own refusals.
   #
@@ -5255,6 +5292,20 @@ verb_preflight() { # slug · keepalive-id
   # to re-run after a compaction.
   [ -n "$(fact "$rel" phase)" ] || set_fact "$rel" phase RUNNING || return 1
   set_fact "$rel" witness "$(GIT rev-parse HEAD)" || return 1
+  # TOOL-dDerivedDocket-27 S4 - THE BACKSTOP IS PINNED AT EVERY PREFLIGHT, the one verb that starts a
+  # run, so a changed wall takes effect at the next one and never between a close's two reads.
+  # `--resume` does not re-pin. A preflight that derives none REMOVES an earlier fact rather than
+  # leaving a bound in force that this conf no longer declares.
+  if [ -n "$GB_SUM" ]; then
+    set_fact "$rel" gate-backstop "$GB_SUM (wall $GB_WALL + queue $GB_QUEUE + margin $GB_MARGIN)" || return 1
+    print_gate_backstop "pinned as this run's gate-backstop fact"
+  else
+    if grep -q '^gate-backstop: ' "$rel" 2>/dev/null; then
+      _pf_gbt=$(mktemp) && grep -v '^gate-backstop: ' "$rel" > "$_pf_gbt" && mv -f "$_pf_gbt" "$rel" \
+        && echo "unattended: preflight — the earlier gate-backstop fact is removed, because this preflight derives none"
+    fi
+    echo "unattended: preflight — no gate-backstop fact is pinned, so the merge bar stays bounded at GATE_BOUND, ${GATE_BOUND}s, and its turnstile queue is charged to that bound: $GB_WHY"
+  fi
   # TOOL-cBriefedPilot-3 - AFTER the facts and BEFORE staging. park() appends with >>, which CREATES
   # the file, so calling it before the scaffold guard makes the later splice fail naming the wrong
   # cause; and the gate leg's whole per-run population is the INDEX, so a waiver written after
@@ -6260,6 +6311,72 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS (the red legs, co
   return 0
 }
 
+# ---- THE BAR'S BACKSTOP - TOOL-dDerivedDocket-27 S2 and S4.
+# THE BAR'S BOUND IS WALL + QUEUE + MARGIN, never GATE_BOUND alone. The runner arms its wall at the
+# first dispatch, AFTER the turnstile queue, and the queue fails open at its own bound, so the
+# longest a HEALTHY bar can take is queue plus wall; the margin covers what follows a wall that
+# fired. A backstop that fires therefore means the runner outlived its own wall - a wedge, never a
+# slow leg - and that holds only because the red attribution runs inside the wall.
+#
+# THE PROFILE IS A DECLARED COMMAND, run under GATE_BOUND like every other one. Probing
+# `$GATE_CMD --print-profile` would guess that the declared gate is this runner, and an adopter's
+# gate that ignores its arguments would start a whole bar at preflight. Blank means NO profile: the
+# bar stays at GATE_BOUND, announced, which is where every adopter starts. A profile that answers
+# without a usable `wall` or `queue` falls back the same way and names the key it lacked, because a
+# sum over a missing term bounds the bar at the margin alone and kills a healthy one.
+#
+# ONE CALL SERVES BOTH QUESTIONS. GB_CMP carries `check_gate_wall`'s verdict on the same answer, so
+# `--preflight` compares the wall with the largest leg ceiling without running the profile twice.
+GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""; GB_WHY=""; GB_CMP=2
+derive_gate_backstop() { # -> 0 with GB_SUM and its three terms, or 1 with GB_WHY; GB_CMP and GW_WHY either way
+  local _db_rc _db_miss=""
+  GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""; GB_WHY=""; GB_CMP=2; GW_WHY=""
+  if [ -z "$GATE_PROFILE_CMD" ]; then
+    GB_WHY="this project declares no GATE_PROFILE_CMD, so the bar has no profile to size a backstop from"
+    GW_WHY="this project declares no GATE_PROFILE_CMD, so the wall cannot be compared with the largest leg ceiling"
+    return 1
+  fi
+  # shellcheck disable=SC2086
+  run_bounded $GATE_PROFILE_CMD; _db_rc=$?
+  if [ "$_db_rc" != 0 ]; then
+    GB_WHY="the declared GATE_PROFILE_CMD exited $_db_rc after ${RB_TOOK}s, so it gave no profile to size a backstop from: $GATE_PROFILE_CMD"
+    GW_WHY="the declared GATE_PROFILE_CMD exited $_db_rc, so the wall cannot be compared with the largest leg ceiling"
+    return 1
+  fi
+  parse_gate_profile "$RB_STDOUT"
+  check_gate_wall "$GATE_WALL"; GB_CMP=$?
+  [ -n "$GPF_WALL" ] || _db_miss="no usable wall"
+  [ -n "$GPF_QUEUE" ] || _db_miss="${_db_miss:+$_db_miss and }no usable queue"
+  if [ -n "$_db_miss" ]; then
+    GB_WHY="the declared GATE_PROFILE_CMD printed $_db_miss, so a backstop summed over it would bound the bar at the margin alone: $GATE_PROFILE_CMD"
+    return 1
+  fi
+  GB_WALL=${GATE_WALL:-$GPF_WALL}; GB_QUEUE=$GPF_QUEUE; GB_MARGIN=$GATE_BACKSTOP_MARGIN
+  GB_SUM=$(( GB_WALL + GB_QUEUE + GB_MARGIN ))
+  return 0
+}
+
+# THE PINNED BACKSTOP, READ BACK. The fact reads `<sum> (wall <w> + queue <q> + margin <m>)`, the one
+# shape `--preflight` writes, and its sum must equal its terms: a value in any other shape, or a sum a
+# hand edited, is not a backstop, and the caller recomputes rather than bounding the bar by a number
+# it cannot account for.
+parse_gate_backstop() { # the gate-backstop fact's value -> 0 with GB_SUM, GB_WALL, GB_QUEUE and GB_MARGIN, or 1
+  local _rg_v=$1 _rg_re='^([0-9]+) \(wall ([0-9]+) \+ queue ([0-9]+) \+ margin ([0-9]+)\)$'
+  GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""
+  [[ $_rg_v =~ $_rg_re ]] || return 1
+  [ "$(( 10#${BASH_REMATCH[1]} ))" = "$(( 10#${BASH_REMATCH[2]} + 10#${BASH_REMATCH[3]} + 10#${BASH_REMATCH[4]} ))" ] || return 1
+  [ "$(( 10#${BASH_REMATCH[1]} ))" -gt 0 ] || return 1
+  GB_SUM=$(( 10#${BASH_REMATCH[1]} )); GB_WALL=$(( 10#${BASH_REMATCH[2]} ))
+  GB_QUEUE=$(( 10#${BASH_REMATCH[3]} )); GB_MARGIN=$(( 10#${BASH_REMATCH[4]} ))
+  return 0
+}
+
+# ONE SPELLING OF THE BOUND LINE, printed at `--preflight` and at every `gates-green`, with all three
+# terms, so the sum re-derives in front of whoever reads it.
+print_gate_backstop() { # where the bound came from -> the line, from GB_SUM and its terms
+  echo "unattended: the merge bar is bounded at ${GB_SUM}s — wall $GB_WALL + queue $GB_QUEUE + margin $GB_MARGIN ($1)"
+}
+
 # ---- THE AUTO-FILE, DARK UNTIL `ASKS_CMD` IS DECLARED. S10.
 # Every INHERITED leg gets an OWNER ON THE RECORD: one ask in the build's own `BACKLOG.md`, a SEV row
 # and a KEEP row, in the grammar the memory-tree kit's parser reads. This driver is shell and has no
@@ -6846,7 +6963,7 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      local _grc _gr _gid _ggd _gh _gdir _gout _hold
+      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gtry=0 _gbs=0 _gbound
       local -a _genv
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
@@ -6857,36 +6974,69 @@ dod_met() { # slug · run-state file · item · checker
       _gr=${ASHA:-}
       read_gate_policy "$_gr"
       echo "unattended: gates-green — the inherited-red policy reads $GP_POLICY: $GP_WHY"
-      _ggd=$(GIT rev-parse --git-dir 2>/dev/null)
-      if [ -n "${EPOCHREALTIME:-}" ]; then _gid="unattended-${EPOCHREALTIME//[!0-9]/}${RANDOM}-$$"
-      else _gid="unattended-$(date -u +%Y%m%d%H%M%S)${RANDOM}-$$"; fi
-      _gdir=""
-      if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
-      _genv=(GATE_RUN_ID="$_gid" GATE_INHERITED_RED="$GP_POLICY")
-      [ -n "$_gr" ] && _genv+=(GATE_ATTRIBUTE="$_gr")
-      [ -n "$GP_MAX_AGE" ] && _genv+=(GATE_INHERITED_RED_MAX_AGE="$GP_MAX_AGE")
-      # TOOL-dDerivedDocket-3 S3 - UNDER `in-place` THE BAR GRADES THE MERGE, and two preconditions
-      # stand between it and running at all. `GATE_FULL=1` is exported through `env` rather than as
-      # a bare assignment prefix, because this kit's own guard is that the bar must not be scoped by
-      # a leg guard here: a guarded manifest would grade the landing merge by guard, which is the
-      # shape two reproduced aborts already have. `GATE_SELFTESTS` is neither set nor unset, so the
-      # bar's environment carries exactly what this close inherited.
-      # TOOL-dDerivedDocket-28 S3 - THE ORPHANS OF AN EARLIER BAR ARE REAPED BEFORE THIS ONE STARTS.
-      # i26's run reached `gates-green` again without passing through `--resume`, and found the legs
-      # of the bar its dead session had started still running beside its own.
-      if [ "$LANDER_MODE" = in-place ]; then
-        check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
-        print_selftests_owed
-        run_orphan_reap "$slug"
-        # shellcheck disable=SC2086
-        run_bounded env GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$?
+      # TOOL-dDerivedDocket-27 S4 - THE BAR'S BOUND IS THE BACKSTOP `--preflight` PINNED, because
+      # GATE_WALL is a working-tree declaration the run can edit and a bound that moves between the
+      # two reads is two bounds. A record that predates the fact is recomputed HERE, announced; no
+      # profile at all leaves the bar at GATE_BOUND, announced too.
+      if parse_gate_backstop "$(fact "$rel" gate-backstop)"; then
+        _gbs=1
+        print_gate_backstop "the backstop --preflight pinned"
       else
-        run_orphan_reap "$slug"
-        # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
-        # was: the project declares a command line, not a path.
-        # shellcheck disable=SC2086
-        run_bounded env "${_genv[@]}" $GATE_CMD; _grc=$?
+        if [ -z "$(fact "$rel" gate-backstop)" ]; then
+          echo "unattended: gates-green — this record pins no gate-backstop fact, so the backstop is recomputed now"
+        else
+          echo "unattended: gates-green — this record's gate-backstop fact does not read as <sum> (wall <w> + queue <q> + margin <m>), so the backstop is recomputed now: $(fact "$rel" gate-backstop)"
+        fi
+        if derive_gate_backstop; then _gbs=1; print_gate_backstop "recomputed at this close"
+        else echo "unattended: the merge bar is bounded at GATE_BOUND, ${GATE_BOUND}s, and its turnstile queue is charged to that bound — $GB_WHY"; fi
       fi
+      if [ "$_gbs" = 1 ]; then _gbound=$GB_SUM; else _gbound=${GATE_BOUND:-0}; fi
+      _ggd=$(GIT rev-parse --git-dir 2>/dev/null)
+      # S5 - EXIT 3, TREE MOVED, RUNS THE BAR ONCE MORE, and only once. The re-run pins a FRESH run id,
+      # so the record the decision table below reads is the re-run's and never the moved one's.
+      while :; do
+        _gtry=$((_gtry + 1))
+        if [ -n "${EPOCHREALTIME:-}" ]; then _gid="unattended-${EPOCHREALTIME//[!0-9]/}${RANDOM}-$$"
+        else _gid="unattended-$(date -u +%Y%m%d%H%M%S)${RANDOM}-$$"; fi
+        _gdir=""
+        if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
+        _genv=(GATE_RUN_ID="$_gid" GATE_INHERITED_RED="$GP_POLICY")
+        [ -n "$_gr" ] && _genv+=(GATE_ATTRIBUTE="$_gr")
+        [ -n "$GP_MAX_AGE" ] && _genv+=(GATE_INHERITED_RED_MAX_AGE="$GP_MAX_AGE")
+        # S1 - THE DECLARED WALL REACHES THE BAR AND NOTHING ELSE. Blank is unset in the bar's
+        # environment rather than empty, so the runner's own profile wall is what applies.
+        [ -n "$GATE_WALL" ] && _genv+=(GATE_WALL="$GATE_WALL")
+        # TOOL-dDerivedDocket-3 S3 - UNDER `in-place` THE BAR GRADES THE MERGE, and two preconditions
+        # stand between it and running at all. `GATE_FULL=1` is exported through `env` rather than as
+        # a bare assignment prefix, because this kit's own guard is that the bar must not be scoped by
+        # a leg guard here: a guarded manifest would grade the landing merge by guard, which is the
+        # shape two reproduced aborts already have. `GATE_SELFTESTS` is neither set nor unset, so the
+        # bar's environment carries exactly what this close inherited.
+        # TOOL-dDerivedDocket-28 S3 - THE ORPHANS OF AN EARLIER BAR ARE REAPED BEFORE THIS ONE STARTS.
+        # i26's run reached `gates-green` again without passing through `--resume`, and found the legs
+        # of the bar its dead session had started still running beside its own.
+        # THE BOUND IS HANDED FOR THIS ONE CALL and cleared on the next line, so the ask generator and
+        # the lander this arm reaches afterwards keep GATE_BOUND.
+        if [ "$LANDER_MODE" = in-place ]; then
+          check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
+          [ "$_gtry" = 1 ] && print_selftests_owed
+          run_orphan_reap "$slug"
+          RB_BOUND=$_gbound
+          # shellcheck disable=SC2086
+          run_bounded env -u GATE_WALL GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$?
+          RB_BOUND=""
+        else
+          run_orphan_reap "$slug"
+          # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
+          # was: the project declares a command line, not a path.
+          RB_BOUND=$_gbound
+          # shellcheck disable=SC2086
+          run_bounded env -u GATE_WALL "${_genv[@]}" $GATE_CMD; _grc=$?
+          RB_BOUND=""
+        fi
+        { [ "$_grc" = 3 ] && [ "$_gtry" = 1 ]; } || break
+        echo "unattended: gates-green — the bar exited 3, TREE MOVED: the tree changed while it ran, so no verdict describes it; running it once more"
+      done
       # THE `gates-run` FACT, naming this bar's id and the HEAD it graded - the record S7's two
       # refusals consult. On a MET bar it is written with the close's other writes, after the carry
       # check, so a refusal there still writes nothing; on an UNMET one it is written HERE, because
@@ -6895,44 +7045,80 @@ dod_met() { # slug · run-state file · item · checker
       # writes nothing new and an older record can never answer for a newer bar.
       _gh=$(GIT rev-parse HEAD 2>/dev/null)
       GG_RUN_FACT="$_gid ${_gh:0:8}"
-      if [ "$_grc" = 0 ]; then DOD_OUT=""; return 0; fi
+      if [ "$_grc" = 0 ]; then
+        [ "$_gtry" = 1 ] || echo "unattended: gates-green — the one re-run after TREE MOVED exited 0"
+        DOD_OUT=""; return 0
+      fi
       if { [ -n "$_gdir" ] && [ -d "$_gdir" ]; } || [ -n "$(fact "$rel" gates-run)" ]; then
         set_fact "$rel" gates-run "$GG_RUN_FACT" && stage_or_fail "$rel"
       fi
       GG_RUN_FACT=""
       DOD_OUT=$RB_OUT
-      # A BREACH IS NOT A RED BAR, and the difference is the whole information this adds. A red bar
-      # says a check ran and said no; a breach says the bar never answered. Reporting them the same
-      # way is how an operator spends an hour looking for a failing leg that does not exist.
-      if { [ "$_grc" = 124 ] || [ "$_grc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
-        DOD_OUT="the merge bar did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so this item is unmet because the bar never returned rather than because a leg failed: $GATE_CMD"
-        return 1
-      fi
-      # S6 - THE DECISION TABLE over this bar's own record; `read_gates_record` states it, first
-      # matching row wins. Every red leg INHERITED within its age under `land` is MET; the same
-      # under `park`, or with an age past the bound, is UNMET and prints the hold line the Skill
-      # acts on; anything else is UNMET with the attribution lines exactly as before this unit.
-      read_gates_record "$_gdir" "$GP_POLICY"
       _gout=$(printf '%s\n' "$RB_OUT" | grep -vE '^(GATE (ok|skip) )')
-      case "$GR_STATE" in
-        moved)
-          DOD_OUT="$GR_WHY"$'\n'"$_gout" ;;
-        land|hold|other)
-          # S10 - an owner on the record for every INHERITED leg, on every path whose record is usable.
-          write_inherited_asks "$slug" "$_gr" "$_gdir"
-          if [ "$GR_STATE" = land ]; then
-            GG_RUN_FACT="$_gid ${_gh:0:8}"
-            GG_INH_FACT="${_gr:0:8} $GR_LEGS"
-            DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED within the ${GP_MAX_AGE}-landing age bound"
-            return 0
-          fi
-          if [ "$GR_STATE" = hold ]; then
-            _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
-            DOD_OUT="hold · inherited-red · until probe gate · $_hold"
-            [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
-            DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code inherited-red --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
-            DOD_OUT="$DOD_OUT"$'\n'"$_gout"
+      # S5 - HOW THE BAR ENDED, a CLOSED table, first match wins. A red bar says a check ran and said
+      # no; every other ending says something else, and reporting them all as a red leg is how an
+      # operator spends an hour looking for a failing leg that does not exist, or a run fixes a
+      # subject that is not at fault. The `hold ·` lines are the Skill's to take: `--hold` needs a
+      # committed tree and a reaped keepalive, which a close that has just failed an item cannot have.
+      case "$_grc" in
+        3)
+          DOD_OUT="the merge bar exited 3, TREE MOVED, on its run and again on its one re-run: the tree changed while it ran both times, so no verdict describes the commit being closed. Something writes to this tree while the bar runs; find it before closing again: $GATE_CMD"$'\n'"$_gout"
+          return 1 ;;
+        4)
+          _hold="the runner exited HOST"
+          DOD_OUT="hold · host-degraded · until probe host · $_hold"
+          DOD_OUT="$DOD_OUT"$'\n'"  every leg that failed timed out twice, the second time alone, while a spawn cost more than the runner's HOST ratio over this clone's floor, so the verdict is about the host and not the tree"
+          DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code host-degraded --until \"probe host\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+          DOD_OUT="$DOD_OUT"$'\n'"$_gout"
+          return 1 ;;
+        124|137)
+          if [ "$GATE_BOUND_LIVE" = 1 ] && [ "${_gbound:-0}" -gt 0 ]; then
+            # THE ACQUIRE LINE DECIDES, and only against the backstop. The runner prints it the moment
+            # it takes the repository, so a kill with none in the output fell in the turnstile queue
+            # or before it: no leg of this run was graded, and a retry is the right next step. Under
+            # the GATE_BOUND fallback the gate may not be this runner at all, and a gate that never
+            # prints the line would read every kill as never started.
+            if [ "$_gbs" = 1 ] && ! printf '%s\n' "$RB_OUT" | grep -q '^gate queue: acquired'; then
+              _hold="the bar was killed at its backstop before it acquired the repository"
+              DOD_OUT="hold · host-degraded · until probe gate · $_hold"
+              DOD_OUT="$DOD_OUT"$'\n'"  it was killed after ${RB_TOOK}s against its ${_gbound}s backstop (wall $GB_WALL + queue $GB_QUEUE + margin $GB_MARGIN) and never printed a gate queue: acquired line, so the host or another bar held the repository the whole time and no leg of this run was graded"
+              DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code host-degraded --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+              return 1
+            fi
+            if [ "$_gbs" = 1 ]; then
+              DOD_OUT="the merge bar did not answer within its ${_gbound}s backstop (wall $GB_WALL + queue $GB_QUEUE + margin $GB_MARGIN) and was killed after ${RB_TOOK}s, having acquired the repository, so the runner outlived its own wall and this item is unmet because the bar never returned rather than because a leg failed: $GATE_CMD"
+            else
+              DOD_OUT="the merge bar did not answer within the declared ${_gbound}s bound and was killed after ${RB_TOOK}s, so this item is unmet because the bar never returned rather than because a leg failed: $GATE_CMD"
+            fi
+            return 1
           fi ;;
+        1)
+          # TOOL-dDerivedDocket-24 S6 - THE DECISION TABLE over this bar's own record;
+          # `read_gates_record` states it, first matching row wins. Every red leg INHERITED within
+          # its age under `land` is MET; the same under `park`, or with an age past the bound, is
+          # UNMET and prints the hold line the Skill acts on; anything else is UNMET with the
+          # attribution lines exactly as before that unit.
+          read_gates_record "$_gdir" "$GP_POLICY"
+          case "$GR_STATE" in
+            moved)
+              DOD_OUT="$GR_WHY"$'\n'"$_gout" ;;
+            land|hold|other)
+              # S10 - an owner on the record for every INHERITED leg, on every path whose record is usable.
+              write_inherited_asks "$slug" "$_gr" "$_gdir"
+              if [ "$GR_STATE" = land ]; then
+                GG_RUN_FACT="$_gid ${_gh:0:8}"
+                GG_INH_FACT="${_gr:0:8} $GR_LEGS"
+                DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED within the ${GP_MAX_AGE}-landing age bound"
+                return 0
+              fi
+              if [ "$GR_STATE" = hold ]; then
+                _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
+                DOD_OUT="hold · inherited-red · until probe gate · $_hold"
+                [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
+                DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code inherited-red --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+                DOD_OUT="$DOD_OUT"$'\n'"$_gout"
+              fi ;;
+          esac ;;
       esac
       return 1 ;;
     records-current)
@@ -9180,8 +9366,8 @@ SIBS
 # ONE `unattended: run log` line on stderr and the verb goes on.
 #
 # NO SIGNAL TRAP, ON PURPOSE. A trapped TERM waits for the foreground child, and `--close` runs the
-# merge bar in the foreground under GATE_BOUND, so a TERM trap would hold a killed close for up to an
-# hour. Every exit the driver CHOOSES sets RUNLOG_CLEAN=1 immediately before it instead, and the EXIT
+# merge bar in the foreground under its backstop or GATE_BOUND, so a TERM trap would hold a killed close
+# for hours. Every exit the driver CHOOSES sets RUNLOG_CLEAN=1 immediately before it instead, and the EXIT
 # trap, which an untrapped TERM still runs, writes `exit=clean` or `exit=unclean`. A KILL runs nothing,
 # so a START with no END is the killed-call signature. An unclean END's `rc` is whatever `$?` the trap
 # saw, often 0: read `exit=` first. The runlog-writer suite enumerates every `exit` in this file and

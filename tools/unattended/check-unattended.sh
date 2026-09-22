@@ -164,6 +164,10 @@ SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""
 # would read them blank whatever the project declares and every arm keyed on them would announce a
 # skip on an adopting repo - a check that is dark while reading green.
 RECALL_CLI=""; ASKS_CMD=""
+# TOOL-dDerivedDocket-27 S6 - the three keys check 42 reads: the unattended bar's declared wall, the
+# command that prints the runner's profile, and the bound that command runs under. All three default
+# to blank, and blank is the kit default each driver reader announces.
+GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
 # ---- and the second is why the guard is now structural rather than a probe.
 # ----
@@ -231,7 +235,7 @@ while IFS= read -r -d '' _ck; do
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
     HALT_FLOOR|UNDECLARED_WRITE_CEILING|HOLD_CODES_EXTRA|HOLD_FLOOR|LEASE_STALE_AFTER|\
     RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
-    RECALL_CLI|ASKS_CMD|SHARED_RECORDS|GENERATED_INDEXES|\
+    RECALL_CLI|ASKS_CMD|SHARED_RECORDS|GENERATED_INDEXES|GATE_BOUND|GATE_WALL|GATE_PROFILE_CMD|\
     UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
     # gov:conf-allow-end
   esac
@@ -5140,6 +5144,105 @@ for _c41_f in "$HERE/STOPS.template.md" "$HERE/SKILL.template.md"; do
     || fail 41 "a carrier an agent acts from does not state that a process not in the ledger is never killed, so a stray process carrying this kit's command line is left to the agent's judgement, which is how a run had to be parked over five processes that were another repository's: $_c41_f"
 done
 report "check 41 graded $_c41_n of 2 carriers of the process-ledger rule"
+
+# ---- check 42 - THE UNATTENDED BAR'S WALL CLEARS THE LARGEST LEG CEILING. TOOL-dDerivedDocket-27 S6.
+# ---- The wall is hand-set by owner ruling D12-i7, and this is the check that keeps a hand-set wall
+# ---- honest: a wall below the largest declared leg ceiling fires on a healthy bar that dispatches
+# ---- that leg. The EFFECTIVE wall is GATE_WALL, else the profile's own. `ceiling_max` is read from the
+# ---- project's declared GATE_PROFILE_CMD, the command the driver sizes its backstop from, so this leg
+# ---- names no other kit's manifest by path, and the comparison is the library's `check_gate_wall`,
+# ---- the one `--preflight` refuses on.
+# ----
+# ---- A PROFILE THAT CANNOT ANSWER IS ANNOUNCED on the report channel and never a red: a blank
+# ---- GATE_PROFILE_CMD is where every adopter starts, and a red there would be the day-one state of
+# ---- every install. A GATE_WALL the driver would refuse at conf load IS a red, because under it no
+# ---- verb of any run in the project is reachable.
+# ----
+# ---- RUN BOUNDED AND CAPTURED THROUGH A FILE, on the driver's terms: GATE_BOUND, else the driver's own
+# ---- default, and never a substitution, which waits on the last inherited write end. GATE_WALL is
+# ---- removed from the command's environment, so an outer bar's value cannot answer for the profile's.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that the profile tells the truth about the runner the bar actually
+# ---- runs, that its queue term is sound, or anything about GATE_BOUND. It runs one declared command
+# ---- and compares two integers.
+_c42_b=$GATE_BOUND
+case "$_c42_b" in ''|*[!0-9]*|0) _c42_b=$(sed -n 's/^GATE_BOUND_DEFAULT=\([0-9][0-9]*\).*/\1/p' "$DRIVER" | head -1) ;; esac
+if [ -n "$GATE_WALL" ] && case "$GATE_WALL" in *[!0-9]*|0) true ;; *) false ;; esac; then
+  fail 42 "GATE_WALL is declared as '$GATE_WALL', which is not a positive integer of seconds, so the driver refuses at conf load and no verb of any unattended run in this project is reachable"
+elif [ -z "$GATE_PROFILE_CMD" ]; then
+  report "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: this project declares no GATE_PROFILE_CMD, so there is no profile to read ceiling_max from"
+elif ! _c42_d=$(mktemp -d 2>/dev/null); then
+  report "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: no scratch directory could be created to capture the profile in"
+else
+  if [ -n "$_c42_b" ] && timeout -k 1s 10 true >/dev/null 2>&1; then
+    # shellcheck disable=SC2086
+    env -u GATE_WALL timeout -k 5s "$_c42_b" $GATE_PROFILE_CMD </dev/null >"$_c42_d/out" 2>/dev/null; _c42_rc=$?
+  else
+    report "check 42 runs the declared GATE_PROFILE_CMD UNBOUNDED: this host has no runnable 'timeout -k', or no bound could be read from the conf or the driver"
+    # shellcheck disable=SC2086
+    env -u GATE_WALL $GATE_PROFILE_CMD </dev/null >"$_c42_d/out" 2>/dev/null; _c42_rc=$?
+  fi
+  _c42_out=$(cat "$_c42_d/out" 2>/dev/null); rm -rf "$_c42_d" 2>/dev/null
+  if [ "$_c42_rc" != 0 ]; then
+    report "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: the declared GATE_PROFILE_CMD exited $_c42_rc: $GATE_PROFILE_CMD"
+  else
+    parse_gate_profile "$_c42_out"
+    check_gate_wall "$GATE_WALL"; _c42_v=$?
+    case "$_c42_v" in
+      0) report "check 42 graded the unattended bar's wall: $GW_WHY" ;;
+      1) fail 42 "the unattended bar's wall is below the largest declared leg ceiling, so a healthy bar that dispatches that leg is killed by its own wall and every unattended close reads red over a bound nobody chose: $GW_WHY" ;;
+      *) report "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: $GW_WHY" ;;
+    esac
+  fi
+fi
+
+# ---- check 43 - THE SKILL ROUTES A `hold ·` LINE TO A HOLD, in the order `--hold` accepts it.
+# ---- TOOL-dDerivedDocket-27 S7. `gates-green` NAMES a hold and never takes one, because `--hold` needs a
+# ---- committed tree and a reaped keepalive that a close which has just failed an item cannot have. So
+# ---- the Skill's Close section is the one thing that turns the line into a hold, and each wrong
+# ---- routing ends the run: an override spends the one check on a host fault, `--hold` before the
+# ---- branch push is refused under ANCHOR_SCOPE=published, and `--hold` before the commit is refused by
+# ---- its clean-tree precondition. A push the remote does not answer needs the one code `--hold` takes
+# ---- over an unpublished tip, or the only documented ending is refused too.
+# ----
+# ---- THE PARAGRAPH IS FOUND BY ITS LEAD, inside the `## Close` section of the Skill TEMPLATE the render
+# ---- is made from, and read with its line wraps folded to spaces. A lead this cannot find is a red: a
+# ---- check that finds no paragraph would otherwise pass by finding nothing.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that the rendered Skill matches the template, which is the adopter's
+# ---- `--check`; that an agent obeys it; or any paragraph but that one.
+_c43_f="$HERE/SKILL.template.md"
+_c43_lead='**A `hold ·` line from `gates-green` is your next step'
+if [ ! -f "$_c43_f" ]; then
+  report "check 43 did not grade $_c43_f - the kit does not carry it here"
+else
+  _c43_p=$(LEAD="$_c43_lead" awk '
+      BEGIN { lead = ENVIRON["LEAD"] }
+      { ln = $0; sub(/\r$/, "", ln) }
+      ln ~ /^## / { if (grab) exit; insec = (ln == "## Close"); next }
+      insec && !grab && index(ln, lead) == 1 { grab = 1 }
+      grab && ln == "" { exit }
+      grab { printf "%s ", ln }' "$_c43_f")
+  if [ -z "$_c43_p" ]; then
+    fail 43 "the Skill template's Close section carries no paragraph opening with the hold lead, so nothing tells a run what to do with the hold line gates-green prints, and this check would pass by finding nothing: $_c43_f"
+  else
+    # FIRST OCCURRENCES, compared in order. A search that resumed after each match would let a later
+    # sentence about `--hold` satisfy the last step of a paragraph that named it first.
+    _c43_miss=$(P="$_c43_p" awk 'BEGIN {
+        p = ENVIRON["P"]; n = split("commit the staged records|push the branch|reap the keepalive|--hold", s, "|"); last = 0
+        for (i = 1; i <= n; i++) { k = index(p, s[i]); if (k == 0 || k <= last) { print s[i]; exit }; last = k }
+      }')
+    [ -z "$_c43_miss" ] \
+      || fail 43 "the Skill's hold paragraph does not name the commit of the staged records, the branch push, the keepalive reap and --hold in that order, and --hold refuses a dirty tree and, under ANCHOR_SCOPE=published, an unpublished tip; the first step missing or out of order: $_c43_miss"
+    case "$_c43_p" in
+      *platform-unavailable*) ;;
+      *) fail 43 "the Skill's hold paragraph names no platform-unavailable hold for a branch push the remote does not answer, so under ANCHOR_SCOPE=published the run's only documented ending is refused: $_c43_f" ;;
+    esac
+    case "$_c43_p" in
+      *--override*) fail 43 "the Skill's hold paragraph routes a hold line to an override, which spends the one check between a run and its landing on a fault that is not the run's: $_c43_f" ;;
+    esac
+  fi
+fi
 
 fi   # ---- end of the checks `--only 28` skips
 
