@@ -76,6 +76,15 @@ Two builds inside the confirmed-landed set are deliberately EXCLUDED from U2: `a
 one non-terminal spec is `DEFERRED` — a chosen state, not an oversight — and `aDeployScout`, a
 research record carrying no status header at all.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dLandedVerdict-1` | 2 | the report-only drift signal for a spec that landed and stayed non-terminal, and its pin |
+| 2 | `TOOL-dLandedVerdict-2` | 1 | the close-out of the confirmed-closeable builds, which drops U1's pin by construction |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-08-19 · streams tooling
 ids TOOL-dLandedVerdict-1 TOOL-dLandedVerdict-2
