@@ -9667,7 +9667,7 @@ pl_unit=$(git -C "$pl_dir" rev-parse unit)
 PL_LEDGER="$pl_dir/.git/unattended/tRun.procs"
 PL_LEASE="$pl_dir/.git/unattended/tRun.lease"
 PL_PROCFS=""
-run_pl() { ( cd "$pl_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" \
+run_pl() { ( cd "$pl_dir" && env -u GATE_SELFTESTS -u UNATTENDED_PROCFS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" \
                ${PL_PROCFS:+UNATTENDED_PROCFS="$PL_PROCFS"} bash "$SCRIPT" "$@" 2>&1 ); }
 run_pl_git() { git -C "$pl_dir" "$@"; }
 read_pl_sum() { if [ -f "$1" ]; then git hash-object "$1"; else echo NONE; fi; }
@@ -9702,7 +9702,7 @@ init_pl_fixture() {
 write_pl_orphan() { # sleep seconds
   local _d _i=0 _k
   PL_ORPH=""; PL_KIDS=""
-  ( cd "$pl_dir" && exec env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" PL_SLEEP="$1" \
+  ( cd "$pl_dir" && exec env -u GATE_SELFTESTS -u UNATTENDED_PROCFS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" PL_SLEEP="$1" \
       ${PL_PROCFS:+UNATTENDED_PROCFS="$PL_PROCFS"} bash "$SCRIPT" --preflight tRun --keepalive-id k1 ) >/dev/null 2>&1 &
   _d=$!
   while [ -z "$PL_ORPH" ] && [ "$_i" -lt 300 ]; do

@@ -30,8 +30,8 @@ reddened the arms written for it:
 - a refusal row reaping: AC9 red, the ledger rewritten and the orphan killed;
 - no removal at `--abort`, and removal ignoring a live record: the two AC12 arms red;
 - no removal at the in-place `--landed` observation: the derived-terminal block's AC12 arm red;
-- the wrapper without the root token: AC1 red, the reaper answering `REFUSED — winpid … is not in
-  scope` for a tree whose parent is gone.
+- the wrapper without the root token: AC1 red, the reaper answering REFUSED because the winpid
+  was not in scope, for a tree whose parent is gone.
 
 One inherited defect was found on the seam this unit changes and repaired in the same file: the
 driver suite's first `run_bounded` harness sourced the function without assigning the lease pair it
@@ -54,8 +54,8 @@ here. AC1 was nonetheless exercised by the block above; its line is the orchestr
   `NOT reaped <pid> — exited, pid reused` at the holder's `--resume`; the sleeper was alive after,
   the stub reaper was never called, and the record was gone from the ledger.
 - AC4 — `PROCMON_CMD` — declared blank, the holder's `--resume` over a killed driver's orphan printed
-  `reaping is OFF because PROCMON_CMD is blank, so 1 orphan(s) of tRun are counted and left
-  running: <pid>` and `orphans 1`; the orphan was alive after and no reaper was reached.
+  `reaping is OFF because PROCMON_CMD is blank`, then `1 orphan(s) of tRun are counted and left`
+  running with the pid, and `orphans 1`; the orphan was alive after and no reaper was reached.
 - AC5 — `orphans 1` — `--status` over one live orphan printed `· orphans 1`, the orphan was alive
   after, and the ledger was byte-unchanged.
 - AC6 — `--hold` — with a recorded `sleep 63` alive under a live driver, `--hold` refused as check 84
@@ -78,12 +78,13 @@ here. AC1 was nonetheless exercised by the block above; its line is the orchestr
   driver it printed `the process ledger is KEPT … <pid> (sleep 67)` and the file remained. The
   in-place half rode the derived-terminal block's `--landed` arm: a ledger asserted present before
   the observation was gone after it.
-- AC13 — amended rev-9 — `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at 64719
-  bytes and 704 lines at the parent and 64615 bytes and 704 lines at the build commit, and
-  `tools/unattended/PROTOCOL.template.md` the same; `grep -c 'unlike the sibling above'` counts 1
-  then 0 with the moved text in `tools/unattended/README.md`, and `grep -c 'PROCMON_CMD'` counts 0
-  then 1. `UNATTENDED-STOPS.md` reads 35330 bytes and 530 lines and `memory/guides/BUILD-METHOD.md`
-  27268 bytes and 349 lines, unchanged, each below `GUIDE_CAP_BYTES` and `GUIDE_CAP_LINES` as
-  `tools/memory-tree/check-memory-hygiene.sh` declares them, and BUILD-METHOD below its 27648-byte
-  row. The protocol is over the guide byte cap at the parent already, grandfathered by
-  `memory/project/curation-debt.txt`, which is what rev-9 amended; §9 records it.
+- AC13 — amended rev-9 — `git cat-file -s` and `wc -l` read
+  `memory/guides/UNATTENDED-PROTOCOL.md` at 64719 bytes and 704 lines at the parent and 64615
+  bytes and 704 lines at the build commit, and `tools/unattended/PROTOCOL.template.md` the same.
+  In the template the phrase `unlike the sibling above` counts 1 then 0, with the moved text in
+  `tools/unattended/README.md`, and `PROCMON_CMD` counts 0 then 1. The companion
+  `UNATTENDED-STOPS.md` reads 35330 bytes and 530 lines, and `memory/guides/BUILD-METHOD.md` 27268
+  bytes and 349 lines, unchanged. Each is below `GUIDE_CAP_BYTES` and `GUIDE_CAP_LINES` as
+  `tools/memory-tree/check-memory-hygiene.sh` declares them, and BUILD-METHOD is below its row in
+  `tools/template-size-limits.txt`. The protocol is over the guide byte cap at the parent already,
+  grandfathered by `memory/project/curation-debt.txt`, which is what rev-9 amended; §9 records it.

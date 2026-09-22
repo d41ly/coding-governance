@@ -466,7 +466,9 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
   negative. Adding a table row adds a line, so the section 8 intro, two lines of prose, is reflowed
   onto one and the line count is unmoved, which is the line-POSITIVE red AC13 names. The stops
   companion S8 names as a new file already existed at this unit's parent, shipped by an earlier unit
-  of this build, so S8's rule lands in it as a new section 14. Design detail the spec left to the
+  of this build, so S8's rule lands in it as a new section 14; it still draws on its own guide cap
+  as §4 planned, and S12's zero-or-negative delta is read, as AC13 reads it, on the protocol, its
+  template and BUILD-METHOD. Design detail the spec left to the
   build: `--preflight` reaps AFTER it takes its lease, the last act before its OK line, because a
   kill is the least reversible thing it does and a refused preflight must not have done it; its own
   wiring check therefore runs before the reap, and AC11's preflight arm observes the reap and the

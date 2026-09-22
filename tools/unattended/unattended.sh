@@ -215,6 +215,13 @@ RB_LEASE_SLUG=""; RB_LEASE_ID=""
 # whose own argv names a declared root, and everything descending from one; an orphan has no living
 # ancestor, so without this token the reaper would refuse the very tree it exists for. `; exit $?`
 # keeps the wrapper a real parent: a lone `"$@"` would be exec'd in its place and the token lost.
+#
+# WHAT THE `&` COSTS, and where it costs nothing (memory/gotchas/async-job-starts-with-sigint-ignored.md).
+# A job started with `&` starts with SIGINT ignored. On the bounded path that changes nothing a
+# signal can reach: `timeout` installs its own INT handler, so the command can still trap INT, and it
+# already moved the command into its own process group, where a terminal's Ctrl-C never reached it.
+# On the UNBOUNDED path, a host with no runnable `timeout`, the command now ignores INT, so a Ctrl-C
+# ends the driver alone and leaves the command running — as a recorded orphan the next reap finds.
 run_bounded() { # argv...
   local _s _e _rc _d _p
   write_lease_refreshed "$RB_LEASE_SLUG" "$RB_LEASE_ID"
