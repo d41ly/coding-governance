@@ -18,11 +18,9 @@ hard rule here, and the last arm re-hashes the live log to prove this run did no
 
 from __future__ import annotations
 
-import contextlib
 import datetime
 import hashlib
 import inspect
-import io
 import json
 import os
 import pathlib
@@ -1585,7 +1583,9 @@ def test_one_walk_two_callers():
 # drives a query.py function that is byte-identical to the one it was written against.
 #
 # WHAT WAS REPATHED, and it is only ever one of three things: inCMS's `_throwaway_repo()` becomes
-# gov's `make_repo()` plus `run_in_repo()`; an `ARCH-` id becomes a `TOOL-` id from this repo's conf;
+# gov's `make_repo()` plus `run()` over the fixture's own copy of the kit, for every arm that drives
+# `query.main` (the note where `run_in_repo()` used to be says why it is not a chdir any more); an
+# `ARCH-` id becomes a `TOOL-` id from this repo's conf;
 # and a `memory/architecture/...` path becomes a `<MEMORY_ROOT>/tooling/...` one. No assertion was
 # weakened and no measurement re-derived — the figures quoted in these docstrings were measured on
 # inCMS's corpus and are cited as PROVENANCE for why an arm exists, never asserted here.
@@ -1617,21 +1617,14 @@ def test_one_walk_two_callers():
 # ==================================================================================================
 
 
-@contextlib.contextmanager
-def run_in_repo(root: pathlib.Path):
-    """chdir into a throwaway repo, for the arms that call the CLI IN PROCESS.
-
-    `query.main` resolves its repo, its cache AND its log from the CWD, so an in-process arm run
-    from this worktree appends to the LIVE query log — the self-inflicted-traffic defect this
-    file's header names and the last arm re-hashes for. `make_repo` deliberately does not chdir
-    (its own arms drive subprocesses with `cwd=root`), so the isolation is explicit here.
-    """
-    prev = os.getcwd()
-    os.chdir(root)
-    try:
-        yield root
-    finally:
-        os.chdir(prev)
+# `run_in_repo()` lived here: a chdir into the throwaway repo, for arms that called `query.main` IN
+# PROCESS. It stopped isolating anything when main's `recall_conf.repo_root()` began anchoring on
+# the kit's own file instead of the CWD (TOOL-aCollapsedScan-7), so an in-process query from a
+# fixture resolved THIS repo and logged into the live query log. Measured on 2026-09-22 when main
+# was merged into this branch: four arms found no fixture log, four synthetic rows reached the live
+# one, and the byte-identity row at the end of `main()` still read ok, because it hashes after every
+# arm has already run at import. Each arm below that drives `query.main` now runs the FIXTURE's copy
+# of the kit through `run()`, which anchors there because that is where the copy lives.
 
 
 def seed_records(root: pathlib.Path, n: int = 14) -> None:
@@ -1994,11 +1987,10 @@ def test_rewrite_terms_are_required_and_survive_verbatim():
     # Contradictory flags are a named error, not a silent preference. Driven inside a throwaway
     # repo: both return before any log write TODAY, and an arm that relies on that is one refactor
     # away from writing to the live log this suite exists to leave alone.
-    root, _ = make_repo()
+    root, kitdir = make_repo()
     try:
-        with run_in_repo(root), contextlib.redirect_stderr(io.StringIO()):
-            assert QRY.main(["q", "--terms", "a b", "--no-terms"]) == 2
-            assert QRY.main(["--terms=a", "--no-terms"]) == 2
+        assert run(root, kitdir, "q", "--terms", "a b", "--no-terms").returncode == 2
+        assert run(root, kitdir, "--terms=a", "--no-terms").returncode == 2
     finally:
         cleanup(root)
     return "6 destroyable terms survived; the refusal leads with --terms"
@@ -2034,22 +2026,22 @@ def test_argv_grammar_and_the_refusal_are_gated():
     _, _, err = QRY.parse([q, "--terms"])
     assert err and "--terms" in err
 
-    # The refusals run in a THROWAWAY repo, because `QRY.main` resolves its log from the CWD and the
-    # bare-question arm APPENDS a `refused` row. Upstream's un-isolated version wrote one synthetic
-    # refusal into the SHARED query log on every gate run on every node: 471 of that log's 489
-    # refusals were this one string, against 18 genuine caller ones.
-    root, _ = make_repo()
+    # The refusals run the THROWAWAY repo's copy of the kit, because the bare-question arm APPENDS a
+    # `refused` row and the kit logs into the repo it sits in. Upstream's un-isolated version wrote
+    # one synthetic refusal into the SHARED query log on every gate run on every node: 471 of that
+    # log's 489 refusals were this one string, against 18 genuine caller ones.
+    root, kitdir = make_repo()
     try:
-        with run_in_repo(root):
-            with contextlib.redirect_stderr(io.StringIO()):
-                assert QRY.main([q]) == 2, "a bare question must be refused"
-                assert QRY.main([q, "--terms", ""]) == 2, (
-                    "an empty --terms must be refused, not treated as none")
-                assert QRY.main([q, "--k", "abc", "--no-terms"]) == 2, "a non-integer --k must refuse"
-                assert QRY.main([q, "--k", "-1", "--no-terms"]) == 2, "a non-positive --k must refuse"
-            assert [r for r in read_log_rows(root)
-                    if r.get("type") == "refused" and r.get("query") == q], (
-                "the bare-question refusal no longer logs at all")
+        assert run(root, kitdir, q).returncode == 2, "a bare question must be refused"
+        assert run(root, kitdir, q, "--terms", "").returncode == 2, (
+            "an empty --terms must be refused, not treated as none")
+        assert run(root, kitdir, q, "--k", "abc", "--no-terms").returncode == 2, (
+            "a non-integer --k must refuse")
+        assert run(root, kitdir, q, "--k", "-1", "--no-terms").returncode == 2, (
+            "a non-positive --k must refuse")
+        assert [r for r in read_log_rows(root)
+                if r.get("type") == "refused" and r.get("query") == q], (
+            "the bare-question refusal no longer logs at all")
     finally:
         cleanup(root)
     return "4 orderings resolve one question; 4 refusals fire and the bare one logs"
@@ -2061,12 +2053,12 @@ def test_result_cap_keeps_the_true_hit_count():
     found 5 things, which is the same log with its one honest number destroyed.
     """
     import query as QRY
-    root, _ = make_repo()
+    root, kitdir = make_repo()
     try:
         seed_records(root)
-        with run_in_repo(root), contextlib.redirect_stdout(io.StringIO()):
-            assert QRY.main(["zylophone latch drift", "--terms", "zylophone latch flush drift"]) == 0
-            rec = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]
+        proc = run(root, kitdir, "zylophone latch drift", "--terms", "zylophone latch flush drift")
+        assert proc.returncode == 0, f"the query failed: {proc.stderr[-300:]}"
+        rec = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]
         assert rec["n_hits"] > QRY.RESULT_CAP, (
             f"fixture too small to test the cap: {rec['n_hits']} hits <= {QRY.RESULT_CAP}")
         assert len(rec["results"]) == QRY.RESULT_CAP, f"results not capped: {len(rec['results'])}"
@@ -2086,12 +2078,12 @@ def test_shown_paths_make_every_rank_recoverable():
     otherwise the clamp and the correct behaviour are indistinguishable and this proves nothing.
     """
     import query as QRY
-    root, _ = make_repo()
+    root, kitdir = make_repo()
     try:
         seed_records(root)
-        with run_in_repo(root), contextlib.redirect_stdout(io.StringIO()):
-            assert QRY.main(["zylophone latch drift", "--terms", "zylophone latch flush drift"]) == 0
-            rec = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]
+        proc = run(root, kitdir, "zylophone latch drift", "--terms", "zylophone latch flush drift")
+        assert proc.returncode == 0, f"the query failed: {proc.stderr[-300:]}"
+        rec = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]
         paths = rec.get("shown_paths")
         assert isinstance(paths, list), "shown_paths missing — the hook cannot infer any rank"
         assert rec["n_shown"] > QRY.RESULT_CAP, (
@@ -2165,36 +2157,31 @@ def test_opened_attaches_to_an_explicit_qid_and_the_query_prints_it():
     worktree-bearing rows, while the race that does happen is INTRA-worktree (49 of 54 consecutive
     gaps from one checkout under 60 s), where a worktree predicate discriminates nothing.
     """
-    import query as QRY
-    root, _ = make_repo()
+    root, kitdir = make_repo()
     try:
         seed_records(root)
-        with run_in_repo(root):
-            buf = io.StringIO()
-            with contextlib.redirect_stdout(buf):
-                assert QRY.main(["zylophone latch drift", "--terms", "zylophone latch flush"]) == 0
-            first = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]["qid"]
-            assert f"qid {first}" in buf.getvalue(), (
-                f"the query path never printed its own qid: {buf.getvalue()[-200:]!r}")
+        proc = run(root, kitdir, "zylophone latch drift", "--terms", "zylophone latch flush")
+        assert proc.returncode == 0, f"the query failed: {proc.stderr[-300:]}"
+        first = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]["qid"]
+        assert f"qid {first}" in proc.stdout, (
+            f"the query path never printed its own qid: {proc.stdout[-200:]!r}")
 
-            # A SECOND query moves the last row. Without it the explicit key and the bare fallback
-            # resolve to the same qid and the arms below prove nothing.
-            with contextlib.redirect_stdout(io.StringIO()):
-                assert QRY.main(["zylophone latch flush", "--terms", "zylophone latch drift"]) == 0
-            second = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]["qid"]
-            assert second != first, "both queries logged one qid; the arms below prove nothing"
+        # A SECOND query moves the last row. Without it the explicit key and the bare fallback
+        # resolve to the same qid and the arms below prove nothing.
+        assert run(root, kitdir, "zylophone latch flush", "--terms",
+                   "zylophone latch drift").returncode == 0
+        second = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]["qid"]
+        assert second != first, "both queries logged one qid; the arms below prove nothing"
 
-            with contextlib.redirect_stdout(io.StringIO()):
-                assert QRY.main(["--opened", "2", "--qid", str(first)]) == 0
-            rec = [r for r in read_log_rows(root) if r.get("type") == "opened"][-1]
-            assert rec["of_qid"] == first, (
-                f"--qid {first} recorded against query {rec['of_qid']} — the key was ignored")
+        assert run(root, kitdir, "--opened", "2", "--qid", str(first)).returncode == 0
+        rec = [r for r in read_log_rows(root) if r.get("type") == "opened"][-1]
+        assert rec["of_qid"] == first, (
+            f"--qid {first} recorded against query {rec['of_qid']} — the key was ignored")
 
-            n = len(read_log_rows(root))
-            with contextlib.redirect_stderr(io.StringIO()):
-                assert QRY.main(["--opened", "1", "--qid", str(second + 999)]) == 2, (
-                    "a qid that is in no log row must be refused, not recorded")
-            assert len(read_log_rows(root)) == n, "a dangling --qid still wrote an outcome record"
+        n = len(read_log_rows(root))
+        assert run(root, kitdir, "--opened", "1", "--qid", str(second + 999)).returncode == 2, (
+            "a qid that is in no log row must be refused, not recorded")
+        assert len(read_log_rows(root)) == n, "a dangling --qid still wrote an outcome record"
         return f"qid {first} printed and attachable while {second} was the newest"
     finally:
         cleanup(root)
@@ -2315,11 +2302,10 @@ def test_alias_join_reaches_the_query_index():
         orig = E.ALIASES_DEFAULT
         try:
             E.ALIASES_DEFAULT = write_alias_fixture(root)
-            with run_in_repo(root):
-                dirp, _, _ = QRY.ensure_cache(root, force=True)
-                expr = QRY.query_expr(probe)
-                assert expr
-                hits = QRY.search(dirp, "records", expr, 10)
+            dirp, _, _ = QRY.ensure_cache(root, force=True)
+            expr = QRY.query_expr(probe)
+            assert expr
+            hits = QRY.search(dirp, "records", expr, 10)
         finally:
             E.ALIASES_DEFAULT = orig
         assert any(h["id"] == "TOOL-777" for h in hits), (

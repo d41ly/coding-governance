@@ -5713,11 +5713,6 @@
       "file": "tools/govkit/matrix.py"
     },
     {
-      "id": "run_in_repo",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
       "id": "run_kill",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
