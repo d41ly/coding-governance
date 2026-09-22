@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-22T15:11:54+03:00 @ 52a442d7a24d975397ea4b7f6b6ec81c29240a19
+last-audit: 2026-09-22T17:54:05+03:00 @ 2de31c7e50814adf2304e2e871b2f73167bf94db
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 83129cd9b6986b87002e51227542a4b67986157d
@@ -60,7 +60,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   verbatim after a compaction). Step 1 consumes it; Step 5 appends the READY card through
   `--card --append`. A main-loop `git commit` in a session whose startup card still reads
   `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js` with the remedy in stderr; an
-  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`.
+  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`. A commit from
+  any tree the card does not name is refused too, so a scratch worktree cannot commit: carry its diff
+  back as a patch (hit by `dBackdatedFixture`).
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).

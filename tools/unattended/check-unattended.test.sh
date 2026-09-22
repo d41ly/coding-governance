@@ -3662,19 +3662,23 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- arms and the aProbedUnit fold, main's own floor 410 -> 434, +24 assertions), which land in
 # ---- whichever of the eight regions this partition puts them in. Every floor below is therefore a
 # ---- MINIMUM the counts rose past until the landing's own shard runs re-read all nine.
-FLOOR_ASSERTIONS=569
+# ---- RE-READ 2026-09-22 at the aBatchedArm landing, node a, from eight direct `--shard k/8` runs on
+# ---- a frozen clone at a5d54fb6 — the first run of this file with EVERY arm reaching its assertion,
+# ---- since the twenty-two reds it carried were all fixtures pinned to texts that had moved. Readings
+# ---- 86 · 69 · 49 · 102 · 64 · 78 · 95 · 94 (sum 637); every floor ~3 %% under its own, the unsharded floor the sum's discount.
+FLOOR_ASSERTIONS=617
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
-FLOOR_SHARD_1=80
-FLOOR_SHARD_2=67
-FLOOR_SHARD_3=38
-FLOOR_SHARD_4=75
+FLOOR_SHARD_1=83
+FLOOR_SHARD_2=66
+FLOOR_SHARD_3=47
+FLOOR_SHARD_4=98
 FLOOR_SHARD_5=62
 FLOOR_SHARD_6=75
 FLOOR_SHARD_7=92
-FLOOR_SHARD_8=77
+FLOOR_SHARD_8=91
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;
