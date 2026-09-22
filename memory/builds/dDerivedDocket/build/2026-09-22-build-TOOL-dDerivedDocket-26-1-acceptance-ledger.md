@@ -45,7 +45,7 @@ drive it over fixtures, each with its break staged and observed RED:
 - AC8 — `tools/run-gates/README.md` — its exit-code table now lists exit 4 HOST beside 0 to 3, a
   paragraph states the precedence 2 REFUSED, 1 RED, 4 HOST, 3 TREE MOVED, 0 GREEN, and a new section
   names the `GATE retry` tail and the `pending` chunk verdict.
-- AC14 — `wc -c < memory/guides/SESSION-KICKOFF.md` — 24171 at each of this unit's two commits
+- AC14 — `wc -c < memory/guides/SESSION-KICKOFF.md` — 24171 at each of this unit's three commits
   against 24172 at the parent of the first, 68942eb0: the command-block ceiling line was replaced by
   one of 156 bytes against 157, and each re-stamped `last-audit:` line is the same length as the one
   it replaced.

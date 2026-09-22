@@ -1836,8 +1836,10 @@ read_spawn_floor() {
 }
 
 # measure_spawn_cost — SPAWN_US, the mean microseconds of one spawn over ten, or empty when a spawn
-# failed or bash has no `EPOCHREALTIME`: a failed spawn measures nothing, and a builtin clock is the
-# only one that does not spawn a process of its own inside the measurement.
+# failed, bash has no `EPOCHREALTIME`, or the clock did not move: a failed spawn measures nothing, a
+# builtin clock is the only one that does not spawn a process of its own inside the measurement, and
+# a zero is NEVER rounded up to a figure. A floor fabricated at one microsecond would read every later
+# double timeout as HOST, which is the fallback-fabricates-the-passing-value class pointed at the host.
 measure_spawn_cost() {
   local -a cmd=()
   local t0 t1 k
@@ -1851,7 +1853,7 @@ measure_spawn_cost() {
   done
   t1=${EPOCHREALTIME//[.,]/}
   SPAWN_US=$(( (10#$t1 - 10#$t0) / 10 ))
-  [ "$SPAWN_US" -gt 0 ] || SPAWN_US=1
+  [ "$SPAWN_US" -gt 0 ] || SPAWN_US=""
 }
 
 # write_spawn_floor <path> <microseconds> — the floor file holds the lower of its reading and this
