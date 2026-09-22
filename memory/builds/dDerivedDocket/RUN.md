@@ -264,3 +264,9 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-22T05:06:58Z rescope · item add TOOL-dDerivedDocket-61 · reason Adopted after the origin/main merge at c23d5701 by owner ruling of 2026-09-22 (reconcile fully): the merge kept two lease models and two restart paths, and none of main's out-of-session actors knew HELD. One Tier-2 unit reconciles them; it also takes the property TOOL-dDerivedDocket-27 S11 guarded, which that unit withdraws.
 
 2026-09-22T05:49:15Z review · item dDerivedDocket-specs-g8 · reason verdict BLOCKED · blockers 1 · BOUNDED · disposition promote
+
+2026-09-22T06:49:36Z rescope · item add TOOL-dDerivedDocket-62 · reason Promoted at the G8 bounded exit (B1): unit 61 moves the lease into each worktree's own copy of the run-state file, so the resume tick and the take-over matrix grade one slug many times; this unit gives one answer per slug, keyed on the checked-out run branch.
+
+2026-09-22T06:49:37Z rescope · item add TOOL-dDerivedDocket-63 · reason Promoted at the G8 bounded exit (H1): unit 61's same-session take-over row shadows --replaces, so the holder loses its own replace; this unit reorders and narrows the leased rows.
+
+2026-09-22T06:49:39Z rescope · item add TOOL-dDerivedDocket-64 · reason Promoted at the G8 bounded exit (H2): the gate turnstile queue writes no gate log, so a healthy queued bar reads STALE; this unit has the queue write a heartbeat the liveness clock reads.

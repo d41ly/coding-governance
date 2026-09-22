@@ -1,6 +1,6 @@
 # DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute
 
-**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 35
+**Status:** SPECCED · rev-7 · 2026-09-22 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 39
 
 <!-- gen:spec-records -->
 
@@ -469,6 +469,9 @@ is kit work; `GATE_FULL=1` alone would still hold it. Every other leg in the lis
 - rev-6 · 2026-09-21 · order re-declared from 38 to 35 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 35, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
+- rev-7 · 2026-09-22 · order re-declared from 35 to 39 in the status header only, derived
+  from the §3 edges: the G8 bounded exit promoted TOOL-dDerivedDocket-62, -63 and -64 to run
+  after TOOL-dDerivedDocket-61, so this unit runs at order 39, alone. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

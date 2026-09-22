@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered
 
-**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 31
+**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 35
 
 <!-- gen:spec-records -->
 
@@ -1236,6 +1236,9 @@ its guard names the four renders step 6 re-renders, so the merge commit triggers
 - rev-7 · 2026-09-21 · order re-declared from 34 to 31 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 31, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
+- rev-8 · 2026-09-22 · order re-declared from 31 to 35 in the status header only, derived
+  from the §3 edges: the G8 bounded exit promoted TOOL-dDerivedDocket-62, -63 and -64 to run
+  after TOOL-dDerivedDocket-61, so this unit runs at order 35, alone. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

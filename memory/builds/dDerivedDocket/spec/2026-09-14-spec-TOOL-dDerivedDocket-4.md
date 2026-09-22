@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase
 
-**Status:** CLOSED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
+**Status:** CLOSED · rev-9 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -149,6 +149,10 @@ lists among this unit's closes.
 - **hands-off** `TOOL-dDerivedDocket-61` — HELD, `run_hold`, the resume matrix with its
   refusal-before-write property, `run_takeover`'s step order and the tri-state `check_lease_fresh`,
   which that unit re-keys onto the run-state lease facts while keeping every row's property.
+- **hands-off** `TOOL-dDerivedDocket-63` — `--replaces` as the holder's own path (§8 F9), identity
+  by the keepalive the holder's own scheduler lists (§8 F3), the refusal-before-write property, and
+  the AC6 and AC20 arms, whose verdicts that unit keeps under the driver suite's one exported session
+  and pid by evaluating the `--replaces` row ahead of the same-session row unit 61 adds.
 
 ## 4. Design
 
@@ -993,6 +997,10 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
   S11 re-terming of the lease bound, which unit 27 has since withdrawn; both passages now say so and
   point at `TOOL-dDerivedDocket-61` §8 F1, so the record does not describe a handoff that will not
   happen.
+- rev-9 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-63`, answering that
+  unit's consumes-from for `--replaces` as the holder's own path (§8 F9), identity by the keepalive
+  (§8 F3), the refusal-before-write property and the AC6 and AC20 arms whose verdicts it keeps.
+  Edges only: the unit stays CLOSED, and nothing it built moved.
 
 ## 10. Reuse audit
 

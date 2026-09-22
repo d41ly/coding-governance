@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-28 — run-owned process ledger
 
-**Status:** SPECCED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
+**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -101,6 +101,16 @@ rule: nothing kills a process this run did not start.
   hold the lease, the take-over at the HELD unit's reap step and the holder's matching-id row, and
   the per-slug ledger S1 keeps beside the lease under the git common dir. That unit keeps each reap
   on its re-keyed row that holds the lease and leaves the ledger's directory in place.
+- **hands-off** `TOOL-dDerivedDocket-62` — the per-slug ledger S1 keeps under the git common dir and
+  the S3 reap on the `--resume` rows that hold the lease, whose prune-race argument (§4 Pruning and
+  concurrency) that unit re-grounds: its `check_holder_worktree` confines those rows to the worktree
+  on the run's branch, and its AC4 reads the ledger byte-unchanged after a refused call from a
+  sibling worktree, while `--preflight`, `--hold` and `gates-green` keep resting on the run's own
+  worktree.
+- **hands-off** `TOOL-dDerivedDocket-63` — the AC9 arm, a `--resume --keepalive-id B` refusal over a
+  fresh lease with a live orphan in the ledger, which unit 61's same-session row alone would turn
+  into a take-over that reaps; that unit's row order keeps it a refusal that reaps nothing, under the
+  driver suite's one exported session, with the assertions this unit writes.
 
 ## 4. Design
 
@@ -436,6 +446,11 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
   unit's consumes-from for the S3 reap on the `--resume` rows that hold the lease and the S1
   ledger's directory under the git common dir. No criterion, design or other edge moved, and the
   status stays SPECCED.
+- rev-8 · 2026-09-22 · §3 · two hands-off edges added, to `TOOL-dDerivedDocket-62` and
+  `TOOL-dDerivedDocket-63`, answering their consumes-from: the S1 ledger and S3 reap whose
+  prune-race argument unit 62's holder-worktree check re-grounds for `--resume`, and the AC9 arm
+  whose refusal unit 63's row order keeps. No criterion, design or other edge moved, and the status
+  stays SPECCED.
 
 ## 10. Reuse audit
 

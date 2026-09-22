@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-35 — arming and the real-tree staged reds
 
-**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 32
+**Status:** SPECCED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 36
 
 <!-- gen:spec-records -->
 
@@ -572,6 +572,9 @@ observes them on real content.
 - rev-6 · 2026-09-21 · order re-declared from 35 to 32 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 32, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
+- rev-7 · 2026-09-22 · order re-declared from 32 to 36 in the status header only, derived
+  from the §3 edges: the G8 bounded exit promoted TOOL-dDerivedDocket-62, -63 and -64 to run
+  after TOOL-dDerivedDocket-61, so this unit runs at order 36, alone. No criterion, design or edge moved.
 
 ## 10. Reuse audit
 

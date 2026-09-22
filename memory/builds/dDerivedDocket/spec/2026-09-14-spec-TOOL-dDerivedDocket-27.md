@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
+**Status:** SPECCED · rev-9 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -81,8 +81,10 @@ fits, instead of reporting all three like a red leg.
   stages each RED. Observed by AC10.
 - **S11** WITHDRAWN at rev-8 (orchestrator, 2026-09-22, TOOL-dDerivedDocket-61 §8 F1): that unit
   deletes `resolve_lease_bound` with the rest of the file lease and grades staleness against
-  `RESUME_STALE_BOUND` through the `--liveness` clock, whose gate-log term moves while a bar runs,
-  so no lease bound is left for the backstop to re-term. NOT OBSERVED: withdrawn.
+  `RESUME_STALE_BOUND` through the `--liveness` clock, whose gate-log term moves as a running bar's
+  legs land and not while the bar waits in the turnstile queue, so no lease bound is left for the
+  backstop to re-term. What that unit carries of the property the term gave, and what it does not,
+  is §3's last non-goal. NOT OBSERVED: withdrawn.
 - **S12** This unit's delta on every capped carrier is ZERO OR NEGATIVE. Leg check 22 owes the two
   conf keys ONE joined protocol key-table row, and §4 names the two §8 spans that fund it — one
   restatement and one argument, no rule among them. Observed by AC14.
@@ -102,8 +104,14 @@ fits, instead of reporting all three like a red leg.
   asks witness and `--dispatch`'s declared spec-token checker keep the declared bound.
 - **The lease's stale bound.** This unit leaves its first term at `GATE_BOUND`. S11, which moved
   that term to the backstop, is withdrawn: `TOOL-dDerivedDocket-61` deletes the bound with the file
-  lease, and keeping a bar that runs past the bound out of STALE is that unit's, through the
-  gate-log term of its one clock (its §8 F1).
+  lease (its §8 F1). That unit carries ONE half of the property the backstop term gave: a bar whose
+  legs keep landing in the run's own worktree stays out of STALE through the gate-log term of its
+  one clock, which its AC20 observes over a planted gate log. It carries two halves nowhere. A bar
+  waiting in the turnstile queue, or otherwise silent, writes no gate log. The runner's queue alone
+  may wait 7200 s, and this unit's S4 sizes the bar's backstop to allow that wait, against gov's
+  5400 s `RESUME_STALE_BOUND`, so such a bar reads STALE there. That is the G8 spec audit's H2,
+  promoted to `TOOL-dDerivedDocket-64`. And a second worktree is graded on its own clocks, which is
+  that audit's B1, promoted to `TOOL-dDerivedDocket-62`.
 
 ### Edges
 
@@ -327,8 +335,13 @@ raised: raising one is an owner turn.
   staleness through the `--liveness` clock instead, so nothing is left here to observe and no
   witness is named.
   Red when: never in this unit. The property it guarded, that a bar running past the bound never
-  reads stale and a second session cannot take the slug over mid-bar, is observed by that unit's
-  AC20, which reds when a fresh gate log past the bound reads STALE.
+  reads stale and a second session cannot take the slug over mid-bar, is observed only in part by
+  that unit's AC20, and the two fixtures show which part. This criterion staged a stub bar that
+  sleeps past the bound and writes nothing, and read `--status` and `--resume` from a second
+  worktree. AC20 plants a fresh gate log in the run's own worktree and reads from that worktree, so
+  it observes legs landing there. The silent or queued bar is observed by no criterion of either
+  unit: it is the G8 audit's H2, promoted to `TOOL-dDerivedDocket-64`. The second-worktree read is
+  observed by none either: it is that audit's B1, promoted to `TOOL-dDerivedDocket-62`.
 - **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
   build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
   no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
@@ -578,13 +591,28 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
 - rev-8 · 2026-09-22 · §2 S11 · §3 · §6 AC9 · the orchestrator decided `TOOL-dDerivedDocket-61`
   §8 F1 as option (a) under the delegated M3 rule. That unit deletes `resolve_lease_bound` and
   grades staleness against `RESUME_STALE_BOUND` through the `--liveness` clock, whose gate-log term
-  moves while a bar runs, so S11 and AC9, the one criterion that observed only S11, are withdrawn
-  in place and keep their numbers. KF7's `max(backstop, declared bound)` is no longer delivered
-  here; the property AC9 guarded passes to that unit's AC20. §3's non-goal on `GATE_BOUND`'s
+  moves as a running bar's legs land, so S11 and AC9, the one criterion that observed only S11, are
+  withdrawn in place and keep their numbers. KF7's `max(backstop, declared bound)` is no longer
+  delivered here; one half of the property AC9 guarded, legs landing in the run's own worktree,
+  passes to that unit's AC20, and the other two halves passed nowhere (both claims corrected in
+  place by the next revision, which names them). §3's non-goal on `GATE_BOUND`'s
   consumers loses its S11 sentence to a non-goal of its own, and the consumes-from edge to unit 4
   drops the stale-bound formula. The pinned `gate-backstop` fact stays: S4 pins it and
   `gates-green` still bounds `$GATE_CMD` by it. No other S-item, criterion or edge moved, and §4,
   §5, §7 and §10 carried nothing that rested on S11.
+- rev-9 · 2026-09-22 · §2 S11 · §3 · §6 AC9 · §9 · G8 spec audit round 1, M1 (ids 3 and 19), folded
+  in the words of that audit's H2 and B1, which are promoted rather than folded, so that this spec
+  and `TOOL-dDerivedDocket-61` say the same thing. rev-8's withdrawal said unit 61's AC20 observes
+  the property AC9 guarded, and it observes one half of it. AC9's own fixture, read at `8f354565`,
+  staged a stub bar that sleeps and writes nothing and read `--status` and `--resume` from a second
+  worktree; AC20 plants a gate log in one worktree. AC9, §3's non-goal on the lease's stale bound
+  and S11 now say what unit 61 carries, legs
+  landing in the run's own worktree, and name the two halves it does not: the silent or queued bar,
+  the audit's H2, promoted to `TOOL-dDerivedDocket-64`, and the second-worktree read, its B1,
+  promoted to `TOOL-dDerivedDocket-62`. S11's and rev-8's sentence that the gate-log term moves
+  "while a bar runs" now says it moves as a running bar's legs land, since a queued bar writes no
+  gate log; rev-8's entry is corrected in place on both claims. S11 and AC9 stay withdrawn, the
+  pinned `gate-backstop` fact stays, and no other S-item, criterion or edge moved.
 
 ## 10. Reuse audit
 
