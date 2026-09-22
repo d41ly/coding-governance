@@ -391,6 +391,24 @@ export CLAUDE_PID=999999999
 reset_tree() { git checkout -q unit 2>/dev/null; git reset -q --hard "$UNIT0"; git clean -qfd; mkconf; }
 
 run() { bash "$SCRIPT" "$@" 2>&1; }
+
+# ---- EVERY `--dispatch` ARM NEEDS A COMMITTED, READY SPEC for the unit it names. The driver refuses
+# ---- a pass for a unit no tracked spec under the build defines (M2's MISSING, check 49) and one
+# ---- whose acceptance section is empty (THIN); at UNIT0 this fixture's build has neither, so every
+# ---- arm in the dispatch region below was answered by that refusal rather than by the one it
+# ---- asserts. `build_audit_fixture` already carried a private copy of this and its header says why.
+# ---- The arms that OWN the MISSING and THIN refusals name `ARCH-tRun-404` and rewrite their own
+# ---- spec file, so neither is disturbed by seeding the four units the dispatch arms declare.
+# ---- COMMITTED, not merely staged: the openness filter reads commits, and a spec riding along in a
+# ---- pass's own commit would close the pass whose openness half these arms are about.
+dspec_reset() {
+  reset_tree
+  mkdir -p memory/builds/tRun/spec
+  for _u in 1 2 3 4; do
+    printf '# ARCH-tRun-%s — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' "$_u" > "memory/builds/tRun/spec/u$_u.md"
+  done
+  git add -A >/dev/null && git commit -q -m "fixture: READY specs for the dispatch units" --no-verify
+}
 # Stage and commit the fixture edit. Preflight evaluates EVERY precondition before it writes, so a
 # dirty fixture still arms the message arms — but it never reaches the write phase, which is where
 # checks 9 and 17 live. Those arms have to commit.
@@ -1611,7 +1629,10 @@ initblock=$(awk '/^MEMORY_ROOT=memory; /{f=1} f{ if ($0 ~ /^[A-Za-z_][A-Za-z_0-9
 undefaulted=""
 checked=0
 for k in $(sed -n 's/^\([A-Z_][A-Z_]*\)=.*/\1/p' "$example"); do
-  grep -q "[^A-Z_]$k" "$SCRIPT" || continue
+  # COMMENTS ARE NOT READS. The driver's headers name keys that other kit scripts own -
+  # `CORE_FLOOR` is the checker's - and a prose mention read as a use, so this arm asked the
+  # driver to default a key it never reads. Strip comment bodies before asking.
+  sed 's/[[:space:]]#.*$//; /^[[:space:]]*#/d' "$SCRIPT" | grep -q "[^A-Z_]$k" || continue
   checked=$((checked + 1))
   case "$initblock" in *"$k="*) ;; *) undefaulted="$undefaulted $k" ;; esac
 done
@@ -5143,7 +5164,7 @@ reset_tree
 # ---- M6 requires two path lists written down before two passes run together and nothing has ever
 # ---- read one. Two of M6's three conditions are decided here; the third is a judgement about
 # ---- meaning and is refused as undecidable rather than faked.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh)
 hit "$out" "dispatch declared"
@@ -5172,7 +5193,7 @@ out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes tools/z.sh)
 hit "$out" "dispatch declared"
 
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/backlog/TOOL.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md)" "--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
@@ -5180,11 +5201,11 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md
 # ---- CONDITION 3, CONDITIONAL HALF. A generated index ALONE is ACCEPTED — every pass changes a spec
 # ---- header the index is rendered from, and refusing that was the VACUOUS reading M6 retracted. The
 # ---- refusal fires only TOGETHER WITH the generator, which is the collision the condition names.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 # UNDECLARED is the shipped default and means the conditional half is OFF, so the index is accepted
 # here for TWO reasons and the next arm separates them by declaring the key.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
-reset_tree
+dspec_reset
 printf '
 GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
 ' >> .unattended.conf
@@ -5195,7 +5216,7 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $
 
 # ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
 # rather than about one declaration.
-reset_tree
+dspec_reset
 printf '
 GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
 ' >> .unattended.conf
@@ -5205,7 +5226,7 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispa
 
 # ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in
 # ---- a space-joined value the path has already become two tokens by the time the verb sees it.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 # The two refusal texts, named once: an arm carrying half a signature passes on a message that
 # no longer says what it used to, which `check-arms` exists to catch.
 SHARED_MSG="--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
@@ -5282,22 +5303,22 @@ done
 # ---- commit is about that unit. The first openness filter counted that as the pass committing, so
 # ---- every pass closed the instant it was declared and this refusal ran over an empty sibling set.
 # ---- Two controls below separate the mechanism from everything else in the verb.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 # control A — no commit at all between the two declarations
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 # control B — an intervening commit whose subject names NO unit
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 git add -A && git commit -q -m "chore: park the run-state" --no-verify
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 # ...and a pass that HAS committed is closed, so its paths stop being claimed. Without this the
 # refusal above would be satisfied by a filter that simply never closes anything.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 mkdir -p work && printf 'a\n' > work/shared
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
@@ -5306,7 +5327,7 @@ miss "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatc
 # ---- A DECLARATION IS APPEND-ONLY: nothing rewrites, supersedes or retracts an earlier one. The
 # ---- property asserted here is the ABSENCE of the widening branch, because its return is exactly
 # ---- what would re-open the retraction escape.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/one >/dev/null 2>&1
 A0=$(sed -n 's/^.* dispatch · item \([0-9a-f]*\) ARCH-tRun-1 · reason .*$/\1/p' memory/builds/tRun/RUN.md | tail -1)
 git add -A && git commit -q -m "chore: park the run-state" --no-verify
@@ -5319,7 +5340,7 @@ grep -q " dispatch · item $A0 ARCH-tRun-1 · reason work/one\$" memory/builds/t
 n=$((n+1))
 [ "$(grep -c ' dispatch · item .* ARCH-tRun-1 · reason ' memory/builds/tRun/RUN.md)" = 2 ] \
   || { echo "FAIL the second declaration did not park its own row"; st=1; }
-reset_tree
+dspec_reset
 
 # ---- B1: THE DECLARATION COMMIT'S REAL SHAPE. The round-2 arm committed RUN.md alone, and the
 # ---- openness filter subtracted exactly that one path — so a declaration commit made the ordinary
@@ -5327,13 +5348,13 @@ reset_tree
 # ---- declaration time and condition 1 proved disjointness against nobody. Two shapes, because they
 # ---- fail differently: with the extra file OUTSIDE the declared set the leg reds downstream, and
 # ---- with it INSIDE nothing anywhere reports the collision.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 mkdir -p work && printf 'x\n' > work/unrelated.txt
 git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 mkdir -p work/shared && printf 'x\n' > work/shared/inside.txt
 git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
@@ -5346,14 +5367,14 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "no sibling
 
 # ---- ...and a proof over NOBODY announces itself, so an empty sibling set is visible in the run log
 # ---- rather than byte-identical to a proof over somebody.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/first)" "no sibling pass is open, so condition 1 is a proof over an empty set"
 
 # ---- B2: A LEGAL SECOND PASS OF ONE UNIT IS NOT A NARROWING. M6 defines several pass kinds per unit
 # ---- and a pass that produced no change commits nothing, so its row stays open for the rest of the
 # ---- run. Keyed on the unit alone, every later pass of that unit was refused — terminally, because
 # ---- an unattended run has no owner turn. A stall, shipped by the build whose subject is stalls.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/spec >/dev/null 2>&1
 git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/build)
@@ -5365,7 +5386,7 @@ n=$((n+1))
 # ...and there is NO narrowing refusal any more, deliberately. With grading dark there is nothing a
 # narrowing can hide from, and the refusal that existed could not be cleared in band — which is the
 # stall this build exists to remove. Asserted as an ABSENCE so its return is visible.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/one --writes work/two >/dev/null 2>&1
 git add -A && git commit -q -m "chore: park the run-state" --no-verify
 miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one)" "narrowing is not"
@@ -5373,7 +5394,7 @@ miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one)" "narrowing is
 # ---- B3: THE RECORD CARRIES ONE SPELLING. Normalised for the refusals and parked raw, `work/sub/`
 # ---- passed every guard and was then graded as a literal by the leg, which reds forever with
 # ---- narrowing refused and no in-band repair.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/sub/ --writes ./work/other >/dev/null 2>&1
 n=$((n+1))
 grep -q ' dispatch · item .* ARCH-tRun-1 · reason work/sub work/other$' memory/builds/tRun/RUN.md \
@@ -5381,7 +5402,7 @@ grep -q ' dispatch · item .* ARCH-tRun-1 · reason work/sub work/other$' memory
 
 # ---- M1: the generated-index/generator pairing, armed. The `covers` to `overlaps` change at this
 # ---- site reverted with the whole suite still green, which is a repair nothing was holding.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+dspec_reset; run --preflight tRun --keepalive-id k1 >/dev/null
 cp .unattended.conf .unattended.conf.bak
 printf '\nGENERATED_INDEXES="work/idx.md:work/gen"\n' >> .unattended.conf
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/idx.md --writes work/gen)" "--dispatch declares a generated index together with its generator"
@@ -5432,7 +5453,7 @@ run --attest tRun --item keepalive-reaped >/dev/null 2>&1
 run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
 run --abort tRun --reason stop --code fork-unresolvable >/dev/null 2>&1
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "the run is already finished and a finished record is not something to move, re-open or re-pin"
-reset_tree; rm -f memory/builds/tRun/RUN.md
+dspec_reset; rm -f memory/builds/tRun/RUN.md
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
 
 # ---- TOOL-aProbedUnit-3: `--audit`, the dispatched-unit stall probe. One line per unit whose LATEST

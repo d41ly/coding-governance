@@ -764,10 +764,11 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # `--disposition` and `--unit`, which is what settled it. Counting occurrences of a flag is not
 # the same question as whether it is DISPATCHED.
 #
-# NOT FIXED HERE: `--unit` and `--disposition` are flags too and are still graded as verbs,
-# which is why this arm reds on a tree nobody has touched. Denying them changes what this arm
-# grades AND its floor, which is TOOL-aQuenchedHarness-9's deferred work, not this unit's.
-_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths'
+# FIXED 2026-09-22, at the aBatchedArm landing, on the owner's instruction to clear the
+# pre-existing reds: `--unit` is a flag of `--brief` and `--disposition` one of `--review`, both
+# dispatched as case arms and both documented by the verb they belong to, so both are denied and
+# the floor below is re-derived over the population they were inflating.
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths --unit --disposition'
 for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)
@@ -778,10 +779,12 @@ done
 # rather than widening the set the join grades.
 _nverbs=$(printf '%s
 ' "$verbs" | grep -c .)
-# FOURTEEN, the verbs this kit actually dispatches. It was 12 against a population of 18 - four of
-# main's flags had not been denied, so the count was inflated and two verbs could have stopped being
-# dispatched with the floor still green. A floor set against a polluted population pins nothing.
-n=$((n+1)); [ "$_nverbs" -ge 14 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 14, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
+# EIGHTEEN, the verbs this kit actually dispatches, DERIVED at the aBatchedArm landing by running
+# this file's own derivation over the driver and counting: 20 case arms less `--unit` and
+# `--disposition`, the two flags the line above now denies. It was 14 against a polluted population
+# of 20, so six verbs could have stopped being dispatched with the floor still green. A floor set
+# against a polluted population pins nothing.
+n=$((n+1)); [ "$_nverbs" -ge 18 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 18, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
 # ...and every DENYLIST entry must really be a flag, or a stale exemption silently narrows the
 # population the join covers. A name is a flag when it is dispatched but assigns rather than acting;
 # the cheap proxy is that it must still appear as a case arm in the driver.
@@ -932,7 +935,7 @@ reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 ndod=$(grep '^DOD_CORE=' $KIT_REL/unattended.sh | tr -d '
 ' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)
-sed -i 's/ parked-decisions-surfaced:agent"$/"/' $KIT_REL/unattended.sh
+mutate $KIT_REL/unattended.sh 's/ [a-z][a-z-]*:\(machine\|agent\)"$/"/'
 out=$(run)
 hit "$out" "the kit's CORE Definition-of-Done set has shrunk below its floor, and deleting an item is a silent, reason-free override of everything keyed on it"
 hit "$out" "$((ndod-1)) against $ndod"
@@ -1280,7 +1283,7 @@ miss "$(run)" "the protocol's binding key table and the declared conf disagree"
 # ---- sent the reader at the network. The driver had already split these one file over.
 # the wall-clock bound FIRING, stubbed at `timeout` so the run does not actually wait it out
 reset_tree
-mkdir -p "$TMPBIN"; printf '#!/bin/sh\ncase "$*" in *"1 true") exit 0 ;; esac\nexit 124\n' > "$TMPBIN/timeout"; chmod +x "$TMPBIN/timeout"
+mkdir -p "$TMPBIN"; printf '#!/bin/sh\ncase "$*" in *" true") exit 0 ;; esac\nexit 124\n' > "$TMPBIN/timeout"; chmod +x "$TMPBIN/timeout"
 out=$(PATH="$TMPBIN:$PATH" run)
 hit  "$out" "the remote observation was KILLED by this kit's own wall-clock bound rather than answered, so the recorded BASE could not be checked; that is a partition or a stalled server, not a remote that advertises nothing"
 miss "$out" "the remote advertised no tips"
@@ -2180,7 +2183,7 @@ miss "$(run)" "check 32"
 # function that exists for the grep. The one call site is deleted and the count the refusal prints
 # is read, so an `at most one` predicate — which would pass this copy — cannot pass this arm.
 reset_tree
-mutate $KIT_REL/unattended.sh '/sidecar=$(resolve_sidecar_dir)/d'
+mutate $KIT_REL/unattended.sh 's|[$](resolve_sidecar_dir)|$(true)|g'
 hit "$(run)" "driver callers: 0"
 reset_tree
 
@@ -2349,12 +2352,12 @@ reset_tree
 
 # E, the COUNT SENTENCE: the rows can all be right while the prose above them miscounts, which is
 # exactly what shipped — an eight-row table under a sentence saying six, in both copies, parity green.
-reset_tree; pedit 's/^Ten kit-owned core items\./Six kit-owned core items./'
+reset_tree; pedit 's/^[A-Z][a-z]* kit-owned core items\./Six kit-owned core items./'
 hit "$(run)" "the protocol's stated count of core Definition-of-Done items disagrees with the set the driver enforces, and that sentence sits directly above the table it miscounts: says '"
 
 # ...and the sentence gone entirely. Absence is its own refusal for the reason every locator here
 # has one: a summary nobody can find is a summary nobody can join.
-reset_tree; pedit 's/^Ten kit-owned core items\. //'
+reset_tree; pedit 's/^[A-Z][a-z]* kit-owned core items\. //'
 hit "$(run)" "the protocol states no count of kit-owned core Definition-of-Done items, so the sentence that summarises the table cannot be joined to the table or to the driver"
 reset_tree
 
@@ -2883,8 +2886,8 @@ hit "$(run)" "the extracted declared-list parser does not REFUSE an array left o
 # reduced the value to a bare `[`. The plain form still refused, which is exactly why the arm above
 # and the fold that wrote it both passed. Moving the strip back after the `case` is the mutation.
 reset_tree
-mutate $KIT_REL/check-playbook.sh '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
-mutate $KIT_REL/unattended.sh     '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+mutate $KIT_REL/check-playbook.sh '/^declared_list() {/,/^}/ s|raw=\${_l%%\[\[:space:\]\]#\*}|raw=${_l}|'
+mutate $KIT_REL/unattended.sh     '/^declared_list() {/,/^}/ s|raw=\${_l%%\[\[:space:\]\]#\*}|raw=${_l}|'
 hit "$(run)" "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [k = [   # one per piece [see section 7]]"
 
 # ---- ROUND 8's LOW 2: a SYNTAX error makes `bash -c` exit 2, the empty-reply branch faithfully
@@ -2912,8 +2915,8 @@ hit "$(run)" "the two inlined copies of the declared-scalar parser have drifted,
 # is a declared null of its own type, so a `#` in the parse is the leak signature — and it is the same
 # signature for all ten keys rather than for the two the old pattern matched.
 reset_tree
-mutate $KIT_REL/check-playbook.sh '/^declared_scalar() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
-mutate $KIT_REL/unattended.sh     '/^declared_scalar() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+mutate $KIT_REL/check-playbook.sh '/^declared_scalar() {/,/^}/ s|_v=\${_l%%\[\[:space:\]\]#\*}|_v=${_l}|'
+mutate $KIT_REL/unattended.sh     '/^declared_scalar() {/,/^}/ s|_v=\${_l%%\[\[:space:\]\]#\*}|_v=${_l}|'
 hit "$(run)" "the shipped template's own declaration line parses with its COMMENT still attached, so an adopter who fills the template in place and keeps the comments gets that prose as the value - key and parse follow:"
 
 # ...and the template half must have RUN. Without this both loops are green over a fence that yielded
@@ -2953,8 +2956,8 @@ hit "$(run)" "the extracted declared-scalar parser does not return the VALUE of 
 # ...and the subtler mutation the byte-compare cannot see, because two identically dead copies are
 # still identical: a strip that DELETES every commented line rather than trimming the comment off it.
 reset_tree
-mutate $KIT_REL/check-playbook.sh '/^declared_scalar() {/,/^}/ s|s/\[\[:space:\]\]\[\[:space:\]\]\*#\.\*\$//|/#/d|'
-mutate $KIT_REL/unattended.sh     '/^declared_scalar() {/,/^}/ s|s/\[\[:space:\]\]\[\[:space:\]\]\*#\.\*\$//|/#/d|'
+mutate $KIT_REL/check-playbook.sh '/^declared_scalar() {/,/^}/ s|_v=\${_l%%\[\[:space:\]\]#\*}|case $_l in *#*) continue ;; esac; _v=${_l}|'
+mutate $KIT_REL/unattended.sh     '/^declared_scalar() {/,/^}/ s|_v=\${_l%%\[\[:space:\]\]#\*}|case $_l in *#*) continue ;; esac; _v=${_l}|'
 hit "$(run)" "the extracted declared-scalar parser does not return the VALUE of a non-empty declaration, which is the only direction that tells a working parser from one answering nothing - a parser that empties every commented line passes every other assertion here. Specimen, wanted and got follow: ["
 
 # ---- THE SOURCE POPULATION the three rules scan, derived from the kit directory rather than typed:
@@ -3081,7 +3084,7 @@ reset_tree
 # ---- check 28 (round-2 fold): the inlined parser is ONE answer in two files, and the answer is the
 # ---- one an adopter gets. Both branches, because agreement and correctness are different claims and
 # ---- this check makes both.
-reset_tree; mutate $KIT_REL/check-playbook.sh '/^declared_list() {/,/^}/ s|; s/,/ /g||'
+reset_tree; mutate $KIT_REL/check-playbook.sh '/^declared_list() {/,/^}/ s|_m=\${_m//,/ }|_m=${_m}|'
 hit "$(run)" "the two inlined copies of the declared-list parser have drifted, and a declaration parsed two ways is two answers to one question - they are copy-inlined because each kit script installs standalone, so this comparison is the only thing holding them together"
 
 # ...and the MISSING half, which is the branch every arm here would silently take if the scratch tree
