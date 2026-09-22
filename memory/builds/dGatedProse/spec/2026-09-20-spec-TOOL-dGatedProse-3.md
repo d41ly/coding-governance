@@ -1,12 +1,13 @@
 # TOOL-dGatedProse-3 — the guide cap rises on both axes, with the reason recorded beside the figure
 
-**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base bd44d3ff · streams tooling · order 4 · ratified 2026-09-21
+**Status:** CLOSED · rev-6 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 4 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md](../build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md) | research | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
+| [2026-09-22-build-TOOL-dGatedProse-3-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dGatedProse-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 
 <!-- /gen:spec-records -->
@@ -677,7 +678,9 @@ with it. If `codebase-map coverage + freshness` disagrees, `python tools/codebas
 
 ## 8. Open questions
 
-**F1 — the ratified figure. RESOLVED (owner, 2026-09-21): 98304 and 1200.** The owner ruled the ACT
+### F1 — the ratified figure
+
+RESOLVED (owner, 2026-09-21): 98304 and 1200. The owner ruled the ACT
 on 2026-09-20 and named no number. On 2026-09-21 the owner first ratified 81920 and 1000, taking this
 unit's recommendation, and re-ruled the pair the same day to 98304 and 1200, once the re-measurement
 below showed the first pair buying 31.7 days on the merged tree where 48.9 had been weighed. Every
@@ -718,8 +721,10 @@ pair to restore that headroom. 98304 and 1200 buy 62.3 days at the merged tree's
 construction: eight fifths of the retired pair, the 81.92 allowance intact, and bytes binding by a
 factor of about 2.8.
 
-**F2 — where the build's single kit-version move has to SIT. RESOLVED (owner, 2026-09-21): here, in
-this unit.** Re-derived from source and not from the ruling, per the instruction to verify it:
+### F2 — where the build's single kit-version move has to SIT
+
+RESOLVED (owner, 2026-09-21): here, in
+this unit. Re-derived from source and not from the ruling, per the instruction to verify it:
 `tools/memory-tree/check-verdict-epoch.sh:16` states the rule topologically and `:179` implements it
 as an ancestry test — W, the newest commit in `<base>..HEAD` moving a behaviour-bearing line of the
 scan set declared at `:68` and `:69`, must be an ancestor of or equal to S, the newest commit that
@@ -878,6 +883,11 @@ AC12 observes the verdict and carries the liveness assertion, and S8 carries the
   and line, and the external edge names both 2026-09-21 rulings as the main loop's relay, with AC7's
   row as their first record. S8 and its clause are untouched, which unit 5's AC7 grades; the trigger
   re-run over this file fires on S8 alone, and S4 and S6 still carry no backticked token.
+- rev-6 · 2026-09-22 · §8 · the closing commit. The two forks open as `###` sub-heads rather than
+  bold paragraphs, because the hygiene engine counts a §8 item as a bullet or a `###` sub-head and a
+  terminal spec whose §8 holds neither refuses as hollow, which is what the sibling unit's closing
+  commit met. Each mark keeps its word, resolver and date, and no fork's question or resolution
+  moves.
 
 ## 10. Reuse audit
 
