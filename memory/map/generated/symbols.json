@@ -1233,6 +1233,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_claim_canary",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "check_commitment",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -5791,6 +5796,11 @@
       "id": "scan_claimed_paths",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_claims",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "scan_class_tokens",

@@ -11,13 +11,14 @@
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
 # CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm and 23 all skip, and the
 # full run at the push boundary is where they bind. Check 22 is NOT among them and still walks
-# every tracked review record here. This line used to read "set-checks tree-wide", which was
+# every tracked review record here, and neither is check 25: its verdict is per spec, and its by-name
+# resolution reads the whole tracked tree whichever files are staged. This line used to read "set-checks tree-wide", which was
 # already false of 13-19 — one rule returning two verdicts, the
 # `amendment-leaves-its-other-half-standing` class this repo catalogues.
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.82   # gov:kit memory-tree@2.82 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.85   # gov:kit memory-tree@2.85 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -81,7 +82,17 @@ BASE_RESOLVE_CUTOFF=""  # date; a LIVE spec dated >= this must have its `base` s
 # means no independent line cap for that class. Validated below: awk compares a bad -v binding
 # silently, so an unvalidated typo here is a gate that reds everything or nothing with no message.
 INDEX_CAP_BYTES=20480         ; INDEX_CAP_LINES=250
-GUIDE_CAP_BYTES=61440         ; GUIDE_CAP_LINES=750
+# THE GUIDE PAIR WAS RAISED ON 2026-09-22, by eight fifths, by TOOL-dGatedProse-3 on two owner
+# rulings: TOOL-dLoggedFlight-33 (2026-09-20: raise the cap rather than split or trim the carrier)
+# and the pair itself (2026-09-21: 98304 and 1200, re-ruled the same day over a first-ratified
+# 81920 and 1000). The trigger was a MERGE-INDUCED overflow of the largest guide, the unattended
+# protocol: two parents each legal alone, their union over the byte cap and carried as a
+# curation-debt row until this raise drained it. BOTH GUIDE_CAP_BYTES AND GUIDE_CAP_LINES MOVED,
+# by that one scalar, so the 81.92 B/line allowance is unchanged. A byte-only raise would have
+# lasted about 17 days: that guide stood 46 lines under the retired line cap, which reds first.
+# Measured refill since its last intervention on 2026-09-01: 509.9 B/day and 2.67 lines/day, so
+# the raise buys 33365 B, about 65 days, and 496 lines, about 186 days; bytes stay the binding axis.
+GUIDE_CAP_BYTES=98304         ; GUIDE_CAP_LINES=1200
 BUILD_README_CAP_BYTES=25600  ; BUILD_README_CAP_LINES=0
 # A codebase-map dossier is its own class (TOOL-aRelaxedShard-1). It is kept TIGHTER than the index
 # class on purpose: check 6 is the only size gate a dossier has, and its remedy is a SPLIT rather
@@ -1188,6 +1199,53 @@ if [ -n "$c12_sel" ]; then
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
 bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v stg="$STAGED" '
+  # ---- TOOL-dGatedProse-1, CHECK 25: the TRIGGER, as two functions, because the arm calls it once
+  # ---- per item and the word test once per stem. Both read the tables the arm builds ONCE from its
+  # ---- literals, so the verb list and the kind nouns have one spelling in this file.
+  # ---- A stem or a past form matches at a WORD BOUNDARY on both sides of the folded copy. As a bare
+  # ---- substring a past form matches inside a camel-case slug, which the fold has lowercased.
+  function test_bounded_word(s, w,    q, p, b, a) {
+    q = 0
+    while ((p = index(substr(s, q + 1), w)) > 0) {
+      p += q
+      b = (p > 1) ? substr(s, p - 1, 1) : ""
+      a = substr(s, p + length(w), 1)
+      if (b !~ /[a-z0-9_]/ && a !~ /[a-z0-9_]/) return 1
+      q = p
+    }
+    return 0
+  }
+  # ---- An item triggers when a verb from the closed list governs it AND one of its backticked tokens
+  # ---- has an identifier shape, or, with no such token, a backticked bare word sits beside one of
+  # ---- the declared kind nouns. The verb and noun tests read a COPY folded through tolower() with
+  # ---- every run of spaces and tabs squeezed to one, so a capitalised verb matches and a phrase the
+  # ---- accumulator joined across a wrapped line still meets its other half. The fold is POSIX
+  # ---- tolower() and never gawk IGNORECASE, which mawk reads as an ordinary unset variable, leaving
+  # ---- the arm case-sensitive there and saying nothing. The SHAPES read each token AS WRITTEN,
+  # ---- because shape 4 is a case transition a fold would erase: an underscore, a slash, a dotted
+  # ---- word tail, a lowercase letter then an uppercase one, two dashes then a letter. A markdown
+  # ---- path is a dotted tail like any other. Never an identifier: a token carrying a space, a
+  # ---- family-slug-seq id, a token of dashes and digits. A :<line> citation tail is stripped first.
+  function test_retirement(t,    lc, i, v, rest, tok, bare) {
+    lc = tolower(t); gsub(/[ \t]+/, " ", lc)
+    v = 0
+    for (i = 1; i <= rd_ns && !v; i++) if (index(lc, rd_s[i]) > 0) v = 1
+    for (i = 1; i <= rd_nw && !v; i++) if (test_bounded_word(lc, rd_w[i])) v = 1
+    if (!v) return 0
+    bare = 0; rest = t
+    while (match(rest, /`[^`]+`/)) {
+      tok = substr(rest, RSTART + 1, RLENGTH - 2); rest = substr(rest, RSTART + RLENGTH)
+      if (tok ~ /^[A-Za-z]+$/) bare = 1
+      if (tok ~ /[ \t]/) continue
+      sub(/:[0-9]+(-[0-9]+)?$/, "", tok)
+      if (tok ~ /^[A-Z]+-[A-Za-z]+-[0-9]+$/ || tok ~ /^[-0-9]+$/) continue
+      if (index(tok, "_") > 0 || index(tok, "/") > 0 || tok ~ /[.][A-Za-z0-9_]+$/ \
+          || tok ~ /[a-z][A-Z]/ || tok ~ /--[A-Za-z]/) return 1
+    }
+    if (!bare) return 0
+    for (i = 1; i <= rd_nk; i++) if (index(lc, rd_k[i]) > 0) return 1
+    return 0
+  }
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1264,6 +1322,12 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     # ---- never population: no verdict of either arm can depend on the other key.
     wlive = (wcut != "" && fdate != "" && fdate >= wcut)
     fmlive = (fmcut != "" && fdate != "" && fdate >= fmcut)
+    # ---- TOOL-dGatedProse-1: a THIRD liveness boolean, for check 25, and the one that is not a date.
+    # ---- It is the base-resolve arm negative test further down, verbatim, so a status word outside the
+    # ---- vocabulary is graded rather than dropped. Each LIVE spec leaves an L record, which is what the
+    # ---- zero-population notice counts.
+    rilive = (hdr !~ /^\*\*Status:\*\* (CLOSED|WONTDO)/)
+    if (rilive) print "\004\tL\t" f
     if (wlive || fmlive) {
       inac = 0; lab = ""; acc = ""; wbad = ""; nwb = 0; fmbad = ""; nfm = 0
       for (i = 1; i <= n; i++) {
@@ -1328,14 +1392,22 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     # ---- An ITEM is a column-0 bullet plus every following line to the next column-0 bullet, the
     # ---- next `## ` or the next `### `, so an item may enumerate its criteria as SUB-bullets and
     # ---- still be graded as one. Fenced lines never arrive: body[] is built by the fence machine.
-    if (jcut != "" && fdate != "" && fdate >= jcut) {
+    # ---- TOOL-dGatedProse-1 HOISTED the accumulator out of this arm. It runs under a guard that is
+    # ---- the UNION of its two consumers, this arm by jcut and check 25 by liveness, and each consumer
+    # ---- then applies its OWN condition to the shared items. This arm keeps its composite condition
+    # ---- byte for byte, both headings included, so no check-12 verdict moves; check 25 does not
+    # ---- inherit the Acceptance heading, which has nothing to do with whether a spec answered for
+    # ---- what it retires. A third consumer adds its own disjunct to the guard AND ships a fixture
+    # ---- arming only its own population, or it reads as live and runs dead.
+    if ((jcut != "" && fdate != "" && fdate >= jcut) || rilive) {
       sj_hasS = 0; sj_hasA = 0
       for (i = 1; i <= n; i++) {
         if (body[i] ~ /^## [0-9]+[.] Scope \(IN\)[ 	]*$/) sj_hasS = 1
         else if (body[i] ~ /^## [0-9]+[.] Acceptance criteria[ 	]*$/) sj_hasA = 1
       }
-      if (sj_hasS && sj_hasA) {
-        sj_in = 0; sj_ni = 0; sj_open = 0
+      sj_ni = 0
+      if (sj_hasS) {
+        sj_in = 0; sj_open = 0
         for (i = 1; i <= n; i++) {
           L = body[i]
           if (L ~ /^## /) { sj_in = (L ~ /^## [0-9]+[.] Scope \(IN\)[ 	]*$/); sj_open = 0; continue }
@@ -1348,6 +1420,8 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
             else sj_lbl[sj_ni] = "item " sj_ni
           } else if (sj_open && sj_ni > 0) sj_txt[sj_ni] = sj_txt[sj_ni] " " L
         }
+      }
+      if (jcut != "" && fdate != "" && fdate >= jcut && sj_hasS && sj_hasA) {
         sj_bad = ""; sj_nb = 0
         for (i = 1; i <= sj_ni; i++) {
           if (sj_txt[i] ~ /(^|[^A-Za-z0-9])AC[0-9]/) continue
@@ -1356,8 +1430,77 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         }
         if (sj_nb > 0)
           print f " (scope items naming neither an acceptance criterion nor NOT OBSERVED, required at/after SCOPE_JOIN_CUTOFF " jcut "): " sj_bad
-        for (i = 1; i <= sj_ni; i++) { delete sj_txt[i]; delete sj_lbl[i] }
       }
+      # ---- TOOL-dGatedProse-1 -- CHECK 25, a retirement answers for its readers. A §2 item the
+      # ---- trigger fires on carries **Readers:**, then by name:, then by value:, on its opening line
+      # ---- or any line beneath it. The TRIGGER decides where a clause is REQUIRED and the MARKER
+      # ---- decides where one is GRADED, so a voluntary clause with a broken half reds too. The
+      # ---- population is check 12 selection filtered LIVE, with NO cutoff key of its own: a blank
+      # ---- SPEC_FORMAT_CUTOFF disarms it with the rest of check 12, which the engine announces
+      # ---- outside that block.
+      # ---- SHAPE AND RESOLUTION, NEVER COMPLETENESS. The by-value half is graded by PRESENCE, a
+      # ---- backticked token or NO VALUE READERS and a reason. The by-name half is graded by
+      # ---- RESOLUTION, and this arm resolves nothing: it emits each backticked name as a T record
+      # ---- and the post-pass resolves the batch. Neither half is graded for completeness, because a
+      # ---- reader the author never typed cannot be seen from here, and TOOL-dLoggedFlight-22 at rev-3
+      # ---- is the control: it missed three readers and every name it did list resolves. Both escapes
+      # ---- are taken on trust. The markers and the escapes are EXACT bytes: a case slip there is a
+      # ---- false red whose message prints the answer, where a slip in the trigger is a silent pass.
+      if (rilive && sj_hasS) {
+        # ONE literal per table, and the kind nouns sit immediately beside the verb list: a verb table
+        # and a noun table in two carriers can disagree, and no refusal can make them agree.
+        if (!rd_init) {
+          rd_ns = split("retires|is replaced by|are replaced by|removes|deletes|drops|no longer exists|no longer carries|no longer reads|stops being|ceases|goes away|leaves the layouts|leaves the set|leaves the vocabulary", rd_s, "|")
+          rd_nw = split("retire|delete|remove|drop|retired|replaced|removed|deleted|dropped", rd_w, "|")
+          rd_nk = split("row kind|vocabulary member|status value|enum value|status token|phase name", rd_k, "|")
+          rd_init = 1
+        }
+        rd_nc = 0; rd_bnc = ""; rd_nn = 0; rd_bnn = ""; rd_nv = 0; rd_bnv = ""; rd_na = 0; rd_bna = ""
+        for (i = 1; i <= sj_ni; i++) {
+          rd_t = sj_txt[i]; rd_l = sj_lbl[i]
+          rd_p = index(rd_t, "**Readers:**")
+          if (rd_p == 0) {
+            if (test_retirement(rd_t)) { rd_nc++; rd_bnc = (rd_nc == 1) ? rd_l : rd_bnc ", " rd_l }
+            continue
+          }
+          rd_c = substr(rd_t, rd_p + length("**Readers:**"))
+          rd_q = index(rd_c, "by name:")
+          if (rd_q == 0) {
+            rd_nn++; rd_bnn = (rd_nn == 1) ? rd_l : rd_bnn ", " rd_l
+            if (index(rd_c, "by value:") == 0) { rd_nv++; rd_bnv = (rd_nv == 1) ? rd_l : rd_bnv ", " rd_l }
+            continue
+          }
+          rd_c = substr(rd_c, rd_q + length("by name:"))
+          rd_r = index(rd_c, "by value:")
+          if (rd_r == 0) { rd_nv++; rd_bnv = (rd_nv == 1) ? rd_l : rd_bnv ", " rd_l; continue }
+          rd_hn = substr(rd_c, 1, rd_r - 1); rd_hv = substr(rd_c, rd_r + length("by value:"))
+          # An escape needs a REASON, at least one non-space byte after it, so the bare escape with
+          # nothing after it is an unanswered half and not its answer.
+          rd_e = index(rd_hv, "NO VALUE READERS")
+          if (rd_hv !~ /`[^`]+`/ && !(rd_e > 0 && substr(rd_hv, rd_e + length("NO VALUE READERS")) ~ /[^ \t]/)) {
+            rd_na++; rd_bna = (rd_na == 1) ? rd_l : rd_bna ", " rd_l
+          }
+          rd_e = index(rd_hn, "READER NOT IN TREE")
+          rd_esc = (rd_e > 0 && substr(rd_hn, rd_e + length("READER NOT IN TREE")) ~ /[^ \t]/) ? 1 : 0
+          # Each by-name token is normalised twice and no further: a :<line> citation tail and a
+          # trailing () are stripped. A token either strip EMPTIES is prose and is set aside HERE,
+          # before the pattern file, because an empty pattern does not reliably match nothing.
+          while (match(rd_hn, /`[^`]+`/)) {
+            rd_k1 = substr(rd_hn, RSTART + 1, RLENGTH - 2); rd_hn = substr(rd_hn, RSTART + RLENGTH)
+            sub(/:[0-9]+(-[0-9]+)?$/, "", rd_k1); sub(/\(\)$/, "", rd_k1); gsub(/\t/, " ", rd_k1)
+            if (rd_k1 != "") print "\004\tT\t" f "\t" rd_l "\t" rd_esc "\t" rd_k1
+          }
+        }
+        if (rd_nc > 0)
+          print "\004\tS\t" f " (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): " rd_bnc
+        if (rd_nn > 0)
+          print "\004\tS\t" f " (§2 items whose **Readers:** clause carries no by name: half; write by name: and the readers that spell the name, or READER NOT IN TREE and a reason): " rd_bnn
+        if (rd_nv > 0)
+          print "\004\tS\t" f " (§2 items whose **Readers:** clause carries no by value: half after its by name:; write by value: and the readers of the value, or NO VALUE READERS and a reason): " rd_bnv
+        if (rd_na > 0)
+          print "\004\tS\t" f " (§2 items whose **Readers:** by value: half names no backticked reader and carries no NO VALUE READERS followed by a reason): " rd_bna
+      }
+      for (i = 1; i <= sj_ni; i++) { delete sj_txt[i]; delete sj_lbl[i] }
     }
     # ---- TOOL-cSettledDocket-3: these two run for EVERY TIER, so they sit ABOVE the Tier-1 cut.
     # ---- TEMPLATE-SPEC calls the fork rule machine-checked; it was checked on Tier-2 alone because
@@ -1783,6 +1926,11 @@ if [ -n "$base12" ]; then
 fi
 edge12=$(printf '%s\n' "$bad12_raw" | grep $'^\003\t' || true)
 bad12=$(printf '%s\n' "$bad12" | grep -v $'^\003\t' || true)
+# ---- TOOL-dGatedProse-1: CHECK 25 rides the same pass under its own tag, \004, split out here so no
+# ---- check-25 record reaches check 12. \001 is the canon-diff excerpt request, \002 the base-sha
+# ---- sentinel and \003 the edge records; \004 is the first tag that feeds a different check NUMBER.
+rd25=$(printf '%s\n' "$bad12_raw" | grep $'^\004\t' || true)
+bad12=$(printf '%s\n' "$bad12" | grep -v $'^\004\t' || true)
 if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
   echo "memory-hygiene: the §3 edge JOINS are held under --staged — the selection is the staged set, so one end of a correctly declared pair would report the other as missing. The shape arm still ran; the push-boundary run is where the joins bind."
 elif [ -n "$edge12" ]; then
@@ -1836,6 +1984,94 @@ $_ee"
 fi
 [ -n "$bad12" ] && fail 12 "spec files dated >= $SPEC_FORMAT_CUTOFF not conforming to $M/TEMPLATE-SPEC.md:
 $bad12"
+# ---- CHECK 25, the post-pass (TOOL-dGatedProse-1). The arm resolved nothing. It left S records, the
+# ---- finished shape findings; T records, one per by-name token; and L records, one per LIVE spec.
+# ---- RESOLUTION is ONE batched `git grep -I -l -F -f` over a pattern FILE, never a command line and
+# ---- never a regex, so a token carrying a shell metacharacter or a leading dash is data. It narrows
+# ---- the tree to candidate files, and one awk pass attributes each token. The same grep printing
+# ---- LINES was measured at 138 s against 0.6 s for this one, on a leg that runs on every bar, so the
+# ---- shape is the protection here and the leg ceiling is not.
+# ---- A token resolves by CONTENT where a READER spells it AS A WHOLE WORD: at each end of the token
+# ---- that is a letter, digit or underscore, the byte beside it in the reader must be none of those.
+# ---- A token carrying a hyphen counts the hyphen among them at both ends, so a kebab-case name or a
+# ---- flag does not resolve inside a longer kebab-case sibling either (closing review, round 2, F2).
+# ---- As a bare substring a deleted helper resolved inside its surviving longer sibling, and a short
+# ---- name after the call-suffix strip resolved inside almost any word (closing review, round 1, R2).
+# ---- An end that is punctuation, a path's slash or a dot, is already its own boundary. The grep below
+# ---- stays a substring SUPERSET, and the word test runs only on the files it returns.
+# ---- A reader is a tracked file whose text
+# ---- something consumes: every tracked file outside the memory root, plus guides/, map/ and the
+# ---- three rendered carriers HYGIENE.md, TEMPLATE-SPEC.md and README.md inside it. Every other file
+# ---- under the root is a RECORD, which quotes a name and so resolves nothing by content: a corpus
+# ---- that admitted records let one review record make four names resolve that nothing reads. It is
+# ---- an ALLOWLIST, so a record class nobody named fails toward a red. The reader rule FILTERS the
+# ---- path list and is never a pathspec: an exclusion pathspec with a wildcard in it was measured
+# ---- excluding nothing.
+# ---- A token resolves by IDENTITY when it equals a tracked path or the part of one after a `/`, over
+# ---- the WHOLE tracked set, records included, because a path proves the file exists wherever it is.
+# ---- NOT BOUGHT: a reader can spell a name that is not live, a comment recording what left the tree
+# ---- for one. Resolution shows a name is SPELLED where something reads, never that it is live.
+# ---- An empty batch runs no grep at all: an empty pattern file lists every file on one git and dies
+# ---- on another, so nothing here rests on it matching nothing.
+bad25=$(printf '%s\n' "$rd25" | sed -n $'s/^\004\tS\t//p')
+_rdn=""
+_rdtok=$(printf '%s\n' "$rd25" | grep $'^\004\tT\t' || true)
+if [ -n "$_rdtok" ]; then
+  _rdpat=$(mktemp) || { echo "HYGIENE — cannot run: mktemp failed, and check 25 resolves its by-name tokens from a pattern file"; exit 2; }
+  printf '%s\n' "$_rdtok" | cut -f6- | LC_ALL=C sort -u > "$_rdpat"
+  _rdhit=$(git -c core.quotePath=false grep -I -l -F -f "$_rdpat" 2>/dev/null || true)
+  rm -f "$_rdpat"
+  _rdres=$( { printf '%s\n' "$_rdtok"
+              git -c core.quotePath=false ls-files | awk '{ print "P\t" $0 }'
+              printf '%s\n' "$_rdhit" | awk 'NF { print "C\t" $0 }'; } | awk -F'\t' -v m="$M" '
+    function test_whole_token(s, w,    q, p, wc, hb, ha, b, a) {
+      wc = (index(w, "-") > 0) ? "[-A-Za-z0-9_]" : "[A-Za-z0-9_]"
+      hb = (substr(w, 1, 1) ~ wc); ha = (substr(w, length(w), 1) ~ wc)
+      q = 0
+      while ((p = index(substr(s, q + 1), w)) > 0) {
+        p += q
+        b = (p > 1) ? substr(s, p - 1, 1) : ""
+        a = substr(s, p + length(w), 1)
+        if ((!hb || b !~ wc) && (!ha || a !~ wc)) return 1
+        q = p
+      }
+      return 0
+    }
+    $1 == "\004" { nt++; tf[nt] = $3; tl[nt] = $4; te[nt] = $5; tt[nt] = $6; next }
+    $1 == "P" { idn[$2] = 1; p = $2; while ((j = index(p, "/")) > 0) { p = substr(p, j + 1); idn[p] = 1 }; next }
+    $1 == "C" {
+      p = $2
+      if (index(p, m "/") != 1 || index(p, m "/guides/") == 1 || index(p, m "/map/") == 1 \
+          || p == m "/HYGIENE.md" || p == m "/TEMPLATE-SPEC.md" || p == m "/README.md") rdr[++nr] = p
+      next
+    }
+    END {
+      for (k = 1; k <= nt; k++) if (!(tt[k] in idn) && !(tt[k] in pw)) { pw[tt[k]] = 1; pl[++np] = tt[k] }
+      left = np
+      for (c = 1; c <= nr && left > 0; c++) {
+        while (left > 0 && (getline ln < rdr[c]) > 0)
+          for (i = 1; i <= np; i++) if (!(pl[i] in got) && test_whole_token(ln, pl[i])) { got[pl[i]] = 1; left-- }
+        close(rdr[c])
+      }
+      for (k = 1; k <= nt; k++) {
+        if ((tt[k] in idn) || (tt[k] in got)) continue
+        rk = (te[k] == 1) ? "N" : "U"
+        print rk "\t" tf[k] "\t" tl[k] "\t" tt[k]
+      }
+      print "D"
+    }')
+  # The pass prints D as its LAST line. Without it the pass did not complete, and its empty output
+  # would read as every token resolving: a delegate that never ran graded as a clean population. It
+  # reds through the one fail-25 branch instead, which needs no second arm to be seen.
+  printf '%s\n' "$_rdres" | grep -qx 'D' \
+    || bad25=$(printf '%s\n%s\n' "$bad25" "check 25's by-name resolution pass did not complete, so no by-name token was graded and a clean result here would mean nothing" | grep . || true)
+  _rdu=$(printf '%s\n' "$_rdres" | awk -F'\t' '$1 == "U" { print $2 " (§2 item " $3 ": by name: lists `" $4 "`, which no reader spells and no tracked path is or ends with; name a reader that spells it, or write READER NOT IN TREE and a reason on that half)" }')
+  _rdn=$(printf '%s\n' "$_rdres" | awk -F'\t' '$1 == "N" { print "memory-hygiene: check 25 did not grade `" $4 "` — READER NOT IN TREE covers it, on " $2 " " $3 }')
+  [ -z "$_rdu" ] || bad25=$(printf '%s\n%s\n' "$bad25" "$_rdu" | grep . || true)
+fi
+[ -n "$bad25" ] && fail 25 "§2 scope items of LIVE specs that retire a named thing, and every **Readers:** clause, must answer by name: with names a reader spells and by value: with a reader or NO VALUE READERS and a reason:
+$bad25"
+[ -z "$_rdn" ] || printf '%s\n' "$_rdn"
 # ---- THE §10 EVIDENCE ARM ANNOUNCES A ZERO POPULATION. At adoption its cutoff is set strictly
 # ---- ahead of every dated spec on every branch, so it grades NOTHING and stays silent — which is
 # ---- byte-identical to an arm that is broken, mis-scoped, or reading an empty selection. A skip
@@ -1877,6 +2113,20 @@ if [ "$STAGED" = 0 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_eg_n:-0}" -gt 0 ] || echo "memory-hygiene: the §3 edge arms graded NO spec — SPEC_EDGES_CUTOFF is $SPEC_EDGES_CUTOFF and every tracked spec predates it. That is the intended state at adoption; their coverage is the self-test fixtures, not this corpus."
 fi
+# Same notice, same footing, for check 25 (TOOL-dGatedProse-1), keyed on the LIVE count rather than on
+# a cutoff: its population empties by specs CLOSING, which nobody configures and so nobody watches.
+# It answers the ARMED-and-empty state only; the disarmed state is the notice below this block.
+if [ "$STAGED" = 0 ]; then
+  _rd_n=$(printf '%s\n' "$rd25" | grep -c $'^\004\tL\t' || true)
+  [ "${_rd_n:-0}" -gt 0 ] || echo "memory-hygiene: the §2 reader-inventory arm, check 25, graded NO spec — no spec in check 12's selection is LIVE by its test, a status header that is not CLOSED|WONTDO. That is a skip that looks like a pass; the arm's coverage is then its self-test fixtures, not this corpus."
+fi
+fi
+# TOOL-dGatedProse-1: a blank SPEC_FORMAT_CUTOFF skips the whole block above, and check 25 grades check
+# 12's selection, so it disarms check 25 as well, whatever that check's own liveness test says. Said
+# here, OUTSIDE the block, because inside it the notice would be skipped by the very key it reports;
+# and never with the failure prefix, so an assertion reading failures only is unmoved by it.
+if [ "$STAGED" = 0 ] && [ -z "$SPEC_FORMAT_CUTOFF" ]; then
+  echo "memory-hygiene: check 25, the §2 reader-inventory arm, is DISARMED — SPEC_FORMAT_CUTOFF is blank, and check 25 grades check 12's selection, so it graded nothing. Declare SPEC_FORMAT_CUTOFF in .memory-tree.conf to arm it."
 fi
 
 # 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE

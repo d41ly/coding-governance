@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.82 -->
+<!-- gov:kit memory-tree@2.85 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -67,7 +67,7 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
   files; a second full spelling of it is how the `guides/` half went missing once.
 - **File caps:** index and generated files are capped BY CLASS, and every cap is declared in
   `.memory-tree.conf` (`INDEX_CAP_*`, `GUIDE_CAP_*`, `BUILD_README_CAP_*`, `DOSSIER_CAP_*`). The shipped
-  defaults are 20 KB / 250 lines for a row document, 60 KB / 750 lines for a guide, 25 KB with no line
+  defaults are 20 KB / 250 lines for a row document, 96 KB / 1200 lines for a guide, 25 KB with no line
   cap for a build README, and 20 KB with no line cap for a codebase-map dossier. `archive/` is wholly
   exempt. A LINE cap of 0 means no independent line cap for that class, which is how a project retires
   the line axis — this repo has, for row documents.
@@ -161,7 +161,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 6. **index size caps** — FOUR classes, because prose, rows, a generated surface and a map dossier
    fail for different reasons. Row
    documents ≤ `INDEX_CAP_BYTES` / `INDEX_CAP_LINES` (20 KB / 250 by default); `guides/*.md` ≤
-   `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (60 KB / 750); a build `README.md` ≤
+   `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (96 KB / 1200); a build `README.md` ≤
    `BUILD_README_CAP_BYTES` (25 KB) with `BUILD_README_CAP_LINES` at 0, which means NO independent
    line cap for that class; and a codebase-map dossier ≤ `DOSSIER_CAP_BYTES` (20 KB) with no line cap,
    reached only where a map is adopted and guarded on a non-empty prefix, because an unguarded selector
@@ -328,6 +328,44 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     **What it does NOT check:** whether the verdict is TRUE. It grades the token and never the
     judgement behind it, exactly as the acceptance-witness rule grades a backticked name and never the
     thing that name points at.
+
+25. **a retirement answers for its readers** — a §2 scope item of a LIVE spec that retires a named
+    thing carries a `**Readers:**` clause, then the literal `by name:`, then the literal `by value:`,
+    on the item's opening line or any line beneath it. LIVE is a status header that is not `CLOSED`
+    or `WONTDO`, and the check has no cutoff key of its own. Its population is check 12's selection,
+    so a blank `SPEC_FORMAT_CUTOFF` disarms this check whatever else is true, and the engine says so
+    at exit 0 rather than going quiet.
+    **The trigger.** A verb from the closed list in the arm is matched ignoring case, over the item
+    with its whitespace squeezed, and reaches the past tense beside the present and the imperative;
+    it must sit beside a backticked token of an identifier shape, which is an underscore, a slash, a
+    dotted word tail, a lowercase letter then an uppercase one, or two dashes then a letter. A
+    markdown path counts as an identifier with or without a slash, because `.md` is a dotted tail
+    like any other. A family-slug-seq id, a token of dashes and digits and a token carrying a space
+    never count, and a `:<line>` tail is stripped before any shape is tried. A bare backticked word
+    counts only beside one of the six declared kind nouns, which are ONE literal in the arm, beside
+    the verb list, and are not restated here.
+    **Which half is graded how.** The `by value:` half is graded by presence: a backticked token, or
+    `NO VALUE READERS` followed by a reason. The `by name:` half is graded by resolution: every
+    backticked name it lists must resolve, or the half carries `READER NOT IN TREE` followed by a
+    reason, and every name that escape covers is printed, so the skip announces itself. Neither half
+    is graded for completeness. The control is `TOOL-dLoggedFlight-22` at rev-3, whose inventory
+    missed three readers while every name it did list resolves, so it passes this check. Both
+    escapes are taken on trust: the check cannot tell a true escape from a false one, and once
+    written a false one passes for good. A clause is graded wherever it appears, not only where the
+    trigger fired.
+    **What a name resolves against.** A name resolves where a reader spells it as a whole word, and
+    never where a record merely quotes it. A reader is every tracked file outside the memory root, plus `guides/`,
+    `map/`, `HYGIENE.md`, `TEMPLATE-SPEC.md` and `README.md` inside it. Every other file under the
+    root is a record, such as a build record, the archive, the decision log, a backlog, a gotcha note
+    or a waiver registry, which quotes a name and so resolves nothing by content. A name also resolves when it is a tracked path, or the part of
+    one after a `/`, anywhere in the tree. A `:<line>` tail and a trailing `()` are stripped before
+    either test. A whole word means that at each end of the name that is a letter, digit or
+    underscore, the character beside it in the reader is none of those, and a name carrying a
+    hyphen counts the hyphen among them. So a name spelled only inside a longer identifier
+    resolves nothing, a hyphenated name inside a longer hyphenated one included.
+    **Not reached, and named rather than implied away:** a retirement whose backticked tokens hold no
+    identifier shape, and a retirement carrying no backticked token at all. The author of either is
+    never asked, and the remedy is to name the withdrawn thing in backticks.
 
 ## Record bindings — how a record names its spec
 
