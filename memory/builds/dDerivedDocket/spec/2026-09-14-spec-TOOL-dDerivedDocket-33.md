@@ -1,12 +1,16 @@
 # TOOL-dDerivedDocket-33 — delegated signing of the same-id and triage tables
 
-**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 25
+**Status:** CLOSED · rev-6 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-22-build-TOOL-dDerivedDocket-33-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dDerivedDocket-33-1-acceptance-ledger.md) | journal | — |
+| [2026-09-22-build-TOOL-dDerivedDocket-33-signed-same-id.md](../build/2026-09-22-build-TOOL-dDerivedDocket-33-signed-same-id.md) | journal | — |
+| [2026-09-22-build-TOOL-dDerivedDocket-33-signed-triage.md](../build/2026-09-22-build-TOOL-dDerivedDocket-33-signed-triage.md) | journal | — |
+| [2026-09-22-build-TOOL-dDerivedDocket-33-signer.py](../build/2026-09-22-build-TOOL-dDerivedDocket-33-signer.py) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
@@ -37,8 +41,11 @@ later reader re-derives by re-running one script over the planner's recorded out
   it failed in the order §4 evaluates them. Observed by AC3 and AC14.
 - **S3** The triage rules T1 to T6 in §4 decide one disposition for every ask the planner lists as
   deriving OPEN on a finished build after the migration's own dispositions. CLOSED and WONTDO are
-  signed only with evidence the script re-reads itself. A row no rule decides is signed KEEP, and its
-  reason names the rule that could not decide it. Observed by AC4, AC5 and AC15.
+  signed only with evidence the script re-reads itself, and only from the one place each rule
+  accepts: a spec header's `closes` verb, a commit's subject, a row's own status slot or opening
+  word (§8 F9). A row
+  no rule decides is signed KEEP, and its reason names the rule that could not decide it. Observed
+  by AC4, AC5 and AC15.
 - **S4** `TOOL-aWeighedCompass-3` is excluded from the triage by rule T1, because the flip disposes
   it as superseded and one file may carry only one disposition per target. Observed by AC6.
 - **S5** No severity is signed. Every triage row records `unlabelled`, and the record's header
@@ -96,7 +103,9 @@ later reader re-derives by re-running one script over the planner's recorded out
   which the switch-over's rollout runs over the worksheets it re-plans at its parent and whose
   records its `--write` applies; and the `--tail landing` re-run, which the landing reconcile runs
   over the worksheets the planner recomputes at the remote tip, and whose records the reconcile's
-  landing form of `--ingest` applies.
+  landing form of `--ingest` applies. Also the two declared places T4 reads a withdrawal from
+  (rev-6), which unit 34 AC15's withdrawal ask must use to be signed WONTDO: a row deriving OPEN
+  cannot carry one in its slot, so that ask's text opens with `WITHDRAWN`.
 - **hands-off** `TOOL-dDerivedDocket-36` — the signed records' shape, header cells and columns,
   which the kit README's signed-records row states.
 
@@ -169,10 +178,10 @@ decides.
 | Rule | Verdict | Signed only when |
 |---|---|---|
 | T1 | excluded | the ask is `TOOL-aWeighedCompass-3`, which the flip disposes as superseded (design §14) |
-| T2 | CLOSED by a spec | the proposal names a spec whose status header the script re-reads as CLOSED at the signing tree, AND that spec's body names the ask id |
-| T3 | CLOSED by a sha | the proposal names a sha that `git cat-file -e` resolves to a commit, AND that commit's message names the ask id |
-| T4 | WONTDO | the row's own text, read with `git show <sha>:<file>` at the worksheet's recorded sha, records a withdrawal, cited by file and line |
-| T5 | BLOCKED or DEFERRED | the proposal carries a hold target the row's own text, read at the worksheet's recorded sha, names, the target is a filed ask or a spec H1, it is live at the signing tree, and DEFERRED additionally needs the row's legacy token to read DEFERRED |
+| T2 | CLOSED by a spec | the proposal names a spec other than the ask's own same-id spec, whose status header the script re-reads as CLOSED at the signing tree, AND whose header's `closes` verb names the ask id |
+| T3 | CLOSED by a sha | the proposal names a sha that `git cat-file` resolves to a commit, whose SUBJECT line names the ask id as a whole token, AND the ask id is no spec H1 at the signing tree |
+| T4 | WONTDO | the row at the cited file and line, read with `git show <sha>:<file>` at the worksheet's recorded sha, is this ask's own row and declares a withdrawal in one of two places: its status slot reads `WITHDRAWN` or `WONTDO`, or its text OPENS with the word `WITHDRAWN` or `WONTDO`; the word anywhere else is prose, never read as a withdrawal |
+| T5 | BLOCKED or DEFERRED | the proposal carries a hold target; the row at the cited line, read at the worksheet's recorded sha, is this ask's own row and names the target as a whole token; the target is a filed ask or a spec H1 at the signing tree and live there, an ask winning a tie as `backlog.py` rules it; and DEFERRED additionally needs that row's status slot to read DEFERRED |
 | T6 | KEEP | otherwise; the reason names the first of T2 to T5 that the row came closest to, or "no evidence" |
 
 What each rule refuses on purpose:
@@ -180,11 +189,33 @@ What each rule refuses on purpose:
 - **T2 and T3 re-read the evidence rather than trust the proposal.** A mined phrase in a spec that
   still reads SPECCED is not a closure, and neither is a sha whose commit never mentions the ask. The
   planner's proposal selects candidates; the script decides.
+- **A mention is a citation, and only a declaration closes (rev-6, §8 F9).** Measured over the
+  planner's own worksheet, computed at `e21fa86f`: of its 66 `commit-names-ask` proposals, 46 name
+  the ask only in the commit BODY, where a mention is a citation, and at least 11 of those naming
+  lines say in words that the ask stays live — "left OPEN and untouched, by decision"
+  (`TOOL-aBranchedMandate-8`), "NARROWED and kept OPEN" (`TOOL-aReapedTicket-5`), "amended rather
+  than closed" (`TOOL-aBoundedVerdict-10`). The other 20
+  name it in the SUBJECT, and every one of the 20 is an ask that is also a spec H1, whose commit is
+  that spec's own unit commit — the four U2 pairs among them. Its one `mined-closure` names
+  `TOOL-aNumeralWarden-2` through `TOOL-dRetiredFork-4`, which reads CLOSED and names the ask, but
+  whose closing word "absorbed" is about its own rev-1 shape, and whose S3b makes that row the
+  successor of its disposition rather than closing it. So T2 reads the one closure a spec DECLARES,
+  the header's `closes` verb (design §2.2), and T3 reads a commit's subject, for an ask whose same-id
+  spec is not the thing the commit is about. A commit about an ask's same-id spec is D2's question
+  asked a second time, and the same-id record already answers it.
 - **A partial answer is not mechanically detectable, and that is stated rather than implied away.**
   The planner pre-fills three rows the kit-stop census found already fixed (design §21.5), and one of
-  them is only half answered. T3 signs such a row only if the fixing commit's message names the ask.
-  If a commit names an ask and answers half of it, the signature is wrong in a way D4's REOPEN
-  repairs, and the triage record's header says so.
+  them is only half answered. At rev-6 all three sign KEEP: each fixing commit names its ask in the
+  body only, and one says the row was amended rather than closed. Closing them is a CLOSED row any
+  later session may write. If a commit's subject names an ask and it answers half of it, the
+  signature is wrong in a way D4's REOPEN repairs, and the triage record's header says so.
+- **A withdrawal is declared, never mentioned.** Over the same worksheet, no status slot among the
+  334 rows reads `WITHDRAWN` or `WONTDO` (326 OPEN, 8 SPECCED) and no row's text opens with either
+  word, while 45 rows carry a withdrawal-shaped word further in — "retired WONTDO", "superseded",
+  "refused", "drop" — and every sample read is about another ask, decision or option. A rule
+  reading prose would sign those. The opening word is admitted beside the slot because a row in the
+  population derives OPEN, so its slot cannot carry the withdrawal; a new ask whose author withdraws
+  it on an OPEN slot writes the word first, which is the form unit 34 AC15's withdrawal ask takes.
 - **The script never originates a hold.** A hold is a dependency judgment. T5 signs one only when
   the row's own author wrote the target.
 - **A dead pointer is not evidence.** The planner flags asks whose pointer target no longer exists.
@@ -237,13 +268,16 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
   the one that disagrees is unfindable. The cheap facts, a spec's token and a sha's existence, are
   re-read because a wrong one signs a closure; the expensive one is consumed and cited.
 - **A default severity for swept asks.** Rejected under §8 F2.
+- **T2 and T3 as rev-5 wrote them**, a spec's body or a commit's whole message naming the ask.
+  Rejected under §8 F9: over the planner's own worksheet they sign 67 closures on citations and on
+  commits about the asks' same-id specs, and at least 11 of the citations say the ask stays live.
 
 ## 5. Production-readiness checklist
 
 - security — N/A for input handling: the script reads tracked records and git objects and writes two
   records in its own build folder. The authority it exercises is the owner's delegation, recorded in
   every signed record's header.
-- perf / scale — one `git cat-file --batch-check` for every cited sha and one read per cited spec,
+- perf / scale — one `git cat-file --batch` for every cited sha and one read per cited spec,
   over a few hundred rows. Seconds.
 - error / empty / loading states — an empty worksheet and an unparseable row both refuse (AC11). An
   ask whose cited spec or sha no longer resolves falls through to KEEP with that reason.
@@ -273,11 +307,17 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
   under rule U2, and every `unit` row cites `specced-in-place` or `born-in-spec-commit` evidence.
   Red when: the U2 set is read from an input that can arrive empty, so a design-named collision
   signs `unit` because its denial never loaded.
-- **AC4** — When the signed triage record is read, every CLOSED row cites either a spec whose status
-  token the script re-read as `CLOSED` and whose body names the ask, or a sha that
-  `git cat-file -e` resolved and whose commit message names the ask.
-  Red when: a proposal's CLOSED is copied through on the planner's word, so a closing phrase in a
-  spec still reading SPECCED signs a closure.
+- **AC4** — When the signed triage record is read, every CLOSED row cites either a spec, not the
+  ask's own same-id spec, whose status token the script re-read as `CLOSED` and whose header's
+  `closes` verb names the ask, or a sha that `git cat-file` resolved to a commit whose subject names
+  the ask, for an ask that is no spec H1 at the signing tree. And when the script signs synthetic
+  triage rows over a copy of the worksheet — a proposed CLOSED by a commit whose subject names the
+  ask, by a commit naming the ask only in its body, and by a CLOSED spec whose header `closes` verb
+  names the ask — the first signs CLOSED under T3, the third CLOSED under T2, and the second KEEP
+  naming T3.
+  Red when: a proposal's CLOSED is copied through on the planner's word or read off a mention, so a
+  closing phrase in a spec still reading SPECCED, a commit body reporting the ask kept OPEN, or a
+  commit about the ask's own same-id spec signs a closure.
   figure: the per-verdict counts are DERIVED at signing time and are not pinned here.
 - **AC5** — When a triage worksheet row carries no evidence that T2 to T5 accept, its signed verdict
   is `KEEP` and its reason names the rule that could not decide it.
@@ -312,8 +352,10 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
   Red when: the bad row is skipped and the liveness line still prints a count, which reads exactly
   like a clean signing.
 - **AC12** — When unit 11's planner, `migrate_backlog.py`, runs as
-  `--plan --signed <same-id record> <triage record>` from `tools/memory-tree/`
-  over the two signed records after the signing, it exits 0 and reports both records applied.
+  `--plan --signed same-id=<same-id record> --signed triage=<triage record>` from
+  `tools/memory-tree/` over the two signed records after the signing, it exits 0, having located
+  every pinned cell in both records, and its `unit-inserted` conservation count equals the same-id
+  record's `unit` count, where the unsigned census reads 0.
   Red when: a header cell is spelled otherwise, such as `ask id` or `by/on/until`, which the planner
   refuses, so the mismatch first shows at the flip.
 - **AC13** — When the script runs with `--worksheets <pair> --tail switch` and then with
@@ -396,6 +438,19 @@ this unit's pass and again by the flip before it applies the records.
   breaks AC13's unchanged-records property; (c) gives two re-signs one record name, so the landing
   replaces the switch-over's records. RESOLVED (agent, 2026-09-16, delegated): (a),
   `signed-same-id-switch` and `signed-triage-switch`.
+- **F9** — Found at the build pass, over the planner's real worksheet: what evidence may sign
+  CLOSED, and what reads as a withdrawal? (a) rev-5's reading, a spec's body or a commit's whole
+  message naming the ask, and a withdrawal wherever the row's text records one. (b) Only a
+  declaration: a CLOSED spec's header `closes` verb, a commit's subject for an ask that is no spec
+  H1, and a row's own status slot or opening word. (c) Park the signing. (a) signs 67 closures whose
+  evidence, as §4 measures it, is a citation, a commit about the ask's same-id spec, or a phrase
+  about something else, with at least 11 of the citations saying the ask stays live; and a prose
+  withdrawal reader would reach 45 rows whose withdrawal words sit mid-text. The Goal's
+  "conservatively" is what (a) fails, and a wrong closure is the silent error of the two. (c) leaves
+  the switch-over without the sweep D6 requires before V10 goes live. (b) signs no closure at this
+  worksheet, and each row's reason names the condition it failed, so a later session closes the
+  three §21.5 rows with a CLOSED row of its own. RESOLVED (agent, 2026-09-22, delegated): (b). Its
+  liveness is AC4's synthetic arms, which show T2 and T3 can each still sign CLOSED.
 - The rulings this unit executes and does not revisit: D2, legacy same-id pairs not linked by
   default; D6, the closeout is a gate from the switch-over, retroactive, sweep first; D7, severity
   now and forward-only — all RESOLVED (owner, 2026-09-13). The delegation of both signatures to this
@@ -483,6 +538,17 @@ this unit's pass and again by the flip before it applies the records.
 - rev-5 · 2026-09-21 · order re-declared from 33 to 25 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 25, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
+- rev-6 · 2026-09-22 · build pass, over the planner's real worksheet at `e21fa86f`. §8 F9 (new):
+  T2 reads a CLOSED spec's header `closes` verb and refuses the ask's own same-id spec, T3 reads a
+  commit's subject and refuses an ask that is a spec H1, T4 reads the row's own status slot or its
+  text's opening word and never prose further in, and T5 names the tie rule and reads the row's own
+  slot for DEFERRED; S3, §4's refusals and Alternatives say why, with the measurement, and
+  hands-off 34 names the withdrawal form unit 34 AC15 relies on. AC4 is amended to the new evidence and
+  gains three synthetic arms, two of them the positive cases that keep T2 and T3 live. AC12 spells
+  the planner's option as the planner parses it, `--signed <kind>=<path>` once per record, since
+  the rev-2 spelling named no form the planner accepts; and it observes what the planner prints,
+  its `unit-inserted` count, because the planner prints no "applied" line. The header moves to
+  CLOSED at this rev.
 
 ## 10. Reuse audit
 
