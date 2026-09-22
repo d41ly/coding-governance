@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** CLOSED · rev-10 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
+**Status:** CLOSED · rev-11 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -110,8 +110,10 @@ fits, instead of reporting all three like a red leg.
   one clock, which its AC20 observes over a planted gate log. It carries two halves nowhere. A bar
   waiting in the turnstile queue, or otherwise silent, writes no gate log. The runner's queue alone
   may wait 7200 s, and this unit's S4 sizes the bar's backstop to allow that wait, against gov's
-  5400 s `RESUME_STALE_BOUND`, so such a bar reads STALE there. That is the G8 spec audit's H2,
-  promoted to `TOOL-dDerivedDocket-64`. And a second worktree is graded on its own clocks, which is
+  5400 s `RESUME_STALE_BOUND`, so such a bar reads STALE there. The QUEUED bar is the G8 spec
+  audit's H2, promoted to `TOOL-dDerivedDocket-64`, whose queue heartbeat puts it on the clock; the
+  SILENT bar, one leg outliving the bound with nothing else moving, is carried by no unit of this
+  build and is handed off external by that unit. And a second worktree is graded on its own clocks, which is
   that audit's B1, promoted to `TOOL-dDerivedDocket-62`.
 
 ### Edges
@@ -340,8 +342,9 @@ raised: raising one is an owner turn.
   that unit's AC20, and the two fixtures show which part. This criterion staged a stub bar that
   sleeps past the bound and writes nothing, and read `--status` and `--resume` from a second
   worktree. AC20 plants a fresh gate log in the run's own worktree and reads from that worktree, so
-  it observes legs landing there. The silent or queued bar is observed by no criterion of either
-  unit: it is the G8 audit's H2, promoted to `TOOL-dDerivedDocket-64`. The second-worktree read is
+  it observes legs landing there. The queued bar is observed by `TOOL-dDerivedDocket-64`, the G8
+  audit's H2 promoted; the silent long leg is observed by no unit of this build, which
+  `TOOL-dDerivedDocket-64` hands off external. The second-worktree read is
   observed by none either: it is that audit's B1, promoted to `TOOL-dDerivedDocket-62`.
 - **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
   build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
@@ -648,6 +651,9 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
     keepalive reap and `--hold`, in that order, and name `platform-unavailable`. It may not route to
     `--override`. S6's leg half is check 42, which also refuses a `GATE_WALL` the driver would refuse
     at conf load. No S-item, criterion or edge moved.
+- rev-11 · 2026-09-22 · §3 · §6 AC9 · the G9 audit's M8, the half left in this spec: the queued bar
+  is `TOOL-dDerivedDocket-64`'s and the silent long leg is carried by no unit, which 64 hands off
+  external. Wording only; the unit stays CLOSED and nothing it built moved.
 
 ## 10. Reuse audit
 
