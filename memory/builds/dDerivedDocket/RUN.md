@@ -280,3 +280,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-22T06:53:32Z brief · item TOOL-dDerivedDocket-28 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-22T07:58:51Z review · item dDerivedDocket-specs-g9 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote
+
+2026-09-22T08:02:34Z dispatch · item 80f61cf9 TOOL-dDerivedDocket-27 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/SKILL.template.md tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md tools/unattended/README.md .unattended.conf tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/README.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md memory/project/unarmed-branches.txt memory/map/features/unattended.md memory/map/features/run-gates.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-27.md
+
+2026-09-22T08:02:35Z brief · item TOOL-dDerivedDocket-27 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
