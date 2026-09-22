@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads
 
-**Status:** SPECCED · rev-10 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
+**Status:** SPECCED · rev-11 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -1107,7 +1107,10 @@ delta row above, because the corpus pass is unit 5's.
   under an exclusion pathspec, lists 973 against `HEAD`, and dies on `no pattern given` with no
   pathspec at all, and the round-1 skeptic's run of the pathspec form listed 1555 of 1556 files. And
   gawk 5.4's `index(s, "")` returns 1, so an emptied token reaching the attribution pass would
-  resolve silently. The guards make the result independent of which of those a machine does.
+  resolve silently. The guards make the result independent of which of those a machine does. The
+  attribution pass prints a completion line LAST, and a result without it is itself a check-25
+  finding, through the one `fail 25` branch: a pass that died prints nothing, and nothing is what a
+  batch whose every token resolved prints.
 - observability — the failure message names the file, the item label, the missing half or the
   unresolved name, and the escape spelling that answers it, so a red row is actionable without
   reading the gate. Every name accepted under the by-name escape is printed. The zero-population
@@ -1782,6 +1785,13 @@ here, where it would read as an observation.
   AC11 now asks the confs for what the criterion protects, that neither DECLARES the set: no line the
   unit adds, and no line holding a second phrase of it. The figure names every base line. rev-9's
   entry above is left as written. REFUSED: nothing.
+- rev-11 · 2026-09-22 · §5 · §9 · the bug-class checklist over the build commit, acted on. It
+  selected `swallowed-delegate-reads-as-clean`, and the class was live: the resolution post-pass
+  reads its awk's output and nothing else, so an awk that died would have printed nothing, and every
+  token would have read as resolved. The pass now prints a completion line last, and its absence
+  adds a finding under the same branch, so no second arm is owed; a staged break of the pass printed
+  the finding. §5's empty-states row carries the sentence. REFUSED: a second `fail 25` branch, which
+  would need a fixture that breaks awk inside the suite to be armed.
 
 ## 10. Reuse audit
 

@@ -2027,7 +2027,13 @@ if [ -n "$_rdtok" ]; then
         rk = (te[k] == 1) ? "N" : "U"
         print rk "\t" tf[k] "\t" tl[k] "\t" tt[k]
       }
+      print "D"
     }')
+  # The pass prints D as its LAST line. Without it the pass did not complete, and its empty output
+  # would read as every token resolving: a delegate that never ran graded as a clean population. It
+  # reds through the one fail-25 branch instead, which needs no second arm to be seen.
+  printf '%s\n' "$_rdres" | grep -qx 'D' \
+    || bad25=$(printf '%s\n%s\n' "$bad25" "check 25's by-name resolution pass did not complete, so no by-name token was graded and a clean result here would mean nothing" | grep . || true)
   _rdu=$(printf '%s\n' "$_rdres" | awk -F'\t' '$1 == "U" { print $2 " (§2 item " $3 ": by name: lists `" $4 "`, which no reader spells and no tracked path is or ends with; name a reader that spells it, or write READER NOT IN TREE and a reason on that half)" }')
   _rdn=$(printf '%s\n' "$_rdres" | awk -F'\t' '$1 == "N" { print "memory-hygiene: check 25 did not grade `" $4 "` — READER NOT IN TREE covers it, on " $2 " " $3 }')
   [ -z "$_rdu" ] || bad25=$(printf '%s\n%s\n' "$bad25" "$_rdu" | grep . || true)
