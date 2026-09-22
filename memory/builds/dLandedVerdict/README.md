@@ -80,16 +80,16 @@ research record carrying no status header at all.
 **Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-08-19 · streams tooling
 ids TOOL-dLandedVerdict-1 TOOL-dLandedVerdict-2
 
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-dLandedVerdict-1 — the signal for a spec that landed and never said so](spec/2026-08-19-spec-TOOL-dLandedVerdict-1.md) | INPROGRESS | rev-1 | 2026-08-19 |
-| [TOOL-dLandedVerdict-2 — the close-out: seven builds that landed and never said so](spec/2026-08-19-spec-TOOL-dLandedVerdict-2.md) | INPROGRESS | rev-1 | 2026-08-19 |
+<!-- gen:build-units -->
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dLandedVerdict-1 — the signal for a spec that landed and never said so](spec/2026-08-19-spec-TOOL-dLandedVerdict-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-08-19 |
+| [TOOL-dLandedVerdict-2 — the close-out: seven builds that landed and never said so](spec/2026-08-19-spec-TOOL-dLandedVerdict-2.md) | — | 1 | INPROGRESS | rev-1 | 2026-08-19 |
+<!-- /gen:build-units -->
 
-Records live under `spec/` and `build/`.
+Records: 1 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md](build/2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md) | research | TOOL-dLandedVerdict-1 TOOL-dLandedVerdict-2 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dLandedVerdict-1 TOOL-dLandedVerdict-2.
 <!-- /gen:build-index -->
@@ -103,12 +103,3 @@ Ids no `spec-audit` record has ever named: TOOL-dLandedVerdict-1 TOOL-dLandedVer
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-19-spec-TOOL-dLandedVerdict-1.md](spec/2026-08-19-spec-TOOL-dLandedVerdict-1.md)
-  - [2026-08-19-spec-TOOL-dLandedVerdict-2.md](spec/2026-08-19-spec-TOOL-dLandedVerdict-2.md)
-- **`build/`**
-  - [2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md](build/2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md)
-<!-- /gen:build-docs -->

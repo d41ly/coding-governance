@@ -1,6 +1,14 @@
 # TOOL-dLandedVerdict-1 — the signal for a spec that landed and never said so
 **Status:** INPROGRESS · rev-1 · 2026-08-19 · node d · Tier-2 · base 098bebd9 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md](../build/2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md) | research | TOOL-dLandedVerdict-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Add a drift-audit signal that reports a spec still carrying a non-terminal status although its unit's

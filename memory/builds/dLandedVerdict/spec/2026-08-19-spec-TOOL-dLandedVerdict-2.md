@@ -1,6 +1,14 @@
 # TOOL-dLandedVerdict-2 — the close-out: seven builds that landed and never said so
 **Status:** INPROGRESS · rev-1 · 2026-08-19 · node d · Tier-1 · base 098bebd9 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md](../build/2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md) | research | TOOL-dLandedVerdict-1 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Take the seven builds whose product work is confirmed on `main` and whose spec records still read
