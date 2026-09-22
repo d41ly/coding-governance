@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE
 
-**Status:** SPECCED · rev-2 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 32
+**Status:** SPECCED · rev-3 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 32
 
 <!-- gen:spec-records -->
 
@@ -16,9 +16,12 @@ calling worktree. Measured at `07997375`, the resume tick already grades each co
 record carried by two worktrees is resumed twice, and the stale sibling is resumed while the run's
 own worktree reads LIVE. Give each slug ONE answer per node: only the worktree whose checked-out
 branch is the record's run branch acts, and every other copy reads the named verdict `ELSEWHERE`.
-There the tick prints a named skip and kills nothing, and the resume matrix refuses, numbered,
-naming the run's branch. This is route (a) of finding B1 in the G8 round-1 audit of unit 61, and it
-also closes that audit's M5 pre-preflight re-bind for a re-run started on a new branch.
+There the tick prints a named skip and kills nothing, and the resume matrix's HELD and working rows
+refuse, numbered, naming the run's branch. This is route (a) of finding B1 in the G8 round-1 audit
+of unit 61. That audit's M5 is not this unit's: unit 61's rev-3 folded it into that unit's own
+pushed-landing re-bind row, which prints nothing to resume and writes nothing off the branches
+where that landing's own `--landed` runs, so this unit leaves that row to unit 61 and guards the
+rows after it (§8 F9).
 
 ## 2. Scope (IN)
 
@@ -36,12 +39,14 @@ also closes that audit's M5 pre-preflight re-bind for a re-run started on a new 
   and launch nothing: `skip · ELSEWHERE` on that verdict, and `skip · NO RUN BRANCH` where a verdict
   that would act meets `holder-ref: absent`. Its header's decision table gains both rows. Observed by
   AC2, AC3 and AC8.
-- **S4** The resume matrix refuses outside the holder worktree. `check_holder_worktree <slug>
-  <run-state file>` holds the one new `fail 58` branch, which names the run's branch, the worktree
-  that has it checked out or that none does, and this worktree's HEAD, after the `--status` block
-  when no id was passed. On a record naming no branch it announces that and lets the call through.
-  `verb_resume` calls it at the head of unit 61's re-bind row and directly ahead of the first HELD
-  row, and nowhere else. Observed by AC4, AC5, AC6 and AC8.
+- **S4** The resume matrix's HELD and working rows refuse outside the holder worktree.
+  `check_holder_worktree <slug> <run-state file>` holds the one new `fail 58` branch, which names
+  the run's branch, the worktree that has it checked out or that none does, and this worktree's
+  HEAD, after the `--status` block when no id was passed. On a record naming no branch it announces
+  that and lets the call through. `verb_resume` calls it once, directly after unit 61's
+  observed-landing row and ahead of the first HELD row, and nowhere else, so it reaches no row of
+  the derived-terminal branch, whose re-bind row keeps unit 61's own branch scope (§8 F9).
+  Observed by AC4, AC5, AC6 and AC8.
 - **S5** `tools/unattended/stop-guard.js` ALLOWS a stop whose verdict is `ELSEWHERE`, with reason
   `elsewhere`, directly after unit 61's `held` row; `REASONS` and the header's decision table gain
   it. Observed by AC7.
@@ -80,19 +85,24 @@ also closes that audit's M5 pre-preflight re-bind for a re-run started on a new 
   reaches a verdict, and skipping the reads is a follow-up.
 - A linked worktree in every tick fixture, the audit's left-shift as written. §8 F8.
 - Detecting one branch forced into two worktrees. §5 risk (4).
-- M5's Skill half, the check-51 sentence and unit 61's AC13 grep, and M3's clock scoping. Both are
-  unit 61's own fold. H1 and H2 are promoted to units of their own.
+- The audit's M5, whole. Unit 61's rev-3 folded it: off the branches where a pushed landing's own
+  `--landed` runs, its re-bind row prints nothing to resume, names the run branch and writes nothing
+  (its S8, §4 and AC23), and the Skill keeps its check-51 sentence (its S11 and AC13). This unit's
+  guard does not reach that row (§8 F9). M3's clock scoping is unit 61's own fold too, and H1 and H2
+  are promoted to units of their own.
 - A `memory/DECISIONS.md` row. The rule lands in the stop contract's §8, a binding carrier, and the
   choice of route is this spec's §8 F1.
 - Any kit version constant. The unattended kit stands unreleased at 1.29 on this branch.
 
 ### Edges
 
-- **consumes-from** `TOOL-dDerivedDocket-61` — the re-keyed resume matrix, whose re-bind row inside
-  the derived-terminal branch and whose observed-landing row place this unit's two call sites;
-  `--liveness`'s HELD verdict and verdict order, into which ELSEWHERE goes second; the tick's named
-  HELD arm and the stop-guard's `held` row, beside which the new ones sit; and the landed log whose
-  observation AC6 reads. Without it the rows this unit guards do not exist in the shape it guards.
+- **consumes-from** `TOOL-dDerivedDocket-61` — the re-keyed resume matrix, whose observed-landing
+  row places this unit's one call site, ahead of the HELD and working rows it guards, and whose
+  re-bind row inside the derived-terminal branch keeps the branch scope that unit's S8 gives it and
+  its AC23 observes, which this unit leaves unguarded (§8 F9); `--liveness`'s HELD verdict and
+  verdict order, into which ELSEWHERE goes second; the tick's named HELD arm and the stop-guard's
+  `held` row, beside which the new ones sit; and the landed log whose observation AC6 reads.
+  Without it the rows this unit guards do not exist in the shape it guards.
 - **consumes-from** `TOOL-dDerivedDocket-28` — the per-slug ledger under the git common dir and its
   reap on the `--resume` rows that hold the lease. AC4 reads that ledger byte-unchanged after a
   refused call from a sibling worktree, and §4 states what that unit's prune-race argument rests on
@@ -120,7 +130,8 @@ repository holding a conf, a README and one committed BUILDING record with sessi
 
 The first two rows are B1's tick half, already live at this base for any record that carries a
 `session` fact; unit 61's Rollout is what gives this build's record one. The third row is the
-property this unit rests on. M5 cannot be measured here, because unit 61's re-bind row is not built.
+property this unit rests on. Unit 61's re-bind row and the branch scope that folded M5 are not built
+at this base, and are unit 61's to observe (its AC23); nothing here measures them.
 
 ### One holder per slug
 
@@ -188,23 +199,23 @@ and refuses once:
 
 ```
 fail 58 "this worktree is not on the run's branch, so its copy of the record is not the run's, and
-resuming, taking over or re-binding from it would drive one slug from a stale copy; the run is
+resuming or taking over from it would drive one slug from a stale copy; the run is
 driven from the worktree that has <ref> checked out: <path | no worktree on this node has it
 checked out, so check it out first>. Nothing was written. This worktree: <ref | a detached HEAD |
 an unreadable HEAD>"
 ```
 
-Nothing is written, reaped or pruned, and it returns 1. `verb_resume` calls it at two sites, each
-`|| return 1`, and one invocation reaches at most one of them:
-
-| Site | Rows it guards |
-|---|---|
-| the head of unit 61's re-bind row, inside the derived-terminal branch at `:5746` | a pushed landing re-bound with an id |
-| directly after unit 61's observed-landing row, ahead of the first HELD row | every HELD row and every working row, on every clock, with an id and without |
+Nothing is written, reaped or pruned, and it returns 1. `verb_resume` calls it at one site, with
+`|| return 1`: directly after unit 61's observed-landing row and ahead of the first HELD row, so it
+guards every HELD row and every working row, on every clock, with an id and without.
 
 Unguarded, and unchanged: `check_asks_pinned`, the `--scheduled` refusals, `refuse_if_terminal
---recorded` with an id at `:5745`, the derived terminal resumed with no id, and the observed landing.
-Each writes nothing, and each is the answer every copy that carries the record gives (§8 F5). A
+--recorded` with an id at `:5745`, every row of unit 61's derived-terminal branch at `:5746`, and
+the observed landing. All but one write nothing, and each of those is the answer every copy that
+carries the record gives (§8 F5). The one that writes is unit 61's re-bind, and that unit already
+confines it to a branch where the landing's own `--landed` runs, the run branch or, under
+`primary`, the default branch, printing nothing to resume from any other (its S8 and AC23). This
+unit leaves that scope as unit 61 states it, so each behaviour of that row has one owner (§8 F9). A
 durable restart's prompt names the worktree `--hold` ran in, and the tick relaunches in the worktree
 it read, so both land in the holder worktree and pass.
 
@@ -213,7 +224,9 @@ driver suite's `--resume` and `--liveness` calls run off the record's branch. Th
 landed fixture checked out as `main` (`tools/unattended/unattended.test.sh:2992`) is the unguarded
 derived-terminal row. The `--scheduled` resume on a detached HEAD (`:7977`) meets check 60 before
 the matrix. Both keep their output. The builder re-runs the scan at the pass's parent, because unit
-61's arms join the population first, and S8 retargets whatever it finds in a guarded row.
+61's arms join the population first, and S8 retargets whatever it finds in a guarded row. The arm
+of unit 61's AC23, which calls the re-bind row from a new branch and from the default branch, joins
+it in an unguarded row and keeps its output unchanged.
 
 ### The stop-guard
 
@@ -262,17 +275,19 @@ and the whole of §8, so the pass re-measures at its parent.
 The protocol nets −32 bytes, the verb carrier −4 and the stop contract −33, and neither the protocol
 paragraph nor the verb entry re-wraps to more lines. The stop contract's §8 row reads `| any other |
 from a worktree not on the run's branch | refuses, numbered, naming the branch and its worktree;
-writes nothing |`. It sits below the three rows unit 61's table answers with nothing to resume: the
-recorded terminal, the derived terminal resumed with no id, and the observed landing. Those move
-above unit 61's re-bind row, which is sound because their conditions are disjoint from it, so the
-first-match order answers nothing differently. The sentence joins the first paragraph below the
-table, so it adds no blank line: "The run's branch is `run-branch`, else `branch-ref`, and git checks
-a branch out in one worktree at most; a record naming neither is graded where it is read." Its line
-delta is derived at the build commit against the two trims, which free about three lines.
+writes nothing |`. It sits directly above the first HELD row, below every row unit 61's table gives
+the recorded terminal, the derived terminal and the observed landing, the re-bind row and its
+off-branch row included, so no row of unit 61's table moves. The sentence joins the first paragraph
+below the table, so it adds no blank line: "The run's branch is `run-branch`, else `branch-ref`, and
+git checks a branch out in one worktree at most; a record naming neither is graded where it is
+read." Its line delta is derived at the build commit against the two trims, which free about three
+lines.
 
 The Skill carries no size row. Its tick paragraph at `tools/unattended/SKILL.template.md:29`, in the
-list of refusals unit 61 writes as expected before `--preflight`, gains "or, on a re-run build whose
-branch still carries the earlier run's record, check 58 naming another branch". Its what-wakes
+list of refusals unit 61 writes as expected before `--preflight`, gains "or check 58 naming another
+branch, where this worktree's copy is a HELD or working record and this worktree is not on its run
+branch". Unit 61's check-51 sentence for an in-place previous record stands as that unit writes it,
+because this unit's guard does not reach the derived-terminal branch. The Skill's what-wakes
 paragraph at `:75` has the stop-guard, reading the run's own worktree, refuse a turn end. Its Resume
 section at `:835` gains, after the refused-resume sentence: "A check-58 refusal that names the run's
 branch means this worktree is not the run's: reap only the job you just scheduled, and resume from
@@ -377,11 +392,15 @@ disk to undo.
   the branch, the worktree holding it and this worktree's HEAD.
 - risks — (1) A holding session that ends its turn from a sibling worktree is allowed to (§8 F4); the
   recovery is the tick in the run's worktree once the run reads STALE there, 5400 s in gov, and only
-  where the tick is registered, which node `d` is not. (2) Under `primary`, a `--resume` issued from
-  the default-branch tree for `fail 55`'s remedy refuses naming the run's branch, and because each
-  copy is re-bound where it sits, `--landed` then runs from the run's worktree too. (3) A re-run
-  started on its predecessor's own branch still reaches unit 61's re-bind row before its
-  `--preflight`, which then refuses at check 2: unit 61's §5 risk (4). (4) `git worktree add -f` or
+  where the tick is registered, which node `d` is not. (2) Under `primary`, for a run whose branch
+  is not the default one, `fail 55`'s remedy issued from the default-branch tree takes unit 61's
+  re-bind there, which this unit does not guard (§8 F9), while `--liveness` in that tree reads
+  ELSEWHERE, so the stop-guard allows a stop there before the landing is stamped: its
+  `landing-unstamped` block binds only in the run's worktree (§8 F7). (3) A re-run on a new branch
+  meets unit 61's off-branch answer, which writes nothing; one started on its predecessor's own
+  branch still reaches unit 61's re-bind row before its `--preflight`, which then refuses at
+  check 2: unit 61's §5 risk (4), which this unit neither closes nor widens.
+  (4) `git worktree add -f` or
   `git checkout --ignore-other-worktrees` puts one branch in two worktrees, and both then hold and
   each grades its own copy. (5) A run whose worktree was removed, or left detached by the lander's
   failure at `tools/push-main.sh:407`, is acted on by no copy until its branch is checked out again.
@@ -447,15 +466,17 @@ disk to undo.
 - **AC6** — Under `LANDER_MODE="in-place"`, take a fixture whose committed LANDING record names
   `run-branch: refs/heads/unit` and is pushed to a local bare `origin`, so `--status` prints
   `phase LANDED (derived:`, and check out a new branch `rerun` at that commit: a re-run build's
-  worktree before its `--preflight`. There `--resume tRun --keepalive-id k9` refuses at check 58
-  naming `refs/heads/unit`, `git status --porcelain` prints nothing, and a following
-  `--preflight tRun --keepalive-id k9` meets no check-2 refusal. Back on `unit`, the same `--resume`
-  takes unit 61's re-bind row and stages the record. With unit 61's landed log naming the landing
-  commit, the call on `rerun` prints nothing to resume and writes nothing.
-  Red when: a keepalive tick issued before a re-run's `--preflight` re-binds the previous run's record
-  and leaves the staged difference that preflight refuses at check 2, the audit's M5 against unit 61
-  as specified; or the guard reaches the observed-landing row, so `--resume` refuses a landing that
-  `--liveness` reads TERMINAL in every worktree.
+  worktree before its `--preflight`. There `--resume tRun --keepalive-id k9` prints no check 58 and
+  no `this worktree is not on the run's branch`, and its output and `git status --porcelain` match
+  the same call's over a driver copy whose `check_holder_worktree` always returns 0, each run from
+  the same fixture state. So does the same call under `LANDER_MODE="primary"` on a `main`
+  fast-forwarded to the pushed tip, and on `rerun` once unit 61's landed log names the landing
+  commit. What each of those calls prints and writes is unit 61's, observed by its AC23 and AC10,
+  and this criterion does not restate it.
+  Red when: the guard reaches unit 61's derived-terminal branch, so a check 58 pre-empts that unit's
+  own branch scope and refuses `fail 55`'s remedy on the default branch, where a `primary` landing's
+  lander runs and unit 61's AC23 re-binds; or the guard reaches the observed-landing row, so
+  `--resume` refuses a landing that `--liveness` reads TERMINAL in every worktree.
 - **AC7** — When `node tools/unattended/stop-guard.js` is fed a Stop payload bound to the record's
   session and its liveness reads `verdict: ELSEWHERE`, it exits 0, prints nothing on stdout, and its
   sidecar line carries `"reason":"elsewhere"`. With the real driver, a payload whose `cwd` is AC1's
@@ -527,7 +548,7 @@ disk to undo.
 
 `unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · a linked worktree added on `wave` after the record commit, with the take-over and no-id calls refused there and the ledger read back, the detached and no-holder message variants, the in-place re-run on a new branch with and without the observation, and the no-run-branch announcement; staged RED by a driver copy whose `check_holder_worktree` always returns 0 · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks
+New arm: `tools/unattended/unattended.test.sh` · a linked worktree added on `wave` after the record commit, with the take-over and no-id calls refused there and the ledger read back, the detached and no-holder message variants, and the no-run-branch announcement, staged RED by a driver copy whose `check_holder_worktree` always returns 0; and the derived-terminal branch and the observed landing left to unit 61, on a new branch under `in-place` with and without the observation and on the default branch under `primary`, staged RED by a driver copy that also calls `check_holder_worktree` at the head of the derived-terminal branch · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks
 New arm: `tools/unattended/resume-tick.test.sh` · `add_sibling_worktree` over a live run, a stale run, a HELD run beside a stale BUILDING copy whose recorded pid is a live `sleep`, and a record naming no run branch; staged RED by a driver copy whose verdict chain drops the ELSEWHERE row · `FLOOR_ASSERTIONS`, raised by exactly the new arms' assertions, counted off their blocks
 New arm: `tools/unattended/stop-guard.test.sh` · a stubbed `verdict: ELSEWHERE` bound to the payload's session; staged RED by a hook copy without the `elsewhere` row · `FLOOR_ASSERTIONS`, raised by exactly the new arm's assertions, counted off its block
 
@@ -572,13 +593,16 @@ read off a run, which this pass does not make. The driver's new arms are written
   delegated): (a). The copy cannot tell a HELD run from a working one, so (c) blocks a held session,
   and (b) tells the session to `--plan` from a stale copy. Every other path on which the hook cannot
   read the run allows, which its header states as its rule. The cost is §5 risk (1).
-- **F5 — which rows the refusal guards.** Options: (a) every row after `check_asks_pinned`; (b) the
-  re-bind row, every HELD row and every working row, leaving unguarded the recorded terminal, the
-  derived terminal resumed with no id and the observed landing. RESOLVED (agent, 2026-09-22,
-  delegated): (b). Each unguarded row writes nothing, and each is the answer every copy carrying the
-  record gives, which is the one-answer property itself: a recorded terminal is frozen, and the
-  observation sits in the common-dir log. (a) would turn a landed record's nothing-to-resume into a
-  refusal from the primary tree, and it changes the arm at `tools/unattended/unattended.test.sh:2992`.
+- **F5 — which rows the refusal guards.** Options: (a) every row after `check_asks_pinned`; (b)
+  every HELD row and every working row, leaving unguarded the recorded terminal, every row of the
+  derived-terminal branch and the observed landing.
+  RESOLVED (agent, 2026-09-22, delegated): (b). Each unguarded row but unit 61's re-bind writes
+  nothing, and each of those is the answer every copy carrying the record gives, which is the
+  one-answer property itself: a recorded terminal is frozen, and the observation sits in the
+  common-dir log. The re-bind writes, and unit 61 scopes it to the branches where that landing's own
+  `--landed` runs, which §8 F9 leaves to it; the previous revision's (b) guarded that row as well.
+  (a) would turn a landed record's nothing-to-resume into a refusal from the primary tree, and it
+  changes the arm at `tools/unattended/unattended.test.sh:2992`.
   Both options keep the `--scheduled` refusals ahead of the matrix, so the detached-HEAD arm at
   `:7977` still meets check 60.
 - **F6 — the refusal's number.** Options: (a) a new branch of check 58; (b) a new check number.
@@ -590,9 +614,10 @@ read off a run, which this pass does not make. The driver's new arms are written
   header says landing happens. RESOLVED (agent, 2026-09-22, delegated): (a). `verb_landed` calls no
   `check_branch` (`:3946`), and the driver suite runs a `primary` `--landed` from the run branch at
   `tools/unattended/unattended.test.sh:9126`, so `fail 55`'s remedy and the landing both work from
-  the run's worktree. (b) would read the landing session's own worktree as ELSEWHERE, taking the
-  stop-guard's `landing-unstamped` block away from the session it exists for, and would need the
-  ancestry test in a second caller. The residual is §5 risk (2).
+  the run's worktree; by unit 61's branch scope, which §8 F9 leaves unguarded, the remedy works from
+  the default-branch tree too. (b) would read the landing session's own worktree as ELSEWHERE,
+  taking the stop-guard's `landing-unstamped` block away from the session it exists for, and would
+  need the ancestry test in a second caller. The residual is §5 risk (2).
 - **F8 — the linked worktree in the tick suite.** Options: (a) every `build_fixture` adds one, the
   audit's left-shift as written; (b) `add_sibling_worktree`, called by the arms whose property is the
   worktree walk. RESOLVED (agent, 2026-09-22, delegated): (b). PINNED on node `d` 2026-09-22, a tick
@@ -600,6 +625,21 @@ read off a run, which this pass does not make. The driver's new arms are written
   suite's 39 tick runs, about 44 s, for arms whose properties are not the walk. The class stays
   gated: every actor the verdict reaches has an arm over two copies, and a new tick row can reach
   the walk only through `--liveness`, whose verdict order AC1 observes.
+- **F9 — which unit owns the pushed-landing re-bind row off the run's branch.** Options: (a) unit
+  61's own branch scope governs that row, which already prints nothing to resume and writes nothing
+  off the branches where the landing's own `--landed` runs, and this unit's guard sits after the
+  derived-terminal branch and the observed landing, ahead of the HELD and working rows; (b) this
+  unit's guard at the head of the re-bind row, as the previous revision placed it when unit 61 was
+  at its rev-2, pre-empting that scope with a check-58 refusal.
+  RESOLVED (agent, 2026-09-22, delegated): (a), the reading the orchestrator's re-grounding brief
+  recommends. Unit 61's rev-3 folded the audit's M5 into that row itself (its S8, §4 and AC23), so
+  under (b) two units would own one row's off-branch answer, and they disagree: under `primary`
+  unit 61 re-binds on the default branch, where that mode's lander runs and `fail 55` fires, while
+  (b) refuses there with check 58, which would red unit 61's AC23 the moment this unit lands. (a)
+  gives each behaviour one owner. The re-bind row and its scope are unit 61's, observed by its
+  AC23; the guard over the HELD and working rows is this unit's, observed by AC4, AC5 and AC8; and
+  the guard's absence from the derived-terminal branch and the observed landing is this unit's too,
+  observed by AC6. The cost is §5 risk (2).
 
 ## 9. Revision log
 
@@ -613,6 +653,21 @@ read off a run, which this pass does not make. The driver's new arms are written
   `TOOL-dDerivedDocket-64` declares no edge to this unit: route (a) leaves `derive_last_move` per
   worktree, as unit 61 extracts it, so that unit's heartbeat term consumes nothing written here. No
   design, other criterion, edge or order moved.
+- rev-3 · 2026-09-22 · §1 · §2 S4 · §3 · §4 · §5 · §6 AC6 · §7 · §8 F5 F7 F9 · re-grounded on
+  unit 61 at its rev-5, where the previous revision here read its rev-2. Unit 61's rev-3 folded the
+  audit's M5 into its own re-bind row, which off the branches where the landing's own `--landed`
+  runs prints nothing to resume, names the run branch and writes nothing (its S8, §4 and AC23), and
+  kept the Skill's check-51 sentence (its S11 and AC13). So §1 and §3's non-goals drop the claim
+  that this unit closes M5, and the new §8 F9 gives the re-bind row one owner: unit 61's scope
+  governs it, and `check_holder_worktree` is called once, after the observed-landing row and ahead
+  of the HELD and working rows, as S4, §3's consumes-from edge and §4's matrix, stop-contract and
+  Skill text now say. AC6 no longer expects a check-58 refusal on `rerun`: it observes that the
+  guard reaches neither the derived-terminal branch nor the observed landing under either landing
+  mode, and leaves what those rows print to unit 61's AC23 and AC10. The check-58 message drops
+  re-binding, F5's option (b) drops the re-bind row, §5 risks (2) and (3) and F7 say where
+  `fail 55`'s remedy now runs, and §7's driver arm line names the second RED copy. The stop
+  contract's new row sits above the first HELD row, so no row of unit 61's table moves. No figure,
+  order or other criterion moved.
 
 ## 10. Reuse audit
 

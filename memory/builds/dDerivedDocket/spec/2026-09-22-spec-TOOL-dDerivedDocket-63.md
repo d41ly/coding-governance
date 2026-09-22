@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix
 
-**Status:** SPECCED · rev-2 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 33
+**Status:** SPECCED · rev-3 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 33
 
 <!-- gen:spec-records -->
 
@@ -72,7 +72,7 @@ pid its prologue exports.
 - The rows this unit does not move. The terminal, landing, re-bind and HELD rows above the working
   rows, the holder row "the recorded keepalive", and unit 61's four no-lease working rows, bar the
   one word S5 names, read as unit 61 specifies them. So does the worktree row
-  `TOOL-dDerivedDocket-62` adds above the re-bind, HELD and working rows, which every call here
+  `TOOL-dDerivedDocket-62` adds directly above the first HELD row, which every call here
   passes on the record's own branch.
 - The driver suite's leaseless arms, at `tools/unattended/unattended.test.sh:7216`, `:7228` and
   `:7426`, and any re-assertion they owe. They are unit 61's (S4, §4).
@@ -167,7 +167,7 @@ still names the same row. N1 to N4 are unit 61's no-lease rows, which its rev-3 
 matrix (its §8 F13). They stand where unit 61 puts them, between its same-session row and its
 leased clock rows, in unit 61's words, which the cells above abbreviate. Every row of unit 61's
 table above row 1, the terminal, landing, re-bind and HELD rows, stands as unit 61 states it, and
-so does the worktree row `TOOL-dDerivedDocket-62` adds above the re-bind row, which every call here
+so does the worktree row `TOOL-dDerivedDocket-62` adds directly above the first HELD row, which every call here
 passes because each runs on the record's own branch.
 
 The first-match audit H1's left-shift proposes, run once over this table: for each row, the rows
@@ -274,7 +274,7 @@ clause and drops "through `run_takeover`", which no other take-over cell in the 
 "and is not `CLAUDE_PID`", which the pid clause now carries. The no-lease row keeps its place among
 unit 61's no-lease rows and trades "below" for "above", five bytes for five. The last loses 17. The
 net is −15 bytes and no line. The contract stood at 29105 bytes in 441 lines at `07997375`; unit 61
-and `TOOL-dDerivedDocket-62`, whose worktree row and three moved rows touch none of these four, both
+and `TOOL-dDerivedDocket-62`, whose one worktree row moves no row and touches none of these four, both
 move that before this unit builds, so AC5 reads the build commit against its parent rather than
 against either figure.
 
@@ -494,6 +494,10 @@ guard the estimate trips is broad and leaves the join.
   at AC4. §3 says unit 61 builds its own table unedited. S3, AC4 and §7 raise the driver suite's
   `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` by exactly the new arms, counted off their blocks, where
   rev-1 moved no floor.
+- rev-3 · 2026-09-22 · §3 §4 · re-grounded on `TOOL-dDerivedDocket-62` rev-3, whose worktree row now
+  sits directly above the first HELD row and moves no row: the non-goal, the table note and the
+  stop-contract size paragraph say so. Every call here still runs on the record's own branch, so no
+  criterion moved.
 
 ## 10. Reuse audit
 

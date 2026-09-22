@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor
 
-**Status:** SPECCED · rev-5 · 2026-09-22 · node d · Tier-2 · base 285701d5 · streams tooling · order 31
+**Status:** SPECCED · rev-6 · 2026-09-22 · node d · Tier-2 · base 285701d5 · streams tooling · order 31
 
 <!-- gen:spec-records -->
 
@@ -73,9 +73,9 @@ bound, with HELD carved out of the stop-guard, `--liveness` and the resume tick.
   the record's run branch or, under `primary`, the default branch, and from any other branch it
   writes nothing (§4). So that the re-bound record still lands, `read_landing_commit` in
   `tools/unattended/lib-unattended.sh` and `--landed`'s `primary` clean check both treat a difference
-  from HEAD confined to the six lease-fact lines as no difference, through one new lib predicate,
-  `check_lease_only_diff`, and no other caller of the clean check is exempted. Observed by AC8 and
-  AC23.
+  from HEAD confined to the six lease-fact lines, `keepalive` among them because the re-bind
+  rewrites it, as no difference, through one new lib predicate, `check_lease_only_diff`, and no
+  other caller of the clean check is exempted. Observed by AC8 and AC23.
 - **S9** The keepalive reap READ-BACK runs under `LANDER_MODE=in-place`. The block at
   `tools/unattended/unattended.sh:4029` moves, with its message texts and check numbers unchanged,
   into `check_keepalive_reaped`, defined directly above `verb_landed`, and both branches call it
@@ -102,14 +102,17 @@ bound, with HELD carved out of the stop-guard, `--liveness` and the resume tick.
 - **S13** The suite arms follow the code. Every assertion in the driver suite that reads or writes a
   lease file is retargeted to the run-state facts or the landed log, one for one, so the executed
   count does not fall; a fixture the suite makes leaseless by deleting the lease file is made
-  leaseless by deleting the six lease-fact lines instead, so the leaseless arms keep their expected
-  texts, the dead-clock `fail 57` one included; the one-line `--status` counts stop filtering the
-  retired `LEASE —` line; the new arms §7 names are written and each is staged RED. Each suite's
-  executed-assertion floor rises by exactly the assertions its new arms carry, counted off their
-  blocks and never read off a run: the driver suite's `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, its
-  new arms written in region two beside the arms they extend, and the stop-guard and
-  resume-tick suites' `FLOOR_ASSERTIONS`. A retargeted assertion is one for one and moves no floor.
-  Observed by AC15.
+  leaseless instead by deleting the five lease-fact lines other than `keepalive`, which are
+  `session`, `pid`, `host`, `pid-image` and `lease-utc`, and keeping its `keepalive` line, the
+  shape of a pre-lease record such as this build's own run-state file (§4), so the leaseless arms
+  keep their expected texts, the dead-clock `fail 57` one included, and the leaseless holder arm
+  still resumes with the `keepalive` its fixture kept, `k1`; the one-line `--status` counts stop
+  filtering the retired `LEASE —` line; the new arms §7 names are written and each is staged RED.
+  Each suite's executed-assertion floor rises by exactly the assertions its new arms carry, counted
+  off their blocks and never read off a run: the driver suite's `FLOOR_ASSERTIONS` and
+  `FLOOR_SHARD_2`, its new arms written in region two beside the arms they extend, and the
+  stop-guard and resume-tick suites' `FLOOR_ASSERTIONS`. A retargeted assertion is one for one and
+  moves no floor. Observed by AC15.
 - **S14** One `memory/DECISIONS.md` row under the TOOL heading, keyed by this unit's id, records the
   reconciliation and names the ruling as relayed. Observed by AC16.
 - **S15** The kickoff manifest's dated correction saying two lease models coexist is pruned, its own
@@ -163,9 +166,11 @@ bound, with HELD carved out of the stop-guard, `--liveness` and the resume tick.
   under the git common dir. This unit keeps each reap on the re-keyed row that holds the lease and
   leaves that directory in place. Whether that unit's prune-race argument survives one lease copy
   per worktree is G8 B1's, promoted (§8), and is not examined here.
-- **hands-off** `TOOL-dDerivedDocket-62` — the re-keyed resume matrix, whose re-bind row and
-  observed-landing row place that unit's two `check_holder_worktree` calls in `verb_resume`;
-  `--liveness`'s HELD verdict and the verdict order its ELSEWHERE joins; the tick's named HELD arm
+- **hands-off** `TOOL-dDerivedDocket-62` — the re-keyed resume matrix, whose observed-landing row
+  places that unit's one `check_holder_worktree` call in `verb_resume`, ahead of the HELD and
+  working rows, while the re-bind row keeps the branch scope S8 gives it and AC23 observes, which
+  that call does not pre-empt; `--liveness`'s HELD verdict and the verdict order its ELSEWHERE
+  joins; the tick's named HELD arm
   and the stop-guard's `held` row; and the landed log under the git common dir. `derive_last_move`
   keeps this unit's per-worktree scope there, because that unit takes route (a) of G8 B1.
 - **hands-off** `TOOL-dDerivedDocket-63` — the working rows of the re-keyed matrix as §4 writes
@@ -212,6 +217,13 @@ The lease IS the run-state facts `write_lease` (`tools/unattended/unattended.sh:
 | is its holder alive | `check_lease_fresh`: `derive_last_move` for the recorded session, against `RESUME_STALE_BOUND` |
 | is it released | the phase: HELD is the released state, and a terminal is the removed one |
 
+Those facts are six: `keepalive`, `session`, `pid`, `host`, `pid-image` and `lease-utc`, and "the
+six lease facts" in this spec always means all six, `keepalive` included. A record preflighted
+before the lease facts existed carries `keepalive` alone of them, as this build's own run-state
+file does (§10). So a fixture is made leaseless by deleting the other five and keeping its
+`keepalive` line (S13, AC22), never by deleting all six: the no-lease holder and `--replaces` rows
+key on that fact.
+
 Freshness is DERIVED, never written. The retired file was refreshed by every writing verb, by the
 start of `run_bounded` and by the holder's tick. All but one of those move a signal `--liveness`
 already reads: a writing verb moves a dirty write or a commit, and a tick's turn appends to the
@@ -255,8 +267,9 @@ HELD, a LANDING the derivation leaves at LANDING included.
 | working, clock stale | no id | the status block, then check 59 naming `--keepalive-id` |
 
 The leaseless rows of the retired matrix do NOT collapse into the clock rows (§8 F13, G8 M3).
-`write_lease` writes the six facts together, so a record with no `lease-utc` names no session
-either: `--liveness` grades it UNBOUND, the tick never acts on it, and the one clock that belongs to
+`write_lease` writes the six facts together, and a pre-lease record carries `keepalive` alone of
+them, so a record with no `lease-utc` names a keepalive and no session: `--liveness` grades it
+UNBOUND, the tick never acts on it, and the one clock that belongs to
 its run, rather than to whichever worktree calls, is the newest commit touching its build folder,
 which unit 4 §8 F8 chose. Only the bound moves, from the retired `resolve_lease_bound` to
 `RESUME_STALE_BOUND`. Its holder is still the first working row. The no-lease `--replaces` row is
@@ -320,7 +333,8 @@ The scope is this row's alone. It is not an identity test (§8 F7), and it is no
 answer across worktrees that G8 B1 asks for.
 
 `check_lease_only_diff <file>` holds when `git diff -U0 HEAD -- <file>` changes only lines of the six
-lease facts, added, removed or rewritten. `read_landing_commit` replaces its byte-equality test at
+lease facts, `keepalive` included, added, removed or rewritten. `read_landing_commit` replaces its
+byte-equality test at
 `tools/unattended/lib-unattended.sh:823` with that predicate; the phase line and every other byte
 must still match a HEAD copy reading LANDING, so a staged or uncommitted LANDING still has no landing
 commit. `check_clean` gains an optional run-state file argument exempting that file when the
@@ -444,8 +458,9 @@ The population holding a lease file is MEASURED EMPTY on the only node that runs
 driver: on node `d`, 2026-09-22, the git common dir holds no `unattended` directory at all. The kit is
 unreleased, so no adopter holds one either. A file left anywhere else is inert, because nothing reads
 it, and no shim ships (§8 F12). A run that held one keeps what every `--preflight` on the merged
-driver also wrote, the run-state facts, and a record with neither is a pre-lease record whose holder
-takes the one lease record at its first matching-id resume, or at its first `--replaces` resume when
+driver also wrote, the run-state facts, and a record with neither, carrying `keepalive` alone of
+the six, is a pre-lease record whose holder takes the one lease record at its first matching-id
+resume, or at its first `--replaces` resume when
 its scheduler lists another job than the record names. This build's own run is such a record, and
 it is the second case (§4 Rollout, §10).
 
@@ -458,11 +473,12 @@ as the run's live keepalive. So once the unit lands, the orchestrator reads its 
 compares it with the record's `keepalive` fact, and makes one of two calls.
 
 - When the two match, `--resume <slug> --keepalive-id <that id>` takes the holder row and records
-  the six facts.
+  all six lease facts, its `keepalive` unchanged.
 - When they differ, as they do at writing, the call is
   `--resume <slug> --keepalive-id <live id> --replaces <recorded id>`. It takes the no-lease
   `--replaces` row while the build folder is inside the bound, and the no-lease take-over row past
-  it, and either records the live id with the six facts. The same call without `--replaces` is
+  it, and either records all six lease facts, the live id as `keepalive`. The same call without
+  `--replaces` is
   refused at check 59 inside the bound, naming `--replaces` and the recorded id.
 
 This is the orchestrator's own act, made because it knows it holds the run. The Skill's Resume
@@ -514,8 +530,8 @@ it a copy of those facts, which the tick grades on that worktree's own clocks un
   retired, which an accidental second driver has no reason to pass. The tick passing `--replaces`
   on every relaunch, which §4 rejects, would pass it for every session, which is the difference.
   The landed log carries validated shapes only, is written by one verb, and decides only whether a
-  landing reads finished. The tolerance names six fact lines, and a difference anywhere else keeps
-  the landing commit unfound.
+  landing reads finished. The tolerance names the six lease-fact lines, `keepalive` included, and a
+  difference anywhere else keeps the landing commit unfound.
 - perf / scale — `--status` and `--resume` on a leased working record now pay `--liveness`'s clock,
   and on a record with no lease the one `git log` of `build_folder_age` they paid before. PINNED,
   node `d` 2026-09-22: `--liveness` over the scratch fixture took 0.68 s with no gate logs and 2.60 s
@@ -616,7 +632,8 @@ it a copy of those facts, which the tick grades on that worktree's own clocks un
   refuse at check 2.
   Red when: `fail 55`'s remedy writes nothing, as measured at `285701d5`; or the re-bound record stops
   deriving LANDED, so in-place `--landed` refuses at check 80 and `primary` at check 2; or the
-  tolerance admits a difference outside the six lease-fact lines, at either of its two sites; or the
+  tolerance admits a difference outside the six lease-fact lines, `keepalive` included, at either
+  of its two sites; or the
   clean check exempts the whole run-state file, so a hand-edited witness reaches `primary`
   `--landed`'s terminal write; or the exemption reaches another caller than that branch, so
   `--preflight` or `--hold` accepts a dirty tree.
@@ -646,7 +663,9 @@ it a copy of those facts, which the tick grades on that worktree's own clocks un
 - **AC11** — On a working fixture whose lease facts name `k1`, session `S` and pid `P`,
   `CLAUDE_CODE_SESSION_ID=S CLAUDE_PID=P` with `--resume <slug> --keepalive-id k1` exits 0 and
   `git status --porcelain` prints nothing; with `CLAUDE_PID=Q` it records pid `Q` and stages; and a
-  fixture with no `lease-utc` resumed with its recorded keepalive gains all six lease facts.
+  fixture made leaseless as S13 makes it, keeping `keepalive` `k1` and none of the other five lease
+  facts, resumed with `--keepalive-id k1` gains `session`, `pid`, `host`, `pid-image` and
+  `lease-utc`, so it carries all six.
   Red when: the tick's first act restages the record every ten minutes and moves `lease-utc`, pushing
   `--landed`'s stop-line test back; or a pre-lease holder stays invisible to the hooks.
 - **AC12** — On a HELD fixture whose condition is met, `--resume --keepalive-id C` from another
@@ -768,8 +787,10 @@ it a copy of those facts, which the tick grades on that worktree's own clocks un
   permission: the direct fixture runs above are this pass's check; the arm that repeats them is
   written and staged RED in the pass, and the driver suite that executes it is a held kit suite on no
   bar leg, so it runs in the orchestrator's attributed VERIFYING run beside AC15's arms.
-- **AC22** — Take AC3's authorized record with its six lease-fact lines deleted, so it carries no
-  lease and its `keepalive` fact names `k1`, and commit the deletion dated past `RESUME_STALE_BOUND`
+- **AC22** — Take AC3's authorized record with its `session`, `pid`, `host`, `pid-image` and
+  `lease-utc` lines deleted and its `keepalive` line kept, five of the six lease facts gone, so it
+  carries no lease and its `keepalive` fact names `k1`, as a pre-lease record's does (§4), and
+  commit the deletion dated past `RESUME_STALE_BOUND`
   with `GIT_COMMITTER_DATE`; then commit one file outside the build folder at the present time, so
   HEAD's committer epoch is fresh. `--status` prints `presumed-stopped` naming `NO LEASE` and the
   build folder's age, and `--resume <slug> --keepalive-id C` announces `presumed-stopped` and takes
@@ -784,8 +805,8 @@ it a copy of those facts, which the tick grades on that worktree's own clocks un
   live for as long as that worktree stays busy, which unit 4 §8 F8 decided against; or a pre-lease
   holder whose scheduler lists another job than the record names has no path but waiting out the
   bound, which is this build's own Rollout (§4).
-  fixture: AC3's authorized record, its lease facts removed and the build-folder commit dated by
-  `GIT_COMMITTER_DATE`, so no clock is faked.
+  fixture: AC3's authorized record, its five lease facts other than `keepalive` removed and the
+  build-folder commit dated by `GIT_COMMITTER_DATE`, so no clock is faked.
   permission: the direct fixture runs above are this pass's check; the arm that repeats them is
   written and staged RED in the pass, and the driver suite that executes it is a held kit suite on no
   bar leg, so it runs in the orchestrator's attributed VERIFYING run beside AC15's arms.
@@ -862,9 +883,10 @@ is the post-merge audit this build already takes after each wave, as `c361e347` 
   (d) is measured to block and relaunch every landed in-place run, (c) drops the post-push enforcement
   the ruling's fifth item restores, and (b) is invisible to the other worktrees the tick walks.
 - **F6 — how a re-bound landing still lands.** Options: (a) a tolerance confined to the six
-  lease-fact lines in `read_landing_commit` and the `primary` clean check; (b) commit the re-bind;
-  (c) `--landed` restores the record from HEAD. RESOLVED (agent, 2026-09-22, delegated): (a). (b)
-  moves HEAD off the pushed tip, and (c) is a verb silently reverting a write.
+  lease-fact lines, `keepalive` included, in `read_landing_commit` and the `primary` clean check;
+  (b) commit the re-bind; (c) `--landed` restores the record from HEAD.
+  RESOLVED (agent, 2026-09-22, delegated): (a). (b) moves HEAD off the pushed tip, and (c) is a verb
+  silently reverting a write.
 - **F7 — the landing re-bind's identity test.** RESOLVED (agent, 2026-09-22, delegated): none, as the
   merge skeptic proposed, because a freshness test would refuse `fail 55`'s remedy just after a push.
   The branch scope the row gained in the G8 fold (M5) is not an identity test: it names where the
@@ -969,6 +991,19 @@ is the post-merge audit this build already takes after each wave, as `c361e347` 
   suite's executed-assertion floor by exactly the arms this unit adds, counted off their blocks and
   never read off a run, where rev-4 moved none: the practice the CLOSED units 25, 30, 49 and 54 set.
   The §4 matrix, the order, every other edge and every other criterion are unchanged.
+- rev-6 · 2026-09-22 · §2 S8 S13 · §3 · §4 · §5 · §6 AC8 AC11 AC22 · §8 F6 · §10 · the counts of
+  lease-fact lines say which facts. `write_lease` writes six, `keepalive` among them, and a
+  pre-lease record such as this build's own run-state file keeps `keepalive` without the other
+  five, so S13 and AC22 make a fixture leaseless by deleting `session`, `pid`, `host`, `pid-image`
+  and `lease-utc` and keeping `keepalive`, which AC22's `k1` and the driver suite's leaseless
+  holder arm both need, where the previous revision deleted all six. §4 now defines the six lease
+  facts once, and AC11's pre-lease fixture, §4's leaseless paragraph, Migration and Rollout, and
+  every tolerance passage (S8, §4, §5, AC8, F6) say whether `keepalive` is counted. §10 records
+  `host` and `pid-image` absent from that record too. §3's hands-off to `TOOL-dDerivedDocket-62`
+  follows that unit's rev-3, which re-grounded it on this spec's rev-5: its one
+  `check_holder_worktree` call sits ahead of the HELD and working rows and does not pre-empt the
+  re-bind row, whose branch scope stays this unit's (S8, AC23). No matrix row, order or other edge
+  moved, and no criterion's property changed.
 
 ## 10. Reuse audit
 
@@ -992,4 +1027,6 @@ Live run state, measured for §4 Rollout (G8 M2) on node `d` on 2026-09-22 at `0
 or `lease-utc` fact, and the git common dir holds no `unattended` directory. The run's live
 keepalive, read from the scheduler's listing by the orchestrator and relayed in its fold brief the
 same day, is `b5b0b444`. The two ids differ, so the Rollout's `--replaces` call is the one that
-applies at writing.
+applies at writing. Re-read at `68942eb0`, the record carries no `host` or `pid-image` fact
+either, so `keepalive` is the only lease fact it has, the shape S13 and AC22 give a leaseless
+fixture.
