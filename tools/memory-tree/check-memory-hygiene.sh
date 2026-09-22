@@ -82,14 +82,14 @@ BASE_RESOLVE_CUTOFF=""  # date; a LIVE spec dated >= this must have its `base` s
 # means no independent line cap for that class. Validated below: awk compares a bad -v binding
 # silently, so an unvalidated typo here is a gate that reds everything or nothing with no message.
 INDEX_CAP_BYTES=20480         ; INDEX_CAP_LINES=250
-# THE GUIDE PAIR WAS RAISED ON 2026-09-22, from 61440 / 750, by TOOL-dGatedProse-3 on two owner
+# THE GUIDE PAIR WAS RAISED ON 2026-09-22, by eight fifths, by TOOL-dGatedProse-3 on two owner
 # rulings: TOOL-dLoggedFlight-33 (2026-09-20: raise the cap rather than split or trim the carrier)
 # and the pair itself (2026-09-21: 98304 and 1200, re-ruled the same day over a first-ratified
 # 81920 and 1000). The trigger was a MERGE-INDUCED overflow of the largest guide, the unattended
 # protocol: two parents each legal alone, their union over the byte cap and carried as a
 # curation-debt row until this raise drained it. BOTH GUIDE_CAP_BYTES AND GUIDE_CAP_LINES MOVED,
-# by one scalar (eight fifths), so the 81.92 B/line allowance is unchanged. A byte-only raise would
-# have lasted about 17 days: that guide stood at 704 of 750 lines, so the line axis reds first.
+# by that one scalar, so the 81.92 B/line allowance is unchanged. A byte-only raise would have
+# lasted about 17 days: that guide stood 46 lines under the retired line cap, which reds first.
 # Measured refill since its last intervention on 2026-09-01: 509.9 B/day and 2.67 lines/day, so
 # the raise buys 33365 B, about 65 days, and 496 lines, about 186 days; bytes stay the binding axis.
 GUIDE_CAP_BYTES=98304         ; GUIDE_CAP_LINES=1200
