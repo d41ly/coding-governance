@@ -15,7 +15,7 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=95
+FLOOR_ASSERTIONS=96
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
@@ -42,6 +42,8 @@ FLOOR_ASSERTIONS=95
 # RAISED 91 -> 95 at the closing diff review of dGatedProse (round 1), by the count of `arm`/`pass=`
 # lines its fold added: 2 `arm` calls for R1's composite claims token and 2 inline increments for
 # R3's tilde fences, each observed RED against the checker before the fold.
+# RAISED 95 -> 96 at round 2 of that review (F3): one inline increment for the arm that uses the
+# composite waiver token alone and expects green, observed RED against a copy that never waives a claim.
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -891,6 +893,23 @@ sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlo
 printf 'tools/nope.sh\t[path] no path hit is left\nclaims <- tools/nope.sh\t[claims] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "R1 a [path] row whose path hit is gone reads stale though a claims sentence names the string" 1 "$d" 'STALE WAIVER `tools/nope.sh` — no spec produces this hit any more'
+git -C "$d" reset -q --hard "$clean"
+
+# R1 — ...and the remedy the fold documents works: the composite token, the only row, waives the
+#      claims hit it names, so the run is green and --list reports the hit as WAIVED (round 2, F3).
+sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlog.md` claims `tools/nope.sh`.\n\n## 6. Acceptance criteria|' "$spec"
+printf 'claims <- tools/nope.sh\t[claims] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+# The VERDICT comes from a plain run, because --list exits 0 and returns before any stale row prints;
+# --list is read only for the WAIVED row, which proves the hit exists and was waived rather than missed.
+out=$(cd "$d" && "$PY" "$LINT" 2>&1); rc=$?
+lst=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if [ "$rc" = 0 ] && printf '%s\n' "$lst" | grep -qF 'WAIVED [claims]' && ! printf '%s\n' "$out" | grep -qF 'STALE WAIVER'; then
+  echo "arm ok    R1 the composite token alone in the registry waives the claims hit it names"; pass=$((pass+1))
+else
+  echo "arm FAIL  R1 the composite waiver — expected rc 0, a WAIVED [claims] row and no stale row, got rc $rc"
+  printf '%s\n' "$out" | grep -E 'claims|STALE' | head -3; fail=$((fail+1))
+fi
 git -C "$d" reset -q --hard "$clean"
 
 total=$((pass+fail))

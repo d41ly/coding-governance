@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-20
 streams: tooling
 roster: TOOL
-ids: TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 TOOL-dGatedProse-6 TOOL-dGatedProse-7 TOOL-dGatedProse-8 TOOL-dGatedProse-9 TOOL-dGatedProse-10 TOOL-dGatedProse-11
+ids: TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 TOOL-dGatedProse-6 TOOL-dGatedProse-7 TOOL-dGatedProse-8 TOOL-dGatedProse-9 TOOL-dGatedProse-10 TOOL-dGatedProse-11 TOOL-dGatedProse-12
 ---
 
 # dGatedProse — the owner's rulings on dLoggedFlight's parked decisions, built only where a dry run earned it
@@ -61,8 +61,8 @@ build method's size budget stands and moves, and on 2026-09-22 set it at 30720 b
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-dGatedProse-1` | CLOSED | hygiene check 25: a live spec that retires a thing names its readers in a `**Readers:**` clause |
-| 2 | `TOOL-dGatedProse-2` | CLOSED | a sixth spec-tokens join: a sentence saying a dossier claims a key names a key that dossier claims |
-| 3 | `TOOL-dGatedProse-3` | CLOSED | the guide cap raised to 98304 bytes and 1200 lines, with the one kit version bump |
+| 2 | `TOOL-dGatedProse-2` | CLOSED | a sixth spec-tokens join: a dossier-claim sentence naming a path, a glob or a code symbol reds |
+| 3 | `TOOL-dGatedProse-3` | CLOSED | the guide cap raised to 98304 bytes and 1200 lines, with the build's first kit version move |
 | 4 | `TOOL-dGatedProse-4` | CLOSED | M4 bounds the promotion chain by review precision, and the build method's budget moves |
 | 5 | `TOOL-dGatedProse-5` | CLOSED | Readers clauses written into every live item check 25 fires on, landed first |
 
@@ -70,19 +70,19 @@ build method's size budget stands and moves, and on 2026-09-22 set it at 30720 b
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 5 unit(s) · node d · opened 2026-09-20 · streams tooling
-ids TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 TOOL-dGatedProse-6 TOOL-dGatedProse-7 TOOL-dGatedProse-8 TOOL-dGatedProse-9 TOOL-dGatedProse-10 TOOL-dGatedProse-11
+ids TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 TOOL-dGatedProse-6 TOOL-dGatedProse-7 TOOL-dGatedProse-8 TOOL-dGatedProse-9 TOOL-dGatedProse-10 TOOL-dGatedProse-11 TOOL-dGatedProse-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dGatedProse-5 — the corpus answers for its readers before the check that asks](spec/2026-09-21-spec-TOOL-dGatedProse-5.md) | 1 | 2 | CLOSED | rev-8 | 2026-09-22 |
-| [TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads](spec/2026-09-20-spec-TOOL-dGatedProse-1.md) | 2 | 2 | CLOSED | rev-12 | 2026-09-22 |
-| [TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold](spec/2026-09-20-spec-TOOL-dGatedProse-2.md) | 3 | 2 | CLOSED | rev-10 | 2026-09-22 |
+| [TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads](spec/2026-09-20-spec-TOOL-dGatedProse-1.md) | 2 | 2 | CLOSED | rev-13 | 2026-09-22 |
+| [TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold](spec/2026-09-20-spec-TOOL-dGatedProse-2.md) | 3 | 2 | CLOSED | rev-11 | 2026-09-22 |
 | [TOOL-dGatedProse-3 — the guide cap rises on both axes, with the reason recorded beside the figure](spec/2026-09-20-spec-TOOL-dGatedProse-3.md) | 4 | 2 | CLOSED | rev-6 | 2026-09-22 |
 | [TOOL-dGatedProse-4 — M4 bounds the spec-audit promotion chain by review precision](spec/2026-09-20-spec-TOOL-dGatedProse-4.md) | 5 | 2 | CLOSED | rev-7 | 2026-09-22 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

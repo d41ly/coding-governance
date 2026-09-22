@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.84   # gov:kit memory-tree@2.84 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.85   # gov:kit memory-tree@2.85 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -1993,6 +1993,8 @@ $bad12"
 # ---- shape is the protection here and the leg ceiling is not.
 # ---- A token resolves by CONTENT where a READER spells it AS A WHOLE WORD: at each end of the token
 # ---- that is a letter, digit or underscore, the byte beside it in the reader must be none of those.
+# ---- A token carrying a hyphen counts the hyphen among them at both ends, so a kebab-case name or a
+# ---- flag does not resolve inside a longer kebab-case sibling either (closing review, round 2, F2).
 # ---- As a bare substring a deleted helper resolved inside its surviving longer sibling, and a short
 # ---- name after the call-suffix strip resolved inside almost any word (closing review, round 1, R2).
 # ---- An end that is punctuation, a path's slash or a dot, is already its own boundary. The grep below
@@ -2022,14 +2024,15 @@ if [ -n "$_rdtok" ]; then
   _rdres=$( { printf '%s\n' "$_rdtok"
               git -c core.quotePath=false ls-files | awk '{ print "P\t" $0 }'
               printf '%s\n' "$_rdhit" | awk 'NF { print "C\t" $0 }'; } | awk -F'\t' -v m="$M" '
-    function test_whole_token(s, w,    q, p, hb, ha, b, a) {
-      hb = (substr(w, 1, 1) ~ /[A-Za-z0-9_]/); ha = (substr(w, length(w), 1) ~ /[A-Za-z0-9_]/)
+    function test_whole_token(s, w,    q, p, wc, hb, ha, b, a) {
+      wc = (index(w, "-") > 0) ? "[-A-Za-z0-9_]" : "[A-Za-z0-9_]"
+      hb = (substr(w, 1, 1) ~ wc); ha = (substr(w, length(w), 1) ~ wc)
       q = 0
       while ((p = index(substr(s, q + 1), w)) > 0) {
         p += q
         b = (p > 1) ? substr(s, p - 1, 1) : ""
         a = substr(s, p + length(w), 1)
-        if ((!hb || b !~ /[A-Za-z0-9_]/) && (!ha || a !~ /[A-Za-z0-9_]/)) return 1
+        if ((!hb || b !~ wc) && (!ha || a !~ wc)) return 1
         q = p
       }
       return 0

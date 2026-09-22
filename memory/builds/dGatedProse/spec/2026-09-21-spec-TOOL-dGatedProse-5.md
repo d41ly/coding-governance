@@ -11,6 +11,7 @@
 | [2026-09-22-build-TOOL-dGatedProse-5-corpus-census.md](../build/2026-09-22-build-TOOL-dGatedProse-5-corpus-census.md) | journal | — |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 |
 | [2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md](../reviews/2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md) | diff-review | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 |
+| [2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round2.md](../reviews/2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round2.md) | diff-review | TOOL-dGatedProse-1 TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 |
 
 <!-- /gen:spec-records -->
 

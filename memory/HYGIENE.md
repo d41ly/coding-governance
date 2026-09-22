@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.84 -->
+<!-- gov:kit memory-tree@2.85 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -360,8 +360,9 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     or a waiver registry, which quotes a name and so resolves nothing by content. A name also resolves when it is a tracked path, or the part of
     one after a `/`, anywhere in the tree. A `:<line>` tail and a trailing `()` are stripped before
     either test. A whole word means that at each end of the name that is a letter, digit or
-    underscore, the character beside it in the reader is none of those, so a name spelled only
-    inside a longer identifier resolves nothing.
+    underscore, the character beside it in the reader is none of those, and a name carrying a
+    hyphen counts the hyphen among them. So a name spelled only inside a longer identifier
+    resolves nothing, a hyphenated name inside a longer hyphenated one included.
     **Not reached, and named rather than implied away:** a retirement whose backticked tokens hold no
     identifier shape, and a retirement carrying no backticked token at all. The author of either is
     never asked, and the remedy is to name the withdrawn thing in backticks.

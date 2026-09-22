@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold
 
-**Status:** CLOSED · rev-10 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 3
+**Status:** CLOSED · rev-11 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-22-build-TOOL-dGatedProse-2-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dGatedProse-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 | [2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md](../reviews/2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md) | diff-review | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
+| [2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round2.md](../reviews/2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round2.md) | diff-review | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 
 <!-- /gen:spec-records -->
 
@@ -917,6 +918,12 @@ declined mechanism. figure PINNED — node d, 2026-09-21.
   by it. Grading on the engine's negative test instead is a behaviour change to a shared population
   and goes to a backlog row. Four arms observe R1 and R3, each observed RED against the join as
   built, and the suite's floor moves from 91 to 95.
+- rev-11 · 2026-09-22 · §5 · the closing diff review, round 2, folded two findings. F3 (LOW): the
+  composite waiver token rev-10 documents gains an arm that uses it as the only row and expects
+  green, observed RED against a copy of the checker that never waives a claim, and the floor moves
+  from 95 to 96. F1 (MEDIUM): the closed backlog row `TOOL-dLoggedFlight-32` and the build README's
+  roster row credited this join with an ownership check it does not have. Both are re-worded to what
+  §3 and §8 F1 say: the join grades shape, resolves no key and reads no dossier.
 
 ## 10. Reuse audit
 

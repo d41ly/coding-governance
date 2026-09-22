@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-1 — a retirement answers for its readers, as a shape a machine reads
 
-**Status:** CLOSED · rev-12 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
+**Status:** CLOSED · rev-13 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-22-build-TOOL-dGatedProse-1-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dGatedProse-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 | [2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md](../reviews/2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md) | diff-review | TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
+| [2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round2.md](../reviews/2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round2.md) | diff-review | TOOL-dGatedProse-2 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 
 <!-- /gen:spec-records -->
 
@@ -1805,6 +1806,15 @@ here, where it would read as an observation.
   commit: unit 3's S8 moved it once for the build as built, and this fold is the second move. The
   same round's R4 (LOW) is folded in part here: the spec template names check 25's population as
   every spec that is not CLOSED or WONTDO.
+- rev-13 · 2026-09-22 · S5 · the closing diff review, round 2, folded three LOW findings on rev-12's
+  fix. F2: a by-name token carrying a hyphen counts the hyphen as a word character at both ends, so
+  a kebab-case name or a flag no longer resolves inside a longer kebab-case sibling, which rev-12's
+  HYGIENE sentence already claimed; fixture 221 observes it. F4: fixture 220 observes the leading
+  boundary, a name spelled only as the tail of a longer identifier, which 218 and 219 could not
+  see because both fail on the trailing byte. F5: the fixture header no longer types a count. Each
+  new fixture was observed RED first, 221 against rev-12's engine and 220 against an engine with the
+  leading test removed. The engine moves again, so memory-tree moves 2.84 to 2.85 in the same
+  commit, the build's third version move.
 
 ## 10. Reuse audit
 

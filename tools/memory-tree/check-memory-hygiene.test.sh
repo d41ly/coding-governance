@@ -844,11 +844,11 @@ write_base_spec 192 26 CLOSED 2 0123abcd
 # 193 — PRE-cutoff twin of 190. Nothing landed goes retroactively red.
 write_base_spec 193 10 OPEN 2 0123abcd
 
-# ---- TOOL-dGatedProse-1: CHECK 25's eighteen fixtures, tFixture-200 to tFixture-217. Every one is
+# ---- TOOL-dGatedProse-1: CHECK 25's fixtures, from tFixture-200 upward. Every one is
 # ---- Tier-1, dated 2026-08-25 and carries NO acceptance heading: past every check-12 rule cutoff the
 # ---- shared conf declares and before BASE_RESOLVE_CUTOFF, with check 12's scope-join arm silent on
 # ---- each by construction, so a red here can only be check 25. All LIVE except 210, the CLOSED twin
-# ---- of 200, and all carry the section-8 none a terminal status needs. They sit ABOVE the commit for
+# ---- of 200, the later ones the closing review's reds included, and all carry the section-8 none a terminal status needs. They sit ABOVE the commit for
 # ---- the reason check 22's do: the engine selects by `git ls-files`, so an untracked fixture is graded
 # ---- by nothing. The assertions are one block further down, after the conf-shaped observations.
 write_readers_spec() { # $1 = num, $2 = status, $3 = the section-2 body
@@ -857,7 +857,7 @@ write_readers_spec() { # $1 = num, $2 = status, $3 = the section-2 body
   } > "$D/spec/2026-08-25-spec-tFixture-$1.md"; }
 # The READER the green fixtures resolve against: a guide is a reader by class. Nothing else in this
 # tree spells either of its two tokens, and its path is what 201 names by identity, with a line tail.
-printf '# treaders guide\n\nThe shard reader is `count_shard_rows`, which compares a row count against the pin.\nThis guide is the one file in the tree that spells `tSpelledInGuide`.\nIts last line spells `tRerunAll` and nothing shorter.\n' > memory/guides/treaders.md
+printf '# treaders guide\n\nThe shard reader is `count_shard_rows`, which compares a row count against the pin.\nThis guide is the one file in the tree that spells `tSpelledInGuide`.\nIts last line spells `tRerunAll` and the flag `--dry-run`, and nothing shorter.\n' > memory/guides/treaders.md
 # 200 -- a retirement verb and an underscore identifier, no clause -> RED, named by its S label
 write_readers_spec 200 SPECCED '- **S1** — retire the `shard_arity` pin and the rows it carried.'
 # 201 -- a conforming clause: a tracked path cited with a line tail and a symbol written with a call
@@ -939,6 +939,14 @@ write_readers_spec 218 SPECCED '- **S1** — retire the `shard_arity` pin.
 # 219 -- ...and the same after the call-suffix strip, where the short name is the whole risk -> RED
 write_readers_spec 219 SPECCED '- **S1** — retire the `shard_arity` pin.
   - **Readers:** by name: `tRerun()` spells it. by value: `count_shard_rows` compares against it.'
+# 220 -- round 2's F4: the LEADING boundary, a name the reader spells only as the tail of a longer
+#        identifier -> RED. 218 and 219 fail on the trailing byte, so neither can see this half.
+write_readers_spec 220 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `shard_rows` spells it. by value: `count_shard_rows` compares against it.'
+# 221 -- round 2's F2: a hyphenated name counts the hyphen as a word character, so a flag the reader
+#        spells only inside a longer flag does not resolve -> RED
+write_readers_spec 221 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `--dry` spells it. by value: `count_shard_rows` compares against it.'
 
 git add -A && git commit -q -m fixtures --no-verify
 # 191 — the green twin, and it can only be written HERE: its base must name a commit that exists,
@@ -1593,6 +1601,8 @@ cnot 25 'DECISIONS.2026-08-01.md'
 # prefix of a longer name nor a short name inside a longer word resolves.
 chit 25 'tFixture-218.md (§2 item S1: by name: lists `count_shard`, which no reader spells'
 chit 25 'tFixture-219.md (§2 item S1: by name: lists `tRerun`, which no reader spells'
+chit 25 'tFixture-220.md (§2 item S1: by name: lists `shard_rows`, which no reader spells'
+chit 25 'tFixture-221.md (§2 item S1: by name: lists `--dry`, which no reader spells'
 # AC13: the declared dependency is ONE key. Blank SPEC_FORMAT_CUTOFF: nothing is named and exactly one
 # line says so, without the failure prefix. Armed, with SCOPE_JOIN_CUTOFF BLANK: 200 is named, which is
 # the arm proving check 25 is in the accumulator's union guard, and the disarmed line is gone.
@@ -2662,7 +2672,8 @@ esac
 # never in a subshell, so each is one increment of `n` and the pin stays the printed number.
 # RAISED 411 -> 434 at the closing diff review of dGatedProse, round 1, to the PRINTED count again:
 # its two R2 chit calls, and the arms the reconcile with main brought in without a raise.
-FLOOR_ASSERTIONS=434
+# RAISED 434 -> 436 at round 2 of that review: the chit calls for fixtures 220 and 221.
+FLOOR_ASSERTIONS=436
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
