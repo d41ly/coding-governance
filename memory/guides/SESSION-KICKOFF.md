@@ -60,7 +60,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   verbatim after a compaction). Step 1 consumes it; Step 5 appends the READY card through
   `--card --append`. A main-loop `git commit` in a session whose startup card still reads
   `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js` with the remedy in stderr; an
-  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`.
+  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`. A commit from
+  any tree the card does not name is refused too, so a scratch worktree cannot commit: carry its diff
+  back as a patch (hit by `dBackdatedFixture`).
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).

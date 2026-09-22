@@ -512,6 +512,65 @@ def settle(t: pathlib.Path, msg: str = "fixture") -> None:
     git(t, "commit", "-qm", msg)
 
 
+def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
+                          vintage: str) -> tuple[list[str], list[str]]:
+    """Rewind an applied target's receipt and bytes to `vintage`. Returns (kept, dropped) paths.
+
+    DEPL-dBackdatedFixture-1. A row whose source gov did NOT ship at `vintage` is DROPPED -- from the
+    receipt, and from the target's index and worktree -- never given an identity there. No install
+    landed at that vintage could hold it. The two inline loops this replaces rewound EVERY row, so
+    when `TOOL-aReplayedCard-2` gave check-wiring a file `24f39915` never had, they recorded the
+    empty blob's id as its `gov_oid` and `update`'s S9 preamble (`DEPL-dCarriedReceipt-7`) refused
+    the whole receipt at exit 2. Twenty-seven arms over the two builders went red, and most of their
+    details were stdout-only, so the first FAIL lines named the measurer instead of the refusal. A
+    dropped row is what an adopter who installed before the file existed really holds, and
+    `update --write` lands it as an unclaimed source (DEPL-dRatifiedSeam-1 S3).
+
+    WHAT IS REWOUND, AND WHAT IS NOT. `commit`, `sha256` and `gov_oid` move to `vintage`, and BOTH
+    identities from the SAME vintage, or the row is S9's corruption rather than an older install --
+    through the engine's own helpers, so the fixture and the thing it grades cannot disagree about
+    what a blob is named. `version` and `oid` stay as `apply` wrote them at HEAD, so any comparison
+    of either against a vintage reads as if the target were at HEAD, whichever `--to` a run names.
+    No arm grades either field over these fixtures today; one that does must rewind them first.
+
+    A row with no `source` is left as `apply` wrote it. `apply` emits one -- the synthesized
+    `attributes` row -- when its selection or a kit the receipt already records declares an `lf_pin`,
+    and `adopt` when its selection does. Both builders apply check-wiring alone to a fresh target and
+    it declares none, so neither holds one and no arm observes the branch. Keep the guard: without it
+    `cat-file -e <vintage>:None` fails and `.gitattributes` would be `git rm`'d. The arms that grade
+    this helper read the target's STATE against the descriptor, never this return value.
+    """
+    gk = govkit_module()
+    rp = target / ".governance" / "install.json"
+    rec = json.loads(rp.read_text(encoding="utf-8"))
+    rec["gov_commit"] = vintage
+    rows: list[dict] = []
+    kept: list[str] = []
+    dropped: list[str] = []
+    for f in rec["files"]:
+        src = f.get("source")
+        if not src:
+            rows.append(f)
+            continue
+        shipped = subprocess.run(["git", "-C", str(govroot), "cat-file", "-e", f"{vintage}:{src}"],
+                                 capture_output=True).returncode == 0
+        if not shipped:
+            git(target, "rm", "-q", "-f", "--", f["path"])
+            dropped.append(f["path"])
+            continue
+        b = subprocess.run(["git", "-C", str(govroot), "show", f"{vintage}:{src}"],
+                           capture_output=True).stdout
+        f["commit"] = vintage
+        f["sha256"] = gk._sha(b)
+        f["gov_oid"] = gk.blob_oid(b)
+        (target / f["path"]).write_bytes(b)
+        rows.append(f)
+        kept.append(f["path"])
+    rec["files"] = rows
+    rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+    return kept, dropped
+
+
 def make_target(tmp: pathlib.Path, deploy: str | None) -> pathlib.Path:
     t = tmp / "target"
     t.mkdir(parents=True, exist_ok=True)
@@ -922,38 +981,51 @@ def main() -> int:
         def stale_target(name: str, deploy: str = DEPLOY_FULL) -> pathlib.Path:
             t = make_target(tmp / name, deploy)
             run("apply", "--target", str(t), "--kits", "check-wiring")
-            rp = t / ".governance" / "install.json"
-            rec = json.loads(rp.read_text(encoding="utf-8"))
-            rec["gov_commit"] = OLD
-            for f in list(rec["files"]):
-                f["commit"] = OLD
-                shown = subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:{f['source']}"],
-                                       capture_output=True)
-                # A FILE THE KIT DID NOT SHIP AT THE OLD VINTAGE was never received by an install
-                # landed there, so its row and its bytes go, rather than the EMPTY blob `show`
-                # hands back being recorded as its identity — which `-7` S9 refuses, correctly,
-                # and refused this whole fixture from the day `check-wiring.fragment.json` joined
-                # the kit (TOOL-aReplayedCard-2, a month after the pinned vintage).
-                if shown.returncode != 0:
-                    rec["files"].remove(f)
-                    (t / f["path"]).unlink()
-                    continue
-                b = shown.stdout
-                f["sha256"] = __import__("hashlib").sha256(b).hexdigest()
-                # AND `gov_oid`, or this fixture is not "landed at an older vintage" — it is a row
-                # whose `commit` came from one vintage and whose `gov_oid` came from another, which
-                # is EXACTLY the corruption `-7` S9 refuses. Measured: nine arms went red on that
-                # refusal, and they were right to. The engine's own helper, so the fixture and the
-                # thing it grades cannot disagree about what a blob is named.
-                f["gov_oid"] = govkit_module().blob_oid(b)
-                (t / f["path"]).write_bytes(b)
-            rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
-            # -12 S4: `apply` staged every row, and the loop above then rewound their bytes in
+            # BOTH identities from OLD, and no row OLD never shipped: `write_vintage_receipt`'s
+            # header says why each half is load-bearing. Measured before either: nine arms red on
+            # a mixed-vintage row, and 27 on a row invented at a vintage that lacked its file.
+            write_vintage_receipt(govroot, t, OLD)
+            # -12 S4: `apply` staged every row, and the rewind then changed their bytes in
             # the worktree. Both halves are dirty by that definition, so the fixture commits
             # the stale state it just built — the target is legitimately AT an older vintage,
             # which is a committed fact about it and not an operator's work-in-progress.
             settle(t, "landed at the older vintage")
             return t
+
+        # --- DEPL-dBackdatedFixture-1. THE FIXTURE HOLDS ONLY ROWS `OLD` SHIPPED, with their identities
+        # --- at OLD, graded BEFORE any arm consumes it (`version` and `oid` are not rewound; the
+        # --- helper's header says so). Expectation from the DESCRIPTOR split by `ls-tree` at OLD,
+        # --- never from the helper's return value or the receipt it wrote. The acceptance arm carries
+        # --- stderr: on 4cf0944d this builder's fixture was refused there, and most consumer arms'
+        # --- stdout-only details pointed at the measurer's UNVERIFIED line instead.
+        bf = stale_target("bf")
+        _gbf = govkit_module()
+        _bf_writes = _gbf.resolve_entry(
+            govroot, _gbf.load_toml(govroot / "tools" / "govkit" / "entries" / "check-wiring.kit.toml"),
+            _gbf.canonical_ctx("check-wiring"))["writes"]
+        _bf_old = set(run_gov_git(govroot, "ls-tree", "-r", "--name-only", OLD).splitlines())
+        _bf_drop = {d for d, w in _bf_writes.items() if w["src"] and w["src"] not in _bf_old}
+        _bf_keep = set(_bf_writes) - _bf_drop
+        _bf_rows = json.loads((bf / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]
+        _bf_ids = [f for f in _bf_rows if f.get("commit") and f.get("gov_oid")]
+        check("[dBF] AC1 every rewound row's gov_oid is gov's own blob at its commit, by rev-parse",
+              len(_bf_ids) > 0
+              and all(run_gov_git(govroot, "rev-parse", f"{f['commit']}:{f['source']}") == f["gov_oid"]
+                      for f in _bf_ids),
+              json.dumps([(f["path"], str(f.get("commit"))[:8], str(f.get("gov_oid"))[:8])
+                          for f in _bf_rows]))
+        check("[dBF] AC2 LIVENESS the descriptor ships a file OLD did not, so the drop is exercised",
+              len(_bf_drop) > 0, f"descriptor writes {sorted(_bf_writes)}, none absent at {OLD[:8]}")
+        check("[dBF] AC2 the receipt holds exactly the rows OLD shipped",
+              {f["path"] for f in _bf_rows} == _bf_keep,
+              f"receipt {sorted(f['path'] for f in _bf_rows)} · expected {sorted(_bf_keep)}")
+        check("[dBF] AC2 a row OLD did not ship is gone from the target's index as well",
+              not (_bf_drop & set(run_gov_git(bf, "ls-files").split())),
+              f"dropped {sorted(_bf_drop)} · index {run_gov_git(bf, 'ls-files')}")
+        _pbf = run("update", "--target", str(bf))
+        check("[dBF] AC3 update ACCEPTS the stale_target fixture: exit 0, no REFUSING on stderr",
+              _pbf.returncode == 0 and "REFUSING" not in _pbf.stderr,
+              f"rc {_pbf.returncode} · stderr: {_pbf.stderr[-900:]} · stdout: {_pbf.stdout[-600:]}")
 
         up = stale_target("u2a")
         p = run("update", "--target", str(up))
@@ -1051,10 +1123,25 @@ def main() -> int:
         rec = json.loads(rp_v.read_text(encoding="utf-8"))
         for f in rec["files"]:
             f["version"] = "STALE-SENTINEL"
+        # DEPL-dBackdatedFixture-2. THE POPULATION IS THE ROWS HELD BEFORE THE WRITE. The fixture no
+        # longer carries a row its vintage never shipped, so `update --write` LANDS that file as a new
+        # row with a freshly resolved `version` (DEPL-dRatifiedSeam-1 S3). That row never held the
+        # sentinel, and it alone satisfied all three arms below with the refresh they guard deleted --
+        # measured by the spec audit on a scratch clone, `govkit.py`'s raw-write `version` line staged
+        # as `pass`. So the arms grade `_held` rows only, and the liveness arm proves the scoping
+        # excludes something rather than nothing.
+        _held = {f["path"] for f in rec["files"]}
         rp_v.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
         p = run("update", "--target", str(vr), "--write")
         rec = json.loads(rp_v.read_text(encoding="utf-8"))
-        _moved = [f for f in rec["files"] if f.get("version") != "STALE-SENTINEL"]
+        _moved = [f for f in rec["files"]
+                  if f["path"] in _held and f.get("version") != "STALE-SENTINEL"]
+        _added = [f["path"] for f in rec["files"] if f["path"] not in _held]
+        check("[dBF] LIVENESS the write ADDED a row the sentinel never touched, so the scoping "
+              "excludes something",
+              len(_added) > 0,
+              f"receipt after the write {sorted(f['path'] for f in rec['files'])} · held before "
+              f"{sorted(_held)}")
         check("[dGV-9] update --write refreshes a refreshed row's version, not only sha256/commit",
               len(_moved) > 0, json.dumps(rec["files"], indent=1)[:900])
         check("[dGV-9] and the refreshed value is the constant's SOURCE LINE, the shape "
@@ -1062,7 +1149,7 @@ def main() -> int:
               any("KIT_CHECK_WIRING_VERSION" in (f.get("version") or "") for f in _moved),
               json.dumps([f.get("version") for f in rec["files"]])[:500])
         check("[dGV-9] and sha256 and commit moved with it, so the three stay one fact",
-              all(f.get("commit") and f.get("sha256") for f in _moved),
+              len(_moved) > 0 and all(f.get("commit") and f.get("sha256") for f in _moved),
               json.dumps(_moved, indent=1)[:600])
 
         # --- DEPL-dGaugedVintage-10. THE MEASURER'S OWN CURRENCY. `demand_published_vintage` and
@@ -1288,22 +1375,24 @@ def main() -> int:
         ev = make_target(tmp / "u5a", DEPLOY_FULL)
         run("apply", "--target", str(ev), "--kits", "check-wiring")
         pc = run("check", "--target", str(ev))
-        # THE EXPECTED COUNT IS THE DESCRIPTOR'S, read from the file that owns it rather than typed
-        # here: these three arms pinned `2/2` and went red the day a third file joined the kit
-        # (TOOL-aReplayedCard-2), which is a number beside the population it counts. The
-        # descriptor and not the receipt, because the receipt is the product's own output.
-        import tomllib as _cwtoml  # noqa: PLC0415
-        _cw_n = len(_cwtoml.loads((HERE / "entries" / "check-wiring.kit.toml")
-                                  .read_text(encoding="utf-8"))["files"][0]["include"])
-        check("PRECONDITION the descriptor ships more than one file, so the counts below are "
-              "not a 1/1 that any single-row loop would print", _cw_n > 1, str(_cw_n))
+        # DEPL-dBackdatedFixture-3. THE EXPECTATION COMES FROM THE DESCRIPTOR (DEPL-aTetheredConvoy-5
+        # S11), never from the receipt or `install.sums`: those are what `check` reads, so a receipt
+        # that lost a row would move both sides together. These arms typed `2/2` until
+        # TOOL-aReplayedCard-2 gave the kit a third file, which is the literal going stale in place.
+        _g5 = govkit_module()
+        _w5 = _g5.resolve_entry(
+            govroot, _g5.load_toml(govroot / "tools" / "govkit" / "entries" / "check-wiring.kit.toml"),
+            _g5.canonical_ctx("check-wiring"))["writes"].values()
+        _n5 = sum(1 for w in _w5 if w["role"] == "engine")
+        _p5 = sum(1 for w in _w5 if w["role"] == "engine" and w["src"])
+        _h5 = sum(1 for w in _w5 if w["src"])
         check("a clean install reports a DERIVED integrity count, non-zero",
-              f"integrity: {_cw_n}/{_cw_n}" in pc.stdout, pc.stdout)
-        check("and a derived provenance count", f"provenance: {_cw_n}/{_cw_n}" in pc.stdout,
-              pc.stdout)
+              _n5 > 0 and f"integrity: {_n5}/{_n5}" in pc.stdout, f"descriptor N={_n5} · {pc.stdout}")
+        check("and a derived provenance count",
+              _p5 > 0 and f"provenance: {_p5}/{_p5}" in pc.stdout, f"descriptor P={_p5} · {pc.stdout}")
         check("and compares the sidecar against the receipt, both counts named",
-              f"sidecar: {_cw_n} line(s) compared against {_cw_n} hashed row(s)" in pc.stdout,
-              pc.stdout)
+              _h5 > 0 and f"sidecar: {_h5} line(s) compared against {_h5} hashed row(s)" in pc.stdout,
+              f"descriptor H={_h5} · {pc.stdout}")
         check("a clean install exits 0 through those loops", pc.returncode == 0,
               pc.stdout + pc.stderr)
 
@@ -5054,28 +5143,10 @@ user_skills = "/tmp/gk-fake-skills"
             """
             t = make_target(tmp / name, DEPLOY_FULL)
             run("apply", "--target", str(t), "--kits", "check-wiring")
-            rp = t / ".governance" / "install.json"
-            rec = json.loads(rp.read_text(encoding="utf-8"))
-            rec["gov_commit"] = V8[0]
-            for f in list(rec["files"]):
-                if not f.get("source"):
-                    continue
-                b = gblob(V8[0], f["source"])
-                # NEVER RECEIVED AT THIS VINTAGE: a kit file gov did not ship at V8[0] leaves the
-                # receipt and the tree, as `stale_target` above does, rather than carrying the
-                # empty blob `gblob` returns for it as an identity `-7` S9 refuses. The fragment
-                # joined the kit at TOOL-aReplayedCard-2, a month after every one of these four.
-                if not b:
-                    rec["files"].remove(f)
-                    (t / f["path"]).unlink()
-                    continue
-                f["commit"] = V8[0]
-                # BOTH identities from the SAME vintage, or the fixture is `-7` S9's corruption
-                # rather than an older install, and every run below refuses before it classifies.
-                f["sha256"] = GK8._sha(b)
-                f["gov_oid"] = GK8.blob_oid(b)
-                (t / f["path"]).write_bytes(b)
-            rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+            # BOTH identities from the SAME vintage, or the fixture is `-7` S9's corruption rather
+            # than an older install, and every run below refuses before it classifies. The SAME
+            # helper as `stale_target`, which also drops a row V8[0] never shipped.
+            write_vintage_receipt(govroot, t, V8[0])
             settle(t, "landed at the oldest vintage")
             (t / CWS).write_bytes((t / CWS).read_bytes() + MINE8)
             settle(t, "the operator's line, committed")
@@ -5083,6 +5154,13 @@ user_skills = "/tmp/gk-fake-skills"
 
         def mine_count(t: pathlib.Path) -> int:
             return (t / CWS).read_bytes().count(MINE8.strip())
+
+        # DEPL-dBackdatedFixture-1 AC3, for THIS builder, before its first consumer arm below.
+        _bf8 = delta_target("d8-bf")
+        _pbf8 = run("update", "--target", str(_bf8))
+        check("[dBF] AC3 update ACCEPTS the delta_target fixture: exit 0, no REFUSING on stderr",
+              _pbf8.returncode == 0 and "REFUSING" not in _pbf8.stderr,
+              f"rc {_pbf8.returncode} · stderr: {_pbf8.stderr[-900:]} · stdout: {_pbf8.stdout[-600:]}")
 
         # ---- AC1: the sequence that destroyed the edit. Staged red twice over — see the header.
         t8 = delta_target("d8-ac1")

@@ -153,3 +153,4 @@ memory/builds/aBlindedTrial/README.md
 memory/builds/cMendedVintage/README.md
 memory/builds/dGatedProse/README.md
 memory/builds/dPinnedHandoff/README.md
+memory/builds/dBackdatedFixture/README.md
