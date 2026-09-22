@@ -1,12 +1,13 @@
 # TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 3
+**Status:** CLOSED · rev-9 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md](../build/2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md) | research | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
+| [2026-09-22-build-TOOL-dGatedProse-2-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dGatedProse-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md](../reviews/2026-09-21-review-TOOL-dGatedProse-1-spec-audit-round1.md) | spec-audit | TOOL-dGatedProse-1 TOOL-dGatedProse-3 TOOL-dGatedProse-4 TOOL-dGatedProse-5 |
 
 <!-- /gen:spec-records -->
@@ -655,7 +656,8 @@ AC7's unfenced copy, AC12's per-arm, uppercase and SHOUTED fixtures · floor mov
 
 ## 8. Open questions
 
-**F1 — does the object test RESOLVE against the map's key set, or refuse a closed set of shapes?**
+### F1 — does the object test RESOLVE against the map's key set, or refuse a closed set of shapes?
+
 `TOOL-dLoggedFlight-32` and the stage-1 dry run both specify resolution: take the object, resolve it
 against a live re-derivation of the inventories, and red what does not resolve.
 
@@ -686,7 +688,8 @@ join shortens the loop from the dossier edit to the spec commit and buys nothing
 eventually catch. The skeptic priced it as shortening a loop rather than closing a hole (research
 record `:297`-`:298`), and that pricing is accepted rather than argued with.
 
-**F2 — is a dated cutoff key declared for this arm, or does it grade every live spec at once?**
+### F2 — is a dated cutoff key declared for this arm, or does it grade every live spec at once?
+
 Both sibling rule arms in this checker took one, `SPEC_LEGLINE_CUTOFF` and `SPEC_DIRECT_CUTOFF`
 (`.memory-tree.conf:241` and `:276`), and rev-2 put the question to the owner rather than deciding it
 on a zero, which BUILD-METHOD M3 refuses as a fork resolver.
@@ -712,7 +715,9 @@ note, and its correction of rev-1's "23 of the 24" were deliberation for a quest
 they are DELETED rather than kept as a negation beside the answer; §9's rev-2 entry records the
 correction so nothing is lost.
 
-**F3 — two arms or four?** The §4 table answers it: active plus passive are red on 9 of the 13
+### F3 — two arms or four?
+
+The §4 table answers it: active plus passive are red on 9 of the 13
 re-spellings, the noun arm takes it to 11, and the fronted arm to 12.
 
 RESOLVED (agent, 2026-09-20; re-measured 2026-09-21): four. FACT-QUESTION · the probe is the same
@@ -895,6 +900,10 @@ declined mechanism. figure PINNED — node d, 2026-09-21.
   so `scan_claims` and `check_claim_canary` are two new rows, and the freshness test reds on the
   stale artifact until `gen_map.py --write` re-renders it. S9 now says so and Files touched lists
   the file. No criterion moves: the freshness test was always the key half's observation.
+- rev-9 · 2026-09-22 · §8 · the closing commit. The three forks open as `###` sub-heads rather than
+  bold paragraphs, because the hygiene engine counts a §8 item as a bullet or a `###` sub-head, and a
+  terminal spec whose §8 holds neither refuses as hollow. The pre-commit run of the closing commit
+  refused this spec on exactly that. No fork's question, resolution, resolver or date moves.
 
 ## 10. Reuse audit
 
