@@ -4702,12 +4702,16 @@ reset_tree
 # ---- driver's argument set before this, so the full bar stayed green while every documented call was
 # ---- missing a required argument. The render is regenerated from the template, so a drift between
 # ---- them is the adopter check's business; what this arm owns is that none of them loses the code.
-for f in "$HERE/SKILL.template.md" "$HERE/PROTOCOL.template.md"; do
+for f in "$HERE/SKILL.template.md" "$HERE/PROTOCOL.template.md" "$HERE/VERBS.template.md"; do
   [ -f "$f" ] || continue
+  # THE VERB ROW MOVED when the protocol pair was split: the sentence this arm reads is
+  # VERBS.template.md's now, and PROTOCOL.template.md describes the field rather than the call.
+  # A surface that does not mention the verb is not a surface that documents it.
+  grep -q -- "--abort" "$f" || continue
   if grep -q 'unattended.sh --abort <slug>' "$f"; then
     n=$((n+1)); grep -q 'unattended.sh --abort <slug> --code' "$f"       || { echo "FAIL a documented abort invocation omits the required code argument: $f"; st=1; }
   else
-    n=$((n+1)); grep -q 'requires a recorded reason, a HALT CODE' "$f"       || { echo "FAIL a documented abort description names no halt code, so the contract and the verb disagree: $f"; st=1; }
+    n=$((n+1)); grep -qi 'halt code' "$f"       || { echo "FAIL a documented abort description names no halt code, so the contract and the verb disagree: $f"; st=1; }
   fi
 done
 
