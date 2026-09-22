@@ -1,6 +1,14 @@
 # KICK-cKeyedLaunchpad-2 — one location list, and the three kits the move drags in
 
-**Status:** OPEN · rev-3 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** CLOSED · rev-3 · 2026-08-20 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md](../reviews/2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md) | spec-audit | KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5 |
+
+<!-- /gen:spec-records -->
 
 ## 1. Goal
 

@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-1 · base 6382c564 · streams tooling
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The NicoCares package repo sits at 109998 B of read path against a 110000 B ceiling — two bytes.

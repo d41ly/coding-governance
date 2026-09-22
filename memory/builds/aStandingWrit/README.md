@@ -188,7 +188,11 @@ with this build's file list, and the rev-1 spec was machine-clean against the fo
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
-<!-- roster:units -->
+#### The scope table this build shipped
+
+*Kept verbatim. It uses `S<n>` HANDLES, not unit ids, which is why the roster pair below it was
+INERT: `roster_ids` selects `[A-Z]+-<slug>-[0-9]+` and matched none of these. Recorded as fixed by
+`TOOL-dHonouredPark-1` rather than silently kept.*
 
 | Area | What changes |
 |---|---|
@@ -202,6 +206,12 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | **S7** | BUILT — seven statements of the rule, all now agreeing with the rule |
 | **S8** | BUILT — the roster marker pair, and the integrity check it makes possible |
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aStandingWrit-1` | 2 | the run authorizes on a plan it did not write |
+
 <!-- /roster:units -->
 
 
@@ -209,16 +219,17 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff
 ids TOOL-aStandingWrit-1 TOOL-aStandingWrit-2 TOOL-aStandingWrit-3 TOOL-aStandingWrit-4 TOOL-aStandingWrit-5 TOOL-aStandingWrit-6 TOOL-aStandingWrit-7 TOOL-aStandingWrit-8 TOOL-aStandingWrit-9
 
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | CLOSED | rev-6 | 2026-08-11 |
+<!-- gen:build-units -->
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aStandingWrit-1 — the run authorizes on a plan it did not write](spec/2026-08-11-spec-aStandingWrit-1.md) | — | 2 | CLOSED | rev-6 | 2026-08-11 |
+<!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 2 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-11-review-TOOL-aStandingWrit-1-1.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-1.md) | spec-audit | TOOL-aStandingWrit-1 |
-| [2026-08-11-review-TOOL-aStandingWrit-1-2.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md) | diff-review | TOOL-aStandingWrit-1 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -230,12 +241,3 @@ Records live under `spec/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-11-spec-aStandingWrit-1.md](spec/2026-08-11-spec-aStandingWrit-1.md)
-- **`reviews/`**
-  - [2026-08-11-review-TOOL-aStandingWrit-1-1.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-1.md)
-  - [2026-08-11-review-TOOL-aStandingWrit-1-2.md](reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md)
-<!-- /gen:build-docs -->

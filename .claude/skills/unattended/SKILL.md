@@ -2,17 +2,100 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.6 -->
+<!-- gov:kit unattended@1.28 -->
 
 # Unattended runs
 
-The binding contract is `memory/guides/UNATTENDED-PROTOCOL.md`. This is the operating
-summary; where they differ, the protocol wins and the difference is a bug in this render.
+The binding contract is `memory/guides/UNATTENDED-PROTOCOL.md` TOGETHER WITH
+`memory/guides/UNATTENDED-VERBS.md`, which holds the verb entries and is the second half of
+the same contract rather than a reference beside it. This is the operating summary; where they
+differ, the contract wins and the difference is a bug in this render.
 
 **The one thing to understand first.** An unattended run does not remove the checkpoint before a
 merge and a push — it REPLACES it with something a machine can check. If the replacement is not
 checkable, the run is not unattended, it is unsupervised. Everything below exists to keep that
 distinction real.
+
+## Before any path — schedule the idle-wake NOW
+
+**This is the run's first act, and it comes before you read anything else.** Not before preflight:
+before ORIENTING. Use `CronCreate`, at the cadence this project declares —
+every 10 minutes (cron 3-59/10 * * * *) — and keep the id it returns, because `--preflight` refuses without it.
+
+```
+CronCreate  ->  keep the id
+```
+
+**What the tick runs.** The prompt it schedules is the stall probe — once this session's
+`--preflight` has written the run's record, run `bash tools/unattended/unattended.sh --audit <slug>`;
+before that the tick does nothing. A slug can be known earlier, and a probe issued then refuses with
+check 51, or on a re-run build says the keepalive should have been reaped: both are expected before
+`--preflight`, and neither is a signal to reap the keepalive `--preflight` is about to need. The verb prints one line per dispatched-and-open unit with how long the TREE has
+been idle and a verdict against `UNIT_STALL_BOUND`. On `PROGRESSING` do nothing. On `STALLED`,
+act: stop the unit's task, record why with `--park` or a brief note, then re-dispatch that unit
+with a brief naming the stalled command and that it is skipped. The verb cannot see what the unit
+is doing or whether a process is stuck — its figures are the tree's, and the process side is the
+process-monitor kit's question, not this one's. Before this the tick fired every ten minutes
+while a `Workflow` ran in the background and did nothing with the turn. On `STALLED` act, and
+never end the turn by asking: the owner is absent, and a session bound to a non-terminal run has
+a stop-guard that refuses the stop and says so. The probe is also the run's heartbeat: the driver
+journals `--audit` like every verb but `--version` and `--plan` (protocol section 2), so each tick
+leaves a line in the run log, and a run that stalled reads as a gap in that journal instead of as
+silence.
+
+**Why it is here and not inside a path.** It used to be step 3 of the slug path and nowhere else, so
+three of the four paths below never reached it: the two that start from prose or a playbook orient,
+research, choose a solution, write a build folder and push a branch BEFORE their first verb, and that
+is the longest unattended stretch a run has. A run that stalls in it has no idle-wake, nothing wakes
+it, and nothing records why. A step written inside one path is a step the other three do not execute,
+which is why this one sits above the table instead.
+
+**One path below is NOT covered by this section, and it is named rather than left out**: `Resume`.
+A resumed session inherits a job it did not schedule and must PRESUME IT ALIVE — the intuition that
+the store went with the process is measured false, and `## Resume` says so with the measurement. That
+section therefore reaps before it schedules and carries its own instruction; this one cannot bind it.
+Every other path routes through the table below.
+
+**If the run never starts, reap it anyway.** Every path below can refuse — a value that does not
+resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s refusals. The store
+is session-scoped, so a job left by a run that never began is orphaned exactly like one left by a run
+that ended, and there is no run-state file for a later reader to find it through. Delete it with
+`CronDelete` before you stop.
+
+## What wakes a stalled run
+
+The idle-wake above fires only while the session is idle, so it cannot wake a stalled one. Three
+actors outside the session's turn can, and all three read one predicate: the stop-guard refuses a
+turn end while the run is non-terminal, up to `STOP_GUARD_BLOCKS` times, and says what to run
+instead; the stall-recorder writes an API-error end to the `stall` sidecar; the resume-tick,
+registered by the owner on the OS scheduler, resumes a run from another process on the verdicts
+the protocol's section 5 names as acting — not `STALE` alone. The
+predicate is `bash tools/unattended/unattended.sh --liveness <slug>`, the one to run by hand when you
+want to know what they will see. The tick's registration line is in the kit README and is not
+restated here.
+
+## Which path
+
+**Four start paths, and picking the wrong one costs a refusal you cannot answer.** Read the row that
+matches what you were handed. The last cell is the `authorized-by:` value the build folder declares,
+which is the key the merge bar re-derives and the driver records.
+
+| You were handed | Path | Declares |
+|---|---|---|
+| a build folder that already exists and names its units | [Start a run](#start-a-run) | `slug` |
+| prose or a prompt file, handed as `--prompt <value>`, and no build folder | [Start a run from a PROMPT](#start-a-run-from-a-prompt) | `prompt` |
+| a PLAYBOOK that already exists, and a number of pieces to make from it | [Start a PLAYBOOK run](#start-a-playbook-run) | `recipe` |
+| a topic and no playbook, handed the same way and bound by the same fence — the playbook is what you are to produce | [Author a PLAYBOOK](#author-a-playbook--creation-and-owner-instructed-amendment) | `prompt` |
+
+**The fourth row is the one a reader gets wrong.** Arriving with a topic and no playbook, the
+playbook-run path is the one that looks right and it is the one that cannot work: preflight refuses a
+`playbook:` that does not resolve at BASE, so a no-playbook start never reaches preflight at all.
+Making a playbook and following one are two acts with two authorizations.
+
+**A fifth path exists and it is not on this list, because it is not a run**: producing pieces from a
+playbook ATTENDED, with an owner in the loop. It writes no run-state file and calls no driver verb.
+It is [below](#produce-pieces-attended), after the unattended paths it shares its records with.
+It schedules no idle-wake, and the section above does not bind it: there is an owner in the loop.
 
 ## Start a run
 
@@ -24,30 +107,59 @@ distinction real.
    it; none of them restates one, and a cell here that grew into a rule would be a defect in this
    table rather than a second source of truth.
 
-   | Handle | What it names | Carrier | From |
-   |---|---|---|---|
-   | `minimal-prose` | the transcript rule under a mandate | M10 | D1 |
-   | `sub-specced` | one mechanism per spec, and sub-spec agreement | M2 | D2 |
-   | `forks-resolved` | when open questions are settled | M3 | D3 |
-   | `specs-reviewed` | the spec audit that precedes code | M4 | D4 |
-   | `reuse-first` | the recall and reuse obligation | M5 | D5 |
-   | `parallel-when-disjoint` | the parallelism default under a mandate | M6 | D6 |
-   | `passes-committed` | the commit boundary | M6 | D8 |
-   | `diff-reviewed` | the closing review of the cumulative diff | M8 | D7 |
-   | `land-once-done` | when a build may land | M8 | D8 |
-   | `conflicts-reconciled` | merge-conflict disposition | M8 | D8 |
-   | `wrap-up-derived` | how the wrap-up is composed | M9 | D8 |
+   | Handle | What it names | Carrier | Scope | From |
+   |---|---|---|---|---|
+   | `minimal-prose` | the transcript rule under a mandate | M10 | all | D1 |
+   | `sub-specced` | one mechanism per spec, and sub-spec agreement | M2 | all | D2 |
+   | `forks-resolved` | when open questions are settled | M3 | all | D3 |
+   | `specs-reviewed` | the spec audit that precedes code, when the build or its project declares it | M4 | all | D4 |
+   | `reuse-first` | the recall and reuse obligation | M5 | all | D5 |
+   | `parallel-when-disjoint` | the parallelism obligation | M6 | all | D6 |
+   | `passes-committed` | the commit boundary | M6 | all | D8 |
+   | `diff-reviewed` | the closing review of the cumulative diff | M8 | all | D7 |
+   | `land-once-done` | when a build may land | M8 | all | D8 |
+   | `conflicts-reconciled` | merge-conflict disposition | M8 | all | D8 |
+   | `wrap-up-derived` | how the wrap-up is composed | M9 | all | D8 |
+   | `discoveries-adopted` | a beneficial discovery joins the running build, decided at once | M10 | all | D12 |
+   | `passes-harnessed` | M6's pass sequence, DRIVEN as one program per protocol section 12 | M6 | all | D13 |
+   | `researched` | the candidate search when no seam fits | M12 | prompt | D9 |
+   | `solution-tested` | testing candidates before the pick | M12 | prompt | D10 |
+   | `playbook-followed` | the pass loop and its regrounding rule | M7 | recipe | D11 |
+   | `pieces-recorded` | the wrap-up derivation, over the pieces | M9 | recipe | D11 |
 
-   Two rows carry a consequence worth knowing before you waive them. **`reuse-first` — recommend
-   against.** Waiving it is SILENT: the bar stays green over a build that skipped the reuse probes,
-   because nothing machine-checks a spec's reuse section for content. A waived run's spec §10 must
-   NAME the waiver, or the skip leaves no trace at all. **`land-once-done`** — waiving it does not
-   remove the Definition-of-Done item that observes completeness; that still owes an override at
-   close.
-1. **The build folder IS the authorization — you do not write one, and neither does the owner.** A
-   `memory/builds/<slug>/README.md` committed before your branch existed is the whole
-   precondition. Preflight refuses a build folder you created, because a run that authorizes itself
-   has no authorization. You also do not create the run-state file: preflight does that.
+   **`Scope`** is which runs a directive binds. `all` binds every unattended run; a scope naming a
+   mode binds only a run whose build README declared that `authorized-by:` value. `prompt` scopes
+   research and a solution test, which are obligations of a build whose solution was not given.
+   `recipe` scopes the two rows above, which are obligations of a build whose instructions were
+   given: following them to the letter, and recording what came out. A waiver of a scoped handle is
+   REFUSED on a run of another mode rather than recorded, since it would relax a rule that never
+   bound it.
+
+   **Neither `recipe` row states its rule, and that is deliberate.** Following a declared procedure
+   to the letter IS the pass loop and its regrounding rule, and recording what was produced IS the
+   wrap-up derivation. Both sections already exist and both are already re-read; a section written
+   per directive is how a method grows until nobody re-reads it, which is what its own budget exists
+   to prevent.
+
+   Two rows carry a consequence worth knowing before you waive them. **`reuse-first`** — waiving it
+   is no longer silent, and both halves that made it so are closed. The `reuse-probed` item reports
+   the waiver and its recorded reason at `--close`, and where the project sets a reuse-evidence
+   cutoff the memory gate refuses a spec whose §10 is missing EITHER the recall terms or a probe
+   result — either one absent is a refusal, not only both. A waived run's spec §10 should still NAME the waiver — that is one of the things the gate
+   accepts as a finding, so naming it is also how the spec lands. **`land-once-done`** — waiving it
+   does not remove the Definition-of-Done item that observes completeness; that still owes an
+   override at close.
+1. **The build folder IS the authorization, and what makes it one is the ANCHOR it resolves at.** A
+   `memory/builds/<slug>/README.md` that resolves at the anchor this project declares is the
+   whole precondition. **This project's anchor scope is `published`.**
+   On the **default-branch** anchor that means committed before your branch existed, and preflight
+   REFUSES a build folder you created — a run that authorizes itself has no authorization. Where the
+   project declares **published**, the tip the remote advertises for your OWN branch also counts, so a
+   run may author its build folder and push it — but only where the build folder declares
+   `authorized-by: prompt` or `recipe`. A `slug` folder, which is what NO `authorized-by:` key means,
+   is refused on that anchor; protocol section 1 states what the anchor costs, and the
+   run-state file records which anchor was used. You still do not create the run-state file:
+   preflight does that.
    **If the build is not on the default branch, PUSH YOUR BRANCH FIRST.** Where the project declares
    `ANCHOR_SCOPE="published"`, a build folder that does not resolve at the merge-base is looked for
    at the tip the remote advertises for the branch you are on — so an unpushed commit authorizes
@@ -76,19 +188,17 @@ distinction real.
    the line and invents a handle gets a question, not a silent relaxation. Carry each confirmed pair
    into step 3 as `--waive <handle> --reason "<text>"`, repeatable.
 
-   Say what the waiver costs, for the two handles that have a consequence: `reuse-first` is silent
-   and is recommended against, and `land-once-done` still owes an override at close.
+   Say what the waiver costs, for the two handles that have a consequence: `reuse-first` surfaces at
+   close through the `reuse-probed` item and still owes its spec §10 a named waiver, and
+   `land-once-done` still owes an override at close.
 
    **From the next command onward there is nobody to ask.** The driver enforces that rather than
    trusting it — `--waive` is accepted by `--preflight` alone, and only while no run-state file
    exists or the requested set matches the recorded one. So a later verb cannot take an answer, and
    a re-preflight after a compaction re-issues the recorded set rather than opening a new turn.
 
-3. **Schedule the keepalive yourself.** This is your half and no script can do it: the scheduling
-   store is in-memory and session-scoped, reachable only through your own tool calls. Use
-   `CronCreate`, at the cadence this project declares — every 10 minutes (cron 3-59/10 * * * *). Keep the
-   id it returns.
-4. **Preflight**, handing over that id and any waiver pairs step 2 confirmed:
+3. **Preflight**, handing over the idle-wake id you already hold and any waiver pairs step 2
+   confirmed:
 
    ```bash
    bash tools/unattended/unattended.sh --preflight <slug> --keepalive-id <id>
@@ -97,10 +207,23 @@ distinction real.
 
    It refuses on a dirty tree, on the default branch, on an unwired repo, when the build README is
    absent at the pinned BASE or does not name this build, when the remote does not answer or
-   advertises no default branch of its own, and when a second run is already live. It writes nothing until every one of those
-   passes. Read the refusal it prints — each one names itself.
+   advertises no default branch of its own. It writes nothing until every one of those
+   passes. It does NOT refuse because another build is live — it announces the concurrent runs and
+   continues. Read the refusal it prints — each one names itself.
 
-5. **If this project ships `/session-kickoff`, invoke it now — after preflight, never before.**
+   One line before `preflight OK` states the spec-audit posture: `unattended: spec-audit — opted in
+   by README spec-audit: <date>` when the build README at BASE declares `spec-audit: <date>`,
+   `unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: <date>` when the README
+   declares no key and the project's `.unattended.conf` at BASE declares that date
+   (`TOOL-aBlindedTrial-7`; the README key wins whatever it says), or
+   `unattended: spec-audit — not owed (opt-in)` when neither does. The pre-code audit is OPT-IN per
+   build (owner ruling of 2026-09-20, `TOOL-aBlindedTrial-6`); both keys are read at BASE, so a
+   working-copy edit opts nothing in or out, and a value that is not a date is a refusal. The `not owed`
+   line carries a recommendation when the build has two or more units or a spec grades FORKED —
+   that is where the audit earned its cost in the trial. Keep the line: the harness call needs it.
+   After a compaction, `--status` carries the same fact as `· spec-audit <date>`.
+
+4. **If this project ships `/session-kickoff`, invoke it now — after preflight, never before.**
    The engine's unattended hand-back fires only when a run-state file already exists in a
    non-terminal phase, and `--preflight` is the only thing that creates one. Invoked first it
    halts at the READY card waiting for a confirmation nobody is present to give; invoked here it
@@ -111,8 +234,287 @@ distinction real.
    and the dated corrections and environment traps that repo has front-loaded. Skip it silently if
    the project has no such skill — that is legal, and this kit states none of what it carries.
 
+## Start a run from a PROMPT
+
+**Only when the invocation carries `--prompt`.** Prose alone is not an unattended build,
+however unattended it sounds — the parameter IS the authorization gesture, and inferring it from
+wording would let a description of a build start one. No `--prompt`, no prompt path; use the
+slug path above or do ordinary attended work. The fourth routing row above is this path too, so this
+fence binds a playbook-authoring start exactly as it binds a code one.
+
+**THE VALUE IS THE BUILD.** `--prompt` takes one argument, and it is everything after the token
+to the end of the invocation line, with one layer of surrounding quotes stripped before any test. It
+is either a path to a file holding the prompt, or the prompt itself. Test for the FILE FIRST — a
+relative path resolves against the repository root and never against wherever this session happens to
+be standing.
+
+| The value | What it is | What you do |
+|---|---|---|
+| no whitespace, names a readable file | a path | read it; the FILE'S CONTENT is the prompt |
+| no whitespace, names nothing readable | a refusal | say the path did not resolve, and stop |
+| has whitespace, names nothing readable | the prompt itself | take it verbatim |
+| has whitespace AND names a readable file | a refusal | say the value is ambiguous, and stop |
+
+The file test runs first because the whitespace rule is not symmetric. A prompt is multi-word in
+every case; a PATH is not single-word in every case, because a quoted path containing a space arrives
+as one argument with whitespace in it. Reading that as a prompt would make a real file silently
+become the whole scope of the build, so the ambiguous case is a refusal rather than a guess.
+
+**This project's anchor scope is `published`, and this path needs `published`.** Under
+`default-branch` there is no anchor a build folder you author can resolve at, so every step below
+would end in the refusal step 1 names, with its remedy inert. If the value above is not `published`,
+say so and stop — do not start, and do not write a build folder nothing can authorize.
+
+**And `authorized-by: prompt` in step 3 is not bookkeeping.** The second anchor is admissible per
+MODE: omit that key and the folder reads as `slug`, which is refused on this anchor because `slug`
+means a folder that already existed. The refusal arrives AFTER the push, where there is no owner turn
+left to ask about it.
+
+The steps are ORDERED and the order is the point. Everything before the push is provably older than
+the commit that authorizes the run; everything after it is contemporaneous with a run already
+authorized. That is what makes "the owner was asked at the start" a property of the commit graph
+rather than a claim in a transcript nobody reads.
+
+1. **Orient from the prose**, in the `/session-kickoff` manner — steps 0 to 4 of that engine. Derive
+   every field you can from the prose, the memory tree and the code. Do not ask yet.
+
+   **RUN the orientation probes HERE, before step 3 writes the roster.** Step 4 of that engine names
+   WHICH they are and this step does not restate them; what it adds is WHEN. The hand-back at step 6
+   runs the same engine, but by then the roster is written, pushed and comparable — so a seam the
+   reuse probe would have found, or a prior record recall would have surfaced, arrives after the
+   decision it was meant to inform, and re-deciding costs a commit and a push. The probes cost
+   seconds. "In the manner of" is a posture a reader can satisfy without running anything, which is
+   why the timing is stated as its own instruction rather than left inside the pointer.
+2. **Decide whether to ask, ONCE.** The field set is the kickoff checker's, not this file's:
+   `bash <check-script> --task-skeleton` prints it. **ACCEPTANCE and GATES are disqualifying** — a
+   unit with no observable that proves it is not Ready, and no run can split it. Any other gap is
+   askable, and askable once.
+
+   **THIS IS THE ONLY OWNER TURN THERE IS.** One `AskUserQuestion`, every gap in it, four options
+   maximum per call because that is the call's own limit. Not one call per gap: the owner is trying
+   to walk away. From step 3 onward there is nobody to answer, and no verb will take an answer.
+
+   If ACCEPTANCE or GATES is still missing after the ask, **stop without writing anything**. No run
+   has started, so there is no run to abort: `--abort` and `--park` both refuse with no run-state
+   file, and the protocol's §13 exit 5 does not reach here — it is scoped to a run already
+   started. Nothing staged, nothing committed, nothing to clean up.
+3. **Write the build folder.** `memory/builds/<slug>/README.md`. **Front matter needs ALL
+   SIX required keys** — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus
+   **`authorized-by: prompt`**, the key recording which discipline bound this run, which the merge
+   bar re-derives from this same file. **And the body needs the generated-region marker pair**,
+   `<!-- gen:build-index -->` and its close, or preflight refuses at step 5 with *the build README's
+   generated markers are malformed*: the unit list is DERIVED from that region, so an unpaired marker
+   is not something the driver guesses around. Every one of these is checked AFTER the push, where
+   there is no owner turn left to ask about it.
+
+   **The prompt itself goes to a RECORD, never into this README.** Write it under
+   `memory/builds/<slug>/prompts/`, which is where this memory tree sanctions prompt-kind
+   files, carrying its `**Serves:**` line and — where the value was a path — the path it came from.
+   The bytes travel rather than the reference: the build folder IS the authorization, so it may not
+   point at a file that can be edited after the run starts. Three reasons it is not the README, and
+   none of them is tidiness. That file's heading canon is CLOSED and its slots carry byte ceilings,
+   so a prompt under a heading of its own is a refusal. That file is PARSED for the marker pair
+   above, by a matcher that reads column 1 and is blind to fencing, so a prompt quoting
+   `<!-- gen:build-index -->` plants a second marker and the refusal lands after the push. And a
+   malformed record reds the memory gate HERE, at step 3, where you can still fix it. The README
+   states the build in its own words and points at the record; clarifications and their answers ride
+   the record too. The roster
+   may be provisional: a roster that grows after preflight draws no refusal on this anchor, because
+   your own push re-satisfies the comparison.
+4. **Commit, then PUSH THE BRANCH.** Both, in that order. Skip the push and preflight refuses with
+   `the remote advertises no tip for the branch this run is on, so nothing published authorizes it`
+   — read here so you do not have to diagnose it there.
+5. **Preflight**, exactly as the slug path does. It records the mode from the file you just pushed.
+6. **The kickoff hand-back**, at the slug path's step 4 and for its reason.
+
+**After any later roster change, commit AND PUSH before the next authorization read.** The roster
+comparison holds on this anchor only because you re-push; a roster grown and committed but not pushed
+is the ordinary state after research, and it blocks `--close` on `authorization-reachable` with no
+override available and nobody to interpret it.
+
+**The research and test obligations bind this path and not the slug path** — `researched` and
+`solution-tested` in the directive table are scoped `prompt`. They point at the build method's M12,
+which is where the loop is stated.
+
+## Start a PLAYBOOK run
+
+**A playbook already exists and the owner wants N pieces from it.** The run FOLLOWS that playbook to
+the letter and produces the number asked for. It declares `authorized-by: recipe`, and that value is
+what turns on everything below: the playbook resolution at BASE, the two piece-scoped
+Definition-of-Done items, and the two `recipe`-scoped directives in the table above.
+
+**CHECK, and there is no machine half — say it out loud before you start.** This mode is for
+producing DECLARED CONTENT: the pieces a playbook describes, landing where its `outputs` globs say.
+**An ordinary code build uses the slug or the prompt path**, and using this one for code would put a
+diff nothing in this kit is shaped to grade under a mode whose whole vocabulary is about pieces. The
+refusal that was to enforce this was withdrawn unbuilt, so on BOTH entry points — unattended and
+attended — this is prose you keep and not a gate you lean on. A reader who mistakes it for
+enforcement will be wrong in the expensive direction.
+
+The steps are ORDERED and the order is the point, exactly as on the prompt path: everything before
+the push is provably older than the commit that authorizes the run.
+
+0. **Read `memory/guides/BUILD-METHOD.md` WHOLE**, and read the PLAYBOOK whole. Then read it
+   again per piece — it is segmented for that, and a pass that carries the last piece's reading
+   forward is the failure mode segmentation exists to answer.
+
+   **Where you are writing the build folder yourself, this path needs `published`**, for the reason
+   the prompt path states, and this project declares `published`. Where the owner landed the
+   build folder before handing you the run, either anchor works and you skip the push in step 4.
+
+1. **Orient from the playbook.** It answers most of what would otherwise be asked: what one piece IS,
+   where pieces land, which checks run over one and which over all N. What it does not answer is
+   usually just the COUNT and, where its `outputs` globs admit more than one location, which.
+
+2. **Decide whether to ask, ONCE.** Same rule and same limit as the prompt path — one
+   `AskUserQuestion`, every gap in it, and from step 4 onward there is nobody to answer. The field
+   set is narrower here, so the ordinary case is no question at all.
+
+3. **Write the build folder.** `memory/builds/<slug>/README.md`, with the six required keys
+   and the generated-region marker pair, plus THREE more:
+
+   - **`authorized-by: recipe`** — the mode.
+   - **`playbook: <repo-relative path>`** — resolved at the pinned BASE, not at HEAD. A playbook this
+     run wrote is not one anything committed before it can vouch for.
+   - **`pieces: <n>`** — the count the close is measured against. Absent, non-numeric or zero is a
+     refusal, because a defaulted count would put a number nobody wrote into the record.
+
+4. **Commit, then PUSH THE BRANCH**, in that order, where you authored the build folder.
+
+5. **Preflight.** It resolves the playbook at BASE and refuses if the playbook declares no output
+   globs, no piece grain or no declaration block — all three are read from the blob at BASE, so fix
+   them in the playbook and land that, never in the working tree.
+
+6. **The kickoff hand-back**, at the slug path's step 4 and for its reason.
+
+**While the pieces are made, RECORD each one.** A verdict that exists only in the transcript is a
+verdict the merge bar cannot read, and the two piece-scoped Definition-of-Done items read the records
+rather than the transcript:
+
+```bash
+bash tools/unattended/unattended.sh --record-piece <slug> --path <piece> --leg <name> --verdict PASS
+bash tools/unattended/unattended.sh --record-set <slug> --leg <name> --verdict PASS
+```
+
+Each piece record is hash-joined to the piece, so editing a piece after recording makes its record
+STALE rather than silently stale-and-passing. The SET record is written once, over all N, and its
+identity is the ordered list of this run's piece hashes — derived, because a caller that named its
+own set could name a set it did not produce.
+
+**What you may NOT do is edit the playbook.** A run that rewrites the checklist it is graded by has
+no rules left. What you would change goes on the record with `--propose`, joined to the step that
+provoked it; the amendment is a separate authoring run.
+
+## Author a PLAYBOOK — creation, and owner-instructed amendment
+
+**A run that MAKES a playbook is not a run that FOLLOWS one, and it uses the PROMPT path above, not
+`recipe`.** It has no playbook to name, so a `recipe`-mode preflight refuses it outright; and its
+whole diff lands outside any declared output glob, which is the shape a content run is scoped to
+avoid. There is no third mode here and no new discipline: the loop a playbook is written by is the
+build method's research-then-test-then-choose section, which this path's two scoped directives
+already bind. What this section adds is the ROUTING and one ordering property.
+
+**Arriving with no playbook and a topic is this path, not an error.** Research the subject and the
+code the pieces must relate to, decide what one piece IS, then write the playbook from
+`memory/guides/PLAYBOOK-TEMPLATE.md` — its canon is closed, and the gate grades against the
+template's own section table rather than a list typed somewhere else.
+
+```bash
+bash tools/unattended/check-playbook.sh
+```
+
+The gate grades **every tracked file carrying a declaration block**, whether or not a build README
+names it. So a playbook you commit is graded from that commit forward, and a playbook that does not
+validate cannot land — which is what lets a later run name it without re-validating anything.
+
+**THE ORDERING PROPERTY: the playbook must be older than the BASE of the run that follows it.** Two
+acts, two authorizations. A single run that authored its own instructions and then followed them has
+no external check on either half, and every gate downstream would be grading a document that run
+wrote for itself.
+
+- **Whenever your build folder was committed before your run**, this has a machine half under either
+  anchor. The BASE is then a merge-base you cannot move, a playbook you committed yourself does not
+  resolve there, and preflight refuses with *a recipe-mode build README names a playbook that does not
+  resolve at the pinned BASE*. The scope value does not change this: the second anchor is reached only
+  when the build folder itself fails to resolve at the merge-base.
+- **The one unprotected state is a run that authors BOTH halves** — its own build folder and its own
+  playbook — under `published`, which this project declares (`published`). Its BASE is the tip
+  it pushed, that tip carries the playbook it just wrote, and nothing refuses it. This is the
+  `published` anchor's declared cost reaching one step further than the protocol spells out: a run
+  that can author its own authorization can author the instructions it is judged against too.
+  So this is a CHECK you keep, stated plainly rather than dressed up as a derivation: **land the
+  playbook in its own earlier run, then start the run that follows it.**
+
+**Amendment rides this same path.** Proposals accumulate on the run-state files of the runs that
+found them, and acting on them is a later, owner-instructed run that reads the surfaced proposals,
+edits the playbook and lands it. That is why a piece-producing run may not edit its own playbook and
+needs no exception to say so.
+
+- CHECK, not a gate: **cite the proposals you acted on**, and say which you declined and why. No gate
+  can check this without reading intent, and a proposal already carries the step it amends, so the
+  join survives even when the citation does not — but the owner reading the amendment is entitled to
+  know which of their run's findings survived it.
+
+## Produce pieces ATTENDED
+
+**Not a run, and this section is here because it shares the RECORDS with the paths above and nothing
+else.** An owner is in the loop, so there is no run to authorize, no run-state file, no phase, no
+idle-wake and no Definition of Done. Every check in the kit gate that is keyed on a run-state file
+sees nothing here, and that is what "not the driver" means.
+
+**What the merge bar still sees is what you PRODUCED.** The per-piece records and the set record are
+tracked files, hash-joined to the pieces, and the playbook leg reads both without knowing who wrote
+them or how. So the honest sentence is this one: **the attended path is gated on what it produced,
+the unattended path on that plus how it ran.**
+
+**And read the split exactly, because it is narrower than it sounds.** The leg CLASSIFIES and reports
+— verified, failed, stale, unrecorded, unchecked, orphan, and whether a declared set check has a
+verdict at all. What BLOCKS on any of it is `--close`, which the attended path never calls. So on this
+path those counts are evidence a human must read, and the only thing that reds the bar for you is a
+record whose shape the leg refuses. An earlier revision of this paragraph said the leg read the set
+record when nothing in it opened one; the reader who believed that stopped looking for a gate that
+was not there.
+
+Both writers take a records ROOT instead of a slug — one function, two callers, never two
+implementations:
+
+```bash
+bash tools/unattended/unattended.sh --record-piece - --records-root <root> --path <piece> --leg <name> --verdict PASS --run <label>
+bash tools/unattended/unattended.sh --record-set - --records-root <root> --leg <name> --verdict PASS --run <label> --set <hash,hash>
+```
+
+The root is the playbook's own `records` declaration — read it from the playbook rather than choosing
+one, or the leg reads a different directory from the one you wrote. `--run` labels the batch so a
+later reader can tell one sitting's pieces from another's; on the unattended path the slug fills that
+in.
+
+**`--set` is WEAKER here than on the unattended path, and the difference is worth knowing.** There
+the set identity is DERIVED from the run's own piece records, because a caller that names its own set
+could name a set it did not produce. Here you name it, so it is a claim rather than a derivation —
+which is the same trade the whole attended path makes, one field further down. Take the hashes from
+the piece records you just wrote, not from memory.
+
+**The CHECK about code builds binds here too, and here it has no machine half at all** — not even a
+withdrawn one. The refusal that was to enforce it reads a recorded mode and a run's commit set, and
+both exist only through the driver. An attended path is outside it by construction, which is the kind
+of thing worth knowing before you rely on a gate to catch you.
+
+**No entry in the kickoff engine's exit list, deliberately.** That list enumerates the interactive
+exits an UNATTENDED run has to resolve with nobody to ask. An attended path has an owner by
+definition, so the absence is a decision and not an oversight.
+
 ## While it runs
 
+- **No merge bar and no self-test suite inside a pass — yours or any agent you dispatch.** A pass
+  verifies with the direct check its spec names; a unit that needs a suite verdict returns the
+  need in its `summary` and does not run one. The bar runs ONCE, at `VERIFYING`, after the last
+  unit is terminal: `--close` runs the plain bar for `gates-green`, and kit work owes the
+  `GATE_SELFTESTS=1` form too, run by you at `VERIFYING` and nowhere earlier. Where a pass touched
+  files a leg guards and you judge a bar necessary, the plain bar with no flag is the scoped form,
+  at the main loop and never in a child. The rule is the build method's M6; this bullet points at
+  it, and gate-guard.js refuses it at the tool call: a `GATE_FULL=`/`GATE_SELFTESTS=` prefix, a
+  self-test runner or any `*.test.sh` is denied on this branch until the record reaches
+  `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal.
 - Keep the phase honest, and give every phase claim a WITNESS — a sha, a tag, a run id. A claim with
   no witness is skipped by the oracle that would have judged it, so an unwitnessed phase is the
   cheapest possible lie and you are the only author of that field.
@@ -127,7 +529,137 @@ distinction real.
   Re-running it with the same question and reason is a no-op, so a resumed run that re-derives the
   same refusal does not duplicate the row. It is refused on a finished record — an abort is the verb
   for a decision that stops the run.
-- Check yourself with `bash tools/unattended/unattended.sh --status <slug>`.
+- **And what you may NOT park: a STRICTLY BENEFICIAL discovery.** Protocol section 11 is the rule and
+  is not restated here. The shape of it: a discovery that makes an observable this repo already
+  MEASURES strictly better, makes nothing it measures worse, and survives M3's vetoes is ADOPTED into
+  this build — now, by you — with `--rescope --act add`. One that fails the first two clauses is a
+  BACKLOG row; one that trips a veto is a park. A BLOCKER between you and your own landing is a
+  discovery, and it is the one most often mistaken for a question. Parking a discovery that qualifies
+  is not caution: the reader you are deferring to is the one who left, so the finding is discarded
+  and the record makes the discarding look careful.
+- A playbook you are FOLLOWING is not a playbook you may edit. A run that rewrites the checklist it
+  is graded by has no rules left, so what you would change goes on the record joined to the step that
+  provoked it, and the amendment is a separate authoring run the owner starts:
+
+  ```bash
+  bash tools/unattended/unattended.sh --propose <slug> --item "<the amendment>" --step "<the step it applies to>" --reason "<what you saw that provoked it>"
+  ```
+
+  Nothing blocks on a proposal and `--status` counts them apart from the questions, so recording one
+  costs the run nothing. The same amendment against two steps is two rows, because it is two edits.
+- **Record WHAT each build pass was handed**, so "which instructions produced this diff" has an
+  answer on disk rather than in a transcript nobody kept. Write the brief as a tracked file under
+  the build's `prompts/` folder, then record it:
+
+  ```bash
+  bash tools/unattended/unattended.sh --brief <slug> --unit <unit-id> --path <the brief file>
+  ```
+
+  A brief is a `history` kind: nothing blocks on it, an unchanged re-brief is a no-op, and `--status`
+  grades the LATEST row per unit as the live claim — re-briefing an edited file clears the stale
+  report the previous row earned.
+- Record a verdict where a check ran over content rather than over code — one piece at a time, and
+  once over the whole set, which is the population a per-piece pass structurally cannot see:
+
+  ```bash
+  bash tools/unattended/unattended.sh --record-piece <slug> --path <piece> --leg <name> --verdict PASS
+  bash tools/unattended/unattended.sh --record-piece <slug> --path <piece> --leg <name> --verdict FAIL
+  bash tools/unattended/unattended.sh --record-set <slug> --leg <name> --verdict PASS
+  ```
+
+  **`FAIL` is spelled here on purpose.** The verdict is validated for SPELLING and nothing else —
+  no leg is executed and nothing compares your word to an outcome — so an example set that only ever
+  says `PASS` is the instruction layer answering the question for you, on the one item `--close` will
+  not let you override. `NA` is the third member, for a leg whose declared coverage mode is dark.
+- **When building uncovers what speccing could not, AMEND — do not stall.** M3 delegates this build's
+  own scope and M2 names the three acts: RETIRE a unit, SUPERSEDE it, or ADD one the build turns out
+  to need. Every amendment owes a row, and this is the verb that writes it:
+
+  ```bash
+  bash tools/unattended/unattended.sh --rescope <slug> --act retire|supersede|add --item <unit-id> [--successor <unit-id>] --reason "<what building uncovered>"
+  ```
+
+  Two bounds, and they are the whole of your authority here. The build README's GOAL statement is
+  what you may not amend, and the delegation does not reach a governance carrier's own stated
+  constraints. An id already in the units region may never LEAVE it — retiring is a status flip to
+  `WONTDO` with a successor or reason in the header tail, never a deletion, because the
+  authorization compares BASE against HEAD as a subset and refuses a removal.
+
+  **A RETIREMENT reaches the owner's one turn; an ADDITION does not.** `retire` and `supersede` are
+  surfaced-class rows and are counted among the decisions your `parked-decisions-surfaced`
+  attestation must cover, while `add` stays history. The asymmetry is the point: M3 delegates a
+  build's scope RESOLUTION and never its scope ABANDONMENT, so growing the build is a declaration you
+  made and dropping declared scope is something the owner is entitled to read. `--status` counts the
+  two apart.
+- **Before dispatching two passes at once, DECLARE what each will write.** The build method requires
+  both path lists written down first, and this verb is what reads one:
+
+  ```bash
+  bash tools/unattended/unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>
+  ```
+
+  `--writes` is REPEATABLE and each occurrence is ONE path. Two of the method's three disjointness
+  clauses are decided here and refused on the spot: two passes claiming one file, and a pass claiming
+  a shared mutable record. A generated index ALONE is fine — every pass changes a spec header it is
+  rendered from — and only the index together with its GENERATOR is refused. The third clause, whether
+  a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
+  pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
+  commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
+- **Drive the build as ONE program, and know exactly what that buys.** The harness is
+  `tools/workflows/unattended-build.js`, which runs SPEC, then — only when the build or its
+  project declares the audit — AUDIT and DISPOSAL as ordered stages, and hands back the ordered roster on a
+  terminal `--review` verdict, or at SPEC completion when the audit is off by declaration. **Pass
+  `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>` or
+  `opted in by project default SPEC_AUDIT_DEFAULT: <date>`**, and
+  omit it when it read `not owed (opt-in)`; the harness owns the OFF branch and logs it. Each unit is
+  then built by
+  `tools/workflows/unattended-unit.js`, one unit per call, holding that unit's brief and spec and
+  nothing else. **Every call is made by `scriptPath` and never by `name`** — the fan-out guard's
+  read-window narrowing is conditional on `scriptPath`, and a `name:` call exits it at zero.
+  **Read the build method WHOLE before the first call**, because the child is handed one unit and the
+  method is what tells it what a pass is.
+  **The child is ordered to run no gate, suite or bar inside its pass** — the bar is `--close`'s,
+  once, after every finding is fixed — and to verify with the one check that exercises its change,
+  and to bound every command it runs: a non-code command that does not return within its bound is
+  skipped and named in its return.
+  **The harness call carries `scratch: <your session scratchpad, absolute>`** — the path your own
+  system prompt names, never `$TMPDIR` — and refuses without it; every agent it spawns is told that
+  is where temporary files go, and the child receives it in `dispatch.args` and refuses too, both
+  without the key and with a `ground` that does not name it.
+
+  Between dispatches, re-read `bash tools/unattended/unattended.sh --plan <slug> --paths` rather than
+  trusting a list you are holding, and branch on all four shapes it prints:
+  `next: <id> (READY - build it)` dispatches that unit; `(MISSING - spec it first)`, `(THIN)` and
+  `(FORKED)` do NOT; `next: none - every tracked spec is terminal` means the loop is done; and
+  `next: none - no tracked spec grades as a unit` means it is NOT done — halt and read the NOT A UNIT
+  rows, because that line is printed when nothing graded as a unit at all and the verb still exits 0.
+  A child returning `committed:false` stops the loop.
+
+  **Nothing refuses the next dispatch for you**, and that is the honest statement rather than a
+  caveat: the order gate treats an earlier unit's declaration row as dispatched, so a row the verb
+  itself wrote un-blocks the step. The one thing that refuses an early stop is `build-complete` at
+  `--close`, and its escape is a recorded `--override build-complete`.
+- **Run the bug-class checklist after every commit, and act on it before the next pass begins.** It
+  is the one per-pass quality act on CODE, the build method mandates it per pass and again over the
+  whole range on every closing round, and until now no carrier this kit ships even named it:
+
+  ```bash
+  python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
+  ```
+
+  It takes a COMMITTED range, so it runs AFTER the commit and never before it — the pre-commit
+  spelling resolves to an empty range and prints "touches no file", which reads exactly like a clean
+  checklist and is not one. Its stdout IS the checklist and it always exits 0, so finish it rather
+  than reading its status. A class it names that is already violated is the next pass. (Adopters
+  whose memory tree ships without that kit have no such command; the obligation is then whatever
+  their own build method names.)
+- Check yourself with `bash tools/unattended/unattended.sh --status <slug>`, and the units with
+  `bash tools/unattended/unattended.sh --audit <slug>`.
+- The one predicate every OUT-OF-SESSION reader shares — key: value lines and one verdict:
+
+  ```bash
+  bash tools/unattended/unattended.sh --liveness <slug>
+  ```
 
 ## While the work runs
 
@@ -144,10 +676,83 @@ Ask what is left instead of re-reading prose for it:
 bash tools/unattended/unattended.sh --plan <slug>
 ```
 
-It prints each tracked spec's id, status and classification, and names the next unit. It also joins
+It takes its unit SET and ORDER from the generated units region, so its "next" and `--status`'s
+are the same unit by construction. It prints each unit's id, status and classification, and names
+the next one. It also joins
 the build README's roster region against the tracked specs, so a planned unit nobody has specced
 is reported as MISSING rather than silently omitted — and a roster whose markers are malformed is
 a named refusal rather than a complete-looking list.
+
+## Record each review round, and let the loop end itself
+
+A review that keeps coming back BLOCKED is the fault this kit was built to remove, and the remedy is
+not a round cap — over the tracked corpus the clean exit the method names occurs ZERO times, so a cap
+would only move the stall earlier. A SPEC subject's declared bound, `REVIEW_ROUNDS`, is not that cap:
+it ends in a DISPOSITION rather than a stall, because every finding standing at the bound is
+disposed exactly as at `NON-CONVERGENT`. Record every round and the verb tells you what the loop
+is doing:
+
+```bash
+bash tools/unattended/unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
+```
+
+`--subject` is the spec document for a spec audit and the BUILD SLUG for the closing diff review.
+`--verdict` is one of exactly three: `CLEAN`, `CLEAN WITH FIXES`, `BLOCKED`. `--blockers` is the
+confirmed-blocker count for THIS round, as a plain integer.
+
+It answers with one of five states, and the state is what you act on:
+
+- **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
+- **CONVERGED** — zero blockers. The loop is done for that subject, and its confirmed highs,
+  mediums and lows are still disposed, by the severity rule the next bullet states. Where a HIGH
+  stood, record `--disposition promote` on that round — ACCEPTED there, never required — so the
+  merge bar demands the unit the high became instead of reading the promotion as nothing; with
+  nothing above MEDIUM the row needs no field.
+- **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every CONFIRMED finding is
+  DISPOSED BY SEVERITY — and that holds at `CONVERGED` too. A BLOCKER or HIGH is PROMOTED: it
+  becomes a UNIT whose mechanism CLOSES the finding, specced at its tier, audited as a SPEC, built,
+  closed. A MEDIUM or LOW is FOLDED into the spec it belongs to, as a `rev-N` bump with its §9 line.
+  Never parked, never waived, never RETIRED, and never re-reviewed. Both terminate.
+  **`never RETIRED` is in that list because it is the cheapest exit and the one the enumeration used
+  to leave open**: a promoted unit flipped to `WONTDO` satisfies the leg's promotion count, which
+  reads new ids, and `build-complete`, which reads only that no row is non-terminal.
+  **Record it**, with `--disposition promote` on the round that exits: `promote` is the ONLY value a
+  terminal exit can record, because every exit that is not `CONVERGED` carries at least one BLOCKER
+  and the rule promotes every one of them, so `fold` at an exit with blockers is REFUSED rather than
+  written. The merge bar reads that field and demands the new unit ids it implies; a promotion with
+  nothing recorded is indistinguishable from one that never happened.
+- **BOUNDED** — the declared round bound, `REVIEW_ROUNDS` (kit default 1), is reached on a subject
+  that is not the build slug. **The loop STOPS**, and every CONFIRMED finding is DISPOSED BY
+  SEVERITY, exactly as at `NON-CONVERGENT`; the round records `--disposition promote`, the only
+  value a terminal exit can carry. The owner ruled on 2026-09-14 that a SPEC subject takes one round
+  by default; the closing diff review keeps its convergence loop, because its subject is the build
+  slug, whose bound is the runaway ceiling. **A promotion at this exit is NOT audited by the round
+  that produced it**: after `--rescope --act add` and the new spec, re-invoke the harness at round
+  N+1. It keys the `--review` subject per spec-set generation: a post-disposal re-invoke passes
+  `auditIds` and no `subjectRound` and takes a fresh subject; a fold re-invoke copies the
+  `subjectRound` the CONVERGING return handed back. So the subject that just ended is never
+  re-rounded, and the re-invoke audits ONLY the promoted specs — the ones no tracked `spec-audit`
+  record names yet — under their own one-round bound. `auditIds` and `subjects` are never passed
+  together: the harness refuses the pair by name, because a supplied subject set cannot be scoped to
+  the promoted units. Skip that re-invocation and the promoted unit closes un-audited, which
+  `specs-audited` refuses at `--close` on a build that declared `spec-audit:` or whose project declared
+  a `SPEC_AUDIT_DEFAULT`; a build under neither
+  owes no audit and the item announces `not owed` instead.
+- **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
+  That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
+  record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.
+
+Strictly smaller, not merely different: a sequence that oscillates 2, 1, 2 satisfies "the count
+changed" forever. A subject whose loop already ended does not take another round.
+
+## Which kit version is installed
+
+```bash
+bash tools/unattended/unattended.sh --version
+```
+
+It prints the engine identity and exits. Worth one line here because it is a dispatched entry point
+like any other, and a verb no surface names is a verb the documentation join treats as missing.
 
 ## Resume
 
@@ -158,16 +763,84 @@ bash tools/unattended/unattended.sh --resume <slug>
 Read the run-state file before doing anything else. It survived compaction and process death; your
 context did not.
 
+**Then REAP the recorded id, and only then schedule a replacement.** In that order, and the order is
+the whole point. The intuition is that a resumed session's idle-wake died with its process because
+the store is session-scoped — and that intuition is MEASURED FALSE: a run asserted it twice about two
+jobs and `CronCreate`'s own listing showed both still firing. So issue
+`CronDelete` against the `keepalive` id the run-state file already names, read the result
+back, and say what it returned. Assume a surviving job, not a dead one; the failure mode of assuming
+dead is an idle-wake firing forever with a green `keepalive-reaped` attestation over it.
+
+Then schedule the new one, with the stall-probe prompt the keepalive section gives: this run
+already has its slug and its run-state file. This is the only exception to "read the record
+first": read it, reap, schedule, kick off, and then do the work.
+
+**Then record the new id, so the record names the session that now holds the run.** After the reap
+and the re-schedule, run `bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <id>` with
+the new id: it re-records `keepalive`, `session` and `pid`, prints what it replaced and stages the
+file, and the close attestation then covers one job. Re-preflighting is NOT the remedy: it refuses
+on a dirty tree and re-pins the anchor.
+
+**Then, if this project ships `/session-kickoff`, invoke it — after the reap and the re-schedule,
+before the first pass.** Its unattended hand-back fires because the run-state file exists in a
+non-terminal phase: it emits the READY card, appends it to this session's orientation card, and
+continues at the phase the record names, halting nowhere. It is owed because a resumed session
+starts with no card, or a replay-written one — two states the card-reading commit deny does NOT
+reach (both allow, with a witness line: a session the writer never ran for cannot run the remedy)
+— so nothing else will orient it, and its first commit would otherwise be the first durable act
+nobody oriented. A backstop that refuses it would be a predicate change in the hook, not a
+sentence here. Skip it silently if the project has no such skill, as the start path does.
+
 ## Close
 
 ```bash
 bash tools/unattended/unattended.sh --close <slug>
 ```
 
-It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest, because no script
-can observe them: that you reaped the keepalive (`CronDelete`), and that every parked
-decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the
-gate says so wherever it reports them.
+**The bar it runs is BOUNDED.** `GATE_BOUND` seconds, declared by the project or defaulted by the
+kit — and when it is the DEFAULT, said so on stderr, because a bound nobody set should not
+be invisible. A bar that does not answer within it is KILLED, and
+`gates-green` is then unmet with a message saying the bar never RETURNED rather than that a leg
+FAILED. Those are different facts, and an operator who confuses them spends an hour hunting a
+failing leg that does not exist. The same bound covers the wiring check `--preflight` runs.
+
+It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest: that you reaped
+the idle-wake (`CronDelete`), and that every parked decision reached the wrap-up. **One of
+them is READ BACK.** The stop-guard records the harness's own cron listing at every stop of a bound
+session, and `--landed` refuses while your recorded id is still in it — so attest the reap honestly,
+because the next verb checks it against evidence you did not write. The other has no observer;
+attestation is not a machine verdict, and the gate says so wherever it reports them.
+
+**TWO items have NO override, and this is where you will meet them: `authorization-reachable` and
+`pieces-complete`.** Neither can be overridden, waived or attested around. An override on the
+authorization check IS the authorization check, so the verb refuses the pair rather than recording
+it; and `pieces-complete` is the item saying a recipe-mode run produced what the owner asked for over
+content nothing else on the bar can grade, so an override on it is the run certifying its own output.
+A recipe run is the one most likely to meet the second.
+
+**The exit is `--abort`, not a flag.** If a close blocks on either, the answer is never an override —
+it is that this run cannot show what authorized it, or cannot show it made what was asked for, and
+`--abort` is the honest exit. The refusal names the rule and the exit, so you do not have to
+remember which of the two you hit.
+
+Write each with the VERB, never by editing the record:
+
+```bash
+bash tools/unattended/unattended.sh --attest <slug> --item keepalive-reaped
+bash tools/unattended/unattended.sh --attest <slug> --item parked-decisions-surfaced
+bash tools/unattended/unattended.sh --attest <slug> --item parked-decisions-surfaced --value "yes, <n> surfaced"
+```
+
+**The parked-decisions attestation may carry a COUNT, and if you give one it is CHECKED.** `--close`
+refuses unless that integer equals the number of `surfaced`-class parked lines in the record, so the
+claim stops being unfalsifiable — "I surfaced them" becomes "I surfaced four, and the record holds
+four". Omit the number and the older, weaker form still stands; it is not a machine verdict either
+way, and the gate says so wherever it reports it. Two things the count does NOT include: a `history`
+kind, which the owner need not adjudicate, and the overrides this same `--close` is about to write,
+because the Definition of Done is evaluated before they land.
+
+It derives the record KEY, which is not always the item name, and stages what it wrote. It refuses a
+machine-checked item, so it cannot be used to certify anything the driver checks itself.
 
 If you must override a blocked item, name it and give a reason:
 
@@ -184,6 +857,47 @@ you are the only reader, and neither way of getting it wrong is silent: a `--ove
 its own `--reason` is REFUSED before anything is written, and an item you never named at all simply
 keeps blocking the close. Nothing is recorded on a reason that was written about a different item.
 
+## Record the run
+
+**This section binds only where `tools/runlog/runlog.py` exists in this repository.** Test for
+it before the first render. Where it is absent, skip every step below and say so in the wrap-up: this
+repository has not taken the runlog kit, so there is nothing to render from and no record is owed.
+Nothing else in this Skill changes when you skip it.
+
+```bash
+test -f tools/runlog/runlog.py   # exit 0: the kit is here and this section binds; exit 1: skip it
+python tools/runlog/runlog.py record <slug> --write
+```
+
+**Why it is a step at all.** The journals a run writes are machine-local and never pushed, so a run
+nobody renders is a run no other node can read. The render writes ONE closed-schema record into the
+build folder and prints the two follow-ups it cannot run itself: re-render the build index, and commit
+under a subject naming the slug and no unit id. Run the index command it prints, stage the record and
+everything the index rewrote, and let them ride the commit named below. A run that served no
+spec-defined unit gets the command's own no-record line and no file. That line is the answer, not a
+failure.
+
+**Three placements, and each rides a commit the run already makes**, so no path gains a commit it did
+not have. Each is the commit that carries the run-state file the verb just staged:
+
+1. **After `--abort`**, in the ABORTED record commit. Render, re-index and stage before you commit it.
+2. **After `--close` and before the merge, on every run that lands**, in the close's records commit:
+   the one `--close` tells you to make before you land. The record then travels with the merge, and
+   the bar at the push boundary grades it.
+3. **After `--landed`**, in the LANDED record commit. Render AGAIN: `record --write` finds the run's
+   existing file by its run key, so it rewrites the SAME file rather than adding a second one. The
+   landing push joins this run by what it pushed, so the re-render adds that push and the landing
+   bar's verdict.
+
+**Never between the lander's push and `--landed`.** Where the project declares a lander marker, a
+commit there moves HEAD off the commit the marker names, and `--landed` refuses it at check 34 — the
+wedge the section on marking it landed warns about. That is why the third render waits for the verb
+rather than following the push.
+
+**A render that refuses blocks nothing.** It names why on stderr; say so in the wrap-up and go on. The
+record is evidence, never an input: no verb reads it, and the leg that grades a committed record
+cannot see one that was never written. A skipped render is caught by nothing, so you have to say it.
+
 ## Land
 
 ```bash
@@ -197,29 +911,74 @@ discards the entire bar the authorization leaned on, and the gate greps your run
 ## Mark it landed — the run is not finished until you do
 
 ```bash
+bash tools/unattended/unattended.sh --version   # which build of this kit am I talking to
 bash tools/unattended/unattended.sh --landed <slug>
 ```
 
-**Run this AFTER the lander returns, not before.** It re-observes the remote and refuses unless HEAD
-is an ancestor of the tip the remote advertises, so it is the one phase claim you cannot simply
-assert — which is the point. Then commit the record it writes and land that commit too; until it is
-committed, every later run still counts yours as live and the bar reds on the second one.
+**Run this AFTER the lander returns, not before.** It re-observes the remote and takes the tip the
+remote advertises whenever your work is on it — the one phase claim you cannot simply assert, which
+is the point. **When that fails it falls back to the LOCAL default branch**, so a build you merged
+locally but cannot push still has a terminal to reach instead of an abort. The fallback asserts your
+own BRANCH TIP is an ancestor of local main, never that HEAD is; on the default branch HEAD is that
+ref, and a commit is its own ancestor.
+
+Two facts land in the record and you do not write either: `landed-anchor`, which says `remote` or
+`local`, and `unpushed-at-landing`, which counts what local main carries that the remote does not.
+Read the second before you believe the first — a local landing sits on top of whatever else is on
+that branch. What the weaker anchor does not buy is protocol section 9, and it is not repeated here.
+
+**RUN IT FROM THE RUN WORKTREE, AFTER THE LANDER.** Where the project declares a lander marker, the
+lander writes the commit it pushed and this verb reads CONTAINMENT, not equality: the marker's
+commit must contain the run's witness, and the tip the remote advertises must reach the marker's
+commit — so the `--no-ff` merge the charter mandates stamps from your own branch, and a record
+commit after the push is not a refusal. Each of the four refusals names what it read, so a stale
+marker, a marker this clone does not hold, and a moved remote are distinguishable. Then commit the record it writes and land that commit too; until it is
+committed, every later run still counts yours as live — which no longer reds anyone's bar, but does
+put your unfinished run in every later run's concurrency report.
+
+**That record commit is where the run record re-renders**, and never before this verb returns: the
+third placement in [Record the run](#record-the-run), which binds where the runlog kit is installed.
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
 Definition of Done was evaluated without evaluating it.
 
+**It reads the reap back, and it may tell you to END THE TURN.** Where the stop-guard is wired, the
+newest stop it recorded for this run carries the harness's cron listing. `--landed` reads that line:
+recorded in `LANDING` and free of your keepalive id, it prints `keepalive-reaped: checked` and
+stamps; still naming the id, it refuses — reap the job, end the turn so the stop-guard records the
+listing again, then re-run. A newest line from BEFORE the close is also a refusal, because the check
+could run and has not: end the turn ONCE, the stop-guard blocks that stop as `finished and unstamped`
+and continues you, and the re-run reads the post-close line. That works for the LEASED session
+alone — the stop-guard binds by the lease — so a session the record does not name is refused FIRST
+and told to run `--resume <slug> --keepalive-id <id>`; ending the turn there records nothing. A
+LANDING line older than the lease is the pre-close case too: it is the dead incarnation's. If no
+record ever appears for the leased session the hook is unwired and `adopt-unattended.sh --check`
+says so. With no sidecar at all — no hook — or a lease naming no session, the verb lands and prints
+`unchecked` with the reason, never silently.
+
 ## If it cannot finish
 
 ```bash
-bash tools/unattended/unattended.sh --abort <slug> --reason "<what stopped it, and what you refused to decide>"
+bash tools/unattended/unattended.sh --abort <slug> --code <halt-code> --reason "<what stopped it, and what you refused to decide>"
 ```
 
-The reason is required and lands in the parked region, because an abort with no recorded reason is
-indistinguishable from a run that simply stopped. You still owe both attestations first — reap the
-keepalive and surface the parked decisions — since an aborted run orphans exactly the same job and
-leaves exactly the same decisions unseen. An abort does not merge and does not push.
+**Both are required, and they are for different readers.** The reason is prose for the owner and
+lands in the parked region, because an abort with no recorded reason is indistinguishable from a run
+that simply stopped. The CODE is the field everything else joins on — the status line, the resume
+path and the gate leg all read it by key — because a single `ABORTED` terminal says a run stopped and
+never says why. It is validated against a closed vocabulary, and the refusal names the legal set, so
+you do not have to read source to find it. There is no catch-all member: if nothing fits, take the
+closest code and put the specifics in the reason, and say so — a mismatch worth a backlog row is
+better than a vocabulary with a hole in it. You still owe both attestations first — reap the
+idle-wake (`keepalive-reaped`) and surface the parked decisions — since an aborted run orphans
+exactly the same job and leaves exactly the same decisions unseen. An abort does not merge and does
+not push.
+
+**Render the run record before you commit the ABORTED record**: the first placement in
+[Record the run](#record-the-run), which binds where the runlog kit is installed.
 
 ## Reap
 
-Delete the keepalive with `CronDelete` before you finish. Nothing else can: when your
-process exits, an unreaped job is orphaned in a store no later run can see.
+Delete the idle-wake with `CronDelete` before you finish, and attest `keepalive-reaped`.
+Nothing else can: when your process exits, an unreaped job is orphaned in a store no later run can
+see.

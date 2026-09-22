@@ -1,0 +1,5 @@
+v=1	t=1757770010	p=driver	ev=start	n=1.1
+v=1	t=1757770011	p=driver	ev=start	n=2.2
+v=1	t=1757770012	p=driver	ev=once	verb=--status
+v=1	t=1757770013	p=driver	ev=end	n=1.1	rc=0
+v=1	t=1757770014	p=driver	ev=end	n=3.3	rc=1

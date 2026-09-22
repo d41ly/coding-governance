@@ -2,6 +2,17 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · review wf_198d8c01-46e · ratified 2026-08-11
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md](../build/2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md) | journal | — |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-1.md](../reviews/2026-08-11-review-TOOL-aWrittenMethod-1-1.md) | diff-review | TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-2.md](../reviews/2026-08-11-review-TOOL-aWrittenMethod-1-2.md) | diff-review | TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-3.md](../reviews/2026-08-11-review-TOOL-aWrittenMethod-1-3.md) | diff-review | TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The build method — how to spec, how to review, how to build — is retyped into chat at the start of

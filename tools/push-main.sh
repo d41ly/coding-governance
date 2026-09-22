@@ -33,6 +33,33 @@ marker="$(git rev-parse --git-dir)/push-main-active"
 # gate run; nothing red reaches origin, and the next push-main run's EXIT trap clears a stale marker.
 trap 'rm -f "$marker"' EXIT INT TERM
 
+# KEEP THE CONNECTION ALIVE ACROSS THE GATE. The gate runs INSIDE the push: git connects and
+# negotiates refs BEFORE `pre-push` fires - that is how the hook receives remote_sha on stdin - and
+# the socket then idles for the entire bar. A server closes an idle SSH session, so the push dies at
+# the very end, AFTER a green gate, with "Connection closed by remote host" and "unable to write
+# flush packet: Broken pipe". The refusal this script prints for that case names auth, permissions
+# and protocol, which is why it reads as anything except a timeout.
+#
+# It is not intermittent. It is a deadline race that a slow bar loses every time, so the longer the
+# adopter's bar, the more certain the failure - and the failure lands on the attempt that did
+# everything right.
+#
+# Measured on an adopter (inCMS, node `a`, 2026-08-27), same objects and same auth throughout: a push
+# to a scratch ref, whose hook ran only a ~4-minute subset, SUCCEEDED; four pushes to main, whose hook
+# ran the 16-to-65-minute full bar, all died this way, two of them after the gate printed PASSED.
+# Setting these three options and changing nothing else landed it first try. That repo's charter had
+# recorded the same failure a fortnight earlier as "unrelated to code".
+#
+# THIS REPO PUSHES OVER HTTPS and so cannot exercise it, which is exactly why it went unnoticed here:
+# the exposure belongs to every adopter that installs this lander and pushes over SSH.
+#
+# `:=` so a caller who has their own GIT_SSH_COMMAND keeps it - theirs may carry an identity or a
+# proxy this must not drop. ServerAliveCountMax is deliberately large: the product with the interval
+# is the tolerated silence, and it has to outlast the SLOWEST bar an adopter can produce, not the
+# fastest. Costs one 32-byte keepalive every 30 s on an otherwise idle socket.
+: "${GIT_SSH_COMMAND:=ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=120 -o TCPKeepAlive=yes}"
+export GIT_SSH_COMMAND
+
 branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
 if [ "$branch" != "$def" ]; then
   echo "push-main: on '$branch', not '$def' — land $def from the primary tree on $def." >&2
@@ -70,6 +97,39 @@ while [ "$attempt" -le "$max" ]; do
   rm -f "$marker"
   if [ "$rc" -eq 0 ]; then
     rm -f "$pout"
+    # THE LANDER MARKER, when the project declares one. It carries the pushed COMMIT, not just its own
+    # existence: a bare touched file is satisfied by any previous landing, which is the
+    # pass-by-finding-anything shape the unattended kit's own Definition of Done was stuck in before
+    # this. The unattended verb compares the sha, so evidence of an earlier landing cannot stand in
+    # for this one. Written only on the branch where the push actually succeeded, which is the whole
+    # point of it being evidence.
+    #
+    # SOURCED, not sed-parsed. The driver SOURCES this conf, so parsing it here with a pattern that
+    # only matches a double-quoted value read a DIFFERENT value than the reader did for any unquoted
+    # or single-quoted declaration - one half honouring a key the other could not see. A subshell
+    # source is the driver's exact semantics without polluting this script's namespace.
+    if [ -f .unattended.conf ]; then
+      lm=$(. ./.unattended.conf 2>/dev/null; printf '%s' "${LANDER_MARKER:-}")
+      if [ -n "$lm" ]; then
+        # RESOLVED AGAINST THE GIT COMMON DIR, which is the only directory both halves agree on. It
+        # was tree-relative and wrong twice: each half resolved it against its own cwd, and in a
+        # LINKED WORKTREE `.git` is a FILE, so `.git/unattended-landed` fails with `Not a directory`
+        # and no unattended run could ever land from one.
+        #
+        # AND THE FAILURE IS REPORTED. `2>/dev/null || true` meant a lander that pushed but could
+        # not record it still printed `landed`, and `--landed` then refused blaming the lander for
+        # writing nothing - the one diagnosis guaranteed to send the reader at the wrong half.
+        _gcd=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || _gcd=""
+        if [ -z "$_gcd" ]; then
+          echo "push-main: pushed $def, but could not resolve the git common dir to write the lander marker ($lm). The push SUCCEEDED and is not recorded." >&2
+          exit 1
+        fi
+        if ! printf 'landed %s at %s by push-main\n' "$def" "$(git rev-parse HEAD)" > "$_gcd/$lm"; then
+          echo "push-main: pushed $def, but could not write the lander marker at $_gcd/$lm. The push SUCCEEDED and is not recorded." >&2
+          exit 1
+        fi
+      fi
+    fi
     echo "push-main: landed $def on $remote." >&2
     exit 0
   fi

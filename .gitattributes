@@ -6,6 +6,13 @@
 
 # The gate leg manifest is runtime-read by run-gates.sh (a stray CR would corrupt leg names/argv).
 tools/gate-legs.json text eol=lf
+
+# Settings fragments are parsed by `sed` in check-wiring.sh, whose bracket-negated capture would
+# take a trailing CR into the value: a matcher of `Bash|PowerShell<CR>` matches nothing and the arm
+# reports UNWIRED against a correctly wired repo. Pinned as a CLASS, not an instance —
+# recall-opened.fragment.json shipped with the same exposure and no pin, and fixing only the new
+# file would certify coverage this does not have.
+*.fragment.json text eol=lf
 # The size gate's high-water record: a data file the gate PARSES and `--bump` REWRITES. The gate
 # strips CR from the value so it is tolerant either way, but an unpinned record makes every --bump
 # rewrite the whole file on a CRLF checkout, and the key side has no such tolerance to spare.
@@ -13,6 +20,9 @@ tools/template-size-highwater.txt text eol=lf
 # The DECLARED ceilings, same reason: the gate parses this file, and an unpinned path smudges to
 # CRLF on this fleet. A person edits it, so it never gets a rewrite to normalise it back.
 tools/template-size-limits.txt text eol=lf
+# The runner's DECLARED hardware profile table: parsed at runtime with a TAB field separator, so a
+# stray CR lands inside the last field and turns `timeout=0` into a value the runner refuses.
+tools/run-gates/gate-profiles.txt text eol=lf
 
 # Git hooks are extensionless (the *.sh rule above misses them); a CRLF hook won't execute.
 .githooks/pre-commit text eol=lf
@@ -35,6 +45,9 @@ tools/template-size-limits.txt text eol=lf
 # (`check-memory-hygiene.sh --print-index-set`): a new backlog shard, guide, or build README joins
 # it with no edit here. A pin that must be remembered is the pin that gets forgotten.
 memory/**/*.md text eol=lf
+# Measurement scripts live beside the build record that ran them (`*.sh` is pinned globally above;
+# `.py` was not, and a build-record script is read and re-run the same way a shell one is).
+memory/**/*.py text eol=lf
 memory/**/*.toml text eol=lf
 memory/**/*.txt text eol=lf
 
@@ -53,7 +66,17 @@ memory/backlog/*.md merge=rows
 
 # The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF
 # checkout can't inflate the count past the limit. (The gate also normalizes, belt-and-suspenders.)
-parallel-coding-governance*.md text eol=lf
+coding-governance-agents.template.md text eol=lf
+AGENTS.md text eol=lf
+.governance/deploy.toml text eol=lf
+tools/line-length-limits.txt text eol=lf
+# TOOL-dHonouredPark-3: the dead-path registry became TAB-separated, so its bytes are load-bearing
+# in a way they were not while a row was `<path>:<line>` plus free whitespace.
+tools/dead-path-waivers.txt text eol=lf
+# DEPL-dCarriedReceipt-15: the carried-prefix ratchet is TAB-separated for the same reason, and its
+# rows are `diff`-compared against `--list`'s output on every authoring pass. Without the pin a
+# Windows checkout turns it CRLF and that comparison reds on every line.
+tools/install-prefix-carried.txt text eol=lf
 
 # The rendered recall Skill is compared to a fresh render with plain `diff` by
 # `adopt-memory-recall.sh --check`. The renderer always emits LF, so without this pin a Windows
@@ -72,6 +95,7 @@ parallel-coding-governance*.md text eol=lf
 # population, which is DERIVED from tracked `.claude/` paths carrying this attribute — so the pin is
 # the whole of that wiring and the script needs no edit.
 .claude/skills/unattended/SKILL.md text eol=lf
+.claude/skills/lexicon/SKILL.md text eol=lf
 
 # The /session-kickoff engine. Pinned because a GATE now reads it — check 12 of the unattended leg
 # greps its text, which nothing did before. That leg strips CR anyway, and both halves are the point:
@@ -87,7 +111,11 @@ skills/session-kickoff/SKILL.md text eol=lf
 # of the checkout with 350 CR bytes and the shipped Tier-2 harness could not be launched at all,
 # while its own syntax leg stayed green. The committed blobs were already LF; `* text=auto` plus
 # core.autocrlf smudged every unpinned path on the way out.
+tools/hooks/*.js text eol=lf
 tools/workflows/*.js text eol=lf
+# The unattended kit's hooks and their shared module, pinned for the same reason as the two lines
+# above: they run under node from a settings.json command, and the index already holds them LF.
+tools/unattended/*.js text eol=lf
 
 # codebase-map determinism (this repo dogfoods the kit). The gate's freshness leg BYTE-COMPARES the
 # generated artifacts against a fresh LF render, so an unpinned generated file on a Windows checkout
@@ -136,6 +164,7 @@ memory/map/affordance-exempt.toml text eol=lf
 # is a class this repo has already paid for twice.
 tools/govkit/*.toml text eol=lf
 tools/govkit/*.py text eol=lf
+tools/run-gates/*.py text eol=lf
 tools/govkit/entries/*.toml text eol=lf
 tools/*/kit.toml text eol=lf
 
@@ -148,3 +177,52 @@ tools/*/kit.toml text eol=lf
 # must fire. Not harmless, and MEASURED — this comment previously said "harmless today", which the
 # same kit's own selftest then disproved. The reader also strips CR; both halves are armed.
 .lexicon.conf text eol=lf
+# The frozen TypeScript conformance corpus. Its records are the compiler's reading of the COMMITTED
+# bytes, and a `src` value is TypeScript source carried as a JSON string — so the file's own line
+# endings are not the load-bearing half here, the excerpts are, and they are LF inside the strings
+# whatever the checkout does. The pin is for the review: this file is read one record per line so a
+# diff says which record moved, and an unpinned path smudges to CRLF on this fleet and re-writes
+# every one of them on the next re-extraction. TOOL-aGradedDialect-2.
+tools/lexicon/ts-conformance-fixtures.json text eol=lf
+memory/guides/PLAYBOOK-TEMPLATE.md eol=lf
+tools/unattended/PLAYBOOK-TEMPLATE.template.md eol=lf
+tools/unattended/check-playbook.sh eol=lf
+tools/unattended/check-playbook.test.sh eol=lf
+tools/unattended/playbook.fixture.md eol=lf
+tools/unattended/fixture-pieces/**/*.md eol=lf
+memory/builds/*/pieces/*.md eol=lf
+tools/unattended/fixture-records/*.md eol=lf
+# The GENERATED subject pin: parsed with a TAB field separator, and a stray CR lands inside the
+# subject value, so `repo\r` compares unequal to `repo` and the ratchet reds on every leg at once.
+# TOOL-dUnstalledConvoy-29.
+tools/govkit/subject-pins.tsv text eol=lf
+
+# TOOL-dFramedEntrypoint-2 - the two slot-budget declarations. Tab-separated and read line by
+# line, so a CR would land inside the value field and a ceiling would parse as UNARMED.
+tools/memory-tree/build-readme-slot-limits.txt eol=lf
+tools/memory-tree/build-readme-slot-highwater.txt eol=lf
+
+# The run-gates declared-value tables are READ WITH A TAB SPLIT — `gate-profiles.txt` by
+# `awk -F'	'`, the ceiling pair by python — so a stray CR lands in the LAST field of every
+# row and corrupts the value nobody thought to strip. TOOL-aQuenchedHarness-2.
+tools/run-gates/*.txt text eol=lf
+
+# process-monitor kit (TOOL-aReapedSpinner-6): the shell and the conf are execution-sensitive.
+tools/process-monitor/*.sh text eol=lf
+.process-monitor.conf text eol=lf
+
+# runlog kit (TOOL-dLoggedFlight-1). The fixtures are journal lines whose bytes ARE the test: TAB
+# separators, LF terminators, and one file whose final line deliberately has no LF. A CRLF
+# smudge would turn every fixture line into one the reader refuses for its unescaped CR.
+tools/runlog/*.py text eol=lf
+tools/runlog/fixtures/* text eol=lf
+# The redaction table (TOOL-dLoggedFlight-5) is read with a TAB split, and the kit's scan of its own
+# files reads bytes. The loader tolerates a CRLF checkout; this pin keeps gov's own copy from needing it.
+tools/runlog/*.tsv text eol=lf
+# The runlog Skill (TOOL-dLoggedFlight-12), pinned for the reason the three rendered Skills above are:
+# `adopt-runlog.sh --check` byte-compares the rendered copy against a fresh LF render. It strips CR
+# from the working copy first, so the pin keeps the committed bytes deterministic rather than holding
+# the leg up. The template is pinned beside it, since the adopter reads it and the kit's self-test
+# renders from it independently.
+.claude/skills/runlog/SKILL.md text eol=lf
+tools/runlog/SKILL.template.md text eol=lf

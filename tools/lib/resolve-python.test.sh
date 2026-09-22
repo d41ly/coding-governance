@@ -89,6 +89,7 @@ out=$(PATH="$C:$PATH" bash -c 'set -u; . "$1"; PY=$(resolve_python) || { echo HA
 PARITY_ROWS="
 resolve_python|$CANON|tools/lib/resolve-python
 kickoff_region|$ROOT/tools/unattended/check-unattended.sh|tools/unattended/check-unattended
+render_doc|$ROOT/tools/lib/render-doc.sh|tools/lib/render-doc
 "
 blk() { awk -v s="$1" '$0 ~ ("^# >>> " s){f=1} f{print} $0 ~ ("^# <<< " s){if(f)exit}' "$2"; }
 while IFS='|' read -r stem canon excl; do
@@ -150,6 +151,13 @@ awk '$0 !~ /^[[:space:]]*#/' "$plant" | grep -qE 'command -v (python3|python|py)
 # Scope is `*.sh`. Widening to .githooks/, *.json and *.md was measured and rejected: 46 further hits
 # across 15 files, every one operator prose, which would need a 46-entry allowlist on day one — an
 # allowlist that size is a second source of truth, not a gate.
+#
+# THE THIRD SHAPE is a PARAMETER DEFAULT: `py=${GOV_PYTHON:-python}`, `"${PYBIN:-python}" x.py`. It
+# names a launcher after `:-`, so neither predicate above sees it, and it is a resolver of its own —
+# one that never RUNS its candidate. Measured (the aReplayedCard closing review, F2): that exact line
+# shipped in the kickoff checker's `--card --append` and locked every commit out on a host with only
+# `python3`, and six test suites carried the same default. `${GOV_PYTHON:-}` — an EMPTY default —
+# is the near-miss the predicate must not fire on: it is the resolver block's own spelling.
 bare_scan() {  # $1=file -> "file:line:text" per bare-launcher site
   awk -v F="$1" '
     /^# >>> resolve_python/ { b = 1 }
@@ -157,7 +165,8 @@ bare_scan() {  # $1=file -> "file:line:text" per bare-launcher site
     /^[[:space:]]*#/ { next }
     /gov:literal-python/ { next }
     /(^|[;&|(){}`!]|&&|\|\||\$\(|(^|[^A-Za-z0-9_])(if|elif|then|else|while|until|do|exec|env|time|nohup|xargs|sudo|command))[[:space:]]*(python3|python|py)([[:space:]]|$)/ ||
-    /(^|[^A-Za-z0-9_$])(export[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*=["'"'"']?(python3|python|py)["'"'"']?([[:space:]]|;|\)|$)/ \
+    /(^|[^A-Za-z0-9_$])(export[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*=["'"'"']?(python3|python|py)["'"'"']?([[:space:]]|;|\)|$)/ ||
+    /:-["'"'"']?(python3|python|py)["'"'"']?\}/ \
       { printf "%s:%d:%s\n", F, NR, $0 }
   ' "$1"
 }
@@ -201,6 +210,13 @@ printf '#!/usr/bin/env bash\nexport PY=python3\n' > "$plant"
 [ -n "$(bare_scan "$plant")" ] || bad "an EXPORTED bare assignment is not caught"; ok
 printf '#!/usr/bin/env bash\nPY="python3"\n' > "$plant"
 [ -n "$(bare_scan "$plant")" ] || bad "a QUOTED bare assignment is not caught"; ok
+# ...the parameter-default shape, the two spellings that shipped, and its one near-miss.
+printf '#!/usr/bin/env bash\n    py=${GOV_PYTHON:-python}\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "a PARAMETER-DEFAULT launcher (\${X:-python}) is not caught — the shape that locked the card append"; ok
+printf '#!/usr/bin/env bash\nout=$( "${PYBIN:-python}" x.py 2>&1 )\n' > "$plant"
+[ -n "$(bare_scan "$plant")" ] || bad "a quoted parameter-default launcher invocation is not caught"; ok
+printf '#!/usr/bin/env bash\nPY=$(resolve_python "${GOV_PYTHON:-}") || exit 2\n' > "$plant"
+[ -z "$(bare_scan "$plant")" ] || bad "an EMPTY default \${GOV_PYTHON:-} fires the parameter-default ban"; ok
 # ...and the ban's own population is real, or it is a gate over nothing.
 nsh2=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -cv '^tools/lib/resolve-python' || true)
 [ "$nsh2" -gt 10 ] || bad "the invocation ban scanned $nsh2 shell files — the population collapsed"; ok

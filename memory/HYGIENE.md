@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.22 -->
+<!-- gov:kit memory-tree@2.85 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -26,7 +26,7 @@ memory/
 ├── decisions/             decision detail (append-only area files)
 ├── guides/                long-lived reference guides
 ├── archive/               rotated indexes + legacy material a build can't claim
-├── project/               the gate's own waiver registries (`*.txt`, six of them) and nothing else
+├── project/               the gate's own waiver registries (`*.txt`) and nothing else
 └── builds/<slug>/
     ├── README.md                   (the build's entry point; mostly generated)
     ├── RUN.md                      run-state for an UNATTENDED run; only when one is/was live
@@ -58,25 +58,43 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
 ## Index budgets, caps, rotation
 
 - **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`,
-  `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤ 300 chars. Detail
+  `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤
+  `ENTRY_CAP_CHARS` (300 by default); a build `README.md` gets its own tier,
+  `BUILD_README_ENTRY_CAP_CHARS` (350). Both are declared in `.memory-tree.conf`. Detail
   lives in the build folder or decision file the line points at. `guides/*.md` is exempt from the
   entry budget — a guide is prose, not index rows — and still carries the file caps below. That
   exemption is ONE expression with one base and one optional append for the codebase-map detail
   files; a second full spelling of it is how the `guides/` half went missing once.
 - **File caps:** index and generated files are capped BY CLASS, and every cap is declared in
   `.memory-tree.conf` (`INDEX_CAP_*`, `GUIDE_CAP_*`, `BUILD_README_CAP_*`, `DOSSIER_CAP_*`). The shipped
-  defaults are 20 KB / 250 lines for a row document, 60 KB / 750 lines for a guide, 25 KB with no line
+  defaults are 20 KB / 250 lines for a row document, 96 KB / 1200 lines for a guide, 25 KB with no line
   cap for a build README, and 20 KB with no line cap for a codebase-map dossier. `archive/` is wholly
   exempt. A LINE cap of 0 means no independent line cap for that class, which is how a project retires
   the line axis — this repo has, for row documents.
-- **The live-row floor.** Because rotation carries forward every non-terminal row, a shard's floor is
-  its live set: when nothing terminal is left, rotating is a no-op and the next row breaches the cap.
-  So the number that actually bounds a shard is its LIVE ROW COUNT, and `drift-audit` reports that per
-  shard on every run (`live_backlog_rows_per_shard`, report-only). `TOOL-aRelaxedShard-4`.
-- **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
-  whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
-  non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still
-  covers them. Rotation moves whole files — it never rewrites or renumbers a ratified record.
+- **Rotation mode is DECLARED, never assumed.** `.memory-tree.conf` sets `ROTATION_MODE` to one of
+  `cut | snapshot`, and a repo that declares neither has not decided rather than defaulted. **`cut`** —
+  move only the TERMINAL rows out to `archive/<INDEX>.<date>.md`, leaving every non-terminal row in the
+  live index, so an id sits in exactly ONE file and its status has exactly one owner. **`snapshot`** —
+  `git mv <INDEX>.md archive/<INDEX>.<date>.md` whole, then open a fresh index carrying the
+  non-terminal rows forward, so a live id sits in two files and the archived copy is a dated
+  PHOTOGRAPH of the index, never a second answer about that id's status.
+- **The two do not blend, and blending them is the defect this key exists to prevent.** A whole-file
+  move PLUS a carry-forward writes every live row into a frozen file, and each of those rows then
+  drifts, one status edit at a time, into contradicting the shard it was cut from. That is not
+  hypothetical: it is how one archive in this kit's own dogfood repo came to hold 66 non-terminal rows
+  under a header promising terminal ones only, with 49 of its ids also live in the shard and 7 of
+  those disagreeing about status.
+- **Either mode:** the fresh or surviving index notes the rotation in its PREAMBLE, naming the archive
+  file (check 10, which greps for that basename and reads nothing else) and what moved; rotated archives stay inside `memory/` so the all-time id-collision
+  grep still reaches them; and rotation never rewrites or renumbers a ratified record.
+- **The live-row floor.** Non-terminal rows survive the rotation under either mode, so a shard's floor
+  is its LIVE ROW COUNT: when nothing terminal is left, rotating is a no-op and the next row breaches
+  the cap. `drift-audit` reports that per shard on every run (`live_backlog_rows_per_shard`,
+  report-only). `TOOL-aRelaxedShard-4`. Under `cut` that floor is reached sooner, because a cut
+  rotation sheds less.
+- **NOT CHECKED, and it matters:** nothing in this engine asserts that a tree HONOURS its declared
+  mode. `ROTATION_MODE` is validated against the closed set and then read by no check. A green bar is
+  therefore not evidence that an archive holds what the mode says it should.
 
 ## Status vocabulary (backlogs)
 
@@ -89,25 +107,32 @@ Spec status headers (check 12) reuse the same seven tokens with spec-lifecycle m
 
 ## The grandfather ratchet
 
-Six plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
+The plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
 set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file:
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
   exempt from the recording-file naming check. Should not grow after the initial adoption.
 - **`curation-debt.txt`** — index files pending slimming, exempt from the cap / entry-budget / status-vocabulary
-  checks while listed. Every curation sweep deletes lines; empty = fully strict. CI fails if a listed path is gone.
+  checks while listed. Every curation sweep deletes lines; empty = fully strict. CI fails if a listed path is gone,
+  and — since `TOOL-cGradedDebt-1` — if a listed path would PASS all three unwaived, because a row
+  that hides nothing has stopped shrinking. The same run prints which of the three each row earns,
+  so a waiver wider than its fault is visible without being failed. Held under `--staged`.
 - **`id-orphan-waiver.txt`** — ids cited but never defined, deliberately (check 14). Shrink-only
   against `ORPHAN_ID_PIN`, with a stale-entry guard: a waived id that now resolves reds.
 - **`corpus-path-unresolved.txt`** — rooted repo-path citations that resolve to nothing (check 15),
   one TAB-separated row per `(citing-file, cited-path)`. Shrink-only against `DEAD_PATH_PIN`.
 - **`unarmed-branches.txt`** — `fail` branches no assertion reaches (the harness meta-gate below).
   Shrink-only, and EMPTY is its working state rather than its retirement.
+- **`substitution-fed-loops.txt`** — the sites `gate-lint`'s shell scan grades, shipped by that kit
+  as an EMPTY seed the repo then owns. Rows are this tree's own; gov's would name paths you do not
+  have.
 - `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
   `guides/BUILD-METHOD.md`, one `<path> · <why>` row each, read by
   `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit
   ships none: an adopter's is scaffolded from their OWN measured population, because gov's rows would
   name paths their tree does not have.
 
-All six are scaffolded by `adopt-memory-tree.sh`. "Absent" and "present and empty" read identically
+MOST are scaffolded by `adopt-memory-tree.sh`, not all: a registry that arrives with the gate
+that reads it is scaffolded by nothing. "Absent" and "present and empty" read identically
 to every consumer, so a registry a gate names and nothing creates is invisible until the first row.
 
 ## The check catalog (all in `tools/memory-tree/check-memory-hygiene.sh`; this file is the prose home)
@@ -123,10 +148,10 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 4. **build-folder naming** — `builds/*` is the SLUG alone, no date and no family prefix; inside a
    build folder only `README.md RUN.md prompts/ spec/ build/ reviews/` plus loose
    recording-named `.md`; non-md only in `build/`. `RUN.md` is the UNATTENDED run-state file: one
-   generated region plus an authored one, present only while a run is or was live. It is capped by
-   rule 6, exempt from rule 7 (the standing mandate is verbatim prose), and deliberately OUTSIDE
-   rule 8 — a run phase is not a slot status, and no token in that vocabulary means "built and
-   reviewed, not yet landed".
+   generated region plus an authored one, present only while a run is or was live. It is in NO size
+   check — see rule 6 — and deliberately OUTSIDE rule 8, because a run phase is not a slot status
+   and no token in that vocabulary means "built and reviewed, not yet landed". The RETIRED form
+   `RUN.<PHASE>.<8 hex>.md` is admitted here by grammar and IS capped by rule 6.
 5. **recording-file naming** — files under the four subfolders, AT ANY DEPTH, match
    `<date>-<kind>[-<FAMILY>]-<slug>-<seq>[-<unit-tail>].md`. The kind comes from the SUBFOLDER, not
    from the file's immediate parent — `spec/units/x.md` is a spec. The family is the closed
@@ -136,7 +161,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 6. **index size caps** — FOUR classes, because prose, rows, a generated surface and a map dossier
    fail for different reasons. Row
    documents ≤ `INDEX_CAP_BYTES` / `INDEX_CAP_LINES` (20 KB / 250 by default); `guides/*.md` ≤
-   `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (60 KB / 750); a build `README.md` ≤
+   `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (96 KB / 1200); a build `README.md` ≤
    `BUILD_README_CAP_BYTES` (25 KB) with `BUILD_README_CAP_LINES` at 0, which means NO independent
    line cap for that class; and a codebase-map dossier ≤ `DOSSIER_CAP_BYTES` (20 KB) with no line cap,
    reached only where a map is adopted and guarded on a non-empty prefix, because an unguarded selector
@@ -145,12 +170,14 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    measure (grandfather:
    `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
    and check 16 refuses a charter-cited file that nothing caps — but for a guide the LINE count is a
-   proxy, and check 16's `READ_PATH_CEILING` is the real budget, measured in bytes and NOT relaxed
-   here. So a guide's effective room is whichever of the two binds first, and past ~250 lines that is
-   normally the read-path ceiling rather than this cap. Entry-budget exempt (check 7's `ex7`) — a
-   guide is prose, not index rows. `builds/*/RUN.md` is a ROW document on both counts: it is designed
-   to GROW, so the cap is the bound the protocol spills against (oldest parked entries move to the
-   build's own `build/` folder as a dated recording).
+   proxy for the byte cap beside it. There is no longer a SUMMED read-path budget behind these:
+   `READ_PATH_CEILING` was retired in 2.42, and these per-class caps ARE the bound a guide has.
+   Entry-budget exempt (check 7's `ex7`) — a
+   guide is prose, not index rows. A LIVE `builds/*/RUN.md` is exempt from this rule BY CLASS: it is
+   append-only by construction, the driver writes a row per verb and removes none, so no compliant
+   state exists and the remedy this rule names is unreachable while the record is still being read.
+   The class is the RESERVED NAME, which rule 4 lets only the run-state file hold, and retirement is
+   a rename — so the frozen `RUN.<PHASE>.<8 hex>.md` stays capped and keeps the `ex7` exemption.
 
    **A row class may retire its line axis, and this repo has.** `TOOL-aRelaxedShard-1` declares
    `INDEX_CAP_LINES=0` after the owner ratified it, reversing what `TOOL-aWidenedGuide-1` refused. It
@@ -158,14 +185,20 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    75,000 B, so the byte figure decided every real case — but the line figure DID bind on 22 of the 29
    members, every dossier among them, which is why dossiers became their own class rather than
    inheriting the relaxed index cap.
-7. **entry budget** — index entry lines ≤ 300 chars (grandfather: `curation-debt.txt`).
+7. **entry budget** — index entry lines ≤ `ENTRY_CAP_CHARS` (300 by default), a build `README.md`
+   ≤ `BUILD_README_ENTRY_CAP_CHARS` (350) (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
+   It REPORTS the number of rows it graded, because its population guard counts shard FILES: a waiver
+   over most of the rows otherwise reads as a green check over a population nobody sees.
 9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is
    DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
    README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
    Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them.
-10. **rotation note** — every rotated `archive/<INDEX>.<date>.md` is referenced from lines 1–3 of its live index.
+10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved by BASENAME anywhere under the memory root rather than at
+    a fixed path; a stem resolving to zero or several live indexes is a NAMED finding, never a
+    skip. The reference is read from everything above the index's first row, and never fewer
+    than its first three lines. It grades ANNOUNCEMENT, never the archive's CONTENTS.
 11. **old-tree tombstone** — if `.memory-tree.conf` sets `TOMBSTONE_ROOTS` (the tree you migrated FROM),
     the gate fails if that tree ever regains a tracked file. Blank = skipped (fresh-scaffold projects).
 12. **spec format** — when `.memory-tree.conf` sets `SPEC_FORMAT_CUTOFF`, spec files dated ≥ it
@@ -179,6 +212,26 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     Every acceptance bullet must name a witness in backticks once the filename date reaches
     `SPEC_WITNESS_CUTOFF`, on either tier. SHAPE only — that a bullet names something, never
     that the named thing exists.
+    Every numbered acceptance bullet must also name the BREAK that would turn it red, in a clause
+    marked `Red when:`, once the filename date reaches `SPEC_FAILURE_MODE_CUTOFF`, on either tier.
+    The per-bullet walk is shared with the witness arm above and each reads only its own key.
+    A LIVE spec must have the `base` sha in its status header RESOLVE to a real commit once the
+    filename date reaches `BASE_RESOLVE_CUTOFF`, on either tier. TERMINAL specs are excluded, so a
+    spec that goes SPECCED to CLOSED in one commit is never graded at all — a known bypass, named
+    here rather than implied away. Skipped with a stderr line in a shallow clone, where every
+    commit outside the fetch depth answers `missing`.
+    A Tier-2 spec must carry a `### Edges` block in §3 once the filename date reaches
+    `SPEC_EDGES_CUTOFF`: one bullet per edge, `**consumes-from**` or `**hands-off**` plus a
+    backticked sibling id or the bare word `external`, or the single word `none`. The SHAPE arm
+    runs under `--staged`; the reciprocity, order and payload JOINS are held there and announce it.
+    Every §2 scope item must name the acceptance criterion that observes it, or carry `NOT OBSERVED`
+    and a reason, once the filename date reaches `SCOPE_JOIN_CUTOFF`, on either tier — and only for a
+    spec carrying BOTH headings, matched by heading TEXT rather than by ordinal. SHAPE only.
+    Every §9 revision entry numbered rev-2 or higher must name what it MOVED — a `§<n>`, `S<n>` or
+    `AC<n>` token — once the filename date reaches `REV_SCOPE_CUTOFF`, on either tier. Graded per
+    ENTRY with continuation lines folded in, because this corpus wraps §9 and puts the detail in the
+    wrap; rev-1 is exempt, and the engine announces a zero population rather than passing silently
+    while the cutoff sits ahead of the corpus.
 
 13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
     and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so
@@ -197,14 +250,23 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     a gate whose steady state is red gets bypassed; (2) a shrink-only pin (`DEAD_PATH_PIN`);
     (3) no duplicate rows; (4) a `moved:<dest>` row needs `<dest>` to be a tracked FILE.
 16. **read-path accounting** — the files `CHARTER` points a session at, under `MEMORY_ROOT`, derived
-    from the charter's own text through three token arms. `--measure` prints a ceiling as the
-    measured total plus `READ_PATH_HEADROOM`, which is ADVICE for the author pasting the pin back;
-    the CHECK compares against `READ_PATH_CEILING` alone, because a ceiling computed from a headroom
-    would let a growing corpus raise its own budget. The total stays under `READ_PATH_CEILING`
-    (one-sided — shrinking never reds) and every member is either byte-capped by check 6 or listed in
-    `READ_PATH_WAIVER`; a charter citation nothing watches is the rule-3 case.
+    from the charter's own text through three token arms. TWO rules, and NO byte budget: rule 3 is
+    that every member is byte-capped by check 6 or listed in `READ_PATH_WAIVER`, because a charter
+    citation nothing watches is a read budget nobody watches; rule 4 is that a cited file tracked but
+    absent from the worktree is a finding, and it is the ONLY detector for that class — check 12's
+    arm covers `builds/*/spec/*.md` alone and the index set drops absent files before check 6
+    measures. The SUMMED budget `READ_PATH_CEILING` carried was retired in 2.42: check 6 already
+    caps every member, so the sum was a second bound over an already-bounded population and it never
+    once caused a trim. A conf still declaring `READ_PATH_CEILING` or `READ_PATH_HEADROOM` is
+    ANNOUNCED and reds nothing.
 
-Checks 13-16 live in `tools/memory-tree/corpus_ids.py` and are DISABLED when their pins are blank.
+Check 16 is STRUCTURAL: it runs whenever the conf is loadable, is behind no pin, and reaches neither
+`walk()` nor the id grammar. It was behind a pin, and that was the defect — one blank line silenced a
+citation check. Rules 3 and 4 REPORT without gating until the version named in `corpus_ids.py`'s
+`READ_PATH_GATES_FROM`, so an adopter is not redded for a pre-existing condition on their first
+upgraded bar; the grace announces itself on every run.
+
+Checks 13-15 live in `tools/memory-tree/corpus_ids.py` and are DISABLED when their pins are blank.
 Every pin is MEASURED against the adopting corpus (`corpus_ids.py --measure`), never inherited: a pin
 copied from a larger tree is either vacuous or permanently red. The id grammar comes from the
 memory-recall kit, so arming these checks requires that kit — with the pins blank it is never
@@ -220,14 +282,32 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     because every universal record is emitted on EVERY reviewer's checklist.
 
 20. **one id, one row per document** — within a single row document (the decision index, a backlog
-    shard, a rotated archive) an id appears at most once. The count of survivors is pinned
-    shrink-only by `ROW_DUPLICATE_PIN`, and an UNDECLARED pin is a refusal, not a disabled check.
+    shard, and the rotated archive of either) an id appears at most once. An archive is recognised by
+    the name of the document it ROTATED — `DECISIONS` or a declared FAMILY, plus a date and an
+    optional same-day disambiguator — and NOT by being any `.md` under `archive/`, which would sweep
+    in frozen snapshots where a quoted example row would red a file nobody may edit. Until
+    `TOOL-cSpliceWarden-3` the archive half admitted only `DECISIONS.`-prefixed names, so a rotated
+    BACKLOG shard was outside this check entirely; three were, and one of them carried two duplicated
+    ids past a green bar for a month. The count of survivors is pinned shrink-only by
+    `ROW_DUPLICATE_PIN`, and an UNDECLARED pin means ZERO — the strictest value, never a refusal and
+    never off, because a default that can only TIGHTEN needs no ceremony.
     Scope is PER FILE deliberately: corpus-wide would red every designed backlog-row-plus-decision-row
     pair. NAMED GAP — the live index and its rotated archive are two files, so a row that rotates out
     and is re-minted is not caught here; the all-time collision grep the index's own header
     prescribes covers that. Keyability is asserted alongside it, but only as the precondition that
     makes the uniqueness census meaningful: on its own it is a check the corpus cannot fail, over a
     property the merge driver already enforces where it can be violated.
+
+24. **the declared rotation mode is HONOURED** — under `ROTATION_MODE=cut` a rotated archive of a
+    status-bearing shard holds TERMINAL rows only, and no id sits in both an archive and the live
+    index it was cut from. Those two together are what `cut` means: one id, one file. Delegated to
+    `row_grammar.py`, which owns the row grammar — a second spelling of it in shell passed a
+    bold-wrapped id silently, and the decision index carries fifteen such rows. NOT GRADED, and
+    announced on every run rather than passed over: `snapshot`, whose assertion inverts to "an
+    archived row is never edited after the rotation" and whose baseline commit is not resolvable
+    here; an UNDECLARED mode; a DECISIONS archive's terminal half, since a decision row carries no
+    lifecycle token; and the CONTENT of any archive, ever. A `cut` tree with no rotated archive says
+    it graded nothing rather than reporting clean.
 
 21. **every record names the spec it is evidence about** — a build folder holds one spec per unit,
     and everything else in it (an adversarial review, a build ledger, a research report, a
@@ -236,6 +316,56 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     grammar and the escape are below under "Record bindings". Delegated to `gen_build_index.py`,
     which already reads every record's bytes; the parse RAISES nothing, so an unannotated record can
     never refuse the render.
+
+22. **review verdict vocabulary** — a review record whose filename date reaches
+    `REVIEW_VERDICT_CUTOFF` carries exactly ONE `## Verdict:` line, and its token is a member of the
+    closed set `CLEAN` / `CLEAN WITH FIXES` / `BLOCKED`. A trailing tally is not a member: the point is
+    a token a machine can compare, and counts belong in the body. Deliberately NOT check 5, which is a
+    recording FILENAME grammar, and NOT check 21, which asks which spec a record is evidence about — a
+    verdict assertion under either number would make a structural check read as a semantic one to
+    everybody who did not write it. Forward-only by the cutoff, because 45 of 111 tracked records
+    carried no verdict at all when this landed and a landed review is not rewritten.
+    **What it does NOT check:** whether the verdict is TRUE. It grades the token and never the
+    judgement behind it, exactly as the acceptance-witness rule grades a backticked name and never the
+    thing that name points at.
+
+25. **a retirement answers for its readers** — a §2 scope item of a LIVE spec that retires a named
+    thing carries a `**Readers:**` clause, then the literal `by name:`, then the literal `by value:`,
+    on the item's opening line or any line beneath it. LIVE is a status header that is not `CLOSED`
+    or `WONTDO`, and the check has no cutoff key of its own. Its population is check 12's selection,
+    so a blank `SPEC_FORMAT_CUTOFF` disarms this check whatever else is true, and the engine says so
+    at exit 0 rather than going quiet.
+    **The trigger.** A verb from the closed list in the arm is matched ignoring case, over the item
+    with its whitespace squeezed, and reaches the past tense beside the present and the imperative;
+    it must sit beside a backticked token of an identifier shape, which is an underscore, a slash, a
+    dotted word tail, a lowercase letter then an uppercase one, or two dashes then a letter. A
+    markdown path counts as an identifier with or without a slash, because `.md` is a dotted tail
+    like any other. A family-slug-seq id, a token of dashes and digits and a token carrying a space
+    never count, and a `:<line>` tail is stripped before any shape is tried. A bare backticked word
+    counts only beside one of the six declared kind nouns, which are ONE literal in the arm, beside
+    the verb list, and are not restated here.
+    **Which half is graded how.** The `by value:` half is graded by presence: a backticked token, or
+    `NO VALUE READERS` followed by a reason. The `by name:` half is graded by resolution: every
+    backticked name it lists must resolve, or the half carries `READER NOT IN TREE` followed by a
+    reason, and every name that escape covers is printed, so the skip announces itself. Neither half
+    is graded for completeness. The control is `TOOL-dLoggedFlight-22` at rev-3, whose inventory
+    missed three readers while every name it did list resolves, so it passes this check. Both
+    escapes are taken on trust: the check cannot tell a true escape from a false one, and once
+    written a false one passes for good. A clause is graded wherever it appears, not only where the
+    trigger fired.
+    **What a name resolves against.** A name resolves where a reader spells it as a whole word, and
+    never where a record merely quotes it. A reader is every tracked file outside the memory root, plus `guides/`,
+    `map/`, `HYGIENE.md`, `TEMPLATE-SPEC.md` and `README.md` inside it. Every other file under the
+    root is a record, such as a build record, the archive, the decision log, a backlog, a gotcha note
+    or a waiver registry, which quotes a name and so resolves nothing by content. A name also resolves when it is a tracked path, or the part of
+    one after a `/`, anywhere in the tree. A `:<line>` tail and a trailing `()` are stripped before
+    either test. A whole word means that at each end of the name that is a letter, digit or
+    underscore, the character beside it in the reader is none of those, and a name carrying a
+    hyphen counts the hyphen among them. So a name spelled only inside a longer identifier
+    resolves nothing, a hyphenated name inside a longer hyphenated one included.
+    **Not reached, and named rather than implied away:** a retirement whose backticked tokens hold no
+    identifier shape, and a retirement carrying no backticked token at all. The author of either is
+    never asked, and the remedy is to name the withdrawn thing in backticks.
 
 ## Record bindings — how a record names its spec
 
@@ -263,6 +393,40 @@ carry it too:
 - `gen_build_index.py --print-bindings` is the read-only report: it classifies every record, writes
   nothing, and always exits 0. It is both the migration checklist and the gate's own predicate, so a
   seed list and a gate that disagree is structurally impossible.
+- The check REFUSES when that report exits non-zero or prints no `N` row. The report is the only
+  thing check 21 reads, so a report that did not run would otherwise look exactly like a clean
+  corpus. An adopter whose generator is a fork must carry the mode, or this check names that first.
+
+## Acceptance ledger — how a built unit evidences its criteria
+
+Inside a record whose `**Serves:**` kind is `journal`, which is already defined as evidence of what
+was built. Two further arms once the SPEC's filename date reaches `LEDGER_LABEL_CUTOFF` and
+`LEDGER_TOKEN_CUTOFF`: an answer whose criterion label the spec does not number is a finding, and an
+answer must share a backticked token with the criterion it answers, case-folded and either way round.
+Both are branches of the same check, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disarms them too. One `**Evidences:**` line per unit, and one line per criterion beneath it:
+
+```
+**Evidences:** <id>
+- AC1 — `<observation token>` — what was observed
+- AC2 — amended rev-<n> — the change, and the section 9 line that logs it
+```
+
+- **TWO forms and no third.** OBSERVED carries a backticked token naming the command, file, flag or
+  test that made the observation. AMENDED names the revision that changed the criterion. There is no
+  "satisfied" without one of them, and no `N/A`: a third form is how a ledger becomes a checkbox
+  exercise, and the resulting green is worth nothing.
+- **The AMENDED form is the more important of the two.** Without it a run that legitimately found a
+  criterion wrong has no legal way to record that, and would either write the observed form untruly
+  or skip the ledger. With it, divergence has a home and becomes visible rather than trusted — which
+  is the whole reason the ledger exists.
+- A record MAY carry several `**Evidences:**` blocks, one per unit it evidences. The block ends at
+  the next `**Evidences:**` line or at the next heading.
+- The ledger is EVIDENCE and belongs in a record, never in the spec. A spec is the design and is
+  written before the code; putting evidence in it would make every build rewrite its own acceptance
+  criteria and fill the revision log with bumps that changed no design.
+- The gate reads SHAPE and COVERAGE only. It asserts every criterion a closed spec numbers has a line
+  in one of the two forms; it does NOT assert the token names anything real, that the observation was
+  actually made, or that an amendment was justified. Its header says so.
 
 ## The harness meta-gate
 

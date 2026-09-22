@@ -37,15 +37,16 @@ from __future__ import annotations
 import ast
 import json
 import os
+import subprocess
 import re
 import tomllib
 from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.7 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.2"
+KIT_CODEBASE_MAP_VERSION = "1.7"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -628,35 +629,251 @@ def stems(text: str) -> frozenset[str]:
     )
 
 
-_LINE_COMMENT_RE = re.compile(r"(?://|#).*$", re.MULTILINE)
-_STRING_RE = re.compile(r'"[^"\n]*"|\'[^\'\n]*\'|`[^`]*`')
 _IDENT_TOKEN_RE = re.compile(r"[A-Za-z_$][\w$]*")
 
 
-def _identifier_tokens(source: str) -> set[str]:
-    """Distinct identifier tokens in a source file, with comments and string literals stripped
-    first (crudely: `/* */`, trailing `//`/`#`, then quoted spans) so fan-in is
-    import/identifier-scoped, never counting a name that only appears in a doc-comment or a
-    string. A documented heuristic (a `//` inside a string over-strips its tail); good enough
-    for ranking + a WARN, per §3."""
-    cleaned = _BLOCK_COMMENT_RE.sub(" ", source)
-    cleaned = _LINE_COMMENT_RE.sub(" ", cleaned)
-    cleaned = _STRING_RE.sub(" ", cleaned)
-    return set(_IDENT_TOKEN_RE.findall(cleaned))
+#: Per-language lexical PROFILE — the sole declaration of the field set (TOOL-aLexedStripper-1 §4,
+#: seventh field by TOOL-aLexedStripper-6). Fields, in order:
+#:   line_markers             tokens opening a comment that runs to end of line
+#:   marker_needs_word_start  whether a marker opens a comment ONLY at line start or after space
+#:   block_pair               the block-comment open/close pair, or None
+#:   quote_chars              characters opening a single-line string
+#:   triple_quoted            whether ''' and \"\"\" open a multi-line string
+#:   backtick_is_string       whether a backtick opens a string whose content is NOT code
+#:   interpolation_pair       open/close tokens whose BODY is code, or None
+#: `marker_needs_word_start` is shell-only: `$#` is the argument count and `${p#/opt/}` is a prefix
+#: strip, and treating either as a comment deletes the rest of the line. Backtick is NOT a string in
+#: shell, where it opens command substitution and the content IS code. `interpolation_pair` is what
+#: lets one rule cover a JS template's `${…}` and a Python f-string's `{…}`; the Python row applies
+#: it only inside a string whose prefix carries `f`.
+_PROFILE_C = (("//",), False, ("/*", "*/"), ("'", '"'), False, True, ("${", "}"))
+_PROFILE_PY = (("#",), False, None, ("'", '"'), True, False, ("{", "}"))
+_PROFILE_SH = (("#",), True, None, ("'", '"'), False, False, None)
+
+_LEX_PROFILES = {}
+for _e in (".js .jsx .mjs .cjs .ts .tsx .c .h .cc .cpp .hpp .java .go .rs .cs .swift .kt "
+           ".scala .php").split():
+    _LEX_PROFILES[_e] = _PROFILE_C
+for _e in (".py", ".pyi"):
+    _LEX_PROFILES[_e] = _PROFILE_PY
+for _e in ".sh .bash .zsh .toml .yaml .yml .cfg .ini .conf".split():
+    _LEX_PROFILES[_e] = _PROFILE_SH
+
+#: Extensions `_LEX_PROFILES` knows a comment syntax for but which declare no functions. This is the
+#: ONLY authored half of the definition-carrying set below — the language half is DERIVED from the
+#: profile table, so a language the tokenizer learns is covered the day it is added.
+#:
+#: A SECOND COPY OF A JUDGEMENT, said plainly. The lexicon kit reaches the same conclusion for its
+#: own coverage denominator and argues it at greater length there. It cannot be imported: this repo
+#: relies on a directional layer rule forbidding that kit from importing this one, and the reverse
+#: direction is no better, so the two are independent readings of one question and may diverge.
+_DATA_EXTS = frozenset({".toml", ".yaml", ".yml", ".cfg", ".ini", ".conf"})
+
+#: What this kit believes CAN carry a definition. Derived, minus the data formats above.
+#:
+#: WHAT IT CANNOT SEE: a language `_LEX_PROFILES` has no profile for. `_identifier_tokens` handles
+#: one fail-open, by design, and a dark-layer check built on this set therefore MISSES it rather
+#: than reporting it — a false negative, chosen over the false positive of calling every unknown
+#: extension a source layer.
+DEFINITION_CARRYING_EXTS = frozenset(_LEX_PROFILES) - _DATA_EXTS
+
+_TRIPLE_QUOTES = ('"""', "'''")
+#: String prefix letters Python allows before a quote. Only `f` (any case) turns the
+#: `interpolation_pair` on, but all of them have to be RECOGNISED so `rf"…"` is still seen as
+#: f-prefixed and `b"…"` is not.
+_PY_PREFIX_CHARS = "rRbBuUfF"
+
+
+def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
+    """Distinct identifier tokens in a source file's CODE, with comments and string CONTENT removed
+    by ONE left-to-right pass over the lexical profile for ``suffix``.
+
+    A regex chain cannot express that comments and strings EXCLUDE each other, and whichever it
+    strips first wins. The three regexes this replaced applied C syntax to every language, so a
+    ``/*`` inside a Python docstring opened a comment running to the next ``*/`` (measured: 674
+    lines swallowed, one file down to 18.8% recall against ``tokenize`` ground truth), a ``//``
+    truncated a line of floor division, and a ``#`` truncated a line of TypeScript.
+
+    An UNDECLARED suffix strips NOTHING and returns every token. Over-counting is this scan's
+    documented fail-open direction — it feeds a RANKING and a WARN, never a gate — and guessing a
+    comment syntax is exactly how the old chain got here.
+
+    A multi-line construct left UNTERMINATED at EOF is ABANDONED, the pass resuming just after the
+    opener, so an odd backtick cannot reproduce the same swallow this function exists to remove.
+    """
+    prof = _LEX_PROFILES.get(suffix)
+    if prof is None:
+        return set(_IDENT_TOKEN_RE.findall(source))
+    markers, word_start, block, quotes, triple, backtick, interp = prof
+    out: list[str] = []
+    i, n = 0, len(source)
+
+    def _string(start: int, delim: str, multiline: bool, interpolate: bool) -> int:
+        """Consume a string opened at ``start`` by ``delim``. Text is blanked; an interpolation body
+        is COPIED, because it holds real code. Returns the index just past the close, or past the
+        opener when the literal is unterminated (the abandon rule)."""
+        j = start + len(delim)
+        while j < n:
+            if source[j] == "\\":
+                j += 2
+                continue
+            if interpolate and source.startswith(interp[0], j):
+                if source.startswith(interp[0] * 2, j) and interp[0] == "{":
+                    j += 2  # `{{` is a literal brace and opens nothing
+                    continue
+                k = j + len(interp[0])
+                depth = 0
+                body = []
+                closed = False
+                while k < n:
+                    c = source[k]
+                    # A brace inside a NESTED STRING is text, not structure. Counting it inflated the
+                    # depth so the real closer never matched, and the walk ran on past the literal
+                    # consuming comments and string bodies as code -- the over-capture direction of
+                    # the same defect this scanner exists to remove. Measured: `{` inside a quoted
+                    # argument leaked a following comment's prose into the index.
+                    if c in quotes:
+                        e = k + 1
+                        while e < n and source[e] != c:
+                            if source[e] == chr(92):
+                                e += 2
+                                continue
+                            if source[e] == chr(10):
+                                break
+                            e += 1
+                        if e < n and source[e] == c:
+                            body.append(" " * (e - k + 1))
+                            k = e + 1
+                            continue
+                    if c == interp[0][-1]:
+                        depth += 1
+                    elif c == interp[1]:
+                        if depth == 0:
+                            closed = True
+                            break
+                        depth -= 1
+                    body.append(c)
+                    k += 1
+                # An interpolation that never closes is TEXT, not code. Emitting the body anyway
+                # walked to EOF and leaked the whole rest of the file into the index as identifiers
+                # -- the over-capture direction of the same defect this scanner exists to remove.
+                out.append(" " + "".join(body) + " " if closed else " ")
+                j = k + 1 if closed else k
+                continue
+            if not multiline and source[j] == "\n":
+                return j  # a single-line literal never crosses its line
+            if source.startswith(delim, j):
+                return j + len(delim)
+            j += 1
+        return start + len(delim)  # unterminated: abandon, rescan from just after the opener
+
+    while i < n:
+        ch = source[i]
+        if block and source.startswith(block[0], i):
+            j = source.find(block[1], i + len(block[0]))
+            i = i + len(block[0]) if j < 0 else j + len(block[1])
+            out.append(" ")
+            continue
+        hit = next((m for m in markers if source.startswith(m, i)), None)
+        if hit and (not word_start or i == 0 or source[i - 1].isspace()):
+            j = source.find("\n", i)
+            i = n if j < 0 else j
+            out.append(" ")
+            continue
+        if ch in quotes or (backtick and ch == "`"):
+            # Python string prefixes sit immediately before the quote; `f` (any case) turns on the
+            # replacement field. A prefix run is at most a few letters and is already in ``out``.
+            # The prefix run is a PYTHON construct, so it is read only for a profile that has
+            # them. Running it for the C family cost nothing but said the opposite of what it meant.
+            fstring = False
+            if triple:
+                k = i - 1
+                pre = ""
+                while k >= 0 and source[k] in _PY_PREFIX_CHARS:
+                    pre = source[k] + pre
+                    k -= 1
+                fstring = "f" in pre.lower()
+            if triple and any(source.startswith(d, i) for d in _TRIPLE_QUOTES):
+                d = source[i : i + 3]
+                i = _string(i, d, True, bool(interp) and fstring)
+            elif ch == "`":
+                i = _string(i, "`", True, bool(interp))
+            else:
+                i = _string(i, ch, False, bool(interp) and fstring)
+            out.append(" ")
+            continue
+        out.append(ch)
+        i += 1
+    return set(_IDENT_TOKEN_RE.findall("".join(out)))
+
+
+def derive_present_layers(root: Path, skip_dirs: frozenset[str] = _SKIP_DIRS) -> dict[str, int]:
+    """`{extension: file count}` over every DEFINITION-CARRYING layer under ``root``.
+
+    `TOOL-dTracedLattice-5` S1, widened by that build's closing review. It walks the WHOLE root
+    rather than the symbol corpus's top-level dirs, because the question is "what languages are in
+    this repository" and answering it over a population shaped by the symbol extractors makes the
+    answer agree with the extractors by construction — a dark-layer check that cannot see a layer
+    nobody extracts is a dark-layer check that reports every layer covered.
+
+    THE POPULATION IS THE TRACKED FILE LIST, and that bound is the whole of the fix this function
+    needed. A bare walk from the root has none: `.claude/worktrees/` holds a checkout per branch, so
+    on a primary tree the first cut counted sixteen sibling worktrees as "this repository" —
+    `{.js: 145, .py: 880, .sh: 1579}` against this tree's `{.js: 8, .py: 61, .sh: 94}`, with
+    `.claude` contributing 2444 of 2604 files. Inflated counts print in a refusal, and one `.ts` on
+    any sibling branch would make `reuse_lookup` exit 2 repo-wide. `git ls-files` is bounded by
+    construction and is the same population every other check in this kit grades.
+
+    It READS NOTHING either way: it counts names, so this costs one `git` call and no I/O. Where git
+    cannot answer it FALLS BACK to a walk — with `.claude` skipped, because that directory is the
+    measured cause — and an adopter's export tarball still gets an answer rather than a crash.
+    """
+    out: dict[str, int] = {}
+    try:
+        listing = subprocess.run(["git", "-C", str(root), "ls-files", "-z"],
+                                 capture_output=True, check=True).stdout
+        names = [n for n in listing.decode("utf-8", "replace").split("\0") if n]
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        names = []
+        for dirpath, dirnames, filenames in os.walk(root):
+            dirnames[:] = [d for d in dirnames if d not in skip_dirs and d != ".claude"]
+            names.extend(filenames)
+    for name in names:
+        suffix = Path(name).suffix
+        if suffix in DEFINITION_CARRYING_EXTS:
+            out[suffix] = out.get(suffix, 0) + 1
+    return out
 
 
 def build_reference_index(
-    files: list[str], *, root: Path | None = None, skip_dirs: frozenset[str] = _SKIP_DIRS
+    files: list[str], *, root: Path | None = None, skip_dirs: frozenset[str] = _SKIP_DIRS,
+    stats: dict | None = None,
 ) -> dict[str, set[str]]:
     """token -> {POSIX files mentioning it as an identifier}, scanned over the covered-layer
     source: the top-level dirs of ``files`` (a symbols.json file list), filtered to their
     extension set. This is the on-demand scan behind fan_in — NEVER committed. Fail-open by
     design on an unreadable file (skipped): this feeds a RANKING/WARN, not a gate, so a binary
-    blob must not abort the lookup (the opposite of the extractor law, and deliberately so)."""
+    blob must not abort the lookup (the opposite of the extractor law, and deliberately so).
+
+    ``stats``, when given, is FILLED with what this scan could and could not see — `files_scanned`,
+    `parse_skips` and the sorted `extensions` it was filtered to. `TOOL-dTracedLattice-1` S6: a
+    fail-open skip that reports nothing is the liveness failure `AGENTS.md` §7 names, because a
+    ranking over half a corpus is indistinguishable from a ranking over all of it. An out-parameter
+    rather than a second return value, so no existing caller has to change to keep working — and it
+    counts what the walk already knows rather than adding a pass."""
     root = root or repo_root()
     roots = sorted({f.split("/", 1)[0] for f in files if f})
     exts = frozenset(Path(f).suffix for f in files if Path(f).suffix)
     index: dict[str, set[str]] = {}
+    scanned = skips = 0
+    # THE PRESENT-LAYER TALLY WALKS THE WHOLE ROOT, not `roots`. `roots` is derived from the SYMBOL
+    # file list, so a language layer living in any other top-level directory would never be counted
+    # as present — and everything downstream reads "not counted" as "not there", which turns a
+    # dark-layer check into an affirmative false claim that every present layer is covered. Found by
+    # this build's own closing review, reproduced with symbols under `src/` and an unextracted
+    # `web/text.ts`: no refusal, no partial-recall paragraph, and the correct declaration reported
+    # STALE. The walk reads no file — it counts dirents — so the second traversal is cheap.
+    present = derive_present_layers(root, skip_dirs)
     for top in roots:
         base = root / top
         if not base.is_dir():
@@ -670,19 +887,44 @@ def build_reference_index(
                 try:
                     text = path.read_text(encoding="utf-8")
                 except (UnicodeDecodeError, OSError):
+                    skips += 1
                     continue
+                scanned += 1
                 rel = path.relative_to(root).as_posix()
-                for tok in _identifier_tokens(text):
+                for tok in _identifier_tokens(text, path.suffix):
                     index.setdefault(tok, set()).add(rel)
+    if stats is not None:
+        stats["files_scanned"] = scanned
+        stats["parse_skips"] = skips
+        stats["extensions"] = sorted(exts)
+        stats["present_extensions"] = sorted(present)
+        stats["present_counts"] = dict(sorted(present.items()))
+        stats["roots"] = roots
     return index
 
 
-def fan_in(index: dict[str, set[str]], symbol_id: str, def_file: str) -> int:
-    """Distinct files referencing ``symbol_id`` as an identifier, minus its own def file (the
-    data-model definition). An import/identifier-scoped HEURISTIC, not a resolved call graph
-    (§3 non-goal): over-counts a common id (`get`), under-counts registry/dynamic dispatch — a
-    documented recall FLOOR used for ranking + a review WARN, never gated."""
-    return len(index.get(symbol_id, set()) - {def_file})
+def fan_in(index: dict[str, set[str]], symbol_id: str, def_files) -> int:
+    """Distinct files referencing ``symbol_id`` as an identifier, minus EVERY file that defines it.
+    An import/identifier-scoped HEURISTIC, not a resolved call graph (§3 non-goal): over-counts a
+    common id (`get`), under-counts registry/dynamic dispatch — a documented recall FLOOR used for
+    ranking + a review WARN, never gated.
+
+    ``def_files`` IS A SET OF PATHS, not one path, and that is `TOOL-dTracedLattice-1` S1. A symbol
+    defined in several files had one arbitrary definer subtracted and the others counted as
+    references, so a homonym scored fan-in for being defined twice. 124 of 769 definitions in this
+    repo have a co-definer.
+
+    **A bare `str` is REFUSED rather than accepted.** Python iterates a string as characters, so the
+    old one-path call site would subtract single letters and silently return the un-subtracted count
+    — a wrong number with no error, at exactly the call sites this change exists to correct. The
+    spec rejects a compatibility path for the same reason: a silent fallback at one site is how a
+    precision fix half-lands."""
+    if isinstance(def_files, str):
+        raise TypeError(
+            "fan_in takes a SET of definer paths, not one path: a str iterates as characters and "
+            f"would subtract letters instead of files (got {def_files!r}). Pass the definer set."
+        )
+    return len(index.get(symbol_id, set()) - set(def_files))
 
 
 def reference_index_for(
@@ -707,7 +949,7 @@ def reference_index_for(
             text = (root / rel).read_text(encoding="utf-8")
         except (UnicodeDecodeError, OSError):
             continue
-        for tok in _identifier_tokens(text):
+        for tok in _identifier_tokens(text, Path(rel).suffix):
             index.setdefault(tok, set()).add(rel)
     return index
 
@@ -1065,6 +1307,7 @@ def detect_collisions(
     range_index: dict[str, set[str]],
     *,
     threshold: int,
+    definers: dict[str, frozenset[str]],
     affordance_seams: frozenset[str] = frozenset(),
 ) -> list[CollisionFlag]:
     """S5 closing loop (pure, deterministic). For each NEW symbol S, flag it iff it collides with
@@ -1078,7 +1321,13 @@ def detect_collisions(
 
     ``base_symbols`` (present at range base) is the seam POOL: a seam must have existed to be
     reinvented. ``new_symbols`` = head rows absent from base (all public — the extractors already
-    drop private names, so every kind here is an export). A malformed/empty stem yields no flag."""
+    drop private names, so every kind here is an export). A malformed/empty stem yields no flag.
+
+    ``definers`` maps a symbol id to EVERY file defining it at head, and is REQUIRED because this
+    function cannot derive it: it sees the base pool and the new rows, never the head symbol table,
+    so a seam co-defined in a file outside both would keep scoring fan-in for its own definition.
+    The caller owns that table and hands it over. No default, deliberately — a defaulted empty map
+    would silently restore the old, wrong subtraction at the one call site that matters."""
     seams_by_kind: dict[str, list[dict[str, str]]] = {}
     for e in base_symbols:
         seams_by_kind.setdefault(e["kind"], []).append(e)
@@ -1094,7 +1343,7 @@ def detect_collisions(
                 continue  # an identical row is not "new vs existing"
             if not (s_stems & stems(e["id"])):
                 continue
-            fe = fan_in(ref_index, e["id"], e["file"])
+            fe = fan_in(ref_index, e["id"], definers.get(e["id"], (e["file"],)))
             if fe < threshold:
                 continue  # E is not a seam — below the reuse threshold
             # "Wired through" = the NEW symbol's OWN file references E — scoped to s["file"], not

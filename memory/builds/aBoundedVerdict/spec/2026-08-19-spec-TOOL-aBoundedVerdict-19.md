@@ -1,0 +1,281 @@
+# TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled
+
+**Status:** CLOSED · rev-4 · 2026-08-20 · node c · Tier-1 · base 098bebd9 · streams tooling
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-19-review-TOOL-aBoundedVerdict-1-2.md](../reviews/2026-08-19-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 |
+| [2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md](../reviews/2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 |
+| [2026-08-20-review-TOOL-aBoundedVerdict-1.md](../reviews/2026-08-20-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-21 |
+| [2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md](../reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-21 |
+| [2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md](../reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-21 |
+| [2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md](../reviews/2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-22 PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-aShardedFloor-4 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+Three documented claims about the close path are false against the code, and the parity legs cannot see
+any of them because they compare the shipped copy to the installed copy rather than either to reality:
+the `records-current` Asserts cell describes retired semantics, no artifact an agent reads at close time
+names the one item that cannot be overridden, and a CLOSED spec's acceptance criterion asserted a grep
+returned zero where it returned two AT THAT SPEC'S CLOSE. Correct the first two, and record the third as
+a finding rather than quietly fixing it — the phrase it turned on has since been removed, which settles
+the text and settles nothing about the record.
+
+## 2. Scope (IN)
+
+- **S1** — the `records-current` Asserts cell is rewritten to the implemented invariant in BOTH halves
+  of the protocol pair. It currently describes a fresh-render comparison and unit status headers the
+  driver never reads; what the item actually asserts is the ABSENCE of a second copy plus both marker
+  pairs being well-formed. The `build-complete` clause beside it is qualified with WHICH file's region
+  it reads, which is the ambiguity that made the whole item unreadable.
+- **S2** — the non-overridable item is named where an agent meets it. Protocol §4's override paragraph
+  carves out only the two attested items; the sole statement that `authorization-reachable` cannot be
+  overridden sits in §1 line 71, scoped there to run START. One sentence in §4 and one in the Skill's
+  Close section, because the Skill is the artifact an agent actually reads when a close refuses.
+- **S3** — `TOOL-cBriefedPilot-18`'s AC9 is settled on the record. It reads *"§1's roster bullet in both
+  halves no longer reads `Opt-in by presence`, grepped and found zero"*. **Stated in the past tense
+  against this unit's base, because the phrase is gone from the tree at HEAD:** at base `098bebd9` the
+  phrase was present once in each half of the protocol pair, and `git log -S` over either half returned
+  exactly one commit — `6200674`, which ADDED it, five days before that spec closed. So the AC was never
+  met at the close it was claimed at. It was made true later and by another unit: `fd8f6fa` removed the
+  phrase from both halves as `TOOL-aBoundedVerdict-11`'s landing, which is CLOSED. This unit does not
+  reopen a closed spec: it files a backlog row naming the unmet AC, the evidence, and the sha that
+  finally satisfied it, so the record-keeping defect is recorded where the next reader of that spec will
+  find it. A claim that was false when written is not repaired by a later commit making it true.
+- **S5** — a note in the protocol pair's own header, or in the parity legs' source, stating what those
+  legs do and do not check: they compare the two copies to each other, so a claim false in both is
+  green. This is the reason all three defects survived, and it is worth one sentence where the next
+  author looks.
+
+## 3. Non-goals (OUT)
+
+- No mechanism change. Every scope item is prose, a backlog row, or a sentence. If a document and the
+  code disagree and the CODE is wrong, that is another unit's finding — here the documents are wrong.
+- Not reopening `TOOL-cBriefedPilot-18`. It is CLOSED and on another node; S3 records the unmet AC as a
+  backlog row rather than reverting a status, which is what this repo's append-only discipline asks for.
+- Not the roster bullet's text. It is already correct: `fd8f6fa` removed `Opt-in by presence` from both
+  halves as `TOOL-aBoundedVerdict-11`'s landing. This unit changes no roster prose and hands nothing to
+  that unit, which is CLOSED.
+- Not a general audit of the protocol pair's other cells. The audit examined the close path; the rest is
+  named as uncovered in its own coverage section.
+- No new gate. S5 is a comment, not a check — a parity leg that compared a document to code would be a
+  different and much larger unit, and pretending one sentence achieves it would be the same class of
+  defect this unit is fixing.
+
+## 4. Design
+
+### The three claims, and what each is measured against
+
+| claim | where | reality |
+|---|---|---|
+| `records-current` asserts a fresh render and reads unit status headers | protocol §4's Asserts cell, both halves | the driver asserts the region is EMPTY and both marker pairs are well-formed; it reads no status header |
+| the overridable carve-out covers the two attested items | protocol §4's override paragraph | `authorization-reachable` is also non-overridable, refused by `fail 21`, and §4 does not say so |
+| the roster bullet no longer reads `Opt-in by presence` | `TOOL-cBriefedPilot-18` AC9, CLOSED | FALSE when claimed and true now, by another commit: present once in each half at base `098bebd9`, `git log -S` returning only the ADDING commit `6200674`; removed at `fd8f6fa` under `TOOL-aBoundedVerdict-11`, so `log -S` now returns both and a live grep returns nothing |
+
+### Why the parity legs are green over all three
+
+`check-unattended.sh` check 10 byte-diffs the shipped protocol against the installed one, and check 16
+joins the DoD item NAMES in the document to the driver's constant. So a cell whose Asserts prose is
+wrong in both copies passes check 10 (they match) and passes check 16 (the name is right). The legs
+verify internal consistency, not correspondence — and nothing in the tree verifies correspondence for
+this document.
+
+That is worth stating in source (S5) because it is the reason three false claims coexisted with a green
+bar, and because a later author will otherwise assume the legs cover more than they do. It is the same
+distinction the playbook parity gate's own header already draws for itself: structural only, and a
+fluent paraphrase that is subtly wrong still passes.
+
+### Inventory
+
+| Concern | Today | After |
+|---|---|---|
+| `records-current`'s documented claim | retired semantics, in both copies | the implemented invariant |
+| which file's region `build-complete` reads | unqualified | named |
+| the non-overridable item | stated once, in a run-START context | stated in §4 and in the Skill's Close section |
+| the closed AC9 claim of `TOOL-cBriefedPilot-18` | closed asserting a grep that returned two at its own close | a backlog row naming the unmet AC, its evidence, and the sha that later satisfied it |
+| what the parity legs check | unstated; assumed to be more | stated in source |
+
+### Migration
+
+None. Prose in two files that a leg byte-compares, so both halves move together in one commit or the leg
+reds — which is the one mechanical constraint this unit has and is why S1 says BOTH halves.
+
+### Rollout
+
+S3 first and alone: a backlog row costs nothing and stops the false AC being inherited by the next reader
+while the rest of this unit is still open. Then S1, S2 and S5, which are one edit across the pair plus the
+rendered Skill.
+
+### Files touched (estimate)
+
+`memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` (S1, S2, S5) ·
+`tools/unattended/SKILL.template.md` and the rendered `.claude/skills/unattended/SKILL.md` (S2) ·
+`memory/backlog/TOOL.md` (S3's row) · possibly `tools/unattended/check-unattended.sh` if S5's note lands
+in the leg's source rather than the document's header · and IF the kit version moves, **not one
+carrier**: `tools/unattended/unattended.sh` and `tools/unattended/check-unattended.sh` each move
+`KIT_UNATTENDED_VERSION=` AND the `gov:kit` marker on the same line, `PROTOCOL.template.md` and
+`SKILL.template.md` each move their `gov:kit` marker, and `.claude/skills/unattended/SKILL.md` is
+re-rendered — five files, seven sites, all forced by `tools/check-kit-versions.sh`. This unit edits
+both templates, so a bump here really does reach all of them.
+
+### Alternatives rejected
+
+- **Fix the roster bullet here, since it is one string.** Rejected while it was still available, on the
+  ground that it would land the text before the mechanism that makes it true, so the document would claim
+  a mandatory roster the code does not enforce — trading a false claim for a different false claim. It is
+  MOOT now: `fd8f6fa` landed both together under `TOOL-aBoundedVerdict-11`, which is the sequencing the
+  rejection asked for.
+- **Reopen `TOOL-cBriefedPilot-18` and reset its status.** Rejected: it is closed, it is another node's,
+  and this repo's discipline is append-only. A backlog row naming the unmet AC is the recorded form.
+- **Add a leg that compares the protocol's Asserts cells to the driver's behaviour.** The right idea and
+  the wrong unit: it is a substantial mechanism, it needs a machine-readable statement of each item's
+  invariant, and pretending S5's sentence approximates it is the defect being fixed. If the owner wants
+  it, it is its own spec.
+- **Say nothing about the parity legs' scope.** Rejected: three false claims survived a green bar
+  precisely because their scope was assumed rather than stated.
+
+## 5. Production-readiness checklist
+
+- **security** — S2 is security-adjacent: an agent that does not know `authorization-reachable` cannot be
+  overridden may spend effort trying, or may reach for a bypass. Naming the carve-out where the agent
+  reads it is the mitigation.
+- **perf / scale** — N/A.
+- **a11y** — N/A.
+- **i18n** — N/A.
+- **error / empty / loading states** — N/A; no code path.
+- **observability** — S5 is the deliverable: the legs' scope becomes readable at the place a later author
+  looks.
+- **risks** — the honest one is that this unit fixes documents and the next drift is unprevented, because
+  S5 is a sentence and not a gate. Stated in §3 and in the rejected alternative rather than implied away.
+- **testing + left-shift gates** — no new test. The existing parity legs enforce that both halves move
+  together, and `adopt-unattended.sh --check` enforces that the rendered Skill matches its template — so
+  S2's Skill edit is gated even though the prose is not.
+- **migration / rollback** — none.
+- **user docs** — this unit IS the user docs.
+
+## 6. Acceptance criteria
+
+- **AC1** — When `grep -n 'records-current' memory/guides/UNATTENDED-PROTOCOL.md` and the same over
+  `tools/unattended/PROTOCOL.template.md` are read, the Asserts cell describes the empty-region and
+  well-formed-marker invariant and mentions no fresh render and no status header, in both.
+- **AC2** — When the `build-complete` clause is read, it names which file's region the item reads.
+- **AC3** — When protocol §4 and `.claude/skills/unattended/SKILL.md`'s Close section are read, each
+  states that `authorization-reachable` cannot be overridden.
+- **AC4** — When `bash tools/unattended/adopt-unattended.sh --check` runs after the Skill edit, it is
+  clean — the rendered Skill still matches its template and carries no surviving `{{`-shaped
+  placeholder.
+- **AC5** — When `bash tools/unattended/check-unattended.sh` runs, check 10's shipped-vs-installed
+  byte-diff is clean, proving both halves moved together.
+- **AC6** — When `memory/backlog/TOOL.md` is read, it carries a row naming `TOOL-cBriefedPilot-18`'s unmet
+  AC9 with its evidence stated as HISTORY rather than as live hits: the adding commit `6200674`, the
+  removing commit `fd8f6fa`, and the fact that `git log -S 'Opt-in by presence' --
+  tools/unattended/PROTOCOL.template.md` now returns both while a live grep returns nothing. And
+  `bash tools/memory-tree/check-memory-hygiene.sh` is clean over it. The two file:line hits rev-1's AC
+  demanded CANNOT be written any more, which is the point of the row.
+- **AC7** — When the parity legs' scope note is read, it states that they compare the two copies to each
+  other and verify no claim against code — found by `grep -n 'byte-diff\|correspondence'` at the site S5
+  chose.
+
+## 7. Gates
+
+`tools/unattended/check-unattended.sh` + `tools/unattended/check-unattended.test.sh` ·
+`bash tools/unattended/adopt-unattended.sh --check` + `tools/unattended/adopt-unattended.test.sh` ·
+`tools/memory-tree/check-memory-hygiene.sh` ·
+`tools/check-kit-versions.sh` · `bash tools/run-gates/run-gates.sh`.
+
+## 8. Open questions
+
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
+- **F1 — does S5's note live in the protocol document's header or in the leg's source?** The document is
+  what an author edits; the leg is what makes the claim. **Recommendation: the leg's source**, beside
+  check 10, because that is where someone about to trust the check is standing — and the protocol pair
+  is byte-compared, so a note in it must be written twice.
+  RESOLVED (agent, 2026-08-19, delegated): the leg's source. Mechanism-only, and the alternative
+  duplicates the note into a byte-compared pair.
+
+- **F2 — should S3's backlog row be filed under TOOL, or raised with the node that owns
+  `TOOL-cBriefedPilot-18`?** The id's slug is node `c`'s and this session is on node `c`, so there is no
+  cross-node hand-off to make. **Recommendation: a TOOL row here**, which is the shard the id already
+  belongs to.
+  RESOLVED (agent, 2026-08-20, delegated): a TOOL row, filed here. Mechanism-only. Re-verified at
+  this run's base rather than inherited: the id's slug is node `c`'s and this run is on node `c`, so
+  the bullet's premise still holds and there is still no cross-node hand-off to make. A row in the
+  shard the id already belongs to is where a reader of that id looks.
+
+## 9. Revision log
+
+- rev-1 · 2026-08-19 · initial draft. Derived from the close-path audit's mediums 30 and 33, plus a
+  defect the design pass found independently and verified with `git log -S`: `TOOL-cBriefedPilot-18`
+  closed asserting a grep returned zero where it returns two, and the phrase was never removed. Kept as
+  one Tier-1 unit because all three are documents that disagree with code and all three survived for one
+  reason — the parity legs compare the copies to each other, which S5 records. F1 and F2 resolved under
+  the delegated fork rule.
+
+- rev-2 · 2026-08-20 · M3 fork sweep, before any code. F2 RESOLVED as recommended, a TOOL row filed
+  here — and its premise was RE-VERIFIED rather than inherited, because "this session is on node c" is
+  exactly the kind of claim that is true when written and false when read. It is still true. §8's
+  first non-blank line is now the machine-legal `none` form.
+
+- rev-3 · 2026-08-20 · folded the M4 spec audit's 2026-08-20 round. **H8**: S3, the §4 claims row, the
+  §4 inventory row, AC6 and §1's own goal sentence all rested on `Opt-in by presence` being LIVE in both
+  protocol halves — two file:line hits and a `git log -S` returning exactly the adding commit. It was
+  removed by `fd8f6fa`, which is `TOOL-aBoundedVerdict-11`'s landing and is CLOSED, so `log -S` now
+  returns two commits and AC6's "two file:line hits" is unwritable: the criterion could not be satisfied
+  by any tree. All five sites are restated in the PAST TENSE against base `098bebd9` and name the removing
+  sha, and AC6 now cites the `git log -S` HISTORY plus that sha instead of live hits. **S4 IS DELETED.**
+  Its whole content was a hand-off of the roster bullet's text to `TOOL-aBoundedVerdict-11`, which has
+  since landed that text and closed — an orphan pointing at finished work, and the §3 non-goal and the
+  Rollout paragraph that referenced it are corrected rather than left dangling. S5 keeps its label: ids
+  are labels, not ranks, and renumbering it would break its five in-spec references for nothing.
+  **L3**: §7 listed `tools/workflows/check-protocol-parity.test.sh`, which gates the REVIEW protocol in
+  the workflows kit — a tree this unit does not touch, and a reader trap rather than coverage, since the
+  unattended pair's byte-diff is check 10 and was already listed. Dropped, and
+  `tools/unattended/adopt-unattended.test.sh` added beside the `--check` invocation that was already
+  there. **Does the unit still hold together with S4 gone? YES, and it stays Tier-1.** S4 was the one
+  item that was explicitly NOT this unit's work, so deleting it removes zero deliverable. All four
+  remaining items were re-verified live during the fold: `records-current`'s Asserts cell still reads
+  "every unit's status header and every generated region match a fresh render" in the installed protocol
+  (S1); protocol §4's override paragraph still names only the two attested items (S2); the
+  `TOOL-cBriefedPilot-18` record-keeping defect is untouched by the later fix (S3); and the parity legs
+  still carry no statement of their own scope (S5). Three document edits plus a backlog row is a unit.
+
+- rev-4 · 2026-08-20 · **built. Every item was prose, and one of them changed where it lands.**
+  S1's `records-current` cell is rewritten to what the driver actually asserts — the generated region
+  being EMPTY plus both marker pairs being well-formed, read from the region reader's EXIT STATUS
+  rather than from its output being empty, because a malformed pair prints nothing and would otherwise
+  score as a satisfied item. S2 lands in two places as specified: the protocol's override paragraph,
+  and the Skill's Close section, which is the artifact an agent reads when a close refuses. S3 is
+  filed as `TOOL-aBoundedVerdict-32` rather than repaired, with the sha that finally satisfied the
+  unmet criterion and the sha that had broken it.
+  **S5 went into the LEG's source, per F1, and the wording is the point.** It is not a note that the
+  parity legs are approximate — it is a statement of what they CANNOT do: they compare the two copies
+  to each other, so a sentence false in BOTH halves is green forever. That is how all three of this
+  unit's defects survived, and check 10's header now says so where somebody about to trust it is
+  standing. This spec's §3 promised no new gate and none was added: a check that graded a document
+  against code would be a different and much larger unit, and pretending one sentence achieves it
+  would be the same class of defect this unit exists to fix.
+  **The note is deliberately in ONE half, not two.** The protocol pair is byte-compared, so anything
+  written into the document itself must be written twice and can drift; the leg's source has one copy.
+  A shorter version of the same fact does sit at the top of the protocol pair, because a reader who
+  never opens the leg still deserves the warning — that duplication is accepted knowingly and is the
+  smaller cost.
+
+## 10. Reuse audit
+
+No code seam: this unit changes prose, a backlog row and one comment. The seams it RELIES on are the
+existing parity legs — check 10's shipped-vs-installed byte-diff and
+`adopt-unattended.sh --check`'s render comparison — which together guarantee that a document edit here
+cannot land in one copy only. That guarantee is why §4's Migration has one constraint and no procedure.
+
+The backlog shard `memory/backlog/TOOL.md` is the recorded form for S3, and the hygiene gate's id
+resolution is what makes the row's citation of a closed spec legal — an id resolves against the set
+defined by a spec H1, and `TOOL-cBriefedPilot-18` has one.
+
+Recall terms used, at the SET level for this build: `closing review round cap blocked verdict adversarial
+diff fold unattended close build-complete DoD stall halt`.

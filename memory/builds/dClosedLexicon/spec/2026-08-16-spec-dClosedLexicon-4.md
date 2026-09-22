@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-16 · node d · Tier-2 · base f7306f35 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-dClosedLexicon-4-8.md](../reviews/2026-08-16-review-TOOL-dClosedLexicon-4-8.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `govkit apply` destroys an adopter's project-owned files on every re-apply. Reproduced end to end

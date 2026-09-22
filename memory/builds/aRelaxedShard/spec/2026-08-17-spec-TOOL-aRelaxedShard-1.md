@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-8 · 2026-08-17 · node a · Tier-2 · base 52f9bbb0 · streams tooling · ratified 2026-08-17
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-17-review-TOOL-aRelaxedShard-1-round2.md](../reviews/2026-08-17-review-TOOL-aRelaxedShard-1-round2.md) | spec-audit | — |
+| [2026-08-17-review-TOOL-aRelaxedShard-1.md](../reviews/2026-08-17-review-TOOL-aRelaxedShard-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Hygiene check 6 caps every row document at a hardcoded 20,480 bytes and 250 lines, and on this repo the

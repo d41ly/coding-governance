@@ -4,10 +4,18 @@ Read this before ANY multi-agent review or `Workflow` run. Ported from the upstr
 (`ARCH-bWhittledTome-1`, 2026-07-15; hard cap added by the owner 2026-07-29) and re-measured here —
 every number below is either measured on THIS tree or marked as inherited with the reason it travels.
 
-## The hard cap — ≤5 verify-stage agents TOTAL
+## The hard cap — the verify-stage total `agent-cap.js` resolves
 
-**A review's verify stage spawns at most 5 agents, whatever the finding count.** The batch size grows
+**A review's verify stage spawns at most the cap `{{TOOL_ROOT}}hooks/agent-cap.js` resolves,
+whatever the finding count.** The batch size grows
 with the finding count; the agent count never does.
+
+The NUMBER is a FILE CONSTANT in `{{TOOL_ROOT}}hooks/agent-cap.js`, and that file is what a run actually
+obeys — it ships deployed verbatim, with no conf channel and no environment override. This document
+restates it only where a reader has to act on it, and every restatement is a copy that can go stale:
+when the two disagree, the hook is right and the sentence you are reading is the bug. An earlier
+revision of this line claimed the number was "declared per repository"; that was written for a
+mechanism that was specced and then parked, and it described a channel this tree does not have.
 
 This is not the concurrency cap wearing a different hat. `boundedParallel(thunks, 5)` bounds how many
 run AT ONCE; N findings still spawn N agents, five at a time. **Concurrency is not a budget.**
@@ -48,6 +56,35 @@ session spawns agents:
   the concurrency rule below already binds every fan-out to the same number. The residual is a wide
   fan-out that is legitimately not a review — accepted, for that reason.
 
+  **A slot also EXPIRES, from 1.5, and what that buys is stated exactly.** `PreToolUse` fires BEFORE
+  the work and there is no matching after-event this hook is wired for, so a slot had no release path
+  and the raw count was LIFETIME-PER-PROMPT, not concurrency: five agents that ran one after another,
+  each finished before the next began, refused the sixth for the rest of the turn. Measured at
+  agent-cap 1.4 — six sequential spawns, distinct `tool_use_id`s, the sixth denied against five
+  long-idle slots. A slot idle past `SLOT_TTL_MS` (45 min, set above the longest subagent measured on
+  this fleet, 34 min) is now reclaimed by the next spawn, so the budget is a rolling window rather
+  than a permanent one.
+
+  **The expiry stands in for a completion signal; it does not turn the counter into a concurrency
+  meter, and the direction it fails in is chosen.** A burst — the case this rule exists for — claims
+  its five slots within a second, so no realistic TTL lets one through. What the TTL does admit is
+  the rarer shape: five agents genuinely running concurrently for longer than 45 minutes, then a
+  sixth. The precise fix is a release keyed on `tool_use_id`, which the harness guarantees identifies
+  ONE tool execution across `PreToolUse` and `PostToolUse`. It is not built, and the reason is a
+  single unmeasured fact: whether the `Agent` tool fires `PostToolUse` at all. Settle it with a
+  `PostToolUse[Agent]` probe plus a `PostToolUse[Bash]` CONTROL, wired IN PLACE. This document used to
+  send that probe to a FRESH session because settings are not hot-reloaded; that reason is wrong. The
+  public hooks reference says direct edits to hooks in settings files are normally picked up by the
+  file watcher, and OBSERVED on node `d` in session `a6d954d0` the wired agent-cap command CHANGED
+  mid-session after commit `206af3de` retargeted `.claude/settings.json` — two denials in one
+  transcript naming two different commands. A fresh session is still the tidier control, because it
+  removes the question of WHEN the watcher caught the edit; it is no longer a precondition. That same
+  reference says Agent skips both tool events in favour of `SubagentStart`/`SubagentStop`, and
+  `SubagentStop` carries no `tool_use_id` to correlate on — while the measurement in the bullet above
+  says `PreToolUse` DOES fire for Agent, re-confirmed by watching a real spawn claim a slot. Both
+  cannot be right, and wiring a release for an event that never
+  arrives would ship exactly the mechanism-that-cannot-fire this repo gates.
+
   Why slots and not a running count: read-then-decide loses updates (measured — a four-call burst
   overlapped its hook processes and two of four read the same count), and create-a-token-then-count
   does not fix it either, since each of six concurrent processes sees between its own ordinal and
@@ -67,9 +104,12 @@ alone still contains the string `agent-cap.js` and used to report the tree corre
   asking it to report what arrived before it read anything: a sidechain agent holds no `Agent` tool
   at all — `ToolSearch` for it returns nothing — so it cannot fan out, and the arity rule has nothing
   to bind at that depth. The capability is ABSENT rather than unpoliced, which is the stronger
-  property and not the one this bullet used to claim. Whether a `PreToolUse` hook would fire there
-  is UNMEASURED: the matcher covers `Workflow|Agent`, neither of which a sidechain holds, so the
-  experiment never ran. A matcher on a tool it does hold — `Bash` — would answer it.
+  property and not the one this bullet used to claim. A `PreToolUse` hook DOES fire there, and that
+  is no longer unmeasured: MEASURED 2026-09-12 on node `d`, the project-level guard on matcher
+  `Bash|PowerShell` (`{{TOOL_ROOT}}hooks/scratch-guard.js`) DENIED a Bash command issued by an agent
+  inside a `Workflow` sidechain — the matcher-on-a-tool-it-does-hold experiment this bullet asked
+  for. So the spawns above are missed because the matcher covers `Workflow|Agent` and a sidechain
+  holds neither, NOT because hooks stop at the sidechain boundary.
 - A session whose token directory cannot be resolved at all — no git dir, or a payload missing
   `session_id` / `prompt_id` / `tool_use_id`. That fails OPEN and silently, because a hook that
   denies every spawn on a filesystem hiccup is worse than the burst it prevents. A token that could
@@ -82,11 +122,22 @@ An `agent(` call reached through an iteration construct is allowed only when its
 - an identifier assigned exactly once on a line carrying `// gov:fixed-verifiers`, where that line
   spells `chunk(<x>, Math.ceil(<x>.length / <K>))` or `splitInto(<x>, <K>)` and `<K>` resolves; or
 - an identifier assigned exactly once from an array LITERAL with ≤ 5 elements — the finder-lens case,
-  where the agent count is visible in the source. A trailing comma is not an element.
+  where the agent count is visible in the source. A trailing comma is not an element; or
+- an identifier assigned exactly once on a line carrying `// gov:fixed-verifiers` whose right-hand
+  side DERIVES from a name already proven bounded above — the marked-derivation case, and the third
+  receiver. Mentioning a bounded name is not enough: EVERY top-level branch of that right-hand side
+  is judged on its own text, the derivation must be ROOTED on the bounded value rather than merely
+  referring to one, every top-level link of the chain after that root must be shrink-only
+  (`.filter` or `.slice`) and the chain must CONSUME to a balanced close, and the whole right-hand
+  side is vetoed if it can grow. A bare reassignment of the name afterwards takes the bound back.
 
-Everything else is denied: a `for` / `while` / `forEach` body containing `agent(`, a `.map` /
-`.flatMap` / `Array.from` over any other receiver, and a marked line whose second argument is an
-expression, a `.length`, a parameter, or a literal above 5.
+Everything else is denied: a `forEach` body containing `agent(`, a `for` / `while` body that does
+not carry a conforming `gov:sequential-agents(<K>)` marker on its header, a `.map` / `.flatMap` /
+`Array.from` over any other receiver, and a marked line whose second argument is an expression, a
+`.length`, a parameter, or a literal above 5. The sequential marker is the one loop affordance and
+it is a CLAIM, not an exemption: the hooks kit's own `README.md` owns its grammar and the hook
+checks every
+clause of it, including that exactly one awaited call sits in the marked body.
 
 **`<K>` resolves** — one definition, used by every consumer above — when it is an integer literal ≤ 5,
 or an identifier bound DIRECTLY by `const <name> = <int>` and never reassigned. An `<expr> || <int>`
@@ -105,9 +156,12 @@ slice a bare identifier by a width that is either the enclosing helper's own `ca
 the two rules above have already bounded, or a `<K>` that resolves. It used to exempt its line
 outright, so a line slicing fifty wide passed unread.
 
-## Concurrency — ≤5 agents at once, always
+## Concurrency — the at-once bound `agent-cap.js` resolves, always
 
-Route ALL fan-out through `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …stages)`. The
+Route ALL fan-out through `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …stages)` —
+the literal `5` STAYS in these two forms on purpose: they are code an agent inlines into a script,
+and a script that spells a pointer instead of an integer does not run. `{{TOOL_ROOT}}hooks/agent-cap.js` re-resolves
+that width at the call site and denies it if it is wrong, so the digit here is checked, not trusted. The
 same hook DENIES a script calling raw `parallel(` / `pipeline(` outside a line marked
 `gov:bounded-fanout`; scripts cannot `import`, so inline the helper.
 
@@ -119,9 +173,11 @@ travels. It moved 6 → 5 here on that basis.
 the cap argument at each `boundedParallel(` / `boundedPipeline(` CALL SITE, the helper's own DEFAULT
 PARAMETER when a call passes none, and the slice width a `gov:bounded-fanout` line claims — joining
 lines forward until the parens balance, because every shipped call site spans lines. A K it cannot
-resolve to an integer ≤ 5 is denied; the burden is on the fan-out.
+resolve to an integer within the cap `{{TOOL_ROOT}}hooks/agent-cap.js` holds is denied; the burden is on
+the fan-out.
 
-The 5 is a FILE CONSTANT. There is no environment override, and a set `AGENT_CAP` is refused with a
+The cap is a FILE CONSTANT in `{{TOOL_ROOT}}hooks/agent-cap.js` — the one place it is written and the
+one place to change it. There is no environment override, and a set `AGENT_CAP` is refused with a
 message rather than ignored — a ceiling that can be raised from the environment leaves no diff behind,
 which is the defeatable class this rule exists to stay out of.
 
@@ -132,7 +188,8 @@ Dimension finders (security / correctness / data-integrity / dead-code / integra
 is recorded. Feed the finders the security model, the open backlog and what is by-design, so they
 hunt NEW issues instead of re-reporting known ones.
 
-Default configuration: **3–6 primed finder lenses → ≤5 batched default-refute skeptics → one
+Default configuration: **3–6 primed finder lenses → batched default-refute skeptics within the
+hook's declared bound → one
 synthesis pass**; three phases, find → verify → synthesize. The ready-made harness is
 `{{TOOL_ROOT}}workflows/tier2-review.js` (`Workflow` with `{name:'tier2-review'}` or `{scriptPath}`); it
 takes a structured `args` object and REFUSES a prose string, because defaulting the review root to
@@ -144,7 +201,8 @@ the process cwd twice made it audit a repository nobody had briefed it on.
   write paths; over already-hardened code it manufactures defence-in-depth noise. Review light, or
   skip.
 - **Scale a large fresh surface by adding LENSES, not skeptics.** Coverage is what more agents buy;
-  precision saturates. The lens allowance is **5**, the same number as everything else here — it
+  precision saturates. The lens allowance is the same number as everything else here, and
+  `{{TOOL_ROOT}}hooks/agent-cap.js` holds it as `MAX_LENSES` — it
   briefly read as 6, which was never a decision: the hook counted a trailing comma as an element, so
   every prettier-formatted 5-lens array measured 6 and the constant had been raised to fit the error.
   Ratified at 5 by the owner once the miscount was found.
@@ -172,6 +230,7 @@ on one unescaped backslash and regenerating whole.
   `system-reminder` holding `CLAUDE.md` and the whole of `AGENTS.md` before it read anything, and a
   `SubagentStart` hook fired and was obeyed, arriving with its own verbatim header. No
   `SessionStart`-shaped injection was observed — recorded as not-observed rather than as absent.
-  Measured by dispatching a probe and asking it to report what arrived before it read anything.
+  `PreToolUse` fires there too, MEASURED 2026-09-12 on node `d`: a project-level guard on
+  `Bash|PowerShell` denied a Bash command issued from inside a sidechain.
   The cap is still enforced at the tool call rather than inside the script, but because the
   orchestrator is where the fan-out decision is MADE — not because nothing reaches a sidechain.

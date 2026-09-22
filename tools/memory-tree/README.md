@@ -3,7 +3,7 @@
 A project-agnostic kit that turns the governance playbook's §5/§6 memory-and-decisions *principles*
 into a concrete, gated folder structure: one `memory/` tree organised by development discipline, with
 per-feature `builds/` folders, index budgets + rotation, a status vocabulary, a GENERATED work-state
-index, and a 21-check hygiene gate that keeps it that way. The owner reads indexes, not files; sessions stop burning tokens
+index, and a hygiene gate that keeps it that way. The owner reads indexes, not files; sessions stop burning tokens
 re-deriving what memory already records.
 
 Opt-in. Everything project-specific lives in one repo-root `.memory-tree.conf`; the scripts and rules
@@ -15,14 +15,14 @@ ARCH-bOrderlyAtlas-1.)
 | File | Role |
 |---|---|
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
-| `check-memory-hygiene.sh` | the gate — 21 checks (1-12 and 21 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 to `row_grammar.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
+| `check-memory-hygiene.sh` | the gate — 25 checks (1-12, 21, 22, 23 and 25 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 and 24 to `row_grammar.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
 | `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. |
 | `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
-| `corpus_ids.py` | the id + path classifier behind checks 13-16 (`--report` / `--check` / `--measure` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; blank pins turn the unit off. |
+| `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 pinned, 16 structural) (`--report` / `--check` / `--measure` / `--print-defined-ids` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none. `--print-defined-ids` prints the id grammar as a POSIX ERE on its first line, then every id the corpus DEFINES, for a caller that must join cited ids against the set without spelling the grammar — the kickoff checker's `--card --append` is that caller. |
 | `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff. |
 | `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. |
 | `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
-| `adopt-memory-tree.sh` | `--scaffold` an empty tree that passes once its conf declares the keys the gate reads from the config (new projects). |
+| `adopt-memory-tree.sh` | `--scaffold` an empty tree that passes once its conf declares the keys the gate reads from the config (new projects). `--render` re-renders the four rendered documents in a tree that already carries the adoption marker, and writes nothing else — the mode `[[regenerate]]` names, and the only one that refreshes them after adoption. It REFUSES on a tree with no marker, and on a kit directory missing any of the four templates, rather than replacing your committed rule set with a placeholder. |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |
 | `SPEC-TEMPLATE.template.md` | the canonical spec/design-pass format, copied to `memory/TEMPLATE-SPEC.md` at scaffold time; check 12 enforces it once `SPEC_FORMAT_CUTOFF` is set. |
 | `merge-rows.py` | the row-keyed three-way merge driver for the authored indexes (`DECISIONS.md`, `backlog/*.md`). TWO PLANES: one stateless predicate (`^\s*[-*]\s`) splits every line into ROW or STRUCTURE, structure is merged positionally by `git merge-file`, and only the row set is key-merged here. The two recombine through a SKELETON — each input projected to a line list where every row becomes a token (its id when the grammar keys it, else a digest of its text with the terminator and trailing whitespace dropped and LEADING whitespace kept, because indentation is nesting and nesting is content) and every other line passes through byte for byte — so placement comes from git's own diff rather than from a splice this driver computes. A conflict region that is entirely tokens on both sides resolves by concatenation, because both sides sit between the same context lines, so section membership is not in dispute and only sibling order is; ANY disputed structure line is always a conflict. Five postconditions run over the WRITTEN BYTES on every verdict: no row line or leading id written more often than any one input carried it, no row under a heading no input filed it under, per-key CONSERVATION (not uniqueness — a file may legitimately carry the same row line twice), and structure identity against the merged skeleton. The anchor grammar is IMPORTED from the sibling memory-recall kit (`grammar_for` / `anchor_at`), never vendored, and there is no degraded mode when it cannot be read: any failure becomes a conflict rather than a silent take-ours. Wiring is two facts in two places and the driver command carries the install prefix — see [Wire the row-keyed merge driver](#wire-the-row-keyed-merge-driver); do not hand-type it. NOT scaffolded by `adopt-memory-tree.sh` — wiring a merge driver is a per-node git config, not a file the scaffolder can write. The kit ships its own launcher, `merge-rows.sh`, carrying the python resolver inline, so a copy-installed kit at any prefix can start the driver. |
@@ -37,6 +37,15 @@ Copy `.memory-tree.conf.example` to your repo root as `.memory-tree.conf` and ed
 - `FAMILIES` — `discipline:FAMILY` pairs; FAMILY is the id-family prefix and the required build-folder FAMILY.
 - `TOMBSTONE_ROOTS` — set to the old tree you migrated FROM (e.g. `docs`) so it can't resurrect; blank otherwise.
 - `SPEC_FORMAT_CUTOFF` — the date you adopt the kit; specs dated ≥ it must follow `TEMPLATE-SPEC.md` (check 12). Blank disables the check; older specs are grandfathered by filename date either way.
+- `SPEC10_EVIDENCE_CUTOFF` — a Tier-2 spec dated ≥ it must RECORD its reuse audit in §10: the recall terms used, AND the probe result (a `reuse_lookup` citation, an explicit "no existing seam fits", or a named `reuse-first` waiver). Blank disables it. Without it check 12 grades §10 on presence and non-emptiness alone, so `N/A — none` is a passing reuse audit and BUILD-METHOD M7's regrounding step 5 has no terms to re-run — measured on this kit's own corpus, a majority of specs recorded none. **Set it strictly ahead of every dated spec on every LIVE BRANCH, not just your own**: a cutoff on today's date reds this leg on the default branch for every in-flight branch carrying a spec dated today. What it does NOT check is whether either fact is true; that needs something watching the probes actually run.
+- `READINESS_ROWS` — the §5 production-readiness row LABELS, in skeleton order, `|`-separated. This
+  is the ONLY literal row set: the spec template renders it through `{{READINESS_ROWS}}` and no
+  script carries a default copy. **IT IS YOURS TO CHANGE** — edit that one string and re-render, and
+  nothing requires reading the checker. The example ships ten; this kit's own repo declares eight,
+  having dropped `a11y` and `i18n` because it ships no user interface. Keep it on ONE line.
+- `READINESS_ROWS_CUTOFF` — the date from which a Tier-2 spec dated ≥ it must carry every declared
+  row in its §5 body (check 12). Blank disables it. An armed cutoff with an empty `READINESS_ROWS`
+  is a REFUSAL rather than a silent pass, because that combination grades no row at all.
 
 Disciplines are yours to name. A SWEBOK v4 mapping is a reasonable default lens (Software Architecture,
 Construction, Testing, Security, Operations, …), but product streams (as inCMS uses) work equally well —
@@ -45,7 +54,7 @@ put the KA tag in each discipline's `README.md`, not in the folder name.
 ## Adopt — new project (scaffold)
 
 ```bash
-cp memory-tree/.memory-tree.conf.example .memory-tree.conf   # then edit
+cp <kit>/.memory-tree.conf.example .memory-tree.conf   # then edit
 bash tools/memory-tree/adopt-memory-tree.sh --scaffold             # creates memory/ + project/ + backlog shards + the generated index
 bash tools/memory-tree/check-memory-hygiene.sh ; echo $?           # expect 0
 git add memory/ .memory-tree.conf && git commit
@@ -116,6 +125,29 @@ section honest rather than merely correct today: `check-wiring.sh` RUNS the conf
 scratch three-way before it reports `ok`, and `check-wiring.test.sh` DERIVES both spellings above by
 running `--fix` in a fixture of each layout, so a stray third spelling in this file reds the bar.
 
+## Upgrading to 2.73 — check 20's population widened, and your bar may red on arrival
+
+Before 2.71, hygiene check 20 admitted a rotated archive only when its basename began `DECISIONS.`,
+so **every rotated BACKLOG shard went unscanned**. From 2.73 an archive is recognised by the name of
+the document it ROTATED — `DECISIONS` or a value declared in `FAMILIES`, plus a date and an optional
+same-day disambiguator such as the `b` in `TOOL.2026-08-17b.md`.
+
+**Your `ROW_DUPLICATE_PIN` may red on the first upgraded bar, with no change of your own.** A
+duplicate id that has always been sitting in a rotated shard becomes visible, and the pin is an
+EQUALITY: too high reds as well as too low.
+
+**The remedy is the duplicate, not the pin.** Raising a shrink-only pin to absorb a defect our upgrade
+made visible is a weakening move caused by us, and it is permanent slack nobody will drain. Run
+`python <kit>/row_grammar.py --report`, read the named ids and lines, fix the rows, then re-run
+`--emit-pin` and take the number it prints.
+
+Two smaller changes ride along. Check 10 now resolves a rotated archive's live index by BASENAME
+anywhere under the memory root instead of at `<MEMORY_ROOT>/<stem>.md` — if your backlog shards live
+one level down, which the shipped layout does, that check has never graded them and may now have
+something to say. And `ROTATION_MODE` is a new `.memory-tree.conf` key (`cut` or `snapshot`): leaving
+it undeclared changes nothing and reds nothing, an unrecognised value aborts the engine at exit 2,
+and **no check grades the declared mode** — it is validated and then read by nobody.
+
 ## Notes
 
 - Determinism: the scripts export `LC_ALL=C` and emit LF, and the build index normalises CR before it
@@ -125,6 +157,15 @@ running `--fix` in a fixture of each layout, so a stray third spelling in this f
   checkout is CRLF in the tracked copy — the normalisation keeps the gate honest, the pin keeps the
   committed bytes right, and you want both.
 - The gate is Bash (git-bash on Windows works). The `--staged` leg scopes the file-checks to staged paths.
+- **`memory/project/stale-header-waiver.txt` — a build README header that is PRESENT and unparseable
+  is not one that is ABSENT.** The generator raises on the first and would otherwise treat it as the
+  second, regenerating the index around a corrupted header. A row here (one build README path, then
+  the reason) tolerates a known-bad header; the run prints how many it tolerated on EVERY invocation,
+  so growing tolerance is visible without opening the file. **Shrink-only**: delete a row when the
+  header is repaired, never add one to clear a red. A row naming a path the tree no longer tracks is
+  a refusal, and the file itself is required even when empty — a file nobody created is a decision
+  nobody made. It ships EMPTY, and the kit declares a `[[hole]]` whose discharge probe reports it
+  unarmed rather than passing silently.
 - No brand gate, no product-specific migration lives here — those stay in the adopting repo.
 
 ## Codebase-map interop
@@ -135,10 +176,13 @@ see the "Codebase-map interop" section the HYGIENE template ships. No conf keys 
 
 ## The build method's displaced sections
 
-`memory/guides/BUILD-METHOD.md` holds itself to ≤20 KB and ≤250 lines — a LOCAL constraint and NOT rule 6's,
-which gives a guide far more and no longer caps lines outside `guides/` at all. It is re-read WHOLE at every
-pass boundary, so it grows only by displacement. These two sections live here because they are EXPLANATION: nothing
-below changes what an agent does next, and the rules that do stayed in the method.
+`memory/guides/BUILD-METHOD.md` DECLARES NO BUDGET OF ITS OWN. It held one until `TOOL-aHonedRuleset-6`
+deleted the passage on an owner ruling, taking with it the admission that no gate enforced the pair; the
+file is capped now only by the hygiene class cap for `guides/`. The two figures were retyped into this
+README once and both were stale within a build, which is the argument against retyping
+them. It is re-read WHOLE at every pass boundary, so it grows only by displacement. The sections below live here
+because they are EXPLANATION: nothing below changes what an agent does next, and the rules that do stayed in the
+method.
 
 ### M5 — the probe-failure taxonomy
 
@@ -159,19 +203,36 @@ against source before building on it, and say in §10 where a record and the sou
 theoretical: a recall pass during `TOOL-aWrittenMethod-1` returned four hits asserting the parity render runs
 LIVE to SHIPPED, which the source contradicts.
 
+### M6 — why the disjointness clause 3 is worded as it is
+
+The method's parallelism test names `memory/DECISIONS.md`, `memory/backlog/*.md`, the run-state file, and a
+generated index TOGETHER WITH its generator. That last pairing is the whole point of the clause, and it replaced a
+form that could not fail.
+
+The vacuous form was "neither touches a shared mutable record". Every pass touches some shared record, so read
+strictly it forbade all parallelism and read loosely it forbade none — and which reading applied was decided by
+whoever wanted an answer. A test whose verdict depends on how generously you read it is not a test.
+
+Naming the files fixes the first half. The generator pairing fixes the second, which is the case nobody predicts:
+two passes can write provably disjoint paths and still collide, because one edits a generated index while the
+other edits the generator that renders it. The second pass regenerates and silently reverts the first. Neither
+wrote the other's path, so clauses 1 and 2 both pass, and the loss surfaces later as a mystery diff.
+
 ### The method's pointer table
 
 Read these, do not restate them — a rule appearing both in the method and in one of these is a defect in the
 method.
 
-- `skills/session-kickoff/SKILL.md` + `memory/guides/SESSION-KICKOFF.md` — starting a unit, closed scope, the tier rule,
-  the six interactive exits.
+- `skills/session-kickoff/SKILL.md` + `memory/guides/SESSION-KICKOFF.md` — starting a unit, closed scope,
+  the tier rule. The six interactive exits moved to the unattended protocol's §13 (`TOOL-aHonedRuleset-3`).
 - `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
 - `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.
 - `memory/HYGIENE.md` — record placement, filename grammar, size budgets, the status vocabulary.
-- `parallel-coding-governance.template.md` §1, §7, §8, §16 + `…domain-rules.md` §7, §10, §12 — DoR, DoD, landing,
-  gate discipline, diff-scoping, the final-message format.
+- `coding-governance-agents.template.md` §1, §7, §8, §16 — DoR, DoD, landing,
+  gate discipline, diff-scoping, the final-message format. (ONE file since v3.0: the activity-scoped
+  companion sections converged into those §§.)
 - `memory/guides/UNATTENDED-PROTOCOL.md` — mandate, run state, phases and witnesses, DoD, keepalive, landing.
+- `memory/guides/UNATTENDED-VERBS.md` — the verb entries, the contract's second half. Same byte-compared pair discipline.
 
 ### M2 and M3 — the judgment calls, and why they are not procedure
 
@@ -194,3 +255,54 @@ Three to five, primed with the mandate, the build overview and the spec format:
 - **unstated assumption** — what must be true of existing code for §4 to work that §4 never says and §10 never
   checked.
 - **prior art** — has a record already decided this? That is the recall probe, M5.
+
+## Adding a check gov does not have — the extension point, and its limits
+
+A project with a rule this kit does not implement does **not** edit the engine. It writes its own
+script, under its own tree, and registers it as a leg it owns. `govkit apply` then leaves that leg
+alone.
+
+That is a MEASURED claim, not a reading of the code. The probe: a fixture target whose gate manifest
+held exactly ONE leg — project-authored, named `project build-README comment convention` — then
+`govkit apply`. Afterwards the manifest held 23: gov's 22 emitted alongside the project's own, byte
+for byte unchanged, argv and ceiling intact.
+
+```json
+{ "name": "project build-README comment convention",
+  "argv": ["bash", "scripts/check-build-readme-comments.sh"],
+  "chunk": "product", "subject": "repo", "ceiling": 3000 }
+```
+
+The leg's script sources `.memory-tree.conf` for `MEMORY_ROOT` exactly as this kit's own checks do,
+so it reads the same tree from the same declaration.
+
+**Give it a ceiling.** The runner reds a leg that arrives without one, and finding that out from a
+red bar is a worse first experience than reading it here.
+
+### Two limits, both measured, neither of which is "declines and reports"
+
+**A non-colliding leg is preserved SILENTLY.** The run says nothing about it at all. Do not expect a
+line confirming your leg survived; its absence from the output is the normal case.
+
+**A COLLIDING name aborts the verb, after a partial write.** If your leg's name is one gov also
+emits and your receipt does not already claim it, `apply` refuses:
+
+```
+govkit: the target's runner already has a leg named 'memory hygiene' and this target's receipt
+does not claim it — overwriting a leg the target wrote silently deletes their own coverage
+```
+
+Measured: exit 2, with **41 paths already changed in the working tree**. The refusal protects your
+leg — it is not overwritten — but it arrives after the install has partly landed, so the tree needs
+`git checkout` or a re-run once the name is changed. Pick a name gov will not: prefixing yours with
+the project name is enough.
+
+### What this kit will NOT grow
+
+**No plugin loader, and no `PROJECT_CHECKS` conf key naming scripts the engine invokes.** An engine
+that loads project code is an engine whose behaviour the kit cannot state, and every gate it runs
+becomes ungradeable. The conf-key version is the same loader under another name: it inverts
+ownership, making this kit responsible for a script it cannot read.
+
+The seam is the gate manifest, and it is already the seam. Your check is your code, in your tree,
+run by your bar.

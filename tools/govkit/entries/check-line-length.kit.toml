@@ -1,0 +1,58 @@
+# kit.toml — the line-length gate, declared as data. Read by tools/govkit/.
+#
+# A FLAT entry, modelled on check-placeholders. The gate and its self-test are depth-1 paths under
+# tools/, and selfcheck reds on any such path no entry claims.
+#
+# THE DECLARATION IS NOT SHIPPED. gov's tools/line-length-limits.txt names gov's own two subjects,
+# and neither path exists in an adopter's tree — where a row naming an absent path is a stale red. So
+# an adopter would red on install day, which is the failure this gate's own fork called decisive.
+# The target authors its own declaration; a subject with no row is graded at the 450 default and says
+# so. The precedent is check-install-prefix, whose registry ships seeded empty rather than copied.
+
+id = "check-line-length"
+scope = "repo"
+kind = "flat"
+home = "tools"
+selectable = "conditional"
+why_conditional = "gov's tools/line-length-limits.txt names gov's own two subjects and neither path exists in an adopter tree, where a row naming an absent path is a stale red — so a default install would red on install day. The target authors its own declaration first."
+version_from = { none = "it grades whatever a target declares and carries no behaviour of its own to version" }
+
+[[files]]
+include = ["check-line-length.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+
+# THE SELF-TEST IS WITHHELD, and this one is not the 2026-08-23 ruling -- it is a hard
+# dependency an adopter cannot satisfy. TOOL-aQuenchedHarness-6 ported the suite onto
+# `tools/lib/lib-selftest.sh`, and `tools/lib` is a standing registry exemption: gov-internal,
+# claimed by no descriptor, shipped to nobody. `silenced_legs` cannot catch the mismatch,
+# because it drops a leg whose argv names a MISSING path and the argv names the suite, which
+# WAS being shipped -- so every adopter selecting this kit got a wired merge-bar leg that reds
+# on arrival with `build_fixture: command not found`. That is the exact class
+# `tools/run-gates/kit.toml` records as the historical reason run-gates itself was
+# un-shippable. The ruling would have withheld it anyway; this makes the reason the stronger
+# one, and it is the question every future port has to answer, because the harness is the one
+# file every ported suite needs and the one file no adopter can receive.
+[[files]]
+include = ["check-line-length.test.sh"]
+role = "project-owned"
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "the declaration is the TARGET's to author; gov seeding its own rows would red an adopter on install day"
+
+[check]
+none = """
+the gate IS the check. Its leg runs it over whatever the target declared, and a second verb wrapping that would be one more thing to keep in step
+"""
+
+[[gate_leg]]
+name = "line length"
+subject = "repo"
+argv = ["bash", "{prefix}/check-line-length.sh"]
+
+# The `line-length gate selftest` leg is NOT declared here. It is a leg on GOV's bar and carries
+# an [[exempt_leg]] row in tools/govkit/registry.toml, for the reason recorded beside
+# `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds
+# the deployer, and it made every adopter apply exit 1 with one silenced-leg problem per suite.

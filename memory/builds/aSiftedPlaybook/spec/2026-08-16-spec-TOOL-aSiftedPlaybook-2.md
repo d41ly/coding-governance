@@ -2,6 +2,18 @@
 
 **Status:** CLOSED · rev-10 · 2026-08-16 · node a · Tier-2 · base 91ef1b05 · streams tooling · ratified 2026-08-16
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md](../reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md) | spec-audit | PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md](../reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md) | spec-audit | PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md](../reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md) | spec-audit | PLAY-aSiftedPlaybook-3 TOOL-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md](../reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md) | spec-audit | PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md](../reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md) | spec-audit | TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-4 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `tools/check-template-size.sh` has no test anywhere in the repo, no `fail()` helper, and therefore

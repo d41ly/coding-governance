@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams kickoff · review wf_eb978bb2-f98
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-11-review-TOOL-aWrittenMethod-1-1.md](../reviews/2026-08-11-review-TOOL-aWrittenMethod-1-1.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-2.md](../reviews/2026-08-11-review-TOOL-aWrittenMethod-1-2.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-3.md](../reviews/2026-08-11-review-TOOL-aWrittenMethod-1-3.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-6 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `memory/guides/BUILD-METHOD.md` is a governing document that binds every multi-pass build, and editing

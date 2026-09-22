@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-10 · node a · Tier-2 · base e7ec3365 · streams playbook+tooling · ratified 2026-08-10
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-review-PLAY-aCandidStub-1-1.md](../reviews/2026-08-10-review-PLAY-aCandidStub-1-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Close the fifteen confirmed convergence defects between the three shipped

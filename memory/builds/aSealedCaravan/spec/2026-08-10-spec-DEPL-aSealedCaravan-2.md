@@ -1,6 +1,17 @@
 # DEPL-aSealedCaravan-2 — govkit, the mechanical deployer
 
-**Status:** INPROGRESS · rev-7 · 2026-08-11 · node a · Tier-2 · base 16aeb5ef · streams deployer · ratified 2026-08-11
+**Status:** CLOSED · rev-7 · 2026-08-20 · node a · Tier-2 · base 16aeb5ef · streams deployer · ratified 2026-08-11
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-build-TOOL-aSealedCaravan-1-1.md](../build/2026-08-10-build-TOOL-aSealedCaravan-1-1.md) | journal | TOOL-aSealedCaravan-1 |
+| [2026-08-10-review-TOOL-aSealedCaravan-1-1.md](../reviews/2026-08-10-review-TOOL-aSealedCaravan-1-1.md) | spec-audit | TOOL-aSealedCaravan-1 |
+| [2026-08-11-review-DEPL-aSealedCaravan-2-2.md](../reviews/2026-08-11-review-DEPL-aSealedCaravan-2-2.md) | spec-audit | — |
+| [2026-08-11-review-DEPL-aSealedCaravan-2-3.md](../reviews/2026-08-11-review-DEPL-aSealedCaravan-2-3.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
 
 ## 1. Goal
 

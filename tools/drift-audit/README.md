@@ -1,8 +1,37 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.4` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.11` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
+
+**Migrating 1.10 → 1.11 (additive, no caller edit).** One new signal,
+`run_records_nonterminal_but_merged`, report-only, so `--check` cannot red on it. A repo with no run
+record and no `.unattended.conf` reads it as NOT ASKED. A repo that does keep run records reads a
+non-zero value against tolerance 0 until it seeds a pin at the value it measures, as the install steps
+below say for every signal. No existing field or signal moves.
+
+**Migrating 1.7 → 1.8 (additive, no caller edit).** Three changes, none of which moves an existing
+field. `drift-audit-state.js` gains the aggregate `severityCorrections` return key and the matching
+downgrade count on its RUN INTEGRITY line, both of which `drift-audit-code.js` has carried since
+1.4 — the per-finding value already reached the synthesis writer, so this adds the number an
+operator reads without opening the report. `drift_report.py`'s conf parser gains `map_lib`'s
+`export ` prefix rule and its ends-at-whitespace rule, which it had claimed in its docstring and did
+not implement: a conf spelling `export K=v` now yields key `K`, and `K=v  # note` now yields `v`
+rather than `v  # note`. **That is the one observable behaviour change**, and it only reaches a repo
+whose `.memory-tree.conf` uses either spelling; no tracked conf in this repo does. Finally
+`shrink_only_lists_not_shrinking` stops counting a list that was seeded EMPTY and is still empty,
+which could never shrink and made the signal unable to reach its own tolerance of 0. A list that
+GREW is still an offender.
+
+**Migrating 1.6 → 1.7 (breaking, one RETURN field).** `lensesRun` on the Tier-2 harnesses was an
+ARRAY of lens slugs in `drift-audit-state.js` and is now an INTEGER, the count of lenses that
+actually returned. A caller reading it as a list breaks, loudly, on a type error rather than quietly
+on a wrong value; no caller in this tree reads it. `drift-audit-code.js` returned no lens information
+at all and now returns the same integer. Everything else added is additive — `lensesDead`,
+`skepticsDead`, `conflicts`, `duplicates`, `spurious` and `note` — so an adopter passing the same
+`args` needs no edit. One behaviour change is observable: a run whose lenses ALL died, or whose
+configured lens set is empty, now returns early with those counters instead of synthesizing a report
+over an empty finding set. That path previously produced a confident report about nothing.
 
 **Migrating 1.0 → 1.1 (breaking, `args` only).** The two Tier-2 harnesses no longer accept a
 caller-supplied concurrency cap or verifier total; both are bare literals matching the review
@@ -41,7 +70,8 @@ The fourth row is real. Keep it **small and loud**, not buried in prose.
 ## Install
 
 ```bash
-cp -r <governance>/tools/drift-audit <target-repo>/drift-audit
+mkdir -p <target-repo>/tools
+cp -r <governance>/tools/drift-audit <target-repo>/tools/drift-audit
 cd <target-repo>
 tools/drift-audit/adopt-drift-audit.sh
 ```
@@ -54,7 +84,12 @@ Then, in order:
 
 1. Fill `tools/drift-audit/drift_signals.py` — `PRODUCT_GLOBS` at minimum.
 2. Run `python tools/drift-audit/drift_report.py`.
-3. **Seed `PINS` at the values you just measured, not at zero.** A pin above the measured value hides
+3. **`RATCHET_LOOKBACK` is optional and shipped at 14** — how many lines above a ratcheted pin the
+   gate looks for the `<old> -> <new>` justification that excuses a weakening move. Narrow it if
+   your pins sit close together, so a justification for a DIFFERENT pin cannot be read as this
+   one's; widen it if your repo writes long justifications above a pin. This tree has two pins
+   three lines apart at the same value, which is the case that makes the first half real.
+4. **Seed `PINS` at the values you just measured, not at zero.** A pin above the measured value hides
    a live regression on day one; a pin below it reds the bar on work nobody did.
 4. Wire `--check` into your gate manifest.
 
@@ -64,7 +99,7 @@ Then, in order:
 |---|---|---|
 | `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
@@ -81,6 +116,11 @@ Tier 2 needs the two workflow scripts from `tools/workflows/drift-audit-{code,st
 | `handkept_inventories_disagreeing_with_source` | does a hand-kept list still match what generates it? | yes |
 | `dangling_pointers_in_own_ledger` | do this node's own rows point at worktrees that exist? | no |
 | `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? | yes |
+| `lexicon_verbs_declared_but_unused` | does the verb table still describe the code it was derived from? | yes |
+| `lexicon_ratified_older_than_language_surface` | was the table curated since the languages it grades last moved? | yes |
+| `live_backlog_rows_per_shard` | is a shard’s live set approaching the floor rotation cannot clear? | no |
+| `readme_mechanism_drift` | does a build README still describe a mechanism its own spec set revised? | no |
+| `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's
@@ -91,6 +131,46 @@ metric, because it is read as good news.
 The kit holds itself to that rule — `selftest.py` exercises each gateable signal **twice**, once on a
 fixture where it must be silent and once on a minimal violating fixture where it must fire. An arm
 that can only pass the first is the dead probe the report refuses.
+
+### Run records left non-terminal after their build merged
+
+An unattended run's record can keep saying `LANDING` or `BUILDING` after its work is on the default
+branch, so "did it land?" cannot be answered from the record. The signal reads every tracked
+`RUN.md`, and every rotated `RUN.<phase>.<blob8>.md`, **at HEAD and never in the working tree**. It
+counts a record whose phase is not terminal, whose witness is an ancestor of the base ref, and whose
+witness is neither equal to nor behind the record's own `base:`. It reports and never gates, because
+a sanctioned worktree landing raises the count through nobody's fault.
+
+A witness at or behind its base is **unjudgeable**, not clean. The witness is HEAD at the last verb
+that writes one, and `--close` writes none, so such a run may well have landed. The signal counts it
+apart with its reason, and every other record whose facts it cannot place goes there too.
+
+Each counted record gets one sub-class, read from its **last** parked row: `retired-unit`,
+`surfaced-park`, `no-rows` or `other`. The first-match table that decides it is
+`_derive_run_subclass` in `drift_report.py`, and it is not restated here. Its kinds and acts are the
+unattended driver's own declared sets, spelled in the engine so the report runs in a tree without that
+kit, and `selftest.py` holds each set to the driver's source wherever the driver is present. A refused
+landing leaves no tracked row, so no sub-class can name one, and the detail says so on every run.
+
+### The harness note is a DERIVED contract, not prose
+
+Both `drift-audit-code.js` and `drift-audit-state.js` build their run `note` from
+`deriveLiveness(counters)` and `renderLivenessNote(state, counters)`. **The sentence is a contract**
+(`TOOL-dRetiredFork-6`, ratified F1): a consumer gate re-derives it and byte-compares, which is what
+a hand-written string can never satisfy — and relaxing such a gate to a substring match makes it
+satisfiable by prose, the first class the charter's §7 names.
+
+Three states, three distinct sentences, and the split is the point:
+
+| state | when | the sentence opens |
+|---|---|---|
+| `clean` | synthesis returned, no lens or skeptic died, nothing unverified | `CLEAN:` |
+| `partial` | something died or something is unverified, but the run measured | `PARTIAL:` |
+| `dead` | synthesis died, OR no lens ran at all | `DEAD PROBE:` |
+
+The retired ternary had three branches and conflated the last two into the bare word `complete`, so
+a run that measured NOTHING reported the same word as a clean one. Changing any of these sentences
+is a version bump like any other.
 
 ## Why pins rather than a perfect oracle
 
@@ -134,7 +214,7 @@ works it prints `SKIP` and tallies it. It never prints `ok` for an arm that did 
 | Tier | Cost | Answers |
 |---|---|---|
 | 0 | seconds, 0 agents | Are the records still true? Which pins moved? |
-| 1 | ~20 min, ≤5 agents | Why did a signal move? Is an instrument blind? |
+| 1 | ~20 min, one bounded wave | Why did a signal move? Is an instrument blind? |
 | 2 | hours, ~22 agents | Dead / unwired / duplicated code, and everything above |
 
 In the founding audit, **Tier 0 alone produced the blocker, the vacuous-metric lead and the entire

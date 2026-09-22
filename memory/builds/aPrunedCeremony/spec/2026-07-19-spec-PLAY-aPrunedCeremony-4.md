@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-4 · 2026-07-19 · node a · Tier-2 · base bf7f2c22 · reviewed wf_2f11fd07,wf_539c5419 · ratified 2026-07-19
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-07-19-build-PLAY-aPrunedCeremony-1-1.md](../build/2026-07-19-build-PLAY-aPrunedCeremony-1-1.md) | journal | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
+| [2026-07-19-review-PLAY-aPrunedCeremony-1-1.md](../reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-1.md) | spec-audit | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
+| [2026-07-19-review-PLAY-aPrunedCeremony-1-2.md](../reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-2.md) | diff-review | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Two coupled ledger-hygiene changes from inCMS `ARCH-aTrimmedGauntlet-2`. (1) R3: bookkeeping (ledger

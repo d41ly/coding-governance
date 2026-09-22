@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # check-template-size.sh — size gate for the governance playbook template.
 # The template is the operational ruleset an agent reads every session; it must stay lean.
-# Prose that doesn't affect instruction clarity still belongs in a companion
-# (parallel-coding-governance.customize.md / .domain-rules.md) rather than the template. The ceiling
+# Prose that doesn't affect instruction clarity is what gets dropped first: since v3.0 the charter
+# is ONE file with no companion to externalize into, so the budget is spent or it is trimmed. The ceiling
 # moved 32 KiB -> 48 KiB on owner order (recorded in memory/DECISIONS.md); the PREFERENCE for externalizing
 # did not move with it, and the high-water ratchet below is what prices growth now that the ceiling
 # is no longer doing it.
@@ -16,7 +16,13 @@
 #
 # Exit 0 = within budget (prints one line). Exit 1 = over budget. Exit 2 = file missing.
 # Exit 3 = the high-water record exists but this subject's row is not a number.
+# Exit 4 = --bump could not write the high-water record.
 # Exit 5 = the DECLARED limit for this subject is not a number.
+# Exit 6 = the subject states its own budget in prose and it disagrees with its declared row.
+#
+# THAT LIST IS THE FULL SET OF DISTINCT FAIL_CODE VALUES this file assigns, and it is stated here
+# because a gate's own header is where a reader learns what its exit codes mean. It omitted 4 for as
+# long as 4 existed, which is the checker-whose-record-does-not-describe-it class one level in.
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || ROOT=.
 
@@ -46,7 +52,7 @@ if [ "$#" -gt 0 ]; then
   unset _n _i _a
 fi
 
-FILE=${1:-"$ROOT/parallel-coding-governance.template.md"}
+FILE=${1:-"$ROOT/coding-governance-agents.template.md"}
 
 # The DECLARED limits file, resolved the same three ways every other path here is — positional,
 # then environment, then the tracked default — so the self-test can point the gate at a scratch copy
@@ -101,12 +107,40 @@ HIGHWATER=${3:-${HIGHWATER:-"$ROOT/tools/template-size-highwater.txt"}}
 bytes=$(tr -d '\r' < "$FILE" | wc -c | tr -d '[:space:]')
 name=$(basename "$FILE")
 
+# --- the PAIR TERM ------------------------------------------------------------------------------
+# A subject may state its own budget in its own prose. With the ceiling ALSO in a declaration that is
+# two spellings of one fact, and a value stated in prose beside the source that owns it rots between
+# changes. This branch is the pair: change both or neither.
+#
+# BEFORE the over-budget branch, deliberately. A disagreement makes the over-budget verdict ambiguous
+# — you cannot tell which ceiling you failed — so the disagreement is reported first.
+#
+# TWO GUARDS, NOT ONE. `[ -n "$declared" ]` keeps a subject with no declared row from being compared
+# against this script's hard default. `[ -n "$bline" ]` keeps the three subjects that carry no budget
+# line out of the comparison entirely; measured, only the two halves of one byte-compared pair carry
+# one at all, and a single guard would have compared the other three against an empty prose value.
+#
+# AN UNPARSEABLE BUDGET LINE REDS THROUGH THIS SAME BRANCH, and that is the point rather than a side
+# effect: `${prose:-…}` is empty when the line says `≤27 KB` instead of bytes, an empty string never
+# equals a declared row, so rewriting the prose back to a KB spelling cannot silently disarm the term.
+# One branch covers both cases, which also means one arm satisfies check-arms.py.
+bline=$(tr -d '\r' < "$FILE" | grep -m1 '^\*\*Budget:')
+if [ -n "$declared" ] && [ -n "$bline" ]; then
+  prose=$(printf '%s' "$bline" | sed -n 's/^\*\*Budget:[^0-9]*\([0-9][0-9]*\) bytes.*/\1/p')
+  if [ "$prose" != "$declared" ]; then
+    FAIL_CODE=6
+    fail 6 "the subject states its own budget and disagrees with its declaration: $name says
+  '${prose:-no bytes figure}', $LIMITS says $declared. Two spellings of one fact; change both or
+  neither. A budget line this gate cannot parse as bytes reads the same as a wrong one, deliberately."
+  fi
+fi
+
 if [ "$bytes" -gt "$MAX_BYTES" ]; then
   over=$((bytes - MAX_BYTES))
   FAIL_CODE=1
   fail 2 "the file is over its size budget: $name is $bytes bytes, $over over $MAX_BYTES.
-  Trim non-instructional prose, or move an activity-scoped section to
-  parallel-coding-governance.domain-rules.md (leaving a §-stub pointer), per the v2.3 pattern.
+  Drop a conditional block, or trim non-instructional prose — the v3.0 charter is ONE file, so
+  there is no companion to move a section into.
   Raising the limit is an OWNER decision recorded in memory/DECISIONS.md, never a fix for
   the edit that hit it — and this message is shared with the kickoff engine at its own limit."
 fi

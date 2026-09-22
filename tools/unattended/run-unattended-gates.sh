@@ -1,0 +1,281 @@
+#!/usr/bin/env bash
+# run-unattended-gates.sh — this kit's SELF-TESTS, run on demand and nowhere else.
+#
+# THE SPLIT, which is the whole point of this file. Two kinds of check live in this directory and they
+# have different subjects:
+#
+#   * the RECORD AND WIRING checks read the REPOSITORY — run-state records, the shipped skill's
+#     wiring. They can go stale without anyone editing this kit, so they stay merge-bar legs.
+#     WHICH ones is the `checks` rows below and nothing else: the three names that used to be typed
+#     here had already fallen behind by one leg before this line was rewritten, which is what a
+#     hand-kept list of a machine-readable population always does. Nothing here replaces them and
+#     they are listed below only so one command answers for the whole kit.
+#   * the SELF-TESTS read THIS KIT. Each stages a break into a copy of a checker and asserts the
+#     checker still catches it. Their subject is the checker, so they have a job only when the source
+#     under this directory changes — and none at all in an adopter's repo that copy-installs the kit
+#     and never edits it. Owner ruling, 2026-08-23: they run when the owner asks, never on the bar,
+#     in this repo and in every adopter alike.
+#
+# MEASURED BEFORE THE RULING, node d, 2026-08-23: as bar legs the self-tests cost 3339 s of a 4926 s
+# bar — 68% of all leg-seconds — and the largest put a 26-minute FLOOR under every full run, because
+# wall clock cannot fall below the longest leg however wide the pool is. The record is
+# memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
+#
+# WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
+# nothing runs the self-tests automatically. A change under this directory that guts a check lands
+# green. The compensating check is a person invoking this script, and the DoD for any work touching
+# `tools/unattended/` is a GREEN verdict from `--selftests` pasted into the landing report.
+#
+# WHAT THIS DOES NOT CHECK: whether an unattended run was HONEST. These read records and stage
+# fixtures; §9 of the protocol says what a check running under the run's own uid can and cannot buy,
+# and that limit is unchanged by how this script is invoked.
+set -u
+HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
+  echo "run-unattended-gates: not a git work tree"; exit 2; }
+cd "$ROOT" || exit 2
+
+# ---- THE BUDGET, AND IT IS A VERDICT RATHER THAN A COMPLAINT. A check nobody can afford to run is a
+# ---- check nobody runs, and this kit proved it: its suites were pulled off the merge bar for costing
+# ---- 68% of it, and the compensating check that replaced them then took an hour, so it was re-run
+# ---- across two days and repeatedly abandoned. Slowness that only annoys never gets fixed. Slowness
+# ---- that REDS gets either fixed or re-declared with a reason, and both of those are progress.
+# ----
+# ---- These are CEILINGS in seconds, paired with the reading they were set against so a raise is
+# ---- visibly a raise. Raising one is fine; raising one silently is not, which is the same rule this
+# ---- repo applies to every other pin it owns.
+# ----
+# ---- THE READINGS ARE NOT ALL FROM ONE NODE, and a single global integer cannot be right for a cost
+# ---- that is node-relative (TOOL-aCollapsedScan-4). FIVE of the eight below are the 2026-08-23
+# ---- readings on node `d`, and two more (`gate_selftest`, `driver_selftest`) are 2026-08-25 node-`d`
+# ---- re-declarations under TOOL-dNarrowedAnchor-1. `BUDGET_kit_gate` is a node-`a` one, because the
+# ---- node-`d` figure was never
+# ---- a statement about node `a` at all: the same leg with check 30 removed costs about 70 s here
+# ---- against 28 s there, a 2.5x ratio that holds across this kit's work. Whether the SHAPE should be
+# ---- per node rather than one integer is `TOOL-aCollapsedScan-9`, not this line.
+# ---- IT IS CALIBRATED IDLE, AND A BUSY BOX WILL BREACH IT. Measured the same day on the same node:
+# ---- 187 s idle, 362 s while a concurrent session ran a full bar with self-tests. The obvious answer
+# ---- is a bigger number and it is WRONG here: this file's own note prices ambient load at 2.4x, which
+# ---- would put the ceiling near 450 s — above the 305 s the leg cost when check 30 landed unmeasured,
+# ---- so the very regression this whole build exists to have caught would pass. A single integer
+# ---- cannot separate "the leg regressed" from "the box was busy", so this one is set to catch the
+# ---- former and is EXPECTED to fire on the latter. READ A BREACH THIS WAY: re-run it on an idle box
+# ---- before believing it. Making the shape load-aware instead of re-arguing the integer is
+# ---- `TOOL-aCollapsedScan-9`.
+# ---- RE-DECLARED UPWARD by TOOL-aQuenchedHarness-7, which made the leg 57% cheaper in processes.
+# ---- Both halves of that sentence are true and the second does not rescue the first: the 240 was
+# ---- set against 187 s IDLE on 2026-08-26, when this repo held 25 `RUN*.md` records and 71
+# ---- builds. It now holds 49 and 102 -- records x1.96 -- and the leg measured 625 s idle BEFORE
+# ---- this unit touched it, x3.34 over the same span. It grows FASTER than the tree does, because
+# ---- the number of (anchor, unit) pairs and the window each pair walks grow together, so the
+# ---- product is roughly quadratic in history. That is the finding; the number below is its
+# ---- consequence.
+# ---- The unit cut 5420 external processes to 2321 with the stdout byte-identical, and 435 s idle
+# ---- is where that lands. 660 is 435 x 1.5, the same headroom every other row here carries, and
+# ---- it is still LOWER than the 187 x 3.34 = 625 the growth alone would have demanded. A budget
+# ---- moving up while the code gets faster is what a monotonically growing population looks like
+# ---- from inside a single integer, and `TOOL-aCollapsedScan-9` is the row for making the SHAPE
+# ---- population-relative instead of re-arguing this figure a third time.
+BUDGET_kit_gate=660           # measured 435 s IDLE on node `a` 2026-09-07 on a frozen clone,
+                              # after TOOL-aQuenchedHarness-7; was 240 against 187 s on a tree
+                              # holding half the records
+
+BUDGET_playbook_validity_gate=120   # measured 13 s
+BUDGET_skill_wiring=60        # measured 0 s
+BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to builds carrying no
+                              # run-state file and added a pre-anchor probe per unresolved unit.
+                              # THREE readings on node `a`, 2026-09-04/05, all with other builds
+                              # running: 804 s, 889 s, 1141 s. Up from 463 s before the widening and
+                              # from the 12 s this line was set at when the leg walked 45 closed
+                              # units; it now walks 65. The 337 s spread across three runs of the
+                              # SAME code is the contention, not the leg, which is exactly why a
+                              # single integer cannot separate "regressed" from "busy". 1800 clears
+                              # the highest reading with margin.
+                              # BOTH READINGS WERE TAKEN UNDER LOAD — two other builds ran
+                              # concurrently throughout — and this file's own header says this
+                              # figure is meant to be calibrated IDLE. I could not obtain an idle
+                              # box, so this is a LOADED reading wearing an idle ceiling's slot, and
+                              # saying so is the point: an idle re-declaration is owed and until it
+                              # lands this bound is looser than the doctrine above wants. It does
+                              # NOT match the gate-legs.json row, and must not — that row is a kill
+                              # bound under the 8-wide pool (TOOL-dRetiredFork-40) and this one is a
+                              # cost verdict. The claim that they are one figure was deleted with
+                              # this edit.
+# ---- THE TWO *_selftest BUDGETS THAT USED TO SIT HERE ARE GONE, and their absence is the merge
+# ---- rather than a deletion: TOOL-aQuenchedHarness-4 moved every self-test budget into
+# ---- `tools/run-gates/selftest-budgets.txt`, and this branch and main each added a suite while
+# ---- the other was in flight. `BUDGET_brief_recorded` stays because its leg is a REPOSITORY
+# ---- check on the merge bar, which is the line this delegation does not cross.
+BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day it landed, when the
+                              # cutoff drops every build before any rev-list runs. 900 is NOT that
+                              # measurement plus headroom - it is the sibling's declared ceiling,
+                              # taken because this leg's walk IS the sibling's walk plus one blob read
+                              # per graded unit, so the honest bound is the one the population grows
+                              # into rather than the one an empty population happens to cost.
+                              # IT EQUALS THE gate-legs.json ROW TODAY AND IS NOT THE SAME BOUND. The
+                              # sibling's note above spells the distinction out — that row is a kill
+                              # bound under the 8-wide pool, this one is a cost verdict — and the two
+                              # coinciding here is arithmetic, not a claim. Moving one does not move
+                              # the other, and neither should be edited to match.
+
+ONLY="${1:---selftests}"
+case "$ONLY" in
+  --all)       ONLY="" ;;
+  --checks)    ONLY=checks ;;
+  --selftests) ONLY=selftests ;;
+  -h|--help)
+    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--checks|--all]"
+    echo "  --selftests  every suite that stages breaks into this kit (default), and the only"
+    echo "               thing that exercises them since none is a bar leg."
+    # THE BUDGET IS DERIVED, NEVER TYPED. Round 7's low 2: this help text quoted ~60 minutes beside a
+    # ceiling this same unit had just re-declared, in the same file - a value stated in prose beside
+    # the source that owns it, broken inside the file that owns it. The sum below is the declarations.
+    # ---- SUMMED OVER THE DECLARED SET, never over a hand-typed list of names. Round 8's low 4: the
+    # ---- first cut derived the number but spelled five of the eight `BUDGET_*` identifiers by hand,
+    # ---- so a ninth suite would have been silently outside the figure - a hand-kept inventory of a
+    # ---- machine-enumerable set, which is the class this repo gates elsewhere.
+    # ONLY THE NAMES THIS FILE DECLARES. Round 9's low 10: `${!BUDGET_@}` enumerates every
+    # BUDGET_-prefixed variable in the ENVIRONMENT too, so an exported `BUDGET_FOO` from the
+    # caller joined the sum - and its contents were evaluated by the arithmetic. The declared
+    # set is read from this file's own text, and a value that is not a plain integer is skipped.
+    _bsum=0
+    for _bk in $(sed -n 's/^\(BUDGET_[A-Za-z0-9_]*\)=.*/\1/p' "$0"); do
+      _bv=${!_bk}
+      case "$_bv" in *[!0-9]*|"") continue ;; esac
+      _bsum=$(( _bsum + _bv ))
+    done
+    echo "               Budget: every BUDGET_* ceiling this file declares, summed - currently"
+    echo "               $(( (_bsum + 59) / 60 )) minutes, dominated by the gate selftest. Do NOT wrap this"
+    echo "               in a timeout below that - a killed suite prints no PASS and no FAIL, and"
+    echo "               greping for a verdict then reads a kill as silence. This script reads the"
+    echo "               EXIT CODE for that reason."
+    echo "  --checks     the record/wiring checks, which are ALSO merge-bar legs. Their own"
+    echo "               ceilings are in the same BUDGET_* block; no wall figure is typed here,"
+    echo "               because the one that was is what round 8 filed."
+    echo "  --all        both"
+    echo ""
+    echo "The suites are run UNSHARDED on purpose. Each carries its own note that a --shard run is"
+    echo "evidence about its region and nothing else, so the whole-suite claim exists only here."
+    exit 0 ;;
+  *) echo "run-unattended-gates: unknown argument '$ONLY'"; exit 2 ;;
+esac
+
+#
+# THE GATE SELFTEST'S CEILING WAS RE-DECLARED RATHER THAN MET, which TOOL-dScriptedRepeat-15's own
+# spec named as one of its two acceptable outcomes, and this note is the reason beside the number.
+#
+# WHAT THE COST ACTUALLY IS, measured on node d 2026-08-23 rather than reasoned about. The leg is not
+# compute-bound and never was: one invocation inside the suite's own fixture reported `real 14.4s
+# user 0.33s sys 0.62s`, so 93% of it is spent waiting rather than working. What it waits on is
+# PROCESS CREATION - an on-access antivirus scanner sits in front of every exec on this node, and one
+# spawn costs 0.019-0.039 s here against roughly a millisecond on a machine without one. The leg made
+# 469 of them per invocation and the suite invokes it 243 times, so the suite's real unit of cost is
+# about 114,000 process creations. 469 x 0.022 s = 10.3 s against a 10.7 s measured invocation, which
+# is the whole of it.
+#
+# WHAT THE UNIT DID: cut the spawns, which is the only term in that product this repo owns. Three
+# loops that ran a grep or a `bash -c` per (item, file) now read each file once - 469 spawns per
+# invocation became 220, counted both ways from an execution trace rather than estimated. The suite's
+# last recorded sharded pair was 846.0 + 2013.7 = 2859.7 s; scaled by 220/469 that is 1342 s, and
+# 243 x 5.2 s + fixture overhead lands in the same place from the other direction.
+#
+# WHY 1800 AND NOT 1342: the same reading taken under ambient load on this node ran 2.4x slower, and a
+# ceiling that reds on someone else's antivirus scan is a ceiling that gets ignored. 1800 has headroom
+# for that and still reds long before the 3200 s this suite used to cost.
+#
+# NOW OBSERVED, and the derivation above was WRONG (TOOL-dNarrowedAnchor-1). The paragraph below
+# closes with "nobody has run the suite end to end at this commit", and this is that run: 3565 s,
+# against a derived 1342 s and a 1800 s ceiling chosen to have headroom over it. The derivation was
+# low by 2.6x, and the sentence it ended with is the reason it went unnoticed — a pin nobody could
+# falsify is a pin nobody did.
+#
+# WHOSE COST: gov's own gate-legs.json records this suite at 3188 s before this build touched it, so
+# the great majority of the 3565 s predates TOOL-dNarrowedAnchor-1 and its four new arms are the
+# remainder. That split is stated rather than measured — separating them needs a baseline end-to-end
+# run, which is another hour of the thing this ceiling exists to bound, and the number that matters
+# for a ceiling is the total either way. 3800 keeps this file's own measured-plus-headroom habit.
+#
+# WHAT IS NOT OBSERVED, said plainly: nobody has run the suite end to end at this commit. The owner
+# stopped these suites after two days of re-runs and the instruction stands, so the 1342 s is DERIVED
+# from a spawn count and a per-spawn cost, both measured, and not from a stopwatch on the whole thing.
+# The equivalence that replaces it is 19 staged breaks, 18 of them red, whose output and exit status
+# are byte-identical before and after the unit. To settle it, one command:
+#   bash tools/unattended/run-unattended-gates.sh --selftests
+
+st=0
+ran=0
+over=0
+run_one() { # label · kind · argv...
+  local label=$1 kind=$2; shift 2
+  case "$ONLY" in ''|"$kind") ;; *) return 0 ;; esac
+  ran=$((ran + 1))
+  local s e out rc took bkey budget
+  s=$(date +%s)
+  out=$("$@" 2>&1); rc=$?
+  e=$(date +%s)
+  took=$((e - s))
+  bkey="BUDGET_$(printf '%s' "$label" | tr ' -' '__')"
+  eval "budget=\${$bkey:-}"
+  if [ "$rc" -eq 0 ]; then
+    printf 'ok    %-30s %5ss  %s\n' "$label" "$took" "$(printf '%s\n' "$out" | grep -E '^PASS' | tail -1)"
+  else
+    st=1
+    printf 'FAIL  %-30s %5ss  (exit %s)\n' "$label" "$took" "$rc"
+    printf '%s\n' "$out" | grep -E '^FAIL|FAILED' | head -6 | sed 's/^/        /'
+  fi
+  # A MISSING BUDGET IS ITSELF A FAILURE. A suite added here without one would be exempt from the rule
+  # by the act of arriving, which is how every population in this repo has previously gone quiet.
+  if [ -z "$budget" ]; then
+    st=1; over=$((over + 1))
+    printf '      OVER BUDGET  %s declares no ceiling, so its cost is unbounded by construction\n' "$label"
+  elif [ "$took" -gt "$budget" ]; then
+    st=1; over=$((over + 1))
+    printf '      OVER BUDGET  %s took %ss against a declared %ss ceiling — fix it or raise the ceiling with a reason beside it\n' "$label" "$took" "$budget"
+  fi
+}
+
+run_one "kit gate"                  checks bash "$HERE/check-unattended.sh"
+run_one "playbook validity gate"    checks bash "$HERE/check-playbook.sh"
+run_one "skill wiring"              checks bash "$HERE/adopt-unattended.sh" --check
+run_one "pass-order history"        checks bash "$HERE/check-pass-order.sh"
+run_one "brief-recorded"            checks bash "$HERE/check-brief-recorded.sh"
+
+# THE SELF-TEST HALF IS DELEGATED. TOOL-aQuenchedHarness-4 S7. These six suites are now rows in
+# `tools/run-gates/selftest-budgets.txt` alongside every other kit's, and one runner executes them
+# all -- which is what the 2026-08-23 ruling always implied and what this file could only do for one
+# kit. Their budgets travelled with them; the `--checks` half above keeps its own, because those four
+# are REPOSITORY checks that stay on the merge bar and are not this delegation's business.
+#
+# WHY THEY WERE THE HARD CASE, recorded because it is why the population is declared rather than
+# derived: the ruling removed all six from `tools/gate-legs.json` AND from `tools/unattended/kit.toml`,
+# so they exist in no manifest at all. A runner deriving its population from held manifest legs sees
+# none of them, which a spec audit caught before this was built.
+# THE COUNT IS DERIVED, NOT TYPED. It read `ran + 6` and this merge is exactly why that was
+# wrong: main added a SEVENTH suite (`brief-recorded selftest`) while this delegation was in
+# flight, and a typed 6 would have under-reported the population forever without anything
+# noticing. `--list` prints the rows the declaration actually holds for this kit.
+if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
+  _uc=$(bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended --list 2>/dev/null \
+        | grep -cE "^  [a-z]" || true)
+  case "$_uc" in ''|*[!0-9]*|0) echo "run-unattended-gates: the declaration holds NO unattended row, so this half would grade nothing" >&2; st=1 ;;
+    *) ran=$((ran + _uc)) ;;
+  esac
+  bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended || st=1
+fi
+
+# LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a clean
+# sweep are indistinguishable from the outside, which is the class this kit has spent six review
+# rounds on.
+if [ "$ran" -eq 0 ]; then
+  echo "run-unattended-gates: no check matched the filter, so this run graded nothing at all"
+  exit 2
+fi
+echo "----"
+if [ "$st" -eq 0 ]; then
+  echo "unattended gates GREEN — $ran ran on demand; no self-test here runs on the merge bar"
+elif [ "$over" -gt 0 ]; then
+  echo "unattended gates RED — $ran ran on demand, $over over budget"
+else
+  echo "unattended gates RED — $ran ran on demand"
+fi
+exit "$st"

@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-cSettledDocket-1-1.md](../reviews/2026-08-16-review-TOOL-cSettledDocket-1-1.md) | spec-audit | TOOL-cSettledDocket-1 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 |
+| [2026-08-17-review-TOOL-cSettledDocket-1-2.md](../reviews/2026-08-17-review-TOOL-cSettledDocket-1-2.md) | diff-review | TOOL-cSettledDocket-1 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 A project may declare `DIRECTIVES_EXTRA` in `.unattended.conf`. `directives()` composes it with the

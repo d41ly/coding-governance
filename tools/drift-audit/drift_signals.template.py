@@ -1,6 +1,6 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.4
+gov:kit drift-audit@1.11
 
 Copied from tools/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
 then run `python tools/drift-audit/drift_report.py`.
@@ -95,6 +95,21 @@ TRACE_CUTOFF: str = ""
 
 TRACE_GLOBS: list[str] = []
 
+# TRACE_WAIVER: where the signal's per-spec waiver registry lives, repo-relative. One row per waived
+# spec, `<spec path><TAB><reason>`, for a CLOSED unit no TRACE_GLOBS subject can ever name, such as a
+# records-only or tooling-only deliverable. BLANK keeps `<MEMORY_ROOT>/project/trace-waiver.txt`,
+# where an absent file is an empty waiver set. Declare it when your memory tree has no `project/`
+# directory. A DECLARED path that is absent or outside the tree is a finding of its own.
+TRACE_WAIVER: str = ""
+
+# EVIDENCE_GLOBS — signal 2's population, narrower than PRODUCT_GLOBS. A citation from a test
+# file is the house's own bookkeeping certifying the bookkeeping, so signal 2 should not read
+# one as evidence a unit shipped. SHIPS EMPTY and falls back to PRODUCT_GLOBS, which is the
+# unnarrowed behaviour — correct on day one and permanently inert if nobody fills it, which is
+# why the kit descriptor declares it a hole with a discharge probe rather than leaving it to
+# be noticed. Git pathspec magic works here: `:(exclude)*.test.sh` and friends.
+EVIDENCE_GLOBS: list[str] = []
+
 # --------------------------------------------------------------------------------------------
 # PINS — shrink-only ceilings per GATEABLE signal, seeded at the values the report actually measured.
 # `--check` reds when a value exceeds its pin. Lower a pin whenever its population drops; raising one
@@ -107,6 +122,10 @@ PINS: dict[str, int] = {
     # "ledger_rows_contradicting_git": 0,
     # "non_terminal_specs_cited_by_product_source": 0,
     # "handkept_inventories_disagreeing_with_source": 0,
+    # "readme_mechanism_drift": 0,   # REPORT-ONLY: seed it at what your first report MEASURES.
+    #   Left at 0 every non-empty count reads "out of tolerance", which is how a reader learns
+    #   to skip the line. The kit cannot ship a number for it: the value is your corpus’s, and a
+    #   guessed pin is the one thing this block forbids.
 }
 
 # --------------------------------------------------------------------------------------------
@@ -148,6 +167,12 @@ DECLARED_EMPTY: set[str] = {
 # leave those to the gate that owns them rather than declaring them here and believing they are
 # watched. Ships EMPTY — seed it with the pins you actually keep.
 # --------------------------------------------------------------------------------------------
+
+# How many lines ABOVE a ratcheted pin this gate looks for the `<old> -> <new>` justification
+# that excuses a weakening move. Absent takes the kit's shipped 14. Widen it if your repo writes
+# long justifications above a pin; narrow it if your pins sit close together, so a justification
+# for a DIFFERENT pin cannot be read as this one's.
+# RATCHET_LOOKBACK = 14
 
 RATCHETS: list[dict] = [
     # {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},

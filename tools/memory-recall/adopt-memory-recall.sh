@@ -43,6 +43,12 @@ ROOT="$(pwd)"
 # silently. Works whether the kit sits at <root>/memory-recall/ or <root>/tools/memory-recall/.
 REL="$(cd "$HERE" && git rev-parse --show-prefix)" || exit 2
 REL="${REL%/}"
+# THE TOOL ROOT, derived exactly as `adopt-unattended.sh` derives it and for the same reason: the
+# settings merger lives BESIDE this kit rather than inside it, so the closing instruction below has
+# to name the adopter's own prefix. A literal `tools/` there resolves to nothing in a root install
+# and told the operator to copy the tool somewhere the next line would not look. TOOL-cMendedVintage-4.
+TOOL_ROOT=${REL%/*}; [ "$TOOL_ROOT" = "$REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
+[ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                   # trailing slash so a root install renders clean
 
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
 # not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
@@ -176,18 +182,26 @@ if [ "$with_hook" = 1 ]; then
   if [ ! -f "$HERE/recall-opened.js" ]; then
     echo "memory-recall: --with-hook asked for, but $REL/recall-opened.js is not installed"; exit 1
   fi
-  mkdir -p "$ROOT/.claude/hooks"
-  cp "$HERE/recall-opened.js" "$ROOT/.claude/hooks/recall-opened.js"
-  echo "installed .claude/hooks/recall-opened.js — now merge it into settings.json:"
-  # RESOLVED, not hardcoded — this is the last instruction an adopter sees at the moment they take
-  # the opt-in, and the step whose omission leaves the hook inert. A hardcoded tools/ path printed
-  # here died with errno 2 in an adopter, because no runbook step delivered the tool. WIRE §3c
-  # step 4 now copies it to tools/; when it still is not there, say so instead of pretending.
+  # NOTHING IS COPIED ANY MORE. The hook SHIPS at $REL/recall-opened.js and is wired there.
+  #
+  # This block used to `mkdir -p .claude/hooks` and copy into it, which RE-CREATED the exact
+  # duplicate TOOL-dRetiredFork-14 withdrew: an adopter who took this opt-in got the second copy
+  # back whatever the descriptor said, and a closing instruction naming it. That instruction is the
+  # last thing they read at the moment they wire the hook, so a stale path here is worse than a
+  # stale path in a descriptor -- one is followed by hand, the other is resolved by a tool.
+  echo "$REL/recall-opened.js is installed — now merge it into settings.json:"
+  # RESOLVED THROUGH THIS KIT'S OWN PREFIX, not hardcoded — this is the last instruction an adopter
+  # sees at the moment they take the opt-in, and the step whose omission leaves the hook inert. The
+  # probe, the copy destination and the fallback are one spelling, `$TOOL_ROOT`, so the directory the
+  # operator is told to copy the merger INTO is the directory the next line then runs it from. A
+  # hardcoded tools/ path printed here died with errno 2 in an adopter, because no runbook step
+  # delivered the tool; at any prefix but gov's own it also named a directory that is not there.
+  # The `<gov>/tools/…` source half stays literal: it names gov's OWN checkout, not the adopter's.
   smerge=""
-  for c in tools/settings-merge.py settings-merge.py; do [ -f "$ROOT/$c" ] && { smerge="$c"; break; }; done
+  for c in "${TOOL_ROOT}settings-merge.py" settings-merge.py; do [ -f "$ROOT/$c" ] && { smerge="$c"; break; }; done
   if [ -z "$smerge" ]; then
-    echo "  cp <gov>/tools/settings-merge.py tools/     # not installed here yet (WIRE §3c step 4)"
-    smerge=tools/settings-merge.py
+    echo "  cp <gov>/tools/settings-merge.py ${TOOL_ROOT:-./}     # not installed here yet (WIRE §3c step 4)"
+    smerge="${TOOL_ROOT}settings-merge.py"
   fi
   echo "  $PY $smerge --fragment $REL/recall-opened.fragment.json"
 fi

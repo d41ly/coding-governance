@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-15 · node c · Tier-2 · base 37c05e1b · streams tooling
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Add a sixth drift-audit signal that reds when a spec claims CLOSED and no single-parent commit,

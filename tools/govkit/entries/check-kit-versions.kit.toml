@@ -39,5 +39,6 @@ this entry IS a gate, and it lands as a `seed` the target is expected to edit do
 
 [[gate_leg]]
 name = "kit version markers"
+subject = "repo"
 argv = ["bash", "{prefix}/check-kit-versions.sh"]
 guard = []

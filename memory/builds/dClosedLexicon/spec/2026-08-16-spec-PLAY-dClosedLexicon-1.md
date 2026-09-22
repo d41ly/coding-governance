@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-16 · node d · Tier-2 · base 587b95a4 · streams playbook
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-PLAY-dClosedLexicon-1-7.md](../reviews/2026-08-16-review-PLAY-dClosedLexicon-1-7.md) | diff-review | TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Add the §0 fallback rule `TOOL-dClosedLexicon-1` F2 ratified, and record that §14 must NOT go behind

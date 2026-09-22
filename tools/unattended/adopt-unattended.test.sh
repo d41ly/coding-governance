@@ -13,7 +13,22 @@
 # Windows node without the privilege, `ln -s` degrades to a copy and would score a refusal as
 # success.
 set -u
+# THE FIXTURE'S KIT HOME, ONCE (TOOL-aGradedDoorway-2). Every arm below spells it through this
+# variable rather than as a literal, because `seed()` INSTALLS the kit here and the arms RUN it
+# here, and those two had been two independent spellings of one fact. An adopter at another
+# prefix had to repath every site by hand, and a missed one is SILENT rather than red: `mutate`
+# and `cp` no-op on a path that does not exist, so the arm asserts against a tree it never
+# changed and passes. Measured three times -- ARCH-dReadoptedConvoy-6, ARCH-aThriftySentry-1 and
+# ARCH-aBridledVintage-5 each cleared the same class by hand, and the last found NINE fresh sites
+# arriving in one kit pull. The default keeps gov identical; an adopter sets it once.
+KIT_REL="${KIT_REL:-tools/unattended}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$HERE/../lib/resolve-python.sh" ]; then
+  . "$HERE/../lib/resolve-python.sh"
+  TESTPY=$(resolve_python) || { echo "adopt-unattended.test: no usable python"; exit 2; }
+else
+  TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
+fi
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 st=0; n=0
@@ -22,12 +37,52 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 absent() { n=$((n+1)); [ ! -e "$1" ] || { echo "FAIL $2: $1 exists and should not"; st=1; }; }
 present() { n=$((n+1)); [ -e "$1" ] || { echo "FAIL $2: $1 is missing"; st=1; }; }
 
-seed() { # dir  -> a git repo carrying the kit and a conf
-  mkdir -p "$1/tools/unattended"
+# THE TOOL ROOT the adopter derives from the kit home, computed the adopter's way so the checklist
+# arms below spell no install prefix of their own.
+TR_T=${KIT_REL%/*}; [ "$TR_T" = "$KIT_REL" ] && TR_T=""; [ -z "$TR_T" ] || TR_T="$TR_T/"
+
+seed() { # dir  -> a git repo carrying the kit, a conf, and a TRACKED memory-tree checklist script
+  mkdir -p "$1/$KIT_REL"
   ( cd "$1" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
       && git config core.autocrlf false )
-  cp "$HERE/SKILL.template.md" "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" \
-     "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" "$1/tools/unattended/"
+  # The Skill's bug-class checklist names the memory-tree kit's `gotchas.py`, and the adopter PROBES
+  # the tracked tree for it and refuses when it finds none. Seeded NESTED, the default layout; the
+  # flat, absent and override arms below each move it deliberately.
+  mkdir -p "$1/${TR_T}memory-tree" && printf '# a stub checklist\n' > "$1/${TR_T}memory-tree/gotchas.py"
+  ( cd "$1" && git add -- "${TR_T}memory-tree/gotchas.py" )
+  # BOTH SIDES ADDED A FILE HERE: main the playbook template, this branch the kit library. A fixture
+  # missing either materialises a kit that cannot run, so the union is the only correct resolution.
+  # EVERY TEMPLATE THE KIT SHIPS, BY GLOB. This line named three and the adopter grew two more — the
+  # verb carrier and the playbook fixture's template — so every adopt below stopped at the fixture
+  # render and exited 1, and arm 1 and everything built on it was red at 24f8c712 in a suite no bar
+  # runs. A hand list of what the adopter reads is the defect; the kit's own `*.template.md` set is
+  # what it reads. Found by the unit that added the checklist arms, which could not observe its own
+  # arms until this was fixed.
+  cp "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" \
+     "$HERE/check-unattended.sh" "$HERE"/*.template.md "$1/$KIT_REL/"
+  # EVERY FRAGMENT AND EVERY HOOK THE KIT SHIPS, BY GLOB (TOOL-aWokenSentinel-3). The adopter's
+  # --check now loops over `*.fragment.json` in the kit dir and joins each to the hook it names, so
+  # the seed carries both populations; this line used to read ONE fragment's marker out of `$HERE`
+  # and never copy the file, which left arm 1's --check red at `gate-guard.fragment.json is missing
+  # from the kit` on every run, in a suite no bar runs. The settings file gets one entry per
+  # fragment under its own event and matcher — read from the fragment, never spelled — because the
+  # adopter reads the marker out of the settings file; arm 1a moves it aside, misfiles it and reads
+  # the refusal.
+  cp "$HERE"/*.fragment.json "$HERE"/*.js "$1/$KIT_REL/"
+  mkdir -p "$1/.claude"
+  # One event key per fragment: the kit's fragments declare distinct events, and a second under
+  # one event would need a group merge this seed does not do — the merger owns that.
+  printf '{"hooks":{' > "$1/.claude/settings.json"
+  _sep=""
+  for _fr in "$HERE"/*.fragment.json; do
+    _ev=$(sed -n 's/^[[:space:]]*"event":[[:space:]]*"\([^"]*\)".*/\1/p' "$_fr" | head -1)
+    _ma=$(sed -n 's/^[[:space:]]*"matcher":[[:space:]]*"\([^"]*\)".*/\1/p' "$_fr" | head -1)
+    _mk=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$_fr" | head -1)
+    printf '%s"%s":[{"matcher":"%s","hooks":[{"type":"command","command":"node \\"${CLAUDE_PROJECT_DIR}/%s/%s\\""}]}]' \
+      "$_sep" "$_ev" "$_ma" "$KIT_REL" "$_mk" >> "$1/.claude/settings.json"
+    _sep=","
+  done
+  printf '}}\n' >> "$1/.claude/settings.json"
   cat > "$1/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory
 LANDER="bash tools/land.sh"
@@ -43,24 +98,155 @@ KICKOFF_EXITS=""
 PHASES_EXTRA=""
 DOD_EXTRA=""
 EOF
+  # ONE COMMIT, SO HEAD IS BORN (TOOL-aWokenSentinel-14). Two later arms borrow this seed for a
+  # fixture the driver's `--liveness` reads, and its clock block marks `git log -1 --format=%ct`
+  # DEAD on the empty answer an unborn HEAD gives, so every borrowing arm was red for a reason it
+  # could not name. Null global and system config, the kit's own seed idiom in
+  # check-playbook.test.sh: a nested `git init` never reads the enclosing checkout's config, but it
+  # DOES read the machine's, and `commit.gpgsign=true` there fails the commit outright — this repo's
+  # `fixture-inherits-ambient-machine-state`. A failing commit is the seed's own loud refusal, never
+  # a quiet subshell exit that leaves HEAD unborn: `borrowed-seed-inherits-its-head-state`.
+  ( cd "$1" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+      && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git commit -q -m seed ) \
+    || { echo "FAIL seed: the fixture commit did not land in $1"; exit 2; }
 }
+
+# The adopter's --check honours GOV_SETTINGS_JSON (aDeferredBar closing review F5), so every --check
+# below reads the FIXTURE's settings file only because the variable is clear here: the node F5
+# exists for exports a real one, and arm 1's --check as much as arm 1a's would then grade the
+# ambient path — a non-file REFUSES it and an unwired out-of-tree file reads UNWIRED, both rc=1
+# where arm 1 asserts 0, observed on an arm-1-shaped fixture with the variable set (closing round
+# 3, T9: round 2's R15 placed this line at the top of arm 1a, one arm short). The one arm that wants
+# the variable sets it inline.
+unset GOV_SETTINGS_JSON
 
 # ---- ARM 1: the ordinary adopt. Asserted on the CONTENT of what was written, because "a file
 # ---- appeared" is satisfied by a render that interpolated nothing.
 A="$TMP/host"; seed "$A"
-out=$( cd "$A" && bash tools/unattended/adopt-unattended.sh 2>&1 )
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 )
 present "$A/.claude/skills/unattended/SKILL.md" "arm 1 rendered the Skill"
 # check 10 of the gate compares the SHIPPED protocol against the installed copy and fails hard
 # when either half is missing, so before this the kit shipped a gate no adopter could satisfy.
 present "$A/memory/guides/UNATTENDED-PROTOCOL.md" "arm 1 installed the protocol's live half"
 hit "$(cat "$A/memory/guides/UNATTENDED-PROTOCOL.md")" "The run is authorized by the **build folder itself**"
+# the THIRD artifact. Asserted on CONTENT for the reason arm 1 states
+# about the other two: a file appearing is satisfied by a copy that carried nothing.
+present "$A/memory/guides/PLAYBOOK-TEMPLATE.md" "arm 1 installed the playbook template"
+hit "$(cat "$A/memory/guides/PLAYBOOK-TEMPLATE.md")" "PROHIBITED OUTPUT unless it is a tracked"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "TheCreateCall"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/land.sh"
-hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/unattended/unattended.sh --preflight"
+hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash "$KIT_REL"/unattended.sh --preflight"
+hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "python ${TR_T}memory-tree/gotchas.py --for-diff HEAD~1..HEAD"
 same "arm 1 left no placeholder" \
   "$(grep -cE '\{\{[A-Z_]+\}\}' "$A/.claude/skills/unattended/SKILL.md" || true)" "0"
-( cd "$A" && bash tools/unattended/adopt-unattended.sh --check >/dev/null 2>&1 )
+( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1 --check agrees with what --render just wrote" "$?" "0"
+
+# ---- ARM 1a: THE UNWIRED REFUSAL and the group it must sit in (aDeferredBar closing review F6, F5,
+# ---- F11). The seed comment above promised an UNWIRED arm that did not exist: both --check arms ran
+# ---- on wired trees, so a regressed marker read would have reported `in sync` over a hook that never
+# ---- fires. Each break below was observed against the adopter at 8b5b3f0c first: the moved-aside
+# ---- file refused there too, but a marker parked under PostToolUse or under matcher `Bash` alone
+# ---- passed, an out-of-tree settings file declared through GOV_SETTINGS_JSON was reported UNWIRED,
+# ---- and a deleted fragment fell through to `in sync`.
+# GOV_SETTINGS_JSON is cleared in the prologue above, before arm 1's --check (round 2 R15 put the
+# `unset` here; round 3 T9 moved it up one arm). The one arm below that wants it sets it inline.
+mv "$A/.claude/settings.json" "$A/.claude/settings.json.aside"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a --check refuses with the settings file gone" "$rc" "1"
+hit "$out" "gate-guard hook is UNWIRED"
+mv "$A/.claude/settings.json.aside" "$A/.claude/settings.json"
+# The marker under the WRONG EVENT, then under the wrong MATCHER: present in the file, never fired.
+sed 's/PreToolUse/PostToolUse/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
+( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 1a a marker under PostToolUse is UNWIRED" "$?" "1"
+sed 's/PostToolUse/PreToolUse/; s/Bash|PowerShell/Bash/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
+( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 1a a marker under another matcher is UNWIRED" "$?" "1"
+sed 's/"Bash"/"Bash|PowerShell"/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
+# The marker under SessionStart BEHIND A MATCHERLESS GROUP — the repo's own settings shape (closing
+# round 2, R9). The resolver kept only the last key of the previous flattened line and left the
+# event alone when that key was `hooks`, so the group after a matcherless one inherited PreToolUse
+# and the adopter at 4d177329 printed `in sync` over it.
+cp "$A/.claude/settings.json" "$TMP/settings.wired.json"
+GG_HOOK=$(sed -n 's/.*"hooks":\[\({[^]]*}\)\].*/\1/p' "$TMP/settings.wired.json" | head -1)
+printf '{"hooks":{"PreToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node x/other.js"}]}],"SessionStart":[{"hooks":[{"type":"command","command":"bash x/session.sh"}]},{"matcher":"Bash|PowerShell","hooks":[%s]}]}}\n' "$GG_HOOK" > "$A/.claude/settings.json"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a a marker under SessionStart behind a matcherless group is UNWIRED" "$rc" "1"
+hit "$out" "gate-guard hook is UNWIRED"
+cp "$TMP/settings.wired.json" "$A/.claude/settings.json"
+# An OUT-OF-TREE settings file, declared the way check-wiring.sh resolves it, is wired.
+mv "$A/.claude/settings.json" "$TMP/settings.out-of-tree.json"
+( cd "$A" && GOV_SETTINGS_JSON="$TMP/settings.out-of-tree.json" bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 1a an out-of-tree settings file declared via GOV_SETTINGS_JSON is wired" "$?" "0"
+# ...and an UNWIRED out-of-tree file gets a remedy naming THAT file (closing round 2, R10): the
+# bare remedy writes the in-tree decoy while --check keeps reading the declared path.
+sed 's/PreToolUse/PostToolUse/' "$TMP/settings.out-of-tree.json" > "$TMP/settings.oot-unwired.json"
+out=$( cd "$A" && GOV_SETTINGS_JSON="$TMP/settings.oot-unwired.json" bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a an unwired out-of-tree settings file is UNWIRED" "$rc" "1"
+hit "$out" "--fragment $KIT_REL/gate-guard.fragment.json $TMP/settings.oot-unwired.json"
+# ...and a DECLARED path that is not a file is REFUSED in check-wiring's words, never UNWIRED (R10).
+out=$( cd "$A" && GOV_SETTINGS_JSON="$TMP/no-such-settings.json" bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a a declared GOV_SETTINGS_JSON that is not a file is REFUSED" "$rc" "1"
+hit "$out" "REFUSED — GOV_SETTINGS_JSON names $TMP/no-such-settings.json, which is not a file"
+mv "$TMP/settings.out-of-tree.json" "$A/.claude/settings.json"
+# The fragments are shipped surface: EVERY fragment gone is a refusal naming the kit dir, never a
+# loop over nothing that prints `in sync` (TOOL-aWokenSentinel-3, spec §8 F5: one fragment gone
+# from a copy that still holds another is NOT detected per file, and the arm says so rather than
+# pretending; the population floor is the zero guard, the fragment-to-hook join below is the
+# other half, and the printed count is what a reader compares).
+mkdir -p "$TMP/fragments.aside"; mv "$A/$KIT_REL"/*.fragment.json "$TMP/fragments.aside/"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a --check refuses with every fragment gone" "$rc" "1"
+hit "$out" "no *.fragment.json in $KIT_REL"
+mv "$TMP/fragments.aside"/*.fragment.json "$A/$KIT_REL/"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a the restored tree is in sync again" "$rc" "0"
+# the count is DERIVED by the loop and equals the kit's own fragment population
+hit "$out" "hooks: $(ls "$HERE"/*.fragment.json | grep -c '') fragment(s) wired"
+# A FIXTURE FRAGMENT naming a fixture hook: UNWIRED by name, wired by the merger, then refused when
+# its hook is deleted — the fragment-to-hook join, observed on a fragment the kit does not ship.
+# one key per line, the shape every shipped fragment has and the only one the adopter's sed reads
+printf '{\n  "name": "fx",\n  "event": "PreToolUse",\n  "matcher": "Read",\n  "marker": "fx.js",\n  "hook_path": "{kit}/unattended/fx.js"\n}\n' > "$A/$KIT_REL/fx.fragment.json"
+printf 'process.exit(0)\n' > "$A/$KIT_REL/fx.js"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a a fixture fragment is UNWIRED" "$rc" "1"
+hit "$out" "the fx hook is UNWIRED"
+hit "$out" "--fragment $KIT_REL/fx.fragment.json"
+# The merger is the kit's SIBLING in the gov tree, run with cwd at the fixture root, which its own
+# docstring fixes as the target: `{kit}` resolves against the fragment's location, not the cwd.
+( cd "$A" && "$TESTPY" "$HERE/../settings-merge.py" --fragment "$KIT_REL/fx.fragment.json" >/dev/null 2>&1 )
+same "arm 1a the merger accepted the fixture fragment" "$?" "0"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a the merger wires the fixture fragment" "$rc" "0"
+hit "$out" "hooks: $(( $(ls "$HERE"/*.fragment.json | grep -c '') + 1 )) fragment(s) wired"
+rm "$A/$KIT_REL/fx.js"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a a fragment naming a hook the kit does not carry is refused" "$rc" "1"
+hit "$out" "names the hook fx.js, which is not a file in $KIT_REL"
+rm "$A/$KIT_REL/fx.fragment.json"
+"$TESTPY" -c 'import json,sys
+p=sys.argv[1]; d=json.load(open(p))
+for ev in list(d["hooks"]):
+    d["hooks"][ev]=[g for g in d["hooks"][ev] if not any("fx.js" in h.get("command","") for h in g.get("hooks",[]))]
+    if not d["hooks"][ev]: del d["hooks"][ev]
+json.dump(d,open(p,"w"),indent=2)' "$A/.claude/settings.json"
+( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 1a the tree without the fixture fragment is in sync again" "$?" "0"
+# THE STALL-RECORDER'S GROUP (TOOL-aWokenSentinel-4): the seed wires every fragment the kit ships, so
+# the `StopFailure` group is in the fixture by glob; with THAT group deleted from a copy declared
+# through GOV_SETTINGS_JSON the loop names the hook by its fragment's name, and with the fixture's
+# own file back the count line reads the population again. Observed on a fragment the kit ships,
+# where the fixture-fragment arm above observes it on one it does not.
+"$TESTPY" -c 'import json,sys
+d=json.load(open(sys.argv[1])); del d["hooks"]["StopFailure"]; json.dump(d,open(sys.argv[2],"w"),indent=2)'   "$A/.claude/settings.json" "$TMP/settings.nostall.json"
+out=$( cd "$A" && GOV_SETTINGS_JSON="$TMP/settings.nostall.json" bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a the StopFailure group removed is UNWIRED" "$rc" "1"
+hit "$out" "the stall-recorder hook is UNWIRED"
+hit "$out" "no StopFailure entry under matcher * naming stall-recorder.js"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a the fixture's own settings file is wired again" "$rc" "0"
+hit "$out" "hooks: $(ls "$HERE"/*.fragment.json | grep -c '') fragment(s) wired"
 
 # ---- ARM 1b: HOSTILE CONF VALUES, round-tripped.
 # ---- Conf values are free prose. The previous `sed` render interpolated them unescaped into
@@ -79,7 +265,7 @@ LANDER="bash tools/land.sh | tee log & echo done \\ok"
 KEEPALIVE_INTERVAL="every 10 min | offset 3 & then \\wait"
 HOSTILEEOF
 mv "$H/.conf.tmp" "$H/.unattended.conf"
-out=$(cd "$H" && bash tools/unattended/adopt-unattended.sh 2>&1); rc=$?
+out=$(cd "$H" && bash "$KIT_REL"/adopt-unattended.sh 2>&1); rc=$?
 same "a hostile conf still adopts" "$rc" "0"
 SK="$H/.claude/skills/unattended/SKILL.md"
 present "$SK" "the Skill is written for a hostile conf"
@@ -87,18 +273,88 @@ hit "$(cat "$SK")" 'bash tools/land.sh | tee log & echo done \ok'
 hit "$(cat "$SK")" 'every 10 min | offset 3 & then \wait'
 # NEGATIVE control: a render that silently drops a substitution leaves the token standing, and would
 # otherwise satisfy every assertion above by writing nothing useful.
+# The SHAPE, not a list. Two named arms follow and both stay — each records a specific break — but a
+# list cannot notice a placeholder nobody added it to, and the render is exactly where an unfilled
+# one survives as literal prose and passes every other check in the kit.
+n=$((n+1)); left=$(grep -oE '[{][{][A-Za-z_]+[}][}]' "$SK" | sort -u | tr '\n' ' ')
+[ -z "$left" ] || { echo "FAIL the render carries a surviving placeholder: $left"; st=1; }
+# ...and the UPPERCASE ANGLE-BRACKET shape, which the renderer does not substitute at all and which
+# a template author reaching for a placeholder writes by accident. The Skill's real argument holes
+# are lowercase (`<slug>`, `<id>`, `<piece>`), so this shape is unused and its presence is a bug.
+# Placeholder completeness and template parity are two different questions; this repo has a recorded
+# failure conflating them, which is why this is its own arm and not part of the byte-compare.
+n=$((n+1)); ang=$(grep -oE '<[A-Z][A-Z_]{2,}>' "$SK" | sort -u | tr '\n' ' ')
+[ -z "$ang" ] || { echo "FAIL the render carries an unsubstituted angle-bracket placeholder: $ang"; st=1; }
 n=$((n+1)); grep -qF '{{LANDER}}' "$SK" && { echo "FAIL a dropped substitution left {{LANDER}} standing"; st=1; }
 n=$((n+1)); grep -qF '{{KEEPALIVE_INTERVAL}}' "$SK" && { echo "FAIL a dropped substitution left {{KEEPALIVE_INTERVAL}} standing"; st=1; }
 # And the gate agrees, rather than comparing one empty file to another.
-out=$(cd "$H" && bash tools/unattended/adopt-unattended.sh --check 2>&1); rc=$?
+out=$(cd "$H" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1); rc=$?
 same "--check agrees on a hostile conf" "$rc" "0"
+
+# ---- ARM 1c: AUTH_PARAM — the conf channel, and the four refusals.
+# ---- TOOL-aNamedGesture-1. The FIRST of these arms is the one that matters and the one this suite
+# ---- did not have: every other assertion in this file is satisfied by an adopter that hardcodes the
+# ---- default and never reads the conf, because the seed conf declares no AUTH_PARAM at all. The
+# ---- non-default arm is the only thing here that can fail against that implementation, and being
+# ---- able to set the token from the conf is the whole of what this key was asked for.
+authconf() { # dir · value  -> reseed with AUTH_PARAM set to exactly <value>
+  grep -v '^AUTH_PARAM=' "$1/.unattended.conf" > "$1/.conf.tmp"
+  printf 'AUTH_PARAM=%s\n' "$2" >> "$1/.conf.tmp"
+  mv "$1/.conf.tmp" "$1/.unattended.conf"
+}
+
+# BLANK derives the kit default. Delete the derivation in adopt-unattended.sh and this arm fails
+# while every placeholder arm above still passes — an empty substitution leaves no token behind.
+AB="$TMP/authblank"; seed "$AB"; authconf "$AB" '""'
+( cd "$AB" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
+same "a blank AUTH_PARAM adopts" "$?" "0"
+hit "$(cat "$AB/.claude/skills/unattended/SKILL.md")" 'Only when the invocation carries `--prompt`'
+
+# A NON-DEFAULT value reaches the render, and the default does not survive anywhere in it.
+AV="$TMP/authvalue"; seed "$AV"; authconf "$AV" '"--build"'
+( cd "$AV" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
+same "a non-default AUTH_PARAM adopts" "$?" "0"
+hit "$(cat "$AV/.claude/skills/unattended/SKILL.md")" 'Only when the invocation carries `--build`'
+same "a non-default AUTH_PARAM leaves no trace of the kit default" \
+  "$(grep -c -- '--prompt' "$AV/.claude/skills/unattended/SKILL.md" || true)" "0"
+
+# THE FOUR REFUSALS, each observed non-zero with nothing written. They are separately reachable: a
+# bare word trips the flag-shape arm, and the other three all begin with a hyphen and reach the
+# character arm. A guard arm that has only ever passed is an assertion about nothing.
+# SINGLE-QUOTED into the conf, and that is not cosmetic. A backtick inside a DOUBLE-quoted conf value
+# is command substitution the moment the adopter sources the file, so AUTH_PARAM="--pro`mpt"
+# arrives at the guard as --pro and adopts cleanly - measured, this arm failed exactly that way before
+# the quoting was fixed. Single quotes are the only declaration form that can carry a literal backtick
+# to the guard, so they are the only form that can exercise it.
+authrefuse() { # label · value
+  local d="$TMP/authbad$n"; seed "$d"; authconf "$d" "'$2'"
+  ( cd "$d" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
+  local rc=$?
+  n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL $1: a malformed AUTH_PARAM adopted at exit 0"; st=1; }
+  absent "$d/.claude/skills/unattended/SKILL.md" "$1 wrote no Skill"
+}
+authrefuse "a bare word is refused"   'prompt'
+authrefuse "whitespace is refused"    '--prompt me'
+authrefuse "a pipe is refused"        '--pro|mpt'
+authrefuse "a backtick is refused"    '--pro`mpt'
+
+# A HOLED RENDER, refused on the WRITE path. TOOL-aNamedGesture-1 round 1, L1. This value passes the
+# character guard - it is hyphen-led and carries no whitespace, pipe or backtick - so it reaches
+# render(), where the LAST-substitution order deliberately lets it survive as a brace shape. Before
+# the fold that shape was only ever looked for under --check, so the adopter INSTALLED it at exit 0.
+AH="$TMP/authholed"; seed "$AH"; authconf "$AH" "'--{{LANDER}}'"
+( cd "$AH" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
+# rc CAPTURED FIRST: `$?` read after the counter increment is the ASSIGNMENT's status, always 0.
+ahrc=$?
+n=$((n+1)); [ "$ahrc" != 0 ] || { echo "FAIL a holed render adopted at exit 0"; st=1; }
+absent "$AH/.claude/skills/unattended/SKILL.md" "a holed render wrote no Skill"
 
 # ---- ARM 2: a FOREIGN repo. The kit lives in host A; the caller runs it from host B. Nothing may be
 # ---- written into EITHER tree — not the caller's, and not the kit owner's.
 B="$TMP/other"; mkdir -p "$B"
 ( cd "$B" && git init -q -b main . && git config user.email t@t.test && git config user.name t )
 rm -rf "$A/.claude"
-out=$( cd "$B" && bash "$A/tools/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
+out=$( cd "$B" && bash "$A/$KIT_REL/adopt-unattended.sh" 2>&1 ); rc=$?
 # RE-KEYED. This asserted "is not inside", which was the PATH-STRIP refusal — and that refusal fired
 # for every repo, including legitimate ones, whenever the adopter was invoked by absolute path. So
 # this arm was green for the wrong reason and could not tell a foreign repo from any repo at all.
@@ -112,7 +368,7 @@ absent "$A/.claude/skills/unattended/SKILL.md" "arm 2 wrote into the KIT OWNER's
 # ---- commands in the rendered Skill, so this is not cosmetic: the render would emit a command that
 # ---- word-splits. Refusing beats emitting a Skill that misfires at the first verb.
 C="$TMP/spaced"; seed "$C"
-mkdir -p "$C/my tools" && cp -r "$C/tools/unattended" "$C/my tools/unattended"
+mkdir -p "$C/my tools" && cp -r "$C/$KIT_REL" "$C/my tools/unattended"
 out=$( cd "$C" && bash "$C/my tools/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
 hit "$out" "the kit path contains whitespace and is interpolated into shell commands"
 same "arm 3 refuses" "$rc" "2"
@@ -143,10 +399,10 @@ if [ -n "$F_ALT" ]; then
   # LIVENESS, asserted rather than assumed: the arm is only meaningful while the two spellings differ.
   n=$((n+1))
   [ "$(cd "$F_ALT" && pwd)" != "$(cd "$F_ALT" && git rev-parse --show-toplevel)" ]     || { echo "FAIL arm 3b fixture is inert: the two spellings agree, so it would pass with the fix reverted"; st=1; }
-  out=$( cd "$F_ALT" && bash "$F_ALT/tools/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
+  out=$( cd "$F_ALT" && bash "$F_ALT/$KIT_REL/adopt-unattended.sh" 2>&1 ); rc=$?
   same "arm 3b adopts despite two spellings" "$rc" "0"
   present "$F/.claude/skills/unattended/SKILL.md" "arm 3b wrote into the adopting repo"
-  hit "$(cat "$F/.claude/skills/unattended/SKILL.md")" "bash tools/unattended/unattended.sh --preflight"
+  hit "$(cat "$F/.claude/skills/unattended/SKILL.md")" "bash "$KIT_REL"/unattended.sh --preflight"
 else
   echo "SKIP arm 3b (two spellings): this host spells one directory one way, so the arm would pass"
   echo "     with the fix reverted and proves nothing. Needs a node where pwd and git disagree."
@@ -158,30 +414,30 @@ fi
 # ---- The walk must stay LOGICAL: resolving the link physically would adopt the target's tree.
 D="$TMP/linkhost"; seed "$D"
 E="$TMP/linktarget"; mkdir -p "$E"
-cp -r "$D/tools/unattended" "$E/unattended"
-rm -rf "$D/tools/unattended"
+cp -r "$D/$KIT_REL" "$E/unattended"
+rm -rf "$D/$KIT_REL"
 # ---- THE DISCRIMINATOR IS `[ -L ]` AFTER CREATION, NEVER `ln -s`'s EXIT CODE. Measured on this
 # ---- fleet: `ln -s` exits 0 here and produces a real directory COPY (`-L` false, `-d` true, entries
 # ---- duplicated). So an `if ln -s …; then` structure always takes the first branch and a junction
 # ---- fallback behind it would be unreachable — and the copy left behind also makes the junction
 # ---- creation fail, because the path is no longer empty. Hence: try, test, clean up, try the other.
 link_ok=0
-if ln -s "$E/unattended" "$D/tools/unattended" 2>/dev/null && [ -L "$D/tools/unattended" ]; then
+if ln -s "$E/unattended" "$D/$KIT_REL" 2>/dev/null && [ -L "$D/$KIT_REL" ]; then
   link_ok=1
 else
-  rm -rf "$D/tools/unattended"                       # the ln -s copy, if that is what we got
+  rm -rf "$D/$KIT_REL"                       # the ln -s copy, if that is what we got
   if command -v powershell >/dev/null 2>&1 && \
-     powershell -NoProfile -Command "New-Item -ItemType Junction -Path '$(cygpath -w "$D/tools/unattended" 2>/dev/null || echo "$D/tools/unattended")' -Target '$(cygpath -w "$E/unattended" 2>/dev/null || echo "$E/unattended")' -ErrorAction Stop" >/dev/null 2>&1 \
-     && [ -L "$D/tools/unattended" ]; then
+     powershell -NoProfile -Command "New-Item -ItemType Junction -Path '$(cygpath -w "$D/$KIT_REL" 2>/dev/null || echo "$D/$KIT_REL")' -Target '$(cygpath -w "$E/unattended" 2>/dev/null || echo "$E/unattended")' -ErrorAction Stop" >/dev/null 2>&1 \
+     && [ -L "$D/$KIT_REL" ]; then
     link_ok=1
   fi
 fi
 if [ "$link_ok" = 1 ]; then
-  out=$( cd "$D" && bash tools/unattended/adopt-unattended.sh 2>&1 ); rc=$?
+  out=$( cd "$D" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
   same "arm 4 adopts through a junction" "$rc" "0"
   present "$D/.claude/skills/unattended/SKILL.md" "arm 4 wrote into the ADOPTING repo"
   absent "$E/.claude" "arm 4 wrote into the LINK TARGET"
-  hit "$(cat "$D/.claude/skills/unattended/SKILL.md")" "bash tools/unattended/unattended.sh --preflight"
+  hit "$(cat "$D/.claude/skills/unattended/SKILL.md")" "bash "$KIT_REL"/unattended.sh --preflight"
 else
   echo "SKIP arm 4 (junction): neither a symlink nor a junction on this host yields -L true, and a"
   echo "     directory COPY would score a refusal as success. Run this suite on a node that can link."
@@ -190,18 +446,80 @@ fi
 # ---- ARM 5: a half-adoption is not an adoption. With the conf absent the adopter refuses BEFORE it
 # ---- writes, so an operator never gets a Skill rendered against declarations that do not exist.
 F="$TMP/noconf"; seed "$F"; rm -f "$F/.unattended.conf"
-out=$( cd "$F" && bash tools/unattended/adopt-unattended.sh 2>&1 ); rc=$?
+out=$( cd "$F" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 hit "$out" "no .unattended.conf at the repo root"
 same "arm 5 refuses" "$rc" "1"
 absent "$F/.claude/skills/unattended/SKILL.md" "arm 5 left a half-stamped adoption"
 
 # ---- ARM 6: the kit's own template missing. Same shape from the other side, and it is the arm that
 # ---- keeps a broken INSTALL from reading as a repo problem.
-G="$TMP/notemplate"; seed "$G"; rm -f "$G/tools/unattended/SKILL.template.md"
-out=$( cd "$G" && bash tools/unattended/adopt-unattended.sh 2>&1 ); rc=$?
+G="$TMP/notemplate"; seed "$G"; rm -f "$G/$KIT_REL/SKILL.template.md"
+out=$( cd "$G" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 hit "$out" "SKILL.template.md is missing from the kit"
 same "arm 6 refuses" "$rc" "1"
 absent "$G/.claude/skills/unattended/SKILL.md" "arm 6 wrote despite a missing template"
+
+# ---- ARM 7: the memory-tree kit installed FLAT, which is how both adopters measured when this arm
+# ---- was written install it. The Skill's checklist line used to spell the nested path as a literal,
+# ---- so every flat adopter received a command naming a file their tree does not have, and the
+# ---- nested seed above passed by coincidence because it IS this repo's layout.
+H7="$TMP/flatmt"; seed "$H7"
+( cd "$H7" && git rm -q --cached -- "${TR_T}memory-tree/gotchas.py" ) && rm -rf "$H7/${TR_T}memory-tree"
+printf '# a stub checklist\n' > "$H7/${TR_T}gotchas.py" && ( cd "$H7" && git add -- "${TR_T}gotchas.py" )
+out=$( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
+same "arm 7 a flat memory-tree adopts" "$rc" "0"
+hit "$(cat "$H7/.claude/skills/unattended/SKILL.md")" "python ${TR_T}gotchas.py --for-diff HEAD~1..HEAD"
+same "arm 7 the flat Skill names no nested checklist path" \
+  "$(grep -c "memory-tree/gotchas.py" "$H7/.claude/skills/unattended/SKILL.md" || true)" "0"  # gov:root-fixture — the nested spelling this arm asserts the flat render does NOT contain
+( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 7 --check agrees with the flat render" "$?" "0"
+
+# ---- ARM 8: NO checklist script anywhere the probe looks. A REFUSAL naming the override, and no
+# ---- Skill: a guessed path renders a command that runs nothing and reads as a clean checklist.
+H8="$TMP/nomt"; seed "$H8"
+( cd "$H8" && git rm -q --cached -- "${TR_T}memory-tree/gotchas.py" ) && rm -rf "$H8/${TR_T}memory-tree"
+out=$( cd "$H8" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
+same "arm 8 no gotchas.py refuses at exit 2" "$rc" "2"
+hit "$out" "set MEMORY_TREE_DIR="
+absent "$H8/.claude/skills/unattended/SKILL.md" "arm 8 wrote a Skill despite refusing"
+
+# ---- ARM 9: the OVERRIDE, both directions. Honoured when it names a TRACKED script, in both modes,
+# ---- because the gate leg re-derives on every run; refused when it names nothing git tracks.
+H9="$TMP/overridemt"; seed "$H9"
+( cd "$H9" && git rm -q --cached -- "${TR_T}memory-tree/gotchas.py" ) && rm -rf "$H9/${TR_T}memory-tree"
+mkdir -p "$H9/vendor/mt" && printf '# a stub checklist\n' > "$H9/vendor/mt/gotchas.py" && ( cd "$H9" && git add -- vendor/mt/gotchas.py )
+out=$( cd "$H9" && MEMORY_TREE_DIR=vendor/mt bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
+same "arm 9 the override adopts" "$rc" "0"
+hit "$(cat "$H9/.claude/skills/unattended/SKILL.md")" "python vendor/mt/gotchas.py --for-diff HEAD~1..HEAD"
+( cd "$H9" && MEMORY_TREE_DIR=vendor/mt bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 9 --check agrees under the same override" "$?" "0"
+H9b="$TMP/overridebad"; seed "$H9b"
+out=$( cd "$H9b" && MEMORY_TREE_DIR=vendor/nowhere bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
+same "arm 9 an override naming an untracked script refuses at exit 2" "$rc" "2"
+absent "$H9b/.claude/skills/unattended/SKILL.md" "arm 9 wrote a Skill for an untracked override"
+# A TRACKED override holding a space still refuses: the value lands in a shell command in the Skill,
+# where the space splits it. The tracked test would pass, so only the charset arm can stop it.
+H9c="$TMP/overridespace"; seed "$H9c"
+mkdir -p "$H9c/vendor/m t" && printf '# a stub checklist\n' > "$H9c/vendor/m t/gotchas.py" && ( cd "$H9c" && git add -A )
+out=$( cd "$H9c" && MEMORY_TREE_DIR='vendor/m t' bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
+same "arm 9 a tracked override holding a space refuses at exit 2" "$rc" "2"
+hit "$out" "holds a character outside"
+absent "$H9c/.claude/skills/unattended/SKILL.md" "arm 9 wrote a Skill for an override holding a space"
+
+# FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
+# static count of the assertion sites in this file — `grep -cE '^\s*(same|hit|miss|absent|present) '`
+# over it, 87 at 4255e292 (TOOL-aWokenSentinel-19) — at ~10 % headroom, rounded down, because the
+# pass that wrote this line may not run the suite; the close's first green under
+# run-unattended-gates.sh is what confirms it held — that runner surfaces no count, only the
+# `unattended adopter e2e` row. The inline `n=$((n+1))` sites are not in the static count, so it is a
+# LOWER bound on what a green run executes. Lower it in a reviewed diff or not at all.
+FLOOR_ASSERTIONS=78
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
+# NOTHING EXECUTABLE MAY FOLLOW THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): an arm appended after it
+# is dead while every static signal says it is fine, and a numeric floor with headroom hides exactly
+# that many. One grep, and it cannot go slack. The range starts at the exit line itself, so a suite
+# with nothing after it reads exactly 1; a comment or a blank line after it is not counted.
+[ "$(sed -n '/^exit "\$st"$/,$p' "$0" | grep -cvE '^\s*(#|$)')" = 1 ] || { echo "FAIL a line follows the terminal exit and can never run"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

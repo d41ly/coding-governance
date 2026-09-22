@@ -1,0 +1,23 @@
+# line-length-limits.txt — the DECLARED maximum line length, keyed by measured file, in CHARACTERS.
+#
+# GRAMMAR: `<repo-relative-path>\t<characters>` per row. Comments carry the justification for a value
+# and every movement of it, because a number with no history beside it is a number nobody can
+# question. Modelled on tools/template-size-limits.txt, which is this tree's established answer to
+# the same problem — a budget whose every raise is argued next to the figure.
+#
+# WHO WRITES THIS FILE: a person, deliberately, per repo. GOV DOES NOT SHIP ITS ROWS TO ADOPTERS.
+# Neither path below exists in an adopter's tree, and a row naming an absent path is a stale red — so
+# seeding gov's rows into a target would red it on install day. An adopter's declaration is theirs to
+# write, and a subject with no row is graded at the 450 default and says so. The precedent is
+# check-install-prefix, whose registry ships seeded empty rather than copied.
+#
+# RESOLUTION: a positional, then THIS declaration, then LINE_MAX, then the gate's 450 default. The
+# declaration sits ABOVE the environment on purpose: a declared per-subject pin is policy, and an
+# environment variable is a local override for a subject nobody declared.
+
+# --- this repo's rendered charter, and the template it renders from ------------------------------
+# 450 is the shipped default and both subjects sit at it. They carry the same lines: the charter's
+# gov:playbook region IS the template's content, so a long line is wrapped in the TEMPLATE and
+# re-rendered — never edited inside the region, where the next render would delete the wrap.
+AGENTS.md	450
+coding-governance-agents.template.md	450

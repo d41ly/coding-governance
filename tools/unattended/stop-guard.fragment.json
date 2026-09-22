@@ -1,0 +1,7 @@
+{
+  "name": "stop-guard",
+  "event": "Stop",
+  "matcher": "*",
+  "marker": "stop-guard.js",
+  "hook_path": "{kit}/unattended/stop-guard.js"
+}

@@ -6,10 +6,10 @@
 # `git merge-file` on the identical three blobs. The MECHANICAL never-worse comparison — the driver
 # may not lose a line the control keeps, nor at rc 0 write a row the control does not — can only
 # bind where the control EXITS 0, because only then is its output an ANSWER rather than a conflict
-# to be resolved by hand. Measured: 12 of the 34 `run` cases, floored below at `NEVER_WORSE_FLOOR`
-# so that a fixture edit flipping a control from rc 0 to rc 1 cannot quietly drop a case out of the
-# bar while the group count stays the same. The other 22 are held by the id-set oracle, the
-# duplicate-id oracle, and per-case assertions on bytes. Conflicting where git resolves CORRECTLY is
+# to be resolved by hand. Floored below at `NEVER_WORSE_FLOOR` so that a fixture edit flipping a
+# control from rc 0 to rc 1 cannot quietly drop a case out of the bar while the group count stays
+# the same; the live split is in this suite's own PASS line, which derives it. The remaining cases
+# are held by the id-set oracle, the duplicate-id oracle, and per-case assertions on bytes. Conflicting where git resolves CORRECTLY is
 # acceptable and is counted by name against a shrink-only constant, never absorbed.
 #
 # That bar exists because a green suite has twice signed off on corruption here. Three adversarial
@@ -27,6 +27,10 @@
 # half of the oracle is proved live in case 0d before anything leans on it.
 #
 #   bash tools/memory-tree/merge-rows.test.sh
+KIT_REL="${KIT_REL:-tools}"
+# EXPORTED, because four python blocks below read it from the environment rather than by
+# interpolation — see the comment at the first of them.
+export KIT_REL
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SELF="$HERE/$(basename "$0")"
@@ -43,7 +47,7 @@ trap cleanup EXIT
 . "$ROOT/tools/lib/resolve-python.sh"
 PY=$(resolve_python) || { echo "FAIL no usable python on this host — every arm below is unrunnable"; exit 2; }
 
-DRV="bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py"
+DRV="bash $KIT_REL/lib/pyrun.sh $KIT_REL/memory-tree/merge-rows.py"
 bad() { echo "FAIL $1"; st=1; }
 
 # THE ORACLE — a family-agnostic id shape, deliberately NOT the driver's grammar. Keying the
@@ -109,7 +113,13 @@ CONSERVATIVE=""
 # How many `run` cases the arithmetic comparison actually BINDS on. A GROW-ONLY floor: without
 # it, a fixture edit that flips a control from rc 0 to rc 1 silently removes a case from the
 # mechanical bar and the suite still prints PASS with the same group count. Measured at 12.
-NEVER_WORSE_FLOOR=12
+# THE THIRD FLOOR LAGS ITS TWO SIBLINGS ON PURPOSE (TOOL-aCollapsedScan-7, closing review round 2).
+# `ngroups` and `nruns` are pure greps of THIS file, so their derived values are the same on every
+# node and were ratcheted to 49 and 40. This bound is not: it counts the controls `git merge-file`
+# exits 0 on, which is a property of the git in hand. Node `a` reads 16 on 2026-08-26 against the 12
+# pinned here, and raising it to 16 would red any node whose git resolves fewer. Raise it when the
+# same reading is confirmed on a second node, not before - the 4-case window is the price.
+NEVER_WORSE_FLOOR=12   # see the note above before raising this
 NEVER_WORSE_BOUND=0
 # Cases where `git merge-file` exits 0 with a WRONG result — it duplicates a row-shaped line at rc 0,
 # which is the single corruption class git commits and the whole justification for this driver. The
@@ -203,7 +213,7 @@ printf -- '- a row\r\n' > "$TMP/bagcrlf"; printf -- '- a row\n' > "$TMP/baglf"
 
 # --- 0a. the driver PARSES under the interpreter the shim actually resolves -----------------------
 "$PY" -c 'import py_compile,sys; py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)' \
-      tools/memory-tree/merge-rows.py "$TMP/mr.pyc" >/dev/null 2>&1 \
+      $KIT_REL/memory-tree/merge-rows.py "$TMP/mr.pyc" >/dev/null 2>&1 \
   || bad "merge-rows.py does not compile under the resolved interpreter ($PY)"
 
 # ...and the version-INDEPENDENT half of the same concern, which py_compile on a modern node cannot
@@ -213,7 +223,7 @@ printf -- '- a row\r\n' > "$TMP/bagcrlf"; printf -- '- a row\n' > "$TMP/baglf"
 # leaves OURS-only content with no markers. Upstream's arm needed `uv python find 3.11` and SKIPPED
 # where uv was absent; this repo depends on uv nowhere, so a skippable arm would be a silent hole.
 FSTR='f"[^"]*\{[^}"]*"'
-nested=$(awk '!/^[[:space:]]*#/' tools/memory-tree/merge-rows.py | grep -nE "$FSTR" || true)
+nested=$(awk '!/^[[:space:]]*#/' $KIT_REL/memory-tree/merge-rows.py | grep -nE "$FSTR" || true)
 [ -z "$nested" ] || { echo "FAIL merge-rows.py carries a nested same-quote f-string (PEP 701, 3.12+):"; printf '%s\n' "$nested" | sed 's/^/    /'; st=1; }
 # ...the ban FIRES on the shape it bans, or "clean" means "the predicate is broken".
 printf 'v = f"{"X" if c else "y"}"\n' > "$TMP/pep701.py"
@@ -255,13 +265,13 @@ printf '%s\n' "$out" | grep -qF "GOV_PYTHON is set to '$C/python3' and did not r
 copies=$(git grep -l '^# >>> resolve_python' -- '*.sh' || true)
 [ -n "$copies" ] || bad "no inline resolver copy found — the marker-population assertion below is vacuous"
 printf '%s\n' "$copies" | grep -qx 'tools/lib/pyrun.sh' \
-  && bad "tools/lib/pyrun.sh carries the resolver marker block; it SOURCES the resolver instead"
+  && bad "$KIT_REL/lib/pyrun.sh carries the resolver marker block; it SOURCES the resolver instead"
 # ...and the COMPLEMENT, which is the half that matters to an adopter. The kit-internal launcher
 # ships inside the kit, where `../lib/` does not exist, so it MUST carry the inline block — and being
 # in the marker population is what puts it under the byte-identical parity gate. Asserting only the
 # exclusion above would pass on a kit that ships no launcher at all.
 printf '%s\n' "$copies" | grep -qx 'tools/memory-tree/merge-rows.sh' \
-  || bad "tools/memory-tree/merge-rows.sh does not carry the inline resolver block; a copy-installed kit cannot source ../lib/ and the driver would never start"
+  || bad "$KIT_REL/memory-tree/merge-rows.sh does not carry the inline resolver block; a copy-installed kit cannot source ../lib/ and the driver would never start"
 
 # --- 0c. FAIL CLOSED: every deferred-resolution failure becomes a conflict, never a take-ours ------
 # The driver reads its anchor grammar from the worktree at merge time. At module scope that import
@@ -270,7 +280,7 @@ printf '%s\n' "$copies" | grep -qx 'tools/memory-tree/merge-rows.sh' \
 # failures land in main()'s fail-closed handler. Simulated on scratch trees rather than by breaking
 # the real kit under a concurrently-running gate. This is corpus case C18, the worst class in it, and
 # the redesign does not touch the property — so it is re-proven here rather than assumed (AC17).
-failclosed() {  # $1 label · $2 scratch tree holding tools/memory-tree/merge-rows.py
+failclosed() {  # $1 label · $2 scratch tree holding $KIT_REL/memory-tree/merge-rows.py
   { pre; row TOOL-zFixture-1 base; } > "$TMP/o"
   { pre; row TOOL-zFixture-1 base; } > "$TMP/a"
   { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 INCOMING; } > "$TMP/b"
@@ -282,7 +292,7 @@ failclosed() {  # $1 label · $2 scratch tree holding tools/memory-tree/merge-ro
 }
 mkscratch() { local d; d=$(mktemp -d); SCRATCH="$SCRATCH $d"
   mkdir -p "$d/tools/memory-tree" "$d/tools/memory-recall"
-  cp tools/memory-tree/merge-rows.py "$d/tools/memory-tree/"
+  cp $KIT_REL/memory-tree/merge-rows.py "$d/tools/memory-tree/"
   printf '%s' "$d"; }
 S=$(mkscratch); cp .memory-tree.conf "$S/"
 printf 'this is not valid syntax(\n' > "$S/tools/memory-recall/extract.py"
@@ -290,7 +300,7 @@ failclosed "broken grammar" "$S"
 S=$(mkscratch); cp .memory-tree.conf "$S/"          # kit dir present, extract.py absent
 failclosed "missing grammar module" "$S"
 S=$(mkscratch)                                       # no .memory-tree.conf above the driver
-cp tools/memory-recall/extract.py tools/memory-recall/recall_conf.py "$S/tools/memory-recall/"
+cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$S/tools/memory-recall/"
 failclosed "missing .memory-tree.conf" "$S"
 
 # --- 0d. the oracle sees a row the driver's grammar does NOT, and `dups` fires ---------------------
@@ -323,7 +333,15 @@ keys() {  # $1=line -> 0 if the DRIVER keys it, 1 if not
   "$PY" - "$1" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True   # a test that leaves __pycache__ in tools/ dirties the tree it gates
-spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mr)
 sys.exit(0 if mr.key(sys.argv[1] + "\n") is not None else 1)
@@ -575,9 +593,9 @@ audit "a structure conflict at rc 1" 1 0 0 1
 E=$(mktemp -d); SCRATCH="$SCRATCH $E"
 mkdir -p "$E/tools/memory-tree" "$E/tools/memory-recall" "$E/tools/lib" "$E/memory/backlog"
 cp .memory-tree.conf "$E/"
-cp tools/memory-tree/merge-rows.py "$E/tools/memory-tree/"
-cp tools/memory-recall/extract.py tools/memory-recall/recall_conf.py "$E/tools/memory-recall/"
-cp tools/lib/pyrun.sh tools/lib/resolve-python.sh "$E/tools/lib/"
+cp $KIT_REL/memory-tree/merge-rows.py "$E/tools/memory-tree/"
+cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$E/tools/memory-recall/"
+cp $KIT_REL/lib/pyrun.sh $KIT_REL/lib/resolve-python.sh "$E/tools/lib/"
 (
   cd "$E" || exit 2
   git init -q -b main
@@ -892,7 +910,15 @@ printf '%s\n' "$BARE" > "$TMP/bare"
 "$PY" - "$BARE" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 a, b = mr._row_key(sys.argv[1] + "\n"), mr._row_key(sys.argv[1])
 sys.exit(0 if a == b and a.startswith("raw:") else 1)
@@ -1147,7 +1173,15 @@ run "a delete/modify row inside a heading rename" 1 "TOOL-zFixture-1 TOOL-zFixtu
 "$PY" - "$TMP/a" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 lines = mr.read(sys.argv[1])
 leaked = [ln for ln in mr.settled(lines) if ln.lstrip().startswith(("<<<<<<<", "=======", ">>>>>>>"))]
@@ -1210,7 +1244,15 @@ done
 cat > "$TMP/sabotage.py" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 _real = mr.reconcile
 
@@ -1469,6 +1511,79 @@ elif [ "$ncons" -lt "$CONSERVATIVE_CAP" ]; then
   st=1
 fi
 
+# --- 47. THE SAME MERGE, INSIDE A LINKED WORKTREE (TOOL-aCollapsedScan-7) -------------------------
+# Case 9 drives git through the real wiring in an ORDINARY repo, which is exactly the tree where this
+# class CANNOT appear: git exports no GIT_DIR there. Measured with a control - ordinary clone, GIT_DIR
+# unset, `git -C <dir> rev-parse --show-toplevel` returns the root; linked worktree, GIT_DIR set, the
+# same command returns <dir> itself. So the driver aborted on every backlog merge in a worktree while
+# case 9 stayed green, and this leg was blind to the class it exists to hold. Observed RED against the
+# pre-fix recall_conf.py.
+#
+# It wires the SHIPPED wrapper, not pyrun.sh: `merge-rows.sh` is what a node actually carries, and it
+# is the path an adopter gets.
+#
+# EACH KIT DIR IS NAMED ONCE, and the sources are anchored rather than left to the caller's cwd.
+# `MT`/`MR`/`LIB` each appear in three places — the scratch layout this case BUILDS, the copies into
+# it, and (for `MT`) the driver command — so those cannot drift apart. Sources hang off `$ROOT`,
+# which is this script's own location two levels up, the idiom case 32 already uses; that makes them
+# independent of the ambient cwd, which a bare relative path is not once any subshell cds elsewhere.
+# It is NOT a claim about the install prefix: `$ROOT` is two segments up, so it answers the repo root
+# only for a kit installed two deep, which is where `check-install-prefix.sh` and its ratchet come in
+# — that checker grades the literal `tools/<kit>/<file>` spellings a body ships, because `apply`
+# writes gov's bytes verbatim and such a literal resolves to nothing at another prefix.
+W=$(mktemp -d); SCRATCH="$SCRATCH $W"
+MT=tools/memory-tree
+MR=tools/memory-recall
+LIB=tools/lib
+mkdir -p "$W/$MT" "$W/$MR" "$W/$LIB" "$W/memory/backlog"
+cp "$ROOT/.memory-tree.conf" "$W/"
+cp "$ROOT/$MT/merge-rows.py" "$ROOT/$MT/merge-rows.sh" "$W/$MT/"
+cp "$ROOT/$MR/extract.py" "$ROOT/$MR/recall_conf.py" "$W/$MR/"
+cp "$ROOT/$LIB/pyrun.sh" "$ROOT/$LIB/resolve-python.sh" "$W/$LIB/"
+WT="$W-wt"; SCRATCH="$SCRATCH $WT"
+(
+  cd "$W" || exit 2
+  git init -q -b main
+  git config user.email t@e; git config user.name t; git config core.autocrlf false
+  printf 'memory/DECISIONS.md merge=rows\nmemory/backlog/*.md merge=rows\n' > .gitattributes
+  git config merge.rows.driver "bash $MT/merge-rows.sh %O %A %B %P"
+  { printf '# tooling backlog\n\n> Mutable. Each row leads with one status token.\n'
+    row TOOL-zFixture-1 base; } > memory/backlog/TOOL.md
+  git add -A; git commit -q -m base
+  git checkout -q -b side
+  row TOOL-zFixture-3 theirs >> memory/backlog/TOOL.md
+  git commit -q -am theirs
+  git checkout -q main
+  row TOOL-zFixture-2 ours >> memory/backlog/TOOL.md
+  git commit -q -am ours
+  # DETACHED, because `main` is checked out in the primary tree and a second checkout of it is
+  # refused. The merge happens HERE, which is the whole point of the arm.
+  git worktree add -q --detach "$WT" main \
+    || { echo "FAIL worktree: could not create the linked worktree"; exit 1; }
+  cd "$WT" || exit 2
+  git check-attr merge -- memory/backlog/TOOL.md | grep -q 'merge: rows' \
+    || { echo "FAIL worktree: git does not resolve memory/backlog/TOOL.md to merge=rows in the worktree"; exit 1; }
+  # THE CLASSIFICATION LIVES IN THE FAILURE BRANCH, because that is the only place it can fire:
+  # the driver's fail-closed handler returns 1 on a ConfError, so git reports the merge as failed
+  # and `$out` is only ever inspected after a NON-zero exit. Written the other way round it was a
+  # probe that could not move.
+  if ! out=$(git merge --no-edit side 2>&1); then
+    if printf '%s\n' "$out" | grep -qi 'ConfError'; then
+      echo "FAIL worktree: the driver raised a ConfError - the inherited GIT_DIR is still deciding the root"
+    else
+      echo "FAIL worktree: git merge did not auto-resolve in a linked worktree"
+    fi
+    printf '%s\n' "$out" | sed 's/^/       /' | head -4
+    exit 1
+  fi
+  for want in TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3; do
+    c=$(grep -c "^- $want " memory/backlog/TOOL.md)
+    [ "$c" = 1 ] || { echo "FAIL worktree: $want appears $c time(s), expected exactly 1"; exit 1; }
+  done
+  grep -q '<<<<<<<' memory/backlog/TOOL.md && { echo "FAIL worktree: conflict markers in an auto-resolved file"; exit 1; }
+  exit 0
+) || st=1
+
 # The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
 # coverage and goes stale the first time a group is added without touching it. The floor is a
 # RATCHET — raised with the groups, never left behind, or a deleted group passes as a green run.
@@ -1479,8 +1594,8 @@ fi
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 46 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 46 — a group was deleted"
-[ "$nruns" -ge 36 ] || bad "only $nruns 'run' case(s) remain, expected at least 36 — a group was emptied while its banner stayed, which the banner count cannot see"
+[ "$ngroups" -ge 49 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 49 — a group was deleted"
+[ "$nruns" -ge 40 ] || bad "only $nruns 'run' case(s) remain, expected at least 40 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
 exit "$st"

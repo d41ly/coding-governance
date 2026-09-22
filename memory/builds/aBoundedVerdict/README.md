@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-16
 streams: tooling
 roster: TOOL
-ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10
+ids: TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21 TOOL-aBoundedVerdict-22 TOOL-aBoundedVerdict-23 TOOL-aBoundedVerdict-24 TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL-aBoundedVerdict-28 TOOL-aBoundedVerdict-29 TOOL-aBoundedVerdict-30 TOOL-aBoundedVerdict-31 TOOL-aBoundedVerdict-32
 ---
 
 # aBoundedVerdict — an unattended run stops reviewing, stops stalling, and says why it stopped
@@ -30,7 +30,7 @@ Each row was reproduced against this tree, not inferred.
 
 | Finding | Measurement |
 |---|---|
-| **The review loop is real, and it happened AGAIN during this build** | `memory/builds/dClosedLexicon/` holds EIGHT review records in one day. Rounds 2–7 are all BLOCKED — six consecutive, blocker counts 1, 1, 2, 1, 2, not converging — round 8 returns "PASS WITH FINDINGS", and the run then reached ABORTED with a witness and no readable reason. All three reported faults in one record, from a run following the method faithfully. It landed on `main` while these specs were open |
+| **The review loop is real, and it happened AGAIN during this build** | `memory/builds/dClosedLexicon/` holds TEN review records over two days, eight of them on 2026-08-16. Rounds 2–7 are all BLOCKED — six consecutive, blocker counts 1, 1, 2, 1, 2, not converging — round 8 returns "PASS WITH FINDINGS", and the run then reached ABORTED with a witness and no readable reason. All three reported faults in one record, from a run following the method faithfully. It landed on `main` while these specs were open |
 | The second-worst case, and the one the specs were first written against | `memory/builds/aSiftedPlaybook/reviews/` holds five consecutive spec-audit rounds over one 7-unit set plus a sixth closing round, all on one day. Verdicts: CLEAN WITH FIXES, BLOCKED, BLOCKED, BLOCKED, CLEAN WITH FIXES, BLOCKED. Final spec revs reached rev-12. That one landed; the eight-round case did not |
 | Nothing counts reviews | A repo-wide grep for any numeric review bound returns nothing. The review filename carries the build slug and a per-build record counter, so the unit is not recoverable from the name — the driver refuses that join in its own source, having measured it wrong on 7 of 7 multi-unit builds |
 | The loop's engine is a rule, not a missing number | The build method has NO stated disposition for a BLOCKED verdict, and its own rule that a rev-moved spec is unreviewed means folding a CLEAN-WITH-FIXES round re-arms the loop |
@@ -79,11 +79,31 @@ deliberately does not restate it.
 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aBoundedVerdict-4` | 2 | the open-questions predicate, in both readers |
-| 2 | `TOOL-aBoundedVerdict-5` | 2 | a park verb |
-| 3 | `TOOL-aBoundedVerdict-2` | 2 | the halt code vocabulary |
-| 4 | `TOOL-aBoundedVerdict-1` | 2 | the review round cap |
-| 5 | `TOOL-aBoundedVerdict-3` | 2 | the stall dispositions |
+| 1 | `TOOL-aBoundedVerdict-11` | 2 | the units region: generated, mandatory, read by name |
+| 2 | `TOOL-aBoundedVerdict-12` | 2 | a blocked close names its cause |
+| 3 | `TOOL-aBoundedVerdict-13` | 2 | every remote observation is bounded |
+| 4 | `TOOL-aBoundedVerdict-4` | 2 | the open-questions predicate, in both readers |
+| 5 | `TOOL-aBoundedVerdict-5` | 2 | a park verb |
+| 6 | `TOOL-aBoundedVerdict-2` | 2 | the halt code and verdict vocabularies |
+| 7 | `TOOL-aBoundedVerdict-1` | 2 | the review loop's convergence rule and the promotion disposition |
+| 8 | `TOOL-aBoundedVerdict-14` | 2 | fold-scoped review rounds |
+| 9 | `TOOL-aBoundedVerdict-3` | 2 | the stall dispositions |
+| 10 | `TOOL-aBoundedVerdict-15` | 1 | close-path writes are staged and guarded — **and see the ordering note below: `-5` and `-3` both depend on its `--attest`, so it moves ahead of both at build time** |
+| 11 | `TOOL-aBoundedVerdict-16` | 2 | the closing-review join: a diff-review, in range |
+| 12 | `TOOL-aBoundedVerdict-17` | 2 | authorization survives a split fetch/push URL |
+| 13 | `TOOL-aBoundedVerdict-18` | 2 | the two vacuous checks get subjects — Tier 2 since its rev-2, when the owner's F2 resolution made it change what `LANDER` means for every adopter; this cell said 1 until 2026-08-20 and mis-priced its review |
+| 14 | `TOOL-aBoundedVerdict-19` | 1 | the protocol pair says what the code does |
+| 15 | `TOOL-aBoundedVerdict-21` | 2 | the landing push is bounded too — **PARKED 2026-08-20, not built.** Its S1 bounds a `$LANDER` invocation the driver never makes, and every fix M3 permits is refused by the unit's own Non-goal about which verb invokes the lander. No survivor, so M3 parks rather than take the least-bad option. Its F1 bound is separately dead: sized against a serial figure the merge bar no longer measures, with the full bar running INSIDE the push the deadline wraps |
+
+*An id appears here only once a conforming spec defines it — hygiene check 14 refuses a cited
+id nothing defines, which is the mechanical form of the method's "never build a MISSING unit".*
+
+**Ordering correction, 2026-08-19 (spec audit).** The numbers above are a dependency order and two of
+them are wrong: `-5` S6 names `-15`'s `--attest --value` as the writer it needs, and `-3`'s halt path
+reaches `--abort`, which requires the two agent keys `--attest` writes. `-15` declares no dependency
+of its own, so it moves ahead of both. Both dependencies are SOFT — the keys are hand-editable, so the
+cost of the old order is a hand-edit rather than a block — which is why this is recorded as a
+correction here rather than a re-numbering of a table two other documents cite.
 
 **The order is a dependency order, not a preference.** Unit 4 hardens the predicate that decides
 whether a fork is resolved; until it does, every rule the later units write about forks is
@@ -111,31 +131,76 @@ concurrently — and their write sets intersect in the protocol document, so the
   measured counts actually grew. Measured: adding one refusal to the driver reds the meta-gate
   immediately, naming the unarmed branch — and only one of the two unattended gates is fully armed,
   the driver carrying a standing pin for one branch.
-- **The authored region's fact pin moves exactly once, and only for a singleton.** The binding
-  protocol pins that region at a closed, enumerated set of facts, and the pin has moved twice before
-  leaving a stale reader each time — the driver's own resume comment still says five. This build
-  therefore splits by SHAPE, not by convenience: `TOOL-aBoundedVerdict-2`'s halt code is a per-run
-  singleton three readers read by key, so it becomes the eighth fact and that unit moves the pin in
-  all four places it is spelled. `TOOL-aBoundedVerdict-1`'s review rounds are append-only history, so
-  they become lines under a new park KIND and move nothing — which is what a tracked sibling spec
-  chose for the identical question, by name.
-- **Any unit touching a path on the kickoff manifest's watch list re-audits the claims derived from
-  it and re-stamps the manifest in the same commit.** Every unit in this build touches at least one:
-  the hygiene engine and `.memory-tree.conf`, `.unattended.conf`, the kickoff engine, and the build
-  method are all watched, and the manifest ratchet is a merge-bar leg that reds on a watched file
-  changed with no re-stamp at or after the change. `memory/guides/SESSION-KICKOFF.md` is in all five
-  units' Files-touched lists for that reason — it was in three when this rule was written, which is
-  the rule asserting its own compliance rather than having it.
-- **The charter read-path budget is shared by four of the five units, and the spender set is stated
-  HERE and nowhere else.** Measured at base: 70262 bytes against a ceiling of 86476, so 16214 bytes
-  of headroom. `TOOL-aBoundedVerdict-1` and `TOOL-aBoundedVerdict-3` grow the build method;
-  `TOOL-aBoundedVerdict-2`, `TOOL-aBoundedVerdict-3` and `TOOL-aBoundedVerdict-5` grow the unattended
-  protocol, which is itself a read-path member at 18214 bytes. Two specs previously each named the
-  total and named only each other as the other spender, which is how a shared budget gets spent
-  twice. No spec carries the figure as authority: the builder re-measures with the corpus reporter.
-- **Two units move the unattended leg's own check count**, which is stated in the leg's header and
-  again in the charter's gate-suite bullet and observed by no gate. They state their moves one apart
-  rather than both writing the same number.
+- **The authored region's fact pin moves only for a per-run SINGLETON, and whoever moves it moves
+  every spelling of it.** The binding protocol pins that region at a closed, enumerated set of facts,
+  and the pin has moved three times before, leaving a stale reader each time. This build therefore
+  splits by SHAPE, not by convenience. **`TOOL-aBoundedVerdict-2` is the pin's only mover here** — its
+  halt code is a per-run singleton three readers read by key. `TOOL-aBoundedVerdict-1`'s review rounds
+  are append-only history, so they become lines under a new park KIND and move nothing, which is what
+  a tracked sibling spec chose for the identical question, by name. **No spec states an ordinal**: the
+  live value is read from the carriers at build time, because the numeral this rule once spelled had
+  already gone stale twice by the time anyone read it.
+  **Its own history, because the rule changed twice in one day and a reader deserves to know why.** It
+  read "moves exactly once" until the morning of 2026-08-20, when `TOOL-aBoundedVerdict-21` F2 needed a
+  second fact and the rule was widened to two movers — that unit had been created by the owner on
+  2026-08-19 and the once-rule predated it. `TOOL-aBoundedVerdict-21` was then PARKED the same day, so
+  the count is one again and the widening is moot. Recorded rather than reverted in silence: the rule
+  survives BECAUSE its real content never moved — no fact for a non-singleton, and no partial pin
+  move — and only the arithmetic did.
+- **A unit whose Files-touched list names a path on the kickoff manifest's watch list also names
+  `memory/guides/SESSION-KICKOFF.md`, re-audits the claims derived from that path, and re-stamps in the
+  SAME commit.** The manifest ratchet is a merge-bar leg and it reds on a watched file changed with no
+  re-stamp at or after the change, both staged and committed. A unit that touches no watched path owes
+  nothing; the watch list is the `watch:` line of that file's own `manifest-audit` block, read there
+  and never copied here. **No count.** This rule used to claim that every unit in the build touches a
+  watched path, and that the manifest was in "all five units'" lists. The first is false — one open
+  unit legitimately touches none — the second counted five in a fifteen-unit build, and together they
+  were the rule asserting its own compliance rather than having it.
+- **The charter read-path budget is shared. The SPENDER SET is stated HERE and nowhere else; the
+  FIGURES are stated nowhere at all.** The set is not derivable and belongs in one place. The byte pair
+  IS derivable and belongs in no document — **read it immediately before spending**, with
+  `python tools/memory-tree/corpus_ids.py --report` against the ceiling in `.memory-tree.conf`.
+  This bullet carried a measured pair twice and it went stale BOTH times inside four days: the
+  2026-08-19 re-measure overstated the surviving headroom by roughly 12 KB within a day of being
+  written, which is the exact failure its own sentence had warned about. A consumable stated in prose
+  is worse than no figure at all, because a builder trusts it.
+  **The spenders**, which is what this bullet is actually for: `-1`, `-3` and `-14` grow the build
+  method; `-2`, `-3`, `-5`, `-11`, `-18` and `-19` grow the unattended protocol pair. `-21` would have
+  grown the protocol and is parked. Two specs once each named the total and named only each other as
+  the other spender, which is how a shared budget gets spent twice.
+  **The method's own cap is separate and binds tighter.** `memory/guides/BUILD-METHOD.md` declares its
+  own line and byte budget on its own line 8, and three units grow it, so a unit displacing a paragraph
+  into `tools/memory-tree/README.md` is doing the thing M11 exists for. Measure with `wc -lc`, never
+  from prose, and a cap RAISE is an owner turn under M3 veto 2.
+- **Two units move the unattended leg's own check count**, which is stated in the leg's header
+  (`tools/unattended/check-unattended.sh:2`) and observed by no gate. They state their moves one apart
+  rather than both writing the same number. The charter's gate-suite bullet was a second carrier of
+  that count until the enumeration there was replaced by a pointer at `tools/gate-legs.json`; it is
+  NOT a carrier any more, and the charter body is generated between `gov:playbook` markers, so a
+  hand-edit there reds the playbook parity leg. Do not recreate it.
+- **The kit version is SIX carriers, and this list is the build's only home for it.** Moving
+  `KIT_UNATTENDED_VERSION` touches `tools/unattended/unattended.sh` and
+  `tools/unattended/check-unattended.sh` — each the constant AND the `gov:kit` marker on the same
+  line — the marker in `tools/unattended/PROTOCOL.template.md` and
+  `tools/unattended/SKILL.template.md`, the marker in **`memory/guides/UNATTENDED-PROTOCOL.md`**, and
+  the re-rendered `.claude/skills/unattended/SKILL.md`.
+  **The fifth one is the trap, and it was found by hitting it.** The specs in this build were folded
+  against a list of FIVE carriers, derived by reading `tools/check-kit-versions.sh` — which does not
+  scan `memory/guides/`. The installed protocol half is forced by a DIFFERENT gate: the unattended
+  leg's check 10 byte-diffs it against its template. Observed rather than reasoned, by bumping five
+  and watching the leg red with *"the shipped protocol and this repo's installed copy have drifted"*.
+  An enumeration built by reading one gate misses whatever a second gate owns, which is the same
+  Files-touched-omits-a-carrier defect the 2026-08-20 audit raised eight times — reproduced while
+  fixing it, which is why the list lives here now instead of in nine spec copies. Where a spec's own
+  Files-touched list still spells five, THIS bullet supersedes it; the specs are not re-folded for it,
+  because re-folding eight documents to correct one list costs more than it buys.
+- **A review loop that reaches the RUNAWAY CEILING is recorded HERE, not only in the run's output.**
+  The ceiling is a backstop behind the convergence predicate, so reaching it means the predicate did
+  not terminate — a defect in the predicate rather than a routine outcome. Under the owner's
+  resolution the run promotes and lands anyway, which is exactly why the fact must not be quiet: a
+  landing that happened despite a defect looks identical to a clean one unless somebody wrote it down.
+  **Status at 2026-08-20: the ceiling has not fired in this build.** Stated rather than left blank,
+  because an empty section reads as "nothing to report" when it may mean "nobody wrote here".
 - **No spec id in this build may be cited from product source while its status is non-terminal.**
   The drift signal that counts such citations sits at its pin with zero tolerance, and the files
   these units edit are product source.
@@ -167,7 +232,11 @@ That rule was written into these specs before the reground and the reground is w
 
 Named here so the cut-line is one place rather than five.
 
-- No implementation. This build lands a README, five specs and their review records.
+- **The 2026-08-16 era's cut-line, kept for the record and no longer live:** "No implementation.
+  This build lands a README, five specs and their review records." True of the design pass that
+  opened this build; false since the 2026-08-19 re-decomposition, which is where the live cut-line
+  is. Five units have landed code, nine more are specced to land code, and one is parked. Retired
+  rather than deleted because a cut-line that silently changed is worse than one dated.
 - No change to the phase vocabulary, the core phase or Definition-of-Done floors, or the terminal
   set.
 - No cap binding attended runs, and no new required field on a review record.
@@ -181,25 +250,226 @@ Named here so the cut-line is one place rather than five.
   planning verb's blindness as a side effect and says so in its own record.
 
 
-<!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-08-16 · streams tooling
-ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10
+## The 2026-08-19 re-decomposition
 
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — two review rounds, then the unit stops being reviewed](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-5 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-4 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-5 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-5 | 2026-08-17 |
-| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-5 | 2026-08-17 |
+The owner reopened this build with three reports and one reversal. The reversal is the round cap:
+`TOOL-aBoundedVerdict-1`'s two-round design is **withdrawn**, not re-tuned. Its replacement, the
+measurement that forced it, and the disposition the owner ratified for a residual blocker are in
+`build/2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md`. A five-lens adversarial audit
+of the close path ran behind that design and confirmed 32 defects, 3 of them blockers;
+`build/2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md` is the findings table and is the
+source every new unit below derives from.
 
-Records live under `spec/`, `build/` and `reviews/`.
+**The reversal in one line.** The cap bound the wrong variable. Over 90 tracked review records the
+only exit the method states — a literal clean verdict — occurs **zero** times, while `BLOCKED` is 36
+and has no disposition anywhere. A count does not give a loop an exit; it moves the stall earlier.
 
-| Record | Kind | Serves |
+**Why the build grew from five units to fourteen.** The owner's second report — closing "faces
+multiple issues, and often stalls" — was scoped to a full close-path audit rather than to the two
+named symptoms, and the audit found that the headline symptom is a dated cross-kit regression rather
+than a design flaw: `TOOL-aTetheredRecord-5` began rendering a Records table inside the region the
+driver selects unit rows out of by row shape, which makes `build-complete` and
+`closing-review-recorded` mutually unsatisfiable on 49 of 49 builds. Nine new units carry that and
+the rest of the confirmed set.
+
+### Classification, per the build method's four states
+
+| Unit | State | What it needs |
 |---|---|---|
-| [2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md](build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md) | — | *none — an adversarial research pass run BEHIND this build; it precedes the spec set and is what warranted it* |
-| [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
-| [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
+| `-11` `-12` `-13` `-14` `-15` `-16` `-17` `-18` `-19` `-21` | **SPECCED** | all authored this session; `-21` was created by the owner's resolution of `-13` F3 |
+| `-1` | **THIN by reversal** | its design is withdrawn; rev-6 replaces the cap with the convergence rule and deletes the S8 the audit found vacuous |
+| `-5` | **THIN** | its S1 spells a three-field `--park` and its S5 a decision-only count; the verb that shipped under `TOOL-cSettledDocket-1` has two fields and counts four kinds, so the spec and the code disagree |
+| `-2` | **READY, widening** | gains the verdict-token half — the vocabulary a machine can read is the same problem one document over |
+| `-3` | **READY** | unchanged in scope. Its rev-6 adds two cross-references only: its halt path reaches `--abort`, whose agent keys `-15`'s `--attest` writes, and the review-side analogue of its park rule is `-1` S9. `--attest` is `-15`'s and the non-overridable sentence is `-19`'s — an earlier draft of this row gave both to `-3`, which would have put two units on one mechanism |
+| `-4` | **READY** | unchanged by any of this |
+
+### What the audit changed about the dependency order
+
+`-11` moves to the front. It is the owner's ratified mechanism — the units region becomes generated
+and mandatory — and three other things wait on it: `build-complete` cannot pass until it lands, the
+promotion disposition `-1` now carries needs a units region a run may legally extend, and `--status`
+cannot name a real next unit without it. `-12` and `-13` are independent blockers on the same verb
+and neither waits for anything.
+
+### The trap the ratified resolution must not fall into
+
+The frozen scope cannot move into the run-state file. That file is written by the run, and a scope
+frozen where its subject can write it is `memory/gotchas/inputs-inside-the-subjects-reach.md`. The
+authority stays the BASE blob, re-derived through git by both the driver and the leg.
+
+## The unattended run, 2026-08-19 — what it built and what it cost
+
+Phase BUILDING, blocked short of landing. `RUN.md` holds the phase, the witness and three parked
+decisions; this section is the derivation an owner reads first.
+
+**Built and green:** `TOOL-aBoundedVerdict-11`, all eight scope items. Driver suite 333 assertions
+(315 before), leg sibling 182, `check-arms` clean. Status INPROGRESS rather than CLOSED, deliberately:
+CLOSED means built AND landed, and marking it otherwise would make `build-complete` pass on a claim
+the tree does not support — the class the unit exists to remove.
+
+**Not started:** the other fourteen units. One consumed the run, and beginning a second while the
+first cannot land would accumulate rather than finish.
+
+### Why it stopped
+
+`gates-green` is unreachable, and not because of this diff. Leg check 7 — at most one live run — reds
+on two non-terminal records: this one and `aPacedTurnstile`'s, which arrived with the merge from main
+at `6f598a1`. That run overrode `build-complete`, could not land because the primary tree's main was
+ahead by three commits of a different mid-flight build, and stopped at phase LANDING. `LANDING` is not
+in `PHASES_TERMINAL`, so the record is live forever and check 7 counts it against every later run: one
+stuck run is a fleet-wide block. `TOOL-aBoundedVerdict-24`.
+
+Every exit is outside this mandate. `--override gates-green` is refused on this repo's own record —
+`aBranchedMandate`'s commit says spending it means spending the one machine check between an
+unattended run and an unverified landing, and that someone else's red is a reason to escalate rather
+than to spend it. Writing `--landed` or `--abort` onto another node's record is not this run's to do.
+So it is parked and escalated, which is what a gate-red-out-of-scope halt names. Two prior runs in
+this corpus met the same class and both parked; this is the third.
+
+### The four parked decisions — the owner's turn this run did not take
+
+Each was parked through the verb, so `RUN.md` carries the question, the options seen and the
+reason. Enumerated here because the wrap-up derives from this file, and a parked entry the
+owner never reads is the "forgotten" the method says a bare park is indistinguishable from.
+
+| # | The question | What the run did instead |
+|---|---|---|
+| 1 | **The closing review's base**, now that the run has merged `origin/main`. M8 pins it to the run's BASE, and that pin now predates 25 commits this run did not write. | Took the merge-base and recorded the deviation rather than silently reinterpreting a binding rule. |
+| 2 | **`-11` S8 retired the authored roster wholesale**, which made `build-complete`'s missing-units term a tautology — the generated region is a subset of the specs by construction. | SPLIT the two questions instead of retiring: authorization, presence and terminality read the generated region; the planned-but-unspecced question keeps the authored pair, the only thing that can express it. Dropping the term outright remains the owner's to prefer. |
+| 3 | **`gates-green` is unreachable**, because another node's run is live at `LANDING` and is not this run's record to write. | Escalated rather than overriding. Two prior runs in this corpus met the same class and both parked; this is the third. |
+| 4 | **`drift-audit`'s non-terminal-spec-citation signal is unsatisfiable** for any multi-unit build that cites its ids in code: CLOSED needs landing, landing needs green, green needs CLOSED. | Filed as `TOOL-aBoundedVerdict-30` with three options named, none of them this run's to pick. |
+
+One OWNER FORK also remains open in the spec set: `TOOL-aBoundedVerdict-21` F3 — whether a
+bounded-out push whose outcome is unknown should wake someone immediately rather than wait for
+the resume path. It would add an owner-notification mechanism this kit does not have.
+
+### Recommendations, in the order that unblocks the most
+
+Put to the owner in the run's own turn and recorded here, because a recommendation
+that lives only in a transcript is one nobody reads again.
+
+1. **Clear `aPacedTurnstile` first.** One command, and it unblocks the FLEET rather than
+   this run: its record sits at `LANDING`, which is not terminal, so check 7 counts it
+   against every later run. `--landed` if that push landed, `--abort` if it did not. Then
+   make `TOOL-aBoundedVerdict-24` a real unit — one stuck run becoming a fleet-wide bar
+   outage will recur, and it is not a subtle failure.
+
+2. **Land this branch before building the remaining ten units.** Five are built, armed and
+   green, and they fix owner issues 2 and 3 outright. Landing makes the rest CHEAPER,
+   because `build-complete`, the message channel and the review scoping start working.
+   The unlanded diff is already ~67 commits, and the closing review over it is exactly the
+   over-large review this build exists to prevent.
+
+3. **Fix `TOOL-aBoundedVerdict-30` before the next unattended run.** Recommended shape: add
+   a signal state for "cited by the diff that implements it". Do NOT stop citing unit ids in
+   shipped code — that provenance is what made half this run's findings traceable — and do
+   not touch a pin whose shrink-only direction is deliberate.
+
+4. **Take the four parked decisions and the one open owner fork** (`-21` F3, whether an
+   unknown-outcome push should wake someone). All carry their options and reasoning.
+
+5. **Two method changes, weighted highest.** The two adversarial audits produced 118
+   findings and caught NONE of the defects execution found, including three that would have
+   bricked the run at close after all fifteen units were built.
+   - **A completion sweep per unit.** Three times this run a unit was called done while its
+     own Files-touched list named carriers nobody had opened — four documentation halves,
+     two kit versions, a status flip; 1-of-5 at the low point. Mechanical, and gateable:
+     every id whose spec reads INPROGRESS must have its named carriers touched in the same
+     range.
+   - **Treat "green at an unchanged assertion count" as a failure.** It happened twice — six
+     scope items and an entire contract change, both unmeasured and both nearly read as
+     confirmation.
+
+**Not recommended:** building further units before landing, and spending
+`--override gates-green` for a red that belongs to another run. Two prior runs in this
+corpus refused that override on exactly these grounds, and the precedent is worth more than
+this run finishing.
+
+### The twelve defects the run found by EXECUTING
+
+None was reachable by reading. Two adversarial audits over this same material — 33 findings on the
+close path, 85 on the spec set — caught none of them.
+
+| where | what |
+|---|---|
+| `-11` design | the cutoff was missing, so the unit was unlandable by ANY run |
+| | the cutoff lived in a conf the driver cannot read |
+| | the cutoff comparison was INVERTED — it would have refused this run at close |
+| | S8 retired the authored roster wholesale, making a DoD term a tautology |
+| S4 | refused every BRAND-NEW build: `unit_rows` returns 1 on a well-formed but empty region |
+| test arms | a branch unreachable from any arm, because the fixture conf never declared the key |
+| | two arms that masked the branch under test by tripping an earlier refusal |
+| | a cutoff moved by export rather than through the conf the driver SOURCES |
+| fixtures | two fixture READMEs that could not exercise the check written for them |
+| tooling | a text-mode read destroyed three raw CR bytes and broke an unrelated check |
+| | `&&` put a `mkdir` inside a background job, so its sibling raced it |
+| naming | a loop variable called `rm` tripped the leg's own read-only guard, correctly |
+
+Three of the first four would have surfaced **at close, after all fifteen units were built**.
+
+### What the run corrected in its own specs
+
+`-11` moved rev-2 → rev-6 while being built: the id-set comparison replacing a byte compare that
+would have refused every run that built anything; the cutoff and its home; S8 narrowed from *retired*
+to *split*, because the authored roster is the only carrier of a planned-but-unspecced unit and the
+generated region is a subset of the specs by construction. Each rev names what was wrong and how it
+was found.
+
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aBoundedVerdict-1` | 2 | the review loop converges or promotes, and no round is refused by a counter |
+| 2 | `TOOL-aBoundedVerdict-11` | 2 | the units region becomes generated, mandatory, and read by name |
+| 3 | `TOOL-aBoundedVerdict-12` | 2 | a blocked close names its cause, not just the item it blocked on |
+| 4 | `TOOL-aBoundedVerdict-13` | 2 | every remote observation is bounded, and pays its cost last |
+| 5 | `TOOL-aBoundedVerdict-14` | 2 | an adversarial round after the first reviews the fold, not the build |
+| 6 | `TOOL-aBoundedVerdict-15` | 1 | every close-path write is staged, guarded, and reachable by a verb |
+| 7 | `TOOL-aBoundedVerdict-16` | 2 | `closing-review-recorded` joins a diff-review, in range |
+| 8 | `TOOL-aBoundedVerdict-17` | 2 | a split fetch/push URL stops being an unsatisfiable authorization |
+| 9 | `TOOL-aBoundedVerdict-18` | 2 | the two checks that cannot fail get subjects |
+| 10 | `TOOL-aBoundedVerdict-19` | 1 | the protocol pair says what the code does, and one closed AC is settled |
+| 11 | `TOOL-aBoundedVerdict-2` | 2 | a halted run records WHY, in a vocabulary something reads |
+| 12 | `TOOL-aBoundedVerdict-21` | 2 | the landing push is bounded too |
+| 13 | `TOOL-aBoundedVerdict-22` | 2 | the promoted blockers: the fold's own defects, specced rather than re-reviewed |
+| 14 | `TOOL-aBoundedVerdict-3` | 2 | every remaining place a run would wait for the owner gets a disposition |
+| 15 | `TOOL-aBoundedVerdict-4` | 2 | a fork that says it is unresolved stops reading as resolved |
+| 16 | `TOOL-aBoundedVerdict-5` | 2 | parking becomes a verb instead of a hand-edit |
+
+<!-- /roster:units -->
+
+<!-- gen:build-index -->
+**Build status:** CLOSED · 16 unit(s) · node a · opened 2026-08-16 · streams tooling
+ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12
+ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21 TOOL-aBoundedVerdict-22 TOOL-aBoundedVerdict-23 TOOL-aBoundedVerdict-24
+ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL-aBoundedVerdict-28 TOOL-aBoundedVerdict-29 TOOL-aBoundedVerdict-30 TOOL-aBoundedVerdict-31 TOOL-aBoundedVerdict-32
+
+<!-- gen:build-units -->
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | — | 2 | CLOSED | rev-13 | 2026-08-21 |
+| [TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md) | — | 2 | CLOSED | rev-8 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md) | — | 2 | CLOSED | rev-3 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md) | — | 2 | CLOSED | rev-6 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md) | — | 2 | CLOSED | rev-4 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md) | — | 1 | CLOSED | rev-3 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-16 — `closing-review-recorded` joins a diff-review, in range](spec/2026-08-19-spec-TOOL-aBoundedVerdict-16.md) | — | 2 | CLOSED | rev-2 | 2026-08-19 |
+| [TOOL-aBoundedVerdict-17 — a split fetch/push URL stops being an unsatisfiable authorization](spec/2026-08-19-spec-TOOL-aBoundedVerdict-17.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md) | — | 2 | CLOSED | rev-5 | 2026-08-21 |
+| [TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled](spec/2026-08-19-spec-TOOL-aBoundedVerdict-19.md) | — | 1 | CLOSED | rev-4 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | — | 2 | CLOSED | rev-9 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-21 — the landing push is bounded too](spec/2026-08-19-spec-TOOL-aBoundedVerdict-21.md) | — | 2 | WONTDO | rev-3 | 2026-08-21 |
+| [TOOL-aBoundedVerdict-22 — the promoted blockers: the fold's own defects, specced rather than re-reviewed](spec/2026-08-21-spec-TOOL-aBoundedVerdict-22.md) | — | 2 | CLOSED | rev-1 | 2026-08-21 |
+| [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | — | 2 | CLOSED | rev-8 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | — | 2 | CLOSED | rev-8 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | — | 2 | CLOSED | rev-10 | 2026-08-20 |
+<!-- /gen:build-units -->
+
+Records: 12 bound to this build, across 3 record folder(s).
+
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-22.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -211,18 +481,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-1.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md)
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-2.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md)
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-3.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md)
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-4.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md)
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-5.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md)
-- **`build/`**
-  - [2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md](build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md)
-- **`reviews/`**
-  - [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md)
-  - [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md)
-<!-- /gen:build-docs -->

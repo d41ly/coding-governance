@@ -88,7 +88,7 @@ def _gate_legs(doc: object) -> object:
 
 EXTRACTORS: dict[str, object] = {
     # The merge bar itself. The runner single-sources its legs from this artifact and
-    # tools/run-gates.test.sh forbids a hardcoded leg command, so the JSON IS the registry.
+    # tools/run-gates/run-gates.test.sh forbids a hardcoded leg command, so the JSON IS the registry.
     "gate-legs": lambda: m.json_artifact_inventory(
         ROOT / "tools" / "gate-legs.json", "gate-legs", _gate_legs
     ),
@@ -180,7 +180,7 @@ def _live_py(layer: str) -> list[dict[str, str]]:
     """Python symbols under tools/, minus the `*.template.py` scaffolding sources.
 
     A template and its instantiated twin define the SAME function names in two files, and
-    map_lib.fan_in() counts distinct referencing files minus the symbol's own def file — so the
+    map_lib.fan_in() counts distinct referencing files minus EVERY file defining the symbol — so the
     twin counts as a reference and every duplicated symbol's fan-in is inflated by one. Measured
     here: with the templates indexed, two `test_*` functions from test_codebase_map.template.py
     outranked walk_dir_keys in the reuse shortlist on that artifact alone.

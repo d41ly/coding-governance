@@ -7,20 +7,24 @@ terminal status. Nothing here is edited by hand.
 | Build | Status | Node | Opened | Streams | Ids (n) |
 |---|---|---|---|---|---|
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 |
-| [aBoundedVerdict](builds/aBoundedVerdict/README.md) | SPECCED | a | 2026-08-16 | tooling | 10 |
+| [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 |
-| [aDrainedSluice](builds/aDrainedSluice/README.md) | INPROGRESS | a | 2026-08-08 | tooling | 9 |
 | [aFerriedDossier](builds/aFerriedDossier/README.md) | OPEN | a | 2026-08-16 | deployer | 3 |
-| [aGuardedTally](builds/aGuardedTally/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 1 |
+| [aGradedDoorway](builds/aGradedDoorway/README.md) | INPROGRESS | a | 2026-08-28 | tooling | 10 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
+| [aPacedTurnstile](builds/aPacedTurnstile/README.md) | SPECCED | a | 2026-08-18 | tooling | 16 |
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
-| [aSealedCaravan](builds/aSealedCaravan/README.md) | INPROGRESS | a | 2026-08-10 | deployer+tooling | 10 |
-| [aTetheredConvoy](builds/aTetheredConvoy/README.md) | OPEN | a | 2026-08-16 | deployer+tooling | 10 |
-| [aTetheredRecord](builds/aTetheredRecord/README.md) | INPROGRESS | a | 2026-08-16 | tooling | 7 |
-| [aTimedTurnstile](builds/aTimedTurnstile/README.md) | INPROGRESS | a | 2026-08-11 | tooling | 8 |
+| [aTetheredScratch](builds/aTetheredScratch/README.md) | INPROGRESS | a | 2026-08-20 | tooling | 4 |
+| [aTunedCompass](builds/aTunedCompass/README.md) | BLOCKED | a | 2026-09-04 | tooling | 11 |
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 |
-| [aWireWarden](builds/aWireWarden/README.md) | INPROGRESS | a | 2026-07-15 | tooling | 1 |
+| [aWeighedCanon](builds/aWeighedCanon/README.md) | OPEN | a | 2026-09-04 | tooling | 2 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
-| [cKeyedLaunchpad](builds/cKeyedLaunchpad/README.md) | OPEN | c | 2026-08-13 | kickoff+tooling | 7 |
 | [dLandedVerdict](builds/dLandedVerdict/README.md) | INPROGRESS | d | 2026-08-19 | tooling | 2 |
+| [dNarrowedAnchor](builds/dNarrowedAnchor/README.md) | INPROGRESS | d | 2026-08-24 | tooling | 3 |
+| [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 |
+| [dPolishedVitrine](builds/dPolishedVitrine/README.md) | INPROGRESS | d | 2026-09-12 | tooling+deployer | 19 |
+| [dPromptedSeam](builds/dPromptedSeam/README.md) | DEFERRED | d | 2026-08-25 | tooling | 4 |
+| [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 |
+| [dScaffoldedMirror](builds/dScaffoldedMirror/README.md) | DEFERRED | d | 2026-08-24 | tooling | 22 |
+| [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 15 |

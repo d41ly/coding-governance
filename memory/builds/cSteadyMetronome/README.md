@@ -85,19 +85,29 @@ has no backlog row, because there is no room to write one.
 The table below is GENERATED from the status header of
 every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-cSteadyMetronome-1` | 2 | concurrency proved by rendezvous, not by elapsed time |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node c · opened 2026-08-14 · streams tooling
 ids TOOL-cSteadyMetronome-1
 
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | CLOSED | rev-4 | 2026-08-14 |
+<!-- gen:build-units -->
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | — | 2 | CLOSED | rev-4 | 2026-08-14 |
+<!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 1 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-14-review-TOOL-cSteadyMetronome-1-1.md](reviews/2026-08-14-review-TOOL-cSteadyMetronome-1-1.md) | spec-audit | TOOL-cSteadyMetronome-1 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -109,11 +119,3 @@ Records live under `spec/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-14-spec-cSteadyMetronome-1.md](spec/2026-08-14-spec-cSteadyMetronome-1.md)
-- **`reviews/`**
-  - [2026-08-14-review-TOOL-cSteadyMetronome-1-1.md](reviews/2026-08-14-review-TOOL-cSteadyMetronome-1-1.md)
-<!-- /gen:build-docs -->

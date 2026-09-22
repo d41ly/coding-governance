@@ -30,7 +30,11 @@ whether the pinned `<metric>@<k>` appeared in the report. Measured while buildin
 `r@k` and `f@k` for whatever `k` it is handed, and the pin grammar admits only those two metrics, so
 the branch was green for every pin it could ever see -- `fixture-passes-by-finding-nothing` shipped
 inside the gate that exists to close it. The reachable state is an absent or empty document set: a
-`--data-dir` built without one, or `spine`, which extracts to zero docs in this repo today.
+`--data-dir` built without one. `spine` used to be the standing example, because `DURABLE` required
+a directory segment this repo's flat memory root does not have and the set extracted to zero docs
+here; the aTunedCompass build fixed the pattern, so that example is retired and the branch is now
+reached by a genuinely absent set rather than by a live bug. (The spec id is not spelled, for the
+reason the paragraph below gives.)
 
 Contract: the build folder at memory/builds/aWalkedCorpus/ (the spec id is deliberately not spelled
 here -- `non_terminal_specs_cited_by_product_source` runs at tolerance 0 and `tools/` is a product

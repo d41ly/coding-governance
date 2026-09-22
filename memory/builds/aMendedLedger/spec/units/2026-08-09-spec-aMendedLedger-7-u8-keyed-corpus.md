@@ -2,6 +2,18 @@
 
 **Status:** SPECCED · rev-2 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md](../../build/2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md) | journal | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md](../../reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md](../../reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md](../../reviews/2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-8 |
+| [2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md](../../reviews/2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-8 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Widen the shared id grammar's session era by four characters, so that all 73 rows of
@@ -45,6 +57,10 @@ in §4 Alternatives rejected, and §9 rev-2 records how the claim died.
   asserts: the 0d oracle block, the unkeyable-duplicate arm, and the two delete arms whose adjacent
   correction row becomes a keyed row. Every re-pointed id must be a shape the WIDENED grammar still
   misses, shown by assertion rather than asserted by comment.
+  - **Readers:** by name: no name leaves the tree, since the arms keep their names and the fixture
+    keeps its id. by value: `tools/memory-tree/merge-rows.test.sh` asserts which fixture rows the
+    driver keys and which it cannot, and `tools/memory-tree/merge-rows.py` decides that through its
+    anchor grammar.
 - **S6** Keep `merge-rows.py:272`'s `_ID_RE` postcondition and re-ground it on the population it
   demonstrably still has, per §8 F4.
 - **S7** Re-true the five statements the WIDENING itself falsifies: `merge-rows.py:78-83`, `:101-107`

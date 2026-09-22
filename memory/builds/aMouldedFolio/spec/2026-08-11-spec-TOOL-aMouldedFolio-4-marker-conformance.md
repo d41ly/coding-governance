@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7890becf · streams tooling
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Settle the marker-region well-formedness contract and prove the four live readers obey it, so the

@@ -38,11 +38,152 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 141    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 255 UNMOVED ACROSS THE RECONCILE, deliberately. The merge of origin/main into cMendedVintage
+# unions two branch populations and the matcher reads 264 over the merged four modules. The pin
+# is a FLOOR — `len(branches) < BRANCH_PIN` is the whole test — so the larger of the two
+# authored floors satisfies it and neither side's shrink-only guarantee is weakened. It is NOT
+# raised to 264 because doing so would silently close the re-baselining the concurrent deployer
+# unit parked as a backlog row of its own, and would claim this reconcile armed nine branches it
+# did not write. Re-baselining stays that row's job.
+# 252 -> 255 at DEPL-cMendedVintage-13, READ OFF this engine's own output at both ends rather than
+# predicted: 252 over the four modules at that unit's base `a47c286b`, taken from a clean export of
+# that tree, and 255 on the tree it left. The NET is three and the SITES are five, and the
+# difference is the whole record. Four are new, all of them on the update path and all of them the
+# same rule — a refusal that is correct in `apply`, which has written nothing when it reaches the
+# gate-leg step, is a wedge in `update`, whose bytes are already on disk. They are the
+# malformed-runner `r.fail` (S5), the pair that grade the target's `[gate_runner]` before the
+# emission writes through it (one for the validator's findings, one for the containment refusal it
+# raises), and the catch-all that converts every OTHER refusal the emission can raise — the live one
+# is a leg whose name the target's runner carries and its receipt does not claim. One went away: the
+# extraction of `write_gate_legs` merged `apply`'s two `raise Refusal` spellings of "that runner file
+# is not a list of rows" into one, because the update path needs the message as a VALUE before it
+# decides whether to raise it at all. The moved branches are count-neutral, which is what Q2's probe
+# predicted and what these two measurements confirm. 4/4 new sites armed, all in `selftest.py`: the
+# malformed-runner arm asserts the report and the absent traceback, the escaping
+# `[gate_runner].file` arm reaches both grading sites in one run, and the dropped-claim arm reaches
+# the catch-all. Each failing case was observed on a scratch fixture against a staged break before
+# the arm was written.
+# 251 -> 252 at DEPL-cMendedVintage-10. MEASURED both sides: the matcher counted 251 at this unit's
+# base and 252 with its ONE new refusal — the renormalize's dirty-population guard in `_cmd_update`,
+# which refuses to re-stage when a pinned path this run did not write is dirty relative to HEAD. It
+# is the same refusal `apply` already makes one function over, moved onto the verb that now writes
+# the pin block, and it is ARMED by the selftest arm that leaves an unrelated pinned path dirty and
+# asserts the message. Its failing case was observed on a scratch fixture before the arm was
+# written. 1/1 armed.
+# 217 -> 251 at DEPL-cMendedVintage-9. MEASURED, both sides: the matcher counted 250 over the four
+# modules at that unit's base `3ca2f144`, so the pin was 33 BEHIND the population before this unit
+# wrote a line, and this unit's ONE new refusal — the reserved-prefix predicate in selfcheck arm 7h,
+# which refuses a descriptor planning a file under `{memory_root}/project/` — carries it to 251.
+# Raised to the live count and not to 218, on the precedent of the 141 -> 161 entry below and for
+# its reason: a floor that trails the population stops catching the matcher going blind. The new
+# branch is armed by three arms on a scratch gov tree — the destination spelled through
+# `{memory_root}`, the same destination spelled as a literal, and a control one segment above it
+# that stays GREEN — and its failing case was observed TWICE. Once on those fixtures, and once over
+# the SHIPPED descriptors in a detached tree at the commit before the withdrawal, where it exited 1
+# naming `gate-lint`'s `memory/project/substitution-fed-loops.txt`: the real instance, at the last
+# revision that still had one. 1/1 armed.
+# NOTE what this raise does NOT buy, because the docstring above promises an anchor SET and this
+# file enumerates none: the join half still runs only when a reached-set is passed on argv, and
+# nothing in the tree passes one. That is TOOL-dUnstalledConvoy-36, unchanged by this unit.
+# 244 -> 246, PIN UNMOVED, TOOL-aHonedRuleset-8. Two new `fail` branches in `selfcheck()`: the
+# why_conditional REASON gate (arm 7d) and the requires-edge REACHABILITY arm (arm 7e). Both are
+# ARMED -- selftest arms exercise each failing case, and each was observed RED by hand before
+# landing: 7d on `check-placeholders` with its reason removed, 7e on this unit's own base state.
+# THE RAISE IS DECLINED, and that is a departure from this file's convention worth naming. Every
+# prior row here is an `X -> Y` pin raise, and `141 -> 161` (TOOL-dUnstalledConvoy-26) states the
+# reason: a floor that trails the population stops catching the matcher going blind. The pin is
+# declined on a ruling recorded by the concurrent deployer unit that also adds branches to this
+# file: its non-goals make moving BRANCH_PIN out of scope, because a 217 -> 219 move would claim two
+# new branches took the pin to the population when the population is 246, and it files re-baselining
+# as its own backlog row. The id is deliberately NOT cited here: that spec is still SPECCED, and
+# drift-audit's `non_terminal_specs_cited_by_product_source` is a shrink-only list of exactly this
+# shape -- product source pointing at something that can still change under it. Find it through
+# memory/LIVE.md, which is generated and cannot go stale. So the trailing floor is a KNOWN DEFERRAL
+# with an owner, not an acceptable property.
+# 216 -> 217 at ROUND 4's fold. ONE new refusal, from the round's BLOCKER: the reserved-key guard in
+# `target_context`, which refuses a target `[answers]` or `[kit.<eid>]` key naming one of the three
+# tokens gov seeds for itself. Armed by SEVEN arms -- five doors, plus the liveness pair that proves
+# the door is reached and that a non-reserved answer through it is still accepted -- and its failing
+# case was observed END TO END: with the guard reverted, a READ-ONLY `check` ran the target's own
+# script and wrote a sentinel file while exiting 1 with an ordinary report.
+# 215 -> 216 at ROUND 3's B1 CLOSE-OUT. One new refusal: the rollback loop's containment guard,
+# B1's third site. It is NOT armed and says so in its own branch -- reaching it needs a receipt row
+# spelling an escape AND a kit whose check goes red after the run, and this suite manufactures no
+# way to produce the pair. Declared unarmed rather than rounded up, on the same convention the
+# `land_through_index` plumbing failures use two entries below. 0/1 armed.
+# 214 -> 215 at ROUND 3's fold. ONE new refusal, from a REPRODUCED defect: `demand_contained_dest`,
+# the path-containment guard. A target's own `prefix = "../../PWNED"` made `plan` preview 26 rows
+# rooted outside the target and `apply` WRITE all 26 -- measured in a sandbox, the files counted,
+# before the guard was written. Armed by four arms on `plan` and `apply`, and its failing case was
+# observed: neutering the guard puts all 29 escaping rows back.
+# NOTE the FILE count also moved, 2 -> 3, and that is the second pin doing its job rather than a
+# surprise: `tools/govkit/fixtures/make_incms_receipt.py` is tracked Python under the deployer's own
+# directory, so the DISCOVERED population picked it up. It contributes no refusal branches.
+# 212 -> 214 at ROUND 2's fold. Two new refusals, both from confirmed blockers: the
+# token-value guard `demand_safe_token` (a target-supplied `prefix` or answer outside
+# [A-Za-z0-9_./~@+-], which is the command injection two reproductions demonstrated), and a
+# non-object `install.json` on the `--re-adopt` carry-forward path (four independent finds,
+# a raw traceback out of `main`, which catches only Refusal). Both armed.
+# 210 -> 212 at this build's CLOSING-REVIEW FOLD. Two new refusals, both from confirmed findings:
+# a `[[decline]].discharge.command` that is not a list (D1's secondary — a string was iterated
+# character by character, spawning `b`), and a `--pin` key that matched no planned destination (D6 —
+# an operator assertion consumed by lookup with nothing checking that any lookup hit). Both armed.
+# 208 -> 210 (DEPL-dCarriedReceipt-6). Its TWO new refusals: `apply`'s silenced-leg finding,
+# and the gov-side `selfcheck` arm that catches the same class one side over, before any
+# adopter can receive the descriptor. Both armed — the first by AC5's fixture, the second by a
+# scratch gov whose descriptor declares a leg engine no rule ships, staged RED deliberately
+# because an arm that has only ever been seen passing is an assertion about nothing. 2/2 armed.
+# 197 -> 208 (DEPL-dCarriedReceipt-5). Its ELEVEN new refusals, all inside `decline_findings`: a row
+# with no `kit` or no `dest`; a `kit` outside the run's selection; an empty `why`; more than one
+# evidence field; the two STALENESS arms (the dest arrived, and gov withdrew it); a `taken_as` the
+# target does not track; a `consumed_into` it does not track; a `discharge` with no command; a
+# discharge argv carrying an unresolved token; and a discharge probe that cannot LAUNCH. The spec
+# estimated "roughly seven" and asked for the figure to be RE-DERIVED at landing rather than pinned
+# to a literal, which is what this is. ALL ELEVEN are armed by a named selftest arm — six by an
+# acceptance criterion and five by arms written for the branches alone, because a branch serving no
+# criterion is exactly the one that otherwise ships unasserted. 11/11 armed.
+# 190 -> 197 (DEPL-dCarriedReceipt-13). Its SEVEN new refusals, all on the `adopt` path: `--pin`
+# with no `=` (in `parse_args`, so it is the one reachable without a target), `--target` resolving
+# to the gov checkout, an existing receipt without `--re-adopt`, a target index differing from HEAD,
+# a `--to` that does not resolve, a `--pin` revision that does not resolve, and a `--pin` naming a
+# revision where gov holds no blob for that source. ALL SEVEN are reached by a named selftest arm —
+# the first four and the `--pin` grammar directly under AC7 and AC8, the last two through the same
+# `--pin` fixture. 7/7 armed, which is rarer here than the two entries below and is stated rather
+# than assumed.
+# 185 -> 190 (DEPL-dCarriedReceipt-14). Its five new refusals, and this unit also RELOCATES four:
+# `cmd_check`'s existing check-arm failures moved into the extracted `run_kit_check`, which changes
+# their anchors and not their count. The five that are new: a check arm that cannot LAUNCH (armed by
+# the no-such-binary fixture), the post-write rollback's own finding (armed by the roll fixture, and
+# seen RED with it removed), and the rollback's THREE restore failures — `git rm --cached`,
+# `git update-index --cacheinfo` and `git checkout-index`. Those three are NOT armed and say so in
+# their own branches: reaching one needs the TARGET's git to refuse a plumbing call this suite
+# manufactures no way to provoke, which is exactly where `-11` left `land_through_index`'s
+# post-`git mv` failure. 2/5 armed, stated rather than rounded up.
+# 180 -> 185 (DEPL-dCarriedReceipt-11). Its five new refusals: the escaping destination, the
+# occupied destination, the failed move, the ambiguous destination and the out-of-kit source.
+# FOUR of the five are reached by a named selftest arm; the fifth -- `land_through_index` failing
+# AFTER a successful `git mv` -- is declared unarmed in its own branch, because reaching it needs
+# the TARGET's git to refuse a blob write and this suite manufactures no such mode.
+# 161 -> 180 (DEPL-dCarriedReceipt-7, -8, -10). Re-derived at the landing of the receipt build
+# rather than guessed: -7's S9 integrity assertion and its land-failure reports, -8's cmd_check
+# gov_oid mismatch and its verdict-grid cell arm, and -10's three `forked` rule refusals plus
+# its FORKED-header arm. Both values named, per this file's own convention.
+# 141 -> 161 (TOOL-dUnstalledConvoy-26). The pin had fallen 19 behind the population before
+# this build and 20 by the end of it, which is the state this file's own convention forbids:
+# `a floor that trails the population stops catching the matcher going blind`. Raised to the
+# live count so the next blind matcher reds. NOTE what this does NOT buy: the JOIN half has
+# never executed, because nothing in the tree passes a reached-set, so `enumeration only` is
+# the whole of what runs. That is TOOL-dUnstalledConvoy-36, not this raise.
                     # 135 -> 141 at the origin/main reconcile: upstream's one plan/apply classifier
                     # adds refusal branches of its own. Raised rather than left slack, because a
                     # floor that trails the population stops catching the matcher going blind.
-FILE_PIN = 1        # 1 -> current: the deployer is one module today; a refactor may only grow this
+FILE_PIN = 4        # 1 -> 4 at DEPL-cMendedVintage-9. MEASURED at the same run: the discovered
+# population is four modules — the engine, `census.py`, `check_runbook_parity.py` and
+# `fixtures/make_incms_receipt.py` — and only the engine contributes a refusal branch, which is
+# exactly the scenario this pin exists for and the branch count cannot see. It sat at 1 while three
+# modules had already joined the scan, so a module dropping out of the glob was ungraded by both
+# pins at once. Shrink-only: a refactor may only grow this.
 
 
 def population(root: pathlib.Path) -> list[pathlib.Path]:

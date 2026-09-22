@@ -30,21 +30,31 @@ drift. W4 is a separate spec because it answers a separate document — the clos
 | W5 | `-6` | the review of W4 — the new self-test was failing open |
 | W6 | `-8` | the epoch gate's endpoint hole; the per-commit trade measured, not guessed |
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aBatchedTribunal-1` | 2 | the review protocol becomes a gate, not a note |
+| 2 | `TOOL-aBatchedTribunal-6` | 2 | W4: the four rows the closing review left open |
+| 3 | `TOOL-aBatchedTribunal-8` | 2 | W6: the epoch gate's endpoint hole, and the trade measured |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-09 · streams tooling
 ids TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-2 TOOL-aBatchedTribunal-3 TOOL-aBatchedTribunal-4 TOOL-aBatchedTribunal-5 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-7 TOOL-aBatchedTribunal-8
 
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aBatchedTribunal-1 — the review protocol becomes a gate, not a note](spec/2026-08-09-spec-aBatchedTribunal-1.md) | CLOSED | rev-3 | 2026-08-09 |
-| [TOOL-aBatchedTribunal-6 — W4: the four rows the closing review left open](spec/2026-08-09-spec-aBatchedTribunal-6.md) | CLOSED | rev-2 | 2026-08-09 |
-| [TOOL-aBatchedTribunal-8 — W6: the epoch gate's endpoint hole, and the trade measured](spec/2026-08-09-spec-aBatchedTribunal-8.md) | CLOSED | rev-1 | 2026-08-09 |
+<!-- gen:build-units -->
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aBatchedTribunal-1 — the review protocol becomes a gate, not a note](spec/2026-08-09-spec-aBatchedTribunal-1.md) | — | 2 | CLOSED | rev-3 | 2026-08-09 |
+| [TOOL-aBatchedTribunal-6 — W4: the four rows the closing review left open](spec/2026-08-09-spec-aBatchedTribunal-6.md) | — | 2 | CLOSED | rev-2 | 2026-08-09 |
+| [TOOL-aBatchedTribunal-8 — W6: the epoch gate's endpoint hole, and the trade measured](spec/2026-08-09-spec-aBatchedTribunal-8.md) | — | 2 | CLOSED | rev-1 | 2026-08-09 |
+<!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 1 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-09-review-TOOL-aBatchedTribunal-1-7.md](reviews/2026-08-09-review-TOOL-aBatchedTribunal-1-7.md) | diff-review | TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8.
 <!-- /gen:build-index -->
@@ -58,13 +68,3 @@ Ids no `spec-audit` record has ever named: TOOL-aBatchedTribunal-1 TOOL-aBatched
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-09-spec-aBatchedTribunal-1.md](spec/2026-08-09-spec-aBatchedTribunal-1.md)
-  - [2026-08-09-spec-aBatchedTribunal-6.md](spec/2026-08-09-spec-aBatchedTribunal-6.md)
-  - [2026-08-09-spec-aBatchedTribunal-8.md](spec/2026-08-09-spec-aBatchedTribunal-8.md)
-- **`reviews/`**
-  - [2026-08-09-review-TOOL-aBatchedTribunal-1-7.md](reviews/2026-08-09-review-TOOL-aBatchedTribunal-1-7.md)
-<!-- /gen:build-docs -->

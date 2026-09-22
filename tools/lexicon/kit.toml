@@ -17,15 +17,62 @@ version_from = { file = "lexicon.py", pattern = "^KIT_LEXICON_VERSION = " }
 include = "**"
 role = "engine"
 
-# The three waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a
+# THIS KIT'S SELF-TESTS ARE WITHHELD. TOOL-aQuenchedHarness-3. Each stages a break into a copy of a
+# checker in THIS directory and asserts the checker still catches it, so its subject is the checker
+# and it has a job only when the source here changes -- and none at all in a tree that copy-installs
+# the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
+# only to what runs.
+#
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
+# `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
+#
+# AND THE LEG GOES WITH THE FILE, through machinery that already exists: `silenced_legs` refuses to
+# emit a gate leg whose argv names a path the target does not hold, and `_cmd_apply` REPORTS each one
+# rather than shipping it. So this rule closes both halves and needs no deployer code.
+#
+# SCOPE, and it is the half a reader misses: this withholds from `govkit apply` ONLY. The
+# copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
+# this file, so that runbook removes them separately. The suites remain in the public repository for
+# anyone who edits a kit.
+#
+# THE TYPESCRIPT CONFORMANCE CORPUS GOES WITH THEM, and for a reason of its own on top of the two
+# above. `ts-conformance-fixtures.json` holds bounded, provenance-stamped excerpts of a THIRD-PARTY
+# tree, drawn to grade this kit's TypeScript reader. Only `selftest.py` reads it, so an adopter who
+# never edits the kit has nothing to run it with — and shipping somebody else's source into every
+# adopter's tree is a disclosure with no consumer at the far end. Same mechanism, same rule:
+# claiming the destination is what withholds it, because `project-owned` is absent from
+# LANDABLE_ROLES and `apply` never writes it. TOOL-aGradedDialect-2.
+#
+# AND THE COPY-INSTALL HALF IS NOW WRITTEN: `cp -r` does not read this file either, so the runbook
+# removes both withheld instruments in its own step. That is the `govkit:entry lexicon` section of
+# WIRE-INTO-PROJECT.md, which the kit had none of until TOOL-aGradedDialect-5 S7 wrote it against the
+# `codebase-map` precedent. Its `rm -f` line names exactly this rule's two paths and NOT
+# `SKILL.template.md`, which is withheld too and must survive a copy-install, because it is what
+# `adopt-lexicon.sh` renders the adopter's Skill FROM.
+[[files]]
+include = ["selftest.py", "ts-conformance-fixtures.json"]
+role = "project-owned"
+
+# The waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a
 # fresh install has somewhere to record its first deliberate exception, but their CONTENT is
 # per-repo and must never be overwritten by an upgrade — a waiver list copied from a larger tree is
 # the same defect as a pin copied from one. `seed` is the role that expresses "copied ONCE, then the
 # target owns it"; `project-owned` alone would still be written on every apply.
 [[files]]
-include = ["lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt", "lexicon-layer-waivers.txt"]
+include = ["lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt"]
 role = "seed"
 to = "{kit}/{relpath}"
+
+# The rendered Skill. `role = "rendered"` rather than `engine` because its CONTENT is derived from
+# the adopter's own declaration, so shipping this repo's copy would teach every adopter THIS repo's
+# verbs. The wildcard rule above cannot claim it: a rule's pool excludes any file whose destination
+# another rule owns, which is the property that lets this entry exist beside `include = "**"`.
+[[files]]
+include = ["SKILL.template.md"]
+role = "rendered"
+to = ".claude/skills/lexicon/SKILL.md"
+placeholders = ["VERBS_TABLE", "SUGGEST_CLI", "GATE_CLI", "CONF", "KIT_VERSION"]
 
 [config]
 file = ".lexicon.conf"
@@ -35,55 +82,105 @@ owner = "lexicon"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--scaffold"]
 mutates_index = false
 
+# THE RE-RENDER an `update` runs by default; GOVKIT_RERENDER=0 declines it. It rewrites what the
+# `rendered` rule above declares, from `SKILL.template.md` plus the target's own declaration — content derived
+# from the adopting tree rather than copied from gov's, which is what makes it go stale.
+#
+# `--render` AND NOT THE `[adopt]` ARGV, which is the whole reason this block exists. `--scaffold`
+# REFUSES once a declaration is present, so re-running the adopter against an adopted tree cannot
+# refresh anything. `--render` skips the derivation, reads the declaration already on disk and
+# re-runs `write_skill` over it. Safe to re-run for the same reason: it writes that one destination,
+# derives no table, measures no pin, and leaves the conf and both waiver registries untouched.
+# WHY THE BLOCK EXISTS AT ALL: `.claude/skills/lexicon/SKILL.md` is this kit's one `rendered`
+# row and its `--check` byte-compares it against a fresh render, so before this block an update
+# that moved the template ran no render at any GOVKIT_RERENDER setting and left that check red at
+# every adopter — measured at two, where it rolled the whole kit back (TOOL-dRetiredFork-29).
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-lexicon.sh", "--render"]
+
 [check]
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 
+# THE PROBE NAMES WHAT THE ADOPTER PRODUCES, not what the WRITE phase copied. `{kit}/lexicon.py` is
+# satisfied by the `include = "**"` rule above before `[adopt]` ever runs, so it was a liveness
+# assertion true by construction -- govkit classified any rc-0 run as adopted even when no Skill had
+# been rendered. Closing review M1; `tools/memory-recall/kit.toml` already has the right shape.
 [[outcome]]
 code = 0
-probe = { must_exist = "{kit}/lexicon.py" }
+probe = { must_exist = ".claude/skills/lexicon/SKILL.md" }
 means = "adopted"
+
+# AN ACCEPTED STOP, not a failure. The argv above exits 1 with `no .lexicon.conf; nothing to render
+# from` against a target that holds this kit and has never declared, and that is a POSTURE rather
+# than a fault: there is no table to render from, so there is nothing for the run to repair. Without
+# `ok = true` here `outcome_accepted` refuses the exit, the receipt is not re-stamped, and a kit that
+# correctly declined is reported as an unaccepted failure — the rollback-by-decline class.
+#
+# THE `must_exist` TERM IS WHAT MAKES THIS A POSTURE AND NOT A CRASH, and it is here because without
+# it a FAILED FIRST SCAFFOLD was shape-identical to the accepted state: `--scaffold` also exits 1
+# with the conf still absent when the derivation fails, because the conf is precisely what the
+# failing run was trying to write. An acceptance declared by an ABSENCE alone is satisfied by every
+# run that died before writing. The Skill is the discriminator that exists: `apply` never lands it
+# (`rendered` is not a LANDABLE role), so only the adopter writes it, and it is written in the same
+# `--scaffold` run as the conf. Skill present with no conf therefore means a declaration that was
+# REMOVED after a successful adopt, which is the posture; neither present means the adopter never
+# got through, which is a fault. DEPL-cMendedVintage-16, over the block DEPL-cMendedVintage-5 added.
+#
+# WHAT IT DELIBERATELY DOES NOT COVER: a target that holds this kit and has never run the adopter at
+# all — a `cp -r` copy-install, or a run whose CONFIGURE never happened — declines the same way and
+# is now REFUSED rather than accepted. That state is byte-identical to the failed install, so no file
+# probe can separate them, and this block chooses to red the rarer one. Under `govkit apply` it is
+# not reachable anyway: this kit declares no `blocks_adopt` hole, so CONFIGURE always runs.
+#
+# AND THE PROBE IS STILL NOT SCOPED TO ONE STEP: `classify_outcome` reads this list for every argv
+# this descriptor declares, so `apply`'s CONFIGURE consults it too. That is why the narrowing had to
+# happen here rather than only on the re-render path — the hole was open on an adopter-facing verb.
+[[outcome]]
+code = 1
+probe = { must_exist = ".claude/skills/lexicon/SKILL.md", must_not_exist = ".lexicon.conf" }
+means = "no-project-layer"
+ok = true
 
 # The conf itself is deliberately NOT a guard pathspec. govkit partitions every guard into declared
 # classes — memory-root-relative, verbatim-repo-root, renamed, exempt, kit-relative — and a root-level
 # conf falls into none of them, so declaring one reds `selfcheck` rather than scoping anything.
-# Widening that taxonomy is a change to a different kit's contract. The cost of the narrower guard is
-# an early signal on a conf-only diff, never a merge verdict: the pre-push hook sets GATE_FULL=1,
-# which bypasses every guard, so the authoritative run stays total.
+# Widening that taxonomy is a change to a different kit's contract.
+#
+# SO THIS LEG IS THE EARLY SIGNAL AND NOT THE AUTHORITY, which is a correction to what this comment
+# used to claim. It said the cost was "an early signal on a conf-only diff, never a merge verdict"
+# because the pre-push hook bypasses every guard — but that force is bounded now (GATE_FULL_MAX_LAG),
+# so a scoped push inside the lag landed a raised pin with NO verdict computed. Closing review B1.
+# The grade moved onto `lexicon wiring` below, which carries an empty guard and already read the
+# declaration; the leg here keeps its guard and keeps saying the same thing sooner, under its own
+# name in the leg log.
 [[gate_leg]]
 name = "lexicon naming predicates"
+subject = "repo"
 argv = ["python", "{kit}/lexicon.py"]
 guard = ["tools/", "skills/session-kickoff/", ".githooks/", ".claude/"]
 
 [[gate_leg]]
-name = "lexicon selftest"
-argv = ["python", "{kit}/selftest.py"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
 name = "lexicon wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
-guard = ["{kit}/"]
+guard = []
 
 [[hole]]
 id = "lexicon-ratified"
 kind = "authoring"
 blocks_adopt = false
 blocks_gate = true
-why = "`--scaffold` DERIVES the verb table from the adopter's own corpus, which for one moment is exactly the hand-kept mirror of the codebase that companion §12 bans a gate from having. The seed ships marked PROPOSED with an empty `ratified` key, and an unedited seed reaching the merge bar would be a naming gate whose vocabulary is the code it grades. The stamp is the checkable form of `a human curated this`."
+why = "`--scaffold` takes each verb's SPELLING from the kit's frozen canon and asks the adopter's corpus only which concepts are live, so the seed is prescriptive rather than the hand-kept mirror companion §12 bans. It is still not CURATED: the canon's negatives are generic and the domain rows are missing. The seed ships marked PROPOSED with an empty `ratified` key, and the stamp is the checkable form of `a human read this table`."
 discharge = { command = ["bash", "{kit}/adopt-lexicon.sh", "--check"] }
-
-[[hole]]
-id = "lexicon-layers"
-kind = "authoring"
-blocks_adopt = false
-blocks_gate = true
-why = "LAYERS ships EMPTY because a frequency count cannot observe intended architecture, so there is no derived proposal for P3. An empty declaration makes the engine report NOT ARMED and red rather than green: an unarmed predicate that exits 0 is indistinguishable from a satisfied one, and this is the hole where that distinction is bought."
-discharge = { command = ["python", "{kit}/lexicon.py"] }
 
 [[hole]]
 id = "lexicon-pins"
 kind = "measurement"
 blocks_adopt = false
 blocks_gate = true
-why = "The three offender pins are MEASURED against the adopting corpus at scaffold and are shrink-only. A pin copied from a larger tree is either vacuous or permanently red, which `.memory-tree.conf` states in its own words. The probe is the gate itself: an unmeasured pin set fails it."
+why = "The offender pins are MEASURED against the adopting corpus at scaffold and are a TWO-SIDED equality thereafter: a rise reds and so does an unrecorded drain. A pin copied from a larger tree is either vacuous or permanently red, which `.memory-tree.conf` states in its own words. The probe is the gate itself: an unmeasured pin set fails it."
 discharge = { command = ["python", "{kit}/lexicon.py"] }
+
+[[lf_pin]]
+pattern = ".claude/skills/lexicon/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"

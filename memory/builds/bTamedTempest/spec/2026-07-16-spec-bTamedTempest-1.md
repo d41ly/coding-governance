@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-2 · 2026-07-16 · node b · Tier-2 · base 770a1aa3 · review wf_d878c8a9-bb3 · landed c2f608e7
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-07-16-build-TOOL-bTamedTempest-1-1.md](../build/2026-07-16-build-TOOL-bTamedTempest-1-1.md) | journal | — |
+| [2026-07-16-review-TOOL-bTamedTempest-1-1.md](../reviews/2026-07-16-review-TOOL-bTamedTempest-1-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Any pytest-xdist suite can wedge forever when a worker dies: the controller and every surviving

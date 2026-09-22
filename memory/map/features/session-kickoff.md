@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["shipped-checker-edit-is-an-adopter-contract-change.md", "msys-grep-counts-cr-on-every-line.md"]
 guides = ["SESSION-KICKOFF.md"]
 backlog-shards = []
 lexicon-verbs = []
@@ -53,6 +53,35 @@ Membership is decided by git identity — the file's toplevel compared against t
 normalised through the same `cd … && pwd` chain — never by comparing path strings. Under MSYS one
 directory has two spellings and mount points are not symlinks, so a string comparison answers
 differently depending on which flavor the caller happened to use.
+
+The checker is also the writer of the session's orientation card (`--card --write`, `--card
+--replay`, `--card --path`; `KICK-aReplayedCard-1`). The card lives under the git common dir, so
+every worktree of one repository shares the directory and a card names the tree it was written in;
+every startup cell is derived, the `node —` cell through the manifest's own `registry:` key, so the
+kit spells no charter path. The verbs run no manifest check and no fetch: those stay in the engine's
+Steps 1 and 2b, where each costs a kickoff rather than every session start.
+
+The engine's kickoff lands on the card through `--card --append` (`KICK-aReplayedCard-2`), which
+checks every cited path, line range and record id for EXISTENCE in two spawns — one
+`git ls-files -- …` and one `corpus_ids.py --print-defined-ids`, the memory-tree reader that owns
+the id grammar and prints it on its first line, so this kit spells none — annotates each miss
+`UNVERIFIED — <token>` beneath its row, and refuses a body with nothing to check, one over the cap,
+or a READY line whose BASE is not HEAD. A real READY line replaces the sentinel and the previous
+body, and re-renders the `tree —` cell in the tree the append runs in. `--card --check` re-runs the
+same check over the stored card. Neither judges relevance, scope, tier, or truth at the cited line.
+The engine consumes the card at Step 1 — its node tag, tree kind, worktree count and recent subjects
+replace `git worktree list` and the log in the batch, while the branch, `status --short`, the
+fast-forward and `rev-parse HEAD` as the BASE still run — and appends at Step 5, piping its six
+sections and the READY line through that verb before Step 2b's staged repair is committed
+(`KICK-aReplayedCard-3`), so the deny reads a READY line when the engine's own commit reaches it.
+
+The engine also puts the spec-audit question to the owner, once, at Step 3 (`KICK-aBlindedTrial-1`):
+only when the DoR is a design pass and the build method the manifest names makes `spec-audit:` opt-in,
+recommending yes for two or more units or an open §8 fork and no otherwise, because the owner decides
+and the engine may only recommend. A yes writes `spec-audit: <today>` into the build README front
+matter before the spec pass; either answer lands on the card's `## open` section as one line. The
+unattended hand-back never asks it — the README at BASE has already decided, and the unattended kit's
+preflight line states the posture.
 
 ## Gaps
 

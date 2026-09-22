@@ -7,7 +7,7 @@
 #
 # WHY THIS EXISTS. Until this file landed, the gate had no test anywhere in the repo, no
 # `fail()` helper and therefore no entry in check-arms.py's population: its failing case had never
-# been observed by any committed harness. `parallel-coding-governance.domain-rules.md:44-45` — "a
+# been observed by any committed harness. `coding-governance-agents.template.md` §7 — "a
 # gate you have only ever seen pass is an assertion about nothing." The debt was paid at the moment
 # the gate's constant changed, because that is exactly when an unproven gate is most likely to be
 # silently wrong.
@@ -30,7 +30,7 @@ set -u
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 GATE="tools/check-template-size.sh"
-TEMPLATE="parallel-coding-governance.template.md"
+TEMPLATE="coding-governance-agents.template.md"
 fails=0
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
@@ -78,7 +78,7 @@ printf 'harness    shipped limit read from the gate: %s\n' "$LIMIT"
 # --- A0 · the SHIPPED ceiling, pinned to a literal ------------------------------------------
 # Deriving the limit (above) is right for the boundary arms — it keeps them honest about the
 # override paths — but it means NO arm pins the number itself. Mutating the default to 131072 or
-# to 40000 leaves every other arm green in both directions, on the one constant this whole build
+# to 47000 leaves every other arm green in both directions, on the one constant this whole build
 # was convened to change. This arm is the literal, and it is deliberately the only one.
 EXPECT_LIMIT=49152
 if [ "$LIMIT" = "$EXPECT_LIMIT" ]; then
@@ -92,19 +92,24 @@ fi
 # Against a SCRATCH limits file via the 4th positional, never the tracked one: `run-gates.sh` runs
 # its legs concurrently, so an arm that mutates a tracked file races every other leg.
 LIM="$TMP/limits"
-printf '%s	%d
-' "parallel-coding-governance.template.md" 40000 > "$LIM"
-# 40000 is deliberately NOT the hard default. The declared value and the default are both 49152 in
-# the shipped tree, so an arm using 49152 would pass whether or not the declaration is read at all —
-# 49152 -> 49152 proves nothing. That is the assertion-between-two-derived-values class one step
-# removed, and it is what the first draft of this arm did.
-expect_out "A14 the DECLARED row supplies the limit"   "/ 40000 bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
-expect_out "A15 a positional beats the declaration"   "/ 45000 bytes" 0 bash "$GATE" "$TEMPLATE" 45000 "" "$LIM"
+# The fixture limit is DERIVED from the subject's real size, never typed. It has rotted TWICE: it
+# read 40000, then 47000, and each time the charter grew past it the two precedence arms red on the
+# OVER-BUDGET branch instead of printing the resolved limit — so they stopped measuring precedence
+# and started measuring a stale constant, silently. A precedence fixture has two constraints, not
+# one: it must differ from the gate's hard default AND sit above the file. Both are now properties
+# of the derivation rather than of somebody's memory.
+_subj_bytes=$(tr -d '\r' < "$TEMPLATE" | wc -c | tr -d '[:space:]')
+LIM_VALUE=$((_subj_bytes + 1000))
+if [ "$LIM_VALUE" -eq 49152 ]; then LIM_VALUE=$((LIM_VALUE + 1)); fi   # never collide with the default
+printf '%s	%d\n' "coding-governance-agents.template.md" "$LIM_VALUE" > "$LIM"
+expect_out "A14 the DECLARED row supplies the limit"   "/ $LIM_VALUE bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
+A15_POS=$((_subj_bytes + 2000))
+expect_out "A15 a positional beats the declaration"   "/ $A15_POS bytes" 0 bash "$GATE" "$TEMPLATE" "$A15_POS" "" "$LIM"
 # The declaration OUTRANKS the environment — the kickoff engine's insulation depends on it.
 out=$(MAX_BYTES=999999 bash "$GATE" "$TEMPLATE" "" "" "$LIM" 2>&1)
 case "$out" in
-  */\ 40000\ bytes*) say_ok "A16 the declaration beats the environment" ;;
-  *) say_fail "A16 the declaration beats the environment" "expected 40000; got: $out" ;;
+  *"/ $LIM_VALUE bytes"*) say_ok "A16 the declaration beats the environment" ;;
+  *) say_fail "A16 the declaration beats the environment" "expected $LIM_VALUE; got: $out" ;;
 esac
 # A subject with NO row falls through to the environment, then to the default.
 mkfile 100 "$TMP/undeclared"
@@ -114,6 +119,37 @@ expect_out "A18 an undeclared subject with no env falls to the hard default"   "
 printf '%s	%s
 ' "$TMP/undeclared" "not-a-number" > "$TMP/limits-bad"
 expect_out "A19 a non-numeric declared limit is a NAMED failure"   "the declared size limit for this subject is not a number: '" 5   bash "$GATE" "$TMP/undeclared" "" "" "$TMP/limits-bad"
+
+# --- A20/A21 · THE PAIR TERM (TOOL-aHoistedPass-3) ----------------------------------------------
+# A subject may state its own budget in its own prose, and the ceiling is ALSO in a declaration.
+# Check 6 reds when the two disagree. THE KEY IS THE ABSOLUTE POSIX PATH for a subject outside the
+# repo, computed the way the gate computes it — writing the drive-letter form the shell was handed
+# makes every row MISS, the gate falls through to its 49152 default, and an arm written that way
+# passes while proving nothing. Measured: that is exactly what the first cut of these arms did.
+_pair_dir=$(cd "$TMP" && pwd)
+printf '**Budget: <=27648 bytes, <=350 lines**\nbody\n' > "$TMP/pair-prose"
+printf '**Budget: <=27648 bytes, <=350 lines**\nbody\n' > "$TMP/pair-kb"
+sed -i 's/<=27648 bytes/<=27 KB/' "$TMP/pair-kb"
+printf '%s\t%s\n' "$_pair_dir/pair-prose" 30000 >  "$TMP/limits-pair"
+printf '%s\t%s\n' "$_pair_dir/pair-kb"    27648 >> "$TMP/limits-pair"
+expect_out "A20 a budget line disagreeing with its declared row reds at check 6" \
+  "the subject states its own budget and disagrees with its declaration" 6 \
+  bash "$GATE" "$TMP/pair-prose" "" "$TMP/hw-pair" "$TMP/limits-pair"
+# A21 is the half that keeps the term from being disarmed by a rewrite: a prose figure this gate
+# cannot parse as BYTES is not equal to any declared row, so it reds through the same branch rather
+# than falling silently out of the comparison.
+expect_out "A21 a budget line the gate cannot parse as bytes reds too, naming it" \
+  "'no bytes figure'" 6 \
+  bash "$GATE" "$TMP/pair-kb" "" "$TMP/hw-pair" "$TMP/limits-pair"
+# THE CONTROL, and it is the arm that proves the two above are not vacuous. A subject whose prose
+# AGREES with its row passes, and a subject carrying no budget line at all is never compared — which
+# is the second guard, and the reason the three shipped subjects are untouched by this term.
+printf '%s\t%s\n' "$_pair_dir/pair-prose" 27648 > "$TMP/limits-pair-ok"
+expect_absent "A22 an agreeing pair is not a check 6" "check 6" 0 \
+  bash "$GATE" "$TMP/pair-prose" "" "$TMP/hw-pair" "$TMP/limits-pair-ok"
+printf '%s\t%s\n' "$_pair_dir/undeclared" 4096 > "$TMP/limits-nobudget"
+expect_absent "A23 a declared subject with NO budget line is never compared" "check 6" 0 \
+  bash "$GATE" "$TMP/undeclared" "" "$TMP/hw-pair" "$TMP/limits-nobudget"
 
 # --- A1 · a file of exactly MAX_BYTES ----------------------------------------------------------
 mkfile "$LIMIT" "$TMP/at"

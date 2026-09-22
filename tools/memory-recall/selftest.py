@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """memory-recall kit self-test — the kit's own contract, stdlib only.
 
-    python memory-recall/selftest.py        # exit 0 = the kit's contract holds
+    python <kit>/selftest.py                       # exit 0 = the kit's contract holds
 
 What this gates is the KIT CONTRACT, not a recall floor. No adopter has a graded fixture, and a
 floor re-derived from the run it grades cannot fail, so there is no honest threshold to pin. What
@@ -24,6 +24,7 @@ import os
 import pathlib
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -31,9 +32,20 @@ import tempfile
 # ABOVE the sys.path insert: this file imports the same siblings query.py does, so without it the
 # gate leg itself drops __pycache__ into the adopter's worktree (spec F5/S12).
 sys.dont_write_bytecode = True
+
+# ALSO above it, and process-level rather than per-subprocess. TOOL-dRetiredFork-2, absorbed from
+# NicoCares `nc carve-out 17/20`; the sibling half lives in gen_build_index.py and the list is gov's
+# own from `.githooks/pre-push`. Every arm here builds a throwaway git repo, and `git init` under an
+# inherited GIT_DIR does not make a repo at the cwd — it RE-INITIALISES the repo GIT_DIR names. Run
+# from a hook, this suite would rewrite the caller's repository instead of its own fixture.
+for _leak in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+              "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX"):
+    os.environ.pop(_leak, None)
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import recall_conf  # noqa: E402
+import query  # noqa: E402
 
 KIT = pathlib.Path(__file__).resolve().parent
 SHIPPED = ("recall_conf.py", "extract.py", "bench.py", "union.py", "query.py", "selftest.py")
@@ -76,7 +88,8 @@ class _Skip(Exception):
 # ------------------------------------------------------------------ throwaway repo construction
 
 
-def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str | None = None):
+def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str | None = None,
+              flat: bool = False):
     """A git repo with the kit copied in, a two-record corpus, and NO __pycache__ ignore rule.
 
     The ignore rule is deliberately absent: `git status --porcelain` is also clean when a write was
@@ -93,8 +106,16 @@ def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str |
     for f in SHIPPED:
         shutil.copyfile(KIT / f, kitdir / f)
     (root / ".memory-tree.conf").write_text(conf, encoding="utf-8", newline="\n")
-    disc = root / "memory" / "tooling"
-    disc.mkdir(parents=True)
+    # `flat` writes <root>/DECISIONS.md, which is the layout the memory-tree kit's own adopter
+    # creates; the default writes <root>/<discipline>/DECISIONS.md, which is upstream's. `DURABLE`
+    # must admit BOTH, and until this parameter existed every fixture here was nested, so the
+    # pattern's failure on a flat root was invisible to this suite as well as to the product.
+    if flat:
+        disc = root / "memory"
+        disc.mkdir(parents=True)
+    else:
+        disc = root / "memory" / "tooling"
+        disc.mkdir(parents=True)
     (disc / "DECISIONS.md").write_text(CORPUS, encoding="utf-8", newline="\n")
     if gitignore is not None:
         (root / ".gitignore").write_text(gitignore, encoding="utf-8", newline="\n")
@@ -140,15 +161,47 @@ def cache_of(root: pathlib.Path) -> pathlib.Path:
     return git_common_dir(root) / "recall" / "cache" / key
 
 
+# Every root `cleanup()` was ASKED to remove. The final arm re-checks them, because the defect
+# this tracking exists for is a removal that reports success and leaves the directory standing.
+_SWEPT: list[pathlib.Path] = []
+
+
+def _set_writable(func, path, _exc):
+    """rmtree error hook: clear the read-only bit, then retry the operation that failed.
+
+    NOT `ignore_errors=True`. These fixtures are git repositories, and git writes loose objects
+    and packfiles READ-ONLY. On Windows `os.unlink` of a read-only file raises PermissionError,
+    which `ignore_errors` swallows -- so the tree survives and the caller believes it was
+    removed. That is TOOL-aBranchedMandate-6: 3,616 residues measured on node `a` on 2026-08-17,
+    4,905 by 2026-08-20. `.git` is the only read-only thing in these fixtures, which is why the
+    same idiom works for the plain-JSONL scratch dirs and fails only here.
+
+    Same shape as `query.py:_remove_cache_dir`, which carries the measured argument against
+    `ignore_errors=True` on this platform: a failure is reported, never silently absorbed.
+    """
+    try:
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+    except OSError:
+        pass          # the final arm re-checks existence; this hook never decides the verdict
+
+
 def cleanup(root: pathlib.Path) -> None:
-    shutil.rmtree(root, ignore_errors=True)
+    _SWEPT.append(root)
+    # `onexc` replaced `onerror` in 3.12 and `onerror` is deprecated there. Feature-detected
+    # rather than version-pinned: this kit ships to adopters whose python this repo does not pick.
+    key = 'onexc' if sys.version_info >= (3, 12) else 'onerror'
+    try:
+        shutil.rmtree(root, **{key: _set_writable})
+    except OSError:
+        pass          # survivors are the final arm's business, not an exception here
 
 
 # ------------------------------------------------------------------------------------ the arms
 
 
 @check("conf parser == bash (the grammar's documented cases)")
-def t_parser_vs_bash():
+def test_parser_vs_bash():
     """Asserted against BASH, never against a second Python parser.
 
     `recall_conf.load_conf` is a copy of codebase-map's twenty-line parser (kits are copied into
@@ -189,7 +242,7 @@ def t_parser_vs_bash():
 
 
 @check("no conf: query.py refuses, names memory-tree, prints a usable stub, creates nothing")
-def t_no_conf_query():
+def test_no_conf_query():
     root, kitdir = make_repo()
     try:
         (root / ".memory-tree.conf").unlink()
@@ -219,7 +272,7 @@ def t_no_conf_query():
 
 
 @check("no conf: adopt-memory-recall.sh refuses and creates nothing")
-def t_no_conf_adopt():
+def test_no_conf_adopt():
     bash = shutil.which("bash")
     if not bash:
         raise _Skip("no bash on PATH")
@@ -240,7 +293,7 @@ def t_no_conf_adopt():
 
 
 @check("index builds and ranks with NO alias data (the empty-alias path is first class)")
-def t_empty_alias():
+def test_empty_alias():
     root, kitdir = make_repo()
     try:
         proc = run(root, kitdir, *Q)
@@ -258,8 +311,166 @@ def t_empty_alias():
         cleanup(root)
 
 
+SPINE_RE = re.compile(r"^spine\s+(\d+) docs", re.M)
+
+
+def _measure_spine_docs(root: pathlib.Path, kitdir: pathlib.Path) -> tuple[int, str]:
+    """Run extract.py and return (spine doc count, stderr)."""
+    out = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-spine-"))
+    try:
+        ex = run(root, kitdir, str(root), str(out), script="extract.py")
+        m = SPINE_RE.search(ex.stdout)
+        assert m, f"no spine row in extract output:\n{ex.stdout}\n{ex.stderr}"
+        return int(m.group(1)), ex.stderr
+    finally:
+        cleanup(out)
+
+
+@check("spine is NON-EMPTY on a FLAT memory root — the layout this kit's own adopter writes")
+def test_spine_flat_layout():
+    """The shipped `DURABLE` required a directory segment between the root and the index file.
+
+    A flat root has none, so `spine` was empty here and in every adopter with a flat tree, for a
+    month, with nothing saying so. This arm was observed RED against the shipped pattern before it
+    was written: it reported 0 docs and the assertion below fired.
+    """
+    root, kitdir = make_repo(flat=True)
+    try:
+        n, err = _measure_spine_docs(root, kitdir)
+        assert n > 0, f"spine is EMPTY on a flat root — DURABLE does not admit <root>/DECISIONS.md\n{err}"
+        assert "EMPTY SPINE" not in err, f"non-empty spine must not print the diagnosis:\n{err}"
+        return f"flat root yields {n} spine doc(s)"
+    finally:
+        cleanup(root)
+
+
+@check("spine is still NON-EMPTY on a NESTED root — the widening trades no layout for the other")
+def test_spine_nested_layout():
+    root, kitdir = make_repo()  # nested, upstream's shape
+    try:
+        n, err = _measure_spine_docs(root, kitdir)
+        assert n > 0, f"the widened DURABLE stopped matching the nested layout\n{err}"
+        return f"nested root yields {n} spine doc(s)"
+    finally:
+        cleanup(root)
+
+
+@check("DURABLE is DERIVED from FAMILIES, not a literal — the pattern moves with the conf")
+def test_durable_derives_families():
+    """A literal family list would ship THIS repo's four prefixes into every adopter's kit.
+
+    The observation is that the compiled pattern CHANGES when the stub conf's FAMILIES changes.
+    Reading the pattern out of the module under two confs is the only way to see that; asserting on
+    spine counts alone would pass for a hard-coded list as readily as for a derived one.
+    """
+    snippet = (
+        "import sys; sys.dont_write_bytecode = True\n"
+        "sys.path.insert(0, sys.argv[1])\n"
+        "import extract\n"
+        "print(extract.DURABLE.pattern)\n"
+    )
+    pats = {}
+    for tag, fam in (("a", "tooling:TOOL"), ("b", "widgets:WDGT")):
+        root, kitdir = make_repo(conf=f'MEMORY_ROOT=memory\nFAMILIES="{fam}"\n')
+        try:
+            p = subprocess.run([sys.executable, "-c", snippet, str(kitdir)],
+                               cwd=str(root), capture_output=True, text=True)
+            assert p.returncode == 0, f"could not read DURABLE under {fam}:\n{p.stderr}"
+            pats[tag] = p.stdout.strip()
+        finally:
+            cleanup(root)
+    assert pats["a"] != pats["b"], (
+        "DURABLE did not move with FAMILIES — the alternation is a literal, and this kit would "
+        f"ship gov's own prefixes to every adopter:\n{pats['a']}"
+    )
+    assert "TOOL" in pats["a"] and "WDGT" in pats["b"], (
+        f"the declared family is absent from the compiled pattern:\n{pats['a']}\n{pats['b']}"
+    )
+    assert "WDGT" not in pats["a"], "a family the conf did not declare leaked into the pattern"
+    return "the compiled pattern follows the declared FAMILIES"
+
+
+@check("an empty spine beside non-empty records ANNOUNCES itself on stderr, and exits 0")
+def test_empty_spine_is_loud():
+    """The state that was silent for a month. A print, not a refusal, matching zero_record_diagnosis.
+
+    The fixture is a corpus whose records anchor in a file `DURABLE` does not admit at any layout,
+    so records are non-empty and spine is empty — the exact shape that shipped.
+    """
+    root, kitdir = make_repo()
+    try:
+        # Move the corpus to a name no index alternation admits: records still extract from it,
+        # but it is not a durable HOME.
+        src = root / "memory" / "tooling" / "DECISIONS.md"
+        dst = root / "memory" / "tooling" / "notes.md"
+        src.rename(dst)
+        subprocess.run(["git", "-C", str(root), "add", "-A"], check=True, capture_output=True)
+        out = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-spine-"))
+        try:
+            ex = run(root, kitdir, str(root), str(out), script="extract.py")
+            assert ex.returncode == 0, f"a print, not a refusal — got {ex.returncode}\n{ex.stderr}"
+            m = SPINE_RE.search(ex.stdout)
+            assert m and int(m.group(1)) == 0, f"wrong fixture: spine is not empty\n{ex.stdout}"
+            assert "EMPTY SPINE" in ex.stderr, f"the silent empty stayed silent:\n{ex.stderr}"
+            assert "DURABLE" in ex.stderr, "the diagnosis does not name the pattern"
+            assert "MEMORY_ROOT" in ex.stderr, "the diagnosis does not name the resolved root"
+            return "diagnosed on stderr, exit 0"
+        finally:
+            cleanup(out)
+    finally:
+        cleanup(root)
+
+
+
+@check("the served chunk arm is ROLLED UP: at most one hit per parent, both key branches")
+def test_chunk_arm_rolls_up():
+    """`run_rollup` keeps the best hit per parent, and BOTH branches of the parent key are covered.
+
+    The key is `hit["id"] or hit["path"]`. Measured over the tracked corpus, 129 of 20056 chunk
+    documents carry a record id, so for 99.4% of the served arm this is a per-PATH cap and an arm
+    over the 0.6% would certify nothing about the rest.
+
+    Corpus-independent: it drives `query.run_rollup` on synthetic hit dicts, so it cannot rot with
+    the memory tree, and it is a pure function so no index is built.
+    """
+    rr = query.run_rollup
+
+    # (a) ANCHORED — several hits sharing one record id collapse to the first, and a second record
+    #     survives. The id, not the path, is doing the work: all three sit in one file.
+    anchored = [
+        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 1},
+        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 40},
+        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 90},
+        {"id": "TOOL-x-2", "path": "memory/a.md", "line": 120},
+    ]
+    got = rr(anchored, 20)
+    assert [h["id"] for h in got] == ["TOOL-x-1", "TOOL-x-2"], got
+    assert got[0]["line"] == 1, "the rollup must keep the BEST-RANKED hit, not the last"
+
+    # (b) UNANCHORED — the branch the corpus actually takes. No `id` at all, so the key degrades to
+    #     the path and the cap is one hit per FILE.
+    unanchored = [
+        {"path": "memory/guides/long.md", "line": 1},
+        {"path": "memory/guides/long.md", "line": 200},
+        {"path": "memory/guides/long.md", "line": 400},
+        {"path": "memory/guides/other.md", "line": 5},
+    ]
+    got = rr(unanchored, 20)
+    assert [h["path"] for h in got] == ["memory/guides/long.md", "memory/guides/other.md"], got
+    assert got[0]["line"] == 1, got
+
+    # (c) the cap still bounds the result, and a MIXED list keys each hit on its own branch.
+    mixed = anchored + unanchored
+    assert len(rr(mixed, 2)) == 2, "k must bound the rolled-up list"
+    assert len(rr(mixed, 20)) == 4, rr(mixed, 20)
+
+    # (d) an empty ranking rolls up to an empty list rather than raising.
+    assert rr([], 20) == []
+    return "one hit per parent on both key branches, capped"
+
+
 @check("mis-declared FAMILIES is LOUD: zero records diagnosed, not reported as success")
-def t_zero_records_is_loud():
+def test_zero_records_is_loud():
     root, kitdir = make_repo(conf='MEMORY_ROOT=memory\nFAMILIES="tooling:ZZZZ"\n')
     try:
         proc = run(root, kitdir, *Q)
@@ -290,7 +501,7 @@ def t_zero_records_is_loud():
 
 
 @check("an EMPTY corpus is diagnosed too, and names MEMORY_ROOT — FAMILIES cannot cause it")
-def t_empty_corpus_names_memory_root():
+def test_empty_corpus_names_memory_root():
     """A one-character MEMORY_ROOT typo produced 0 records + 0 chunks, 0 hits and exit 0.
 
     The old guard read `if n_records or not n_chunks: return None`, so the one state the record
@@ -313,7 +524,7 @@ def t_empty_corpus_names_memory_root():
 
 
 @check("conf_digest joins freshness: a FAMILIES edit rebuilds, and the repair rebuilds back")
-def t_conf_digest_both_directions():
+def test_conf_digest_both_directions():
     """The blocker. The corpus digest is mtime+size over the tree's .md files, so a conf edit never
     enters it; without conf_digest in the manifest the S7 remediation is a silent no-op in BOTH
     directions — the diagnosis fires, the adopter fixes the conf, and the cache keeps answering.
@@ -340,7 +551,7 @@ def t_conf_digest_both_directions():
 
 
 @check("the KIT VERSION is inside conf_digest, so a grammar edit cannot leave a cache warm")
-def t_digest_covers_kit_version():
+def test_digest_covers_kit_version():
     """`digest()`'s docstring promises "an id-grammar or corpus-root edit invalidates a warm cache".
 
     The blob hashed `memory_root`, `families` and `node_tag_class` — and the ERAS, which are half the
@@ -373,7 +584,7 @@ def t_digest_covers_kit_version():
 
 
 @check("a query writes NOTHING in the worktree — asserted by path, with no ignore rule present")
-def t_writes_nothing_in_worktree():
+def test_writes_nothing_in_worktree():
     root, kitdir = make_repo()
     try:
         assert not (root / ".gitignore").exists(), "fixture must carry no ignore rule"
@@ -397,7 +608,7 @@ def t_writes_nothing_in_worktree():
 
 
 @check("an alias file dropped in the kit dir rebuilds the cache and lands in the manifest")
-def t_alias_rebuild():
+def test_alias_rebuild():
     root, kitdir = make_repo()
     try:
         run(root, kitdir, *Q)
@@ -426,7 +637,7 @@ def t_alias_rebuild():
 
 
 @check("an alias layer that joins to ZERO records is diagnosed, not silently dead")
-def t_dead_alias_is_loud():
+def test_dead_alias_is_loud():
     """`query.py` discarded `join_aliases`' return, so a 100%-dead alias column was reported
     NOWHERE — the dead-plumbing class one layer inside the tool built to close it. An adopter
     authoring aliases against the wrong id family gets a silently empty third FTS5 column whose
@@ -472,7 +683,7 @@ def t_dead_alias_is_loud():
 
 
 @check("cache eviction: dead worktree evicted, live worktree kept, no-manifest NEVER evicted")
-def t_eviction():
+def test_eviction():
     """One predicate read in two directions: rebuild MINE, never delete THEIRS.
 
     The builder writes both .db files BEFORE the manifest, deliberately and atomically, so a
@@ -550,7 +761,7 @@ def _budget_conf(mb: str) -> str:
 
 
 @check("the cache budget evicts least-recently-built first and stops at the budget")
-def t_budget_lru():
+def test_budget_lru():
     root, kitdir = make_repo(conf=_budget_conf("0.4"))
     try:
         run(root, kitdir, *Q)
@@ -570,7 +781,7 @@ def t_budget_lru():
 
 
 @check("a mid-build and a built_at-less cache survive a run that DID evict something")
-def t_budget_protections():
+def test_budget_protections():
     root, kitdir = make_repo(conf=_budget_conf("0.5"))
     try:
         run(root, kitdir, *Q)
@@ -591,7 +802,7 @@ def t_budget_protections():
 
 
 @check("a real build WRITES the marker and removes it when it finishes")
-def t_build_marker_lifecycle():
+def test_build_marker_lifecycle():
     """THE PRODUCER, armed. Every other marker arm plants the file by hand, so replacing
     `marker.write_text(...)` with `pass` left the whole suite green — the consumer was covered and the
     thing that feeds it was not. Both halves are asserted from ONE real build: the marker exists while
@@ -628,7 +839,7 @@ def t_build_marker_lifecycle():
 
 
 @check("a build in flight survives, in every phase the mtime test cannot see")
-def t_budget_build_in_flight():
+def test_budget_build_in_flight():
     """THE STATE TABLE. The mtime predicate is True only from the first new database byte until the
     manifest is replaced. Measured phase-by-phase against a real rebuild, it is FALSE during
     extraction (31% of the build), FALSE in the window where _write_set has unlinked a database and
@@ -661,7 +872,7 @@ def t_budget_build_in_flight():
 
 
 @check("an ABANDONED build stops protecting its directory")
-def t_budget_marker_ttl():
+def test_budget_marker_ttl():
     """Without a TTL a killed builder's marker would protect that directory forever, and the budget
     would quietly stop being a budget. The two siblings differ ONLY in marker age."""
     root, kitdir = make_repo(conf=_budget_conf("0.3"))
@@ -682,7 +893,7 @@ def t_budget_marker_ttl():
 
 
 @check("an unsatisfiable budget reports the shortfall and deletes NOTHING")
-def t_budget_cannot_satisfy():
+def test_budget_cannot_satisfy():
     root, kitdir = make_repo(conf=_budget_conf("0.3"))
     try:
         run(root, kitdir, *Q)
@@ -701,7 +912,7 @@ def t_budget_cannot_satisfy():
 
 
 @check("a build that starts AFTER the plan is made is not deleted by it")
-def t_budget_recheck_before_delete():
+def test_budget_recheck_before_delete():
     """THE DELETION-TIME RE-CHECK, actually reached.
 
     The first cut planted the marker before the run, which excludes the directory at the CANDIDATE
@@ -751,7 +962,7 @@ def t_budget_recheck_before_delete():
 
 
 @check("a blank RECALL_CACHE_BUDGET_MB runs no size-based eviction at all")
-def t_budget_blank():
+def test_budget_blank():
     root, kitdir = make_repo(conf=_budget_conf(""))
     try:
         run(root, kitdir, *Q)
@@ -802,7 +1013,7 @@ def settings_merge_src() -> pathlib.Path | None:
 
 
 @check("every invocation the CLI and the --with-hook remedy print resolves to a real file")
-def t_printed_invocations_resolve():
+def test_printed_invocations_resolve():
     """The fixture kit dir is spelled like NEITHER layout, so a baked-in path cannot pass by luck.
 
     Not `memory-recall`: WIRE §3c step 1 mandates exactly that name in an adopter, so a fixture
@@ -823,12 +1034,14 @@ def t_printed_invocations_resolve():
         answered = run(root, kitdir, *Q)
         assert refused.returncode == 2 and "--terms" in refused.stderr
         # The hook opt-in's remedy is the kit's OTHER printed invocation, and it was the one naming
-        # a path no runbook step created (errno 2 when run verbatim). The fixture is built to the
-        # post-WIRE state — §3c step 4 copies the wiring tool into <project>/tools/ — so the remedy
-        # is checked against the tree the runbook actually produces.
+        # a path no runbook step created (errno 2 when run verbatim). THE MERGER GOES BESIDE THE KIT,
+        # not under a `tools/` this fixture has no kit in: `make_repo` installs the fixture kit at the
+        # ROOT, so the adopter derives an EMPTY tool root and `settings_merge_src` looks at the kit's
+        # own parent. A `tools/`-prefixed copy models neither layout WIRE §3c supports — it was
+        # reachable only while the adopter hardcoded `tools/` too, and two agreeing hardcodes are not
+        # a passing test. TOOL-cMendedVintage-4 removed one and this fixture was the other.
         copy_extra(kitdir, *SURFACE)
-        (root / "tools").mkdir()
-        shutil.copyfile(smerge, root / "tools" / "settings-merge.py")
+        shutil.copyfile(smerge, root / "settings-merge.py")
         hooked = adopt(root, kitdir, "--scaffold", "--with-hook")
         assert hooked.returncode == 0, f"{hooked.stdout}{hooked.stderr}"
         for proc in (helped, refused, answered, hooked):
@@ -861,7 +1074,7 @@ def t_printed_invocations_resolve():
 
 
 @check("adopt --check runs with `python` off PATH and only `python3` available")
-def t_python3_only():
+def test_python3_only():
     """A node with both binaries can never see this defect, so PATH is cut down to prove it."""
     bash = shutil.which("bash")
     git = shutil.which("git")
@@ -909,8 +1122,8 @@ def t_python3_only():
         cleanup(shimdir)
 
 
-@check("adopt --scaffold converges byte-identically, and copies NO hook without --with-hook")
-def t_scaffold_converges():
+@check("adopt --scaffold converges byte-identically, and --with-hook copies no hook anywhere")
+def test_scaffold_converges():
     """AC8 and the opt-in half of AC13.
 
     A hook file copied in but never merged into settings.json reads as UNWIRED forever, in the repo
@@ -933,16 +1146,23 @@ def t_scaffold_converges():
         assert not (root / ".claude" / "hooks").exists(), "a hook was installed without --with-hook"
         with_hook = adopt(root, kitdir, "--scaffold", "--with-hook")
         assert with_hook.returncode == 0, f"{with_hook.stdout}{with_hook.stderr}"
-        hook = root / ".claude" / "hooks" / "recall-opened.js"
-        assert hook.read_bytes() == (KIT / "recall-opened.js").read_bytes(), "hook copy differs"
+        # --with-hook COPIES NOTHING NOW. TOOL-dRetiredFork-21: the hook ships in the kit directory
+        # and is wired there, so the old behaviour -- copying it into `.claude/hooks/` -- re-created
+        # the exact duplicate TOOL-dRetiredFork-14 withdrew. This arm asserted the copy existed, so
+        # it was pinning the defect in place.
+        assert not (root / ".claude" / "hooks").exists(), \
+            "--with-hook re-created .claude/hooks/, the destination gov withdrew"
+        assert (kitdir / "recall-opened.js").exists(), "the shipped copy is missing from the kit dir"
+        assert "recall-opened.js is installed" in with_hook.stdout, \
+            "--with-hook does not name the copy it wired"
         assert "settings-merge.py --fragment" in with_hook.stdout, "no wiring instruction printed"
-        return f"{len(b1)} B skill, idempotent; hook absent until --with-hook"
+        return f"{len(b1)} B skill, idempotent; --with-hook wires the shipped copy and copies nothing"
     finally:
         cleanup(root)
 
 
 @check("a FAMILIES edit nobody re-rendered reds --check and shows the stale description")
-def t_skill_drift_reds():
+def test_skill_drift_reds():
     root, kitdir = make_repo()
     try:
         copy_extra(kitdir, *SURFACE)
@@ -1013,7 +1233,7 @@ def test_crlf_working_copy_is_not_drift():
 
 
 @check("the rendered Skill augments grep, prints only real flags, and claims no kickoff step")
-def t_skill_description_invariants():
+def test_skill_description_invariants():
     """AC18's three invariants, all of one class: the description is the whole trigger mechanism.
 
     The flag set is imported from query.py rather than restated here — a second copy of that tuple
@@ -1073,7 +1293,7 @@ def t_skill_description_invariants():
 
 
 @check("recall-opened.test.sh: the hook records a rank on ANY corpus root")
-def t_hook_test():
+def test_hook_test():
     bash = shutil.which("bash")
     if not bash:
         raise _Skip("no bash on PATH")
@@ -1088,7 +1308,7 @@ def t_hook_test():
 
 
 @check("kit version constant and the gov:kit marker agree")
-def t_version_marker():
+def test_version_marker():
     v = recall_conf.KIT_MEMORY_RECALL_VERSION
     assert re.fullmatch(r"\d+\.\d+", v), f"version {v!r} is not the house two-part X.Y"
     hits = []
@@ -1102,12 +1322,19 @@ def t_version_marker():
     return f"{len(hits)} marker(s) == {v}"
 
 
-@check("bench.py and union.py are byte-identical to the upstream copies they were taken from")
-def t_verbatim_files():
+@check("union.py is byte-identical upstream; bench.py matches its recorded digest (one delta)")
+def test_verbatim_files():
     """Not a diff against upstream (no adopter has that repo) — a diff against the recorded digest.
 
-    These two carry no coupling on the query path, so they are re-pulled WHOLESALE on an upstream
-    fix rather than merged. An edit here means somebody forked them without saying so.
+    `union.py` carries no coupling on the query path, so it is re-pulled WHOLESALE on an upstream
+    fix rather than merged. An unexplained edit there means somebody forked it without saying so.
+
+    **`bench.py` IS forked, by one hunk.** `TOOL-dTracedLattice-7` made `run_rm3`'s expansion-term
+    selection independent of `PYTHONHASHSEED`; the file's own header says so. So a red here on
+    `bench.py` does NOT mean "re-pull it wholesale" — that would revert the fix and this pin would
+    then go GREEN over the revert. It means the digest and the file disagree: re-read the header,
+    keep the delta, and re-stamp. This label used to instruct the wholesale re-pull, and it is the
+    line an operator reads at the exact moment the pin reds.
     """
     pins = json.loads((KIT / "verbatim.json").read_text(encoding="utf-8"))
     bad = []
@@ -1121,7 +1348,7 @@ def t_verbatim_files():
 
 
 @check("the whole selftest passes from the ADOPTER layout (kit at <root>/memory-recall/)")
-def t_adopter_layout():
+def test_adopter_layout():
     """The layout the runbook ships, on the merge bar — because a gate green only in the repo that
     authored it is the third-shape defect this kit exists to prevent.
 
@@ -1137,10 +1364,11 @@ def t_adopter_layout():
         # The WHOLE kit, not just SHIPPED: the surface arms read README.md, verbatim.json, the
         # template and the hook test from their own kit dir.
         shutil.copytree(KIT, kitdir, ignore=shutil.ignore_patterns("__pycache__"), dirs_exist_ok=True)
-        (root / "tools").mkdir(exist_ok=True)
         smerge = settings_merge_src()
         if smerge is not None:
-            shutil.copyfile(smerge, root / "tools" / "settings-merge.py")
+            # Beside the kit, for the same reason as the arm above: the nested run's own
+            # `settings_merge_src` resolves against ITS kit's parent, which is this root.
+            shutil.copyfile(smerge, root / "settings-merge.py")
         proc = subprocess.run(
             [sys.executable, str(kitdir / "selftest.py")], cwd=str(root),
             env=dict(os.environ, MRECALL_NESTED="1"), capture_output=True, text=True,
@@ -1159,10 +1387,6 @@ def t_adopter_layout():
 # ------------------------------------------------------------------------------------ the runner
 
 
-# These three are `test_*` where every sibling is `t_*`, and the inconsistency is deliberate.
-# The lexicon gate pins verb offenders shrink-only, `t` is not in the declared VERBS table and
-# `test` is, so the existing arms sit UNDER the pin as legacy and three more would push it over.
-# Renaming the siblings is that kit's shrink work, not this unit's.
 @check("a DECLARED conf source reaches the corpus as chunks, and un-declaring returns it")
 def test_declared_sources_reach_the_corpus():
     """S6's reproduction, as an arm. The corpus is rooted at MEMORY_ROOT, so a constraint DECLARED in
@@ -1267,6 +1491,76 @@ def test_one_walk_two_callers():
         cleanup(root)
 
 
+@check("repo_root() resolves the root from inside a LINKED WORKTREE with GIT_DIR inherited")
+def test_repo_root_linked_worktree():
+    """TOOL-aCollapsedScan-7. Git exports an absolute GIT_DIR to a merge driver, and under it
+    `git -C <dir> rev-parse --show-toplevel` returns <dir> ITSELF rather than the root.
+
+    THE ARM BUILDS A WORKTREE because the precondition IS a worktree, measured with a control: in
+    an ordinary clone git exports no GIT_DIR and the defect is ABSENT, so a fixture in a plain
+    scratch repo cannot fail before the fix and proves nothing after it. Observed RED against the
+    pre-fix function, which returned the KIT directory here - which is what made extract.py's
+    import-time CONF raise and the row-keyed merge driver write conflict markers on every merge of
+    `memory/DECISIONS.md` and `memory/backlog/*.md` inside a worktree.
+    """
+    root, kitdir = make_repo()
+    wt = root.parent / (root.name + "-wt")
+    try:
+        git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
+        subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
+        gitdir = subprocess.run(
+            ["git", "-C", str(wt), "rev-parse", "--absolute-git-dir"],
+            check=True, capture_output=True, text=True,
+        ).stdout.strip()
+        env = dict(os.environ, GIT_DIR=gitdir)
+        env.pop("GIT_WORK_TREE", None)
+        out = subprocess.run(
+            [sys.executable, "-c",
+             "import sys;sys.path.insert(0, sys.argv[1]);import recall_conf;"
+             "print(recall_conf.repo_root().as_posix())",
+             str(wt / kitdir.name)],
+            cwd=str(wt), env=env, capture_output=True, text=True,
+        )
+        got = out.stdout.strip()
+        want = pathlib.Path(wt).resolve().as_posix()
+        if got != want:
+            raise AssertionError(
+                f"repo_root() returned {got!r}; want the worktree root {want!r}. "
+                f"stderr: {out.stderr.strip()[:300]}"
+            )
+        return "worktree root resolved under an inherited GIT_DIR"
+    finally:
+        # BOTH, through `cleanup`, and in this order. `wt` is a SIBLING of `root`, not a child, so
+        # sweeping root alone leaves a registered worktree standing - and `cleanup` is what appends
+        # to `_SWEPT`, so a bare rmtree would leave the residue arm blind to whether either went.
+        cleanup(wt)
+        cleanup(root)
+
+
+@check("extract.py refuses a flag in a positional PATH slot rather than materialising it")
+def test_extract_rejects_flag_in_path_slot():
+    """A FLAG IS NOT A PATH, and this script guarded its argv by ARITY alone.
+
+    `extract.py <repo> --help` is a well-formed three-argument call, so `--help` reached
+    `outdir` and `mkdir(parents=True)` CREATED A DIRECTORY named `--help`, exit 0. The sibling
+    instance in the lexicon kit's scaffolder wrote a FILE by the same route, and that one
+    was committed and pushed to a real adopter before anyone noticed. A path whose name is a
+    flag also breaks every unquoted glob in its directory from then on, and a directory is the
+    worse half: `rm -rf --help` does not remove it either.
+    """
+    root, kitdir = make_repo()
+    try:
+        proc = run(root, kitdir, str(root), "--help", script="extract.py")
+        assert proc.returncode != 0, f"exited 0 on a flag outdir: {proc.stdout[-300:]}"
+        assert not (root / "--help").exists(), "materialised a path named '--help'"
+        out = (proc.stdout + proc.stderr).lower()
+        assert "flag" in out or "usage" in out, f"unnamed refusal: {out[-300:]}"
+        return f"rc={proc.returncode}, nothing materialised"
+    finally:
+        cleanup(root)
+
+
 def main() -> int:
     # The live log of the repo this kit sits in, hashed before and after: a gate that writes to the
     # instrument it measures is how upstream's log came to be 96% self-inflicted refusals.
@@ -1277,19 +1571,22 @@ def main() -> int:
         live, before = None, "(absent)"
 
     order = [
-        t_parser_vs_bash, t_no_conf_query, t_no_conf_adopt, t_empty_alias,
-        t_zero_records_is_loud, t_empty_corpus_names_memory_root,
-        t_conf_digest_both_directions, t_digest_covers_kit_version, t_writes_nothing_in_worktree,
-        t_alias_rebuild, t_dead_alias_is_loud, t_eviction, t_printed_invocations_resolve,
-        t_budget_lru, t_budget_protections, t_build_marker_lifecycle,
-        t_budget_build_in_flight, t_budget_marker_ttl,
-        t_budget_cannot_satisfy, t_budget_recheck_before_delete, t_budget_blank,
-        t_python3_only,
-        t_scaffold_converges, t_skill_drift_reds, test_crlf_working_copy_is_not_drift,
-        t_skill_description_invariants, t_hook_test,
-        t_version_marker, t_verbatim_files, t_adopter_layout,
+        test_parser_vs_bash, test_no_conf_query, test_no_conf_adopt, test_empty_alias,
+        test_spine_flat_layout, test_spine_nested_layout, test_durable_derives_families, test_chunk_arm_rolls_up,
+        test_empty_spine_is_loud,
+        test_zero_records_is_loud, test_empty_corpus_names_memory_root,
+        test_conf_digest_both_directions, test_digest_covers_kit_version, test_writes_nothing_in_worktree,
+        test_alias_rebuild, test_dead_alias_is_loud, test_eviction, test_printed_invocations_resolve,
+        test_budget_lru, test_budget_protections, test_build_marker_lifecycle,
+        test_budget_build_in_flight, test_budget_marker_ttl,
+        test_budget_cannot_satisfy, test_budget_recheck_before_delete, test_budget_blank,
+        test_python3_only,
+        test_scaffold_converges, test_skill_drift_reds, test_crlf_working_copy_is_not_drift,
+        test_skill_description_invariants, test_hook_test,
+        test_version_marker, test_verbatim_files, test_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
         test_undeclared_file_stays_out, test_one_walk_two_callers,
+        test_repo_root_linked_worktree, test_extract_rejects_flag_in_path_slot,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
 
@@ -1300,6 +1597,33 @@ def main() -> int:
             if after == before
             else ("FAIL", "the live query log is byte-identical after this run", "the gate wrote to it")
         )
+
+    # TOOL-dRetiredFork-2 — the git-environment scrub at the top of this file, asserted rather than
+    # trusted. Appended here for the same reason the sweep below is: it is a property of the RUN.
+    # Every arm above built a throwaway repo, and `git init` under an inherited GIT_DIR does not
+    # make a repo at the cwd — it RE-INITIALISES the repo GIT_DIR names, so run from a hook this
+    # suite would rewrite the caller's repository. The scrub is process-level, so the assertion is
+    # that the variables are gone from THIS process by the time any arm ran.
+    _still_set = [k for k in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+                              "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE",
+                              "GIT_PREFIX") if k in os.environ]
+    _checks.append(
+        ("ok", "git's exported repository pointers were scrubbed before any arm ran", "8 checked")
+        if not _still_set
+        else ("FAIL", "git's exported repository pointers were scrubbed before any arm ran",
+              f"still set: {', '.join(_still_set)}")
+    )
+
+    # The scratch sweep, asserted rather than assumed - the shape test_recall_floor.py already
+    # uses. Appended after the arity assert on purpose: it is a property of the RUN, not a
+    # declared arm, so it must not move the declared-vs-ran count.
+    _leaked = [d for d in _SWEPT if d.exists()]
+    _checks.append(
+        ("ok", "every scratch repo this run created was removed", f"{len(_SWEPT)} swept")
+        if not _leaked
+        else ("FAIL", "every scratch repo this run created was removed",
+              f"{len(_leaked)} of {len(_SWEPT)} survived, first: {_leaked[0]}")
+    )
 
     for state, name, detail in _checks:
         print(f"{state:<5}{name}" + (f" — {detail}" if detail else ""))

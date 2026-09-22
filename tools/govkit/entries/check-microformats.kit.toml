@@ -1,0 +1,53 @@
+# kit.toml — the micro-format definition gate, declared as data. Read by tools/govkit/.
+#
+# A FLAT entry, modelled on check-placeholders: the gate, its self-test and its subject are all
+# depth-1 paths under tools/, and selfcheck reds on any such path no entry claims.
+#
+# NOT conditional, since TOOL-aHonedRuleset-8. This gate grades a block inside the SHIPPED charter,
+# so it travels WITH the charter: it is in the declared default selection, and `requires = ["playbook"]`
+# below states the dependency rather than gating the entry's reachability. The conditional mark it
+# used to carry made it reachable only by an operator who typed its id, which is a state no runbook
+# or default led anyone to — the gate existed, was declared, and reached nobody for its entire life.
+# A target that does not want it declines the same way it declines any other entry: by naming the
+# selection it does want.
+
+id = "check-microformats"
+scope = "repo"
+kind = "flat"
+home = "tools"
+requires = ["playbook"]
+# No constant: this gate versions with the CHARTER whose block it grades, not on its own clock. A
+# second version to keep in step would be a second thing to drift, and the grammar it enforces is
+# stated in that document rather than here.
+version_from = { none = "it grades a block in the charter and versions with it, carrying no independent constant" }
+
+[[files]]
+include = ["check-microformats.sh", "check-microformats.test.sh"]
+role = "engine"
+to = "{prefix}/{relpath}"
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "a gate needs no adoption step; it reads the charter template wherever the playbook entry put it"
+
+[check]
+none = """
+the gate IS the check. Running it over a target's own charter is what the gate leg does, and a second verb wrapping it would be one more thing to keep in step
+"""
+
+# THE SUBJECT IS PASSED, never defaulted, in a target. The gate's own default is gov's repo-root
+# filename, and the `playbook` entry lands the charter at the operator-chosen `{playbook_path}` — so
+# a leg carrying no argument resolved to a path no adopter has and exited 2 on install day
+# (reproduced in a scratch install). `{playbook_path}` is already an intake answer this entry's
+# `requires` guarantees; the plumbing existed and was simply not connected.
+[[gate_leg]]
+name = "micro-format definitions"
+subject = "repo"
+argv = ["bash", "{prefix}/check-microformats.sh", "{playbook_path}"]
+
+[[gate_leg]]
+name = "micro-format gate selftest"
+subject = "kit"
+argv = ["bash", "{prefix}/check-microformats.test.sh"]
+guard = ["{prefix}/check-microformats.sh", "{prefix}/check-microformats.test.sh"]

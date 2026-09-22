@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-1 · 2026-08-05 · node c · Tier-2 · base 42c3f4dc · dogfooded, 3 legs wired
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Port the inCMS `ARCH-bCandidLoupe-2/-3` drift-audit tooling into a project-agnostic kit, so any repo

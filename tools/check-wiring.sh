@@ -5,6 +5,9 @@
 #   check-wiring.sh            # --check (default): report; exit 1 if any installed tool is unwired
 #   check-wiring.sh --fix      # wire the safe cases (core.hooksPath when unset); exit reflects remainder
 #   check-wiring.sh --session  # like --fix but ALWAYS exit 0 — the SessionStart hook mode
+#   check-wiring.sh --resolve-fragment <f.fragment.json>   # print the fragment's hook path with
+#                              # {kit}/{here} expanded — the value the arms below decide on, twinned
+#                              # on settings-merge.py so the hook-destinations gate can assert parity
 #
 # SEVERITY IS A VOCABULARY, and only `UNWIRED` gates. `ok` / `skip` / `fixed` / `note` do not. `note`
 # is for a condition that is TRUE and worth printing but is not dormant wiring — today only the eol
@@ -17,20 +20,154 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.0
+KIT_CHECK_WIRING_VERSION=1.5   # gov:kit check-wiring@1.5 — the deployer's read
 set -u
+# ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
+# TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
+# bytes VERBATIM — so each one arrives unchanged in a target installed at another prefix and resolves
+# to nothing there. That is the fork class this build exists to stop manufacturing. The walk is the
+# unattended adopter's, copied rather than invented: a `.git` boundary walk from THIS file, because a
+# junctioned worktree makes a `${DIR#$ROOT/}` strip a no-op and `git rev-parse --show-prefix` answers
+# with a junction's TARGET.
+_HERE="$(cd "$(dirname "$0")" && pwd)"
+_KIT_ROOT=""; KIT_REL=""; _p="$_HERE"
+while : ; do
+  if [ -e "$_p/.git" ]; then _KIT_ROOT="$_p"; break; fi
+  _parent="$(dirname "$_p")"
+  [ "$_parent" = "$_p" ] && break
+  KIT_REL="$(basename "$_p")${KIT_REL:+/$KIT_REL}"
+  _p="$_parent"
+done
+# KIT_REL is this file's own directory relative to the repo root — `tools` here, whatever an adopter
+# installs it under there. Empty is legal AND reachable: TOOL-cMendedVintage-3 moved the `.git` test
+# ABOVE the append, so a ROOT install breaks on iteration one with no segment. It used to append
+# first and test the PARENT, so `$_p` was never tested as the root: a root install walked PAST the
+# repository to the filesystem root and handed every rung a prefix of directories ABOVE the tree —
+# measured as `c/Temp/kw3/repo`, and the agent-cap arm skipped `not adopted` over a hook that was
+# there. OUTSIDE a repo the walk still ends at the filesystem root with that same path in KIT_REL;
+# that is not fixed here because `--check` exits at `skip — not a git repo` before any rung reads it.
+KIT_REL=${KIT_REL:-}
 
-MODE=check
+# ---- S1: the settings file is RESOLVED, never spelled --------------------------------------------
+# gov hardcoded the settings path at ten sites. inCMS's live settings file sits OUTSIDE the
+# worktree on every one of its nodes BY DESIGN, so that spelling resolves to nothing there and every
+# arm below passed BY FINDING NO FILE — the worktree false-green recorded at ARCH-dBriskLanyard-1 S10.
+#
+# THE INVERSION FROM THE ADOPTER'S VERSION IS THE UNIT. Theirs returns an empty string when nothing
+# resolves; this one REFUSES. An empty string is precisely what let every downstream arm pass by
+# absence, so a path that resolves to nothing must be a refusal and not a non-match — the rule
+# TOOL-aBoundedCeiling-7 records for `.githooks/pre-push`.
+#
+# THE DECOY HAZARD, carried from the source that records it: a printed remedy can CREATE a settings
+# file at the worktree root, and a naive walk-up then finds the DECOY first and reports ok forever
+# over a machine-global hook nothing wired. Reproduced live at that adopter. So the walk stops at the
+# repo root rather than continuing to the filesystem root, and the override is checked FIRST: a
+# deliberate out-of-tree layout is declared, never discovered by walking past the boundary.
+GOV_SETTINGS_JSON=${GOV_SETTINGS_JSON:-}
+_SETTINGS_CACHE=""
+settings_json() {
+  [ -n "$_SETTINGS_CACHE" ] && { printf '%s\n' "$_SETTINGS_CACHE"; return 0; }
+  local cand="" _pref="$ROOT/.claude/settings.json"
+  if [ -n "$GOV_SETTINGS_JSON" ]; then
+    # DECLARED wins, and a declared path that is not there is a refusal rather than a fallthrough:
+    # silently ignoring it would resolve a DIFFERENT file than the operator named, and every arm
+    # would then be confidently wrong about the wrong file.
+    if [ ! -f "$GOV_SETTINGS_JSON" ]; then
+      echo "check-wiring: REFUSED — GOV_SETTINGS_JSON names $GOV_SETTINGS_JSON, which is not a file." >&2
+      return 2
+    fi
+    cand="$GOV_SETTINGS_JSON"
+  else
+    # The PREFERENCE RUNG, bound once above so this file spells the path exactly ONCE — which is
+    # what AC5 greps for, because byte-identity cannot catch a caller left on the literal here.
+    [ -f "$_pref" ] && cand="$_pref"
+  fi
+  if [ -z "$cand" ]; then
+    echo "check-wiring: REFUSED — no settings file resolved. Looked for GOV_SETTINGS_JSON, then" >&2
+    echo "  $_pref (the preference rung). A path that resolves to nothing is" >&2
+    echo "  a REFUSAL, not a non-match: every wiring arm below would otherwise pass by finding" >&2
+    echo "  no file, which is the worktree false-green this resolver exists to remove." >&2
+    return 2
+  fi
+  _SETTINGS_CACHE="$cand"
+  printf '%s\n' "$cand"
+}
+
+# ---- S2: is the resolved file inside the repo? REPORT, never RED (ratified F1) --------------------
+# A per-machine layout that keeps settings outside the worktree is deliberate at at least one
+# adopter, so this reports. A project that wants it RED promotes it through TOOL-dRetiredFork-16's
+# extension point rather than by changing this kit for everyone.
+render_settings_path() { # the resolved path as a reader wants it: relative in-tree, absolute out
+  local p; p=$(settings_json 2>/dev/null) || { printf '%s\n' "(unresolved)"; return 0; }
+  case "$p" in
+    "$ROOT"/*) printf '%s\n' "${p#"$ROOT"/}" ;;
+    *)         printf '%s\n' "$p" ;;
+  esac
+}
+
+check_settings_scope() {
+  local sj; sj=$1
+  case "$sj" in
+    "$ROOT"/*) echo "ok       settings  — resolved $sj (inside the repo root)" ;;
+    *)          echo "note     settings  — resolved $sj, which is OUTSIDE the repo root $ROOT. That is a"
+                echo "note     settings    legitimate per-machine layout and is reported, not failed. It is also the"
+                echo "note     settings    shape in which a hardcoded path silently graded nothing." ;;
+  esac
+}
+
+
+# ---- the fragment reader, ONE for every arm ------------------------------------------------------
+json_str() {  # value of a top-level "key": "..." in a small flat JSON file
+  sed -n 's|.*"'"$2"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*|\1|p' "$1" | head -1
+}
+# `{kit}` and `{here}` ARE EXPANDED HERE, at the one place the value is read. A fragment ships
+# verbatim, so it names its kit symbolically rather than spelling a prefix that is only correct in
+# gov; leaving a token unexpanded makes an arm test for a file literally called `{kit}/...` and
+# report a missing hook that is present. TOOL-dRetiredFork-14.
+# Both resolve against THE FRAGMENT WE FOUND, never against this script's own KIT_REL. Those differ
+# whenever the checker is run against a tree other than its own -- which is exactly what its
+# self-test does -- and gov's prefix applied to a foreign layout names a file nobody has. `{kit}` is
+# two dirnames up (a fragment sits at <kit>/<dir>/x.fragment.json), empty for a kit installed at
+# the repo root; `{here}` is the fragment's OWN directory, which is what a `kind = "flat"` kit needs
+# because its engine ships to `{prefix}/` and `{kit}` would name the prefix's PARENT there.
+# TOOL-aReplayedCard-2: this used to be two inline copies, one per arm, and a third reader in the
+# hook-destinations gate; it is one function now, printable through `--resolve-fragment`, so that
+# gate reads the value the arms decide on rather than deriving a fourth beside them.
+resolve_fragment_hook() { # fragment path -> its hook_path, tokens expanded; rc 1 + a reason on stderr when it declares none
+  local frag="$1" hp here kitpfx
+  # ONE spelling, repo-relative, whichever way the caller spelled the root: git's (`C:/…`) or the
+  # shell's own after the cd (`/c/…` under MSYS). Both readers must print the same bytes.
+  case "$frag" in
+    "${ROOT:-/nonexistent}"/*) frag=${frag#"$ROOT"/} ;;
+    "$PWD"/*)                  frag=${frag#"$PWD"/} ;;
+  esac
+  [ -f "$frag" ] || { echo "check-wiring: $frag is not a file" >&2; return 1; }
+  hp=$(json_str "$frag" hook_path)
+  [ -n "$hp" ] || { echo "check-wiring: $frag declares no hook_path" >&2; return 1; }
+  here=$(dirname "$frag"); [ "$here" = . ] && here=""
+  kitpfx=$(dirname "${here:-.}"); [ "$kitpfx" = . ] && kitpfx=""
+  printf '%s\n' "$hp" | sed -e "s|{kit}/|${kitpfx:+$kitpfx/}|g" -e "s|{here}/|${here:+$here/}|g"
+}
+
+MODE=check; FRAG_ARG=""
 case "${1:-}" in
   ""|--check) MODE=check ;;
   --fix)      MODE=fix ;;
   --session)  MODE=session ;;
-  *) echo "usage: $(basename "$0") [--check|--fix|--session]" >&2; exit 2 ;;
+  --resolve-fragment) MODE=resolve; FRAG_ARG=${2:-}
+    [ -n "$FRAG_ARG" ] || { echo "usage: $(basename "$0") --resolve-fragment <fragment.json>" >&2; exit 2; } ;;
+  *) echo "usage: $(basename "$0") [--check|--fix|--session|--resolve-fragment <fragment.json>]" >&2; exit 2 ;;
 esac
 
 # Not a git repo → nothing to wire; never an error (and never break session start).
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "skip     — not a git repo"; exit 0; }
 cd "$ROOT" || { [ "$MODE" = session ] && exit 0; exit 0; }
+
+# The print verb answers and leaves BEFORE the settings resolver and the arms run: it is a reader
+# of one fragment, and its output is compared byte-for-byte against settings-merge.py's.
+if [ "$MODE" = resolve ]; then
+  resolve_fragment_hook "$FRAG_ARG"; exit $?
+fi
 
 DO_FIX=0; case "$MODE" in fix|session) DO_FIX=1 ;; esac
 unwired=0
@@ -39,9 +176,15 @@ unwired=0
 abspath() { ( cd "$1" 2>/dev/null && pwd ); }
 
 # First of the candidates that is a file ("" if none).
+# STILL TWO RUNGS, and TOOL-dRetiredFork-8 measured why the obvious collapse is wrong. `KIT_REL` is
+# derived from where THIS SCRIPT lives, not from the tree it grades, and those differ exactly when it
+# matters: the self-test runs the real checker against root-install fixtures, and five recall arms
+# plus the two-layout arm went RED the moment the bare rung was dropped. What the derivation buys is
+# that the PREFIXED rung is no longer a literal `tools/` that ships verbatim and resolves to nothing
+# at another prefix; the root-install rung stays, waived as it always was.
 first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
 
-# THE wired signal, for every arm: the hook's marker substring present in .claude/settings.json —
+# THE wired signal, for every arm: the hook's marker substring present in the RESOLVED settings file —
 # INSIDE A GROUP WHOSE MATCHER IS THE ONE THE FRAGMENT DECLARES. settings-merge.py documents that
 # same substring as the deployer's is-it-wired test (its module docstring), so the marker half is the
 # one predicate stated once — not a second spelling of it. Reading it here also removes the
@@ -61,16 +204,28 @@ first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
 # EVERY matcher whose group carries the marker, one per line — not just the first. A settings.json
 # may legitimately hold several groups, and `settings-merge.py` ADDS the widened group rather than
 # migrating a stale one, so "the first group mentioning the hook" is the wrong question to ask.
-matchers_of() { # marker -> the matcher of each group carrying it (empty if the marker is absent)
-  [ -f .claude/settings.json ] || return 0
-  tr -d ' \t\r\n' < .claude/settings.json \
+matchers_of() { # marker [hook-basename] -> the matcher of each group carrying BOTH (empty if absent)
+  # A REFUSAL PROPAGATES. The retired form tested the settings path with `|| return 0`, so a
+  # missing file was indistinguishable from a present file with no matching group — which is the
+  # whole defect. Returning 2 keeps them apart even though `wired` treats both as not-wired.
+  local _sj; _sj=$(settings_json 2>/dev/null) || return 2
+  # `-e` BEFORE THE MARKER. The card markers are `--write` and `--replay`, dash-leading by design
+  # (they are the verb's own arguments), and a bare `grep -F "$1"` reads one as an OPTION: grep
+  # exits 2, the pipeline yields nothing, and every card check prints UNWIRED over a correctly
+  # merged file forever. TOOL-aReplayedCard-2.
+  # THE SECOND KEY, `$2`, is the hook's BASENAME, which the stripped view keeps intact: a bare-flag
+  # marker (`--write`) alone took an adopter's own `--write-log` hook for the card writer, in this
+  # reader and in the merger's (the aReplayedCard closing review, F5). Absent, it defaults to the
+  # marker itself, so a one-key caller filters twice on one key and reads exactly as before.
+  tr -d ' \t\r\n' < "$_sj" \
     | sed 's/{"matcher":/\n{"matcher":/g' \
     | sed 's/\].*$//' \
-    | grep -F "$1" \
+    | grep -F -e "$1" \
+    | grep -F -e "${2:-$1}" \
     | sed -n 's/^{"matcher":"\([^"]*\)".*/\1/p'
 }
-wired() { # marker · the matcher the fragment declares
-  [ -n "$2" ] && matchers_of "$1" | grep -qxF "$2"
+wired() { # marker · the matcher the fragment declares · [hook-basename]
+  [ -n "$2" ] && matchers_of "$1" "${3:-}" | grep -qxF "$2"
 }
 
 # The launcher named in a remedy string. It is PRINTED rather than run, which is exactly why it
@@ -89,6 +244,56 @@ else
   PY=python3   # gov:literal-python — printed in a remedy string, never executed; the resolver is not installed beside this script
 fi
 
+# TOOL-aWeldedTribunal-7 — WHICH HOOK WILL ACTUALLY RUN. `core.hooksPath` is repo-global and
+# absolute, so in a multi-worktree layout the hooks that gate a commit and a push come from whatever
+# the PRIMARY tree has checked out, NOT from the tree being worked in. Measured at
+# `TOOL-dUnstalledConvoy-26`'s landing: the primary tree sat on `contrib/incms-memory-recall`, so the
+# push ran that branch's `pre-push` — no gate-env sourcing, no predicate 8, and the boundary's own
+# coverage check simply absent. Nothing wrong shipped, because a separate full bar had verified the
+# pushed tree; the BOUNDARY was not the one that shipped.
+#
+# WHAT THIS DOES NOT CHECK, stated because a structural check reads as a semantic one to everybody
+# who did not write it: it reports a divergence, it does not PREVENT one, and a push made after the
+# report still runs the other checkout's hook. Closing that needs a refusal inside the hook itself,
+# which is a separate decision about what the push boundary REFUSES.
+#
+# IT IS A `note`, NOT AN `UNWIRED`, and that is the load-bearing half. `unwired` is exactly what
+# this script's final line turns into its exit code, and `.unattended.conf` makes `--check` an unattended
+# run's precondition — so an UNWIRED line here would refuse every unattended run whenever a sibling
+# checkout moved to a branch that touched `.githooks/`. A primary tree parked on a feature branch is
+# a NORMAL state of this layout, and a gate that reds on a structural condition is a gate that gets
+# bypassed. The severity carries the whole fork resolution.
+#
+# WRITTEN OVER A LIST, so a third hook is one row rather than a third copy of the comparison.
+GOV_WIRING_HOOKS="pre-commit pre-push"
+check_hook_blobs() { # $1 = resolved hooks dir, $2 = the configured value as written
+  local dir="$1" shown="$2" hook resolved tracked otherbranch
+  for hook in $GOV_WIRING_HOOKS; do
+    # A hook this tree does not TRACK is a SKIP, never a comparison and never a finding. Check H's
+    # entry guard is tracked `.githooks/pre-commit` alone, so an adopter that owns its own pre-commit
+    # and ships no pre-push must not acquire a permanent report it has no action to clear.
+    if ! git ls-files --error-unmatch ".githooks/$hook" >/dev/null 2>&1; then
+      echo "skip     hooks     — .githooks/$hook is not tracked here, so there is nothing to compare"
+      continue
+    fi
+    # `ls-tree`, not `rev-parse HEAD:<path>`: a POSIX-emulation shell on Windows can mangle the
+    # `<rev>:.dotpath` spelling and report ABSENT for a file that is present.
+    tracked=$(git ls-tree HEAD -- ".githooks/$hook" 2>/dev/null | awk '{print $3}')
+    resolved=$([ -f "$dir/$hook" ] && git hash-object "$dir/$hook" 2>/dev/null)
+    # LIVENESS: an unreadable side is never printed as `ok`. "Could not compare" and "compared and
+    # agreed" are different facts, and only one of them is evidence.
+    if [ -z "$tracked" ] || [ -z "$resolved" ]; then
+      echo "note     hooks     — $hook: UNKNOWN, could not read both sides (tracked='${tracked:-?}' resolved='${resolved:-?}')"
+      continue
+    fi
+    [ "$tracked" = "$resolved" ] && continue
+    otherbranch=$(git -C "$(dirname "$dir")" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+    echo "note     hooks     — $hook DIVERGES: the hook that will run is $resolved from $shown"
+    echo "note     hooks       (checkout on '${otherbranch:-unknown}'), this tree tracks $tracked."
+    echo "note     hooks       core.hooksPath is repo-global, so a sibling worktree supplies it."
+  done
+}
+
 # --- Check H: git hooks (core.hooksPath) ---------------------------------------------------------
 check_hooks() {
   if ! { [ -f .githooks/pre-commit ] && git ls-files --error-unmatch .githooks/pre-commit >/dev/null 2>&1; }; then
@@ -101,6 +306,7 @@ check_hooks() {
     curdir=$(abspath "$cur")
     if [ -n "$curdir" ] && [ -f "$curdir/pre-commit" ]; then
       echo "ok       hooks     — core.hooksPath -> $cur"
+      check_hook_blobs "$curdir" "$cur"
     else
       echo "UNWIRED  hooks     — core.hooksPath='$cur' resolves to no pre-commit; NOT overwriting (deliberate?). Fix: git config core.hooksPath .githooks"
       unwired=$((unwired+1))
@@ -116,7 +322,30 @@ check_hooks() {
   fi
 }
 
-# --- Check A: agent-cap PreToolUse hook in .claude/settings.json ----------------------------------
+# S2 runs ONCE, before any arm, so the resolved path and its scope are on the record BEFORE any
+# verdict that depends on them. A scope arm nobody calls is the same silent nothing this unit
+# removes one level down.
+#
+# IT DOES NOT EXIT. The refusal belongs to the arms that NEED the file, not to the run: a repo with
+# no settings file is a legal state — a fresh clone before anything is wired — and refusing there
+# says nothing about the hooks, skills and eol wiring the run was asked to grade. Measured: an eager
+# exit killed 45 of 76 self-test arms, not one of which was about settings. What the refusal buys is
+# that no arm can read "no file" as "nothing to check": `matchers_of` propagates it, `wired` is then
+# false, and each settings arm reports UNWIRED with the reason instead of passing by absence.
+_sj_err=$(mktemp)
+if _sj_for_scope=$(settings_json 2>"$_sj_err"); then
+  check_settings_scope "$_sj_for_scope"
+else
+  # THE RESOLVER'S OWN WORDS, not a generic substitute. "You named a path that is not there"
+  # and "there is no settings file anywhere" are different operator problems with different
+  # fixes, and discarding stderr here made them the same sentence.
+  sed 's/^/note     settings  /' "$_sj_err"
+  echo "note     settings  — every settings-dependent arm below reports UNWIRED rather than"
+  echo "note     settings    passing by absence."
+fi
+rm -f "$_sj_err"
+
+# --- Check A: agent-cap PreToolUse hook in the resolved settings file -----------------------------
 # Advisory: no mode mutates settings.json (the SessionStart hook must not rewrite its own file).
 #
 # THE MATCHER IS A LIST OF EXACT STRINGS separated by `|`, not a regular expression: the hook fires
@@ -125,24 +354,138 @@ check_hooks() {
 # value found rather than reported as a generic miss — an operator who is told "unwired" about a
 # hook that is plainly in the file will conclude the checker is broken.
 AGENTCAP_MATCHER='Workflow|Agent'
+# The merger every remedy names, resolved ONCE across both install layouts. Four arms used to
+# resolve it each; one spelling is one fewer carried literal per arm that names it.
+# DERIVED, and NEVER EMPTY. This file sits directly under the tool root, so its own KIT_REL IS that
+# root. The remedies below used to fall back to the merger under a literal `tools/` prefix, which names
+# nothing at any install prefix but gov's own — an operator at `scripts/gov/` was handed a command
+# that cannot start, and TOOL-cMendedVintage-3 made a root install REACH that line for the first
+# time. With the fallback derived, every tail collapses to the bare variable and the literal is
+# deleted rather than repathed, which is what removes the class instead of moving it.
+SMERGE_DEFAULT="${KIT_REL:+$KIT_REL/}settings-merge.py"
+SMERGE=$(first_of "$SMERGE_DEFAULT" settings-merge.py); SMERGE=${SMERGE:-$SMERGE_DEFAULT}
 check_agentcap() {
-  local smerge found; smerge=$(first_of tools/settings-merge.py settings-merge.py)
-  # Left as a plain skip on purpose: agent-cap's hook path is not declared anywhere this script can
-  # read (settings-merge.py hardcodes it), so "settings wired, script missing" cannot be told from a
-  # deliberate out-of-tree copy. The recall arm below CAN — its fragment declares `hook_path`.
-  if [ ! -f .claude/hooks/agent-cap.js ]; then
-    echo "skip     agent-cap — not adopted (.claude/hooks/agent-cap.js absent)"
+  local smerge found shipped; smerge=$SMERGE
+  # THE ADOPTION TEST PROBES FOR THE HOOK, IT DOES NOT NAME ONE COPY. This used to key on
+  # `.claude/hooks/agent-cap.js` and said so on purpose: the hook path "is not declared anywhere this
+  # script can read". That reason stopped being true at TOOL-dRetiredFork-14, which moved `hook_path`
+  # into the fragment exactly as the recall arm below already had it.
+  #
+  # Keying on the withdrawn copy was not merely stale, it was DANGEROUS: the moment the duplicate was
+  # dropped this arm printed `skip — not adopted` about a hook that is adopted and wired, over the
+  # most important guard in the repo. A skip that reads as a pass is the shape this repo keeps
+  # finding, and here it was one commit away from hiding an unwired security hook.
+  # The adopter rung is spelled through KIT_REL rather than as a bare `hooks/...`. Both forms probe
+  # the same place; only the bare one is a root-install spelling the prefix gate bans, and its
+  # waiver registry is shrink-only, so buying a new row here would spend a budget meant for the
+  # probes that already have one.
+  # `${KIT_REL:+...}` LIKE EVERY SIBLING ARM, and this one was the only probe in the file
+  # without it. Unguarded, a ROOT install (KIT_REL empty) built the absolute path
+  # `/hooks/agent-cap.js`, matched nothing, and printed `skip -- not adopted` over a hook that
+  # was present and correctly wired. A silent skip over the concurrency hook, which is the
+  # one arm in this file where a false skip has a security shape. Found by the closing review
+  # of TOOL-dRetiredFork-17, reproduced on a scratch root-layout tree.
+  #
+  # The guard buys no waiver row: with KIT_REL empty the rung IS the bare spelling, so the
+  # form the prefix gate bans never appears in the source.
+  shipped=$(first_of "${KIT_REL:+$KIT_REL/}hooks/agent-cap.js" .claude/hooks/agent-cap.js)
+  if [ -z "$shipped" ]; then
+    # THE MESSAGE NAMES WHAT THE PROBE ACTUALLY TRIED. It used to advertise three locations
+    # for a two-rung probe, one of them a hardcoded install-prefix literal in prose that
+    # ships verbatim to an adopter at another prefix -- the class this build exists to drain,
+    # inside the arm whose own comment is about skips that read as passes.
+    echo "skip     agent-cap — not adopted (no agent-cap.js at ${KIT_REL:+$KIT_REL/}hooks/ or .claude/hooks/)"
     return
   fi
+  # S4: a LEGACY second copy is REPORTED, never redded. An adopter mid-migration has both, and their
+  # wired command may still name either; blocking them would make the safe ordering -- move the
+  # command first, withdraw second -- impossible to perform.
+  if [ "$shipped" != ".claude/hooks/agent-cap.js" ] && [ -f .claude/hooks/agent-cap.js ]; then
+    echo "note     agent-cap — a legacy copy remains at .claude/hooks/agent-cap.js while the shipped copy is $shipped; withdraw it once your wired command names the shipped one"
+  fi
   if wired "agent-cap.js" "$AGENTCAP_MATCHER"; then
-    echo "ok       agent-cap — PreToolUse hook wired in .claude/settings.json (matcher '$AGENTCAP_MATCHER')"
+    # TOOL-dTieredTribunal-14 S7 - a WIRED command may never carry --only. The flag narrows the hook
+    # to one rule, so `--only=join` in settings.json turns the three cap rules off with no diff and a
+    # hook that still looks wired. That is the class of the AGENT_CAP environment knob this file
+    # deleted, whose own header records that it survived two releases by appearing to work.
+    # matchers_of() discards the command, so the command text is read here rather than there.
+    # M8 closing review, BLOCKER: the first spelling of this guard could never fire. Every class was
+    # bounded with [^"]*, and the command settings.json actually ships is
+    #   "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\""
+    # so no class could cross the ESCAPED quote and the match was always empty. The only declared
+    # control on a bypass this same build introduced was itself a check that could not fail. Scoped
+    # to the LINE now, which no quoting defeats, and the test file observes the failing case.
+    if grep 'agent-cap\.js' "$(settings_json)" 2>/dev/null | grep -q -- '--only'; then
+      echo "UNWIRED  agent-cap — the wired command carries --only, which runs ONE rule and silently disables the rest. Remove the flag from $(render_settings_path)."
+      unwired=$((unwired+1))
+      return
+    fi
+    # WIRED IS NOT ENOUGH -- it must name the copy that actually ships. A command pointing at a
+    # withdrawn path satisfies the marker test and loads nothing, which is precisely the silent
+    # unwiring this unit's migration ordering exists to prevent.
+    if ! grep -q "$shipped" "$(settings_json)" 2>/dev/null; then
+      echo "UNWIRED  agent-cap — wired, but the command does not name the shipped copy $shipped. Repath with: $PY $smerge"
+      unwired=$((unwired+1))
+      return
+    fi
+    echo "ok       agent-cap — PreToolUse hook wired in $(render_settings_path) at $shipped (matcher '$AGENTCAP_MATCHER')"
     return
   fi
   found=$(matchers_of "agent-cap.js" | paste -sd, - 2>/dev/null || matchers_of "agent-cap.js" | tr '\n' ',')
   if [ -n "$found" ]; then
-    echo "UNWIRED  agent-cap — the hook is wired under matcher '$found', not '$AGENTCAP_MATCHER'; it never fires for a direct Agent spawn, which is the modality the arity rule was blind to. Fix: $PY ${smerge:-tools/settings-merge.py}"
+    echo "UNWIRED  agent-cap — the hook is wired under matcher '$found', not '$AGENTCAP_MATCHER'; it never fires for a direct Agent spawn, which is the modality the arity rule was blind to. Fix: $PY $smerge"
   else
-    echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py}"
+    echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY $smerge"
+  fi
+  unwired=$((unwired+1))
+}
+
+# --- Check S: scratch-guard PreToolUse hook -------------------------------------------------------
+# Reads marker, matcher and hook path from the SHIPPED fragment, the way the recall arm does and the
+# agent-cap arm above does not. That is deliberate: this arm should assert nothing the kit does not
+# itself declare, so widening the matcher is a one-line fragment edit rather than a two-file edit
+# with a drift window between them.
+#
+# Unlike recall, this hook is NOT an opt-in — it ships wired with the hooks kit — so an absent hook
+# file means "kit not adopted here" and a present-but-unwired one is a real UNWIRED, exactly as for
+# agent-cap. A guard that is silent when unwired looks identical to a guard that is passing.
+# Advisory like every other arm: no mode rewrites settings.json.
+check_scratch_guard() {
+  local frag smerge marker hookjs smatcher found
+  frag=$(first_of "${KIT_REL:+$KIT_REL/}hooks/scratch-guard.fragment.json" hooks/scratch-guard.fragment.json)
+  if [ -z "$frag" ]; then
+    echo "skip     scratch   — hooks kit does not ship scratch-guard.fragment.json here"
+    return
+  fi
+  smerge=$SMERGE
+  marker=$(json_str "$frag" marker)
+  hookjs=$(resolve_fragment_hook "$frag" 2>/dev/null)
+  smatcher=$(json_str "$frag" matcher)
+  if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$smatcher" ]; then
+    echo "UNWIRED  scratch   — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
+    unwired=$((unwired+1))
+    return
+  fi
+  if [ ! -f "$hookjs" ]; then
+    if wired "$marker" "$smatcher"; then
+      echo "UNWIRED  scratch   — settings.json dispatches the guard but $hookjs is missing; every shell call runs node against nothing. Fix: cp ${frag%/*}/scratch-guard.js $hookjs"
+      unwired=$((unwired+1))
+    else
+      echo "skip     scratch   — not adopted ($hookjs absent)"
+    fi
+    return
+  fi
+  if wired "$marker" "$smatcher"; then
+    echo "ok       scratch   — PreToolUse guard wired in $(render_settings_path) (matcher '$smatcher')"
+    return
+  fi
+  # Name the value FOUND rather than reporting a generic miss: an operator told "unwired" about a
+  # hook plainly present in the file concludes the checker is broken. Same reasoning as agent-cap.
+  found=$(matchers_of "$marker" | paste -sd, - 2>/dev/null || matchers_of "$marker" | tr '\n' ',')
+  if [ -n "$found" ]; then
+    echo "UNWIRED  scratch   — the guard is wired under matcher '$found', not '$smatcher'; it never fires for the shells the fragment declares. Fix: $PY $smerge --fragment $frag"
+  else
+    echo "UNWIRED  scratch   — $hookjs present but the guard is not in settings.json. Fix: $PY $smerge --fragment $frag"
   fi
   unwired=$((unwired+1))
 }
@@ -155,21 +498,18 @@ check_agentcap() {
 # to ignore the wiring verifier. Both halves — the marker and the script path — are read from the
 # fragment, so this arm asserts nothing the shipped kit does not itself declare.
 # Advisory like every other arm: no mode rewrites settings.json.
-json_str() {  # value of a top-level "key": "..." in a small flat JSON file
-  sed -n 's|.*"'"$2"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*|\1|p' "$1" | head -1
-}
 check_recall_opened() {
   local frag smerge marker hookjs rmatcher
   # Resolved by path because the kit is COPIED: <root>/memory-recall/ in an adopter,
-  # <root>/tools/memory-recall/ in this repo.
-  frag=$(first_of memory-recall/recall-opened.fragment.json tools/memory-recall/recall-opened.fragment.json)
+  # <root>/$KIT_REL/memory-recall/ in this repo.
+  frag=$(first_of "${KIT_REL:+$KIT_REL/}memory-recall/recall-opened.fragment.json" memory-recall/recall-opened.fragment.json)
   if [ -z "$frag" ]; then
     echo "skip     recall    — memory-recall kit not adopted (no recall-opened.fragment.json)"
     return
   fi
-  smerge=$(first_of tools/settings-merge.py settings-merge.py)
+  smerge=$SMERGE
   marker=$(json_str "$frag" marker)
-  hookjs=$(json_str "$frag" hook_path)
+  hookjs=$(resolve_fragment_hook "$frag" 2>/dev/null)
   # The MATCHER comes from the fragment too, so this arm still asserts nothing the shipped kit does
   # not itself declare — the same rule the marker already followed, applied to the half that decides
   # whether the hook fires at all.
@@ -189,11 +529,74 @@ check_recall_opened() {
     return
   fi
   if wired "$marker" "$rmatcher"; then
-    echo "ok       recall    — recall-opened PostToolUse hook wired in .claude/settings.json"
+    echo "ok       recall    — recall-opened PostToolUse hook wired in $(render_settings_path)"
   else
-    echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
+    echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY $smerge --fragment $frag"
     unwired=$((unwired+1))
   fi
+}
+
+# --- Check C: the orientation card's two SessionStart entries (kickoff-manifest kit) --------------
+# TOOL-aReplayedCard-2. Two fragments beside the kickoff engine, each one verb of `manifest-check.sh
+# --card`: the WRITER at `startup|clear`, the REPLAY at `resume|compact`. Their matchers are the
+# whole point — a SessionStart entry with no matcher runs on every compaction, and a matcher that
+# is misspelled or narrowed never fires at all while looking exactly like one that is wired. So
+# this arm asserts the LITERAL matcher each fragment declares, the way the scratch arm does, and
+# names the value it found instead. Both fragments must be present, and both wired, for `ok`: a
+# writer with no replay is a card every compaction drops, and a replay with no writer replays a
+# card nothing wrote.
+#
+# The fragments sit at the kit's HOME in this repo and at `{prefix}/` in an adopter — the kit is
+# `kind = "flat"`, so the engine and its two fragments ship side by side — and their `{here}` token
+# resolves to whichever of those the fragment was found at. Advisory like every other arm.
+#
+# WHAT THIS DOES NOT CHECK: any other SessionStart entry. The `check-wiring.sh --session` entry and
+# the process-monitor session entry ship fragments too, and NO arm here reads their matchers — the
+# merger re-matches them on apply, and a hand edit or a later narrowing to `startup` passes green
+# (the aReplayedCard closing review, F12). The two card fragments are graded; the count is two.
+check_card() {
+  local name frag marker hooksh cmatcher found nfound=0 nok=0 line=""
+  for name in orientation-card orientation-replay; do
+    frag=$(first_of "skills/session-kickoff/$name.fragment.json" "${KIT_REL:+$KIT_REL/}$name.fragment.json" "$name.fragment.json")
+    if [ -z "$frag" ]; then
+      echo "skip     card      — kickoff-manifest kit does not ship $name.fragment.json here"
+      return
+    fi
+    nfound=$((nfound+1))
+    marker=$(json_str "$frag" marker)
+    hooksh=$(resolve_fragment_hook "$frag" 2>/dev/null)
+    cmatcher=$(json_str "$frag" matcher)
+    if [ -z "$marker" ] || [ -z "$hooksh" ] || [ -z "$cmatcher" ]; then
+      echo "UNWIRED  card      — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
+      unwired=$((unwired+1))
+      return
+    fi
+    if [ ! -f "$hooksh" ]; then
+      if wired "$marker" "$cmatcher" "$(basename "$hooksh")"; then
+        echo "UNWIRED  card      — settings.json dispatches $marker but $hooksh is missing; every session start runs bash against nothing. Fix: re-copy the kickoff-manifest kit beside $frag"
+        unwired=$((unwired+1))
+      else
+        echo "skip     card      — not adopted ($hooksh absent)"
+      fi
+      return
+    fi
+    if wired "$marker" "$cmatcher" "$(basename "$hooksh")"; then
+      nok=$((nok+1)); line="$line${line:+, }$marker at '$cmatcher'"
+      continue
+    fi
+    # Name the value FOUND rather than a generic miss, and the matcher EXPECTED beside it: the
+    # replay wired under `resume` alone is the exact state this arm exists to catch — it looks
+    # wired, and the card is gone after the first compaction.
+    found=$(matchers_of "$marker" "$(basename "$hooksh")" | paste -sd, - 2>/dev/null || matchers_of "$marker" "$(basename "$hooksh")" | tr '\n' ',')
+    if [ -n "$found" ]; then
+      echo "UNWIRED  card      — the $name entry ($marker) is wired under matcher '$found', not '$cmatcher'; it never fires for the events the fragment declares. Fix: $PY $SMERGE --fragment $frag"
+    else
+      echo "UNWIRED  card      — $hooksh present but the $name entry ($marker) is not in settings.json. Fix: $PY $SMERGE --fragment $frag"
+    fi
+    unwired=$((unwired+1))
+  done
+  [ "$nok" = "$nfound" ] && [ "$nfound" = 2 ] \
+    && echo "ok       card      — SessionStart card entries wired in $(render_settings_path) ($line)"
 }
 
 
@@ -217,7 +620,7 @@ check_eol() {
   local pop f bad=""
   # THE POPULATION IS THE RENDERED SKILL MARKDOWN, not "every eol=lf path under .claude/". Measured
   # in a scratch repo with a `* text=auto eol=lf` .gitattributes — an ordinary thing to write — the
-  # wider selector pulled in `.claude/settings.json` and a PNG, and `--fix` rewrote both: three CR
+  # wider selector pulled in the settings file and a PNG, and `--fix` rewrote both: three CR
   # bytes stripped out of the middle of the image, md5 changed, reported as "fixed". A repair whose
   # bound depends on how an adopter spelled their attributes has no bound.
   #
@@ -313,9 +716,9 @@ EOF
 check_merge_rows() {
   local drv launcher want cur declared
   # Resolved by path because the kit is COPIED: <root>/memory-tree/ in an adopter,
-  # <root>/tools/memory-tree/ here. The remedy string is BUILT from the two resolved paths rather
+  # <root>/$KIT_REL/memory-tree/ here. The remedy string is BUILT from the two resolved paths rather
   # than hand-kept, so it cannot drift from the layout it is describing.
-  drv=$(first_of tools/memory-tree/merge-rows.py memory-tree/merge-rows.py)
+  drv=$(first_of "${KIT_REL:+$KIT_REL/}memory-tree/merge-rows.py" memory-tree/merge-rows.py)
   if [ -z "$drv" ]; then
     echo "skip     merge     — memory-tree merge driver not adopted (no merge-rows.py)"
     return
@@ -324,7 +727,7 @@ check_merge_rows() {
   # guaranteed to have; `tools/lib/pyrun.sh` is gov-internal and ships nothing, and a wiring that
   # names it in an adopting repo execs a command that cannot start. A driver that never starts never
   # writes %A, so git reports CONFLICT and leaves the path holding OURS-ONLY content with no markers.
-  launcher=$(first_of "$(dirname "$drv")/merge-rows.sh" tools/lib/pyrun.sh lib/pyrun.sh)
+  launcher=$(first_of "$(dirname "$drv")/merge-rows.sh" "${KIT_REL:+$KIT_REL/}lib/pyrun.sh" lib/pyrun.sh)
   if [ -z "$launcher" ]; then
     echo "UNWIRED  merge     — $drv is present but no launcher is: expected $(dirname "$drv")/merge-rows.sh beside it. git would exec a command that cannot start, and a driver that never starts leaves OURS-only content with no conflict markers. Fix: re-copy the memory-tree kit"
     unwired=$((unwired+1))
@@ -347,7 +750,7 @@ check_merge_rows() {
   # RUN THE COMMAND, do not pattern-match its parts. "Wired" is "the command git will exec actually
   # merges", and the three tests above — driver exists, launcher exists, config string matches — are all
   # path-and-string. They cannot see the two runtime dependencies the driver reaches for at merge
-  # time: `lib/resolve-python.sh`, which `pyrun.sh` sources, and the sibling memory-recall kit that
+  # time: the resolve-python helper, which `pyrun.sh` sources, and the sibling memory-recall kit that
   # owns the anchor grammar. Both were MEASURED printing `ok  merge  — merge.rows.driver wired`
   # here while the very next merge left `memory/DECISIONS.md` holding OURS-only content with zero
   # conflict markers and status `UU` — the silent take-ours the driver's own fail-closed wrapper
@@ -431,7 +834,7 @@ check_merge_rows() {
   kd=$(sed -n 's/.*written (\([0-9]*\) keyed.*/\1/p' "$smoke/err" | tail -1)
   hs=$(sed -n 's/.*keyed, \([0-9]*\) hashed.*/\1/p' "$smoke/err" | tail -1)
   if [ -z "$hs" ]; then
-    echo "UNWIRED  merge     — the driver merged the smoke but printed no keyed/hashed audit line, so there is no way to tell whether it KEYED the rows or merely copied them; a driver whose anchor grammar is dead resolves this fixture too. Fix: the installed tools/memory-tree/merge-rows.py predates the audit line — re-copy the kit, then re-run"
+    echo "UNWIRED  merge     — the driver merged the smoke but printed no keyed/hashed audit line, so there is no way to tell whether it KEYED the rows or merely copied them; a driver whose anchor grammar is dead resolves this fixture too. Fix: the installed $drv predates the audit line — re-copy the kit, then re-run"
     unwired=$((unwired+1))
     rm -rf "$smoke"
     return
@@ -556,7 +959,9 @@ check_skill_install() {
 
 check_hooks
 check_agentcap
+check_scratch_guard
 check_recall_opened
+check_card
 check_merge_rows
 check_eol
 check_skill_install

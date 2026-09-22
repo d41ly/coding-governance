@@ -8,12 +8,12 @@ machines/sessions on the same repo.
 
 ## Contents
 
-- **`parallel-coding-governance.template.md`** — the governance playbook template (the operating
+- **`coding-governance-agents.template.md`** — the governance playbook template (the operating
   ruleset; **≤48 KiB, gated** by `tools/check-template-size.sh`). Historical `…-v-N-N.md`
-  snapshots live under `memory/archive/`. Two companions ship with it:
-  **`.customize.md`** (the deploy-time placeholder catalog — fill `{{PLACEHOLDERS}}` per it) and
-  **`.domain-rules.md`** (the §4/§9/§10/§11/§12/§13 activity-scoped checklists the template references
-  by §-stub — copy it alongside the template into a target repo).
+  snapshots live under `memory/archive/`. **ONE file as of v3.0** — the activity-scoped checklists
+  converged into the charter and the deploy-time placeholder catalog became a program. Install it
+  with `bash tools/playbook/adopt-playbook.sh --target <repo>`, which fills every placeholder from
+  the target's `deploy.toml` and drops the conditional blocks that target has no kit for.
 - **`tools/agent-instructions/`** — install a canonical `AGENTS.md` in a target repo and wire every AI
   tool's file to it (`CLAUDE.md` `@AGENTS.md` import, Gemini config, symlink/copy), with a `--check`
   drift gate. Use it to deploy the filled playbook as a project's agent-instruction file.
@@ -69,11 +69,12 @@ machines/sessions on the same repo.
   numbered slot with `O_EXCL` under a session+prompt-keyed dir in the git common dir, and the spawn
   that finds every slot taken is denied; the budget resets on the next user prompt. A `Workflow` call
   is read statically: it DENIES any
-  script calling raw `parallel(`/`pipeline(` instead of the cap-5 `boundedParallel`/`boundedPipeline`
+  script calling raw `parallel(`/`pipeline(` instead of the bounded `boundedParallel`/`boundedPipeline`
   helpers, so a wide agent burst can't trip the server rate limiter. It enforces the second half of
-  the rule too: a review's verify stage spawns at most 5 agents TOTAL. The 5 is a FILE CONSTANT and
-  not overridable — the guard resolves the number at the call site, at the helper's default parameter
-  and at the `gov:bounded-fanout` width, and refuses a set `AGENT_CAP` rather than ignoring it.
+  the rule too: a review's verify stage spawns at most the total the guard resolves. That number is a
+  FILE CONSTANT inside `tools/hooks/agent-cap.js`, which ships deployed verbatim; the guard resolves it at the call
+  site, at the helper's default parameter and at the `gov:bounded-fanout` width, and refuses a set
+  `AGENT_CAP` rather than ignoring it — an environment override leaves no diff behind.
   Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
   Operationalizes the playbook's §8 concurrency rule; the binding text is
   `memory/guides/REVIEW-PROTOCOL.md`.
@@ -87,7 +88,7 @@ machines/sessions on the same repo.
   documentation-currency goals with machine enforcement.
 - **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
   verify → synth): four finder lenses, at most five batched verifiers, one synthesis pass — 6–10
-  agents over the run, of which at most 5 are verify-stage and at most 5 concurrent, per the BINDING
+  agents over the run, all of them within the verify-stage and concurrency bounds, per the BINDING
   `memory/guides/REVIEW-PROTOCOL.md`. Run via `Workflow({scriptPath})`, parameterized
   by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction. Findings join to
   their verdicts on an INTEGER the orchestrator assigns before the skeptic sees them — a `file:line`

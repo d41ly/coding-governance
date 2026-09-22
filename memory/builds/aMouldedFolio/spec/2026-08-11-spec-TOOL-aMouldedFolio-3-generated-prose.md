@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7890becf · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md](../build/2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md) | journal | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Stop the build README from asserting which record folders it holds. Measured at this spec's base: 17

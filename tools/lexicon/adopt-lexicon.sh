@@ -7,8 +7,11 @@
 # WHY THE SEED IS DERIVED AND THEN FROZEN. Companion §12 bans a gate whose vocabulary is a
 # hand-kept mirror of the codebase's own identifiers; a PRESCRIPTIVE verb table is the inverse and
 # is safe. But an adopter cannot author a closed vocabulary for a domain they have not read yet, so
-# `--scaffold` derives a proposal from their own corpus by leading-token frequency — which for one
-# moment IS the banned shape. The resolution is that the proposal is marked PROPOSED, a human
+# `--scaffold` takes each verb's SPELLING from the kit's frozen canon and asks the adopter's
+# corpus only which concepts are live in it, so the seed is prescriptive at the moment it is
+# written and is NOT the banned shape. It ranked the corpus's own leading tokens until
+# `TOOL-dScaffoldedMirror-8`, and that WAS the banned shape: a repo already calling everything
+# `get` was certified as calling it `get`.
 # curates it, and "was edited" is CHECKABLE: `--check` reds while `ratified` is empty, so an
 # unedited seed cannot reach the merge bar disguised as a curated vocabulary.
 #
@@ -54,8 +57,268 @@ resolve_python() {
 
 PY="$(resolve_python)" || { echo "$PY"; exit 2; }
 
+# REPO-RELATIVE, via git rather than by trimming ROOT off KIT_DIR. On Windows those two are
+# spelled differently -- `git rev-parse --show-toplevel` answers `C:/...` while `cd && pwd` under
+# MSYS answers `/c/...` -- so the trim silently does nothing and the ABSOLUTE path renders into a
+# committed artifact. Measured here: it shipped into the Skill description before this line
+# existed. memory-recall carries the same derivation and the same warning; this is the second
+# time that warning has been paid for.
+KITREL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)" || exit 2
+KITREL="${KITREL%/}"
+TEMPLATE="$KIT_DIR/SKILL.template.md"
+SKILL="$ROOT/.claude/skills/lexicon/SKILL.md"
+# CHECKED, because an empty value here is INVISIBLE downstream. The Skill's marker would render as
+# `gov:kit lexicon@` with nothing after the `@`, and `--check` would still report "Skill in sync":
+# its drift gate re-renders and byte-compares, so it compares a render against a render and both
+# carry the same empty version. Round 2 of the closing review renamed the constant in a sandbox and
+# watched exactly that happen. A pipeline takes its LAST command's status, so `head -1` succeeding
+# on empty input is a zero — the emptiness has to be tested for, not inferred from the exit code.
+KIT_VERSION="$(grep -oE 'KIT_LEXICON_VERSION = "[0-9.]+"' "$KIT_DIR/lexicon.py" | grep -oE '[0-9.]+' | head -1)"
+if [ -z "$KIT_VERSION" ]; then
+  echo "lexicon-adopt: cannot read KIT_LEXICON_VERSION from $KIT_DIR/lexicon.py — the Skill would"
+  echo "lexicon-adopt: render a version-less marker and its own drift gate could not tell." >&2
+  exit 2
+fi
+# ---- S4 of TOOL-dScaffoldedMirror-10: the rendered Skill -----------------------------------------
+#
+# WHY A RENDER AND NOT A POINTER. The charter can only POINT at the declaration -- it has 118 bytes of
+# headroom against a 1,787-byte table -- so the only way the table itself travels to an author is a
+# separate artifact. And an artifact that carries a copy of a declaration is a second carrier, which
+# this repo's own rule says drifts. The answer is that the copy is GENERATED and its gate re-renders
+# and byte-compares: a `.lexicon.conf` edit nobody re-rendered REDS. That is the one shape in which
+# two carriers are allowed, because only one of them is authored.
+#
+# THREE STATES, NOT TWO, copied deliberately from memory-recall. A missing template with no rendered
+# Skill is "not installed" and SKIPS -- a red an adopter cannot fix by editing their own repo trains
+# them to ignore the leg. A rendered Skill with no template is the one genuinely unverifiable state
+# and it REDS.
+render_skill() { # -> stdout
+  local out verbs
+  # The table, rendered from the declaration rather than retyped. Every row, in declaration order.
+  # THROUGH THE ONE READER, not a second parser. This block used to carry its own inline grammar
+  # for the VERBS: section, so `lexicon_conf.py` and the render disagreed on shapes both accept --
+  # and the drift gate could not see it, because it compares two outputs of THIS renderer. Closing
+  # review H2. `--print-rows` is that reader's own row form.
+  verbs=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-rows "$CONF"           | while IFS=$'	' read -r v g; do [ -n "$v" ] && printf -- '- `%s` — %s
+' "$v" "$g"; done) || return 1
+  [ -n "$verbs" ] || return 1
+  out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1
+  out=${out%X}
+  out=${out//$'\r'/}
+  out=${out//\{\{VERBS_TABLE\}\}/"$verbs"}
+  out=${out//\{\{SUGGEST_CLI\}\}/"python3 $KITREL/lexicon.py --suggest"}   # gov:literal-python
+  out=${out//\{\{GATE_CLI\}\}/"python3 $KITREL/lexicon.py"}                # gov:literal-python
+  out=${out//\{\{CONF\}\}/".lexicon.conf"}
+  out=${out//\{\{KIT_VERSION\}\}/"$KIT_VERSION"}
+  # STRIP CR AFTER SUBSTITUTION, not only from the template. Python's `print` writes CRLF to stdout
+  # on Windows, so `$verbs` arrives CR-bearing however clean the template is — measured here: the
+  # render carried \r\n on every verb row while the on-disk Skill carried \n, and `--check` reported
+  # DRIFTED against a file it had just written. memory-recall's adopter records the same class one
+  # seam earlier ("those CRs rendered straight into SKILL.md and broke its YAML frontmatter"); the
+  # lesson that transfers is that the strip belongs at the LAST point before emission, where it
+  # covers every value rather than the one the author remembered.
+  out=${out//$'\r'/}
+  printf '%s' "$out"
+}
+
+check_skill() {
+  local rendered
+  if [ ! -f "$TEMPLATE" ]; then
+    if [ -f "$SKILL" ]; then
+      echo "lexicon: $SKILL exists but $KITREL/SKILL.template.md does not — cannot verify drift"
+      return 1
+    fi
+    echo "skip     lexicon skill — $KITREL/SKILL.template.md not installed, nothing to render"
+    return 0
+  fi
+  rendered="$(render_skill)" || { echo "lexicon: the Skill render failed"; return 1; }
+  # AC7 — an EMPTY render must refuse rather than be compared against an equally empty Skill and
+  # pass. Two empty files are byte-identical, so the comparison itself cannot see this.
+  if [ -z "$rendered" ]; then
+    echo "lexicon: the Skill render produced NOTHING, so a byte-comparison against it would pass"
+    echo "lexicon: on emptiness rather than on agreement. Refusing instead."
+    return 1
+  fi
+  # An unsubstituted placeholder ships `{{...}}` into a Skill description and breaks its trigger.
+  local leftover
+  leftover="$(printf '%s' "$rendered" | grep -o '{{[A-Z_]*}}' | sort -u | tr '\n' ' ')"
+  if [ -n "$leftover" ]; then
+    echo "lexicon: the Skill template carries placeholders this script cannot fill: $leftover"
+    return 1
+  fi
+  if [ ! -f "$SKILL" ]; then
+    echo "lexicon: $SKILL is not rendered — run --scaffold"
+    return 1
+  fi
+  # TWO TEMP FILES, not a pipe into a process substitution. Git-Bash supports `<( )`, but a `diff -q`
+  # reading stdin AND a substitution is one of the shapes that fails opaquely there — it returned
+  # non-zero on a file it had just rendered, which reads as DRIFTED and is indistinguishable from a
+  # real drift. A comparison that cannot be wrong about equality is worth two mktemps.
+  local a b
+  a="$(mktemp)"; b="$(mktemp)"
+  printf '%s' "$rendered" > "$a"
+  tr -d '\r' < "$SKILL" > "$b"
+  if ! cmp -s "$a" "$b"; then
+    rm -f "$a" "$b"
+    echo "lexicon: DRIFTED — $SKILL does not match a fresh render of $KITREL/SKILL.template.md."
+    echo "lexicon: The declaration moved and nobody re-rendered, so the Skill is teaching a table"
+    echo "lexicon: this repo no longer declares. Re-run --render."
+    return 1
+  fi
+  rm -f "$a" "$b"
+  return 0
+}
+
+write_skill() {
+  local rendered
+  [ -f "$TEMPLATE" ] || return 0
+  rendered="$(render_skill)" || { echo "lexicon: the Skill render failed"; return 1; }
+  [ -n "$rendered" ] || { echo "lexicon: the Skill render produced nothing; refusing to write it"; return 1; }
+  mkdir -p "$(dirname "$SKILL")"
+  printf '%s' "$rendered" > "$SKILL"
+  echo "lexicon: rendered $SKILL"
+}
+
+read_conf_scalar() {
+  # ONE READER FOR A CONF SCALAR, and `tr -d '\r'` runs FIRST. Both halves are needed and the
+  # ORDERING is the whole mechanism: an anchored `s/"$//` cannot strip a quote that a carriage
+  # return follows, so a CRLF conf yields the residue `"\r` -- a NON-EMPTY value -- and every
+  # refusal built on emptiness passes exactly when it should fire. Callers test emptiness with
+  # `[ -z "${v// /}" ]`, so an all-whitespace value refuses too.
+  #
+  # A FUNCTION AT THE THIRD CALLER, not the second, which is one later than the rule wants. It read
+  # `ratified` alone, then `canon_unfrozen` copied it, and `expanded` would have been the third
+  # verbatim copy of a pipeline whose correctness lives entirely in the order of its stages.
+  #
+  # AND IT CANNOT BE PROVEN BY REVERT ON A GIT-BASH NODE, which is worth writing down beside it
+  # rather than leaving for whoever next tries. MSYS `grep` reads in text mode and drops the CR
+  # before `sed` ever sees it, so removing this `tr` changes NOTHING here: measured on node `a`,
+  # both forms red identically on a wholly-CRLF conf. On a GNU-coreutils node the CR survives grep
+  # and the `tr` is the whole mechanism. Kept for that node; unexercisable on this one.
+  tr -d '\r' < "$CONF" | grep -E "^$1=" | head -1 | sed -E "s/^$1=//; s/^\"//; s/\"\$//"
+}
+
 MODE="${1:---check}"
-case "$MODE" in --scaffold|--check) ;; *) echo "usage: $(basename "$0") [--scaffold|--check]"; exit 2 ;; esac
+case "$MODE" in --scaffold|--check|--render|--expand) ;; *) echo "usage: $(basename "$0") [--scaffold|--check|--render|--expand [--stamp]]"; exit 2 ;; esac
+
+# --render exists because --scaffold REFUSES on an existing declaration, so without it the only
+# remedy for a DRIFTED Skill would be deleting the conf and re-deriving the table. A refusal whose
+# only fix is destructive is a refusal people learn to bypass.
+if [ "$MODE" = "--render" ]; then
+  [ -f "$CONF" ] || { echo "lexicon-adopt: no .lexicon.conf; nothing to render from"; exit 1; }
+  write_skill || exit 1
+  exit 0
+fi
+
+# ---- --expand ------------------------------------------------------------------------------------
+# THE SECOND AND LAST SUPPORTED TRANSITION. `--scaffold` refuses once a declaration exists, so an
+# adopter who needs a concept the seed missed had no tool-supported route at all and edited by hand
+# with nothing bounding what they added. This one is BOUNDED: the engine proposes only cluster
+# representatives with a live site in this corpus, and a leading token no cluster holds cannot enter
+# a proposal by any path. Proposals go to stdout and an owner pastes them, which keeps the curation
+# step where the whole design puts it -- the gate reds any VERBS row carrying no negative, so a
+# hand-pasted row is born failing until a human writes one. TOOL-aSurfacedLexicon-10.
+if [ "$MODE" = "--expand" ]; then
+  [ -f "$CONF" ] || {
+    echo "lexicon-adopt: NOT ADOPTED — no .lexicon.conf at the repo root, so there is no table to"
+    echo "lexicon-adopt: widen. Run --scaffold to derive the first one."
+    exit 1
+  }
+  # `${2:-}` because `set -u` is on and `-e` is not, so a bare `$2` is fatal the moment somebody
+  # runs --expand with no second word. REFUSED rather than ignored: every other mode in this file
+  # drops argv[2] silently, and `--stmap` would then be an unstamped run that reported success.
+  STAMP=0
+  case "${2:-}" in
+    "") ;;
+    --stamp) STAMP=1 ;;
+    *) echo "lexicon-adopt: unknown argument '${2:-}' — --expand takes --stamp, or nothing."; exit 2 ;;
+  esac
+  # S2 — THE ONCE REFUSAL, and it is a stamp rather than a lock. An absent key and an empty one both
+  # read as "never expanded", which is the correct verdict for each; the message distinguishes them
+  # and the verdict does not.
+  expanded="$(read_conf_scalar expanded)"
+  if [ -n "${expanded// /}" ]; then
+    echo "lexicon-adopt: ALREADY EXPANDED — .lexicon.conf carries \`expanded=\"$expanded\"\`, so this"
+    echo "lexicon-adopt: table has had its one widening. Once is the design: a vocabulary that grows"
+    echo "lexicon-adopt: whenever the corpus grows is the mirror this kit exists to refuse, and the"
+    echo "lexicon-adopt: second expansion is always the one that legalises a habit. Clearing that line"
+    echo "lexicon-adopt: re-opens it and nothing running under your own uid can stop you — what the"
+    echo "lexicon-adopt: stamp buys is a visible edit in a tracked file, never a lock."
+    exit 1
+  fi
+  "$PY" "$KIT_DIR/lexicon.py" --expand || exit 1
+  if [ "$STAMP" = 0 ]; then
+    echo ""
+    echo "lexicon-adopt: NOT STAMPED. Paste the rows you mean to keep, sharpen every negative, commit"
+    echo "lexicon-adopt: that, then re-run with --stamp to record the widening and refuse a second."
+    exit 0
+  fi
+  # F2 — REFUSE ON A DIRTY TREE, with the predicate NAMED: this repo's own tracked-only two-sided
+  # diff, and deliberately NOT `git status --porcelain`. The sha's whole job is to name the tree the
+  # proposal was measured against, and a clean tree's worktree IS its HEAD tree; a dirty one has no
+  # such sha, so HEAD would name a tree this run did not read.
+  #
+  # THE WEAKER OF THE TWO DEFINITIONS THIS REPO CARRIES, ON PURPOSE. `tools/run-gates` treats
+  # untracked files as dirt and has an arm asserting it. That definition cannot be used here: a kit
+  # fixture copies this directory in UNTRACKED by design, so porcelain is non-empty there forever
+  # and a refusal built on it could never be exercised — the arm would be unobservable for the life
+  # of the kit, which is a check that certifies nothing. govkit already owns this definition and
+  # wrote down the same reasoning.
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "lexicon-adopt: DIRTY TREE — refusing to stamp. The sha in \`expanded=\` names the tree the"
+    echo "lexicon-adopt: proposal was measured against; a worktree with uncommitted TRACKED changes"
+    echo "lexicon-adopt: has no such sha. Commit what you pasted, then re-run --expand --stamp."
+    echo "lexicon-adopt: Untracked files are not dirt here — the test is the two-sided tracked diff."
+    exit 1
+  fi
+  # AND THE DECLARATION ITSELF MUST BE TRACKED, which the diff above cannot see. The two-sided diff
+  # is tracked-only by design -- a kit fixture copies this directory in untracked, so a porcelain
+  # refusal could never be exercised -- but that exemption swallows `.lexicon.conf` as collateral,
+  # and this is the natural first-adoption path: --scaffold writes the conf, the operator curates it,
+  # and nothing forces a commit before --stamp. Both properties the messages here claim then fail at
+  # once: the sha names a tree containing no declaration at all, and the "visible edit in a tracked
+  # file" the once-refusal promises is an edit to an untracked one. Round-2 review F4.
+  if ! git ls-files --error-unmatch -- "$CONF" >/dev/null 2>&1; then
+    echo "lexicon-adopt: UNTRACKED DECLARATION — refusing to stamp. .lexicon.conf is not tracked, so"
+    echo "lexicon-adopt: the sha below would name a tree that does not contain it, and the stamp's"
+    echo "lexicon-adopt: whole value — a visible edit in a tracked file — would not exist. Commit the"
+    echo "lexicon-adopt: declaration first, then re-run --expand --stamp."
+    exit 1
+  fi
+  sha="$(git rev-parse HEAD 2>/dev/null)" || sha=""
+  # AN EMPTY DERIVATION REFUSES, which is this file's rule for every derived value and is why
+  # KIT_VERSION is tested for emptiness rather than trusted. It is NOT a gate with an observable
+  # failing case, and saying so is the point rather than an apology.
+  #
+  # THE STATE IT WAS WRITTEN FOR -- an unborn branch, where `rev-parse HEAD` exits 128 -- is
+  # unreachable from here, and it takes BOTH refusals above to make it so, not the one this comment
+  # first credited. A repo with no commit either has something STAGED, in which case the two-sided
+  # diff sees a staged change against the empty tree and DIRTY TREE fires; or it has nothing staged,
+  # in which case the conf is untracked and UNTRACKED DECLARATION fires. Neither alone closes it.
+  #
+  # So its red has never been seen and cannot be. It survives as the empty-derivation guard rather
+  # than as a checked one: an unreachable refusal that writes nothing is cheaper than a stamp reading
+  # `expanded="<date> "`. Round-2 F9, corrected at round-3 L2.
+  if [ -z "$sha" ]; then
+    echo "lexicon-adopt: NO SHA — refusing to stamp. \`git rev-parse HEAD\` produced nothing, so there"
+    echo "lexicon-adopt: is no tree for the stamp to point at."
+    exit 1
+  fi
+  # IN PLACE, NEVER APPENDED, and `awk`'s END clause covers the absent-key case in the same pass.
+  # `load_conf` takes the LAST occurrence of a repeated scalar and refuses no duplicate, while the
+  # guard above reads the FIRST — so an appended second stamp would leave the two readers disagreeing
+  # and the once-only refusal silently off. A freshly scaffolded conf also ends WITHOUT a trailing
+  # newline, which is the other way an append corrupts the line above it.
+  tmp="$(mktemp)" || { echo "lexicon-adopt: no writable temp dir; NOT stamping"; exit 1; }
+  awk -v repl="expanded=\"$(date +%Y-%m-%d) $sha\"" \
+      '/^expanded=/ && !seen {print repl; seen=1; next} {print} END {if (!seen) print repl}' \
+      "$CONF" > "$tmp" || { rm -f "$tmp"; echo "lexicon-adopt: the stamp rewrite failed"; exit 1; }
+  cat "$tmp" > "$CONF" || { rm -f "$tmp"; echo "lexicon-adopt: the stamp write failed"; exit 1; }
+  rm -f "$tmp"
+  echo ""
+  echo "lexicon-adopt: STAMPED $(read_conf_scalar expanded) — this table has had its widening."
+  exit 0
+fi
 
 if [ "$MODE" = "--check" ]; then
   fail=0
@@ -85,16 +348,44 @@ if [ "$MODE" = "--check" ]; then
     fail=1
   fi
   # S10 — the unratified-seed refusal. This is the arm that makes "the human curated it" checkable.
-  # `tr -d '\r'` FIRST. Both halves of this are needed and the pin alone is not enough: an anchored
-  # `s/"$//` cannot strip a quote that a carriage return follows, so a CRLF conf yields `"\r` — a
-  # NON-EMPTY value — and the unratified-seed refusal passes exactly when it should fire.
-  ratified=$(tr -d '\r' < "$CONF" | grep -E '^ratified=' | head -1 | sed -E 's/^ratified=//; s/^"//; s/"$//')
+  # The CRLF hardening that keeps it from passing exactly when it should fire lives in
+  # `read_conf_scalar`, with the reasoning; this was its first caller.
+  ratified=$(read_conf_scalar ratified)
   if [ -z "${ratified// /}" ]; then
-    echo "lexicon-adopt: .lexicon.conf carries an EMPTY \`ratified\` key. --scaffold DERIVES the verb"
-    echo "lexicon-adopt: table from your corpus and marks it PROPOSED; a derived table that nobody"
-    echo "lexicon-adopt: curated is a mirror of the code, which is the shape a naming gate must not"
-    echo "lexicon-adopt: have. Curate the table, then stamp \`ratified=\"<date> node <tag>\"\`."
+    echo "lexicon-adopt: .lexicon.conf carries an EMPTY \`ratified\` key. --scaffold takes each verb's"
+    echo "lexicon-adopt: SPELLING from the kit's frozen canon and asks your corpus only which concepts"
+    echo "lexicon-adopt: are live, so the seed is prescriptive rather than a mirror of your code — but"
+    echo "lexicon-adopt: it is not CURATED: the negatives are generic and your domain rows are missing."
+    echo "lexicon-adopt: Read the table, edit it, then stamp \`ratified=\"<date> node <tag>\"\`."
     fail=1
+  fi
+  # S5 of TOOL-aSurfacedLexicon-11 — THE CANON DOOR IS RECORDED OR IT IS REFUSED.
+  #
+  # CONDITIONAL on a block being present: a repo that declares none is the frozen state and the
+  # common one, so this arm must not red for every adopter who is not the author. This repo declares
+  # no block, so the false-refusal branch is exercised by the real bar on every run.
+  #
+  # DETECTED THROUGH THE ONE READER, never a grep: `--print-rows CANON` prints one overlay row per
+  # line and exits 0 with no output where no block exists. A second parser for this grammar in this
+  # script is the class the shell-out three lines above already rules out by name.
+  #
+  canon_rows=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-rows CANON "$CONF" 2>/dev/null | grep -c . || true)
+  if [ "${canon_rows:-0}" -gt 0 ]; then
+    stamp=$(read_conf_scalar canon_unfrozen)
+    if [ -z "${stamp// /}" ]; then
+      echo "lexicon-adopt: .lexicon.conf declares a CANON: overlay ($canon_rows row(s)) with an EMPTY"
+      echo "lexicon-adopt: \`canon_unfrozen\` stamp. The canon ships FROZEN and an owner may open it —"
+      echo "lexicon-adopt: but no machine check can tell a considered overlay from a mirror of your own"
+      echo "lexicon-adopt: corpus, so what the door buys is attribution rather than proof. Stamp it:"
+      echo "lexicon-adopt:   canon_unfrozen=\"<date> node <tag> — <why these rows>\""
+      fail=1
+    elif ! printf '%s' "$stamp" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}[[:space:]]+node[[:space:]]+[A-Za-z0-9_]+[[:space:]]+[^[:space:]]'; then
+      echo "lexicon-adopt: the \`canon_unfrozen\` stamp carries no REASON: $stamp"
+      echo "lexicon-adopt: A date and a node record that an unfreeze happened, not why — and why is the"
+      echo "lexicon-adopt: only thing separating a considered overlay from a mirror. The shape is"
+      echo "lexicon-adopt:   canon_unfrozen=\"<date> node <tag> — <why these rows>\""
+      fail=1
+    fi
   fi
   verbs=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-verbs "$CONF" 2>/dev/null | grep -c . || true)
   if [ "${verbs:-0}" -eq 0 ]; then
@@ -102,7 +393,98 @@ if [ "$MODE" = "--check" ]; then
     echo "lexicon-adopt: pin would absorb the whole corpus and the predicate would assert nothing."
     fail=1
   fi
-  [ "$fail" -eq 0 ] && echo "lexicon-adopt OK — .lexicon.conf parses, ratified, $verbs verb(s) declared"
+  # S9 — THE UNFREEZE, OBSERVED ON A LEG THE PUSH BOUNDARY RUNS, and it exercises ITSELF rather
+  # than depending on this repo declaring anything. Every other arm that touches the merge sits on
+  # `lexicon selftest`, chunk `selftests`, which GATE_FULL=1 does not reach and no boundary sets —
+  # so the unit whose whole subject is a behaviour change would ship its evidence on a leg nobody
+  # runs. This leg carries an EMPTY guard, so nothing scopes it off any bar.
+  #
+  # COST IS BOUNDED BY CONSTRUCTION: `--suggest` walks no corpus, so this is one `git init` and one
+  # declaration read. `frobnicate` is in no shipped cluster, so a run that answers `build_thing`
+  # can only have read the OVERLAY.
+  canon_tmp=$(mktemp -d 2>/dev/null) || canon_tmp=""
+  if [ -n "$canon_tmp" ] && git -C "$canon_tmp" init -q 2>/dev/null; then
+    {
+      echo 'canon_unfrozen="2026-09-05 node a — self-exercising arm for the overlay merge"'
+      echo 'LANGS="py:python-ast:parser"'
+      echo ''
+      echo 'CANON:'
+      echo '  build  frobnicate'
+      echo ''
+      echo 'CELLS:'
+      echo '  py.function  snake  vocab'
+      echo ''
+      echo 'VERBS:'
+      echo '  build  create a new value and return it - NOT `create`'
+    } > "$canon_tmp/.lexicon.conf"
+    # `--as` IS REQUIRED SINCE TOOL-aSurfacedLexicon-8, so the fixture declares the one cell this arm
+    # asks about. `snake` is the convention `build_thing` already satisfies, which keeps the expected
+    # answer byte-identical and keeps this arm about the OVERLAY rather than about the re-caser.
+    canon_out=$(cd "$canon_tmp" && "$PY" "$KIT_DIR/lexicon.py" --suggest frobnicate_thing \
+                                       --as py.function 2>&1)
+    case "$canon_out" in
+      *"CANON UNFROZEN"*) ;;
+      *) echo "lexicon-adopt: THE OVERLAY POSTURE LINE DID NOT PRINT on a stamped CANON: block."
+         echo "lexicon-adopt: A canon opened without saying so on every run is the quiet unfreeze this"
+         echo "lexicon-adopt: door was built not to be. Got: $canon_out"
+         fail=1 ;;
+    esac
+    case "$canon_out" in
+      *'use `build_thing`'*) ;;
+      *) echo "lexicon-adopt: THE OVERLAY DID NOT REACH THE ANSWER. A stamped row mapping"
+         echo "lexicon-adopt: \`frobnicate\` onto \`build\` must make --suggest answer \`build_thing\`;"
+         echo "lexicon-adopt: the shipped canon holds no cluster for that token at all."
+         echo "lexicon-adopt: Got: $canon_out"
+         fail=1 ;;
+    esac
+    rm -rf "$canon_tmp"
+  else
+    echo "lexicon-adopt: SKIPPED the canon-overlay arm — no writable temp dir or git init failed, so"
+    echo "lexicon-adopt: the overlay merge went UNEXERCISED on this run. Not a pass."
+  fi
+
+  check_skill || fail=1
+
+  # B1 OF THE CLOSING REVIEW — THE DECLARATION IS GRADED ON A LEG A CONF-ONLY COMMIT CANNOT SKIP.
+  #
+  # Every ratchet this kit owns lives in `.lexicon.conf`: the two scalar pins, the `CELLS`
+  # conventions, the `PINS` rows, the `CANON` overlay's effect on the DEBT/UNRULED split. The leg
+  # that computes those verdicts (`lexicon naming predicates`) is guarded on `tools/` and three
+  # sibling dirs, and `.lexicon.conf` is at the repo ROOT — so a branch whose whole diff is the
+  # declaration skipped its own verifier. Raising `VERB_OFFENDER_PIN` to any number, or flipping a
+  # cell to `dark`, landed with no verdict computed. A ratchet whose drain is invisible on the
+  # commit that drains it is not a ratchet, and the tool's own red text instructs the author to
+  # produce exactly that commit shape ("Paste this row into .lexicon.conf").
+  #
+  # THE GUARD IS NOT THE FIX, and that was tried twice and STRUCK twice. govkit partitions every
+  # declared guard into classes — memory-root-relative, verbatim-repo-root, renamed, exempt,
+  # kit-relative — and a root-level conf is in none of them, so declaring one reds `govkit
+  # selfcheck` rather than scoping anything. That ruling is written into this kit's own `kit.toml`.
+  # What was left was this script: it is the argv of `lexicon wiring`, the one leg in this kit
+  # carrying an EMPTY guard, and it already reads the declaration on every bar.
+  #
+  # THE OTHER LEG STAYS, and it is not made redundant by this. It runs the same engine SCOPED,
+  # which is an early signal under its own name in the leg log; this arm is the one that binds at
+  # the merge. The two share an argv, which the "ONE LEG, NOT TWO" ruling above warns about — but
+  # what that ruling struck was two legs with the same argv and DIFFERENT guards, where the guarded
+  # copy could never say anything the unguarded one had not. Here the unguarded copy is the
+  # authority and the guarded one is the fast fail; deleting either is a `gate-legs.json` and a map
+  # edit, not a behaviour change.
+  #
+  # COST: one corpus walk. Measured on node `a` from `<git-dir>/gate-ledger.tsv`, the row named
+  # `lexicon naming predicates`; read it there rather than from a number written here.
+  grade_out=$(cd "$ROOT" && "$PY" "$KIT_DIR/lexicon.py" 2>&1)
+  grade_rc=$?
+  if [ "$grade_rc" -ne 0 ]; then
+    echo "lexicon-adopt: THE DECLARATION DOES NOT GRADE — \`$PY $KITREL/lexicon.py\` exited"
+    echo "lexicon-adopt: $grade_rc over this corpus. Every pin in .lexicon.conf is a two-sided"
+    echo "lexicon-adopt: equality, so this is either a name that moved or a pin nobody re-measured."
+    echo "lexicon-adopt: The engine's own output follows; it names the row to paste."
+    printf '%s\n' "$grade_out"
+    fail=1
+  fi
+
+  [ "$fail" -eq 0 ] && echo "lexicon-adopt OK — .lexicon.conf parses, ratified, $verbs verb(s) declared, Skill in sync, declaration grades clean"
   exit "$fail"
 fi
 
@@ -113,4 +495,14 @@ if [ -f "$CONF" ]; then
   exit 1
 fi
 "$PY" "$KIT_DIR/scaffold_lexicon.py" "$CONF" || exit 1
+# `|| exit 1`, matching the --render branch. Without it this script -- which runs under `set -u` and
+# NOT `-e` -- took the echo's status, so a failed render printed "wrote .lexicon.conf" and exited 0
+# with no Skill on disk. The adopter was then wedged: --check reds, --scaffold refuses because the
+# conf now exists, and --render is named only in the usage line. Closing review H3.
+write_skill || {
+  echo "lexicon-adopt: the declaration was written but the Skill was NOT rendered."
+  echo "lexicon-adopt: curate the VERBS: block in .lexicon.conf, then run:"
+  echo "lexicon-adopt:   bash $KITREL/adopt-lexicon.sh --render"
+  exit 1
+}
 echo "lexicon-adopt: wrote .lexicon.conf marked PROPOSED — curate the table, then stamp \`ratified=\`."

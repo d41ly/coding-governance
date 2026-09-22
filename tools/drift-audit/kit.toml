@@ -4,11 +4,39 @@ id = "drift-audit"
 home = "tools/drift-audit"
 scope = "repo"
 version_from = { file = "drift_report.py", pattern = "^KIT_DRIFT_AUDIT_VERSION = " }
+# DEPL-dGaugedVintage-4 S1. The two workflow harnesses carry `gov:kit drift-audit@` but live under
+# `tools/workflows/`, which entry `review-harness` claims through its own `**` — so no resolution of
+# THIS entry reaches them and its marker assertion would be blind to two of its own sites. Declared
+# rather than inferred, so the cross-entry exception is visible. It works around TOOL-aScouredKit-26:
+# no cross-entry destination token exists.
+marker_carriers = ["{prefix}/workflows/drift-audit-code.js", "{prefix}/workflows/drift-audit-state.js"]
 requires = ["memory-tree"]
 
 [[files]]
 include = "**"
 role = "engine"
+
+# THIS KIT'S SELF-TESTS ARE WITHHELD. TOOL-aQuenchedHarness-3. Each stages a break into a copy of a
+# checker in THIS directory and asserts the checker still catches it, so its subject is the checker
+# and it has a job only when the source here changes -- and none at all in a tree that copy-installs
+# the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
+# only to what runs.
+#
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
+# `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
+#
+# AND THE LEG GOES WITH THE FILE, through machinery that already exists: `silenced_legs` refuses to
+# emit a gate leg whose argv names a path the target does not hold, and `_cmd_apply` REPORTS each one
+# rather than shipping it. So this rule closes both halves and needs no deployer code.
+#
+# SCOPE, and it is the half a reader misses: this withholds from `govkit apply` ONLY. The
+# copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
+# this file, so that runbook removes them separately. The suites remain in the public repository for
+# anyone who edits a kit.
+[[files]]
+include = ["selftest.py"]
+role = "project-owned"
 
 [[files]]
 include = ["drift_signals.py"]
@@ -34,6 +62,21 @@ required_keys_render = ["MEMORY_ROOT"]
 argv = ["bash", "{kit}/adopt-drift-audit.sh"]
 mutates_index = false
 
+# THE RE-RENDER an `update` runs by default; GOVKIT_RERENDER=0 declines it. It rewrites what the
+# `rendered` rule above declares, from `SKILL.template.md` plus the shared memory-tree conf — content derived
+# from the adopting tree rather than copied from gov's, which is what makes it go stale.
+#
+# THE SAME WORDS AS `[adopt]`, and that is a property rather than an oversight. This adopter carries
+# no scaffold guard to trip over and no mode narrower than its bare invocation: it renders
+# unconditionally, and it seeds the project layer only when that file is absent, printing `already
+# present — left untouched` otherwise. So re-running it cannot reset a measured pin set, which is the
+# one thing a re-render must never do here.
+# WHY THE BLOCK EXISTS AT ALL: without one, the kit's `rendered` row went a vintage stale on
+# every update — GOVKIT_RERENDER set or not, because the flag runs a block and there was none
+# (TOOL-dRetiredFork-29).
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-drift-audit.sh"]
+
 [check]
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 
@@ -43,12 +86,8 @@ probe = { must_exist = "{kit}/drift_signals.py" }
 means = "adopted"
 
 [[gate_leg]]
-name = "drift-audit selftest"
-argv = ["python", "{kit}/selftest.py"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
 name = "drift-audit records"
+subject = "repo"
 argv = ["python", "{kit}/drift_report.py", "--check"]
 guard = []
 history_depth = "full"
@@ -70,6 +109,14 @@ why = "TRACE_CUTOFF ships empty and the engine then returns gateable:False for c
 discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(0 if (getattr(d, 'TRACE_CUTOFF', '') or '').strip() else 1)"] }
 
 [[hole]]
+id = "drift-evidence-globs"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "EVIDENCE_GLOBS ships empty and the engine then falls back to PRODUCT_GLOBS, which is the UNNARROWED population signal 2 was corrected away from \u2014 so an unfilled hole leaves the adopter with the self-certifying oracle while the kit README records the correction as shipped. Same shape as drift-product-globs rather than drift-trace-cutoff: an unfilled hole here INVENTS an answer instead of staying silent, which is the worse of the two failure modes."
+discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(0 if (getattr(d, 'EVIDENCE_GLOBS', None) or []) else 1)"] }
+
+[[hole]]
 id = "drift-pins"
 kind = "measurement"
 blocks_adopt = false
@@ -77,8 +124,16 @@ blocks_gate = true
 why = "PINS ships empty and the reader defaults tolerance to 0, so an unmeasured pin set is indistinguishable from one measured at zero by any probe over the file. The probe below is weaker and differently scoped than the others, and that is stated rather than hidden."
 discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 
+# TOOL-aScouredKit-30. NO SIBLING PATH IN ANY ARGV HERE, and the reason is a constraint rather than
+# a preference. `govkit selfcheck` refuses a gate-leg argv naming a path this entry does not ship,
+# correctly — an adopter may install drift-audit alone. So the LEG cannot carry the answer, and an
+# answer given only to `[adopt]` makes adopt and `--check` resolve DIFFERENT values, which reds the
+# template-drift arm with a remedy that overwrites the correct Skill. One derivation for both is
+# the only shape that is self-consistent. The pointer is therefore still wrong in a deployed tree,
+# and the script now SAYS SO instead of being silent; the real fix is `TOOL-aScouredKit-26`.
 [[gate_leg]]
 name = "drift-audit wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 guard = []
 

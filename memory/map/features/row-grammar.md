@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["row-grammar selftest", "marker contract"]
+gate-legs = ["row-grammar selftest", "marker contracts"]
 kits = []
 git-hooks = []
 workflow-scripts = []
@@ -40,8 +40,15 @@ The check found a third on its first exposure to another node's rows during the 
 
 SCOPE IS PER FILE. Corpus-wide uniqueness would red 19 ids on day one, every one of them the designed
 backlog-row-plus-decision-row pair — the shape `corpus_ids.py` refused in writing for the same reason.
-NAMED GAP: the live index and its rotated archive are two files, so a row that rotates out and is
-re-minted is not caught here.
+NAMED GAP, NARROWED by `TOOL-cSpliceWarden-3`: the live index and its rotated archive are still two
+files, so a row that rotates out and is re-minted is not caught here. What changed is the POPULATION,
+not the assertion — a rotated BACKLOG archive is now scanned at all. It was not: the archive branch
+admitted a file only when its basename began `DECISIONS.`, so three rotated TOOL shards sat outside
+this check entirely and one of them carried two duplicated ids past a green bar for a month. A
+rotated archive is now recognised by the name of the document it rotated, `DECISIONS` or a DECLARED
+family plus a date, and deliberately NOT by "every `.md` under `archive/`" — that sweeps in the
+frozen charter snapshots, where a quoted example row would red the unkeyed branch on a file nobody
+may edit.
 
 THE PIN IS A COUNT, NOT A REGISTRY. A membership list would put the offending ids in a second place
 and let a deletion there pass unnoticed. An undeclared pin means ZERO — the strictest value, never a refusal and never off. Refusing one was the first design and it cost every hygiene fixture and every freshly scaffolded adopter a red bar: a default that can only TIGHTEN needs no ceremony.

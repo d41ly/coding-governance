@@ -37,20 +37,27 @@ while `AGENTS.md` calls that run the full bar. Making individual legs cheaper is
 floor stops being the sum and becomes the longest leg under load.
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aTimedTurnstile-2` | 2 | diff-scope the self-test legs, keep the push boundary full |
+| 2 | `TOOL-aTimedTurnstile-5` | 2 | run the merge bar's legs concurrently |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-11 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node a · opened 2026-08-11 · streams tooling
 ids TOOL-aTimedTurnstile-1 TOOL-aTimedTurnstile-2 TOOL-aTimedTurnstile-3 TOOL-aTimedTurnstile-4 TOOL-aTimedTurnstile-5 TOOL-aTimedTurnstile-6 TOOL-aTimedTurnstile-7 TOOL-aTimedTurnstile-8
 
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aTimedTurnstile-2 — diff-scope the self-test legs, keep the push boundary full](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md) | INPROGRESS | rev-1 | 2026-08-11 |
-| [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | INPROGRESS | rev-3 | 2026-08-11 |
+<!-- gen:build-units -->
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aTimedTurnstile-2 — diff-scope the self-test legs, keep the push boundary full](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md) | — | 2 | CLOSED | rev-2 | 2026-08-20 |
+| [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+<!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
-
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-11-review-TOOL-aTimedTurnstile-5-1.md](reviews/2026-08-11-review-TOOL-aTimedTurnstile-5-1.md) | spec-audit | TOOL-aTimedTurnstile-5 |
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: TOOL-aTimedTurnstile-2.
 
@@ -66,12 +73,3 @@ Ids no `spec-audit` record has ever named: TOOL-aTimedTurnstile-2.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-11-spec-TOOL-aTimedTurnstile-2.md](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md)
-  - [2026-08-11-spec-TOOL-aTimedTurnstile-5.md](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md)
-- **`reviews/`**
-  - [2026-08-11-review-TOOL-aTimedTurnstile-5-1.md](reviews/2026-08-11-review-TOOL-aTimedTurnstile-5-1.md)
-<!-- /gen:build-docs -->

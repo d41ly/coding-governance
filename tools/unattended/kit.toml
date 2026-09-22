@@ -4,17 +4,49 @@ id = "unattended"
 home = "tools/unattended"
 scope = "repo"
 version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
-requires = ["memory-tree"]
+requires = ["memory-tree", "review-harness"]
 
 [[files]]
 include = "**"
 role = "engine"
 
+# THIS KIT'S SELF-TESTS ARE WITHHELD. TOOL-aQuenchedHarness-3. Each stages a break into a copy of a
+# checker in THIS directory and asserts the checker still catches it, so its subject is the checker
+# and it has a job only when the source here changes -- and none at all in a tree that copy-installs
+# the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
+# only to what runs.
+#
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
+# `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
+#
+# AND THE LEG GOES WITH THE FILE, through machinery that already exists: `silenced_legs` refuses to
+# emit a gate leg whose argv names a path the target does not hold, and `_cmd_apply` REPORTS each one
+# rather than shipping it. So this rule closes both halves and needs no deployer code.
+#
+# SCOPE, and it is the half a reader misses: this withholds from `govkit apply` ONLY. The
+# copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
+# this file, so that runbook removes them separately. The suites remain in the public repository for
+# anyone who edits a kit.
+#
+# `runlog-writer.test.sh` joined it with TOOL-dLoggedFlight-2 for the same reason: its subject is the
+# driver's run-log writer in THIS directory, so an adopter who never edits the driver gains nothing
+# from it. It is not a gate leg either. `run-unattended-gates.sh` picks it up from its budget row with
+# the rest, and it also runs alone, which is how a build holding the siblings back runs it.
+[[files]]
+include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh", "unattended.test.sh"]
+role = "project-owned"
+
+# `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
+# bug-class checklist names by path. The adopter PROBES the tracked tree for it rather than deriving
+# it from `TOOL_ROOT`, because an adopter may install that kit flat in its tool root, and it refuses
+# when neither spelling is tracked. The review-harness kit's build harness carries the same command
+# and fills it the same way, so the two carriers cannot disagree about where the checklist lives.
 [[files]]
 include = ["SKILL.template.md"]
 role = "rendered"
 to = ".claude/skills/unattended/SKILL.md"
-placeholders = ["KIT_DIR", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL", "ANCHOR_SCOPE", "AUTH_PARAM"]
 
 [[files]]
 include = ["PROTOCOL.template.md"]
@@ -22,18 +54,104 @@ role = "rendered"
 to = "{memory_root}/guides/UNATTENDED-PROTOCOL.md"
 placeholders = []
 
+# the verb carrier. TOOL-dFoldedVerdict-5 moved the protocol's section 7 out to its own pair, because
+# that document had reached its byte cap exactly and a contract with no room for its next rule has
+# stopped being amendable. Placeholder-free like the protocol, so the adopter copies rather than
+# renders it.
+[[files]]
+include = ["VERBS.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/UNATTENDED-VERBS.md"
+placeholders = []
+
+# the playbook template. Placeholder-free like the protocol, so the
+# adopter copies it rather than rendering it.
+[[files]]
+include = ["PLAYBOOK-TEMPLATE.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
+placeholders = []
+
+# the playbook FIXTURE. RENDERED, not engine — and that role change is the whole unit. It shipped
+# verbatim with `{kit}` spelled out five times in its outputs, grain, records and legs, so
+# `check-playbook.sh` exited 1 for any adopter installed at another prefix and the suite above it
+# could not follow a variable the fixture did not have. TOOL-dScrubbedConduit-2.
+#
+# ONE token here, and the reason stands on its own ground: all five spellings in the FIXTURE sit
+# under the kit directory, so `KIT_DIR` covers every one of them. The clause this comment used to
+# carry - that `TOOL_ROOT` is computed only by the memory-tree adopter and declaring it would ship an
+# unresolved brace - was true when it was written and is false now: `adopt-unattended.sh` derives and
+# substitutes `TOOL_ROOT`, and the SKILL row above declares it. A stale premise is what the next
+# author reads before touching this rule.
+[[files]]
+include = ["playbook.fixture.template.md"]
+role = "rendered"
+to = "{kit}/playbook.fixture.md"
+placeholders = ["KIT_DIR"]
+
+# THE FIXTURE RECORDS, the rule above applied one file class further. Each is named for the piece it
+# describes with `/` written as `~`, so the install prefix sits in the FILENAME and not only in the
+# body. Shipped verbatim as engine rows they arrived at every foreign prefix under GOV's spelling,
+# the adopter renamed that file over the target's own copy, and the next `update` restored gov's
+# spelling so the rename ran again -- every update destroying whatever the target held there.
+# Reproduced at prefix `scripts`. DEPL-cMendedVintage-6.
+#
+# `{prefix}~{kit_id}` is the name the adopter derives from its own kit path, and the two agree for
+# every target whose kit home is the default. A target declaring an explicit kit home breaks that
+# equality, and the residue is a REPORT line rather than a misplaced write: `update` never writes a
+# `rendered` row, so the worst case is a row reported against a path its adopter does not use.
+#
+# THE TEMPLATES SIT IN THE KIT ROOT, not beside the records they render, because
+# `check-playbook.sh` globs the records directory and would read a template as a record whose piece
+# does not exist -- an orphan record, which is the state this pair exists to prevent.
+[[files]]
+include = ["fixture-record-one.template.md"]
+role = "rendered"
+to = "{kit}/fixture-records/{prefix}~{kit_id}~fixture-pieces~one~piece.md.md"
+placeholders = ["KIT_DIR"]
+
+[[files]]
+include = ["fixture-record-two.template.md"]
+role = "rendered"
+to = "{kit}/fixture-records/{prefix}~{kit_id}~fixture-pieces~two~piece.md.md"
+placeholders = ["KIT_DIR"]
+
+# AND GOV'S OWN TWO COPIES ARE WITHHELD, through the destination claim this descriptor already uses
+# to withhold its self-tests. A `**` rule drops a file only when the destination IT would produce is
+# claimed, and at a foreign prefix the two rendered destinations above carry THAT prefix while these
+# two carry gov's -- different paths, so without this rule the wildcard ships gov's spelling beside
+# the rendered one and `check-playbook.sh` reports the survivor as an orphan record. Measured before
+# this rule existed: a plan at prefix `scripts` printed both.
+#
+# The two destinations COINCIDE at gov's own prefix, which is what makes the render reproduce the
+# committed bytes here and is the parity the adopter's fixture arm already depends on.
+[[files]]
+include = ["fixture-records/tools~unattended~fixture-pieces~one~piece.md.md",
+           "fixture-records/tools~unattended~fixture-pieces~two~piece.md.md"]
+role = "project-owned"
+
 [config]
 file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
 argv = ["bash", "{kit}/adopt-unattended.sh"]
 mutates_index = false
 requires_config_first = true
+
+# THE RE-RENDER an update runs by default; GOVKIT_RERENDER=0 declines it. Every `rendered` row above
+# is written by the adopter, and without a regenerate block, or with this one and GOVKIT_RERENDER=0,
+# `update` lands the new templates, leaves the renders stale, and then fails its own post-write check
+# on the Skill and rolls the kit back. That is what happened at one adopter on 2026-09-11, and this
+# block prevents it unless an operator turns the step off. The adopter re-renders unconditionally,
+# so it is the whole argv;
+# its declared outcomes below classify its exit exactly as they do for `apply`.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-unattended.sh"]
 
 [check]
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
@@ -48,14 +166,71 @@ code = 1
 probe = { must_exist = "{memory_root}/guides/UNATTENDED-PROTOCOL.md", must_not_exist = ".claude/skills/unattended/SKILL.md" }
 means = "render-failed-half-stamped"
 
+# ---------------------------------------------------------------------------------------------------
+# THIS KIT'S SELF-TESTS ARE NOT GATE LEGS, and that is an owner ruling rather than an omission.
+# `check-unattended.test.sh`, `unattended.test.sh`, `check-playbook.test.sh`, `cross-component.test.sh`
+# and `adopt-unattended.test.sh` stage breaks into copies of this kit and assert the checkers still
+# catch them. Their subject is the CHECKER, so they have a job only when this kit's source changes and
+# none at all in an adopter's repo that copy-installs the kit and never edits it. Ruled 2026-08-23:
+# they run on the owner's demand, never on the merge bar, here and in every adopter alike.
+#
+# THE LEGS BELOW STAY, and the difference is their SUBJECT, and the difference is their subject: they read the REPOSITORY - its
+# run-state records, its playbooks, the shipped skill's wiring - which goes stale with nobody editing
+# this kit. Those are seconds. The self-tests were 3339 s of a 4926 s bar, 68% of all leg-seconds,
+# with the largest putting a 26-minute FLOOR under every full run. Measured node d, 2026-08-23;
+# memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
+#
+# THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
+# `tools/unattended/` is not done until this prints GREEN and the verdict is in the landing report:
+#
+#     bash tools/unattended/run-unattended-gates.sh            # the self-tests
+#     bash tools/unattended/run-unattended-gates.sh --all      # and the three legs beside them
+#
+# There is no gate behind that sentence. A kit edit that guts a check now lands green unless a person
+# runs it, and this file is where that trade is recorded as having been made deliberately.
+# ---------------------------------------------------------------------------------------------------
+
 [[gate_leg]]
 name = "unattended kit gate"
+subject = "repo"
 argv = ["bash", "{kit}/check-unattended.sh"]
+guard = []
+red_after_land = true
+
+# the playbook validity leg. No guard: it grades an adopter's playbooks and
+# the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
+# change a playbook.
+[[gate_leg]]
+name = "playbook validity gate"
+subject = "repo"
+argv = ["bash", "{kit}/check-playbook.sh"]
+guard = []
+red_after_land = true
+
+[[gate_leg]]
+name = "pass-order history"
+subject = "repo"
+argv = ["bash", "{kit}/check-pass-order.sh"]
+guard = []
+red_after_land = true
+
+# the brief-recorded leg. No guard, for `pass-order history`'s reason: its subject is the
+# REPOSITORY's run-state records, so it goes stale with nobody editing this kit, and a guard scoped
+# to this kit dir would skip it on exactly the commits that add a brief row — a build commit that
+# touches no kit file at all. Its ceiling is declared in the leg manifest and copied from the
+# sibling's, whose own
+# measured cost already sits at 73% of it: when the graded population catches up, that ceiling is the
+# next thing to red, and re-declaring it with a reason is the right answer then rather than now.
+[[gate_leg]]
+name = "brief-recorded"
+subject = "repo"
+argv = ["bash", "{kit}/check-brief-recorded.sh"]
 guard = []
 red_after_land = true
 
 [[gate_leg]]
 name = "unattended skill wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
@@ -66,7 +241,20 @@ kind = "authoring"
 blocks_adopt = false
 blocks_gate = true
 why = "a key ABSENT from the conf reds both the adopter check arm and the kit gate leg. But the shipped conf example copied verbatim renders its angle-bracket placeholder text as literal prose and passes EVERY check, because the placeholder detector greps the brace shape only — so this hole is half-silent and the probe is the only thing that sees that half."
-discharge = { command = ["bash", "-c", "! grep -qE '<[a-z-]+>' .claude/skills/unattended/SKILL.md"] }
+# NARROWED, and re-SUBJECTED, by TOOL-dScrubbedConduit-1 S4. The old probe grepped `<[a-z-]+>` over
+# the RENDERED SKILL.md — a file whose own template ships 25 `<slug>`, 6 `<name>` and more as
+# DOCUMENTED SYNTAX. It therefore failed for every adopter no matter how correctly the conf was
+# filled, including in this repo, where it has never passed. A hole nobody can discharge is worse
+# than the half-silence it was added to catch, and because `exempt_leg` suppresses the
+# red-after-install criterion for any entry with an undischarged blocks_gate hole, it was also
+# silently exempting all three unattended gate legs in every adopter tree.
+#
+# The subject is now the CONF, not the render: a rendered SKILL.md cannot tell a conf-injected
+# placeholder from the template's own syntax without matching literals. The predicate is "a value
+# wrapped in angle brackets is still a placeholder", which is general rather than a literal match —
+# and it catches KEEPALIVE_INTERVAL, whose shipped value `<e.g. every 10 minutes (…)>` does NOT match
+# `<[a-z-]+>` and was undetectable under the old probe.
+discharge = { command = ["bash", "-c", "! grep -qE '^KEEPALIVE_(CREATE|DELETE|INTERVAL)=\"<.*>\"' .unattended.conf"] }
 
 [[hole]]
 id = "directives-floor"
@@ -84,24 +272,6 @@ blocks_gate = true
 why = "undeclared or malformed reds the kit gate. For a faithful copy install the correct value is the driver's own core set sizes, so this is a transcription hole rather than a corpus measurement."
 discharge = { command = ["bash", "-c", "grep -qE '^CORE_FLOOR=\"?[0-9]+:[0-9]+' .unattended.conf"] }
 
-[[gate_leg]]
-name = "unattended gate selftest"
-argv = ["bash", "{kit}/check-unattended.test.sh"]
-guard = ["{memory_root}/guides/UNATTENDED-PROTOCOL.md", "{kit}/"]
-
-[[gate_leg]]
-name = "unattended driver selftest"
-argv = ["bash", "{kit}/unattended.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "unattended adopter e2e"
-argv = ["bash", "{kit}/adopt-unattended.test.sh"]
-guard = ["{kit}/"]
-
-# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
-# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
-# answer about which paths they govern, never these pattern strings.
 [[lf_pin]]
 pattern = ".unattended.conf"
 why = "its values are shell COMMANDS; a CR is executed"
@@ -110,7 +280,13 @@ pattern = "{kit}/.unattended.conf.example"
 why = "the adopter copies it verbatim into the line above"
 [[lf_pin]]
 pattern = "{kit}/*.md"
-why = "the protocol is byte-compared against the shipped copy"
+why = "the protocol and the playbook template are byte-compared against the shipped copies"
+[[lf_pin]]
+pattern = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
+why = "an installed artifact its own adopter byte-compares"
+[[lf_pin]]
+pattern = "{memory_root}/guides/UNATTENDED-VERBS.md"
+why = "an installed artifact both its adopter and check 10 byte-compare"
 [[lf_pin]]
 pattern = ".claude/skills/unattended/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

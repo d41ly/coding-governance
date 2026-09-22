@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-4 · 2026-07-20 · node a · Tier-2 · base d5ada669 · ports inCMS ARCH-aLeasedGauntlet-1 · reviewed wf_76540d9d,wf_e2be3386 · owner-ratified 2026-07-20 · built+closing-reviewed (wf_2a93910e, 7 findings folded)+landed 2026-07-20
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-07-20-review-TOOL-aLeasedGauntlet-1-1.md](../reviews/2026-07-20-review-TOOL-aLeasedGauntlet-1-1.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Port the owner-ratified LIGHT gate-economy fix (inCMS `ARCH-aLeasedGauntlet-1` rev-3) into the

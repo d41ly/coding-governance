@@ -11,6 +11,18 @@
 > cannot decide. A ratified table that no longer describes the code is the exact drift class this
 > repo gates for, so the rule change is recorded here and not only in a commit message.
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md](../build/2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md) | journal | TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md](../reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md) | diff-review | TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md](../reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md) | diff-review | TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md](../reviews/2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md) | diff-review | TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md](../reviews/2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md) | diff-review | TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Close the four items `TOOL-aFoldedQuarry-1` left open when it ported upstream `ARCH-dQuarriedLedger-1`,
@@ -21,7 +33,19 @@ declared draining `<MEMORY_ROOT>/project/` out of scope in writing, and nothing 
 
 - **S1** Relocate both journals under upstream's relocate-not-delete rule, give `bThriftyBellows` the
   stub build folder its slug has no home for, and delete the three `.md` stubs in the same commit.
+  - **Readers:** by name: `tools/memory-tree/check-memory-hygiene.sh` names the retired stubs in
+    check 3's comment and admits none of them in its closed case,
+    `tools/memory-tree/check-memory-hygiene.test.sh` asserts the scaffolder writes none of them, and
+    `WIRE-INTO-PROJECT.md` names the pointer stub. by value: `WIRE-INTO-PROJECT.md` tells an adopter
+    where the pointer stub's protocol prose is folded, which is where the stubs' content is read
+    now.
 - **S2** Retire the authored session ledger to `memory/archive/ledger/{a,b,c}.md` byte-identically.
+  - **Readers:** by name: `tools/drift-audit/drift_report.py` still points its ledger directory at
+    the old location for adopters who keep a ledger, `tools/drift-audit/drift_signals.py` declares
+    the ledger probe empty because the shards moved, and `WIRE-INTO-PROJECT.md` names the old
+    location and the new one. by value: `signal_ledger` reads every row of every shard and compares
+    what each row asserts against git, and `tools/drift-audit/selftest.py` drains a fixture ledger
+    and asserts that the declared-empty probe goes dead.
 - **S3** Make the hygiene gate match the drained tree, including a selector-integrity guard so a
   mis-segmented `project/` path expression reds instead of reporting nothing.
 - **S4** Resolve the `drift-audit` ledger probe, which is `gateable` and dies the moment

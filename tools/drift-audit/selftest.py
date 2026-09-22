@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.4
+gov:kit drift-audit@1.11
 
-    python drift-audit/selftest.py
+    python <kit>/selftest.py
 
 The kit's central claim is that a metric which cannot move is worse than no metric. That claim
 obliges the kit to prove its OWN signals can move, so every gateable signal is exercised twice: once
@@ -19,8 +19,10 @@ Everything runs in a throwaway git repo under tempfile. Nothing is written into 
 from __future__ import annotations
 
 import os
+import io
 import pathlib
 import shutil
+import re
 import subprocess
 import sys
 import tempfile
@@ -28,11 +30,24 @@ import tempfile
 sys.dont_write_bytecode = True
 
 KIT = pathlib.Path(__file__).resolve().parent
+# The report's path INSIDE the scratch repos this file builds, which install the kit at the ROOT
+# prefix on purpose — that is the dual-spelling support gov keeps for its not-retrofitted adopters,
+# and a selftest that could not build one could not test it. Written ONCE here rather than twelve
+# times below: a literal repeated twelve times is twelve chances for eleven of them to be updated.
+REPORT_REL = "drift-audit/drift_report.py"  # gov:root-fixture — scratch-repo path, never gov's own
 FAILS: list[str] = []
 SKIPS: list[str] = []
+EXECUTED: list[str] = []
+# TOOL-dLoggedFlight-13. The suite printed "all checks passed" with no count behind it, so an arm
+# stranded behind an early `return` passed by not running. This is the executed-check count measured
+# on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
+# one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
+# for a reason the floor cannot see.
+CHECK_FLOOR = 261
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
+    EXECUTED.append(label)
     if cond:
         print(f"  ok   {label}")
     else:
@@ -94,6 +109,11 @@ def run(cmd: list[str], cwd: pathlib.Path, env: dict | None = None) -> subproces
 
 def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
     print("conf parser vs bash")
+    # TOOL-aScouredKit-5 — the last two spellings are the ones this arm did NOT cover, and their
+    # absence is why a gate written to catch parser divergence had never observed one. Both are
+    # legal bash and both diverged: an `export ` prefix left the key spelled `export EXPORTED`, and
+    # an unquoted value with a trailing comment swallowed the comment into the value. The arm below
+    # was seen RED against the unfixed parser before the parser was touched.
     body = (
         '# a comment with an = sign\n'
         'MEMORY_ROOT=memory\n'
@@ -101,6 +121,10 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
         "QUOTED_SINGLE='x y'\n"
         '\n'
         'TRAILING=spaced   \n'
+        'export EXPORTED=exported\n'
+        'INLINE=value   # a trailing comment bash does not put in the value\n'
+        'QUOTED_NOTE="noted"  # a note after a quoted value\n'
+        "SINGLE_NOTE='single' # a note after a single-quoted value\n"
     )
     p = tmp / ".memory-tree.conf"
     p.write_text(body, encoding="utf-8", newline="\n")
@@ -113,7 +137,10 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
     if sh is None:
         skip("conf parser vs shell", "no POSIX shell here can source a file at this path")
         return
-    for key in ("MEMORY_ROOT", "DISCIPLINES", "QUOTED_SINGLE", "TRAILING"):
+    # TOOL-dLoggedFlight-13 R2-L5 — QUOTED_NOTE and SINGLE_NOTE: a quoted value followed by a comment
+    # kept its quotes, because the parser told quoted from unquoted by the value's last character.
+    for key in ("MEMORY_ROOT", "DISCIPLINES", "QUOTED_SINGLE", "TRAILING",
+                "EXPORTED", "INLINE", "QUOTED_NOTE", "SINGLE_NOTE"):
         res = run([sh, "-c", f'set -a; . ./.memory-tree.conf; printf "%s" "${key}"'], tmp)
         if res.returncode != 0:
             check(f"{sh} could source the conf for {key}", False, res.stderr.strip()[:120])
@@ -237,6 +264,10 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
         # the two 2026-02-02 specs, so one spec is grandfathered and two are judged.
         "TRACE_CUTOFF = '2026-01-15'\n"
         "TRACE_GLOBS = ['src']\n"
+        # Signal 2's own population, and NARROWER than PRODUCT_GLOBS on purpose:
+        # `conf/` stays outside it, so an engine that read PRODUCT_GLOBS here would
+        # be caught rather than passing by coincidence.
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']\n"
         "SHRINK_ONLY = {'shrinkme.txt': 'a list that promises to shrink'}\n"
         "HANDKEPT = []\n"
         # PINS stays EMPTY and is spelled exactly `PINS = {}`: the pin-semantics arm below rewrites
@@ -284,7 +315,7 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
 def report(r: pathlib.Path, *extra: str) -> dict:
     import json
 
-    out = run([sys.executable, "drift-audit/drift_report.py", "--json", *extra], r)
+    out = run([sys.executable, REPORT_REL, "--json", *extra], r)
     if out.returncode != 0 or not out.stdout.strip():
         raise AssertionError(f"report failed rc={out.returncode}: {out.stderr.strip()[:300]}")
     return {s["signal"]: s for s in json.loads(out.stdout)}
@@ -352,6 +383,26 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
           v2["non_terminal_specs_cited_by_product_source"]["value"] == 1,
           f"got {v2['non_terminal_specs_cited_by_product_source']['value']}")
 
+    # --- the PREFIX arm: a SIBLING's id must not certify this spec --------------------------
+    # `-F` alone matches a PREFIX, so `TOOL-aThing-1` hit inside `TOOL-aThing-11`. Measured live on
+    # this repo at TOOL-aBoundedVerdict-30: id `-1` carried three citations and all three were
+    # `-11`'s. Without this arm the `-w` that fixes it is an unproven character.
+    (r / "src" / "app.py").write_text("# implements TOOL-aThing-11\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "cite only the SIBLING id"], r)
+    v2p = report(r)
+    check("a sibling id sharing this id's prefix does not fire it",
+          v2p["non_terminal_specs_cited_by_product_source"]["value"] == 0,
+          f"got {v2p['non_terminal_specs_cited_by_product_source']['value']} "
+          f"detail={v2p['non_terminal_specs_cited_by_product_source']['detail']}")
+    # Without this the arm above is satisfied by a probe that judged nothing.
+    check("...and the probe is still live, so that 0 is a measurement",
+          v2p["non_terminal_specs_cited_by_product_source"]["live"] is True)
+    # Restore the real citation: the arms below judge a repo where the id IS cited.
+    (r / "src" / "app.py").write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "restore the real citation"], r)
+
     # --- a TERMINAL status must not fire, or the signal is just counting specs -------------
     spec = r / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aThing-1.md"
     spec.write_text(spec.read_text(encoding="utf-8").replace("SPECCED", "CLOSED"),
@@ -371,6 +422,47 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     s3b = report(r)["shrink_only_lists_not_shrinking"]
     check("shrink-only signal goes quiet once the list actually shrinks", s3b["value"] == 0,
           str(s3b["detail"]))
+
+    # --- DEPL-dGaugedVintage-13: a backlog row that outlived its own CLOSED spec ---
+    print("backlog rows outliving closed specs (dGV-13)")
+    b13 = report(r)["backlog_rows_outliving_closed_specs"]
+    check("[dGV-13] a spec whose id is in NO backlog row is not a finding",
+          b13["value"] == 0, f"got {b13['value']} detail={b13['detail']}")
+    check("[dGV-13] ...and the signal is LIVE, so a zero means it looked",
+          b13["live"] is True and b13["of"] >= 1, f"live={b13['live']} of={b13['of']}")
+    _shard = r / "memory" / "backlog"
+    _shard.mkdir(parents=True, exist_ok=True)
+    _ids = [x["id"] for x in report(r)["spec_status_terminal_ids"]["detail"]] \
+        if "spec_status_terminal_ids" in report(r) else []
+    _sp = sorted((r / SPEC_DIR_FOR_FIXTURE).glob("*.md"))
+    _own = None
+    for _f in _sp:
+        _m = re.search(r"^#\s+([A-Z]+-[a-zA-Z]+-\d+)\b", _f.read_text(encoding="utf-8"), re.M)
+        _s = re.search(r"^\*\*Status:\*\*\s*([A-Za-z]+)", _f.read_text(encoding="utf-8"), re.M)
+        if _m and _s and _s.group(1).upper() in ("CLOSED", "WONTDO"):
+            _own = _m.group(1)
+            break
+    if _own is None:
+        skip("[dGV-13] the row arms", "this fixture carries no terminal spec to key a row on")
+    else:
+        _fam = _own.split("-", 1)[0]
+        _row = _shard / f"{_fam}.md"
+        _row.write_text(f"# fixture backlog\n\n- {_own} \u00b7 OPEN \u00b7 a row that outlived its spec\n",
+                        encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r); run(["git", "commit", "-qm", "dgv13 open row"], r)
+        b13o = report(r)["backlog_rows_outliving_closed_specs"]
+        check("[dGV-13] a NON-terminal row under a CLOSED spec is counted",
+              b13o["value"] == 1, f"got {b13o['value']} detail={b13o['detail']}")
+        check("[dGV-13] ...and the detail names the id, the row's token and the spec's",
+              bool(b13o["detail"]) and b13o["detail"][0]["id"] == _own
+              and b13o["detail"][0]["row_status"] == "OPEN",
+              str(b13o["detail"][:1]))
+        _row.write_text(f"# fixture backlog\n\n- {_own} \u00b7 CLOSED \u00b7 reconciled\n",
+                        encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r); run(["git", "commit", "-qm", "dgv13 closed row"], r)
+        b13c = report(r)["backlog_rows_outliving_closed_specs"]
+        check("[dGV-13] a TERMINAL row under the same spec is not counted",
+              b13c["value"] == 0, f"got {b13c['value']} detail={b13c['detail']}")
 
     # --- signal 6: a CLOSED spec must be backed by a commit that names it AND changed product ---
     print("closed-spec traceability (signal 6)")
@@ -511,16 +603,79 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "records: drop the straddling fixture", "--no-verify"], r)
 
+    # THE WAIVER, both directions over one fixture. `aWaived` is CLOSED, post-cutoff and certified by
+    # nothing, so it FIRES on its own — that is the precondition, asserted first, because a waiver arm
+    # over a spec that was already silent would pass without the waiver doing anything.
+    waiver = r / "memory" / "project" / "trace-waiver.txt"
+    wspec_rel = SPEC_DIR_FOR_FIXTURE + "/2026-02-02-spec-aWaived-1.md"
+    wspec = r / wspec_rel
+    wspec.write_text("# TOOL-aWaived-1 — a unit no product subject can name\n\n"
+                     "**Status:** CLOSED · rev-1 · 2026-02-02 · node a · Tier-2 · base 0000000\n",
+                     encoding="utf-8", newline="\n")
+    run(["git", "add", wspec_rel], r)
+    run(["git", "commit", "-q", "-m", "records: a unit nothing certifies", "--no-verify"], r)
+    v6w0 = report(r)["closed_specs_with_no_product_commit"]
+    check("the waiver fixture fires BEFORE it is waived",
+          [d["id"] for d in v6w0["detail"]] == ["TOOL-aWaived-1"],
+          f"got {v6w0['detail']} -- the arm below would pass vacuously")
+
+    waiver.write_text("# fixture\n" + wspec_rel + "\tTOOL-aWaived-1\tno subject can name it\n",
+                      encoding="utf-8", newline="\n")
+    v6w1 = report(r)["closed_specs_with_no_product_commit"]
+    check("a waived spec is silent", v6w1["value"] == 0,
+          f"got {v6w1['detail']} -- the waiver is not being read")
+
+    # THE REGISTRY'S PATH IS DECLARABLE (TOOL-dMuffledSentinel-2), over the same fixture. Moved out of
+    # `memory/project/` with no key, the spec FIRES again: that is the precondition, because an arm
+    # over a spec a stray file already silenced would pass without the key doing anything. Then the
+    # key names the new home and it is silent; then a declared path that is not there, and one outside
+    # the tree, each come back as a finding of their own rather than as an empty waiver set.
+    sigp = r / "drift-audit" / "drift_signals.py"
+    sig_base = sigp.read_text(encoding="utf-8")
+    moved = r / "waivers" / "trace.txt"
+    moved.parent.mkdir(parents=True, exist_ok=True)
+    moved.write_text(waiver.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
+    waiver.unlink()
+    v6m0 = report(r)["closed_specs_with_no_product_commit"]
+    check("a relocated registry with no TRACE_WAIVER waives nothing",
+          [d["id"] for d in v6m0["detail"]] == ["TOOL-aWaived-1"],
+          f"got {v6m0['detail']} -- the TRACE_WAIVER arm below would pass vacuously")
+    for decl, want, why in (
+        ("waivers/trace.txt", [], "TRACE_WAIVER reads the registry where it is declared"),
+        ("waivers/missing.txt", ["(declared TRACE_WAIVER)", "TOOL-aWaived-1"],
+         "a declared TRACE_WAIVER that is not there is a finding, not an empty waiver set"),
+        ("../trace.txt", ["(declared TRACE_WAIVER)", "TOOL-aWaived-1"],
+         "a declared TRACE_WAIVER outside the tree is a finding, not an empty waiver set"),
+    ):
+        sigp.write_text(sig_base + f'\nTRACE_WAIVER = "{decl}"\n', encoding="utf-8", newline="\n")
+        got = report(r)["closed_specs_with_no_product_commit"]
+        check(why, sorted(d["id"] for d in got["detail"]) == want, f"got {got['detail']}")
+    sigp.write_text(sig_base, encoding="utf-8", newline="\n")
+    waiver.write_text(moved.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
+    moved.unlink()
+    moved.parent.rmdir()
+
+    # A row must not outlive its subject. Deleting the spec leaves the row behind, which is the shape
+    # that silently widens the exemption, so it has to come back as a finding rather than as silence.
+    wspec.unlink()
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "records: drop the waived fixture", "--no-verify"], r)
+    v6w2 = report(r)["closed_specs_with_no_product_commit"]
+    check("a waiver row whose spec is gone becomes a finding of its own",
+          [d["id"] for d in v6w2["detail"]] == ["(stale waiver)"],
+          f"got {v6w2['detail']} -- a stale waiver is being swallowed")
+    waiver.unlink()
+
     # --- 3 — --check honours the pin in BOTH directions -------------------------------------
     print("--check pin semantics")
     sig = r / "drift-audit" / "drift_signals.py"
-    over = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    over = run([sys.executable, REPORT_REL, "--check"], r)
     check("--check reds while a gateable signal is over its (default 0) pin", over.returncode == 1,
           f"rc={over.returncode}")
     sig.write_text(sig.read_text(encoding="utf-8").replace(
         "PINS = {}", "PINS = {'non_terminal_specs_cited_by_product_source': 1}"),
         encoding="utf-8", newline="\n")
-    at = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    at = run([sys.executable, REPORT_REL, "--check"], r)
     check("--check greens once the pin is seeded at the measured value", at.returncode == 0,
           f"rc={at.returncode} stderr={at.stderr.strip()[:200]}")
 
@@ -565,14 +720,14 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     unset = report(r)["closed_specs_with_no_product_commit"]
     check("unset cutoff: the signal is not gateable", unset["gateable"] is False,
           f"gateable={unset['gateable']}")
-    quiet6 = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    quiet6 = run([sys.executable, REPORT_REL, "--check"], r)
     check("unset cutoff: --check stays green rather than reding a dead gateable probe",
           quiet6.returncode == 0, f"rc={quiet6.returncode} stderr={quiet6.stderr.strip()[:200]}")
     sig.write_text(keep, encoding="utf-8", newline="\n")
 
     # --- a missing project layer is a REFUSAL, never a default ------------------------------
     sig.unlink()
-    gone = run([sys.executable, "drift-audit/drift_report.py"], r)
+    gone = run([sys.executable, REPORT_REL], r)
     check("a missing project layer refuses with rc 2", gone.returncode == 2, f"rc={gone.returncode}")
 
 
@@ -626,8 +781,8 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     conf = r / ".lexicon.conf"
     conf.write_text(
         'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
-        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
-        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n\nLAYERS:\n  src/* -> vendor/*\n',
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n',
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
@@ -676,6 +831,238 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
           stale["value"] == 1, f"{stale}")
     check("...and the signal is LIVE by derivation, not a hardcoded True",
           stale["live"] is True, f"{stale}")
+
+    # THE PATTERNS RESOLUTION, ARMED, and nothing armed it before. Both lexicon signals read
+    # `lex.PATTERN_SETS` — the SHIPPED constant — and skipped any extension whose pattern set was not
+    # in it, so a language armed only through a `PATTERNS:` row was passed over file by file while
+    # the signal reported a confident number with `live` still true off the Python half. That is
+    # green-by-absence on a gateable signal. Reverting `_resolve_lexicon_sets` back to the constant
+    # left this whole suite green, which is the defect this arm exists to make impossible.
+    #
+    # `vanish` is declared above and used by nothing. Its ONLY definition site now lives in a
+    # language reachable only through the declaration, so the signal falls to 0 exactly when the
+    # resolution is read and stays at 1 when it is not.
+    (r / "web").mkdir()
+    (r / "web" / "widget.ts").write_text("export function vanishThing() {}\n",
+                                         encoding="utf-8", newline="\n")
+    conf.write_text(
+        conf.read_text(encoding="utf-8").replace(
+            'LANGS="py:python-ast:parser js:js-regex:probe"',
+            'LANGS="py:python-ast:parser js:js-regex:probe ts:ts-regex:probe"')
+        + "\nPATTERNS:\n"
+        + r"  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)" + "\n",
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "arm a language through PATTERNS alone", "--no-verify"], r)
+    armed = report(r)["lexicon_verbs_declared_but_unused"]
+    check("a language armed ONLY by a PATTERNS row is read: the verb it defines stops being unused",
+          armed["value"] == 0, f"{armed}")
+    check("...and the signal stays LIVE over that widened population", armed["live"] is True,
+          f"{armed}")
+
+    # H1 OF THE CLOSING REVIEW — AN UNSHIPPED `parser` ID MUST NOT TAKE THE WHOLE REPORT DOWN.
+    #
+    # `_build_armed_exts` dropped `dark` rows and unknown-`probe` rows and KEPT a `parser` row whose
+    # pattern-set id the kit does not ship, so `extract_text` reached `PARSERS[pset]` and raised
+    # `KeyError`. Neither `except` tuple downstream covered it and `main()` evaluates every signal
+    # unguarded, so ONE legal-looking `LANGS` row cost all eight signals and printed a traceback —
+    # on a leg that carries no guard and runs on every bar. The engine's own `scan_corpus` refuses
+    # the same row by name, so the two readers of one declaration disagreed; `_load_lexicon`'s
+    # docstring promises "never a raise and never a red" for exactly this class.
+    #
+    # A TYPO IS THE WHOLE POPULATION. Nothing validates the id upstream — `langs()` checks the MODE
+    # token, `check_declaration` checks the CELLS/PINS cross-references — so an adopter is one
+    # mistyped set id away from a dead report.
+    conf.write_text(conf.read_text(encoding="utf-8")
+                    .replace("py:python-ast:parser", "py:bogus-parser:parser"),
+                    encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "a parser id the kit does not ship", "--no-verify"], r)
+    _raw = run([sys.executable, REPORT_REL, "--json"], r)
+    check("H1: an unshipped `parser` pattern-set id does not raise out of the report",
+          "Traceback" not in _raw.stderr and "KeyError" not in _raw.stderr,
+          _raw.stderr.strip()[-400:])
+    check("H1: ...and the report still returns every signal rather than none",
+          _raw.returncode == 0 and _raw.stdout.strip().startswith("["),
+          f"rc={_raw.returncode} {_raw.stdout.strip()[:200]}")
+
+
+def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
+    """The marginal-offense-rate signal: four states, and each one must be distinguishable.
+
+    THE ARM THAT MATTERS IS THE EMPTY WINDOW. A stretch in which nobody added a definition is a real
+    and common state — a records-only week — and reporting it as a rate of 0 is byte-identical to
+    reporting a clean one. Only the NOT ASKED arm separates them, and a version that returned 0 there
+    would pass every other check here.
+
+    THE SHALLOW ARM IS THE ONE THIS SIGNAL'S SPEC GOT WRONG. rev-2 asserted a `--depth 1` clone makes
+    the derived base unresolvable; measured, `git log --diff-filter=A` there returns the SHALLOW ROOT
+    as the adding commit and it resolves fine, so a resolves-check is armed against a case it cannot
+    see and the signal would report a rate over a one-commit window. The assertion that fires asks
+    whether the repository is truncated at all.
+    """
+    print("lexicon marginal-offense-rate (four states, each distinguishable)")
+    r = make_repo(tmp / "lexrate")
+    name = "lexicon_marginal_offense_rate"
+
+    absent = report(r)[name]
+    check("no .lexicon.conf: the rate is NOT ASKED, not a clean zero",
+          absent["gateable"] is False and absent["value"] == 0, f"{absent}")
+    check("no .lexicon.conf: it says why", "not adopted" in str(absent["detail"]), f"{absent['detail']}")
+
+    kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
+    shutil.copytree(kit_src, r / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (r / ".lexicon.conf").write_text(
+        'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n',
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
+
+    # The adoption commit IS the derived base, so HEAD == base and the window is empty BY
+    # CONSTRUCTION. This is the state a rate of 0 would misreport as clean.
+    empty = report(r)[name]
+    # ASSERTS `not_asked`, not `value == 0`. A rate of 0 ALSO has value 0 and gateable False, so the
+    # obvious spelling of this arm stays green under exactly the break it exists to catch -- observed
+    # 2026-08-25 by staging that break and watching this line pass. `not_asked` is the field the
+    # renderer branches on to keep the three states three, so it is the field the arm must read.
+    check("empty window: NOT ASKED rather than a rate of 0",
+          empty.get("not_asked") is True, f"{empty}")
+    check("empty window: it names the reason, so 0 is never mistaken for clean",
+          "no definition was added" in str(empty["detail"]), f"{empty['detail']}")
+
+    # Two definitions added, exactly one of them off-table.
+    (r / "src" / "later.py").write_text(
+        "def build_ok():\n    pass\n\n\ndef frobnicate_bad():\n    pass\n",
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "add two definitions, one off-table", "--no-verify"], r)
+    fired = report(r)[name]
+    check("a window with definitions added reports offenders over that population",
+          fired["value"] == 1 and fired["of"] == 2, f"{fired}")
+    check("...and is LIVE by derivation over a non-empty population",
+          fired["live"] is True, f"{fired}")
+    check("...and carries the fresh-versus-pre-existing split the kill-rule reads",
+          any("FRESH" in str(d.get("note", "")) for d in fired["detail"]), f"{fired['detail']}")
+
+    # UNGRADEABLE NAMES ARE IN NEITHER OPERAND. `leading_verb` returns "" for an identifier with no
+    # word characters, and the kit's own reuse note says plainly that a caller must treat that as
+    # ungradeable rather than as a violation. The signal did neither: "" is not in the declared
+    # table, so such a name counted as an offender AND stayed in the denominator, inflating the rate
+    # at both ends. Asserting BOTH operands is the point -- an arm reading only `value` would stay
+    # green against a version that merely stopped counting it as an offender while leaving it in
+    # `of`, which is the same rate wrong in the other direction. Closing review L4.
+    before = report(r)[name]
+    # A GRADEABLE CONTROL LANDS IN THE SAME COMMIT. Round 1 asserted `before["of"] > 0` as its
+    # non-vacuity guard, which is a property of the PREVIOUS window and says nothing about whether
+    # this commit reached the signal at all -- the round-2 review patched the extractor to skip
+    # word-character-free names entirely, an ordinary upstream change, and watched all three arms
+    # report ok. The control makes one assertion do both jobs: `of` must rise by exactly one, which
+    # proves the commit was seen, AND `value` must not move, which proves the ungradeable name left
+    # both operands. Neither can pass by finding nothing.
+    (r / "src" / "ungradeable.py").write_text(
+        "def __():" + chr(10) + "    pass" + chr(10) + chr(10) + chr(10)
+        + "def build_control():" + chr(10) + "    pass" + chr(10),
+        encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "one ungradeable name and one gradeable control", "--no-verify"], r)
+    after = report(r)[name]
+    check("an ungradeable name is not counted as an offender",
+          after["value"] == before["value"], f"before={before['value']} after={after['value']}")
+    check("...and the population grew by the CONTROL alone, so the ungradeable name left both operands",
+          after["of"] == before["of"] + 1, f"before={before['of']} after={after['of']}")
+
+    # THE SECOND RESOLUTION SITE. It was ungated until a re-verification pass reverted it ALONE and
+    # watched both suites stay green. `build_lexicon_marginal_offense_rate` reads the resolved pattern
+    # sets in three places -- the armed-extension set and both per-sha reads -- and the arm covering
+    # the OTHER lexicon signal reaches none of them. Two call sites and one arm between them is the
+    # same green-by-absence shape that sibling arm exists to abolish, one signal over.
+    #
+    # THE POPULATION IS THE OPERAND THAT MOVES. A language armed only through a `PATTERNS:` row is
+    # invisible to the shipped constant, so its definitions never enter `of`. One gradeable definition
+    # in that language must raise `of` by exactly one; with the resolution dropped it raises it by
+    # nothing and the signal reports a confident rate over the Python half alone. Asserting `value`
+    # holds STILL is the other half: a population that grew while the rate moved would mean the added
+    # name was graded off-table, which would make this arm pass for the wrong reason.
+    (r / "web").mkdir()
+    (r / "web" / "panel.ts").write_text(
+        "export function buildPanel() {}" + chr(10), encoding="utf-8", newline=chr(10))
+    ts_regex = r"  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)"
+    conf_p = r / ".lexicon.conf"
+    conf_p.write_text(
+        conf_p.read_text(encoding="utf-8").replace(
+            'LANGS="py:python-ast:parser"', 'LANGS="py:python-ast:parser ts:ts-regex:probe"')
+        + chr(10) + "PATTERNS:" + chr(10) + ts_regex + chr(10),
+        encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "arm a second language through PATTERNS alone", "--no-verify"], r)
+    widened = report(r)[name]
+    check("the marginal rate READS a language armed only by a PATTERNS row: its population grows",
+          widened["of"] == after["of"] + 1,
+          f"of before={after['of']} after={widened['of']} -- a population that did not grow means "
+          "build_lexicon_marginal_offense_rate never resolved the declared pattern sets")
+    check("...and the rate itself did not move, so the population grew by an ON-TABLE name",
+          widened["value"] == after["value"],
+          f"value before={after['value']} after={widened['value']}")
+
+
+    # ...and a window in which EVERY added definition is ungradeable must say so rather than read as
+    # a clean measured window. The round-1 L4 fix pointed every operand at `gradeable` and left the
+    # emptiness guard reading `added`, so that window returned value 0, of 0, live True and no
+    # `not_asked` -- and `0 > 0` is false, so it printed a plain `ok`. Found by the round-2 review.
+    #
+    # IT NEEDS ITS OWN REPO. The window runs from the declaration's adoption commit to HEAD and is
+    # cumulative, so appending an ungradeable file to the fixture above leaves the earlier gradeable
+    # definitions in it and the window is not all-ungradeable at all. The first spelling of this arm
+    # carried an `or of > 0` escape to paper over that, which made it satisfiable by the very
+    # population it was supposed to exclude -- observed staying green with the guard reverted.
+    b = make_repo(tmp, "lexblind")
+    shutil.copytree(kit_src, b / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (b / ".lexicon.conf").write_text(
+        'BANNED_SUFFIXES="Manager"' + chr(10) + 'LANGS="py:python-ast:parser"' + chr(10)
+        + 'VERB_OFFENDER_PIN="99"' + chr(10) + 'SUFFIX_OFFENDER_PIN="0"' + chr(10)
+        + 'ratified="2999-01-01 node t"' + chr(10) + chr(10)
+        + "VERBS:" + chr(10) + "  build  make a thing" + chr(10),
+        encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], b)
+    run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], b)
+    (b / "src" / "onlyblind.py").write_text(
+        "def __():" + chr(10) + "    pass" + chr(10), encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], b)
+    run(["git", "commit", "-q", "-m", "add only an ungradeable name", "--no-verify"], b)
+    _blind = report(b)[name]
+    check("an all-ungradeable window is NOT ASKED, never a clean zero",
+          _blind.get("not_asked") is True, f"{_blind}")
+    check("...and it says WHY, so the zero is never mistaken for a clean window",
+          "no word characters" in str(_blind["detail"]), f"{_blind['detail']}")
+
+    # ADMITTING the verb must move the rate. Without this the offender test could be reading a
+    # frozen table and nothing here would notice.
+    conf = r / ".lexicon.conf"
+    conf.write_text(conf.read_text(encoding="utf-8").replace(
+        "VERBS:\n  build  make a thing\n", "VERBS:\n  build  make a thing\n  frobnicate  do the thing\n"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "admit the verb", "--no-verify"], r)
+    admitted = report(r)[name]
+    check("admitting a verb lowers the rate, so the table is read at HEAD and not frozen",
+          admitted["value"] == 0 and admitted["of"] >= 2, f"{admitted}")
+
+    # THE SHALLOW ARM. A `--depth 1` clone still DERIVES a base — the shallow root — and it resolves,
+    # so only a truncation check can refuse it.
+    shallow = tmp / "lexrate-shallow"
+    run(["git", "clone", "-q", "--depth", "1", "file://" + str(r).replace("\\", "/"), str(shallow)], tmp)
+    if (shallow / ".git").exists():
+        deep = run(["git", "rev-parse", "--is-shallow-repository"], shallow).stdout.strip()
+        check("the fixture clone really is shallow (or this arm proves nothing)", deep == "true", deep)
+        got = report(shallow)[name]
+        check("shallow clone: DEAD PROBE rather than a rate over a one-commit window",
+              got["live"] is False and "shallow" in str(got["detail"]).lower(), f"{got}")
+    else:
+        skip("shallow-clone arm", "the fixture clone did not materialise on this platform")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -739,6 +1126,230 @@ def test_live_backlog_rows(tmp: pathlib.Path) -> None:
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
 
 
+NL_ = chr(10)
+
+
+def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
+    """TOOL-dScriptedRepeat-14: a build README asserting a mechanism its own spec set has revised.
+
+    Every arm here fixes the CLOCKS, because the predicate is entirely about which of two records
+    spoke last. `GIT_AUTHOR_DATE` on the README commit sets the blame side; the revision log's own
+    dates set the spec side. A fixture that let either float would be asserting over today's date."""
+    print("readme mechanism drift")
+    r = make_repo(tmp, name="rmdrift")
+    bdir = (r / SPEC_DIR_FOR_FIXTURE).parent
+
+    # THE README. Four authored claims and one generated one, chosen so each arm below has both
+    # directions present in the SAME fixture — a corpus that only carries violations cannot tell a
+    # working predicate from one that matches everything.
+    readme = [
+        "---",
+        "slug: x",
+        "---",
+        "",
+        "# a build",
+        "",
+        "The unit ships `--counts`, which takes the recorded FACTS.",
+        "It also ships `--stable`, and nothing has moved it since.",
+        "The run reaches `LANDED` at the end, which is a status and not a mechanism.",
+        "Its entry point is `drift_report.py`, which is a file and not a mechanism.",
+        "",
+        "<!-- gen:build-units -->",
+        "Rendered below this marker: `--generated-only` is not authored prose.",
+        "<!-- /gen:build-units -->",
+        "",
+    ]
+    (bdir / "README.md").write_text(NL_.join(readme) + NL_, encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "readme", "--no-verify"], r,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+
+    # THE SPEC SET. One revision AFTER the README line's date and three that are not, so the
+    # `rd > d` comparison has a failing input as well as a passing one.
+    spec = [
+        "# TOOL-aDrift-1 - a drifting thing",
+        "",
+        "**Status:** CLOSED - rev-2 - 2026-01-05 - node a - Tier-2 - base 0000000",
+        "",
+        "## 9. Revision log",
+        "",
+        "- rev-2 - 2026-01-05 - `--counts` now takes a pinned BASE sha and re-parses the blob,",
+        "  which is not what it did.",
+        "- rev-1 - 2025-12-01 - `--stable` introduced, and `LANDED` and `drift_report.py` named here",
+        "  so the shape filters below have an input rather than an absence to pass over.",
+        "- rev-3 - 2026-01-09 - `--counts-format` is a DIFFERENT flag that merely STARTS WITH one the",
+        "  README names. It is the latest entry here, so a bare-substring match would make it the",
+        "  revision this row cites - and the row must cite rev-2 instead. This wording deliberately",
+        "  never spells the shorter flag, because a fixture that mentions it grades its own prose.",
+        "",
+    ]
+    (r / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aDrift-1.md").write_text(
+        NL_.join(spec) + NL_, encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "spec", "--no-verify"], r)
+
+    got = report(r)["readme_mechanism_drift"]
+    toks = sorted(d["mechanism"] for d in got["detail"])
+    check("AC1: the README claim its own spec later revised is reported",
+          toks == ["--counts"], f"got {toks}")
+    check("AC1: the row names both records",
+          bool(got["detail"]) and got["detail"][0]["spec"].endswith("2026-01-01-spec-aDrift-1.md")
+          and got["detail"][0]["readme"].endswith(":7"), f"got {got['detail'][:1]}")
+    check("a revision EARLIER than the README line is not a hit", "--stable" not in toks)
+    check("a status word is not a mechanism, so LANDED is not a hit", "LANDED" not in toks)
+    check("a filename is not a mechanism, so drift_report.py is not a hit",
+          "drift_report.py" not in toks)
+    check("the generated region is not authored prose", "--generated-only" not in toks)
+    # `--counts-format` is dated LATEST, so a bare-substring match would name rev-3 as the revision.
+    # The row must still cite rev-2, which is the only entry that names `--counts` itself.
+    check("a longer flag that merely starts with the token is not a match",
+          bool(got["detail"]) and got["detail"][0]["revised"] == "2026-01-05",
+          f"got {got['detail'][:1]}")
+    check("the probe is LIVE with tokens and revisions present", got["live"] is True)
+    # REPORT ONLY, for the reason F2 settled: `drift-audit records` is an unguarded merge-bar leg and
+    # this predicate reports a POINTER, not a proven contradiction.
+    check("the signal is not gateable", got["gateable"] is False)
+
+    # --- AC2: a README and spec set that AGREE are silent, and the probe stays live -----------
+    r2 = make_repo(tmp, name="rmagree")
+    b2 = (r2 / SPEC_DIR_FOR_FIXTURE).parent
+    (b2 / "README.md").write_text(
+        "# a build" + NL_ + NL_ + "The unit ships `--counts`." + NL_,
+        encoding="utf-8", newline="\n")
+    (r2 / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aAgree-1.md").write_text(
+        NL_.join([
+            "# TOOL-aAgree-1 - a thing",
+            "",
+            "## 9. Revision log",
+            "",
+            "- rev-1 - 2025-12-01 - `--counts` introduced.",
+            "",
+        ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r2)
+    run(["git", "commit", "-q", "-m", "agree", "--no-verify"], r2,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+    ok = report(r2)["readme_mechanism_drift"]
+    check("AC2: an agreeing pair reports nothing", ok["value"] == 0, f"got {ok['value']}")
+    check("AC2: and the probe is still LIVE, so silence is a verdict rather than a blind spot",
+          ok["live"] is True)
+
+    # --- ROUND 7, MEDIUM 1: the two sides are dated on DIFFERENT CLOCKS unless the blame side
+    # --- honours `author-tz`. The spec side is a hand-typed LOCAL date; reading `author-time` as UTC
+    # --- backdates every README line written between 00:00 and 03:00 at +0300 and fires on a spec
+    # --- revision made the same local day. On this repo that was 11 of 31 rows, and the shipped pin
+    # --- was seeded through the skew. This arm is the one the existing fixtures could not be: every
+    # --- other GIT_AUTHOR_DATE here is +0000, which is exactly the timezone that cannot show it.
+    r4 = make_repo(tmp, name="rmtz")
+    b4 = (r4 / SPEC_DIR_FOR_FIXTURE).parent
+    (b4 / "README.md").write_text(
+        "# a build" + NL_ + NL_ + "The unit ships `--counts`." + NL_,
+        encoding="utf-8", newline="\n")
+    (r4 / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aTz-1.md").write_text(
+        NL_.join([
+            "# TOOL-aTz-1 - a thing",
+            "",
+            "## 9. Revision log",
+            "",
+            "- rev-2 - 2026-01-02 - `--counts` revised on the same LOCAL day the README line was",
+            "  written, which is only a hit if the two sides are read on different clocks.",
+            "",
+        ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r4)
+    # 01:00 at +0300 is 2026-01-01T22:00Z the day BEFORE. A UTC reader dates this line 2026-01-01 and
+    # the rev-2 entry then compares as later; an author-tz reader dates it 2026-01-02 and it does not.
+    run(["git", "commit", "-q", "-m", "tz", "--no-verify"], r4,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T01:00:00 +0300",
+             "GIT_COMMITTER_DATE": "2026-01-02T01:00:00 +0300"})
+    tz = report(r4)["readme_mechanism_drift"]
+    check("MEDIUM 1: a README line and a spec revision on the same LOCAL day are not a hit",
+          tz["value"] == 0, f"got {tz['value']} rows: {tz['detail'][:1]}")
+    check("MEDIUM 1: and the probe is LIVE, so the zero is a verdict", tz["live"] is True)
+
+    # --- ROUND 7, LOW 1: one row per README CLAIM, never one per backtick occurrence. `value` is
+    # --- what the shipped pin ratchets against, and its comment says each row is one sentence to
+    # --- re-read - which is false the moment a sentence naming a token twice counts twice.
+    r5 = make_repo(tmp, name="rmdup")
+    b5 = (r5 / SPEC_DIR_FOR_FIXTURE).parent
+    (b5 / "README.md").write_text(
+        "# a build" + NL_ + NL_
+        + "It ships `--counts`, and `--counts` is the one that matters." + NL_,
+        encoding="utf-8", newline="\n")
+    (r5 / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aDup-1.md").write_text(
+        NL_.join([
+            "# TOOL-aDup-1 - a thing",
+            "",
+            "## 9. Revision log",
+            "",
+            "- rev-2 - 2026-01-05 - `--counts` now takes a pinned BASE sha.",
+            "",
+        ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r5)
+    run(["git", "commit", "-q", "-m", "dup", "--no-verify"], r5,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+    dup = report(r5)["readme_mechanism_drift"]
+    check("LOW 1: a line naming one mechanism twice is ONE row",
+          dup["value"] == 1, f"got {dup['value']}")
+
+    # --- ROUND 7, LOW 3: the build slug comes from the DECLARED root. `MEMORY_ROOT` is not
+    # --- constrained to one path segment and this repo's own manifest records `docs/mem` as a real
+    # --- adopter value; an index-based split lands on the literal `builds` for every path and grades
+    # --- every README against every build's revision log. One arm covers every future signal that
+    # --- reaches for an index.
+    r6 = make_repo(tmp, name="rmnested")
+    (r6 / ".memory-tree.conf").write_text("MEMORY_ROOT=docs/mem" + NL_, encoding="utf-8", newline="\n")
+    for _b in ("one", "two"):
+        _d = r6 / "docs" / "mem" / "builds" / _b / "spec"
+        _d.mkdir(parents=True, exist_ok=True)
+        # THE TOKENS CROSS. Round 8's low 6: with each README naming its OWN build's token, a
+        # slug collapse merges the spec sets and still yields the same row count as the correct
+        # per-build grouping, so the count assertion passed with the fix reverted and only the
+        # slug assertion discriminated. Build `one`'s README names `--two-flag`, which ONLY
+        # build two's spec revises: a collapse produces rows here, correct grouping produces none.
+        # Build `one` names BOTH tokens, build `two` names only its own. Correct grouping: one
+        # row per build, two in total. A slug collapse grades every README against the merged
+        # spec set and yields THREE, because one's `--two-flag` line then matches too. Both
+        # assertions below discriminate; with each README naming only its own token neither did.
+        _extra = (NL_ + "It also mentions `--two-flag`." + NL_) if _b == "one" else NL_
+        (_d.parent / "README.md").write_text(
+            "# build " + _b + NL_ + NL_ + "It ships `--" + _b + "-flag`." + _extra,
+            encoding="utf-8", newline="\n")
+        (_d / ("2026-01-01-spec-a" + _b + "-1.md")).write_text(
+            NL_.join([
+                "# TOOL-a" + _b + "-1 - a thing",
+                "",
+                "## 9. Revision log",
+                "",
+                "- rev-2 - 2026-01-05 - `--" + _b + "-flag` was revised here.",
+                "",
+            ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r6)
+    run(["git", "commit", "-q", "-m", "nested", "--no-verify"], r6,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+    nest = report(r6)["readme_mechanism_drift"]
+    slugs = sorted({d["build"] for d in nest["detail"]})
+    check("LOW 3: a two-segment MEMORY_ROOT still names the BUILD, not the literal `builds`",
+          slugs == ["one", "two"], f"got {slugs}")
+    check("LOW 3: and each README grades against its OWN spec set only",
+          nest["value"] == 2, f"got {nest['value']} rows: {nest['detail'][:3]}")
+
+    # --- AC4: LIVENESS over the population that CAN empty. Not "did I find a build" - the tree
+    # --- always has builds - but "did I find a mechanism token to compare against a revision".
+    r3 = make_repo(tmp, name="rmdead")
+    b3 = (r3 / SPEC_DIR_FOR_FIXTURE).parent
+    (b3 / "README.md").write_text(
+        "# a build" + NL_ + NL_ + "Prose with no backticked mechanism in it." + NL_,
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r3)
+    run(["git", "commit", "-q", "-m", "no tokens", "--no-verify"], r3)
+    dead = report(r3)["readme_mechanism_drift"]
+    check("AC4: a corpus with no mechanism token reports DEAD rather than a reassuring 0",
+          dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+
+
 def test_declared_empty(tmp: pathlib.Path) -> None:
     """A declaration must stay LIFTABLE, or it is the DEAD PROBE defect wearing a nicer label.
 
@@ -781,14 +1392,14 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
           f"live={drained['live']}")
     check("drained: it reports 0 rather than a stale count", drained["value"] == 0,
           f"got {drained['value']}")
-    quiet = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    quiet = run([sys.executable, REPORT_REL, "--check"], r)
     check("drained + declared: --check stays green", quiet.returncode == 0,
           f"rc={quiet.returncode} stderr={quiet.stderr.strip()[:200]}")
 
     # THE DISCRIMINATING ASSERTION of direction one. The three above hold just as well for a signal
     # `--check` is merely ignoring; only the PRINTED status tells a reader "empty on purpose" from
     # "blind", and that line is the one a human acts on.
-    human = run([sys.executable, "drift-audit/drift_report.py"], r)
+    human = run([sys.executable, REPORT_REL], r)
     row = next((ln for ln in human.stdout.splitlines()
                 if "ledger_rows_contradicting_git" in ln), "")
     check("drained + declared: the printed row reads 'empty by declaration'",
@@ -823,7 +1434,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
     check("still declared, a row returns: and it scores the contradiction", still["value"] == 1,
           f"got {still['value']}")
     # THE DISCRIMINATING ARM. A declaration that survived into the over-pin filter would green this.
-    muzzle = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    muzzle = run([sys.executable, REPORT_REL, "--check"], r)
     check("still declared, a row returns: --check REDS — the declaration was not a muzzle",
           muzzle.returncode == 1, f"rc={muzzle.returncode} stderr={muzzle.stderr.strip()[:200]}")
     check("still declared, a row returns: ...and names the signal on stderr",
@@ -831,7 +1442,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
           f"stderr={muzzle.stderr.strip()[:200]}")
     # ...and the human-facing print must stop excusing it too. The status ladder reads the same
     # declaration set, so a muzzle can hide there just as easily as in the gate.
-    printed = run([sys.executable, "drift-audit/drift_report.py"], r)
+    printed = run([sys.executable, REPORT_REL], r)
     prow = next((ln for ln in printed.stdout.splitlines()
                  if "ledger_rows_contradicting_git" in ln), "")
     check("still declared, a row returns: the printed row reads OVER PIN, not 'empty by declaration'",
@@ -853,7 +1464,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
     check("declaration lifted: the probe is still LIVE", back["live"] is True, f"live={back['live']}")
     check("declaration lifted: and still scores the contradiction", back["value"] == 1,
           f"got {back['value']}")
-    fires = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    fires = run([sys.executable, REPORT_REL, "--check"], r)
     check("declaration lifted: --check reds identically", fires.returncode == 1,
           f"rc={fires.returncode}")
     check("declaration lifted: ...and names the signal on stderr",
@@ -937,23 +1548,982 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
           (out.stdout + out.stderr)[-400:])
 
 
+
+def test_ratchet_lookback(tmp: pathlib.Path) -> None:
+    """The justification WINDOW is a project-layer declaration — TOOL-aDeclaredBound-3.
+
+    Both directions over ONE fixture: the same pin, the same justification, the same distance, and
+    only the declared window moving. A one-directional arm would pass under any window wide enough,
+    which is the failure mode a tunable threshold invites. The shipped default is asserted against
+    the module constant rather than a retyped 14, so an arm cannot agree with itself.
+    """
+    print("RATCHET_LOOKBACK (a declared window, both directions over one fixture)")
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    from drift_report import _justified, _read_lookback, DEFAULT_RATCHET_LOOKBACK, DriftError
+
+    lines = ["# filler"] * 21
+    lines[10] = "# RAISED 5 -> 8 because the measurement said so"
+    text = "\n".join(lines)
+
+    check("a justification ten lines up is INSIDE the shipped window",
+          _justified(text, 20, 5, 8, DEFAULT_RATCHET_LOOKBACK))
+    check("...and OUTSIDE a declared window of five",
+          not _justified(text, 20, 5, 8, 5))
+    check("...and inside a declared eleven, so the boundary moves with the number",
+          _justified(text, 20, 5, 8, 11))
+
+    class _Bare:
+        pass
+    check("a layer declaring nothing takes the shipped default",
+          _read_lookback(_Bare()) == DEFAULT_RATCHET_LOOKBACK)
+
+    class _Declared:
+        RATCHET_LOOKBACK = 6
+    check("a layer declaring six gets six", _read_lookback(_Declared()) == 6)
+
+    for bad in (0, -3, "14", 2.5, True):
+        cls = type("_Bad", (), {"RATCHET_LOOKBACK": bad})
+        named = False
+        try:
+            _read_lookback(cls())
+        except DriftError as exc:
+            named = "RATCHET_LOOKBACK" in str(exc)
+        check(f"an unusable declaration ({bad!r}) is a refusal that NAMES the key", named)
+
+    # THE RAISE IS NOT THE CHANNEL. Every arm above calls the function and catches the exception,
+    # which is exactly what let the real defect through: the raise worked and nothing carried it to
+    # the caller, because the only call site sat OUTSIDE main's try. That shipped as a raw traceback
+    # and rc=1 -- the leg's "a signal is over its pin" exit -- so a config error read as drift.
+    # This arm drives main() and asserts the REFUSAL CHANNEL: rc 2, and the `drift-report: ` prefix
+    # a reader greps for. The repo's own idiom, asserted on the message and the code, never the raise.
+    import drift_report as _dr
+    import drift_signals as _ds
+
+    _saved = getattr(_ds, "RATCHET_LOOKBACK", None)
+    _err = io.StringIO()
+    try:
+        _ds.RATCHET_LOOKBACK = 0
+        _stderr, sys.stderr = sys.stderr, _err
+        try:
+            rc = _dr.main(["--check"])
+        finally:
+            sys.stderr = _stderr
+    finally:
+        if _saved is None:
+            delattr(_ds, "RATCHET_LOOKBACK")
+        else:
+            _ds.RATCHET_LOOKBACK = _saved
+
+    check("an unusable RATCHET_LOOKBACK refuses through main with rc=2, not a traceback", rc == 2)
+    check("...and on the prefixed channel a reader greps for",
+          _err.getvalue().startswith("drift-report: ") and "RATCHET_LOOKBACK" in _err.getvalue())
+
+
+def test_ratchet_message_states_its_window(tmp: pathlib.Path) -> None:
+    """The finding says how far it looked, using the DECLARED number.
+
+    Stated differentially on purpose: the message already interpolated the constant before this
+    unit, so an arm asserting it names fourteen would have been green before a line was written.
+    """
+    print("RATCHET message (states the window it actually searched)")
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import drift_report as dr
+
+    class _Git:
+        base_ref = "BASE"
+        def run(self, *a):
+            return type("R", (), {"returncode": 0, "stdout": 'PIN="5"\n'})()
+
+    root = tmp / "lookbackmsg"
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "p.conf").write_text('PIN="9"\n', encoding="utf-8", newline="\n")
+    spec = [{"file": "p.conf", "key": "PIN", "weakens": "up"}]
+
+    out6 = dr.ratchet_findings(_Git(), root, spec, 6)
+    check("a declared six is what the message reports",
+          bool(out6) and "within 6 lines" in out6[0], str(out6))
+    out_def = dr.ratchet_findings(_Git(), root, spec)
+    check("...and the shipped default when the caller passes none",
+          bool(out_def) and f"within {dr.DEFAULT_RATCHET_LOOKBACK} lines" in out_def[0], str(out_def))
+
+
+def test_lang_mode_ratchet(tmp: pathlib.Path) -> None:
+    """The LANGS mode ratchet: a weakening move needs its reason beside it.
+
+    THE ARM THAT MATTERS IS THE JUSTIFIED ONE. A ratchet that only ever fires is a ratchet nobody can
+    satisfy, and it would be indistinguishable from one that fires unconditionally -- which is the
+    same could-not-fail shape one level up. Both directions are asserted over one fixture.
+
+    THE EXTENSION IS REQUIRED IN THE MARKER, and that has its own arm. One LANGS line carries every
+    extension, so a bare `parser -> dark` beside it would justify a move for whichever extension the
+    reader guessed.
+    """
+    print("LANGS mode ratchet (a weakening move needs its reason)")
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import drift_report as dr
+
+    class _Git:
+        base_ref = "BASE"
+        def run(self, *a):
+            return type("R", (), {"returncode": 0,
+                                  "stdout": 'LANGS="py:python-ast:parser js:js-regex:probe"\n'})()
+
+    root = tmp / "langmode"
+    root.mkdir(parents=True, exist_ok=True)
+    conf = root / ".lexicon.conf"
+
+    # UNJUSTIFIED: py falls parser -> dark with nothing beside it.
+    conf.write_text('LANGS="py:python-ast:dark js:js-regex:probe"\n', encoding="utf-8", newline="\n")
+    out = dr.build_lang_mode_findings(_Git(), root)
+    check("mode ratchet: an unjustified parser -> dark is a finding", bool(out), str(out))
+    check("mode ratchet: it names the extension and both modes",
+          bool(out) and ".py" in out[0] and "parser -> dark" in out[0], str(out))
+
+    # JUSTIFIED: the same move, with the marker above the LANGS line.
+    conf.write_text('# py: parser -> dark, because the extractor moved to another kit.\n'
+                    'LANGS="py:python-ast:dark js:js-regex:probe"\n',
+                    encoding="utf-8", newline="\n")
+    check("mode ratchet: the SAME move with its reason beside it is silent",
+          dr.build_lang_mode_findings(_Git(), root) == [], str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # The marker must name the EXTENSION, not just the two modes.
+    conf.write_text('# parser -> dark, and this comment names no extension.\n'
+                    'LANGS="py:python-ast:dark js:js-regex:probe"\n',
+                    encoding="utf-8", newline="\n")
+    check("mode ratchet: a marker naming no extension does NOT justify the move",
+          bool(dr.build_lang_mode_findings(_Git(), root)),
+          str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # AN EXTENSION WHOSE NAME IS NOT A WORD. `<none>` is what this repo declares for a dotless
+    # basename, and the marker was anchored with a word boundary on both sides of the extension --
+    # which sits before `<` and after `>` and can NEVER match there. So the one extension whose name
+    # is not a word had a justification clause nobody could satisfy: every weakening move on it would
+    # red forever with a correct marker sitting right above it. Gated as a CLASS rather than for
+    # `<none>` alone, because the next such name will not be spelled that way. Closing review M2.
+    class _GitNone:
+        base_ref = "BASE"
+        def run(self, *a):
+            return type("R", (), {"returncode": 0,
+                                  "stdout": 'LANGS="<none>::parser py:python-ast:parser"\n'})()
+
+    conf.write_text('LANGS="<none>::dark py:python-ast:parser"\n', encoding="utf-8", newline="\n")
+    _un = dr.build_lang_mode_findings(_GitNone(), root)
+    check("mode ratchet: an unjustified move on a non-word extension is still a finding",
+          any("<none>" in f for f in _un), str(_un))
+    conf.write_text('# <none>: parser -> dark, because nothing extracts dotless files.\n'
+                    'LANGS="<none>::dark py:python-ast:parser"\n',
+                    encoding="utf-8", newline="\n")
+    _j = dr.build_lang_mode_findings(_GitNone(), root)
+    check("mode ratchet: a non-word extension CAN be justified (the marker must be satisfiable)",
+          _j == [], str(_j))
+
+    # THE MARKER GRAMMAR IS A SUPERSET OF THE ONE IT REPLACED, and that is asserted rather than
+    # assumed. The round-1 M2 fix required whitespace-or-start before the extension, which fixed
+    # `<none>` and silently NARROWED every other shape: `#py:` with no space, a parenthesised marker,
+    # and `# js,py:` -- the natural way to justify one move for two extensions -- all stopped
+    # matching. That reintroduced M2's own symptom (a permanent red under a correct-looking marker)
+    # for the shapes that used to work, which is why the rows below are spellings and not one
+    # spelling. `pyx` is the negative: a longer name must never be justified by a shorter one's row.
+    for _marker, _want_ok in (
+            ("# py: parser -> dark", True),
+            ("#py: parser -> dark", True),
+            ("# (py: parser -> dark)", True),
+            ("# js,py: parser -> dark", True),
+            ("# ext=py: parser -> dark", True),
+            ("# pyx: parser -> dark", False),
+            ("# parser -> dark", False),
+    ):
+        conf.write_text(_marker + chr(10) + 'LANGS="py:python-ast:dark js:js-regex:probe"' + chr(10),
+                        encoding="utf-8", newline=chr(10))
+        _silent = dr.build_lang_mode_findings(_Git(), root) == []
+        check(f"mode ratchet: {'justifies' if _want_ok else 'refuses'} {_marker!r}",
+              _silent is _want_ok, f"silent={_silent} want_ok={_want_ok}")
+
+    # A STRENGTHENING move is free, and an extension that never moved is silent.
+    conf.write_text('LANGS="py:python-ast:parser js:js-regex:parser"\n',
+                    encoding="utf-8", newline="\n")
+    check("mode ratchet: a tightening move needs no justification",
+          dr.build_lang_mode_findings(_Git(), root) == [],
+          str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # An extension DROPPED from LANGS entirely is the strongest weakening: rank falls to absent.
+    conf.write_text('LANGS="js:js-regex:probe"\n', encoding="utf-8", newline="\n")
+    gone = dr.build_lang_mode_findings(_Git(), root)
+    check("mode ratchet: an extension DELETED from LANGS is a weakening, not an absence",
+          bool(gone) and "absent" in gone[0], str(gone))
+
+    # NOT ADOPTED: no declaration at all is silence, never a finding.
+    conf.unlink()
+    check("mode ratchet: a repo without the kit reports nothing",
+          dr.build_lang_mode_findings(_Git(), root) == [], "expected []")
+
+
+def test_harness_liveness_note_is_derived(tmp: pathlib.Path) -> None:
+    """TOOL-dRetiredFork-6 S4 — the derived note, one arm per counter state.
+
+    The harnesses are Workflow-runtime scripts: top-level `await`, globals this process does not
+    have, so they cannot be imported. The two helpers are EXTRACTED and run in node, which grades
+    the SHIPPED bytes rather than a paraphrase of them.
+
+    WHY THREE ARMS AND NOT ONE. The ternary this replaced had three outcomes and conflated two of
+    them: "nothing moved" and "the probe could not run" both rendered the bare word `complete`. An
+    arm that only checked the dead state would pass against the ternary too, because the ternary
+    also produced *a* string. What distinguishes them is that the three states are now DISTINCT
+    sentences, so the arms assert distinctness, not just presence.
+    """
+    import json
+    import subprocess
+
+    LF = chr(10)
+
+    for harness in ("drift-audit-code.js", "drift-audit-state.js"):
+        src = (KIT.parent / "workflows" / harness).read_text(encoding="utf-8")
+        if "function deriveLiveness" not in src:
+            check(f"{harness}: carries the derived note", False,
+                  "deriveLiveness is absent — the hand-written ternary is back")
+            continue
+
+        def extract_fn(name: str) -> str:
+            i = src.index("function " + name + "(")
+            depth = 0
+            started = False
+            for j in range(i, len(src)):
+                if src[j] == "{":
+                    depth += 1
+                    started = True
+                elif src[j] == "}":
+                    depth -= 1
+                    if started and depth == 0:
+                        return src[i:j + 1]
+            raise AssertionError("unterminated " + name)
+
+        driver = (
+            extract_fn("deriveLiveness") + LF + extract_fn("renderLivenessNote") + LF +
+            "const states = {" + LF +
+            "  clean: { synth: true, lensesRun: 3, lensesDead: 0, skepticsDead: 0, unverified: 0 }," + LF +
+            "  partial: { synth: true, lensesRun: 3, lensesDead: 1, skepticsDead: 0, unverified: 2 }," + LF +
+            "  dead: { synth: false, lensesRun: 0, lensesDead: 3, skepticsDead: 0, unverified: 0 }," + LF +
+            "};" + LF +
+            "const out = {};" + LF +
+            "for (const k of Object.keys(states)) {" + LF +
+            "  out[k] = [deriveLiveness(states[k]), renderLivenessNote(deriveLiveness(states[k]), states[k])];" + LF +
+            "}" + LF +
+            "console.log(JSON.stringify(out));" + LF
+        )
+        d = tmp / (harness + ".driver.js")
+        d.write_text(driver, encoding="utf-8")
+        proc = subprocess.run(["node", str(d)], capture_output=True, text=True, encoding="utf-8")
+        check(f"{harness}: the extracted helpers run", proc.returncode == 0, proc.stderr[:160])
+        if proc.returncode != 0:
+            continue
+        got = json.loads(proc.stdout)
+
+        # AC1 / AC2 — moved and did-not-move are DIFFERENT sentences, and a consumer re-deriving
+        # either byte-matches, because both come from the same two functions.
+        check(f"{harness}: a moved counter renders PARTIAL", got["partial"][0] == "partial"
+              and got["partial"][1].startswith("PARTIAL:"), str(got["partial"]))
+        check(f"{harness}: nothing-moved renders CLEAN, not the bare word complete",
+              got["clean"][0] == "clean" and got["clean"][1].startswith("CLEAN:")
+              and got["clean"][1] != "complete", str(got["clean"]))
+
+        # AC3 — the state the ternary could not express. Observed RED against the ternary first:
+        # with `!synth` it produced an UNVERIFIED string and with lensesRun 0 alone it produced the
+        # bare `complete`, so a dead probe reported as a clean run.
+        check(f"{harness}: a probe that could not run says DEAD PROBE",
+              got["dead"][0] == "dead" and "DEAD PROBE" in got["dead"][1], str(got["dead"]))
+
+        # ANTI-VACUITY: three states, three DISTINCT sentences. The defect was that two of them were
+        # the same string, so an arm that never compared them would have passed against the ternary.
+        check(f"{harness}: the three states are three distinct sentences",
+              len({got["clean"][1], got["partial"][1], got["dead"][1]}) == 3)
+
+
+
+# ---------------------------------------------------------------------------------------------
+# The shipped-evidence oracle: one grammar, its own population, and a liveness half that can see
+# that population collapse. Five arms, one per criterion that observes a change this unit makes.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_evidence_oracle(tmp: pathlib.Path) -> None:
+    r = make_repo(tmp, name="evidence")
+    proj = r / "drift-audit" / "drift_signals.py"
+    conf = r / ".memory-tree.conf"
+    spec_dir = r / SPEC_DIR_FOR_FIXTURE
+
+    def add(rel: str, body: str, msg: str) -> None:
+        p = r / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(body, encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
+
+    def read_signal(*extra: str) -> dict:
+        return report(r, *extra)["non_terminal_specs_cited_by_product_source"]
+
+    # ---- ARM 1: the correction-form id. Its seq carries a trailing lowercase letter, which the
+    # hand-typed digits-then-boundary pattern could not match at all -- so the spec scored UNKEYED
+    # and the probe declined to judge it, silently. Observed RED against that pattern: the spec was
+    # absent from the judgeable population entirely.
+    before = read_signal()["of"]
+    add(str(pathlib.Path(SPEC_DIR_FOR_FIXTURE) / "2026-01-02-spec-aFixed-1b.md").replace("\\", "/"),
+        "# TOOL-aFixed-1b \u2014 a ratified correction\n\n"
+        "**Status:** SPECCED \u00b7 rev-1 \u00b7 2026-01-02 \u00b7 node a \u00b7 Tier-2 \u00b7 base 0000000\n",
+        "spec(aFixed): a correction-form id")
+    check("evidence: a correction-form id is JUDGED, not silently unkeyed",
+          read_signal()["of"] == before + 1,
+          f"population {before} -> {read_signal()['of']}, wanted +1")
+
+    # ---- ARM 2: a citation from a TEST file is the house's own bookkeeping certifying the
+    # bookkeeping, so it must not count as evidence a unit shipped. The same id cited from a
+    # PRODUCT file must count. Both halves, because only the pair discriminates.
+    add("src/thing.test.sh", "# cites TOOL-aThing-1 from a test file\n",
+        "test: cite a spec id from a test file")
+    check("evidence: a test-file citation is not evidence a unit shipped",
+          all(row["id"] != "TOOL-aThing-1" for row in read_signal()["detail"]),
+          f"detail: {[row['id'] for row in read_signal()['detail']]}")
+    add("src/thing.py", "# cites TOOL-aThing-1 from product source\n",
+        "feat: cite the same id from product source")
+    check("evidence: a product-file citation IS evidence a unit shipped",
+          any(row["id"] == "TOOL-aThing-1" for row in read_signal()["detail"]),
+          f"detail: {[row['id'] for row in read_signal()['detail']]}")
+
+    # ---- ARM 3: the drain. Remove every remaining product citation and the VALUE reaches zero,
+    # while the judgeable population does NOT -- they are different fields, and an arm asserting on
+    # the population would be green whatever the citations did.
+    (r / "src" / "thing.py").unlink()
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: drop the product citation", "--no-verify"], r)
+    drained = read_signal()
+    check("evidence: the value drains to zero when the product citations go",
+          drained["value"] == 0, f"value {drained['value']}")
+    check("evidence: the judgeable population does NOT drain with it",
+          drained["of"] > 0, f"of {drained['of']}")
+
+    # ---- ARM 4: the second liveness half. Empty the declaration and the signal must report itself
+    # DEAD rather than a clean zero. Observed RED against the pre-change engine, whose only liveness
+    # half counts specs and is computed before any glob is read -- it stayed True at full size.
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']", "EVIDENCE_GLOBS = ['no-such-directory']"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: empty the evidence declaration", "--no-verify"], r)
+    dead = read_signal()
+    check("evidence: a declaration resolving to no file reports DEAD, not a clean zero",
+          dead["live"] is False and dead["evidence_files"] == 0,
+          f"live={dead['live']} evidence_files={dead['evidence_files']}")
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['no-such-directory']", "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: restore the evidence declaration", "--no-verify"], r)
+
+    # ---- ARM 5: the grammar is bound to the TREE, not to the repo this kit lives in. A family this
+    # repo does not declare must still be classified in a tree that declares it. Observed RED
+    # against a module-constant binding, which reads the installing repo's family list and reports a
+    # confident zero over a corpus full of ids it cannot see.
+    conf.write_text("MEMORY_ROOT=memory\nFAMILIES=\"widget:WDGT\"\n",
+                    encoding="utf-8", newline="\n")
+    add(str(pathlib.Path(SPEC_DIR_FOR_FIXTURE) / "2026-01-03-spec-aWidget-1.md").replace("\\", "/"),
+        "# WDGT-aWidget-1 \u2014 a foreign family\n\n"
+        "**Status:** SPECCED \u00b7 rev-1 \u00b7 2026-01-03 \u00b7 node a \u00b7 Tier-2 \u00b7 base 0000000\n",
+        "spec(aWidget): an id in a family this kit's own repo does not declare")
+    add("src/widget.py", "# cites WDGT-aWidget-1 from product source\n",
+        "feat: cite the foreign-family id")
+    check("evidence: the grammar is bound to the tree, so a foreign family is classified",
+          any(row["id"] == "WDGT-aWidget-1" for row in read_signal()["detail"]),
+          f"detail: {[row['id'] for row in read_signal()['detail']]}")
+
+
+def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
+    """The local fallback is not a second grammar, and this is what keeps it honest.
+
+    The report falls back to a local copy of the id alternation when the recall extractor is not
+    importable, which is the only way a copy-installed kit can run in a tree without it. A copy
+    nobody compares is a second grammar with extra steps, so compare it -- here, where this repo
+    HAS the extractor, against what the extractor itself produces for this same tree.
+    """
+    import importlib.util
+
+    extractor = KIT.parent / "memory-recall" / "extract.py"
+    if not extractor.exists():
+        skip("local grammar equals the extractor's", "no memory-recall kit beside this one")
+        return
+    spec = importlib.util.spec_from_file_location("_drift_report_probe", KIT / "drift_report.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    root = KIT.parent.parent
+    families = mod._read_families(mod.load_conf(root))
+    # AGAINST THE EXTRACTOR ITSELF, not against the accessor. The accessor falls back to the local
+    # copy on ANY import failure, so comparing the two compared the copy to itself and passed for
+    # free -- reproduced by forcing the import to raise. The arm now imports the extractor by path
+    # and lets an import failure FAIL rather than quietly satisfy it.
+    espec = importlib.util.spec_from_file_location("_recall_extract_probe", extractor)
+    emod = importlib.util.module_from_spec(espec)
+    sys.path.insert(0, str(extractor.parent))
+    try:
+        espec.loader.exec_module(emod)
+        shipped = emod.grammar_for(root).ID
+    finally:
+        try:
+            sys.path.remove(str(extractor.parent))
+        except ValueError:
+            pass
+    check("local grammar equals the extractor's for this tree",
+          mod._build_local_ident(families) == shipped,
+          "the local fallback has diverged from the shipped alternation")
+
+
+# ---------------------------------------------------------------------------------------------
+# The source-citation signal: slug-resolvability as the discriminator, and two liveness halves.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_source_cited_ids(tmp: pathlib.Path) -> None:
+    NL = chr(10)
+    r = make_repo(tmp, name="citations")
+    conf = r / ".memory-tree.conf"
+    proj = r / "drift-audit" / "drift_signals.py"
+
+    def run_commit(msg: str) -> None:
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
+
+    def read_signal(*extra: str) -> dict:
+        return report(r, *extra)["source_cited_ids_resolving_to_no_record"]
+
+    base = read_signal()
+    check("citations: the signal is live on a fixture with records and source",
+          base["live"] and base["known_slugs"] > 0 and base["scanned_source_files"] > 0,
+          f"slugs={base['known_slugs']} files={base['scanned_source_files']}")
+
+    # ---- THE DISCRIMINATOR, both directions. A fabricated id under a slug that ANCHORS a record is
+    # a real dangling citation; the same shape under a slug no record anchors is a fixture. Only the
+    # pair proves the discriminator discriminates -- one half alone passes for a signal that counts
+    # everything, and the other for a signal that counts nothing.
+    before = read_signal()["value"]
+    (r / "src" / "resolving.py").write_text(
+        "# cites TOOL-aThing-999, whose slug anchors a record\n", encoding="utf-8", newline="\n")
+    run_commit("chore: cite a fabricated id under a RESOLVING slug")
+    check("citations: a dangling id under a known slug is a finding",
+          read_signal()["value"] == before + 1, f"value {before} -> {read_signal()['value']}, wanted +1")
+
+    mid = read_signal()["value"]
+    (r / "src" / "fixture.py").write_text(
+        "# cites TOOL-zNoSuchSlug-1, whose slug anchors nothing\n", encoding="utf-8", newline="\n")
+    run_commit("chore: cite a fabricated id under a slug no record anchors")
+    check("citations: a dangling id under an UNKNOWN slug is a fixture, not a finding",
+          read_signal()["value"] == mid, f"value {mid} -> {read_signal()['value']}, wanted no movement")
+
+    # ---- LIVENESS HALF ONE: no records, so no slugs. The signal must say it is dead rather than
+    # report a clean zero over a corpus it cannot see.
+    keep = {}
+    for p in sorted((r / FIXTURE_MEMORY_ROOT).rglob("*.md")):
+        keep[p] = p.read_text(encoding="utf-8")
+        p.unlink()
+    run_commit("chore: empty the memory root")
+    dead = read_signal()
+    check("citations: an empty memory root reports DEAD, not zero findings",
+          dead["live"] is False and dead["known_slugs"] == 0,
+          f"live={dead['live']} slugs={dead['known_slugs']}")
+    for p, text in keep.items():
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    run_commit("chore: restore the memory root")
+
+    # ---- LIVENESS HALF TWO, and it is NOT the scanned-file count. That count can never reach zero
+    # in a tree with this kit installed, because the report is itself a tracked non-memory file --
+    # measured, by writing the arm the obvious way and watching it fail to go dead. What CAN collapse
+    # is the CITED set: bind the grammar to a family nothing uses and every file is still scanned
+    # while nothing matches, which is a confident zero over a corpus full of ids the signal cannot
+    # see. That is the hazard, and this is the arm for it.
+    conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="nothing:ZZZZ"' + NL,
+                    encoding="utf-8", newline=NL)
+    run_commit("chore: bind the grammar to a family nothing uses")
+    blind = read_signal()
+    check("citations: a grammar matching nothing reports DEAD, not a clean zero",
+          blind["live"] is False and blind["of"] == 0 and blind["scanned_source_files"] > 0,
+          f"live={blind['live']} of={blind['of']} files={blind['scanned_source_files']}")
+
+    # ---- THE FAMILY ENUM IS READ, NOT SPELLED, and the arm runs in the NARROWING direction. With no
+    # FAMILIES declared the engine falls back to a permissive family pattern, so declaring an enum
+    # can only narrow -- an arm that declared a family and expected the count to RISE would pass on
+    # an engine that ignored the conf entirely, which is how it was first written.
+    (r / "src" / "foreign.py").write_text(
+        "# cites WDGT-aThing-7, in a family the conf may or may not declare" + NL,
+        encoding="utf-8", newline=NL)
+    run_commit("chore: cite an id in a foreign family")
+    conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="tooling:TOOL"' + NL,
+                    encoding="utf-8", newline=NL)
+    run_commit("chore: declare TOOL only")
+    narrow = read_signal()["value"]
+    conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="widget:WDGT tooling:TOOL"' + NL,
+                    encoding="utf-8", newline=NL)
+    run_commit("chore: declare the foreign family too")
+    check("citations: the family enum is READ from the conf, not spelled in the engine",
+          read_signal()["value"] == narrow + 1,
+          f"value {narrow} -> {read_signal()['value']}, wanted +1 once the family was declared")
+
+    # ---- THE WHOLE REPORT SURVIVES A TREE WITH NO RECALL KIT. This fixture has never had one, so
+    # the assertion is that the run RETURNS at all rather than raising and taking the other signals
+    # with it -- the failure mode is a dead leg for that adopter, not a missing signal.
+    check("citations: the report returns in a tree with drift-audit and no recall kit",
+          not (r / "memory-recall").exists() and read_signal()["signal"],
+          "the fixture unexpectedly has a recall kit beside it")
+
+
+# ---------------------------------------------------------------------------------------------
+# The two closing-review repairs, each with the arm it landed without.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None:
+    """A report-only signal at exactly its pinned value prints a CALM status, not an over one.
+
+    The display branch for a non-gateable signal compared against the bare `tolerance` while both
+    gateable branches compared against the resolved `pin`, so a report-only signal WITH a pin
+    announced itself over at the very value its pin ratifies. A signal whose only product is its
+    status line cannot afford that: it trains a reader to ignore the column.
+    """
+    r = make_repo(tmp, name="pinned")
+    proj = r / "drift-audit" / "drift_signals.py"
+    NL = chr(10)
+
+    def read_human_table() -> str:
+        out = run([sys.executable, REPORT_REL], r)
+        assert out.returncode == 0, out.stderr[:300]
+        return out.stdout
+
+    # A REPORT-ONLY SIGNAL WITH A NON-ZERO VALUE, built rather than assumed. The first version of
+    # this arm reached for a signal the fixture leaves at 0, so pinning it at its value pinned it at
+    # zero and the two checks below passed over nothing -- the fixture-passes-by-finding-nothing
+    # class, in the arm written to catch a reporting defect. The premise is asserted first now.
+    (r / "src" / "dangling.py").write_text(
+        "# cites TOOL-aThing-404, whose slug anchors a record but whose seq does not" + NL,
+        encoding="utf-8", newline=NL)
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: plant a dangling citation", "--no-verify"], r)
+
+    name = "source_cited_ids_resolving_to_no_record"
+    value = report(r)[name]["value"]
+    check("report-only: the fixture's report-only signal has a value to pin",
+          value > 0, f"value {value} -- the arm below would pin at zero and prove nothing")
+
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "PINS = {}", "PINS = {'" + name + "': " + str(value) + "}"),
+        encoding="utf-8", newline=NL)
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: pin the report-only signal at its value", "--no-verify"], r)
+
+    line = [ln for ln in read_human_table().splitlines() if name in ln]
+    check("report-only: a signal AT its pin does not report itself over",
+          bool(line) and "over" not in line[0],
+          f"status line: {line[0].strip() if line else '(absent)'}")
+    check("report-only: and it NAMES the pin rather than printing a bare ok",
+          bool(line) and ("pin " + str(value)) in line[0],
+          f"status line: {line[0].strip() if line else '(absent)'}")
+
+
+def test_evidence_globs_exclude_test_templates(tmp: pathlib.Path) -> None:
+    """A `.test-template` file is a test that is neither `.test.sh` nor named `fixture`.
+
+    The exclusion list was collapsed to a single fixture predicate and silently lost this shape,
+    re-admitting a template to the evidence population under a comment claiming total coverage.
+    """
+    r = make_repo(tmp, name="templates")
+    proj = r / "drift-audit" / "drift_signals.py"
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']",
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh', ':(exclude)*fixture*', "
+        "':(exclude)*.test-template.*']"),
+        encoding="utf-8", newline="\n")
+    (r / "src" / "thing.test-template.py").write_text(
+        "# cites TOOL-aThing-1 from a test TEMPLATE\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: cite a spec id from a test template", "--no-verify"], r)
+
+    sig = report(r)["non_terminal_specs_cited_by_product_source"]
+    check("evidence: a `.test-template` citation is not evidence a unit shipped",
+          all(row["id"] != "TOOL-aThing-1" for row in sig["detail"]),
+          f"detail: {[row['id'] for row in sig['detail']]}")
+
+    # AND THE SHIPPED DECLARATION CARRIES IT. The arm above writes its own glob list into the
+    # fixture's project layer, so it proves the PATHSPEC works and guards nothing about what this
+    # repo actually declares -- measured, by deleting the shipped line and watching the arm stay
+    # green. This half reads the shipped list directly, which is the only thing that reds when the
+    # exclusion is dropped from it.
+    shipped = KIT / "drift_signals.py"
+    globs = [ln.strip().strip(",").strip('"').strip("'")
+             for ln in shipped.read_text(encoding="utf-8").splitlines()]
+    check("evidence: the SHIPPED declaration excludes the test-template shape",
+          ":(exclude)*.test-template.*" in globs,
+          "the shipped EVIDENCE_GLOBS lost the exclusion the arm above only proves is honoured")
+
+
+# ---------------------------------------------------------------------------------------------
+# TOOL-dLoggedFlight-13 — run records left non-terminal after their build merged
+# ---------------------------------------------------------------------------------------------
+
+_RUN_SIG = "run_records_nonterminal_but_merged"
+
+
+def _write_run_record(r: pathlib.Path, rel: str, facts: dict, rows=()) -> str:
+    """A run-state file in the layout the driver leaves: its scaffold's header and generated region,
+    `## Run facts` with one `<key>: <value>` line per fact, then `## Parked` with every row on its own
+    line after a blank one, which is how `park` appends. A fact passed as None is absent, the way a
+    record reads when no verb ever wrote it. Returns `rel`, the repo-relative path."""
+    NL = chr(10)
+    p = r / rel
+    p.parent.mkdir(parents=True, exist_ok=True)
+    body = [f"# {p.parent.name} - run state", "", "<!-- run:generated -->", "<!-- /run:generated -->",
+            "", "## Run facts"]
+    body += [f"{k}: {v}" for k, v in facts.items() if v is not None]
+    body += ["", "## Parked"]
+    for row in rows:
+        body += ["", row]
+    p.write_text(NL.join(body) + NL, encoding="utf-8", newline=NL)
+    return rel
+
+
+def _build_park_row(kind: str, item: str) -> str:
+    """One parked row, in the byte shape of the driver's `park`."""
+    return f"2026-01-01T00:00:00Z {kind} \u00b7 item {item} \u00b7 reason a fixture row"
+
+
+def _build_run_ctx(dr, r: pathlib.Path, base_ref: str = "main"):
+    """The four attributes the signal reads, over a fixture repo, and nothing the full `Ctx` would
+    derive from a charter or a family grammar this signal never consults."""
+    import types
+    return types.SimpleNamespace(root=r, memory_root=FIXTURE_MEMORY_ROOT, git=dr.Git(r, base_ref),
+                                 pins={})
+
+
+def _measure_git_calls(dr, r: pathlib.Path) -> int:
+    """How many git processes ONE call of the signal starts. Counted at the report module's own
+    `subprocess` binding, which both `Git.run` and the held-open batch resolve at call time, so no
+    other code in this process is touched and the binding is restored whatever happens."""
+    import types
+    real = dr.subprocess
+    calls: list = []
+
+    def run_counted(cmd, *a, **k):
+        if cmd and cmd[0] == "git":
+            calls.append(cmd)
+        return real.run(cmd, *a, **k)
+
+    def run_piped_counted(cmd, *a, **k):
+        if cmd and cmd[0] == "git":
+            calls.append(cmd)
+        return real.Popen(cmd, *a, **k)
+
+    proxy = types.SimpleNamespace(**{k: getattr(real, k) for k in dir(real) if not k.startswith("__")})
+    proxy.run, proxy.Popen = run_counted, run_piped_counted
+    dr.subprocess = proxy
+    try:
+        dr.build_nonterminal_merged_runs(_build_run_ctx(dr, r))
+    finally:
+        dr.subprocess = real
+    return len(calls)
+
+
+def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
+    """TOOL-dLoggedFlight-13 AC1 AC2 AC3 AC4: every row of the S3 table and every alternative in it,
+    the witness-to-base test in both stale directions, each other unjudgeable reason, the read at HEAD
+    and never the working tree, the report-only property, and the call count.
+
+    The value is asserted against THIS fixture and never against the tree the kit lives in, whose
+    count moves with every landing. Witnesses are real commits on and off `main`, so ancestry is
+    git's answer rather than a double of it.
+    """
+    print("run records left non-terminal after their build merged")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    NL = chr(10)
+    B = f"{FIXTURE_MEMORY_ROOT}/builds"
+    P = _build_park_row
+    r = make_repo(tmp, name="runrecords")
+
+    def run_commit(msg: str) -> None:
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
+
+    def read_signal(base_ref: str = "main") -> dict:
+        return dr.build_nonterminal_merged_runs(_build_run_ctx(dr, r, base_ref))
+
+    # ---- S4, the two empty states. Nothing adopted is NOT ASKED; the kit's conf with no record is a
+    # population that may have gone blind, so it is DEAD. Neither may read as a clean zero.
+    empty = read_signal()
+    check("run records: none tracked and no .unattended.conf reads NOT ASKED, not a clean zero",
+          empty.get("not_asked") is True and empty["live"] is False, f"{empty}")
+    (r / ".unattended.conf").write_text("# the kit is adopted and no run has started" + NL,
+                                        encoding="utf-8", newline=NL)
+    run_commit("chore: adopt the unattended kit, with no run yet")
+    dead = read_signal()
+    check("run records: the conf with no record reads DEAD, not NOT ASKED",
+          dead["live"] is False and not dead.get("not_asked"), f"{dead}")
+
+    early = run(["git", "rev-list", "--max-parents=0", "main"], r).stdout.strip()
+    tip = run(["git", "rev-parse", "main"], r).stdout.strip()
+    side = run(["git", "rev-parse", "sidework"], r).stdout.strip()
+    check("run records: the fixture has a merged tip, its root and an unmerged side commit",
+          len({early, tip, side}) == 3 and all(len(s) == 40 for s in (early, tip, side)),
+          f"early={early!r} tip={tip!r} side={side!r}")
+
+    # ---- AC3, the S3 table. Every counted record has its witness AHEAD of its base on `main`, so only
+    # its last parked row decides its sub-class. One fixture per alternative, not per row: a table row
+    # listing four kinds is four ways to be wrong.
+    counted: dict = {}
+
+    def add_counted(slug: str, subclass: str, rows=(), phase: str = "BUILDING") -> None:
+        rel = _write_run_record(r, f"{B}/{slug}/RUN.md",
+                                {"phase": phase, "witness": tip, "base": early}, rows)
+        counted[rel] = (phase, subclass)
+
+    add_counted("tRetire", "retired-unit", [P("rescope", "retire TOOL-tRun-1")])
+    add_counted("tSupersede", "retired-unit", [P("rescope", "supersede TOOL-tRun-2 -> TOOL-tRun-3")])
+    add_counted("tRescopeAdd", "other", [P("rescope", "add TOOL-tRun-4")])
+    # The act is the item's FIRST word. A reader matching `retire` anywhere in the item reads this one
+    # as a retirement.
+    add_counted("tSecondWord", "other", [P("rescope", "add retire")])
+    for kind in ("decision", "abort", "override", "waiver"):
+        add_counted("tOwed" + kind.capitalize(), "surfaced-park", [P(kind, "a question refused")])
+    add_counted("tNoRows", "no-rows")
+    for kind in ("review", "dispatch", "brief", "proposal"):
+        add_counted("tHistory" + kind.capitalize(), "other", [P(kind, "a declaration")])
+    # LAST, not ANY: the same two rows in both orders, so a reader that asks "is there an owed row"
+    # passes one of these and fails the other.
+    add_counted("tOwedThenReview", "other", [P("decision", "asked first"), P("review", "then this")])
+    add_counted("tReviewThenOwed", "surfaced-park", [P("review", "this first"), P("decision", "then asked")])
+    # A kind the driver does not declare is not a parked row, so it cannot be the last one.
+    add_counted("tUndeclaredKind", "surfaced-park",
+                [P("decision", "asked"), P("heartbeat", "no driver writes this kind")])
+    add_counted("tLanding", "surfaced-park", [P("decision", "asked")], phase="LANDING")
+
+    # ---- AC3, the unjudgeable half: counted apart with the reason, never scored clean, never counted.
+    stale: dict = {}
+
+    def add_stale(slug: str, facts: dict, relation: str, why: str) -> None:
+        stale[_write_run_record(r, f"{B}/{slug}/RUN.md", facts)] = (relation, why)
+
+    add_stale("tClosedAtBase", {"phase": "LANDING", "witness": tip, "base": tip},
+              "equal", "witness not re-written since preflight")
+    add_stale("tBehindBase", {"phase": "LANDING", "witness": early, "base": tip},
+              "behind", "witness not re-written since preflight")
+    add_stale("tNoPhase", {"witness": tip, "base": early}, "unknown", "no phase: fact")
+    add_stale("tNoWitness", {"phase": "BUILDING", "base": early}, "unknown", "no witness: fact")
+    add_stale("tNamedWitness", {"phase": "BUILDING", "witness": "main", "base": early},
+              "unknown", "witness is not a sha")
+    add_stale("tGhostWitness", {"phase": "BUILDING", "witness": "0" * 40, "base": early},
+              "unknown", "witness does not resolve")
+    add_stale("tNoBase", {"phase": "BUILDING", "witness": tip}, "unknown", "no base: fact")
+    add_stale("tGhostBase", {"phase": "BUILDING", "witness": tip, "base": "f" * 40},
+              "unknown", "base does not resolve")
+    # Its witness IS behind this base in truth, which is exactly what one walk of `main` cannot see.
+    add_stale("tBaseOffMain", {"phase": "BUILDING", "witness": early, "base": side},
+              "unknown", "base is not on main")
+
+    # ---- Neither counted nor listed: terminal, archived, and unmerged.
+    quiet = [
+        _write_run_record(r, f"{B}/tLanded/RUN.md", {"phase": "LANDED", "witness": tip, "base": early},
+                          [P("decision", "asked")]),
+        _write_run_record(r, f"{B}/tArchived/RUN.ABORTED.0123abcd.md",
+                          {"phase": "ABORTED", "witness": tip, "base": early}),
+        _write_run_record(r, f"{B}/tUnmerged/RUN.md", {"phase": "BUILDING", "witness": side, "base": early}),
+        # AC1's HEAD-not-worktree pair, committed terminal here and edited live below.
+        _write_run_record(r, f"{B}/tWorktreeLive/RUN.md", {"phase": "LANDED", "witness": tip, "base": early}),
+    ]
+    # ...and its mirror, committed live here and edited terminal below.
+    add_counted("tWorktreeDone", "no-rows")
+    run_commit("chore: run records")
+
+    # AFTER the commit the working tree contradicts HEAD for two records, and a third record exists in
+    # the working tree alone. Every one of these is read at HEAD or not at all.
+    _write_run_record(r, f"{B}/tWorktreeLive/RUN.md", {"phase": "BUILDING", "witness": tip, "base": early})
+    _write_run_record(r, f"{B}/tWorktreeDone/RUN.md", {"phase": "LANDED", "witness": tip, "base": early})
+    untracked = _write_run_record(r, f"{B}/tUntracked/RUN.md",
+                                  {"phase": "BUILDING", "witness": tip, "base": early})
+
+    got = read_signal()
+    rows = {d.split(" ", 1)[0]: d for d in got["detail"] if not d.startswith("note")}
+    tracked = len(counted) + len(stale) + len(quiet)
+    check("run records: the population is every TRACKED record, the archive in and the untracked out",
+          got["of"] == tracked, f"of {got['of']}, wanted {tracked}")
+    check("run records: live over a non-empty population", got["live"] is True, f"live={got['live']}")
+    check("run records: the value is the counted fixtures and nothing else",
+          got["value"] == len(counted), f"value {got['value']}, wanted {len(counted)}: {got['detail']}")
+    check("run records: every unjudgeable fixture is counted apart",
+          got["unjudgeable"] == len(stale), f"unjudgeable {got['unjudgeable']}, wanted {len(stale)}")
+    for rel, (phase, sub) in sorted(counted.items()):
+        want = f"{rel} {phase} {tip[:8]} ahead {sub}"
+        check(f"run records: {rel.split('/')[2]} reads {sub}",
+              rows.get(rel) == want, f"got {rows.get(rel)!r}, wanted {want!r}")
+    for rel, (relation, why) in sorted(stale.items()):
+        row = rows.get(rel, "")
+        check(f"run records: {rel.split('/')[2]} is unjudgeable, {relation}, with its reason",
+              f" {relation} unjudgeable \u2014 {why}" in row, f"got {row!r}")
+    for rel in quiet + [untracked]:
+        check(f"run records: {rel.split('/')[2]} is neither counted nor listed",
+              rel not in rows, f"got {rows.get(rel)!r}")
+    check("run records: the refused-landing note closes the detail",
+          got["detail"][-1].startswith("note \u2014 a refused landing"), f"last {got['detail'][-1]!r}")
+
+    # ---- AC2, through the CLI: registered in SIGNALS, and `--check` exits 0 with the value above its
+    # pin, because nothing gates on a report-only signal. The premise is asserted first.
+    rep = report(r)
+    check("run records: the report registers the signal", _RUN_SIG in rep, f"signals {sorted(rep)}")
+    check("run records: the CLI reads what the in-process call read",
+          rep.get(_RUN_SIG, {}).get("value") == got["value"], f"cli {rep.get(_RUN_SIG)}")
+    chk = run([sys.executable, REPORT_REL, "--check"], r)
+    check("run records: --check exits 0 with the signal over its pin, because it is report-only",
+          chk.returncode == 0 and got["value"] > 0,
+          f"rc={chk.returncode} value={got['value']} stderr={chk.stderr.strip()[:200]}")
+
+    # ---- A walk that cannot happen is DEAD with its stage named, never a clean zero.
+    blind = read_signal("no-such-branch")
+    check("run records: a base ref the rev-list cannot walk reads DEAD, not a clean zero",
+          blind["live"] is False and blind["value"] == 0 and "rev-list" in str(blind["detail"]),
+          f"{blind}")
+
+    # ---- AC4, three git calls for five records and for fifty. A separate minimal repo, so the count
+    # is over a population the arm sets rather than over whatever the fixture above accumulated.
+    small = tmp / "runcalls"
+    small.mkdir()
+    run(["git", "init", "-q", "-b", "main"], small)
+    run(["git", "config", "user.email", "selftest@example.com"], small)
+    run(["git", "config", "user.name", "selftest"], small)
+    for name in ("base", "witness"):
+        (small / f"{name}.txt").write_text(name + NL, encoding="utf-8", newline=NL)
+        run(["git", "add", "-A"], small)
+        run(["git", "commit", "-q", "-m", name, "--no-verify"], small)
+    wit = run(["git", "rev-parse", "HEAD"], small).stdout.strip()
+    bas = run(["git", "rev-parse", "HEAD~1"], small).stdout.strip()
+    per_size = {}
+    for lo, hi in ((0, 5), (5, 50)):
+        for i in range(lo, hi):
+            _write_run_record(small, f"{B}/tCall{i}/RUN.md",
+                              {"phase": "BUILDING", "witness": wit, "base": bas}, [P("decision", "x")])
+        run(["git", "add", "-A"], small)
+        run(["git", "commit", "-q", "-m", f"{hi} records", "--no-verify"], small)
+        seen = dr.build_nonterminal_merged_runs(_build_run_ctx(dr, small))
+        per_size[hi] = (_measure_git_calls(dr, small), seen["value"])
+    for size, (calls, value) in sorted(per_size.items()):
+        check(f"run records: {size} records are all read and counted (the premise)",
+              value == size, f"value {value}")
+        check(f"run records: {size} records cost three git calls", calls == 3, f"{calls} calls")
+
+
+def _extract_driver_set(text: str, name: str):
+    """The members of one space-separated declaration in the driver, or None where it is absent."""
+    m = re.search(r"^" + name + r'="([^"]*)"', text, re.M)
+    return set(m.group(1).split()) if m else None
+
+
+def test_park_sets_match_the_driver(tmp: pathlib.Path) -> None:
+    """TOOL-dLoggedFlight-13 AC6: the engine's copies of the driver's four sets, held to the driver.
+
+    The engine SPELLS them because drift-audit runs in trees with no unattended kit; this arm is what
+    keeps a spelling from becoming a second vocabulary. The driver is reached by a path derived from
+    this kit's own directory, as the recall and workflow arms above reach theirs.
+    """
+    print("run-record sets vs the unattended driver's own declarations")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    driver = KIT.parent / "unattended" / "unattended.sh"
+    if not driver.exists():
+        skip("run-record sets equal the driver's", "no unattended driver beside this kit")
+        return
+    text = driver.read_text(encoding="utf-8", errors="replace")
+    pairs = (("PHASES_TERMINAL", dr._RUN_PHASES_TERMINAL), ("PARK_KINDS", dr._RUN_PARK_KINDS),
+             ("PARK_KINDS_OWED", dr._RUN_PARK_KINDS_OWED), ("PARK_ACTS_OWED", dr._RUN_PARK_ACTS_OWED))
+    for name, mine in pairs:
+        theirs = _extract_driver_set(text, name)
+        check(f"driver sets: {name} is declared where this arm reads it", bool(theirs),
+              "the declaration moved or emptied, so nothing below would compare anything")
+        if not theirs:
+            continue
+        check(f"driver sets: every {name} member the driver declares is in the engine",
+              not (theirs - set(mine)), f"engine lacks {sorted(theirs - set(mine))}")
+        check(f"driver sets: every {name} member the engine spells is the driver's",
+              not (set(mine) - theirs), f"driver lacks {sorted(set(mine) - theirs)}")
+
+    # THE CONTROL, so the comparison is seen to discriminate: the driver as it would read after gaining
+    # an owed kind the table lacks. The doctored copy is the real file with one member added, never a
+    # synthetic declaration, so the extraction it exercises is the one the checks above rely on.
+    doctored = re.sub(r'^PARK_KINDS_OWED="([^"]*)"', r'PARK_KINDS_OWED="\1 heartbeat"', text,
+                      count=1, flags=re.M)
+    grown = _extract_driver_set(doctored, "PARK_KINDS_OWED") or set()
+    check("driver sets: control — a driver that gains an owed kind reads unequal",
+          "heartbeat" in grown - set(dr._RUN_PARK_KINDS_OWED), f"extracted {sorted(grown)}")
+
+
+def test_version_carriers_agree(tmp: pathlib.Path) -> None:
+    """TOOL-dLoggedFlight-13 S6: every carrier of this kit's version agrees with the engine's constant.
+
+    The population is DERIVED: every file in this kit's directory that carries the marker, plus the
+    out-of-kit carriers its descriptor declares. A carrier that forgets the marker entirely drops out
+    of the first half, which is why the descriptor's declared list is required to resolve too.
+    """
+    print("drift-audit version carriers agree with the engine")
+    import tomllib
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    want = dr.KIT_DRIFT_AUDIT_VERSION
+    marker = re.compile(r"gov:kit drift-audit@([0-9][0-9.]*[0-9])")
+    in_kit = sorted(p for p in KIT.iterdir()
+                    if p.is_file() and marker.search(p.read_text(encoding="utf-8", errors="replace")))
+    desc = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))
+    declared = [KIT.parent / c.split("/", 1)[1] for c in desc.get("marker_carriers", [])
+                if c.startswith("{prefix}/")]
+    check("versions: the kit dir holds carriers beyond the engine", len(in_kit) > 1,
+          f"found {[p.name for p in in_kit]}")
+    check("versions: the descriptor declares its out-of-kit carriers", bool(declared),
+          "marker_carriers is empty or no longer spelled with {prefix}")
+    for p in in_kit + declared:
+        text = p.read_text(encoding="utf-8", errors="replace") if p.exists() else ""
+        found = marker.findall(text)
+        check(f"versions: {p.name} carries the marker at {want}", bool(found) and set(found) == {want},
+              f"found {found}")
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
+        test_harness_liveness_note_is_derived(tmp)
         test_signals_can_move(tmp)
         test_lexicon_signals(tmp)
+        test_lexicon_marginal_rate(tmp)
         test_no_signal_hardcodes_live(tmp)
         test_live_backlog_rows(tmp)
+        test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)
+        test_ratchet_lookback(tmp)
+        test_ratchet_message_states_its_window(tmp)
+        test_lang_mode_ratchet(tmp)
+        test_evidence_oracle(tmp)
+        test_local_grammar_matches_the_extractor(tmp)
+        test_source_cited_ids(tmp)
+        test_report_only_signal_is_judged_against_its_pin(tmp)
+        test_evidence_globs_exclude_test_templates(tmp)
+        test_nonterminal_merged_runs(tmp)
+        test_park_sets_match_the_driver(tmp)
+        test_version_carriers_agree(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")
+        print(f"drift-audit selftest: floor {CHECK_FLOOR} NOT compared — a skipped arm's checks are "
+              f"absent for a reason the floor cannot see")
+    elif len(EXECUTED) < CHECK_FLOOR:
+        FAILS.append("check floor")
+        print(f"drift-audit selftest: FAIL executed {len(EXECUTED)} checks, under the floor of "
+              f"{CHECK_FLOOR} — an arm went missing")
     if FAILS:
         print(f"drift-audit selftest: {len(FAILS)} FAILED — {', '.join(FAILS)}")
         return 1
-    print(f"drift-audit selftest: all checks passed"
+    print(f"drift-audit selftest: all checks passed ({len(EXECUTED)} executed, floor {CHECK_FLOOR})"
           + (f" ({len(SKIPS)} skipped, see above)" if SKIPS else ""))
     return 0
 

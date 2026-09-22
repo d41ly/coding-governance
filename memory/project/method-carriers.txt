@@ -10,8 +10,13 @@ tools/memory-tree/adopt-memory-tree.sh · renders the method into an adopting tr
 tools/unattended/SKILL.template.md · the source of the rendered Skill's step 0
 tools/unattended/unattended.sh · verb_resume echoes the method path to a resuming run
 tools/memory-tree/HYGIENE.template.md · the shipped hygiene rules describe this registry, and naming what it guards names the method
-.memory-tree.conf · its READ_PATH_CEILING comment names the method as the largest read-path member
+.memory-tree.conf · its READ_PATH_WAIVER comment points at the retirement exhibit, which names the method as the largest read-path member it measured
 tools/memory-tree/kit.toml · the deployer descriptor names the method as a RENDERED artifact of this kit — a destination, never a restatement
 tools/unattended/check-unattended.sh · check 16 arm B resolves each cited M-section against the method's own heading grammar; it POINTS at the sections rather than restating any rule
 tools/unattended/PROTOCOL.template.md · §10 names the build method as the carrier every directive points into, and §1 names it a run-time dependency; both POINT, neither restates a rule
 tools/drift-audit/drift_signals.py · TRACE_CUTOFF cites the commit that landed the method, because that commit is what dates the commit-subject convention this signal judges
+tools/gate-legs.json · a GUARD pathspec names the method file, because the kit/dogfood parity leg validates it — a path the leg reads, never a restatement of what the method says
+tools/workflows/unattended-build.js · the build harness POINTS at the method: its stage prompts tell each agent to read BUILD-METHOD.md whole before acting, and its BUILD prompt cites M4's two dispositions by name rather than restating either. It states no rule the method does not.
+tools/workflows/unattended-build.template.js · the SOURCE the build harness above is rendered from; its prompts point at the method in the same words, since the render fills install paths and nothing else. It states no rule the method does not.
+tools/template-size-limits.txt · the DECLARED byte ceiling for the rendered method, and the identity of the leg that reads it — a row keyed by the file, never a restatement of what the method says
+tools/template-size-highwater.txt · the MEASURED high-water for the rendered method, written by --bump and never by hand — a measurement of the file, never a restatement of it

@@ -1,0 +1,30 @@
+# spec-token-waivers.txt - declared exceptions for tools/check-spec-tokens.py (TOOL-dRetiredFork-20).
+#
+# One `<token>	<reason>` per row. SHRINK-ONLY: the count may fall, never rise, so a new hit cannot
+# be waived away quietly. A row carrying no reason REDS, and so does one no spec produces any more -
+# a stale exception cannot hide a live hit.
+#
+# SEEDED EMPTY, deliberately. A registry seeded at the size of the problem is a ratchet with a worse
+# name; the pre-wiring run decides its first rows and each one is dispositioned in the record.
+codebase-map/selftest.py	a prefix-relative path in bConvergentLodestar, whose spec predates the tools/ prefix.
+tools/run-gates.sh	[path] REAL and that build's to fix: the runner moved to tools/run-gates/run-gates.sh (aBatchedLintel)
+selftest	[leg] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+in-flight/.gitkeep	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+in-flight/{a,b,c}.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/project/journal/2026-07-15-aRuledParchment.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+verifier fan-out (≤5 verify agents per review)	[leg] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/archive/ledger/{a,b,c}.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/architecture/project/legacy-files.txt	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/project/tstray.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/guides/tfixture.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/guides/tguide.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/map/features/tdoss.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/project/IN-FLIGHT.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/project/MEMORY.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/project/README.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+.claude/SESSION-KICKOFF.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+memory/backlog/<FAMILY>.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
+testsuite counts	[leg] REAL and that build's to fix: a leg name truncated in its section 7 (aTetheredScratch)
+review-join ban	[leg] REAL and that build's to fix: a leg name truncated in its section 7 (aTetheredScratch)
+.claude/hooks/agent-cap.js	a path THIS build retired. TOOL-dRetiredFork-14/21 moved the hooks to the shipped kit dir and dropped the .claude/ copies, so a live spec of another build (aDeclaredBound-4 AC10) now cites a file gov does not track. Its AC is about PARITY between the shipped and wired copies -- a mechanism this build removed -- so rewriting the citation would change another build's acceptance criteria rather than repath it. Waived, and the disposition is an owner turn.
+.claude/hooks/scratch-guard.js	same cause and same reasoning, for aTetheredScratch-1 (its section 2 and AC7). Both rows exist because a retirement in one build invalidated a path two other builds' LIVE specs depend on; net waiver count FELL 24 -> 23 in the same pass, so the shrink-only discipline holds.

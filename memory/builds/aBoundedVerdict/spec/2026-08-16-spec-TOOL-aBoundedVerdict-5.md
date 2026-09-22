@@ -1,38 +1,58 @@
 # TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit
 
-**Status:** SPECCED · rev-5 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-10 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](../reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 |
+| [2026-08-16-review-TOOL-aBoundedVerdict-1.md](../reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 |
+| [2026-08-19-review-TOOL-aBoundedVerdict-1-2.md](../reviews/2026-08-19-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
+| [2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md](../reviews/2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
+| [2026-08-20-review-TOOL-aBoundedVerdict-1.md](../reviews/2026-08-20-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-21 |
+| [2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md](../reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-21 |
+| [2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md](../reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-21 |
+
+<!-- /gen:spec-records -->
 
 ## 1. Goal
 
 The build method names parking as the substitute for asking an absent owner and demands the
 question, the options seen and the reason be written into the run's authored record — but the driver
-exposes no verb that writes one. `park()` exists with exactly two callers, both internal to other
-verbs, so a run following the method must hand-edit the authored region of a file the kit calls
+exposes no verb that writes one. `park()` has FOUR callers today (`:1135`, `:1298`, `:1435`, `:1597`) — the two-caller figure was
+true before the verb shipped, and the driver's own comment at `:1551` records the pre-verb state — so a run following the method must hand-edit the authored region of a file the kit calls
 generated and whose grammar the driver owns. Give parking a verb.
 
 ## 2. Scope (IN)
 
-- **S1** — `unattended.sh --park <slug> --question <text> --options <text> --reason <text>`, routing
-  through the existing `park()` helper with a `park` kind, and staging the file as every other
-  writer does.
-- **S2** — all three fields are required. A park missing any one of them is refused, because the
-  method's own words are that a bare park is indistinguishable from a forgotten one, and the driver
-  is the only place that distinction can be enforced.
-- **S3** — the same bypass-flag refusal the abort verb already carries applies to all three fields.
+- **S1** — `unattended.sh --park <slug> --item <text> --reason <text>`, routing through the existing
+  `park()` helper and staging the file as every other writer does. **Two fields, and the kind it
+  writes is `decision`.** Rev-7 performs the restatement rev-6 announced and did not apply: the verb
+  SHIPPED under `TOOL-cSettledDocket-1` at `unattended.sh:1556` taking slug · item · reason, refusing
+  on `--item`/`--reason` alone and routing an unknown `--question` to `fail 14`, and it writes kind
+  `decision` at `:1597` — not the `park` kind rev-6 still specified, which nothing reads. The
+  method's three-part obligation — the question, the options seen, the reason — is carried by the
+  CONTENT of the two fields, not by three flags.
+- **S2** — both fields are required. A park missing either is refused, because the method's own words
+  are that a bare park is indistinguishable from a forgotten one, and the driver is the only place
+  that distinction can be enforced. Rev-7: two, not three — S2's refusal for a missing third field
+  was unbuildable against a verb that has no third field.
+- **S3** — the same bypass-flag refusal the abort verb already carries applies to both fields.
   The gate greps the run-state file whole for the declared flag, so a truthful park text naming it
   would red the bar permanently on a record no verb can rewrite.
 - **S4** — `--park` refuses a terminal record, through the single existing refusal rather than a
   fourth copy of that rule.
-- **S5** — `--status` reports the DECISION-kind parked count alongside the phase, so a run that
-  parked everything and reached the close is visible without reading the file. Decisions only, and
-  the same qualifier as S6: a status line inflated by review rounds would report the opposite of what
-  it is for.
+- **S5** — `--status` reports the `surfaced`-class parked count alongside the phase, so a run that
+  parked everything and reached the close is visible without reading the file. That class only, and
+  the same qualifier as S6: a status line inflated by `history`-class lines would report the opposite
+  of what it is for.
 - **S6** — the Definition-of-Done item asserting that parked decisions reached the wrap-up gains a
   countable observable. The attestation's VALUE carries the number surfaced, and the close verb
-  refuses when that integer does not equal the number of **DECISION-kind** parked lines in the
+  refuses when that integer does not equal the number of **`surfaced`-class** parked lines in the
   record. The qualifier is load-bearing and is spelled in every place the count appears — S5's status
   line, the inventory row and the acceptance criteria — because `TOOL-aBoundedVerdict-1` adds a
-  `record`-kind line that must not be counted, and an unqualified count is the exact failure S7
+  `history`-class line that must not be counted, and an unqualified count is the exact failure S7
   exists to prevent. The item stays agent-attested — a machine cannot observe a wrap-up — but "I
   surfaced them" becomes "I surfaced four decisions, and the record holds four". Three constraints
   bound the shape:
@@ -49,22 +69,78 @@ generated and whose grammar the driver owns. Give parking a verb.
     close carrying an override validates against N and leaves N+1 on disk, and a count that included
     it could never be satisfied. The exclusion is stated here and armed by an acceptance fixture
     carrying an override, because the arm that does not carry one passes either way.
+- **S6a** — **RECONCILIATION, new at rev-6.** The park VERB this unit specifies has SHIPPED, under
+  `TOOL-cSettledDocket-1`, and it disagrees with what S1, S5 and §4 originally specified in the ways
+  enumerated below — rev-6 declared a count of them and was wrong twice, so this bullet enumerates
+  instead. The spec is what moves where the shipped behaviour is defensible, and the code is what
+  moves where it is not:
+  - **Two fields, not three.** The shipped verb is `--park <slug> --item <text> --reason <text>`; S1
+    specifies `--question`, `--options` and `--reason`. The shipped shape is DEFENSIBLE — the method
+    asks for the question, the options and the reason, and `--item` carries the question while the
+    reason carries the rest — but it is not what S1 says, and S2's refusal for a missing field cannot
+    be met for a field that does not exist. S1 and S2 are restated to the two-field shape, and the
+    method's three-part obligation is carried by the REASON's content rather than by three flags.
+  - **Four kinds counted, and today that is CORRECT — the inflation claim is WITHDRAWN.** The shipped
+    counter at `unattended.sh:1344` greps `(decision|abort|override|waiver)`, and S7a1's taxonomy puts
+    ALL FOUR of those in the `surfaced` class, `waiver` included. So the counter over-counts by
+    nothing against every record that exists today, and both earlier readings of this — rev-6's
+    "inflated by three kinds" and rev-7's "inflated by one class member" — were wrong about the
+    shipped code. **This bullet is the ONE statement of that arithmetic in this spec; S7, S7a and
+    S7a1 point at it rather than restate it.** The code still moves, for a different and stronger
+    reason: the alternation is a SECOND SPELLING of the taxonomy, so it silently becomes wrong the
+    moment `TOOL-aBoundedVerdict-1` lands the first `history` kind, and a counter that has to be
+    hand-edited when a kind is added is the decoration S7a refuses. S7a derives it from the constant
+    instead. This is also why the taxonomy must be declared BEFORE that unit rather than alongside it.
+  - **A third divergence, found by the audit and missed by rev-6's own enumeration:** the shipped
+    verb writes kind `decision` (`:1597`) where S1 and §4 specified a `park` kind that nothing reads.
+    The code is right and the spec moves, as S1 now does. Rev-6 declared "two divergences" and
+    "the rest reconciled", which was itself the class this reconciliation exists to fix.
+  - S6's countable attestation is UNSHIPPED and stays as specified, and `TOOL-aBoundedVerdict-15`'s
+    `--attest --value` is the writer it needs — named here so neither unit invents a second one.
+- **S7a1** — **the two CLASS names, and every live kind classified.** Rev-7 opened this split and
+  rev-9 settles it. The word "decision" was doing two jobs — the literal KIND TOKEN the park verb
+  writes, and the class the surfaced count measures — and neither the driver constant nor the counter
+  is buildable until they are named apart. The classes are **`surfaced`** (the owner must be shown it)
+  and **`history`** (the owner need not adjudicate it). "Decision" is released back to its one job:
+  the kind token. Four kind tokens are live and counted by `--status` at `unattended.sh:1344` —
+  `decision`, `abort`, `override`, `waiver` — and **all four are `surfaced`, `waiver` included**,
+  because `memory/guides/UNATTENDED-PROTOCOL.md:380-381` already records that a waiver's parked entry
+  is surfaced by the wrap-up derivation with the other parked kinds. An implementer building the set
+  from S7's earlier two-name enumeration ships it short that member and regresses a stated behaviour.
+  What follows from all four being `surfaced` is S6a's one statement of the arithmetic, not repeated
+  here. `TOOL-aBoundedVerdict-1` takes both class names from this spec: its S4a and AC3a currently
+  name the classes `decision` and `record`, which are the retired names, and aligning them is a
+  coordination this unit's landing forces rather than a fork either spec may resolve alone.
 - **S7** — the parked region's KINDS become a declared two-class taxonomy, because this unit is the
-  first to need the distinction and `TOOL-aBoundedVerdict-1` depends on it. A **decision** kind is
-  one the owner must be shown — the existing abort and override kinds, and this unit's park. A
-  **record** kind is history the owner need not adjudicate, of which `TOOL-aBoundedVerdict-1`'s
-  review round is the first. S6's count ranges over DECISION kinds only. Without this, a build's
-  review rounds would inflate the count of decisions a run must surface, and the two units would
-  disagree about what a parked line is.
-- **S7a** — the DECISION set is a driver constant beside the existing core phase and
-  Definition-of-Done sets, read by the leg through the same helper that already reads those. A
-  taxonomy declared only in prose has no machine home, no shrink-only pin and nothing to read it —
-  which is the decoration this kit already names as a defect in its own phase writer, and which the
-  vocabulary unit avoids by giving its codes all three.
+  first to need the distinction and `TOOL-aBoundedVerdict-1` depends on it. A **`surfaced`** kind is
+  one the owner must be shown: today that is every live kind — `decision`, `abort`, `override`,
+  `waiver`. A **`history`** kind is one the owner need not adjudicate, of which
+  `TOOL-aBoundedVerdict-1`'s review round is the first and of which there are NONE today. Membership
+  is declared in exactly one place — S7a's constant — and a kind absent from it is `history` by
+  construction, so there is no second set to keep in step. S6's count ranges over the `surfaced`
+  class only. Without this, a build's review rounds would inflate the count of decisions a run must
+  surface, and the two units would disagree about what a parked line is.
+- **S7a** — the `surfaced` set is ONE driver constant, `PARK_KINDS_SURFACED`, sitting beside the
+  existing core phase and Definition-of-Done sets and read by the leg through the same `core_of`
+  helper that already reads those. One constant, not two: the `history` class is the complement and is
+  declared nowhere. `--status`'s alternation at `unattended.sh:1344` is DERIVED from the constant
+  rather than spelling the four tokens a second time — the code move S6a states. A taxonomy declared
+  only in prose has no machine home, no shrink-only pin and nothing to read it — which is the
+  decoration this kit already names as a defect in its own phase writer, and which the vocabulary unit
+  avoids by giving its codes all three.
+  - **OPEN, and an owner turn this unit does not take: where the shrink-only FLOOR lives.** The two
+    sets this constant sits beside pin their counts from `.unattended.conf` — `CORE_FLOOR` for the
+    pair, with `DIRECTIVES_FLOOR` as the precedent for a third key — and a new conf key is a new
+    public surface for the kit, which is M3's veto 2. It would also add `.unattended.conf`,
+    `tools/unattended/.unattended.conf.example` and `tools/unattended/adopt-unattended.sh` to a write
+    set that does not name them. This unit therefore ships the constant and its single reader, and
+    states plainly that the taxonomy's shrink-only property is UNARMED until that carrier is decided.
+    No acceptance criterion asserts a floor, because none can be written against a carrier that does
+    not exist, and a criterion that pretended otherwise would be the green-by-absence shape.
 - **S7b** — the taxonomy is ARMED, and the arm must be able to fail. At this unit's landing every
-  existing kind is a decision kind, so an implementation that counts every parked line satisfies any
-  fixture built only from today's kinds. The acceptance fixture therefore carries a `record`-kind
-  line explicitly, and `TOOL-aBoundedVerdict-1` carries the mirror case, so the interface is armed on
+  live kind is `surfaced`, so an implementation that counts every parked line satisfies any fixture
+  built only from today's kinds. The acceptance fixture therefore carries a `history`-kind line
+  explicitly, and `TOOL-aBoundedVerdict-1` carries the mirror case, so the interface is armed on
   both sides of the gap between the two units.
 - **S7c** — the method's wrap-up derivation row is NOT this unit's, and rev-2 wrongly implied it was.
   That row says every parked entry with its question, options and reason — a shape a review line does
@@ -81,8 +157,8 @@ generated and whose grammar the driver owns. Give parking a verb.
   them. Unit 3 is where a new disposition is written.
 - No unpark. A parked entry is a record for the owner's turn, not a queue the run drains, and a verb
   that removed one would let a run erase the only turn the owner gets.
-- No machine verdict on whether a park is a good park. The three fields are checked for presence,
-  not for quality.
+- No machine verdict on whether a park is a good park. Both fields are checked for presence, not
+  for quality.
 - No change to the spill rule for the authored region's size budget. The verb makes parks more
   likely, which makes the spill more likely to matter — that is a real consequence and it gets a
   backlog row rather than a scope item, because the rule already exists and is already gated.
@@ -92,7 +168,8 @@ generated and whose grammar the driver owns. Give parking a verb.
 ### Data model
 
 `park()` appends one line carrying a timestamp, a kind, an item and a reason. The verb supplies
-`park` as the kind, uses the question as the item, and composes the reason field from the options
+`decision` as the kind, uses the question text as the item, and composes the reason field from the
+options
 and the reason so the three facts land on one line without changing the helper's signature. The
 helper's own history is the argument for not changing it: the kind became an argument precisely
 because a single hardcoded grammar made an abort arrive wearing the label of an override that never
@@ -106,13 +183,18 @@ verb must not reformat it.
 
 ### Inventory
 
-| Concern | Today | After |
+The table is stated against the DECLARED BASE, where the verb has already shipped — not against the
+pre-verb tree this spec was first written over. Rev-7 corrected the prose to that tree and left this
+table describing the old one, and rev-8 did not catch it; rev-9 re-checks every row against S1.
+
+| Concern | Today, at the declared base | After |
 |---|---|---|
-| writing a park | hand-edit of the authored region | `--park` |
-| callers of `park()` | the abort verb and the close verb's override | those two plus `--park` |
-| a park's required fields | none — the method asks in prose | three, refused by the driver |
-| seeing that a run parked | read the file | `--status` reports the count |
-| the attested Definition-of-Done item | a grep for a line the run writes about itself | the same grep, plus a close-verb refusal when the attested COUNT does not equal the DECISION-kind parked-line count, excluding the verb's own override line |
+| writing a park | `--park`, shipped under `TOOL-cSettledDocket-1` | unchanged — S1 restates this spec to the shipped shape |
+| callers of `park()` | four — the abort verb, `--preflight --waive`, the close verb's override, and `--park` | unchanged at four |
+| a park's required fields | two, refused by the driver | unchanged |
+| the kinds a parked line may carry | four tokens, classified nowhere | two declared classes, membership held in one driver constant |
+| seeing that a run parked | `--status` counts every parked line | `--status` counts the `surfaced` class, from that constant |
+| the attested Definition-of-Done item | a grep for a line the run writes about itself | the same grep, plus a close-verb refusal when the attested COUNT does not equal the `surfaced`-class parked-line count, excluding the verb's own override line |
 
 S6 is the part worth stating plainly: it does not make the item machine-checked. It narrows one
 specific dishonesty — a record with parked entries and an attestation that does not account for them
@@ -134,17 +216,32 @@ protocol's own boundary section is the model for saying so.
 
 ### Files touched (estimate)
 
-`tools/unattended/unattended.sh` · `tools/unattended/unattended.test.sh` ·
-`tools/unattended/check-unattended.test.sh` · `tools/unattended/PROTOCOL.template.md` and the
-installed protocol · `tools/unattended/SKILL.template.md` and the rendered Skill ·
-`.memory-tree.conf` (the arms floor for the driver) · `memory/guides/SESSION-KICKOFF.md` (the
-manifest re-stamp; `.unattended.conf` and the conf are on its watch list) · the kit version
-constants. The decision-set constant lands in the driver beside the existing core sets, so S7a adds
-no file of its own.
+- `tools/unattended/unattended.sh` — the verb, `PARK_KINDS_SURFACED`, the derived `--status`
+  alternation, and `KIT_UNATTENDED_VERSION` with its same-line `gov:kit unattended@` marker.
+- `tools/unattended/check-unattended.sh` — **a mandatory edit, not a free inheritance.** Its core-set
+  reads are one explicit `core_of` assignment per key, so `PARK_KINDS_SURFACED` needs its own line
+  there before AC6c's leg read exists at all. The same file also carries the version constant and its
+  same-line marker.
+- `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.test.sh` — the refusal
+  arms, the fixtures AC5 and AC6 describe, and the arms floor's own count.
+- `tools/unattended/PROTOCOL.template.md` (the verb section, the parked-kind rows, and its `gov:kit`
+  marker) and the installed `memory/guides/UNATTENDED-PROTOCOL.md`.
+- `tools/unattended/SKILL.template.md` (the call and its `gov:kit` marker) and
+  `.claude/skills/unattended/SKILL.md`, the re-render `tools/check-wiring.sh` compares against the
+  tracked copy.
+- `.memory-tree.conf` — the arms floor for the driver.
+- `memory/backlog/TOOL.md` — the authored-region spill row §3's last non-goal defers to a backlog row
+  rather than a scope item. The row is written in this unit's landing commit.
+- `memory/guides/SESSION-KICKOFF.md` — the manifest is re-stamped in the same commit, because
+  `.memory-tree.conf` is on its watch list.
+
+The version bump is not "the kit version constant": `tools/check-kit-versions.sh` pairs every site
+enumerated above, and naming one file is one carrier short of what it forces. The `surfaced` constant
+lands in the driver beside the existing core sets, so S7a adds no file of its own.
 
 ## 5. Production-readiness checklist
 
-- security — the three fields are free text appended to a tracked file the gate greps whole. S3 is
+- security — both fields are free text appended to a tracked file the gate greps whole. S3 is
   the guard, and it is the same guard the abort reason already carries, for the same measured reason.
 - perf / scale — N/A. One append per call.
 - a11y — N/A.
@@ -163,12 +260,13 @@ no file of its own.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `bash tools/unattended/unattended.sh --park <slug> --question q --options o
-  --reason r` runs against a live run, one parked line is appended and the file is staged; arm in
+- **AC1** — When `bash tools/unattended/unattended.sh --park <slug> --item q --reason r` runs against
+  a live run, one parked line is appended, its kind is `decision`, and the file is staged; arm in
   `tools/unattended/unattended.test.sh`.
-- **AC2** — When any one of the three fields is missing,
-  `bash tools/unattended/unattended.sh --park <slug> --question q --reason r` refuses naming the
-  missing field, and the file is unchanged. Asserted on the on-disk effect, not the exit code alone.
+- **AC2** — When either field is missing, `bash tools/unattended/unattended.sh --park <slug> --item q`
+  refuses naming the missing field, and the file is unchanged. Asserted on the on-disk effect, not the
+  exit code alone. An unknown `--question` reaches `fail 14`, which is the shipped verb's behaviour
+  and is asserted rather than changed.
 - **AC3** — When a field spells the declared bypass flag, the verb refuses before writing, and
   `bash tools/unattended/check-unattended.sh` is green afterwards — the arm proves the refusal
   prevented the wedge rather than merely reporting it.
@@ -177,26 +275,32 @@ no file of its own.
   arm's existing fixture; the arm's derived phase-writer count stays at five, because the park verb
   writes no phase.
 - **AC5** — When a run has parked entries, `bash tools/unattended/unattended.sh --status <slug>`
-  names the DECISION-kind count on its single line, and a fixture carrying a `record`-kind line
-  proves the line is excluded.
-- **AC6** — When a record carries four decision-kind parked lines AND two record-kind lines and the
-  attestation counts three, `bash tools/unattended/unattended.sh --close <slug>` refuses naming the
-  attested item, the record key and both integers; when it counts four, the close proceeds. The
-  fixture's record-kind lines are what make the arm fail under a count of all parked lines, so it
-  tests the taxonomy rather than a total.
+  names the `surfaced`-class count on its single line. **The fixture carries one line of EVERY live
+  kind — `decision`, `abort`, `override`, `waiver` — PLUS one `history`-kind line**, and the expected
+  per-class count is stated in the arm: five parked lines, four reported. Without the `history` line
+  the arm CANNOT fail — an implementation counting every parked line passes it — which is S7b in one
+  sentence. The fixture is deliberately synthetic: an `abort`-kind line in a non-terminal record is
+  not a truthful history, and it is buildable precisely because the counter reads kinds and not
+  phases.
+- **AC6** — When a record carries AC5's fixture — one line of every live `surfaced` kind plus two
+  `history`-kind lines — and the attestation counts three,
+  `bash tools/unattended/unattended.sh --close <slug>` refuses naming the attested item, the record
+  key and both integers; when it counts four, the close proceeds. The `history` lines are what make the arm fail under a count of all
+  parked lines, so it tests the taxonomy rather than a total.
 - **AC6a** — When the same close carries `--override`, it still proceeds at an attestation of four,
   proving the verb's own override line is excluded — the arm that omits the override passes either
   way and therefore proves nothing.
 - **AC6b** — When the same over-counted record is ABORTED rather than closed,
   `bash tools/unattended/unattended.sh --abort <slug> --reason r` fires no such refusal, proving the
   close-verb-only placement rather than asserting it.
-- **AC6c** — When the decision set is read, the leg reads it from the driver through the same helper
-  that already reads the core phase and Definition-of-Done sets, and no class member is spelled in
-  `tools/unattended/check-unattended.sh`.
+- **AC6c** — When the `surfaced` set is read, the leg reads it from the driver through the same
+  `core_of` helper that already reads the core phase and Definition-of-Done sets, no class member is
+  spelled in `tools/unattended/check-unattended.sh`, and `--status`'s alternation in the driver is
+  built from `PARK_KINDS_SURFACED` rather than spelling the four tokens a second time.
 - **AC7** — When the Skill is re-rendered, `bash tools/unattended/adopt-unattended.sh --check`
   reports in sync and the render carries no surviving placeholder shape.
 - **AC8** — `python tools/memory-tree/check-arms.py --check` exits 0 with the driver's `ARMS_FLOORS`
-  entry raised, and `GATE_FULL=1 bash tools/run-gates.sh` is green.
+  entry raised, and `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
 
@@ -204,15 +308,22 @@ no file of its own.
 `tools/unattended/unattended.test.sh` · `tools/unattended/adopt-unattended.sh --check` ·
 `tools/unattended/adopt-unattended.test.sh` · `tools/check-kit-versions.sh` ·
 `python tools/memory-tree/check-arms.py` · `python tools/codebase-map/test_codebase_map.py` ·
-`bash tools/run-gates.sh`.
+`bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
+
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
 
 - **F1 — does `--park` take a unit id?** A park almost always concerns one unit, and recording which
   would let the wrap-up group them. Against it: the anchor ban means the id cannot lead the line, and
   an id in the middle of free text is not a join anything can rely on. Options: no id field, and the
   question text names the unit in prose; or an explicit field placed after the timestamp.
   Recommendation: no field. The wrap-up is composed by an agent reading the record, not by a parser.
+  RESOLVED (agent, 2026-08-20, delegated): NO id field. Mechanism-only, and the richer option is
+  discarded by a rule already in the protocol rather than by taste: the anchor ban forbids an id
+  leading a dash row, so the field could only sit mid-line where nothing can join on it — a field
+  that cannot be parsed is prose with a colon in it. The question text names the unit in prose.
 - **F2 — is S6 in this unit or its own?** It changes a Definition-of-Done item's evaluation, which is
   a different mechanism from a verb, and this build's own rule is one mechanism per spec.
   **RESOLVED (owner, 2026-08-17): keep it in this unit.** The refusal is only reachable once a verb
@@ -250,12 +361,106 @@ no file of its own.
   this spec, so the sub-bullet now names the pin without a numeral. Every other claim — the park
   helper and its two callers, the attestation predicate's tolerance of a richer value, the close
   verb's override ordering, the phase-writer arm's count of five — re-verified unchanged.
+- rev-6 · 2026-08-19 · **reconciled with the verb that shipped.** The mechanism this unit specifies
+  exists in the driver under `TOOL-cSettledDocket-1`, which the re-decomposition found by reading the
+  code rather than the roster — so this spec was SPECCED against a tree that had already built part of
+  it. S6a records the two divergences and which side moves for each: the two-field flag shape is the
+  shipped verb's and defensible, so S1 and S2 restate to it; the four-kind `--status` count contradicts
+  S5's own argument and is a defect in the code, so the code moves. S4a's justification for the `record`
+  class is unchanged but its motivating example moved — `TOOL-aBoundedVerdict-1` rev-6 still writes a
+  `review` line per round, so review rounds can still inflate a decision count and the qualifier stays
+  load-bearing.
+
+- rev-7 · 2026-08-19 · folded the M4 spec audit. **Rev-6's reconciliation was announced and never
+  applied** — the audit found S1 still spelling `--question --options --reason` and S2, S3, §3, §4's
+  Data model, §5, the inventory row, AC1 and AC2 all still describing three fields, against a shipped
+  two-field verb. Rev-7 performs it. A THIRD divergence rev-6's own enumeration missed: the shipped
+  verb writes kind `decision`, not the `park` kind this spec specified and nothing reads. S7a1 is new
+  and carries two corrections the taxonomy needed — `waiver` is a live, counted, owner-facing kind
+  the two-class enumeration never classified, so building from it ships a set short one member; and
+  this spec used "decision" for both the kind token and the class, which must be split before either
+  the constant or the counter is buildable. That split also corrects rev-6's arithmetic: the counter
+  is inflated by one class member, not by three kinds. The `park()` caller count is corrected from
+  two to four.
+
+- rev-8 · 2026-08-20 · M3 fork sweep, before any code. F1 RESOLVED as recommended, no id field, on
+  the anchor ban's grounds rather than on the wrap-up's — a field the ban confines to mid-line is one
+  no reader can join on, which is a stronger reason than "an agent reads it". §8's first non-blank
+  line is now the machine-legal `none` form.
+
+- rev-9 · 2026-08-20 · folded the M4 spec audit's second round: **B4**, H17, H18, M5, M6.
+  **B4 + M5 — the DECISION class had THREE incompatible definitions** and one of them was arguing for
+  a code change on false arithmetic. S7 listed abort, override and park and never classified
+  `waiver`; S7a1 named `waiver` without assigning it and demanded a second class name it never
+  supplied; S6a said only `decision` was in the class and still carried "inflated by three kinds" at
+  the top. Settled: the classes are `surfaced` and `history`, ALL FOUR live kinds are `surfaced`
+  (`waiver` on `memory/guides/UNATTENDED-PROTOCOL.md:380-381`'s grounds), and `history` has no member
+  until `TOOL-aBoundedVerdict-1` lands one. **The inflation claim is WITHDRAWN**: the shipped counter
+  over-counts by nothing today, so AC5's old arm was green against the unmodified driver and rev-6's
+  and rev-7's arithmetic were both wrong about the code. The code still moves, on the single-spelling
+  argument instead — the alternation is a second copy of the taxonomy that silently goes wrong the
+  moment a `history` kind exists, so S7a derives it from ONE constant, `PARK_KINDS_SURFACED`, read by
+  the leg through `core_of`. The arithmetic is now stated ONCE, in S6a, and S7/S7a/S7a1 point at it.
+  AC5 and AC6 gained the fixture that can actually fail — one line of every live kind PLUS a
+  `history`-kind line, with the expected per-class count in the arm — which is what S7b already
+  demanded in prose and no criterion carried. Scope note NOT taken as a fix: the shrink-only FLOOR the
+  constant needs would take a new `.unattended.conf` key, which is a new public surface under M3's
+  veto 2 and would pull the conf, its example and the adopter into the write set, so S7a carries it as
+  an explicit OPEN owner turn and says the pin is unarmed until it is answered, rather than widening
+  the unit.
+  **H17** — `tools/unattended/check-unattended.sh` was absent from Files touched while AC6c graded a
+  read inside it; its `core_of` reads are one explicit assignment per key, so the new key is a
+  mandatory edit and is now named as one, together with the version constant and its same-line marker.
+  **H18** — `memory/backlog/TOOL.md` was written by §3's spill non-goal and declared nowhere; it is in
+  Files touched now. While there, the whole version bump is enumerated by site rather than abbreviated
+  to "the kit version constants", which named one carrier where `tools/check-kit-versions.sh` forces
+  several, and the `SESSION-KICKOFF.md` note now names the watched path this unit actually touches
+  (`.memory-tree.conf`, not `.unattended.conf`).
+  **M6** — rev-7's two-field / four-caller correction reached the prose and skipped the inventory
+  TABLE for the second rev running. The whole table is re-checked against S1 in this one edit and now
+  states its Today column against the DECLARED BASE, where the verb has already shipped: required
+  fields two, `park()` callers four and unchanged at four, `--park` already the writer, `--status`
+  already counting, and §10's "two callers" corrected to four. The rows that describe no delta say so
+  instead of inventing one.
+
+- rev-10 · 2026-08-20 · **built.** S1-S4 needed no code: the verb shipped under `TOOL-cSettledDocket-1`
+  in the shape rev-7 reconciled to, and rev-9 had already withdrawn the inflation claim, so what this
+  pass actually built is the taxonomy, its single reader, and the countable attestation.
+  **The leg's join is ONE-DIRECTIONAL, and the missing direction is a design decision rather than an
+  omission.** It asserts that every token in `PARK_KINDS_SURFACED` is a kind some `park` call site can
+  write — which catches a STALE MEMBER, a kind deleted from the driver and left behind in the taxonomy,
+  silently widening a count that exists to be narrow. It does NOT assert the converse, that every
+  written kind is in the set, because that is false by design: `history` is the complement and is
+  declared nowhere, so the first history kind would red a check demanding it, and a future unit would
+  have to weaken this leg in the same commit that adds a legitimate kind. **The consequence is stated
+  in the leg's own comment: a new kind arrives unclassified and this leg stays silent about it.** A
+  reader who assumed both directions were covered would be wrong.
+  Both refusals were OBSERVED before landing, per the merge-bar rule: a fabricated member reds with the
+  stale-member message, and an empty constant reds with the vacuity message.
+  **The `history` arm carries a kind that does not exist yet, and that is the only fixture that can
+  fail.** At this landing every LIVE kind is `surfaced`, so an implementation counting every parked
+  line satisfies any fixture built from today's kinds. The arm therefore writes a `review` line
+  directly — legal precisely because a kind absent from the constant is history by construction — and
+  asserts both the attestation and `--status` ignore it.
+  **The override exclusion is measured, not reasoned.** The close evaluates the Definition of Done and
+  only afterwards appends its override lines, so a close carrying two overrides validates against N and
+  leaves N+2 on disk. It is armed from both sides: one fixture attests the pre-override number and
+  passes, another attests the post-override total and must refuse.
+  **The kit version stays at 1.8 for this whole build rather than moving per unit.** The sibling unit
+  moved it, these changes ride it, and they land together — a version bumped once per unit inside an
+  unlanded branch is churn nobody outside can observe, and the landed value is the only one an adopter
+  reads. Said here so a later unit does not bump it again for no reader.
+  **Read-path cost, measured:** the protocol pair grew by roughly 1.1 KB and the shared budget stands
+  at 105253 B against a ceiling of 112987. Recorded as a figure only in this rev entry, which is
+  history; no scope item or criterion carries it, because it is a consumable and the README's rule is
+  that the command is the authority.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "record a decision the run refused to make"` names the
 unattended kit's conf and the driver as the only seams, with no second implementation anywhere. The
 seam this unit extends is `park()` itself, unchanged — the helper already takes the kind as an
-argument, already has two callers, and already carries the comment explaining why a third caller
+argument, already has FOUR callers, and already carries the comment explaining why a further caller
 must not hardcode a grammar. The shared refusal helper and the staging helper are both reused as-is,
 which is what keeps the new verb's branch count to the three refusals §5 enumerates.
 

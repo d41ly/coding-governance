@@ -22,7 +22,48 @@ LANDER="bash tools/push-main.sh"
 BYPASS_BAN="--no-verify"
 
 # REPLACE. Your full merge bar, for the `gates-green` DoD item.
-GATE_CMD="bash tools/run-gates.sh"
+GATE_CMD="bash tools/run-gates/run-gates.sh"
+
+# The wall-clock bound, in seconds, on any command this driver runs that the PROJECT declared --
+# GATE_CMD and WIRING_CHECK. OPTIONAL: leave it out and the kit default applies, announced on
+# stderr so a defaulted bound is never a silent one. A non-numeric or zero value is a REFUSAL,
+# because 0 means no bound at all and a bound nobody can parse is a bound nobody set.
+#
+# Set it ABOVE your slowest legitimate bar. A bound that fires on a healthy run gets deleted.
+GATE_BOUND="3600"
+
+# The idle bound, in seconds, `--audit` measures a dispatched-and-open unit against: STALLED when
+# BOTH the newest write in the tree and the newest commit are older than this. OPTIONAL, on
+# GATE_BOUND's terms: absent takes the kit default and says so on stderr; non-numeric or zero is a
+# refusal.
+#
+# Set it to a few idle-wake cadences, so a verdict is never one missed tick.
+UNIT_STALL_BOUND="1800"
+
+# the stop-guard blocks a bound session's turn end at most this many times per run and session, then allows and says so; the harness itself ends a turn after 8 consecutive blocks, so a value above 8 is unreachable inside one turn
+STOP_GUARD_BLOCKS="6"
+
+# The bound, in seconds, past which `--liveness` reads a RUN as STALE when none of its four signals
+# has moved: the last commit, the newest dirty write, the newest gate log, the session transcript.
+# OPTIONAL: absent takes the DERIVED default GATE_BOUND + UNIT_STALL_BOUND and says so on stderr;
+# non-numeric or zero is a refusal; a value BELOW that sum is accepted with a NOTE, because under it
+# a full bar's silence reads STALE and an out-of-process resumer may kill a healthy bar.
+#
+# Leave it absent unless you need to sit ABOVE the sum: raising GATE_BOUND raises the default.
+RESUME_STALE_BOUND="5400"
+
+# resumes this many times with no movement between them, then stops and says ATTEMPTS EXHAUSTED; the resume tick reads the root's copy of this line, so one repo has one cap. OPTIONAL, on GATE_BOUND's terms.
+RESUME_ATTEMPTS="6"
+# one resumed turn budget; a run that needs more is resumed again by the next tick. The resume tick reads the root's copy of this line. OPTIONAL, on GATE_BOUND's terms.
+RESUME_TURNS="40"
+
+# The round bound a spec-audit subject -- any `--review` subject that is not the build slug -- takes
+# before it exits BOUNDED; the build slug keeps the runaway ceiling. OPTIONAL, on GATE_BOUND's terms:
+# absent takes the kit default of 1 and says so on stderr; non-numeric, zero, or above the runaway
+# ceiling is a refusal.
+#
+# 1 is the owner ruling: a spec subject takes one round, and a blocker it confirms is disposed.
+REVIEW_ROUNDS="1"
 
 # REPLACE. The NON-repairing wiring check `--preflight` delegates to. Only read-only flags are
 # accepted (--check, --dry-run, --verify, -n): a repairing mode sets git config and rewrites tracked
@@ -31,11 +72,12 @@ WIRING_CHECK="bash tools/check-wiring.sh --check"
 
 # REPLACE with YOUR harness's scheduler tool names. These are named for the AGENT to call — no
 # script can reach the store, which is in-memory and session-scoped. The driver only records the id
-# the agent hands it and later asserts a recorded reap.
+# the agent hands it and later asserts a recorded reap. The job is the idle-wake; the keepalive is
+# the hooks and the tick, protocol section 5.
 KEEPALIVE_CREATE="<your-schedule-create-tool>"
 KEEPALIVE_DELETE="<your-schedule-delete-tool>"
 
-# The cadence the agent schedules the keepalive at. Rendered into the Skill as prose, so an
+# The cadence the agent schedules the idle-wake at. Rendered into the Skill as prose, so an
 # UNDECLARED value now leaves its own placeholder standing and reds the adopter check rather than
 # rendering "at the cadence this project declares — ." with every gate green.
 KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
@@ -43,12 +85,49 @@ KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 # MEASURE, do not copy. `<phases>:<dod>` — the SIZE of the kit's core sets as your installed copy
 # ships them. Count them in `unattended.sh` (`PHASES_CORE`, `DOD_CORE`) and write the two numbers
 # here. Undeclared or malformed leaves BOTH shrink-only pins unenforced, so both are refusals.
-CORE_FLOOR="10:6"
+#
+# UPDATING FROM unattended 1.12 OR EARLIER: the DoD half moves 10 -> 11. Kit 1.13 adds the core item
+# `reuse-probed`, and the floor is shrink-only, so leaving it at 10 makes `check-unattended.sh`
+# check 3 red with "the declared floor sits below the kit's own core count". Bump it when you take
+# the version.
+CORE_FLOOR="12:12"
+
+# The recall CLI whose query log the `reuse-probed` Definition-of-Done item reads. REPO-RELATIVE
+# path, and BLANK is the default and means "not adopted": the item then reports an announced SKIP
+# rather than an unmeetable UNMET, so a project that took this kit and not the recall kit is not
+# wedged by a core item it can never satisfy.
+#
+# A DECLARATION rather than a path in the driver, for the reason every other key here exists: gov
+# ships its own bytes verbatim, so a `tools/<kit>/` literal in a script arrives unchanged in a tree
+# installed at another prefix and resolves to nothing there — `tools/check-install-prefix.sh` reds
+# on exactly that. You know where your recall kit lives; the driver does not.
+#
+# It is NOT a `requires_if` edge in kit.toml. `govkit` resolves such an edge against a condition key,
+# and conditioning "needs the recall kit" on "declares the recall kit" is a tautology, not a
+# dependency.
+RECALL_CLI=""
+
+# OPTIONAL, and the same shape as RECALL_CLI above. The codebase-map probe whose lookup log
+# `reuse-probed` also reads — the OTHER half of the build method's M5 pair. BLANK means that
+# kit is not adopted; the item counts rows from whichever declared logs exist, and announces a
+# skip only when NEITHER CLI is declared.
+MAP_CLI=""
+
+# OPTIONAL, the same shape again. The spec-token checker `--dispatch` runs over the live tree
+# BEFORE it admits a build pass, refusing the dispatch when the checker exits non-zero — a live
+# spec naming a merge bar or a self-test suite as an acceptance observation, or a token that does
+# not resolve. BLANK means no such checker is carried, and the verb ANNOUNCES the skip on stdout
+# rather than passing silently. The checker this repo declares is gov-internal, at its tool root,
+# and no kit ships it: fill the key only where the project carries its own spec-token checker. Declared here because the bar's own run of the
+# checker grades LIVE specs and an unattended build closes every unit spec in its build commit,
+# so the dispatch is the one point that sees a spec while it can still be changed.
+SPEC_TOKENS_CLI=""
 
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
-# interactive exits that engine resolves without an owner turn — MEASURE it against your own engine,
-# because the count is a property of that document and not of this kit.
+# of that skill's interactive exits the INSTALLED PROTOCOL enumerates a no-owner-turn resolution for
+# — it counts in <MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md section 13, so MEASURE it against your
+# own installed protocol, because the count is a property of that document and not of this kit.
 KICKOFF_ENGINE=""
 KICKOFF_EXITS=""
 
@@ -59,7 +138,12 @@ KICKOFF_EXITS=""
 # that key has a recorded failure where ONE malformed spelling disarms BOTH its pins while the
 # conf still looks configured, and a third field would make one typo disarm three.
 DIRECTIVES_EXTRA=""
-DIRECTIVES_FLOOR="11"
+# The project-owned ROW SOURCE for anything DIRECTIVES_EXTRA declares: a repo-relative markdown
+# file carrying rows in the Skill table shape. Undeclared is the EMPTY SET, which is what every
+# adopter has today. Without it an extra handle is waivable by a verb and invisible to the agent,
+# and a project cannot fix that by editing the Skill, which is rendered from a kit template.
+DIRECTIVES_EXTRA_TABLE=""
+DIRECTIVES_FLOOR="17"
 
 # Which anchors may authorize a run. CLOSED value set: `default-branch` (the build README must
 # resolve at the merge-base with the tip the remote advertises for its own HEAD) or `published`
@@ -71,7 +155,178 @@ DIRECTIVES_FLOOR="11"
 # a branch push is not gated by the pre-push hook; the bar's BASE check widens for EVERY adopter,
 # because this file is a working-tree file the run can commit and so the leg cannot read it; and
 # roster integrity stops being enforceable on the branch anchor. Protocol section 1 carries them.
+# TOOL-aPromptedMandate-5 - this key also gates the Skill's PROMPT start path. Left blank (the
+# default, and what this example ships) a run can only be started from a build folder somebody
+# already landed; the prompt path is rendered as unavailable and says so, rather than printing a
+# procedure that ends in a refusal. Declaring `published` turns it on and accepts the three costs
+# section 1 of the protocol enumerates.
+#
+# TOOL-dNarrowedAnchor-1 - and it spends them PER MODE, not per project. The second anchor is
+# admissible only for a build README declaring a discipline that AUTHORS that folder: `prompt` and
+# `recipe`, which the driver publishes as `SECOND_ANCHOR_MODES`. A `slug` README - and an absent
+# `authorized-by:` key IS `slug` - is refused there, because `slug` names a folder that already
+# exists and a `slug` run reaching the branch anchor has contradicted its own declaration. So turning
+# this key on no longer widens every run in the project; it widens the two disciplines that say, in
+# the file the bar reads, that they author their own authorization. The leg re-derives the same
+# verdict from the recorded BASE and the advertised default-branch tip, so cost 2 above is no longer
+# the whole story: the leg cannot read THIS file, but it can read that.
 ANCHOR_SCOPE=""
+
+# TOOL-aNamedGesture-1 - the TOKEN that authorizes a prompt-mode run. The Skill's prompt path is
+# entered only when the invocation carries it, so this is the gesture that separates a description of
+# a build from a run that will merge and push with no owner turn. Its ARGUMENT is the build: either a
+# path to a file holding the prompt, or the prompt itself.
+#
+# BLANK is the kit default and is what every adopter should ship. The default literal lives in
+# adopt-unattended.sh and nowhere else, and the RENDERED Skill states it verbatim - so read the value
+# out of .claude/skills/unattended/SKILL.md rather than expecting this file to name it. Declare a
+# value here only to override the spelling, which is worth doing in a project whose ordinary prose
+# would contain the default.
+#
+# WHAT IS REFUSED at render time, and why each: a value that does not begin with a hyphen (a bare
+# word reads as a positional argument, which is the prose inference the fence forbids), and a value
+# carrying whitespace, a pipe or a backtick (it is interpolated into a markdown table row and a code
+# span, and each of those three ends one of them early).
+#
+# NOTHING VERIFIES THE GESTURE. No script in this kit sees an invocation, so this key buys a token an
+# agent can test for and never an authorization; the authorization stays the pushed build folder.
+AUTH_PARAM=""
+
+# UNITS_REGION_CUTOFF - the day THIS repo's build READMEs started carrying the generated
+# `gen:build-units` region, as YYYY-MM-DD. It decides what a pinned BASE whose README carries NO such
+# region means to the scope-integrity check in `check_authorization`.
+#
+# BLANK (the default, and what this example ships) is the OFF SWITCH: a BASE with no region keeps the
+# older presence-based opt-in, so the check simply does not apply and nothing refuses. That is the
+# right setting until you have rendered the region across your build folders - see the `--write` mode
+# of the memory-tree kit's `gen_build_index.py`.
+#
+# Set it once the render has landed, to the day it landed. From that date onward a BASE with no region
+# is a REFUSAL rather than a pass, because an absent region makes the subset comparison vacuously true
+# - the scope would be "compared" against the empty set and every run would clear it. Leaving this
+# blank forever is a supported choice; it means you have declined the check, not that you have passed
+# it. Moving it later re-opens the vacuity for every BASE in between; moving it earlier refuses runs
+
+# whose BASE predates the region and can never carry it.
+UNITS_REGION_CUTOFF=""
+
+# TOOL-aGradedMandate-4 - the date from which a CLOSED unit whose spec grades THIN blocks
+# `build-complete`. THIN is the kit's own predicate: an empty section 2 Scope, section 6
+# Acceptance criteria or section 7 Gates. Graded on the spec's FILENAME date, the same idiom
+# UNITS_REGION_CUTOFF uses and for the same reason - two of 307 tracked CLOSED specs grade THIN
+# today, both from a pre-kit July build, and a term that reds a landed spec no run may rewrite is
+# unlandable. BLANK or absent turns the term OFF, and --close ANNOUNCES that it did rather than
+# passing silently. Set to the day this landed.
+SPEC_THIN_CUTOFF=""
+
+# TOOL-aBlindedTrial-7 - a PROJECT-WIDE opt-in to the pre-code spec audit: a YYYY-MM-DD date
+# recording the day the project ruled audits on. Any dated value opts EVERY build in whose README
+# declares no `spec-audit:` key, for every run whose BASE carries it; the date is a record, not a
+# threshold, and is compared to nothing - unlike the cutoffs above, which grade a date. Read at the
+# pinned BASE by check_authorization, never from the working copy, so a run cannot blank it to
+# escape; a README key wins whatever it says; a non-date is a refusal, and so is a BASE conf whose
+# evaluation does not reach the end. BLANK or absent keeps the
+# per-build opt-in - a per-adopter fact, like every cutoff above, so the example ships it blank.
+SPEC_AUDIT_DEFAULT=""
 
 PHASES_EXTRA=""
 DOD_EXTRA=""
+
+# The HALT VOCABULARY. A run that stops records WHY in a token,
+# validated against the kit core set plus whatever a project appends here. The floor is
+# shrink-only and REQUIRED: undeclared or malformed is a refusal, not a defaulted value,
+# because a pin that quietly defaults is a pin nobody set.
+HALT_CODES_EXTRA=""
+HALT_FLOOR="7"
+
+# The UNDECLARED-WRITE CEILING. A concurrently dispatched pass declares its write set before it
+# starts, and that declaration is the disjointness proof two passes rest on. Check 23 compares the
+# declaration against what the pass actually committed and grades the COUNT against this pin, which
+# is shrink-only: it may fall and never rise. Undeclared or malformed is a refusal, not a defaulted
+# value, for the reason the floor above gives.
+#
+# 0 is the value a repo adopting this kit wants, and it means what it says: a pass that writes
+# outside its declaration reds the bar. Raise it ONLY to grandfather instances that already exist in
+# append-only history, MEASURED over your own tree rather than guessed, with the date and the reason
+# written here beside it - then lower it as they close.
+UNDECLARED_WRITE_CEILING="0"
+
+# The LANDER MARKER. A BARE NAME, resolved by the lander AND by `--landed` against
+# `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in
+# each half and cannot be written at all from a linked worktree, where `.git` is a FILE. When
+# declared, the lander writes it on a successful push and `--landed` reads it — the only verb that
+# runs after the push, so the only one that can observe it. What a COMPLIANT LANDER must write: a line naming the commit it pushed. Identity,
+# not existence — a bare touched file is satisfied by any previous landing. Leave it EMPTY and
+# the observation is simply not asked for; an adopter who has not adapted their lander is not
+# wedged by a key they have never heard of.
+LANDER_MARKER=""
+# The two halves of the build method's condition 3, for a concurrently dispatched pass. A pass may not
+# declare a write under SHARED_RECORDS; a GENERATED_INDEXES entry is refused only TOGETHER WITH its
+# generator, because a generated index alone is what every ordinary pass touches. The run-state file
+# is derived, never declared. Blank is the empty set; absent takes the kit default.
+SHARED_RECORDS="memory/DECISIONS.md memory/backlog"
+GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py memory/ledger:tools/memory-tree/gen_build_index.py"
+
+# The date from which a LANDED record must name its anchor kind (`remote` or `local`). A record whose
+# first commit predates it is read as `remote`, which is what every pre-existing record in fact is.
+# Blank or absent grandfathers every record. Set it to the day you adopt the two-anchor landing.
+LANDED_ANCHOR_CUTOFF=""
+
+# TOOL-dBriefedPass-3 — the date from which a CLOSED unit whose BUILD COMMIT predates a conforming
+# spec for it blocks the bar. Graded on the build README's `opened:` date, the same idiom
+# UNITS_REGION_CUTOFF and SPEC_THIN_CUTOFF use and for the same reason: a build that landed before
+# this leg existed cannot be rewritten, and a term that reds one is unlandable by any run.
+#
+# WHAT IT BUYS, because the two neighbouring mechanisms sound like they already do this and do not.
+# `--dispatch` refuses a MISSING or THIN unit at the moment of the act, and is bypassed by not
+# calling the verb. `--close`'s build-complete grades the spec at CLOSE time, by which point a run
+# that built first and specced afterwards has a spec that is neither missing nor thin. Only the
+# commit graph remembers the ORDER.
+#
+# BLANK or absent turns the term OFF and the leg ANNOUNCES that rather than passing silently.
+# Set to the day this landed.
+# BLANK in the example, like every sibling cutoff here: a date is a per-adopter fact, and shipping
+# THIS repo's landing date would grade an adopter's whole back-catalogue from a day their tree
+# knows nothing about. Blank turns the term OFF and the leg announces that it did.
+PASS_ORDER_CUTOFF=""
+
+# PASS_ORDER_WAIVER - where the pass-order leg's waiver registry lives, repo-relative
+# (TOOL-dMuffledSentinel-2). One row per waived unit, `<unit-id><TAB><reason>`, read from the graded
+# commit. BLANK keeps `<MEMORY_ROOT>/project/pass-order-waiver.txt`, where an absent file is an empty
+# waiver set. Declare it when your memory tree has no `project/` directory. A DECLARED path must be
+# tracked at HEAD or the leg refuses, because a mistyped one would otherwise waive nothing in silence.
+PASS_ORDER_WAIVER=""
+
+# DISPOSITION_CUTOFF - the date from which check 2 clause 3 reads a review exit's recorded
+# disposition instead of inferring one from new unit ids. Graded on the run-state record's own
+# first-commit date. A record before it keeps the id-delta proxy verbatim — except one with no
+# first-commit date at all, which is a staged in-flight record and is graded whatever the cutoff
+# says, being the one case that can still record a disposition.
+#
+# BLANK in the example, like every sibling cutoff here, and for the same reason: a date is a
+# per-adopter fact, and shipping THIS repo's landing date would grade an adopter's whole
+# back-catalogue from a day their tree knows nothing about. Blank turns the term OFF and the leg
+# announces that it did.
+DISPOSITION_CUTOFF=""
+
+# BRIEF_RECORDED_CUTOFF - the date from which the `brief-recorded` leg grades a CLOSED unit on
+# whether its BUILD COMMIT carries a `brief · item <id>` row whose hash still joins to a tracked file
+# at that commit. Graded on the build README's `opened:` date. The anchor is the build commit itself
+# and not its first parent, unlike PASS_ORDER_CUTOFF above: `--brief` STAGES its row, so the row
+# lands in the same commit as the pass it describes. Which units the leg grades, and which it only
+# announces, is stated once, in the protocol's `BRIEF_RECORDED_CUTOFF` row at
+# <MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md, and not restated here.
+#
+# BLANK in the example, like every sibling cutoff here, and for the same reason: a date is a
+# per-adopter fact, and shipping THIS repo's landing date would grade an adopter's whole
+# back-catalogue from a day their tree knows nothing about. Blank turns the term OFF and the leg
+# announces that it did.
+BRIEF_RECORDED_CUTOFF=""
+
+# RUNLOG_SESSION_VARS - the NAMES of environment variables whose values each run-log START line
+# records as `sess.<NAME>=`, space-separated, eight at most. The run log is the driver's own
+# machine-local journal (protocol section 2); this key only says which session wrote a line. A value
+# is shape-checked first, letters, digits and `_ . : -` up to 128 characters, because it becomes part
+# of a line other tools parse: one that fails is written EMPTY and flagged, and an unset one writes
+# nothing. BLANK records no session.
+RUNLOG_SESSION_VARS=""

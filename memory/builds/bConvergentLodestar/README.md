@@ -40,19 +40,29 @@ rev-2 reframed S5 around the shipped-reinvention closing loop (rev-1's metric wa
 - **F7** collision-WARN / backlog home: (a) append to the reinvention backlog file, dedup by {new,resembles} *(rec)* · (b) stdout-only · (c) per-node sharded log.
 - **F8** collision precision knobs: (a) token stem + fan-in threshold · (b) + structural signal *(rec)* · (c) + affordance cross-check; threshold in `.codebase-map.conf`.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-bConvergentLodestar-1` | 2 | reuse-convergence layer for codebase-map |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** SPECCED · 1 unit(s) · node b · opened 2026-07-22 · streams tooling
 ids TOOL-bConvergentLodestar-1
 
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map](spec/2026-07-22-spec-bConvergentLodestar-1.md) | SPECCED | rev-2 | 2026-07-22 |
+<!-- gen:build-units -->
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map](spec/2026-07-22-spec-bConvergentLodestar-1.md) | — | 2 | SPECCED | rev-2 | 2026-07-22 |
+<!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 1 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-07-22-review-TOOL-bConvergentLodestar-1-1.md](reviews/2026-07-22-review-TOOL-bConvergentLodestar-1-1.md) | spec-audit | TOOL-bConvergentLodestar-1 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -64,11 +74,3 @@ Records live under `spec/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-07-22-spec-bConvergentLodestar-1.md](spec/2026-07-22-spec-bConvergentLodestar-1.md)
-- **`reviews/`**
-  - [2026-07-22-review-TOOL-bConvergentLodestar-1-1.md](reviews/2026-07-22-review-TOOL-bConvergentLodestar-1-1.md)
-<!-- /gen:build-docs -->

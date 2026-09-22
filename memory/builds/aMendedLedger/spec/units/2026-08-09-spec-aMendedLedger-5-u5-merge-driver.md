@@ -7,6 +7,18 @@
 > rather than the anchor line, and two postconditions are added. Three review-reproduced silent
 > corruptions of `memory/DECISIONS.md` at rc 0 sit behind those four edits.
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md](../../build/2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md) | journal | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md](../../reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md](../../reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md](../../reviews/2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md](../../reviews/2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Port upstream `ARCH-dQuarriedLedger-1` U9 into this repo: a three-way merge driver that key-merges
@@ -32,6 +44,9 @@ replay test — and this unit builds all five plus the gate leg that keeps them 
 - **S5** New `tools/memory-tree/merge-rows.test.sh`: the master's AC7 (a)-(d), the delete/modify
   interaction in both directions, the union-shape conflict, and an end-to-end two-branch `git merge`
   through the real `.gitattributes` + `git config` wiring.
+  - **Readers:** by name: nothing leaves the tree; the verb names the delete/modify merge case the
+    new suite covers. by value: NO VALUE READERS — the item creates the merge suite, and nothing
+    leaves the tree.
 - **S6** `tools/gate-legs.json` gains the leg `row-keyed merge driver replay`, and `AGENTS.md`'s gate
   suite gains a bullet citing `tools/memory-tree/merge-rows.test.sh` verbatim.
 - **S7** New codebase-map dossier `memory/map/features/memory-tree-merge-driver.md`, structured as a
