@@ -541,7 +541,8 @@ remove_descendants() {
 # columns, so procps' `-o pid,pgid` and cygwin's default table (PID PPID PGID ...) both parse. A cygwin
 # row may lead with a one-letter state column its header does not name, and a row whose PID field is
 # not a number is the continuation of a multi-line argv, which is skipped for the reason
-# `scan_descendants` gives.
+# `scan_descendants` gives. A PROBE THAT CANNOT MOVE SAYS SO: rc 2 when neither form yields a header
+# naming both columns, so a host whose `ps` cannot show a group is never read as a group that emptied.
 scan_group() {
   local snap
   snap=$(ps -e -o pid,pgid 2>/dev/null) || snap=""
@@ -549,7 +550,8 @@ scan_group() {
   printf '%s\n' "$snap" | awk -v g="$1" '
     NR == 1 { for (k = 1; k <= NF; k++) { if ($k == "PID") p = k; if ($k == "PGID") q = k }; next }
     p && q { o = ($1 ~ /^[0-9]+$/) ? 0 : 1
-             if ($(p + o) ~ /^[0-9]+$/ && $(q + o) ~ /^[0-9]+$/ && $(q + o) == g) printf "%s ", $(p + o) }'
+             if ($(p + o) ~ /^[0-9]+$/ && $(q + o) ~ /^[0-9]+$/ && $(q + o) == g) printf "%s ", $(p + o) }
+    END     { if (!p || !q) exit 2 }'
 }
 
 # remove_group_residue <pgid> — kills every process still in that group, snapshot then kill, up to
@@ -557,11 +559,12 @@ scan_group() {
 # it still found after the last round, and nothing when the group emptied. This shell and its parent
 # are skipped by name: neither is in the group, and the guard is a belt over that fact.
 remove_group_residue() {
-  local g=$1 p round=0 left
+  local g=$1 p round=0 left members
   case "$g" in ''|*[!0-9]*) return 0 ;; esac
   while :; do
     left=""
-    for p in $(scan_group "$g"); do
+    members=$(scan_group "$g") || { printf 'unscannable'; return 0; }
+    for p in $members; do
       [ "$p" = "$$" ] && continue
       [ "$p" = "${BASHPID:-}" ] && continue
       left="$left $p"
@@ -1884,6 +1887,8 @@ if [ "$CEILINGS_LIVE" = 1 ]; then
 fi
 if [ "$_sf_bounded" = 1 ]; then
   measure_spawn_cost
+  [ -n "$SPAWN_US" ] \
+    || echo "run-gates: the spawn cost could not be measured, so this bar adds nothing to the floor at ${SPAWN_FLOOR_FILE:-<no common dir>}" >&2
   write_spawn_floor "$SPAWN_FLOOR_FILE" "$SPAWN_US"
 fi
 unset _sf_bounded
@@ -2328,10 +2333,16 @@ measure_neighbours() {
 
 # check_residue_gone <leg index> <attempt suffix> — rc 0 when that attempt's worker has exited and no
 # process is left in the group its `timeout` led. RESIDUE names what is left otherwise: a live worker
-# with its ppid-descendants from one snapshot, then any live member of the group. It ASSERTS and never
-# kills, because the reap is the worker's and a second reaper here would hide a first one that failed.
+# with its ppid-descendants from one snapshot, then any live member of the group, or the fact that the
+# group could not be read at all. It ASSERTS and never kills, because the reap is the worker's and a
+# second reaper here would hide a first one that failed.
+#
+# WHAT IT DOES NOT CHECK: that `scan_group` itself works. The reap and this assertion read the group
+# through the same scan, so a scan that returned a wrong empty answer would blind both at once; an
+# unparseable table is caught by the scan's own rc, and the canary grades the reap from the leg's side
+# instead, by the grandchild's pid as the leg itself recorded it.
 check_residue_gone() {
-  local i=$1 sfx=${2:-} p g q snap
+  local i=$1 sfx=${2:-} p g q snap members
   RESIDUE=""
   p=$(cat "$WORK/$i$sfx.pid" 2>/dev/null) || p=""
   if [ -n "$p" ] && kill -0 "$p" 2>/dev/null; then
@@ -2344,9 +2355,13 @@ check_residue_gone() {
   fi
   g=$(cat "$WORK/$i$sfx.tpid" 2>/dev/null) || g=""
   if [ -n "$g" ]; then
-    for q in $(scan_group "$g"); do
-      kill -0 "$q" 2>/dev/null && RESIDUE="$RESIDUE${RESIDUE:+ }$q"
-    done
+    if members=$(scan_group "$g"); then
+      for q in $members; do
+        kill -0 "$q" 2>/dev/null && RESIDUE="$RESIDUE${RESIDUE:+ }$q"
+      done
+    else
+      RESIDUE="$RESIDUE${RESIDUE:+ }(ps shows no process group here, so group $g could not be read)"
+    fi
   fi
   [ -z "$RESIDUE" ]
 }

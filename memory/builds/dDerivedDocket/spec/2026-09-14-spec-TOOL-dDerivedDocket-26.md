@@ -614,7 +614,11 @@ New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record, a
   of its legs can be deferred and a spawn floor it can never read is not worth ten spawns on every
   nested suite bar. §4 Inventory names the verdict-write seam `GATE_VERDICT_FAULT` and the seven
   helpers the build added. No criterion moved: AC4 leaves its writer bars' legs to the arm, which
-  gives each one a bounded leg, and AC11's three arms grade the mechanism as they were written.
+  gives each one a bounded leg, and AC11's three arms grade the mechanism as they were written. Two
+  hardenings the checklist pass asked for, both inside S5 and S6 as written: the group scan returns
+  rc 2 on a process table with no PGID column, so the post-drain assertion reads an unreadable group
+  as NOT cleared rather than as an empty one, and `.githooks/pre-push` unsets the three arm seams
+  before its bar, so a push's environment cannot choose how its own red is classified.
 
 ## 10. Reuse audit
 

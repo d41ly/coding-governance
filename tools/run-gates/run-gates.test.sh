@@ -2328,7 +2328,7 @@ build_hv_repo() { # dir — a scratch repository carrying this runner and its si
 run_hv_bar() { # dir · manifest · VAR=value… -> HV_OUT (stdout and stderr) and HV_RC
   local d=$1 m=$2; shift 2
   HV_OUT=$( cd "$d" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
-      GATE_INHERITED_RED= GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_JOBS=4 GATE_PROFILE=minimal \
+      GATE_INHERITED_RED= GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal \
       GATE_TURNSTILE=0 GATE_LEGS="$m" "$@" bash $KIT_REL/run-gates.sh 2>&1 ); HV_RC=$?
 }
 check_hv_line() { # label · pattern -> one counted assertion that some line of HV_OUT matches the ERE
@@ -2361,14 +2361,18 @@ check_hv_line "AC12 and the refusal names the verdict file" '^gates REFUSED — 
 run_hv_bar "$H12" "$HV/fine.json"
 check_hv_value "AC12 control: the same bar with its record written exits 0" "$HV_RC" 0
 
-# 9b. AC3 — THE ACQUIRE LINE, after a queue behind a planted LIVE holder that releases three seconds in.
+# 9b. AC3 — THE ACQUIRE LINE, after a queue behind a planted LIVE holder. The holder is released only
+#     once the bar has ANNOUNCED its position through the queue-status file, and a second later, so the
+#     bar is known to have queued: a fixed sleep would guess at the bar's startup time, which load
+#     stretches past any guess (the fixed-sleep-does-not-place-a-signal class).
 H3="$HV/r3"; build_hv_repo "$H3"
 mkdir -p "$H3/.git/gate-bar-beacon"
 sleep 300 & _hvholder=$!
 printf '%s' "$(date +%s)" > "$H3/.git/gate-bar-beacon/heartbeat"
 printf '%s' "$_hvholder" > "$H3/.git/gate-bar-beacon/pid"
 printf 'planted' > "$H3/.git/gate-bar-beacon/nonce"
-( sleep 3; rm -rf "$H3/.git/gate-bar-beacon" ) &
+( _i=0; while [ ! -f "$H3/.git/gate-queue-status" ] && [ "$_i" -lt 1200 ]; do sleep 0.1; _i=$((_i + 1)); done
+  sleep 1; rm -rf "$H3/.git/gate-bar-beacon" ) &
 _hvrel=$!
 run_hv_bar "$H3" "$HV/fine.json" GATE_TURNSTILE=1 GATE_TURNSTILE_TICK=1
 wait "$_hvrel" 2>/dev/null; kill "$_hvholder" 2>/dev/null; wait "$_hvholder" 2>/dev/null
@@ -2429,14 +2433,16 @@ check_hv_value "AC11 the same reap rooted at a LIVE pid reaches it" "$(kill -0 "
 if [ "$HAVE_TIMEOUT" = 1 ]; then
   # 9f. AC1 and AC2 — A LEG THAT TIMES OUT ONLY BESIDE A SPINNER. The contended leg waits for the
   #     spinner to start, hangs while its flag stands, and passes once the spinner has finished, so
-  #     its first attempt times out beside one neighbour and its serial retry, alone, is green.
+  #     its first attempt times out beside one neighbour and its serial retry, alone, is green. The
+  #     spinner holds its flag until the contended leg ANNOUNCES it hung and then three seconds more,
+  #     past that leg's two-second ceiling, so the kill lands while the spinner runs whatever the load.
   H1="$HV/r1"; build_hv_repo "$H1"
   export HV_FLAG="$HV/spinner"
-  printf '#!/usr/bin/env bash\n: > "$HV_FLAG"\nsleep 4\nrm -f "$HV_FLAG"\n: > "$HV_FLAG.done"\n' > "$H1/fx/spin.sh"
-  printf '#!/usr/bin/env bash\nwhile [ ! -f "$HV_FLAG" ] && [ ! -f "$HV_FLAG.done" ]; do sleep 0.1; done\n[ -f "$HV_FLAG" ] && sleep 60\nexit 0\n' > "$H1/fx/contended.sh"
+  printf '#!/usr/bin/env bash\n: > "$HV_FLAG"\ni=0; while [ ! -f "$HV_FLAG.hung" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done\nsleep 3\nrm -f "$HV_FLAG"\n: > "$HV_FLAG.done"\n' > "$H1/fx/spin.sh"
+  printf '#!/usr/bin/env bash\nwhile [ ! -f "$HV_FLAG" ] && [ ! -f "$HV_FLAG.done" ]; do sleep 0.1; done\nif [ -f "$HV_FLAG" ]; then : > "$HV_FLAG.hung"; sleep 60; fi\nexit 0\n' > "$H1/fx/contended.sh"
   printf '[{"name": "spinner", "argv": ["bash", "fx/spin.sh"]},\n {"name": "contended", "argv": ["bash", "fx/contended.sh"], "ceiling": 2}]\n' > "$HV/contended.json"
   ( cd "$H1" && git add -A && git commit -qm legs ) >/dev/null 2>&1
-  rm -f "$HV_FLAG" "$HV_FLAG.done"
+  rm -f "$HV_FLAG" "$HV_FLAG.done" "$HV_FLAG.hung"
   run_hv_bar "$H1" "$HV/contended.json"
   check_hv_value "AC1 the contended bar exits 0" "$HV_RC" 0
   check_hv_line "AC1 its first timeout is deferred beside ONE neighbour" '^GATE retry  contended  \(timed out after 2s beside 1 neighbours; one serial retry after the pool drains\)$'

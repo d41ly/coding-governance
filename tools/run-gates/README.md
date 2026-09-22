@@ -64,7 +64,8 @@ attempts' processes must be gone first: the worker kills whatever is left in the
 `timeout` led, and the retry pass verifies that before it measures, naming any survivor instead of
 calling it another tenant. A descendant that left that group on its own is invisible to both.
 `GATE_SPAWN_CMD` (what is timed), `GATE_SPAWN_FLOOR` (the floor file's path) and `GATE_VERDICT_FAULT`
-(make the verdict write fail) are arm seams for the suites, not conf keys.
+(make the verdict write fail) are arm seams for the suites, not conf keys: the runner unsets each
+once read, and the pre-push hook clears all three before the bar it runs.
 
 The records keep both attempts: the first attempt's `<i>.leg` row reads `timeout` and a
 `<i>.retry.leg` row sits beside it, the verdict file gains `retried <n>`, and the ledger row takes the

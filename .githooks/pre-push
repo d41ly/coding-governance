@@ -808,6 +808,10 @@ check_verdict_record() {
   PP_NOT="the bar exited 0 and its run record reads verdict '${v:-none}', not GREEN"; return 1
 }
 
+# THE RUNNER'S ARM SEAMS DO NOT REACH THE BOUNDARY (TOOL-dDerivedDocket-26). `GATE_SPAWN_CMD`,
+# `GATE_SPAWN_FLOOR` and `GATE_VERDICT_FAULT` exist so the runner's own suites can stage a HOST verdict
+# or a refusal; inherited here, the environment of the push would choose how its own red is classified.
+unset GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT
 gate=${GOV_GATE_CMD:-bash $GOV_KITROOT/run-gates/run-gates.sh}
 $gate </dev/null
 rc=$?
