@@ -108,6 +108,27 @@ times; the derivation is monotone instead. They exist so a party outside this pr
 the pin without trusting a byte the run wrote, which is the only form of verification §9 concludes
 actually binds.
 
+## Why `brief-recorded` anchors on the build commit
+
+`TOOL-dDerivedDocket-28` needed a protocol key-table row for `PROCMON_CMD` and funded it by moving
+the ARGUMENT out of the `BRIEF_RECORDED_CUTOFF` row. The rule stays in the protocol: the anchor is
+the build commit and NOT its first parent. Why, unlike its `PASS_ORDER_CUTOFF` sibling: `--brief`
+STAGES its row, so the row lands in the same commit as the pass, and a first-parent anchor would red
+the CONFORMING runs. The two terms are jointly satisfiable — a spec in an earlier commit, the brief
+row alongside the code.
+
+## The process ledger — why the driver's death defines an orphan
+
+Every command the driver starts is recorded by identity beside the slug's lease, and only a recorded
+process whose driver is gone is reaped (`UNATTENDED-STOPS.md` §14 is the rule). Two narrower
+definitions were rejected. "Any recorded process alive" kills the bar a background `--close` is
+still waiting on. "Recorded under a different keepalive id" never reaps a same-session orphan, which
+is the case that was observed: the harness killed the driver mid-bar and the session lived on.
+Matching by command line was rejected outright, because five of the six same-named processes one run
+found belonged to another repository. The driver never kills the pid itself either: a bare `kill -9`
+on a tree's top left every descendant alive, and a native process ignores the MSYS signal, which is
+why the declared reaper walks leaves first and verifies by a second census.
+
 ## Why `RECALL_CLI` and `MAP_CLI` are declarations
 
 Both name a repo-relative path in `.unattended.conf` rather than carrying one in the driver, and the

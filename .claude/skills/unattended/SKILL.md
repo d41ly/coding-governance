@@ -571,6 +571,11 @@ definition, so the absence is a decision and not an oversight.
   `LANDER_MODE=in-place` the close ANNOUNCES when that flagged run is owed — when the landing range
   touches a path `SELFTESTS_OWED_PATHS` declares — so you are told rather than left to remember; it
   still does not run it and does not set the flag, and you name the command you ran in the record.
+- **A process not in the ledger is never killed**, whatever its command line says. The driver records
+  every command it starts and reaps only those, once their driver is gone; `--status` prints
+  `orphans <n>` while any wait. A stray process it did not record — another session's, another
+  repository's — is reported and left to a person: never `kill` one by name, age or spin rate.
+  `UNATTENDED-STOPS.md` §14 is the rule.
 - Keep the phase honest, and give every phase claim a WITNESS — a sha, a tag, a run id. A claim with
   no witness is skipped by the oracle that would have judged it, so an unwitnessed phase is the
   cheapest possible lie and you are the only author of that field.
@@ -834,7 +839,7 @@ context did not.
 **Run `--status <slug>` first, because who you are decides everything below.** If your own
 scheduler lists the keepalive its `LEASE` line names — or, when no `LEASE` line prints, the
 keepalive the record's `keepalive` fact names — you HOLD the lease: resume with
-`--resume <slug> --keepalive-id <that id>` and do not reap anything. Otherwise you are TAKING
+`--resume <slug> --keepalive-id <that id>` and do not reap any job. Otherwise you are TAKING
 OVER: reap the recorded job and read the result back, schedule a new one, then run
 `--resume <slug> --keepalive-id <new id>`, which records the new id. If that resume REFUSES or
 prints `still held`, reap only the job you just scheduled, read your scheduler's listing back to

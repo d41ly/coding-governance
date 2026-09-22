@@ -82,7 +82,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
 - `--status` — one line: the phase, the first non-terminal unit, and the parked counts, then the
-  fields that print only when there is something to report — the resume tick's attempts, and
+  fields that print only when there is something to report — the resume tick's attempts,
+  `orphans <n>` from the process ledger (`UNATTENDED-STOPS.md` §14, nothing killed), and
   `keepalive <id> present|absent in the harness listing at <utc>` from the stop-guard's newest
   sidecar line, whatever its phase, omitted when the record names no keepalive id or no line
   exists. The line stays ONE line: a field joins it or does not print, and the suite arms that.
@@ -184,8 +185,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   halt codes, never an extension of them — a halt code ends a run and a hold code pauses one, and
   one list would let a pause be recorded as an ending. Every refusal is numbered and comes before
   any write: an already-HELD record, a dirty tree, an unpublished tip under `ANCHOR_SCOPE=published`,
-  a code or condition outside its grammar, and a keepalive neither reaped nor recorded unreachable,
-  because a job still firing into a held run re-dispatches its units at the next tick. One
+  a code or condition outside its grammar, a keepalive neither reaped nor recorded unreachable,
+  because a job still firing into a held run re-dispatches its units at the next tick, and a
+  process the slug's driver recorded still alive once its orphans are reaped. One
   exception to the published-tip clause: under `--code platform-unavailable`, and only when the
   remote does not ANSWER, it accepts the unpublished tip and records it as `hold-unpushed`. In the
   SAME write it decides whether a DURABLE restart is owed and records `resume-owed` and

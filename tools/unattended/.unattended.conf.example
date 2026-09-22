@@ -194,6 +194,15 @@ GATE_POLICY_FILE=""
 # grade. A repo with no `asks:` key anywhere takes today's path unchanged and is told so on stdout.
 ASKS_CMD=""
 
+# OPTIONAL. The REAPER a run's own orphaned processes go through: every command the driver starts is
+# recorded by identity in a per-slug ledger, and a recorded process whose driver is gone is killed
+# by calling `<this> --kill-msys <pid>`, one at a time. The process-monitor kit's `reap.py` is the
+# reaper this is written for — declare it with a launcher and its path in YOUR tree — because it
+# kills a tree leaves first and never outside its declared roots. BLANK turns reaping OFF: orphans
+# are still counted, on `--status` and at every verb that would have reaped, and nothing is killed.
+# A process the ledger does not name is never killed, whatever this key says.
+PROCMON_CMD=""
+
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
 # of that skill's interactive exits the INSTALLED PROTOCOL enumerates a no-owner-turn resolution for

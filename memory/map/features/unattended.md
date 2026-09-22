@@ -87,13 +87,8 @@ resume tick from the OS scheduler — three actors outside the session, reading 
 `--liveness`. The tick launches only on a lease the INDEX holds, on the node that took it; the
 reap is read back at `--landed` against the stop-guard's listing.
 
-**A stop the run cannot fix is a PAUSE, not an ending.** `HELD` is non-terminal: entered by
-`--hold` with a code, a condition and a witness, left by `--resume` alone. A per-slug LEASE
-under the git common dir keys on the session-scoped keepalive id, so a resume tells orientation
-from take-over. Every `phase` read routes through `read_derived_phase` or `read_recorded_phase`.
-A hold on a review that deferred twice records its Workflow runId (`--pending-run`, fact
-`hold-run`), and the take-over prints the relaunch (`TOOL-dDerivedDocket-29`).
-See `UNATTENDED-STOPS.md`.
+**How a run stops, who drives it and which processes are its own has its own dossier.** HELD,
+the per-slug lease and the process ledger are `unattended-stops`.
 
 **LANDED is DERIVED, not written after the push (TOOL-dDerivedDocket-22, ruling D12-i2).** A
 committed `LANDING` record whose own commit the advertised tip holds reads landed, found by CONTENT

@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-28 — run-owned process ledger
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
+**Status:** CLOSED · rev-9 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-22-build-TOOL-dDerivedDocket-28-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dDerivedDocket-28-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 |
@@ -320,7 +321,10 @@ anything the other writes.
   `GUIDE_CAP_LINES` together and never retyped here as literals, because check 6 reds on EITHER
   half. `memory/guides/BUILD-METHOD.md` carries a SECOND ceiling, its row in
   `tools/template-size-limits.txt`, which declares bytes and no line half, so that one is graded on
-  bytes alone; this unit's delta on it is 0 either way.
+  bytes alone; this unit's delta on it is 0 either way. `memory/guides/UNATTENDED-PROTOCOL.md` is
+  the one carrier ALREADY over its guide byte cap at this unit's parent, by a merge-induced overflow
+  that `memory/project/curation-debt.txt` records and grandfathers for check 6, so the ceiling that
+  governs it is that row: it is graded by the parent comparison, both halves, and not by the cap.
   Red when: the key-table row is added and nothing is trimmed, so a unit whose design says it spends
   nothing quietly spends the headroom the build's units share; or the size is read against the
   figure written in this spec rather than against the parent commit, so a sibling's landing hides
@@ -451,6 +455,25 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
   prune-race argument unit 62's holder-worktree check re-grounds for `--resume`, and the AC9 arm
   whose refusal unit 63's row order keeps. No criterion, design or other edge moved, and the status
   stays SPECCED.
+- rev-9 · 2026-09-22 · §6 AC13 · the build pass, re-verified on the tree after the origin/main merge.
+  The protocol stands at 64719 bytes and 704 lines at this unit's parent, over the guide byte cap
+  AC13 told every carrier to sit under: the overflow is the merge-induced one
+  `memory/project/curation-debt.txt` records, and no unit of this build caused it. AC13 now names
+  that row as the ceiling governing the protocol and grades it by the parent comparison on both
+  halves, which this pass keeps at minus 104 bytes and zero lines; nothing else in the criterion
+  moved. Recorded, not changed: the trimmed tail measures 263 bytes, not §4's 264, because the em
+  dash inside it is one character and three bytes; the new row is 159 bytes, so the delta is still
+  negative. Adding a table row adds a line, so the section 8 intro, two lines of prose, is reflowed
+  onto one and the line count is unmoved, which is the line-POSITIVE red AC13 names. The stops
+  companion S8 names as a new file already existed at this unit's parent, shipped by an earlier unit
+  of this build, so S8's rule lands in it as a new section 14; it still draws on its own guide cap
+  as §4 planned, and S12's zero-or-negative delta is read, as AC13 reads it, on the protocol, its
+  template and BUILD-METHOD. Design detail the spec left to the
+  build: `--preflight` reaps AFTER it takes its lease, the last act before its OK line, because a
+  kill is the least reversible thing it does and a refused preflight must not have done it; its own
+  wiring check therefore runs before the reap, and AC11's preflight arm observes the reap and the
+  prune. The `--hold` precondition S7 fills is refusal 84, a new number rather than a fifth
+  `fail 56`, so no pinned ordinal moves. S8's gate is check 41 of the kit leg.
 
 ## 10. Reuse audit
 

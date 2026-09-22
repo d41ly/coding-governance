@@ -186,7 +186,7 @@ would lock that lease's own holder out for the whole bound.
 |---|---|---|
 | HELD | released, stale or absent | take-over; with no `--keepalive-id`, prints the `--status` block, then refuses, numbered, and writes nothing |
 | HELD | fresh and taken | refuses, numbered: another session already resumed it |
-| working | fresh, taker equals the `--keepalive-id` passed | orientation; refreshes the lease |
+| working | fresh, taker equals the `--keepalive-id` passed | orientation; refreshes the lease and reaps the run's orphans (§14) |
 | working | fresh, a different `--keepalive-id` passed | refuses, numbered — unless `--replaces <old>` names the lease's id, which records the new id in the lease and the `keepalive` fact |
 | working | fresh, no id passed | prints the `--status` block, then refuses, numbered; writes nothing |
 | working | stale | `presumed-stopped`: take-over, refusing a missing id as the first row does |
@@ -215,7 +215,7 @@ lease is taken, so a refused take-over writes nothing at all:
 4. interrupted acts are NAMED — a non-empty index, the newest gate window with no verdict, a
    turnstile ticket whose pid is dead — and never repaired;
 5. the lease is taken, naming the new id;
-6. the run's own orphaned processes are reaped;
+6. the run's own orphaned processes are reaped (§14);
 7. the new id is recorded in the `keepalive` fact;
 8. a HELD record returns to its `held-from` phase, and one carrying `hold-run` prints the relaunch of
    that deferred review FIRST: re-run it with identical args, which reuses every lens and skeptic
@@ -481,3 +481,50 @@ against the ask filed for that leg. KF3 still binds, so a fix that edits the gra
 OWN. The gate leg's check 23 reads that subject as an ABSORB, reports the commit's paths on an
 `ABSORB` line, and counts it as neither a dodged join nor an undeclared write; the same paths under a
 subject that names a unit id are still the anomaly.
+
+## 14. The process ledger — nothing is killed that this run did not start
+
+*`TOOL-dDerivedDocket-28`. One run found an earlier bar's legs still running beside its own; another
+found six abandoned processes matching this kit's commands, and five were another repository's.*
+
+**A process not in the ledger is never killed**, whatever its command line says: it is reported, by
+the process-monitor kit where one is adopted, and left to a person. The ledger is what makes a
+process this run's. Every command the driver starts through its bounded runner is appended, by
+identity, to `<git-common-dir>/unattended/<slug>.procs`, beside the lease (§7):
+
+```
+<msys pid> <start token|-> <driver pid> <driver token|-> <keepalive|-> <iso-utc> <argv0> [argv1] [argv2]
+```
+
+The start token is field 22 of `/proc/<pid>/stat`, read at record time and again before any reap, so
+a reused pid is told apart from the process it once named. Where procfs cannot answer, the token is
+`-`, and that record is counted and never reaped.
+
+**An orphan** is a recorded process alive with its recorded token while its recorded driver is not.
+The driver waits on every command it starts, so a live driver is a live consumer; a driver pid reused
+by another process reads as alive and withholds the reap, so the error direction is a process left
+running, never one killed.
+
+**Who reaps**: `--preflight` once its lease is held, `gates-green` before it starts a bar, `--hold`
+before it releases the lease, and the two `--resume` rows that hold it — the take-over and the holder
+passing the lease's own id. Every other `--resume` row only counts. Each orphan goes through
+`PROCMON_CMD --kill-msys <pid>`, one at a time, and success is read back from the recorded pid,
+never from the reaper's exit. One line per record acted on:
+
+```
+unattended: reaped orphan <pid> (<argv>), started <iso> by driver <pid>, now gone
+unattended: NOT reaped <pid> — <exited, pid reused | no procfs token | fence refused: <why>>
+```
+
+The same pass prunes a record whose process is gone or whose pid now names another process. A fence
+refusal keeps its record, so a later reap can succeed. A blank `PROCMON_CMD` turns reaping off,
+announced, and the orphans are still counted. The runner's wrapper carries the repository root as an
+argument, which is what lets the fence admit a tree whose parent is gone.
+
+`--status` prints `orphans <n>` when n is positive and kills nothing. `--hold` refuses, numbered,
+while any recorded process of the slug is alive after its reap, naming it: a run does not hold while
+its own bar runs. At a terminal, and at an `in-place` `--landed` that observed the landing, the
+ledger is removed — or KEPT, naming each live pid, while a recorded process is still alive.
+
+**What it cannot see**: a process the agent starts in its own shell, such as a suite at `VERIFYING`.
+The driver did not start it, so it is not recorded and never reaped here.

@@ -204,8 +204,26 @@ RB_OUT=""; RB_TOOK=0; RB_STDOUT=""; RB_ERR=""
 # the whole bar through here, before its own write gate — and the two names are what let the
 # refresh obey the calling verb's identity rather than renewing whatever lease it finds.
 RB_LEASE_SLUG=""; RB_LEASE_ID=""
+# STARTED IN THE BACKGROUND, RECORDED, THEN WAITED FOR — TOOL-dDerivedDocket-28 S1. A session that
+# dies leaves the command it was waiting on running with nobody waiting (i26: an earlier bar's legs
+# still competing with the next run's), and the only thing that can later tell that orphan apart
+# from a stranger with the same command line is a record made HERE, by identity: `$!` names the
+# process this driver started and nothing else. The bound, the `</dev/null` and the two capture
+# files are unchanged, so no caller reads a different value.
+#
+# THE WRAPPER CARRIES THE REPOSITORY ROOT AS ITS `$0` (S4). process-monitor's fence admits a process
+# whose own argv names a declared root, and everything descending from one; an orphan has no living
+# ancestor, so without this token the reaper would refuse the very tree it exists for. `; exit $?`
+# keeps the wrapper a real parent: a lone `"$@"` would be exec'd in its place and the token lost.
+#
+# WHAT THE `&` COSTS, and where it costs nothing (memory/gotchas/async-job-starts-with-sigint-ignored.md).
+# A job started with `&` starts with SIGINT ignored. On the bounded path that changes nothing a
+# signal can reach: `timeout` installs its own INT handler, so the command can still trap INT, and it
+# already moved the command into its own process group, where a terminal's Ctrl-C never reached it.
+# On the UNBOUNDED path, a host with no runnable `timeout`, the command now ignores INT, so a Ctrl-C
+# ends the driver alone and leaves the command running — as a recorded orphan the next reap finds.
 run_bounded() { # argv...
-  local _s _e _rc _d
+  local _s _e _rc _d _p
   write_lease_refreshed "$RB_LEASE_SLUG" "$RB_LEASE_ID"
   # THE REFUSAL BRANCH KEEPS RB_OUT'S SENTENCE and empties only the two NEW values. That sentence
   # is this branch's ONLY diagnostic -- it is SET here and the function returns before RB_TOOK is
@@ -221,10 +239,13 @@ run_bounded() { # argv...
   # never by testing for the binary. With no runnable timeout the command still RUNS, unbounded --
   # a bound may cost speed and may turn a hang into a verdict; it may never turn a check into a skip.
   if [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
-    timeout -k 5s "$GATE_BOUND" "$@" </dev/null >"$_d/out" 2>"$_d/err"; _rc=$?
+    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" timeout -k 5s "$GATE_BOUND" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   else
-    "$@" </dev/null >"$_d/out" 2>"$_d/err"; _rc=$?
+    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   fi
+  _p=$!
+  write_proc_record "$_p" "$@"
+  wait "$_p"; _rc=$?
   _e=$(date +%s); RB_TOOK=$(( _e - _s ))
   RB_STDOUT=$(cat "$_d/out" 2>/dev/null)
   RB_ERR=$(cat "$_d/err" 2>/dev/null)
@@ -444,7 +465,7 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""
+ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; LEASE_STALE_AFTER=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
@@ -474,6 +495,8 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWI
 #   * LANDED_FACTS_CUTOFF (TOOL-dDerivedDocket-22 S10) - the date from which the landed fact-set
 #     arm grades a record, read here because `--preflight` refuses to retire a record that arm
 #     would red. Blank turns both halves off.
+#   * PROCMON_CMD (TOOL-dDerivedDocket-28 S5) - the REAPER a recorded orphan goes through, called
+#     `<cmd> --kill-msys <pid>`. Blank turns reaping OFF, announced, and orphans are still counted.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -1269,6 +1292,213 @@ check_lease_fresh() { # slug (after read_lease)
   case "$_t" in ""|*[!0-9]*) return 2 ;; esac
   case "$_n" in ""|*[!0-9]*) return 2 ;; esac
   [ $((_n - _t)) -gt "$(resolve_lease_bound)" ] && return 1
+  return 0
+}
+
+# ------------------------------------------------------------------------------ the process ledger
+# TOOL-dDerivedDocket-28. ONE FILE PER SLUG BESIDE THE LEASE, one line per command `run_bounded`
+# started, appended:
+#
+#   <msys pid> <start token|-> <driver pid> <driver token|-> <keepalive|-> <iso-utc> <argv0> [argv1] [argv2]
+#
+# A RECORD IS AN IDENTITY, NOT A NAME. The start token is field 22 of `<procfs>/<pid>/stat`, the
+# process start time in clock ticks, read once here and again before any reap: two processes that
+# share a pid do not share it. Where procfs cannot answer the token is `-`, and such a record is
+# counted and NEVER reaped, announced — the pid alone can name a stranger.
+#
+# AN ORPHAN is a recorded process alive with its recorded token while its recorded DRIVER is not. The
+# driver waits on every command it starts, so a live driver is a live consumer. A driver pid reused by
+# another process reads as alive and withholds the reap: the error direction is a process left
+# running, never one killed. The driver's own token is recorded for the reader and decides nothing.
+#
+# NOTHING OUTSIDE THE LEDGER IS IN REACH, whatever its command line says. i1 found six abandoned
+# processes matching this kit's commands and five were another repository's, so a same-named process
+# nobody recorded is reported by the process-monitor kit and never killed here.
+#
+# `UNATTENDED_PROCFS` is the FIXTURE SEAM and nothing else: pointed away, every new record carries
+# `-` and nothing is ever reaped. A crafted directory could forge a token, and any reap it earned still
+# goes through the reaper's own fence.
+PROCFS_ROOT=${UNATTENDED_PROCFS:-/proc}
+# 120 s: one census of the reaper's is bounded at 90 s inside it and a kill costs two, so this admits
+# one slow census and still ends a hung one. A pinned literal, chosen rather than measured, on
+# REMOTE_BOUND's argument that a bound raisable from the environment leaves no diff behind.
+REAP_BOUND=120
+PT_TOKEN=""
+read_proc_token() { # pid -> sets PT_TOKEN to its procfs start token, or `-` when procfs cannot say
+  local _l="" _r
+  local -a _f
+  PT_TOKEN=-
+  case "${1:-}" in ""|*[!0-9]*) return 0 ;; esac
+  { IFS= read -r _l < "$PROCFS_ROOT/$1/stat" || [ -n "$_l" ]; } 2>/dev/null || return 0
+  # EVERY FIELD AFTER THE LAST `)` IS NUMERIC OR ONE LETTER. The command name inside the parentheses
+  # may carry spaces and parentheses of its own, so the split starts after it: field 3 is `_f[0]`.
+  _r=${_l##*) }
+  read -r -a _f <<<"$_r"
+  [ "${#_f[@]}" -ge 20 ] || return 0
+  case "${_f[19]}" in ""|*[!0-9]*) return 0 ;; esac
+  PT_TOKEN=${_f[19]}
+  return 0
+}
+resolve_procs_path() { # slug -> the process ledger's path on this node, beside the lease
+  local _pp; _pp=$(resolve_lease_path "$1") || return 1
+  printf '%s.procs\n' "${_pp%.lease}"
+}
+# THE RECORDER. A verb with no slug (`--plan`, `--phase`) has no ledger to write, and a record that
+# cannot be written costs the reap and never the command: a bounded run is never refused for it.
+write_proc_record() { # pid · argv... -> one line appended to the running verb's slug ledger
+  local _pid="$1" _f _t _w _a="" _i=0 _k
+  shift
+  check_slug_shape "${SLUG:-}" || return 0
+  _f=$(resolve_procs_path "$SLUG") || return 0
+  mkdir -p "${_f%/*}" 2>/dev/null || return 0
+  read_proc_token "$_pid"; _t=$PT_TOKEN
+  # A WORD IS WHITESPACE-FREE BEFORE IT IS WRITTEN, because the line is split on whitespace when it
+  # is read back and a space inside an argv word would forge the fields after it.
+  for _w in "$@"; do
+    [ "$_i" -lt 3 ] || break
+    _w=${_w//[[:space:]]/_}; [ -n "$_w" ] || _w=-
+    _a="$_a ${_w:0:80}"; _i=$((_i + 1))
+  done
+  _k=${RB_LEASE_ID:--}; _k=${_k//[[:space:]]/_}
+  read_proc_token "$$"
+  printf '%s %s %s %s %s %s%s\n' "$_pid" "$_t" "$$" "$PT_TOKEN" "$_k" "$(read_utc_now)" "$_a" >> "$_f" 2>/dev/null
+  return 0
+}
+PL_FILE=""; PL_LINES=()
+read_proc_ledger() { # slug -> 0 with PL_FILE and PL_LINES filled, or 1 when this slug has no ledger
+  local _l
+  PL_FILE=""; PL_LINES=()
+  PL_FILE=$(resolve_procs_path "$1") || { PL_FILE=""; return 1; }
+  [ -f "$PL_FILE" ] || return 1
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    _l=${_l%$'\r'}
+    [ -n "$_l" ] && PL_LINES+=("$_l")
+  done < "$PL_FILE"
+  return 0
+}
+# ONE CLASSIFIER, and every reader asks it: the reaper, the count `--status` prints, the precondition
+# `--hold` refuses on and the removal at a terminal. Four spellings of "is this ours and is it alive"
+# would be four answers to one question.
+PS_STATE=""; PS_PID=""; PS_TOK=""; PS_DPID=""; PS_ISO=""; PS_ARGV=""
+derive_proc_state() { # ledger line -> PS_STATE gone|reused|live|orphan|untokened|malformed, and its fields
+  local -a _f
+  read -r -a _f <<<"$1"
+  PS_PID=${_f[0]:-}; PS_TOK=${_f[1]:--}; PS_DPID=${_f[2]:-}; PS_ISO=${_f[5]:-}; PS_ARGV="${_f[*]:6}"
+  case "$PS_PID" in ""|*[!0-9]*) PS_STATE=malformed; return 0 ;; esac
+  case "$PS_DPID" in ""|*[!0-9]*) PS_STATE=malformed; return 0 ;; esac
+  if ! kill -0 "$PS_PID" 2>/dev/null; then PS_STATE=gone; return 0; fi
+  read_proc_token "$PS_PID"
+  if [ "$PS_TOK" != - ] && [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$PS_TOK" ]; then PS_STATE=reused; return 0; fi
+  if kill -0 "$PS_DPID" 2>/dev/null; then PS_STATE=live; return 0; fi
+  if [ "$PS_TOK" = - ] || [ "$PT_TOKEN" = - ]; then PS_STATE=untokened; else PS_STATE=orphan; fi
+  return 0
+}
+# Is the RECORDED process still there? Dead, or its pid now carrying another start token, is gone.
+check_proc_gone() { # pid · recorded token -> 0 when that process no longer exists
+  kill -0 "$1" 2>/dev/null || return 0
+  [ "${2:--}" != - ] || return 1
+  read_proc_token "$1"
+  [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$2" ] && return 0
+  return 1
+}
+measure_orphans() { # slug -> how many recorded processes are alive with their driver gone, on stdout; reads only
+  local _l _n=0
+  if read_proc_ledger "$1"; then
+    for _l in "${PL_LINES[@]}"; do
+      derive_proc_state "$_l"
+      case "$PS_STATE" in orphan|untokened) _n=$((_n + 1)) ;; esac
+    done
+  fi
+  printf '%s' "$_n"
+}
+read_procs_alive() { # slug -> one `<pid> (<argv>)` line per recorded process still alive, on stdout; reads only
+  local _l
+  read_proc_ledger "$1" || return 0
+  for _l in "${PL_LINES[@]}"; do
+    derive_proc_state "$_l"
+    case "$PS_STATE" in live|orphan|untokened) printf '%s (%s)\n' "$PS_PID" "$PS_ARGV" ;; esac
+  done
+  return 0
+}
+# THE REAPER'S CALL, bounded and captured through a FILE, never a substitution: a reaper that leaves a
+# descendant holding its stdout would hold a `$( )` open past the bound (bounded-through-a-pipe).
+# `PROCMON_ROOT` is the declared root the reaper's fence reads, set as the gate runner sets it.
+RP_WHY=""
+run_reaper() { # msys pid -> the declared reaper's exit status; RP_WHY carries what it said
+  local _o _rc
+  RP_WHY=""
+  _o=$(mktemp 2>/dev/null) || { RP_WHY="no capture file could be created for the reaper's answer"; return 1; }
+  # shellcheck disable=SC2086
+  if [ "$GATE_BOUND_LIVE" = 1 ]; then
+    PROCMON_ROOT="$ROOT" timeout -k 5s "$REAP_BOUND" $PROCMON_CMD --kill-msys "$1" </dev/null >"$_o" 2>&1; _rc=$?
+  else
+    PROCMON_ROOT="$ROOT" $PROCMON_CMD --kill-msys "$1" </dev/null >"$_o" 2>&1; _rc=$?
+  fi
+  if { [ "$_rc" = 124 ] || [ "$_rc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ]; then
+    RP_WHY="the reaper did not answer within ${REAP_BOUND}s"
+  else
+    RP_WHY=$(grep -m1 'REFUSED' "$_o" 2>/dev/null)
+    [ -n "$RP_WHY" ] || RP_WHY=$(grep -v '^[[:space:]]*$' "$_o" 2>/dev/null | tail -n 1)
+    [ -n "$RP_WHY" ] || RP_WHY="the reaper exited $_rc and said nothing"
+  fi
+  RP_WHY=${RP_WHY//$'\r'/}; RP_WHY=${RP_WHY:0:200}
+  rm -f "$_o" 2>/dev/null
+  return "$_rc"
+}
+# THE REAP, one orphan at a time and in ledger order, and the PRUNE beside it: a record whose process
+# is gone, or whose pid now names a different process, leaves the ledger; every other record stays.
+# Called only by a verb that HOLDS the slug's lease when it gets here (`--preflight` after taking it,
+# `gates-green`, `--hold` before releasing it, and the `--resume` rows that hold it), so the rewrite
+# cannot race another session's append. SILENT when there is nothing to report.
+#
+# SUCCESS IS READ BACK, never taken from the reaper's exit: the recorded pid is asked again, and a
+# process still alive with its recorded token is NOT reaped, with what the reaper said. The record is
+# then kept, so a later reap can succeed and a person can read why this one did not.
+run_orphan_reap() { # slug -> every orphan of the slug reaped through PROCMON_CMD, and the ledger pruned
+  local slug="$1" _l _t _keep _off="" _noff=0 _k
+  read_proc_ledger "$slug" || return 0
+  _t=$(mktemp "$PL_FILE.XXXXXX" 2>/dev/null) || {
+    echo "unattended: NOTE - the process ledger cannot be rewritten on this node, so nothing was reaped or pruned: $PL_FILE"
+    return 0; }
+  for _l in "${PL_LINES[@]}"; do
+    derive_proc_state "$_l"; _keep=1
+    case "$PS_STATE" in
+      gone) _keep=0 ;;
+      reused) _keep=0; echo "unattended: NOT reaped $PS_PID — exited, pid reused" ;;
+      untokened) echo "unattended: NOT reaped $PS_PID — no procfs token" ;;
+      orphan)
+        if [ -z "$PROCMON_CMD" ]; then
+          _off="$_off $PS_PID"; _noff=$((_noff + 1))
+        else
+          run_reaper "$PS_PID"
+          # A KILLED PROCESS LEAVES THE TABLE A MOMENT AFTER ITS KILLER RETURNS, so it is asked a few
+          # times over two seconds before a survivor is called one.
+          _k=0
+          while ! check_proc_gone "$PS_PID" "$PS_TOK" && [ "$_k" -lt 10 ]; do sleep 0.2 2>/dev/null || sleep 1; _k=$((_k + 1)); done
+          if check_proc_gone "$PS_PID" "$PS_TOK"; then
+            _keep=0
+            echo "unattended: reaped orphan $PS_PID ($PS_ARGV), started $PS_ISO by driver $PS_DPID, now gone"
+          else
+            echo "unattended: NOT reaped $PS_PID — fence refused: $RP_WHY"
+          fi
+        fi ;;
+    esac
+    [ "$_keep" = 0 ] || printf '%s\n' "$_l" >> "$_t"
+  done
+  mv -f "$_t" "$PL_FILE" 2>/dev/null || rm -f "$_t" 2>/dev/null
+  [ "$_noff" = 0 ] \
+    || echo "unattended: reaping is OFF because PROCMON_CMD is blank, so $_noff orphan(s) of $slug are counted and left running:$_off"
+  return 0
+}
+# S11 - AT A TERMINAL THE LEDGER GOES WITH THE LEASE, unless a recorded process is still alive: the
+# ledger is then the only thing a later reap can find it by, so it is KEPT and each live pid named.
+remove_procs_ledger() { # slug -> the ledger removed, or kept with a line naming each live pid
+  local _f _alive
+  _f=$(resolve_procs_path "$1") || return 0
+  [ -f "$_f" ] || return 0
+  _alive=$(read_procs_alive "$1")
+  if [ -z "$_alive" ]; then rm -f "$_f" 2>/dev/null; return 0; fi
+  echo "unattended: the process ledger is KEPT, because a recorded process is still alive and a later reap can find it only there: ${_alive//$'\n'/; } at $_f"
   return 0
 }
 # The LEASELESS record's clock, and it is a different question from the lease's: how long ago did
@@ -4017,6 +4247,9 @@ WTS
       write_lease_released "$slug" landed \
         || echo "unattended: NOTE — the lease could not be rewritten, so a reader that cannot observe the remote later will not see this observation: $(resolve_lease_path "$slug" 2>/dev/null)"
       echo "unattended: phase LANDED (derived: ${DP_LANDING:0:8} on $DP_AREF at ${DP_TIP:0:8}) · observed, not written: under in-place landing the record the push carried is the terminal, and the next --preflight of $slug retires it"
+      # TOOL-dDerivedDocket-28 S11 - the in-place landing writes no terminal until a rotation that
+      # may never come, so the ledger goes HERE, beside the one write this verb makes.
+      remove_procs_ledger "$slug"
       return 0
     fi
     if [ -z "$DP_LANDING" ]; then
@@ -4305,6 +4538,7 @@ WTS
   # AT A TERMINAL THERE IS NO SLUG LEFT TO DRIVE, so the lease is REMOVED rather than released:
   # a released lease still answers "who held this", and nobody holds a finished run.
   remove_lease "$slug"
+  remove_procs_ledger "$slug"
   stage_or_fail "$rel" || return 1
   if [ "$akind" = remote ]; then
     echo "unattended: phase LANDED · witness $head · anchor remote · observed on $AREF at $ASHA · unpushed on local $lbranch: $unp"
@@ -4397,6 +4631,7 @@ verb_abort() { # slug · reason · code
   head=$(GIT rev-parse HEAD)
   set_fact "$rel" phase ABORTED || return 1
   remove_lease "$slug"
+  remove_procs_ledger "$slug"
   set_fact "$rel" witness "$head" || return 1
   # AN AUTHORED FACT, not a substring of the reason. A reader is a field read rather than a parse, and
   # three readers want it by key. It is a per-run SINGLETON written by a terminal verb, which is the
@@ -4484,7 +4719,7 @@ print_interrupted_acts() {
 run_hold() { # slug · code · until · reason · reaped · unreachable · pending run
   local slug="$1" code="$2" until="$3" reason="$4" reaped="$5" unreach="$6" pendrun="${7-}"
   local rel cur ka head legal bt rc adv unpushed=""
-  local rsname heldat streak owed owedwhy rsrow pendrun_bad=0
+  local rsname heldat streak owed owedwhy rsrow pendrun_bad=0 inflight
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to hold: $rel"; return 1; }
@@ -4628,7 +4863,20 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   # pair: the second half of that pair expands to the VALUE when the variable is set, so the row
   # would have carried the fire instant where the schedule name belongs.
   if [ -n "$owed" ]; then rsrow="$rsname"; else rsrow="none($owedwhy)"; fi
-  # ---- nothing above this line wrote anything ------------------------------------------------------
+  # ---- TOOL-dDerivedDocket-28 S7 - A RUN CANNOT HOLD WHILE ITS OWN BAR IS STILL RUNNING. The orphans
+  # ---- are reaped first, while this verb still holds the lease it is about to release, and anything
+  # ---- the ledger still shows alive after that is refused by name: a HELD record over work in flight
+  # ---- is a pause whose witness does not describe what the tree is about to become. LAST of the
+  # ---- refusals, because the reap is the one act above the record writes, and the prune it makes
+  # ---- touches the process ledger alone.
+  run_orphan_reap "$slug"
+  inflight=$(read_procs_alive "$slug")
+  if [ -n "$inflight" ]; then
+    inflight=${inflight//$'\n'/; }
+    fail 84 "a process this slug's driver started is still alive, and a hold now would leave a HELD record with its own work in flight; let it finish, or reap it, then hold again: $inflight"
+    return 1
+  fi
+  # ---- nothing above this line wrote anything but the process ledger's prune -----------------------
   set_fact "$rel" phase HELD || return 1
   set_fact "$rel" witness "$head" || return 1
   set_fact "$rel" held-from "$cur" || return 1
@@ -5030,6 +5278,10 @@ verb_preflight() { # slug · keepalive-id
   else
     write_lease_taken "$slug" "$kid" || { fail 57 "cannot write this slug's lease file, and an unwritten lease leaves the run readable as undriven by the next session that asks: $LEASE_FILE"; return 1; }
   fi
+  # TOOL-dDerivedDocket-28 S3 - THE RUN'S OWN ORPHANS ARE REAPED HERE, after every precondition passed
+  # and the lease is held: a kill is the least reversible thing this verb does, so a refused preflight
+  # must not have done it.
+  run_orphan_reap "$slug"
   # RE-READ, like the base above and for the identical reason. Unit 5 froze the anchor triple, so on
   # a second preflight $AREF/$ASHA hold what was just OBSERVED while the record holds what is pinned.
   # Printing the observation would be the same lie in the operator's face that the unconditional
@@ -5249,6 +5501,10 @@ BRIEFROWS
     _rtn=$(grep -c '' "$_rt"); _rtl=$(tail -n 1 -- "$_rt"); _rtl=${_rtl%$'\r'}
     parked="$parked · resume-tick $_rtn attempt(s), last ${_rtl%% *}"
   fi
+  # THE PROCESS LEDGER'S ORPHANS (TOOL-dDerivedDocket-28 S6), on the same rule: a field printed only
+  # when there is one, each identity checked, and nothing killed — this is a read verb.
+  local _orph; _orph=$(measure_orphans "$slug")
+  [ "${_orph:-0}" -gt 0 ] 2>/dev/null && parked="$parked · orphans $_orph"
   # THE STOP-GUARD'S NEWEST LISTING, on the same rule (TOOL-aWokenSentinel-9): a FIELD on this one
   # line, printed only when the record names a keepalive id AND the sidecar holds a line, so a
   # record with nothing to report prints the bytes it printed before this unit. `present` and
@@ -5642,8 +5898,9 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
   check_ask_mandate "$slug" "$rel" || return 1
   print_interrupted_acts
   write_lease_taken "$slug" "$kid" || { fail 57 "cannot write this slug's lease file, and an unwritten lease leaves the run readable as undriven by the next session that asks: $LEASE_FILE"; return 1; }
-  # THE SEAM the process-ledger unit fills: the run's own orphaned processes are reaped HERE, after
-  # the lease is held and before the phase moves, and only on this row and the stale one.
+  # TOOL-dDerivedDocket-28 S3 - the run's own orphaned processes are reaped HERE, after the lease is
+  # held and before the phase moves: the dead session's bar is exactly what a take-over inherits.
+  run_orphan_reap "$slug"
   # THE RUN-STATE LEASE, beside the slug's (TOOL-aWokenSentinel-1): the keepalive this session holds
   # and the session and pid the stop-guard, the stall-recorder and the resume tick bind to, written
   # by the one function --preflight writes them with. Old values READ BEFORE the write, so the line
@@ -5831,6 +6088,10 @@ verb_resume() { # slug
       return 1
     fi
     write_lease_refreshed "$slug" "$KID"
+    # TOOL-dDerivedDocket-28 S3 - THE HOLDER'S OWN ORPHANS: i26's harness killed the driver mid-bar
+    # while the session lived on, so the holder resuming under its own id is the one who finds them.
+    # Every row that does NOT hold the lease only counts them, through the status block.
+    run_orphan_reap "$slug"
     verb_status "$slug" || return 1
     print_resume_orientation "$rel" "$p"
     return 0
@@ -6610,12 +6871,17 @@ dod_met() { # slug · run-state file · item · checker
       # a leg guard here: a guarded manifest would grade the landing merge by guard, which is the
       # shape two reproduced aborts already have. `GATE_SELFTESTS` is neither set nor unset, so the
       # bar's environment carries exactly what this close inherited.
+      # TOOL-dDerivedDocket-28 S3 - THE ORPHANS OF AN EARLIER BAR ARE REAPED BEFORE THIS ONE STARTS.
+      # i26's run reached `gates-green` again without passing through `--resume`, and found the legs
+      # of the bar its dead session had started still running beside its own.
       if [ "$LANDER_MODE" = in-place ]; then
         check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
         print_selftests_owed
+        run_orphan_reap "$slug"
         # shellcheck disable=SC2086
         run_bounded env GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$?
       else
+        run_orphan_reap "$slug"
         # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
         # was: the project declares a command line, not a path.
         # shellcheck disable=SC2086
