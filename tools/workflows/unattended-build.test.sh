@@ -698,7 +698,9 @@ has    "MT ...and the harness disposes the unverified population" "$o" "disposal
 # M2 (41, 6), with H2, M3 and L1 one id each. One lens returns 10 findings and three return 12.
 MT20_SHAPE='{"confirmed":[1,2,6,9,10,16,20,25,29,30,31,38,39,40,41,43],"lenses":{"find:underspecification":10,"find:":12},"typed":[2,3],"summary":"16 confirmed in 9 items"}'
 MT20_MERGED='[{"severity":"BLOCKER","ids":[38,29]},{"severity":"BLOCKER","ids":[39,30]},{"severity":"HIGH","ids":[1,20,43]},{"severity":"HIGH","ids":[2]},{"severity":"HIGH","ids":[40,31]},{"severity":"MEDIUM","ids":[25,9]},{"severity":"MEDIUM","ids":[41,6]},{"severity":"MEDIUM","ids":[16]},{"severity":"LOW","ids":[10]}]'
-MT20_DISPOSE='{"disposed":true,"standing":[],"promoted":10,"folded":6,"refuted":0,"promotedIds":["A-tB-21","A-tB-22","A-tB-23","A-tB-24"],"summary":"10 promoted into 4 units, 6 folded"}'
+# Every promoted unit is PLACED (TOOL-cMendedVintage-19), as MT_DISPOSE is: this double predates that
+# rule, and without a placement the accepted disposal never prints and no roster is handed out.
+MT20_DISPOSE='{"disposed":true,"standing":[],"promoted":10,"folded":6,"refuted":0,"promotedIds":["A-tB-21","A-tB-22","A-tB-23","A-tB-24"],"edges":[],"placements":[{"unit":"A-tB-21","repairs":"A-tB-3","order":3},{"unit":"A-tB-22","repairs":"A-tB-3","order":3},{"unit":"A-tB-23","repairs":"A-tB-3","order":3},{"unit":"A-tB-24","repairs":"A-tB-3","order":3}],"summary":"10 promoted into 4 units, 6 folded"}'
 t2=$(run_merged_review "$(build_merged_returns "$MT20_MERGED" 46 "$MT20_SHAPE")")
 au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
 # LIVENESS, and the MERGE is part of it: a double that put one id in each item would count 4 and 6
