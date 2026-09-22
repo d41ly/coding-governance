@@ -48,6 +48,9 @@ owner blocked `TOOL-aTunedCompass-2` and `TOOL-aTunedCompass-3` on this unit.
   cannot reject a member of its own population is a check that cannot fail. What remains is the half
   that CAN reject: a question whose passage the chunk substrate does not retrieve either is a
   question about nothing, and it is dropped.
+  - **Readers:** by name: nothing tracked is withdrawn; the deleted half was this spec's own earlier
+    design. by value: NO VALUE READERS — nothing under the recall kit samples questions, so the half
+    the item deletes never reached code.
 - **S3** — questions are SAMPLED from the live query log rather than hand-authored. The log at the
   git common dir holds 130 distinct real questions with the terms their session supplied and the
   paths each was shown. Sampling from it removes the authorship bias the parent report flagged in its
@@ -84,6 +87,10 @@ owner blocked `TOOL-aTunedCompass-2` and `TOOL-aTunedCompass-3` on this unit.
   set its targets resolve in, the audit reads that declaration instead of the pin, and the committed
   fixture declares `records`, which is what it has always been graded as. The coupling being removed
   is a coincidence — that the pin's set happened to match the only fixture — not a design.
+  - **Readers:** by name: `measure_run` loads the pin's set, `check_audit` reds a question that
+    resolves no target in it, and `test_audit_green` is the arm a widened audit would red. by value:
+    `tools/memory-recall/check-recall.py` grades every audit in the set the recall floor's pin
+    names, so that field decides which set is graded.
 - **S5c-ii** — an arm pinning the DEAD PROBE branch itself, so the widened audit cannot pass by
   finding nothing. A fixture whose declared set resolves no target for any question REDS. Without it,
   S5c-i's declaration is a knob that can silently disable the audit it was added to preserve, which is

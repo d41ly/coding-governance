@@ -1,6 +1,6 @@
 # process-monitor — find, report and kill the processes an agent session forgot
 
-<!-- gov:kit process-monitor@0.1 -->
+<!-- gov:kit process-monitor@0.2 -->
 
 Every deadline a repo like this owns bounds a command a CHECKER launched. Nothing bounds a process
 an AGENT launched — a `Bash run_in_background` job, a `Monitor` pipeline, a suite invoked by hand —
@@ -65,7 +65,11 @@ because a monitor that seems to cover more than it does is worse than one that c
   dangerous — not a filesystem root, not the system temp directory. A root naming somebody else's
   project is accepted.
 - **The adopter's `--check` grades the DECLARATION, not the result.** Whether your roots actually
-  admit your own work is a separate arm, because answering it needs a census and a closure.
+  admit your own work is a separate arm, because answering it needs a census and a closure. When
+  that arm finds a well-formed conf and nothing live under its roots, it is an ANNOUNCED SKIP and
+  not a pass: the engine exits 3, `--check` prints the line naming the unexercised arm and still
+  exits 0. Only a declaration fault or a census that cannot run refuses. A verdict that went the
+  other way would withdraw a correctly installed kit for what happened to be running at the time.
 - **It never restarts, reschedules or cleans up after anything it killed.**
 - **The POSIX backend is unexercised on the machine this was built on.** MSYS `ps` rejects `-o`
   entirely, so that path is graded by captured fixtures only, and its arms say so.

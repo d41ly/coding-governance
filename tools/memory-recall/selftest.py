@@ -1034,12 +1034,14 @@ def test_printed_invocations_resolve():
         answered = run(root, kitdir, *Q)
         assert refused.returncode == 2 and "--terms" in refused.stderr
         # The hook opt-in's remedy is the kit's OTHER printed invocation, and it was the one naming
-        # a path no runbook step created (errno 2 when run verbatim). The fixture is built to the
-        # post-WIRE state — §3c step 4 copies the wiring tool into <project>/tools/ — so the remedy
-        # is checked against the tree the runbook actually produces.
+        # a path no runbook step created (errno 2 when run verbatim). THE MERGER GOES BESIDE THE KIT,
+        # not under a `tools/` this fixture has no kit in: `make_repo` installs the fixture kit at the
+        # ROOT, so the adopter derives an EMPTY tool root and `settings_merge_src` looks at the kit's
+        # own parent. A `tools/`-prefixed copy models neither layout WIRE §3c supports — it was
+        # reachable only while the adopter hardcoded `tools/` too, and two agreeing hardcodes are not
+        # a passing test. TOOL-cMendedVintage-4 removed one and this fixture was the other.
         copy_extra(kitdir, *SURFACE)
-        (root / "tools").mkdir()
-        shutil.copyfile(smerge, root / "tools" / "settings-merge.py")
+        shutil.copyfile(smerge, root / "settings-merge.py")
         hooked = adopt(root, kitdir, "--scaffold", "--with-hook")
         assert hooked.returncode == 0, f"{hooked.stdout}{hooked.stderr}"
         for proc in (helped, refused, answered, hooked):
@@ -1362,10 +1364,11 @@ def test_adopter_layout():
         # The WHOLE kit, not just SHIPPED: the surface arms read README.md, verbatim.json, the
         # template and the hook test from their own kit dir.
         shutil.copytree(KIT, kitdir, ignore=shutil.ignore_patterns("__pycache__"), dirs_exist_ok=True)
-        (root / "tools").mkdir(exist_ok=True)
         smerge = settings_merge_src()
         if smerge is not None:
-            shutil.copyfile(smerge, root / "tools" / "settings-merge.py")
+            # Beside the kit, for the same reason as the arm above: the nested run's own
+            # `settings_merge_src` resolves against ITS kit's parent, which is this root.
+            shutil.copyfile(smerge, root / "settings-merge.py")
         proc = subprocess.run(
             [sys.executable, str(kitdir / "selftest.py")], cwd=str(root),
             env=dict(os.environ, MRECALL_NESTED="1"), capture_output=True, text=True,

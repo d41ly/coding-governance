@@ -75,6 +75,7 @@ micro-format gate selftest	460		worst of 8 readings 303s, x1.5
 placeholder-catalogue self-test	80		worst of 8 readings 50s, x1.5
 playbook parity selftest	150		worst of 7 readings 93s, x1.5
 playbook render selftest	60		worst of 8 readings 10s, x1.5
+pre-push run-log line	60		worst of 3 readings 39s on node d 2026-09-14 by direct invocation, x1.5 floored at this file 60s minimum. TOOL-dLoggedFlight-4, withheld from adopters
 pre-push self-test	1020		worst of 8 readings 676s, x1.5
 process-monitor adopter selftest	330		worst of 2 readings 220s, x1.5; the spread is wide (120s and 220s) because one arm waits out a real census bound
 process-monitor census selftest	40		worst of 2 readings 23s, x1.5
@@ -90,8 +91,10 @@ run-gates adopter e2e	300		worst of 8 readings 198s, x1.5
 run-gates canary	3660		worst of 12 readings 2436s, x1.5
 run-gates evidence	2250		worst of 12 readings 1500s, x1.5
 run-gates gov canary	60		worst of 11 readings 19s, x1.5
+run-gates run-log line	280		worst of 6 readings 186s on node d 2026-09-13 by direct invocation, the fastest 62s, x1.5. TOOL-dLoggedFlight-3, withheld from adopters
 run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 run-selftests self-test	1217		measured 811s on node a 2026-09-14, direct timed run of the suite alone on a frozen git clone --local at f23b71e0 (108 arms, inner width 1, 15 bash processes on the box before it started, PASS), x1.5 rounded up; the 300s ceiling it replaces was killed at 300.333s exit 124 and had observed no wall
+runlog selftest	93		measured 62s on node d 2026-09-16, the worst of the direct runs (58 to 62 s) after the closing review's round-1 fold and the second origin/main reconcile raised the suite to 1291 assertions, x1.5
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5
@@ -114,7 +117,12 @@ unattended gate selftest shard 6/8	1590	bash tools/unattended/check-unattended.t
 unattended gate selftest shard 7/8	2320	bash tools/unattended/check-unattended.test.sh --shard 7/8	measured 1546s on node a 2026-09-14, the instrumented profile run of the re-cut region beside a two-shard BASE pair (TOOL-aBatchedArm-3 prof-s7), x1.5; idle eight-wide direct reading 603s on node a 2026-09-15 at a117faeb, the eight shards concurrent on a frozen clone with ps before 0, longest 922s (TOOL-aBatchedArm-1 AC6, the 20-minute question); the ceiling stays at the contended reading
 unattended gate selftest shard 8/8	2460	bash tools/unattended/check-unattended.test.sh --shard 8/8	measured 1635s on node a 2026-09-15, direct run on a frozen clone at 7549981a seven-wide beside six sibling shards on an otherwise idle box (TOOL-aBatchedArm-3 D13, re-measured at the build's final pass; the first candidate read 3762s eight-wide), x1.5; idle eight-wide direct reading 922s on node a 2026-09-15 at a117faeb, the eight shards concurrent on a frozen clone with ps before 0, longest 922s (TOOL-aBatchedArm-1 AC6, the 20-minute question); the ceiling stays at the contended reading
 unattended gate-guard selftest	220	bash tools/unattended/gate-guard.test.sh	sized from one arm measured direct on node a 2026-09-14: 718 ms per payload fed to the hook, 100 arms, doubled by the meta-arm, 144 s, x1.5 — the pass that wrote the suite may not run it, so the main loop's first VERIFYING reading is the one this row is re-derived from
+unattended stall-recorder selftest	60	bash tools/unattended/stall-recorder.test.sh	sized from every arm run alone on node a 2026-09-20: ten arm blocks from the sourced prologue summing 16 s of wall, each paying the prologue again and the real-driver arm paying the driver's startup twice, x1.5 floored at 60 — the pass that wrote the suite may not run it, so the main loop's first VERIFYING reading is the one this row is re-derived from
+unattended stop-guard selftest	60	bash tools/unattended/stop-guard.test.sh	sized from every arm run alone on node a 2026-09-20: thirteen arm blocks from the sourced prologue summing 35 s of wall, each paying the prologue again, x1.5 floored at 60 — the pass that wrote the suite may not run it, so the main loop's first VERIFYING reading is the one this row is re-derived from
+unattended resume-tick selftest	60	bash tools/unattended/resume-tick.test.sh	sized from every arm block run alone on node a 2026-09-20: seven arm blocks from the sourced prologue summing 36 s of wall, each paying the prologue and a git init, the launch arms returning while their stub still sleeps, x1.5 floored at 60, and the stub's fifteen-second sleepers reaped at every fixture build rather than waited on — the pass that wrote the suite may not run it, so the main loop's first VERIFYING reading is the one this row is re-derived from
 unattended pass-order selftest	170	bash tools/unattended/check-pass-order.test.sh	measured 111s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
 unattended playbook selftest	630	bash tools/unattended/check-playbook.test.sh	measured 418s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended-build self-test	60		sized from one run_wf invocation measured alone on node a 2026-09-21 from the suite's sourced preamble: 186 ms worst of three, times the 103 run_wf sites the suite carried at 1d8530e7 by grep -c, 19 s, x1.5 floored at 60 — the pass that wrote this row may not run the suite, so the main loop's first VERIFYING reading is the one it is re-derived from
+unattended runlog-writer selftest	110	bash tools/unattended/runlog-writer.test.sh	measured 71s on node d 2026-09-13, the worst of four readings (a cold first run; then 31s and 32s direct and 51s under run-selftests.sh --kit), x1.5. TOOL-dLoggedFlight-2, owner-approved, withheld and never a leg
 verdict-epoch self-test	390		worst of 9 readings 257s, x1.5
 verifier fan-out self-test	230		worst of 8 readings 151s, x1.5

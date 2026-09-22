@@ -28,8 +28,13 @@ role = "engine"
 # copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
+#
+# `runlog-writer.test.sh` joined it with TOOL-dLoggedFlight-2 for the same reason: its subject is the
+# driver's run-log writer in THIS directory, so an adopter who never edits the driver gains nothing
+# from it. It is not a gate leg either. `run-unattended-gates.sh` picks it up from its budget row with
+# the rest, and it also runs alone, which is how a build holding the siblings back runs it.
 [[files]]
-include = ["adopt-unattended.test.sh", "check-arms-groups.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "unattended.test.sh"]
+include = ["adopt-unattended.test.sh", "check-arms-groups.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh", "unattended.test.sh"]
 role = "project-owned"
 
 # `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
@@ -84,12 +89,53 @@ role = "rendered"
 to = "{kit}/playbook.fixture.md"
 placeholders = ["KIT_DIR"]
 
+# THE FIXTURE RECORDS, the rule above applied one file class further. Each is named for the piece it
+# describes with `/` written as `~`, so the install prefix sits in the FILENAME and not only in the
+# body. Shipped verbatim as engine rows they arrived at every foreign prefix under GOV's spelling,
+# the adopter renamed that file over the target's own copy, and the next `update` restored gov's
+# spelling so the rename ran again -- every update destroying whatever the target held there.
+# Reproduced at prefix `scripts`. DEPL-cMendedVintage-6.
+#
+# `{prefix}~{kit_id}` is the name the adopter derives from its own kit path, and the two agree for
+# every target whose kit home is the default. A target declaring an explicit kit home breaks that
+# equality, and the residue is a REPORT line rather than a misplaced write: `update` never writes a
+# `rendered` row, so the worst case is a row reported against a path its adopter does not use.
+#
+# THE TEMPLATES SIT IN THE KIT ROOT, not beside the records they render, because
+# `check-playbook.sh` globs the records directory and would read a template as a record whose piece
+# does not exist -- an orphan record, which is the state this pair exists to prevent.
+[[files]]
+include = ["fixture-record-one.template.md"]
+role = "rendered"
+to = "{kit}/fixture-records/{prefix}~{kit_id}~fixture-pieces~one~piece.md.md"
+placeholders = ["KIT_DIR"]
+
+[[files]]
+include = ["fixture-record-two.template.md"]
+role = "rendered"
+to = "{kit}/fixture-records/{prefix}~{kit_id}~fixture-pieces~two~piece.md.md"
+placeholders = ["KIT_DIR"]
+
+# AND GOV'S OWN TWO COPIES ARE WITHHELD, through the destination claim this descriptor already uses
+# to withhold its self-tests. A `**` rule drops a file only when the destination IT would produce is
+# claimed, and at a foreign prefix the two rendered destinations above carry THAT prefix while these
+# two carry gov's -- different paths, so without this rule the wildcard ships gov's spelling beside
+# the rendered one and `check-playbook.sh` reports the survivor as an orphan record. Measured before
+# this rule existed: a plan at prefix `scripts` printed both.
+#
+# The two destinations COINCIDE at gov's own prefix, which is what makes the render reproduce the
+# committed bytes here and is the parity the adopter's fixture arm already depends on.
+[[files]]
+include = ["fixture-records/tools~unattended~fixture-pieces~one~piece.md.md",
+           "fixture-records/tools~unattended~fixture-pieces~two~piece.md.md"]
+role = "project-owned"
+
 [config]
 file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -97,11 +143,12 @@ argv = ["bash", "{kit}/adopt-unattended.sh"]
 mutates_index = false
 requires_config_first = true
 
-# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. Every `rendered` row above is written by the
-# adopter, and without a regenerate block, or with this one and GOVKIT_RERENDER unset, `update` lands
-# the new templates, leaves the renders stale, and then fails its own post-write check on the Skill
-# and rolls the kit back. That is what happened at one adopter on 2026-09-11, and this block
-# prevents it only under the flag. The adopter re-renders unconditionally, so it is the whole argv;
+# THE RE-RENDER an update runs by default; GOVKIT_RERENDER=0 declines it. Every `rendered` row above
+# is written by the adopter, and without a regenerate block, or with this one and GOVKIT_RERENDER=0,
+# `update` lands the new templates, leaves the renders stale, and then fails its own post-write check
+# on the Skill and rolls the kit back. That is what happened at one adopter on 2026-09-11, and this
+# block prevents it unless an operator turns the step off. The adopter re-renders unconditionally,
+# so it is the whole argv;
 # its declared outcomes below classify its exit exactly as they do for `apply`.
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-unattended.sh"]

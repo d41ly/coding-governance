@@ -396,11 +396,14 @@ run_arm "S1 ...and the same sidecar at the declared prefix is clean" "no undecla
 # `tools/`, and its waiver registry sits beside it. A gate still spelling `tools/…` finds no waiver
 # registry, so the waived hit reds — which is the defect, visible as a failing arm rather than as a
 # wrong verdict nobody sees.
+# The WHOLE kit tree moves, not the gate alone: since the kit walk derives its prefix too, a gate at
+# `vendor/gov/` enumerates `vendor/gov/*/` and a fixture that left its kits under `tools/` handed it
+# an empty population — the refusal, not a verdict. Two segments on purpose: one segment is the
+# shape the walk was first written for and would not have caught the pinned field.
 P="$TMP/prefix"; mkfix "$P" 'Run `bash memory-tree/check-memory-hygiene.sh` to lint.'   # gov:root-fixture — the fixture's own hit, waived below
-mkdir -p "$P/vendor/gov"
-mv "$P/tools/check-install-prefix.sh" "$P/vendor/gov/check-install-prefix.sh"
-printf 'tools/memory-tree/README.md:1  the fixture hit this arm waives\n' > "$P/vendor/gov/install-prefix-waivers.txt"
-rm -f "$P/tools/install-prefix-waivers.txt"
+mkdir -p "$P/vendor"
+git -C "$P" mv tools vendor/gov
+printf 'vendor/gov/memory-tree/README.md:1  the fixture hit this arm waives\n' > "$P/vendor/gov/install-prefix-waivers.txt"
 git -C "$P" add -A >/dev/null 2>&1
 pout=$(cd "$P" && bash vendor/gov/check-install-prefix.sh 2>&1); prc=$?
 if [ "$prc" != 0 ]; then
@@ -441,6 +444,33 @@ mkdir -p "$R4/tools/other"
 printf '#!/usr/bin/env bash\nbash demo/thing.sh\n' > "$R4/tools/other/stray.test.sh"
 git -C "$R4" add -A >/dev/null 2>&1
 arm_received_set "S5 an UNSHIPPED test keeps its exclusion — no descriptor resolves it" "no undeclared root-install spelling" 0 "$R4"
+
+# ==================== TOOL-cMendedVintage-5 — EPOCH 4, THE LEAD CLASS ==========================
+# A shell default expansion is a carried literal — a variable that resolves at the target's prefix
+# with a hardcoded fallback that resolves only at gov's — and it was invisible to every epoch before
+# this one, because `-` sat in the class of characters that may not precede a hit.
+#
+# TWO arms, because one of them alone only proves the gate reds at something. The RED fixture uses
+# the `:-` form the widening admits; the GREEN control uses the `/`-preceded form the measurement
+# deliberately KEPT excluded, since dropping `/` too adds 203 occurrences to this repo and almost
+# every one of them is a CORRECT spelling of gov's own checkout in runbook prose. If a later pass
+# widens the class again, the control is what reds.
+#
+# NOTE FOR WHOEVER EDITS THIS BLOCK: do not complete a kit path anywhere in this comment. `-` is no
+# longer an excluded lead character, so a sentence quoting one is itself a hit, and a raised row is
+# the one thing `--write-ratchet` may not absorb. The fixture spellings below are safe only because
+# `demo` is not a kit in this repo.
+E4R="$TMP/epoch4-default"; mkfix_source "$E4R" 'The engine lives at tools/demo/thing.sh in this repo.'
+(cd "$E4R" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+printf 'Run it as ENGINE=${GOV_ENGINE:-tools/demo/thing.sh} from anywhere in the tree.\n' >> "$E4R/tools/demo/README.md"
+git -C "$E4R" add -A >/dev/null 2>&1
+carried_arm 'epoch4 a ${VAR:-…} default RAISES the count the ratchet recorded' "ROSE" 1 "$E4R" --check
+
+E4G="$TMP/epoch4-slash"; mkfix_source "$E4G" 'The engine lives at tools/demo/thing.sh in this repo.'
+(cd "$E4G" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+printf "Copy it from <gov>/tools/demo/thing.sh into your own tree.\n" >> "$E4G/tools/demo/README.md"
+git -C "$E4G" add -A >/dev/null 2>&1
+carried_arm "epoch4 ...and a /-preceded spelling of gov's own checkout is still not one" "carried-prefix clean" 0 "$E4G"
 
 # --- AC6, the skip announces itself. `mkfix` builds a repo with no govkit registry, so arm 1 cannot
 # tell a shipped test from an unshipped one and must SAY so rather than report a clean population.

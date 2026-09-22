@@ -80,6 +80,35 @@ defaults = { MEMORY_ROOT = "memory" }
 argv = ["bash", "{kit}/adopt-memory-tree.sh", "--scaffold"]
 mutates_index = true
 
+# `--render` AND NOT THE `[adopt]` ARGV, which is the whole reason this block exists. `--scaffold`
+# takes one of exactly two branches on an adopted tree and NEITHER re-renders: the marker branch
+# prints `already scaffolded — nothing to do` and exits 0, and a marker-less root is refused. So the
+# four `rendered` rows below — `{memory_root}/HYGIENE.md`, `{memory_root}/TEMPLATE-SPEC.md`,
+# `{memory_root}/guides/BUILD-METHOD.md` and `{memory_root}/guides/ANNOTATION-STYLE.md` — had no verb
+# able to refresh them, and went one vintage stale on every pull. `--render` skips the adoption guard,
+# reads the `gov:kit memory-tree@` marker instead — and stops at the accepted exit 3 when it is
+# absent rather than refusing — then writes those four and nothing else.
+#
+# GATED BY `GOVKIT_RERENDER`, like every block of this kind: the step runs by default, and with
+# GOVKIT_RERENDER=0 exported a `govkit update` refreshes nothing here and still relabels each moved
+# `rendered` row `re-rendered` before the flag is ever read. Reachable by hand at any time.
+#
+# SAFE TO RE-RUN for the reason the mode was cut this narrow: it seeds no conf, writes no waiver
+# registry, creates no directory beyond a destination's own parent, and leaves a file whose render is
+# already current byte-identical and unmentioned. It cannot reset a measured pin, because it never
+# touches a file that holds one.
+#
+# NO `[[outcome]]` PAIR OF ITS OWN. The marker question `--render` used to answer with exit 1 is now
+# answered at exit 3 by the accepted `not-rendered-here` row below, so the only exit-1 states left
+# under `--render` are the blank-`READINESS_ROWS` refusal, which sits after the marker gate and which
+# an adopted tree does reach, and the incomplete-render-set refusal inside `render_all`. Both leave
+# `{memory_root}/HYGIENE.md` present, so the `code = 1` probe below matches and labels them
+# `refused-foreign-tree`, which is the wrong `means` for either: they stay failures, and the label is
+# misleading rather than wrong in effect. Stated here rather than given a row, because a second
+# `code = 1` row would have to discriminate on a file neither state distinguishes.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-memory-tree.sh", "--render"]
+
 [[outcome]]
 code = 1
 probe = { must_exist = ".memory-tree.conf", must_not_exist = "{memory_root}/HYGIENE.md" }
@@ -94,6 +123,30 @@ ok = true
 code = 1
 probe = { must_exist = "{memory_root}/HYGIENE.md" }
 means = "refused-foreign-tree"
+
+# `--render` ON A TREE THAT DOES NOT RENDER FROM THIS KIT, and it is ACCEPTED. A target can claim
+# these rendered rows in its receipt while holding its own hand-authored docs — measured at one of
+# the two adopters this kit shipped to this week — and for it there is nothing to refresh and nothing
+# wrong. Without this row the regenerate step of an `update` run with GOVKIT_RERENDER=1 read the
+# refusal as a wedge and told the operator to repair by hand a render that should never have run.
+# Exit 3 and NOT 1 so it stays
+# distinguishable from `refused-foreign-tree` above, which is `--scaffold` meeting a real conflict.
+[[outcome]]
+code = 3
+means = "not-rendered-here"
+ok = true
+# THE CONF, NOT `{memory_root}/HYGIENE.md`, and the difference is the whole row. The adopter exits 3
+# on a DISJUNCTION -- no HYGIENE.md at all, OR one without the marker -- so a probe naming HYGIENE.md
+# matches the second half only, and the first half is this kit's own declared first-install steady
+# state: `seed-and-stop` above pins `must_not_exist = "{memory_root}/HYGIENE.md"` and its comment
+# says every correct first install ends there. Narrowed that way the descriptor held two `ok = true`
+# rows contradicting each other about one path, and an `update` over a seeded-and-stopped target
+# found no accepted outcome for exit 3, left its writes staged and told the operator to repair by
+# hand a render that should never have run -- verbatim the wedge this row exists to remove. The conf
+# is present on both halves, it cannot be satisfied by a run that died before writing (the adopter
+# refuses and seeds it long before the exit-3 gate), and a `must_exist` term is REQUIRED here by
+# DEPL-cMendedVintage-16's arm, so it cannot simply be dropped.
+probe = { must_exist = ".memory-tree.conf" }
 
 [[gate_leg]]
 name = "memory hygiene"
@@ -126,11 +179,22 @@ blocks_gate = false
 why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-15 are simply OFF, so the hygiene leg exits 0 with that hole wide open. Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the pins say."
 discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
 
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. This kit owns FOUR `rendered` rows — the
+# hygiene rules, the spec template, the build method and the annotation style — and until this block
+# existed it declared no way to refresh any of them, so each went one vintage stale on every update
+# INCLUDING one run with GOVKIT_RERENDER=1, which had nothing here to run
+# and the adopter's own dogfood-parity leg reds on the gap (TOOL-dRetiredFork-29, measured at two
+# adopters). `--scaffold` cannot be that argv and the backlog row says why: on an adopted tree it
+# prints "already scaffolded" and exits 0. `--render` is the narrow entrypoint added for this, it
+# refuses an unadopted tree, and it stops before the authored files a refresh must never touch.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-memory-tree.sh", "--render"]
+
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
 none = """
-the adopter accepts only `--scaffold`, measured. Its verifiers default to a check mode but each is already this kit's own gate leg. Wiring one is a backlog row, not a silence
+the adopter's two modes are `--scaffold` and `--render`, measured, and neither is a verifier. Its verifiers default to a check mode but each is already this kit's own gate leg. Wiring one is a backlog row, not a silence
 """
 
 [[gate_leg]]

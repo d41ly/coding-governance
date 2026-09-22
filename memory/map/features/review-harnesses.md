@@ -13,6 +13,7 @@ gate-legs = [
   "review-join ban (no ref-keyed join)",
   "review-join self-test",
   "tier2-review self-test",
+  "unattended-build self-test",
 ]
 kits = []
 git-hooks = []
@@ -77,7 +78,11 @@ kit's own directory, the tool root, and the memory-tree kit's directory filled i
 engine file verbatim, so the four install paths the harness spells used to reach an adopter at
 another prefix naming files that adopter did not have. The third token is PROBED from the tracked
 tree rather than derived from the prefix, because an adopter may install that kit flat. The harness
-is claimed by the unattended dossier and its template here, because this kit renders it.
+is claimed by the unattended dossier and its template here, because this kit renders it. Its
+suite is `unattended-build.test.sh`, claimed here beside the tier2-review and review-join suites:
+it exercises `unattended-build.js` and `unattended-unit.js` with stub hooks in place of the
+Workflow runtime, and it is held on the bar like its siblings (`TOOL-aWokenSentinel-21`, enrolled
+in this claim, the `PASS` count line and the subject pin by `TOOL-aWokenSentinel-27`).
 
 **The build harness REQUIRES a `scratch` argument, and it is the one path that cannot be rendered.**
 The session scratchpad is in the caller's system prompt and nowhere a workflow script can read, and
@@ -112,6 +117,13 @@ files.
   remains a gap is the other two harnesses, which still know only their own subject, and the fact
   that a kind is a parameter rather than a profile: adding a third would mean a third branch at each
   of the six sites, and the enforcement hook admits no registry that would collapse them.
+- **`blockers` and `highs` are COUNTED from ids, but the severities are still the synthesis's word.**
+  `TOOL-dMergedTally-1` stopped the synthesis agent typing the two integers: it returns `items`, each
+  a severity and the raw confirmed ids it merged, and the harness counts over raw ids and returns
+  null when an id sits in no item or in two. The typed integers had counted ITEMS against a
+  `confirmed` that counts raw findings, and the build harness's disposal guard subtracts one from the
+  other. What stays a prompt property is that the item list matches the table the same agent wrote
+  into the report: nothing re-reads the record.
 - **The two enforcement points AGREE now, and the modality gap is closed for one rule.**
   `TOOL-dTieredTribunal-14` lifted the ref-keyed-join ban into `tools/hooks/agent-cap.js` as its fifth
   rule and made `check-review-join.sh` delegate through `--only=join`, so both entry points share one

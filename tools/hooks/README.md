@@ -124,6 +124,38 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   finding. This rule reads the literal-blanked view, so a mention inside a string is not a hit, and a
   REGEX literal is — which is why a gate holding the ban table excludes itself from its own
   population.
+- An UNDECLARED SPEC AUDIT. A `Workflow` call whose structured `args` carry `kind: "spec-audit"` is
+  denied unless the build README at `<args.repo>/<parent of args.reviewDir>/README.md` carries
+  `spec-audit: <YYYY-MM-DD>` in its FRONT MATTER — the slice between the opening `---` and the next,
+  the same scope `scratch-guard.js` reads `authorized-by:` in, through the one reader both hooks
+  share. A body mention (a fenced example) is not front matter, and `spec-audit: yes` is a claim
+  with no owner date behind it and reads as absent. The pre-code spec audit is OPT-IN by the owner's
+  ruling (`TOOL-aBlindedTrial-6`), and this rule is what makes it FORBIDDEN in an attended session
+  rather than merely not required; the remedy is the key, dated, on the build README. It reads
+  `tool_input.args` ONLY — an object, or the JSON string the Workflow tool often delivers — and
+  never the script text, which both shipped harnesses fill with the word. It fails CLOSED for this
+  kind alone: a `repo` that is not a string, a `reviewDir` not directly under a `builds/<slug>/`
+  folder or climbing through `..`, a `subjects[].path` under any OTHER build than the one `reviewDir`
+  places (the declaration is read from where the record lands, so the subjects must sit under that
+  same build), and a README it cannot read are each a deny naming the field or the path, and every
+  throw inside it is returned as a deny because a hook that crashes at exit 1 admits. `kind` is
+  compared as `String(kind)`, the callee's own derivation, so `["spec-audit"]` is a spec audit to
+  both; on Windows `repo` is folded from MSYS drive spelling (`/c/…`) before it is resolved, and a
+  repo under any other MSYS mount (`/tmp/…`) is not folded — it is denied by name, since Node cannot
+  place it. A subject that is absolute or `~`-rooted is denied too: a direct spec-audit subject is
+  repo-relative by the harness's contract, and a same-slug `builds/` folder in a second checkout is
+  otherwise indistinguishable from this one. A PROJECT-WIDE DEFAULT (`TOOL-aBlindedTrial-7`): when
+  the README is readable and carries NO key, the hook reads `SPEC_AUDIT_DEFAULT` from
+  `<args.repo>/.unattended.conf` — the worktree copy, last assignment wins, both quote styles and a
+  trailing `# comment` read as the shell would — and a date admits, a non-date denies by name, a
+  missing file or a blank is no default. The README key wins whatever it says, so a malformed key
+  never falls back to the default. TWO LIMITS, stated
+  rather than implied. The `workflow()` a running harness calls from INSIDE its script is a runtime
+  call and not a tool call, so the programmatic route is the unattended driver's to refuse
+  (`TOOL-aBlindedTrial-3`); and this hook reads the WORKTREE README and conf while that driver reads
+  both at BASE, so the two can disagree for exactly one uncommitted edit. An `args` string that does
+  not parse shows the hook no `kind` and is admitted here; the harness itself throws on it, so no
+  audit runs.
 
 ## Running ONE rule
 
@@ -134,7 +166,10 @@ nothing. It exists so a file gate can share this predicate instead of re-impleme
 **A WIRED command must never carry it.** `--only=join` in `.claude/settings.json` would turn the cap
 rules off with no diff and a hook that still looks wired. `tools/check-wiring.sh` asserts its absence.
 
-An array LITERAL of ≤5 elements — the finder-lens fan — passes unmarked and needs no helper.
+An array LITERAL of ≤5 elements — the finder-lens fan — is a RECEIVER the hook can size, which is
+one of the three ways a receiver branch qualifies above; it needs no helper. It is not a blanket
+exemption for the shape: a raw `parallel([...])` over five literal elements is still denied,
+because the allowance is a property of what an `agent(` fan runs OVER and not of the literal.
 
 ## Direct spawns are COUNTED, not parsed
 

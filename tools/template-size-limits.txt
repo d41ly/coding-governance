@@ -69,7 +69,7 @@ AGENTS.md	64512
 # a constant that could stand in for it — four {{KIT_DIR}} grow by 6 each and five {{TOOL_ROOT}}
 # shrink by 7 each, a net -11 that a different install prefix flips.
 #
-# THIS ROW IS PAIRED WITH THE DOCUMENT'S OWN PROSE. `**Budget: ≤27648 bytes` is written in the file
+# THIS ROW IS PAIRED WITH THE DOCUMENT'S OWN PROSE. Its `**Budget:` line spells this row's figure in the file
 # itself, and check 6 of the gate reds when the two disagree — including when the prose is rewritten
 # to a spelling the gate cannot parse as bytes. Change both or neither.
 #
@@ -83,4 +83,13 @@ AGENTS.md	64512
 #
 # WHAT THE LEG DOES NOT COVER is the LINE half of that budget line. No checker reads it, so a
 # document that grew in lines without growing in bytes still passes — priced at TOOL-aHoistedPass-28.
-memory/guides/BUILD-METHOD.md	27648
+#
+# RAISED 27648 -> 30720 = 30 KiB, owner rulings 2026-09-21 and 2026-09-22 (TOOL-dGatedProse-4),
+# which also settle TOOL-dLoggedFlight-35: the budget STANDS, as TOOL-aHoistedPass-3 made it
+# enforceable, and moves. On 2026-09-21 the owner kept the M4 sentence TOOL-dGatedProse-4 adds and
+# chose a raise over paying for it in deletions; on 2026-09-22 the owner ruled this figure. The
+# render measures 27936 with it, 288 over the old row, and the row leaves 2784 bytes, about 28
+# prose lines, reserved for nothing. Spent, it is the owner's again. The same rulings moved the
+# document's LINE half with this row, in the same edit. No checker reads that half (above), so its
+# figure is spelled in the document alone.
+memory/guides/BUILD-METHOD.md	30720

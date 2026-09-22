@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-15T13:40:53+03:00 @ 4fccc0eee5e500b2265a2e6377d67b982acc0afa
+last-audit: 2026-09-22T15:11:54+03:00 @ 52a442d7a24d975397ea4b7f6b6ec81c29240a19
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: d9fce70af4970efe59fe89dba9e60022baca3c27
+last-body-change: 83129cd9b6986b87002e51227542a4b67986157d
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -20,7 +20,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 - Every unit that changed what this file front-loads (a gate command, entrypoint, governing doc, a
   trap hit, a doc/memory claim found stale, or a fact re-derived it should have front-loaded) re-stamps
   `last-audit` with a delta line in the commit message; no delta → no touch.
-- Stamp rule: sha = `HEAD` on `main`, else `git merge-base origin/main HEAD`; datetime always advances.
+- Stamp rule: sha = `HEAD` on any branch; datetime always advances.
 - Dated entries carry a prune-when condition and are deleted once it holds.
 
 ## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)
@@ -80,7 +80,13 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
   the handles are written here — that is the drift the pointer design exists to avoid. Two invert
-  the reflex: a discovery is ADOPTED not parked; the keepalive precedes orienting. §11 and §5.
+  the reflex: a discovery is ADOPTED not parked; the idle-wake precedes orienting. §11 and §5.
+
+- **The idle-wake is not the keepalive.** The cron job wakes an idle session and nothing else; what
+  resumes a stalled run lives OUTSIDE its session — the stop-guard at every turn end, the
+  stall-recorder at every error end, the resume tick from the OS scheduler — reading the LEASE
+  (`session:`, `pid:`, `host:`, `pid-image:`, `lease-utc:`) the driver records and the verdict
+  `--liveness` derives. `RESUME_STALE_BOUND` is the bound they act on. Protocol §5; `aWokenSentinel`.
 
 - **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`; `GATE_REAP_BOUND` the
   teardown reap.** A breach is KILLED, and `gates-green` then says the bar never RETURNED
@@ -100,10 +106,25 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   cutoff is a `.memory-tree.conf` date, so units that closed before the grammar existed are outside
   it; anything this session closes is inside it.
 
+- **A LIVE spec's §2 item that retires a named thing owes a `**Readers:**` clause**: `by name:` with
+  names a reader spells, then `by value:` with a reader or `NO VALUE READERS` and a reason. Hygiene
+  check 25, with no cutoff. The trigger, both escapes and what counts as a reader are
+  `memory/HYGIENE.md` item 25; the author's line is in the spec template's §2. `TOOL-dGatedProse-1`.
+
 - **A CLOSED unit whose spec grades THIN blocks `build-complete`** — an empty Scope, Acceptance
   criteria or Gates section, keyed on the heading TITLE and NOT the ordinal, which on a Tier-1 spec
   read Gates as acceptance (`TOOL-dBriefedPass-1`). Date-grandfathered on the spec's FILENAME against
   `.unattended.conf`'s `SPEC_THIN_CUTOFF`; BLANK turns the term OFF. `TOOL-aGradedMandate-4`.
+
+- **From `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`) a LIVE spec's §7 leg line must name every
+  gate leg its §4 `### Files touched` trips** — `python tools/check-spec-tokens.py --list` prints the
+  `NEAR [guards]` rows to add BEFORE the spec is dated; a guard more legs share than the checker's
+  floor is excluded and printed with its count, a one-segment root such as `tools/` under the sub-head
+  declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
+
+- **The pre-code spec audit is owed where the build README's `spec-audit: <date>` OR the conf's
+  `SPEC_AUDIT_DEFAULT` (read at BASE, the README winning) declares it; under neither, nothing is owed
+  and the kickoff engine asks the owner once at READY.** `TOOL-aBlindedTrial-6`, `-7`, `KICK-aBlindedTrial-1`.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
@@ -111,8 +132,32 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   sharing node tag `c`, for 13 conflicts at the landing. Neither time did anyone run it. §3's rule
   is own STREAMS not files, and a kit is the unit that rule is about.
 
+- **A finished or live unattended run ANSWERS QUESTIONS about itself** — `/runlog`, over the run's
+  committed record first, the local run model for anything time-shaped (the record carries no event
+  times), and the redacted narration where the transcript is on this machine. Came in with
+  `dLoggedFlight`. It is not a code search: a symbol, caller or filename is still a grep.
+
+- **`tools/unattended/check-unattended.sh` carries four RAW CR BYTES** inside its `sub(...)` awk
+  regexes and one `tr -d`, and any text-mode read destroys all four. Python's universal-newline
+  translation turns a lone CR (0x0D) into LF (0x0A), which leaves the regex holding a newline and
+  silently breaks the checks that use it. Rewrite that file in BYTES. Hit during the 2026-09-21
+  reconcile; the class is `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already
+  registered and not read.
+  THE BYTES ARE NAMED RATHER THAN SHOWN, deliberately. Two earlier attempts at this sentence put a
+  raw CR in it and both were eaten by the next tool that rewrote the file -- the manifest is the
+  document most likely to be rewritten in text mode, which is the bullet's own subject.
+
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
+
+- **A LIVE run-state file is outside check 6 by CLASS** (`TOOL-cMendedVintage-13`). `RUN.md` at a
+  build root is append-only by design and cannot satisfy a cap measured for authored index rows; a
+  36-unit run reached 71 KB against 61,440. A RETIRED record is a rename and stays capped.
+
+- **The orientation card's READY anchor accepts BOTH spellings** (`TOOL-cMendedVintage-16`). A card
+  body written in the charter's §16 R1 list-item form used to be read as carrying no ready line,
+  leaving the sentinel in place and the scratch-guard then blocking the next commit. The writer and
+  the hook both widened; the charter did not move.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -151,8 +196,8 @@ python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints> 
 
 ### Tier rule
 
-Tier 2 (spec + adversarial review before building) for: a change to the governance template's rules,
-the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
+Tier 2 (a spec before building; the spec audit only where the build or its project declares it, M4) for: a change to the governance template's
+rules, the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
 Tier 1 (gates + one focused self-review).
 
 ### ID + work-state protocol

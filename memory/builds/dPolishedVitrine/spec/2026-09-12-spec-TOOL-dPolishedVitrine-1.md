@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived
 
-**Status:** INPROGRESS · rev-10 · 2026-09-14 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
+**Status:** INPROGRESS · rev-11 · 2026-09-22 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -47,6 +47,9 @@ Skill's copy of the same checklist line is fixed the same way.
 - **S5** — version bumps. review-harness goes 1.7 to 1.8 and unattended 1.18 to 1.21, at every
   carrier `tools/check-kit-versions.sh` reads; 1.19 and then 1.20 were taken by `main` while this branch was open. Then `--write-ratchet` DROPS the two carried rows
   that reached zero. Observed by AC7 and AC10.
+  - **Readers:** by name: `tools/check-install-prefix.sh` declares the ratchet mode, writes the
+    carried rows and states why the arm became a ban. by value: `tools/check-install-prefix.sh`
+    compares each carried row's count against a live one, so the number in the row is what is read.
 - **S6** — the arms, in `tools/workflows/unattended-build.test.sh` and
   `tools/unattended/adopt-unattended.test.sh`, with their failing cases observed before the fix and
   recorded in the build journal. The adopter suite's `seed()` copies the kit's `*.template.md` by
@@ -83,6 +86,9 @@ Skill's copy of the same checklist line is fixed the same way.
   receipt row the re-adopt no longer measures. Block 3 refuses pins whose GOV or receipt moved and
   deletes them when it finishes. A restore block sets a conflicting harness edit aside at the row's
   `gov_oid`. Observed by AC21, AC22, AC23, AC24, AC25, AC26, AC27 and AC28.
+  - **Readers:** by name: nothing tracked is withdrawn; the deleted pins are a runbook block's own
+    output. by value: NO VALUE READERS — the deleted pins are block 2's untracked output, read by
+    block 3 alone before it deletes them.
 - **S11** — the consumer runs' repairs, rev-9. Block 1 takes the release's scope: gov names its
   kits in `RELEASE`, block 1 keeps those the receipt claims, and govkit's `update --kits` adds every
   claimed kit that shares a version marker with one in scope, derived from `marker_carriers`. Block
@@ -696,6 +702,9 @@ New arm: `tools/govkit/selftest.py` · one staged break per consumer finding in 
   `main`'s own 1.20. Their routine pull to 1.21 is the follow-up `TOOL-dPolishedVitrine-16`.
   review-harness 1.8 and govkit 1.11 were checked unclaimed on `main`, which holds 1.7 and 1.10.
   AC10 now names 1.21.
+- rev-11 · 2026-09-22 · S5 · S10 · a reader clause is added on S5 and on S10 by the corpus pass of
+  `TOOL-dGatedProse-5`, which the owner ruled on 2026-09-21 is written on every node before check
+  25 exists. Each clause is additive; no other sentence of this spec moves.
 
 ## 10. Reuse audit
 

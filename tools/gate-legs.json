@@ -247,7 +247,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 740
+    "ceiling": 1800
   },
   {
     "name": "scratch-guard self-test",
@@ -290,7 +290,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 900
+    "ceiling": 4800
   },
   {
     "name": "row-keyed merge driver replay",
@@ -471,6 +471,21 @@
     "ceiling": 1780
   },
   {
+    "name": "pre-push run-log line",
+    "argv": [
+      "bash",
+      ".githooks/pre-push.runlog.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/runlog/",
+      "tools/run-gates/"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 600
+  },
+  {
     "name": "push-main self-test",
     "argv": [
       "bash",
@@ -559,6 +574,19 @@
     "ceiling": 1800
   },
   {
+    "name": "unattended-build self-test",
+    "argv": [
+      "bash",
+      "tools/workflows/unattended-build.test.sh"
+    ],
+    "guard": [
+      "tools/workflows/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "review-join self-test",
     "argv": [
       "bash",
@@ -613,7 +641,7 @@
     "guard": [
       "tools/codebase-map/"
     ],
-    "ceiling": 60
+    "ceiling": 180
   },
   {
     "name": "codebase-map coverage + freshness",
@@ -742,7 +770,7 @@
     ],
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 180
   },
   {
     "name": "process-monitor census selftest",
@@ -771,6 +799,41 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 360
+  },
+  {
+    "name": "runlog selftest",
+    "argv": [
+      "python",
+      "tools/runlog/selftest.py"
+    ],
+    "guard": [
+      "tools/runlog/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 360
+  },
+  {
+    "name": "runlog record schema",
+    "argv": [
+      "python",
+      "tools/runlog/runlog.py",
+      "check-records"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 180
+  },
+  {
+    "name": "runlog skill wiring",
+    "argv": [
+      "bash",
+      "tools/runlog/adopt-runlog.sh",
+      "--check"
+    ],
+    "chunk": "wiring",
+    "subject": "repo",
+    "ceiling": 300
   },
   {
     "name": "drift-audit records",
@@ -906,6 +969,20 @@
     "chunk": "selftests",
     "subject": "repo",
     "ceiling": 300
+  },
+  {
+    "name": "run-gates run-log line",
+    "argv": [
+      "bash",
+      "tools/run-gates/run-gates.runlog.test.sh"
+    ],
+    "guard": [
+      "tools/run-gates/",
+      "tools/runlog/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 1200
   },
   {
     "name": "run-gates adopter e2e",
@@ -1170,6 +1247,16 @@
     "ceiling": 300
   },
   {
+    "name": "govkit runbook parity",
+    "argv": [
+      "python",
+      "tools/govkit/check_runbook_parity.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "govkit acceptance matrix",
     "argv": [
       "python",
@@ -1240,7 +1327,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 180
   },
   {
     "name": "kit placeholders (a declared token its adopter substitutes)",
@@ -1250,7 +1337,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 180
   },
   {
     "name": "leg ceilings clear their evidenced maximum",
@@ -1270,6 +1357,17 @@
       "tools/run-gates/run-selftests.sh",
       "--check"
     ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "receipt sync (installed files match the receipt)",
+    "argv": [
+      "python",
+      "tools/run-gates/check-receipt.py"
+    ],
+    "guard": [],
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300
@@ -1298,7 +1396,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 120
+    "ceiling": 180
   },
   {
     "name": "selftest harness self-test",

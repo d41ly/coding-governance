@@ -31,10 +31,21 @@ inner language, not the shell.
 ## The fix
 
 Write source with a file-writing tool, or with a RAW string, and verify with `repr()` on the compiled
-pattern rather than by printing it. When repairing, sweep tracked AND untracked files — the first
+pattern rather than by printing it. A file-writing tool is not immune either: the section below says
+which escape it interprets and the census that catches it. When repairing, sweep tracked AND untracked files — the first
 sweep here scanned tracked files only and reported zero, because the offending module was not yet
 staged.
 
 No machine gate: a control byte in a source file is legal, and banning one class of byte across every
 file would cost more than it catches. The remedy is the writing habit and the `repr()` check, both
 recorded in the kickoff manifest's environment traps.
+
+## The file-writing tool is not immune to a `\u` escape
+
+Measured on `TOOL-dLoggedFlight-6`, 2026-09-14. The agent's string-replacement edit tool wrote a
+`\u` escape typed in its replacement text as the CHARACTER it names, while leaving `\x`, `\r` and
+`\n` escapes as typed. It bit twice in one unit. A JSON fixture received a raw ESC and failed to
+load, which is loud. A raw-string regex received a literal U+2028 and U+2029 inside a character
+class, which still matched, so every arm stayed green; only a census of the file's non-ASCII
+characters found it, after the commit. So the check after writing ANY escape is that census, not a
+passing test: count characters above U+007E per file, and expect only the ones you meant.

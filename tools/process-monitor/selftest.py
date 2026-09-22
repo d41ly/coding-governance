@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the process-monitor engine's arms.
 
-gov:kit process-monitor@0.1
+gov:kit process-monitor@0.2
 
 Two kinds of arm and the split is deliberate. PARSING arms run over captured fixtures, so they grade
 column contracts without a live table. LIVENESS arms run over a live read, because a property like
@@ -13,8 +13,10 @@ criterion aimed at a frozen fixture for a live property can neither pass nor fai
 Exit 0 = every arm passed · 1 = an arm failed.
 """
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -311,6 +313,25 @@ import scope  # noqa: E402
 ROOTS = ["/c/projects/gov"]
 
 
+def seed_witness(root):
+    """A child whose argv carries `root` as a plain token, for the LIVE arms to find in scope.
+
+    Planted one line before the census that grades it. The live arms used to assert that the
+    shipped roots admitted SOMETHING, which is a claim about how the box was launched and not
+    about the declaration: a bar started from a Claude session inherits its cwd and no command
+    line on the machine spells the repo path, so those arms were red on that node and green under
+    a pre-push hook, whose argv is absolute — and green in a wide bar only when a sibling leg
+    happened to spawn an absolute path at the right moment. The caller kills it.
+    """
+    return subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)",
+                             root.rstrip("/") + "/procmon-witness"])
+
+
+def read_root_dir():
+    return os.environ.get("PROCMON_ROOT") or subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+
+
 def build_row(winpid, win_ppid, command, age=100.0, msys_pid=None, msys_ppid=None, cpu=1.0):
     return {"winpid": winpid, "msys_pid": msys_pid, "win_ppid": win_ppid,
             "msys_ppid": msys_ppid, "kind": "msys" if msys_pid else "native",
@@ -449,16 +470,48 @@ def test_live_scope_is_not_empty():
     if not sys.platform.startswith("win"):
         print("  SKIP test_live_scope_is_not_empty (windows-join backend only)")
         return
-    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True,
-        text=True).stdout.strip()
-    rows = read_live_census()
-    if rows is None:
+    roots = scope.load_conf(read_root_dir())
+    witness = seed_witness(roots[0])
+    try:
+        rows = read_live_census()
+        if rows is None:
+            return
+        sc, _ = scope.derive_scope(rows, roots, scope.build_self_chain(rows, os.getpid()))
+        check_true("test_live_scope_is_not_empty", witness.pid in sc,
+                   "(the shipped conf admits NOTHING on this machine, the planted witness included)")
+    finally:
+        witness.kill()
+        witness.wait()
+
+
+def test_empty_live_scope_exits_three_not_one():
+    """`main` graded through its EXIT STATUS, because that integer is the entire unit.
+
+    A well-formed declaration nothing live matches is MACHINE STATE, and a caller that rolls a kit
+    back on any non-zero must be able to tell it from a fault. The arm above is this one's control:
+    it asserts the shipped conf still admits work, so a census that cannot move fails there rather
+    than passing here.
+
+    THE FIXTURE CANNOT BECOME THE BUG IT TESTS. The declared root is created microseconds before the
+    census runs, under a name no live command line on this machine carries, so "nothing matches it"
+    is a property of the directory and not a claim about how loaded the box is. A dead census raises
+    and returns 1, so this arm cannot pass by the probe being unable to move either.
+    """
+    if not sys.platform.startswith("win"):
+        print("  SKIP test_empty_live_scope_exits_three_not_one (windows-join backend only)")
         return
-    sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
-                               scope.build_self_chain(rows, os.getpid()))
-    check_true("test_live_scope_is_not_empty", len(sc) > 0,
-               "(the shipped conf admits NOTHING on this machine)")
+    tree, quiet = tempfile.mkdtemp(), tempfile.mkdtemp()
+    with open(os.path.join(tree, ".process-monitor.conf"), "w") as fh:
+        fh.write('PROCMON_ROOTS="%s"\n' % quiet)
+    prior = os.environ.get("PROCMON_ROOT")
+    os.environ["PROCMON_ROOT"] = tree
+    try:
+        check("test_empty_live_scope_exits_three_not_one", scope.main(["--check-conf"]), 3)
+    finally:
+        if prior is None:
+            del os.environ["PROCMON_ROOT"]
+        else:
+            os.environ["PROCMON_ROOT"] = prior
 
 
 # ================================================================ classify (unit 3)
@@ -771,19 +824,25 @@ def test_explain_answers_one_row():
 
 
 def test_shipped_conf_admits_this_repo():
-    """`--check-conf`'s subject: the shipped declaration must admit live work here."""
+    """`--check-conf`'s subject: the shipped declaration admits a process carrying its root, and
+    grades it KILLABLE — a child, not a self-chain member."""
     if not sys.platform.startswith("win"):
         print("  SKIP test_shipped_conf_admits_this_repo (windows-join backend only)")
         return
-    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
-    rows = read_live_census()
-    if rows is None:
-        return
-    sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
-                               scope.build_self_chain(rows, os.getpid()))
-    check_true("test_shipped_conf_admits_this_repo", len(sc) > 0,
-               "(the shipped roots admit nothing live on this machine)")
+    roots = scope.load_conf(read_root_dir())
+    witness = seed_witness(roots[0])
+    try:
+        rows = read_live_census()
+        if rows is None:
+            return
+        sc, _ = scope.derive_scope(rows, roots, scope.build_self_chain(rows, os.getpid()))
+        check_true("test_shipped_conf_admits_this_repo",
+                   sc.get(witness.pid, {}).get("killable"),
+                   "(a child carrying %r on its argv is not in scope under the shipped roots)"
+                   % roots[0])
+    finally:
+        witness.kill()
+        witness.wait()
 
 
 def test_mixed_namespace_tree_dies_completely():
@@ -839,43 +898,95 @@ def test_non_msys_row_is_signalled_by_taskkill():
           (True, True, True, False, False))
 
 
+def resolve_launcher():
+    """The POSIX shell whose processes the census can enumerate, plus every candidate RUN.
+
+    RESOLUTION IS BY EXECUTION. On this node `bash` is FOUND on PATH inside Git's own `usr/bin`
+    and nevertheless EXECUTES as WSL, whose processes are not Windows processes — so the census
+    cannot enumerate a tree staged through it and the arm below reads a working product as broken.
+    A name is not evidence, and neither is the absolute path a lookup answered with; only the
+    candidate's own answer is. This repo already records that lesson for its python launcher,
+    which RUNS each candidate because a stub answers `command -v` and then exits 9009.
+
+    Returns `(launcher or None, candidates run)`. The second half is what the arm's skip names,
+    because a skip that cannot say what it looked for reads as coverage.
+    """
+    candidates = ["bash", shutil.which("bash")]
+    git = shutil.which("git")
+    if git:
+        home = os.path.dirname(os.path.dirname(os.path.dirname(git)))
+        candidates += [os.path.join(home, "usr", "bin", "bash.exe"),
+                       os.path.join(home, "bin", "bash.exe")]
+    ran = []
+    for cand in candidates:
+        if not cand or cand in ran:
+            continue
+        ran.append(cand)
+        try:
+            answer = subprocess.run([cand, "-c", "uname -s"], capture_output=True,
+                                    text=True, timeout=30).stdout.strip()
+        except (OSError, subprocess.TimeoutExpired):
+            continue
+        if answer.startswith(("MINGW", "MSYS", "CYGWIN")):
+            return cand, ran
+    return None, ran
+
+
 def test_live_tree_dies_completely():
     """The arm this whole build exists for: a real bash -> bash -c -> sleep tree PLUS a native
     python grandchild, killed by winpid, verified by re-read. A fixture cannot show this.
 
     The tree is launched with `bash -c` rather than from a script file, so the arm writes nothing
     into the repo. Its command line carries the repo root, which is what puts it in scope.
+
+    THE ARM ASSERTS ITS MEMBERS, NEVER A COUNT, and that is part of the fix rather than a tidy-up.
+    A count is satisfiable by launcher plumbing: measured, this arm goes GREEN at a longer wait
+    while walking the console host, the WSL host and two copies of the launcher, with zero members
+    of the staged tree in the walk. Every predicate below that the launcher's own row could also
+    satisfy EXCLUDES it by marker, because that row quotes the whole body and therefore contains
+    every string its members do — which is exactly how a green earned by plumbing gets built.
     """
     if not sys.platform.startswith("win"):
         print("  SKIP test_live_tree_dies_completely (windows-join backend only)")
         return
     import time
-    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    launcher, ran = resolve_launcher()
+    if launcher is None:
+        print("  SKIP test_live_tree_dies_completely (no candidate answered as a POSIX shell the "
+              "census can see; RAN %s)" % (", ".join(ran) or "nothing"))
+        return
+    roots = scope.load_conf(read_root_dir())
     marker = "procmon-selftest-tree"
+    # THE ROOT TOKEN IS THE SHIPPED CONF'S FIRST ROOT, not this checkout's path: a clone of this
+    # repo anywhere else is outside the fence the conf declares, and the tree then staged under
+    # `cd <checkout>` read "not in scope" for a reaper nothing was wrong with. `:` because the
+    # directory need not exist — the token on the command line is what the fence admits.
     body = (
-        "cd '" + root_dir + "' ; "
+        ": '" + roots[0].rstrip("/") + "/" + marker + "' ; "
         "bash -c 'bash -c \"sleep 613\" & sleep 613' & "
         "python -c 'import time; time.sleep(613)' & "
         "sleep 613"
     )
-    launched = subprocess.Popen(["bash", "-c", "# " + marker + "\n" + body],
+    launched = subprocess.Popen([launcher, "-c", "# " + marker + "\n" + body],
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(3)
     try:
         rows = read_live_census()
         if rows is None:
             return
+        # OUR launcher by pid, never the first row carrying the marker: a stray from an earlier
+        # run — one staged under a clone the roots do not admit, measured — is found first and
+        # reads as "not in scope" for a tree that is.
         target = next((r["winpid"] for r in rows
-                       if r.get("command") and marker in r["command"]), None)
+                       if r["winpid"] == launched.pid and r.get("command")
+                       and marker in r["command"]), None)
         if target is None:
             FAIL.append("test_live_tree_dies_completely")
             print("  FAIL test_live_tree_dies_completely (the staged tree was not found in the "
                   "census, so the arm could not run — a skip here is indistinguishable from "
                   "coverage)", file=sys.stderr)
             return
-        sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
-                                   scope.build_self_chain(rows, os.getpid()))
+        sc, _ = scope.derive_scope(rows, roots, scope.build_self_chain(rows, os.getpid()))
         if target not in sc:
             FAIL.append("test_live_tree_dies_completely")
             print("  FAIL test_live_tree_dies_completely (the staged tree is not in scope; the "
@@ -884,21 +995,43 @@ def test_live_tree_dies_completely():
         rep = reap.run_kill(target, rows, sc)
         fresh, _c2 = census.scan_processes()
         rep = reap.check_survivors(rep, fresh)
+        by_win = {r["winpid"]: (r.get("command") or "") for r in rows}
+        walked_cmds = [by_win.get(w, "") for w in rep["walked"]]
+        staged = [
+            ("the marked launcher", lambda c: marker in c),
+            ("the nested shell", lambda c: marker not in c and "bash" in c.lower()),
+            ("the native python grandchild",
+             lambda c: marker not in c and "time.sleep(613)" in c),
+            ("a staged sleep",
+             lambda c: marker not in c and "sleep" in c.lower()
+             and "bash" not in c.lower() and "python" not in c.lower()),
+        ]
+        found = [name for name, hit in staged if any(hit(c) for c in walked_cmds)]
+        missing = [name for name, hit in staged if not any(hit(c) for c in walked_cmds)]
+        print("  walked %d through %s · members seen: %s"
+              % (len(rep["walked"]), launcher, ", ".join(found) or "none"))
         check("test_live_tree_dies_completely",
-              (len(rep["walked"]) >= 4, rep["survivors"], rep["errors"]),
-              (True, [], []))
+              (missing, rep["survivors"], rep["errors"]),
+              ([], [], []))
     finally:
         try:
             launched.kill()
         except OSError:
             pass
-        listing = subprocess.run(["ps", "-ef"], capture_output=True).stdout.decode(
+        # Through the RESOLVED launcher for the same reason the tree is: a probe shelling out to a
+        # bare `bash` cannot see a tree it cannot enumerate, so it reports clean over anything it
+        # left behind. Today the strays only die because tearing down the launcher tears down the
+        # session, which is luck, not cleanup.
+        listing = subprocess.run([launcher, "-c", "ps -ef"], capture_output=True).stdout.decode(
             "utf-8", "replace")
+        strays = []
         for line in listing.splitlines():
             if "sleep 613" in line or marker in line:
                 bits = line.split()
                 if len(bits) > 1 and bits[1].isdigit():
-                    subprocess.run(["kill", "-9", bits[1]], capture_output=True)
+                    strays.append(bits[1])
+                    subprocess.run([launcher, "-c", "kill -9 " + bits[1]], capture_output=True)
+        print("  cleanup probe through %s — stray: %s" % (launcher, ", ".join(strays) or "none"))
 
 
 if __name__ == "__main__":

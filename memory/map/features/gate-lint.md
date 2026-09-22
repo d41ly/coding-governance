@@ -49,16 +49,24 @@ listed as one below rather than closed by association.
 **A kit file names nothing outside itself by literal, and the registry is what that costs.** The
 shell scanner grades a repository's own sites, so the list of carried exceptions is nothing but
 literals naming files outside the kit — which the carried-prefix ban refuses in a shipped kit body.
-So the registry lives at `memory/project/substitution-fed-loops.txt` beside the other gate
-registries and arrives as the leg's argv, through a `{memory_root}` token rather than a literal.
+So THIS repository's registry lives at `memory/project/substitution-fed-loops.txt` beside the other
+gate registries, and reaches the scanner as an argument in this repository's own leg row. The kit
+descriptor names no registry at all — see the paragraph below for why the token it used to carry
+had to go too.
 
 **Naming the registry is not shipping it, and the first cut only named it.** `TOOL-aLeakedHandle-1`
 landed the leg with an argv pointing at a path no descriptor rule wrote, so `silenced_legs` withheld
 the leg at every adopter, `govkit apply` exited 1, and the receipt recorded no coverage — while the
-descriptor comment beside it declared the `gate-lint-leg-wiring` hole discharged. A `seed` rule now
-ships an EMPTY registry to that path: copied once, owned by the adopter from then on, so a later
-install cannot delete rows they declared, and gov's own carried sites do not travel to a tree where
-the scan would report every one of them as gone. Its closing review is the record; the class is
+descriptor comment beside it declared the `gate-lint-leg-wiring` hole discharged. A `seed` rule
+shipping an EMPTY registry to that path closed it — and reopened the same wound one layer out, so
+`TOOL-cMendedVintage-2` withdrew both halves together. Check 3 of `check-memory-hygiene.sh` keeps
+`{memory_root}/project/` a closed set of names, so the seed wrote a file into every adopter's memory
+tree that the adopter's own hygiene gate then refused; widening that case list reaches an adopter
+only on a later `update` and reaches a FORKED checker never, and one live adopter runs a fork. The
+argument went instead of the file: the scanner's registry positional is OPTIONAL, an absent one
+grades against an empty declaration, and the shipped leg argv names no path. The two edits are ONE
+commit by construction — dropping the seed while the argv still named the path is the withheld-leg
+failure again, in the other direction. Its closing review is the record; the class is
 gated by `govkit selfcheck`'s `gate legs` check, which used to skip any argv element carrying a
 token it could not resolve — most of them — and now offers every entry's argv to one predicate
 against a bare target. Not every element is graded even so: an element carrying an intake token no
@@ -98,8 +106,9 @@ who did not write it.
   directory, same both-directions rule. Membership is declared through `PROJECT_REGISTRY_EXTRA` in
   `.memory-tree.conf`, because hygiene check 3 keeps that directory a closed set.
 - `tools/gate-legs.json` — the leg manifest is the single source for what the bar runs. The kit
-  descriptor declares the same two rows through `{kit}` and `{memory_root}` tokens, and `govkit`
-  compares the two spellings in both directions.
+  descriptor declares the same two rows through `{kit}` tokens, and `govkit` compares the two
+  spellings in both directions on NAME, SUBJECT and CHUNK and never on argv — which is what lets
+  this repository's own row carry a registry argument the shipped descriptor does not.
 - `git ls-files` as the population — the same derived-not-authored rule
   `check-testsuite-counts.sh` and `check-install-prefix.sh` already apply. A hand-kept list goes
   quiet on the file that arrives without being added to it.
@@ -117,8 +126,9 @@ that must land green over a non-compliant population without keying on a line nu
 
 ## Affordances
 
-- `python tools/gate-lint/sh_hygiene.py <registry> [root]` — the tree scan. It prints every measured
-  population, then the verdict.
+- `python tools/gate-lint/sh_hygiene.py [registry] [root]` — the tree scan. It prints every measured
+  population, then the verdict. With no registry it grades against an empty declaration; with one
+  that does not resolve it refuses.
 - `python tools/gate-lint/sh_hygiene.py --selftest` — the predicate proved in both directions over a
   fixture holding the failing form and its nearest innocent neighbour.
 - `python tools/gate-lint/ps-hygiene.py [root]` — the PowerShell scans, and `--selftest` for the

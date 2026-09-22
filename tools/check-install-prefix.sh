@@ -69,6 +69,13 @@ if ! SELF_REL=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
 fi
 SELF_REL=${SELF_REL%/}
 SELF_PREFIX=${SELF_REL:+$SELF_REL/}
+# The awk field the kit-name walk reads, derived from the same answer: the path is
+# `<prefix…>/<kit>/<file>` and the kit is the field after the prefix's own segments, so a root
+# install reads field 1, `scripts/` field 2, `vendor/gov/` field 3. The first cut of this line
+# pinned the field at 2, which held for a one-segment prefix only — at `vendor/gov/` the walk
+# named `gov` as every kit's name and the refusal below fired (the self-test's S4 arm, red from
+# the day that cut landed).
+_seg_kit=$(( $(printf '%s' "$SELF_PREFIX" | tr -cd '/' | wc -c) + 1 )); _seg_min=$_seg_kit
 WAIVERS="${SELF_PREFIX}install-prefix-waivers.txt"
 # Derived for the same reason and hoisted to sit beside its sibling; the ban arm's own section below
 # says what this file IS.
@@ -85,8 +92,14 @@ case "$MODE" in --check|--list|--write-ratchet|--rebaseline) ;;
 
 # The kit names, derived. `git ls-files` so the answer is the same on every node and in every
 # checkout — a directory listing would also see untracked scratch dirs.
-kits=$(git ls-files -- 'tools/*/*' | awk -F/ 'NF>2 {print $2}' | sort -u)
-[ -n "$kits" ] || { echo "install-prefix: no kit directories under tools/ — that is not a pass"; exit 1; }
+#
+# THE PREFIX IS `SELF_PREFIX`, not the literal `tools/`, and this is the same defect the sidecar
+# derivation twenty lines up was written to close — met a second time in the same file, which is why
+# one fix did not cover it. At an adopter installed anywhere else the glob matched NOTHING and the
+# refusal below fired, so the one gate guarding this whole class could only ever REFUSE outside gov.
+# Measured at a `scripts/` adopter, which had been carrying a local carve-out for exactly this line.
+kits=$(git ls-files -- "${SELF_PREFIX}*/*" | awk -F/ "NF>${_seg_min} {print \$${_seg_kit}}" | sort -u)
+[ -n "$kits" ] || { echo "install-prefix: no kit directories under ${SELF_PREFIX:-the repo root} — that is not a pass"; exit 1; }
 alt=$(printf '%s' "$kits" | tr '\n' '|'); alt=${alt%|}
 
 # TOOL-cWidenedNet-1 S5 — HOISTED, and the hoist is the whole reason this sits here rather than
@@ -150,7 +163,10 @@ PYEOF
 # per-LINE marker below is what carries the fixture exemption the file-level drop used to carry.
 SUFFIX_EXCL='(\.test\.sh|\.test\.py|selftest\.py|\.conf\.example)$'
 self_excl="^${SELF_PREFIX}(check-install-prefix\.sh|install-prefix-waivers\.txt)$"
-glob_set=$(git ls-files -- 'tools/*' 'skills/*' '.githooks/*' '*.template.*' '*.fragment.json' \
+# `${SELF_PREFIX}*`, the third place this file spelled its own prefix as a literal: at any other
+# install the kit surface matched nothing and the empty-population refusal below fired instead of a
+# verdict — the same shape the kit walk had, one block down.
+glob_set=$(git ls-files -- "${SELF_PREFIX}*" 'skills/*' '.githooks/*' '*.template.*' '*.fragment.json' \
                        'coding-governance-agents.template.md' 'WIRE-INTO-PROJECT.md' \
         | grep -vE "$self_excl")
 files=$(printf '%s\n' "$glob_set" | grep -vE "$SUFFIX_EXCL" || true)
@@ -344,7 +360,7 @@ fi
 # So it is guarded by a value that a definitional change MUST move and an ordinary pass CANNOT:
 # this epoch, recorded in the ratchet's own header. `--rebaseline` refuses unless the two differ,
 # which makes it one-shot per predicate change and useless for absorbing a literal.
-PREDICATE_EPOCH=3
+PREDICATE_EPOCH=4
 
 # epoch 1 — `tools/<kit>/<file>.<ext>`, a kit DIRECTORY segment required.
 # epoch 2 — TOOL-aScouredKit-20. Adds a LOOSE file directly under `tools/`, which epoch 1 could not
@@ -365,6 +381,20 @@ PREDICATE_EPOCH=3
 #   this epoch was spent on. The remaining blind extensions are deliberate: `.yml`, `.ini`, `.cfg`
 #   and `.example`'s longer cousins appear nowhere in this tree, and an alternative matching
 #   nothing is an assertion about nothing.
+# epoch 4 — TOOL-cMendedVintage-5 S1. Drops `-` from the LEAD class both regexes share, so a shell
+#   default expansion — `${VAR:-tools/…}` and its `:+` and `:=` cousins — is finally a hit. That
+#   spelling is a variable resolving at the target's prefix with a hardcoded fallback resolving
+#   only at gov's, which is the commonest shape this ban exists to catch and was the one shape it
+#   could not see. MEASURED over the shipped population at this commit: +2 occurrences, both argv
+#   defaults in gov-side checkers, and both carry a reason column rather than a repair. The
+#   population's own size is NOT written here — the ban list carries every current figure, and this
+#   block records what an epoch cost when it was spent.
+#   `/` was measured in the same run and DELIBERATELY KEPT: dropping it adds 203 occurrences,
+#   dominated by CORRECT `<gov>/…` spellings that name gov's own checkout in runbook and adopter
+#   prose, so the ban would red on the one spelling that is right.
+#   THE LEAD CLASS IS ALSO THIS COMMENT'S PROBLEM. A backtick is not in it, so a sentence here that
+#   quotes a kit path in full is itself a hit — TOOL-cMendedVintage-4 held its own row that way.
+#   Name the prefix or name the file, never both.
 
 
 carried_live() {
@@ -396,7 +426,11 @@ carried_rows() {
   # EPOCH 2. The second alternative is the loose file, and it is fenced on both sides: `(?!/)` is
   # unavailable in POSIX ERE, so the trailing `[^/]` job is done by the existence filter below —
   # a `tools/foo/` prefix never names an existing loose file, so it cannot double-count.
-  local re_ship="(^|[^/{}[:alnum:]._-])tools/(($alt)/[A-Za-z0-9_.-]+|[A-Za-z0-9_.-]+)\.($EXT)"
+  # EPOCH 4, THE LEAD CLASS. `-` left this class so a shell default expansion reaches the ban: a
+  # variable that resolves at the target's prefix, with a hardcoded fallback that resolves only at
+  # gov's, is the commonest way a dead literal is spelled here and every one of them was invisible.
+  # `/` STAYS, and that is measured rather than tidy — see the epoch block above.
+  local re_ship="(^|[^/{}[:alnum:]._])tools/(($alt)/[A-Za-z0-9_.-]+|[A-Za-z0-9_.-]+)\.($EXT)"
   # `tr -d '\r'` because python's `print` translates newlines on Windows, so every path arrives with
   # a trailing CR and `[ -f "$f" ]` answers false for all 181 of them — a population that silently
   # becomes empty, which is the shape this whole unit is written against. The arm above already does

@@ -1,8 +1,14 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.10` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.11` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
+
+**Migrating 1.10 → 1.11 (additive, no caller edit).** One new signal,
+`run_records_nonterminal_but_merged`, report-only, so `--check` cannot red on it. A repo with no run
+record and no `.unattended.conf` reads it as NOT ASKED. A repo that does keep run records reads a
+non-zero value against tolerance 0 until it seeds a pin at the value it measures, as the install steps
+below say for every signal. No existing field or signal moves.
 
 **Migrating 1.7 → 1.8 (additive, no caller edit).** Three changes, none of which moves an existing
 field. `drift-audit-state.js` gains the aggregate `severityCorrections` return key and the matching
@@ -114,6 +120,7 @@ Tier 2 needs the two workflow scripts from `tools/workflows/drift-audit-{code,st
 | `lexicon_ratified_older_than_language_surface` | was the table curated since the languages it grades last moved? | yes |
 | `live_backlog_rows_per_shard` | is a shard’s live set approaching the floor rotation cannot clear? | no |
 | `readme_mechanism_drift` | does a build README still describe a mechanism its own spec set revised? | no |
+| `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's
@@ -124,6 +131,26 @@ metric, because it is read as good news.
 The kit holds itself to that rule — `selftest.py` exercises each gateable signal **twice**, once on a
 fixture where it must be silent and once on a minimal violating fixture where it must fire. An arm
 that can only pass the first is the dead probe the report refuses.
+
+### Run records left non-terminal after their build merged
+
+An unattended run's record can keep saying `LANDING` or `BUILDING` after its work is on the default
+branch, so "did it land?" cannot be answered from the record. The signal reads every tracked
+`RUN.md`, and every rotated `RUN.<phase>.<blob8>.md`, **at HEAD and never in the working tree**. It
+counts a record whose phase is not terminal, whose witness is an ancestor of the base ref, and whose
+witness is neither equal to nor behind the record's own `base:`. It reports and never gates, because
+a sanctioned worktree landing raises the count through nobody's fault.
+
+A witness at or behind its base is **unjudgeable**, not clean. The witness is HEAD at the last verb
+that writes one, and `--close` writes none, so such a run may well have landed. The signal counts it
+apart with its reason, and every other record whose facts it cannot place goes there too.
+
+Each counted record gets one sub-class, read from its **last** parked row: `retired-unit`,
+`surfaced-park`, `no-rows` or `other`. The first-match table that decides it is
+`_derive_run_subclass` in `drift_report.py`, and it is not restated here. Its kinds and acts are the
+unattended driver's own declared sets, spelled in the engine so the report runs in a tree without that
+kit, and `selftest.py` holds each set to the driver's source wherever the driver is present. A refused
+landing leaves no tracked row, so no sub-class can name one, and the detail says so on every run.
 
 ### The harness note is a DERIVED contract, not prose
 
