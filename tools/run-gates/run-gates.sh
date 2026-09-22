@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # run-gates.sh — the coding-governance merge bar: run every gate this repo dogfoods, report per leg.
-# The full bar green at the push boundary; earlier runs scoped. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo.
+# The full bar green at the push boundary; earlier runs scoped. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo · 3 = TREE MOVED.
+# TREE MOVED: no leg failed, but the tree changed while the bar ran, so no verdict describes it; a failed leg outranks it.
 #   bash <prefix>/run-gates/run-gates.sh             # legs run CONCURRENTLY, at the width
 #                                                    # <prefix>/run-gates/gate-profiles.txt declares
 #                                                    # for the detected cores and RAM
@@ -47,6 +48,22 @@ KIT_RUN_GATES_VERSION=1.9   # gov:kit run-gates@1.9
 # `bash ../tools/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
 # manifest to `./gate-legs.json`, and the runner ran ZERO legs. Captured here, used below.
 KITDIR=$(cd "$(dirname "$0")" && pwd)
+# AN ABSOLUTE ARGV, BY RE-EXECUTING THROUGH THE PATH JUST RESOLVED (TOOL-dDerivedDocket-25 S4). The
+# process-monitor fence attributes a process by its command line, and `bash <prefix>/run-gates/…`
+# carries a RELATIVE one that no declared root can reach, so a killed runner's tree could not be
+# reaped by it (TOOL-aReapedSpinner-14). Every leg subshell is a FORK of this process and inherits
+# the argv, so fixing it here fixes it for all of them and for every caller at once, the operator's
+# own catalogued invocation included. `exec` keeps the pid, so a caller holding it loses nothing, and
+# it runs before any output, lock or scratch exists. The loop guard is the absolute `$0` itself. A
+# `$0` naming no file beside the kit dir (a runner fed on stdin) is left alone rather than exec'd
+# into a path that does not exist. `-x` is carried because an exec'd bash would otherwise drop it.
+case "$0" in
+  /*) ;;
+  *) if [ -f "$KITDIR/${0##*/}" ]; then
+       case "$-" in *x*) exec "${BASH:-bash}" -x "$KITDIR/${0##*/}" "$@" ;; esac
+       exec "${BASH:-bash}" "$KITDIR/${0##*/}" "$@"
+     fi ;;
+esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 # The python-launcher resolver, INLINED byte-identically from tools/lib/resolve-python.sh. This
@@ -996,7 +1013,99 @@ QUEUE_SUMMARY="gate queue: queued $QUEUED from $QUEUED_FROM"
 # header and the summary file, which is why `QUEUE_SUMMARY` is a separate string.
 echo "gate queue: waited ${TS_WAITED}s"
 
-WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
+# ---- the scratch dir: OWNED, REDIRECTED and SWEPT (TOOL-dDerivedDocket-25) -----------------------
+# Every hermetic leg makes its own `mktemp -d` scratch, and before this unit every one of them landed
+# in the AMBIENT `TMPDIR` and none was ever swept: node `a` measured 30733 entries there, and a bar
+# killed by signal 9 left its whole scratch dir besides, since no trap runs on SIGKILL. Three moves:
+#
+#   OWNED     `WORK` is a NAMED `gate-work.*` dir under the ambient `TMPDIR`, captured here before
+#             anything redirects it — `/tmp` when unset or empty, which is where `mktemp -d` itself
+#             falls back. Its `owner` file holds this pid, the resolved git common dir and the start
+#             epoch, written tmp-then-`mv` the way the run record is, so no sweeper reads half a line.
+#   SWEPT     each bar removes every `gate-work.*` whose owner names THIS common dir and whose pid
+#             fails `ts_alive`, with the predicate of `ts_sweep_queue`: a live pid only WITHHOLDS the
+#             sweep, so a pid table that errs can only keep a dir, never remove a live bar's. A dir
+#             with no readable owner is never touched, which is also why a bar that predates this
+#             unit, or another repository's, is left alone (the spec's F1 kept the delete surface to
+#             this repository). The owner record is removed LAST, so a sweep that fails part-way
+#             leaves a dir the next bar can still prove dead and retry.
+#   REDIRECTED  `TMPDIR` is exported as `$WORK/tmp` before the first leg dispatches, so every leg's
+#             `mktemp -d` and every Python `tempfile` lands inside the scratch the `cleanup` trap
+#             already removes. The spelling is the one `mktemp -d` returned and never a drive-letter
+#             rewrite, which is what broke four arms of the template-size self-test when an external
+#             root was tried (TOOL-aTetheredScratch-2).
+#
+# It runs HERE, after the turnstile, so a bar still queued never sweeps. Every refusal in this block
+# sits ABOVE the `cleanup` trap, the same class as the `mktemp -d` beside it, so each removes what it
+# made before it exits.
+GATE_AMBIENT_TMP=${TMPDIR:-/tmp}
+WORK=$(mktemp -d "$GATE_AMBIENT_TMP/gate-work.XXXXXXXX") || { echo "run-gates: cannot create a scratch dir"; exit 2; }
+# THE COMMON DIR THE OWNER NAMES, resolved exactly as the turnstile resolves its key and reused from
+# it when it ran. With the turnstile off it is resolved here, because the sweep must still know which
+# repository a scratch dir belongs to.
+WORK_COMMON=$TS_COMMON
+if [ -z "$WORK_COMMON" ]; then
+  WORK_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || WORK_COMMON=""
+  [ -n "$WORK_COMMON" ] && WORK_COMMON=$(cd "$WORK_COMMON" 2>/dev/null && pwd) || WORK_COMMON=""
+fi
+
+write_work_owner() { # -> $WORK/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
+  printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "${EPOCHSECONDS:-$(date +%s)}" > "$WORK/owner.tmp" 2>/dev/null \
+    && mv -f "$WORK/owner.tmp" "$WORK/owner" 2>/dev/null
+}
+
+scan_dead_work() { # -> removes each gate-work dir under the ambient TMPDIR that this repo's dead bar owns
+  local d own pid rest common f
+  local -a doomed
+  # No common dir, no proof of ownership: sweep nothing rather than match an empty field.
+  [ -n "$WORK_COMMON" ] || return 0
+  for d in "$GATE_AMBIENT_TMP"/gate-work.*; do
+    [ -d "$d" ] || continue
+    # NEVER OUR OWN, guarded explicitly although our live pid already withholds it — the same belt
+    # `ts_sweep_queue` wears, for the same reason: a later edit to the pid test must not reach here.
+    [ "${d##*/}" = "${WORK##*/}" ] && continue
+    own=""
+    { IFS= read -r own < "$d/owner"; } 2>/dev/null
+    own=${own%$'\r'}
+    [ -n "$own" ] || continue
+    pid=${own%%$'\t'*}; rest=${own#*$'\t'}; common=${rest%%$'\t'*}
+    case "$pid" in ''|*[!0-9]*) continue ;; esac
+    [ "$common" = "$WORK_COMMON" ] || continue
+    ts_alive "$pid" && continue
+    printf 'run-gates: sweeping the scratch of a dead bar (pid %s)\n' "$pid" >&2
+    doomed=()
+    for f in "$d"/* "$d"/.[!.]*; do
+      [ -e "$f" ] || [ -L "$f" ] || continue
+      [ "${f##*/}" = owner ] && continue
+      doomed+=("$f")
+    done
+    if { [ "${#doomed[@]}" = 0 ] || rm -rf "${doomed[@]}" 2>/dev/null; } && rm -rf "$d" 2>/dev/null; then
+      :
+    else
+      printf 'run-gates: NOTE - the scratch of dead bar %s was not removed whole; its owner record stays, so the next bar retries: %s\n' "$pid" "$d" >&2
+    fi
+  done
+  return 0
+}
+
+write_work_owner \
+  || echo "run-gates: NOTE - no owner record could be written into $WORK, so if this bar is killed no later bar can prove it dead and sweep its scratch" >&2
+mkdir "$WORK/tmp" 2>/dev/null \
+  || { rm -rf "$WORK" 2>/dev/null; echo "run-gates: cannot create the legs' scratch dir under $WORK"; exit 2; }
+scan_dead_work
+# THE AMBIENT COUNT, ONCE PER BAR, measured after the sweep and counting this bar's own dir, so two
+# bars over an unchanged ambient print the same figure and a leak reads as growth. A glob rather than
+# `ls | wc -l`: no process, and no per-entry stat on a directory that may hold tens of thousands.
+_te_ng=0; shopt -q nullglob && _te_ng=1
+_te_dg=0; shopt -q dotglob && _te_dg=1
+shopt -s nullglob dotglob
+_te_all=("$GATE_AMBIENT_TMP"/*)
+[ "$_te_ng" = 1 ] || shopt -u nullglob
+[ "$_te_dg" = 1 ] || shopt -u dotglob
+TMPDIR_ENTRIES=${#_te_all[@]}
+unset _te_all _te_ng _te_dg
+echo "TMPDIR entries $TMPDIR_ENTRIES"
+export TMPDIR="$WORK/tmp"
 # THE TRAP COVERS THE SCRATCH DIR AND THE BEACON, AND NOTHING ELSE. That exclusion is load-bearing:
 # the run record below lives under the git dir and is DURABLE, so a trap that swept it would erase
 # the record on every ordinary exit and on every caught signal — which is every path except the
@@ -1086,7 +1195,8 @@ run_outstanding_reap() {
 # ever runs pays one `mkdir` for the journal directory, and a clone that has one pays nothing.
 #
 # WHAT THIS DOES NOT CATCH. An exit above the EXIT trap: not a repo, no python, a refused profile,
-# `--print-profile`, the turnstile queue and the scratch-dir `mktemp`. A SIGKILL, which runs no trap.
+# `--print-profile`, the turnstile queue, the scratch-dir `mktemp` and its legs' `tmp` subdir. A
+# SIGKILL, which runs no trap.
 # A leg reported `(no result)`, which is counted in `failed` but has no `.leg` row and so no name on
 # the line. And an unset name read inside the handler, which `set -u` would turn into a handler that
 # writes nothing: every read here is defaulted for that reason, and a new read must be too.
@@ -1550,6 +1660,9 @@ if [ -n "$RUNDIR" ]; then
     # additive key breaks none, and a bump could not be armed because nothing reads the field.
     printf 'queued\t%s\n'      "$QUEUED"
     printf 'queued_from\t%s\n' "$QUEUED_FROM"
+    # The ambient TMPDIR count the bar printed, measured once after its sweep (TOOL-dDerivedDocket-25
+    # S3). Outside the run-envelope block for the reason the queue keys above give.
+    printf 'tmpdir_entries\t%s\n' "$TMPDIR_ENTRIES"
     # The RESOLVED dispatch order, recorded here because this is the point at which it is in
     # scope. The chunking unit's ordering criteria read it from the record rather than
     # re-deriving it, which is what keeps the record's key set single-sourced.
@@ -2417,6 +2530,13 @@ tree_moved=no
 # documented crash signal: a breach left a plausible green one instead.
 gate_verdict=GREEN; [ "$fails" = 0 ] || gate_verdict=RED
 [ -f "$WORK/wall.breach" ] && gate_verdict=RED
+# A MOVED TREE OUTRANKS GREEN AND NOTHING ELSE (TOOL-dDerivedDocket-25 S5). A bar whose tree changed
+# under it graded a tree that no longer exists — it may have graded a mixture — so exit 0 over it
+# asserted something nobody observed, and until this line that is exactly what the runner did: the
+# stamp below already refused it, and the verdict and the exit code did not. It never outranks a
+# red: a failed leg is a real finding about SOME tree, and exit 3 over it would hide that, so a bar
+# that failed AND moved stays RED with exit 1 and its RED line names the move.
+[ "$gate_verdict" = GREEN ] && [ "$tree_moved" = yes ] && gate_verdict="TREE MOVED"
 
 if [ -n "$RUNDIR" ]; then
   # WRITTEN LAST, and its ABSENCE is the crash signal — the only one needed. A run that dies
@@ -2479,7 +2599,17 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
 fi
 # TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
 # gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.
-if [ "$fails" = 0 ]; then
+# THE MOVE NOTE rides the RED line only, where a failed leg outranked the move and the reader would
+# otherwise never learn the tree also changed. A green bar that moved does not reach that line.
+movenote=""; [ "$tree_moved" = yes ] && movenote=" (the tree moved while the bar ran)"
+if [ "$gate_verdict" = "TREE MOVED" ]; then
+  # EXIT 3, its own status and never 0 or 1: 0 would certify a tree nobody graded, and 1 would send
+  # the reader hunting a failing leg that does not exist. Every caller that reads any non-zero exit as
+  # "not green" reads this one correctly without learning it. The summary file says it too, so the
+  # previous run's `gates GREEN` does not stand there for anyone reading the durable record.
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates TREE MOVED — the tree changed while the bar ran, so no verdict describes it\n'; } >"$sfile" 2>/dev/null || true
+  echo "gates TREE MOVED — the tree changed while the bar ran, so no verdict describes it"; exit 3
+elif [ "$fails" = 0 ]; then
   # THE CHUNK ROLL-UP, with per-chunk wall time, goes into the DURABLE records and never to stdout.
   # A wall clock on a terminal line invites comparison between two runs that are not comparable —
   # the profiling verb exists precisely because a duration without its envelope is not a
@@ -2493,16 +2623,16 @@ else
   # 42 legs reported `1/85 legs failed` — a ratio against a population it never ran. The two lines
   # are read by the same person in the same terminal and a figure that changes meaning between them
   # is worse than either. TOOL-dUnstalledConvoy-31.
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$ran" "$skipnote" >>"$sfile"; } 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s%s\n' "$fails" "$ran" "$skipnote" "$movenote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.
   if [ -n "$gd" ]; then
     ffile="$gd/gate-last-failure.txt"
-    { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
+    { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s%s\n' "$fails" "$n" "$skipnote" "$movenote"; } >"$ffile" 2>/dev/null || true
     chmod 600 "$ffile" 2>/dev/null || true
   fi
-  echo "gates RED — $fails/$ran legs failed$skipnote"
+  echo "gates RED — $fails/$ran legs failed$skipnote$movenote"
   [ -n "$sfile" ] && echo "gate summary saved to $sfile"
   [ -n "$gd" ] && [ -f "$gd/gate-last-failure.txt" ] && echo "gate failure record saved to $gd/gate-last-failure.txt"
   exit 1

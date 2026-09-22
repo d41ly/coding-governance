@@ -11,6 +11,22 @@ The merge-bar runner, its two harnesses, and the adopter that keeps a target's v
 declaration honest. The runner is a thin iterator over a leg manifest: it holds no leg command of
 its own, and the canary asserts that.
 
+## Exit codes
+
+| exit | the bar | its last stdout line |
+|---|---|---|
+| 0 | GREEN: every leg that ran passed, over a tree that did not move | `gates GREEN — …` |
+| 1 | RED: one or more legs failed, or the whole-run wall fired | `gates RED — …` |
+| 2 | REFUSED: not run from a repository, no usable python, a manifest or profile table it cannot read, a scratch dir or run record it cannot create, or a manifest whose every leg is held | a `run-gates:` line, or `gates REFUSED — …` in the summary file |
+| 3 | TREE MOVED: no leg failed, but the tree changed while the bar ran, so no verdict describes it | `gates TREE MOVED — …` |
+
+**Exit 3 never outranks a red.** A failed leg is a finding about some tree, so a bar that failed AND
+moved exits 1, and its RED line ends `(the tree moved while the bar ran)`. A moved bar never writes
+the `gate-full-green` stamp, and its run record says `verdict TREE MOVED`. Every caller that reads
+any non-zero exit as "not green" — the pre-push hook is one — reads exit 3 correctly without
+learning it. What to do about a moved tree, such as re-running once on a tree that has stopped
+moving, is the caller's decision and not the runner's.
+
 ## The switch every adopter needs to know about
 
 **A leg declaring `subject = "kit"` is HELD.** It does not run on your bar unless you ask:
@@ -106,6 +122,37 @@ and HUP: a run whose beacon was reaped can never delete its successor's.
 It FAILS OPEN. The wait is bounded at a declared multiple of the TTL; on expiry the run says so
 loudly, drops its ticket and proceeds unqueued. `GATE_TURNSTILE=0` disables it entirely. It never
 contributes to the exit code — a turnstile that can wedge a bar is worse than two bars.
+
+## The scratch directory — owned, redirected and swept
+
+Every heavy leg is hermetic because it builds its own `mktemp -d` scratch repo, so the scratch a bar
+produces is proportional to its legs. The runner owns all of it:
+
+- **Owned.** The run's scratch dir is a named `gate-work.*` directory under the AMBIENT `TMPDIR` —
+  `/tmp` when that is unset or empty, where `mktemp -d` itself falls back — and it carries an `owner`
+  record: the runner's pid, the resolved git common dir and the start epoch, one TAB-separated line.
+- **Redirected.** Before the first leg dispatches the runner exports `TMPDIR` as that dir's `tmp/`,
+  so every leg's `mktemp -d` and every Python `tempfile` lands inside it and goes when the bar exits.
+  The spelling is the one `mktemp -d` returned and never a drive-letter rewrite.
+- **Swept.** A bar killed by signal 9 runs no trap and leaves its whole scratch dir. Each later bar
+  removes every `gate-work.*` whose owner names THIS repository's common dir and whose pid is dead,
+  and says so on stderr: `run-gates: sweeping the scratch of a dead bar (pid <p>)`. A live pid only
+  withholds the sweep. A dir with no readable owner — every bar's scratch from before this kit
+  version, and another repository's — is never touched.
+
+Once per bar, after the sweep, the runner prints `TMPDIR entries <n>`, the count of top-level entries
+in the ambient `TMPDIR`, its own dir included, and writes the same figure to the run record header as
+`tmpdir_entries`. Over an unchanged ambient two bars print the same figure, so a leak reads as growth.
+
+**What the ambient cost before the runner owned it.** Measured on node `a`: 30733 entries, 58 legs,
+and a full bar >10 min and still running, where the same bar finished on a fresh `TMPDIR`. Growth
+there now comes only from bars that predate the owned scratch or run another repository. On a node
+that still carries such a backlog, point `TMPDIR` at an empty dir before blaming the diff, and do not
+delete the shared one.
+
+The runner also re-executes itself through its own absolute path when it was started relatively, so
+its argv, and the argv every leg subshell inherits by fork, names a path the process-monitor fence can
+attribute. `exec` keeps the pid, and it happens before any output, lock or scratch exists.
 
 ## The run record
 

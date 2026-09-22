@@ -45,9 +45,12 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=188
+FLOOR_ASSERTIONS=205
 # RAISED 149 -> 188 by TOOL-dDerivedDocket-23: the `signature` key-set control and section 7's
 # thirty-eight red-attribution assertions, every one counted on a host with no `timeout` as well.
+# RAISED 188 -> 205 by TOOL-dDerivedDocket-25: arm 3a's `TMPDIR entries` presence check and the
+# sixteen owned-scratch assertions of section 8 (8a-8e), each counted whether it passes, fails or,
+# for 8e on a host with no `/proc`, announces its skip.
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -385,8 +388,15 @@ s4=$(run_scratch 4); peaks4=$(peaks_now); n4=$(npeaks_now)
 # reports the EFFECTIVE width, which is the one thing these runs are supposed to disagree about. The
 # companion arms below are what stop that filter from hiding the line's disappearance — a filter with
 # no presence check is a way to make any regression in the filtered line invisible.
-f1=$(printf '%s\n' "$s1" | grep -v '^gate profile: ')
-f4=$(printf '%s\n' "$s4" | grep -v '^gate profile: ')
+# THE AMBIENT COUNT IS FILTERED TOO (TOOL-dDerivedDocket-25): `TMPDIR entries <n>` counts a
+# directory other legs of an outer bar write into concurrently, so two runs legitimately disagree
+# about it. The presence check right below is what keeps this filter from hiding its disappearance.
+f1=$(printf '%s\n' "$s1" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ')
+f4=$(printf '%s\n' "$s4" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ')
+n=$((n+1))
+{ [ "$(printf '%s\n' "$s1" | grep -c '^TMPDIR entries [0-9][0-9]*$')" = 1 ] \
+  && [ "$(printf '%s\n' "$s4" | grep -c '^TMPDIR entries [0-9][0-9]*$')" = 1 ]; } \
+  || { echo "canary: a bar did not print exactly one 'TMPDIR entries <n>' line, so arm 3a's filter is hiding its absence rather than its count"; fail=1; }
 n=$((n+1))
 if [ "$f1" != "$f4" ]; then
   echo "canary: GATE_JOBS=1 and GATE_JOBS=4 disagree — concurrency changed the report"
@@ -2037,6 +2047,180 @@ if [ -z "$_listrun" ]; then
 elif [ -z "$(check_signature_shape "$_listrun")" ]; then
   echo "canary: a declared signature's own --list output passed the shape predicate, so AC12 cannot tell a list mode from a key set"; fail=1
 fi
+
+# ================================================================================================
+# 8. THE RUNNER OWNS ITS SCRATCH, CARRIES AN ABSOLUTE ARGV, AND EXITS 3 OVER A MOVED TREE.
+#    TOOL-dDerivedDocket-25, AC1, AC2, AC4, AC5 and AC7. Fixture-driven and true in any tree, so it
+#    ships. Every bar below runs in a COMMITTED scratch repo built here, against a manifest held
+#    OUTSIDE its tree through GATE_LEGS so no run starts dirty, and every ambient `TMPDIR` is a
+#    private directory of this arm's, so another session's scratch cannot move a count. Each bar is
+#    started RELATIVELY, the way an operator types it, so the re-exec is on the path of every arm.
+OS=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the owned-scratch arms"; exit 2; }
+build_owned_fixture() { # dir -> a committed repo carrying the runner, its table, the fingerprint and four legs
+  local d=$1
+  mkdir -p "$d/$KIT_REL" "$d/fx" || return 1
+  cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || return 1
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$d/fx/ok.sh"
+  printf '#!/usr/bin/env bash\necho "FAIL on purpose"\nexit 1\n' > "$d/fx/bad.sh"
+  # THE MOVER edits a TRACKED file mid-bar: after the start fingerprint, which is taken before the
+  # first leg dispatches, and before the end one. Idle unless asked, so one fixture is its own control.
+  printf '#!/usr/bin/env bash\n[ -z "${RG_MOVE:-}" ] || echo moved >> fx/target.txt\nexit 0\n' > "$d/fx/move.sh"
+  printf 'seed\n' > "$d/fx/target.txt"
+  # THE HOLDER makes `mktemp -d` scratch, records where it landed OUTSIDE the tree, reports ready with
+  # its pid and holds until told to go. Its stdio goes nowhere once ready, so nothing it holds open
+  # pins a file inside the runner's scratch dir when a sweep comes for it.
+  cat > "$d/fx/hold.sh" <<'HOLD'
+#!/usr/bin/env bash
+s=$(mktemp -d) || exit 1
+: > "$s/held"
+[ -z "${RG_PATHS:-}" ] || printf '%s\n' "$s" >> "$RG_PATHS"
+if [ -n "${RG_READY:-}" ]; then
+  exec >/dev/null 2>&1
+  printf '%s\n' "$$" > "$RG_READY.tmp" && mv "$RG_READY.tmp" "$RG_READY"
+  i=0; while [ ! -e "$RG_READY.go" ] && [ "$i" -lt 900 ]; do sleep 0.1; i=$((i + 1)); done
+fi
+exit 0
+HOLD
+  ( cd "$d" && git init -q -b main . && git config user.email o@t.invalid && git config user.name o \
+      && git config core.autocrlf false && git add -A && git commit -qm seed ) >/dev/null 2>&1
+}
+# One bar, in the foreground, its merged output to a file OUTSIDE the repo (a file inside would make
+# the tree untracked-dirty before the runner starts). The ambient scoping environment is cleared for
+# the reason the evidence harness gives: a nested runner must not answer a question about an outer run.
+run_owned_bar() { # repo · ambient TMPDIR · output file · NAME=VALUE... -> the bar's exit status
+  local d=$1 amb=$2 of=$3; shift 3
+  ( cd "$d" && env -u GATE_RUN_ID -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_SELFTESTS \
+      TMPDIR="$amb" GATE_FULL=1 GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 "$@" \
+      bash $KIT_REL/run-gates.sh ) >"$of" 2>&1
+}
+read_owned_entries() { sed -n 's/^TMPDIR entries \([0-9][0-9]*\)$/\1/p' "$1" 2>/dev/null | head -1; }
+OM="$OS/repo"; build_owned_fixture "$OM" || { echo "canary: cannot build the owned-scratch fixture"; exit 2; }
+printf '[\n  {"name": "ok", "argv": ["bash", "fx/ok.sh"]},\n  {"name": "mover", "argv": ["bash", "fx/move.sh"]}\n]\n' > "$OS/moved.json"
+printf '[\n  {"name": "bad", "argv": ["bash", "fx/bad.sh"]},\n  {"name": "mover", "argv": ["bash", "fx/move.sh"]}\n]\n' > "$OS/redmoved.json"
+printf '[\n  {"name": "holder", "argv": ["bash", "fx/hold.sh"]}\n]\n' > "$OS/hold.json"
+mkdir -p "$OS/amb-moved" "$OS/amb-owned" "$OS/amb-killed" "$OS/amb-argv"
+
+# 8a. AC1 — A MOVED TREE EXITS 3, SAYS SO, RECORDS IT, AND STAMPS NOTHING. The CONTROL runs first: the
+#     same bar with the mover idle is GREEN and DOES stamp, so the stamp assertion below cannot pass
+#     on a fixture that could never have earned one.
+run_owned_bar "$OM" "$OS/amb-moved" "$OS/moved.ctl" GATE_LEGS="$OS/moved.json"; omrc=$?
+n=$((n+1))
+{ [ "$omrc" = 0 ] && [ -f "$OM/.git/gate-full-green" ]; } \
+  || { echo "canary: tree moved — control: the idle-mover bar exited $omrc or stamped nothing, so the moved arm below grades nothing"; sed 's/^/    /' "$OS/moved.ctl"; fail=1; }
+rm -f "$OM/.git/gate-full-green"
+run_owned_bar "$OM" "$OS/amb-moved" "$OS/moved.out" GATE_LEGS="$OS/moved.json" RG_MOVE=1; omrc=$?
+omrec="$OM/.git/gate-run/$(cat "$OM/.git/gate-run/current" 2>/dev/null)/verdict"
+n=$((n+1))
+[ "$omrc" = 3 ] \
+  || { echo "canary: tree moved — a bar whose leg edited a tracked file mid-run exited $omrc, not 3"; sed 's/^/    /' "$OS/moved.out"; fail=1; }
+n=$((n+1))
+grep -q '^gates TREE MOVED — ' "$OS/moved.out" \
+  || { echo "canary: tree moved — the bar printed no 'gates TREE MOVED — ' line"; fail=1; }
+n=$((n+1))
+grep -q "^verdict	TREE MOVED$" "$omrec" 2>/dev/null \
+  || { echo "canary: tree moved — the run record's verdict is not TREE MOVED"; sed 's/^/    /' "$omrec" 2>/dev/null; fail=1; }
+n=$((n+1))
+[ ! -f "$OM/.git/gate-full-green" ] \
+  || { echo "canary: tree moved — a bar over a moved tree wrote the full-green stamp"; fail=1; }
+( cd "$OM" && git checkout -q -- fx/target.txt ) >/dev/null 2>&1
+
+# 8b. AC7 — A FAILED LEG OUTRANKS THE MOVE. Exit 1, not 3, so the re-run a caller makes on exit 3 can
+#     never end naming the move instead of the leg; the RED line still says the tree moved.
+run_owned_bar "$OM" "$OS/amb-moved" "$OS/redmoved.out" GATE_LEGS="$OS/redmoved.json" RG_MOVE=1; omrc=$?
+omrec="$OM/.git/gate-run/$(cat "$OM/.git/gate-run/current" 2>/dev/null)/verdict"
+n=$((n+1))
+[ "$omrc" = 1 ] || { echo "canary: failed and moved — the bar exited $omrc, not 1: a moved tree outranked a failed leg"; fail=1; }
+n=$((n+1))
+grep -q '^gates RED — 1/2 legs failed.*tree moved' "$OS/redmoved.out" \
+  || { echo "canary: failed and moved — the RED line does not name the moved tree"; grep '^gates ' "$OS/redmoved.out" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+{ grep -q "^verdict	RED$" "$omrec" && grep -q "^tree_moved	yes$" "$omrec"; } 2>/dev/null \
+  || { echo "canary: failed and moved — the run record does not say RED over a moved tree"; sed 's/^/    /' "$omrec" 2>/dev/null; fail=1; }
+( cd "$OM" && git checkout -q -- fx/target.txt ) >/dev/null 2>&1
+
+# 8c. AC4 — A LEG'S `mktemp -d` LANDS IN THE RUN'S OWN SCRATCH AND GOES WITH IT. Red when `TMPDIR` is
+#     exported after dispatch or not at all, and the leg's scratch lands in the ambient instead.
+: > "$OS/paths"
+run_owned_bar "$OM" "$OS/amb-owned" "$OS/owned.out" GATE_LEGS="$OS/hold.json" RG_PATHS="$OS/paths"; oarc=$?
+op=$(head -1 "$OS/paths" 2>/dev/null)
+n=$((n+1))
+case "$oarc:$op" in
+  0:"$OS/amb-owned"/gate-work.*/tmp/*) ;;
+  *) echo "canary: owned scratch — the bar exited $oarc and its leg's mktemp -d landed at '$op', not under the run's own gate-work.*/tmp"; fail=1 ;;
+esac
+n=$((n+1))
+{ [ -n "$op" ] && [ ! -e "$op" ]; } || { echo "canary: owned scratch — the leg's scratch '$op' outlived the bar"; fail=1; }
+n=$((n+1))
+oleft=""
+for _of in "$OS/amb-owned"/* "$OS/amb-owned"/.[!.]*; do [ -e "$_of" ] && oleft="$oleft ${_of##*/}"; done
+[ -z "$oleft" ] || { echo "canary: owned scratch — the ambient TMPDIR still holds$oleft after a clean exit"; fail=1; }
+
+# 8d. AC2 — TWO BARS KILLED BY SIGNAL 9 LEAK NOTHING THE NEXT BAR KEEPS. Each is killed while its leg
+#     holds `mktemp -d` scratch; no trap runs, so each leaves its whole scratch dir. A third bar's
+#     `TMPDIR entries <n>` must equal the first bar's: the second swept the first, the third swept the
+#     second. Red when the sweep is skipped, and n grows by the two leaked gate-work dirs.
+#     The runner's pid is the tail of its default run id, which `gate-run/current` names; `exec` keeps
+#     it across the subshell, `env` and the runner's own re-exec, so `wait` reaps the very process
+#     killed and a zombie cannot answer `kill -0` for it.
+for _k in 1 2; do
+  rm -f "$OS/ready.$_k" "$OS/ready.$_k.go"
+  ( cd "$OM" && exec env -u GATE_RUN_ID -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_SELFTESTS \
+      TMPDIR="$OS/amb-killed" GATE_FULL=1 GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 \
+      GATE_LEGS="$OS/hold.json" RG_READY="$OS/ready.$_k" bash $KIT_REL/run-gates.sh ) >"$OS/killed.$_k" 2>&1 &
+  _kbg=$!
+  _i=0; while [ ! -s "$OS/ready.$_k" ] && [ "$_i" -lt 1200 ]; do sleep 0.1; _i=$((_i + 1)); done
+  _kpid=$(cat "$OM/.git/gate-run/current" 2>/dev/null); _kpid=${_kpid##*-}
+  n=$((n+1))
+  if [ -s "$OS/ready.$_k" ] && [ -n "$_kpid" ]; then
+    kill -9 "$_kpid" 2>/dev/null
+    wait "$_kbg" 2>/dev/null
+    # The orphaned holder leaves at once, and its orphaned writer's LAST write is the leg's `.rc`:
+    # waiting for it keeps the next bar's sweep from racing a file still being created.
+    : > "$OS/ready.$_k.go"
+    _i=0
+    while [ "$_i" -lt 100 ]; do
+      _kdone=""; for _kf in "$OS/amb-killed"/gate-work.*/0.rc; do [ -e "$_kf" ] && _kdone=1; done
+      [ -n "$_kdone" ] && break
+      sleep 0.1; _i=$((_i + 1))
+    done
+  else
+    echo "canary: owned scratch — held bar $_k never reported its leg ready, so the kill arm has nothing to kill"; fail=1
+    : > "$OS/ready.$_k.go"; wait "$_kbg" 2>/dev/null
+  fi
+done
+run_owned_bar "$OM" "$OS/amb-killed" "$OS/killed.3" GATE_LEGS="$OS/hold.json"
+_e1=$(read_owned_entries "$OS/killed.1"); _e3=$(read_owned_entries "$OS/killed.3")
+n=$((n+1))
+{ [ -n "$_e1" ] && [ "$_e1" = "$_e3" ]; } \
+  || { echo "canary: owned scratch — two SIGKILLed bars leaked: the first bar counted ${_e1:-no} ambient entries and the third ${_e3:-no}"; fail=1; }
+n=$((n+1))
+grep -q '^run-gates: sweeping the scratch of a dead bar (pid [0-9][0-9]*)$' "$OS/killed.3" \
+  || { echo "canary: owned scratch — the third bar did not announce sweeping the second bar's scratch"; fail=1; }
+
+# 8e. AC5 — THE RUNNER'S ARGV IS ABSOLUTE, read the way the process-monitor fence reads it: the pid
+#     from the turnstile beacon, the argv from `/proc/<pid>/cmdline`. Started relatively, as every arm
+#     above is. Red when the re-exec is removed and the argv stays relative (TOOL-aReapedSpinner-14).
+#     A host with no `/proc` says so rather than passing.
+rm -f "$OS/ready.a" "$OS/ready.a.go"
+( cd "$OM" && exec env -u GATE_RUN_ID -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_SELFTESTS \
+    TMPDIR="$OS/amb-argv" GATE_FULL=1 GATE_PROFILE=minimal GATE_WALL=0 GATE_TURNSTILE_TICK=1 \
+    GATE_LEGS="$OS/hold.json" RG_READY="$OS/ready.a" bash $KIT_REL/run-gates.sh ) >"$OS/argv.out" 2>&1 &
+_abg=$!
+_i=0; while [ ! -s "$OS/ready.a" ] && [ "$_i" -lt 1200 ]; do sleep 0.1; _i=$((_i + 1)); done
+_apid=$(cat "$OM/.git/gate-bar-beacon/pid" 2>/dev/null)
+_acmd=""
+[ -n "$_apid" ] && [ -r "/proc/$_apid/cmdline" ] && _acmd=$(tr '\0' '\n' < "/proc/$_apid/cmdline" 2>/dev/null)
+: > "$OS/ready.a.go"; wait "$_abg" 2>/dev/null
+n=$((n+1))
+if [ -z "$_apid" ]; then
+  echo "canary: absolute argv — the bar never wrote a beacon pid, so there was no runner to read"; fail=1
+elif [ -z "$_acmd" ]; then
+  echo "canary: SKIP absolute argv — this host exposes no /proc/$_apid/cmdline, so the runner's argv went UNREAD (reported, not a pass)"
+else
+  printf '%s\n' "$_acmd" | grep -qE "^(/|[A-Za-z]:[/\\\\]).*/$KIT_REL/run-gates\.sh\$" \
+    || { echo "canary: absolute argv — the runner's argv carries no absolute path to its own script, so the fence cannot attribute it:"; printf '%s\n' "$_acmd" | sed 's/^/    /'; fail=1; }
+fi
+rm -rf "$OS" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

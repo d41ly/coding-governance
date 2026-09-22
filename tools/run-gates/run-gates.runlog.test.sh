@@ -16,7 +16,8 @@
 #
 # ONE ARM PER ACCEPTANCE CRITERION of the unit's spec, named by it:
 #   AC1  a red bar under a pinned run id: one line, its counts, its failing leg, its head
-#   AC2  a green bar, a wall-breached bar and an all-held bar each write their own verdict and rc
+#   AC2  a green bar, a wall-breached bar, an all-held bar and a bar over a moved tree each write their
+#        own verdict and rc
 #   AC3  TERM, INT and HUP each end a running bar with exactly ONE line, verdict=NONE and 128+n, and a
 #        TERM held behind a command substitution still carries 143, not the command's 0
 #   AC4  the writer adds no external exec after the last leg; a clone's first bar pays one mkdir
@@ -40,7 +41,8 @@
 # by its own staged arms.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
-FLOOR_ASSERTIONS=192
+# 192 -> 197, TOOL-dDerivedDocket-25: AC2's moved-tree bar, five checks.
+FLOOR_ASSERTIONS=197
 # Where the scratch clone installs the runner: a FIXTURE-INTERNAL path, bound once, never gov's prefix.
 KR=kit/run-gates
 n=0; st=0
@@ -139,7 +141,7 @@ elif mode == "render":
 PYEOF
 
 build_scratch() {
-  mkdir -p "$WORK/nohooks" || return 1
+  mkdir -p "$WORK/nohooks" "$WORK/ambient" || return 1
   git init -q -b main "$REPO" || return 1
   cd "$REPO" || return 1
   # Hooks pointed at an EMPTY directory rather than bypassed per commit, and autocrlf OFF: the global
@@ -161,9 +163,12 @@ build_scratch() {
 write_legs() { printf '%s\n' "$2" > "$WORK/$1.json"; }   # name · JSON array -> $WORK/<name>.json
 
 # One bar from the scratch clone, stdout and stderr OUTSIDE it: a file written inside would make the
-# tree untracked-dirty and move the runner onto a different teardown path.
+# tree untracked-dirty and move the runner onto a different teardown path. Its ambient TMPDIR is this
+# suite's own, because the runner prints a `TMPDIR entries <n>` count of it (TOOL-dDerivedDocket-25)
+# and AC5 compares two bars' stdout byte for byte: under the bar the inherited ambient is shared with
+# every other leg running beside this one, and its count would move between the two.
 run_bar() { # NAME=VALUE... -> RC, OUT, ERR
-  env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 "$@" bash "$KR/run-gates.sh" \
+  env TMPDIR="$WORK/ambient" GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 "$@" bash "$KR/run-gates.sh" \
     >"$WORK/out" 2>"$WORK/err"; RC=$?
   OUT=$(cat "$WORK/out"); ERR=$(cat "$WORK/err")
 }
@@ -272,6 +277,23 @@ check_ac2_paths() {
   check "AC2 held ran" "$(read_field "$l" ran)" 0
   check "AC2 held selftests is empty without GATE_SELFTESTS" "$(read_field "$l" selftests)" ""
   [ "$l" = "$((l0 + 1))" ] && [ "$(read_field "$l" verdict)" = REFUSED ] && add_arm_seen "AC2 refused"
+  # A MOVED TREE, TOOL-dDerivedDocket-25: a leg edits a TRACKED file mid-bar and nothing fails, so the
+  # runner takes its TREE MOVED exit, 3, and the line reads that verdict and that status. The mover and
+  # its target are committed first, so the tree is clean when the start fingerprint is taken.
+  printf 'seed\n' > fx/target.txt
+  printf '#!/usr/bin/env bash\necho moved >> fx/target.txt\nexit 0\n' > fx/move.sh
+  git add fx/target.txt fx/move.sh >/dev/null && git commit -qm mover >/dev/null
+  write_legs ac2-moved '[{"name": "mover", "argv": ["bash", "fx/move.sh"]}]'
+  l0=$(measure_lines)
+  run_bar GATE_LEGS="$WORK/ac2-moved.json"
+  l=$(measure_lines)
+  check "AC2 a bar over a moved tree exits 3" "$RC" 3
+  check "AC2 the runner said the tree moved" "$(printf '%s\n' "$OUT" | grep -c '^gates TREE MOVED — ')" 1
+  check "AC2 moved bar, one line" "$l" "$((l0 + 1))"
+  check "AC2 moved verdict" "$(read_field "$l" verdict)" "TREE MOVED"
+  check "AC2 moved rc" "$(read_field "$l" rc)" 3
+  [ "$l" = "$((l0 + 1))" ] && [ "$(read_field "$l" verdict)" = "TREE MOVED" ] && add_arm_seen "AC2 moved"
+  git checkout -q -- fx/target.txt
   check_journal AC2
 }
 
@@ -588,6 +610,7 @@ cd "$dir" || exit 97	1	exempt: run_leg_at's ( … ) subshell, from TOOL-dDerived
 exit 1	2	AC2 wall|AC1 red
 exit 2	1	AC2 refused
 echo "gates GREEN — $ran/$ran legs passed$skipnote"; exit 0	1	AC2 green
+echo "gates TREE MOVED — the tree changed while the bar ran, so no verdict describes it"; exit 3	1	AC2 moved
 EXITS
 
 check_exit_table() { # runner -> EXIT_TRAP, EXIT_SITES, EXIT_UNKNOWN, EXIT_MISCOUNT, EXIT_STALE

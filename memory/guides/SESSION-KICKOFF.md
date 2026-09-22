@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-21T23:39:42+03:00 @ c23d5701b56584722a27d60ffa5633383ae6fbdb
+last-audit: 2026-09-22T00:05:09+03:00 @ 5c33fd5ab2d96a8929efd6e185768560f92def3f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: c23d5701b56584722a27d60ffa5633383ae6fbdb
+last-body-change: 5c33fd5ab2d96a8929efd6e185768560f92def3f
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -288,10 +288,10 @@ does — hit three times in one file in one session; also the whole-signature an
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
-- The full bar can TIME OUT on a node whose `TMPDIR` holds tens of thousands of stale scratch dirs:
-  every hermetic leg does its own `mktemp -d` into it. Measured on node `a`: 30733 entries, 58 legs,
-  >10 min and still running; the same bar finished on a fresh `TMPDIR`. Point `TMPDIR` at an empty
-  dir before blaming the diff, and do not delete the shared one.
+- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's `TMPDIR` is the runner's own
+  `gate-work.*/tmp`, gone on exit; a SIGKILLed bar's is swept by the next once its pid is dead.
+  `TMPDIR entries <n>` prints the ambient count, which now grows only from older bars or another
+  repository's. The measured cost is in the run-gates kit README.
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
   RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
   before and after, never estimate, and record every movement beside the number.
