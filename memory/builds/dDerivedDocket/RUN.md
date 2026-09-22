@@ -303,3 +303,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-22T09:24:22Z hold · item platform-limit · reason until owner · unreachable d · resume none(owner)
 
 2026-09-22T18:31:27Z resume · item dDerivedDocket · reason held · keepalive 3575a45e · manual
+
+2026-09-22T18:34:34Z dispatch · item e03d8fe8 TOOL-dDerivedDocket-31 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/marker-contract.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-pass-order.sh tools/unattended/check-pass-order.test.sh tools/unattended/lib-unattended.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md .memory-tree.conf tools/memory-tree/.memory-tree.conf.example memory/project/unarmed-branches.txt memory/map/features/memory-tree-hygiene.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-31.md
+
+2026-09-22T18:34:35Z brief · item TOOL-dDerivedDocket-31 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
