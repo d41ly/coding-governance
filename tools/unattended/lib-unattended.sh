@@ -353,9 +353,25 @@ scan_shared_index_overlaps() { # shared-records · generated-indexes -> the over
 # empty answer here MEANS "this pass declared no brief paths", which is a legitimate and common
 # state, so a broken TMPDIR answered with silence would read as a correct answer and forgive a write
 # nothing declared. The stderr line is the only thing that makes it visible.
+#
+# THREE CONDITIONS, AND A ROW MEETING TWO OF THEM COVERS NOTHING. TOOL-dDerivedDocket-30 S1, which
+# finishes what TOOL-aLeakedHandle-7 ruled and TOOL-aRatifiedRulings-2 built as the first of them.
+#   * THE UNIT: the row names THIS unit, so a pass cannot carry a sibling's brief unreported.
+#   * THE DIRECTORY: the path lies under the build's own `prompts/`, the folder beside the run-state
+#     file, so a row cannot name a product file and excuse it. The folder itself is not under itself.
+#   * THE BLOB: the path's blob AT <commit> starts with the row's twelve-hex hash, so a brief EDITED
+#     after `--brief` hashed it is not excused — that edit is exactly the write the declare-before-
+#     dispatch rule exists to see. A hash that is not twelve lowercase hex digits matches nothing.
+# All three are applied HERE and nowhere else, because this function's two consumers must excuse one
+# set: narrowed in check 23 alone, `pass_commit` would still skip a commit carrying an edited brief as
+# bookkeeping, and the commit that edited it would never be the one graded. The blob is read from
+# the COMMIT, never the working copy, because the question is what that commit wrote; it goes through
+# a scratch file for the substitution reason stated above, the same file reused per row.
 read_brief_paths() {  # commit · unit · run-state-path
   _rb_f=$(mktemp) || { printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
+  _rb_b=$(mktemp) || { rm -f "$_rb_f"; printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
   GIT show "$1:$3" >"$_rb_f" 2>/dev/null || :
+  _rb_d=$(normpath "$3"); _rb_d=${_rb_d%/*}/prompts/
   # THE `|| [ -n … ]` REPLACES A GUARANTEE THE HEREDOC GAVE FREE. Command substitution stripped the
   # trailing newlines and the heredoc put exactly one back, so every line was terminated; a FILE may
   # end without one, and a bare `read` drops that last line. Without this the repair would silently
@@ -363,10 +379,15 @@ read_brief_paths() {  # commit · unit · run-state-path
   # move a disjointness verdict while claiming to fix a stall.
   while IFS= read -r _rb_r || [ -n "$_rb_r" ]; do
     case "$_rb_r" in *" brief · item $2 · reason "*) ;; *) continue ;; esac
-    _rb_r=${_rb_r#* · reason }; _rb_r=${_rb_r#* }
-    normpath "$_rb_r"; printf '\n'
+    _rb_r=${_rb_r#* · reason }
+    _rb_h=${_rb_r%% *}; _rb_p=$(normpath "${_rb_r#* }")
+    case "$_rb_h" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;; *) continue ;; esac
+    case "$_rb_p" in "$_rb_d"?*) ;; *) continue ;; esac
+    GIT rev-parse --verify --quiet "$1:$_rb_p" </dev/null >"$_rb_b" 2>/dev/null || continue
+    _rb_o=""; IFS= read -r _rb_o <"$_rb_b" || :
+    case "$_rb_o" in "$_rb_h"*) printf '%s\n' "$_rb_p" ;; esac
   done <"$_rb_f"
-  rm -f "$_rb_f"
+  rm -f "$_rb_f" "$_rb_b"
 }
 
 # ------------------------------------------------------------- has this pass committed yet, once

@@ -2158,6 +2158,17 @@ same "--plan --paths: the ids appear in the padded table's order" \
 # A TRAILING flag that is NOT --paths leaves the human table alone rather than being read as one.
 same "--plan <slug> <anything else>: still the padded table" \
   "$(run --plan tPlan --frobnicate | grep -cF "$TAB")" "0"
+# ---- TOOL-dDerivedDocket-30 S6: `--framed`, the declared framing mode the gate leg's check 30 asks
+# ---- for, and the one parsed flag this suite had never passed. It frames even ONE slug - framing is a
+# ---- mode, not a consequence of arity - and the bare table beside it carries no frame.
+framed=$(run --plan tPlan --framed)
+hit  "$framed" "unattended-plan-open: tPlan"
+hit  "$framed" "unattended-plan-rc: tPlan "
+miss "$out" "unattended-plan-open:"
+# ---- ...and `--version`, the other: the kit version the driver declares, then exit 0.
+same "--version prints the kit version the driver declares" "$(run --version)" \
+  "unattended $(sed -n 's/^KIT_UNATTENDED_VERSION=\([0-9.]*\).*/\1/p' "$SCRIPT")"
+run --version >/dev/null; same "--version exits 0" "$?" "0"
 git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- TOOL-dDerivedDocket-49: the `next:` line comes off a DECLARED ladder ------------------------
@@ -9236,7 +9247,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # raises (+326, to 1116) + origin/main's (+236, to 1026), both enumerated below. The two builds'
 # arms are disjoint blocks over the common base 790, so the floor is the sum of the two raises;
 # nothing measured it on the merged tree, and the whole-suite run at VERIFYING is the observer.
-FLOOR_ASSERTIONS=1352
+# RAISED 1352 -> 1357 by exactly the arm, TOOL-dDerivedDocket-30: the `--framed` and `--version`
+# arms beside the `--plan --paths` block, five assertions, all in region two. COUNTED by executing
+# them behind a replica of this prologue by hand; this pass runs no suite.
+FLOOR_ASSERTIONS=1357
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -9360,7 +9374,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=1156
+FLOOR_SHARD_2=1161
+# +5 for the TOOL-dDerivedDocket-30 `--framed` and `--version` arms, in region two - see FLOOR_ASSERTIONS.
 # 1156 at the dDerivedDocket reconcile of origin/main: base 594 + this branch's +326 (to 920) +
 # origin/main's +236 (to 830), both enumerated below - see FLOOR_ASSERTIONS.
 # +14 for the TOOL-dDerivedDocket-29 `--pending-run` arms, all in region two - see FLOOR_ASSERTIONS.
