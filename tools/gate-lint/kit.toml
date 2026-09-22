@@ -11,21 +11,23 @@ sentinel = "tools/gate-lint/ps-hygiene.py"
 include = "**"
 role = "engine"
 
-# THE REGISTRY THE TREE-SCAN LEG READS, SHIPPED rather than named into the void. The leg's argv
-# resolves `{memory_root}/project/substitution-fed-loops.txt` at every target, and until this rule
-# existed NO kit wrote anything under `{memory_root}/project` — so `silenced_legs` refused the leg
-# at every adopter, `apply` exited 1, and the receipt recorded no coverage for it. Reproduced
-# against a bare fixture target; TOOL-aLeakedHandle-1's closing review, F1.
+# NO REGISTRY IS SHIPPED, AND THE LEG NAMES NONE. A `seed` rule here used to land an empty registry
+# under `{memory_root}/project/`, because the leg's argv named that path and `silenced_legs`
+# withholds a leg whose argv names a file no rule writes — `apply` exited 1 at every adopter until
+# the rule existed (TOOL-aLeakedHandle-1's closing review, F1).
 #
-# `seed` AND NOT `engine`, which is the whole point: the file is copied ONCE and the target owns it
-# from then on. This is a declaration OF THAT REPOSITORY's carried sites, so a later `apply` that
-# rewrote it would delete the adopter's own rows. The template ships EMPTY of rows — gov's own
-# carried sites are gov's, and an adopter receiving them would red on the first bar for every one
-# the scan cannot find. Same shape as `drift-audit`'s `drift_signals.template.py`.
-[[files]]
-include = ["substitution-fed-loops.template.txt"]
-role = "seed"
-to = "{memory_root}/project/substitution-fed-loops.txt"
+# The rule then broke the same thing one layer out. Check 3 of the memory-tree hygiene gate admits
+# only a closed set of names under `{memory_root}/project/`, so gov wrote a file into every
+# adopter's memory tree that the adopter's own gate then refused. Widening that case list reaches
+# an adopter only on a later `update`, and reaches a FORKED copy of the checker never — one live
+# adopter runs a fork — so the seed had to go rather than the refusal.
+#
+# The ARGUMENT went instead of the file. The scanner's registry positional is OPTIONAL: with none
+# supplied it grades against an empty declaration and reports every carried site as undeclared,
+# which is a RED leg an adopter answers by declaring their own rows and putting the path back into
+# their own leg argv — theirs to edit, in their own manifest. Dropping this rule while the argv
+# still named the path is F1 again in the other direction, so the two land in ONE commit by
+# construction. TOOL-cMendedVintage-2.
 
 [adopt]
 argv = []
@@ -40,11 +42,11 @@ why_no_adopter = "the kit ships no adopter. Its README carries no copy or instal
 # shipped no leg of its own and that nothing in a target observed it, and it carried
 # `discharge = { command = ["bash", "-c", "exit 1"] }` — undischargeable by construction, which is
 # how a permanent gap gets recorded honestly. The two `[[gate_leg]]` blocks below are what closes
-# it: the kit declares legs, and the seed rule above is what makes a target that copies it actually
-# RECEIVE the first one. TOOL-aLeakedHandle-1. Declaring the leg alone did NOT close the hole — its
-# argv named a registry path no rule shipped, so `silenced_legs` withheld it and `apply` exited 1 at
-# every adopter while this comment said otherwise. That is the correction, and it is why the
-# discharge claim now rests on a file rule rather than on a leg declaration.
+# it: the kit declares legs, and both run at a target out of the kit's own home.
+# TOOL-aLeakedHandle-1. Declaring the leg alone did NOT close the hole at first — its argv named a
+# registry path no rule shipped, so `silenced_legs` withheld it and `apply` exited 1 at every
+# adopter while this comment said otherwise. The correction is that the argv now names nothing
+# outside the kit, so there is no shipped path for that predicate to miss. TOOL-cMendedVintage-2.
 #
 # What has NOT changed is the adopter. There is still none, still no rendered artifact, and so still
 # nothing for `check` to measure — a gate leg is run by the merge bar, not by this verb.
@@ -59,7 +61,7 @@ the kit ships no adopter and no rendered artifact, so there is nothing for this 
 [[gate_leg]]
 name = "shell hygiene (a loop fed by a command substitution)"
 subject = "repo"
-argv = ["python3", "{kit}/sh_hygiene.py", "{memory_root}/project/substitution-fed-loops.txt"]
+argv = ["python3", "{kit}/sh_hygiene.py"]
 guard = []
 
 # The self-test arm. `subject = "kit"` puts it under the 2026-08-23 kit-self-test hold deliberately:

@@ -18,7 +18,7 @@
 # WHAT THIS DOES NOT CHECK, stated in the header because a structural check reads as a semantic one to
 # everybody who did not write it:
 #   - whether the spec was GOOD, whether it was reviewed, or whether the code followed it.
-#     `specs-audited` measures that a pre-code audit left evidence; this measures ORDER and nothing else.
+#     `specs-audited` measures that a pre-code audit left evidence, when the build declared one; this measures ORDER and nothing else.
 #   - whether a build pass was DISPATCHED. That is a different join over the same range.
 #   - anything about a unit that is not CLOSED. An OPEN unit legitimately has no build commit yet, so
 #     grading one would red mid-build on every run including the one that must land it.
@@ -35,7 +35,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.24   # gov:kit unattended@1.24 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.28   # gov:kit unattended@1.28 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong

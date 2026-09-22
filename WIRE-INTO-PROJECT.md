@@ -79,7 +79,7 @@ placeholder from the target's own `deploy.toml` and drops the conditional blocks
 kit for. Run it rather than copying by hand.
 
 ```bash
-python <gov>/tools/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,…
+python <gov>/tools/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,check-microformats,…
 bash  <gov>/tools/playbook/adopt-playbook.sh --target <project>
 bash  <gov>/tools/playbook/adopt-playbook.sh --target <project> --check   # wire as a gate leg
 ```
@@ -146,6 +146,18 @@ Declaring one the adopter never computes ships an unresolved `{{TOKEN}}` brace i
 committed tree, and they can only fix it by forking the descriptor. `python
 tools/check-kit-placeholders.py` is the join and reds on it; a kit that legitimately has no adopter
 says so with `why_no_adopter` in its `[adopt]` block.
+
+<!-- govkit:entry check-microformats -->
+### 2a — The micro-format definition gate
+
+`check-microformats` arrives with the charter and grades the micro-format DEFINITION block inside
+it, so a target that renders the charter gets the gate that keeps that block honest. It is in the
+default selection; decline it by naming a selection that omits it.
+
+Wire the leg into your gate runner and CI as `micro-format definitions`, running
+`bash {prefix}/check-microformats.sh <playbook>` — the argv the descriptor declares, with
+`{prefix}` resolved to your install prefix. The token form is deliberate: a literal `tools/` path
+here would raise this file's carried-prefix count and red `install-prefix`.
 
 <!-- govkit:entry memory-tree -->
 ## 3 — Adopt the memory-tree kit (if chosen in §0)
@@ -510,8 +522,8 @@ exits 0, so an installed-but-undeclared kit is a legal state rather than a red.
    byte-compares, so an edit nobody re-rendered reds.
 4. `bash <project>/tools/lexicon/adopt-lexicon.sh --check` — the drift mode, green when the conf
    parses, the stamp is present and the Skill is in sync. `govkit apply` emits two gate legs
-   (`lexicon naming predicates`, `lexicon wiring`); a `cp -r` install wires them into your own gate
-   runner by hand.
+   (`lexicon naming predicates`, `lexicon wiring`), and so does `govkit update --write`; a `cp -r`
+   install wires them into your own gate runner by hand.
 5. Commit `tools/lexicon/`, `.lexicon.conf`, the two waiver registries and
    `.claude/skills/lexicon/SKILL.md` as one landing. Pin the Skill to LF — it is a rendered artifact
    its own gate byte-compares.
@@ -534,9 +546,8 @@ from §2). Write the manifest to one of those paths so it resolves.
    where work state is READ from, e.g. the generated `memory/LIVE.md`) · the environment traps. Fill the
    **`manifest-audit` block** per the template's Customize notes: `watch` = the pathspecs the gate/layout
    claims derive FROM (never lockfiles; ≤~8); `verify-paths` = the 2–3 tracked anchors; stamp
-   `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha (HEAD on the
-   default branch, else `git merge-base <remote>/<default> HEAD`; no remote →
-   `git merge-base <local-default> HEAD`); `registry` = the repo-relative file whose first table
+   `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha per the stamp
+   rule those notes state; `registry` = the repo-relative file whose first table
    under `## Node registry` names the project's nodes (the charter from §2 when the playbook is
    adopted) — the checker's `--card` verbs resolve the session's node from its Machine/user
    column; tag claims whose truth lives in another repo
@@ -762,6 +773,16 @@ condition is a defect in a gov-authored descriptor, not something you can fix in
 write — so a first install is not warned about being new.
 
 If you see one, it is gov's to fix: either the leg is withdrawn or the file starts shipping.
+
+### The leg rows gov emits are gov's to rewrite
+
+A gov-side change to a leg — a new `argv`, a different guard — is a new vintage and is **delivered**,
+not refused, however far it has moved from what you hold. Do not answer a newly red leg by editing
+its row in your own manifest: that row's NAME is one the receipt claims, so the next `apply` or
+`update --write` compares your row against what the receipt records, reports drift naming the leg,
+and withholds the whole manifest rather than writing half of it against a file it cannot grade. Put
+the row back as gov wrote it, and take the argument you wanted through the leg's own flags or through
+a leg of your own under a name gov does not emit.
 
 ### Before any of that: how much of each kit did this tree actually take?
 
@@ -991,11 +1012,25 @@ it.
 ### A check your project needs and gov does not have
 
 Do not edit a kit engine. Write the check as your own script, in your own tree, and register it as a
-leg in your gate manifest — `govkit apply` leaves a leg it does not own alone.
+leg in your gate manifest — `govkit apply` leaves a leg it does not own alone, and so does
+`govkit update --write`.
 
 Measured, not assumed: a fixture whose manifest held one project-authored leg came out of `apply`
 holding 23, the project's row byte-identical. The run reports nothing about it, so silence is the
 success case.
+
+### Gate legs arrive on the safe verb too
+
+`update --write` emits them, from the same implementation `apply` uses. That closes the gap where a
+leg gov newly declared over a file you already hold reached you only when you re-ran the verb that
+overwrites engine bytes unconditionally — the population is the kits your receipt claims, narrowed
+by `--kits`, so a kit whose bytes did not move this run still gets its legs. Two exceptions, both
+deliberate: a kit whose writes the verify pass rolled back gets none, because its engine went back
+with them; and a read-only `update` emits nothing at all, because it wrote nothing else either.
+
+If your runner file is malformed when the step is reached — hand-edited, or truncated by something
+else — the run says so by name and emits nothing, keeps every byte it already wrote, and does not
+re-stamp the receipt. Restore that file from your own history and re-run.
 
 Two limits worth knowing before you hit them. Give the leg a **ceiling**, because the runner reds one
 that arrives without it. And pick a name gov does not use: a collision makes `apply` exit 2 *after*
@@ -1007,14 +1042,156 @@ kit's own README.
 
 ## Maintenance
 
+### The orders `update` leaves under `.governance/outbox/`
+
+`update-declined-red-<kit>.md` means that kit's own `[check]` went green-to-red across this run and
+the cause was a render step **this run declined**, not the bytes it wrote: nothing was rolled back,
+the writes stand, the receipt is not re-stamped, and its first sentence names the declined step to
+fix — a missing `[[regenerate]]` argv, or the `GOVKIT_RERENDER=0` that declined a step `update`
+otherwise runs by default. Its siblings are
+`update-rollback-<kit>.md`, where this run's writes really were reverted, and
+`update-preexisting-red-<kit>.md`, where the kit was red before the run started.
+
+When the LAST kit declaring an `[[lf_pin]]` leaves a target — dropped from `kits`, or its descriptor
+retired the pin between vintages — `update` reports `pins-withdrawn` rather than `pins-moved`, and
+under `--write` it REMOVES gov's marked region from your `.gitattributes` and drops the matching row
+from the receipt. Both halves go together on purpose: the region without the row leaves gov's bytes
+in a repository gov no longer claims, and the row without the region leaves the next `check` reading
+a block that is not there. Nothing outside the marked region is read or rewritten, so a
+`.gitattributes` you also maintain by hand keeps every line of its own, byte for byte. A read-only
+run says `REMOVED` in so many words before any of it happens.
+
+**Uncommitted edits to `.gitattributes` outside gov's marked region now stop a write.** Both writing
+verbs already refuse when a path your receipt claims is uncommitted, and that file is one it claims:
+gov writes its pin block there, stages it, and a rollback restores the pre-run index entry over it,
+so an uncommitted line of your own would go with it. Commit or stash that edit and re-run. Edits
+INSIDE gov's block are not counted — gov rewrites that region on every run and reports it as
+`pins-moved` — so the ordinary state straight after an `apply` still proceeds.
+
+**A receipt path that leaves your repository is reported as a receipt defect, and there is nothing to
+stage.** `update` grades every path its receipt claims for containment before it asks anything about
+your index, so a row carrying `..` or a drive letter is refused by name, naming the row that supplied
+it. That refusal is the one you want: the untracked-shadow refusal above would tell you to `git add`
+the path, and git answers that a path outside the repository cannot be added. Fix the row in
+`.governance/install.json`, or the `prefix` in `.governance/deploy.toml` that produced it.
+
+### `role-moved` — gov changed its mind about who owns a file
+
+A row lands under a role, and a later vintage of gov's descriptor can declare that same destination
+under a different one — most often moving a file gov used to supply into your project's own keeping.
+`update` re-resolves every row's role against the descriptor as it stands, at every receipt schema,
+and prints `role-moved` naming the role the row landed under, the role gov declares today and the
+path. **Nothing is written for such a row and nothing in your receipt changes**, with one exception
+named below. The two rules disagree about who owns those bytes, so the file on disk is exactly as
+you left it — including a destination you have edited or emptied, which an older gov would have
+restored from its own copy. There is nothing to undo and no order to read. `govkit apply` re-records
+the row under the role the descriptor declares now, which is the verb a role change belongs to, and
+the line stops appearing.
+
+**The exception is the move where standing back would protect nothing.** Where the role gov now
+declares is served by that kit's own re-render — the argv an `update` runs for every kit it touches —
+skipping the row does not stop that argv. It removes only gov's half of the same run, the half that
+compares your copy against both vintages and refuses when the three-way conflicts, so the render
+lands on your edit with nothing in the run naming it. Such a row therefore keeps the disposition it
+landed under: it is graded, reconciled and written like any other row of the role it landed under,
+and the move is said on a line of its own rather than in place of that row's verdict. A move to a
+role that writes nothing — your project's own keeping, a file your own tooling generates — stands
+back exactly as described above.
+
+One exception, and it is deliberate: on a receipt still at schema 1 the same disagreement REFUSES
+the row instead. A schema-1 receipt is known to stamp roles its own descriptor contradicts, so
+neither answer can be trusted there and acting on either would be a guess.
+
+**`update-conflict-*.md` orders are REAPED, and they are the only family that is.** A conflict order
+records a STATE — this row still conflicts — which every run re-derives from scratch, so an order
+left standing after the conflict is resolved is a lie the operator keeps reading. An unscoped
+`update --write` therefore removes every conflict order it did not itself write this run, unstages
+each one from your index alongside the file, and prints the count and the names. The count prints
+even when it is zero. Nothing else is touched: a withdrawal, rollback, preexisting-red or
+declined-red order records an ACTION, and the row it belongs to has LEFT the receipt, so no later run
+could re-derive it — and `apply`'s machine and hole orders are recorded in your receipt's `orders`
+list, which `check` asserts against disk.
+
+**A run carrying `--kits` reaps NOTHING and says so in one line.** A scoped run classifies only the
+named kits' rows, so an order belonging to a row it never looked at is not stale — it is unexamined,
+and removing it would destroy the only record that that row is still conflicted. Widen the scope, or
+run unscoped, if you want the outbox tidied.
+
+**A scoped run guards exactly the rows it can write, which is why it and a full run can disagree
+about one target.** The refusal over a file that is present in your worktree and missing from your
+index covers the named kits' rows only: a row outside the scope is never classified and never
+written, so nothing there can be clobbered and nothing there is refused over. Gov's own
+`.gitattributes` row belongs to no kit, so a scoped run neither rewrites its LF-pin block nor stands
+in front of it; run unscoped to get both. The separate refusal over **uncommitted bytes** at a
+claimed path is not scoped and never was — it protects work you have not committed, which a rollback
+can destroy whichever kits this run named.
+
+The first unscoped `--write` after you pull this vintage will remove every conflict order written by
+an earlier one, because those carry the old filename key. Any whose conflict is still open is
+rewritten by the same run under the new key before the reap runs, so you are never left without one.
+
+A rollback order that names `.gitattributes` among its restored paths is not a mistake. Where this
+run rewrote govkit's own LF-pin block, that block goes back with ANY kit's rollback, because it is
+rendered from every claimed kit's pins at once and so belongs to no single one of them. A run that
+rolled one kit of six back therefore restores a block the other five still want; the fix is the next
+`update --write`, which re-renders it from the pin set that survived.
+
+A `NOT restored <path>` line in a rollback order means your git refused the call that would have put
+that path back — the line names which call — so the rollback is PART done and its receipt row was
+deliberately left at this run's values rather than reverted, because a row claiming a pre-run state
+the tree does not have is what makes the next run classify from bytes that are not there. The repair
+is yours and the order is the only record of it: the next `update` sees that row at this run's
+vintage and will not re-offer the work. Where `git checkout-index` is the call that refused, the
+index was already reverted to the pre-run blob before it ran, so `git status` shows a change at that
+path you did not make.
+
+Where the path was one this run WITHDREW — a `--write-withdrawals` run, whose rollback then could not
+put the deleted file back — the line says so instead, and says that its receipt row was KEPT rather
+than dropped. A completed withdrawal drops the row; one the rollback left half-undone must not,
+because that row is then the only thing naming bytes the target still holds. Expect the path to
+appear in `git status` and expect the next `update` to classify it from where it actually is.
+
+### `gate-lint` withdrew its seeded registry — a receipt already carrying that row keeps it silently
+
+The tree-scan leg used to read a registry gov SEEDED under `{memory_root}/project/`. That rule is
+gone: the leg's argv names no registry, and the scanner's registry argument is now optional — absent
+means an empty declaration, and a path that was supplied and does not resolve is a refusal. Check 3
+of the memory-tree hygiene gate treats that directory as a closed name set, so the seed was shipping
+a red gate to anyone who cannot widen their own case list, and a FORKED checker takes a widening
+never.
+
+**`update` will not tell you.** The row's role is `seed`, `UPDATE_ROLE` maps `seed` to
+`report-reseed`, and the seed branch in `update`'s disposition loop rewrites any surviving verdict to
+`current` or `patched`. Its only exemptions are `missing` and `renamed`, and a withdrawal grids to
+`withdrawn` — so a row gov no longer ships reads as `current` in every future run, and no order
+names it. That override is deliberate and this release does not change it: widening its exemption set
+re-adjudicates every seed row in every receipt, a verdict change on a population nothing here has
+measured.
+
+**So the step is manual, once, and only for a receipt written before this vintage.** That is inCMS
+core and NicoCares, the two trees carrying an installed copy of this kit.
+
+1. Pull the kit as usual.
+2. Delete `substitution-fed-loops.txt` from the `project/` directory under your `memory_root`, and
+   delete its row from `.governance/install.json`. Nothing reads either one from this vintage on.
+3. If you had rows in that registry they were always yours — the shipped copy was empty — so carry
+   them to wherever your scanner now reads its declaration from before you delete the file.
+4. Your own gate manifest still carries the old argv element naming that file. Leg rows arrive as an
+   order under `.governance/outbox/`, not as a write, so nothing removes it for you; drop it when you
+   apply that order, or the scan refuses a path that no longer resolves.
+
 ### The build harness is rendered from review-harness 1.8 — migrating a receipt that rows it as an engine file
 
 Before review-harness 1.8, `unattended-build.js` shipped as an engine file, so a receipt written
 then rows `<kit>/unattended-build.js` with role `engine`. From 1.8 it is `rendered` from
-`unattended-build.template.js`, and **`update` does not move the row**. It takes each row's role
-from the receipt and re-resolves it only below receipt schema 2, so on a schema-3 receipt it writes
-gov's own render, which spells gov's `tools/` layout, over yours. Every later run then grades that
-row as an engine file, and a correct render reads as a local edit. This needs govkit 1.11 or later,
+`unattended-build.template.js`, and **`update` does not move the row**. It re-resolves every row's
+role against the descriptor at every schema, but a destination whose NEW role is served by that
+kit's own re-render keeps the disposition it landed under — standing back would not stop the
+re-render, only gov's reconciliation of it. So on a schema-3 receipt the row is still graded as an
+engine file: with no local edit `update` writes gov's own render, which spells gov's `tools/`
+layout, over yours, and with one it reports a three-way conflict, leaves your copy in the index and
+writes an order. Every later run then grades that row as an engine file, and a correct render reads
+as a local edit. This needs govkit 1.11 or later,
 which lands a new template BEFORE it re-renders; an older govkit refuses the render with
 `missing shipped copy`.
 
@@ -1415,8 +1592,8 @@ regenerated, describes that vintage and no other.
 - A render whose kit declined its regenerate keeps the bytes of the vintage it was rendered at, so
   it stays unpinned. Pinned to the new vintage, it would record stale bytes as current, and the
   next update would grade it `patched` rather than `re-rendered`. Pinning it to the receipt's old
-  stamp is true only when that stamp is the vintage it was rendered at, which a flag-off update or
-  `--allow-ungraded` can break, so that is an assertion you make by hand and never a default.
+  stamp is true only when that stamp is the vintage it was rendered at, which a flag-off update can
+  break, so that is an assertion you make by hand and never a default.
 - A rendered destination is never pinned to a recorded commit. After a conflicted step 1 that
   commit predates the template, and `adopt` refuses a pin naming a base gov does not hold.
 - Block rows (`merged`, `attributes`) are left to `adopt`, which re-synthesizes them and prints no
@@ -1467,11 +1644,14 @@ receipt back.
 every row blocks 1 and 2 did not flag keeps the attribution it had. The next `update --write` writes
 nothing to the harness. It either re-stamps, or it withholds the stamp over exactly the rows block
 2's last line counted, and says how many. That withheld stamp is the migration's end state, not a
-fault in it. **Do not answer that message with the bare `adopt --re-adopt --write` it suggests.**
-That is the unpinned re-adopt, and it drops the harness's `pinned` evidence and every edited row's
-base. Re-running the migration does not clear the message either, because it measures the same
-rows the same way. Pass `--allow-ungraded` to `update` knowingly, or live with the
-withheld stamp. Every row of a kit outside the scope keeps its base, and the re-adopt stamps each
+fault in it. The message names `adopt --re-adopt --pin <path>=<rev> --write`, and that IS the form to
+run. **Do not answer it by dropping the `--pin`.** The bare `--re-adopt --write` is the unpinned
+re-adopt: it drops the harness's `pinned` evidence and every edited row's base, and it re-walks the
+same bytes to the same answer. Re-running the migration does not clear the message either, because it
+measures the same rows the same way. Pin the rows it counted, or live with the withheld stamp; there
+is no override, and `DEPL-cMendedVintage-4` retired the one there used to be, because its only
+effect was to advance the base those rows must be attributed FROM. Every row of a kit outside the
+scope keeps its base, and the re-adopt stamps each
 row with its kit's version at the vintage its bytes come from, so `update`'s per-kit delta still
 reads that kit behind rather than `level`. Before govkit's re-adopt did that, NicoCares' re-adopt
 stamped memory-tree's rows 2.69 over bytes at 2.68. Blocks 2 and 3 are run again only to recover

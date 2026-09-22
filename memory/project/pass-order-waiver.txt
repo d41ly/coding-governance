@@ -28,7 +28,12 @@
 # after the code, in the same session, and both went into one commit. It was not rewritten into a
 # spec-first order, because that would record an authoring order that did not happen. The owner chose
 # to land it as it is, 2026-09-12. Its own acceptance ledger says the same.
+#
+# THE FOURTH ROW IS THE THIRD'S KIND. TOOL-dMergedTally-1 was built and committed as Tier-1, then
+# re-tiered to Tier-2 because the file it changes ships to adopters, so its spec came after the code in a
+# later commit. The owner chose to land it as it is, 2026-09-16, rather than rewrite the order.
 
 DEPL-dGaugedVintage-12	spec and product code in one commit (9ba3757d); landed 2026-09-01, before the leg graded run-state-free builds
 DEPL-dGaugedVintage-13	spec and product code in one commit (34492bb6); landed 2026-09-01, before the leg graded run-state-free builds
 TOOL-dMuffledSentinel-1	spec written after the code, both in one commit (a3b4ca1e); seen by the leg before landing and landed as-is by owner decision 2026-09-12
+TOOL-dMergedTally-1	spec written after the code (built at ff8f1a4c, spec at a8bc2230) when the unit was re-tiered to Tier-2; seen by the leg before landing and landed as-is by owner decision 2026-09-16

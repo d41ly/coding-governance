@@ -82,6 +82,22 @@ owner = "lexicon"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--scaffold"]
 mutates_index = false
 
+# THE RE-RENDER an `update` runs by default; GOVKIT_RERENDER=0 declines it. It rewrites what the
+# `rendered` rule above declares, from `SKILL.template.md` plus the target's own declaration — content derived
+# from the adopting tree rather than copied from gov's, which is what makes it go stale.
+#
+# `--render` AND NOT THE `[adopt]` ARGV, which is the whole reason this block exists. `--scaffold`
+# REFUSES once a declaration is present, so re-running the adopter against an adopted tree cannot
+# refresh anything. `--render` skips the derivation, reads the declaration already on disk and
+# re-runs `write_skill` over it. Safe to re-run for the same reason: it writes that one destination,
+# derives no table, measures no pin, and leaves the conf and both waiver registries untouched.
+# WHY THE BLOCK EXISTS AT ALL: `.claude/skills/lexicon/SKILL.md` is this kit's one `rendered`
+# row and its `--check` byte-compares it against a fresh render, so before this block an update
+# that moved the template ran no render at any GOVKIT_RERENDER setting and left that check red at
+# every adopter — measured at two, where it rolled the whole kit back (TOOL-dRetiredFork-29).
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-lexicon.sh", "--render"]
+
 [check]
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 
@@ -93,6 +109,37 @@ argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 code = 0
 probe = { must_exist = ".claude/skills/lexicon/SKILL.md" }
 means = "adopted"
+
+# AN ACCEPTED STOP, not a failure. The argv above exits 1 with `no .lexicon.conf; nothing to render
+# from` against a target that holds this kit and has never declared, and that is a POSTURE rather
+# than a fault: there is no table to render from, so there is nothing for the run to repair. Without
+# `ok = true` here `outcome_accepted` refuses the exit, the receipt is not re-stamped, and a kit that
+# correctly declined is reported as an unaccepted failure — the rollback-by-decline class.
+#
+# THE `must_exist` TERM IS WHAT MAKES THIS A POSTURE AND NOT A CRASH, and it is here because without
+# it a FAILED FIRST SCAFFOLD was shape-identical to the accepted state: `--scaffold` also exits 1
+# with the conf still absent when the derivation fails, because the conf is precisely what the
+# failing run was trying to write. An acceptance declared by an ABSENCE alone is satisfied by every
+# run that died before writing. The Skill is the discriminator that exists: `apply` never lands it
+# (`rendered` is not a LANDABLE role), so only the adopter writes it, and it is written in the same
+# `--scaffold` run as the conf. Skill present with no conf therefore means a declaration that was
+# REMOVED after a successful adopt, which is the posture; neither present means the adopter never
+# got through, which is a fault. DEPL-cMendedVintage-16, over the block DEPL-cMendedVintage-5 added.
+#
+# WHAT IT DELIBERATELY DOES NOT COVER: a target that holds this kit and has never run the adopter at
+# all — a `cp -r` copy-install, or a run whose CONFIGURE never happened — declines the same way and
+# is now REFUSED rather than accepted. That state is byte-identical to the failed install, so no file
+# probe can separate them, and this block chooses to red the rarer one. Under `govkit apply` it is
+# not reachable anyway: this kit declares no `blocks_adopt` hole, so CONFIGURE always runs.
+#
+# AND THE PROBE IS STILL NOT SCOPED TO ONE STEP: `classify_outcome` reads this list for every argv
+# this descriptor declares, so `apply`'s CONFIGURE consults it too. That is why the narrowing had to
+# happen here rather than only on the re-render path — the hole was open on an adopter-facing verb.
+[[outcome]]
+code = 1
+probe = { must_exist = ".claude/skills/lexicon/SKILL.md", must_not_exist = ".lexicon.conf" }
+means = "no-project-layer"
+ok = true
 
 # The conf itself is deliberately NOT a guard pathspec. govkit partitions every guard into declared
 # classes — memory-root-relative, verbatim-repo-root, renamed, exempt, kit-relative — and a root-level

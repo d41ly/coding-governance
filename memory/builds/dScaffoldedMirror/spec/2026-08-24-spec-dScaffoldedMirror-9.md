@@ -33,10 +33,25 @@ this kit's history that a ceiling edit could violate.
 - **S5** — one commit deletes all three `*_OFFENDER_PIN` keys from `.lexicon.conf`, `PIN_KEYS` from
   `lexicon.py`, the `lexicon-pins` hole from `kit.toml`, and `-5`'s three `RATCHETS` rows from
   `drift_signals.py`, and adds the assert that a `RATCHETS` row names a live key.
+  - **Readers:** by name: `tools/lexicon/lexicon.py` maps the live pin keys in its key table and
+    compares them, `tools/lexicon/kit.toml` declares the pin hole, `tools/lexicon/selftest.py`
+    asserts that every key of that table is scaffolded, `tools/drift-audit/selftest.py` writes the
+    verb and suffix pins into its fixture confs, and `tools/lexicon/README.md`,
+    `tools/lexicon/LEXICON.md`, `tools/lexicon/adopt-lexicon.sh` and
+    `tools/drift-audit/drift_report.py` spell the keys in their prose. The three ratchet rows the
+    item names were never written, because the unit that proposed them closed without landing.
+    by value: `tools/lexicon/lexicon.py` compares the unwaived count against the pin's number on
+    every run.
 - **S6** — the same commit deletes about 70 lines of pin archaeology from `.lexicon.conf`.
+  - **Readers:** by name: no name leaves the tree; the deleted lines are comments. by value:
+    NO VALUE READERS — every program reader of the conf skips its comment lines, and the one arm
+    that reads its comment text reads other rows.
 - **S7** — a `--freeze` verb that writes the set once, refusing on an empty `ratified` stamp, and a
   `--drain` verb that deletes every grandfathered key which is no longer an offender. `--drain` can
   only delete, so it cannot absorb.
+  - **Readers:** by name: nothing tracked is withdrawn; the item adds two verbs the tree does not
+    carry. by value: NO VALUE READERS — the item adds two verbs the tree does not carry, and what
+    the drain verb deletes waives nothing by its own predicate.
 - **S8** — the three multiplicity keys are RENAMED rather than carried:
   `tools/memory-recall/bench.py::enc` (3 occurrences), `tools/memory-tree/gen_build_index.py::_rec`
   (2) and `tools/govkit/selftest.py::scratch_gov` (2). Verified today: 463 occurrences over 459

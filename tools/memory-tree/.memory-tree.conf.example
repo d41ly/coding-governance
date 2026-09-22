@@ -139,6 +139,20 @@ SPEC_LEGLINE_CUTOFF=""
 # hand for the same reason as the row above: the example-parity arm cannot see this key.
 SPEC_DIRECT_CUTOFF=""
 
+# Guarded-leg ratchet, read by the spec-tokens checker rather than by the hygiene engine: from this
+# date a LIVE spec's §7 leg line must name every leg in your gate manifest whose `guard` any
+# backticked path under the spec's §4 `### Files touched` sub-head trips (the exact path, or under
+# the guard as a directory; a directory token of two or more segments is a declared prefix and trips
+# symmetrically, a one-segment root such as `tools/` is prose and declares nothing). BROAD guards —
+# carried by more than the checker's `BROAD_LEG_FLOOR` legs, whatever their depth — are excluded and
+# listed by `--list` as near-misses, and the excluded set prints with its counts on every run; a leg
+# with no `guard` key is never owed; a spec with no Gates heading is not joined. Set it strictly
+# past your corpus as with the two above; the checker refuses a committed value not strictly past
+# the day it was committed.
+# Blank = never required, and the report line then counts the live specs carrying such an omission.
+# Declared here by hand for the same reason as the rows above: the example-parity arm cannot see it.
+SPEC_GUARD_LEGS_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.
@@ -177,8 +191,8 @@ DEAD_PATH_PIN=""
 # every file in its class, which reads as a misconfiguration rather than an intent.
 INDEX_CAP_BYTES="20480"         # a row document: an index a curation sweep prunes
 INDEX_CAP_LINES="250"
-GUIDE_CAP_BYTES="61440"         # a guide: prose the charter points a session at, read end to end
-GUIDE_CAP_LINES="750"
+GUIDE_CAP_BYTES="98304"         # a guide: prose the charter points a session at, read end to end
+GUIDE_CAP_LINES="1200"
 BUILD_README_CAP_BYTES="25600"  # a build README: generated regions plus one bounded authored block
 BUILD_README_CAP_LINES="0"
 # Codebase-map dossiers, when that kit is adopted under this tree. Kept TIGHTER than the row cap on

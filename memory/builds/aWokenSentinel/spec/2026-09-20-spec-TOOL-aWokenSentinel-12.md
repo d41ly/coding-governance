@@ -1,0 +1,269 @@
+# TOOL-aWokenSentinel-12 — the resume tick consults login BEFORE it kills: a logged-out node kills nothing
+
+**Status:** CLOSED · rev-4 · 2026-09-21 · node a · Tier-2 · base 12b3701d · streams tooling · order 12
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-12-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-12-1-acceptance-ledger.md) | journal | — |
+| [2026-09-20-prompt-TOOL-aWokenSentinel-12-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-12-1-build-brief.md) | journal | — |
+| [2026-09-21-prompt-TOOL-aWokenSentinel-5-2-fold-brief.md](../prompts/2026-09-21-prompt-TOOL-aWokenSentinel-5-2-fold-brief.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-7 |
+| [2026-09-21-prompt-TOOL-aWokenSentinel-5-3-fold-brief.md](../prompts/2026-09-21-prompt-TOOL-aWokenSentinel-5-3-fold-brief.md) | journal | TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
+| [2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 |
+| [2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md](../reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md) | diff-review | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 |
+| [2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round2.md](../reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round2.md) | diff-review | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+Close audit finding H4 (round 1, raw id 22): `TOOL-aWokenSentinel-5`'s decision table put the tree
+kill on `STALE` with `pid-alive: yes` BEFORE the login row, so on a node whose CLI is logged out the
+tick's first act is `taskkill //T //F` on the recorded pid's tree and its second is to print that it
+cannot resume the run — a killed session with no resumer, on the false-`STALE` case spec 2's M8
+makes likely, and a harm spec 5 §5 described as "duplicated work". This unit fixes the order of the
+two acts and proves it: the login row precedes the kill row, a logged-out node kills nothing, the
+arm that observes it starts a live process and asserts it survives, and the class — a destructive
+step ordered before the precondition that makes it useful — is left-shifted into `memory/gotchas/`
+so the next out-of-process killer in this repo reads it before it is written.
+
+## 2. Scope (IN)
+
+- **S1** — In `tools/unattended/resume-tick.sh`, for a `STALE` run under the attempts cap, the
+  order of acts is: consult `claude auth status`; on not-logged-in print the announced SKIP line and
+  do nothing else; only then, on `pid-alive: yes`, kill the tree; then append the attempt line and
+  launch. Spec 5's decision table is folded at its rev-2 to this order and cites this unit; unit 5
+  builds the tick in this order at its own pass, and this unit's diff is the proof and the class.
+  Observed by AC1 and AC3.
+- **S2** — The arm: the fixture of spec 5 AC4 (a background `sleep 300` whose Windows pid is
+  recorded as `pid:`) run with `STUB_LOGGED_IN=false` — the tick prints the SKIP line, the sleep is
+  still listed by `tasklist` afterwards, the stub's log shows `auth status` and no `-p`, and no
+  attempt line is written; observed RED first against a tick copy with the two calls swapped.
+  Observed by AC1.
+- **S3** — Spec 5 §5's risk row is corrected at its rev-2: a logged-out node kills nothing; the
+  false-`STALE` harm is a kill-and-resume of a healthy session on a logged-in node, bounded by
+  `RESUME_STALE_BOUND`. Observed by AC2.
+- **S4** — A new class in `memory/gotchas/`, `destructive-step-before-its-precondition.md`, in
+  that folder's grammar — front matter `name`, `description`, `kind: class`, and a body whose
+  backticked paths are its DERIVED anchors — naming the files where this repo's out-of-process
+  killers live, so `gotchas.py --for-diff` selects it for any diff touching one. The body names
+  its gate with the phrase check 18 reads (`gated by` the arm of S2), and `memory/gotchas/INDEX.md`
+  is regenerated by `gotchas.py --write` in the same commit, which check 17 compares. Observed by
+  AC4.
+- **S5** — The tick's header carries the sentence `a logged-out node kills nothing`, as this
+  unit's edit, unconditionally: unit 5 builds the order and states it in its own spec, and this
+  unit writes the one sentence in the file that AC2 reads. Observed by AC2.
+
+## 3. Non-goals (OUT)
+
+- **No change to the kill itself.** `taskkill //PID <pid> //T //F` under MSYS and the `pgid` form
+  elsewhere are spec 5 S5's; this unit moves the call, not its bytes.
+- **No change to the login probe.** The `"loggedIn":[[:space:]]*true` grep and its `timeout 60`
+  bound are spec 5 §4's.
+- **No in-flight guard.** Spec 5 §4 states its ceiling; this unit changes one ordering.
+- **No `--dry-run` change.** Dry-run already probes nothing and kills nothing.
+
+### Edges
+
+- **consumes-from** `TOOL-aWokenSentinel-5` — the tick, its decision table, the stub `claude`
+  with `STUB_LOGGED_IN`, and the AC4 fixture whose live `sleep` this unit's arm reuses; and,
+  through unit 5's own edge on unit 2, `pid-alive: yes` on the recorded pid, the row's
+  precondition. Without the tick there is no order to fix.
+- **hands-off** external — the process-monitor kit's per-row reaper as the upgrade path for a
+  survivor, which spec 5 §4 names as its ceiling.
+
+## 4. Design
+
+### The order, per `STALE` run under the cap
+
+| step | act | on failure |
+|---|---|---|
+| 1 | `check_login` — `claude auth status` bounded by `timeout 60`, grep for `"loggedIn": true` | print `SKIP — the CLI is not logged in on this node; nothing can resume <slug>`, exit 0 for this run, kill nothing, write nothing |
+| 2 | `run_kill_tree` when `pid-alive` is `yes` | as spec 5 S5 |
+| 3 | append the attempt line, `run_detached` the launcher | as spec 5 S7 |
+
+The decision table in spec 5 §4 at rev-2 reads, for the last three rows: `STALE · under the cap ·
+any · not logged in → SKIP`; `STALE · under the cap · yes · logged in → kill the tree, then the
+row below`; `STALE · under the cap · any · logged in → append, launch`. One row moved, and the
+login probe becomes the first thing a resumable `STALE` run costs, which is the right order for a
+probe that decides whether anything after it can happen.
+
+### The arm
+
+Spec 5 AC4's fixture starts `sleep 300` in the background, waits until `ps -p $!` names `sleep`,
+and records that row's `WINPID` as `pid:`. This unit's arm runs the same fixture with
+`STUB_LOGGED_IN=false`: the tick prints the SKIP line; `tasklist //FI "PID eq <pid>"` afterwards
+lists the sleep, which the arm then kills itself; `stub.log` carries `auth status` and no `-p`; the
+sidecar has no line. Against a tick copy with the two calls swapped the sleep is gone and the arm
+is RED, which is the observation that makes it an arm rather than a comment.
+
+### The class, in `memory/gotchas/`
+
+One file in the folder's grammar: front matter `name: destructive-step-before-its-precondition`,
+a one-line `description`, `kind: class`; the body states the class — a destructive step ordered
+before the precondition that makes it useful — the instance, this tick's kill-then-login order as
+specced at rev-1, the remedy in one sentence: order the precondition's probe first, and make
+the arm observe the precondition failing with the destructive target still alive; and the gate
+sentence check 18 requires of a `kind: class` record — `gated by` the logged-out arm in the tick's
+suite — because a class that names no gate and does not say it has none reds
+`tools/memory-tree/gotchas.py --check` at the close. `memory/gotchas/INDEX.md` is the render of
+the folder and is regenerated by `gotchas.py --write` in the same commit, or check 17 reds. Anchors are
+DERIVED by `tools/memory-tree/gotchas.py` from the backticked path-like tokens in the body, never
+declared, so the body cites the files where this repo's killers live —
+`tools/unattended/resume-tick.sh`, `tools/process-monitor/reap.py`, and the driver's `run_bounded`
+in `tools/unattended/unattended.sh` — and `--for-diff` prints the class over any diff that touches
+one of them. A kill written in a file the body does not name is not selected, which the record
+says in its own text: the catalogue anchors by path and cannot read a verb.
+
+From rev-3 the record carries a SECOND INSTANCE of the class (closing review id 2): the kill's
+target was a pid, and `pid-alive: yes` proved only that some process held the number — after a
+reboot, a recorded event on this fleet, the owner's next process; on a second node, whatever holds
+that number there. The precondition the kill needs, that the number IS the run's process, was
+never probed. The record names the remedy the fold built — the lease's `host` and `pid-image`
+facts (unit 1), the image match in `check_pid_alive` (unit 2) and the tick's foreign-host stand-off
+(unit 5) — and its Gating paragraph names the arms that observe it beside this unit's own.
+
+From rev-4 the record states the two residuals the image left and their one closure (closing
+review round 2, defects A and E): a pid recycled to the SAME image passed the match, and the pid
+the tick launched was probed and killed by number with no image at all — the fold that guarded
+the recorded pid shipped a second kill target unguarded, the class one level up. The closure is
+the third thing the probe matches, the holder's START TIME against the stamp the pid was recorded
+under — `lease-utc` for the recorded pid, the `launched <pid> <utc> <image>` field's stamp for the
+launched one — read by `read_pid_start` in the library (unit 2's rev-6) and applied by the tick
+(unit 5's rev-6); the record names the arms that gate both. The record carries exactly ONE
+`## Where this repo's killers live` heading (rev-4: the rev-3 fold left an empty duplicate above
+the real one, and a heading-keyed reader resolved to the empty one — defect G).
+
+### Inventory
+
+| identifier | kind | cell |
+|---|---|---|
+| `memory/gotchas/destructive-step-before-its-precondition.md` | gotcha class | no cell; the folder's grammar |
+
+No function is minted; `check_login` and `run_kill_tree` are spec 5's inventory, reordered at
+their call site.
+
+### Files touched (estimate)
+
+| file | change |
+|---|---|
+| `tools/unattended/resume-tick.sh` | the call order in the `STALE` branch, if unit 5's pass did not already build spec 5's rev-2 order; the header sentence `a logged-out node kills nothing`, unconditionally this unit's |
+| `tools/unattended/resume-tick.test.sh` | one arm, the logged-out fixture with a live pid |
+| `memory/gotchas/destructive-step-before-its-precondition.md` | new, naming its gate |
+| `memory/gotchas/INDEX.md` | regenerated by `gotchas.py --write` |
+
+### Alternatives rejected
+
+- **Kill only when `--liveness` reports the transcript silent too.** A second predicate in the
+  tick, the two-answers class spec 5 §3 refuses; the order fix costs nothing and closes the finding.
+- **Leave the order and document the harm.** A documented kill with no resumer is a documented
+  defect.
+
+## 5. Production-readiness checklist
+
+- security — the kill runs strictly less often: never on a logged-out node.
+- perf / scale — the login probe runs before the kill instead of after; same count per run.
+- error / empty / loading states — a login probe that answers nothing is not-logged-in, so a
+  broken CLI kills nothing, which is the safe direction.
+- observability — the SKIP line prints before any act, as before; the arm's `tasklist` read is the
+  observation.
+- risks — a logged-in node still kills a healthy session on a false `STALE`; that is spec 2's
+  bound and unit 5's risk row, restated correctly at spec 5's rev-2.
+- testing — §6; one arm over the AC4 fixture with the stub logged out.
+- migration — N/A.
+- user docs — none; the tick's own header states the order.
+
+## 6. Acceptance criteria
+
+The fixture is spec 5 §6's scratch repo with its stub `claude`, plus AC4's background `sleep` and
+its `WINPID` recorded as `pid:`.
+
+- **AC1** — When that fixture runs `bash resume-tick.sh --repo <fixture>` with
+  `STUB_LOGGED_IN=false`, the tick prints `SKIP — the CLI is not logged in on this node; nothing can
+  resume tRun` and exits 0; `tasklist //FI "PID eq <pid>"` afterwards still lists the sleep; the
+  stub's log shows `auth status` and no `-p`; and `resume.tRun.log` does not exist. Observed RED
+  first against a tick copy with the login call and the kill call swapped.
+  Red when: the sleep is gone, which is the kill ordered before the probe; or an attempt line is
+  written, which is an attempt that could not have launched.
+  fixture: the arm's own background sleep, killed by the arm afterwards; the Windows pid read from
+  `ps`, as spec 5 AC4 measures.
+- **AC2** — When `grep -c 'logged-out node kills nothing'` runs over
+  `memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md`, it prints at least
+  1, and the same over the header of `resume-tick.sh` prints 1 at this unit's tip and 0 at its
+  base — the sentence is this unit's edit (S5), never unit 5's.
+  Red when: the tick's header states an order its code does not have, which the arm of AC1 would
+  catch only for the code and not the sentence; or the sentence has no writer, which is the
+  expected path reading 0.
+- **AC3** — When `grep -n 'check_login\|run_kill_tree' resume-tick.sh` lists the
+  call sites in the `STALE` branch, the `check_login` line number is smaller than the
+  `run_kill_tree` line number.
+  Red when: the order regressed in a later edit while the arm was skipped on a POSIX node, where
+  `tasklist` does not exist and the arm's observation takes its `kill -0` form.
+- **AC4** — When `python tools/memory-tree/gotchas.py --for-diff <base>..<tip>` runs over a
+  range that touches the tick, `resume-tick.sh`, its stdout names
+  `destructive-step-before-its-precondition`; the same tool's report mode does not list the record
+  as unanchored; `python tools/memory-tree/gotchas.py --check` exits 0 at the tip, which is check
+  17's index freshness and check 18's gate sentence together; the file's front matter parses
+  under the folder's grammar so `memory hygiene` reads it; and from rev-4 `grep -c '^## Where
+  this repo.s killers live'` over the record prints 1 (2 at the rev-3 tip), and its `## Gating`
+  region names `AC13` at least once, the tick suite's block that gates the launched-pid instance,
+  0 at the rev-3 tip.
+  Red when: the class is written but reaches no path, which the tool reports as unanchored and is
+  a gotcha nobody is shown; `--check` reds on a stale `INDEX.md` or a class naming no gate,
+  which the memory hygiene leg reds at the close for a record built as rev-1 specced it; the
+  duplicate heading stands, which a heading-keyed reader resolves to nothing; or the launched-pid
+  instance is stated with no arm named, which is a class the record says is gated and is not.
+
+## 7. Gates
+
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `unattended kit gate`
+
+These run once at `--close`. The pass runs none of them: it verifies with the tick over the fixture
+of AC1, the greps of AC2 and AC3 and the checklist run of AC4.
+
+New arm: `tools/unattended/resume-tick.test.sh` · the logged-out fixture with a live recorded pid, observed red against a tick copy with the two calls swapped · `FLOOR_ASSERTIONS` rises by the arm's executed assertions
+
+## 8. Open questions
+
+none
+
+## 9. Revision log
+
+- rev-4 · 2026-09-21 · §4 · AC4 · folded the closing diff review round 2
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round2.md`), the CONVERGED exit,
+  defects E and G and the class half of A: the record gains the two residuals the image match
+  left — a same-image recycle, and the launched pid probed by number — with their one closure,
+  the start-time compare against the stamp the pid was recorded under, and the arms that gate it
+  (unit 2's AC11 start half, unit 5's AC13 image-and-start block); the duplicate empty
+  `## Where this repo's killers live` heading is deleted; `INDEX.md` is regenerated, the record
+  now anchoring `tools/unattended/lib-unattended.sh` too. Status unchanged, CLOSED.
+- rev-3 · 2026-09-21 · §4 · folded the closing diff review round 1
+  (`reviews/2026-09-21-review-TOOL-aWokenSentinel-1-diff-review-round1.md`), id 2 (HIGH): the class this
+  unit left-shifted had a second instance in the same tick — the tree kill aimed at a pid rather
+  than at the leased process, on a fleet with a recorded reboot — so the gotcha record gains the
+  reboot case and the arms that gate it; the code is units 1, 2 and 5's at their rev-5. Status
+  unchanged, CLOSED.
+- rev-2 · 2026-09-20 · S4 · S5 · §3 · §4 · AC2 · AC4 · folded spec-audit round 2: M4 (raw
+  24) — AC2 grepped a tick header sentence neither spec wrote on the expected path, so S5 makes it
+  this unit's unconditional edit and AC2 reads 0 at base; M5 (raw 25) — the `consumes-from` on
+  unit 2 had no reciprocal, so the `pid-alive` dependency is folded into the unit-5 bullet through
+  unit 5's own edge, as spec 8 did at its rev-2; M8 (raw 41) — the gotcha record as specced redded
+  `gotchas.py --check` 17 and 18, so the body names its gate, `INDEX.md` joins Files touched and
+  AC4 runs `--check`. Order 10 → 12 for the insertions of units 20 and 16.
+- rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 1 as the
+  promotion of H4 (raw id 22).
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py "consult login before killing a process tree in a
+scheduled resumer"` returned no seam and `unscanned layers: .sh`; the one Python hit, `run_kill` in
+`tools/process-monitor/reap.py`, is the per-row reaper spec 5 §10 already read and did not take,
+for the reason stated there. The seam is spec 5's own table and its two functions `check_login`
+and `run_kill_tree`, reordered at their call site; the class file's seam is the `memory/gotchas/`
+folder and `tools/memory-tree/gotchas.py`'s selector grammar. The recall probe returned
+`TOOL-aReapedSpinner-10` (the measured `taskkill /T` hole and the reaper's header), this build's
+own audit at the H4 paragraph, and `TOOL-aReapedSpinner-13`; none records a kill ordered before
+its precondition, which is why the class is new.
+
+Recall terms used: `taskkill tree kill pid reaper login claude auth status precondition destructive order skip announced`

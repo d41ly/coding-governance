@@ -1,0 +1,7 @@
+{
+  "name": "stall-recorder",
+  "event": "StopFailure",
+  "matcher": "*",
+  "marker": "stall-recorder.js",
+  "hook_path": "{kit}/unattended/stall-recorder.js"
+}
