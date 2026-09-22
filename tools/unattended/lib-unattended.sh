@@ -21,9 +21,10 @@
 # WHAT IT HOLDS: `GIT` and its two pins; `resolve_sidecar_dir`, the one derivation of the sidecar
 # root the driver and the resume tick both read; `read_bound_key`, the one reader of a bound conf
 # key both of them call; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
-# of "which node, which process" the lease writer and both pid probes share; the anchored id tests;
-# path containment; and "has this pass committed yet". The same rule admits the resume tick as a
-# third sourcer.
+# of "which node, which process" the lease writer and both pid probes share; `parse_gate_profile` and
+# `check_gate_wall`, the one reading of the gate runner's profile the driver and the leg both ask; the
+# anchored id tests; path containment; and "has this pass committed yet". The same rule admits the
+# resume tick as a third sourcer.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -103,6 +104,78 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the 
         echo "unattended: REFUSING - $_bk_name is declared as '$_bk_val', which is not a positive integer of $_bk_unit. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
         RUNLOG_CLEAN=1; exit 2 ;;
   esac
+}
+
+# ------------------------------------------------------------------------ the gate profile, once
+# TOOL-dDerivedDocket-27 S2, S3 and S6. The runner prints its resolved profile as TAB-separated
+# key/value lines, and two readers need three of those keys: the driver bounds its bar by `wall`
+# plus `queue`, and both the driver's `--preflight` and the gate leg compare the effective wall with
+# `ceiling_max`. One parse and one comparison here, because a threshold spelled in both callers is
+# two answers to one question, and the leg is the second opinion on a number the driver acts on.
+#
+# THE KEYS ARE READ, NEVER GUESSED. A key the profile did not print, or printed as anything but a
+# plain integer, is MISSING and named in GPF_MISSING, so a caller can say which one it lacked. A
+# `wall` of 0 counts as missing too: the runner prints 0 for NO wall, and a bound derived from it
+# would be the margin alone, which kills a healthy bar. A `queue` of 0 is a real value, a turnstile
+# that never waits. `ceiling_max` may read `-`, the runner's word for a manifest declaring no
+# ceiling, and that is an answer rather than a missing key.
+#
+# NORMALISED WITH `10#`, because a value that arrives as `08` is otherwise read as a broken octal
+# literal by the first arithmetic that touches it.
+GPF_WALL=""; GPF_QUEUE=""; GPF_CEILING_MAX=""; GPF_MISSING=""
+parse_gate_profile() { # the profile command's stdout -> GPF_WALL, GPF_QUEUE, GPF_CEILING_MAX, GPF_MISSING; rc 1 when a key is missing
+  local _gp_k _gp_v _gp_w="" _gp_q="" _gp_c=""
+  GPF_WALL=""; GPF_QUEUE=""; GPF_CEILING_MAX=""; GPF_MISSING=""
+  while IFS=$'\t' read -r _gp_k _gp_v || [ -n "$_gp_k" ]; do
+    _gp_v=${_gp_v%$'\r'}
+    case "$_gp_k" in
+      wall) _gp_w=$_gp_v ;;
+      queue) _gp_q=$_gp_v ;;
+      ceiling_max) _gp_c=$_gp_v ;;
+    esac
+  done <<< "$1"
+  case "$_gp_w" in ''|*[!0-9]*) GPF_MISSING="wall" ;; *) GPF_WALL=$((10#$_gp_w)); [ "$GPF_WALL" -gt 0 ] || { GPF_WALL=""; GPF_MISSING="wall"; } ;; esac
+  case "$_gp_q" in ''|*[!0-9]*) GPF_MISSING="${GPF_MISSING:+$GPF_MISSING }queue" ;; *) GPF_QUEUE=$((10#$_gp_q)) ;; esac
+  case "$_gp_c" in
+    -) GPF_CEILING_MAX=- ;;
+    ''|*[!0-9]*) GPF_MISSING="${GPF_MISSING:+$GPF_MISSING }ceiling_max" ;;
+    *) GPF_CEILING_MAX=$((10#$_gp_c)) ;;
+  esac
+  [ -z "$GPF_MISSING" ]
+}
+
+# THE CONF CHECK, one predicate for both readers, called after `parse_gate_profile`. The EFFECTIVE
+# wall is the declared GATE_WALL, else the profile's own `wall`, because a blank GATE_WALL leaves the
+# runner's row in force. It may not sit below the largest leg ceiling the profile reports: a wall
+# below it fires on a healthy bar that dispatches that leg. rc 0 when it clears, 1 when it is below,
+# naming both numbers in GW_WHY, and 2 when there is nothing to compare, saying why. The caller
+# decides what each means; the leg announces a 2 and never reds on one.
+GW_EFFECTIVE=""; GW_WHY=""
+check_gate_wall() { # the declared GATE_WALL, blank or a positive integer -> rc 0 clears · 1 below the ceiling · 2 cannot compare
+  local _gw_w=$1 _gw_src="the declared GATE_WALL"
+  GW_EFFECTIVE=""; GW_WHY=""
+  if [ -z "$_gw_w" ]; then
+    _gw_w=$GPF_WALL; _gw_src="the profile's own wall, GATE_WALL being blank"
+    if [ -z "$_gw_w" ]; then
+      GW_WHY="GATE_WALL is blank and the profile printed no usable wall, so there is no wall to compare with the largest leg ceiling"
+      return 2
+    fi
+  fi
+  GW_EFFECTIVE=$_gw_w
+  if [ -z "$GPF_CEILING_MAX" ]; then
+    GW_WHY="the profile printed no usable ceiling_max, so the ${_gw_w}s wall cannot be compared with the largest leg ceiling"
+    return 2
+  fi
+  if [ "$GPF_CEILING_MAX" = - ]; then
+    GW_WHY="the profile reports that no leg declares a ceiling, so the ${_gw_w}s wall has no ceiling to clear"
+    return 2
+  fi
+  if [ "$_gw_w" -lt "$GPF_CEILING_MAX" ]; then
+    GW_WHY="the effective wall, $_gw_src, is ${_gw_w}s, below the largest declared leg ceiling of ${GPF_CEILING_MAX}s"
+    return 1
+  fi
+  GW_WHY="the effective wall, $_gw_src, is ${_gw_w}s and clears the largest declared leg ceiling of ${GPF_CEILING_MAX}s"
+  return 0
 }
 
 # --------------------------------------------------------------------------- processes, once

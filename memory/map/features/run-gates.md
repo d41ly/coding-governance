@@ -214,6 +214,8 @@ world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDo
 
 **An INHERITED leg is aged and owned, and a landable red is stamped apart.** Under `GATE_INHERITED_RED_MAX_AGE=<n>` each INHERITED leg runs once more at R~n and, when not red there, a first-parent bisection names the landing that introduced it; the three columns go before the reason. Under an exported `land` with every red leg aged inside the bound, `gate-inherited-green` records R and `max_age` and never touches `gate-full-green`. The pre-push hook reads the policy at the remote sha, trusts that stamp only at the same R and bound, and lands an inherited-only red on an unmoved tree. `TOOL-dDerivedDocket-24`.
 
+**`--print-profile` carries a backstop's two terms.** `queue` is `TS_MAXWAIT`, derived above the verb's exit so it never reads 0, and `ceiling_max` the manifest's largest positive ceiling by the parse's own predicate: `-` for none, absent for a manifest that will not parse. The unattended driver sizes its bar's backstop from them. `TOOL-dDerivedDocket-27`.
+
 ## Shared seams
 
 **The inlined `resolve_python` block.** Between the `>>> resolve_python` / `<<< resolve_python`

@@ -154,6 +154,9 @@ LANDER_MODE="primary"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
 GATE_BOUND="${4-3600}"
+# DECLARED for LANDER_MODE's reason above: a blank GATE_WALL NOTEs its default on stderr at every
+# verb, and the arms that read WHOLE output, or its first line, would read that NOTE instead.
+GATE_WALL="21600"
 UNIT_STALL_BOUND="${6-1800}"
 REVIEW_ROUNDS="${7-7}"
 RESUME_STALE_BOUND="${9-5400}"
@@ -6499,6 +6502,8 @@ NOCONF
 out=$(run --status tRun)
 hit "$out" "declares no GATE_BOUND, so a declared command is bounded at the kit default"
 hit "$out" "declares no UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s"
+# ...and a blank GATE_WALL keeps the runner's own wall, said so (TOOL-dDerivedDocket-27 AC12).
+hit "$out" "declares no GATE_WALL, so the unattended bar runs under the gate runner's own profile wall"
 # ...and the fourth bound's default is DERIVED from the two above it, 3600 + 1800, so the NOTE
 # reds if the derivation or either addend moves (TOOL-aWokenSentinel-2).
 same "the derived RESUME_STALE_BOUND default is announced once" "$(grep -c 'declares no RESUME_STALE_BOUND, so a run reads STALE after the derived default of 5400s' <<<"$out")" "1"
@@ -7509,6 +7514,7 @@ SELFTESTS_OWED_PATHS="kitsurface/"
 BYPASS_BAN="--no-verify"
 GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
+GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
 LEASE_STALE_AFTER="7200"
 REVIEW_ROUNDS="7"
@@ -8850,6 +8856,7 @@ SELFTESTS_OWED_PATHS=""
 BYPASS_BAN="--no-verify"
 GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
+GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
 LEASE_STALE_AFTER="7200"
 REVIEW_ROUNDS="7"
@@ -9268,11 +9275,16 @@ ih_dir=$(mktemp -d); ih_oroot=$(mktemp -d); ih_origin="$ih_oroot/origin.git"; ih
 [ "${IH_RC:-1}" = 0 ] && exit 0
 d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
 printf 'head\t%s\ntree_clean\t%s\nmanifest\ttools/gate-legs.json\n' "$(git rev-parse HEAD)" "${IH_CLEAN:-yes}" > "$d/header"
-printf 'verdict\tRED\nfailed\t1\ntree_moved\t%s\n' "${IH_MOVED:-no}" > "$d/verdict"
+ih_f=1; [ -n "${IH_SECOND:-}" ] && ih_f=2
+printf 'verdict\tRED\nfailed\t%s\ntree_moved\t%s\n' "$ih_f" "${IH_MOVED:-no}" > "$d/verdict"
 printf 'x leg\t%s\t1\t0\t%s\t%s\t%s\t%s\tstub\n' "${IH_VERDICT:-INHERITED}" "${GATE_ATTRIBUTE:--}" \
   "${IH_AGE:-3}" "${IH_OWN8:-0badc0de}" "${IH_OWNID:--}" > "$d/attribution"
+if [ -n "${IH_SECOND:-}" ]; then
+  printf 'y leg\t%s\t1\t0\t%s\t3\t0badc0de\t-\tstub\n' "$IH_SECOND" "${GATE_ATTRIBUTE:--}" >> "$d/attribution"
+fi
 echo "GATE FAIL  x leg  (exit 1)"
 echo "GATE attr  x leg  ${IH_VERDICT:-INHERITED} · stub"
+if [ -n "${IH_SECOND:-}" ]; then echo "GATE FAIL  y leg  (exit 1)"; echo "GATE attr  y leg  $IH_SECOND · stub"; fi
 exit 1
 IHB
   cat > bin/asks.sh <<'IHA'
@@ -9302,6 +9314,7 @@ LANDER_MODE="primary"
 BYPASS_BAN="--no-verify"
 GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
+GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
 LEASE_STALE_AFTER="7200"
 REVIEW_ROUNDS="7"
@@ -9437,6 +9450,17 @@ build_ih_policy "$IH_LAND"
 out=$(IH_MOVED=yes run_ih --close tRun $IHOVR)
 hit  "$out" "the bar's verdict reads tree_moved yes: the tree moved while it ran, so no verdict describes the commit being closed, whatever its attribution says"
 miss "$out" "gates-green MET over an inherited-only red"
+
+# TOOL-dDerivedDocket-27 AC13: one leg INHERITED beside one leg MIXED, under land, is UNMET with the
+# attribution lines and no hold line. The quantifier is UNIVERSAL: RED against a table copy that
+# lands when ANY red is INHERITED, which would commit LANDING over a new red.
+build_ih_policy "$IH_LAND"
+out=$(IH_SECOND=MIXED run_ih --close tRun $IHOVR)
+hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+hit  "$out" "GATE attr  y leg  MIXED · stub"
+hit  "$out" "GATE attr  x leg  INHERITED · stub"
+miss "$out" "gates-green MET over an inherited-only red"
+miss "$out" "hold · "
 
 # AC6: the replayed aStagedLane override over an OWN attribution is refused, numbered; over an
 # attribution whose every red is INHERITED it proceeds and writes its override park row.
@@ -9640,6 +9664,7 @@ LANDER_MODE="primary"
 BYPASS_BAN="--no-verify"
 GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
+GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
 LEASE_STALE_AFTER="7200"
 REVIEW_ROUNDS="7"
@@ -9894,6 +9919,242 @@ kill "$pl_bar" 2>/dev/null; wait "$pl_bar" 2>/dev/null
 
 cd "$TMP" || exit 2
 rm -rf "$pl_dir" "$pl_oroot" "$pl_out"
+
+# ================ TOOL-dDerivedDocket-27: the declared gate wall and the bar's backstop ============
+# ---- SELF-CONTAINED, for the in-place block's reason: every arm needs a conf whose GATE_WALL,
+# ---- GATE_PROFILE_CMD and GATE_BOUND it chooses, a preflight that pins the backstop from a stub
+# ---- profile, and a close whose stub bar ends the one way the arm names. The stubs are the knobs.
+# ---- `bin/profile.sh` prints `wall`, `queue` and `ceiling_max` from GWP_WALL, GWP_QUEUE and GWP_CMAX,
+# ---- each only when set, so an unset knob is a key the profile did not print. `bin/bar.sh` records the
+# ---- GATE_WALL it was handed and every run it made, then ends by GW_MODE: `ok`, `slow` (waits, prints
+# ---- the acquire line, exits 0), `queued` (hangs WITHOUT the acquire line), `running` (prints it, then
+# ---- hangs), `moved1` (TREE MOVED once, then green), `moved2` (TREE MOVED every time) or `host`. The
+# ---- hanging modes `exec` their sleep, so the process the bound kills is the sleeper itself.
+gw_dir=$(mktemp -d); gw_oroot=$(mktemp -d); gw_origin="$gw_oroot/origin.git"; gw_out=$(mktemp -d)
+(
+  cd "$gw_dir" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  git init -q --bare "$gw_origin"
+  git --git-dir="$gw_origin" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$gw_origin"
+  mkdir -p bin memory/guides
+  printf '# build method\n' > memory/guides/BUILD-METHOD.md
+  cat > bin/bar.sh <<'GWB'
+#!/usr/bin/env bash
+printf 'GATE_WALL=%s\n' "${GATE_WALL-<unset>}" > "$GWOUT/barenv.txt"
+printf 'run\n' >> "$GWOUT/runs"
+case "${GW_MODE:-ok}" in
+  ok)      echo "gate queue: acquired 2026-09-22T00:00:00Z from off"; exit 0 ;;
+  slow)    sleep "${GW_SLEEP:-12}"; echo "gate queue: acquired 2026-09-22T00:00:00Z from held"; exit 0 ;;
+  queued)  exec sleep 60 ;;
+  running) echo "gate queue: acquired 2026-09-22T00:00:00Z from off"; exec sleep 60 ;;
+  moved1)  if [ -f "$GWOUT/moved" ]; then echo "gate queue: acquired 2026-09-22T00:00:00Z from off"; exit 0; fi
+           : > "$GWOUT/moved"; echo "gates TREE MOVED — the tree changed while the bar ran, so no verdict describes it"; exit 3 ;;
+  moved2)  echo "gates TREE MOVED — the tree changed while the bar ran, so no verdict describes it"; exit 3 ;;
+  host)    echo "gates HOST — 1 leg(s) timed out twice while a spawn cost 9.0x this clone's floor; the verdict is about the host, not the subject"; exit 4 ;;
+esac
+exit 1
+GWB
+  cat > bin/profile.sh <<'GWP'
+#!/usr/bin/env bash
+printf 'name\tstub\n'
+if [ -n "${GWP_WALL:-}" ]; then printf 'wall\t%s\n' "$GWP_WALL"; fi
+if [ -n "${GWP_QUEUE:-}" ]; then printf 'queue\t%s\n' "$GWP_QUEUE"; fi
+if [ -n "${GWP_CMAX:-}" ]; then printf 'ceiling_max\t%s\n' "$GWP_CMAX"; fi
+exit 0
+GWP
+  readme tRun
+  runmd tRun "$MANDATE"
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  git push -q origin main
+  git checkout -q -b unit
+  git commit -q --allow-empty -m "unit work" --no-verify
+) >/dev/null 2>&1
+gw_unit=$(git -C "$gw_dir" rev-parse unit)
+run_gw() { ( cd "$gw_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main GWOUT="$gw_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_gw_git() { git -C "$gw_dir" "$@"; }
+read_gw_record() { cat "$gw_dir/memory/builds/tRun/RUN.md"; }
+# THE MARGIN IS READ OUT OF THE DRIVER, never retyped, so a moved constant moves every expected line.
+GW_M=$(sed -n 's/^GATE_BACKSTOP_MARGIN=\${GATE_BACKSTOP_MARGIN:-\([0-9][0-9]*\)}$/\1/p' "$SCRIPT" | head -1)
+n=$((n+1)); [ -n "$GW_M" ] || { echo "FAIL the backstop margin could not be read out of the driver, so every expected bound below is wrong"; st=1; }
+GWOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
+# A clean RUNNING-ready unit branch whose conf declares GATE_WALL, GATE_PROFILE_CMD and GATE_BOUND.
+build_gw() { # GATE_WALL · GATE_PROFILE_CMD · GATE_BOUND
+  run_gw_git checkout -qf unit >/dev/null 2>&1; run_gw_git reset -q --hard "$gw_unit"; run_gw_git clean -qfd
+  rm -f "$gw_out/barenv.txt" "$gw_out/runs" "$gw_out/moved" "$gw_dir/.git/unattended/tRun.procs"
+  cat > "$gw_dir/.unattended.conf" <<GWC
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="echo land"
+LANDER_MODE="primary"
+BYPASS_BAN="--no-verify"
+GATE_CMD="bash bin/bar.sh"
+GATE_BOUND="$3"
+GATE_WALL="$1"
+GATE_PROFILE_CMD="$2"
+UNIT_STALL_BOUND="1800"
+LEASE_STALE_AFTER="7200"
+REVIEW_ROUNDS="7"
+RESUME_STALE_BOUND="5400"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+GWC
+  run_gw_git add -A >/dev/null; run_gw_git commit -q -m "gw conf" --no-verify
+}
+# ...and the preflighted record sealed with the two attestations the close reads, committed.
+write_gw_seal() {
+  printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> "$gw_dir/memory/builds/tRun/RUN.md"
+  run_gw_git add -A >/dev/null; run_gw_git commit -q -m sealed --no-verify
+}
+GW_HAVE_TIMEOUT=0; timeout -k 1s 10 true >/dev/null 2>&1 && GW_HAVE_TIMEOUT=1
+
+# AC1: a bar that queues 12 s under a 10 s GATE_BOUND is MET, bounded by the pinned backstop whose
+# three terms are printed at preflight and again at the close. RED against the bar bounded by
+# GATE_BOUND, which charges the queue to the bar and kills it at 10 s.
+build_gw "" "bash bin/profile.sh" "10"
+out=$(GWP_WALL=5 GWP_QUEUE=20 run_gw --preflight tRun --keepalive-id k1)
+hit  "$out" "unattended: the merge bar is bounded at $((25 + GW_M))s — wall 5 + queue 20 + margin $GW_M (pinned as this run's gate-backstop fact)"
+hit  "$(read_gw_record)" "gate-backstop: $((25 + GW_M)) (wall 5 + queue 20 + margin $GW_M)"
+write_gw_seal
+out=$(GW_MODE=slow run_gw --close tRun $GWOVR)
+hit  "$out" "unattended: the merge bar is bounded at $((25 + GW_M))s — wall 5 + queue 20 + margin $GW_M (the backstop --preflight pinned)"
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+miss "$out" "did not answer within"
+
+# AC4, the driver's half: a declared wall below the profile's largest ceiling refuses at preflight,
+# naming both numbers, before any write. RED against a comparison with the profile's own wall.
+build_gw "10" "bash bin/profile.sh" "600"
+gw_before=$(git -C "$gw_dir" hash-object memory/builds/tRun/RUN.md)
+out=$(GWP_WALL=40 GWP_QUEUE=20 GWP_CMAX=30 run_gw --preflight tRun --keepalive-id k1)
+hit  "$out" "the unattended bar's wall is below the largest declared leg ceiling, so a healthy bar that dispatches that leg is killed by its own wall and every close reads red over a bound nobody chose"
+hit  "$out" "the effective wall, the declared GATE_WALL, is 10s, below the largest declared leg ceiling of 30s"
+hit  "$out" "--preflight refused; the run-state file is unchanged"
+same "AC4 the refused preflight left the record byte-identical" "$(git -C "$gw_dir" hash-object memory/builds/tRun/RUN.md)" "$gw_before"
+same "AC4 the refused preflight left the tree clean" "$(run_gw_git status --porcelain)" ""
+# ...and the control: the same profile under a wall that clears the ceiling pins the backstop.
+build_gw "30" "bash bin/profile.sh" "600"
+out=$(GWP_WALL=40 GWP_QUEUE=20 GWP_CMAX=30 run_gw --preflight tRun --keepalive-id k1)
+miss "$out" "the unattended bar's wall is below the largest declared leg ceiling"
+hit  "$out" "unattended: the merge bar is bounded at $((50 + GW_M))s — wall 30 + queue 20 + margin $GW_M (pinned as this run's gate-backstop fact)"
+
+# AC3: TREE MOVED once and then green is MET and names its one re-run; TREE MOVED twice is UNMET
+# naming the moved tree, after exactly two runs. RED against exit 3 read as a failed leg, and against
+# a re-run that repeats without bound.
+build_gw "" "bash bin/profile.sh" "600"
+GWP_WALL=5 GWP_QUEUE=20 run_gw --preflight tRun --keepalive-id k1 >/dev/null; write_gw_seal
+out=$(GW_MODE=moved1 run_gw --close tRun $GWOVR)
+hit  "$out" "unattended: gates-green — the bar exited 3, TREE MOVED: the tree changed while it ran, so no verdict describes it; running it once more"
+hit  "$out" "unattended: gates-green — the one re-run after TREE MOVED exited 0"
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+build_gw "" "bash bin/profile.sh" "600"
+GWP_WALL=5 GWP_QUEUE=20 run_gw --preflight tRun --keepalive-id k1 >/dev/null; write_gw_seal
+out=$(GW_MODE=moved2 run_gw --close tRun $GWOVR)
+hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+hit  "$out" "the merge bar exited 3, TREE MOVED, on its run and again on its one re-run: the tree changed while it ran both times, so no verdict describes the commit being closed"
+miss "$out" "hold · "
+same "AC3 a second TREE MOVED stops after exactly two runs" "$(grep -c . "$gw_out/runs" 2>/dev/null)" "2"
+
+# AC7: an exit 4 is UNMET with the host-degraded hold released by probe host, never a red leg.
+build_gw "" "bash bin/profile.sh" "600"
+GWP_WALL=5 GWP_QUEUE=20 run_gw --preflight tRun --keepalive-id k1 >/dev/null; write_gw_seal
+out=$(GW_MODE=host run_gw --close tRun $GWOVR)
+hit  "$out" "hold · host-degraded · until probe host · the runner exited HOST"
+hit  "$out" "--hold tRun --code host-degraded --until \"probe host\" --reason \"the runner exited HOST\""
+
+# AC12: a declared GATE_WALL reaches the bar and becomes the backstop's wall term; a blank one is
+# UNSET in the bar's environment, even with GATE_WALL exported to the driver, and is announced.
+build_gw "7" "bash bin/profile.sh" "600"
+out=$(GWP_WALL=5 GWP_QUEUE=20 GWP_CMAX=3 run_gw --preflight tRun --keepalive-id k1)
+hit  "$out" "unattended: the merge bar is bounded at $((27 + GW_M))s — wall 7 + queue 20 + margin $GW_M (pinned as this run's gate-backstop fact)"
+write_gw_seal
+GW_MODE=ok run_gw --close tRun $GWOVR >/dev/null
+same "AC12 the declared wall reaches the bar" "$(cat "$gw_out/barenv.txt" 2>/dev/null)" "GATE_WALL=7"
+build_gw "" "bash bin/profile.sh" "600"
+GWP_WALL=5 GWP_QUEUE=20 run_gw --preflight tRun --keepalive-id k1 >/dev/null; write_gw_seal
+out=$(GATE_WALL=99 GW_MODE=ok run_gw --close tRun $GWOVR)
+same "AC12 a blank wall is unset in the bar's environment" "$(cat "$gw_out/barenv.txt" 2>/dev/null)" "GATE_WALL=<unset>"
+hit  "$out" "declares no GATE_WALL, so the unattended bar runs under the gate runner's own profile wall"
+# ...and a record that predates the fact is recomputed at the close, announced.
+build_gw "" "bash bin/profile.sh" "600"
+GWP_WALL=5 GWP_QUEUE=20 run_gw --preflight tRun --keepalive-id k1 >/dev/null; write_gw_seal
+sed -i '/^gate-backstop: /d' "$gw_dir/memory/builds/tRun/RUN.md"
+run_gw_git add -A >/dev/null; run_gw_git commit -q -m "a record from before the fact" --no-verify
+out=$(GWP_WALL=5 GWP_QUEUE=20 GW_MODE=ok run_gw --close tRun $GWOVR)
+hit  "$out" "unattended: gates-green — this record pins no gate-backstop fact, so the backstop is recomputed now"
+hit  "$out" "unattended: the merge bar is bounded at $((25 + GW_M))s — wall 5 + queue 20 + margin $GW_M (recomputed at this close)"
+
+# AC15: the day-one state. A BLANK profile command pins no fact and says why, and the close bounds the
+# bar at GATE_BOUND, announced; a declared profile printing neither queue nor wall does the same, naming
+# both keys. Neither refuses at conf load.
+build_gw "" "" "600"
+out=$(run_gw --preflight tRun --keepalive-id k1)
+hit  "$out" "unattended: preflight — the wall is not compared with the largest leg ceiling: this project declares no GATE_PROFILE_CMD, so the wall cannot be compared with the largest leg ceiling"
+hit  "$out" "unattended: preflight — no gate-backstop fact is pinned, so the merge bar stays bounded at GATE_BOUND, 600s, and its turnstile queue is charged to that bound: this project declares no GATE_PROFILE_CMD, so the bar has no profile to size a backstop from"
+hit  "$out" "unattended: preflight OK"
+miss "$(read_gw_record)" "gate-backstop:"
+write_gw_seal
+out=$(GW_MODE=ok run_gw --close tRun $GWOVR)
+hit  "$out" "unattended: the merge bar is bounded at GATE_BOUND, 600s, and its turnstile queue is charged to that bound — this project declares no GATE_PROFILE_CMD"
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+build_gw "" "bash bin/profile.sh" "600"
+out=$(run_gw --preflight tRun --keepalive-id k1)
+hit  "$out" "the declared GATE_PROFILE_CMD printed no usable wall and no usable queue, so a backstop summed over it would bound the bar at the margin alone"
+hit  "$out" "GATE_WALL is blank and the profile printed no usable wall, so there is no wall to compare with the largest leg ceiling"
+hit  "$out" "unattended: preflight OK"
+miss "$(read_gw_record)" "gate-backstop:"
+# ...and a re-preflight that derives none REMOVES the fact an earlier one pinned.
+build_gw "" "bash bin/profile.sh" "600"
+GWP_WALL=5 GWP_QUEUE=20 run_gw --preflight tRun --keepalive-id k1 >/dev/null
+hit  "$(read_gw_record)" "gate-backstop: $((25 + GW_M)) (wall 5 + queue 20 + margin $GW_M)"
+run_gw_git add -A >/dev/null; run_gw_git commit -q -m pinned --no-verify
+out=$(run_gw --preflight tRun --keepalive-id k1)
+hit  "$out" "unattended: preflight — the earlier gate-backstop fact is removed, because this preflight derives none"
+miss "$(read_gw_record)" "gate-backstop:"
+
+# The kill arms need a runnable bound. COUNTED EITHER WAY, so the floor grades this suite and not
+# this box: the SKIP line says which arms went unexercised.
+if [ "$GW_HAVE_TIMEOUT" = 1 ]; then
+  # AC2: a bar killed at its backstop before it printed the acquire line is UNMET as never started,
+  # with the host-degraded hold released by probe gate. The margin seam makes the backstop 3 s. RED
+  # against the kill read as a red bar, which is the i97 misreport.
+  build_gw "" "bash bin/profile.sh" "600"
+  GATE_BACKSTOP_MARGIN=1 GWP_WALL=1 GWP_QUEUE=1 run_gw --preflight tRun --keepalive-id k1 >/dev/null; write_gw_seal
+  hit  "$(read_gw_record)" "gate-backstop: 3 (wall 1 + queue 1 + margin 1)"
+  out=$(GW_MODE=queued run_gw --close tRun $GWOVR)
+  hit  "$out" "hold · host-degraded · until probe gate · the bar was killed at its backstop before it acquired the repository"
+  hit  "$out" "--hold tRun --code host-degraded --until \"probe gate\" --reason \"the bar was killed at its backstop before it acquired the repository\""
+  miss "$out" "never returned"
+  # AC11: killed AFTER the acquire line, the same backstop is the never-returned verdict and no hold.
+  # RED against every backstop kill mapped to host-degraded, which retries a wedged leg.
+  build_gw "" "bash bin/profile.sh" "600"
+  GATE_BACKSTOP_MARGIN=1 GWP_WALL=1 GWP_QUEUE=1 run_gw --preflight tRun --keepalive-id k1 >/dev/null; write_gw_seal
+  out=$(GW_MODE=running run_gw --close tRun $GWOVR)
+  hit  "$out" "the merge bar did not answer within its 3s backstop (wall 1 + queue 1 + margin 1) and was killed after"
+  hit  "$out" "so the runner outlived its own wall and this item is unmet because the bar never returned rather than because a leg failed"
+  miss "$out" "hold · "
+  # AC15's kill half: with NO profile the bar is bounded at GATE_BOUND, and a kill there keeps the
+  # never-returned text with no hold, because a gate that is not this runner prints no acquire line.
+  build_gw "" "" "2"
+  run_gw --preflight tRun --keepalive-id k1 >/dev/null; write_gw_seal
+  out=$(GW_MODE=queued run_gw --close tRun $GWOVR)
+  hit  "$out" "the merge bar did not answer within the declared 2s bound and was killed after"
+  miss "$out" "hold · "
+else
+  n=$((n+9))
+  echo "  (SKIP the backstop kill arms, AC2 AC11 and AC15's kill half — this host has no runnable 'timeout -k', so no bound can fire here)"
+fi
+
+cd "$TMP" || exit 2
+rm -rf "$gw_dir" "$gw_oroot" "$gw_out"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
@@ -9947,7 +10208,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # running both behind a replica of this prologue by hand over their own fixtures; this pass runs no
 # suite. The same pass repaired the first run_bounded harness in region two, which died on `set -u`
 # at its first call because the lease pair the function reads was never assigned there.
-FLOOR_ASSERTIONS=1484
+# RAISED 1484 -> 1540 by exactly the arm, TOOL-dDerivedDocket-27: the backstop block at the foot of
+# region two executes 50 assertions, nine of them behind its `timeout` gate and counted on a host
+# without one as well; the inherited-red block's MIXED-beside-INHERITED arm adds five and the NOCONF
+# arm one, all in region two. COUNTED by running the backstop block and the MIXED arm behind a
+# replica of this prologue by hand over their own fixtures, n 0 -> 50 and 0 -> 5, green, and red
+# under twelve staged breaks; this pass runs no suite.
+FLOOR_ASSERTIONS=1540
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -10072,7 +10339,8 @@ FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1288
+FLOOR_SHARD_2=1344
+# +56 for the TOOL-dDerivedDocket-27 backstop, MIXED and NOCONF arms, all in region two - see FLOOR_ASSERTIONS.
 # +66 for the TOOL-dDerivedDocket-24 inherited-red arms, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the TOOL-dDerivedDocket-30 `--framed` and `--version` arms, in region two - see FLOOR_ASSERTIONS.
 # 1156 at the dDerivedDocket reconcile of origin/main: base 594 + this branch's +326 (to 920) +

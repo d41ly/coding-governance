@@ -58,6 +58,17 @@ GATE_CMD="bash tools/run-gates/run-gates.sh"
 # Set it ABOVE your slowest legitimate bar. A bound that fires on a healthy run gets deleted.
 GATE_BOUND="3600"
 
+# The unattended bar's whole-run wall, in seconds, handed to GATE_CMD as GATE_WALL, and the command
+# that prints your gate runner's resolved profile as TAB-separated `wall`, `queue` and `ceiling_max`
+# lines. BOTH OPTIONAL, and blank is where every adopter starts: with no profile command the bar has
+# no backstop and stays bounded at GATE_BOUND, announced. Declare one and `--preflight` bounds the
+# bar at wall + queue + a fixed margin instead, so the turnstile's wait is no longer charged to
+# GATE_BOUND, and refuses a wall below the largest leg ceiling the profile reports. A blank
+# GATE_WALL leaves the profile's own wall in force; a value that is not a positive integer is a
+# refusal. The run-gates kit's runner answers the profile question with its `--print-profile` verb.
+GATE_WALL=""
+GATE_PROFILE_CMD=""
+
 # The idle bound, in seconds, `--audit` measures a dispatched-and-open unit against: STALLED when
 # BOTH the newest write in the tree and the newest commit are older than this. OPTIONAL, on
 # GATE_BOUND's terms: absent takes the kit default and says so on stderr; non-numeric or zero is a

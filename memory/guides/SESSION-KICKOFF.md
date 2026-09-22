@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-22T11:01:11+03:00 @ 57662dd8c9f102195314673f3e9eba4c71915efd
+last-audit: 2026-09-22T12:12:07+03:00 @ 67d2ccfcc36015df40c2db7c09db90f6670432b9
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 5c33fd5ab2d96a8929efd6e185768560f92def3f
@@ -88,10 +88,12 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   (`session:`, `pid:`, `host:`, `pid-image:`, `lease-utc:`) the driver records and the verdict
   `--liveness` derives. `RESUME_STALE_BOUND` is the bound they act on. Protocol §5; `aWokenSentinel`.
 
-- **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`; `GATE_REAP_BOUND` the
-  teardown reap.** A breach is KILLED, and `gates-green` then says the bar never RETURNED
-  — not a leg FAILING. None of them bounds an AGENT-launched
-  process; see `tools/process-monitor/`. `TOOL-aBoundedCeiling-6`.
+- **`GATE_BOUND` bounds every command a project declares, `GATE_CMD` only where no
+  `GATE_PROFILE_CMD` is; `GATE_REAP_BOUND` the teardown reap.** This repo declares a profile, so its
+  unattended bar is bounded by the backstop `--preflight` pins: `GATE_WALL` + the queue + a margin. A
+  breach is KILLED, and `gates-green` then says the bar never RETURNED — not a leg FAILING — or,
+  killed before it acquired the repository, prints a hold. None of them bounds an AGENT-launched
+  process; see `tools/process-monitor/`. `TOOL-aBoundedCeiling-6`, `TOOL-dDerivedDocket-27`.
 
 - **An unattended run declares a MODE, and which one decides what binds it**: the authorization
   discipline, WHICH ANCHOR may authorize it, which scoped directives apply, and whether the

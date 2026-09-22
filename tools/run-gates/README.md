@@ -171,6 +171,25 @@ It FAILS OPEN. The wait is bounded at a declared multiple of the TTL; on expiry 
 loudly, drops its ticket and proceeds unqueued. `GATE_TURNSTILE=0` disables it entirely. It never
 contributes to the exit code — a turnstile that can wedge a bar is worse than two bars.
 
+## `--print-profile` — the resolved profile, for a second reader
+
+`run-gates.sh --print-profile` prints what this run WOULD use and exits before the turnstile: no
+beacon, no leg, no run record. One TAB-separated `key value` line each, and a reader takes the keys
+it knows:
+
+| key | value |
+|---|---|
+| `name` · `width` · `timeout` | the selected row, the effective width and its per-leg timeout |
+| `wall` | the whole-run wall in seconds, `GATE_WALL` over the row's own; 0 is no wall |
+| `queue` | the turnstile's bounded wait in seconds, the declared multiple of the TTL, derived before the verb exits |
+| `ceiling_max` | the largest positive leg `ceiling` in the resolved manifest, or `-` when no leg declares one; ABSENT when the manifest does not parse |
+| `ceilings` · `line` | whether per-leg ceilings are live here, and the profile line a bar prints |
+
+The unattended kit's driver reads `wall`, `queue` and `ceiling_max` to size the backstop of its
+own bar (`TOOL-dDerivedDocket-27`): the wall is armed only after the queue, so the longest a
+healthy bar takes is the two together, and a wall below `ceiling_max` fires on a healthy bar that
+dispatches that leg.
+
 ## The scratch directory — owned, redirected and swept
 
 Every heavy leg is hermetic because it builds its own `mktemp -d` scratch repo, so the scratch a bar

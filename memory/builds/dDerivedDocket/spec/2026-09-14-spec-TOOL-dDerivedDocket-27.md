@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** SPECCED · rev-9 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
+**Status:** CLOSED · rev-10 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-22-build-TOOL-dDerivedDocket-27-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dDerivedDocket-27-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-28 |
@@ -389,7 +390,7 @@ raised: raising one is an owner turn.
   build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
   parent's, and neither is its `wc -l` line count. Both trims are taken, both landed, and both left
   their rule behind:
-  `grep -c 'terms: absent takes the kit default and says so'` and
+  `grep -c '^| .UNIT_STALL_BOUND. .*terms: absent takes the kit default and says so'` and
   `grep -c 'because the ceiling would fire first'`, each over
   `tools/unattended/PROTOCOL.template.md`, count 1 at the parent and 0 at the build commit, with
   both trimmed passages present in `tools/unattended/README.md`. Each rule survived its own trim,
@@ -403,7 +404,10 @@ raised: raising one is an owner turn.
   `grep -c 'GATE_CMD.*GATE_WALL.*GATE_PROFILE_CMD' tools/unattended/PROTOCOL.template.md` counts 1
   at the build commit, so the three keys share one first cell and the table gained no row. The same byte and line
   readings hold for `tools/unattended/PROTOCOL.template.md` and for
-  `memory/guides/BUILD-METHOD.md`, and every carrier is below the ceilings that govern it. For the
+  `memory/guides/BUILD-METHOD.md`, and every carrier is below the ceilings that govern it, save one
+  half recorded elsewhere: `memory/guides/UNATTENDED-PROTOCOL.md` is already over the guide BYTE cap
+  at the parent, carried by its row in `memory/project/curation-debt.txt`, so its byte half is read
+  against the parent alone and its line half against the cap. For the
   two under `memory/guides/` that is the guide BYTE cap and the guide LINE cap, RESOLVED from the
   single line of `tools/memory-tree/check-memory-hygiene.sh` that declares `GUIDE_CAP_BYTES` and
   `GUIDE_CAP_LINES` together and never retyped here as literals, because check 6 reds on EITHER
@@ -613,6 +617,37 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
   "while a bar runs" now says it moves as a running bar's legs land, since a queued bar writes no
   gate log; rev-8's entry is corrected in place on both claims. S11 and AC9 stay withdrawn, the
   pinned `gate-backstop` fact stays, and no other S-item, criterion or edge moved.
+- rev-10 · 2026-09-22 · §6 AC14 · §9 · the build pass, re-reading every claim at `67d2ccfc`, the tree
+  origin/main was merged into at `c23d5701`.
+  - AC14's first witness counted 3 at the parent, not 1. The `RESUME_ATTEMPTS` and `RESUME_TURNS`
+    rows that merge brought in say "on `UNIT_STALL_BOUND`'s terms: absent takes the kit default and
+    says so", and neither is trimmed here, so the bare phrase could never reach 0. The witness is now
+    anchored to the row that owns the trimmed passage, `^| .UNIT_STALL_BOUND. `, which reads 1 at the
+    parent. It is still a phrase the widened `GATE_CMD` cell cannot carry.
+  - AC14's "every carrier is below the ceilings" could not hold at the parent: the protocol is
+    64615 B against `GUIDE_CAP_BYTES` 61440, a merge-induced overflow `memory/project/curation-debt.txt`
+    carries. The criterion now reads that half against the parent only. The line half, 704 against
+    750, holds, and so do both halves on `memory/guides/BUILD-METHOD.md`.
+  - The line citations moved, and none of them is a pin. At `67d2ccfc` the three key-table rows sit at
+    `tools/unattended/PROTOCOL.template.md:459`, `:461` and `:466`. Check 22's first-cell extractor is
+    at `tools/unattended/check-unattended.sh:2777` and the driver's runaway refusal at
+    `tools/unattended/unattended.sh:771`. The runner arms its wall at `tools/run-gates/run-gates.sh:2903`
+    and fails the queue open at `:1001`, and the profile comment is at
+    `tools/run-gates/gate-profiles.txt:58`.
+  - Four readings the design left open, each decided on the conservative side. A kill is told apart
+    by the `gate queue: acquired` line only when the bound is the derived backstop. Under the
+    `GATE_BOUND` fallback it keeps today's never-returned text, because a declared gate that is not
+    this runner never prints that line, and AC11's retry loop would otherwise follow every kill. The
+    exit-3 re-run pins a fresh `GATE_RUN_ID`, so the record the decision table reads is the re-run's.
+    The declared `GATE_WALL` reaches `$GATE_CMD` and nothing else: the driver unexports it and hands
+    it only to the bar, so the lander's pre-push bar keeps the profile wall (§3). And a re-preflight
+    that can derive no backstop removes an earlier `gate-backstop` fact rather than leaving a bound
+    the new conf no longer declares.
+  - AC8's Red-when had no checker to red it: no leg graded the Skill's Close section. New leg check 43
+    grades it. The `hold ·` paragraph must name the commit of the staged records, the branch push, the
+    keepalive reap and `--hold`, in that order, and name `platform-unavailable`. It may not route to
+    `--override`. S6's leg half is check 42, which also refuses a `GATE_WALL` the driver would refuse
+    at conf load. No S-item, criterion or edge moved.
 
 ## 10. Reuse audit
 

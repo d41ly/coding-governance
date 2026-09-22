@@ -201,6 +201,8 @@ as a note.
 
 **An inherited red is a policy read at R.** `gates-green` maps its pinned bar's record by `GATE_POLICY_FILE` at the advertised tip, and S7 backs the two escapes. `TOOL-dDerivedDocket-24`.
 
+**The bar is bounded by its pinned backstop**, wall + queue + margin from `GATE_PROFILE_CMD`, and its ending is read, not assumed: TREE MOVED re-runs once, HOST and a kill before `acquired` print holds. Check 42 grades the wall, 43 the Skill's hold routing. `TOOL-dDerivedDocket-27`.
+
 ## Shared seams
 
 - `memory/guides/REVIEW-PROTOCOL.md` — the structural precedent for a BINDING guide: charter-cited,
