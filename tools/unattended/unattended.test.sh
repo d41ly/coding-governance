@@ -6528,7 +6528,7 @@ git checkout -qf unit; bcreset
 
 # ---- AC3 (unit 7), first half: a non-date default at BASE is fail 54 — never read as absent.
 bcreset; git checkout -qf main
-mkconf true true "" 3600 "" 1800 7 later
+mkconf true true "" 3600 "" 1800 7 5400 later
 git add -A >/dev/null && git commit -q -m sa-default-malformed --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
 out=$(run --preflight tRun --keepalive-id KA-1234)
