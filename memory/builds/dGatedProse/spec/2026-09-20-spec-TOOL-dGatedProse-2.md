@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-2 — a dossier claim in spec prose names a shape the map can hold
 
-**Status:** SPECCED · rev-6 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 3
+**Status:** SPECCED · rev-7 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -43,7 +43,9 @@ is graded at the spec commit instead of remembered.
   `spec tokens (a spec's own names resolve)`, which must clear. It runs through the scan before the
   population loop, and the test is structural rather than a typed total: every arm of `CLAIM_ARMS` is
   the designated arm of a refused entry, every class appears, a clearing entry exists, and each
-  entry's result carries its designated arm among the arms reported and its expected verdict. Any
+  entry's result carries its designated arm among the arms reported and its expected verdict.
+  rev-7 adds a fifth structural test: no entry spells its claim verb in lowercase, so an entry
+  edited back to lowercase refuses rather than quietly un-pinning the case fold. Any
   other result is a REFUSAL naming the canary, so an arm added without an entry refuses at startup.
   The clear half is what pins S2's space clause structurally rather than by comment. Observed by AC6.
 - S4. Fenced blocks are excluded from the scan, so a SPEC may exhibit the refused sentence as a
@@ -89,7 +91,11 @@ is graded at the spec commit instead of remembered.
   spec was being written, which is how rev-3's criterion came to pass over a wrong count with no edit.
   The sentence at `:167`, "The three joins prove a name resolves", stays exactly as written — this
   join resolves nothing, so the resolving-join count there does not move, and editing it would
-  introduce the error the other two fix. Observed by AC11.
+  introduce the error the other two fix. Two more sites are refreshed on touch, because the join
+  makes them false or incomplete rather than miscounted: the sentence at `:37`-`:40` saying the
+  checker grades no prose gains the claims join as its one exception, and the Gaps section gains
+  one bullet pointing at the six limits in the checker's own header rather than restating them.
+  Neither counts the joins, so AC11's reading does not move with them. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -228,15 +234,21 @@ skeptic found: a spec listing several claimed keys is the normal way to write on
 
 | arm | shape | closes |
 |---|---|---|
-| active | subject, up to two closed-set modals or adverbs, the verb, up to three closed-set determiners, the run | the baseline, the wrap, the bare basename, the determiner, the adverb, the modal, the future |
-| passive | the run, a copula, `claimed by`, subject | `X` is claimed by the dossier |
-| noun | subject, up to three words, a claim verb, then `on`, `over`, `to`, `under` or `as`, the run | the possessive and the periphrasis |
-| fronted | the run, an optional relativiser, subject, an optional `dossier`, the verb | the object-fronted relative clause |
+| active | subject, at most one dash or colon, up to two closed-set modals or adverbs, the verb in any inflection, up to three closed-set determiners, the run | the baseline, the wrap, the bare basename, the determiner, the adverb, the modal, the future |
+| passive | the run, up to two closed-set modals or adverbs, a copula, at most one more, `claimed by`, at most one determiner, subject | `X` is claimed by the dossier |
+| noun | subject, an optional possessive `'s`, at most one dash or colon, up to three words, `claim` or `claims`, then `on`, `over`, `to`, `under` or `as`, up to three determiners, the run | the possessive and the periphrasis |
+| fronted | the run, an optional relativiser with or without a comma before it, subject, an optional `dossier`, up to two closed-set modals or adverbs, the verb | the object-fronted relative clause |
 
 The filler sets are CLOSED word lists, not `\w+` slack. An open filler is what let the stage-1 broad
 predicate walk out of one clause and into the next, which produced two of the false positives the
 research record lists at `:256`-`:257`, a that-clause and a table row flattened into its neighbour,
 each graded on a token outside the clause its verb sat in.
+
+The sets themselves are `CLAIM_PARTS` in the checker, read there and not restated here; rev-7 wrote
+the table above from the arms as built. Two words are absent on purpose. No negation is a modal, so
+a sentence saying a dossier does not claim a symbol is no claim at all, and `that` is no
+determiner, so a that-clause after the verb reaches nothing, which is the first of the two false
+positives above.
 
 The verb match is case-insensitive. The skeptic measured 37 uppercase claim-verb tokens across the
 641 specs of its corpus and found that neither stage 1's rule text nor its predicate said whether
@@ -252,6 +264,10 @@ The refusal set, and the sentence of the map's contract each class rests on:
 | PATH | contains `/` | `memory/map/README.md:28` and `tools/codebase-map/gen_map.py:119` — path globs are digest-only, never gated |
 | GLOB | contains `*` or `?` | the same sentence |
 | CODE SYMBOL | an underscore between two letters or digits, in either case, or a parenthesis | `tools/codebase-map/map_extractors.py:170` — the symbol tier feeds `generated/symbols.json` only and never the ratchet |
+
+The first row to match decides, the space clause first. rev-7 tests GLOB before PATH, so
+`tools/*/kit.toml` reports its real shape; both rest on one contract sentence, so the order moves a
+label and never a verdict.
 
 **The space clause is the whole safety of the refusal set, and rev-1 had it on one class instead of
 three.** Measured on node d, 2026-09-21, by importing the extractor set on the merged tree at
@@ -341,11 +357,17 @@ only this spec's author ever held has no record to cite.
 ### Inventory
 
 New identifiers, all inside `tools/check-spec-tokens.py`, and this repo declares no naming cell for
-Python module constants in this file: `CLAIM_ARMS` (the four compiled arms), `CLAIM_REFUSALS` (the
-three-class predicate and its shared space clause), `CLAIM_CANARY`, `CLAIMS_WHY` (the message, beside
-the existing `BAR_WHY`), and `claims_scan` (the function both the canary and the loop call, which
-returns each hit with the arms that matched it). The hit kind on the report is `claims`, beside the
-kinds the report already emits at `bd44d3ff`: `leg`, `legline`, `path`, `cite`, `bar` and `guards`.
+Python module constants in this file: `CLAIM_PARTS` (the closed fragments, named once and composed
+into the arms), `CLAIM_ARMS` (the four compiled arms), `CLAIM_REFUSALS` (the three-class predicate
+and its shared space clause, one row each), `CLAIM_CANARY`, `CLAIMS_WHY` (the message, beside the
+existing `BAR_WHY`), `scan_claims` (the function both the canary and the loop call, which returns
+each hit with the arms that matched it) and `check_claim_canary` (S3's structural test). The two
+functions are graded by the `py.function` cell of `.lexicon.conf` and lead with its declared verbs
+`scan` and `check`. rev-6 named the scan `claims_scan`, which leads with no declared verb:
+`python tools/lexicon/lexicon.py --suggest claims_scan --as py.function` answers that `claims` is
+not in the declared table, and every criterion below names `scan_claims`. The hit kind on the
+report is `claims`, beside the kinds the report already emits at `bd44d3ff`: `leg`, `legline`,
+`path`, `cite`, `bar` and `guards`.
 
 ### Migration
 
@@ -392,7 +414,7 @@ both in the same commit, because the parity leg compares them.
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | the rule section, authored |
 | `memory/TEMPLATE-SPEC.md` | REGENERATED from the template; never hand-edited |
 | `tools/check-spec-tokens.test.sh` | the arms of AC1 to AC10 and AC12, and the floor raise |
-| `memory/map/features/spec-tokens.md` | the join count at `:5` and `:49`-`:50` |
+| `memory/map/features/spec-tokens.md` | the join count at `:5` and `:49`-`:50`, the no-prose sentence at `:37`-`:40`, and one Gaps bullet |
 | `memory/backlog/TOOL.md` | at landing: the `TOOL-dLoggedFlight-32` row re-worded to name the refusal set and closed, and one new row routing H1's left-shift (§3 Edges); units 3 and 4 write their own rows of this file at the same landing, so every edit here is row-disjoint and reconciles additively |
 
 ### Alternatives rejected
@@ -428,8 +450,12 @@ reproduced 6, and every one was innocent either way (research record `:256` and 
   PINNED — node d, 2026-09-21. It SUPERSEDES rev-2's 20.5 ms over 24 live specs and its 22.1 ms
   forecast over 28, and the supersession is stated rather than quiet because the new number is LOWER
   over a LARGER population. Both figures measure a reconstruction of §4's grammar and not a shipped
-  join, which does not exist yet, so neither is a claim about `claims_scan`; what the pin buys is the
-  order of magnitude, and that has not moved. The whole-leg total is UNVERIFIED, and deliberately:
+  join, which did not exist yet, so neither is a claim about `scan_claims`; what the pin buys is the
+  order of magnitude, and that has not moved. The shipped `scan_claims` was timed at rev-7, over
+  the 27 live specs of this branch at 1048612 characters: 38.0 ms best of three, node d,
+  2026-09-22, the same order of magnitude. It costs about twice the reconstruction because it
+  tries every arm at every token start rather than searching once per arm. figure PINNED, and the
+  probe is untracked. The whole-leg total is UNVERIFIED, and deliberately:
   measuring it means running the leg, which a pass may not do, and the dry run's skeptic left its
   predecessor's cost figures unverified for exactly that reason (research record `:300`).
 - error / empty / loading states — a corpus with no dossier-claim sentence is the measured normal
@@ -453,14 +479,14 @@ reproduced 6, and every one was innocent either way (research record `:256` and 
   `kit`, chunk `selftests`, guard `tools/` in `tools/gate-legs.json`, so a default bar runs none of
   S8 and this unit's Definition of Done owes
   `GATE_FULL=1 GATE_SELFTESTS=1`. The compensating check is that AC1, AC6, AC7, AC10 and AC12 each
-  observe `claims_scan` or the checker process directly rather than through the suite, and AC9 is
+  observe `scan_claims` or the checker process directly rather than through the suite, and AC9 is
   read statically, so the evidence exists before the held leg ever runs.
 - migration — N/A — see the Migration sub-head above.
 - user docs — the rule section of S6 is the user-facing page; this repo ships no `help/` tree.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `claims_scan` runs over the blob of
+- **AC1** — When `scan_claims` runs over the blob of
   `memory/builds/dLoggedFlight/spec/2026-09-16-spec-TOOL-dLoggedFlight-25.md` at `9f43bb26^`, and
   over the sibling unit 27 blob at the same commit, each yields exactly one hit whose refusal class
   is CODE SYMBOL and whose object is the snake_case identifier that blob's sentence names —
@@ -469,7 +495,7 @@ reproduced 6, and every one was innocent either way (research record `:256` and 
   staged break, and they are why this arm is not a gate nobody has seen fail.
   fixture: the two blobs are reachable from this tree's object database today; the fixture copies
   their sentences rather than depending on the commit staying reachable.
-- **AC2** — When `claims_scan` runs over three fixtures carrying, verbatim and at a live status, the
+- **AC2** — When `scan_claims` runs over three fixtures carrying, verbatim and at a live status, the
   sentences at `memory/builds/cKeyedLaunchpad/spec/2026-08-13-spec-cKeyedLaunchpad-2.md:39`-`:40`,
   `memory/builds/aProbedUnit/spec/2026-09-14-spec-TOOL-aProbedUnit-1.md:82` and
   `memory/builds/aPacedTurnstile/spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md:123`, each matches an
@@ -479,7 +505,7 @@ reproduced 6, and every one was innocent either way (research record `:256` and 
   skeptic's one real hit against stage 1's form and it wraps across two lines — the sentence opens at
   `:39` and its claimed object sits at `:40`, which is why the citation names both and why this
   criterion also observes that the scan flows a hard-wrapped sentence.
-- **AC3** — When `claims_scan` runs over a fixture whose sentence claims a key-shaped token present
+- **AC3** — When `scan_claims` runs over a fixture whose sentence claims a key-shaped token present
   nowhere in the tree, it yields zero hits.
   Red when: the fixture reds. This is the forward-looking case: a spec is authored before its code,
   and the skeptic measured 22 minutes between a spec commit and the commit creating the key its
@@ -518,7 +544,7 @@ reproduced 6, and every one was innocent either way (research record `:256` and 
   is here because the space clause is the one part of S2 whose loss makes the join LOUDER rather
   than quieter, and a canary that only catches silence would miss it.
 - **AC7** — When a fixture carries one refused sentence inside a triple-backtick fence and the same
-  sentence outside it, `claims_scan` yields exactly one hit, and its line number is the unfenced one.
+  sentence outside it, `scan_claims` yields exactly one hit, and its line number is the unfenced one.
   Red when: the count is two, or zero, or the hit names the fenced line.
 - **AC8** — When `tools/check-spec-tokens.py` runs with no argument over a fixture tree, its stdout
   carries a `claims join` line naming the sentences examined, the live specs carrying one and the
@@ -546,7 +572,7 @@ reproduced 6, and every one was innocent either way (research record `:256` and 
   `bd44d3ff` that population is exactly this build's own spec files, the newest live spec outside it
   dated 2026-09-13. A suite path written into a criterion bullet here is therefore graded rather than
   skipped.
-- **AC10** — When `claims_scan` runs at the landing commit over every tracked spec file under
+- **AC10** — When `scan_claims` runs at the landing commit over every tracked spec file under
   `memory/builds/dGatedProse/spec/`, listed at observation time rather than counted here, and over
   every live spec the checker's own population yields at that commit, it yields zero hits.
   Red when: any spec in either population reds. This criterion exists because the OWNER ruled the
@@ -576,7 +602,7 @@ reproduced 6, and every one was innocent either way (research record `:256` and 
   its "name five" became true on the merged tree with no edit at all, once TOOL-aBlindedTrial-8 had
   landed the `guards` join.
   figure: DERIVED — read from the checker's docstring at observation time.
-- **AC12** — When `claims_scan` runs over four fixtures, each carrying one refused claim spelled in
+- **AC12** — When `scan_claims` runs over four fixtures, each carrying one refused claim spelled in
   the shape of exactly one arm of §4's table — active, passive, noun and fronted, one fixture each —
   over a fifth carrying the active arm's claim with its verb in UPPERCASE, and over a sixth carrying
   the active arm's claim with a SHOUTED constant as its only object, each fixture yields exactly one
@@ -587,7 +613,7 @@ reproduced 6, and every one was innocent either way (research record `:256` and 
   underscore test read as lowercase only. Every sentence AC1 and AC2 use is shaped for the
   active arm, so without this criterion the passive, noun and fronted arms could each be dead, or
   case-sensitive, with every other criterion green. S3's canary is the startup half of the same
-  observation; this criterion reads `claims_scan` directly on spec-shaped input, so the evidence
+  observation; this criterion reads `scan_claims` directly on spec-shaped input, so the evidence
   exists before the held suite ever runs.
   fixture: the six sentences are the fixtures' own, not corpus quotations; §4's arm table fixes
   each shape.
@@ -846,6 +872,19 @@ declined mechanism. figure PINNED — node d, 2026-09-21.
   the join's WHAT IT DOES NOT CHECK block beside the other five, so a green is never read as covering
   it. No predicate reaches it, as none reaches the unbackticked subject: the dry run scored that look-back
   window at precision 0.00 over this corpus.
+- rev-7 · 2026-09-22 · §2 S3 S10 · §4 · §5 · §6 AC1 AC2 AC3 AC7 AC10 AC12 · the build pass, before any
+  code, recording what building the join showed this spec did not say.
+  NAMED BY THE LEXICON. The scan function is `scan_claims`, because `claims_scan` leads with no
+  declared verb of `.lexicon.conf`, and every criterion naming it follows.
+  INVENTORY COMPLETED. `CLAIM_PARTS`, the closed fragments the arms compose, and
+  `check_claim_canary`, S3's structural test, are the two identifiers rev-6 did not list.
+  GRAMMAR STATED AS BUILT. The arm table names every optional slot the shipped arms carry: one dash
+  or colon after the subject, modals around the passive copula and before the fronted verb, a comma
+  with the relativiser, and a possessive and determiners on the noun arm. §4 says why negation and
+  `that` are absent from the closed sets, and that the refusal rows are ordered, GLOB before PATH.
+  S3 gains a fifth structural test, a lowercase verb in any canary entry. S10 refreshes two dossier
+  sites the join makes false or incomplete, neither of them a count, and Files touched says so.
+  §5 pins the shipped scan's timing beside the reconstruction's. No criterion's observation moves.
 
 ## 10. Reuse audit
 
