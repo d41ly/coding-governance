@@ -1,6 +1,6 @@
 # TOOL-dGatedProse-4 — M4 bounds the spec-audit promotion chain by review precision
 
-**Status:** SPECCED · rev-6 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 5
+**Status:** SPECCED · rev-7 · 2026-09-22 · node d · Tier-2 · base bd44d3ff · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -39,9 +39,13 @@ The owner ruled both figures on 2026-09-22: 30720 bytes and 400 lines.
   move and names the question it answers, and M1's `**Budget:` line. The two move in one commit
   because `tools/check-template-size.sh` reds any disagreement between them. The line half goes from
   350 to 400 in M1's `**Budget:` line, its only spelling, since no checker reads it. M1's raise
-  history gains one dated entry naming both figures. This S3 is the budget raise rev-4 wrote under a
-  label rev-3 used for a different item, which §3's unit-1 edge accounts for. Observed by AC5, AC6
-  and AC7.
+  history gains one dated entry naming both figures. M1's budget sentence changes one word, in the
+  template and so in the render: "so most of that figure is headroom the bytes do not grant" becomes
+  "so part of that figure is headroom the bytes do not grant", because at 30720 and 400 only about 20
+  of the 48 free lines are headroom the bytes do not grant. `most` and `part` are both four bytes, so
+  the edit moves no size this unit measures. This S3 is the budget raise rev-4 wrote under a label
+  rev-3 used for a different item, which §3's unit-1 edge accounts for. Observed by AC5, AC6, AC7 and
+  AC10.
 - **S4** — `memory/guides/BUILD-METHOD.md` is re-rendered from the edited template, never hand-edited,
   because the render is the direction the kit declares. Observed by AC2.
 - **S5** — The edit adds no line to either file, and both land inside both raised halves: the
@@ -496,8 +500,9 @@ about 28 lines at M1's ~100 B, running out near 380, and about 35 at the file's 
 the byte half binds first again. The sentence's second clause stays false. At M1's own reading about
 20 of the 48 lines the figure leaves are headroom the bytes do not grant, and at the measured average
 about 13, so that headroom is a minority either way, never "most of that figure". Re-wording M1's
-budget prose is the owner's under M1 and M3, so this unit reports the false clause rather than
-editing it; F6 carries the question. The figure costs no byte, because 400 has the digit count of 350.
+budget prose is the owner's under M1 and M3, and the owner ruled it re-worded (F6): the clause reads
+"part of that figure", the same four bytes. The figure costs no byte, because 400 has the digit count
+of 350.
 
 ### Measured cost of the whole edit
 
@@ -732,6 +737,11 @@ citing this unit and `TOOL-dLoggedFlight-35`.
   `tools/check-template-size.sh:144`, naming that file as where a raise of this limit is recorded,
   pointing at a file that does not record it; or two rows name this unit, which check 20's
   one-id-one-row rule refuses.
+- **AC10** — When `tools/memory-tree/BUILD-METHOD.template.md` and `memory/guides/BUILD-METHOD.md` are
+  read, each carries `so part of that figure is headroom the bytes do not grant` exactly once and
+  carries `so most of that figure is headroom the bytes do not grant` nowhere.
+  Red when: either carrier still says `most`, which the figures of 2026-09-22 refute, or the new clause
+  appears in only one carrier, which the parity pair would red on its own but this criterion names.
 
 ## 7. Gates
 
@@ -856,8 +866,9 @@ and the token was verified present once on the scratch copies.
   line figure, "so most of that figure is headroom the bytes do not grant". At 30720 bytes and 400
   lines the first half holds and the second does not: about 20 of the 48 free lines are headroom the
   bytes do not grant at M1's own ~100 B reading, and about 13 at the measured average. M1's budget
-  prose is the owner's under M1 and M3, so this unit reports the false clause and does not edit it.
-  OPEN until the owner rules: re-word the clause to what the figures give, or leave it as it stands.
+  prose is the owner's under M1 and M3, so this unit asked rather than edited. RESOLVED (owner,
+  2026-09-22): re-worded to the figures. The clause reads "so part of that figure is headroom the bytes
+  do not grant", one word changed and the same byte length, carried by S3 and observed by AC10.
 
 ## 9. Revision log
 
@@ -1037,6 +1048,12 @@ and the token was verified present once on the scratch copies.
   the render loop of `tools/memory-tree/kit-dogfood-parity.test.sh` is cited at `:100`, where rev-5
   said `:99`, which is the line st=0. The entries above are left as written: they record 28672 and
   370 truthfully as what those revisions wrote.
+- rev-7 · 2026-09-22 · S3 · §4 · §6 AC10 · §8 F6 · the owner ruled F6: M1's budget sentence is
+  re-worded to what the figures of 2026-09-22 give. At 30720 bytes and 400 lines its first half holds,
+  the bytes running out near line 380 to 387, and its second half did not, about 20 of the 48 free
+  lines being headroom the bytes do not grant. The clause reads `part` for `most`, the same four bytes,
+  so no measured size in this spec moves. S3 carries it and AC10 observes it in both carriers; the
+  verifier of rev-6 found the false claim that the sentence was true again, which rev-6 had kept.
 
 ## 10. Reuse audit
 
