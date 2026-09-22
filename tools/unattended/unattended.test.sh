@@ -6228,6 +6228,15 @@ sed -n '/^run_bounded() {/,/^}$/p' "$SCRIPT" > "$rb_fn"
 # PASS line, with the stranded-arm floor never reached. Caught by this build's closing review.
 GATE_BOUND_LIVE=1
 GATE_BOUND=2
+# ...and the four names the extracted function reaches that are not ITS OWN, for the same `set -u`
+# reason. The lease pair and its refresh are the lease unit's, `ROOT` and the recorder the process
+# ledger's (TOOL-dDerivedDocket-28): the wrapper carries the root as its `$0`, and the recorder is
+# graded by that unit's own arms rather than through a copy of the function outside its driver.
+RB_LEASE_SLUG=""
+RB_LEASE_ID=""
+ROOT="$TMP"
+write_lease_refreshed() { :; }
+write_proc_record() { :; }
 # shellcheck disable=SC1090
 . "$rb_fn"
 
@@ -6355,7 +6364,9 @@ RB_LEASE_SLUG=""
 RB_LEASE_ID=""
 GATE_BOUND_LIVE=0
 GATE_BOUND=0
+ROOT="$TMP"
 write_lease_refreshed() { :; }
+write_proc_record() { :; }
 # shellcheck disable=SC1090
 . "$sp_fn"
 
@@ -8954,7 +8965,14 @@ hit "$out" "phase LANDED (derived: ${DL_C:0:8}"
 write_dl_landing ""
 run_dl_git push -q origin HEAD:main
 dl_h=$(run_dl_git rev-parse HEAD)
+# TOOL-dDerivedDocket-28 AC12, the in-place half: the observation removes a process ledger that
+# records only exited processes. One such record is PLANTED, so the ledger is asserted to exist
+# before the verb and an absent one cannot pass for a removed one.
+dl_pl="${DL_LEASE%.lease}.procs"
+( true & printf '%s - %s - k1 2026-09-22T00:00:00Z true\n' "$!" "$!" >> "$dl_pl"; wait )
+n=$((n+1)); [ -f "$dl_pl" ] || { echo "FAIL AC12 the in-place fixture carries no ledger, so its removal proves nothing"; st=1; }
 out=$(run_dl --landed tRun); rc=$?
+n=$((n+1)); [ ! -f "$dl_pl" ] || { echo "FAIL AC12 an in-place --landed that observed the landing left the process ledger behind"; st=1; }
 same "in-place --landed on a derived LANDED exits 0" "$rc" "0"
 hit  "$out" "phase LANDED (derived: ${DL_C:0:8} on refs/heads/main at ${DL_C:0:8}) · observed, not written"
 miss "$out" "the run is already finished"
@@ -9569,6 +9587,313 @@ same "AC11 this repository at HEAD reads land with a bound of 10" "$_o" "land 10
 
 cd "$TMP" || exit 2
 rm -rf "$ih_dir" "$ih_oroot" "$ih_out"
+
+# ================ TOOL-dDerivedDocket-28: the run-owned process ledger =============================
+# ---- SELF-CONTAINED, for the in-place block's reason and one more: these arms KILL drivers, and a
+# ---- ledger another block appends to would make every count here a count of that block's history.
+# ---- The stubs are the knobs. `bin/wire.sh` is the wiring check and becomes `sleep <PL_SLEEP>` when
+# ---- the caller exports one, which is how a re-preflight is caught mid-command and its driver killed
+# ---- there; `bin/bar.sh` is the bar and logs `bar`; `bin/reap.sh` is a STUB reaper that logs
+# ---- `reap <pid>` to the same file, then kills the recorded process and its descendants leaves first.
+# ---- AC1 alone runs the real reaper, through its fence.
+pl_dir=$(mktemp -d); pl_oroot=$(mktemp -d); pl_origin="$pl_oroot/origin.git"; pl_out=$(mktemp -d)
+(
+  cd "$pl_dir" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  git init -q --bare "$pl_origin"
+  git --git-dir="$pl_origin" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$pl_origin"
+  mkdir -p bin memory/guides
+  printf '# build method\n' > memory/guides/BUILD-METHOD.md
+  cat > bin/wire.sh <<'PLW'
+#!/usr/bin/env bash
+[ -n "${PL_SLEEP:-}" ] && exec sleep "$PL_SLEEP"
+exit 0
+PLW
+  cat > bin/bar.sh <<'PLB'
+#!/usr/bin/env bash
+printf 'bar\n' >> "$PLOUT/order.log"
+exit 0
+PLB
+  cat > bin/reap.sh <<'PLR'
+#!/usr/bin/env bash
+printf 'reap %s\n' "$2" >> "$PLOUT/order.log"
+read_kids() {
+  local d l r
+  local -a f
+  for d in /proc/[0-9]*; do
+    { IFS= read -r l < "$d/stat"; } 2>/dev/null || continue
+    r=${l##*) }; read -r -a f <<<"$r"
+    [ "${f[1]:-}" = "$1" ] && printf '%s\n' "${d#/proc/}"
+  done
+}
+run_kill() { local k; for k in $(read_kids "$1"); do run_kill "$k"; done; kill -9 "$1" 2>/dev/null; }
+run_kill "$2"
+exit 0
+PLR
+  cat > .unattended.conf <<'PLC'
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="echo land"
+LANDER_MODE="primary"
+BYPASS_BAN="--no-verify"
+GATE_CMD="bash bin/bar.sh"
+GATE_BOUND="600"
+UNIT_STALL_BOUND="1800"
+LEASE_STALE_AFTER="7200"
+REVIEW_ROUNDS="7"
+RESUME_STALE_BOUND="5400"
+WIRING_CHECK="bash bin/wire.sh"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+PROCMON_CMD="bash bin/reap.sh"
+PLC
+  readme tRun
+  runmd tRun "$MANDATE"
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  git push -q origin main
+  git checkout -q -b unit
+  git commit -q --allow-empty -m "unit work" --no-verify
+) >/dev/null 2>&1
+pl_unit=$(git -C "$pl_dir" rev-parse unit)
+PL_LEDGER="$pl_dir/.git/unattended/tRun.procs"
+PL_LEASE="$pl_dir/.git/unattended/tRun.lease"
+PL_PROCFS=""
+run_pl() { ( cd "$pl_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" \
+               ${PL_PROCFS:+UNATTENDED_PROCFS="$PL_PROCFS"} bash "$SCRIPT" "$@" 2>&1 ); }
+run_pl_git() { git -C "$pl_dir" "$@"; }
+read_pl_sum() { if [ -f "$1" ]; then git hash-object "$1"; else echo NONE; fi; }
+read_pl_token() { # pid -> its procfs start token, or `-`
+  local l r
+  local -a f
+  { IFS= read -r l < "/proc/$1/stat"; } 2>/dev/null || { printf -- '-'; return 0; }
+  r=${l##*) }; read -r -a f <<<"$r"; printf '%s' "${f[19]:--}"
+}
+read_pl_kids() { # pid -> every descendant's pid, one per line
+  local d l r k
+  local -a f
+  for d in /proc/[0-9]*; do
+    { IFS= read -r l < "$d/stat"; } 2>/dev/null || continue
+    r=${l##*) }; read -r -a f <<<"$r"
+    if [ "${f[1]:-}" = "$1" ]; then k=${d#/proc/}; printf '%s\n' "$k"; read_pl_kids "$k"; fi
+  done
+}
+# The arms' own cleanup, collected before anything is signalled so no descendant is reparented first.
+run_pl_kill() { local k; for k in $(read_pl_kids "$1"); do kill -9 "$k" 2>/dev/null; done; kill -9 "$1" 2>/dev/null; }
+# A preflighted, committed, clean RUNNING fixture whose lease k1 holds, with NO ledger and no log.
+init_pl_fixture() {
+  run_pl_git checkout -qf unit >/dev/null 2>&1; run_pl_git reset -q --hard "$pl_unit"; run_pl_git clean -qfd
+  rm -f "$PL_LEDGER" "$PL_LEASE" "$pl_out/order.log"
+  run_pl --preflight tRun --keepalive-id k1 >/dev/null
+  run_pl_git add -A >/dev/null; run_pl_git commit -q -m pl-fixture --no-verify
+  rm -f "$PL_LEDGER" "$pl_out/order.log"
+}
+# A driver KILLED mid-command: a same-id re-preflight whose wiring check sleeps, killed once the ledger
+# names it. Sets PL_ORPH, the recorded wrapper left running, and PL_KIDS, its descendants once the stub
+# sleeps — the wrapper, then `timeout`, then the stub, which exists a moment after the record does.
+write_pl_orphan() { # sleep seconds
+  local _d _i=0 _k
+  PL_ORPH=""; PL_KIDS=""
+  ( cd "$pl_dir" && exec env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" PL_SLEEP="$1" \
+      ${PL_PROCFS:+UNATTENDED_PROCFS="$PL_PROCFS"} bash "$SCRIPT" --preflight tRun --keepalive-id k1 ) >/dev/null 2>&1 &
+  _d=$!
+  while [ -z "$PL_ORPH" ] && [ "$_i" -lt 300 ]; do
+    PL_ORPH=$(awk -v d="$_d" '$3 == d { print $1; exit }' "$PL_LEDGER" 2>/dev/null)
+    [ -n "$PL_ORPH" ] || { sleep 0.1; _i=$((_i + 1)); }
+  done
+  kill -9 "$_d" 2>/dev/null; wait "$_d" 2>/dev/null
+  n=$((n+1)); [ -n "$PL_ORPH" ] || { echo "FAIL the killed driver $_d left no record in $PL_LEDGER, so every arm on this orphan grades nothing"; st=1; return 1; }
+  _i=0
+  while [ "$_i" -lt 150 ]; do
+    PL_KIDS=$(read_pl_kids "$PL_ORPH")
+    for _k in $PL_KIDS; do grep -q '(sleep)' "/proc/$_k/stat" 2>/dev/null && return 0; done
+    sleep 0.1; _i=$((_i + 1))
+  done
+  echo "FAIL the orphan $PL_ORPH never grew its sleeping stub, so the arms on it grade a tree that is not the one a bar leaves"; st=1
+  return 1
+}
+true & pl_dead=$!; wait "$pl_dead"
+
+# ---- AC1: a driver killed while its stub sleeps leaves an orphan, and the holder's matching-id
+# ---- `--resume` reaps it through the REAL reaper, whose fence admits the tree by the root the wrapper
+# ---- carries as its `$0`. A sleeper with the same argv that nobody recorded is still alive after.
+pl_pm=$(cd "$HERE/../process-monitor" 2>/dev/null && pwd) || pl_pm=""
+pl_py=""
+if slice_fn resolve_python; then pl_py=$(resolve_python 2>/dev/null) || pl_py=""; fi
+if [ -z "$pl_pm" ] || [ ! -f "$pl_pm/reap.py" ] || [ -z "$pl_py" ]; then
+  echo "  (SKIP AC1 — this tree carries no process-monitor reaper or no runnable python, so the fence's end-to-end reap cannot be exercised here)"
+else
+  init_pl_fixture
+  pl_roots=$(cd "$pl_dir" && { pwd -W 2>/dev/null; pwd; } | tr '\n' ' ')
+  printf 'PROCMON_ROOTS="%s"\nPROCMON_REAP_MODE="report"\n' "${pl_roots% }" > "$pl_dir/.process-monitor.conf"
+  printf 'PROCMON_CMD="%s %s"\n' "$pl_py" "$pl_pm/reap.py" >> "$pl_dir/.unattended.conf"
+  run_pl_git add -A >/dev/null; run_pl_git commit -q -m real-reaper --no-verify
+  write_pl_orphan 53
+  sleep 53 & pl_foreign=$!
+  out=$(run_pl --resume tRun --keepalive-id k1)
+  hit "$out" "unattended: reaped orphan $PL_ORPH ("
+  n=$((n+1)); kill -0 "$PL_ORPH" 2>/dev/null && { echo "FAIL AC1 the recorded wrapper $PL_ORPH survived the real reaper"; st=1; }
+  n=$((n+1)); for pl_k in $PL_KIDS; do kill -0 "$pl_k" 2>/dev/null && { echo "FAIL AC1 the stub $pl_k under the recorded wrapper survived the real reaper"; st=1; }; done
+  n=$((n+1)); kill -0 "$pl_foreign" 2>/dev/null || { echo "FAIL AC1 a same-argv sleeper nobody recorded was killed, so orphans are matched by command line"; st=1; }
+  kill "$pl_foreign" 2>/dev/null; wait "$pl_foreign" 2>/dev/null
+  run_pl_kill "$PL_ORPH"
+fi
+
+# ---- AC2: an UNRECORDED process whose parent is gone is out of every verb's reach and uncounted,
+# ---- while the recorded orphan beside it is counted and reaped by the stub.
+init_pl_fixture
+write_pl_orphan 47
+( sleep 57 >/dev/null 2>&1 & printf '%s' "$!" > "$pl_out/stray.pid" )
+pl_stray=$(cat "$pl_out/stray.pid")
+out=$(run_pl --status tRun)
+hit  "$out" "· orphans 1"
+out=$(run_pl --resume tRun --keepalive-id k1)
+hit  "$out" "unattended: reaped orphan $PL_ORPH ("
+n=$((n+1)); kill -0 "$pl_stray" 2>/dev/null || { echo "FAIL AC2 a reaping verb killed a process the ledger does not name"; st=1; }
+n=$((n+1)); grep -q "^reap $pl_stray\$" "$pl_out/order.log" 2>/dev/null && { echo "FAIL AC2 the reaper was called on an unrecorded pid"; st=1; }
+out=$(run_pl --status tRun)
+miss "$out" "· orphans"
+kill "$pl_stray" 2>/dev/null
+run_pl_kill "$PL_ORPH"
+
+# ---- AC3: a record naming a live pid whose start token is not the recorded one is a REUSED pid. The
+# ---- reap says so, kills nothing, never calls the reaper, and prunes the record.
+init_pl_fixture
+sleep 61 & pl_live=$!
+mkdir -p "${PL_LEDGER%/*}"
+printf '%s 1 %s - k1 2026-09-22T00:00:00Z sleep 61\n' "$pl_live" "$pl_dead" > "$PL_LEDGER"
+out=$(run_pl --resume tRun --keepalive-id k1)
+hit  "$out" "unattended: NOT reaped $pl_live — exited, pid reused"
+n=$((n+1)); kill -0 "$pl_live" 2>/dev/null || { echo "FAIL AC3 a reused pid was killed on the pid alone"; st=1; }
+n=$((n+1)); grep -q '^reap ' "$pl_out/order.log" 2>/dev/null && { echo "FAIL AC3 the reaper was called for a reused pid"; st=1; }
+n=$((n+1)); grep -q "^$pl_live " "$PL_LEDGER" 2>/dev/null && { echo "FAIL AC3 the reused-pid record was not pruned"; st=1; }
+kill "$pl_live" 2>/dev/null; wait "$pl_live" 2>/dev/null
+
+# ---- AC4: a BLANK reaper turns reaping off, says so, and counts; the orphan is still alive after.
+init_pl_fixture
+printf 'PROCMON_CMD=""\n' >> "$pl_dir/.unattended.conf"
+run_pl_git add -A >/dev/null; run_pl_git commit -q -m blank-reaper --no-verify
+write_pl_orphan 47
+out=$(run_pl --resume tRun --keepalive-id k1)
+hit  "$out" "unattended: reaping is OFF because PROCMON_CMD is blank, so 1 orphan(s) of tRun are counted and left running: $PL_ORPH"
+hit  "$out" "· orphans 1"
+n=$((n+1)); kill -0 "$PL_ORPH" 2>/dev/null || { echo "FAIL AC4 a blank reaper still killed the orphan, so it fell back to a kill that bypasses the fence"; st=1; }
+n=$((n+1)); grep -q '^reap ' "$pl_out/order.log" 2>/dev/null && { echo "FAIL AC4 a blank PROCMON_CMD still reached a reaper"; st=1; }
+run_pl_kill "$PL_ORPH"
+
+# ---- AC5 and AC9 over one orphan: `--status` counts it and kills nothing, and the two `--resume` rows
+# ---- that do not hold the fresh lease k1 refuse, reap nothing and write neither the ledger nor the lease.
+init_pl_fixture
+write_pl_orphan 47
+pl_pb=$(read_pl_sum "$PL_LEDGER"); pl_lb=$(read_pl_sum "$PL_LEASE")
+out=$(run_pl --status tRun)
+hit  "$out" "· orphans 1"
+same "AC5 --status left the ledger byte-unchanged" "$(read_pl_sum "$PL_LEDGER")" "$pl_pb"
+out=$(run_pl --resume tRun)
+hit  "$out" "a live session drives this slug, and a second driver is exactly what the lease exists to stop, so this refuses before any write"
+hit  "$out" "· orphans 1"
+out=$(run_pl --resume tRun --keepalive-id kB)
+hit  "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder"
+same "AC9 the two refused resumes left the ledger byte-unchanged" "$(read_pl_sum "$PL_LEDGER")" "$pl_pb"
+same "AC9 the two refused resumes left the lease byte-unchanged" "$(read_pl_sum "$PL_LEASE")" "$pl_lb"
+n=$((n+1)); kill -0 "$PL_ORPH" 2>/dev/null || { echo "FAIL AC5/AC9 a verb that does not hold the lease killed the orphan"; st=1; }
+n=$((n+1)); grep -q '^reap ' "$pl_out/order.log" 2>/dev/null && { echo "FAIL AC5/AC9 a verb that does not hold the lease called the reaper"; st=1; }
+run_pl_kill "$PL_ORPH"
+
+# ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
+# ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
+init_pl_fixture
+sleep 63 & pl_bar=$!
+pl_tok=$(read_pl_token "$pl_bar")
+mkdir -p "${PL_LEDGER%/*}"
+printf '%s %s %s - k1 2026-09-22T00:00:00Z sleep 63\n' "$pl_bar" "$pl_tok" "$$" > "$PL_LEDGER"
+pl_rb=$(run_pl_git hash-object memory/builds/tRun/RUN.md)
+out=$(run_pl --hold tRun --code platform-limit --until owner --reason "the api is rate limited" --reaped k1)
+hit  "$out" "a process this slug's driver started is still alive, and a hold now would leave a HELD record with its own work in flight; let it finish, or reap it, then hold again: $pl_bar (sleep 63)"
+same "AC6 the refused hold wrote nothing to the record" "$(run_pl_git hash-object memory/builds/tRun/RUN.md)" "$pl_rb"
+n=$((n+1)); grep -q '^reap ' "$pl_out/order.log" 2>/dev/null && { echo "FAIL AC6 a bar under a live driver was sent to the reaper"; st=1; }
+kill "$pl_bar" 2>/dev/null; wait "$pl_bar" 2>/dev/null
+out=$(run_pl --hold tRun --code platform-limit --until owner --reason "the api is rate limited" --reaped k1)
+hit  "$out" "phase HELD · code platform-limit"
+
+# ---- AC8: with the procfs seam pointed at nothing, a new record carries `-` twice, and the holder's
+# ---- `--resume` counts it, reaps none, and says why.
+init_pl_fixture
+PL_PROCFS="$pl_out/no-such-procfs"
+write_pl_orphan 47
+same "AC8 a record made with no procfs carries no start token" \
+  "$(awk -v p="$PL_ORPH" '$1 == p { print $2 " " $4 }' "$PL_LEDGER")" "- -"
+out=$(run_pl --resume tRun --keepalive-id k1)
+hit  "$out" "unattended: NOT reaped $PL_ORPH — no procfs token"
+hit  "$out" "· orphans 1"
+n=$((n+1)); kill -0 "$PL_ORPH" 2>/dev/null || { echo "FAIL AC8 a record without a token was reaped on the pid alone"; st=1; }
+n=$((n+1)); grep -q '^reap ' "$pl_out/order.log" 2>/dev/null && { echo "FAIL AC8 a record without a token was sent to the reaper"; st=1; }
+PL_PROCFS=""
+run_pl_kill "$PL_ORPH"
+
+# ---- AC11: `gates-green` reaps BEFORE its bar starts, `--preflight` reaps once its lease is held, and
+# ---- `--hold` reaps and proceeds. After each, a record whose process had already exited is gone.
+init_pl_fixture
+write_pl_orphan 47
+printf '%s - %s - k1 2026-09-22T00:00:00Z true\n' "$pl_dead" "$pl_dead" >> "$PL_LEDGER"
+run_pl --close tRun >/dev/null
+same "AC11 gates-green reaped the orphan BEFORE its bar started" "$(tr '\n' ' ' < "$pl_out/order.log")" "reap $PL_ORPH bar "
+n=$((n+1)); kill -0 "$PL_ORPH" 2>/dev/null && { echo "FAIL AC11 gates-green left the orphan $PL_ORPH running"; st=1; }
+n=$((n+1)); grep -q "^$pl_dead " "$PL_LEDGER" 2>/dev/null && { echo "FAIL AC11 gates-green kept a record whose process had exited"; st=1; }
+run_pl_kill "$PL_ORPH"
+init_pl_fixture
+write_pl_orphan 47
+printf '%s - %s - k1 2026-09-22T00:00:00Z true\n' "$pl_dead" "$pl_dead" >> "$PL_LEDGER"
+out=$(run_pl --preflight tRun --keepalive-id k1)
+hit  "$out" "unattended: reaped orphan $PL_ORPH ("
+hit  "$out" "preflight OK"
+n=$((n+1)); kill -0 "$PL_ORPH" 2>/dev/null && { echo "FAIL AC11 --preflight left the orphan $PL_ORPH running"; st=1; }
+n=$((n+1)); grep -q "^$pl_dead " "$PL_LEDGER" 2>/dev/null && { echo "FAIL AC11 --preflight kept a record whose process had exited"; st=1; }
+run_pl_kill "$PL_ORPH"
+init_pl_fixture
+write_pl_orphan 47
+printf '%s - %s - k1 2026-09-22T00:00:00Z true\n' "$pl_dead" "$pl_dead" >> "$PL_LEDGER"
+out=$(run_pl --hold tRun --code platform-limit --until owner --reason "the api is rate limited" --reaped k1)
+hit  "$out" "unattended: reaped orphan $PL_ORPH ("
+hit  "$out" "phase HELD · code platform-limit"
+n=$((n+1)); grep -q "^$pl_dead " "$PL_LEDGER" 2>/dev/null && { echo "FAIL AC11 --hold kept a record whose process had exited"; st=1; }
+run_pl_kill "$PL_ORPH"
+
+# ---- AC12: `--abort` removes a ledger that records only exited processes, and KEEPS one naming a live
+# ---- process, with the pid in its output. Each arm asserts the ledger exists first, so an absent one
+# ---- cannot pass for a removed one. The in-place `--landed` half is the derived-terminal block's.
+init_pl_fixture
+mkdir -p "${PL_LEDGER%/*}"
+printf '%s - %s - k1 2026-09-22T00:00:00Z true\n' "$pl_dead" "$pl_dead" > "$PL_LEDGER"
+n=$((n+1)); [ -f "$PL_LEDGER" ] || { echo "FAIL AC12 the fixture carries no ledger, so its removal proves nothing"; st=1; }
+run_pl --attest tRun --item keepalive-reaped >/dev/null
+run_pl --attest tRun --item parked-decisions-surfaced >/dev/null
+out=$(run_pl --abort tRun --code external-prerequisite --reason "nothing left to try")
+hit  "$out" "phase ABORTED"
+n=$((n+1)); [ ! -f "$PL_LEDGER" ] || { echo "FAIL AC12 --abort left the ledger of a finished run behind"; st=1; }
+init_pl_fixture
+sleep 67 & pl_bar=$!
+pl_tok=$(read_pl_token "$pl_bar")
+mkdir -p "${PL_LEDGER%/*}"
+printf '%s %s %s - k1 2026-09-22T00:00:00Z sleep 67\n' "$pl_bar" "$pl_tok" "$$" > "$PL_LEDGER"
+n=$((n+1)); [ -f "$PL_LEDGER" ] || { echo "FAIL AC12 the fixture carries no ledger, so its survival proves nothing"; st=1; }
+run_pl --attest tRun --item keepalive-reaped >/dev/null
+run_pl --attest tRun --item parked-decisions-surfaced >/dev/null
+out=$(run_pl --abort tRun --code external-prerequisite --reason "nothing left to try")
+hit  "$out" "unattended: the process ledger is KEPT, because a recorded process is still alive and a later reap can find it only there: $pl_bar (sleep 67)"
+n=$((n+1)); [ -f "$PL_LEDGER" ] || { echo "FAIL AC12 --abort removed a ledger that still names a live process"; st=1; }
+kill "$pl_bar" 2>/dev/null; wait "$pl_bar" 2>/dev/null
+
+cd "$TMP" || exit 2
+rm -rf "$pl_dir" "$pl_oroot" "$pl_out"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
@@ -9616,7 +9941,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1357 -> 1423 by exactly the arm, TOOL-dDerivedDocket-24: the inherited-red block at the foot
 # of region two executes 66 assertions, COUNTED by running that block behind a replica of this
 # prologue by hand over its own fixture; this pass runs no suite.
-FLOOR_ASSERTIONS=1423
+# RAISED 1423 -> 1484 by exactly the arm, TOOL-dDerivedDocket-28: the process-ledger block at the
+# foot of region two executes 59 assertions with AC1's real-reaper arm taken, and the in-place
+# `--landed` half of its AC12 adds two to the derived-terminal block, all in region two. COUNTED by
+# running both behind a replica of this prologue by hand over their own fixtures; this pass runs no
+# suite. The same pass repaired the first run_bounded harness in region two, which died on `set -u`
+# at its first call because the lease pair the function reads was never assigned there.
+FLOOR_ASSERTIONS=1484
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -9740,7 +10071,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=1227
+# +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1288
 # +66 for the TOOL-dDerivedDocket-24 inherited-red arms, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the TOOL-dDerivedDocket-30 `--framed` and `--version` arms, in region two - see FLOOR_ASSERTIONS.
 # 1156 at the dDerivedDocket reconcile of origin/main: base 594 + this branch's +326 (to 920) +

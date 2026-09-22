@@ -4904,7 +4904,7 @@ reset_tree
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --only 28 2>&1); rc=$?
 same "--only 28 exits 0 once the conf is read above the scope guard" "$rc" "0"
 miss "$out" "unbound variable"
-for o28 in 30 31 32 33 39 40 15; do
+for o28 in 30 31 32 33 39 40 15 41; do
   hit "$out" "check $o28 skipped under --only 28 — this run asked for the 28 region alone"
 done
 out=$(bash "$SCRIPT" --only 28 2>&1); rc=$?
@@ -4977,6 +4977,28 @@ hit "$(run_skip_leg)" "check-unattended.test.sh lacks --skip"
 reset_tree
 mutate $KIT_REL/check-unattended.sh '/^# gov:argv-begin$/d'
 hit "$(run_skip_leg)" "a parser's argument region is not exactly one bare gov:argv-begin and gov:argv-end pair holding at least one flag, so the flag join would grade that parser against nothing and pass by finding nothing"
+reset_tree
+
+# ==== TOOL-dDerivedDocket-28 S8: CHECK 41, a process not in the ledger is never killed ===============
+# ---- Both carriers an agent acts from must say so. The stops template is SEEDED into the kit copy
+# ---- here, because the shared fixture carries only the Skill's; the pristine pair is the GREEN control,
+# ---- each carrier with the sentence reworded is a RED naming that file, and an absent carrier is
+# ---- announced on the report channel rather than graded green in silence.
+reset_tree
+cp "$HERE/STOPS.template.md" $KIT_REL/
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "does not state that a process not in the ledger is never killed"
+hit  "$out" "check 41 graded 2 of 2 carriers of the process-ledger rule"
+mutate $KIT_REL/STOPS.template.md 's/never killed/sometimes killed/I'
+out=$(run)
+hit  "$out" "a carrier an agent acts from does not state that a process not in the ledger is never killed, so a stray process carrying this kit's command line is left to the agent's judgement, which is how a run had to be parked over five processes that were another repository's"
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 41 FAILED')" "/STOPS.template.md"
+reset_tree
+mutate $KIT_REL/SKILL.template.md 's/never killed/sometimes killed/I'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 41 FAILED')" "/SKILL.template.md"
+hit  "$out" "check 41 did not grade"
+hit  "$out" "check 41 graded 1 of 2 carriers of the process-ledger rule"
 reset_tree
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
@@ -5069,7 +5091,12 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- unit's block at the END of region two - so FLOOR_SHARD_2 carries the same +43 and
 # ---- FLOOR_SHARD_1 is untouched. COUNTED by executing both blocks behind a replica of this
 # ---- prologue by hand; this pass runs no suite.
-FLOOR_ASSERTIONS=700
+# ---- RAISED 700 -> 710 by exactly the arm, TOOL-dDerivedDocket-28: the check-41 block at the END
+# ---- of region two executes nine assertions (two `mutate`, six `hit`, one `miss`) and the
+# ---- `--only 28` announcement loop one more for check 41, so FLOOR_SHARD_2 carries the same +10 and
+# ---- FLOOR_SHARD_1 is untouched. COUNTED off the diff; this pass runs no suite, and the check's
+# ---- block was run sliced out of the leg over the kit and its staged breaks.
+FLOOR_ASSERTIONS=710
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -5095,7 +5122,7 @@ FLOOR_ASSERTIONS=700
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=102
-FLOOR_SHARD_2=598
+FLOOR_SHARD_2=608
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

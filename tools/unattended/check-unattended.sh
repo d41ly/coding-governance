@@ -5118,6 +5118,29 @@ _c15s=$(for _c15f in "$HERE"/*.sh; do
 [ -z "${_c15s//[[:space:]]/}" ] \
   || fail 15 "a first-commit DATE is read with --diff-filter=A and no --follow in this kit's own shell, so a rotation re-dates an archived record to the commit that added its name and a cutoff grades a record it was written to grandfather:$_c15s"
 
+# ---- check 41 - A PROCESS NOT IN THE LEDGER IS NEVER KILLED, and both carriers an agent acts from SAY
+# ---- so. TOOL-dDerivedDocket-28 S8. One run found six abandoned processes whose command lines matched
+# ---- this kit's, five of them another repository's, and had to be parked because nothing told it
+# ---- which it could kill. The rule's sentence is its marker: the stops companion and the Skill
+# ---- template must each hold it, read with line wraps folded to spaces and case ignored.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that the driver OBEYS the rule, which is the driver suite's reused-pid
+# ---- and same-argv arms, or that the INSTALLED copies match these, which is the adopter's --check. A
+# ---- carrier absent from the kit is ANNOUNCED and not graded here, because each already has a
+# ---- refusal of its own: check 16 for the Skill template, the adopter's --check for the stops one.
+_c41_rule='a process not in the ledger is never killed'
+_c41_n=0
+for _c41_f in "$HERE/STOPS.template.md" "$HERE/SKILL.template.md"; do
+  if [ ! -f "$_c41_f" ]; then
+    report "check 41 did not grade $_c41_f - the kit does not carry it here"
+    continue
+  fi
+  _c41_n=$((_c41_n + 1))
+  tr -s '\n\r ' '   ' < "$_c41_f" | grep -qiF -- "$_c41_rule" \
+    || fail 41 "a carrier an agent acts from does not state that a process not in the ledger is never killed, so a stray process carrying this kit's command line is left to the agent's judgement, which is how a run had to be parked over five processes that were another repository's: $_c41_f"
+done
+report "check 41 graded $_c41_n of 2 carriers of the process-ledger rule"
+
 fi   # ---- end of the checks `--only 28` skips
 
 
