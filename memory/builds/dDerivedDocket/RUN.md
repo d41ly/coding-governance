@@ -270,3 +270,11 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-22T06:49:37Z rescope · item add TOOL-dDerivedDocket-63 · reason Promoted at the G8 bounded exit (H1): unit 61's same-session take-over row shadows --replaces, so the holder loses its own replace; this unit reorders and narrows the leased rows.
 
 2026-09-22T06:49:39Z rescope · item add TOOL-dDerivedDocket-64 · reason Promoted at the G8 bounded exit (H2): the gate turnstile queue writes no gate log, so a healthy queued bar reads STALE; this unit has the queue write a heartbeat the liveness clock reads.
+
+2026-09-22T06:52:30Z dispatch · item 3db00cab TOOL-dDerivedDocket-26 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/README.md .githooks/pre-push .githooks/pre-push.test.sh .githooks/pre-push.runlog.test.sh tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/features/run-gates.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-26.md
+
+2026-09-22T06:53:30Z dispatch · item 3db00cab TOOL-dDerivedDocket-28 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/STOPS.template.md tools/unattended/SKILL.template.md tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/README.md .unattended.conf memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md memory/project/unarmed-branches.txt memory/map/features/unattended.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-28.md
+
+2026-09-22T06:53:31Z brief · item TOOL-dDerivedDocket-26 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-22T06:53:32Z brief · item TOOL-dDerivedDocket-28 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
