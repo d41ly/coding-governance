@@ -793,9 +793,43 @@ check_inherited_verdict() {
   return 0
 }
 
+# check_verdict_record <run dir> — rc 0 when THAT bar's own record reads `verdict GREEN`, the
+# honest-verdicts unit's boundary half of its no-silent-pass envelope (TOOL-dDerivedDocket-26 S6).
+# Sets PP_NOT naming what was missing otherwise. The run dir is the id this hook pinned above and
+# cleared before the bar started, so a record the runner did not write in THIS push cannot be read.
+check_verdict_record() {
+  local d=$1 v
+  PP_NOT=""
+  if [ ! -f "$d/verdict" ]; then
+    PP_NOT="the bar exited 0 and left no verdict in its run record at $d"; return 1
+  fi
+  v=$(awk -F'\t' '$1=="verdict"{print $2; exit}' "$d/verdict" 2>/dev/null)
+  [ "$v" = GREEN ] && return 0
+  PP_NOT="the bar exited 0 and its run record reads verdict '${v:-none}', not GREEN"; return 1
+}
+
+# THE RUNNER'S ARM SEAMS DO NOT REACH THE BOUNDARY (TOOL-dDerivedDocket-26). `GATE_SPAWN_CMD`,
+# `GATE_SPAWN_FLOOR` and `GATE_VERDICT_FAULT` exist so the runner's own suites can stage a HOST verdict
+# or a refusal; inherited here, the environment of the push would choose how its own red is classified.
+unset GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT
 gate=${GOV_GATE_CMD:-bash $GOV_KITROOT/run-gates/run-gates.sh}
 $gate </dev/null
 rc=$?
+# AN EXIT 0 IS NOT A VERDICT UNTIL THE RECORD SAYS SO (TOOL-dDerivedDocket-26 S6). One push to the
+# default branch proceeded with no bar run while this hook said it was forcing one
+# (TOOL-aSurfacedLexicon-25), and the path that exited 0 was never found. Whatever it was, a runner
+# that exits 0 without writing `verdict GREEN` into the record of the id pinned above is now RED here.
+# The record is read, never stdout: a pipe waits for the last inherited write end, and the runner's
+# wall watcher can outlive it holding one. An override command is not the runner and writes no
+# record, so it is announced and not checked -- which is also what every arm that stubs the bar uses.
+if [ "$rc" -eq 0 ]; then
+  if [ -n "${GOV_GATE_CMD:-}" ]; then
+    echo "pre-push: GOV_GATE_CMD overrides the bar, so its run record is not checked for an override command"
+  elif ! check_verdict_record "$gd/gate-run/$RUNLOG_GATE_RUN"; then
+    echo "pre-push: $PP_NOT — treating it as RED"
+    rc=1
+  fi
+fi
 # A RED ON INHERITED LEGS ONLY LANDS UNDER `land`, and nowhere else (D12-i4). The exit that follows is
 # still this hook's one exit, so the run log's decision stays the gate decision above; the landing is
 # the printed line. An attended push lands over it too: `land` is this repository's policy for every

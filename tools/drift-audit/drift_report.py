@@ -2143,6 +2143,58 @@ def build_nonterminal_merged_runs(ctx) -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------------
+# Signal - legs the merge bar retried after a timeout (TOOL-dDerivedDocket-26 S7)
+#
+# The gate runner retries, once and alone, a leg whose own ceiling fired, and counts a pass on that
+# retry as green. That is right for one bar and invisible across many: a leg that needs its retry on
+# every bar is a leg whose ceiling no longer fits the box, and a green bar says nothing about it. Each
+# run record's verdict file carries `retried <n>`, and this sums it over the records the git dir
+# still holds.
+#
+# REPORT-ONLY, over a window nobody chose here: the runner keeps a handful of run directories and
+# sweeps the rest, so the figure describes the last few bars of THIS worktree's git dir and is not a
+# history. LIVENESS is a verdict file that carries the key at all. A git dir with no run record, or
+# only records from a runner that predates the retry, cannot move this signal, and it says DEAD
+# PROBE rather than a reassuring 0.
+#
+# WHAT IT DOES NOT CHECK: which legs were retried. The verdict file counts them; the per-leg
+# `<i>.retry.leg` rows beside it name them, and a reader who wants the names reads those.
+_RUN_RECORD_DIR = "gate-run"
+
+
+def measure_legs_retried_after_timeout(ctx) -> dict:
+    """`retried` summed over every readable run-record verdict under this worktree's git dir."""
+    name = "legs_retried_after_timeout"
+    rows = []
+    gd = ctx.git.run("rev-parse", "--git-dir")
+    base = pathlib.Path(gd.stdout.strip()) if gd.returncode == 0 and gd.stdout.strip() else None
+    if base is not None and not base.is_absolute():
+        base = ctx.root / base
+    if base is not None:
+        for verdict in sorted((base / _RUN_RECORD_DIR).glob("*/verdict")):
+            try:
+                text = verdict.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            retried = None
+            for line in text.splitlines():
+                key, _, val = line.rstrip("\r").partition("\t")
+                if key == "retried" and val.strip().isdigit():
+                    retried = int(val.strip())
+            rows.append({"run": verdict.parent.name, "retried": retried})
+    judgeable = [r for r in rows if r["retried"] is not None]
+    return {
+        "signal": name,
+        "value": sum(r["retried"] for r in judgeable),
+        "of": len(rows),
+        "tolerance": ctx.pins.get(name, 0),
+        "gateable": False,
+        "live": bool(judgeable),
+        "detail": rows,
+    }
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
@@ -2152,7 +2204,8 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_backlog_rows_outliving_specs,
            build_source_cited_ids_with_no_record,
            build_backlog_stragglers,
-           build_nonterminal_merged_runs]
+           build_nonterminal_merged_runs,
+           measure_legs_retried_after_timeout]
 
 
 # --------------------------------------------------------------------------------------------

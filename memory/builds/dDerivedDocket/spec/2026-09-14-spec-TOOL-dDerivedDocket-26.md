@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-26 — honest verdicts under contention
 
-**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
+**Status:** CLOSED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-22-build-TOOL-dDerivedDocket-26-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dDerivedDocket-26-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
@@ -61,10 +62,15 @@ that row stays OPEN.
   bar reads the recorded floor, then measures once at start and folds that figure into the minimum
   kept in `<git-common-dir>/gate-spawn-floor`, written tmp-then-rename. A retry compares against the
   floor AS READ before this bar measured, so a bar never calibrates against itself and a clone's
-  first bar has no floor (§8 F4). Before a deferred leg's retry, and again before the second
+  first bar has no floor (§8 F4). A bar in which no leg that will run carries a live bound neither
+  measures nor writes (rev-8): none of its legs can be deferred, so it pays no spawns for a
+  calibration it can never read, and every suite bar with no ceiling stays as cheap as it was.
+  Before a deferred leg's retry, and again before the second
   spawn-cost measurement, the timed-out attempt's process tree must already be gone. WHICH mechanism
-  buys that is F5, parked for the orchestrator, because three properties measured at HEAD rule out
-  every mechanism this runner already carries, and the spec names none until that fork is resolved.
+  buys that is F5, resolved at rev-8: `runleg` runs `timeout` in the background, records its pid in
+  `<i>.tpid`, and on a fired ceiling kills every process still in the process GROUP that pid leads,
+  from one `ps` snapshot, keyed on the group and never on a ppid chain. The three properties below,
+  measured at HEAD, are why every mechanism this runner already carried was ruled out.
   First, `run_leg_reap` (`tools/run-gates/run-gates.sh:1001`) MAY NOT be rooted at the walker's own
   pid: `scan_descendants` seeds its accumulator with the ROOT (`out=$1`,
   `tools/run-gates/run-gates.sh:429`) and `remove_descendants` iterates that list and `kill -9`s the
@@ -183,8 +189,15 @@ The floor is per CLONE, because node `a` pays roughly 251 ms per process against
 second timeout happens after the pool drained AND after the timed-out attempts' trees were reaped,
 so the bar's own concurrency, grandchildren included, is gone and a high figure means another
 tenant; the runner's own comment records a grandchild outliving `timeout` by 51 s on these nodes
-(`:1376-1381`). That precondition is bought by the mechanism F5 settles, and S5 states the bounds
-rather than the mechanism. Rooting a live-tree reap at the walker's own pid is REFUSED, because
+(`:1376-1381`). That precondition is bought by the process-group reap F5 settles at rev-8.
+`timeout` without `--foreground` makes itself the leader of a new process group, and a descendant
+that outlives it keeps that group id after it is reparented to pid 1: measured on node `d`
+2026-09-22, a TERM-ignoring grandchild outlived `timeout -k 2s 2` returning 124 with PPID 1 and a
+PGID equal to `timeout`'s pid. So a sweep of one `ps` snapshot for that group id reaches the residue
+a ppid walk cannot, and the worker, which is in the runner's own group, is never in it. What the
+sweep does NOT reach is a descendant that left the group itself, by `setsid` or job control; the
+post-drain assertion below names such a survivor only when it is still a ppid-descendant of a live
+root, and otherwise nothing sees it. Rooting a live-tree reap at the walker's own pid is REFUSED, because
 `remove_descendants` kills its seed and would take the worker with it before `.sec` and `.rc` are
 written. Moving `run_leg_reap` after the pool drains is refused too, because by then that pid has
 exited and both of its arms die on a dead root — the walk returns its seed, the monitor refuses the
@@ -211,14 +224,19 @@ did: the directory is removed before the run, and the id carries `$$` and `$RAND
 ### Inventory
 
 `measure_neighbours`, `measure_spawn_cost`, `run_leg_retry`, `check_verdict_record` (hook) in
-`sh.function`; `measure_legs_retried_after_timeout` in `py.function`. `GATE_SPAWN_CMD` is an arm
+`sh.function`; `measure_legs_retried_after_timeout` in `py.function`. Rev-8 adds the helpers the
+build needed, each through `lexicon.py --suggest` in `sh.function`: `scan_group` and
+`remove_group_residue` for F5's reap, `check_residue_gone` for the post-drain assertion,
+`read_spawn_floor` and `write_spawn_floor` for the floor file, `derive_fail_tail` for the one tail
+both attempts print, and `derive_host_note` for the HOST decision. `GATE_SPAWN_CMD` is an arm
 seam, and `GATE_HOST_RATIO` is a source constant, not a conf key. `GATE_SPAWN_FLOOR`, which
 Calibration above introduces, is a SECOND arm seam and not a conf key either: it names the floor
 file's path so AC4 can stage the two floor states §5 declares without permission bits.
 Beside `GATE_SPAWN_CMD`, a
 verdict-write arm seam that forces the verdict-file write to fail, spelled as the runner's existing
 arm seams are (`GATE_` plus a noun), named at build time, and marked an arm seam, not a conf key,
-exactly as `GATE_SPAWN_CMD` is.
+exactly as `GATE_SPAWN_CMD` is. Named at build time: `GATE_VERDICT_FAULT`. All three seams are read
+once and then unset, as `GATE_RUN_ID` is, so a nested runner a leg starts never inherits one.
 
 ### Files touched (estimate)
 
@@ -460,8 +478,14 @@ New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record, a
   by-recorded-root entry point. What is already settled, and is not part of this fork, is what may
   NOT be done: rooting a live-tree reap at the walker's own pid, because `scan_descendants` seeds
   its accumulator with the root and `remove_descendants` kills that seed first, so the worker dies
-  before `.sec` and `.rc`. PARKED for the orchestrator. S5 and §4 state the bounds and name no
-  mechanism; AC11's third arm holds whichever option is chosen to the worker's survival.
+  before `.sec` and `.rc`. Rev-8 adds (d): (a)'s backgrounded `timeout`, with the reap keyed on the
+  process GROUP that `timeout` leads rather than on any ppid chain. RESOLVED (agent, 2026-09-22,
+  delegated): (d). (a) and (b) fail AC11's first arm, because the residue they walk to has been
+  reparented off both roots; (c) needs a by-recorded-root entry point in another kit's reaper, which
+  is new public surface outside this unit (veto 2). (d) satisfies all three AC11 arms with no new
+  dependency and no new surface: `ps` is already this runner's, and the group it sweeps is the one
+  `timeout` made for this leg alone. It rests on a read of the existing `timeout` rather than on a
+  built arm, recorded in §4 Calibration with its one blind spot, a descendant that left the group.
 
 ## 9. Revision log
 
@@ -581,6 +605,22 @@ New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record, a
 - rev-7 · 2026-09-21 · order re-declared from 26 to 27 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 27, beside TOOL-dDerivedDocket-28. No criterion, design or edge moved.
+- rev-8 · 2026-09-22 · §2 §4 §8 · S5 · the build pass. F5 was still parked when the unit was
+  dispatched, and a spec cannot close over an unresolved fork, so the pass resolved it under the
+  mandate's delegation before writing code: (d), the process-group reap, after a read of the
+  existing `timeout` on node `d` showed the residue keeps its group id once reparented. S5 and §4
+  Calibration now name that mechanism and its one blind spot. S5 also gains one refinement the
+  spec did not price: a bar with no live-bounded leg to run skips the start measurement, since none
+  of its legs can be deferred and a spawn floor it can never read is not worth ten spawns on every
+  nested suite bar. §4 Inventory names the verdict-write seam `GATE_VERDICT_FAULT` and the seven
+  helpers the build added. No criterion moved: AC4 leaves its writer bars' legs to the arm, which
+  gives each one a bounded leg, and AC11's three arms grade the mechanism as they were written. Three
+  hardenings the checklist pass asked for, all inside S5 and S6 as written: the group scan returns
+  rc 2 on a process table with no PGID column, so the post-drain assertion reads an unreadable group
+  as NOT cleared rather than as an empty one; `.githooks/pre-push` unsets the three arm seams before
+  its bar, so a push's environment cannot choose how its own red is classified; and a spawn
+  measurement whose clock did not move is no measurement, never a one-microsecond floor that would
+  read every later double timeout as HOST.
 
 ## 10. Reuse audit
 

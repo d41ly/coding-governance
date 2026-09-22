@@ -15,10 +15,19 @@ its own, and the canary asserts that.
 
 | exit | the bar | its last stdout line |
 |---|---|---|
-| 0 | GREEN: every leg that ran passed, over a tree that did not move | `gates GREEN — …` |
-| 1 | RED: one or more legs failed, or the whole-run wall fired | `gates RED — …` |
-| 2 | REFUSED: not run from a repository, no usable python, a manifest or profile table it cannot read, a scratch dir or run record it cannot create, or a manifest whose every leg is held | a `run-gates:` line, or `gates REFUSED — …` in the summary file |
+| 0 | GREEN: every leg that ran passed, over a tree that did not move, with at least one leg line reported and the run record's verdict file written | `gates GREEN — …` |
+| 1 | RED: one or more legs failed and at least one of them is not HOST, or the whole-run wall fired | `gates RED — …` |
+| 2 | REFUSED: not run from a repository, no usable python, a manifest or profile table it cannot read, a scratch dir or run record it cannot create, a manifest whose every leg is held, a run that reported no leg line (an empty manifest), or a green whose verdict file was not written | a `run-gates:` line, or `gates REFUSED — …` |
 | 3 | TREE MOVED: no leg failed, but the tree changed while the bar ran, so no verdict describes it | `gates TREE MOVED — …` |
+| 4 | HOST: every failed leg timed out twice, the second time alone, while one spawn cost more than `GATE_HOST_RATIO` times this clone's recorded floor, so the verdict is about the host and not the subject | `gates HOST — …` |
+
+**The precedence, first match wins: 2 REFUSED, 1 RED, 4 HOST, 3 TREE MOVED, 0 GREEN.** One leg that
+failed for a reason of its own makes a bar RED however many others the host explains, and its RED
+line names them as `(<n> HOST: <legs>)`. A HOST bar over a moved tree still exits 4, its line ending
+`(the tree moved while the bar ran)`. HOST writes no `gate-full-green` stamp, keeps the failure record
+a red keeps, and its run record says `verdict HOST`. Exit 0 is never taken on the status of the legs
+alone: the pre-push hook reads `verdict GREEN` from the run record of the id it pinned after every
+exit 0, and blocks a push whose record says anything else or nothing.
 
 **Exit 3 never outranks a red.** A failed leg is a finding about some tree, so a bar that failed AND
 moved exits 1, and its RED line ends `(the tree moved while the bar ran)`. A moved bar never writes
@@ -26,6 +35,42 @@ the `gate-full-green` stamp, and its run record says `verdict TREE MOVED`. Every
 any non-zero exit as "not green" — the pre-push hook is one — reads exit 3 correctly without
 learning it. What to do about a moved tree, such as re-running once on a tree that has stopped
 moving, is the caller's decision and not the runner's.
+
+## A leg killed by its own ceiling gets one serial retry
+
+A leg whose OWN ceiling fired — `timeout` exited 124, or 137 once the leg ran to its bound and ignored
+the TERM — is not failed on the spot, because a bar under its own concurrency kills legs that pass in
+a fraction of the time alone. It is printed in its manifest position as
+
+```
+GATE retry  <leg>  (timed out after <n>s beside <k> neighbours; one serial retry after the pool drains)
+```
+
+where `<k>` counts the legs that were running when it timed out. Its chunk closes `pending`, never
+`green`. After the pool drains, and inside the run's wall, each such leg runs once more ALONE under its
+own ceiling and prints its final line: `GATE ok    <leg>  (retried after timeout)`, which counts green,
+or `GATE FAIL  <leg>  (timed out after <n>s, again on its serial retry; …)`, whose note says whether
+HOST was read and why not. One `---- retry: <green|RED|HOST|killed>  (<n> retried, <m> failed)` line
+follows. Any other 137 — a self-kill, an OOM kill, an operator's or a CI cancel, under a bound or with
+none — is an ordinary failure and is never retried; nor is an assertion failure.
+
+**HOST is a ratio, never a wall clock.** Each bar with a bounded leg to run times ten spawns of one
+external binary and keeps the lowest figure this clone has ever measured in `gate-spawn-floor` under
+the git common dir, one `<per-spawn-ms><TAB><iso-utc>` line written tmp-then-rename. A leg that times
+out on its retry is HOST when one more measurement then exceeds `GATE_HOST_RATIO` times the floor AS
+READ before this bar measured, so a clone's first bar can never read HOST. The ratio is a constant in
+the runner's source, not a conf key, and every HOST tail prints the ratio it measured. The timed-out
+attempts' processes must be gone first: the worker kills whatever is left in the process group its
+`timeout` led, and the retry pass verifies that before it measures, naming any survivor instead of
+calling it another tenant. A descendant that left that group on its own is invisible to both.
+`GATE_SPAWN_CMD` (what is timed), `GATE_SPAWN_FLOOR` (the floor file's path) and `GATE_VERDICT_FAULT`
+(make the verdict write fail) are arm seams for the suites, not conf keys: the runner unsets each
+once read, and the pre-push hook clears all three before the bar it runs.
+
+The records keep both attempts: the first attempt's `<i>.leg` row reads `timeout` and a
+`<i>.retry.leg` row sits beside it, the verdict file gains `retried <n>`, and the ledger row takes the
+retry's seconds with the status `retried`, which reuse never accepts. The drift report sums `retried`
+across the run records as `legs_retried_after_timeout`.
 
 ## The switch every adopter needs to know about
 
@@ -103,7 +148,10 @@ outranks both, and an unresolvable baseline runs every leg.
 A run claims a beacon under the git COMMON dir before it dispatches, so every worktree of one
 repository shares one beacon and two repositories never contend. A second run takes a time-sorted
 ticket and queues, announcing its position; the runner prints `gate queue: waited <n>s` on exactly
-one line, always, zero when uncontended, so a wrapper can tell waiting from working.
+one line, always, zero when uncontended, so a wrapper can tell waiting from working. The next line is
+`gate queue: acquired <iso-utc> from <state>`, the instant the bar stopped waiting, and the run
+record's header carries the same pair as `acquired` and `acquired_from`, so a bar killed later can
+still be told apart from one that never acquired.
 
 That line is not durable, and the status file beside it is deleted the moment the wait ends, so the
 wait also reaches the RUN RECORD as the paired keys `queued` and `queued_from`, and the summary
@@ -197,9 +245,11 @@ file's name true, and an implementation that forgets one passes every arm writte
 ## Every leg may declare a `ceiling`, and the runner holds it to it
 
 **`"ceiling": <seconds>`, a positive integer, per leg row in the manifest.** A leg that outlives it
-is KILLED and reported `GATE FAIL <leg> (timed out after Ns)` — never skipped, never green. That is
-the one way a knob here may change a verdict: it converts an unbounded hang into a RED naming its
-leg. Before it existed, one leg that never returned wedged the whole bar and named nothing.
+is KILLED, deferred and retried once alone, as the serial-retry section above states, and a leg that
+outlives it on the retry too is reported `GATE FAIL <leg> (timed out after Ns, again on its serial
+retry; …)` — never skipped, and green only when its retry passed. That is the one way a knob here may
+change a verdict: it converts an unbounded hang into a RED naming its leg. Before it existed, one leg
+that never returned wedged the whole bar and named nothing.
 
 **A KILLED leg names the seconds it RAN and its ceiling separately.** `timeout` exits 124 when its
 own TERM fires and 137 when a SIGKILL ends the leg — its `-k` escalation, an operator, an OOM killer

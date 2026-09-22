@@ -43,7 +43,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 261
+CHECK_FLOOR = 267
+# 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
@@ -2440,6 +2441,47 @@ def test_asks_disposed_overrides(tmp: pathlib.Path) -> None:
 
 
 # ---------------------------------------------------------------------------------------------
+# TOOL-dDerivedDocket-26 — legs the merge bar retried after a timeout
+# ---------------------------------------------------------------------------------------------
+
+
+def _write_gate_verdict(r: pathlib.Path, run: str, body: str) -> None:
+    """One run record's verdict file under the fixture's git dir, where the gate runner writes it."""
+    d = r / ".git" / "gate-run" / run
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "verdict").write_text(body, encoding="utf-8", newline="\n")
+
+
+def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
+    """The sum of `retried` over the run records a git dir holds, and DEAD where none can move it.
+
+    The runner retries a leg whose own ceiling fired and counts a pass on that retry green, which is
+    right for one bar and invisible across many. This signal is the reader across them.
+    """
+    print("legs retried after a timeout, over the run records")
+    r = make_repo(tmp, name="retried")
+    _write_gate_verdict(r, "r1", "verdict\tGREEN\nretried\t1\n")
+    _write_gate_verdict(r, "r2", "verdict\tRED\nretried\t1\n")
+    got = report(r)["legs_retried_after_timeout"]
+    check("two records with retried 1 report 2", got["value"] == 2, f"got {got['value']}")
+    check("the probe is LIVE where a record carries the key", got["live"] is True)
+    check("report-only: a retried leg is not a refusal", got["gateable"] is False)
+    # --- a record from a runner that predates the retry is read but moves nothing ------------------
+    _write_gate_verdict(r, "r0", "verdict\tGREEN\nran\t4\n")
+    got = report(r)["legs_retried_after_timeout"]
+    check("a record without the key is counted in `of` and adds nothing",
+          got["value"] == 2 and got["of"] == 3, f"value {got['value']} of {got['of']}")
+    # --- it MOVES when another bar retries ---------------------------------------------------------
+    _write_gate_verdict(r, "r3", "verdict\tGREEN\nretried\t3\n")
+    check("a further record raises the sum",
+          report(r)["legs_retried_after_timeout"]["value"] == 5, "the signal does not track its variable")
+    # --- DEAD, not a reassuring 0, over a git dir holding no run record -------------------------------
+    dead = report(make_repo(tmp, name="noruns"))["legs_retried_after_timeout"]
+    check("a git dir with no run record reports DEAD rather than 0",
+          dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+
+
+# ---------------------------------------------------------------------------------------------
 # TOOL-dLoggedFlight-13 — run records left non-terminal after their build merged
 # ---------------------------------------------------------------------------------------------
 
@@ -2777,6 +2819,7 @@ def main() -> int:
         test_no_signal_hardcodes_live(tmp)
         test_live_backlog_rows(tmp)
         test_asks_disposed_overrides(tmp)
+        test_legs_retried_after_timeout(tmp)
         test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)

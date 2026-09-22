@@ -107,6 +107,17 @@ leg failed, which stays RED and names the move. Two readers compare whole output
 arm and the run-log suite's failed-append arm, so both keep the new count line stable.
 `TOOL-dDerivedDocket-25`.
 
+**A fired ceiling is deferred, not failed, and exit 0 needs a written verdict.** `check_ceiling_fired`,
+the predicate the red attribution reads CONTENDED by, defers a leg to ONE serial retry after the pool
+drains, inside the wall; a pass counts green and `retried`, and a second timeout is HOST (exit 4) when
+a spawn then costs more than `GATE_HOST_RATIO` times the clone's `gate-spawn-floor` as read before the
+bar measured. The reap is keyed on `timeout`'s PROCESS GROUP, because a descendant outliving the leg
+is reparented off every ppid chain and keeps only its group id; a walk rooted at the worker kills the
+worker. Retry files sit beside the first attempt's, so the attribution still reads the first. An
+empty manifest and an unwritten verdict file are REFUSED, and the pre-push hook reads `verdict GREEN`
+after every exit 0. Two whole-output readers filter the timestamped `gate queue: acquired` line.
+`TOOL-dDerivedDocket-26`.
+
 **Exactly one leg is impure, and it is the gate rather than a self-test.** Seven of the 86 legs name
 a network verb in their own script; six build their origin under `mktemp -d`. The seventh,
 `unattended kit gate`, runs `ls-remote` against the real remote and fails closed, so its verdict is a

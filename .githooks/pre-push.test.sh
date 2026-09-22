@@ -619,4 +619,78 @@ esac
 
 cd "$pfx_home" || exit 2
 
+# ---- TOOL-dDerivedDocket-26: AN EXIT 0 IS NOT A VERDICT UNTIL THE RUN RECORD SAYS SO ------------------
+# A STUB RUNNER at the hook's DEFAULT command, with GOV_GATE_CMD unset, because an override command is
+# announced and not checked. It exits 0 in every mode; the variable is what it writes into the run
+# record of the id the hook pinned. The GREEN mode is the control: without it a hook that blocked
+# every push would pass the two arms that expect a block.
+build_vr_fixture() { # tag -> a pushed main whose tree carries the stub runner; cwd moves into its work tree
+  local d="$tmp/vr-$1"
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  cd "$d/work" || return 1
+  git config user.email t@example.com; git config user.name t
+  git config core.hooksPath "$d/hooks"
+  mkdir -p "$KIT_REL/run-gates"
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  cat > "$KIT_REL/run-gates/run-gates.sh" <<'VRSTUB'
+#!/usr/bin/env bash
+[ -n "${VR_IDS:-}" ] && printf '%s\n' "$GATE_RUN_ID" >> "$VR_IDS"
+d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"
+case "${VR_MODE:-none}" in
+  green) mkdir -p "$d" && printf 'verdict\tGREEN\n' > "$d/verdict" ;;
+  red)   mkdir -p "$d" && printf 'verdict\tRED\n' > "$d/verdict" ;;
+esac
+exit 0
+VRSTUB
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+}
+run_vr_push() { # [env assignments…] -> VR_OUT and VR_RC, the push's merged output and its status
+  git commit -q --allow-empty -m "vr $RANDOM" >/dev/null 2>&1
+  VR_OUT=$( env -u GOV_GATE_CMD -u GATE_RUN_ID GATE_SELFTESTS= "$@" git push origin main 2>&1 ); VR_RC=$?
+}
+build_vr_fixture ac5 || bad "VR could not build its fixture"
+# AC5, the hook's half: a runner that exits 0 and writes NO record is blocked — the
+# TOOL-aSurfacedLexicon-25 shape, where the status alone let a push through with no bar run.
+run_vr_push VR_MODE=none
+case "$VR_RC|$VR_OUT" in
+  1*"left no verdict in its run record"*) ok "VR AC5 an exit 0 with no run record is blocked, naming the missing verdict" ;;
+  *) bad "VR AC5 an exit 0 with no run record must block, got rc $VR_RC: $VR_OUT" ;;
+esac
+git reset -q --hard origin/main
+run_vr_push VR_MODE=red
+case "$VR_RC|$VR_OUT" in
+  1*"reads verdict 'RED', not GREEN"*) ok "VR AC5 an exit 0 over a RED record is blocked" ;;
+  *) bad "VR AC5 an exit 0 over a RED record must block, got rc $VR_RC: $VR_OUT" ;;
+esac
+git reset -q --hard origin/main
+run_vr_push VR_MODE=green
+[ "$VR_RC" = 0 ] && ok "VR control: an exit 0 over its own GREEN record lands" \
+  || bad "VR control: an exit 0 over its own GREEN record must land, got rc $VR_RC: $VR_OUT"
+# AC15: an inherited GATE_RUN_ID naming a pre-planted GREEN record buys nothing, because the hook pins
+# and clears its OWN id; and two consecutive pushes pin two different ids.
+_vgd=$(git rev-parse --git-dir)
+mkdir -p "$_vgd/gate-run/planted"; printf 'verdict\tGREEN\n' > "$_vgd/gate-run/planted/verdict"
+run_vr_push VR_MODE=none GATE_RUN_ID=planted
+[ "$VR_RC" = 1 ] && ok "VR AC15 an inherited id naming a planted GREEN record is not honoured" \
+  || bad "VR AC15 a planted GREEN record under an inherited id satisfied the boundary: rc $VR_RC: $VR_OUT"
+git reset -q --hard origin/main
+: > "$tmp/vr-ids"
+run_vr_push VR_MODE=green VR_IDS="$tmp/vr-ids"; run_vr_push VR_MODE=green VR_IDS="$tmp/vr-ids"
+case "$(sort -u "$tmp/vr-ids" | grep -c .)|$(grep -c '^planted$' "$tmp/vr-ids")" in
+  "2|0") ok "VR AC15 two pushes pin two different ids, neither the inherited one" ;;
+  *) bad "VR AC15 the stub runner saw these ids: $(tr '\n' ' ' < "$tmp/vr-ids")" ;;
+esac
+# S6's announcement: an override command is not the runner and writes no record, so it is not checked.
+git commit -q --allow-empty -m "vr override" >/dev/null 2>&1
+_o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git push origin main 2>&1 ); _r=$?
+case "$_r|$_o" in
+  0*"its run record is not checked for an override command"*) ok "VR an override command lands and the skipped record check is announced" ;;
+  *) bad "VR an override command must land with the skip announced, got rc $_r: $_o" ;;
+esac
+cd "$pfx_home" || exit 2
+
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }
