@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-22-review-TOOL-dDerivedDocket-61-spec-audit-g8-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-61-spec-audit-g8-round1.md) | spec-audit | TOOL-dDerivedDocket-27 |
 
 <!-- /gen:spec-records -->
 

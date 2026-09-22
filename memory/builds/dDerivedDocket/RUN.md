@@ -262,3 +262,5 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-22T04:47:01Z brief · item TOOL-dDerivedDocket-24 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-22T05:06:58Z rescope · item add TOOL-dDerivedDocket-61 · reason Adopted after the origin/main merge at c23d5701 by owner ruling of 2026-09-22 (reconcile fully): the merge kept two lease models and two restart paths, and none of main's out-of-session actors knew HELD. One Tier-2 unit reconciles them; it also takes the property TOOL-dDerivedDocket-27 S11 guarded, which that unit withdraws.
+
+2026-09-22T05:49:15Z review · item dDerivedDocket-specs-g8 · reason verdict BLOCKED · blockers 1 · BOUNDED · disposition promote

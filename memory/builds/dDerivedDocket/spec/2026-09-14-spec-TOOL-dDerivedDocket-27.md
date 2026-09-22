@@ -12,6 +12,7 @@
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-28 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-28 |
 | [2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-28 |
+| [2026-09-22-review-TOOL-dDerivedDocket-61-spec-audit-g8-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-61-spec-audit-g8-round1.md) | spec-audit | TOOL-dDerivedDocket-61 |
 
 <!-- /gen:spec-records -->
 
