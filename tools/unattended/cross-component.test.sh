@@ -82,6 +82,7 @@ fi
 sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CMD="true"|' \
     -e 's|^WIRING_CHECK=.*|WIRING_CHECK="true"|' -e 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' \
     -e 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' \
+    -e 's|^UNDECLARED_WRITE_CEILING=.*|UNDECLARED_WRITE_CEILING="0"|' \
     "$HERE/../../.unattended.conf" > .unattended.conf
 git add -A >/dev/null && git commit -q -m base --no-verify
 git remote add origin ../origin.git && git push -q origin main

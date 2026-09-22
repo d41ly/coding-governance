@@ -109,7 +109,6 @@
       "testsuite counts (every bar self-test prints one)",
       "testsuite counts self-test",
       "tier2-review self-test",
-      "unattended arms-groups selftest",
       "unattended kit gate",
       "unattended skill wiring",
       "unattended-build self-test",

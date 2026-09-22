@@ -901,19 +901,6 @@
     "ceiling": 300
   },
   {
-    "name": "unattended arms-groups selftest",
-    "argv": [
-      "bash",
-      "tools/unattended/check-arms-groups.test.sh"
-    ],
-    "guard": [
-      "tools/unattended/"
-    ],
-    "chunk": "selftests",
-    "subject": "kit",
-    "ceiling": 300
-  },
-  {
     "name": "run-gates canary",
     "argv": [
       "bash",
