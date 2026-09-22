@@ -23,6 +23,18 @@ root_relative = true
 to = "{relpath}"
 claims = [".githooks/pre-push", ".githooks/pre-push.test.sh"]
 
+# THE HOOK'S RUN-LOG SUITE IS WITHHELD, per TOOL-aQuenchedHarness-3. Its subject is the hook's own
+# writer, which a target receives verbatim and never edits, so it has a job only where that source
+# changes. Withheld by claiming the source as `project-owned`, which `apply` never lands; its leg is
+# carried on gov's bar by an [[exempt_leg]] row in the deployer's registry, never a [[gate_leg]] here,
+# because a descriptor row naming a leg the target cannot carry is what reds the deployer. The sibling
+# suite above still ships, and changing that is not TOOL-dLoggedFlight-4's.
+[[files]]
+include = [".githooks/pre-push.runlog.test.sh"]
+role = "project-owned"
+root_relative = true
+claims = [".githooks/pre-push.runlog.test.sh"]
+
 # The branch-guard BLOCK, not the file. The runbook's instruction is to copy that block into the
 # target's own pre-commit, which is a merged-role write into a file the target owns.
 [[files]]

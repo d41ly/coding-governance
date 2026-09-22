@@ -2,6 +2,7 @@
 # Self-test for check-verdict-epoch.sh. Every arm runs in a throwaway repo with a synthetic engine,
 # because the arm that matters — "the engine moved and the version did not" — cannot be staged in
 # this tree without leaving the merge bar red.
+KIT_REL="${KIT_REL:-tools/memory-tree}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 GATE="$HERE/check-verdict-epoch.sh"
@@ -87,7 +88,7 @@ commit_engine "$K" 1.5 "" base
 BASE_K=$(cd "$K" && git rev-parse HEAD)
 commit_engine "$K" 1.5 "echo one" "change, no bump"
 ( cd "$K" && sed -i 's/# gov:kit memory-tree@1.5/# gov:kit memory-tree@1.5 — engine identity, reworded/' \
-    tools/memory-tree/check-memory-hygiene.sh && git add -A && git commit -qm "reword the comment ON the constant line" --no-verify ) >/dev/null
+    $KIT_REL/check-memory-hygiene.sh && git add -A && git commit -qm "reword the comment ON the constant line" --no-verify ) >/dev/null
 arm 'touching the constant LINE without its VALUE is not a bump' 1 'NO' "$K" "$BASE_K"
 
 # A COMMENT-ONLY commit after a correct bump must not re-open the range: W is the newest
@@ -96,7 +97,7 @@ M=$(newrepo trailing)
 commit_engine "$M" 1.5 "" base
 BASE_M=$(cd "$M" && git rev-parse HEAD)
 commit_engine "$M" 1.6 "echo one" "bump + change"
-( cd "$M" && printf '# a trailing comment\n' >> tools/memory-tree/check-memory-hygiene.sh \
+( cd "$M" && printf '# a trailing comment\n' >> $KIT_REL/check-memory-hygiene.sh \
     && git add -A && git commit -qm "comment only, after the bump" --no-verify ) >/dev/null
 arm 'a comment-only commit after the bump does not re-open it' 0 'the version moved 1.5 -> 1.6' "$M" "$BASE_M"
 
@@ -106,7 +107,7 @@ P=$(newrepo delegate)
 commit_engine "$P" 1.5 "" base
 BASE_P=$(cd "$P" && git rev-parse HEAD)
 commit_engine "$P" 1.6 "echo one" "bump + change"
-( cd "$P" && printf 'print("classify")\n' > tools/memory-tree/gotchas.py \
+( cd "$P" && printf 'print("classify")\n' > $KIT_REL/gotchas.py \
     && git add -A && git commit -qm "a delegate moves after the bump" --no-verify ) >/dev/null
 arm 'a DELEGATE change after the bump is caught' 1 'the bump is OLDER than the change' "$P" "$BASE_P"
 

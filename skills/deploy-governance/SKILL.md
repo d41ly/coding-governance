@@ -43,7 +43,9 @@ Read-only. Lists every destination the install TOUCHES, one row per path, with i
 the source commit, and leaves the target byte-identical. **Only a `write` row says govkit puts bytes
 there.** `SIDE` means a step `apply` runs produces it, `ORDER` means something outside `apply` must
 supply it, `COVER` means a sibling rule writes that same path, `BLOCK` means `apply` refuses the
-install over it, and `UNRES.` means the destination still carries an unanswered token and is not a
+install over it, `FORK` means gov's own copy is a DERIVATIVE of the target's — reported in
+both directions and written in NEITHER — and `UNRES.` means the destination still carries an
+unanswered token and is not a
 path. The legend prints above the rows. Read it before applying — this is the last cheap moment to
 notice a destination you did not expect, and the last cheap moment to notice one you expected and are
 not getting.
@@ -57,6 +59,20 @@ what makes the receipt's provenance claim true — then stages everything it wro
 adopter. It writes `<target>/.governance/install.json` and a flat `install.sums` a target verifies
 with bash alone.
 
+**The receipt is at schema 3, and each landed row carries TWO identities.** `gov_oid` is the git
+blob gov shipped at that row's `commit`; `oid` is the blob the target holds, read from its INDEX
+rather than from worktree bytes. The pair is what lets `update` tell gov's own file from one
+somebody edited, without a stored flag that can go stale: `oid != gov_oid` IS the local-delta
+question, asked fresh every run. Reading the index rather than the worktree is what makes this
+survive a checkout filter — on a default Windows clone the old worktree comparison reported
+almost every row as diverged. Rows gov does not supply whole bytes for carry NEITHER identity:
+the synthesized `.gitattributes` row, the `merged` rows that are a gov-owned region inside a file
+the target owns, and the unlanded `project-owned` / `generated` / `rendered` rows.
+
+A schema-2 receipt upgrades in place on its first `update`, from gov's blob at each row's own
+commit. Nothing back-fills a schema-3 receipt, because filling one in is how a merge result would
+be laundered into a provenance claim.
+
 **It does not commit, branch, push, or open a pull request.** That is deliberate and it is your job:
 review what it staged, then land it the way that target lands anything.
 
@@ -67,6 +83,64 @@ python tools/govkit/govkit.py check --target <path>
 Read-only. Reports each kit as not landed, landed but inert, or adopted, and RUNS every declared
 hole's discharge probe. Exit 0 from an adopter means "the adopter ran", never "the kit works", so
 `check` reds on an undischarged hole regardless of what any adopter exited with.
+
+```bash
+python tools/govkit/govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+```
+
+Moves an installed target forward to a newer gov commit. **Read-only by default**, because this
+verb's failure mode is silent data loss in a repository the operator owns and gov does not, so the
+muscle-memory invocation must not be the destructive one. `--write` performs what it printed.
+
+**Deletion is opt-in.** When gov stops shipping a file, `update` prints the row `withdrawn` and
+writes an order under `<target>/.governance/outbox/` naming the file, its last gov commit and why
+nothing happened — and the adopter's copy stays exactly where it is. Only `--write-withdrawals`
+performs the deletion. That flag is a SCOPE flag rather than a `--force`: it enables a narrower
+class of action, defaults off, and overrides no refusal. Before it existed, that branch was this
+engine's one unguarded delete — it removed a tracked file from a repository gov does not own, with
+no flag and no order.
+
+**A file gov RENAMED is not a withdrawal.** `update` runs one rename diff between the two vintages
+and prints the map it derived. A row whose source moved reads `renamed`, and `--write` performs
+`git mv` to the destination the target's OWN descriptor resolves for the new source — never a
+string edit of the old destination, because a rename that crosses a rule boundary changes the
+descriptor's answer. The bytes are decided BEFORE the move: a row the adopter never edited takes
+gov's blob at the new source, and one carrying a local edit takes a three-way merge, so the edit
+survives the move. Gov's rename detection is scored, so a rewrite too large to pair reads
+`withdrawn` and is reported rather than guessed at. So is a source that moved OUT of the kit's
+claimed surface, or one the descriptor now resolves to several destinations — both drop loudly,
+naming the source and the reason, because a report costs a line and a guess costs a file in the
+wrong place.
+
+**Every `--write` run verifies what it wrote, and a kit that this run broke undoes itself.** The
+exposure was specifically the CLEAN-merge path: a three-way that succeeds on non-overlapping hunks
+produces a plausible, wrong, executable file, and its first observer used to be a merge bar days
+later. So after the write loop, `update` runs each TOUCHED kit's own `[check].argv` — the same
+declaration `check` runs, not a second implementation — and compares it against a BASELINE it took
+of that same kit before the first byte moved. A kit that passed before and fails after is rolled
+back: every path it touched goes back to the index entry it had, both spellings of a rename
+included, its receipt rows go back with them, an order lands under `<target>/.governance/outbox/`
+naming the kit, its check argv, both exit codes and every path restored, and the receipt is not
+re-stamped. Only that kit — a sibling kit's write is correct and reverting it to punish a neighbour
+discards a good result.
+
+The baseline is the part that keeps this from becoming a wedge. A kit that was ALREADY red before
+the run is reported as pre-existing red, keeps its writes, and does not block the receipt: without
+that, one unrelated standing red in a target would revert every correct write on every run, forever,
+with no `--force` in any spelling to escape by. What that costs is stated rather than implied — a
+binary check cannot tell "still broken" from "newly broken", so a bad merge inside a kit that was
+already red lands unobserved. A kit whose check is `{ none = "…" }`, or whose argv does not resolve,
+is counted as **unverified** rather than green, because a check that could not run is not a pass. A
+claimed kit this run did not touch is printed `not-run` and its check is executed neither time. Every
+one of those five counts prints even when it is zero. There is no flag to turn any of this off: an
+opt-in verifier verifies the runs that were already careful.
+
+The two roles `update` classifies but never writes — `seed` and `rendered` — get the `renamed`
+verdict AND a second line saying the row was reported rather than moved, so a template or a
+rendered document whose gov source moved is visible rather than silent. Performing that one is
+yours. The roles that never reach classification at all — `project-owned`, `generated`, `merged`,
+`gate-leg`, `ci`, `forked` — are unchanged by this: each still prints what its own disposition
+prints.
 
 ## What it will refuse, and what to do about it
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Runnable check for tools/check-wiring.sh. Spins throwaway repos and asserts the wired/unwired
 # detection, the never-clobber auto-fix, and the always-exit-0 --session mode. Run: bash tools/check-wiring.test.sh
+KIT_REL="${KIT_REL:-tools}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"      # safe dir to return to before any rm -rf
@@ -18,6 +19,10 @@ newrepo() {   # cd (in THIS shell) into a fresh repo with a tracked .githooks/pr
 }
 cleanup() { cd "$REPO"; [ -n "$D" ] && rm -rf "$D"; [ -n "$OOT" ] && rm -rf "$OOT"; D=""; OOT=""; }
 chk() { bash "$SCRIPT" "$@" 2>/dev/null; }   # run the checker, drop stderr noise
+# ...and the variant that KEEPS stderr. The resolver's refusals are written there, so an arm that
+# asserts on a refusal MESSAGE through `chk` would be asserting on text it discarded — a fixture
+# that cannot see what it grades. TOOL-dRetiredFork-8.
+chke() { bash "$SCRIPT" "$@" 2>&1; }
 
 # A kit file in THIS repo, resolved across both install prefixes the way every arm resolves them
 # (`tools/<rel>` here, `<rel>` in a copy-installed adopter). Nothing below hard-codes `$HERE/…`:
@@ -33,8 +38,11 @@ src_of() { for c in "$REPO/tools/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; 
 install_driver() {
   local p="$1" rel src
   mkdir -p "${p}memory-tree" "${p}lib" "${p}memory-recall" memory/backlog
-  for rel in memory-tree/merge-rows.py memory-tree/merge-rows.sh lib/pyrun.sh lib/resolve-python.sh \
-             memory-recall/extract.py memory-recall/recall_conf.py; do
+  # A CONTINUED LINE CANNOT CARRY A COMMENT — the backslash would escape the space before it,
+  # not the newline — so the list is two assignments, each of which can be marked.
+  _rels="memory-tree/merge-rows.py memory-tree/merge-rows.sh lib/pyrun.sh lib/resolve-python.sh"  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  _rels="$_rels memory-recall/extract.py memory-recall/recall_conf.py"  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  for rel in $_rels; do
     src=$(src_of "$rel")
     # A NAMED cause instead of `cp: cannot stat ''`. Every file in this list is a runtime dependency
     # of the driver — the shim's resolver, the memory-recall kit the anchor grammar is imported
@@ -99,7 +107,12 @@ cleanup
 
 # AC7 — agent-cap adopted but unwired -> --check UNWIRED (exit 1); --session still exits 0
 if [ -f "$SMERGE" ]; then
-  newrepo; mkdir -p tools .claude/hooks; cp "$SMERGE" tools/settings-merge.py; printf '// stub\n' > .claude/hooks/agent-cap.js
+  newrepo; mkdir -p $KIT_REL/hooks .claude/hooks; cp "$SMERGE" tools/settings-merge.py
+  # The stub goes where the FRAGMENT declares the hook, not at `.claude/hooks/`.
+  # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
+  # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
+  # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
+  printf '// stub\n' > $KIT_REL/hooks/agent-cap.js
   git config core.hooksPath .githooks     # isolate: hooks wired, so only agent-cap can be unwired
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap'; } && ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 1 || ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 0
@@ -119,7 +132,7 @@ if [ -f "$SMERGE" ]; then
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/agent-cap.js\""
           }
         ]
       }
@@ -140,6 +153,24 @@ JSON
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
     && ck "AC7b the widened matcher -> ok, exit 0" 1 || ck "AC7b the widened matcher -> ok, exit 0" 0
+  # AC7d — THE --only BYPASS, and the arm that should have landed with the guard. `--only=<rule>`
+  # narrows agent-cap to one rule, so a wired command carrying `--only=join` turns the three cap
+  # rules off with no diff and a hook that still looks wired. The guard's FIRST spelling bounded
+  # every character class with [^"]*, which cannot cross the escaped quote this settings.json
+  # actually ships, so it matched nothing and printed `ok` over a live bypass — a check that could
+  # not fail, guarding a bypass the same build introduced. This arm fails against that spelling.
+  sed -i 's|agent-cap\.js\\"|agent-cap.js\\" --only=join|' .claude/settings.json
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' \
+      && printf '%s' "$out" | grep -q -- '--only'; } \
+    && ck "AC7d a wired command carrying --only -> UNWIRED" 1 \
+    || ck "AC7d a wired command carrying --only -> UNWIRED" 0
+  # ...and it goes back to ok when the flag leaves. Without this half the arm is satisfied by a
+  # checker that denies every wired command there is.
+  sed -i 's| --only=join||' .claude/settings.json
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
+    && ck "AC7d the flag removed -> ok, exit 0" 1 || ck "AC7d the flag removed -> ok, exit 0" 0
   cleanup
 else
   echo "skip agent-cap cases — settings-merge.py not found next to script"
@@ -152,9 +183,9 @@ fi
 # UNWIRED and an absent hook file is "kit not adopted here".
 SGFRAG="$HERE/hooks/scratch-guard.fragment.json"
 if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
-  newrepo; mkdir -p tools/hooks .claude/hooks
+  newrepo; mkdir -p $KIT_REL/hooks $KIT_REL/memory-recall .claude/hooks
   cp "$SMERGE" tools/settings-merge.py
-  cp "$SGFRAG" tools/hooks/scratch-guard.fragment.json
+  cp "$SGFRAG" $KIT_REL/hooks/scratch-guard.fragment.json
   git config core.hooksPath .githooks    # isolate: hooks wired, so only scratch-guard can move the exit
 
   # 13a — fragment shipped, hook not installed, nothing in settings: NOT adopted, must not gate.
@@ -165,7 +196,11 @@ if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
 
   # 13b — hook installed but nothing in settings.json: the dormant-guard state, and the whole reason
   # this arm exists. A guard that is silent because it is unwired looks exactly like one that passed.
-  printf '// stub\n' > .claude/hooks/scratch-guard.js
+  # The stub goes where the FRAGMENT declares the hook, not at `.claude/hooks/`.
+  # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
+  # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
+  # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
+  printf '// stub\n' > $KIT_REL/hooks/scratch-guard.js
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  scratch'; } \
     && ck "AC13b hook present, unwired -> UNWIRED, exit 1" 1 \
@@ -187,7 +222,7 @@ if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/scratch-guard.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/scratch-guard.js\""
           }
         ]
       }
@@ -204,7 +239,9 @@ JSON
   # 13d — and the declared matcher reads ok. Without this half the arm is satisfied by a checker that
   # denies every matcher there is.
   rm -f .claude/settings.json
-  "${PYBIN:-python}" tools/settings-merge.py --fragment tools/hooks/scratch-guard.fragment.json >/dev/null 2>&1
+  . "$REPO/tools/lib/resolve-python.sh"
+  py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
+  "$py" tools/settings-merge.py --fragment $KIT_REL/hooks/scratch-guard.fragment.json >/dev/null 2>&1
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
     && ck "AC13d the fragment's own matcher -> ok, exit 0" 1 \
@@ -235,13 +272,17 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
     && ck "AC8 recall kit absent -> skip, exit 0" 1 || ck "AC8 recall kit absent -> skip, exit 0" 0
 
   # state 2 — kit adopted, hook opt-in NOT taken -> skip, exit 0 (never UNWIRED)
-  cp "$FRAG" memory-recall/recall-opened.fragment.json
+  cp "$FRAG" memory-recall/recall-opened.fragment.json  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     recall' && printf '%s' "$out" | grep -q 'opt-in not taken'; } \
     && ck "AC8 recall opt-in not taken -> skip, exit 0" 1 || ck "AC8 recall opt-in not taken -> skip, exit 0" 0
 
   # state 3 — hook file present but no settings block -> UNWIRED, exit 1; --session still exits 0
-  printf '// stub\n' > .claude/hooks/recall-opened.js
+  # The stub goes where the FRAGMENT declares the hook, not at `.claude/hooks/`.
+  # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
+  # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
+  # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
+  printf '// stub\n' > memory-recall/recall-opened.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
     && ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 1 || ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 0
@@ -257,7 +298,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   cp "$SMERGE" tools/settings-merge.py
 
   # state 4 — merged into settings.json -> ok, exit 0
-  "$py" tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1
+  "$py" tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
     && ck "AC8 recall merged -> ok, exit 0" 1 || ck "AC8 recall merged -> ok, exit 0" 0
@@ -265,13 +306,118 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # state 5 — settings still dispatch the hook, the script is gone: UNWIRED, exit 1. Reachable from
   # WIRE §3c step 4 (two separate commands) in reverse order, and from any later loss of the
   # untracked hook file; Claude Code then runs `node` against nothing on every Read.
-  rm -f .claude/hooks/recall-opened.js
+  rm -f memory-recall/recall-opened.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall' && printf '%s' "$out" | grep -q 'is missing'; } \
     && ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 1 || ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 0
   cleanup
 else
   echo "skip recall cases — settings-merge.py or recall-opened.fragment.json not found"
+fi
+
+# AC14 — the orientation-card arm (TOOL-aReplayedCard-2), SIX states in one repo, plus the
+# `--resolve-fragment` print verb. The two fragments are `{here}`-shaped: they sit beside the
+# kickoff engine, which is `kind = "flat"` and ships to `{prefix}/`, so the fixture installs them
+# at `$KIT_REL/` next to a stub engine — the adopter layout — and reads the matchers back from the
+# fragments themselves, never from a second spelling here.
+CARDFRAG=""; REPLAYFRAG=""
+for c in "$HERE/orientation-card.fragment.json" "$REPO/skills/session-kickoff/orientation-card.fragment.json"; do
+  [ -f "$c" ] && { CARDFRAG="$c"; REPLAYFRAG="$(dirname "$c")/orientation-replay.fragment.json"; break; }
+done
+if [ -f "$SMERGE" ] && [ -n "$CARDFRAG" ] && [ -f "$REPLAYFRAG" ]; then
+  . "$REPO/tools/lib/resolve-python.sh"
+  py=$(resolve_python) || { echo "check-wiring.test: no usable python"; exit 2; }
+  newrepo
+  git config core.hooksPath .githooks        # isolate: hooks wired, so only the card arm can move the exit
+  mkdir -p $KIT_REL .claude; cp "$SMERGE" $KIT_REL/settings-merge.py
+
+  # state 1 — no fragment anywhere -> skip, exit 0
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     card' && printf '%s' "$out" | grep -q 'does not ship'; } \
+    && ck "AC14 card fragments absent -> skip, exit 0" 1 || ck "AC14 card fragments absent -> skip, exit 0" 0
+
+  # state 2 — fragments shipped, engine absent -> skip (not adopted), exit 0
+  cp "$CARDFRAG" $KIT_REL/orientation-card.fragment.json
+  cp "$REPLAYFRAG" $KIT_REL/orientation-replay.fragment.json
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     card' && printf '%s' "$out" | grep -q 'not adopted'; } \
+    && ck "AC14 fragments present, engine absent -> skip, exit 0" 1 || ck "AC14 fragments present, engine absent -> skip, exit 0" 0
+
+  # the print verb: `{here}` is the fragment's OWN directory, `{kit}` two up, and a fragment with
+  # no hook_path is a non-zero answer rather than an empty line that reads as a root path.
+  got=$(bash "$SCRIPT" --resolve-fragment $KIT_REL/orientation-card.fragment.json 2>/dev/null)
+  ck "AC14 --resolve-fragment expands {here} to the fragment's directory" "$([ "$got" = "$KIT_REL/manifest-check.sh" ] && echo 1 || echo 0)"
+  mkdir -p $KIT_REL/hooks; printf '{"hook_path": "{kit}/hooks/x.js", "marker": "x.js", "matcher": "M", "event": "E", "name": "x"}\n' > $KIT_REL/hooks/x.fragment.json
+  got=$(bash "$SCRIPT" --resolve-fragment $KIT_REL/hooks/x.fragment.json 2>/dev/null)
+  ck "AC14 --resolve-fragment expands {kit} two directories up" "$([ "$got" = "$KIT_REL/hooks/x.js" ] && echo 1 || echo 0)"
+  printf '{"marker": "x.js"}\n' > $KIT_REL/hooks/nohook.fragment.json
+  got=$(bash "$SCRIPT" --resolve-fragment $KIT_REL/hooks/nohook.fragment.json 2>/dev/null); rc=$?
+  ck "AC14 --resolve-fragment refuses a fragment with no hook_path" "$([ "$rc" != 0 ] && [ -z "$got" ] && echo 1 || echo 0)"
+  rm -rf $KIT_REL/hooks
+
+  # state 3 — engine present, nothing in settings.json -> UNWIRED, exit 1; --session still exits 0
+  printf '#!/usr/bin/env bash\nexit 0\n' > $KIT_REL/manifest-check.sh
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  card' && printf '%s' "$out" | grep -q 'orientation-card entry (--write)'; } \
+    && ck "AC14 engine present, unmerged -> UNWIRED naming the entry, exit 1" 1 || ck "AC14 engine present, unmerged -> UNWIRED naming the entry, exit 1" 0
+  chk --session >/dev/null; [ "$?" = 0 ] && ck "AC6 --session exit 0 despite card unwired" 1 || ck "AC6 --session exit 0 despite card unwired" 0
+
+  # state 4 — THE NARROWED MATCHER (AC7). The writer is right; the replay sits under `resume`
+  # alone, so the card is gone after the first compaction while the file reads as wired to a
+  # marker grep. Written by hand, because the merger would re-match it.
+  cat > .claude/settings.json <<JSON
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \\"\${CLAUDE_PROJECT_DIR}/$KIT_REL/manifest-check.sh\\" --card --write"
+          }
+        ]
+      },
+      {
+        "matcher": "resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \\"\${CLAUDE_PROJECT_DIR}/$KIT_REL/manifest-check.sh\\" --card --replay"
+          }
+        ]
+      }
+    ]
+  }
+}
+JSON
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  card' \
+      && printf '%s' "$out" | grep -q "wired under matcher 'resume', not 'resume|compact'"; } \
+    && ck "AC14 a replay matcher lacking compact -> UNWIRED naming compact" 1 \
+    || ck "AC14 a replay matcher lacking compact -> UNWIRED naming compact" 0
+  ck "AC14 ...and the correctly wired writer does not print ok on its own" \
+    "$(printf '%s' "$out" | grep -q 'ok       card' && echo 0 || echo 1)"
+
+  # state 5 — both merged by the merger itself -> ok, exit 0. This is the arm that reds when
+  # `matchers_of` greps a dash-leading marker without `-e`: grep exits 2 on `--write` as an option.
+  rm -f .claude/settings.json
+  "$py" $KIT_REL/settings-merge.py --fragment $KIT_REL/orientation-card.fragment.json >/dev/null 2>&1
+  "$py" $KIT_REL/settings-merge.py --fragment $KIT_REL/orientation-replay.fragment.json >/dev/null 2>&1
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       card' \
+      && printf '%s' "$out" | grep -q -- "--write at 'startup|clear', --replay at 'resume|compact'"; } \
+    && ck "AC14 both merged -> ok naming both matchers, exit 0" 1 || ck "AC14 both merged -> ok naming both matchers, exit 0" 0
+
+  # state 6 — the writer alone merged: half a wiring is UNWIRED naming the half that is missing.
+  rm -f .claude/settings.json
+  "$py" $KIT_REL/settings-merge.py --fragment $KIT_REL/orientation-card.fragment.json >/dev/null 2>&1
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'orientation-replay entry (--replay) is not in settings.json'; } \
+    && ck "AC14 writer merged, replay not -> UNWIRED naming the replay" 1 || ck "AC14 writer merged, replay not -> UNWIRED naming the replay" 0
+  cleanup
+else
+  echo "skip card cases — settings-merge.py or the orientation fragments not found"
 fi
 
 # AC9 — the eol arm: detect in --check, repair in --fix, and never reach past its bound.
@@ -390,7 +536,7 @@ cleanup
 newrepo
 git config core.hooksPath .githooks        # isolate: hooks wired, so only the merge arm can be unwired
 mkdir -p tools/memory-tree tools/lib memory/backlog
-WANT="bash tools/memory-tree/merge-rows.sh %O %A %B %P"
+WANT="bash $KIT_REL/memory-tree/merge-rows.sh %O %A %B %P"
 
 # state 1 — kit not adopted -> skip, exit 0
 out=$(chk --check); rc=$?
@@ -401,7 +547,7 @@ out=$(chk --check); rc=$?
 # a merge driver that cannot start exits non-zero without writing %A: git then reports CONFLICT and
 # leaves the path holding OURS-only content with no markers. The remedy has to name the launcher that
 # TRAVELS WITH THE KIT, because `tools/lib/pyrun.sh` is gov-internal and an adopter never receives it.
-cp "$(src_of memory-tree/merge-rows.py)" tools/memory-tree/merge-rows.py
+cp "$(src_of memory-tree/merge-rows.py)" $KIT_REL/memory-tree/merge-rows.py  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'merge-rows.sh beside it'; } \
   && ck "AC10 no launcher -> UNWIRED naming the kit-internal one, exit 1" 1 \
@@ -431,7 +577,10 @@ chk --fix >/dev/null; got=$(git config merge.rows.driver); out=$(chk --check); r
 # ...and it is the KIT-INTERNAL launcher that won, not the gov-internal shim. `install_driver` lays
 # both, so without this the fallback could silently win everywhere and every arm here would still
 # pass — while an adopter, who receives only the kit, got a command naming a file they do not have.
-{ printf '%s' "$got" | grep -q 'memory-tree/merge-rows.sh' \
+# The pattern sits in a variable so the marked line carries no line continuation — a trailing
+# backslash escapes the space before a comment, not the newline, and the break is valid shell.
+_want_launcher='memory-tree/merge-rows.sh'   # gov:root-fixture — the kit launcher's own spelling
+{ printf '%s' "$got" | grep -q "$_want_launcher" \
   && ! printf '%s' "$got" | grep -q 'pyrun'; } \
   && ck "AC10 the kit launcher wins over the gov-internal shim" 1 \
   || ck "AC10 the kit launcher wins over the gov-internal shim" 0
@@ -445,7 +594,7 @@ chk --fix >/dev/null; got=$(git config merge.rows.driver); out=$(chk --check); r
 # longer breaks it — that decoupling is the whole point of shipping a launcher with the kit. What it
 # still cannot survive is a driver that will not parse. Removing the FILE would trip the
 # not-adopted probe one test earlier and never reach this arm, so the content is what breaks.
-cp tools/memory-tree/merge-rows.py tools/memory-tree/merge-rows.py.away
+cp $KIT_REL/memory-tree/merge-rows.py $KIT_REL/memory-tree/merge-rows.py.away
 printf 'this is not python(
 ' > tools/memory-tree/merge-rows.py
 out=$(chk --check); rc=$?
@@ -457,7 +606,7 @@ out=$(chk --check); rc=$?
 git config --unset merge.rows.driver
 chk --fix >/dev/null; got=$(git config merge.rows.driver 2>/dev/null || true)
 [ -z "$got" ] && ck "AC10 --fix refuses to wire a driver that cannot run" 1 || ck "AC10 --fix refuses to wire a driver that cannot run" 0
-mv -f tools/memory-tree/merge-rows.py.away tools/memory-tree/merge-rows.py
+mv -f $KIT_REL/memory-tree/merge-rows.py.away $KIT_REL/memory-tree/merge-rows.py
 chk --fix >/dev/null; out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the driver goes green again" 1 || ck "AC10 restoring the driver goes green again" 0
@@ -515,7 +664,7 @@ out=$(chk --check); rc=$?
 # id-level no-duplicate guarantee is entirely off. Every other assertion in the arm is green over it.
 # `anchor_at` is REDEFINED rather than deleted, so the import still succeeds and the fail-closed
 # handler is not what answers: this state is about a grammar that works and recognises nothing.
-printf '\n\ndef anchor_at(line, g=None):\n    return None\n' >> tools/memory-recall/extract.py
+printf '\n\ndef anchor_at(line, g=None):\n    return None\n' >> $KIT_REL/memory-recall/extract.py
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'HASHED'; } \
   && ck "AC10 a grammar that keys NOTHING -> UNWIRED naming the hashed count, exit 1" 1 || ck "AC10 a grammar that keys NOTHING -> UNWIRED naming the hashed count, exit 1" 0
@@ -524,15 +673,15 @@ out=$(chk --check); rc=$?
 # smoke's own three-way by hand and observing a clean, complete, id-preserving merge.
 Q=$(mktemp -d); printf -- '- TOOL-001 | base\n' > "$Q/o"
 printf -- '- TOOL-001 | base\n- TOOL-002 | ours\n' > "$Q/a"; printf -- '- TOOL-001 | base\n- TOOL-003 | theirs\n' > "$Q/b"
-qerr=$(bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py "$Q/o" "$Q/a" "$Q/b" x 2>&1 >/dev/null); qrc=$?
+qerr=$(bash $KIT_REL/lib/pyrun.sh $KIT_REL/memory-tree/merge-rows.py "$Q/o" "$Q/a" "$Q/b" x 2>&1 >/dev/null); qrc=$?
 qn=0; for i in 001 002 003; do [ "$(grep -c -- "^- TOOL-$i |" "$Q/a")" = 1 ] && qn=$((qn+1)); done
 { [ "$qrc" = 0 ] && [ "$qn" = 3 ] && printf '%s' "$qerr" | grep -q '(0 keyed, 3 hashed)'; } \
   && ck "AC10 the dead grammar still merges cleanly (0 keyed, 3 hashed) — the channel is real and quiet" 1 \
   || ck "AC10 the dead grammar still merges cleanly (0 keyed, 3 hashed) — the channel is real and quiet [rc=$qrc ids=$qn err=$qerr]" 0
 rm -rf "$Q"
-git checkout -q -- tools/memory-recall/extract.py 2>/dev/null || true
-if grep -q 'def anchor_at(line, g=None):' tools/memory-recall/extract.py; then
-  cp "$(src_of memory-recall/extract.py)" tools/memory-recall/extract.py
+git checkout -q -- $KIT_REL/memory-recall/extract.py 2>/dev/null || true
+if grep -q 'def anchor_at(line, g=None):' $KIT_REL/memory-recall/extract.py; then
+  cp "$(src_of memory-recall/extract.py)" $KIT_REL/memory-recall/extract.py  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
 fi
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
@@ -715,6 +864,144 @@ HOME="$FAKEHOME" bash "$SCRIPT" --fix >/dev/null 2>&1 || true
 after=$(cat "$FAKEHOME/.claude/skills/session-kickoff/SKILL.md")
 ck "AC5 --fix leaves the out-of-repo install byte-identical" "$([ "$before" = "$after" ] && echo 1 || echo 0)"
 rm -rf "$FAKEHOME"; cleanup
+
+# ---- S4: the settings file is RESOLVED, and an unresolvable one REFUSES (TOOL-dRetiredFork-8) -----
+# Three arms, because the three outcomes are three different facts and the defect this unit removes
+# was exactly that two of them looked the same. The pre-change script had NO settings file in these
+# trees and graded the wiring anyway, reporting ok for every settings-dependent arm.
+newrepo
+mkdir -p .claude
+printf '{"hooks":{}}\n' > .claude/settings.json
+out=$(chke --check); ck "S4 in-tree settings resolve and are reported" \
+  "$(printf '%s' "$out" | grep -qF 'settings  — resolved' && echo 1 || echo 0)"
+ck "S4 an in-tree file is reported as INSIDE the root" \
+  "$(printf '%s' "$out" | grep -qF '(inside the repo root)' && echo 1 || echo 0)"
+
+# OUT OF TREE: reported, never failed. This is the layout at least one adopter runs deliberately,
+# and it is also the shape in which the hardcoded path silently graded nothing.
+OOTS=$(mktemp -d); printf '{"hooks":{}}\n' > "$OOTS/settings.json"
+out=$(GOV_SETTINGS_JSON="$OOTS/settings.json" chke --check)
+ck "S4 an out-of-tree settings file is REPORTED, not failed" \
+  "$(printf '%s' "$out" | grep -qF 'OUTSIDE the repo root' && echo 1 || echo 0)"
+ck "S4 ...and the wiring is still graded" \
+  "$(printf '%s' "$out" | grep -qE '^(ok|UNWIRED|note) +(hooks|agent-cap|scratch|recall|merge)' && echo 1 || echo 0)"
+
+# UNRESOLVABLE: a REFUSAL, not a non-match. An empty string here is what let every arm pass by
+# absence, so this is the arm the whole unit exists for.
+rm -f .claude/settings.json
+# NOT exit 2. The refusal belongs to the ARMS that need the file, not to the run: a repo with no
+# settings file is legal and its hooks, skills and eol wiring must still be graded. Measured: an
+# eager whole-run refusal killed 45 of 76 arms, not one of which was about settings. What the
+# refusal buys is that no arm reads "no file" as "nothing to check".
+chk --check >/dev/null 2>&1; rc=$?
+ck "S4 no settings file -> non-zero, the run still grading" "$([ "$rc" != 0 ] && echo 1 || echo 0)"
+out=$(chke --check)
+ck "S4 ...and the run names the failed resolution" \
+  "$(printf '%s' "$out" | grep -qF 'no settings file resolved' && echo 1 || echo 0)"
+# THE ARM NEEDS AN ADOPTED KIT. With no kit installed every settings arm reports `skip — not
+# adopted`, which is correct and says nothing about this unit; the false-green case is a kit
+# that IS installed while the settings file cannot be found.
+mkdir -p $KIT_REL/hooks && printf '// agent-cap\n' > $KIT_REL/hooks/agent-cap.js
+out=$(chke --check)
+ck "S4 an ADOPTED kit with no settings file says UNWIRED, not ok" \
+  "$(printf '%s' "$out" | grep -qE '^UNWIRED +agent-cap' && echo 1 || echo 0)"
+
+# A DECLARED path that is not there is also a refusal, never a silent fallthrough to the preference
+# rung — resolving a DIFFERENT file than the operator named would make every arm confidently wrong.
+chk --check >/dev/null 2>&1 || true
+out=$(GOV_SETTINGS_JSON="$OOTS/nope.json" chke --check)
+ck "S4 a declared path that is absent does NOT fall back to the rung" \
+  "$(printf '%s' "$out" | grep -qF 'which is not a file' && echo 1 || echo 0)"
+rm -rf "$OOTS"; cleanup
+
+# ---- TOOL-aWeldedTribunal-7: WHICH HOOK WILL ACTUALLY RUN --------------------------------------
+# `core.hooksPath` is repo-global and absolute, so a sibling worktree supplies the hook that gates
+# your push. The check REPORTS that as a `note` and must never gate on it: `unwired` decides this
+# script's exit code and `.unattended.conf` makes `--check` an unattended run's precondition, so an
+# UNWIRED line would refuse every unattended run whenever another checkout moved.
+#
+# ARMS PER HOOK AND PER STATE, derived from the same list the check walks, so a third hook added to
+# `GOV_WIRING_HOOKS` arrives with its arms demanded rather than remembered.
+newrepo
+printf '#!/bin/sh\nexit 0\n' > .githooks/pre-push; chmod +x .githooks/pre-push
+git add -A; git commit -q -m "track both hooks"
+OOT=$(mktemp -d); cp .githooks/pre-commit .githooks/pre-push "$OOT/"
+git config core.hooksPath "$OOT"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: identical blobs report no divergence" \
+   "$([ "$(printf '%s' "$out" | grep -c 'DIVERGES')" = 0 ] && [ "$rc" = 0 ] && echo 1 || echo 0)"
+printf '# planted\n' >> "$OOT/pre-push"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: a diverging pre-push is REPORTED, naming both blobs" \
+   "$(printf '%s' "$out" | grep -q 'pre-push DIVERGES' && echo 1 || echo 0)"
+# THE ONE THAT CARRIES THE FORK RESOLUTION. A report that changes the exit code is the option the
+# spec vetoed, shipped under the accepted option's name.
+ck "hooks: a divergence does NOT gate — --check still exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+printf '# planted\n' >> "$OOT/pre-commit"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: the pre-commit half is reported too" \
+   "$(printf '%s' "$out" | grep -q 'pre-commit DIVERGES' && echo 1 || echo 0)"
+ck "hooks: two divergences still exit 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+rm -f "$OOT/pre-push"
+out=$(bash "$SCRIPT" --check 2>&1)
+ck "hooks: an unreadable side is UNKNOWN, never ok" \
+   "$(printf '%s' "$out" | grep -q 'pre-push: UNKNOWN' && echo 1 || echo 0)"
+cleanup
+# A hook this tree does not TRACK is a SKIP. An adopter owning its own pre-commit and shipping no
+# pre-push must not acquire a permanent finding it has no action to clear.
+newrepo
+OOT=$(mktemp -d); cp .githooks/pre-commit "$OOT/"
+git config core.hooksPath "$OOT"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: an untracked hook announces a skip" \
+   "$(printf '%s' "$out" | grep -q 'pre-push is not tracked here' && echo 1 || echo 0)"
+ck "hooks: a tracked-pre-commit-only adopter still exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+cleanup
+
+# TOOL-cMendedVintage-3 — THE INSTALL PREFIX IS DERIVED, and the ROOT install was the one case the
+# derivation could not reach. The `.git` boundary walk appended `basename "$_p"` to KIT_REL BEFORE it
+# tested the PARENT for `.git`, so `$_p` was never tested as the repo root: a root install walked
+# past the repository to the filesystem root and handed every rung a prefix of directories ABOVE the
+# tree. Measured RED against base 859daa67 with these three arms — the probe path read
+# `at c/Temp/kw3/repo/hooks/`, and with the guard actually shipped the arm still printed
+# `skip — not adopted` over it. The two-segment arm is the CONTROL: it is the case every other rung
+# in the file already depends on, and the reorder had to leave it exactly where it was. It is green
+# on BOTH sides of the fix, which is what makes the other two mean something.
+newrepo
+cp "$SCRIPT" ./check-wiring.sh
+mkdir -p scripts/gov; cp "$SCRIPT" scripts/gov/check-wiring.sh
+git add -A; git commit -q -m "installs at the root and at a two-segment prefix"
+out=$(bash ./check-wiring.sh --check 2>&1)
+ck "prefix: a ROOT install probes agent-cap at 'hooks/', carrying no prefix segment" \
+   "$(printf '%s' "$out" | grep -q 'no agent-cap.js at hooks/ or' && echo 1 || echo 0)"
+out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
+ck "prefix: a two-segment install still carries both segments" \
+   "$(printf '%s' "$out" | grep -q 'no agent-cap.js at scripts/gov/hooks/ or' && echo 1 || echo 0)"
+# THE SECURITY SHAPE, which the path string on its own does not show: with the hook actually THERE, a
+# root install reported the fan-out guard as not adopted. A skip that reads as a pass, over the one
+# arm in this file where a false skip has a security shape.
+mkdir -p hooks; printf '// stub\n' > hooks/agent-cap.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+git add -A; git commit -q -m "ship agent-cap.js at the root install"
+out=$(bash ./check-wiring.sh --check 2>&1)
+ck "prefix: a ROOT install FINDS a shipped agent-cap.js instead of skipping it" \
+   "$(printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' && echo 1 || echo 0)"
+# TOOL-cMendedVintage-4 — AND THE REMEDY IT PRINTS HAS TO BE RUNNABLE WHERE IT IS PRINTED. `SMERGE`
+# used to fall back to a hardcoded `tools/` prefix, so an install at any other prefix with no merger
+# beside it handed the operator a command naming a file their tree does not contain. The two-segment
+# install is the discriminating one: the old spelling and the new differ in both directions here, so
+# the second assertion is not a restatement of the first — it reds if the literal comes back beside
+# a derived one. No merger is installed anywhere in this fixture, which is the fallback's own case.
+# That second pattern deliberately stops before the extension: spelled whole it would be a carried
+# `tools/` literal in this file's own bytes and would RAISE the install-prefix row, which the ratchet
+# cannot absorb. Truncated it still matches the dead spelling and nothing else. Do not "complete" it.
+mkdir -p scripts/gov/hooks; printf '// stub\n' > scripts/gov/hooks/agent-cap.js
+git add -A; git commit -q -m "ship agent-cap.js at the two-segment install"
+out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
+ck "prefix: the agent-cap remedy names the INSTALL PREFIX's merger" \
+   "$(printf '%s' "$out" | grep -q 'scripts/gov/settings-merge.py' && echo 1 || echo 0)"
+ck "prefix: no remedy in that install still names the dead tools/ merger" \
+   "$(printf '%s' "$out" | grep -q 'tools/settings-merge' && echo 0 || echo 1)"
+cleanup
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

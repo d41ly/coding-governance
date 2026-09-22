@@ -1,0 +1,183 @@
+# spec tokens — a spec's machine-facing names resolve against the tree that owns them
+
+```toml
+feature = "spec-tokens"
+title = "Six joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, owe a guarded leg its name, and refuse a dossier claim the map cannot hold"
+status = "shipped"
+streams = ["tooling"]
+decisions = []
+
+[claims]
+gate-legs = ["spec tokens (a spec's own names resolve)", "spec-tokens self-test"]
+kits = []
+git-hooks = []
+workflow-scripts = []
+skill-engines = []
+rendered-skills = []
+gotcha-classes = []
+guides = []
+backlog-shards = []
+lexicon-verbs = []
+[paths]
+globs = [
+  "tools/check-spec-tokens.py",
+  "tools/check-spec-tokens.test.sh",
+  "memory/project/spec-token-waivers.txt",
+]
+```
+
+## Constraints & why
+
+Three spec-audit rounds over one build found the same class by hand every time: a section 7 gate
+name that is not a leg, a section 6 criterion whose witness path is not tracked, and a `path:line`
+citation past the end of its file. Each is a JOIN over two tracked files, so hand-verifying them was
+paying a reviewer to do what a checker does. The checker's own header carries the measurements that
+sized each arm, pinned to the sha they were taken at; they are not restated here.
+
+**It resolves EXISTENCE and RANGE, and nothing else.** It does not read the cited line, so a
+citation naming a real line that argues the opposite passes. It grades no scope, acceptance or
+tier, and it grades prose only where the claims join reads a dossier-claim sentence, whose object's
+SHAPE it grades and nothing more. That limit is in the checker's own header because a structural
+check reads as a semantic one to everybody who did not write it.
+
+**The joins keep their populations apart, and conflating them was the defect rev-2 folded.** Legs
+are graded only on a section 7 line that IS the list, because treating every backticked token there
+as a leg name drowns in prose. Paths are graded only where path-shaped, a slash AND an extension or
+an exact tracked path, because a bare word is prose. Citations are SCOPED to a tracked path, because
+the house style cites a kit file by basename and most citations therefore name nothing `git ls-files`
+holds. Redding those is a disposition per row and the lint never lands; passing them silently is a
+could-not-fail arm over much of the corpus. So they are skipped AND COUNTED, and the count prints on
+every run. The fourth join, `bar`, reads the legs and paths populations rather than minting one; the
+fifth, `guards`, reads the legs population plus one of its own, the declared write set; the sixth,
+`claims`, reads none of them, being a grammar over the spec's own prose outside its fenced blocks.
+
+**A bar or a suite is not an acceptance observation (TOOL-aDeferredBar-2).** The `bar` join reds a
+live spec dated at or after `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf`, blank = off) whose acceptance
+bullet or §7 leg line backticks a merge-bar or self-test-suite INVOCATION: the runner, a
+`*.test.sh` or a whole-suite `selftest.py` at command position, past optional `VAR=value` prefixes,
+`timeout` and a `bash`/`sh`/`python` launcher, or a non-empty `GATE_FULL=`/`GATE_SELFTESTS=`
+assignment (the quoted empty one is OFF, as the hook reads it). The suite population is DERIVED:
+a parity arm feeds every `chunk = selftests` argv of `tools/gate-legs.json` without a `--selftest`
+flag to `BAR`. The unattended driver's `--dispatch` runs the checker, declared as `SPEC_TOKENS_CLI`
+in `.unattended.conf`, over the live tree before admitting a pass, because that harness closes each
+unit spec in its build commit and no bar ever grades one. The research record under
+`memory/builds/aDeferredBar/build/` traced one unit's 68-minute stall to exactly such a token in its
+AC8; the substitute the refusal names is the direct check — the checker on a staged break, a
+`--selftest` flag, a fixture — with the suite declared under `New arm:`. The test runs FIRST in each
+loop on the raw token, because `NOT_A_TOKEN` and `NOT_A_LEG` would drop the motivating
+`GATE_SELFTESTS=1 bash …` token unread. The cutoff is a RELATION, not a constant: the day after the
+later of the newest spec filename date on any ref and the setting commit's own date, and the checker
+REFUSES, before grading, a committed value not strictly past the day it was committed. On the
+landing day it therefore grades zero tracked specs; the pre-cutoff carriers are counted on the bar
+line and listed by `--list` as `NEAR`, so that zero is announced rather than silent. The bullet loop
+now finds the acceptance section by heading text, the read the Gates section already had, so a
+light-profile spec is graded where its criteria sit.
+
+**A path a spec declares it will touch owes the legs it trips (TOOL-aBlindedTrial-8).** The `guards`
+join reads every backticked path-shaped token under a live spec's §4 `### Files touched` sub-head,
+spelled with or without ` (estimate)`, and joins each to every `guard` list in `tools/gate-legs.json`
+with git-pathspec semantics: the exact path, or anything under the guard as a directory, never a
+bare prefix. A leg whose guard the write set trips must be a name on the §7 leg line, in a spec dated
+at or after `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`, blank = off; the same commit-date relation
+as `SPEC_DIRECT_CUTOFF`, asserted by one helper for both keys). The measured case: unit 4 of the
+aBlindedTrial build edited `tools/hooks/scratch-guard.js` and omitted `scratch-guard self-test`, and
+closing review round 1 found it as F7 where no gate did. BROAD guards are excluded from the join and
+listed by `--list` as `NEAR`, and broad is BREADTH: a guard carried by more than `BROAD_LEG_FLOOR`
+legs (a file constant of the checker; a guard listed twice in one row is one leg), whatever its
+depth — a guard many legs share adds nothing when named and buries the specific one. The set the
+floor excludes is derived and printed with its per-guard counts on the guards line of every run,
+never typed in prose (the closing review of units 7/8, R1 and R11: the first cut split on depth,
+which joined `tools/lib/` and excluded `.githooks/`). A directory token of two or more segments
+under the sub-head is a declared PREFIX and trips symmetrically — a guard it equals or sits under,
+and a guard under it, an exact-file guard included (R3); a one-segment ROOT (`tools/`) is how prose
+names a tree, declares nothing, and is listed as NEAR so the skip has a name (round 2, R1). A spec
+with no Gates heading is not joined and is counted, not examined, its tripping paths listed as
+NEAR — the legline arm's own precondition (R4, round 2 R8). The hit token is the composite
+`<leg> <- <path>`, one per missing leg naming the first path
+that trips it, so a `[leg]` waiver row keyed on the bare leg name cannot swallow it. The join reads
+the ESTIMATE as written, not the write set the build made, and reads no path named in prose outside
+the sub-head. The report carries a `guards join` line on every run: declared paths examined in how
+many graded specs, pre-cutoff carriers of a missing leg counted and not graded, specs with no
+sub-head counted apart, no-Gates declarers counted apart, and the excluded broad set with counts. On
+the landing day the graded figures read zero by the relation, and the carriers are the announced
+skip.
+
+**Terminal specs are outside the population by construction.** This repo cites a landed decision
+verbatim and never rewrites one, so grading a CLOSED spec would demand editing a frozen record to
+clear a hit. The population is the specs a build can still change.
+
+**It refuses rather than passing.** An empty spec population refuses, because a lint that graded
+nothing reports the same zero as a clean tree. An unreadable manifest refuses. A waiver row naming
+a path no spec cites, or one the tree now tracks, refuses — a stale exception cannot hide a live hit.
+
+## Shared seams
+
+- `tools/gate-legs.json` — the manifest is READ for leg names, never mirrored. It is the single
+  source for what the bar runs, and this join adds no second list.
+- `memory/project/*.txt` — the shrink-only registry convention, shared with
+  `testsuite-count-waivers.txt` and `install-prefix-waivers.txt`. Same directory, same
+  stale-row-reds rule, and hygiene check 3's allowed set names it so a stray file there still reds.
+- `git ls-files` — the tracked-path oracle, the same population every other gate here grades
+  against. A gate that read the filesystem instead would pass on an unstaged file.
+
+## Reuse affordance
+
+seam: the SKIP-AND-COUNT arm — reuse for any lint whose honest population is a subset of what it
+can see; extend via the printed counter, which is what stops a scoped green row reading as full
+coverage. The pattern is that the skipped count rides every run, not a comment.
+
+seam: the shape-based exclusion set (`NOT_A_TOKEN`, `NOT_A_LEG`, `LEG_LINE`) — reuse for any join
+over house-style markdown that must separate a machine-facing token from prose; extend by adding a
+shape, never a waiver row, because a shape generalises to specs nobody has written yet.
+
+## Affordances
+
+- `python tools/check-spec-tokens.py` — the leg. Silent plus exit 0 is compliance.
+- `python tools/check-spec-tokens.py --list` — every hit AND near-miss, exit 0. The authoring aid,
+  and the pre-wiring instrument section 7 of the charter requires before a predicate is wired.
+- `memory/project/spec-token-waivers.txt` — the shrink-only exception registry.
+
+## The section-7 contract (TOOL-aJoinedCanon-7)
+
+The Gates section is located by HEADING TEXT — `^## [0-9]+[.] Gates[ 	]*$` — and never by ordinal.
+A Tier-1 spec that drops the production-readiness checklist slides every later section up one, so
+the ordinal read graded whatever sat seventh; once `SPEC_LEGLINE_CUTOFF` turns the silent read into
+a verdict, that would red a spec the format permits.
+
+A token that IS a manifest name resolves BEFORE the `NOT_A_LEG` shape exclusions. Those exclusions
+drop commands, conf keys and graded files out of the join, but a real leg name carrying a `/`, or
+opening with a command verb, was discarded UNREAD — so a correct §7 contributed nothing and looked
+like prose. Measured on a fixture: the old reader graded 1 token where the new one grades 2.
+
+The run report carries the UNGRADED population in two separate fields: how many live specs carry a
+Gates heading contributing no leg name, and how many carry no Gates heading at all. They are kept
+apart because the remedies differ — the first is an author writing prose where the list goes, the
+second is the light profile being exercised, which is legal. Measured at this landing: **32 of 44**
+live specs were in the first field and 0 in the second, and before this the report said neither.
+
+`SPEC_LEGLINE_CUTOFF` (`.memory-tree.conf`, blank = off) makes the first field a verdict for any
+live spec dated at or after it that CARRIES a Gates heading. The heading precondition is the whole
+Tier-1 accommodation.
+
+## Gaps
+
+- **The citation arm skips most of its corpus.** The majority of citations name an untracked path
+  and are skipped; the run prints how many. Draining that means changing the house style for
+  kit-file citations, which nothing schedules.
+- **A leg name inside section 7 PROSE is not graded.** The list-line predicate is what makes the arm
+  affordable, and it is also the hole: a spec that names a dead leg in a sentence passes.
+- **Existence is not agreement.** The three joins prove a name resolves; no arm reads what it
+  resolves TO, so a spec citing the wrong real line is invisible here.
+- **The claims join grades a claimed object's SHAPE, never whether it is a key.** It resolves
+  nothing by design, and the six things it cannot see are listed in the checker's own header rather
+  than restated here.
+- **A MISSPELLED shape-excluded name is still skipped.** The manifest-first resolution rescues a leg
+  name that IS in the manifest; one that carries a `/` and is spelled wrong still falls through the
+  shape exclusion unread, so it neither resolves nor reds.
+- **A spec that omits its Gates section is silent by design**, and the S7 arm cannot reach it. That
+  is the Tier-1 accommodation and the price of it.
+- **The bar join reads INVOCATIONS as written in backticks.** A path built at runtime, a runner
+  inside `sh -c`, a fenced block's body and a suite named in prose are all invisible to it; each is
+  the ACT, which the hook of `TOOL-aDeferredBar-3` refuses. The relation's first clause — the
+  cutoff past the newest spec date on ANY ref — has no tree-side form either; the checker mechanises
+  only the commit-date clause.

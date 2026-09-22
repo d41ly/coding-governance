@@ -2,6 +2,20 @@
 
 **Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base abd0f026 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-23-build-TOOL-dScriptedRepeat-15-acceptance.md](../build/2026-08-23-build-TOOL-dScriptedRepeat-15-acceptance.md) | journal | — |
+| [2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md](../build/2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md) | journal | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 |
+| [2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md](../build/2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md) | journal | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md](../reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md](../reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md](../reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 |
+| [2026-08-24-review-TOOL-dScriptedRepeat-13-diff-round9.md](../reviews/2026-08-24-review-TOOL-dScriptedRepeat-13-diff-round9.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `check-unattended.test.sh` is the compensating check for seven merge-bar legs this build removed, and

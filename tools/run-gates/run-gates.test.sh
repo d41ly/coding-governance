@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # run-gates.test.sh — canary: gate-legs.json is well-formed AND run-gates.sh sources every leg from it
 # (no inlined leg command). Exit 0 = clean. Runs as a leg of run-gates.sh itself.
+KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -42,7 +43,9 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=129
+# 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
+# skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
+FLOOR_ASSERTIONS=149
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -93,7 +96,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -113,16 +116,147 @@ if stray:
     sys.exit(1)
 ' "$LEGS_FILE" || fail=1
 
+# ---- 1c. THE PER-LEG CEILING'S BOUND IS A CLOCK, NOT A MESSAGE. TOOL-aBoundedCeiling-1 AC1/AC2.
+#     The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
+#     so an arm asserting "timed out after Ns" is satisfied by the broken code. This one measures
+#     ELAPSED TIME against a control, which is the only instrument that can see the defect.
+#
+#     IT GRADES THE CONSTRUCT, NOT THE BAR. A whole-bar timing assertion is a fact about the node:
+#     measured on node `a` while writing this, a bar carrying ONE trivial leg exceeded 120 s under
+#     ambient load, which would make any absolute bar-level bound flaky in exactly the way that
+#     drives people to delete arms.
+#
+#     THE WINDOW IS DECIDED BY A MEASUREMENT. The CORRECT construct was measured at 12 s under heavy
+#     load against a 2 s bound -- that is kill-path and scheduling overhead, and it does NOT shrink
+#     when the sleeper does. So the valid window is (12, sleeper): a 30 s sleeper against a 20 s
+#     allowance. An earlier revision of this arm used a 10 s sleeper and a 6 s allowance, which is an
+#     EMPTY window and would have redded correct code on the node that produced the 12 s.
+#
+#     WHAT IT DOES NOT CHECK: that run-gates.sh USES this construct. Arm 1d does that, by source.
+# HOISTED: the same probe the timing arms further down use. RUN, never `command -v`.
+# THE BOUND IS 10 s AND IT IS NOT A TIMEOUT, IT IS A CAPABILITY PROBE. `true` returns instantly, so
+# the only thing a bound can add here is a FALSE NEGATIVE: at the shipped `1` it was process-creation
+# latency that tripped it, not a missing binary. MEASURED node `a` 2026-08-28, `timeout -k 1s 1 true`
+# 0/40 failures quiet and 7/40 under eight concurrent spawn loops, while `timeout -k 1s 10 true` was
+# 0/40 under that same load. That 17% is the whole of the run-gates canary's flakiness: the suite
+# probes once while the box is quiet, the runner probes again under a full bar, they disagree, and an
+# arm then blames `GATE_JOBS` or the clamp for a binary that was there the entire time. Raising the
+# bound costs nothing -- it is only ever reached if `timeout` genuinely hangs. TOOL-aSiftedFork-7.
+HAVE_TIMEOUT=0; timeout -k 1s 10 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+# COUNTED EITHER WAY, hoisted above the host check for the reason arm 4h states in its own skip:
+# FLOOR_ASSERTIONS grades whether this SUITE still carries its arms, not whether this BOX could run
+# them, and the SKIP below is what reports the host. Left inside the else branch these six vanished
+# on a host with no runnable `timeout` and the executed total fell to 128 against a floor of 132 --
+# the box redding the bar, which is the exact thing that skip exists to prevent. An arm added to
+# that branch owes its increment HERE, where it cannot be lost with the host.
+n=$((n+1))   # 1c        the construct bounds a grandchild
+n=$((n+1))   # 1d        the runner uses that construct, by source
+n=$((n+1))   # 1e        the runner applies a leg's declared ceiling
+n=$((n+1))   # 1e-ctl    an identical leg with NO ceiling is not reported timed out
+n=$((n+1))   # 1e-report an unbounded leg is counted, never refused
+n=$((n+1))   # 1e-scope  the negative search selected the population it claims to
+if [ "$HAVE_TIMEOUT" != 1 ]; then
+  # A SKIP THAT ANNOUNCES ITSELF. Asserting a timeout on a host that has none reds an adopter's bar
+  # for a property of their box, which is what the sibling arms below already refuse to do.
+  echo "canary: SKIP arms 1c/1d/1e — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here. 1e is INSIDE this gate: with CEILINGS_LIVE=0 the runner deliberately runs every leg unbounded, so its fixture leg would finish and the arm would red for a property of the box"
+else
+_cw=$(mktemp -d)
+_t0=$(date +%s)
+timeout -k 5s 2 bash -c 'sleep 30 & exit 0' </dev/null >"$_cw/grandchild.raw" 2>&1
+_t1=$(date +%s)
+_took=$(( _t1 - _t0 ))
+# The control: the SAME command through a command substitution, which is the form that does not
+# bound the clock. Without it a green here could mean "this box is fast", not "the form is right".
+_t2=$(date +%s)
+_ctl=$(timeout -k 5s 2 bash -c 'sleep 30 & exit 0' 2>&1)
+_t3=$(date +%s)
+_ctltook=$(( _t3 - _t2 ))
+if [ "$_took" -gt 20 ]; then
+  echo "canary: a file-captured 2s timeout over a backgrounded grandchild took ${_took}s — the bound"
+  echo "canary: is on the verdict and not on the clock, which is bounded-through-a-pipe-is-unbounded."
+  fail=1
+elif [ "$_ctltook" -le 20 ]; then
+  echo "canary: the CONTROL returned in ${_ctltook}s, so this host does not reproduce the pipe defect"
+  echo "canary: and the arm above proved nothing. Not a pass: a control that cannot fail is the"
+  echo "canary: vacuous-selector class, and this arm is reported UNPROVEN rather than green."
+  fail=1
+fi
+rm -rf "$_cw"
+
+# ---- 1d. THE RUNNER USES THAT CONSTRUCT. Scoped to CODE LINES: a whole-file grep reds on the
+#     comments documenting the fix, which is absence-assertion-over-whole-file-text happening inside
+#     the guard. TOOL-aBoundedCeiling-1.
+if grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" >/dev/null 2>&1; then
+  echo "canary: run-gates.sh captures a timeout through a command substitution on a code line —"
+  echo "canary: that bounds the verdict and not the clock. Redirect to a file and read the file."
+  grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" | sed 's/^/    /'
+  fail=1
+fi
+
+# ---- 1e. THE RUNNER ACTUALLY APPLIES A LEG'S CEILING. spec-1 AC1/AC3.
+#     Arms 1c and 1d grade the CONSTRUCT and the SOURCE. Neither invokes the runner, so deleting the
+#     `timeout` wrapper from runleg() leaves both of them green and every leg unbounded -- 1c runs its
+#     own literal in this process, and 1d is a negative search that matches nothing when there is no
+#     timeout at all. This build's closing review staged exactly that deletion and watched the bar
+#     stay green. So this arm drives the REAL runner over a fixture manifest.
+#
+#     ELAPSED IS NOT ASSERTED HERE, deliberately, and the reason is measured: on the node that wrote
+#     this, a bar carrying ONE trivial leg exceeded 120 s under ambient load, so a wall-clock bound
+#     around the whole runner is a fact about the box. What IS asserted is the VERDICT plus the
+#     control -- an identical leg with NO ceiling is not reported as timed out -- which is what
+#     distinguishes "the runner bounds legs" from "this leg happened to fail".
+_cd=$(mktemp -d)
+printf '#!/usr/bin/env bash\nsleep 45\n' > "$_cd/slow.sh"
+"$PYBIN" - "$_cd" <<'CEILPY'
+import json, sys, io
+d = sys.argv[1]
+bounded = [{"name": "slow bounded", "argv": ["bash", d + "/slow.sh"], "subject": "repo", "ceiling": 2},
+           {"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]
+unbounded = [{"name": "slow bounded", "argv": ["bash", d + "/slow.sh"], "subject": "repo"},
+             {"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]
+io.open(d + "/bounded.json", "w", encoding="utf-8", newline="\n").write(json.dumps(bounded, indent=2) + "\n")
+io.open(d + "/unbounded.json", "w", encoding="utf-8", newline="\n").write(json.dumps(unbounded, indent=2) + "\n")
+CEILPY
+# A SCRATCH REPO, cwd and all. $KITDIR/run-gates.sh is absolute and GATE_LEGS is explicit, so
+# nothing else moves; the runner's git dir and the turnstile beacon both follow cwd.
+_cr=$(mktemp -d); ( cd "$_cr" && git init -q . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
+_bout=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+case "$_bout" in
+  *"GATE FAIL  slow bounded"*"timed out after 2s"*) ;;
+  *) echo "canary: a leg declaring \"ceiling\": 2 over a 45s command was not reported as timed out —"
+     echo "canary: the runner is not applying per-leg ceilings. Got:"
+     printf '%s\n' "$_bout" | grep -E 'GATE (ok|FAIL|skip)' | sed 's/^/    /'
+     fail=1 ;;
+esac
+
+# 1e-control: the SAME leg with NO ceiling must NOT be reported as timed out. Without this, an arm
+#     that reds every long leg for any reason would read as proof that ceilings work.
+_uout=$(cd "$_cr" && GATE_LEGS="$_cd/unbounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+case "$_uout" in
+  *"timed out after"*) echo "canary: a leg declaring NO ceiling was reported as timed out, so the arm above"
+                       echo "canary: does not discriminate and proves nothing about the ceiling."
+                       fail=1 ;;
+esac
+
+# 1e-report: an unbounded leg is COUNTED and never refused. spec-1 S6 -- the runner cannot tell a
+#     forgotten gov leg from an adopter leg it has no business bounding, so a mixed manifest RUNS.
+case "$_uout" in
+  *"declare no ceiling and run unbounded"*) ;;
+  *) echo "canary: a manifest with an unbounded leg printed no unbounded count, so a manifest quietly"
+     echo "canary: losing its bounds is invisible on every run"; fail=1 ;;
+esac
+rm -rf "$_cd" "$_cr"
+fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e ----------------------------------------------
+
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.
-n=$((n+1))
 ctl=$(mktemp -d)
 printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.sh"],"guard":["z/"]}]' > "$ctl/clean.json"
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -226,7 +360,7 @@ JSON
 
 # CLEARS fx/ts FIRST. Without it the width-1 run reads the width-4 run's records and the negative
 # control passes on stale evidence -- this repo's fixture-passes-by-finding-nothing class exactly.
-run_scratch() { rm -rf "$SCRATCH/fx/ts"; ( cd "$SCRATCH" && GATE_FULL= GATE_BASE= GATE_JOBS=$1 bash tools/run-gates/run-gates.sh 2>&1 ); }
+run_scratch() { rm -rf "$SCRATCH/fx/ts"; ( cd "$SCRATCH" && GATE_FULL= GATE_BASE= GATE_JOBS=$1 bash $KIT_REL/run-gates.sh 2>&1 ); }
 # Read IMMEDIATELY after a run: the next run_scratch deletes these.
 peaks_now()  { cat "$SCRATCH/fx/ts"/*.peak 2>/dev/null | sort -rn | tr "\n" " "; }
 npeaks_now() { ls "$SCRATCH/fx/ts"/*.peak 2>/dev/null | grep -c . || true; }
@@ -377,12 +511,17 @@ esac
 # arm that could not look has not looked, and scoring that green is fixture-passes-by-finding-nothing
 # with the machine blamed for the fixture. The caller owns `fail`, so the self-test below can call
 # this in a subshell and read the message without reddening the suite.
-clamp_expired_verdict() { # width-input -> prints the verdict, always returns 1
+clamp_expired_verdict() { # width-input -> prints the verdict; 1 = blame the clamp, 2 = undecidable
   local w="$1" ctw ctl crc
   ctw=$(clamp_target "$w")
-  ctl=$(GATE_FULL= GATE_BASE= GATE_JOBS="$ctw" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); crc=$?
+  ctl=$(GATE_FULL= GATE_BASE= GATE_JOBS="$ctw" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash $KIT_REL/run-gates.sh" 2>&1); crc=$?
   if [ "$crc" = 124 ]; then
     echo "canary: GATE_JOBS='$w' and its width-$ctw control BOTH expired - this host could not finish the fixture at any width, so the clamp is unproven either way"
+    # 2, NOT 1. This branch already DECLINES to blame the clamp, and the caller red anyway - so
+    # the canary reported "the clamp is broken" on the strength of a sentence saying it is
+    # unproven. Naming a cause it never checked, which is the defect this unit exists to remove,
+    # arriving through the arm that asserts it. The caller skips loudly on 2 and reds on 1.
+    return 2
   else
     echo "canary: GATE_JOBS='$w' never terminated while its width-$ctw control finished - the clamp let it spin"
   fi
@@ -392,10 +531,15 @@ cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/slow.sh"; cp "$SCRATCH/fx/instant.sh" "
 for w in 0 -3 nonsense 99999999999999999999 999999999999999999999999999999; do
 n=$((n+1))
 n=$((n+1))
-  out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); trc=$?
+  out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash $KIT_REL/run-gates.sh" 2>&1); trc=$?
   if [ "$trc" = 124 ]; then
-    clamp_expired_verdict "$w"
-    fail=1; continue
+    clamp_expired_verdict "$w"; cv=$?
+    if [ "$cv" = 2 ]; then
+      echo "canary: SKIP the GATE_JOBS='$w' clamp arm - UNEXERCISED on this host, not passed"
+    else
+      fail=1
+    fi
+    continue
   fi
   printf '%s\n' "$out" | grep -q '^gates GREEN — 4/4 legs passed$' \
     || { echo "canary: GATE_JOBS='$w' did not clamp to a working width"; printf '%s\n' "$out" | tail -3 | sed 's/^/    /'; fail=1; }
@@ -429,8 +573,21 @@ case "$v" in
   *) echo "canary: the expiry verdict emitted neither outcome when its control was run: $v"; fail=1 ;;
 esac
 #        ...and the two outcomes are DISTINGUISHABLE, which is the whole point of the unit.
-[ "$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )" != "$( CLAMP_BUDGET=60 clamp_expired_verdict 0 2>&1 )" ] \
-  || { echo "canary: the two expiry outcomes emit the same message, so the verdict cannot be read"; fail=1; }
+#        GUARDED THE WAY ITS NEIGHBOUR ALREADY IS, and for that neighbour's reason. When this host
+#        cannot finish the control inside 60s BOTH runs legitimately report `BOTH expired`, the two
+#        strings are equal, and an unguarded comparison then reds claiming the verdict is unreadable
+#        - when what actually happened is that the second outcome was never produced. The arm
+#        directly above already classifies such a host as a SKIP; this one used to red on it.
+v_undec=$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )
+v_spun=$(  CLAMP_BUDGET=60   clamp_expired_verdict 0 2>&1 )
+case "$v_spun" in
+  *"BOTH expired"*)
+    echo "canary: SKIP the distinguishability arm - this host never produced the spun outcome, so the two messages were never both generated" ;;
+  *)
+    if [ "$v_undec" = "$v_spun" ]; then
+      echo "canary: the two expiry outcomes emit the same message, so the verdict cannot be read"; fail=1
+    fi ;;
+esac
 
 # 3g. a healthy leg is NEVER reported "(no result)" — the reader must not conclude a still-pending
 #     leg is dead just because no job is RUNNING at the instant it looks.
@@ -455,7 +612,7 @@ json.dump([{"name": "l%02d" % i, "argv": ["bash", "fx/a.sh"]} for i in range(30)
 #     parent scratch repo and the arm runs the 4-leg manifest at width 1: exactly the configuration
 #     the comment above forbids, reported green. So assert the run HAPPENED first.
 for rep in 1 2 3 4; do
-  o=$( cd "$SCRATCH/many" && GATE_FULL= GATE_BASE= GATE_JOBS=1 bash tools/run-gates/run-gates.sh 2>&1 )
+  o=$( cd "$SCRATCH/many" && GATE_FULL= GATE_BASE= GATE_JOBS=1 bash $KIT_REL/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^gates GREEN — 30/30 legs passed$' \
     || { echo "canary: the 30-leg width-1 fixture did not run — arm 3g proves nothing"
     n=$((n+1))
@@ -489,7 +646,7 @@ JSON
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 # Pass 1 with no origin ref: BASE is unresolvable, changed() fails SAFE to "run", so all three legs
 # execute and all three land a timing row. This is also the arm for that fail-safe.
-o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
   || { echo "canary: with no resolvable BASE a guarded leg did not fail safe to RUN"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
@@ -500,7 +657,7 @@ for w in 1 4; do
 n=$((n+1))
 n=$((n+1))
 n=$((n+1))
-  o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=$w bash tools/run-gates/run-gates.sh 2>&1 )
+  o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=$w bash $KIT_REL/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^GATE skip  guarded  (unchanged vs main)$' \
     || { echo "canary: width $w printed no GATE skip line for a guarded, unchanged leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (1 skipped)$' \
@@ -541,7 +698,7 @@ JSON
 
 # OFF: the kit leg is held, and it is held with its OWN verb. Not `skip`, whose tail says
 # `unchanged vs <branch>` — false here, since the leg is not unchanged, it is out of subject.
-o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  ' \
   || { echo "canary: a kit-subject leg was not HELD with the switch off"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
@@ -560,13 +717,13 @@ printf '%s\n' "$o" | grep -q '^GATE ok    an undeclared leg$' \
 # GATE_FULL DOES NOT ASK. This is the arm the whole unit rests on: GATE_FULL means "ignore every
 # guard", and a kit's own self-tests are not a guard. If this ever passes, every adopter is back to
 # running them at the push boundary.
-o=$( cd "$S" && GATE_FULL=1 GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S" && GATE_FULL=1 GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  ' \
   || { echo "canary: GATE_FULL unlocked the kit-subject legs, which is the bypass this replaced"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 
 # ON: the switch is the only thing that asks, and it asks for all of them.
-o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^GATE ok    a kit self-test$' \
   || { echo "canary: GATE_SELFTESTS=1 did not run the kit-subject leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
@@ -583,7 +740,7 @@ grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
 # then reads every partial bar as a complete one. The row must be present and EMPTY, never absent —
 # absent and empty read the same to a grep, and TOOL-dUnstalledConvoy-27 defaults a missing key to
 # HELD, so the two agree; what must not happen is a `1`.
-o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
   && { echo "canary: a switch-OFF green recorded selftests=1 — the stamp claims a coverage the run did not have"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
@@ -614,7 +771,7 @@ JSON
 ( cd "$S2" && git init -q -b main . && git config user.email t@e && git config user.name t \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
-o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 # -31 AC1: the total is the count that RAN. Two repo legs ran, so the total is 2 and not 5.
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
@@ -622,7 +779,7 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
 # -31 AC2: and it NAMES the held population, or the smaller number is a smaller lie — a bar that
 # shrank with no explanation reads as a bar that shrank for reasons nobody recorded.
 n=$((n+1))
-printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: kit self-tests, GATE_SELFTESTS=1 runs them)$' \
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: every self-test, GATE_SELFTESTS=1 runs them)$' \
   || { echo "canary: the summary did not name the held population beside the reduced total"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 # -31 AC3: the RECORDED figure is the printed one. Two call sites computing one number is how they
 # come to disagree, and the record is what a later run and the push boundary read instead of stdout.
@@ -650,7 +807,7 @@ printf '%s\n' "$o" | grep -qE '^---- chunk mixed: green  \(2 ran, 0 failed, 0 sk
 
 # -31 AC4: with the switch ON nothing is held, so the total is the whole manifest and the note is
 # gone. A note that survives a run with nothing to report is the same defect pointing the other way.
-o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
   || { echo "canary: with the switch on the total was not the whole manifest, or a stale held note survived"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
@@ -673,7 +830,7 @@ JSON
 ( cd "$S3" && git init -q -b main . && git config user.email t@e && git config user.name t \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
-o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
 n=$((n+1))
 [ "$rc" = 2 ] \
   || { echo "canary: an all-held run exited $rc, not the configuration-refusal code 2"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
@@ -698,13 +855,13 @@ cat > "$S3/tools/gate-legs.json" <<'JSON'
 ]
 JSON
 ( cd "$S3" && git add -A && git commit -qm two ) >/dev/null 2>&1
-o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
 n=$((n+1))
 { [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN — 1/1 legs passed'; } \
   || { echo "canary: CONTROL — one repo-subject leg beside two held ones must still be a green partial bar, got rc=$rc"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 # ...and with the switch ON the all-held manifest is an ordinary full bar, not a refusal. The
 # refusal is about a run that executed nothing, never about the subject values themselves.
-o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
 n=$((n+1))
 { [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$'; } \
   || { echo "canary: CONTROL — with the switch on, the same manifest must run every leg, got rc=$rc"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
@@ -720,7 +877,7 @@ cat > "$S3/tools/gate-legs.json" <<'JSON'
 ]
 JSON
 ( cd "$S3" && git add -A && git commit -qm allheld ) >/dev/null 2>&1
-( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh >/dev/null 2>&1 )
+( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh >/dev/null 2>&1 )
 n=$((n+1))
 vf3="$S3/.git/gate-run/$(cat "$S3/.git/gate-run/current" 2>/dev/null)/verdict"
 awk -F'\t' '$1=="verdict" && $2=="REFUSED"{ok=1} END{exit !ok}' "$vf3" 2>/dev/null \
@@ -746,7 +903,7 @@ cat > "$S3/tools/gate-legs.json" <<'JSON'
 ]
 JSON
 ( cd "$S3" && git add -A && git commit -qm redbar ) >/dev/null 2>&1
-o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates RED — 1/2 legs failed' \
   || { echo "canary: the RED line's denominator is not the count that ran"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
@@ -763,7 +920,7 @@ grep -q 'gates RED — 1/2 legs failed' "$S3/.git/gate-last-summary.txt" 2>/dev/
 for w in 1 4; do
 n=$((n+1))
 n=$((n+1))
-  o=$( cd "$G" && GATE_FULL=1 GATE_BASE= GATE_JOBS=$w bash tools/run-gates/run-gates.sh 2>&1 )
+  o=$( cd "$G" && GATE_FULL=1 GATE_BASE= GATE_JOBS=$w bash $KIT_REL/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
     || { echo "canary: GATE_FULL=1 at width $w did not run every leg past its guard"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^GATE skip' \
@@ -813,6 +970,11 @@ printf '#!/usr/bin/env bash\nbash -c "sleep 20" &\nsleep 20\nexit 0\n' > "$P/fx/
 # The first spelling mapped 124 alone, so the very case `-k` exists for reported as a bare exit code
 # that reads like an OOM.
 printf '#!/usr/bin/env bash\ntrap "" TERM\nsleep 25\nexit 0\n' > "$P/fx/stubborn.sh"
+# A leg SIGKILLED BY SOMETHING THAT IS NOT THE CEILING. `timeout` returns 128+9 for a command killed
+# by a signal, so the runner sees rc=137 from a kill it never ordered — an operator, an OOM killer or
+# a CI cancel, staged without any of them and in about two seconds. Nothing else in this file
+# produces a 137 whose ceiling did NOT fire, which is the whole class arm 4h-kill grades.
+printf '#!/usr/bin/env bash\nsleep 2\nkill -9 $$\n' > "$P/fx/selfkill.sh"
 cat > "$P/tools/gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
@@ -820,7 +982,7 @@ cat > "$P/tools/gate-legs.json" <<'JSON'
 ]
 JSON
 ( cd "$P" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
-runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash tools/run-gates/run-gates.sh 2>&1 ); }
+runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash $KIT_REL/run-gates.sh 2>&1 ); }
 profline() { printf '%s\n' "$1" | grep '^gate profile: ' | head -1; }
 # A LEG's own measured seconds, from the timing cache the runner writes for the next run's dispatch
 # hint. Truncated to an integer: the arm compares magnitudes and `[` cannot read a decimal.
@@ -876,7 +1038,7 @@ printf '%s\n' "$o" | grep -q 'big' \
 #     deliberately two separate statements — a knob added to the table reds here until an author
 #     edits this line, which is the moment they read the invariant. Collapsing the two would remove
 #     the only forcing function a coverage knob would ever meet.
-PINNED_KNOBS="timeout width"
+PINNED_KNOBS="timeout wall width"
 PTBL="$KITREL/gate-profiles.txt"
 n=$((n+1))
 if [ ! -f "$PTBL" ]; then
@@ -909,7 +1071,7 @@ case "$(profline "$o")" in *'built-in default'*) ;; *) echo "canary: the no-tabl
 # announcing the knob INERT and taking the width alone — a supported state, on a BSD base install or a
 # minimal image. Asserting a timeout there reds an adopter's bar and blames the runner's override
 # logic for a missing binary. `timeout` is RUN, never probed for on PATH, which is this tree's rule.
-HAVE_TIMEOUT=0; timeout 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+# (probed once, near the top, so arms 1c and 4g/4h can all gate on it)
 
 # 4g. GATE_JOBS overrides the WIDTH ONLY. The row is still selected and still supplies every other
 #     knob — an override that silently disabled the rest of the profile would make the table a lie
@@ -960,6 +1122,17 @@ n=$((n+1))
 n=$((n+1))
 n=$((n+1))
 n=$((n+1))
+# arm 4h-kill's three, counted HERE for arm 4h's own reason: the floor is a count of EXECUTED
+# assertions, so counting inside the guard drops the executed total by three on a host with no
+# runnable `timeout` and reds a correct suite there.
+n=$((n+1))
+n=$((n+1))
+n=$((n+1))
+# tbl-loose is written OUTSIDE the guard for the same reason: the no-ceiling arm below the `fi`
+# names this profile on every host, and a file written only inside the guard leaves that arm running
+# under the runner's silent built-in fallback on a timeout-less box while claiming the profile. 4h
+# still reads it from inside the guard, byte-identical. TOOL-aRatifiedRulings-4.
+printf 'loose\t0\t0\twidth=2,timeout=0\n' > "$P/fx/tbl-loose.txt"
 if [ "$HAVE_TIMEOUT" = 1 ]; then
   o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
   # THE LEG'S CLOCK, NOT THE PROCESS TREE'S. The first spelling subtracted two WHOLE-RUN wall clocks,
@@ -979,7 +1152,6 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
     || { echo "canary: a timed-out leg did not make the run RED — a timeout must never read as a skip or a pass"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^GATE skip' \
     && { echo "canary: a timed-out leg was reported as a SKIP — the one thing a knob may never turn a leg into"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
-  printf 'loose\t0\t0\twidth=2,timeout=0\n' > "$P/fx/tbl-loose.txt"
   runp GATE_PROFILES=fx/tbl-loose.txt >/dev/null 2>&1
   t_ctl=$(leg_secs sleeper)
   { [ -n "$t_timed" ] && [ -n "$t_ctl" ]; } \
@@ -996,8 +1168,42 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
 JSON
 n=$((n+1))
   o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
-  printf '%s\n' "$o" | grep -qE '^GATE FAIL  stubborn  [(]timed out after 3s(, killed)?[)]$' \
+  # THE TAIL MOVED WITH TOOL-aLeakedHandle-3 and this assertion accepts either signal winning, as it
+  # always has — which one wins is the host's business. TERM winning still says `timed out after 3s`;
+  # KILL winning now says `killed after <n>s, ceiling 3s`, and that is more honest about this very
+  # path, because the leg ran the bound PLUS the five-second kill-after and the old line's `3s` was
+  # already wrong by 5 s.
+  printf '%s\n' "$o" | grep -qE '^GATE FAIL  stubborn  [(](timed out after 3s|killed after [0-9][0-9.]*s, ceiling 3s)[)]$' \
     || { echo "canary: a leg that IGNORES SIGTERM was not reported with a timeout tail — the kill-after escalates to SIGKILL and that path exits 137, not 124, so it is the one case -k exists for"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+
+  # 4h-kill. A KILLED LEG REPORTS THE SECONDS IT RAN, NOT THE CEILING IT NEVER REACHED. The class is
+  #     a failure tail whose number disagrees with the ledger row for the same leg, and the arm grades
+  #     that class rather than the rc=137 instance: it extracts whatever seconds the tail states and
+  #     compares them against field 2 of the ledger, so any future branch that invents a number reds
+  #     it too. Observed RED against the source before TOOL-aLeakedHandle-3, where the tail said the
+  #     declared 600 and the ledger said 2.0xx — a factor of three hundred on one run.
+  cat > "$P/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "one", "argv": ["bash", "fx/a.sh"]},
+  {"name": "selfkilled", "argv": ["bash", "fx/selfkill.sh"], "ceiling": 600}
+]
+JSON
+  # tbl-loose, so PROF_TIMEOUT is 0 and the leg's DECLARED 600 is the only bound in play: a tail
+  # naming 600 can then only have come from the ceiling, never from the profile's fallback.
+  o=$(runp GATE_PROFILES=fx/tbl-loose.txt)
+  kt=$(printf '%s\n' "$o" | grep -m1 '^GATE FAIL  selfkilled  ')
+  [ -n "$kt" ] \
+    || { echo "canary: a leg SIGKILLed by its own command was not reported as a named FAIL — rc=137 is a RED naming its leg, whoever sent the signal"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  # THE LIVENESS HALF IS INSIDE THE ASSERTION. An absent ledger row, or a tail this extraction did
+  # not match, fails saying the arm could not measure — never quietly passes on two empty strings.
+  ks=$(printf '%s\n' "$kt" | sed -n 's/.*after \([0-9][0-9.]*\)s.*/\1/p')
+  kl=$(awk -F'\t' '$1=="selfkilled" { print $2; exit }' "$P/.git/gate-ledger.tsv" 2>/dev/null)
+  { [ -n "$ks" ] && [ -n "$kl" ] && [ "$ks" = "$kl" ]; } \
+    || { echo "canary: the failure tail for a killed leg states '${ks:-<no number found>}'s where gate-ledger.tsv records '${kl:-<no row>}'s for the same leg on the same run. The summary and the ledger must read ONE value from one file, or a diagnosis starts by picking which number to believe."; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  case "$kt" in
+    *"timed out"*) echo "canary: a leg killed at ${ks:-?}s under a declared ceiling of 600 was reported as having TIMED OUT. The ceiling never fired; rc=137 is what an operator, an OOM killer or a CI cancel produces too, and the verb may not claim a bound it cannot know about. Got: $kt"; fail=1 ;;
+  esac
+
   cat > "$P/tools/gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
@@ -1005,8 +1211,38 @@ n=$((n+1))
 ]
 JSON
 else
-  echo "canary: SKIP arm 4h — no working \`timeout\` on this host, so no leg can be bounded and the runner takes its INERT branch instead; arm 4m grades that branch. The assertions are counted either way, so the executed total does not move with host capability."
+  echo "canary: SKIP arms 4h and 4h-kill — no working \`timeout\` on this host, so no leg can be bounded and the runner takes its INERT branch instead; arm 4m grades that branch. 4h-kill's fixture kills itself rather than waiting for a ceiling, but it still reads a tail the runner only builds under a live bound, so it skips with its sibling. The assertions are counted either way, so the executed total does not move with host capability."
 fi
+# 4h-nobound. A LEG KILLED WITH NO BOUND IN PLAY STILL NAMES THE SECONDS IT RAN. Same fixture as
+#     4h-kill with the `ceiling` key DROPPED, so `runleg` execs it directly with `bound` at 0 and no
+#     `timeout` is involved — which is why this arm sits OUTSIDE the guard: it is the one path that
+#     needs no `timeout`, and on a timeout-less host EVERY leg runs unbounded, so that host is where
+#     the branch is most reachable. The value is asserted byte for byte against the ledger row, the
+#     liveness half inside the same assertion, and the third assertion pins the SHAPE: no ceiling
+#     clause, because none was in play. Observed RED against the runner before TOOL-aLeakedHandle-9,
+#     where the tail said `(exit 137)` and the ledger said 2.424. The red case is fixture-only by
+#     class — every shipped leg declares a ceiling — which the ruling accepted with the class named:
+#     memory/gotchas/staged-break-substitutes-a-synthetic-value.md.
+cat > "$P/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "one", "argv": ["bash", "fx/a.sh"]},
+  {"name": "selfkilled", "argv": ["bash", "fx/selfkill.sh"]}
+]
+JSON
+n=$((n+1))
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_PROFILES=fx/tbl-loose.txt)
+kt=$(printf '%s\n' "$o" | grep -m1 '^GATE FAIL  selfkilled  ')
+[ -n "$kt" ] \
+  || { echo "canary: a leg SIGKILLed with no bound in play was not reported as a named FAIL — rc=137 is a RED naming its leg, bound or no bound"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+ks=$(printf '%s\n' "$kt" | sed -n 's/.*after \([0-9][0-9.]*\)s.*/\1/p')
+kl=$(awk -F'\t' '$1=="selfkilled" { print $2; exit }' "$P/.git/gate-ledger.tsv" 2>/dev/null)
+{ [ -n "$ks" ] && [ -n "$kl" ] && [ "$ks" = "$kl" ]; } \
+  || { echo "canary: the failure tail for a leg killed with NO ceiling states '${ks:-<no number found>}'s where gate-ledger.tsv records '${kl:-<no row>}'s for the same leg on the same run. The runner already read that value on this path and printed a bare exit code instead of it."; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+printf '%s\n' "$kt" | grep -qE '^GATE FAIL  selfkilled  [(]killed after [0-9][0-9.]*s[)]$' \
+  || { echo "canary: a leg killed with no bound in play must read exactly (killed after Ns) — no ceiling clause for a ceiling that was never in play, no bare exit 137, no timeout it cannot have observed. Got: $kt"; fail=1; }
+# The reset below is the restore: the arms after it read the row set they expect.
 cat > "$P/tools/gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
@@ -1062,7 +1298,7 @@ printf '#!/usr/bin/env bash\nexit 7\n' > "$P/shim/getconf"
 chmod +x "$P/shim/nproc" "$P/shim/getconf"
 n=$((n+1))
 n=$((n+1))
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" bash $KIT_REL/run-gates.sh 2>&1 )
 printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
   || { echo "canary: with its first core and RAM sources failing, the runner did not complete"; printf '%s\n' "$o" | tail -3 | sed 's/^/    /'; fail=1; }
 case "$(profline "$o")" in
@@ -1095,7 +1331,7 @@ chmod +x "$P/shim/timeout"
 n=$((n+1))
 n=$((n+1))
 n=$((n+1))
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" GATE_PROFILES=fx/tbl-timeout.txt bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" GATE_PROFILES=fx/tbl-timeout.txt bash $KIT_REL/run-gates.sh 2>&1 )
 printf '%s\n' "$o" | grep -q 'INERT' \
   || { echo "canary: with no working timeout the runner did not announce the knob INERT — a knob the operator set and the host cannot honour is worse than no knob"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 case "$(profline "$o")" in *'timeout off'*) ;; *) echo "canary: the INERT run still reported a live timeout on its visibility line: $(profline "$o")"; fail=1 ;; esac
@@ -1156,14 +1392,14 @@ n=$((n+1))
 n=$((n+1))
 n=$((n+1))
 printf '2147483648\n' > "$P/cg/memory.max"        # 2 GB, well under any real host reading
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash $KIT_REL/run-gates.sh 2>&1 )
 case "$(profline "$o")" in
   *'via '*'cgroup'*) ;;
   *) echo "canary: an enforced cgroup memory limit was not read, so the RAM guard cannot fire in a container: $(profline "$o")"; fail=1 ;;
 esac
 [ "$(profname "$o")" != "$(profname "$(runp)")" ] || echo "canary: SKIP the cgroup-selection half — this host already selects the same row at 2 GB, so the fixture cannot show the limit changing the choice"
 printf 'max\n' > "$P/cg/memory.max"               # v2's no-limit spelling is UNKNOWN, never a reading
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash $KIT_REL/run-gates.sh 2>&1 )
 case "$(profline "$o")" in
   *cgroup*) echo "canary: the literal 'max' was taken as a memory READING rather than as no limit: $(profline "$o")"; fail=1 ;;
 esac
@@ -1175,14 +1411,14 @@ esac
 rm -f "$P/cg/memory.max"; mkdir -p "$P/cg/memory"
 printf '2147483648\n' > "$P/cg/memory/memory.limit_in_bytes"     # v1, and the ONLY source present
 n=$((n+1))
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash $KIT_REL/run-gates.sh 2>&1 )
 case "$(profline "$o")" in
   *'via '*'cgroup'*) ;;
   *) echo "canary: the cgroup v1 limit file was never opened, so the older images this source exists for are ungraded: $(profline "$o")"; fail=1 ;;
 esac
 n=$((n+1))
 printf '9223372036854771712\n' > "$P/cg/memory/memory.limit_in_bytes"   # v1's sentinel, in v1's file
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash $KIT_REL/run-gates.sh 2>&1 )
 case "$(profline "$o")" in
   *cgroup*) echo "canary: the cgroup v1 no-limit sentinel was taken as a memory reading: $(profline "$o")"; fail=1 ;;
 esac
@@ -1197,11 +1433,11 @@ rm -rf "$P/cg"; mkdir -p "$P/cg"
 printf '2147483648\n' > "$P/cg/memory.max"
 n=$((n+1))
 n=$((n+1))
-pl=$(profline "$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" GATE_CORES=16 GATE_RAM_MB=32000 bash tools/run-gates/run-gates.sh 2>&1 )")
+pl=$(profline "$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" GATE_CORES=16 GATE_RAM_MB=32000 bash $KIT_REL/run-gates.sh 2>&1 )")
 case "$pl" in
   *cgroup*) echo "canary: an explicit GATE_RAM_MB was capped by the cgroup source — the seam bypasses detection by definition, and the shipped threshold arms would red inside any memory-capped container: $pl"; fail=1 ;;
 esac
-pl=$(profline "$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" GATE_CORES=0 GATE_RAM_MB=0 bash tools/run-gates/run-gates.sh 2>&1 )")
+pl=$(profline "$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" GATE_CORES=0 GATE_RAM_MB=0 bash $KIT_REL/run-gates.sh 2>&1 )")
 case "$pl" in
   *'detection failed'*) ;;
   *) echo "canary: GATE_RAM_MB=0 is a deliberate UNKNOWN and the cgroup source replaced it with a reading: $pl"; fail=1 ;;
@@ -1236,7 +1472,7 @@ printf '%s\n' '[' \
 ( cd "$BB" && git checkout -q -b feature && echo edited > ga/f && git add -A && git commit -qm branch \
    && git checkout -q main && echo advanced > gb/f && git add -A && git commit -qm advance \
    && git update-ref refs/remotes/origin/main HEAD && git checkout -q feature ) >/dev/null 2>&1
-bout=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+bout=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash $KIT_REL/run-gates.sh 2>&1 )
 if printf '%s' "$bout" | grep -q '^GATE skip  gb leg'; then
   : # the branch never touched gb/, and against the BRANCH POINT it is unchanged
 else
@@ -1252,7 +1488,7 @@ n=$((n+1))
 # An unresolvable baseline runs EVERYTHING. Fail-safe, and it is the property that makes every
 # scoping rule above safe to get wrong.
 ( cd "$BB" && git update-ref -d refs/remotes/origin/main; git symbolic-ref -d refs/remotes/origin/HEAD ) >/dev/null 2>&1
-bout2=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+bout2=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash $KIT_REL/run-gates.sh 2>&1 )
 printf '%s' "$bout2" | grep -q '^GATE skip' \
   && { echo "canary: a leg skipped with NO resolvable baseline — the scoping rule does not fail safe"; fail=1; } || :
 rm -rf "$BB"
@@ -1277,7 +1513,7 @@ printf '%s\n' '[' \
   ']' > "$CK/tools/gate-legs.json"
 ( cd "$CK" && git init -q -b main . && git config user.email c@t && git config user.name c \
    && git add -A && git commit -qm seed ) >/dev/null 2>&1
-cout=$( cd "$CK" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh 2>&1 )
+cout=$( cd "$CK" && env GATE_FULL=1 bash $KIT_REL/run-gates.sh 2>&1 )
 # SNAPSHOT THE SUMMARY NOW. Every run overwrites it, and the all-skipped fixture below runs a
 # DIFFERENT manifest with different chunk names — so an assertion deferred to the end looks for
 # this run's chunks in that run's file and reports a missing roll-up that is really a missing run.
@@ -1305,7 +1541,7 @@ printf '%s\n' '[' \
 ( cd "$CK" && git add -A && git commit -qm two \
    && git update-ref refs/remotes/origin/main HEAD \
    && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
-sout=$( cd "$CK" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+sout=$( cd "$CK" && env GATE_FULL= GATE_BASE= bash $KIT_REL/run-gates.sh 2>&1 )
 if printf '%s' "$sout" | grep -q '^GATE skip  guarded'; then
   printf '%s' "$sout" | grep -qE '^---- chunk gone: skipped' \
     || { echo "canary: a chunk whose every leg was skipped did not report as skipped"; printf '%s\n' "$sout" | grep 'chunk' | sed 's/^/    /'; fail=1; }
@@ -1325,6 +1561,151 @@ printf '%s' "$cout" | awk -F'\t' '$1=="chunk"{found=1} END{exit !found}' \
 printf '%s\n' "$csum" | awk -F'\t' '$1=="chunk" && $2=="one"{found=1} END{exit !found}' \
   || { echo "canary: the durable summary carries no chunk roll-up row"; fail=1; }
 rm -rf "$CK"
+# ================================================================================================
+# 4g. THE WHOLE-RUN WALL. TOOL-aQuenchedHarness-1. Five assertions over ONE scratch bar plus ONE
+#     control, because the property is a RELATION between them: "the walled run ended sooner than
+#     the unwalled one" is the only form that cannot pass on a fast box, and `TOOL-aProvenReuse-6`
+#     records this suite's wall-clock arms flaking under fleet load when they assert a literal.
+#
+#     THE LEG SPAWNS A GRANDCHILD that outlives its parent's own sleep, because reaching the
+#     descendant is the property MSYS is recorded failing
+#     (`memory/builds/aPacedTurnstile/reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md` B1) and a
+#     leg without one would grade a mechanism simpler than the shipped case.
+_wd=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the wall arms"; exit 2; }
+mkdir -p "$_wd/tools/run-gates" "$_wd/tools/lib"
+cp "$ROOT/$KITREL/run-gates.sh" "$ROOT/$KITREL/gate-profiles.txt" "$_wd/tools/run-gates/" 2>/dev/null
+cp "$ROOT/$KITREL/gate-fingerprint.sh" "$_wd/tools/run-gates/" 2>/dev/null || true
+cp "$ROOT/tools/lib/resolve-python.sh" "$_wd/tools/lib/" 2>/dev/null || true
+( cd "$_wd" && git init -q -b main . && git config user.email w@t.invalid && git config user.name w ) >/dev/null 2>&1
+printf 'x\n' > "$_wd/file.txt"
+printf '#!/bin/sh\n( sleep 120 ) &\nsleep 120\n' > "$_wd/slow.sh"
+printf '[\n { "name": "slow leg", "argv": ["bash", "slow.sh"], "chunk": "product", "subject": "repo", "ceiling": 600 }\n]\n' > "$_wd/legs.json"
+( cd "$_wd" && git add -A && git commit -qm base ) >/dev/null 2>&1
+
+# BOTH RUNS ARE BOUNDED FROM OUTSIDE, and both bounds sit far above anything either should reach:
+# a runner whose wall is broken must RED this arm, never hang the suite that grades it.
+#
+# THE LEG SLEEPS 120s AND THE WALL IS 8s, so the two runs differ by about 112 seconds of LEG time
+# while paying the SAME startup and teardown. That matters on this box: an earlier revision bounded
+# the control at 45s and compared raw wall clock, and it failed 3/3 runs because a loaded bar spends
+# 90-100s in startup and teardown alone -- the arm was grading the MACHINE, which is the class both
+# TOOL-aProvenReuse-6 and TOOL-aScannedThrottle-7 record. Overhead is additive to both arms, so the
+# DIFFERENCE survives any load this box can produce.
+_ws=$(date +%s)
+( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=8 \
+    timeout -k 5s 300 bash tools/run-gates/run-gates.sh ) > "$_wd/walled.out" 2>&1
+_wrc=$?
+_wel=$(( $(date +%s) - _ws ))
+# THE WALLED RUN'S RECORD IS CAPTURED HERE, while it is the only one there is. Captured after
+# the control below instead, `tail -1` selects the CONTROL's record -- later timestamp, and
+# GREEN by design -- so the arm asserted RED against a run that was never walled and could not
+# pass. It did not report as a broken arm either: the ticker fd-hold was eating this leg's whole
+# 13200s ceiling, so execution never reached it. TOOL-aReapedSpinner-21.
+_wrec=$(ls -1d "$_wd"/.git/gate-run/*/ 2>/dev/null | tail -1)
+
+_cs=$(date +%s)
+( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=0 \
+    timeout -k 5s 300 bash tools/run-gates/run-gates.sh ) > "$_wd/unwalled.out" 2>&1
+_cel=$(( $(date +%s) - _cs ))
+
+n=$((n+1))
+[ "$_wrc" = 1 ] || { echo "canary: a bar whose leg outlived the 8s wall exited $_wrc — a breach must exit 1 as a VERDICT, never 0 (a green over legs it killed) and never 2 (a configuration refusal, which is how an early revision misreported a hang)"; fail=1; }
+n=$((n+1))
+grep -q 'gates RED — the 8s wall fired' "$_wd/walled.out" \
+  || { echo "canary: the walled run printed no wall verdict; a breach that reports nothing is indistinguishable from a leg failure"; fail=1; }
+n=$((n+1))
+grep -q 'still running at the wall: slow leg' "$_wd/walled.out" \
+  || { echo "canary: the wall verdict did not NAME the leg that had not returned"; fail=1; }
+n=$((n+1))
+# THE RELATION, not a literal. If the control did not outlast the walled run this arm proves
+# nothing about the wall, and says so rather than passing.
+# GRADED AS A MARGIN, not as an ordering: where startup dwarfs both runs, a bare `-lt` can pass on
+# noise. The leg/wall gap is 112s; requiring 30 sits well inside it and well outside the jitter.
+if [ "$(( _cel - _wel ))" -lt 30 ]; then
+  echo "canary: the UNWALLED control finished in ${_cel}s against the walled run's ${_wel}s — a margin of"
+  echo "canary: $(( _cel - _wel ))s where the leg/wall gap is 112s. Either the wall did not shorten the run,"
+  echo "canary: or this box did not reproduce the unbounded case; either way the wall arms graded nothing."
+  fail=1
+fi
+n=$((n+1))
+grep -q 'wall 8s' "$_wd/walled.out" \
+  || { echo "canary: the profile line does not report the wall, so an operator cannot see the bound the run is under"; fail=1; }
+n=$((n+1))
+# THE DURABLE RECORD MUST SAY RED TOO. The run record is written from `gate_verdict`, and a killed
+# leg writes no .rc, so before this was fixed a breach could leave `verdict GREEN / ran 0 / failed 0`
+# on disk while stdout said RED. That file's ABSENCE is this runner's documented crash signal, so a
+# plausible green one is strictly worse than none.
+{ [ -n "$_wrec" ] && [ -f "$_wrec/verdict" ] && grep -q "RED" "$_wrec/verdict"; } \
+  || { echo "canary: the run record does not say RED after a wall breach (record: ${_wrec:-none}) — a breach that leaves a green durable verdict is the reassuring-zero class at the altitude of the whole bar"; fail=1; }
+n=$((n+1))
+# A BREACH MUST NOT STAMP A FULL GREEN. A killed leg writes no .rc, so `fails` stays 0 — the exact
+# state that would let a wedged bar record a green the push boundary later trusts.
+[ -f "$_wd/.git/gate-full-green" ] \
+  && { echo "canary: a wall breach stamped gate-full-green — the stamp reads a variable the breach leaves untouched"; fail=1; } \
+  || true
+rm -rf "$_wd" 2>/dev/null || true
+
+# ---- TOOL-aReapedSpinner-7: the TEARDOWN REAP -------------------------------------------------
+# WHAT WAS BROKEN. The WALL path has walked and killed leg descendants since TOOL-aQuenchedHarness-1.
+# The SIGNAL path never had: `cleanup` at the INT/TERM/HUP traps removed the scratch dir and released
+# the turnstile and killed NOTHING, so a bar stopped by a signal -- a harness TaskStop, a Ctrl-C --
+# deleted the directory its legs were writing into and left the whole tree running.
+#
+# EXERCISED DIRECTLY, not through a whole bar. `run_outstanding_reap` reads `$WORK/*.pid` and reaps
+# each unfinished leg's tree; that is the unit of behaviour, and staging it needs a scratch dir with
+# a pid file rather than a 26-minute gate run. Observed RED against the pre-change runner: the leg
+# and its grandchild both survived.
+_tdm="procmon-teardown-$$"
+_tdw=$(mktemp -d)
+
+# Two STRUCTURAL arms, and they say so: reading an order out of source is not observing it, but the
+# order is the correctness here -- removing the scratch dir first is what turns a live leg into a
+# process writing to a deleted path.
+_tdc=$(grep -E '^cleanup\(\) \{' "$KITDIR/run-gates.sh")
+case "$_tdc" in
+  *run_outstanding_reap*rm\ -rf*) ;;
+  *) echo "canary: test_signal_path_reaps_the_tree — cleanup does not reap BEFORE removing the scratch dir (structural): $_tdc"; fail=1 ;;
+esac
+n=$((n+1))
+case "$_tdc" in
+  *run_outstanding_reap*ts_release*ts_drop_ticket*) ;;
+  *) echo "canary: test_teardown_reap_cannot_strand_the_turnstile — the release does not follow the reap (structural); a hung reap would strand a ticket and queue every later bar on this host"; fail=1 ;;
+esac
+n=$((n+1))
+grep -q 'GATE_REAP_BOUND' "$KITDIR/run-gates.sh" \
+  || { echo "canary: test_walked_and_killed_are_reported_apart — the teardown reap declares no bound (structural)"; fail=1; }
+n=$((n+1))
+
+# The FUNCTIONAL arm. Source only the reaping functions; the runner is not run.
+(
+  ROOT=$(cd "$KITDIR/../.." && pwd)
+  # The suite already resolved one at :42. Re-deriving it here as a bare `python` is the
+  # retired launcher idiom the resolver leg bans, and it bans it because the MS-Store
+  # stub answers `command -v` and exits 9009 without running anything.
+  CEILINGS_LIVE=0
+  PROCMON_OK=0
+  # PYBIN is inherited from the enclosing suite scope.
+  WORK="$_tdw"
+  # shellcheck disable=SC1090
+  eval "$(sed -n '/^scan_descendants() {/,/^}/p;/^remove_descendants() {/,/^}/p;/^run_leg_reap() {/,/^}/p;/^GATE_REAP_BOUND=/p;/^run_outstanding_reap() {/,/^}/p' "$KITDIR/run-gates.sh")"
+  bash -c "bash -c 'sleep 300 # $_tdm-gc' & sleep 300 # $_tdm-leg" &
+  _tdleg=$!
+  sleep 2
+  echo "$_tdleg" > "$WORK/1.pid"
+  _tdgc=$(ps -ef | grep -F "$_tdm-gc" | grep -vc grep)
+  [ "$_tdgc" -ge 1 ] || { echo "canary: the teardown fixture staged no grandchild, so this arm proves nothing"; exit 2; }
+  run_outstanding_reap
+  sleep 2
+  _tdgc2=$(ps -ef | grep -F "$_tdm-gc" | grep -vc grep)
+  _tdlg2=$(ps -ef | grep -F "$_tdm-leg" | grep -vc grep)
+  [ "$_tdgc2" -eq 0 ] && [ "$_tdlg2" -eq 0 ] && exit 0
+  echo "canary: the teardown reap left $_tdgc2 grandchild(ren) and $_tdlg2 leg(s) running"
+  exit 1
+) || fail=1
+n=$((n+1))
+for _p in $(ps -ef | grep -F "$_tdm" | grep -v grep | awk '{print $2}'); do kill -9 "$_p" 2>/dev/null; done
+rm -rf "$_tdw" 2>/dev/null || true
+
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ] && exit 0 || exit 1

@@ -16,10 +16,20 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.1   # gov:kit run-gates@1.1
+KIT_RUN_GATES_VERSION=1.8   # gov:kit run-gates@1.8
+# 1.7 -> 1.8: every bar appends one line to the run log under the git common dir, from the EXIT trap
+# (TOOL-dLoggedFlight-3). No manifest key, profile knob or stdout line moves, so neither direction of
+# a skew between the runner and its table or manifest changes a verdict.
 # 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
 # the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
 # there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
+# 1.4 -> 1.5: `gate-profiles.txt` gained the `wall` knob and the runner gained `KNOWN_KNOBS`
+# entry for it. THE SKEW IS ASYMMETRIC AND FATAL IN ONE DIRECTION: a 1.4 runner reading a 1.5
+# table hits `prof_die` on the first row and exits 2 having run ZERO legs -- every bar, not
+# some. A 1.5 runner reading a 1.4 table is fine, because an absent knob defaults. The two
+# files ship in one kit and one `include = "**"` rule, so an ordinary apply moves them
+# together; what is NOT covered is a partial update or a hand copy of one file, and unlike the
+# 1.1 case above no govkit floor withholds the table today. TOOL-aQuenchedHarness-1.
 # THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
 # cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
 # `bash ../tools/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
@@ -174,7 +184,7 @@ TIMINGS="$LEDGER"
 # slower, and it may turn an unbounded hang into a bounded RED. It may never make the bar check less.
 # KNOWN_KNOBS is the whole implemented set; the canary PINS the same set separately, which is what
 # stops a coverage knob being added without an author reading this paragraph.
-KNOWN_KNOBS="width timeout"
+KNOWN_KNOBS="width timeout wall"
 PROFILES="${GATE_PROFILES:-$KITREL/gate-profiles.txt}"
 prof_die() { echo "run-gates: $*" >&2; exit 2; }
 
@@ -259,7 +269,7 @@ det_ram_capped() {
   return 0
 }
 
-PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_TAG=""; PROF_WHERE=""
+PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_TAG=""; PROF_WHERE=""
 if [ -f "$PROFILES" ]; then
   # GATE_PROFILE names a row and SKIPS detection; otherwise the first row both thresholds satisfy.
   if [ -n "${GATE_PROFILE:-}" ]; then PROF_WHERE="detection skipped"
@@ -315,7 +325,8 @@ if [ -f "$PROFILES" ]; then
   PROF_NAME=$sel
   IFS=, read -ra kv <<<"$selknobs"
   for k in "${kv[@]}"; do
-    case "${k%%=*}" in width) PROF_WIDTH=${k#*=} ;; timeout) PROF_TIMEOUT=${k#*=} ;; esac
+    case "${k%%=*}" in width) PROF_WIDTH=${k#*=} ;; timeout) PROF_TIMEOUT=${k#*=} ;;
+                        wall) PROF_WALL=${k#*=} ;; esac
   done
   [ -n "$PROF_WIDTH" ] || prof_die "$PROFILES: row '$sel' declares no width knob"
   PROF_TAG="detected"
@@ -330,7 +341,7 @@ else
   # still agreeing loudly enough that nobody checks.
   det_cores; det_ram_capped
   bi=$DET_CORES; [ "$bi" -gt 0 ] || bi=4
-  PROF_NAME="built-in"; PROF_WIDTH=$(( bi < 8 ? bi : 8 )); PROF_TIMEOUT=0; PROF_TAG="built-in default"
+  PROF_NAME="built-in"; PROF_WIDTH=$(( bi < 8 ? bi : 8 )); PROF_TIMEOUT=0; PROF_WALL=0; PROF_TAG="built-in default"
   # A pin the operator set and this branch cannot honour. WARNED, not refused: refusing would block
   # the documented rollback for anyone carrying GATE_PROFILE in their environment. Silence is the one
   # option ruled out — the same typo is FATAL against a present table, so staying quiet here turns a
@@ -346,7 +357,22 @@ fi
 # PROBED WITH THE OPTION SET THE RUN ACTUALLY USES. A bare `timeout 1 true` passes on a build that
 # rejects `-k`, so the probe cleared a path the leg exec then failed on — the probe and the subject
 # were two different commands, which is the shape a probe exists to rule out.
-if [ "$PROF_TIMEOUT" -gt 0 ] && ! timeout -k 1s 1 true >/dev/null 2>&1; then
+# PROBED ONCE, READ TWICE. The profile knob and the per-leg ceilings need the same fact -- does
+# `timeout -k` actually RUN here -- and probing it per consumer would cost a spawn each and could
+# answer differently. RUN it, never `command -v` — the resolver note near the top of this file
+# records why, and repeating the path here would add a kit literal that resolves to nothing in a
+# target installed at another prefix.
+CEILINGS_LIVE=1
+# THE BOUND IS 10 s AND IT IS NOT A TIMEOUT, IT IS A CAPABILITY PROBE. `true` returns instantly, so
+# the only thing a bound can add here is a FALSE NEGATIVE: at the shipped `1` it was process-creation
+# latency that tripped it, not a missing binary. MEASURED node `a` 2026-08-28, `timeout -k 1s 1 true`
+# 0/40 failures quiet and 7/40 under eight concurrent spawn loops, while `timeout -k 1s 10 true` was
+# 0/40 under that same load. That 17% is the whole of the run-gates canary's flakiness: the suite
+# probes once while the box is quiet, the runner probes again under a full bar, they disagree, and an
+# arm then blames `GATE_JOBS` or the clamp for a binary that was there the entire time. Raising the
+# bound costs nothing -- it is only ever reached if `timeout` genuinely hangs. TOOL-aSiftedFork-7.
+timeout -k 1s 10 true >/dev/null 2>&1 || CEILINGS_LIVE=0
+if [ "$PROF_TIMEOUT" -gt 0 ] && [ "$CEILINGS_LIVE" = 0 ]; then
   echo "run-gates: profile '$PROF_NAME' asks for a ${PROF_TIMEOUT}s per-leg timeout but timeout does not run here — the knob is INERT this run" >&2
   PROF_TIMEOUT=0
 fi
@@ -374,8 +400,160 @@ prof_n() { if [ "$1" = 0 ]; then printf '?'; else printf '%s' "$1"; fi; }
 if [ -n "$PROF_WHERE" ]; then prof_where=$PROF_WHERE
 else prof_where="cores $(prof_n "$DET_CORES") via $CORE_SRC, ram $(prof_n "$DET_RAM") MB via $RAM_SRC"; fi
 prof_t=off; [ "$PROF_TIMEOUT" -gt 0 ] && prof_t="${PROF_TIMEOUT}s"
-PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t; $PROF_TAG)"
+# THE CEILING REGIME IS ITS OWN FIELD, and deliberately not folded into `timeout`. That field names
+# the PROFILE knob, which every shipped row sets to 0, and the canary asserts it reads `off` on a
+# host that cannot honour it -- overloading it made an INERT run read as a live bound. But leaving
+# the line saying only `timeout off` while 85 legs carried a ceiling was the opposite lie, so the
+# regime is reported beside the knob rather than instead of it. TOOL-aBoundedCeiling-1.
+prof_c=live; [ "$CEILINGS_LIVE" = 1 ] || prof_c=INERT
+
+# ---- THE WHOLE-RUN WALL. TOOL-aQuenchedHarness-1. The per-leg ceiling bounds ONE leg; nothing
+# ---- bounded the RUN, so a bar's worst case was the sum of every ceiling it could reach. This is a
+# ---- HANG bound and never a cost verdict: a breach is RED, naming the legs that had not returned.
+#
+# IT IS NOT A PROCESS-GROUP KILL, and that is the load-bearing sentence. This runner never enables
+# job control -- `set -u` only, no `set -m`, no `setsid` (absent on node `a`, `command -v setsid`
+# returns rc=1) -- and legs are dispatched as plain `runleg "$k" &` from the single dispatch/report
+# shell. So every leg is in the RUNNER's own process group, and a group kill would take down the
+# reader loop and the shell that has to render the verdict: the run would die signalled and silent
+# instead of exiting non-zero with a summary. The wall kills RECORDED PER-LEG PIDS and their
+# descendants, touching nothing outside that set.
+#
+# THE DESCENDANTS ARE COLLECTED BEFORE ANYTHING IS KILLED. Measured on this host: killing a parent
+# REPARENTS its children, so they no longer match the ppid you were about to walk. One `ps` snapshot,
+# the whole tree from it, then the kills.
+WALL=${GATE_WALL:-$PROF_WALL}
+case "$WALL" in ''|*[!0-9]*) WALL=0 ;; esac
+WALL_ARMED=0; WALL_PID=""
+
+# The descendant set of a pid, from ONE snapshot. Depth-bounded rather than "until the frontier is
+# empty": a ps table that disagrees with itself mid-write must cost a truncated tree, never a spin.
+scan_descendants() {
+  local root=$1 snap=$2 out=$1 frontier=$1 next depth=0
+  while [ -n "$frontier" ] && [ "$depth" -lt 8 ]; do
+    # `$3+0 == $3` and the `$2` guard are not defensiveness: cygwin `ps -ef` prints argv RAW, so a
+    # command line containing a newline splits one process across rows whose field 2 and 3 are
+    # attacker-or-accident-chosen text. Snapshots on this box already carry about ten such
+    # continuation rows from other sessions' multi-line `bash -c`. Without the guard this walk feeds
+    # arbitrary text to `kill -9`.
+    next=$(awk -v ps="$frontier" 'BEGIN{n=split(ps,a," ");for(i=1;i<=n;i++)P[a[i]]=1}
+                                  NR>1 && $2 ~ /^[0-9]+$/ && $3 ~ /^[0-9]+$/ && ($3 in P) {print $2}' "$snap" 2>/dev/null | tr '\n' ' ')
+    next=${next% }
+    [ -n "$next" ] || break
+    out="$out $next"; frontier=$next; depth=$((depth+1))
+  done
+  printf '%s' "$out"
+}
+
+remove_descendants() {
+  local snap; snap=$(mktemp 2>/dev/null) || return 0
+  ps -ef > "$snap" 2>/dev/null || : > "$snap"
+  local p left=""
+  for p in $(scan_descendants "$1" "$snap"); do
+    case "$p" in ''|*[!0-9]*) continue ;; esac
+    kill -9 "$p" 2>/dev/null || true
+  done
+  # WHAT IT COULD NOT KILL IS REPORTED, and this is where the wall's liveness assertion lives now.
+  # A host where the walk cannot reach a leg's descendants says so with the pids, at the moment the
+  # fact matters, instead of a startup probe guessing at it for every run that never breaches.
+  #
+  # THE SNAPSHOT IS DELETED AFTER THIS LOOP, NOT BEFORE IT. It used to be removed one line above,
+  # and this loop then re-scanned the deleted path: `scan_descendants` reads it under
+  # `2>/dev/null`, so a missing file yields an empty frontier and the walk returns its SEED --
+  # the root pid alone. The survivor loop could therefore never examine a descendant and the
+  # message below could never name one. That is byte-for-byte the failure the deleted startup
+  # probe had, described a few lines further down in this same file, reintroduced by an `rm` in
+  # the wrong place -- and since this is the wall's ONLY liveness assertion, the guarantee was
+  # decorative. Found by the closing review of the build that wrote it. TOOL-aQuenchedHarness-1,
+  # corrected in TOOL-aQuenchedHarness-7's closing pass.
+  for p in $(scan_descendants "$1" "$snap" 2>/dev/null); do
+    case "$p" in ''|*[!0-9]*) continue ;; esac
+    kill -0 "$p" 2>/dev/null && left="$left $p"
+  done
+  rm -f "$snap" 2>/dev/null || true
+  [ -n "$left" ] && printf 'run-gates: the wall could not reach these descendants of %s, so they are still running:%s\n' "$1" "$left" >&2
+  return 0
+}
+
+# THERE IS NO STARTUP LIVENESS PROBE, and its removal is the single most load-bearing correction in
+# this unit. One shipped, and it GRADED NOTHING on every host: it built its subject as
+# `( ( sleep 90 & ) ; sleep 90 ) &`, and bash exec-replaces a subshell's last command, so `$!` WAS
+# the sleep and had no children at all. The intended grandchild was reparented to PPID 1 before the
+# snapshot was taken. `scan_descendants` therefore returned a one-element set on every run, the survivor
+# check saw only the pid that had just been SIGKILLed, and `WALL_LIVE` was pinned at 1 with the
+# INERT branch unreachable dead code. Reproduced 14/14. It cost 4.2 s quiet and 12-16 s loaded per
+# bar, twice over -- two `ps -ef` walks at 0.4-3.2 s each -- to answer a question it could not ask,
+# and it leaked one orphaned `sleep 90` per bar because nothing could reach the reparented child.
+#
+# THE ASSERTION MOVED TO THE BREACH PATH, which is the only moment the answer is needed and the only
+# moment a REAL tree exists to grade. `remove_descendants` reports what it could not kill, so a host
+# where the walk cannot reach a descendant says so with the pids it left behind, at the instant that
+# fact matters, and costs nothing on the runs where the wall never fires.
+prof_w=off; [ "$WALL" -gt 0 ] && prof_w="${WALL}s"
+# ON STDERR, and independent of PROF_TIMEOUT. The pre-existing INERT notice at the profile probe is
+# gated on a knob every shipped row sets to 0, so it can never fire; without this line the only
+# signal that all 85 ceilings are dead would be a stdout suffix nobody reads for warnings.
+if [ "$CEILINGS_LIVE" != 1 ]; then
+  echo "run-gates: NOTE - this host has no runnable 'timeout -k', so EVERY leg's declared ceiling is INERT and every leg runs unbounded this run" >&2
+fi
+PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w; $PROF_TAG)"
+
+# ---- `--print-profile`: ONE RESOLVER, TWO READERS. TOOL-aQuenchedHarness-4 S11 ------------------
+# Profile selection -- the hardware detection, the table walk, the clamp, the GATE_JOBS override --
+# is 200 lines and lives inline here, so any second script wanting the width had to re-implement it.
+# A spec audit caught exactly that: `run-selftests.sh` was specced to run "at a width read from the
+# same gate-profiles.txt row the bar reads", over a seam that did not exist. Two resolvers is the
+# drift class this repo gates elsewhere, so this verb is the seam instead.
+#
+# IT EXITS BEFORE THE TURNSTILE, and that placement is the whole of its safety: a bar that took the
+# beacon to answer a question would serialise every caller behind a real run, and a caller polling it
+# would wedge the repository. It also runs no leg, writes no run record and touches no ledger.
+#
+# TAB-SEPARATED KEY/VALUE, because the caller is a shell script and `read -r k v` is the cheapest
+# correct parse there. Adding a key is safe; a reader takes the keys it knows.
+if [ "${1:-}" = "--print-profile" ]; then
+  printf 'name\t%s\n'      "$PROF_NAME"
+  printf 'width\t%s\n'     "$JOBS"
+  printf 'timeout\t%s\n'   "$PROF_TIMEOUT"
+  printf 'wall\t%s\n'      "$WALL"
+  printf 'ceilings\t%s\n'  "$CEILINGS_LIVE"
+  printf 'line\t%s\n'      "$PROF_LINE"
+  exit 0
+fi
+
 echo "$PROF_LINE"
+
+# ---- PROCESS-MONITOR DELEGATION. TOOL-aReapedSpinner-7.
+#
+# WHAT WAS ACTUALLY BROKEN, because this unit's first draft got it wrong and the spec audit caught
+# it: the WALL path has walked and killed leg descendants since TOOL-aQuenchedHarness-1. The SIGNAL
+# path never has. `cleanup` at the INT/TERM/HUP traps removed the scratch dir and released the
+# turnstile and killed NOTHING, so a bar stopped by a signal -- a harness TaskStop, a Ctrl-C --
+# deleted the directory its legs were writing into and left the whole tree running. That is the
+# fourth failure in the sweep this kit was opened over.
+#
+# DETECTION IS THREE CONDITIONS AND IT RESOLVES HERE, before the first leg is dispatched, so a
+# fallback is announced with the profile line rather than discovered mid-kill. The third condition
+# is the one a file-presence test cannot see: the monitor may be installed and still refuse, if its
+# declared roots do not admit this runner. The walk root is a leg process, and every leg is this
+# runner's descendant, so asking whether THIS process is in scope answers it for all of them.
+PROCMON_REAP="$ROOT/tools/process-monitor/reap.py"
+PROCMON_SCOPE="$ROOT/tools/process-monitor/scope.py"
+PROCMON_OK=0
+PROCMON_WHY="not installed; tree kills use the runner's own depth-8 walk"
+if [ -f "$PROCMON_REAP" ] && [ -f "$PROCMON_SCOPE" ] && [ -f "$ROOT/.process-monitor.conf" ]; then
+  _pm_win=$(ps -W 2>/dev/null | awk -v p="$$" '$1==p {print $4}')
+  if [ -z "$_pm_win" ]; then
+    PROCMON_WHY="installed, but this runner has no resolvable winpid; tree kills fall back"
+  elif PROCMON_ROOT="$ROOT" "$PYBIN" "$PROCMON_SCOPE" --explain "$_pm_win" 2>/dev/null \
+       | grep -q "IN SCOPE"; then
+    PROCMON_OK=1
+    PROCMON_WHY="delegating tree kills to process-monitor"
+  else
+    PROCMON_WHY="installed, but its declared roots do not admit this runner; tree kills fall back"
+  fi
+fi
+echo "run-gates: process-monitor: $PROCMON_WHY"
 
 
 # ---- the turnstile: one bar per repository at a time (the turnstile unit) -------------------------
@@ -389,21 +567,34 @@ echo "$PROF_LINE"
 # two different repositories never do — so "one bar per repo" falls out of the key derivation instead
 # of needing a predicate. The runner's per-worktree `$gd` resolutions above are deliberate and are
 # left exactly as they are: evidence is per-worktree, contention is per-repository.
-TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0
+TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0; TS_Q=""; TS_UNTICKETED=0
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
 fi
 
 # THE TTL IS DERIVED, never a wall clock copied out of a timing cache. What has to be outlasted is
-# the gap between two heartbeat refreshes, and S4 refreshes at one site: a leg COMPLETING. So the
-# bound is "how long can one leg take", and the runner already has a declared answer for that when
-# the selected profile row sets one — `timeout=<s>`. When it does not, no number here is derivable
-# from anything, and the fallback is deliberately large and says so.
+# the gap between two heartbeat refreshes — and since TOOL-aQuenchedHarness-8 that gap is
+# `TS_TICK_EVERY`, a TIMER, not "how long can one leg take". The distinction is the whole unit:
+# liveness is a property of the PROCESS and is cheap to assert often; progress is a property of the
+# WORK and is what the per-leg ceiling and the whole-bar wall are for. The reaper wants the first.
 #
-# ponytail: a single leg longer than TS_TTL with no per-leg deadline configured is reaped mid-run.
-# That is the named ceiling of the fallback, and the fix is to set `timeout=` on the profile row
-# rather than to raise this constant — a bigger fallback only moves the same cliff further out.
+# WHAT THIS REPLACED, recorded because the cliff was real and measured. `ts_hb` used to be called at
+# exactly ONE site — a leg COMPLETING — so the TTL had to outlast a whole leg. Every shipped profile
+# row sets `timeout=0`, so every real run used the 1800 s fallback, while the longest recorded leg
+# was 3837 s. A bar therefore went stale mid-leg on every full run, the next bar reaped its beacon as
+# "stalled", and both ran. Reproduced in a scratch repo with this file unmodified: bar B printed
+# `reaping the beacon of a stalled holder (heartbeat 13s old, ttl 6s)` while bar A was alive and
+# working, and both exited 0. The old note here said the fix was to set `timeout=` on a profile row;
+# it is not, because that value would have to exceed the longest leg, which puts TS_TTL at three
+# times it and TS_MAXWAIT — a declared TS_TTL * 4 — near thirteen hours.
+#
+# A BACKGROUND TICKER WAS REJECTED ONCE, in `memory/builds/aPacedTurnstile/spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md`,
+# on two premises. The second — "a leg-sized TTL makes it unnecessary" — is refuted by the two
+# numbers above. The first — one more process on a spawn-bound machine — survives and is PRICED: at
+# `TS_TTL / 6` a 4000 s bar ticks about 13 times, two spawns each, at the 319 ms per-spawn cost
+# measured on node `a`; roughly 8 s against a bar that makes tens of thousands. That is the
+# supersession `AGENTS.md` §6 requires, written where the reversal happens.
 if [ "${PROF_TIMEOUT:-0}" -gt 0 ]; then TS_TTL=$(( PROF_TIMEOUT * 3 ))
 else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
 # The bounded wait is a DECLARED MULTIPLE OF THE TTL, so it moves with the one number this unit
@@ -412,6 +603,11 @@ else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
 # releases within an hour.
 TS_MAXWAIT=$(( TS_TTL * 4 ))
 TS_TICK=${GATE_TURNSTILE_TICK:-2}
+# The heartbeat cadence is DERIVED from the TTL and declared nowhere else, so the pair cannot drift —
+# the same rule TS_MAXWAIT above already follows. Six, so a single missed tick cannot trip the reap.
+TS_TICK_EVERY=$(( TS_TTL / 6 )); [ "$TS_TICK_EVERY" -ge 1 ] || TS_TICK_EVERY=1
+TS_TICK_PID=""
+TS_TICK_LIVE=0
 
 ts_now()  { date +%s; }
 ts_hb()   { [ -n "$TS_DIR" ] && printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat.tmp" 2>/dev/null && mv -f "$TS_DIR/heartbeat.tmp" "$TS_DIR/heartbeat" 2>/dev/null || true; }
@@ -427,6 +623,65 @@ ts_release() {
   TS_DIR=""
 }
 ts_drop_ticket() { [ -n "$TS_TICKET" ] && rm -f "$TS_TICKET" 2>/dev/null; TS_TICKET=""; }
+
+# THE HEARTBEAT TICKER. TOOL-aQuenchedHarness-8. Three properties, and each one is a defect this
+# would otherwise have introduced — none of them is decoration:
+#
+# 1. DETACHED FROM JOB CONTROL. The turnstile block and the dispatch pool are the SAME shell (see the
+#    dispatch comment below: one shell owns every worker so it can block on `wait -n`). An undetached
+#    ticker is a live job FOREVER: `live()` counts it, `GATE_JOBS=1` never satisfies
+#    `[ "$(live)" -lt "$JOBS" ]`, and the terminal `wait` never returns. The unit that exists to stop
+#    the bar wedging would wedge every bar, starting with the documented serial rollback. Hence
+#    `disown`, and hence the arm that runs a two-leg fixture bar at GATE_JOBS=1 under an outer bound.
+#
+# 2. NONCE-GUARDED, exactly as `ts_release` above is, and for the same reason one level along. No
+#    trap runs on SIGKILL, and `TS_DIR_C` is a CONSTANT path every later bar recreates — so a killed
+#    holder's orphan would refresh its SUCCESSOR's heartbeat forever, disabling the stale-holder
+#    signal repo-wide. That converts a recoverable wedge into a permanent one, which is strictly
+#    worse than the defect this ticker fixes.
+#
+# 3. PID-CHECKED as well, because the nonce catches a beacon that was replaced and not a holder that
+#    simply died before anything replaced it. Two independent exits, mirroring `ts_try_reap`'s own
+#    two-signal design.
+#
+# The tick is `sleep` then a guarded write, never a write then a sleep: a ticker that writes once
+# before checking anything is a ticker that can refresh a beacon it never owned.
+ts_tick_start() {
+  [ -n "$TS_DIR" ] || return 0
+  local _hp=$$ _d=$TS_DIR _n=$TS_NONCE _every=$TS_TICK_EVERY
+  (
+    while :; do
+      sleep "$_every"
+      [ "$(cat "$_d/nonce" 2>/dev/null)" = "$_n" ] || exit 0
+      kill -0 "$_hp" 2>/dev/null || exit 0
+      printf '%s' "$(ts_now)" > "$_d/heartbeat.tmp" 2>/dev/null \
+        && mv -f "$_d/heartbeat.tmp" "$_d/heartbeat" 2>/dev/null || true
+    done
+  # STDIO GOES NOWHERE, and that is the whole point. Backgrounded and disowned, this
+  # subshell and its `sleep` still INHERIT the runner's fd 1 and 2, and the sleep outlives
+  # the bar with ppid 1 -- so anything reading the bar's output to EOF blocked for up to
+  # TS_TICK_EVERY seconds AFTER it had already exited. `ts_tick_stop` does not help: it
+  # kills this subshell and the sleep survives holding the fd. Measured on a 2-leg fixture:
+  # captured 307s -> 19s. The body writes only to files and already swallows its own
+  # errors, and the degraded-start NOTE is emitted below, outside this subshell.
+  ) >/dev/null 2>&1 &
+  TS_TICK_PID=$!
+  disown "$TS_TICK_PID" 2>/dev/null || true
+  if ts_alive "$TS_TICK_PID"; then
+    TS_TICK_LIVE=1
+  else
+    TS_TICK_PID=""
+    # DEGRADED IS ANNOUNCED. A reaper reading a heartbeat nothing writes is not a reaper, and a run
+    # that proceeds silently under an unrefreshed bound is indistinguishable from one that is fine.
+    echo "run-gates: NOTE - the turnstile heartbeat ticker did not start, so this run's beacon is refreshed only when a leg completes and a leg longer than ${TS_TTL}s can be reaped mid-run" >&2
+  fi
+}
+
+ts_tick_stop() {
+  [ -n "$TS_TICK_PID" ] || return 0
+  kill "$TS_TICK_PID" 2>/dev/null || true
+  TS_TICK_PID=""; TS_TICK_LIVE=0
+}
 
 # Reap a holder that cannot still be holding. TWO independent signals, because each covers a case the
 # other cannot: a dead PID is immediate and certain, and a stale heartbeat catches the holder whose
@@ -449,6 +704,71 @@ ts_try_reap() {
   return 1
 }
 
+# Reap a QUEUE TICKET whose owner cannot still be waiting (TOOL-aReapedTicket-2) — the other half of
+# `ts_try_reap`, which looks only at the beacon and RETURNS ON ITS FIRST LINE when there is no beacon
+# to look at. That asymmetry was the deadlock: a bar killed while queued left a ticket that sorts
+# first forever, nothing pruned it, and every later bar waited out the full TS_MAXWAIT and then ran
+# UNQUEUED. The turnstile was not slowed by that — it was permanently defeated, by one death, for
+# good. Measured before the fix: one leaked ticket, no beacon at all, and the next bar still reached
+# `WAIT EXPIRED` and left the ticket behind for the bar after it.
+#
+# TWO SIGNALS, mirroring the holder's, and BOTH are chosen so they CANNOT BE TRUE OF A LIVE WAITER.
+# That constraint is the whole design, not a nicety: a sweep that deletes a LIVE waiter's ticket
+# leaves that waiter unable to ever match the acquire predicate, which turns a wedge affecting future
+# bars into one affecting the bar in front of you. Strictly worse. So neither signal is a heuristic:
+#
+#   dead pid       a live waiter's own pid answers, by definition. NEGATIVE-ONLY, exactly as for the
+#                  holder — a pid that answers proves nothing, because pids are recycled, so success
+#                  only withholds the sweep and never confers life.
+#   older than     a live waiter FAILS OPEN at TS_MAXWAIT and drops its own ticket, so a ticket past
+#   TS_MAXWAIT     that bound cannot belong to one. DERIVED from the fail-open rule below rather than
+#                  chosen, which is why this whole unit introduces NO new constant.
+#
+# THE AGE IS READ FROM THE TICKET NAME, never its mtime. The name is what the sort order is derived
+# from, and a name and an mtime that disagree would give the sweep and the ordering two opinions
+# about one ticket. The cutoff is computed ONCE per call and compared as a STRING: `%Y%m%dT%H%M%S` is
+# lexicographically ordered by time, which is already why the queue sorts correctly — so the
+# staleness test reuses that property instead of parsing a date per ticket.
+#
+# ON THE PID'S REACH: a ticket's pid was written by another bash process, and two different msys
+# runtimes do not necessarily share a pid table. That can only make `kill -0` answer for the wrong
+# process or answer when it should not — and because the signal is negative-only, both directions
+# merely WITHHOLD the fast sweep and defer to the age signal. It cannot cause a false sweep, which is
+# the only direction that would hurt.
+ts_sweep_queue() {
+  local t base pid stamp cutoff swept=0
+  [ -n "$TS_Q" ] && [ -d "$TS_Q" ] || return 1
+  # If `date` cannot produce the cutoff the AGE SIGNAL IS UNARMED, and it says so rather than leaving
+  # a reaper silently down to one signal — which is indistinguishable from one that is working.
+  cutoff=$(date -u -d "@$(( $(ts_now) - TS_MAXWAIT ))" +%Y%m%dT%H%M%S 2>/dev/null) || cutoff=""
+  if [ -z "$cutoff" ]; then
+    printf 'run-gates: NOTE - this host cannot compute a queue staleness cutoff, so a leaked ticket whose pid has been RECYCLED will not be swept this run\n' >&2
+  fi
+  for t in "$TS_Q"/*; do
+    [ -e "$t" ] || continue
+    base=${t##*/}
+    # NEVER OUR OWN, guarded explicitly. Both signals already exclude it — our pid answers and our
+    # ticket is young — so this line is redundant TODAY. That is exactly the point: it is what stops
+    # a later edit to either signal deleting the ticket of the process doing the sweeping.
+    [ -n "$TS_TICKET" ] && [ "$base" = "${TS_TICKET##*/}" ] && continue
+    stamp=${base%%-*}
+    pid=${base#*-}; pid=${pid%%-*}
+    # A ticket whose name we cannot read is one we must NOT delete.
+    case "$stamp" in [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]T[0-9][0-9][0-9][0-9][0-9][0-9]) ;; *) continue ;; esac
+    case "$pid" in ''|*[!0-9]*) pid="" ;; esac
+    if [ -n "$pid" ] && ! ts_alive "$pid"; then
+      printf 'run-gates: sweeping the queue ticket of a dead waiter (pid %s)\n' "$pid" >&2
+      rm -f "$t" 2>/dev/null && swept=1
+      continue
+    fi
+    if [ -n "$cutoff" ] && [ "$stamp" \< "$cutoff" ]; then
+      printf 'run-gates: sweeping a queue ticket past the bounded wait (stamp %s, cutoff %s)\n' "$stamp" "$cutoff" >&2
+      rm -f "$t" 2>/dev/null && swept=1
+    fi
+  done
+  [ "$swept" = 1 ]
+}
+
 if [ -n "$TS_COMMON" ]; then
   TS_DIR_C="$TS_COMMON/gate-bar-beacon"
   TS_Q="$TS_COMMON/gate-bar-queue"
@@ -459,11 +779,60 @@ if [ -n "$TS_COMMON" ]; then
   # independently, so there is no counter file to corrupt and no coordinator to elect.
   TS_TICKET="$TS_Q/$(date -u +%Y%m%dT%H%M%S)-$$-$RANDOM"
   : > "$TS_TICKET" 2>/dev/null || TS_TICKET=""
+  # THE TICKET GETS A HANDLER THE MOMENT IT EXISTS (TOOL-aReapedTicket-1). Until this line the only
+  # `ts_drop_ticket` trap was armed 24 lines below, inside the branch that WINS the beacon — so a
+  # waiter polling the loop below ran with no handler at all, for the entire queue wait.
+  #
+  # That is the same defect the claim-time trap's own comment argues against, one participant over,
+  # and the consequence is worse because the window is the whole wait rather than a few seconds: the
+  # leak needs no SIGKILL, an ordinary Ctrl-C on a queued bar leaves a ticket that sorts first
+  # FOREVER. Nothing prunes it, every later bar then burns the full TS_MAXWAIT and runs UNQUEUED,
+  # and the turnstile is not slowed by that — it is permanently defeated. Measured before the fix:
+  # one leaked ticket, no beacon at all, and the next bar still reached `WAIT EXPIRED`.
+  #
+  # DELIBERATELY NOT `ts_release; ts_drop_ticket`. No beacon is held here and `ts_release` returns on
+  # its first line, so the release half would be inert code implying a waiter can release something
+  # it never claimed. Both traps below REPLACE this one — `trap` replaces rather than appends — and
+  # both are strictly wider, so there is never an instant with no handler and never two handlers
+  # racing.
+  #
+  # THE SIGNAL ARMS RE-EXIT, and that is not cosmetic symmetry with the `cleanup` traps below — it
+  # is required for correctness, and the first draft of this line got it wrong. Setting a trap on
+  # INT REPLACES bash's default disposition, so a handler that does not exit drops the ticket and
+  # then RESUMES the loop below. That run is now ticketless, its acquire predicate can never match
+  # again, and it spins to the full bound — the exact "a waiter that can never acquire" state this
+  # unit exists to remove, re-created by its own fix. Caught by running it: `timeout -s INT` had to
+  # escalate to KILL because the runner would not die.
+  trap 'ts_drop_ticket' EXIT
+  trap 'ts_drop_ticket; exit 130' INT
+  trap 'ts_drop_ticket; exit 143' TERM
+  trap 'ts_drop_ticket; exit 129' HUP
   ts_start=$(ts_now); ts_lastpos=""; ts_announced=0
-  while :; do
+  # A RUN WITH NO TICKET CANNOT EVER ACQUIRE, so it must not wait to find that out. Every iteration
+  # of the loop below opens with `[ -n "$TS_TICKET" ]`, which is false forever once the write above
+  # failed — so the run burned the ENTIRE TS_MAXWAIT (7200s at the shipped fallback) to reach a
+  # fail-open it was entitled to on the first tick. Same class as the wedge this unit is about: a
+  # loop waiting on a condition that cannot change.
+  if [ -z "$TS_TICKET" ]; then
+    echo "run-gates: could not create a queue ticket in $TS_Q — running UNQUEUED rather than waiting out the ${TS_MAXWAIT}s bound on a predicate that can never match" >&2
+    TS_UNTICKETED=1
+  fi
+  while [ -n "$TS_TICKET" ]; do
     # THE CLAIM IS A DIRECTORY CREATE, which is atomic on every filesystem this runs on and needs no
     # `flock` — which does not exist on this platform. The heartbeat is written FIRST on winning, so
     # a just-claimed holder is never mistaken by a waiter for one with no clock.
+    # THE DEAD-WAITER SWEEP IS NOT HERE, AND THAT IS THE FIX. It was here, silently, and being here
+    # is what broke it: this loop deleted the dead ticket before `ts_sweep_queue` at the wait branch
+    # below could ever see one, so the sweep that ANNOUNCES never spoke and arm 16 of
+    # `run-gates.turnstile.test.sh` red on a message that was never going to be printed. Two
+    # implementations of one predicate, and the quiet one won the race.
+    #
+    # The sweep now happens ONCE, in `ts_sweep_queue`, reached from the failure of the acquire
+    # below on every tick. That call is NOT guarded on a beacon existing — which is the guard that
+    # made `ts_try_reap` unable to see this wedge at all — so the wedge is still swept. The cost is
+    # one extra tick before acquiring behind a dead ticket; the gain is a reason on stderr naming
+    # the pid, which is the whole difference between a fixed wedge and a wedge nobody can see was
+    # fixed. TOOL-aBoundedCeiling-12.
     if [ -n "$TS_TICKET" ] && [ "$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | head -1)" = "$(basename "$TS_TICKET")" ] \
        && mkdir "$TS_DIR_C" 2>/dev/null; then
       TS_DIR="$TS_DIR_C"
@@ -471,6 +840,9 @@ if [ -n "$TS_COMMON" ]; then
       printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
       printf '%s' "$TS_NONCE" > "$TS_DIR/nonce" 2>/dev/null || true
       TS_HELD=1
+      # STARTED HERE, after the nonce exists and before the traps below, because the ticker's first
+      # act is to compare that nonce. Started earlier it would have nothing to compare against.
+      ts_tick_start
       # THE RELEASE TRAP GOES ON HERE, at the instant the beacon becomes ours, and not with the
       # scratch-dir trap further down. Everything between this line and there — the manifest
       # parse, the fingerprint, the whole run-record setup — is time during which the beacon is
@@ -482,7 +854,22 @@ if [ -n "$TS_COMMON" ]; then
       # harness. Under that load the window is seconds wide — process creation on this platform
       # has been measured 25x slower under contention — so the window is not theoretical and it is
       # widest exactly when two bars are most likely to collide.
-      trap 'ts_release; ts_drop_ticket' EXIT INT TERM HUP
+      #
+      # THE SIGNAL ARMS RE-EXIT, for the reason the ticket trap above states and which applies here
+      # unchanged: this spelling was a single `EXIT INT TERM HUP` handler, so an interrupt in this
+      # window released the beacon and then RESUMED — leaving the run believing it still held a
+      # lock it had just given away, and running the whole bar unqueued beside whoever claimed
+      # next. That is the two-bar condition this unit exists to prevent, arriving through its own
+      # cleanup path, which is the same shape the nonce guard was written for.
+      # `ts_tick_stop` FIRST in every handler: the ticker must stop before the beacon it refreshes
+      # is removed, or a tick can land between the two and recreate a heartbeat inside a directory
+      # this run has just given up. It is a belt over the nonce guard's braces, and it costs one
+      # signal. These handlers do NOT cover SIGKILL — nothing does — which is why the guards inside
+      # the ticker are the real mitigation and this line is only the tidy path.
+      trap 'ts_tick_stop; ts_release; ts_drop_ticket' EXIT
+      trap 'ts_tick_stop; ts_release; ts_drop_ticket; exit 130' INT
+      trap 'ts_tick_stop; ts_release; ts_drop_ticket; exit 143' TERM
+      trap 'ts_tick_stop; ts_release; ts_drop_ticket; exit 129' HUP
       # S4 (TOOL-aShardedFloor-1), and the GUARD is the whole of it. `TS_WAITED` is refreshed at
       # the BOTTOM of this loop and this path breaks above it, so a contended acquire records the
       # previous tick's value and understates the wait by up to one `TS_TICK`.
@@ -503,7 +890,12 @@ if [ -n "$TS_COMMON" ]; then
       [ "$ts_announced" = 1 ] && TS_WAITED=$(( $(ts_now) - ts_start ))
       break
     fi
-    ts_try_reap && continue
+    # BOTH probes, on the same tick, and either one making progress re-tries the claim at once.
+    # `ts_try_reap` first because it is the cheaper of the two and the commoner case; `||` because
+    # when there IS a dead holder the ticket sweep can wait a tick. The two are separate functions
+    # rather than one because their preconditions differ — the reaper is guarded on a beacon
+    # EXISTING, which is precisely the guard that made it unable to see the wedge.
+    { ts_try_reap || ts_sweep_queue; } && continue
     TS_WAITED=$(( $(ts_now) - ts_start ))
     if [ "$TS_WAITED" -ge "$TS_MAXWAIT" ]; then
       # FAILS OPEN, LOUDLY. A turnstile that can wedge a bar is worse than two bars: the run drops
@@ -516,7 +908,17 @@ if [ -n "$TS_COMMON" ]; then
     pos=$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | grep -n "^$(basename "${TS_TICKET:-none}")$" | cut -d: -f1)
     [ -n "$pos" ] || pos="?"
     if [ "$pos" != "$ts_lastpos" ] || [ "$ts_announced" = 0 ]; then
-      echo "run-gates: another bar holds this repository — queued at position $pos (waited ${TS_WAITED}s)" >&2
+      # SAY WHICH OF THE TWO IS TRUE. This line used to claim a holder unconditionally, because it is
+      # emitted from the FAILURE of the acquire predicate — which conflates "someone is ahead of me
+      # in the queue" with "someone holds the beacon". In the reproduction that wedge was diagnosed
+      # from, nothing held the beacon at all and this line still named one, sending the reader to
+      # hunt a holder that did not exist. The `queued at position N (waited Ns)` tail is byte-stable
+      # because `run-gates.turnstile.test.sh` greps it; only the leading clause varies.
+      if [ -d "$TS_DIR_C" ]; then
+        echo "run-gates: another bar holds this repository — queued at position $pos (waited ${TS_WAITED}s)" >&2
+      else
+        echo "run-gates: no bar holds this repository, but a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
+      fi
       [ -n "$gd" ] && printf 'position\t%s\nwaited\t%s\n' "$pos" "$TS_WAITED" > "$gd/gate-queue-status" 2>/dev/null || true
       ts_lastpos=$pos; ts_announced=1
     fi
@@ -545,6 +947,13 @@ fi
 # burned at least `TS_MAXWAIT`, which is `TS_TTL * 4` and therefore never 0. What the second key
 # carries that a bare integer cannot is the `held`/`expired` split, and the `off`/`unresolved` one.
 #
+# `unticketed` (TOOL-aReapedTicket-2) is a FOURTH measurable state and it is why the sentence above
+# now needs this one beside it. A run whose ticket write failed cannot ever acquire, so it fails open
+# on the first tick and its wait IS 0 — which would otherwise have been recorded as `expired` and
+# broken the "an expired run is never 0" invariant that paragraph leans on. Splitting the state word
+# keeps the invariant true as written rather than quietly falsifying it: `expired` still means the
+# bound was burned, and a `queued 0` is still unambiguous once the state word is read with it.
+#
 # WHAT THIS DOES NOT CHECK, stated here because a reader will assume otherwise: `unresolved` is
 # UNARMED. Reaching it needs `git rev-parse --git-common-dir` to fail while the runner is already
 # past its own repo guard, and breaking a linked worktree's `commondir` makes `--show-toplevel` fail
@@ -553,6 +962,7 @@ QUEUED="-"; QUEUED_FROM=off
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   if   [ -z "$TS_COMMON" ]; then QUEUED_FROM=unresolved
   elif [ "$TS_HELD" = 1 ];  then QUEUED="$TS_WAITED"; QUEUED_FROM=held
+  elif [ "$TS_UNTICKETED" = 1 ]; then QUEUED="$TS_WAITED"; QUEUED_FROM=unticketed
   else                            QUEUED="$TS_WAITED"; QUEUED_FROM=expired
   fi
 fi
@@ -582,11 +992,248 @@ WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
 # SUPERSEDES the claim-time trap above with the same release plus the scratch dir. `trap` replaces
 # rather than appends, which is what makes this safe: there is never a moment with no handler, and
 # never two handlers racing to remove the same directory.
-cleanup() { rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+# THE REAP COMES FIRST, and the order is the correctness of it: removing the scratch dir while
+# the legs are still alive is what turns a live leg into a process writing to a deleted path, which
+# is how the survivors in the opening sweep came to be doing nothing against directories that no
+# longer existed. The release runs afterwards unconditionally.
+# The teardown/wall reaper. Delegates when the monitor is usable and ALWAYS also runs the
+# runner's own `remove_descendants`: two verifications by two mechanisms is not duplication here,
+# it is the guard not sharing a variable with the thing it guards. Its walked/killed figures are
+# the monitor's own and are printed as SEPARATE numbers -- summing them hides a walk that found
+# nothing.
+run_leg_reap() {
+  _rlt_pid="$1"
+  [ -n "$_rlt_pid" ] || return 0
+  if [ "${PROCMON_OK:-0}" = 1 ]; then
+    # Bounded where `timeout -k` actually runs, unbounded where the runner already established
+    # it does not -- the same CEILINGS_LIVE gate every other ceiling in this file respects,
+    # rather than a second opinion about the host.
+    if [ "${CEILINGS_LIVE:-0}" = 1 ]; then
+      _rlt_out=$(PROCMON_ROOT="$ROOT" timeout -k 5s 60 "$PYBIN" "$PROCMON_REAP" \
+                   --kill-msys "$_rlt_pid" 2>&1) || true
+    else
+      _rlt_out=$(PROCMON_ROOT="$ROOT" "$PYBIN" "$PROCMON_REAP" --kill-msys "$_rlt_pid" 2>&1) || true
+    fi
+    printf '%s\n' "$_rlt_out" | sed 's/^/run-gates: /' >&2
+  fi
+  remove_descendants "$_rlt_pid"
+}
+
+# Every outstanding leg's tree, BOUNDED as a whole. The bound is what keeps this from becoming a
+# new way to wedge the fleet: `ts_release` and `ts_drop_ticket` run after it whatever it did, so a
+# hung monitor cannot strand a turnstile ticket and queue every later bar on this host behind it.
+GATE_REAP_BOUND=${GATE_REAP_BOUND:-120}
+run_outstanding_reap() {
+  [ -n "${WORK:-}" ] && [ -d "${WORK:-}" ] || return 0
+  _rol_deadline=$(( EPOCHSECONDS + GATE_REAP_BOUND ))
+  for _rol_f in "$WORK"/*.pid; do
+    [ -e "$_rol_f" ] || continue
+    if [ "$EPOCHSECONDS" -ge "$_rol_deadline" ]; then
+      echo "run-gates: teardown reap hit its ${GATE_REAP_BOUND}s bound; the remaining legs were not walked" >&2
+      break
+    fi
+    _rol_i=${_rol_f##*/}; _rol_i=${_rol_i%.pid}
+    [ -f "$WORK/$_rol_i.rc" ] && continue
+    _rol_p=$(cat "$_rol_f" 2>/dev/null) || continue
+    [ -n "$_rol_p" ] && run_leg_reap "$_rol_p"
+  done
+  return 0
+}
+
+# ---- the run log (TOOL-dLoggedFlight-3) ------------------------------------------------------------
+# ONE LINE PER BAR, appended to `gates.log` under `runlog/` in the git COMMON dir, in the runlog kit's
+# grammar, from the one seam every exit below this point passes through: `cleanup`, the EXIT trap. The
+# common dir is shared by the primary tree and every linked worktree of a clone, so every bar a clone
+# runs lands in one file. The grammar is stated in that kit's README; this block writes it and reads
+# none of it.
+#
+# READ BACK, NEVER RECOMPUTED. The run id, the header's worktree, head, start time and full flag, the
+# verdict file's counts and the failing legs' names from their `.leg` rows are all read from the run
+# record below, so the line cannot disagree with the record it summarises. A run killed before its
+# verdict has no verdict file, so its line says `verdict=NONE` and carries the signal's status; a
+# refusal before the header says `stage=pre-header` with the header's keys empty.
+#
+# EVIDENCE, NEVER AN INPUT. Nothing in this runner or any gate branches on a line. A failed append
+# prints ONE `run-gates: run log` line on stderr and changes neither the exit code nor stdout, and
+# `GOV_RUNLOG=0` in the environment writes nothing.
+#
+# ONCE PER PROCESS, and the guard is load-bearing. Each signal trap below runs `cleanup` and then
+# `exit`s, and that exit fires the EXIT trap, which runs `cleanup` again: the handler runs TWICE on
+# every caught signal, which is the gotcha class `signal-trap-runs-the-exit-handler-twice`. The first
+# entry takes the signal's status from `RUNLOG_RC`, because its own `$?` is 128+n only when the signal
+# interrupted `wait -n`: a signal held behind a foreground command, a `$(fingerprint)` say, runs its
+# trap when that command ends and arrives with the command's status. The second entry appends
+# nothing. `cleanup`'s existing work is unchanged and still runs on both entries.
+#
+# ZERO SPAWNS: builtin reads, a glob, parameter expansion and one `printf >>`. The first bar a clone
+# ever runs pays one `mkdir` for the journal directory, and a clone that has one pays nothing.
+#
+# WHAT THIS DOES NOT CATCH. An exit above the EXIT trap: not a repo, no python, a refused profile,
+# `--print-profile`, the turnstile queue and the scratch-dir `mktemp`. A SIGKILL, which runs no trap.
+# A leg reported `(no result)`, which is counted in `failed` but has no `.leg` row and so no name on
+# the line. And an unset name read inside the handler, which `set -u` would turn into a handler that
+# writes nothing: every read here is defaulted for that reason, and a new read must be too.
+RUNLOG_MAX_BYTES=2048   # the grammar's line cap, LF not counted
+RUNLOG_FAIL_CAP=20      # fail.1 .. fail.20; the rest are counted into fail_more
+RUNLOG_RC=""; RUNLOG_DONE=""
+
+# `<key>TAB<value>` per line, the header's and the verdict's grammar, into `<prefix><key>` for each key
+# the caller names and for nothing else, so a line the runner did not expect cannot set a variable.
+# The caller declares the variables it names, as locals, before calling. Rc 1 when the file is absent.
+read_record_keys() { # file · variable prefix · key... -> sets <prefix><key> for each named key present
+  local _rk_f=$1 _rk_p=$2 _rk_k="" _rk_v="" _rk_want
+  shift 2
+  _rk_want=" $* "
+  [ -f "$_rk_f" ] || return 1
+  while IFS=$'\t' read -r _rk_k _rk_v || [ -n "$_rk_k" ]; do
+    case "$_rk_want" in *" $_rk_k "*) printf -v "$_rk_p$_rk_k" '%s' "${_rk_v%$'\r'}" ;; esac
+    _rk_k=""; _rk_v=""
+  done 2>/dev/null < "$_rk_f"
+  return 0
+}
+
+# THE ONE APPEND, in the grammar's own bytes. Each value is escaped backslash FIRST, then TAB, LF and CR,
+# so the first pass cannot re-escape the others. A line over the cap is fitted by the runlog kit's
+# REFERENCE rule, and its suite compares the result with that kit's `render_line`: drop whole indexed
+# fields, highest index first, counting each into `fail_more`; only when none is left, cut the longest
+# value outside `v n t p ev` and the `_more` counts from its end, never inside a UTF-8 character and
+# never inside an escape, and measure again. `LC_ALL=C` for this function alone, so `${#v}` counts
+# BYTES, which is what the cap counts.
+write_runlog_verdict() { # the status the EXIT trap saw -> one ev=once line appended to the gates journal
+  [ -z "${RUNLOG_DONE:-}" ] || return 0
+  RUNLOG_DONE=1
+  [ "${GOV_RUNLOG:-}" != 0 ] || return 0
+  local LC_ALL=C bs='\' tab=$'\t' rc="${RUNLOG_RC:-${1:-}}" t="" g="" c="" dir="" line="" stage=""
+  local i f nm st n=0 more=0 size=0 best blen top cut b need
+  local rh_worktree="" rh_head="" rh_started="" rh_full=""
+  local rv_verdict=NONE rv_ran="" rv_failed="" rv_skipped="" rv_held="" rv_reused="" rv_wall_breach=""
+  local -a key=() val=() fails=()
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; else printf -v t '%(%s)T' -1; fi
+  # The COMMON dir from the git dir this runner already resolved, with no `git` process. A linked
+  # worktree's git dir holds a `commondir` file naming the common dir relative to itself, and its `..`
+  # segments are folded so a path this prints is the one git would print; the primary tree has no such
+  # file and its git dir IS the common dir. Never `.git/worktrees/<name>/runlog`, which would split
+  # one clone's journal in two.
+  g=${GD:-}
+  if [ -n "$g" ]; then
+    case "$g" in /*|[A-Za-z]:[/\\]*) ;; *) g="${ROOT:-.}/$g" ;; esac
+    if [ -f "$g/commondir" ]; then
+      { IFS= read -r c < "$g/commondir"; } 2>/dev/null || [ -n "$c" ] || c=""
+      c=${c%$'\r'}
+      case "$c" in
+        "") ;;
+        /*|[A-Za-z]:[/\\]*) dir="$c/runlog" ;;
+        *) while :; do
+             case "$c" in
+               ..)   g=${g%/*}; c=""; break ;;
+               ../*) g=${g%/*}; c=${c#../} ;;
+               *)    break ;;
+             esac
+           done
+           dir="$g${c:+/$c}/runlog" ;;
+      esac
+    else
+      dir="$g/runlog"
+    fi
+  fi
+  if [ -n "${RUNDIR:-}" ]; then
+    read_record_keys "$RUNDIR/header" rh_ worktree head started full || stage=pre-header
+    read_record_keys "$RUNDIR/verdict" rv_ verdict ran failed skipped held reused wall_breach
+    # Indexed by the leg's MANIFEST position, which names its file, so the array walks in manifest
+    # order whatever order the glob returned.
+    for f in "$RUNDIR"/*.leg; do
+      [ -f "$f" ] || continue
+      i=${f##*/}; i=${i%.leg}
+      case "$i" in ""|*[!0-9]*) continue ;; esac
+      nm=""; st=""
+      { IFS=$'\t' read -r nm st _ < "$f"; } 2>/dev/null || [ -n "$nm" ] || continue
+      [ "$st" = fail ] && fails[10#$i]=$nm
+    done
+  else
+    stage=pre-header
+  fi
+  key=(v t p ev run wt head started full selftests verdict stage ran failed skipped held reused
+       wall_breach rc)
+  val=(1 "$t" gates once "${RUNID:-}" "$rh_worktree" "$rh_head" "$rh_started" "$rh_full"
+       "${GATE_SELFTESTS:+1}" "$rv_verdict" "$stage" "$rv_ran" "$rv_failed" "$rv_skipped" "$rv_held"
+       "$rv_reused" "$rv_wall_breach" "$rc")
+  for i in ${fails[@]+"${!fails[@]}"}; do
+    if [ "$n" -lt "$RUNLOG_FAIL_CAP" ]; then n=$((n + 1)); key+=("fail.$n"); val+=("${fails[i]}")
+    else more=$((more + 1)); fi
+  done
+  [ "$more" -gt 0 ] && { key+=(fail_more); val+=("$more"); }
+  key+=(kit); val+=("${KIT_RUN_GATES_VERSION:-}")
+  for i in "${!val[@]}"; do
+    f=${val[i]//"$bs"/"$bs$bs"}; f=${f//$'\t'/'\t'}; f=${f//$'\n'/'\n'}; f=${f//$'\r'/'\r'}
+    val[i]=$f
+    size=$(( size + ${#key[i]} + ${#f} + 2 ))
+  done
+  size=$(( size - 1 ))
+  # STEP ONE: whole indexed fields, the highest index first, a tie going to the later field.
+  while [ "$size" -gt "$RUNLOG_MAX_BYTES" ]; do
+    best=-1; top=-1
+    for i in "${!key[@]}"; do
+      case "${key[i]}" in
+        *.*) nm=${key[i]#*.}
+             case "$nm" in ""|*[!0-9]*) ;; *) [ "$((10#$nm))" -ge "$top" ] && { best=$i; top=$((10#$nm)); } ;; esac ;;
+      esac
+    done
+    [ "$best" -ge 0 ] || break
+    nm="${key[best]%%.*}_more"
+    size=$(( size - ${#key[best]} - ${#val[best]} - 2 ))
+    key=("${key[@]:0:best}" "${key[@]:best+1}"); val=("${val[@]:0:best}" "${val[@]:best+1}")
+    f=-1
+    for i in "${!key[@]}"; do [ "${key[i]}" = "$nm" ] && { f=$i; break; }; done
+    if [ "$f" -ge 0 ]; then
+      size=$(( size - ${#val[f]} )); val[f]=$(( ${val[f]} + 1 )); size=$(( size + ${#val[f]} ))
+    else
+      key+=("$nm"); val+=(1); size=$(( size + ${#nm} + 3 ))
+    fi
+  done
+  # STEP TWO: cut the longest value outside the protected keys, the first of equals, from its end.
+  while [ "$size" -gt "$RUNLOG_MAX_BYTES" ]; do
+    best=-1; blen=0
+    for i in "${!key[@]}"; do
+      case "${key[i]}" in v|n|t|p|ev|*_more) continue ;; esac
+      [ "${#val[i]}" -gt "$blen" ] && { best=$i; blen=${#val[i]}; }
+    done
+    [ "$best" -ge 0 ] || break
+    b=$(( blen - (size - RUNLOG_MAX_BYTES) )); [ "$b" -gt 0 ] || b=0
+    cut=${val[best]:0:b}
+    # A character cut in half is dropped whole, as the reference's decode drops it: count the
+    # continuation bytes that end the value, then ask the lead byte before them how many it needed.
+    b=0
+    while [ "$b" -lt "${#cut}" ] && [ "$b" -lt 3 ]; do
+      case "${cut:$(( ${#cut} - b - 1 )):1}" in [$'\x80'-$'\xbf']) b=$((b + 1)) ;; *) break ;; esac
+    done
+    if [ "$b" -lt "${#cut}" ]; then
+      case "${cut:$(( ${#cut} - b - 1 )):1}" in
+        [$'\xc0'-$'\xdf']) need=1 ;;
+        [$'\xe0'-$'\xef']) need=2 ;;
+        [$'\xf0'-$'\xf7']) need=3 ;;
+        *)                 need=0 ;;
+      esac
+      [ "$b" -lt "$need" ] && cut=${cut:0:$(( ${#cut} - b - 1 ))}
+    fi
+    # ...and an escape cut in half leaves an ODD run of trailing backslashes: drop one.
+    b=0
+    while [ "$b" -lt "${#cut}" ] && [ "${cut:$(( ${#cut} - b - 1 )):1}" = "$bs" ]; do b=$((b + 1)); done
+    [ $(( b % 2 )) -eq 1 ] && cut=${cut%?}
+    size=$(( size - blen + ${#cut} )); val[best]=$cut
+  done
+  for i in "${!key[@]}"; do line+="${line:+$tab}${key[i]}=${val[i]}"; done
+  [ -n "$dir" ] && [ ! -d "$dir" ] && mkdir "$dir" 2>/dev/null
+  [ -n "$dir" ] && { printf '%s\n' "$line" >> "$dir/gates.log"; } 2>/dev/null && return 0
+  printf 'run-gates: run log — cannot append to %s, so this bar is not recorded there; its verdict, its output and its exit code are unaffected\n' \
+    "${dir:-(no git dir resolved)}/gates.log" >&2
+  return 0
+}
+
+cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
-trap 'cleanup; exit 130' INT
-trap 'cleanup; exit 143' TERM
-trap 'cleanup; exit 129' HUP
+trap 'RUNLOG_RC=130; cleanup; exit 130' INT
+trap 'RUNLOG_RC=143; cleanup; exit 143' TERM
+trap 'RUNLOG_RC=129; cleanup; exit 129' HUP
 
 # ---- the run record (the run-record unit) --------------------------------------------------------
 # The runner used to forget everything on exit: the per-leg results lived in $WORK, which the trap
@@ -638,6 +1285,13 @@ if [ -n "$gd" ]; then
     echo "run-gates: cannot create the run record at $RUNDIR" >&2; exit 2
   fi
 fi
+# A PINNED ID PINS THIS RUN AND NO OTHER — TOOL-dLoggedFlight-4. The pre-push hook exports one so its
+# push line joins this bar's run-log line by id, and nothing here scrubs a leg's environment: left
+# set, every leg inherits it, and a leg that drives a nested runner, as this kit's own suites do in
+# scratch clones, would reuse ONE run directory for every nested bar it starts. That is the per-run
+# uniqueness the paragraph above calls a correctness property. Read above, removed here, before any
+# leg starts.
+unset GATE_RUN_ID
 
 FPRINT="$KITREL/gate-fingerprint.sh"
 fingerprint() { [ -f "$FPRINT" ] || { printf ''; return; }; bash "$FPRINT" "$@" 2>/dev/null; }
@@ -712,21 +1366,38 @@ rows = [" ".join(str(i) for i in order)]
 rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"])
          + "\x1e" + ("1" if l.get("impure") else "")
          + "\x1e" + str(l.get("chunk", "") or "")
-         + "\x1e" + (l.get("subject") or "repo") for l in data]
+         + "\x1e" + (l.get("subject") or "repo")
+         # THE SEVENTH FIELD, appended after `subject` for exactly the reason `subject` was appended
+         # after `chunk`: a field inserted before an existing one is parsed AS that one by any reader
+         # that has not moved in the same commit. EMPTY when the leg declares none, which is legal and
+         # is what an adopter emitted manifest carries until the deployer learns the key
+         # (TOOL-aBoundedCeiling-5). A non-integer or non-positive value reads as absent rather than
+         # as zero: `timeout 0` means NO timeout, so coercing junk to 0 would silently unbound the one
+         # leg whose declaration was malformed.
+         + "\x1e" + (str(l["ceiling"]) if isinstance(l.get("ceiling"), int)
+                            and not isinstance(l.get("ceiling"), bool) and l["ceiling"] > 0 else "")
+         for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch sj <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj ce <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
-  subjects+=("${sj:-repo}")
+  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}")
 done <<<"$legs"
 total=${#names[@]}
 
+# UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED. TOOL-aBoundedCeiling-1 S6. The runner cannot know
+# whether a row with no ceiling is a gov leg somebody forgot or an adopter leg the deployer has no
+# business bounding, and a refusal it cannot justify is a refusal that reds a tree for a field it
+# has no way to supply -- the class the shipped canary header names. So this is a COUNT on the
+# profile line, which is where an operator already reads this run's knobs. The DECLARATION
+# requirement over gov's own corpus is S9, in run-gates.gov.test.sh, which is the suite allowed to
+# hold a claim about this repository.
 # Guard evaluation runs SERIALLY and up front: it is a read-only `git diff` per guarded leg, and
 # deciding before dispatch keeps the skip verdict independent of scheduling.
 for ((i=0; i<total; i++)); do
@@ -738,13 +1409,43 @@ for ((i=0; i<total; i++)); do
   # without them — and it is the very bypass that made `guard = ["{kit}/"]` ineffective here.
   # Deciding in the dispatch loop instead would leave an index with no result, which the reporting
   # pass reports as `(no result)`. TOOL-dUnstalledConvoy-26.
-  if [ "${subjects[$i]}" = kit ] && [ -z "${GATE_SELFTESTS:-}" ]; then
+  #
+  # THE CHUNK IS HELD TOO, by owner ruling 2026-08-26: EVERY self-test is on demand, not just the
+  # kit-subject ones. The `subject = kit` predicate alone left SIX legs in the `selftests` chunk
+  # running on every bar, because they carry `subject = repo` — the two hook self-tests, the
+  # push-main self-test, the recall floor arms and the two run-gates canaries. Each is a `.test.sh`
+  # or `test_*.py` that exercises a checker's own source, which is the thing this hold is for, and
+  # the split by subject was grading WHOSE source rather than WHAT KIND of leg it is.
+  #
+  # WHAT THIS COSTS, stated rather than discovered later: the two run-gates canaries are the bar's
+  # own liveness assertion — the arms that catch a guard naming an untracked path, which would
+  # otherwise skip forever and silently. Holding them means a default bar no longer proves it can
+  # move. That is a real reduction in what a green means, it is the owner's call, and
+  # `GATE_SELFTESTS=1` remains the way to ask for it. The push boundary is where it matters, and
+  # `.githooks/pre-push` decides there against a recorded green whose `selftests` key says whether
+  # the recorded run had them held.
+  if { [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; } \
+     && [ -z "${GATE_SELFTESTS:-}" ]; then
     printf 'ondemand' > "$WORK/$i.rc"; continue
   fi
   [ -z "${guards[$i]}" ] && continue
   IFS=, read -ra gp <<<"${guards[$i]}"
   changed "${gp[@]}" || printf 'skip' > "$WORK/$i.rc"
 done
+
+# UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED, and counted over the legs that will actually RUN.
+# The runner cannot tell a leg somebody forgot from an adopter leg the deployer has no business
+# bounding, so a refusal it cannot justify would red a tree for a field it has no way to supply.
+# Counted HERE rather than at parse time: before the hold and guard passes the count is a fact about
+# the manifest, and this line claims to be a fact about the run. TOOL-aBoundedCeiling-1 S6.
+unbounded=0; willrun=0
+for ((i=0; i<total; i++)); do
+  [ -z "${names[$i]}" ] && continue
+  [ -f "$WORK/$i.rc" ] && continue          # already held, skipped or reuse-marked: it will not run
+  willrun=$((willrun + 1))
+  [ -n "${ceilings[$i]:-}" ] || unbounded=$((unbounded + 1))
+done
+[ "$unbounded" -gt 0 ] && printf 'run-gates: %s of %s legs that will run declare no ceiling and run unbounded\n' "$unbounded" "$willrun" >&2
 
 # The per-leg INPUT KEY: "what did this leg's verdict depend on". Written here and CONSUMED by
 # the reuse unit, which is what makes the two units' authority explicit rather than assumed —
@@ -808,6 +1509,9 @@ if [ -n "$RUNDIR" ]; then
     printf 'profile_row\t%s\n' "$PROF_NAME"
     printf 'width\t%s\n' "$JOBS"
     printf 'leg_timeout\t%s\n' "$PROF_TIMEOUT"
+    # THE REGIME the legs actually ran under, beside the profile knob rather than instead of it: the
+    # knob is an input a later reader may want, and the regime is what the run did.
+    printf 'leg_ceilings\t%s\n' "$([ "$CEILINGS_LIVE" = 1 ] && echo live || echo inert)"
     printf 'profile_from\t%s\n' "$PROF_TAG"
     printf 'legs\t%s\n' "$total"
     printf 'worktree\t%s\n' "$(git rev-parse --show-toplevel 2>/dev/null)"
@@ -856,6 +1560,10 @@ fi
 
 runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the completion signal)
   local i=$1 s e out rc
+  # THE WALL'S HANDLE ON THIS LEG. `$BASHPID`, never `$$`: inside a backgrounded function `$$` is
+  # still the RUNNER's pid, and a wall that killed that would kill the shell that has to print the
+  # verdict. Written before anything else so a leg that wedges on its first line is still reachable.
+  printf '%s' "$BASHPID" > "$WORK/$i.pid" 2>/dev/null || true
   local argv; IFS=$'\x1f' read -ra argv <<<"${argvs[$i]}"
   case "${argv[0]}" in python|python3) argv[0]=$PYBIN ;; esac   # the manifest stores the canonical python3; run under the resolved PYBIN
   s=$(date +%s%N)
@@ -871,7 +1579,19 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
   # wall against a 1 s bound, indistinguishable from the same fixture with the timeout off. The
   # verdict was bounded and the clock was not, which is the one property the knob exists for.
   # `-k` follows for the child that ignores SIGTERM; the file read cannot block on anybody.
-  if [ "$PROF_TIMEOUT" -gt 0 ]; then timeout -k 5s "$PROF_TIMEOUT" "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?
+  # THE LEG'S OWN CEILING WINS, and the two bounds NEVER wrap one leg together: nested deadlines
+  # both exit 124 and the verdict cannot then say which fired. `PROF_TIMEOUT` stays the fallback for
+  # a leg that declares none, which is every leg in a manifest the deployer has not yet taught the
+  # key. `bound` is also what report_one reads, so the number in the verdict is the number that
+  # fired rather than a second lookup that could disagree with it. TOOL-aBoundedCeiling-1.
+  local bound=${ceilings[$i]:-}
+  [ -n "$bound" ] || bound=$PROF_TIMEOUT
+  # CEILINGS_LIVE is the liveness gate: with no runnable `timeout` a declared ceiling is INERT, and
+  # the leg runs UNBOUNDED rather than being skipped. A knob may cost speed and may turn a hang into
+  # a RED; it may never turn a leg into a pass or a skip (gate-profiles.txt, the governing invariant).
+  [ "$CEILINGS_LIVE" = 1 ] || bound=0
+  printf '%s' "$bound" > "$WORK/$i.bound"
+  if [ "${bound:-0}" -gt 0 ]; then timeout -k 5s "$bound" "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?
   else "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?; fi
   out=$(cat "$WORK/$i.raw" 2>/dev/null)
   e=$(date +%s%N)
@@ -936,7 +1656,7 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     # and `skips` is conjoined into the `gate-full-green` stamp, so counting an on-demand skip there
     # would silence the stamp and pin `.githooks/pre-push` into forcing a full run forever.
     ondemands=$((ondemands+1)); c_ondemand=$((c_ondemand+1))
-    printf 'GATE held  %s  (kit self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"
+    printf 'GATE held  %s  (self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"
   elif [ "$rc" = skip ]; then
     skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = reuse ]; then
@@ -947,11 +1667,35 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
   else fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1))
        # `timeout` exits 124 on the TERM, and 137 once `-k` escalates to KILL — which is exactly the
        # leg the kill-after exists for, so mapping only 124 left the worst case reported as a bare
-       # exit code. Both stay behind the PROF_TIMEOUT guard, so a leg that chooses either for its own
-       # reasons is still reported as the code it chose.
+       # exit code. 124 stays behind the bound guard, so a leg that chooses it for its own reasons is
+       # still reported as the code it chose; 137 has no such case to protect, because bash reports
+       # 128+9 for a SIGKILLed child and a leg that "chose" 137 is indistinguishable from one killed.
+       # THE BOUND THAT ACTUALLY FIRED, read from what runleg recorded rather than re-derived. The
+       # old spelling read `PROF_TIMEOUT` for both the guard and the number, so once a leg carried
+       # its own ceiling and PROF_TIMEOUT stayed 0 -- which is every shipped profile row -- a killed
+       # leg reported a bare `(exit 124)` naming nothing. TOOL-aBoundedCeiling-1.
+       local fired; fired=$(cat "$WORK/$i.bound" 2>/dev/null || printf 0)
+       # THE SECONDS THE LEG ACTUALLY RAN, from the file that already holds them. `runleg` writes
+       # `.sec` before it writes `.rc`, and the ledger block below reads that same file as its field
+       # 2 -- so this is a THIRD READER of one value, never a second source. Read VERBATIM, decimals
+       # and all, because byte-equality with the ledger row is the property; a `?` when it is
+       # unreadable, because any numeric fallback would be a second wrong answer. TOOL-aLeakedHandle-3.
+       local secs; secs=$(cat "$WORK/$i.sec" 2>/dev/null) || secs=""
        ftail="(exit $rc)"
-       { [ "$rc" = 124 ] && [ "$PROF_TIMEOUT" -gt 0 ]; } && ftail="(timed out after ${PROF_TIMEOUT}s)"
-       { [ "$rc" = 137 ] && [ "$PROF_TIMEOUT" -gt 0 ]; } && ftail="(timed out after ${PROF_TIMEOUT}s, killed)"
+       # 124 KEEPS THE CEILING DELIBERATELY, and the asymmetry with 137 below is a decision rather
+       # than an oversight. rc=124 means `timeout` fired its own TERM, so the ceiling is the CAUSE of
+       # the verdict and true by construction, while the elapsed value on that path is the ceiling
+       # plus kill-path overhead -- measured at 12 s against a 2 s bound under load, which would send
+       # a reader hunting for a bound nobody declared. rc=137 is the opposite case: SIGKILL says
+       # nothing about who sent it, and `timeout -k`, an operator, an OOM killer and a CI cancel all
+       # arrive here identically, so the verb states the kill and the two numbers stay apart.
+       { [ "$rc" = 124 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(timed out after ${fired}s)"
+       { [ "$rc" = 137 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(killed after ${secs:-?}s, ceiling ${fired}s)"
+       # NO BOUND IN PLAY, and the leg was still killed: an operator, an OOM killer, a CI cancel, or
+       # any leg on a host with no runnable `timeout`. The guard is the line above NEGATED so the two
+       # PARTITION rc=137 and nothing falls between; the seconds are the same `.sec` read, verbatim,
+       # and there is no ceiling clause because the absence IS the information. TOOL-aLeakedHandle-9.
+       { [ "$rc" = 137 ] && ! [ "${fired:-0}" -gt 0 ]; } && ftail="(killed after ${secs:-?}s)"
        printf 'GATE FAIL  %s  %s\n' "${names[$i]}" "$ftail"; sed 's/^/    /' "$WORK/$i.out"
        FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  $ftail"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY
@@ -1009,6 +1753,13 @@ chunk_close() {   # emit the verdict for the chunk just finished
   # The rule above was already correct and already stated; what it lacked was reachability from the
   # newer skip kind, which is worse than a missing rule because the comment asserts it. A chunk of
   # nothing but kit self-tests closed GREEN on every switch-off bar. TOOL-dUnstalledConvoy-32.
+  # A CHUNK THE WALL EMPTIED IS `killed`, NEVER `green`. A killed leg writes no `.rc`, so it
+  # increments none of the five counters below and the chunk fell straight through to the `else`.
+  # Observed: `---- chunk product: green  (0 ran, 0 failed, 0 skipped, 0 reused, 0 held)` over a
+  # chunk whose every leg the wall had just SIGKILLed. This is TOOL-dUnstalledConvoy-32's rule --
+  # the one the comment above already states for held legs -- reaching the newer kind of
+  # did-not-run, which is exactly the reachability failure that row records.
+  elif [ -f "$WORK/wall.breach" ] && [ "$c_ran" = 0 ] && [ "$c_fail" = 0 ]; then verdict="killed"
   elif [ "$c_ran" = 0 ] && [ "$c_reuse" = 0 ] && { [ "$c_skip" -gt 0 ] || [ "${c_ondemand:-0}" -gt 0 ]; }; then verdict="skipped"
   else verdict="green"; fi
   # HELD IS ITS OWN TALLY and not folded into `skipped`, for the reason the leg verb is its own verb:
@@ -1022,8 +1773,69 @@ chunk_close() {   # emit the verdict for the chunk just finished
   CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${c_ondemand:-0}\t${secs}\n"
   cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_t0=$(date +%s)
 }
+# S2. ARMED AT THE FIRST DISPATCH AND NOT AT PROCESS START. Everything above this point -- the
+# turnstile wait most of all -- is a bar waiting for its turn rather than a bar running, and a wall
+# that counted the queue would kill a run for being polite. The queue has its own bound, TS_MAXWAIT.
+#
+# THE WATCHER KILLS; it does not merely mark. The reader blocks on `wait -n`, so a marker alone would
+# never be read: the whole point is that every leg is wedged. Killing the outstanding legs is what
+# returns the reader to a state where it can see the marker and render a verdict.
+#
+# DETACHED, for the reason `ts_tick_start` above is: this shell owns the pool and counts its own jobs.
+arm_wall() {
+  [ "$WALL" -gt 0 ] || return 0
+  [ "$WALL_ARMED" = 0 ] || return 0
+  WALL_ARMED=1
+  local _w=$WALL _work=$WORK _me=$$
+  (
+    # A DEADLINE, NOT A COUNTER. The first cut slept 1 second `$WALL` times, and `sleep` is external:
+    # measured on this box, 20 nominal seconds took 32.9 s and 30 took 58.0 s -- a 1.65x to 1.93x
+    # drift, entirely spawn cost, which made `wall=10800` fire somewhere between 4h56m and 5h48m
+    # while the profile line printed 3h. A knob whose declared value is not its delivered value is
+    # worse than no knob. `EPOCHSECONDS` is a bash builtin and costs nothing; the 30 s poll cuts the
+    # watcher from ~0.64 spawns per elapsed second of the bar to ~0.033.
+    # THE POLL SCALES WITH THE WALL, so the spawn count is bounded at about ten per run whatever the
+    # wall is, and the overshoot stays proportional instead of absolute. A flat 30 s poll made an 8 s
+    # fixture wall fire at 30 s -- 375% over -- while a flat 1 s poll cost 10800 spawns on the shipped
+    # 3-hour row. Tenth-of-the-wall, floored at 1 s and capped at 30 s, is both: 8 spawns for the
+    # fixture, 360 across three hours for the shipped value.
+    _poll=$(( _w / 10 )); [ "$_poll" -ge 1 ] || _poll=1; [ "$_poll" -le 30 ] || _poll=30
+    _end=$(( EPOCHSECONDS + _w ))
+    while [ "$EPOCHSECONDS" -lt "$_end" ]; do
+      sleep "$_poll"
+      kill -0 "$_me" 2>/dev/null || exit 0
+      [ -f "$_work/wall.disarm" ] && exit 0
+    done
+    # BREACHED. THE MARKER IS WRITTEN FIRST, BEFORE A SINGLE KILL, and the order is the whole
+    # correctness of the breach path. Written last -- as it was -- the kill loop runs a
+    # `remove_descendants` per stuck leg, seconds to tens of seconds wide, during which the reader loop
+    # is free to report the killed legs and dispatch fresh ones. Measured with the marker last: an
+    # 8 s wall, two wedged legs, and a THIRD leg started 57 s after the breach and ran to completion,
+    # 149 s against an 8 s bound. Writing the marker first also collapses the race that decided
+    # whether the durable run record said RED or GREEN.
+    printf '%s' "$EPOCHSECONDS" > "$_work/wall.breach" 2>/dev/null || true
+    for _f in "$_work"/*.pid; do
+      [ -e "$_f" ] || continue
+      _i=${_f##*/}; _i=${_i%.pid}
+      [ -f "$_work/$_i.rc" ] && continue
+      _p=$(cat "$_f" 2>/dev/null) || continue
+      [ -n "$_p" ] && run_leg_reap "$_p"
+    done
+  ) &
+  WALL_PID=$!
+  disown "$WALL_PID" 2>/dev/null || true
+}
+
+remove_wall_watcher() {
+  [ "$WALL_ARMED" = 1 ] || return 0
+  : > "$WORK/wall.disarm" 2>/dev/null || true
+  [ -n "$WALL_PID" ] && kill "$WALL_PID" 2>/dev/null
+  WALL_PID=""; WALL_ARMED=0
+}
+
 live() { jobs -rp | wc -l; }
 while [ "$wi" -lt "$nwalk" ]; do
+  [ -f "$WORK/wall.breach" ] && break
   next=${WALK[$wi]}
   # THE CHUNK BOUNDARY. The walk is grouped, so a change of chunk here is the end of the previous
   # one — every leg of it has printed, because the reader never advances past a leg with no result.
@@ -1032,6 +1844,7 @@ while [ "$wi" -lt "$nwalk" ]; do
   while [ "$di" -lt "$ndisp" ] && [ "$(live)" -lt "$JOBS" ]; do
     k=${disp[$di]}; di=$((di+1))
     { [ -z "${names[$k]}" ] || [ -f "$WORK/$k.rc" ]; } && continue   # sentinel, or already decided by the guard pass
+    arm_wall
     runleg "$k" &
   done
   if [ -f "$WORK/$next.rc" ]; then report_one "$next"; wi=$((wi+1)); continue; fi
@@ -1061,6 +1874,7 @@ while [ "$wi" -lt "$nwalk" ]; do
   report_one "$next"; wi=$((wi+1))         # genuinely no result: report it, never hang
 done
 wait
+remove_wall_watcher
 chunk_close                                # the last chunk has no successor to close it
 
 # THE LEDGER. It replaces the old `gate-timings.tsv` rather than sitting beside it: two stores of
@@ -1103,7 +1917,7 @@ skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 # THE HELD LEGS ARE NAMED, exactly as a guard-skip and a reuse are, and for the same reason: a
 # total that shrank silently reads as a bar that shrank for reasons nobody recorded. Naming the
 # population is what keeps the smaller number from being a smaller lie. TOOL-dUnstalledConvoy-31.
-[ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: kit self-tests, GATE_SELFTESTS=1 runs them)"
+[ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: every self-test, GATE_SELFTESTS=1 runs them)"
 
 # THE COUNT THAT RAN, computed ONCE and read by the verdict record, the durable summary and stdout.
 # Three call sites recomputing one figure is how two of them end up disagreeing, and this figure is
@@ -1118,6 +1932,57 @@ ran=$((n-skips-${ondemands:-0}))
 # run over an untouched tree legitimately executes nothing. This fires only when the on-demand hold
 # is the SOLE reason: nothing ran, nothing was skipped, nothing was reused, and something was held.
 # Exit 2, the runner's own configuration-refusal code, never 0 and never 1. TOOL-dUnstalledConvoy-26.
+# THE BREACH VERDICT COMES FIRST, above every other exit path, and the ordering is a fix rather than
+# a preference. A breach leaves `fails` at 0 and `ran` at 0 on the break path, so on a manifest whose
+# walked legs were all held self-tests it satisfied every clause of the refusal below and exited 2
+# announcing "this run executed NOTHING" -- a hang reported as operator error. Hoisted here it cannot.
+if [ -f "$WORK/wall.breach" ]; then
+  WALL_STUCK=""
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    [ -f "$WORK/$i.rc" ] && continue
+    [ -f "$WORK/$i.pid" ] || continue
+    WALL_STUCK="${WALL_STUCK}  still running at the wall: ${names[$i]}
+"
+  done
+  [ -n "$WALL_STUCK" ] || WALL_STUCK="  (no leg was still marked running — the wall fired as the last leg returned)
+"
+  [ -n "$sfile" ] && { printf '%s
+' "$PROF_LINE"; printf '%s
+' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%b' "$WALL_STUCK"; printf 'gates RED — the %ss wall fired; the run was killed, not the legs
+' "$WALL"; } >"$sfile" 2>/dev/null || true
+  if [ -n "$gd" ]; then
+    { printf '%s
+' "$PROF_LINE"; printf '%s
+' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%b' "$WALL_STUCK"; printf 'gates RED — the %ss wall fired; the run was killed, not the legs
+' "$WALL"; } >"$gd/gate-last-failure.txt" 2>/dev/null || true
+  fi
+  printf '%b' "$WALL_STUCK"
+  echo "gates RED — the ${WALL}s wall fired; the run was killed, not the legs"
+  # THE RUN RECORD GETS ITS VERDICT BEFORE THIS EXIT. This block `exit 1`s above the verdict
+  # writer at the foot of the file, so a breach left a run directory with a header and NO
+  # verdict -- which is precisely the state this runner documents as its crash signal. A wall
+  # firing is the most deliberate outcome the runner has and it was recording itself as a crash,
+  # so the one condition the wall exists to make legible was the one it made unreadable. The
+  # `[ -f "$WORK/wall.breach" ] && gate_verdict=RED` line further down could never fire for the
+  # same reason, and its own neighbour comment already said so. TOOL-aQuenchedHarness-1,
+  # corrected in TOOL-aQuenchedHarness-7's closing pass.
+  if [ -n "$RUNDIR" ]; then
+    {
+      printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      printf 'verdict\t%s\n' RED
+      printf 'ran\t%s\n' "$ran"
+      printf 'failed\t%s\n' "$fails"
+      printf 'skipped\t%s\n' "$skips"
+      printf 'held\t%s\n' "${ondemands:-0}"
+      printf 'reused\t%s\n' "$reuses"
+      printf 'wall_breach\t%s\n' "$WALL"
+    } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
+    chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
+  fi
+  exit 1
+fi
+
 if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
    && [ "$skips" = 0 ] && [ "${reuses:-0}" = 0 ]; then
   echo "run-gates: every leg in this manifest is subject=kit and the self-tests were not asked for,"
@@ -1151,7 +2016,14 @@ reuses=${reuses:-0}
 FPRINT_END=$(fingerprint)
 tree_moved=no
 [ -n "$FPRINT_START" ] && [ -n "$FPRINT_END" ] && [ "$FPRINT_START" != "$FPRINT_END" ] && tree_moved=yes
+# THE BREACH IS READ HERE, from the marker and not from `fails`. A killed leg writes no `.rc`, so
+# whether `fails` moved at all is a RACE between the watcher's kill and the reader's report -- both
+# outcomes were reproduced. The marker is the only fact that is true on every path, so the durable
+# record reads it directly. Without this line the run record wrote `verdict GREEN / ran 0 / failed 0`
+# over a bar whose legs the wall had just SIGKILLed, and that file's absence is this runner's
+# documented crash signal: a breach left a plausible green one instead.
 gate_verdict=GREEN; [ "$fails" = 0 ] || gate_verdict=RED
+[ -f "$WORK/wall.breach" ] && gate_verdict=RED
 
 if [ -n "$RUNDIR" ]; then
   # WRITTEN LAST, and its ABSENCE is the crash signal — the only one needed. A run that dies
@@ -1181,7 +2053,12 @@ fi
 # The last one is the one a spec audit found missing. A developer's ordinary full run on a dirty
 # tree would otherwise stamp a green that the push boundary later treats as proof about a tree
 # nobody ever tested.
+# A SIXTH PRECONDITION, and it is deliberately the MARKER rather than `fails`: a wall breach leaves
+# `fails` at zero, because a killed leg writes no `.rc`. The verdict block above already exits on a
+# breach, so this can never fire today — and that is exactly why it is here. A guard that reads the
+# same state the bug corrupts is disabled by the bug it exists to catch.
 if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
+   && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ]; then
   {
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"

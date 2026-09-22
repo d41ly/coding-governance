@@ -2,6 +2,14 @@
 
 **Status:** SPECCED · rev-2 · 2026-07-22 · node b · Tier-2 · base 7b01979ad7 · review wf_69de6d2e-926
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-07-22-review-TOOL-bConvergentLodestar-1-1.md](../reviews/2026-07-22-review-TOOL-bConvergentLodestar-1-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `codebase-map` proves COVERAGE (what exists, who owns it) but never NON-REDUNDANCY, so a repo does not
@@ -34,6 +42,9 @@ existing repo.
   (review #9/#16). A completeness self-check (parsed-symbol count vs export-keyword count) reds on
   under-enumeration. A repo declares its covered layers explicitly; an uncovered layer is recorded
   recall-dark, and the lookup announces it (S3) so "no seam fits" is never falsely confident (review #27).
+  - **Readers:** by name: nothing leaves the tree; the verb names the symbol churn that regenerates
+    the index. by value: NO VALUE READERS — the item creates a generated artifact, and nothing
+    leaves the tree.
 - **S3 — `reuse-lookup` (behavior→seam entrypoint).** A portable CLI that deterministically assembles a
   candidate corpus — `inventories.json` keys, every `## Reuse affordance` `seam:` line, `symbols.json`
   ids/kinds, and `## Shared seams` prose — into a shortlist that is NOT a hard top-K lexical cut (the
@@ -43,12 +54,21 @@ existing repo.
   whenever a covered-layer gap could hide the answer. Fan-in is computed on demand HERE (not committed),
   scoped to import/identifier positions, to rank hot seams. This is bThriftyCompass S1's portable
   re-implementation, not a separate mechanism; inCMS retires `reuse-discovery.js` on re-adoption (§4 Rollout).
+  - **Readers:** by name: `reuse-discovery.js`, READER NOT IN TREE — the retired file and its
+    readers are the inCMS repo's, and nothing here reads either. by value: NO VALUE READERS — the
+    same reason: the file and every reader of it live in the inCMS repo.
 - **S4 — retroactive convergence.** (a) touch-triggered backfill: a dossier's affordance exemption is
   dropped mechanically off `map_diff` attribution — when a merge range's changed files match a dossier's
   globs, that dossier loses its exemption and must carry an affordance next time it is gated (no reliance
   on a human remembering, review #5/#32). (b) bounded big-bang: `gen_map.py --seed-affordances --top <N>`
   lists the N highest-fan-in seams no dossier yet declares, as the worklist, so the reinvention-prone
   active surface converges first.
+  - **Readers:** by name: `memory/map/affordance-exempt.toml` is the list,
+    `tools/codebase-map/map_diff.py` drops touched rows from it, `tools/codebase-map/map_lib.py`
+    loads it, renders it and states the drop rule, `tools/codebase-map/selftest.py` arms the drop,
+    and `tools/memory-tree/check-memory-hygiene.sh` sanctions the file in the map tree. by value:
+    `tools/codebase-map/test_codebase_map.py` passes the list to `affordance_offenders`, so whether
+    a dossier's row is present decides whether the presence check grades that dossier at all.
 - **S5 — the closing loop + convergence metric, as a `map_diff` mode (not a new CLI — `map_diff` already
   walks `<base>..<head>` and calls itself the convergence-visibility metric, review #31).** `map_diff
   --converge <base>..<head>` emits: `collision_flags` — each NEW exported symbol in the range whose id

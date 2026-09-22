@@ -2,6 +2,17 @@
 
 **Status:** CLOSED · rev-6 · 2026-08-19 · node a · Tier-2 · base 497d25d0 · streams deployer
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-build-PLAY-aFusedCharter-1-1-conditional-enumeration.md](../build/2026-08-18-build-PLAY-aFusedCharter-1-1-conditional-enumeration.md) | journal | PLAY-aFusedCharter-1 |
+| [2026-08-18-review-DEPL-aFusedCharter-1-1.md](../reviews/2026-08-18-review-DEPL-aFusedCharter-1-1.md) | diff-review | PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 |
+| [2026-08-18-review-PLAY-aFusedCharter-1-1.md](../reviews/2026-08-18-review-PLAY-aFusedCharter-1-1.md) | spec-audit | PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 |
+| [2026-08-18-review-PLAY-aFusedCharter-1-2.md](../reviews/2026-08-18-review-PLAY-aFusedCharter-1-2.md) | spec-audit | PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Replace `parallel-coding-governance.customize.md` — prose instructing a human agent to fill every

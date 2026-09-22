@@ -2,6 +2,16 @@
 
 **Status:** WONTDO · rev-3 · 2026-08-21 · node c · Tier-2 · base 098bebd9 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-20-review-TOOL-aBoundedVerdict-1.md](../reviews/2026-08-20-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
+| [2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md](../reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
+| [2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md](../reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `TOOL-aBoundedVerdict-13` bounds every remote OBSERVATION the driver makes, and stops at the one

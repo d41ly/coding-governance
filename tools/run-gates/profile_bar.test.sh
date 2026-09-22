@@ -16,6 +16,7 @@
 # Hermetic: every arm builds its own scratch repo under `mktemp -d`, sets git config only inside it,
 # and never touches the real tree. That is what makes this leg safe beside the others, and it keeps
 # fixture leg names out of the real timing cache, which the runner would carry forward forever.
+KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
 
 FLOOR_ASSERTIONS=39
@@ -83,7 +84,7 @@ FLOOR_LEGS='[
  {"name": "pb dominant", "argv": ["bash","-c","sleep 6"]}
 ]'
 S1=$(build_scratch "$FLOOR_LEGS") || { echo "profile_bar.test: could not build scratch (floor)"; exit 2; }
-( cd "$S1" && "$PY" tools/run-gates/profile_bar.py --width 3 >"$S1/out.txt" 2>&1 )
+( cd "$S1" && "$PY" $KIT_REL/profile_bar.py --width 3 >"$S1/out.txt" 2>&1 )
 chk $? "floor fixture: profiler exited non-zero"
 chk $([ -s "$S1/.git/gate-profile.jsonl" ] && echo 0 || echo 1) "floor fixture: no record appended"
 B=$(field "$S1" "regime.bound" 2>/dev/null)
@@ -115,7 +116,7 @@ THRU_LEGS='[
  {"name": "pb even four",  "argv": ["bash","-c","sleep 2"]}
 ]'
 S2=$(build_scratch "$THRU_LEGS") || { echo "profile_bar.test: could not build scratch (throughput)"; exit 2; }
-( cd "$S2" && "$PY" tools/run-gates/profile_bar.py --width 2 >"$S2/out.txt" 2>&1 )
+( cd "$S2" && "$PY" $KIT_REL/profile_bar.py --width 2 >"$S2/out.txt" 2>&1 )
 chk $? "throughput fixture: profiler exited non-zero"
 B2=$(field "$S2" "regime.bound" 2>/dev/null)
 chk $([ "$B2" = throughput ] && echo 0 || echo 1) "throughput fixture: bound was '$B2', expected throughput"
@@ -130,7 +131,7 @@ rm -rf "$S2"
 # `throughput`, `bound`, `ideal` and `packing` all wrong together, in a record advertised as
 # comparable across months. Every other arm passes --width, so this branch is reachable only here.
 S3=$(build_scratch "$FLOOR_LEGS") || { echo "profile_bar.test: could not build scratch (width)"; exit 2; }
-( cd "$S3" && GATE_JOBS=1 "$PY" tools/run-gates/profile_bar.py >"$S3/out.txt" 2>&1 )
+( cd "$S3" && GATE_JOBS=1 "$PY" $KIT_REL/profile_bar.py >"$S3/out.txt" 2>&1 )
 chk $? "width fixture: profiler exited non-zero"
 W=$(field "$S3" "width" 2>/dev/null)
 chk $([ "$W" = 1 ] && echo 0 || echo 1) "width fixture: recorded width '$W' but GATE_JOBS=1 was exported"
@@ -146,7 +147,7 @@ GUARD_LEGS='[
  {"name": "pb always",  "argv": ["bash","-c","sleep 0.2"]}
 ]'
 S4=$(build_scratch "$GUARD_LEGS") || { echo "profile_bar.test: could not build scratch (scoped)"; exit 2; }
-( cd "$S4" && GATE_FULL=1 GATE_BASE=HEAD "$PY" tools/run-gates/profile_bar.py --width 2 --scoped >"$S4/out.txt" 2>&1 )
+( cd "$S4" && GATE_FULL=1 GATE_BASE=HEAD "$PY" $KIT_REL/profile_bar.py --width 2 --scoped >"$S4/out.txt" 2>&1 )
 chk $? "scoped fixture: profiler exited non-zero"
 grep -q 'GATE skip' "$S4/out.txt" 2>/dev/null || grep -q '1 skipped' "$S4/out.txt" 2>/dev/null
 SKIPPED=$("$PY" -c "
@@ -182,7 +183,7 @@ chk $([ "$INJ" = OK ] && echo 0 || echo 1) "injection arm: parse_verdicts return
 # PRECONDITION-ASSERTED: the arm first proves the cache is genuinely unwritable. If chmod does not
 # take on this platform the arm reports that instead of passing.
 S6=$(build_scratch "$FLOOR_LEGS") || { echo "profile_bar.test: could not build scratch (stale)"; exit 2; }
-( cd "$S6" && "$PY" tools/run-gates/profile_bar.py --width 3 >/dev/null 2>&1 )
+( cd "$S6" && "$PY" $KIT_REL/profile_bar.py --width 3 >/dev/null 2>&1 )
 chk $([ -s "$S6/.git/gate-ledger.tsv" ] && echo 0 || echo 1) "stale arm: first run wrote no ledger"
 ledger_before=$(cat "$S6/.git/gate-ledger.tsv" 2>/dev/null)
 # THE FREEZE IS A RUNNER THAT DOES NOT WRITE, not a permission bit. Three ways of making the
@@ -210,7 +211,7 @@ echo "----"
 echo "gates GREEN — $cnt/$cnt legs passed"
 exit 0
 STUB
-( cd "$S6" && "$PY" tools/run-gates/profile_bar.py --width 3 >"$S6/stale.txt" 2>&1 )
+( cd "$S6" && "$PY" $KIT_REL/profile_bar.py --width 3 >"$S6/stale.txt" 2>&1 )
 rc=$?
 chk $([ "$(cat "$S6/.git/gate-ledger.tsv" 2>/dev/null)" = "$ledger_before" ] && echo 0 || echo 1) \
     "stale arm: PRECONDITION UNMET — the ledger moved under the stub runner, so this arm proves nothing"
@@ -226,7 +227,7 @@ FAIL_LEGS='[
  {"name": "pb breaks", "argv": ["bash","-c","sleep 0.3; exit 3"]}
 ]'
 S7=$(build_scratch "$FAIL_LEGS") || { echo "profile_bar.test: could not build scratch (red)"; exit 2; }
-( cd "$S7" && "$PY" tools/run-gates/profile_bar.py --width 2 >"$S7/out.txt" 2>&1 )
+( cd "$S7" && "$PY" $KIT_REL/profile_bar.py --width 2 >"$S7/out.txt" 2>&1 )
 chk $([ -s "$S7/.git/gate-profile.jsonl" ] && echo 0 || echo 1) "red arm: no record appended for a red bar"
 EX=$(field "$S7" "exit" 2>/dev/null)
 chk $([ "${EX:-0}" != 0 ] && echo 0 || echo 1) "red arm: recorded runner exit was '$EX', expected non-zero"
@@ -241,11 +242,11 @@ rm -rf "$S7"
 # --------------------------------------------------- arm 8: the refusals, and the report verb
 S8=$(build_scratch '[{"name": "pb nothing", "argv": ["bash","-c","exit 0"]}]') \
   || { echo "profile_bar.test: could not build scratch (refusal)"; exit 2; }
-( cd "$S8" && GATE_LEGS=does-not-exist.json "$PY" tools/run-gates/profile_bar.py --width 1 >"$S8/out.txt" 2>&1 )
+( cd "$S8" && GATE_LEGS=does-not-exist.json "$PY" $KIT_REL/profile_bar.py --width 1 >"$S8/out.txt" 2>&1 )
 rc=$?
 chk $([ "$rc" = 2 ] && echo 0 || echo 1) "refusal: unparseable manifest exited $rc, expected 2"
 chk $([ ! -s "$S8/.git/gate-profile.jsonl" ] && echo 0 || echo 1) "refusal: a record was written for a run with no verdict"
-( cd "$S8" && "$PY" tools/run-gates/profile_bar.py --report >"$S8/rep.txt" 2>&1 )
+( cd "$S8" && "$PY" $KIT_REL/profile_bar.py --report >"$S8/rep.txt" 2>&1 )
 rc=$?
 chk $([ "$rc" = 2 ] && echo 0 || echo 1) "report verb: exited $rc with no record present, expected 2"
 rm -rf "$S8"

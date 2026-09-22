@@ -2,6 +2,17 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-19 · node a · Tier-2 · base 497d25d0 · streams playbook
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-build-PLAY-aFusedCharter-1-1-conditional-enumeration.md](../build/2026-08-18-build-PLAY-aFusedCharter-1-1-conditional-enumeration.md) | journal | DEPL-aFusedCharter-1 |
+| [2026-08-18-review-DEPL-aFusedCharter-1-1.md](../reviews/2026-08-18-review-DEPL-aFusedCharter-1-1.md) | diff-review | DEPL-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 |
+| [2026-08-18-review-PLAY-aFusedCharter-1-1.md](../reviews/2026-08-18-review-PLAY-aFusedCharter-1-1.md) | spec-audit | PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 DEPL-aFusedCharter-1 |
+| [2026-08-18-review-PLAY-aFusedCharter-1-2.md](../reviews/2026-08-18-review-PLAY-aFusedCharter-1-2.md) | spec-audit | PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 DEPL-aFusedCharter-1 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Fold `parallel-coding-governance.domain-rules.md` back into the operating ruleset, delete the

@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md](../build/2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md) | research | TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
+| [2026-08-21-review-TOOL-aShardedFloor-1.md](../reviews/2026-08-21-review-TOOL-aShardedFloor-1.md) | spec-audit | TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The turnstile queue wait is printed to stdout and recorded nowhere, so a bar that spent 20 minutes

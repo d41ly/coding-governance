@@ -34,9 +34,14 @@ this entry IS a gate. Its self-test is the leg, and running a gate from `check` 
 """
 
 [[gate_leg]]
+# TOOL-aScouredKit-12. Same shape as the kickoff leg: the waiver registry ships to `{prefix}/`, the
+# script defaults it to a literal `tools/...`, and the miss is swallowed by a `2>/dev/null` — so at
+# any other prefix the gate exits 1 and names a path absent from the adopter's tree. The script
+# takes the registry as $1 and grades it correctly, so the answer is to pass what the descriptor
+# already knows. Line 74 of that same script reads MEMORY_ROOT properly; this is the other root.
 name = "agent-cap restatement"
 subject = "repo"
-argv = ["bash", "{prefix}/check-agent-cap-restatement.sh"]
+argv = ["bash", "{prefix}/check-agent-cap-restatement.sh", "{prefix}/agent-cap-restatement-waivers.txt"]
 guard = []
 
 [[gate_leg]]

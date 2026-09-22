@@ -54,17 +54,14 @@ against an existing backlog id or a new one, and landing any of them is a separa
 ids TOOL-aMeteredTurnstile-1 TOOL-aMeteredTurnstile-2 TOOL-aMeteredTurnstile-3 TOOL-aMeteredTurnstile-4 TOOL-aMeteredTurnstile-5 TOOL-aMeteredTurnstile-6
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md) | CLOSED | rev-4 | 2026-08-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aMeteredTurnstile-1 — the merge bar gets an instrument, not another guess](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 2 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-20-build-TOOL-aMeteredTurnstile-1.md](build/2026-08-20-build-TOOL-aMeteredTurnstile-1.md) | journal | TOOL-aMeteredTurnstile-1 |
-| [2026-08-20-review-TOOL-aMeteredTurnstile-1.md](reviews/2026-08-20-review-TOOL-aMeteredTurnstile-1.md) | diff-review | TOOL-aMeteredTurnstile-1 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aMeteredTurnstile-1.
 <!-- /gen:build-index -->
@@ -78,13 +75,3 @@ Ids no `spec-audit` record has ever named: TOOL-aMeteredTurnstile-1.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-20-spec-TOOL-aMeteredTurnstile-1.md](spec/2026-08-20-spec-TOOL-aMeteredTurnstile-1.md)
-- **`build/`**
-  - [2026-08-20-build-TOOL-aMeteredTurnstile-1.md](build/2026-08-20-build-TOOL-aMeteredTurnstile-1.md)
-- **`reviews/`**
-  - [2026-08-20-review-TOOL-aMeteredTurnstile-1.md](reviews/2026-08-20-review-TOOL-aMeteredTurnstile-1.md)
-<!-- /gen:build-docs -->

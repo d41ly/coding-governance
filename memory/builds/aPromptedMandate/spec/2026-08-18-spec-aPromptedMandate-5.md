@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](../reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-6 |
+| [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](../reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-6 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Give the agent the procedure that turns the owner's prose plus an authorizing parameter into a pushed

@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-11 · node a · Tier-2 · base 7890becf · streams tooling
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Replace check 20's private fence toggle with the fence reader this kit already has, and add the one

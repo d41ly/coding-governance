@@ -2,6 +2,20 @@
 
 **Status:** CLOSED · rev-11 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams playbook+tooling · ratified 2026-08-16
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-PLAY-dClosedLexicon-1-7.md](../reviews/2026-08-16-review-PLAY-dClosedLexicon-1-7.md) | diff-review | PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-2 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-1.md](../reviews/2026-08-16-review-TOOL-dClosedLexicon-1-1.md) | spec-audit | — |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-2.md](../reviews/2026-08-16-review-TOOL-dClosedLexicon-1-2.md) | spec-audit | TOOL-dClosedLexicon-2 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-3.md](../reviews/2026-08-16-review-TOOL-dClosedLexicon-1-3.md) | diff-review | — |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-4.md](../reviews/2026-08-16-review-TOOL-dClosedLexicon-1-4.md) | diff-review | — |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-5.md](../reviews/2026-08-16-review-TOOL-dClosedLexicon-1-5.md) | diff-review | — |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-6.md](../reviews/2026-08-16-review-TOOL-dClosedLexicon-1-6.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Companion §12 already claims "gate the layout conventions you can (naming, layer boundaries)" and

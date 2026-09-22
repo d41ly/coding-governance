@@ -108,6 +108,14 @@ case "$KIT_REL" in
     exit 2 ;;
 esac
 
+# THE TOOL ROOT, derived exactly as `adopt-memory-tree.sh` derives it, and for the same reason: the
+# Skill names the harness scripts, which live BESIDE this kit rather than inside it. Spelled as a
+# literal they were `tools/workflows/…` in every render, which resolves to nothing in a root install
+# and disagreed with the build-method carrier that already spelled the same two paths through this
+# placeholder. Two carriers, one route, two answers. Closing-review F6.
+TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
+[ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
+
 TEMPLATE="$KIT_DIR/SKILL.template.md"
 [ -f "$TEMPLATE" ] || { echo "unattended: SKILL.template.md is missing from the kit at $KIT_DIR"; exit 1; }
 
@@ -122,6 +130,16 @@ KEEPALIVE_DELETE="{{KEEPALIVE_DELETE}}"; KEEPALIVE_INTERVAL="{{KEEPALIVE_INTERVA
 # placeholder when undeclared. Every adopter shipped today declares it blank, which is legal and
 # means the strict anchor; a placeholder there would red the placeholder arm for the majority case.
 ANCHOR_SCOPE=""
+# TOOL-aNamedGesture-1 - AUTH_PARAM is the SECOND such key, and for the reason ANCHOR_SCOPE gives:
+# no adopter declares it today, so keeping the placeholder would red the placeholder arm for every
+# one of them. Pre-set EMPTY rather than to the default, because the default is written once, below,
+# in the derivation - a pre-set default plus a blank-normalisation writes the same literal twice.
+AUTH_PARAM=""
+# MEMORY_TREE_DIR's override is read from the ENVIRONMENT, captured before the conf is sourced so a
+# conf line cannot set it by accident: it is not a conf key, and check 22 of the kit gate reds a conf
+# that sets an undocumented one. The probe that uses it runs further down, after every refusal the
+# conf itself can cause.
+_MTD_OVERRIDE=${MEMORY_TREE_DIR:-}
 # shellcheck disable=SC1090
 . "$CONF"
 # The EFFECTIVE scope, not the raw declaration. Absent, blank and misspelled all keep the strict
@@ -132,6 +150,88 @@ case "$ANCHOR_SCOPE" in
   published) ANCHOR_EFFECTIVE=published ;;
   *)         ANCHOR_EFFECTIVE=default-branch ;;
 esac
+# TOOL-aNamedGesture-1 - the EFFECTIVE authorizing parameter, derived on the same terms and in the
+# same place. THE KIT DEFAULT IS WRITTEN HERE AND NOWHERE ELSE IN THE REPOSITORY: both shipped confs
+# declare the key BLANK, which is this layer's idiom for kit-owned, and the rendered Skill is where a
+# reader learns the value. Absent and blank are the same answer deliberately - an adopter who has
+# never heard of this key must receive a working Skill, not a hole in the sentence that authorizes
+# every prompt-mode run.
+case "$AUTH_PARAM" in
+  "") AUTH_EFFECTIVE="--prompt" ;;
+  *)  AUTH_EFFECTIVE="$AUTH_PARAM" ;;
+esac
+# A MALFORMED TOKEN, refused rather than rendered. Same shape as the kit-path refusal above and for
+# the same reason: the value is interpolated into prose an agent acts on, so a value that breaks the
+# prose breaks the authorization gesture. Four conditions, each with its own reason:
+#
+#   no leading hyphen  the token is an argv flag an owner types and an agent tests the invocation
+#                      for. A bare word reads as a positional argument and re-opens the inference
+#                      from prose that the prompt path's own non-goal forbids. NOTE it is NOT
+#                      justified by check 24 of check-unattended.sh, which binds its template path
+#                      and therefore never sees a rendered value - that reason was written once in a
+#                      draft of this unit and was false.
+#   whitespace         the token is one argv word; two words render a fence naming two things
+#   a pipe             the token renders inside a markdown table row, which a pipe closes
+#   a backtick         the token renders inside a code span, which a backtick closes
+#
+# `echo` and `exit`, never a `fail()`: this file deliberately defines no such helper, per the note at
+# its head, and defining one would put it in check-arms.py's population.
+case "$AUTH_EFFECTIVE" in
+  -*) ;;
+  *)  echo "unattended: AUTH_PARAM does not begin with a hyphen and so is not a flag: $AUTH_EFFECTIVE"
+      echo "  The rendered Skill would tell an agent to look for a positional argument, which is"
+      echo "  indistinguishable from ordinary prose. Declare a flag-shaped token."
+      exit 2 ;;
+esac
+case "$AUTH_EFFECTIVE" in
+  *[[:space:]]*|*"|"*|*'`'*)
+      echo "unattended: AUTH_PARAM contains whitespace, a pipe or a backtick: $AUTH_EFFECTIVE"
+      echo "  It is interpolated into a markdown table row and a code span in the rendered Skill,"
+      echo "  and each of those three characters ends one of them early."
+      exit 2 ;;
+esac
+
+# MEMORY_TREE_DIR — the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
+# bug-class checklist names by path. PROBED, never derived from TOOL_ROOT: an adopter may install
+# that kit FLAT in its tool root, and both adopters measured when this was written do, so TOOL_ROOT
+# plus `memory-tree/` named a file neither of them had and the Skill told every run to execute it.
+# The first TRACKED of the nested and the flat spelling wins. Neither is a REFUSAL that names the
+# override, and nothing is written, because a guessed path renders a command that runs nothing and
+# reads exactly like a clean checklist. The review-harness kit's parity script probes the same way
+# for the same line in the build harness, so the two carriers of one command cannot disagree.
+#
+# The override is asserted exactly as a probe answer is. It is an ENVIRONMENT variable and a
+# hand-install channel only: `--check` re-derives on every run, so a tree whose bar needs the
+# override has to export it for the gate as well.
+check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
+MEMORY_TREE_DIR=""
+if [ -n "$_MTD_OVERRIDE" ]; then
+  _mtd=${_MTD_OVERRIDE%/}
+  case "$_mtd" in
+    *[!A-Za-z0-9._/+@-]*)
+      echo "unattended: MEMORY_TREE_DIR holds a character outside [A-Za-z0-9._/+@-]: $_mtd"
+      echo "  It is interpolated into a shell command in the rendered Skill, where a space splits it."
+      exit 2 ;;
+  esac
+  if check_tracked "$_mtd/gotchas.py"; then MEMORY_TREE_DIR="$_mtd"
+  else
+    echo "unattended: MEMORY_TREE_DIR is set to '$_MTD_OVERRIDE', and '$_mtd/gotchas.py' is not tracked"
+    echo "  in this repo. The Skill would tell every run to execute a checklist that does not exist."
+    exit 2
+  fi
+else
+  for _c in "${TOOL_ROOT}memory-tree/gotchas.py" "${TOOL_ROOT}gotchas.py"; do
+    if check_tracked "$_c"; then MEMORY_TREE_DIR=$(dirname "$_c"); break; fi
+  done
+  if [ -z "$MEMORY_TREE_DIR" ]; then
+    echo "unattended: cannot derive MEMORY_TREE_DIR — neither ${TOOL_ROOT}memory-tree/gotchas.py nor"
+    echo "  ${TOOL_ROOT}gotchas.py is tracked in this repo. The Skill names the memory-tree kit's"
+    echo "  bug-class checklist by path, and a guessed path is a command that runs nothing."
+    echo "  If that kit is installed somewhere else, set MEMORY_TREE_DIR=<the directory holding"
+    echo "  gotchas.py> and re-run. Nothing was written."
+    exit 2
+  fi
+fi
 
 SKILL_DIR="$ROOT/.claude/skills/unattended"
 SKILL_OUT="$SKILL_DIR/SKILL.md"
@@ -143,12 +243,28 @@ PROTO_OUT="$ROOT/$PROTO_REL"
 PBT_SHIP="$KIT_DIR/PLAYBOOK-TEMPLATE.template.md"
 PBT_REL="$MEMORY_ROOT/guides/PLAYBOOK-TEMPLATE.md"
 PBT_OUT="$ROOT/$PBT_REL"
+# the FOURTH artifact (TOOL-dFoldedVerdict-5). The protocol's section 7 moved here so a contract
+# sitting at its byte cap EXACTLY could be amended again. Copied like the two above it and for the
+# same reason: it carries no placeholder, so rendering would be a second spelling of `cat`.
+VERBS_SHIP="$KIT_DIR/VERBS.template.md"
+VERBS_REL="$MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
+VERBS_OUT="$ROOT/$VERBS_REL"
+# the FIFTH artifact (TOOL-dRetiredFork-12), and the only one besides the Skill that is RENDERED
+# rather than copied: it carries `{{KIT_DIR}}` five times. It also lands inside the kit directory
+# rather than under the memory root, because it is a fixture the kit's own validity gate reads.
+FIXTURE_SHIP="$KIT_DIR/playbook.fixture.template.md"
+FIXTURE_REL="$KIT_REL/playbook.fixture.md"
+FIXTURE_OUT="$KIT_DIR/playbook.fixture.md"
 
 # NON-ZERO on a failed substitution. A conf value carrying the s||| delimiter makes sed exit 1 while
 # the trailing `tr` still exits 0, so the adopter wrote a ZERO-BYTE Skill and --check then diffed
 # empty against empty and certified it. pipefail plus the emptiness refusal below turn that silent
 # truncation into a loud one. Escaping the values themselves is tracked separately.
-render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
+render() { # [template] -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
+  # The template is an ARGUMENT now, defaulting to the Skill's so every existing caller is
+  # unchanged. Two artifacts carry placeholders, and a second copy of this function is the last
+  # thing this file needs -- the escaping commentary below is the reason why.
+  local TEMPLATE=${1:-$TEMPLATE}
   # NO `sed`. Conf values are FREE PROSE, and unescaped they landed in `s|…|…|` where a `|` closes
   # the delimiter (sed exits 1, the trailing `tr` exits 0, so a ZERO-BYTE Skill was written and
   # `--check` certified it) and an `&` re-inserts the whole match. Two attempts to escape around that
@@ -169,12 +285,19 @@ render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
   out=${out%X}
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
+  out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MEMORY_TREE_DIR"}
   out=${out//\{\{MEMORY_ROOT\}\}/"$MEMORY_ROOT"}
   out=${out//\{\{LANDER\}\}/"$LANDER"}
   out=${out//\{\{KEEPALIVE_CREATE\}\}/"$KEEPALIVE_CREATE"}
   out=${out//\{\{KEEPALIVE_DELETE\}\}/"$KEEPALIVE_DELETE"}
   out=${out//\{\{KEEPALIVE_INTERVAL\}\}/"$KEEPALIVE_INTERVAL"}
   out=${out//\{\{ANCHOR_SCOPE\}\}/"$ANCHOR_EFFECTIVE"}
+  # LAST, deliberately. Substitutions run in sequence over one string, so a value carrying another
+  # key's placeholder text would be re-substituted by any pass that followed it. Appended here, such
+  # a value survives into the output as a brace shape, where the surviving-placeholder arm below reds
+  # it. The order is the fail-closed direction, not a preference.
+  out=${out//\{\{AUTH_PARAM\}\}/"$AUTH_EFFECTIVE"}
   printf '%s' "$out"
 }
 
@@ -219,6 +342,131 @@ if [ "$MODE" = "--check" ]; then
   if ! diff -q <(tr -d '' < "$PBT_OUT") "$PBT_SHIP" >/dev/null 2>&1; then
     echo "unattended: $PBT_REL has drifted from the shipped playbook template; re-run $0"; exit 1
   fi
+  # the fourth artifact, with the same two refusals for the same reason: a reader sent to run the
+  # adopter and a reader sent to read a diff need different sentences.
+  if [ ! -f "$VERBS_OUT" ]; then
+    echo "unattended: $VERBS_REL is missing — run $0 to install the verb carrier"; exit 1
+  fi
+  if ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
+    echo "unattended: $VERBS_REL has drifted from the shipped verb carrier; re-run $0"; exit 1
+  fi
+  # the FIFTH artifact. RENDERED, so it is compared the way the Skill is and not the way the three
+  # copied ones are: re-render from the template and diff. This is the parity assertion that makes
+  # the role change safe -- at the default prefix the render must reproduce the committed bytes
+  # exactly. This leg is ON THE BAR, so a drifted fixture reds here rather than waiting for a kit
+  # self-test that no boundary runs.
+  if [ ! -f "$FIXTURE_OUT" ]; then
+    echo "unattended: $FIXTURE_REL is not rendered — run $0"; exit 1
+  fi
+  FTMP=$(mktemp) || exit 2
+  render "$FIXTURE_SHIP" > "$FTMP" || { echo "unattended: the fixture render FAILED — refusing to compare"; rm -f "$FTMP"; exit 1; }
+  [ -s "$FTMP" ] || { echo "unattended: the fixture render produced an EMPTY file — comparing it to an equally empty fixture is the green-by-absence shape this kit refuses"; rm -f "$FTMP"; exit 1; }
+  if ! diff -q <(tr -d '' < "$FIXTURE_OUT") "$FTMP" >/dev/null 2>&1; then
+    echo "unattended: $FIXTURE_REL is out of sync with playbook.fixture.template.md"
+    echo "  re-render with: $0"
+    diff <(tr -d '' < "$FIXTURE_OUT") "$FTMP" | head -20 | sed 's/^/    /'
+    rm -f "$FTMP"; exit 1
+  fi
+  rm -f "$FTMP"
+  # An UNRESOLVED token is a REFUSAL, never an emitted brace. Same rule as the Skill's, and it is
+  # asserted separately because a fixture in sync with its template can still carry a placeholder
+  # the conf declared nothing for -- in sync and useless, which is the whole value of the channel.
+  if grep -qE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT"; then
+    echo "unattended: $FIXTURE_REL still carries an unfilled placeholder"
+    grep -nE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT" | head -5 | sed 's/^/    /'
+    exit 1
+  fi
+  # the SIXTH artifact (TOOL-aDeferredBar-3): every hook the kit ships is WIRED. A hook ships with
+  # the kit and is live only through an entry in .claude/settings.json; nothing else on the bar
+  # reads that file for its marker, so an adopter with the file and no entry has a guard that never
+  # fires and a --check that said "in sync". Each marker is read from the kit's own fragment, never
+  # spelled here, and the remedy is the one merge command that writes the entry idempotently.
+  # The fragments are SHIPPED SURFACE (closing review F11): KIT_DIR is this script's own directory
+  # and the `**` engine rule ships each fragment beside it, so a copy that lost EVERY fragment is a
+  # broken copy and a refusal naming the kit dir, like the five artifacts above — not the silent
+  # `in sync` it was.
+  #
+  # GENERALISED FROM ONE NAMED FRAGMENT TO THE POPULATION (TOOL-aWokenSentinel-3): the kit ships a
+  # second hook, and a hand list of fragment names is the class the kit's `**` rule exists to
+  # avoid. WHAT THIS LOOP CANNOT SEE, said here because a glob loop reads as a complete check to
+  # everybody who did not write it: a fragment DELETED from a copy that still holds another is not
+  # detected per file — the old per-name check saw one file, this one sees the population, and the
+  # population floor is the zero guard. The fragment-to-hook join below catches the other half of a
+  # partial copy (a fragment naming a hook the kit does not carry), and the printed count lets a
+  # reader see one where two are expected (spec §8 F5).
+  # THE SETTINGS FILE IS RESOLVED THE WAY check-wiring.sh RESOLVES IT (closing review F5): a
+  # declared GOV_SETTINGS_JSON first, else the repo's own — an out-of-tree layout is a legitimate
+  # per-machine choice that resolver documents, and grepping the in-tree path alone redded it
+  # UNWIRED while the printed remedy would have created the in-tree decoy check-wiring warns about.
+  # And the marker must sit in a group under the fragment's EVENT with the fragment's MATCHER:
+  # an entry parked under PostToolUse, or under another matcher, passed the bare grep and never
+  # fired. Read without a JSON parser, as check-wiring's `matchers_of` reads it: flattened, each
+  # `{"matcher":` opens a group and its hooks array ends at the first `]`; the group's event is the
+  # last `"<Event>":[` key OTHER THAN `hooks` seen before it (closing round 2, R9: keeping only the
+  # last key of the lead and skipping when it was `hooks` let a matcherless first group hide its
+  # event, so a marker misfiled under `SessionStart` behind one read as wired under `PreToolUse`).
+  # A DECLARED settings file that is not a file is a REFUSAL in check-wiring's own words (R10),
+  # never UNWIRED: silently reading a different file than the operator named is the decoy class.
+  SJ=${GOV_SETTINGS_JSON:-$ROOT/.claude/settings.json}
+  if [ -n "${GOV_SETTINGS_JSON:-}" ] && [ ! -f "$GOV_SETTINGS_JSON" ]; then
+    echo "unattended: REFUSED — GOV_SETTINGS_JSON names $GOV_SETTINGS_JSON, which is not a file, so the gate-guard wiring cannot be read from the file the operator declared"
+    exit 1
+  fi
+  # The settings file is FLATTENED ONCE and each fragment's group reader runs over that.
+  SJ_FLAT=""; [ -f "$SJ" ] && SJ_FLAT=$(tr -d ' \t\r\n' < "$SJ" | sed 's/{"matcher":/\n{"matcher":/g')
+  N_FRAG=0
+  for GG_FRAG in "$KIT_DIR"/*.fragment.json; do
+    [ -f "$GG_FRAG" ] || continue
+    N_FRAG=$((N_FRAG + 1))
+    GG_BASE=${GG_FRAG##*/}
+    GG_NAME=$(sed -n 's/^[[:space:]]*"name":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+    GG_MARK=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+    [ -n "$GG_NAME" ] && [ -n "$GG_MARK" ] || { echo "unattended: $KIT_REL/$GG_BASE declares no name or no marker, so the wiring arm has nothing to look for"; exit 1; }
+    GG_EVENT=$(sed -n 's/^[[:space:]]*"event":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+    GG_MATCHER=$(sed -n 's/^[[:space:]]*"matcher":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+    [ -n "$GG_EVENT" ] && [ -n "$GG_MATCHER" ] || { echo "unattended: $KIT_REL/$GG_BASE declares no event or no matcher, so the wiring arm cannot say which group the marker must sit in"; exit 1; }
+    # A fragment naming a hook the kit dir does not carry is the other half of a partial copy: the
+    # entry would point at nothing and the harness would report a hook error on every event.
+    [ -f "$KIT_DIR/$GG_MARK" ] || { echo "unattended: $KIT_REL/$GG_BASE names the hook $GG_MARK, which is not a file in $KIT_REL, so the wired entry would point at nothing — re-copy the kit"; exit 1; }
+    GG_WIRED=$( printf '%s\n' "$SJ_FLAT" \
+      | awk -v M="$GG_MARK" -v W="$GG_MATCHER" -v E="$GG_EVENT" '
+          { lead = prev; prev = $0
+            s = lead
+            while (match(s, /"[A-Za-z]+":\[/)) { key = substr(s, RSTART + 1, RLENGTH - 4); s = substr(s, RSTART + RLENGTH); if (key != "hooks") ev = key }
+            g = $0; sub(/\].*$/, "", g)
+            if (index(g, M) && ev == E && match(g, /^{"matcher":"[^"]*"/) && substr(g, 13, RLENGTH - 13) == W) print "wired"
+          }' | head -1 )
+    if [ "$GG_WIRED" != wired ]; then
+      echo "unattended: the $GG_NAME hook is UNWIRED — ${SJ#"$ROOT"/} carries no $GG_EVENT entry under matcher $GG_MATCHER naming $GG_MARK, so the hook never fires"
+      # The remedy names the file the check READ (R10): settings-merge.py takes it as a positional
+      # defaulting to the in-tree path, so an out-of-tree layout handed the bare remedy wrote the
+      # in-tree decoy check-wiring warns about while this arm kept reading the declared file.
+      if [ "$SJ" = "$ROOT/.claude/settings.json" ]; then
+        echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/$GG_BASE"
+      else
+        echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/$GG_BASE $SJ"
+      fi
+      exit 1
+    fi
+  done
+  # ZERO is a refusal, never a loop over nothing that prints `in sync`: the kit ships its hooks as
+  # fragments, so a kit dir with none is a copy that lost them.
+  [ "$N_FRAG" -gt 0 ] || { echo "unattended: no *.fragment.json in $KIT_REL, so no hook wiring can be checked and nothing else on the bar asserts the files — re-copy the kit"; exit 1; }
+  echo "unattended: hooks: $N_FRAG fragment(s) wired"
+  # THE RESUME TICK'S REGISTRATION, reported and never graded (TOOL-aWokenSentinel-5 S9). Registering
+  # `gov-resume-tick` is the OWNER's act, once per node, and an adopter who has not done it has a
+  # working kit, not a broken one — so this is INFO on either answer and the exit code does not
+  # move. Under MSYS `schtasks //query` — a single `/query` from bash is mangled to a Program Files
+  # path, measured 2026-09-16 — elsewhere the crontab listing.
+  case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*) if schtasks //query //tn gov-resume-tick >/dev/null 2>&1; then RT_REG=1; else RT_REG=0; fi ;;
+    *) if crontab -l 2>/dev/null | grep -qF resume-tick; then RT_REG=1; else RT_REG=0; fi ;;
+  esac
+  if [ "$RT_REG" = 1 ]; then
+    echo "unattended: INFO — the resume tick is registered as gov-resume-tick"
+  else
+    echo "unattended: INFO — no scheduled task named gov-resume-tick on this node; the resume tick is unregistered (the kit README has the line)"
+  fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0
 fi
@@ -238,12 +486,92 @@ if [ ! -f "$PBT_OUT" ] || ! diff -q <(tr -d '' < "$PBT_OUT") "$PBT_SHIP" >/dev/
   tr -d '' < "$PBT_SHIP" > "$PBT_OUT"
   echo "unattended: installed $PBT_REL"
 fi
+# the verb carrier, the same shape again. Without this the kit would ship a gate its own adopter
+# could not satisfy, which is the defect the protocol block above records having had.
+if [ ! -f "$VERBS_OUT" ] || ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
+  tr -d '' < "$VERBS_SHIP" > "$VERBS_OUT"
+  echo "unattended: installed $VERBS_REL"
+fi
+# the fifth artifact, RENDERED rather than copied. It is written into the kit directory itself, so
+# an adopter installed at any prefix gets a fixture whose paths name THEIR prefix -- which is the
+# entire point of the role change, and what lets check-playbook.sh run anywhere.
+FTMP=$(mktemp) || exit 2
+if render "$FIXTURE_SHIP" > "$FTMP" && [ -s "$FTMP" ]; then
+  # AN UNRESOLVED TOKEN EMITS NO FILE. Catching it at --check time would still leave a rendered
+  # artifact on disk carrying a literal brace, and something downstream reads that file before
+  # anything runs --check. Refusing here means the bad render never lands.
+  if grep -qE '[{][{][A-Z_]+[}][}]' "$FTMP"; then
+    echo "unattended: the fixture render left an unfilled placeholder — refusing to write $FIXTURE_REL" >&2
+    grep -nE '[{][{][A-Z_]+[}][}]' "$FTMP" | head -5 | sed 's/^/    /' >&2
+    rm -f "$FTMP"; exit 1
+  fi
+  if [ ! -f "$FIXTURE_OUT" ] || ! diff -q <(tr -d '' < "$FIXTURE_OUT") "$FTMP" >/dev/null 2>&1; then
+    cp "$FTMP" "$FIXTURE_OUT"
+    echo "unattended: rendered $FIXTURE_REL"
+  fi
+else
+  echo "unattended: the fixture render FAILED or was empty — refusing to write $FIXTURE_REL" >&2
+  rm -f "$FTMP"; exit 1
+fi
+rm -f "$FTMP"
+
+# THE FIXTURE RECORDS CARRY THE PREFIX IN THEIR FILENAMES as well as in their bodies. Each is named
+# for the piece it describes with `/` written as `~`, so the name this install needs is derived from
+# `KIT_REL` exactly as the body is -- and both come out of the SAME render, from templates that
+# carry the token and nothing else. A record whose body names a piece this tree does not hold is an
+# ORPHAN RECORD to `check-playbook.sh`, coverage nobody has, so the pair is written together.
+#
+# THIS USED TO BE A RENAME LOOP over the copies gov shipped, and the rename is what made it a DATA
+# LOSS: gov's descriptor landed its own spelling at every prefix, the loop moved that file over the
+# target's own copy, and the next `update` restored gov's spelling so the move ran again. The
+# descriptor now declares the rendered destination and ships gov's spelling to nobody, so there is
+# nothing left to move. DEPL-cMendedVintage-6.
+_fx_want=$(printf '%s' "$KIT_REL" | tr '/' '~')
+mkdir -p "$KIT_DIR/fixture-records"
+for _fx_n in one two; do
+  _fx_tpl="$KIT_DIR/fixture-record-$_fx_n.template.md"
+  _fx_rel="$KIT_REL/fixture-records/${_fx_want}~fixture-pieces~${_fx_n}~piece.md.md"
+  _fx_out="$KIT_DIR/fixture-records/${_fx_want}~fixture-pieces~${_fx_n}~piece.md.md"
+  # A MISSING TEMPLATE IS A REFUSAL, not a skip: the records are the fixture playbook's only
+  # coverage, and a silently unwritten one reads downstream as a piece nobody ever checked.
+  [ -f "$_fx_tpl" ] || { echo "unattended: $KIT_REL/fixture-record-$_fx_n.template.md is missing from the kit, so the fixture record it renders cannot be written -- re-copy the kit" >&2; exit 1; }
+  RTMP=$(mktemp) || exit 2
+  if render "$_fx_tpl" > "$RTMP" && [ -s "$RTMP" ]; then
+    # The same refusal the fixture render above makes, and for its reason: an unresolved token must
+    # never reach disk, because `check-playbook.sh` reads these files before anything runs --check.
+    if grep -qE '[{][{][A-Z_]+[}][}]' "$RTMP"; then
+      echo "unattended: the fixture-record render left an unfilled placeholder -- refusing to write $_fx_rel" >&2
+      grep -nE '[{][{][A-Z_]+[}][}]' "$RTMP" | head -5 | sed 's/^/    /' >&2
+      rm -f "$RTMP"; exit 1
+    fi
+    if [ ! -f "$_fx_out" ] || ! diff -q <(tr -d '\r' < "$_fx_out") "$RTMP" >/dev/null 2>&1; then
+      cp "$RTMP" "$_fx_out"
+      echo "unattended: rendered $_fx_rel"
+    fi
+  else
+    echo "unattended: the fixture-record render FAILED or was empty -- refusing to write $_fx_rel" >&2
+    rm -f "$RTMP"; exit 1
+  fi
+  rm -f "$RTMP"
+done
 mkdir -p "$SKILL_DIR"
 TMPW=$(mktemp) || exit 2
 render > "$TMPW" || { rm -f "$TMPW"; echo "unattended: the render FAILED — the template could not be read; the Skill is unchanged"; exit 1; }
 # Write through a temp file and refuse an EMPTY one. Redirecting straight into the target truncated it
 # to zero bytes the instant sed failed, and then reported success.
 [ -s "$TMPW" ] || { rm -f "$TMPW"; echo "unattended: the render produced an EMPTY file — refusing to install it over the Skill"; exit 1; }
+# ...and refuse a HOLED one, on the WRITE path and not only under --check. TOOL-aNamedGesture-1 round 1,
+# L1. The identical grep lived only inside the --check branch, so the write path installed a Skill with
+# a surviving placeholder at exit 0 and the operator learned about it on the NEXT run, from a --check
+# message that blames an undeclared conf key rather than the value that carried the token. Reproducible
+# with a conf declaring a value that contains another key's placeholder text, which is exactly the case
+# the {{AUTH_PARAM}}-last substitution order was chosen to make fail closed - it produced the brace
+# shape correctly and then nothing on this path looked for it.
+if grep -qE '\{\{[A-Z_]+\}\}' "$TMPW"; then
+  echo "unattended: the render carries an unfilled placeholder — refusing to install it over the Skill"
+  grep -noE '\{\{[A-Z_]+\}\}' "$TMPW" | sort -u -t: -k2 | head -5 | sed 's/^/    /'
+  rm -f "$TMPW"; exit 1
+fi
 mv "$TMPW" "$SKILL_OUT"
 echo "unattended: rendered $SKILL_OUT"
 cat <<EOF

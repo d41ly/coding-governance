@@ -2,6 +2,18 @@
 
 **Status:** CLOSED · rev-9 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md](../reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
+| [2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md](../reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
+| [2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md](../reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
+| [2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md](../reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md) | diff-review | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
+| [2026-08-18-review-TOOL-aPacedTurnstile-1.md](../reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The runner forgets everything the moment it exits: the per-leg results it already computes live in a

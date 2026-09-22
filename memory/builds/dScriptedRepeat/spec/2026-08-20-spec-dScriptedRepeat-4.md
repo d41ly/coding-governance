@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Bind a run to a playbook: the build README's front matter at the pinned BASE names the playbook PATH

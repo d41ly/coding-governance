@@ -6,6 +6,7 @@
 # Every arm runs against a SCRATCH repo, never this tree: the leg reads `git ls-files`, so a fixture
 # built in place would either see gov's real population or need this repo mutated to fail. The green
 # control comes FIRST — a leg that reds on everything arms every branch and checks nothing.
+KIT_REL="${KIT_REL:-tools/memory-tree}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 LEG="$HERE/check-method-carriers.sh"
@@ -25,7 +26,7 @@ seed() { # dir -> a git repo with the kit, a conf, a memory tree and ONE declare
   printf '# method-carriers\nPOINTER.md \xc2\xb7 the one declared carrier\n' > "$1/memory/project/method-carriers.txt"
   ( cd "$1" && git add -A >/dev/null 2>&1 )
 }
-run() { ( cd "$1" && bash tools/memory-tree/check-method-carriers.sh 2>&1 ); }
+run() { ( cd "$1" && bash $KIT_REL/check-method-carriers.sh 2>&1 ); }
 
 R="$TMP/r"
 

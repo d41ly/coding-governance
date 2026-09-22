@@ -88,22 +88,21 @@ ids KICK-cSettledDocket-1 TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSett
 ids TOOL-cSettledDocket-13 TOOL-cSettledDocket-14 TOOL-cSettledDocket-15 TOOL-cSettledDocket-16
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-cSettledDocket-1 — a `--park` verb, so a refused decision has somewhere the gate reads](spec/2026-08-16-spec-cSettledDocket-1.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-cSettledDocket-2 — `DIRECTIVES_EXTRA` is waivable and unshowable at once](spec/2026-08-16-spec-cSettledDocket-2.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-cSettledDocket-3 — a rule called machine-checked that holds for one tier out of two](spec/2026-08-16-spec-cSettledDocket-3.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-cSettledDocket-4 — the hygiene suite's floor covers its helpers and not its file](spec/2026-08-16-spec-cSettledDocket-4.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cSettledDocket-5 — one leg: every self-test prints a count, in one shape, against a floor](spec/2026-08-16-spec-cSettledDocket-5.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cSettledDocket-6 — a standing fixture for the frozen-versus-live class](spec/2026-08-16-spec-cSettledDocket-6.md) | CLOSED | rev-2 | 2026-08-16 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-cSettledDocket-1 — a `--park` verb, so a refused decision has somewhere the gate reads](spec/2026-08-16-spec-cSettledDocket-1.md) | — | 2 | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-cSettledDocket-2 — `DIRECTIVES_EXTRA` is waivable and unshowable at once](spec/2026-08-16-spec-cSettledDocket-2.md) | — | 2 | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-cSettledDocket-3 — a rule called machine-checked that holds for one tier out of two](spec/2026-08-16-spec-cSettledDocket-3.md) | — | 2 | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-cSettledDocket-4 — the hygiene suite's floor covers its helpers and not its file](spec/2026-08-16-spec-cSettledDocket-4.md) | — | 1 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cSettledDocket-5 — one leg: every self-test prints a count, in one shape, against a floor](spec/2026-08-16-spec-cSettledDocket-5.md) | — | 2 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cSettledDocket-6 — a standing fixture for the frozen-versus-live class](spec/2026-08-16-spec-cSettledDocket-6.md) | — | 1 | CLOSED | rev-2 | 2026-08-16 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 2 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-review-TOOL-cSettledDocket-1-1.md](reviews/2026-08-16-review-TOOL-cSettledDocket-1-1.md) | spec-audit | TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 |
-| [2026-08-17-review-TOOL-cSettledDocket-1-2.md](reviews/2026-08-17-review-TOOL-cSettledDocket-1-2.md) | diff-review | TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -115,17 +114,3 @@ Records live under `spec/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-cSettledDocket-1.md](spec/2026-08-16-spec-cSettledDocket-1.md)
-  - [2026-08-16-spec-cSettledDocket-2.md](spec/2026-08-16-spec-cSettledDocket-2.md)
-  - [2026-08-16-spec-cSettledDocket-3.md](spec/2026-08-16-spec-cSettledDocket-3.md)
-  - [2026-08-16-spec-cSettledDocket-4.md](spec/2026-08-16-spec-cSettledDocket-4.md)
-  - [2026-08-16-spec-cSettledDocket-5.md](spec/2026-08-16-spec-cSettledDocket-5.md)
-  - [2026-08-16-spec-cSettledDocket-6.md](spec/2026-08-16-spec-cSettledDocket-6.md)
-- **`reviews/`**
-  - [2026-08-16-review-TOOL-cSettledDocket-1-1.md](reviews/2026-08-16-review-TOOL-cSettledDocket-1-1.md)
-  - [2026-08-17-review-TOOL-cSettledDocket-1-2.md](reviews/2026-08-17-review-TOOL-cSettledDocket-1-2.md)
-<!-- /gen:build-docs -->

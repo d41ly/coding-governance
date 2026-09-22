@@ -2,8 +2,10 @@
 #
 # GRAMMAR: `<repo-relative-path>\t<bytes>` per row. Comments carry the justification for a value and
 # every movement of it, because a number with no history beside it is a number nobody can question.
-# Modelled on `.memory-tree.conf`'s READ_PATH_CEILING, which is this tree's established answer to the
-# same problem: a budget whose every raise is argued in the conf next to the figure.
+# Modelled on `.memory-tree.conf`'s per-class caps, which are this tree's established answer to the
+# same problem: a budget whose every movement is argued in the conf next to the figure. The original
+# model was READ_PATH_CEILING, retired by TOOL-dSpentCeiling-1 after 27 movements bought no trim —
+# the LESSON kept here is the argued-in-place justification, not the summed budget.
 #
 # WHO WRITES THIS FILE: a person, deliberately. This is NOT the high-water record — that one is
 # `tools/template-size-highwater.txt`, which `--bump` WRITES as a side effect of measuring. Keeping
@@ -50,3 +52,44 @@ skills/session-kickoff/SKILL.md	18432
 #
 # The headroom's one known consumer is line-wrapping in the ruleset, which re-renders through here.
 AGENTS.md	64512
+
+# --- the build method, as rendered -------------------------------------------------------------
+# 27648 bytes = 27 KiB. SEEDED FROM THE MEASUREMENT PLUS THE WORK THIS BUILD FUNDS, 2026-09-05
+# (TOOL-aHoistedPass-3). The render measured 24553 CR-stripped at the commit that declared this row.
+# The arithmetic, so the number can be questioned rather than only obeyed: +742 for the M6 route
+# sentence TOOL-aHoistedPass-2 lands at order 3 (carried from that unit's design, which measured 764
+# in template form and ~22 less after substitution — the sentence is not in the tree, so it cannot be
+# re-derived here), +289 as a floor for its 17 backticked directive anchors (17 handles from
+# DIRECTIVES_CORE, 255 characters, plus 34 backticks; realistically 400-700 with joining words), and
+# ~300 for the rewritten budget line and its dated raise entry. That projects ≈26,100 at 500 bytes of
+# anchors, leaving ≈1,550 of headroom — roughly fifteen lines at this file's ~100 B prose line.
+#
+# THE SUBJECT IS THE RENDER, NOT THE TEMPLATE, and the reason is the budget's own stated reason: the
+# figure prices M7's re-read cost, and M7 re-reads the render. The template-minus-render delta is not
+# a constant that could stand in for it — four {{KIT_DIR}} grow by 6 each and five {{TOOL_ROOT}}
+# shrink by 7 each, a net -11 that a different install prefix flips.
+#
+# THIS ROW IS PAIRED WITH THE DOCUMENT'S OWN PROSE. Its `**Budget:` line spells this row's figure in the file
+# itself, and check 6 of the gate reds when the two disagree — including when the prose is rewritten
+# to a spelling the gate cannot parse as bytes. Change both or neither.
+#
+# THE LEG IS `build-method size`, AND ITS IDENTITY LIVES HERE RATHER THAN IN THE DOCUMENT. The
+# subject is a RENDERED kit template: `tools/memory-tree/` ships BUILD-METHOD.template.md and ships
+# no size gate, so the leg is an `[[exempt_leg]]` in tools/govkit/registry.toml and reaches no
+# adopter. The template used to name this leg in its own M1, which made every adopter render assert
+# a checker it does not receive — the `a directive names a route that does not run` class. That
+# sentence was dropped on 2026-09-06 (aHoistedPass closing review, F5) and the byte figure stayed,
+# because the figure is a property of the document and the gate is a property of THIS repo.
+#
+# WHAT THE LEG DOES NOT COVER is the LINE half of that budget line. No checker reads it, so a
+# document that grew in lines without growing in bytes still passes — priced at TOOL-aHoistedPass-28.
+#
+# RAISED 27648 -> 30720 = 30 KiB, owner rulings 2026-09-21 and 2026-09-22 (TOOL-dGatedProse-4),
+# which also settle TOOL-dLoggedFlight-35: the budget STANDS, as TOOL-aHoistedPass-3 made it
+# enforceable, and moves. On 2026-09-21 the owner kept the M4 sentence TOOL-dGatedProse-4 adds and
+# chose a raise over paying for it in deletions; on 2026-09-22 the owner ruled this figure. The
+# render measures 27936 with it, 288 over the old row, and the row leaves 2784 bytes, about 28
+# prose lines, reserved for nothing. Spent, it is the owner's again. The same rulings moved the
+# document's LINE half with this row, in the same edit. No checker reads that half (above), so its
+# figure is spelled in the document alone.
+memory/guides/BUILD-METHOD.md	30720

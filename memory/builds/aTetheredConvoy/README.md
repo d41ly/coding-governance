@@ -86,30 +86,41 @@ merely rework.
 The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `DEPL-aTetheredConvoy-1` | 2 | the truthful core: roles, the receipt, and one expansion |
+| 2 | `DEPL-aTetheredConvoy-2` | 2 | update, the verb that moves an install forward |
+| 3 | `DEPL-aTetheredConvoy-3` | 2 | the convergence ratchet: nothing new ships un-deployable |
+| 4 | `DEPL-aTetheredConvoy-4` | 2 | the gate-runner declaration, end to end |
+| 5 | `DEPL-aTetheredConvoy-5` | 2 | check stops printing states and starts carrying evidence |
+| 6 | `DEPL-aTetheredConvoy-6` | 2 | the merged role, the attributes block, and the renormalize |
+| 7 | `DEPL-aTetheredConvoy-7` | 2 | the acceptance matrix, the refusal join, and the runbook parity gate |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-16 · streams deployer+tooling
 ids DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 DEPL-aTetheredConvoy-8 DEPL-aTetheredConvoy-9 TOOL-aTetheredConvoy-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion](spec/2026-08-16-spec-DEPL-aTetheredConvoy-1.md) | CLOSED | rev-6 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-2 — update, the verb that moves an install forward](spec/2026-08-16-spec-DEPL-aTetheredConvoy-2.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable](spec/2026-08-16-spec-DEPL-aTetheredConvoy-3.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-4 — the gate-runner declaration, end to end](spec/2026-08-16-spec-DEPL-aTetheredConvoy-4.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence](spec/2026-08-16-spec-DEPL-aTetheredConvoy-5.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md) | CLOSED | rev-4 | 2026-08-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion](spec/2026-08-16-spec-DEPL-aTetheredConvoy-1.md) | — | 2 | CLOSED | rev-6 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-2 — update, the verb that moves an install forward](spec/2026-08-16-spec-DEPL-aTetheredConvoy-2.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable](spec/2026-08-16-spec-DEPL-aTetheredConvoy-3.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-4 — the gate-runner declaration, end to end](spec/2026-08-16-spec-DEPL-aTetheredConvoy-4.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence](spec/2026-08-16-spec-DEPL-aTetheredConvoy-5.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 4 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-build-DEPL-aTetheredConvoy-1-1.md](build/2026-08-16-build-DEPL-aTetheredConvoy-1-1.md) | journal | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
-| [2026-08-16-review-DEPL-aTetheredConvoy-1-1.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-1.md) | spec-audit | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
-| [2026-08-16-review-DEPL-aTetheredConvoy-1-2.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-2.md) | spec-audit | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
-| [2026-08-16-review-DEPL-aTetheredConvoy-1-3.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-3.md) | diff-review | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -121,21 +132,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-1.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-1.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-2.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-2.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-3.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-3.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-4.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-4.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-5.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-5.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-6.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-7.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md)
-- **`build/`**
-  - [2026-08-16-build-DEPL-aTetheredConvoy-1-1.md](build/2026-08-16-build-DEPL-aTetheredConvoy-1-1.md)
-- **`reviews/`**
-  - [2026-08-16-review-DEPL-aTetheredConvoy-1-1.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-1.md)
-  - [2026-08-16-review-DEPL-aTetheredConvoy-1-2.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-2.md)
-  - [2026-08-16-review-DEPL-aTetheredConvoy-1-3.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-3.md)
-<!-- /gen:build-docs -->

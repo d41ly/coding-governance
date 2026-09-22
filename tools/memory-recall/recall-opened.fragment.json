@@ -3,5 +3,5 @@
   "event": "PostToolUse",
   "matcher": "Read",
   "marker": "recall-opened.js",
-  "hook_path": ".claude/hooks/recall-opened.js"
+  "hook_path": "{kit}/memory-recall/recall-opened.js"
 }

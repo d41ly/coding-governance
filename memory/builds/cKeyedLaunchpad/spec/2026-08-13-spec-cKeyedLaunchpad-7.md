@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-20 · node c · Tier-1 · base f006691f · streams kickoff+tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md](../reviews/2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md) | spec-audit | KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 TOOL-cKeyedLaunchpad-5 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Correct the engine's remaining false claim, trim what U2 through U6 made redundant, and put the file

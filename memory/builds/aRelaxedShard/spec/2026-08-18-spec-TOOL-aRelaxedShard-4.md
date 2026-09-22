@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-2 · base 86eefd8e · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-build-TOOL-aRelaxedShard-4-census.md](../build/2026-08-18-build-TOOL-aRelaxedShard-4-census.md) | research | — |
+| [2026-08-18-review-TOOL-aRelaxedShard-4.md](../reviews/2026-08-18-review-TOOL-aRelaxedShard-4.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `TOOL-aRelaxedShard-1` raised the row byte cap and bought about 18 days. This unit is the one the owner

@@ -2,6 +2,19 @@
 
 **Status:** INPROGRESS · rev-2 · 2026-08-03 · node a · Tier-2 · base 9368d1e8 · ratified 2026-08-03 · U1-U3 built, closing review folded; NOT CLOSED — §8 Q6 is deliberately open
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-1.md](../build/2026-08-03-build-TOOL-aQuarriedLantern-1-1.md) | journal | — |
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-2.md](../build/2026-08-03-build-TOOL-aQuarriedLantern-1-2.md) | journal | — |
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-3.md](../build/2026-08-03-build-TOOL-aQuarriedLantern-1-3.md) | journal | — |
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-4.md](../build/2026-08-03-build-TOOL-aQuarriedLantern-1-4.md) | journal | — |
+| [2026-08-03-review-TOOL-aQuarriedLantern-1-1.md](../reviews/2026-08-03-review-TOOL-aQuarriedLantern-1-1.md) | spec-audit | — |
+| [2026-08-03-review-TOOL-aQuarriedLantern-1-2.md](../reviews/2026-08-03-review-TOOL-aQuarriedLantern-1-2.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Port the working memory-tree retrieval CLI from the inCMS repo (the scripts/recall folder, records
@@ -41,11 +54,19 @@ shipping a second declaration of the corpus root, the disciplines and the id fam
      instead of inside the worktree, and its node-registry lookup is removed — `--tag` becomes
      required for `--export` and refuses when absent.
   5. `--rebuild` is documented in `--help`; it exists upstream but is undiscoverable there.
+  - **Readers:** by name: `tools/memory-recall/query.py` records the withdrawn lookup in its fork
+    comment and refuses an export without a tag in its place, and `tools/memory-recall/README.md`
+    and `tools/memory-recall/SKILL.template.md` document that pair. by value: the lookup produced
+    the node tag, and `tools/memory-recall/query.py` still reads the tag to name the per-node export
+    file, as `build_cutoff` keys on it too.
 - **S6** — cache manifest and eviction. The manifest gains two fields: `worktree` (the absolute path
   the cache was built for) and `conf_digest` (S2). `conf_digest` joins the `fresh` predicate in
   `ensure_cache`, so an id-grammar or corpus-root change invalidates the cache the way an alias
   change already does. A build deletes sibling cache directories whose recorded `worktree` no longer
   exists. A cache directory with no readable manifest is **never** evicted.
+  - **Readers:** by name: nothing tracked is withdrawn; the verb is runtime eviction of cache
+    directories. by value: NO VALUE READERS — the evicted directories are untracked caches whose
+    recorded worktree is gone, and nothing tracked reads one.
 - **S7** — a loud diagnosis for the mis-declared-families failure: when the records document set is
   empty while the chunks set is not, the CLI prints which conf key produced no anchors, the conf
   path, and `--rebuild` as the escape hatch for a cache built before the conf was fixed.

@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-17 · node d · Tier-2 · base b4f0cf1c · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-17-review-TOOL-dClosedLexicon-11-9.md](../reviews/2026-08-17-review-TOOL-dClosedLexicon-11-9.md) | spec-audit | TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-13 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Unit 2's F1 asked whether `codebase-map` should CONSUME a lexicon-owned definition census, and

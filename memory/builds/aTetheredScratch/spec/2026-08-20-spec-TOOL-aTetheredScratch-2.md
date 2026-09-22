@@ -8,6 +8,14 @@ not fire, and unit 1's rev-2 allowlist made the retarget worthless to unit 1 any
 an unverifiable carrier, was withdrawn at rev-3 after unit 1's probe measured the opposite.) Rev-2
 keeps the sweep and replaces the retarget with the root cause it was working around.
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-20-review-TOOL-aTetheredScratch-1-2.md](../reviews/2026-08-20-review-TOOL-aTetheredScratch-1-2.md) | spec-audit | TOOL-aTetheredScratch-1 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Remove the litter from the operator's home directory, and repair the cleanup that is generating the

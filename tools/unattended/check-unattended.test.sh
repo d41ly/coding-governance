@@ -9,6 +9,13 @@
 # from the source tree, because the leg resolves its own install prefix and the parity arm depends
 # on that prefix being the scratch repo's, not this one's.
 set -u
+# THE FIXTURE'S KIT HOME, ONCE (TOOL-aGradedDoorway-2). `seed()` INSTALLS the kit here and every
+# arm below RUNS it here, and those had been two independent spellings of one fact. An adopter at
+# another prefix had to repath all of them by hand, and a missed one is SILENT rather than red:
+# `mutate` and `cp` no-op on a path that does not exist, so the arm asserts against a tree it never
+# changed and passes. The default keeps gov byte-identical; an adopter sets it once, and the arms
+# are run at a foreign prefix to prove the suite still grades.
+KIT_REL="${KIT_REL:-tools/unattended}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
 # ---- THE SHARD CONTRACT — ADOPTED, not reinvented (TOOL-aShardedFloor-3) -------------------------
@@ -54,17 +61,22 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
-mkdir -p tools/unattended memory/guides
-cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" tools/unattended/
+mkdir -p $KIT_REL memory/guides
+cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" $KIT_REL/
 # BOTH SIDES OF THE MERGE ADDED A SEED HERE, for different checks, and both are needed.
 # Check 28 compares the parser inlined in the driver AND the playbook leg and then runs it
 # over the shipped template, so a tree missing either takes the missing-from-the-pair branch
 # and every arm below grades that refusal. Check 22 joins the protocol key table against the
 # EXAMPLE CONF and refuses when it is absent. A fixture that drops either models a broken
 # install rather than a repo.
-cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$HERE/.unattended.conf.example" tools/unattended/
+cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$HERE/.unattended.conf.example" $KIT_REL/
+cp "$HERE/VERBS.template.md" $KIT_REL/
 cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
-SCRIPT="$TMP/tools/unattended/check-unattended.sh"
+# THE VERB CARRIER, BOTH HALVES. Seeded for the same reason the protocol pair is: check 10 now
+# iterates two pairs and check 26 reads this carrier ALONE, so a fixture missing either half
+# models a broken install and every arm below grades that refusal instead of its own subject.
+cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
+SCRIPT="$TMP/$KIT_REL/check-unattended.sh"
 
 mkconf() { cat > .unattended.conf <<EOF
 MEMORY_ROOT=memory
@@ -91,6 +103,7 @@ DIRECTIVES_EXTRA_TABLE=""
 # 50-minute suite run to find, which is the only reason it is this loud.
 HALT_CODES_EXTRA=""
 HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
+UNDECLARED_WRITE_CEILING="${UWC_OVERRIDE:-0}"
 EOF
 }
 
@@ -161,6 +174,43 @@ BASE0=$(git rev-parse HEAD)
 export GOV_DEFAULT_BRANCH=main
 sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md
 sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRun/RUN.md
+# TOOL-dHonouredPark-4 fallout. Check 30 asserts its own LIVENESS — it refuses to report clean when
+# it walked no build whose `--plan` returned a verdict — and every fixture build here has an EMPTY
+# generated units region and no spec, so `--plan` refused for all of them and the check redded on a
+# population of zero. Five arms failed for a fixture that predates the check.
+#
+# A SEPARATE BUILD, not a reshape of tRun. Dozens of arms below assert against tRun's README and
+# run-state file; changing its shape to satisfy one check would put every one of them at risk. This
+# one exists only to be counted, and nothing else references it.
+#
+# SPECCED, NOT CLOSED, deliberately: check 30 separately flags a build whose every tracked spec is
+# TERMINAL, so the obvious status would trade this red for that one.
+mkdir -p memory/builds/tPlanOk/spec
+cat > memory/builds/tPlanOk/README.md <<'PLANOK'
+---
+slug: tPlanOk
+node: a
+opened: 2026-08-01
+streams: architecture
+roster: ARCH
+ids: ARCH-tPlanOk-1
+---
+
+# tPlanOk
+
+<!-- gen:build-index -->
+**Build status:** SPECCED · 1 unit(s)
+<!-- gen:build-units -->
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-tPlanOk-1 — the unit](spec/one.md) | SPECCED | rev-1 | 2026-08-01 |
+<!-- /gen:build-units -->
+<!-- /gen:build-index -->
+PLANOK
+printf '# ARCH-tPlanOk-1 the unit
+
+**Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture
+' > memory/builds/tPlanOk/spec/one.md
 git add -A && git commit -q -m facts --no-verify
 PRISTINE=$(git rev-parse HEAD)
 # RESETS THE REF NAMESPACE TOO, not just the work tree. Arms below repoint the anchor and add
@@ -267,7 +317,69 @@ out=$(run)
 hit "$out" "a required key is undeclared in .unattended.conf, and an undeclared value is not a defaulted one"
 hit "$out" "LANDER"
 
-reset_tree; sed -i 's/^PHASES_CORE=.*/PHASES_CORE=unparseable/' tools/unattended/unattended.sh
+# ---- THE CONF MAY NOT REDIRECT THE LEG'S OWN SUBJECT (closing-review F1). The import's arm used to
+# ---- be the open glob `[A-Z][A-Z0-9_]*`, which assigned EVERY uppercase key the conf declared -
+# ---- including the three this leg sets ABOVE the import. `.unattended.conf` is a tracked file an
+# ---- unattended run commits itself, and this leg is on an unguarded merge bar, so one line in it
+# ---- pointed the gate at a file other than the one it certifies.
+# ----
+# ---- PORTED FROM `check-brief-recorded.test.sh`'s evil-driver arm, which armed the same class on
+# ---- the sibling importer in the same build. Three keys, three shapes, because they break three
+# ---- different things and an arm on one is an arm on one.
+# ----
+# ---- EQUALITY, not a `miss` on one string. The claim is that the hostile line changed NOTHING, and
+# ---- a `miss` on one refusal would pass over any other damage the redirect did. `$_f1_clean` is
+# ---- captured on the same pristine fixture, so the two runs differ by exactly one appended line.
+# ----
+# ---- THE HOSTILE LINES ARE `export`-PREFIXED, and that is the whole point rather than a flourish.
+# ---- Check 22's project-conf key join greps `^[A-Z_]+=` - column 0, no `export` - while the
+# ---- importer's sed accepts a leading `export`, so the exported spelling is the one check 22 is
+# ---- BLIND to and the importer still honours. An arm on the column-0 form alone would have been
+# ---- satisfied by check 22 redding for an entirely different reason, and would have proved nothing
+# ---- about the import. The column-0 form gets its own arm below, saying exactly that.
+reset_tree
+_f1_clean=$(run)
+# The control's validity, asserted rather than assumed - and NOT as "the baseline is empty". This
+# fixture carries whatever standing reds the suite already has, and an emptiness assertion here would
+# simply restate the conforming-tree arm above and inherit its failures. What matters is that the
+# baseline does not ALREADY carry the redirect's own symptom, or the equality arms below would be
+# comparing one broken run against another.
+miss "$_f1_clean" "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set"
+
+reset_tree
+printf 'export DRIVER="/dev/null"
+' >> .unattended.conf
+same "a conf DRIVER does not redirect the leg away from the driver it certifies" "$(run)" "$_f1_clean"
+
+# ...`HERE` redirects the kit files this leg reads out of its own install directory - the Skill
+# template check 16 joins the registry against, and the playbook leg check 28 byte-compares.
+reset_tree
+printf 'export HERE="/nonexistent"
+' >> .unattended.conf
+same "a conf HERE does not redirect the kit files this leg reads out of its own install dir" "$(run)" "$_f1_clean"
+
+# ...and `SCOPE`, which is the worst of the three: it is read AFTER the import, so `skip28` in the
+# conf silently deleted the whole check-28 region including 28c, the pinned-git-read enforcement -
+# a check quietly deleted by the file it grades. The break is check 28's own scalar-parser arm, so a
+# region that RAN says so in its own words rather than by the absence of something.
+reset_tree
+rm -f $KIT_REL/check-playbook.sh
+printf 'export SCOPE="skip28"
+' >> .unattended.conf
+hit "$(run)" "the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow:"
+
+# ...and the COLUMN-0 spelling, recorded so nobody re-litigates check 22 as the mitigation. It reds
+# here, but on check 22 and for its own reason - an undeclared key in the project conf - while the
+# thing that actually matters is that check 1 no longer refuses over a driver it was pointed at.
+reset_tree
+printf 'DRIVER="/dev/null"
+' >> .unattended.conf
+out=$(run)
+hit "$out" "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol:"
+miss "$out" "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set"
+reset_tree
+
+reset_tree; sed -i 's/^PHASES_CORE=.*/PHASES_CORE=unparseable/' $KIT_REL/unattended.sh
 hit "$(run)" "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set"
 
 # ---- a FOURTH branch, separate from the one above because an empty mode
@@ -283,13 +395,20 @@ reset_tree; sed -i 's/^CORE_FLOOR=.*/CORE_FLOOR="2:10"/' .unattended.conf
 hit "$(run)" "the declared PHASE floor sits below the kit's own core count, so the pin guards nothing and a later deletion would pass it - declared against core:"
 reset_tree
 
-reset_tree; sed -i 's/^AUTH_MODES=.*/AUTH_MODES=unparseable/' tools/unattended/unattended.sh
+reset_tree; sed -i 's/^AUTH_MODES=.*/AUTH_MODES=unparseable/' $KIT_REL/unattended.sh
 hit "$(run)" "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set - an empty vocabulary makes every check keyed on it vacuously true"
+
+# ---- the same read, one set over (TOOL-dNarrowedAnchor-1), and the DIRECTION of the failure is why
+# ---- it gets its own refusal rather than a default. An unreadable AUTH_MODES makes checks keyed on
+# ---- it vacuously TRUE; an unreadable SECOND_ANCHOR_MODES makes check 29 treat every mode as
+# ---- inadmissible, so it would red every branch-anchored run in the tree instead of passing them.
+reset_tree; sed -i 's/^SECOND_ANCHOR_MODES=.*/SECOND_ANCHOR_MODES=unparseable/' $KIT_REL/unattended.sh
+hit "$(run)" "cannot read SECOND_ANCHOR_MODES from the driver, so check 29 would treat every declared mode as inadmissible on the second anchor and red every branch-anchored run in the tree"
 
 # ---- checks 2 and 3: the CORE sets are one-directional. Deleting a member reds; ADDING a project
 # ---- member is green — and that green half is the arm that keeps the check from being "the sets
 # ---- must be exactly the core sets", which would make PHASES_EXTRA and DOD_EXTRA unusable.
-reset_tree; sed -i 's/^PHASES_CORE="[^"]*"/PHASES_CORE=""/' tools/unattended/unattended.sh
+reset_tree; sed -i 's/^PHASES_CORE="[^"]*"/PHASES_CORE=""/' $KIT_REL/unattended.sh
 hit "$(run)" "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set"
 
 # ---- The floor is a COUNT because the membership form was measured VACUOUS: the leg composes the
@@ -299,12 +418,12 @@ hit "$(run)" "cannot read the kit's core sets from the driver, so every membersh
 reset_tree
 # reset_tree's `git clean -qfd` removes the copied kit, so the arm re-stages it before editing.
 # Without this the sed edits nothing, the grep counts nothing, and the arm passes by finding nothing.
-mkdir -p tools/unattended && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" tools/unattended/
-ncore=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+ncore=$(grep '^PHASES_CORE=' $KIT_REL/unattended.sh | tr -d '
 ' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w)
-short=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '
+short=$(grep '^PHASES_CORE=' $KIT_REL/unattended.sh | tr -d '
 ' | sed 's/^PHASES_CORE="//; s/"$//')
-sed -i "s|^PHASES_CORE=.*|PHASES_CORE=\"${short% *}\"|" tools/unattended/unattended.sh
+sed -i "s|^PHASES_CORE=.*|PHASES_CORE=\"${short% *}\"|" $KIT_REL/unattended.sh
 out=$(run)
 hit "$out" "the kit's CORE phase vocabulary has shrunk below its floor, and deleting a core member is a silent, reason-free override of everything keyed on it"
 hit "$out" "$((ncore-1)) against $ncore"
@@ -321,7 +440,7 @@ hit "$out" "a TERMINAL phase is not in the effective vocabulary, so no run could
 # ---- the exemption exists. Measured when it was scoped: unexempting this branch reds nothing in the
 # ---- corpus, which is exactly why it needs a fixture. A check whose only evidence is a corpus that
 # ---- cannot trigger it is the fixture-passes-by-finding-nothing class.
-reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
 mkdir -p memory/builds/tMarker
 printf '# tMarker - run state\n\n<!-- run:generated -->\n\n## Run facts\nphase: LANDED\nwitness: 0123456789abcdef0123456789abcdef01234567\nbase: 0123456789abcdef0123456789abcdef01234567\nunits-at-landing: ARCH-tMarker-1\n' > memory/builds/tMarker/RUN.md
 printf 'readme\n' > memory/builds/tMarker/README.md
@@ -356,7 +475,22 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # `--witness` is NOT here: it is read inside the --phase handler rather than dispatched as its own
 # case arm, so it never enters the derived population and exempting it removed nothing. The
 # assertion below caught that on its first run, which is the entire reason it exists.
-_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set'
+# `--framed` and `--paths` are flags of `--plan`: each selects an output MODE and dispatches
+# nothing, so demanding either a Skill section would demand a section nobody should write.
+# TOOL-aQuenchedHarness-10.
+#
+# BOTH ARE HERE BECAUSE THAT UNIT PUT THEM IN THE POPULATION. Rewriting `--plan`'s argument
+# loop turned `[ "${1:-}" = "--paths" ]` into a `--paths)` case arm, and this population is
+# derived from case arms - so a refactor that changed no behaviour added a verb to a set it
+# never meant to touch. I first recorded `--paths` as a pre-existing red on the strength of it
+# appearing equally in both trees; a baseline run of this suite against main named only
+# `--disposition` and `--unit`, which is what settled it. Counting occurrences of a flag is not
+# the same question as whether it is DISPATCHED.
+#
+# NOT FIXED HERE: `--unit` and `--disposition` are flags too and are still graded as verbs,
+# which is why this arm reds on a tree nobody has touched. Denying them changes what this arm
+# grades AND its floor, which is TOOL-aQuenchedHarness-9's deferred work, not this unit's.
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths'
 for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)
@@ -396,8 +530,8 @@ n=$((n+1)); [ -z "$undoc" ] || { echo "FAIL a dispatched verb is absent from a s
 # ---- ceiling from the driver through `core_of`, which parses only a DOUBLE-QUOTED value; when that
 # ---- read came back empty the whole three-clause check was skipped and said nothing, which is
 # ---- indistinguishable from a clean corpus. An unreadable ceiling is a refusal now.
-reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
-sed -i 's/^RUNAWAY_CEILING=.*/RUNAWAY_CEILING=8/' tools/unattended/unattended.sh
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
+sed -i 's/^RUNAWAY_CEILING=.*/RUNAWAY_CEILING=8/' $KIT_REL/unattended.sh
 
 
 hit "$(run)" "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
@@ -407,17 +541,17 @@ hit "$(run)" "the driver declares no readable RUNAWAY_CEILING, so the review-loo
 # ---- `${x:-60}` fallback restated the numbers from memory. The leg then observed the remote under
 # ---- bounds it invented while a comment above claimed a single source, and tuning the driver moved
 # ---- nothing. Unquoting one here reproduces exactly that read.
-reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
-sed -i 's/^REMOTE_CONNECT_BOUND=.*/REMOTE_CONNECT_BOUND=20/' tools/unattended/unattended.sh
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
+sed -i 's/^REMOTE_CONNECT_BOUND=.*/REMOTE_CONNECT_BOUND=20/' $KIT_REL/unattended.sh
 hit "$(run)" "the driver declares no readable REMOTE_BOUND, REMOTE_CONNECT_BOUND or REMOTE_LOWSPEED_BYTES, so this leg would observe the remote under bounds it invented rather than the ones the driver uses; core_of reads a double-quoted value only, so an unquoted constant reads as absent"
 
 # a group whose counts do not shrink and which records no exit
-reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
 mkdir -p memory/builds/tRev
 printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T03:00:00Z review · item S1 · reason verdict BLOCKED · blockers 3\n' > memory/builds/tRev/RUN.md
 git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev --no-verify >/dev/null 2>&1
 out=$(run)
-hit "$out" "review loops that ran past the ceiling, stalled without recording it, or exited without promoting"
+hit "$out" "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers"
 hit "$out" "blocker counts did not shrink across consecutive rounds and no round carries an exit token"
 
 # ...and the SAME sequence carrying an exit token is green. Without this the arm above could be
@@ -434,31 +568,31 @@ reset_tree
 # ---- nothing. The driver-editing arms re-stage the kit copy first: reset_tree's `git clean -qfd`
 # ---- removes it, and without the re-stage the sed edits nothing and the arm passes by finding nothing.
 
-reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
 mkconf; sed -i 's/^HALT_FLOOR=.*/HALT_FLOOR=""/' .unattended.conf
 # SED, not the override channel: `${HFLOOR_OVERRIDE:-$DERIVED}` substitutes the default when the
 # override is empty, so an empty override declares the key rather than clearing it — the arm passed
 # by testing the opposite of what it says.
 hit "$(run)" "HALT_FLOOR is undeclared in .unattended.conf, and with no floor a deleted halt code is indistinguishable from a vocabulary that never had one"
 
-reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
 HFLOOR_OVERRIDE="seven" mkconf
 # A WORD, not a numeral. The shrink-only comparison below it is `-ge`, which on a non-numeric operand
 # is a shell error rather than a verdict — so a floor that reads as English disarms the pin while
 # looking set, which is worse than one left blank.
 hit "$(run)" "HALT_FLOOR is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name"
 
-reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
-mkconf; sed -i 's/^HALT_CODES_CORE="[a-z-]* /HALT_CODES_CORE="/' tools/unattended/unattended.sh
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
+mkconf; sed -i 's/^HALT_CODES_CORE="[a-z-]* /HALT_CODES_CORE="/' $KIT_REL/unattended.sh
 hit "$(run)" "the kit's CORE halt vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record that cited it"
 
-reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
-mkconf; sed -i 's/^HALT_CODES_CORE=.*/HALT_CODES_CORE=""/' tools/unattended/unattended.sh
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
+mkconf; sed -i 's/^HALT_CODES_CORE=.*/HALT_CODES_CORE=""/' $KIT_REL/unattended.sh
 hit "$(run)" "the driver declares no HALT_CODES_CORE vocabulary, so the abort verb would validate against an empty set and accept anything"
 
 # ---- and the two record-level refusals. The population is every TRACKED run-state file, archived ones
 # ---- included, so the fixture has to be committed for the check to see it at all.
-reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
 mkdir -p "memory/builds/tHalt"
 printf '# tHalt - run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: ABORTED\nwitness: 0123456789abcdef0123456789abcdef01234567\nbase: 0123456789abcdef0123456789abcdef01234567\n' > memory/builds/tHalt/RUN.md
 git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m halt --no-verify >/dev/null 2>&1
@@ -487,24 +621,24 @@ reset_tree
 # ---- is load-bearing — reset_tree's `git clean -qfd` removes the copied kit, and without it the sed
 # ---- edits nothing, the grep finds nothing, and the arm passes by finding nothing.
 reset_tree
-mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
 # a STALE MEMBER: a kind in the taxonomy that no park call site writes. This is the direction the
 # join asserts, and the failure it exists for — a count that exists to be narrow, silently wider.
-sed -i 's|^PARK_KINDS_OWED=.*|PARK_KINDS_OWED="decision abort override waiver ghostkind"|' tools/unattended/unattended.sh
+sed -i 's|^PARK_KINDS_OWED=.*|PARK_KINDS_OWED="decision abort override waiver ghostkind"|' $KIT_REL/unattended.sh
 out=$(run)
 hit "$out" "the parked-kind taxonomy names a kind no park call site in the driver writes, so a count that exists to be narrow is silently wider than the code it measures"
 
 reset_tree
-mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
 # ...and the VACUITY arm. An empty set would make the surfaced count and the parked-decisions
 # Definition-of-Done item both range over nothing, which is the empty-population shape this kit
 # refuses by name everywhere else.
-sed -i 's|^PARK_KINDS_OWED=.*|PARK_KINDS_OWED=""|' tools/unattended/unattended.sh
+sed -i 's|^PARK_KINDS_OWED=.*|PARK_KINDS_OWED=""|' $KIT_REL/unattended.sh
 out=$(run)
 hit "$out" "the driver declares no PARK_KINDS_OWED taxonomy, so the surfaced count and the parked-decisions Definition-of-Done item both range over a set this leg cannot read"
 
 reset_tree
-mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
 # ...and the CONTROL: the shipped set is green. Without it both arms above could be passing because
 # the check reds on everything.
 out=$(run)
@@ -518,10 +652,10 @@ miss "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
 same "a project phase EXTENSION is green" "$(run)" ""
 
 reset_tree
-mkdir -p tools/unattended && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" tools/unattended/
-ndod=$(grep '^DOD_CORE=' tools/unattended/unattended.sh | tr -d '
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+ndod=$(grep '^DOD_CORE=' $KIT_REL/unattended.sh | tr -d '
 ' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)
-sed -i 's/ parked-decisions-surfaced:agent"$/"/' tools/unattended/unattended.sh
+sed -i 's/ parked-decisions-surfaced:agent"$/"/' $KIT_REL/unattended.sh
 out=$(run)
 hit "$out" "the kit's CORE Definition-of-Done set has shrunk below its floor, and deleting an item is a silent, reason-free override of everything keyed on it"
 hit "$out" "$((ndod-1)) against $ndod"
@@ -536,9 +670,9 @@ hit "$(run)" "CORE_FLOOR is undeclared in .unattended.conf, and with no floor a 
 
 # ---- check 2/3's empty-set branches. Reached by declaring the CORE set as whitespace, which parses
 # ---- to a readable-but-empty value — distinct from the unreadable case armed above.
-reset_tree; sed -i 's/^PHASES_CORE="[^"]*"/PHASES_CORE=" "/' tools/unattended/unattended.sh
+reset_tree; sed -i 's/^PHASES_CORE="[^"]*"/PHASES_CORE=" "/' $KIT_REL/unattended.sh
 hit "$(run)" "the effective phase vocabulary is empty, which makes every phase check below vacuously true"
-reset_tree; sed -i 's/^DOD_CORE="[^"]*"/DOD_CORE=" "/' tools/unattended/unattended.sh
+reset_tree; sed -i 's/^DOD_CORE="[^"]*"/DOD_CORE=" "/' $KIT_REL/unattended.sh
 hit "$(run)" "the effective Definition-of-Done set is empty, so --close would block on nothing"
 
 # ---- check 4 branch 1: THE POPULATION GUARD, both states. A run-state file under the memory root
@@ -584,18 +718,22 @@ out=$(run)
 miss "$out" "a witness looks like a sha and resolves to no commit in this history"
 miss "$out" "a phase claim carries no witness"
 
-# ---- check 7: two non-terminal run-state files. The green half is the whole rest of this file —
+# ---- TOOL-aUnblockedFleet-2/-4: check 7 REPORTS two non-terminal run-state files and the leg still
+# ---- passes. It asserted a refusal until kit 1.13. The green half is the whole rest of this file —
 # ---- every other arm runs with exactly one live run and must not trip this.
 reset_tree; build tTwo
 sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tTwo/RUN.md
 sed -i "s/^base: BASE$/base: $(git merge-base main HEAD)/" memory/builds/tTwo/RUN.md
 git add -A && git commit -q -m two --no-verify
 out=$(run)
-hit "$out" "more than one run-state file is non-terminal, so 'the run' is not well-defined for anything keyed on it"
-# ...and a TERMINAL second run does not trip it: the invariant is about live runs, not about files.
+hit "$out" "2 concurrent unattended run(s) — none of them blocks another"
+hit "$out" "memory/builds/tTwo/RUN.md · phase RUNNING"
+miss "$out" "more than one run-state file is non-terminal"
+# ...and a TERMINAL second run produces NO report at all: the report is about live runs, not files.
+# This is the silent-at-one control, and without it a leg that reported unconditionally passes above.
 sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tTwo/RUN.md
 out=$(run)
-miss "$out" "more than one run-state file is non-terminal"
+miss "$out" "concurrent unattended run(s)"
 
 # ---- check 4, the ARCHIVED-record branch (kit 1.6). An archived record must be TERMINAL, and this
 # ---- has its own branch rather than riding check 7 because check 7 fires at TWO: a live RUN.md that
@@ -656,7 +794,150 @@ PROMBASE=$(git rev-parse HEAD)
 printf '# tProm\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n| TOOL-tProm-1 | CLOSED |\n| TOOL-tProm-2 | CLOSED |\n<!-- /gen:build-units -->\n' > memory/builds/tProm/README.md
 printf '# tProm\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n\n2026-08-20T02:00:00Z review · item S2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' "$PROMBASE" > memory/builds/tProm/RUN.md
 git add -A >/dev/null 2>&1
-hit "$(run)" "2 subject(s) EXITED without converging and the generated units region gained only 1 unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted"
+hit "$(run)" "2 subject(s) EXITED without converging and the generated units region gained only 1 non-WONTDO unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted"
+reset_tree
+
+# ---- THE SET IS READ FROM THE DRIVER, so an unreadable declaration is a refusal and not a silent
+# ---- comparison against nothing. Closing-review fold: the leg used to restate `fold|promote`, which
+# ---- drifts the moment the driver's set moves and lets this leg tell a record it was hand-edited
+# ---- when the driver itself wrote the value.
+reset_tree; mkconf
+mutate $KIT_REL/unattended.sh 's|^REVIEW_DISPOSITIONS=.*|REVIEW_DISPOSITIONS=fold\|promote|'
+hit "$(run)" "the driver declares no readable REVIEW_DISPOSITIONS, so the clause that grades a recorded disposition would compare every value against an empty set and report whatever that produces as a verdict"
+reset_tree
+
+# ---- TOOL-dFoldedVerdict-2: THE GRADED PATH — clause 3 READING a recorded disposition instead of
+# ---- inferring one from ids. Every arm pins the cutoff to a date the fixture cannot drift past:
+# ---- 2000-01-01 forces grading, 2099-01-01 forces the pre-cutoff proxy. Neither depends on the day
+# ---- the suite runs, which a cutoff of "today" would.
+dispconf() { mkconf; printf 'DISPOSITION_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
+mkdisp() { # base-region-rows · head-region-rows · run rows
+  mkdir -p memory/builds/tDisp
+  printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$1" > memory/builds/tDisp/README.md
+  git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m dispbase --no-verify
+  DISPBASE=$(git rev-parse HEAD)
+  printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$2" > memory/builds/tDisp/README.md
+  printf '# tDisp\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n%b' "$DISPBASE" "$3" > memory/builds/tDisp/RUN.md
+  # COMMITTED, not merely staged. The cutoff grades the record's own FIRST-COMMIT date; a staged
+  # record has none, and an undated record is graded regardless of the cutoff — so a staged fixture
+  # made the 2099 and 2000 arms produce byte-identical output and the grandfathering arm proved
+  # nothing at all. GIT_COMMITTER_DATE pins the date so neither arm depends on the day it runs.
+  # DISPDATE overrides it for the arms that grade a record against the driver's FOLD_CUTOFF, which
+  # the default of 2026-09-01 predates: a fold-beside-blockers row at that date is the grandfathered
+  # population, and the red arm has to commit AT the cutoff to be graded by the rule.
+  git add -A >/dev/null 2>&1
+  GIT_COMMITTER_DATE="${DISPDATE:-2026-09-01T12:00:00 +0000}" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
+}
+D_ONE='| TOOL-tDisp-1 | CLOSED |\n'
+D_TWO='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n'
+
+# A FOLD BESIDE A NON-ZERO BLOCKER COUNT IS A REFUSAL (closing review of aProbedUnit, cluster C).
+# This fixture used to be the green "a fold-only exit demands nothing" control, and that was the
+# hole: `review_state` returns CONVERGED for count 0, so a NON-CONVERGENT row stands on a blocker,
+# the severity rule promotes every blocker, and `blockers 2 · disposition fold` was two blockers left
+# standing under a field the clause read as demanding nothing. The driver refuses the row at write
+# time now; the leg reds one first-committed AT OR AFTER the driver's FOLD_CUTOFF, so the record is
+# committed at that date. At base this fixture printed no check 2 line.
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
+hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF, after which the driver refuses this at write time, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was"
+
+# ...AND THE RULE HAS ITS OWN CUTOFF (closing review of aProbedUnit, round 2, cluster A — the
+# BLOCKER). Graded under DISPOSITION_CUTOFF alone, the clause above redded sixteen tracked
+# append-only records this repo's own driver wrote while `fold` was legal at every terminal exit,
+# and no verb can rewrite them. A record first-committed BEFORE FOLD_CUTOFF carrying the same row is
+# read as the contract that accepted it read it — demanding nothing — and one AT the cutoff is
+# graded by the rule. The pair is BOUNDED, the exit the kit default produces.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition fold\n'
+hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF"
+
+# ...and a FOLD_CUTOFF the leg cannot read is named, not defaulted: empty sorts before every date
+# and reds the whole grandfathered population, malformed sorts after and disarms the clause. Named
+# inside check 2's own failure rather than at a `fail` site of its own, because the pinned check-2
+# ordinals in memory/project/unarmed-branches.txt sit below the read.
+reset_tree; mkconf
+mutate $KIT_REL/unattended.sh 's|^FOLD_CUTOFF=.*|FOLD_CUTOFF=2026-09-15|'
+hit "$(run)" "the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none"
+
+# ...and a fold beside ZERO blockers still demands nothing: nothing above MEDIUM stood, so nothing
+# was owed a unit. Written by hand — the driver reaches CONVERGED at 0 and never NON-CONVERGENT —
+# which is exactly the population this clause grades.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+
+# A CONVERGED ROW RECORDING `promote` OWES AN ID (cluster C, id 12). The severity rule disposes the
+# HIGHS that stood at zero blockers, the driver records the promotion on the converged row, and
+# `needs` never read a CONVERGED row — so a promotion the harness performed was invisible to the bar
+# and a missing unit passed. At base the first fixture printed no check 2 line.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote\n'
+hit "$(run)" "1 subject(s) EXITED recording disposition promote and the generated units region gained only 0 non-WONTDO unit id(s) this run BASE lacked"
+# ...its green control: the id present, the row passes.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+# ...and a CONVERGED row with NO field is still the ordinary converged round and demands nothing.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED\n'
+miss "$(run)" "check 2 FAILED"
+
+# ...and the GREEN CONTROL for it: the same fixture with the disposition stripped is a REFUSAL, not a
+# pass. Without this arm `nneed` falls to zero on every unlabelled record and the clause becomes
+# green-by-absence — the shape this rewrite exists to remove.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n'
+hit "$(run)" "record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read"
+
+# A PROMOTE EXIT SHORT OF IDS still reds, so reading the field did not disarm the clause.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n'
+hit "$(run)" "EXITED recording disposition promote and the generated units region gained only 0 non-WONTDO unit id(s) this run BASE lacked"
+
+# ...and its green control: the same promote exit WITH the id present passes.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+
+# ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
+# ---- id, exactly as NON-CONVERGENT does. At base the first fixture printed NOTHING: the `needs`
+# ---- regex did not know the token, so a bounded promote owed nothing and the exit was green by
+# ---- absence. The `term` half cannot be discriminated by a driver-written record — the driver writes
+# ---- BOUNDED only on a strictly smaller count and the stalled-loop clause needs a flat one.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED\n'
+hit "$(run)" "record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+
+# AN ILLEGAL VALUE IS ITS OWN REFUSAL, and `promoted` is the near-miss a hand-editor actually types —
+# not a nonsense token. Reading it as ABSENT would name the wrong cause, and the hand-edited record
+# is not hypothetical: TOOL-dFoldedVerdict-3 creates exactly that class.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promoted\n'
+out=$(run)
+hit "$out" "carry a disposition outside the closed set fold|promote"
+miss "$out" "record NO disposition while this record is graded against DISPOSITION_CUTOFF"
+
+# A CUTOFF AHEAD OF THE RECORD restores today's verdict verbatim, which is what grandfathering means.
+reset_tree; dispconf 2099-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
+hit "$(run)" "1 subject(s) EXITED without converging and the generated units region gained only 0 non-WONTDO unit id(s) this run BASE lacked"
+
+# A BLANK CUTOFF grandfathers everything AND SAYS SO, unconditionally and on stdout. A silently
+# disabled clause reads exactly like a clause finding nothing wrong.
+reset_tree; mkconf
+hit "$(run)" "DISPOSITION_CUTOFF is blank or undeclared, so check 2 clause 3 grades EVERY record on the id-delta proxy"
+
+# A MALFORMED CUTOFF is a REFUSAL, never a defaulted value — S6's one new branch, and the reason the
+# three pinned check-2 ordinals moved by one in memory/project/unarmed-branches.txt.
+reset_tree; dispconf "last tuesday"
+hit "$(run)" "DISPOSITION_CUTOFF is declared and is not an ISO date, and a cutoff nothing can compare grades every record or none"
 reset_tree
 
 # ---- check 9: A TRANSPORT FAILURE IS NOT AN ANSWER EITHER. Splitting the wall-clock bound out left
@@ -698,7 +979,7 @@ reset_tree
 # `[ -f ]` guard around the whole thing made it vanish silently exactly where a documentation join is
 # worth most, and a check that says nothing reads identically to one that passed.
 reset_tree
-rm -f tools/unattended/.unattended.conf.example
+rm -f $KIT_REL/.unattended.conf.example
 hit "$(run)" "the kit ships no .unattended.conf.example, so the key table below can be joined against nothing and this check would pass by grading an empty set"
 reset_tree
 
@@ -776,8 +1057,18 @@ reset_tree; printf '\ndrifted line\n' >> memory/guides/UNATTENDED-PROTOCOL.md
 out=$(run)
 hit "$out" "the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
 hit "$out" "drifted line"
-reset_tree; rm -f tools/unattended/PROTOCOL.template.md
+reset_tree; rm -f $KIT_REL/PROTOCOL.template.md
 hit "$(run)" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
+
+# ---- check 10, THE SECOND PAIR. TOOL-dFoldedVerdict-5 moved the verb entries into their own
+# ---- byte-compared carrier because the protocol had reached its cap exactly. A pair added without
+# ---- its own two arms is a pair nothing watches, and the check would still report green.
+reset_tree; printf '\ndrifted line\n' >> memory/guides/UNATTENDED-VERBS.md
+out=$(run)
+hit "$out" "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
+hit "$out" "drifted line"
+reset_tree; rm -f $KIT_REL/VERBS.template.md
+hit "$(run)" "one half of the verb-carrier pair is missing, and a parity check with one file is a check that cannot fail"
 
 # ---- check 12: the kickoff hand-back, all four states. This is the only check that reads a file
 # ---- outside the kit, and it exists because nothing else read the engine's TEXT — the manifest
@@ -811,12 +1102,48 @@ sed -i "/Ready — say go/d" skills/session-kickoff/SKILL.md
 hit "$(run)" "the kickoff engine no longer carries the READY prompt string, so the DEFAULT stop is gone and every attended kickoff would run on unasked"
 
 # ...an exit dropped from the enumeration: the count is the only thing that notices a run silently
-# regaining a place to stop.
+# regaining a place to stop. TOOL-aHonedRuleset-3 MOVED that enumeration out of the engine and into
+# the contract, so the break is staged in the PROTOCOL PAIR -- template and installed copy, the way
+# pedit does it below -- and no longer in the synthetic engine fixture, which does not carry the
+# exits any more. `mutate` fails loudly on a no-op, so an arm that stopped reaching its subject
+# reports as a broken fixture rather than as a passing check.
 git checkout -q -- skills/session-kickoff/SKILL.md
-sed -i '/^4\. \*\*Step 2/d' skills/session-kickoff/SKILL.md
+mutate $KIT_REL/PROTOCOL.template.md '/^4\. \*\*Step 2/d'
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^4\. \*\*Step 2/d'
 out=$(run)
-hit "$out" "the kickoff engine enumerates fewer interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop"
+hit "$out" "the installed protocol enumerates fewer of the kickoff engine's interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop"
 hit "$out" "5 against 6"
+
+# ...and the floor declared with no installed protocol to count in. Without this arm the move above
+# turns a missing contract into a zero count, which reads exactly like a dropped exit.
+#
+# NOT `reset_tree` HERE. PRISTINE is pinned long before this section's own fixture commit (the
+# synthetic engine plus KICKOFF_ENGINE/KICKOFF_EXITS, committed above), so resetting to it does
+# not clean the tree -- it DESTROYS the fixture, check 12 is then skipped for want of a declared
+# engine, and every arm below reads green while testing nothing. `checkout -- .` keeps the commit.
+git checkout -q -- .
+rm -f memory/guides/UNATTENDED-PROTOCOL.md
+hit "$(run)" "KICKOFF_EXITS declares a floor on the kickoff engine's interactive exits, which now live in the installed protocol, and there is no protocol at"
+# Put the deleted half BACK. Check 10 compares the protocol pair unconditionally and returns 2 on
+# a missing half, so leaving it deleted makes every later run() emit and the blank-engine arm
+# below -- which asserts byte-empty output -- could never pass for the right reason.
+git checkout -q -- memory/guides/UNATTENDED-PROTOCOL.md
+
+# ...and the protocol present but carrying NO section 13. The count is declared section-scoped, so a
+# protocol without that heading must refuse by name rather than count zero and read as six dropped.
+mutate memory/guides/UNATTENDED-PROTOCOL.md 's/^## 13[.] /## 13x /'
+hit "$(run)" "KICKOFF_EXITS declares a floor counted in section 13 of the installed protocol, and there is no section 13 heading in"
+git checkout -q -- memory/guides/UNATTENDED-PROTOCOL.md
+
+# ...an exit dropped from a `**Step ` item OUTSIDE section 13 must NOT satisfy the floor. The
+# count is declared section-scoped in three places; before this arm it ran over the whole file,
+# so one such item anywhere could mask a real drop from section 13.
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^## 12[.] /a 9. **Step X** -- a decoy outside section 13.'
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^4\. \*\*Step 2/d'
+out=$(run)
+hit "$out" "the installed protocol enumerates fewer of the kickoff engine's interactive exits than the floor"
+hit "$out" "5 against 6"
+git checkout -q -- memory/guides/UNATTENDED-PROTOCOL.md
 
 # ...and a declared engine that is not there. Without this the whole check is skipped by a typo.
 git checkout -q -- skills/session-kickoff/SKILL.md
@@ -1103,7 +1430,11 @@ mkt=$(grep -oE '^[[:space:]]*(local +)?[A-Za-z_][A-Za-z0-9_]*=\$\(mktemp' "$HERE
 # word-boundary group as well. So every redirect the exemption removes sat OUTSIDE the bound's
 # population and the stated bound did not hold over redirects at all - it still fired on mv, rm and
 # cp, which is why it read as armed.
-WRITE_RE='(^|[^-[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)'
+# UNDERSCORE IN THE BOUNDARY CLASS. `[^-[:alnum:]]` does not exclude `_`, so a VARIABLE whose name
+# ends in one of these verbs matched as a write: this kit's OWN check-unattended.sh carries
+# `for _pv_rm in $(GIT ls-files ...)` in check 30, and the word `rm` inside that identifier reds
+# this arm against a file that writes nothing. A name is not a command.
+WRITE_RE='(^|[^-_[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)'
 w=$(grep -nE "$WRITE_RE" "$HERE/check-unattended.sh" \
     | grep -v '^[0-9]*: *#' || true)
 # A line is exempt when its write touches a SCRATCH variable and the line names no path in the
@@ -1139,28 +1470,28 @@ n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per
 # ---- the two agree by construction and check nothing.
 
 # arm 1: the kit ships no template at all — a broken install, not a project choice.
-reset_tree; mv tools/unattended/SKILL.template.md tools/unattended/SKILL.template.md.bak
+reset_tree; mv $KIT_REL/SKILL.template.md $KIT_REL/SKILL.template.md.bak
 hit "$(run)" "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
-mv tools/unattended/SKILL.template.md.bak tools/unattended/SKILL.template.md
+mv $KIT_REL/SKILL.template.md.bak $KIT_REL/SKILL.template.md
 
 # arm 2: a template with no readable row. This is the arm that matters most — without it the join
 # passes by finding nothing, which is the class this whole build keeps meeting.
-reset_tree; grep -v '^[[:space:]]*| `[a-z]' tools/unattended/SKILL.template.md > t.md && mv t.md tools/unattended/SKILL.template.md
+reset_tree; grep -v '^[[:space:]]*| `[a-z]' $KIT_REL/SKILL.template.md > t.md && mv t.md $KIT_REL/SKILL.template.md
 hit "$(run)" "the Skill template carries no directive table row this leg can read, so arm A would join the registry against nothing and pass by finding nothing; the row shape it looks for is a leading pipe then a backticked lowercase handle"
 
 # arm 3: a row citing two sections has no single answer to read. The reset is load-bearing: without
 # it this ran on the tree arm 2 left behind, whose rows were all stripped, so the sed matched nothing
 # and the arm asserted a state its own fixture had just made unreachable.
-reset_tree; sed -i 's/| the transcript rule under a mandate |/| M2 |/' tools/unattended/SKILL.template.md   # a second M<n> must be its OWN CELL
+reset_tree; sed -i 's/| the transcript rule under a mandate |/| M2 |/' $KIT_REL/SKILL.template.md   # a second M<n> must be its OWN CELL
 hit "$(run)" "a directive row cites more than one build-method section, so the join has no single answer to read for that handle"
 
 # arm 4: declared in the registry, absent from the table.
-reset_tree; sed -i '/| `wrap-up-derived` |/d' tools/unattended/SKILL.template.md
+reset_tree; sed -i '/| `wrap-up-derived` |/d' $KIT_REL/SKILL.template.md
 hit "$(run)" "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown"
 
 # arm 5: in the table, absent from the registry — the other direction, and it needs its own arm
 # because a one-way containment check would pass here.
-reset_tree; sed -i 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="/' tools/unattended/unattended.sh
+reset_tree; sed -i 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="/' $KIT_REL/unattended.sh
 hit "$(run)" "the Skill's table names a directive the registry does not declare, so the agent is told about a handle no verb will accept"
 
 # arm 6: a cited section that does not resolve. Arm B is SILENT without the carrier, so the fixture
@@ -1184,6 +1515,47 @@ reset_tree; printf '# method
 hit "$(run)" "a directive points at a build-method section that does not exist, so the handle names a rule no reader can reach:"
 rm -f memory/guides/BUILD-METHOD.md
 
+# arm 6b: THE BODY TERM (TOOL-aHoistedPass-2). Arm 6 above proves the section EXISTS check; this one
+# proves the term that opens it. FOUR FIXTURES, because the block-wise comment strip is the whole
+# point of the term and only the fourth separates it from the naive line-prefix filter that was
+# measured ADMITTING that evasion.
+_bm_sections() { printf '# method
+
+## M2
+
+## M3
+
+## M4
+
+## M5
+
+## M6
+%s
+## M7
+
+## M8
+
+## M9
+
+## M10
+
+## M12
+' "$1"; }
+# every section present, every handle absent from every body -> RED, naming the pair
+reset_tree; _bm_sections "" > memory/guides/BUILD-METHOD.md
+hit "$(run)" "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment"
+# the anchor present ONLY inside a SINGLE-line HTML comment -> still RED
+reset_tree; _bm_sections '
+<!-- anchors: `passes-harnessed` `passes-committed` `parallel-when-disjoint` -->' > memory/guides/BUILD-METHOD.md
+hit "$(run)" "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment"
+# the anchor present ONLY inside a MULTI-line HTML comment, on its SECOND line -> still RED.
+# THIS is the fixture the naive filter passes: it drops the comment's first line and keeps line two.
+reset_tree; _bm_sections '
+<!-- anchors:
+     `passes-harnessed` `passes-committed` `parallel-when-disjoint` -->' > memory/guides/BUILD-METHOD.md
+hit "$(run)" "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment"
+rm -f memory/guides/BUILD-METHOD.md
+
 # arm 7: the floor undeclared.
 reset_tree; sed -i '/^DIRECTIVES_FLOOR=/d' .unattended.conf
 hit "$(run)" "DIRECTIVES_FLOOR is undeclared in .unattended.conf, and with no floor a deleted directive is indistinguishable from a set that never had one"
@@ -1194,7 +1566,7 @@ reset_tree; sed -i 's/^DIRECTIVES_FLOOR=.*/DIRECTIVES_FLOOR="eleven"/' .unattend
 hit "$(run)" "DIRECTIVES_FLOOR is not a plain integer, so the shrink-only pin on the directive set is unenforced while the conf still looks configured"
 
 # arm 9: the core set shrunk below its floor.
-reset_tree; sed -i 's/^DIRECTIVES_CORE="[a-z-]*:M[0-9]* /DIRECTIVES_CORE="/' tools/unattended/unattended.sh
+reset_tree; sed -i 's/^DIRECTIVES_CORE="[a-z-]*:M[0-9]* /DIRECTIVES_CORE="/' $KIT_REL/unattended.sh
 hit "$(run)" "the kit's CORE directive set has shrunk below its floor, and deleting a directive is a silent, reason-free relaxation of everything keyed on it"
 
 # ---- and the green control AGAIN, after nine mutations. reset_tree restores refs as well as the
@@ -1223,12 +1595,30 @@ git checkout -q main
 # directive redded the GREEN CONTROL of an unrelated arm — a fixture falling behind the thing it
 # exists to support, reported as a failure of whatever ran next. The MISSING-section case keeps its
 # own hand-written carrier at arm 6 above, which is where that negative belongs.
+#
+# IT FELL BEHIND ANYWAY, in exactly the way the paragraph above predicts, and this is the repair.
+# `TOOL-aHoistedPass-2` landed check 16's BODY term: a section must now name its own handles in
+# backticks, not merely exist. A carrier of bare headings satisfies arm B and reds the body term
+# SEVENTEEN times, so the green control below - "a tree whose waiver was taken at preflight exits 0"
+# - failed on a check-16 message that has nothing to do with waivers. Measured while building
+# `TOOL-aHoistedPass-9`, on shard 2/2, with that unit's own edits reverted; the derivation now emits
+# each section's handles as well as its heading, and both halves still come out of the registry.
 { printf '# method\n'
-  grep -m1 '^DIRECTIVES_CORE=' tools/unattended/unattended.sh \
-    | grep -oE ':M[0-9]+' | tr -d ':' | sort -u | while read -r _sec; do printf '\n## %s\n' "$_sec"; done
+  _reg=$(grep -m1 '^DIRECTIVES_CORE=' $KIT_REL/unattended.sh | sed 's/^DIRECTIVES_CORE="//; s/"$//')
+  for _sec in $(printf '%s\n' $_reg | cut -d: -f2 | sort -u); do
+    printf '\n## %s\n\n' "$_sec"
+    for _h in $(printf '%s\n' $_reg | awk -F: -v s="$_sec" '$2 == s { print $1 }'); do printf '`%s` ' "$_h"; done
+    printf 'state their rules in this section.\n'
+  done
 } > memory/guides/BUILD-METHOD.md
 n=$((n+1)); [ "$(grep -c '^## M' memory/guides/BUILD-METHOD.md)" -ge 8 ] \
   || { echo "FAIL the derived build-method carrier holds too few sections to satisfy the registry"; st=1; }
+# ...and the ANCHORS, counted, because the section list alone is what stopped being enough. Without
+# this the fixture can fall behind a THIRD time and the report will again be a message about whatever
+# ran next. Both sides derive from the registry, so neither can be typed out of date.
+_want_h=$(printf '%s\n' $_reg | grep -c .)
+n=$((n+1)); [ "$(grep -oE '`[a-z][a-z-]*`' memory/guides/BUILD-METHOD.md | sort -u | grep -c .)" -ge "$_want_h" ] \
+  || { echo "FAIL the derived build-method carrier names fewer directive handles than the registry declares, so check 16's body term reds every arm below it"; st=1; }
 mkdir -p memory/builds/tWaive
 cat > memory/builds/tWaive/README.md <<'RM'
 ---
@@ -1261,7 +1651,7 @@ git add -A && git commit -q -m tWaive --no-verify && git push -q -f origin main
 git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
 WP=$(git rev-parse HEAD)
 wreset() { git reset -q --hard "$WP"; git clean -qfd; }
-drive() { bash tools/unattended/unattended.sh "$@" 2>&1; }
+drive() { bash "$KIT_REL"/unattended.sh "$@" 2>&1; }
 wline() { grep -F ' waiver · item ' memory/builds/tWaive/RUN.md; }
 
 # GREEN CONTROL: the driver writes the waiver, the record's first commit carries it, the leg is silent.
@@ -1337,19 +1727,316 @@ same "the shipped Skill template orders kickoff after preflight" "$(run)" ""
 
 # ...TRANSPOSED. The deadlock: kickoff invoked first halts at its READY card with nobody under a
 # mandate to answer it. Judged on the FIRST occurrence of each, which is the one the agent reads.
-mutate tools/unattended/SKILL.template.md '2i Invoke /session-kickoff before anything else.'
+mutate $KIT_REL/SKILL.template.md '2i Invoke /session-kickoff before anything else.'
 hit "$(run)" "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line"
 
 # ...kickoff never named at all. ABSENCE IS A REFUSAL rather than the safe side, because a template
 # that never names kickoff and one that names it too early read identically on any count.
 reset_tree; kick_engine
-mutate tools/unattended/SKILL.template.md '\|/session-kickoff|d'
+mutate $KIT_REL/SKILL.template.md '\|/session-kickoff|d'
 hit "$(run)" "the Skill template never names /session-kickoff while this project declares a kickoff engine, and a missing step reads exactly like a deadlocked one on any count-based check"
 
 # ...no --preflight invocation to order anything against.
 reset_tree; kick_engine
-mutate tools/unattended/SKILL.template.md '/unattended.sh --preflight/d'
+mutate $KIT_REL/SKILL.template.md '/unattended.sh --preflight/d'
 hit "$(run)" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
+
+# ---- 30 (TOOL-dHonouredPark, closing review round 3): a --plan run may never claim terminality over
+# ---- a build it graded nothing on. The check WALKS the corpus, so its liveness assertion is the one
+# ---- that decides whether a clean verdict means anything: with every build's units pair broken,
+# ---- every --plan refuses, the walk grades nothing, and a check without this branch would report
+# ---- clean over an empty population.
+# ---- BOTH BUILDS. The comment above describes a fixture that predates tPlanOk: breaking tRun alone
+# ---- WAS enough when tRun was the only build, and tPlanOk was added in this same round precisely so
+# ---- that one build grades. From that commit on, this arm asserted a message the check cannot emit —
+# ---- `--plan tPlanOk` exits 0, the walk counts one verdict, and the liveness branch never fires.
+# ---- Measured on the fixture: tRun alone gives 0 hits, both give 1.
+reset_tree
+mutate memory/builds/tRun/README.md '/gen:build-units/d'
+mutate memory/builds/tPlanOk/README.md '/gen:build-units/d'
+hit "$(run)" "the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus"
+# ---- AND THIS IS THE ARM THAT EXERCISES THE CANARY. TOOL-aQuenchedHarness-10 gave check 30 a
+# ---- selection stage, so on a corpus where nothing is selected the driver would be asked about
+# ---- NOTHING and this liveness branch would pass over an empty ask - the exact vacuity it exists
+# ---- to catch. One build is therefore graded anyway. Every `--plan` in this fixture refuses, so
+# ---- the branch above fires whether the slug came from the selection or from the canary - this
+# ---- arm grades that the ask is never EMPTY, not which limb supplied it.
+
+# ---- 30 branch 2: the VERDICT the walk exists to reach. Branch 1 above grades the walk's LIVENESS
+# ---- and nothing else, so `check-arms.py` reports this branch as carrying no positive assertion and
+# ---- the leg ships pinned-or-unarmed. BOTH halves of the mutation are load-bearing and neither reds
+# ---- alone: a headerless spec beside a SPECCED unit still names a next, and a CLOSED unit with no
+# ---- headerless spec prints no NOT A UNIT row. Only the conjunction is the blocker — a build told it
+# ---- is finished by a verb that graded nothing on the file it is reporting.
+# ---- The new spec is `git add`ed because `--plan` finds specs with `git ls-files`, so an untracked
+# ---- file is invisible to it and this arm would assert against an unchanged listing.
+reset_tree
+mutate memory/builds/tPlanOk/spec/one.md 's/^\*\*Status:\*\* SPECCED /**Status:** CLOSED /'
+printf '# cross-unit contracts
+
+Ratified centrally. Not a unit spec, and carries no status header.
+' > memory/builds/tPlanOk/spec/contracts.md
+git add memory/builds/tPlanOk/spec/contracts.md
+hit "$(run)" "a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it: tPlanOk"
+
+# ---- 30 branch 3 (TOOL-aQuenchedHarness-10): the SELECTOR's own liveness. The check no longer
+# ---- asks the driver about every build - it scans the spec corpus and asks about the ones that
+# ---- can produce a NOT A UNIT row. A scan reading no spec selects nothing, asks nothing, and
+# ---- reports clean; that is a second empty population one level above the one branch 1 guards,
+# ---- and it needs its own assertion because branch 1 cannot see it.
+# ---- The break is the INDEX, not the worktree: the scan enumerates with `git ls-files`, so a
+# ---- spec still on disk but no longer tracked is invisible to it - which is also the real shape
+# ---- this could take in a live tree.
+reset_tree
+# UNTRACK THE WHOLE POPULATION, not two builds by name. Naming tRun and tPlanOk left every
+# other fixture build's specs tracked, so the scan still read specs, the check never fired,
+# and this arm asserted a message the tool had no reason to emit. The fixture-no-op guard
+# below is what caught it - which is the entire reason `mutate` and this arm carry one.
+git ls-files -z "memory/builds/*/spec/*.md" | xargs -0 -r git rm -q --cached >/dev/null 2>&1
+n=$((n+1)); [ -z "$(git ls-files "memory/builds/*/spec/*.md")" ] || { echo "FAIL fixture no-op: specs still tracked"; st=1; }
+hit "$(run)" "the spec scan that selects this check's population read no tracked spec at all, so both the selection and the clean result below are about an empty corpus rather than about the builds"
+
+# ---- 30 branch 4 (TOOL-aQuenchedHarness-10): the selector is keyed on TWO patterns copied from
+# ---- the driver's own `spec_facts`, and a predicate spelled in two places is one that stops
+# ---- selecting when a copy moves. A selector that silently selects nothing reports clean
+# ---- forever, so the check greps both literals out of the driver first and REFUSES without them.
+# ---- The mutation is anchored on `spec_facts`'s own status action so it moves that one awk
+# ---- pattern and nothing else the leg parses out of this file.
+reset_tree
+mutate $KIT_REL/unattended.sh '/if (st == "")/s/Status:/Stat_us:/'
+hit "$(run)" "the driver no longer spells one of the two patterns this check selects its population with, so the selection below is keyed on a predicate the driver has moved away from and would quietly grade nothing"
+
+# ---- 31 (TOOL-aHoistedPass-9): the route the `passes-harnessed` directive names RESOLVES in this
+# ---- tree, and every case the check cannot COMPARE announces itself on the REPORT channel instead
+# ---- of passing silently. ONE BREAK PER BRANCH plus a green control; the arms are the count and
+# ---- no numeral is typed beside them, for the reason the leg's own header now gives.
+# ----
+# ---- The fixture ships no build-method carrier, so each arm writes one through `_bm_sections` -
+# ---- the same helper arm 6b uses. That keeps every OTHER cited section present, so these arms grade
+# ---- check 31 rather than grading arm B's missing-section refusal.
+# ----
+# ---- THE ROUTE PATH IS DERIVED, NEVER SPELLED. `install-prefix` is a BAN on this file, not a
+# ---- ratchet: a literal kit path in a shipped body arrives verbatim in a target installed at
+# ---- another prefix and resolves to nothing there. Six literal spellings here moved this file's
+# ---- ratchet row 3 -> 9 and the gate refused them, correctly. The route's home is the SIBLING of
+# ---- this suite's own `KIT_REL`, which is where `mutate` and `cp` already reach the kit under test.
+# ---- At a root install `KIT_REL` has no directory part and this resolves to `./workflows`, which
+# ---- the check's own `(^|/)workflows/` key still matches and `dirname` still walks.
+_c31_dir="$(dirname "$KIT_REL")/workflows"
+_c31_route="$_c31_dir/unattended-unit.js"
+# The M6 body, built through printf so the BACKTICKS come from a single-quoted format while the path
+# comes from the derived variable. A backtick inside a double-quoted string in this suite is command
+# substitution, and the fixture would then be written by whatever it ran - the trap `mkconf` carries
+# a loud comment about, which cost a 50-minute run to find.
+_bm31() { # [route path]; with no argument the section names no route at all
+  local body
+  body=$(printf '\n`parallel-when-disjoint` `passes-committed` `passes-harnessed`')
+  [ $# -gt 0 ] && body=$(printf '%s — the route is `%s`' "$body" "$1")
+  _bm_sections "$body" > memory/guides/BUILD-METHOD.md
+}
+
+# branch F1, and this is the POSITIVE assertion `fail 31` owes under check-arms: the section names a
+# script this tree does not carry while the directory that would hold it IS present, which is a kit
+# that was taken and a route that is broken. The kit's own parent exists in the fixture because the
+# kit installs under it; the route directory is created by this arm and by nothing else.
+reset_tree
+_bm31 "$_c31_route"
+mkdir -p "$_c31_dir"
+hit "$(run)" "a carrier of the harnessed-pass route names a script this tree does not carry while the directory that holds it IS present, so the route's kit was taken and its route is broken: $_c31_route named by memory/guides/BUILD-METHOD.md"
+
+# branch S5, and the split against F1 above IS the ruling: an absent DIRECTORY means the route's kit
+# was never installed here, which is an install decision a standing bar cannot undo. It announces on
+# REPORT and stays silent on the default channel, which is what makes a skip byte-distinguishable
+# from a pass. `govkit apply` is where that same gap is refused, at the act that creates it.
+reset_tree
+_bm31 "$_c31_route"
+miss "$(run)" "check 31"
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for $_c31_route — the directory that would hold it is absent"
+
+# branch S2, the carrier absent. Check 16 arm B is SILENT on this exact state by design - it guards
+# its whole loop on `[ -f … ]` - and this line is the announcement arm B does not make. The fixture
+# ships no carrier, so this arm breaks nothing and that is the point: the silent state is the shipped
+# one. No `mutate` here for the same reason; there is no file to no-op against.
+reset_tree
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for memory/guides/BUILD-METHOD.md — this tree carries no build-method carrier"
+
+# branch S4, the section resolving but naming no route at all. This is the state of every adopter
+# tree whose render predates the M6 route sentence, which is the whole population this check exists
+# to reach - so an arm for it is not a corner case, it is the common one.
+reset_tree
+_bm31
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for memory/guides/BUILD-METHOD.md — M6 names no backticked route script"
+
+# branches S5 then F1 at a FOREIGN PREFIX, which is what says the verdict follows the named path's
+# own `dirname` rather than an install-prefix literal. TOOL_ROOT renders to the empty string at a
+# root install, so a literal would be wrong in an adopter tree in BOTH directions - failing a correct
+# route installed elsewhere, or skipping forever over a broken one. This prefix is not a kit path,
+# so spelling it here carries nothing an adopter would have to repath.
+reset_tree
+_bm31 vendor/harness/workflows/unattended-unit.js
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for vendor/harness/workflows/unattended-unit.js — the directory that would hold it is absent"
+mkdir -p vendor/harness/workflows
+hit "$(run)" "so the route's kit was taken and its route is broken: vendor/harness/workflows/unattended-unit.js"
+
+# branch S1, the registry itself unreadable, so the section holding the route is unnamed. Reached by
+# EMPTYING the driver's core set rather than by `--only 28`: that flag leaves `$core` unset for the
+# same reason, but the leg dies at check 30's `MEMORY_ROOT: unbound variable` twenty lines earlier
+# and check 31 never runs. Measured at e828f778, filed as TOOL-aHoistedPass-37, not this unit's.
+reset_tree
+mutate $KIT_REL/unattended.sh 's/^DIRECTIVES_CORE=.*/DIRECTIVES_CORE=""/'
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "— the directive registry names no passes-harnessed handle this leg can read"
+miss "$(run)" "check 31"
+
+# ---- THE SECOND CARRIER (closing-review F6). Check 31 read the build-method render alone, so the
+# ---- Skill - the carrier an agent actually reads, and the one that mandates `scriptPath` calls -
+# ---- was graded by nothing, while it spelled the same two scripts as install-prefix LITERALS that
+# ---- resolve to nothing at a root install. A check added to catch an unresolvable route, passing
+# ---- over exactly the half that had one. These arms are the same three branches as above, driven
+# ---- through the Skill instead, so a future edit cannot re-narrow the subject without redding.
+# ----
+# ---- THE SKILL IS WRITTEN, NOT RENDERED. The fixture's kit ships `SKILL.template.md` and no
+# ---- adopter has run here, so `.claude/skills/unattended/SKILL.md` is genuinely absent - which is
+# ---- branch S6's own fixture and is why that arm needs no break. `printf` with a single-quoted
+# ---- format for the same reason `_bm31` uses one: a backtick inside a double-quoted string in this
+# ---- suite is command substitution.
+_c31_skill=".claude/skills/unattended/SKILL.md"
+_mkskill() { # <route path>...; the Skill's harness bullet and nothing else
+  mkdir -p "$(dirname "$_c31_skill")"
+  { printf 'the harness is:\n'; for _s in "$@"; do printf -- '- `%s`\n' "$_s"; done; } > "$_c31_skill"
+}
+
+# branch S6, the Skill absent. The fixture ships no render, so this state is the shipped one and the
+# arm breaks nothing - the point being that the announcement exists at all, where before this the
+# whole carrier was silent by omission rather than by a stated skip.
+reset_tree
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for .claude/skills/unattended/SKILL.md — this tree carries no rendered Skill"
+
+# branch S7, the Skill present and naming no route: every adopter whose render predates the bullet.
+reset_tree
+_mkskill
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for .claude/skills/unattended/SKILL.md — the rendered Skill names no backticked route script"
+
+# branch F1 THROUGH THE SKILL, which is the arm that says the widening actually grades: the same
+# broken route, named only by the Skill, with the build-method carrier absent entirely. The message
+# names its own carrier, so the two halves are distinguishable in a failing run rather than merged.
+reset_tree
+_mkskill "$_c31_route"
+mkdir -p "$_c31_dir"
+hit "$(run)" "a carrier of the harnessed-pass route names a script this tree does not carry while the directory that holds it IS present, so the route's kit was taken and its route is broken: $_c31_route named by $_c31_skill"
+
+# ...and the GREEN CONTROL, which is the arm that makes the announcing ones mean anything: with the
+# route actually resolving in BOTH carriers, check 31 says nothing on EITHER channel. Without it,
+# every arm above is equally consistent with a check that announces unconditionally. The Skill is
+# seeded here too - leave it out and the S6 announcement fires and this control reds, which is the
+# correct behaviour and would make the control a test of the fixture.
+reset_tree
+_bm31 "$_c31_route"
+_mkskill "$_c31_route"
+mkdir -p "$_c31_dir" && : > "$_c31_route"
+miss "$(GOV_UNATTENDED_REPORT=1 run)" "check 31"
+reset_tree
+
+# ---- 32 (TOOL-aWokenSentinel-11): the kit holds ONE derivation of the sidecar root, on a CODE
+# ---- line of the library, and the driver reads every sidecar through it. The fixture's driver and
+# ---- library are copies of the shipped pair, so the pristine tree counts one spelling in the lib,
+# ---- none in the driver and one caller, and the arms below move exactly one of those three.
+# ---- The break is the shape the spec-audit finding named: a second `$(GIT rev-parse --git-dir)`
+# ---- spelled inline inside `verb_status`, which is where one spec of that build had put it.
+# ---- The arm carries the ENTIRE literal signature up to the first interpolation plus the count
+# ---- the refusal prints, so it reads the refusal's number and not only its sentence.
+reset_tree
+mutate $KIT_REL/unattended.sh '/^verb_status() {/a\  _x=$(GIT rev-parse --git-dir)/unattended'
+hit "$(run)" "the kit must hold ONE derivation of the sidecar root — resolve_sidecar_dir, in lib-unattended.sh — and the driver must read every sidecar through it; a second 'rev-parse --git-dir' on a code line of the driver, the lib or the tick is a second spelling that drifts from the first, and zero is a reader with no derivation. code-line count: 2"
+# ...the NEAR-MISS, and it is a control on the predicate rather than a second break: the same line
+# as a COMMENT is not a spelling, because the driver's idiom is a prose header beside every function
+# and a header that names the rule is right. The check's own header says a commented-out second
+# derivation passes until the edit that uncomments it, and this arm is that sentence, observed.
+reset_tree
+mutate $KIT_REL/unattended.sh '/^verb_status() {/a\  # _x=$(GIT rev-parse --git-dir)/unattended'
+miss "$(run)" "check 32"
+# ...and ZERO CALLERS is the other direction of the same refusal: a derivation nothing calls is a
+# function that exists for the grep. The one call site is deleted and the count the refusal prints
+# is read, so an `at most one` predicate — which would pass this copy — cannot pass this arm.
+reset_tree
+mutate $KIT_REL/unattended.sh '/sidecar=$(resolve_sidecar_dir)/d'
+hit "$(run)" "driver callers: 0"
+reset_tree
+
+# ---- 33 (TOOL-aWokenSentinel-23): no shell file in the kit counts a captured variable's lines by
+# ---- adding a newline before the count. The fixture's kit holds no suite, so the arm copies the
+# ---- DRIVER SUITE in — the file the instance lived in, and the one the check's own population must
+# ---- read where KIT_SH does not — and stages the banned count inside a function body. THE STAGED
+# ---- LINE IS ASSEMBLED FROM FRAGMENTS: the command word split and the variable joined at run time,
+# ---- written to a file and spliced in by sed's `r`, so this suite never carries the banned bytes
+# ---- contiguously on a code line and the checker's by-name exclusion of this file is a second guard
+# ---- rather than the only one. (A quoted heredoc would put those exact bytes on a code line the
+# ---- `^[^#]*` predicate matches, and sed's `a` processes escapes, so `\n` in the text would become a
+# ---- newline — `r` copies the file verbatim.) The arm carries the ENTIRE literal signature up to
+# ---- the first interpolation, and reads the file the refusal names.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_cmd="pri""ntf"; _lc_var='"$_o"'
+_lc_line="  _x=\$($_lc_cmd '%s\\n' $_lc_var | wc -l)"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+out=$(run)
+hit "$out" "a shell file in this kit counts a captured variable's lines by adding a newline first — printf '%s\n', echo or a here-string into wc -l — which reads an EMPTY capture as one line, so an assertion on the count passes on a command that wrote nothing; count with printf '%s' \"\$x\" | grep -c '' instead, which reads empty as 0. hits: unattended.test.sh:"
+hit "$out" "UNATTENDED check 33 FAILED"
+# ...the NEAR-MISS, a control on the predicate rather than a second break: the same count WITHOUT the
+# added newline is the driver's own idiom — it counts embedded newlines and reads an empty capture
+# as 0 — and the check's header says it is not a hit. This arm is that sentence,
+# observed; without it the arm above is equally consistent with a ban on every `| wc -l`.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_line="  _x=\$($_lc_cmd '%s' $_lc_var | wc -l)"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+miss "$(run)" "check 33"
+# ...and the RESTORED copy: the shipped driver suite, unmodified, in the population. This is the
+# reading that says spec 17's `grep -c ''` fold actually landed — a suite still carrying the
+# instance would red here, on every bar, naming its own line.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+miss "$(run)" "check 33"
+reset_tree
+# ---- 33, THE OTHER TWO SPELLINGS (TOOL-aWokenSentinel-28): the predicate has three branches and the
+# ---- arm above stages only `printf '%s\n'`. The `echo` spelling shares the first group and the
+# ---- here-string is a separate top-level alternation with the variable AFTER `wc -l`, so a
+# ---- mis-escaped `<<<` branch passed every reading above. Each is staged here by the same
+# ---- fragment-assembled splice, read RED naming the copy's basename AND line, then DELETED from
+# ---- that copy by a second `mutate` and read GREEN — a fresh copy would be the restored reading
+# ---- above, and would not say the red was this line. `_lc_at` is the line the splice lands on.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_at=$(( $(grep -n '^check_status_one_line() {' $KIT_REL/unattended.test.sh | cut -d: -f1) + 1 ))
+_lc_cmd="ec""ho"
+_lc_line="  _x=\$($_lc_cmd \"\$_o\" | wc -l)"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+out=$(run)
+hit "$out" "counts a captured variable's lines by adding a newline first"
+hit "$out" "hits: unattended.test.sh:$_lc_at:"
+mutate $KIT_REL/unattended.test.sh '/^check_status_one_line() {/{n;d;}'
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
+# ...the HERE-STRING, the second top-level alternation. `<<""<` joins to `<<<` at run time.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+_lc_line="  _x=\$(wc -l <<""< \"\$_o\")"
+printf '%s\n' "$_lc_line" > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+out=$(run)
+hit "$out" "counts a captured variable's lines by adding a newline first"
+hit "$out" "hits: unattended.test.sh:$_lc_at:"
+mutate $KIT_REL/unattended.test.sh '/^check_status_one_line() {/{n;d;}'
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
+# ...and the here-string CONTROL: a here-string that is not a count. Without it the arm above is
+# equally consistent with a `<<<` branch escaped so loosely it bans every here-string in the kit.
+reset_tree
+cp "$HERE/unattended.test.sh" $KIT_REL/
+printf '%s\n' '  read -r _y <<< "$_o"' > "$TMPBIN_PARENT/lc.line"
+mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT/lc.line"
+miss "$(run)" "counts a captured variable's lines by adding a newline first"
+reset_tree
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
 # ---- README. The corpus is clean, so a check with no red fixture here proves nothing - it would be
@@ -1378,7 +2065,7 @@ miss "$(run)" "well-formed generated-units marker pair"
 # ...a blank engine turns the check off, and the arm proves it by leaving the lines TRANSPOSED —
 # silent because the project ships no kickoff skill, not because the template is conforming.
 reset_tree
-mutate tools/unattended/SKILL.template.md '2i Invoke /session-kickoff before anything else.'
+mutate $KIT_REL/SKILL.template.md '2i Invoke /session-kickoff before anything else.'
 same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(run)" ""
 reset_tree
 
@@ -1387,7 +2074,7 @@ reset_tree
 # ---- satisfied by a refusal that has nothing to do with the join it is testing.
 # Through `mutate`, so a locator that stops matching after a document reword FAILS here instead of
 # silently turning six arms into six no-ops that still read as tests.
-pedit() { mutate tools/unattended/PROTOCOL.template.md "$1"
+pedit() { mutate $KIT_REL/PROTOCOL.template.md "$1"
           mutate memory/guides/UNATTENDED-PROTOCOL.md "$1"; }
 
 # GREEN CONTROL: the shipped contract already agrees with the driver in both tables.
@@ -1498,6 +2185,35 @@ mkdir -p memory/project && printf 'no rows here, just prose\n' > memory/project/
 hit "$(run)" "DIRECTIVES_EXTRA_TABLE names a file carrying no readable directive row, so the project declared a row source and the union it contributes is empty"
 reset_tree
 
+# ---- AN EXTRA HANDLE IS GRADED FOR EXISTENCE AND NOT FOR BODY (closing-review F3). The body term
+# ---- looped `core` - core PLUS extra - while its own rationale promised CORE-ONLY, so an adopter
+# ---- who used the documented `DIRECTIVES_EXTRA` knob got a permanent `fail 16` on a carrier the
+# ---- memory-tree kit ships as `role = "rendered"` and the doc-parity leg byte-compares. No route
+# ---- to green, on an unguarded merge-bar leg.
+# ----
+# ---- THE FIXTURE MUST HAVE THE CARRIER, and that is the reusable half. `declared + shown is
+# ---- silent` above runs after a `reset_tree` that leaves no `BUILD-METHOD.md`, so the term's own
+# ---- `[ -f … ]` guard makes it silent whatever it iterates: that arm passed on the broken code and
+# ---- on the fixed code alike. Any arm exercising a `[ -f ]`-guarded term must assert the file is
+# ---- there first, or it is testing the guard.
+# ----
+# ---- THE CONTROL IS A CORE HANDLE CITING THE SAME SECTION. `wrap-up-derived:M9` and
+# ---- `house-style:M9` read the same empty M9 body; the only difference between them is core versus
+# ---- extra. So the `hit` proves the term is LIVE on this exact fixture and the `miss` proves it
+# ---- stops at the core set - which no pair of separate fixtures could establish.
+reset_tree
+mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9"/'
+mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
+mkdir -p memory/project
+printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
+_bm_sections "" > memory/guides/BUILD-METHOD.md
+n=$((n+1)); [ -f memory/guides/BUILD-METHOD.md ] \
+  || { echo "FAIL fixture: no build-method carrier, so the term under test is guarded off and this arm proves nothing"; st=1; }
+out=$(run)
+hit  "$out" "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment: wrap-up-derived:M9"
+miss "$out" "absent in backticks outside every HTML comment: house-style:M9"
+reset_tree
+
 # ---- TOOL-cSettledDocket-6: the STANDING frozen-versus-live fixture. cBriefedPilot's closing review
 # ---- found one root three times — a predicate joining a FROZEN historical value to a LIVE present
 # ---- one. The rule it encodes is general: once a run is TERMINAL its record is immutable through
@@ -1539,7 +2255,7 @@ printf '
 2026-08-16T00:00:00Z waiver · item minimal-prose · reason owner took it
 ' >> memory/builds/tRun/RUN.md
 same "the frozen arm HAS a waiver row to grade" "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "1"
-mutate tools/unattended/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="retired-handle:M10 /'
+mutate $KIT_REL/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="retired-handle:M10 /'
 frozen
 miss "$(run)" "a parked waiver names a handle outside the effective directive set"
 
@@ -1549,7 +2265,7 @@ reset_tree
 printf '
 2026-08-16T00:00:00Z waiver · item minimal-prose · reason owner took it
 ' >> memory/builds/tRun/RUN.md
-mutate tools/unattended/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="retired-handle:M10 /'
+mutate $KIT_REL/unattended.sh 's/^DIRECTIVES_CORE="minimal-prose:M10 /DIRECTIVES_CORE="retired-handle:M10 /'
 hit "$(run)" "a parked waiver names a handle outside the effective directive set"
 reset_tree
 
@@ -1599,11 +2315,13 @@ hit  "$(run)" "a run-state file records an authorization mode outside the kit's 
 miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
 anchor_restore
 
-# ---- THE README SIDE. MEASURED while writing this arm: the whole mode block is guarded by
-# ---- `[ -n "$recmode" ]`, so a SILENT record never computes `dmode` and this branch is unreachable
-# ---- from any fixture whose record carries no mode. That guard is correct — a legacy record is
-# ---- outside the arm by construction — and it means the fixture must pair a LEGAL recorded mode
-# ---- with an ILLEGAL declared one. The agreement branch fires too on that pair, which is expected;
+# ---- THE README SIDE. The fixture must pair a LEGAL recorded mode with an ILLEGAL declared one,
+# ---- because check 19 lives inside the `[ -n "$recmode" ]` guard: a record carrying no mode of its
+# ---- own is outside this arm by construction, and that is correct for a legacy record.
+# ---- The ORIGINAL note here said the reason was that a silent record never computes `dmode`. That
+# ---- stopped being true at TOOL-dNarrowedAnchor-1, which hoisted the `dmode` derivation ABOVE the
+# ---- guard so check 29 could reach every record. The requirement is unchanged; the reason for it
+# ---- is now the guard alone, and a measured claim that has quietly gone false is worse than none. The agreement branch fires too on that pair, which is expected;
 # ---- this arm asserts only its own message, because asserting the absence of the other would be
 # ---- asserting a coincidence rather than a behaviour.
 anchor_break add_bad_mode
@@ -1611,6 +2329,39 @@ sed -i '/^base: /a mode: slug' memory/builds/tRun/RUN.md
 git add -A >/dev/null
 hit "$(run)" "the build README at a run's recorded BASE declares an authorization mode outside the kit's published set, so the authorization names a discipline no kit member defines - legal values are"
 anchor_restore
+
+# ---- check 29: THE SECOND ANCHOR IS ADMISSIBLE PER MODE, and the bar has its own opinion of it.
+# ---- The fixture is a base on the `unit` branch and NOT on the advertised default branch, which is
+# ---- exactly what the second anchor produces — no stub, because the discriminator is an ancestry
+# ---- test against a real advertisement and a fixture that faked it would assert this file's own
+# ---- imagination. The README at that base carries no `authorized-by:` key, which reads as `slug`.
+reset_tree
+git commit -q --allow-empty -m unit-only --no-verify
+sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+hit "$(run)" "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode"
+
+# ---- ...and the ADMITTED direction, which is the only thing separating this check from one that
+# ---- reds every branch-anchored run. Same base, same anchor, one declared mode different.
+reset_tree
+sed -i '/^slug: /a authorized-by: prompt' memory/builds/tRun/README.md
+git add -A >/dev/null && git commit -q -m prompt-mode --no-verify
+sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+miss "$(run)" "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode"
+
+# ---- ...and CANNOT TELL stays silent. With no remote there is no advertised default-branch tip, so
+# ---- the ancestry test has nothing to run against. A leg that reds a fleet on a network fault is
+# ---- worse than one that waits for the next run, and without this arm the guard could red on
+# ---- absence and every other arm here would still pass.
+reset_tree; mkconf
+git commit -q --allow-empty -m unit-only --no-verify
+sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+git remote remove origin
+miss "$(run)" "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode"
+git remote add origin "$ORIGIN"
+reset_tree
 
 # ---- the DECLARATION SEAM second-opinioned. The record claims a
 # ---- playbook and a count the README at its own BASE does not declare. Two branches, two
@@ -1671,12 +2422,12 @@ reset_tree
 # G, the scopes disagree. ONE branch and not a comm pair: measured, a single changed scope cell puts
 # the same handle in BOTH differences, so an only-in-table branch could never fire alone and its arm
 # would have proved nothing. Arm A already covers the handle set in both directions.
-reset_tree; mutate tools/unattended/SKILL.template.md 's/| M12 | prompt | D9 |/| M12 | all | D9 |/'
+reset_tree; mutate $KIT_REL/SKILL.template.md 's/| M12 | prompt | D9 |/| M12 | all | D9 |/'
 hit "$(run)" "the directive scopes the registry declares are not the scopes the Skill's table shows, so the agent is told which runs a rule binds by a table that disagrees with the verb enforcing it:"
 
 # G, the locator: the column REMOVED entirely. Without this the join compares two empty sets and is
 # green - the vacuity shape every other join in this leg carries a guard for.
-reset_tree; mutate tools/unattended/SKILL.template.md 's/ | [a-z][a-z-]* | D\([0-9]\)/ | D\1/'
+reset_tree; mutate $KIT_REL/SKILL.template.md 's/ | [a-z][a-z-]* | D\([0-9]\)/ | D\1/'
 out=$(run)
 hit "$out" "the Skill's directive table carries no scope cell this leg can read, so the scope join would compare the registry against nothing and pass by finding nothing; the cell it looks for holds one of:"
 miss "$out" "the agent is told which runs a rule binds by a table that disagrees"
@@ -1705,21 +2456,21 @@ reset_tree
 # H, the OWNER TURN after the push. This is the direction that destroys the provenance argument: the
 # one question the path may ask would be asked by a run already authorized, with nobody present.
 reset_tree
-mutate tools/unattended/SKILL.template.md 's/One `AskUserQuestion`, every gap/One ask, every gap/'
-mutate tools/unattended/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. **The kickoff hand-back** AskUserQuestion/'
+mutate $KIT_REL/SKILL.template.md 's/One `AskUserQuestion`, every gap/One ask, every gap/'
+mutate $KIT_REL/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. **The kickoff hand-back** AskUserQuestion/'
 hit "$(run)" "the Skill's prompt path puts its owner turn AFTER the branch push, so the one question it is allowed to ask would be asked by a run that is already authorized and has nobody to answer it:"
 
 # H, the PUSH after preflight. Preflight run first meets the refusal that nothing published
 # authorizes the run - the exact refusal step 1 quotes so the agent does not have to diagnose it.
 reset_tree
-mutate tools/unattended/SKILL.template.md 's/^4\. \*\*Commit, then PUSH THE BRANCH\.\*\*/4. **Commit.**/'
-mutate tools/unattended/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. PUSH THE BRANCH now\n6. **The kickoff hand-back**/'
+mutate $KIT_REL/SKILL.template.md 's/^4\. \*\*Commit, then PUSH THE BRANCH\.\*\*/4. **Commit.**/'
+mutate $KIT_REL/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. PUSH THE BRANCH now\n6. **The kickoff hand-back**/'
 hit "$(run)" "the Skill's prompt path puts the branch push AFTER preflight, and preflight run first meets the refusal that nothing published authorizes the run:"
 
 # H, the locator: a step no longer named at all. Without this the two order comparisons compare
 # against empty strings and are green - the vacuity shape every join in this leg carries a guard for.
 reset_tree
-mutate tools/unattended/SKILL.template.md 's/PUSH THE BRANCH/push the branch/'
+mutate $KIT_REL/SKILL.template.md 's/PUSH THE BRANCH/push the branch/'
 out=$(run)
 hit "$out" "the Skill's prompt path does not name all three of its ordered steps, so the order that makes the owner turn provably older than the authorization cannot be checked at all; it looks for AskUserQuestion, PUSH THE BRANCH and a bolded Preflight"
 miss "$out" "puts its owner turn AFTER the branch push"
@@ -1727,8 +2478,36 @@ miss "$out" "puts its owner turn AFTER the branch push"
 # H, a template with NO prompt path is legal and silent - this kit shipped without one, and an
 # adopter on an older copy is not in error. Deleting the heading empties the slice.
 reset_tree
-mutate tools/unattended/SKILL.template.md 's/^## Start a run from a PROMPT$/## Notes/'
+mutate $KIT_REL/SKILL.template.md 's/^## Start a run from a PROMPT$/## Notes/'
 miss "$(run)" "the Skill's prompt path does not name all three of its ordered steps"
+reset_tree
+
+# TOOL-aGroundedOrientation-2 - the ORIENTATION PROBES precede the build-folder write. Three arms,
+# and the third is the one that earns the section slice: without it every criterion is satisfied by
+# a whole-file grep, which the spec's own 4 rejects. The round-1 spec audit caught exactly that.
+#
+# J, the ORDERING violation: probes moved below the write, so the roster is authored before the
+# probes that inform it.
+reset_tree
+mutate $KIT_REL/SKILL.template.md '/RUN the orientation probes/d'
+mutate $KIT_REL/SKILL.template.md 's|^5\. \*\*Preflight\*\*|5. RUN the orientation probes\n5. **Preflight**|'
+hit "$(run)" "the Skill's prompt path runs its orientation probes AFTER it writes the build folder, so the roster is authored and pushed before the probes that inform it, and correcting it costs a commit and a push:"
+
+# J, the VACUITY case: the locator gone entirely. Without this arm the ordering comparison runs
+# against an empty string and is GREEN - the same shape check 20's own third arm exists for.
+reset_tree
+mutate $KIT_REL/SKILL.template.md '/RUN the orientation probes/d'
+out=$(run)
+hit "$out" "the Skill's prompt path does not name both its orientation-probe step and its build-folder write, so the ordering that puts the probes before the roster cannot be checked at all and would compare against an empty string; it looks for 'RUN the orientation probes' and 'Write the build folder'"
+miss "$out" "runs its orientation probes AFTER it writes the build folder"
+
+# J, THE SECTION SLICE IS OBSERVABLE. The literal is deleted from the prompt path and re-added under
+# a DIFFERENT heading. A file-wide locator finds it there and goes green; a section-scoped one still
+# refuses. This arm is the only thing separating the shipped implementation from the one 4 rejects.
+reset_tree
+mutate $KIT_REL/SKILL.template.md '/RUN the orientation probes/d'
+mutate $KIT_REL/SKILL.template.md 's|^## While it runs$|## While it runs\n\nRUN the orientation probes\n|'
+hit "$(run)" "the Skill's prompt path does not name both its orientation-probe step and its build-folder write, so the ordering that puts the probes before the roster cannot be checked at all and would compare against an empty string; it looks for 'RUN the orientation probes' and 'Write the build folder'"
 reset_tree
 
 # TOOL-aPromptedMandate-6 fold — the three predicates the CLOSING REVIEW asked for. Each was measured
@@ -1748,76 +2527,84 @@ hit "$(run)" "a project-declared directive carries a SCOPE, and the scope is kit
 
 # I, review L3: a pass kind outside the vocabulary. The both-ways join to the protocol cannot see it
 # - both sides would agree on the same wrong token, which is the two-derived-values class.
-reset_tree; mutate tools/unattended/unattended.sh 's/^PHASES_PASSKIND="SPECCING /PHASES_PASSKIND="INVENTED /'
+reset_tree; mutate $KIT_REL/unattended.sh 's/^PHASES_PASSKIND="SPECCING /PHASES_PASSKIND="INVENTED /'
 hit "$(run)" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
 reset_tree
 
 # ---- the proposal-kind unit: check 26, the VERB SET across the documents that spell it. Each arm
 # ---- removes ONE carrier and asserts THIS check speaks, because a leg that reds on everything arms
 # ---- every branch and checks nothing.
-reset_tree; mutate tools/unattended/unattended.sh '/^#   unattended[.]sh --propose /d'
+reset_tree; mutate $KIT_REL/unattended.sh '/^#   unattended[.]sh --propose /d'
 hit "$(run)" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
 
-# The protocol carrier. BOTH copies, so check 10's byte-parity arm does not fire alongside and leave
-# two messages where the arm under test is one of them.
+# The VERB CARRIER, which is where the entries live after TOOL-dFoldedVerdict-5. BOTH copies, so
+# check 10's byte-parity arm does not fire alongside and leave two messages where the arm under test
+# is one of them.
 reset_tree
-mutate tools/unattended/PROTOCOL.template.md '/^- .--propose. — writes a PROPOSAL/d'
-mutate memory/guides/UNATTENDED-PROTOCOL.md '/^- .--propose. — writes a PROPOSAL/d'
-hit "$(run)" "a declared verb has no entry in the protocol's verb section, so the contract a run is measured against does not describe a verb that run can call:"
+mutate $KIT_REL/VERBS.template.md '/^- .--propose. — writes a PROPOSAL/d'
+mutate memory/guides/UNATTENDED-VERBS.md '/^- .--propose. — writes a PROPOSAL/d'
+hit "$(run)" "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call:"
 
-reset_tree; mutate tools/unattended/SKILL.template.md 's|unattended[.]sh --propose <slug>|unattended.sh --nothing <slug>|'
+# The carrier ABSENT. Its own named refusal, because the guard it replaced was `[ -f X ] && read X`
+# with no else — which skips the whole join in silence and reports a green that means nothing. This
+# arm accepts that check 10's missing-half branch speaks too: `hit` asserts the message under test is
+# PRESENT, and the alternative is a fixture that cannot reach the state at all.
+reset_tree; rm -f $KIT_REL/VERBS.template.md
+hit "$(run)" "the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence"
+
+reset_tree; mutate $KIT_REL/SKILL.template.md 's|unattended[.]sh --propose <slug>|unattended.sh --nothing <slug>|'
 hit "$(run)" "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it:"
 
 # LIVENESS. Every arm above iterates the declared set, so a set that fails to parse would run zero
 # comparisons and report exactly the green a fully-wired driver reports.
-reset_tree; mutate tools/unattended/unattended.sh 's/^VERBS_SLUG=".*"$/VERBS_SLUG=""/'
+reset_tree; mutate $KIT_REL/unattended.sh 's/^VERBS_SLUG=".*"$/VERBS_SLUG=""/'
 hit "$(run)" "cannot read the driver's verb declarations, so every carrier below would be joined against an empty set and this check would pass over nothing:"
 
 # ---- check 27: the parked-kind vocabulary against the call sites that write it, BOTH directions.
-reset_tree; mutate tools/unattended/unattended.sh 's/^  park "[$]rel" decision /  park "$rel" notakind /'
+reset_tree; mutate $KIT_REL/unattended.sh 's/^  park "[$]rel" decision /  park "$rel" notakind /'
 hit "$(run)" "a park() call site writes a kind the driver does not declare, and every reader of that region parses BY kind, so the row would be written and then counted by nothing:"
 
 # The other direction, which is the half this kit has a recorded case of: DECISION was declared for
 # as long as the contract had instructed a run to park one, and no verb wrote it.
-reset_tree; mutate tools/unattended/unattended.sh 's/^PARK_KINDS="decision /PARK_KINDS="invented decision /'
+reset_tree; mutate $KIT_REL/unattended.sh 's/^PARK_KINDS="decision /PARK_KINDS="invented decision /'
 hit "$(run)" "the driver declares a parked kind that no park() call site ever writes, so the vocabulary names a row nothing can produce and the instruction to record one cannot be obeyed:"
 
-reset_tree; mutate tools/unattended/unattended.sh 's/^PARK_KINDS_OWED="decision /PARK_KINDS_OWED="ghost decision /'
+reset_tree; mutate $KIT_REL/unattended.sh 's/^PARK_KINDS_OWED="decision /PARK_KINDS_OWED="ghost decision /'
 hit "$(run)" "a kind the owner is owed an answer to is not in the declared parked-kind set, so the status split and the vocabulary disagree about which rows exist:"
 
-reset_tree; mutate tools/unattended/unattended.sh 's/^PARK_KINDS=".*"$/PARK_KINDS=""/'
+reset_tree; mutate $KIT_REL/unattended.sh 's/^PARK_KINDS=".*"$/PARK_KINDS=""/'
 hit "$(run)" "cannot read the parked-kind vocabulary or cannot find a single park() call site, so the membership join below would pass over an empty set - declared and found follow: ["
 reset_tree
 
 # ---- check 24: the MODE SET against the routing table, both directions, plus the two vacuity arms.
 # ---- A join whose extraction returns nothing passes over nothing, which is the shape every other
 # ---- arm in this file exists because of.
-reset_tree; mutate tools/unattended/SKILL.template.md 's/^## Which path$/## Something Else/'
+reset_tree; mutate $KIT_REL/SKILL.template.md 's/^## Which path$/## Something Else/'
 hit "$(run)" "the Skill template carries no routing section, so a reader holding a build to start is never told which mode their path declares and every join below would have nothing to read; the heading this looks for is '## Which path'"
 
 # The section present and carrying no readable mode cell. Backticks stripped from every mode, so the
 # rows survive and the extraction does not — which is exactly the state a green would be a lie about.
-reset_tree; mutate tools/unattended/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `\([a-z][a-z-]*\)` |/| \1 |/'
+reset_tree; mutate $KIT_REL/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `\([a-z][a-z-]*\)` |/| \1 |/'
 hit "$(run)" "the Skill's routing section carries no row naming an authorization mode, so both joins below would compare the driver's mode set against an empty one and pass by finding nothing"
 
 # A declared mode with no row. The playbook row's cell is retyped as an existing mode, so the table
 # stays well-formed and one mode simply stops being reachable — the failure that does not look like
 # a failure.
-reset_tree; mutate tools/unattended/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `slug` |/'
+reset_tree; mutate $KIT_REL/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `slug` |/'
 hit "$(run)" "the driver declares an authorization mode that no routing row names, so a build may legally declare a mode the Skill never tells anyone how to start: recipe against"
 
 # ...and the reverse: a row for a mode the driver will refuse.
-reset_tree; mutate tools/unattended/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `sonnet` |/'
+reset_tree; mutate $KIT_REL/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `sonnet` |/'
 hit "$(run)" "the Skill's routing table names an authorization mode the driver does not declare, so a reader following that row writes a build README preflight will refuse: sonnet against"
 
 # ---- check 25: the content-scope rule stays a CHECK that denies its own machine half.
-reset_tree; mutate tools/unattended/SKILL.template.md 's/^## Start a PLAYBOOK run$/## Start a playbook run/'
+reset_tree; mutate $KIT_REL/SKILL.template.md 's/^## Start a PLAYBOOK run$/## Start a playbook run/'
 hit "$(run)" "the Skill template carries no playbook-run section, so the mode the driver accepts has no start path an agent can follow:"
 
-reset_tree; mutate tools/unattended/SKILL.template.md 's/there is no machine half/it is enforced end to end/'
+reset_tree; mutate $KIT_REL/SKILL.template.md 's/there is no machine half/it is enforced end to end/'
 hit "$(run)" "the Skill's playbook-run path does not deny its own machine half, and a prose rule that reads like enforcement stops the reader looking for the gate that is not there:"
 
-reset_tree; mutate tools/unattended/SKILL.template.md 's/ordinary code build/perfectly ordinary build/'
+reset_tree; mutate $KIT_REL/SKILL.template.md 's/ordinary code build/perfectly ordinary build/'
 hit "$(run)" "the Skill's playbook-run path does not say what this mode is NOT for, so the one refusal it is supposed to carry in prose is absent from the prose:"
 reset_tree
 
@@ -1833,7 +2620,7 @@ reset_tree
 # ---- because `mutate` proves the edit landed and the arm still named the wrong branch.
 gut_parser() { # fn-name · whole replacement body (one line)
   local f
-  for f in tools/unattended/check-playbook.sh tools/unattended/unattended.sh; do
+  for f in $KIT_REL/check-playbook.sh $KIT_REL/unattended.sh; do
     mutate "$f" "/^$1() {/,/^}/ { /^$1() {/b; /^}/b; d; }"
     mutate "$f" "/^$1() {/a\\$2"
   done
@@ -1848,7 +2635,7 @@ gut_parser() { # fn-name · whole replacement body (one line)
 # ---- template's ONLY grader. A degraded-mode substitute must never be spelled with the value some
 # ---- assertion reads as clean.
 reset_tree
-for _pf in tools/unattended/check-playbook.sh tools/unattended/unattended.sh; do
+for _pf in $KIT_REL/check-playbook.sh $KIT_REL/unattended.sh; do
   mutate "$_pf" '/^declared_scalar() {/a\  case "$1" in *step_selector*) printf "EXTRA\\n" ;; esac'
 done
 hit "$(run)" "the batched parser harness got a reply it cannot split per specimen, so no assertion below is answering about the input it names - parser, specimens sent and answer lines received follow"
@@ -1860,8 +2647,8 @@ hit "$(run)" "the extracted declared-list parser does not return the members of 
 # ...and the MULTI-LINE refusal itself: a parser that ANSWERS an unterminated array rather than
 # refusing it is round 3's blocker, and this check used to certify that answer because empty was all
 # it ever asserted.
-reset_tree; mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
-mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
+reset_tree; mutate $KIT_REL/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
+mutate $KIT_REL/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
 hit "$(run)" "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [k = ["
 
 # ...and the COMMENTED spellings of the same array, which is round 4's blocker: the terminator test
@@ -1869,8 +2656,8 @@ hit "$(run)" "the extracted declared-list parser does not REFUSE an array left o
 # reduced the value to a bare `[`. The plain form still refused, which is exactly why the arm above
 # and the fold that wrote it both passed. Moving the strip back after the `case` is the mutation.
 reset_tree
-mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
-mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+mutate $KIT_REL/check-playbook.sh '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+mutate $KIT_REL/unattended.sh     '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
 hit "$(run)" "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [k = [   # one per piece [see section 7]]"
 
 # ---- ROUND 8's LOW 2: a SYNTAX error makes `bash -c` exit 2, the empty-reply branch faithfully
@@ -1888,18 +2675,18 @@ hit "$(run)" "the extracted declared-scalar parser could not be executed over th
 # ---- the SCALAR sibling, byte-compared on the same terms as the list one. Round 3, HIGH 6: the list
 # ---- parse was consolidated and compared while five scalar reads stayed ad-hoc, so this check
 # ---- generalised the PARSE across list keys and the GATE across `*_checks` — two of the ten keys.
-reset_tree; rm -f tools/unattended/check-playbook.sh
+reset_tree; rm -f $KIT_REL/check-playbook.sh
 hit "$(run)" "the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow:"
 
-reset_tree; mutate tools/unattended/check-playbook.sh '/^declared_scalar() {/a\  # a line only this copy carries'
+reset_tree; mutate $KIT_REL/check-playbook.sh '/^declared_scalar() {/a\  # a line only this copy carries'
 hit "$(run)" "the two inlined copies of the declared-scalar parser have drifted, and a declaration parsed two ways is two answers to one question - they are copy-inlined because each kit script installs standalone, so this comparison is the only thing holding them together"
 
 # ...and the ANSWER for the scalar keys: the COMMENT must not survive. Every key in the shipped block
 # is a declared null of its own type, so a `#` in the parse is the leak signature — and it is the same
 # signature for all ten keys rather than for the two the old pattern matched.
 reset_tree
-mutate tools/unattended/check-playbook.sh '/^declared_scalar() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
-mutate tools/unattended/unattended.sh     '/^declared_scalar() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+mutate $KIT_REL/check-playbook.sh '/^declared_scalar() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+mutate $KIT_REL/unattended.sh     '/^declared_scalar() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
 hit "$(run)" "the shipped template's own declaration line parses with its COMMENT still attached, so an adopter who fills the template in place and keeps the comments gets that prose as the value - key and parse follow:"
 
 # ...and the template half must have RUN. Without this both loops are green over a fence that yielded
@@ -1910,20 +2697,20 @@ hit "$(run)" "the shipped template's own declaration line parses with its COMMEN
 # ---- one counter, so the list half could go dark while the seven scalar keys satisfied the liveness
 # ---- assertion, or the reverse. The all-keys indent below kills BOTH and cannot tell them apart, so
 # ---- it is kept as the both-dark arm and each half now has its own.
-reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|'
+reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|'
 out=$(run)
 hit "$out" "the shipped template's declaration block yielded no LIST key this check could parse, so the list half of the template assertion covered nothing and a parser that answers nothing for every array would pass it"
 hit "$out" "the shipped template's declaration block yielded no SCALAR key this check could parse, so the scalar half of the template assertion covered nothing and a comment leak on every scalar key would pass it"
 
 # ...the LIST half alone. Indenting only the `= [` lines leaves the seven scalar keys reachable, so a
 # shared counter would still be satisfied and the check would stay green over a dead list loop.
-reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=[[:space:]]*\[\)|  \1|'
+reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=[[:space:]]*\[\)|  \1|'
 out=$(run)
 hit "$out" "the shipped template's declaration block yielded no LIST key this check could parse, so the list half of the template assertion covered nothing and a parser that answers nothing for every array would pass it"
 miss "$out" "the shipped template's declaration block yielded no SCALAR key this check could parse"
 
 # ...and the SCALAR half alone, the mirror image. Indent every declaration that is NOT a list.
-reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ { /^[a-z_][a-z_]*[[:space:]]*=[[:space:]]*\[/b; s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|; }'
+reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ { /^[a-z_][a-z_]*[[:space:]]*=[[:space:]]*\[/b; s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|; }'
 out=$(run)
 hit "$out" "the shipped template's declaration block yielded no SCALAR key this check could parse, so the scalar half of the template assertion covered nothing and a comment leak on every scalar key would pass it"
 miss "$out" "the shipped template's declaration block yielded no LIST key this check could parse"
@@ -1939,15 +2726,15 @@ hit "$(run)" "the extracted declared-scalar parser does not return the VALUE of 
 # ...and the subtler mutation the byte-compare cannot see, because two identically dead copies are
 # still identical: a strip that DELETES every commented line rather than trimming the comment off it.
 reset_tree
-mutate tools/unattended/check-playbook.sh '/^declared_scalar() {/,/^}/ s|s/\[\[:space:\]\]\[\[:space:\]\]\*#\.\*\$//|/#/d|'
-mutate tools/unattended/unattended.sh     '/^declared_scalar() {/,/^}/ s|s/\[\[:space:\]\]\[\[:space:\]\]\*#\.\*\$//|/#/d|'
+mutate $KIT_REL/check-playbook.sh '/^declared_scalar() {/,/^}/ s|s/\[\[:space:\]\]\[\[:space:\]\]\*#\.\*\$//|/#/d|'
+mutate $KIT_REL/unattended.sh     '/^declared_scalar() {/,/^}/ s|s/\[\[:space:\]\]\[\[:space:\]\]\*#\.\*\$//|/#/d|'
 hit "$(run)" "the extracted declared-scalar parser does not return the VALUE of a non-empty declaration, which is the only direction that tells a working parser from one answering nothing - a parser that empties every commented line passes every other assertion here. Specimen, wanted and got follow: ["
 
 # ---- THE SOURCE POPULATION the three rules scan, derived from the kit directory rather than typed:
 # ---- round 5 found 28c naming three files while the kit had seven. Its liveness is MEMBERSHIP rather
 # ---- than a count - this checker and the adopter are themselves in that directory, so the population
 # ---- is never empty and a count floor could be reached by no fixture.
-reset_tree; rm -f tools/unattended/check-playbook.sh
+reset_tree; rm -f $KIT_REL/check-playbook.sh
 hit "$(run)" "the playbook leg is not in the source population these three rules scan, so the census reader - the one that dereferences the BASE blob every DoD verdict rests on - would go unexamined"
 
 # ---- 28a, RE-ARMED AFTER ROUND 6 FOUND THE DISCARD ENUMERATION UNWINNABLE. The rule now enumerates
@@ -1955,40 +2742,40 @@ hit "$(run)" "the playbook leg is not in the source population these three rules
 # ---- Four spellings are staged, and the last two are the ones round 6 found walking past the
 # ---- enumerate-the-discards version.
 DISC='does not act on its exit status'
-reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || true; if false; then@'
+reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || true; if false; then@'
 hit "$(run)" "a parser that can REFUSE is called at a site that does not act on its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: declared_list at"
-reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || return 0; if false; then@'
+reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || return 0; if false; then@'
 hit "$(run)" "$DISC"
-reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || _declared=""; if false; then@'
+reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || _declared=""; if false; then@'
 hit "$(run)" "$DISC"
-reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks); if false; then@'
+reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks); if false; then@'
 hit "$(run)" "$DISC"
 
 # ...and TWO CONTROLS, which are as load-bearing as the four breaks. A rule tightened until it reds on
 # an honest caller has traded one false answer for another, and round 6 found exactly that: an honest
 # refusal whose PROSE contained the word `true` matched the old discard arm.
-reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || { DOD_OUT=x; return 1; }; if false; then@'
+reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || { DOD_OUT=x; return 1; }; if false; then@'
 miss "$(run)" "$DISC"
-reset_tree; mutate tools/unattended/unattended.sh 's@so this item would read the declared null@so this item would read what is not true, the declared null@'
+reset_tree; mutate $KIT_REL/unattended.sh 's@so this item would read the declared null@so this item would read what is not true, the declared null@'
 miss "$(run)" "$DISC"
 
 # ---- 28a's per-FILE branch, which is the masking direction the per-parser counter cannot see: one
 # ---- file's call spelling drifts, the other file still has calls, and the parser-level count stays
 # ---- healthy while a whole file goes unpoliced.
-reset_tree; mutate tools/unattended/check-playbook.sh 's@$(declared_list "@$( declared_list "@g'
+reset_tree; mutate $KIT_REL/check-playbook.sh 's@$(declared_list "@$( declared_list "@g'
 hit "$(run)" "a file spells a call to a refusing parser in a shape this rule cannot enumerate, so its call sites go unpoliced while the rule reports nothing about them - parser and file follow"
 
 # ---- 28a's per-PARSER liveness. Renaming the calls in BOTH files leaves the refusal in place and the
 # ---- enumeration empty, which a hit count of zero cannot tell from compliance.
 reset_tree
-mutate tools/unattended/check-playbook.sh 's@$(declared_list @$(declared_list_X @g'
-mutate tools/unattended/unattended.sh     's@$(declared_list @$(declared_list_X @g'
+mutate $KIT_REL/check-playbook.sh 's@$(declared_list @$(declared_list_X @g'
+mutate $KIT_REL/unattended.sh     's@$(declared_list @$(declared_list_X @g'
 hit "$(run)" "a refusing parser has NO call site this rule can see, so it was asserted over an empty population and would stay green with every caller discarding the status - the enumeration pattern has stopped matching the way this kit calls this parser"
 
 # ---- ...and the rule binding nothing at all, if the refusal itself is removed.
 reset_tree
-mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
-mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
+mutate $KIT_REL/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
+mutate $KIT_REL/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
 hit "$(run)" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
 
 # ---- 28b. THE EXEMPTION ROW IS RETARGETED, never replaced with a synthetic: round 6's BLOCKER 1 was
@@ -1996,51 +2783,51 @@ hit "$(run)" "neither inlined parser carries a nonzero return any more, so the r
 # ---- to cover it substituted a value with no spaces in it, so it could not exhibit the split. The
 # ---- table is newline-separated and read without splitting now, and this arm keeps the shipped
 # ---- record's real spacing while pointing its key at one the template does not declare.
-reset_tree; mutate tools/unattended/check-unattended.sh 's@^legs|check-playbook.sh|@legsX|check-playbook.sh|@'
+reset_tree; mutate $KIT_REL/check-unattended.sh 's@^legs|check-playbook.sh|@legsX|check-playbook.sh|@'
 hit "$(run)" "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it"
 
 # ...and the exemption going STALE, which is the failure mode an exemption list adds. Rewriting the
 # reader it names takes its excuse with it.
-reset_tree; mutate tools/unattended/check-playbook.sh 's@    ent=$(printf .%s.n. "$body" | grep -oE@    ent=$(printf "%s" "$body" | grep -oE@'
+reset_tree; mutate $KIT_REL/check-playbook.sh 's@    ent=$(printf .%s.n. "$body" | grep -oE@    ent=$(printf "%s" "$body" | grep -oE@'
 hit "$(run)" "a key exemption names a reader whose signature is no longer in that file, so the key is unread by any parser AND unaccounted for by the exemption that excused it - key, file and missing literal follow"
 
 # ...and a parser read that is COMMENTED OUT, which the positive half had no filter for until round 6.
-reset_tree; mutate tools/unattended/check-playbook.sh 's@^  cur=$(declared_scalar "$body" curated)@#  cur=$(declared_scalar "$body" curated)@'
+reset_tree; mutate $KIT_REL/check-playbook.sh 's@^  cur=$(declared_scalar "$body" curated)@#  cur=$(declared_scalar "$body" curated)@'
 hit "$(run)" "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it"
 
 # ...and the NEGATIVE half: an ad-hoc read added BESIDE a parser read, never instead of it.
-reset_tree; mutate tools/unattended/check-playbook.sh 's@^  cur=$(declared_scalar "$body" curated)@  cur=$(declared_scalar "$body" curated); _x=$(printf "%s" "$body" | sed -n "s/^curated[[:space:]]*=//p")@'
+reset_tree; mutate $KIT_REL/check-playbook.sh 's@^  cur=$(declared_scalar "$body" curated)@  cur=$(declared_scalar "$body" curated); _x=$(printf "%s" "$body" | sed -n "s/^curated[[:space:]]*=//p")@'
 hit "$(run)" "a declaration key the shipped template ships is read by an ad-hoc pipeline rather than by the parser this check certifies it through, so the answer this gate blesses and the answer its consumer actually gets are two answers to one question - key, site and read follow: curated at"
 
 # ---- 28b's own liveness: a template whose fence yields no key to bind.
-reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|'
+reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|'
 hit "$(run)" "the shipped template yielded no declaration key to bind to a reader, so every key in it could be read by an ad-hoc pipeline and this rule would stay green over the empty set"
 
 # ---- 28c. The WRAPPER's own pin first, which round 5's cut could not see at all.
 # THE CONSTANT, not the wrapper line. The merged library spells the pin as `-c "$GIT_PIN_REPLACE"`,
 # so a break aimed at the old literal no-ops - and it is the constant that check 28c now follows, so
 # breaking it is both the reachable mutation and the one that exercises the indirection.
-reset_tree; mutate tools/unattended/lib-unattended.sh 's|^GIT_PIN_REPLACE=.*|GIT_PIN_REPLACE=core.useReplaceRefs=true|'
+reset_tree; mutate $KIT_REL/lib-unattended.sh 's|^GIT_PIN_REPLACE=.*|GIT_PIN_REPLACE=core.useReplaceRefs=true|'
 hit "$(run)" "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows"
 
 # ...a bare unpinned read on a verb the first widening did not carry.
-reset_tree; mutate tools/unattended/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git log -1 --format=%s "$1"; }@'
+reset_tree; mutate $KIT_REL/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git log -1 --format=%s "$1"; }@'
 hit "$(run)" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
 
 # ...and the same read with a trailing comment mentioning the WRAPPER, which is round 6's MEDIUM 2:
 # classifying the whole LINE as wrapper-routed let prose excuse the code beside it.
-reset_tree; mutate tools/unattended/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git cat-file -p "$1"; }  # routed through GIT show elsewhere@'
+reset_tree; mutate $KIT_REL/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git cat-file -p "$1"; }  # routed through GIT show elsewhere@'
 hit "$(run)" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
 
 # ...and the raw arm reaching NO graded candidate, which must not look like a pass. Routing the kit's
 # last bare dereference through the wrapper leaves only exempt candidates behind.
-reset_tree; mutate tools/unattended/check-playbook.sh 's@^GITSHOW() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false show@GITSHOW() { GIT show@'
+reset_tree; mutate $KIT_REL/check-playbook.sh 's@^GITSHOW() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false show@GITSHOW() { GIT show@'
 hit "$(run)" "every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim"
 
 # ---- 28c's three liveness statements. The wrapper DEFINITION going missing, the bare spelling going
 # ---- missing, and the wrapped spelling going missing are three different blindnesses, and round 5's
 # ---- cut reported a clean nothing for two of them.
-reset_tree; mutate tools/unattended/lib-unattended.sh 's@^GIT() {@GITWRAP() {@'
+reset_tree; mutate $KIT_REL/lib-unattended.sh 's@^GIT() {@GITWRAP() {@'
 hit "$(run)" "no git wrapper definition was found anywhere in this kit, so the GIT-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
 
 # ---- the scalar SPECIMEN loop's exec branch, a different branch from the template loop's.
@@ -2048,7 +2835,7 @@ reset_tree; gut_parser declared_scalar '  ((this is not shell'
 hit "$(run)" "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
 
 # ---- and the shipped template's own LIST declaration being refused by the parser that reads it.
-reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md 's|^\([a-z_][a-z_]*[[:space:]]*\)= \[\]|\1= [|'
+reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md 's|^\([a-z_][a-z_]*[[:space:]]*\)= \[\]|\1= [|'
 hit "$(run)" "the shipped template's own list declaration is REFUSED by the parser that reads it, so an adopter who copies the template inherits a declaration the driver cannot parse - and this check is the template's only grader, so nothing else would say so. Key and exit status follow"
 
 reset_tree
@@ -2056,20 +2843,20 @@ reset_tree
 # ---- check 28 (round-2 fold): the inlined parser is ONE answer in two files, and the answer is the
 # ---- one an adopter gets. Both branches, because agreement and correctness are different claims and
 # ---- this check makes both.
-reset_tree; mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|; s/,/ /g||'
+reset_tree; mutate $KIT_REL/check-playbook.sh '/^declared_list() {/,/^}/ s|; s/,/ /g||'
 hit "$(run)" "the two inlined copies of the declared-list parser have drifted, and a declaration parsed two ways is two answers to one question - they are copy-inlined because each kit script installs standalone, so this comparison is the only thing holding them together"
 
 # ...and the MISSING half, which is the branch every arm here would silently take if the scratch tree
 # stopped carrying the leg. A pair check with one file present grades nothing.
-reset_tree; rm -f tools/unattended/check-playbook.sh
+reset_tree; rm -f $KIT_REL/check-playbook.sh
 hit "$(run)" "the declared-list parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow:"
 
 # ...and the ANSWER, over the line the shipped template actually carries. Agreement alone is
 # satisfied by two identical wrong copies, which is how the defect that produced this check shipped.
-reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md 's/^piece_checks = \[\]/piece_checks = [oops]/'
+reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md 's/^piece_checks = \[\]/piece_checks = [oops]/'
 hit "$(run)" "the shipped template's own declaration line does not parse to the declared null, so an adopter who copies the template verbatim inherits phantom check names and every piece grades unchecked - key and parse follow:"
 
-reset_tree; rm -f tools/unattended/PLAYBOOK-TEMPLATE.template.md
+reset_tree; rm -f $KIT_REL/PLAYBOOK-TEMPLATE.template.md
 hit "$(run)" "the shipped playbook template is missing, so the parser cannot be run over the line every adopter actually copies and this check would grade agreement alone:"
 
 reset_tree
@@ -2100,8 +2887,12 @@ seed_ros() {
   awk -v r="$URO" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros.$$ \
     && mv /tmp/ros.$$ memory/builds/tRos/README.md
   sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
-  sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRos/RUN.md
   git add -A && git commit -q -m "tRos baseline" --no-verify
+  # THE PINNED BASE IS THIS COMMIT, not the merge-base. `pinned_units` reads the units REGION at the
+  # pinned commit, and the merge-base predates this fixture build folder entirely — so the RETIRE arm
+  # would refuse rather than grade, and every arm below would be green because the arm found nothing.
+  sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
+  git add -A && git commit -q -m "tRos baseline pin" --no-verify
 }
 add_u7() {
   awk -v r="$UR7" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros7.$$ \
@@ -2138,7 +2929,7 @@ hit "$(run)" "a rescope row supersedes into a successor the executing roster doe
 seed_ros
 sed -i 's#(spec/one.md) | OPEN |#(spec/one.md) | WONTDO |#' memory/builds/tRos/README.md
 git add -A && git commit -q -m dropped --no-verify
-hit "$(run)" "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so:"
+hit "$(run)" "a unit is WONTDO now and was not at the BASE this run pinned, and no rescope row retires or supersedes it, so declared scope was dropped with nothing on the record saying so:"
 
 # ...and the same transition WITH a retire row is accounted for.
 seed_ros
@@ -2159,8 +2950,13 @@ build tRos
 awk -v r="$UROW" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/rosw.$$ \
   && mv /tmp/rosw.$$ memory/builds/tRos/README.md
 sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
-sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRos/RUN.md
 git add -A && git commit -q -m "already retired before the run" --no-verify
+# THE PIN IS THIS COMMIT, not the merge-base, and this arm is the one that most needs it: its whole
+# subject is the exemption the RETIRE arm reads out of the PINNED roster. Against a merge-base that
+# predates this fixture build folder, `pinned_units` REFUSES, the arm SKIPS, and `miss "check 24
+# FAILED"` passes by absence - a rewritten predicate with no arm that can fail.
+sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "already retired, pinned" --no-verify
 miss "$(run)" "check 24 FAILED"
 # ITS LIVENESS HALF: the fixture must actually carry a WONTDO row, or the arm above is green because
 # the loop selected nothing rather than because the exemption fired.
@@ -2191,14 +2987,14 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # ...and a pass that commits OUTSIDE it is the disjointness proof failing where it can be checked
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # ---- THE WIDENING REPAIR, AND THE POST-HOC REWRITE THAT WEARS ITS CLOTHES (closing review F3/F4).
 # ---- `--dispatch`'s widening supersedes an OPEN pass's row and parks the replacement AT THE SAME
@@ -2218,7 +3014,7 @@ reset_tree
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # B: ...and the superseding row is still GRADED. Without this arm the fix above is indistinguishable
 # from switching the check off for any pass that ever re-declared, which is a larger hole.
@@ -2226,7 +3022,7 @@ reset_tree
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # C: THE POST-HOC REWRITE. Narrow row, the offending commit, THEN a widened row at a later anchor.
 # The finding must survive: a declaration cannot be rewritten to cover a write already made. The
@@ -2236,7 +3032,7 @@ drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 drow ARCH-tRun-1 "work/one.txt work/stray.txt"
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # D: SEVERAL PASSES OF ONE UNIT are legal — M6 defines five pass kinds and a unit may be dispatched
 # once per kind. Each row governs its own pass. Folding them together graded pass one's commit
@@ -2248,7 +3044,7 @@ git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
 printf 'b\n' > work/build.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # E: ...and the SECOND pass is graded too. The fold left it unlooked-at entirely, so a stray write in
 # pass two exited 0 — the same fixture as D with one extra file, and the difference is the point.
@@ -2259,7 +3055,7 @@ git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
 printf 'b\n' > work/build.txt && printf 'x\n' > work/STRAY.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # F: BOTH IDS IN ONE DISPATCH GROUP, which is the whole of this arm and is what the first two
 # versions of it missed. The ambiguity loop only pairs siblings sharing an anchor, so a fixture that
@@ -2279,7 +3075,7 @@ mkdir -p work && printf 'b\n' > work/ten.txt
 git add -A && git commit -q -m "ARCH-tRun-10 builds its lane" --no-verify
 out=$(run)
 miss "$out" "unattended: check 23 — one commit names two passes of the same dispatch group"
-miss "$out" "unattended: check 23 —"
+miss "$out" "check 23 FAILED"
 # ...and the positive control, so this arm cannot pass by finding nothing: ONE commit that genuinely
 # names both passes IS ambiguous, and the refusal must fire.
 reset_tree
@@ -2293,7 +3089,7 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # ---- THE NO-COMMIT CASE IS SPLIT. A pass that produced no change commits nothing and that is legal;
 # ---- the same silence with the declared paths MOVED is the join being dodged.
@@ -2301,7 +3097,7 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit "$out" "no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
@@ -2335,7 +3131,7 @@ mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 printf 'folded\n' > work/later.txt
 git add -A && git commit -q -m "ARCH-tRun-1 folds a review fix" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 
 # ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
 # ---- default run must still print nothing.
@@ -2344,7 +3140,7 @@ out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit "$out" "this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
 out=$(run)
 miss "$out" "check 23 skipped"
-miss "$out" "unattended: check 23 —"
+miss "$out" "check 23 FAILED"
 
 reset_tree
 printf '\n2026-08-21T00:00:00Z dispatch · item deadbeef ARCH-tRun-1 · reason work/one.txt\n' >> memory/builds/tRun/RUN.md
@@ -2364,26 +3160,146 @@ reset_tree
 drow ARCH-tRun-1 "work/sub/"
 mkdir -p work/sub && printf 'a\n' > work/sub/x.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "unattended: check 23 —"
+miss "$(run)" "check 23 FAILED"
 # ...and the positive control on the same shape, so the arm cannot pass by the check being silent:
 # a commit genuinely outside the declared lane still reports.
 reset_tree
 drow ARCH-tRun-1 "work/sub/"
 mkdir -p work/sub && printf 'a\n' > work/sub/x.txt && printf 'b\n' > work/elsewhere.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside"
+hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
-# ---- THE COMPARISON NEVER FAILS THE LEG (spec 23 S1 / AC9). Both halves, because a check that is
-# ---- silent AND exits 0 is indistinguishable from one that is working, and that is the shape this
-# ---- whole mechanism spent four rounds in. The fixture is the one that produced a finding above.
+# ---- THE BRIEF ROW'S PATH LEAVES THE POPULATION (TOOL-aLeakedHandle-7, TOOL-aRatifiedRulings-2).
+# ---- `--brief` stages only the run-state file and the brief is already tracked, so the pass's one
+# ---- commit carries a file the pass never wrote and never declared. Five fixtures, one shape: the
+# ---- dispatch row through `drow`, the brief file and a conforming `brief · item` row written
+# ---- inline — a real twelve-hex `hash-object` prefix, though check 23 never reads the hash — and
+# ---- the pass commit carrying all of it. A is the exclusion; B is the control that keeps A from
+# ---- passing by finding nothing, one stray file apart; C pins the tree at the PASS COMMIT, a row
+# ---- appended after it excludes nothing; D pins the PATH and not its directory; E pins `normpath`,
+# ---- for the reason the `covers` arm above was written. A, B and E were RED against the checker at
+# ---- base; C and D are controls the base checker already passes, each redded once by a staged
+# ---- break named in the unit's acceptance ledger.
+BRIEF=memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md
+# A: the brief is in the pass commit and its row names it — silent by default, announced on the
+# report channel, which is the positive artifact that the exclusion branch ran on that path.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "check 23 excluded $BRIEF for ARCH-tRun-1 in memory/builds/tRun/RUN.md"
+# B: ...and a stray file beside it still reports, minus the brief. The exclusion is the one path.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt \
+  && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(run)
+hit  "$out" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+miss "$out" "build-brief.md"
+# C: POST HOC. The row lands in a second commit touching only the run-state file, so the pass
+# commit's tree holds no row and the brief stays reported — a row written afterwards hides nothing.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+printf '2026-08-21T00:00:02Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "run-state bookkeeping" --no-verify
+hit "$(run)" "wrote $BRIEF"
+# D: DIRECTORY. A row naming `prompts` excludes nothing under it, so both files still report.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF" \
+  && printf 'other\n' > memory/builds/tRun/prompts/other.md
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s memory/builds/tRun/prompts\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "memory/builds/tRun/prompts/other.md"
+# E: SPELLING. A row naming the brief as `./memory/...` is the same path once normalised.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s ./%s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+# F: THE BOOKKEEPING COMMIT IS NOT THE PASS COMMIT (closing diff review, finding 7). The ordinary
+# shape: `--brief` requires the brief tracked and stages the run-state file, so the run commits
+# `{brief, brief row}` first, naming the unit, and the pass's real commit follows. With the brief
+# forgiven only in this check, `pass_commit` SELECTED that bookkeeping commit, the exclusion emptied
+# it, and the stray in the commit that followed was never graded — silent where B reports. Now the
+# library subtracts the same set before selecting, so the walk reaches the commit with the stray.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 brief handed" --no-verify
+printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+
+# ---- THE COMPARISON NOW FAILS THE LEG, ABOVE ITS CEILING (TOOL-cMendedVintage-14). This arm used
+# ---- to assert the opposite - spec 23 S1 / AC9 pinned "reports without failing" - and that pin is
+# ---- SUPERSEDED rather than deleted quietly, because it is the whole of what the ruling changed:
+# ---- a comparison that can only report is a declaration enforced in one direction. The fixture is
+# ---- the one that produced a finding above, graded against the adopter's ceiling of 0.
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(run); rc=$?
-same "check 23 reports without failing the leg, exit code" "$rc" "0"
-hit  "$out" "unattended: check 23 — a dispatched pass committed a path outside"
-miss "$out" "FAILED"
+same "check 23 fails the leg above its ceiling, exit code" "$rc" "1"
+hit  "$out" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
+hit  "$out" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+
+# ---- ...AND THE CEILING IS A CEILING. Same fixture, one instance, a pin of 1: clean. Without this
+# ---- control the arm above is satisfied by a check that reds on everything.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="1"/'
+out=$(run); rc=$?
+same "check 23 is clean at its ceiling, exit code" "$rc" "0"
+miss "$out" "check 23 FAILED"
+# ...and the per-instance detail survives on the report channel, so a green run has not gone dark.
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+
+# ---- A FALL IS ANNOUNCED, NOT RED. One instance against a pin of 2. The announcement is the only
+# ---- thing that can make the pin fall, since nothing re-stamps it.
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="2"/'
+out=$(run); rc=$?
+same "check 23 does not red on a fall, exit code" "$rc" "0"
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the undeclared-write count sits BELOW its ceiling, 1 against 2"
+reset_tree
+
+# ---- THE PIN IS MANDATORY, in the shape its three siblings already take: undeclared or malformed is
+# ---- a refusal and never a defaulted value.
+reset_tree
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING=""/'
+hit "$(run)" "UNDECLARED_WRITE_CEILING is undeclared in .unattended.conf, and with no ceiling a pass that wrote outside its declared set is reported and never graded - which is the state this ratchet exists to end"
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="several"/'
+hit "$(run)" "UNDECLARED_WRITE_CEILING is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name"
+reset_tree
+
+# ---- THE LIVENESS HALF. A ceiling above zero says instances exist; grading NO dispatched pass at
+# ---- all and then reporting zero of them is a probe that died, not a tree that is clean. The
+# ---- fixture declares no dispatch, so the loop above takes its skip branch and grades nothing.
+reset_tree
+mutate .unattended.conf 's/^UNDECLARED_WRITE_CEILING=.*/UNDECLARED_WRITE_CEILING="1"/'
+hit "$(run)" "the declared ceiling on undeclared writes is above zero while NO dispatched pass was graded at all, so the comparison below would report a reassuring zero for a probe that died rather than for a tree that is clean"
+# ...and the control: at a ceiling of 0 the same tree is clean, so the arm above is not just
+# asserting that an undeclared-dispatch fixture reds.
+reset_tree
+miss "$(run)" "check 23 FAILED"
+reset_tree
 
 # ---- check 15 (TOOL-dUnstalledConvoy-2): the ancestry half now branches on the RECORDED anchor kind.
 # ---- A `local` record is a claim about ONE clone — the protocol calls it a record of a merge rather
@@ -2511,7 +3427,32 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- re-armed after round 5 found all three of them instance gates - eight staged breaks and, as much
 # ---- to the point, two CONTROLS: a rule tightened until it reds on an honest caller has traded one
 # ---- false answer for another, and only a control says which happened.
-FLOOR_ASSERTIONS=392
+# ---- RAISED by exactly the arm, 2026-09-13, node a (TOOL-aRatifiedRulings-2): the five check-23 brief
+# ---- fixtures execute seven assertions, all in region two, so both floors below carry +7 and
+# ---- FLOOR_SHARD_1 is untouched. Both breach-line reads are in that unit's acceptance ledger.
+# ---- RAISED by exactly the arm, 2026-09-14, node a (closing diff review of aRatifiedRulings, finding
+# ---- 7): fixture F executes one assertion, in region two, so both floors below carry +1.
+FLOOR_ASSERTIONS=434
+# ---- RAISED 422 -> 434 by TOOL-aWokenSentinel-28: the check-33 readings of the `echo` and
+# ---- here-string spellings and the here-string control execute twelve assertions (five `mutate`,
+# ---- four `hit`, three `miss`, measured by running the block alone from the sourced preamble:
+# ---- n=12 st=0), all in region two beside the check-33 `printf` arms, so FLOOR_SHARD_2 carries
+# ---- the same +12 and FLOOR_SHARD_1 is untouched.
+# ---- RAISED 416 -> 422 by TOOL-aWokenSentinel-23: the three check-33 arms execute six assertions
+# ---- (two `mutate`, two `hit`, two `miss`), all in region two beside the check-32 arms, so
+# ---- FLOOR_SHARD_2 carries the same +6 and FLOOR_SHARD_1 is untouched.
+# ---- RAISED 410 -> 416 by TOOL-aWokenSentinel-11: the three check-32 arms execute six assertions
+# ---- (three `mutate`, two `hit`, one `miss`), all in region two beside the check-31 arms, so
+# ---- FLOOR_SHARD_2 carries the same +6 and FLOOR_SHARD_1 is untouched.
+# ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
+# ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
+# ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
+# ---- carries the same +4 and FLOOR_SHARD_2 is untouched.
+# ---- RAISED 400 -> 402 by TOOL-aProbedUnit-6: the two BOUNDED check-2 fixtures, both in region two.
+# ---- RAISED 402 -> 406 by the closing diff review of aProbedUnit (cluster C, id 12): the four
+# ---- check-2 disposition fixtures — fold beside a non-zero count, and the CONVERGED trio — which
+# ---- sit in the check-2 block INSIDE region one (the `if in_shard 1` at :279 to the `fi` at :1264),
+# ---- so FLOOR_SHARD_1 carries the same +4 and FLOOR_SHARD_2 is untouched.
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
 # measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
@@ -2527,8 +3468,8 @@ FLOOR_ASSERTIONS=392
 # check asserting it, because the driver suite's own three constants cannot satisfy the same
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
-FLOOR_SHARD_1=83
-FLOOR_SHARD_2=309
+FLOOR_SHARD_1=91
+FLOOR_SHARD_2=343
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
@@ -2542,6 +3483,57 @@ esac
 # because no gate sees it: a "the tree is still clean after N mutations" control is a control only if
 # those N mutations ran in the same process. Split away from them it degrades into a duplicate of the
 # opening control — still green, and no longer evidence.
+
+
+# ---- TOOL-dRetiredFork-9 S3: the BATCHED C21 join agrees with the per-file loop -------------------
+# The absorption replaced 2 greps PER FILE with 2 greps and one awk for the whole population — 176
+# processes to 3 over this corpus's 88 build READMEs. A speed-up that changes a verdict is not an
+# optimisation, so the two are run over one fixture and their answers compared.
+#
+# The fixture carries all four shapes on purpose: well-formed, missing-open, missing-close, and
+# DUPLICATED — because the check's own contract is EXACTLY ONE pair, and a join that merely tested
+# presence would pass the duplicate.
+c21_fixture=$(mktemp -d)
+mkdir -p "$c21_fixture/ok" "$c21_fixture/noopen" "$c21_fixture/noclose" "$c21_fixture/dup"
+printf '<!-- gen:build-units -->\n<!-- /gen:build-units -->\n' > "$c21_fixture/ok/README.md"
+printf '<!-- /gen:build-units -->\n'                            > "$c21_fixture/noopen/README.md"
+printf '<!-- gen:build-units -->\n'                             > "$c21_fixture/noclose/README.md"
+printf '<!-- gen:build-units -->\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n' > "$c21_fixture/dup/README.md"
+c21_files="$c21_fixture/ok/README.md $c21_fixture/noopen/README.md $c21_fixture/noclose/README.md $c21_fixture/dup/README.md"
+
+# the RETIRED per-file loop, kept here as the oracle
+c21_loop=""
+for f in $c21_files; do
+  o=$(grep -cxF -- '<!-- gen:build-units -->' "$f" 2>/dev/null || true)
+  c=$(grep -cxF -- '<!-- /gen:build-units -->' "$f" 2>/dev/null || true)
+  [ "${o:-0}" = 1 ] && [ "${c:-0}" = 1 ] && continue
+  c21_loop="$c21_loop $f"
+done
+
+# the SHIPPED batched join, character for character
+c21_batched=$(grep -cxF -- '<!-- gen:build-units -->' /dev/null $c21_files 2>/dev/null \
+  | awk -F: -v closes="$(grep -cxF -- '<!-- /gen:build-units -->' /dev/null $c21_files 2>/dev/null)" '
+      BEGIN { n = split(closes, L, "\n")
+              for (i = 1; i <= n; i++) { p = L[i]; sub(/:[0-9]*$/, "", p)
+                                         c = L[i]; sub(/^.*:/, "", c); CL[p] = c } }
+      $0 !~ /^\/dev\/null:/ {
+        path = $0; sub(/:[0-9]*$/, "", path)
+        open = $0; sub(/^.*:/, "", open)
+        if (open != 1 || CL[path] != 1) printf " %s", path
+      }')
+
+n=$((n+1))
+if [ "$c21_loop" = "$c21_batched" ]; then
+  echo "ok   C21: the batched join and the per-file loop return the same verdict"
+else
+  echo "FAIL C21: batched [$c21_batched] != per-file [$c21_loop]"; st=1
+fi
+# ANTI-VACUITY: the fixture must actually catch something, or the equality above is two empties.
+n=$((n+1))
+case "$c21_batched" in *noopen*|*noclose*|*dup*) echo "ok   C21: the fixture is non-vacuous" ;;
+  *) echo "FAIL C21: the fixture caught nothing, so the equality proves nothing"; st=1 ;; esac
+rm -rf "$c21_fixture"
+
 [ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other region was NOT exercised here)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

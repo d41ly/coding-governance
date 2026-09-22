@@ -1,0 +1,938 @@
+{
+ "carry_map_population": [
+  [
+   "skills/session-kickoff/MANIFEST-TEMPLATE.md",
+   "scripts/MANIFEST-TEMPLATE.md"
+  ],
+  [
+   "skills/session-kickoff/manifest-check.sh",
+   "scripts/manifest-check.sh"
+  ],
+  [
+   "skills/session-kickoff/manifest-check.test.sh",
+   "scripts/manifest-check.test.sh"
+  ],
+  [
+   "tools/check-wiring.sh",
+   "scripts/check-wiring.sh"
+  ],
+  [
+   "tools/check-wiring.test.sh",
+   "scripts/check-wiring.test.sh"
+  ],
+  [
+   "tools/codebase-map/.codebase-map.conf.example",
+   "scripts/codebase-map/.codebase-map.conf.example"
+  ],
+  [
+   "tools/codebase-map/INVENTORY-DERIVATION.md",
+   "scripts/codebase-map/INVENTORY-DERIVATION.md"
+  ],
+  [
+   "tools/codebase-map/README.md",
+   "scripts/codebase-map/README.md"
+  ],
+  [
+   "tools/codebase-map/adopt-codebase-map.sh",
+   "scripts/codebase-map/adopt-codebase-map.sh"
+  ],
+  [
+   "tools/codebase-map/adopt-codebase-map.test.sh",
+   "scripts/codebase-map/adopt-codebase-map.test.sh"
+  ],
+  [
+   "tools/codebase-map/gen_map.py",
+   "scripts/codebase-map/gen_map.py"
+  ],
+  [
+   "tools/codebase-map/map_diff.py",
+   "scripts/codebase-map/map_diff.py"
+  ],
+  [
+   "tools/codebase-map/map_extractors.py",
+   "scripts/codebase-map/map_extractors.py"
+  ],
+  [
+   "tools/codebase-map/map_extractors.template.py",
+   "scripts/codebase-map/map_extractors.template.py"
+  ],
+  [
+   "tools/codebase-map/map_lib.py",
+   "scripts/codebase-map/map_lib.py"
+  ],
+  [
+   "tools/codebase-map/reuse-lookup.agent.md",
+   "scripts/codebase-map/reuse-lookup.agent.md"
+  ],
+  [
+   "tools/codebase-map/reuse_lookup.py",
+   "scripts/codebase-map/reuse_lookup.py"
+  ],
+  [
+   "tools/codebase-map/selftest.py",
+   "scripts/codebase-map/selftest.py"
+  ],
+  [
+   "tools/codebase-map/test_codebase_map.template.py",
+   "scripts/codebase-map/test_codebase_map.template.py"
+  ],
+  [
+   "tools/drift-audit/README.md",
+   "scripts/drift-audit/README.md"
+  ],
+  [
+   "tools/drift-audit/drift_report.py",
+   "scripts/drift-audit/drift_report.py"
+  ],
+  [
+   "tools/drift-audit/drift_signals.py",
+   "scripts/drift-audit/drift_signals.py"
+  ],
+  [
+   "tools/drift-audit/drift_signals.template.py",
+   "scripts/drift-audit/drift_signals.template.py"
+  ],
+  [
+   "tools/drift-audit/selftest.py",
+   "scripts/drift-audit/selftest.py"
+  ],
+  [
+   "tools/gate-lint/README.md",
+   "scripts/gate-lint/README.md"
+  ],
+  [
+   "tools/gate-lint/ps-hygiene.py",
+   "scripts/gate-lint/ps-hygiene.py"
+  ],
+  [
+   "tools/hooks/agent-cap.js",
+   ".claude/hooks/agent-cap.js"
+  ],
+  [
+   "tools/hooks/agent-cap.test.sh",
+   ".claude/hooks/agent-cap.test.sh"
+  ],
+  [
+   "tools/lexicon/LEXICON.md",
+   "scripts/lexicon/LEXICON.md"
+  ],
+  [
+   "tools/lexicon/README.md",
+   "scripts/lexicon/README.md"
+  ],
+  [
+   "tools/lexicon/adopt-lexicon.sh",
+   "scripts/lexicon/adopt-lexicon.sh"
+  ],
+  [
+   "tools/lexicon/lexicon-layer-waivers.txt",
+   "scripts/lexicon/lexicon-layer-waivers.txt"
+  ],
+  [
+   "tools/lexicon/lexicon-suffix-waivers.txt",
+   "scripts/lexicon/lexicon-suffix-waivers.txt"
+  ],
+  [
+   "tools/lexicon/lexicon-verb-waivers.txt",
+   "scripts/lexicon/lexicon-verb-waivers.txt"
+  ],
+  [
+   "tools/lexicon/lexicon.py",
+   "scripts/lexicon/lexicon.py"
+  ],
+  [
+   "tools/lexicon/lexicon_conf.py",
+   "scripts/lexicon/lexicon_conf.py"
+  ],
+  [
+   "tools/lexicon/scaffold_lexicon.py",
+   "scripts/lexicon/scaffold_lexicon.py"
+  ],
+  [
+   "tools/lexicon/selftest.py",
+   "scripts/lexicon/selftest.py"
+  ],
+  [
+   "tools/lexicon/subtokens.py",
+   "scripts/lexicon/subtokens.py"
+  ],
+  [
+   "tools/memory-recall/README.md",
+   "scripts/recall/README.md"
+  ],
+  [
+   "tools/memory-recall/bench.py",
+   "scripts/recall/bench.py"
+  ],
+  [
+   "tools/memory-recall/extract.py",
+   "scripts/recall/extract.py"
+  ],
+  [
+   "tools/memory-recall/query.py",
+   "scripts/recall/query.py"
+  ],
+  [
+   "tools/memory-recall/recall-opened.fragment.json",
+   "scripts/recall/recall-opened.fragment.json"
+  ],
+  [
+   "tools/memory-recall/recall-opened.js",
+   ".claude/hooks/recall-opened.js"
+  ],
+  [
+   "tools/memory-recall/recall-opened.test.sh",
+   ".claude/hooks/recall-opened.test.sh"
+  ],
+  [
+   "tools/memory-recall/selftest.py",
+   "scripts/recall/selftest.py"
+  ],
+  [
+   "tools/memory-recall/union.py",
+   "scripts/recall/union.py"
+  ],
+  [
+   "tools/memory-tree/check-arms.py",
+   "scripts/check-arms.py"
+  ],
+  [
+   "tools/memory-tree/corpus_ids.py",
+   "scripts/corpus_ids.py"
+  ],
+  [
+   "tools/memory-tree/gen_build_index.py",
+   "scripts/gen_build_index.py"
+  ],
+  [
+   "tools/memory-tree/gotchas.py",
+   "scripts/gotchas.py"
+  ],
+  [
+   "tools/memory-tree/hygiene-parity.test.sh",
+   "scripts/hygiene-parity.test.sh"
+  ],
+  [
+   "tools/memory-tree/merge-rows.py",
+   "scripts/merge-rows.py"
+  ],
+  [
+   "tools/memory-tree/merge-rows.test.sh",
+   "scripts/merge-rows.test.sh"
+  ],
+  [
+   "tools/push-main.sh",
+   "scripts/push-main.sh"
+  ],
+  [
+   "tools/push-main.test.sh",
+   "scripts/push-main.test.sh"
+  ],
+  [
+   "tools/pytest-parallel-guardrails/README.md",
+   "scripts/pytest-guardrails/README.md"
+  ],
+  [
+   "tools/pytest-parallel-guardrails/crashprobe.py",
+   "scripts/pytest-guardrails/crashprobe.py"
+  ],
+  [
+   "tools/settings-merge.py",
+   "scripts/settings-merge.py"
+  ],
+  [
+   "tools/unattended/.unattended.conf.example",
+   "scripts/unattended/.unattended.conf.example"
+  ],
+  [
+   "tools/unattended/PLAYBOOK-TEMPLATE.template.md",
+   "scripts/unattended/PLAYBOOK-TEMPLATE.template.md"
+  ],
+  [
+   "tools/unattended/PROTOCOL.template.md",
+   "scripts/unattended/PROTOCOL.template.md"
+  ],
+  [
+   "tools/unattended/SKILL.template.md",
+   "scripts/unattended/SKILL.template.md"
+  ],
+  [
+   "tools/unattended/adopt-unattended.sh",
+   "scripts/unattended/adopt-unattended.sh"
+  ],
+  [
+   "tools/unattended/adopt-unattended.test.sh",
+   "scripts/unattended/adopt-unattended.test.sh"
+  ],
+  [
+   "tools/unattended/check-playbook.sh",
+   "scripts/unattended/check-playbook.sh"
+  ],
+  [
+   "tools/unattended/check-playbook.test.sh",
+   "scripts/unattended/check-playbook.test.sh"
+  ],
+  [
+   "tools/unattended/check-unattended.sh",
+   "scripts/unattended/check-unattended.sh"
+  ],
+  [
+   "tools/unattended/check-unattended.test.sh",
+   "scripts/unattended/check-unattended.test.sh"
+  ],
+  [
+   "tools/unattended/cross-component.test.sh",
+   "scripts/unattended/cross-component.test.sh"
+  ],
+  [
+   "tools/unattended/fixture-pieces/one/piece.md",
+   "scripts/unattended/fixture-pieces/one/piece.md"
+  ],
+  [
+   "tools/unattended/fixture-pieces/two/piece.md",
+   "scripts/unattended/fixture-pieces/two/piece.md"
+  ],
+  [
+   "tools/unattended/fixture-records/set-dScriptedRepeat.md",
+   "scripts/unattended/fixture-records/set-dScriptedRepeat.md"
+  ],
+  [
+   "tools/unattended/lib-unattended.sh",
+   "scripts/unattended/lib-unattended.sh"
+  ],
+  [
+   "tools/unattended/playbook.fixture.md",
+   "scripts/unattended/playbook.fixture.md"
+  ],
+  [
+   "tools/unattended/run-unattended-gates.sh",
+   "scripts/unattended/run-unattended-gates.sh"
+  ],
+  [
+   "tools/unattended/unattended.sh",
+   "scripts/unattended/unattended.sh"
+  ],
+  [
+   "tools/unattended/unattended.test.sh",
+   "scripts/unattended/unattended.test.sh"
+  ],
+  [
+   "tools/workflows/check-review-join.sh",
+   "scripts/workflows/check-review-join.sh"
+  ],
+  [
+   "tools/workflows/check-review-join.test.sh",
+   "scripts/workflows/check-review-join.test.sh"
+  ],
+  [
+   "tools/workflows/check-verifier-fanout.sh",
+   "scripts/workflows/check-verifier-fanout.sh"
+  ],
+  [
+   "tools/workflows/check-verifier-fanout.test.sh",
+   "scripts/workflows/check-verifier-fanout.test.sh"
+  ],
+  [
+   "tools/workflows/check-workflow-syntax.js",
+   "scripts/workflows/check-workflow-syntax.js"
+  ],
+  [
+   "tools/workflows/drift-audit-code.js",
+   ".claude/workflows/drift-audit-code.js"
+  ],
+  [
+   "tools/workflows/drift-audit-state.js",
+   ".claude/workflows/drift-audit-state.js"
+  ]
+ ],
+ "files": [
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "3f134ba8c73589647d4d5a5d24647c12f229db79",
+   "kit": "agent-cap",
+   "lf_oid": "a755c944d6175856471bc6a48b0766cc3b038551",
+   "oid": "a755c944d6175856471bc6a48b0766cc3b038551",
+   "path": ".claude/hooks/agent-cap.js",
+   "role": "engine",
+   "sha256": "06aa8558712b9515c952e39bc2893b14749da0b0df9097b9900a9c479195753e",
+   "source": "tools/hooks/agent-cap.js"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "d3c854f90af00d2a78c62ac7d4813cbe600d6c3f",
+   "kit": "agent-cap",
+   "lf_oid": "85d77b3cd46410049479ccacf8c2aac20ab37618",
+   "oid": "85d77b3cd46410049479ccacf8c2aac20ab37618",
+   "path": ".claude/hooks/agent-cap.test.sh",
+   "role": "engine",
+   "sha256": "d3155eda821cbd3804223adf03a6d0b67b48f66289a65db3faeb6ee4504406e9",
+   "source": "tools/hooks/agent-cap.test.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "8951db7bcb096dc4612ab4a40fb57b1c37170e73",
+   "kit": "review-harness",
+   "lf_oid": "98a8e04ee37296c1539853194366e9f05bda5298",
+   "oid": "98a8e04ee37296c1539853194366e9f05bda5298",
+   "path": ".claude/workflows/drift-audit-code.js",
+   "role": "engine",
+   "sha256": "955819f618505a0a4c72c53f56bf031fb1f33c925f4445e3e30f5f17607eaf1f",
+   "source": "tools/workflows/drift-audit-code.js"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "72c2922ed34e88375a99d99324c346984b6398b3",
+   "kit": "review-harness",
+   "lf_oid": "361b90c87703538c3322688931c458201d6fc03d",
+   "oid": "361b90c87703538c3322688931c458201d6fc03d",
+   "path": ".claude/workflows/drift-audit-state.js",
+   "role": "engine",
+   "sha256": "c7119c6db49be5d669d148c17e3ae11082fc8935479428793a4294e06833eb93",
+   "source": "tools/workflows/drift-audit-state.js"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "f81856655df074f8d368efaef5199cdf93e4c48a",
+   "kit": "kickoff-manifest",
+   "lf_oid": "f81856655df074f8d368efaef5199cdf93e4c48a",
+   "oid": "56024cc9d919dc4733333a99a8ac0dd89637f6ce",
+   "path": "scripts/MANIFEST-TEMPLATE.md",
+   "role": "engine",
+   "sha256": "63175ef6a2cca4d68df91c6093ebc4a75647bfee8c68e5e4032dc68e33eccc09",
+   "source": "skills/session-kickoff/MANIFEST-TEMPLATE.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "1db4d083d461719511b090e9f49de656eb3e8d74",
+   "kit": "check-wiring",
+   "lf_oid": "0fcb4f7fd0bcda9cee4e2b33e6f931e7796ea423",
+   "oid": "0fcb4f7fd0bcda9cee4e2b33e6f931e7796ea423",
+   "path": "scripts/check-wiring.sh",
+   "role": "engine",
+   "sha256": "ad17c8f428f4fe8b686dd884e5880afc7e5198aeb8ddc92c93108037fdf8852f",
+   "source": "tools/check-wiring.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "a43220f52c65e4d6272c7c94b3f28bd84748ee14",
+   "kit": "check-wiring",
+   "lf_oid": "614a3beed7f970ec0b0815779700d5642748bffe",
+   "oid": "614a3beed7f970ec0b0815779700d5642748bffe",
+   "path": "scripts/check-wiring.test.sh",
+   "role": "engine",
+   "sha256": "9eb30003b881f92ff2d34b1f2f6fbda11fd7010e41c21ecf949b2622470f9dc8",
+   "source": "tools/check-wiring.test.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "ad48e2f50ed24033ece6991df6422b605c7bdda6",
+   "kit": "codebase-map",
+   "lf_oid": "4dcb408728ae28fbda94467f901f058d92160c1c",
+   "oid": "4dcb408728ae28fbda94467f901f058d92160c1c",
+   "path": "scripts/codebase-map/map_extractors.py",
+   "role": "project-owned",
+   "sha256": "883c88387bfea92477088278b1fb4643c313cd9cf00fa1760d446cc764efa837",
+   "source": "tools/codebase-map/map_extractors.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "77c44045a39b0c8310e91e9355db67c1abb3695e",
+   "kit": "codebase-map",
+   "lf_oid": "77c44045a39b0c8310e91e9355db67c1abb3695e",
+   "oid": "14a5970c8998815c4ba747ae94a6ecf2a7bac73e",
+   "path": "scripts/codebase-map/map_extractors.template.py",
+   "role": "engine",
+   "sha256": "8ce64454204cd3c89d6f79df5601c8389691740aa40424515de7b86e31dcb5e9",
+   "source": "tools/codebase-map/map_extractors.template.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "b1a9351cd946436e3b3b8c71d6c29d9610e202e2",
+   "kit": "codebase-map",
+   "lf_oid": "b1a9351cd946436e3b3b8c71d6c29d9610e202e2",
+   "oid": "44de552a964f81392201276418843971028879f9",
+   "path": "scripts/codebase-map/map_lib.py",
+   "role": "engine",
+   "sha256": "be028355ff493aca3c3cc6b66a1d434d8a9f363c0c0105a8ebaaf441d981a186",
+   "source": "tools/codebase-map/map_lib.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "d898aaef33e9a7d62235c59f24763a1c347a7584",
+   "kit": "codebase-map",
+   "lf_oid": "d898aaef33e9a7d62235c59f24763a1c347a7584",
+   "oid": "5c91af8af99b1d716d12d0750218465954021116",
+   "path": "scripts/codebase-map/selftest.py",
+   "role": "engine",
+   "sha256": "b78fd254458f5ce3f437dd64e4f039a631be9242b38548f06a81e1a550a55cce",
+   "source": "tools/codebase-map/selftest.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "84c101a232173f7daa7a52c729abe5290e43c6db",
+   "kit": "drift-audit",
+   "lf_oid": "84c101a232173f7daa7a52c729abe5290e43c6db",
+   "oid": "84c101a232173f7daa7a52c729abe5290e43c6db",
+   "path": "scripts/drift-audit/README.md",
+   "role": "engine",
+   "sha256": "43e2452bb567009ccc17a908c1a5a3ff00bc0eb60b1383713853bcd41137ad8f",
+   "source": "tools/drift-audit/README.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "374179454576df2f9ec5167824b8f9ea1a0fbe5c",
+   "kit": "drift-audit",
+   "lf_oid": "9e01ab7426a368c764b812ceee23df6430946921",
+   "oid": "9e01ab7426a368c764b812ceee23df6430946921",
+   "path": "scripts/drift-audit/drift_report.py",
+   "role": "engine",
+   "sha256": "5d3c0e2fed0b17b160a5bcd158ac2fc235ca48ef3ada12e14c735e2cf18ca4f3",
+   "source": "tools/drift-audit/drift_report.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "897e041802819873d2890280c45031494808a240",
+   "kit": "drift-audit",
+   "lf_oid": "965c5c540f277a0e98f3eaafb3cdda2084096755",
+   "oid": "965c5c540f277a0e98f3eaafb3cdda2084096755",
+   "path": "scripts/drift-audit/drift_signals.py",
+   "role": "project-owned",
+   "sha256": "7fc9209d90f5b5e31c193d2c24ab19ae89a0ab304542ef6ceb8ef034b04504a5",
+   "source": "tools/drift-audit/drift_signals.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "51fe4bdc8cf63305ad45d25ab45c5c80e02b9854",
+   "kit": "drift-audit",
+   "lf_oid": "51fe4bdc8cf63305ad45d25ab45c5c80e02b9854",
+   "oid": "51fe4bdc8cf63305ad45d25ab45c5c80e02b9854",
+   "path": "scripts/drift-audit/drift_signals.template.py",
+   "role": "engine",
+   "sha256": "4d980dd139ca1b11128c068b88a07a97d35308cd0bdccde584d999fc9cb8601e",
+   "source": "tools/drift-audit/drift_signals.template.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "38e9366d70232014da53e32bb3f8c76a59b6dbca",
+   "kit": "drift-audit",
+   "lf_oid": "38e9366d70232014da53e32bb3f8c76a59b6dbca",
+   "oid": "38e9366d70232014da53e32bb3f8c76a59b6dbca",
+   "path": "scripts/drift-audit/selftest.py",
+   "role": "engine",
+   "sha256": "18d86d65dc988f4bd3584ff9c99bfcc1e684104b099249e2b000c4cad9313a81",
+   "source": "tools/drift-audit/selftest.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "ce5dc69e99f9f6d1c6360a2f821f2c8dcc1acf73",
+   "kit": "gate-lint",
+   "lf_oid": "ce5dc69e99f9f6d1c6360a2f821f2c8dcc1acf73",
+   "oid": "0edec24c21a83336bcba3df02988aa6f98a8cd4c",
+   "path": "scripts/gate-lint/README.md",
+   "role": "engine",
+   "sha256": "abab983491734dc1592c8344ee74300c392bf7808008e9da9cec7f5be780693a",
+   "source": "tools/gate-lint/README.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "fd5b407ab7ce46bdad3290384cf68bc7951985f0",
+   "kit": "gate-lint",
+   "lf_oid": "fd5b407ab7ce46bdad3290384cf68bc7951985f0",
+   "oid": "3a3077956593a99e4b0e9c09417b5b903238458f",
+   "path": "scripts/gate-lint/ps-hygiene.py",
+   "role": "engine",
+   "sha256": "97cfe54215519b4e0ea3ecde289620c598031fff036328dcd066b02670ccb2fa",
+   "source": "tools/gate-lint/ps-hygiene.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "6f81e007f3a028d1be5005e949aebf5ad6107522",
+   "kit": "memory-tree",
+   "lf_oid": "2afe66e92924e63a51db5a6c1a55f30aa45a318b",
+   "oid": "2afe66e92924e63a51db5a6c1a55f30aa45a318b",
+   "path": "scripts/gotchas.py",
+   "role": "engine",
+   "sha256": "1c66aac0a7b747d0766f67f8a903e56d77331aa8227262f48cdb1e8547086473",
+   "source": "tools/memory-tree/gotchas.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "13a6c6c63780d834c9b232ff37be8d8470805cff",
+   "kit": "lexicon",
+   "lf_oid": "13a6c6c63780d834c9b232ff37be8d8470805cff",
+   "oid": "13a6c6c63780d834c9b232ff37be8d8470805cff",
+   "path": "scripts/lexicon/LEXICON.md",
+   "role": "engine",
+   "sha256": "efd4e15115435d0e49a757e4397ec15ac5242075aa1f070c28aa5a56353a0b85",
+   "source": "tools/lexicon/LEXICON.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "82016fb4c8c8ad42b78711932bc49c692b336c18",
+   "kit": "lexicon",
+   "lf_oid": "82016fb4c8c8ad42b78711932bc49c692b336c18",
+   "oid": "82016fb4c8c8ad42b78711932bc49c692b336c18",
+   "path": "scripts/lexicon/README.md",
+   "role": "engine",
+   "sha256": "3456612a50d05d67dc6110401751b8052b6ee965e4fa29916a5be859bd87dc5f",
+   "source": "tools/lexicon/README.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "6ec13d640f3e1e9503aec9a1b8cad3a089fe2665",
+   "kit": "lexicon",
+   "lf_oid": "6ec13d640f3e1e9503aec9a1b8cad3a089fe2665",
+   "oid": "6ec13d640f3e1e9503aec9a1b8cad3a089fe2665",
+   "path": "scripts/lexicon/adopt-lexicon.sh",
+   "role": "engine",
+   "sha256": "8cdff7ef47ab8d9eaff3151c54bbbfa90727d816206215ae7f45ec8367946bf4",
+   "source": "tools/lexicon/adopt-lexicon.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "45444a7dffa20e36d0ea74b71c3a92538608caba",
+   "kit": "lexicon",
+   "lf_oid": "45444a7dffa20e36d0ea74b71c3a92538608caba",
+   "oid": "45444a7dffa20e36d0ea74b71c3a92538608caba",
+   "path": "scripts/lexicon/lexicon-layer-waivers.txt",
+   "role": "seed",
+   "sha256": "4f49424e9337a61eef40b2284cd0f6e7da55ba06b65710c9e3d6b490a788b72b",
+   "source": "tools/lexicon/lexicon-layer-waivers.txt"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "a94a4fe4206d06da9f14767738254f769e2a3a90",
+   "kit": "lexicon",
+   "lf_oid": "a94a4fe4206d06da9f14767738254f769e2a3a90",
+   "oid": "a94a4fe4206d06da9f14767738254f769e2a3a90",
+   "path": "scripts/lexicon/lexicon-suffix-waivers.txt",
+   "role": "seed",
+   "sha256": "68501d7e03df8039e162d264e54c02c78312c4290e2f2033a6eec464c600a381",
+   "source": "tools/lexicon/lexicon-suffix-waivers.txt"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "58f49d677545c1d4a13f713bc68c07a6f694a1fb",
+   "kit": "lexicon",
+   "lf_oid": "58f49d677545c1d4a13f713bc68c07a6f694a1fb",
+   "oid": "58f49d677545c1d4a13f713bc68c07a6f694a1fb",
+   "path": "scripts/lexicon/lexicon-verb-waivers.txt",
+   "role": "seed",
+   "sha256": "7f3df11a5f70ae60e71d9d0e108572353935e43c2c71e3736c6bb90967543ee9",
+   "source": "tools/lexicon/lexicon-verb-waivers.txt"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "62e49b0b25efa9dd2d2725e9844a4c8517b432aa",
+   "kit": "lexicon",
+   "lf_oid": "62e49b0b25efa9dd2d2725e9844a4c8517b432aa",
+   "oid": "62e49b0b25efa9dd2d2725e9844a4c8517b432aa",
+   "path": "scripts/lexicon/lexicon.py",
+   "role": "engine",
+   "sha256": "5cf6872dbad0a3c93e47de023bd38ec70c8f036472936177154160ae47fe1ae4",
+   "source": "tools/lexicon/lexicon.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "abdaa711cdd7307f22c49780d9d5a10d602bb198",
+   "kit": "lexicon",
+   "lf_oid": "abdaa711cdd7307f22c49780d9d5a10d602bb198",
+   "oid": "abdaa711cdd7307f22c49780d9d5a10d602bb198",
+   "path": "scripts/lexicon/lexicon_conf.py",
+   "role": "engine",
+   "sha256": "2b417464955ea89af95c782badd0ef25118d878bfee64adecfaaf356a3d93c66",
+   "source": "tools/lexicon/lexicon_conf.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "eb903c95c35c149a4f923e20c761e5edac8fea1e",
+   "kit": "lexicon",
+   "lf_oid": "eb903c95c35c149a4f923e20c761e5edac8fea1e",
+   "oid": "eb903c95c35c149a4f923e20c761e5edac8fea1e",
+   "path": "scripts/lexicon/scaffold_lexicon.py",
+   "role": "engine",
+   "sha256": "e1d07625023eb787e91bebe89f180d1aa303275f0f26d69fe9ae8f3b826894a8",
+   "source": "tools/lexicon/scaffold_lexicon.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "5d121217cd2df70d9cb73026f92f3218aaaad9cf",
+   "kit": "lexicon",
+   "lf_oid": "5d121217cd2df70d9cb73026f92f3218aaaad9cf",
+   "oid": "5d121217cd2df70d9cb73026f92f3218aaaad9cf",
+   "path": "scripts/lexicon/selftest.py",
+   "role": "engine",
+   "sha256": "2ff50395b94cb4a589a6829d6a875ef9ef4b98d946273a7b97c206f7ca0e08d1",
+   "source": "tools/lexicon/selftest.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "caec10ed0f7b886db0aebd29afbdaa26a6a952b0",
+   "kit": "lexicon",
+   "lf_oid": "caec10ed0f7b886db0aebd29afbdaa26a6a952b0",
+   "oid": "caec10ed0f7b886db0aebd29afbdaa26a6a952b0",
+   "path": "scripts/lexicon/subtokens.py",
+   "role": "engine",
+   "sha256": "c5424c2cbfe0106af00e456e710435c1ac945bafe8f454223fe208f466fdfba0",
+   "source": "tools/lexicon/subtokens.py"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "12c1afb3a07d78a9cb7979ac009f7a9eb669c4c4",
+   "kit": "kickoff-manifest",
+   "lf_oid": "12c1afb3a07d78a9cb7979ac009f7a9eb669c4c4",
+   "oid": "12c1afb3a07d78a9cb7979ac009f7a9eb669c4c4",
+   "path": "scripts/manifest-check.sh",
+   "role": "engine",
+   "sha256": "a471c830981477f9d3216402c7f6f6b8dc56bd9ded5b33aee5e562b1a198a5d0",
+   "source": "skills/session-kickoff/manifest-check.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "0368e87687f1c3d0dc32b543f27f9db9fc565d04",
+   "kit": "kickoff-manifest",
+   "lf_oid": "82065716b212fe6ac42c9efecb00daf4a70cffe8",
+   "oid": "82065716b212fe6ac42c9efecb00daf4a70cffe8",
+   "path": "scripts/manifest-check.test.sh",
+   "role": "engine",
+   "sha256": "d4ab1b7360613a080da5987afa2e5144bd61867da541f15deea962a2d807bae1",
+   "source": "skills/session-kickoff/manifest-check.test.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "acd79e6410f2b9bb6c7cacd561fc7f5c2e922458",
+   "kit": "memory-recall",
+   "lf_oid": "acd79e6410f2b9bb6c7cacd561fc7f5c2e922458",
+   "oid": "acd79e6410f2b9bb6c7cacd561fc7f5c2e922458",
+   "path": "scripts/recall/recall-opened.fragment.json",
+   "role": "engine",
+   "sha256": "77a796c89135af31a64ae675a7710c0fa0b10826d2142f1220d6b0b1043e4c53",
+   "source": "tools/memory-recall/recall-opened.fragment.json"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "fac1231646bc8acc284514c551bc906b3ea6378e",
+   "kit": "unattended",
+   "lf_oid": "e627c97bb0418e11a28dcf54041c8253cf417062",
+   "oid": "e627c97bb0418e11a28dcf54041c8253cf417062",
+   "path": "scripts/unattended/.unattended.conf.example",
+   "role": "engine",
+   "sha256": "433574c4d076c27d61e036f466d9d9295851a3da367a7f42b9c1b77295e39f19",
+   "source": "tools/unattended/.unattended.conf.example"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "99288573aaf73c2f2e640783ed3e8be9460c39c3",
+   "kit": "unattended",
+   "lf_oid": "99288573aaf73c2f2e640783ed3e8be9460c39c3",
+   "oid": "99288573aaf73c2f2e640783ed3e8be9460c39c3",
+   "path": "scripts/unattended/PLAYBOOK-TEMPLATE.template.md",
+   "role": "engine",
+   "sha256": "eecc9642053af47052212ea2221a1ea07465caf79d526de78796f94cd7dc1ead",
+   "source": "tools/unattended/PLAYBOOK-TEMPLATE.template.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "6f167cacde0271bb09758d2fb74bc8362350a4de",
+   "kit": "unattended",
+   "lf_oid": "3ca0897abd3d9c81657286b44b4cc06788fc93d1",
+   "oid": "3ca0897abd3d9c81657286b44b4cc06788fc93d1",
+   "path": "scripts/unattended/PROTOCOL.template.md",
+   "role": "engine",
+   "sha256": "f56f57cc929fb6beb3a1e4dcaeb6c233ec10dce5a931dbf7fab0d006b8a0b9d2",
+   "source": "tools/unattended/PROTOCOL.template.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "8543bee7a1c1c5ad85f62fda940276db143d7fad",
+   "kit": "unattended",
+   "lf_oid": "e629e9663fd3719333d5ff7006abeb24eff0f2c5",
+   "oid": "e629e9663fd3719333d5ff7006abeb24eff0f2c5",
+   "path": "scripts/unattended/SKILL.template.md",
+   "role": "engine",
+   "sha256": "30803d0c6f9ab8e6ce0879af73f6964bc6473cd87f5add64f1c7c7b315b65e11",
+   "source": "tools/unattended/SKILL.template.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "0d02d035160dc7530b8183fe658188f2c6ed7391",
+   "kit": "unattended",
+   "lf_oid": "c2fc16e90dc802b581f93a63f608272cd9bfc762",
+   "oid": "c2fc16e90dc802b581f93a63f608272cd9bfc762",
+   "path": "scripts/unattended/adopt-unattended.sh",
+   "role": "engine",
+   "sha256": "095d40c0b6de9fd2d32516d578d02fbd2671106ff1a6d2aceb05d2802bfb8ec3",
+   "source": "tools/unattended/adopt-unattended.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "91823d158b0f70914218ba4256e507ccfed354be",
+   "kit": "unattended",
+   "lf_oid": "d1f219b70b22b6ebf985bcbb1eaae4de2f4133fc",
+   "oid": "d1f219b70b22b6ebf985bcbb1eaae4de2f4133fc",
+   "path": "scripts/unattended/adopt-unattended.test.sh",
+   "role": "engine",
+   "sha256": "79db59f48c205207f1d9f37dfc5f8ba8fddb1b2dbc45f6262ec6324577254231",
+   "source": "tools/unattended/adopt-unattended.test.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "9ce84d87f3284001b1ae1d9c9cca8bde7f17c237",
+   "kit": "unattended",
+   "lf_oid": "9ce84d87f3284001b1ae1d9c9cca8bde7f17c237",
+   "oid": "9ce84d87f3284001b1ae1d9c9cca8bde7f17c237",
+   "path": "scripts/unattended/check-playbook.sh",
+   "role": "engine",
+   "sha256": "345a2e2efb3de3fb3c2468951348acd4ac854bd04a5d1da415d1385541c44c76",
+   "source": "tools/unattended/check-playbook.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "d310cc9c4c5297dddf2010a9322a30694e2035cb",
+   "kit": "unattended",
+   "lf_oid": "858551837ba2fe376dec8b74820aa21c38870fe4",
+   "oid": "858551837ba2fe376dec8b74820aa21c38870fe4",
+   "path": "scripts/unattended/check-playbook.test.sh",
+   "role": "engine",
+   "sha256": "cae076d635122fca5f185f2f12e3a39d8ba746f4ef582dc2d212473404366a23",
+   "source": "tools/unattended/check-playbook.test.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "7e4506d3ab64cd22d689eaa5e1f7f89202b2ba68",
+   "kit": "unattended",
+   "lf_oid": "f33a5972b8e35a54814fb9d1209c29fb70f9ccee",
+   "oid": "f33a5972b8e35a54814fb9d1209c29fb70f9ccee",
+   "path": "scripts/unattended/check-unattended.sh",
+   "role": "engine",
+   "sha256": "a0b0d4487807b8a872f20de7d28f10c36d6bdd97478116be72daa6475db4e5ff",
+   "source": "tools/unattended/check-unattended.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "a03bfb701615b8a40658e721d57d9f6b3fc9b786",
+   "kit": "unattended",
+   "lf_oid": "fd652517d9183f5e8663eca2bcd4a15b4c71b218",
+   "oid": "fd652517d9183f5e8663eca2bcd4a15b4c71b218",
+   "path": "scripts/unattended/check-unattended.test.sh",
+   "role": "engine",
+   "sha256": "43624f85be3f8c7e22b909e7b1b2d9fdc5fdbbeda25757148e8f5e5dccf024c8",
+   "source": "tools/unattended/check-unattended.test.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "b5c8310724ce80f260496baeafa6381c3cd80c3d",
+   "kit": "unattended",
+   "lf_oid": "f8fd03637fbe8cc581e7c17b123068d788423579",
+   "oid": "f8fd03637fbe8cc581e7c17b123068d788423579",
+   "path": "scripts/unattended/cross-component.test.sh",
+   "role": "engine",
+   "sha256": "5a4fc1d7860a31720c6c17a785a9e0f0c989ded4b6734fa5e1f54b83361c6ace",
+   "source": "tools/unattended/cross-component.test.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "57787f3e201f8edb2153f43318ea65b641ae0ccb",
+   "kit": "unattended",
+   "lf_oid": "57787f3e201f8edb2153f43318ea65b641ae0ccb",
+   "oid": "57787f3e201f8edb2153f43318ea65b641ae0ccb",
+   "path": "scripts/unattended/fixture-pieces/one/piece.md",
+   "role": "engine",
+   "sha256": "b638f61116c7f9f53769b7a3b1bdf3c5519a3568266ae2cde5cac8d026c0a5f3",
+   "source": "tools/unattended/fixture-pieces/one/piece.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "44433e009c98e5b7f4730743c8ce7286165e21ef",
+   "kit": "unattended",
+   "lf_oid": "44433e009c98e5b7f4730743c8ce7286165e21ef",
+   "oid": "44433e009c98e5b7f4730743c8ce7286165e21ef",
+   "path": "scripts/unattended/fixture-pieces/two/piece.md",
+   "role": "engine",
+   "sha256": "84b7f6d47bd36673ba0cd035e0050f018509fd23ed33bb42d61a9fa80b8436c4",
+   "source": "tools/unattended/fixture-pieces/two/piece.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "458dd8120def611fa003535e8fbe759bcb87b420",
+   "kit": "unattended",
+   "lf_oid": "458dd8120def611fa003535e8fbe759bcb87b420",
+   "oid": "458dd8120def611fa003535e8fbe759bcb87b420",
+   "path": "scripts/unattended/fixture-records/set-dScriptedRepeat.md",
+   "role": "engine",
+   "sha256": "e6223c2dd87a630c8f2e8d95c90e9af15fb3f05970fdf48a833fdd75138a556f",
+   "source": "tools/unattended/fixture-records/set-dScriptedRepeat.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "10293d56ee1945138597bbb83831ed0532fb6f8c",
+   "kit": "unattended",
+   "lf_oid": "54d8eaa92b4ae60fadb2cffc8decc86aa3ec2497",
+   "oid": "54d8eaa92b4ae60fadb2cffc8decc86aa3ec2497",
+   "path": "scripts/unattended/lib-unattended.sh",
+   "role": "engine",
+   "sha256": "683f3e77ed5ad8f555e72cdf9f2d25a72c3223d0800c2d7b6a3e7e67ed1f9265",
+   "source": "tools/unattended/lib-unattended.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "0c88a36e7b9b28da4e3c0774d6fb39be8c29542d",
+   "kit": "unattended",
+   "lf_oid": "a0b6f38f2007aa69c78e1e046714b76a9dd495f5",
+   "oid": "a0b6f38f2007aa69c78e1e046714b76a9dd495f5",
+   "path": "scripts/unattended/playbook.fixture.md",
+   "role": "engine",
+   "sha256": "3d5b572a42b00a8d14ea48e2874b8526b3c89b8f94aa920dd90255af7f20f393",
+   "source": "tools/unattended/playbook.fixture.md"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "00b5d76e73f6f490fe89b74c9ddd7cadcf9e6e9d",
+   "kit": "unattended",
+   "lf_oid": "98301bc17925a0d5d5ccdd3799982adf06a1e033",
+   "oid": "98301bc17925a0d5d5ccdd3799982adf06a1e033",
+   "path": "scripts/unattended/run-unattended-gates.sh",
+   "role": "engine",
+   "sha256": "8f6778744429242b091fe383971a15c78fff18bdbfec7110463451d92222e136",
+   "source": "tools/unattended/run-unattended-gates.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "13c26e745061984f9482145d67b318c30c0bd709",
+   "kit": "unattended",
+   "lf_oid": "fd7cbc14acaa782f80937206274661ea94972c55",
+   "oid": "fd7cbc14acaa782f80937206274661ea94972c55",
+   "path": "scripts/unattended/unattended.sh",
+   "role": "engine",
+   "sha256": "b7edcc2f14ea02f060dec7814cb98b59e8a8805f5bcbf14731ce9505de4c8ca0",
+   "source": "tools/unattended/unattended.sh"
+  },
+  {
+   "commit": "ce5dca99",
+   "gov_oid": "e91949fa4e01e271816fd2a42c2f2dca5bac439c",
+   "kit": "unattended",
+   "lf_oid": "5a801982d491ea48389bad1dae9c9e3cce31f9a6",
+   "oid": "5a801982d491ea48389bad1dae9c9e3cce31f9a6",
+   "path": "scripts/unattended/unattended.test.sh",
+   "role": "engine",
+   "sha256": "6fcabdd1549d1dde867e342b17f621ec4178823916b4c6f04270469e68d4e56c",
+   "source": "tools/unattended/unattended.test.sh"
+  }
+ ],
+ "gov_commit": "ce5dca99",
+ "gov_source": "(reconstructed \u2014 see make_incms_receipt.py)",
+ "provenance": {
+  "adopter": "inCMS",
+  "adopter_record": ".governance/install.index",
+  "adopter_rev": "2cff5855",
+  "generated_by": "tools/govkit/fixtures/make_incms_receipt.py",
+  "gov_rev": "ce5dca99",
+  "index_rows": 92,
+  "unresolved": [
+   "[memory-tree] scripts/check-docs-hygiene.sh",
+   "[memory-tree] scripts/check-docs-hygiene.test.sh"
+  ],
+  "unverified_rows": 38
+ },
+ "schema": 3
+}

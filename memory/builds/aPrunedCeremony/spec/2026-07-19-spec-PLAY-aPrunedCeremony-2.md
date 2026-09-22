@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-2 · 2026-07-19 · node a · Tier-1 · base bf7f2c22 · reviewed wf_2f11fd07 · ratified 2026-07-19
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-07-19-build-PLAY-aPrunedCeremony-1-1.md](../build/2026-07-19-build-PLAY-aPrunedCeremony-1-1.md) | journal | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
+| [2026-07-19-review-PLAY-aPrunedCeremony-1-1.md](../reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-1.md) | spec-audit | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
+| [2026-07-19-review-PLAY-aPrunedCeremony-1-2.md](../reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-2.md) | diff-review | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Capture the most expensive lesson of inCMS `ARCH-aTrimmedGauntlet-2` (its RD15 reversal) as a

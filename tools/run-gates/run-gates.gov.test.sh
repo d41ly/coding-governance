@@ -69,7 +69,7 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=14
+FLOOR_ASSERTIONS=15
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -233,6 +233,94 @@ else
   a=$((a+1))
   grep -qF 'tools/run-gates/gate-profiles.txt' "$CHARTER" \
     || { echo "gov-canary: $CHARTER does not name tools/run-gates/gate-profiles.txt as the source of the pool width, so the negative half above would pass on a DELETED sentence"; fail=1; }
+fi
+
+# ---- G6. EVERY GOV LEG DECLARES A CEILING --------------------------------------------------------
+# TOOL-aBoundedCeiling-1 S9. The RUNNER deliberately does not enforce this: it cannot tell a gov leg
+# somebody forgot from an adopter leg the deployer has no business bounding, so it reports an
+# unbounded count and refuses nothing. The requirement over THIS corpus lives here, which is the file
+# allowed to hold a claim about this repository -- see this suite's header for why that split exists.
+#
+# WHAT THIS DOES NOT CHECK: whether a ceiling is the RIGHT number. It grades presence and shape only.
+# A leg bounded at 99999 passes here and is still unbounded in every sense that matters; the number is
+# argued in the spec and in the manifest, and no gate reads an argument.
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, sys
+try:
+    legs = json.load(open(sys.argv[1]))
+except Exception as e:
+    print("gov-canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
+
+bad = []
+for l in legs:
+    if not isinstance(l, dict):
+        print("gov-canary: a leg row is not an object"); sys.exit(1)
+    nm = l.get("name", "?")
+    if "ceiling" not in l:
+        bad.append("%s declares no ceiling, so it runs unbounded and a hang in it wedges the bar" % nm)
+        continue
+    c = l.get("ceiling")
+    if isinstance(c, bool) or not isinstance(c, int) or c <= 0:
+        bad.append("%s has ceiling %r, which is not a positive integer of seconds" % (nm, c))
+
+# LIVENESS. An empty manifest, or one this predicate never selected, would report zero problems and
+# read exactly like a fully-bounded corpus. Say so instead.
+if not legs:
+    print("gov-canary: the manifest carries no legs at all, so this arm graded nothing"); sys.exit(1)
+
+if bad:
+    print("gov-canary: %d of %d gov leg(s) are not bounded:" % (len(bad), len(legs)))
+    for b in bad[:12]:
+        print("  " + b)
+    if len(bad) > 12:
+        print("  ... and %d more" % (len(bad) - 12))
+    sys.exit(1)
+' "$LEGS_FILE"; then
+  fail=1
+fi
+
+# ---- G7. `memory hygiene` DECLARES NO GUARD, AND THAT IS LOAD-BEARING ----------------------------
+# TOOL-aThawedCorpus-5 gave check 23 the `[ "$STAGED" = 0 ]` guard its four siblings carry, so the
+# pre-commit leg no longer runs it at all. That is a deliberate COVERAGE REDUCTION, and its
+# compensating control is that the push boundary still runs it: `.githooks/pre-push` always invokes
+# `run-gates.sh` and only chooses between `GATE_FULL=1` and a scoped `GATE_BASE` run, while
+# `run-gates.sh` skips a GUARDED leg whose pathspecs did not move against BASE.
+#
+# So the control holds only while this leg declares no guard. Add one and a scoped default-branch
+# push skips check 23 outright, while pre-commit already skips it — the acceptance ledger would then
+# be graded at neither boundary, with every gate green throughout. `TOOL-aThawedCorpus-2` proposed
+# exactly that edit and was retired to preserve this property; nothing asserted it until now, which
+# is the lockstep-invariant-without-a-guard shape. Round-1 diff review, F3.
+#
+# WHAT THIS DOES NOT CHECK: that the push boundary actually runs the leg. It grades one key on one
+# row. The reachability argument lives in the checker's own header beside the exemption.
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, sys
+try:
+    legs = json.load(open(sys.argv[1]))
+except Exception as e:
+    print("gov-canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
+
+rows = [l for l in legs if isinstance(l, dict) and l.get("name") == "memory hygiene"]
+
+# LIVENESS. A renamed or deleted leg would make this arm select nothing and pass in silence, which
+# reads exactly like a correctly unguarded leg. Say so instead.
+if len(rows) != 1:
+    print("gov-canary: expected exactly one leg named \"memory hygiene\", found %d, so this arm"
+          " graded nothing" % len(rows))
+    sys.exit(1)
+
+if "guard" in rows[0]:
+    print("gov-canary: the `memory hygiene` leg declares a guard (%r)." % (rows[0]["guard"],))
+    print("  TOOL-aThawedCorpus-5 removed check 23 from the pre-commit leg, and its compensating")
+    print("  control is that this leg runs on BOTH of .githooks/pre-push branches, which is true")
+    print("  only while it is unguarded. With a guard, a scoped push skips it and the acceptance")
+    print("  ledger is graded at neither boundary. Remove the guard, or retire that exemption.")
+    sys.exit(1)
+' "$LEGS_FILE"; then
+  fail=1
 fi
 
 # ---- verdict -------------------------------------------------------------------------------------

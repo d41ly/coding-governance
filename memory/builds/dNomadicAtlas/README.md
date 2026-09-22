@@ -17,17 +17,29 @@ The upstream half of `ARCH-dNomadicAtlas-2` in the adopting repo (inCMS), where 
 a full gate cycle: a red leg inside a push piped through `tail -45`, unidentifiable afterwards, and
 the reflexive re-run passed, so the evidence was gone for good.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dNomadicAtlas-1` | 2 | a red leg leaves its reason on disk |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-11 · streams tooling
 ids TOOL-dNomadicAtlas-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-dNomadicAtlas-1 — a red leg leaves its reason on disk](spec/2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md) | CLOSED | rev-1 | 2026-08-11 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dNomadicAtlas-1 — a red leg leaves its reason on disk](spec/2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md) | — | 2 | CLOSED | rev-1 | 2026-08-11 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`.
+Records: 0 bound to this build, across 1 record folder(s).
+
+Ids no record names: TOOL-dNomadicAtlas-1.
+
+Ids no `spec-audit` record has ever named: TOOL-dNomadicAtlas-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -39,9 +51,3 @@ Records live under `spec/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md](spec/2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md)
-<!-- /gen:build-docs -->

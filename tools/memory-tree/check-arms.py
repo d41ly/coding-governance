@@ -55,6 +55,12 @@ HELPER_RE = re.compile(r"^\s*fail\(\)\s*\{")
 INTERP_RE = re.compile(r'\$\{?[A-Za-z_][A-Za-z0-9_]*\}?')
 # A NEGATIVE assertion. `miss` is this kit's absence helper; the `&&` form is the inline one.
 NEGATIVE_RE = re.compile(r"^\s*(miss\b|.*grep -qF .* <<<.*\s&&\s)")
+# A STRANDED prefix: an unarmed branch whose test holds a line carrying the signature's first
+# STRAND_MIN characters but not the whole of it. It is a DIAGNOSIS beside the refusal, never an
+# arm — a prefix that armed would let any fragment satisfy the leg. A shorter quote is
+# indistinguishable from prose about the message, so below this bound nothing is named; a signature
+# shorter than this cannot strand by prefix, because a line holding all of it arms the branch.
+STRAND_MIN = 24
 
 
 class Problem(Exception):
@@ -70,16 +76,19 @@ def read(p):
         return fh.read().decode("utf-8", "replace").replace("\r\n", "\n")
 
 
+# TOOL-aWeldedTribunal-5 -- ONE `.memory-tree.conf` parser for the whole kit. Six readers held an
+# identical naive body while the shell gate SOURCES the same file, so a legal spelling bash accepts
+# and the python half mis-read REMOVED coverage with the gate still green. `row_grammar.py` already
+# used this sys.path pattern to reach a sibling; the edges are new and are priced in the unit's
+# section 4, against a backlog row that claimed reuse here was free.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from corpus_ids import parse_conf  # noqa: E402  the kit's ONE conf parser
+
 def load_conf(root):
     conf = {"MEMORY_ROOT": "memory", "ARMS_FLOORS": ""}
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
-        for line in read(p).split("\n"):
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            k, _, v = line.partition("=")
-            conf[k.strip()] = v.strip().strip('"').strip("'")
+        parse_conf(read(p), conf)
     return conf
 
 
@@ -110,8 +119,10 @@ def signature(message: str) -> str:
     FOR THE ARM AUTHOR: the run does not stop where the sentence does. A message ending
     `"... is not the remedy: refs/heads/$cur"` has the signature `... is not the remedy: refs/heads/`,
     trailing path fragment and all, because that text precedes the first interpolation. Only ':', '"'
-    and spaces are trimmed. An arm that stops at the last WORD reads as unarmed with no hint why;
-    run --report and copy the row it prints.
+    and spaces are trimmed. An arm that stops at the last WORD reads as UNARMED, and both --check's
+    refusal and --report name it STRANDED at its test line; --report prints every row's signature
+    WHOLE (it once cut rows at 72 characters, so the row it told the author to copy WAS the prefix
+    that stranded the arm — TOOL-aWokenSentinel-25), so copy that row rather than the source.
     """
     parts = [p.strip() for p in INTERP_RE.split(message)]
     parts = [p.rstrip(':" ').strip() for p in parts]
@@ -164,26 +175,28 @@ def branches(root: str, gate_rel: str) -> list:
     return out
 
 
-def armed_signatures(root: str, test_rel: str) -> set:
-    """Lines of the test file that could carry a POSITIVE assertion.
+def armed_signatures(root: str, test_rel: str) -> list:
+    """(line number, text) for every line of the test file that could carry a POSITIVE assertion.
 
     A COMMENT is not an arm. The test file's prose explains what each arm covers and naturally quotes
     the messages, so a comment-blind scan would let a branch read as armed on the strength of a
     sentence describing it — the same shape as the bare-`check N` mention and the absence assertion
     this function already refuses. All three are "something mentions it", not "something exercises
-    it".
+    it". The numbers are kept so a STRANDED prefix can be named at its line, over EXACTLY the
+    population the armed read walks: a comment quoting a message can no more be reported stranded
+    than it can be counted as an arm.
     """
     path = os.path.join(root, test_rel)
     if not os.path.isfile(path):
         raise Problem(f"check-arms: {test_rel} is missing, but its gate has `fail` branches — with no "
                       f"test file EVERY branch is unarmed and there is nothing to arm them with")
-    out = set()
-    for line in read(path).split("\n"):
+    out = []
+    for no, line in enumerate(read(path).split("\n"), 1):
         if line.lstrip().startswith("#"):
             continue
         if NEGATIVE_RE.match(line):
             continue
-        out.add(line)
+        out.append((no, line))
     return out
 
 
@@ -224,18 +237,33 @@ def classify(root: str, conf: dict, pairs=None) -> dict:
         # and both floors would go unchecked, and a second regression could land under cover.
         try:
             gb = branches(root, gate_rel)
-            lines = armed_signatures(root, test_rel)
+            numbered = armed_signatures(root, test_rel)
         except Problem as exc:
             errors.append(str(exc))
             continue
+        lines = {l for _, l in numbered}
         for b in gb:
             b["armed"] = any(b["sig"] in l for l in lines)
+        # A STRANDED prefix: the first arm-shaped line holding the signature's opening run but not
+        # the whole of it. Diagnosis only — the branch stays unarmed (TOOL-aWokenSentinel-25). A line
+        # that arms SOME branch of this gate is that branch's arm, never a sibling's stranded prefix:
+        # two messages of one gate opening with the same STRAND_MIN characters is a common shape, and
+        # without this exclusion the row names a whole, working arm as the line to lengthen.
+        arms = {l for l in lines if any(b["sig"] in l for b in gb)}
+        for b in gb:
+            b["stranded"] = None
+            if not b["armed"] and len(b["sig"]) >= STRAND_MIN:
+                head = b["sig"][:STRAND_MIN]
+                for no, l in numbered:
+                    if head in l and l not in arms:
+                        b["stranded"] = (test_rel, no)
+                        break
         brs.extend(gb)
     return {"branches": brs, "pinned": parse_pin(root, m), "errors": errors,
             "pairs": pairs, "m": m}
 
 
-def do_check(root: str, conf: dict) -> int:
+def cmd_check(root: str, conf: dict) -> int:
     st = classify(root, conf)
     brs, pinned, m = st["branches"], st["pinned"], st["m"]
     bad = list(st["errors"])
@@ -249,9 +277,11 @@ def do_check(root: str, conf: dict) -> int:
                            f"(the pin is shrink-only)")
             continue
         if key not in pin_keys:
+            hint = (f" — a STRANDED prefix at {b['stranded'][0]}:{b['stranded'][1]} stops short of "
+                    f"the signature; copy the whole row --report prints") if b["stranded"] else ""
             bad.append(f"check-arms: {b['gate']}:{b['line']} check {b['num']} branch {b['ord']} has "
                        f"no POSITIVE assertion naming its own failure text ({b['sig']!r}) and is not "
-                       f"pinned in {m}/{PIN}")
+                       f"pinned in {m}/{PIN}{hint}")
         elif pin_keys[key][3] != b["sig"]:
             bad.append(f"check-arms: {m}/{PIN}:{pin_keys[key][4]} pins {b['gate']} check {b['num']} "
                        f"branch {b['ord']} with a stale signature — the message was reworded")
@@ -267,7 +297,7 @@ def do_check(root: str, conf: dict) -> int:
     floors = parse_floors(conf)
     # A FLOOR NAMING A GATE THAT IS NOT IN THE POPULATION IS A FAILURE, not a skip. The loop below
     # walks the DISCOVERED gates and looks each floor up by key, so a floor whose gate vanished was
-    # simply never consulted: `do_check` returned 0 with no output. Measured — reformatting one gate's
+    # simply never consulted: `cmd_check` returned 0 with no output. Measured — reformatting one gate's
     # helper from `fail() {` to `fail () {` drops it out of discovery entirely, taking 14 branches and
     # 14 arms with it, and every floor stayed green. The pin has this guard already (above); the
     # floors did not, and with the pin empty by design the floors are the only backstop left.
@@ -294,7 +324,7 @@ def do_check(root: str, conf: dict) -> int:
     return 1 if bad else 0
 
 
-def do_report(root: str, conf: dict) -> int:
+def cmd_report(root: str, conf: dict) -> int:
     st = classify(root, conf)
     floors = parse_floors(conf)
     for gate_rel, test_rel in st["pairs"]:
@@ -304,15 +334,18 @@ def do_report(root: str, conf: dict) -> int:
         print(f"    branches {len(gb):>3} (floor {want[0]})   armed "
               f"{sum(1 for b in gb if b['armed']):>3} (floor {want[1]})")
         for b in gb:
+            # The signature prints WHOLE: this row is what the arm author copies, and a row cut at
+            # 72 characters was itself the prefix that stranded every arm over a long message.
+            tail = f"  STRANDED {b['stranded'][0]}:{b['stranded'][1]}" if b["stranded"] else ""
             print(f"      check {b['num']:>2} branch {b['ord']}  line {b['line']:>4}  "
-                  f"{'ARMED ' if b['armed'] else '      '} {b['sig'][:72]}")
+                  f"{'ARMED ' if b['armed'] else '      '} {b['sig']}{tail}")
     print(f"pinned rows   : {len(st['pinned'])}")
     for e in st["errors"]:
         print("ERROR " + e)
     return 0
 
 
-def do_emit_pin(root: str, conf: dict) -> int:
+def cmd_emit_pin(root: str, conf: dict) -> int:
     """Print the pin file for the CURRENT unarmed set — the measurement, not a guess."""
     st = classify(root, conf)
     print("# unarmed-branches.txt — `fail` branches with no positive assertion naming their own")
@@ -335,7 +368,7 @@ def _w(path, text):
         fh.write(text.encode("utf-8"))
 
 
-def do_selftest() -> int:
+def cmd_selftest() -> int:
     fails = []
 
     def arm(label, want, fn):
@@ -400,7 +433,7 @@ def do_selftest() -> int:
         _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
                 "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "p", "--no-verify", cwd=root)
-        arm("a fully pinned + armed population passes", None, lambda: do_check(root, conf))
+        arm("a fully pinned + armed population passes", None, lambda: cmd_check(root, conf))
         # gate A's (1,1) pinned must NOT exempt gate B's (1,1)
         _w(os.path.join(root, "tools", "gate-b.test.sh"), "# no arm here\n")
         _w(pin, "tools/gate-a.sh\t1\t1\talpha branch message here\n"
@@ -410,12 +443,12 @@ def do_selftest() -> int:
         out = []
         arm("a pin for gate A does not exempt gate B's same key",
             "tools/gate-b.sh:2 check 1 branch 1 has no POSITIVE",
-            lambda: _capture(do_check, root, conf, out))
+            lambda: _capture(cmd_check, root, conf, out))
         arm("...and raises no stale-signature line against gate B", "[rc=0]",
             lambda: 0 if not any("gate-b" in l and "stale signature" in l for l in out) else 1)
         arm("...and gate A's own armed branch is reported as wrongly pinned",
             "pins tools/gate-a.sh check 1 branch 1, which IS armed now",
-            lambda: _capture(do_check, root, conf, []))
+            lambda: _capture(cmd_check, root, conf, []))
 
         # a missing sibling test is a NAMED failure, and it does not abort the other gate
         _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
@@ -423,7 +456,7 @@ def do_selftest() -> int:
         os.remove(os.path.join(root, "tools", "gate-b.test.sh"))
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "rm", "--no-verify", cwd=root)
         arm("a gate with no sibling test is named", "gate-b.test.sh is missing, but its gate has",
-            lambda: do_check(root, conf))
+            lambda: cmd_check(root, conf))
         out2 = []
         _w(pin, "")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "e", "--no-verify", cwd=root)
@@ -431,27 +464,27 @@ def do_selftest() -> int:
         # where in that gate the branch happens to sit.
         arm("one gate's error does not hide the other gate's branches",
             "tools/gate-a.sh:4 check 1 branch 2 has no POSITIVE",
-            lambda: _capture(do_check, root, conf, out2))
+            lambda: _capture(cmd_check, root, conf, out2))
 
         # restore gate B, then the per-gate floors
         _w(os.path.join(root, "tools", "gate-b.test.sh"), "hit 'delta branch message here'\n")
         _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
                 "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=root)
-        arm("restored population passes", None, lambda: do_check(root, conf))
+        arm("restored population passes", None, lambda: cmd_check(root, conf))
         confh = dict(conf, ARMS_FLOORS="tools/gate-a.sh:4:1")
         arm("a per-gate branch floor catches a deleted guard",
             "tools/gate-a.sh has 3 fail branch(es) against a floor of 4",
-            lambda: do_check(root, confh))
+            lambda: cmd_check(root, confh))
         confa = dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:2")
         arm("a per-gate armed floor catches a dropped assertion",
             "tools/gate-a.sh has 1 armed branch(es) against a floor of 2",
-            lambda: do_check(root, confa))
+            lambda: cmd_check(root, confa))
         # CROSS-GATE COMPENSATION: an aggregate floor would be satisfied here; a per-gate one is not.
         confc = dict(conf, ARMS_FLOORS="tools/gate-a.sh:4:1 tools/gate-b.sh:0:0")
         arm("a per-gate floor is not satisfied by another gate's growth",
             "tools/gate-a.sh has 3 fail branch(es)",
-            lambda: do_check(root, confc))
+            lambda: cmd_check(root, confc))
 
         # A FLOOR whose gate is gone. The floors loop walks the DISCOVERED gates and looks each floor
         # up by key, so before this guard a floor for a vanished gate was never consulted at all:
@@ -459,11 +492,11 @@ def do_selftest() -> int:
         # hypothetical — reformatting `fail() {` to `fail () {` drops a gate out of discovery.
         confz = dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1 tools/gate-gone.sh:9:9")
         arm("a floor naming a gate outside the population is a failure",
-            "which is NOT in the discovered population", lambda: do_check(root, confz))
+            "which is NOT in the discovered population", lambda: cmd_check(root, confz))
         # ...and the same floor set with the gate PRESENT is silent, so the arm above is not passing
-        # because do_check reds on everything.
+        # because cmd_check reds on everything.
         arm("...and a floor whose gate IS discovered stays silent", "[rc=0]",
-            lambda: do_check(root, dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1")))
+            lambda: cmd_check(root, dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1")))
 
         # a pin whose GATE is gone names that, not "the guard was deleted"
         _w(pin, "tools/gate-z.sh\t1\t1\tvanished gate message here\n"
@@ -471,7 +504,7 @@ def do_selftest() -> int:
                 "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "z", "--no-verify", cwd=root)
         arm("a pin for a gate outside the population says so",
-            "the gate is no longer in the population", lambda: do_check(root, conf))
+            "the gate is no longer in the population", lambda: cmd_check(root, conf))
 
         # a signature present only in the PIN arms nothing
         arm("a signature present only in the PIN arms nothing", "[rc=0]",
@@ -486,7 +519,7 @@ def do_selftest() -> int:
         _w(pin, "")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "c", "--no-verify", cwd=root)
         outc = []
-        _capture(do_check, root, conf, outc)
+        _capture(cmd_check, root, conf, outc)
         arm("a comment naming the message does not arm", "[rc=0]",
             lambda: 0 if any("check 2 branch 1 has no POSITIVE" in l for l in outc) else 1)
         arm("an absence assertion does not arm", "[rc=0]",
@@ -496,7 +529,37 @@ def do_selftest() -> int:
         _w(os.path.join(root, "tools", "gate-a.sh"), HELPER + '[ -n "$a" ] && fail 1 "$X:\n"\n')
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "x", "--no-verify", cwd=root)
         arm("a message with no literal run is named", "no literal run long enough",
-            lambda: do_check(root, conf))
+            lambda: cmd_check(root, conf))
+
+        # A STRANDED prefix. `signature()` runs past the sentence to the first interpolation, so a
+        # test quoting the readable head of a long message reads UNARMED with nothing saying the
+        # line is there and short; --check and --report now name that line. The verdict does not
+        # move, and the report row holds the signature to its last character — a row cut at 72 was
+        # the prefix the gotcha told the author to copy (TOOL-aWokenSentinel-25).
+        LONG = ("epsilon branch message here runs long enough that a readable prefix of it "
+                "strands its arms")
+        # The second branch opens with the first's 40 characters: once the test arms branch 1 with
+        # the whole signature, that line holds branch 2's opening run and is NOT its stranded prefix.
+        _w(os.path.join(root, "tools", "gate-c.sh"),
+           HELPER + f'[ -n "$e" ] && fail 1 "{LONG}: $x"\n'
+           f'[ -n "$f" ] && fail 2 "{LONG[:40]} but this sibling ends another way: $y"\n')
+        _w(os.path.join(root, "tools", "gate-c.test.sh"), f"hit '{LONG[:40]}'\n")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "s", "--no-verify", cwd=root)
+        arm("a test quoting a prefix of a long message is named STRANDED at its line",
+            "STRANDED prefix at tools/gate-c.test.sh:1 stops short of the signature; copy the whole row",
+            lambda: cmd_check(root, conf))
+        arm("...and --report prints that row's signature whole, with the STRANDED line",
+            f"{LONG}  STRANDED tools/gate-c.test.sh:1",
+            lambda: cmd_report(root, conf))
+        # the CONTROL: the same test quoting the whole signature arms it, and nothing says STRANDED
+        _w(os.path.join(root, "tools", "gate-c.test.sh"), f"hit '{LONG}'\n")
+        run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "w", "--no-verify", cwd=root)
+        outs = []
+        _capture(cmd_report, root, conf, outs)
+        arm("...and the same test quoting the whole signature reads ARMED with no STRANDED token",
+            "[rc=0]",
+            lambda: 0 if any("ARMED " in l and l.rstrip().endswith(LONG) for l in outs)
+            and not any("STRANDED" in l and "gate-c" in l for l in outs) else 1)
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
@@ -522,7 +585,7 @@ def _capture(fn, root, conf, sink):
 def main(argv):
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
-        return do_selftest()
+        return cmd_selftest()
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
     except Exception:  # noqa: BLE001
@@ -531,11 +594,11 @@ def main(argv):
     conf = load_conf(root)
     try:
         if mode == "--check":
-            return do_check(root, conf)
+            return cmd_check(root, conf)
         if mode == "--report":
-            return do_report(root, conf)
+            return cmd_report(root, conf)
         if mode == "--emit-pin":
-            return do_emit_pin(root, conf)
+            return cmd_emit_pin(root, conf)
         print("usage: check-arms.py [--check|--report|--emit-pin|--selftest]")
         return 2
     except Problem as exc:

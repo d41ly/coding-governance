@@ -1,0 +1,263 @@
+# TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED
+
+**Status:** CLOSED · rev-5 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 3
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-01-build-TOOL-dBriefedPass-3-1-pass-order.md](../build/2026-09-01-build-TOOL-dBriefedPass-3-1-pass-order.md) | journal | — |
+| [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-prompt-TOOL-dBriefedPass-3.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-3.md) | journal | — |
+| [2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round2.md) | diff-review | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+Move the M2 hard floor from a rule an agent remembers to a refusal a machine makes. A build pass
+declared for a unit that is MISSING, THIN or out of its declared order is refused at the moment of
+the act, and a unit whose build commit predates a conforming spec reds the merge bar afterwards.
+
+## 2. Scope (IN)
+
+- **S1** — `--dispatch` REFUSES when its `--pass <unit-id>` names a unit whose `plan_state` is
+  `MISSING` or `THIN`. The message names the ID and the STATE, and NOT the empty section:
+  `plan_state`'s contract is one bare token on stdout, pinned deliberately at
+  `tools/unattended/unattended.sh:3231-3237` because two harnesses slice the function body, and
+  `TOOL-dBriefedPass-1` §3 declines to widen it. `build-complete` already words its own message the
+  same way for the same reason.
+- **S2** — `--dispatch` REFUSES when the unit's declared `order` step has an earlier step holding a
+  unit that is neither terminal nor itself dispatched. Units sharing an order value are the parallel
+  group and do not block each other; a unit with NO order verb is unordered and is not blocked.
+- **S3** — a new merge-bar check in a NEW script, `tools/unattended/check-pass-order.sh`: for every
+  unit the build README's generated region carries as CLOSED, the commit that BUILT it must have a conforming,
+  non-THIN spec for that id at its FIRST PARENT. The build commit is the earliest commit in
+  `BASE..HEAD` carrying the unit id in its subject and touching a file outside `spec/` and outside
+  `reviews/`.
+- **S4** — S3 is DATE-GATED by a new `.unattended.conf` declaration `PASS_ORDER_CUTOFF`, on the
+  build README's `opened:` date, for the reason every other cutoff in this conf exists: every build
+  that landed before this check cannot be rewritten, and a term that reds them is unlandable by any
+  run. BLANK or absent turns the term OFF and the check ANNOUNCES that it did.
+- **S5** — S3 reports a LIVENESS assertion on every run naming THREE counts, one per population it
+  walks: builds graded, builds skipped by the cutoff, and units `unbuilt-in-range`. The third is the
+  §4 step-2 population and omitting it would let a run whose every unit fell outside `BASE..HEAD`
+  print a clean two-count line while grading nothing — a liveness line naming fewer populations than
+  the check walks is a partial probe reporting as a whole one.
+- **S6** — the check is registered as its OWN leg, and FIVE declarations land in ONE COMMIT, because
+  a row in `tools/gate-legs.json` is not a declared leg. The row itself is
+  `{"name": "pass-order history", "argv": ["bash", "tools/unattended/check-pass-order.sh"],
+  "chunk": "declarations", "subject": "repo", "guard": [], "ceiling": <measured>}` — `chunk` from the
+  closed six, matching the sibling `unattended kit gate` row, because
+  `tools/run-gates/run-gates.gov.test.sh:337-346` reds unconditionally on an absent or out-of-set
+  chunk; `subject: "repo"` because a `kit` subject or a `selftests` chunk is HELD off every default
+  bar by `run-gates.sh:947`, which would ship a merge-bar refusal that never runs; and `guard: []`
+  with its reason stated, since a guard scoped to this kit would skip the leg on exactly the commits
+  that add a build. The other four: a `[[gate_leg]]` block in `tools/unattended/kit.toml` mirroring
+  its `:83-88` shape, whose `subject` must AGREE with the manifest's (`govkit.py:1317`, `:1345`) —
+  which SHIPS this leg to every adopter, and this unit makes that choice deliberately rather than by
+  omission; a row in `tools/govkit/subject-pins.tsv`, regenerated by
+  `python tools/govkit/govkit.py selfcheck --write`; the leg NAME added to the `gate-legs` claim in
+  `memory/map/features/unattended.md` with its prose refreshed; and the regenerated
+  `memory/map/generated/MAP.md` and `inventories.json`. `govkit selfcheck` and
+  `codebase-map coverage + freshness` are both `chunk: declarations`, `subject: repo`, NO guard, so
+  both run on every bar and a row landing without its four siblings reds them from this unit through
+  to landing. It is not a second row over `check-unattended.sh`: that
+  script's argv contract at `:85-90` accepts only `""`, `--only 28` and `--skip 28` and exits 2 on
+  anything else, and a second row over it would re-run all 28 checks and grade the whole of them
+  against this unit's ceiling.
+- **S8** — `PASS_ORDER_CUTOFF` LANDS WITH ITS PROTOCOL CARRIER, in the same commit as the conf key.
+  Check 22 of `tools/unattended/check-unattended.sh:1281-1317` joins conf keys in BOTH directions —
+  `undocumented` is the example minus the protocol's section-8 key table, `proj_extra` is the
+  repo-root conf minus that same table — so declaring the key into the two conf files without the
+  table row fires both failures at once, on a leg that carries no guard and therefore runs on every
+  bar. The carriers are `tools/unattended/PROTOCOL.template.md` section 8 and its render
+  `memory/guides/UNATTENDED-PROTOCOL.md`, because check 22 reads the RENDER for its doc keys and
+  check 10 byte-diffs the pair. `TOOL-cSettledDocket-14` is the open row stating the general rule.
+- **S7** — arms for every refusal, each observed RED before the guard exists and each observed GREEN
+  on the legitimate shape it must not refuse. TWO suites and exactly two, matching the two subjects:
+  the dispatch refusals of S1 and S2 are arms in `tools/unattended/unattended.test.sh`, and the
+  history check of S3 is arms in the NEW `tools/unattended/check-pass-order.test.sh`. At rev-3 this
+  item still named `check-unattended.test.sh`, which S3's move made wrong, while §4, §6 and §7 named
+  a third set — four sections describing one obligation three ways.
+
+## 3. Non-goals (OUT)
+
+- The check does not require a build pass to have been dispatched. `--dispatch` is owed by
+  CONCURRENT passes; making it mandatory for every pass is `TOOL-dBriefedPass-5`'s carrier edit, and
+  stating the requirement in two places would be two answers to one question.
+- The check does not grade whether the spec was GOOD, reviewed, or followed. `specs-audited` already
+  measures that a pre-code audit left evidence, and this is a strictly different question.
+- No existing gate leg is scoped, relaxed or exempted to make room for this one. That non-goal is
+  what forces S3's new script: the only alternative that keeps the check inside
+  `check-unattended.sh` is scoping the existing `unattended kit gate` row, and that leg is already
+  roughly 44 s over its declared `BUDGET_kit_gate=120` per the open `TOOL-aCollapsedScan-4`.
+- Retro-grading landed builds is explicitly out, by S4.
+
+## 4. Design
+
+### Data model
+
+S3's join, stated as the predicate rather than as prose, for each CLOSED unit id `U` under build
+`B`:
+
+1. `C` is the earliest commit in `BASE..HEAD` whose subject contains `U` as a WHOLE TOKEN and whose
+   diff touches at least one path outside `memory/builds/<B>/spec/` and `memory/builds/<B>/reviews/`.
+2. If no such commit exists, the unit contributes NOTHING and is counted as `unbuilt-in-range`. A
+   run whose units were built before its own BASE is the ordinary shape for a resumed build.
+3. Otherwise, at the first parent of `C`, a tracked file under `memory/builds/<B>/spec/` must carry
+   `U` in a conforming status header, and `plan_state` over that blob must not return `MISSING` or
+   `THIN`. Those two are the whole refused set, because `TOOL-dBriefedPass-1` adds no third outcome:
+   its duplicate-title case binds the first occurrence rather than refusing, so there is no
+   ungraded state for this predicate to mistake for a pass.
+
+The whole-token match is mandatory and its class is `memory/gotchas/id-matched-as-a-substring`:
+every id ending in a 1-up sequence is a prefix of nine others, so an unanchored `TOOL-x-1` would
+match `TOOL-x-19`'s commit and grade the wrong unit.
+
+### Migration
+
+`PASS_ORDER_CUTOFF` is seeded to the day this unit lands, so the population it grades starts empty
+and grows. S5's liveness line is what stops that empty population reading as a pass.
+
+### Alternatives rejected
+
+- **Refuse at COMMIT time via a hook.** Rejected: the pre-commit hook runs a fast leg and a
+  history-based join is not fast; and a hook is bypassable by the documented flag, which the
+  protocol already names as a lever it cannot close. The merge bar is where this binds.
+- **Assert the spec existed at BASE.** Rejected: the build method REQUIRES a run to author a missing
+  spec, so a BASE-anchored test would refuse the shape the method mandates. The first parent of the
+  BUILD commit is the correct anchor — it admits authoring, and refuses authoring AFTERWARDS.
+- **Grade every unit, not only CLOSED ones.** Rejected: an OPEN unit legitimately has no build
+  commit yet, so the term would red mid-build on every run including the one that must land it.
+
+### Files touched (estimate)
+
+`tools/unattended/unattended.sh` (the dispatch refusal), `tools/unattended/check-pass-order.sh` and
+`tools/unattended/check-pass-order.test.sh` (both NEW), `tools/unattended/unattended.test.sh`,
+`.unattended.conf`, `tools/unattended/.unattended.conf.example`,
+`tools/unattended/PROTOCOL.template.md` and its render `memory/guides/UNATTENDED-PROTOCOL.md` (S8's
+carriers), and S6's five declaration carriers: `tools/gate-legs.json`,
+`tools/unattended/kit.toml`, `tools/govkit/subject-pins.tsv`,
+`memory/map/features/unattended.md` and the regenerated `memory/map/generated/`.
+
+## 5. Production-readiness checklist
+
+- **Security · data · write surface** — none new. The check reads git history and tracked blobs.
+- **Performance** — one `git log` over the run's range per build plus one `plan_state` per graded
+  unit. `TOOL-aCollapsedScan-4` records the `unattended kit gate` leg already over its declared
+  120 s ceiling, so this check ships as its OWN leg with its own declared ceiling rather than
+  widening that one. A leg arriving without a ceiling reds by that fact.
+- **Error states** — S1's and S2's refusals each name the id, the state and the remedy.
+- **Observability** — S5's liveness line on every run, graded and skipped counts both.
+- **Testing** — S7, with the negative arms observed RED first.
+- **Migration · rollback** — the cutoff. Reverting is deleting the leg row and the conf key.
+
+## 6. Acceptance criteria
+
+- **AC1** — a dispatch naming a unit with no tracked spec is REFUSED, naming the id and `MISSING`.
+  Observed RED against the shipped driver, which accepts it today.
+- **AC2** — a dispatch naming a unit whose spec has an empty acceptance section is REFUSED, naming
+  the unit id and `THIN`. It does NOT name the empty section, and the arm asserts that wording: at
+  rev-1 this criterion required an output the classifier that owns the grade cannot emit, which made
+  two units of one build disagree about that classifier's interface.
+- **AC3** — in `tools/unattended/unattended.test.sh`, a dispatch at order 3 while an order-2 unit is OPEN and undispatched is REFUSED naming
+  the blocking unit; the same call with that unit CLOSED succeeds. Both arms, because a refusal with
+  no observed passing case is a gate that cannot be satisfied.
+- **AC4** — the equal-order and no-order branches of S2 are DECLARED UNEXERCISED, and the arms that
+  would cover them are `TOOL-dBriefedPass-6`. No fixture spec in the driver suite carries an `order`
+  verb, so the block is skipped rather than passed in every existing arm; and the `tRun` fixture's
+  units region emits one row, which makes the sibling population zero and an out-of-order arm
+  unconstructible without a new fixture. Declaring it is the honest form: rev-4 claimed the suite
+  covered both branches and it covers neither.
+- **AC5** — in `tools/unattended/check-pass-order.test.sh`, a staged fixture repo where a unit's build commit precedes its spec commit reds the new
+  leg, and the message names the unit and both shas. Staged, confirmed RED, unstaged.
+- **AC6** — in `tools/unattended/check-pass-order.test.sh`, the same fixture with the spec commit FIRST is green. The passing case, observed.
+- **AC7** — with `PASS_ORDER_CUTOFF` blank the leg prints its announced-OFF line and exits 0, and
+  with it set the leg prints all THREE of S5's counts. One arm runs a fixture whose units all fall
+  outside `BASE..HEAD` and asserts the `unbuilt-in-range` count is printed and non-zero, because a
+  count that only ever appears as zero is a count nothing proved is wired.
+- **AC8** — `bash tools/unattended/check-unattended.sh` is GREEN with `PASS_ORDER_CUTOFF` declared,
+  which is check 22 in both directions over the new key. This is the criterion S8 exists for, and it
+  is the mirror of `TOOL-dBriefedPass-2` AC7.
+- **AC9** — the new leg's row is present in `tools/gate-legs.json` with a numeric `ceiling`, and
+  `bash tools/run-gates/run-gates.sh` SCHEDULES it — witnessed POSITIVELY, by the leg's own named row
+  appearing in the run's per-leg output and in `<git-dir>/gate-ledger.tsv` with a non-zero duration.
+  Not by the absence of an unbounded-leg warning: that warning prints counts only and only when
+  non-zero, so silence there is satisfied by a leg that was never scheduled at all, which is the one
+  outcome this criterion exists to refuse.
+- **AC10** — `python tools/govkit/govkit.py selfcheck` and
+  `python3 tools/codebase-map/test_codebase_map.py` are both GREEN with the new leg declared. These
+  are S6's two unguarded enforcers, and they are the criterion for the four declarations beyond the
+  manifest row.
+
+## 7. Gates
+
+`bash tools/run-gates/run-gates.sh` · `unattended kit gate` · the new leg itself ·
+`run-gates canary` · `run-gates gov canary` · `govkit selfcheck` ·
+`codebase-map coverage + freshness` · `kit version markers` · `memory hygiene`. Every name resolves against
+`tools/gate-legs.json`; `unattended driver selftest` and `gate manifest shape` were listed at rev-2
+and resolve to nothing — the two canaries are the legs that actually grade a manifest row. The
+driver suite is not on the bar by the owner's 2026-08-23 ruling, so S7's arms are witnessed by
+running `tools/unattended/unattended.test.sh` and the new `check-pass-order.test.sh` directly, with
+the verdict owed in the landing report.
+
+## 8. Open questions
+
+none
+
+## 9. Revision log
+
+- rev-1 · 2026-09-01 · authored under the dBriefedPass mandate.
+- rev-2 · 2026-09-01 · round-1 spec-audit fold. H5 (finding 40): S1 and AC2 required the refusal to
+  name the empty SECTION, which `plan_state` cannot emit — its single-token contract is a recorded
+  decision and `TOOL-dBriefedPass-1` §3 now states that it is not widened — so both are weakened to
+  the id and the state, which is the wording `build-complete` already defends. H2's consumer half
+  (finding 22): §4 step 3 now says why MISSING and THIN are the complete refused set rather than
+  leaving a third outcome unhandled.
+- rev-3 · 2026-09-01 · round-2 spec-audit fold. B2 (finding 24): S3, S6 and §5 were jointly
+  unsatisfiable — S3 put the check inside `check-unattended.sh`, whose argv contract admits no
+  selector and whose only manifest row is the over-budget `unattended kit gate`, while S6 and §5
+  required its own leg with its own ceiling and §3 forbade scoping the existing row. The check moves
+  to a new script. B1 (finding 35): `PASS_ORDER_CUTOFF` was declared into both conf files with no
+  protocol carrier, firing check 22 in both directions on an unguarded leg from this unit through to
+  landing, and spec 5 §3 had refused the key in writing — S8 brings the carriers here and AC8
+  observes the join. H3 (finding 3): the unit had no criterion reading its own manifest row, so AC9;
+  and §7 named two legs that resolve to nothing. M3 (finding 8): S5's liveness line reported two
+  counts over a three-population check.
+- rev-5 · 2026-09-01 · closing diff review, M3. AC4 claimed `tools/unattended/unattended.test.sh`
+  covered the order gate's equal-order and no-order branches; it covers neither, and no fixture spec
+  in that suite carries an `order` verb at all, so the whole block is SKIPPED in every arm including
+  the one that reads as the passing case. The criterion now DECLARES the gap and names
+  `TOOL-dBriefedPass-6` for the fixture work, which is not done here because the fixture is shared by
+  a suite this node may not run and unverifiable test code is worse than a recorded gap.
+- rev-4 · 2026-09-01 · round-3 spec-audit fold, at the NON-CONVERGENT exit. Every blocker still
+  standing is DISPOSED and all three were defects in documents the review was reading, so all three
+  FOLD; none needed a mechanism this build lacks and none is promoted. B1 (findings 1, 7, 18, 26, 28
+  and 20): S6 treated a `tools/gate-legs.json` row as the whole of declaring a leg, and four more
+  declarations are enforced on two UNGUARDED legs — a kit descriptor block, a `subject-pins.tsv`
+  row, a map dossier claim and the regenerated map artifacts — so the row alone would have red the
+  bar from this unit through to landing. Third instance of the same class in three rounds, and the
+  first two were this build's other two blockers. S6 now states the row's full shape and all five
+  carriers, §4 lists them, AC10 observes the two enforcers. H1 (AC9's witness was the ABSENCE of an
+  unbounded-leg warning, which prints only when non-zero, so silence satisfied it whether or not the
+  leg ran). H3 (four sections named three different test-file sets for one obligation, rev-3
+  collateral: S3's move to a new script was not carried into S7).
+
+## 10. Reuse audit
+
+No existing seam fits the history join in S3, and the evidence is that `plan_state` is called at
+exactly two sites in the shipped driver — `tools/unattended/unattended.sh:2067` in `--plan`, which
+only reports, and `:3271` in the `build-complete` term, which runs after every commit has landed.
+Neither is a refusal at the moment of the act, which is the whole gap. What IS extended, cited by
+path: `pass_commit` in `tools/unattended/lib-unattended.sh:98-109` already resolves the commit that
+carries a unit id in its subject and touched a declared path, which is step 1 of S3's predicate, and
+`TOOL-dCarriedReceipt-3` records its known limitation for FOLD passes spanning many units — read
+that row before extending it.
+
+Recall terms used: unattended mandate pass ordering workflow harness spec before code regrounding
+compaction driver orchestration agent-cap fan-out build-method handoff prompt.

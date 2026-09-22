@@ -291,34 +291,49 @@ hold the same version with different refusals. Refused to drop it silently; it i
 five to reverse.
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aRuledFrontispiece-1` | 2 | the build README gets a slot contract and an immutable authored plan |
+| 2 | `TOOL-aRuledFrontispiece-10` | 2 | the corpus retrofit and the kit version bump |
+| 3 | `TOOL-aRuledFrontispiece-11` | 2 | the corpus is conformed to the slot contract, by hand |
+| 4 | `TOOL-aRuledFrontispiece-2` | 2 | build order and parallel groups become a header verb and a region |
+| 5 | `TOOL-aRuledFrontispiece-3` | 2 | dependency edges between builds, declared once and rendered both ways |
+| 6 | `TOOL-aRuledFrontispiece-4` | 2 | the build README gets a generated document inventory |
+| 7 | `TOOL-aRuledFrontispiece-5` | 2 | the build README joins the hygiene index set at its own cap tier |
+| 8 | `TOOL-aRuledFrontispiece-6` | 2 | the slot contract becomes a leg of its own on the merge bar |
+| 9 | `TOOL-aRuledFrontispiece-7` | 1 | the STATUS.md slot is retired |
+| 10 | `TOOL-aRuledFrontispiece-8` | 2 | check 8 stops judging a run it can no longer repair |
+| 11 | `TOOL-aRuledFrontispiece-9` | 2 | the build method's roster claim and its parallelism test are corrected |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 11 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-1.md) | CLOSED | rev-4 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-10 — the corpus retrofit and the kit version bump](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-10.md) | CLOSED | rev-2 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-2 — build order and parallel groups become a header verb and a region](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-2.md) | WONTDO | rev-3 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-3 — dependency edges between builds, declared once and rendered both ways](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-3.md) | WONTDO | rev-3 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-4 — the build README gets a generated document inventory](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-4.md) | WONTDO | rev-3 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-5 — the build README joins the hygiene index set at its own cap tier](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-5.md) | CLOSED | rev-2 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-6 — the slot contract becomes a leg of its own on the merge bar](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-6.md) | CLOSED | rev-2 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-7 — the STATUS.md slot is retired](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-7.md) | CLOSED | rev-2 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-8 — check 8 stops judging a run it can no longer repair](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-8.md) | CLOSED | rev-2 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-9 — the build method's roster claim and its parallelism test are corrected](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-9.md) | CLOSED | rev-2 | 2026-08-17 |
-| [TOOL-aRuledFrontispiece-11 — the corpus is conformed to the slot contract, by hand](spec/2026-08-17-spec-TOOL-aRuledFrontispiece-11.md) | CLOSED | rev-1 | 2026-08-17 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-1.md) | — | 2 | CLOSED | rev-4 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-10 — the corpus retrofit and the kit version bump](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-10.md) | — | 2 | CLOSED | rev-2 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-11 — the corpus is conformed to the slot contract, by hand](spec/2026-08-17-spec-TOOL-aRuledFrontispiece-11.md) | — | 2 | CLOSED | rev-1 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-2 — build order and parallel groups become a header verb and a region](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-2.md) | — | 2 | WONTDO | rev-3 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-3 — dependency edges between builds, declared once and rendered both ways](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-3.md) | — | 2 | WONTDO | rev-3 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-4 — the build README gets a generated document inventory](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-4.md) | — | 2 | WONTDO | rev-3 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-5 — the build README joins the hygiene index set at its own cap tier](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-5.md) | — | 2 | CLOSED | rev-2 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-6 — the slot contract becomes a leg of its own on the merge bar](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-6.md) | — | 2 | CLOSED | rev-2 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-7 — the STATUS.md slot is retired](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-7.md) | — | 1 | CLOSED | rev-2 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-8 — check 8 stops judging a run it can no longer repair](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-8.md) | — | 2 | CLOSED | rev-2 | 2026-08-17 |
+| [TOOL-aRuledFrontispiece-9 — the build method's roster claim and its parallelism test are corrected](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-9.md) | — | 2 | CLOSED | rev-2 | 2026-08-17 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 4 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md](build/2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md) | journal | TOOL-aRuledFrontispiece-11 |
-| [2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md](reviews/2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md) | spec-audit | TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11 |
-| [2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md](reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md) | spec-audit | TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11 |
-| [2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md](reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md) | diff-review | TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -330,25 +345,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-1.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-1.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-10.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-10.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-2.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-2.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-3.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-3.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-4.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-4.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-5.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-5.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-6.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-6.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-7.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-7.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-8.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-8.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-9.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-9.md)
-  - [2026-08-17-spec-TOOL-aRuledFrontispiece-11.md](spec/2026-08-17-spec-TOOL-aRuledFrontispiece-11.md)
-- **`build/`**
-  - [2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md](build/2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md)
-- **`reviews/`**
-  - [2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md](reviews/2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md)
-  - [2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md](reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md)
-  - [2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md](reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md)
-<!-- /gen:build-docs -->

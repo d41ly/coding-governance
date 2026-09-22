@@ -2,6 +2,18 @@
 
 **Status:** CLOSED · rev-5 · 2026-08-18 · node a · Tier-2 · base 497d25d0 · streams tooling · ratified 2026-08-18
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md](../build/2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md) | research | — |
+| [2026-08-18-review-TOOL-aDeclaredBound-1-2.md](../reviews/2026-08-18-review-TOOL-aDeclaredBound-1-2.md) | spec-audit | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 |
+| [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md](../reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md) | diff-review | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 |
+| [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md](../reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md) | diff-review | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 |
+| [2026-08-18-review-TOOL-aDeclaredBound-1.md](../reviews/2026-08-18-review-TOOL-aDeclaredBound-1.md) | spec-audit | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `5` is asserted as the enforced fan-out cap across the live document surface. While the number is a

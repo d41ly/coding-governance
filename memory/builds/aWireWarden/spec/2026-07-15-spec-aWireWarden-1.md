@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base 06f5632f · review wf_f0164aef · ratified 2026-07-15
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Detect coding-governance tools that are installed in a repo but not wired, and surface or auto-wire

@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-08 · node a · Tier-2 · base 42c3f4dc · streams tooling · ratified 2026-08-08
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-08-review-TOOL-aFoldedQuarry-1-7.md](../../reviews/2026-08-08-review-TOOL-aFoldedQuarry-1-7.md) | diff-review | TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2 TOOL-aFoldedQuarry-3 TOOL-aFoldedQuarry-4 TOOL-aFoldedQuarry-5 TOOL-aFoldedQuarry-7 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-6-5.md](../../reviews/2026-08-08-review-TOOL-aFoldedQuarry-6-5.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Give the kit a catalogue of recurring bug classes that a reviewer is HANDED rather than pointed at:

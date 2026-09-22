@@ -8,13 +8,14 @@ streams = ["deployer", "tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["govkit selfcheck", "govkit selftest", "govkit refusal join", "govkit acceptance matrix"]
+gate-legs = ["govkit selfcheck", "govkit selftest", "govkit refusal join", "govkit acceptance matrix", "govkit runbook parity"]
 kits = ["govkit"]
 git-hooks = []
 workflow-scripts = []
 skill-engines = ["deploy-governance"]
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["fixture-lacks-a-gate-the-consumer-has.md",
+  "guard-above-a-fold-makes-its-fallback-dead.md"]
 guides = []
 backlog-shards = ["DEPL.md"]
 lexicon-verbs = []
@@ -78,10 +79,19 @@ at only one install prefix. The walk inherits nothing and is correct at any pref
 
 - `tools/govkit/registry.toml` — the population: entries with their descriptor paths, the surface
   globs, and the exemptions with their reasons.
-- `tools/govkit/govkit.py` — `selfcheck`, the read-only `plan` and `check`, and `apply` /
-  `apply --resume` with the receipt, and `intake`. All five verbs. `apply` lands the roles it can
+- `tools/govkit/govkit.py` — `selfcheck`, the read-only `plan`, `check`, `update` and `adopt`, the
+  writing `apply` / `apply --resume` with the receipt, and `intake`. **The COUNT is not spelled**,
+  here or in that file's docstring: this line read "all five verbs" from the commit that landed the
+  sixth until `DEPL-dCarriedReceipt-13` landed the seventh, and `USAGE` and `main`'s dispatch tuple
+  own the set between them with a selftest arm joining the two. `apply` lands the roles it can
   honour and refuses the others BY NAME, and reports the two steps of the hard order it cannot
-  perform on every run rather than skipping them quietly.
+  perform on every run rather than skipping them quietly. `adopt` is the BOOTSTRAP — it writes the
+  receipt an already-installed tree never had by measuring that tree against gov's own history, and
+  it is the only path onto the engine for a repo somebody vendored kits into by hand.
+- `tools/check-install-prefix.sh` — TWO arms over two populations and two prefixes: the ROOT
+  spelling over a glob-derived shipped surface, and the SHIPPING spelling inside the set the
+  descriptors declare shippable, ratcheted per file at `tools/install-prefix-carried.txt`. The
+  second is inert where the repo is not a kit source and says so rather than passing silently.
 - `tools/govkit/selftest.py` — every refusal and reported state, exercised in throwaway repos. Each
   arm asserts a specific MESSAGE or on-disk effect, never an exit code alone: an exit code shared by
   six unrelated outcomes is the ambiguity the descriptors' outcome probes exist to resolve.
@@ -98,6 +108,11 @@ non-empty reason. Never by editing a listing.
 seam: `govkit.py selfcheck` — reuse for asserting a declared population against a tracked surface in
 both directions; extend via a new arm inside `selfcheck`, which is the single home for every
 registry-shaped assertion this unit adds.
+
+seam: `derive_marker_coupling` — reuse for "which kits must move together because one ships the
+other's version marker", read from each descriptor's `marker_carriers` and owned through
+`entry_members`; `update --kits` closes its scope over it. Extend via a descriptor's
+`marker_carriers`, never by naming a kit pair in code.
 
 seam: `refusal_join.py` — reuse for "is every branch of this shape reached by something that
 asserts it", over any Python population; extend via the matcher in `_is_refusal`, which is the one

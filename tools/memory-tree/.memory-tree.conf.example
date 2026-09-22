@@ -43,12 +43,134 @@ SPEC_WITNESS_CUTOFF=""
 # corpus; lower it to ratchet an existing corpus toward the ten-section canon.
 SPEC10_CUTOFF="2026-08-04"
 
+# The FIFTH cutoff, and it takes the semantics of the three RULE cutoffs rather than SPEC10_CUTOFF's:
+# blank means OFF. A Tier-2 spec dated >= this must RECORD its reuse audit in §10 — the recall terms
+# used, AND the probe result (a `reuse_lookup` citation, an explicit "no existing seam fits", or a
+# named `reuse-first` waiver). Without it, check 12 grades §10 on presence and non-emptiness alone,
+# so "N/A — none" is a passing reuse audit and BUILD-METHOD M7's regrounding step 5 has no terms to
+# re-run. Set it STRICTLY AHEAD of every dated spec on every live branch, not just your own: a
+# cutoff on today's date reds this leg on the default branch for every in-flight branch carrying a
+# spec dated today. Your corpus then exercises neither arm, which is why the kit self-test carries
+# red and green fixtures for both.
+SPEC10_EVIDENCE_CUTOFF=""
+
+# Rev-scope ratchet (check 12): from this date, a §9 revision entry numbered rev-2 or higher must
+# name what it MOVED — at least one `§<n>`, `S<n>` or `AC<n>` token anywhere in the entry, with
+# continuation lines folded in. rev-1 is exempt, because a first draft moved everything. Blank =
+# never required. Set it STRICTLY AHEAD of every dated spec on every live branch AND ahead of a date
+# your fleet can still write into, as with the cutoffs above; your corpus then exercises neither arm,
+# which is why the kit self-test carries red and green fixtures for both. The engine prints a
+# zero-population notice while that is true, so the silence is announced rather than assumed.
+REV_SCOPE_CUTOFF=""
+
+# Scope-join ratchet (check 12): from this date, every column-0 item in a spec's `## N. Scope (IN)`
+# must name at least one acceptance criterion — `AC` followed by digits — or carry the marker
+# `NOT OBSERVED` and the reason none observes it. One escape spelling and no synonyms, because a
+# false red names its own remedy while a false pass is silent. The arm needs BOTH the Scope and the
+# Acceptance heading present, matched by heading TEXT rather than by ordinal, so a Tier-1 spec that
+# legitimately writes no acceptance section is untouched. Blank = never required. Set it STRICTLY
+# AHEAD of every dated spec on every live branch, as with the cutoffs above; the engine prints a
+# zero-population notice for as long as that leaves the arm grading nothing.
+SCOPE_JOIN_CUTOFF=""
+
+# Failure-mode ratchet (check 12): from this date, every numbered acceptance bullet must name the
+# break that would turn it red, in a clause marked `Red when:`, matched case-insensitively as a
+# substring so it may sit on a continuation line. No `N/A` and no second form. It reads THIS key and
+# no other — the per-bullet walk it rides is hoisted out of the acceptance-witness guard, so arming
+# this key while SPEC_WITNESS_CUTOFF stays blank gives you a live arm rather than a silent one.
+# Blank = never required; set it strictly ahead of your corpus as with the cutoffs above.
+SPEC_FAILURE_MODE_CUTOFF=""
+
+# Two BRANCHES of check 23 (the acceptance ledger), never independent checks: a blank
+# ACCEPTANCE_LEDGER_CUTOFF disarms both whatever these say. LEDGER_LABEL_CUTOFF walks the LEDGER
+# side and reds an answer whose criterion label the spec does not number — every other arm walks the
+# spec side, so that direction was unwatched. LEDGER_TOKEN_CUTOFF requires an answer to share a
+# backticked token with the criterion it answers, so the two are joined by content rather than by
+# label alone. Case-folded containment either way, and an empty list on either side is silent.
+# Blank = off for each; set them strictly ahead of your corpus as with the cutoffs above.
+LEDGER_LABEL_CUTOFF=""
+# Its own block, not a shared one: the contiguous comment lines directly above a key row are what
+# a reader and the gate both take as that key's documentation. Same rule — a BRANCH of check 23,
+# so a blank ACCEPTANCE_LEDGER_CUTOFF disarms it whatever this key says.
+LEDGER_TOKEN_CUTOFF=""
+
+# Sibling-edge ratchet (check 12): from this date a Tier-2 spec carries a `### Edges` sub-head inside
+# §3, holding one bullet per edge or the single word `none` — `**consumes-from**` or `**hands-off**`,
+# then a backticked sibling unit id or the bare word `external`. The SHAPE arm reads one spec and
+# runs under `--staged` too; the reciprocity, order and payload JOINS are held there and say so,
+# because the staged selection would report one end of a correct pair as missing. A join whose target
+# is outside the graded population is silent by design, not passing. Blank = never required; set it
+# strictly ahead of your corpus as with the cutoffs above.
+SPEC_EDGES_CUTOFF=""
+
+# The §5 production-readiness row LABELS, in skeleton order, `|`-separated. This is the ONLY literal
+# row set — the spec template renders it through `{{READINESS_ROWS}}` and no script carries a default
+# copy. IT IS YOURS TO CHANGE: edit this one string and re-run the render. The ten below are a
+# starting point, not a rule; gov's own conf declares eight, having dropped `a11y` and `i18n` because
+# it ships no user interface. Keep it on ONE line — a wrapped value reaches the retrieval corpus by
+# its first row only.
+READINESS_ROWS="security|perf / scale|a11y|i18n|error / empty / loading states|observability|risks|testing|migration|user docs"
+# The date from which check 12 requires every declared row to appear in a Tier-2 spec's §5 body.
+# Blank = never required; set it strictly ahead of your corpus as with the cutoffs above.
+READINESS_ROWS_CUTOFF=""
+
+# Base-resolve ratchet (check 12): from this date a LIVE spec must have the `base` sha in its status
+# header resolve to a real commit here. Both tiers — `base` is a field both carry. Terminal specs are
+# excluded, because a landed record is frozen. Every distinct sha goes through ONE
+# `git cat-file --batch-check`, and the arm SKIPS itself with a stderr line in a shallow clone, where
+# every commit outside the fetch depth answers `missing` and it could only red honest work. Blank =
+# never required; set it strictly ahead of your corpus as with the cutoffs above.
+BASE_RESOLVE_CUTOFF=""
+
+# Section-7 leg-line ratchet, read by the spec-tokens checker rather than by the hygiene engine:
+# from this date a LIVE spec that CARRIES a `## N. Gates` heading must contribute at least one leg
+# name your gate manifest resolves. A spec with no Gates heading is silent, which is the whole Tier-1
+# accommodation. Blank = never required. Declared here because a key that reaches only the shipping
+# repo's conf leaves an adopter a dead arm reading as armed.
+SPEC_LEGLINE_CUTOFF=""
+
+# Bar-invocation ratchet, read by the spec-tokens checker rather than by the hygiene engine: from
+# this date a LIVE spec whose acceptance bullet or §7 leg line backticks a merge-bar or self-test
+# suite invocation is red — a bar or a suite is not an acceptance observation; observe the checker
+# on a staged break, a --selftest flag or a fixture, and name the suite under `New arm:`. Set it to
+# the day AFTER the later of your newest spec filename date on any ref and the setting commit's own
+# date; the checker refuses a value not strictly past the day it was committed. Blank = never
+# required, and the report line then counts the live specs carrying such a token. Declared here by
+# hand for the same reason as the row above: the example-parity arm cannot see this key.
+SPEC_DIRECT_CUTOFF=""
+
+# Guarded-leg ratchet, read by the spec-tokens checker rather than by the hygiene engine: from this
+# date a LIVE spec's §7 leg line must name every leg in your gate manifest whose `guard` any
+# backticked path under the spec's §4 `### Files touched` sub-head trips (the exact path, or under
+# the guard as a directory; a directory token of two or more segments is a declared prefix and trips
+# symmetrically, a one-segment root such as `tools/` is prose and declares nothing). BROAD guards —
+# carried by more than the checker's `BROAD_LEG_FLOOR` legs, whatever their depth — are excluded and
+# listed by `--list` as near-misses, and the excluded set prints with its counts on every run; a leg
+# with no `guard` key is never owed; a spec with no Gates heading is not joined. Set it strictly
+# past your corpus as with the two above; the checker refuses a committed value not strictly past
+# the day it was committed.
+# Blank = never required, and the report line then counts the live specs carrying such an omission.
+# Declared here by hand for the same reason as the rows above: the example-parity arm cannot see it.
+SPEC_GUARD_LEGS_CUTOFF=""
+
+# Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
+# item must mark the SECTION with the documented resolution shape before its status may go terminal.
+# Blank = never required. Set it ahead of your corpus at adoption, as with the two above.
+FORK_MARK_CUTOFF=""
+
+# Review-verdict ratchet (check 22): a review record whose FILENAME date is on or after this must
+# open with one `## Verdict: <member>` line from the closed set. Blank = never required. Same
+# grandfathering rule; the wrap-up derivation reads these verdicts, so a corpus without them makes
+# that derivation resolve to nothing.
+REVIEW_VERDICT_CUTOFF=""
+
 # The document a session is pointed at before it touches code; check 16 derives the mandatory read
 # path from it. Usually AGENTS.md or CLAUDE.md.
 CHARTER="AGENTS.md"
 
-# --- corpus_ids.py (checks 13-16). Every number below is MEASURED against YOUR corpus by
-# --- `python memory-tree/corpus_ids.py --measure`, and NEVER inherited from another repo: a pin
+# --- corpus_ids.py (checks 13-15; check 16 is STRUCTURAL and behind no pin). Every number below
+# --- is MEASURED against YOUR corpus by
+# --- `python <kit>/corpus_ids.py --measure`, and NEVER inherited from another repo: a pin
 # --- copied from a larger tree is either vacuous or permanently red. Blank turns its check off.
 # --- Ship them blank, run --measure once the tree has content, and paste what it prints.
 # Orphan ids: cited but never defined. Shrink-only once set.
@@ -56,16 +178,11 @@ ORPHAN_ID_PIN=""
 # Dead repo-path citations in the present-tense corpus. Measure 0 on a fresh tree and it becomes a
 # ratchet: the next unresolving citation reds until it is registered or repaired.
 DEAD_PATH_PIN=""
-# The charter's read path under MEMORY_ROOT, in bytes, plus headroom. One-sided: a session's
-# mandatory reading is a budget, and a new binding doc spends from it visibly.
-READ_PATH_CEILING=""
-# The headroom `--measure` ADDS to the measured total when it prints a ceiling for you to paste
-# above. Advice to an author, never an input to check 16 — that check compares the measured total
-# against READ_PATH_CEILING alone, because a ceiling COMPUTED from a headroom would let a growing
-# corpus raise its own budget. ABSENT = the kit's default, which is larger than one member of the
-# largest class on a typical read path. Declare your own if your tree grows continuously rather
-# than in rare jumps: a headroom that cannot absorb one more binding document absorbs nothing.
-READ_PATH_HEADROOM=""
+# READ_PATH_CEILING and READ_PATH_HEADROOM were RETIRED in memory-tree 2.42. Check 16 no longer
+# sums the read path: check 6 already caps every member by class, so the sum was a second bound over
+# an already-bounded population, and across 27 movements it never once caused a trim. A conf that
+# still declares either key is ANNOUNCED on every run and reds nothing — delete the line when you
+# see it. What survives is check 16's rules 3 and 4, which are STRUCTURAL and behind no pin.
 # Check 6's per-class size caps. Declared here with the SHIPPED values rather than blank, because
 # blank is not 'use the default' for these: the gate SOURCES this file, so an empty assignment
 # overrides the built-in with an empty string and is refused at startup. Delete a line to take the
@@ -74,8 +191,8 @@ READ_PATH_HEADROOM=""
 # every file in its class, which reads as a misconfiguration rather than an intent.
 INDEX_CAP_BYTES="20480"         # a row document: an index a curation sweep prunes
 INDEX_CAP_LINES="250"
-GUIDE_CAP_BYTES="61440"         # a guide: prose the charter points a session at, read end to end
-GUIDE_CAP_LINES="750"
+GUIDE_CAP_BYTES="98304"         # a guide: prose the charter points a session at, read end to end
+GUIDE_CAP_LINES="1200"
 BUILD_README_CAP_BYTES="25600"  # a build README: generated regions plus one bounded authored block
 BUILD_README_CAP_LINES="0"
 # Codebase-map dossiers, when that kit is adopted under this tree. Kept TIGHTER than the row cap on
@@ -89,6 +206,30 @@ DOSSIER_CAP_LINES="0"
 # because it reds every line rather than expressing an intent.
 ENTRY_CAP_CHARS="300"           # a row document
 BUILD_README_ENTRY_CAP_CHARS="350"  # a build README, whose authored rows were measured wider
+
+# ROTATION_MODE — what a ROTATION MEANS for a status-bearing shard. TWO values and no third:
+#   cut       the archive holds TERMINAL rows only (CLOSED/WONTDO); every non-terminal row stays in
+#             the live shard. Live and archive PARTITION the family, so an id sits in exactly ONE
+#             file and its status has exactly one owner.
+#   snapshot  `git mv` the whole index to the archive, then open a fresh one carrying the
+#             non-terminal rows forward. A live id then sits in TWO files, the archived copy being a
+#             dated photograph of the index rather than a second answer about that id's status.
+# BOTH ARE COHERENT. They are different DISCIPLINES, not different strictnesses, which is why there
+# is no default and no forward resolution: neither is the safe fallback, and a tree graded under the
+# other project's discipline reports green over rows nobody reconciled.
+# THIS REPO DECLARES cut. The shipped example declares snapshot — the deliberate example/gov
+# divergence READINESS_ROWS above already records — because snapshot is what this kit's prose has
+# always described and what inCMS practises (its scripts/rotate_index.py R1-R6 and carry_backlog.py).
+# MEASURED, and the reason the key exists: memory/HYGIENE.md stated BOTH procedures in one paragraph
+# — move the whole file AND carry every non-terminal row forward — and the pair writes every live row
+# into a frozen file. memory/archive/TOOL.2026-08-17.md is what that produced: a header promising
+# terminal rows only over 90 rows of which 66 were not, 49 ids also live in the shard and 7 of those
+# disagreeing about status. TOOL-cSpliceWarden-1, owner-ratified 2026-09-12.
+# BLANK IS UNDECLARED, and nothing refuses it today. That is the honest cost of not breaking every
+# adopter tree on a kit upgrade, and it is weaker than this comment's "no default" reads: an adopter
+# can run forever undeclared. An UNRECOGNISED value is a different answer from a blank one and does
+# NOT collapse into it — it aborts the engine at exit 2, beside ENTRY_CAP_UNIT.
+ROTATION_MODE="snapshot"
 # Path prefixes that are NOT repo CONTENT (e.g. a worktree root). Resolution is `git ls-files`
 # membership plus a prefix scan and never touches the filesystem, so a checkout LOCATION classifies
 # identically on every node — which is why the answer is declared here rather than probed.
@@ -125,3 +266,37 @@ ACCEPTANCE_LEDGER_CUTOFF=""
 # the rule above. For the units that close across the cutoff date, where a date boundary falling
 # mid-day is the whole of the reason. Naming them individually is what keeps the exemption auditable.
 ACCEPTANCE_LEDGER_GRANDFATHER=""
+
+# ---- FIVE VALUES A PROJECT OWNS — TOOL-dRetiredFork-15 -------------------------------------------
+# Each of these was a literal inside check-memory-hygiene.sh, which is why an adopter with a
+# different convention had to fork the checker to keep their own bar green. BLANK MEANS GOV'S
+# CURRENT BEHAVIOUR for all five, so leaving this whole block untouched changes nothing.
+#
+# TWO OF THEM NARROW WHAT IS GRADED, and both are validated at startup: a bad value ABORTS rather
+# than quietly grading nothing. Blank and invalid are different answers and the checker keeps them
+# apart.
+
+# BUILD_SLUG_RE — the pattern a build folder name must match. Blank = ^[A-Za-z][A-Za-z0-9-]*$
+# MUST be anchored at both ends, and MUST NOT match the empty string: a pattern matching "" admits
+# every folder name and check 4 then passes everything. The checker refuses all three cases.
+BUILD_SLUG_RE=""
+
+# PROJECT_REGISTRY_EXTRA — whitespace-separated extra filenames legal directly under
+# <MEMORY_ROOT>/project/. This only WIDENS the whitelist and is bounded by what your tree actually
+# contains, so it carries none of the silent-narrowing risk the two keys above and below do.
+PROJECT_REGISTRY_EXTRA=""
+
+# RECORD_SERVES_CUTOFF — an ISO date. Records whose filename date falls BEFORE it are exempt from
+# check 21's "every record names the spec it is evidence about". For a tree adopting this kit
+# mid-life with landed records that predate the grammar. A record whose name carries no parseable
+# date is KEPT: unparseable is not the same answer as old, and only one of them is an exemption.
+# A cutoff dated after today is REFUSED — it would exempt every record and report a clean run.
+RECORD_SERVES_CUTOFF=""
+
+# ENTRY_CAP_UNIT — `chars`, `bytes`, or blank. Blank leaves the counting exactly as your platform
+# does it today, and that is deliberate. The checker's own comment explains why it pins no locale:
+# doing so "would silently re-decide the cap on any adopter whose awk counts characters today". A
+# DECLARED key re-decides nothing; it only makes the choice visible. Measured on gov's own node, the
+# default counts BYTES, so `chars` is the value that changes anything there — which is precisely the
+# platform-dependence this key exists to take out of the shadows.
+ENTRY_CAP_UNIT=""

@@ -11,22 +11,65 @@ sentinel = "tools/gate-lint/ps-hygiene.py"
 include = "**"
 role = "engine"
 
+# NO REGISTRY IS SHIPPED, AND THE LEG NAMES NONE. A `seed` rule here used to land an empty registry
+# under `{memory_root}/project/`, because the leg's argv named that path and `silenced_legs`
+# withholds a leg whose argv names a file no rule writes — `apply` exited 1 at every adopter until
+# the rule existed (TOOL-aLeakedHandle-1's closing review, F1).
+#
+# The rule then broke the same thing one layer out. Check 3 of the memory-tree hygiene gate admits
+# only a closed set of names under `{memory_root}/project/`, so gov wrote a file into every
+# adopter's memory tree that the adopter's own gate then refused. Widening that case list reaches
+# an adopter only on a later `update`, and reaches a FORKED copy of the checker never — one live
+# adopter runs a fork — so the seed had to go rather than the refusal.
+#
+# The ARGUMENT went instead of the file. The scanner's registry positional is OPTIONAL: with none
+# supplied it grades against an empty declaration and reports every carried site as undeclared,
+# which is a RED leg an adopter answers by declaring their own rows and putting the path back into
+# their own leg argv — theirs to edit, in their own manifest. Dropping this rule while the argv
+# still named the path is F1 again in the other direction, so the two land in ONE commit by
+# construction. TOOL-cMendedVintage-2.
+
 [adopt]
 argv = []
 mutates_index = false
 why_no_adopter = "the kit ships no adopter. Its README carries no copy or install instruction either, and the runbook's claim that the README hands leg wiring to the consuming project is not borne out by the README — recorded as a gap rather than papered over."
 
-[[hole]]
-id = "gate-lint-leg-wiring"
-kind = "authoring"
-blocks_adopt = false
-blocks_gate = false
-why = "the kit declares no legs of its own and no document says which lints a target should wire. Nothing in a target observes this, which is why it is declared as a hole rather than left as silence."
-discharge = { command = ["bash", "-c", "exit 1"] }
-
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+#
+# THE HOLE `gate-lint-leg-wiring` IS GONE, discharged rather than deleted. It declared that this kit
+# shipped no leg of its own and that nothing in a target observed it, and it carried
+# `discharge = { command = ["bash", "-c", "exit 1"] }` — undischargeable by construction, which is
+# how a permanent gap gets recorded honestly. The two `[[gate_leg]]` blocks below are what closes
+# it: the kit declares legs, and both run at a target out of the kit's own home.
+# TOOL-aLeakedHandle-1. Declaring the leg alone did NOT close the hole at first — its argv named a
+# registry path no rule shipped, so `silenced_legs` withheld it and `apply` exited 1 at every
+# adopter while this comment said otherwise. The correction is that the argv now names nothing
+# outside the kit, so there is no shipped path for that predicate to miss. TOOL-cMendedVintage-2.
+#
+# What has NOT changed is the adopter. There is still none, still no rendered artifact, and so still
+# nothing for `check` to measure — a gate leg is run by the merge bar, not by this verb.
 none = """
-the kit ships no adopter, no rendered artifact and no leg of its own — there is nothing to measure, which is also why its only hole is declared undischargeable by construction
+the kit ships no adopter and no rendered artifact, so there is nothing for this verb to run; its two gate legs are declared below and are executed by the bar rather than by `check`
 """
+
+# The tree scan. `subject = "repo"` because a failure of this leg is a statement about the graded
+# repository's shell tree and not about the kit that ships the scanner, and NO guard, because it
+# grades every tracked `*.sh`: no subset of paths bounds it, and a guard could only make it skip the
+# file that just broke.
+[[gate_leg]]
+name = "shell hygiene (a loop fed by a command substitution)"
+subject = "repo"
+argv = ["python3", "{kit}/sh_hygiene.py"]
+guard = []
+
+# The self-test arm. `subject = "kit"` puts it under the 2026-08-23 kit-self-test hold deliberately:
+# a suite that stages breaks into a copy of a scanner has a job only when that scanner's source
+# changes, and none at all in an adopter's repo that copy-installs the kit and never edits it. The
+# guard names the kit dir the scanner lives in, so it runs when the thing it grades moves.
+[[gate_leg]]
+name = "shell-hygiene selftest"
+subject = "kit"
+argv = ["python3", "{kit}/sh_hygiene.py", "--selftest"]
+guard = ["{kit}/"]

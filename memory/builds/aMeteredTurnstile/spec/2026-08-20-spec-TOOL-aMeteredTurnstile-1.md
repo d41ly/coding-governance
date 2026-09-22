@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-20-build-TOOL-aMeteredTurnstile-1.md](../build/2026-08-20-build-TOOL-aMeteredTurnstile-1.md) | journal | — |
+| [2026-08-20-review-TOOL-aMeteredTurnstile-1.md](../reviews/2026-08-20-review-TOOL-aMeteredTurnstile-1.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Ship one profiling verb in the `run-gates` kit that measures a bar run as a RUN — width, wall clock,

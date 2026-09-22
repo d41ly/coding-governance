@@ -1,0 +1,9 @@
+{
+  "name": "orientation-card",
+  "event": "SessionStart",
+  "matcher": "startup|clear",
+  "marker": "--write",
+  "hook_path": "{here}/manifest-check.sh",
+  "interpreter": "bash",
+  "args": ["--card", "--write"]
+}

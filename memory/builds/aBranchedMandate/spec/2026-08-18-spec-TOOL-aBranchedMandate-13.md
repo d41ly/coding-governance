@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-18 · node a · Tier-1 · base 401416fa · streams tooling · ratified 2026-08-18
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md](../build/2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md) | journal | TOOL-aBranchedMandate-12 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `build-complete`'s first term requires a `<!-- roster:units -->` pair in the build README. A build

@@ -89,26 +89,35 @@ It does not widen the pool, shard a third time, or touch `gate-profiles.txt` —
 dead ends in that report. It does not fix `input_key`'s tree-not-commit hole, which
 `TOOL-aShardedFloor-4` would make routine rather than rare; that is its own unit and its own risk.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aShardedFloor-1` | 2 | record the turnstile queue wait in the run record |
+| 2 | `TOOL-aShardedFloor-2` | 2 | the shard contract, and the driver selftest split by it |
+| 3 | `TOOL-aShardedFloor-3` | 2 | the gate selftest, split by the same contract |
+| 4 | `TOOL-aShardedFloor-4` | 2 | the dispatch hint reads a repository-wide store |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-21 · streams tooling
 ids TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aShardedFloor-1 — record the turnstile queue wait in the run record](spec/2026-08-21-spec-TOOL-aShardedFloor-1.md) | CLOSED | rev-2 | 2026-08-21 |
-| [TOOL-aShardedFloor-2 — the shard contract, and the driver selftest split by it](spec/2026-08-21-spec-TOOL-aShardedFloor-2.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-aShardedFloor-3 — the gate selftest, split by the same contract](spec/2026-08-21-spec-TOOL-aShardedFloor-3.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-aShardedFloor-4 — the dispatch hint reads a repository-wide store](spec/2026-08-21-spec-TOOL-aShardedFloor-4.md) | WONTDO | rev-4 | 2026-08-21 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aShardedFloor-1 — record the turnstile queue wait in the run record](spec/2026-08-21-spec-TOOL-aShardedFloor-1.md) | — | 2 | CLOSED | rev-2 | 2026-08-21 |
+| [TOOL-aShardedFloor-2 — the shard contract, and the driver selftest split by it](spec/2026-08-21-spec-TOOL-aShardedFloor-2.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-aShardedFloor-3 — the gate selftest, split by the same contract](spec/2026-08-21-spec-TOOL-aShardedFloor-3.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-aShardedFloor-4 — the dispatch hint reads a repository-wide store](spec/2026-08-21-spec-TOOL-aShardedFloor-4.md) | — | 2 | WONTDO | rev-4 | 2026-08-21 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 3 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md](build/2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md) | research | TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
-| [2026-08-21-build-TOOL-aShardedFloor-4-repricing.md](build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md) | journal | TOOL-aShardedFloor-4 |
-| [2026-08-21-review-TOOL-aShardedFloor-1.md](reviews/2026-08-21-review-TOOL-aShardedFloor-1.md) | spec-audit | TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 
@@ -121,17 +130,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-21-spec-TOOL-aShardedFloor-1.md](spec/2026-08-21-spec-TOOL-aShardedFloor-1.md)
-  - [2026-08-21-spec-TOOL-aShardedFloor-2.md](spec/2026-08-21-spec-TOOL-aShardedFloor-2.md)
-  - [2026-08-21-spec-TOOL-aShardedFloor-3.md](spec/2026-08-21-spec-TOOL-aShardedFloor-3.md)
-  - [2026-08-21-spec-TOOL-aShardedFloor-4.md](spec/2026-08-21-spec-TOOL-aShardedFloor-4.md)
-- **`build/`**
-  - [2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md](build/2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md)
-  - [2026-08-21-build-TOOL-aShardedFloor-4-repricing.md](build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md)
-- **`reviews/`**
-  - [2026-08-21-review-TOOL-aShardedFloor-1.md](reviews/2026-08-21-review-TOOL-aShardedFloor-1.md)
-<!-- /gen:build-docs -->

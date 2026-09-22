@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md](../build/2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md) | journal | — |
+| [2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md](../reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md) | journal | TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Check 24 reds when a unit is in the roster a run is executing and was not in the roster it entered

@@ -152,19 +152,47 @@ case "$CONF_BYPASS" in
   *[[:space:]]*|*'#'*)
     fail 10 "the declared bypass flag resolves to a value carrying whitespace or a comment character, which no flag does - so this leg would grep the corpus for a literal no record can contain and then report that it read the corpus. Resolved value follows: [$CONF_BYPASS]" ;;
 esac
+# TOOL-aScouredKit-6 — TWO greps over the whole corpus, not two PER FILE. The predicate is
+# unchanged: a playbook is a `.md` carrying BOTH `^step_selector =` and a `^```toml` fence, and the
+# template is still excluded for the reason below. What changed is that the population is now
+# discovered by intersecting two batched `grep -l` runs instead of by spawning a process per file.
+# Measured on node `a`: 941 spawns discovering a population of ONE.
+#
+# `grep -l` exits 1 on no match, which is the passing-zero-reads-as-failure class — the run is
+# terminated with `|| true`, and an empty population is decided by the explicit arm below, not by an
+# exit code. `xargs -0 -r` keeps a path with a space intact and keeps an empty list from making grep
+# read stdin.
+#
+# THE NUL LIST IS NOT ROUND-TRIPPED THROUGH A VARIABLE. `$(…)` strips NUL bytes, so building the
+# candidate list into a shell variable and re-feeding it to `xargs -0` yields ONE mangled argument
+# and a `warning: ignored null byte in input` — the first cut of this change did exactly that and
+# reported a population of 0 against a tree holding 1. It is piped straight through instead.
+#
+# The SECOND predicate stays per-file on purpose. It runs over the handful of files the first grep
+# selected rather than over the corpus, so it costs nothing, and it keeps the `^```toml` anchor
+# exactly as it was — a batched `-F` pass would match the fence anywhere on a line and widen the
+# predicate, which is not a speed-up, it is a different check.
+#
+# The TEMPLATE is the canon, definitionally not a playbook: its block is a SPECIMEN with empty
+# values, and grading it would red on every field the specimen leaves for an author to fill.
+# Found by running this predicate over the real tree before wiring it, which is the rule.
+_pb_sel=$(git -c core.quotePath=false ls-files -z -- '*.md' \
+  | xargs -0 -r grep -lE '^step_selector[[:space:]]*=' -- 2>/dev/null || true)
 PLAYBOOKS=""
 while IFS= read -r f; do
-  case "$f" in *.md) ;; *) continue ;; esac
-  # The TEMPLATE is the canon, definitionally not a playbook: its block is a SPECIMEN with empty
-  # values, and grading it would red on every field the specimen leaves for an author to fill.
-  # Found by running this predicate over the real tree before wiring it, which is the rule.
-  case "$f" in */PLAYBOOK-TEMPLATE.template.md|*/PLAYBOOK-TEMPLATE.md) continue ;; esac
-  if grep -q '^step_selector[[:space:]]*=' "$f" 2>/dev/null && grep -q '^```toml' "$f" 2>/dev/null; then
-    PLAYBOOKS="$PLAYBOOKS$f
+  [ -n "$f" ] || continue
+  # WIDENED from the two PLAYBOOK-TEMPLATE spellings to ANY `*.template.md`. The reason above is
+  # not specific to that one file: a template's values are a SPECIMEN, and a rendered artifact's
+  # template necessarily carries unresolved `{{TOKEN}}` braces, so grading one reds check 6 on a
+  # target that is not meant to resolve until render time. Found the moment a second template
+  # existed -- `playbook.fixture.template.md`, TOOL-dRetiredFork-12 -- which redded this gate in
+  # gov's own tree.
+  case "$f" in *.template.md|*/PLAYBOOK-TEMPLATE.md) continue ;; esac
+  grep -q '^```toml' "$f" 2>/dev/null || continue
+  PLAYBOOKS="$PLAYBOOKS$f
 "
-  fi
 done <<EOF
-$(git -c core.quotePath=false ls-files -- '*.md')
+$_pb_sel
 EOF
 POP=$(printf '%s' "$PLAYBOOKS" | grep -c . || true)
 
@@ -279,12 +307,22 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
   # So the pipeline below produces a fully normalised VALUE - comment gone, key gone, CR gone, ends
   # trimmed - and nothing is asked about it until it is. A `#` at position zero is then unambiguous:
   # a TOML value cannot begin with one, so it is a comment on a key with no value at all.
-  local raw
-  raw=$(printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
-        | sed 's/[[:space:]][[:space:]]*#.*$//' \
-        | sed "s/^$2[[:space:]]*=[[:space:]]*//" \
-        | tr -d '\r' \
-        | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+  # TEN PROCESSES BECAME ZERO, on the same terms as its scalar sibling and in the same order.
+  local raw="" _l _r
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    _r=${_l#"$2"}; [ "$_r" != "$_l" ] || continue
+    while :; do case $_r in [[:space:]]*) _r=${_r#?} ;; *) break ;; esac; done
+    case $_r in '='*) ;; *) continue ;; esac
+    raw=${_l%%[[:space:]]#*}
+    raw=${raw#"$2"}
+    while :; do case $raw in [[:space:]]*) raw=${raw#?} ;; *) break ;; esac; done
+    raw=${raw#=}
+    while :; do case $raw in [[:space:]]*) raw=${raw#?} ;; *) break ;; esac; done
+    raw=${raw//$'\r'/}
+    while :; do case $raw in [[:space:]]*) raw=${raw#?} ;; *) break ;; esac; done
+    while :; do case $raw in *[[:space:]]) raw=${raw%?} ;; *) break ;; esac; done
+    break
+  done <<< "$1"
   case "$raw" in '#'*) raw='' ;; esac
   # AND THE CLOSER IS ANCHORED AT BOTH ENDS. A value is an array only if it STARTS with `[`, so
   # `k = "a[0]"` is not one and is not refused for failing to close; an array that starts is closed
@@ -293,8 +331,13 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
     '['*']') ;;
     '['*) return 2 ;;
   esac
-  printf '%s\n' "$raw" | tr -d '"' \
-    | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+  local _m=${raw//'"'/}
+  _m=${_m#'['}; _m=${_m%']'}
+  _m=${_m//,/ }
+  while :; do case $_m in *'  '*) _m=${_m//  / } ;; *) break ;; esac; done
+  while :; do case $_m in [[:space:]]*) _m=${_m#?} ;; *) break ;; esac; done
+  while :; do case $_m in *[[:space:]]) _m=${_m%?} ;; *) break ;; esac; done
+  printf '%s\n' "$_m"
 }
 
 declared_scalar() { # body · key -> the scalar it declares, comment/quotes/space stripped
@@ -314,11 +357,30 @@ declared_scalar() { # body · key -> the scalar it declares, comment/quotes/spac
   # THE `#` AT POSITION ZERO, for its sibling's reason: the trailing-comment strip needs whitespace
   # before the `#` and a key with no value at all leaves none, so `k =# note` and `k =#note` came back
   # as their own comment text at rc 0. A TOML value cannot begin with `#`.
-  printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
-    | sed 's/[[:space:]][[:space:]]*#.*$//' \
-    | sed "s/^$2[[:space:]]*=[[:space:]]*//" | sed 's/^#.*$//' | tr -d '\r' \
-    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
-    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+  # EIGHT PROCESSES BECAME ZERO. This was `grep | sed | sed | sed | tr | sed | sed | sed`, and the
+  # leg that drives this kit ran it often enough that the pipeline, not the work, was the cost. The
+  # steps below are the same steps in the same order; what changed is that bash does them.
+  local _l _v _r
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    _r=${_l#"$2"}; [ "$_r" != "$_l" ] || continue
+    while :; do case $_r in [[:space:]]*) _r=${_r#?} ;; *) break ;; esac; done
+    case $_r in '='*) ;; *) continue ;; esac
+    _v=${_l%%[[:space:]]#*}
+    _v=${_v#"$2"}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    _v=${_v#=}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    case $_v in '#'*) _v='' ;; esac
+    _v=${_v//$'\r'/}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    while :; do case $_v in *[[:space:]]) _v=${_v%?} ;; *) break ;; esac; done
+    _v=${_v#'"'}; _v=${_v%'"'}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    while :; do case $_v in *[[:space:]]) _v=${_v%?} ;; *) break ;; esac; done
+    printf '%s\n' "$_v"
+    return 0
+  done <<< "$1"
+  return 0
 }
 
 # ------------------------------------------------------------------------ per playbook
@@ -617,7 +679,7 @@ CANONEOF
     # merely starts with those letters — `nonempty-rows` read as "declares nothing", and the item
     # returned MET with no record, no verdict and no override entry.
     case "$schk" in none|'none '*|none[!A-Za-z0-9-]*) schk="" ;; esac
-    if [ -n "$COUNTS_FOR" ] || [ -z "$(printf '%s' "$schk" | tr -d '[:space:]')" ]; then :; else
+    if [ -n "$COUNTS_FOR" ] || [ -z "${schk//[[:space:]]/}" ]; then :; else
       # The run ids come from the PIECE records, so this reports on the runs that actually produced
       # something here rather than on a roster no merge-bar run can see.
       # THE INNER ENUMERATION IS SPLIT-SAFE, the outer one does not need to be: run ids are the

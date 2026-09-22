@@ -2,6 +2,24 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-corpus-anatomy.md](../build/2026-08-20-build-TOOL-dScriptedRepeat-1-corpus-anatomy.md) | research | — |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-extension-seams.md](../build/2026-08-20-build-TOOL-dScriptedRepeat-1-extension-seams.md) | research | — |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md](../build/2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md) | research | — |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-grounding-findings.md](../build/2026-08-20-build-TOOL-dScriptedRepeat-1-grounding-findings.md) | journal | — |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](../build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md) | research | — |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](../build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md) | research | — |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md](../build/2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md) | journal | — |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md](../build/2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md) | journal | — |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](../build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md) | research | — |
+| [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](../reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md) | spec-audit | — |
+| [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](../reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Publish the authorization-mode set as a driver constant, add the third member, add the matching third

@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-20 · node a · Tier-2 · base 76fcd09b · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-08-review-TOOL-aBatchedTribunal-1-3.md](../../reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md) | diff-review | TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9 TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
+| [2026-08-08-review-TOOL-aDrainedSluice-2-1.md](../../reviews/2026-08-08-review-TOOL-aDrainedSluice-2-1.md) | spec-audit | TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Check 12's rev high-water scan opens at `## 9. Revision log` and never closes. Every `rev-N` after

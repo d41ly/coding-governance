@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-20 · node c · Tier-1 · base f006691f · streams tooling+kickoff
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md](../reviews/2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md) | spec-audit | KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make the recurring-bug-class checklist reachable at kickoff, when there is no diff yet but there is a

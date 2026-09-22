@@ -15,13 +15,13 @@ reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. Histor
 ## §0 — TL;DR (the load-bearing rules)
 
 - **Session-scope every new ID** (slug = node tag + CamelCase adjective-noun) — collisions become impossible, not avoided (§2).
-- **Own streams, not files; merge small and often** to local `{{DEFAULT_BRANCH}}` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
+- **Own streams, not files; merge small and often** to local `{{DEFAULT_BRANCH}}` (§3) — and isolate *runtimes* too: ports/DBs per session.
 - **Memory holds only the non-derivable**; status is DERIVED, no shared mutable index, no per-node shard (§5).
 - **Gates are the merge bar; reviews cover what gates can't**; every confirmed finding becomes a gate or a documented check (§7, §8).
 - **Never more than the declared bound at once, AND never more than the declared total per verify
   stage** — two rules, not one: concurrency bounds how many run together, the total bounds how many exist. Batching grows the batch, never the agent count. A wide burst trips the server rate limiter (§8, enforced by the `agent-cap` hook, which counts direct spawns too).
-- **Verify before claiming done** — a check that exercises the change, never an assertion (§4, §8).
-- **Consistency by construction**: build tokens, primitives, and factories *before* the screens/features that use them (§12, §13).
+- **Verify before claiming done** — a check that exercises the change, never an assertion (§8).
+- **Consistency by construction**: build tokens, primitives, and factories *before* the screens/features that use them (§12).
 - **Chat carries signal, not narration**: payload first, one line per mechanical event, facts outrank format (§16).
 - **When no rule below covers it**, decide by these: verify over assert, gate over remember, derive over author, delete over disable, one fact in one place.
 
@@ -65,7 +65,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
 **Kickoff-manifest merge exception.**
 
-- The manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD on the default branch, the merge-base otherwise; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
+- The manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
 
 **Unattended runs** *(kit-conditional — drop this block if the project does not adopt the unattended-run kit).*
 
@@ -127,17 +127,16 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   freshness checks are merge-bar legs like any other (§7).
 - Ask periodically whether this repo's RECORD of its own state still matches the tree — stale claims,
   closed plans with no product commit, hand-kept inventories disagreeing with what they describe.
-  Every such signal carries a LIVENESS assertion, so a probe that cannot move says so rather than
-  reporting a reassuring zero; a green audit must mean the checks ran, not that nothing was reported.
+  Every such signal carries the liveness assertion §7 requires of any probe.
 - Retrieval over the decision corpus beats grepping it: ask a question, get the records that answer
   it, ranked. It ADDS to grep rather than replacing it — a symbol, caller or filename is still a grep.
 - **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT
   `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a
-  `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps +
-  archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front
-  matter, and a **hygiene gate** whose check count is stated by the kit README and the gate-leg name
-  and is deliberately not restated here, wired into CI + pre-commit + `{{GATE_RUNNER}}`;
-  `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+  `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps, a
+  DECLARED archive-rotation mode, a status vocabulary, a GENERATED work-state index rendered from
+  build front matter, and a **hygiene gate** whose check count is stated by the kit README and the
+  gate-leg name and is deliberately not restated here, wired into CI + pre-commit +
+  `{{GATE_RUNNER}}`; `.memory-tree.conf` holds both. Adopt per the kit README.
 
 ## §6 — Decisions, backlogs & the governing doc
 
@@ -158,7 +157,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 - A value stated in prose beside the source that OWNS it rots between changes — point at the source,
   or gate the pair. This is the same rule as "derive over author", applied to documents rather than
   to code, and it is the one most often broken by the document that states it.
-- In-doc paths are repo-root-relative; the root is pinned once per node in the §2 registry, never re-derived. (User-facing links follow §17, a different convention.)
+- In-doc paths are repo-root-relative; the root is pinned once per node in the §2 registry, never re-derived. (User-facing links follow §16, a different convention.)
 - Non-obvious rules carry provenance inline (the motivating decision/incident id); environment/capability claims carry a verified-(date, node) stamp.
 - Each guarded security surface keeps a written security-model section in the decision log; read it BEFORE extending that surface (§9).
 
@@ -228,29 +227,24 @@ matched its target population.
 - Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `{{DEFAULT_BRANCH}}`) — per-increment reviews re-scan overlapping code.
 - Default Tier-2 shape (ROI-tuned): a parallel fan of 3–6 primed finder lenses (security · correctness · data-integrity · dead-code · integration-seams) → a skeptic prompted to REFUTE each finding → one synthesis pass; drop any finding a skeptic refutes unless reachability + impact re-established.
 - **CONCURRENCY IS CAPPED, ALWAYS, and the verify-stage TOTAL is capped too — two rules, not one.**
-  A wide fan trips the SERVER rate limiter and kills whole phases for millions of tokens; a
-  harness auto-cap does NOT protect you. Concurrency bounds how many run together; the total
-  bounds how many exist. **CONSOLIDATE before you fan out:** batching grows the batch, never the
-  agent count — at most 5 verify agents TOTAL. Route Workflow fan-out through the bounded
-  helpers, inlined because scripts cannot import: `boundedParallel(thunks, 5)` and its pipeline
-  sibling. Enforce it mechanically at the tool call rather than inside the script, where no hook
-  reaches — the `agent-cap` hook denies a raw primitive and any fan-out over a receiver it
-  cannot PROVE bounded, and counts direct spawns, which is the only enforcement reaching a
-  fan-out made outside a workflow script. It resolves a bound wherever it is written and denies
-  any K it cannot resolve to an integer ≤5; an array LITERAL of ≤5 elements (the lens fan)
-  passes unmarked, and it fires on matcher `Workflow|Agent`, the exact pair — `Workflow` alone
-  leaves direct spawns unguarded. FIVE of these values are machine-compared against the sources
-  that own them by `tools/check-playbook-parity.sh`; retyping one wrong reds the bar rather than
-  drifting. The marker spellings and the full resolvable-bound grammar are the hook's own, in
-  `tools/hooks/README.md`; a ready harness ships beside it.
+  A wide fan trips the SERVER rate limiter and kills whole phases for millions of tokens; a harness
+  auto-cap does NOT protect you. Concurrency bounds how many run together; the total bounds how many
+  exist. **CONSOLIDATE before you fan out:** batching grows the batch, never the agent count —
+  at most 5 verify agents TOTAL. Route Workflow fan-out through the bounded helpers, inlined
+  because scripts cannot import: `boundedParallel(thunks, 5)` and its pipeline sibling. Enforcement
+  sits at the tool call, on matcher `Workflow|Agent` — the exact pair, since `Workflow` alone
+  leaves direct spawns unguarded. The hook denies any K it cannot resolve to an integer ≤5, and
+  an array LITERAL of ≤5 elements is a receiver it can size. FIVE of these values are
+  machine-compared against the sources that own them by `tools/check-playbook-parity.sh`; retyping
+  one wrong reds the bar rather than drifting. The marker spellings and the full resolvable-bound
+  grammar are the hook's own, in `tools/hooks/README.md`; a ready harness ships beside it.
 - Finders emit CONCRETE findings — `file:line` + repro/impact + proposed fix — so skeptics can actually verify them.
 - Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics; past ~25 agents returns diminish.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
 - Match intensity to target richness: heavy multi-lens earns its tokens on fresh/complex write paths; over hardened code it manufactures refuted noise — review light or skip.
 - Persist each Tier-2 run as an in-repo artifact folder (`{{REVIEW_DIR}}`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
-- Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet; the cap is enforced at the `Workflow` tool-call AND at the `Agent` one (both fire a main-loop `PreToolUse`), never inside the script, where no hook reaches.
-- A sidechain agent holds NEITHER tool, so it cannot fan out at all — the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
-- Verify before "done": a check that exercises THIS change (its own/affected test, the relevant gate, or the §4 harness) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
+- Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet. A sidechain agent holds NEITHER tool, so it cannot fan out at all: the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
+- Verify before "done": a check that exercises THIS change (its own/affected test, or the relevant gate) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
 - Commit freely as you go (branch/worktree, or local `{{DEFAULT_BRANCH}}` for doc-only per §3); landing is §1's rule, not restated here.
 
 - Structured-output schemas so a malformed return can't force full regeneration (top output-token
@@ -312,19 +306,21 @@ matched its target population.
 - Forward-compatible data: new fields additive + defaulted (old content renders identically, new capability inert until used); shape changes ship an auto-upgrade step; prefer riding an existing shape over a migration.
 - Reuse audit before building: grep for an existing component/util/endpoint to extend before adding one.
 - Gate the layout conventions you can (naming, layer boundaries); the "where things live" map lives in the always-loaded doc (§6) so every feature has an obvious home.
+- **A kit file names nothing outside itself by literal.** Its own kit dir and tool root are DERIVED and an empty derivation REFUSES; a sibling kit is a render token. Gated as a BAN, not a ratchet — the writer may lower a count, never add one. The hooks kit README states it.
 <!-- kit:lexicon -->
-*The five naming bullets below are kit-conditional — drop them if the project does not adopt the lexicon kit, the same way §1's unattended block is dropped. The rest of §12 is universal core.*
+*The naming bullets below are kit-conditional — drop them where the lexicon kit is not adopted. §12's rest is core.*
 
-- **Naming is one of those conventions, and it is gateable.** Declare it in `{{LEXICON_CONF}}`: a CLOSED verb table every function/method definition leads with, a banned type-suffix list, and forbidden import DIRECTIONS between layers (the machine-checkable form of "one shared core, thin adapters" above). A repo that declares none of these has a naming convention it asks people to remember.
-- The verb table's value is NOT spelling — it is scoping. "Which verb is this?" is answerable only when a function does ONE thing, so a name that will not fit the table is reporting an unclear responsibility or a seam in the wrong place. If the reflex on a refusal is to add a verb, the table has become a synonym list and is buying nothing.
-- Write the NEGATIVE definitions or do not bother: `build` not `create`, `load` not `fetch`, `remove` not `delete`, `set` not `update`. A row with only a positive gloss cannot tell two verbs apart, and the boundary is the whole product.
-- DERIVE the initial table from the repo's own corpus, then FREEZE it and mark that a human curated it — a derived table nobody edited is a mirror of the code, which is the one shape a naming gate must not have (§7's rule against a gate whose vocabulary tracks its subject). Measure every offender pin against THIS corpus; a pin copied from a larger tree is either vacuous or permanently red.
-- Declare a COVERAGE MODE per language — a real parser, a regex probe (incomplete by construction, and reported as such on every run), or explicitly dark. An undeclared language must be a named refusal, never a silent skip: a regex that quietly misses what it forgot looks exactly like coverage. An unarmed predicate REDS rather than passing green (§7).
+- **Naming is one of those conventions, and it is gateable.** Declare it in `{{LEXICON_CONF}}`: a CLOSED verb table every function/method definition leads with, a banned type-suffix list, and a (language, surface) CELL matrix pinning each to one spelling convention, subsets routed to a second by a selector. A repo declaring none asks people to remember.
+- The table's value is NOT spelling, it is SCOPING: "which verb is this?" is answerable only when a function does ONE thing, so a name that will not fit is reporting an unclear responsibility or a seam in the wrong place. If the reflex on a refusal is to add a verb, the table has become a synonym list.
+- Every row carries a NEGATIVE — `build` not `create`, `load` not `fetch` — because a row with only a positive gloss cannot tell two verbs apart, and the boundary is the whole product.
+- The corpus decides WHICH concepts the table holds, never what any of them is CALLED: seed spellings from a prescriptive source OUTSIDE the tree, freeze the result, and mark a human curated it — a table ranked from the code it grades is a mirror, the one shape a naming gate must not have (§7). Measure every pin against THIS corpus. Unfreezing that seed is one dated, attributed, REASONED line, refused without one and printed every run.
+- Declare a COVERAGE MODE per language — parser, probe (incomplete by construction, reported every run), or dark — and make an undeclared one a named refusal, never a silent skip.
+- **The rows themselves are NOT restated here.** They live in the declaration, which the kit renders into a Skill its gate byte-compares, so an edit nobody re-rendered reds. Ask per name rather than read a copy: `--suggest` answers one identifier from the declaration and canon.
 <!-- /kit:lexicon -->
 
 ## §14 — Session execution hygiene (per-call token discipline)
 
-- Strategy: spend tokens on NEW judgment, never re-deriving the known — tier + diff-scope reviews (§8), gate over re-review (§7), lean memory (§5), streams + small merges (§3), system-first UI (§12, §13); **stop once verified** (re-reads, uncapped output, hand-polling, and edit/format ordering are the dominant avoidable spend).
+- Strategy: spend tokens on NEW judgment, never re-deriving the known — tier + diff-scope reviews (§8), gate over re-review (§7), lean memory (§5), streams + small merges (§3), system-first UI (§12); **stop once verified** (re-reads, uncapped output, hand-polling, and edit/format ordering are the dominant avoidable spend).
 - Don't re-fetch what's in context: no re-Read to keep editing a file or to "verify" an edit the tool confirmed; slice large files (range/grep), never whole re-reads; never re-read a command-output spill or large artifact — filter it at generation.
 - Re-Read ONLY when something outside your edits changed the file (formatter/`--fix`, format-on-save, a concurrent node on a shared doc); make manual edits FIRST and format LAST — reformatting between edits forces the modified-since-read re-read loop; batch a file's edits.
 - Bound every command's output (it all lands in the transcript): `--stat`/`--name-only` over raw diffs; concise linter formats; head/tail caps on noisy tails; quiet test flags.
@@ -359,17 +355,16 @@ matched its target population.
 - Readable beats dense — brevity comes from OMITTING items, never compressing prose. Banned in work reports: `·`-chains outside micro-formats, parenthetical inventories (parens hold ≤3 items), multi-clause em-dash trains, one paragraph carrying multiple topics. Keep complete sentences, one idea each; >~5 items becomes a short bulleted list; the rest is omitted and lives in the linked doc. Test: a tired reader parses every line in ONE pass.
 - Micro-formats — MANDATORY, byte-stable, greppable shapes for these events; every other rule binds in substance but its formatting is advisory (wit lives in the freeform sentences, never inside).
 - **The grammar, one statement.** A shape is a HEAD, the joiner, and a TAIL. The head is one keyword
-  from the closed set below, with its case fixed per keyword. The joiner ` — ` appears exactly ONCE
-  and nothing but the head precedes it. Tail fields are separated by ` · ` and by nothing else. No
-  parentheses, except markdown-link syntax. No colon as a joiner or a label — a colon survives only
-  glued to a value, as a port. Placeholders are `<lowercase-name>`, and alternation inside one is the
-  ASCII `|`. A trailing field the shape may omit is wrapped in ASCII square brackets, `[ · <field>]`,
-  which is a notation of the DEFINITION and never appears in an emission. Five glyphs are pinned as
-  STRUCTURE: `—` (U+2014) · `·` (U+00B7) · `→` (U+2192) · `⏳` (U+23F3) · `…` (U+2026); the alternation
-  `|` is ASCII and is deliberately NOT one of them. The grammar binds shape SYNTAX and never value
-  BYTES: an opaque field such as `<subject>`, `<why>` or `<step>` keeps whatever characters it has, so
-  the bans do not reach inside one. A deploy-time `{{…}}` token inside a shape is a VALUE, not
-  structure — it is neither required nor forbidden, and it is not part of the keyword set.
+  from the closed set below, with its case fixed per keyword. Tail fields are separated by ` · ` and
+  by nothing else. Placeholders are `<lowercase-name>`, and alternation inside one is the ASCII `|`.
+  A gate holds the block's own syntax; what follows binds EMISSION, which no gate sees. A trailing
+  field the shape may omit is wrapped in ASCII square brackets, `[ · <field>]`, which is a notation
+  of the DEFINITION and never appears in an emission. Five glyphs are pinned as STRUCTURE: `—`
+  (U+2014) · `·` (U+00B7) · `→` (U+2192) · `⏳` (U+23F3) · `…` (U+2026); the alternation `|` is ASCII
+  and is deliberately NOT one of them. The grammar binds shape SYNTAX and never value BYTES: an
+  opaque field such as `<subject>`, `<why>` or `<step>` keeps whatever characters it has, so the
+  bans do not reach inside one. A deploy-time `{{…}}` token inside a shape is a VALUE, not structure
+  — it is neither required nor forbidden, and it is not part of the keyword set.
 - **R1 — an emitted micro-format is a markdown list item.** `- ` at column 0, then the shape's bytes.
   No backticks, no fence, no bold, no heading. Nothing before the marker and nothing after the last
   field, one shape per line. Two reasons, neither of them taste: backticks and fences defeat the

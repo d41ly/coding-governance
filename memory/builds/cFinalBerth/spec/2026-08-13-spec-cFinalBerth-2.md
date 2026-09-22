@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-14 · node c · Tier-2 · base f006691f · streams tooling · ratified 2026-08-13
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-13-review-TOOL-cFinalBerth-1-1.md](../reviews/2026-08-13-review-TOOL-cFinalBerth-1-1.md) | spec-audit | TOOL-cFinalBerth-1 |
+| [2026-08-13-review-TOOL-cFinalBerth-1-2.md](../reviews/2026-08-13-review-TOOL-cFinalBerth-1-2.md) | diff-review | TOOL-cFinalBerth-1 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Stop `--close` refusing every run whose HEAD is already published. The refusal fires on the state

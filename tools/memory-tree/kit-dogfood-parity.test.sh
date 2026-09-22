@@ -34,6 +34,11 @@ set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "kit-parity: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
+# TOOL-aJoinedCanon-9: PRESET above the conf source, and it is `set -u` safety rather than a
+# default — there is exactly ONE literal row set and it is the conf. Without this line every adopter
+# tree whose .memory-tree.conf predates the key ABORTS on an unbound variable inside render_doc,
+# which is a reader that fails to RUN rather than one that fails.
+READINESS_ROWS="${READINESS_ROWS:-}"
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 M="$MEMORY_ROOT"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -50,12 +55,21 @@ TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
 [ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"
 
 MODE="${1:---check}"
-PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPEC-TEMPLATE.template.md $M/guides/BUILD-METHOD.md:$KITREL/BUILD-METHOD.template.md"
+PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPEC-TEMPLATE.template.md $M/guides/BUILD-METHOD.md:$KITREL/BUILD-METHOD.template.md $M/guides/ANNOTATION-STYLE.md:$KITREL/ANNOTATION-STYLE.template.md"
 
-# Byte-identical in intent to `render_doc` in adopt-memory-tree.sh. Two spellings of one
-# substitution is the drift class this file exists to catch, so the SHAPE arm below proves they agree
-# on the only thing that matters: no placeholder survives a render.
-render() {
+# NOT "byte-identical IN INTENT" any more, which is what the previous version of this comment
+# claimed while the two spellings sat in two files with two variable names and nothing comparing
+# them. The block below is now a marked INLINE COPY of `tools/lib/render-doc.sh`, gated byte for
+# byte by the parity table in `tools/lib/resolve-python.test.sh` — the same mechanism `resolve_python`
+# already runs, one more row. DEPL-dCarriedReceipt-15 S6.
+#
+# The block reads `KIT_REL` and `TOOL_ROOT`, which is the canonical spelling; this file derives the
+# same two values under its own names, so they are bound here rather than in the block.
+KIT_REL="$KITREL"
+TOOL_ROOT="$TOOLROOT"
+
+# >>> render_doc — canonical copy: tools/lib/render-doc.sh (byte-identical; gated)
+render_doc() {
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
   # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash
   # 5.1 gave an unquoted one the same `&` meaning sed has.
@@ -66,10 +80,21 @@ render() {
   out=$( cat "$1" || exit 1; printf X ) || return 1
   out=${out%X}
   out=${out//$'\r'/}
-  out=${out//\{\{KIT_DIR\}\}/"$KITREL"}
-  out=${out//\{\{TOOL_ROOT\}\}/"$TOOLROOT"}
+  out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
+  out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  # TOOL-aJoinedCanon-9: the §5 row set is DECLARED, not written into the skeleton. The transform
+  # sits INSIDE the marked block rather than in the callers, so the parity table already gating this
+  # block covers it too — a per-caller transform would be a second duplication nothing compares,
+  # because gov's live copy is written by the parity test and an adopter's by the adopter, so the
+  # two formatters never meet.
+  local rows=${READINESS_ROWS//|/$'
+'- }
+  out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
   printf '%s' "$out"
 }
+# <<< render_doc
+
+render() { render_doc "$@"; }
 
 st=0
 for pair in $PAIRS; do

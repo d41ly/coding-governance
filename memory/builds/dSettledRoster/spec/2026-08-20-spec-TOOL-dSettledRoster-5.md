@@ -7,6 +7,12 @@ record of what was built and why, not a plan that preceded it. §9 says so in on
 has to infer it, and the traceability consequence is carried in `memory/project/trace-waiver.txt`
 rather than hidden: the product commits could not name a slug that did not exist when they landed.*
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The `govkit acceptance matrix` leg was RED on clean `main` and blocked every push through

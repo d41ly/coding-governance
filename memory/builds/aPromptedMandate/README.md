@@ -123,27 +123,23 @@ ids TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL
 ids TOOL-aPromptedMandate-13 TOOL-aPromptedMandate-14
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aPromptedMandate-1 — the prompt-mode declaration, and where it is carried](spec/2026-08-18-spec-aPromptedMandate-1.md) | CLOSED | rev-2 | 2026-08-18 |
-| [TOOL-aPromptedMandate-12 — `build-complete` reads the units table, not the whole region](spec/2026-08-18-spec-aPromptedMandate-12.md) | CLOSED | rev-2 | 2026-08-18 |
-| [TOOL-aPromptedMandate-13 — the canary's timeout must not assert a cause it cannot see](spec/2026-08-18-spec-aPromptedMandate-13.md) | CLOSED | rev-2 | 2026-08-18 |
-| [TOOL-aPromptedMandate-2 — the RESEARCHING and TESTING phases](spec/2026-08-18-spec-aPromptedMandate-2.md) | CLOSED | rev-3 | 2026-08-18 |
-| [TOOL-aPromptedMandate-3 — the build method's research→test→choose section](spec/2026-08-18-spec-aPromptedMandate-3.md) | CLOSED | rev-3 | 2026-08-18 |
-| [TOOL-aPromptedMandate-4 — the two mode-scoped directives](spec/2026-08-18-spec-aPromptedMandate-4.md) | CLOSED | rev-3 | 2026-08-18 |
-| [TOOL-aPromptedMandate-5 — the Skill's prompt start path](spec/2026-08-18-spec-aPromptedMandate-5.md) | CLOSED | rev-4 | 2026-08-18 |
-| [TOOL-aPromptedMandate-6 — the driver-then-leg cross-component arm](spec/2026-08-18-spec-aPromptedMandate-6.md) | CLOSED | rev-3 | 2026-08-18 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aPromptedMandate-1 — the prompt-mode declaration, and where it is carried](spec/2026-08-18-spec-aPromptedMandate-1.md) | — | 2 | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aPromptedMandate-12 — `build-complete` reads the units table, not the whole region](spec/2026-08-18-spec-aPromptedMandate-12.md) | — | 2 | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aPromptedMandate-13 — the canary's timeout must not assert a cause it cannot see](spec/2026-08-18-spec-aPromptedMandate-13.md) | — | 2 | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aPromptedMandate-2 — the RESEARCHING and TESTING phases](spec/2026-08-18-spec-aPromptedMandate-2.md) | — | 2 | CLOSED | rev-3 | 2026-08-18 |
+| [TOOL-aPromptedMandate-3 — the build method's research→test→choose section](spec/2026-08-18-spec-aPromptedMandate-3.md) | — | 2 | CLOSED | rev-3 | 2026-08-18 |
+| [TOOL-aPromptedMandate-4 — the two mode-scoped directives](spec/2026-08-18-spec-aPromptedMandate-4.md) | — | 2 | CLOSED | rev-3 | 2026-08-18 |
+| [TOOL-aPromptedMandate-5 — the Skill's prompt start path](spec/2026-08-18-spec-aPromptedMandate-5.md) | — | 2 | CLOSED | rev-4 | 2026-08-18 |
+| [TOOL-aPromptedMandate-6 — the driver-then-leg cross-component arm](spec/2026-08-18-spec-aPromptedMandate-6.md) | — | 1 | CLOSED | rev-3 | 2026-08-18 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 5 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md](build/2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md) | research | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 |
-| [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
-| [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
-| [2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-12 TOOL-aPromptedMandate-13 |
-| [2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md](reviews/2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-12 TOOL-aPromptedMandate-13 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -155,23 +151,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-18-spec-aPromptedMandate-1.md](spec/2026-08-18-spec-aPromptedMandate-1.md)
-  - [2026-08-18-spec-aPromptedMandate-12.md](spec/2026-08-18-spec-aPromptedMandate-12.md)
-  - [2026-08-18-spec-aPromptedMandate-13.md](spec/2026-08-18-spec-aPromptedMandate-13.md)
-  - [2026-08-18-spec-aPromptedMandate-2.md](spec/2026-08-18-spec-aPromptedMandate-2.md)
-  - [2026-08-18-spec-aPromptedMandate-3.md](spec/2026-08-18-spec-aPromptedMandate-3.md)
-  - [2026-08-18-spec-aPromptedMandate-4.md](spec/2026-08-18-spec-aPromptedMandate-4.md)
-  - [2026-08-18-spec-aPromptedMandate-5.md](spec/2026-08-18-spec-aPromptedMandate-5.md)
-  - [2026-08-18-spec-aPromptedMandate-6.md](spec/2026-08-18-spec-aPromptedMandate-6.md)
-- **`build/`**
-  - [2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md](build/2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md)
-- **`reviews/`**
-  - [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md)
-  - [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md)
-  - [2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md](reviews/2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md)
-  - [2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md](reviews/2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md)
-<!-- /gen:build-docs -->

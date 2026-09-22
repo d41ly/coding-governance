@@ -2,6 +2,17 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-21 · node a · Tier-1 · base 4773902f · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-20-build-TOOL-aScannedThrottle-1.md](../build/2026-08-20-build-TOOL-aScannedThrottle-1.md) | journal | — |
+| [2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md](../reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md) | diff-review | — |
+| [2026-08-21-review-TOOL-aScannedThrottle-1-diff.md](../reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff.md) | diff-review | — |
+| [2026-08-21-review-TOOL-aScannedThrottle-1.md](../reviews/2026-08-21-review-TOOL-aScannedThrottle-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The owner reports the lander is extremely slow and does not use the machine, and names the canary

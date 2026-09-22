@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-10 · node a · Tier-2 · base 16aeb5ef · streams tooling · ratified 2026-08-10
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-build-TOOL-aSealedCaravan-1-1.md](../build/2026-08-10-build-TOOL-aSealedCaravan-1-1.md) | journal | DEPL-aSealedCaravan-2 |
+| [2026-08-10-review-TOOL-aSealedCaravan-1-1.md](../reviews/2026-08-10-review-TOOL-aSealedCaravan-1-1.md) | spec-audit | DEPL-aSealedCaravan-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Declare `tools/<kit>/` the single install prefix for every kit a new adopter lands, and close the four

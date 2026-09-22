@@ -86,9 +86,21 @@ to code lines so the comment documenting the fix does not red it. The second is 
 assertion on the node running the suite, which is the only half that can see the defect at all,
 because the message was always the correct part.
 
+**The SIBLING construct is gated repo-wide, and only that one.** `shell hygiene (a loop fed by a
+command substitution)` refuses a `while … done` loop whose input redirect is an unquoted heredoc, or
+a here-string, whose body holds a command substitution — over every tracked `*.sh`, with a
+shrink-only registry of the sites that predate it. That is the same EOF dependency with a
+STREAM-shaped consumer, and it is where the class stops being a slow verdict and becomes a reader
+that never returns: on 2026-09-10 `pass_commit` held a merge-bar leg at zero CPU for 63 minutes,
+with the forked subshell holding both ends of its own pipe and no descendant alive. The leg counts
+`done < <(…)` and prints the count without gating it, because a NUL stream cannot ride a heredoc and
+process substitution is the only form left for those consumers. TOOL-aLeakedHandle-1.
+
 **What nothing gates:** the class repo-wide. `tools/run-gates/run-gates.sh` carries the same fix and
 its own suite asserts a rendezvous rather than elapsed time for the concurrency arm — deliberately,
 since elapsed time there is a fact about the node — so the runner's bound is correct today by
 inspection and by its comment, not by an arm that would catch a regression. Nothing sweeps other kits
 for `out=$(timeout`. Adding a repo-wide source scan is cheap and is not done here; the two dossiers
-that claim this class are the two places it has actually bitten.
+that claim this class are the two places it has actually bitten. The leg named above does NOT close
+this: `out=$(timeout N cmd)` is a plain assignment, and every non-loop command substitution sits
+outside that leg's failing population by construction. Two constructs, one class, one of them gated.

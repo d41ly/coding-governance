@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-10 · node a · Tier-2 · base 663ca427 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-09-review-TOOL-aRootedPrefix-1-1.md](../reviews/2026-08-09-review-TOOL-aRootedPrefix-1-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `map_lib.repo_root()` hardcodes the kit's `<repo-root>/codebase-map/` install convention by taking

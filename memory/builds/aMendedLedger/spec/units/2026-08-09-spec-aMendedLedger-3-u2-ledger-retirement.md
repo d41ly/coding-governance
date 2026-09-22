@@ -2,6 +2,18 @@
 
 **Status:** SPECCED · rev-2 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md](../../build/2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md) | journal | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md](../../reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md](../../reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md](../../reviews/2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+| [2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md](../../reviews/2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Retire this repo's authored per-node session ledger to `memory/archive/ledger/` and resolve the
@@ -17,9 +29,21 @@ into one commit for that reason.
 - **S1** `git mv memory/project/in-flight/{a,b,c}.md` to `memory/archive/ledger/{a,b,c}.md`,
   byte-identical, with git recording each as a 100% rename.
 - **S2** Delete `memory/project/in-flight/.gitkeep`, and with it the directory.
+  - **Readers:** by name: `tools/memory-tree/check-memory-hygiene.sh` names the directory among
+    check 3's retired members and admits no such entry in its closed case, and
+    `tools/memory-tree/check-memory-hygiene.test.sh` asserts the scaffolder does not write it.
+    by value: `tools/drift-audit/drift_report.py` still points the ledger probe at that directory,
+    and `tools/drift-audit/drift_signals.py` declares the probe's population empty because the
+    directory is gone.
 - **S3** Resolve `signal_ledger` per the master's F3 exit: add `ledger_rows_contradicting_git` to
   `DECLARED_EMPTY` and retire its pin of 4, both in the PROJECT layer
   `tools/drift-audit/drift_signals.py`. The kit engine `drift_report.py` is not edited.
+  - **Readers:** by name: `tools/drift-audit/drift_signals.py` carries the signal in
+    `DECLARED_EMPTY` and records in its pins table that it now carries no pin,
+    `tools/drift-audit/drift_report.py` reads both tables off the project layer, and
+    `tools/drift-audit/selftest.py` arms a declared-empty fixture and rewrites a pin row to test pin
+    semantics. by value: `tools/drift-audit/drift_report.py` falls back to the bare tolerance for a
+    signal with no pin, so the comparison a run makes changes value and not merely label.
 - **S4** Extend — never recreate — `memory/archive/ledger/README.md`, which U1 creates, with the
   retirement record for the three shards.
 - **S5** Add a two-direction arm to `tools/drift-audit/selftest.py` asserting the signal reports
@@ -32,6 +56,12 @@ into one commit for that reason.
 - **S6** Remove every ledger REFERENCE from `tools/workflows/drift-audit-state.js` — all ten sites,
   not the four the master's Files-touched row names — and re-key the surviving `work-state` lens on
   the generated build index. The lens itself stays; see §3.
+  - **Readers:** by name: `tools/drift-audit/SKILL.template.md` and its render
+    `.claude/skills/drift-audit/SKILL.md` tell a session to narrow the harness's lens list,
+    `tools/check-kit-versions.sh` asserts its version, and `memory/map/features/review-harnesses.md`
+    records the harness, with `memory/map/generated/inventories.json` carrying its generated key.
+    by value: `tools/drift-audit/README.md` records the harness's return key moving from an array of
+    lens slugs to a count of lenses, a reader of the lens set this item re-keys.
 
 ## 3. Non-goals (OUT)
 

@@ -2,6 +2,17 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base 0f0a121d · streams deployer+tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-build-DEPL-aTetheredConvoy-1-1.md](../build/2026-08-16-build-DEPL-aTetheredConvoy-1-1.md) | journal | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
+| [2026-08-16-review-DEPL-aTetheredConvoy-1-1.md](../reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-1.md) | spec-audit | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
+| [2026-08-16-review-DEPL-aTetheredConvoy-1-2.md](../reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-2.md) | spec-audit | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
+| [2026-08-16-review-DEPL-aTetheredConvoy-1-3.md](../reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-3.md) | diff-review | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make it mechanically impossible for a new moving part in this repo to ship without being deployable.

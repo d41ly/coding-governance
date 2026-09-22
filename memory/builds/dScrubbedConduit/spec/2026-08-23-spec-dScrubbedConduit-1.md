@@ -2,6 +2,18 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-23-build-TOOL-dScrubbedConduit-1-acceptance-ledger.md](../build/2026-08-23-build-TOOL-dScrubbedConduit-1-acceptance-ledger.md) | journal | — |
+| [2026-08-23-review-TOOL-dScrubbedConduit-1-claims.md](../reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-claims.md) | spec-audit | — |
+| [2026-08-23-review-TOOL-dScrubbedConduit-1-fixes.md](../reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-fixes.md) | spec-audit | — |
+| [2026-08-23-review-TOOL-dScrubbedConduit-1-specdoc.md](../reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-specdoc.md) | spec-audit | — |
+| [2026-08-23-review-TOOL-dScrubbedConduit-1-verdicts.md](../reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-verdicts.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Fix five defects reported from `d41ly/nc`, which re-adopted the whole kit set on 2026-08-23. Each was

@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-code',
-  version: '1.6',
+  version: '1.11',
   description:
     'Drift audit Tier 2, wave 1: dead / inefficient / unwired / duplicated code + instrument integrity. Project-agnostic; all repo facts arrive via args.',
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.6
+// gov:kit drift-audit@1.11
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
 // budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.
@@ -22,6 +22,43 @@ export const meta = {
 // now RESOLVES the bound and refuses that binder form outright. (The spelling itself is paraphrased
 // here on purpose: the acceptance grep for it is repo-wide and would match the comment explaining it.)
 const CAP = 5
+// TOOL-dRetiredFork-6, taken from inCMS's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
+// hand-written ternary with THREE outcomes that conflated TWO of them: `!synth` gave UNVERIFIED,
+// anything non-zero gave PARTIAL, and everything else gave the bare string `complete` — so "nothing
+// moved" and "the probe could not run" were the same sentence, and `complete` is a reassuring word
+// for a run that measured nothing.
+//
+// DERIVED, so a consumer gate can re-derive the expected sentence and byte-compare it. That is the
+// whole mechanical difference: a gate that re-derives CANNOT be satisfied by a hand-written string,
+// and relaxing it to a substring match would make it satisfiable by prose — the first class
+// AGENTS.md section 7 names.
+//
+// THE SENTENCE IS NOW A CONTRACT (ratified F1). Changing it is a version bump like any other, and
+// the drift-audit kit's own README states the three states so a later editor knows the cost.
+function deriveLiveness(c) {
+  // Order matters and is the fail-closed direction: the WORST state is decided first, so a run that
+  // is both dead and partial reports dead.
+  if (!c.synth) return 'dead'
+  if (c.lensesRun === 0) return 'dead'
+  if (c.lensesDead || c.skepticsDead || c.unverified) return 'partial'
+  return 'clean'
+}
+
+function renderLivenessNote(state, c) {
+  if (state === 'dead') {
+    // DEAD PROBE, never a zero. AGENTS.md section 7: a probe that cannot move says so, because a
+    // reassuring zero from a broken signal is indistinguishable from a clean run.
+    return `DEAD PROBE: this run measured NOTHING - ${c.lensesRun} lens(es) ran, ` +
+      `${c.lensesDead} died, synthesis ${c.synth ? 'returned' : 'DIED'}; the note is not a zero ` +
+      `because the signal could not move`
+  }
+  if (state === 'partial') {
+    return `PARTIAL: ${c.lensesDead} lens(es) and ${c.skepticsDead} skeptic batch(es) died, ` +
+      `${c.unverified} finding(s) unverified`
+  }
+  return `CLEAN: ${c.lensesRun} lens(es) ran, none died, ${c.unverified} finding(s) unverified`
+}
+
 async function boundedParallel(thunks, cap = CAP) {
   const out = []
   for (let i = 0; i < thunks.length; i += cap)
@@ -80,6 +117,22 @@ EVIDENCE RULES (these decide whether your finding survives the skeptic):
 - Prefer few high-confidence findings over many speculative ones. Precision is the metric.
 - Severity: blocker = breaks a merge-bar gate or ships a live defect; high = real user-visible or
   data-integrity impact; medium = real debt with a concrete cost; low = tidy-up.
+
+COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter §7: every suite declares a wall-clock ceiling
+and one arriving without a ceiling reds by that fact. Yours is roughly 30 TOOL CALLS. If a question
+cannot be answered inside it, RECORD THE QUESTION AS UNANSWERED and move on — an unanswered question
+on disk is worth more than a perfect one nobody ever receives.
+
+WRITE THE FILE FIRST, THEN APPEND. Create your writeup EARLY and incomplete, and add to it as you
+learn. Do not hold the whole thing in your head and write at the end.
+
+WHY, and it is not hypothetical. A completeness lens on this exact harness ran 2 HOURS 10 MINUTES
+against siblings that finished in TWELVE, building end-to-end fixtures nobody asked it for. It was
+killed with NOTHING on disk: 75 tool calls, zero durable output, and the whole workflow blocked
+behind it because verify and synthesize cannot start until every lens returns. Had it written as it
+went, two hours of real work would have survived instead of being discarded. Nothing here can
+enforce this — a script cannot time out its own agent — so it is a brief, and the brief is the only
+control there is.
 
 OUTPUT: Write your full prose writeup (evidence, commands run, per-finding detail) to
 ${OUT}/wave1-<yourLensSlug>.md and return ONLY the structured object. Keep each structured field
@@ -223,7 +276,42 @@ const indexed = []
 lensOut.forEach((r) => {
   ;(r.findings || []).forEach((f) => indexed.push({ id: indexed.length + 1, lens: r.lens, ...f }))
 })
+// TOOL-dTieredTribunal-3 S1 (from TOOL-aGuardedTally-1 S1 on tier2-review.js) - a dead lens returns
+// null and `filter(Boolean)` drops it SILENTLY, so an all-dead run was indistinguishable from an
+// all-clean one. The sibling harness learned this from a live run that reported `clean: 0 findings`
+// with four transport errors and zero results. Count what came back; never call absence cleanliness.
+const lensesDead = LENSES.length - lensOut.length
+if (lensesDead) log(`WARNING: ${lensesDead}/${LENSES.length} lens(es) DIED and returned nothing.`)
 log(`Find: ${lensOut.length}/${LENSES.length} lenses returned, ${indexed.length} raw findings`)
+
+// TOOL-dTieredTribunal-3 S4 - the all-lenses-dead exit, and the misconfiguration exit beside it.
+// The predicate is guarded on `LENSES.length > 0` and never the bare `lensesDead === LENSES.length`.
+// An empty lens set makes the bare form read `0 === 0` and report a TYPO as a degraded run, which is
+// the vacuous-selector-empty-population class. The two states get two branches and two notes.
+// Every counter below is 0 rather than null, and that is a claim rather than a placeholder: no
+// verify stage was dispatched on either path, so zero spurious, duplicate and conflicting verdicts
+// is what provably happened. A count of events that could not have occurred is 0; an adjudication
+// that never ran would be null, which is why the report and summary are null here.
+if (LENSES.length === 0) {
+  const note = 'REFUSED: the configured lens set is EMPTY, so nothing was reviewed - check the caller\'s lens slugs'
+  log(note)
+  return {
+    counts: { raw: 0, confirmed: 0, partial: 0, refuted: 0, unverified: 0 },
+    precision: null, report: null, summary: null,
+    lensesRun: 0, lensesDead: 0, skepticsDead: 0, conflicts: 0, duplicates: 0, spurious: 0, note,
+    confirmedTop: [], unverifiedList: [],
+  }
+}
+if (LENSES.length > 0 && lensesDead === LENSES.length) {
+  const note = `UNVERIFIED: all ${LENSES.length} lens(es) died, so NOTHING was reviewed`
+  log(note)
+  return {
+    counts: { raw: 0, confirmed: 0, partial: 0, refuted: 0, unverified: 0 },
+    precision: null, report: null, summary: null,
+    lensesRun: 0, lensesDead, skepticsDead: 0, conflicts: 0, duplicates: 0, spurious: 0, note,
+    confirmedTop: [], unverifiedList: [],
+  }
+}
 
 const VERDICT_SCHEMA = {
   type: 'object',
@@ -283,12 +371,40 @@ ${JSON.stringify(b, null, 1)}`,
   CAP
 )
 
+// TOOL-dTieredTribunal-3 S2 (from TOOL-aBoundedVerdict-14 S2 on tier2-review.js) - a refutation
+// reached with dead skeptics is not a refutation. An all-skeptics-dead run used to return
+// `all findings refuted` at precision 0.00 with no indication anything had died.
+const liveBatches = verdictBatches.filter(Boolean)
+const skepticsDead = batches.length - liveBatches.length
+if (skepticsDead) log(`WARNING: ${skepticsDead}/${batches.length} skeptic batch(es) DIED - verification is PARTIAL.`)
+
+// TOOL-dTieredTribunal-3 S5 (from TOOL-aFoldedQuarry-2 U6 on tier2-review.js) - three degraded
+// shapes get a counter each instead of silently rewriting or dropping a verdict.
+//   spurious  - an id this run never assigned: a hallucinated or renumbered verdict. Counted, ignored.
+//   duplicate - a repeat whose verdict TOKEN equals the standing one. Idempotent, counted.
+//   conflict  - a repeat whose TOKEN differs. The finding is DEMOTED to unverified, because two
+//               skeptics saying opposite things is precisely the state where this harness does not
+//               know. The predecessor kept whichever verdict arrived FIRST, silently.
+// The vocabulary here is TERNARY where tier2-review.js is binary, so the rule is stated over tokens:
+// `partial` is a distinct token, and a `partial` arriving against a standing `confirmed` is a
+// CONFLICT rather than partial agreement.
+const assignedIds = new Set(indexed.map((f) => f.id))
 const vmap = new Map()
-verdictBatches.filter(Boolean).forEach((vb) => {
-  ;(vb.verdicts || []).forEach((v) => {
-    if (typeof v.id === 'number' && !vmap.has(v.id)) vmap.set(v.id, v)
-  })
-})
+const conflictIds = new Set()
+let duplicates = 0
+let spurious = 0
+for (const vb of liveBatches)
+  for (const v of vb.verdicts || []) {
+    if (!Number.isInteger(v.id) || !assignedIds.has(v.id)) { spurious++; continue }
+    const prev = vmap.get(v.id)
+    if (!prev) { vmap.set(v.id, v); continue }
+    if (prev.verdict === v.verdict) duplicates++
+    else conflictIds.add(v.id)
+  }
+for (const id of conflictIds) vmap.delete(id)
+if (conflictIds.size) log(`WARNING: ${conflictIds.size} finding(s) got CONTRADICTORY verdicts - demoted to UNVERIFIED.`)
+if (duplicates) log(`note: ${duplicates} repeat verdict(s) agreed with the standing one - idempotent.`)
+if (spurious) log(`WARNING: ${spurious} verdict(s) carried an id this run never assigned - discarded.`)
 // A finding with NO verdict is UNVERIFIED, never refuted. Two prior runs reported a hard zero
 // because the join matched nothing, and a hard zero reads as a clean bill of health.
 const judged = indexed.map((f) => {
@@ -296,7 +412,12 @@ const judged = indexed.map((f) => {
   return {
     ...f,
     verdict: v ? v.verdict : 'unverified',
-    reason: v ? v.reason : 'no verdict returned',
+    // TOOL-dTieredTribunal-3 S5 - a DEMOTED finding did get verdicts, two of them, and they
+    // disagreed. Rendering `no verdict returned` for it would be false, and that string is
+    // serialized into the synthesis prompt and into the report.
+    reason: v ? v.reason : (conflictIds.has(f.id)
+      ? 'DEMOTED: two skeptic batches returned contradictory verdicts for this id'
+      : 'no verdict returned'),
     severityCorrection: v && v.severityCorrection,
   }
 })
@@ -342,7 +463,10 @@ than silently picking one.
 Return {path, summary} only — the prose goes in the file. Forward slashes in the path.
 
 DATA:
-counts: raw ${indexed.length}, confirmed ${confirmed.length}, partial ${partial.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision === null ? 'n/a' : precision.toFixed(2)}, severity corrections ${downgrades}
+counts: raw ${indexed.length}, confirmed ${confirmed.length}, partial ${partial.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision === null ? 'n/a' : precision.toFixed(2)}
+RUN INTEGRITY - state these in the report and do NOT describe this run as complete if any is non-zero:
+lenses ${lensOut.length}/${LENSES.length} returned, ${lensesDead} DIED; skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s), ${conflictIds.size} contradictory verdict(s) demoted to unverified, ${downgrades} severity correction(s).
+If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. Say so where you would otherwise call a zero positive evidence.
 lens writeups: ${JSON.stringify(lensOut.map((r) => ({ lens: r.lens, path: r.path, summary: r.summary })), null, 1)}
 judged findings: ${JSON.stringify(judged, null, 1)}`,
   {
@@ -356,8 +480,34 @@ judged findings: ${JSON.stringify(judged, null, 1)}`,
   }
 )
 
+// TOOL-dTieredTribunal-3 S6 (from TOOL-aBoundedVerdict-14 S6 on tier2-review.js) - the SYNTH-DEATH
+// hole. A dead synthesis returned a null report with no indication, and every confirmed finding was
+// lost with nothing logged. They exist here in memory; the only thing missing was saying so.
+if (!synth) {
+  log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below exist only in this log:`)
+  for (const f of confirmed) log(`  CONFIRMED [${f.severity}] ${f.file}:${f.line} - ${f.claim}`)
+  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.file}:${f.line} - ${f.claim}`)
+}
+
 return {
   wave: 'code-drift',
+  // TOOL-dTieredTribunal-3 S3 - this file returned NO lens information at all, which is not safer
+  // than returning the wrong thing. The SURVIVING count, as an integer, matching its sibling.
+  lensesRun: lensOut.length,
+  lensesDead,
+  skepticsDead,
+  conflicts: conflictIds.size,
+  duplicates,
+  spurious,
+  // TOOL-dTieredTribunal-3, closing-review D1 - ORDER MATTERS HERE and it was wrong. A dead
+  // synthesis is the WORST outcome this function can report, so it is tested FIRST. Tested last, it
+  // was reachable only when nothing else was degraded, which made the most serious note the least
+  // reachable one. This unit's own demote-on-conflict rule makes `unverified.length` non-zero more
+  // often, so the port had quietly narrowed the path to its own honest message.
+  note: renderLivenessNote(
+    deriveLiveness({ synth, lensesRun: LENSES.length - lensesDead, lensesDead, skepticsDead, unverified: unverified.length }),
+    { synth, lensesRun: LENSES.length - lensesDead, lensesDead, skepticsDead, unverified: unverified.length },
+  ),
   counts: {
     raw: indexed.length,
     confirmed: confirmed.length,

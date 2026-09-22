@@ -8,6 +8,7 @@
 # EVERY ARM IS A STAGED BREAK WITH AN EXPECTED CHECK NUMBER. Asserting only that the leg RED would
 # pass whenever anything at all was wrong, which is the shape that lets a predicate drift onto a
 # different population and still look armed. The arms assert WHICH check spoke.
+KIT_REL="${KIT_REL:-tools/unattended}"
 set -u
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 TMP=$(mktemp -d) || exit 2
@@ -52,8 +53,8 @@ seed() { # dir
   ( cd "$1" && git add -A >/dev/null && git commit -qm seed )
 }
 
-run() { ( cd "$W" && bash tools/unattended/check-playbook.sh 2>&1 ); }
-rc()  { ( cd "$W" && bash tools/unattended/check-playbook.sh >/dev/null 2>&1; echo $? ); }
+run() { ( cd "$W" && bash $KIT_REL/check-playbook.sh 2>&1 ); }
+rc()  { ( cd "$W" && bash $KIT_REL/check-playbook.sh >/dev/null 2>&1; echo $? ); }
 
 W="$TMP/w"; seed "$W"
 F="$W/tools/unattended/playbook.fixture.md"
@@ -88,7 +89,7 @@ run | grep -qE 'pieces 2 · verified 2 · failed 0 · stale 0 · unrecorded 0 ·
   || bad "the leg did not report the per-piece census over the tracked records, so the attended path's only gated surface is ungraded"
 
 probe() { # label · expected check · sed program · expected message signature
-  cp "$KEEP" "$F"; ( cd "$W" && sed -i "$3" tools/unattended/playbook.fixture.md )
+  cp "$KEEP" "$F"; ( cd "$W" && sed -i "$3" $KIT_REL/playbook.fixture.md )
   out=$(run); r=$?
   got=$(printf '%s\n' "$out" | grep -oE 'check [0-9]+ FAILED' | head -1)
   if [ "$r" -eq 0 ]; then bad "$1: the leg exited 0 — the check is UNARMED, not lenient"
@@ -119,14 +120,14 @@ probe "canon section gone"  7 's/^## 8\. Set-scoped checks/## 8. Something Else 
 # ---- reach it — and it is the arm that matters most, because the state it catches is the one that
 # ---- otherwise prints `GATE ok` over an empty set for the leg carrying this mode's enforcement.
 cp "$KEEP" "$F"
-( cd "$W" && git rm -q tools/unattended/playbook.fixture.md )
+( cd "$W" && git rm -q $KIT_REL/playbook.fixture.md )
 out=$(run); r=$?
 if [ "$r" -ne 0 ] && printf '%s\n' "$out" | grep -q 'check 1 FAILED'; then ok
   n=$((n+1)); grep -qF -- "no tracked file carries a playbook declaration block, so every check in this leg would pass over an empty population and print a green that means the opposite of what it looks like - this leg ships a fixture playbook precisely so that cannot be the ordinary state" <<<"$out" || { st=1; echo "FAIL missing: no tracked file carries a playbook declaration block, so every check in this leg would pass over an empty population and print a green that means the opposite of what it looks like - this leg ships a fixture playbook precisely so that cannot be the ordinary state"; }
 else bad "empty population: expected check 1 and a non-zero exit, got rc=$r"; fi
 # and the leg must NOT print a green-looking line in that state
 printf '%s\n' "$out" | grep -q 'population 0 playbook' && ok || bad "the empty-population report does not name the count it found"
-( cd "$W" && git checkout -q -- tools/unattended/playbook.fixture.md 2>/dev/null || git reset -q HEAD tools/unattended/playbook.fixture.md )
+( cd "$W" && git checkout -q -- $KIT_REL/playbook.fixture.md 2>/dev/null || git reset -q HEAD $KIT_REL/playbook.fixture.md )
 cp "$KEEP" "$F"
 
 # ---- the DECLARED-NULL versus EMPTY distinction, which check 7 exists to make. A section carrying
@@ -196,7 +197,7 @@ if [ -n "$R1" ] && [ -f "$P1" ]; then
 
   # THE LIVENESS ASSERTION. Every count above can be satisfied by a tree with no pieces, so the arm
   # that matters most is the one proving the reader SAYS SO instead of reporting a clean zero.
-  ( cd "$W" && sed -i 's|^grain .*|grain         = "tools/unattended/nowhere/*/piece.md"|' tools/unattended/playbook.fixture.md )
+  ( cd "$W" && sed -i 's|^grain .*|grain         = "tools/unattended/nowhere/*/piece.md"|' $KIT_REL/playbook.fixture.md )
   run | grep -q 'DEAD PROBE' && ok || bad "a grain resolving no piece did not report a DEAD PROBE — a reader that enumerates zero and reports zero failures is indistinguishable from a clean run"
   [ "$(rc)" = 0 ] && ok || bad "the dead probe REDDED the leg; the reader classifies and never grades, and only --close blocks"
   cp "$KEEP" "$F"
@@ -207,8 +208,8 @@ fi
 # ---- THE CANON IS DERIVED, and this is the arm that proves it. Removing a row from the shipped
 # ---- template must shrink what the leg demands; if it does not, the canon is hardcoded somewhere
 # ---- and the template is decoration.
-( cd "$W" && sed -i '/^| 8 | Set-scoped checks/d' tools/unattended/PLAYBOOK-TEMPLATE.template.md \
-    && sed -i 's/^## 8\. Set-scoped checks/## 8. Renamed/' tools/unattended/playbook.fixture.md )
+( cd "$W" && sed -i '/^| 8 | Set-scoped checks/d' $KIT_REL/PLAYBOOK-TEMPLATE.template.md \
+    && sed -i 's/^## 8\. Set-scoped checks/## 8. Renamed/' $KIT_REL/playbook.fixture.md )
 [ "$(rc)" = 0 ] && ok || bad "removing a canon row from the template did not relax the section check — the canon is not derived from the template"
 seed_out=$(run | grep -c 'canon 11 section' || true)
 [ "$seed_out" = 1 ] && ok || bad "the leg did not report the shrunken canon count it derived"
@@ -222,7 +223,7 @@ n=$((n+1))
 # `check-arms` reads as a NEGATIVE assertion — so this arm existed and scored as an absence test,
 # which is the "something mentions it" shape that checker exists to refuse. The output is computed
 # on its own line; the assertion line then carries neither the `&&` nor a here-string with one.
-badsha=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' 0000000000000000000000000000000000000000 2>&1 )
+badsha=$( cd "$W" && bash $KIT_REL/check-playbook.sh --counts $KIT_REL/playbook.fixture.md '' 0000000000000000000000000000000000000000 2>&1 )
 grep -qF -- "the playbook does not resolve at the sha this count was asked for, so every declaration it carries would parse to nothing and the census would report a clean run over an unreadable file - sha and playbook follow" <<<"$badsha" \
   || bad "--counts at an unresolvable sha did not refuse, so an empty body would parse as declaring no checks"
 # ...and at a REAL sha it reads the BLOB, not the tree — asserted in the one direction where the
@@ -242,20 +243,20 @@ n=$((n+1))
 grep -q 'phantom-leg' "$F" || bad "the phantom-leg fixture edit did not take, so both halves below would measure the shipped declaration"
 ( cd "$W" && git add -A >/dev/null && git commit -qm phantom )
 AT=$( cd "$W" && git rev-parse HEAD )
-PIN0=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | grep -m1 '^pieces=' )
+PIN0=$( cd "$W" && bash $KIT_REL/check-playbook.sh --counts $KIT_REL/playbook.fixture.md '' "$AT" | grep -m1 '^pieces=' )
 n=$((n+1))
 [ "$PIN0" = "pieces=2 verified=0 failed=0 stale=0 unrecorded=0 unchecked=2" ] \
   || bad "a leg no record satisfies did not grade its pieces unchecked, so the arm below cannot tell the pinned read from the tree read: [$PIN0]"
 sed -i '/^piece_checks/d' "$F"
-PIN1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | grep -m1 '^pieces=' )
-TREE1=$( cd "$W" && bash tools/unattended/check-playbook.sh | grep -oE 'pieces [0-9]+ · verified [0-9]+' | head -1 )
+PIN1=$( cd "$W" && bash $KIT_REL/check-playbook.sh --counts $KIT_REL/playbook.fixture.md '' "$AT" | grep -m1 '^pieces=' )
+TREE1=$( cd "$W" && bash $KIT_REL/check-playbook.sh | grep -oE 'pieces [0-9]+ · verified [0-9]+' | head -1 )
 require_shape "$TREE1" 'pieces * · verified *' "the tree read of the census"
 n=$((n+1))
 [ "$PIN1" = "$PIN0" ] \
   || bad "an UNCOMMITTED piece_checks delete moved the PINNED census, so the close still reads the file the run can edit: [$PIN0] then [$PIN1]"
 n=$((n+1))
 case "$PIN1" in *"verified=0"*) [ "${TREE1#*verified }" -ne 0 ] || bad "the tree read and the pinned read agree over a tree where the declaration was deleted, so this arm cannot distinguish them and would pass against the defect it exists to catch" ;; *) bad "the pinned read is not the unchecked one, so the comparison below is not the one this arm makes: [$PIN1]" ;; esac
-( cd "$W" && git checkout -q -- tools/unattended/playbook.fixture.md 2>/dev/null )
+( cd "$W" && git checkout -q -- $KIT_REL/playbook.fixture.md 2>/dev/null )
 cp "$KEEP" "$F"
 ( cd "$W" && git add -A >/dev/null && git commit -qm restore-fixture )
 
@@ -434,10 +435,10 @@ BYPASS_BAN="--no-verify"
 # ---- freshly authored one, not a defect. The arm below asserts the RED for a full grain; this one
 # ---- asserts the GREEN, and only the pair states the rule.
 cp "$KEEP" "$F"
-( cd "$W" && sed -e 's|^records       = .*|records       = "tools/unattended/empty-records"|'       -e 's|^grain         = .*|grain         = ""|' tools/unattended/playbook.fixture.md > tools/unattended/playbook.third.md    && mkdir -p tools/unattended/empty-records && git add -A >/dev/null 2>&1 )
+( cd "$W" && sed -e 's|^records       = .*|records       = "tools/unattended/empty-records"|'       -e 's|^grain         = .*|grain         = ""|' $KIT_REL/playbook.fixture.md > $KIT_REL/playbook.third.md    && mkdir -p tools/unattended/empty-records && git add -A >/dev/null 2>&1 )
 n=$((n+1))
 grep -qF -- "NO readable record under its declared records root" <<<"$(run)"   && bad "a playbook whose grain enumerates nothing reds for having no evidence yet, which is the ordinary state of one nobody has run"
-( cd "$W" && git rm -q --cached -- tools/unattended/playbook.third.md >/dev/null 2>&1; rm -f tools/unattended/playbook.third.md; rmdir tools/unattended/empty-records 2>/dev/null )
+( cd "$W" && git rm -q --cached -- $KIT_REL/playbook.third.md >/dev/null 2>&1; rm -f $KIT_REL/playbook.third.md; rmdir tools/unattended/empty-records 2>/dev/null )
 cp "$KEEP" "$F"
 
 # ---- ROUND 8's BLOCKERS, EACH WITH THE ARM THAT WOULD HAVE CAUGHT IT.
@@ -497,7 +498,7 @@ cp "$KEEP" "$F"
 # state of a freshly authored playbook and is a note now, not a refusal. The defect is work with
 # no evidence, which is a full grain and an empty root - and that is what this arm stages.
 ( cd "$W" && sed -e 's|^records       = .*|records       = "tools/unattended/empty-records"|' \
-      tools/unattended/playbook.fixture.md > tools/unattended/playbook.second.md \
+      $KIT_REL/playbook.fixture.md > $KIT_REL/playbook.second.md \
    && mkdir -p tools/unattended/empty-records && git add -A >/dev/null 2>&1 )
 out=$(run)
 n=$((n+1))
@@ -509,7 +510,7 @@ grep -qF -- "a playbook enumerates pieces from its declared grain and NO readabl
 n=$((n+1))
 grep -E "FAILED.*a playbook enumerates pieces from its de" <<<"$out" | grep -qF -- "tools/unattended/empty-records" \
   || bad "the refusal does not name the root that contributed nothing, so a reader cannot tell which of them is empty"
-( cd "$W" && git rm -q --cached -- tools/unattended/playbook.second.md >/dev/null 2>&1; rm -f tools/unattended/playbook.second.md; rmdir tools/unattended/empty-records 2>/dev/null )
+( cd "$W" && git rm -q --cached -- $KIT_REL/playbook.second.md >/dev/null 2>&1; rm -f $KIT_REL/playbook.second.md; rmdir tools/unattended/empty-records 2>/dev/null )
 cp "$KEEP" "$F"
 
 # ---- ROUND 7's THREE DEFECTS IN CHECK 10, each with the arm that would have caught it. All three
@@ -609,12 +610,12 @@ cp "$KEEP" "$F"
 sed -i 's|^piece_checks  = .*|piece_checks  = ["phantom-leg"]|' "$F"
 ( cd "$W" && git add -A >/dev/null && git commit -qm honest-strict )
 HONEST=$( cd "$W" && git rev-parse HEAD )
-PINH=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$HONEST" | grep -m1 '^pieces=' )
+PINH=$( cd "$W" && bash $KIT_REL/check-playbook.sh --counts $KIT_REL/playbook.fixture.md '' "$HONEST" | grep -m1 '^pieces=' )
 require_shape "$PINH" 'pieces=* verified=*' "the honest pinned census this arm compares against"
 cp "$KEEP" "$F"
 ( cd "$W" && git add -A >/dev/null && git commit -qm forged-permissive )
 FORGED=$( cd "$W" && git rev-parse HEAD )
-PINF=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$FORGED" | grep -m1 '^pieces=' )
+PINF=$( cd "$W" && bash $KIT_REL/check-playbook.sh --counts $KIT_REL/playbook.fixture.md '' "$FORGED" | grep -m1 '^pieces=' )
 require_shape "$PINF" 'pieces=* verified=*' "the forged pinned census this arm compares against"
 n=$((n+1))
 [ "$PINF" != "$PINH" ] \
@@ -630,9 +631,9 @@ n=$((n+1))
 # arm could not tell a working pin from a machine where the lever does nothing. An UNPINNED read of
 # the same sha must return the forged bytes, or there is no lever to be pinned against.
 n=$((n+1))
-[ "$( cd "$W" && git show "$HONEST:tools/unattended/playbook.fixture.md" | grep -c 'phantom-leg' )" = "0" ] \
+[ "$( cd "$W" && git show "$HONEST:$KIT_REL/playbook.fixture.md" | grep -c 'phantom-leg' )" = "0" ] \
   || bad "an UNPINNED read at the honest sha returned the honest bytes, so the replace ref does nothing on this machine and the pinned assertion below proves nothing"
-PINR=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$HONEST" | grep -m1 '^pieces=' )
+PINR=$( cd "$W" && bash $KIT_REL/check-playbook.sh --counts $KIT_REL/playbook.fixture.md '' "$HONEST" | grep -m1 '^pieces=' )
 n=$((n+1))
 [ "$PINR" = "$PINH" ] \
   || bad "a replace ref moved the PINNED census at an unchanged, honest sha, so the run supplies the playbook it is measured against on the one item that takes no override: honest [$PINH] became [$PINR]"
@@ -644,7 +645,7 @@ cp "$KEEP" "$F"
 # ---- when a field was missing; the fold replaced it with a per-SHA pin that silently reverted when
 # ---- the sha was missing. `fact` returns empty with exit 0, so the only caller could hand this
 # ---- nothing and never know.
-emptypin=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' '' 2>&1 )
+emptypin=$( cd "$W" && bash $KIT_REL/check-playbook.sh --counts $KIT_REL/playbook.fixture.md '' '' 2>&1 )
 n=$((n+1))
 grep -qF -- "--counts requires the sha to read the playbook at; an absent pin would silently parse the working tree, which is the file the run itself can edit" <<<"$emptypin" \
   || bad "--counts accepted an EMPTY sha, so an absent pin silently reads the file the run can edit"

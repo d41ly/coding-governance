@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](../build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md) | research | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Ship the template a playbook is written from: a closed section canon derived from the reference

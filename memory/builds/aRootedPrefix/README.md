@@ -15,21 +15,29 @@ segment short, and the two entrypoints that do not import the project layer answ
 corpus that produced instead of failing. Measured on paired fixture repos: one range with a genuine
 shipped reinvention reports `collision_flags: 1` at a root install and `0` at a prefixed one.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aRootedPrefix-1` | 2 | codebase-map: make the kit correct at any install prefix |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-09 · streams tooling
 ids TOOL-aRootedPrefix-1 TOOL-aRootedPrefix-2 TOOL-aRootedPrefix-3
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aRootedPrefix-1 — codebase-map: make the kit correct at any install prefix](spec/2026-08-09-spec-aRootedPrefix-1.md) | CLOSED | rev-3 | 2026-08-10 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aRootedPrefix-1 — codebase-map: make the kit correct at any install prefix](spec/2026-08-09-spec-aRootedPrefix-1.md) | — | 2 | CLOSED | rev-3 | 2026-08-10 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 1 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-09-review-TOOL-aRootedPrefix-1-1.md](reviews/2026-08-09-review-TOOL-aRootedPrefix-1-1.md) | spec-audit | TOOL-aRootedPrefix-1 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -41,11 +49,3 @@ Records live under `spec/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-09-spec-aRootedPrefix-1.md](spec/2026-08-09-spec-aRootedPrefix-1.md)
-- **`reviews/`**
-  - [2026-08-09-review-TOOL-aRootedPrefix-1-1.md](reviews/2026-08-09-review-TOOL-aRootedPrefix-1-1.md)
-<!-- /gen:build-docs -->

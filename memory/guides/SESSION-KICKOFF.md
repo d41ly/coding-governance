@@ -1,12 +1,13 @@
 # Session kickoff manifest — coding-governance
 
-<!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
+<!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-24T16:43:52+03:00 @ b164a29603cb4fa3e5533721252de164853f948d
+last-audit: 2026-09-22T12:44:25+03:00 @ bbabce16c9dd5138bd7eccb128ee84d878ba0fc7
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2b69704015b739a1736f79d5c35c661ddd8bb148
+last-body-change: 83129cd9b6986b87002e51227542a4b67986157d
 check-script: skills/session-kickoff/manifest-check.sh
+registry: AGENTS.md
 -->
 
 The project layer read by the generic `/session-kickoff` skill. Precedence on conflicts:
@@ -19,7 +20,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 - Every unit that changed what this file front-loads (a gate command, entrypoint, governing doc, a
   trap hit, a doc/memory claim found stale, or a fact re-derived it should have front-loaded) re-stamps
   `last-audit` with a delta line in the commit message; no delta → no touch.
-- Stamp rule: sha = `HEAD` on `main`, else `git merge-base origin/main HEAD`; datetime always advances.
+- Stamp rule: sha = `HEAD` on any branch; datetime always advances.
 - Dated entries carry a prune-when condition and are deleted once it holds.
 
 ## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)
@@ -50,15 +51,16 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
   build's stated goal rather than stalling on a spec that turned out wrong, and M6's default is now
-  parallel-where-proven with sequence as the fallback. The conditions and the two bounds on that
-  authority are M3's and M6's; they are not restated here, for the reason the directives bullet
-  below gives. What is NOT in force is the VERIFICATION of that parallelism: `--dispatch` records a
-  pass's declared write set, but grading it against what the pass committed ships DARK behind
-  any run carrying dispatch rows. `TOOL-dUnstalledConvoy-23` redesigned it: the comparison now
-  RUNS on every leg and REPORTS to stdout, and it never fails the bar — a gate here and a
-  stall-free unattended run were shown to be the same choice. Declare your write
-  sets anyway — a redesign reads them — but do not treat a green leg as a disjointness proof.
+  parallel-where-proven with sequence as the fallback. Conditions and bounds are M3's and M6's. What
+  is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
+  comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
 
+- **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
+  (`manifest-check.sh --card --write`, wired as a SessionStart hook; `--card --replay` re-injects it
+  verbatim after a compaction). Step 1 consumes it; Step 5 appends the READY card through
+  `--card --append`. A main-loop `git commit` in a session whose startup card still reads
+  `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js` with the remedy in stderr; an
+  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`.
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
@@ -71,16 +73,30 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
-  `memory/guides/UNATTENDED-PROTOCOL.md` (a run that merges and pushes with no owner turn).
+  `memory/guides/UNATTENDED-PROTOCOL.md` + `UNATTENDED-VERBS.md` (a run that merges and pushes
+  with no owner turn).
 - **An unattended run is bound by DIRECTIVES**, not just by the protocol: a kit-owned set, each one a
   POINTER into a `BUILD-METHOD.md` section rather than a copy of it, waivable only by the owner at
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
-  the handles are written here — that is the drift the pointer design exists to avoid.
+  the handles are written here — that is the drift the pointer design exists to avoid. Two invert
+  the reflex: a discovery is ADOPTED not parked; the idle-wake precedes orienting. §11 and §5.
+
+- **The idle-wake is not the keepalive.** The cron job wakes an idle session and nothing else; what
+  resumes a stalled run lives OUTSIDE its session — the stop-guard at every turn end, the
+  stall-recorder at every error end, the resume tick from the OS scheduler — reading the LEASE
+  (`session:`, `pid:`, `host:`, `pid-image:`, `lease-utc:`) the driver records and the verdict
+  `--liveness` derives. `RESUME_STALE_BOUND` is the bound they act on. Protocol §5; `aWokenSentinel`.
+
+- **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`; `GATE_REAP_BOUND` the
+  teardown reap.** A breach is KILLED, and `gates-green` then says the bar never RETURNED
+  — not a leg FAILING. None of them bounds an AGENT-launched
+  process; see `tools/process-monitor/`. `TOOL-aBoundedCeiling-6`.
 
 - **An unattended run declares a MODE, and which one decides what binds it**: the authorization
-  discipline, which scoped directives apply, and whether the piece-scoped Definition-of-Done items
-  evaluate at all or announce a skip. The set is a driver constant, the unattended Skill's routing
+  discipline, WHICH ANCHOR may authorize it, which scoped directives apply, and whether the
+  piece-scoped Definition-of-Done items evaluate at all or announce a skip. The set is a driver
+  constant and so is the subset admissible on the second anchor, the unattended Skill's routing
   table names a start path per member, and a leg joins the two in both directions. Neither the
   members nor their count are written here, for the reason the directives bullet above gives.
 
@@ -90,14 +106,58 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   cutoff is a `.memory-tree.conf` date, so units that closed before the grammar existed are outside
   it; anything this session closes is inside it.
 
+- **A LIVE spec's §2 item that retires a named thing owes a `**Readers:**` clause**: `by name:` with
+  names a reader spells, then `by value:` with a reader or `NO VALUE READERS` and a reason. Hygiene
+  check 25, with no cutoff. The trigger, both escapes and what counts as a reader are
+  `memory/HYGIENE.md` item 25; the author's line is in the spec template's §2. `TOOL-dGatedProse-1`.
+
+- **A CLOSED unit whose spec grades THIN blocks `build-complete`** — an empty Scope, Acceptance
+  criteria or Gates section, keyed on the heading TITLE and NOT the ordinal, which on a Tier-1 spec
+  read Gates as acceptance (`TOOL-dBriefedPass-1`). Date-grandfathered on the spec's FILENAME against
+  `.unattended.conf`'s `SPEC_THIN_CUTOFF`; BLANK turns the term OFF. `TOOL-aGradedMandate-4`.
+
+- **From `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`) a LIVE spec's §7 leg line must name every
+  gate leg its §4 `### Files touched` trips** — `python tools/check-spec-tokens.py --list` prints the
+  `NEAR [guards]` rows to add BEFORE the spec is dated; a guard more legs share than the checker's
+  floor is excluded and printed with its count, a one-segment root such as `tools/` under the sub-head
+  declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
+
+- **The pre-code spec audit is owed where the build README's `spec-audit: <date>` OR the conf's
+  `SPEC_AUDIT_DEFAULT` (read at BASE, the README winning) declares it; under neither, nothing is owed
+  and the kickoff engine asks the owner once at READY.** `TOOL-aBlindedTrial-6`, `-7`, `KICK-aBlindedTrial-1`.
+
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
-  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. On 2026-08-21 two
-  builds rewrote `tools/unattended/` concurrently — aBoundedVerdict on node `c` and dUnstalledConvoy
-  on node `d` — and neither noticed until the landing. The integration cost 25 conflicting files, 40
-  hunks, and a Tier-2 review that found FOUR merge-bar legs red on the merged tree and none red on
-  either parent. Nothing was lost, because the work turned out largely orthogonal, but that was luck
-  rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
-  the cheap check is a `git log` at kickoff rather than a merge at landing.
+  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
+  `tools/unattended/` on 2026-08-21, and `check-memory-hygiene.sh` on 2026-09-13 by two sessions
+  sharing node tag `c`, for 13 conflicts at the landing. Neither time did anyone run it. §3's rule
+  is own STREAMS not files, and a kit is the unit that rule is about.
+
+- **A finished or live unattended run ANSWERS QUESTIONS about itself** — `/runlog`, over the run's
+  committed record first, the local run model for anything time-shaped (the record carries no event
+  times), and the redacted narration where the transcript is on this machine. Came in with
+  `dLoggedFlight`. It is not a code search: a symbol, caller or filename is still a grep.
+
+- **`tools/unattended/check-unattended.sh` carries four RAW CR BYTES** inside its `sub(...)` awk
+  regexes and one `tr -d`, and any text-mode read destroys all four. Python's universal-newline
+  translation turns a lone CR (0x0D) into LF (0x0A), which leaves the regex holding a newline and
+  silently breaks the checks that use it. Rewrite that file in BYTES. Hit during the 2026-09-21
+  reconcile; the class is `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already
+  registered and not read.
+  THE BYTES ARE NAMED RATHER THAN SHOWN, deliberately. Two earlier attempts at this sentence put a
+  raw CR in it and both were eaten by the next tool that rewrote the file -- the manifest is the
+  document most likely to be rewritten in text mode, which is the bullet's own subject.
+
+- **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
+  the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
+
+- **A LIVE run-state file is outside check 6 by CLASS** (`TOOL-cMendedVintage-13`). `RUN.md` at a
+  build root is append-only by design and cannot satisfy a cap measured for authored index rows; a
+  36-unit run reached 71 KB against 61,440. A RETIRED record is a rename and stays capped.
+
+- **The orientation card's READY anchor accepts BOTH spellings** (`TOOL-cMendedVintage-16`). A card
+  body written in the charter's §16 R1 list-item form used to be read as carrying no ready line,
+  leaving the sentinel in place and the scratch-guard then blocking the next commit. The writer and
+  the hook both widened; the charter did not move.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -105,17 +165,20 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 |---|---|---|
 | playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `coding-governance-agents.template.md`, ONE file since v3.0, rendered into `AGENTS.md` by `tools/playbook/` · `check-playbook-parity.sh` (read its refusal before editing prose it owns) · `check-template-size.sh` · `check-placeholders.sh` |
 | kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
-| tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
+| tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | the `tools/<kit>/` dirs THIS unit touches, not `tools/` — that is what the probes above take; kits self-describe in their own `README.md` |
 | deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
 
 ### Gate commands (the merge bar)
 
 ```bash
 bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width tools/run-gates/gate-profiles.txt declares for the detected hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
-# Legs report in CHUNKS, each closing with its own verdict line, so a red is readable before the run ends. Chunks bound REPORTING only — dispatch is untouched, and a chunk whose every leg skipped reports as skipped, never green.
+# Legs report in CHUNKS, each closing with a verdict line, so a red is readable before the run ends. A chunk whose every leg skipped reports skipped, never green.
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run the KIT-SUBJECT legs, held by default. GATE_FULL does NOT unlock them. A DoD needs BOTH
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
+# Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
+# The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1
+bash tools/run-gates/run-selftests.sh  # the HELD population on demand, budget-timed. TOOL-aQuenchedHarness-4
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
@@ -126,12 +189,14 @@ environment is needed — the engine resolves this repo's `tools/` install prefi
 ```bash
 python tools/codebase-map/map_diff.py <old>..<new>          # Step 1: what a fast-forward brought in
 python tools/codebase-map/reuse_lookup.py "<behaviour>"     # Step 4 / §10: the seam to wire through
+python tools/memory-recall/query.py "<question>" --terms "<8-14 words>"  # Step 4: the records that bind it — REFUSES without --terms
+python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints>  # Step 4: the bug classes for this area
 ```
 
 ### Tier rule
 
-Tier 2 (spec + adversarial review before building) for: a change to the governance template's rules,
-the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
+Tier 2 (a spec before building; the spec audit only where the build or its project declares it, M4) for: a change to the governance template's
+rules, the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
 Tier 1 (gates + one focused self-review).
 
 ### ID + work-state protocol
@@ -149,18 +214,12 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
-- 2026-08-23 · the gate selftest's ceiling, and the standing instruction about running it · the
-  ceiling is 1800 s and the cost is process creation rather than logic, per
-  `memory/gotchas/process-creation-is-the-suite-cost.md`. **The owner's standing instruction is
-  not to run those suites**: `--checks` yes, `--selftests` only when they ask ·
-  `TOOL-dScriptedRepeat-15` · prune when a `--selftests` run has been timed end to end.
-- 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
-  take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
-  adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand
-  runner. They were 68 % of leg-seconds and the largest put a 26-minute floor under every full run.
-  Nothing exercises them automatically now; the compensating check is in that kit's descriptor ·
-  `TOOL-dScriptedRepeat-5` · prune when a second kit adopts the same split, which makes it a rule
-  rather than an exception.
+- 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
+  `--selftests` only when they ask · prune when a bar runs them automatically.
+- 2026-09-17 · a leg ceiling read as a bound somebody measured · on node `c` two were BELOW the
+  leg's real cost and killed a healthy suite; a killed leg records no reading, so
+  `derive-ceilings.py --write` can never raise exactly the ones that need it · prune when
+  that checker accepts a reading taken outside the runner.
 
 
 ### Environment traps worth front-loading
@@ -177,115 +236,55 @@ against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc
 composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs) ·
 `arm-literal-strands-on-message-edit.md` (editing a `fail` message strands its arm; the signature
 runs to the first interpolation, so lengthening a message always strands it and shortening never
-does — hit three times in one file in one session) · `process-creation-is-the-suite-cost.md` ·
+does — hit three times in one file in one session; also the whole-signature and positional facets) · `process-creation-is-the-suite-cost.md` ·
 `trace-profile-measures-itself.md` · `fallback-fabricates-the-passing-value.md` ·
-`two-readers-of-one-config-one-re-derived.md`.
+`two-readers-of-one-config-one-re-derived.md` · `line-keyed-registry-reds-on-a-file-that-grew.md` (a waiver keyed `<path>:<line>`, and the sibling arm that is a BAN rather than a ratchet) · `naming-leg-grades-what-python-named.md` (nested helpers and dunders count, and arming follows `symbols.json`, so it only reds at the lander)
+· `row-driver-emits-a-plausible-file-with-rows-missing.md` · `worktree-crlf-outside-the-gated-population.md` · `settings-edit-takes-effect-mid-session.md` · `node-check-is-not-a-syntax-gate.md`
+· `check-format-grades-two-populations.md` · `waiver-row-that-hides-nothing-reds.md` · `a-new-leg-trips-a-growing-set-of-meta-gates.md` · `conf-value-interpolated-into-a-regex.md`
+· `pin-gated-checks-arm-nothing-without-a-pin.md` · `record-without-serves-or-with-a-round-counter.md` · `sourced-conf-blank-overrides-the-default.md`
+· `shipped-checker-edit-is-an-adopter-contract-change.md` · `concurrency-is-not-a-budget.md` (also the file-constant bound) · `allowlist-narrower-than-the-root-it-guards.md` (also what a
+`scratch-guard` denial means). The 2026-09-14 eviction is `TOOL-aReplayedCard-4`; its acceptance ledger maps every bullet to the record it landed in.
 
-- A gate FIXTURE this node cannot host: `git add` never stages a `*.bak` path (the global
-  `core.excludesfile` carries it), and a name differing only in CASE is the same file. Both
-  produce an arm that passes because its fixture was never there. Check what `git ls-files`
-  actually holds before trusting a near-miss control.
-- The read-path ceiling is spent by things nobody thinks of as reading: the generated
-  `memory/LIVE.md` row a NEW BUILD FOLDER adds, and every `memory/DECISIONS.md` append. A
-  build can red check 16 on its own bookkeeping before it edits a guide. Read the margin
-  from `python tools/memory-tree/corpus_ids.py --report`, never from the ceiling alone.
+- A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
+  CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`
+  is ignored on node `d`, on node `a` at NO scope (2026-09-04): run `git check-ignore -v` on YOURS.
 - The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
   recorded high-water. Prefer dropping a conditional block, or trimming non-instructional prose, to
   spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
   margin FROM `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
-- Merging in a LINKED WORKTREE leaves conflict markers in the row-merged files: the driver's
-  grammar load raises against a conf path and it fails CLOSED rather than take-ours. Recover by
-  running `tools/memory-tree/merge-rows.py <base> <ours> <theirs>` directly on the three stages
-  (`git show :1: :2: :3:`) — it merges them clean. `TOOL-aCandidStub-4`.
-- Two branches can BOTH rotate `memory/backlog/<FAMILY>.md` to archive independently. The row
-  driver then reports the other side's rotation as DELETES and conflicts. Before resolving,
-  verify every id absent from the union is present in some `memory/archive/<FAMILY>.*.md` —
-  0 unaccounted is the check — then union the rows and carry BOTH rotation notes.
+- `git -C <dir> rev-parse --show-toplevel` returns `<dir>` ITSELF when an absolute `GIT_DIR` is
+  inherited — what git exports to a merge driver in a LINKED WORKTREE. That made the row driver
+  conflict every merge there until `repo_root()` walked up for the conf (`TOOL-aCollapsedScan-7`).
+  Worktree merges are CLEAN now, re-verified 2026-09-04.
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
-- Several sessions share this node and the bar has no admission control: four concurrent full
-  bars turned the run-gates canary's timing arms RED at every width and stretched the driver
-  selftest from 11 to 99 minutes. `both expired ... unproven either way` means contention —
-  re-run on a quiet box before believing a latency claim. `TOOL-aPacedTurnstile-2`.
-- All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
-  `git diff --cached --check`.
+- The turnstile serializes bars WITHIN one repository only; sessions on this node still contend
+  across repos. `both expired ... unproven either way` means contention, and now SKIPS that arm
+  loudly rather than redding — re-run quiet before believing a latency claim.
+  `TOOL-aPacedTurnstile-2`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
-- Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
-- The hooks kit (1.5) ships TWO PreToolUse guards. `agent-cap` is wired on `Workflow|Agent` and enforces four rules;
-  the bound is a FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Binding rules:
-  `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`. The
-  concurrency half of this trap is `memory/gotchas/concurrency-is-not-a-budget.md`.
-- `scratch-guard` is the second hook, wired on `Bash|PowerShell`: it DENIES a shell command that
-  writes under the home directory outside the roots it derives from `TMPDIR`/`TEMP`/`TMP` plus
-  `~/.claude`. A blocked command is a real refusal, not a harness glitch — put the write in the
-  scratchpad. Note `%TEMP%` is INSIDE `$HOME` on Windows, which is why the allowlist is derived.
-- A conf value interpolated into a REGEX must be VALIDATED, not escaped: `MEMORY_ROOT="docs/mem"`
-  matched nothing and `docs|memory` swallowed a subtree, both silently. A vacuity arm firing only at
-  zero cannot see a PARTIAL exclusion. Detail: `memory/builds/aDeclaredBound/reviews/`.
-- Two constants that COINCIDE are not pinned equal. Ownership belongs to the one that CHANGES THE
-  OUTCOME — verify by moving it, not by reading it.
-- An exclusion is only as wide as the control it defers to, and a guard that a binding pair EXISTS
-  is not a guard that it COVERS. Prefer deleting an exclusion to widening its justification.
-- Editing `.claude/settings.json` takes effect MID-SESSION — hooks are re-read, not snapshotted at
-  start. Measured 2026-08-10 with a throwaway `PreToolUse` hook that fired on the call which checked
-  for it. Do not skip the liveness half of such a probe.
-- A CRLF fixture cannot test a CR guard on a Cygwin node: the runtime strips CR before `awk` sees a
-  byte, through a filename, through `getline` AND through a pipe. Assert at source level.
-- `node --check <file>` is NOT a syntax gate on node v24 — module auto-detection retries the parse and
-  swallows the failure. Parse by constructing an `AsyncFunction`: `tools/workflows/check-workflow-syntax.js`.
-- A kit that resolves the repo root by counting directories UP breaks SILENTLY at any other install
-  prefix — codebase-map answered from an empty corpus. Walk up for the conf, bounded by `.git`.
-- A build README's top level is a SLOT SEQUENCE gated by its own leg,
-  `gen_build_index.py --check-format`: authored content after the first generated marker reds it.
-  Detail in `memory/map/features/build-readme-surface.md`.
-- `--write` CREATES a missing generated region pair; `--check` never demands one. Rely on that when
-  adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
-- `memory/builds/*/STATUS.md` no longer exists. The slot was retired at kit 2.17 — one file existed
-  corpus-wide and contradicted its own build README. Check 8's population is the backlog shards alone.
-- A build README's `ids:` key is DERIVED and rewritten by `--write` from the id corpus. It is not a
-  reservation range and a planned unit cannot be added to it by hand; the next render removes it.
-- A build README's `roster:` is `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with a
-  message that reads like a families misconfiguration.
-- Hygiene check 12's skeleton scan matches a literal date-shape or id-shape ANYWHERE in a spec body,
-  so QUOTING a stale artifact that contains one reds the spec. Paraphrase the shape instead.
-- A new tool at the REPO ROOT rather than under `tools/` silently leaves the enforced surface: the
-  source-level gates, the codebase-map inventories and drift-audit's globs all scope to `tools/**`.
-- Adding ONE gate leg trips a SET of meta-gates that GROWS as new ones land — run the full bar, not
-  this list. MEASURED 2026-08-18: map freshness, the kickoff ratchet, govkit selfcheck + selftest (a
-  leg needs a `[[gate_leg]]` in its kit's `kit.toml`, else an `[[exempt_leg]]` row). The coverage
-  assert and handkept signal did NOT fire; this line claimed both and neither govkit gate.
+- `gate-guard` is the third `Bash|PowerShell` hook, from the unattended kit: while this branch's
+  run-state record is before `VERIFYING` it DENIES a `GATE_FULL=`/`GATE_SELFTESTS=` bar and any
+  `*.test.sh` or self-test runner, naming the record. Not a glitch: feed the hook the payload, or
+  wait for the main loop's `VERIFYING`.
+- `scratch-guard` (aProbedUnit, 2026-09-14) also DENIES a write rooted at an EMPTY `$TMPDIR`/`$TMP`/`$TEMP`
+  — and `TMPDIR` IS empty on this node, so `$TMPDIR/x` is `/x` — any `/tmp` target, and root litter.
+  Rules: `tools/hooks/README.md`. Write to the session scratchpad; a git clone goes under
+  `%TEMP%/<short>` (MAX_PATH).
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
 - A gate that returns a VALUE on stdout cannot also report on stdout — `fail` echoes, so `x=$(check …)`
   captures the diagnostics and the operator sees only the downstream symptom. Use a separate channel.
-- CRLF in a worktree is NOT limited to what a gate byte-compares, and `check-wiring.sh` will not tell
-  you: its eol population is scoped to `.claude/` paths carrying the pin. Ask which CONSUMER reads a
-  file whole (a launcher, a sourced conf, a hook), not which gate diffs it.
 - A NEW record under `memory/gotchas/` needs `gotchas.py --write` AND a dossier claim, and the
   coverage inventory reads TRACKED files — so `git add` first, then measure, or the gap surfaces on
   the full bar instead.
 - Template parity and PLACEHOLDER COMPLETENESS are two different questions. A render whose conf
   declares nothing for a key is byte-identical to a fresh render and still tells the agent to invoke a
   placeholder's name as a tool. Grep the render for a surviving brace-shape as its own arm.
-- An arm must contain the branch's ENTIRE literal signature — a readable PREFIX of a long message
-  reds — and a literal word between the sentence and the first interpolation is part of it, so end
-  the sentence and let only interpolations follow. Adding branches RENUMBERS the per-check
-  ordinals, invalidating any `unarmed-branches.txt` row below the insertion point.
-- A positional in a gate's `fail` message CANNOT be armed — `check-arms.py` reads a bare `$1` as
-  literal text inside the signature. Bind it to a name and put it at the END, after the sentence.
-- Hygiene checks 13-19 are OFF unless a pin is armed; a fixture tree written WITHOUT pins arms nothing
-  in that range. Set the pin in the scratch tree, or the arm passes by finding nothing.
-- `merge-rows.py` takes `%O %A %B` — BASE, OURS, THEIRS — and writes into the OURS path. A wrong
-  order does not error: it emits a plausible file with the other side's rows silently dropped.
-  Diff the merged id-set against BOTH inputs, never eyeball the output.
-- A HARNESS-CREATED WORKTREE starts with a RED bar and a refusing `--preflight`: it carries CRLF on
-  the `eol=lf`-pinned `.claude/` renders, which reds the `memory-recall skill wiring` leg and makes
-  `check-wiring.sh --check` exit 1. NOT `git worktree add`, which measures clean. Run
-  `bash tools/check-wiring.sh --fix` first. Prune when the memory-recall adopter CR-normalises.
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
@@ -293,17 +292,6 @@ does — hit three times in one file in one session) · `process-creation-is-the
   every hermetic leg does its own `mktemp -d` into it. Measured on node `a`: 30733 entries, 58 legs,
   >10 min and still running; the same bar finished on a fresh `TMPDIR`. Point `TMPDIR` at an empty
   dir before blaming the diff, and do not delete the shared one.
-- Every NEW file under `builds/*/{build,prompts,reviews}/` needs a `**Serves:**` line or check 21 reds;
-  grammar in `memory/HYGIENE.md`. The filename must PROJECT it — family, slug, ordinal of the lowest id
-  served. A ROUND COUNTER there cites an id nothing defines: check 14 reds and a phantom id reaches the
-  front matter. Use `…-<slug>-1-round2.md`.
-- A new CHECK inside the hygiene gate is far cheaper than a new gate LEG: the codebase-map coverage
-  assert and drift-audit's leg signal both key on `tools/gate-legs.json`, so neither moves. It still
-  costs `ARMS_FLOORS`, an arm per `fail` call site (not per check number), and the leg's own name if
-  that name states a count.
-- The hygiene engine PRE-SETS its conf keys and sources `.memory-tree.conf` OVER them, so a blank line
-  overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
-  skippable needs re-normalising AFTER the source; `_resolve_cap` is the seam.
-- A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
-  TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
-  the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.
+- A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
+  RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
+  before and after, never estimate, and record every movement beside the number.

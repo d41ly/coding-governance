@@ -2,6 +2,17 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md](../build/2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md) | journal | — |
+| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md](../reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-25 |
+| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](../reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-25 |
+| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](../reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `--close` writes `LANDING` into the run-state file and STAGES it. Nothing commits it. A run that then

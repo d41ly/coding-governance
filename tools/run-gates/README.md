@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.1` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.8` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `tools/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -62,8 +62,10 @@ file that had one, byte-identically, under the markers `tools/lib/resolve-python
 | `run-gates.gov.test.sh` | the GOV-ONLY arms, withheld from the payload; see below |
 | `run-gates.evidence.test.sh` | the durability arm: a red leg's output survives on disk |
 | `run-gates.turnstile.test.sh` | the turnstile arms: peak occupancy, reaping, FIFO order, release on every signal |
+| `run-gates.runlog.test.sh` | the run-log arms: one line per bar on every exit path after the trap and on every caught signal, withheld from the payload |
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
+| `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and four built-in fixture arms run on every invocation so the leg has a verdict there too |
 | `kit.toml` | this entry, declared as data |
 
 ## Reuse, and the baseline a guard diffs against
@@ -113,6 +115,28 @@ row and one redacted `<i>.out` copy land per leg; the `verdict` is written last,
 the crash signal. `GATE_RUN_KEEP` run directories are kept, swept after the verdict and never before
 dispatch, so a crashed run's record survives the next few ordinary runs.
 
+A caller may pin the run id with `GATE_RUN_ID`, and the pre-push hook does, so its push line joins
+this run's line exactly. The runner reads the pin and then REMOVES it from its environment before any
+leg starts: left set, every leg would inherit it, and a leg that drives a nested runner, as this
+kit's own suites do in scratch clones, would reuse one run directory for every nested bar. A pin
+names ONE run.
+
+**Every bar also leaves one line in the run log.** From its EXIT trap the runner appends one
+`ev=once` line to `runlog/gates.log` under the git COMMON dir, in the runlog kit's grammar, so the
+primary tree and every linked worktree of a clone write one file, and a run that ran the bar
+seventeen times keeps seventeen verdicts rather than the last five records of one worktree. Every
+value is read back from this record rather than recomputed: the run id, the header's worktree,
+`head`, `started` and `full`, the verdict and its counts, `rc`, and the first twenty failing legs in
+manifest order as `fail.1` onward, with `fail_more` counting the rest. A bar killed by INT, TERM or
+HUP has no verdict file, so its line reads `verdict=NONE` with 130, 143 or 129, written once although
+the signal runs the handler twice. A refusal between the trap and the header reads
+`stage=pre-header` with the header's keys empty. An exit above the trap, `--print-profile` or a
+refused profile table among them, writes nothing.
+
+The line is evidence and never an input. A failed append prints one `run-gates: run log` line on
+stderr and changes neither the exit code nor stdout, `GOV_RUNLOG=0` turns the line off, and writing
+it costs no process beyond the one `mkdir` a clone's first bar pays for the journal directory.
+
 `<git-dir>/gate-ledger.tsv` is the cross-run store: one row per leg, with the duration in field 2 —
 which is what lets the runner read it as a dispatch hint and `profile_bar.py` read it as a
 measurement, with no second copy of the same fact.
@@ -121,6 +145,57 @@ measurement, with no second copy of the same fact.
 nothing, the tree did not move, AND the tree was CLEAN when the run started. CLEAN means
 `git status --porcelain` empty, untracked files included. All five preconditions are what make the
 file's name true, and an implementation that forgets one passes every arm written for the others.
+
+## Every leg may declare a `ceiling`, and the runner holds it to it
+
+**`"ceiling": <seconds>`, a positive integer, per leg row in the manifest.** A leg that outlives it
+is KILLED and reported `GATE FAIL <leg> (timed out after Ns)` — never skipped, never green. That is
+the one way a knob here may change a verdict: it converts an unbounded hang into a RED naming its
+leg. Before it existed, one leg that never returned wedged the whole bar and named nothing.
+
+**A KILLED leg names the seconds it RAN and its ceiling separately.** `timeout` exits 124 when its
+own TERM fires and 137 when a SIGKILL ends the leg — its `-k` escalation, an operator, an OOM killer
+and a CI cancel all arrive as 137 and cannot be told apart. So that tail reads
+`GATE FAIL <leg>  (killed after Ns, ceiling Ms)`: N is the elapsed value the runner measured, byte
+for byte the same figure `gate-ledger.tsv` carries for that leg, and M is the bound it may never have
+reached. Neither is passed off as the other, and the verb does not claim a timeout it cannot observe.
+With NO bound in play — no ceiling declared, no profile timeout, or a host with no runnable
+`timeout` — the tail is `(killed after Ns)` alone: the absence of the ceiling clause is the
+information, and N is still the ledger's own figure.
+
+**A leg that declares no ceiling runs UNBOUNDED, and is COUNTED rather than refused.** The runner
+prints `N of M legs declare no ceiling and run unbounded this run` on stderr and carries on. It
+cannot tell a leg somebody forgot from a leg you deliberately left alone, so it reports and leaves
+the judgement to you. If you want the requirement enforced over YOUR corpus, assert it in a harness
+of your own — gov does exactly that in `run-gates.gov.test.sh`, which is withheld from this payload
+for the reason that file's header gives.
+
+**Choosing a number.** `<git-dir>/gate-ledger.tsv` already carries one row per leg with its own
+seconds, so the derivation gov used is `max(60, 3 × that leg's measured seconds)`. The factor is
+headroom for the box, not for the code: the same workload has been measured at 10.7 s and 26 s
+across one session on a machine with an on-access antivirus scanner, and a ceiling that reds on
+someone else's scan is a ceiling that gets deleted. The 60 s floor is what gives a leg that
+finishes in under five seconds a bound worth having.
+
+**Raising one that fired needs a reading the bar cannot give you.** A leg killed at its ceiling
+never completes, so the only thing its run record holds is the bound that stopped it, and
+`derive-ceilings.py` builds evidence from completed runs — the mechanism cannot reach exactly the
+legs whose bounds fire. Re-run the leg quiet, then hand the number in rather than editing a bound
+from something nobody wrote down:
+
+```
+GOV_NODE=<tag> python derive-ceilings.py --write \
+  --observed '<leg>=<seconds>' --how 'how you took the reading'
+```
+
+It refuses a reading with no stated conditions, one for a leg the manifest does not carry, one whose
+node would have to be defaulted, and one that raises nothing. The row lands in the evidence file
+carrying its source, so a number somebody measured by hand never reads as one the runner watched,
+and `--check` names those legs apart from the rest.
+
+**On a host with no runnable `timeout -k`, every ceiling is INERT** and the runner says so on
+stderr. Legs still run. A bound may cost you speed and may turn a hang into a verdict; it may never
+turn a leg into a pass or a skip.
 
 ## The leg manifest is the kit dir's SIBLING
 

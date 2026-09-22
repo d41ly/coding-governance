@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling · ratified 2026-08-11
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Stop authoring the one build-README field that has no rule, no validator and a measured live error,

@@ -8,9 +8,15 @@
 #
 # ONE scratch repo, reset between arms. Twenty-six git inits would triple the runtime and buy
 # nothing: every arm's state is reachable from the pristine tree by a checkout and a clean.
+KIT_REL="${KIT_REL:-tools}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/unattended.sh"
+# The library is sourced for `read_host_name` and `read_pid_image`: the lease arms compare what
+# `--preflight` recorded against the kit's own probe of this node and this shell's pid, never a
+# second spelling of `COMPUTERNAME` or `tasklist`. It defines functions and nothing else.
+# shellcheck source=lib-unattended.sh
+. "$HERE/lib-unattended.sh"
 
 # ---- THE SHARD CONTRACT (TOOL-aShardedFloor-2) ---------------------------------------------------
 # This suite IS the merge bar's floor: one leg exceeding leg-seconds / width sets the whole bar's
@@ -61,9 +67,53 @@ n=0
 
 # A POSITIVE assertion: the run's output must CONTAIN the branch's own failure text. `hit` is the
 # only arming helper here; `miss` is deliberately spelled so check-arms scores it as negative.
-hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1; }; }
+# A FAILING ASSERTION SHOWS WHAT IT GOT. `hit` printed only the needle, so every red here read
+# "the driver did not say X" with no way to learn what it DID say — and diagnosing three stale
+# arms in this file meant re-running a 900 s suite to find out. The actual output is truncated
+# because some refusals are paragraphs, and the first line is always the verdict.
+hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; echo "     GOT: $(printf '%s' "$1" | head -c 400)"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
+# TOOL-aWokenSentinel-17 — the `--status` line is read by FIELD, never as "everything after
+# `next `". The driver's printf takes `$parked` LAST, so every suffix — parked, noted, STALE briefs,
+# briefs gone, resume-tick — prints AFTER `next`, and a whole-line reader survives only on a fixture
+# that accumulates none (round-2 audit H2). `sed -n … p` prints only the line carrying the field, so a
+# NOTE that reached the input through `run`'s 2>&1 is dropped rather than mangled; the second cut
+# stops at the first ` · ` after the value, the separator every suffix uses and no unit id contains.
+extract_next() { # status-line -> the `next` field's value, cut at the next separator
+  printf '%s\n' "$1" | sed -n 's/.*· next //p' | sed 's/ · .*//'
+}
+# The header's `# one line` promise is about STDOUT: the driver legitimately NOTEs to stderr when
+# the conf declares no bound, so counting `run`'s merged output would grade the fixture's conf.
+# `grep -c ''` over `printf '%s'` reads an EMPTY capture as 0, where `printf '%s\n' … | wc -l` reads
+# it as 1 — which is how a verb that wrote NOTHING passed as one line (round-3 audit H3). Call it in
+# the MAIN shell with stdout sent to a file: a `$( )` capture runs the `same` in a subshell and
+# loses its verdict, and the line it prints is for the caller to read back from that file.
+check_status_one_line() { # slug -> asserts --status wrote exactly one stdout line; prints it
+  local _o; _o=$(bash "$SCRIPT" --status "$1" 2>/dev/null)
+  same "--status $1 is one stdout line" "$(printf '%s' "$_o" | grep -c '')" "1"
+  printf '%s\n' "$_o"
+}
+
+# ---- TOOL-dRetiredFork-9 S3: a `_`-prefixed subfolder under spec/ is NOT a spec -------------------
+# Absorbed from NicoCares `nc carve-out 20/20`. The cause is the PATHSPEC, not a shell glob: in
+# `git ls-files "<dir>/spec/*.md"` the `*` crosses `/`, so `spec/_working/notes.md` was enumerated
+# and produced a `NOT A UNIT` row beside "every tracked spec is terminal". Reproduced on the live
+# tree before the fix, and this arm is what stops it coming back.
+#
+# BOTH ENUMERATION SITES, because both carried it: `spec_ids` and the `--plan` sibling now filter
+# through one predicate, and an arm that exercised only one would leave the other free to drift.
+t_uw=$(mktemp -d); ( cd "$t_uw" && git init -q . && git config user.email t@t && git config user.name t
+  mkdir -p memory/builds/tW/spec/_working
+  printf 'x\n' > memory/builds/tW/spec/_working/notes.md
+  printf '# t\n\n**Status:** OPEN . rev-1 . 2026-09-03 . node t . Tier-1 . base 0123abcd . streams tooling . order 0\n' \
+    > memory/builds/tW/spec/2026-09-03-spec-TOOL-tW-1.md
+  git add -A && git commit -q -m f --no-verify ) >/dev/null 2>&1
+out=$(cd "$t_uw" && git ls-files "memory/builds/tW/spec/*.md" | grep -vE '/spec/_[^/]*/' || true)
+miss "$out" "_working/notes.md"
+hit  "$out" "2026-09-03-spec-TOOL-tW-1.md"
+rm -rf "$t_uw"
+
 
 # A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
 # real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
@@ -80,13 +130,19 @@ cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
 
-mkconf() { # wiring · gate
+mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · SPEC_AUDIT_DEFAULT
   cat > .unattended.conf <<EOF
 MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="${3-2026-08-19}"
+SPEC_THIN_CUTOFF="${5-}"
+SPEC_AUDIT_DEFAULT="${8-}"
 LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
+GATE_BOUND="${4-3600}"
+UNIT_STALL_BOUND="${6-1800}"
+REVIEW_ROUNDS="${7-7}"
+RESUME_STALE_BOUND="${8-5400}"
 WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -321,6 +377,13 @@ git commit -q --allow-empty -m "unit work" --no-verify
 BASE=$(git rev-parse main)
 UNIT0=$(git rev-parse HEAD)
 export GOV_DEFAULT_BRANCH=main
+# THE LEASE FIXTURE (TOOL-aWokenSentinel-1). Every `--preflight` below records `session:` and `pid:`
+# from the environment, and the bar runs INSIDE a Claude session on every registered node — so
+# without these two lines each fixture record carries the real session's id and names a live
+# process, differently on every box (memory/gotchas/fixture-inherits-ambient-machine-state.md). The
+# pid is above anything a Linux box hands out and past any Windows box on this fleet.
+export CLAUDE_CODE_SESSION_ID=fixture-session
+export CLAUDE_PID=999999999
 
 # Back to the pristine unit-branch tree. A HARD reset, not a checkout: several arms COMMIT their
 # fixture (they have to — preflight refuses a dirty tree, so an uncommitted fixture would be
@@ -352,6 +415,22 @@ roster() { # slug · body   (pure shell: a python launcher here is unresolved, a
 # TOOL-aBoundedVerdict-11 - the GENERATED pair's fixture writer. The authorization scope moved off the
 # authored roster onto this region, so the arms below drive THIS. Appends a second pair when the
 # README already has one, which is exactly what the duplicate-pair arms need.
+# TOOL-dHonouredPark-4, closing review round 2. `units` APPENDS a pair to a README that `readme`
+# already gave one — which is what the malformed-pair arm WANTS, and what three arms written for the
+# absent/empty/NO-TRACKED-SPEC branches got by accident. All three built DUPLICATED-pair fixtures and
+# asserted branches they could never reach. This one REPLACES the rendered body instead.
+#
+# ENVIRON, never `awk -v`: a -v assignment expands backslash sequences, and a unit row is a value a
+# caller wrote rather than a literal this file controls.
+setunits() { # slug · body (an EMPTY body leaves a well-formed pair enclosing nothing)
+  local _t; _t=$(mktemp)
+  BODY="$2" awk '
+    BEGIN { b = ENVIRON["BODY"] }
+    $0 == "<!-- gen:build-units -->" { print; if (b != "") print b; skip = 1; next }
+    $0 == "<!-- /gen:build-units -->" { skip = 0 }
+    !skip { print }
+  ' "memory/builds/$1/README.md" > "$_t" && mv "$_t" "memory/builds/$1/README.md"
+}
 units() { # slug · body
   printf '
 %s
@@ -370,13 +449,32 @@ bcsetup() {
   roster tRun "1. ARCH-tRun-1 — the unit"
   mkdir -p memory/builds/tRun/spec
   printf '# ARCH-tRun-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n' > memory/builds/tRun/spec/one.md
+  # The spec-audit record `specs-audited` wants. This fixture's only unit is CLOSED, so without
+  # it every close arm below would red on an item none of them is about.
+  mkdir -p memory/builds/tRun/reviews
+  printf '**Serves:** spec-audit ARCH-tRun-1
+
+# the audit
+' > memory/builds/tRun/reviews/audit.md
   git add -A >/dev/null && git commit -q -m bc-fixture --no-verify && git push -q -f origin main
   git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
   BCP=$(git rev-parse HEAD)
 }
 bcreset() { git reset -q --hard "$BCP"; git clean -qfd; mkconf; }
 bcopen() { bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md; }
+           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+           # The CONVERGED closing round `closing-review-recorded`'s second term wants, written in
+           # `park()`'s own line shape. Every close arm below is about a DIFFERENT item, and without
+           # this they would all red on this one — which is a fixture answering a question nobody
+           # asked. The arms that are about this term strip the row or replace it.
+           printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' \
+             >> memory/builds/tRun/RUN.md; }
+# Drop the round bcopen wrote, for the arms whose subject IS its absence.
+crdrop() { sed -i '/ review · item tRun · reason /d' memory/builds/tRun/RUN.md; }
+# Replace it with one of this run's choosing: subject · verdict · blockers · [terminal token]
+crround() { crdrop
+            printf '%s review · item %s · reason verdict %s · blockers %s%s\n' \
+              "2026-08-31T00:00:00Z" "$1" "$2" "$3" "${4:+ · $4}" >> memory/builds/tRun/RUN.md; }
 # Restore main to the shared BASE so the later arms see the tree they were written against.
 bcrestore() { git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree; }
 
@@ -450,15 +548,38 @@ out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "the declared wiring check failed, and a dormant hook makes every later green meaningless"
 hit "$out" "WIRINGPROBE-the-declared-checks-own-remedy"
 
-# ---- check 5: a second non-terminal run-state file. Both are TRACKED, because the selector reads
-# ---- git, not the filesystem — an untracked second run would leave this arm passing over one file.
+# ---- TOOL-aUnblockedFleet-1/-4: a second non-terminal run-state file is ANNOUNCED, never refused,
+# ---- and the preflight SUCCEEDS. This arm asserted the opposite until kit 1.13. Both records are
+# ---- TRACKED, because the selector reads git, not the filesystem.
+# ----
+# ---- EXACTLY ONE CONCURRENT RECORD is the fixture, and that is the whole point of it (S4b). The
+# ---- threshold this unit moves is one: the announcement fires at n>=1 where the old refusal fired
+# ---- at n>1, so a driver that kept the inherited `n > 1` trigger would be SILENT here and would
+# ---- still pass a fixture built with two competitors.
 reset_tree
 readme tTwo; runmd tTwo "other"
 printf 'phase: RUNNING\n' >> memory/builds/tTwo/RUN.md
-sed -i 's/^## Run facts$/## Run facts\nphase: RUNNING/' memory/builds/tRun/RUN.md
 git add -A && git commit -q -m two --no-verify
 out=$(run --preflight tRun --keepalive-id k1)
-hit "$out" "more than one run-state file is in a non-terminal phase, so 'the run' is not well-defined"
+hit "$out" "1 concurrent unattended run(s) — this run is NOT blocked by them"
+hit "$out" "memory/builds/tTwo/RUN.md · phase RUNNING"
+miss "$out" "more than one run-state file is in a non-terminal phase"
+same "the announced-at-one preflight still created the run-state file" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "yes"
+
+# ---- ...and SILENT at zero concurrent records. The green control for the arm above: without it, a
+# ---- driver that announced unconditionally passes every assertion in this file.
+reset_tree
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "concurrent unattended run(s)"
+
+# ---- ...and a run's OWN tracked record is not a competitor. The re-preflight case: after a
+# ---- compaction the run's record IS tracked and non-terminal, and counting it announces the run to
+# ---- itself. The `hit` above is what makes this `miss` discriminating rather than vacuous.
+reset_tree
+sed -i 's/^## Run facts$/## Run facts\nphase: RUNNING/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m selfrec --no-verify
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "concurrent unattended run(s)"
 
 # ---- check 6: the build folder exists on the unit branch but NOT at the pinned BASE. The
 # ---- self-authored case in its purest form - the run invented the build that authorizes it.
@@ -535,7 +656,7 @@ miss "$out" "preflight OK"
 
 # ...and the remedy it prints names the SCRIPT and its mode, never a bare launcher: the driver's own
 # resolver ban refuses one, and this repo cannot assume a launcher exists on the operator's PATH.
-hit "$out" "the --write mode of tools/memory-tree/gen_build_index.py"
+hit "$out" "the --write mode of $KIT_REL/memory-tree/gen_build_index.py"
 
 # ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
 # that proves the presence test is a grep and not that exit status.
@@ -747,6 +868,131 @@ run --preflight tRun --keepalive-id k1 >/dev/null
 ALIEN=$(git commit-tree "$(git rev-parse HEAD^{tree})" -m alien </dev/null)
 sed -i "s/^base: .*/base: $ALIEN/" memory/builds/tRun/RUN.md
 hit "$(run --close tRun)" "the BASE recorded in the run-state file is not an ancestor of the base this history derives"
+
+# ---- reuse-probed, all five outcomes (TOOL-aProvenReuse-2). The fixture conf declares no
+# ---- RECALL_CLI, so EVERY other close arm in this suite meets this item through the not-adopted
+# ---- skip and none of them changes. These five arms are what make the other four outcomes
+# ---- reachable at all.
+# ----
+# ---- THE CLI IS A DECLARATION, and that is what makes this testable. The first cut probed two
+# ---- hardcoded kit paths under $ROOT; this suite runs the driver from OUTSIDE the scratch tree, so
+# ---- KIT_DIR was always the real repo and the probe always found the real repo's recall kit --
+# ---- the not-adopted branch could not be reached from here at all. A conf key can be set to a
+# ---- scratch path, so all five outcomes are exercised and none of them needs a kit literal.
+# ----
+# ---- THE `met` FIXTURE REPRODUCES A REAL ROW'S ESCAPING rather than copying a real row: the
+# ---- worktree here is a mktemp path, so a copied row names a tree this is not and could only ever
+# ---- produce the `zero` outcome. What must be copied is the DOUBLED BACKSLASH, because that is
+# ---- where the bug was -- a fixture authored from the same wrong rule as the code agrees with it.
+_rp_close() { run --close tRun --override closing-review-recorded --reason r --override build-complete --reason r; }
+_rp_log()   { printf '%s/recall/queries.jsonl' "$(cd "$(git rev-parse --git-common-dir)" && pwd)"; }
+# Windows-escape a forward-slashed path the way json.dumps writes it: / -> \\ , doubled.
+_rp_esc()   { printf '%s' "$1" | sed 's|/|\\\\|g'; }
+
+reset_tree; git push -q -f origin unit:main
+run --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+fixture; git push -q -f origin HEAD:main
+
+# 1. NOT ADOPTED — the fixture conf declares no RECALL_CLI. MET, and it names the key.
+hit "$(_rp_close)" "declares no readable RECALL_CLI"
+
+# 1b. DECLARED BUT UNREADABLE is the SAME outcome, and it must be, or a typo'd path would fall
+#     through to the log arms and report a missing PROBE when the real fault is a missing FILE.
+printf 'RECALL_CLI="no/such/cli.py"\n' >> .unattended.conf
+out=$(_rp_close)
+hit "$out" "declares no readable RECALL_CLI"
+hit "$out" "no/such/cli.py"
+
+# From here the declared CLI exists, so the log outcomes become reachable. The path is the scratch
+# tree's own -- no kit literal, because a kit literal in shipped bytes is what the carried-prefix
+# ratchet exists to refuse.
+sed -i 's|^RECALL_CLI=.*|RECALL_CLI="fake-recall-cli.py"|' .unattended.conf
+: > fake-recall-cli.py
+
+# 2. LOG ABSENT — the kit is installed and nothing has ever written a log. UNMET, and the word is
+#    ABSENT, not zero: an operator who confuses "cannot answer" with "answered no" repairs the wrong
+#    thing.
+rm -f "$(_rp_log)"
+out=$(_rp_close)
+hit "$out" "every declared probe log is ABSENT"
+miss "$out" "holds a row for this tree"
+
+# 3. ZERO — a log that exists and names only ANOTHER tree. UNMET, and it names the remedy.
+mkdir -p "$(dirname "$(_rp_log)")"
+printf '{"qid": 1, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc /c/somewhere/else)" > "$(_rp_log)"
+out=$(_rp_close)
+hit "$out" "no declared probe log holds a row for this tree"
+miss "$out" "is ABSENT"
+
+# 4. MET — one row naming THIS tree, escaped as json.dumps writes it. The count rides the message.
+printf '{"qid": 2, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc "$(git rev-parse --show-toplevel)")" >> "$(_rp_log)"
+out=$(_rp_close)
+hit "$out" "1 probe row(s) recorded for this tree: 1 recall, 0 map"
+# ...and the PREFIX arm, which is the whole reason the compare is `grep -xF` and not a substring.
+# THE EXTRA ROW IS A CHILD OF THIS TREE, NOT ITS PARENT, and the direction is the entire arm. A
+# parent row is SHORTER than this tree's path, so a substring test does not match it either and the
+# count reads 1 with or without `-x` — the first cut staged it that way and pinned nothing, caught
+# by this build's own closing diff review. A CHILD row CONTAINS this tree's path, so dropping `-x`
+# makes the count read 2 and the arm reds. Measured both ways before this was rewritten.
+printf '{"qid": 3, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc "$(git rev-parse --show-toplevel)/nested-worktree")" >> "$(_rp_log)"
+out=$(_rp_close)
+hit "$out" "1 probe row(s) recorded for this tree: 1 recall, 0 map"
+miss "$out" "2 probe row(s)"
+
+# ---- MAP_CLI: the three outcomes the closed unit specced and never shipped a reader for.
+# ---- Its acceptance ledger asserted a merge-bar run had accepted this declaration, and the key
+# ---- appeared nowhere in the product -- so these arms are the evidence that claim needed.
+_rp_maplog() { printf '%s/codebase-map/lookups.jsonl' "$(cd "$(git rev-parse --git-common-dir)" && pwd)"; }
+
+# 4c. NOT DECLARED — MAP_CLI blank while RECALL_CLI is adopted. The map half contributes nothing
+#     and says so with a zero, rather than being silently absent from the count.
+rm -f "$(_rp_maplog)"
+out=$(_rp_close)
+hit "$out" "0 map"
+
+# 4d. ADOPTED AND EMPTY — the state that silently passed before. MAP_CLI declared and readable, its
+#     log absent, and the recall log absent too: UNMET, and the message NAMES BOTH logs it looked
+#     for, so an unmet item is diagnosable rather than merely red.
+sed -i 's|^MAP_CLI=.*||' .unattended.conf
+printf 'MAP_CLI="fake-map-cli.py"\n' >> .unattended.conf
+: > fake-map-cli.py
+rm -f "$(_rp_log)" "$(_rp_maplog)"
+out=$(_rp_close)
+hit "$out" "every declared probe log is ABSENT"
+hit "$out" "recall/queries.jsonl"
+hit "$out" "codebase-map/lookups.jsonl"  # gov:root-fixture — expected-output substring from a fixture probe log
+
+# 4e. ADOPTED AND PRESENT — a map log naming THIS tree, and NO recall log. MET on the map half
+#     alone, which is the arm the closed unit claimed and never had: before this reader existed the
+#     map log was a write-only surface and this state was UNMET.
+mkdir -p "$(dirname "$(_rp_maplog)")"
+printf '{"type": "lookup", "query": "q", "n_shown": 3, "worktree": "%s"}\n' "$(_rp_esc "$(git rev-parse --show-toplevel)")" > "$(_rp_maplog)"
+out=$(_rp_close)
+hit "$out" "1 probe row(s) recorded for this tree: 0 recall, 1 map"
+miss "$out" "ABSENT"
+
+# ...and a map row naming ANOTHER tree does not count, on the same exact-compare rule the recall
+# half uses. Without this the map arm would be the one place a foreign row leaked into the count.
+printf '{"type": "lookup", "query": "q", "n_shown": 3, "worktree": "%s"}\n' "$(_rp_esc /c/somewhere/else)" > "$(_rp_maplog)"
+out=$(_rp_close)
+hit "$out" "no declared probe log holds a row for this tree"
+
+# Restore the single-CLI shape the waived arm below was written against.
+sed -i 's|^MAP_CLI=.*|MAP_CLI=""|' .unattended.conf
+rm -f "$(_rp_maplog)"
+
+
+# 5. WAIVED — short-circuits every arm above, INCLUDING a log that would have said zero. This is the
+#    arm that ends the silent waiver, so it asserts the reason reaches the message.
+rm -f "$(_rp_log)"
+printf '\n2026-08-31T00:00:00Z waiver · item reuse-first · reason the owner said so\n' >> memory/builds/tRun/RUN.md
+out=$(_rp_close)
+hit "$out" "the reuse-first directive was waived at preflight"
+hit "$out" "the owner said so"
+miss "$out" "every declared probe log is ABSENT"
+
+reset_tree; git push -q -f origin unit:main
 
 # BRANCH 4 — THE POINT OF THE UNIT: a run whose work is fully LANDED can close. Same degenerate
 # merge-base as branch 1, and the only difference is that the recorded base is no longer HEAD —
@@ -1075,6 +1321,11 @@ bcrestore   # HOISTED: restore main to the shared BASE for the arms below.
 crbc='--override build-complete --reason fixture-build-is-one-open-unit'
 cropen() { reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
            printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+           # The CONVERGED closing round the item's SECOND term wants. Every arm below is about
+           # the FIRST term - the record join - so without this they would all red on the other.
+           printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED
+' \
+             >> memory/builds/tRun/RUN.md
            mkdir -p memory/builds/tRun/reviews; }
 crbase() { sed -n 's/^base: //p' memory/builds/tRun/RUN.md; }
 
@@ -1522,8 +1773,11 @@ mkdir -p .git/index-blocked 2>/dev/null || true
 # ---- S4, the gap list. The states are the build method's M2 vocabulary, spelled exactly; what is
 # ---- asserted here is that this verb COMPUTES them, never that it defines them.
 mkspec() { # slug · id · status · scope · acceptance · gates · forks
+  # THE FILENAME IS DERIVED FROM THE ID, not pinned to `-1`. It was pinned, so a second call in one
+  # fixture silently OVERWROTE the first and any arm wanting two units got one. Backward compatible:
+  # every existing caller passes an id ending `-1`, which lands on the same path it always did.
   mkdir -p "memory/builds/$1/spec"
-  cat > "memory/builds/$1/spec/2026-08-01-spec-$1-1.md" <<SPEC
+  cat > "memory/builds/$1/spec/2026-08-01-spec-$1-${2##*-}.md" <<SPEC
 # $2 — a unit
 
 **Status:** $3 · rev-1 · 2026-08-01 · node a · Tier-2 · base abcdef12 · streams architecture
@@ -1573,11 +1827,21 @@ hit "$out" "THIN"
 miss "$out" "FORKED"
 git reset -q --hard HEAD~1; git clean -qfd
 
-# ...a terminal spec is DONE whatever its sections say, and is never the next target.
+# ...a terminal spec is DONE whatever its sections say, and is never the next target — but the GRADE
+# is printed BESIDE `DONE` rather than in place of it. `hit "$out" "DONE"` alone cannot fail: it is
+# satisfied by `DONE` and by `DONE (THIN)` equally, so reverting the verb's edit left this arm green.
 reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 CLOSED "" "" "" "F1 unresolved"; fixture
 out=$(run --plan tPlan)
-hit "$out" "DONE"
+hit "$out" "DONE (THIN)"
 hit "$out" "next: none - every tracked spec is terminal"
+git reset -q --hard HEAD~1; git clean -qfd
+
+# ...and a terminal spec that is NOT thin prints a bare DONE, which is the other half of the same
+# claim: the parenthetical is the grade, not decoration on every terminal row.
+reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 CLOSED "S1 a thing" "AC1 it works" "the bar" "none"; fixture
+out=$(run --plan tPlan)
+hit "$out" "DONE"
+miss "$out" "DONE ("
 git reset -q --hard HEAD~1; git clean -qfd
 
 # ...and a build with no tracked spec REFUSES rather than printing an empty, complete-looking list.
@@ -1615,8 +1879,11 @@ reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
 fixture
 out=$(run --plan tPlan)
-hit "$out" "roster: tracked specs under"
-hit "$out" "a planned unit with no spec is invisible here"
+# TOOL-dHonouredPark-4 S1: the SET comes from the GENERATED region now, so the summary no longer
+# says "tracked specs under ...". The authored roster pair is what is absent here, and the sentence
+# says so. The two markers are different regions and only one of them is missing in this fixture.
+hit "$out" "roster: the generated units region, in build order"
+hit "$out" "the authored pair names no id of this build"
 miss "$out" "MISSING"
 
 # ---- S6's extraction is BYTE-IDENTICAL at --status. A refactor and a behaviour change in one
@@ -1638,10 +1905,235 @@ same "--status names a non-terminal unit through the extracted helper" "$(run --
 # proof of the defect.
 want_unit=$(awk '/<!-- gen:build-index -->/{f=1;next} /<!-- .gen:build-index -->/{f=0} f' memory/builds/tRun/README.md | grep -E '^\| \[.*\]\(spec/' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\](spec\/.*//')
 same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && echo yes || echo no)" "yes"
-same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
+same "--status selects the same first row through the extracted helper" "$(extract_next "$(run --status tRun)")" "$want_unit"
+
+# ---- TOOL-aWokenSentinel-17 S4 / AC1: the reader above yields the id only because ITS fixture
+# ---- carries no suffix. One parked row makes the line end `· next <unit> · parked 1`, and the raw
+# ---- `sed 's/.*· next //'` it used to read through yields `<unit> · parked 1`; `extract_next` cuts
+# ---- at the separator. The control is `want_unit`, the same awk derivation the reader above
+# ---- compares against. RED against the helper reduced to the raw sed: the id, then ` · parked 1`.
+reset_tree
+run --preflight tRun --keepalive-id k1 >/dev/null
+run --park tRun --item x --reason y >/dev/null
+s17=$(run --status tRun)
+hit "$s17" "· parked 1"
+same "AC1 extract_next cuts the next field under a parked suffix" "$(extract_next "$s17")" "$want_unit"
+# ---- AC2: exactly ONE stdout line, through `check_status_one_line`. RED against a driver copy
+# ---- with `printf 'x\n'` after the status printf (reads 2) and against one with the status printf
+# ---- deleted (reads 0), each copied WITH lib-unattended.sh beside it — the `stripped.sh` idiom
+# ---- below, not the lib-less L2 one — so the count is the verb's stdout and not the
+# ---- missing-library refusal's. The line it printed is read back from the file and cut the same
+# ---- way, so the helper is shown to hand its caller the line it counted.
+check_status_one_line tRun > "$TMP/s17.line"
+grep '^FAIL' "$TMP/s17.line" || true
+same "AC2 the helper prints the line it counted" "$(extract_next "$(cat "$TMP/s17.line")")" "$want_unit"
+# ---- AC4: with GATE_BOUND deleted from the conf the driver NOTEs to stderr. That is not the
+# ---- promise the header makes about stdout, and the count still reads 1 — a count over `run`'s
+# ---- merged output would red here and pass on a conf that declares everything.
+mutate .unattended.conf '/^GATE_BOUND=/d'
+hit "$(run --status tRun)" "declares no GATE_BOUND"
+check_status_one_line tRun > "$TMP/s17.line"
+grep '^FAIL' "$TMP/s17.line" || true
+
+# ---- TOOL-aWokenSentinel-5 S8 / AC9: the resume tick's attempts are a FIELD on the one status
+# ---- line, printed only when the sidecar holds a line. Absent, the line is byte-identical to what
+# ---- the verb printed before the sidecar existed — a field printed at zero would grow every
+# ---- existing status line, and a second line would red the whole-output readers above. Present,
+# ---- the count and the last line's stamp ride the parked/noted rule, and --resume's first line
+# ---- carries the same field. The sidecar root is `resolve_sidecar_dir`, so the driver spells no
+# ---- `rev-parse --git-dir` of its own: unit 11's check 32 owns that count across the kit, and the
+# ---- pin here is this unit's base, zero.
+reset_tree
+run --preflight tRun --keepalive-id k1 >/dev/null
+rt_before=$(run --status tRun)
+RT_SIDECAR="$(git rev-parse --git-dir)/unattended"; mkdir -p "$RT_SIDECAR"
+printf '2026-09-20T10:00:00Z attempt 1 session s pid 1 pid-alive no out o1\n2026-09-20T10:10:00Z attempt 2 session s pid 1 pid-alive no out o2\n' > "$RT_SIDECAR/resume.tRun.log"
+out=$(run --status tRun)
+same "AC9 --status is still one line with the sidecar present" "$(printf '%s\n' "$out" | grep -c '')" "1"
+hit "$out" " · resume-tick 2 attempt(s), last 2026-09-20T10:10:00Z"
+same "AC9 --resume's first line carries the same field" "$(run --resume tRun | head -n 1 | grep -c 'resume-tick 2 attempt(s), last 2026-09-20T10:10:00Z')" "1"
+rm -f "$RT_SIDECAR/resume.tRun.log"
+same "AC9 with the sidecar removed the line is byte-identical to before" "$(run --status tRun)" "$rt_before"
+miss "$rt_before" "resume-tick"
+same "AC9 the driver spells no sidecar derivation of its own" "$(grep -cE '^[^#]*rev-parse --git-dir' "$SCRIPT")" "0"
 
 
+# REBUILT IMMEDIATELY BEFORE THE ARM (TOOL-dHonouredPark-4 fallout, not this build's). A
+# `reset_tree` between the setup above and this line wipes tPlanEmpty, so `--plan` ran against
+# a build that no longer existed. The OLD driver fell through to the spec-derived listing and
+# printed the message below anyway; S5 removed that fall-through, so the absent README now
+# refuses at check 42 and this arm asserted a branch it could no longer reach.
+reset_tree; readme tPlanEmpty; fixture
 hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against"
+
+# ---- TOOL-dHonouredPark-4 — the SET and its ORDER come from the GENERATED region -----------------
+# NOT EXECUTED IN THIS BUILD. A standing owner instruction of 2026-08-23 forbids running this kit's
+# self-test suites and no bar leg invokes this file, so these were written and syntax-checked and
+# nothing more. The compensating observation is in the unit's build record: `--plan` captured over
+# ALL 63 tracked builds before and after, unit SET identical on every one, ORDER moved on 11.
+# That is evidence about the DRIVER and none at all about these lines.
+
+# S5 — an ABSENT units region REFUSES. It used to fall through to the spec-derived listing, guarded
+# away by the outer `grep -qF`, while a MALFORMED one already refused.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+# NO PYTHON LAUNCHER. `check-python-resolver` bans a bare `python3` in a tracked script and this
+# suite has no resolver in scope, so the marker pair is stripped with grep instead.
+_tmp_rm=$(mktemp)
+grep -v 'gen:build-units' memory/builds/tPlan/README.md > "$_tmp_rm"
+mv "$_tmp_rm" memory/builds/tPlan/README.md
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the build README carries no units marker at all, and this verb takes its unit SET and ORDER from that region:"
+miss "$out" "ARCH-tPlan-1"
+
+# S1/S2 — the region's ORDER wins, and it is not the spec files' path order. `units` replaces the
+# rendered body, so the two rows are deliberately written id-descending.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+mkspec tPlan ARCH-tPlan-2 SPECCED "S1 another" "AC1 it works" "the bar" "none"
+# R2-M4: the TARGET carries the id too, which is what `render_region` emits and what makes the
+# `head -1` dedup load-bearing. With `spec/two.md` targets the arm passed with the dedup deleted.
+setunits tPlan "| [ARCH-tPlan-2](spec/2026-08-01-spec-ARCH-tPlan-2.md) | SPECCED | rev-1 | 2026-08-01 |
+| [ARCH-tPlan-1](spec/2026-08-01-spec-ARCH-tPlan-1.md) | SPECCED | rev-1 | 2026-08-01 |"
+fixture
+out=$(run --plan tPlan)
+same "--plan lists the region's FIRST row first, not the lowest id" "$(printf '%s\n' "$out" | head -1 | awk '{print $1}')" "ARCH-tPlan-2"
+same "each unit appears ONCE — a row spells its id twice, in the link text and the target" "$(printf '%s\n' "$out" | grep -c '^ARCH-tPlan-1 ')" "1"
+
+# S7 — a region row whose id no tracked spec defines. Unreachable while the region is rendered from
+# those specs; S1 makes the state representable, so it gets a name rather than falling through.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+setunits tPlan "| [ARCH-tPlan-9](spec/nine.md) | SPECCED | rev-1 | 2026-08-01 |"
+fixture
+hit "$(run --plan tPlan)" "NO TRACKED SPEC (rendered row without one)"
+
+# H2 (closing review) — the EMPTY case, which is the third vacuity shape and the one that shipped
+# broken. `region` exits 0 with empty stdout for a well-formed pair enclosing nothing, so the unit
+# loop ran zero times and this verb reported every spec terminal over a build full of SPECCED units.
+# That is the state of EVERY build between its first --write and the next one after spec #1 exists.
+# The generic form worth keeping: a verb deriving its unit SET from a region owes all THREE arms.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+setunits tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the generated units region carries no unit rows but this build has specs that would render them, so the region is stale:"
+miss "$out" "every tracked spec is terminal"
+
+# R2-H2 — and the guard must NOT fire where nothing renders. Seven live builds have specs with no
+# status header, so their region is legitimately empty; the first cut of this guard refused all seven
+# and named a repair that could not change the tree. The NOT A UNIT rows ARE the answer there.
+reset_tree; readme tPlan
+mkdir -p memory/builds/tPlan/spec
+printf '# not a spec
+
+no status header here.
+' > memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md
+setunits tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "NOT A UNIT (no status header)"
+miss "$out" "so the region is stale"
+# R3-H1 — THE TAIL LINE IS PINNED. This arm asserted only the refusal's ABSENCE, so it stayed green
+# while the verb printed `next: none - every tracked spec is terminal` over a build it graded nothing
+# on. Both sibling arms carry this `miss`; this one dropped it, and a blocker shipped through the gap.
+miss "$out" "every tracked spec is terminal"
+hit "$out" "no tracked spec grades as a unit"
+
+# R3-H1, second shape — a spec that WAS meant to be one and failed to parse, which is the realistic
+# case. The fixture above uses a file that was never a spec at all, so it never exercised a build
+# whose author believed it had a unit.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+sed -i 's/^\*\*Status:\*\*/  **Status:**/' memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md
+setunits tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "NOT A UNIT (no status header)"
+miss "$out" "every tracked spec is terminal"
+
+# R2-H1 — rows that name no unit of THIS build. Before the fold the loop iterated a substitution, so
+# this was indistinguishable from an empty region and the verb answered `next: none - every tracked
+# spec is terminal` at exit 0 — a false all-clear on the verb an agent reads to pick up work.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+setunits tPlan "| [ARCH-tOther-9](spec/2026-08-01-spec-ARCH-tOther-9.md) | SPECCED | rev-1 | 2026-08-01 |"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the generated units region carries rows but none names an id of this build, so this verb has no unit set to grade:"
+miss "$out" "every tracked spec is terminal"
+
+# H1 (closing review) — a MALFORMED authored roster pair. `roster_ids` refuses it with exit 3, and
+# before the fold this verb discarded that status twice and printed "the authored pair names no id of
+# this build" — a sentence that is affirmatively FALSE over a pair that is malformed rather than
+# empty, and one the skill doc written in the same diff promises will not print.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+printf '\n%s\n%s\n' '<!-- roster:units -->' '<!-- roster:units -->' >> memory/builds/tPlan/README.md
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the build README carries a roster marker but not exactly one well-formed pair, so the id set this line reports is not a single slice:"
+miss "$out" "the authored pair names no id of this build"
+# R3-M5 — THE ORDERING IS ASSERTED, not just the message. R2-M3 hoisted this guard above the listing
+# so a malformed pair stops producing a complete-looking table first; the arm pinned only the refusal
+# TEXT, so moving the guard back below the listing kept the suite green. With the guard at the top the
+# verb returns before any unit row prints, so the fixture's id appears nowhere.
+miss "$out" "ARCH-tPlan-1"
+git reset -q --hard HEAD~1; git clean -qfd
+
+# ---- TOOL-aHoistedPass-6: `--plan <slug> --paths`, the TSV mode. `verb_plan` already resolves each
+# ---- unit's spec path internally and discards it; the harness that hands out a roster needs it
+# ---- back. ONE emitter serves both modes, so they cannot disagree about which rows are units.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+printf '# not a spec
+
+no status header here.
+' > memory/builds/tPlan/spec/2026-08-01-spec-notaunit.md
+roster tPlan "1. ARCH-tPlan-1 the specced one
+2. ARCH-tPlan-7 the one nobody has specced"
+fixture
+out=$(run --plan tPlan)
+paths=$(run --plan tPlan --paths)
+TAB=$(printf '\t')
+# AC10 - the DEFAULT output is UNTOUCHED. The padded human table carries no TAB in any row class,
+# which is the durable half of "byte-identical to the pre-change tree" — the by-hand diff against
+# the pre-change bytes is in this unit's acceptance ledger, and cannot be re-run from inside here.
+same "--plan default: not one TAB anywhere in the padded table" \
+  "$(printf '%s\n' "$out" | grep -cF "$TAB")" "0"
+# AC11 - a graded unit row carries exactly three TABs, and its fourth field is the spec path.
+same "--plan --paths: the graded unit row carries exactly four fields" \
+  "$(printf '%s\n' "$paths" | grep '^ARCH-tPlan-1' | awk -F'\t' '{print NF}')" "4"
+same "--plan --paths: the fourth field is the spec's repo-relative path" \
+  "$(printf '%s\n' "$paths" | grep '^ARCH-tPlan-1' | cut -f4)" \
+  "memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md"
+# ...and a MISSING unit's path field is EMPTY rather than ABSENT, so a four-field split still yields
+# four. An absent field would shift every caller's index by one on exactly the rows it cannot see.
+same "--plan --paths: a MISSING unit still carries four fields" \
+  "$(printf '%s\n' "$paths" | grep '^ARCH-tPlan-7' | awk -F'\t' '{print NF}')" "4"
+same "--plan --paths: a MISSING unit's path field is EMPTY" \
+  "$(printf '%s\n' "$paths" | grep '^ARCH-tPlan-7' | cut -f4)" ""
+# AC13 - the two NOT A UNIT diagnostics are keyed on a FILENAME, not an id, so they keep their padded
+# shape in both modes: ZERO TABs, and a four-field split skips them.
+hit "$paths" "NOT A UNIT (no status header)"
+same "--plan --paths: a NOT A UNIT diagnostic carries no TAB at all" \
+  "$(printf '%s\n' "$paths" | grep -F 'NOT A UNIT' | grep -cF "$TAB")" "0"
+# The roster and next lines are untouched, so ONE invocation answers both "which unit is next" and
+# "where is its spec" — which is what makes this the resume path's single source.
+hit "$paths" "roster: the README roster region"
+hit "$paths" "next: ARCH-tPlan-1 (READY - build it)"
+# AC12 - ORDER comes free. Both modes take their set and order from the generated units region, so
+# the two listings are the same lines in the same sequence and no sort was added.
+same "--plan --paths: the same line count as the padded table" \
+  "$(printf '%s\n' "$paths" | grep -c .)" "$(printf '%s\n' "$out" | grep -c .)"
+same "--plan --paths: the ids appear in the padded table's order" \
+  "$(printf '%s\n' "$paths" | cut -f1 | awk '{print $1}' | tr '\n' ' ')" \
+  "$(printf '%s\n' "$out" | awk '{print $1}' | tr '\n' ' ')"
+# A TRAILING flag that is NOT --paths leaves the human table alone rather than being read as one.
+same "--plan <slug> <anything else>: still the padded table" \
+  "$(run --plan tPlan --frobnicate | grep -cF "$TAB")" "0"
 git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
@@ -1870,11 +2362,16 @@ while IFS= read -r ln; do
   sed -n "$((no-4)),${no}p" "$SCRIPT" | grep -q 'trusted_base'     || { echo "FAIL check_authorization is called without a trusted_base guard within 4 lines: $ln"; st=1; }
 done <<<"$ug"
 
-# ---- SOURCE-level: the driver must not grow a python dependency. Every other kit here carries the
-# ---- launcher resolver inline because it needs python; this one does not, and a `python` appearing
-# ---- in it later would be an un-resolved launcher rather than a resolved one.
-np=$(grep -nE '(^|[^-[:alnum:]])(python3?|py) ' "$SCRIPT" | grep -v '^[0-9]*:#' || true)
+# ---- SOURCE-level: the driver runs python ONLY through the resolver it carries inline (aDeferredBar
+# ---- closing round 2, R2). The premise this arm used to state -- the driver has no python dependency
+# ---- -- stopped being true when --dispatch grew the spec-token check, and the arm was RED on the
+# ---- fold that made it false. Now: the marker-delimited `>>> resolve_python` block is the ONE place
+# ---- the candidate names may appear (its parity gate holds it byte-identical to the canonical copy),
+# ---- and outside it and outside comments the only launcher spelling is the resolved variable.
+n=$((n+1)); [ "$(grep -c '^# >>> resolve_python' "$SCRIPT")" = 1 ] || { echo "FAIL the driver carries no inline resolve_python block, so any launcher it runs is unresolved"; st=1; }
+np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} {print NR": "$0}' "$SCRIPT" | grep -E '(^|[^-[:alnum:]])(python3?|py) ' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
+n=$((n+1)); grep -q 'run_bounded "\$_stpy" "\$SPEC_TOKENS_CLI"' "$SCRIPT" || { echo "FAIL the declared spec-token checker is not run through the resolved launcher"; st=1; }
 
 # ============================================================ TOOL-aBoundedVerdict-15
 # ---- S1: the two phase writers that did NOT stage now do. The leg's whole per-run population is the
@@ -2146,6 +2643,205 @@ git checkout -q -- memory/builds/tRun/README.md 2>/dev/null || true
 n=$((n+1)); git diff --cached --name-only | grep -qF 'memory/builds/tRun/RUN.md' \
   || { echo "FAIL --landed left the terminal record unstaged, so the leg's index-read population cannot see it"; st=1; }
 git checkout -q unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main
+
+# ==================================================================================================
+# TOOL-aWokenSentinel-7 — `keepalive-reaped` is READ BACK at --landed against the stop-guard's newest
+# sidecar line. The fixture is the success arm above, rebuilt per arm; the hand-written stop lines
+# are one compact JSON object each with `session_crons` LAST, which is this unit's fixture and not a
+# claim about the harness (spec 7 S10). `reset_tree` runs `git clean`, which never reaches the git
+# dir, so every arm starts with `rm -f` of the sidecar and the last one removes it — or the --landed
+# arms downstream would read a line this block left behind.
+# ==================================================================================================
+build_landed_fixture() { # [extra-sed] -> the success fixture: a LANDING record whose HEAD is on origin/main, checked out as main
+  reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+  sed -i "s/^phase: .*/phase: LANDING/${1:+; $1}" memory/builds/tRun/RUN.md
+  fixture; git push -q -f origin HEAD:main; git checkout -q -B main HEAD
+}
+remove_landed_fixture() { git checkout -q unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main; }
+STOP7="$(git rev-parse --git-dir)/unattended/stop.tRun.log"; mkdir -p "${STOP7%/*}"
+# ---- AC1: the NEWEST line is post-close and still names the id — refused, naming id and utc, and the
+# ---- record untouched. The older line would pass, so this also proves the reader takes the last one.
+# STAMPED AT OR AFTER THE LEASE: `write_lease` records `lease-utc` at preflight, and --landed grades
+# only a line the CURRENT lease's incarnation could have produced (closing review id 15, AC16 below);
+# a post-close line dated before the lease is the pre-close refusal. The older `[]` line stays old.
+build_landed_fixture; rm -f "$STOP7"; STOP_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+printf '%s\n' '{"utc":"2026-09-16T11:00:00Z","phase":"LANDING","session_crons":[]}' \
+  "{\"utc\":\"$STOP_UTC\",\"phase\":\"LANDING\",\"session_crons\":[{\"id\":\"k1\"}]}" > "$STOP7"
+check_status_one_line tRun > "$ORIGIN_DIR/s7.line"   # AC5 — --status is untouched by this unit: one line
+before=$(sum)
+out=$(run --landed tRun)
+hit "$out" "the keepalive attestation is contradicted by the harness's own listing: the stop-guard recorded the cron store after the close and it still names the recorded keepalive id, so the job was not reaped — reap it, END THE TURN so the stop-guard records the listing again, then re-run --landed"
+hit "$out" "k1 listed at $STOP_UTC"
+miss "$out" "phase LANDED"
+same "AC1 the contradicted --landed wrote nothing" "$(sum)" "$before"
+# ---- AC2: the newest line is PRE-CLOSE — refused as a check that could run and did not, naming utc
+# ---- and phase; a line with no `phase` key reads `(unreadable)` and refuses the same way. Same
+# ---- fixture: AC1 landed nothing.
+rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"BUILDING","session_crons":[]}' > "$STOP7"
+out=$(run --landed tRun)
+hit "$out" "the stop-guard records this session and no stop after the close exists to check the reap against, so the attestation could be checked and was not — END THE TURN once (the stop-guard records the listing and continues you), then re-run --landed; if no record appears afterwards the hook is unwired and adopt-unattended.sh --check says so: newest stop-guard record"
+hit "$out" "2026-09-16T12:00:00Z in phase BUILDING"
+same "AC2 the pre-close --landed wrote nothing" "$(sum)" "$before"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","session_crons":[]}' > "$STOP7"
+out=$(run --landed tRun)
+hit "$out" "in phase (unreadable)"
+same "AC2 the unreadable --landed wrote nothing" "$(sum)" "$before"
+# ---- AC3: post-close and the id is ABSENT — one `checked` line naming id and utc, then LANDED on
+# ---- the remote arm. A silent pass is what this unit forbids.
+rm -f "$STOP7"
+printf '%s\n' "{\"utc\":\"$STOP_UTC\",\"phase\":\"LANDING\",\"session_crons\":[]}" > "$STOP7"
+check_status_one_line tRun > "$ORIGIN_DIR/s7.line"
+out=$(run --landed tRun)
+hit "$out" "keepalive-reaped: checked — k1 absent from the harness listing at $STOP_UTC"
+hit "$out" "phase LANDED"
+same "AC3 the checked landing records the remote anchor" "$(sed -n 's/^landed-anchor: //p' memory/builds/tRun/RUN.md)" "remote"
+remove_landed_fixture
+# ---- AC4: NO sidecar lands with an ANNOUNCED `unchecked`, and no `keepalive` fact with the other
+# ---- one. A refusal on a missing file would wedge every adopter without the hook.
+build_landed_fixture; rm -f "$STOP7"
+check_status_one_line tRun > "$ORIGIN_DIR/s7.line"
+out=$(run --landed tRun)
+hit "$out" "keepalive-reaped: attested, unchecked — no stop-guard record for this run"
+hit "$out" "phase LANDED"
+remove_landed_fixture
+build_landed_fixture '/^keepalive: /d'; rm -f "$STOP7"
+out=$(run --landed tRun)
+hit "$out" "keepalive-reaped: attested, unchecked — the record names no keepalive id"
+hit "$out" "phase LANDED"
+remove_landed_fixture
+# ---- AC14 — THE CONTINUATION, end to end through the REAL hook: the pre-close refusal, one Stop
+# ---- payload for the fixture's bound session fed to stop-guard.js with the real driver beside it,
+# ---- the `landing-unstamped` BLOCK (unit 8's row), the LANDING line the hook itself writes with the
+# ---- payload's listing verbatim, and --landed re-run to LANDED with no second turn. RED against a
+# ---- hook copy with that row reverted to allow: nothing prints and the block assertions fail, which
+# ---- is the B1 wedge as an arm. The listing names ANOTHER job, so the pass is the id's absence and
+# ---- not the listing's emptiness. `node` is on PATH wherever gate-guard.js runs.
+build_landed_fixture; rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"BUILDING","session_crons":[]}' > "$STOP7"
+out=$(run --landed tRun)
+hit "$out" "no stop after the close exists to check the reap against"
+n=$((n+1)); command -v node >/dev/null 2>&1 || { echo "FAIL AC14 needs node on PATH, as gate-guard.js already does"; st=1; }
+_root7=$(cygpath -m "$PWD" 2>/dev/null || printf '%s' "$PWD")
+_hook7=$(printf '{"hook_event_name":"Stop","session_id":"fixture-session","cwd":"%s","stop_hook_active":false,"session_crons":[{"id":"other-job"}]}' "$_root7" \
+  | node "$HERE/stop-guard.js" 2>"$ORIGIN_DIR/s7.hook.err")
+hit "$_hook7" '"decision":"block"'
+hit "$_hook7" "finished and unstamped"
+hit "$_hook7" "--landed"
+_last7=$(tail -n 1 "$STOP7")
+hit "$_last7" '"phase":"LANDING"'
+hit "$_last7" '"session_crons":[{"id":"other-job"}]'
+out=$(run --landed tRun)
+hit "$out" "keepalive-reaped: checked — k1 absent from the harness listing at"
+hit "$out" "phase LANDED"
+remove_landed_fixture; rm -f "$STOP7"
+# ---- AC15 (closing review ids 7 and 11): a session the lease does NOT name is refused BEFORE the
+# ---- sidecar read, naming the mismatch and `--resume <slug> --keepalive-id` as the step that binds
+# ---- it — never END THE TURN, which the stop-guard would ignore for an unbound session. Same with
+# ---- no session id in the environment at all. A lease reading `absent` (the harness exposed none)
+# ---- is `unchecked` and lands, sidecar or not. RED against a driver copy with the `fail 55` line
+# ---- commented out: the pre-close line then fires 54 and END THE TURN prints.
+build_landed_fixture; rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"BUILDING","session_crons":[]}' > "$STOP7"
+before=$(sum)
+out=$(CLAUDE_CODE_SESSION_ID=some-other-session bash "$SCRIPT" --landed tRun 2>&1); rc=$?
+same "AC15 an unbound session's --landed exits 1" "$rc" "1"
+hit  "$out" "the stop-guard binds by the lease and this session is not the one the record names, so no stop of this session is ever recorded and ending the turn cannot help — run --resume tRun --keepalive-id"
+hit  "$out" "lease session fixture-session, this session some-other-session"
+miss "$out" "END THE TURN"
+same "AC15 the unbound --landed wrote nothing" "$(sum)" "$before"
+out=$(env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --landed tRun 2>&1)
+hit  "$out" "UNATTENDED check 55 FAILED"
+hit  "$out" "this session unset"
+miss "$out" "END THE TURN"
+remove_landed_fixture
+build_landed_fixture 's/^session: .*/session: absent/'; rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"BUILDING","session_crons":[]}' > "$STOP7"
+out=$(run --landed tRun)
+hit  "$out" "keepalive-reaped: attested, unchecked — the lease names no session (the harness exposed none), so the stop-guard never bound this run and recorded no stop of it"
+hit  "$out" "phase LANDED"
+miss "$out" "UNATTENDED check 5"
+remove_landed_fixture; rm -f "$STOP7"
+# ---- AC16 (closing review id 15): a LANDING line the DEAD incarnation wrote does not pass for the
+# ---- new one. The line is stamped now, the lease is then REPLACED one second later by
+# ---- `--resume --keepalive-id` (which writes `lease-utc`), and --landed reads the line as older
+# ---- than the lease: the pre-close refusal, naming the lease it lost to. RED against a driver copy
+# ---- without the `lease-utc` compare: the line passes as `checked` and the record lands.
+build_landed_fixture; rm -f "$STOP7"; STOP_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+printf '%s\n' "{\"utc\":\"$STOP_UTC\",\"phase\":\"LANDING\",\"session_crons\":[]}" > "$STOP7"
+sleep 1
+out=$(run --resume tRun --keepalive-id k2); hit "$out" "lease replaced · keepalive k1 -> k2"
+LEASE_UTC=$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)
+same "AC16 the replaced lease is stamped after the stop line" "$([ "$STOP_UTC" \< "$LEASE_UTC" ] && echo after || echo "not after: $STOP_UTC vs $LEASE_UTC")" "after"
+fixture; git push -q -f origin HEAD:main
+before=$(sum)
+out=$(run --landed tRun)
+hit  "$out" "UNATTENDED check 54 FAILED"
+hit  "$out" "newest stop-guard record $STOP_UTC in phase LANDING, older than the lease taken at $LEASE_UTC"
+miss "$out" "phase LANDED"
+same "AC16 the dead incarnation's line landed nothing" "$(sum)" "$before"
+remove_landed_fixture; rm -f "$STOP7"
+
+# ==================================================================================================
+# TOOL-aWokenSentinel-9 — the stop-guard listing is a FIELD on `--status`'s ONE line, on the
+# parked/noted rule: the LAST suffix, printed only when the record names a keepalive id AND the
+# sidecar holds a line, omitted otherwise, so a record with nothing to report prints the bytes it
+# printed before this unit. `present`/`absent` is unit 7's `grep -qF`; the newest line is read
+# whatever its phase, because the verb reports and --landed judges. Unit 7's fixtures, rebuilt per
+# arm; the sidecar removed before and after. Each field arm RED against a driver copy with the field
+# clause removed (`keepalive` missing, the byte-identical `same` still green); the one-line arm RED
+# against unit 17's two-line copy, because the field-clause copy prints one line too.
+# ==================================================================================================
+# ---- AC1: newest line `LANDING` and the listing names k1 — `present`, the LAST ` · ` field, and
+# ---- `extract_next` still yields the id under the suffix. Then the listing `[]` — `absent`, same utc.
+# ---- The older `[]` line proves the field reads the NEWEST line, as --landed does.
+build_landed_fixture; rm -f "$STOP7"
+s9_before=$(run --status tRun)
+printf '%s\n' '{"utc":"2026-09-16T11:00:00Z","phase":"LANDING","session_crons":[]}' \
+  '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
+s9=$(run --status tRun)
+hit  "$s9" " · keepalive k1 present in the harness listing at 2026-09-16T12:00:00Z"
+same "AC1 the keepalive field is the LAST field of the status line" "$(printf '%s\n' "$s9" | sed -n '/· next /p' | sed 's/.* · //')" "keepalive k1 present in the harness listing at 2026-09-16T12:00:00Z"
+same "AC1 extract_next still yields the id under the keepalive suffix" "$(extract_next "$s9")" "$want_unit"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[]}' > "$STOP7"
+s9=$(run --status tRun)
+hit  "$s9" " · keepalive k1 absent in the harness listing at 2026-09-16T12:00:00Z"
+miss "$s9" "k1 present"
+# ---- AC2: no sidecar — byte-identical to the line the same fixture printed before the sidecar
+# ---- existed, with no field on it. A field printed at nothing would grow every existing status
+# ---- line, which is the byte change unit 5 F1 refused for its own field.
+rm -f "$STOP7"
+same "AC2 with no sidecar the line is byte-identical to before" "$(run --status tRun)" "$s9_before"
+miss "$s9_before" "in the harness listing"
+remove_landed_fixture
+# ---- AC2, the `none` arm: a stop line PRESENT and the record's `keepalive` fact deleted — no field,
+# ---- because a listing with no id to compare against has no presence to print. The `next` hit is
+# ---- what keeps the `miss` from passing on a verb that printed nothing.
+build_landed_fixture '/^keepalive: /d'; rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
+s9=$(run --status tRun)
+hit  "$s9" "· next $want_unit"
+miss "$s9" "in the harness listing"
+remove_landed_fixture; rm -f "$STOP7"
+# ---- AC3: EVERY optional field populated — a parked row, a two-line resume log and a stop line
+# ---- naming k1 — and `check_status_one_line` still reads ONE stdout line, with each field on it and
+# ---- the `next` value intact; `--resume`'s first line carries the same field. This is the header's
+# ---- `# one line` as an arm: a future field that arrives on a second line reds here by name. RED
+# ---- against unit 17's two-line driver copy, never against the field-clause copy.
+build_landed_fixture; rm -f "$STOP7"
+run --park tRun --item x --reason y >/dev/null
+printf '2026-09-20T10:00:00Z attempt 1 session s pid 1 pid-alive no out o1\n2026-09-20T10:10:00Z attempt 2 session s pid 1 pid-alive no out o2\n' > "${STOP7%/*}/resume.tRun.log"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
+check_status_one_line tRun > "$ORIGIN_DIR/s9.line"
+grep '^FAIL' "$ORIGIN_DIR/s9.line" || true
+s9=$(cat "$ORIGIN_DIR/s9.line")
+hit  "$s9" "· parked 1"
+hit  "$s9" "· resume-tick 2 attempt(s), last 2026-09-20T10:10:00Z"
+hit  "$s9" "· keepalive k1 present in the harness listing at 2026-09-16T12:00:00Z"
+same "AC3 extract_next yields the id with every suffix on the line" "$(extract_next "$s9")" "$want_unit"
+same "AC3 --resume's first line carries the keepalive field" "$(run --resume tRun | head -n 1 | grep -c 'keepalive k1 present in the harness listing at 2026-09-16T12:00:00Z')" "1"
+rm -f "$STOP7" "${STOP7%/*}/resume.tRun.log"
+remove_landed_fixture
 
 # ---- THE LOCAL ARM (TOOL-dUnstalledConvoy-1). A build merged into local main that could not push had
 # ---- no terminal to reach and aborted with the work complete; three of the five aborted runs in this
@@ -2436,13 +3132,69 @@ done
 
 # ...and DECLARED, the same tree, now authorizes. Paired with the arms above so "it refused" and "it
 # refused for the reason we think" are two claims, not one.
-reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+#
+# THE MODE IS NOW LOAD-BEARING HERE (TOOL-dNarrowedAnchor-1). This fixture carried no
+# `authorized-by:` line, so it declared `slug` by default and this arm was the passing case for a
+# self-authorizing slug run — the exact behaviour that unit narrows. What changed is the fixture's
+# declaration, not the tree it is asserted against.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
 git push -q -f origin unit 2>/dev/null
 out=$(run --preflight tBr --keepalive-id k1)
 miss "$out" "no build README at the pinned BASE, so nothing committed before this run branched authorizes it"
 hit "$out" "preflight OK"
 hit "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: run-branch"
 hit "$(cat memory/builds/tBr/RUN.md)" "branch-ref: refs/heads/unit"
+hit "$(cat memory/builds/tBr/RUN.md)" "mode: prompt"
+
+# ---- 50: THE SECOND ANCHOR IS ADMISSIBLE PER MODE. Four arms, because a refusal needs a companion
+# ---- saying it refused the right thing and a companion saying it did not refuse everything.
+# ----
+# ---- 50a: the DEFAULT. No `authorized-by:` key at all reads as `slug`, which is every build README
+# ---- written before that key existed — so this arm decides whether the narrowing reaches the
+# ---- population it exists for, rather than only the ones that spell the value out.
+reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
+same "check 50 created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+
+# ---- 50b: the EXPLICIT spelling refuses identically. A guard that catches only the defaulted value
+# ---- is one `authorized-by: slug` line away from being no guard at all.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: slug'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+hit "$(run --preflight tBr --keepalive-id k1)" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
+
+# ---- 50c: `recipe` is INSIDE the set, and the Skill's playbook path is why — it tells an author in
+# ---- as many words that writing the build folder yourself needs `published`. It passes this branch
+# ---- and refuses further down on its own missing playbook. A narrowing that swallowed `recipe`
+# ---- would make this kit refuse a path its own carrier instructs.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: recipe'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+miss "$out" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
+hit "$out" "a recipe-mode build README declares no playbook"
+
+# ---- 50d: the FIRST anchor is UNTOUCHED. Same project, same `published` declaration, a build folder
+# ---- that IS at the merge-base, declaring `slug` by default — the ordinary case every adopter runs.
+# ---- Without this arm the refusal could fire on every run and every other arm here would still pass.
+reset_tree; scope published; git add -A >/dev/null && git commit -q -m sc --no-verify
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tRun/RUN.md)" "anchor-kind: default-branch"
+# ---- 50e (TOOL-aDeferredBar-3): a DEFAULT-BRANCH-anchored preflight writes the run's LOCAL branch
+# ---- under `run-branch:`, protocol fact 13 — the fact the gate-guard hook keys on, because
+# ---- `branch-ref:` is written only where the second anchor fired and 17 of 44 anchored records in
+# ---- the real tree carried no branch fact at all. Asserted against the fixture's OWN symbolic-ref,
+# ---- read at this moment and never a literal: `reset_tree` checks out `unit`, so `refs/heads/main`
+# ---- is a value this fixture cannot produce, and a literal would pass or fail for the wrong reason.
+same "50e run-branch: equals the fixture's own git symbolic-ref HEAD" \
+  "$(grep '^run-branch: ' memory/builds/tRun/RUN.md)" "run-branch: $(git symbolic-ref HEAD)"
+miss "$(cat memory/builds/tRun/RUN.md)" "branch-ref:"
+reset_tree
 
 # ---- 32: the branch is committed but NOT published. Nothing the remote advertises authorizes it.
 reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
@@ -2488,7 +3240,13 @@ git checkout -qf unit
 # ---- S12's WIDENED fail 18. The guard now fires only for a base on NEITHER derivation, which is
 # ---- strictly smaller than before — so without a failing case here "monotone" and "deleted" look
 # ---- identical from outside. The base recorded is a commit on no advertised history at all.
-reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+# The fixture DECLARES `prompt` (TOOL-dNarrowedAnchor-1): this arm needs preflight to SUCCEED on the
+# second anchor so that a run-state file exists to corrupt, and `readme` writes no `authorized-by:`
+# key, which reads as `slug` and is now refused there. Measured: without this the preflight refused,
+# the `sed` below reported a missing file, and the fail-18 arm read as broken by a change that had
+# nothing to do with base ancestry.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
 git push -q -f origin unit 2>/dev/null
 run --preflight tBr --keepalive-id k1 >/dev/null
 ORPHAN=$(git commit-tree -m orphan "$(git rev-parse HEAD^{tree})" 2>/dev/null)
@@ -2710,7 +3468,7 @@ hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 
 # refused correctly and the reader was told the offender was `other R9` — a true refusal for a
 # false reason, which is the kit's own recorded class sending them to the wrong field.
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a · b' --verdict PASS)" "leg [a · b]"
-hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'x --no-verify y' --verdict PASS)" "a piece record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag:"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'x --no-verify y' --verdict PASS)" "a piece record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag:"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg "$(printf 'a
 b')" --verdict PASS)" "a piece record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"
 
@@ -2764,6 +3522,12 @@ reset_tree
 # ---- ...and both writers REFUSE the flag at write time, which is the guard the citation above points
 # ---- at. The pair matters: the driver prevents, check 10 detects what landed anyway, and neither
 # ---- alone is the both-ends coverage the charter asks for on a guarded surface.
+# ---- THE FIXTURE IS REBUILT FIRST. The `reset_tree` above wipes `pc/` and `recs/`, so without this
+# ---- the driver refuses on "a piece record names a path that is not a file in this tree" and the
+# ---- bypass branch below is never reached — the arm asserted a message it could not provoke and
+# ---- read as this suite's own rot rather than as a fixture that had gone stale under it.
+mkdir -p pc/one recs recs2; printf 'a fixture piece
+' > pc/one/piece.md; git add -A >/dev/null
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a --no-verify b' --verdict PASS)" "a piece record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag"
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a --no-verify b' --verdict PASS)" "a set record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag"
 
@@ -2802,7 +3566,7 @@ hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b'
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b' --verdict PASS)" "leg [a · reason b]"
 # ...and a separator in the SET, which is the field the widening added and the message did not.
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg ok --verdict PASS --set 'AAAA · leg honest · verdict PASS')" "set [AAAA · leg honest · verdict PASS]"
-hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'drop --no-verify' --verdict PASS)" "a set record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag:"
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'drop --no-verify' --verdict PASS)" "a set record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag:"
 
 # ---- HIGH 2: the row dropper takes NO REGEX. Both writers spelled it as a `sed` ADDRESS carrying an
 # ---- unescaped caller-supplied leg name, so a leg named `.*` matched every verdict row and erased a
@@ -3128,10 +3892,14 @@ hit "$out" "skipped — set-checks-recorded is scoped to recipe-mode runs and th
 # fixture's close is unmet for, it is not these.
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: pieces-complete"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: set-checks-recorded"
-# ...and EXACTLY TWO announcements, not one per MET item. dod_met does not clear DOD_OUT on entry,
+# ...and EXACTLY THREE announcements, not one per MET item. dod_met does not clear DOD_OUT on entry,
 # so an item with nothing to say would otherwise inherit the previous item's text and print one
-# item's explanation under another item's name.
-same "exactly two skip announcements" "$(grep -c '^unattended: skipped — ' <<<"$out")" "2"
+# item's explanation under another item's name — that is what this count guards and it still does.
+# It was TWO until kit 1.13 added `reuse-probed`, whose kit-absent outcome is a THIRD legitimate
+# skip in this fixture: the fixture conf declares no RECALL_CLI, so the item
+# announces that it has nothing to observe rather than reporting a zero. Raising the pin without
+# this sentence would be indistinguishable from weakening the leak guard.
+same "exactly three skip announcements" "$(grep -c '^unattended: skipped — ' <<<"$out")" "3"
 reset_tree
 
 # ---- ABSENT is `slug`, which is every build README written before this key existed. Run over
@@ -3168,6 +3936,7 @@ hit "$out" "preflight OK"
 hit "$(cat memory/builds/tRecipeOk/RUN.md)" "waiver · item playbook-followed · reason the owner said so"
 git rm -q --cached memory/builds/tRecipeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tRecipeOk/RUN.md
 reset_tree
+
 
 # ---- ...and an ALL-scoped handle on the SAME run is accepted, or the refusal is just a broken
 # ---- waiver path wearing a scope's name.
@@ -3499,6 +4268,280 @@ fkspec '- **F1 — a question?** options and a recommendation.
 same "fork-mark: a mark on a continuation line still resolves its item" "$(plan_state "$TMP/fk.md")" "READY"
 
 
+# ---- TOOL-dBriefedPass-1 - THE TIER-1 ARMS. `plan_state` keyed on section ORDINALS, and a Tier-1
+# ---- spec legitimately drops `## 5. Production-readiness checklist`, so every section from five
+# ---- onward renumbers. The ordinal reader therefore graded a Tier-1 spec's GATES as its acceptance
+# ---- criteria, its OPEN QUESTIONS as its gates and its REVISION LOG as its open questions.
+# ----
+# ---- The QUIET half is the one that mattered and it is arm 2: the acceptance slot was filled by the
+# ---- Gates section, so a Tier-1 spec stating NO acceptance criterion at all graded READY. A THIN
+# ---- predicate that cannot fail on a whole spec shape is worse than the loud FORKED false positive
+# ---- beside it, and only one of the two was in the backlog row that reported this.
+t1spec() { # <acceptance body> <open-questions body> -> a TIER-1 shaped spec at $TMP/t1.md
+  printf '# t\n\n**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-1 · base 0123abcd\n\n## 1. Goal\n\n- g\n\n## 2. Scope (IN)\n\n- s\n\n## 3. Non-goals (OUT)\n\n- n\n\n## 4. Design\n\n- d\n\n## 5. Acceptance criteria\n\n%s\n\n## 6. Gates\n\n- g\n\n## 7. Open questions\n\n%s\n\n## 8. Revision log\n\n- rev-1 first\n- rev-2 second\n' "$1" "$2" > "$TMP/t1.md"
+}
+
+t1spec '- AC1 something observable.' 'none'
+same "tier-1: a filled section 5 acceptance and a none section 7 grades READY" "$(plan_state "$TMP/t1.md")" "READY"
+
+# THE QUIET ONE. Empty acceptance on a Tier-1 spec. The ordinal reader never looked at section 5, so
+# it read the GATES section as acceptance, found it non-empty, and graded READY.
+t1spec '' 'none'
+same "tier-1: an EMPTY section 5 acceptance grades THIN" "$(plan_state "$TMP/t1.md")" "THIN"
+
+# THE LOUD ONE, from both directions. A revision log has bullets and no conforming mark, so the
+# ordinal reader graded EVERY Tier-1 spec FORKED off section 8.
+t1spec '- AC1 observable.' 'none - nothing open here.'
+same "tier-1: a bulleted section 8 revision log does NOT make the spec FORKED" "$(plan_state "$TMP/t1.md")" "READY"
+
+t1spec '- AC1 observable.' '- **F1 - a real question?** options, and no mark anywhere.'
+same "tier-1: a genuinely unresolved section 7 open question IS FORKED" "$(plan_state "$TMP/t1.md")" "FORKED"
+
+# ---- FIRST OCCURRENCE BINDS on a duplicate title. Two arms, because one alone is satisfied by a
+# ---- reader that always takes the LAST. Not a refusal: this function's contract is one bare token,
+# ---- a third outcome has no branch at verb_plan's case and build-complete's string equality
+# ---- discards the exit status, so a refusing spec would grade silently non-THIN where it decides a
+# ---- landing.
+# WHICH OF THESE ARMS ACTUALLY DISCRIMINATE, stated because an arm that passes against BOTH readers
+# is not evidence about the fix and reads exactly like one that is. Driven against the pre-fix bytes
+# before landing: the first THREE Tier-1 arms go RED on the ordinal reader and are the observation
+# this unit exists for. The fourth (an unresolved section 7) passes on both, and on the OLD reader it
+# passes for the wrong reason - it graded the section 8 revision log, whose bullets carry no mark, so
+# FORKED was right by accident. The two duplicate-title arms also pass on both, because the ordinal
+# reader could not match a second `## 9. Acceptance criteria` at all; they pin a rule that title
+# keying makes newly EXPRESSIBLE rather than a behaviour that changed.
+dupspec() { # <first acceptance body> <second acceptance body>
+  printf '# t\n\n**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n%s\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n\n## 9. Acceptance criteria\n\n%s\n' "$1" "$2" > "$TMP/dup.md"
+}
+dupspec '- AC1 filled.' ''
+same "duplicate title: the FIRST occurrence binds, so a filled first section is READY" "$(plan_state "$TMP/dup.md")" "READY"
+dupspec '' '- AC1 filled.'
+same "duplicate title: the FIRST occurrence binds, so an empty first section is THIN" "$(plan_state "$TMP/dup.md")" "THIN"
+
+# ---- THE TIER-2 CONTROL. 397 of the 401 tracked specs are Tier-2 shaped, and a fix that regraded
+# ---- any of them would be a corpus-wide change wearing a bug fix's clothes. Measured before landing
+# ---- by slicing BOTH readers and running them over every tracked spec: 401 graded, 4 regraded, all
+# ---- four Tier-1 and all four FORKED -> READY. These arms pin the shape that measurement covered.
+fkspec 'none'
+same "tier-2 control: the canonical ordinals still grade READY" "$(plan_state "$TMP/fk.md")" "READY"
+
+
+
+
+echo "MARK brief-and-dispatch-arms" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- TOOL-dBriefedPass-2 and -3 - THE REFUSAL ARMS, asserting each branch's OWN longest literal
+# ---- run. `check-arms.py` grades a branch as armed only when a test line carries that run, and an
+# ---- arm asserting a short substring reads as UNARMED with no hint why. The strings below were
+# ---- copied out of `check-arms.py --report` rather than retyped, which is what that mode is for.
+mkdir -p memory/builds/tRun/prompts memory/builds/tRun/spec
+printf 'a brief
+' > memory/builds/tRun/prompts/armbrief.md
+git add memory/builds/tRun/prompts/armbrief.md >/dev/null 2>&1
+o=$(run --brief tRun --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"--brief requires --unit, because a brief naming no unit records what SOME agent was handed and joins to nothing"*) echo "ok   brief: --unit is required" ;; *) echo "FAIL brief: --unit is required -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit ARCH-tRun-1)
+n=$((n+1)); case "$o" in *"--brief requires --path, because the brief is the FILE and a row with no path records that one existed"*) echo "ok   brief: --path is required" ;; *) echo "FAIL brief: --path is required -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit ARCH-tRun-404 --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"--brief names a unit the build README's generated units region does not carry, so the brief joins to no unit of this build"*) echo "ok   brief: a unit off the roster is refused" ;; *) echo "FAIL brief: a unit off the roster is refused -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/gone.md)
+n=$((n+1)); case "$o" in *"--brief names a path that is not a file in this tree, so there is nothing to hash and the row would describe nothing"*) echo "ok   brief: a --path naming no file is refused" ;; *) echo "FAIL brief: a --path naming no file is refused -- $o"; st=1 ;; esac
+printf 'untracked
+' > memory/builds/tRun/prompts/armuntracked.md
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/armuntracked.md)
+n=$((n+1)); case "$o" in *"--brief names an UNTRACKED path, and an untracked brief does not travel with the push, so a later reader in a fresh clone finds neither the file nor anything to compare its hash against"*) echo "ok   brief: an UNTRACKED path is refused" ;; *) echo "FAIL brief: an UNTRACKED path is refused -- $o"; st=1 ;; esac
+rm -f memory/builds/tRun/prompts/armuntracked.md
+o=$(run --brief tRun --unit "$(printf 'A
+B')" --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"a brief unit or path contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second parked row nothing wrote"*) echo "ok   brief: a newline in the unit forges a second row and is refused" ;; *) echo "FAIL brief: a newline in the unit forges a second row and is refused -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit "A · B" --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"a brief unit or path spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"*) echo "ok   brief: the field separator in the unit is refused" ;; *) echo "FAIL brief: the field separator in the unit is refused -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit "A--no-verify" --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"a brief unit or path spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite"*) echo "ok   brief: the declared bypass flag in the unit is refused" ;; *) echo "FAIL brief: the declared bypass flag in the unit is refused -- $o"; st=1 ;; esac
+o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last"*) echo "ok   dispatch: a unit no spec defines is M2 MISSING" ;; *) echo "FAIL dispatch: a unit no spec defines is M2 MISSING -- $o"; st=1 ;; esac
+printf '# ARCH-tRun-1 — u
+
+**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd
+
+## 2. Scope (IN)
+
+- s
+
+## 6. Acceptance criteria
+
+## 7. Gates
+
+- g
+
+## 8. Open questions
+
+none
+' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it"*) echo "ok   dispatch: a THIN unit is refused" ;; *) echo "FAIL dispatch: a THIN unit is refused -- $o"; st=1 ;; esac
+printf '# ARCH-tRun-1 — u
+
+**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd · order 2x
+
+## 2. Scope (IN)
+
+- s
+
+## 6. Acceptance criteria
+
+- a
+
+## 7. Gates
+
+- g
+
+## 8. Open questions
+
+none
+' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: "*" spells ["*) echo "ok   order verb: a malformed value is REFUSED, not truncated to its prefix" ;; *) echo "FAIL order verb: a malformed value is REFUSED, not truncated to its prefix -- $o"; st=1 ;; esac
+rm -f memory/builds/tRun/spec/one.md
+
+# A slug with a README and NO run-state file, and one with neither: the two preconditions the
+# verb tests before it looks at anything the caller passed.
+mkdir -p memory/builds/tNoRun
+readme tNoRun
+o=$(run --brief tNoRun --unit ARCH-tNoRun-1 --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"no run-state file, so there is no run to record a brief against"*) echo "ok   brief: a build with no run-state file has no run to record against" ;; *) echo "FAIL brief: a build with no run-state file has no run to record against -- $o"; st=1 ;; esac
+mkdir -p memory/builds/tNoRm
+runmd tNoRm "$MANDATE"
+o=$(run --brief tNoRm --unit ARCH-tNoRm-1 --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"no build README, so there is no roster to check this unit against"*) echo "ok   brief: a build with no README has no roster to check against" ;; *) echo "FAIL brief: a build with no README has no roster to check against -- $o"; st=1 ;; esac
+
+echo "MARK pass-order-dispatch" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- TOOL-dBriefedPass-3 S1/S2 - THE M2 HARD FLOOR, AT THE MOMENT OF THE ACT. Never build a
+# ---- MISSING or THIN unit was carried entirely by an agent's memory: `plan_state` was called at
+# ---- `verb_plan`, which only reports, and at `build-complete`, which runs after every commit has
+# ---- landed. A run that built first and specced afterwards therefore passed the Definition of Done
+# ---- by construction, because by close time the spec existed and was not thin.
+# ----
+# ---- The passing case is armed BESIDE each refusal. A refusal with no observed pass is a gate that
+# ---- cannot be satisfied, and it is the arm most often missing.
+o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"which is M2's MISSING"*) ;; *) echo "FAIL dispatch: a unit no tracked spec defines was accepted -- $o"; st=1 ;; esac
+
+# THIN: a spec whose acceptance section is empty. The state token is what the message must name,
+# never the empty SECTION -- `plan_state`'s contract is one bare token by a recorded decision, and
+# `TOOL-dBriefedPass-1` declines to widen it.
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"grades THIN"*) ;; *) echo "FAIL dispatch: a THIN unit was accepted, which is the hard floor this refusal IS -- $o"; st=1 ;; esac
+n=$((n+1)); case "$o" in *"section is empty or names nothing observable"*) ;; *) echo "FAIL dispatch: the THIN message did not say what THIN means -- $o"; st=1 ;; esac
+
+# THE PASSING CASE. The same unit with a filled acceptance section dispatches.
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"dispatch declared"*) ;; *) echo "FAIL dispatch: a READY unit was REFUSED, so the guard cannot be satisfied -- $o"; st=1 ;; esac
+
+# ---- aDeferredBar closing review F3 - THE DECLARED SPEC-TOKEN CHECKER RUNS BEFORE THE DISPATCH.
+# ---- The memory kit's bar join grades LIVE specs and this harness closes every unit spec in its
+# ---- build commit, so the bar never grades one; the dispatch is the one point that can. The REAL
+# ---- checker is copied into the fixture at the declared path - a stub exiting 1 would prove only
+# ---- that the driver reads an exit code - and the spec is renamed to a DATED filename, because the
+# ---- checker arms its bar join on the filename date. RED-first: the driver at 8b5b3f0c declared the
+# ---- dispatch over this fixture.
+STC="$HERE/../check-spec-tokens.py"
+if [ -f "$STC" ]; then
+  mkdir -p tools memory/project
+  cp "$STC" tools/check-spec-tokens.py
+  printf '[{"name":"g"}]\n' > tools/gate-legs.json
+  printf '# waivers\n' > memory/project/spec-token-waivers.txt
+  printf 'SPEC_DIRECT_CUTOFF="2026-08-01"\n' > .memory-tree.conf
+  git mv memory/builds/tRun/spec/one.md memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
+  printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 `GATE_SELFTESTS=1 bash run-gates.sh` is green.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
+  git add memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md >/dev/null 2>&1
+  printf 'SPEC_TOKENS_CLI="tools/check-spec-tokens.py"\n' >> .unattended.conf
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+  n=$((n+1)); case "$o" in *"--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ("*) echo "ok   dispatch: a live spec naming the flagged bar as its observation REFUSES the dispatch" ;; *) echo "FAIL dispatch: a live spec naming the flagged bar was dispatched against -- $o"; st=1 ;; esac
+  n=$((n+1)); case "$o" in *"[bar]"*) echo "ok   dispatch: the refusal carries the checker's own [bar] line" ;; *) echo "FAIL dispatch: the refusal does not carry the checker's [bar] line -- $o"; st=1 ;; esac
+  # The same tree with the key BLANK: an ANNOUNCED skip on stdout, and the dispatch is declared.
+  sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' .unattended.conf
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+  n=$((n+1)); case "$o" in *"SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"*) echo "ok   dispatch: a blank SPEC_TOKENS_CLI announces the skip" ;; *) echo "FAIL dispatch: a blank SPEC_TOKENS_CLI did not announce the skip -- $o"; st=1 ;; esac
+  n=$((n+1)); case "$o" in *"dispatch declared"*) echo "ok   dispatch: the announced skip still declares" ;; *) echo "FAIL dispatch: the announced skip did not declare -- $o"; st=1 ;; esac
+  # A declared path that is not there is a refusal, not a check that passes by running nothing.
+  sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="tools/gone.py"|' .unattended.conf
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+  n=$((n+1)); case "$o" in *"--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing"*) echo "ok   dispatch: a declared checker that is not there is refused" ;; *) echo "FAIL dispatch: a missing declared checker was not refused -- $o"; st=1 ;; esac
+  # Restore the fixture the brief arms below read: the undated spec name, no extras.
+  sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
+  git mv memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tRun/spec/one.md
+  rm -f tools/check-spec-tokens.py tools/gate-legs.json memory/project/spec-token-waivers.txt .memory-tree.conf
+else
+  echo "FAIL dispatch: the spec-token checker is not beside this kit at $STC, so the F3 arms have no subject"; st=1
+fi
+
+echo "MARK brief" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- TOOL-dBriefedPass-2 - THE UNIT BRIEF. "Which instructions produced this diff" had no answer
+# ---- on disk before this verb: a build pass was handed prose by whatever orchestrated it, and the
+# ---- prose left no trace. These arms grade the four things that make the row a RECORD rather than
+# ---- a note - the roster join, the tracked-path refusal, the park() grammar, and the staleness
+# ---- reader that is the only thing making the recorded hash more than decoration.
+mkdir -p memory/builds/tRun/prompts
+printf 'the brief for unit one\n' > memory/builds/tRun/prompts/brief-1.md
+git add memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
+
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md)
+n=$((n+1)); case "$o" in *"brief recorded"*) ;; *) echo "FAIL brief: a tracked path naming a rostered unit was refused -- $o"; st=1 ;; esac
+# THE GRAMMAR IS park()'s AND THE ARM READS THE BYTES. A bespoke dash-led row was specified first and
+# no reader in this driver could have matched it, so this asserts the shape the readers actually use.
+n=$((n+1)); grep -qE "^[0-9][0-9-]*T[0-9:]*Z brief · item ARCH-tRun-1 · reason [0-9a-f]{12} memory/builds/tRun/prompts/brief-1.md$" memory/builds/tRun/RUN.md \
+  || { echo "FAIL brief: the row is not in park()'s grammar, so no reader in this driver can match it"; st=1; }
+
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md)
+n=$((n+1)); case "$o" in *"already recorded, unchanged"*) ;; *) echo "FAIL brief: an identical re-run was not idempotent -- $o"; st=1 ;; esac
+
+o=$(run --brief tRun --unit ARCH-tRun-99 --path memory/builds/tRun/prompts/brief-1.md)
+n=$((n+1)); case "$o" in *"does not carry"*) ;; *) echo "FAIL brief: a unit absent from the units region was accepted -- $o"; st=1 ;; esac
+
+printf 'untracked\n' > memory/builds/tRun/prompts/untracked.md
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/untracked.md)
+n=$((n+1)); case "$o" in *UNTRACKED*) ;; *) echo "FAIL brief: an untracked brief was accepted, and it does not travel with the push -- $o"; st=1 ;; esac
+rm -f memory/builds/tRun/prompts/untracked.md
+
+# ---- THE CLASSIFICATION. `brief` is in PARK_KINDS and deliberately NOT in PARK_KINDS_OWED, so it
+# ---- must move `noted` and must NOT move `parked`. A brief that inflated the surfaced count would
+# ---- make a truthful `parked-decisions-surfaced` attestation refuse.
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"· noted "*) ;; *) echo "FAIL brief: a recorded brief did not reach the noted aggregate -- $o"; st=1 ;; esac
+n=$((n+1)); case "$o" in *"· parked "*) echo "FAIL brief: a brief inflated the SURFACED count, which is what its history classification exists to prevent -- $o"; st=1 ;; *) ;; esac
+
+# ---- THE STALENESS READER, both directions. Detecting is half the arm; CLEARING is the half that
+# ---- proves the reader grades the LATEST row per unit. Graded over every row instead, the count
+# ---- rises monotonically and can never return to zero, which is a signal a reader cannot act on.
+# ---- Observed exactly that way while building this unit, which is why rev-5 bumped S3.
+printf 'edited after the brief was recorded\n' >> memory/builds/tRun/prompts/brief-1.md
+git add memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"STALE briefs"*) ;; *) echo "FAIL brief: an edited brief did not report STALE, so the recorded hash is decoration -- $o"; st=1 ;; esac
+run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"STALE briefs"*) echo "FAIL brief: re-briefing the edited file did NOT clear STALE, so the count can only rise -- $o"; st=1 ;; *) ;; esac
+
+# ---- TWO UNITS, ONE STALE. The case a per-unit reader must get right and the collapsed one cannot
+# ---- see: the first cut of this reader lost its unit id to a heredoc-eaten back-reference and
+# ---- grouped every row under one key, which passes with one unit and drops rows with two.
+printf 'the brief for unit two\n' > memory/builds/tRun/prompts/brief-2.md
+git add memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
+run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
+printf 'and now edited\n' >> memory/builds/tRun/prompts/brief-2.md
+git add memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"STALE briefs 1"*) ;; *) echo "FAIL brief: with two briefs and one edited, the reader did not report exactly one stale -- $o"; st=1 ;; esac
 
 echo "MARK park-taxonomy" >&2
 # ---------------------------------------------------------------------------------------------
@@ -3538,6 +4581,10 @@ fixture
 out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
 miss "$out" "the attested count of surfaced parked decisions does not match the record"
 hit  "$out" "close OK"
+# ---- TOOL-aWokenSentinel-7 AC6, on the same close-OK output: the MET `keepalive-reaped` item says
+# ---- where it is read back, through the announcing branch a met item with something to say already
+# ---- has — so a green close never reads as the reap having been observed here.
+hit  "$out" "unattended: keepalive-reaped: attested; checked at --landed against the stop-guard's last harness listing"
 
 # ---- THE OVERRIDE EXCLUSION, and it needs a fixture CARRYING an override or it passes either way.
 # ---- The close evaluates the Definition of Done and only THEN appends its override lines, so a close
@@ -3778,21 +4825,76 @@ sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
 fixture
 git push -q -f origin HEAD:main 2>/dev/null
 
-# a marker naming an EARLIER commit — the arm a presence test cannot fail. The refusal names BOTH
-# shas, because "stale marker" and "HEAD moved since the push" are different faults with different
-# remedies and a message naming only the wanted one cannot tell them apart.
+# a marker naming a commit this clone does NOT HOLD — forty zeros is no commit anywhere, so the
+# predicate stops at its existence read and says so, rather than reporting a containment it could
+# not measure. TOOL-aWokenSentinel-16: this arm used to read the string-equality refusal.
 printf 'landed main at 0000000000000000000000000000000000000000 by a previous run\n' > "$GCD/tmarker"
-hit "$(run --landed tRun)" "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted"
+hit "$(run --landed tRun)" "the lander marker names a commit this clone does not hold, so nothing here can say whether it contains this landing; fetch the remote or re-run the lander. marker"
+
+# a marker naming an EARLIER commit that the remote DOES reach — the fixture's parent — which is
+# the pass-by-finding-anything class the equality was written against and the containment read
+# keeps refusing: an earlier commit does not contain a later witness. The refusal names BOTH shas,
+# because "stale marker" and "HEAD moved since the push" are different faults with different
+# remedies and a message naming only the wanted one cannot tell them apart.
+printf 'landed main at %s by push-main
+' "$(git rev-parse HEAD~1)" > "$GCD/tmarker"
+out=$(run --landed tRun)
+hit "$out" "the lander marker names a commit that does not contain the witness, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes. wanted"
+hit "$out" "wanted $(git rev-parse HEAD)"
+
+# ---- TOOL-aWokenSentinel-22: the two refusal branches unit 16 left unarmed, each observed RED first
+# ---- against the driver at 12513c25, where the equality compare reads both markers as `names a
+# ---- different commit`. The first `hit` of each pair quotes the branch's WHOLE signature as
+# ---- check-arms.py derives it — the longest literal run before the first interpolation, which runs
+# ---- past the sentence to `marker holds` and to `is not the one` — because a readable prefix reads
+# ---- as UNARMED (memory/gotchas/arm-literal-strands-on-message-edit.md).
+# the marker carries NO sha — a touched file, not evidence; and the refusal leaves the record where
+# it found it, the write-before-check property TOOL-dScaffoldedMirror-22 fixed.
+printf 'landed main at nothing by push-main\n' > "$GCD/tmarker"
+out=$(run --landed tRun)
+hit "$out" "the lander marker carries no commit sha, so it is a touched file and not evidence; fix what the lander writes. marker holds"
+hit "$out" "marker holds: landed main at nothing by push-main"
+same "no-sha marker leaves the record at LANDING" "$(grep -c '^phase: LANDING' memory/builds/tRun/RUN.md)" "1"
+
+# the marker names a commit that CONTAINS the witness but was never pushed. The scratch commit is
+# made over a TRACKED write: fixture() is `git add -A && git commit`, and on a clean tree it commits
+# nothing, exits 1 under set -u without set -e, and leaves HEAD where origin main already is.
+git branch -f tscratch HEAD; git checkout -q tscratch; printf 'scratch\n' > tscratch.txt; fixture; _unpushed=$(git rev-parse HEAD); git checkout -q -
+same "the scratch commit is not the run branch HEAD" "$([ "$_unpushed" != "$(git rev-parse HEAD)" ] && echo distinct)" "distinct"
+printf 'landed main at %s by push-main\n' "$_unpushed" > "$GCD/tmarker"
+out=$(run --landed tRun)
+hit "$out" "the lander marker names a commit the remote default branch does not reach, so the landing it records is not the one"
+hit "$out" "marker $_unpushed against refs/heads/main"
+same "unpushed marker leaves the record at LANDING" "$(grep -c '^phase: LANDING' memory/builds/tRun/RUN.md)" "1"
+# ...and pushed, the same marker is a LATER landing that contains this one — accepted: the
+# run-B-overwrites-run-A ordering TOOL-aUnblockedFleet-7 records, which spec 16 §4 tolerates.
+git push -q -f origin tscratch:main 2>/dev/null
+out=$(run --landed tRun)
+miss "$out" "does not reach"
+same "a later landing containing this one is accepted" "$(grep -c '^phase: LANDED' memory/builds/tRun/RUN.md)" "1"
+# THE CONTROL CONSUMED THE STATE: the record is LANDED and origin main is the scratch commit. The
+# accepting arm below establishes nothing of its own (TOOL-aWokenSentinel-26 makes it assert this),
+# so restore what the region's setup left — a committed LANDING, a clean tree, HEAD advertised.
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md; fixture; git push -q -f origin HEAD:main 2>/dev/null
 
 # ...and the marker naming THIS commit is ACCEPTED, which this fixture can finally prove. It used to
 # assert only that execution REACHED the ancestry check, because the unit branch sat one commit past
 # the anchor and `--landed` could never succeed here. Now that the marker gate is scoped to the
 # REMOTE arm the fixture pushes HEAD to the default branch, so the accepting path is reachable and is
 # asserted directly rather than inferred from which refusal came back.
+# THE ACCEPTING ARM ESTABLISHES NOTHING, so it asserts what it needs. Spec 22's pushed control
+# (TOOL-aWokenSentinel-22) landed the record and moved origin main above this line; every miss
+# below passes on ANY refusal, so an inherited LANDED record read as green here. Three properties,
+# each named when it is the one that moved — a committed LANDING record, a clean tree, and HEAD as
+# the commit origin advertises for main, read by `ls-remote` the way check 34 reads it. The remedy
+# is the region's own setup, never a rebuild here: a rebuild would hide the next insertion.
+same "accepting arm enters at a committed LANDING record" "$(grep -c '^phase: LANDING' memory/builds/tRun/RUN.md)" "1"
+same "accepting arm enters with a clean tree" "$(git status --porcelain | grep -c '')" "0"
+same "accepting arm enters with HEAD advertised as origin main" "$(git rev-parse HEAD)" "$(git ls-remote -q origin refs/heads/main | cut -f1)"
 printf 'landed main at %s by push-main
 ' "$(git rev-parse HEAD)" > "$GCD/tmarker"
 out=$(run --landed tRun)
-miss "$out" "the lander marker names a different commit"
+miss "$out" "the lander marker names a commit"
 miss "$out" "the lander wrote none"
 miss "$out" "HEAD is not an ancestor of the tip the remote advertises"
 same "the run reached LANDED with the marker accepted" "$(grep -c '^phase: LANDED' memory/builds/tRun/RUN.md)" "1"
@@ -3819,6 +4921,39 @@ git push -q -f origin HEAD:main 2>/dev/null
 out=$(run --landed tRun)
 miss "$out" "the project declares a lander marker and the lander wrote none"
 rm -f .git/tmarker
+
+# ---- THE `--no-ff` LANDING, FROM THE RUN WORKTREE (TOOL-aWokenSentinel-16, TOOL-dUnstalledConvoy-38).
+# ---- The charter's lander merges `--no-ff` and writes the MERGE to the marker; the run worktree's
+# ---- HEAD is that merge's second parent. The string equality refused every such landing and the
+# ---- only way through was to fast-forward the run branch onto the merge by hand. The predicate
+# ---- reads containment: the marker's commit CONTAINS the witness and the advertised default branch
+# ---- REACHES it. Observed RED first against the driver at this unit's base, where it refuses with
+# ---- `names a different commit`. The witness recorded is the run branch's HEAD, the commit this arm
+# ---- validated - never the merge, which nothing here examined.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkconf; printf 'LANDER_MARKER="tmarker"
+' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+RUNTIP=$(git rev-parse HEAD)
+git checkout -q -B main "$BASE"
+git merge -q --no-ff -m "land the run" "$RUNTIP"
+MERGE=$(git rev-parse HEAD)
+git push -q -f origin HEAD:main 2>/dev/null
+git checkout -q unit
+printf 'landed main at %s by push-main
+' "$MERGE" > "$GCD/tmarker"
+out=$(run --landed tRun)
+hit "$out" "phase LANDED"
+miss "$out" "the lander marker names a commit"
+same "the no-ff landing witnesses the run branch's HEAD, not the merge" \
+  "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$RUNTIP"
+# ...and the marker names a DIFFERENT commit from HEAD, or the arm above is the fast-forward one.
+[ "$MERGE" != "$RUNTIP" ] \
+  || { echo "FAIL the no-ff fixture left the marker's commit equal to HEAD, so it cannot tell containment from equality"; st=1; }
+n=$((n+1))
+rm -f "$GCD/tmarker"
+git branch -f main "$BASE"; git push -q -f origin "$BASE":main 2>/dev/null
 reset_tree
 
 
@@ -3850,12 +4985,23 @@ same "an oscillation 2,1,2 is NON-CONVERGENT"         "$(review_state '2 1' 2)" 
 # predicate did not terminate, not because the loop misbehaved.
 same "a long shrinking sequence hits the ceiling"     "$(review_state '9 8 7 6 5 4 3' 2)" "CEILING"
 
+# ---- TOOL-aProbedUnit-6: THE THIRD ARGUMENT IS THE BOUND, defaulting to the ceiling, so every
+# ---- two-argument arm above holds unchanged. BOUNDED is tested after the two facts about THIS round
+# ---- and after the ceiling, so a clean round, a flat round and a ceiling hit each keep their own exit.
+same "a bound of 1 makes the first blocked round terminal"    "$(review_state '' 3 1)"      "BOUNDED"
+same "a bound of 2 ends a strictly smaller second round"      "$(review_state '3' 2 2)"     "BOUNDED"
+same "a bound equal to the ceiling arms round 1 as before"    "$(review_state '' 3 8)"      "CONVERGING"
+same "a flat count is NON-CONVERGENT before it is BOUNDED"    "$(review_state '2' 2 1)"     "NON-CONVERGENT"
+same "zero blockers is CONVERGED before it is BOUNDED"        "$(review_state '' 0 1)"      "CONVERGED"
+same "the ceiling fires before a bound equal to it"           "$(review_state '9 8 7 6 5 4 3' 2 8)" "CEILING"
+
 # ---- the verb's refusals, on disk
 bcopen
 hit "$(run --review tNoSuchBuild --subject S1 --verdict BLOCKED --blockers 1)" "no run-state file, so there is no run to record a review round against"
 hit "$(run --review tRun --subject S1 --verdict MAYBE --blockers 1)" "--review names a verdict outside the closed set, and a verdict nothing can compare is prose in a field; legal verdicts"
 hit "$(run --review tRun --subject S1 --verdict BLOCKED)" "--review requires --blockers as a plain integer, because the predicate compares this round's count against the previous one and cannot compare prose"
 hit "$(run --review tRun --verdict BLOCKED --blockers 1)" "--review requires --subject, because the convergence predicate is per SUBJECT and a round with no subject cannot be sequenced against anything"
+crdrop
 same "a refused round wrote nothing" "$(grep -c 'review · item' memory/builds/tRun/RUN.md)" "0"
 # the SUBJECT is free text from the caller, and leg check 11 greps this file WHOLE for the declared
 # bypass flag — so a subject naming it would red the bar permanently on a record no verb can
@@ -3875,26 +5021,118 @@ hit "$(run --review tRun --subject "S1 · reason smuggled" --verdict BLOCKED --b
 # ---- carrying `(` missed its OWN recorded terminal line and the loop accepted a further round.
 bcopen
 run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
-run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
-hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+# The second call EXITS, so TOOL-dFoldedVerdict-1 makes --disposition mandatory here. This arm is
+# about the subject-as-regex defect and not about the disposition, so the flag is supplied rather
+# than asserted on — `promote`, the one value a blocker-bearing exit accepts since aProbedUnit's close.
+run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition promote >/dev/null
+hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 reset_tree
 
 # ---- the recorded round, and the TERMINAL LINE the leg reads
 bcopen
 run --review tRun --subject S1 --verdict BLOCKED --blockers 2 >/dev/null
-out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2)
+out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2 --disposition promote)
 hit "$out" "NON-CONVERGENT"
 hit "$out" "PROMOTED"
 same "the exit token is written into the round's own reason" "$(grep -c 'review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
 # ...and a subject whose loop ENDED does not take another round: the history would say the opposite
 # of what happened.
-hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
+
+# ---- CONVERGED is terminal too, and the refusal names where a later blocker goes. Both arms above
+# ---- reach branch 10 through NON-CONVERGENT; this one reaches it through the exit the owner ruling
+# ---- is about: a subject that converged at round 1 takes no further round, the refusal names the
+# ---- M4 severity-rule route, and the refused round wrote NO row — one review row, not two.
+bcopen
+run --review tRun --subject C1 --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
+hit "$(run --review tRun --subject C1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
+same "a refused round on a converged subject wrote nothing" "$(grep -c 'review · item C1 · reason' memory/builds/tRun/RUN.md)" "1"
+# ---- CONVERGED takes an OPTIONAL disposition (closing review of aProbedUnit, cluster C, id 12). The
+# ---- severity rule disposes the HIGHS that stood at zero blockers, and the harness promotes them;
+# ---- refusing the field here left that promotion unrecordable and invisible to the gate. Never
+# ---- required: the C1 round above recorded with no field and still does. Against the base driver
+# ---- the first call is refused as "not a terminal exit" and the row count reads 0.
+out=$(run --review tRun --subject C2 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition promote)
+hit "$out" "CONVERGED · disposition promote — the loop is done for this subject, and"
+hit "$out" "PROMOTED"
+same "the optional promote is written into the converged round's reason" "$(grep -c 'review · item C2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote' memory/builds/tRun/RUN.md)" "1"
+# ...and `fold` there is the value for nothing above MEDIUM — legal, redundant, and the one exit
+# `review_exit_note fold` is still reachable from.
+out=$(run --review tRun --subject C3 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition fold)
+hit "$out" "CONVERGED · disposition fold"
+hit "$out" "FOLDED into the specs it belongs to"
+reset_tree
 
 # ---- a review round is HISTORY, so it must not inflate the surfaced count the owner is shown.
 bcopen
 run --park tRun --item "a real question" --reason "options seen, and why I refused" >/dev/null
 run --review tRun --subject S1 --verdict BLOCKED --blockers 1 >/dev/null
 same "a review round does not join the surfaced parked count" "$(run --status tRun | grep -c 'parked 1')" "1"
+reset_tree
+
+# ---- TOOL-dFoldedVerdict-1: THE DISPOSITION — its closed set, its state gate in BOTH directions,
+# ---- and the ORDER of the two refusals. The order is not decoration: a value outside the set on a
+# ---- CONVERGING round must produce the CLOSED-SET refusal and not the state one, or an arm passes
+# ---- against either and proves neither.
+bcopen
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition nonsense)" "--review names a disposition outside the closed set, and a disposition nothing can compare is prose in a field; legal dispositions"
+# A VALUE CARRYING THE SET SEPARATOR. `case "|$SET|" in *"|$v|"*` matches any pipe-bounded SUBSTRING,
+# so `fold|promote` passed the membership test, was written to an append-only record, and reached
+# review_exit_note's `*)` arm — the branch whose own header certifies it unreachable. Found by the
+# closing review, reproduced against the shipped driver. The --verdict test above has the identical
+# hole and is filed rather than folded here.
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition 'fold|promote')" "--review names a disposition containing the set separator, which the membership test would read as a pipe-bounded substring of the closed set rather than as one member of it; legal dispositions"
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition promote)" "--review names a disposition on a round that is not a terminal exit, and a disposition recorded mid-loop is a claim about an exit that has not happened yet: state"
+run --review tRun --subject D1 --verdict BLOCKED --blockers 3 >/dev/null
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3)" "blocker(s) standing and requires --disposition promote, because the severity rule promotes every blocker and a record naming no disposition leaves the gate inferring one from ids"
+reset_tree
+
+# ---- FOLD AT A BLOCKER-BEARING EXIT IS REFUSED (closing review of aProbedUnit, cluster C). This arm
+# ---- used to pin `NON-CONVERGENT · disposition fold` as LEGAL: `review_state` returns CONVERGED for
+# ---- count 0, so every NON-CONVERGENT, CEILING or BOUNDED exit stands on a blocker, and the severity
+# ---- rule promotes every blocker — `blockers 2 · disposition fold` was a row the gate read as
+# ---- demanding nothing while two blockers stood. The refusal writes NOTHING, so the subject is still
+# ---- open and the same round records with `promote`, the field AFTER the state token as before.
+bcopen
+run --review tRun --subject D2 --verdict BLOCKED --blockers 2 >/dev/null
+out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition fold)
+hit "$out" "blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
+hit "$out" "--review exits NON-CONVERGENT with 2 blocker(s) standing"
+same "a refused fold wrote nothing" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "0"
+out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition promote)
+hit "$out" "NON-CONVERGENT · disposition promote"
+same "the promote disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote' memory/builds/tRun/RUN.md)" "1"
+same "the pre-existing substring the leg reads still matches" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+
+# ---- TOOL-aProbedUnit-6: A SPEC SUBJECT IS BOUNDED, THE SLUG SUBJECT IS NOT. The conf below declares
+# ---- REVIEW_ROUNDS=1 through mkconf's SEVENTH positional; every other review arm in this file runs at
+# ---- the default, ONE BELOW the ceiling (a bound equal to it is refused at startup, cluster H of
+# ---- aProbedUnit's closing review), which is why none of them moved. Against the base driver every arm
+# ---- here reads CONVERGING where BOUNDED is expected and refuses the explicit disposition.
+bcopen
+mkconf "true" "true" "2026-08-19" "3600" "" "1800" "1"
+hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3)" "--review exits BOUNDED with 3 blocker(s) standing and requires --disposition promote"
+same "a refused bounded round wrote nothing" "$(grep -c 'review · item B1' memory/builds/tRun/RUN.md)" "0"
+out=$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3 --disposition promote)
+hit "$out" "BOUNDED · disposition promote"
+hit "$out" "the declared round bound of 1 is reached"
+# the echo names the rule the exit applies — every CONFIRMED finding, by severity — and not the
+# pre-severity-rule "every standing blocker" (cluster G of the closing review, the driver half)
+hit "$out" "so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY:"
+same "the bounded exit is written into the round's own reason" "$(grep -c 'review · item B1 · reason verdict BLOCKED · blockers 3 · BOUNDED · disposition promote' memory/builds/tRun/RUN.md)" "1"
+hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+# the SLUG subject keeps the ceiling: an explicit disposition on its first blocked round is refused as
+# non-terminal, and the round itself arms the loop — the closing diff review is unchanged in behaviour.
+crdrop
+hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3 --disposition promote)" "not a terminal exit"
+hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3)" "CONVERGING"
+# ...and fold is REFUSED at a BOUNDED exit exactly as at NON-CONVERGENT: three blockers stand, the
+# severity rule promotes every one, and a row saying `fold` beside them is the hole the field was
+# added to close (cluster C). Nothing is written, so the subject stays open.
+out=$(run --review tRun --subject B2 --verdict BLOCKED --blockers 3 --disposition fold)
+hit "$out" "--review exits BOUNDED with 3 blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition"
+same "a refused fold at a bounded exit wrote nothing" "$(grep -c 'review · item B2 · reason' memory/builds/tRun/RUN.md)" "0"
 reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
@@ -3948,21 +5186,21 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
 reset_tree
 printf '
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
 ' >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 # ...DECLARED, the index ALONE is still accepted — that is the retraction M6 earned.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes tools/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $KIT_REL/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
 # rather than about one declaration.
 reset_tree
 printf '
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
 ' >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
-run --dispatch tRun --pass ARCH-tRun-1 --writes tools/memory-tree/gen_build_index.py >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes $KIT_REL/memory-tree/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in
@@ -3972,9 +5210,12 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # no longer says what it used to, which `check-arms` exists to catch.
 SHARED_MSG="--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
 RELF_MSG="--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
-# ---- CONTAINMENT IS SYMMETRIC (closing review H5/H6, TOOL-dUnstalledConvoy-21). The refusals tested
-# ---- only "is the declared path UNDER the protected one", so the NARROW declarations were refused
-# ---- and the one claiming everything sailed through. Each arm below passed before the fix.
+# ---- CONTAINMENT IS SYMMETRIC, and the refusals tested only one direction of it: "is the declared
+# ---- path UNDER the protected one". So the NARROW declarations were refused and the one claiming
+# ---- EVERYTHING sailed through — the widest possible declaration passing while the exact one was
+# ---- caught. Each arm below passed before the fix, which is what makes them regression arms rather
+# ---- than illustrations. Found by a closing review, its H5 and H6.
+# ---- Pointer, not evidence: TOOL-dUnstalledConvoy-21.
 # `memory` CONTAINS the run-state file without being under it, so the old `[ "$p" = "$rel" ]` let the
 # widest possible declaration through while refusing the exact one. Both arms are that shape.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory)" "$RELF_MSG"
@@ -4194,6 +5435,440 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "the run is 
 reset_tree; rm -f memory/builds/tRun/RUN.md
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
 
+# ---- TOOL-aProbedUnit-3: `--audit`, the dispatched-unit stall probe. One line per unit whose LATEST
+# ---- dispatch row is still open, the tree's two clocks, and a verdict against UNIT_STALL_BOUND.
+# ---- Every arm below is the driver over the scratch repo; the fixture is the one the `--dispatch`
+# ---- arms above already build, plus a READY spec COMMITTED on the unit branch: at UNIT0 the build
+# ---- has no spec, so `--dispatch` refuses it as MISSING and no row would exist to audit. The bound
+# ---- rides mkconf's SIXTH positional.
+build_audit_fixture() { # reset, commit a READY spec, preflight
+  reset_tree
+  mkdir -p memory/builds/tRun/spec
+  printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+  git add -A && git commit -q -m "fixture: a READY spec" --no-verify
+  run --preflight tRun --keepalive-id k1 >/dev/null
+}
+# AC1 — STALLED. The dispatch row an hour old, the fixture commit an hour old by GIT_COMMITTER_DATE,
+# the tree clean, the bound 60s. `last-write none` must read as OLDER than any bound: a clean tree
+# read as "written just now" is PROGRESSING forever, which is the reassuring-zero class.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mkconf "true" "true" "" "3600" "" "60"
+HOUR_AGO=$(( $(date -u +%s) - 3600 ))
+mutate memory/builds/tRun/RUN.md "s/^[0-9T:-]*Z dispatch · item /$(date -u -d "@$HOUR_AGO" +%Y-%m-%dT%H:%M:%SZ) dispatch · item /"
+git add -A && GIT_COMMITTER_DATE="$HOUR_AGO +0000" git commit -q -m "fixture: age the clocks" --no-verify
+out=$(run --audit tRun); rc=$?
+same "AC1 a STALLED verdict exits 0" "$rc" "0"
+hit "$out" "unattended-audit: ARCH-tRun-1 · dispatched"
+hit "$out" "· last-write none ·"
+hit "$out" "· STALLED"
+hit "$out" "unattended-audit: remedy — stop the unit's task, then re-dispatch ARCH-tRun-1 with a brief naming what stalled and that it is skipped"
+# AC2 — PROGRESSING. One untracked file under the declared directory, made with touch: the listing
+# must carry `ls-files --others`, and the write clock must be consulted, not the commit clock alone.
+mkdir -p work && touch work/new.txt
+out=$(run --audit tRun); rc=$?
+same "AC2 a PROGRESSING verdict exits 0" "$rc" "0"
+hit "$out" "· PROGRESSING"
+miss "$out" "unattended-audit: remedy"
+same "AC2 last-write is numeric after an untracked write" "$(printf '%s\n' "$out" | grep -cE 'ARCH-tRun-1 .* last-write [0-9]+s ago ')" "1"
+# AC8 — a listed path DELETED from disk is skipped, not a dead probe. `rm`, not `git rm --cached`:
+# the latter leaves the file on disk, so `stat` answers and the branch under test is never reached.
+rm memory/guides/BUILD-METHOD.md
+out=$(run --audit tRun); rc=$?
+same "AC8 a deletion in the listing is skipped, exit 0" "$rc" "0"
+hit "$out" "· PROGRESSING"
+miss "$out" "UNATTENDED check 51 FAILED"
+same "AC8 last-write stays numeric after the skip" "$(printf '%s\n' "$out" | grep -cE 'last-write [0-9]+s ago')" "1"
+# AC5, third branch — a probe that cannot answer is a refusal, never a zero. `stat` shadowed on PATH
+# by a stub exiting 1, over the same dirty tree, so the mtime probe dies on a path that EXISTS.
+mkdir -p "$TMP/stub"; printf '#!/bin/sh\nexit 1\n' > "$TMP/stub/stat"; chmod +x "$TMP/stub/stat"
+out=$(PATH="$TMP/stub:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
+same "AC5 a dead mtime probe exits 1" "$rc" "1"
+hit "$out" "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now:"
+miss "$out" "· PROGRESSING"
+# AC5, first branch — no run-state file.
+reset_tree
+out=$(run --audit tNoRun); rc=$?
+same "AC5 no run-state file exits 1" "$rc" "1"
+hit "$out" "no run-state file, so there is no dispatched unit to audit for idleness:"
+# AC5, second branch — a terminal record. Not `refuse_if_terminal`: its sentence says the verb would
+# REWRITE the record, and this verb rewrites nothing, so that sentence would be false here.
+build_audit_fixture
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+out=$(run --audit tRun); rc=$?
+same "AC5 a finished run exits 1" "$rc" "1"
+hit "$out" "the run is already finished, so no unit of it can be dispatched and open, and a keepalive still auditing it should have been reaped:"
+# AC3 — no open unit is ONE line and exit 0, never silence over nothing.
+build_audit_fixture
+out=$(run --audit tRun); rc=$?
+same "AC3 no dispatch row exits 0" "$rc" "0"
+same "AC3 the no-unit line, once" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+same "AC3 and no other audit line" "$(printf '%s\n' "$out" | grep -c '^unattended-audit:')" "1"
+# ...a commit naming the unit AND writing inside the declared set closes the pass — the openness
+# test is `check_pass_open`, the one `--dispatch` uses, so the two verbs cannot disagree.
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mkdir -p work && printf 'x\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 build" --no-verify
+out=$(run --audit tRun)
+same "AC3 a build commit inside the declared set closes the pass" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# ...and a commit naming the unit but touching ONLY the run-state file leaves it open — the
+# declaration commit is the ordinary shape a run produces, and counting it closed every pass at
+# declaration time once already.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
+out=$(run --audit tRun)
+hit "$out" "unattended-audit: ARCH-tRun-1 · dispatched"
+miss "$out" "no unit is dispatched and open"
+# ---- SAME-ANCHOR ROWS ARE ONE PASS (closing review of aProbedUnit, cluster A, ids 19/1/6). Two
+# ---- one-path rows at one anchor — `--writes` is repeatable and the driver's own repair is "declare
+# ---- again" — and a pass commit inside the FIRST row's set. The last-row read asked whether the
+# ---- pass wrote its LAST path and graded a finished unit open; the union asks whether it wrote
+# ---- inside ANY of them, which is check 23's key. Against the base driver the unit's line prints.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/two.txt >/dev/null 2>&1
+same "two same-anchor rows for one unit" "$(grep -c 'dispatch · item [0-9a-f]* ARCH-tRun-1 · reason' memory/builds/tRun/RUN.md)" "2"
+mkdir -p work && printf 'x\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 build" --no-verify
+out=$(run --audit tRun)
+same "a pass commit inside the FIRST of two same-anchor rows closes the pass" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# ---- A UNIT WHOSE SPEC IS TERMINAL IS NOT OPEN, whatever its rows say. The openness test is the
+# ---- disjointness proof's and answers conservatively — a pass that declared a path it never wrote
+# ---- stays open under it forever — so a CLOSED unit read as STALLED and the keepalive was handed a
+# ---- kill-and-redispatch order for it, on this repo, for hours. `--plan` graded the same unit DONE.
+# ---- The status is resolved the way `--plan` resolves it. The closing commit here does NOT name the
+# ---- unit, so `check_pass_open` alone still says open; only the status guard closes it.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* SPECCED/**Status:** CLOSED/'
+git add -A && git commit -q -m "fixture: the spec closes, the row stays" --no-verify
+out=$(run --audit tRun); rc=$?
+same "a CLOSED unit with an open row exits 0" "$rc" "0"
+same "a CLOSED unit with an open row is not listed" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# ---- THE SPEC READ IS A PROBE (closing review of aProbedUnit, round 2, cluster H, ids 5 and 18).
+# ---- The status skip above is only as good as the read that feeds it: `load_spec_facts` swallowed
+# ---- with `|| true` left the maps empty on a failed read, the CLOSED skip never fired, and the unit
+# ---- was graded STALLED with the kill order printed — the round-1 defect with its cause discarded.
+# ---- The four other probes in the verb set `dead`; this one now does too. `awk` is shadowed by a
+# ---- stub that exits 2 ONLY on an argument under `spec/`, so `spec_facts` fails on a file `-r`
+# ---- accepted while every other awk in the verb keeps answering. Its own stub dir, because the
+# ---- `stat` stub above shares `$TMP/stub` and would die first on any dirty path. Against the base
+# ---- driver: exit 0 and the CLOSED unit's line, graded by the clocks as though it were open.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* SPECCED/**Status:** CLOSED/'
+git add -A && git commit -q -m "fixture: the spec closes, the row stays" --no-verify
+mkdir -p "$TMP/stubawk"
+printf '#!/bin/sh\ncase "$*" in *spec/*) exit 2 ;; esac\nexec %s "$@"\n' "$(command -v awk)" > "$TMP/stubawk/awk"; chmod +x "$TMP/stubawk/awk"
+out=$(PATH="$TMP/stubawk:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
+same "a dead spec read exits 1" "$rc" "1"
+hit "$out" "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now: load_spec_facts over memory/builds/tRun/spec"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# AC4 — the bound is read through `read_bound_key`, GATE_BOUND's hoisted reader: junk and zero are
+# refusals at exit 2 before any verb runs, in GATE_BOUND's own sentence with the key name lifted out.
+reset_tree; mkconf "true" "true" "" "3600" "" "abc"
+out=$(run --audit tRun); rc=$?
+same "AC4 a non-integer UNIT_STALL_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - UNIT_STALL_BOUND is declared as"
+hit "$out" "which is not a positive integer of seconds"
+reset_tree; mkconf "true" "true" "" "3600" "" "0"
+out=$(run --audit tRun); rc=$?
+same "AC4 a zero UNIT_STALL_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - UNIT_STALL_BOUND is declared as"
+reset_tree
+
+# ---- TOOL-aWokenSentinel-1: the LEASE. `--preflight` records `session:` and `pid:` beside the
+# ---- keepalive, `absent` with ONE NOTE where the harness exposes none, and `--resume --keepalive-id`
+# ---- replaces all three on a live record and is refused through check 26 on a terminal one. The
+# ---- environment is the subject, so these arms spell `bash "$SCRIPT"` rather than the `run` helper
+# ---- where the env differs from the prologue's fixture values.
+# AC1 — both exposed: three facts, no NOTE.
+reset_tree
+out=$(CLAUDE_CODE_SESSION_ID=abc CLAUDE_PID=4242 bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
+same "AC1 preflight with the lease exposed exits 0" "$rc" "0"
+same "AC1 session recorded verbatim" "$(grep -c '^session: abc$' memory/builds/tRun/RUN.md)" "1"
+same "AC1 pid recorded verbatim" "$(grep -c '^pid: 4242$' memory/builds/tRun/RUN.md)" "1"
+same "AC1 the moved keepalive line still lands" "$(grep -c '^keepalive: k1$' memory/builds/tRun/RUN.md)" "1"
+miss "$out" "NOTE - this harness exposes no"
+# AC10 (closing review ids 2 and 15) — the three DERIVED facts ride beside the pid: `host` is this
+# node's name as `read_host_name` spells it; `pid-image` is `absent` for 4242, a pid nothing holds;
+# `lease-utc` is a UTC stamp. Then a lease on the suite's OWN pid records the image `tasklist`
+# reports for it (`ps -o comm=` elsewhere), and a harness exposing no pid records `absent` there.
+same "AC10 host recorded as this node" "$(sed -n 's/^host: //p' memory/builds/tRun/RUN.md)" "$(read_host_name)"
+same "AC10 pid-image absent for a pid nothing holds" "$(grep -c '^pid-image: absent$' memory/builds/tRun/RUN.md)" "1"
+same "AC10 lease-utc is a UTC stamp" "$(grep -cE '^lease-utc: [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) OWN_PID=$(ps -p $$ | awk -v p=$$ 'NR>1 && $1==p {print $4}') ;;
+  *) OWN_PID=$$ ;;
+esac
+n=$((n+1)); [ -n "$OWN_PID" ] || { echo "FAIL fixture: no pid for this shell, so the image arm would probe an empty value and prove nothing"; st=1; }
+CLAUDE_CODE_SESSION_ID=abc CLAUDE_PID=$OWN_PID bash "$SCRIPT" --preflight tRun --keepalive-id k1 >/dev/null 2>&1
+same "AC10 pid-image names the image holding the pid" "$(sed -n 's/^pid-image: //p' memory/builds/tRun/RUN.md)" "$(read_pid_image "$OWN_PID")"
+miss "$(sed -n 's/^pid-image: //p' memory/builds/tRun/RUN.md)" "absent"
+reset_tree
+CLAUDE_CODE_SESSION_ID=abc env -u CLAUDE_PID bash "$SCRIPT" --preflight tRun --keepalive-id k1 >/dev/null 2>&1
+same "AC10 pid-image absent when the harness exposes no pid" "$(grep -c '^pid-image: absent$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+out=$(CLAUDE_CODE_SESSION_ID=abc CLAUDE_PID=4242 bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
+# AC3 — on the record AC1 left, the resumed session replaces the lease: old values read BEFORE the
+# write, the file staged, exit 0. Then the plain form is byte-identical to before and rewrites nothing.
+out=$(CLAUDE_CODE_SESSION_ID=def CLAUDE_PID=9 bash "$SCRIPT" --resume tRun --keepalive-id zzz 2>&1); rc=$?
+same "AC3 a live-record replacement exits 0" "$rc" "0"
+hit "$out" "resume at phase RUNNING"
+hit "$out" "lease replaced · keepalive k1 -> zzz · session abc -> def · pid 4242 -> 9"
+same "AC3 keepalive replaced" "$(grep -c '^keepalive: zzz$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 session replaced" "$(grep -c '^session: def$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 pid replaced" "$(grep -c '^pid: 9$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 the replaced record is staged" "$(git diff --cached --name-only | grep -c '^memory/builds/tRun/RUN.md$')" "1"
+# ...and the INDEX carries the new value, which is what says --resume staged it rather than
+# --preflight having staged the old one: HEAD's fixture record has no keepalive line at all.
+same "AC3 the staged blob holds the replaced keepalive" "$(git diff --cached -- memory/builds/tRun/RUN.md | grep -c '^+keepalive: zzz$')" "1"
+out=$(run --resume tRun)
+miss "$out" "lease replaced"
+same "AC3 the plain form leaves the keepalive" "$(grep -c '^keepalive: zzz$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 the plain form leaves the session" "$(grep -c '^session: def$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 the plain form leaves the pid" "$(grep -c '^pid: 9$' memory/builds/tRun/RUN.md)" "1"
+# AC4 — a terminal record is not re-leased: check 26 names the verb, nothing is written, exit 1; and
+# the plain form on the same record still prints the terminal line at exit 0.
+mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: LANDED/'
+out=$(run --resume tRun --keepalive-id yyy); rc=$?
+same "AC4 a terminal-record replacement exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 26 FAILED"
+hit "$out" "LANDED via --resume"
+miss "$out" "lease replaced"
+same "AC4 the terminal record's keepalive is untouched" "$(grep -c '^keepalive: yyy$' memory/builds/tRun/RUN.md)" "0"
+same "AC4 the terminal record's keepalive still reads the live value" "$(grep -c '^keepalive: zzz$' memory/builds/tRun/RUN.md)" "1"
+out=$(run --resume tRun); rc=$?
+same "AC4 the plain form on a terminal record exits 0" "$rc" "0"
+hit "$out" "nothing to resume — phase LANDED is terminal"
+# AC2 — neither exposed: both facts `absent`, ONE NOTE naming both.
+reset_tree
+out=$(env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_PID bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
+same "AC2 preflight under a harness exposing nothing still exits 0" "$rc" "0"
+same "AC2 session absent" "$(grep -c '^session: absent$' memory/builds/tRun/RUN.md)" "1"
+same "AC2 pid absent" "$(grep -c '^pid: absent$' memory/builds/tRun/RUN.md)" "1"
+same "AC2 one NOTE naming both" "$(grep -c 'NOTE - this harness exposes no session id or pid, so no out-of-session resumer can find this run' <<<"$out")" "1"
+# ...and only the pid withheld: the NOTE names the pid alone, and the session the harness exposed is
+# recorded rather than blanked with it.
+reset_tree
+out=$(CLAUDE_CODE_SESSION_ID=abc env -u CLAUDE_PID bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
+same "AC2 preflight with only the pid withheld exits 0" "$rc" "0"
+same "AC2 the NOTE names the pid alone" "$(grep -c 'exposes no pid, so' <<<"$out")" "1"
+same "AC2 the exposed session survives the withheld pid" "$(grep -c '^session: abc$' memory/builds/tRun/RUN.md)" "1"
+same "AC2 the withheld pid is absent" "$(grep -c '^pid: absent$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+
+# ---- TOOL-aWokenSentinel-2: `--liveness`, the one predicate every out-of-session reader shares.
+# ---- Fourteen `key: value` lines and ONE verdict over the run-state file, the tree's clocks, the
+# ---- gate logs, the transcript and the recorded pid. Every arm is the driver over the `--audit`
+# ---- fixture; the stale bound rides mkconf's EIGHTH positional, at the derived default so no
+# ---- fixture above sees a NOTE it did not see before. The transcript root is pointed at a scratch
+# ---- directory for the whole block, so the box's real transcripts are never read and `HOME`, which
+# ---- is also where git reads its global config, is untouched. OUTSIDE the fixture tree: `$TMP` IS
+# ---- that tree, and a config directory under it is an untracked WRITE that ties the transcript's
+# ---- mtime to the second and wins the source line — measured on the first run of this block.
+mkdir -p "$ORIGIN_DIR/cfg-empty"; export CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg-empty"
+# AC2 — TERMINAL: every key prints on a terminal record too, in S2's order, and nothing else.
+build_audit_fixture
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+out=$(run --liveness tRun); rc=$?
+same "AC2 a TERMINAL verdict exits 0" "$rc" "0"
+hit "$out" "state: terminal"
+hit "$out" "verdict: TERMINAL"
+same "AC2 fourteen key: value lines on a terminal record" "$(printf '%s\n' "$out" | grep -c ':')" "14"
+same "AC2 no line that is not key: value" "$(printf '%s\n' "$out" | grep -cvE '^[a-z-]+: ')" "0"
+same "AC2 the keys in S2's order" "$(printf '%s\n' "$out" | sed 's/:.*//' | tr '\n' ' ')" "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict stale-bound "
+# ...the fourteenth line is the bound the verdict was graded against (closing review round 2,
+# defect D): the fixture's declared 5400, printed so the resume tick bounds its in-flight skip by
+# the driver's number and never reads RESUME_STALE_BOUND itself. RED against a driver copy
+# printing thirteen lines.
+same "AC2 the fourteenth line prints the declared stale bound" "$(printf '%s\n' "$out" | sed -n '14p')" "stale-bound: 5400"
+# ...and the same fourteen on a BUILDING record, so a reader never learns which state omits what.
+build_audit_fixture
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: BUILDING/'
+out=$(run --liveness tRun); rc=$?
+same "AC2 a LIVE verdict exits 0" "$rc" "0"
+hit "$out" "state: live"
+hit "$out" "session: fixture-session"
+hit "$out" "keepalive: k1"
+hit "$out" "verdict: LIVE"
+same "AC2 fourteen key: value lines on a BUILDING record" "$(printf '%s\n' "$out" | grep -c ':')" "14"
+# AC3 — FINISHED-UNSTAMPED: LANDING with a witness on the fixture's main, offline, against the
+# remote-tracking ref; the witness moved to the unit branch's HEAD reads live; and with no
+# GOV_DEFAULT_BRANCH and no origin/HEAD the ref is announced `unresolved` rather than fabricated.
+build_audit_fixture
+same "AC3 fixture: origin/main is BASE" "$(git rev-parse refs/remotes/origin/main)" "$BASE"
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDING/'
+mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $BASE/"
+out=$(run --liveness tRun); rc=$?
+same "AC3 a FINISHED-UNSTAMPED verdict exits 0" "$rc" "0"
+hit "$out" "state: finished-unstamped"
+hit "$out" "default-branch: refs/remotes/origin/main"
+hit "$out" "verdict: FINISHED-UNSTAMPED"
+mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $(git rev-parse HEAD)/"
+out=$(run --liveness tRun)
+hit "$out" "state: live"
+miss "$out" "verdict: FINISHED-UNSTAMPED"
+mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $BASE/"
+out=$(env -u GOV_DEFAULT_BRANCH bash "$SCRIPT" --liveness tRun 2>&1); rc=$?
+same "AC3 an unresolvable default branch exits 0" "$rc" "0"
+hit "$out" "default-branch: unresolved"
+hit "$out" "state: live"
+miss "$out" "default-branch: refs/"
+# UNBOUND — a record with no session to bind to.
+build_audit_fixture
+mutate memory/builds/tRun/RUN.md 's/^session: .*/session: absent/'
+out=$(run --liveness tRun)
+hit "$out" "session: absent"
+hit "$out" "verdict: UNBOUND"
+# AC4 — pid-alive: the fixture's dead pid reads `no`; a background sleep the arm starts reads `yes`
+# by its WINDOWS pid under MSYS (`ps`'s WINPID column) and `no` once killed; `absent` is never
+# probed; and under MSYS a `tasklist` that answers nothing is `unknown`, not `no`.
+build_audit_fixture
+out=$(run --liveness tRun)
+hit "$out" "pid: 999999999"
+hit "$out" "pid-alive: no"
+sleep 60 & SLEEP_PID=$!
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) WPID=$(ps -p "$SLEEP_PID" | awk -v p="$SLEEP_PID" 'NR>1 && $1==p {print $4}') ;;
+  *) WPID=$SLEEP_PID ;;
+esac
+n=$((n+1)); [ -n "$WPID" ] || { echo "FAIL fixture: no pid for the background sleep, so the live-pid arm below would probe an empty value and prove nothing"; st=1; }
+# LEASED AFTER IT STARTED: the fixture's `lease-utc` predates the sleep, and a holder that started
+# after the lease is a recycled number by the start-time compare below, so the lease is re-stamped
+# now — the shape a real lease has, since a process writes its lease after it exists.
+mutate memory/builds/tRun/RUN.md "s/^pid: .*/pid: $WPID/"
+mutate memory/builds/tRun/RUN.md "s/^lease-utc: .*/lease-utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)/"
+out=$(run --liveness tRun)
+hit "$out" "pid: $WPID"
+hit "$out" "pid-alive: yes"
+# ...AC11 (closing review id 2): the IMAGE decides too. The suite's own sleep leased under a recorded
+# `pid-image: claude.exe` is the recycled-pid shape — some process holds the number and it is not the
+# leased one — and reads `no`; under the image the probe reports for it, `yes`; under `absent`, the
+# pid-only reading. RED against a lib copy whose `check_pid_alive` ignores its second argument.
+mutate memory/builds/tRun/RUN.md 's/^pid-image: .*/pid-image: claude.exe/'
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: no"
+mutate memory/builds/tRun/RUN.md "s/^pid-image: .*/pid-image: $(read_pid_image "$WPID")/"
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: yes"
+mutate memory/builds/tRun/RUN.md 's/^pid-image: .*/pid-image: absent/'
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: yes"
+# ...and the START TIME decides last (closing review round 2, defect E): under the matching image,
+# a `lease-utc` older than the sleep's start is a same-image recycle — the number was freed and
+# taken again by the same kind of process — and reads `no`; re-stamped after the start it reads
+# `yes` again; and `absent` keeps the image reading. RED against a lib copy without the compare.
+mutate memory/builds/tRun/RUN.md "s/^pid-image: .*/pid-image: $(read_pid_image "$WPID")/"
+mutate memory/builds/tRun/RUN.md 's/^lease-utc: .*/lease-utc: 2026-01-01T00:00:00Z/'
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: no"
+mutate memory/builds/tRun/RUN.md "s/^lease-utc: .*/lease-utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)/"
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: yes"
+mutate memory/builds/tRun/RUN.md 's/^lease-utc: .*/lease-utc: absent/'
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: yes"
+kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: no"
+mutate memory/builds/tRun/RUN.md 's/^pid: .*/pid: absent/'
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: unknown"
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    mkdir -p "$TMP/stubtl"; printf '#!/bin/sh\nexit 1\n' > "$TMP/stubtl/tasklist"; chmod +x "$TMP/stubtl/tasklist"
+    mutate memory/builds/tRun/RUN.md 's/^pid: .*/pid: 999999999/'
+    out=$(PATH="$TMP/stubtl:$PATH" bash "$SCRIPT" --liveness tRun 2>&1)
+    hit "$out" "pid-alive: unknown"
+    rm -rf "$TMP/stubtl" ;;
+esac
+# AC5 — the four signals. An hour-old commit over a clean tree with no gate logs and no transcript
+# is STALE against a 60s bound and names the commit; one gate log flips it LIVE and names the log;
+# a transcript at the derived path names the transcript; one untracked write names the write. The
+# 60s bound is below the fixture's declared sum, which is AC6's NOTE, asserted here once.
+build_audit_fixture
+mkconf "true" "true" "" "3600" "" "1800" "7" "60"
+HOUR_AGO=$(( $(date -u +%s) - 3600 ))
+git add -A && GIT_COMMITTER_DATE="$HOUR_AGO +0000" git commit -q -m "fixture: age the clock" --no-verify
+GATE_LOGS="$(git rev-parse --git-dir)/gate-logs"; rm -rf "$GATE_LOGS"
+out=$(run --liveness tRun); rc=$?
+same "AC5 a STALE verdict exits 0" "$rc" "0"
+hit "$out" "last-move-source: commit"
+hit "$out" "transcript: absent"
+hit "$out" "stale: yes"
+hit "$out" "verdict: STALE"
+same "AC6 the below-sum NOTE prints once" "$(grep -c 'RESUME_STALE_BOUND (60s) is below GATE_BOUND + UNIT_STALL_BOUND (5400s), so a full bar'"'"'s silence reads STALE and an out-of-process resumer may kill a healthy bar' <<<"$out")" "1"
+mkdir -p "$GATE_LOGS" && touch "$GATE_LOGS/leg.log"
+out=$(run --liveness tRun)
+hit "$out" "last-move-source: gate-log"
+hit "$out" "stale: no"
+hit "$out" "verdict: LIVE"
+rm -rf "$GATE_LOGS"
+# ...the transcript: the worktree root with `:`, `\`, `/` and `.` each replaced by `-`, under the
+# override's `projects/`, named by the session the prologue pinned.
+ENC=$(git rev-parse --show-toplevel | tr ':\\/.' '----')
+n=$((n+1)); case "$ENC" in *[:/.]*|"") echo "FAIL fixture: the encoded root still carries a separator or is empty: $ENC"; st=1 ;; esac
+# ...pinned to a LITERAL of the rule the CLI was measured to apply on node `a`, 2026-09-16 — a
+# drive colon, every slash and the leading dot of `.claude` each become one `-` — so the arm is an
+# oracle the driver's spelling must match rather than a re-derivation that would agree with it.
+same "AC5 the encoding pins the measured rule" "$(printf '%s' 'D:/some.repo/.claude/wt' | tr ':\\/.' '----')" "D--some-repo--claude-wt"
+mkdir -p "$ORIGIN_DIR/cfg/projects/$ENC" && touch "$ORIGIN_DIR/cfg/projects/$ENC/fixture-session.jsonl"
+out=$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>&1)
+hit "$out" "transcript: $ORIGIN_DIR/cfg/projects/$ENC/fixture-session.jsonl"
+hit "$out" "last-move-source: transcript"
+hit "$out" "verdict: LIVE"
+rm -rf "$ORIGIN_DIR/cfg"
+touch scratch.txt
+out=$(run --liveness tRun)
+hit "$out" "last-move-source: write"
+hit "$out" "stale: no"
+rm -f scratch.txt
+# AC7 — the last recorded stall, verbatim, from the sidecar under the WORKTREE's git dir; absent
+# is `none`. This unit only reads the file; the line is written by hand here.
+SIDECAR="$(git rev-parse --git-dir)/unattended"; mkdir -p "$SIDECAR"
+printf '2026-09-16T00:00:00Z fixture-session rate_limit {}\n' > "$SIDECAR/stall.tRun.log"
+out=$(run --liveness tRun)
+hit "$out" "last-stall: 2026-09-16T00:00:00Z fixture-session rate_limit {}"
+rm -f "$SIDECAR/stall.tRun.log"
+out=$(run --liveness tRun)
+hit "$out" "last-stall: none"
+# AC1 — no run-state file is check 52's first sentence and no verdict; no slug is check_slug's.
+reset_tree
+out=$(run --liveness tNoRun); rc=$?
+same "AC1 no run-state file exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 52 FAILED"
+hit "$out" "no run-state file, so there is no run whose liveness can be graded:"
+miss "$out" "verdict:"
+out=$(run --liveness); rc=$?
+same "AC1 no slug exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 1 FAILED"
+miss "$out" "verdict:"
+# AC8 — a dead probe is check 52's second sentence and NO verdict line: `stat` shadowed by a stub
+# exiting 1 over a dirty tree, so the mtime probe dies on a path that exists.
+build_audit_fixture
+mkdir -p work && touch work/new.txt
+mkdir -p "$TMP/stub"; printf '#!/bin/sh\nexit 1\n' > "$TMP/stub/stat"; chmod +x "$TMP/stub/stat"
+out=$(PATH="$TMP/stub:$PATH" bash "$SCRIPT" --liveness tRun 2>&1); rc=$?
+same "AC8 a dead mtime probe exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 52 FAILED"
+hit "$out" "the liveness cannot be measured on this node, because a probe it needs answered nothing, so no verdict is answerable and a zero from a dead probe would read as moved-just-now:"
+miss "$out" "verdict:"
+# AC6 — junk in the eighth positional is `read_bound_key`'s refusal at exit 2 before any verb runs;
+# the absent-key NOTE is asserted on the NOCONF fixture below, beside its three siblings.
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "7" "abc"
+out=$(run --liveness tRun); rc=$?
+same "AC6 a non-integer RESUME_STALE_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - RESUME_STALE_BOUND is declared as"
+miss "$out" "verdict:"
+unset CLAUDE_CONFIG_DIR
+reset_tree
+
 # ---- TOOL-dUnstalledConvoy-5: `--rescope`, the amendment record. M3 now delegates the build's own
 # ---- scope, and an authority with no record is indistinguishable from a run doing what it likes.
 # ---- Every refusal below is its own `fail` call site and carries that site's ENTIRE literal
@@ -4309,13 +5984,687 @@ reset_tree; rm -f memory/builds/tRun/RUN.md
 out=$(run --rescope tRun --act retire --item ARCH-tNone-1 --reason r)
 hit "$out" "no run-state file, so there is no run to record an amendment against:"
 
+# ---- TOOL-aBoundedCeiling-6: run_bounded is a bound on the CLOCK, not on the verdict -------------
+# The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
+# which names THIS FILE as one of the two places the class has bitten. So these arms measure ELAPSED
+# TIME, and one of them carries the control that proves the instrument can see the defect at all.
+#
+# The function is SOURCED FROM THE SHIPPED FILE rather than retyped, because an arm that proves a
+# mechanism against a copy proves it for the copy — memory/gotchas/staged-break-substitutes-a-
+# synthetic-value.md.
+# THE SAME HOST GATE. With GATE_BOUND_LIVE forced to 1 on a host with no runnable timeout, the
+# sourced function would take exit 127 against a 124|137 case; and the verb-level arm below would
+# watch its sleeper run to completion and red for a property of the box.
+# THE BOUND IS 10 s AND IT IS NOT A TIMEOUT, IT IS A CAPABILITY PROBE. `true` returns instantly, so
+# the only thing a bound can add here is a FALSE NEGATIVE: at the shipped `1` it was process-creation
+# latency that tripped it, not a missing binary. MEASURED node `a` 2026-08-28, `timeout -k 1s 1 true`
+# 0/40 failures quiet and 7/40 under eight concurrent spawn loops, while `timeout -k 1s 10 true` was
+# 0/40 under that same load. That 17% is the whole of the run-gates canary's flakiness: the suite
+# probes once while the box is quiet, the runner probes again under a full bar, they disagree, and an
+# arm then blames `GATE_JOBS` or the clamp for a binary that was there the entire time. Raising the
+# bound costs nothing -- it is only ever reached if `timeout` genuinely hangs. TOOL-aSiftedFork-7.
+RB_HAVE_TIMEOUT=0; timeout -k 1s 10 true >/dev/null 2>&1 && RB_HAVE_TIMEOUT=1
+if [ "$RB_HAVE_TIMEOUT" != 1 ]; then
+  echo "  (SKIP the run_bounded arms — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here)"
+else
+rb_fn=$(mktemp)
+sed -n '/^run_bounded() {/,/^}$/p' "$SCRIPT" > "$rb_fn"
+[ -s "$rb_fn" ] || { echo "FAIL could not extract run_bounded from $SCRIPT — the arms below would grade nothing"; st=1; }
+# PLAIN ASSIGNMENTS, ON THEIR OWN LINE. A prefix assignment on the `.` builtin does not persist in
+# bash outside POSIX mode, so the sourced function saw GATE_BOUND_LIVE UNSET, `set -u` killed the
+# suite at the first call, and the redirect below swallowed the diagnostic -- no FAIL line and no
+# PASS line, with the stranded-arm floor never reached. Caught by this build's closing review.
+GATE_BOUND_LIVE=1
+GATE_BOUND=2
+# shellcheck disable=SC1090
+. "$rb_fn"
+
+# ...a plain child that outlives the bound is KILLED, and the WALL CLOCK reflects it. Compared
+# against a 30 s sleeper with a 2 s bound. THE WINDOW IS DECIDED BY A MEASUREMENT, not by taste:
+# the CORRECT construct was measured on node `a` at 12 s under heavy ambient load against that same
+# 2 s bound -- kill-path and scheduling overhead, which does NOT shrink when the sleeper does. So the
+# valid window is (12, sleeper), and a 10 s sleeper made it empty. 30 s gives a real window at half
+# the cost of the 60 s original, which mattered: the control BLOCKS for its full sleep by
+# construction, and this suite's declared budget is 970 s against a measured 906 s.
+_t0=$(date +%s); run_bounded bash -c 'sleep 30' >/dev/null 2>&1; _rc=$?; _t1=$(date +%s)
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded took $(( _t1 - _t0 ))s against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
+n=$((n+1))
+case "$_rc" in 124|137) ;; *) echo "FAIL run_bounded returned $_rc for a killed command; 124 or 137 expected"; st=1 ;; esac
+
+# ...and a backgrounded GRANDCHILD does not hold it, which is the actual defect. The CONTROL is the
+# same command through a command substitution: if the control also returns fast, this host does not
+# reproduce the class and the arm above proved nothing, so that is a FAIL and not a pass.
+_t0=$(date +%s); run_bounded bash -c 'sleep 30 & exit 0' >/dev/null 2>&1; _t1=$(date +%s)
+_t2=$(date +%s); _ctl=$(timeout -k 5s 2 bash -c 'sleep 30 & exit 0' 2>&1); _t3=$(date +%s)
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded blocked $(( _t1 - _t0 ))s on a backgrounded grandchild — bounded-through-a-pipe-is-unbounded"; st=1; }
+n=$((n+1))
+[ $(( _t3 - _t2 )) -ge 20 ] || { echo "FAIL the CONTROL returned in $(( _t3 - _t2 ))s, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
+
+# ...a command that finishes INSIDE the bound is not killed and its output survives.
+run_bounded bash -c 'echo alive; exit 0'; _rc=$?
+n=$((n+1))
+[ "$_rc" = 0 ] || { echo "FAIL run_bounded returned $_rc for a command that finished inside its bound"; st=1; }
+hit "$RB_OUT" "alive"
+
+# ...and with the bound INERT the command still RUNS, exit status intact. A bound may cost speed and
+# may turn a hang into a verdict; it may never turn a check into a skip.
+GATE_BOUND_LIVE=0
+run_bounded bash -c 'echo ran-unbounded; exit 3'; _rc=$?
+GATE_BOUND_LIVE=1
+n=$((n+1))
+[ "$_rc" = 3 ] || { echo "FAIL an INERT bound changed the command exit status to $_rc; 3 expected"; st=1; }
+hit "$RB_OUT" "ran-unbounded"
+rm -f "$rb_fn"
+
+# ...and the BOUND REACHES ITS VERBS, which the helper arms above cannot show. spec-6 AC1 and AC5.
+# Asserted as ELAPSED TIME against a 30 s sleeper with a 2 s bound: the message was always the
+# correct half of this defect.
+#
+# TWO PRECONDITIONS THIS ARM LEARNED THE HARD WAY, both of them the driver being right. The fixture
+# must be COMMITTED, because check 2 refuses a dirty tree before check_wiring is ever reached. And
+# WIRING_CHECK may carry only flags this kit recognises as READ-ONLY (check 4 permits --check,
+# --dry-run, --verify, -n), so the sleeper is a SCRIPT invoked with --check rather than a `bash -c`.
+reset_tree
+printf '#!/usr/bin/env bash\nsleep 60\n' > slowwire.sh
+mkconf "bash slowwire.sh --check" "true" "" "2"     # WIRING_CHECK sleeps; GATE_BOUND=2
+fixture
+# ---- THE INSTRUMENT IS THE DRIVER'S OWN ELAPSED, NOT THIS HARNESS'S CLOCK. TOOL-aClosedDocket-3.
+# ---- `run_bounded` records RB_TOOK inside the bound's own scope and the breach message prints it,
+# ---- so the number below is what the BOUND measured. The harness clock around a whole verb also
+# ---- counts process start, git operations and a remote advertisement the bound does not govern —
+# ---- measured on node `a` 2026-08-31, this arm read 35 s while other Claude sessions ran these same
+# ---- suites on sibling worktrees, and the same shard was clean unloaded on one unchanged tree. The
+# ---- mechanism was never wrong: the breach message fired on every one of those runs.
+_t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
+hit "$out" "the declared wiring check did not answer within the declared"
+# The DRIVER's number, extracted from its own message. `killed after <n>s` is what the bound saw.
+n=$((n+1))
+_rbt=$(printf '%s' "$out" | sed -n 's/.*killed after \([0-9][0-9]*\)s.*/\1/p' | head -1)
+{ [ -n "$_rbt" ] && [ "$_rbt" -lt 25 ]; } \
+  || { echo "FAIL --preflight: the driver reported killed after '${_rbt:-<no figure>}'s against a 2s GATE_BOUND — the bound does not reach check_wiring"; st=1; }
+# ...and an OUTER SANITY BOUND, whose only job is to catch a HANG. It is deliberately far above any
+# load this fleet produces: a bound that can fire for two reasons cannot tell you which, and the
+# tight one above is the one that answers the question this arm asks.
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 300 ] || { echo "FAIL --preflight hung for $(( _t1 - _t0 ))s — this is the hang backstop, not the bound assertion"; st=1; }
+# ...and the OTHER call site, which is the one AC5's own text warns about: "the helper has one
+# exercised call site and one asserted only by inspection, which is how the sibling seam went
+# unbounded the first time." Until this arm, $GATE_CMD was that unexercised site -- check-arms is
+# structurally blind to it because the branch sets DOD_OUT rather than calling `fail`.
+reset_tree
+printf '#!/usr/bin/env bash\nsleep 30\n' > slowgate.sh
+mkconf "true" "bash slowgate.sh" "" "2"        # GATE_CMD sleeps; GATE_BOUND=2
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null 2>&1
+# ---- Same instrument, same reason, and this arm read 44 s and 66 s under that same load.
+_t0=$(date +%s); out=$(run --close tRun); _t1=$(date +%s)
+hit "$out" "the merge bar did not answer within the declared"
+n=$((n+1))
+_rbt=$(printf '%s' "$out" | sed -n 's/.*killed after \([0-9][0-9]*\)s.*/\1/p' | head -1)
+{ [ -n "$_rbt" ] && [ "$_rbt" -lt 25 ]; } \
+  || { echo "FAIL --close: the driver reported killed after '${_rbt:-<no figure>}'s against a 2s GATE_BOUND — the bound does not reach the gates-green arm"; st=1; }
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 300 ] || { echo "FAIL --close hung for $(( _t1 - _t0 ))s — this is the hang backstop, not the bound assertion"; st=1; }
+reset_tree
+
+fi   # ---- end the run_bounded host gate: the VERB arm needs it too, because with the bound INERT
+     # ---- the wiring sleeper runs to completion, the check PASSES, and both assertions above red
+     # ---- for a property of the box rather than a defect in the code.
+
+# ...and a MALFORMED bound is a refusal rather than a silent fallback, because 0 means no bound at
+# all to `timeout` and a value nobody can parse is a value nobody set.
+reset_tree
+mkconf "true" "true" "" "nonsense"
+out=$(run --status tRun)
+hit "$out" "which is not a positive integer of seconds"
+reset_tree
+mkconf "true" "true" "" "0"
+out=$(run --status tRun)
+hit "$out" "which is not a positive integer of seconds"
+
+# ...and an ABSENT bound announces the default rather than applying it silently. spec-6 AC3. This is
+# the one arm that WANTS the NOTE, which is why every other fixture now declares the key.
+reset_tree
+cat > .unattended.conf <<'NOCONF'
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="echo land"
+BYPASS_BAN="--no-verify"
+GATE_CMD="true"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+NOCONF
+out=$(run --status tRun)
+hit "$out" "declares no GATE_BOUND, so a declared command is bounded at the kit default"
+hit "$out" "declares no UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s"
+# ...and the fourth bound's default is DERIVED from the two above it, 3600 + 1800, so the NOTE
+# reds if the derivation or either addend moves (TOOL-aWokenSentinel-2).
+same "the derived RESUME_STALE_BOUND default is announced once" "$(grep -c 'declares no RESUME_STALE_BOUND, so a run reads STALE after the derived default of 5400s' <<<"$out")" "1"
+# THE DEFAULT IS READ OUT OF THE DRIVER, not retyped: the NOTE interpolates `REVIEW_ROUNDS_DEFAULT`
+# exactly as its two siblings interpolate theirs, so a raised argument cannot leave the sentence
+# saying 1 (cluster I of aProbedUnit's closing review). A literal-digit default in any
+# `read_bound_key` call is what that fold removed, and the count below pins it at zero.
+RR_DEF=$(sed -n 's/^REVIEW_ROUNDS_DEFAULT=\([0-9]*\).*/\1/p' "$SCRIPT" | head -1)
+n=$((n+1)); [ -n "$RR_DEF" ] || { echo "FAIL REVIEW_ROUNDS_DEFAULT could not be read out of the driver, so the NOTE arm below would assert an empty default"; st=1; }
+hit "$out" "declares no REVIEW_ROUNDS, so a spec-audit subject exits BOUNDED after the kit default of ${RR_DEF} round"
+same "no read_bound_key call types its default as a literal digit" "$(grep -cE '^read_bound_key [A-Z_]+ [0-9]' "$SCRIPT")" "0"
+reset_tree
+
+# ---- TOOL-aProbedUnit-6: REVIEW_ROUNDS above the runaway ceiling is a refusal, because the ceiling
+# ---- would fire first and the declared bound could never be reached; zero is the reader's own refusal,
+# ---- naming the key. Both exit 2 before any verb runs.
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "9"
+out=$(run --status tRun)
+hit "$out" "above the runaway ceiling of 8"
+# ...and EQUAL to it (cluster H of the closing review): `review_state` tests the ceiling first, so a
+# bound of 8 is exactly the value the sentence refuses and `-le` let through; `-lt` closes it.
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "8"
+out=$(run --status tRun); rc=$?
+same "a bound equal to the ceiling exits 2" "$rc" "2"
+hit "$out" "REFUSING - REVIEW_ROUNDS is 8, at or above the runaway ceiling of 8"
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "0"
+out=$(run --status tRun)
+hit "$out" "REFUSING - REVIEW_ROUNDS is declared as '0', which is not a positive integer"
+reset_tree
+
+
+# ==================================================================================================
+# TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing LOOP to have ended.
+# ==================================================================================================
+# `crfix` writes the tracked diff-review the FIRST term wants, so every arm below isolates the
+# SECOND. Without it these arms would red on term one and prove nothing about the term they name —
+# a fixture answering a different question, which is this repo's own named class.
+crfix() { mkdir -p memory/builds/tRun/reviews
+          printf '**Serves:** diff-review ARCH-tRun-1\n\n# closing review\n\nrange %s...HEAD\n' \
+            "$(git rev-parse --short "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)")" \
+            > memory/builds/tRun/reviews/r1.md
+          git add -A >/dev/null; }
+bcov="--override build-complete --reason fixture-roster"
+
+# ---- AC1: a tracked diff-review exists and NO round names the build slug. This is the state two
+# ---- LANDED records in this corpus were in, with the item MET.
+bcopen; crfix; crdrop; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "closing-review-recorded"
+hit "$out" "this run recorded no --review round whose subject is the build slug"
+
+# ---- ...and a round on a DIFFERENT subject does not satisfy it. `tRun-specs` is the live case: a
+# ---- spec-audit subject, and a substring join would have accepted it.
+bcopen; crfix; crround "tRun-specs" "CLEAN" 0 "CONVERGED"; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "this run recorded no --review round whose subject is the build slug"
+
+# ---- AC2: the last round for the slug carries no terminal token — the loop was abandoned.
+bcopen; crfix; crround "tRun" "BLOCKED" 1; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "the last recorded review round for this build carries no terminal token"
+hit "$out" "blockers 1"
+
+# ---- AC3: CONVERGED naming a non-zero count. No verb can write that pairing, so reaching it means
+# ---- the record was hand-edited — the one thing a run-state file cannot rule out.
+bcopen; crfix; crround "tRun" "BLOCKED" 3 "CONVERGED"; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "claims CONVERGED while naming a non-zero blocker count"
+
+# ---- AC4: all THREE legal exits are MET. An arm proving only CONVERGED would leave the two exits a
+# ---- non-convergent loop actually takes unexercised.
+bcopen; crfix; git add -A >/dev/null
+out=$(run --close tRun $bcov); miss "$out" "closing-review-recorded"
+bcopen; crfix; crround "tRun" "BLOCKED" 2 "NON-CONVERGENT"; git add -A >/dev/null
+out=$(run --close tRun $bcov); miss "$out" "closing-review-recorded"
+bcopen; crfix; crround "tRun" "BLOCKED" 2 "CEILING"; git add -A >/dev/null
+out=$(run --close tRun $bcov); miss "$out" "closing-review-recorded"
+
+# ==================================================================================================
+# TOOL-aGradedMandate-2 — `specs-audited`.
+# ==================================================================================================
+# TOOL-aBlindedTrial-2 — the audit is OPT-IN, declared by `spec-audit: <date>` in the build README and
+# read at BASE. Every arm below that expects the item OWED runs inside this epoch: the key is committed
+# on the fixture's main and merged into the epoch tip, because a working-copy edit is exactly what the
+# BASE read must not see. `bcreset` first, so the checkout leaves nothing behind; restored at AC3.
+_sa_main0=$(git rev-parse main); _sa_bcp0=$BCP
+bcreset; git checkout -qf main
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: 2026-09-20'
+git add -A >/dev/null && git commit -q -m sa-declared --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+BCP=$(git rev-parse HEAD)
+
+# ---- AC1/AC6 (aBlindedTrial-2): preflight reads the key at BASE, pins it as a fact and SAYS so;
+# ---- --status carries it, so a resumed run can hand it to the harness without the preflight line.
+bcreset
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by README spec-audit: 2026-09-20"
+miss "$out" "recommend spec-audit"
+same "the spec-audit fact is pinned from the README at BASE" "$(sed -n 's/^spec-audit: //p' memory/builds/tRun/RUN.md)" "2026-09-20"
+hit "$(run --status tRun)" "spec-audit 2026-09-20"
+
+# ---- AC2: a re-preflight writes the fact ONCE. Committed first, because preflight refuses a dirty tree.
+git add -A >/dev/null; git commit -q -m "sa pinned" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "preflight OK"
+same "a re-preflight leaves one spec-audit fact row" "$(grep -c '^spec-audit: ' memory/builds/tRun/RUN.md)" "1"
+
+# ---- MET-with-nothing-to-check when no unit is CLOSED, and it ANNOUNCES that. A silent pass over an
+# ---- empty selection is indistinguishable from coverage.
+bcopen; crfix; mutate memory/builds/tRun/README.md 's/| CLOSED |/| OPEN |/'; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "no unit of this build is CLOSED, so no spec audit is owed yet"
+
+# ---- AC1: a CLOSED unit no spec-audit record names blocks, and the message names the id. This is
+# ---- also aBlindedTrial-2's AC4: DECLARED at BASE, no record at all, the close blocks and the text
+# ---- names the declaration the build made rather than a default it never chose.
+bcopen; crfix; git rm -q --cached memory/builds/tRun/reviews/audit.md >/dev/null
+rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited"
+hit "$out" "ARCH-tRun-1"
+hit "$out" "the pre-code review pass this build owes (spec-audit 2026-09-20, from readme) left no evidence"
+miss "$out" "close OK"
+
+# ---- AC2: a tracked record whose binding line names the id satisfies it.
+printf '**Serves:** spec-audit ARCH-tRun-1\n\n# audit\n' > memory/builds/tRun/reviews/a1.md
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+miss "$out" "specs-audited"
+
+# ---- AC4c, the RANGE form: `ARCH-tRun-1..3` names ARCH-tRun-1. Eighteen tracked binding lines in
+# ---- this corpus use it, and only the memory-tree generator expands it — which this kit ships
+# ---- without, so the expansion is the kit's own or the item blocks a unit that WAS audited.
+rm -f memory/builds/tRun/reviews/a1.md
+printf '**Serves:** spec-audit ARCH-tRun-1..3\n\n# audit\n' > memory/builds/tRun/reviews/a2.md
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+miss "$out" "specs-audited"
+
+# ---- ...and the BOUNDARY: `ARCH-tRun-19` must NOT satisfy `ARCH-tRun-1`. A substring join accepts
+# ---- it, and both spellings are real ids in builds this corpus holds.
+rm -f memory/builds/tRun/reviews/a2.md
+printf '**Serves:** spec-audit ARCH-tRun-19\n\n# audit\n' > memory/builds/tRun/reviews/a3.md
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited"
+# aBlindedTrial-2 AC4, the DECLARED-and-unmet text the not-owed arm below asserts the absence of.
+hit "$out" "a CLOSED unit is named by no tracked spec-audit record"
+
+# ---- ...and an UNTRACKED record is invisible, because the join reads the INDEX. The likeliest
+# ---- operator state and the least guessable one.
+rm -f memory/builds/tRun/reviews/a3.md; git add -A >/dev/null
+printf '**Serves:** spec-audit ARCH-tRun-1\n\n# audit\n' > memory/builds/tRun/reviews/a4.md
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited"
+rm -f memory/builds/tRun/reviews/a4.md
+
+# ---- F3 (closing review of units 2–5, round 1): the term zero keys on the BASE DERIVATION and the
+# ---- pinned fact is EVIDENCE. Key at BASE, the `spec-audit:` line deleted from RUN.md: the first cut
+# ---- read the fact, said the README at BASE declares no key — false — and MET the item, so a unit
+# ---- landed with no audit evidence and no recorded override. The tracked audit record is left in
+# ---- place so the ONLY reason --close blocks on this item is the disagreement.
+bcopen; crfix
+mutate memory/builds/tRun/RUN.md '/^spec-audit: /d'; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "the spec-audit fact in the run-state file and the spec-audit: key in the build README, or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-20; recorded: (none)"
+hit "$out" "so --close blocks: specs-audited"
+miss "$out" "declares no spec-audit: key"
+miss "$out" "close OK"
+
+# ---- R3 (closing review round 2): "derived absent" and "never derived" were the same empty bytes.
+# ---- Key at BASE, fact pinned, the anchor UNREACHABLE at --close: authorization-reachable returns
+# ---- before the README at BASE is read, the DoD loop grades every item anyway, and the term zero
+# ---- printed `at BASE: (none)` about a README nobody read. Now it says it could not grade, and why.
+bcopen; crfix; git add -A >/dev/null
+git remote set-url origin "$ORIGIN_DIR/nope.git"
+out=$(run --close tRun $bcov)
+git remote set-url origin "$ORIGIN"
+hit "$out" "specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read)"
+miss "$out" "at BASE: (none)"
+miss "$out" "declares no spec-audit: key"
+miss "$out" "close OK"
+
+# ---- AC3 (aBlindedTrial-2): the epoch closes — main back to where tRun declares NO key — and a CLOSED
+# ---- unit with NO record closes with the item MET and ANNOUNCED, never blocked on it.
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; BCP=$_sa_bcp0
+bcopen; crfix; git rm -q --cached memory/builds/tRun/reviews/audit.md >/dev/null
+rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited — not owed"
+miss "$out" "a CLOSED unit is named by no tracked spec-audit record"
+
+# ---- AC6: not owed, ONE unit, no fork — the line prints and the recommendation clause does NOT.
+bcreset
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+miss "$out" "recommend spec-audit"
+
+# ---- ...TWO units in the generated region: the recommendation rides the line.
+bcreset
+setunits tRun '| [ARCH-tRun-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |
+| [ARCH-tRun-2 — the second](spec/two.md) | OPEN | rev-1 | 2026-08-01 |'
+git add -A >/dev/null; git commit -q -m "two units" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "not owed (opt-in); recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: 2 units in the generated region"
+
+# ---- ...and ONE unit whose tracked spec grades FORKED: the same clause, by the other trigger.
+bcreset
+printf '# ARCH-tRun-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n\n## 2. Scope (IN)\n\nS1 a thing\n\n## 6. Acceptance criteria\n\nAC1 a thing\n\n## 7. Gates\n\nthe bar\n\n## 8. Open questions\n\n- F1 — which way? open\n' \
+  > memory/builds/tRun/spec/one.md
+git add -A >/dev/null; git commit -q -m "forked spec" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: a spec grading FORKED"
+
+# ---- AC1's red half: a key committed on the RUN BRANCH only is not at BASE, so it pins NOTHING.
+bcreset
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: 2026-09-20'
+git add -A >/dev/null; git commit -q -m "key on the branch" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+same "a key committed on the run branch pins no fact" "$(sed -n 's/^spec-audit: //p' memory/builds/tRun/RUN.md)" ""
+
+# ---- AC5: a value that is not a date is a REFUSAL at BASE — never read as absent, never pinned.
+bcreset; git checkout -qf main
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: later'
+git add -A >/dev/null && git commit -q -m sa-malformed --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: later"
+miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- F4 (closing review of units 2–5, round 1): a BARE `spec-audit:` line is present-and-empty, not
+# ---- absent. The `""` arm read it as undeclared and preflight said not owed — the silent opt-out the
+# ---- refusal's own comment forbids, one value narrower. The same refusal, shown as (empty).
+bcreset; git checkout -qf main
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit:'
+git add -A >/dev/null && git commit -q -m sa-empty --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: (empty)"
+miss "$out" "not owed (opt-in)"
+miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- TOOL-aBlindedTrial-7 — a PROJECT-WIDE default: `SPEC_AUDIT_DEFAULT="<date>"` in .unattended.conf
+# ---- at BASE opts every build in whose README declares no key. The conf is TRACKED in this fixture
+# ---- and `mkconf` rewrites it on every reset, so inside this epoch every reset calls mkconf with the
+# ---- SAME eight positionals the BASE commit used — one byte off and preflight refuses on a dirty
+# ---- tree before authorization is ever reached, which is a fixture answering the wrong question.
+init_sa_tree() { git reset -q --hard "$BCP"; git clean -qfd; mkconf true true "" 3600 "" 1800 7 2026-09-21; }
+init_sa_run() { init_sa_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+             printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+             printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' \
+               >> memory/builds/tRun/RUN.md; }
+bcreset; git checkout -qf main
+mkconf true true "" 3600 "" 1800 7 2026-09-21
+git add -A >/dev/null && git commit -q -m sa-default --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+BCP=$(git rev-parse HEAD)
+
+# ---- AC1 (unit 7): README silent, conf default at BASE — the THIRD preflight spelling, the fact
+# ---- pinned from the conf's date, and --status carrying it like a README-declared one.
+init_sa_tree
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
+miss "$out" "opted in by README"
+miss "$out" "not owed (opt-in)"
+same "the spec-audit fact is pinned from the conf default at BASE" "$(sed -n 's/^spec-audit: //p' memory/builds/tRun/RUN.md)" "2026-09-21"
+hit "$(run --status tRun)" "spec-audit 2026-09-21"
+
+# ---- AC4 (unit 7): the default makes the audit OWED — a CLOSED unit with no record blocks --close by id...
+init_sa_run; crfix; git rm -q --cached memory/builds/tRun/reviews/audit.md >/dev/null
+rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited"
+hit "$out" "ARCH-tRun-1"
+# ---- ...naming the SOURCE the audit is owed through (closing review of units 7/8, R10): rev-1 told
+# ---- the operator to look for a README key this build does not have.
+hit "$out" "the pre-code review pass this build owes (spec-audit 2026-09-21, from project) left no evidence"
+miss "$out" "specs-audited — not owed"
+miss "$out" "close OK"
+# ---- ...and the tracked record satisfies it, so the default is honoured in both directions.
+init_sa_run; crfix; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+miss "$out" "specs-audited"
+# ---- ...and fail 53 compares the fact against the derivation whichever source filled it: the fact
+# ---- deleted from RUN.md under a project default reads `at BASE: <the conf's date>`.
+init_sa_run; crfix
+mutate memory/builds/tRun/RUN.md '/^spec-audit: /d'; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-21; recorded: (none)"
+miss "$out" "close OK"
+
+# ---- closing review of units 7/8, round 2, R2 — a REFUSED read leaves the grader NOT GRADABLE. The
+# ---- fold's fail 55 (and fail 52, fail 54) returned with AUTH_SPEC_AUDIT_DERIVED already set from the
+# ---- README half, so `specs-audited` printed the very absence the refusal had declined to assert:
+# ---- `at BASE: (none)` under a pinned fact, `not owed … declares no SPEC_AUDIT_DEFAULT` without one.
+# ---- Fixture: a run pinned on the dated BASE, then main gains a blob that dies before the read and the
+# ---- run branch merges it, so the merge-base --close derives IS the dying blob while the pinned base
+# ---- stays its ancestor. Observed RED-first on the round-1 driver: fail 53 with `at BASE: (none)`.
+_sa_main7=$(git rev-parse main)
+init_sa_run; crfix; git add -A >/dev/null; git commit -q -m sa-run-pinned --no-verify
+git checkout -qf main; printf 'return 0\n' >> .unattended.conf
+git add -A >/dev/null; git commit -q -m sa-base-dies-after-preflight --no-verify; git push -q -f origin main
+git checkout -qf unit; git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --close tRun $bcov)
+hit "$out" "the project conf at the pinned BASE could not be evaluated to the end"
+hit "$out" "specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read)"
+miss "$out" "at BASE: (none)"
+miss "$out" "specs-audited — not owed"
+miss "$out" "close OK"
+git checkout -qf main; git reset -q --hard "$_sa_main7"; git push -q -f origin main
+git checkout -qf unit; init_sa_tree
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; BCP=$_sa_bcp0; bcreset
+
+# ---- AC2 (unit 7): the default committed on the RUN BRANCH only is not at BASE, so it opts nothing in.
+bcreset
+mkconf true true "" 3600 "" 1800 7 2026-09-21
+git add -A >/dev/null; git commit -q -m "default on the branch" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+same "a default committed on the run branch pins no fact" "$(sed -n 's/^spec-audit: //p' memory/builds/tRun/RUN.md)" ""
+
+# ---- ...and the same with a BASE conf that PREDATES the key entirely. The blob is evaluated in a
+# ---- subshell that inherits the driver's environment, where the WORKING copy's value already sits
+# ---- from the `. "$CONF"` at startup; a read that does not blank the variable first would report
+# ---- the branch's date as the project's. The first cut of the read had exactly that hole.
+bcreset; git checkout -qf main
+mutate .unattended.conf '/^SPEC_AUDIT_DEFAULT=/d'
+git add -A >/dev/null && git commit -q -m sa-conf-predates-key --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+mkconf true true "" 3600 "" 1800 7 2026-09-21
+git add -A >/dev/null; git commit -q -m "default on the branch, none at base" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+miss "$out" "opted in by project default"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- AC3 (unit 7), first half: a non-date default at BASE is fail 54 — never read as absent.
+bcreset; git checkout -qf main
+mkconf true true "" 3600 "" 1800 7 later
+git add -A >/dev/null && git commit -q -m sa-default-malformed --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "the project conf at the pinned BASE declares SPEC_AUDIT_DEFAULT with a value that is not a YYYY-MM-DD date, and a project-wide opt-in is a dated declaration or not at all - declared: later"
+miss "$out" "not owed (opt-in)"
+miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- AC3, second half: a malformed README key beside a VALID default is still fail 52 — the README
+# ---- wins whatever it says, because a typo falling back to the default is the silent opt-out class.
+bcreset; git checkout -qf main
+mkconf true true "" 3600 "" 1800 7 2026-09-21
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: later'
+git add -A >/dev/null && git commit -q -m sa-readme-over-default --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: later"
+miss "$out" "opted in by project default"
+miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- closing review of units 7/8, R2 — the BASE-conf eval must PROVE it finished. rev-1 discarded
+# ---- the eval's status and read the variable regardless, so a blob that ends before the read printed
+# ---- nothing and graded as "no default": the read-as-absent opt-out fail 52 and fail 54 refuse,
+# ---- through the one path they left ungraded. Four shapes, each a dated conf at BASE with one line
+# ---- appended. `return 0` needs NO divergence — a top-level return in a sourced file is legal, so the
+# ---- SAME bytes read as the date at the driver's startup source and as nothing at the BASE read; the
+# ---- other three would kill that startup source, so the run branch carries a repaired conf and BASE
+# ---- alone holds the broken one. Observed RED-first on the rev-1 driver: every shape said not owed.
+init_sa_base_ending_early() {   # $1 = the line added to a dated conf at BASE, after the key, or BEFORE it when
+                                # spelled `^<line>` · $2 = repair the branch (1) or not
+  bcreset; git checkout -qf main
+  mkconf true true "" 3600 "" 1800 7 2026-09-21
+  case "$1" in
+    ^*) { printf '%s\n' "${1#^}"; cat .unattended.conf; } > .unattended.conf.new; mv .unattended.conf.new .unattended.conf ;;
+    *)  printf '%s\n' "$1" >> .unattended.conf ;;
+  esac
+  git add -A >/dev/null && git commit -q -m sa-base-ends-early --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  if [ "$2" = 1 ]; then mkconf true true "" 3600 "" 1800 7 2026-09-21
+    git add -A >/dev/null; git commit -q -m sa-branch-repaired --no-verify; fi
+}
+# The syntax error sits ABOVE the key: bash executes an eval's assignments before its parse fails at
+# EOF, so one appended below the key let rev-1 read the DATE out of a blob that never finished — a
+# different wrong answer from the same defect, and the fold refuses both.
+for _sa_shape in 'return 0|0' 'exit 0|1' 'X="$UNSET_IN_THIS_FIXTURE"|1' '^if|1'; do
+  init_sa_base_ending_early "${_sa_shape%|*}" "${_sa_shape#*|}"
+  out=$(run --preflight tRun --keepalive-id KA-1234)
+  hit "$out" "the project conf at the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
+  miss "$out" "not owed (opt-in)"
+  miss "$out" "opted in by project default"
+  miss "$out" "preflight OK"
+  git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+  git checkout -qf unit; bcreset
+done
+
+# ---- round 2, R6 — a blob read to its END is the date whatever its LAST statement's status. The
+# ---- round-1 sentinel was gated on the eval's exit status, so a conf ending in `false` — or the
+# ---- ordinary `[ -n "${OPT:-}" ] && Y=1` idiom with OPT unset — was refused as "could not be
+# ---- evaluated to the end" while the startup source and the hook both read the date. The sentinel
+# ---- now prints from inside the eval'd text; same bytes on the branch, so no repair. Observed
+# ---- RED-first on the round-1 driver: fail 55.
+init_sa_base_ending_early 'false' 0
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
+miss "$out" "could not be evaluated to the end"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- round 3, R1 — a TRAILING LINE CONTINUATION on the key line, as the conf's LAST statement. The
+# ---- round-2 sentinel was glued to the blob with ONE newline, so `SPEC_AUDIT_DEFAULT="<date>" \` at
+# ---- the end turned the assignment into a temp-env prefix of the sentinel printf, whose argument had
+# ---- already expanded from the blanked variable: `OK ` — a DECLARED default read as absent, the
+# ---- opt-out fail 52/54/55 exist to refuse. Its own conf, NOT init_sa_base_ending_early: that
+# ---- helper's mkconf already writes the date and the sentinel expands from it, so the break needs a
+# ---- BLANK default above the continuation line. Observed RED-first on the round-2 driver: not owed.
+bcreset; git checkout -qf main
+mkconf true true "" 3600 "" 1800 7 ""
+printf '%s\n' 'SPEC_AUDIT_DEFAULT="2026-09-21" \' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m sa-continuation --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
+miss "$out" "not owed (opt-in)"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ==================================================================================================
+# TOOL-aGradedMandate-5 / -10 — the parked split, on BOTH axes.
+# ==================================================================================================
+# ---- AC1 (unit 10): one retire row is counted among the decisions the owner is OWED and NOT among
+# ---- the notes. Before the act axis existed it was counted as both.
+bcopen; crdrop
+run --rescope tRun --act retire --item ARCH-tRun-1 --reason "the fixture retires its only unit" >/dev/null
+out=$(run --status tRun)
+hit "$out" "parked 1"
+miss "$out" "noted"
+
+# ---- ...and an ADD row is a NOTE. Growing the build is a declaration the run made; dropping
+# ---- declared scope is something the owner is entitled to read.
+bcopen; crdrop
+run --rescope tRun --act add --item ARCH-tRun-9 --reason "the fixture adds a unit" >/dev/null
+out=$(run --status tRun)
+hit "$out" "noted 1"
+miss "$out" "parked 1"
+
+# ---- AC2 (unit 10): the PARTITION, over one row of every shape. This arm gates the CLASS — any
+# ---- future kind or act landing in both alternations or in neither — where an arm about `retire`
+# ---- alone gates one instance.
+bcopen
+run --rescope tRun --act retire --item ARCH-tRun-1 --reason "owed by act" >/dev/null
+run --rescope tRun --act add --item ARCH-tRun-8 --reason "history by act" >/dev/null
+run --park tRun --item "a question" --reason "owed by kind" >/dev/null
+run --propose tRun --item "an amendment" --step "step 1" --reason "history by kind" >/dev/null
+_pt=$(grep -cE '^[0-9][0-9-]*T[0-9:]*Z [a-z]+ · item ' memory/builds/tRun/RUN.md)
+out=$(run --status tRun)
+_pp=$(printf '%s' "$out" | grep -oE 'parked [0-9]+' | grep -oE '[0-9]+'); _pp=${_pp:-0}
+_pn=$(printf '%s' "$out" | grep -oE 'noted [0-9]+' | grep -oE '[0-9]+'); _pn=${_pn:-0}
+same "the parked and noted counts PARTITION the parked rows" "$((_pp + _pn))" "$_pt"
+
+# ---- AC1 (unit 5): the surfaced COUNT the close checks includes a retirement, so an attested count
+# ---- that excludes it is refused. That is the whole point of moving the act across the class line.
+bcopen; crfix
+run --rescope tRun --act retire --item ARCH-tRun-1 --reason "dropped scope the owner must read" >/dev/null
+run --attest tRun --item parked-decisions-surfaced --value "yes, 0 surfaced" >/dev/null
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "the attested count of surfaced parked decisions does not match the record"
+run --attest tRun --item parked-decisions-surfaced --value "yes, 1 surfaced" >/dev/null
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+miss "$out" "the attested count of surfaced parked decisions does not match"
+
+# ==================================================================================================
+# TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN.
+# ==================================================================================================
+# ---- The term is OFF and ANNOUNCES it when no cutoff is declared. A silently disabled term is what
+# ---- a blank declaration must never produce.
+bcopen; crfix; git add -A >/dev/null
+out=$(run --close tRun)
+hit "$out" "the project declares no SPEC_THIN_CUTOFF"
+
+# ---- AC1: ON, with a DATED spec that grades THIN — its section 6 is empty — on a CLOSED unit.
+bcopen; crfix
+printf '# ARCH-tRun-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n\n## 2. Scope (IN)\n\nS1 a thing\n\n## 6. Acceptance criteria\n\n## 7. Gates\n\nthe bar\n' \
+  > memory/builds/tRun/spec/2026-08-01-spec-thin.md
+mutate memory/builds/tRun/README.md 's#spec/one.md#spec/2026-08-01-spec-thin.md#'
+mkconf true true 2026-08-19 3600 2026-07-01
+printf '**Serves:** spec-audit ARCH-tRun-1\n\n# audit\n' > memory/builds/tRun/reviews/a5.md
+git add -A >/dev/null
+out=$(run --close tRun)
+hit "$out" "grades THIN"
+hit "$out" "ARCH-tRun-1"
+
+# ---- AC2: the same spec, GRANDFATHERED by a cutoff after its filename date.
+mkconf true true 2026-08-19 3600 2026-09-01
+out=$(run --close tRun)
+miss "$out" "grades THIN"
+
+# ---- AC3: a spec that states an acceptance criterion is not THIN, with the term ON.
+mkconf true true 2026-08-19 3600 2026-07-01
+mutate memory/builds/tRun/spec/2026-08-01-spec-thin.md 's/^## 6. Acceptance criteria$/## 6. Acceptance criteria\n\nAC1 it works/'
+git add -A >/dev/null
+out=$(run --close tRun)
+miss "$out" "grades THIN"
+reset_tree
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=500
+FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bump here does nothing
 # ---- ONE MEASUREMENT, and the reason this block is a single paragraph is that it stopped being one.
 # ---- Both sides of the dUnstalledConvoy merge kept their own notes here and the result stated THREE
 # ---- mutually exclusive triples as though each described the merged tree, none of them in order and
@@ -4346,7 +6695,70 @@ FLOOR_ASSERTIONS=500
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=659
+FLOOR_ASSERTIONS=1026
+# RAISED 1004 -> 1026 at the aWokenSentinel reconcile of origin/main 0e61932d: TOOL-aBlindedTrial-2's +22
+# spec-audit opt-in arms (region two) and this build's raises are disjoint blocks over the common base
+# 790, so the floor is their sum; the close's frozen-clone run is the observer.
+# RAISED 1000 -> 1004 by TOOL-aWokenSentinel-5's fold of the closing review's round 2: the
+# fourteenth `--liveness` line, `stale-bound` (1), and the start-time half of the liveness arm (3),
+# region two, the `--liveness` block measured alone over the sourced prologue on node `a`: n 110
+# with the four, st=0.
+# RAISED 973 -> 1000 by TOOL-aWokenSentinel-5's fold of the closing review: the `--landed`
+# unbound-session and dead-incarnation arms (17), the lease's three derived facts (7) and the
+# pid-image liveness arm (3), all region two, each block measured alone over the sourced prologue
+# on node `a`: unit 7's block n 48 -> 65, unit 1's 54 -> 61, unit 2's 98 -> 101.
+# RAISED 970 -> 973 by TOOL-aWokenSentinel-26: the accepting marker arm's three entry-state
+# assertions (3), region two's lander-marker block, measured by running that block alone over the
+# sourced prologue: n 24 -> 27 on node `a`.
+# RAISED 961 -> 970 by TOOL-aWokenSentinel-22: the no-sha marker arm (3), the unpushed-commit
+# marker arm with its scratch-commit guard (4) and its pushed control (2), region two's
+# lander-marker block, measured by running that block alone over the sourced prologue: n 15 -> 24
+# on node `a`.
+# RAISED 946 -> 961 by TOOL-aWokenSentinel-9: the `--status` keepalive-field arms (15) in region two
+# beside the `keepalive-reaped` read-back arms, measured by running that block alone over the sourced
+# prologue and the extraction block: n 23 -> 38 on node `a`.
+# RAISED 917 -> 946 by TOOL-aWokenSentinel-7: the `keepalive-reaped` read-back arms (28) beside the
+# --landed success arm and one hit on the close-OK output (1), all region two, measured by running
+# the two blocks alone over the sourced prologue: n 20 -> 48 and 48 -> 51 (two of those three are
+# the fixture's own) on node `a`.
+# RAISED 910 -> 917 by TOOL-aWokenSentinel-17: the field-wise `--status` reader arms (7) in region
+# two beside the extraction arms, measured by running that block alone over the sourced prologue:
+# n 23 -> 30 on node `a`.
+# RAISED 904 -> 910 by TOOL-aWokenSentinel-5: the `--status` resume-tick field arm (6), in region
+# two beside the extraction arms, measured by running that block alone over the sourced prologue:
+# n 20 -> 26 on node `a`.
+# RAISED 898 -> 904 by TOOL-aWokenSentinel-16: the parent-commit marker arm (2) and the `--no-ff`
+# remote-arm fixture (4), in region two's lander-marker block, measured by running that block
+# alone over the sourced prologue: n 9 -> 15 on node `a`.
+# RAISED 824 -> 898 by TOOL-aWokenSentinel-2: the `--liveness` block plus one NOCONF assertion, in
+# region two beside the lease arms, measured by running that block alone over the sourced prologue:
+# n 26 -> 101 on node `a` (MSYS), of which 2 are the MSYS-only `tasklist`-stub arm, so the raise is
+# the 73 every platform executes plus the NOCONF line — a floor is the minimum a green run reaches.
+# RAISED 790 -> 824 by TOOL-aWokenSentinel-1: the lease block's 34 executed assertions, in region two
+# beside the `--audit` arms, measured by running that block alone over the sourced prologue.
+# RAISED 790 -> 812 by TOOL-aBlindedTrial-2, the +22 spec-audit opt-in arms (hit/miss/same/mutate lines)
+# in the `specs-audited` block of region two, counted off the block run alone with the prelude
+# sourced: n went 28 -> 50.
+# RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
+# (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
+# the sum of both raises over the shared 706 base.
+# RAISED 779 -> 783 by the closing diff review of aProbedUnit, round 2 (cluster H, ids 5 and 18): the
+# dead-spec-read `--audit` arm, one `mutate` and three assertion lines, in region two beside the
+# `--audit` arms; n read before and after the block run alone with the preamble sourced, 20 -> 24.
+# RAISED 760 -> 779 by the closing diff review of aProbedUnit: +25 `hit`/`same`/`miss` lines, one
+# `mutate` and one `n=$((n+1))` guard added, 8 assertion lines removed with the re-targeted fold
+# arms — net +19, every one in region two (clusters A, C, G, H, I), counted off the diff.
+# RAISED 741 -> 760 by TOOL-aProbedUnit-6, the +19 BOUNDED arms (6 sliced, 10 verb, 3 conf), each
+# run alone with the suite's preamble sourced and counted as the `hit`/`same` lines the diff adds.
+# RAISED 706 -> 741 by TOOL-aProbedUnit-3, the +35 `--audit` and bound arms, counted off a run of the
+# block alone with the suite's preamble sourced (n before and after), not off the file.
+# RAISED 675 -> 706 by TOOL-aGradedMandate, the +31 arms this build added, keeping the headroom the
+# paragraph above declares. The bump first landed on the SHADOWED assignment 31 lines up and did
+# nothing; this is the one the run reads.
+# RAISED 706 -> 711 at aDeferredBar's closing review F3: the five SPEC_TOKENS_CLI dispatch arms, all in
+# region two. That fold wrote 712 and "six" here for five `n=$((n+1))` lines (round 2, R16); the
+# count is DERIVED from the fold's diff, never typed beside it. RAISED 711 -> 713 at round 2 (R2):
+# the source-level resolver arm went from one assertion to three.
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #
@@ -4367,8 +6779,37 @@ FLOOR_ASSERTIONS=659
 # The per-shard floors carry the same proportional discount the unsharded pin does (338 against a
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=18
-FLOOR_SHARD_1=205
-FLOOR_SHARD_2=471
+FLOOR_SHARD_1=208
+# +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
+# paid by shard 2 as well as by an unsharded run.
+FLOOR_SHARD_2=830
+# +4 for TOOL-aWokenSentinel-5's fold of the closing review's round 2: the fourteenth `--liveness`
+# line and the start-time half of the liveness arm, region two's `--liveness` block.
+# +27 for TOOL-aWokenSentinel-5's fold of the closing review: the `--landed` unbound-session and
+# dead-incarnation arms (17), the lease's derived facts (7) and the pid-image liveness arm (3),
+# region two beside the `keepalive-reaped`, lease and `--liveness` blocks.
+# +3 for the TOOL-aWokenSentinel-26 entry-state assertions on the accepting marker arm, in region
+# two's lander-marker block below the TOOL-aWokenSentinel-22 pushed control.
+# +9 for the TOOL-aWokenSentinel-22 no-sha and unpushed-commit marker arms with the pushed control,
+# in region two's lander-marker block beside the TOOL-aWokenSentinel-16 arms.
+# +15 for the TOOL-aWokenSentinel-9 `--status` keepalive-field arms, in region two beside the
+# `keepalive-reaped` read-back arms.
+# +29 for the TOOL-aWokenSentinel-7 `keepalive-reaped` read-back arms, in region two beside the
+# --landed success arm, plus one hit on the park-taxonomy close-OK output.
+# +7 for the TOOL-aWokenSentinel-17 field-wise `--status` reader arms, in region two beside the
+# extraction arms.
+# +6 for the TOOL-aWokenSentinel-5 `--status` resume-tick field arm, in region two beside the
+# extraction arms.
+# +6 for the TOOL-aWokenSentinel-16 marker arms, in region two's lander-marker block.
+# +74 for the TOOL-aWokenSentinel-2 `--liveness` arms and the NOCONF line, in region two — see
+# FLOOR_ASSERTIONS above for the platform split.
+# +34 for the TOOL-aWokenSentinel-1 lease arms, in region two beside the `--audit` arms.
+# +22 for the TOOL-aBlindedTrial-2 spec-audit opt-in arms, all in region two.
+# +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).
+# +4 for the closing diff review of aProbedUnit, round 2, cluster H, in region two.
+# +19 for the closing diff review of aProbedUnit, all in region two — see FLOOR_ASSERTIONS above.
+# +19 for the TOOL-aProbedUnit-6 BOUNDED arms, all in region two.
+# +35 for the TOOL-aProbedUnit-3 `--audit` arms, which sit in region two beside the `--dispatch` arms.
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
@@ -4382,3 +6823,4 @@ esac
 [ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other region was NOT exercised here)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
+

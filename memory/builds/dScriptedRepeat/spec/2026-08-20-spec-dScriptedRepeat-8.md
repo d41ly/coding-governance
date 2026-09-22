@@ -2,6 +2,12 @@
 
 **Status:** SPECCED · rev-6 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Refuse a code build wearing `recipe` mode: red when a `recipe`-mode run's diff touches anything

@@ -78,7 +78,9 @@ what the previous fix was and it lasted exactly one verb. `VERBS_SLUG` is now RE
 so a verb missing from it does not read wrong, it does not run; refusal 14 renders from that
 declaration; and the usage text renders from the header docstring, which is the only place a verb's
 ARGUMENTS are spelled. The two carriers in other files — the protocol's verb section and the Skill's
-invocations — are joined to the declaration by leg check 26, because no runtime derivation crosses a
+invocations — are joined to the declaration by leg check 26 (the first is the VERB CARRIER since
+`TOOL-dFoldedVerdict-5` moved section 7 out, and check 26's contract arm reads that carrier ALONE so
+a half-completed move cannot pass), because no runtime derivation crosses a
 file boundary.
 
 The same shape one level down: `PARK_KINDS` is the parked-region vocabulary, the `--status`

@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-20 · node a · Tier-2 · base af6de231 · streams tooling
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 29 of the 47 legs are self-tests holding 96.7% of the bar's wall clock, and only one leg carries a

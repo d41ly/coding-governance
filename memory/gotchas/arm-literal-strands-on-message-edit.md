@@ -42,8 +42,14 @@ newly written arms that stopped one word short of the signature.
 
 ## The fix
 
-Run `python tools/memory-tree/check-arms.py --report` and COPY the signature it prints. Do not retype
-the message into the arm from the code — the two look identical and differ at the tail.
+Run `python tools/memory-tree/check-arms.py --report` and COPY the signature it prints, which is the
+row WHOLE. Until `TOOL-aWokenSentinel-25` that row was cut at 72 characters, so for any longer
+message the row this paragraph told you to copy WAS a prefix, and copying it produced the defect it
+was the remedy for. An unarmed branch whose test holds a line carrying the signature's opening run
+but not the whole of it is now reported `STRANDED <test>:<line>` at the end of its report row and
+as a clause on the refusal `--check` prints, so the line to lengthen is named rather than the
+branch reading as one nothing arms. Do not retype the message into the arm from the code — the two
+look identical and differ at the tail.
 
 Treat any edit to a `fail` string as a two-file edit, the same way a protocol change is a two-carrier
 edit. The gate is reliable here, so the cost is one extra run, not a missed defect.
@@ -54,3 +60,45 @@ This class is **gated by** `python tools/memory-tree/check-arms.py --check`, whi
 rather than a check written against it, and that gate is armed by its own selftest. What
 is worth pinning is the FLOOR — `ARMS_FLOORS` in `.memory-tree.conf` — because a stranded arm shows up
 as an armed-count that dropped by one, and without a floor that number is just a report nobody reads.
+
+## The limit of that gate, MEASURED
+
+`check-arms` grades the SIGNATURE — the longest literal run between interpolations — and nothing
+else on the line. An arm may therefore CONTAIN the signature and still assert text the message no
+longer emits, which leaves the branch reported ARMED and the arm RED at runtime. The two states are
+indistinguishable to this gate.
+
+Measured by `TOOL-dFoldedVerdict-2` on 2026-09-01. `check-unattended.test.sh:714` asserted
+`gained only 1 unit id(s) this run BASE lacked` while the shipped message had said
+`gained only %d non-WONTDO unit id(s)` since the WONTDO filter landed at `ccb5492c`. The signature
+stops at that `%d`, the arm contained every byte of it, and `--check` was green for the whole
+interval. Nothing found it but a reader comparing the two strings by hand.
+
+**A SECOND EXCLUSION, from the same unit.** A message COMPOSED INSIDE an awk sub-program and
+appended to a `fail` argument is outside the population `check-arms` signs at all. Check 2's third
+clause in `tools/unattended/check-unattended.sh` builds a per-record sentence in awk, accumulates it
+into a shell variable, and passes it as the tail of one `fail 2 "...:$rv_bad"`. What gets signed is
+the OUTER head — `review loops that ran past the ceiling, …` — and `--report` duly lists that branch
+ARMED on it. Every per-record message inside is unsigned: it can be reworded, deleted, or made
+unreachable with no gate anywhere noticing. Three of those messages were rewritten by
+`TOOL-dFoldedVerdict-2` and two more added, and `--check` stayed green throughout.
+
+So: the gate covers a message edit that shortens or moves the SIGNATURE, and does not cover one
+that changes the text AFTER the first interpolation. For the second class the arm is still a
+two-file edit and the only check is reading both. A refusal whose distinguishing words all sit after
+an interpolation has, in effect, no automated arm at all — which is a reason to put the distinguishing
+words BEFORE the first one.
+
+## Two more facets of the signature grammar, evicted here from the kickoff manifest
+
+**An arm must contain the branch's ENTIRE literal signature.** A readable PREFIX of a long message
+reds, and a literal word sitting between the sentence and the first interpolation is part of the
+signature — so end the sentence and let only interpolations follow it. Adding branches RENUMBERS the
+per-check ordinals, which invalidates any `memory/project/unarmed-branches.txt` row below the
+insertion point: re-key those rows in the same commit.
+
+**A positional in a `fail` message CANNOT be armed.** `tools/memory-tree/check-arms.py` reads a bare
+`$1` as literal text inside the signature, so an arm quoting the rendered message never matches the
+source. Bind the positional to a name and put it at the END, after the sentence, where it is an
+interpolation the signature stops at. Both facets are gated by the same `--check`, and both bit
+before they were written down.

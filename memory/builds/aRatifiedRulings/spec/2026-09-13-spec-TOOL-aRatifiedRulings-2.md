@@ -1,0 +1,566 @@
+# TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names
+
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base 9fac2b53 · streams tooling · ratified 2026-09-13
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-aRatifiedRulings-2-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-aRatifiedRulings-2-1-acceptance-ledger.md) | journal | — |
+| [2026-09-13-prompt-TOOL-aRatifiedRulings-2-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-2-1-build-brief.md) | journal | — |
+| [2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md) | spec-audit | TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4 |
+| [2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md) | spec-audit | TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4 |
+| [2026-09-14-review-TOOL-aRatifiedRulings-1-diff-round1.md](../reviews/2026-09-14-review-TOOL-aRatifiedRulings-1-diff-round1.md) | diff-review | TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+Build the ruling `TOOL-aLeakedHandle-7` in `memory/DECISIONS.md`: check 23 of
+`tools/unattended/check-unattended.sh` excludes, from the undeclared-write population of a dispatched
+pass, the path that a `brief · item <unit>` row names for that unit. The ruling is the authority and
+is not restated here; the park that motivated it is the 2026-09-10T10:52:00Z decision row in
+`memory/builds/aLeakedHandle/RUN.md`. The class keeps firing for every other undeclared write, and
+that is proven by a control in the same fixture, not asserted.
+
+## 2. Scope (IN)
+
+- **S1** — The subset test in check 23 drops a committed path when the unit's own brief rows name
+  it. The row set is read from the run-state file AS OF THE PASS COMMIT, through the same
+  `GIT show "<rev>:<path>"` read the leg already makes of that file, so a row appended after the
+  commit excludes nothing. Observed by AC1, AC2 and AC3.
+- **S2** — The exclusion is keyed on the PATH the row names, compared as one normalised spelling
+  through the library's `normpath`, never on the directory that path sits in. A hand-written row
+  naming `prompts/` excludes nothing under it. Observed by AC4 and AC5.
+- **S3** — The exclusion announces itself on the report channel, one `report` line per excluded
+  path, so the default run stays byte-stable and a reader asking why a brief did not fire gets an
+  answer under `GOV_UNATTENDED_REPORT=1`. Observed by AC1.
+- **S4** — `tools/unattended/check-unattended.test.sh` gains one arm of five fixtures in region two,
+  beside the existing check-23 arms, with its failing case observed RED against the unfixed checker
+  before the fix lands. `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the assertions the arm
+  executes. Observed by AC6.
+- **S5** — The leg run over this repository names no brief path in any check-23 line whose pass
+  commit's tree carries the unit's brief row, still names it in any line whose pass commit's tree
+  does not, and every line that named another undeclared path beside the brief still prints,
+  minus the brief. The corpus holds one line of the second kind, and it is S1's boundary on live
+  data rather than an exception to it. Observed by AC7.
+
+## 3. Non-goals (OUT)
+
+- **Nothing else leaves the population.** The derivation AC7 records shows 24 of today's 29
+  brief-naming lines also name other paths: shared records and generated indexes such as
+  `memory/LIVE.md`, `memory/ledger/2026-09.md` and `memory/backlog/TOOL.md`, and acceptance
+  ledgers, README rows and product files the pass simply never declared. Of those three,
+  only `memory/backlog/TOOL.md` is one `--dispatch` cannot declare: `SHARED_RECORDS` at
+  `.unattended.conf:206` is `memory/DECISIONS.md`, `memory/backlog` and
+  `memory/project/readme-contract.txt`, and check 49 condition 3 at `unattended.sh:4774` refuses a
+  path overlapping one of them. `memory/LIVE.md` and the ledger shard are `GENERATED_INDEXES`, and a
+  generated index declared ALONE is accepted; `--dispatch` refuses it only beside its generator, in
+  the same declaration or a sibling's, which is the conditional half at `unattended.sh:4780`. The
+  parent's own rows in `memory/builds/aLeakedHandle/RUN.md` declare `memory/LIVE.md` and
+  `memory/ledger/2026-09.md` and were parked. So a line naming `memory/LIVE.md` or the ledger
+  shard fires because that pass did not declare it, not because it could not. Those 24 lines keep
+  firing after this unit, minus the brief. The shared-record class is the one `TOOL-aLeakedHandle-3`'s park
+  describes and it needs its own ruling; this unit does not widen into it, and the build README's
+  "thirty corpus lines clear" sentence is corrected at close from the leg's own count rather than
+  from this paragraph.
+- **The hash in the brief row is not read here.** Whether the committed blob matches the row's
+  hash is the `brief-recorded` leg's join, made at the build commit. Reading it twice is two
+  answers to one question.
+- **No change to `--brief`, `--dispatch`, `pass_commit`, `covers` or the row grammar.** The
+  writer stays as it is; only the reader's exclusion set changes.
+- **No new shell function in either file.** The lexicon leg parses `.sh` and grades `*.test.sh`
+  helpers too, and `VERB_OFFENDER_PIN` in `.lexicon.conf` is shrink-only, so a `brow()` beside
+  `drow()` would red the bar. The fixture rows are written inline.
+- **No kit version bump inside this unit.** `TOOL-aRatifiedRulings-1` also edits this kit —
+  `tools/unattended/unattended.sh` at check 37's branch 10 and
+  `tools/unattended/unattended.test.sh`, never `check-unattended.sh`, which holds no check 37 —
+  and two units bumping
+  `KIT_UNATTENDED_VERSION` independently is a conflict or a double bump on every carrier. Section 8
+  carries it.
+- **The passes are SEQUENTIAL, and the product files are not why.** The two product write sets
+  are disjoint: this unit writes `tools/unattended/check-unattended.sh` and
+  `tools/unattended/check-unattended.test.sh`; unit 1 writes `tools/unattended/unattended.sh`,
+  `tools/unattended/unattended.test.sh`, the BUILD-METHOD template and render, and
+  `memory/guides/SESSION-KICKOFF.md`. The only product line both could touch is the carrier
+  `check-unattended.sh:40`, and only under an in-pass bump, which section 8 F1 forbids. But a
+  pass's declared set is never only its product files. Every pass commit moves its spec's status
+  header, hygiene check 9 (`gen_build_index.py --check`, run by the pre-commit staged leg whenever
+  `memory/` is touched) then forces `memory/LIVE.md` and `memory/ledger/2026-09.md` to regenerate
+  in the same commit, and every pass edits the build README; the parent's pass commit `922fd926`
+  wrote all four, and the parent's dispatch rows for each of its three units declared all four. Check 49 condition 1 at
+  `unattended.sh:4853` refuses a declared path that `overlaps` any still-open sibling's, and
+  `overlaps` at `lib-unattended.sh:105` is `covers` both ways with `covers` at `:100` returning 0 on
+  equality, so two open passes honestly declaring `memory/LIVE.md` collide at the second
+  declaration and the run parks; a pass declaring less than it writes prints check-23 lines
+  instead. No two passes of this build can be open together, and the roster orders them; the
+  order between this unit and unit 1 is free, and section 8 F1's closing pass follows both.
+
+### Edges
+
+- **consumes-from** external — `verb_brief` in `tools/unattended/unattended.sh` refuses an
+  untracked path and stages only the run-state file, so the brief arrives in the index before the
+  pass begins and lands in the pass commit. If that verb ever started staging the brief itself,
+  nothing here changes; if it stopped requiring the file tracked, a brief could be named and never
+  committed, and the exclusion would then name a path no commit carries, which is harmless.
+- **hands-off** external — the `KIT_UNATTENDED_VERSION` bump across every file
+  `git grep -l 'gov:kit unattended@' -- tools/unattended memory/guides .claude/skills/unattended`
+  returns, once for the kit, as section 8 F1 spells; 15 files at base, and
+  `tools/check-kit-versions.sh` pairs only nine of them.
+
+## 4. Design
+
+### The join today
+
+Check 23 sits at `check-unattended.sh:2222` to `:2361` at base `9fac2b53`. It skips a `LANDED` or
+`ABORTED` run at `:2243`, unions dispatch rows per `(anchor, unit)` at `:2249`, resolves the pass
+commit through `pass_commit` at `:2301` — the first commit after the anchor whose subject names the
+unit and which touches something other than the run-state file — and runs the subset test at
+`:2346` to `:2357`. That loop takes `git diff-tree --name-only` of the pass commit, drops the
+run-state file by `grep -v -x -F "$f"` at `:2347`, and reports every remaining path no declared path
+`covers`. The brief file is never declared, because the pass never wrote it: `verb_brief` at
+`unattended.sh:4261` requires the path already tracked at `:4280`, hashes it, parks the row at
+`:4306` and stages only the run-state file at `:4307`. The orchestrator therefore has the brief in
+the index before dispatch, and the pass's one commit carries it. `c0964657` on the parent build is
+the measured instance: its tree lists the brief beside the run-state file and the declared paths.
+
+### The row
+
+`park()` at `unattended.sh:3911` writes `<ISO-Z> brief · item <unit> · reason <hash12> <path>`,
+reason line-final. Two readers already depend on that shape and this unit becomes the third. The
+parse is the sibling leg's, verbatim: `check-brief-recorded.sh:263` to `:265` take
+`${row#* · reason }`, then the hash as `${rest%% *}` and the path as `${rest#* }`. This unit needs
+only the path and spells the same three expansions, so a grammar change breaks both readers the
+same way and the sibling's DEAD PROBE guard at `check-brief-recorded.sh:144` is the canary for both.
+
+The row is selected by the whole field ` brief · item <unit> · reason `, both separators included,
+which is what makes the unit id a whole token: `TOOL-x-1` is a prefix of `TOOL-x-10`, and the
+existing check-23 arm F in the suite exists because an unanchored match once refused a correct run.
+
+### The exclusion
+
+Inside the per-row loop, after `pass_commit` has answered and before the subset test:
+
+1. Read the run-state file at the pass commit: `GIT show "$dshit:$f"`, into a variable. The leg
+   already reads that file at a revision the same way at `check-unattended.sh:1467`, and the
+   run-state path has no leading dot segment, so the `rev:dotpath` mangling the sibling avoids with
+   `ls-tree` does not reach it. An adopter whose `MEMORY_ROOT` starts with a dot inherits the
+   sibling's exposure, stated here rather than solved.
+2. Walk that text with `while read` fed by a heredoc holding the VARIABLE, never a command
+   substitution — the `shell hygiene (a loop fed by a command substitution)` leg refuses the other
+   form and `memory/project/substitution-fed-loops.txt` is shrink-only. Keep every line carrying
+   ` brief · item $dsunit · reason `, take the path with the three expansions above, and append
+   `normpath` of it to a newline-delimited set.
+3. In the subset loop at `:2347`, before the declared-path walk, drop a committed path that is a
+   member of that set by exact string match. The `diff-tree` spelling is git's canonical one, so
+   only the row's side is normalised; `covers` is deliberately not used, because it is a
+   containment test and a row naming a directory would then hide everything under it.
+4. Emit `report "check 23 excluded <path> for <unit> in <file> — the path its brief row names,
+   staged by --brief rather than written by the pass"` for each dropped path. `report()` prints
+   only under `GOV_UNATTENDED_REPORT=1`, so the default stdout changes by exactly the brief paths
+   leaving the `wrote` lists and by nothing else.
+
+The check's header comment gains one paragraph naming the ruling and the two boundaries: the
+path, not its directory; the tree at the pass commit, not the working copy.
+
+### Why the tree at the pass commit
+
+Reading brief rows from the working-tree run-state file would pass the two mandated arms and open
+the post-hoc dodge the parent build's park refused in its option (a): a run that committed a stray
+file could then `--brief` that file afterwards, and the row would silence the report. Check 23
+already closes that shape for dispatch rows by anchoring — arm C in the suite pins that a widened
+row at a later anchor does not cover a commit already made. A brief row has no anchor, so the
+ordering constraint is obtained the way `pass_commit` obtains its own: a row is in force for a pass
+only if the pass commit's tree contains it. A row appended after the commit is outside that tree
+by construction. The live corpus holds one such row: `TOOL-dRetiredFork-6`'s brief row was parked
+before its pass commit `ffdaa82b` but reached the tree only in `295e58d8`, the run-state commit
+made after it, so `git show` of that file at the pass commit holds no row for the unit and its
+brief path stays reported. That is the cost of the boundary and it is paid rather than waived: a
+rule that read the row's timestamp or the working tree to rescue it could not tell it from the
+post-hoc row fixture C stages. AC7 names it as the residual. This is one extra git spawn per
+`(anchor, unit)` row that reaches the subset test; `TOOL-aQuenchedHarness-7` measured the leg at
+2321 spawns after its cut, and the rows that reach the subset test are a subset of the
+` dispatch · item ` keys in the live run-state files, which is a `grep -c` away and is not typed
+here.
+
+What this does NOT buy, said in the header as well: a run that writes the brief row and the stray
+file into the same pass commit still hides the stray file. Both artifacts are authored by the run,
+which is the limit check 23's own header already states for dispatch rows. A brief row naming a
+stray path is excluded here and joined by NOTHING downstream: `brief-recorded` grades CLOSED units
+only, at the BUILD commit `build_commit` selects rather than the pass commit, reads the LAST row per
+unit (`tail -1`) where this check takes the union, and asserts only a twelve-hex shape, tracked at
+that commit, and hash-prefix equals blob — never that the path was a brief. This unit does not
+claim to reach it, and the diff-review round 1 (finding ids 2 and 5) is where the earlier claim
+that the sibling leg joins it was withdrawn; a build-folder containment line was weighed there and
+not taken, because the only actor who can plant such a row is the run, which the stated limit
+already covers.
+
+### The arm
+
+Five fixtures in region two of `tools/unattended/check-unattended.test.sh`, placed after the
+`covers` normalisation pair at `:2951` to `:2968` and before the exit-code arm at `:2970`, using the
+existing `drow` helper for the dispatch row and an inline `printf` for each brief row. Every brief
+row is written with a real twelve-hex `git hash-object` prefix so the fixture is also a conforming
+`brief-recorded` row, even though check 23 never reads the hash. The unit is `ARCH-tRun-1`, as in
+the sibling arms, and the brief file is
+`memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md`, so every `wrote` list
+below is spelled from those two names and the checker's `printf` at `check-unattended.sh:2357`.
+
+| Fixture | The pass commit carries | Brief row | Assertion |
+|---|---|---|---|
+| A · silent | `work/one.txt` declared, the brief file, the run-state file with the brief row | in the pass commit | `miss` on `unattended: check 23 —`; `hit` on the report-channel `check 23 excluded` line under `GOV_UNATTENDED_REPORT=1` |
+| B · control | A plus `work/stray.txt` | in the pass commit | `hit` on `wrote work/stray.txt in memory/builds/tRun/RUN.md`; `miss` on `build-brief.md` anywhere in the output |
+| C · post hoc | `work/one.txt` and the brief file, NO row yet; a second commit, touching only the run-state file, appends the row | after the pass commit | `hit` on `wrote memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md` |
+| D · directory | A plus `memory/builds/tRun/prompts/other.md` | names `memory/builds/tRun/prompts` | `hit` on `memory/builds/tRun/prompts/other.md` |
+| E · spelling | as A | names `./memory/builds/tRun/prompts/…` | `miss` on `unattended: check 23 —` |
+
+B is what keeps A from passing by finding nothing: the two fixtures differ by one file and the
+report must name that file and not the brief. The `hit` in A is the positive artifact that the
+exclusion branch ran on that path rather than check 23 skipping the row for an unrelated reason —
+a `skipped` line and a silent pass look identical without it. C pins the ordering boundary, which
+the two mandated arms cannot see. D pins path-not-directory. E pins the `normpath` call, for the
+reason the `covers` arm above it was written: a bare string compare passed both suites at
+byte-identical counts when that fix landed.
+
+Red-first: the arm is committed against the checker at base first and the shard is run. Three
+fixtures red at base, because the base subset loop at `check-unattended.sh:2346` to `:2357` prints
+every undeclared path of the pass commit in one `wrote` list and the brief file is undeclared in
+all of them. A prints `FAIL unexpected: unattended: check 23 —` and `FAIL missing: check 23
+excluded`, because the base line reads `wrote memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md`
+and no report line exists yet. B prints `FAIL missing: wrote work/stray.txt in
+memory/builds/tRun/RUN.md` and `FAIL unexpected: build-brief.md`, because the base line reads
+`wrote memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md work/stray.txt`,
+the brief first in `diff-tree` order. E prints `FAIL unexpected: unattended: check 23 —` for A's
+reason. Then the exclusion lands and the same invocation prints none of those five lines.
+
+C and D are controls and print nothing at base, because they assert what the base checker already
+does: C's base line is A's, `wrote` the brief path alone, since no row is in the pass commit's tree
+either way; D's base line is `wrote memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md
+memory/builds/tRun/prompts/other.md`, and the fixed checker prints the same line, because the row
+names the directory and exact membership excludes neither file. A control that has only ever
+passed is the could-not-fail class, so each is redded ONCE by a staged break in
+`tools/unattended/check-unattended.sh` at the landed tip, observed, and unstaged with
+`git checkout -- tools/unattended/check-unattended.sh`; the shard output under each break is quoted
+in the acceptance ledger. C's break: replace the `GIT show "$dshit:$f"` read of step 1 with
+`cat "$f"`, so the rows come from the working tree, which holds the row the second commit
+appended; the brief path is then excluded, the `wrote` list is empty, no check-23 line prints, and
+C's `hit` prints `FAIL missing: wrote memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md`.
+D's break: replace step 3's exact `case` membership with `covers "$row" "$dsq"`, so the directory
+row covers both files under it; the list is empty again and D's `hit` prints
+`FAIL missing: memory/builds/tRun/prompts/other.md`. Each break reds exactly its own fixture and
+nothing else in the shard, which is what makes it that fixture's break rather than a second
+red-first run.
+
+The observation is that FAIL-line delta and never the exit status or a
+`PASS (<n> assertions)` line, because the suite cannot print one on this tree: backlog row
+`TOOL-aHoistedPass-38` records it RED in both shards for causes that predate this build, and two
+of them are still in the source at base. `mkconf` at `check-unattended.test.sh:81` to `:106`
+declares no `DISPOSITION_CUTOFF`, so `check-unattended.sh:418` prints its notice on every default
+run and the `same ... ""` controls at `:283` and `:1880` fail; and the `pedit` of
+`Ten kit-owned core items.` at `:1924` and `:1929` is a fixture no-op against
+`PROTOCOL.template.md:324`, which reads `Twelve`, so `mutate` at `:245` sets `st=1`. `PASS` prints
+only at `st=0` (`:3191`), and `n` otherwise prints only on a floor breach (`:3131`). Repairing
+those causes is that row's work under its own owner, outside this ruling's mandate, so this unit
+reads the suite as a set of FAIL lines: the lines present at base minus the lines present after are
+the arm's, and both full outputs are quoted in the acceptance ledger so the residual is visible
+rather than implied. The floors are read the one way the suite still prints `n`, which AC6
+spells.
+
+### Inventory
+
+No identifier is minted. No leg name, no shell function, no conf key, no waiver row, no inventory
+key of any kind the codebase map enumerates, so `memory/map/generated/` is untouched and no
+`subject-pins.tsv` or `selftest-budgets.txt` row moves. `tools/unattended/check-unattended.sh`'s
+`ARMS_FLOORS` entry in `.memory-tree.conf` counts `fail` branches, and check 23 reports through
+`printf`, so it does not move either.
+
+### Files touched (estimate)
+
+- `tools/unattended/check-unattended.sh` — the exclusion set, the membership test, the report line,
+  one header paragraph. About thirty lines.
+- `tools/unattended/check-unattended.test.sh` — five fixtures and the two floors. About sixty
+  lines.
+- `memory/builds/aRatifiedRulings/build/` — the acceptance ledger with the red-first output.
+
+### Alternatives rejected
+
+- **Exclude by directory** (`prompts/` under the build folder). Rejected by the ruling's own
+  grammar and by the task: a pass could hide any write under `prompts/`. Fixture D is the arm.
+- **Read the rows from the working-tree run-state file.** Rejected above; fixture C is the arm.
+- **Extract a shared row-parse helper into `lib-unattended.sh`** for this leg and the sibling.
+  Three parameter expansions do not earn a function, and a new shell function is graded by the
+  lexicon leg against a shrink-only pin.
+- **Declare the brief path in the dispatch row instead**, driver-side. The park refused this as the
+  post-hoc-declaration dodge, and declaring it up front would make every orchestrator spell a
+  path the driver already knows from the brief row. The reader is the right side.
+- **Drop the brief path with `grep -v -x -F -e` beside `$f`.** Exact and cheap, but it cannot
+  normalise the row's spelling, and a path holding a space breaks the argument list. The
+  `case`-over-a-newline-set form costs the same and does both.
+
+## 5. Production-readiness checklist
+
+- security — the exclusion admits one path per brief row, named in a record the run authored,
+  which is the trust level dispatch rows already carry. Ordering-bound to the pass commit's tree,
+  so a row written after the fact hides nothing; the same-commit lie is named in section 4 and in
+  the header, not closed.
+- perf / scale — one `git show` per graded row that reaches the subset test and one `normpath`
+  subshell per brief row, against a leg whose spawn count `TOOL-aQuenchedHarness-7` records. The
+  five fixtures add five leg invocations to a suite that is no bar leg; the budget row is re-read
+  after the measured run rather than re-declared.
+- error / empty / loading states — a pass commit whose tree holds no run-state file, or no brief
+  row for the unit, yields an empty set and today's behaviour; a row with nothing after the hash
+  yields the hash token as its path under the sibling's three expansions, which matches no
+  committed path.
+- observability — the default output loses exactly the brief paths; the report channel names each
+  exclusion. No new skip line, because nothing is skipped.
+- risks — two readers of one row grammar in two legs, both spelling the sibling's parse; the
+  `-1`/`-10` prefix trap, closed by matching both separators; the one carrier line this unit and
+  `TOOL-aRatifiedRulings-1` could both move, `check-unattended.sh:40`, which neither pass touches
+  under section 8 F1.
+- testing — five fixtures, one red-first observation, two floors moved; section 6.
+- migration — N/A. No record shape changes and rows already in the corpus are read as they are.
+- user docs — the check's header is the rule's prose home and gains one paragraph;
+  `memory/map/features/unattended.md` is not touched, because a dossier sentence restating a
+  checker rule is a second answer to one question.
+
+## 6. Acceptance criteria
+
+For AC1 to AC5 the observation is the shard's own FAIL lines: `hit` and `miss` at
+`check-unattended.test.sh:57` and `:58` print `FAIL missing: <text>` and `FAIL unexpected: <text>`
+and nothing on success, so a criterion holds when the arm's lines are absent from the output at
+the landed tip and were present in the run that stages its failing case: the red-first run
+against the checker at base for AC1, AC2 and AC5, and the named staged break for the two
+controls, AC3 and AC4, whose fixtures the base checker already passes. The exit status is NOT the
+observation, and neither is a `PASS` line: `TOOL-aHoistedPass-38` records the suite red in both shards at base for
+causes this unit does not repair, so the shard exits 1 before and after, and the ledger quotes the
+FAIL lines that remain so nobody reads them as the arm's.
+
+- **AC1** — When `bash tools/unattended/check-unattended.test.sh --shard 2/2` runs fixture A, the
+  default leg output carries no `unattended: check 23 —` line, and the same fixture run under
+  `GOV_UNATTENDED_REPORT=1` prints a `check 23 excluded` line naming the brief path and the unit.
+  Red when: the checker at base is used, which prints the brief path in a `wrote` list — the
+  observed RED before the fix — or the exclusion branch never executes and the report line is
+  absent while the default output is silent for another reason.
+  cost: region two of the suite, minutes rather than seconds; the whole-file figure is the
+  `unattended gate selftest` row of `tools/run-gates/selftest-budgets.txt`.
+  permission: the suite is on the bar under no chunk at all — `tools/unattended/kit.toml` records
+  the 2026-08-23 ruling that removed it — so no boundary runs it and the direct invocation above is
+  the only observation. It exits 1 on this tree before and after the fix: `TOOL-aHoistedPass-38`
+  records the suite RED in both shards for causes that predate this build, and the two still in
+  the source at base are named in section 4. So the observation is the arm's own FAIL lines, as
+  the section preamble states, and a FAIL exit is not the arm's failure until a line names it.
+  `bash tools/unattended/run-unattended-gates.sh` runs it unsharded with the five sibling suites;
+  `TOOL-aTracedSpawn-1` recorded the driver suite dying unsharded at its line 4107, and that line
+  was fixed at `8b29f0b9` on 2026-09-08 while the backlog row still reads OPEN.
+  fixture: the suite's own scratch repo, `drow` and the `tRun` build; no fixture in this tree.
+  Check 23 arms no conf cutoff, so no key gates the fixture.
+- **AC2** — When the same shard runs fixture B, the output carries a `wrote` list whose only
+  member is the stray file — the line reads wrote work/stray.txt in memory/builds/tRun/RUN.md,
+  spelled here without backticks because the spec-tokens leg joins backticked paths against
+  `git ls-files` and these are fixture paths — and no occurrence of `build-brief.md`.
+  Red when: the exclusion widened past the named path and the stray file went silent too, or the
+  brief path stayed in the list beside the stray one.
+- **AC3** — When the same shard runs fixture C, where the brief row lands in a commit AFTER the
+  pass commit, the output carries a `wrote` list naming the brief path, and C prints no FAIL
+  line at base, at the landed tip, and nowhere in between: it is a control, and the base checker
+  already prints that list. Its failing case is observed by ONE staged break at the landed tip,
+  quoted in the acceptance ledger: in `tools/unattended/check-unattended.sh`, replace the
+  `GIT show "$dshit:$f"` read of the exclusion set with `cat "$f"`, run
+  `bash tools/unattended/check-unattended.test.sh --shard 2/2`, and C's `hit` prints
+  FAIL missing: wrote memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md
+  while no other fixture's line changes; then `git checkout -- tools/unattended/check-unattended.sh`
+  and the line is gone.
+  Red when: the rows are read from the working-tree run-state file, so a row appended after the
+  commit silences the report; or the staged break above reds nothing, which means the read is
+  not what excludes and C is a control over nothing.
+- **AC4** — When the same shard runs fixture D, whose row names the directory
+  `memory/builds/tRun/prompts` and whose pass commits `other.md` under it, the output carries a
+  `wrote` list naming `other.md`, and D prints no FAIL line at base or at the landed tip: the base
+  checker reports the file too, because it excludes nothing. Its failing case is observed by ONE
+  staged break at the landed tip, quoted in the acceptance ledger: in
+  `tools/unattended/check-unattended.sh`, replace the exact `case` membership of step 3 with
+  `covers "$row" "$dsq"`, run the same shard, and D's `hit` prints
+  FAIL missing: memory/builds/tRun/prompts/other.md while A, B, C and E stay silent, E because
+  `covers` normalises both sides; then `git checkout -- tools/unattended/check-unattended.sh` and the
+  line is gone.
+  Red when: the membership test is a containment test, so the directory row covers the file; or
+  the staged break above reds nothing, which means the membership test is not what D reaches.
+- **AC5** — When the same shard runs fixture E, whose row spells the brief path with a leading
+  `./`, the default output carries no `unattended: check 23 —` line.
+  Red when: the row's path is compared as a raw string and the dot-spelled row excludes nothing.
+- **AC6** — When `bash tools/unattended/check-unattended.test.sh --shard 2/2` and the unsharded
+  `bash tools/unattended/check-unattended.test.sh` run at the landed tip, neither prints a
+  `FAIL executed` line, `FLOOR_SHARD_2` and `FLOOR_ASSERTIONS` each stand exactly the arm's
+  executed assertions above their base values of 309 and 392 at `check-unattended.test.sh:3125`
+  and `:3108`, and `FLOOR_SHARD_1` at `:3124` is unchanged. The suite prints `n` nowhere on this
+  tree except its floor-breach line at `:3131`, because `PASS` needs `st=0`, so `n` is read from
+  that line: one shard run with `FLOOR_SHARD_2` over-pinned in place to `99999` by `sed`, reverted
+  with `git checkout` of the file afterwards, prints the breach line
+  `FAIL executed <n> assertions in shard 2/2 against a floor of 99999`; the same read at base
+  gives the base `n`, and the difference is the arm's executed count.
+  Red when: a `FAIL executed` line appears in either run at the landed tip, which is a floor
+  pinned above what the suite executes; or the tip's breach-line `n` minus the base's is below
+  the arm's `hit` and `miss` call count, which is an assertion stranded past an exit or outside
+  region two; or the floors did not move, so a stranded arm is invisible.
+  cost: two shard runs beyond the red-first pair, one at base and one at the tip, each with the
+  floor over-pinned; minutes each, on the same budget row AC1 names.
+  figure: the arm's executed count is DERIVED from the two breach-line reads, never from this
+  line; by design in section 4 it is seven, because `hit`, `miss` and `same` at
+  `check-unattended.test.sh:57` to `:59` each add exactly one and `drow` at `:2777` adds none.
+  Both floors are then PINNED in the suite by the build at base plus that count.
+- **AC7** — When `bash tools/unattended/check-unattended.sh` runs over this repository at the
+  landed tip, every `-build-brief.md` path whose unit's brief row is in the pass commit's tree has
+  left its `unattended: check 23 —` line, every such path whose row is NOT in that tree is still
+  in it, and every line that named another path beside the brief at base still prints without
+  the brief. The expected set is DERIVED from the base run, never counted by hand: for each line
+  of the `committed a path outside` class, take the unit, the pass sha and the run-state file
+  from its `<unit> at <sha> wrote <paths> in <file>` tail, run `git show` of `<sha>:<file>`, and
+  keep the row carrying the unit's whole ` brief · item <unit> · reason ` field; a brief path that
+  row names is expected to leave, any other is expected to stay. The loop is recorded in the
+  acceptance ledger beside its output, so the audit re-runs it rather than re-counting.
+  Red when: an expected-to-leave brief path survives in a `wrote` list; an expected-to-stay one
+  leaves it, which means the rows were read from somewhere other than the pass commit's tree; or
+  a line that also named another path has gone silent — the widening this ruling does not
+  license.
+  cost: the leg, `unattended kit gate` in `tools/gate-legs.json`, chunk `declarations`, subject
+  `repo`, no guard, so every boundary bar runs it; measured 220 s wall on 2026-09-13 in this
+  worktree with three sibling agents editing beside it, and 5 m 35 s earlier the same day under a
+  running bar, against the 435 s idle reading the runner records.
+  figure: DERIVED at observation time by the loop above. Its result on 2026-09-13, node a, this
+  worktree at `2928df63` with the unattended sources byte-identical to base, over the leg's 30
+  check-23 lines: 29 of the `committed a path outside` class, each naming exactly one
+  `-build-brief.md`, and 1 of the `moved inside its window` class. Of the 29, the pass commit's
+  tree holds the unit's brief row for 28 and not for 1: `TOOL-dRetiredFork-6` at `ffdaa82b`,
+  whose brief and dispatch rows first reach `memory/builds/dRetiredFork/RUN.md` in `295e58d8`,
+  the run-state commit made after the pass commit. So 5 lines fall silent, the ones where the
+  brief was the only path; 23 keep printing without the brief; and 1 keeps printing WITH it, by
+  construction and not by grandfathering — that row is fixture C's shape on live data, and S1
+  cannot tell it from a row appended to hide a stray write. The ruling's "30" is the count of
+  brief rows across the live run-state files, 28 in `memory/builds/dRetiredFork/RUN.md` and 2 in
+  `memory/builds/dRatifiedSeam/RUN.md` at `2928df63`, not the count of lines that clear.
+
+## 7. Gates
+
+`unattended kit gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `shell hygiene (a loop fed by a command substitution)` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)`
+
+Chunks and guards, from `tools/gate-legs.json` at base: `unattended kit gate` is chunk
+`declarations`, subject `repo`, no guard, and its stdout is AC7's observation. `memory hygiene` is
+chunk `records`, no guard, and grades this file. `spec tokens` is chunk `declarations`, no guard,
+and joins this section's list and section 6's backticked paths against the manifest and
+`git ls-files`. `shell hygiene` is chunk `product`, no guard, and refuses a substitution-fed loop
+in the edited checker. `lexicon naming predicates` is chunk `declarations`, guarded on `tools/`,
+and grades any function the edit would add. `harness arms` is chunk `declarations`, no guard, and
+would move only on a `fail` branch, which this unit adds none of. No leg here is chunk
+`selftests`; the suite that observes AC1 to AC6 is on no leg and is named in AC1.
+
+New arm: `tools/unattended/check-unattended.test.sh` · fixtures A, B and E run against the
+checker at base, which prints the brief path in every `wrote` list; the controls C and D by one
+staged break each in the fixed checker, the working-tree read for C and `covers` for D, as
+section 4 and AC3, AC4 spell · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the arm's executed
+assertions.
+
+## 8. Open questions
+
+- **F1 — who bumps `KIT_UNATTENDED_VERSION`, and once or per unit?** `TOOL-dMuffledSentinel-3`
+  records that a checker edit shipped without a bump made an adopter's `kit-versions` leg refuse
+  the pull, and that no rule forces the bump. This unit and `TOOL-aRatifiedRulings-1` both edit
+  the unattended kit in disjoint files, and the one surface they share is the carrier line
+  `check-unattended.sh:40` together with its three pairs at `unattended.sh:42`,
+  `check-brief-recorded.sh:49` and `check-pass-order.sh:38`, which `tools/check-kit-versions.sh`
+  holds equal; the rendered copies under `memory/guides/` and `.claude/skills/unattended/` are
+  re-made by `adopt-unattended.sh`. Options: each unit bumps in its own pass, which conflicts on
+  every carrier; the closing pass bumps once for the kit after both units land; no bump, which
+  repeats the refusal. Recommendation: once, at the closing pass, 1.19 to 1.20, by whichever pass
+  lands last in the kit, recorded in that pass's declaration.
+
+RESOLVED (agent, 2026-09-13, delegated) F1: the kit version is bumped ONCE, 1.19 to 1.20, by
+the closing pass after both units that edit the unattended kit have landed, and that pass
+declares every file
+`git grep -l 'gov:kit unattended@' -- tools/unattended memory/guides .claude/skills/unattended`
+returns at its tip. That grep prints 15 files at base, DERIVED and not counted: the four `.sh`
+constants at `unattended.sh:42`, `check-unattended.sh:40`, `check-pass-order.sh:38` and
+`check-brief-recorded.sh:49`, whose same-line markers are what the grep matches; the five
+`tools/unattended/*.template.md`; the five installed artifacts `adopt-unattended.sh --check`
+re-makes and diffs, `.claude/skills/unattended/SKILL.md`, `memory/guides/UNATTENDED-PROTOCOL.md`,
+`memory/guides/PLAYBOOK-TEMPLATE.md`, `memory/guides/UNATTENDED-VERBS.md` and
+`tools/unattended/playbook.fixture.md`; and `tools/unattended/README.md`, whose line-1 marker is
+outside both populations `tools/check-kit-versions.sh` reads, which `DEPL-aHoistedPass-10` records
+OPEN. The checker pairs the first nine only, and `--check` diffs the next five against their
+templates, so a list spelled from either source undercounts and the unpaired `README.md` line
+stays at 1.19 with no gate to say so. `b8e8d6dc`, the commit `TOOL-dMuffledSentinel-3` names, is
+the commit shape: it moved exactly those 15 unattended files, one marker line each. Per-unit
+bumps collide on every carrier; no bump repeats the refusal that record describes. This repo's
+own note that a watched-kit change owes more stamps than the checker names is the reason the
+carrier set is derived in the declaration rather than remembered. No M3 veto is tripped: the
+bump is the kit's own convention. The bump
+commit lands AFTER the two commits that moved the kit's bytes, and no gate grades that order for
+this kit: `tools/memory-tree/check-verdict-epoch.sh` reads `KIT_MEMORY_TREE_VERSION` from the one
+engine its `ENGINE` line at `:68` names, and `check-kit-versions.sh` asserts the carriers equal,
+not when they moved. The closing pass states this in its declaration rather than showing an
+epoch-gate observation the kit has no gate to make.
+
+## 9. Revision log
+
+- rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · §3 · §4 · §5 · §6 · §8 · S5 · AC1 · AC6 · AC7 · folded the round-1
+  spec audit, clusters D (id 3), E (id 42), C (ids 4, 14, 44) and F (ids 28, 49). D: AC7 and S5
+  assert the set the mechanism derives from each pass commit's tree, naming
+  `TOOL-dRetiredFork-6` at `ffdaa82b` as the one brief path that stays by construction. E: AC1
+  to AC5 observe the arm's FAIL-line delta and AC6 reads `n` from the floor-breach line, since
+  `TOOL-aHoistedPass-38` leaves the suite unable to print `PASS`. C: §3, §5 and F1's body name
+  unit 1's real files, the carrier line as the only shared surface, and the write sets as
+  disjoint; the F1 RESOLVED mark is unchanged and F1 now states that no epoch gate grades this
+  kit's bump order. F: the header tail carries the `ratified` pointer the mark owes.
+- rev-3 · 2026-09-13 · §3 · §4 · §6 · §7 · §8 · AC3 · AC4 · folded the round-2 spec audit,
+  clusters B (id 18), D (id 3) and G (id 23). B: §3 now says the passes are sequential because
+  every pass declares its spec, the build README and the two generated indexes, which check 49
+  condition 1 refuses on equality; the product write sets stay disjoint, and the
+  `GENERATED_INDEXES` sentence reads "accepted alone, refused only beside its generator" against
+  `unattended.sh:4780`. D: §4 names B red at base beside A and E with the base `wrote` lines, and
+  gives the controls C and D one staged break each, the working-tree read and `covers`, with the
+  FAIL line each prints; AC3 and AC4 carry the break and its invocation, and the §6 preamble no
+  longer claims every fixture was present in the red-first run. G: the F1 body and the §3
+  hands-off edge derive the carrier set from the scoped `git grep`, 15 files at base including
+  `tools/unattended/README.md`, citing `b8e8d6dc` as the commit shape; the RESOLVED mark is
+  unchanged.
+- rev-4 · 2026-09-13 · §5 · the build pass. §5 said a row with nothing after the hash yields an
+  EMPTY path; under the sibling's three expansions, which §4 mandates verbatim, `${rest#* }` on a
+  spaceless rest is the rest itself, so the path is the hash token. Same outcome, matches nothing,
+  stated as built. Every staged break and floor over-pin §4 and §6 spell as an in-place edit
+  reverted by `git checkout` was made on a frozen copy of `tools/unattended/` instead, one
+  copy per run, so the seven suite runs could go concurrently and no working-tree edit existed
+  to revert; the acceptance ledger under `build/` names each copy's one-line delta. Status CLOSED.
+- rev-5 · 2026-09-14 · §3 · §4 · after close, from the closing diff review round 1, and only the
+  prose that review names. Ids 2 and 5: the "What this does NOT buy" paragraph credited `brief-recorded`
+  with a join it does not make; it now states what that leg proves (CLOSED units, the build commit,
+  the last row, hash-only) and that a stray-path row is joined by nothing. Id 7, the HIGH, is a
+  code fix outside this spec's prose and is recorded here for the reader of §4's "The exclusion":
+  the brief-row parse moved into the kit library as `read_brief_paths`, `pass_commit` subtracts
+  that set before it selects a commit, and check 23 calls the same helper; fixture F in the suite
+  pins the `{run-state, brief}` bookkeeping commit as skipped. §3's "No change to `pass_commit`"
+  and "No new shell function in either file" bullets bound this unit's own pass and are
+  superseded by that repair; they stand as written because they were true of the pass, and the
+  bug-class checklist for the fix commit (`amendment-leaves-its-other-half-standing`) is why this
+  line names them. No re-declaration; status unchanged.
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py "check 23 excludes the brief path a dispatched pass
+commits undeclared"`, run on 2026-09-13 at this worktree, reported
+`scan coverage: 70 files scanned | 0 parse skips | unscanned layers: .sh`. Every file this unit
+touches is `.sh`, so the map probe is BLIND to this subject and no claim in this spec rests on it —
+its ranked candidates are Python `check_*` functions from other kits and the `.unattended.conf`
+affordance seam, none of which is this seam. The seam was found by reading the source and it
+exists: `covers` and `normpath` at `lib-unattended.sh:100` and `:79` are the path compare every
+containment question in the kit already goes through; the `GIT show "<rev>:<path>"` read of the
+run-state file at `check-unattended.sh:1467` is the revision-bound read this unit reuses; and the
+brief row parse at `check-brief-recorded.sh:263` to `:265` is the grammar reader this unit spells a
+second time rather than a new one. The recall query returned the ruling as its first hit, the
+`dUnstalledConvoy-23` spec and red-first record as the origin of check 23's window and `covers`
+rule, and the parent park; it also surfaced `TOOL-aSiftedFork-1` and `-2`, which name a different
+check 23 — the memory-hygiene one — and were set aside.
+
+Recall terms used: `python tools/memory-recall/query.py "why does check 23 report the brief file a
+dispatched pass commits, and what did the owner rule about excluding it" --terms "check 23" "brief"
+"verb_brief" "dispatch" "declared write set" "undeclared write" "run-state" "parked" "prompts"
+"subset test" "covers" "TOOL-dUnstalledConvoy-10" "TOOL-dBriefedPass-2"`

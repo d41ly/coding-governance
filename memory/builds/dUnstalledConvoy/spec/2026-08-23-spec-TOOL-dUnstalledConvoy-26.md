@@ -2,6 +2,18 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md](../build/2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md) | journal | — |
+| [2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md](../build/2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 |
+| [2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md](../reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md) | journal | TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 |
+| [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md](../reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md) | diff-review | — |
+| [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md](../reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 A kit's self-tests read THE KIT: they stage a break into a copy of a checker and assert the checker

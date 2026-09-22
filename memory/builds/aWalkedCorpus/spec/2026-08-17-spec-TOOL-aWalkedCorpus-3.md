@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-5 · 2026-08-17 · node a · Tier-2 · base 3e5c6d43 · streams tooling · ratified 2026-08-17
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-17-review-TOOL-aWalkedCorpus-3-2.md](../reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-2.md) | spec-audit | — |
+| [2026-08-17-review-TOOL-aWalkedCorpus-3-3.md](../reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-3.md) | spec-audit | — |
+| [2026-08-17-review-TOOL-aWalkedCorpus-3-4.md](../reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-4.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Ship the merge-bar leg `TOOL-aWalkedCorpus-2` could not: a committed question set, a measured floor
