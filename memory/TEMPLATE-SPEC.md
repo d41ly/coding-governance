@@ -103,6 +103,19 @@ an absent region cannot be told from a spec nobody has recorded against.
   one names when it was measured, a derived one names what re-derives it. This binds every section,
   §4's inventories and estimates included; §6's `figure:` sub-field is where an acceptance criterion
   answers it.
+- A codebase-map dossier claims EXACT inventory keys, so a sentence saying a dossier claims a path,
+  a glob or a code symbol books a grader that does not exist. `tools/check-spec-tokens.py`
+  refuses three shapes as the object of such a sentence in every LIVE spec, each for the reason the
+  map's own contract gives. A PATH carries `/` and a GLOB carries `*` or `?`, and the map rules path
+  globs digest-only and never gated (`<MEMORY_ROOT>/map/README.md`, rendered by
+  `tools/codebase-map/gen_map.py`). A CODE SYMBOL carries an underscore between two letters or
+  digits in either case, or a parenthesis, and the symbol tier feeds `generated/symbols.json` only and
+  never the ratchet (`tools/codebase-map/map_extractors.py`). The space clause: a token
+  carrying a space is never refused, because every live key carrying punctuation also carries one.
+  The check grades SHAPE, and six things are invisible to it: an unbackticked dossier subject, an
+  unbackticked claimed object, a claim inside a fenced block, a key-shaped object that is not a key,
+  a claim in the wrong dossier, and a filler run longer than the closed arm admits. Name the key the
+  dossier will claim, or describe the thing in prose.
 - A section that genuinely doesn't apply keeps its heading with the single line `N/A — <why>`.
   Headings never disappear, and empty bodies are machine-rejected: an absent or hollow section is
   indistinguishable from a forgotten one.

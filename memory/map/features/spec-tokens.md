@@ -2,7 +2,7 @@
 
 ```toml
 feature = "spec-tokens"
-title = "Five joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, and owe a guarded leg its name"
+title = "Six joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, owe a guarded leg its name, and refuse a dossier claim the map cannot hold"
 status = "shipped"
 streams = ["tooling"]
 decisions = []
@@ -35,9 +35,10 @@ paying a reviewer to do what a checker does. The checker's own header carries th
 sized each arm, pinned to the sha they were taken at; they are not restated here.
 
 **It resolves EXISTENCE and RANGE, and nothing else.** It does not read the cited line, so a
-citation naming a real line that argues the opposite passes. It grades no prose, scope, acceptance
-or tier. That limit is in the checker's own header because a structural check reads as a semantic
-one to everybody who did not write it.
+citation naming a real line that argues the opposite passes. It grades no scope, acceptance or
+tier, and it grades prose only where the claims join reads a dossier-claim sentence, whose object's
+SHAPE it grades and nothing more. That limit is in the checker's own header because a structural
+check reads as a semantic one to everybody who did not write it.
 
 **The joins keep their populations apart, and conflating them was the defect rev-2 folded.** Legs
 are graded only on a section 7 line that IS the list, because treating every backticked token there
@@ -47,7 +48,8 @@ the house style cites a kit file by basename and most citations therefore name n
 holds. Redding those is a disposition per row and the lint never lands; passing them silently is a
 could-not-fail arm over much of the corpus. So they are skipped AND COUNTED, and the count prints on
 every run. The fourth join, `bar`, reads the legs and paths populations rather than minting one; the
-fifth, `guards`, reads the legs population plus one of its own, the declared write set.
+fifth, `guards`, reads the legs population plus one of its own, the declared write set; the sixth,
+`claims`, reads none of them, being a grammar over the spec's own prose outside its fenced blocks.
 
 **A bar or a suite is not an acceptance observation (TOOL-aDeferredBar-2).** The `bar` join reds a
 live spec dated at or after `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf`, blank = off) whose acceptance
@@ -166,6 +168,9 @@ Tier-1 accommodation.
   affordable, and it is also the hole: a spec that names a dead leg in a sentence passes.
 - **Existence is not agreement.** The three joins prove a name resolves; no arm reads what it
   resolves TO, so a spec citing the wrong real line is invisible here.
+- **The claims join grades a claimed object's SHAPE, never whether it is a key.** It resolves
+  nothing by design, and the six things it cannot see are listed in the checker's own header rather
+  than restated here.
 - **A MISSPELLED shape-excluded name is still skipped.** The manifest-first resolution rescues a leg
   name that IS in the manifest; one that carries a `/` and is spelled wrong still falls through the
   shape exclusion unread, so it neither resolves nor reds.
