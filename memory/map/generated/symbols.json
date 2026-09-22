@@ -448,6 +448,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "build_alias_repo",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "build_anomaly_rows",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -973,6 +978,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_synthetic_log",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "build_tempdir",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -1421,6 +1431,11 @@
       "id": "check_projection",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_provenance_chain",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "check_quiet",
@@ -4308,6 +4323,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "read_jsonl",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "read_judged_kinds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4361,6 +4381,11 @@
       "id": "read_log",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "read_log_rows",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "read_manifest",
@@ -5345,6 +5370,11 @@
     {
       "id": "resolve_memory_root",
       "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "resolve_memory_root",
+      "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
     },
     {
@@ -6058,6 +6088,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "seed_records",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "seed_witness",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -6313,6 +6348,26 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_alias_column_is_separate_and_downweighted",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_alias_join_lands_on_the_named_record_and_only_it",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_alias_join_reaches_the_query_index",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_alias_on_versus_none_is_a_differential",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_alias_rebuild",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -6326,6 +6381,11 @@
       "id": "test_already_gone_is_not_a_signal_error",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_argv_grammar_and_the_refusal_are_gated",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_assignment_inside_a_dash_c_body_does_not_admit",
@@ -6388,6 +6448,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_budget_bounds_emission_and_beats_full_documents",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_budget_build_in_flight",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -6418,6 +6483,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_build_index_default_stays_in_memory",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_build_marker_lifecycle",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -6429,6 +6499,11 @@
     },
     {
       "id": "test_chunk_arm_rolls_up",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_chunk_matching",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
@@ -6593,6 +6668,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_ensemble_arg_grammar",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_every_advertised_gen_map_mode_runs",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -6651,6 +6731,16 @@
       "id": "test_explicit_kill_still_obeys_membership",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_export_day_counts_agree_with_an_independent_count",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_export_is_idempotent_and_leaks_no_query_text",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_extract_ac10_members",
@@ -6751,6 +6841,16 @@
       "id": "test_fresh_ac4_three_shapes",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_fts_query_safety",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_full_at_k_counts_targets_not_documents",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_gate_coverage_fails_on_an_uncompared_artifact",
@@ -7213,6 +7313,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_opened_attaches_to_an_explicit_qid_and_the_query_prints_it",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_orphan_outranks_rate",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -7289,6 +7394,11 @@
     },
     {
       "id": "test_python3_only",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_query_expr_refuses_empty_and_phrases_ids",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
@@ -7518,6 +7628,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_result_cap_keeps_the_true_hit_count",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_reuse_lookup",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -7528,9 +7643,19 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_rewrite_terms_are_required_and_survive_verbatim",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_rm3_is_seed_stable",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_rollup_dedupes_by_parent",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_root_that_claims_everything_refuses",
@@ -7541,6 +7666,16 @@
       "id": "test_row_contract_is_complete",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_rrf_is_rank_based_not_score_based",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_rrf_key_separates_two_windows_of_one_section",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_run_kill_refuses_a_bare_set",
@@ -7588,6 +7723,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_scoring",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -7626,6 +7766,11 @@
       "id": "test_shipped_conf_admits_this_repo",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_shown_paths_make_every_rank_recoverable",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_signals_can_move",
@@ -7708,6 +7853,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_substrate_dispatch_is_total",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_summary_counts_are_derived",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -7756,6 +7906,11 @@
       "id": "test_the_gate_and_its_template_are_byte_identical",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_the_selftest_pin_carries_an_unbroken_provenance_chain",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_tokenizer_strips_assignments_everywhere",
@@ -7951,6 +8106,11 @@
       "id": "writeStamp",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "write_alias_fixture",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "write_atomic",
