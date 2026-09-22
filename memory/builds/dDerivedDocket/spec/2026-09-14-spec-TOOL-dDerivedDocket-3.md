@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-3 — the run's landing path
 
-**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 4
+**Status:** CLOSED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -127,6 +127,10 @@ landing that cannot complete ending HELD instead of on local main.
 - **hands-off** `TOOL-dDerivedDocket-34` — the in-place landing sequence S6 carries, a reconcile from
   the remote's default branch onto the run branch and then `--prepare`, `--close`, `--land` and
   `--landed`, into which the switch-over's landing reconcile puts its steps before `--prepare`.
+- **hands-off** `TOOL-dDerivedDocket-61` — the in-place landing sequence S6 carries, from the
+  attestations' commit through `--prepare` and the close to `--landed`, and its rule that nothing is
+  committed after the push, against which that unit scopes the Skill's Record-the-run placements by
+  landing mode.
 
 ## 4. Design
 
@@ -617,6 +621,10 @@ New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `
   stamp's clean-tree terms are still `run-gates.sh:1114-1119` and `:1861-1863`. §4's byte
   arithmetic held: both protocol carriers end the pass at 60275 bytes and 673 lines against 60313
   and 674 at the parent, so the trim paid for the §6 rewrite and both §8 rows with room left.
+- rev-7 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-61`, answering that
+  unit's consumes-from for the in-place landing sequence S6 carries and its no-commit-after-the-push
+  order, against which it scopes the Skill's Record-the-run placements. Edges only: the unit stays
+  CLOSED, and nothing it built or specified moved.
 
 ## 10. Reuse audit
 

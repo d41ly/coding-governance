@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase
 
-**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
+**Status:** CLOSED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -136,8 +136,8 @@ lists among this unit's closes.
   the advertised tip goes; the call-site table that derivation must respect; and the lease matrix,
   to which that unit adds the `released <iso> landed` row.
 - **hands-off** `TOOL-dDerivedDocket-27` — the `host-degraded` code and the `probe gate` condition
-  that a kill before `acquired` holds with, and the lease's stale-bound formula, whose first term
-  that unit moves to the pinned backstop.
+  that a kill before `acquired` holds with. The lease's stale-bound formula is no longer handed to it:
+  that unit's S11 was withdrawn at its rev-8 (`TOOL-dDerivedDocket-61` §8 F1).
 - **hands-off** `TOOL-dDerivedDocket-28` — the named precondition seam in `--hold` where the
   run-owned process reap goes, and the `--status` line the orphan count joins, and the reap step
   inside `--resume`, placed after the lease is held on the take-over and matching-id rows only.
@@ -146,6 +146,9 @@ lists among this unit's closes.
   labels a claiming build terminal or not, report-only.
 - **hands-off** `TOOL-dDerivedDocket-24` — the `inherited-red` hold code and the resumable HELD
   stop the park policy ends in.
+- **hands-off** `TOOL-dDerivedDocket-61` — HELD, `run_hold`, the resume matrix with its
+  refusal-before-write property, `run_takeover`'s step order and the tri-state `check_lease_fresh`,
+  which that unit re-keys onto the run-state lease facts while keeping every row's property.
 
 ## 4. Design
 
@@ -212,9 +215,9 @@ refreshed <iso>
 ```
 
 or `released <iso> held` after `--hold`. The bound is `max(GATE_BOUND, LEASE_STALE_AFTER)` in this
-unit. The declared-wall unit replaces the first term with the record's pinned `gate-backstop` fact
-(`TOOL-dDerivedDocket-27` S11), and keeps `GATE_BOUND` as the announced fallback for a record that
-carries no such fact. `LEASE_STALE_AFTER` is a new optional conf key defaulting to 7200 seconds,
+unit. The declared-wall unit was to replace the first term with the record's pinned `gate-backstop`
+fact (`TOOL-dDerivedDocket-27` S11); that S11 was withdrawn, because `TOOL-dDerivedDocket-61` retires
+this lease and both of its bounds for `RESUME_STALE_BOUND` (its §8 F1). `LEASE_STALE_AFTER` is a new optional conf key defaulting to 7200 seconds,
 announced when defaulted. The first term exists because a live bar can hold a session silent for
 the whole bar.
 
@@ -983,6 +986,13 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
     the reap-before-schedule measurement is settled the way AC23 already witnesses it: the ordering
     MOVES to `UNATTENDED-STOPS.md`, §5 keeps none of it, and the Skill's user-facing copy above is
     the one that stays. No criterion moved.
+- rev-8 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-61`, answering that
+  unit's consumes-from for HELD, `run_hold`, the resume matrix, `run_takeover`'s step order and
+  `check_lease_fresh`, which it re-keys onto the run-state lease facts. Edges only: the unit stays
+  CLOSED, and nothing it built moved. The §3 hands-off to unit 27 and §4 'The lease' named unit 27's
+  S11 re-terming of the lease bound, which unit 27 has since withdrawn; both passages now say so and
+  point at `TOOL-dDerivedDocket-61` §8 F1, so the record does not describe a handoff that will not
+  happen.
 
 ## 10. Reuse audit
 

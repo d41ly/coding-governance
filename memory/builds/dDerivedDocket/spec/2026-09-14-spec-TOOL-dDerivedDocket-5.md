@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-5 — auto-resume from HELD
 
-**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 5
+**Status:** CLOSED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -135,6 +135,9 @@ default-off gate for this one feature, and this unit records that ruling as a de
   is no hold to schedule against and no take-over to schedule.
 - **consumes-from** `TOOL-dDerivedDocket-1` — the attributed criterion over the unattended suites
   this unit's verification reads: `verdict clean`, with every inherited suite filed.
+- **hands-off** `TOOL-dDerivedDocket-61` — `RESUME_SCHEDULE` as the durable restart of a HELD run,
+  which is why that unit's resume tick skips HELD, and the `--scheduled` refusals evaluated ahead of
+  the resume matrix, which that unit leaves unchanged.
 
 ## 4. Design
 
@@ -686,6 +689,10 @@ pair, and recorded in the unit's journal. No gate can make it.
     the arm asserts; its PASSING branch is armed in the published fixture on its own announcement
     rather than on a take-over, whose authorization re-verification is a different subject and would
     have made the arm red for a reason AC8 is not about.
+- rev-8 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-61`, answering that
+  unit's consumes-from for `RESUME_SCHEDULE` as HELD's restart and the `--scheduled` refusals ahead
+  of the resume matrix. Edges only: the unit stays CLOSED, and nothing it built or specified
+  moved.
 
 ## 10. Reuse audit
 

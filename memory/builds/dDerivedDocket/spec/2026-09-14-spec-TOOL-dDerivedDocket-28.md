@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-28 — run-owned process ledger
 
-**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
+**Status:** SPECCED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -97,6 +97,10 @@ rule: nothing kills a process this run did not start.
 - **consumes-from** `TOOL-dDerivedDocket-48` — the two-file capture inside `run_bounded`, which this
   unit wraps rather than rewrites. Without knowing that unit lands first, S1's pin would be read as
   forbidding the split and the two units would contradict each other on one function.
+- **hands-off** `TOOL-dDerivedDocket-61` — the orphan reap S3 places on the `--resume` rows that
+  hold the lease, the take-over at the HELD unit's reap step and the holder's matching-id row, and
+  the per-slug ledger S1 keeps beside the lease under the git common dir. That unit keeps each reap
+  on its re-keyed row that holds the lease and leaves the ledger's directory in place.
 
 ## 4. Design
 
@@ -428,6 +432,10 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
 - rev-6 · 2026-09-21 · order re-declared from 28 to 27 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 27, beside TOOL-dDerivedDocket-26. No criterion, design or edge moved.
+- rev-7 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-61`, answering that
+  unit's consumes-from for the S3 reap on the `--resume` rows that hold the lease and the S1
+  ledger's directory under the git common dir. No criterion, design or other edge moved, and the
+  status stays SPECCED.
 
 ## 10. Reuse audit
 

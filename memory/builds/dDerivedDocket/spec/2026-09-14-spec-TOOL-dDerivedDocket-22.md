@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-22 — LANDED derived from the tip
 
-**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 22
+**Status:** CLOSED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
@@ -221,6 +221,10 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   defect in each other. Without the split a reader who meets one of the two is routed to neither.
 - **hands-off** `TOOL-dDerivedDocket-28` — the in-place removal point, `--landed`'s successful
   observation, where that unit removes its ledger.
+- **hands-off** `TOOL-dDerivedDocket-61` — the LANDED derivation S2 put inside
+  `read_derived_phase`, `read_landing_commit`, whose comparison that unit narrows by the six
+  lease-fact lines, and the in-place `--landed` observation with the matrix row that reads it,
+  which that unit moves out of the retired lease file into `landed.<slug>.log`.
 
 ## 4. Design
 
@@ -810,6 +814,10 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
     half its lines with another at its first commit dates by that other's add. On a real history the
     source is older, which is the grandfathering direction §4 states; the dated fixtures use
     dissimilar records, because a backdated commit is older than its own copy source.
+- rev-8 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-61`, answering that
+  unit's consumes-from for the LANDED derivation, `read_landing_commit` and the in-place `--landed`
+  observation, which it moves into `landed.<slug>.log`. Edges only: the unit stays CLOSED, and
+  nothing it built or specified moved.
 
 ## 10. Reuse audit
 

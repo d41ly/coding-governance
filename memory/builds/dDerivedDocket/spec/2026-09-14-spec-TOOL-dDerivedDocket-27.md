@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** SPECCED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
+**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -78,10 +78,10 @@ fits, instead of reporting all three like a red leg.
 - **S10** The unattended suites run under attribution at the build's one post-build bar, the run
   the main loop makes at VERIFYING after the last unit; this unit's pass writes the arms and
   stages each RED. Observed by AC10.
-- **S11** The lease's stale bound (`TOOL-dDerivedDocket-4` §4 'The lease') takes the pinned
-  `gate-backstop` fact as its first term, `max(gate-backstop, LEASE_STALE_AFTER)`. `GATE_BOUND` is
-  the announced fallback when the record carries no fact. KF7 specified
-  `max(backstop, declared bound)`, and this is where the build delivers it. Observed by AC9.
+- **S11** WITHDRAWN at rev-8 (orchestrator, 2026-09-22, TOOL-dDerivedDocket-61 §8 F1): that unit
+  deletes `resolve_lease_bound` with the rest of the file lease and grades staleness against
+  `RESUME_STALE_BOUND` through the `--liveness` clock, whose gate-log term moves while a bar runs,
+  so no lease bound is left for the backstop to re-term. NOT OBSERVED: withdrawn.
 - **S12** This unit's delta on every capped carrier is ZERO OR NEGATIVE. Leg check 22 owes the two
   conf keys ONE joined protocol key-table row, and §4 names the two §8 spans that fund it — one
   restatement and one argument, no rule among them. Observed by AC14.
@@ -98,14 +98,16 @@ fits, instead of reporting all three like a red leg.
 - **The attended bar and the push boundary.** The pre-push hook and a person's run keep the profile
   row's wall. `GATE_WALL` here governs the unattended bar only.
 - **`GATE_BOUND`'s default and its other consumers**: the wiring check, the lander probes, the
-  asks witness and `--dispatch`'s declared spec-token checker keep the declared bound. The lease's
-  stale bound is not one of them: S11 moves its first term to the backstop.
+  asks witness and `--dispatch`'s declared spec-token checker keep the declared bound.
+- **The lease's stale bound.** This unit leaves its first term at `GATE_BOUND`. S11, which moved
+  that term to the backstop, is withdrawn: `TOOL-dDerivedDocket-61` deletes the bound with the file
+  lease, and keeping a bar that runs past the bound out of STALE is that unit's, through the
+  gate-log term of its one clock (its §8 F1).
 
 ### Edges
 
-- **consumes-from** `TOOL-dDerivedDocket-4` — the `host-degraded` hold code and the `probe gate` and
-  `probe host` conditions the two `hold` lines name, and the `--hold` verb S7 routes to, and the
-  lease's stale-bound formula S11 re-terms.
+- **consumes-from** `TOOL-dDerivedDocket-4` — the `host-degraded` hold code, the `probe gate` and
+  `probe host` conditions the two `hold` lines name, and the `--hold` verb S7 routes to.
 - **consumes-from** `TOOL-dDerivedDocket-25` — exit 3, TREE MOVED, which S5 re-runs once.
 - **consumes-from** `TOOL-dDerivedDocket-26` — exit 4 and the `gate queue: acquired` line, without
   which a kill in the queue cannot be told from a kill in a leg.
@@ -319,20 +321,13 @@ raised: raising one is an owner turn.
   refused under `ANCHOR_SCOPE=published`.
   permission: both run over the rendered tree rather than a fixture, so they are gate legs and are
   observed at the build's one post-build bar.
-- **AC9** — When `tools/unattended/unattended.test.sh` runs `gates-green` with a stub bar that sleeps
-  past `GATE_BOUND` and past `LEASE_STALE_AFTER`, both set low in the fixture conf, but stays inside
-  the pinned `gate-backstop`, then `--status` from a second worktree of the fixture repository prints
-  no `presumed-stopped`, and `--resume --keepalive-id C` there refuses with a numbered message.
-  Red when: the lease bound keeps `GATE_BOUND` as its first term, so a live bar past it reads
-  `presumed-stopped` and a second session takes the slug over.
-  fixture: a second WORKTREE, not a second clone, because the lease lives under the git common dir,
-  which a clone does not share.
-  permission: the arm is written and staged RED in the pass; the suite that executes it,
-  `tools/unattended/unattended.test.sh`, sits on no bar leg at all, so the run that executes it is
-  the VERIFYING run's attributed
-  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
-  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
-  suite.
+- **AC9** — WITHDRAWN at rev-8 (orchestrator, 2026-09-22, `TOOL-dDerivedDocket-61` §8 F1), with
+  S11, the one item it observed. That unit deletes the lease bound this criterion graded and judges
+  staleness through the `--liveness` clock instead, so nothing is left here to observe and no
+  witness is named.
+  Red when: never in this unit. The property it guarded, that a bar running past the bound never
+  reads stale and a second session cannot take the slug over mid-bar, is observed by that unit's
+  AC20, which reds when a fresh gate log past the bound reads STALE.
 - **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
   build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
   no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
@@ -579,6 +574,16 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
 - rev-7 · 2026-09-21 · order re-declared from 27 to 28 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 28, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
+- rev-8 · 2026-09-22 · §2 S11 · §3 · §6 AC9 · the orchestrator decided `TOOL-dDerivedDocket-61`
+  §8 F1 as option (a) under the delegated M3 rule. That unit deletes `resolve_lease_bound` and
+  grades staleness against `RESUME_STALE_BOUND` through the `--liveness` clock, whose gate-log term
+  moves while a bar runs, so S11 and AC9, the one criterion that observed only S11, are withdrawn
+  in place and keep their numbers. KF7's `max(backstop, declared bound)` is no longer delivered
+  here; the property AC9 guarded passes to that unit's AC20. §3's non-goal on `GATE_BOUND`'s
+  consumers loses its S11 sentence to a non-goal of its own, and the consumes-from edge to unit 4
+  drops the stale-bound formula. The pinned `gate-backstop` fact stays: S4 pins it and
+  `gates-green` still bounds `$GATE_CMD` by it. No other S-item, criterion or edge moved, and §4,
+  §5, §7 and §10 carried nothing that rested on S11.
 
 ## 10. Reuse audit
 

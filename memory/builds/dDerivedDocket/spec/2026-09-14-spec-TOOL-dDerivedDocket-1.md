@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-1 — held-suite failure baseline
 
-**Status:** CLOSED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 1
+**Status:** CLOSED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -143,6 +143,8 @@ at L, and no OVER BUDGET at L. It is stated once, in S10. Built first, by owner 
 - **hands-off** `TOOL-dDerivedDocket-32` — both runner headers as S8 leaves them, whose "nothing
   runs automatically" sentence that unit corrects, and the run-gates and unattended version moves
   (S9) its header edits ride.
+- **hands-off** `TOOL-dDerivedDocket-61` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit's verification reads.
 
 ## 4. Design
 
@@ -503,6 +505,9 @@ New arm: `tools/run-gates/run-selftests.test.sh` · a two-commit fixture repo wh
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at VERIFYING, and the ledger
   lines for those criteria are owed to that run. AC7 and the pass's half of AC11 WERE observed
   here, directly and without a suite.
+- rev-7 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-61`, answering that
+  unit's consumes-from for the S10 criterion its AC15 reads at VERIFYING. Edges only: the unit stays
+  CLOSED, and nothing it built or specified moved.
 
 ## 10. Reuse audit
 
