@@ -136,6 +136,7 @@ memory/builds/aReapedSpinner/README.md
 memory/builds/aGradedDialect/README.md
 memory/builds/aLeakedHandle/README.md
 memory/builds/dMuffledSentinel/README.md
+memory/builds/dLoggedFlight/README.md
 memory/builds/dPolishedVitrine/README.md
 memory/builds/cGradedDebt/README.md
 memory/builds/cSpliceWarden/README.md
@@ -145,4 +146,10 @@ memory/builds/cWidenedNet/README.md
 memory/builds/aRatifiedRulings/README.md
 memory/builds/aProbedUnit/README.md
 memory/builds/aDeferredBar/README.md
+memory/builds/aWokenSentinel/README.md
 memory/builds/dMergedTally/README.md
+memory/builds/aProbedToolkit/README.md
+memory/builds/aBlindedTrial/README.md
+memory/builds/cMendedVintage/README.md
+memory/builds/dGatedProse/README.md
+memory/builds/dPinnedHandoff/README.md

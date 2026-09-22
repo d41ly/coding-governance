@@ -13,6 +13,7 @@ gate-legs = [
   "review-join ban (no ref-keyed join)",
   "review-join self-test",
   "tier2-review self-test",
+  "unattended-build self-test",
 ]
 kits = []
 git-hooks = []
@@ -77,7 +78,11 @@ kit's own directory, the tool root, and the memory-tree kit's directory filled i
 engine file verbatim, so the four install paths the harness spells used to reach an adopter at
 another prefix naming files that adopter did not have. The third token is PROBED from the tracked
 tree rather than derived from the prefix, because an adopter may install that kit flat. The harness
-is claimed by the unattended dossier and its template here, because this kit renders it.
+is claimed by the unattended dossier and its template here, because this kit renders it. Its
+suite is `unattended-build.test.sh`, claimed here beside the tier2-review and review-join suites:
+it exercises `unattended-build.js` and `unattended-unit.js` with stub hooks in place of the
+Workflow runtime, and it is held on the bar like its siblings (`TOOL-aWokenSentinel-21`, enrolled
+in this claim, the `PASS` count line and the subject pin by `TOOL-aWokenSentinel-27`).
 
 **The build harness REQUIRES a `scratch` argument, and it is the one path that cannot be rendered.**
 The session scratchpad is in the caller's system prompt and nowhere a workflow script can read, and

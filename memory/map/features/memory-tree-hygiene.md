@@ -1,4 +1,4 @@
-# memory-tree hygiene engine — the 21-check gate over the memory tree
+# memory-tree hygiene engine — the gate over the memory tree
 
 ```toml
 feature = "memory-tree-hygiene"
@@ -31,8 +31,8 @@ globs = [
 
 ## What it is
 
-One shell engine over the tracked contents of `<MEMORY_ROOT>/`, 22 checks, plus the epoch rule that
-makes its verdicts datable. Checks 9 and 13-21 delegate to sibling Python modules
+One shell engine over the tracked contents of `<MEMORY_ROOT>/`, plus the epoch rule that
+makes its verdicts datable. Checks 9, 13-21 and 24 delegate to sibling Python modules
 (`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`); this dossier owns the engine,
 its self-test and the epoch, not those modules. The self-test's project-key arms run the engine over
 the suite's own scratch tree, one invocation per arm, never over an archive of this repository
@@ -48,7 +48,7 @@ Check 6 is the part that moves most, so it is the part worth writing down.
 
 | class | byte bound | line bound |
 |---|---|---|
-| `guides/*.md` | 60 KB (hardcoded) | 750 |
+| `guides/*.md` | `GUIDE_CAP_BYTES`, 96 KB (98304) by default | `GUIDE_CAP_LINES`, 1200 by default |
 | `builds/*/README.md` | 25 KB (hardcoded) | none |
 | `<MAP_ROOT>/features/*.md` | `DOSSIER_CAP_BYTES` | none |
 | every other row document | `ROW_DOC_CAP_BYTES` | none |

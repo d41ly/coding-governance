@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 3 · ratified 2026-09-04
+**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 3 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,10 @@
 |---|---|---|
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-06-build-TOOL-aHonedRuleset-4-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aHonedRuleset-4-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md) | diff-review | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-8 |
+| [2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 
 <!-- /gen:spec-records -->
 
@@ -30,8 +33,14 @@ backlog row `TOOL-dFramedEntrypoint-1`.
 - **S1** — Rewrite the bullet occupying `coding-governance-agents.template.md:230-245` so the
   surviving text carries only: the two-rules sentence, the gloss separating the two bounds, the
   rate-limiter rationale, the CONSOLIDATE rule, the route-through instruction, the fact that
-  enforcement happens at the tool call on the exact matcher pair, the parity sentence, and the
-  pointer at `tools/hooks/README.md`.
+  enforcement happens at the tool call on the exact matcher pair, the parity sentence, the pointer at
+  `tools/hooks/README.md`, **and the two parity-pinned clauses S2 requires**: fragment I compressed
+  to `cannot resolve to an integer ≤5`, and fragment J rewritten per S5 around
+  `an array LITERAL of ≤5 elements`. Those two were absent from the rev-4 list while S2, S5 and §4's
+  PAIRS table all require them to survive, so a builder implementing the list literally would delete
+  two of the five pinned phrases and red `playbook parity` on two rows with
+  `an extraction matched NOTHING`. §4's inventory grades them COMPRESS and REWRITE — survivors, not
+  casualties — and the list now agrees with it.
 - **S2** — Every one of the five phrases `tools/check-playbook-parity.sh` extracts from this bullet
   survives verbatim, each intact on a single line, because the gate's extractions are `sed`
   substitutions applied line by line and a phrase split across a wrap resolves to nothing.
@@ -51,7 +60,11 @@ backlog row `TOOL-dFramedEntrypoint-1`.
   `skills/session-kickoff/manifest-check.sh:412-421` fails check 5 whenever a watched file is staged
   and the staged manifest's block stamp still equals HEAD's, so the bundle is the only green path
   through a blocking pre-commit. The §B claims those two files feed are re-verified before the
-  re-stamp; this is unit 5's S8 mechanism applied to this unit's own watched carrier.
+  re-stamp; this is unit 5's S8 mechanism applied to this unit's own watched carrier. **BOTH stamp
+  keys, not one — `last-audit` alone does not clear check 9, which counts watched commits since
+  `last-body-change` and fails at 10.** The re-derivation command, the measured counter and the two
+  prior builds where this was ruled a blocker are stated in full at `TOOL-aHonedRuleset-5` S8, which
+  this item points at rather than copying.
 - **S7** — The two neighbouring `§8` bullets at `coding-governance-agents.template.md:251` and
   `:252` collapse into one. What survives is the restricted-runtime fact, the instruction to inline
   the schema discipline as a snippet, the fact that a sidechain agent holds NEITHER tool so the
@@ -68,8 +81,11 @@ backlog row `TOOL-dFramedEntrypoint-1`.
   are copies of a single wrong claim about `tools/hooks/agent-cap.js`, and correcting one carrier
   while leaving the other is the `amendment-leaves-its-other-half-standing` class this build audits.
   That is what separates S8 from S7, which folds two independent bullets.
-- **S9** — The backlog row `TOOL-dFramedEntrypoint-1` in `memory/backlog/TOOL.md:40` flips from
-  `OPEN` to `CLOSED` in the same commit, with a pointer at `builds/aHonedRuleset/`. Its stated fix is
+- **S9** — The backlog row `TOOL-dFramedEntrypoint-1` in `memory/backlog/TOOL.md` — addressed by ID
+  and never by line, the way AC11 already greps for it — flips from `OPEN` to `CLOSED` in the same
+  commit, with a pointer at `builds/aHonedRuleset/`. The rev-4 text pinned `:40`, which was already
+  the WRONG line at this spec's own base and names a plausible-looking CLOSED neighbour at HEAD;
+  backlog rows are added above one another, so a line pin into one is stale by construction. Its stated fix is
   "two sentences, in the file that owns each", and S5 and S8 are those two sentences, so the row has
   nothing left open. The flip is part of this unit, not a follow-up.
 
@@ -249,8 +265,14 @@ neither edited region contains a `{{…}}` placeholder and the render therefore 
 
 | File | Before this unit | After | Ceiling | Free after |
 |---|---|---|---|---|
-| `coding-governance-agents.template.md` | 49018 | 48485 | 49152 | 667 |
-| `AGENTS.md` (regenerated, not hand-edited) | 64380 | 63847 | 64512 | 665 |
+| `coding-governance-agents.template.md` | 49018 | 48531 | 49152 | 621 |
+| `AGENTS.md` (regenerated, not hand-edited) | 64355 | 63868 | 64512 | 644 |
+
+*MEASURED at rev-6, after the build. The `After` column held the PREDICTED 48485/63847, which
+assumed a 533-byte recovery; the built cut recovers **487** — the replacement prose came out 46
+bytes fatter than the §4 candidate once every parity phrase was held on its own physical line,
+which is a constraint the candidate block did not have to satisfy. AC4 asks for at most 48611 and
+the landing is 48531, so the criterion holds on the measurement rather than on the estimate.*
 
 Three more files are touched and are absent from the table because none carries a size ceiling:
 `memory/guides/SESSION-KICKOFF.md`, where S6 re-verifies the §B claims and re-stamps `last-audit`;
@@ -264,10 +286,18 @@ arithmetic, not a measurement. If unit 2 does not land, this unit lands at 48611
 and 539 free; if unit 2 also drops its 86-byte connective, at 48399 and 63761 with 753 and 751 free.
 
 The advisory `TEMPLATE-SIZE WARN` about growth past the recorded high-water of 48378 survives this
-cut on every one of those branches, because the smallest of them, 48399, is still above it. The
-margin is 21 bytes, down from 178 before `F3` widened the cut, so a fourth cut on this carrier could
-take the template under its high-water and clear the WARN as a side effect. Clearing it is still not
-this unit's job, and dropping below a high-water reds nothing.
+cut. **Restated at rev-5 from the RATIFIED path only**, because the rev-4 arithmetic hung its margin
+off the if-unit-2-drops-its-connective branch, and `TOOL-aHonedRuleset-2` §8 F2 was RESOLVED on
+2026-09-04 as *keep the connective — S2 ships as written at 86 bytes*. Under the ratified plan the
+landing MEASURED at **48531** — 613 below the base 49144, of which 126 is unit 2's and **487** is
+this unit's — so the margin over the 48378 high-water is **153 bytes**, seven times the 21 rev-4
+stated. rev-5 predicted 48485 and 107 from an assumed 533-byte cut; rev-6 replaces both with what
+the build actually produced, because a prediction left standing beside a measurement is the same
+class this unit's own §5 warns about. A fourth cut on this carrier could still take the template under
+its high-water and clear the WARN as a side effect; clearing it is not this unit's job, and dropping
+below a high-water reds nothing. The live figure is what
+`bash tools/check-template-size.sh` reports, and a later session sizing a cut should read it there
+rather than trust this line.
 
 ### Alternatives rejected
 
@@ -342,8 +372,14 @@ this unit's job, and dropping below a high-water reds nothing.
 - **AC7** — When `grep -rc 'passes unmarked' coding-governance-agents.template.md AGENTS.md
   tools/hooks/README.md` runs, every one of the three returns `0`, and
   `grep -n 'array LITERAL of ≤5 elements' coding-governance-agents.template.md` still returns exactly
-  one line. Both carriers of the wrong claim are corrected, which is what closes
-  `TOOL-dFramedEntrypoint-1`.
+  one line. **And the correction is observed PRESENT, not only the wrong sentence observed absent**:
+  `grep -c 'is a receiver' coding-governance-agents.template.md tools/hooks/README.md` returns at
+  least `1` for each, that being the pinned phrase of the replacement S5 and S8 both write. Without
+  the positive half, deleting `tools/hooks/README.md:117` outright — or replacing it with a
+  DIFFERENT wrong sentence — passes every criterion in this spec while violating S8, and the unit then
+  closes `TOOL-dFramedEntrypoint-1` on a fix half of which was never observed to exist. §5's risk
+  line names that exact hazard, and an absence-only criterion is the green-by-absence shape §7 bans.
+  Both carriers of the wrong claim are corrected, which is what closes `TOOL-dFramedEntrypoint-1`.
 - **AC8** — When `git diff --stat` is read on the landing commit, exactly five files are touched:
   the two carriers `coding-governance-agents.template.md` and `AGENTS.md`, S6's bundled re-stamp of
   `memory/guides/SESSION-KICKOFF.md` which the pre-commit hook requires, S8's
@@ -354,6 +390,15 @@ this unit's job, and dropping below a high-water reds nothing.
   returns `0`, and the `§8` bullets between `- Persist each Tier-2 run` and `- Verify before "done"`
   number exactly one. That observes the widened cut `F3` ordered: two bullets became one, and the
   third and fourth statements of the enforcement location are gone rather than merely reworded.
+- **AC12** — When `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs, it exits green and
+  reports `agent-cap self-test`, `scratch-guard self-test`, `verifier fan-out self-test`,
+  `review-join self-test` and `hook destinations self-test` as RUN rather than skipped. §7 states the
+  Definition of Done owes this run because S8 arms five guarded `tools/hooks/` self-test legs, and
+  AC9's plain `bash tools/run-gates/run-gates.sh` structurally cannot reach them — §7 says so itself,
+  since every `chunk = selftests` leg is HELD on the ordinary bar and under `GATE_FULL=1`. These five
+  were the only §7 obligation with no criterion; every other leg §7 names is on the default bar. The
+  siblings already grade their off-bar suites, `TOOL-aHonedRuleset-3` AC7 and `TOOL-aHonedRuleset-5`
+  AC9, and this closes the inconsistency.
 - **AC11** — When `grep -n 'TOOL-dFramedEntrypoint-1' memory/backlog/TOOL.md` runs, the row reads
   `CLOSED` and points at `builds/aHonedRuleset/`, and `bash tools/memory-tree/check-memory-hygiene.sh`
   exits `0` over the edited backlog.
@@ -466,8 +511,40 @@ this unit's job, and dropping below a high-water reds nothing.
   `102e98f0`: the cap bullet 1488, the sidechain pair 580 as 313 plus 267, the untouched five 863,
   the three summing to 2931 over `230,252p`; the replacements 1110 and 425 for 1535; recovery 533,
   which is 25.8% of the edited region. Ceilings 49152 and 64512 read from
-  `tools/template-size-limits.txt`, high-water 48378 from `tools/template-size-highwater.txt`,
-  leaving 21 bytes of margin on the narrowest branch instead of the previous 178.
+  `tools/template-size-limits.txt`, high-water 48378 from `tools/template-size-highwater.txt`.
+  The margin figure this bullet carried was corrected at rev-5 to a predicted 107 bytes and at rev-6
+  to the MEASURED **153 bytes**;
+  see the `Files touched` paragraph above for why the old 21 was arithmetic off a closed fork.
+
+- rev-5 · 2026-09-06 · **round-2 spec audit folded: H3, M2, M4, M5, L1 and L2.** **H3** — S6 said
+  `last-audit` and this build named `last-body-change` nowhere; S6 now states both keys and POINTS at
+  `TOOL-aHonedRuleset-5` S8, which carries the mechanism, the re-derivation command and the measured
+  counter in full rather than a fifth copy of them. **M4** — S1's `only:` list omitted the
+  resolvable-K and array-literal clauses, which S2, S5 and §4's PAIRS table all require to survive;
+  implemented literally it would have deleted two of the five pinned phrases and red `playbook parity`
+  on both. Added, spelled as §4's inventory grades them. **M2** — AC7 was absence-only, so deleting
+  `tools/hooks/README.md:117` outright passed it while violating S8; it gains a positive assertion on
+  the replacement's pinned phrase. **M5** — §7 owes a `GATE_SELFTESTS=1` run for five armed
+  `tools/hooks/` legs and no criterion ran them, since AC9's plain bar HOLDS every
+  `chunk = selftests` leg; AC12 added. **L1** — §4's margin was computed off unit 2's dropped-connective
+  branch, which §8 F2 ratified AGAINST; restated as 107 bytes on the ratified path, in both places it
+  appeared, and pointed at `check-template-size.sh` as the live source. **L2** — S9's `memory/backlog/TOOL.md:40`
+  pin was wrong at this spec's own base and names a plausible CLOSED neighbour today; the row is now
+  addressed by id, as AC11 already did. No fork re-opened, no scope item removed, no acceptance
+  criterion weakened.
+
+- rev-6 · 2026-09-06 · **built; every figure replaced by its measurement, and the unit CLOSED.**
+  The cut recovers **487** bytes, not the 533 §4 estimated: holding each of the five parity-pinned
+  phrases on its own physical line — S2's requirement, and the thing a `sed`-per-line extraction
+  actually needs — cost 46 bytes the §4 candidate block never had to spend. The template lands at
+  **48531** against AC4's ceiling of 48611, so the criterion holds on the measurement. §4's
+  files-touched table, its high-water paragraph and the Alternatives bullet all carried the predicted
+  48485/107; all three now carry 48531/153, because a prediction left standing beside a measurement is
+  `amendment-leaves-its-other-half-standing`, which is the class the M6 checklist selected on this
+  unit's own build commit and was right about. `AGENTS.md`'s before-column also moves, 64380 to 64355,
+  since unit 2 landed first. Every acceptance criterion was run: AC2's five extractions were executed
+  ALONE against the template and each returned non-empty, which is what proves no phrase was broken by
+  a wrap — the first draft broke two of them and the build script now refuses that tree outright.
 
 ## 10. Reuse audit
 

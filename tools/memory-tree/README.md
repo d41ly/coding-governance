@@ -15,14 +15,14 @@ ARCH-bOrderlyAtlas-1.)
 | File | Role |
 |---|---|
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
-| `check-memory-hygiene.sh` | the gate — 23 checks (1-12, 21, 22 and 23 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 to `row_grammar.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
+| `check-memory-hygiene.sh` | the gate — 25 checks (1-12, 21, 22, 23 and 25 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 and 24 to `row_grammar.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
 | `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. |
 | `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
 | `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 pinned, 16 structural) (`--report` / `--check` / `--measure` / `--print-defined-ids` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none. `--print-defined-ids` prints the id grammar as a POSIX ERE on its first line, then every id the corpus DEFINES, for a caller that must join cited ids against the set without spelling the grammar — the kickoff checker's `--card --append` is that caller. |
 | `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff. |
 | `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. |
 | `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
-| `adopt-memory-tree.sh` | `--scaffold` an empty tree that passes once its conf declares the keys the gate reads from the config (new projects). |
+| `adopt-memory-tree.sh` | `--scaffold` an empty tree that passes once its conf declares the keys the gate reads from the config (new projects). `--render` re-renders the four rendered documents in a tree that already carries the adoption marker, and writes nothing else — the mode `[[regenerate]]` names, and the only one that refreshes them after adoption. It REFUSES on a tree with no marker, and on a kit directory missing any of the four templates, rather than replacing your committed rule set with a placeholder. |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |
 | `SPEC-TEMPLATE.template.md` | the canonical spec/design-pass format, copied to `memory/TEMPLATE-SPEC.md` at scaffold time; check 12 enforces it once `SPEC_FORMAT_CUTOFF` is set. |
 | `merge-rows.py` | the row-keyed three-way merge driver for the authored indexes (`DECISIONS.md`, `backlog/*.md`). TWO PLANES: one stateless predicate (`^\s*[-*]\s`) splits every line into ROW or STRUCTURE, structure is merged positionally by `git merge-file`, and only the row set is key-merged here. The two recombine through a SKELETON — each input projected to a line list where every row becomes a token (its id when the grammar keys it, else a digest of its text with the terminator and trailing whitespace dropped and LEADING whitespace kept, because indentation is nesting and nesting is content) and every other line passes through byte for byte — so placement comes from git's own diff rather than from a splice this driver computes. A conflict region that is entirely tokens on both sides resolves by concatenation, because both sides sit between the same context lines, so section membership is not in dispute and only sibling order is; ANY disputed structure line is always a conflict. Five postconditions run over the WRITTEN BYTES on every verdict: no row line or leading id written more often than any one input carried it, no row under a heading no input filed it under, per-key CONSERVATION (not uniqueness — a file may legitimately carry the same row line twice), and structure identity against the merged skeleton. The anchor grammar is IMPORTED from the sibling memory-recall kit (`grammar_for` / `anchor_at`), never vendored, and there is no degraded mode when it cannot be read: any failure becomes a conflict rather than a silent take-ours. Wiring is two facts in two places and the driver command carries the install prefix — see [Wire the row-keyed merge driver](#wire-the-row-keyed-merge-driver); do not hand-type it. NOT scaffolded by `adopt-memory-tree.sh` — wiring a merge driver is a per-node git config, not a file the scaffolder can write. The kit ships its own launcher, `merge-rows.sh`, carrying the python resolver inline, so a copy-installed kit at any prefix can start the driver. |
@@ -176,9 +176,10 @@ see the "Codebase-map interop" section the HYGIENE template ships. No conf keys 
 
 ## The build method's displaced sections
 
-`memory/guides/BUILD-METHOD.md` holds itself to a budget DECLARED ON ITS OWN LINE 8 - a LOCAL constraint and NOT
-rule 6's, which gives a guide far more and no longer caps lines outside `guides/` at all. Read the pair there;
-both figures were retyped here once and both were stale within a build, which is the argument against retyping
+`memory/guides/BUILD-METHOD.md` DECLARES NO BUDGET OF ITS OWN. It held one until `TOOL-aHonedRuleset-6`
+deleted the passage on an owner ruling, taking with it the admission that no gate enforced the pair; the
+file is capped now only by the hygiene class cap for `guides/`. The two figures were retyped into this
+README once and both were stale within a build, which is the argument against retyping
 them. It is re-read WHOLE at every pass boundary, so it grows only by displacement. The sections below live here
 because they are EXPLANATION: nothing below changes what an agent does next, and the rules that do stayed in the
 method.
@@ -222,8 +223,8 @@ wrote the other's path, so clauses 1 and 2 both pass, and the loss surfaces late
 Read these, do not restate them — a rule appearing both in the method and in one of these is a defect in the
 method.
 
-- `skills/session-kickoff/SKILL.md` + `memory/guides/SESSION-KICKOFF.md` — starting a unit, closed scope, the tier rule,
-  the six interactive exits.
+- `skills/session-kickoff/SKILL.md` + `memory/guides/SESSION-KICKOFF.md` — starting a unit, closed scope,
+  the tier rule. The six interactive exits moved to the unattended protocol's §13 (`TOOL-aHonedRuleset-3`).
 - `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
 - `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.
 - `memory/HYGIENE.md` — record placement, filename grammar, size budgets, the status vocabulary.

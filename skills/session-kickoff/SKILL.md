@@ -115,9 +115,7 @@ flagged §A task instead) and STAGE it; Step 5 commits it after the append: for 
 drift check lists, re-check the §B claim(s) derived from it (gate fence ← CI/scripts · pointer
 map ← moved dirs · traps/corrections ← toolchain files), fix or DELETE stale rows, and delete
 dated entries whose prune-when condition now holds.
-Re-stamp `last-audit` (ISO datetime with offset · sha = `HEAD` on the default branch, else
-`git merge-base <remote>/<default> HEAD`; no remote → `git merge-base <local-default> HEAD` —
-Step 0 already resolved the local default), and record
+Re-stamp `last-audit` (ISO datetime with offset · sha per the manifest's own stamp rule), and record
 `manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp: <n>`
 (n = `git rev-list --count <old-stamp-sha>..HEAD -- <watch…>`, counted BEFORE re-stamping) in the
 repair commit message AND the READY card. The repair rides the session's unit branch/worktree — never a direct
@@ -150,6 +148,15 @@ pass**, a written spec (goal · scope · non-goals · acceptance) approved BEFOR
 per the project's plan convention. When the project's memory kit ships a spec template, the spec
 follows it — the template states its own section count and the gate that enforces it; do not restate
 that number here, because it has already gone stale in three other carriers.
+
+**The spec audit is the owner's call, asked once.** When the DoR is a design pass AND the build method
+the manifest names makes the audit opt-in (`grep -q 'spec-audit:'` on that carrier; no carrier or no
+hit → skip, one clause), put ONE `AskUserQuestion`: "Declare `spec-audit:` for this build?" —
+recommend yes for two or more units or an open §8 fork, no otherwise; recommend, never decide. On
+yes, write `spec-audit: <today>` into the build README front matter BEFORE the spec pass (create the
+README first when the DoR authors it); on no, write nothing. Do NOT ask when the build README already
+carries `spec-audit:` (card `declared <date>`), else when `<repo>/.unattended.conf` declares a dated
+`SPEC_AUDIT_DEFAULT` (card `project default <date>`): a "no" could change nothing.
 
 If a field still can't be filled after you've DERIVED from the message/memory/code AND asked
 (`AskUserQuestion`) — acceptance + gates especially — say so plainly: it isn't Ready — split or clarify
@@ -197,7 +204,9 @@ slug per its rules and draft the ledger row for the user. No id scheme → skip 
 Echo a compact **READY card** — repo · remote/default branch · `## task` (the sealed fields:
 scope in/out · acceptance · gates · slug or "none") · `## manifest` (the audit delta line, when
 Step 2b ran a repair) · `## read` (governing docs + entrypoints) · `## records` (prior records +
-the `Recall terms used:` line) · `## classes` (the gotcha names) · `## open` (parked items) —
+the `Recall terms used:` line) · `## classes` (the gotcha names) · `## open` (parked items, plus
+Step 3's answer, or what answered for it: `spec audit: declared <date>`,
+`spec audit: not declared (owner)` or `spec audit: project default <date>`) —
 closed by the READY micro-format at branch + `base` = BASE. Pipe the six sections and that line
 into `bash <check-script> --card --append --session <sid>`, `<sid>` from the `orientation —`
 header in context; report a refusal on the card and still stop. Commit Step 2b's staged repair
@@ -219,28 +228,17 @@ as written, prompt string and all.
 Inside one: echo the READY card, append it as Step 5 does plus one line naming the build and its
 run-state file, commit the staged repair after that append, and **continue without halting**. The
 card is still emitted — an unattended run needs its scope on the record MORE, because nobody is
-going to ask.
+going to ask. Step 3's spec-audit question is never asked here: the README at BASE decides, and that
+kit's preflight line already states the posture.
 
 Before the first pass, load the project's build method if it ships one —
 `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, rendered by the memory-tree kit: the spec set, the fork
 rule, the pass loop and the regrounding procedure, none of which this engine states.
 
-**The six interactive exits, and how each resolves with no owner turn** — a run that still stops
-at any of these is not unattended, it is stuck:
-
-1. **Step 0 · ambiguous worktree parent** ("Ask only if ambiguous") → resolve to the checkout holding
-   the default branch; if still ambiguous, ABORT and record why.
-2. **Step 0 · no git anywhere** ("scope-only kickoff, or stop") → ABORT: there is nothing to land into.
-3. **Step 1 · the STOP conditions** (foreign `MERGE_HEAD`/`UU`, a failed ff-merge, a branch violating
-   conventions) → ABORT and record the condition verbatim: continuing here is how a run destroys
-   work, and the mandate does not reach them.
-4. **Step 2 · no manifest, offer to scaffold** → do NOT scaffold. Proceed with the generic steps and
-   park the offer as a decision the owner gets at the wrap-up.
-5. **Step 3 · a field that cannot be derived** → park it with the question, the options seen, and the
-   reason, then proceed on the most conservative reading. If ACCEPTANCE or GATES is the unfillable
-   field, ABORT: a unit with no acceptance check is not Ready, and an unattended run cannot split it.
-6. **Step 5 · the READY stop** → replaced by this step's hand-back, the ONLY replacement the
-   mandate buys.
+**Six other interactive exits of this engine stop to ask, and a mandated run that stops at one is stuck, not
+unattended.** `<MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md` §13 enumerates them and how each resolves
+with no owner turn; this step's hand-back is the only one of the six the mandate buys. Not restated
+here — a paraphrase and its source are two answers to one question.
 
 An ABORT is a VERB: the unattended kit's `--abort <slug> --reason "<why>"` writes the reason into
 the run-state file's parked region, records a terminal phase with a witness, and stages it. A run

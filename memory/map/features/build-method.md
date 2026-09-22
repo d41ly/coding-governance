@@ -76,8 +76,12 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
 - **Headroom is MEASURED, not recorded here.** The pair that used to sit in this bullet was wrong in
   the measurement and in the caps it named, because both move and a number typed beside them does
   not. The caps are declared on the method's own line 8; compare with
-  `awk 'END{print NR}' memory/guides/BUILD-METHOD.md` and `wc -c`. The line axis binds before the
-  byte axis, so M1's displacement rule stays load-bearing.
+  `awk 'END{print NR}' memory/guides/BUILD-METHOD.md` and `wc -c`. Which axis binds first is M1's to
+  state, and only the byte axis has a leg — `build-method size`, reading the
+  `tools/template-size-limits.txt` row. **The owner ruled on 2026-09-21 that the budget STANDS and
+  moves**, settling `TOOL-dLoggedFlight-35`, which recorded `TOOL-aHonedRuleset-6` deleting the
+  declaration and `TOOL-aHoistedPass-3` making it enforceable. `TOOL-dGatedProse-4` moved both
+  halves to the figures the owner ruled on 2026-09-22, and the reason sits beside the row.
 - **The carrier check is STRUCTURAL, not semantic.** `check-method-carriers.sh` catches an
   undeclared carrier, a stale row and a copied `## M<n>` section. A fluent paraphrase that invents
   its own headings passes, and the leg says so rather than implying a comprehension it lacks.
@@ -95,7 +99,18 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   category assertion nothing could falsify, and it reached that state by losing its mechanism clause
   in a deletion no record explains. The replacement is falsifiable: it names the missing input, so a
   reader can check whether the call carries it. The obligation is still the method's least
-  instrumented step, because nothing yet asserts that a spec audit HAPPENED.
+  instrumented step, because nothing yet asserts that a spec audit HAPPENED. Since
+  `TOOL-aBlindedTrial-6` it is also OPT-IN: M4 owes the audit only where the build README's front
+  matter declares `spec-audit: <date>`, and undeclared it says none is owed — the blinded trial
+  measured no quality the audit bought on one-context units at 12× the tokens. Since
+  `TOOL-dGatedProse-4` the CHAIN of promotions is bounded by review precision: a promoting round
+  below the review protocol's floor ends it. No checker enforces that bound, because the precision
+  lives only in the review record and never on the run record's `--review` row.
+- **The `Decided:` trailer M10 routes a choice to is ungated, by design.** Whether a choice was made
+  is not observable, so nothing refuses a run that left none. M10's own example went through git's
+  trailer parser once, in the pass that wrote it (`TOOL-dLoggedFlight-7` AC3), and nothing grades a
+  later edit to it. How a run's trailers are harvested, and a line git did not parse counted, is the
+  run model's spec to say (`TOOL-dLoggedFlight-8`).
 - **A spec's gate list is authored. The bar's list is derived.** No check compares the two. Five builds
   closed a unit green on the legs their specs named while the unguarded codebase-map leg was red.
   The pre-commit hook now catches that one leg for staged `.py` and `.js` paths. For every other leg

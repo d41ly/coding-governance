@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-process-monitor.test.sh — the adopter's refusals, each staged and observed RED.
 #
-# gov:kit process-monitor@0.1
+# gov:kit process-monitor@0.2
 #
 # Every arm here stages a break into a SCRATCH copy of the conf and asserts the adopter refuses.
 # Nothing is asserted about the shipped tree except by the two arms that say so, because a suite
@@ -28,7 +28,7 @@ fi
 # The floor the merge bar's `check-testsuite-counts.sh` reads: a suite that prints no
 # executed count against a declared floor could strand a block of its arms past an exit and
 # still report success.
-FLOOR_ASSERTIONS=31
+FLOOR_ASSERTIONS=34
 PASS=0; FAIL=0
 WORK="$(mktemp -d)"
 REALROOT="$WORK/declared-root-under-test"
@@ -61,6 +61,10 @@ run_against() {
   mkdir -p "$repo/tools/process-monitor" "$REALROOT"
   git -C "$repo" init -q 2>/dev/null
   cp "$ADOPT" "$repo/tools/process-monitor/"
+  # THE ENGINE, and only where an arm asks for it. The line above copies the adopter ALONE, so the
+  # delegation to the engine's own reader is never reached and an arm over that branch would pass
+  # by finding nothing. `$KIT_REL` is derived, so no install prefix is spelled here.
+  [ -z "${COPY_ENGINE:-}" ] || cp "$KIT_DIR/scope.py" "$KIT_DIR/census.py" "$repo/$KIT_REL/"
   [ "$conf_body" = "__ABSENT__" ] || printf '%s\n' "$conf_body" > "$repo/.process-monitor.conf"
   # A COMPLETE adoption, because --check now refuses an unwired hook: a fixture that omitted the
   # settings entry would pin the permissive exit the closing review flagged. BOTH events since
@@ -278,6 +282,29 @@ if grep -q '^PROCMON_ROOTS=' "$ROOT/.process-monitor.conf"; then
 else
   add_fail "test_shipped_roots_exclude_the_temp_root (no shipped conf to grade)"
 fi
+
+# ---- TOOL-cMendedVintage-8: the delegation branch, actually REACHED ---------------------------
+# `govkit update` re-runs this check and rolls a kit back on a red, so an empty live scope must not
+# read as a refusal — the verdict would otherwise depend on what happened to be running at the time.
+# The engine separates the two cases by exit status and these arms grade that the adopter reads it.
+#
+# THE DECLARED ROOT IS MADE HERE, one line before the census that grades it, under a name no command
+# line on this machine carries. "Nothing runs under it" is therefore a property of the fixture and
+# not a claim about how busy the box is — which is the class of claim this unit exists to remove.
+_quiet="$WORK/nothing-has-ever-run-under-this"; mkdir -p "$_quiet"
+_quiet_conf="$(build_base_conf | awk -v r="$_quiet" '/^PROCMON_ROOTS=/{print "PROCMON_ROOTS=\"" r "\""; next} {print}')"
+check_equal "test_empty_live_scope_is_a_skip_not_a_refusal" \
+    "$(COPY_ENGINE=1 run_against "$_quiet_conf")" 0
+grep -q "went UNEXERCISED, not passed" "$WORK/out" \
+  && add_pass "test_skip_names_the_unexercised_arm" \
+  || add_fail "test_skip_names_the_unexercised_arm (a skip that reads like a pass is indistinguishable from coverage)"
+
+# ...and the refusal the skip must NOT swallow. Two `PROCMON_ROOTS=` assignments: the shell reader
+# takes the last and accepts, the engine refuses outright, and the adopter must still exit 1. A root
+# that is merely absent would be caught by the adopter's own rules and never reach the delegation,
+# so it would grade a different branch while looking like it graded this one.
+check_equal "test_engine_refusal_still_exits_1" \
+    "$(COPY_ENGINE=1 run_against "$(printf '%s\nPROCMON_ROOTS="%s"' "$_quiet_conf" "$_quiet")")" 1
 
 n=$((PASS + FAIL))
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] \

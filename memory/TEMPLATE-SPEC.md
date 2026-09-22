@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.78 -->
+<!-- gov:kit memory-tree@2.85 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -103,6 +103,22 @@ an absent region cannot be told from a spec nobody has recorded against.
   one names when it was measured, a derived one names what re-derives it. This binds every section,
   §4's inventories and estimates included; §6's `figure:` sub-field is where an acceptance criterion
   answers it.
+- A codebase-map dossier claims EXACT inventory keys, so a sentence saying a dossier claims a path,
+  a glob or a code symbol books a grader that does not exist. `tools/check-spec-tokens.py`
+  refuses three shapes as the object of such a sentence in every spec that is OPEN, SPECCED,
+  INPROGRESS or BLOCKED, each for the reason the map's own contract gives. A DEFERRED spec is not
+  graded by this join, though check 25 below grades it. A PATH carries `/` and a GLOB carries `*` or `?`, and the map rules path
+  globs digest-only and never gated (`<MEMORY_ROOT>/map/README.md`, rendered by
+  `tools/codebase-map/gen_map.py`). A CODE SYMBOL carries an underscore between two letters or
+  digits in either case, or a parenthesis, and the symbol tier feeds
+  `<MEMORY_ROOT>/map/generated/symbols.json` only and never the ratchet
+  (`tools/codebase-map/map_extractors.py`). The space clause: a token
+  carrying a space is never refused, because every live key carrying punctuation also carries one.
+  The check grades SHAPE, and six things are invisible to it: an unbackticked dossier subject, an
+  unbackticked claimed object, a claim inside a fenced block, a key-shaped object that is not a key,
+  a claim in the wrong dossier, and a filler run longer than the closed arm admits. Name the key the
+  dossier will claim, or describe the thing in prose. A refusal is waived by the token
+  `claims <- <object>`, so a waiver on the bare string answers only the path join.
 - A section that genuinely doesn't apply keeps its heading with the single line `N/A — <why>`.
   Headings never disappear, and empty bodies are machine-rejected: an absent or hollow section is
   indistinguishable from a forgotten one.
@@ -186,6 +202,19 @@ a spec that DOES carry a Gates heading must carry such a line. From that date th
 requirement rather than only a reading rule — and the heading precondition is the whole of the
 Tier-1 accommodation, so the only spec this can red is one that wrote a Gates section and named no
 leg in it.
+
+Once a spec's filename date reaches `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`; blank turns it
+off), the leg line must also name every leg in `tools/gate-legs.json` whose `guard` any
+backticked path under §4 `### Files touched (estimate)` trips — the exact path, or anything under
+the guard as a directory; a directory token of two or more segments declares everything under it
+and trips symmetrically, while a one-segment root such as `tools/` is prose and declares nothing.
+The join reads the ESTIMATE as written and the leg's guard pathspecs, nothing else: a path named in
+prose outside that sub-head is not read, a spec with no Gates heading is not joined, and a BROAD
+guard — one carried by more legs than the checker's floor, as the printed set shows (a rule that
+owes a shared guard's every leg per spec is obeyed by paste) — is excluded, the set printed with
+its counts on every run. The hit names the leg and the path together, `<leg> <- <path>`, and a
+waiver row must carry that whole token. The checker is a repo-root tool of the shipping repo; an
+adopter receives this paragraph and the blank key in the example conf.
 
 **Where a new arm lives.** When a unit adds or moves a gate arm, §7 carries one line per arm:
 
@@ -278,6 +307,17 @@ spec carries BOTH this heading and an Acceptance criteria heading, found by head
 by number, so a Tier-1 spec that legitimately writes no acceptance section is untouched. SHAPE only:
 it asserts the item names a label, never that the criterion so named actually observes it.
 
+An item that retires a name, a row kind or a vocabulary member answers for its readers, on its own
+lines: `**Readers:**`, then `by name:` and the readers that spell the name, then `by value:` and the
+readers that compare, count or derive from its value. One escape per half, each with a reason:
+`NO VALUE READERS` on the by-value half, and `READER NOT IN TREE` on the by-name half for a name that
+lives outside this tree. Hygiene check 25 asks it of every spec that is not CLOSED or WONTDO, with
+no cutoff: an item
+triggers when a retirement verb, matched ignoring case and in the past tense too, sits beside a
+backticked identifier, a markdown path included, and a clause is graded wherever it appears. Each
+name the by-name half lists must be spelled by a reader, not merely quoted by a record. SHAPE and
+RESOLUTION only: nothing asks whether the list is complete, which is the author's question to answer.
+
 ## 3. Non-goals (OUT)
 
 The explicit cut-line: what an eager builder might include but must not. Name follow-ups.
@@ -293,7 +333,9 @@ Or the single word `none`. Rules: the §3 section above this skeleton.
 
 The mechanism: data shapes, contracts, flows. Use the canonical ### sub-heads (Data model ·
 Inventory · Migration · Rollout · Files touched (estimate) · Alternatives rejected) as needed.
-Review corrections fold in here; bump the header rev and log it in §9.
+The backticked paths under `### Files touched (estimate)` are machine-read: each is joined to the
+gate manifest's guards, and a guarded leg they trip is owed on the §7 leg line (the §7 section
+above this skeleton). Review corrections fold in here; bump the header rev and log it in §9.
 
 ## 5. Production-readiness checklist
 
@@ -373,7 +415,8 @@ carries no fields at all — the common case. Nothing grades these lines.
 The named gate legs this unit must keep green, plus any new gate it adds. Put the names on a
 line of their own carrying nothing but backticked names and separators — that line is what the
 leg join reads, and from `SPEC_LEGLINE_CUTOFF` onward a spec with this heading must have one.
-Add `New arm: <suite path> · <what stages its failing case> · <floor to move, or none>` per arm
+From `SPEC_GUARD_LEGS_CUTOFF` onward that line must also name every leg whose manifest `guard`
+a path under §4 `### Files touched (estimate)` trips. Add `New arm: <suite path> · <what stages its failing case> · <floor to move, or none>` per arm
 this unit adds or moves. The rules are the §7 section above this skeleton.
 
 ## 8. Open questions

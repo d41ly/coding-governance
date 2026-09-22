@@ -37,7 +37,7 @@ role = "engine"
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
 [[files]]
-include = ["adopt-run-gates.test.sh", "profile_bar.test.sh", "run-gates.evidence.test.sh", "run-gates.test.sh", "run-gates.turnstile.test.sh", "run-selftests.test.sh"]
+include = ["adopt-run-gates.test.sh", "profile_bar.test.sh", "run-gates.evidence.test.sh", "run-gates.runlog.test.sh", "run-gates.test.sh", "run-gates.turnstile.test.sh", "run-selftests.test.sh"]
 role = "project-owned"
 
 # THE GOV-ONLY HARNESS IS WITHHELD. Its arms are keyed on THIS repo's corpus — gov's declared chunk
@@ -96,6 +96,24 @@ means = "adopted"
 name = "run-gates wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
+guard = []
+
+# THE INTEGRITY HALF OF `check`, ON A BAR THAT NEEDS NO GOV CHECKOUT. `check` answers three
+# questions and two of them — descriptor and provenance — resolve only against gov's own blobs, so
+# an adopter can never run it; the third is a sha256 against bytes on their own disk and needs
+# nothing but this file. `subject = "repo"` because a FAILURE means THIS tree's installed files no
+# longer match its own record, which is the criterion the runner states at its `subject` field.
+#
+# NO GUARD, and that is the deliberate half. A guard scopes a run to commits touching some path, and
+# the drift this leg looks for arrives from a commit touching NOTHING here — an eol filter, a stray
+# editor save, a partial merge. It is also cheap enough that scoping it would buy nothing: the work
+# is one sha256 per engine row and nothing else. NO FIGURE IS WRITTEN HERE: the recorded seconds are
+# owned by this kit's own ceiling evidence, which the runner refreshes, and a number typed beside it
+# in a comment is the copy that rots.
+[[gate_leg]]
+name = "receipt sync (installed files match the receipt)"
+subject = "repo"
+argv = ["python", "{kit}/check-receipt.py"]
 guard = []
 
 # The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this

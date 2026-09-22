@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # check-spec-tokens.test.sh — red/green arms for tools/check-spec-tokens.py (TOOL-dRetiredFork-20).
+# TOOL-aBlindedTrial-8 added the guards-join arms: a §4 files-touched path that trips a leg's guard
+# owes that leg's name on the §7 leg line.
 #
 # HERMETIC: every arm runs in a scratch repo under mktemp -d — its own, or one of the two the bar
 # arms share and reset between edits — and never touches the real tree, so the suite is safe beside
@@ -13,12 +15,35 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=42
+FLOOR_ASSERTIONS=96
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
 # RAISED 38 -> 42 at closing round 2, by the count of `arm`/`pass=` lines its diff added: two
 # leg-line cutoff refusals (R7, R11), the `py` launcher hit (R12) and the parity accounting (R3).
+# RAISED 42 -> 55 at TOOL-aBlindedTrial-8, by the count of `arm`/`pass=` lines its diff added: the
+# guards join's hit and clean pair, the pre-cutoff carrier, the blank key, the non-path token, the
+# short sub-head spelling, the absent sub-head, the one-segment near-miss (rc and `--list`), the
+# composite waiver and the bare-leg row that does not consume it, and the two refusals (non-ISO,
+# relation).
+# RAISED 55 -> 62 at the closing diff review of TOOL-aBlindedTrial-7/8 (round 1), by the count of
+# `arm` lines its diff added: the breadth pair (R1), the declared-prefix pair (R3), the no-Gates
+# precondition (R4) and the exact-file guard pair (R12).
+# RAISED 62 -> 66 at round 2 of that review, by the count of `arm`/`pass=` lines its diff added: the
+# one-segment root pair (R1: rc and the --list row), the duplicated-entry breadth arm (R7) and the
+# no-Gates --list row (R8).
+# RAISED 66 -> 67 at round 3 of that review: the dot-token count arm on the one-leg bare-`tools/`
+# fixture (R5), where the `tools/./` refusal is load-bearing.
+# RAISED 67 -> 91 at TOOL-dGatedProse-2, by the count of `arm`/`pass=` lines its diff added: 3 `arm`
+# calls and 21 inline increments. The claims join's direct half is fourteen — the two motivating
+# blob sentences, the three closed specs' clears, the unwritten key, the fenced copy, the six
+# per-arm, uppercase and shouted fixtures, and the live-key disjointness; its process half is ten —
+# the six staged breaks, the report line twice, the --list rows and the hit as the report prints it.
+# RAISED 91 -> 95 at the closing diff review of dGatedProse (round 1), by the count of `arm`/`pass=`
+# lines its fold added: 2 `arm` calls for R1's composite claims token and 2 inline increments for
+# R3's tilde fences, each observed RED against the checker before the fold.
+# RAISED 95 -> 96 at round 2 of that review (F3): one inline increment for the arm that uses the
+# composite waiver token alone and expects green, observed RED against a copy that never waives a claim.
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -356,6 +381,224 @@ git -C "$d" add -A >/dev/null
 arm "a whole-suite selftest.py behind the py launcher REDS as [bar]" 1 "$d" '[bar] `py tools/govkit/selftest.py`'   # gov:literal-python — the expected hit line, never run
 git -C "$d" reset -q --hard "$clean"
 
+# ---- TOOL-aBlindedTrial-8: the guards join, over the same shared repo and reset the same way. A
+#      §4 `### Files touched` path that trips a leg's `guard` in the manifest owes that leg's name on
+#      the §7 leg line. Each arm is observed RED-first on the checker at 987c5bec, which read no
+#      sub-head and no guard: the hit arms graded clean, the report arms printed no guards line, and
+#      the refusal arms never read the key. The fixture spec carries no `## 4.`, so each arm inserts
+#      one above the acceptance heading; the manifest gains one leg guarded on `tools/x/`.
+GUARD_LEGS='[{"name":"real leg"},{"name":"guarded leg","guard":["tools/x/"]}]'
+write_files_touched() {   # $1 = the sub-head line · $2 = the line under it (backticked tokens)
+  sed -i "s|^## 6. Acceptance criteria\$|## 4. Design\n\n$1\n\n$2\n\n## 6. Acceptance criteria|" "$spec"
+}
+
+# AC2 — a post-cutoff spec declaring `tools/x/thing.sh` whose leg line omits `guarded leg` REDS as
+#       [guards], naming the spec, the leg and the path in one composite token.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff spec whose files-touched trips a guard the leg line omits REDS as [guards]" 1 "$d" '-spec-TOOL-tOne-1.md [guards] `guarded leg <- tools/x/thing.sh` — §4 files-touched names tools/x/thing.sh, which trips the guard of leg '"'"'guarded leg'"'"', absent from the §7 leg line'
+# ...and the same tree with the leg NAMED is green, and the guards line reports what it examined.
+sed -i 's|^`real leg`\.|`real leg` · `guarded leg`.|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "the same tree with the guarded leg named on the leg line is green and counted as examined" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s) at/after SPEC_GUARD_LEGS_CUTOFF 2026-09-01"
+git -C "$d" reset -q --hard "$clean"
+
+# AC6 — the PRE-cutoff twin is green, and COUNTED on the guards line rather than silently skipped.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" mv "$spec" "$d/memory/builds/tOne/spec/2026-08-30-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a PRE-cutoff spec missing a guarded leg is green, counted and not graded" 0 "$d" "1 pre-cutoff live spec(s) carry a missing guarded leg and are not graded"
+git -C "$d" reset -q --hard "$clean"
+
+# AC1 — a BLANK key turns the join off over the AC2 tree, announces it, and still counts the carrier.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF=""\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a blank SPEC_GUARD_LEGS_CUTOFF turns the join off and still counts the carrier" 0 "$d" "guards join · SPEC_GUARD_LEGS_CUTOFF blank (arm off) · 1 live spec(s) carry a missing guarded leg"
+git -C "$d" reset -q --hard "$clean"
+
+# S2 — a token under the sub-head that is not path-shaped (`$KIT`, a deploy-time token) declares
+#      nothing: zero paths examined, no hit, no carrier.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`$KIT` · `last-audit`'
+git -C "$d" add -A >/dev/null
+arm "a non-path token under the sub-head declares no path" 0 "$d" "guards join · 0 declared path(s) examined in 1 live spec(s)"
+git -C "$d" reset -q --hard "$clean"
+
+# AC3 — the sub-head spelled WITHOUT the parenthetical is read the same way.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "the short sub-head spelling is read and REDS the same omission" 1 "$d" '[guards] `guarded leg <- tools/x/thing.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# S2 — no sub-head at all is SILENT, and counted in its own field: nothing declared, nothing joined.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff spec with no Files touched sub-head is silent and counted apart" 0 "$d" "1 carry no Files touched sub-head"
+git -C "$d" reset -q --hard "$clean"
+
+# AC4 — a path under a BROAD guard only is excluded from the join: green, the report line prints the
+#       excluded guard with its leg count, and `--list` prints the path as NEAR so the exclusion
+#       announces itself. Broad is BREADTH (closing review round 1, R1): a guard carried by more than
+#       BROAD_LEG_FLOOR legs, whatever its depth. The fixture is floor+1 legs sharing bare `tools/`;
+#       one leg on `tools/` was the rev-1 fixture, and it is a HIT below now.
+BROAD_LEGS='[{"name":"real leg"},{"name":"b1","guard":["tools/"]},{"name":"b2","guard":["tools/"]},{"name":"b3","guard":["tools/"]},{"name":"b4","guard":["tools/"]},{"name":"b5","guard":["tools/"]},{"name":"b6","guard":["tools/"]}]'
+printf '%s\n' "$BROAD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a path matching only a broad guard (floor+1 legs on tools/) is no hit, and the exclusion is printed with its count" 0 "$d" "excluded as broad (carried by more than 5 legs): tools/ (6)"
+out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: tools/x/thing.sh — matches only the broad guard(s) tools/ (6 legs)'; then
+  echo "arm ok    --list prints the broad-guard match as NEAR [guards]"; pass=$((pass+1))
+else
+  echo "arm FAIL  --list — expected a NEAR [guards] row for tools/x/thing.sh naming the broad guard and its count"
+  printf '%s\n' "$out" | grep -F 'NEAR' | head -3; fail=$((fail+1))
+fi
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 1, R1 — the exclusion is BREADTH, not depth. rev-1's predicate read the guard's
+# slash count, so on the real manifest `tools/lib/` (30 legs) was joined and `.githooks/` (5 legs)
+# was excluded. Two arms, observed RED-first on that checker: a TWO-segment guard carried by floor+1
+# legs is excluded (rev-1 redded it), and a ONE-segment guard carried by one leg is joined and hits
+# (rev-1 passed it).
+printf '[{"name":"real leg"},{"name":"d1","guard":["tools/x/"]},{"name":"d2","guard":["tools/x/"]},{"name":"d3","guard":["tools/x/"]},{"name":"d4","guard":["tools/x/"]},{"name":"d5","guard":["tools/x/"]},{"name":"d6","guard":["tools/x/"]}]\n' > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a two-segment guard carried by floor+1 legs is excluded by breadth, whatever its depth" 0 "$d" "excluded as broad (carried by more than 5 legs): tools/x/ (6)"
+printf '[{"name":"real leg"},{"name":"broad leg","guard":["tools/"]}]\n' > "$d/tools/gate-legs.json"
+git -C "$d" add -A >/dev/null
+arm "a one-segment guard carried by ONE leg is joined and REDS" 1 "$d" '[guards] `broad leg <- tools/x/thing.sh`'
+# round 3, R5 — the dot tokens `./`, `../` and `tools/./` declare nothing, asserted where the
+# refusal is LOAD-BEARING: on this Gates-carrying spec under a bare `tools/` guard, an admitted
+# `tools/./` is `tools/.`, which starts with `tools/` and counts as a second examined path (the R8
+# no-Gates fixture could not see it: there the join never runs). Observed RED-first on a mutant
+# checker refusing only a LEADING dot segment: `2 declared path(s) examined`.
+sed -i 's|^`tools/x/thing.sh`$|`tools/x/thing.sh` · `./` · `../` · `tools/./`|' "$spec"
+sed -i 's|^`real leg`\.|`real leg` · `broad leg`.|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "dot tokens beside a real path declare nothing: one path examined, the named leg clean" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s)"
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 1, R3 — a DIRECTORY token under the sub-head is a declared PREFIX, not prose.
+# rev-1 dropped every trailing-slash token before the join, so writing the folder instead of the
+# files was a clean pass with no NEAR row. Symmetric: the declared prefix trips a guard it equals or
+# sits under, AND a guard that sits under it — an exact-file guard included (round 2, R1 retargeted
+# this arm from bare `tools/`, which is a ROOT and declares nothing; observed RED on a staged break of
+# the symmetric clause). Observed RED-first on the rev-1 checker, the first arm.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/`'
+git -C "$d" add -A >/dev/null
+arm "a declared directory equal to the guard trips it and REDS" 1 "$d" '[guards] `guarded leg <- tools/x/`'
+printf '[{"name":"real leg"},{"name":"exact leg","guard":["tools/x/y.sh"]}]\n' > "$d/tools/gate-legs.json"
+git -C "$d" add -A >/dev/null
+arm "a declared directory that CONTAINS an exact-file guard trips it and REDS" 1 "$d" '[guards] `exact leg <- tools/x/`'
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 2, R1 — a ONE-SEGMENT root under the sub-head declares NOTHING. Round 1's fold
+# kept `tools/` as a declared prefix, so the corpus's most common negation — "No file under `tools/`
+# is touched" — owed every non-broad leg under `tools/` (34 on the manifest at 315201b0). A root is
+# prose;
+# `--list` names it so the skip is not silent. Observed RED-first on the round-1 checker: exit 1.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' 'New: `memory/builds/tOne/build/note.md`. No file under `tools/` is touched.'
+git -C "$d" add -A >/dev/null
+arm "a one-segment root in a negation sentence declares nothing and is no hit" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s)"
+out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: tools/ — a one-segment root declares nothing, not joined - name the files or a directory of two or more segments'; then
+  echo "arm ok    --list names the one-segment root as NEAR [guards], not joined"; pass=$((pass+1))
+else
+  echo "arm FAIL  --list — expected a NEAR [guards] row naming tools/ as a root that declares nothing"
+  printf '%s\n' "$out" | grep -F 'NEAR' | head -3; fail=$((fail+1))
+fi
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 2, R7 — breadth is counted in LEGS, not guard entries. A guard carried by
+# exactly the floor with one leg listing it twice counted as floor+1 and left the join, dropping the
+# motivating class silently. Observed RED-first on the round-1 checker: exit 0.
+printf '[{"name":"real leg"},{"name":"f1","guard":["tools/x/","tools/x/"]},{"name":"f2","guard":["tools/x/"]},{"name":"f3","guard":["tools/x/"]},{"name":"f4","guard":["tools/x/"]},{"name":"f5","guard":["tools/x/"]}]\n' > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+git -C "$d" add -A >/dev/null
+arm "a guard on exactly the floor's legs, one listing it twice, stays joined and REDS" 1 "$d" '[guards] `f1 <- tools/x/thing.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 1, R4 — the join grades only a spec that CARRIES a Gates heading, the legline
+# arm's own precondition: a Tier-1 spec under the light profile may omit the section, and rev-1 gave
+# it one hit per tripped leg while the same run counted it as "no Gates heading to grade". Observed
+# RED-first on the rev-1 checker: exit 1 with two [guards] rows. Round 2, R8: the skipped spec is
+# NOT "examined" — that figure reads zero — and the path it skipped is named by a NEAR row; `./`,
+# `../` and `tools/./` are not declared paths at all. Observed RED-first on the round-1 checker.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh` · `./` · `../` · `tools/./`'
+awk '/^## 7[.] Gates$/{exit} {print}' "$spec" > "$d/.tmp.md"; mv "$d/.tmp.md" "$spec"
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff spec with NO Gates heading is not joined, not examined, and is counted on the guards line" 0 "$d" "guards join · 0 declared path(s) examined in 0 live spec(s) at/after SPEC_GUARD_LEGS_CUTOFF 2026-09-01 · 0 pre-cutoff live spec(s) carry a missing guarded leg and are not graded · 0 carry no Files touched sub-head · 1 declare a path and carry no Gates heading, not joined"
+out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if [ "$(printf '%s\n' "$out" | grep -c 'NEAR   \[guards\]')" = 1 ] \
+   && printf '%s\n' "$out" | grep -qF ':: tools/x/thing.sh — no Gates heading, not joined'; then
+  echo "arm ok    --list names the skipped path as NEAR [guards] and nothing else (dot tokens declare nothing)"; pass=$((pass+1))
+else
+  echo "arm FAIL  --list — expected exactly one NEAR [guards] row, naming tools/x/thing.sh as skipped for no Gates heading"
+  printf '%s\n' "$out" | grep -F 'NEAR' | head -5; fail=$((fail+1))
+fi
+git -C "$d" reset -q --hard "$clean"
+
+# closing review round 1, R12 — the EXACT-FILE branch of check_guard_trips, seen to fail. Every arm
+# above uses the directory guard, so `path == guard` and the docstring's `x.sh.bak` non-prefix claim
+# were asserted by prose alone; the live manifest carries exact-file guards. The `.bak` sibling is
+# path-shaped (a slash and an extension) and untracked, which the guards join does not grade.
+printf '[{"name":"real leg"},{"name":"exact leg","guard":["tools/x/thing.sh"]}]\n' > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh.bak`'
+git -C "$d" add -A >/dev/null
+arm "an exact-file guard does not trip on a .bak sibling" 0 "$d" "guards join · 1 declared path(s) examined"
+sed -i 's|^`tools/x/thing.sh.bak`$|`tools/x/thing.sh`|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "an exact-file guard trips on the file itself and REDS" 1 "$d" '[guards] `exact leg <- tools/x/thing.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# AC5 — a waiver row keyed on the COMPOSITE token clears the hit and is counted; a bare row keyed
+#       on the leg name alone does not consume it, so the hit stays live and the row reds as stale.
+printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+write_files_touched '### Files touched (estimate)' '`tools/x/thing.sh`'
+printf 'guarded leg <- tools/x/thing.sh\t[guards] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "a [guards] waiver row keyed on the composite token clears the hit and is counted" 0 "$d" "1 waiver(s)"
+sed -i 's|^guarded leg <- tools/x/thing.sh\t|guarded leg\t|' "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "a waiver row keyed on the bare leg name does not consume a guards hit" 1 "$d" '[guards] `guarded leg <- tools/x/thing.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# closing review F10's rule, for the new key — a non-ISO value is REFUSED, never armed.
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-9-8"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "a non-ISO SPEC_GUARD_LEGS_CUTOFF is REFUSED like the other cutoff keys" 1 "$d" "REFUSING — SPEC_GUARD_LEGS_CUTOFF 2026-9-8 is not an ISO date"
+git -C "$d" reset -q --hard "$clean"
+
+# AC17's relation, for the new key — a COMMITTED value not strictly past its own commit day is
+# REFUSED before grading. The relation block is one helper for both keys, so this observes the
+# second caller rather than trusting the first.
+printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-02"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm guardcutoff --no-verify
+day=$(git -C "$d" log -1 --format=%cs)
+arm "a committed SPEC_GUARD_LEGS_CUTOFF not strictly past its own commit day is REFUSED" 1 "$d" "REFUSING — SPEC_GUARD_LEGS_CUTOFF 2026-09-02 is not strictly past $day"
+git -C "$d" reset -q --hard "$clean"
+
 # The WAIVER family: its committed clean state IS the AC1 fixture, and the commit is dated the day
 # before its cutoff so the relation holds and the arms grade rather than refuse.
 d=$base/barwaiver; scratch "$d"
@@ -446,6 +689,228 @@ if [ "$unmatched" = 0 ]; then echo "arm ok    parity: BAR matches every whole-su
 else echo "arm FAIL  parity: a manifest suite invocation BAR does not match:"; printf '%s\n' "$parity" | sed '1,/^--$/d' | sed 's/^/          /'; fail=$((fail+1)); fi
 if [ "$((${popn:-0} + ${skipn:-0}))" = "${legn:-x}" ]; then echo "arm ok    parity: graded $popn + exempt $skipn = the manifest's $legn selftests legs, no unannounced skip"; pass=$((pass+1))
 else echo "arm FAIL  parity: graded $popn + exempt $skipn != the manifest's $legn selftests legs — a leg was skipped without being printed"; fail=$((fail+1)); fi
+
+# ---- TOOL-dGatedProse-2: the claims join. A dossier-claim sentence whose backticked object is a
+#      PATH, a GLOB or a CODE SYMBOL names a shape the codebase map cannot hold as a key, and reds.
+#      TWO halves. The DIRECT half loads the checker as a module and calls `scan_claims` on
+#      spec-shaped input, because AC1, AC2, AC3, AC7 and AC12 grade the scan's own return, and AC4
+#      enumerates every key of every ratchet inventory from the real tree through it; each of its
+#      verdicts is one assertion below. The PROCESS half runs the checker, or a broken copy of it,
+#      in a scratch repo: AC6's staged breaks, AC8's report line and --list rows, and AC1's hit as the
+#      report prints it. Each arm was observed RED on the checker before this join, which printed no
+#      claims line, carried no `scan_claims` and exited 0 over every fixture here.
+MAPKIT="$(dirname "$LINT")/codebase-map"
+cat > "$base/claims-direct.py" <<'PYEOF'
+import importlib.util, os, sys
+spec = importlib.util.spec_from_file_location("cst", sys.argv[1])
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+
+def print_verdict(label, ok, detail):
+    print(("ok " + label) if ok else ("FAIL " + label + " :: " + str(detail)))
+
+def check_one_hit(label, text, obj, cls, arm):
+    runs, hits, clears = m.scan_claims(text)
+    ok = len(hits) == 1 and hits[0][1] == obj and hits[0][2] == cls and arm in hits[0][3]
+    print_verdict(label, ok, [(h[1], h[2], h[3]) for h in hits])
+
+def check_clears_only(label, text):
+    runs, hits, clears = m.scan_claims(text)
+    print_verdict(label, runs >= 1 and not hits, "runs=%d hits=%s" % (runs, [(h[1], h[2]) for h in hits]))
+
+# AC1 -- the two motivating sentences, copied verbatim from their blobs at 9f43bb26^.
+check_one_hit("AC1 unit 25",
+        "- **S6** The docs. The kit README's Summary section states the three closers and the lag S3 declares,\n"
+        "  and `memory/map/features/runlog.md` claims `derive_window_closer`. NOT OBSERVED: prose, and the map's\n"
+        "  coverage leg grades the claim at the close.\n", "derive_window_closer", "CODE SYMBOL", "active")
+check_one_hit("AC1 unit 27",
+        "- **S7** The docs. The kit README's paragraph on unknown values names `count_sources` and the\n"
+        "  `withheld rows` fact, and `memory/map/features/runlog.md` claims `check_count_sources`. NOT OBSERVED:\n"
+        "  prose, and the map's coverage leg grades the claim at the close.\n", "check_count_sources", "CODE SYMBOL", "active")
+# AC2 -- three CLOSED specs' sentences, verbatim; the first wraps its object onto the next line.
+check_clears_only("AC2 kickoff dossier",
+            "- S10. A new codebase-map dossier at `memory/map/features/kickoff.md` claiming\n"
+            "  `guides = [\"SESSION-KICKOFF.md\"]`, plus a regeneration of `memory/map/generated/`.\n")
+check_clears_only("AC2 unattended dossier",
+            "- **No dossier edit.** `memory/map/features/unattended.md` claims `unattended-unit.js` and measures\n"
+            "  20470 bytes against a 20480-byte `DOSSIER_CAP_BYTES`; it describes the kit's gates and refusals,\n")
+check_clears_only("AC2 run-gates dossier",
+            "- **S12** — author `memory/map/features/run-gates.md` claiming the `kits` key and the gate-leg keys\n"
+            "  THIS unit creates, and drop the now-claimed row from `memory/map/baseline.toml`.\n")
+# AC3 -- the forward-looking claim: a key-shaped token no tree holds yet clears, since nothing resolves.
+check_clears_only("AC3 unwritten key", "`memory/map/features/runlog.md` claims `tUnwrittenLeg-not-yet-built` once it lands.\n")
+# AC7 -- the same refused sentence fenced and unfenced: one hit, on the unfenced line.
+s = "`memory/map/features/runlog.md` claims `derive_window_closer`."
+runs, hits, clears = m.scan_claims("prose\n```\n" + s + "\n```\n" + s + "\n")
+print_verdict("AC7 fenced copy", len(hits) == 1 and hits[0][0] == 5, [(h[0], h[1]) for h in hits])
+# AC12 -- one fixture per arm, then the active arm with an UPPERCASE verb and with a SHOUTED constant.
+check_one_hit("AC12 active", "`memory/map/features/runlog.md` claims `derive_window_closer`.", "derive_window_closer", "CODE SYMBOL", "active")
+check_one_hit("AC12 passive", "`tools/runlog/runlog.py` is claimed by `memory/map/features/runlog.md`.", "tools/runlog/runlog.py", "PATH", "passive")
+check_one_hit("AC12 noun", "`memory/map/features/runlog.md` makes a claim on `tools/runlog/*.py` here.", "tools/runlog/*.py", "GLOB", "noun")
+check_one_hit("AC12 fronted", "`check_count_sources`, which `runlog.md` now claims, stays.", "check_count_sources", "CODE SYMBOL", "fronted")
+check_one_hit("AC12 uppercase verb", "`memory/map/features/runlog.md` CLAIMS `derive_window_closer`.", "derive_window_closer", "CODE SYMBOL", "active")
+check_one_hit("AC12 shouted constant", "`memory/map/features/runlog.md` claims `KIT_MEMORY_TREE_VERSION`.", "KIT_MEMORY_TREE_VERSION", "CODE SYMBOL", "active")
+# R3 (closing review, round 1) -- the fence machine is the engine's `_unfenced`. A tilde fence holding
+# a lone backtick line closes on its OWN marker, so the claim after it is graded; a claim inside a
+# tilde fence is blanked. The boolean toggle this replaced read both of these the other way round.
+runs, hits, clears = m.scan_claims("prose\n~~~\n```\n~~~\n" + s + "\n")
+print_verdict("R3 tilde fence closes on its own marker", len(hits) == 1 and hits[0][0] == 5, [(h[0], h[1]) for h in hits])
+runs, hits, clears = m.scan_claims("prose\n~~~\n" + s + "\n~~~\n")
+print_verdict("R3 a claim inside a tilde fence is blanked", not hits, [(h[0], h[1]) for h in hits])
+# AC4 -- DISJOINTNESS over the live key set, never resolution: every key of every ratchet inventory,
+# enumerated from the real tree by the map's own extractors, through the real scan. Both counts are
+# the enumeration's, printed rather than typed.
+try:
+    os.environ.pop("CODEBASE_MAP_ROOT", None)
+    sys.path.insert(0, sys.argv[2])
+    import map_extractors
+    inv = map_extractors.all_inventories()
+    keys = [k for v in inv.values() for k in v]
+    bad = [k for k in keys if (lambda r: r[0] != 1 or r[1])(m.scan_claims("`memory/map/features/x.md` claims `%s`." % k))]
+    print("info AC4: %d key(s) examined over %d inventories, %d carrying a parenthesis" % (len(keys), len(inv), sum("(" in k for k in keys)))
+    print_verdict("AC4 live keys", bool(keys) and not bad, "refused or unmatched: %s" % bad[:5])
+except Exception as exc:  # the map kit absent or failing is a FAIL, never a skip
+    print_verdict("AC4 live keys", False, "the key enumeration did not run: %r" % exc)
+PYEOF
+claims=$("$PY" "$base/claims-direct.py" "$LINT" "$MAPKIT" 2>&1 | tr -d '\r')
+printf '%s\n' "$claims" | grep '^info ' | sed 's/^info /          /'
+check_claims_verdict() { printf '%s\n' "$claims" | grep -qxF "ok $1"; }   # $1 = a label the direct half printed
+print_claims_detail() { printf '%s\n' "$claims" | grep -F "$1" | head -2; }
+if check_claims_verdict "AC1 unit 25"; then echo "arm ok    AC1 unit 25's sentence yields one CODE SYMBOL hit on derive_window_closer"; pass=$((pass+1)); else echo "arm FAIL  AC1 unit 25"; print_claims_detail "AC1 unit 25"; fail=$((fail+1)); fi
+if check_claims_verdict "AC1 unit 27"; then echo "arm ok    AC1 unit 27's sentence yields one CODE SYMBOL hit on check_count_sources"; pass=$((pass+1)); else echo "arm FAIL  AC1 unit 27"; print_claims_detail "AC1 unit 27"; fail=$((fail+1)); fi
+if check_claims_verdict "AC2 kickoff dossier"; then echo "arm ok    AC2 the wrapped kickoff-dossier sentence matches an arm and clears"; pass=$((pass+1)); else echo "arm FAIL  AC2 kickoff dossier"; print_claims_detail "AC2 kickoff" ; fail=$((fail+1)); fi
+if check_claims_verdict "AC2 unattended dossier"; then echo "arm ok    AC2 the unattended-dossier sentence matches an arm and clears"; pass=$((pass+1)); else echo "arm FAIL  AC2 unattended dossier"; print_claims_detail "AC2 unattended"; fail=$((fail+1)); fi
+if check_claims_verdict "AC2 run-gates dossier"; then echo "arm ok    AC2 the run-gates-dossier sentence matches an arm and clears"; pass=$((pass+1)); else echo "arm FAIL  AC2 run-gates dossier"; print_claims_detail "AC2 run-gates"; fail=$((fail+1)); fi
+if check_claims_verdict "AC3 unwritten key"; then echo "arm ok    AC3 a claim on a key no tree holds yet matches an arm and clears"; pass=$((pass+1)); else echo "arm FAIL  AC3 unwritten key"; print_claims_detail "AC3"; fail=$((fail+1)); fi
+if check_claims_verdict "AC7 fenced copy"; then echo "arm ok    AC7 a fenced copy is blanked: one hit, on the unfenced line"; pass=$((pass+1)); else echo "arm FAIL  AC7 fenced copy"; print_claims_detail "AC7"; fail=$((fail+1)); fi
+if check_claims_verdict "AC12 active"; then echo "arm ok    AC12 the active arm reaches its own fixture"; pass=$((pass+1)); else echo "arm FAIL  AC12 active"; print_claims_detail "AC12 active"; fail=$((fail+1)); fi
+if check_claims_verdict "AC12 passive"; then echo "arm ok    AC12 the passive arm reaches its own fixture"; pass=$((pass+1)); else echo "arm FAIL  AC12 passive"; print_claims_detail "AC12 passive"; fail=$((fail+1)); fi
+if check_claims_verdict "AC12 noun"; then echo "arm ok    AC12 the noun arm reaches its own fixture"; pass=$((pass+1)); else echo "arm FAIL  AC12 noun"; print_claims_detail "AC12 noun"; fail=$((fail+1)); fi
+if check_claims_verdict "AC12 fronted"; then echo "arm ok    AC12 the fronted arm reaches its own fixture"; pass=$((pass+1)); else echo "arm FAIL  AC12 fronted"; print_claims_detail "AC12 fronted"; fail=$((fail+1)); fi
+if check_claims_verdict "AC12 uppercase verb"; then echo "arm ok    AC12 an UPPERCASE verb is folded"; pass=$((pass+1)); else echo "arm FAIL  AC12 uppercase verb"; print_claims_detail "AC12 uppercase"; fail=$((fail+1)); fi
+if check_claims_verdict "AC12 shouted constant"; then echo "arm ok    AC12 a SHOUTED constant refuses as CODE SYMBOL"; pass=$((pass+1)); else echo "arm FAIL  AC12 shouted constant"; print_claims_detail "AC12 shouted"; fail=$((fail+1)); fi
+if check_claims_verdict "R3 tilde fence closes on its own marker"; then echo "arm ok    R3 a tilde fence holding a lone backtick line closes on its own marker: one hit, on the unfenced line"; pass=$((pass+1)); else echo "arm FAIL  R3 tilde fence closes on its own marker"; print_claims_detail "R3 tilde fence"; fail=$((fail+1)); fi
+if check_claims_verdict "R3 a claim inside a tilde fence is blanked"; then echo "arm ok    R3 a refused claim inside a tilde fence is blanked: no hit"; pass=$((pass+1)); else echo "arm FAIL  R3 a claim inside a tilde fence is blanked"; print_claims_detail "R3 a claim inside"; fail=$((fail+1)); fi
+if check_claims_verdict "AC4 live keys"; then echo "arm ok    AC4 no key of any ratchet inventory is refused, over the population printed above"; pass=$((pass+1)); else echo "arm FAIL  AC4 live keys"; print_claims_detail "AC4"; fail=$((fail+1)); fi
+
+# The PROCESS half, over one scratch repo reset between fixtures.
+d=$base/claims; scratch "$d"
+clean=$(git -C "$d" rev-parse HEAD)
+spec="$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+
+# AC6 — the staged breaks: each arm in turn made to match nothing, the case fold dropped, and the
+#       space clause dropped. Each broken COPY must refuse naming CLAIM_CANARY and print no claims
+#       line. A substitution that missed leaves an unbroken copy, which exits 0 and reds the arm.
+check_break_refuses() {   # $1 = a broken copy of the checker
+  local out rc; out=$(cd "$d" && "$PY" "$1" 2>&1); rc=$?
+  [ "$rc" != 0 ] && printf '%s' "$out" | grep -qF 'REFUSING — CLAIM_CANARY' && ! printf '%s' "$out" | grep -qF 'spec-tokens: claims join'
+}
+for a in active passive noun fronted; do sed "s|(\"$a\", r\"|(\"$a\", r\"(?!)|" "$LINT" > "$base/claims-break-$a.py"; done
+sed 's|CLAIM_PARTS), re\.I)|CLAIM_PARTS))|' "$LINT" > "$base/claims-break-fold.py"
+sed '/cleared by the space clause/d' "$LINT" > "$base/claims-break-space.py"
+if check_break_refuses "$base/claims-break-active.py"; then echo "arm ok    AC6 the active arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 active arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$base/claims-break-passive.py"; then echo "arm ok    AC6 the passive arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 passive arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$base/claims-break-noun.py"; then echo "arm ok    AC6 the noun arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 noun arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$base/claims-break-fronted.py"; then echo "arm ok    AC6 the fronted arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 fronted arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$base/claims-break-fold.py"; then echo "arm ok    AC6 the arms compiled without the case fold refuse naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 case-fold break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$base/claims-break-space.py"; then echo "arm ok    AC6 the space clause dropped refuses naming CLAIM_CANARY, the LOUDER direction"; pass=$((pass+1)); else echo "arm FAIL  AC6 space-clause break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+
+# AC8 — the join's line prints on EVERY run: a tree with no claim sentence reports three zeros.
+arm "a tree with no dossier-claim sentence still prints the claims line, zeros and all" 0 "$d" "claims join · 0 dossier-claim sentence(s) examined · 0 live spec(s) carry one · 0 object(s) cleared"
+# ...and the figures are COUNTED: two live specs, one carrying four clearing sentences and five
+#    objects, the fourth sentence claiming two objects through a conjunction.
+cat > "$spec" <<'SPEC'
+# TOOL-tOne-1 — a unit
+
+**Status:** OPEN · rev-1 · 2026-09-02 · node t · Tier-1 · base 0123abcd · streams tooling
+
+## 4. Design
+
+- S10. A new codebase-map dossier at `memory/map/features/kickoff.md` claiming
+  `guides = ["SESSION-KICKOFF.md"]`, plus a regeneration of `memory/map/generated/`.
+- **No dossier edit.** `memory/map/features/unattended.md` claims `unattended-unit.js` and measures
+  20470 bytes against a 20480-byte `DOSSIER_CAP_BYTES`; it describes the kit's gates and refusals,
+- **S12** — author `memory/map/features/run-gates.md` claiming the `kits` key and the gate-leg keys
+  THIS unit creates.
+- `memory/map/features/runlog.md` will claim `tUnwrittenLeg-a` and `tUnwrittenLeg-b` once they land.
+
+## 6. Acceptance criteria
+
+- **AC1** — `tools/gate-legs.json` exists.
+
+## 7. Gates
+
+`real leg`.
+SPEC
+cat > "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md" <<'SPEC'
+# TOOL-tOne-2 — a second unit, carrying no dossier-claim sentence
+
+**Status:** OPEN · rev-1 · 2026-09-02 · node t · Tier-1 · base 0123abcd · streams tooling
+
+## 6. Acceptance criteria
+
+- **AC1** — `tools/gate-legs.json` exists.
+
+## 7. Gates
+
+`real leg`.
+SPEC
+git -C "$d" add -A >/dev/null
+arm "four clearing sentences and five objects in one of two live specs are COUNTED on the claims line" 0 "$d" "claims join · 4 dossier-claim sentence(s) examined · 1 live spec(s) carry one · 5 object(s) cleared"
+out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if [ "$(printf '%s\n' "$out" | grep -c 'NEAR   \[claims\]')" = 5 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- guides = ["SESSION-KICKOFF.md"] — ')" = 1 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- unattended-unit.js — ')" = 1 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- kits — ')" = 1 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- tUnwrittenLeg-a — ')" = 1 ] \
+   && [ "$(printf '%s\n' "$out" | grep -cF ':: claims <- tUnwrittenLeg-b — ')" = 1 ] \
+   && ! printf '%s\n' "$out" | grep -q 'HIT    \[claims\]'; then
+  echo "arm ok    --list prints each cleared object once as NEAR [claims], and none as a hit"; pass=$((pass+1))
+else
+  echo "arm FAIL  --list — expected exactly five NEAR [claims] rows, one per cleared object, and no [claims] hit"
+  printf '%s\n' "$out" | grep -F '[claims]' | head -6; fail=$((fail+1))
+fi
+git -C "$d" reset -q --hard "$clean"
+
+# AC1, as the report prints it — the unit-25 sentence in a live spec REDS the checker, naming the
+#      class, the arm and the contract sentence.
+sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n  and `memory/map/features/runlog.md` claims `derive_window_closer`. NOT OBSERVED: prose, and the map'"'"'s\n\n## 6. Acceptance criteria|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "the unit-25 sentence in a live spec REDS as [claims], naming the class, the arm and the contract" 1 "$d" '-spec-TOOL-tOne-1.md [claims] `claims <- derive_window_closer` — CODE SYMBOL at line 7, arm(s) active — a codebase-map dossier claims EXACT inventory keys and no key is a CODE SYMBOL: the symbol tier feeds generated/symbols.json only'
+git -C "$d" reset -q --hard "$clean"
+
+# R1 (closing review, round 1) — a claims hit answers to its OWN composite token. A `[path]` waiver
+#      on the bare string, used by the path hit, must not also swallow the claims refusal of it.
+sed -i 's|`tools/gate-legs.json` exists|`tools/nope.sh` exists|' "$spec"
+sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlog.md` claims `tools/nope.sh`.\n\n## 6. Acceptance criteria|' "$spec"
+printf 'tools/nope.sh\t[path] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "R1 a [path] waiver on the bare string does not swallow a claims refusal of it" 1 "$d" '[claims] `claims <- tools/nope.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# R1 — ...and a claims hit keeps no `[path]` row alive: with the path hit gone, the row reads stale
+#      while a claims sentence still names the string, under a row of its own that waives it.
+sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlog.md` claims `tools/nope.sh`.\n\n## 6. Acceptance criteria|' "$spec"
+printf 'tools/nope.sh\t[path] no path hit is left\nclaims <- tools/nope.sh\t[claims] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "R1 a [path] row whose path hit is gone reads stale though a claims sentence names the string" 1 "$d" 'STALE WAIVER `tools/nope.sh` — no spec produces this hit any more'
+git -C "$d" reset -q --hard "$clean"
+
+# R1 — ...and the remedy the fold documents works: the composite token, the only row, waives the
+#      claims hit it names, so the run is green and --list reports the hit as WAIVED (round 2, F3).
+sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlog.md` claims `tools/nope.sh`.\n\n## 6. Acceptance criteria|' "$spec"
+printf 'claims <- tools/nope.sh\t[claims] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+# The VERDICT comes from a plain run, because --list exits 0 and returns before any stale row prints;
+# --list is read only for the WAIVED row, which proves the hit exists and was waived rather than missed.
+out=$(cd "$d" && "$PY" "$LINT" 2>&1); rc=$?
+lst=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if [ "$rc" = 0 ] && printf '%s\n' "$lst" | grep -qF 'WAIVED [claims]' && ! printf '%s\n' "$out" | grep -qF 'STALE WAIVER'; then
+  echo "arm ok    R1 the composite token alone in the registry waives the claims hit it names"; pass=$((pass+1))
+else
+  echo "arm FAIL  R1 the composite waiver — expected rc 0, a WAIVED [claims] row and no stale row, got rc $rc"
+  printf '%s\n' "$out" | grep -E 'claims|STALE' | head -3; fail=$((fail+1))
+fi
+git -C "$d" reset -q --hard "$clean"
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

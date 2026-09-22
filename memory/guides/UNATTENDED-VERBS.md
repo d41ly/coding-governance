@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.24 -->
+<!-- gov:kit unattended@1.28 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -6,6 +6,9 @@ legs byte-compare it against the template it ships from. **They compare the two 
 other, so a claim FALSE IN BOTH is green** — a parity leg is a copy check, not a truth check, and
 only a reader grades a sentence against the code. This file was created by moving section 7 of the
 protocol verbatim, and one bullet arrived carrying a sentence the same build then measured false.*
+
+Every verb but `--version` and `--plan` also writes a START and an END line to the machine-local
+run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 
 - `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
   records the keepalive id the agent hands it, and accepts `--waive <handle> --reason <text>` where no
@@ -69,20 +72,44 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   format from the slug COUNT gives a caller two output shapes for one verb: a frame-reading caller
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
-- `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
+- `--status` — one line: the phase, the first non-terminal unit, and the parked counts, then the
+  fields that print only when there is something to report — the resume tick's attempts, and
+  `keepalive <id> present|absent in the harness listing at <utc>` from the stop-guard's newest
+  sidecar line, whatever its phase, omitted when the record names no keepalive id or no line
+  exists. The line stays ONE line: a field joins it or does not print, and the suite arms that.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
   open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
-  `STALLED` line followed by one remedy line. Read-only; the keepalive runs it. It cannot see what
+  `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree.
-- `--resume` — re-enters the run from the run-state file; must agree with `--status`.
+- `--liveness` — key: value lines and one verdict for an OUT-OF-SESSION reader: the phase, the
+  lease, whether the recorded pid exists AND is the leased process (image and start time, not the
+  number alone), seconds since anything moved, the last recorded stall, `TERMINAL`,
+  `FINISHED-UNSTAMPED`, `UNBOUND`, `STALE` or `LIVE`, and last the `stale-bound` the verdict was
+  graded against, so the tick bounds its own reads by this reader's number. Read-only; the
+  stop-guard, the stall-recorder's readers and the resume tick call it rather than deciding for
+  themselves. It cannot see what the session is doing or whether a process is hung — existence is
+  not progress.
+- `--resume` — re-enters the run from the run-state file; must agree with `--status`. With
+  `--keepalive-id <id>` it REPLACES the lease — keepalive, session, pid — so a resumed session's
+  record names the session that now holds it; refused on a terminal record.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
 - `--landed` — the sole producer of `LANDED`, an OBSERVATION rather than a claim. It accepts a record
   only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip the
-  remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker names HEAD
-  exactly — equality, not ancestry, so any commit between the push and this verb is a refusal. It does
+  remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker's commit
+  contains the run's witness and the advertised tip reaches that commit — containment, not
+  equality, so a `--no-ff` landing stamps from the run worktree and a record commit after the push
+  is not a refusal. It does
   not refuse the default branch: the mandated lander refuses every other one, so landing happens
-  exactly where that guard would otherwise fire.
+  exactly where that guard would otherwise fire. It READS THE REAP BACK: the newest line of the
+  stop-guard's sidecar carries the harness listing of the cron store, and the verb compares the
+  recorded keepalive id with it before the anchor round-trip. Two refusals — the line is post-close
+  and still names the id (reap it, end the turn so the listing is recorded again, re-run), or the
+  newest line predates the close, so the check could run and has not (end the turn once; the
+  stop-guard blocks a finished-and-unstamped stop and continues you). A post-close line without the
+  id prints `keepalive-reaped: checked`; no sidecar, or no recorded id, prints `unchecked` with the
+  reason and lands. It parses nothing beyond a substring test for the id, and it does not check that
+  the id was ever this run's job.
 - `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the unit
   as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the three
   acts; this verb is the record. It RECORDS rather than acts: a row derived from the change it just
@@ -96,13 +123,13 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   two of that condition's three clauses — the intersection test, and the shared-record refusal in
   BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
   is refused. The third clause is a judgement about meaning and is refused as undecidable rather than
-  faked. A re-declaration of a pass still OPEN widens or no-ops; it never narrows. Once that pass has
-  COMMITTED, a further declaration of the same unit is a new pass — M6 sanctions several pass kinds
-  per unit — recorded as its own row rather than judged against the previous one. The driver
-  distinguishes them by OVERLAP: a narrowing is a strict subset and always overlaps, so it stays
-  refused; a disjoint set is a new pass. One that PARTLY overlaps is read as
-  a narrowing and refused, which is the conservative direction and is stated here rather than
-  discovered. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  faked. A DECLARATION IS APPEND-ONLY: every call parks its own row at the current
+  anchor and nothing rewrites, supersedes or retracts an earlier one, so a re-declaration of the same
+  unit is ACCEPTED whatever its relation to the row before it — wider, NARROWER, or disjoint. A pass
+  that discovers it needs fewer paths than it declared says so, and both rows stand. M6 sanctions
+  several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
+  REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
+  one thing here that is unchanged; a unit's own rows are never siblings of each other. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
   an unattended build closes each unit spec in its own build commit, and this verb is the one point
   that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,
@@ -134,7 +161,7 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
 
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
-  nothing, so the machine items assert obligations it does not have, while the keepalive is still
+  nothing, so the machine items assert obligations it does not have, while the idle-wake is still
   orphaned and the parked decisions still unseen. The code is validated before it is recorded and the
   refusal names the legal set; it is the twelfth authored fact, and it exists because one terminal
   phase said a run stopped and never said why.

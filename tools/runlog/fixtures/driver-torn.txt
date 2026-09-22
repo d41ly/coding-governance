@@ -1,0 +1,3 @@
+v=1	t=1757770020.1	p=driver	ev=start	n=9.1	verb=--status	slug=dLoggedFlight
+v=1	t=1757770020.9	p=driver	ev=end	n=9.1	verb=--status	rc=0	exit=clean
+v=1	t=1757770021.1	p=driver	ev=start	n=9.2	verb=--pha

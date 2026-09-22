@@ -88,6 +88,20 @@ while IFS= read -r line; do
   case "$body" in
     *": "*) fail 5 "a definition uses a colon as a label, which the grammar admits only glued to a value: $body" ;;
   esac
+  # ---- the FIELD SEPARATOR. Tail fields break on ' · ' and on nothing else. Added by
+  #      TOOL-aHonedRuleset-8's closing review: the charter's connective said a gate held this and
+  #      no arm did, so a definition separating fields with a comma or a semicolon passed at exit 0.
+  #      Commas INSIDE an opaque field are legal -- the grammar binds shape, never value bytes -- so
+  #      this greps the field breaks the shape defines, which are the ones outside <...> and `...`.
+  sep=$(printf '%s' "$body" | sed -E 's/<[^>]*>//g; s/`[^`]*`//g')
+  case "$sep" in
+    *";"*) fail 7 "a definition breaks a tail field on a semicolon, and the grammar admits only ' · ': $body" ;;
+  esac
+  # ---- ALTERNATION is the ASCII pipe and lives INSIDE a placeholder. A bare pipe in the tail is a
+  #      field break the grammar does not define. Same finding, same review.
+  case "$sep" in
+    *"|"*) fail 8 "a definition carries a bare ASCII pipe outside a placeholder, and the grammar admits alternation only inside <...>: $body" ;;
+  esac
   # ---- placeholders are lowercase angle-bracket names
   while IFS= read -r ph; do
     [ -n "$ph" ] || continue
