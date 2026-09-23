@@ -534,7 +534,12 @@ read the durable summary instead.
 ref, the validated tree must be the pushed tip, and `--no-verify` bypasses). `GOV_GATE_CMD` may
 name only a script this repo tracks, unmodified, and anything else is refused before a bar runs;
 `GOV_GATE_CMD_TEST=1` is the one test escape, labelled `bar: STUB` and denied a lander marker
-(`TOOL-aRepatriatedFork-5`). Earlier runs are diff-scoped and are developer-choice. `core.hooksPath` is
+(`TOOL-aRepatriatedFork-5`). The hook reads the default branch from the remote it is pushing to,
+refuses a dirty tree and a `HEAD` the bar moved, hands the bar `GATE_PUSH_BASE` from git's own ref
+line, and leaves each refusal as a token in `<git-dir>/pre-push-refusal`, which the lander reads
+instead of the push's output. A repository may declare a branch bar, `GOV_BRANCH_GATE_CMD`, in
+`.githooks/gate-env.sh`; undeclared, a branch push stays ungated (`TOOL-aRepatriatedFork-8`).
+Earlier runs are diff-scoped and are developer-choice. `core.hooksPath` is
 repo-GLOBAL, so the hook gating your push is the PRIMARY tree's; check H REPORTS a divergence. A tracked pre-commit fast leg sits beside it and also enforces the
 branch guard, refusing a primary-tree commit off the default branch (`GOV_DEFAULT_BRANCH` pins it).
 A SessionStart hook runs `tools/check-wiring.sh --session`, which auto-sets an unset

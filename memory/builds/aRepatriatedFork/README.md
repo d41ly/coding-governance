@@ -121,7 +121,7 @@ ids TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOO
 | [DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"](spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-15 — a kit whose shipped bytes move bumps its version](spec/2026-09-23-spec-TOOL-aRepatriatedFork-15.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-24 |
-| [TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries](spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-23 |
+| [TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries](spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter](spec/2026-09-23-spec-DEPL-aRepatriatedFork-14.md) | 3 | 1 | SPECCED | rev-1 | 2026-09-23 |
 | [DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did](spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [DEPL-aRepatriatedFork-21 — apply never lands gov's bytes on a file the target owns](spec/2026-09-24-spec-DEPL-aRepatriatedFork-21.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-24 |

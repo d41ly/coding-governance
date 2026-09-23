@@ -36,3 +36,16 @@
 #
 # The `export` line is DELETED rather than commented out. A commented assignment is a line somebody
 # uncomments without reading the paragraph above it.
+#
+# THE KEYS THIS FILE MAY DECLARE, as documentation only; gov declares none of them today.
+#   GATE_SELFTESTS=1          run the kit self-tests on every default-branch push (the switch above).
+#   GOV_GATE_CMD=<cmd>        the merge bar, when it is not `run-gates.sh`. It must name a script this
+#                             repo tracks, unmodified in the working tree; the hook refuses anything
+#                             else. An adopter's bar may read GATE_PUSH_BASE, the remote's sha for the
+#                             default branch before the push, which the hook sets from git's own ref
+#                             line and never inherits (TOOL-aRepatriatedFork-8 S5).
+#   GOV_BRANCH_GATE_CMD=<cmd> a bar for a push that does NOT touch the default branch, vetted by the
+#                             same rule at HEAD and fed git's pre-push ref lines on stdin. Unset, such
+#                             a push is ungated. It can only add a refusal, never remove one.
+# The default branch is deliberately NOT a key here: this file is sourced after the hook has decided
+# which ref is the default, so a tracked file cannot choose which branch escapes the bar.

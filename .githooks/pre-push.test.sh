@@ -533,4 +533,107 @@ else bad "AC3 the hook refused a tree that simply has no leg manifest"; fi
 
 cd "$pfx_home" || exit 2
 
+# ============================================================================================
+# TOOL-aRepatriatedFork-8 — THE CONTRACTS inCMS's OWN HOOK CARRIED. A fresh fixture whose ONLY
+# remote is named `incms`, as on inCMS's node `d`, with its HEAD set and NO GOV_DEFAULT_BRANCH, so
+# every arm below also proves S1: the pre-S1 hook read `origin/HEAD` and refused each of these
+# pushes with "can't determine the default branch" before any of them reached what it grades.
+fx8="$tmp/fx8"
+mkdir -p "$fx8"
+git init -q --bare "$fx8/incms.git"
+git init -q "$fx8/work"
+cd "$fx8/work" || exit 2
+git config user.email t@example.com; git config user.name t
+git config core.hooksPath "$tmp/hooks"
+git commit -q --allow-empty -m init; git branch -M main
+git remote add incms "$fx8/incms.git"
+git push -q --no-verify incms main
+git -C "$fx8/incms.git" symbolic-ref HEAD refs/heads/main
+git remote set-head incms main >/dev/null 2>&1
+read_token() { cut -f1 "$(git rev-parse --git-dir)/pre-push-refusal" 2>/dev/null; }
+read_tip() { git -C "$fx8/incms.git" rev-parse -q --verify "refs/heads/${1:-main}" 2>/dev/null; }
+
+# AC3 — a raw push is refused by the lander-marker rule, NOT the default-branch lookup, and leaves
+#       the machine token the lander reads.
+git commit -q --allow-empty -m r8
+msg=$( ( unset GOV_DEFAULT_BRANCH; git push -q incms main 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"refusing a raw push"*"|raw-push") ok "AC3 a raw push to a remote named incms is refused as raw-push, with its token" ;;
+  *) bad "AC3 expected the raw-push refusal and token, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+touch "$(git rev-parse --git-dir)/push-main-active"
+
+# AC2 — the same remote, a RED bar: refused AT THE BAR, and the token says the bar ran.
+before=$(read_tip)
+msg=$( ( unset GOV_DEFAULT_BRANCH; GOV_GATE_CMD="bash $red" git push -q incms main 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"gate RED"*"|gate-red") [ "$(read_tip)" = "$before" ] && ok "AC2 a remote named incms reaches the bar, which refuses as gate-red" \
+                            || bad "AC2 the remote moved over a red bar" ;;
+  *) bad "AC2 expected the bar to run and refuse, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+
+# AC9 — the bar is handed the pushed range from git's own ref line, never from the environment.
+pb="$tmp/pushbase.sh"; printf '#!/usr/bin/env bash\necho "PUSH_BASE=[$GATE_PUSH_BASE]"\nexit 0\n' > "$pb"
+before=$(read_tip)
+msg=$( ( unset GOV_DEFAULT_BRANCH; GATE_PUSH_BASE=inherited GOV_GATE_CMD="bash $pb" git push -q incms main 2>&1 ) )
+case "$msg" in
+  *"PUSH_BASE=[$before]"*) ok "AC9 GATE_PUSH_BASE is the remote's pre-push sha, and an inherited value is overwritten" ;;
+  *) bad "AC9 expected PUSH_BASE=[$before], got: ${msg:-<nothing>}" ;;
+esac
+
+# AC8 — a bar that COMMITS while it runs and exits green: the green describes a tree git is no
+#       longer pushing, so the hook refuses as head-moved and the remote stays put.
+mv8="$tmp/moves-head.sh"; printf '#!/usr/bin/env bash\ngit commit -q --allow-empty -m moved-by-the-bar\nexit 0\n' > "$mv8"
+git commit -q --allow-empty -m c8m
+before=$(read_tip)
+msg=$( ( unset GOV_DEFAULT_BRANCH; GOV_GATE_CMD="bash $mv8" git push -q incms main 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"HEAD moved"*"|head-moved") [ "$(read_tip)" = "$before" ] && ok "AC8 a HEAD moved by the bar is refused as head-moved" \
+                               || bad "AC8 the remote moved although HEAD moved under the bar" ;;
+  *) bad "AC8 expected the head-moved refusal, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+
+# AC6 — an untracked superproject file is dirt: the bar would certify a file the push does not carry.
+echo 'x = 1' > brand_new_module.py
+msg=$( ( unset GOV_DEFAULT_BRANCH; GOV_GATE_CMD="bash $green" git push -q incms main 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"working tree is dirty"*"brand_new_module.py"*"|dirty-tree") ok "AC6 an untracked file refuses the push as dirty-tree, naming it" ;;
+  *) bad "AC6 expected the dirty-tree refusal, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+rm -f brand_new_module.py
+# ITS CONTROL, which is also AC3's other half: the clean tree lands, and leaves no token behind.
+if ( unset GOV_DEFAULT_BRANCH; GOV_GATE_CMD="bash $green" git push -q incms main >/dev/null 2>&1 ) \
+   && [ -z "$(read_token)" ]; then
+  ok "AC6 control — the same push from a clean tree lands, and no stale token survives it"
+else
+  bad "AC6 control — a clean push did not land, or left token '$(read_token)'"
+fi
+
+# AC10 — THE BRANCH BAR (S5). Declared in gate-env.sh it gates a feature push; naming an untracked
+#        script it is refused as bar-refused; undeclared the push is ungated. The escape is unset in
+#        each arm, since it would let an untracked bar through.
+git checkout -q -b feat8
+printf '#!/usr/bin/env bash\necho "BRANCH BAR RED"\nexit 1\n' > branch-red.sh
+git add branch-red.sh; git commit -q -m "a tracked branch bar"
+mkdir -p .githooks
+printf 'GOV_BRANCH_GATE_CMD="bash branch-red.sh"\n' > .githooks/gate-env.sh
+msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 2>&1 ) )
+case "$msg|$(read_token)|$(read_tip feat8)" in
+  *"BRANCH BAR RED"*"|gate-red|") ok "AC10 a declared, tracked, red branch bar refuses a feature push" ;;
+  *) bad "AC10 expected the branch bar to run and refuse, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+printf 'GOV_BRANCH_GATE_CMD="bash %s"\n' "$red" > .githooks/gate-env.sh
+msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"does not track"*"|bar-refused") ok "AC10 an untracked branch bar is refused as bar-refused" ;;
+  *) bad "AC10 expected an untracked branch bar to be refused, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+rm -f .githooks/gate-env.sh
+if ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 >/dev/null 2>&1 ) && [ -n "$(read_tip feat8)" ]; then
+  ok "AC10 control — with no branch bar declared, the feature push is ungated"
+else
+  bad "AC10 control — an undeclared branch bar still gated a feature push"
+fi
+cd "$pfx_home" || exit 2
+
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -158,16 +158,33 @@ One gov commit. The hook is `core.hooksPath`-resolved from the primary tree, so 
 a clone once its primary tree checks the commit out. A lander that predates S2 reads no token and
 falls back to its prose grep, so an old lander against a new hook is no worse than today.
 
-### Files touched (estimate)
+### As built (rev-2)
+
+- **S2's one function holds the pairing.** `write_refusal <token> <message>` writes the file and maps
+  the token to its run-log decision, so no call site spells both words. `gate-red` and `head-moved`
+  map to no decision: the bar RAN, and the `full` or `scoped` decision it ran under stands.
+- **S3 computes the dirt before the bar is vetted and refuses after it**, so the vetting's own
+  working-copy refusal keeps its message. `.githooks/pre_push_bar_selftest.py`'s mutation clears the
+  dirt as well, since S3 now catches the rewrite its case M3 needs to see land.
+- **S5's branch bar reads git's ref lines on stdin**, the pre-push hook's own input, and runs with
+  `GATE_PUSH_BASE` unset: a non-default push can carry several refs, so one base sha cannot describe
+  it. It is vetted at `HEAD`, the tree it runs from, and its run is the run-log decision `branch-gated`.
+- **S2's lander probes the PUSH URL** with `ls-remote`, since the fetch URL may reach a remote the
+  push cannot.
+- **S7's backlog flip is the main loop's.** `--dispatch` refused `memory/backlog/TOOL.md` as a shared
+  mutable record, so this unit closes the mechanism and the main loop records the row.
+
+### Files touched
 
 - `.githooks/pre-push`
 - `.githooks/pre-push.test.sh`
+- `.githooks/pre-push.runlog.test.sh` (the exit table, and the `refuse-dirty` and `branch-gated` decisions)
+- `.githooks/pre_push_bar_selftest.py` (the mutation also clears S3's dirt)
 - `.githooks/gate-env.sh` (the documented keys, as comments)
 - `tools/push-main.sh`
 - `tools/push-main.test.sh`
 - `tools/check-wiring.test.sh`
-- `AGENTS.md` (the push-boundary paragraph at `:532-537`)
-- `memory/backlog/TOOL.md`
+- `AGENTS.md` (the push-boundary paragraph)
 
 ### Alternatives rejected
 
@@ -262,6 +279,10 @@ New arm: `.githooks/pre-push.test.sh` · a fixture remote named `incms`, a dirty
 
 - rev-1 · 2026-09-23 · initial draft, from audit-B and a re-read of gov a7c78ad2, inCMS 1bc57da27
   and nc f69e2ffb.
+- rev-2 · 2026-09-24 · built. §4 gains "As built": S2's refusal function maps token to decision,
+  S3 refuses after the bar is vetted, S5's branch bar reads the ref lines on stdin, the lander probes
+  the push URL, and S7's backlog row moves to the main loop after `--dispatch` refused it. Files
+  touched gains the run-log suite and the bar self-test, and loses `memory/backlog/TOOL.md`.
 
 ## 10. Reuse audit
 

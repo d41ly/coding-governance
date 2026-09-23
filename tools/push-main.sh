@@ -15,18 +15,39 @@ set -u
 top=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "push-main: not a git repo" >&2; exit 2; }
 cd "$top" || exit 2
 
-# Resolve the default branch, GOV_DEFAULT_BRANCH first then origin/HEAD. Fail CLOSED if neither is
-# set — silently assuming 'main' would let a push to a real 'develop'/'master' default run un-gated.
-def=${GOV_DEFAULT_BRANCH:-$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)}
-def=${def#origin/}
+# THE REMOTE FIRST, then ITS default branch (TOOL-aRepatriatedFork-8 S1). This read `origin/HEAD`
+# before it knew which remote it would push to, so on a node whose remote is named anything else
+# (inCMS's node `d` names it `incms`) it exited 2 before its first fetch. The remote is GOV_REMOTE,
+# else the current branch's configured remote, else the repository's ONLY remote. Several remotes
+# and none configured is a refusal: guessing picks a remote nobody chose.
+branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
+remote=${GOV_REMOTE:-}
+[ -n "$remote" ] || remote=$(git config "branch.$branch.remote" 2>/dev/null || true)
+if [ -z "$remote" ]; then
+  remotes=$(git remote 2>/dev/null)
+  case "$remotes" in *$'\n'*|"") ;; *) remote=$remotes ;; esac
+  if [ -z "$remote" ]; then
+    echo "push-main: can't determine which remote to land on — GOV_REMOTE is unset, '$branch' has no configured remote, and this repository has $(printf '%s' "$remotes" | grep -c .) remotes." >&2
+    echo "  Name it: export GOV_REMOTE=<remote>." >&2
+    exit 2
+  fi
+fi
+
+# Resolve the default branch, GOV_DEFAULT_BRANCH first then that remote's HEAD. Fail CLOSED if neither
+# is set — silently assuming 'main' would let a push to a real 'develop'/'master' default run un-gated.
+def=${GOV_DEFAULT_BRANCH:-$(git symbolic-ref --short "refs/remotes/$remote/HEAD" 2>/dev/null)}
+def=${def#"$remote"/}
 if [ -z "$def" ]; then
-  echo "push-main: can't determine the default branch (origin/HEAD unset, GOV_DEFAULT_BRANCH unset) —" >&2
-  echo "  set it with 'git remote set-head origin -a', or export GOV_DEFAULT_BRANCH=<branch>." >&2
+  echo "push-main: can't determine the default branch ($remote/HEAD unset, GOV_DEFAULT_BRANCH unset) —" >&2
+  echo "  set it with 'git remote set-head $remote -a', or export GOV_DEFAULT_BRANCH=<branch>." >&2
   exit 2
 fi
-remote=${GOV_REMOTE:-$(git config "branch.$def.remote" 2>/dev/null || echo origin)}
 max=${GOV_PUSH_MAIN_MAX_RETRIES:-3}
-marker="$(git rev-parse --git-dir)/push-main-active"
+gd=$(git rev-parse --git-dir)
+marker="$gd/push-main-active"
+# THE HOOK'S VERDICT (S2): `<token><TAB><message>`, written by .githooks/pre-push on every refusal and
+# on a red bar, cleared by it on every run and by this script before every push.
+refusal="$gd/pre-push-refusal"
 
 # The marker is a SOFT advisory guard: a SIGKILL/OOM/power-loss during the gate can leak it (this
 # trap can't catch those). Worst case a later raw push skips reconcile-before-gate and wastes ONE
@@ -60,7 +81,6 @@ trap 'rm -f "$marker"' EXIT INT TERM
 : "${GIT_SSH_COMMAND:=ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=120 -o TCPKeepAlive=yes}"
 export GIT_SSH_COMMAND
 
-branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
 if [ "$branch" != "$def" ]; then
   echo "push-main: on '$branch', not '$def' — land $def from the primary tree on $def." >&2
   exit 2
@@ -68,8 +88,15 @@ fi
 
 # A dirty tree makes the reconcile merge refuse to START — NOT a merge conflict; catch it here with
 # the real remedy instead of the misleading "reconcile CONFLICT" the merge-failure path would print.
-if [ -n "$(git status --porcelain -uno 2>/dev/null)" ]; then
-  echo "push-main: the working tree has uncommitted changes — commit or stash before landing $def." >&2
+# ONE definition of dirty, spelled identically in .githooks/pre-push, which refuses the same tree
+# (TOOL-aRepatriatedFork-8 S3, from inCMS's ARCH-dWaryGatepost-1). `-uno`, the spelling this used,
+# passed a brand-new untracked source file that the bar then certified and the push did not carry.
+# `--ignore-submodules=untracked` also refuses a moved submodule pointer and a tracked edit inside a
+# submodule, and ignores a submodule's own untracked files, which no commit here can carry.
+dirt=$(git status --porcelain --ignore-submodules=untracked 2>/dev/null) || dirt="(git status failed)"
+if [ -n "$dirt" ]; then
+  echo "push-main: the working tree has uncommitted changes or untracked files — commit, stash or remove them before landing $def:" >&2
+  printf '%s\n' "$dirt" | sed 's/^/    /' >&2
   exit 2
 fi
 
@@ -86,17 +113,16 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
+  rm -f "$refusal"
   touch "$marker"
   echo "push-main: gating + pushing $def (attempt $attempt/$max)..." >&2
-  # Classify a push failure on what git SAID (streamed live via tee, also captured), not on whether
-  # origin moved (a guard on the wrong signal calls a gate-passed-but-network-failed push "RED", and
-  # loops a still-RED commit as a race when a peer advanced origin during the gate).
-  pout=$(mktemp)
-  git push "$remote" "$def" 2>&1 | tee "$pout" >&2
-  rc=${PIPESTATUS[0]}
+  # THE PUSH'S OUTPUT IS SHOWN, NEVER READ (S2). It carries the bar's own output, so classifying on
+  # its words let any leg that printed `connection` report a red bar as an unreachable remote
+  # (TOOL-aHonedRuleset-10), and any leg that printed `rejected` fake a race and re-run the bar.
+  git push "$remote" "$def" >&2
+  rc=$?
   rm -f "$marker"
   if [ "$rc" -eq 0 ]; then
-    rm -f "$pout"
     # THE LANDER MARKER, when the project declares one. It carries the pushed COMMIT, not just its own
     # existence: a bare touched file is satisfied by any previous landing, which is the
     # pass-by-finding-anything shape the unattended kit's own Definition of Done was stuck in before
@@ -142,27 +168,34 @@ while [ "$attempt" -le "$max" ]; do
     exit 0
   fi
 
-  if grep -qiE 'rejected|fetch first|non-fast-forward|stale info' "$pout"; then
-    cls=race
-  elif grep -qiE 'unable to access|could not resolve host|could not read from remote|connection|timed out' "$pout"; then
-    cls=unreachable
-  else
-    git fetch "$remote" "$def" 2>/dev/null || true
-    if git merge-base --is-ancestor "$remote/$def" HEAD 2>/dev/null; then cls=red; else cls=race; fi
-  fi
-  rm -f "$pout"
-
-  case "$cls" in
-    race)
-      echo "push-main: push rejected — $remote/$def advanced during the gate; re-reconciling and re-gating..." >&2
-      attempt=$((attempt + 1)) ;;
-    unreachable)
-      echo "push-main: could not reach $remote — the gate ran but nothing was pushed; retry when the remote is reachable." >&2
+  # THE ORDER OF EVIDENCE is inCMS's: the hook's own verdict; else a probe of the push URL, so that
+  # unreachability is OBSERVED rather than inferred; else fetch and ancestry, a race or a failure the
+  # hook did not claim. An absent verdict is the cue to probe, never a pass: a hook that predates the
+  # channel, or a push that died before the hook ran, writes none.
+  tok=""; msg=""
+  [ -f "$refusal" ] && IFS=$'\t' read -r tok msg < "$refusal"
+  case "$tok" in
+    gate-red)
+      echo "push-main: the bar RAN and is RED, so nothing was pushed — read $gd/gate-last-summary.txt, fix it, and re-run push-main." >&2
       exit 1 ;;
-    red)
-      echo "push-main: push failed and $remote/$def is unchanged — the gate is RED (output above). Fix it and re-run push-main." >&2
+    head-moved)
+      echo "push-main: the bar ran GREEN but HEAD moved while it ran, so the green does not describe the pushed tree — re-run push-main. ($msg)" >&2
+      exit 1 ;;
+    ?*)
+      echo "push-main: pre-push refused the push ($tok) — a precondition; no leg ran: $msg" >&2
       exit 1 ;;
   esac
+  if ! git ls-remote "$(git remote get-url --push "$remote" 2>/dev/null || printf '%s' "$remote")" "refs/heads/$def" >/dev/null 2>&1; then
+    echo "push-main: could not reach $remote — a probe of its push URL failed after the push did, and the hook left no verdict; retry when the remote is reachable." >&2
+    exit 1
+  fi
+  git fetch "$remote" "$def" 2>/dev/null || true
+  if git merge-base --is-ancestor "$remote/$def" HEAD 2>/dev/null; then
+    echo "push-main: the push failed, $remote/$def is unchanged and reachable, and the hook left no verdict — the remote refused it or the hook predates its refusal channel; read the push output above." >&2
+    exit 1
+  fi
+  echo "push-main: push rejected — $remote/$def advanced during the gate; re-reconciling and re-gating..." >&2
+  attempt=$((attempt + 1))
 done
 
 echo "push-main: $remote/$def is moving faster than the gate ($max attempts exhausted) — land when the fleet is quieter, or coordinate." >&2

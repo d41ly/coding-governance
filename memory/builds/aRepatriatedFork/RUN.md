@@ -108,3 +108,11 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-23T22:52:40Z dispatch · item 8cf89a61 TOOL-aRepatriatedFork-2 · reason tools skills/session-kickoff memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md memory/builds/aRepatriatedFork/build memory/builds/aRepatriatedFork/README.md memory/map memory/guides memory/HYGIENE.md memory/TEMPLATE-SPEC.md .claude/skills coding-governance-agents.template.md WIRE-INTO-PROJECT.md AGENTS.md memory/archive
 
 2026-09-23T23:19:22Z dispatch · item 8cf89a61 TOOL-aRepatriatedFork-2 · reason tools skills/session-kickoff .githooks/pre-push memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md memory/builds/aRepatriatedFork/build memory/builds/aRepatriatedFork/README.md memory/map memory/guides memory/HYGIENE.md memory/TEMPLATE-SPEC.md .claude/skills coding-governance-agents.template.md WIRE-INTO-PROJECT.md AGENTS.md memory/archive
+
+2026-09-23T23:38:59Z dispatch · item 67cde587 TOOL-aRepatriatedFork-8 · reason .githooks/pre-push .githooks/pre-push.test.sh .githooks/pre-push.runlog.test.sh .githooks/pre_push_bar_selftest.py .githooks/gate-env.sh tools/push-main.sh tools/push-main.test.sh tools/check-wiring.test.sh AGENTS.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md
+
+2026-09-23T23:39:00Z brief · item TOOL-aRepatriatedFork-8 · reason cd4fa636a71a memory/builds/aRepatriatedFork/prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-8-build-brief.md
+
+2026-09-23T23:51:35Z dispatch · item 67cde587 TOOL-aRepatriatedFork-8 · reason .githooks/pre-push .githooks/pre-push.test.sh .githooks/pre-push.runlog.test.sh .githooks/pre_push_bar_selftest.py .githooks/gate-env.sh tools/push-main.sh tools/push-main.test.sh tools/check-wiring.test.sh AGENTS.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md tools/install-prefix-carried.txt
+
+2026-09-23T23:53:25Z dispatch · item 67cde587 TOOL-aRepatriatedFork-8 · reason .githooks/pre-push .githooks/pre-push.test.sh .githooks/pre-push.runlog.test.sh .githooks/pre_push_bar_selftest.py .githooks/gate-env.sh tools/push-main.sh tools/push-main.test.sh tools/check-wiring.test.sh AGENTS.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md tools/install-prefix-carried.txt memory/builds/aRepatriatedFork/README.md

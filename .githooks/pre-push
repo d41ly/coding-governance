@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # coding-governance pre-push: the authoritative merge bar. On a push to the default branch it runs the
-# FULL gate (tools/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes are not
-# gated. Every push this hook sees, gated or not, leaves its lines in the run log (see THE RUN LOG).
+# FULL gate (tools/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes are gated
+# only by a branch bar the repository itself declares (GOV_BRANCH_GATE_CMD, see THE BRANCH BAR). Every
+# refusal leaves a machine verdict in the git dir (see THE REFUSAL CHANNEL), and every push this hook
+# sees, gated or not, leaves its lines in the run log (see THE RUN LOG).
 # Install once per clone: git config core.hooksPath .githooks. Override: git push --no-verify.
 #
 # Drift note: the ACTIVE hook is the TRACKED .githooks/ dir (core.hooksPath), and check-wiring.sh
@@ -293,6 +295,37 @@ write_push_end() { # the status the EXIT trap saw -> the END line
 
 resolve_push_dirs "$top" || { RUNLOG_GITDIR=""; RUNLOG_DIR=""; }
 
+# ---- THE REFUSAL CHANNEL — TOOL-aRepatriatedFork-8 S2, from inCMS's `fail_push` ------------------
+# `pre-push-refusal` in this tree's git dir holds `<token><TAB><message>` for the refusal this run
+# made, and nothing when it made none: it is cleared here, on every run, before anything can refuse.
+# push-main.sh reads it after a failed push. It used to grep its own tee of the push output instead,
+# and the bar's output is IN that stream, so a leg printing `connection` turned a red bar into an
+# "unreachable remote" (TOOL-aHonedRuleset-10). A token is written by this hook and read by the
+# lander; no wording anywhere can select a verdict.
+#
+# The tokens are inCMS's spellings, so its reader and this one read one vocabulary. The function
+# below is the one place a token is paired with its run-log decision. `gate-red` and `head-moved`
+# pair with none: the bar RAN, and the decision it ran under stands. Before the ref loop no START
+# exists, so the decision goes to one `ev=once` line instead. The two refusals above the journal
+# root write nothing, and a lander reads that absence as its cue to probe, never as a pass.
+PUSH_REFUSAL="$(git rev-parse --git-dir 2>/dev/null)/pre-push-refusal"
+rm -f "$PUSH_REFUSAL"
+why=""
+write_refusal() { # token · one-line message -> the refusal file, and the run-log decision the token pairs with
+  local dec=""
+  case "$1" in
+    default-branch) dec=refuse-default-branch ;;
+    manifest)       dec=refuse-manifest ;;
+    raw-push)       dec=refuse-raw ;;
+    head-mismatch)  dec=refuse-head ;;
+    dirty-tree)     dec=refuse-dirty ;;
+    bar-refused)    dec=refuse-bar ;;
+  esac
+  { printf '%s\t%s\n' "$1" "${2-}" > "$PUSH_REFUSAL"; } 2>/dev/null
+  [ -n "$dec" ] || return 0
+  if [ -n "$RUNLOG_N" ]; then RUNLOG_DECISION=$dec; else write_push_once "$dec"; fi
+}
+
 # ---- WHERE THIS TREE KEEPS ITS KITS — TOOL-dRetiredFork-11 ---------------------------------------
 # This hook ships VERBATIM to every push-main adopter, so a hardcoded prefix ships too. It spelled
 # `tools/` at five functional sites; at an adopter installed anywhere else the fingerprint helper and
@@ -330,33 +363,54 @@ fi
 # So the observed default WINS, and the environment value is a CROSS-CHECK that can only refuse, never
 # select. Where nothing is observable (a fresh `git init` + `remote add`, which is what this hook's own
 # test builds) the environment is the only source and must at least name a branch that exists.
-obs=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); obs=${obs#origin/}
+#
+# OBSERVED ON THE REMOTE THIS PUSH GOES TO — TOOL-aRepatriatedFork-8 S1. Git hands a pre-push hook the
+# remote's NAME as $1, and this read `origin/HEAD` for every push regardless. On a node whose remote
+# is named anything else (inCMS's node `d` names it `incms`) nothing was observed, and every
+# default-branch push was refused unless each node exported GOV_DEFAULT_BRANCH. A push to a URL names
+# no remote, so nothing is observable and the environment is the only source, the rule a fresh
+# `git init` already lives by. WHAT IS A NAME is decided once, by `render_push_remote`, which keeps a
+# URL out of the run log by the same test. `.githooks/gate-env.sh` is not sourced until after this,
+# on purpose: a tracked file that could set the default could choose which branch escapes the bar.
+render_push_remote "$RUNLOG_ARG1" "$RUNLOG_ARG2"
+push_remote=""
+[ "${RUNLOG_REMOTE[0]-}" = remote ] && push_remote=${RUNLOG_REMOTE[1]}
+obs=""
+if [ -n "$push_remote" ]; then
+  obs=$(git symbolic-ref --short "refs/remotes/$push_remote/HEAD" 2>/dev/null); obs=${obs#"$push_remote"/}
+fi
 env_def=${GOV_DEFAULT_BRANCH:-}
 if [ -n "$obs" ] && [ -n "$env_def" ] && [ "$obs" != "$env_def" ]; then
-  echo "pre-push: GOV_DEFAULT_BRANCH names a branch this clone does not observe as the default, and the pushed ref is classified by that name — so an unrecognised one skips the bar entirely: env '$env_def' against observed '$obs'." >&2
-  write_push_once refuse-default-branch; exit 1
+  why="pre-push: GOV_DEFAULT_BRANCH names a branch this clone does not observe as the default, and the pushed ref is classified by that name — so an unrecognised one skips the bar entirely: env '$env_def' against observed '$obs'."
+  echo "$why" >&2
+  write_refusal default-branch "$why"; exit 1
 fi
 def=${obs:-$env_def}
 if [ -z "$def" ]; then
-  echo "pre-push: can't determine the default branch (origin/HEAD unset and GOV_DEFAULT_BRANCH unset)." >&2
+  why="pre-push: can't determine the default branch (${push_remote:+$push_remote/HEAD unset}${push_remote:-the push names a URL, so no remote HEAD is observable} and GOV_DEFAULT_BRANCH unset)."
+  echo "$why" >&2
   echo "  Refusing to guess — silently assuming 'main' would BYPASS this gate on a non-main default." >&2
-  echo "  Fix once: git remote set-head origin -a   — or export GOV_DEFAULT_BRANCH=<branch>." >&2
-  write_push_once refuse-default-branch; exit 1
+  echo "  Fix once: git remote set-head ${push_remote:-<remote>} -a   — or export GOV_DEFAULT_BRANCH=<branch>." >&2
+  write_refusal default-branch "$why"; exit 1
 fi
 if ! git rev-parse --verify --quiet "refs/heads/$def" >/dev/null 2>&1 \
-   && ! git rev-parse --verify --quiet "refs/remotes/origin/$def" >/dev/null 2>&1; then
-  echo "pre-push: the default branch resolves to a name that is no branch in this clone, so every pushed ref would classify as 'not the default branch' and skip the gate: $def" >&2
-  echo "  Fix once: git remote set-head origin -a   — or export GOV_DEFAULT_BRANCH=<a branch that exists>." >&2
-  write_push_once refuse-default-branch; exit 1
+   && { [ -z "$push_remote" ] || ! git rev-parse --verify --quiet "refs/remotes/$push_remote/$def" >/dev/null 2>&1; }; then
+  why="pre-push: the default branch resolves to a name that is no branch in this clone, so every pushed ref would classify as 'not the default branch' and skip the gate: $def"
+  echo "$why" >&2
+  echo "  Fix once: git remote set-head ${push_remote:-<remote>} -a   — or export GOV_DEFAULT_BRANCH=<a branch that exists>." >&2
+  write_refusal default-branch "$why"; exit 1
 fi
 
 # git feeds one line per pushed ref on stdin: <local ref> <local sha> <remote ref> <remote sha>.
 # Classify on the 3rd field (remote_ref) — `git push origin feat:refs/heads/main` updates the default
 # branch from a differently-named local ref. Read ALL lines here; run the gate ONCE after the loop.
-# The run log keeps each line too, rejoined with git's single spaces, up to its count cap.
-main_local=""
+# The run log keeps each line too, rejoined with git's single spaces, up to its count cap. The 4th
+# field of the default branch's line is the remote's sha before this push, which the bar receives as
+# GATE_PUSH_BASE (S5); every line, uncapped, is what a branch bar reads on its stdin.
+main_local=""; push_base=""; push_refs=""
 while read -r _localref localsha remoteref _remotesha; do
-  [ "$remoteref" = "refs/heads/$def" ] && main_local=$localsha
+  [ "$remoteref" = "refs/heads/$def" ] && { main_local=$localsha; push_base=$_remotesha; }
+  push_refs+="$_localref $localsha $remoteref $_remotesha"$'\n'
   if [ "${#RUNLOG_REFS[@]}" -lt "$RUNLOG_REF_CAP" ]; then
     RUNLOG_REFS+=("$_localref $localsha $remoteref $_remotesha")
   else
@@ -366,6 +420,169 @@ done
 write_push_start
 trap 'write_push_end "$?"' EXIT
 # FROM HERE ON, every exit sets its decision and RUNLOG_CLEAN=1 immediately before it.
+
+# THE REPOSITORY'S OWN GATE POLICY, if it has one. This hook is shipped VERBATIM to every push-main
+# adopter, so anything decided IN it is decided FOR them; anything decided in a file they do not
+# receive is not. The mechanism travels, the choice does not. An adopter with no such file runs with
+# whatever their environment carries, which is the documented default. TOOL-dUnstalledConvoy-28.
+# SOURCED HERE, above the non-default exit, because the branch bar below is one of the things it may
+# declare (TOOL-aRepatriatedFork-8 S5); it used to be sourced just before the forcing predicates, and
+# nothing between the two positions read anything it may set. It is still below the default-branch
+# lookup, deliberately: see the comment there.
+_gate_env="$top/.githooks/gate-env.sh"
+# shellcheck source=/dev/null
+[ -f "$_gate_env" ] && . "$_gate_env"
+
+# ---- WHICH BAR RUNS, and has this repository ever seen it? — TOOL-aRepatriatedFork-5 ----------
+# The bar used to be resolved on the line that ran it, out of an environment variable nothing checked.
+# Reproduced 2026-09-23 in a scratch repo with the default bar stubbed RED: with no override the push
+# was refused at rc 1 and the remote stayed put; with GOV_GATE_CMD=true the SAME commit landed at rc 0
+# under a BYTE-IDENTICAL "FULL gate … no recorded full green" line, a run-log END reading
+# `decision=full rc=0`, and push-main's lander marker. The evidence an unattended run is read for
+# could not tell a whole bar from `true`. NicoCares found and fixed it first (PKG-dCandidLodestar-5);
+# this is its rev-3 guard, taken without change but for the run-log decision it writes. Since
+# TOOL-aRepatriatedFork-8 it is a function, because the branch bar is vetted by the same rule.
+#
+# So a bar command gets the treatment GOV_DEFAULT_BRANCH got above: the environment may REFUSE,
+# never SELECT. There is no observed counterpart to prefer here, so the cross-check takes the other
+# available form — the command must name a file THIS REPOSITORY TRACKS. That single property
+# separates a reviewed bar script from `true`, from `bash /tmp/anything.sh`, and from anything a
+# local untracked .githooks/gate-env.sh could set.
+#
+# TRACKED AT THE SHA THE CALLER NAMES. For the merge bar that is the pushed default-branch sha, never
+# HEAD: a bar script that lands in this very push exists only on the branch being pushed, and the
+# equality check below has already established that sha IS this working tree. A branch bar runs from
+# the working tree whatever is being pushed, so it is vetted at HEAD.
+#
+# WHAT THIS DOES NOT CLOSE. `--no-verify` and a redirected `core.hooksPath` skip this file whole, and
+# `BASH_ENV` runs an actor's own file inside this hook's interpreter before its first line; each needs
+# an act of its own, and the unattended protocol lists that class as open. What this closes is the
+# case where no such act is needed: the knob this hook documents, set to a four-letter word.
+bar_class=""
+check_bar_command() { # knob name · command · sha its scripts must be tracked at -> rc 0 and bar_class, or rc 1 printed with its headline in `why`
+  local knob=$1 cmd=$2 at=$3
+  if [ -n "${GOV_GATE_CMD_TEST:-}" ]; then
+    # THE DECLARED ESCAPE, and it declares ITSELF: in the decision line, in the run log's `bar=stub`,
+    # and by the lander marker push-main withholds. Every hook harness stubs the bar with an mktemp
+    # script that is untracked by construction, so with no escape this hook could not be tested at
+    # all. A SILENT waiver would be the defect wearing a test's name.
+    bar_class=stub; return 0
+  fi
+  # EVERY path-shaped token has to be tracked, not merely the last one: "last token wins" accepts
+  # `bash /tmp/evil.sh <tracked>`, because the tracked name trails the one that actually runs.
+  #
+  # AND THE EVERY-TOKEN RULE STILL DOES NOT CONSTRAIN WHAT RUNS. `gatepayload <tracked>` and
+  # `bash -c gatepayload <tracked>` both landed over a RED bar at NicoCares: `gatepayload` is a PATH
+  # command, it holds no `/` and does not end `.sh`, so no arm looked at it while the shell ran it.
+  # So the FIRST word is constrained on its own: it is either a tracked script this repo reviews,
+  # or one of two interpreters running one, with no option word in between (`-c` turns the next
+  # word into the program and the tracked name into `$0`).
+  #
+  # AND THE CONTENT, NOT ONLY THE NAME. `bash <tracked>` with that file rewritten in the working
+  # tree also landed: the blob at the pushed tip is what the name check reads and the working copy
+  # is what runs. push-main.sh refuses a dirty tree, but the boundary may not rest on a check one
+  # layer up that a different lander need not make.
+  #
+  # `.githooks/pre_push_bar_selftest.py` disables the first-word, option and working-copy arms in a
+  # copy of this file on every run and observes the three evasions land. Its anchor is the
+  # `set +f` line below, spelled exactly once in this file.
+  _bar_tok=""; _bar_bad=""; _bar_first=""; _bar_opt=""; _bar_seen=""; _bar_dirty=""
+  set -f                       # the value is a command line; glob-expanding it is never wanted
+  for _w in $cmd; do
+    [ -z "$_bar_first" ] && _bar_first=$_w
+    case "$_w" in
+      */*|*.sh)
+        _bar_tok=$_w; _bar_seen=1
+        if [ -z "$_bar_bad" ] && ! git cat-file -e "$at:$_w" 2>/dev/null; then
+          _bar_bad=$_w
+        elif [ -z "$_bar_bad" ] && [ -z "$_bar_dirty" ]; then
+          _wt=$(git hash-object -- "$_w" 2>/dev/null || true)
+          _bl=$(git rev-parse "$at:$_w" 2>/dev/null || true)
+          [ "$_wt" != "$_bl" ] && _bar_dirty=$_w
+        fi
+        ;;
+      -*)
+        # An option word BEFORE the script decides what the interpreter runs; after it, it is the
+        # script's own argument and none of this hook's business.
+        [ -z "$_bar_seen" ] && [ -z "$_bar_opt" ] && _bar_opt=$_w
+        ;;
+    esac
+  done
+  set +f
+  if [ -z "$_bar_tok" ]; then
+    why="pre-push: REFUSING - $knob names no script at all, so nothing here can tell the"
+    echo "$why" >&2
+    echo "  merge bar from a no-op: '$cmd'. A push gated by 'true' prints the same decision line" >&2
+    echo "  as a push gated by every leg. Name a tracked script, or use --no-verify - which at" >&2
+    echo "  least leaves no gate line behind for a later reader to misread as evidence." >&2
+    return 1
+  fi
+  case "$_bar_first" in
+    */*|*.sh|bash|sh) : ;;
+    *)
+      why="pre-push: REFUSING - $knob would RUN '$_bar_first', which is neither a script"
+      echo "$why" >&2
+      echo "  this repository tracks nor one of the permitted interpreters (bash, sh). A tracked" >&2
+      echo "  name later in the value does not make the first word safe - it is the first word the" >&2
+      echo "  shell executes. Full value: '$cmd'" >&2
+      echo "  Sanctioned use: $knob='bash $GOV_KITROOT/unattended-bar.sh'. To test this hook," >&2
+      echo "  export GOV_GATE_CMD_TEST=1, which waives this and marks the decision line 'bar: STUB'." >&2
+      return 1
+      ;;
+  esac
+  if [ -n "$_bar_opt" ]; then
+    why="pre-push: REFUSING - $knob passes '$_bar_opt' to the interpreter before naming a"
+    echo "$why" >&2
+    echo "  script, so the tracked name need not be what runs at all ('-c' makes the next word the" >&2
+    echo "  program and the script name its \$0). Full value: '$cmd'" >&2
+    echo "  Name the script with no interpreter options: $knob='bash $GOV_KITROOT/unattended-bar.sh'." >&2
+    return 1
+  fi
+  if [ -n "$_bar_bad" ]; then
+    why="pre-push: REFUSING - $knob names '$_bar_bad', which this repository does not track"
+    echo "$why" >&2
+    echo "  at ${at:0:8}. The merge bar has to be a script the repo reviews;" >&2
+    echo "  an untracked one is a bar nobody has read. Full value: '$cmd'" >&2
+    echo "  Sanctioned use: $knob='bash $GOV_KITROOT/unattended-bar.sh'. To test this hook," >&2
+    echo "  export GOV_GATE_CMD_TEST=1, which waives this and marks the decision line 'bar: STUB'." >&2
+    return 1
+  fi
+  if [ -n "$_bar_dirty" ]; then
+    why="pre-push: REFUSING - $knob names '$_bar_dirty', which IS tracked at"
+    echo "$why" >&2
+    echo "  ${at:0:8} but whose working copy differs from it. The reviewed blob is what this" >&2
+    echo "  check can vouch for and the working copy is what would run, so the two have to agree." >&2
+    echo "  Commit the edit and push that, or point $knob at a bar you have not modified." >&2
+    return 1
+  fi
+  bar_class=tracked
+}
+
+# ---- THE BRANCH BAR — TOOL-aRepatriatedFork-8 S5 ------------------------------------------------
+# A push that does not touch the default branch is ungated UNLESS the repository declares a branch
+# bar, `GOV_BRANCH_GATE_CMD`, in its `.githooks/gate-env.sh`. It is the seam for an adopter policy that
+# is not generic (inCMS runs its docs hygiene on a branch push that moved `memory/`). Unset, nothing
+# changes. Set, it is vetted by the rule above, at HEAD, and run with git's own ref lines on its
+# stdin, since a branch push can carry several refs and one base sha cannot describe them; so
+# `GATE_PUSH_BASE` is unset for it rather than inherited. A branch bar can only ADD a refusal to a
+# push that is ungated without it.
+if [ -z "$main_local" ] && [ -n "${GOV_BRANCH_GATE_CMD:-}" ]; then
+  if ! check_bar_command GOV_BRANCH_GATE_CMD "$GOV_BRANCH_GATE_CMD" "$(git rev-parse HEAD 2>/dev/null)"; then
+    write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1
+  fi
+  RUNLOG_BAR=$bar_class; RUNLOG_DECISION=branch-gated
+  bar_label=$GOV_BRANCH_GATE_CMD; [ "$bar_class" = stub ] && bar_label="STUB $bar_label"
+  echo "pre-push: branch bar on a non-default push — bar: $bar_label"
+  unset GATE_PUSH_BASE
+  printf '%s' "$push_refs" | $GOV_BRANCH_GATE_CMD
+  rc=$?
+  if [ "$rc" -ne 0 ]; then
+    why="pre-push: branch bar RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."
+    echo "$why"
+    write_refusal gate-red "$why"
+  fi
+  RUNLOG_CLEAN=1; exit "$rc"
+fi
 
 [ -z "$main_local" ] && { RUNLOG_DECISION=skip-nondefault; RUNLOG_CLEAN=1; exit 0; }   # no push to the default branch → nothing to gate
 [ -z "${main_local//0/}" ] && { RUNLOG_DECISION=skip-delete; RUNLOG_CLEAN=1; exit 0; }   # all-zero local sha = a delete → nothing to gate
@@ -391,12 +608,13 @@ trap 'write_push_end "$?"' EXIT
 if [ ! -f "$top/$GOV_KITROOT/gate-legs.json" ]; then
   _elsewhere=$(git ls-files --cached -- '*gate-legs.json' 2>/dev/null | head -1)
   if [ -n "$_elsewhere" ]; then
-    echo "pre-push: REFUSING — this tree tracks a leg manifest at '$_elsewhere', but this hook" >&2
+    why="pre-push: REFUSING — this tree tracks a leg manifest at '$_elsewhere', but this hook"
+    echo "$why" >&2
     echo "  resolved its kit root to '$GOV_KITROOT' and looked for '$GOV_KITROOT/gate-legs.json'." >&2
     echo "  Left alone, the two forcing predicates that read that path would match NOTHING and the" >&2
     echo "  push would be scoped against a green earned on a different leg set." >&2
     echo "  Deliberate override, as always: git push --no-verify" >&2
-    RUNLOG_DECISION=refuse-manifest; RUNLOG_CLEAN=1; exit 1
+    write_refusal manifest "$why"; RUNLOG_CLEAN=1; exit 1
   fi
 fi
 
@@ -406,18 +624,32 @@ fi
 # push lacks it and is refused (--no-verify bypasses). The kit hook has no code/docs split, so EVERY
 # unmarked default-branch push is refused.
 if [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then
-  echo "pre-push: refusing a raw push to $def — land via $GOV_KITROOT/push-main.sh (it reconciles before the gate), or --no-verify to bypass." >&2
-  RUNLOG_DECISION=refuse-raw; RUNLOG_CLEAN=1; exit 1
+  why="pre-push: refusing a raw push to $def — land via $GOV_KITROOT/push-main.sh (it reconciles before the gate), or --no-verify to bypass."
+  echo "$why" >&2
+  write_refusal raw-push "$why"; RUNLOG_CLEAN=1; exit 1
 fi
 
 # The tree the hook validates must BE the pushed default-branch tip, else the gate certifies content
 # that isn't what lands (a push issued from a feature worktree, or `git push <sha>:main`).
 head=$(git rev-parse HEAD 2>/dev/null || true)
 if [ "$main_local" != "$head" ]; then
-  echo "pre-push: refusing — pushing $def @ ${main_local:0:8} but this working tree is at ${head:0:8}."
+  why="pre-push: refusing — pushing $def @ ${main_local:0:8} but this working tree is at ${head:0:8}."
+  echo "$why"
   echo "  Push $def from the primary tree checked out at the pushed tip (playbook §3), or --no-verify."
-  RUNLOG_DECISION=refuse-head; RUNLOG_CLEAN=1; exit 1
+  write_refusal head-mismatch "$why"; RUNLOG_CLEAN=1; exit 1
 fi
+
+# ---- THE TREE THE BAR CERTIFIES — TOOL-aRepatriatedFork-8 S3, from inCMS's ARCH-dWaryGatepost-1 ----
+# The bar reads the WORKING TREE and the push carries the COMMIT, so a dirty tree is a tree the green
+# does not describe. ONE definition of dirty, spelled identically in push-main.sh:
+# `--ignore-submodules=untracked` refuses an untracked superproject file, a moved submodule pointer
+# and a tracked edit inside a submodule, and ignores a submodule's own untracked files, which no
+# commit here can carry. `-uno`, push-main's old spelling, missed a brand-new source file; plain
+# `--porcelain` refused a submodule holding a stranger's scratch file. MEASURED HERE, REFUSED BELOW:
+# the refusal sits after the bar command is vetted, so a rewritten bar script is still named by the
+# vetting's own sharper message; `.githooks/pre_push_bar_selftest.py` clears this value in its
+# mutation too. A tree whose status cannot be read is refused as dirty, never passed as clean.
+_tree_dirty=$(git status --porcelain --ignore-submodules=untracked 2>/dev/null) || _tree_dirty="(git status failed, so this tree's state is unknown)"
 
 # ---- the boundary DECIDES, and the obligation it replaces is bounded rather than deleted --------
 # This hook used to export GATE_FULL=1 unconditionally, which made every landing pay the whole bar
@@ -441,14 +673,6 @@ fi
 # stop paying the full bar per landing, and 1 defers essentially all of the saving. Lowering it
 # later needs no code.
 GATE_FULL_MAX_LAG=10
-
-# THE REPOSITORY'S OWN GATE POLICY, if it has one. This hook is shipped VERBATIM to every push-main
-# adopter, so anything decided IN it is decided FOR them; anything decided in a file they do not
-# receive is not. The mechanism travels, the choice does not. An adopter with no such file runs with
-# whatever their environment carries, which is the documented default. TOOL-dUnstalledConvoy-28.
-_gate_env="$(git rev-parse --show-toplevel 2>/dev/null)/.githooks/gate-env.sh"
-# shellcheck source=/dev/null
-[ -f "$_gate_env" ] && . "$_gate_env"
 
 gd=$(git rev-parse --git-dir 2>/dev/null)
 kitfp="$top/$GOV_KITROOT/run-gates/gate-fingerprint.sh"
@@ -530,126 +754,26 @@ if [ -z "$force" ] && [ -n "${GATE_SELFTESTS:-}" ] && [ "$rec_st" != "1" ]; then
   force="this push runs the kit self-tests and the recorded full green was earned with them HELD"
 fi
 
-# ---- WHICH BAR RUNS, and has this repository ever seen it? — TOOL-aRepatriatedFork-5 ----------
-# $gate used to be resolved on the line that ran it, out of an environment variable nothing checked.
-# Reproduced 2026-09-23 in a scratch repo with the default bar stubbed RED: with no override the push
-# was refused at rc 1 and the remote stayed put; with GOV_GATE_CMD=true the SAME commit landed at rc 0
-# under a BYTE-IDENTICAL "FULL gate … no recorded full green" line, a run-log END reading
-# `decision=full rc=0`, and push-main's lander marker. The evidence an unattended run is read for
-# could not tell a whole bar from `true`. NicoCares found and fixed it first (PKG-dCandidLodestar-5);
-# this block is its rev-3 guard, taken without change but for the run-log decision it writes.
-#
-# So GOV_GATE_CMD gets the treatment GOV_DEFAULT_BRANCH got above: the environment may REFUSE,
-# never SELECT. There is no observed counterpart to prefer here, so the cross-check takes the other
-# available form — the command must name a file THIS REPOSITORY TRACKS. That single property
-# separates a reviewed bar script from `true`, from `bash /tmp/anything.sh`, and from anything a
-# local untracked .githooks/gate-env.sh could set.
-#
-# TRACKED AT THE PUSHED REF, never at HEAD. A bar script that lands in this very push exists only on
-# the branch being pushed. $main_local is the pushed local sha the classification loop resolved, and
-# the equality check above has already established that it IS this working tree.
-#
-# WHAT THIS DOES NOT CLOSE. `--no-verify` and a redirected `core.hooksPath` skip this file whole, and
-# `BASH_ENV` runs an actor's own file inside this hook's interpreter before its first line; each needs
-# an act of its own, and the unattended protocol lists that class as open. What this closes is the
-# case where no such act is needed: the knob this hook documents, set to a four-letter word.
+# ---- WHICH BAR RUNS: GOV_GATE_CMD, vetted by `check_bar_command` above, at the pushed tip -----
 gate=${GOV_GATE_CMD:-bash $GOV_KITROOT/run-gates/run-gates.sh}
 bar_label="$gate"
 if [ -n "${GOV_GATE_CMD:-}" ]; then
-  if [ -n "${GOV_GATE_CMD_TEST:-}" ]; then
-    # THE DECLARED ESCAPE, and it declares ITSELF: in the decision line, in the run log's `bar=stub`,
-    # and by the lander marker push-main withholds. Every hook harness stubs the bar with an mktemp
-    # script that is untracked by construction, so with no escape this hook could not be tested at
-    # all. A SILENT waiver would be the defect wearing a test's name.
-    bar_label="STUB $gate"
-    RUNLOG_BAR=stub
-  else
-    # EVERY path-shaped token has to be tracked, not merely the last one: "last token wins" accepts
-    # `bash /tmp/evil.sh <tracked>`, because the tracked name trails the one that actually runs.
-    #
-    # AND THE EVERY-TOKEN RULE STILL DOES NOT CONSTRAIN WHAT RUNS. `gatepayload <tracked>` and
-    # `bash -c gatepayload <tracked>` both landed over a RED bar at NicoCares: `gatepayload` is a PATH
-    # command, it holds no `/` and does not end `.sh`, so no arm looked at it while the shell ran it.
-    # So the FIRST word is constrained on its own: it is either a tracked script this repo reviews,
-    # or one of two interpreters running one, with no option word in between (`-c` turns the next
-    # word into the program and the tracked name into `$0`).
-    #
-    # AND THE CONTENT, NOT ONLY THE NAME. `bash <tracked>` with that file rewritten in the working
-    # tree also landed: the blob at the pushed tip is what the name check reads and the working copy
-    # is what runs. push-main.sh refuses a dirty tree, but the boundary may not rest on a check one
-    # layer up that a different lander need not make.
-    #
-    # `.githooks/pre_push_bar_selftest.py` disables the first-word, option and working-copy arms in a
-    # copy of this file on every run and observes the three evasions land. Its anchor is the
-    # `set +f` line below, spelled exactly once in this file.
-    _bar_tok=""; _bar_bad=""; _bar_first=""; _bar_opt=""; _bar_seen=""; _bar_dirty=""
-    set -f                       # the value is a command line; glob-expanding it is never wanted
-    for _w in $gate; do
-      [ -z "$_bar_first" ] && _bar_first=$_w
-      case "$_w" in
-        */*|*.sh)
-          _bar_tok=$_w; _bar_seen=1
-          if [ -z "$_bar_bad" ] && ! git cat-file -e "$main_local:$_w" 2>/dev/null; then
-            _bar_bad=$_w
-          elif [ -z "$_bar_bad" ] && [ -z "$_bar_dirty" ]; then
-            _wt=$(git hash-object -- "$_w" 2>/dev/null || true)
-            _bl=$(git rev-parse "$main_local:$_w" 2>/dev/null || true)
-            [ "$_wt" != "$_bl" ] && _bar_dirty=$_w
-          fi
-          ;;
-        -*)
-          # An option word BEFORE the script decides what the interpreter runs; after it, it is the
-          # script's own argument and none of this hook's business.
-          [ -z "$_bar_seen" ] && [ -z "$_bar_opt" ] && _bar_opt=$_w
-          ;;
-      esac
-    done
-    set +f
-    if [ -z "$_bar_tok" ]; then
-      echo "pre-push: REFUSING - GOV_GATE_CMD names no script at all, so nothing here can tell the" >&2
-      echo "  merge bar from a no-op: '$gate'. A push gated by 'true' prints the same decision line" >&2
-      echo "  as a push gated by every leg. Name a tracked script, or use --no-verify - which at" >&2
-      echo "  least leaves no gate line behind for a later reader to misread as evidence." >&2
-      RUNLOG_DECISION=refuse-bar; RUNLOG_CLEAN=1; exit 1
-    fi
-    case "$_bar_first" in
-      */*|*.sh|bash|sh) : ;;
-      *)
-        echo "pre-push: REFUSING - GOV_GATE_CMD would RUN '$_bar_first', which is neither a script" >&2
-        echo "  this repository tracks nor one of the permitted interpreters (bash, sh). A tracked" >&2
-        echo "  name later in the value does not make the first word safe - it is the first word the" >&2
-        echo "  shell executes. Full value: '$gate'" >&2
-        echo "  Sanctioned use: GOV_GATE_CMD='bash $GOV_KITROOT/unattended-bar.sh'. To test this hook," >&2
-        echo "  export GOV_GATE_CMD_TEST=1, which waives this and marks the decision line 'bar: STUB'." >&2
-        RUNLOG_DECISION=refuse-bar; RUNLOG_CLEAN=1; exit 1
-        ;;
-    esac
-    if [ -n "$_bar_opt" ]; then
-      echo "pre-push: REFUSING - GOV_GATE_CMD passes '$_bar_opt' to the interpreter before naming a" >&2
-      echo "  script, so the tracked name need not be what runs at all ('-c' makes the next word the" >&2
-      echo "  program and the script name its \$0). Full value: '$gate'" >&2
-      echo "  Name the script with no interpreter options: GOV_GATE_CMD='bash $GOV_KITROOT/unattended-bar.sh'." >&2
-      RUNLOG_DECISION=refuse-bar; RUNLOG_CLEAN=1; exit 1
-    fi
-    if [ -n "$_bar_bad" ]; then
-      echo "pre-push: REFUSING - GOV_GATE_CMD names '$_bar_bad', which this repository does not track" >&2
-      echo "  at the pushed tip ${main_local:0:8}. The merge bar has to be a script the repo reviews;" >&2
-      echo "  an untracked one is a bar nobody has read. Full value: '$gate'" >&2
-      echo "  Sanctioned use: GOV_GATE_CMD='bash $GOV_KITROOT/unattended-bar.sh'. To test this hook," >&2
-      echo "  export GOV_GATE_CMD_TEST=1, which waives this and marks the decision line 'bar: STUB'." >&2
-      RUNLOG_DECISION=refuse-bar; RUNLOG_CLEAN=1; exit 1
-    fi
-    if [ -n "$_bar_dirty" ]; then
-      echo "pre-push: REFUSING - GOV_GATE_CMD names '$_bar_dirty', which IS tracked at the pushed tip" >&2
-      echo "  ${main_local:0:8} but whose working copy differs from it. The reviewed blob is what this" >&2
-      echo "  check can vouch for and the working copy is what would run, so the two have to agree." >&2
-      echo "  Commit the edit and push that, or point GOV_GATE_CMD at a bar you have not modified." >&2
-      RUNLOG_DECISION=refuse-bar; RUNLOG_CLEAN=1; exit 1
-    fi
-    RUNLOG_BAR=tracked
+  if ! check_bar_command GOV_GATE_CMD "$gate" "$main_local"; then
+    write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1
   fi
+  RUNLOG_BAR=$bar_class
+  [ "$bar_class" = stub ] && bar_label="STUB $gate"
 fi
 RUNLOG_BAR=${RUNLOG_BAR:-default}   # set only once the value is vetted, so a refusal records no bar
+
+# S3's refusal, measured above the forcing predicates and refused here, once the bar is vetted.
+if [ -n "$_tree_dirty" ]; then
+  why="pre-push: refusing — the working tree is dirty, so the bar would certify files the push to $def does not carry."
+  echo "$why" >&2
+  while IFS= read -r _l; do echo "    $_l" >&2; done <<< "$_tree_dirty"
+  echo "  Commit or remove them and land again, or --no-verify. A submodule's own untracked files are ignored; its moved pointer is not." >&2
+  write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1
+fi
 
 # THE DECISION AND ITS REASON, on one line, always. A boundary that silently chooses the cheap path
 # is indistinguishable from one that is broken, and this line is the only place the choice is
@@ -668,7 +792,26 @@ fi
 if [ -n "${EPOCHREALTIME:-}" ]; then RUNLOG_GATE_RUN="push-${EPOCHREALTIME//[!0-9]/}-$$"
 else printf -v RUNLOG_GATE_RUN 'push-%(%s)T-%s' -1 "$$"; fi
 export GATE_RUN_ID="$RUNLOG_GATE_RUN"
+# THE PUSHED RANGE, from git's own ref line and never from the environment (S5): the remote's sha for
+# the default branch before this push, all zeros when the push creates it. An inherited value is
+# OVERWRITTEN, so no caller can hand the bar a range. An adopter's bar may classify the range
+# `$GATE_PUSH_BASE..HEAD` by its own policy; gov's runner does not read it.
+export GATE_PUSH_BASE="$push_base"
 $gate </dev/null
 rc=$?
-[ "$rc" -eq 0 ] || echo "pre-push: gate RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."
+if [ "$rc" -ne 0 ]; then
+  why="pre-push: gate RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."
+  echo "$why"
+  write_refusal gate-red "$why"
+else
+  # S4: THE GREEN MUST DESCRIBE THE PUSHED TREE. The bar runs for minutes to an hour, and anything
+  # that commits during it (a formatter leg, another session in this tree) leaves a green earned on a
+  # tree git is no longer pushing. The check at the top of this hook made before the bar is made again.
+  _after=$(git rev-parse HEAD 2>/dev/null || true)
+  if [ "$_after" != "$main_local" ]; then
+    why="pre-push: refusing — HEAD moved from ${main_local:0:8} to ${_after:0:8} while the bar ran, so its green does not certify the tree being pushed."
+    echo "$why" >&2
+    write_refusal head-moved "$why"; RUNLOG_CLEAN=1; exit 1
+  fi
+fi
 RUNLOG_CLEAN=1; exit "$rc"

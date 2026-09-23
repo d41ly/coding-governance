@@ -24,10 +24,24 @@ chk() { bash "$SCRIPT" "$@" 2>/dev/null; }   # run the checker, drop stderr nois
 # that cannot see what it grades. TOOL-dRetiredFork-8.
 chke() { bash "$SCRIPT" "$@" 2>&1; }
 
-# A kit file in THIS repo, resolved across both install prefixes the way every arm resolves them
-# (`tools/<rel>` here, `<rel>` in a copy-installed adopter). Nothing below hard-codes `$HERE/…`:
-# this test file itself ships to `<project>/tools/`, where the kits it copies from do NOT.
-src_of() { for c in "$REPO/tools/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; return; }; done; }
+# ONE PYTHON, resolved the way the hooks kit's suites resolve it (TOOL-aRepatriatedFork-8 S6): the
+# resolver library when it sits beside this suite, which it does only in gov, else the launcher name.
+# This sourced the resolver library by its gov path at three sites, and that library is gov-internal
+# and ships to no adopter, so the suite could not run anywhere it is installed.
+if [ -f "$HERE/lib/resolve-python.sh" ]; then
+  # shellcheck source=/dev/null
+  . "$HERE/lib/resolve-python.sh"
+  py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
+else
+  py=python3   # gov:literal-python — last-resort fallback when lib/ is absent (adopter layout)
+fi
+
+# A kit file in THIS repo, resolved across both install layouts the way every arm resolves them:
+# beside this suite (`tools/<rel>` here, `scripts/<rel>` at an adopter that installs the kits there),
+# or at the root in a copy-installed adopter. The prefix is this file's own directory, DERIVED
+# (TOOL-aRepatriatedFork-8 S6); it used to be the literal `tools/`, which NicoCares patched with a
+# third rung for `scripts/`.
+src_of() { for c in "$HERE/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; return; }; done; }
 
 # Lay a COMPLETE, RUNNABLE merge-driver install into the cwd under prefix $1 ("tools/" here, "" for
 # the copy-installed adopter layout). Complete is the point: the driver sources a resolver through
@@ -239,8 +253,6 @@ JSON
   # 13d — and the declared matcher reads ok. Without this half the arm is satisfied by a checker that
   # denies every matcher there is.
   rm -f .claude/settings.json
-  . "$REPO/tools/lib/resolve-python.sh"
-  py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
   "$py" tools/settings-merge.py --fragment $KIT_REL/hooks/scratch-guard.fragment.json >/dev/null 2>&1
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
@@ -256,12 +268,10 @@ fi
 # a skip: mirroring the agent-cap arm literally would print a permanent false UNWIRED in the repo
 # that runs check-wiring.sh as its own SessionStart hook. The fragment is resolved the way the arm
 # itself resolves it, so this test works in both layouts (adopter: <root>/memory-recall/).
-FRAG=""; for c in "$REPO/memory-recall/recall-opened.fragment.json" "$REPO/tools/memory-recall/recall-opened.fragment.json"; do
+FRAG=""; for c in "$REPO/memory-recall/recall-opened.fragment.json" "$HERE/memory-recall/recall-opened.fragment.json"; do
   [ -f "$c" ] && { FRAG="$c"; break; }
 done
 if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
-  . "$REPO/tools/lib/resolve-python.sh"
-  py=$(resolve_python) || { echo "check-wiring.test: no usable python"; exit 2; }
   newrepo
   git config core.hooksPath .githooks        # isolate: hooks wired, so only the recall arm can be unwired
   mkdir -p tools memory-recall .claude/hooks; cp "$SMERGE" tools/settings-merge.py
@@ -325,8 +335,6 @@ for c in "$HERE/orientation-card.fragment.json" "$REPO/skills/session-kickoff/or
   [ -f "$c" ] && { CARDFRAG="$c"; REPLAYFRAG="$(dirname "$c")/orientation-replay.fragment.json"; break; }
 done
 if [ -f "$SMERGE" ] && [ -n "$CARDFRAG" ] && [ -f "$REPLAYFRAG" ]; then
-  . "$REPO/tools/lib/resolve-python.sh"
-  py=$(resolve_python) || { echo "check-wiring.test: no usable python"; exit 2; }
   newrepo
   git config core.hooksPath .githooks        # isolate: hooks wired, so only the card arm can move the exit
   mkdir -p $KIT_REL .claude; cp "$SMERGE" $KIT_REL/settings-merge.py
@@ -722,7 +730,7 @@ cleanup
 # files and git is the only authority on the answer. That is the same rule check_eol and
 # check_merge_rows already follow, and the rule the end-to-end merge fixture applies to its own tree.
 cd "$REPO"
-ATTR_DRV=""; for c in "$REPO/tools/memory-tree/merge-rows.py" "$REPO/memory-tree/merge-rows.py"; do
+ATTR_DRV=""; for c in "$HERE/memory-tree/merge-rows.py" "$REPO/memory-tree/merge-rows.py"; do
   [ -f "$c" ] && { ATTR_DRV="$c"; break; }
 done
 if [ -z "$ATTR_DRV" ]; then

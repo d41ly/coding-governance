@@ -53,13 +53,16 @@ import tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOOK = os.path.join(ROOT, ".githooks", "pre-push")
 
-# The anchor the mutation splices after. It is the end of the tokenising loop, so everything the
-# rev-3 arms read is already computed and can be overwritten wholesale.
-ANCHOR = "    set +f\n"
+# The anchor the mutation splices after. It is the end of the tokenising loop inside the hook's
+# `check_bar_command`, so everything the rev-3 arms read is already computed and can be overwritten
+# wholesale.
+ANCHOR = "  set +f\n"
 # Neutralises exactly the three rev-3 arms and nothing else: the first-word case, the option check
 # and the working-copy hash check. The every-token tracked check (rev-2) keeps working, which is
-# what makes the mutation a test of THESE arms rather than of the whole block.
-NEUTER = '    _bar_first=bash; _bar_opt=""; _bar_dirty=""   # SELFTEST MUTATION\n'
+# what makes the mutation a test of THESE arms rather than of the whole block. `_tree_dirty` is the
+# hook's dirty-tree refusal (TOOL-aRepatriatedFork-8 S3), measured before this point and refused
+# after it: it catches M3's rewritten bar one layer out, so it is cleared too or M3 could not land.
+NEUTER = '  _bar_first=bash; _bar_opt=""; _bar_dirty=""; _tree_dirty=""   # SELFTEST MUTATION\n'
 
 # The executed-assertion floor. A case block stranded behind an early return reads as fewer
 # assertions, never as a pass.
