@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
+**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
 
 <!-- gen:spec-records -->
 
@@ -201,31 +201,49 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   (b) a gov conf key that exempts builds opened before a cutoff. Recommendation: (a). Convergence is
   the ruling, the authoring is one-time, and gov's docstring records that every default it tried was
   wrong, which a bulk value the owner signs is not.
+  RESOLVED (agent, 2026-09-23, delegated): (a), with no bulk default: each of the 194 values is
+  derived from that build's own records at inCMS, and a build whose status no record decides is
+  parked by name. (b) trips veto 2: its pin is documented in `memory/HYGIENE.md`, a governance
+  carrier.
 - **F2 — the gotcha-declaration scope.** Gov's check 18 is corpus-wide and reds 68 inCMS records.
   Options: (a) inCMS writes 68 declarations; (b) gov gains a shrink-only pin for check 18, the shape
   of its other `*_PIN` keys. Recommendation: (b). inCMS's reason, that a corpus-wide arm reds the bar
   on debt the committer did not write, holds for every adopter with a history, and a pin is gov's
   house form for debt.
+  RESOLVED (agent, 2026-09-23, delegated): (a). (b) trips veto 2, because a check-18 pin changes
+  `memory/HYGIENE.md`, a governance carrier the delegation does not reach. A record whose gate no
+  evidence names is parked by name rather than given an invented one.
 - **F3 — the three checks whose input the migration removes (22, 27, 28).** Options: (a) inCMS accepts
   the loss, and gov's backlog gets rows for 27 and 28 as candidate gov checks; (b) this build adds
   them to gov first. Recommendation: (a). Check 22 guards a meaning of `roster:` gov does not have,
   and 27 and 28 are properties worth having everywhere, which is a unit of its own, not a
   precondition here.
+  RESOLVED (agent, 2026-09-23, delegated): (a). (b) trips veto 2: two new gov checks change
+  `memory/HYGIENE.md`, a governance carrier. The two backlog rows ride the landing commit.
 - **F4 — the summed read-path ceiling (inCMS check 19).** Gov retired the sum in 2.42. Options: (a)
   inCMS accepts the loss; (b) keep it as an inCMS project leg. Recommendation: (a). Gov already weighed
   and refused it.
+  RESOLVED (agent, 2026-09-23, delegated): (b), against the recommendation. M3 ratifies the most
+  feature-rich survivor, and (b) keeps a check (a) drops. It survives every veto: the leg is inCMS's
+  own and touches no gov carrier. It joins F5's project leg.
 - **F5 — the other inCMS-only checks (13, 16, 21, 26, 29, 30, 32).** Options: (a) inCMS extracts them
   into one project leg of its own; (b) they retire. Recommendation: (a). They guard inCMS's own
   surfaces, 32 is a credential guard, and none of them conflicts with gov's engine.
+  RESOLVED (agent, 2026-09-23, delegated): (a), the most feature-rich survivor.
 - **F6 — the lexicon leg, 15 over its pin.** Options: (a) inCMS re-pins once in the landing commit,
   naming the four swapped files as the cause; (b) gov renames. Recommendation: (a). Gov's own lexicon
   grades these files by gov's table, which differs from inCMS's, so a rename for one table is a red
   for the other.
+  RESOLVED (agent, 2026-09-23, delegated): (a). (b) trips veto 2: renaming functions consumers
+  import changes a public surface.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · opened after the owner ruled that inCMS converges and that this build carries
   the migration. Grounded at inCMS 9a0e5ebb and gov f8fdd873 by the convergence census.
+- rev-2 · 2026-09-23 · §8 resolved under the aRepatriatedFork mandate (M3, delegated). F4
+  keeps inCMS check 19 as a project leg beside F5's checks, which moves its row in §4 from a
+  loss to a kept check.
 
 ## 10. Reuse audit
 
