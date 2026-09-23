@@ -65,8 +65,12 @@ cd "$ROOT" || exit 2
 # not a check — its "verdict" is the file it writes — and that is the reason it belongs here rather
 # than an argument against it: an adopter reading `memory-tree@2.0` is being told which merge
 # semantics their indexes were merged under.
+#
+# AND `tree_lib.py` (TOOL-aRepatriatedFork-9): the conf parser, the fence reader and the status
+# vocabulary every delegate above reads moved there, so a change to any of them moves a verdict. It
+# is spelled off ENGINE's own directory, because the carried-prefix ban takes no new literal.
 ENGINE=tools/memory-tree/check-memory-hygiene.sh
-DELEGATES="tools/memory-tree/row_grammar.py tools/memory-tree/gen_build_index.py tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py tools/memory-recall/extract.py tools/memory-tree/merge-rows.py"
+DELEGATES="${ENGINE%/*}/tree_lib.py tools/memory-tree/row_grammar.py tools/memory-tree/gen_build_index.py tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py tools/memory-recall/extract.py tools/memory-tree/merge-rows.py"
 [ -f "$ENGINE" ] || { echo "verdict-epoch: $ENGINE is missing — this gate reads the engine's own source"; exit 2; }
 SCAN="$ENGINE"
 for _d in $DELEGATES; do [ -f "$_d" ] && SCAN="$SCAN $_d"; done

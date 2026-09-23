@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-9 — row_grammar and check-arms take NicoCares' additions, and stop importing sibling engines
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-9-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-9-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-TOOL-aRepatriatedFork-9-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-9-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -26,7 +27,8 @@ upstreaming measured, and moves the shared helpers into one kit module both engi
   `tools/memory-tree/row_grammar.py:235`; nc wraps the read at `scripts/row_grammar.py:240-252` and
   raises the module's own `Problem`. Taken verbatim. Observed by AC1.
 - **S2** — The exported backlog-row grammar, as specified in §4 `### Data model`: `ParsedRow`,
-  `parse_row`, `backlog_shards`, `census` and `census_problems`, from nc `scripts/row_grammar.py:386-583`,
+  `parse_row`, `backlog_shards`, `census` and `census_problems` (the last three as aliases of
+  verb-led definitions, see rev-2), from nc `scripts/row_grammar.py:386-583`,
   with two corrections nc's own corpus could not surface. The row id accepts a frozen legacy id such
   as `ABL-015` or `DPL-a012`, and a `CLOSED by` clause may carry a parenthetical before its separator.
   Observed by AC2 and AC3.
@@ -35,7 +37,7 @@ upstreaming measured, and moves the shared helpers into one kit module both engi
 - **S4** — `--emit-pin` prints all three pins. nc prints `ROW_DUPLICATE_PIN` and
   `SEVERITY_UNLABELLED_PIN` only (`scripts/row_grammar.py:851-867`) while its own announcement at
   `:679` tells the operator `--emit-pin` prints the `LIVE_ROW_PIN` token. Observed by AC4.
-- **S5** — The `--ages` mode and `row_first_seen`, from nc `scripts/row_grammar.py:903-998`, with
+- **S5** — The `--ages` mode and nc's `row_first_seen`, defined as `derive_first_seen`, from nc `scripts/row_grammar.py:903-998`, with
   `encoding="utf-8"` on its `git log` call. Observed by AC5.
 - **S6** — Hygiene check 20 prints `row_grammar.py --check`'s output on a GREEN run as well as a red
   one, so the NOT MEASURED lines reach the operator of the bar. Today
@@ -50,8 +52,8 @@ upstreaming measured, and moves the shared helpers into one kit module both engi
 - **S9** — `ARMS_FLOORS`, `LIVE_ROW_PIN` and `SEVERITY_UNLABELLED_PIN` join
   `tools/memory-tree/.memory-tree.conf.example` with their blank semantics stated, and join
   `optional_keys` in `tools/memory-tree/kit.toml`. Observed by AC9.
-- **S10** — `KIT_MEMORY_TREE_VERSION` moves off 2.85 and every paired marker moves with it. Observed
-  by AC9.
+- **S10** — `KIT_MEMORY_TREE_VERSION` moves to 2.88 and every paired marker moves with it. It was 2.85
+  at base; units 10 and 3 of this unlanded build took 2.86 and 2.87. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -92,11 +94,12 @@ already import against. `read` stays exported, because `check_closed_build_rows.
 | `SEVERITY_VOCAB` | tuple | `BLOCKER` `HIGH` `MED` `LOW`, most severe first; closed |
 | `ParsedRow` | class | slots `raw form id keyed status qualifiers closed_by live severity rank opened body pointer` |
 | `parse_row(line)` | function | a `ParsedRow`, or `None` for prose |
-| `backlog_shards(root, conf)` | function | every tracked `.md` under the memory root's `backlog/`, sorted |
-| `census(root, conf)` | function | one dict per shard: `shard live terminal unkeyed rows dashes unranked note` |
-| `census_problems(rows)` | function | the non-vacuity floor as messages |
-| `unranked_pins(conf)`, `live_row_pins(conf)` | function | `{shard: ceiling}`, `{}` when undeclared |
-| `row_first_seen(root, conf)` | function | `{row-id: ISO date}` from `git log --reverse -p -m` over the backlog pathspecs |
+| `scan_backlog_shards(root, conf)`, alias `backlog_shards` | function | every tracked `.md` under the memory root's `backlog/`, sorted |
+| `measure_census(root, conf)`, alias `census` | function | one dict per shard: `shard live terminal unkeyed rows dashes unranked note` |
+| `check_census_floor(rows)`, alias `census_problems` | function | the non-vacuity floor as messages |
+| `parse_unranked_pins(conf)`, `parse_live_row_pins(conf)` | function | `{shard: ceiling}`, `{}` when undeclared |
+| `derive_first_seen(root, conf)` | function | `{row-id: ISO date}` from `git log --reverse -p -m` over the backlog pathspecs, keyed on a declared family plus one or more dash segments |
+| `scan_engine_imports(kit_dir)` | function | `(hits, graded)`: every sibling import of `corpus_ids` or `gen_build_index`, for AC8 |
 
 The two grammar corrections, both measured on 2026-09-23 on node a by parsing every tracked
 `memory/backlog/*.md` with nc's module:
@@ -141,13 +144,15 @@ today re-import them so every existing caller keeps working:
 | `parse_conf_line`, `parse_conf` | `corpus_ids.py:106-181` | `corpus_ids.py`, `gen_build_index.py`, `gotchas.py`, `check-arms.py`, `row_grammar.py` |
 | `unfenced_lines` | `gen_build_index.py:294` | `gen_build_index.py`, `row_grammar.py` |
 | `STATUS_TOKENS`, `TERMINAL` | `gen_build_index.py:150-151` | `gen_build_index.py`, `row_grammar.py` |
+| `CENSUS_TERMINAL` | new, F1's second tuple | `row_grammar.py` |
 | `kit_rel` | `gen_build_index.py:135` | `gen_build_index.py`, `check-arms.py` |
 
 The module name follows `tools/codebase-map/map_lib.py` and `tools/runlog/runlog_lib.py`. Each
 function name keeps its current verb, so no lexicon cell moves. The new mode `--emit-floors` and
-the new functions `cmd_emit_floors`, `cmd_ages`, `row_first_seen`, `census` and `census_problems`
-are graded by the lexicon leg under the Python function cell; `census` is a noun-led name nc already
-shipped and is a candidate for that leg's verb table, see F4.
+the new functions are graded by the lexicon leg under the Python function cell. Per F4 every one
+leads with a declared verb (`cmd_emit_floors`, `cmd_ages`, `derive_first_seen`, `measure_census`,
+`check_census_floor`, `scan_backlog_shards`, `parse_unranked_pins`, `parse_live_row_pins`,
+`scan_engine_imports`), and nc's noun-led names survive only as aliases.
 
 ### Migration
 
@@ -181,6 +186,9 @@ What each adopter then does:
 - `tools/memory-tree/kit.toml`
 - `tools/memory-tree/HYGIENE.template.md` and its render `memory/HYGIENE.md`, for the marker move
 - `memory/map/features/row-grammar.md`
+- `tools/memory-tree/check-verdict-epoch.sh`, `tools/memory-tree/adopt-memory-tree.sh`,
+  `tools/memory-tree/README.md`, `tools/memory-tree/check-memory-hygiene.test.sh`, the other three
+  rendered carriers of the marker, `.memory-tree.conf` and `tools/install-prefix-waivers.txt`
 
 ### Alternatives rejected
 
@@ -230,7 +238,7 @@ What each adopter then does:
 - **AC5** — When `python3 tools/memory-tree/row_grammar.py --ages` runs over a fixture whose one row
   was edited in place after it was minted, it reports the mint date; and over a fixture whose
   families match nothing, it raises the vacuity `Problem`.
-  Red when: `row_first_seen` drops `-m` or the walk reads blame dates.
+  Red when: `derive_first_seen` drops `-m` or the walk reads blame dates.
 - **AC6** — When `ARMS_FLOORS=""` over a tree with one discovered gate,
   `python3 tools/memory-tree/check-arms.py --check` exits 1 with the empty-floors refusal naming the
   derived module path, and `--emit-floors` prints one token for that gate.
@@ -246,7 +254,7 @@ What each adopter then does:
 - **AC9** — `bash tools/check-kit-versions.sh` exits 0 after the bump, and
   `tools/memory-tree/.memory-tree.conf.example` carries `ARMS_FLOORS`, `LIVE_ROW_PIN` and
   `SEVERITY_UNLABELLED_PIN` with their blank meaning stated.
-  Red when: a paired marker is left on 2.85, or a key is read by the engine and absent from the example.
+  Red when: a paired marker is left on 2.87, or a key is read by the engine and absent from the example.
 
 ## 7. Gates
 
@@ -290,6 +298,17 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a green check 20 ru
 
 - rev-1 · 2026-09-23 · initial draft, from audit-D §1 and §5, audit-B §7 and audit-A's side finding,
   with the two grammar corrections measured over all three corpora on node a.
+- rev-2 · 2026-09-24 · the build pass. S10 and AC9 name 2.87 -> 2.88, since units 10 and 3 of this
+  build had taken 2.86 and 2.87. S2 and section 4 Data model, per F4: `--suggest` graded `census`,
+  `census_problems`, `backlog_shards`, both pin readers and the age walk as undeclared leading tokens,
+  and the lexicon verb pin counts those, so each is DEFINED under a declared verb and the three names
+  NicoCares imports stay as aliases, which is what lets that fork run gov's bytes unchanged; AC5's
+  red-when names `derive_first_seen`. S5: the age walk keys on a declared family plus one or more dash
+  segments, the census's shape, because under `id_pattern` it dated no frozen legacy id and inCMS's
+  live legacy rows would all have read undated. S8 and section 4 Inventory: `tree_lib.py` also holds
+  F1's `CENSUS_TERMINAL`, and joins `check-verdict-epoch.sh`'s delegates, spelled off that gate's own
+  engine path because the carried-prefix ban takes no new literal. Section 4 Files touched grows by
+  the files those changes reach.
 
 ## 10. Reuse audit
 

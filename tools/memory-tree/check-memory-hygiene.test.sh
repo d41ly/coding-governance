@@ -1835,6 +1835,12 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
 # has no run to record, so there is no precondition that could make its absence a mis-segmentation.
 n=$((n+1))
 [ "$rcy" = 0 ] || { echo "FAIL a freshly scaffolded tree is not clean (rc=$rcy):"; printf '%s\n' "$outy" | sed 's/^/      /'; st=1; }
+# TOOL-aRepatriatedFork-9 S6: check 20's capture reaches the operator on a GREEN run. This tree
+# declares no LIVE_ROW_PIN, so row_grammar.py announces the unarmed shard inside its green output,
+# and a gate that printed the capture only on failure turned that announcement back into silence.
+n=$((n+1))
+grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md has no LIVE_ROW_PIN entry' <<<"$outy" \
+  || { echo "FAIL a green check 20 run swallowed its NOT MEASURED line, so an unarmed live-row pin is silent again"; st=1; }
 
 # ---- (c) A tree carrying a .codebase-map.conf. This is the ONLY place check 7's MAP_SUB branch is
 # ----     reachable: every tree above writes no such conf, so `MAP_SUB` is empty throughout and the

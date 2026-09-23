@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.87   # gov:kit memory-tree@2.87 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.88   # gov:kit memory-tree@2.88 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -2202,8 +2202,14 @@ fi
 # 20 — the row documents' grammar, and id collisions INSIDE one file. Delegated for the same reason
 # 13-19 are: the assertion is a corpus walk with a pin, which is a Python job, and check-arms.py's
 # population is `*.sh` only, so the branches are armed by the module's own selftest.
+# The capture is printed on a GREEN run too (TOOL-aRepatriatedFork-9): an undeclared backlog-row pin
+# is announced as a NOT MEASURED line inside the module's green output, and a gate that swallowed
+# that output would turn the announcement back into the silent skip it exists to replace.
 if [ "$STAGED" = 0 ]; then
-  if ! rowg=$("$_PY" "$HERE/row_grammar.py" --check 2>&1); then
+  if rowg=$("$_PY" "$HERE/row_grammar.py" --check 2>&1); then
+    [ -z "$rowg" ] || printf '%s
+' "$rowg"
+  else
     printf '%s
 ' "$rowg"; status=1
   fi

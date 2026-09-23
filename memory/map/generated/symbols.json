@@ -123,6 +123,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "ParsedRow",
+      "kind": "class",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "Problem",
       "kind": "class",
       "file": "tools/memory-tree/check-arms.py"
@@ -1268,6 +1273,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_census_floor",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "check_claim_canary",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -1783,6 +1793,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "cmd_ages",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "cmd_apply",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1841,6 +1856,11 @@
       "id": "cmd_contribute",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "cmd_emit_floors",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
     },
     {
       "id": "cmd_emit_pin",
@@ -2249,6 +2269,11 @@
     },
     {
       "id": "derive_families",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "derive_first_seen",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
     },
@@ -3020,7 +3045,7 @@
     {
       "id": "kit_rel",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "land_through_index",
@@ -3533,6 +3558,11 @@
       "file": "tools/workflows/orient-counterfactual.js"
     },
     {
+      "id": "measure_census",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "measure_class_cells",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3805,12 +3835,12 @@
     {
       "id": "parse_conf",
       "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "parse_conf_line",
       "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "parse_cpu_clock",
@@ -3863,6 +3893,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "parse_live_row_pins",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "parse_observed",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -3908,6 +3943,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "parse_row",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "parse_shell_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -3941,6 +3981,11 @@
       "id": "parse_tsx_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "parse_unranked_pins",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "parse_verdicts",
@@ -5993,6 +6038,11 @@
       "file": "tools/codebase-map/check_gate_coverage.py"
     },
     {
+      "id": "scan_backlog_shards",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "scan_canon",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -6031,6 +6081,11 @@
       "id": "scan_definition_carriers",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_engine_imports",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "scan_file",
@@ -8230,7 +8285,7 @@
     {
       "id": "unfenced_lines",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "validate_gate_runner",

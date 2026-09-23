@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.87 -->
+<!-- gov:kit memory-tree@2.88 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -297,6 +297,10 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     ids past a green bar for a month. The count of survivors is pinned shrink-only by
     `ROW_DUPLICATE_PIN`, and an UNDECLARED pin means ZERO — the strictest value, never a refusal and
     never off, because a default that can only TIGHTEN needs no ceremony.
+    The backlog shards carry two more shrink-only ceilings, `SEVERITY_UNLABELLED_PIN` and
+    `LIVE_ROW_PIN`, one `<shard>:<count>` token per shard. Their polarity is the opposite: undeclared
+    means UNARMED, because no default ceiling over an inherited population is honest, and every green
+    run prints one NOT MEASURED line per unarmed shard, which the gate shows rather than swallows.
     Scope is PER FILE deliberately: corpus-wide would red every designed backlog-row-plus-decision-row
     pair. NAMED GAP — the live index and its rotated archive are two files, so a row that rotates out
     and is re-minted is not caught here; the all-time collision grep the index's own header
@@ -468,7 +472,9 @@ catches a deleted guard; the armed floor catches an assertion dropped by WIDENIN
 branch count alone cannot see because the count falls and the pin still holds. Per-gate rather than
 aggregate: a total lets one gate's deletion be masked by another gate's addition, and goes slack by a
 whole gate's branch count the day a third gate lands. A gate that raises a named error does not abort
-the walk, so one bad gate cannot hide every other gate's findings.
+the walk, so one bad gate cannot hide every other gate's findings. A BLANK `ARMS_FLOORS` is refused while any gate
+is discovered, since both floor arms would iterate nothing; `check-arms.py --emit-floors` prints the
+measured line to declare.
 
 `{{KIT_DIR}}/check-arms.py --report` shows every branch, its line, its signature and its state.
 
