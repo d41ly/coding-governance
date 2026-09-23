@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-aBatchedArm-4 TOOL-aBatchedArm-3 TOOL-aBatchedArm-5 TOOL-aBatchedArm-1 TOOL-aBatchedArm-2
+unpushed-at-landing: 0
 parked-surfaced: yes
 keepalive-reaped: yes
-witness: 0bda01304f3dda643cfcbf9444f886e84c0ea810
-phase: LANDING
+witness: 02e0112f2a233aec47bfbbef13a68ac71d414533
+phase: LANDED
 branch-sha: c2db2f5d2d6100af08a09da113086d114c67b603
 branch-ref: refs/heads/branch/unattended-checks-performance-a37d8d
 mode: prompt
