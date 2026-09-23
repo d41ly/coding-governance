@@ -25,7 +25,7 @@ defects that force the fork. The rest is govkit mechanics that made the pull uns
 Nineteen units, each specced against gov HEAD and both adopters with `file:line` on both sides.
 
 The evidence of record is in each spec. Two adopter landings carry the pull itself: inCMS `9a0e5ebbe`
-(pending push at the time of writing) and nc `b6dfacac`, which records the charter migration and the
+and nc `b6dfacac`, both on their origins, which record the charter migration and the
 check-install-prefix deselection this build explains.
 
 ## Expected improvements
