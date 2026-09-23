@@ -2302,6 +2302,23 @@ mutate $KIT_REL/SKILL.template.md '2i Invoke /session-kickoff before anything el
 same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(run)" ""
 reset_tree
 
+# ---- 34 (TOOL-aRepatriatedFork-6 AC5): a Run facts key carried twice with two DIFFERENT values is a
+# ---- fact nothing wrote, because every reader takes the first match. The forgery's own shape: a
+# ---- `phase: LANDED` inserted directly under the heading, above the real `phase: RUNNING`.
+reset_tree
+mutate memory/builds/tRun/RUN.md '/^## Run facts/a phase: LANDED'
+out=$(run)
+hit "$out" "UNATTENDED check 34 FAILED"
+hit "$out" "memory/builds/tRun/RUN.md: phase is [LANDED] and [RUNNING]"
+# ...the NEAR-MISS control: a SAME-value repeat forges nothing (the first match gives the same
+# answer) and is the shape of the one hand repair in gov's tree, so the rule is not "any repeat".
+reset_tree
+mutate memory/builds/tRun/RUN.md '/^## Run facts/a phase: RUNNING'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "UNATTENDED check 34 FAILED"
+hit "$out" "check 34 graded "
+reset_tree
+
 # ---- check 16 arms D and E: the CONTRACT's two tables joined to the constants the driver enforces.
 # ---- Both edits go to BOTH protocol copies, or check 15's parity fires and the arm would be
 # ---- satisfied by a refusal that has nothing to do with the join it is testing.

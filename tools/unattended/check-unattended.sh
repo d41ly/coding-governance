@@ -2769,6 +2769,40 @@ if [ -f "$tmpl" ]; then
   fi
 fi
 
+# ---- 34: a `## Run facts` key carried twice with two DIFFERENT values. TOOL-aRepatriatedFork-6 S3.
+# ---- The driver's `fact` and this leg's `fact_of`/`phase_of` all take the FIRST match, and the
+# ---- driver's insert branch writes a new key directly under the heading, above every existing fact,
+# ---- so a second, different line for one key is a fact nothing wrote - a forged `phase: LANDED`
+# ---- above the real `phase: RUNNING` is the instance, and the driver's write-guard closes its verb
+# ---- route. This is the class, over every tracked run-state file, live and archived.
+# ----
+# ---- A SAME-VALUE repeat passes: the first match gives the same answer, so it forges nothing, and
+# ---- the one near-miss in this tree is exactly that - a hand repair carrying `landed-anchor: remote`
+# ---- twice. The section ends at the next `## ` heading; a key is a line's text up to its first
+# ---- colon, with no space in it. ONE awk over the whole population, never one per file.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: a hand edit that REPLACES the real line rather than adding a second
+# ---- one is not detectable from the file and is not claimed (TOOL-aBoundedCeiling-11 stays open).
+# ---- A key outside the `## Run facts` section is not read. The count it prints is DERIVED, and a
+# ---- population of zero is announced rather than passed silently.
+_rf_files=()
+while IFS= read -r _rf_f; do [ -n "$_rf_f" ] && [ -f "$_rf_f" ] && _rf_files+=("$_rf_f"); done <<< "$RUNS"
+if [ "${#_rf_files[@]}" -eq 0 ]; then
+  report "check 34 graded NO run-state file — this tree carries none at the selected path, so a duplicate-fact verdict here would be coverage of nothing"
+else
+  _rf_hits=$(awk '
+    FNR == 1 { sec = 0; split("", seen) }
+    { sub(/\r$/, "") }
+    /^## / { sec = (index($0, "## Run facts") == 1); next }
+    sec && match($0, /^[^ :]+:/) {
+      k = substr($0, 1, RLENGTH - 1); v = substr($0, RLENGTH + 1); sub(/^ +/, "", v)
+      if (k in seen) { if (seen[k] != v) printf "%s: %s is [%s] and [%s]\n", FILENAME, k, seen[k], v }
+      else seen[k] = v
+    }' "${_rf_files[@]}")
+  report "check 34 graded ${#_rf_files[@]} run-state files for a Run facts key carried twice with different values"
+  [ -z "$_rf_hits" ] || fail 34 "a run-state file carries one Run facts key twice with two different values, and every reader takes the first match, so one of them is a fact nothing wrote: $_rf_hits"
+fi
+
 # ---- 28: THE INLINED PARSER, one answer in two files. `declared_list` is copy-inlined in the driver
 # ---- and in the playbook leg because each kit script is installed standalone and cannot import — so
 # ---- the only thing keeping two copies one answer is this check.

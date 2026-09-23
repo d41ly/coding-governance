@@ -2449,6 +2449,61 @@ run --attest tRun --item parked-decisions-surfaced >/dev/null
 # never says why. This fixture only needs a TERMINAL record, so any legal member does.
 hit "$(run --abort tRun --code fork-unresolvable --reason "the arm that proves the documented exit needs no hand edit")" "phase ABORTED"
 
+# ---- TOOL-aRepatriatedFork-6: a value that can forge a second fact. `set_fact`'s insert branch
+# ---- writes above every existing fact and every reader takes the FIRST match, so `--attest --value`
+# ---- carrying `phase: LANDED` on a second line made the run terminal. AC1 + AC4: the literal line
+# ---- feed is refused with the file byte-identical.
+read_phase() { sed -n 's/^phase: //p' memory/builds/tRun/RUN.md | head -1 | tr -d '\r'; }
+bcopen
+before=$(sum); _rf_p0=$(read_phase)
+out=$(run --attest tRun --item keepalive-reaped --value $'yes\nphase: LANDED')
+hit "$out" "a run fact contains a newline, and these files are parsed line-wise with the FIRST match winning"
+n=$((n+1)); [ "$(sum)" = "$before" ] || { echo "FAIL a refused fact write rewrote the run-state file, so the guard ran after the damage"; st=1; }
+same "phase after a refused literal-newline attestation" "$(read_phase)" "$_rf_p0"
+# ---- AC2: the ONE-LINE escape form. `awk -v` turned backslash-n into a line feed after any shell
+# ---- check had passed - the path nc's port of the guard missed. Stored as written, one line.
+bcopen
+_rf_p0=$(read_phase)
+run --attest tRun --item keepalive-reaped --value 'yes\nphase: LANDED' >/dev/null
+hit "$(cat memory/builds/tRun/RUN.md)" 'keepalive-reaped: yes\nphase: LANDED'
+same "phase lines after a backslash-n attestation" "$(grep -c '^phase: ' memory/builds/tRun/RUN.md)" 1
+same "phase after a backslash-n attestation" "$(read_phase)" "$_rf_p0"
+# ---- AC3: the CLASS is the verb set, not --attest. Every verb that writes a caller-supplied string,
+# ---- driven with both hostile forms; none may leave a second `phase:` line or move the phase. A verb
+# ---- that refuses for its own reason passes, which is correct: the property is "phase unchanged".
+run_hostile_verb() { # verb · value
+  case "$1" in
+    attest)    run --attest tRun --item keepalive-reaped --value "$2" ;;
+    resume)    run --resume tRun --keepalive-id "$2" ;;
+    park)      run --park tRun --item "$2" --reason "a hostile item" ;;
+    propose)   run --propose tRun --item "$2" --step F4 --reason "a hostile item" ;;
+    brief)     run --brief tRun --unit ARCH-tRun-1 --path "$2" ;;
+    piece)     run --record-piece tRun --records-root recs --path "$2" --leg L --verdict PASS ;;
+    set)       run --record-set tRun --records-root recs2 --leg "$2" --verdict PASS ;;
+    rescope)   run --rescope tRun --act add --item ARCH-tRun-9 --reason "$2" ;;
+    preflight) run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "$2" ;;
+  esac
+}
+for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED'; do
+  for _rf_v in attest resume park propose brief piece set rescope preflight; do
+    if [ "$_rf_v" = preflight ]; then reset_tree; _rf_p0=""; else bcopen; _rf_p0=$(read_phase); fi
+    run_hostile_verb "$_rf_v" "$_rf_form" >/dev/null 2>&1
+    # A refusal that left no run-state file at all forged nothing: counted as the verdict it is.
+    if [ ! -f memory/builds/tRun/RUN.md ]; then n=$((n+1)); continue; fi
+    same "phase lines after --$_rf_v with a hostile value" "$(grep -c '^phase: ' memory/builds/tRun/RUN.md)" 1
+    if [ -n "$_rf_p0" ]; then same "phase after --$_rf_v with a hostile value" "$(read_phase)" "$_rf_p0"
+    else n=$((n+1)); [ "$(read_phase)" != LANDED ] || { echo "FAIL --preflight recorded a hostile waiver reason as a LANDED phase"; st=1; }; fi
+  done
+done
+
+# ---- AC7: a machine-checked item outside DOD_NO_OVERRIDE prints the --override spelling, so the
+# ---- comment on `build-complete` that says fail 13 prints it is true. `crdrop` leaves exactly one
+# ---- machine item unmet here; the gates-green half is the `GATEPROBE` arm's `miss` below.
+bcopen; crdrop
+out=$(run --close tRun)
+hit "$out" "a machine-checked DoD item is unmet, so --close blocks: closing-review-recorded"
+hit "$out" "--close tRun --override closing-review-recorded --reason"
+
 # ---- S3: the override park is the FOURTH caller of a guard that existed in triplicate. A truthful
 # ---- reason -- one that says why the flag matters -- used to red leg check 11 permanently on a record
 # ---- no verb can rewrite. Refused in the validation loop, BEFORE anything is written.
@@ -3122,6 +3177,8 @@ run --preflight tRun --keepalive-id k1 >/dev/null
 out=$(run --close tRun)
 hit "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
 hit "$out" "GATEPROBE-the-leg-that-blocked-it"
+# TOOL-aRepatriatedFork-6 AC7: a red bar is not a paperwork problem, so no --override remedy for it.
+miss "$out" "--override gates-green"
 
 # ---- ...and a PASSING bar prints nothing. Without this the arm above is satisfied by a driver that
 # ---- dumps the gate's output unconditionally, which is noise on every successful close.

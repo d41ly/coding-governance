@@ -531,7 +531,11 @@ under a worktree: the resume tick reads leases from the index alone. Two more ar
 this kit's own reads and named where they sit: an object-substitution ref and a graft file, either
 of which rewrites what a sha MEANS at a perfectly honest anchor — and both are ALSO refused by
 their mere PRESENCE, because suppressing them makes only THIS kit's reads honest and binds no other
-tool reading the same objects.
+tool reading the same objects. A run fact whose value forges a second line: `--attest --value`
+carrying a line end, or a backslash-n `awk` used to expand, wrote a `phase: LANDED` every reader
+took as the run's phase. The driver refuses both line ends and stores escapes as written, and the
+leg refuses a `## Run facts` key carried twice with two different values; a hand edit that
+REPLACES the real line is not detectable from the file and is not claimed.
 
 **What the second anchor changes here.** It opens no new class — §1 cost 4 already granted
 successor-authorization — but lowers that price to two commands and widens the leg's BASE check for

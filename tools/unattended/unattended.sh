@@ -3110,12 +3110,33 @@ print_spec_audit_line() { # slug · run-state file
 # Rewrite one `key: value` line in place, or append it under the Run facts heading if absent.
 # A key that can be placed NEITHER way is a REFUSAL, not a silent drop: the caller would otherwise
 # report a successful preflight over a file carrying none of the facts it just claimed to record.
+# TOOL-aRepatriatedFork-6 - THE WRITE-GUARD every sibling writer already carries, and the one path
+# none of them needs. The insert branch puts `k: v` directly under `## Run facts`, above every
+# existing fact, and `fact` here plus `fact_of`/`phase_of` in the leg return the FIRST match - so a
+# value carrying a line end, `--attest <item> --value` above all, wrote a forged `phase: LANDED` that
+# driver and leg alike read as the run's phase. Two routes, both reproduced at a7c78ad2:
+#   1. a literal line feed or carriage return in the shell string - refused below with `wc -l`, the
+#      form every sibling uses, NOT a case glob built from a command substitution (which strips the
+#      newline and matches everything; nc paid for that one). A CR is refused because `fact` strips a
+#      trailing one, so this kit reads the byte as a line end.
+#   2. a backslash-n in a ONE-LINE value - `awk -v` processes escape sequences, so awk manufactured the
+#      line feed after any shell-side check had passed. nc's port of the guard missed this; the values
+#      now reach awk through ENVIRON, which has no escape grammar, so the bytes are stored as written.
 set_fact() { # file · key · value
-  local f="$1" k="$2" v="$3" tmp; tmp=$(mktemp) || return 2
+  local f="$1" k="$2" v="$3" tmp
+  if [ "$(printf '%s' "$k$v" | wc -l)" -ne 0 ]; then
+    fail 17 "a run fact contains a newline, and these files are parsed line-wise with the FIRST match winning, so this would forge a fact nothing wrote: $k in $f"
+    return 1
+  fi
+  case "$k$v" in *$'\r'*)
+    fail 17 "a run fact contains a carriage return, which every reader of this file strips as a line end, so this would forge a fact nothing wrote: $k in $f"
+    return 1 ;;
+  esac
+  tmp=$(mktemp) || return 2
   if grep -q "^$k: " "$f"; then
-    awk -v k="$k" -v v="$v" '{ if (index($0, k ": ") == 1) print k ": " v; else print }' "$f" > "$tmp"
+    K="$k" V="$v" awk '{ if (index($0, ENVIRON["K"] ": ") == 1) print ENVIRON["K"] ": " ENVIRON["V"]; else print }' "$f" > "$tmp"
   elif grep -qF '## Run facts' "$f"; then
-    awk -v k="$k" -v v="$v" '{ print } index($0, "## Run facts") == 1 { print k ": " v }' "$f" > "$tmp"
+    K="$k" V="$v" awk '{ print } index($0, "## Run facts") == 1 { print ENVIRON["K"] ": " ENVIRON["V"] }' "$f" > "$tmp"
   else
     rm -f "$tmp"
     fail 17 "cannot record a run fact — the file carries neither that key's line nor a Run facts heading to put one under: $k in $f"
@@ -3681,6 +3702,17 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
         # summary and any stderr all reach the operator while the roll-call does not.
         [ -n "${DOD_OUT:-}" ] && printf '%s\n' "$DOD_OUT" | grep -vE '^(GATE (ok|skip) )' | sed 's/^/    /'
         DOD_OUT=""
+        # TOOL-aRepatriatedFork-6 S5 - THE REMEDY, which this branch did not print while
+        # `build-complete`'s comment claimed it did. A run whose one open unit was honestly BLOCKED
+        # read the bare refusal, concluded no exit existed, and stopped at a non-terminal phase. The
+        # override RECORDS the shortfall and surfaces it in the wrap-up. SUPPRESSED for gates-green
+        # and every DOD_NO_OVERRIDE member: a red bar is not a paperwork problem, and printing the
+        # flag there would make the one move that must never look routine look routine.
+        case " $DOD_NO_OVERRIDE gates-green " in
+          *" $item "*) ;;
+          *) printf '    if that is TRUE rather than merely inconvenient, say so ON THE RECORD instead of stopping:\n'
+             printf '      --close %s --override %s --reason "<why it is unmet, and what would meet it>"\n' "$slug" "$item" ;;
+        esac
       fi
     else
       # the playbook-authoring unit - A MET ITEM WITH SOMETHING TO SAY SAYS IT. The piece-scoped items

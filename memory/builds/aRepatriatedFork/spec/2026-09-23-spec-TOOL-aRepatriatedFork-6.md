@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-6 — unattended set_fact refuses a value that can forge a second fact
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -36,7 +36,8 @@ guard misses, and gates the class at the leg.
   that claims fail 13 already prints it becomes true. This is the second half of nc carve-out 21.
   Observed by AC7.
 - **S6** — `KIT_UNATTENDED_VERSION` moves in the four carriers `tools/check-kit-versions.sh` pairs.
-  Observed by AC8.
+  Observed by AC8. rev-2: it already moved in this build, 1.28 to 1.29 at `TOOL-aRepatriatedFork-5`,
+  and nothing has shipped 1.29, so this unit's bytes ride that one move rather than minting 1.30.
 
 ## 3. Non-goals (OUT)
 
@@ -220,7 +221,8 @@ tracked run-state file in all three trees.
 - **AC6** — When `tools/unattended/check-unattended.sh` runs over gov's tree, the new check reports
   66 run-state files graded and no hit, `memory/builds/dCarriedReceipt/RUN.md` included.
   Red when: the check fires on a same-value repeat, or grades nothing.
-  figure: PINNED at 66, measured 2026-09-23; the check prints the count it derives.
+  figure: PINNED at 66, measured 2026-09-23; the check prints the count it derives. rev-2: 67 at
+  the build's tip, the one added file being this build's own `RUN.md`, still no hit.
 - **AC7** — When `--close` refuses a machine-checked item outside `DOD_NO_OVERRIDE`,
   `tools/unattended/unattended.sh` prints `--close <slug> --override <item> --reason`; for
   `gates-green` it does not.
@@ -251,6 +253,10 @@ New arm: `tools/unattended/check-unattended.test.sh` · a fixture with two diffe
 
 - rev-1 · 2026-09-23 · initial draft, measured against gov a7c78ad2, nc f69e2ffb and inCMS 1bc57da27,
   with the forgery reproduced on all three from extracted functions under the session scratchpad.
+- rev-2 · 2026-09-23 · S6 rides the 1.29 move `TOOL-aRepatriatedFork-5` already made in this build, so
+  AC8 grades 1.29 and no carrier moves twice; AC6's pin reads 67, the build's own `RUN.md` added; S3
+  is leg check 34; the §5 user-docs line lands in the protocol's §9 "What it closes" paragraph, in both
+  copies, because the protocol keeps no check list.
 
 ## 10. Reuse audit
 
