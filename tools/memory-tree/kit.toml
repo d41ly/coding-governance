@@ -177,6 +177,9 @@ kind = "measurement"
 blocks_adopt = false
 blocks_gate = false
 why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-15 are simply OFF, so the hygiene leg exits 0 with that hole wide open. Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the pins say."
+# DEPL-aRepatriatedFork-13 S5. The probe runs `{kit}/corpus_ids.py --check`; at a target that
+# owns that program, it would grade the adopter's own engine against gov's pins.
+stands_down = { when_owned = ["corpus_ids.py"], why = "the probe runs corpus_ids.py, and an adopter-owned corpus_ids.py is the target's program rather than gov's" }
 discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
 
 # THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. This kit owns FOUR `rendered` rows — the
@@ -303,4 +306,66 @@ kind = "measurement"
 blocks_adopt = false
 blocks_gate = false
 why = "stale-header-waiver.txt ships with its header and NO rows, in gov and in every adopter. The rows a tree needs are the headers that actually corrupted in THAT tree, so a list measured on gov's corpus is vacuous anywhere else — the same reason measured-pins and slot-budget-ceilings ship unarmed. EMPTY IS THE EXPECTED STATE and the mechanism is inert until a header rots; a MISSING file stays a refusal, because a file nobody created is a decision nobody made. The generator names how many headers it tolerated on every run, so a tree that never armed this says so rather than reporting a clean bar."
+stands_down = { when_owned = ["gen_build_index.py"], why = "only gov's gen_build_index.py reads stale-header-waiver.txt, so at a target that owns that program the file has no reader" }
 discharge = { command = ["grep", "-qvE", "^[[:space:]]*(#|$)", "{memory_root}/project/stale-header-waiver.txt"] }
+
+# DEPL-aRepatriatedFork-13 S3. THE CONTRACTS OTHER SHIPPED FILES CALL THESE ENGINES BY, so a target that
+# declares one of them `adopter-owned` in its `[[own]]` rows is told, on every `update` and `check`,
+# which clauses its own program keeps. A REPORT, never a red, unless an installed consumer that cannot
+# run sits on a leg the receipt emitted. Every clause cites its consumer; `selfcheck` refuses one that
+# is not a tracked gov file, and a contract with no clause. A consumer is a path relative to this
+# kit's home, or `<entry>:<path>` relative to that entry's home, because this file ships. A probe must be READ-ONLY, because `check`
+# runs it: `gen_build_index.py --write` and the `merge-rows.py` driver are not probed, and
+# `check-wiring.sh` already smoke-tests whatever merge driver a target installed. The re-derivation
+# and every row left out, with its reason, is the spec's section 4.
+[[contract]]
+source = "gen_build_index.py"
+id = "memory-tree/gen-build-index"
+[[contract.clause]]
+probe = ["python3", "{own}", "--check"]
+expect = "(?m)^build-index: "
+consumer = "check-memory-hygiene.sh"
+[[contract.clause]]
+probe = ["python3", "{own}", "--print-bindings"]
+expect = '(?m)^N\t[0-9]+$'
+consumer = "check-memory-hygiene.sh"
+[[contract.clause]]
+imports = ["apply_region", "Problem", "MARK_OPEN", "MARK_CLOSE"]
+consumer = "marker-contract.test.sh"
+
+[[contract]]
+source = "corpus_ids.py"
+id = "memory-tree/corpus-ids"
+[[contract.clause]]
+probe = ["python3", "{own}", "--print-defined-ids"]
+expect = "(?m)^# id-ere: "
+consumer = "kickoff-manifest:manifest-check.sh"
+[[contract.clause]]
+imports = ["ask_shell"]
+consumer = "gotchas.py"
+
+[[contract]]
+source = "gotchas.py"
+id = "memory-tree/gotchas"
+[[contract.clause]]
+probe = ["python3", "{own}", "--for-paths", "{own}"]
+expect = "(?m)^# "
+consumer = "kickoff-manifest:SKILL.md unattended:SKILL.template.md"
+
+# SHAPE-EXACT, and measured: inCMS's own hygiene engine ignores two of these flags and runs its whole
+# check instead, whose failure text a bare `\S` read as a pass. One path per line, and one line.
+[[contract]]
+source = "check-memory-hygiene.sh"
+id = "memory-tree/hygiene-print-modes"
+[[contract.clause]]
+probe = ["bash", "{own}", "--print-index-set"]
+expect = '\A(\S+\r?\n)+\Z'
+consumer = "corpus_ids.py"
+[[contract.clause]]
+probe = ["bash", "{own}", "--print-append-only-ere"]
+expect = '\A[^\n]+\n?\Z'
+consumer = "corpus_ids.py"
+[[contract.clause]]
+probe = ["bash", "{own}", "--print-rotated-archive-ere"]
+expect = '\A[^\n]+\n?\Z'
+consumer = "row_grammar.py"

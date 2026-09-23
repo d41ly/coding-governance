@@ -689,6 +689,214 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
           and "shipped takes no arguments" in pr.stderr, pr.stderr)
 
 
+OWN_KIT = """id = "demo"
+home = "tools/demo"
+version_from = { none = "fixture" }
+
+[check]
+none = "a fixture kit"
+
+[[files]]
+include = ["seed.txt"]
+role = "seed"
+
+[[files]]
+include = ["run.py", "use.py", "tpl.md"]
+role = "engine"
+
+[[files]]
+include = ["tpl.md"]
+role = "rendered"
+to = "docs/tpl.md"
+
+[[hole]]
+id = "pins"
+kind = "measurement"
+blocks_adopt = false
+blocks_gate = false
+why = "a probe that grades run.py"
+discharge = { command = ["bash", "-c", "exit 1"] }
+stands_down = { when_owned = ["run.py"], why = "the probe grades run.py" }
+"""
+OWN_CONTRACT = """
+[[contract]]
+source = "run.py"
+id = "demo/run"
+[[contract.clause]]
+imports = ["alpha", "beta"]
+consumer = "use.py"
+[[contract.clause]]
+probe = [PYTHON, "{own}", "--hello"]
+expect = "(?m)^hello$"
+consumer = "use.py"
+""".replace("PYTHON", json.dumps(sys.executable))  # this interpreter, not whatever PATH calls python3
+OWN_RUN = "alpha = 1\n\n\ndef beta():\n    return 2\n\n\nif __name__ == '__main__':\n    print('hello')\n"
+OWN_DEPLOY = ('gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n\n'
+              '[[own]]\npath = "{path}"\nimplements = "{impl}"\nwhy = "the target wrote its own"\n')
+
+
+def check_adopter_owned(tmp: pathlib.Path) -> None:
+    """DEPL-aRepatriatedFork-13 AC1-AC8 — the `adopter-owned` role, over a scratch gov carrying one
+    `demo` entry with a contract and a `when_owned` hole. Asserted on lines and receipt fields."""
+    env = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
+    g = tmp / "own-gov"
+    (g / "tools" / "govkit").mkdir(parents=True)
+    (g / "tools" / "demo").mkdir(parents=True)
+    shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+    (g / "tools" / "govkit" / "registry.toml").write_text(
+        '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
+        '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+        '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+        encoding="utf-8", newline="\n")
+    (g / "tools" / "demo" / "kit.toml").write_text(OWN_KIT + OWN_CONTRACT, encoding="utf-8",
+                                                   newline="\n")
+    (g / "tools" / "demo" / "run.py").write_text(OWN_RUN, encoding="utf-8", newline="\n")
+    (g / "tools" / "demo" / "use.py").write_text("from run import alpha, beta\n",
+                                                 encoding="utf-8", newline="\n")
+    (g / "tools" / "demo" / "seed.txt").write_text("seed\n", encoding="utf-8", newline="\n")
+    (g / "tools" / "demo" / "tpl.md").write_text("tpl\n", encoding="utf-8", newline="\n")
+    for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
+              ("config", "user.name", "t"), ("add", "-A"), ("commit", "-qm", "base")):
+        git(g, *a)
+
+    def run_govkit(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+                              capture_output=True, text=True, env=env)
+
+    def build_target(name: str, path: str, impl: str, run_src: str) -> pathlib.Path:
+        t = make_target(tmp / name, OWN_DEPLOY.format(path=path, impl=impl))
+        (t / "tools" / "demo").mkdir(parents=True)
+        for f in ("use.py", "seed.txt", "tpl.md"):
+            shutil.copy2(g / "tools" / "demo" / f, t / "tools" / "demo" / f)
+        (t / "tools" / "demo" / "run.py").write_text(run_src, encoding="utf-8", newline="\n")
+        settle(t)
+        return t
+
+    # AC1 — a hostile `path` refuses at exit 1 and names the row, before anything is measured. The
+    # file each names EXISTS, so the refusal is the path grade's and not the missing-file one's.
+    for tag, bad, said in (("space", "tools/demo/run x.py", "'own.path'"),
+                           ("dotdot", "../run.py", "leaves the target repository")):
+        t = build_target(f"own-ac1-{tag}", bad, "demo:run.py", OWN_RUN)
+        (t / bad).write_text(OWN_RUN, encoding="utf-8", newline="\n")
+        p = run_govkit("adopt", "--target", str(t), "--write")
+        check(f"[aRF-13 AC1] a `path` with a {tag} is refused at exit 1, naming the [[own]] row",
+              p.returncode == 1 and "[[own]] row 1" in p.stdout and said in p.stdout
+              and not (t / ".governance" / "install.json").exists(), p.stdout + p.stderr)
+    # AC2 — `implements` naming a seed source refuses, naming the role that owns those bytes.
+    t = build_target("own-ac2", "tools/demo/seed.txt", "demo:seed.txt", OWN_RUN)
+    p = run_govkit("adopt", "--target", str(t), "--write")
+    check("[aRF-13 AC2] an [[own]] row implementing a seed source is refused, naming `seed`",
+          p.returncode == 1 and "ships as seed" in p.stdout, p.stdout + p.stderr)
+    t = build_target("own-ac2r", "tools/demo/tpl.md", "demo:tpl.md", OWN_RUN)
+    p = run_govkit("adopt", "--target", str(t), "--write")
+    check("[aRF-13 AC2] ...and one whose source a rendered rule reaches beside an engine one",
+          p.returncode == 1 and "ships as rendered" in p.stdout, p.stdout + p.stderr)
+
+    # The owned program keeps `alpha` and the probe, and LACKS `beta`: one clause of two fails.
+    lacking = "alpha = 1\n\nif __name__ == '__main__':\n    print('hello')\n"
+    t = build_target("own-main", "tools/demo/run.py", "demo:run.py", lacking)
+    p = run_govkit("adopt", "--target", str(t), "--write")
+    rec = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+    row = next((f for f in rec["files"] if f["path"] == "tools/demo/run.py"), {})
+    check("[aRF-13 S2] adopt records the row adopter-owned, evidence declared, no commit or gov_oid",
+          p.returncode == 0 and row.get("role") == "adopter-owned"
+          and row.get("evidence") == "declared" and row.get("implements") == "demo:run.py"
+          and "commit" not in row and "gov_oid" not in row and row.get("oid"),
+          p.stdout + p.stderr + json.dumps(row))
+    settle(t, "adopted")
+
+    # AC6 + AC7 + AC8 — `check`: the parity line, the installed-consumer mark, the stood-down hole.
+    p = run_govkit("check", "--target", str(t))
+    check("[aRF-13 AC6] check prints 1/2 for the owned file lacking one declared import",
+          "contract demo/run <- tools/demo/run.py: 1/2 clauses hold" in p.stdout
+          and "FAILS imports beta — needed by tools/demo/use.py" in p.stdout, p.stdout)
+    check("[aRF-13 AC7] ...marks the installed consumer, and the exit code does not move for it",
+          "INSTALLED CONSUMER CANNOT RUN: tools/demo/use.py against tools/demo/run.py" in p.stdout
+          and p.returncode == 0, p.stdout + p.stderr)
+    check("[aRF-13 AC8] the when_owned hole stands down at a target owning run.py",
+          "hole 'pins' stood down — run.py adopter-owned here" in p.stdout
+          and "'pins' is UNDISCHARGED" not in p.stdout, p.stdout)
+    # §8 F3 — the same failure reds ONLY once the consumer sits on a leg the receipt emitted.
+    rp = t / ".governance" / "install.json"
+    wired = dict(rec, gate_runner={"kind": "manifest", "emitted": [
+        {"name": "use", "kit": "demo", "argv": ["python3", "tools/demo/use.py"]}]})
+    rp.write_text(json.dumps(wired, indent=2), encoding="utf-8", newline="\n")
+    p = run_govkit("check", "--target", str(t))
+    check("[aRF-13 F3] an installed consumer on an emitted leg that cannot run reds `check`",
+          p.returncode == 1 and "tools/demo/use.py is on a leg this receipt emitted" in p.stdout,
+          p.stdout + p.stderr)
+    # AC6's second red-when: a consumer that is NOT installed is reported without the mark.
+    bare = dict(rec, files=[f for f in rec["files"] if f["path"] != "tools/demo/use.py"])
+    rp.write_text(json.dumps(bare, indent=2), encoding="utf-8", newline="\n")
+    (t / ".governance" / "install.sums").write_text(
+        "".join(f"{f['sha256']}  {f['path']}\n" for f in bare["files"] if "sha256" in f),
+        encoding="utf-8", newline="\n")
+    p = run_govkit("check", "--target", str(t))
+    check("[aRF-13 AC6] ...and with the consumer not installed, the clause reports with no mark",
+          "FAILS imports beta" in p.stdout and "INSTALLED CONSUMER" not in p.stdout
+          and p.returncode == 0, p.stdout + p.stderr)
+    # AC8's control: the same row recorded `engine` runs the hole's probe, as before.
+    eng = dict(rec, files=[dict(f, role="engine") if f["path"] == "tools/demo/run.py" else f
+                           for f in rec["files"]])
+    rp.write_text(json.dumps(eng, indent=2), encoding="utf-8", newline="\n")
+    p = run_govkit("check", "--target", str(t))
+    check("[aRF-13 AC8] ...and without the ownership the same hole's probe runs",
+          "hole 'pins' is UNDISCHARGED" in p.stdout and "stood down" not in p.stdout, p.stdout)
+    rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+    (t / ".governance" / "install.sums").write_text(
+        "".join(f"{f['sha256']}  {f['path']}\n" for f in rec["files"] if "sha256" in f),
+        encoding="utf-8", newline="\n")
+    settle(t, "restored")
+
+    # AC3 + AC4 — gov moves one commit that touches no claimed file; `update --write` then counts
+    # the owned row under its role and re-stamps. The control records the row `unattributed`.
+    (g / "tools" / "govkit" / "registry.toml").write_text(
+        (g / "tools" / "govkit" / "registry.toml").read_text(encoding="utf-8") + "# moved\n",
+        encoding="utf-8", newline="\n")
+    git(g, "commit", "-qam", "gov moves")
+    head = subprocess.run(["git", "-C", str(g), "rev-parse", "HEAD"], capture_output=True,
+                          text=True).stdout.strip()
+    ctl = build_target("own-ac4", "tools/demo/run.py", "demo:run.py", lacking)
+    shutil.copy2(rp, ctl / ".governance" / "install.json")
+    shutil.copy2(t / ".governance" / "install.sums", ctl / ".governance" / "install.sums")
+    p = run_govkit("update", "--target", str(t), "--write")
+    now = json.loads(rp.read_text(encoding="utf-8"))
+    check("[aRF-13 AC3] update counts the row under adopter-owned and re-stamps gov_commit",
+          "adopter-owned 1" in p.stdout and "unattributed" not in p.stdout
+          and now.get("gov_commit") == head and p.returncode == 0, p.stdout + p.stderr)
+    check("[aRF-13 S4] ...and prints the contract parity line on update too",
+          "govkit update — contract demo/run <- tools/demo/run.py: 1/2 clauses hold" in p.stdout,
+          p.stdout)
+    crec = json.loads((ctl / ".governance" / "install.json").read_text(encoding="utf-8"))
+    for f in crec["files"]:
+        if f["path"] == "tools/demo/run.py":
+            f.update(role="engine", evidence="unattributed")
+            f.pop("implements", None)
+    (ctl / ".governance" / "install.json").write_text(json.dumps(crec, indent=2),
+                                                      encoding="utf-8", newline="\n")
+    settle(ctl, "control receipt")
+    p = run_govkit("update", "--target", str(ctl), "--write")
+    check("[aRF-13 AC4] the control: the same row recorded `unattributed` withholds the re-stamp",
+          "The receipt is NOT re-stamped" in p.stdout and json.loads(
+              (ctl / ".governance" / "install.json").read_text(encoding="utf-8")
+          ).get("gov_commit") != head, p.stdout + p.stderr)
+
+    # AC5 — selfcheck names the contract, and refuses an untracked consumer and a clauseless one.
+    p = run_govkit("selfcheck")
+    check("[aRF-13 AC5] selfcheck names every [[contract]] a descriptor declares",
+          "contract demo/run (demo:run.py): 2 clause(s)" in p.stdout, p.stdout)
+    (g / "tools" / "demo" / "kit.toml").write_text(
+        OWN_KIT + OWN_CONTRACT.replace('"use.py"\n[[contract.clause]]',
+                                       '"nope.py"\n[[contract.clause]]')
+        + '\n[[contract]]\nsource = "use.py"\nid = "demo/empty"\n', encoding="utf-8", newline="\n")
+    p = run_govkit("selfcheck")
+    check("[aRF-13 AC5] ...and refuses a clause citing an untracked consumer",
+          "contract 'demo/run'" in p.stdout and "consumer tools/demo/nope.py is not a tracked gov file"
+          in p.stdout and p.returncode == 1, p.stdout)
+    check("[aRF-13 AC5] ...and a contract with zero clauses",
+          "contract 'demo/empty': it has zero clauses" in p.stdout, p.stdout)
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -820,6 +1028,7 @@ def main() -> int:
 
         check_playbook_hole_modes(tmp / "pb")
         check_shipped_verb(tmp)
+        check_adopter_owned(tmp / "own")
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO

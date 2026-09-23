@@ -1238,6 +1238,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "check_adopter_owned",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_anomaly_sources",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -2386,6 +2391,11 @@
       "id": "derive_node_tag",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_parity_lines",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_path_key",
@@ -3571,6 +3581,11 @@
       "id": "measure_commitment",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "measure_contract_parity",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "measure_conventions",
@@ -5458,6 +5473,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "resolve_consumer_paths",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "resolve_declaration",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
@@ -5581,6 +5601,11 @@
       "id": "resolve_own_claim",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "resolve_owned_rows",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "resolve_pattern_sets",

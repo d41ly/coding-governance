@@ -929,6 +929,43 @@ unique and already grep-able), write the registry with one row per id, and repoi
 the registry. Do it BEFORE retiring anything, or the first retirement pays the cost this contract
 exists to remove.
 
+### Saying "this program is ours, not gov's" — the `[[own]]` declaration
+
+A carve-out is gov's file with your edit in it. Some trees hold something else under gov's
+filename: a program written before gov wrote its own, with no gov vintage behind it. `adopt`
+records such a file `unattributed`, and one `unattributed` row withholds the receipt's
+`gov_commit` re-stamp on every `update`. Pinning it to the nearest vintage records a base its bytes
+never came from. Declare it instead:
+
+```toml
+[[own]]
+path = "scripts/gen_build_index.py"          # your file, repo-relative
+implements = "memory-tree:gen_build_index.py" # <entry>:<gov source relative to the kit home>
+why = "written before gov's, a parallel program"
+```
+
+Then run `govkit adopt --re-adopt --write`. The row is recorded `adopter-owned` with
+`evidence: "declared"` and no gov vintage. After that:
+
+- `update` counts it under `adopter-owned`, writes it in neither direction, and still re-stamps.
+- `update` and `check` print one parity line per contract gov declares for that source, such as
+  `contract memory-tree/corpus-ids <- scripts/corpus_ids.py: 1/2 clauses hold`. Each failing clause
+  is listed with the gov file that needs it. A failing clause never reds, because you own the file.
+  Two things change that. When the file that needs the clause is installed in your tree, its line
+  says `INSTALLED CONSUMER CANNOT RUN`. When that installed file is also in the argv of a leg your
+  receipt emitted, `check` reds.
+- A hole whose probe would run gov's program against yours stands down and says so, for example
+  memory-tree's `measured-pins` when you own `corpus_ids.py`.
+- Your file may sit at a different path from gov's copy, as a stand-in. Gov keeps landing its own
+  copy, and each run prints one line saying whether any emitted leg runs it.
+
+`adopt` exits 1 and names the row when `path` carries anything outside the strict path class or
+leaves the repository. It does the same when `implements` names a source gov ships as a seed, or
+as rendered, generated, forked or project-owned, because each of those already says who owns the
+bytes. It also exits 1 when the entry is not in your selection, and when your index does not track
+`path`. The declaration is a bridge, not a fork: once your program converges onto gov's, delete the
+row and re-adopt.
+
 ## 6 — Verify the whole chain, then commit
 
 - Codebase-map (if adopted): `python <kit>/selftest.py` (kit contract) · run the gate file

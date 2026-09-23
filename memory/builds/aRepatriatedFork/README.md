@@ -117,7 +117,7 @@ ids TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TO
 | [TOOL-aRepatriatedFork-6 — unattended set_fact refuses a value that can forge a second fact](spec/2026-09-23-spec-TOOL-aRepatriatedFork-6.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap](spec/2026-09-23-spec-TOOL-aRepatriatedFork-7.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-9 — row_grammar and check-arms take NicoCares' additions, and stop importing sibling engines](spec/2026-09-23-spec-TOOL-aRepatriatedFork-9.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-24 |
-| [DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"](spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-23 |
+| [DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"](spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-15 — a kit whose shipped bytes move bumps its version](spec/2026-09-23-spec-TOOL-aRepatriatedFork-15.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries](spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-23 |
@@ -130,7 +130,7 @@ ids TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TO
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-23 |
 <!-- /gen:build-units -->
 
-Records: 28 bound to this build, across 3 record folder(s).
+Records: 29 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

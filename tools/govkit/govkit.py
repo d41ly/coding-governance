@@ -253,6 +253,11 @@ UNLANDED_REASON = {
     # without that demand being written a second time: 7g's `known_roles` is built from this table.
     "forked": "gov's copy is a derivative of the target's — gov keeps these bytes for itself and "
               "has no right to send them; reported in both directions, written in neither",
+    # DEPL-aRepatriatedFork-13 S2. A TARGET's claim, never a descriptor's: it reaches a receipt only
+    # through `adopt` reading the target's `[[own]]` rows, and it is deliberately NOT in `ROLE_KINDS`,
+    # so selfcheck arm 3b refuses a descriptor that spells it. Here so arm 7g demands its dispatch row.
+    "adopter-owned": "the target declares it owns these bytes in its deploy.toml [[own]] — gov grades "
+                     "the contract other kits call, never the bytes",
 }
 
 
@@ -1009,6 +1014,50 @@ def load_deploy(target: pathlib.Path) -> dict:
     return load_toml(p)
 
 
+def resolve_owned_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
+                       descs: dict[str, tuple[dict, str]]) -> dict[str, dict]:
+    """DEPL-aRepatriatedFork-13 S1. The target's `[[own]]` declarations, graded, keyed by `path`.
+
+    `path` becomes a probe argv, so it takes the STRICT class and the containment guard, like
+    `prefix`. `implements` must name a source some rule of that entry ships as `engine` AT THIS
+    TARGET and that no other rule reaches: a seed, rendered, generated, forked or project-owned
+    source already says who owns its bytes, and a declaration overriding that is the thing refused.
+    """
+    own = deploy.get("own") or []
+    if not isinstance(own, list):
+        raise Refusal("the target descriptor's `own` must be an array of [[own]] tables")
+    out: dict[str, dict] = {}
+    for i, o in enumerate(own, 1):
+        where = f"[[own]] row {i} of the target's .governance/deploy.toml"
+        o = o if isinstance(o, dict) else {}
+        path, impl, why = o.get("path"), o.get("implements"), o.get("why")
+        if not (isinstance(path, str) and path and isinstance(impl, str) and ":" in impl
+                and isinstance(why, str) and why.strip()):
+            raise Refusal(f"{where} needs `path`, `implements = \"<entry>:<source>\"` and a `why`")
+        demand_contained_dest(demand_safe_token("own.path", path, where), where)
+        if path in out:
+            raise Refusal(f"{where} declares '{path}' a second time")
+        eid, _, rel = impl.partition(":")
+        if eid not in descs:
+            raise Refusal(f"{where}: `implements = {impl!r}` names no registry entry")
+        d = descs[eid][0]
+        home = (d.get("home") or "").rstrip("/")
+        src = f"{home}/{rel}" if home else rel
+        res = resolve_entry(root, d, target_context(target, deploy, eid, d))
+        others = sorted({x["role"] for x in res["survivors"] if x["src"] == src} - {"engine"})
+        dests = sorted(k for k, w in res["writes"].items() if w["src"] == src and w["role"] == "engine")
+        if others or not dests:
+            raise Refusal(
+                f"{where}: `implements = {impl!r}` " + (
+                    f"names a source gov ships as {', '.join(others)}, which already states who "
+                    f"owns those bytes" if others else
+                    f"names no source a rule of '{eid}' ships as engine"))
+        if not (target / path).is_file():
+            raise Refusal(f"{where}: '{path}' is not a file in the target")
+        out[path] = {"entry": eid, "source": src, "implements": impl, "why": why, "dests": dests}
+    return out
+
+
 # ----------------------------------------------------------------------------------- the findings
 class Report:
     def __init__(self) -> None:
@@ -1538,15 +1587,57 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             # DEPL-aRepatriatedFork-1 S4. A `when_selected` member naming no entry never matches a
             # selection, so the stand-down its author meant never happens and nothing says so.
             # ONE refusal site for every malformed shape, so the one arm that stages a typo reaches it.
+            # DEPL-aRepatriatedFork-13 S5. `when_owned` is the second trigger, and its members are
+            # sources relative to this entry's home that a rule ships as `engine`; a member naming
+            # anything else could never be `adopter-owned` at a target, so it would never stand down.
             if "stands_down" in h:
                 sd = h["stands_down"] if isinstance(h["stands_down"], dict) else {}
-                ws = sd.get("when_selected")
-                stray = [str(m) for m in ws if m not in descs] if isinstance(ws, list) else []
-                if (not isinstance(ws, list) or not ws or stray
+                ws, wo = sd.get("when_selected", []), sd.get("when_owned", [])
+                _home = (d.get("home") or "").rstrip("/")
+                _eng = {x["src"] for x in resolve_entry(root, d, canonical_ctx(eid))["survivors"]
+                        if x["role"] == "engine" and x["src"]}
+                stray = ([str(m) for m in ws if m not in descs] if isinstance(ws, list) else []) + (
+                    [str(m) for m in wo if f"{_home}/{m}" not in _eng] if isinstance(wo, list) else [])
+                if (not isinstance(ws, list) or not isinstance(wo, list) or not (ws or wo) or stray
                         or not str(sd.get("why", "")).strip()):
                     r.fail(f"entry '{eid}' hole '{hid}' stands_down needs a non-empty "
-                           f"when_selected of registry entry ids and a why; non-entries named: "
-                           f"{', '.join(stray) or 'none'}")
+                           f"when_selected of registry entry ids or when_owned of engine sources, "
+                           f"and a why; non-entries named: {', '.join(stray) or 'none'}")
+
+        # ---- DEPL-aRepatriatedFork-13 S3. A `[[contract]]` names an engine source, and every clause
+        # ---- cites a TRACKED consumer: a clause nothing calls reports a false gap forever. A contract
+        # ---- with no clause would print `0/0 hold`, which reads as a pass and measured nothing.
+        _eng_c = {x["src"] for x in resolve_entry(root, d, canonical_ctx(eid))["survivors"]
+                  if x["role"] == "engine" and x["src"]} if d.get("contract") else set()
+        _home_c = (d.get("home") or "").rstrip("/")
+        _trk_c = set(tracked(root)) if d.get("contract") else set()
+        for c in d.get("contract", []):
+            cid = c.get("id") or "<unnamed>"
+            cl = c.get("clause") if isinstance(c.get("clause"), list) else []
+            bad = [] if f"{_home_c}/{c.get('source')}" in _eng_c else [
+                f"source '{c.get('source')}' is not an engine source of this entry"]
+            bad += [] if cl else ["it has zero clauses"]
+            for k in cl:
+                probe, imps = k.get("probe"), k.get("imports")
+                if (probe is None) == (imps is None):
+                    bad.append("a clause carries neither or both of `probe` and `imports`")
+                elif probe is not None and not (isinstance(probe, list) and "{own}" in probe
+                                                and isinstance(k.get("expect"), str)):
+                    bad.append(f"probe {probe!r} needs an `{{own}}` argument and an `expect`")
+                elif imps is not None and not (isinstance(imps, list) and imps):
+                    bad.append("an `imports` clause names no module attribute")
+                cons = resolve_consumer_paths(descs, eid, k.get("consumer"))
+                try:
+                    re.compile(k.get("expect") or "")
+                except re.error as e:
+                    bad.append(f"expect {k.get('expect')!r} is not a regex: {e}")
+                if not cons or any(x not in _trk_c for x in cons):
+                    bad.append(f"consumer {', '.join(x for x in cons if x not in _trk_c) or '(none)'}"
+                               f" is not a tracked gov file")
+            if bad:
+                r.fail(f"entry '{eid}' contract '{cid}': " + "; ".join(bad))
+            else:
+                r.note(f"contract {cid} ({eid}:{c.get('source')}): {len(cl)} clause(s)")
 
     # ---- 7: a requires_if condition names keys that resolve in the named kit's config lists, and
     #         names a kit that is a registry entry. PLAIN `requires` gets the same name arm, because
@@ -3213,6 +3304,10 @@ SHELL_EXEC_SITES = {
     "read_gate_verdicts": "target",  # the target's own `[gate_runner].command` — apply-only, printed
     "decline_findings": "target",    # `[[decline]].discharge.command` — opt-in, printed
     "hook_probe": "target-code",     # `git hook run pre-commit` — gov's ARGV, the TARGET's SCRIPT
+    # DEPL-aRepatriatedFork-13 S4. A `[[contract]]` probe: gov's argv, the TARGET's program, and one
+    # target value — the receipt row's `path`, re-graded strictly every run — substituted into it.
+    # `target` and not `target-code`, because it is reached from the read-only `check` too.
+    "measure_contract_parity": "target",
     "check_runs": "gov",             # a bash candidate probed with `-c :` — gov's own candidate list
     # ---- ROUND 4's M4 admitted these five. Each is a spawn whose SUBCOMMAND this census cannot
     # ---- resolve from the argv node, which is now a HIT rather than a silent allowlist entry: the
@@ -3924,6 +4019,12 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     if n_orders:
         r.note(f"outbox: {n_orders} order(s) recorded")
 
+    # ---- DEPL-aRepatriatedFork-13 S4/S5. The contract parity of every `adopter-owned` row, and the
+    # ---- set of gov sources those rows stand for, which is what a hole's `when_owned` reads.
+    for _ln in derive_parity_lines(target, receipt, descs, r):
+        print(f"govkit check — {_ln}")
+    _owned_src = {f.get("source") for f in rows if f.get("role") == "adopter-owned"}
+
     for eid in selection:
         if eid not in descs:
             r.fail(f"the receipt claims kit '{eid}', which is not a registry entry")
@@ -3952,9 +4053,9 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
                 r.fail(f"kit '{eid}' hole '{hid}' has no discharge probe, so 'discharged' is "
                        f"undefined for it and this check cannot answer the question")
                 continue
-            by = resolve_stand_down(h, selection)
+            by = resolve_stand_down(h, selection, _owned_src, (d.get("home") or "").rstrip("/"))
             if by:
-                print(f"govkit check — {eid}: hole '{hid}' stood down — {by} observes this")
+                print(f"govkit check — {eid}: hole '{hid}' stood down — {by}")
                 continue
             resolved = []
             unresolved: list[str] = []
@@ -4338,18 +4439,157 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     return verdicts
 
 
-def resolve_stand_down(hole: dict, selection: list[str]) -> str:
-    """The selected entry a hole stands down for, or '' when its probe runs.
+def resolve_stand_down(hole: dict, selection: list[str], owned: frozenset | set = frozenset(),
+                       home: str = "") -> str:
+    """Why a hole stands down, or '' when its probe runs.
 
     DEPL-aRepatriatedFork-1 S4. A `[[hole]]` may declare `stands_down = { when_selected = [...],
     why = "..." }`: when another selected entry observes what the probe observes, and the probe is
     WRONG in that mode, the probe is not run. The playbook's placeholder probe reads the template in
     render mode, which always carries placeholders; the render's own `--check` is the observer.
+
+    DEPL-aRepatriatedFork-13 S5. `when_owned = [<source>, ...]`, relative to the entry's `home`: when
+    EVERY listed source is `adopter-owned` at the target, gov's probe would grade the adopter's own
+    program, which is the pressure the role exists to remove. `owned` is the gov source paths of the
+    receipt's `adopter-owned` rows; a caller with no receipt passes none and the probe runs.
     """
-    for eid in (hole.get("stands_down") or {}).get("when_selected") or []:
+    sd = hole.get("stands_down") or {}
+    for eid in sd.get("when_selected") or []:
         if eid in selection:
-            return eid
+            return f"{eid} observes this"
+    wo = sd.get("when_owned") or []
+    if wo and all(f"{home}/{s}" in owned for s in wo):
+        return f"{', '.join(wo)} adopter-owned here, so gov's probe would grade the target's program"
     return ""
+
+
+def resolve_consumer_paths(descs: dict[str, tuple[dict, str]], eid: str, text) -> list[str]:
+    """DEPL-aRepatriatedFork-13 S3. A clause's `consumer` words, as gov repo paths.
+
+    Each word is a path relative to THIS entry's home, or `<entry>:<path>` relative to that entry's
+    home, and never a repo-root literal: the descriptor SHIPS, and a kit file names nothing outside
+    itself by literal. A word naming no entry comes back as written, so the tracked-file test that
+    reads this refuses it rather than resolving it somewhere plausible.
+    """
+    out: list[str] = []
+    for w in str(text or "").split():
+        e, sep, rel = w.rpartition(":")
+        d = descs.get(e if sep else eid)
+        home = ((d[0].get("home") or "") if d else "").rstrip("/")
+        out.append(w if d is None else (f"{home}/{rel}" if home else rel))
+    return out
+
+
+def measure_contract_parity(target: pathlib.Path, contract: dict,
+                            own_path: str) -> list[tuple[dict, str]]:
+    """DEPL-aRepatriatedFork-13 S4. The FAILING clauses of one contract against the target's file.
+
+    An `imports` clause is graded STATICALLY — the names bound at the file's top level, `if`/`try`
+    bodies included — so nothing of the adopter's is imported to answer it. A `probe` clause RUNS
+    gov's argv with `{own}` replaced, in the target, and holds when `expect` finds a match in its
+    stdout. `own_path` comes off the hand-editable receipt, so it is graded here and not trusted.
+    A probe gets 60 s: every declared one is a print mode, and one still running after a minute is
+    running something else — measured at inCMS, whose hygiene engine ignores two such flags.
+
+    WHAT THIS DOES NOT CHECK: that an imported name has the SIGNATURE its consumer calls, or that a
+    probe's exit code means what gov's does. It measures the surface, which is what a consumer
+    breaks on first, and never the behaviour.
+    """
+    where = f"the adopter-owned row '{own_path}' of the target's receipt"
+    demand_contained_dest(demand_safe_token("own.path", own_path, where), where)
+    fp = target / own_path
+    clauses = contract.get("clause") or []
+    if not fp.is_file():
+        return [(k, "the owned file is not on disk") for k in clauses]
+    fails: list[tuple[dict, str]] = []
+    bound: set[str] | None = None
+    for k in clauses:
+        if "imports" in k:
+            if bound is None:
+                bound = set()
+                try:
+                    todo = list(ast.parse(fp.read_bytes()).body)
+                except (SyntaxError, ValueError):
+                    todo = []
+                while todo:
+                    n = todo.pop()
+                    if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                        bound.add(n.name)
+                    elif isinstance(n, (ast.Assign, ast.AnnAssign)):
+                        for t in (n.targets if isinstance(n, ast.Assign) else [n.target]):
+                            bound.update(x.id for x in ast.walk(t) if isinstance(x, ast.Name))
+                    elif isinstance(n, (ast.Import, ast.ImportFrom)):
+                        bound.update((a.asname or a.name).split(".")[0] for a in n.names)
+                    elif isinstance(n, (ast.If, ast.Try, ast.With)):
+                        todo += list(n.body) + list(getattr(n, "orelse", [])) + list(
+                            getattr(n, "finalbody", [])) + [
+                            s for h in getattr(n, "handlers", []) for s in h.body]
+            miss = [x for x in k["imports"] if x not in bound]
+            if miss:
+                fails.append((k, f"imports {', '.join(miss)}"))
+            continue
+        argv = [a.replace("{own}", own_path) for a in k.get("probe") or []]
+        shown = " ".join(k.get("probe") or [])
+        try:
+            p = subprocess.run(resolve_shell_argv(argv), cwd=str(target), capture_output=True,
+                               text=True, encoding="utf-8", errors="replace", timeout=60)
+            if not re.search(k.get("expect") or "", p.stdout or ""):
+                fails.append((k, f"probe `{shown}` printed nothing matching "
+                                 f"/{k.get('expect')}/ (exit {p.returncode})"))
+        except (OSError, subprocess.TimeoutExpired) as e:
+            fails.append((k, f"probe `{shown}` could not run: {e}"))
+    return fails
+
+
+def derive_parity_lines(target: pathlib.Path, receipt: dict, descs: dict[str, tuple[dict, str]],
+                        r: Report) -> list[str]:
+    """DEPL-aRepatriatedFork-13 S4. One parity line per `[[contract]]` of every `adopter-owned` row.
+
+    Both `update` and `check` print these and neither reds for a clause: the adopter owns the file.
+    A failing clause whose consumer is installed as a receipt `engine` row is marked INSTALLED
+    CONSUMER CANNOT RUN, and reds ONLY when that installed path is in the argv of a leg the receipt
+    records as emitted (§8 F3). A gov `engine` row sharing the owned source at another path gets one
+    line saying it stays installed (§8 F2).
+    """
+    rows = receipt.get("files") or []
+    at: dict[str, list[str]] = {}
+    for f in rows:
+        if f.get("role", "engine") == "engine" and f.get("source"):
+            at.setdefault(f["source"], []).append(f["path"])
+    # WORDS, not substrings: a path is on a leg when one argv word IS it, quotes stripped, so a
+    # `bash -c` string still counts and `x.py` does not match `x.py.orig`.
+    leg_words = {w.strip("'\"") for g in ((receipt.get("gate_runner") or {}).get("emitted") or [])
+                 for a in (g.get("argv") or []) for w in str(a).split()}
+    out: list[str] = []
+    for f in rows:
+        if f.get("role") != "adopter-owned":
+            continue
+        path, src = f.get("path", ""), f.get("source", "")
+        d = (descs.get(f.get("kit")) or ({}, ""))[0]
+        home = (d.get("home") or "").rstrip("/")
+        rel = src[len(home) + 1:] if home and src.startswith(home + "/") else src
+        for p in (x for x in at.get(src, []) if x != path):
+            run_by = p in leg_words
+            out.append(f"{p} stays installed beside {path}, which the target declares stands in for "
+                       f"it; " + ("a leg this receipt emitted runs it" if run_by else
+                                  "no leg this receipt emitted runs it, so it is unwired"))
+        cs = [c for c in d.get("contract", []) if c.get("source") == rel]
+        if not cs:
+            out.append(f"contract (none) <- {path}: gov declares no contract for {src}")
+        for c in cs:
+            fails = measure_contract_parity(target, c, path)
+            n = len(c.get("clause") or [])
+            out.append(f"contract {c.get('id')} <- {path}: {n - len(fails)}/{n} clauses hold")
+            for k, why in fails:
+                cons = resolve_consumer_paths(descs, f.get("kit"), k.get("consumer"))
+                inst = [p for s in cons for p in at.get(s, [])]
+                out.append(f"  FAILS {why} — needed by {', '.join(cons)}"
+                           + (f" · INSTALLED CONSUMER CANNOT RUN: {', '.join(inst)} against {path}"
+                              if inst else ""))
+                for p in (x for x in inst if x in leg_words):
+                    r.fail(f"contract {c.get('id')}: {p} is on a leg this receipt emitted and "
+                           f"cannot run against the adopter-owned {path}: {why}")
+    return out
 
 
 def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: str,
@@ -6245,6 +6485,10 @@ UPDATE_ROLE = {
     # NOT `refuse`, which `-2` exists to remove: one forked row would make every future `update` on
     # that target exit non-zero and never re-stamp its receipt.
     "forked": "report",
+    # DEPL-aRepatriatedFork-13 S2. Written in neither direction and graded by NO byte comparison: the
+    # target declared it owns these bytes, so `update` counts the row and reports the contract parity
+    # other kits call it by. Never `r.fail`, so the row never withholds the re-stamp.
+    "adopter-owned": "contract",
 }
 
 # DEPL-cMendedVintage-24 S1. THE DISPOSITIONS A WRITING VERB CAN PUT BYTES AT, declared once, beside
@@ -7240,6 +7484,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             r.fail(f"receipt row '{row['path']}' carries role '{role}', which has no row in the "
                    f"update dispatch — refusing rather than classifying it from an absent field")
             continue
+        # DEPL-aRepatriatedFork-13 S2. ABOVE the re-resolution, deliberately: gov's descriptor
+        # resolves this path as `engine`, and the role-move branch below would stand the row back as
+        # `role-moved`. The role is the TARGET's declaration, which no descriptor can move.
+        if how == "contract":
+            tally[role] = tally.get(role, 0) + 1
+            print(f"  {role:<18} [{role:<13}] {row['path']}")
+            continue
 
         # DEPL-cMendedVintage-19 S1. THE RE-RESOLUTION RUNS AT EVERY SCHEMA. It used to be gated on
         # `schema < 2`, so a schema-3 row whose descriptor had since moved its destination to
@@ -7508,6 +7759,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               "`update` does not install them: widening a target's governance surface is an owner "
               "decision, and `--add-kits` is the flag that would")
     print("govkit update — " + " · ".join(f"{k} {v}" for k, v in sorted(tally.items())))
+    if tally.get("adopter-owned"):
+        for _ln in derive_parity_lines(target, receipt, descs, r):
+            print(f"govkit update — {_ln}")
     # DEPL-dCarriedReceipt-13 S7's remedy, said ONCE and only when it applies. An operator who sees
     # `unattributed` rows and no next step concludes the tool is broken; one who sees the sentence
     # repeated per row learns to scroll past the whole block.
@@ -9541,7 +9795,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 # ABSENCE, on S11's two synthesized classes, and it is NOT a synonym for `"unattributed"` — S7's skip
 # keys on the string, so widening it to field-absence would swallow every unlanded row and silently
 # delete four dispositions. That reading was in an earlier rev of the spec and was destructive.
-EVIDENCE_STATES = ("apply", "vintage-match", "pinned", "unattributed")
+# DEPL-aRepatriatedFork-13 S2: `"declared"` is an `adopter-owned` row's — the target SAID it owns the
+# bytes, so no vintage is inferred and none is asserted.
+EVIDENCE_STATES = ("apply", "vintage-match", "pinned", "unattributed", "declared")
 
 
 def carry_matches(rung: str, ours: bytes, base: bytes, needles: dict[str, str]) -> bool:
@@ -9698,6 +9954,19 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     if out.returncode != 0:
         raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
     commit = out.stdout.strip()
+    # DEPL-aRepatriatedFork-13 S1. A malformed `[[own]]` row is a FINDING naming the row, exit 1,
+    # before anything is measured: the declaration is the operator's, and it is wrong, not hostile.
+    try:
+        owned = resolve_owned_rows(root, target, deploy, descs)
+    except Refusal as e:
+        r.fail(str(e))
+        return r.emit()
+    for _op, _o in owned.items():
+        if _o["entry"] not in selection:
+            r.fail(f"[[own]] '{_op}' implements '{_o['implements']}', and '{_o['entry']}' is not in "
+                   f"this target's selection")
+    if r.problems:
+        return r.emit()
 
     print(f"govkit adopt — target {target.as_posix()} · selection: {', '.join(selection)}")
     print(f"govkit adopt — measuring against gov {commit[:8]} "
@@ -9747,6 +10016,17 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
               f"{len(ds)} target directories ({', '.join(ds)}), so it is no single needle")
     print(f"govkit adopt — needle map: {len(dpairs)} directory pair(s), {len(needles)} needle(s)")
 
+    # ---- DEPL-aRepatriatedFork-13 S1/S2. An owned path that is gov's destination for its source
+    # ---- takes that planned row over. One at ANOTHER path stands in for gov's copy (§8 F2), which
+    # ---- keeps its own row, so it is planned beside it. After the needle map, which a stand-in's
+    # ---- (source, path) pair would otherwise enter as a relocation it is not.
+    _planned = {p["dest"] for p in plan}
+    for _op, _o in sorted(owned.items()):
+        if _op not in _planned:
+            plan.append({"dest": _op, "role": "engine", "kit": _o["entry"],
+                         "version": entry_version(root, descs[_o["entry"]][0]),
+                         "src": _o["source"], "landable": True, "rule": {}})
+
     # ---- THE INDEX, ONE batched read over every planned destination. A destination the target does
     # ---- not track has no identity to record and gets no row at all.
     idx, _present = index_read(target, [p["dest"] for p in plan]) if plan else ({}, set())
@@ -9763,6 +10043,13 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     versions_at: dict[tuple[str, str], str] = {}
     for p in plan:
         dest = p["dest"]
+        _own = owned.get(dest)
+        if _own is not None and (_own["source"] != p["src"] or dest not in idx):
+            r.fail(f"[[own]] '{dest}' implements '{_own['implements']}', and "
+                   + (f"gov lands '{p['src']}' at that path, a different source"
+                      if _own["source"] != p["src"] else
+                      "the target's index does not track it, so there is no identity to record"))
+            continue
         if dest not in idx:
             tally["not-installed"] = tally.get("not-installed", 0) + 1
             print(f"  {'not-installed':<15} [{p['role']:<13}] {dest}")
@@ -9810,6 +10097,17 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
                 _bytes = ours
             row["sha256"] = hashlib.sha256(_bytes).hexdigest()
             row["oid"] = idx[dest][1]
+
+        # DEPL-aRepatriatedFork-13 S2. NO attribution walk and NO `commit`/`gov_oid`: the target said
+        # these bytes are its own, so a vintage inferred for them would be the claim `unattributed`
+        # exists to avoid, and one `update` would then write against.
+        if _own is not None:
+            row.update({"role": "adopter-owned", "implements": _own["implements"],
+                        "why": _own["why"], "evidence": "declared"})
+            tally["declared"] = tally.get("declared", 0) + 1
+            print(f"  {'declared':<15} [{'adopter-owned':<13}] {dest}")
+            rows.append(row)
+            continue
 
         # THE RUNG IS A LOCAL, and never read back off the row it was just written to. `-9` S2 says
         # no branch anywhere reads a stored `carry`, and an arm over this file's SOURCE enforces it
@@ -9885,6 +10183,8 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             f"names is stuck in. The destinations measured were: " +
             (", ".join(_seen[:12]) + (f" (and {len(_seen) - 12} more)" if len(_seen) > 12 else "")
              if _seen else "(none — this target tracks no planned destination)"))
+    if r.problems:
+        return r.emit()
 
     # ---- S11. THE TWO CLASSES `resolve_entry` DOES NOT PRODUCE, in `apply`'s own shapes rather
     # ---- than in a second one. Without them `-2`'s `pins` arm never dispatches and `cmd_check`'s
