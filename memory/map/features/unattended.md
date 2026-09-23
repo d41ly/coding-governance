@@ -136,11 +136,11 @@ never a DoD item and never a gate.
 
 **Every remote observation is BOUNDED, and the bound is a file constant.** The kit makes remote
 round-trips on the authorization path — the default-branch HEAD advertisement, the per-branch tip
-under the published anchor, and the leg's own two — and until 2026-08-20 not one of them had a
-deadline. A partitioned endpoint therefore turned `--close` into an indefinite silent wait, and the
+under the published anchor, and the leg's own two — and until 2026-08-20 none had a
+deadline. A partitioned endpoint therefore turned `--close` into a silent wait, and the
 same calls inside the leg turned a `git push` into a HUNG push rather than a red one, because the leg
 runs under `.githooks/pre-push`. The tracked incident is a driver selftest that produced zero output
-at 240 s and wedged the whole bar.
+at 240 s and wedged the bar.
 
 Three bounds, because no single mechanism covers every transport: an outer wall clock for blackholed
 packets, `http.lowSpeed{Limit,Time}` for a server that ACCEPTS and then stalls — which no wall clock

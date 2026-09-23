@@ -74,47 +74,259 @@ PYBIN=$(resolve_python) || { echo "run-selftests: no usable python"; exit 2; }
 
 print_usage() {
   cat <<'USAGE'
-usage: bash tools/run-gates/run-selftests.sh [--kit <dir>] [--check] [--list]
-  (no flag)   run the declared population, time each suite, RED on a breach
-  --kit <dir> only the suites whose argv lies under <dir>; a filter matching
-              nothing is a REFUSAL, because an unknown filter and a clean sweep
-              are indistinguishable from outside
-  --check     the gate: assert the declaration against tools/gate-legs.json in
-              BOTH directions, run nothing
-  --list      print the population and the derived total, run nothing
-  --rank      rank the population by its RECORDED seconds and mark the set that
-              carries the declared majority share; REFUSES if any row's reading
-              states no condition, because ranking two conditions together ranks
-              the conditions
-  --sweep     the same population through a bounded OUTER pool, so the wall clock
+usage: bash tools/run-gates/run-selftests.sh (--serial|--pooled [--calibrate [--reset <row>]]) [--kit <dir>] | --check | --list | --rank
+  --serial    run the declared population ONE suite at a time, time each against
+              its own budget, RED on a breach. The only mode that issues a cost
+              verdict, because an uncontended clock is the only one that can grade
+              a budget.
+  --pooled    the same population through a bounded OUTER pool, so the wall clock
               falls toward the longest suite instead of the sum of all of them.
-              It answers ONE question -- did any suite fail -- and issues NO cost
-              verdict at all: every reading it takes is contended by the other
-              suites, and a contended clock cannot grade a budget. Use the no-flag
-              mode for that. SELFTEST_OUTER_WIDTH overrides the outer width
-              (clamped to the resolved one); SELFTEST_WALL overrides the run bound
-              and is REFUSED below the largest per-suite bound.
+              It answers ONE question -- did every suite run to its own end and
+              MATCH its calibrated baseline (rc, ^FAIL count, executed count),
+              which is PARITY -- and issues NO cost verdict at all: every reading
+              it takes is contended by the other suites, and a contended clock
+              cannot grade a budget. Use --serial for that. A red-by-design suite
+              that completed and matched is GREEN here; a crash, a kill, a wall,
+              an unrun or an unstarted row is RED. Each row's HANG bound is
+              max(serial budget, worst calibrated reading) plus ceiling-margin.txt's
+              headroom, read from selftest-pooled-evidence.txt under this node and
+              the run's condition token; a row with NO reading REFUSES the run by
+              name and nothing executes. SELFTEST_OUTER_WIDTH overrides the outer
+              width (clamped to the resolved one); SELFTEST_WALL overrides the run
+              bound and is REFUSED below the largest per-suite bound. --sweep is an
+              alias, kept so every recorded invocation still runs.
               IT PAYS IN PROPORTION TO HOW UNDOMINATED THE POPULATION IS. The wall
               clock cannot fall below the longest member, so a selection of three
               suites where one holds most of the time is a LOSS — measured at 56s
               serial against 62s pooled. Nine suites measured 1692s against 981s.
+  --calibrate with --pooled ONLY: run every selected row under ONE wall, the SUM
+              of their serial budgets, grade NOTHING, and write each completed
+              row's reading (worst seconds, monotone; rc, FAIL and executed
+              counts, latest) to selftest-pooled-evidence.txt. A row the wall
+              killed, whose output carries no trailer, or whose output carries
+              the no-baseline sentinel (a batched group with no expected set yet)
+              writes NO reading and reds the calibrate; an UNSOUND run (pool over
+              its bound, fingerprint not taken or changed) writes NOTHING and
+              says so. Every row's output is kept under
+              <git-dir>/gate-logs/selftests/ and the path printed on each row
+              that is not ok. Off --pooled it REFUSES.
+  --reset <row>  with --pooled --calibrate ONLY: drop that row's reading, run
+              ONLY the reset rows, and write the new seconds even when lower — the
+              one path that lowers a bound. Off --calibrate, or naming a row the
+              evidence file lacks, it REFUSES.
+  (no mode)   REFUSED. A run that executes a suite declares --serial or --pooled;
+              a silent default in either direction is a verdict nobody asked for.
+  --kit <dir> only the suites whose argv lies under <dir>; a filter matching
+              nothing is a REFUSAL, because an unknown filter and a clean sweep
+              are indistinguishable from outside
+  --check     the gate: assert the declaration against tools/gate-legs.json in
+              BOTH directions, the pooled evidence's shape, and — over the rows
+              under each `# pooled-kit:` the evidence header declares — that a
+              row's script prints its trailer OUTSIDE a `[ "$<var>" = 0 ] &&` guard
+              unless declared `# no-trailer:`, because a green-only trailer is
+              UNTRAILED under --pooled the moment the suite reds; run nothing;
+              takes no mode and no --kit
+  --list      print the population and the derived total, run nothing; no mode
+  --rank      rank the population by its RECORDED seconds and mark the set that
+              carries the declared majority share; REFUSES if any row's reading
+              states no condition, because ranking two conditions together ranks
+              the conditions; takes no mode
 USAGE
 }
 
-MODE=run; FILTER=""
+# `run` IS THE UNDECLARED STATE, NOT A MODE. Nothing below executes a suite under it: the refusal
+# past the --list exit turns it away, so the serial loop at the bottom is reached only by --serial
+# and the pool only by --pooled. TOOL-aBatchedArm-4 S2.
+MODE=run; FILTER=""; CALIBRATE=0; RESETS=()
 while [ $# -gt 0 ]; do
   case "$1" in
     --kit)   FILTER=${2:-}; shift 2 ;;
     --check) MODE=check; shift ;;
     --list)  MODE=list; shift ;;
     --rank)  MODE=rank; shift ;;
-    --sweep) MODE=sweep; shift ;;
+    --serial) MODE=serial; shift ;;
+    # ONE BRANCH, TWO SPELLINGS. --sweep is the name every recorded invocation carries and --pooled
+    # is the declared mode; an alias that kept its own branch would be two answers to one question.
+    --pooled|--sweep) MODE=sweep; shift ;;
+    # THE BOOTSTRAP IS A DECLARED MODE, not a fallback. TOOL-aBatchedArm-5 S2: the evidence shape
+    # cannot bound a row nobody has observed, so the first observation is taken under a wall that
+    # says it is calibrating and grades nothing. It is a modifier of --pooled and of nothing else,
+    # and --reset is a modifier of it; both refusals sit right below the loop so that
+    # `--serial --calibrate`, `--check --calibrate` and a bare `--calibrate` execute NOTHING.
+    --calibrate) CALIBRATE=1; shift ;;
+    --reset) [ -n "${2:-}" ] || { echo "run-selftests: --reset takes a row name"; exit 2; }
+             RESETS+=("$2"); shift 2 ;;
     -h|--help) print_usage; exit 0 ;;
     *) echo "run-selftests: unknown argument '$1'"; print_usage; exit 2 ;;
   esac
 done
+if [ "$CALIBRATE" = 1 ] && [ "$MODE" != sweep ]; then
+  echo "run-selftests: --calibrate modifies --pooled and nothing else, and was given with '$( [ "$MODE" = run ] && echo "no mode" || echo "--$MODE" )'." >&2
+  echo "run-selftests: A calibrate that ran the serial loop, or the gate, and wrote nothing would be" >&2
+  echo "run-selftests: silent in a mode whose whole point is announcing itself. Nothing was run." >&2
+  echo "run-selftests: Spell it: bash $SELF --pooled --calibrate [--kit <dir>]" >&2
+  exit 2
+fi
+if [ "${#RESETS[@]}" -gt 0 ] && [ "$CALIBRATE" != 1 ]; then
+  echo "run-selftests: --reset lowers a row's calibrated seconds and is a modifier of --calibrate," >&2
+  echo "run-selftests: which was not given; a reset with no re-reading would leave the row unbounded" >&2
+  echo "run-selftests: and say nothing. Nothing was run. Rows named: ${RESETS[*]}" >&2
+  echo "run-selftests: Spell it: bash $SELF --pooled --calibrate --reset <row>" >&2
+  exit 2
+fi
+# --check TAKES NO --kit, and the usage line says so. Its trailer arm iterates the population
+# against a whole-file `# pooled-kit:` declaration, so a filter outside that kit made the gate red
+# by selecting nothing — a false red on a manual invocation (aBatchedArm closing review R4).
+# Refused by name here, beside the two refusals above, rather than filtered inside the arm.
+if [ "$MODE" = check ] && [ -n "$FILTER" ]; then
+  echo "run-selftests: --check grades the WHOLE declaration and takes no --kit, and was given '--kit $FILTER'." >&2
+  echo "run-selftests: A filtered gate would red its trailer arm for selecting nothing outside the declared" >&2
+  echo "run-selftests: pooled kit, or pass a filtered declaration off as the whole. Nothing was run." >&2
+  echo "run-selftests: Spell it: bash $SELF --check" >&2
+  exit 2
+fi
 
 [ -f "$BUDGETS" ] || { echo "run-selftests: no declaration at $BUDGETS"; exit 2; }
+
+# ---- THE POOLED EVIDENCE, and the three readers of it. TOOL-aBatchedArm-5 S1, S2, S3 -------------
+# ---- Siblings of this script, DERIVED as `$HERE/...` like the declaration above: a literal
+# ---- kit path here would ship gov's prefix into an adopter installed elsewhere (the
+# ---- install-prefix ban). The evidence file itself ships to NO adopter — it is a
+# ---- `project-owned` row in this kit's descriptor, beside the declaration, for the same reason.
+EVIDENCE="$HERE/selftest-pooled-evidence.txt"
+MARGIN="$HERE/ceiling-margin.txt"
+# THE TRAILER, ONE REGEX CONSTANT. A completed exit is a READING only when the filed output carries
+# the suite's trailer — `PASS (` from the harness, the executed-count line from a shard, the shard
+# leg's own line — because a red-by-design row exits 1 at 0.3 s on an unbound variable exactly as it
+# does after 1300 s of work, and TOOL-aBatchedArm-3 AC4's ratified rule asks for an artifact of the
+# work beside the exit (the `ab-arm-never-did-the-work` class).
+SWEEP_TRAILER_RX='PASS \(|assertions executed|this leg ran shard'
+# THE NO-BASELINE SENTINEL. A batched group whose expected signature set is still `"?"` prints
+# `FAIL check_emitted: expected set not yet observed` and its observed set beneath, and the shard
+# still prints its trailer — so a calibrate would fold those refusals into `fails` and the next
+# --pooled would print parity GREEN over a suite that refused by name in every such group
+# (aBatchedArm closing review D3). A hit is UNTRAILED at calibrate and MISMATCH under --pooled,
+# so the landing order can never matter again. The phrase is the suite's own, verbatim.
+SWEEP_NOBASELINE_RX='expected set not yet observed'
+
+# THE NODE IS THE CHARTER'S §2 REGISTRY TAG, never a hostname, which the registry does not know:
+# GOV_NODE when set, else USERNAME/USER matched against the registry table of the charter at the
+# repo root — `AGENTS.md`, then `CLAUDE.md`, the precedent `run-gates.gov.test.sh` spells — with the
+# row regex the drift audit's `_resolve_node_tag` uses (the registry's machine/user token is a
+# SUBSTRING of the lowercased user). Prints the tag; returns 1 when no row
+# matches, and the caller refuses BY NAME rather than falling back to a hostname.
+_rs_reg_rx='^\|[[:space:]]*`([a-z])`[[:space:]]*\|[[:space:]]*`?([A-Za-z0-9_@.-]+)`?'
+read_registry_tags() {  # every tag the registry table carries, one per line
+  local f line
+  for f in "$ROOT/AGENTS.md" "$ROOT/CLAUDE.md"; do
+    [ -r "$f" ] || continue
+    while IFS= read -r line; do
+      [[ "$line" =~ $_rs_reg_rx ]] && printf '%s\n' "${BASH_REMATCH[1]}"
+    done < "$f"
+  done
+}
+resolve_node_tag() {
+  if [ -n "${GOV_NODE:-}" ]; then
+    # VALIDATED AGAINST THE SAME TABLE --check ENFORCES on the field it writes: an unregistered
+    # GOV_NODE used to reach the evidence file verbatim, and the unguarded --check leg then redded
+    # every bar on every node until the tracked file was hand-edited (aBatchedArm closing D11).
+    # Refused by name, and the refusal is the caller's: return 2 is "set but not a tag".
+    # ANCHORED, one tag per line: the space-joined `case` this replaced was a substring match,
+    # so `GOV_NODE='a b'` — two adjacent registered tags — was accepted and written as a node
+    # (aBatchedArm closing review R5, the `id-matched-as-a-substring` class).
+    if read_registry_tags | grep -qxF -- "$GOV_NODE"; then printf '%s' "$GOV_NODE"; return 0; fi
+    return 2
+  fi
+  local user=${USERNAME:-${USER:-}} f line tok
+  user=${user,,}
+  [ -n "$user" ] || return 1
+  for f in "$ROOT/AGENTS.md" "$ROOT/CLAUDE.md"; do
+    [ -r "$f" ] || continue
+    while IFS= read -r line; do
+      if [[ "$line" =~ $_rs_reg_rx ]]; then
+        tok=${BASH_REMATCH[2],,}
+        case "$user" in *"$tok"*) printf '%s' "${BASH_REMATCH[1]}"; return 0 ;; esac
+      fi
+    done < "$f"
+  done
+  return 1
+}
+
+# THE MARGIN, READ FROM THE FILE BESIDE THIS SCRIPT and REFUSED when absent — the rule
+# `derive-ceilings.py` `read_margin` applies, reused as a RULE and not imported, because this runner
+# is bash. Headroom over a bound's base is `max(<floor seconds>, <fraction> x base)`; a silent
+# zero-margin default is a bound nobody chose. Sets MARGIN_FLOOR and MARGIN_FRAC.
+read_margin() {
+  [ -f "$MARGIN" ] || {
+    echo "run-selftests: no margin declared at $MARGIN — a pooled hang bound with an undeclared" >&2
+    echo "run-selftests: headroom is a number nobody chose. Refusing rather than defaulting; nothing was run." >&2
+    return 1; }
+  local line f1 f2
+  while IFS= read -r line; do
+    line=${line%$'\r'}
+    case "$line" in ''|'#'*) continue ;; esac
+    f1=${line%%$'\t'*}; f2=${line#*$'\t'}; f2=${f2%%$'\t'*}
+    case "$f1" in ''|*[!0-9]*) continue ;; esac
+    case "$f2" in ''|*[!0-9.]*) continue ;; esac
+    MARGIN_FLOOR=$f1; MARGIN_FRAC=$f2; return 0
+  done < "$MARGIN"
+  echo "run-selftests: $MARGIN declares no <floor seconds>, tab, <fraction> row, so no headroom" >&2
+  echo "run-selftests: could be derived. Nothing was run." >&2
+  return 1
+}
+
+# THE EVIDENCE, READ ONCE AND EMITTED AS ROWS the shell loads into keyed arrays. Nine tab fields per
+# row: name, condition token, node, max seconds, rc, fails, executed, readings, date. Emits
+# `ROW<TAB>...` for a well-formed row, `BAD<TAB><line>:<why>` for one that does not parse (which
+# `--check` reds by line and `--pooled` REFUSES on, naming the file), `DUP<TAB><line>:<key>` for a
+# repeated (row, token, node) key, `NOTRAILER<TAB><row>` for each row the header declares as
+# printing no trailer, and `POOLEDKIT<TAB><dir>` for each `# pooled-kit:` the header declares —
+# the population --check's static trailer arm grades. An ABSENT file emits nothing: that is the
+# bootstrap state --calibrate fills and --pooled refuses row by row.
+read_evidence() {
+  [ -f "$EVIDENCE" ] || return 0
+  "$PYBIN" - "$EVIDENCE" <<'PY'
+import re, sys
+sys.stdout.reconfigure(newline="")
+seen = {}
+for n, raw in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
+    line = raw.rstrip("\r\n")
+    s = line.strip()
+    if not s:
+        continue
+    if s.startswith("#"):
+        m = re.match(r"#\s*no-trailer:\s*(.+?)\s*$", s)
+        if m:
+            print("NOTRAILER\t" + m.group(1))
+        m = re.match(r"#\s*pooled-kit:\s*(.+?)\s*$", s)
+        if m:
+            print("POOLEDKIT\t" + m.group(1))
+        continue
+    f = line.split("\t")
+    if len(f) != 9:
+        print("BAD\t%d:%d field(s), not 9" % (n, len(f)))
+        continue
+    name, cond, node, secs, rc, fails, executed, readings, date = f
+    why = None
+    if not name or not cond or not node or not date:
+        why = "an empty name, condition, node or date"
+    elif not (secs.isdigit() and rc.isdigit() and fails.isdigit() and readings.isdigit()):
+        why = "seconds, rc, fails and readings must be integers"
+    elif not (executed == "-" or executed.isdigit()):
+        why = "executed must be an integer or '-'"
+    elif int(readings) < 1:
+        why = "readings is %s, and a row nobody has read is not evidence" % readings
+    if why:
+        print("BAD\t%d:%s" % (n, why))
+        continue
+    key = (name, cond, node)
+    if key in seen:
+        print("DUP\t%d:%s under %s on node %s (first at line %d)" % (n, name, cond, node, seen[key]))
+        continue
+    seen[key] = n
+    print("\t".join(["ROW"] + f))
+PY
+}
 
 # ---- --rank: which suites carry the cost, and therefore which are worth rebuilding -------------
 # ---- It runs BEFORE the width resolution below, because ranking is a read of a text file and has
@@ -279,7 +491,7 @@ case "${W:-}" in ''|*[!0-9]*) W=2 ;; esac
 # caught this unit and the harness unit each reading that width independently, which at width 8 would
 # be 8 suites x 8 arms = 64 concurrent processes on a host where a bare spawn costs 319 ms.
 #
-# THE OUTER POOL IS 1 IN THE DEFAULT MODE, because that loop is serial on purpose: it grades each
+# THE OUTER POOL IS 1 UNDER --serial, because that loop is serial on purpose: it grades each
 # suite against its OWN declared budget, so two suites racing would charge each of them the other's
 # contention and a breach would name the wrong one. An earlier draft divided by a pool of 4 that does
 # not exist, which handed every ported suite a quarter of the width it was entitled to — measured on
@@ -316,7 +528,17 @@ if [ "$MODE" = sweep ]; then
 fi
 export SELFTEST_INNER_WIDTH=$(( W / OUTER )); [ "$SELFTEST_INNER_WIDTH" -ge 1 ] || SELFTEST_INNER_WIDTH=1
 
+# FED FROM FILES, NOT FROM A HEREDOC OVER A VARIABLE. Six loops here used to read their rows
+# from a heredoc holding
+# `$POP` and `$EV_TEXT`, both assigned from command substitutions, which is the shape the
+# shell-hygiene leg gates: such a loop can read until an EOF that never arrives. Its registry is
+# set-equality with shrink-only counts, so a build that adds a site cannot declare one. The text
+# is written once and every loop reads the file; the registry row for this file goes with them.
+RS_SCRATCH=$(mktemp -d) || { echo "run-selftests: cannot create a scratch dir" >&2; exit 2; }
+trap 'rm -rf "$RS_SCRATCH" 2>/dev/null' EXIT
+POP_FILE="$RS_SCRATCH/population"; EV_FILE="$RS_SCRATCH/evidence"
 POP=$(read_population)
+printf '%s\n' "$POP" > "$POP_FILE"
 NROWS=$(printf '%s' "$POP" | grep -c . || true)
 
 # ---- --check: the gate. BOTH DIRECTIONS, because one alone cannot fail usefully -----------------
@@ -356,15 +578,139 @@ PY
     fi
     for tok in $argv; do
       case "$tok" in
-        */*) git ls-files --error-unmatch -- "$tok" >/dev/null 2>&1 \
+        */*)
+          # A NUMERIC RATIO IS A SHARD TOKEN, NOT A PATH. `--shard 1/8` carries a slash and is what a
+          # sharded row's argv says, so it must not be handed to `git ls-files`. TOOL-aBatchedArm-4 S1.
+          # A REGEX, deliberately: the glob `[0-9]*/[0-9]*` reads as ONE digit then anything, so a
+          # digit-led directory name would slip past the tracked-path check — staged and proven.
+          [[ "$tok" =~ ^[0-9]+/[0-9]+$ ]] && continue
+          git ls-files --error-unmatch -- "$tok" >/dev/null 2>&1 \
                || { echo "run-selftests: row '$name' names '$tok', which git does not track" >&2; fails=1; } ;;
       esac
     done
-  done <<EOF
-$POP
-EOF
+  done < "$POP_FILE"
+  # ---- THE SHARD JOIN, ported from the gov canary's shard contract (run-gates.gov.test.sh, the
+  # ---- text `shard contract`) to this file's row format. TOOL-aBatchedArm-3 S4. FORWARD HALF ONLY:
+  # ---- a script any row calls with `--shard i/n` is called at ONE arity, and its indices 1..n are
+  # ---- each declared exactly once — a missing index is a region nobody runs while the other seven
+  # ---- rows report green, which is green-by-absence one row at a time. The canary's REVERSE half
+  # ---- ("declares SHARD_ARITY but is called whole") is deliberately NOT ported: the driver suite
+  # ---- declares an arity and is called whole here on purpose, so that half would red a row this
+  # ---- declaration is right to carry. Scoped to rows that carry `--shard`, so it never reads that
+  # ---- row. WHAT IT DOES NOT CHECK: that a shard runs the region it claims — only the suite's own
+  # ---- per-mode floor sees that. Run over the real tree before it was wired: 0 sharded scripts.
+  shard_faults=$(printf '%s\n' "$POP" | awk -F'\t' '
+    { n = split($4, t, " ")
+      for (i = 1; i <= n; i++) if (t[i] == "--shard") {
+        s = "?"; for (j = 1; j <= n; j++) if (t[j] ~ /\.(sh|py)$/) { s = t[j]; break }
+        v = (i < n) ? t[i + 1] : ""
+        if (v !~ /^[0-9]+\/[0-9]+$/) { print "row " $2 " carries a malformed --shard value " v; next }
+        split(v, p, "/")
+        if (!(s in arity)) { arity[s] = p[2]; order[++k] = s }
+        else if (arity[s] != p[2]) multi[s] = multi[s] " " p[2]
+        seen[s, p[1]]++
+      } }
+    END {
+      for (q = 1; q <= k; q++) { s = order[q]; a = arity[s]
+        if (s in multi) { print s " is called with more than one shard arity: " a multi[s]; continue }
+        miss = ""; dup = ""; wide = ""
+        for (j = 1; j <= a; j++) { if (!((s, j) in seen)) miss = miss " " j; else if (seen[s, j] > 1) dup = dup " " j }
+        for (key in seen) { split(key, kk, SUBSEP); if (kk[1] == s && (kk[2] + 0 < 1 || kk[2] + 0 > a)) wide = wide " " kk[2] }
+        if (miss != "") print s " declares arity " a " but the declaration carries no row for index" miss " — every index 1.." a " is a region, and one nobody runs is green by absence"
+        if (dup != "") print s " declares arity " a " but index" dup " is declared more than once, so one region is graded twice and paid twice"
+        if (wide != "") print s " declares arity " a " but the declaration carries index" wide ", outside 1.." a
+      } }')
+  if [ -n "$shard_faults" ]; then
+    echo "run-selftests: the shard join fails — a script called with --shard must be called at one arity with every index 1..n declared once:" >&2
+    printf '%s\n' "$shard_faults" | sed 's/^/  /' >&2
+    fails=1
+  fi
+  # ---- THE POOLED EVIDENCE'S SHAPE. TOOL-aBatchedArm-5 S3. A hand-edited, truncated or orphaned
+  # ---- row reds HERE, on the unguarded bar leg: nine tab fields, the numbers parse, readings is at
+  # ---- least one, the node is a tag the registry table carries, no (row, token, node) key repeats,
+  # ---- and every row names a row the declaration declares — an ORPHAN is the right red, because a
+  # ---- deleted budget row takes its evidence with it or the file lies. WHAT IT DOES NOT CHECK:
+  # ---- that any reading is true, or that the population --pooled reaches is calibrated; the
+  # ---- pooled run refuses that by name at run time. An ABSENT file is announced and is not a
+  # ---- red: the file ships to no adopter, and --pooled refuses every row until --calibrate
+  # ---- writes one, which is the announced-unarmed state.
+  if [ -f "$EVIDENCE" ]; then
+    ev_tags=$(read_registry_tags)
+    ev_rows=0; ev_faults=""; ev_nt="|"; ev_kits=""
+    # READ ONCE INTO A VARIABLE and feed the loop from that: a heredoc holding a command
+    # substitution is the shape the shell-hygiene leg gates (a loop that can wait for an EOF that
+    # never arrives), and the population loops feed from $POP the same way.
+    EV_TEXT=$(read_evidence)
+    printf '%s\n' "$EV_TEXT" > "$EV_FILE"
+    while IFS=$'\t' read -r kind a b c _rest; do
+      [ -n "${kind:-}" ] || continue
+      case "$kind" in
+        NOTRAILER) ev_nt="$ev_nt$a|"; continue ;;
+        POOLEDKIT) ev_kits="$ev_kits $a"; continue ;;
+        BAD) ev_faults="$ev_faults"$'\n'"  line $a" ;;
+        DUP) ev_faults="$ev_faults"$'\n'"  line $a — the (row, token, node) key repeats" ;;
+        ROW)
+          ev_rows=$((ev_rows + 1))
+          # ANCHORED, the same comparison `resolve_node_tag` makes on the write path (R5).
+          if ! printf '%s\n' "$ev_tags" | grep -qxF -- "$c"; then
+            ev_faults="$ev_faults"$'\n'"  row '$a' under $b names node '$c', which is no tag the charter's registry table carries"
+          fi
+          # AGAINST THE WHOLE DECLARATION, not the --kit-filtered population: a row outside a
+          # filter is declared all the same, and reading it as an orphan would red a true file.
+          if ! awk -F'\t' -v n="$a" '/^[[:space:]]*#/ { next } NF >= 2 && $1 == n { hit = 1 } END { exit hit ? 0 : 1 }' "$BUDGETS"; then
+            ev_faults="$ev_faults"$'\n'"  row '$a' under $b is an ORPHAN — the declaration carries no row of that name, so its evidence bounds nothing"
+          fi ;;
+      esac
+    done < "$EV_FILE"
+    if [ -n "$ev_faults" ]; then
+      echo "run-selftests: the pooled evidence at $EVIDENCE is malformed — every row is nine tab fields (row, condition, node, seconds, rc, fails, executed, readings, date), keyed once, on a registry tag, naming a declared row:" >&2
+      printf '%s\n' "$ev_faults" | grep . >&2
+      fails=1
+    fi
+    ev_note=", $ev_rows pooled evidence row(s) well-formed"
+    # ---- THE TRAILER RULE, STATICALLY, before anyone pays for a calibrate. aBatchedArm closing
+    # ---- review D4: five of the seven non-shard kit rows printed their only trailer under
+    # ---- `[ "$st" = 0 ] &&`, three of them red by design, so the calibrate would have rendered
+    # ---- them UNTRAILED, written no reading, and every later --pooled would have refused the whole
+    # ---- population — a 5.7 h serial-sum wall declared over rows that could never reach parity.
+    # ---- SCOPED to the rows under each `# pooled-kit:` the evidence header declares: run as a
+    # ---- candidate over the WHOLE declaration first, it named 34 of 69 rows that print no trailer
+    # ---- at all because they are not on the pooled route, and a gate that reds innocent rows is
+    # ---- not a gate. A row declared `# no-trailer:` is skipped. WHAT IT DOES NOT CHECK: a trailer
+    # ---- behind a guard that is not a `[ "$<var>" = 0 ] &&` prefix, a trailer printed by a file the script sources,
+    # ---- or that the print is reached — the calibrate's UNTRAILED verdict is the runtime half.
+    # ---- No pooled-kit declared is ANNOUNCED, never a silent skip.
+    if [ -n "$ev_kits" ]; then
+      tr_graded=0; tr_skipped=0; tr_faults=""
+      while IFS=$'\t' read -r state name budget argv; do
+        [ "${state:-}" = ok ] || continue
+        tr_in=0; for kd in $ev_kits; do case "$argv" in *"$kd"*) tr_in=1 ;; esac; done
+        [ "$tr_in" = 1 ] || continue
+        case "$ev_nt" in *"|$name|"*) tr_skipped=$((tr_skipped + 1)); continue ;; esac
+        tr_script=""; for tok in $argv; do case "$tok" in *.sh|*.py) tr_script=$tok; break ;; esac; done
+        tr_graded=$((tr_graded + 1))
+        if [ -z "$tr_script" ] || [ ! -f "$tr_script" ]; then
+          tr_faults="$tr_faults"$'\n'"  row '$name' names no script this arm can read, so its trailer is unknown"
+        elif ! grep -vE '^[[:space:]]*#' "$tr_script" | grep -E "$SWEEP_TRAILER_RX" | grep -qvE '^[[:space:]]*\[ "\$[A-Za-z_]+" = 0 \] &&'; then
+          tr_faults="$tr_faults"$'\n'"  row '$name': $tr_script prints no trailer outside a [ \"\$<var>\" = 0 ] && guard, so a red-but-complete run is UNTRAILED under --pooled and writes no reading"
+        fi
+      done < "$POP_FILE"
+      if [ -n "$tr_faults" ]; then
+        echo "run-selftests: the trailer rule fails under pooled-kit$ev_kits — every row's script must print a trailer ($SWEEP_TRAILER_RX) unconditionally, or be declared no-trailer in $EVIDENCE:" >&2
+        printf '%s\n' "$tr_faults" | grep . >&2
+        fails=1
+      fi
+      [ "$tr_graded" -gt 0 ] || { echo "run-selftests: pooled-kit$ev_kits selects NO row, so the trailer arm graded nothing" >&2; fails=1; }
+      ev_note="$ev_note, trailer arm graded $tr_graded row(s) under pooled-kit$ev_kits ($tr_skipped declared no-trailer)"
+    else
+      ev_note="$ev_note, no pooled-kit declared so the trailer arm graded NOTHING"
+    fi
+  else
+    echo "run-selftests: no pooled evidence at $EVIDENCE, so the evidence-shape arm graded NOTHING — --pooled refuses every row until --pooled --calibrate writes one"
+    ev_note=", no pooled evidence file"
+  fi
   [ "$NROWS" -gt 0 ] || { echo "run-selftests: the declaration is EMPTY, so both directions above passed by finding nothing" >&2; fails=1; }
-  [ "$fails" = 0 ] && echo "run-selftests: declaration clean — $NROWS row(s), every held leg budgeted, every row resolvable"
+  [ "$fails" = 0 ] && echo "run-selftests: declaration clean — $NROWS row(s), every held leg budgeted, every row resolvable$ev_note"
   exit "$fails"
 fi
 
@@ -378,6 +724,23 @@ if [ "$MODE" = list ]; then
   exit 0
 fi
 
+# ---- THE MODE IS DECLARED, NEVER DEFAULTED. TOOL-aBatchedArm-4 S2. A run that executes a suite
+# ---- says which clock it runs on: --serial grades budgets, --pooled withholds them. A silent
+# ---- default in EITHER direction is a coupling nobody declared — the one caller that reports
+# ---- cost read only the exit code, so a pooled default would have printed GREEN with every
+# ---- budget withheld, and a serial default is the contract this refusal makes explicit.
+# ---- IT SITS HERE, after --check and --list, which execute nothing and take no mode (--check is
+# ---- the unguarded bar leg, and a refusal above it would red every bar), and BEFORE the
+# ---- filter-liveness refusal below, because the mode is the invocation's shape and the filter
+# ---- is its content: a wrong filter under a declared mode still reds by name.
+if [ "$MODE" = run ]; then
+  echo "run-selftests: no execution mode was given, and a run that executes a suite declares --serial or --pooled:" >&2
+  echo "run-selftests:   --serial   one suite at a time, each graded against its own budget" >&2
+  echo "run-selftests:   --pooled   a bounded outer pool, every cost verdict withheld" >&2
+  echo "run-selftests: Nothing was run." >&2
+  exit 2
+fi
+
 # ---- LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a
 # ---- clean sweep are indistinguishable from the outside, which is the class this kit's sibling
 # ---- spent six review rounds on.
@@ -387,8 +750,9 @@ if [ "$NROWS" -eq 0 ]; then
 fi
 
 # ---- --sweep: the population through a bounded OUTER pool. TOOL-aPooledSweep-1 -----------------
-# ---- It answers "did any suite fail" and NOTHING about cost. The serial loop below is the only
-# ---- mode that grades a budget, and that division is the whole reason this one is admissible.
+# ---- It answers "did every suite run to its own end and match its calibrated baseline" — PARITY,
+# ---- TOOL-aBatchedArm-5 S4 — and NOTHING about cost. The serial loop below is the only mode that
+# ---- grades a budget, and that division is the whole reason this one is admissible.
 if [ "$MODE" = sweep ]; then
   # THE BOUND IS A PROBED CAPABILITY, NOT AN ASSUMPTION, and its absence REFUSES rather than
   # degrading quietly. the selftest harness probes for `timeout` the same way and runs its
@@ -405,92 +769,210 @@ if [ "$MODE" = sweep ]; then
     command -v "$_cand" >/dev/null 2>&1 && { SWEEP_TIMEOUT=$_cand; break; }
   done
   [ -n "$SWEEP_TIMEOUT" ] || {
-    echo "run-selftests: --sweep needs a 'timeout' binary to bound each suite and found none of:" >&2
+    echo "run-selftests: --pooled needs a 'timeout' binary to bound each suite and found none of:" >&2
     echo "run-selftests:   ${SELFTEST_TIMEOUT_BIN:-timeout gtimeout}" >&2
     echo "run-selftests: without one every suite below would run unbounded while this mode claims" >&2
     echo "run-selftests: each one is bounded, and a single hang would suppress all $NROWS verdict" >&2
-    echo "run-selftests: lines. Use the no-flag mode, which reports each suite as it finishes." >&2
+    echo "run-selftests: lines. Use --serial, which reports each suite as it finishes." >&2
     exit 2; }
 
-  # THE PER-SUITE BOUND IS DERIVED FROM THE ROW'S OWN BUDGET, and the declaration is refused when
-  # absent — a factor nobody wrote is not a factor, which is the rule `--rank` already applies to
-  # its share. This does NOT make the budget a hang bound: it derives one from it, exactly as the
-  # manifest ceilings this file's header points at are themselves derived from recorded seconds.
-  SWEEP_FACTOR=$(sed -n 's/^#[[:space:]]*sweep-ceiling-factor:[[:space:]]*\([0-9][0-9]*\).*/\1/p' "$BUDGETS" | head -1)
-  case "${SWEEP_FACTOR:-}" in ''|*[!0-9]*|0)
-    echo "run-selftests: $BUDGETS declares no sweep-ceiling-factor, so no suite could be bounded" >&2
-    echo "run-selftests: and --sweep would background $NROWS unbounded processes. Declare it in" >&2
-    echo "run-selftests: that file's header, beside the reading it was set against." >&2
-    exit 2 ;;
-  esac
+  # THE CONDITION, COMPOSED ONCE, and composed HERE because the evidence is keyed on it. Not
+  # re-derived per row: the same fact spelled twice in a file whose own header names that defect.
+  # It is printed in a stable shape because the `--rank` refusal matches this exact token, and the
+  # arm that proves they agree captures it from here.
+  SWEEP_CONDITION="pooled@${OUTER}x${SELFTEST_INNER_WIDTH}"
 
-  # THE ROWS, INDEXED. Declaration order is the reporting order whatever the pool does with them,
-  # so the output is byte-stable against the serial mode's and against itself at another width.
-  SW_N=0; SW_STATE=(); SW_NAME=(); SW_BUDGET=(); SW_ARGV=()
-  SWEEP_LARGEST=0
+  # THE PER-SUITE BOUND IS EVIDENCE, NOT A FACTOR. TOOL-aBatchedArm-5 S1. The shape this replaces
+  # bounded every row at `budget x sweep-ceiling-factor`, which killed 14 of 58 suites in the full
+  # sweep of 2026-09-08 and which three records refused as a predictor (`TOOL-dRetiredFork-40`
+  # measured 443 s under load against 583 s quiet — a multiplier gets it the wrong way round). The
+  # bound is now `max(<serial budget>, <worst reading observed under THIS token on THIS node>)` plus
+  # the declared headroom, monotone over whatever was observed. The serial-budget floor is the
+  # guard against a fast red: a pooled row cannot legitimately need less than it costs alone, so a
+  # 0.3 s refusal recorded as a reading never bounds a repaired suite below its serial budget. A
+  # row with NO reading REFUSES the run by name — there is no fallback, because a fallback is the
+  # bound that killed 14 of 58 — and the refusal names what to type.
+  read_margin || exit 2
+  SWEEP_NODE=$(resolve_node_tag) || {
+    if [ $? = 2 ]; then
+      echo "run-selftests: GOV_NODE is '${GOV_NODE:-}', which is no tag the charter's §2 node table (AGENTS.md," >&2
+      echo "run-selftests: then CLAUDE.md, at the repo root) carries — a reading written under it would red" >&2
+      echo "run-selftests: --check on every bar until the tracked file was hand-edited. Nothing was run." >&2
+      exit 2
+    fi
+    echo "run-selftests: no registry row matches user '${USERNAME:-${USER:-}}' in the charter's §2" >&2
+    echo "run-selftests: node table (AGENTS.md, then CLAUDE.md, at the repo root), and GOV_NODE is" >&2
+    echo "run-selftests: unset. Pooled evidence is keyed by NODE — a reading taken on another box" >&2
+    echo "run-selftests: bounds nothing here — and a hostname is a name the registry does not know." >&2
+    echo "run-selftests: Register the node, or set GOV_NODE=<tag>. Nothing was run." >&2
+    exit 2; }
+
+  # THE EVIDENCE, LOADED INTO KEYED ARRAYS. A file that does not parse REFUSES rather than
+  # defaulting past the bad row; the shape gate is `--check`, and this is the same predicate read
+  # at run time so a hand edit cannot bound a row with a number nobody could parse.
+  declare -A EV_SECS=() EV_RC=() EV_FAILS=() EV_EXEC=() EV_READINGS=() EV_DATE=() EV_NOTRAILER=()
+  ev_bad=""
+  EV_TEXT=$(read_evidence)   # read once, fed as a variable: the shell-hygiene leg's rule
+  printf '%s\n' "$EV_TEXT" > "$EV_FILE"
+  while IFS=$'\t' read -r kind a b c d e f g h i; do
+    [ -n "${kind:-}" ] || continue
+    case "$kind" in
+      NOTRAILER) EV_NOTRAILER["$a"]=1 ;;
+      BAD|DUP) ev_bad="$ev_bad"$'\n'"  line $a" ;;
+      ROW) k="$a"$'\t'"$b"$'\t'"$c"
+           EV_SECS["$k"]=$d; EV_RC["$k"]=$e; EV_FAILS["$k"]=$f; EV_EXEC["$k"]=$g
+           EV_READINGS["$k"]=$h; EV_DATE["$k"]=$i ;;
+    esac
+  done < "$EV_FILE"
+  if [ -n "$ev_bad" ]; then
+    echo "run-selftests: the pooled evidence at $EVIDENCE will not parse, and a bound read past a" >&2
+    echo "run-selftests: malformed row is a number nobody wrote. Run --check for the shape; nothing was run." >&2
+    printf '%s\n' "$ev_bad" | grep . >&2
+    exit 2
+  fi
+
+  # --reset NARROWS THE CALIBRATE TO THE RESET ROWS: a reset row is uncalibrated by construction
+  # and the refusal has nothing else to refuse. Each must name a row the declaration selects AND a
+  # key the file carries under this token and node, or there is nothing to lower.
+  if [ "${#RESETS[@]}" -gt 0 ]; then
+    _rs_narrow=""
+    for _r in "${RESETS[@]}"; do
+      k="$_r"$'\t'"$SWEEP_CONDITION"$'\t'"$SWEEP_NODE"
+      if [ -z "${EV_SECS[$k]+x}" ]; then
+        echo "run-selftests: --reset names '$_r', and $EVIDENCE carries no reading for it under" >&2
+        echo "run-selftests: $SWEEP_CONDITION on node $SWEEP_NODE, so there is nothing to lower. Nothing was run." >&2
+        exit 2
+      fi
+      if ! printf '%s\n' "$POP" | awk -F'\t' -v n="$_r" '$2 == n { hit = 1 } END { exit hit ? 0 : 1 }'; then
+        echo "run-selftests: --reset names '$_r', which the declaration${FILTER:+ under --kit $FILTER} does not select," >&2
+        echo "run-selftests: so the narrowed calibrate could not re-read it. Nothing was run." >&2
+        exit 2
+      fi
+      _rs_narrow="$_rs_narrow"$'\n'"$(printf '%s\n' "$POP" | awk -F'\t' -v n="$_r" '$2 == n')"
+    done
+    POP=$(printf '%s\n' "$_rs_narrow" | grep . | awk '!seen[$0]++')
+    printf '%s\n' "$POP" > "$POP_FILE"
+    echo "run-selftests: --reset narrows this calibrate to ${#RESETS[@]} row(s): ${RESETS[*]}"
+  fi
+
+  # THE ROWS, INDEXED, EACH WITH ITS BOUND. Declaration order is the reporting order whatever the
+  # pool does with them, so the output is byte-stable against the serial mode's and against itself
+  # at another width. Under --calibrate NO per-row bound exists — every row runs under the one wall,
+  # and the `timeout` a worker is wrapped in sits ABOVE that wall so the watchdog's TERM (exit 143,
+  # rendered WALL) always lands before `timeout`'s own (exit 124, rendered TIMEOUT).
+  SW_N=0; SW_STATE=(); SW_NAME=(); SW_BUDGET=(); SW_ARGV=(); SW_BOUND=(); SW_TERM=(); SW_KEY=()
+  SWEEP_LARGEST=0; SWEEP_TOTAL=0; SW_RUNNABLE=0; SWEEP_SUM=0; sw_missing=""
   while IFS=$'\t' read -r state name budget argv; do
     [ -n "${name:-}" ] || continue
     SW_N=$((SW_N + 1))
-    SW_STATE+=("$state"); SW_NAME+=("$name"); SW_BUDGET+=("$budget"); SW_ARGV+=("$argv")
+    k="$name"$'\t'"$SWEEP_CONDITION"$'\t'"$SWEEP_NODE"
+    SW_STATE+=("$state"); SW_NAME+=("$name"); SW_BUDGET+=("$budget"); SW_ARGV+=("$argv"); SW_KEY+=("$k")
+    b=0; term=""
     if [ "$state" = ok ]; then
-      b=$(( budget * SWEEP_FACTOR ))
-      [ "$b" -gt "$SWEEP_LARGEST" ] && SWEEP_LARGEST=$b
-    fi
-  done <<EOF
-$POP
-EOF
-
-  # THE RUN WALL IS THE LARGEST PER-SUITE BOUND, and it is DERIVED here rather than borrowed from
-  # `run-gates.sh --print-profile`. That row declares 10800s while this population declares 13600s
-  # for `unattended gate selftest` alone, so a borrowed wall would sit BELOW the largest bound and
-  # kill every sweep for arriving on time. A pool cannot finish before its longest member's own
-  # bound expires; any smaller wall is an error, not a policy.
-  # THE WALL COVERS EVERY WAVE. `largest bound` alone is the wall for a pool wide enough to run the
-  # whole population at once, and this one is not: at `SELFTEST_OUTER_WIDTH=1` -- a documented
-  # setting -- fifty-nine suites run one after another and a one-suite wall kills a perfectly clean
-  # run. Waves is the honest denominator, and it is derived from the population and the width rather
-  # than guessed.
-  # THE STRUCTURAL CEILING, not a multiple of the worst suite. `largest x waves` assumes every wave
-  # is as slow as the slowest suite, which over this population is 2x to 15x the real maximum -- a
-  # wall that large can never fire, and a backstop that cannot fire is not one. The true ceiling is
-  # the total bounded work spread over the pool, and it can never be below the longest single suite.
-  SW_RUNNABLE=0; SWEEP_TOTAL=0
-  _sx=0
-  while [ "$_sx" -lt "$SW_N" ]; do
-    if [ "${SW_STATE[$_sx]}" = ok ]; then
       SW_RUNNABLE=$((SW_RUNNABLE + 1))
-      SWEEP_TOTAL=$(( SWEEP_TOTAL + ${SW_BUDGET[$_sx]} * SWEEP_FACTOR ))
+      SWEEP_SUM=$((SWEEP_SUM + budget))
+      if [ "$CALIBRATE" != 1 ]; then
+        if [ -z "${EV_SECS[$k]+x}" ]; then
+          sw_missing="$sw_missing"$'\n'"  $name"
+        else
+          if [ "${EV_SECS[$k]}" -gt "$budget" ]; then base=${EV_SECS[$k]}; term=reading; else base=$budget; term=budget; fi
+          # THE HEADROOM IS `max(floor, fraction x base)`, ceiled, by awk because the fraction is
+          # not an integer and this shell's arithmetic is.
+          head=$(awk -v b="$base" -v fl="$MARGIN_FLOOR" -v fr="$MARGIN_FRAC" \
+                 'BEGIN { h = fr * b; if (h < fl) h = fl; printf "%d", (h == int(h)) ? h : int(h) + 1 }')
+          b=$((base + head))
+          SWEEP_TOTAL=$((SWEEP_TOTAL + b))
+          [ "$b" -gt "$SWEEP_LARGEST" ] && SWEEP_LARGEST=$b
+        fi
+      fi
     fi
-    _sx=$((_sx + 1))
-  done
-  SWEEP_WALL=$(( (SWEEP_TOTAL + OUTER - 1) / OUTER ))
-  [ "$SWEEP_WALL" -ge "$SWEEP_LARGEST" ] || SWEEP_WALL=$SWEEP_LARGEST
-  SWEEP_DERIVED=$SWEEP_WALL
-  case "${SELFTEST_WALL:-}" in
-    '') : ;;
-    *[!0-9]*)
-      # D5: A KNOB WITH A TYPO IN IT MUST NOT BE SILENTLY IGNORED. Discarding the value leaves the
-      # operator believing a bound they never set, which is the same shape as a gate that reports a
-      # reassuring zero when it is broken.
-      echo "run-selftests: SELFTEST_WALL is '$SELFTEST_WALL', which is not a number of seconds," >&2
-      echo "run-selftests: so the run bound you asked for could not be applied. Nothing was run." >&2
-      exit 2 ;;
-    *) SWEEP_WALL=$((10#$SELFTEST_WALL))
-       if [ "$SWEEP_WALL" -lt "$SWEEP_DERIVED" ]; then
-         echo "run-selftests: NOTE — the wall you set (${SWEEP_WALL}s) is below the derived one"
-         echo "run-selftests: (${SWEEP_DERIVED}s, the bounded work over $OUTER slot(s)), so a legitimately slow run can be killed."
-       fi ;;
-  esac
-  if [ "$SWEEP_WALL" -lt "$SWEEP_LARGEST" ]; then
-    echo "run-selftests: the run wall is ${SWEEP_WALL}s but the largest per-suite bound in this" >&2
-    echo "run-selftests: population is ${SWEEP_LARGEST}s, so the run would be killed before its" >&2
-    echo "run-selftests: longest suite could legitimately finish. Raise SELFTEST_WALL, or lower" >&2
-    echo "run-selftests: the budget the bound derives from." >&2
+    SW_BOUND+=("$b"); SW_TERM+=("$term")
+  done < "$POP_FILE"
+  if [ -n "$sw_missing" ]; then
+    echo "run-selftests: these row(s) have NO pooled reading under $SWEEP_CONDITION on node $SWEEP_NODE in" >&2
+    echo "run-selftests: $EVIDENCE, so no hang bound can be derived for them and nothing was run:" >&2
+    printf '%s\n' "$sw_missing" | grep . >&2
+    echo "run-selftests: Take the readings first: bash $SELF --pooled --calibrate${FILTER:+ --kit $FILTER}" >&2
+    echo "run-selftests: (a factor wearing a refusal's name is the bound that killed 14 of 58; there is no fallback)" >&2
     exit 2
+  fi
+
+  if [ "$CALIBRATE" = 1 ]; then
+    # THE CALIBRATE WALL IS THE SERIAL SUM, UNDIVIDED. TOOL-aBatchedArm-5 S2, F5. Nothing pooled can
+    # honestly need longer than everything run one after another, so the population fully serialised
+    # is the largest backstop derivable with no typed number: a pooled pass exceeding its own serial
+    # sum is a HANG and not a cost. The divided form — `ceil(sum / OUTER)` — was rejected because the
+    # tree's own sweep record kills it (3860 s against a 7722 s driver row at width 8).
+    # SELFTEST_WALL TIGHTENS ONLY: a knob that could loosen a backstop is a knob for disabling it.
+    SWEEP_DERIVED=$SWEEP_SUM; SWEEP_WALL=$SWEEP_SUM; wall_term="the serial sum"
+    case "${SELFTEST_WALL:-}" in
+      '') : ;;
+      *[!0-9]*)
+        echo "run-selftests: SELFTEST_WALL is '$SELFTEST_WALL', which is not a number of seconds," >&2
+        echo "run-selftests: so the run bound you asked for could not be applied. Nothing was run." >&2
+        exit 2 ;;
+      *) if [ "$((10#$SELFTEST_WALL))" -lt "$SWEEP_SUM" ]; then
+           SWEEP_WALL=$((10#$SELFTEST_WALL)); wall_term="SELFTEST_WALL"
+         else
+           echo "run-selftests: NOTE — SELFTEST_WALL (${SELFTEST_WALL}s) is at or above the serial sum (${SWEEP_SUM}s) and tightens nothing; a calibrate wall only ever tightens."
+         fi ;;
+    esac
+    _sx=0
+    while [ "$_sx" -lt "$SW_N" ]; do
+      [ "${SW_STATE[$_sx]}" = ok ] && SW_BOUND[$_sx]=$((SWEEP_WALL + 5))
+      _sx=$((_sx + 1))
+    done
+  else
+    # THE RUN WALL IS DERIVED FROM THE EVIDENCE BOUNDS by the shape the factor used: the total
+    # bounded work spread over the pool, `ceil(sum of bounds / OUTER)`, floored at the largest
+    # bound — a pool cannot finish before its longest member's own bound expires, and any smaller
+    # wall is an error, not a policy. It is DERIVED rather than borrowed from `run-gates.sh
+    # --print-profile`, whose row would sit below the largest bound and kill every sweep for
+    # arriving on time. `largest x waves` was rejected: it assumes every wave is as slow as the
+    # slowest suite, 2x to 15x the real maximum, and a backstop that cannot fire is not one.
+    SWEEP_WALL=$(( (SWEEP_TOTAL + OUTER - 1) / OUTER ))
+    [ "$SWEEP_WALL" -ge "$SWEEP_LARGEST" ] || SWEEP_WALL=$SWEEP_LARGEST
+    SWEEP_DERIVED=$SWEEP_WALL
+    case "${SELFTEST_WALL:-}" in
+      '') : ;;
+      *[!0-9]*)
+        # D5: A KNOB WITH A TYPO IN IT MUST NOT BE SILENTLY IGNORED. Discarding the value leaves the
+        # operator believing a bound they never set, which is the same shape as a gate that reports a
+        # reassuring zero when it is broken.
+        echo "run-selftests: SELFTEST_WALL is '$SELFTEST_WALL', which is not a number of seconds," >&2
+        echo "run-selftests: so the run bound you asked for could not be applied. Nothing was run." >&2
+        exit 2 ;;
+      *) SWEEP_WALL=$((10#$SELFTEST_WALL))
+         if [ "$SWEEP_WALL" -lt "$SWEEP_DERIVED" ]; then
+           echo "run-selftests: NOTE — the wall you set (${SWEEP_WALL}s) is below the derived one"
+           echo "run-selftests: (${SWEEP_DERIVED}s, the bounded work over $OUTER slot(s)), so a legitimately slow run can be killed."
+         fi ;;
+    esac
+    if [ "$SWEEP_WALL" -lt "$SWEEP_LARGEST" ]; then
+      echo "run-selftests: the run wall is ${SWEEP_WALL}s but the largest per-suite bound in this" >&2
+      echo "run-selftests: population is ${SWEEP_LARGEST}s (an evidence bound), so the run would be killed before its" >&2
+      echo "run-selftests: longest suite could legitimately finish. Raise SELFTEST_WALL, or --reset the row" >&2
+      echo "run-selftests: whose reading the bound derives from." >&2
+      exit 2
+    fi
   fi
 
   SWEEP_ROOT=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
   trap 'rm -rf "$SWEEP_ROOT" 2>/dev/null' EXIT
+  # EACH ROW'S OUTPUT OUTLIVES THE TRAP. The render loop copies `$d/out` to
+  # `<git-dir>/gate-logs/selftests/<row>.out` — the per-leg pattern `run-gates.sh` already keeps —
+  # and prints that path on every row that is not `ok`, because a calibrate's READ row prints none
+  # of the suite's output, the two render paths that do print it cap at four un-indented lines, and
+  # the trap deletes the rest: the `observed:` lines a batched group's expected set is pasted from
+  # were unobtainable from a calibrate (aBatchedArm closing review D3). Resolved ONCE and never
+  # composed from an empty git dir; capture OFF is announced, not silent.
+  SWEEP_LOGDIR=""
+  _gd=$(git rev-parse --git-dir 2>/dev/null) || _gd=""
+  if [ -n "$_gd" ] && mkdir -p "$_gd/gate-logs/selftests" 2>/dev/null; then
+    SWEEP_LOGDIR="$_gd/gate-logs/selftests"; chmod 700 "$SWEEP_LOGDIR" 2>/dev/null || true
+  else
+    echo "run-selftests: per-row output capture OFF (no usable git dir) — a row's output dies with the scratch this run" >&2
+  fi
 
   # ---- POOL SAFETY IS OBSERVED, NOT ASSUMED. TOOL-aPooledSweep-3 -------------------------------
   # Running 59 suites together is sound only if each confines its writes to its own scratch. The
@@ -519,13 +1001,15 @@ EOF
     exit 2
   fi
 
-  # THE CONDITION, COMPOSED ONCE. Not re-derived per row: the same fact spelled twice in a file
-  # whose own header names that defect. It is printed in a stable shape because the `--rank` refusal
-  # matches this exact token, and the arm that proves they agree captures it from here.
-  SWEEP_CONDITION="pooled@${OUTER}x${SELFTEST_INNER_WIDTH}"
-  echo "run-selftests: SWEEP of $SW_N suite(s), width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH)"
-  echo "run-selftests: condition: $SWEEP_CONDITION"
-  echo "run-selftests: per-suite bound = budget x ${SWEEP_FACTOR}; run wall ${SWEEP_WALL}s; NO cost verdict is issued"
+  if [ "$CALIBRATE" = 1 ]; then
+    echo "run-selftests: CALIBRATE of $SW_N suite(s), width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH), node $SWEEP_NODE"
+    echo "run-selftests: condition: $SWEEP_CONDITION"
+    echo "run-selftests: no per-suite bound; run wall ${SWEEP_WALL}s = $wall_term (serial sum ${SWEEP_SUM}s over $SW_RUNNABLE budget(s)); EVERY verdict withheld, readings written to $EVIDENCE"
+  else
+    echo "run-selftests: SWEEP of $SW_N suite(s), width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH), node $SWEEP_NODE"
+    echo "run-selftests: condition: $SWEEP_CONDITION"
+    echo "run-selftests: per-suite bound = max(budget, calibrated reading) + headroom max(${MARGIN_FLOOR}s, ${MARGIN_FRAC} x that); run wall ${SWEEP_WALL}s; NO cost verdict is issued"
+  fi
 
   # THE REAP IS PROBED ONCE, OUTSIDE THE LOOP. `wait -n` returns the exit STATUS of the job that
   # finished, so `wait -n || wait` reads a RED suite as "this shell has no wait -n" and falls back
@@ -559,7 +1043,7 @@ EOF
     local k=$1
     local d="$SWEEP_ROOT/$k"
     mkdir -p "$d/tmp" || return
-    local bound=$(( ${SW_BUDGET[$((k - 1))]} * SWEEP_FACTOR ))
+    local bound=${SW_BOUND[$((k - 1))]}
     local s e rc tp
     s=$(read_now_ms)
     # THE WORKER'S OWN PID, NOT `$$`. A subshell INHERITS `$$` from its parent, so `echo $$` here
@@ -627,14 +1111,43 @@ EOF
 
   # RENDERED IN DECLARATION ORDER, by builtins, off the arrays. A suite's position in the output
   # never depends on when the pool happened to free its slot.
+  # EVERY NON-COMPLETION OUTCOME HAS ITS OWN WORD AND ITS OWN COUNTER, because two review rounds each
+  # found a summary counting fewer outcomes than this loop has. TOOL-aBatchedArm-5 S4: `killed` (own
+  # bound), `walled` (the run wall), `unrun` (the wall stopped the dispatch), `unstarted` (no verdict
+  # file under no wall breach — the worker-death class the comment on `run_sweep_one` records — or a
+  # row that could not be resolved), `mismatched` (completed, and its (rc, FAIL, executed) is not
+  # its calibrated baseline). Every place this loop set `st=1` before parity still does, by name;
+  # the ONLY change is that a completed, trailed, MATCHED row no longer sets it.
   st=0; ran=0; killed=0; walled=""; unrun=""; withheld=0
+  unstarted=0; mismatched=0; untrailed=0; calibrated=0; cal_red=0; cal_rows=""; walled_n=0; unrun_n=0
+  # SOUNDNESS IS ITS OWN BIT, cleared by the three post-loop checks (pool wider than OUTER,
+  # fingerprint not taken, fingerprint changed): the calibrate's writer used to key on CALIBRATE
+  # alone, so a run that had just said "every reading above is suspect" wrote those readings as the
+  # monotone bound and the parity baseline anyway (aBatchedArm closing review D7). The cause
+  # ACCUMULATES across the three checks rather than being overwritten, so a run that oversubscribed
+  # the box AND saw the tree change names both on the one line an operator greps (R6).
+  sound=1; unsound_why=""
+  outlog=""
+  print_outlog() { [ -n "$outlog" ] && printf '        output: %s\n' "$outlog"; return 0; }
   j=1
   while [ "$j" -le "$SW_N" ]; do
-    name=${SW_NAME[$((j - 1))]}; state=${SW_STATE[$((j - 1))]}; d="$SWEEP_ROOT/$j"
+    name=${SW_NAME[$((j - 1))]}; state=${SW_STATE[$((j - 1))]}; d="$SWEEP_ROOT/$j"; key=${SW_KEY[$((j - 1))]}
     if [ "$state" != ok ]; then
-      st=1
+      st=1; unstarted=$((unstarted + 1))
       printf 'FAIL  %-46s        (%s: this row could not be resolved into a runnable suite)\n' "$name" "$state"
       j=$((j + 1)); continue
+    fi
+    # THE OUTPUT IS KEPT BEFORE ANY VERDICT IS READ, a killed row's partial capture included.
+    # MASKED AND MODE 600 on the way, the sibling runner's `redact()` inlined (a kit file sources no
+    # sibling): a suite can echo an operator-exported credential — `fatal: unable to access
+    # 'https://user:token@host/…'` from a git call under the operator's global config — and a
+    # durable copy that skips the masking its sibling applies is a credential leak the old
+    # scratch-dir lifetime was merely hiding (aBatchedArm closing review R1). Every grep below
+    # still reads `$d/out`, so no verdict changes.
+    outlog=""
+    if [ -n "$SWEEP_LOGDIR" ] && [ -f "$d/out" ]; then
+      outlog="$SWEEP_LOGDIR/$(printf '%s' "$name" | tr -c 'A-Za-z0-9._-' '_').out"
+      sed -E 's#://[^/@[:space:]]+:[^/@[:space:]]+@#://***:***@#g' "$d/out" > "$outlog" 2>/dev/null && chmod 600 "$outlog" 2>/dev/null || outlog=""
     fi
     if [ ! -r "$d/v" ]; then
       st=1
@@ -642,44 +1155,131 @@ EOF
         # NEVER LAUNCHED. The wall stopped the dispatch, so this suite has no result of any kind —
         # which is a different fact from a suite that started and was killed, and reporting both as
         # "killed" would tell an operator this suite had been tried.
-        unrun="$unrun $name"
+        unrun="$unrun $name"; unrun_n=$((unrun_n + 1))
         printf 'UNRUN %-46s        (the %ss run wall stopped the dispatch before this suite started)\n' "$name" "$SWEEP_WALL"
       elif [ "$WALL_BREACHED" = 1 ]; then
-        ran=$((ran + 1)); walled="$walled $name"
+        ran=$((ran + 1)); walled="$walled $name"; walled_n=$((walled_n + 1))
         printf 'WALL  %-46s        (killed by the %ss run wall before it finished)\n' "$name" "$SWEEP_WALL"
+        print_outlog
       else
-        ran=$((ran + 1))
+        ran=$((ran + 1)); unstarted=$((unstarted + 1))
         printf 'FAIL  %-46s        (no verdict was written, so this suite could not start)\n' "$name"
+        print_outlog
       fi
       j=$((j + 1)); continue
     fi
     ran=$((ran + 1))
     IFS=$'\t' read -r rc s e < "$d/v"
     took=$(( (e - s) / 1000 ))
+    # THE ARTIFACT OF THE WORK, read beside the exit: the `^FAIL` count, whether the trailer is in
+    # the filed output, the executed count where the trailer is the executed-count line, and
+    # whether the no-baseline sentinel is in it.
+    fails=$(grep -c '^FAIL' "$d/out" 2>/dev/null || true); case "$fails" in ''|*[!0-9]*) fails=0 ;; esac
+    trailer=0; grep -qE "$SWEEP_TRAILER_RX" "$d/out" 2>/dev/null && trailer=1
+    nobase=0; grep -qE "$SWEEP_NOBASELINE_RX" "$d/out" 2>/dev/null && nobase=1
+    executed="-"
+    if [ "$trailer" = 1 ]; then
+      executed=$(grep -oE '\(([0-9]+) assertions executed' "$d/out" 2>/dev/null | head -1 | tr -dc '0-9')
+      [ -n "$executed" ] || executed="-"
+    fi
+    declared_nt=${EV_NOTRAILER[$name]:-0}
+
+    if [ "$CALIBRATE" = 1 ]; then
+      # THE CALIBRATE WITHHOLDS EVERY VERDICT and records a reading ONLY for a row that exited on
+      # its own AND left its trailer — or is DECLARED trailer-less in the file's header, in which
+      # case the reading is rc-plus-FAIL and the gap is printed rather than silent.
+      # THE WALL'S WHOLE SIGNAL PATH: its TERM (143) and that TERM escalated to KILL by the
+      # worker's `timeout -k` grace (137) are both the wall. Keyed on 143 alone, a suite that
+      # ignored TERM under the wall was counted `killed`, `walled` stayed 0, and the summary named
+      # a bound the row never hit (aBatchedArm closing review R3). 124 is the row's own bound and
+      # stays KILLED below.
+      if [ "$WALL_BREACHED" = 1 ] && { [ "$rc" = 143 ] || [ "$rc" = 137 ]; }; then
+        st=1; walled="$walled $name"; walled_n=$((walled_n + 1))
+        printf 'WALL  %-46s %5ss  (killed by the %ss calibrate wall — NO reading written)\n' "$name" "$took" "$SWEEP_WALL"
+        print_outlog
+      elif [ "$rc" = 124 ] || [ "$rc" = 137 ] || [ "$rc" = 143 ]; then
+        # A KILL IS NOT A COMPLETION whatever the trailer rule says of the row: a declared
+        # trailer-less row that outlived TERM (137 after `timeout -k`'s grace) or hit the bound
+        # (124) was written as a baseline of that rc, and the next --pooled MISMATCHed a healthy
+        # run against it (aBatchedArm closing review D8) — the asymmetry with the graded branch's
+        # TIMEOUT clause, closed.
+        st=1; killed=$((killed + 1))
+        printf 'KILLED %-45s %5ss  (exit %s is a kill, not a completion — NO reading written)\n' "$name" "$took" "$rc"
+        print_outlog
+      elif [ "$nobase" = 1 ]; then
+        # THE SENTINEL IS NOT A BASELINE. The trailer is there and the exit is the suite's own, but
+        # a group that says its expected set is unwritten has refused by name, and a reading taken
+        # over it would make the next --pooled GREEN over that refusal.
+        st=1; untrailed=$((untrailed + 1))
+        printf 'UNTRAILED %-42s %5ss  (exit %s, %s FAIL, and its output carries "%s" — a group with no expected set is a refusal, not a reading; paste the observed sets first)\n' "$name" "$took" "$rc" "$fails" "$SWEEP_NOBASELINE_RX"
+        print_outlog
+      elif [ "$trailer" = 1 ] || [ "$declared_nt" = 1 ]; then
+        calibrated=$((calibrated + 1)); [ "$rc" = 0 ] || cal_red=$((cal_red + 1))
+        cal_rows="$cal_rows"$'\n'"$name"$'\t'"$took"$'\t'"$rc"$'\t'"$fails"$'\t'"$executed"
+        if [ "$declared_nt" = 1 ]; then
+          printf 'READ  %-46s %5ss  rc %s, %s FAIL, %s executed  (declared trailer-less: completion NOT witnessed, rc-plus-FAIL only)\n' "$name" "$took" "$rc" "$fails" "$executed"
+        else
+          printf 'READ  %-46s %5ss  rc %s, %s FAIL, %s executed  (verdict withheld)\n' "$name" "$took" "$rc" "$fails" "$executed"
+        fi
+        print_outlog
+      else
+        st=1; untrailed=$((untrailed + 1))
+        printf 'UNTRAILED %-42s %5ss  (exit %s, %s FAIL, and NO trailer in its output — a completed exit is not a reading)\n' "$name" "$took" "$rc" "$fails"
+        grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
+        print_outlog
+      fi
+      j=$((j + 1)); continue
+    fi
+
     # EVERY ROW THAT RAN CARRIES ITS COST VERDICT, and that verdict is `withheld`. Printing the
     # seconds and nothing else would be a budget silently not graded, which is the green-by-absence
     # class; printing `ok` for the cost would be a verdict taken from a clock this run contended.
     withheld=$((withheld + 1))
-    if [ "$rc" = 0 ]; then
-      printf 'ok    %-46s %5ss  cost withheld\n' "$name" "$took"
-    elif [ "$WALL_BREACHED" = 1 ] && [ "$rc" = 143 ]; then
+    if [ "$WALL_BREACHED" = 1 ] && { [ "$rc" = 143 ] || [ "$rc" = 137 ]; }; then
       # KILLED BY THE WALL, not by its own bound, and the two are different facts. `timeout` exits
-      # 124 when ITS bound expires; the watchdog sends TERM, so the worker exits 143. Rendering both
+      # 124 when ITS bound expires; the watchdog sends TERM, so the worker exits 143 — or 137 when
+      # the suite ignored TERM and the `-k` grace escalated the wall's own signal (R3). Rendering both
       # as one lost the distinction, and the WALL branch below -- which only fires on a MISSING
       # verdict -- was unreachable, because a TERMed worker still writes its verdict file. Observed
       # by running it: a 12s wall over an 18s run rendered the killed suite as an ordinary FAIL.
-      st=1; walled="$walled $name"
+      st=1; walled="$walled $name"; walled_n=$((walled_n + 1))
       printf 'WALL  %-46s %5ss  cost withheld  (killed by the %ss run wall, not by its own bound)
 '         "$name" "$took" "$SWEEP_WALL"
+      print_outlog
     elif [ "$rc" = 124 ] || [ "$rc" = 137 ]; then
       st=1; killed=$((killed + 1))
-      printf 'TIMEOUT %-44s %5ss  (killed at its %ss bound — it did not fail, it did not finish)\n' \
-        "$name" "$took" "$(( ${SW_BUDGET[$((j - 1))]} * SWEEP_FACTOR ))"
+      printf 'TIMEOUT %-44s %5ss  (killed at its %ss evidence bound — it did not fail, it did not finish)\n' \
+        "$name" "$took" "${SW_BOUND[$((j - 1))]}"
+      print_outlog
     else
-      st=1
-      printf 'FAIL  %-46s %5ss  cost withheld  (exit %s)\n' "$name" "$took" "$rc"
-      grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
+      # THE POOLED VERDICT IS PARITY. GREEN-by-exit-code is impossible for a population whose
+      # baseline is RED by design (unit 3's shard rows exit 1 when complete), so the verdict is
+      # re-based: a row that ran to its own end whose (rc, FAIL count, executed count) equals its
+      # calibrated baseline is `ok`, and one whose triple differs — or that left no trailer where
+      # its baseline has one — is `MISMATCH`, naming both triples and the acceptance. The `FAIL`
+      # count is what makes a 0.3 s crash visible: it exits 1 with zero FAIL lines where the
+      # baseline carries three. The output grep beneath is the only debug surface a pooled red has.
+      got="rc $rc, $fails FAIL, $executed executed"
+      base_triple="rc ${EV_RC[$key]}, ${EV_FAILS[$key]} FAIL, ${EV_EXEC[$key]} executed"
+      trailer_ok=$trailer; [ "$declared_nt" = 1 ] && trailer_ok=1
+      # THE SENTINEL MISMATCHES WHATEVER THE TRIPLE SAYS: a group with no expected set has refused,
+      # and a baseline that happened to be taken over the same refusal must not read as parity.
+      if [ "$trailer_ok" = 1 ] && [ "$nobase" = 0 ] && [ "$rc" = "${EV_RC[$key]}" ] && [ "$fails" = "${EV_FAILS[$key]}" ] && [ "$executed" = "${EV_EXEC[$key]}" ]; then
+        printf 'ok    %-46s %5ss  cost withheld  ok (%s matched)\n' "$name" "$took" "$got"
+      else
+        st=1; mismatched=$((mismatched + 1))
+        printf 'MISMATCH %-43s %5ss  cost withheld  (%s) against baseline (%s)%s%s; --calibrate to take the new baseline, --reset <row> to lower seconds\n' \
+          "$name" "$took" "$got" "$base_triple" "$( [ "$trailer_ok" = 1 ] || printf ', and NO trailer in its output' )" \
+          "$( [ "$nobase" = 0 ] || printf ', and its output carries "%s" — a group with no expected set is a refusal, never parity' "$SWEEP_NOBASELINE_RX" )"
+        grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
+        print_outlog
+      fi
     fi
+    # EVERY POOLED VERDICT NAMES THE READING IT WAS BOUNDED BY — seconds, readings, token, node,
+    # date — and which term of the bound won, so a bound is never a number with no provenance.
+    printf '        bounded at %ss: %s won (budget %ss; reading %ss over %s reading(s) under %s on node %s, %s) + headroom\n' \
+      "${SW_BOUND[$((j - 1))]}" "${SW_TERM[$((j - 1))]}" "${SW_BUDGET[$((j - 1))]}" \
+      "${EV_SECS[$key]}" "${EV_READINGS[$key]}" "$SWEEP_CONDITION" "$SWEEP_NODE" "${EV_DATE[$key]}"
     j=$((j + 1))
   done
 
@@ -712,7 +1312,7 @@ EOF
   # width; a pool that ran wider than its own outer bound has broken it, and the printed pair cannot
   # notice because the pair is what the pool was ASKED for.
   if [ "$SWEEP_PEAK" -gt "$OUTER" ]; then
-    st=1
+    st=1; sound=0; unsound_why="${unsound_why:+$unsound_why; }the pool ran wider than its outer bound (peak $SWEEP_PEAK of $OUTER)"
     echo "run-selftests: THE POOL RAN WIDER THAN ITS BOUND — peak $SWEEP_PEAK against an outer width"
     echo "run-selftests: of $OUTER. The composite invariant (outer x inner <= the declared width) is"
     echo "run-selftests: broken, so this run oversubscribed the box and every reading above is suspect."
@@ -725,12 +1325,12 @@ EOF
   # verdict for a reason that never happened -- and on a clean tree compares equal and reports a
   # match the probe never made.
   if ! FP_AFTER=$(read_tree_fingerprint); then
-    st=1
+    st=1; sound=0; unsound_why="${unsound_why:+$unsound_why; }the closing tree fingerprint could not be taken"
     echo "run-selftests: the closing tree fingerprint could not be TAKEN, so this sweep is UNGRADED"
     echo "run-selftests: for pool safety. That is not the same as a clean tree and is not reported"
     echo "run-selftests: as one."
   elif [ "$FP_BEFORE" != "$FP_AFTER" ]; then
-    st=1
+    st=1; sound=0; unsound_why="${unsound_why:+$unsound_why; }the tracked working tree changed while the pool ran"
     echo "run-selftests: THE SWEEP IS UNSOUND — the tracked working tree changed while it ran, so a"
     echo "run-selftests: suite wrote outside its own scratch. This cannot name which one: a whole-run"
     echo "run-selftests: fingerprint has no way to attribute, and guessing would be worse than saying"
@@ -740,22 +1340,109 @@ EOF
     echo "run-selftests: tree fingerprint MATCHED before and after — no suite wrote outside its scratch"
   fi
 
+  if [ "$CALIBRATE" = 1 ]; then
+    # THE READINGS ARE WRITTEN HERE, AFTER THE CLOSING FINGERPRINT, in one pass over the collected
+    # verdicts: the evidence file is TRACKED, so a write inside the fingerprinted window would red
+    # this run's own soundness. Seconds are MONOTONE per (row, token, node) — raised, never lowered,
+    # except by --reset — while rc, fails and executed are the LATEST reading's, so a repaired suite
+    # updates its baseline on the next calibrate with no reset. A reset row is DROPPED first: if the
+    # narrowed calibrate then walled it or found it untrailed, it stays uncalibrated, named, and the
+    # next graded run refuses it by name — a row nobody has seen complete has no bound.
+    _rs_resets=""; [ "${#RESETS[@]}" -gt 0 ] && _rs_resets=$(printf '%s\n' "${RESETS[@]}")
+    # THE READINGS GO THROUGH A FILE, not the pipe: the heredoc below IS the interpreter's stdin.
+    printf '%s\n' "$cal_rows" | grep . > "$SWEEP_ROOT/readings" || true
+    # AND ONLY A SOUND RUN WRITES THEM. An unsound calibrate's seconds would become the monotone
+    # bound only --reset lowers and its triples the parity baseline every later --pooled is graded
+    # against, while the summary blamed walled and untrailed rows at 0 and 0.
+    if [ "$sound" != 1 ]; then
+      st=1
+      echo "run-selftests: readings NOT written: this calibrate was unsound — $unsound_why — so every reading above is suspect and $EVIDENCE is byte-unchanged"
+    elif ! "$PYBIN" - "$EVIDENCE" "$SWEEP_CONDITION" "$SWEEP_NODE" "$(date +%Y-%m-%d)" "$_rs_resets" "$SWEEP_ROOT/readings" <<'PY'
+import sys
+path, cond, node, today, resets, readings = sys.argv[1:7]
+resets = set(r for r in resets.split("\n") if r)
+head, rows, order = [], {}, []
+try:
+    with open(path, encoding="utf-8", newline="") as fh:
+        for raw in fh:
+            line = raw.rstrip("\r\n")
+            if not line.strip() or line.lstrip().startswith("#"):
+                head.append(line)
+                continue
+            f = line.split("\t")
+            if len(f) != 9:
+                sys.exit("run-selftests: refusing to rewrite %s past a row that is not nine fields: %r" % (path, line))
+            k = (f[0], f[1], f[2])
+            rows[k] = f
+            order.append(k)
+except FileNotFoundError:
+    head = ["# selftest-pooled-evidence.txt — pooled hang-bound readings, written by run-selftests.sh --pooled --calibrate.",
+            "# <row>\t<condition>\t<node>\t<max seconds>\t<rc>\t<fails>\t<executed>\t<readings>\t<date>"]
+for r in sorted(resets):
+    k = (r, cond, node)
+    if k in rows:
+        print("run-selftests: RESET %s under %s on node %s: dropped its %ss reading; the re-reading below replaces it or it stays uncalibrated" % (r, cond, node, rows[k][3]))
+        del rows[k]; order.remove(k)
+for line in open(readings, encoding="utf-8"):
+    line = line.rstrip("\r\n")
+    if not line:
+        continue
+    name, took, rc, fails, executed = line.split("\t")
+    k = (name, cond, node)
+    if k in rows:
+        old = int(rows[k][3]); n = int(rows[k][7]) + 1
+        secs = max(old, int(took))
+        how = "raised from %ss" % old if secs > old else "kept at %ss (this reading %ss is not worse)" % (old, took)
+    else:
+        secs, n, how = int(took), 1, ("first reading after --reset" if name in resets else "first reading")
+    rows[k] = [name, cond, node, str(secs), rc, fails, executed, str(n), today]
+    if k not in order:
+        order.append(k)
+    print("run-selftests: reading %s under %s on node %s: %ss (%s), rc %s, %s FAIL, %s executed, %s" % (name, cond, node, secs, how, rc, fails, executed, today))
+with open(path, "w", encoding="utf-8", newline="") as fh:
+    for h in head:
+        fh.write(h + "\n")
+    for k in order:
+        fh.write("\t".join(rows[k]) + "\n")
+PY
+    then
+      st=1
+      echo "run-selftests: the readings could NOT be written to $EVIDENCE, so this calibrate took nothing"
+    fi
+    if [ "$st" -eq 0 ]; then
+      echo "calibrated $calibrated row(s), $cal_red red, graded none"
+    else
+      # THE RED SUMMARY NAMES ITS ACTUAL CAUSE. An unsound run has written nothing at all; only a
+      # sound one is red for the rows that took no reading.
+      echo "calibrated $calibrated row(s), $cal_red red, ${walled_n:-0} walled, $untrailed untrailed, graded none"
+      [ "$killed" -gt 0 ] && echo "run-selftests: and $killed row(s) KILLED — exit 124, 137 or 143, killed by a signal or its own bound — wrote NO reading either."
+      if [ "$sound" != 1 ]; then
+        echo "run-selftests: NO reading was written for ANY row: $unsound_why. Fix that and calibrate again."
+      else
+        [ "$((${walled_n:-0} + untrailed + killed))" -gt 0 ] && echo "run-selftests: a walled, killed or untrailed row wrote NO reading and stays uncalibrated; the next --pooled refuses it by name."
+      fi
+      [ "${unrun_n:-0}" -gt 0 ] && echo "run-selftests: and ${unrun_n} row(s) were never dispatched under the wall, so they took no reading either."
+    fi
+    exit "$st"
+  fi
+
   # THE COUNT IS WHAT STOPS THE WITHHOLDING BEING A SILENT PASS. A green sweep announces on every
   # run how many budgets it did not grade, so it can never be mistaken for a budget-clean run.
   echo "run-selftests: $withheld cost verdict(s) WITHHELD under $SWEEP_CONDITION — a contended clock cannot grade a budget"
-  echo "run-selftests: for a cost verdict, run the serial mode: bash $SELF"
+  echo "run-selftests: for a cost verdict, run the serial mode: bash $SELF --serial"
+  counts="killed $killed · walled ${walled_n:-0} · unrun ${unrun_n:-0} · unstarted $unstarted · mismatched $mismatched"
   if [ "$st" -eq 0 ]; then
-    echo "sweep GREEN — $ran suite(s) ran concurrently; NO cost verdict was issued for any of them"
+    echo "sweep GREEN — $ran suite(s) ran concurrently, every one to its own end and matching its baseline; $counts; NO cost verdict was issued for any of them"
   else
-    echo "sweep RED — $ran suite(s) ran concurrently, $killed killed at their own bound; NO cost verdict was issued"
-    # A POOLED RED IS AMBIGUOUS BY CONSTRUCTION and the summary says which step resolves it.
-    # TOOL-dSpentCeiling-8 measured `run-gates turnstile` and `row-keyed merge driver replay` —
-    # both rows of this population — redding under the bar's own concurrency and green standalone,
-    # with no commit and no working-tree change between the runs. So a red here cannot separate "the
-    # mechanism is broken" from "this machine was too busy", and an operator handed that verdict
-    # with no next step will either re-run at random or stop trusting the mode.
-    echo "run-selftests: a pooled RED cannot tell a broken mechanism from a busy box. Confirm it with"
-    echo "run-selftests: the serial re-run: bash $SELF"
+    echo "sweep RED — $ran suite(s) ran concurrently; $counts; NO cost verdict was issued"
+    # A POOLED RED IS A PARITY RED, and the summary says what each word means and what resolves it.
+    # It is NOT told to confirm itself serially: the question this mode answers is parity with the
+    # calibrated baseline, which the serial loop does not ask.
+    echo "run-selftests: a pooled RED means a row did not run to its own end, or did and did not match"
+    echo "run-selftests: its calibrated (rc, FAIL, executed) baseline. A MISMATCH after a genuine repair is"
+    echo "run-selftests: one calibrate away: bash $SELF --pooled --calibrate${FILTER:+ --kit $FILTER}"
+    echo "run-selftests: A killed or walled row is a hang, or a box slower than its evidence — the same"
+    echo "run-selftests: calibrate raises its bound from what it observes. For a COST verdict use --serial."
   fi
   exit "$st"
 fi
@@ -788,9 +1475,7 @@ while IFS=$'\t' read -r state name budget argv; do
     st=1; over=$((over + 1))
     printf '      OVER BUDGET  %s took %ss against a declared %ss — fix it, or re-declare it with a reason beside the number\n' "$name" "$took" "$budget"
   fi
-done <<EOF
-$POP
-EOF
+done < "$POP_FILE"
 
 echo "----"
 if [ "$st" -eq 0 ]; then

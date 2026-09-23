@@ -130,12 +130,16 @@ cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
 
-mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · SPEC_AUDIT_DEFAULT
+mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · RESUME_STALE_BOUND · SPEC_AUDIT_DEFAULT
+  # NINE SLOTS, NOT EIGHT. `RESUME_STALE_BOUND` and `SPEC_AUDIT_DEFAULT` both read ${8-}: the
+  # liveness arms pass a seconds bound there and the spec-audit arms a DATE, so those arms set
+  # RESUME_STALE_BOUND to a date and the driver refused at exit 2 before any verb ran. One slot
+  # per key, and the call sites that meant the date now spell it ninth.
   cat > .unattended.conf <<EOF
 MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="${3-2026-08-19}"
 SPEC_THIN_CUTOFF="${5-}"
-SPEC_AUDIT_DEFAULT="${8-}"
+SPEC_AUDIT_DEFAULT="${9-}"
 LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
@@ -391,6 +395,24 @@ export CLAUDE_PID=999999999
 reset_tree() { git checkout -q unit 2>/dev/null; git reset -q --hard "$UNIT0"; git clean -qfd; mkconf; }
 
 run() { bash "$SCRIPT" "$@" 2>&1; }
+
+# ---- EVERY `--dispatch` ARM NEEDS A COMMITTED, READY SPEC for the unit it names. The driver refuses
+# ---- a pass for a unit no tracked spec under the build defines (M2's MISSING, check 49) and one
+# ---- whose acceptance section is empty (THIN); at UNIT0 this fixture's build has neither, so every
+# ---- arm in the dispatch region below was answered by that refusal rather than by the one it
+# ---- asserts. `build_audit_fixture` already carried a private copy of this and its header says why.
+# ---- The arms that OWN the MISSING and THIN refusals name `ARCH-tRun-404` and rewrite their own
+# ---- spec file, so neither is disturbed by seeding the four units the dispatch arms declare.
+# ---- COMMITTED, not merely staged: the openness filter reads commits, and a spec riding along in a
+# ---- pass's own commit would close the pass whose openness half these arms are about.
+build_specced_tree() {
+  reset_tree
+  mkdir -p memory/builds/tRun/spec
+  for _u in 1 2 3 4; do
+    printf '# ARCH-tRun-%s — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' "$_u" > "memory/builds/tRun/spec/u$_u.md"
+  done
+  git add -A >/dev/null && git commit -q -m "fixture: READY specs for the dispatch units" --no-verify
+}
 # Stage and commit the fixture edit. Preflight evaluates EVERY precondition before it writes, so a
 # dirty fixture still arms the message arms — but it never reaches the write phase, which is where
 # checks 9 and 17 live. Those arms have to commit.
@@ -1611,7 +1633,10 @@ initblock=$(awk '/^MEMORY_ROOT=memory; /{f=1} f{ if ($0 ~ /^[A-Za-z_][A-Za-z_0-9
 undefaulted=""
 checked=0
 for k in $(sed -n 's/^\([A-Z_][A-Z_]*\)=.*/\1/p' "$example"); do
-  grep -q "[^A-Z_]$k" "$SCRIPT" || continue
+  # COMMENTS ARE NOT READS. The driver's headers name keys that other kit scripts own -
+  # `CORE_FLOOR` is the checker's - and a prose mention read as a use, so this arm asked the
+  # driver to default a key it never reads. Strip comment bodies before asking.
+  sed 's/[[:space:]]#.*$//; /^[[:space:]]*#/d' "$SCRIPT" | grep -q "[^A-Z_]$k" || continue
   checked=$((checked + 1))
   case "$initblock" in *"$k="*) ;; *) undefaulted="$undefaulted $k" ;; esac
 done
@@ -4491,6 +4516,10 @@ echo "MARK brief" >&2
 # ---- prose left no trace. These arms grade the four things that make the row a RECORD rather than
 # ---- a note - the roster join, the tracked-path refusal, the park() grammar, and the staleness
 # ---- reader that is the only thing making the recorded hash more than decoration.
+# SELF-CONTAINED, like every other region here: these arms used to inherit whatever run-state the
+# dispatch arms above left, and once `--status` grew its no-phase refusal (check 10) the three
+# aggregate arms below were answered by that instead of by a status line.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 mkdir -p memory/builds/tRun/prompts
 printf 'the brief for unit one\n' > memory/builds/tRun/prompts/brief-1.md
 git add memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
@@ -4673,12 +4702,16 @@ reset_tree
 # ---- driver's argument set before this, so the full bar stayed green while every documented call was
 # ---- missing a required argument. The render is regenerated from the template, so a drift between
 # ---- them is the adopter check's business; what this arm owns is that none of them loses the code.
-for f in "$HERE/SKILL.template.md" "$HERE/PROTOCOL.template.md"; do
+for f in "$HERE/SKILL.template.md" "$HERE/PROTOCOL.template.md" "$HERE/VERBS.template.md"; do
   [ -f "$f" ] || continue
+  # THE VERB ROW MOVED when the protocol pair was split: the sentence this arm reads is
+  # VERBS.template.md's now, and PROTOCOL.template.md describes the field rather than the call.
+  # A surface that does not mention the verb is not a surface that documents it.
+  grep -q -- "--abort" "$f" || continue
   if grep -q 'unattended.sh --abort <slug>' "$f"; then
     n=$((n+1)); grep -q 'unattended.sh --abort <slug> --code' "$f"       || { echo "FAIL a documented abort invocation omits the required code argument: $f"; st=1; }
   else
-    n=$((n+1)); grep -q 'requires a recorded reason, a HALT CODE' "$f"       || { echo "FAIL a documented abort description names no halt code, so the contract and the verb disagree: $f"; st=1; }
+    n=$((n+1)); grep -qi 'halt code' "$f"       || { echo "FAIL a documented abort description names no halt code, so the contract and the verb disagree: $f"; st=1; }
   fi
 done
 
@@ -5143,7 +5176,7 @@ reset_tree
 # ---- M6 requires two path lists written down before two passes run together and nothing has ever
 # ---- read one. Two of M6's three conditions are decided here; the third is a judgement about
 # ---- meaning and is refused as undecidable rather than faked.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh)
 hit "$out" "dispatch declared"
@@ -5172,7 +5205,7 @@ out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes tools/z.sh)
 hit "$out" "dispatch declared"
 
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/backlog/TOOL.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md)" "--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
@@ -5180,14 +5213,12 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md
 # ---- CONDITION 3, CONDITIONAL HALF. A generated index ALONE is ACCEPTED — every pass changes a spec
 # ---- header the index is rendered from, and refusing that was the VACUOUS reading M6 retracted. The
 # ---- refusal fires only TOGETHER WITH the generator, which is the collision the condition names.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # UNDECLARED is the shipped default and means the conditional half is OFF, so the index is accepted
 # here for TWO reasons and the next arm separates them by declaring the key.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
-reset_tree
-printf '
-GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
-' >> .unattended.conf
+build_specced_tree
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$KIT_REL" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 # ...DECLARED, the index ALONE is still accepted — that is the retraction M6 earned.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
@@ -5195,17 +5226,15 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $
 
 # ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
 # rather than about one declaration.
-reset_tree
-printf '
-GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
-' >> .unattended.conf
+build_specced_tree
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$KIT_REL" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes $KIT_REL/memory-tree/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in
 # ---- a space-joined value the path has already become two tokens by the time the verb sees it.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # The two refusal texts, named once: an arm carrying half a signature passes on a message that
 # no longer says what it used to, which `check-arms` exists to catch.
 SHARED_MSG="--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
@@ -5282,22 +5311,22 @@ done
 # ---- commit is about that unit. The first openness filter counted that as the pass committing, so
 # ---- every pass closed the instant it was declared and this refusal ran over an empty sibling set.
 # ---- Two controls below separate the mechanism from everything else in the verb.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 # control A — no commit at all between the two declarations
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 # control B — an intervening commit whose subject names NO unit
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 git add -A && git commit -q -m "chore: park the run-state" --no-verify
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 # ...and a pass that HAS committed is closed, so its paths stop being claimed. Without this the
 # refusal above would be satisfied by a filter that simply never closes anything.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 mkdir -p work && printf 'a\n' > work/shared
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
@@ -5306,7 +5335,7 @@ miss "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatc
 # ---- A DECLARATION IS APPEND-ONLY: nothing rewrites, supersedes or retracts an earlier one. The
 # ---- property asserted here is the ABSENCE of the widening branch, because its return is exactly
 # ---- what would re-open the retraction escape.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/one >/dev/null 2>&1
 A0=$(sed -n 's/^.* dispatch · item \([0-9a-f]*\) ARCH-tRun-1 · reason .*$/\1/p' memory/builds/tRun/RUN.md | tail -1)
 git add -A && git commit -q -m "chore: park the run-state" --no-verify
@@ -5319,7 +5348,7 @@ grep -q " dispatch · item $A0 ARCH-tRun-1 · reason work/one\$" memory/builds/t
 n=$((n+1))
 [ "$(grep -c ' dispatch · item .* ARCH-tRun-1 · reason ' memory/builds/tRun/RUN.md)" = 2 ] \
   || { echo "FAIL the second declaration did not park its own row"; st=1; }
-reset_tree
+build_specced_tree
 
 # ---- B1: THE DECLARATION COMMIT'S REAL SHAPE. The round-2 arm committed RUN.md alone, and the
 # ---- openness filter subtracted exactly that one path — so a declaration commit made the ordinary
@@ -5327,13 +5356,13 @@ reset_tree
 # ---- declaration time and condition 1 proved disjointness against nobody. Two shapes, because they
 # ---- fail differently: with the extra file OUTSIDE the declared set the leg reds downstream, and
 # ---- with it INSIDE nothing anywhere reports the collision.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 mkdir -p work && printf 'x\n' > work/unrelated.txt
 git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
 mkdir -p work/shared && printf 'x\n' > work/shared/inside.txt
 git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
@@ -5346,14 +5375,14 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "no sibling
 
 # ---- ...and a proof over NOBODY announces itself, so an empty sibling set is visible in the run log
 # ---- rather than byte-identical to a proof over somebody.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/first)" "no sibling pass is open, so condition 1 is a proof over an empty set"
 
 # ---- B2: A LEGAL SECOND PASS OF ONE UNIT IS NOT A NARROWING. M6 defines several pass kinds per unit
 # ---- and a pass that produced no change commits nothing, so its row stays open for the rest of the
 # ---- run. Keyed on the unit alone, every later pass of that unit was refused — terminally, because
 # ---- an unattended run has no owner turn. A stall, shipped by the build whose subject is stalls.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/spec >/dev/null 2>&1
 git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/build)
@@ -5365,7 +5394,7 @@ n=$((n+1))
 # ...and there is NO narrowing refusal any more, deliberately. With grading dark there is nothing a
 # narrowing can hide from, and the refusal that existed could not be cleared in band — which is the
 # stall this build exists to remove. Asserted as an ABSENCE so its return is visible.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/one --writes work/two >/dev/null 2>&1
 git add -A && git commit -q -m "chore: park the run-state" --no-verify
 miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one)" "narrowing is not"
@@ -5373,7 +5402,7 @@ miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one)" "narrowing is
 # ---- B3: THE RECORD CARRIES ONE SPELLING. Normalised for the refusals and parked raw, `work/sub/`
 # ---- passed every guard and was then graded as a literal by the leg, which reds forever with
 # ---- narrowing refused and no in-band repair.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/sub/ --writes ./work/other >/dev/null 2>&1
 n=$((n+1))
 grep -q ' dispatch · item .* ARCH-tRun-1 · reason work/sub work/other$' memory/builds/tRun/RUN.md \
@@ -5381,7 +5410,7 @@ grep -q ' dispatch · item .* ARCH-tRun-1 · reason work/sub work/other$' memory
 
 # ---- M1: the generated-index/generator pairing, armed. The `covers` to `overlaps` change at this
 # ---- site reverted with the whole suite still green, which is a repair nothing was holding.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 cp .unattended.conf .unattended.conf.bak
 printf '\nGENERATED_INDEXES="work/idx.md:work/gen"\n' >> .unattended.conf
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/idx.md --writes work/gen)" "--dispatch declares a generated index together with its generator"
@@ -5417,11 +5446,15 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes '')" "--dispatch was give
 UNBORN=$(mktemp -d)
 git -C "$UNBORN" init -q
 cp .unattended.conf "$UNBORN/"
-mkdir -p "$UNBORN/memory/builds/tRun"
+mkdir -p "$UNBORN/memory/builds/tRun/spec"
 printf 'phase: BUILDING
 witness: x
 base: y
 ' > "$UNBORN/memory/builds/tRun/RUN.md"
+# A STAGED spec, or the pass is refused as M2's MISSING before the HEAD resolution this arm is
+# about: `ls-files` reads the index, which an unborn repository has, and HEAD still answers nothing.
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' > "$UNBORN/memory/builds/tRun/spec/u1.md"
+git -C "$UNBORN" add -A >/dev/null 2>&1
 hit "$(cd "$UNBORN" && bash "$SCRIPT" --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh 2>&1)" "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share:"
 rm -rf "$UNBORN"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'has--no-verify.sh')" "--dispatch was given a --writes path spelling the declared bypass flag, and the gate greps this file whole for it:"
@@ -5432,7 +5465,7 @@ run --attest tRun --item keepalive-reaped >/dev/null 2>&1
 run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
 run --abort tRun --reason stop --code fork-unresolvable >/dev/null 2>&1
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "the run is already finished and a finished record is not something to move, re-open or re-pin"
-reset_tree; rm -f memory/builds/tRun/RUN.md
+build_specced_tree; rm -f memory/builds/tRun/RUN.md
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
 
 # ---- TOOL-aProbedUnit-3: `--audit`, the dispatched-unit stall probe. One line per unit whose LATEST
@@ -5710,11 +5743,18 @@ same "AC3 a FINISHED-UNSTAMPED verdict exits 0" "$rc" "0"
 hit "$out" "state: finished-unstamped"
 hit "$out" "default-branch: refs/remotes/origin/main"
 hit "$out" "verdict: FINISHED-UNSTAMPED"
+# A COMMIT THE DEFAULT BRANCH CANNOT CARRY, made here rather than assumed of HEAD: the property
+# under test is a witness that has NOT landed, and whether the fixture's HEAD is one depends on
+# what the arms above left behind.
+git commit -q --allow-empty -m "a commit origin/main does not carry" --no-verify
 mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $(git rev-parse HEAD)/"
 out=$(run --liveness tRun)
 hit "$out" "state: live"
 miss "$out" "verdict: FINISHED-UNSTAMPED"
 mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $BASE/"
+# ...and NO origin/HEAD either, which is the other half of the sentence above this block. The
+# env var alone leaves the remote's own symref to resolve from, and an arm above may have set it.
+git remote set-head origin -d >/dev/null 2>&1 || true
 out=$(env -u GOV_DEFAULT_BRANCH bash "$SCRIPT" --liveness tRun 2>&1); rc=$?
 same "AC3 an unresolvable default branch exits 0" "$rc" "0"
 hit "$out" "default-branch: unresolved"
@@ -6395,13 +6435,13 @@ git checkout -qf unit; bcreset
 # ---- and `mkconf` rewrites it on every reset, so inside this epoch every reset calls mkconf with the
 # ---- SAME eight positionals the BASE commit used — one byte off and preflight refuses on a dirty
 # ---- tree before authorization is ever reached, which is a fixture answering the wrong question.
-init_sa_tree() { git reset -q --hard "$BCP"; git clean -qfd; mkconf true true "" 3600 "" 1800 7 2026-09-21; }
+init_sa_tree() { git reset -q --hard "$BCP"; git clean -qfd; mkconf true true "" 3600 "" 1800 7 5400 2026-09-21; }
 init_sa_run() { init_sa_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
              printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
              printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' \
                >> memory/builds/tRun/RUN.md; }
 bcreset; git checkout -qf main
-mkconf true true "" 3600 "" 1800 7 2026-09-21
+mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
 git add -A >/dev/null && git commit -q -m sa-default --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
 BCP=$(git rev-parse HEAD)
@@ -6464,7 +6504,7 @@ git checkout -qf unit; BCP=$_sa_bcp0; bcreset
 
 # ---- AC2 (unit 7): the default committed on the RUN BRANCH only is not at BASE, so it opts nothing in.
 bcreset
-mkconf true true "" 3600 "" 1800 7 2026-09-21
+mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
 git add -A >/dev/null; git commit -q -m "default on the branch" --no-verify
 out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "unattended: spec-audit — not owed (opt-in)"
@@ -6478,7 +6518,7 @@ bcreset; git checkout -qf main
 mutate .unattended.conf '/^SPEC_AUDIT_DEFAULT=/d'
 git add -A >/dev/null && git commit -q -m sa-conf-predates-key --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
-mkconf true true "" 3600 "" 1800 7 2026-09-21
+mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
 git add -A >/dev/null; git commit -q -m "default on the branch, none at base" --no-verify
 out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "unattended: spec-audit — not owed (opt-in)"
@@ -6488,7 +6528,7 @@ git checkout -qf unit; bcreset
 
 # ---- AC3 (unit 7), first half: a non-date default at BASE is fail 54 — never read as absent.
 bcreset; git checkout -qf main
-mkconf true true "" 3600 "" 1800 7 later
+mkconf true true "" 3600 "" 1800 7 5400 later
 git add -A >/dev/null && git commit -q -m sa-default-malformed --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
 out=$(run --preflight tRun --keepalive-id KA-1234)
@@ -6501,7 +6541,7 @@ git checkout -qf unit; bcreset
 # ---- AC3, second half: a malformed README key beside a VALID default is still fail 52 — the README
 # ---- wins whatever it says, because a typo falling back to the default is the silent opt-out class.
 bcreset; git checkout -qf main
-mkconf true true "" 3600 "" 1800 7 2026-09-21
+mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
 mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: later'
 git add -A >/dev/null && git commit -q -m sa-readme-over-default --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
@@ -6523,14 +6563,14 @@ git checkout -qf unit; bcreset
 init_sa_base_ending_early() {   # $1 = the line added to a dated conf at BASE, after the key, or BEFORE it when
                                 # spelled `^<line>` · $2 = repair the branch (1) or not
   bcreset; git checkout -qf main
-  mkconf true true "" 3600 "" 1800 7 2026-09-21
+  mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
   case "$1" in
     ^*) { printf '%s\n' "${1#^}"; cat .unattended.conf; } > .unattended.conf.new; mv .unattended.conf.new .unattended.conf ;;
     *)  printf '%s\n' "$1" >> .unattended.conf ;;
   esac
   git add -A >/dev/null && git commit -q -m sa-base-ends-early --no-verify && git push -q -f origin main
   git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
-  if [ "$2" = 1 ]; then mkconf true true "" 3600 "" 1800 7 2026-09-21
+  if [ "$2" = 1 ]; then mkconf true true "" 3600 "" 1800 7 5400 2026-09-21
     git add -A >/dev/null; git commit -q -m sa-branch-repaired --no-verify; fi
 }
 # The syntax error sits ABOVE the key: bash executes an eval's assignments before its parse fails at
@@ -6821,6 +6861,9 @@ esac
 # developer habitually types and reds only on the bar — there is no gate for that, and the mitigation
 # is this sentence.
 [ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other region was NOT exercised here)"
+# THE TRAILER IS UNCONDITIONAL: a red-but-complete run must still carry one, or the pooled runner
+# reads it as untrailed and writes no reading (aBatchedArm closing D4).
+echo "  ($n assertions executed)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
 

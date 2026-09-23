@@ -509,7 +509,7 @@ Its `*.test.sh` legs left both `tools/gate-legs.json` and the kit's own `kit.tom
 stop receiving them too. What stayed are the legs whose subject is the REPOSITORY rather than the
 kit, because those go stale with nobody editing it; which, and how many, are its
 `tools/unattended/` rows in `tools/gate-legs.json`. On demand:
-`bash tools/unattended/run-unattended-gates.sh`. The compensating check is written into that kit's
+`bash tools/unattended/run-unattended-gates.sh --serial`. The compensating check is written into that kit's
 descriptor, because an exemption is not coverage (§7).
 
 Do not read a leg COUNT out of this paragraph; `tools/gate-legs.json` owns it and prose beside a

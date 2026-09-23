@@ -520,6 +520,9 @@ FLOOR_ASSERTIONS=78
 # that many. One grep, and it cannot go slack. The range starts at the exit line itself, so a suite
 # with nothing after it reads exactly 1; a comment or a blank line after it is not counted.
 [ "$(sed -n '/^exit "\$st"$/,$p' "$0" | grep -cvE '^\s*(#|$)')" = 1 ] || { echo "FAIL a line follows the terminal exit and can never run"; st=1; }
-
+# THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer
+# (SWEEP_TRAILER_RX); a red-but-complete run that prints only a green-gated `PASS (` is UNTRAILED
+# there, writes no calibrate reading, and refuses every later pooled run (aBatchedArm closing D4).
+echo "  ($n assertions executed)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

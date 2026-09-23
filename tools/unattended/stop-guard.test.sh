@@ -326,12 +326,15 @@ check_hit "$ERR" "sidecar-unwritable" "AC19 unwritable says so on stderr"
 check_same "AC19 unwritable wrote nothing" "$(cat "$F/.git/unattended")" "a file where the directory goes"
 F=$(build_fixture BUILDING "$SID"); set_liveness BUILDING LIVE
 T0=$(read_now_ms)
-STOP_GUARD_TEST_LIVENESS_SLEEP=3 STOP_GUARD_LIVENESS_BOUND_MS=500 run_hook "$(build_payload "$F")"
+# THE SLEEP IS LONG AND THE WINDOW WIDE ON PURPOSE: the property is that the 500 ms bound fires
+# INSTEAD of the probe's sleep completing, and a 2 s window against a 3 s sleep made that a
+# wall-clock coin toss: it read 2560 ms under the eight-wide pool and the row went red for load.
+STOP_GUARD_TEST_LIVENESS_SLEEP=30 STOP_GUARD_LIVENESS_BOUND_MS=500 run_hook "$(build_payload "$F")"
 T1=$(read_now_ms)
 check_same "AC19 hung liveness rc" "$RC" "0"
 check_same "AC19 hung liveness stdout empty" "$OUT" ""
 check_same "AC19 hung liveness line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "liveness-unreadable"
-[ $((T1 - T0)) -lt 2000 ] && print_ok "AC19 the bound fired within 2 s ($((T1 - T0)) ms)" || print_bad "AC19 the bound did not fire: $((T1 - T0)) ms"
+[ $((T1 - T0)) -lt 10000 ] && print_ok "AC19 the bound fired well inside the 30 s sleep it bounded ($((T1 - T0)) ms)" || print_bad "AC19 the bound did not fire: $((T1 - T0)) ms"
 
 # ---- AC11: ONE arm against the REAL driver, on a `git init` fixture seeded by the adopter suite's
 # ---- own seed() — extracted as one function, never the suite — which commits once so HEAD is
@@ -371,5 +374,10 @@ n=$((pass+fail))
 FLOOR_ASSERTIONS=104
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
+# THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer
+# (SWEEP_TRAILER_RX); a red-but-complete run that prints only a green-gated `PASS (` is UNTRAILED
+# there, writes no calibrate reading, and refuses every later pooled run (aBatchedArm closing D4,
+# applied at the merge that brought this suite in).
+echo "  ($n assertions executed)"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ]

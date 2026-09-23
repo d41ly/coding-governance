@@ -155,3 +155,4 @@ memory/builds/dGatedProse/README.md
 memory/builds/dPinnedHandoff/README.md
 memory/builds/dBackdatedFixture/README.md
 !memory/builds/dLandedVerdict/README.md - authored 2026-08-19 on a branch that did not carry the contract, landed 2026-09-22 still INPROGRESS; drains when its build's owner conforms it
+memory/builds/aBatchedArm/README.md

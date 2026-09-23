@@ -34,7 +34,7 @@ role = "engine"
 # from it. It is not a gate leg either. `run-unattended-gates.sh` picks it up from its budget row with
 # the rest, and it also runs alone, which is how a build holding the siblings back runs it.
 [[files]]
-include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh", "unattended.test.sh"]
+include = ["adopt-unattended.test.sh", "check-arms-groups.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh", "unattended.test.sh"]
 role = "project-owned"
 
 # `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
@@ -181,10 +181,16 @@ means = "render-failed-half-stamped"
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
-# `tools/unattended/` is not done until this prints GREEN and the verdict is in the landing report:
+# `tools/unattended/` is not done until this prints parity GREEN and the verdict is in the landing report:
 #
-#     bash tools/unattended/run-unattended-gates.sh            # the self-tests
-#     bash tools/unattended/run-unattended-gates.sh --all      # and the three legs beside them
+#     bash tools/unattended/run-unattended-gates.sh --pooled        # the self-tests through the bounded pool, parity graded
+#     bash tools/unattended/run-unattended-gates.sh --checks        # and the legs beside them, which take no mode
+#
+# The mode is DECLARED and never defaulted (TOOL-aBatchedArm-4): a route reaching the self-tests
+# with neither `--serial` nor `--pooled` refuses. `--pooled` runs them through the shared runner's
+# bounded pool, withholds every cost verdict and grades PARITY against the runner's calibrated
+# pooled evidence, taken on node a 2026-09-15 (`TOOL-aBatchedArm-5`); the on-demand cost reading
+# is the serial mode, which grades each suite against its budget.
 #
 # There is no gate behind that sentence. A kit edit that guts a check now lands green unless a person
 # runs it, and this file is where that trade is recorded as having been made deliberately.
@@ -234,6 +240,12 @@ subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
+
+# the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
+# bar like every `subject = kit` row. This kit declares NO self-test as a leg: the arms-groups
+# linter had one, and the owner's 2026-08-23 ruling takes every `tools/unattended/*.test.sh` leg
+# off the manifest without exception — which main's runlog-writer AC9 asserts. The linter's suite
+# runs through `run-unattended-gates.sh` with the rest, from its budget row.
 
 [[hole]]
 id = "keepalive-tool-names"

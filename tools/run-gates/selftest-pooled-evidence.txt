@@ -1,0 +1,56 @@
+# selftest-pooled-evidence.txt — the pooled HANG-bound readings `run-selftests.sh --pooled` derives
+# each row's bound from. TOOL-aBatchedArm-5 S3. Written by `--pooled --calibrate`; its SHAPE is
+# graded by `--check`, the unguarded bar leg; it ships to NO adopter (a `project-owned` row in this
+# kit's descriptor, beside the declaration, for the same reason: readings taken on this node over
+# this population bound nothing anywhere else).
+#
+# ONE ROW PER (row name, condition token, node). The token is the runner's own `pooled@<outer>x<inner>`
+# and the node is the charter's §2 registry TAG — never a hostname, which the registry does not know.
+# SECONDS ARE MONOTONE: every calibrate raises them and never lowers them, so a reading taken on a
+# loaded day stays until `--reset <row>`, the one lowering path — the monotone rule's stated price.
+# rc, fails (the count of ^FAIL lines) and executed (the shard trailer's count, `-` where the trailer
+# is not the executed-count line) are the LATEST reading's, so a repaired suite updates its parity
+# baseline on the next calibrate with no reset. The bound `--pooled` derives is
+# `max(<serial budget>, <max seconds>)` plus `ceiling-margin.txt`'s headroom; the serial-budget floor
+# is what keeps a fast red (0.3 s on an unbound variable, exit 1) from bounding a repaired suite
+# below what it costs alone, and the FAIL count beside rc is what keeps that fast red from MATCHING.
+#
+# ROWS WHOSE SUITES PRINT NO TRAILER, declared here because the runner cannot witness their
+# completion: `check-brief-recorded.test.sh` and `check-pass-order.test.sh` exit `$st` with no
+# `PASS (` line, so a completed exit from either is a reading of rc plus ^FAIL count only, and the
+# calibrate prints that gap on the row rather than being silent about it.
+# no-trailer: unattended brief-recorded selftest
+# no-trailer: unattended pass-order selftest
+#
+# THE POOLED POPULATION, DECLARED, so `--check` can hold the trailer rule over it statically
+# before a calibrate pays for it: every row whose argv lies under a `pooled-kit:` dir must print
+# its trailer unconditionally — a `PASS (` behind `[ "$st" = 0 ] &&` is the same class as no
+# trailer, since the run that most needs a reading is the red one — or be declared `no-trailer:`
+# above. The closing review of TOOL-aBatchedArm found five such green-only trailers in this kit.
+# pooled-kit: tools/unattended
+#
+# NO ROW YET, and that is the announced-unarmed state: `--pooled` over any population refuses every
+# uncalibrated row by name until `--pooled --calibrate` has run it to its end. The build's landing
+# step calibrates the population `--kit tools/unattended --list` resolves and commits the rows.
+#
+# <row>	<condition>	<node>	<max seconds>	<rc>	<fails>	<executed>	<readings>	<date>
+unattended adopter e2e	pooled@8x1	a	303	0	0	100	3	2026-09-23
+unattended arms-groups selftest	pooled@8x1	a	10	0	0	35	3	2026-09-23
+unattended brief-recorded selftest	pooled@8x1	a	299	0	0	-	3	2026-09-23
+unattended cross-component	pooled@8x1	a	480	0	0	21	3	2026-09-23
+unattended driver selftest	pooled@8x1	a	6300	0	0	1391	3	2026-09-23
+unattended gate selftest shard 1/8	pooled@8x1	a	2516	0	0	86	3	2026-09-23
+unattended gate selftest shard 2/8	pooled@8x1	a	3090	0	0	69	3	2026-09-23
+unattended gate selftest shard 3/8	pooled@8x1	a	2266	0	0	49	3	2026-09-23
+unattended gate selftest shard 4/8	pooled@8x1	a	3768	0	0	102	3	2026-09-23
+unattended gate selftest shard 5/8	pooled@8x1	a	1893	0	0	64	3	2026-09-23
+unattended gate selftest shard 6/8	pooled@8x1	a	2104	0	0	78	3	2026-09-23
+unattended gate selftest shard 7/8	pooled@8x1	a	2247	0	0	95	3	2026-09-23
+unattended gate selftest shard 8/8	pooled@8x1	a	2418	0	0	94	3	2026-09-23
+unattended gate-guard selftest	pooled@8x1	a	201	0	0	165	3	2026-09-23
+unattended pass-order selftest	pooled@8x1	a	400	0	0	-	3	2026-09-23
+unattended playbook selftest	pooled@8x1	a	866	0	0	123	3	2026-09-23
+unattended stall-recorder selftest	pooled@8x1	a	44	0	1	45	2	2026-09-23
+unattended stop-guard selftest	pooled@8x1	a	106	0	1	114	2	2026-09-23
+unattended resume-tick selftest	pooled@8x1	a	550	0	0	163	2	2026-09-23
+unattended runlog-writer selftest	pooled@8x1	a	165	0	0	163	1	2026-09-23

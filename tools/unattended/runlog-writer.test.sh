@@ -675,5 +675,9 @@ check_cap_fit
 if [ "$n" -lt "$FLOOR_ASSERTIONS" ]; then
   echo "FAIL $n assertions ran, under the floor of $FLOOR_ASSERTIONS: an arm stopped asserting"; st=1
 fi
+# THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer;
+# `FAILED (n assertions)` is not one, so a red-but-complete run read as UNTRAILED, wrote no
+# calibrate reading and refused every later pooled run (aBatchedArm closing D4).
+echo "  ($n assertions executed)"
 if [ "$st" = 0 ]; then echo "PASS ($n assertions)"; else echo "FAILED ($n assertions)"; fi
 exit "$st"

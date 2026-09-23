@@ -78,7 +78,7 @@ build_stub() {
     printf 'printf "pid %%s argv %%s\\n" "$$" "$*" >> %q\n' "$STUB_LOG"
     printf 'case "$1" in\n'
     printf '  auth) if [ "${STUB_LOGGED_IN:-true}" = false ]; then printf "{\\n  \\"loggedIn\\": false\\n}\\n"; else printf "{\\n  \\"loggedIn\\": true\\n}\\n"; fi ;;\n'
-    printf '  -p) sleep 15; printf "done\\n" >> %q ;;\n' "$STUB_LOG"
+    printf '  -p) sleep 60; printf "done\\n" >> %q ;;\n' "$STUB_LOG"
     printf 'esac\nexit 0\n'
   } > "$TMP/stub/claude"
   chmod +x "$TMP/stub/claude"
@@ -262,11 +262,11 @@ check_same "AC2 a LIVE record consults neither login nor the stub" "$([ -f "$STU
 # rather than when the sleeper ends. The arm MEASURES the wall, because the message half of this
 # class is always right. RED against a tick reading the answer through `$( )`.
 mkdir -p "$TMP/stub2"
-printf '#!/bin/sh\nsleep 20 &\nprintf "{\\n  \\"loggedIn\\": false\\n}\\n"\nexit 0\n' > "$TMP/stub2/claude"; chmod +x "$TMP/stub2/claude"
+printf '#!/bin/sh\nsleep 60 &\nprintf "{\\n  \\"loggedIn\\": false\\n}\\n"\nexit 0\n' > "$TMP/stub2/claude"; chmod +x "$TMP/stub2/claude"
 build_fixture 999999999
 PATH="$TMP/stub2:$PATH" run_tick_over "$TICK"
 check_hit "$OUT" "SKIP — the CLI is not logged in on this node" "AC2 a sleeper behind the CLI still yields the logged-out skip"
-check_same "AC2 the tick did not wait for the CLI's orphan" "$([ "$SECS" -le 8 ] && echo yes || echo "no: ${SECS}s")" "yes"
+check_same "AC2 the tick did not wait for the CLI's 60 s orphan" "$([ "$SECS" -le 20 ] && echo yes || echo "no: ${SECS}s")" "yes"
 
 # ---- AC1: the STALE fixture with a dead recorded pid is RESUMED: one line ending in the .out path,
 # ---- the tick back within 5 s while the stub still sleeps (the launch is DETACHED), the argv
@@ -279,7 +279,7 @@ run_tick_over "$TICK"
 check_same "AC1 exits 0" "$RC" "0"
 check_same "AC1 one decision line" "$(printf '%s\n' "$OUT" | grep -c '')" "1"
 check_hit "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1 · out $SIDECAR/resume.tRun." "AC1 the resumed decision line"
-check_same "AC1 the tick returned within 5 s, so the launch is detached" "$([ "$SECS" -le 5 ] && echo yes || echo "no: ${SECS}s")" "yes"
+check_same "AC1 the tick returned well inside the 60 s launch, so it is detached" "$([ "$SECS" -le 20 ] && echo yes || echo "no: ${SECS}s")" "yes"
 LOG=$(read_stub_log)
 check_hit "$LOG" "argv -p --resume $SID --dangerously-skip-permissions --max-turns 40 " "AC1 the stub was launched with the session, the flag and the turns"
 check_miss "$LOG" "done" "AC1 the stub is still running when the tick has returned"
@@ -747,5 +747,10 @@ n=$((pass+fail))
 FLOOR_ASSERTIONS=145
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
+# THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer
+# (SWEEP_TRAILER_RX); a red-but-complete run that prints only a green-gated `PASS (` is UNTRAILED
+# there, writes no calibrate reading, and refuses every later pooled run (aBatchedArm closing D4,
+# applied at the merge that brought this suite in).
+echo "  ($n assertions executed)"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ]

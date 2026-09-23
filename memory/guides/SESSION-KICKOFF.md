@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-22T17:54:05+03:00 @ 2de31c7e50814adf2304e2e871b2f73167bf94db
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
+last-audit: 2026-09-23T02:02:44+03:00 @ ad5a0d3c2564f2e43321869483bf5fc76d6b7c36
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 83129cd9b6986b87002e51227542a4b67986157d
+last-body-change: 2ae12086bf7bc70723d6535a24c3b05368b18664
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -180,7 +180,8 @@ GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githo
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
 # The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1
-bash tools/run-gates/run-selftests.sh  # the HELD population on demand, budget-timed. TOOL-aQuenchedHarness-4
+bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES any row with no calibrated reading until --pooled --calibrate has run (TOOL-aBatchedArm-5); bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
+bash tools/unattended/run-unattended-gates.sh --pooled   # the DoD for work touching tools/unattended/: the kit self-tests through the bounded pool, PARITY against the calibrated evidence (twenty rows, node a, 2026-09-22); --serial is the on-demand cost reading. TOOL-aBatchedArm-5
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
@@ -216,8 +217,12 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
+- 2026-09-22 · the unattended kit's self-tests · they are GREEN WHOLE for the first time: 76 failing
+  assertions across the gate, driver and cross-component suites were fixtures pinned to texts that had
+  moved, fixed at the aBatchedArm landing · prune when a later run finds one red again.
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
-  `--selftests` only when they ask · prune when a bar runs them automatically.
+  `--selftests --serial` only when they ask. The cost is process creation, not logic:
+  `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
 
 
 ### Environment traps worth front-loading
