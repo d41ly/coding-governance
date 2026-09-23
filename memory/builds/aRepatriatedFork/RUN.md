@@ -90,3 +90,5 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-23T21:38:53Z dispatch · item 73113582 DEPL-aRepatriatedFork-13 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/memory-tree/kit.toml WIRE-INTO-PROJECT.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-13-1-acceptance-ledger.md memory/map/generated/symbols.json
 
 2026-09-23T21:38:58Z brief · item DEPL-aRepatriatedFork-13 · reason 53c3b0971702 memory/builds/aRepatriatedFork/prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-13-build-brief.md
+
+2026-09-23T22:27:05Z rescope · item add DEPL-aRepatriatedFork-21 · reason DEPL-aRepatriatedFork-13's builder found that apply reads no [[own]] row, so apply --resume over an owning target lands gov's bytes on the adopter's program: a hole in the role this build introduced. Adopted under protocol section 11 with its red case (AC2) first.

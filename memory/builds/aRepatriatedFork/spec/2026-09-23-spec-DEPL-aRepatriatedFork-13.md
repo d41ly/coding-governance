@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"
 
-**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer+tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer+tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -106,6 +106,8 @@ call, and stands down the holes that only gov's own engine could discharge.
 - **hands-off** `DEPL-aRepatriatedFork-20` — inCMS's convergence onto gov's programs, which deletes
   S6's five rows in one landing. Without this unit, inCMS's pulls stay blocked until the convergence
   lands.
+- **hands-off** `DEPL-aRepatriatedFork-21` — `resolve_owned_rows`, which `apply` calls so it never
+  lands gov's bytes on a file the target owns. This unit left `apply` out of scope.
 
 ## 4. Design
 
@@ -350,6 +352,8 @@ New arm: `tools/govkit/selftest.py` · an `[[own]]` fixture per S item, a non-co
   Section 5: the census label is `target`, and govkit has no README. Section 3's edge to
   `TOOL-aRepatriatedFork-3` records that no clause reads its line yet. AC9's `row_grammar.py` mark
   is re-derived.
+- rev-4 · 2026-09-24 · §3 gains the **hands-off** edge to `DEPL-aRepatriatedFork-21`, which closes the
+  gap in `apply` this unit's builder reported.
 
 ## 10. Reuse audit
 
