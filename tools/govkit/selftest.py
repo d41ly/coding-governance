@@ -675,7 +675,7 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
         '[[files]]\ninclude = ["seed.txt"]\nrole = "generated"\nto = "{prefix}/seed.txt"\n',
         encoding="utf-8", newline="\n")
     p = subprocess.run([sys.executable, str(fx / "tools" / "govkit" / "govkit.py"), "shipped"],
-                       capture_output=True, text=True)
+                       capture_output=True, text=True, encoding="utf-8")
     want = ["demo\tengine\ttools/demo/run.sh", "demo\tgenerated\ttools/demo/seed.txt"]
     cut = "\n".join(ln.split("\t", 1)[0] + "\t" + ln.split("\t")[-1]
                     for ln in p.stdout.splitlines() if "\t" in ln)
@@ -684,7 +684,7 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
     check("[aRF-16 S1] ...and the same predicate REJECTS a copy with the role column deleted",
           cut.splitlines() != want and len(cut.splitlines()) == len(want), cut)
     pr = subprocess.run([sys.executable, str(fx / "tools" / "govkit" / "govkit.py"),
-                         "shipped", "--all"], capture_output=True, text=True)
+                         "shipped", "--all"], capture_output=True, text=True, encoding="utf-8")
     check("[aRF-16 S1] `shipped` refuses an argument", pr.returncode == 2
           and "shipped takes no arguments" in pr.stderr, pr.stderr)
 
@@ -722,11 +722,11 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
     git(fx, "config", "user.name", "fixture")
     settle(fx, "base")
     base = subprocess.run(["git", "-C", str(fx), "rev-parse", "HEAD"],
-                          capture_output=True, text=True).stdout.strip()
+                          capture_output=True, text=True, encoding="utf-8").stdout.strip()
 
     def run_epoch(*args: str) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, str(fx / "tools" / "govkit" / "govkit.py"), "epoch",
-                               *args], capture_output=True, text=True,
+                               *args], capture_output=True, text=True, encoding="utf-8",
                               env={**os.environ, "GOV_DEFAULT_BRANCH": "no-such-branch"})
 
     (fx / "tools" / "vk" / "lib.sh").write_text("echo two\n", encoding="utf-8", newline="\n")
@@ -743,7 +743,7 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
                                               encoding="utf-8", newline="\n")
     settle(fx, "bump")
     bump = subprocess.run(["git", "-C", str(fx), "rev-parse", "HEAD"],
-                          capture_output=True, text=True).stdout.strip()
+                          capture_output=True, text=True, encoding="utf-8").stdout.strip()
     p = run_epoch("--base", base)
     check("[aRF-15 AC1] ...and the bump in a later commit makes it clean, exit 0",
           p.returncode == 0 and "epoch: vk · clean · 1.1" in p.stdout, p.stdout + p.stderr)
@@ -844,7 +844,7 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
 
     def run_govkit(*args: str) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
-                              capture_output=True, text=True, env=env)
+                              capture_output=True, text=True, encoding="utf-8", env=env)
 
     def build_target(name: str, path: str, impl: str, run_src: str) -> pathlib.Path:
         t = make_target(tmp / name, OWN_DEPLOY.format(path=path, impl=impl))
@@ -938,7 +938,7 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
         encoding="utf-8", newline="\n")
     git(g, "commit", "-qam", "gov moves")
     head = subprocess.run(["git", "-C", str(g), "rev-parse", "HEAD"], capture_output=True,
-                          text=True).stdout.strip()
+                          text=True, encoding="utf-8").stdout.strip()
     ctl = build_target("own-ac4", "tools/demo/run.py", "demo:run.py", lacking)
     shutil.copy2(rp, ctl / ".governance" / "install.json")
     shutil.copy2(t / ".governance" / "install.sums", ctl / ".governance" / "install.sums")

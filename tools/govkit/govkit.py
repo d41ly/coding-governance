@@ -10565,12 +10565,12 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
         dflt = os.environ.get("GOV_DEFAULT_BRANCH") or "main"
         for ref in (f"origin/{dflt}", dflt):
             mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
-                                capture_output=True, text=True)
+                                capture_output=True, text=True, encoding="utf-8")
             if mb.returncode == 0 and mb.stdout.strip():
                 base = mb.stdout.strip()
                 break
     rb = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
-                         f"{base}^{{commit}}"], capture_output=True, text=True) if base else None
+                         f"{base}^{{commit}}"], capture_output=True, text=True, encoding="utf-8") if base else None
     if rb is None or rb.returncode != 0:
         print(f"epoch: FAILED · no base to compare against ({base or 'no merge-base with the default branch'})"
               " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
