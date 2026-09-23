@@ -112,6 +112,8 @@ if [ -n "$CARD" ] && [ -z "$CARD_VERB" ]; then
 fi
 
 CALLER_PWD=$PWD
+# This kit's own directory, captured before the `cd` below: the sibling resolver walks from it.
+MC_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd) || MC_DIR=$PWD
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "MANIFEST env ERROR — not a git repository"; exit 2; }
 TOPLEVEL=$ROOT   # the bytes git prints, kept for the card's `tree —` cell: ONE declared spelling, before the normalisation below
 ROOT=$(cd "$ROOT" 2>/dev/null && pwd) || { echo "MANIFEST env ERROR — cannot enter repo root"; exit 2; }   # normalize to the shell's path flavor (git-bash: C:/ vs /c/)
@@ -352,13 +354,71 @@ resolve_python() {
 }
 # <<< resolve_python
 
-# The memory-tree kit's id reader, by the engine's own <MEMORY_TREE_KIT> rule: whichever of
-# `tools/memory-tree/` or `memory-tree/` holds it. Empty when neither does; the caller says so.
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+
+# The memory-tree kit's id reader, through the sibling resolver (TOOL-aRepatriatedFork-2 S3): the
+# receipt, which is the only record of a flat or renamed install, then the two probes beside this
+# kit. Gov homes THIS kit under skills/, which no probe walks from, and gov keeps no receipt, so
+# gov's own layout is the one named fallback. Empty when nothing answers; the caller says so.
 resolve_id_reader() {
-  local d
-  for d in tools/memory-tree memory-tree; do
-    [ -f "$ROOT/$d/corpus_ids.py" ] && { printf '%s\n' "$ROOT/$d/corpus_ids.py"; return 0; }
-  done
+  local d py gov
+  py=$(resolve_python 2>/dev/null) || py=""
+  if [ -n "$py" ] && d=$(resolve_kit_dir "$py" memory-tree corpus_ids.py "$MC_DIR" 2>/dev/null); then
+    printf '%s\n' "$ROOT/$d/corpus_ids.py"; return 0
+  fi
+  gov="$ROOT/tools/memory-tree"   # gov:prefix-literal — gov homes this kit under skills/ and keeps no receipt, so neither rung can reach gov's own reader
+  [ -f "$gov/corpus_ids.py" ] && printf '%s\n' "$gov/corpus_ids.py"
   return 0
 }
 
@@ -410,7 +470,7 @@ check_card_citations() {
   CARD_ID_ERE=""; : > "$CARD_TMP/ids"
   reader=$(resolve_id_reader)
   if [ -z "$reader" ]; then
-    echo "NOTE: id citations unchecked — no corpus_ids.py under tools/memory-tree/ or memory-tree/ in this tree, so only paths are judged"
+    echo "NOTE: id citations unchecked — no memory-tree corpus_ids.py in this tree, by the receipt or beside this kit, so only paths are judged"
   else
     py=$(resolve_python) || { echo "MANIFEST env ERROR — no usable python launcher for the id reader $reader, so the defined-id set is unknown rather than empty; resolve_python's refusal above names every candidate it ran, and GOV_PYTHON=<launcher> is the override"; exit 2; }
     "$py" "$reader" --print-defined-ids > "$CARD_TMP/idout" 2>&1; st=$?

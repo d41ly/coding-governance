@@ -504,7 +504,7 @@ def _main(argv: list[str]) -> int:
     if len(argv) == 4 and argv[1] == "--print-rows":
         block, argv = argv[2], [argv[0], argv[1], argv[3]]
     if len(argv) != 3 or argv[1] not in ("--print-verbs", "--print-rows") or block not in BLOCK_KEYS:
-        sys.stderr.write("usage: python tools/lexicon/lexicon_conf.py "
+        sys.stderr.write(f"usage: python {argv[0]} "
                          "--print-verbs <conf> | --print-rows [" + "|".join(BLOCK_KEYS) + "] <conf>\n")
         return 2
     try:

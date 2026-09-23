@@ -85,7 +85,7 @@ def write(path, text):
 # and the python half mis-read REMOVED coverage with the gate still green. TOOL-aRepatriatedFork-9
 # moved it into `tree_lib.py`, so this engine no longer needs a sibling ENGINE to import.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from tree_lib import parse_conf  # noqa: E402  the kit's ONE conf parser
+from tree_lib import kit_rel, parse_conf  # noqa: E402  the kit's ONE conf parser
 
 def load_conf(root: str) -> dict:
     conf = {"MEMORY_ROOT": "memory", "UNIVERSAL_BUDGET": ""}
@@ -222,8 +222,9 @@ def render(recs: list, m: str) -> str:
         "Hand a reviewer the classes their diff can hit:",
         "",
         "```bash",
-        "python tools/memory-tree/gotchas.py --for-diff <base>..<head>",
-        "python tools/memory-tree/gotchas.py --for-paths <path>...",
+        # THIS install's path, derived, because INDEX.md is committed in the adopter's tree (S5).
+        f"python {kit_rel()}/gotchas.py --for-diff <base>..<head>",
+        f"python {kit_rel()}/gotchas.py --for-paths <path>...",
         "```",
         "",
         BEGIN,
@@ -517,12 +518,12 @@ def cmd_selftest() -> int:
         # written that way was silently unanchored. Here the tail may be empty, the directory token
         # IS harvested, and it selects everything beneath it. The arm pins the DIFFERENCE, so a
         # future tightening of the pattern reintroduces the upstream defect loudly.
-        d2 = ANCHOR_RE.findall("a directory `tools/memory-tree/` reference\n")
+        d2 = ANCHOR_RE.findall("a directory `tools/memory-tree/` reference\n")  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
         arm("harvest defect 2 does NOT apply here: a trailing slash harvests the directory", "[rc=0]",
-            lambda: 0 if d2 == ["tools/memory-tree/"] else 1)
+            lambda: 0 if d2 == ["tools/memory-tree/"] else 1)  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
         arm("...and that directory anchor selects everything beneath it", "[rc=0]",
-            lambda: 0 if selectable("tools/memory-tree/", ["tools/memory-tree/gotchas.py"], "memory")
-            == {"tools/memory-tree/gotchas.py"} else 1)
+            lambda: 0 if selectable("tools/memory-tree/", ["tools/memory-tree/gotchas.py"], "memory")  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            == {"tools/memory-tree/gotchas.py"} else 1)  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
         paths = ["tools/some-gate.sh", "deep/nested/some-gate.sh", "memory/README.md"]
         sel = selectable("some-gate.sh", paths, "memory")
         arm("harvest defect 3: a basename selects tree-wide", "[rc=0]",

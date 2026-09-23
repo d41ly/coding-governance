@@ -66,6 +66,74 @@ resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir c
   printf '%s/unattended\n' "$g"
 }
 
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+
+# The REPAIR POINTER for a missing or stale units region (TOOL-aRepatriatedFork-2 S6): the
+# memory-tree generator where THIS install put it. Both the driver and the gate leg print it, so it
+# is spelled once, here, with the caller's own inline `resolve_python`. -> the hint text; a miss
+# says what was not found, never a guess.
+derive_index_repair() {
+  local d="" py=""
+  declare -F resolve_python >/dev/null && py=$(resolve_python 2>/dev/null) || py=""
+  [ -n "$py" ] && d=$(resolve_kit_dir "$py" memory-tree gen_build_index.py "$(dirname -- "${BASH_SOURCE[0]}")" 2>/dev/null)
+  case "$d" in
+    '') printf '%s' "the --write mode of the memory-tree kit's gen_build_index.py, which neither the receipt nor a probe beside this kit located" ;;
+    .) printf '%s' "the --write mode of gen_build_index.py" ;;
+    *) printf '%s' "the --write mode of $d/gen_build_index.py" ;;
+  esac
+}
+
 # ------------------------------------------------------------------------------ bounds, once
 # MOVED from the driver by TOOL-aWokenSentinel-5, body unchanged: the resume tick reads its two
 # knobs through this function, and the driver its four, so it lives where both source it. THE

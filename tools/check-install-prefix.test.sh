@@ -521,6 +521,47 @@ printf "Copy it from <gov>/tools/demo/thing.sh into your own tree.\n" >> "$E4G/t
 git -C "$E4G" add -A >/dev/null 2>&1
 carried_arm "epoch4 ...and a /-preceded spelling of gov's own checkout is still not one" "carried-prefix clean" 0 "$E4G"
 
+# ==================== TOOL-aRepatriatedFork-2 S8 — ARM 3, RUNTIME LITERALS =====================
+# Three fixtures over one mechanism: an argv spelled `$ROOT/` plus gov's prefix (P1's `$VAR/` lead,
+# which no earlier epoch could see), a Python join of a quoted `tools` segment (P2), and that same
+# join carrying a marker with its reason, which is the green control. `RUNTIME_ARMS` counts the arms
+# whose output proves arm 3 actually ran, so a fixture that stopped reaching it reds the liveness row
+# below rather than passing by grading nothing. `demo` is no kit of this repo, so none of these
+# spellings is a literal the ban list counts here.
+RUNTIME_ARMS=0
+runtime_arm() { # label · want-substring · want-rc · dir
+  local label="$1" want="$2" wrc="$3" d="$4" out rc
+  out=$(cd "$d" && bash "$GATE_REL" --check 2>&1); rc=$?
+  case "$out" in *"runtime literals clean"*|*"SHIPPED engine spells"*) RUNTIME_ARMS=$((RUNTIME_ARMS+1)) ;;
+    *) bad "$label — arm 3 never ran"; printf '%s\n' "$out" | sed 's/^/      /' | head -8; return ;; esac
+  if [ "$rc" != "$wrc" ]; then bad "$label — rc $rc, wanted $wrc"; printf '%s\n' "$out" | sed 's/^/      /' | head -12; return; fi
+  case "$out" in *"$want"*) ;; *) bad "$label — output does not carry '$want'"; printf '%s\n' "$out" | sed 's/^/      /' | head -12; return ;; esac
+  good "$label"
+}
+RT1="$TMP/rt-argv"; mkfix_source "$RT1" 'A demo kit.'
+(cd "$RT1" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+printf 'bash "$ROOT/tools/demo/thing.sh" --go\n' >> "$RT1/tools/demo/thing.sh"
+git -C "$RT1" add -A >/dev/null 2>&1
+runtime_arm 'runtime P1 a $ROOT/-led argv naming a kit path REDS by line' "tools/demo/thing.sh:3  P1" 1 "$RT1"
+
+RT2="$TMP/rt-join"; mkfix_source "$RT2" 'A demo kit.'
+(cd "$RT2" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+printf 'import pathlib\nkit = pathlib.Path(".") / "tools" / "demo"\n' > "$RT2/tools/demo/find.py"
+git -C "$RT2" add -A >/dev/null 2>&1
+runtime_arm 'runtime P2 a "tools" / "<kit>" join REDS by line' "tools/demo/find.py:2  P2" 1 "$RT2"
+
+RT3="$TMP/rt-marked"; mkfix_source "$RT3" 'A demo kit.'
+printf 'import pathlib\nkit = pathlib.Path(".") / "tools" / "demo"  # gov:prefix-literal — a fixture layout, correct by construction\n' > "$RT3/tools/demo/find.py"
+git -C "$RT3" add -A >/dev/null 2>&1
+(cd "$RT3" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+runtime_arm 'runtime ...and the same join, MARKED with a reason, is the green control' "1 marked line(s)" 0 "$RT3"
+
+if [ "$RUNTIME_ARMS" -ge 3 ]; then
+  good "LIVENESS $RUNTIME_ARMS arm(s) reached the runtime-literal arm"
+else
+  bad "LIVENESS only $RUNTIME_ARMS arm(s) reached the runtime-literal arm — the rest stopped short of it, so arm 3 is reported on and not graded"
+fi
+
 if [ "$BAN_ARMS" -ge 5 ]; then
   good "LIVENESS $BAN_ARMS ban arm(s) engaged the real gate"
 else

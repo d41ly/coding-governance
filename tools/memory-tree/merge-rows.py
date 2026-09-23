@@ -142,6 +142,43 @@ import sys
 # one should write nothing else, and this is the whole of that property on the deferred import below.
 sys.dont_write_bytecode = True
 
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 _ANCHOR_AT = None
 _GRAMMAR = None
 
@@ -162,22 +199,6 @@ def _anchor_root() -> pathlib.Path:
     raise RuntimeError(
         f"no .memory-tree.conf above {here.as_posix()} — the anchor grammar is read from the "
         f"memory-tree conf, so there is no grammar to key rows with"
-    )
-
-
-def _kit_dir(root: pathlib.Path) -> pathlib.Path:
-    """The memory-recall kit directory, in either install layout.
-
-    Tools-first, the same order `tools/check-wiring.sh` uses when it resolves `settings-merge.py`
-    across the two layouts: `<root>/tools/memory-recall/` in this repo, `<root>/memory-recall/` in a
-    repo that copy-installed the kit at the canonical prefix.
-    """
-    for cand in (root / "tools" / "memory-recall", root / "memory-recall"):
-        if cand.is_dir():
-            return cand
-    raise RuntimeError(
-        f"no memory-recall kit under {root.as_posix()} (looked at tools/memory-recall and "
-        f"memory-recall) — the anchor grammar lives there and is never vendored here"
     )
 
 
@@ -203,7 +224,10 @@ def anchors() -> tuple:
         # APPEND, never `insert(0, …)`: prepending puts the kit dir ahead of the stdlib, so any
         # module name it ever gains shadows the real one — a `tempfile.py` there would silently
         # replace the stdlib module `text_merge` imports below.
-        sys.path.append(str(_kit_dir(root)))
+        # The sibling kit through the ONE resolver (TOOL-aRepatriatedFork-2 S3): receipt, probes, then
+        # a LookupError naming all three places, which the driver turns into a real conflict.
+        sys.path.append(str(resolve_kit_dir("memory-recall", "extract.py",
+                                            pathlib.Path(__file__).resolve().parent)))
         import extract as EX  # noqa: PLC0415 — deliberately deferred; see above
         _GRAMMAR = EX.grammar_for(str(root))
         _ANCHOR_AT = EX.anchor_at

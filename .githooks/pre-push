@@ -311,7 +311,7 @@ resolve_push_dirs "$top" || { RUNLOG_GITDIR=""; RUNLOG_DIR=""; }
 # is only consulted when this tree shows no sign of `tools` at all. NicoCares probes `scripts` first
 # for the mirror-image reason — the order is a default, never a rule.
 GOV_KITROOT=tools
-if [ ! -f "$top/tools/gate-legs.json" ] && [ ! -d "$top/tools/run-gates" ]; then
+if [ ! -f "$top/tools/gate-legs.json" ] && [ ! -d "$top/tools/run-gates" ]; then  # gov:prefix-literal — probes gov's own layout first and falls back to the derived prefix below
   if [ -f "$top/scripts/gate-legs.json" ] || [ -d "$top/scripts/run-gates" ]; then
     GOV_KITROOT=scripts
   fi

@@ -42,9 +42,50 @@ import tempfile
 
 HERE = pathlib.Path(__file__).resolve().parent
 HYGIENE = HERE / "check-memory-hygiene.sh"
-# The grammar lives in the sibling kit. Resolved relative to the TOOL ROOT, so an adopter who installs
-# the kits somewhere other than `tools/` still finds it.
-GRAMMAR_DIR = HERE.parent / "memory-recall"
+
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+# The grammar lives in the sibling kit, found by `resolve_kit_dir` (TOOL-aRepatriatedFork-2 S3): the
+# receipt first, which is the only record of a kit dir an adopter RENAMED, then the two probes. On a
+# miss it holds the last place probed, and the two readers below name it as "not installed".
+try:
+    GRAMMAR_DIR = resolve_kit_dir("memory-recall", "extract.py", HERE)
+except LookupError:
+    GRAMMAR_DIR = HERE.parent / "memory-recall"  # gov:prefix-literal — the resolver missed; the last place probed, named by the not-installed message
 
 # TOOL-dSpentCeiling-1 — the two keys this engine no longer reads. A conf that still declares one
 # is ANNOUNCED, never refused: the shipped example declared READ_PATH_CEILING blank, so refusing on
@@ -922,7 +963,7 @@ def cmd_selftest() -> int:
         # of it written WITHOUT that prefix.
         tP = os.path.join(base, "prefix"); os.makedirs(tP)
         cP = _scratch(tP, extra={
-            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
+            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
             "memory/HYGIENE.md": "sentinel\n\nRun `memory-tree/check-memory-hygiene.sh` to lint.\n",
         })
         cP["DEAD_PATH_PIN"] = "0"
@@ -933,8 +974,8 @@ def cmd_selftest() -> int:
         # also pass on a rule that reds every token whose first segment is not a top-level directory.
         tQ = os.path.join(base, "prefix-ok"); os.makedirs(tQ)
         cQ = _scratch(tQ, extra={
-            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
-            "memory/HYGIENE.md": "sentinel\n\nRun `tools/memory-tree/check-memory-hygiene.sh` to lint.\n",
+            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            "memory/HYGIENE.md": "sentinel\n\nRun `tools/memory-tree/check-memory-hygiene.sh` to lint.\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
         })
         cQ["DEAD_PATH_PIN"] = "0"
         arm("...and the correctly-prefixed spelling of it is silent", None,

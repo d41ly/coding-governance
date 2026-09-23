@@ -85,7 +85,7 @@ def _kit_rel() -> str:
     try:
         return Path(__file__).resolve().parent.relative_to(Path.cwd().resolve()).as_posix()
     except (ValueError, OSError):
-        return "tools"
+        return "tools"  # gov:prefix-literal — a name-only default when run from outside the tree it writes into; whether it should refuse instead is the settings-merge owner's call (TOOL-aRepatriatedFork-2 section 8 F4)
 
 
 # A path fragment and nothing else — the character class govkit's own `demand_safe_token` grades
@@ -503,10 +503,13 @@ def _selftest() -> int:
 
         # 10) the SHIPPED fragment beside this script parses and declares the schema check-wiring
         #     joins on. Skipped, not failed, in a project that did not adopt memory-recall.
-        shipped = Path(__file__).resolve().parent / "memory-recall" / "recall-opened.fragment.json"
+        shipped = Path(__file__).resolve().parent / "memory-recall" / "recall-opened.fragment.json"  # gov:prefix-literal — selftest arm, skipped where no kit sits beside this file
         if shipped.is_file():
             got = load_fragment(shipped)
-            assert {k: got[k] for k in _FRAGMENT_KEYS} == recall, \
+            # The shipped hook_path is `{here}`-relative (TOOL-aRepatriatedFork-2 S4), so a renamed
+            # kit dir resolves; the fixture above keeps `{kit}` because it has no fragment file.
+            pinned = dict(recall, hook_path="{here}/recall-opened.js")
+            assert {k: got[k] for k in _FRAGMENT_KEYS} == pinned, \
                 f"shipped fragment drifted from the pinned schema: {got}"
             # A fragment carrying neither optional key is DEFAULTED, and the defaults are the
             # pre-1.4 render: this is what keeps the three older fragments byte-identical.
@@ -526,7 +529,7 @@ def _selftest() -> int:
         replay = resolve_shipped(here / "orientation-replay.fragment.json",
                             here.parent / "skills" / "session-kickoff" / "orientation-replay.fragment.json")
         cw = resolve_shipped(here / "check-wiring.fragment.json")
-        pm = resolve_shipped(here / "process-monitor" / "procmon-session.fragment.json")
+        pm = resolve_shipped(here / "process-monitor" / "procmon-session.fragment.json")  # gov:prefix-literal — a loose engine at the tool root: here/<home> is the resolver's own first probe
 
         # 13) the render: a bash fragment with arguments lands as UNQUOTED tokens after the quoted
         #     path, `{here}` resolves to the fragment's own directory, and the token never survives.
@@ -580,8 +583,8 @@ def _selftest() -> int:
 
         # 14b) the three fragments shipped BEFORE the optional keys render byte-identically to the
         #      pre-1.4 shape: the command is the interpreter default, the path, and nothing after.
-        for older in (here / "hooks" / "scratch-guard.fragment.json",
-                      here / "process-monitor" / "procmon-hook.fragment.json", shipped):
+        for older in (here / "hooks" / "scratch-guard.fragment.json",  # gov:prefix-literal — a loose engine at the tool root: here/<home> is the resolver's own first probe
+                      here / "process-monitor" / "procmon-hook.fragment.json", shipped):  # gov:prefix-literal — a loose engine at the tool root: here/<home> is the resolver's own first probe
             if older.is_file():
                 fr = load_fragment(older)
                 rp = resolve_hook_path(fr["hook_path"], str(older))

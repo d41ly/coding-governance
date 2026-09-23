@@ -277,6 +277,8 @@ against the ceiling rather than against its value. This README and the repo char
   look like a working one.
 - A sibling kit is a token the render channel fills. So is anything a non-program document must
   SAY rather than execute. An unresolved token is a refusal, not an emitted brace.
+- An ENGINE is not rendered, so it reaches a sibling kit through `resolve_kit_dir`: the install
+  receipt first, then two probes beside its own directory, then a refusal naming all three.
 - A replicated policy value is extracted or rendered from the one file that owns it. Retyping it
   creates two answers to one question, and the copy is always the one that rots.
 
@@ -295,6 +297,10 @@ ban list, in the pass that wants it. Those reasons survive later writes. A defin
 of the predicate — which necessarily makes many literals newly visible at once — goes through a
 separate re-baseline mode guarded by a declared predicate epoch, so it can be spent once per
 change to the predicate and never to absorb a literal.
+
+A path an engine RUNS or READS at run time is graded again by the gate's runtime-literal arm, over
+CODE lines only and with zero tolerance, because it is a defect the day it lands rather than a count
+to drain. A line that is correct by construction carries `gov:prefix-literal — <reason>` on itself.
 
 ## scratch-guard — the write-target guard, and what it cannot see
 

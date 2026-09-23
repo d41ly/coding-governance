@@ -38,8 +38,8 @@ import lexicon as lex  # noqa: E402
 KNOWN = lex.KNOWN_EXTS
 
 HEADER = """\
-# .lexicon.conf — the naming lexicon this repo declares. Read by tools/lexicon/lexicon.py through
-# tools/lexicon/lexicon_conf.py, which is the ONE reader; nothing else parses this file.
+# .lexicon.conf — the naming lexicon this repo declares. Read by @KIT@/lexicon.py through
+# @KIT@/lexicon_conf.py, which is the ONE reader; nothing else parses this file.
 #
 # GRAMMAR: single-line keys use the sibling KEY=VALUE form (`.memory-tree.conf`, `.codebase-map.conf`
 # ) — a value with spaces is double-quoted and no comment follows it on the line. Block keys are a
@@ -268,7 +268,13 @@ def main(argv: list[str]) -> int:
     suffix_offenders = _measure_suffix_offenders(scanned)
     verb_offenders = sum(n for v, n in counts.items() if v not in set(seeded))
 
-    body = [HEADER, ""]
+    # `@KIT@` is THIS install's kit dir, derived: the header is committed into the adopter's
+    # `.lexicon.conf`, where gov's prefix would name files that do not exist (S5).
+    try:
+        kit = Path(__file__).resolve().parent.relative_to(root.resolve()).as_posix()
+    except ValueError:
+        kit = Path(__file__).resolve().parent.name
+    body = [HEADER.replace("@KIT@", kit), ""]
     body.append('# Type-name suffixes that name a responsibility nobody scoped. Seeded from the source')
     body.append('# charter\'s eight; edit freely — this one is safe to inherit because it is prescriptive.')
     body.append('BANNED_SUFFIXES="%s"' % " ".join(BANNED_SUFFIXES))
@@ -282,7 +288,7 @@ def main(argv: list[str]) -> int:
     body.append("# offenders. They used to be hardcoded `0` under a comment that called them measured, so")
     body.append("# a corpus with one `Manager` type scaffolded green and redded on its first gate run,")
     body.append("# against a pin the tool itself had written (TOOL-dScaffoldedMirror-1).")
-    body.append("# Re-measure after curating: python tools/lexicon/lexicon.py --measure")
+    body.append(f"# Re-measure after curating: python {kit}/lexicon.py --measure")
     body.append("# The pin is a TWO-SIDED equality thereafter: a count that RISES reds, and a count")
     body.append("# that FALLS reds too, printing the row to paste. A drain lands in the declaration")
     body.append("# or it is not landed -- an unrecorded drain leaves a pin nothing can ever meet.")

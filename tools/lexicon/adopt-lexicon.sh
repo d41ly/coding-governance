@@ -55,6 +55,59 @@ resolve_python() {
 }
 # <<< resolve_python
 
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+
 PY="$(resolve_python)" || { echo "$PY"; exit 2; }
 
 # REPO-RELATIVE, via git rather than by trimming ROOT off KIT_DIR. On Windows those two are
@@ -328,13 +381,16 @@ if [ "$MODE" = "--check" ]; then
     # which is step 4 done before step 2 of the uninstall order. The map gate does red on that state,
     # but it reds as a stale dossier claim, which reads like a map problem rather than a half-removed
     # kit. Naming it here is the difference between a confusing red and an actionable one.
-    if [ -f "$ROOT/tools/codebase-map/map_extractors.py" ] \
-       && grep -q '"lexicon-verbs"' "$ROOT/tools/codebase-map/map_extractors.py" 2>/dev/null; then
+    # The codebase-map kit through the sibling resolver (TOOL-aRepatriatedFork-2 S3); a miss means
+    # there is no extractor to be orphaned, which is the ordinary not-adopted answer below.
+    _cm=$(resolve_kit_dir "$PY" codebase-map map_extractors.py "$KIT_DIR" 2>/dev/null) || _cm=""
+    if [ -n "$_cm" ] \
+       && grep -q '"lexicon-verbs"' "$ROOT/$_cm/map_extractors.py" 2>/dev/null; then
       echo "lexicon-adopt: ORPHANED EXTRACTOR — .lexicon.conf is gone but map_extractors.py still"
       echo "lexicon-adopt: declares the \`lexicon-verbs\` inventory, so the map's dossier claims now"
       echo "lexicon-adopt: name keys nothing produces. This is the uninstall order run backwards."
       echo "lexicon-adopt: Remove the dossier claims, then the EXTRACTORS entry, then re-render"
-      echo "lexicon-adopt: memory/map/generated/ — tools/lexicon/README.md carries the full order."
+      echo "lexicon-adopt: memory/map/generated/ — ${KITREL}README.md carries the full order."
       exit 1
     fi
     echo "lexicon-adopt: NOT ADOPTED — no .lexicon.conf at the repo root. The kit is opt-in; this is"

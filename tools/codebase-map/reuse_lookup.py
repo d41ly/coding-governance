@@ -749,7 +749,7 @@ def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None
             return
         # REQUIRED, not defaulted: an optional `paths` turns a dropped argument into a row that
         # logs zero sources and looks merely quiet. A TypeError at the one call site is louder.
-        path = common / "codebase-map" / "lookups.jsonl"
+        path = common / "codebase-map" / "lookups.jsonl"  # gov:prefix-literal — a sidecar dir inside the git common dir, not the kit's install path
         path.parent.mkdir(parents=True, exist_ok=True)
         row = {
             "type": "lookup",

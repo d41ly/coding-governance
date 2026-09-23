@@ -185,7 +185,7 @@ def derive_backlog_path(root: Path) -> Path:
         return m.map_root(root) / "reinvention-backlog.md"
     gd = Path(raw)
     gd = gd if gd.is_absolute() else (root / raw)
-    return gd.resolve() / "codebase-map" / "reinvention-backlog.md"
+    return gd.resolve() / "codebase-map" / "reinvention-backlog.md"  # gov:prefix-literal — a sidecar dir inside the git dir, named for the kit, not the kit's install path
 
 
 def _new_clones(root: Path, conf: dict[str, str]) -> int | None:

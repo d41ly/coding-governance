@@ -84,6 +84,16 @@ const KIT_AGENT_CAP_VERSION = '1.19' // gov:kit agent-cap@1.19 — engine identi
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
 
+// The review harness a deny message points at, DERIVED (TOOL-aRepatriatedFork-2 S6): probed in the
+// workflows kit beside this hook's own directory, and the bare name when that probe misses, because
+// a path spelled at gov's prefix sends an adopter's reader to a file that is not there.
+function resolveHarnessName() {
+  const path = require('path')
+  const p = path.join(path.dirname(__dirname), 'workflows', 'tier2-review.js')
+  if (!require('fs').existsSync(p)) return 'tier2-review.js'
+  return path.relative(process.env.CLAUDE_PROJECT_DIR || process.cwd(), p).split(path.sep).join('/')
+}
+
 function readStdin() {
   try {
     return require('fs').readFileSync(0, 'utf8')
@@ -1711,7 +1721,7 @@ function guardAgentSpawn(data) {
     `${EFFECTIVE_CAP} agents TOTAL${renderCapSource()} and the charter binds every other fan-out to the same number ` +
     `(memory/guides/REVIEW-PROTOCOL.md).\n\n` +
     `Consolidate instead of spawning again: batch the work so the BATCH SIZE grows with the item ` +
-    `count and the agent count does not. For a review, tools/workflows/tier2-review.js already does ` +
+    `count and the agent count does not. For a review, ${resolveHarnessName()} already does ` +
     `it. A new user prompt resets the budget, and a slot idle longer than ` +
     `${Math.round(SLOT_TTL_MS / 60000)} minutes is reclaimed on the next spawn; nothing needs ` +
     `cleaning up either way.\n`
@@ -1964,7 +1974,8 @@ function main() {
         `default parameter and the gov:bounded-fanout width; a repo may only LOWER it, with ` +
         `FANOUT_CAP in a tracked ${CAP_CONF}. An environment override would be a ` +
         `ceiling raise that leaves no diff behind. Unset AGENT_CAP and re-run; to change the number, ` +
-        `change it in tools/hooks/agent-cap.js, the source of truth -- .claude/hooks/agent-cap.js is a mirror the bar reverts.\n`,
+        `change it in the kit's own agent-cap.js, the source of truth, never in a mirror of it that a bar ` +
+        `reverts (this process ran ${require('path').basename(__dirname)}/${require('path').basename(__filename)}).\n`,
     )
     process.exit(2)
   }
@@ -2033,7 +2044,7 @@ function main() {
         `  const batches = chunk(items, Math.ceil(items.length / MAX_VERIFIERS)) // ${FIXED_MARK}\n` +
         `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), ${EFFECTIVE_CAP})\n\n` +
         `A fixed lens array (<= ${MAX_LENSES} elements) is allowed as-is — its agent count is a ` +
-        `constant. Ready-made: tools/workflows/tier2-review.js.\n`,
+        `constant. Ready-made: ${resolveHarnessName()}.\n`,
     )
     process.exit(2)
   }
@@ -2102,7 +2113,7 @@ function main() {
         `runtime signal - a mis-keyed harness reports a clean bill.\n\n` +
         joins.slice(0, 6).map(({ n, line, why }) => `  L${n}: ${String(line).trim()}\n        ${why}`).join('\n') +
         `\n\nKey the join on the integer id the orchestrator assigns, never on a string the skeptic ` +
-        `reproduces. Ready-made: tools/workflows/tier2-review.js.\n`,
+        `reproduces. Ready-made: ${resolveHarnessName()}.\n`,
     )
     process.exit(2)
   }

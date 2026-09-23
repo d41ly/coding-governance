@@ -691,7 +691,7 @@ EOF
   # If a renderer is ever found emitting CRLF into a committed file, this is the line to reopen.
   while IFS= read -r f; do
     [ -n "$f" ] || continue
-    echo "note     eol       — $f holds CRLF despite its eol=lf pin; the committed bytes are LF, so this is a working-copy artifact and does not gate. Fix: bash tools/check-wiring.sh --fix"
+    echo "note     eol       — $f holds CRLF despite its eol=lf pin; the committed bytes are LF, so this is a working-copy artifact and does not gate. Fix: bash ${KIT_REL:+$KIT_REL/}$(basename "$0") --fix"
   done <<EOF
 $bad
 EOF

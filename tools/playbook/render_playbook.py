@@ -74,6 +74,43 @@ import sys
 import tomllib
 from pathlib import Path
 
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 OPEN_RE = re.compile(r'^[ \t]*<!--\s*(kit|when):([A-Za-z0-9_-]+)\s*-->[ \t]*$')
 CLOSE_RE = re.compile(r'^[ \t]*<!--\s*/(kit|when):([A-Za-z0-9_-]+)\s*-->[ \t]*$')
 PLACEHOLDER_RE = re.compile(r'\{\{([A-Z][A-Z0-9_]*)\}\}')
@@ -145,7 +182,7 @@ def derive_id_families(root: Path, _a: dict) -> str:
 
 
 def derive_ci_file(root: Path, _a: dict) -> str:
-    d = root / '.github' / 'workflows'
+    d = root / '.github' / 'workflows'  # gov:prefix-literal — the target's CI dir, not the review-harness kit
     if d.is_dir():
         hits = sorted(p.name for p in d.iterdir() if p.suffix in ('.yml', '.yaml'))
         if hits:
@@ -154,8 +191,17 @@ def derive_ci_file(root: Path, _a: dict) -> str:
 
 
 def derive_gate_runner(root: Path, _a: dict) -> str:
-    for cand in ('tools/run-gates/run-gates.sh', 'tools/run-gates.sh',
-                 'scripts/run-gates.sh', 'scripts/gate.sh'):
+    # The run-gates kit through the ONE sibling resolver (TOOL-aRepatriatedFork-2 S3), looked up
+    # from this engine when it sits inside the target and from the target's root when it renders a
+    # tree it is not installed in. A dir outside the target is no answer, and neither is a miss.
+    here = Path(__file__).resolve().parent
+    top = root.resolve()
+    try:
+        kit = resolve_kit_dir('run-gates', 'run-gates.sh', here if top in here.parents else top)
+        return f'bash {(kit / "run-gates.sh").relative_to(top).as_posix()}'
+    except (LookupError, ValueError):
+        pass
+    for cand in ('tools/run-gates.sh', 'scripts/run-gates.sh', 'scripts/gate.sh'):
         if (root / cand).is_file():
             return f'bash {cand}'
     return ''
@@ -335,8 +381,8 @@ def resolve_declaration_paths(engine_dir: Path, gov_root: Path) -> tuple[Path, P
     """
     desc = engine_dir / 'playbook.kit.toml'
     reg = engine_dir / 'registry.toml'
-    return (desc if desc.is_file() else gov_root / 'tools' / 'govkit' / 'entries' / desc.name,
-            reg if reg.is_file() else gov_root / 'tools' / 'govkit' / reg.name)
+    return (desc if desc.is_file() else gov_root / 'tools' / 'govkit' / 'entries' / desc.name,  # gov:prefix-literal — falls back to gov's own checkout, whose layout is gov's by definition
+            reg if reg.is_file() else gov_root / 'tools' / 'govkit' / reg.name)  # gov:prefix-literal — falls back to gov's own checkout, whose layout is gov's by definition
 
 
 def resolve_template_path(gov_root: Path, target: Path, answers: dict) -> Path:

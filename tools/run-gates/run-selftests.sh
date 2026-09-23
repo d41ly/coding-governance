@@ -33,7 +33,8 @@ SELF="$(git -C "$(dirname -- "$0")" rev-parse --show-prefix 2>/dev/null)$(basena
 [ -n "$SELF" ] || { echo "run-selftests: cannot derive this script's own path" >&2; exit 2; }
 
 BUDGETS="$HERE/selftest-budgets.txt"
-LEGS="${GATE_LEGS:-$ROOT/tools/gate-legs.json}"
+# The manifest is this kit dir's SIBLING, derived exactly as run-gates.sh derives it (S1).
+LEGS="${GATE_LEGS:-$(dirname -- "$HERE")/gate-legs.json}"
 # The python-launcher resolver, INLINED byte-identically from the canonical copy named on
 # the marker line below, for
 # the reason the sibling runner states: this kit is deployable and tools/lib/ is gov-internal.
@@ -73,8 +74,9 @@ resolve_python() {
 PYBIN=$(resolve_python) || { echo "run-selftests: no usable python"; exit 2; }
 
 print_usage() {
+  printf 'usage: bash %s ' "$SELF"
   cat <<'USAGE'
-usage: bash tools/run-gates/run-selftests.sh (--serial|--pooled [--calibrate [--reset <row>]]) [--kit <dir>] | --check | --list | --rank
+(--serial|--pooled [--calibrate [--reset <row>]]) [--kit <dir>] | --check | --list | --rank
   --serial    run the declared population ONE suite at a time, time each against
               its own budget, RED on a breach. The only mode that issues a cost
               verdict, because an uncontended clock is the only one that can grade
@@ -119,7 +121,7 @@ usage: bash tools/run-gates/run-selftests.sh (--serial|--pooled [--calibrate [--
   --kit <dir> only the suites whose argv lies under <dir>; a filter matching
               nothing is a REFUSAL, because an unknown filter and a clean sweep
               are indistinguishable from outside
-  --check     the gate: assert the declaration against tools/gate-legs.json in
+  --check     the gate: assert the declaration against the sibling gate-legs.json in
               BOTH directions, the pooled evidence's shape, and — over the rows
               under each `# pooled-kit:` the evidence header declares — that a
               row's script prints its trailer OUTSIDE a `[ "$<var>" = 0 ] &&` guard
@@ -332,7 +334,7 @@ PY
 # ---- It runs BEFORE the width resolution below, because ranking is a read of a text file and has
 # ---- no business paying for a profile probe.
 if [ "$MODE" = rank ]; then
-  "$PYBIN" - "$BUDGETS" <<'PY'
+  "$PYBIN" - "$BUDGETS" "$(dirname -- "$SELF")/run-gates.sh" <<'PY'
 import re, sys
 
 # THE CONDITION VOCABULARY IS CLOSED, and that is the whole point of this verb. Spec 6 S3a: the
@@ -408,7 +410,7 @@ if unbacked:
     print("run-selftests: largest members is not a majority of anything. NO share was computed.")
     for name, reading in unbacked:
         print("  %-46s %s" % (name, reading or "(no reading at all)"))
-    print("run-selftests: produce them with  GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh")
+    print("run-selftests: produce them with  GATE_SELFTESTS=1 bash %s" % sys.argv[2])
     print("run-selftests: and, for a row with no manifest leg, a direct timed run of its argv; then")
     print("run-selftests: write the seconds and the condition into this file's fourth column.")
     raise SystemExit(1)

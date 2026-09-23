@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** SPECCED · rev-3 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -169,6 +169,11 @@ it is gov-side data. Rung 2 is nc's carve-out 8 order and is what answers in gov
 no receipt. `tools/run-gates/check-receipt.py:48` is the existing engine that already reads the
 receipt at an adopter.
 
+The receipt join (rev-4) compares the last two segments of `source` with `[<home>, <anchor>]`, so the
+resolver spells no prefix of its own. It returns an absolute directory; the shell form,
+`resolve_kit_dir <python> <home> <anchor> <here>`, runs the same block through a quoted heredoc and
+prints the directory repo-relative.
+
 Python consumers carry the function as an inline copy with a canonical source and a parity arm, the
 pattern `resolve_python` already uses (`tools/lib/resolve-python.test.sh`). A shell consumer that
 already resolves a Python gets rung 1 by calling it with a one-line import of the canonical copy,
@@ -182,8 +187,11 @@ and prints the bare harness name when the probe misses.
 ### The runtime arm
 
 Arm 3 of `tools/check-install-prefix.sh`, run only inside `TOOL-aRepatriatedFork-16`'s kit-source
-branch. Its population is `govkit.py shipped` rows with role `engine`, `rendered` or `merged`, minus
-the gate's existing `SUFFIX_EXCL` (`:164`). A `seed` is out: written once and adopter-owned after.
+branch. Its population is `govkit.py shipped` rows with role `engine` or `rendered`, minus the
+gate's existing `SUFFIX_EXCL`. A `seed` is out: written once and adopter-owned after. So is
+`merged` (rev-4): no writer lands that role (`tools/govkit/govkit.py`'s `UNLANDED_REASON`), which is
+the reason §3 already gives for putting `.githooks/pre-commit` out, and the role's only other member
+is a `.toml` snippet the arm does not read.
 
 It classifies each line as code or prose, then applies three predicates to code only:
 
@@ -197,7 +205,8 @@ Code is: for `.py`, `tokenize` STRING and f-string tokens that are not a docstri
 text of path expressions; for `.sh` and extensionless hooks, every line whose first non-blank byte
 is not `#`, heredoc bodies included because they are printed; for `.js`, text outside `//` and
 `/* */`; for `*.fragment.json`, the `hook_path` value. P1's existence filter is the ban arm's
-epoch-2 filter (`:460-470`), so fixture names like `tools/gate-a.sh` never hit.
+epoch-2 filter (`:460-470`), so fixture names like `tools/gate-a.sh` never hit. P1's non-path lead
+class excludes `-`, as the ban's epoch 4 does, so a `${VAR:-…}` default is a hit (rev-4).
 
 A hit exits 1 and names `<path>:<line>`. The marker is `gov:prefix-literal — <reason>`, with the
 three-state reading `check_marker_reason` already applies to `gov:root-fixture` (`:258-264`): no
@@ -281,6 +290,27 @@ on gov is green and its red-first observation is taken on the parent commit.
   render token in an engine would ship as a literal brace.
 - **A conf key per sibling kit.** It moves the literal into the adopter's conf, where it rots
   against the receipt that already records the answer.
+
+### What the build found (rev-4)
+
+- **S3 at gov's own kickoff.** Gov homes the kickoff kit under `skills/`, outside the tool root the
+  probes walk, and keeps no receipt, so `manifest-check.sh`'s id reader keeps gov's layout as its one
+  named fallback, marked `gov:prefix-literal`. `drift_report.py`'s two memory-recall lookups
+  (`_resolve_ident`, `_resolve_anchors`) take the resolver too; they were the same probe.
+- **S6 in the unattended kit.** The seven repair hints go through one helper,
+  `derive_index_repair` in `tools/unattended/lib-unattended.sh`, which the driver and the gate leg
+  both source. `check-unattended.sh` resolved no python, so it gains the inline `resolve_python` block
+  and its ban-list row swaps `memory-tree` for `lib` at equal count, justified by hand.
+- **S2 in `check-verdict-epoch.sh`.** It resolves no python, so the memory-recall delegate is probed
+  beside the kit and one level up, and a miss prints a note naming what is not scanned.
+- **S4's pin.** `tools/settings-merge.py`'s selftest pinned the shipped fragment's `hook_path`; the
+  pin follows the fragment to `{here}`.
+- **Arm 3's first run over gov.** Besides §4's marked list, P3 matched ten lines that name no kit
+  path: git-dir sidecars in `tools/codebase-map/map_diff.py` and `reuse_lookup.py`, a session dir's
+  subdir in `tools/runlog/extract.py`, a target's `.github/workflows`, the codebase-map test
+  template's own-kit probe, and settings-merge's loose-engine probes and selftest. Each is marked
+  with its reason. Two check-15 waivers in `tools/install-prefix-waivers.txt` were re-keyed to the
+  lines the inline resolver block moved them to.
 
 ## 5. Production-readiness checklist
 
@@ -397,6 +427,10 @@ New arm: `tools/lib/resolve-python.test.sh` parity table · one extra row per in
   consumer, and check-wiring's awk rung stays that unit's.
 - rev-3 · 2026-09-23 · §3 gains the **hands-off** edge back to `DEPL-aRepatriatedFork-20`,
   which declared its **consumes-from** here and met no matching edge (hygiene check 12).
+- rev-4 · 2026-09-24 · §4 The runtime arm drops `merged` from its population and `-` from P1's lead
+  class; §4 The resolver joins the receipt on `source`'s last two segments and gains a shell form;
+  §4 gains "What the build found", recording how S2, S3, S4 and S6 met the tree and which lines S8
+  marked. AC1-AC10 are unchanged.
 
 ## 10. Reuse audit
 

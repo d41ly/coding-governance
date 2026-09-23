@@ -1702,7 +1702,7 @@ check_authorization() { # slug · base
     # refused every BASE before the cutoff while admitting every one after: the precise inversion
     # the cutoff exists to prevent, and it would have refused the run that built this unit.
     if [ -n "$bdate" ] && printf '%s\n%s\n' "$UNITS_REGION_CUTOFF" "$bdate" | sort -C; then
-      fail 20 "the build README at the pinned BASE carries no units marker pair and this BASE is dated at or after UNITS_REGION_CUTOFF, so an empty set would satisfy the subset test vacuously: $base:$rel · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+      fail 20 "the build README at the pinned BASE carries no units marker pair and this BASE is dated at or after UNITS_REGION_CUTOFF, so an empty set would satisfy the subset test vacuously: $base:$rel · repair: $(derive_index_repair)"
       return 1
     fi
   fi
@@ -2188,7 +2188,7 @@ units_refusal() { # build README path
   # defect the ban exists to stop. Same shape as absence-assertion-over-whole-file-text: the
   # check cannot tell an invocation from a sentence about one, and need not when the sentence
   # is right anyway.
-  printf 'the build README carries no single well-formed %s pair, so the unit list cannot be read (absent, duplicated or transposed): %s\n  repair: the --write mode of tools/memory-tree/gen_build_index.py\n' "$UNITS_OPEN" "$1"
+  printf 'the build README carries no single well-formed %s pair, so the unit list cannot be read (absent, duplicated or transposed): %s\n  repair: %s\n' "$UNITS_OPEN" "$1" "$(derive_index_repair)"
 }
 
 # ONE EMITTER FOR EVERY ROW THAT NAMES A UNIT ID, so the two modes cannot disagree about which rows
@@ -2219,7 +2219,7 @@ verb_plan() { # slug
   # while a MALFORMED one refused - and a silent fall-back restores the divergence this unit removes
   # exactly when the tree is in the state most likely to hide it.
   if ! grep -qF -- "$UNITS_OPEN" "$_rmp" 2>/dev/null; then
-    fail 42 "the build README carries no units marker at all, and this verb takes its unit SET and ORDER from that region: $_rmp · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+    fail 42 "the build README carries no units marker at all, and this verb takes its unit SET and ORDER from that region: $_rmp · repair: $(derive_index_repair)"
     return 1
   fi
   if ! region "$_rmp" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
@@ -2286,7 +2286,7 @@ verb_plan() { # slug
   # the answer.
   local _rows; _rows=$(unit_rows "$_rmp")
   if [ "$_renderable" -gt 0 ] && [ -z "$_rows" ]; then
-    fail 42 "the generated units region carries no unit rows but this build has specs that would render them, so the region is stale: $_rmp · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+    fail 42 "the generated units region carries no unit rows but this build has specs that would render them, so the region is stale: $_rmp · repair: $(derive_index_repair)"
     return 1
   fi
   # S1/S2 - the SET and its ORDER come from the REGION, which is rendered in BUILD ORDER. `--status`
@@ -4030,7 +4030,7 @@ dod_met() { # slug · run-state file · item · checker
       # only exit was `--override build-complete`, the run authorizing itself past the one item that
       # means the build is done.
       if ! region "$(readme_of "$slug")" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
-        DOD_OUT="the build README carries no well-formed units marker pair, and build-complete reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+        DOD_OUT="the build README carries no well-formed units marker pair, and build-complete reads the roster from that region: $(readme_of "$slug") · repair: $(derive_index_repair)"
         return 1
       fi
       # TOOL-aBoundedVerdict-12 S3 - the four surviving terms are evaluated SEQUENTIALLY so each can
@@ -4308,7 +4308,7 @@ $_bcnon"
         return 0
       fi
       if ! _sa_rows=$(unit_rows "$(readme_of "$slug")"); then
-        DOD_OUT="the build README carries no well-formed units marker pair, and this item reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+        DOD_OUT="the build README carries no well-formed units marker pair, and this item reads the roster from that region: $(readme_of "$slug") · repair: $(derive_index_repair)"
         return 1
       fi
       _sa_ids=$(printf '%s\n' "$_sa_rows" | grep -E '\| CLOSED \|' | row_ids_of)

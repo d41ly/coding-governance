@@ -115,7 +115,8 @@ function main() {
   try {
     out = execFileSync(
       process.env.PROCMON_PYTHON || 'python',
-      [path.join(root, 'tools', 'process-monitor', 'reap.py'), '--sweep', '--dry-run'],
+      // Beside this hook, derived the way the remedy line below derives it (TOOL-aRepatriatedFork-2 S2).
+      [path.join(__dirname, 'reap.py'), '--sweep', '--dry-run'],
       {
         cwd: root,
         encoding: 'utf8',

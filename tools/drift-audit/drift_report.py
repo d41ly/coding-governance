@@ -48,6 +48,43 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 KIT_DRIFT_AUDIT_VERSION = "1.12"
 
 CONF_NAME = ".memory-tree.conf"
@@ -478,8 +515,9 @@ def _build_local_ident(families) -> str:
 
 def _resolve_ident(root, families) -> str:
     """The shipped alternation for THIS tree, from the recall extractor where it is importable."""
-    kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
-    if not (kit / "extract.py").exists():
+    try:
+        kit = resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
         return _build_local_ident(families)
     added = str(kit)
     sys.path.insert(0, added)
@@ -525,8 +563,9 @@ def _build_local_anchors(ident: str):
 
 def _resolve_anchors(root, families):
     """The anchor patterns for THIS tree, from the recall extractor where it is importable."""
-    kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
-    if not (kit / "extract.py").exists():
+    try:
+        kit = resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
         return _build_local_anchors(_build_local_ident(families))
     added = str(kit)
     sys.path.insert(0, added)
@@ -936,7 +975,10 @@ def _load_lexicon(ctx):
     promised "never a raise and never a red"; this is what keeps that true.
     """
     import sys as _sys
-    kit = str(ctx.root / "tools" / "lexicon")
+    try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon_conf.py", pathlib.Path(__file__).resolve().parent))
+    except LookupError:
+        return None
     if kit not in _sys.path:
         _sys.path.insert(0, kit)
     try:
@@ -1000,7 +1042,10 @@ def signal_lexicon_verbs_unused(ctx) -> dict:
         return _build_not_asked(name, ".lexicon.conf is present but its kit is not importable here "
                                       "(root-prefix install, mid-teardown, or an unparseable conf)")
     import sys as _sys
-    kit = str(ctx.root / "tools" / "lexicon")
+    try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon.py", pathlib.Path(__file__).resolve().parent))
+    except LookupError as e:
+        return _build_not_asked(name, str(e))
     if kit not in _sys.path:
         _sys.path.insert(0, kit)
     try:
@@ -1199,7 +1244,10 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     if loaded is None:
         return _build_not_asked(name, ".lexicon.conf is present but its kit is not importable here")
     import sys as _sys
-    kit = str(ctx.root / "tools" / "lexicon")
+    try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon.py", pathlib.Path(__file__).resolve().parent))
+    except LookupError as e:
+        return _build_not_asked(name, str(e))
     if kit not in _sys.path:
         _sys.path.insert(0, kit)
     try:

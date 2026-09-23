@@ -249,7 +249,7 @@ def build_session_tree(main, copies=1) -> SessionTree:
                 escaped += 1
                 continue
             (wagents if path.relative_to(sub).parts[0] == "workflows" else agents).append(path)
-        flow_dir = sdir / "workflows"
+        flow_dir = sdir / "workflows"  # gov:prefix-literal — a session transcript dir's own subdir, not the review-harness kit
         for path in sorted(flow_dir.glob("wf_*.json")) if flow_dir.is_dir() else ():
             if not _check_inside(path, inside):
                 escaped += 1
