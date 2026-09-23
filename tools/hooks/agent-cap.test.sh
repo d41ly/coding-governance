@@ -1684,15 +1684,15 @@ NEST_HELPER='async function boundedParallel(thunks, cap = 5) {
   return out
 }'
 NEST_FAN='await boundedParallel(findings.map((g) => () => agent(g)), 5)'
-nest_pair() { # name nested-script flat-script, FAN standing for the unbounded verify stage
+write_nest_pair() { # name nested-script flat-script, FAN standing for the unbounded verify stage
   printf '%s\n%s\n' "$NEST_HELPER" "${2//FAN/$NEST_FAN}" > "$TMP/nest/$1.js"
   printf '%s\n%s\n' "$NEST_HELPER" "${3//FAN/$NEST_FAN}" > "$TMP/nest/$1-flat.js"
 }
-nest_pair depth-two 'const s = `a ${ `b ${ x } c` + FAN } d`' 'const s = `a ${ 1 + FAN } d`'
-nest_pair depth-three 'const s = `a ${ f({ k: `b ${ g({ m: `c ${ y } d` }) } e` }) + FAN } z`' 'const s = `a ${ f({ k: 1 }) + FAN } z`'
-nest_pair object-before-inner 'const s = `a ${ f({ k: `b ${ x } c` }) + FAN } d`' 'const s = `a ${ f({ k: 1 }) + FAN } d`'
-nest_pair arrow-body 'const s = `a ${ [1].map((v) => { return `b ${ v } c` }).join("") + FAN } d`' 'const s = `a ${ [1].map((v) => { return v }).join("") + FAN } d`'
-nest_pair multi-line 'const s = `a ${ f({ k: `b ${ x } c` })
+write_nest_pair depth-two 'const s = `a ${ `b ${ x } c` + FAN } d`' 'const s = `a ${ 1 + FAN } d`'
+write_nest_pair depth-three 'const s = `a ${ f({ k: `b ${ g({ m: `c ${ y } d` }) } e` }) + FAN } z`' 'const s = `a ${ f({ k: 1 }) + FAN } z`'
+write_nest_pair object-before-inner 'const s = `a ${ f({ k: `b ${ x } c` }) + FAN } d`' 'const s = `a ${ f({ k: 1 }) + FAN } d`'
+write_nest_pair arrow-body 'const s = `a ${ [1].map((v) => { return `b ${ v } c` }).join("") + FAN } d`' 'const s = `a ${ [1].map((v) => { return v }).join("") + FAN } d`'
+write_nest_pair multi-line 'const s = `a ${ f({ k: `b ${ x } c` })
   + FAN
 } d`' 'const s = `a ${ f({ k: 1 })
   + FAN
@@ -1722,12 +1722,12 @@ fi
 # fixture checkout is a bare `.git` DIRECTORY, which is all the root walk looks for, and each call
 # stands in a subdirectory so the walk is exercised rather than assumed.
 CAPREPO="$TMP/caprepo"; mkdir -p "$CAPREPO/.git" "$CAPREPO/sub"
-cap_harness() { # K -> a harness whose default parameter AND call site both carry K
+render_cap_harness() { # K -> a harness whose default parameter AND call site both carry K
   printf 'async function boundedParallel(thunks, cap = %s) {\n  const out = []\n  for (let i = 0; i < thunks.length; i += cap)\n    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout\n  return out\n}\nconst LENSES = [1, 2, 3]\nawait boundedParallel(LENSES.map((L) => () => agent(L)), %s)\n' "$1" "$1"
 }
-cap_check() { # name expected_exit K [text stderr must carry]
+check_cap() { # name expected_exit K [text stderr must carry]
   local payload got
-  payload=$(cap_harness "$3" | "$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":{"script":sys.stdin.read()}}))' "$CAPREPO/sub")
+  payload=$(render_cap_harness "$3" | "$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":{"script":sys.stdin.read()}}))' "$CAPREPO/sub")
   printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" = "$2" ] && { [ -z "${4:-}" ] || grep -qF -- "$4" "$TMP/err"; }; then
     echo "ok   $1 (exit $got)"; pass=$((pass+1))
@@ -1735,7 +1735,7 @@ cap_check() { # name expected_exit K [text stderr must carry]
     echo "FAIL $1 (exit $got, want $2${4:+, stderr carrying '$4'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
   fi
 }
-spawn_check() { # name expected_exit prompt_id tool_use_id [text stderr must carry]
+check_spawn() { # name expected_exit prompt_id tool_use_id [text stderr must carry]
   local got
   printf '{"tool_name":"Agent","cwd":"%s","session_id":"s7","prompt_id":"%s","tool_use_id":"%s"}' \
     "$("$TESTPY" -c 'import sys; print(sys.argv[1].replace(chr(92), "/"))' "$CAPREPO/sub")" "$3" "$4" \
@@ -1747,31 +1747,31 @@ spawn_check() { # name expected_exit prompt_id tool_use_id [text stderr must car
   fi
 }
 # No conf: the ceiling, unchanged.
-cap_check "declared cap: no conf, a cap-5 harness -> allow" 0 5
-cap_check "declared cap: no conf, a cap-4 harness -> allow" 0 4
+check_cap "declared cap: no conf, a cap-5 harness -> allow" 0 5
+check_cap "declared cap: no conf, a cap-4 harness -> allow" 0 4
 # AC4: a declared 4 is READ and ENFORCED at the call site and the default parameter.
 printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
-cap_check "declared cap: FANOUT_CAP=4, a cap-5 harness -> deny naming the effective cap" 2 5 'above the 4-agent cap'
-cap_check "declared cap: FANOUT_CAP=4, the denial names the file that lowered it" 2 5 '.agent-cap.conf'
-cap_check "declared cap: FANOUT_CAP=4, the same harness at 4 -> allow" 0 4
+check_cap "declared cap: FANOUT_CAP=4, a cap-5 harness -> deny naming the effective cap" 2 5 'above the 4-agent cap'
+check_cap "declared cap: FANOUT_CAP=4, the denial names the file that lowered it" 2 5 '.agent-cap.conf'
+check_cap "declared cap: FANOUT_CAP=4, the same harness at 4 -> allow" 0 4
 printf '# the fleet cap\nFANOUT_CAP="4"\r\n' > "$CAPREPO/.agent-cap.conf"
-cap_check "declared cap: quoted value with a CRLF ending still lowers -> deny" 2 5 'above the 4-agent cap'
+check_cap "declared cap: quoted value with a CRLF ending still lowers -> deny" 2 5 'above the 4-agent cap'
 printf 'FANOUT_CAP=5\n' > "$CAPREPO/.agent-cap.conf"
-cap_check "declared cap: FANOUT_CAP at the ceiling -> allow" 0 5
+check_cap "declared cap: FANOUT_CAP at the ceiling -> allow" 0 5
 # AC6: out of range or malformed DENIES, naming the file -- never a raise, never ignored.
 for bad in 6 0 four ''; do
   printf 'FANOUT_CAP=%s\n' "$bad" > "$CAPREPO/.agent-cap.conf"
-  cap_check "declared cap: FANOUT_CAP=${bad:-<empty>} denies a bounded harness, naming the file" 2 4 '.agent-cap.conf declares FANOUT_CAP'
+  check_cap "declared cap: FANOUT_CAP=${bad:-<empty>} denies a bounded harness, naming the file" 2 4 '.agent-cap.conf declares FANOUT_CAP'
 done
 printf 'FANOUT_CAP=6\n' > "$CAPREPO/.agent-cap.conf"
-spawn_check "declared cap: FANOUT_CAP=6 denies a direct Agent spawn too" 2 p-bad u-bad '.agent-cap.conf declares FANOUT_CAP'
+check_spawn "declared cap: FANOUT_CAP=6 denies a direct Agent spawn too" 2 p-bad u-bad '.agent-cap.conf declares FANOUT_CAP'
 # AC5: the direct-spawn slots count to the declared value, and to the ceiling without one.
 printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
-for k in 1 2 3 4; do spawn_check "declared cap: FANOUT_CAP=4, direct spawn $k -> allow" 0 p-four "u$k"; done
-spawn_check "declared cap: FANOUT_CAP=4, direct spawn 5 -> deny" 2 p-four u5 '4 of 4 claimed'
+for k in 1 2 3 4; do check_spawn "declared cap: FANOUT_CAP=4, direct spawn $k -> allow" 0 p-four "u$k"; done
+check_spawn "declared cap: FANOUT_CAP=4, direct spawn 5 -> deny" 2 p-four u5 '4 of 4 claimed'
 rm -f "$CAPREPO/.agent-cap.conf"
-for k in 1 2 3 4 5; do spawn_check "declared cap: no conf, direct spawn $k -> allow" 0 p-five "u$k"; done
-spawn_check "declared cap: no conf, direct spawn 6 -> deny (control)" 2 p-five u6 '5 of 5 claimed'
+for k in 1 2 3 4 5; do check_spawn "declared cap: no conf, direct spawn $k -> allow" 0 p-five "u$k"; done
+check_spawn "declared cap: no conf, direct spawn 6 -> deny (control)" 2 p-five u6 '5 of 5 claimed'
 
 # ---- S10: `verbatim` is CHECKED, not asserted ----------------------------------------------------
 # The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
