@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** SPECCED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-24-build-TOOL-aRepatriatedFork-2-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-TOOL-aRepatriatedFork-2-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.9   # gov:kit run-gates@1.9
+KIT_RUN_GATES_VERSION=1.10   # gov:kit run-gates@1.10
 # 1.7 -> 1.8: every bar appends one line to the run log under the git common dir, from the EXIT trap
 # (TOOL-dLoggedFlight-3). No manifest key, profile knob or stdout line moves, so neither direction of
 # a skew between the runner and its table or manifest changes a verdict.

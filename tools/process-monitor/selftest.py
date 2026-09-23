@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the process-monitor engine's arms.
 
-gov:kit process-monitor@0.3
+gov:kit process-monitor@0.4
 
 Two kinds of arm and the split is deliberate. PARSING arms run over captured fixtures, so they grade
 column contracts without a live table. LIVENESS arms run over a live read, because a property like

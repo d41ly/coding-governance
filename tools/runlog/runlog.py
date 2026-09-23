@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""runlog.py — the runlog kit's command line. gov:kit runlog@1.0
+"""runlog.py — the runlog kit's command line. gov:kit runlog@1.1
 
     python <this kit>/runlog.py journal --producer driver|gates|pushes
     python <this kit>/runlog.py extract --slug <slug> | --session <sid> | --discover [--slug <slug>]

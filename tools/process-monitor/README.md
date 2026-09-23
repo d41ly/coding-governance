@@ -1,6 +1,6 @@
 # process-monitor — find, report and kill the processes an agent session forgot
 
-<!-- gov:kit process-monitor@0.3 -->
+<!-- gov:kit process-monitor@0.4 -->
 
 Every deadline a repo like this owns bounds a command a CHECKER launched. Nothing bounds a process
 an AGENT launched — a `Bash run_in_background` job, a `Monitor` pipeline, a suite invoked by hand —

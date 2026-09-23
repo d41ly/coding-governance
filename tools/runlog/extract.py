@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""extract.py — the runlog kit's transcript extractor (TOOL-dLoggedFlight-6). gov:kit runlog@1.0
+"""extract.py — the runlog kit's transcript extractor (TOOL-dLoggedFlight-6). gov:kit runlog@1.1
 
 The driver's journal lines cover a small share of what a run does. The rest — every tool call, every
 owner turn, the compactions, the limits and the token cost — is recorded only in Claude Code's session

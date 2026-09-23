@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # adopt-runlog.sh — render the runlog Skill, and check that the rendered copy has not drifted.
-# gov:kit runlog@1.0
+# gov:kit runlog@1.1
 #
 #   bash <this kit>/adopt-runlog.sh --scaffold    # render .claude/skills/runlog/SKILL.md
 #   bash <this kit>/adopt-runlog.sh --check       # the gate leg: is the rendered Skill a fresh render?
