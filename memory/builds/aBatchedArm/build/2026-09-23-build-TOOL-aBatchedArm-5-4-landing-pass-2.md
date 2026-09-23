@@ -150,6 +150,25 @@ criterion — `AGENTS.md:512`, `memory/guides/SESSION-KICKOFF.md:224`, `tools/un
 `.githooks/gate-env.sh`, `tools/unattended/run-unattended-gates.sh` and `kit.toml`'s two lines. No
 second flip commit is owed; the GREEN above is the evidence the first one was waiting for.
 
+## The close's bar, and the last red it found
+
+`--close` ran the merge bar and it redded on the shell-hygiene leg, which gates a `while` loop fed
+by a heredoc or here-string over a variable assigned from a command substitution -- a loop that can
+read until an EOF that never arrives, and that held a merge-bar leg at zero CPU for 63 minutes on
+2026-09-10. The finding is this build's own: its registry is set-equality with shrink-only counts,
+so a build that ADDS a site cannot declare one, and `run-selftests.sh` went from 3 sites to 6 while
+`check-unattended.test.sh` gained 4 in unit 1's `check_emitted`. Both drained completely at
+`56060eab` by the remedy the checker prints -- the text written once to a scratch file, every loop
+reading that file -- so the registry row for the runner names zero sites and is deleted with them.
+
+That drain touched the runner and a suite in the pooled population, so the GREEN above no longer
+covered the tip and the pass was taken again at `56060eab`, the commit that lands: 4159 s, rc 0,
+tree fingerprint MATCHED, `sweep GREEN - 20 suite(s) ran concurrently, every one to its own end and
+matching its baseline; killed 0 / walled 0 / unrun 0 / unstarted 0 / mismatched 0`, and
+`unattended gates GREEN - 20 ran on demand`. Shard 3 was run alone against the drained helper first
+and read rc 0, 0 FAIL, 49 executed -- its calibrated baseline exactly, so the parity rows stand
+without a third calibrate.
+
 ## Reported to the owner, not fixed here
 
 - The manifest's §B now carries a dated correction saying the kit's self-tests are green whole, and
