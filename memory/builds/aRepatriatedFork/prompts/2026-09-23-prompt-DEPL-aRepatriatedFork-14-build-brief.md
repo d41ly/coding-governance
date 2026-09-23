@@ -35,6 +35,11 @@ used.
 - `python tools/memory-tree/gen_build_index.py --write` sees tracked files only: `git add` a new file
   before rendering.
 - `git rev-parse "<rev>:.claude/x"` is mangled by MSYS; use `git ls-tree <rev> -- <path>`.
+- Two legs this build has already redded twice from inside a unit: run BOTH before committing, and
+  commit only when both exit 0. `python tools/lexicon/lexicon.py` grades every new function name
+  against a pin that is an equality; `bash tools/check-install-prefix.sh` is a BAN on new carried
+  `tools/` literals, and its `--write-ratchet` cannot absorb one. Both are single checkers, not
+  suites.
 
 ## What to return
 
