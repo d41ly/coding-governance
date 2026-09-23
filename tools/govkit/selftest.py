@@ -623,6 +623,39 @@ kits = ["playbook"]
 """
 
 
+def check_playbook_hole_modes(tmp: pathlib.Path) -> None:
+    """DEPL-aRepatriatedFork-1 AC6, AC7, AC9, S5 — the placeholder hole in both modes, and the
+    `[charter]` table's two govkit halves. Fixture-driven through `check`, asserted on its lines."""
+    base = ('gov_source = "local"\nprefix = "tools"\nkits = ["playbook"]\n\n'
+            '[answers]\nplaybook_path = "CHARTER.md"\n')
+
+    def run_fixture(name: str, kits: list[str], deploy: str) -> subprocess.CompletedProcess:
+        t = make_target(tmp / name, deploy)
+        (t / "CHARTER.md").write_text("{{PROJECT_NAME}}\n", encoding="utf-8", newline="\n")
+        (t / ".governance" / "install.json").write_text(
+            json.dumps({"schema": 2, "gov_source": "local", "kits": kits,
+                        "files": [{"path": "CHARTER.md", "role": "seed", "kit": "playbook",
+                                   "written": True}]}, indent=2),
+            encoding="utf-8", newline="\n")
+        return run("check", "--target", str(t))
+
+    p = run_fixture("pb-copy", ["playbook"], base)
+    check("[aRF-1 AC7] copy mode: the placeholder hole still probes, and reds on a `{{` line",
+          "hole 'playbook-placeholders' is UNDISCHARGED" in p.stdout, p.stdout)
+    p = run_fixture("pb-render", ["playbook", "playbook-render"], base)
+    check("[aRF-1 AC6] render mode: the hole stands down, naming playbook-render",
+          "hole 'playbook-placeholders' stood down — playbook-render observes this" in p.stdout
+          and "playbook-placeholders' is UNDISCHARGED" not in p.stdout, p.stdout)
+    p = run_fixture("pb-charter", ["playbook"], base + '\n[charter]\nplaybook_path = "CHARTER.md"\n')
+    check("[aRF-1 S5] a [charter] key a selected kit's argv needs is a finding",
+          "[charter] playbook_path names a token" in p.stdout, p.stdout)
+    p = run_fixture("pb-trailer", ["playbook"],
+               base + 'commit_trailer = "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"\n')
+    check("[aRF-1 AC9] the same trailer under [answers] is still refused",
+          p.returncode != 0 and "answers.commit_trailer" in p.stdout + p.stderr,
+          p.stdout + p.stderr)
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -751,6 +784,8 @@ def main() -> int:
         p = run("check", "--target", str(full))
         check("check reds on a receipt claiming an unknown kit", p.returncode == 1, p.stdout)
         check("that message names the kit", "claims kit 'ghost-kit'" in p.stdout, p.stdout)
+
+        check_playbook_hole_modes(tmp / "pb")
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
@@ -1612,6 +1647,17 @@ user_skills = "/tmp/gk-fake-skills"
         cm.write_text(ckeep, encoding="utf-8")
         check("and is green again once the entry rejoins the default selection",
               _run_selfcheck(gcopy).returncode == 0, "")
+
+        # --- DEPL-aRepatriatedFork-1 AC7: a `stands_down.when_selected` member naming no entry.
+        pk = gcopy / "tools" / "govkit" / "entries" / "playbook.kit.toml"
+        pkeep = pk.read_text(encoding="utf-8")
+        pk.write_text(pkeep.replace('when_selected = ["playbook-render"]',
+                                    'when_selected = ["playbook-rendr"]', 1), encoding="utf-8")
+        rsd = _run_selfcheck(gcopy)
+        check("[aRF-1 AC7] selfcheck refuses a when_selected member that is not an entry",
+              rsd.returncode != 0
+              and "non-entries named: playbook-rendr" in rsd.stdout, rsd.stdout + rsd.stderr)
+        pk.write_text(pkeep, encoding="utf-8")
 
         # ===== unit 4: the gate-runner declaration, end to end =====
         # The interpreter is spelled by PATH, never by name. A bare `python` inside the fixture's

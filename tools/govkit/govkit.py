@@ -1535,6 +1535,18 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                        f"then undefined, and check has no evaluator for it")
             if not str(h.get("why", "")).strip():
                 r.fail(f"entry '{eid}' hole '{hid}' carries no reason")
+            # DEPL-aRepatriatedFork-1 S4. A `when_selected` member naming no entry never matches a
+            # selection, so the stand-down its author meant never happens and nothing says so.
+            # ONE refusal site for every malformed shape, so the one arm that stages a typo reaches it.
+            if "stands_down" in h:
+                sd = h["stands_down"] if isinstance(h["stands_down"], dict) else {}
+                ws = sd.get("when_selected")
+                stray = [str(m) for m in ws if m not in descs] if isinstance(ws, list) else []
+                if (not isinstance(ws, list) or not ws or stray
+                        or not str(sd.get("why", "")).strip()):
+                    r.fail(f"entry '{eid}' hole '{hid}' stands_down needs a non-empty "
+                           f"when_selected of registry entry ids and a why; non-entries named: "
+                           f"{', '.join(stray) or 'none'}")
 
     # ---- 7: a requires_if condition names keys that resolve in the named kit's config lists, and
     #         names a kit that is a registry entry. PLAIN `requires` gets the same name arm, because
@@ -3715,6 +3727,16 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     deploy = load_deploy(target)
     selection = receipt.get("kits") or []
 
+    # ---- DEPL-aRepatriatedFork-1 S5. `[charter]` is the render-only value class: `target_context`
+    # ---- never reads it, so a key a selected kit needs as an argv or destination token, answered
+    # ---- there, reaches no argv at all. The renderer grades its own descriptor's tokens; this is the
+    # ---- whole-selection join, which only a verb holding every descriptor can make.
+    _argv_keys = set(needed_answers(descs, [e for e in selection if e in descs]))
+    for _k in sorted(deploy.get("charter") or {}):
+        if _k.lower() in _argv_keys:
+            r.fail(f"[charter] {_k} names a token a selected kit's argv or destination needs. "
+                   f"[charter] never reaches an argv, so that value belongs in [answers]")
+
     # ---- DEPL-dCarriedReceipt-5 S7, call site two of two. The SAME predicate `plan --coverage`
     # ---- runs, so the two verbs cannot disagree about whether a decline is stale. The gap list is
     # ---- computed here rather than passed, because `check` has no plan of its own — and it is what
@@ -3929,6 +3951,10 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
             if not cmd:
                 r.fail(f"kit '{eid}' hole '{hid}' has no discharge probe, so 'discharged' is "
                        f"undefined for it and this check cannot answer the question")
+                continue
+            by = resolve_stand_down(h, selection)
+            if by:
+                print(f"govkit check — {eid}: hole '{hid}' stood down — {by} observes this")
                 continue
             resolved = []
             unresolved: list[str] = []
@@ -4312,6 +4338,20 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     return verdicts
 
 
+def resolve_stand_down(hole: dict, selection: list[str]) -> str:
+    """The selected entry a hole stands down for, or '' when its probe runs.
+
+    DEPL-aRepatriatedFork-1 S4. A `[[hole]]` may declare `stands_down = { when_selected = [...],
+    why = "..." }`: when another selected entry observes what the probe observes, and the probe is
+    WRONG in that mode, the probe is not run. The playbook's placeholder probe reads the template in
+    render mode, which always carries placeholders; the render's own `--check` is the observer.
+    """
+    for eid in (hole.get("stands_down") or {}).get("when_selected") or []:
+        if eid in selection:
+            return eid
+    return ""
+
+
 def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: str,
                configure_skipped: set[str], deploy: dict) -> bool:
     """Is a leg that is red AFTER the install exempt? Two ways, and nothing else.
@@ -4330,7 +4370,8 @@ def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: st
             if leg.get("name") != name:
                 continue
             for h in d.get("hole", []):
-                if not h.get("blocks_gate"):
+                # A stood-down hole's probe is not run, so it grants no exemption either.
+                if not h.get("blocks_gate") or resolve_stand_down(h, selection):
                     continue
                 cmd = (h.get("discharge") or {}).get("command")
                 if not cmd:

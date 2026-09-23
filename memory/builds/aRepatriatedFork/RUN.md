@@ -26,3 +26,13 @@ anchor-ref: refs/heads/main
 base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 
 ## Parked
+
+2026-09-23T18:08:18Z dispatch · item a5a6af4d DEPL-aRepatriatedFork-1 · reason tools/playbook/render_playbook.py tools/govkit/entries/playbook.kit.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/playbook/README.md WIRE-INTO-PROJECT.md .governance/deploy.toml memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-1.md memory/builds/aRepatriatedFork/build/2026-09-23-build-DEPL-aRepatriatedFork-1-journal.md
+
+2026-09-23T18:08:23Z brief · item DEPL-aRepatriatedFork-1 · reason 00119e799031 memory/builds/aRepatriatedFork/prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-1-build-brief.md
+
+2026-09-23T18:24:11Z dispatch · item a5a6af4d DEPL-aRepatriatedFork-1 · reason tools/playbook/render_playbook.py tools/govkit/entries/playbook.kit.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/playbook/README.md WIRE-INTO-PROJECT.md .governance/deploy.toml memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-1.md memory/builds/aRepatriatedFork/build/2026-09-23-build-DEPL-aRepatriatedFork-1-1-acceptance-ledger.md
+
+2026-09-23T18:25:57Z dispatch · item a5a6af4d DEPL-aRepatriatedFork-1 · reason tools/playbook/render_playbook.py tools/govkit/entries/playbook.kit.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/playbook/README.md WIRE-INTO-PROJECT.md .governance/deploy.toml memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-1.md memory/builds/aRepatriatedFork/build/2026-09-23-build-DEPL-aRepatriatedFork-1-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md
+
+2026-09-23T18:29:30Z dispatch · item a5a6af4d DEPL-aRepatriatedFork-1 · reason tools/playbook/render_playbook.py tools/govkit/entries/playbook.kit.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/playbook/README.md WIRE-INTO-PROJECT.md .governance/deploy.toml memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-1.md memory/builds/aRepatriatedFork/build/2026-09-23-build-DEPL-aRepatriatedFork-1-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md memory/map/generated/symbols.json

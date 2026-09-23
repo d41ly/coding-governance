@@ -1423,6 +1423,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_playbook_hole_modes",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_producer_keys",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4133,6 +4138,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_argv_tokens",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_bash_conf_values",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4156,6 +4166,11 @@
       "id": "read_canon_refusal",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_charter_table",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_class_values",
@@ -5393,6 +5408,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "resolve_placeholder_value",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -5491,6 +5511,11 @@
       "id": "resolve_source",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
+    },
+    {
+      "id": "resolve_stand_down",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "resolve_state_dir",

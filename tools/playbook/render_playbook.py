@@ -9,9 +9,13 @@ to the runbook.
 THE THREE CLASSES. Every placeholder is DECLARED in the playbook entry's govkit descriptor as one of:
 
   derived    a named probe here computes it from the target repo. The render PRINTS what it derived,
-             so a wrong derivation is visible rather than silent. A probe returning nothing falls
-             through to REFUSAL, never to a default it did not declare — a probe that quietly returns
-             the empty string is how a charter ships with a blank where a branch name belongs.
+             so a wrong derivation is visible rather than silent. AN EXPLICIT ANSWER OUTRANKS THE
+             PROBE (DEPL-aRepatriatedFork-1 S1): a probe that answers WRONGLY — a submodule's
+             `.git/modules/<name>` read as the primary tree — was uncorrectable, so both adopters
+             forked the descriptor instead. The note line prints the answer beside what the probe
+             would have derived. A probe returning nothing with no answer falls through to REFUSAL,
+             never to a default it did not declare — a probe that quietly returns the empty string
+             is how a charter ships with a blank where a branch name belongs.
   asked      it must come from the target's deploy.toml answers table. Absent is a refusal NAMING the
              key. Nothing is guessed; that posture is govkit's and this engine inherits it.
   defaulted  a declared default applies, and the render RECORDS that it defaulted. A default silently
@@ -20,6 +24,12 @@ THE THREE CLASSES. Every placeholder is DECLARED in the playbook entry's govkit 
 TWO FENCE NAMESPACES, AND NEITHER READS A BOOLEAN.
   <!-- kit:<id> -->      drops when <id> is absent from deploy.toml's `kits`.
   <!-- when:<name> -->   drops when <name> is a MEMBER of deploy.toml's `drop_blocks`.
+
+WHERE A VALUE COMES FROM, in order: deploy.toml's `[charter]` table, then `[answers]`, then (for
+`derived`) the probe or (for `defaulted`) the declared default. `[charter]` is the RENDER-ONLY value
+class: govkit's `target_context` never reads it, so nothing in it reaches a `ctx` token or an argv,
+and it may therefore carry the prose `[answers]` refuses — an em dash, angle brackets, a backtick.
+What it may NOT carry is graded by `read_charter_table`.
 
 `drop_blocks` is a LIST, not a set of booleans, and that is load-bearing. govkit's intake writes
 every answer as `key = "value"`, so a key "answered false" arrives as the STRING `false` — truthy
@@ -69,6 +79,11 @@ CLOSE_RE = re.compile(r'^[ \t]*<!--\s*/(kit|when):([A-Za-z0-9_-]+)\s*-->[ \t]*$'
 PLACEHOLDER_RE = re.compile(r'\{\{([A-Z][A-Z0-9_]*)\}\}')
 REGION_OPEN = '<!-- gov:playbook -->'
 REGION_CLOSE = '<!-- /gov:playbook -->'
+REGION_MARKER_RE = re.compile(r'<!--\s*/?gov:playbook\s*-->')
+# govkit's TOKEN_RX, spelled again because this engine ships without govkit. `{relpath}` and the
+# seeded three are govkit-derived, so they are never an operator's key.
+ARGV_TOKEN_RE = re.compile(r'(?<!\$)\{([a-z_]+)\}')
+ARGV_DERIVED_TOKENS = {'prefix', 'kit_id', 'kit', 'relpath', 'memory_root'}
 
 
 class Refusal(Exception):
@@ -330,6 +345,10 @@ def resolve_template_path(gov_root: Path, target: Path, answers: dict) -> Path:
     The deployer lands it at the operator-chosen `playbook_path`, so that answer is authoritative
     when a target has one — and when it names a file that is not there, the read REFUSES rather than
     silently falling back to gov's copy, which would render somebody else's template.
+
+    `playbook_path` names the TEMPLATE here, never the charter; the charter is `--charter`. When the
+    two are one file `render` refuses (S3), because the render would append a region into its own
+    template and the next render would read that region back as template text.
     """
     p = answers.get('playbook_path')
     if isinstance(p, str) and p:
@@ -344,7 +363,103 @@ def load_declarations(desc_path: Path, reg_path: Path) -> tuple[dict, list[dict]
     return desc, desc.get('block', []), entries
 
 
-def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[str]]:
+def read_argv_tokens(desc: dict) -> set[str]:
+    """Every `{token}` the descriptor puts in a destination or an argv — govkit's `needed_answers`
+    walk over the ONE descriptor this engine ships with. The whole-selection join is `govkit check`'s,
+    which holds every descriptor; this engine holds only its own."""
+    blobs: list[str] = []
+    for rule in desc.get('files', []):
+        to = rule.get('to')
+        blobs += (to if isinstance(to, list) else [to]) if to else []
+    for h in desc.get('hole', []):
+        blobs += (h.get('discharge') or {}).get('command') or []
+    for leg in desc.get('gate_leg', []):
+        blobs += (leg.get('argv') or []) + (leg.get('guard') or [])
+    blobs += (desc.get('adopt') or {}).get('argv') or []
+    blobs += (desc.get('check') or {}).get('argv') or []
+    return {t for b in blobs for t in ARGV_TOKEN_RE.findall(b or '')} - ARGV_DERIVED_TOKENS
+
+
+def read_charter_table(cfg: dict, rows: list[dict], argv_tokens: set[str]) -> dict[str, str]:
+    """The `[charter]` table, every key and value graded. Returns `{lowercase key: value}`.
+
+    Refused, naming the key: a key that is an argv token (its value must reach that argv, so it
+    belongs in `[answers]`, where this engine's reader would never see it moved); a key no
+    `[[placeholder]]` declares (it would supply nothing, silently); a non-string value; a control
+    character other than a newline; the `{{` opener (the value would re-enter substitution); and a
+    `gov:playbook` region marker (the value would split the region `build_region` rewrites).
+    """
+    table = cfg.get('charter') or {}
+    if not isinstance(table, dict):
+        raise Refusal('deploy.toml `charter` must be a table of placeholder keys')
+    declared = {r['key'].lower() for r in rows}
+    out: dict[str, str] = {}
+    for k, v in table.items():
+        key = k.lower()
+        if key in argv_tokens:
+            raise Refusal(f'[charter] {k} names a token an argv or destination of this kit needs. '
+                          f'[charter] never reaches an argv, so that value belongs in [answers]')
+        if key not in declared:
+            raise Refusal(f'[charter] {k} names no declared [[placeholder]], so it would supply '
+                          f'nothing. A misspelt key here is otherwise silent')
+        if not isinstance(v, str):
+            raise Refusal(f'[charter] {k} must be a string')
+        bad = sorted({c for c in v if (ord(c) < 32 and c != '\n') or ord(c) == 127})
+        if bad:
+            raise Refusal(f'[charter] {k} carries control character(s) {"".join(bad)!r}; only a '
+                          f'newline is admitted')
+        if '{{' in v:
+            raise Refusal(f'[charter] {k} carries `{{{{`, which would re-enter placeholder '
+                          f'substitution')
+        if REGION_MARKER_RE.search(v):
+            raise Refusal(f'[charter] {k} carries a gov:playbook region marker, which would split '
+                          f'the region the render rewrites')
+        out[key] = v
+    return out
+
+
+def resolve_placeholder_value(row: dict, charter: dict, answers: dict,
+                              target: Path) -> tuple[str, str]:
+    """One placeholder's value and its note line. Precedence: `[charter]`, `[answers]`, then the
+    probe (derived) or the declared default (defaulted). The one site the three classes share."""
+    key, cls = row['key'], row.get('class')
+    given = charter.get(key.lower()) or answers.get(key.lower())
+    if cls == 'derived':
+        probe = PROBES.get(row.get('probe', ''))
+        if probe is None:
+            raise Refusal(f'{key} declares probe `{row.get("probe")}`, which this engine does '
+                          f'not define')
+        seen = probe(target, answers)
+        if given:
+            # F2, RESOLVED: a redundant answer is a note, never a failure. The empty-probe case is
+            # gov's own `ci_file`: no workflow exists yet, and the answer says so.
+            why = ('probe derives nothing' if not seen else
+                   'redundant: the probe derives the same value' if str(given) == seen else
+                   f'probe would derive {seen}')
+            return given, f'answered  {key} = {given}   ({why})'
+        if not seen:
+            raise Refusal(f'{key} is derived by probe `{row["probe"]}`, it returned nothing for '
+                          f'this target, and no answer overrides it. Supply it under [answers] or '
+                          f'[charter] rather than shipping a blank')
+        return seen, f'derived   {key} = {seen}'
+    if cls == 'asked':
+        if given in (None, ''):
+            raise Refusal(f'{key} is an ASKED placeholder and deploy.toml supplies no value for it. '
+                          f'Refusing to invent one: an answer this tool guesses is one the '
+                          f'operator never made and cannot audit')
+        return given, f'answered  {key}'
+    if cls == 'defaulted':
+        if given:
+            return given, f'answered  {key}'
+        val = row.get('default', '')
+        if not val:
+            raise Refusal(f'{key} is defaulted and its declared default is empty')
+        return val, f'DEFAULTED {key} = {val}   (no answer supplied)'
+    raise Refusal(f'{key} declares class `{cls}`, which is not derived, asked or defaulted')
+
+
+def render(engine_dir: Path, gov_root: Path, target: Path,
+           charter_path: Path | None = None) -> tuple[str, list[str]]:
     desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
     dep = target / '.governance' / 'deploy.toml'
     if not dep.is_file():
@@ -352,6 +467,8 @@ def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[st
                       f'answers this render reads, once, and refuses to overwrite them afterwards')
     cfg = tomllib.loads(dep.read_text(encoding='utf-8'))
     answers = {k.lower(): v for k, v in (cfg.get('answers') or {}).items()}
+    rows = desc.get('placeholder', [])
+    charter = read_charter_table(cfg, rows, read_argv_tokens(desc))
     kits = set(cfg.get('kits') or [])
     drop_names = list(cfg.get('drop_blocks') or [])
 
@@ -378,6 +495,12 @@ def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[st
                           f'that drops nothing is a typo or a block that has already gone')
 
     template = resolve_template_path(gov_root, target, answers)
+    if (charter_path is not None and template.is_file() and charter_path.is_file()
+            and os.path.samefile(template, charter_path)):
+        raise Refusal(f'the template {template.as_posix()} and the charter '
+                      f'{charter_path.as_posix()} are one file, so the render would append a '
+                      f'region into its own template. `playbook_path` names the TEMPLATE; point it '
+                      f'at the installed template, or pass a different --charter')
     text = read_input(template, 'the charter template')
     present = check_fences(text, entries, declared_blocks)
     for d in drop_names:
@@ -389,51 +512,14 @@ def render(engine_dir: Path, gov_root: Path, target: Path) -> tuple[str, list[st
     text = remove_fenced(text, drop)
 
     notes = []
-    rows = desc.get('placeholder', [])
     by_key = {r['key']: r for r in rows}
     for key in sorted(set(PLACEHOLDER_RE.findall(text))):
         row = by_key.get(key)
         if row is None:
             raise Refusal(f'the template carries {{{{{key}}}}} and the descriptor declares no '
                           f'[[placeholder]] row for it, so nothing can supply a value')
-        cls = row.get('class')
-        if cls == 'derived':
-            probe = PROBES.get(row.get('probe', ''))
-            if probe is None:
-                raise Refusal(f'{key} declares probe `{row.get("probe")}`, which this engine does '
-                              f'not define')
-            val = probe(target, answers)
-            if not val:
-                # AN EXPLICIT ANSWER OVERRIDES A PROBE THAT CANNOT SEE. Gov's own first render found
-                # this: it has no CI workflow yet, so `ci_file` derived to nothing and the refusal
-                # told the operator to "supply it as an answer" — which the engine then did not
-                # honour. A message naming an escape the code does not implement is worse than no
-                # escape. What is still refused is the SILENT case: probe empty AND no answer.
-                val = answers.get(key.lower()) or ''
-                if not val:
-                    raise Refusal(f'{key} is derived by probe `{row["probe"]}`, it returned nothing '
-                                  f'for this target, and no answer overrides it. Supply it under '
-                                  f'[answers] rather than shipping a blank')
-                notes.append(f'override  {key} = {val}   (probe saw nothing)')
-            else:
-                notes.append(f'derived   {key} = {val}')
-        elif cls == 'asked':
-            val = answers.get(key.lower())
-            if val in (None, ''):
-                raise Refusal(f'{key} is an ASKED placeholder and {dep.as_posix()} supplies no value '
-                              f'for it. Refusing to invent one: an answer this tool guesses is one '
-                              f'the operator never made and cannot audit')
-            notes.append(f'answered  {key}')
-        elif cls == 'defaulted':
-            val = answers.get(key.lower()) or row.get('default', '')
-            if not val:
-                raise Refusal(f'{key} is defaulted and its declared default is empty')
-            if not answers.get(key.lower()):
-                notes.append(f'DEFAULTED {key} = {val}   (no answer supplied)')
-            else:
-                notes.append(f'answered  {key}')
-        else:
-            raise Refusal(f'{key} declares class `{cls}`, which is not derived, asked or defaulted')
+        val, note = resolve_placeholder_value(row, charter, answers, target)
+        notes.append(note)
         text = build_substitution(text, key, str(val))
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
@@ -533,6 +619,106 @@ def run_selftest() -> int:
             failed += 1
             print(f'  arm FAIL a pipe in PROSE is left alone — got {body.strip()!r}')
 
+    # DEPL-aRepatriatedFork-1. Each case is a whole fixture: a descriptor, a template and the
+    # deploy.toml tail below `kits`, so an arm states exactly the input it is about.
+    def arm_fixture(name: str, desc: str, tpl: str, deploy: str, want: str | None = None,
+             in_body: str = '', in_notes: str = ''):
+        nonlocal passed, failed
+        with tempfile.TemporaryDirectory() as td:
+            eng, tgt = Path(td) / 'engine', Path(td) / 'target'
+            eng.mkdir()
+            (tgt / '.governance').mkdir(parents=True)
+            (eng / 'playbook.kit.toml').write_text(desc, encoding='utf-8')
+            (eng / 'registry.toml').write_text(REG_FIXTURE, encoding='utf-8')
+            (tgt / 'CHARTER.md').write_text(tpl, encoding='utf-8')
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                'kits = ["lexicon"]\n\n' + deploy, encoding='utf-8')
+            try:
+                body, notes = render(eng, Path(td), tgt)
+                got = None
+            except Refusal as e:
+                body, notes, got = '', [], str(e)
+        if want is None:
+            ok = got is None and in_body in body and any(in_notes in n for n in notes)
+            detail = f'refused: {got}' if got else f'body {body!r} notes {notes!r}'
+        else:
+            ok = got is not None and want in got
+            detail = 'no refusal at all' if got is None else f'refused with: {got}'
+        if ok:
+            passed += 1
+        else:
+            failed += 1
+            print(f'  arm FAIL {name} — {detail}')
+
+    probe_desc = ('[[placeholder]]\nkey = "MEMORY_ROOT"\nclass = "derived"\n'
+                  'probe = "memory_root"\n')
+    # S1 / AC1 — an answer outranks a probe that DOES answer. The fixture has no .memory-tree.conf,
+    # so the probe derives `memory`; the answer says `records`, and the answer must win.
+    arm_fixture('an answer outranks a derived probe that answers too', probe_desc,
+         'root {{MEMORY_ROOT}}\n',
+         '[answers]\nplaybook_path = "CHARTER.md"\nmemory_root = "records"\n',
+         in_body='root records', in_notes='(probe would derive memory)')
+    # F2 — an answer equal to the probe is a note, never a refusal.
+    arm_fixture('an answer equal to its probe is noted as redundant', probe_desc,
+         'root {{MEMORY_ROOT}}\n',
+         '[answers]\nplaybook_path = "CHARTER.md"\nmemory_root = "memory"\n',
+         in_body='root memory', in_notes='redundant: the probe derives the same value')
+    # S5 — [charter] outranks [answers], for a derived key too (F3).
+    arm_fixture('a [charter] value outranks an [answers] value', probe_desc,
+         'root {{MEMORY_ROOT}}\n',
+         '[charter]\nmemory_root = "ledger"\n\n'
+         '[answers]\nplaybook_path = "CHARTER.md"\nmemory_root = "records"\n',
+         in_body='root ledger', in_notes='answered  MEMORY_ROOT = ledger')
+
+    # AC9 — the mandated trailer, which [answers] cannot carry, rides [charter] byte-exact.
+    trailer_desc = '[[placeholder]]\nkey = "COMMIT_TRAILER"\nclass = "asked"\n'
+    trailer = 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>'
+    arm_fixture('[charter] carries the commit trailer byte-exact', trailer_desc,
+         'end with `{{COMMIT_TRAILER}}`\n',
+         f'[charter]\ncommit_trailer = "{trailer}"\n\n[answers]\nplaybook_path = "CHARTER.md"\n',
+         in_body=f'end with `{trailer}`', in_notes='answered  COMMIT_TRAILER')
+
+    # AC10 — four hostile [charter] shapes, each refused naming the key.
+    ans = '\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
+    arm_fixture('a [charter] value carrying the {{ opener is refused', trailer_desc,
+         '{{COMMIT_TRAILER}}\n', '[charter]\ncommit_trailer = "a {{MACHINE_A}} b"' + ans,
+         want='[charter] commit_trailer carries `{{`')
+    arm_fixture('a [charter] value carrying a region marker is refused', trailer_desc,
+         '{{COMMIT_TRAILER}}\n', '[charter]\ncommit_trailer = "x <!-- /gov:playbook --> y"' + ans,
+         want='[charter] commit_trailer carries a gov:playbook region marker')
+    arm_fixture('a [charter] value carrying a control byte is refused', trailer_desc,
+         '{{COMMIT_TRAILER}}\n', '[charter]\ncommit_trailer = "a\\u001bb"' + ans,
+         want='[charter] commit_trailer carries control character')
+    arm_fixture('a [charter] key an argv needs is refused', trailer_desc
+         + '\n[[placeholder]]\nkey = "PLAYBOOK_PATH"\nclass = "asked"\n\n'
+         '[[files]]\ninclude = ["x"]\nto = "{playbook_path}"\n',
+         '{{COMMIT_TRAILER}}\n', '[charter]\nplaybook_path = "CHARTER.md"' + ans,
+         want='[charter] playbook_path names a token an argv')
+    arm_fixture('a [charter] key naming no placeholder is refused', trailer_desc,
+         '{{COMMIT_TRAILER}}\n', '[charter]\ncomit_trailer = "x"' + ans,
+         want='[charter] comit_trailer names no declared [[placeholder]]')
+
+    # S3 / AC5 — the template is never its own charter. Driven through `main`, so the exit code is
+    # the one an operator sees, over gov's own declarations and a real registry entry.
+    import contextlib
+    import io
+    with tempfile.TemporaryDirectory() as td:
+        tgt = Path(td)
+        (tgt / '.governance').mkdir()
+        (tgt / '.governance' / 'deploy.toml').write_text(
+            'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "AGENTS.md"\n', encoding='utf-8')
+        (tgt / 'AGENTS.md').write_text('{{PROJECT_NAME}}\n', encoding='utf-8')
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+            rc = main(['--target', str(tgt)])
+        left = (tgt / 'AGENTS.md').read_text(encoding='utf-8')
+        if rc == 1 and 'are one file' in err.getvalue() and left == '{{PROJECT_NAME}}\n':
+            passed += 1
+        else:
+            failed += 1
+            print(f'  arm FAIL a template that is its own charter is refused — rc {rc}, '
+                  f'{err.getvalue()!r}, file now {left!r}')
+
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')
         return 1
@@ -569,7 +755,7 @@ def main(argv: list[str]) -> int:
         return 0
 
     try:
-        body, notes = render(engine_dir, gov_root, target)
+        body, notes = render(engine_dir, gov_root, target, charter_path)
     except Refusal as e:
         print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
         return 1
@@ -618,4 +804,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.0"  # gov:kit playbook-render@1.0
+KIT_PLAYBOOK_RENDER_VERSION = "1.1"  # gov:kit playbook-render@1.1

@@ -136,6 +136,19 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 `§15`'s persona is adjustable per project and is NOT a droppable block: editing the persona is the
 sanctioned change, and its facts-over-wit rules are not adjustable at all.
 
+### Where each value comes from
+
+- **Precedence.** `[charter]`, then `[answers]`, then the probe or the declared default. An answer
+  outranks a probe, and the render prints both, so correct a wrong derivation by answering it rather
+  than by forking the descriptor.
+- **`playbook_path` names the TEMPLATE** when `playbook-render` is selected; the charter is
+  `--charter`, default `AGENTS.md`, and the render refuses when the two are one file. Without the
+  renderer it is the copied charter, and the placeholder hole probes it.
+- **`[charter]`** holds render-only prose that `[answers]` refuses, such as the commit trailer with
+  its angle brackets. govkit never reads it into an argv. A key there must name a declared
+  placeholder and no argv token, and a value may not carry a control character other than a
+  newline, `{{`, or a `gov:playbook` marker.
+
 **Verify:** the renderer's `--check` is the standing verification and it asserts two separate things
 — that the rendered region still matches the template plus the answers, and that no placeholder
 survived. Those are two questions, and a conf that declares nothing for a key renders a region that
