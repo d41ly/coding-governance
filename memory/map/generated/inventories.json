@@ -70,6 +70,7 @@
       "playbook render selftest",
       "playbook render wiring",
       "playbook validity gate",
+      "pre-push bar self-test",
       "pre-push run-log line",
       "pre-push self-test",
       "process-monitor adopter selftest",
@@ -141,7 +142,8 @@
     "git-hooks": [
       "gate-env.sh",
       "pre-commit",
-      "pre-push"
+      "pre-push",
+      "pre_push_bar_selftest.py"
     ],
     "workflow-scripts": [
       "check-workflow-syntax.js",

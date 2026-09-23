@@ -20,6 +20,11 @@ if [ -f "$tmp/race-once" ]; then rm -f "$tmp/race-once"; git -C "$tmp/racer" com
 STUB
 chmod +x "$tmp/stub.sh"
 export GOV_GATE_CMD="bash $tmp/stub.sh"
+# THE DECLARED TEST ESCAPE (TOOL-aRepatriatedFork-5). The stub above lives under mktemp and is
+# untracked by construction, and .githooks/pre-push refuses an untracked merge bar. This waives the
+# tracked-file requirement, marks the hook's decision line 'bar: STUB', and makes push-main withhold
+# the lander marker, which case 9 grades. Case 9b unsets it deliberately.
+export GOV_GATE_CMD_TEST=1
 # The scratch work repo is `git init`+`remote add` (origin/HEAD unset); pin the default so the hook's
 # and lander's fail-CLOSED resolution doesn't refuse every case (that path is tested by cases 7-8).
 export GOV_DEFAULT_BRANCH=main
@@ -83,5 +88,36 @@ git checkout -q -- junk 2>/dev/null || true
 # 8 — the lander fails CLOSED when the default branch is unresolvable (origin/HEAD unset here)
 out8=$( ( unset GOV_DEFAULT_BRANCH; bash tools/push-main.sh 2>&1 ) )
 case "$out8" in *"determine the default branch"*) ok "8 unresolvable default → fail closed";; *) bad "8 expected fail-closed: $out8";; esac
+
+# 9 — a push gated by the declared STUB is not a landing: with LANDER_MARKER declared, push-main lands
+#     the push under GOV_GATE_CMD_TEST, writes NO marker, and says why. Without this, a stub-gated push
+#     leaves exactly the artifact `unattended.sh --landed` accepts (TOOL-aRepatriatedFork-5).
+#     Back onto origin first: case 6 left a conflicting commit that would stop the reconcile.
+git fetch -q origin main && git reset -q --hard origin/main
+printf 'LANDER_MARKER=unattended-landed\n' > .unattended.conf
+git add .unattended.conf && git commit -q -m lander-conf
+gcd=$(cd "$(git rev-parse --git-common-dir)" && pwd)
+rm -f "$gcd/unattended-landed"
+lander=$(git ls-files -- '*push-main.sh')   # the copy setup_repo committed, derived rather than spelled
+out9=$(bash "$lander" 2>&1); rc9=$?
+if [ "$rc9" -ne 0 ]; then bad "9 push-main should land under the stub: $out9"
+elif [ -f "$gcd/unattended-landed" ]; then bad "9 a STUB-gated push wrote the lander marker: $(cat "$gcd/unattended-landed")"
+else
+  case "$out9" in
+    *"NOT writing the lander marker"*) ok "9 a STUB-gated landing writes no lander marker, and says so" ;;
+    *) bad "9 the marker was withheld without saying why: $out9" ;;
+  esac
+fi
+
+# 9b — ITS CONTROL: the same lander with a TRACKED bar and no escape writes the marker naming the
+#      pushed commit. Without it, 9 passes on a push-main that never writes a marker at all.
+printf '#!/usr/bin/env bash\nexit 0\n' > bar.sh
+git add bar.sh && git commit -q -m tracked-bar
+out9b=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash bar.sh" bash "$lander" 2>&1 ) ); rc9b=$?
+if [ "$rc9b" -eq 0 ] && grep -q "$(git rev-parse HEAD)" "$gcd/unattended-landed" 2>/dev/null; then
+  ok "9b control — a push gated by a tracked bar writes the lander marker naming the pushed commit"
+else
+  bad "9b a tracked-bar landing did not write its marker (rc $rc9b): $out9b"
+fi
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

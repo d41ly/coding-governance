@@ -3,7 +3,7 @@
  * stop-guard — a `Stop` hook that refuses the turn end of a session bound to a non-terminal
  * unattended run, and continues the conversation with the absent-owner instruction instead.
  *
- * gov:kit unattended@1.28 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.29 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aWokenSentinel-3 under the build folder of that slug.

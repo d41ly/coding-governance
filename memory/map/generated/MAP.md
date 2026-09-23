@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 115 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 87 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 116 · kits: 17 · git-hooks: 4 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 87 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -77,6 +77,7 @@ Inventories: gate-legs: 115 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `playbook render selftest` | playbook |
 | `playbook render wiring` | playbook |
 | `playbook validity gate` | playbook-mode |
+| `pre-push bar self-test` | run-gates |
 | `pre-push run-log line` | runlog |
 | `pre-push self-test` | baseline |
 | `process-monitor adopter selftest` | process-monitor |
@@ -155,6 +156,7 @@ Inventories: gate-legs: 115 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 �
 | `gate-env.sh` | foundation |
 | `pre-commit` | baseline |
 | `pre-push` | baseline |
+| `pre_push_bar_selftest.py` | run-gates |
 
 ## workflow-scripts
 

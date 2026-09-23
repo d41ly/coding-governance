@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-5 — pre-push runs only a tracked, unmodified gate command
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-5-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-TOOL-aRepatriatedFork-5-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-5-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -150,7 +151,21 @@ The four hostile values AC2 names, in nc's order. Each landed at rc 0 on some vi
 
 Two refusals are added, each writing `RUNLOG_DECISION=refuse-bar` and exiting 1 before the bar:
 a value naming no script, and a value failing any S1 clause. Their messages are nc's, with
-`$GOV_KITROOT` kept in the sanctioned-use hint.
+`$GOV_KITROOT` kept in the sanctioned-use hint. nc's block keeps one exit per S1 clause, so the two
+refusals are FIVE exit sites sharing one code, and the run-log suite's exit table carries that row
+with a count of 5. A refused END carries no `bar` key: the class is set only once the value is vetted.
+
+### The ported harness
+
+`.githooks/pre_push_bar_selftest.py`, Python as nc wrote it, with its functions renamed to the verb
+table (`print_ok`, `print_fail`, `check_refused`, `check_landed`, `run_push`, `read_tip`) and every
+text encoding named. It adds three `bar` checks and one `refuse-bar` check on the run-log END, so it
+observes AC5 as well. Its leg is `pre-push bar self-test`: held with the other hook suites
+(`chunk = selftests`, `subject = repo`), shipped by the push-main entry beside `pre-push.test.sh` with
+its own `[[gate_leg]]` so an adopter can retire its copy, ceiling 600 over one out-of-band proxy
+reading, and claimed, with the file's own `git-hooks` key, by the run-gates dossier. `tools/check-testsuite-counts.sh` grades `*.test.sh`
+only, so a Python leg has no row there; the harness prints `PASS (<n> assertions)` against its own
+`FLOOR_ASSERTIONS` instead.
 
 ### Placement
 
@@ -200,6 +215,10 @@ so no marker moves; the unattended kit bumps for S7's template edit.
 - `tools/unattended/unattended.sh`, `tools/unattended/check-unattended.sh`, `tools/unattended/check-pass-order.sh`, `tools/unattended/check-brief-recorded.sh` (the `KIT_UNATTENDED_VERSION` bump)
 - `AGENTS.md`
 - `tools/gate-legs.json` (a leg for the ported bar self-test, if F2 lands that way)
+- as built, also: `.githooks/pre_push_bar_selftest.py`, `tools/govkit/entries/push-main.kit.toml`,
+  `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt`,
+  `tools/run-gates/selftest-budgets.txt`, `memory/map/features/run-gates.md` with its generated map,
+  `memory/guides/UNATTENDED-PROTOCOL.md`, and every other `unattended@` marker carrier for 1.29
 
 ### Alternatives rejected
 
@@ -288,6 +307,10 @@ New arm: a port of nc's `scripts/pre_push_bar_selftest.py` under `.githooks/`, w
 
 - rev-1 · 2026-09-23 · initial draft, measured against gov a7c78ad2, nc f69e2ffb and inCMS 1bc57da27,
   with the exploit reproduced in a scratch repo under the session scratchpad.
+- rev-2 · 2026-09-23 · built. §4 Data model: the two refusal classes are five exit sites of one
+  code, and a refused END records no `bar`. §4 gains "The ported harness": Python kept, renamed to
+  the verb table, AC5's run-log checks added, shipped with its own leg; it has no testsuite-count row
+  because that leg grades `*.test.sh` only. Unattended kit bumped 1.28 to 1.29 for S7.
 
 ## 10. Reuse audit
 

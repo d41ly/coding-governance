@@ -17,11 +17,11 @@ claims = ["tools/push-main.sh", "tools/push-main.test.sh"]
 # A verbatim repo-root destination with no prefix at all — the class the guard table calls
 # "verbatim repo-root", emitted under the identity substitution.
 [[files]]
-include = [".githooks/pre-push", ".githooks/pre-push.test.sh"]
+include = [".githooks/pre-push", ".githooks/pre-push.test.sh", ".githooks/pre_push_bar_selftest.py"]
 role = "engine"
 root_relative = true
 to = "{relpath}"
-claims = [".githooks/pre-push", ".githooks/pre-push.test.sh"]
+claims = [".githooks/pre-push", ".githooks/pre-push.test.sh", ".githooks/pre_push_bar_selftest.py"]
 
 # THE HOOK'S RUN-LOG SUITE IS WITHHELD, per TOOL-aQuenchedHarness-3. Its subject is the hook's own
 # writer, which a target receives verbatim and never edits, so it has a job only where that source
@@ -73,6 +73,15 @@ the self-test is this entry's gate leg and there is no rendered artifact to comp
 name = "pre-push self-test"
 subject = "repo"
 argv = ["bash", ".githooks/pre-push.test.sh"]
+guard = [".githooks/"]
+
+# THE BAR HARNESS, which re-disables the hook's first-word, option and working-copy arms in a copy
+# on every run and observes the evasions land (TOOL-aRepatriatedFork-5, the owner's F2 ruling). It
+# ships so an adopter can retire its own copy: NicoCares carried the original.
+[[gate_leg]]
+name = "pre-push bar self-test"
+subject = "repo"
+argv = ["python3", ".githooks/pre_push_bar_selftest.py"]
 guard = [".githooks/"]
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own

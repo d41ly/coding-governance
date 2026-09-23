@@ -500,6 +500,19 @@
     "ceiling": 600
   },
   {
+    "name": "pre-push bar self-test",
+    "argv": [
+      "python3",
+      ".githooks/pre_push_bar_selftest.py"
+    ],
+    "guard": [
+      ".githooks/"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 600
+  },
+  {
     "name": "push-main self-test",
     "argv": [
       "bash",

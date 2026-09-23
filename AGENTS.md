@@ -531,8 +531,10 @@ read the durable summary instead.
 
 **The push boundary is where the bar binds.** The tracked `.githooks/pre-push` hook runs
 `tools/run-gates/run-gates.sh` once on a default-branch push and blocks a red one (it classifies on the remote
-ref, the validated tree must be the pushed tip, `GOV_GATE_CMD` overrides the gate for testing, and
-`--no-verify` bypasses). Earlier runs are diff-scoped and are developer-choice. `core.hooksPath` is
+ref, the validated tree must be the pushed tip, and `--no-verify` bypasses). `GOV_GATE_CMD` may
+name only a script this repo tracks, unmodified, and anything else is refused before a bar runs;
+`GOV_GATE_CMD_TEST=1` is the one test escape, labelled `bar: STUB` and denied a lander marker
+(`TOOL-aRepatriatedFork-5`). Earlier runs are diff-scoped and are developer-choice. `core.hooksPath` is
 repo-GLOBAL, so the hook gating your push is the PRIMARY tree's; check H REPORTS a divergence. A tracked pre-commit fast leg sits beside it and also enforces the
 branch guard, refusing a primary-tree commit off the default branch (`GOV_DEFAULT_BRANCH` pins it).
 A SessionStart hook runs `tools/check-wiring.sh --session`, which auto-sets an unset

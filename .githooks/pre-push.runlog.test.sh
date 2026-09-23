@@ -48,7 +48,7 @@ SRC="$(cd "$HERE/.." && pwd)"
 # Where this repository keeps its kits, the hook's own default. The suite never ships, so only gov's
 # layout and a caller's override are ever asked for.
 KIT_REL="${KIT_REL:-tools}"
-FLOOR_ASSERTIONS=240
+FLOOR_ASSERTIONS=246
 n=0; st=0
 SEEN=" "; WRITER_FNS=""
 
@@ -61,6 +61,10 @@ unset GATE_BASE GATE_FULL GATE_REUSE GATE_JOBS GATE_PROFILES GATE_PROFILE GATE_R
   GOV_DEFAULT_BRANCH GIT_SSH_COMMAND PPRL_SEEN GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR \
   GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_PREFIX
 export GOV_DEFAULT_BRANCH=main
+# THE DECLARED TEST ESCAPE (TOOL-aRepatriatedFork-5). Every bar below is an mktemp stub or a copy of
+# the runner outside the scratch tree, untracked by construction, and the hook refuses an untracked
+# bar. The DEC arm's `bar` checks empty it per push to reach the tracked, default and refused cases.
+export GOV_GATE_CMD_TEST=1
 
 check() { # name · got · want
   n=$((n + 1))
@@ -578,6 +582,27 @@ check_dec_rest() {
   check "DEC no-branch: by that refusal" "$(printf '%s\n' "$ERR" | grep -c 'no branch in this clone')" 1
   check "DEC no-branch: one once line" "$((l - l0))|$(read_field $l ev)|$(read_field $l decision)" "1|once|refuse-default-branch"
   git remote set-head origin main >/dev/null 2>&1
+  # WHICH BAR (TOOL-aRepatriatedFork-5). END names the CLASS of bar the push was gated by, and a
+  # value the hook cannot vouch for is refused before any bar, as `refuse-bar`, recording no bar.
+  # The escape is emptied per push here, because every other arm in this file depends on it.
+  printf '#!/usr/bin/env bash\nexit 0\n' > tracked-bar.sh && git add tracked-bar.sh && git commit -q -m bar
+  write_refs "$WORK/refs.bar" "refs/heads/main $(git rev-parse HEAD) refs/heads/main $ZERO"
+  run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD="bash $WORK/green.sh"
+  l=$(measure_lines)
+  check "DEC bar: an untracked stub under the escape is recorded as a stub" "$RC|$(read_field $l bar)" "0|stub"
+  run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash tracked-bar.sh"
+  l=$(measure_lines)
+  check "DEC bar: a tracked bar is recorded as tracked" "$RC|$(read_field $l bar)" "0|tracked"
+  run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD=
+  l=$(measure_lines)
+  check "DEC bar: no override is recorded as the default bar" "$(read_field $l bar)" default
+  run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD=true
+  l=$(measure_lines)
+  check "DEC bar: a value naming no script is refused" "$RC" 1
+  check "DEC bar: by the bar refusal" "$(printf '%s\n' "$ERR" | grep -c 'names no script at all')" 1
+  check "DEC bar: decision, and no bar recorded" "$(read_field $l decision)|$(read_field $l exit)|$(read_field $l bar)" \
+    "refuse-bar|clean|<absent>"
+  [ "$(read_field $l decision)" = refuse-bar ] && add_seen refuse-bar
   rm -f "$REPO/.git/push-main-active"
   check_journal DEC
 }
@@ -834,6 +859,7 @@ scan_exit_sites() { # file -> one TAB-separated row per shell exit
   printf '%s\t%s\t%s\n' 'RUNLOG_DECISION=refuse-manifest; RUNLOG_CLEAN=1; exit 1' 1 refuse-manifest
   printf '%s\t%s\t%s\n' 'RUNLOG_DECISION=refuse-raw; RUNLOG_CLEAN=1; exit 1' 1 refuse-raw
   printf '%s\t%s\t%s\n' 'RUNLOG_DECISION=refuse-head; RUNLOG_CLEAN=1; exit 1' 1 refuse-head
+  printf '%s\t%s\t%s\n' 'RUNLOG_DECISION=refuse-bar; RUNLOG_CLEAN=1; exit 1' 5 refuse-bar
   printf '%s\t%s\t%s\n' 'RUNLOG_CLEAN=1; exit "$rc"' 1 'full|scoped'
 } > "$WORK/exits.tsv"
 

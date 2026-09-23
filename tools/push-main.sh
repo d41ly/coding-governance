@@ -110,6 +110,14 @@ while [ "$attempt" -le "$max" ]; do
     # source is the driver's exact semantics without polluting this script's namespace.
     if [ -f .unattended.conf ]; then
       lm=$(. ./.unattended.conf 2>/dev/null; printf '%s' "${LANDER_MARKER:-}")
+      # A STUB-GATED PUSH IS NOT A LANDING (TOOL-aRepatriatedFork-5). GOV_GATE_CMD_TEST is the hook's
+      # one declared escape: it lets an untracked stub stand in for the bar so the hook can be tested
+      # at all. The marker is what `unattended.sh --landed` accepts as a landing through this lander,
+      # so writing it here would let a push nobody's bar gated read as a gated landing.
+      if [ -n "$lm" ] && [ -n "${GOV_GATE_CMD_TEST:-}" ]; then
+        echo "push-main: pushed $def under GOV_GATE_CMD_TEST, so the bar was a declared STUB; NOT writing the lander marker ($lm), because a stub-gated push is not a landing." >&2
+        lm=""
+      fi
       if [ -n "$lm" ]; then
         # RESOLVED AGAINST THE GIT COMMON DIR, which is the only directory both halves agree on. It
         # was tree-relative and wrong twice: each half resolved it against its own cwd, and in a

@@ -13,9 +13,9 @@ gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring"
   "every held leg is budgeted, every budget row resolves", "run-selftests self-test",
   "selftest harness self-test", "extract-arms self-test",
   "leg ceilings clear their evidenced maximum", "run-gates run-log line",
-  "receipt sync (installed files match the receipt)"]
+  "receipt sync (installed files match the receipt)", "pre-push bar self-test"]
 kits = ["run-gates"]
-git-hooks = []
+git-hooks = ["pre_push_bar_selftest.py"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []

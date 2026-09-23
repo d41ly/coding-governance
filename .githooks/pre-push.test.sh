@@ -15,6 +15,11 @@ bad() { echo "  FAIL — $1"; fail=1; }
 # The scratch repo is `git init`+`remote add` (origin/HEAD unset); pin the default so the hook's
 # fail-CLOSED resolution doesn't refuse the gate cases (case 6 unsets it to test that path).
 export GOV_DEFAULT_BRANCH=main
+# THE DECLARED TEST ESCAPE (TOOL-aRepatriatedFork-5, from NicoCares' PKG-dCandidLodestar-5). Every
+# stub below is an mktemp script, which is untracked by construction, and the hook refuses an
+# untracked merge bar. Without this the whole file would test a refusal path and nothing else.
+# Cases 25-27 unset it deliberately.
+export GOV_GATE_CMD_TEST=1
 
 # Isolate ONLY the pre-push hook (a scratch hooks dir) so the repo's pre-commit branch-guard does not
 # fire on the test's own setup commits. A clone does NOT carry core.hooksPath — set it explicitly.
@@ -267,6 +272,77 @@ case "$(decide)" in
   *) bad "24b the boundary forced with no gate-env.sh present, so arm 24 proves nothing" ;;
 esac
 
+# --- 25-29b: WHICH BAR RAN (TOOL-aRepatriatedFork-5, NicoCares' PKG-dCandidLodestar-5) --------
+# Until this unit `gate` was resolved from GOV_GATE_CMD with no check at all, and the decision line
+# named the SCOPE of the run without naming WHAT ran. `GOV_GATE_CMD=true git push` landed a commit
+# over a bar that never existed, under a line byte-identical to a full run's. THE ESCAPE IS UNSET IN
+# EACH ARM BELOW rather than at the top, because every earlier case in this file depends on it.
+# `.githooks/pre_push_bar_selftest.py` covers the evasions and disables the arms that refuse them.
+cd "$tmp/work" || exit 2
+printf '#!/usr/bin/env bash\nexit 0\n' > tracked-bar.sh
+git add -A >/dev/null 2>&1; git commit -qm "a tracked bar" >/dev/null 2>&1
+
+# 25 — THE CONTROL FIRST: a bar this repo TRACKS is accepted with no escape. Without it, 26 and 27
+#      are satisfied by a hook that refuses every value it is handed, which is its own outage.
+git commit -q --allow-empty -m c25 >/dev/null 2>&1
+if ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main >/dev/null 2>&1 ); then
+  ok "25 control — a TRACKED bar command is accepted with no test escape"
+else
+  bad "25 a tracked bar was refused, so 26-27 prove only that the hook refuses everything"
+fi
+
+# 26 — an UNTRACKED bar is refused. $green lives under mktemp, so it is untracked by construction —
+#      the same shape every stub in this file has. GREEN, not red, deliberately: with a red stub the
+#      push fails either way and the arm cannot tell a refusal from a bar doing its job.
+git commit -q --allow-empty -m c26 >/dev/null 2>&1
+msg=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 1>/dev/null ) )
+case "$msg" in
+  *"does not track"*) ok "26 an UNTRACKED bar command is refused" ;;
+  *) bad "26 expected a refusal naming the untracked bar, got: ${msg:-<push SUCCEEDED over a bar nobody has read>}" ;;
+esac
+
+# 26b — and a tracked name may not merely TRAIL the one that runs. `bash $green tracked-bar.sh`
+#       ends in a tracked script and executes an untracked one, so a rule reading only the LAST
+#       path-shaped token accepts it — gating the instance rather than the class.
+git commit -q --allow-empty -m c26b >/dev/null 2>&1
+msg=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash $green tracked-bar.sh" git push -q origin main 2>&1 1>/dev/null ) )
+case "$msg" in
+  *"does not track"*) ok "26b an untracked token is refused even when a tracked one follows it" ;;
+  *) bad "26b a tracked name trailing an untracked command was accepted: ${msg:-<push SUCCEEDED>}" ;;
+esac
+
+# 27 — a value naming NO script at all is refused outright. `true` is the unit's own reproduction: a
+#      real command that exits 0 and gates nothing.
+git commit -q --allow-empty -m c27 >/dev/null 2>&1
+msg=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD=true git push -q origin main 2>&1 1>/dev/null ) )
+case "$msg" in
+  *"names no script"*) ok "27 GOV_GATE_CMD=true is refused — a no-op bar names nothing" ;;
+  *) bad "27 'true' was accepted as the merge bar, got: ${msg:-<push SUCCEEDED with no bar at all>}" ;;
+esac
+
+# 28 — the escape DECLARES ITSELF. Under GOV_GATE_CMD_TEST the untracked stub is let through, and
+#      the decision line says so. A silent waiver would be the defect wearing a test's name.
+line=$(decide)
+case "$line" in
+  *"bar: STUB "*) ok "28 under the test escape the decision line marks the bar as a STUB" ;;
+  *) bad "28 the test escape waived the check without saying so: ${line:-<no decision line>}" ;;
+esac
+
+# 29 — and the bar is named in BOTH arms. This line is the only durable record of which bar ran, and
+#      a field added to one arm is half a record.
+stamp "$(git rev-parse HEAD)"
+line=$(decide)
+case "$line" in
+  *"scoped gate"*"bar: "*) ok "29 the SCOPED decision line names the bar that ran" ;;
+  *) bad "29 the scoped arm reports a scope without naming the bar: ${line:-<no decision line>}" ;;
+esac
+rm -f "$(git rev-parse --git-dir)/gate-full-green"
+line=$(decide)
+case "$line" in
+  *"FULL gate"*"bar: "*) ok "29b the FULL decision line names the bar that ran" ;;
+  *) bad "29b the full arm reports a scope without naming the bar: ${line:-<no decision line>}" ;;
+esac
+
 # --- 16-18: TOOL-dScrubbedConduit-1 S2/S5. A LINKED WORKTREE, because that is the shape this
 # --- harness could not previously see. Every fixture above is `git init` plus `git init --bare`, and
 # --- neither exports GIT_DIR into a hook — which is exactly why this class went unobserved here
@@ -354,7 +430,19 @@ pfx_home=$PWD
 # 05455c45 is the last commit that touched this hook BEFORE that unit.
 PREPUSH_PRE=05455c45fc0fc32f7de331541daea5c57cb856e0
 git -C "$SRC" show "$PREPUSH_PRE:.githooks/pre-push" > "$tmp/hooks-old-pre-push" 2>/dev/null || true
-[ -s "$tmp/hooks-old-pre-push" ] || bad "AC1 red-first control unavailable — could not read the pre-change hook"
+# THE RED-FIRST CONTROL IS GOV-ONLY, AND THE SKIP SAYS SO OUT LOUD (TOOL-aRepatriatedFork-5 S6, the
+# form of NicoCares' carve-out 25). `PREPUSH_PRE` is a commit in the coding-governance repository.
+# This file ships to every push-main adopter, and no adopter has that object, so the arm cannot
+# resolve there and `bad` reddened the leg over gov's history rather than over anything the adopter
+# did. Substituting an adopter sha does not rescue it: the control has to be a hook that did NOT
+# force in the fixture's layout, which is structurally gov's fix. So it SKIPS, loudly, naming what
+# went unexercised; it is counted as neither a pass nor a failure. The loop below then skips the
+# `old` pass by its own `[ -s ]` guard.
+if [ ! -s "$tmp/hooks-old-pre-push" ]; then
+  echo "  SKIP — AC1 red-first control NOT RUN: $PREPUSH_PRE is a coding-governance commit and"
+  echo "         this repository does not carry it. The AC1/AC2/AC3 arms below still run; what"
+  echo "         is unexercised is the proof that the PRE-fix hook failed where they pass."
+fi
 
 # Build a scratch repo whose kits live at $1, push once so a record can name a real sha, and leave
 # the caller standing in it.

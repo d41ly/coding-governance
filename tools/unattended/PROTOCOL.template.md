@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.28 -->
+<!-- gov:kit unattended@1.29 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -539,8 +539,10 @@ every adopter. Neither is closed; what survives is the leg re-run in a clone the
 
 **What it does not close, stated so no reader has to discover it.** A run that edits this kit and
 commits it: nothing binds the executing code to code an owner approved. A run that shims the
-ordinary tools this kit calls. A run that skips the hook layer, by `--no-verify`, by pointing
-`core.hooksPath` at an empty directory, or by overriding the gate command. A run that relays through
+ordinary tools this kit calls, `BASH_ENV` included, which runs inside the hook's own interpreter.
+A run that skips the hook layer, by `--no-verify` or by pointing `core.hooksPath` at an empty
+directory. The gate command is not a third way: the hook runs only a script the repository tracks
+unmodified, and its declared test escape withholds the lander marker. A run that relays through
 an endpoint it seeded, which satisfies every URL comparison with one URL and one config source. A
 run that simply never creates a run-state file, since every leg check iterates over the tracked ones.
 And a run that gets one push past all of that, after which the remote's advertisement is genuine.
