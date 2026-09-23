@@ -17,7 +17,10 @@ else
   TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
 fi
 check() { # name expected_exit json
-  printf '%s' "$3" | node "$HOOK" >/dev/null 2>"$TMP/err"; local got=$?
+  # FROM "$TMP", not from wherever the suite was launched (TOOL-aRepatriatedFork-7): a payload with no
+  # `cwd` makes the hook read `.agent-cap.conf` at the caller's checkout root, so an adopter that
+  # LOWERS its cap would otherwise move every ceiling arm below. The scratch dir has no checkout.
+  printf '%s' "$3" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; local got=$?
   if [ "$got" = "$2" ]; then echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else echo "FAIL $1 (exit $got, want $2)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 }
@@ -211,7 +214,7 @@ jso() { # name expected_exit flag  (script on stdin)
   local name=$1 want=$2 flag=$3 payload got
   payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
   case "$payload" in *'"script"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
-  printf '%s' "$payload" | node "$HOOK" "$flag" >/dev/null 2>"$TMP/err"; got=$?
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK" "$flag") >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" = "$want" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
   else echo "FAIL $name (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 }
@@ -687,7 +690,7 @@ check_spec_audit() { # name expected_exit needles(;;-joined, empty for an allow)
 g,a,form=sys.argv[1:4]
 args=json.loads(a)
 print(json.dumps({"tool_name":"Workflow","tool_input":{"scriptPath":g,"args":args if form=="object" else json.dumps(args)}}))' "$GOOD" "$args" "$form")
-    printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+    printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
     if [ "$got" != "$want" ]; then
       echo "FAIL $name [args as $form] (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); continue
     fi
@@ -771,7 +774,7 @@ if [ -f "$T2R" ]; then
   for k in '"spec-audit"' '["spec-audit"]' '"diff-review"' '"SPEC-AUDIT"' '{"k":"spec-audit"}' '7'; do
     callee=$(node -e "const a={kind:$k}; $kind_line; console.log(kind==='spec-audit'?2:0)" 2>/dev/null)
     printf '%s' "{\"tool_name\":\"Workflow\",\"tool_input\":{\"scriptPath\":\"$GOOD\",\"args\":{\"kind\":$k,\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}" \
-      | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+      | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
     if [ -n "$callee" ] && [ "$got" = "$callee" ]; then echo "ok   rule0: pair — hook and tier2-review agree on kind $k (exit $got)"; pass=$((pass+1))
     else echo "FAIL rule0: pair — hook exit $got, tier2-review isSpec says exit-equivalent '$callee' for kind $k"; fail=$((fail+1)); fi
   done
@@ -898,7 +901,7 @@ msg() { # name expected_exit needle   (script on stdin)
   local name=$1 want=$2 needle=$3 payload got
   payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
   case "$payload" in *'"script"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
-  printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" != "$want" ]; then
     echo "FAIL $name (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); return
   fi
@@ -1016,18 +1019,18 @@ EOF
 # silently-ignored knob that appears to work is how that survived, so it denies and says why.
 AGENT_CAP=50 printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await agent(1)"}}' \
   > "$TMP/envpayload"
-AGENT_CAP=50 node "$HOOK" < "$TMP/envpayload" >/dev/null 2>"$TMP/env.err"; envrc=$?
+(cd "$TMP" && AGENT_CAP=50 node "$HOOK") < "$TMP/envpayload" >/dev/null 2>"$TMP/env.err"; envrc=$?
 if [ "$envrc" = 2 ] && grep -qF 'AGENT_CAP is set (50) and this guard NO LONGER reads it' "$TMP/env.err"; then
   echo "ok   a set AGENT_CAP is refused with a message"; pass=$((pass+1))
 else
   echo "FAIL a set AGENT_CAP was not refused (exit $envrc)"; sed 's/^/     /' "$TMP/env.err"; fail=$((fail+1))
 fi
-node "$HOOK" < "$TMP/envpayload" >/dev/null 2>&1
+(cd "$TMP" && node "$HOOK") < "$TMP/envpayload" >/dev/null 2>&1
 if [ "$?" = 0 ]; then echo "ok   ...and an UNSET AGENT_CAP changes nothing"; pass=$((pass+1))
 else echo "FAIL an unset AGENT_CAP denied a clean script"; fail=$((fail+1)); fi
 
 # The rule-2 remediation text still names the number it enforces.
-if grep -qF 'verify-stage agents at 5 TOTAL' <(printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await boundedParallel(all.map((f) => () => agent(f.c)), 5)"}}' | node "$HOOK" 2>&1); then
+if grep -qF 'verify-stage agents at 5 TOTAL' <(printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await boundedParallel(all.map((f) => () => agent(f.c)), 5)"}}' | (cd "$TMP" && node "$HOOK") 2>&1); then
   echo "ok   rule-2 deny text names the 5-verifier cap"; pass=$((pass+1))
 else echo "FAIL rule-2 deny text does not name the cap"; fail=$((fail+1)); fi
 
@@ -1052,9 +1055,9 @@ apay() { # session · prompt · tool_use_id
 # unique to this branch and never on the exit code, which all four rules in this file share.
 ok5=1
 for i in 1 2 3 4 5; do
-  printf '%s' "$(apay S1 P1 "u$i")" | node "$HOOK" >/dev/null 2>"$TMP/ag.err" || ok5=0
+  printf '%s' "$(apay S1 P1 "u$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/ag.err" || ok5=0
 done
-printf '%s' "$(apay S1 P1 u6)" | node "$HOOK" >/dev/null 2>"$TMP/ag6.err"; rc6=$?
+printf '%s' "$(apay S1 P1 u6)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/ag6.err"; rc6=$?
 if [ "$ok5" = 1 ] && [ "$rc6" = 2 ] \
    && grep -qF 'direct-Agent spawn budget for this prompt is exhausted' "$TMP/ag6.err"; then
   echo "ok   rule4: six sequential spawns — five allowed, the sixth denied by name"; pass=$((pass+1))
@@ -1064,7 +1067,7 @@ fi
 
 # ...and the SAME tool_use_id re-fed does not spend a second slot. A hook re-invoked for one call
 # would otherwise burn the turn's budget on a single spawn.
-printf '%s' "$(apay S1 P1 u3)" | node "$HOOK" >/dev/null 2>&1; rcdup=$?
+printf '%s' "$(apay S1 P1 u3)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcdup=$?
 [ "$rcdup" = 0 ] && { echo "ok   rule4: a repeated tool_use_id is idempotent"; pass=$((pass+1)); } \
                  || { echo "FAIL rule4: a repeated tool_use_id was charged again (exit $rcdup)"; fail=$((fail+1)); }
 
@@ -1079,7 +1082,7 @@ for round in 1 2 3 4 5 6 7 8; do
   P="Pc$round"
   rm -f "$TMP"/ag.rc.*
   for i in 1 2 3 4 5 6; do
-    ( printf '%s' "$(apay S1 "$P" "c$round-$i")" | node "$HOOK" >/dev/null 2>&1; echo $? > "$TMP/ag.rc.$i" ) &
+    ( printf '%s' "$(apay S1 "$P" "c$round-$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; echo $? > "$TMP/ag.rc.$i" ) &
   done
   wait
   denies=$(cat "$TMP"/ag.rc.* 2>/dev/null | grep -c '^2$')
@@ -1091,7 +1094,7 @@ done
 
 # AC25 — a FRESH prompt resets the budget, with no cleanup step run in between. The budget is keyed
 # per prompt precisely so nothing has to remember to clear it.
-printf '%s' "$(apay S1 Pfresh n1)" | node "$HOOK" >/dev/null 2>&1; rcf=$?
+printf '%s' "$(apay S1 Pfresh n1)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcf=$?
 [ "$rcf" = 0 ] && { echo "ok   rule4: a new prompt resets the budget with no cleanup"; pass=$((pass+1)); } \
                || { echo "FAIL rule4: a new prompt did not reset the budget (exit $rcf)"; fail=$((fail+1)); }
 
@@ -1104,7 +1107,7 @@ printf '%s' "$(apay S1 Pfresh n1)" | node "$HOOK" >/dev/null 2>&1; rcf=$?
 # turn's budget forever — measured, six sequential spawns with distinct tool_use_ids and the sixth
 # denied against five long-idle slots. Revert SLOT_TTL_MS to Infinity and this arm goes red.
 for i in 1 2 3 4 5; do
-  printf '%s' "$(apay Sttl Pttl "t$i")" | node "$HOOK" >/dev/null 2>&1
+  printf '%s' "$(apay Sttl Pttl "t$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
 done
 TURNTTL="$AGROOT/Sttl__Pttl"
 if [ ! -d "$TURNTTL" ]; then
@@ -1113,8 +1116,8 @@ else
   # Age slot-1 only. The remaining four stay fresh, which is what makes the second half a control
   # rather than a restatement of the first.
   touch -d '46 minutes ago' "$TURNTTL/slot-1" 2>/dev/null || touch -A -004600 "$TURNTTL/slot-1" 2>/dev/null
-  printf '%s' "$(apay Sttl Pttl t6)" | node "$HOOK" >/dev/null 2>&1; rcstale=$?
-  printf '%s' "$(apay Sttl Pttl t7)" | node "$HOOK" >/dev/null 2>"$TMP/ttl.err"; rcfresh=$?
+  printf '%s' "$(apay Sttl Pttl t6)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcstale=$?
+  printf '%s' "$(apay Sttl Pttl t7)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/ttl.err"; rcfresh=$?
   if [ "$rcstale" = 0 ] && [ "$rcfresh" = 2 ] \
      && grep -qF 'within the last' "$TMP/ttl.err"; then
     echo "ok   rule4: an idle slot past the TTL is reclaimed; four fresh ones are not"; pass=$((pass+1))
@@ -1127,9 +1130,9 @@ fi
 # ...and the DENY MESSAGE says which rule it is enforcing. It used to read "already spawned in this
 # turn", which described a permanent budget and named the concurrency rule in the same breath. A
 # message that misstates the rule sends the reader to consolidate work that did not need it.
-printf '%s' "$(apay Smsg Pmsg m1)" | node "$HOOK" >/dev/null 2>&1
+printf '%s' "$(apay Smsg Pmsg m1)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
 for i in 2 3 4 5 6; do
-  printf '%s' "$(apay Smsg Pmsg "m$i")" | node "$HOOK" >/dev/null 2>"$TMP/msg.err"
+  printf '%s' "$(apay Smsg Pmsg "m$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/msg.err"
 done
 grep -qF 'claimed in this turn within the last' "$TMP/msg.err" \
   && grep -qF 'is reclaimed on the next spawn' "$TMP/msg.err" \
@@ -1142,7 +1145,7 @@ grep -qF 'claimed in this turn within the last' "$TMP/msg.err" \
 # CREATE is a different fact and denies (the branch above it).
 before=$(ls "$AGROOT" 2>/dev/null | grep -c .)
 printf '{"tool_name":"Agent","cwd":"%s","session_id":"S9","tool_use_id":"x"}' "$AGJ" \
-  | node "$HOOK" >/dev/null 2>&1; rcn=$?
+  | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcn=$?
 after=$(ls "$AGROOT" 2>/dev/null | grep -c .)
 { [ "$rcn" = 0 ] && [ "$before" = "$after" ]; } \
   && { echo "ok   rule4: an unkeyable payload fails OPEN and writes no token"; pass=$((pass+1)); } \
@@ -1700,7 +1703,7 @@ for f in "$TMP"/nest/*.js; do
   nest_n=$((nest_n+1))
   n=$(basename "$f" .js)
   payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":open(sys.argv[1],encoding="utf-8").read()}}))' "$f")
-  printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"; rc=$?
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; rc=$?
   if [ "$rc" = 2 ] && grep -qF 'spawns one agent per item' "$TMP/err"; then
     echo "ok   nesting matrix: $n -> denied by the verify-stage rule"; pass=$((pass+1))
   else
@@ -1725,7 +1728,7 @@ cap_harness() { # K -> a harness whose default parameter AND call site both carr
 cap_check() { # name expected_exit K [text stderr must carry]
   local payload got
   payload=$(cap_harness "$3" | "$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":{"script":sys.stdin.read()}}))' "$CAPREPO/sub")
-  printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" = "$2" ] && { [ -z "${4:-}" ] || grep -qF -- "$4" "$TMP/err"; }; then
     echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else
@@ -1736,7 +1739,7 @@ spawn_check() { # name expected_exit prompt_id tool_use_id [text stderr must car
   local got
   printf '{"tool_name":"Agent","cwd":"%s","session_id":"s7","prompt_id":"%s","tool_use_id":"%s"}' \
     "$("$TESTPY" -c 'import sys; print(sys.argv[1].replace(chr(92), "/"))' "$CAPREPO/sub")" "$3" "$4" \
-    | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+    | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" = "$2" ] && { [ -z "${5:-}" ] || grep -qF -- "$5" "$TMP/err"; }; then
     echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else
@@ -1940,7 +1943,7 @@ line = 'const x = [' + ','.join(\"f(a%d, 'lit%d')\" % (i, i) for i in range(n)) 
 print(json.dumps({'tool_name':'Workflow','tool_input':{'script': line}}))
 ")
 t0=$(date +%s)
-printf '%s' "$long_one" | node "$HOOK" >/dev/null 2>&1
+printf '%s' "$long_one" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
 t1=$(date +%s)
 if [ $((t1 - t0)) -le 10 ]; then
   echo "ok   quadratic budget: 8000 literals on ONE line in $((t1 - t0))s (<= 10s)"; pass=$((pass+1))
@@ -1957,7 +1960,7 @@ k = ' ? args.big : '.join('c%d' % i for i in range(9000))
 sc = 'const K = ' + k + ' : args.big // gov:fixed-verifiers\nawait boundedParallel(K.map((g) => () => agent(g)), 5)'
 print(json.dumps({'tool_name':'Workflow','tool_input':{'script': sc}}))
 ")
-printf '%s' "$deep" | node "$HOOK" >/dev/null 2>&1; deeprc=$?
+printf '%s' "$deep" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; deeprc=$?
 if [ "$deeprc" = 2 ]; then
   echo "ok   crash posture: a script neither view can scan is DENIED, not admitted at exit 1"; pass=$((pass+1))
 else
