@@ -95,7 +95,7 @@ def read_git(root: Path, *args: str) -> str:
     """Run git in the target and return stdout, or the empty string when it cannot answer."""
     try:
         r = subprocess.run(['git', '-C', root.as_posix(), *args],
-                           capture_output=True, text=True, timeout=30)
+                           capture_output=True, text=True, encoding="utf-8", timeout=30)
         return r.stdout.strip() if r.returncode == 0 else ''
     except (OSError, subprocess.SubprocessError):
         return ''
@@ -804,4 +804,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.1"  # gov:kit playbook-render@1.1
+KIT_PLAYBOOK_RENDER_VERSION = "1.2"  # gov:kit playbook-render@1.2

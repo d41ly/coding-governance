@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.5 -->
+<!-- gov:kit lexicon@1.6 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import

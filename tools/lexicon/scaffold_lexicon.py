@@ -205,7 +205,7 @@ def main(argv: list[str]) -> int:
         return 2
     dest = Path(argv[1])
     root = Path(subprocess.run(["git", "rev-parse", "--show-toplevel"],
-                               capture_output=True, text=True, check=True).stdout.strip())
+                               capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip())
     # THE ONE WALK, and every figure below comes out of it. There used to be two — this function's
     # and `_measure_suffix_offenders`'s — each re-deriving which extensions are armed and each
     # SWALLOWING an extraction failure, so an unparseable file was invisible here while `run()`

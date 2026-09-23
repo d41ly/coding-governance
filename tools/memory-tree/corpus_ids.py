@@ -95,7 +95,7 @@ class Problem(Exception):
 
 
 def run(*argv: str, cwd=None) -> str:
-    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, check=True).stdout
+    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=True).stdout
 
 
 def read(path) -> str:
@@ -338,7 +338,7 @@ def ask_shell(flag: str, root: str) -> str:
         raise Problem("corpus_ids: %s is missing — it owns the sets this module asks for" % HYGIENE)
     sh = resolve_bash()
     try:
-        out = subprocess.run([sh, HYGIENE.as_posix(), flag], cwd=root, capture_output=True, text=True)
+        out = subprocess.run([sh, HYGIENE.as_posix(), flag], cwd=root, capture_output=True, text=True, encoding="utf-8")
     except OSError as exc:
         # A bash that cannot be LAUNCHED raises before any return code exists. Left unhandled this is
         # a traceback out of a hygiene gate — every failure here is named, including this one.

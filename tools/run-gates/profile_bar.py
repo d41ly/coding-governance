@@ -277,7 +277,7 @@ def resolve_bash(script):
         tried.append(c)
         try:
             r = subprocess.run([c, "-c", 'test -f "$1"', "_", script],
-                               capture_output=True, text=True, timeout=20)
+                               capture_output=True, text=True, encoding="utf-8", timeout=20)
         except (OSError, subprocess.SubprocessError):
             continue
         if r.returncode == 0:
@@ -287,7 +287,7 @@ def resolve_bash(script):
 
 def run_git(args, cwd=None):
     try:
-        r = subprocess.run(["git"] + args, capture_output=True, text=True, cwd=cwd, timeout=30)
+        r = subprocess.run(["git"] + args, capture_output=True, text=True, encoding="utf-8", cwd=cwd, timeout=30)
         return r.stdout.strip() if r.returncode == 0 else ""
     except (OSError, subprocess.SubprocessError):
         return ""
@@ -380,7 +380,7 @@ def main():
     print("profile-bar: running the bar (width %d via %s, %s) — this takes as long as the bar takes"
           % (width, width_source, "scoped" if args.scoped else "GATE_FULL=1"))
     start = time.monotonic()
-    proc = subprocess.run([bash, RUNNER], cwd=root, env=env, capture_output=True, text=True)
+    proc = subprocess.run([bash, RUNNER], cwd=root, env=env, capture_output=True, text=True, encoding="utf-8")
     wall = time.monotonic() - start
 
     # THE QUEUE WAIT IS NOT WORK, so it comes out of the wall clock before anything is derived from

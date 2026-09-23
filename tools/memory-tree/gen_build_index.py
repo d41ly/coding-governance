@@ -233,7 +233,7 @@ def run(*argv: str, cwd: str | None = None) -> str:
     # `env=` HERE, at the one choke point every git call in this file goes through, rather than at
     # seven call sites that would each have to remember.
     return subprocess.run(
-        argv, cwd=cwd, capture_output=True, text=True, check=True, env=_build_git_env()
+        argv, cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=True, env=_build_git_env()
     ).stdout
 
 

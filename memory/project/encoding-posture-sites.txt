@@ -1,0 +1,36 @@
+# encoding-posture-sites.txt — the sites that PREDATE the `encoding posture (text IO names its
+# encoding)` leg. TOOL-aRepatriatedFork-3.
+#
+# A row is `<path> TAB <arm> TAB <count> TAB <reason>`. The key is the file and the ARM — `file-io`
+# or `subprocess` — and NEVER a line number: a line-keyed registry reds on an unrelated edit above
+# the waived line, and a gate whose steady state is red gets bypassed. The count is how many sites of
+# that arm the file carries.
+#
+# SET EQUALITY IN BOTH DIRECTIONS, and the counts too. A measured site with no row fails, a row the
+# scan no longer finds fails, and a count that no longer matches fails, so draining a site forces
+# its row down or out in the same commit and the count can only fall.
+#
+# WHY THESE ARE CARRIED RATHER THAN DRAINED: every file below is one no adopter receives — gov's own
+# deployer, a kit self-test or fixture kept `project-owned`, or a `forked` recall source that is
+# never sent. The unit that wired this leg fixed every site in the LANDABLE shipped set, which is
+# the population an adopter's own encoding gate reds on; draining these is a follow-up the owner
+# ruled out of that unit (its §8 F1). Nothing here says these are SAFE on a cp1251 node — only that
+# they are known, counted, and cannot grow. No total is written here: the scanner prints it.
+tools/check-spec-tokens.py	subprocess	2	gov-internal gate, shipped by no descriptor
+tools/codebase-map/rank_harness.py	subprocess	1	project-owned harness, withheld from adopters
+tools/codebase-map/replay-phrases.py	subprocess	1	project-owned harness, withheld from adopters
+tools/codebase-map/selftest.py	subprocess	4	project-owned kit self-test, withheld from adopters
+tools/govkit/fixtures/make_incms_receipt.py	subprocess	4	govkit test fixture, shipped by no descriptor
+tools/govkit/govkit.py	subprocess	41	gov's deployer, shipped by no descriptor
+tools/govkit/matrix.py	subprocess	4	govkit acceptance matrix, shipped by no descriptor
+tools/govkit/refusal_join.py	subprocess	1	govkit helper, shipped by no descriptor
+tools/govkit/selftest.py	file-io	1	govkit self-test, shipped by no descriptor
+tools/govkit/selftest.py	subprocess	40	govkit self-test, shipped by no descriptor
+tools/lexicon/selftest.py	subprocess	31	project-owned kit self-test, withheld from adopters
+tools/memory-recall/check-recall.py	subprocess	1	project-owned recall check, withheld from adopters
+tools/memory-recall/extract.py	subprocess	1	forked recall source, never sent to an adopter
+tools/memory-recall/query.py	subprocess	1	forked recall source, never sent to an adopter
+tools/memory-recall/selftest.py	subprocess	13	project-owned kit self-test, withheld from adopters
+tools/memory-recall/test_recall_floor.py	subprocess	4	project-owned recall floor, withheld from adopters
+tools/process-monitor/selftest.py	file-io	1	project-owned kit self-test, withheld from adopters
+tools/process-monitor/selftest.py	subprocess	2	project-owned kit self-test, withheld from adopters

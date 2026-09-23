@@ -41,6 +41,7 @@ dead-path carriers self-test	72.6	3	a	2026-09-21	runner
 drift-audit records	24.4	6	a	2026-09-21	runner
 drift-audit selftest	184.0	3	a	2026-09-21	runner
 drift-audit wiring	9.8	1	a	2026-09-06	runner
+encoding posture (text IO names its encoding)	2.5	1	a	2026-09-23	direct invocation
 every held leg is budgeted, every budget row resolves	16.3	6	a	2026-09-21	runner
 extract-arms self-test	13.8	3	a	2026-09-21	runner
 gotchas selftest	19.7	3	a	2026-09-21	runner

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.9
+gov:kit memory-recall@1.10
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -36,7 +36,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.9"
+KIT_MEMORY_RECALL_VERSION = "1.10"
 
 CONF_NAME = ".memory-tree.conf"
 # a-z, per tools/memory-tree/check-memory-hygiene.sh's own `node [a-z]` (spec Q1 option (b)).
@@ -106,7 +106,7 @@ def repo_root() -> pathlib.Path:
         out = subprocess.run(
             ["git", "-C", str(here), "rev-parse", "--show-toplevel"],
             capture_output=True,
-            text=True,
+            text=True, encoding="utf-8",
             check=True,
         ).stdout.strip()
     except (OSError, subprocess.CalledProcessError) as e:

@@ -2,7 +2,7 @@
 
 ```toml
 feature = "gate-lint"
-title = "Two scanners for the failure modes a reader cannot see: PowerShell's decoding traps, and a shell loop that blocks forever"
+title = "Three scanners for the failure modes a reader cannot see: PowerShell's decoding traps, a shell loop that blocks forever, and Python text IO that decodes with the locale"
 status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-aLeakedHandle-1"]
@@ -11,6 +11,7 @@ decisions = ["TOOL-aLeakedHandle-1"]
 gate-legs = [
   "shell hygiene (a loop fed by a command substitution)",
   "shell-hygiene selftest",
+  "encoding posture (text IO names its encoding)",
 ]
 kits = ["gate-lint"]
 git-hooks = []
@@ -25,6 +26,7 @@ lexicon-verbs = []
 globs = [
   "tools/gate-lint/*",
   "memory/project/substitution-fed-loops.txt",
+  "memory/project/encoding-posture-sites.txt",
 ]
 ```
 
@@ -34,6 +36,9 @@ collisions, because PS variable names are case-INSENSITIVE, and a BOM-less scrip
 because 5.1 decodes it as CP1252 and an em dash closes a string early. `sh_hygiene.py` owns the
 shell one: a `while … done` loop fed by a heredoc or here-string whose body holds a command
 substitution, which reads until an EOF that a surviving grandchild can keep from ever arriving.
+`encoding_posture.py` owns Python's: a text-mode file read or subprocess with no `encoding=`,
+which decodes with cp1251 or cp1252 on a Windows node and UTF-8 in CI, so it crashes on one and
+passes on the other.
 
 ## Constraints & why
 
@@ -99,6 +104,14 @@ zero a clean tree does, and the two are indistinguishable from outside. Both sca
 own headers what they do NOT check, because a structural check reads as a semantic one to everybody
 who did not write it.
 
+**The encoding scanner is a PORT, and gov's leg for it is gov's alone.** `TOOL-aRepatriatedFork-3`
+took an adopter's AST predicate whole and changed only its population (`git ls-files`), its
+registry (keyed on the ARM, same both-directions rule as the shell registry) and its clean line,
+which prints the graded file count. The file ships with the kit's `**` include; the leg does not,
+because a declared adopter leg reds at every adopter's next pull until they seed a registry, and
+whether it replaces an adopter's own scanner is theirs to decide (that unit's §8 F2). The leg is
+therefore an `[[exempt_leg]]` row in the govkit registry, not a `[[gate_leg]]` in the descriptor.
+
 ## Shared seams
 
 - `memory/project/*.txt` — the shrink-only registry convention, shared with
@@ -135,8 +148,15 @@ that must land green over a non-compliant population without keying on a line nu
   same proof. Neither is on the bar.
 - `memory/project/substitution-fed-loops.txt` — the carried sites. Delete a row when its site is
   drained; the leg reds if you delete one too early or too late.
+- `python tools/gate-lint/encoding_posture.py [registry] [root] [pathspec ...]` — the Python
+  text-IO scan; `--selftest` proves both arms fire on an offending fixture and clear on its twin.
+- `memory/project/encoding-posture-sites.txt` — gov's gov-internal carried sites, one row per
+  file and arm. Lower a count or delete a row in the commit that drains the site.
 
 ## Gaps
+
+- **The gov-internal encoding sites are carried, not drained.** Every file in that registry is one
+  no adopter receives; the drain is a follow-up the owner ruled out of the unit that wired the leg.
 
 - **`ps-hygiene.py` is still on no leg.** This kit's original defect, half-closed. There are zero
   tracked `.ps1` files in this repository, so wiring it would put a leg on the bar whose population

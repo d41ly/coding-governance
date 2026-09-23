@@ -557,3 +557,7 @@ why = "its subject is `tools/lib/extract-arms.sh`, and `tools/lib/` is gov-inter
 [[exempt_leg]]
 name = "selftest harness self-test"
 why = "its subject is `tools/lib/lib-selftest.sh`, and `tools/lib/` is gov-internal by a standing registry exemption -- no kit carries it, so no descriptor can claim a leg over it. Held like every other self-test and run by `tools/run-gates/run-selftests.sh`. TOOL-aQuenchedHarness-5."
+
+[[exempt_leg]]
+name = "encoding posture (text IO names its encoding)"
+why = "it grades GOV's own tools and skills Python against `memory/project/encoding-posture-sites.txt`, a registry of THIS repo's gov-internal sites. The scanner ships with the gate-lint kit's `**` include, but the leg does not: a declared adopter leg would red at every adopter's next pull until they seeded a registry, and whether gov's scanner replaces an adopter's own is theirs to decide. Owner ruling, TOOL-aRepatriatedFork-3 section 8 F2."

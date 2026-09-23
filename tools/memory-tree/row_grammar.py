@@ -51,7 +51,7 @@ class Problem(Exception):
 
 
 def run(*argv, cwd=None):
-    p = subprocess.run(argv, cwd=cwd, capture_output=True, text=True)
+    p = subprocess.run(argv, cwd=cwd, capture_output=True, text=True, encoding="utf-8")
     if p.returncode != 0:
         raise Problem(f"row-grammar: `{' '.join(argv)}` failed: {p.stderr.strip()}")
     return p.stdout
@@ -651,7 +651,7 @@ def cmd_selftest():
                     continue
                 try:
                     r = subprocess.run([c, sh, "--print-rotated-archive-ere"], cwd=cwd,
-                                       capture_output=True, text=True, timeout=60)
+                                       capture_output=True, text=True, encoding="utf-8", timeout=60)
                 except (OSError, subprocess.TimeoutExpired):
                     continue
                 if r.returncode != 0:
@@ -774,7 +774,7 @@ def cmd_selftest():
                              "- ARCH-tOne-1 · the same id twice", ""]), pin="0")
         def _foreign():
             r = subprocess.run([sys.executable, os.path.abspath(__file__), "--check"],
-                               cwd=t9, capture_output=True, text=True)
+                               cwd=t9, capture_output=True, text=True, encoding="utf-8")
             return f"rc={r.returncode} {r.stdout}{r.stderr}"
         arm("--check grades the tree it is RUN IN, not the tree the kit lives in",
             "two answers to one question", _foreign)

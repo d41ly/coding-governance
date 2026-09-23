@@ -178,7 +178,7 @@ def derive_backlog_path(root: Path) -> Path:
     """
     try:
         raw = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
-                             capture_output=True, text=True, check=True).stdout.strip()
+                             capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError, OSError):
         return m.map_root(root) / "reinvention-backlog.md"
     if not raw:

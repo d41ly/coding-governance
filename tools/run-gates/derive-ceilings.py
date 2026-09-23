@@ -95,7 +95,7 @@ RUNNER_SOURCE = "runner"
 
 def resolve_repo_root() -> pathlib.Path:
     out = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--show-toplevel"],
-                         capture_output=True, text=True)
+                         capture_output=True, text=True, encoding="utf-8")
     if out.returncode != 0:
         sys.exit("derive-ceilings: not a git work tree")
     return pathlib.Path(out.stdout.strip())
@@ -103,7 +103,7 @@ def resolve_repo_root() -> pathlib.Path:
 
 def resolve_git_dir(root: pathlib.Path) -> pathlib.Path:
     out = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-dir"],
-                         capture_output=True, text=True)
+                         capture_output=True, text=True, encoding="utf-8")
     return pathlib.Path(out.stdout.strip()) if out.returncode == 0 else root / ".git"
 
 
@@ -428,7 +428,7 @@ def cmd_write(root, gd, args) -> int:
     have = read_evidence()
     node = os.environ.get("GOV_NODE") or "a"
     date = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs"],
-                          capture_output=True, text=True).stdout.strip() or "unknown"
+                          capture_output=True, text=True, encoding="utf-8").stdout.strip() or "unknown"
     rows, raised, held, lowered = {}, 0, 0, 0
     for name, vals in runs.items():
         mx = max(vals)

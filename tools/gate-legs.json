@@ -161,6 +161,20 @@
     "ceiling": 300
   },
   {
+    "name": "encoding posture (text IO names its encoding)",
+    "argv": [
+      "python3",
+      "tools/gate-lint/encoding_posture.py",
+      "memory/project/encoding-posture-sites.txt",
+      ".",
+      "tools",
+      "skills"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "kit version markers",
     "argv": [
       "bash",

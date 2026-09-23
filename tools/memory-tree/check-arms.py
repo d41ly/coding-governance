@@ -68,7 +68,7 @@ class Problem(Exception):
 
 
 def run(*argv, cwd=None):
-    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, check=True).stdout
+    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=True).stdout
 
 
 def read(p):
