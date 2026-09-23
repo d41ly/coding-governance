@@ -434,23 +434,34 @@ def read_code_py(src):
 
 
 def read_code_js(src):
-    out, block = [], False
+    """Text outside `//` and `/* */`, read by a scanner that knows its strings: a `/*` inside a
+    quoted glob opened a comment the first cut never closed, and every line after it went unread."""
+    out, mode, quote = [], None, None
     for ln in src.split("\n"):
-        text = ""
-        while ln:
-            if block:
-                j = ln.find("*/")
-                if j < 0:
-                    ln = ""
-                    break
-                block, ln = False, ln[j + 2:]
+        text, i = [], 0
+        while i < len(ln):
+            c, two = ln[i], ln[i:i + 2]
+            if mode == "block":
+                mode, i = (None, i + 2) if two == "*/" else (mode, i + 1)
                 continue
-            j = ln.find("/*")
-            if j < 0:
-                text, ln = text + ln, ""
+            if mode == "str":
+                text.append(ln[i:i + 2] if c == "\\" else c)
+                i += 2 if c == "\\" else 1
+                if c == quote:
+                    mode = None
+                continue
+            if two == "/*":
+                mode, i = "block", i + 2
+                continue
+            if two == "//":
                 break
-            text, ln, block = text + ln[:j], ln[j + 2:], True
-        out.append(re.sub(r"(^|[\s;(){},])//.*$", r"\1", text))
+            if c in "'\"`":
+                mode, quote = "str", c
+            text.append(c)
+            i += 1
+        if mode == "str" and quote != "`":
+            mode = None
+        out.append("".join(text))
     return out
 
 

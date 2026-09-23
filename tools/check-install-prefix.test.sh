@@ -556,6 +556,14 @@ git -C "$RT3" add -A >/dev/null 2>&1
 (cd "$RT3" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
 runtime_arm 'runtime ...and the same join, MARKED with a reason, is the green control' "1 marked line(s)" 0 "$RT3"
 
+# The JS reader's comment scanner must know its strings: a quoted glob carrying `/*` opened a block
+# comment in the first cut, and every line after it went unread (a-pair-exists-and-it-is-the-wrong-one).
+RT4="$TMP/rt-js-glob"; mkfix_source "$RT4" 'A demo kit.'
+(cd "$RT4" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+printf "const g = '*builds/*/README.md'\nconst p = path.join(root, 'tools', 'demo')\n" > "$RT4/tools/demo/find.js"
+git -C "$RT4" add -A >/dev/null 2>&1
+runtime_arm 'runtime a join AFTER a quoted /* glob in JS still REDS by line' "tools/demo/find.js:2  P2" 1 "$RT4"
+
 if [ "$RUNTIME_ARMS" -ge 3 ]; then
   good "LIVENESS $RUNTIME_ARMS arm(s) reached the runtime-literal arm"
 else

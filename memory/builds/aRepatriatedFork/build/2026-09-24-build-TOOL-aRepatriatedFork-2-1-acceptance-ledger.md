@@ -38,6 +38,15 @@ adopter trees were read only through clones.
 - AC9 — `bash tools/check-install-prefix.sh` — over gov it exited 0 printing `runtime literals clean — 108 shipped code file(s), 24 marked line(s)` beside the two older arms' clean lines
 - AC10 — `bash tools/check-install-prefix.sh --check` — in the pre-fix clone arm 3 exited 1 over 72 hit lines, naming `tools/drift-audit/drift_report.py:939` (P2+P3), `tools/process-monitor/procmon-hook.js:118` (P2) and `tools/unattended/run-unattended-gates.sh:302` (P1)
 
+## The checklist's finding
+
+The bug-class checklist over the closing commit selected `a-pair-exists-and-it-is-the-wrong-one`,
+and it was live: arm 3's first JS reader paired a `/*` inside a quoted glob with the next `*/` and
+read nothing in between, at `tools/hooks/agent-cap.js:301` and `tools/hooks/scratch-guard.js:648`.
+The reader now tracks its strings, and a fourth arm puts a join after such a glob: the new reader
+reds that fixture by line, and the old one passed it silently, which failed the arm. Gov's verdict
+and the pre-fix clone's count did not move.
+
 ## Owed to the close
 
 The suites that grade these files whole run once, at the close: `install-prefix self-test`,
