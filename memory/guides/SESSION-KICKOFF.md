@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-24T02:23:00+03:00 @ 3e9395277464f28559dab929fbcb367301931ddf
+last-audit: 2026-09-24T02:32:05+03:00 @ 894c107aeba7e1ce15f58cfb95a8793bddf2cf96
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2ae12086bf7bc70723d6535a24c3b05368b18664
+last-body-change: 894c107aeba7e1ce15f58cfb95a8793bddf2cf96
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -184,6 +184,8 @@ bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand,
 bash tools/unattended/run-unattended-gates.sh --pooled   # the DoD for work touching tools/unattended/: the kit self-tests through the bounded pool, PARITY against the calibrated evidence (twenty rows, node a, 2026-09-22); --serial is the on-demand cost reading. TOOL-aBatchedArm-5
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
+python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
+python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
 ```
 
 The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. No
