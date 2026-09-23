@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts
 
-**Status:** CLOSED · rev-3 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -80,6 +80,8 @@ and writes the configuration route down, so nc runs gov's engine and gov's rende
 
 - **hands-off** external — a governing-docs list for check 15, which nc's unnumbered `corpus_ids.py` extension asks for
 - **hands-off** external — NicoCares applies the §4 carve-out table in its own tree, config and data only
+- **hands-off** `DEPL-aRepatriatedFork-20` — the engine's grandfathering, which decides how
+  inCMS's records with no Serves line are graded once it runs gov's engine.
 
 ## 4. Design
 
@@ -281,6 +283,8 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a flat `scripts/` i
 - rev-3 · 2026-09-23 · S8 moved to match the rev-2 AC9: it no longer claims the runner half of
   `TOOL-dRetiredFork-16`'s claim is observed. Found by the post-commit bug-class checklist,
   `amendment-leaves-its-other-half-standing`.
+- rev-4 · 2026-09-23 · §3 gains the **hands-off** edge back to `DEPL-aRepatriatedFork-20`,
+  which declared its **consumes-from** here and met no matching edge (hygiene check 12).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -89,6 +89,8 @@ and declares its shape in four conf lines.
   (`:560`). inCMS cannot take this unit's bytes until it can take gov's `check-wiring.sh`, which
   already reads the conf (`tools/check-wiring.sh:784`). AC8 rests on that.
 - **hands-off** external — inCMS's recall selftest fixture repair, per the second non-goal above.
+- **hands-off** `DEPL-aRepatriatedFork-20` — gov's `extract.py` running at inCMS, which gov's
+  `corpus_ids.py` and `merge-rows.py` import `grammar_for` from after the convergence.
 
 ## 4. Design
 
@@ -274,6 +276,8 @@ pre-change `resolve()` that ignores it, plus the archive-segment path against th
 
 - rev-1 · 2026-09-23 · initial draft, from the brief's unit 12 and audit-B §9 and §10, with the
   archive-pattern and leading-family measurements taken for this spec.
+- rev-2 · 2026-09-23 · §3 gains the **hands-off** edge back to `DEPL-aRepatriatedFork-20`,
+  which declared its **consumes-from** here and met no matching edge (hygiene check 12).
 
 ## 10. Reuse audit
 

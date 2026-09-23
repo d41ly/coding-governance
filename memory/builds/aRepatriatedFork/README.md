@@ -109,7 +109,7 @@ ids TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TO
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [DEPL-aRepatriatedFork-1 — the charter renderer lets an answer win, and knows which file is its template](spec/2026-09-23-spec-DEPL-aRepatriatedFork-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
-| [TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts](spec/2026-09-23-spec-TOOL-aRepatriatedFork-10.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-23 |
+| [TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts](spec/2026-09-23-spec-TOOL-aRepatriatedFork-10.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-16 — check-install-prefix grades only what a repo ships](spec/2026-09-23-spec-TOOL-aRepatriatedFork-16.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-3 — shipped Python names its encoding on every text-IO call](spec/2026-09-23-spec-TOOL-aRepatriatedFork-3.md) | 1 | 1 | CLOSED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-4 — review-harness gates find harnesses where adopters keep them](spec/2026-09-23-spec-TOOL-aRepatriatedFork-4.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
@@ -119,14 +119,14 @@ ids TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TO
 | [TOOL-aRepatriatedFork-9 — row_grammar and check-arms take NicoCares' additions, and stop importing sibling engines](spec/2026-09-23-spec-TOOL-aRepatriatedFork-9.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"](spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-15 — a kit whose shipped bytes move bumps its version](spec/2026-09-23-spec-TOOL-aRepatriatedFork-15.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-23 |
-| [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-23 |
+| [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries](spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter](spec/2026-09-23-spec-DEPL-aRepatriatedFork-14.md) | 3 | 1 | SPECCED | rev-1 | 2026-09-23 |
 | [DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did](spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-18 — the test suites that arm gov's gates reach adopters](spec/2026-09-23-spec-TOOL-aRepatriatedFork-18.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-19 — check-wiring judges every arm at a relocated layout](spec/2026-09-23-spec-TOOL-aRepatriatedFork-19.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-11 — unattended: build-root pathspecs stop at the build root, and a pull lands its hooks wired and its pins measurable](spec/2026-09-23-spec-TOOL-aRepatriatedFork-11.md) | 6 | 2 | SPECCED | rev-1 | 2026-09-23 |
-| [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | SPECCED | rev-1 | 2026-09-23 |
+| [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | SPECCED | rev-2 | 2026-09-23 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-23 |
 <!-- /gen:build-units -->
 

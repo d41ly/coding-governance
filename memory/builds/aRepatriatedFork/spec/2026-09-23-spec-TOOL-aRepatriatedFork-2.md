@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -90,6 +90,8 @@ adds a zero-tolerance arm over CODE lines that the shipped-prefix ban cannot see
   check-unattended fork on it and keeps the C21 narrowing for itself.
 - **hands-off** `TOOL-aRepatriatedFork-19` — `tools/check-wiring.sh`'s recall, scratch and merge
   arms, which locate sibling kits by the same two-layout probe and can move onto S3's resolver.
+- **hands-off** `DEPL-aRepatriatedFork-20` — the sibling-kit resolver, which inCMS's
+  convergence needs so gov's `corpus_ids.py` finds the recall kit under `scripts/recall/`.
 
 ## 4. Design
 
@@ -393,6 +395,8 @@ New arm: `tools/lib/resolve-python.test.sh` parity table · one extra row per in
 - rev-2 · 2026-09-23 · §8 resolved by the owner. §4's shell-consumer rule disagreed with
   `TOOL-aRepatriatedFork-19` §8 F2 on whether a shell consumer reads the receipt; it now splits by
   consumer, and check-wiring's awk rung stays that unit's.
+- rev-3 · 2026-09-23 · §3 gains the **hands-off** edge back to `DEPL-aRepatriatedFork-20`,
+  which declared its **consumes-from** here and met no matching edge (hygiene check 12).
 
 ## 10. Reuse audit
 
