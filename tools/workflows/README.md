@@ -59,8 +59,8 @@ rendered from review-harness 1.8".
 `TOOL-dRetiredFork-10`, which cost three carve-outs at one adopter and three divergence rows at
 another — six hand-maintained records for a path each script can work out from where it is standing.
 
-**The population.** Each shell gate derives the kit directory from its own location and scopes the
-population to it:
+**The population.** Each shell gate derives the kit directory from its own location — the
+predicate's probe needs it, and `check-review-join.sh` scopes its population to it:
 
 ```sh
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -77,11 +77,15 @@ and there is no error: measured at population 0 during the unit that wrote this.
 *An empty prefix is a real layout.* A kit installed at the repository root has nothing to strip, and
 the population is then every `*.js` the repo holds.
 
-`check-workflow-syntax.js` has no prefix filter at all, and that asymmetry is deliberate rather than
-an oversight. It applies a `meta`-declaration marker to every candidate, so its population is already
-*a file declaring workflow meta* and a prefix was doing nothing but naming a directory. The other two
-apply no marker filter, so removing theirs would widen them into files whose own ban tables trip the
-predicate — measured, and it reds the bar.
+**The population rule, for all three gates** (TOOL-aRepatriatedFork-4):
+
+- `check-workflow-syntax.js` and `check-verifier-fanout.sh` apply NO prefix filter. Each applies a
+  `meta`-declaration marker to every `*.js` git lists, so the population is *a file declaring
+  workflow meta* wherever it lives — including `.claude/workflows/`, where both adopters keep their
+  harnesses and where a prefix filter judged none of them.
+- `check-review-join.sh` applies no marker filter, so dropping its prefix would widen it into files
+  whose own ban tables trip the predicate — measured, and it reds the bar. It keeps the derived prefix
+  and ADDS `.claude/workflows/` as a literal, the harness's own convention. `.claude/hooks/` stays out.
 
 **The predicate.** Three rungs, tried in order, then a refusal:
 

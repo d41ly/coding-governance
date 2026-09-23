@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -40,7 +40,7 @@ costing a five-file fork.
   call with a message naming the file and the value, the way `AGENT_CAP` is refused today
   (`:1884-1892`). An absent file or key means 5. Observed by AC6.
 - **S6** — Every hook message that prints the cap prints the effective one, and so does
-  `tools/workflows/check-verifier-fanout.sh:121`, which types `≤5`. Observed by AC7.
+  `tools/workflows/check-verifier-fanout.sh:111`, which types `≤5`. Observed by AC7.
 - **S7** — The four shipped harnesses carry the cap as a render token, `{{FANOUT_CAP}}`, rendered from
   the same conf by the kit's existing renderer, so a repo declaring 4 receives harnesses the hook admits.
   Observed by AC8.
@@ -277,6 +277,8 @@ New arm: `tools/workflows/check-protocol-parity.test.sh` · a template with a su
 
 - rev-1 · 2026-09-23 · initial draft, measured against gov a7c78ad2, inCMS 1bc57da27 and nc f69e2ffb,
   with the nested fail-open reproduced by piping one payload to all three hooks.
+- rev-2 · 2026-09-23 · S6 citation moved from `:121` to `:111`: TOOL-aRepatriatedFork-4 removed the
+  verifier-fanout prefix derivation above that line. Same `≤5` echo, no design change.
 
 ## 10. Reuse audit
 

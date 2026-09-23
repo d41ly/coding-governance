@@ -112,10 +112,10 @@ ids TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TO
 | [TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts](spec/2026-09-23-spec-TOOL-aRepatriatedFork-10.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-16 — check-install-prefix grades only what a repo ships](spec/2026-09-23-spec-TOOL-aRepatriatedFork-16.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-3 — shipped Python names its encoding on every text-IO call](spec/2026-09-23-spec-TOOL-aRepatriatedFork-3.md) | 1 | 1 | CLOSED | rev-2 | 2026-09-23 |
-| [TOOL-aRepatriatedFork-4 — review-harness gates find harnesses where adopters keep them](spec/2026-09-23-spec-TOOL-aRepatriatedFork-4.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-23 |
+| [TOOL-aRepatriatedFork-4 — review-harness gates find harnesses where adopters keep them](spec/2026-09-23-spec-TOOL-aRepatriatedFork-4.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-5 — pre-push runs only a tracked, unmodified gate command](spec/2026-09-23-spec-TOOL-aRepatriatedFork-5.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-6 — unattended set_fact refuses a value that can forge a second fact](spec/2026-09-23-spec-TOOL-aRepatriatedFork-6.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-23 |
-| [TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap](spec/2026-09-23-spec-TOOL-aRepatriatedFork-7.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-23 |
+| [TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap](spec/2026-09-23-spec-TOOL-aRepatriatedFork-7.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-9 — row_grammar and check-arms take NicoCares' additions, and stop importing sibling engines](spec/2026-09-23-spec-TOOL-aRepatriatedFork-9.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"](spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-15 — a kit whose shipped bytes move bumps its version](spec/2026-09-23-spec-TOOL-aRepatriatedFork-15.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-23 |
@@ -130,7 +130,7 @@ ids TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TO
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-23 |
 <!-- /gen:build-units -->
 
-Records: 24 bound to this build, across 3 record folder(s).
+Records: 25 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

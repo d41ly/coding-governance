@@ -210,6 +210,27 @@ cp "$GATE" "$N/tools/workflows/gate.sh"
 arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
   bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$N"
 
+# ---- TOOL-aRepatriatedFork-4: the population reaches .claude/workflows/, and only that ------------
+# A kit at a `scripts/` prefix, as both adopters install it, with the adopter's harness under
+# `.claude/workflows/`. The a7c78ad2 bytes answered this fixture with `no JavaScript under
+# scripts/` (observed). The hook copy under `.claude/hooks/` carries the same banned join and must
+# stay OUT: `.claude/` wholesale admits the hook ban tables.
+H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/workflows" "$H4/scripts/hooks" "$H4/.claude/workflows" "$H4/.claude/hooks"
+cp "$GATE" "$H4/scripts/workflows/check-review-join.sh"
+cp "$ROOT/tools/hooks/agent-cap.js" "$H4/scripts/hooks/agent-cap.js"
+( cd "$H4" && git init -q . && git config user.email t@t.test && git config user.name t \
+  && git add -A && git commit -qm h4 --no-verify ) >/dev/null 2>&1
+out=$(cd "$H4" && bash scripts/workflows/check-review-join.sh 2>&1); rc=$?
+case "$rc:$out" in 1:*"no JavaScript under scripts/ or .claude/workflows/"*) printf 'arm ok    an empty refusal names both directories\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  the empty refusal does not name both directories (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+cp "$TMP/bracket.js" "$H4/.claude/workflows/review.js"
+cp "$TMP/bracket.js" "$H4/.claude/hooks/ban-table.js"
+out=$(cd "$H4" && bash scripts/workflows/check-review-join.sh 2>&1); rc=$?
+case "$rc:$out" in 1:*".claude/workflows/review.js:"*) printf 'arm ok    a join in a harness under .claude/workflows/ is caught\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  a join under .claude/workflows/ was not caught (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+case "$out" in *ban-table.js*) fails=$((fails+1)); printf 'arm FAIL  a file under .claude/hooks/ was judged\n%s\n' "$out" ;;
+  *) printf 'arm ok    a file under .claude/hooks/ is not judged\n' ;; esac
+
 # ---- ARM 2: the agent wave that silently drops itself (TOOL-dRetiredFork-7) ----------------------
 # Absorbed from inCMS, REDUCED: its arms keyed on that repo's own record ids are left behind, because
 # an arm keyed on a foreign corpus reds on absence rather than on behaviour.

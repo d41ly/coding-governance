@@ -25,23 +25,13 @@ set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "verifier-fanout: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-# ---- WHERE THIS KIT LIVES, DERIVED -- TOOL-dRetiredFork-10 ------------------------------------
-# This script spells no install prefix. It is `tools/` here, `scripts/` at both measured adopters,
-# and whatever the next one picks. Three carve-outs and three divergence rows existed for a path
-# each script can work out from its own location.
-#
-# GIT COMPUTES THE REPO-RELATIVE PATH. This does NOT subtract `--show-toplevel` from `pwd`, which
-# is the obvious spelling and is broken on MSYS: `pwd` yields /c/projects/... while
-# `--show-toplevel` yields C:/projects/..., so the subtraction leaves the string untouched and the
-# population matches NOTHING. Measured during this unit -- population 0, no error, no diagnostic.
-#
-# An EMPTY prefix is a real layout, not a bug: a kit installed at the repository root has no
-# prefix to strip, and the population is then every *.js the repo holds.
+# ---- THE POPULATION HAS NO PREFIX -- TOOL-aRepatriatedFork-4 ----------------------------------
+# Every `*.js` git lists, then the `export const meta` marker below. The marker IS the selector,
+# as it is in check-workflow-syntax.js, so a harness is judged wherever it lives -- both adopters
+# keep theirs under `.claude/workflows/`, which a kit-prefix filter never reached, and each carried
+# a hand-kept fork to compensate. The prefix TOOL-dRetiredFork-10 derived here was doing nothing
+# the marker does not, except hiding those harnesses.
 HERE="$(cd "$(dirname "$0")" && pwd)"
-KIT_PREFIX="$(cd "$HERE/.." && git rev-parse --show-prefix 2>/dev/null)"
-KIT_PREFIX="${KIT_PREFIX%/}"
-if [ -n "$KIT_PREFIX" ]; then POP_RE="^$KIT_PREFIX/.*\.js$"; else POP_RE='\.js$'; fi
-KIT_SAYS="${KIT_PREFIX:-the repository root}"
 
 # ---- THE PREDICATE, PROBED -------------------------------------------------------------------
 # Three rungs, and the third is not optional. NicoCares keeps its hooks a directory up from its
@@ -64,8 +54,8 @@ command -v node >/dev/null 2>&1 || { echo "verifier-fanout: node not found — t
 # permanently red. (They live under `mktemp -d`, so this is belt-and-braces — the same shape
 # check-review-join.sh carries for the same reason.)
 SELF_EXCLUDE='(^|/)check-verifier-fanout\.(sh|js|test\.sh)$'
-# BASENAME-anchored for the same reason as the population's derived prefix: an exclusion
-# spelled with a rooted literal is the same class as the filter it scopes.
+# BASENAME-anchored, because the gate is installed under whatever prefix an adopter picks: an
+# exclusion spelled with a rooted literal would name a path that exists only here.
 
 if [ "$#" -gt 0 ]; then
   FILES=$(printf '%s\n' "$@")
@@ -74,7 +64,7 @@ else
   # tracked AND untracked-but-unignored, matching the other two JavaScript gates: a new harness is
   # judged the moment it exists, not the moment someone remembers to stage it.
   FILES=$(git ls-files --cached --others --exclude-standard -- '*.js' \
-    | grep -E "$POP_RE" | grep -vE "$SELF_EXCLUDE" | LC_ALL=C sort -u || true)
+    | grep -vE "$SELF_EXCLUDE" | LC_ALL=C sort -u || true)
   EXPLICIT=0
 fi
 
@@ -93,7 +83,7 @@ if [ -z "$SCAN" ]; then
   if [ "$EXPLICIT" = 1 ]; then
     echo "verifier-fanout: none of the named files exist — nothing was scanned, which is not a pass"
   else
-    echo "verifier-fanout: no workflow script under $KIT_SAYS/ — the population is empty, which is not a pass"
+    echo "verifier-fanout: no workflow script (a *.js exporting meta) anywhere git lists, .claude/workflows/ included — the population is empty, which is not a pass"
   fi
   exit 1
 fi
