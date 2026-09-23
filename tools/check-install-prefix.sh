@@ -12,6 +12,11 @@
 # install scaffolded the adopter's own committed `HYGIENE.md` with seven kit paths that resolve to
 # nothing in their tree, and the hygiene gate exited 0 over it.
 #
+# WHAT "SHIPS" MEANS, and where this gate grades nothing. A repo ships what its govkit registry
+# resolves (TOOL-aRepatriatedFork-16). Installed at a repo that carries no registry — a consumer,
+# which ships nothing onward — BOTH arms skip, each printing a SKIP line, and the gate exits 0. It
+# does not grade a consumer's own tree or the gov files that consumer received.
+#
 # THE POPULATION is what a target repo RECEIVES. Tests, selftests and `*.conf.example` are dropped
 # from the glob and then added back IF the descriptors say an adopter receives them (S5). They were
 # excluded outright until TOOL-cWidenedNet-1, for a reason that was half right: those files BUILD
@@ -83,6 +88,30 @@ CARRIED="${SELF_PREFIX}install-prefix-carried.txt"
 MODE="${1:---check}"
 case "$MODE" in --check|--list|--write-ratchet|--rebaseline) ;;
   *) echo "usage: $(basename "$0") [--check|--list|--write-ratchet|--rebaseline]"; exit 2 ;; esac
+
+# TOOL-cWidenedNet-1 S5 made this THE KIT-SOURCE TEST, ONCE; TOOL-aRepatriatedFork-16 S2 hoisted it
+# above BOTH arms. A repo SHIPS what its registry resolves — `govkit apply` writes nothing a registry
+# does not name — so a repo with no registry ships nothing and neither arm has a population. Arm 1
+# used to grade `${SELF_PREFIX}*` regardless, and at a consumer that is the consumer's own tree plus
+# every gov file it received, against waivers keyed on gov's paths: measured at a `scripts/` adopter,
+# nine hits, five of them gov's own waived bytes, and the kit was deselected. The two paths stay
+# literal on purpose: a kit source's registry sits at gov's layout by definition, because the
+# registry's own directory is an exemption that never travels.
+REGISTRY=tools/govkit/registry.toml
+KIT_SOURCE=no
+[ -f "$REGISTRY" ] && [ -f tools/lib/resolve-python.sh ] && KIT_SOURCE=yes
+if [ "$KIT_SOURCE" != yes ]; then
+  # A SKIP ANNOUNCES ITSELF (§7), and exits 0 (§8 F1, owner): a consumer's bar stays green when it
+  # has nothing to police, and a printed skip cannot be misread as a graded run.
+  echo "install-prefix: root-install arm SKIPPED — this repo is not a kit SOURCE (it carries no"
+  echo "install-prefix: govkit registry, or no python resolver beside it), so it ships nothing and"
+  echo "install-prefix: its files under ${SELF_PREFIX:-the repo root} were NOT graded on this run."
+  echo "install-prefix: carried-prefix arm SKIPPED — this repo is not a kit SOURCE (it carries no"
+  echo "install-prefix: govkit registry, or no python resolver beside it) and so has no"
+  echo "install-prefix: shippable set to grade. Said out loud rather than passed silently: a skip"
+  echo "install-prefix: that looks like a pass is indistinguishable from coverage."
+  exit 0
+fi
 # The python launcher for the carried-prefix arm below, resolved through the repo's ONE resolver and
 # through nothing else. There is deliberately no `PY=python` fallback: the MS-Store `python3` stub
 # answers `command -v` and exits 9009, so a bare launcher name is not an answer — and the idiom ban
@@ -117,36 +146,30 @@ derive_received_files() {
   # alone: arm 1 intersects its own suffix-excluded files with this set, so a received test is graded
   # for the ROOT spelling while an unshipped one is not. The name now says what the set IS rather
   # than which arm happened to ask first.
+  #
+  # TOOL-aRepatriatedFork-16 S1 — the set itself is govkit's `shipped` verb, the ONE derivation of
+  # what this repo ships; this function used to carry its own heredoc over the same calls. The verb
+  # sits beside the registry the kit-source test already found. A verb that fails prints NOTHING
+  # here, not the named addition alone, so the liveness checks below still see a dead probe.
   # shellcheck source=/dev/null
   . tools/lib/resolve-python.sh
-  CARRIED_SELF="$CARRIED" "$(resolve_python)" - <<'PYEOF'
-import os
-import pathlib, sys
-CARRIED_SELF = os.environ.get("CARRIED_SELF", "")
-sys.path.insert(0, "tools/govkit")
-import govkit
-root = pathlib.Path(".").resolve()
-reg = govkit.load_toml(root / "tools" / "govkit" / "registry.toml")
-srcs = set()
-for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
-    for row in govkit.resolve_entry(root, d, govkit.canonical_ctx(eid))["survivors"]:
-        if row.get("src"):
-            srcs.add(row["src"])
-srcs.add("WIRE-INTO-PROJECT.md")
-# TOOL-dTieredTribunal-27, AND IT DOES REPRODUCE — under epoch 2, which is how it was finally
-# seen. THE RATCHET MUST NOT GRADE ITSELF. Every row in it IS a path, so the file counts its own
-# rows as carried literals: writing it moves its own count, the next --check reds, and no
-# hand-edit settles it because the edit changes the count again. Under epoch 1 the number
-# happened to sit still and the defect read as FIXED — my own brief recorded it as not
-# reproducing, on a one-pass fixed-point measurement. Widening the predicate moved it 96 -> 107
-# and the loop was immediate.
-#
-# A file whose entire content is a list of paths cannot CARRY one: the paths are its data, not a
-# reference that would arrive at a target and resolve to nothing there. Same reason the arm above
-# already drops this script and the waiver registry from its own population.
-srcs.discard(str(CARRIED_SELF))
-print("\n".join(sorted(srcs)))
-PYEOF
+  local _shipped
+  _shipped=$("$(resolve_python)" "${REGISTRY%/*}/govkit.py" shipped) || return 0
+  [ -n "$_shipped" ] || return 0
+  # TOOL-dTieredTribunal-27, AND IT DOES REPRODUCE — under epoch 2, which is how it was finally
+  # seen. THE RATCHET MUST NOT GRADE ITSELF. Every row in it IS a path, so the file counts its own
+  # rows as carried literals: writing it moves its own count, the next --check reds, and no
+  # hand-edit settles it because the edit changes the count again. Under epoch 1 the number
+  # happened to sit still and the defect read as FIXED — my own brief recorded it as not
+  # reproducing, on a one-pass fixed-point measurement. Widening the predicate moved it 96 -> 107
+  # and the loop was immediate.
+  #
+  # A file whose entire content is a list of paths cannot CARRY one: the paths are its data, not a
+  # reference that would arrive at a target and resolve to nothing there. Same reason the arm above
+  # already drops this script and the waiver registry from its own population. The verb prints
+  # every survivor, this one included; dropping it is this gate's business, so it happens here.
+  { printf '%s\n' "$_shipped" | tr -d '\r' | cut -f3 | grep -vxF "$CARRIED"
+    echo "WIRE-INTO-PROJECT.md"; } | LC_ALL=C sort -u
 }
 
 # The shipped surface: what a target repo receives, plus the file that tells them where to put it.
@@ -174,30 +197,20 @@ files=$(printf '%s\n' "$glob_set" | grep -vE "$SUFFIX_EXCL" || true)
 
 # The suffix-excluded members come back IF AND ONLY IF an adopter RECEIVES them, which is the
 # descriptor-resolved set the ban arm has always used. An unshipped test is still dropped: nobody
-# reads it but us, and its fixtures are none of this arm's business.
-recv_skip=""
-# TOOL-cWidenedNet-1 S5 — THE KIT-SOURCE TEST, ONCE. Two arms ask it now, and the pair of literal
-# paths it needs is exactly the sort of thing this gate exists to stop being retyped. The carried
-# arm below reads this variable rather than repeating the test.
-KIT_SOURCE=no
-[ -f tools/govkit/registry.toml ] && [ -f tools/lib/resolve-python.sh ] && KIT_SOURCE=yes
-
-if [ "$KIT_SOURCE" = yes ]; then
-  _recv=$(derive_received_files | tr -d '\r' | grep -v '^$' | LC_ALL=C sort)
-  if [ -n "$_recv" ]; then
-    _extra=$(printf '%s\n' "$glob_set" | grep -E "$SUFFIX_EXCL" | LC_ALL=C sort \
-             | comm -12 - <(printf '%s\n' "$_recv") || true)
-    [ -n "$_extra" ] && files=$(printf '%s\n%s\n' "$files" "$_extra" | grep -v '^$' | LC_ALL=C sort -u)
-  else
-    # The population DIED rather than being empty. Both other arms already refuse on this, and a
-    # silent narrowing here would be the same defect with a quieter failure mode.
-    echo "install-prefix: the received-set derivation resolved NOTHING, so arm 1 cannot tell a"
-    echo "install-prefix: shipped test from an unshipped one. Refusing to grade a narrowed"
-    echo "install-prefix: population over a probe that cannot move."
-    exit 1
-  fi
+# reads it but us, and its fixtures are none of this arm's business. Only a kit source reaches this
+# line (the test above), so the received set always exists here.
+_recv=$(derive_received_files | tr -d '\r' | grep -v '^$' | LC_ALL=C sort)
+if [ -n "$_recv" ]; then
+  _extra=$(printf '%s\n' "$glob_set" | grep -E "$SUFFIX_EXCL" | LC_ALL=C sort \
+           | comm -12 - <(printf '%s\n' "$_recv") || true)
+  [ -n "$_extra" ] && files=$(printf '%s\n%s\n' "$files" "$_extra" | grep -v '^$' | LC_ALL=C sort -u)
 else
-  recv_skip="yes"
+  # The population DIED rather than being empty. Both other arms already refuse on this, and a
+  # silent narrowing here would be the same defect with a quieter failure mode.
+  echo "install-prefix: the received-set derivation resolved NOTHING, so arm 1 cannot tell a"
+  echo "install-prefix: shipped test from an unshipped one. Refusing to grade a narrowed"
+  echo "install-prefix: population over a probe that cannot move."
+  exit 1
 fi
 
 # TOOL-cWidenedNet-1 S1 — THE EXTENSION CLASS, WRITTEN ONCE. Both arms read this string. Two copies
@@ -287,8 +300,11 @@ while IFS= read -r h; do
   check_marker_reason "$h"; _m=$?
   if [ "$_m" = 0 ]; then marked_n=$((marked_n+1)); continue; fi
   if [ "$bad" = 0 ]; then
-    echo "install-prefix: a SHIPPED file spells a root-install kit path. An adopter installs kits at"
-    echo "install-prefix: tools/<kit>/, so these resolve to nothing in their tree — and nothing else"
+    # TOOL-aRepatriatedFork-16 S4: the prefix is the DERIVED one. This line used to name gov's
+    # default, which is false at every other prefix this gate runs under.
+    echo "install-prefix: a SHIPPED file spells a root-install kit path. Kits install at"
+    echo "install-prefix: ${SELF_PREFIX:-the repo root/}<kit>/ here and at an adopter's own prefix there, so"
+    echo "install-prefix: these resolve to nothing in their tree — and nothing else"
     echo "install-prefix: reds. Fix the path, or mark the line \`gov:root-fixture — <reason>\` when the"
     echo "install-prefix: spelling is a deliberate fixture. (The $WAIVERS registry still holds its"
     echo "install-prefix: existing rows and takes no new ones: it keys on <path>:<line> and unpins.)"
@@ -318,12 +334,6 @@ EOF
 [ "$stale" = 0 ] || exit 1
 
 echo "install-prefix: clean — $(printf '%s\n' "$files" | grep -c .) shipped files, $waived_n declared waiver(s), $marked_n marked fixture line(s), no undeclared root-install spelling"
-# A SKIP ANNOUNCES ITSELF (§7). Without this line a run over a repo that is not a kit source is
-# byte-identical to one that graded every received test, and a green row would be misread as a
-# verified one.
-[ -z "$recv_skip" ] || echo "install-prefix: received-set extension SKIPPED — no govkit registry, so this repo is
-install-prefix: not a kit source and arm 1 cannot tell a shipped test from an unshipped one. The
-install-prefix: suffix-excluded files went UNGRADED for the root spelling on this run."
 fi
 
 # ---------------------------------------------------------------------------------------------
@@ -476,12 +486,8 @@ carried_rows() {
        | LC_ALL=C sort || true
 }
 
-if [ "$KIT_SOURCE" != yes ]; then
-  echo "install-prefix: carried-prefix arm SKIPPED — this repo is not a kit SOURCE (it carries no"
-  echo "install-prefix: govkit registry, or no python resolver beside it) and so has no"
-  echo "install-prefix: shippable set to grade. Said out loud rather than passed silently: a skip"
-  echo "install-prefix: that looks like a pass is indistinguishable from coverage."
-elif [ "$MODE" = --write-ratchet ]; then
+# A repo that is not a kit source exited at the kit-source test near the top, with this arm's SKIP.
+if [ "$MODE" = --write-ratchet ]; then
   # D3, from the closing review of DEPL-dCarriedReceipt. `carried_rows` ends in a pipe, and this
   # script sets only `set -u` — no `pipefail` — so the status is `sort`'s and a DEAD producer (an
   # unresolvable python, a govkit import error, a `resolve_entry` raise, a traceback out of the

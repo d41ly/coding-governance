@@ -656,6 +656,39 @@ def check_playbook_hole_modes(tmp: pathlib.Path) -> None:
           p.stdout + p.stderr)
 
 
+def check_shipped_verb(tmp: pathlib.Path) -> None:
+    """TOOL-aRepatriatedFork-16 S1 — `shipped` over a fixture registry: one entry, two roles.
+
+    The predicate is applied twice, to the verb's output and to a copy with the role column cut,
+    so the arm is observed REJECTING a verb that drops the role — not only accepting a good one.
+    """
+    fx = tmp / "shipped-fx"
+    (fx / "tools" / "govkit" / "entries").mkdir(parents=True, exist_ok=True)
+    (fx / "tools" / "demo").mkdir(parents=True, exist_ok=True)
+    shutil.copy(GOVKIT, fx / "tools" / "govkit" / "govkit.py")
+    (fx / "tools" / "govkit" / "registry.toml").write_text(
+        '[[entry]]\nid = "demo"\ndescriptor = "tools/govkit/entries/demo.kit.toml"\n',
+        encoding="utf-8", newline="\n")
+    (fx / "tools" / "govkit" / "entries" / "demo.kit.toml").write_text(
+        'id = "demo"\nhome = "tools/demo"\n\n'
+        '[[files]]\ninclude = ["run.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n\n'
+        '[[files]]\ninclude = ["seed.txt"]\nrole = "generated"\nto = "{prefix}/seed.txt"\n',
+        encoding="utf-8", newline="\n")
+    p = subprocess.run([sys.executable, str(fx / "tools" / "govkit" / "govkit.py"), "shipped"],
+                       capture_output=True, text=True)
+    want = ["demo\tengine\ttools/demo/run.sh", "demo\tgenerated\ttools/demo/seed.txt"]
+    cut = "\n".join(ln.split("\t", 1)[0] + "\t" + ln.split("\t")[-1]
+                    for ln in p.stdout.splitlines() if "\t" in ln)
+    check("[aRF-16 S1] `shipped` prints one row per survivor, with its entry and its role",
+          p.returncode == 0 and p.stdout.splitlines() == want, p.stdout + p.stderr)
+    check("[aRF-16 S1] ...and the same predicate REJECTS a copy with the role column deleted",
+          cut.splitlines() != want and len(cut.splitlines()) == len(want), cut)
+    pr = subprocess.run([sys.executable, str(fx / "tools" / "govkit" / "govkit.py"),
+                         "shipped", "--all"], capture_output=True, text=True)
+    check("[aRF-16 S1] `shipped` refuses an argument", pr.returncode == 2
+          and "shipped takes no arguments" in pr.stderr, pr.stderr)
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -786,6 +819,7 @@ def main() -> int:
         check("that message names the kit", "claims kit 'ghost-kit'" in p.stdout, p.stdout)
 
         check_playbook_hole_modes(tmp / "pb")
+        check_shipped_verb(tmp)
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO

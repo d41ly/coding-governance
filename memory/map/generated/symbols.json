@@ -1538,6 +1538,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_shipped_verb",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_slot_table",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1906,6 +1911,11 @@
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_shipped",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "cmd_survey",

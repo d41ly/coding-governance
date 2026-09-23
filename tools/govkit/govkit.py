@@ -3,7 +3,7 @@
 
 Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/
 
-WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. The verbs are `selfcheck`, the read-only `plan`,
+WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. The verbs are `selfcheck`, the read-only `shipped`, `plan`,
 `check`, `update` and `adopt`, the writing `apply` / `apply --resume`, and `intake`. THE COUNT IS
 NOT SPELLED HERE and the list is not a second source: `USAGE` and `main`'s dispatch tuple own it
 between them, a selftest arm joins the two, and the sentence that used to say "all five" was wrong
@@ -10189,10 +10189,32 @@ def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tupl
     return descs
 
 
+def cmd_shipped(root: pathlib.Path) -> int:
+    """TOOL-aRepatriatedFork-16 S1 — what THIS repo ships, as ONE derivation.
+
+    One `<entry>\\t<role>\\t<src>` row per descriptor survivor carrying a source, sorted. The
+    install-prefix gate used to carry this as its own heredoc over the same calls, and two further
+    readers were about to paste it again. Read-only, no arguments. A registry naming a broken
+    descriptor exits 1 and prints NO row: a reader must not grade a narrowed set as the whole one.
+    """
+    r = Report()
+    descs = read_descriptors(root, load_toml(root / "tools" / "govkit" / "registry.toml"), r)
+    if r.problems:
+        for p in r.problems:
+            sys.stderr.write(f"govkit: {p}\n")
+        return 1
+    rows = {f"{eid}\t{row['role']}\t{row['src']}"
+            for eid, (d, _p) in descs.items()
+            for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"] if row.get("src")}
+    sys.stdout.write("".join(f"{x}\n" for x in sorted(rows)))
+    return 0
+
+
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
   govkit.py selfcheck
-  govkit.py plan  --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
+  govkit.py shipped
+  govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
   govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
@@ -10634,6 +10656,10 @@ def main(argv: list[str]) -> int:
             if len(argv) > 2 or (len(argv) == 2 and argv[1] != "--write"):
                 raise Refusal("selfcheck takes no arguments except --write")
             return selfcheck(root, write=(len(argv) == 2))
+        if verb == "shipped":
+            if len(argv) > 1:
+                raise Refusal("shipped takes no arguments")
+            return cmd_shipped(root)
         if verb == "contribute":
             if target is None:
                 raise Refusal("contribute needs an explicit --target: the adopter tree to "

@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-16 — check-install-prefix grades only what a repo ships
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-16-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-16-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-TOOL-aRepatriatedFork-16-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-16-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -41,6 +42,14 @@ grade that set, and skip out loud where no registry exists.
   fixtures of arms 1-8, S4 and AC6 (`:39-50`, `:395-414`, `:475-481`) build repos with NO registry
   and expect arm 1 to grade them; after S2 those repos skip, so they take a registry through the
   existing `mkfix_source` (`:120`). Observed by AC6.
+  rev-2: `mkfix` itself takes the registry, a minimal one naming only the kit's engine file, plus
+  an empty ratchet, so arms 1-8 keep their bodies and their meaning. `GATE_REL` becomes the gate's
+  FIXTURE-internal path — every fixture lays its kits under `tools/` whatever the host prefix, so the
+  gate inside a fixture sits there too — and `run_arm` runs that copy rather than the host's, which
+  resolved its prefix from the host tree. The arms that need a NON-source (the carried skip at
+  `:157` and AC6 at `:475`) move onto AC3's consumer fixture; arm 7's empty-kit refusal moves its
+  gate to a prefix with no kit directory; the S4 arm moves the kit and sidecars and leaves the
+  registry at `tools/govkit/`, rewriting the descriptor's home.
 - **S6** — `tools/govkit/entries/check-install-prefix.kit.toml`'s `why_conditional` and the gate's
   header state the consumer behaviour: installed at a repo that ships nothing, the kit grades
   nothing and says so. NOT OBSERVED — prose, graded by review only.
@@ -182,8 +191,11 @@ where arm 1 changes, and AC3 and AC4 bracket it.
 
 - **AC1** — When `python tools/govkit/govkit.py shipped` runs at gov HEAD, its third column, sorted
   and de-duplicated, equals the set the pre-change `derive_received_files` heredoc prints minus
-  `WIRE-INTO-PROJECT.md`, and it exits 0. Red when: a role or an entry is dropped and the diff of
-  the two sets is non-empty.
+  `WIRE-INTO-PROJECT.md` and plus the gate's own ratchet `install-prefix-carried.txt`, and it exits
+  0. The ratchet is a descriptor survivor the heredoc discarded; the verb prints every survivor and
+  the gate keeps discarding its own ratchet after the call, so the gate's set is unchanged (rev-2,
+  measured: the heredoc run with an empty `CARRIED_SELF` prints exactly that one extra row).
+  Red when: a role or an entry is dropped and the diff of the two sets is non-empty.
   figure: derived at observation time from both outputs; no count is written here.
 - **AC2** — When `bash tools/check-install-prefix.sh` runs over gov's own tree after the change,
   both summary lines match those at a7c78ad2: 301 shipped files, 11 declared waivers, 26 marked
@@ -194,10 +206,14 @@ where arm 1 changes, and AC3 and AC4 bracket it.
   (kits under `scripts/`, a govkit receipt, no registry) whose files carry the five
   gov-waived spellings from §4, it exits 0 and prints both SKIP lines. Red when: arm 1 grades the
   fixture and exits 1 naming a hit.
-  fixture: built by the new suite arm in §7; the tree holds no such repo today.
+  fixture: built by the new suite arm in §7; the tree holds no such repo today. rev-2: the
+  fixture COPIES gov's own four files carrying those spellings rather than retyping them — the
+  bytes nc received — so the suite gains no marked fixture line and AC2's figure holds.
 - **AC4** — When the AC3 fixture is run with the gate's bytes at a7c78ad2 (blob `6b3c599a` of
   `tools/check-install-prefix.sh`), it exits 1 naming the root-install hits. Red when: the old gate
   exits 0, meaning the fixture does not reproduce nc's measurement and AC3 proves nothing.
+  rev-2: observed ONCE, by hand, at the build; it is not a standing arm, because an adopter
+  running the suite has no gov history to `git show` from.
 - **AC5** — When arm 1 refuses in a fixture whose gate sits at `vendor/gov/`, the refusal text names
   `vendor/gov/` and no longer spells a `tools/` home; checked with
   `grep -c 'installs kits at tools/' tools/check-install-prefix.sh` returning 0. Red when: the
@@ -242,6 +258,13 @@ print both rows with their roles, and a copy with the role column deleted must f
 
 - rev-1 · 2026-09-23 · initial draft, from the nc deselection commit `239057ca` and a re-run of gov
   a7c78ad2's gate and suite at nc `052a8b39`.
+- rev-2 · 2026-09-23 · built. AC1 gains the ratchet row the heredoc discarded (the verb prints every
+  survivor; the gate still discards its own). S5 names how the fixtures take a registry — through
+  `mkfix`, not by rewriting each arm onto `mkfix_source` — and that `GATE_REL` is fixture-internal,
+  because a derived host path resolves to nothing inside a fixture whose kits sit under `tools/`.
+  AC3's fixture copies gov's files rather than retyping the spellings; AC4 is a one-time
+  observation, not a standing arm. §4 Rollout landed as ONE commit, not two: S1's call site and
+  S2's hoist edit the same function's file, and AC1 was observed before either gate edit.
 
 ## 10. Reuse audit
 
