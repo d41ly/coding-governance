@@ -27,6 +27,20 @@ who did not write it.
   It grades DECLARATIONS, never rendered output. A brace that survives a real render is the
   adopter's own surviving-placeholder arm, one stage later and only for kits somebody rendered.
 
+THE SECOND ARM, TOOL-aRepatriatedFork-10 S7: a `rendered` template may not spell `KEY=value` for a
+key its own kit's configuration declares. A rendered doc becomes the ADOPTER's committed rule set,
+so a value typed into the template is the shipping repo's own value stated as the adopter's — the
+memory-tree HYGIENE template said `INDEX_CAP_LINES=0` into every tree that declared 500. The key
+set is every key list in the descriptor's `[config]`, its `defaults`, AND every key the kit's
+shipped `<config file>.example` assigns, because the caps a template cites are declared there and
+in no list. `KEY={{PLACEHOLDER}}` is a render, not a leak, and passes. A key any `rendered` rule of
+the same kit declares as a placeholder is EXEMPT: the kit states the adopter's value through
+`{{KEY}}`, so a spelled `KEY=value` in its templates describes a value rather than claiming one (the
+unattended templates' `ANCHOR_SCOPE="published"`). The cost is real and stated: once a kit renders a
+key, a template of that kit re-spelling the key's value is not caught — intent, a description
+versus a claim, is not textual. It does NOT check a value spelled without its key (`the cap is
+250`), nor a template no `rendered` rule includes.
+
 REFUSALS, not passes. A population of zero declaring rules REFUSES: a gate that scanned nothing
 reports the same zero as a clean tree. A descriptor that is not valid TOML refuses. A descriptor
 whose `[adopt]` block names no resolvable script refuses rather than skipping, because a skipped
@@ -155,6 +169,55 @@ def build_report(root):
     return rows, silent
 
 
+_CONF_ASSIGN = re.compile(r"^\s*([A-Z][A-Z0-9_]*)=", re.M)
+
+
+def extract_conf_keys(kit_dir, doc):
+    """Every key this kit's configuration declares: the `[config]` key lists, its `defaults`, and
+    the assignments in the shipped `<file>.example` beside the descriptor."""
+    cfg = doc.get("config") or {}
+    keys = set()
+    for name, val in cfg.items():
+        if "keys" in name and isinstance(val, list):
+            keys.update(str(k) for k in val)
+    keys.update(str(k) for k in (cfg.get("defaults") or {}))
+    conf_file = cfg.get("file")
+    if conf_file:
+        example = kit_dir / (pathlib.PurePath(str(conf_file)).name + ".example")
+        if example.is_file():
+            keys.update(_CONF_ASSIGN.findall(read_bytes_as_text(example)))
+    return keys
+
+
+def scan_conf_leaks(root):
+    """(template, key) for every `KEY=value` a `rendered` template spells for its own kit's key.
+
+    A value is anything but whitespace, a backtick or `{` after the `=`: a bare `KEY=` in prose names
+    the key, and `KEY={{...}}` is the render this arm asks for."""
+    leaks = []
+    templates = 0
+    for desc in sorted(root.glob(KIT_GLOB)):
+        kit_dir = desc.parent
+        doc = load_descriptor(desc)
+        keys = extract_conf_keys(kit_dir, doc)
+        rendered = [r for r in (doc.get("files", []) or []) if r.get("role") == "rendered"]
+        if not rendered:
+            continue
+        # A key the KIT renders as a placeholder is exempt: the kit states the adopter's own value
+        # through `{{KEY}}`, so a `KEY=value` in its templates describes a value rather than claiming
+        # one. The cost is named in the module docstring.
+        rule_keys = keys - {str(p) for r in rendered for p in (r.get("placeholders", []) or [])}
+        for rule in rendered:
+            for pattern in rule.get("include", []) or []:
+                for tpl in sorted(kit_dir.glob(str(pattern))):
+                    templates += 1
+                    text = read_bytes_as_text(tpl)
+                    for key in sorted(rule_keys):
+                        if re.search(r"(?<![A-Za-z0-9_])" + re.escape(key) + r"=[^\s`{]", text):
+                            leaks.append((tpl.relative_to(root).as_posix(), key))
+    return leaks, templates
+
+
 def resolve_root(argv):
     """`--root <path>` if given, else the tree this script ships in."""
     if "--root" in argv:
@@ -169,6 +232,7 @@ def main(argv):
     listing = "--list" in argv
     root = resolve_root(argv)
     rows, silent = build_report(root)
+    leaks, templates = scan_conf_leaks(root)
 
     if not rows:
         sys.stderr.write(
@@ -186,6 +250,10 @@ def main(argv):
                   % (", ".join(r["extra"]) or "-"))
         print("kit-placeholders: %d kit(s) graded, %d declaring none: %s"
               % (len(rows), len(silent), ", ".join(silent) or "-"))
+        for tpl, key in leaks:
+            print("    conf value spelled: %s  %s=" % (tpl, key))
+        print("kit-placeholders: %d rendered template(s) scanned for a spelled conf value, %d hit(s)"
+              % (templates, len(leaks)))
         return 0
 
     bad = [r for r in rows if r["missing"] or r["adopter"] is None]
@@ -200,14 +268,19 @@ def main(argv):
                 "kit-placeholders: %s declares placeholder {{%s}} and its own adopter %s never "
                 "substitutes it, so that brace ships unresolved to every adopter\n"
                 % (r["kit"], tok, r["adopter"]))
-    if bad:
+    for tpl, key in leaks:
+        sys.stderr.write(
+            "kit-placeholders: %s is a rendered template and spells %s=<value>, a key its own kit's "
+            "configuration declares, so the shipping repo's value ships as every adopter's — render "
+            "it through a placeholder instead\n" % (tpl, key))
+    if bad or leaks:
         return 1
 
     exempt = [r["kit"] for r in rows if r.get("exempt")]
     print("kit-placeholders: %d kit(s) graded, %d rule-token pair(s), %d kit(s) declaring none, "
-          "%d exempt by a declared `why_no_adopter`%s"
+          "%d exempt by a declared `why_no_adopter`%s; %d rendered template(s) spell no conf value"
           % (len(rows), sum(len(r["declared"]) for r in rows), len(silent), len(exempt),
-             (": " + ", ".join(exempt)) if exempt else ""))
+             (": " + ", ".join(exempt)) if exempt else "", templates))
     return 0
 
 

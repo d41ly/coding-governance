@@ -35,6 +35,17 @@ if [ "$KIT_REL" = "$HERE" ]; then
   echo "memory-tree: the kit dir is outside this repo — printed paths will name the declared '$KIT_REL' prefix." >&2
 fi
 TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
+# THE RECEIPT WINS WHERE ONE EXISTS (TOOL-aRepatriatedFork-10 S6). A FLAT install puts this kit's
+# files straight into the prefix (`scripts/check-memory-hygiene.sh`), so the kit directory's parent
+# is EMPTY and every `{{TOOL_ROOT}}` path rendered bare — naming the codebase-map generator with
+# no prefix in a tree that holds it under `scripts`. govkit records the prefix it installed at; the first
+# `"prefix"` key is the top-level one, because the writer emits it before any row. No receipt — a
+# copy-install — keeps the parent derivation, which is right for every kit-per-directory layout.
+if [ "$KIT_INSIDE" = yes ] && [ -f "$ROOT/.governance/install.json" ]; then
+  _rcpt_pfx=$(grep -o '"prefix"[[:space:]]*:[[:space:]]*"[^"]*"' "$ROOT/.governance/install.json" | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+  _rcpt_pfx=${_rcpt_pfx%/}
+  if [ -n "$_rcpt_pfx" ] && [ "$_rcpt_pfx" != . ]; then TOOL_ROOT=$_rcpt_pfx; fi
+fi
 [ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
 MEMORY_ROOT=memory
 # DISCIPLINES is a CLOSED ENUM of stream values, not a directory list (kit 1.5). The tree is flat.
@@ -116,6 +127,11 @@ render_doc() {
   local rows=${READINESS_ROWS//|/$'
 '- }
   out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
+  # TOOL-aRepatriatedFork-10 S5: two conf FACTS, rendered from the conf this tree declares, so an
+  # adopter's rule set states its own values rather than the shipping repo's. An undeclared key names
+  # the owner of its default instead of retyping a number that lives in the engine's preset block.
+  out=${out//\{\{INDEX_CAP_LINES\}\}/"${INDEX_CAP_LINES:-undeclared — the engine default applies}"}
+  out=${out//\{\{ENTRY_CAP_UNIT\}\}/"${ENTRY_CAP_UNIT:-undeclared — the engine default applies}"}
   printf '%s' "$out"
 }
 # <<< render_doc

@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-10-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-10-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-TOOL-aRepatriatedFork-10-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-10-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -47,7 +48,9 @@ and writes the configuration route down, so nc runs gov's engine and gov's rende
   `corpus-path-unresolved.txt` rows 38 and 39. Observed by AC7.
 - **S7** — A class gate: `tools/check-kit-placeholders.py` refuses a `rendered` template that spells
   `KEY=value` for a key its own kit's `[config]` declares, since that is the repo's own value leaking
-  into an adopter's doc. Observed by AC8.
+  into an adopter's doc. The key set is the `[config]` key lists, its `defaults`, and every key the
+  kit's shipped `<file>.example` assigns; a key any `rendered` rule of that kit declares as a
+  placeholder is exempt, because the kit states the adopter's value through it. Observed by AC8.
 - **S8** — The project-leg seam dRetiredFork-16 ruled for nc's check 90, shipped as a worked,
   runnable example in `tools/memory-tree/README.md` rather than a JSON fragment and a promise, and
   its one unobserved claim observed. Observed by AC9.
@@ -222,10 +225,10 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
 - **AC8** — `python tools/check-kit-placeholders.py` exits 1 on today's
   `tools/memory-tree/HYGIENE.template.md`, naming `INDEX_CAP_LINES`, and exits 0 after S5.
   Red when: the arm scans no template or skips keys absent from `optional_keys`.
-- **AC9** — When a fixture target's `gate-legs.json` carries one leg, `project build-README comment
-  convention`, whose script is absent, that fixture's gate runner refuses naming the script. This is
-  the claim `TOOL-dRetiredFork-16` recorded as NOT VERIFIED.
-  Red when: the runner skips the leg silently.
+- **AC9** — When the leg's argv, `bash scripts/check-build-readme-comments.sh`, runs in a fixture
+  where the script is absent, it exits 127 naming the script, and `tools/memory-tree/README.md`
+  ships the runnable script and says which half of `TOOL-dRetiredFork-16`'s claim that observes.
+  Red when: the README ships a fragment and a promise, or claims the runner half as observed.
   cost: a fixture runner hung past 300 s the last time this was attempted; the observation needs a
   bounded single-leg manifest.
 - **AC10** — `bash tools/check-kit-versions.sh` exits 0 after the bump, and `tools/memory-tree/README.md`
@@ -265,6 +268,15 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a flat `scripts/` i
 
 - rev-1 · 2026-09-23 · initial draft, from audit-D §6 and §7 and nc's merged tree, with the
   populations re-measured on node a.
+- rev-2 · 2026-09-23 · built. S7 and AC8 moved: the predicate run over the real tree before wiring
+  redded two unattended templates spelling `ANCHOR_SCOPE="published"` as a described value, and
+  rewriting them changes `memory/guides/UNATTENDED-PROTOCOL.md`, a governance carrier; so a key the
+  kit renders as a placeholder is exempt, and the key set also reads the kit's conf example, where
+  `INDEX_CAP_LINES` is declared. The HYGIENE template's `ROTATION_MODE` sentence was reworded to pass.
+  AC9 moved: a unit pass runs no gate runner, so it observes the leg's own exit instead, and the
+  runner half stays recorded as unobserved in the README. S3's count line goes to stderr beside the
+  other configuration notices. S3 adds no `fail` branch, so the hygiene `ARMS_FLOORS` token does not
+  move.
 
 ## 10. Reuse audit
 

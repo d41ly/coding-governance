@@ -15,7 +15,7 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=9
+FLOOR_ASSERTIONS=11
 GATE="$(cd "$(dirname "$0")" && pwd)/check-kit-placeholders.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -102,7 +102,22 @@ T6=$(mktemp -d); scratch "$T6" '"TOOL_ROOT"' none 'argv = []'
 o6=$(run "$T6"); rc6=$?
 arm "an adopter-less kit with NO stated reason REDS" 1 "$rc6" "$o6" "no resolvable"
 
-rm -rf "$T" "$T2" "$T3" "$T4" "$T5" "$T6"
+# ---- TOOL-aRepatriatedFork-10 S7: a RENDERED template spelling `KEY=value` for a key its own kit's
+# ---- conf example declares REDS, naming the key — the shipping repo's value would ship as every
+# ---- adopter's. The key is in NO `[config]` list on purpose: the caps a template cites live in the
+# ---- example alone, so an arm reading the lists only would pass this fixture by scanning nothing.
+T7=$(mktemp -d); scratch "$T7" '"KIT_DIR"' escaped 'argv = ["bash", "{kit}/adopt-demo.sh"]'
+printf '\n[config]\nfile = ".demo.conf"\noptional_keys = ["OTHER_KEY"]\n' >> "$T7/tools/demo/kit.toml"
+printf 'INDEX_CAP_LINES="250"\n' > "$T7/tools/demo/.demo.conf.example"
+printf 'This repo declares `INDEX_CAP_LINES=0`.\n' > "$T7/tools/demo/t.md"
+o7=$(run "$T7"); rc7=$?
+arm "a rendered template spelling its own kit's conf value REDS" 1 "$rc7" "$o7" "INDEX_CAP_LINES"
+# ...and the render form passes: the same key through a placeholder is what the arm asks for.
+printf 'This tree declares `INDEX_CAP_LINES={{KIT_DIR}}`.\n' > "$T7/tools/demo/t.md"
+o8=$(run "$T7"); rc8=$?
+arm "the same key rendered through a placeholder passes" 0 "$rc8" "$o8" "spell no conf value"
+
+rm -rf "$T" "$T2" "$T3" "$T4" "$T5" "$T6" "$T7"
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then
   echo "check-kit-placeholders: $total assertion(s) executed, below the declared floor of $FLOOR_ASSERTIONS —"

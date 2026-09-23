@@ -2640,6 +2640,111 @@ for rbad in Cut rotate; do
   esac
 done
 
+# ---- TOOL-aRepatriatedFork-10: legacy-files.txt reaches check 4's ENTRY branch and check 21's
+# ---- missing-Serves branch, a KIT registry is admitted by name, and RECORD_UNDATED_ARTIFACTS
+# ---- narrows check 21 OUT LOUD. One commit adds the fixtures; the conf line and the registry decide
+# ---- the rest. RECORD_UNBOUND_PIN is declared on every run here so check 21's pin branch is never
+# ---- the red these arms read, and `zz-probe.txt` is an unlisted registry whose check-3 finding
+# ---- proves check 3 RAN before its silence about `pass-order-waiver.txt` is read as a pass.
+mkdir -p "$_b1/memory/builds/tOne/build"
+printf 'status\n' > "$_b1/memory/builds/tOne/STATUS.md"
+printf '# a build record\n\nno serves line\n' > "$_b1/memory/builds/tOne/build/2026-08-01-build-tOne-1.md"
+printf '{"a": 1}\n' > "$_b1/memory/builds/tOne/build/result.json"
+printf '# pass-order waivers\n' > "$_b1/memory/project/pass-order-waiver.txt"
+printf 'x\n' > "$_b1/memory/project/zz-probe.txt"
+printf '# legacy\n' > "$_b1/memory/project/legacy-files.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10 --no-verify ) >/dev/null 2>&1
+pk_set 'RECORD_UNBOUND_PIN="9"'; o=$(pk_out)
+n=$((n+1))
+case "$o" in
+  *"HYGIENE check 4 FAILED"*"memory/builds/tOne/STATUS.md"*) echo "ok   check 4: an UNLISTED build-root STATUS.md reds" ;;
+  *) echo "FAIL check 4: an unlisted build-root STATUS.md did not red — the entry arm's control is dead"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"memory/builds/tOne/build/2026-08-01-build-tOne-1.md — no Serves line"*) echo "ok   check 21: an UNLISTED unbound record reds" ;;
+  *) echo "FAIL check 21: an unlisted unbound record was not named"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"memory/builds/tOne/build/result.json — no Serves line"*) echo "ok   RECORD_UNDATED_ARTIFACTS blank: an undated result.json is graded" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS blank: an undated result.json was not graded — blank must mean today's behaviour"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"undated non-markdown artifact(s) not graded"*) echo "FAIL RECORD_UNDATED_ARTIFACTS blank: the exemption count printed, so the filter ran with the key blank"; st=1 ;;
+  *) echo "ok   RECORD_UNDATED_ARTIFACTS blank: the filter does not run" ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"memory/project/pass-order-waiver.txt"*) echo "FAIL check 3 named pass-order-waiver.txt, a registry the unattended kit reads at its default path"; st=1 ;;
+  *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registry pass-order-waiver.txt by name" ;;
+  *) echo "FAIL check 3 did not name the unlisted zz-probe.txt, so its silence about pass-order-waiver.txt proves nothing"; st=1 ;;
+esac
+printf '# legacy\nmemory/builds/tOne/STATUS.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10-legacy --no-verify ) >/dev/null 2>&1
+pk_set "$(printf 'RECORD_UNBOUND_PIN="9"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(pk_out)
+n=$((n+1))
+case "$o" in
+  *"memory/builds/tOne/STATUS.md"*) echo "FAIL check 4: a build-root STATUS.md legacy-files.txt lists still reds — the entry branch ignores LEG"; st=1 ;;
+  *) echo "ok   check 4: a legacy-listed build-root STATUS.md is grandfathered" ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"2026-08-01-build-tOne-1.md — no Serves line"*) echo "FAIL check 21: a record legacy-files.txt lists is still graded for its Serves line"; st=1 ;;
+  *) echo "ok   check 21: a legacy-listed unbound record is grandfathered" ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"result.json — no Serves line"*) echo "FAIL RECORD_UNDATED_ARTIFACTS=exempt: result.json is still graded"; st=1 ;;
+  *"check 21: 1 undated non-markdown artifact(s) not graded (RECORD_UNDATED_ARTIFACTS=exempt)"*) echo "ok   RECORD_UNDATED_ARTIFACTS=exempt drops result.json and prints the count" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS=exempt: result.json vanished without the count printing — a silent narrowing"; st=1 ;;
+esac
+pk_set "$(printf 'RECORD_UNBOUND_PIN="9"\nRECORD_UNDATED_ARTIFACTS="grade"')"; o=$(pk_out)
+n=$((n+1))
+case "$o" in
+  *"result.json — no Serves line"*) echo "ok   RECORD_UNDATED_ARTIFACTS=grade grades result.json" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS=grade did not grade result.json"; st=1 ;;
+esac
+pk_set 'RECORD_UNDATED_ARTIFACTS="Exempt"'; o=$(pk_out); r=$?
+n=$((n+1))
+case "$r:$o" in
+  2:*RECORD_UNDATED_ARTIFACTS*) echo "ok   RECORD_UNDATED_ARTIFACTS='Exempt' ABORTS naming the key" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS='Exempt' did not abort (rc=$r) — an unknown value read as blank"; st=1 ;;
+esac
+
+# ---- TOOL-aRepatriatedFork-10 S5 and S6: a FLAT install at `scripts/` with a govkit receipt,
+# ---- rendered through `--render`. The rendered HYGIENE.md states THIS tree's two conf values, and
+# ---- TEMPLATE-SPEC.md names the codebase-map generator under the receipt's prefix — the kit
+# ---- directory's own parent is empty here, which is the case the receipt exists for.
+_fl=$(mktemp -d)
+(
+  cd "$_fl" || exit 1
+  git init -q .; git config user.email t@t.test; git config user.name t
+  mkdir -p scripts memory .governance
+  cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
+  printf '{\n  "schema": 3,\n  "prefix": "scripts",\n  "files": [{"prefix": "decoy"}]\n}\n' > .governance/install.json
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\nINDEX_CAP_LINES="500"\nENTRY_CAP_UNIT="bytes"\n' > .memory-tree.conf
+  printf '<!-- gov:kit memory-tree@0 -->\n' > memory/HYGIENE.md
+  git add -A && git -c commit.gpgsign=false commit -q -m flat --no-verify
+  bash scripts/adopt-memory-tree.sh --render
+) >/dev/null 2>&1
+n=$((n+1))
+if grep -qF '`INDEX_CAP_LINES`, is: 500.' "$_fl/memory/HYGIENE.md" 2>/dev/null \
+   && grep -qF '`ENTRY_CAP_UNIT` is: bytes.' "$_fl/memory/HYGIENE.md" 2>/dev/null \
+   && ! grep -qF 'INDEX_CAP_LINES=0' "$_fl/memory/HYGIENE.md"; then
+  echo "ok   --render states the adopter's INDEX_CAP_LINES and ENTRY_CAP_UNIT, never gov's"
+else
+  echo "FAIL --render did not state the fixture's own INDEX_CAP_LINES=500 / ENTRY_CAP_UNIT=bytes, or still spells gov's INDEX_CAP_LINES=0"; st=1
+fi
+n=$((n+1))
+if grep -qF '`scripts/codebase-map/gen_map.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
+  echo "ok   a flat install renders TOOL_ROOT from the receipt's prefix"
+else
+  echo "FAIL a flat install with a receipt prefix of scripts did not render the codebase-map generator under scripts/ — TOOL_ROOT is still the empty parent"; st=1
+fi
+rm -rf "$_fl"
+
 # PROJECT_REGISTRY_EXTRA — it only WIDENS, so the arm that matters is that it does not widen to
 # everything. The first cut of this key sat above the named cases in check 3 and matched all of
 # them, accepting any file under project/ and disabling the check while reporting clean. BOTH
@@ -2673,7 +2778,9 @@ esac
 # RAISED 411 -> 434 at the closing diff review of dGatedProse, round 1, to the PRINTED count again:
 # its two R2 chit calls, and the arms the reconcile with main brought in without a raise.
 # RAISED 434 -> 436 at round 2 of that review: the chit calls for fixtures 220 and 221.
-FLOOR_ASSERTIONS=436
+# RAISED 436 -> 448 by TOOL-aRepatriatedFork-10: its ten registry/key arms and two flat-render arms,
+# each one top-level increment of `n`.
+FLOOR_ASSERTIONS=448
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

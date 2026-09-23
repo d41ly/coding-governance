@@ -256,6 +256,30 @@ Three to five, primed with the mandate, the build overview and the spec format:
   checked.
 - **prior art** — has a record already decided this? That is the recall probe, M5.
 
+## Running this engine verbatim — the four adopter routes
+
+A carve-out against `check-memory-hygiene.sh` or `HYGIENE.template.md` is a fork, and a fork goes
+stale on every kit bump. Each shape an adopter has needed so far has a route that runs gov's bytes
+unchanged:
+
+| Carve-out shape | Route |
+|---|---|
+| an extra registry under `<MEMORY_ROOT>/project/` | `PROJECT_REGISTRY_EXTRA` in `.memory-tree.conf` |
+| a pre-governance file or folder name — a build-root `STATUS.md`, a free-named record, an unbound old record | a row in `<MEMORY_ROOT>/project/legacy-files.txt`, which checks 4, 5 and 21 all read |
+| undated build artifacts, a JSON result or an HTML report, that cannot carry a Serves line | `RECORD_UNDATED_ARTIFACTS="exempt"`, which prints its exempted count on every run |
+| a rule gov does not have | a project leg in the gate manifest, above |
+
+Two things are not carve-outs at all. A value in the rendered `HYGIENE.md` that states the shipping
+repo's figure is a render gap, and `INDEX_CAP_LINES` and `ENTRY_CAP_UNIT` now render from your conf.
+A registry a KIT ships, such as `pass-order-waiver.txt`, is admitted by name.
+
+**The worked instance is NicoCares**, measured 2026-09-23 by running gov's engine over its tree:
+its registries under `project/` go to `PROJECT_REGISTRY_EXTRA`; its ten build-root `STATUS.md`
+files and thirteen run-protocol records go to `legacy-files.txt`; its undated JSON, HTML and Python
+artifacts go to `RECORD_UNDATED_ARTIFACTS`; and its check 90 becomes the project leg worked below.
+The per-carve-out table is the spec for the unit that shipped these routes, `TOOL-aRepatriatedFork-10`
+§4.
+
 ## Adding a check gov does not have — the extension point, and its limits
 
 A project with a rule this kit does not implement does **not** edit the engine. It writes its own
@@ -278,6 +302,46 @@ so it reads the same tree from the same declaration.
 
 **Give it a ceiling.** The runner reds a leg that arrives without one, and finding that out from a
 red bar is a worse first experience than reading it here.
+
+**The worked example, runnable as written.** NicoCares' check 90 is the case this seam was ruled
+for: a `<!-- status derived: … -->` comment justifies a DECLARED `status:` key in a build README,
+and once the key goes the comment is a false claim nothing regenerates. Save this as
+`scripts/check-build-readme-comments.sh` beside the leg above:
+
+```bash
+#!/usr/bin/env bash
+# Project leg: a '<!-- status derived:' comment in a build README whose front matter declares no
+# 'status:' key. Exit 0 clean, 1 on a finding, 2 when it cannot run.
+set -u
+ROOT="$(git rev-parse --show-toplevel)" || exit 2
+cd "$ROOT" || exit 2
+MEMORY_ROOT=memory
+[ -f .memory-tree.conf ] && . ./.memory-tree.conf
+readmes=$(git ls-files "$MEMORY_ROOT/builds/" | grep -E "^$MEMORY_ROOT/builds/[^/]+/README\.md$")
+[ -n "$readmes" ] || { echo "build-readme-comments: no build README under $MEMORY_ROOT/builds/ — graded nothing"; exit 2; }
+bad=""
+for f in $readmes; do
+  grep -q '<!-- status derived:' "$f" || continue
+  grep -q '^status:' "$f" && continue
+  bad="$bad  $f
+"
+done
+[ -z "$bad" ] && { echo "build-readme-comments: clean"; exit 0; }
+printf 'build-readme-comments: a status-derived comment survives with no status: key — delete it:\n%s' "$bad"
+exit 1
+```
+
+It refuses an EMPTY population at exit 2 rather than printing `clean`, for the reason this kit's
+rule 5 gives. Two facts about the seam around it:
+
+- **If the script is missing, the leg reds; it does not skip.** The leg's argv is `bash <path>`, and
+  bash exits 127 naming the path: `bash: scripts/check-build-readme-comments.sh: No such file or
+  directory`. That exit is observed directly. That the runner then reports the leg red rather than
+  holding it is `TOOL-dRetiredFork-16`'s one unobserved claim, and the unit that shipped this
+  example leaves its observation to the merge bar that closes it.
+- **It runs at the push bar, not at pre-commit.** The engine ran nc's check 90 under `--staged`;
+  a project leg does not, and gov ships no pre-commit hook to adopters. To keep the earlier signal,
+  call the script from your own `.githooks/pre-commit`. Nothing in this kit needs to change for that.
 
 ### Two limits, both measured, neither of which is "declines and reports"
 

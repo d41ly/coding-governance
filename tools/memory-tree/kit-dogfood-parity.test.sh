@@ -52,6 +52,13 @@ ROOT_N="$(cd "$ROOT" && pwd)"
 KITREL=${HERE#"$ROOT_N"/}               # e.g. tools/memory-tree
 [ "$KITREL" = "$HERE" ] && { echo "kit-parity: cannot locate this kit inside the repo ($HERE vs $ROOT_N)"; exit 2; }
 TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
+# The receipt's prefix wins where one exists, exactly as `adopt-memory-tree.sh` derives it: a FLAT
+# install's kit directory has an empty parent. TOOL-aRepatriatedFork-10 S6.
+if [ -f "$ROOT/.governance/install.json" ]; then
+  _rcpt_pfx=$(grep -o '"prefix"[[:space:]]*:[[:space:]]*"[^"]*"' "$ROOT/.governance/install.json" | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+  _rcpt_pfx=${_rcpt_pfx%/}
+  if [ -n "$_rcpt_pfx" ] && [ "$_rcpt_pfx" != . ]; then TOOLROOT=$_rcpt_pfx; fi
+fi
 [ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"
 
 MODE="${1:---check}"
@@ -90,6 +97,11 @@ render_doc() {
   local rows=${READINESS_ROWS//|/$'
 '- }
   out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
+  # TOOL-aRepatriatedFork-10 S5: two conf FACTS, rendered from the conf this tree declares, so an
+  # adopter's rule set states its own values rather than the shipping repo's. An undeclared key names
+  # the owner of its default instead of retyping a number that lives in the engine's preset block.
+  out=${out//\{\{INDEX_CAP_LINES\}\}/"${INDEX_CAP_LINES:-undeclared — the engine default applies}"}
+  out=${out//\{\{ENTRY_CAP_UNIT\}\}/"${ENTRY_CAP_UNIT:-undeclared — the engine default applies}"}
   printf '%s' "$out"
 }
 # <<< render_doc

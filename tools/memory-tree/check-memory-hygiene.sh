@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.85   # gov:kit memory-tree@2.85 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.86   # gov:kit memory-tree@2.86 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -104,13 +104,13 @@ DOSSIER_CAP_BYTES=20480       ; DOSSIER_CAP_LINES=0
 # the awk build and the ambient locale, which check 7 deliberately does not pin.
 ENTRY_CAP_CHARS=300           ; BUILD_README_ENTRY_CAP_CHARS=350
 
-# ---- FIVE VALUES A PROJECT OWNS — TOOL-dRetiredFork-15 -------------------------------------------
+# ---- THE VALUES A PROJECT OWNS — TOOL-dRetiredFork-15, TOOL-aRepatriatedFork-10 -----------------
 # Each was a literal in a check below, which is why NicoCares carries four carve-outs against this
-# one file. BLANK MEANS GOV'S CURRENT BEHAVIOUR for all five, so an adopter who never edits
+# one file. BLANK MEANS GOV'S CURRENT BEHAVIOUR for every one, so an adopter who never edits
 # .memory-tree.conf sees a byte-identical run.
 #
-# TWO OF THESE NARROW WHAT IS GRADED and are therefore validated below rather than merely read.
-# BUILD_SLUG_RE is a predicate and RECORD_SERVES_CUTOFF is a population filter: a bad value does not
+# SOME OF THESE NARROW WHAT IS GRADED and are therefore validated below rather than merely read.
+# BUILD_SLUG_RE is a predicate; RECORD_SERVES_CUTOFF and RECORD_UNDATED_ARTIFACTS are population filters: a bad value does not
 # red, it silently grades NOTHING and reports green. A regex matching the empty string admits every
 # folder name; a cutoff dated in the future excludes every record. That is the difference between a
 # declared key and a hole with a name.
@@ -118,6 +118,9 @@ BUILD_SLUG_RE=""              # blank = ^[A-Za-z][A-Za-z0-9-]*$ ; must be anchor
 PROJECT_REGISTRY_EXTRA=""     # whitespace-separated extra filenames legal under <M>/project/
 RECORD_SERVES_CUTOFF=""       # blank = grade every record; else ISO date, records BEFORE it are exempt
 ENTRY_CAP_UNIT=""             # blank = today's locale-decided counting; or `chars` / `bytes`
+RECORD_UNDATED_ARTIFACTS=""   # blank / `grade` = grade every record; `exempt` = check 21 skips an
+                              # undated non-markdown file under build/, prompts/ or reviews/, and
+                              # prints how many it skipped. TOOL-aRepatriatedFork-10.
 ROTATION_MODE=""              # blank = UNDECLARED; or `cut` / `snapshot`. PRESET for `set -u`: the
                               # observability loop below reads it unguarded, so a conf predating the
                               # key would abort the engine rather than run it.
@@ -181,6 +184,12 @@ case "${ENTRY_CAP_UNIT:-}" in
   ""|chars|bytes) ;;
   *) _cfgbad="$_cfgbad ENTRY_CAP_UNIT='$ENTRY_CAP_UNIT' (not one of: chars bytes)" ;;
 esac
+# RECORD_UNDATED_ARTIFACTS NARROWS check 21's population, so an unknown value must not read as blank:
+# `Exempt` is a typo for an exemption and `grade` would silently be what the author did not mean.
+case "${RECORD_UNDATED_ARTIFACTS:-}" in
+  ""|grade|exempt) ;;
+  *) _cfgbad="$_cfgbad RECORD_UNDATED_ARTIFACTS='$RECORD_UNDATED_ARTIFACTS' (not one of: grade exempt)" ;;
+esac
 # ROTATION_MODE is a CLOSED set, validated the way ENTRY_CAP_UNIT is. Blank is UNDECLARED and passes:
 # an adopter conf predating the key must not red on a kit upgrade, and `adopt-memory-tree.sh` never
 # back-fills. An unrecognised value is a DIFFERENT answer from a blank one and must not collapse into
@@ -203,7 +212,7 @@ esac
 # `memory/archive/…`, so the append-only exemption had been silently dead for as long as any project
 # key was set. A print mode that prepends prose to its value is a delegate answering a question it
 # was not asked, and the consumer cannot tell. Found by the Tier-2 review of TOOL-cSpliceWarden.
-for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF ENTRY_CAP_UNIT ROTATION_MODE; do
+for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF RECORD_UNDATED_ARTIFACTS ENTRY_CAP_UNIT ROTATION_MODE; do
   eval "_dv=\${$_dk}"
   [ -n "$_dv" ] && echo "memory-hygiene: project key $_dk='$_dv' (gov's default is blank)" >&2
 done
@@ -538,6 +547,10 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # `PROJECT_REGISTRY_EXTRA`, which is the escape for a registry a PROJECT adds; using it for a
   # kit-shipped one hides the defect at the one repo positioned to notice it.
   F:substitution-fed-loops.txt) ;;
+  # The same class: the unattended kit's pass-order checker reads this registry at its DEFAULT path
+  # under <M>/project/, so an adopter of that kit owns the file whether or not it lists it in
+  # PROJECT_REGISTRY_EXTRA. TOOL-aRepatriatedFork-10 S4.
+  F:pass-order-waiver.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
   # forking this whitelist, which is what NicoCares carved this file out to do.
   #
@@ -633,6 +646,10 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
         for (i=1;i<=n;i++){ k=keys[i]; type=substr(k,1,1); name=substr(k,3)
           if (k=="F:README.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
           if (type=="F" && name ~ arre) continue
+          # The ENTRY consults the registry exactly as the folder branch above does: a grandfathered
+          # build-root FILE (a pre-governance STATUS.md, say) used to red here while its folder-name
+          # twin passed. TOOL-aRepatriatedFork-10 S1.
+          if ((m "/builds/" folder "/" name) in LEG) continue
           if (type=="F"){ if (name !~ rre) print m "/builds/" folder "/" name }
           else print m "/builds/" folder "/" name }
         folder=""; delete ent
@@ -991,6 +1008,15 @@ $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
     b21=""
   fi
   miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
+  # The grandfather registry reaches this population as it reaches check 5: a record legacy-files.txt
+  # lists was exempt from the filename grammar and still redded here, so one registry answered two
+  # ways. Builtins only -- `in_legacy` is an array lookup, so this costs no process per row.
+  # TOOL-aRepatriatedFork-10 S2.
+  miss21=$(printf '%s\n' "$miss21" | while IFS= read -r _r21; do
+    [ -n "$_r21" ] || continue
+    _p21=${_r21#"  "}; _p21=${_p21%% *}
+    in_legacy "$_p21" || printf '%s\n' "$_r21"
+  done)
   # S3 — RECORD_SERVES_CUTOFF. A project adopting this kit mid-life has landed records that
   # predate the Serves grammar; NicoCares measured 549 of them. A cutoff is one value where a
   # grandfather list would be 549 rows, and it matches the five cutoffs already in the conf.
@@ -1015,6 +1041,24 @@ $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
         }
         print
       }' | grep . || true)
+  fi
+  # RECORD_UNDATED_ARTIFACTS=exempt — a JSON result or an HTML report cannot carry a Serves line at
+  # any date, so a DATE is not what decides it (the owner ruled this independent of the cutoff). The
+  # class is STRUCTURAL: no leading ISO date AND no .md suffix. A suffix list was rejected because an
+  # adopter's artifacts span suffixes nobody would think to list. It NARROWS a population, so the
+  # count prints on every run, zero included, and blank or `grade` never reaches this branch.
+  # TOOL-aRepatriatedFork-10 S3.
+  if [ "${RECORD_UNDATED_ARTIFACTS:-}" = exempt ]; then
+    _k21=$(printf '%s\n' "$miss21" | awk '
+      {
+        p = $0; sub(/^ +/, "", p); sub(/ .*$/, "", p)
+        b = p; sub(/^.*\//, "", b)
+        if (b !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-/ && b !~ /\.md$/) next
+        print
+      }' | grep . || true)
+    _u21=$(( $(printf '%s\n' "$miss21" | grep -c .) - $(printf '%s\n' "$_k21" | grep -c .) ))
+    miss21=$_k21
+    echo "memory-hygiene: check 21: $_u21 undated non-markdown artifact(s) not graded (RECORD_UNDATED_ARTIFACTS=exempt)" >&2
   fi
   [ -n "$miss21" ] && fail 21 "records under build/, prompts/ or reviews/ whose head carries no conformant Serves line:
 $miss21"

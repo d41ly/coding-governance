@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # render-doc.sh — the ONE canonical `render_doc`, and the file every inline copy is gated against.
 #
-# WHAT IT DOES. Substitutes a kit template's two placeholders — `{{KIT_DIR}}` and `{{TOOL_ROOT}}` —
-# and prints the result. It exists because a document the ADOPTER commits must not carry whatever
+# WHAT IT DOES. Substitutes a kit template's placeholders — the two paths, `{{KIT_DIR}}` and
+# `{{TOOL_ROOT}}`, and the conf facts `{{READINESS_ROWS}}`, `{{INDEX_CAP_LINES}}` and `{{ENTRY_CAP_UNIT}}`
+# — and prints the result. It exists because a document the ADOPTER commits must not carry whatever
 # prefix the SHIPPING repo happened to use: `apply` writes gov's bytes verbatim, so a verbatim copy
 # of a template stamps gov's own layout into a file the adopter now owns.
 #
@@ -13,10 +14,13 @@
 # markers below INLINE, byte-identical, and `resolve-python.test.sh`'s parity table gates every copy
 # against this one — the same mechanism, the same marker grammar, one more row.
 #
-# THE CALLER SUPPLIES `KIT_REL` AND `TOOL_ROOT`. Both are the caller's, deliberately: the adopter
-# script derives them from where it was invoked, and the parity test derives them from the kit it is
-# grading. A block that read them from its own location would answer for the wrong tree in one of
-# the two callers, which is how the second spelling was born in the first place.
+# THE CALLER SUPPLIES `KIT_REL` AND `TOOL_ROOT`, and has sourced `.memory-tree.conf` for the rest.
+# Both are the caller's, deliberately: the adopter script derives them from where it was invoked,
+# and the parity test derives them from the kit it is grading — `TOOL_ROOT` from the install
+# receipt's `prefix` where `.governance/install.json` exists, since a FLAT install's kit directory
+# has an empty parent (TOOL-aRepatriatedFork-10 S6). A block that read them from its own location
+# would answer for the wrong tree in one of the two callers, which is how the second spelling was
+# born in the first place.
 # DEPL-dCarriedReceipt-15 S6.
 
 # >>> render_doc — canonical copy: tools/lib/render-doc.sh (byte-identical; gated)
@@ -41,6 +45,11 @@ render_doc() {
   local rows=${READINESS_ROWS//|/$'
 '- }
   out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
+  # TOOL-aRepatriatedFork-10 S5: two conf FACTS, rendered from the conf this tree declares, so an
+  # adopter's rule set states its own values rather than the shipping repo's. An undeclared key names
+  # the owner of its default instead of retyping a number that lives in the engine's preset block.
+  out=${out//\{\{INDEX_CAP_LINES\}\}/"${INDEX_CAP_LINES:-undeclared — the engine default applies}"}
+  out=${out//\{\{ENTRY_CAP_UNIT\}\}/"${ENTRY_CAP_UNIT:-undeclared — the engine default applies}"}
   printf '%s' "$out"
 }
 # <<< render_doc

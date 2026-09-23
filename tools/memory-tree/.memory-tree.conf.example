@@ -293,6 +293,13 @@ PROJECT_REGISTRY_EXTRA=""
 # A cutoff dated after today is REFUSED — it would exempt every record and report a clean run.
 RECORD_SERVES_CUTOFF=""
 
+# RECORD_UNDATED_ARTIFACTS — `grade`, `exempt`, or blank (= `grade`). A JSON result, an HTML report
+# or a script kept under build/, prompts/ or reviews/ cannot carry a Serves line at any date. `exempt`
+# drops a file with NO leading ISO date AND no `.md` suffix from check 21's missing-Serves branch,
+# independent of the cutoff above, and prints how many it dropped on every run, zero included. Any
+# other value aborts the engine at exit 2 naming the key.
+RECORD_UNDATED_ARTIFACTS=""
+
 # ENTRY_CAP_UNIT — `chars`, `bytes`, or blank. Blank leaves the counting exactly as your platform
 # does it today, and that is deliberate. The checker's own comment explains why it pins no locale:
 # doing so "would silently re-decide the cap on any adopter whose awk counts characters today". A
