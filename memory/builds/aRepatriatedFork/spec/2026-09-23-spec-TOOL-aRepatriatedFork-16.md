@@ -40,8 +40,9 @@ grade that set, and skip out loud where no registry exists.
   `$ROOT/tools/check-install-prefix.sh` at `tools/check-install-prefix.test.sh:17`, and at nc's
   `scripts/` install every `mkfix` arm exited 127 on that path (measured below). The `mkfix`
   fixtures of arms 1-8, S4 and AC6 (`:39-50`, `:395-414`, `:475-481`) build repos with NO registry
-  and expect arm 1 to grade them; after S2 those repos skip, so they take a registry through the
-  existing `mkfix_source` (`:120`). Observed by AC6.
+  and expect arm 1 to grade them; after S2 those repos skip, so they take a registry — through
+  `mkfix` itself, per the rev-2 note below, not by moving each arm onto `mkfix_source` (`:120`).
+  Observed by AC6.
   rev-2: `mkfix` itself takes the registry, a minimal one naming only the kit's engine file, plus
   an empty ratchet, so arms 1-8 keep their bodies and their meaning. `GATE_REL` becomes the gate's
   FIXTURE-internal path — every fixture lays its kits under `tools/` whatever the host prefix, so the
@@ -150,7 +151,8 @@ writes nothing, and refuses outside a repo carrying a registry.
 ### Rollout
 
 One commit for S1, one for S2-S5. The first is behaviour-neutral and AC1 proves it; the second is
-where arm 1 changes, and AC3 and AC4 bracket it.
+where arm 1 changes, and AC3 and AC4 bracket it. rev-2: landed as ONE commit instead (§9); AC1 was
+observed before either gate edit, so the neutrality it proves still holds.
 
 ### Files touched (estimate)
 
