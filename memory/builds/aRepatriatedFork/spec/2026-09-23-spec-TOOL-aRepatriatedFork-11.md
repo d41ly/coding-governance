@@ -223,14 +223,18 @@ The new leg `unattended protocol size` is not an arm; AC6 observes its failing c
 - **F1 — does the wiring step ride `GOVKIT_RERENDER`?** Options: (a) yes, one switch for "this verb
   runs target-side code"; (b) its own switch. Recommendation: (a). A second switch is a second
   channel with no diff, the thing `.memory-tree.conf`'s cutoff history records removing.
+  RESOLVED (owner, 2026-09-23): (a), it rides `GOVKIT_RERENDER`, as recommended.
 - **F2 — what if the target did not select settings-merge?** The step then cannot wire, and a kit
   whose `[check]` grades wiring, as unattended's does, rolls back. Options: (a) add
   `settings-merge` to the unattended kit's `requires`; (b) run gov's own copy of `settings-merge.py`
   against the target. Recommendation: (a), because the target's receipt then names the program that
   wrote its settings file.
+  RESOLVED (owner, 2026-09-23): (a), `settings-merge` joins the unattended kit's `requires`, as
+  recommended.
 - **F3 — the protocol's ceiling value.** Options: (a) the committed render's size at build, PINNED;
   (b) the 96 KB guide default. Recommendation: (a), so the next growth is a line in this repo's diff,
   as `TOOL-dFoldedVerdict-7` asked for the three carriers it found at their caps.
+  RESOLVED (owner, 2026-09-23): (a), the committed render's size, PINNED, as recommended.
 
 ## 9. Revision log
 

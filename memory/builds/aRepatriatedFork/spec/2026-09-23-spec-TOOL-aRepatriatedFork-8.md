@@ -246,12 +246,15 @@ New arm: `.githooks/pre-push.test.sh` · a fixture remote named `incms`, a dirty
   docs-only dirty path through (`.githooks/pre-push:139-156` at inCMS). Recommendation: no; the
   bar certifies a tree, and a dirty tree is not the pushed one. An adopter wanting the tolerance
   declares it in its bar.
+  RESOLVED (owner, 2026-09-23): no, as recommended.
 - **F2 — does the lander refuse when the repo has several remotes and none is configured for the
   branch?** Guessing picks a remote nobody chose. Recommendation: refuse and name
   `GOV_REMOTE`.
+  RESOLVED (owner, 2026-09-23): refuse and name `GOV_REMOTE`, as recommended.
 - **F3 — is `GOV_BRANCH_GATE_CMD` worth a key, or should inCMS keep branch-push hygiene in its
   pre-commit?** Without it inCMS cannot run gov's hook verbatim. Recommendation: take the key; it is
   one vetted command and the mechanism `gate-env.sh` exists for.
+  RESOLVED (owner, 2026-09-23): take the key, as recommended.
 
 ## 9. Revision log
 

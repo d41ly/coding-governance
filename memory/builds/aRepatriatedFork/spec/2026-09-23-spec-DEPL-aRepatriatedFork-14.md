@@ -211,9 +211,12 @@ New arm: `tools/govkit/selftest.py` · two pytest fixtures for S1, one unsized a
 - **F1 — retire `stale-header-waiver`, or keep it with an existence probe?** Recommendation: retire,
   per S2. The generator already refuses the missing file on every bar, and a second observer of one
   fact is how the two drift apart.
+  RESOLVED (owner, 2026-09-23): retire `stale-header-waiver`, per S2, as recommended.
 - **F2 — should S1 also read `pytest.ini`, `setup.cfg` and `tox.ini`?** Recommendation: not now. The
   kit ships a `pyproject.toml` snippet and every adopter measured uses that file. Widen it when an
   adopter configures pytest elsewhere.
+  RESOLVED (owner, 2026-09-23): not now; widen when an adopter configures pytest elsewhere, as
+  recommended.
 
 ## 9. Revision log
 

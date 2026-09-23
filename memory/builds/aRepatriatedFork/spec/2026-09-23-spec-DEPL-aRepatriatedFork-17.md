@@ -268,13 +268,18 @@ New arm: `tools/govkit/selftest.py` · one fixture per scope item, each first ru
   Recommendation: a pin is suggested when the changed-line count is at most half the target file's
   line count, declared as a constant beside `derive_nearest_vintage` and printed with every
   suggestion.
+  RESOLVED (owner, 2026-09-23): suggest a pin when at most half the target's lines changed, the
+  fraction a constant beside `derive_nearest_vintage`, printed with every suggestion, as
+  recommended.
 - **F2 — should `--accept-role-moves` be the default for a move into a non-writing disposition?**
   Nothing is written, so the only effect is the receipt agreeing with the descriptor.
   Recommendation: keep it opt-in for one release. The existing report says choosing is not gov's to
   do on the operator's behalf, and a release of opt-in use tests that stance.
+  RESOLVED (owner, 2026-09-23): opt-in for one release, as recommended.
 - **F3 — should S4's `lone-CR` row be `r.fail` rather than a report?** Recommendation: `r.fail` on a
   `--write` run and a report on a read-only one. A write run that lands over a damaged program is the
   moment the loss becomes permanent.
+  RESOLVED (owner, 2026-09-23): `r.fail` on `--write`, a report on a read-only run, as recommended.
 
 ## 9. Revision log
 

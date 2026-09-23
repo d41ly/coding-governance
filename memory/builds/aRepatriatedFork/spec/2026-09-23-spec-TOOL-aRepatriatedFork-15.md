@@ -234,15 +234,20 @@ observed red on drift-audit · none.
 - **F1 — split kickoff-manifest's number, or bump the format too?** Bumping `KIT_MANIFEST_VERSION`
   alone warns every adopter to upgrade a format that did not move. Recommendation: the split in S4,
   because the warning's whole value is that it fires only when the format changes.
+  RESOLVED (owner, 2026-09-23): the split in S4, as recommended.
 - **F2 — what does bumping the charter template mean?** Its `governance-template: v3.0` marker is
   also the charter's printed version, and the template header says history lives in `…-v-N-N.md`
   snapshots, so a bump implies a snapshot. Recommendation: treat it as a format like the manifest —
   bump the playbook kit's vintage only when rendered output changes, and snapshot on a charter-text
   change — and ask the owner before S3 moves it.
+  RESOLVED (owner, 2026-09-23): a format: the playbook kit's vintage bumps only when rendered output
+  changes, and a `-v-N-N` snapshot is cut on a charter-text change. This is the owner turn S3 waited
+  on; S3 may move the marker under that rule.
 - **F3 — does the memory-tree verdict-epoch leg stay on gov's bar?** The new verb subsumes it for
   memory-tree bytes and is stricter. Recommendation: keep it one release, because it is also the
   adopter-side check for memory-tree, then decide with its adopter behaviour fixed by
   `TOOL-aRepatriatedFork-2`.
+  RESOLVED (owner, 2026-09-23): keep it one release, as recommended.
 
 ## 9. Revision log
 

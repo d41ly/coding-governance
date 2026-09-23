@@ -263,18 +263,26 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a green check 20 ru
   terminal set, making a `DEFERRED` row live. Recommendation: (a). A census counting parked work as
   outstanding is the defensible report-only reading, not a gate's, and naming both tuples in one
   place is what keeps it one decision.
+  RESOLVED (owner, 2026-09-23): (a), nc's ruling as a named second tuple beside `TERMINAL`, as
+  recommended.
 - **F2 — does S7 red a fresh adopter on day one?** It does: installing this kit installs
   `check-memory-hygiene.sh`, which defines the helper `discover()` looks for, so nc's claim that a
   fresh adopter has no gate is false for this kit. Options: (a) refuse, and have
   `adopt-memory-tree.sh --scaffold` print the `--emit-floors` command in its next steps; (b) announce
   an undeclared key as NOT MEASURED and refuse only an explicitly empty one. Recommendation: (a),
   matching how `UNDECLARED_WRITE_CEILING` is handled, because (b) cannot catch the key being dropped.
+  RESOLVED (owner, 2026-09-23): (a), refuse, and `--scaffold` prints the `--emit-floors` command, as
+  recommended.
 - **F3 — should gov declare the two shard pins for its own tree?** Undeclared, gov's own bar
   prints four NOT MEASURED lines on every run. Recommendation: measure with `--emit-pin` in the build
   commit and declare both, so the ratchets are exercised on the one tree that ships them.
+  RESOLVED (owner, 2026-09-23): measure with `--emit-pin` in the build commit and declare both, as
+  recommended.
 - **F4 — `census` and `census_problems` as function names.** The lexicon leg may refuse a
   noun-led name. Recommendation: ask `--suggest` at build time and rename in gov before nc's two
   importers are told to follow, since they are the only callers.
+  RESOLVED (owner, 2026-09-23): ask `--suggest` at build time and rename in gov first, as
+  recommended.
 
 ## 9. Revision log
 

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -166,8 +166,11 @@ no receipt. `tools/run-gates/check-receipt.py:48` is the existing engine that al
 receipt at an adopter.
 
 Python consumers carry the function as an inline copy with a canonical source and a parity arm, the
-pattern `resolve_python` already uses (`tools/lib/resolve-python.test.sh`). Shell consumers use
-rungs 2 and 3 only and announce a miss rather than parsing JSON in bash (§8 F1). The one JS
+pattern `resolve_python` already uses (`tools/lib/resolve-python.test.sh`). A shell consumer that
+already resolves a Python gets rung 1 by calling it with a one-line import of the canonical copy,
+and never parses JSON in bash; a miss on every rung is announced, never silent (§8 F1).
+`tools/check-wiring.sh` has no resolved interpreter, so it alone reads the receipt with an awk rung
+and a parity arm against the Python resolver, which `TOOL-aRepatriatedFork-19` owns. The one JS
 consumer, `agent-cap.js`, only needs a message: it derives its own path from `__filename` and names
 the review harness by probing `path.join(path.dirname(__dirname), 'workflows', 'tier2-review.js')`,
 and prints the bare harness name when the probe misses.
@@ -361,22 +364,33 @@ New arm: `tools/lib/resolve-python.test.sh` parity table · one extra row per in
   brittle, and every shell consumer here already resolves a Python. Recommendation: shell consumers
   use the probe rungs and print a named miss; the one that needs the receipt, `manifest-check.sh`'s
   id reader, calls its already-resolved Python with a one-line import of the canonical copy.
+  RESOLVED (owner, 2026-09-23): split by consumer. Shell consumers that already resolve a Python
+  import the canonical reader; `tools/check-wiring.sh` alone takes the awk rung with a parity arm
+  against the Python resolver, owned by `TOOL-aRepatriatedFork-19` (its §8 F2). §4 amended at rev-2.
 - **F2 — does inCMS move its recall hook beside the fragment?** Gov's `{here}` token finds a renamed
   kit dir, but inCMS keeps the hook in `.claude/hooks/` as a project-owned file. Recommendation:
   inCMS keeps its row until it chooses to install the hook at `scripts/recall/`; gov does not model
   a hook living outside its kit.
+  RESOLVED (owner, 2026-09-23): inCMS keeps its row until it installs the hook at `scripts/recall/`,
+  as recommended.
 - **F3 — where does an adopter's preferred review harness come from?** inCMS points the deny text at
   its own `tier2-review-indexed.js`. Recommendation: fold it into `TOOL-aRepatriatedFork-7`'s
   declared agent-cap conf as one optional key; until then inCMS keeps that one pointer as its delta.
+  RESOLVED (owner, 2026-09-23): one optional key in `TOOL-aRepatriatedFork-7`'s `.agent-cap.conf`,
+  as recommended.
 - **F4 — is `tools/settings-merge.py:88`'s name-only fallback a refusal?** The house rule says an
   empty derivation refuses. Recommendation: mark it now and ask the settings-merge owner, because it
   fires only when the script runs from outside the tree it writes into.
+  RESOLVED (owner, 2026-09-23): mark it now and ask the settings-merge owner, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, from audit-C's cross-cutting list, audit-A's sibling-kit
   lookups, and a fresh enumeration over gov a7c78ad2's shipped set that found six sites the brief
   did not list.
+- rev-2 · 2026-09-23 · §8 resolved by the owner. §4's shell-consumer rule disagreed with
+  `TOOL-aRepatriatedFork-19` §8 F2 on whether a shell consumer reads the receipt; it now splits by
+  consumer, and check-wiring's awk rung stays that unit's.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams deployer+tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams deployer+tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -57,13 +57,16 @@ call, and stands down the holes that only gov's own engine could discharge.
   long as that hole exists. Observed by AC8.
 - **S6** — THE INCMS DECLARATION, handed over rather than written. The build journal records the
   five `[[own]]` rows inCMS would add, and a scratch-clone run proves they discharge AC3, AC6 and
-  AC8. Gov writes nothing in inCMS. Observed by AC9.
+  AC8. Gov writes nothing in inCMS. The rows are a bridge: `DEPL-aRepatriatedFork-20` deletes
+  all five in its one landing. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
 - Converging any of the four programs with gov's. Audit-A measured each as a parallel
-  reimplementation, not a stale copy; converging `gen_build_index.py` alone means migrating 324
-  build READMEs to gov's front-matter schema. That is inCMS's decision, not this unit's.
+  reimplementation, not a stale copy. The owner ruled on 2026-09-23 that inCMS converges, and
+  `DEPL-aRepatriatedFork-20` owns that work, including migrating inCMS's build READMEs. This role
+  is the BRIDGE that lets inCMS pull gov verbatim while that unit is in flight. Every other adopter
+  that owns an engine can use it too.
 - A contract for every engine file in every kit. S3 covers the memory-tree sources another shipped
   file calls. A kit gains a contract when an adopter first needs to own one of its files.
 - nc. Its forks are carve-outs patched onto gov's bytes, not parallel programs, and TOOL units in
@@ -88,6 +91,9 @@ call, and stands down the holes that only gov's own engine could discharge.
   may retire. S5 declares a stand-down for it only while it exists.
 - **hands-off** `DEPL-aRepatriatedFork-17` — the nearest-vintage pin suggestion, which names this
   role as the remedy when no vintage is near.
+- **hands-off** `DEPL-aRepatriatedFork-20` — inCMS's convergence onto gov's programs, which deletes
+  S6's five rows in one landing. Without this unit, inCMS's pulls stay blocked until the convergence
+  lands.
 
 ## 4. Design
 
@@ -275,22 +281,30 @@ New arm: `tools/govkit/selftest.py` · an `[[own]]` fixture per S item, a non-co
 - **F1 — where does `[[own]]` live, `deploy.toml` or the receipt?** The deploy descriptor is the
   owner's standing decisions and the receipt is what happened. Recommendation: `deploy.toml`, with
   `adopt` copying the declaration into the row, the same split `[[decline]]` uses.
+  RESOLVED (owner, 2026-09-23): `deploy.toml`, with `adopt` copying the declaration into the row, as
+  recommended.
 - **F2 — when an owned file stands in for a gov source at a DIFFERENT path, does gov keep landing
   its own copy?** inCMS's `check-docs-hygiene.sh` stands in for `check-memory-hygiene.sh`, which gov
   keeps installing unwired beside it. Recommendation: keep landing it and print one line saying the
   stood-in copy is unwired. Withdrawing it is a separate, reversible decision the operator makes with
   `--write-withdrawals`.
+  RESOLVED (owner, 2026-09-23): keep landing it and print one unwired line, as recommended.
 - **F3 — when does `INSTALLED CONSUMER CANNOT RUN` become `r.fail`?** Measured at inCMS on
   2026-09-23, five gov engine rows would carry the mark against its own programs:
   `check-memory-hygiene.sh`, `row_grammar.py`, `marker-contract.test.sh`, `manifest-check.sh` and
   `check-arms.py`. None is on an inCMS leg. Recommendation: escalate only when the consumer's argv
   is on a leg the receipt records as emitted, which inCMS's receipt does not record today, so the
   escalation is inert there until it does.
+  RESOLVED (owner, 2026-09-23): escalate only when the consumer's argv is on a leg the receipt
+  records as emitted, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, grounded at a7c78ad2 with audit-A's measurements, the
   2026-09-23 read-only `update` of the inCMS worktree and a nearest-vintage search over its four programs.
+- rev-2 · 2026-09-23 · §8 resolved by the owner. The owner also ruled that inCMS converges, which
+  §3 had called inCMS's decision. This unit becomes the bridge, and `DEPL-aRepatriatedFork-20`
+  owns the convergence.
 
 ## 10. Reuse audit
 

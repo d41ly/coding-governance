@@ -242,11 +242,14 @@ New arm: `tools/govkit/selftest.py` · a copy-mode and a render-mode fixture for
   prints that the value was not chosen. `asked` matches `MACHINE_A` and costs every adopter one more
   intake question. Recommendation: `defaulted`, because the registry row it fills is the rendering
   node's own and `a` is the fleet's first tag by construction.
+  RESOLVED (owner, 2026-09-23): `defaulted`, as recommended.
 - **F2 — should a redundant answer, equal to its probe, be a finding?** inCMS's `deploy.toml`
   comment calls such an answer a second copy of a value that has a home. Recommendation: a note
   line, never a failure. A finding would red an adopter for being explicit.
+  RESOLVED (owner, 2026-09-23): a note line, never a failure, as recommended.
 - **F3 — does `[charter]` also admit a `derived` override, or only `asked` and `defaulted` keys?**
   Recommendation: all three, per the Data model table. The class is about the consumer, not the key.
+  RESOLVED (owner, 2026-09-23): all three classes, per the Data model table, as recommended.
 
 ## 9. Revision log
 

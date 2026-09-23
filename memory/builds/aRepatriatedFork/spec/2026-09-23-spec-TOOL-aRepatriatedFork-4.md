@@ -203,6 +203,7 @@ New arm: `tools/workflows/check-review-join.test.sh` · a fixture with a ref-key
   would let the prefix go as it does for verifier-fanout. Against it: review-join's arm 2 judges files
   that dispatch agents, and a helper that dispatches without declaring `meta` would leave the arm.
   Recommendation: no, keep the union; the two gates answer different questions.
+  RESOLVED (owner, 2026-09-23): no, keep the union, as recommended.
 
 ## 9. Revision log
 

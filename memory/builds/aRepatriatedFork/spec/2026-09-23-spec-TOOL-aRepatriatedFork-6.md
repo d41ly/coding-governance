@@ -239,9 +239,11 @@ New arm: `tools/unattended/check-unattended.test.sh` · a fixture with two diffe
 - **F1 — should S3 also refuse a same-value repeat for keys the driver owns exclusively, `phase`
   above all?** It would catch a forgery that happens to repeat the real value, which forges nothing.
   Recommendation: no; the different-values rule is the one that separates a forgery from a repair.
+  RESOLVED (owner, 2026-09-23): no, as recommended.
 - **F2 — should `--attest` refuse a value outside a closed set, `yes` and a reason sentence?** It
   narrows what an agent can author at all. Recommendation: no; S1 and S2 remove the forging power,
   and the value is prose by design.
+  RESOLVED (owner, 2026-09-23): no, as recommended.
 
 ## 9. Revision log
 

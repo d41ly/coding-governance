@@ -225,13 +225,16 @@ print both rows with their roles, and a copy with the role column deleted must f
   consumer's bar green when it has nothing to police. Exit 2 would force a consumer to deselect,
   which is what nc did by hand. Recommendation: exit 0 with both SKIP lines, because the descriptor
   already calls the kit conditional and a printed skip is the house form for "nothing to grade".
+  RESOLVED (owner, 2026-09-23): exit 0 with both SKIP lines, as recommended.
 - **F2 — does nc re-select the kit after this lands?** Re-selecting buys nothing nc uses today — it
   ships no kits — and costs nine lexicon offender names. Recommendation: nc stays deselected; this
   unit exists so the next consumer that selects the kit is not red on day one.
+  RESOLVED (owner, 2026-09-23): nc stays deselected, as recommended.
 - **F3 — should the self-test's `GATE` derivation wait for `TOOL-aRepatriatedFork-18`'s canonical
   block?** Recommendation: no. S5 needs one line, the same `$(dirname "$0")` form the gate already
   uses for `_self_dir` at `:46`; if 18 ships a canonical block later, this line joins its parity
   table.
+  RESOLVED (owner, 2026-09-23): no; one `$(dirname "$0")` line now, as recommended.
 
 ## 9. Revision log
 

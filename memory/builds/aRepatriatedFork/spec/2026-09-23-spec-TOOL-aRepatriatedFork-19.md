@@ -225,6 +225,7 @@ on, each run against the a7c78ad2 checker first · none
   `WIRING_CHECK` in `.unattended.conf`. Recommendation: (a). A missing installed file is the receipt
   leg's red; making the wiring checker gate on it would red one defect in two places, and the
   unattended preflight would stop on something `receipt sync` already stops.
+  RESOLVED (owner, 2026-09-23): (a), `skip` naming the receipt row, as recommended.
 - **F2 — does a shell consumer read the receipt at all?** `TOOL-aRepatriatedFork-2` §8 F1
   recommends that shell consumers use the probe rungs only and print a named miss, because parsing
   the pretty-printed receipt in bash is brittle. check-wiring is the shell consumer where the probe
@@ -237,9 +238,13 @@ on, each run against the a7c78ad2 checker first · none
   and the checker runs as a SessionStart hook with no resolved interpreter of its own
   (`tools/check-wiring.sh:240-245`). The two recommendations need one answer before either unit
   builds.
+  RESOLVED (owner, 2026-09-23): (a) for this checker: the awk rung plus the parity arm. Shell
+  consumers that already resolve a Python import the canonical reader instead, per
+  `TOOL-aRepatriatedFork-2` §8 F1, so the two answers are one.
 - **F3 — who owns `tools/push-main.test.sh`'s identical `tools/lib/resolve-python.sh` defect?** The
   brief lists it under the lander contracts unit. Recommendation: that unit, applying S4's recipe;
   this unit touches only the check-wiring suite.
+  RESOLVED (owner, 2026-09-23): `TOOL-aRepatriatedFork-8`, applying S4's recipe, as recommended.
 
 ## 9. Revision log
 

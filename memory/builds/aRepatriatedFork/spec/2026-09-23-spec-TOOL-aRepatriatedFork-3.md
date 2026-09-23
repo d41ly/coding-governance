@@ -221,10 +221,14 @@ and the registry seed · none.
   `tools/govkit/govkit.py` in about fifty places and every kit's self-test. Recommendation: pin them
   in this unit and file one backlog row to drain them, because none reaches an adopter and the
   registry reds on any new one.
+  RESOLVED (owner, 2026-09-23): pin the 151 sites here and file one backlog row to drain them, as
+  recommended.
 - **F2 — does the gate-lint kit declare an adopter leg for the scanner?** A declared leg reds at
   every adopter's next pull until they seed a registry, which is what gate-lint's two existing legs
   already do. Recommendation: not in this unit; ship the file, keep the leg gov-only, and let inCMS
   decide whether gov's scanner replaces its own.
+  RESOLVED (owner, 2026-09-23): no adopter leg in this unit; the scanner stays gov-only, as
+  recommended.
 
 ## 9. Revision log
 

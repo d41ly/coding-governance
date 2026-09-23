@@ -256,9 +256,11 @@ pre-change `resolve()` that ignores it, plus the archive-segment path against th
   a recall-scoped key, as specified. Option (b): a memory-tree `NODE_TAGS` key that both kits read.
   Recommendation: (a). The hygiene engine accepts any letter by design and only the id grammar pays
   for a wide class; (b) is the right move when a second reader appears, not before.
+  RESOLVED (owner, 2026-09-23): (a), a recall-scoped key, as recommended.
 - **F2 — should gov ship a node-tag derivation for `--export`?** Recommendation: no, per §3. If the
   owner wants it, the precondition is ONE registry reader replacing the three gov already has,
   which is its own unit.
+  RESOLVED (owner, 2026-09-23): no, as recommended.
 - **FACT-QUESTION · F3 — why does `PERF-aSwiftHourglass-2` move from `grammar` to `glossed` under
   gov's `extract.py`?** audit-B §9 measured the move and did not explain it. The id sits at inCMS
   `memory/backend-test-harness.md:8` and in `scripts/corpus-id-unresolved.txt:75`. Probe: diff

@@ -272,12 +272,15 @@ New arm: a port of nc's `scripts/pre_push_bar_selftest.py` under `.githooks/`, w
 - **F1 — record the full bar command in the run log, or only its class?** The class is enough to tell
   a stub from a gate and keeps the line under `RUNLOG_MAX_BYTES` (`.githooks/pre-push:95`).
   Recommendation: the class.
+  RESOLVED (owner, 2026-09-23): the class, as recommended.
 - **F2 — port nc's python harness as its own leg, or fold its cases into `.githooks/pre-push.test.sh`?**
   Its mutation step re-disables the three arms on every run, which the shell suite does not do.
   Recommendation: port it as a leg beside the hook, since the mutation is the only control that keeps
   observing the arms fail.
+  RESOLVED (owner, 2026-09-23): port it as its own leg beside the hook, as recommended.
 - **F3 — should the guard also refuse `GOV_GATE_CMD_TEST` when `.unattended.conf` declares a live
   run?** S4 already withholds the lander marker. Recommendation: no.
+  RESOLVED (owner, 2026-09-23): no, as recommended.
 
 ## 9. Revision log
 

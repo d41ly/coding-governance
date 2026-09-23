@@ -260,11 +260,16 @@ New arm: `tools/workflows/check-protocol-parity.test.sh` · a template with a su
 - **F1 — one key, or one for concurrency and one for the verify-stage total?** The charter states two
   rules. Both adopters that lower the cap lower both to the same number. Recommendation: one key now;
   a second key is additive later.
+  RESOLVED (owner, 2026-09-23): one key for both rules; a second is additive later, as recommended.
+  The declared lower-only cap itself, parked by `dRetiredFork`, is ratified.
 - **F2 — `.agent-cap.conf` as its own file, or a key in an existing conf?** A new file is one more
   root dotfile; `.memory-tree.conf` couples two kits. Recommendation: its own file, documented in the
   hooks README.
+  RESOLVED (owner, 2026-09-23): its own `.agent-cap.conf`, documented in the hooks README, as
+  recommended.
 - **F3 — should the S9 property arm's population gain the nesting matrix?** It would pin that no
   matrix fixture BASE denied is admitted now. Recommendation: yes, it costs only fixture files.
+  RESOLVED (owner, 2026-09-23): yes, as recommended.
 
 ## 9. Revision log
 

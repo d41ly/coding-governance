@@ -288,14 +288,19 @@ grep · the held-leg budget gains one row
   S1 as specified. Option (b): §4's first rejected alternative. Recommendation: (a) now, because
   both adopters fork these gates today and (b) cannot arm a fork. Revisit (b) once the gates run
   verbatim at both adopters, when it would let S1's files leave again.
+  RESOLVED (owner, 2026-09-23): (a), ship the suites now; revisit (b) once both adopters run the
+  gates verbatim, as recommended.
 - **F2 — does reversing the file half of `TOOL-aQuenchedHarness-3` need an owner ruling?** The
   2026-08-23 ruling withheld the files because a copy-installed adopter "never edits" the checker.
   check-arms makes the adopter READ the suite whether it edits the checker or not, which the ruling
   did not weigh; its spec never mentions check-arms. Recommendation: put S1 to the owner as a
   narrowing of that ruling to legs, not a reversal.
+  RESOLVED (owner, 2026-09-23): S1 is ratified as a NARROWING of `TOOL-aQuenchedHarness-3` to legs
+  only; the files ship, the legs stay withheld.
 - **F3 — should the S1 suites' execution proof be a bar leg or a held leg?** Running
   `unattended.test.sh` and `check-unattended.test.sh` in a scratch adopter is minutes of wall.
   Recommendation: a held leg with a budget row, as the third `New arm:` states, run once per build.
+  RESOLVED (owner, 2026-09-23): a held leg with a budget row, run once per build, as recommended.
 
 ## 9. Revision log
 

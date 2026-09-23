@@ -246,15 +246,18 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a flat `scripts/` i
   Options: (a) S3 as written, independent of the cutoff; (b) scope it to the cutoff as nc does.
   Recommendation: (a). A JSON file cannot carry a Serves line at any date, so a date is not what
   decides it.
+  RESOLVED (owner, 2026-09-23): (a), independent of the cutoff, as recommended.
 - **F2 — the receipt as the `TOOL_ROOT` source.** A copy-installed adopter has no receipt and keeps
   the parent derivation, which is right for any kit-per-directory layout and wrong only for a flat
   one. Options: (a) receipt then parent; (b) a declared `TOOL_ROOT` key in `.memory-tree.conf`.
   Recommendation: (a), because the receipt already records the prefix and a second declaration of it
   is a second copy.
+  RESOLVED (owner, 2026-09-23): (a), receipt then parent, as recommended.
 - **F3 — does S8 need pre-commit reach?** nc's check 90 ran under `--staged` inside the engine; as a
   project leg it runs at the push bar only, which is a later signal. Gov does not ship
   `.githooks/pre-commit` to adopters, so nc can call its script from its own hook. Recommendation:
   say so in the README example and build nothing.
+  RESOLVED (owner, 2026-09-23): a README note, build nothing, as recommended.
 
 ## 9. Revision log
 
