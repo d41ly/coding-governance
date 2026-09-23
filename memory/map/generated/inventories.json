@@ -42,6 +42,7 @@
       "install-prefix self-test",
       "kickoff engine size <=18KiB",
       "kickoff-manifest ratchet",
+      "kit epoch (shipped bytes move, the version moves)",
       "kit placeholders (a declared token its adopter substitutes)",
       "kit version markers",
       "kit-placeholders self-test",

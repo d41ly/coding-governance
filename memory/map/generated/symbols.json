@@ -1343,6 +1343,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_epoch_verb",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_extract_covers",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -1876,6 +1881,11 @@
       "id": "cmd_emit_pin",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_epoch",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "cmd_extract",
@@ -5734,6 +5744,11 @@
     },
     {
       "id": "resolve_tokens",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_version_value_at",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },

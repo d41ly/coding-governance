@@ -34,7 +34,13 @@
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
-KIT_MANIFEST_VERSION="1.4"   # gov:kit kickoff-manifest@1.4 — the registry id
+KIT_MANIFEST_VERSION="1.5"   # gov:kit kickoff-manifest@1.5 — the registry id
+# TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
+# VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
+# MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
+# marker and the shipped seed's marker are compared with. It was one number, so every vintage bump
+# told every adopter to upgrade a format that had not moved. Raise it only with an upgrade step.
+MANIFEST_FORMAT="1.4"
 
 # THE ONE LIST of places a kickoff manifest may live, in precedence order. Every consumer reads it
 # from here — the discovery loop, the not-found message, and the `--locations` verb that the kickoff
@@ -579,8 +585,8 @@ esac
 # Forward-drift signal: manifest format older than this kit copy (no sort -V — BSD/busybox safe).
 ver_older() { awk -v a="$1" -v b="$2" 'BEGIN{na=split(a,x,".");nb=split(b,y,".");n=(na>nb?na:nb);for(i=1;i<=n;i++){d=(x[i]+0)-(y[i]+0);if(d<0){print "y";exit}if(d>0)exit}}'; }
 mver=$(sed -n 's/.*kickoff-manifest: v\([0-9][0-9.]*\).*/\1/p' "$MF" | head -1); mver=${mver%.}
-if [ -n "$mver" ] && [ "$(ver_older "$mver" "$KIT_MANIFEST_VERSION")" = "y" ]; then
-  echo "WARN: manifest format v$mver < kit v$KIT_MANIFEST_VERSION — see the upgrade recipe in coding-governance/WIRE-INTO-PROJECT.md §4."
+if [ -n "$mver" ] && [ "$(ver_older "$mver" "$MANIFEST_FORMAT")" = "y" ]; then
+  echo "WARN: manifest format v$mver < kit format v$MANIFEST_FORMAT — see the upgrade recipe in coding-governance/WIRE-INTO-PROJECT.md §4."
 fi
 
 status=0

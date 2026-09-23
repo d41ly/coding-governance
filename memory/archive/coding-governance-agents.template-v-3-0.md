@@ -1,90 +1,12 @@
-# coding-governance — working guide
-
-Project-agnostic governance + tooling for running Claude Code (or any agent) across several
-machines/sessions on one repo. This repo **dogfoods its own kits**: it runs the memory-tree hygiene
-gate, the kickoff-manifest ratchet, the template size gate, and the codebase-map coverage gate on
-itself. The map lives at `memory/map/`; its dossiers are the files under `memory/map/features/`, and the
-keys not yet claimed by one are in the `baseline.toml`, which shrinks except where a recorded
-decision says otherwise (`TOOL-aSiftedPlaybook-1` swapped one key in place; see the file's header). Both counts move as dossiers
-land, so neither is spelled here: count `memory/map/features/` and the rows of
-`memory/map/baseline.toml`. No command reports the pair — this line used to claim
-`reuse_lookup.py` did, and it needs a query and prints the whole inventory, not the remainder.
-
-*(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import — Claude Code
-doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
-
-## What ships here (the product)
-
-- **`coding-governance-agents.template.md`** — the governance playbook template (the operating
-  ruleset; **≤48 KiB, gated** by `tools/check-template-size.sh`, which also prices every growth
-  against a recorded high-water — prefer externalizing to spending the headroom). **ONE file as of
-  v3.0**: the activity-scoped checklists that used to sit in a prose companion converged into the
-  charter, and the deploy-time placeholder catalog became a program — `tools/playbook/`, whose
-  renderer fills every placeholder from the target's `deploy.toml` and drops the `kit:`/`when:`
-  conditional blocks that target has no kit for.
-- **`skills/session-kickoff/`** — the `/session-kickoff` engine + `MANIFEST-TEMPLATE.md` + the
-  ratchet gate `manifest-check.sh` (+ its test). Installed per-machine via a junction (not in-repo).
-- **`tools/`** — `lib/resolve-python.sh` (the one python-launcher resolver: it RUNS the candidate,
-  because the MS-Store `python3` stub answers `command -v` and exits 9009) plus the copy-in kits:
-  `memory-tree/`, `memory-recall/` (offline conf-driven retrieval
-  over the memory tree + the rendered recall Skill and its opt-in `recall-opened` hook),
-  `codebase-map/`, `drift-audit/` (does this repo's own RECORD of its state still match reality —
-  stdlib+git, seconds, no agents; every signal carries a liveness assertion so a probe
-  that cannot move prints DEAD PROBE instead of a reassuring 0), `hooks/agent-cap.js` (the fan-out guard: raw-primitive ban + the verifier-arity rule it resolves),
-  `workflows/tier2-review.js`, `workflows/drift-audit-{code,state}.js`,
-  `unattended/` (the unattended-run kit: the binding protocol, the four-verb driver, and the leg that
-  reads the project's `.unattended.conf` declarations rather than restating them — a run that will
-  merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
-  mandate it ASSERTS and cannot have written),
-  `agent-instructions/`, `pytest-parallel-guardrails/` (bounded,
-  attributable pytest-xdist runs: the four-knob ini recipe, the crashprobe worker-death
-  attribution plugin, the aiosqlite closed-loop seam patch + forced-race gate), the
-  `check-template-size.sh` gate, and `check-wiring.sh` (detects/auto-wires
-  installed-but-unwired tools; SessionStart-driven).
-- **`WIRE-INTO-PROJECT.md`** — the agent runbook for wiring the whole chain into a target repo.
-
-## Layout
-
-- Root: `README.md`, this charter, `WIRE-INTO-PROJECT.md`, the product template (one file).
-- `tools/` — the deployable kits (copied into target repos).
-- `skills/session-kickoff/` — the kickoff skill (stays at repo root for machine-junction discovery).
-- `memory/` — this repo's dogfooded memory tree, FLAT: `README.md` · append-only `DECISIONS.md` ·
-  `HYGIENE.md` · `TEMPLATE-SPEC.md` · the GENERATED `LIVE.md` + `ledger/<month>.md` ·
-  `backlog/<FAMILY>.md` · `builds/<slug>/` · `gotchas/` · `guides/` · `map/` · `archive/` ·
-  `project/` (the gate's `*.txt` waiver registries and nothing else). Specs, reports, research
-  and reviews live under a build's own folder, NOT the root. The `streams` enum is
-  `playbook kickoff tooling deployer`. Version snapshots and the RETIRED session ledger live in
-  `memory/archive/`.
-- `.memory-tree.conf` · `memory/guides/SESSION-KICKOFF.md` · `.gitattributes` (LF discipline).
-
-## Node registry
-
-| Tag | Machine/user | Primary tree | Remote |
-|-----|--------------|--------------|--------|
-| `a` | daily-agent | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
-| `b` | agent5 @ `DESKTOP-3J1O6CD` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
-| `c` | agent-0 @ `DESKTOP-8BKM8GN` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
-| `d` | d41ly | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
-
-IDs are `FAMILY-<slug>-<seq>` (`PLAY`/`KICK`/`TOOL`/`DEPL`); slug = node tag + CamelCase adjective-noun,
-minted once per session. One append-only `memory/DECISIONS.md`; backlogs shard per family at
-`memory/backlog/<FAMILY>.md`. Builds live at `memory/builds/<slug>/` — the discipline is a `streams`
-value in each spec's status header, not a directory, so a build spanning two disciplines is one build.
-Live work state is READ from the generated `memory/LIVE.md` (plus the `ledger/<month>.md` shards),
-rendered by `gen_build_index.py` from build front matter and every spec's status header. There is no
-authored session ledger: the sharded per-node one retired at playbook v2.4 / memory-tree kit 1.8 and
-its shards sit frozen under `memory/archive/`.
-
-<!-- gov:playbook -->
 # Coding Governance — the agent charter template
 
-*Template **v3.1** · 2026-09-24. One file. One line per directive, and a wrapped line is still one
+*Template **v3.0** · 2026-08-18. One file. One line per directive, and a wrapped line is still one
 rule. This file BECOMES a project's `AGENTS.md`: `tools/playbook/adopt-playbook.sh` fills every
 placeholder and drops the blocks a target has no kit for, so filling it is a program's job and not a
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
 `…-v-N-N.md` snapshots and in git.*
 
-<!-- governance-template: v3.1 -->
+<!-- governance-template: v3.0 -->
 
 > **What:** a project-agnostic charter for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** deploy it with the renderer; the rules are
@@ -93,7 +15,7 @@ reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. Histor
 ## §0 — TL;DR (the load-bearing rules)
 
 - **Session-scope every new ID** (slug = node tag + CamelCase adjective-noun) — collisions become impossible, not avoided (§2).
-- **Own streams, not files; merge small and often** to local `main` (§3) — and isolate *runtimes* too: ports/DBs per session.
+- **Own streams, not files; merge small and often** to local `{{DEFAULT_BRANCH}}` (§3) — and isolate *runtimes* too: ports/DBs per session.
 - **Memory holds only the non-derivable**; status is DERIVED, no shared mutable index, no per-node shard (§5).
 - **Gates are the merge bar; reviews cover what gates can't**; every confirmed finding becomes a gate or a documented check (§7, §8).
 - **Never more than the declared bound at once, AND never more than the declared total per verify
@@ -108,25 +30,31 @@ reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. Histor
 Keep units small: one stream/owner, no cross-stream contract change, reviewable as one Tier-1 diff — else split.
 
 **Definition of Ready — run before touching code:**
-- Sync: `fetch` + fast-forward local `main` (another node may be ahead); recreate/repair your worktree if needed (§3).
+- Sync: `fetch` + fast-forward local `{{DEFAULT_BRANCH}}` (another node may be ahead); recreate/repair your worktree if needed (§3).
 - Locate: read your stream's decision log + backlog (§6) and the derived work-state index (§5); confirm your node tag (§2).
 - Scope: clear acceptance criteria, one stream, small, gates named — if you can't state those, split or clarify first.
 - Reserve: at your session's first work-unit, mint + grep-check a session slug (§2) and open the unit's record (§6).
-- Large new feature (a Tier-2 change): the DoR *is* a design pass — a written spec (goal · scope · non-goals · acceptance) + a bounded production-readiness menu (best-practice implementation, the extra tools it needs, and the cross-cutting concerns: security · perf/scale · a11y · i18n · error/empty/loading states · observability · testing/gates · migration/rollback · `help/` docs). Spec shape: the memory-kit `TEMPLATE-SPEC.md` (check 12).
+- Large new feature (a Tier-2 change): the DoR *is* a design pass — a written spec (goal · scope · non-goals · acceptance) + a bounded production-readiness menu (best-practice implementation, the extra tools it needs, and the cross-cutting concerns: security · perf/scale · a11y · i18n · error/empty/loading states · observability · testing/gates · migration/rollback · `{{HELP_DIR}}` docs). Spec shape: the memory-kit `TEMPLATE-SPEC.md` (check 12).
 - Surface that menu and **get scope approval BEFORE building** (a menu to select from, not scope-creep licence); record the agreed spec per §6.
+<!-- kit:codebase-map -->
 - Codebase map adopted (§5)? A design pass touching an UNDOSSIERED feature creates/refreshes that dossier as a DoR item (the pass already reads what the dossier needs) — the map's convergence forcing function.
+<!-- /kit:codebase-map -->
 
 **Definition of Done — before you call it done:**
 - Gates green (§7); the change verified by a check that exercises it (§8), not asserted.
 - Every confirmed finding left-shifted: a regression gate, or a §10 checklist entry if its class can't be gated (§7).
-- User-facing change → its `help/` page created/updated (§5).
+- User-facing change → its `{{HELP_DIR}}` page created/updated (§5).
+<!-- kit:codebase-map -->
 - Codebase map adopted (§5)? New inventory keys claimed in the map tree (machine-enforced); dossier prose refreshed on touch; claim edits regen the generated artifacts in the same commit.
+<!-- /kit:codebase-map -->
 - Memory (non-derivable only), decision log/backlog, and the unit's own record updated — **committed before the push and the wrap-up message** (§16).
 - Kickoff manifest (when the project keeps one) updated if this unit changed what it front-loads — a gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim found stale, or a fact re-derived that it should have front-loaded — re-stamp `last-audit` with a delta line in the commit message; no delta → no touch.
 
 **Landing — merge protocol:**
-- Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask.
+- Land on local `{{DEFAULT_BRANCH}}` first, verify, then push; the merge to shared `{{DEFAULT_BRANCH}}` and the push each need an explicit ask.
+<!-- kit:unattended -->
 - That explicit ask has ONE substitute: a committed build folder the run did not create, whose shape your merge bar validates. The mandate is ASSERTED, never written by the run that uses it, and must be reachable from a BASE observed on the remote rather than read from a local ref. A run with full shell access can still defeat that, and the control that actually binds lives on the remote.
+<!-- /kit:unattended -->
 - After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the push boundary DECIDES whether a full bar is owed, against a recorded green and a declared staleness bound.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
@@ -141,7 +69,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
 **Unattended runs** *(kit-conditional — drop this block if the project does not adopt the unattended-run kit).*
 
-- The contract is `memory/guides/UNATTENDED-PROTOCOL.md`, installed by the kit: the committed
+- The contract is `{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md`, installed by the kit: the committed
   build folder as the authorization and its provenance properties, the run-state file's generated and
   authored halves, the phase vocabulary and its witnesses, the Definition of Done and its override,
   the keepalive split by actor, the default directive set and its named waiver, and the landing rule.
@@ -152,9 +80,9 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
 - Register every node once, in-repo — tag · machine/user · primary tree · worktree root · **per-node variances** (remote name, harness launch config, credential quirks like an elevated scope for CI-config pushes):
 
-  | Tag | Machine/user | Primary tree (`main` lives here) | Worktree root | Variances |
+  | Tag | Machine/user | Primary tree (`{{DEFAULT_BRANCH}}` lives here) | Worktree root | Variances |
   |-----|--------------|----------------------------------|---------------|-----------|
-  | `a` | `daily-agent` | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths |
+  | `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | {{VARIANCES_A}} |
 
 - Identify your node by machine/user, never by filesystem path — roots can be identical across machines.
 - A new node claims the lowest free one-letter lowercase tag and adds its row in the same commit.
@@ -172,17 +100,17 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
 ## §3 — Parallel work: streams, worktrees, trunk
 
-- Own streams, not files: `no fixed ownership — a solo tooling repo, one stream per work-unit`. Overlap on shared files (API clients, config, indexes) breeds collisions and integration reviews — minimize it.
-- Trunk-based: merge small and often to LOCAL `main`; long-lived branches mean bigger reconciles and review surface.
-- `main` stays checked out in exactly ONE tree (the primary); feature work happens ONLY in sibling worktrees — parking `main` on a feature branch strands it and is the root cause of concurrent-session collisions.
-- Machine-enforce the branch rule: a tracked pre-commit hook refuses primary-tree commits off `main`, wired per node by an install script; a session-start check flags the contested state; `--no-verify` is the deliberate bypass.
-- Doc-only commits go directly on local `main` only while the primary tree is on `main` and idle; a busy tree (dirty, mid-merge, another session) routes through a worktree.
-- Bootstrap worktrees with one script (`none yet — worktrees are created by hand under .claude/worktrees/`): sibling worktree on a fresh branch off fast-forwarded `main` + dependency install.
+- Own streams, not files: `{{STREAM_OWNERSHIP}}`. Overlap on shared files (API clients, config, indexes) breeds collisions and integration reviews — minimize it.
+- Trunk-based: merge small and often to LOCAL `{{DEFAULT_BRANCH}}`; long-lived branches mean bigger reconciles and review surface.
+- `{{DEFAULT_BRANCH}}` stays checked out in exactly ONE tree (the primary); feature work happens ONLY in sibling worktrees — parking `{{DEFAULT_BRANCH}}` on a feature branch strands it and is the root cause of concurrent-session collisions.
+- Machine-enforce the branch rule: a tracked pre-commit hook refuses primary-tree commits off `{{DEFAULT_BRANCH}}`, wired per node by an install script; a session-start check flags the contested state; `--no-verify` is the deliberate bypass.
+- Doc-only commits go directly on local `{{DEFAULT_BRANCH}}` only while the primary tree is on `{{DEFAULT_BRANCH}}` and idle; a busy tree (dirty, mid-merge, another session) routes through a worktree.
+- Bootstrap worktrees with one script (`{{WORKTREE_SCRIPT}}`): sibling worktree on a fresh branch off fast-forwarded `{{DEFAULT_BRANCH}}` + dependency install.
 - Worktree lifecycle: enumerate with `git worktree list` (never assume the set); worktrees do NOT sync across machines (absolute links — recreate per machine); relocate with `worktree move` + `repair`, never `mv`.
-- Commit the governing doc to `main` so it propagates — it only exists in checkouts where it's committed.
+- Commit the governing doc to `{{DEFAULT_BRANCH}}` so it propagates — it only exists in checkouts where it's committed.
 - Contract-first for cross-cutting changes: a schema/wire-format/enum two nodes depend on lands as a contract + gate before either builds on it.
 - Landings are `--no-ff` merges with a descriptive message — one visible, atomic, cleanly revertable integration unit.
-- Every agent commit ends with the mandated attribution trailer: `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+- Every agent commit ends with the mandated attribution trailer: `{{COMMIT_TRAILER}}`.
 
 ## §5 — Memory & docs
 
@@ -192,7 +120,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 - Status is DERIVED, never authored: a generated work-state index over the per-unit records, not prose memory and not a table sessions edit — anything time-sensitive rots.
 - Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
 - Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.
-- User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `help/` + an index; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
+- User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
 - A system inventory that CANNOT rot into fiction is worth more than one that is merely current:
   per-feature records claiming EXACT KEYS from machine-enumerated sets, with a ratchet failing on any
   unclaimed new key AND any claim naming a dead one. Where the project keeps one, its coverage and
@@ -203,12 +131,12 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 - Retrieval over the decision corpus beats grepping it: ask a question, get the records that answer
   it, ranked. It ADDS to grep rather than replacing it — a symbol, caller or filename is still a grep.
 - **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT
-  `memory/` tree of per-feature `builds/` folders — the discipline is a
-  `playbook kickoff tooling deployer` value in each spec's status header, not a directory — plus index caps, a
+  `{{MEMORY_ROOT}}/` tree of per-feature `builds/` folders — the discipline is a
+  `{{MEMORY_DISCIPLINES}}` value in each spec's status header, not a directory — plus index caps, a
   DECLARED archive-rotation mode, a status vocabulary, a GENERATED work-state index rendered from
   build front matter, and a **hygiene gate** whose check count is stated by the kit README and the
   gate-leg name and is deliberately not restated here, wired into CI + pre-commit +
-  `bash tools/run-gates/run-gates.sh`; `.memory-tree.conf` holds both. Adopt per the kit README.
+  `{{GATE_RUNNER}}`; `.memory-tree.conf` holds both. Adopt per the kit README.
 
 ## §6 — Decisions, backlogs & the governing doc
 
@@ -218,14 +146,14 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   it, so there is one text and no copy to drift, and verify the wiring with a check rather than by
   eye — an unwired pair fails silently and looks fine.
 - Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog is mutable (stable ids, status updated in place; gaps fine).
-- Per-stream id families (`playbook:PLAY kickoff:KICK tooling:TOOL deployer:DEPL`): the family prefix routes an id to its log/backlog; allocation is slug-scoped (§2), so no shared "next free id" marker exists.
+- Per-stream id families (`{{ID_FAMILIES}}`): the family prefix routes an id to its log/backlog; allocation is slug-scoped (§2), so no shared "next free id" marker exists.
 - Record real decisions as you make them — future sessions and nodes rely on these being current.
-- Session-start reading order: ALWAYS load the master decision index first, then the stream logs for the area touched — routed by `playbook -> the charter template · kickoff -> skills/session-kickoff/ · tooling -> tools/ · deployer -> WIRE-INTO-PROJECT.md` (work-area → doc tree → id families → backlog).
+- Session-start reading order: ALWAYS load the master decision index first, then the stream logs for the area touched — routed by `{{DOC_ROUTING_TABLE}}` (work-area → doc tree → id families → backlog).
 - Logs are two-tier for token scoping: a one-line-per-decision index pointing at per-decision detail files; open details only for the areas you touch.
-- The instantiated doc opens with a compact product-identity preamble for `coding-governance` (`coding-governance ships project-agnostic governance and tooling for running agents across several machines on one repo, and dogfoods every kit it ships`: what the software is, deployment model, major runtime pieces).
-- The instantiated doc carries the repo-layout map (`root holds the charter template and the runbook · tools/ the deployable kits · skills/session-kickoff/ the kickoff engine · memory/ the dogfooded memory tree`: each top-level dir + its role and the core/adapter relationships) — sessions never re-derive where things live.
-- The instantiated doc carries the everyday-command catalog (`bash tools/run-gates/run-gates.sh (the bar) · GATE_JOBS=1 for the serial rollback · GATE_FULL=1 to ignore every leg guard · bash tools/push-main.sh (the lander)`: install, dev servers, migrations, artifact regeneration, seeding, the one formatter/linter per language) — sessions never re-derive the one-true invocation.
-- Pin one in-repo home for business/product context (`README.md, plus memory/DECISIONS.md for why anything is the way it is`: brand, positioning, specs) so sessions locate it instead of asking.
+- The instantiated doc opens with a compact product-identity preamble for `{{PROJECT_NAME}}` (`{{PRODUCT_PREAMBLE}}`: what the software is, deployment model, major runtime pieces).
+- The instantiated doc carries the repo-layout map (`{{REPO_LAYOUT_MAP}}`: each top-level dir + its role and the core/adapter relationships) — sessions never re-derive where things live.
+- The instantiated doc carries the everyday-command catalog (`{{COMMAND_CATALOG}}`: install, dev servers, migrations, artifact regeneration, seeding, the one formatter/linter per language) — sessions never re-derive the one-true invocation.
+- Pin one in-repo home for business/product context (`{{PRODUCT_CONTEXT_HOME}}`: brand, positioning, specs) so sessions locate it instead of asking.
 - A value stated in prose beside the source that OWNS it rots between changes — point at the source,
   or gate the pair. This is the same rule as "derive over author", applied to documents rather than
   to code, and it is the one most often broken by the document that states it.
@@ -248,9 +176,9 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   descriptor each, asserted against the tracked surface in both directions — a new moving part reds
   until a declaration claims it, and an exemption naming a path that no longer exists reds too,
   because a stale one silently widens the surface it was written to narrow.
-- Keep the automated suite green at the push boundary: `bash tools/run-gates/run-gates.sh — the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
-- Wire the suite into remote CI as machine-required checks (`none yet — .githooks/pre-push decides at the push boundary whether a full bar is owed`) — convention is not enforcement.
-- Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `bash tools/run-gates/run-gates.sh`.
+- Keep the automated suite green at the push boundary: `{{GATE_COMMANDS}}` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
+- Wire the suite into remote CI as machine-required checks (`{{CI_FILE}}`) — convention is not enforcement.
+- Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `{{GATE_RUNNER}}`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.
 - Single source of truth → generated artifacts → parity gate, for every contract duplicated across languages/layers; a new shared contract gets ONE source, generation, and a drift test — never a hand-kept second copy.
 - Lockstep invariants get a guard (migration single-head, stale manifest, schema↔validator skew) — a gate, not memory.
@@ -263,7 +191,9 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   a number typed beside the thing it counts is wrong on the next commit and nobody notices.
 - Left-shift every confirmed finding: not done until a regression test covers its CLASS, or (if ungateable) it joins §10 as a documented check — this is how review cost trends down.
 - Guard against green-by-absence: every test/typecheck glob spans ALL real file classes (beware glob dialects that don't brace-expand), and a collection gate asserts every test file contributes ≥1 collected item — a de-collected file can't fail.
+<!-- kit:codebase-map -->
 - Codebase map adopted (§5)? Its coverage + freshness tests are merge-bar legs like any other — never exempt them to "unblock" a landing (claiming the key IS the unblock).
+<!-- /kit:codebase-map -->
 - Classify special-execution tests STRUCTURALLY: a collection hook auto-marks by fixture/dependency so a new test can't forget its class, and the default environment can't silently switch engines.
 - Parallel test runs preserve per-file isolation (file-level distribution, not per-test); parallelism is opt-in; small selections run serially (worker startup makes them a net loss).
 - A check nobody can afford to run is a check nobody runs, so COST IS A VERDICT: every suite declares a wall-clock
@@ -294,7 +224,7 @@ matched its target population.
 
 - Tier 1 — mechanical/additive (no new write path, migration, auth/sanitization/egress surface, or shared-contract change): gates + one focused self-review of the diff. NO multi-agent review.
 - Tier 2 — substantive (any of the above, or a cross-stream merge): adversarial find → verify → synthesize, running the §10 checklist as part of it.
-- Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `main`) — per-increment reviews re-scan overlapping code.
+- Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `{{DEFAULT_BRANCH}}`) — per-increment reviews re-scan overlapping code.
 - Default Tier-2 shape (ROI-tuned): a parallel fan of 3–6 primed finder lenses (security · correctness · data-integrity · dead-code · integration-seams) → a skeptic prompted to REFUTE each finding → one synthesis pass; drop any finding a skeptic refutes unless reachability + impact re-established.
 - **CONCURRENCY IS CAPPED, ALWAYS, and the verify-stage TOTAL is capped too — two rules, not one.**
   A wide fan trips the SERVER rate limiter and kills whole phases for millions of tokens; a harness
@@ -312,10 +242,10 @@ matched its target population.
 - Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics; past ~25 agents returns diminish.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
 - Match intensity to target richness: heavy multi-lens earns its tokens on fresh/complex write paths; over hardened code it manufactures refuted noise — review light or skip.
-- Persist each Tier-2 run as an in-repo artifact folder (`memory/builds/<slug>/reviews/`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
+- Persist each Tier-2 run as an in-repo artifact folder (`{{REVIEW_DIR}}`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
 - Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet. A sidechain agent holds NEITHER tool, so it cannot fan out at all: the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
 - Verify before "done": a check that exercises THIS change (its own/affected test, or the relevant gate) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
-- Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing is §1's rule, not restated here.
+- Commit freely as you go (branch/worktree, or local `{{DEFAULT_BRANCH}}` for doc-only per §3); landing is §1's rule, not restated here.
 
 - Structured-output schemas so a malformed return can't force full regeneration (top output-token
   waste): write a large body to a file and return `{path, summary}`, forward-slash paths (never
@@ -328,8 +258,10 @@ matched its target population.
 - Sanitize untrusted input at the WRITE boundary, once; trust storage at render; re-check size/shape caps AFTER any transform that can grow content (sanitizers add attributes).
 - ONE composite write-guard (scrub + capability gate + sanitize) on EVERY path that stores renderable/dangerous content — sibling write paths (templates, imports, saved/shared components) included; a bare or partial sanitizer on a sibling path is the recurring hole.
 - Gate the most dangerous sanctioned content class behind an explicit per-principal permission at write time — a capability check distinct from, and additional to, sanitization.
+<!-- when:security-outbound -->
 - One canonical URL/href normalizer shared by client AND server: strip control/whitespace, fold `\`→`/`, reject protocol-relative (`//host`, `/\host`), deny dangerous schemes (`javascript:`/`data:`/`vbscript:`); divergence is a stored open-redirect; pin the evasions (`/\evil`, `\\evil`, control chars) in tests on both sides.
 - SSRF-guard every outbound request: https-only, resolve to public IPs only, no redirect-following, signed payloads; the SAME guard on retry/queue paths, not just inline; blocking DNS/network resolution runs OFF the event loop (a hung nameserver must not freeze a worker).
+<!-- /when:security-outbound -->
 - Authorization lives in the shared core (deny-by-default RBAC, defined as code) so every adapter — HTTP, RPC, CLI, AI tool — inherits it; a service fn reachable by a future adapter re-checks authz itself.
 - AI/automation runs as a dedicated non-login service principal with a deliberately narrow grant — never a human/admin role; authority bounded by construction.
 - Automation writes are draft-only by default; autonomous publish/irreversible action sits behind an explicit default-OFF gate — a standing blast-radius bound distinct from per-feature launch flags.
@@ -344,21 +276,23 @@ matched its target population.
   keeps a documented manual one; the rule is that the classes are the PROJECT's, derived from
   its own failures, never a generic list carried in from somewhere else.
 
+<!-- when:cross-os -->
 ## §11 — Cross-OS & toolchain hygiene
 
 - Force `LF` via `.gitattributes` on execution-sensitive filetypes (shell scripts, Dockerfiles, configs, env files, migration templates, runtime-read JSON) — a stray CR breaks shebangs, `sh -c`, servers, generated migrations.
 - Verify the staged BYTES, not a pretty-printer: `git diff | cat -A` / `git cat-file -p <blob>`; `git show` and MSYS `grep` mislead on CRLF.
-- Pin toolchain versions + the one-true way to run gates on each OS: `bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009` — no per-session re-derivation.
+- Pin toolchain versions + the one-true way to run gates on each OS: `{{TOOLCHAIN_NOTES}}` — no per-session re-derivation.
 - Prefer deterministic run modes (no auto-reload) where a watcher can leave stale processes/ports squatting.
 - POSIX-emulation shells on Windows (MSYS/Git-Bash/Cygwin) mangle backslash working-dir paths (`git -C C:\repo` → `fatal: cannot change to 'C:repo'`) — use forward-slash there; a zero-false-positive hook can block the broken form.
 - Package installs run from a POSIX-emulation shell can create broken links in the dependency tree — if it looks wrong, reinstall from the native shell.
 - Absence of crash evidence is only evidence where the reporter is on: parallel-test workers get fd 0/1 (Windows: fd 2 too) redirected to devnull, so banners and native tracebacks vanish; Windows Event Viewer records nothing when WER is disabled (`Disabled=1`), and an `os._exit` is not a fault so WER never records it anywhere — instrument the process itself (a probe log) before concluding "no crash".
 
+<!-- /when:cross-os -->
 
 ## §12 — Architectural consistency (build-once, reuse-everywhere)
 
 - Decide the extension pattern before the SECOND instance — so #3..#N are data + a few overrides, never new plumbing.
-- A "kind" gets a factory/base, not copies: at instance #2, extract the shared contract into a definition helper/base — per-kind map: `kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter`.
+- A "kind" gets a factory/base, not copies: at instance #2, extract the shared contract into a definition helper/base — per-kind map: `{{KIND_FACTORY_MAP}}`.
 - One shared core, thin adapters: business logic + authorization in a single service core; HTTP/RPC/CLI/AI surfaces are thin adapters that cannot diverge (also how authz stays consistent, §9).
 - Single source of truth → generated artifacts (§7): the catalog of a kind's instances generates the
   schema/validator/manifest/docs; adding an instance = one edit + a drift gate. When the ONLY consumer
@@ -368,19 +302,21 @@ matched its target population.
   cross-language/cross-layer consumer must read it (that boundary is the artifact's whole
   justification), and make that parity gate compare the committed artifact against a LIVE
   re-derivation, never generated-vs-generated (§10).
-- Promote shared widgets the instant two features need them, on a two-tier ladder: product-generic presentational primitives → the shared kit (`tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead`); app-scoped shared widgets → that app's own kit; a feature re-implementing or re-styling a primitive locally is a smell.
+- Promote shared widgets the instant two features need them, on a two-tier ladder: product-generic presentational primitives → the shared kit (`{{SHARED_PRIMITIVES_LOCATION}}`); app-scoped shared widgets → that app's own kit; a feature re-implementing or re-styling a primitive locally is a smell.
 - Forward-compatible data: new fields additive + defaulted (old content renders identically, new capability inert until used); shape changes ship an auto-upgrade step; prefer riding an existing shape over a migration.
 - Reuse audit before building: grep for an existing component/util/endpoint to extend before adding one.
 - Gate the layout conventions you can (naming, layer boundaries); the "where things live" map lives in the always-loaded doc (§6) so every feature has an obvious home.
 - **A kit file names nothing outside itself by literal.** Its own kit dir and tool root are DERIVED and an empty derivation REFUSES; a sibling kit is a render token. Gated as a BAN, not a ratchet — the writer may lower a count, never add one. The hooks kit README states it.
+<!-- kit:lexicon -->
 *The naming bullets below are kit-conditional — drop them where the lexicon kit is not adopted. §12's rest is core.*
 
-- **Naming is one of those conventions, and it is gateable.** Declare it in `.lexicon.conf`: a CLOSED verb table every function/method definition leads with, a banned type-suffix list, and a (language, surface) CELL matrix pinning each to one spelling convention, subsets routed to a second by a selector. A repo declaring none asks people to remember.
+- **Naming is one of those conventions, and it is gateable.** Declare it in `{{LEXICON_CONF}}`: a CLOSED verb table every function/method definition leads with, a banned type-suffix list, and a (language, surface) CELL matrix pinning each to one spelling convention, subsets routed to a second by a selector. A repo declaring none asks people to remember.
 - The table's value is NOT spelling, it is SCOPING: "which verb is this?" is answerable only when a function does ONE thing, so a name that will not fit is reporting an unclear responsibility or a seam in the wrong place. If the reflex on a refusal is to add a verb, the table has become a synonym list.
 - Every row carries a NEGATIVE — `build` not `create`, `load` not `fetch` — because a row with only a positive gloss cannot tell two verbs apart, and the boundary is the whole product.
 - The corpus decides WHICH concepts the table holds, never what any of them is CALLED: seed spellings from a prescriptive source OUTSIDE the tree, freeze the result, and mark a human curated it — a table ranked from the code it grades is a mirror, the one shape a naming gate must not have (§7). Measure every pin against THIS corpus. Unfreezing that seed is one dated, attributed, REASONED line, refused without one and printed every run.
 - Declare a COVERAGE MODE per language — parser, probe (incomplete by construction, reported every run), or dark — and make an undeclared one a named refusal, never a silent skip.
 - **The rows themselves are NOT restated here.** They live in the declaration, which the kit renders into a Skill its gate byte-compares, so an edit nobody re-rendered reds. Ask per name rather than read a copy: `--suggest` answers one identifier from the declaration and canon.
+<!-- /kit:lexicon -->
 
 ## §14 — Session execution hygiene (per-call token discipline)
 
@@ -439,8 +375,8 @@ matched its target population.
 
 <!-- microformats -->
 - `committed — <sha> · <branch> · <subject>`
-- `pushed — <remote>/main · <old>..<new> · ff · <n> commits`
-- `merged — --no-ff <branch> → main · <sha>[ · post-merge gates GREEN]`
+- `pushed — <remote>/{{DEFAULT_BRANCH}} · <old>..<new> · ff · <n> commits`
+- `merged — --no-ff <branch> → {{DEFAULT_BRANCH}} · <sha>[ · post-merge gates GREEN]`
 - `gates — GREEN · <leg> · <leg> …`
 - `skipped — <leg> · <why>`
 - `up — <service> :<port> · <tree> · admin <user> · pw <pw-or-where-it-lives>`
@@ -460,121 +396,6 @@ matched its target population.
   not the build's maximum.
 - Two shapes carry an OPTIONAL final field, marked `[ · …]` above: `merged`'s post-merge gate clause, present only when the scoped gate actually ran, and `SPEC`'s open-items clause. An optional field that is not marked optional is indistinguishable from a missing one.
 - Pre-send self-check (documented check — emission has no universal machine gate): is line 1 a payload? is every caveat OUTSIDE a template line? did I re-emit anything? does the green line name every leg? **is every micro-format a bare `- ` list item with no backticks, fence or bold?** would a tired reader parse every line in one pass?
-- The discipline is measured, not vibes: keep an audit script (`none yet — the thresholds still bind`) that quantifies chat-prose waste; re-audit when sessions feel noisy; alarm thresholds — mid-turn narration >40% of session prose, or >3 interjections per final message.
+- The discipline is measured, not vibes: keep an audit script (`{{PROSE_AUDIT}}`) that quantifies chat-prose waste; re-audit when sessions feel noisy; alarm thresholds — mid-turn narration >40% of session prose, or >3 interjections per final message.
 - Cite files in user-aimed output in the ONE link format your client actually linkifies (commonly GFM `[text](path)`), forward-slashed throughout — verify once by clicking; bare/absolute/mixed-separator paths are dead copy-paste strings in many clients.
 - Resolve hrefs from the SESSION working directory — in the §3 layout the session often opens at the worktrees' PARENT, so a repo-root-relative href silently drops the worktree segment and points at nothing; prefix the worktree folder. (Repo-internal doc prose keeps §6's repo-root-relative convention — two conventions, two audiences.)
-<!-- /gov:playbook -->
-
-## The merge bar — `bash tools/run-gates/run-gates.sh`
-
-**The leg list is `tools/gate-legs.json`. Read it there and nowhere else.** Each leg's rationale is
-its own script header, and the machinery around a leg is its dossier under `memory/map/features/`.
-This section used to enumerate all seventy while telling the reader, two paragraphs in, to read the
-split from the manifest — 26 KB of prose restating a file that cannot go stale, in front of the file
-that can. What survives here is what a session cannot get anywhere else.
-
-```bash
-bash tools/run-gates/run-gates.sh                 # the bar, legs CONCURRENT
-GATE_JOBS=1 bash tools/run-gates/run-gates.sh     # the serial bar, same code path — the concurrency rollback
-GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard — NOT the whole bar: it holds every `subject = kit` OR `chunk = selftests` leg
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run those. ON DEMAND ONLY: no boundary sets it (owner, 2026-08-27)
-GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # every leg there is. Owed by a DoD only for KIT work
-```
-
-**Guards scope a run, never a verdict.** MOST self-test legs carry a `guard` in the manifest naming
-the kit dir they exercise, so a records-only commit runs only the legs that check this repo's actual
-state. Not all do, and the split is DERIVED from `tools/gate-legs.json` rather than counted here —
-an unguarded leg runs on every bar, which is the whole point of leaving it unguarded. `GATE_FULL=1` bypasses every guard, and `.githooks/pre-push` DECIDES whether to set it rather
-than setting it unconditionally, forcing a total run when no recorded full green covers the pushed tip, when that green is more than a declared
-number of commits behind it, when its tree fingerprint does not reproduce at the sha it names, when
-the leg manifest itself moved, or when the push runs the kit self-tests and the recorded green was
-earned with them held. That last one is COVERAGE and not equality — a green that covered MORE still
-satisfies a push that needs less, and a stamp with no such key at all reads as HELD. A guard can therefore scope the authoritative run too, and a
-too-narrow guard cost an early signal rather than a wrong merge verdict. A guard naming an untracked path would
-skip forever and silently, so the run-gates canary refuses one.
-
-**How the bar behaves**, because none of this is derivable from the manifest. Legs run through a
-bounded pool whose width is DECLARED rather than computed: `tools/run-gates/gate-profiles.txt` maps
-the detected cores and RAM to a named row of knobs, the runner prints the row it chose before the
-first leg verdict, and `GATE_JOBS` overrides the width alone. That row also declares a whole-run
-`wall` (`GATE_WALL` overrides): a breach kills the outstanding legs and REDS naming them. Legs are safe together because each
-heavy one is hermetic — its own `mktemp -d` scratch repo, never the real tree. Order is
-scheduled longest-first from a timing cache the runner resolves and NAMES on its own profile line,
-while REPORTING is
-always manifest order, so output is byte-stable whatever the width and a corrupt cache costs wall
-clock only. **A KIT'S SELF-TESTS ARE NOT ON THIS BAR.** Owner ruling, 2026-08-23, and the first kit to take it is
-`unattended`: a suite that stages breaks into a copy of a checker has a job only when that checker's
-source changes, and none at all in an adopter's repo that copy-installs the kit and never edits it.
-Its `*.test.sh` legs left both `tools/gate-legs.json` and the kit's own `kit.toml`, so adopters
-stop receiving them too. What stayed are the legs whose subject is the REPOSITORY rather than the
-kit, because those go stale with nobody editing it; which, and how many, are its
-`tools/unattended/` rows in `tools/gate-legs.json`. On demand:
-`bash tools/unattended/run-unattended-gates.sh --serial`. The compensating check is written into that kit's
-descriptor, because an exemption is not coverage (§7).
-
-Do not read a leg COUNT out of this paragraph; `tools/gate-legs.json` owns it and prose beside a
-source that owns a number is the rule this file keeps breaking.
-
-Measured on node `d` 2026-08-23, immediately BEFORE that removal: a full bar cost 4926 s of leg-sum
-with its longest leg at 1565 s, and the unattended and playbook legs alone were 3412 s of it — 69%.
-A 1565 s leg puts a 26-minute FLOOR under every full run, because wall clock cannot fall below the
-longest leg however wide the pool is. Fifty of the ninety-two legs then present finished in under five
-seconds each, so the distribution was not gradual: it was a handful of suites and a long tail of
-nothing. None of those figures is authored anywhere: `<git-dir>/gate-ledger.tsv` carries one row per
-leg with its own seconds, so the per-leg table is a `sort -rn` away and cannot go stale in prose. Read
-it there. The build record that first measured this is reachable from `memory/LIVE.md` like any other.
-
-Every leg's output is persisted
-per-leg under `<git-dir>/gate-logs/`, redacted; a RED run also leaves `gate-last-failure.txt`, which
-only the next RED run overwrites. Never pipe the bar through `tail` — it discards the failing row;
-read the durable summary instead.
-
-**The push boundary is where the bar binds.** The tracked `.githooks/pre-push` hook runs
-`tools/run-gates/run-gates.sh` once on a default-branch push and blocks a red one (it classifies on the remote
-ref, the validated tree must be the pushed tip, and `--no-verify` bypasses). `GOV_GATE_CMD` may
-name only a script this repo tracks, unmodified, and anything else is refused before a bar runs;
-`GOV_GATE_CMD_TEST=1` is the one test escape, labelled `bar: STUB` and denied a lander marker
-(`TOOL-aRepatriatedFork-5`). Earlier runs are diff-scoped and are developer-choice. `core.hooksPath` is
-repo-GLOBAL, so the hook gating your push is the PRIMARY tree's; check H REPORTS a divergence. A tracked pre-commit fast leg sits beside it and also enforces the
-branch guard, refusing a primary-tree commit off the default branch (`GOV_DEFAULT_BRANCH` pins it).
-A SessionStart hook runs `tools/check-wiring.sh --session`, which auto-sets an unset
-`core.hooksPath` and never clobbers a set one, so a fresh clone self-heals rather than running with
-dormant gates. Wiring the bar into remote CI needs a `workflow`-scoped push and is a follow-up.
-
-**Two protocols are BINDING, and they are rules rather than leg descriptions.**
-
-- `memory/guides/REVIEW-PROTOCOL.md` — a review's verify stage spawns **at most the total
-  `tools/hooks/agent-cap.js` resolves** (the batch grows, the agent count never does), and how many
-  run at once is a **second bound held as its own constant in that same file**. Both are file
-  constants there and are written nowhere else, so this line points instead of restating. Enforced
-  at the tool call by that hook, which sees the inline script where the rule actually gets
-  broken, and on the bar by a leg that delegates to that same hook rather than re-implementing it.
-  The marker grammar it enforces is `tools/hooks/README.md`. Ready-made harness:
-  `tools/workflows/tier2-review.js`.
-- `memory/guides/UNATTENDED-PROTOCOL.md` — a run that will merge and push with no owner turn replaces
-  the explicit-ask checkpoint with a committed standing mandate it ASSERTS and cannot have written.
-  The BASE that mandate hangs on is OBSERVED from the remote's own HEAD advertisement, never read
-  from a local ref and never named by the environment; both of those were reproduced bypasses. §9
-  states plainly what a check running under the run's own uid can and cannot buy.
-
-Before theorizing about drift, run `python tools/drift-audit/drift_report.py` — seconds, no agents,
-and it answers whether this repo's records still describe it. Before a review, run
-`python tools/memory-tree/gotchas.py --for-diff <base>..<head>` — its stdout IS the bug-class
-checklist for that diff.
-
-## Conventions
-
-- A build that runs more than one pass follows `memory/guides/BUILD-METHOD.md` — the spec set, the
-  fork rule, the pass loop, regrounding, and the wrap-up derivation. It is rendered from the
-  memory-tree kit; the unattended kit points at it, and `/session-kickoff` loads it at the hand-back.
-
-- **LF** on all `.sh` + the memory-tree data files (`.gitattributes`); verify staged bytes on Windows.
-- Kits live in `tools/`; the session-kickoff skill stays at `skills/` (machine-junction discovery).
-- The template is the operating ruleset — keep it ≤48 KiB; anything activity-scoped or one-time goes
-  in a companion, not the template.
-- Follow the governance playbook (`coding-governance-agents.template.md`) for the full multi-node
-  rules — this repo is its reference dogfood.
-- Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed build
-  folder the run did not create**. §1 Landing states the substitute and its properties, and
-  `memory/guides/UNATTENDED-PROTOCOL.md` is the contract; this bullet is the pointer, not a third
-  copy of the rule.

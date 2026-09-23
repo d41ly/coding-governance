@@ -612,7 +612,9 @@ the INVOKING directory, not from its own location — run it with the cwd inside
    session card's `node —` cell. Without it every card the project writes reads `node — UNKNOWN:
    no registry`, and nothing else fails: the key is what the version WARN is now for.
 6. Bump the manifest marker to `kickoff-manifest: v1.4` **LAST** — the bump silences the kit's
-   version WARN, the only standing signal that the body still predates the ratchet.
+   format WARN, the only standing signal that the body still predates the ratchet. The WARN compares
+   the marker with the checker's `MANIFEST_FORMAT`, never with `KIT_MANIFEST_VERSION`: that one is
+   the kit's vintage and moves whenever its bytes do, with no upgrade step owed.
 
 <!-- govkit:entry push-main -->
 ## 5 — Optional: worktree tooling + SessionStart nudge
@@ -669,7 +671,9 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 
 - `tools/check-kit-versions.sh` — asserts every kit's version constant and its doc marker agree, which
   is what makes an installed kit's version detectable at all. Edit its `need` list to your kit subset;
-  it is a hardcoded list by design, not an enumeration.
+  it is a hardcoded list by design, not an enumeration. If your project ships kits onward, the rule
+  that goes with it is that **a kit whose shipped bytes move bumps its version**: gov grades it with
+  the deployer's `govkit.py epoch` verb, which reads gov's registry and history and so stays in gov.
 - `tools/gate-lint/` — the gate-authoring lints. It ships no legs of its own; its README hands leg
   wiring to the consuming project.
 - `tools/push-main.sh` + `tools/push-main.test.sh` + `.githooks/pre-push` — §5 already tells you to

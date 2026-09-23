@@ -689,6 +689,89 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
           and "shipped takes no arguments" in pr.stderr, pr.stderr)
 
 
+def check_epoch_verb(tmp: pathlib.Path) -> None:
+    """TOOL-aRepatriatedFork-15 AC1, AC3, AC6 — `epoch` over a fixture registry on a real branch.
+
+    One versioned entry (`vk`) and one that declares none (`nk`). Edit without a bump, bump, edit
+    after the bump, then a decoy edit of the version line: observed FAILED, clean, FAILED, FAILED.
+    Each arm reads a different line, so a verb that printed one verdict for every state fails three.
+    """
+    fx = tmp / "epoch-fx"
+    for d in ("tools/govkit/entries", "tools/vk", "tools/nk"):
+        (fx / d).mkdir(parents=True, exist_ok=True)
+    shutil.copy(GOVKIT, fx / "tools" / "govkit" / "govkit.py")
+    files = {
+        "tools/govkit/registry.toml":
+            '[[entry]]\nid = "vk"\ndescriptor = "tools/govkit/entries/vk.kit.toml"\n\n'
+            '[[entry]]\nid = "nk"\ndescriptor = "tools/govkit/entries/nk.kit.toml"\n',
+        "tools/govkit/entries/vk.kit.toml":
+            'id = "vk"\nhome = "tools/vk"\n'
+            'version_from = { file = "vk.sh", pattern = "^KIT_VK_VERSION=" }\n\n'
+            '[[files]]\ninclude = ["vk.sh", "lib.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n',
+        "tools/govkit/entries/nk.kit.toml":
+            'id = "nk"\nhome = "tools/nk"\nversion_from = { none = "a fixture kit" }\n\n'
+            '[[files]]\ninclude = ["nk.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n',
+        "tools/vk/vk.sh": "KIT_VK_VERSION=1.0   # gov:kit vk@1.0\n",
+        "tools/vk/lib.sh": "echo one\n",
+        "tools/nk/nk.sh": "echo nk\n",
+    }
+    for rel, text in files.items():
+        (fx / rel).write_text(text, encoding="utf-8", newline="\n")
+    git(fx, "init", "-q")
+    git(fx, "config", "user.email", "fixture@example.invalid")
+    git(fx, "config", "user.name", "fixture")
+    settle(fx, "base")
+    base = subprocess.run(["git", "-C", str(fx), "rev-parse", "HEAD"],
+                          capture_output=True, text=True).stdout.strip()
+
+    def run_epoch(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(fx / "tools" / "govkit" / "govkit.py"), "epoch",
+                               *args], capture_output=True, text=True,
+                              env={**os.environ, "GOV_DEFAULT_BRANCH": "no-such-branch"})
+
+    (fx / "tools" / "vk" / "lib.sh").write_text("echo two\n", encoding="utf-8", newline="\n")
+    (fx / "tools" / "nk" / "nk.sh").write_text("echo nk2\n", encoding="utf-8", newline="\n")
+    settle(fx, "edit, no bump")
+    p = run_epoch("--base", base)
+    check("[aRF-15 AC1] an edit of a shipped engine with no bump is a FAILED naming the entry, exit 1",
+          p.returncode == 1 and "epoch: vk · FAILED · moved in" in p.stdout
+          and "no value change" in p.stdout and "(still 1.0)" in p.stdout, p.stdout + p.stderr)
+    check("[aRF-15 AC6] an unversioned kit that moved prints an announced skip naming its file",
+          "epoch: nk · skip · no declared version · moved: tools/nk/nk.sh" in p.stdout, p.stdout)
+
+    (fx / "tools" / "vk" / "vk.sh").write_text("KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n",
+                                              encoding="utf-8", newline="\n")
+    settle(fx, "bump")
+    bump = subprocess.run(["git", "-C", str(fx), "rev-parse", "HEAD"],
+                          capture_output=True, text=True).stdout.strip()
+    p = run_epoch("--base", base)
+    check("[aRF-15 AC1] ...and the bump in a later commit makes it clean, exit 0",
+          p.returncode == 0 and "epoch: vk · clean · 1.1" in p.stdout, p.stdout + p.stderr)
+    check("[aRF-15 AC6] ...with the unversioned kit's skip still printed on the exit-0 run",
+          "epoch: nk · skip · no declared version · moved: tools/nk/nk.sh" in p.stdout, p.stdout)
+
+    (fx / "tools" / "vk" / "lib.sh").write_text("echo three\n", encoding="utf-8", newline="\n")
+    settle(fx, "edit after the bump")
+    p = run_epoch("--base", base)
+    check("[aRF-15 AC3] a bump BEFORE a later edit does not excuse it: 'last bump precedes last move'",
+          p.returncode == 1 and f"epoch: vk · FAILED · last bump {bump[:10]} precedes last move"
+          in p.stdout, p.stdout + p.stderr)
+
+    (fx / "tools" / "vk" / "vk.sh").write_text("KIT_VK_VERSION=1.1   # gov:kit vk@1.1, reflowed\n",
+                                              encoding="utf-8", newline="\n")
+    settle(fx, "decoy: the version line moves, the value does not")
+    p = run_epoch("--base", base)
+    check("[aRF-15 S1] a decoy edit of the version line with the same value is not a bump",
+          p.returncode == 1 and "epoch: vk · FAILED · last bump" in p.stdout, p.stdout + p.stderr)
+
+    p = run_epoch()
+    check("[aRF-15 S1] no resolvable base is a FAILED exit 1, never a zero-status skip",
+          p.returncode == 1 and "epoch: FAILED · no base" in p.stdout, p.stdout + p.stderr)
+    p = run_epoch("--all")
+    check("[aRF-15 S1] `epoch` refuses an argument other than --base",
+          p.returncode == 2 and "epoch takes no arguments except --base" in p.stderr, p.stderr)
+
+
 OWN_KIT = """id = "demo"
 home = "tools/demo"
 version_from = { none = "fixture" }
@@ -1028,6 +1111,7 @@ def main() -> int:
 
         check_playbook_hole_modes(tmp / "pb")
         check_shipped_verb(tmp)
+        check_epoch_verb(tmp)
         check_adopter_owned(tmp / "own")
 
         # ================= apply =================

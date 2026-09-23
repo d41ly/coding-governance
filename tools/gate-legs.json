@@ -1140,6 +1140,17 @@
     "ceiling": 310
   },
   {
+    "name": "kit epoch (shipped bytes move, the version moves)",
+    "argv": [
+      "python",
+      "tools/govkit/govkit.py",
+      "epoch"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "govkit selftest",
     "argv": [
       "python",

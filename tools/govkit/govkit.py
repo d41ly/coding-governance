@@ -10510,10 +10510,136 @@ def cmd_shipped(root: pathlib.Path) -> int:
     return 0
 
 
+# The roles whose bytes an adopter RECEIVES from gov. `project-owned` and `forked` are the adopter's,
+# and `generated` is rebuilt in the target, so a move in any of them tells an adopter nothing.
+EPOCH_ROLES = ("engine", "seed", "rendered", "merged")
+
+
+def resolve_version_value_at(root: pathlib.Path, desc: dict, commit: str) -> str:
+    """The VALUE on an entry's version line at a commit, not the line.
+
+    `resolve_entry_version_at` returns the whole line, and a line that carries a comment beside its
+    constant changes when the comment does. A comment reflow is not a bump, the same point
+    `check-verdict-epoch.sh` makes about its own candidates, so the first dotted number after the
+    pattern is the value. A line with none keeps its whole text, which still compares honestly.
+    """
+    line = resolve_entry_version_at(root, desc, commit)
+    m = re.search((desc.get("version_from") or {}).get("pattern") or "^", line)
+    v = re.search(r"\d+(?:\.\d+)+", line[m.end():] if m else line)
+    return v.group(0) if v else line
+
+
+def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
+    """TOOL-aRepatriatedFork-15 S1, S5 — a kit whose shipped bytes move bumps its version.
+
+    `check-verdict-epoch.sh`'s TOPOLOGICAL rule, lifted from one engine to every registry entry.
+    Over `<base>..HEAD`, every commit that changes a byte of the entry's shipped set — the
+    `govkit.py shipped` rows in EPOCH_ROLES — must be an ancestor of, or equal to, a commit that
+    changes the entry's version VALUE. Asked as one `rev-list HEAD ^base ^S...`: whatever is left
+    is a move no bump dates. That is stricter than "the newest move precedes the newest bump" on a
+    branchy range, and identical to it on a line.
+
+    BYTES, NOT BEHAVIOUR. An adopter's comparison reads blob ids, so a comment-only move reds it
+    exactly as a logic change does; counting every shipped byte over-counts on purpose.
+
+    Merges are not moves (`--no-merges`): a merge introduces no byte its parents did not carry.
+    An entry declaring no version is not graded: it prints an announced `skip` naming what moved.
+
+    DOES NOT CHECK: that the bump is the RIGHT size, that every marker carrying the value moved with
+    it (`tools/check-kit-versions.sh` owns that), or files a descriptor withholds from its survivors.
+    Nor a move made inside a merge's own resolution, and a merge that brings a new value in counts
+    as a bump for every move it contains: over a long branchy range that is lenient, and on the
+    push-boundary range the base check above is what closes it.
+    Exit 1 on any FAILED line or an unresolvable base, 2 on an unreadable registry, else 0.
+    """
+    r = Report()
+    descs = read_descriptors(root, load_toml(root / "tools" / "govkit" / "registry.toml"), r)
+    if r.problems:
+        for p in r.problems:
+            sys.stderr.write(f"govkit: {p}\n")
+        return 2
+    if base is None:
+        # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,
+        # the remote's first. No base is a FAILED exit 1 and never a zero-status skip, because
+        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever.
+        dflt = os.environ.get("GOV_DEFAULT_BRANCH") or "main"
+        for ref in (f"origin/{dflt}", dflt):
+            mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
+                                capture_output=True, text=True)
+            if mb.returncode == 0 and mb.stdout.strip():
+                base = mb.stdout.strip()
+                break
+    rb = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
+                         f"{base}^{{commit}}"], capture_output=True, text=True) if base else None
+    if rb is None or rb.returncode != 0:
+        print(f"epoch: FAILED · no base to compare against ({base or 'no merge-base with the default branch'})"
+              " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
+        return 1
+    base = rb.stdout.strip()
+    rng = f"{base}..HEAD"
+    failed = 0
+    for eid in sorted(descs):
+        desc = descs[eid][0]
+        paths = sorted({row["src"] for row in resolve_entry(root, desc, canonical_ctx(eid))["survivors"]
+                        if row.get("src") and row["role"] in EPOCH_ROLES})
+        if not paths:
+            print(f"epoch: {eid} · FAILED · no {'/'.join(EPOCH_ROLES)} source to measure")
+            failed += 1
+            continue
+        vf = desc.get("version_from") or {}
+        if "none" in vf or not vf.get("file"):
+            moved = sorted({p for p in git(root, "-c", "core.quotePath=false", "log", "--format=",
+                                           "--name-only", "--full-history", "--no-merges", rng,
+                                           "--", *paths).splitlines() if p})
+            print(f"epoch: {eid} · skip · no declared version · moved: {' '.join(moved) or 'none'}")
+            continue
+        now = resolve_version_value_at(root, desc, "HEAD")
+        if now.startswith("("):
+            print(f"epoch: {eid} · FAILED · version {now} at HEAD")
+            failed += 1
+            continue
+        movers = git(root, "rev-list", "--full-history", "--no-merges", rng, "--", *paths).split()
+        if not movers:
+            print(f"epoch: {eid} · clean · {now}")
+            continue
+        # THE BASE VOTES FIRST. A branch that moved bytes and then reconciled a mainline that had
+        # bumped the kit carries a merge whose value differs from its first parent, which reads as a
+        # bump below — yet the base already holds the value HEAD holds, with other bytes. Two trees,
+        # one number: the defect itself, so an unchanged value against the base is a FAILED outright.
+        same = resolve_version_value_at(root, desc, base) == now
+        home = (desc.get("home") or "").rstrip("/")
+        vsrc = f"{home}/{vf['file']}" if home else vf["file"]
+        # S is VALIDATED, not matched: `-G` finds commits touching the version line, and only one
+        # whose value differs from its FIRST parent's is a bump. A decoy edit must not launder a
+        # move. Merges are diffed against their first parent, because a value can enter a range
+        # only through a merge — measured: check-wiring's 1.4 -> 1.5 over fd240496..a7c78ad2.
+        bumps = [] if same else [
+            c for c in git(root, "log", "--format=%H", "--no-patch", "--full-history",
+                           "--diff-merges=first-parent", "-G", vf["pattern"], rng, "--", vsrc).split()
+            if resolve_version_value_at(root, desc, c) != resolve_version_value_at(root, desc, c + "^")]
+        loose = movers if not bumps else git(
+            root, "rev-list", "--full-history", "--no-merges", "HEAD", f"^{base}",
+            *(f"^{s}" for s in bumps), "--", *paths).split()
+        if not loose:
+            print(f"epoch: {eid} · clean · {now}")
+            continue
+        failed += 1
+        w = loose[0]
+        if not bumps:
+            n = len([p for p in git(root, "diff-tree", "--no-commit-id", "--name-only", "-r", w,
+                                    "--", *paths).splitlines() if p])
+            print(f"epoch: {eid} · FAILED · moved in {w[:10]} ({n} files) · no value change in "
+                  f"{base[:10]}..HEAD (still {now})")
+        else:
+            print(f"epoch: {eid} · FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}")
+    return 1 if failed else 0
+
+
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
   govkit.py selfcheck
   govkit.py shipped
+  govkit.py epoch [--base <rev>]
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
@@ -10946,6 +11072,11 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
+        if argv[0] == "epoch":
+            # Parsed here and not in `parse_args`: `--base` is this verb's alone.
+            if len(argv) not in (1, 3) or (len(argv) == 3 and argv[1] != "--base"):
+                raise Refusal("epoch takes no arguments except --base <rev>")
+            return cmd_epoch(repo_root(), argv[2] if len(argv) == 3 else None)
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
          PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE) = parse_args(argv)
         root = repo_root()

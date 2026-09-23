@@ -343,6 +343,12 @@ the deployer grading its own declarations. It runs on the deployer machine and i
 """
 
 [[exempt_leg]]
+name = "kit epoch (shipped bytes move, the version moves)"
+why = """
+the deployer grading gov's own history: it reads this registry, the descriptors' shipped rows and gov's commits, none of which travels into a target. An adopter's copy of a kit is never where a forgotten bump is made, so the check has to live where the kit is authored. TOOL-aRepatriatedFork-15.
+"""
+
+[[exempt_leg]]
 name = "govkit selftest"
 why = """
 the deployer's own arms. Same reason as its selfcheck: the deployer does not travel.
