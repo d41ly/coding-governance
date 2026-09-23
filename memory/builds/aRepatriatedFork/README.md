@@ -109,7 +109,7 @@ ids TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TO
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [DEPL-aRepatriatedFork-1 — the charter renderer lets an answer win, and knows which file is its template](spec/2026-09-23-spec-DEPL-aRepatriatedFork-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
-| [TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts](spec/2026-09-23-spec-TOOL-aRepatriatedFork-10.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
+| [TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts](spec/2026-09-23-spec-TOOL-aRepatriatedFork-10.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-16 — check-install-prefix grades only what a repo ships](spec/2026-09-23-spec-TOOL-aRepatriatedFork-16.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-3 — shipped Python names its encoding on every text-IO call](spec/2026-09-23-spec-TOOL-aRepatriatedFork-3.md) | 1 | 1 | SPECCED | rev-1 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-4 — review-harness gates find harnesses where adopters keep them](spec/2026-09-23-spec-TOOL-aRepatriatedFork-4.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-23 |

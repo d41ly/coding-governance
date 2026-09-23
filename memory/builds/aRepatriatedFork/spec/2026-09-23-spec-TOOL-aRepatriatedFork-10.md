@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts
 
-**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -52,8 +52,9 @@ and writes the configuration route down, so nc runs gov's engine and gov's rende
   kit's shipped `<file>.example` assigns; a key any `rendered` rule of that kit declares as a
   placeholder is exempt, because the kit states the adopter's value through it. Observed by AC8.
 - **S8** — The project-leg seam dRetiredFork-16 ruled for nc's check 90, shipped as a worked,
-  runnable example in `tools/memory-tree/README.md` rather than a JSON fragment and a promise, and
-  its one unobserved claim observed. Observed by AC9.
+  runnable example in `tools/memory-tree/README.md` rather than a JSON fragment and a promise, with
+  the leg's own exit on an absent script observed and the runner half of that claim recorded as
+  unobserved. Observed by AC9.
 - **S9** — `tools/memory-tree/README.md` gains an adopter section mapping each carve-out shape to
   its route, with the carve-out table in §4 as its worked instance. Observed by AC10.
 - **S10** — `KIT_MEMORY_TREE_VERSION` moves and every paired marker moves with it; the two new
@@ -277,6 +278,9 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a flat `scripts/` i
   runner half stays recorded as unobserved in the README. S3's count line goes to stderr beside the
   other configuration notices. S3 adds no `fail` branch, so the hygiene `ARMS_FLOORS` token does not
   move.
+- rev-3 · 2026-09-23 · S8 moved to match the rev-2 AC9: it no longer claims the runner half of
+  `TOOL-dRetiredFork-16`'s claim is observed. Found by the post-commit bug-class checklist,
+  `amendment-leaves-its-other-half-standing`.
 
 ## 10. Reuse audit
 
