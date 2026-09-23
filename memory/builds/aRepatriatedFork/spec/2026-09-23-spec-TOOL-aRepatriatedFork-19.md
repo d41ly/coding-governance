@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-19 — check-wiring judges every arm at a relocated layout
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -52,7 +52,7 @@ prefix, so inCMS can drop its check-wiring fork and nc can drop carve-out 27.
   a7c78ad2 checker before it lands, plus one arm asserting that `receipt_path` and the Python
   resolver `TOOL-aRepatriatedFork-2` ships give the same answer over one fixture receipt, so a change
   to govkit's receipt format reds instead of silently missing. Observed by AC1 through AC5.
-- **S6** — `KIT_CHECK_WIRING_VERSION` moves from `1.5` to `1.6` (`tools/check-wiring.sh:23`).
+- **S6** — `KIT_CHECK_WIRING_VERSION` moves one step, from `1.7` to `1.8` (`tools/check-wiring.sh:23`).
   `TOOL-dPolishedVitrine-2` in `memory/backlog/TOOL.md` closes with the measurement that already
   answers it: `SMERGE_DEFAULT` has been derived from `KIT_REL` since `TOOL-dRetiredFork-8`
   (`:365-366`), and gov's checker printed `Fix: python3 scripts/settings-merge.py` at inCMS on
@@ -133,7 +133,7 @@ inCMS, once it takes gov's `check-wiring.sh` and `check-wiring.test.sh` byte-for
 |---|---|---|
 | `KIT_CHECK_WIRING_DELTA` | `.governance/kits.json` divergence `scripts/check-wiring.sh`, header `scripts/check-wiring.sh:2-40` | deleted; its settings-outside-the-repo justification went stale at ba4999965 |
 | `KIT_CHECK_WIRING_TEST_DELTA` | kits.json divergence `scripts/check-wiring.test.sh` | deleted |
-| `version_waivers.check-wiring` | kits.json | deleted; the checker moves to 1.6 with a gov release behind it |
+| `version_waivers.check-wiring` | kits.json | deleted; the checker moves to 1.8 with a gov release behind it |
 | `kits.check-wiring.files` | kits.json | both rows `diverged` to `engine` |
 | patches 2, 3, 4, 5, 6, 8, 9, 10, D8, D9, D10, D12 | `scripts/check-wiring.sh` | gone with the fork: 3, 4, 8, 9 and 10 by S1; D9 by S3; 2 and D10 by ba4999965; 5 by gov's conf read at `tools/check-wiring.sh:784`; D8 by gov's `--only` arm; D12's remedy names a script inCMS now tracks |
 | two card fragments unwired | `.claude/settings.json` | adopter wires both with `settings-merge.py --fragment` until `TOOL-aRepatriatedFork-11` does it |
@@ -200,7 +200,7 @@ nc deletes carve-out 27 (`scripts/check-wiring.test.sh:30-35`), which S4 absorbs
   puts the suite in the inline-parity leg's scanned population.
   Red when: a gov-prefix default or a `tools/lib/` source survives.
 - **AC7** — When `bash tools/check-kit-versions.sh` runs it exits 0 with
-  `KIT_CHECK_WIRING_VERSION=1.6`, and `grep -n 'TOOL-dPolishedVitrine-2 · CLOSED' memory/backlog/TOOL.md`
+  `KIT_CHECK_WIRING_VERSION=1.8`, and `grep -n 'TOOL-dPolishedVitrine-2 · CLOSED' memory/backlog/TOOL.md`
   prints one line.
   Red when: the checker's bytes moved and its version did not.
 - **AC8** — When gov's `check-wiring.sh` replaces inCMS's in a shared clone of inCMS whose
@@ -252,6 +252,8 @@ on, each run against the a7c78ad2 checker first · none
 
 - rev-1 · 2026-09-23 · initial draft, from the brief's unit 19, audit-B §4 and §5 and audit-C's nc
   `check-wiring.test.sh` row, with nc's checker run read-only for this spec.
+- rev-2 · 2026-09-24 · S6 and its acceptance line move to `1.7` -> `1.8`: `TOOL-aRepatriatedFork-2` and
+  `TOOL-aRepatriatedFork-8` each bumped check-wiring in this build before this unit reached it.
 
 ## 10. Reuse audit
 

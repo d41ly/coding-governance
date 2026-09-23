@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-24-build-TOOL-aRepatriatedFork-8-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-8-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-TOOL-aRepatriatedFork-8-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-8-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
