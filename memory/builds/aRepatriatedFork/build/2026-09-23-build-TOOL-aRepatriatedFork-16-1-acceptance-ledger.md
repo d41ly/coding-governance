@@ -14,7 +14,7 @@ spellings nc measured, which are the bytes nc received.
 - **Kit-source fixtures** built by the suite's `mkfix`: a green README, a red README, the gate moved
   to `solo/` (no kit directory), and the kit plus the gate's sidecars moved to `vendor/gov/` with
   the registry left at gov's layout.
-- **Consumer fixture** built by the suite's `mkfix_consumer`: gov's check-wiring script and three
+- **Consumer fixture** built by the suite's `build_consumer_fixture`: gov's check-wiring script and three
   codebase-map files under `scripts/`, a receipt under `.governance/`, no registry.
 - **Red case**: a7c78ad2's gate bytes (blob `6b3c599a`) written over the consumer fixture's gate.
 - **govkit arm**: `check_shipped_verb` called in-process over a fixture registry of one entry and

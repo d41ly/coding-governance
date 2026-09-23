@@ -167,7 +167,7 @@ carried_arm() { # label · want-substring · want-rc · dir · [extra argv...]
 # repo rather than retyped, so they carry gov's own waived dual-spelling probes and legacy literals
 # — the bytes a consumer receives, and the five of them that redded one at nine hits. gov's waiver
 # rows key on gov's paths and never reach them there, so a gate that graded this tree would red.
-mkfix_consumer() { # $1 = dir
+build_consumer_fixture() { # $1 = dir
   local d="$1" f
   mkdir -p "$d/scripts/codebase-map" "$d/scripts/hooks" "$d/scripts/memory-recall" "$d/.governance"
   git -C "$d" init -q
@@ -181,7 +181,7 @@ mkfix_consumer() { # $1 = dir
   printf '{"schema": 2, "gov_source": "local", "kits": [], "files": []}\n' > "$d/.governance/install.json"
   git -C "$d" add -A >/dev/null 2>&1
 }
-N="$TMP/consumer"; mkfix_consumer "$N"
+N="$TMP/consumer"; build_consumer_fixture "$N"
 # LIVENESS: the fixture must carry root spellings of its own kits, or the skip below proves nothing.
 if grep -rqE '(^|[^/{}[:alnum:]._-])(codebase-map|hooks|memory-recall)/[A-Za-z0-9_.-]+\.(sh|py|json)' "$N/scripts"; then
   good "AC3 the consumer fixture carries root-install spellings a grading gate would red on"
