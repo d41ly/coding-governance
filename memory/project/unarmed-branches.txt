@@ -60,7 +60,7 @@ tools/unattended/check-unattended.sh	16	18	the Skill's non-overridable paragraph
 # `git hash-object` on a path this verb has already proven is a tracked file cannot fail without
 # git itself failing, so there is no constructible fixture. Pinned rather than armed with a
 # synthetic break, which proves the mechanism for the synthetic value and not the real one.
-tools/unattended/unattended.sh	49	8	cannot hash the brief, so the row would carry no join
+tools/unattended/unattended.sh	49	11	cannot hash the brief, so the row would carry no join
 # The order-gate blocker message needs TWO rostered units carrying `order` verbs, and the tRun
 # fixture's units region emits one row. A second rostered unit changes a fixture shared by this
 # whole suite, which the standing instruction on this node forbids running. TOOL-dBriefedPass-6

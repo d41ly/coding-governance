@@ -242,15 +242,10 @@ guard = []
 red_after_land = true
 
 # the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
-# bar like every `subject = kit` row, and the one self-test this kit declares as a leg: its subject
-# is the linter, a static seconds-long scan, and the ruling above withheld suites that RUN a checker.
-# The test file is project-owned (the include list above), so `silenced_legs` reports this leg to an
-# adopter rather than shipping it; the linter itself ships as engine.
-[[gate_leg]]
-name = "unattended arms-groups selftest"
-subject = "kit"
-argv = ["bash", "{kit}/check-arms-groups.test.sh"]
-guard = ["{kit}/"]
+# bar like every `subject = kit` row. This kit declares NO self-test as a leg: the arms-groups
+# linter had one, and the owner's 2026-08-23 ruling takes every `tools/unattended/*.test.sh` leg
+# off the manifest without exception — which main's runlog-writer AC9 asserts. The linter's suite
+# runs through `run-unattended-gates.sh` with the rest, from its budget row.
 
 [[hole]]
 id = "keepalive-tool-names"
