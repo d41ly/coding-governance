@@ -2457,9 +2457,13 @@ read_phase() { sed -n 's/^phase: //p' memory/builds/tRun/RUN.md | head -1 | tr -
 bcopen
 before=$(sum); _rf_p0=$(read_phase)
 out=$(run --attest tRun --item keepalive-reaped --value $'yes\nphase: LANDED')
-hit "$out" "a run fact contains a newline, and these files are parsed line-wise with the FIRST match winning"
+hit "$out" "a run fact contains a newline, and these files are parsed line-wise with the FIRST match winning, so this would forge a fact nothing wrote"
 n=$((n+1)); [ "$(sum)" = "$before" ] || { echo "FAIL a refused fact write rewrote the run-state file, so the guard ran after the damage"; st=1; }
 same "phase after a refused literal-newline attestation" "$(read_phase)" "$_rf_p0"
+# ...and the carriage return, which every reader strips as a line end.
+out=$(run --attest tRun --item keepalive-reaped --value $'yes\rphase: LANDED')
+hit "$out" "a run fact contains a carriage return, which every reader of this file strips as a line end, so this would forge a fact nothing wrote"
+n=$((n+1)); [ "$(sum)" = "$before" ] || { echo "FAIL a refused carriage-return fact write rewrote the run-state file"; st=1; }
 # ---- AC2: the ONE-LINE escape form. `awk -v` turned backslash-n into a line feed after any shell
 # ---- check had passed - the path nc's port of the guard missed. Stored as written, one line.
 bcopen
@@ -2485,8 +2489,11 @@ run_hostile_verb() { # verb · value
   esac
 }
 for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED'; do
+  # ONE open run per form, not one per verb: a preflight costs a process tree, and the property is
+  # per-call (phase unchanged by THIS verb), so the verbs share the run and --preflight goes last.
+  bcopen; _rf_p0=$(read_phase)
   for _rf_v in attest resume park propose brief piece set rescope preflight; do
-    if [ "$_rf_v" = preflight ]; then reset_tree; _rf_p0=""; else bcopen; _rf_p0=$(read_phase); fi
+    [ "$_rf_v" != preflight ] || { reset_tree; _rf_p0=""; }
     run_hostile_verb "$_rf_v" "$_rf_form" >/dev/null 2>&1
     # A refusal that left no run-state file at all forged nothing: counted as the verdict it is.
     if [ ! -f memory/builds/tRun/RUN.md ]; then n=$((n+1)); continue; fi

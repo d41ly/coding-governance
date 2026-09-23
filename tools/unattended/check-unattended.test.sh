@@ -2308,8 +2308,7 @@ reset_tree
 reset_tree
 mutate memory/builds/tRun/RUN.md '/^## Run facts/a phase: LANDED'
 out=$(run)
-hit "$out" "UNATTENDED check 34 FAILED"
-hit "$out" "memory/builds/tRun/RUN.md: phase is [LANDED] and [RUNNING]"
+hit "$out" "UNATTENDED check 34 FAILED — a run-state file carries one Run facts key twice with two different values, and every reader takes the first match, so one of them is a fact nothing wrote: memory/builds/tRun/RUN.md: phase is [LANDED] and [RUNNING]"
 # ...the NEAR-MISS control: a SAME-value repeat forges nothing (the first match gives the same
 # answer) and is the shape of the one hand repair in gov's tree, so the rule is not "any repeat".
 reset_tree

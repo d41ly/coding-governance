@@ -219,7 +219,7 @@ tracked run-state file in all three trees.
   both values.
   Red when: the leg reads only the first match and passes.
 - **AC6** — When `tools/unattended/check-unattended.sh` runs over gov's tree, the new check reports
-  66 run-state files graded and no hit, `memory/builds/dCarriedReceipt/RUN.md` included.
+  every tracked run-state file graded (the figure below) and no hit, `memory/builds/dCarriedReceipt/RUN.md` included.
   Red when: the check fires on a same-value repeat, or grades nothing.
   figure: PINNED at 66, measured 2026-09-23; the check prints the count it derives. rev-2: 67 at
   the build's tip, the one added file being this build's own `RUN.md`, still no hit.
