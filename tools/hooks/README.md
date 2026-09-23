@@ -173,12 +173,41 @@ because the allowance is a property of what an `agent(` fan runs OVER and not of
 
 ## Direct spawns are COUNTED, not parsed
 
-A direct `Agent` spawn carries no script for the hook to read, so it is counted instead: five per
-user prompt, claimed as atomic slots. That count is the only enforcement reaching a fan-out made
-outside a workflow script, which is why the matcher must name both tools.
+A direct `Agent` spawn carries no script for the hook to read, so it is counted instead: the
+effective cap's worth per user prompt, claimed as atomic slots. That count is the only enforcement
+reaching a fan-out made outside a workflow script, which is why the matcher must name both tools.
 
-`AGENT_CAP` in the environment is REFUSED, not honoured — the bound is a file constant. A ready-made
+`AGENT_CAP` in the environment is REFUSED, not honoured — the ceiling is a file constant. A ready-made
 harness that satisfies every rule above ships at `tools/workflows/tier2-review.js`.
+
+## Lowering the cap — `.agent-cap.conf`
+
+A repo that runs a LOWER fan-out cap than the hook's ceiling declares it once, in a tracked file at
+its checkout root:
+
+```sh
+# .agent-cap.conf
+FANOUT_CAP=4
+```
+
+The hook reads it on every `Workflow` and `Agent` call and enforces the smaller of that value and its
+file constant everywhere it resolves a bound: the helper call site, the helper's default parameter,
+the `gov:bounded-fanout` width, the verify-stage total and the direct-spawn slots. Every denial then
+prints the effective cap and names the file that lowered it. The lens allowance does not move with it.
+
+- **Lower only.** The value must be an integer from 1 up to the hook's `MAX_VERIFIERS`. Anything else,
+  including a word, zero or a value above the ceiling, DENIES every call and names the file. An absent
+  file or key means the ceiling. A value that can only lower the cap raises nothing, which is why a
+  tracked file is admissible where the `AGENT_CAP` environment knob is not.
+- **Grammar.** `FANOUT_CAP=4` or `FANOUT_CAP="4"`; the last such line wins, as a shell `.` reads it.
+  A linked worktree reads its own checkout's file.
+- **One key for both rules.** The charter's concurrency bound and its verify-stage total are two
+  rules, and this one number lowers both (TOOL-aRepatriatedFork-7 F1; a second key is additive later).
+- **The shipped harnesses follow it.** The review-harness kit renders `{{FANOUT_CAP}}` from this same
+  file into `tier2-review.js`, `unattended-build.js` and both drift-audit workflows, so a repo that
+  lowers the cap re-renders them rather than forking them: run
+  `bash <kit>/check-protocol-parity.test.sh --render` in the same commit as the conf line, or the
+  cap-ceiling renders are denied by the hook and the verifier fan-out leg reds.
 
 **The two mechanisms are mutually exclusive, and the slot ledger must not be extended to `Workflow`.**
 The script rules bound the fan-out inside one script; the slot ledger bounds the spawns made without

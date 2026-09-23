@@ -13,8 +13,10 @@
 # memory-tree alone would get a gate demanding a file their tree has no reason to contain, and the
 # memory-tree kit would carry knowledge of a kit it does not depend on. Each kit gates its own pairs.
 #
-# THE PAIRS, declared once in `PAIRS` below, and there are TWO. The review protocol this repo RUNS ON,
-# and the unattended BUILD HARNESS. The harness joined this list when it stopped shipping verbatim:
+# THE PAIRS, declared once in `PAIRS` below. The review protocol this repo RUNS ON, the unattended
+# BUILD HARNESS, and — since TOOL-aRepatriatedFork-7 — the review and drift-audit harnesses, which
+# render only so a repo that LOWERS the fan-out cap in `.agent-cap.conf` receives harnesses its own
+# hook admits, instead of a hand-kept fork of each. The build harness joined this list when it stopped shipping verbatim:
 # apply writes an engine file's bytes unchanged, so every install path it spelled arrived in a tree
 # installed at another prefix naming files that tree does not have — the driver, the bug-class
 # checklist, the sub-workflow it awaits and the child it hands the caller. A workflow script has no
@@ -32,10 +34,11 @@
 # purpose, and no line anywhere named the file. Creating a live copy is an install decision, so it
 # stays with the hand `--render` a fresh install runs; `--tracked-only` refreshes and skips out loud.
 #
-# THREE TOKENS, and each one is DERIVED here rather than typed:
+# FOUR TOKENS, and each one is DERIVED here rather than typed:
 #   KIT_DIR          this kit's directory, repo-relative — the harness's own siblings live in it
 #   TOOL_ROOT        the directory the kits sit in, with a trailing slash; empty at a root install
 #   MEMORY_TREE_DIR  the directory holding the memory-tree kit's `gotchas.py`
+#   FANOUT_CAP       the fan-out cap, from `.agent-cap.conf` at the root as the agent-cap hook reads it
 # The third is NOT derivable from the second. Both adopters measured when this was written install
 # the memory-tree kit FLAT, directly in their tool root, so `TOOL_ROOT` plus `memory-tree/` names a
 # file neither of them has. It is PROBED instead: the first TRACKED of the nested and the flat
@@ -86,7 +89,37 @@ TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
 # The pairs: `<live copy>|<template>`, both repo-relative. The render of each template is the live
 # copy's ENTIRE expected content.
 PAIRS="$M/guides/REVIEW-PROTOCOL.md|$KITREL/REVIEW-PROTOCOL.template.md
-$KITREL/unattended-build.js|$KITREL/unattended-build.template.js"
+$KITREL/unattended-build.js|$KITREL/unattended-build.template.js
+$KITREL/tier2-review.js|$KITREL/tier2-review.template.js
+$KITREL/drift-audit-code.js|$KITREL/drift-audit-code.template.js
+$KITREL/drift-audit-state.js|$KITREL/drift-audit-state.template.js"
+
+# FANOUT_CAP, THE FOURTH TOKEN — TOOL-aRepatriatedFork-7 S7. Read from the file the agent-cap hook
+# reads, `.agent-cap.conf` at this checkout's root, with the hook's grammar and the hook's default:
+# the LAST `FANOUT_CAP=<n>` line wins, double quotes are optional, and an absent file or key means
+# the ceiling. A value outside 1..5 REFUSES here as the hook denies it there, because a harness
+# rendered at a cap its own hook will not admit is exactly the fork this token retires. The value
+# is normalized to plain decimal: `05` would render a legacy octal literal that strict mode rejects.
+FANOUT_CAP=5
+if [ -f .agent-cap.conf ]; then
+  _fc=$(tr -d '\r' < .agent-cap.conf | sed -n 's/^[[:space:]]*FANOUT_CAP[[:space:]]*=/=/p' | tail -1)
+  if [ -n "$_fc" ]; then
+    _fc=${_fc#=}
+    _fc=$(printf '%s' "$_fc" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+    case "$_fc" in \"*\") _fc=${_fc#\"}; _fc=${_fc%\"} ;; esac
+    case "$_fc" in
+      ''|*[!0-9]*) _fc_ok=0 ;;
+      *) if [ "$((10#$_fc))" -ge 1 ] && [ "$((10#$_fc))" -le 5 ]; then _fc_ok=1; else _fc_ok=0; fi ;;
+    esac
+    if [ "$_fc_ok" != 1 ]; then
+      echo "protocol-parity: .agent-cap.conf declares FANOUT_CAP=$_fc, and the declared cap must be an"
+      echo "  integer from 1 to 5 -- the agent-cap hook denies every call over this file, so no harness"
+      echo "  rendered from it could run. Nothing was rendered or graded."
+      exit 2
+    fi
+    FANOUT_CAP=$((10#$_fc))
+  fi
+fi
 
 check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
 
@@ -144,6 +177,7 @@ render() { # template -> stdout
   out=${out//\{\{KIT_DIR\}\}/"$KITREL"}
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOLROOT"}
   out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MTD"}
+  out=${out//\{\{FANOUT_CAP\}\}/"$FANOUT_CAP"}
   printf '%s' "$out"
 }
 read_lf() { sed 's/\r$//' "$1"; }

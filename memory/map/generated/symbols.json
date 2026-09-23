@@ -370,12 +370,27 @@
     {
       "id": "boundedParallel",
       "kind": "function",
+      "file": "tools/workflows/drift-audit-code.template.js"
+    },
+    {
+      "id": "boundedParallel",
+      "kind": "function",
       "file": "tools/workflows/drift-audit-state.js"
     },
     {
       "id": "boundedParallel",
       "kind": "function",
+      "file": "tools/workflows/drift-audit-state.template.js"
+    },
+    {
+      "id": "boundedParallel",
+      "kind": "function",
       "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "boundedParallel",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "boundedParallel",
@@ -1690,12 +1705,27 @@
     {
       "id": "chunk",
       "kind": "function",
+      "file": "tools/workflows/drift-audit-code.template.js"
+    },
+    {
+      "id": "chunk",
+      "kind": "function",
       "file": "tools/workflows/drift-audit-state.js"
     },
     {
       "id": "chunk",
       "kind": "function",
+      "file": "tools/workflows/drift-audit-state.template.js"
+    },
+    {
+      "id": "chunk",
+      "kind": "function",
       "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "chunk",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "chunk",
@@ -2110,7 +2140,17 @@
     {
       "id": "deriveLiveness",
       "kind": "function",
+      "file": "tools/workflows/drift-audit-code.template.js"
+    },
+    {
+      "id": "deriveLiveness",
+      "kind": "function",
       "file": "tools/workflows/drift-audit-state.js"
+    },
+    {
+      "id": "deriveLiveness",
+      "kind": "function",
+      "file": "tools/workflows/drift-audit-state.template.js"
     },
     {
       "id": "deriveSidecarPath",
@@ -3023,6 +3063,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "loadDeclaredCap",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "load_affordance_exempt",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -3610,7 +3655,17 @@
     {
       "id": "meta",
       "kind": "const-export",
+      "file": "tools/workflows/drift-audit-code.template.js"
+    },
+    {
+      "id": "meta",
+      "kind": "const-export",
       "file": "tools/workflows/drift-audit-state.js"
+    },
+    {
+      "id": "meta",
+      "kind": "const-export",
+      "file": "tools/workflows/drift-audit-state.template.js"
     },
     {
       "id": "meta",
@@ -3621,6 +3676,11 @@
       "id": "meta",
       "kind": "const-export",
       "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "meta",
+      "kind": "const-export",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "meta",
@@ -4858,6 +4918,11 @@
       "file": "tools/unattended/stop-guard.js"
     },
     {
+      "id": "renderCapSource",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderCodeView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -4890,7 +4955,17 @@
     {
       "id": "renderLivenessNote",
       "kind": "function",
+      "file": "tools/workflows/drift-audit-code.template.js"
+    },
+    {
+      "id": "renderLivenessNote",
+      "kind": "function",
       "file": "tools/workflows/drift-audit-state.js"
+    },
+    {
+      "id": "renderLivenessNote",
+      "kind": "function",
+      "file": "tools/workflows/drift-audit-state.template.js"
     },
     {
       "id": "renderOrientationDeny",
@@ -5231,6 +5306,11 @@
       "id": "resolveAllowedRoots",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveCheckoutRoot",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "resolveCommonDir",

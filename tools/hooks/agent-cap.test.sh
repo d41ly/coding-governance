@@ -1665,6 +1665,111 @@ js "no-regress: a DOUBLE-quoted URL in a template does it without an apostrophe 
 const p = `see "http://x" now`; await parallel(all.map(f))
 EOF
 
+# ---- TOOL-aRepatriatedFork-7 S3: the NESTED-INTERPOLATION matrix ---------------------------------
+# A nested `${` zeroed the ONE depth counter the lexed view kept, so a brace open around an inner
+# template -- an object literal, a block, an arrow body -- closed the OUTER interpolation at its own
+# `}` and every fan-out after it left the view. a7c78ad2 admitted four of these five nested forms at
+# exit 0 through the sanctioned helper, where the raw-text rule has no reason to fire. `depth-two`
+# opens no brace and is the class's control. Every nested form and its flat control must be denied
+# BY THE VERIFY-STAGE RULE, asserted on its text: an exit code alone cannot tell rules apart. The
+# files also join the S9 property population below (F3), so no BASE denial among them can be lost.
+mkdir -p "$TMP/nest"
+NEST_HELPER='async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}'
+NEST_FAN='await boundedParallel(findings.map((g) => () => agent(g)), 5)'
+nest_pair() { # name nested-script flat-script, FAN standing for the unbounded verify stage
+  printf '%s\n%s\n' "$NEST_HELPER" "${2//FAN/$NEST_FAN}" > "$TMP/nest/$1.js"
+  printf '%s\n%s\n' "$NEST_HELPER" "${3//FAN/$NEST_FAN}" > "$TMP/nest/$1-flat.js"
+}
+nest_pair depth-two 'const s = `a ${ `b ${ x } c` + FAN } d`' 'const s = `a ${ 1 + FAN } d`'
+nest_pair depth-three 'const s = `a ${ f({ k: `b ${ g({ m: `c ${ y } d` }) } e` }) + FAN } z`' 'const s = `a ${ f({ k: 1 }) + FAN } z`'
+nest_pair object-before-inner 'const s = `a ${ f({ k: `b ${ x } c` }) + FAN } d`' 'const s = `a ${ f({ k: 1 }) + FAN } d`'
+nest_pair arrow-body 'const s = `a ${ [1].map((v) => { return `b ${ v } c` }).join("") + FAN } d`' 'const s = `a ${ [1].map((v) => { return v }).join("") + FAN } d`'
+nest_pair multi-line 'const s = `a ${ f({ k: `b ${ x } c` })
+  + FAN
+} d`' 'const s = `a ${ f({ k: 1 })
+  + FAN
+} d`'
+nest_n=0
+for f in "$TMP"/nest/*.js; do
+  [ -f "$f" ] || continue
+  nest_n=$((nest_n+1))
+  n=$(basename "$f" .js)
+  payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":open(sys.argv[1],encoding="utf-8").read()}}))' "$f")
+  printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"; rc=$?
+  if [ "$rc" = 2 ] && grep -qF 'spawns one agent per item' "$TMP/err"; then
+    echo "ok   nesting matrix: $n -> denied by the verify-stage rule"; pass=$((pass+1))
+  else
+    echo "FAIL nesting matrix: $n exited $rc without the verify-stage denial"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+done
+if [ "$nest_n" = 10 ]; then
+  echo "ok   nesting matrix: all 10 fixtures were written and judged"; pass=$((pass+1))
+else
+  echo "FAIL nesting matrix: $nest_n fixture(s) judged, want 10 -- a matrix that judged fewer certifies shapes it never saw"; fail=$((fail+1))
+fi
+
+# ---- TOOL-aRepatriatedFork-7 S4/S5/S6: a DECLARED, lower-only cap ---------------------------------
+# `FANOUT_CAP` in `.agent-cap.conf` at the checkout root lowers the cap at every enforcement site and
+# for the direct-spawn slots; a value outside 1..ceiling denies every call naming the file. The
+# fixture checkout is a bare `.git` DIRECTORY, which is all the root walk looks for, and each call
+# stands in a subdirectory so the walk is exercised rather than assumed.
+CAPREPO="$TMP/caprepo"; mkdir -p "$CAPREPO/.git" "$CAPREPO/sub"
+cap_harness() { # K -> a harness whose default parameter AND call site both carry K
+  printf 'async function boundedParallel(thunks, cap = %s) {\n  const out = []\n  for (let i = 0; i < thunks.length; i += cap)\n    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout\n  return out\n}\nconst LENSES = [1, 2, 3]\nawait boundedParallel(LENSES.map((L) => () => agent(L)), %s)\n' "$1" "$1"
+}
+cap_check() { # name expected_exit K [text stderr must carry]
+  local payload got
+  payload=$(cap_harness "$3" | "$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":{"script":sys.stdin.read()}}))' "$CAPREPO/sub")
+  printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { [ -z "${4:-}" ] || grep -qF -- "$4" "$TMP/err"; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${4:+, stderr carrying '$4'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+spawn_check() { # name expected_exit prompt_id tool_use_id [text stderr must carry]
+  local got
+  printf '{"tool_name":"Agent","cwd":"%s","session_id":"s7","prompt_id":"%s","tool_use_id":"%s"}' \
+    "$("$TESTPY" -c 'import sys; print(sys.argv[1].replace(chr(92), "/"))' "$CAPREPO/sub")" "$3" "$4" \
+    | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { [ -z "${5:-}" ] || grep -qF -- "$5" "$TMP/err"; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${5:+, stderr carrying '$5'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+# No conf: the ceiling, unchanged.
+cap_check "declared cap: no conf, a cap-5 harness -> allow" 0 5
+cap_check "declared cap: no conf, a cap-4 harness -> allow" 0 4
+# AC4: a declared 4 is READ and ENFORCED at the call site and the default parameter.
+printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
+cap_check "declared cap: FANOUT_CAP=4, a cap-5 harness -> deny naming the effective cap" 2 5 'above the 4-agent cap'
+cap_check "declared cap: FANOUT_CAP=4, the denial names the file that lowered it" 2 5 '.agent-cap.conf'
+cap_check "declared cap: FANOUT_CAP=4, the same harness at 4 -> allow" 0 4
+printf '# the fleet cap\nFANOUT_CAP="4"\r\n' > "$CAPREPO/.agent-cap.conf"
+cap_check "declared cap: quoted value with a CRLF ending still lowers -> deny" 2 5 'above the 4-agent cap'
+printf 'FANOUT_CAP=5\n' > "$CAPREPO/.agent-cap.conf"
+cap_check "declared cap: FANOUT_CAP at the ceiling -> allow" 0 5
+# AC6: out of range or malformed DENIES, naming the file -- never a raise, never ignored.
+for bad in 6 0 four ''; do
+  printf 'FANOUT_CAP=%s\n' "$bad" > "$CAPREPO/.agent-cap.conf"
+  cap_check "declared cap: FANOUT_CAP=${bad:-<empty>} denies a bounded harness, naming the file" 2 4 '.agent-cap.conf declares FANOUT_CAP'
+done
+printf 'FANOUT_CAP=6\n' > "$CAPREPO/.agent-cap.conf"
+spawn_check "declared cap: FANOUT_CAP=6 denies a direct Agent spawn too" 2 p-bad u-bad '.agent-cap.conf declares FANOUT_CAP'
+# AC5: the direct-spawn slots count to the declared value, and to the ceiling without one.
+printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
+for k in 1 2 3 4; do spawn_check "declared cap: FANOUT_CAP=4, direct spawn $k -> allow" 0 p-four "u$k"; done
+spawn_check "declared cap: FANOUT_CAP=4, direct spawn 5 -> deny" 2 p-four u5 '4 of 4 claimed'
+rm -f "$CAPREPO/.agent-cap.conf"
+for k in 1 2 3 4 5; do spawn_check "declared cap: no conf, direct spawn $k -> allow" 0 p-five "u$k"; done
+spawn_check "declared cap: no conf, direct spawn 6 -> deny (control)" 2 p-five u6 '5 of 5 claimed'
+
 # ---- S10: `verbatim` is CHECKED, not asserted ----------------------------------------------------
 # The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
 # differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.
@@ -1762,6 +1867,9 @@ EOF
   cat > "$TMP/nrfix/template-borne-comment.js" <<'EOF'
 const p = `see 'http://x' now`; await parallel(all.map(f))
 EOF
+  # TOOL-aRepatriatedFork-7 F3: the nesting matrix joins the population, so no fixture of it that BASE
+  # denied -- every flat control, and `depth-two` -- may be admitted now.
+  cp "$TMP"/nest/*.js "$TMP/nrfix/" 2>/dev/null || true
   cat > "$TMP/nr.py" <<'PYEOF'
 import json, subprocess, sys, pathlib
 base_hook, cur_hook, root, fixdir = sys.argv[1:5]

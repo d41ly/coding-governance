@@ -40,7 +40,10 @@ function discovered() {
   // adopters keep under `.claude/workflows/`. check-verifier-fanout.sh applies the same marker
   // and takes the same shape (TOOL-aRepatriatedFork-4); check-review-join.sh applies none, so it
   // keeps its derived prefix and adds `.claude/workflows/` to it. TOOL-dRetiredFork-10.
-  const seen = new Set(out.split('\n').filter((p) => p.endsWith('.js')))
+  // A `*.template.js` is a RENDER SOURCE and not a script any runtime evaluates: its
+  // `{{FANOUT_CAP}}` token sits where a number goes (TOOL-aRepatriatedFork-7 S7). Its render is in
+  // this population, and check-protocol-parity.test.sh pins that render to it.
+  const seen = new Set(out.split('\n').filter((p) => p.endsWith('.js') && !p.endsWith('.template.js')))
   return [...seen].sort()
 }
 

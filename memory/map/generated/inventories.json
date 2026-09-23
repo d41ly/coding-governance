@@ -148,9 +148,12 @@
     "workflow-scripts": [
       "check-workflow-syntax.js",
       "drift-audit-code.js",
+      "drift-audit-code.template.js",
       "drift-audit-state.js",
+      "drift-audit-state.template.js",
       "orient-counterfactual.js",
       "tier2-review.js",
+      "tier2-review.template.js",
       "unattended-build.js",
       "unattended-build.template.js",
       "unattended-unit.js"

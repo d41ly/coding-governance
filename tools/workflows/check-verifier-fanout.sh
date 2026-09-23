@@ -63,8 +63,11 @@ if [ "$#" -gt 0 ]; then
 else
   # tracked AND untracked-but-unignored, matching the other two JavaScript gates: a new harness is
   # judged the moment it exists, not the moment someone remembers to stage it.
+  # A `*.template.js` is a RENDER SOURCE, not a harness (TOOL-aRepatriatedFork-7 S7): its fan-out cap
+  # is the `{{FANOUT_CAP}}` token, which no hook can resolve and no runtime ever sees. What runs is
+  # its render, which IS in this population, and check-protocol-parity.test.sh pins the render to it.
   FILES=$(git ls-files --cached --others --exclude-standard -- '*.js' \
-    | grep -vE "$SELF_EXCLUDE" | LC_ALL=C sort -u || true)
+    | grep -vE "$SELF_EXCLUDE" | grep -vE '\.template\.js$' | LC_ALL=C sort -u || true)
   EXPLICIT=0
 fi
 
@@ -108,5 +111,11 @@ while IFS= read -r f; do
   fi
 done <<<"$SCAN"
 
-[ "$st" = 0 ] && echo "verifier-fanout: clean — $n workflow script(s) obey the ≤5-verifier rule"
+# THE CAP PRINTED IS THE EFFECTIVE ONE (TOOL-aRepatriatedFork-7 S6): `FANOUT_CAP` from `.agent-cap.conf`
+# at the root the hook resolved it from (this script stands there), else the ceiling. DISPLAY ONLY —
+# the hook judged every file above against the same file, and a malformed value already redded them.
+CAPN=$(tr -d '\r' < .agent-cap.conf 2>/dev/null \
+  | sed -n 's/^[[:space:]]*FANOUT_CAP[[:space:]]*=[[:space:]]*"\{0,1\}\([0-9][0-9]*\)"\{0,1\}[[:space:]]*$/\1/p' | tail -1)
+[ -n "$CAPN" ] && CAPN=$((10#$CAPN)) || CAPN=5
+[ "$st" = 0 ] && echo "verifier-fanout: clean — $n workflow script(s) obey the ≤$CAPN-verifier rule"
 exit "$st"

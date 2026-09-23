@@ -36,12 +36,18 @@
  * string that does not parse shows it no `kind`; and it reads the WORKTREE README and conf while the
  * unattended driver reads both at BASE, so the two can disagree for exactly one uncommitted edit.
  *
- * CAP: 5, a FILE CONSTANT and not overridable. This guard RESOLVES the number
+ * CAP: 5, a FILE CONSTANT and the CEILING, never raisable. This guard RESOLVES the number
  * wherever a bound is written — the helper CALL SITE, the helper's own DEFAULT
  * PARAMETER, and the width a `gov:bounded-fanout` line claims — and denies one
  * it cannot resolve at or under the cap. Setting AGENT_CAP is REFUSED with a
  * message rather than ignored: a knob that used to appear to work is how the
  * override claim this version deletes survived two releases.
+ *
+ * A REPO MAY LOWER IT, and only lower it (TOOL-aRepatriatedFork-7): `FANOUT_CAP=<n>` in a tracked
+ * `.agent-cap.conf` at the checkout root makes the enforced cap min(n, 5) at every site above and
+ * for the direct-spawn slots. A value that is not an integer from 1 to 5 denies every call and
+ * names the file. Absent file or key means 5. A value that can only LOWER the cap raises nothing,
+ * which is why a file is admissible where the AGENT_CAP environment knob is not.
  *
  * Wiring (per project): run `python tools/settings-merge.py` (idempotent) — it merges the block
  * below into .claude/settings.json; or merge it by hand:
@@ -73,7 +79,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.18' // gov:kit agent-cap@1.18 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.19' // gov:kit agent-cap@1.19 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -202,6 +208,12 @@ function renderShippedLine(line) {
   return line.replace(/'(?:\\.|[^'\\])*'/g, "''").replace(/"(?:\\.|[^"\\])*"/g, '""')
 }
 
+// TOOL-aRepatriatedFork-7 S2 — THIS VIEW KEEPS THE NESTED-INTERPOLATION DEFECT, on purpose. Its one
+// `interpDepth` is zeroed by a nested `${` and never restored, which `renderLexedView` now fixes. The
+// frozen body is the no-regression BASELINE (the S10 byte arm compares it to `d65da7ab`), and a
+// corrupted view can only LOSE code, so its failure is a false negative: `runBothViews` denies when
+// EITHER view denies, and the corrected lexed view decides every case this one misses. Editing it
+// would move the baseline the S9 property measures against for no verdict the union lacks.
 function renderShippedView(script) {
   const out = []
   let mode = 'code' // code | tmpl
@@ -451,6 +463,16 @@ const MAX_VERIFIERS = 5
 // and no shipped harness has ever had six lenses — tier2-review has four, both drift-audit waves
 // have five. With the count fixed, 5 is what the charter says and what every harness already obeys.
 const MAX_LENSES = 5
+// TOOL-aRepatriatedFork-7 S4 — the cap EVERY enforcement site reads: the call-site bound, the
+// helper's default parameter, the `gov:bounded-fanout` width, the verify-stage total and the
+// direct-spawn slots. It is `min(FANOUT_CAP, MAX_VERIFIERS)`, set ONCE by main() from the repo's
+// tracked `.agent-cap.conf` before any rule runs (a hook process judges one call), and it is 5 when
+// no conf declares one. MAX_VERIFIERS stays the CEILING: a declared value can only LOWER it, so an
+// untracked local edit is at worst stricter than the tracked one. MAX_LENSES does not move with it.
+let EFFECTIVE_CAP = MAX_VERIFIERS
+// The file that lowered EFFECTIVE_CAP, named in every message that prints the cap; '' at the ceiling.
+let CAP_SOURCE = ''
+const CAP_CONF = '.agent-cap.conf'
 // THE THIRD MARKER, and the only one that admits a LOOP. Spelling ratified by the owner
 // 2026-09-01: `gov:sequential-agents`, carrying its bound — `gov:sequential-agents(5)`.
 //
@@ -491,11 +513,12 @@ const LOOP_HEADER = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{
 const LOOP_HEADER_G = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{', 'g')
 const LOOP_KEYWORD_TAIL = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*$')
 
-// `K` resolved against this file: an integer literal, or an identifier bound to one.
+// `K` resolved against this file: an integer literal, or an identifier bound to one. Judged against
+// EFFECTIVE_CAP, the declared lower cap where a repo has one, never above MAX_VERIFIERS.
 function boundedK(tok, consts) {
   const t = String(tok).trim()
-  if (/^\d+$/.test(t)) return Number(t) <= MAX_VERIFIERS
-  if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t)) return consts.get(t) <= MAX_VERIFIERS
+  if (/^\d+$/.test(t)) return Number(t) <= EFFECTIVE_CAP
+  if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t)) return consts.get(t) <= EFFECTIVE_CAP
   return false
 }
 
@@ -666,6 +689,12 @@ function renderLexedView(script) {
   let mode = 'code' // code | tmpl
   const stack = [] // 'tmpl' | 'interp', innermost last
   let interpDepth = 0 // brace depth inside the current interpolation
+  // TOOL-aRepatriatedFork-7 S1 — the depth of every ENCLOSING interpolation, saved when a nested `${`
+  // opens and restored when it closes. One scalar zeroed on every `${` lost the outer depth, so in
+  // `${ f({ k: `b ${ x } c` }) + fan }` the object's own `}` closed the OUTER interpolation and the
+  // fan-out after it left the view: measured admitted at exit 0 by a7c78ad2, through a sanctioned
+  // helper the raw-text rule has no reason to fire on. inCMS's D1, absorbed.
+  const interpDepths = []
   for (const raw of script.split(/\r?\n/)) {
     let res = ''
     let i = 0
@@ -694,7 +723,7 @@ function renderLexedView(script) {
         if (stack.length && stack[stack.length - 1] === 'interp') {
           if (ch === '{') interpDepth++
           else if (ch === '}') {
-            if (interpDepth === 0) { stack.pop(); mode = 'tmpl'; res += ' '; i++; continue }
+            if (interpDepth === 0) { stack.pop(); interpDepth = interpDepths.length ? interpDepths.pop() : 0; mode = 'tmpl'; res += ' '; i++; continue }
             interpDepth--
           }
         }
@@ -702,7 +731,7 @@ function renderLexedView(script) {
         i++
       } else if (mode === 'tmpl') {
         if (ch === '\\') { i += 2; continue }
-        if (two === '${') { stack.push('interp'); interpDepth = 0; mode = 'code'; res += '  '; i += 2; continue }
+        if (two === '${') { stack.push('interp'); interpDepths.push(interpDepth); interpDepth = 0; mode = 'code'; res += '  '; i += 2; continue }
         if (ch === '`') { stack.pop(); mode = 'code'; res += '`'; i++; continue }
         i++
       }
@@ -767,7 +796,7 @@ function fanoutFindings(script) {
     // stated refusal — the two rules are separate and the marker must satisfy both.
     if (!mm) return ` — ${SEQ_MARK} carries no bound token, and a bare marker claims concurrency one with an unbounded total`
     // C4: the number is CHECKED, never trusted, and by the one resolver every other consumer uses.
-    if (!boundedK(mm[1], consts)) return ` — ${SEQ_MARK}(${mm[1]}) names a bound this file does not resolve to an integer no greater than ${MAX_VERIFIERS}`
+    if (!boundedK(mm[1], consts)) return ` — ${SEQ_MARK}(${mm[1]}) names a bound this file does not resolve to an integer no greater than ${EFFECTIVE_CAP}`
     const ch = code[h] || ''
     // C5: the SHAPE is read from the literal-blanked view, so a marker sitting inside a quoted
     // string on a line that is not really a loop header blesses nothing.
@@ -1336,10 +1365,10 @@ function capFindings(script) {
     if (orBound.has(t))
       return `${where} resolves \`${t}\`, bound by an \`<expr> || ${orBound.get(t)}\` FALLBACK form — a caller-settable knob is not a bound, so it no longer resolves`
     if (/^\d+$/.test(t))
-      return `${where} is ${t}, above the ${MAX_VERIFIERS}-agent cap`
+      return `${where} is ${t}, above the ${EFFECTIVE_CAP}-agent cap`
     if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t))
-      return `${where} resolves \`${t}\` to ${consts.get(t)}, above the ${MAX_VERIFIERS}-agent cap`
-    return `${where} is \`${t || '(nothing)'}\`, which this file cannot resolve to an integer at or under ${MAX_VERIFIERS}`
+      return `${where} resolves \`${t}\` to ${consts.get(t)}, above the ${EFFECTIVE_CAP}-agent cap`
+    return `${where} is \`${t || '(nothing)'}\`, which this file cannot resolve to an integer at or under ${EFFECTIVE_CAP}`
   }
 
   // --- S2: the helper DEFINITIONS, and the default each one carries ---------------------------
@@ -1518,38 +1547,85 @@ const AGENT_TTL_MS = 12 * 60 * 60 * 1000
 const SLOT_TTL_MS = 45 * 60 * 1000
 const slug = (s) => String(s).replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120)
 
-// The git COMMON dir, resolved without shelling out to git — this runs on every spawn.
-function gitCommonDir(start) {
+// The CHECKOUT root: the nearest directory holding `.git`, a directory in a primary tree and a FILE
+// in a linked worktree. Resolved without shelling out to git — this runs on every call.
+function resolveCheckoutRoot(start) {
   const fs = require('fs')
   const path = require('path')
   let dir = path.resolve(start)
   for (let i = 0; i < 64; i++) {
-    const g = path.join(dir, '.git')
-    let st = null
-    try { st = fs.statSync(g) } catch { st = null }
-    if (st) {
-      if (st.isDirectory()) return g
-      // A WORKTREE: `.git` is a FILE holding `gitdir: <path>`, and that gitdir names the shared
-      // common dir in its own `commondir`. One budget per repo, not per worktree — a session is a
-      // session whichever checkout it stands in.
-      try {
-        const m = /gitdir:\s*(.+)/.exec(fs.readFileSync(g, 'utf8'))
-        if (!m) return null
-        const gd = path.resolve(dir, m[1].trim())
-        try {
-          return path.resolve(gd, fs.readFileSync(path.join(gd, 'commondir'), 'utf8').trim())
-        } catch {
-          return gd
-        }
-      } catch {
-        return null
-      }
-    }
+    try {
+      fs.statSync(path.join(dir, '.git'))
+      return dir
+    } catch { /* not here; keep walking */ }
     const up = path.dirname(dir)
     if (up === dir) return null
     dir = up
   }
   return null
+}
+
+// The git COMMON dir, resolved without shelling out to git — this runs on every spawn.
+function gitCommonDir(start) {
+  const fs = require('fs')
+  const path = require('path')
+  const dir = resolveCheckoutRoot(start)
+  if (!dir) return null
+  const g = path.join(dir, '.git')
+  let st = null
+  try { st = fs.statSync(g) } catch { return null }
+  if (st.isDirectory()) return g
+  // A WORKTREE: `.git` is a FILE holding `gitdir: <path>`, and that gitdir names the shared
+  // common dir in its own `commondir`. One budget per repo, not per worktree — a session is a
+  // session whichever checkout it stands in.
+  try {
+    const m = /gitdir:\s*(.+)/.exec(fs.readFileSync(g, 'utf8'))
+    if (!m) return null
+    const gd = path.resolve(dir, m[1].trim())
+    try {
+      return path.resolve(gd, fs.readFileSync(path.join(gd, 'commondir'), 'utf8').trim())
+    } catch {
+      return gd
+    }
+  } catch {
+    return null
+  }
+}
+
+// TOOL-aRepatriatedFork-7 S4/S5 — the DECLARED cap, read from `.agent-cap.conf` at the checkout root
+// (a linked worktree reads its own checkout's file, not the primary's). Returns
+// `{ cap, file }` — `file` is '' when nothing lowered the ceiling — or `{ error }`, a deny message.
+// Grammar: `FANOUT_CAP=4` or `FANOUT_CAP="4"` on a line of its own; the LAST such line wins, as a
+// shell `.` would read it; blank lines, `#` comments and other keys are ignored.
+function loadDeclaredCap(start) {
+  const fs = require('fs')
+  const path = require('path')
+  const root = resolveCheckoutRoot(start)
+  if (!root) return { cap: MAX_VERIFIERS, file: '' }
+  const file = path.join(root, CAP_CONF)
+  let text
+  try {
+    text = fs.readFileSync(file, 'utf8')
+  } catch (e) {
+    if (e && e.code === 'ENOENT') return { cap: MAX_VERIFIERS, file: '' }
+    return { error: `${file} could not be read (${(e && e.code) || (e && e.message) || e}), and a declared cap this hook cannot read is not one it may assume` }
+  }
+  let raw = null
+  for (const line of text.split(/\r?\n/)) {
+    const m = /^\s*FANOUT_CAP\s*=(.*)$/.exec(line)
+    if (m) raw = m[1].trim()
+  }
+  if (raw === null) return { cap: MAX_VERIFIERS, file: '' }
+  const v = /^"(.*)"$/.test(raw) ? raw.slice(1, -1) : raw
+  if (!/^[0-9]+$/.test(v) || Number(v) < 1 || Number(v) > MAX_VERIFIERS)
+    return { error: `${file} declares FANOUT_CAP=${raw}, and the declared cap must be an integer from 1 to ${MAX_VERIFIERS} — it can LOWER the ceiling, never raise or disable it` }
+  const n = Number(v)
+  return { cap: n, file: n < MAX_VERIFIERS ? file : '' }
+}
+
+// The clause every cap-printing message carries when a conf LOWERED the cap, and nothing otherwise.
+function renderCapSource() {
+  return CAP_SOURCE ? ` (lowered from ${MAX_VERIFIERS} by FANOUT_CAP in ${CAP_SOURCE})` : ''
 }
 
 function sweepTurns(root, keep) {
@@ -1593,7 +1669,7 @@ function guardAgentSpawn(data) {
     if (held.trim() === uid) return null
   }
 
-  for (let n = 1; n <= MAX_VERIFIERS; n++) {
+  for (let n = 1; n <= EFFECTIVE_CAP; n++) {
     const slot = path.join(turn, `slot-${n}`)
     let fd
     try {
@@ -1620,7 +1696,7 @@ function guardAgentSpawn(data) {
       }
       return (
         `BLOCKED by agent-cap: this spawn's token could not be created in ${turn} ` +
-        `(${e.code || e.message}), so the ${MAX_VERIFIERS}-agent budget could not be enforced for ` +
+        `(${e.code || e.message}), so the ${EFFECTIVE_CAP}-agent budget could not be enforced for ` +
         `it. A spawn this hook cannot count is not a spawn it may approve.`
       )
     }
@@ -1630,9 +1706,9 @@ function guardAgentSpawn(data) {
 
   return (
     `BLOCKED by agent-cap: the direct-Agent spawn budget for this prompt is exhausted — ` +
-    `${MAX_VERIFIERS} of ${MAX_VERIFIERS} claimed in this turn within the last ` +
+    `${EFFECTIVE_CAP} of ${EFFECTIVE_CAP} claimed in this turn within the last ` +
     `${Math.round(SLOT_TTL_MS / 60000)} minutes. A review's verify stage spawns at most ` +
-    `${MAX_VERIFIERS} agents TOTAL and the charter binds every other fan-out to the same number ` +
+    `${EFFECTIVE_CAP} agents TOTAL${renderCapSource()} and the charter binds every other fan-out to the same number ` +
     `(memory/guides/REVIEW-PROTOCOL.md).\n\n` +
     `Consolidate instead of spawning again: batch the work so the BATCH SIZE grows with the item ` +
     `count and the agent count does not. For a review, tools/workflows/tier2-review.js already does ` +
@@ -1884,13 +1960,25 @@ function main() {
   if (process.env.AGENT_CAP !== undefined && process.env.AGENT_CAP !== '') {
     process.stderr.write(
       `BLOCKED by agent-cap: AGENT_CAP is set (${process.env.AGENT_CAP}) and this guard NO LONGER ` +
-        `reads it. The cap is the file constant ${MAX_VERIFIERS}, resolved at the call site, the ` +
-        `default parameter and the gov:bounded-fanout width. An environment override would be a ` +
+        `reads it. The ceiling is the file constant ${MAX_VERIFIERS}, resolved at the call site, the ` +
+        `default parameter and the gov:bounded-fanout width; a repo may only LOWER it, with ` +
+        `FANOUT_CAP in a tracked ${CAP_CONF}. An environment override would be a ` +
         `ceiling raise that leaves no diff behind. Unset AGENT_CAP and re-run; to change the number, ` +
         `change it in tools/hooks/agent-cap.js, the source of truth -- .claude/hooks/agent-cap.js is a mirror the bar reverts.\n`,
     )
     process.exit(2)
   }
+
+  // TOOL-aRepatriatedFork-7 S4/S5 — the declared cap, read on EVERY call before any rule, so each
+  // rule and each message below sees the one effective number. A malformed declaration DENIES,
+  // fail closed, whichever tool this is: a value this hook cannot trust is not one it may ignore.
+  const declared = loadDeclaredCap(data.cwd || process.cwd())
+  if (declared.error) {
+    process.stderr.write(`BLOCKED by agent-cap: ${declared.error}. Fix or remove FANOUT_CAP and re-run.\n`)
+    process.exit(2)
+  }
+  EFFECTIVE_CAP = Math.min(declared.cap, MAX_VERIFIERS)
+  CAP_SOURCE = declared.file
 
   // RULE 4 first for an `Agent` payload, and it is the ONLY thing that path runs: the rules below
   // all read a script, and an Agent spawn carries none.
@@ -1937,13 +2025,13 @@ function main() {
   if (fan.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a verify/fan-out stage spawns one agent per item. The review protocol ` +
-        `caps verify-stage agents at ${MAX_VERIFIERS} TOTAL — the batch size grows with the finding ` +
+        `caps verify-stage agents at ${EFFECTIVE_CAP} TOTAL${renderCapSource()} — the batch size grows with the finding ` +
         `count, the agent count never does (memory/guides/REVIEW-PROTOCOL.md).\n\n` +
         fan.slice(0, 6).map(({ n, line, why }) => `  L${n}: ${line.trim()}\n        ${why}`).join('\n') +
         `\n\nSplit into a BOUNDED number of groups and mark the assignment:\n` +
-        `  const MAX_VERIFIERS = ${MAX_VERIFIERS}\n` +
+        `  const MAX_VERIFIERS = ${EFFECTIVE_CAP}\n` +
         `  const batches = chunk(items, Math.ceil(items.length / MAX_VERIFIERS)) // ${FIXED_MARK}\n` +
-        `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), ${CAP})\n\n` +
+        `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), ${EFFECTIVE_CAP})\n\n` +
         `A fixed lens array (<= ${MAX_LENSES} elements) is allowed as-is — its agent count is a ` +
         `constant. Ready-made: tools/workflows/tier2-review.js.\n`,
     )
@@ -1957,12 +2045,12 @@ function main() {
   if (caps.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a bound is written here that this file cannot resolve at or under ` +
-        `${MAX_VERIFIERS}. The cap is enforced by reading the number, not by trusting the helper's ` +
+        `${EFFECTIVE_CAP}${renderCapSource()}. The cap is enforced by reading the number, not by trusting the helper's ` +
         `name (memory/guides/REVIEW-PROTOCOL.md).\n\n` +
         caps.slice(0, 6).map(({ n, line, why }) => `  L${n}: ${String(line).trim()}\n        ${why}`).join('\n') +
-        `\n\nWrite the bound as an integer literal at or under ${MAX_VERIFIERS}, or as an identifier ` +
+        `\n\nWrite the bound as an integer literal at or under ${EFFECTIVE_CAP}, or as an identifier ` +
         `bound DIRECTLY to one and never reassigned:\n` +
-        `  const MAX_VERIFIERS = ${MAX_VERIFIERS}\n` +
+        `  const MAX_VERIFIERS = ${EFFECTIVE_CAP}\n` +
         `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), MAX_VERIFIERS)\n`,
     )
     process.exit(2)
@@ -1983,8 +2071,8 @@ function main() {
   process.stderr.write(
     `BLOCKED by agent-cap: raw parallel()/pipeline() fans out to the harness ` +
       `cap (~14 agents) and trips the server rate limiter.\n\n` +
-      `Route ALL fan-out through the cap-${CAP} helpers and call them instead:\n` +
-      `  async function boundedParallel(thunks, cap = ${CAP}) {\n` +
+      `Route ALL fan-out through the cap-${EFFECTIVE_CAP} helpers${renderCapSource()} and call them instead:\n` +
+      `  async function boundedParallel(thunks, cap = ${EFFECTIVE_CAP}) {\n` +
       `    const out = []\n` +
       `    for (let i = 0; i < thunks.length; i += cap)\n` +
       `      out.push(...await parallel(thunks.slice(i, i + cap))) // gov:bounded-fanout\n` +

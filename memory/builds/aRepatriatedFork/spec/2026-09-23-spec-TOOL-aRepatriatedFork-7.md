@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap
 
-**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-7-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-7-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-TOOL-aRepatriatedFork-7-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-7-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -279,6 +280,14 @@ New arm: `tools/workflows/check-protocol-parity.test.sh` · a template with a su
   with the nested fail-open reproduced by piping one payload to all three hooks.
 - rev-2 · 2026-09-23 · S6 citation moved from `:121` to `:111`: TOOL-aRepatriatedFork-4 removed the
   verifier-fanout prefix derivation above that line. Same `≤5` echo, no design change.
+- rev-3 · 2026-09-24 · S8: closing `TOOL-dRetiredFork-24` in `memory/backlog/TOOL.md` moves to the
+  main loop, because `--dispatch` refuses a unit pass that declares a shared mutable record; and
+  review-harness takes no second bump, already at 1.9 in this unlanded build. S7: a `*.template.js`
+  leaves the verifier fan-out and workflow-syntax populations, since its token sits where a number
+  goes and neither gate can judge it; review-harness `version_from` reads the template and
+  drift-audit declares both templates in `marker_carriers`, which `govkit selfcheck` required.
+  The tier2-review meta prose that states the cap renders the token too, so no rendered text types
+  the ceiling over a lowered cap.
 
 ## 10. Reuse audit
 

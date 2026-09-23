@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 116 · kits: 17 · git-hooks: 4 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 87 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 116 · kits: 17 · git-hooks: 4 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 87 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -164,9 +164,12 @@ Inventories: gate-legs: 116 · kits: 17 · git-hooks: 4 · workflow-scripts: 8 �
 |---|---|
 | `check-workflow-syntax.js` | review-harnesses |
 | `drift-audit-code.js` | review-harnesses |
+| `drift-audit-code.template.js` | review-harnesses |
 | `drift-audit-state.js` | review-harnesses |
+| `drift-audit-state.template.js` | review-harnesses |
 | `orient-counterfactual.js` | review-harnesses |
 | `tier2-review.js` | review-harnesses |
+| `tier2-review.template.js` | review-harnesses |
 | `unattended-build.js` | unattended |
 | `unattended-build.template.js` | review-harnesses |
 | `unattended-unit.js` | unattended |

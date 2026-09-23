@@ -13,13 +13,25 @@ version under **two** kit ids, and both are paired — see its line 3 and `check
 
 ## What this kit RENDERS, and its one renderer
 
-`check-protocol-parity.test.sh --render` writes both artifacts below, and the same script with no
+`check-protocol-parity.test.sh --render` writes every artifact below, and the same script with no
 argument is the leg that grades them:
 
 | rendered | from | tokens |
 |---|---|---|
 | `<memory root>/guides/REVIEW-PROTOCOL.md` | `REVIEW-PROTOCOL.template.md` | `TOOL_ROOT` |
-| `unattended-build.js`, beside its template | `unattended-build.template.js` | `KIT_DIR`, `TOOL_ROOT`, `MEMORY_TREE_DIR` |
+| `unattended-build.js`, beside its template | `unattended-build.template.js` | `KIT_DIR`, `TOOL_ROOT`, `MEMORY_TREE_DIR`, `FANOUT_CAP` |
+| `tier2-review.js`, beside its template | `tier2-review.template.js` | `FANOUT_CAP` |
+| `drift-audit-code.js`, beside its template | `drift-audit-code.template.js` | `FANOUT_CAP` |
+| `drift-audit-state.js`, beside its template | `drift-audit-state.template.js` | `FANOUT_CAP` |
+
+**`FANOUT_CAP` is the agent-cap hook's own declaration** (TOOL-aRepatriatedFork-7): `FANOUT_CAP=<n>` in
+`.agent-cap.conf` at the checkout root, read with the hook's grammar and default, so a repo that
+lowers its cap receives harnesses its hook admits. No conf renders the ceiling, byte-identical to the
+harnesses as they shipped before. A value the hook would refuse makes the render refuse too. The
+three harnesses beside the build harness moved from `engine` to `rendered` at review-harness 1.9, and
+an install from before that migrates them the way the build harness migrated at 1.8, below. A
+`*.template.js` is a render source, not a harness: the verifier fan-out and syntax gates judge its
+render and skip the template.
 
 **Edit the template, never the render.** The build harness names four install paths: the driver,
 the bug-class checklist, the review sub-workflow it awaits and the child it hands the caller. A

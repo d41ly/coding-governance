@@ -21,7 +21,7 @@ export const meta = {
 // a caller raised this harness's own agent count past the cap with every gate green. agent-cap.js
 // now RESOLVES the bound and refuses that binder form outright. (The spelling itself is paraphrased
 // here on purpose: the acceptance grep for it is repo-wide and would match the comment explaining it.)
-const CAP = 5
+const CAP = {{FANOUT_CAP}}
 // TOOL-dRetiredFork-6, taken from inCMS's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
 // hand-written ternary with THREE outcomes that conflated TWO of them: `!synth` gave UNVERIFIED,
 // anything non-zero gave PARTIAL, and everything else gave the bare string `complete` — so "nothing
@@ -86,7 +86,7 @@ const a = args || {}
 const REPO = a.repo || '.'
 const BASE = a.base || 'HEAD'
 const OUT = a.outDir || `${REPO}/memory`
-const MAX_VERIFIERS = 5
+const MAX_VERIFIERS = {{FANOUT_CAP}}
 
 const COMMON = `
 You are auditing the repo at ${REPO}. Treat ${BASE} as "what ships".

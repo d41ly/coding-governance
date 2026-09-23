@@ -1,12 +1,12 @@
 export const meta = {
-  name: 'drift-audit-code',
+  name: 'drift-audit-state',
   version: '1.12',
   description:
-    'Drift audit Tier 2, wave 1: dead / inefficient / unwired / duplicated code + instrument integrity. Project-agnostic; all repo facts arrive via args.',
+    "Drift audit Tier 1/2: are this repo's own records still true? Stale maps, stale memory, charter drift, work-state uncertainty, record-gate integrity. Project-agnostic; all repo facts arrive via args.",
   whenToUse:
-    'After Tier 0 (drift_report.py) and only when the question is about CODE rather than records. Run wave 1 and wave 2 sequentially, never together — the concurrency cap is fleet-wide.',
+    'Tier 1: narrow LENSES to the one Tier-0 signal that moved, plus the standing record-gate lens. Tier 2: run all five, sequentially after drift-audit-code (the concurrency cap is fleet-wide).',
   phases: [
-    { title: 'Find', detail: '5 primed lenses over the whole repo, bounded fan-out' },
+    { title: 'Find', detail: 'primed lenses over the memory tree, charter and generated build index' },
     { title: 'Verify', detail: 'batched default-refute skeptics, keyed by integer index' },
     { title: 'Synthesize', detail: 'one pass -> report file' },
   ],
@@ -14,14 +14,13 @@ export const meta = {
 
 // gov:kit drift-audit@1.12
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
-// The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
-// budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.
-// BOTH ARE BARE LITERALS AND NEITHER IS CALLER-SETTABLE. The retired form bound each of them from
-// an `<expr> || 5` fallback, which read as a constant to the guard and as a knob to the runtime — so
-// a caller raised this harness's own agent count past the cap with every gate green. agent-cap.js
-// now RESOLVES the bound and refuses that binder form outright. (The spelling itself is paraphrased
-// here on purpose: the acceptance grep for it is repo-wide and would match the comment explaining it.)
-const CAP = 5
+// BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS, and neither is caller-settable.
+// The retired form bound each of them from an `<expr> || 5` fallback, which read as a constant to the
+// guard and as a knob to the runtime — so a caller raised this harness's own agent count past the cap
+// with every gate green. agent-cap.js now RESOLVES the bound and refuses that binder form outright.
+// (The spelling itself is paraphrased here on purpose: the acceptance grep for it is repo-wide and
+// would match the comment explaining it.)
+const CAP = {{FANOUT_CAP}}
 // TOOL-dRetiredFork-6, taken from inCMS's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
 // hand-written ternary with THREE outcomes that conflated TWO of them: `!synth` gave UNVERIFIED,
 // anything non-zero gave PARTIAL, and everything else gave the bare string `complete` — so "nothing
@@ -73,50 +72,55 @@ function chunk(a, n) {
 
 // --- inputs (via Workflow `args`) ----------------------------------------
 // {
-//   repo: "/c/projects/<repo>",            // forward slashes
-//   base: "<immutable SHA>",               // what "ships" means
-//   outDir: "<repo>/memory/.../reviews",   // where lens writeups + the report land
-//   stack: "one paragraph: languages, frameworks, layout, entrypoints",
-//   productGlobs: ["src", "packages"],     // what counts as product source
-//   frameworkExports: "which exports a framework references by convention, not by import",
-//   measured: "the Tier-0 numbers already established — agents must interrogate, not re-derive",
-//   byDesign: "recorded/backlogged issues reviewers must NOT re-report as new",
+//   repo, base, outDir,                      // as in drift-audit-code
+//   memoryRoot: "memory",                    // from .memory-tree.conf
+//   charter: "AGENTS.md",                    // the file holding the binding rules + node registry
+//   gateManifest: "tools/gate-legs.json",    // the generated/authoritative leg list, if any
+//   measured: "Tier-0 numbers, to interrogate not re-derive",
+//   heuristics: "any orchestrator heuristic handed over, WITH its known failure mode",
+//   byDesign: "recorded/backlogged issues reviewers must NOT re-report",
+//   lenses: ["map-truth","memory-rot","charter-drift","work-state","record-gate-integrity"],
 // }
 const a = args || {}
 const REPO = a.repo || '.'
 const BASE = a.base || 'HEAD'
 const OUT = a.outDir || `${REPO}/memory`
-const MAX_VERIFIERS = 5
+const MEM = a.memoryRoot || 'memory'
+const CHARTER = a.charter || 'AGENTS.md'
+const MAX_VERIFIERS = {{FANOUT_CAP}}
 
 const COMMON = `
-You are auditing the repo at ${REPO}. Treat ${BASE} as "what ships".
+You are auditing the RECORDS of the repo at ${REPO}. Treat ${BASE} as "what ships".
 
-STACK: ${a.stack || 'not supplied — infer it from the tree before you start, and say what you inferred.'}
+THE COMMISSIONING QUESTION: the owner reports that the build FEELS like it is drifting and its state
+is UNCERTAIN. This wave audits the repo's SELF-KNOWLEDGE: its memory tree at \`${MEM}/\`, its charter
+\`${CHARTER}\`, and the gates that police them. A repo whose own records are wrong cannot tell its
+owner what state it is in — that IS the reported symptom, so treat every record-vs-reality gap as a
+first-class finding.
 
-PRODUCT SOURCE: ${(a.productGlobs || ['(not supplied — infer it)']).join(', ')}
+MEASURED BASELINES (already established; do not re-derive, DO interrogate/extend):
+${a.measured || '(none supplied — establish your own and show the command behind each number)'}
 
-SCOPE: the WHOLE repo at ${BASE}, not a diff. Ignore vendored/submodule trees — they have their own
-records and their own drift.
+HEURISTIC LEADS handed over by the orchestrator, each with its known failure mode. These are LEADS to
+re-derive, NOT findings. Do not repeat their numbers as fact:
+${a.heuristics || '(none supplied)'}
 
-MEASURED BASELINES (already established; do not re-derive, DO interrogate — a number that cannot move
-is the failure mode this audit exists to catch):
-${a.measured || '(none supplied — establish your own and show the command that produced each)'}
-
-ALREADY KNOWN — DO NOT RE-REPORT AS NEW. You MAY report that one is still live, got worse, or that
-its recorded description is now wrong:
-${a.byDesign || '(none supplied — assume nothing is known and expect a lower precision)'}
+ALREADY KNOWN — do not re-report as new:
+${a.byDesign || '(none supplied)'}
 
 EVIDENCE RULES (these decide whether your finding survives the skeptic):
-- Every finding needs a real path:line you actually read. Forward slashes only, never backslashes.
-- "Dead"/"unused" requires that you ACTUALLY searched for consumers across ALL of: direct imports,
-  re-exports through barrels/index files, dynamic imports, framework file-convention exports,
-  string-keyed registries, generated artifacts, decorators/annotations that register a symbol at
-  import time, CLI entrypoints, tests, and fixture/seed data. Say WHICH searches you ran. An
-  unsearched claim will be refuted.
-  Framework-referenced exports in this repo: ${a.frameworkExports || '(not supplied — determine them yourself and list them)'}
-- Prefer few high-confidence findings over many speculative ones. Precision is the metric.
-- Severity: blocker = breaks a merge-bar gate or ships a live defect; high = real user-visible or
-  data-integrity impact; medium = real debt with a concrete cost; low = tidy-up.
+- Every finding needs a real path:line you actually opened. Forward slashes only, no backslashes.
+- A "stale record" claim must show BOTH sides: what the record says, and what is actually true, each
+  with its own path:line or command output. A one-sided claim will be refuted.
+- Distinguish three very different things and never conflate them:
+  (a) a record that is WRONG — says X, reality is not-X. The serious class.
+  (b) a record that is merely OLD but still true.
+  (c) an APPEND-ONLY record deliberately superseded by a later id, or one under an archive/ path.
+      That is the designed behaviour of a decision log and is NOT staleness. Reporting (c) as drift
+      will be refuted.
+- Quantify. "Some specs are stale" is worthless; "N of M, here is the list" is a finding.
+- Severity: blocker = actively misleads a session into wrong work, or breaks a gate; high = a session
+  would make a materially wrong decision from it; medium = real cost; low = tidy-up.
 
 COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter §7: every suite declares a wall-clock ceiling
 and one arriving without a ceiling reds by that fact. Yours is roughly 30 TOOL CALLS. If a question
@@ -134,9 +138,9 @@ went, two hours of real work would have survived instead of being discarded. Not
 enforce this — a script cannot time out its own agent — so it is a brief, and the brief is the only
 control there is.
 
-OUTPUT: Write your full prose writeup (evidence, commands run, per-finding detail) to
-${OUT}/wave1-<yourLensSlug>.md and return ONLY the structured object. Keep each structured field
-under ~300 chars; long detail belongs in the file.
+OUTPUT: Write your full prose writeup (evidence, commands, per-finding detail, and any list too long
+for the structured return) to ${OUT}/wave2-<yourLensSlug>.md and return ONLY the structured object.
+Keep each structured field under ~300 chars.
 Required keys on the returned object: lens, path, summary, findings.
 Each finding requires: file, line, severity, claim, impact, fix.
 `
@@ -166,99 +170,111 @@ const FINDING_SCHEMA = {
   },
 }
 
-const LENSES = [
+const ALL_LENSES = [
   {
-    slug: 'dead-code',
-    label: 'find:dead-code',
-    brief: `LENS 1 — DEAD CODE, trustworthy this time.
-Any fan-in / unused-export metric this repo reports is a HINT computed from a symbol table, and it is
-wrong in BOTH directions. Turn it into a list someone can act on.
-First read whatever computes it and learn exactly what it structurally cannot see. Then produce:
- (a) FALSE POSITIVES: classes of symbol the number wrongly includes, with counts and examples. If a
-     large fraction is framework-referenced, the number is decorative and THAT is the finding.
- (b) TRUE DEAD CODE you verified has no consumer by exhaustive search. Whole dead FILES and dead
-     FEATURES are worth far more than dead one-line exports.
-Also hunt what a fan-in metric cannot see at all: branches behind a flag that no longer exists,
-retired-feature tombstones still carrying live paths, modules kept alive only by their own tests, and
-schema/migrations for columns nothing reads.`,
+    slug: 'map-truth',
+    label: 'find:map-truth',
+    brief: `LENS — IS THE MACHINE-VERIFIED LAYER STILL TRUE?
+If this repo has a codebase map, dossier layer, or any artifact advertised as CI-verified, sessions are
+told to TRUST IT OVER PROSE. That makes a false claim there far more dangerous than a false journal
+note. Audit it:
+ - Read the generator and the gate. Learn exactly what the ratchet DOES prove (usually: every
+   inventory key is claimed somewhere, and no claim names a deleted key) and what it does NOT (that
+   the surrounding PROSE is true; that a claim is non-redundant — multi-claim is typically legal).
+ - Then sample dossiers for BUSY areas and check their prose against source. Name specific false
+   sentences with both path:lines.
+ - Every grace/backfill/exemption list: how big, what is still parked there, has it shrunk? A large
+   permanent baseline means the coverage gate is mostly excused.
+ - If a shrink mechanism is documented, find its CALLERS. A grace list whose un-gracing command is
+   invoked by nothing is permanent, and any docstring promising "no human remembering" is false.
+ - Which shipped features have NO entry at all? Undossiered features are invisible to the premise.`,
   },
   {
-    slug: 'unwired',
-    label: 'find:unwired',
-    brief: `LENS 2 — UNWIRED FUNCTIONALITY (built, shipped, never reachable).
-Hunt end-to-end reachability gaps in BOTH directions:
- - an endpoint/handler with no caller in any client, CLI, or automation surface;
- - a service function no adapter reaches;
- - a tool/command registered but unreachable, or gated by a flag nothing can set;
- - a feature flag or setting that gates nothing, or whose gate is unreachable;
- - a registered unit (block/plugin/component) missing from one of the several places registration
-   requires — enumerate ALL of them for this repo and check every unit against every place;
- - a stored field written but never read, or read but never written;
- - a screen with no navigation entry, or a route nothing links to;
- - a docs page describing a control that does not exist — name the control a reader would click;
- - the inverse: a shipped user-facing capability with no docs page at all.
-This class has a documented shape: computed -> serialized -> passed -> never read. The docs face of it
-is a page promising a capability whose service, endpoint and client all exist while NO UI calls any.`,
+    slug: 'memory-rot',
+    label: 'find:memory-rot',
+    brief: `LENS — IS THE MEMORY TREE STILL TRUE, AND IS IT AFFORDABLE?
+ - THE SPEC STATUS QUESTION (highest value). For each non-terminal spec (OPEN/SPECCED/BLOCKED/
+   INPROGRESS), determine whether its unit actually landed — cross-reference the generated build
+   index, the decision indexes, the backlog rows, and git (\`git log --grep=<id>\`, and whether a
+   named merge sha is an ancestor of ${BASE}). Report the REAL count whose header contradicts
+   reality, with the list. A spec frozen mid-build is a named rot class; a spec that shipped and
+   still says SPECCED is the same class.
+ - Which memory documents make claims now FALSE about the code at ${BASE}? Sample the
+   highest-traffic notes and verify their concrete claims — paths, flags, commands, ports.
+ - Does any CURRENT (non-archive) doc still instruct a session to use a RETIRED mechanism? That
+   actively misleads. An archived or explicitly-superseded doc doing so is by design.
+ - COST: is the read path affordable? Measure what a session is actually told to read at DoR against
+   what it plausibly reads. A mandate nobody can follow is worse than a smaller one they would.
+ - Indexes: is each within its declared byte/line budget? Are journals bounded or unbounded?`,
   },
   {
-    slug: 'duplication',
-    label: 'find:duplication',
-    brief: `LENS 3 — duplication and reinvention beyond whatever is already recorded.
-Clone detectors catch verbatim copies. The MODAL reinvention class is semantic near-duplication and
-ORCHESTRATION duplication — differently-strung calls to the same primitives — which no clone detector
-and no name-keyed index can see. Leaf helpers get reused well; what stays duplicated is the
-orchestration stringing them together.
-So do NOT just run a clone detector.
- - Identify this repo's high-fan-in seams, then ask of each: does a second implementation of this
-   BEHAVIOUR exist that does not wire through the seam?
- - Concentrate where orchestration lives: service-layer flows, tool/command bodies, CRUD page
-   composition, router preludes (error/permission/flag handling), install/seed loops, fetch wrappers.
- - Report duplication that has DRIFTED (the copies now disagree) at HIGHER severity than duplication
-   that is merely repeated. Drift is a live bug; repetition is debt.`,
+    slug: 'charter-drift',
+    label: 'find:charter-drift',
+    brief: `LENS — DOES THE CHARTER STILL DESCRIBE THE REPO?
+\`${CHARTER}\` is auto-loaded into EVERY session and its directives are binding, so a false sentence
+there propagates into every future session's behaviour. It is the highest-leverage document here.
+Read ALL of it and verify every checkable factual assertion against the tree at ${BASE}.
+ - Any hand-kept INVENTORY in charter prose (a gate-leg list, a package list, a count) against its
+   generated or authoritative source${a.gateManifest ? ` — start with \`${a.gateManifest}\`` : ''}. A
+   hand-kept twin of a generated list is a recorded defect class; find every instance.
+ - Every in-repo path the charter names: does it still exist?
+ - Every command it prescribes: does it still work, and is it still the right one?
+ - Do the charter and any SECONDARY governance doc (a kickoff manifest, a skill, a protocol file)
+   CONTRADICT each other? A session obeying the wrong one behaves wrongly, and the two documents
+   usually share no greppable token, so only reading both finds it.
+ - User-facing docs: does each page name a control a reader can actually click? Is any page describing
+   a capability that never shipped or has been removed? Which shipped features have no page?`,
   },
   {
-    slug: 'inefficient',
-    label: 'find:inefficient',
-    brief: `LENS 4 — INEFFICIENT code, on paths that actually run.
- - N+1 queries and per-row awaits, especially on list/index paths;
- - blocking synchronous work on an async event loop (DNS, sockets, file IO, subprocess, crypto);
- - an index that cannot serve its query — an inequality-led composite or wrong column order cannot
-   seek or sort; read the migrations AND the query sites;
- - unbounded queries with no limit on a surface that grows;
- - render-path waste: a component defined inside a render body (new type per parent render, remount
-   per keystroke), missing memoization on an expensive list, effects that refetch every render,
-   client bundles pulling in code meant to stay server-side or editor-only;
- - the gate suite itself: is any leg redundant, vacuous, or pathologically slow for what it proves?
-Prefer measured or clearly-reasoned impact over "this looks slow". An unmeasured perf claim will be
-downgraded, and rightly.`,
+    slug: 'work-state',
+    label: 'find:work-state',
+    brief: `LENS — WHAT STATE IS THE WORK ACTUALLY IN? (the owner's literal question)
+The GENERATED build index (\`${MEM}/LIVE.md\` and \`${MEM}/ledger/<month>.md\`) is the record of who
+touched what. It is DERIVED from build front matter, so test it against git rather than trusting it.
+ - For each build the index calls non-terminal: does git agree? Separate a record's BASE sha ("off
+   \`X\`") from its WORK shas — the base is an ancestor by construction and proves nothing, and
+   conflating them makes every record a false positive. Report the real count that contradicts git.
+ - The inverse and more dangerous direction: work claimed as LANDED that is NOT an ancestor of
+   ${BASE}, and work sitting on branches nobody tracks.
+ - Say explicitly what is STRUCTURALLY UNKNOWABLE from this clone. Other nodes are other machines;
+   their landed work is visible, their working trees are not. An audit that pretends to see them is
+   worse than one that names the blind spot. Name the unknowables.
+ - Do the branches and worktrees any record names still resolve? A pointer at a deleted worktree is
+   work nobody can resume. Be careful to judge only THIS node's paths.
+ - Is the index still a byte-identical render of its source, or has someone hand-edited it?
+ - The bottom line the owner needs: is there work that is BUILT, GATED, REVIEWED and simply LOST —
+   nobody merged it and no record accurately says so? Name it, or state plainly that there is none.`,
   },
   {
-    slug: 'instruments',
-    label: 'find:instrument-integrity',
-    brief: `LENS 5 — ARE THE INSTRUMENTS LYING? (the highest-value lens — be ruthless)
-The reason anyone commissions this audit is that state feels uncertain. Gates and metrics that report
-green or zero while BLIND are how that happens, and they are invisible by construction.
-Known shapes of this failure, all observed in real repos:
- - a gate comparing two values neither of which is what ships (e.g. two tokens while the painted
-   surface is translucent), whose empty offender list reads as all-clear;
- - a --check freshness gate that is vacuous because the generator's correct output is always
-   "unchanged";
- - a test that runs in NEITHER CI leg because it opts into a resource outside the marker mechanism;
- - an assertion whose two operands come from the same generator run;
- - a metric structurally pinned at zero, whose zero reads as "converged";
- - a review harness whose verdict lookup never matches, reporting precision 0.00 as a clean bill.
-Targets:
- 1. For EVERY number this repo reports about itself, determine whether it CAN move. Try to make it
-    move: construct the minimal input it should flag and check that it flags it. A number that cannot
-    move is a blocker-class finding regardless of how reassuring it looks.
- 2. For every gate leg: can it fail? Is any leg scope-gated so it never runs where the work happens?
-    Is any assertion vacuous?
- 3. Are any exemption/baseline lists being used to silence real findings rather than sanctioned ones?
-    How large are they, and when did each last shrink?
- 4. Is the gate suite's own declared leg set the same as what CI actually runs?
+    slug: 'record-gate-integrity',
+    label: 'find:record-gate-integrity',
+    brief: `LENS — CAN THE RECORD-POLICING GATES ACTUALLY FAIL? (the keystone — be ruthless)
+If they cannot, every "green" above is meaningless and the drift the owner feels is invisible BY
+CONSTRUCTION. Do not assume; TEST.
+ 1. Enumerate every check in the hygiene/record gate suite. For a sample, CONSTRUCT the minimal
+    violating input and verify the check actually reds. Report any check that is unreachable,
+    permanently satisfied, grandfathered into irrelevance, or gated on a date/path condition that no
+    longer selects anything. If a golden harness exists, check whether it covers every check or only
+    some — an uncovered check is one nobody has ever seen fail.
+ 2. Distinguish SHAPE checks from TRUTH checks and count each. A check that a status token is spelled
+    legally is not a check that it is true. If nothing in the suite adjudicates truth, that gap is the
+    finding, and it is the mechanism behind every stale record above.
+ 3. Date-gated or path-gated checks: what selects the population? If a session chooses the date or the
+    path, it chooses whether the check applies. Test whether the gate can be evaded.
+ 4. Any ratchet or pin: is it pinned to a floor that is trivially met? Quantify how much of the
+    population is LOAD-BEARING versus excused.
+ 5. Does the local gate suite run the same legs as CI? Twin enforcement points that no test compares
+    are a recorded defect class — and unifying on the form that silences a symptom trades a false
+    positive for a false NEGATIVE, so enumerate every state the predicate can see.
+ 6. Is any gate currently RED at the tip of the shared default branch? A leg that always runs being
+    red at the tip is itself proof the full bar did not run at that push boundary.
 Demonstrate, do not assert — run the tool and show the output for every claim.`,
   },
 ]
+
+// gov:fixed-verifiers — derived from the ALL_LENSES literal above; `.filter` cannot grow it, so the
+// agent count stays the constant the source shows.
+const LENSES = a.lenses && a.lenses.length ? ALL_LENSES.filter((L) => a.lenses.includes(L.slug)) : ALL_LENSES // gov:fixed-verifiers
 
 phase('Find')
 const finderResults = await boundedParallel(
@@ -269,9 +285,6 @@ const finderResults = await boundedParallel(
 )
 
 const lensOut = finderResults.filter(Boolean)
-// Orchestrator-assigned INTEGER index — the verdict join key. A model can echo a small integer
-// reliably; it cannot echo "file.py:1234 — long claim text" byte-identically, and every miss
-// silently became "refuted" in the ref-keyed harness this replaces.
 const indexed = []
 lensOut.forEach((r) => {
   ;(r.findings || []).forEach((f) => indexed.push({ id: indexed.length + 1, lens: r.lens, ...f }))
@@ -334,33 +347,39 @@ const VERDICT_SCHEMA = {
 }
 
 phase('Verify')
-// <= MAX_VERIFIERS agents TOTAL. Batch size grows with the finding count; agent count never does.
 const batches = indexed.length ? chunk(indexed, Math.ceil(indexed.length / MAX_VERIFIERS)) : [] // gov:fixed-verifiers
 const verdictBatches = await boundedParallel(
   batches.map((b, bi) => () =>
     agent(
-      `You are a DEFAULT-REFUTE skeptic auditing findings from a whole-repo drift audit of ${REPO}
+      `You are a DEFAULT-REFUTE skeptic auditing findings from a records/state drift audit of ${REPO}
 (ships at ${BASE}). Your job is to REFUTE. Assume each finding is wrong until its evidence forces you
-to agree. Open the cited file:line yourself and run the searches the finder claims to have run.
+to agree. Open the cited file:line yourself and re-run the checks.
 
 Refute when ANY of these hold:
 - the cited file:line does not say what the finding claims;
-- a consumer/caller/reference DOES exist that the finder missed — check barrels, re-exports, dynamic
-  imports, framework file conventions, string-keyed registries, generated artifacts, decorators, CLI
-  entrypoints, tests and seed data;
-- the "duplication" is a sanctioned or justified twin rather than reinvention;
+- the record is APPEND-ONLY and was deliberately superseded by a later id — designed behaviour, not
+  staleness;
+- the document is under an archive/ path, or is explicitly marked SUPERSEDED/rotated;
+- the claim rests on an orchestrator HEURISTIC (with its stated failure mode) rather than on the
+  finder's own re-derivation;
+- a sha the finding calls a "work sha" is actually the row's BASE sha, an ancestor by construction;
+- the item is correctly grandfathered by an explicit date cutoff or exemption file;
+- the gate the finding calls vacuous CAN in fact fail — if you can construct a failing input, refute;
 - the claim is already recorded/backlogged and adds nothing new;
-- the impact does not follow even if the fact is true (debt asserted as a live defect);
-- the finding is speculative, unmeasured, or an aesthetic preference.
-Mark "partial" when the underlying fact is real but severity or impact is overstated, and give the
-corrected severity in severityCorrection.
+- the impact does not follow even if the fact is true (cost asserted as correctness);
+- the finding is speculative, unquantified, or an aesthetic preference.
+Mark "partial" when the fact is real but severity/impact is overstated; give the corrected severity in
+severityCorrection.
 
 Return ONE verdict per id below. Required keys: id (integer), verdict
 (confirmed|refuted|partial), reason. Optional: severityCorrection.
-Echo the id EXACTLY as an integer. Return every id in this batch, even if unsure — if you cannot
-reach a judgement use "partial" and say why. Do not invent ids not in this batch.
+Echo the id EXACTLY as an integer. Return every id in this batch, even if unsure — if you cannot reach
+a judgement use "partial" and say why. Do not invent ids not in this batch.
 
-ALREADY KNOWN (a finding that merely restates one of these is refuted):
+HEURISTICS the finders were given as leads, NOT findings:
+${a.heuristics || '(none supplied)'}
+
+ALREADY KNOWN:
 ${a.byDesign || '(none supplied)'}
 
 FINDINGS BATCH ${bi + 1}:
@@ -405,8 +424,6 @@ for (const id of conflictIds) vmap.delete(id)
 if (conflictIds.size) log(`WARNING: ${conflictIds.size} finding(s) got CONTRADICTORY verdicts - demoted to UNVERIFIED.`)
 if (duplicates) log(`note: ${duplicates} repeat verdict(s) agreed with the standing one - idempotent.`)
 if (spurious) log(`WARNING: ${spurious} verdict(s) carried an id this run never assigned - discarded.`)
-// A finding with NO verdict is UNVERIFIED, never refuted. Two prior runs reported a hard zero
-// because the join matched nothing, and a hard zero reads as a clean bill of health.
 const judged = indexed.map((f) => {
   const v = vmap.get(f.id)
   return {
@@ -427,6 +444,11 @@ const refuted = judged.filter((f) => f.verdict === 'refuted')
 const unverified = judged.filter((f) => f.verdict === 'unverified')
 const precision =
   confirmed.length + refuted.length ? confirmed.length / (confirmed.length + refuted.length) : null
+// TOOL-aScouredKit-9 - the AGGREGATE its sibling drift-audit-code.js has had since 1.4. The
+// per-finding `severityCorrection` already reaches the synthesis writer, because `judged` is
+// serialized wholesale into that prompt; what was missing is the number an operator reads WITHOUT
+// opening the report. A run where every finding was downgraded and a run where none was looked
+// identical on this line.
 const downgrades = judged.filter((f) => f.verdict === 'partial' && f.severityCorrection).length
 log(
   `Verify: ${confirmed.length} confirmed, ${partial.length} partial, ${refuted.length} refuted, ` +
@@ -435,30 +457,31 @@ log(
 
 phase('Synthesize')
 const synth = await agent(
-  `Synthesize a whole-repo code-drift audit of ${REPO} (ships at ${BASE}) into ONE report at
-${OUT}/drift-audit-wave1-code.md.
+  `Synthesize a records/state drift audit of ${REPO} (ships at ${BASE}) into ONE report at
+${OUT}/drift-audit-wave2-state.md.
 
-The commissioning question was: is the build drifting — is there dead or inefficient code, unwired
-functionality, duplicate or reinvented functionality?
+The commissioning question was: are the records stale, and why does the project's state feel uncertain?
 
 Write it so a tired reader has the answer in the first ten lines. Structure:
-1. Verdict up front: is there drift, how much, and what is the single worst thing.
-2. Severity-ordered table of CONFIRMED findings (id, severity, file:line, one-line claim).
-3. PARTIAL findings, with the corrected severity beside the original.
-4. UNVERIFIED findings listed explicitly — NOT refuted, NOT cleared. State plainly that no skeptic
-   reached them. If the count is zero, say so and say why that is positive evidence.
-5. Refuted findings, one line each, so the reader knows what was checked and dismissed.
-6. Instrument integrity — a dedicated section on whether this repo's own drift metrics can be
-   trusted. If a metric cannot move or a gate cannot fail, say so loudly and early.
-7. Cross-cutting themes: what the findings say collectively about HOW drift enters this codebase —
-   the mechanism, not the instances.
-8. A prioritized do-this-next list, cheapest-high-value first, each item naming the file to touch.
+1. Verdict up front: are the records trustworthy, and what is the single worst instance.
+2. THE STATE ANSWER — a plain-language statement of what state the work is actually in: how many
+   build records contradict git, what is built-but-unlanded, and what is structurally UNKNOWABLE from
+   this clone. The owner asked this directly; answer it directly and do not bury it.
+3. Severity-ordered table of CONFIRMED findings (id, severity, file:line, one-line claim).
+4. PARTIAL findings with the corrected severity beside the original.
+5. UNVERIFIED findings, listed explicitly — NOT refuted, NOT cleared. If the count is zero, say so and
+   explain why that is positive evidence rather than an absence of checking.
+6. Refuted findings, one line each.
+7. Gate integrity: can the record-policing gates actually fail? Say which were TESTED versus assumed.
+   Separate SHAPE checks from TRUTH checks and say whether anything adjudicates truth at all.
+8. Cross-cutting themes: the MECHANISM by which records go stale here, not the instances.
+9. A prioritized do-this-next list, cheapest-high-value first, each naming the file to touch.
 
 Rules: every claim keeps its file:line. Do not soften or round. Do not invent findings not in the
-data. Report precision and the raw/confirmed/partial/refuted/unverified counts honestly, and state
-the correction DIRECTION beside precision — precision 1.00 with zero refutations means nothing was
-fabricated, not that the severities were right. Where findings contradict each other, say so rather
-than silently picking one.
+data. Report precision and all five counts honestly. Where a number came from an orchestrator
+heuristic and was NOT re-derived, label it as such. Where findings contradict each other, surface the
+contradiction rather than silently picking one — include a short contradictions appendix if there are
+several.
 
 Return {path, summary} only — the prose goes in the file. Forward slashes in the path.
 
@@ -470,7 +493,7 @@ If lenses died, the finding set is INCOMPLETE and a zero count is not evidence o
 lens writeups: ${JSON.stringify(lensOut.map((r) => ({ lens: r.lens, path: r.path, summary: r.summary })), null, 1)}
 judged findings: ${JSON.stringify(judged, null, 1)}`,
   {
-    label: 'synth:code-drift',
+    label: 'synth:state-drift',
     phase: 'Synthesize',
     schema: {
       type: 'object',
@@ -490,9 +513,12 @@ if (!synth) {
 }
 
 return {
-  wave: 'code-drift',
-  // TOOL-dTieredTribunal-3 S3 - this file returned NO lens information at all, which is not safer
-  // than returning the wrong thing. The SURVIVING count, as an integer, matching its sibling.
+  wave: 'state-drift',
+  // TOOL-dTieredTribunal-3 S3 - the SURVIVING count, not the CONFIGURED set. This returned
+  // `LENSES.map((L) => L.slug)`, so a dead lens was invisible to the caller. BREAKING: an array
+  // becomes an integer. The survivor IDENTITIES are not derivable here - `r.lens` is agent-typed
+  // free text and `filter(Boolean)` has already destroyed the index alignment - so they are not
+  // returned under any key rather than guessed at.
   lensesRun: lensOut.length,
   lensesDead,
   skepticsDead,
