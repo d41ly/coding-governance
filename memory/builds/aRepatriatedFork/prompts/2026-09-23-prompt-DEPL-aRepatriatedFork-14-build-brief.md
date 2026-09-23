@@ -40,6 +40,10 @@ used.
   against a pin that is an equality; `bash tools/check-install-prefix.sh` is a BAN on new carried
   `tools/` literals, and its `--write-ratchet` cannot absorb one. Both are single checkers, not
   suites.
+- A kit whose shipped files your commit changes owes a version bump in every carrier, and
+  `python tools/govkit/govkit.py epoch --base f8fdd873` is the gate that now says so: it exits 1
+  naming the kit. Run it after your commit, with `bash tools/check-kit-versions.sh` and
+  `python tools/govkit/govkit.py selfcheck`; fold any bump it asks for into a follow-up commit.
 
 ## What to return
 
