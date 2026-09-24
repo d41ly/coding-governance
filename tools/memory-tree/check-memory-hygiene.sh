@@ -647,7 +647,7 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
           if (k=="F:README.md"||k=="F:RUN.md"||k=="D:prompts"||k=="D:spec"||k=="D:build"||k=="D:reviews") continue
           if (type=="F" && name ~ arre) continue
           # The ENTRY consults the registry exactly as the folder branch above does: a grandfathered
-          # build-root FILE (a pre-governance STATUS.md, say) used to red here while its folder-name
+          # build-root FILE (a pre-governance status file, say) used to red here while its folder-name
           # twin passed. TOOL-aRepatriatedFork-10 S1.
           if ((m "/builds/" folder "/" name) in LEG) continue
           if (type=="F"){ if (name !~ rre) print m "/builds/" folder "/" name }

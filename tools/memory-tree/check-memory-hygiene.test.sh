@@ -2670,7 +2670,7 @@ done
 # ---- the red these arms read, and `zz-probe.txt` is an unlisted registry whose check-3 finding
 # ---- proves check 3 RAN before its silence about `pass-order-waiver.txt` is read as a pass.
 mkdir -p "$_b1/memory/builds/tOne/build"
-printf 'status\n' > "$_b1/memory/builds/tOne/STATUS.md"
+printf 'status\n' > "$_b1/memory/builds/tOne/NOTES.md"
 printf '# a build record\n\nno serves line\n' > "$_b1/memory/builds/tOne/build/2026-08-01-build-tOne-1.md"
 printf '{"a": 1}\n' > "$_b1/memory/builds/tOne/build/result.json"
 printf '# pass-order waivers\n' > "$_b1/memory/project/pass-order-waiver.txt"
@@ -2680,8 +2680,8 @@ printf '# legacy\n' > "$_b1/memory/project/legacy-files.txt"
 write_pk_conf 'RECORD_UNBOUND_PIN="9"'; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
-  *"HYGIENE check 4 FAILED"*"memory/builds/tOne/STATUS.md"*) echo "ok   check 4: an UNLISTED build-root STATUS.md reds" ;;
-  *) echo "FAIL check 4: an unlisted build-root STATUS.md did not red — the entry arm's control is dead"; st=1 ;;
+  *"HYGIENE check 4 FAILED"*"memory/builds/tOne/NOTES.md"*) echo "ok   check 4: an UNLISTED build-root NOTES.md reds" ;;
+  *) echo "FAIL check 4: an unlisted build-root NOTES.md did not red — the entry arm's control is dead"; st=1 ;;
 esac
 n=$((n+1))
 case "$o" in
@@ -2704,13 +2704,13 @@ case "$o" in
   *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registry pass-order-waiver.txt by name" ;;
   *) echo "FAIL check 3 did not name the unlisted zz-probe.txt, so its silence about pass-order-waiver.txt proves nothing"; st=1 ;;
 esac
-printf '# legacy\nmemory/builds/tOne/STATUS.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"
+printf '# legacy\nmemory/builds/tOne/NOTES.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10-legacy --no-verify ) >/dev/null 2>&1
 write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="9"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
-  *"memory/builds/tOne/STATUS.md"*) echo "FAIL check 4: a build-root STATUS.md legacy-files.txt lists still reds — the entry branch ignores LEG"; st=1 ;;
-  *) echo "ok   check 4: a legacy-listed build-root STATUS.md is grandfathered" ;;
+  *"memory/builds/tOne/NOTES.md"*) echo "FAIL check 4: a build-root NOTES.md legacy-files.txt lists still reds — the entry branch ignores LEG"; st=1 ;;
+  *) echo "ok   check 4: a legacy-listed build-root NOTES.md is grandfathered" ;;
 esac
 n=$((n+1))
 case "$o" in

@@ -308,7 +308,7 @@ unchanged:
 | Carve-out shape | Route |
 |---|---|
 | an extra registry under `<MEMORY_ROOT>/project/` | `PROJECT_REGISTRY_EXTRA` in `.memory-tree.conf` |
-| a pre-governance file or folder name — a build-root `STATUS.md`, a free-named record, an unbound old record | a row in `<MEMORY_ROOT>/project/legacy-files.txt`, which checks 4, 5 and 21 all read |
+| a pre-governance file or folder name — a build-root status file, a free-named record, an unbound old record | a row in `<MEMORY_ROOT>/project/legacy-files.txt`, which checks 4, 5 and 21 all read |
 | undated build artifacts, a JSON result or an HTML report, that cannot carry a Serves line | `RECORD_UNDATED_ARTIFACTS="exempt"`, which prints its exempted count on every run |
 | a rule gov does not have | a project leg in the gate manifest, above |
 
@@ -317,7 +317,7 @@ repo's figure is a render gap, and `INDEX_CAP_LINES` and `ENTRY_CAP_UNIT` now re
 A registry a KIT ships, such as `pass-order-waiver.txt`, is admitted by name.
 
 **The worked instance is NicoCares**, measured 2026-09-23 by running gov's engine over its tree:
-its registries under `project/` go to `PROJECT_REGISTRY_EXTRA`; its ten build-root `STATUS.md`
+its registries under `project/` go to `PROJECT_REGISTRY_EXTRA`; its ten build-root status
 files and thirteen run-protocol records go to `legacy-files.txt`; its undated JSON, HTML and Python
 artifacts go to `RECORD_UNDATED_ARTIFACTS`; and its check 90 becomes the project leg worked below.
 The per-carve-out table is the spec for the unit that shipped these routes, `TOOL-aRepatriatedFork-10`

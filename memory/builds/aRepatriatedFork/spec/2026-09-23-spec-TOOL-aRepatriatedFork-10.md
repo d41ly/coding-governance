@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts
 
-**Status:** CLOSED · rev-7 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-8 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -311,6 +311,11 @@ New arm: `tools/lib/resolve-python.test.sh` · a `derive_kit_paths` parity row, 
 - rev-7 · 2026-09-24 · S7: gate repair at VERIFYING, leg `kit placeholders`. A value opening with a
   `<...>` placeholder is a format description, not a conf value; the template's `ARMS_FLOORS` format
   line, older than this build, read as gov's value once `TOOL-aRepatriatedFork-9` declared the key.
+- rev-8 · 2026-09-24 · S1: gate repair at VERIFYING, leg `dead-path carriers`. `STATUS.md` is a
+  basename this repo deleted, so the prose this unit wrote naming it, two lines of the memory-tree
+  README and one comment in `check-memory-hygiene.sh`, now says "status file", and S1's two check-4
+  arms in `check-memory-hygiene.test.sh` build `NOTES.md`: the arms grade the entry branch's LEG
+  lookup, which no particular filename owns. The waiver file is shrink-only, so no row was added.
 
 ## 10. Reuse audit
 

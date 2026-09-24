@@ -260,3 +260,5 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T09:24:12Z dispatch · item a5b0124a TOOL-aRepatriatedFork-8 · reason .githooks/pre-push memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md tools/unattended/check-unattended.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-6.md tools/memory-tree/README.md tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-10.md
 
 2026-09-24T09:24:18Z brief · item TOOL-aRepatriatedFork-8 · reason a2030117ff07 memory/builds/aRepatriatedFork/prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-8-repair-r4-brief.md
+
+2026-09-24T09:35:26Z dispatch · item 6cd239fc TOOL-aRepatriatedFork-8 · reason memory/guides/SESSION-KICKOFF.md
