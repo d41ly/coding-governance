@@ -1002,6 +1002,10 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
             f.pop("implements", None)
     (ctl / ".governance" / "install.json").write_text(json.dumps(crec, indent=2),
                                                       encoding="utf-8", newline="\n")
+    # No [[own]] row in the control, or closing review round 1 M4's refusal of an `engine` row the
+    # target declares owned would withhold the re-stamp too, and the control would prove less.
+    (ctl / ".governance" / "deploy.toml").write_text(OWN_DEPLOY.split("[[own]]")[0],
+                                                     encoding="utf-8", newline="\n")
     settle(ctl, "control receipt")
     p = run_govkit("update", "--target", str(ctl), "--write")
     check("[aRF-13 AC4] the control: the same row recorded `unattributed` withholds the re-stamp",
@@ -1086,6 +1090,33 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
           p.returncode == 1 and "[[own]] row 1" in p.stdout and "leaves the target repository"
           in p.stdout and dirty == "" and rp.read_bytes() == before, p.stdout + p.stderr + dirty)
 
+    # DEPL-aRepatriatedFork-13 S1, closing review round 1 M3. Every reader joins the owned path on
+    # its exact string, so a second spelling of the same file matched no destination, and apply
+    # wrote gov's bytes over the program the target declared its own. Each spelling is refused.
+    for spelt in ("./tools/demo/run.py", "tools//demo/run.py", "tools/demo/./run.py"):
+        (t / ".governance" / "deploy.toml").write_text(
+            OWN_DEPLOY.format(path=spelt, impl="demo:run.py"), encoding="utf-8", newline="\n")
+        settle(t, "a non-canonical spelling")
+        p = run_govkit("apply", "--target", str(t), "--resume", "--write")
+        check(f"[aRF-13 M3] the non-canonical [[own]] path {spelt!r} refuses apply, naming the row, "
+              f"and the owned bytes stand",
+              p.returncode == 1 and "[[own]] row 1" in p.stdout and "is not canonical" in p.stdout
+              and (t / "tools" / "demo" / "run.py").read_text(encoding="utf-8") == lacking,
+              p.stdout[-1200:] + p.stderr)
+
+    # DEPL-aRepatriatedFork-21 S2, closing review round 1 residual (e). A FIRST apply over an owning
+    # target has no receipt row to carry, so it builds one; the row carries every key adopt's does.
+    f1 = make_target(tmp / "first", OWN_DEPLOY.format(path="tools/demo/run.py", impl="demo:run.py"))
+    (f1 / "tools" / "demo").mkdir(parents=True)
+    (f1 / "tools" / "demo" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
+    settle(f1, "the target's own program")
+    p = run_govkit("apply", "--target", str(f1))
+    frow = next((f for f in json.loads((f1 / ".governance" / "install.json").read_text(
+        encoding="utf-8"))["files"] if f["path"] == "tools/demo/run.py"), {})
+    check("[aRF-21 residual e] a first apply builds the owned row with adopt's keys, oid included",
+          frow.get("role") == "adopter-owned" and sorted(frow) == sorted(adopted or {})
+          and frow.get("oid") == (adopted or {}).get("oid"), json.dumps(frow) + p.stdout[-600:])
+
     # AC4 — no [[own]] rows: gov's run.py lands as `engine` and no owned skip is printed.
     n = make_target(tmp / "non", SAFE_DEPLOY)
     run_govkit("apply", "--target", str(n))
@@ -1099,6 +1130,26 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
           p.returncode == 0 and "adopter-owned" not in p.stdout and nrow.get("role") == "engine"
           and (n / "tools" / "demo" / "run.py").read_text(encoding="utf-8") == OWN_RUN,
           p.stdout + p.stderr + json.dumps(nrow))
+
+    # DEPL-aRepatriatedFork-13 S2, closing review round 1 M4. The operator declares the file their
+    # own AFTER it landed as `engine`, and gov moves it. `update` and `check` read the declaration
+    # too, so the write is refused naming `adopt --re-adopt`, rather than merged into their program.
+    (n / ".governance" / "deploy.toml").write_text(
+        OWN_DEPLOY.format(path="tools/demo/run.py", impl="demo:run.py"), encoding="utf-8",
+        newline="\n")
+    settle(n, "the operator declares run.py their own")
+    (g / "tools" / "demo" / "run.py").write_text(OWN_RUN + "# v2\n", encoding="utf-8", newline="\n")
+    git(g, "commit", "-qam", "gov moves run.py")
+    p = run_govkit("update", "--target", str(n), "--write")
+    check("[aRF-13 M4] update --write refuses an engine row the target declares owned, naming "
+          "adopt --re-adopt, and writes nothing into it",
+          p.returncode == 1 and "tools/demo/run.py" in p.stdout and "adopt --re-adopt" in p.stdout
+          and (n / "tools" / "demo" / "run.py").read_text(encoding="utf-8") == OWN_RUN,
+          p.stdout[-1500:] + p.stderr)
+    p = run_govkit("check", "--target", str(n))
+    check("[aRF-13 M4] ...and check names the same row instead of saying nothing",
+          p.returncode == 1 and "declares 'tools/demo/run.py' adopter-owned" in p.stdout
+          and "adopt --re-adopt" in p.stdout, p.stdout[-1500:])
 
 
 SAFE_REG = ('[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo"]\n\n'

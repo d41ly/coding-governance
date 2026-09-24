@@ -1065,6 +1065,12 @@ def resolve_owned_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                 and isinstance(why, str) and why.strip()):
             raise Refusal(f"{where} needs `path`, `implements = \"<entry>:<source>\"` and a `why`")
         demand_contained_dest(demand_safe_token("own.path", path, where), where)
+        # Closing review round 1 M3. Every reader joins on this exact string, so `./x` or `a//x`
+        # matched no destination and the owned file was written as engine. Refused, never re-keyed:
+        # the operator's spelling is wrong, and a silent re-key would hide that from them.
+        if path != posixpath.normpath(path):
+            raise Refusal(f"{where}: '{path}' is not canonical — spell it "
+                          f"'{posixpath.normpath(path)}', because every reader joins on the exact path")
         if path in out:
             raise Refusal(f"{where} declares '{path}' a second time")
         eid, _, rel = impl.partition(":")
@@ -1086,6 +1092,34 @@ def resolve_owned_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
             raise Refusal(f"{where}: '{path}' is not a file in the target")
         out[path] = {"entry": eid, "source": src, "implements": impl, "why": why, "dests": dests}
     return out
+
+
+def build_owned_row(dest: str, kit: str, version: str, source: str, own: dict, data: bytes,
+                    oid: str | None) -> dict:
+    """DEPL-aRepatriatedFork-13 S2. The ONE shape of an `adopter-owned` receipt row, which `adopt`
+    and `apply` both build (closing review round 1 residual e): a key added to one copy was
+    silently missing from the other. No `commit` or `gov_oid`, because gov never supplied the
+    bytes. `sha256` is the target's own bytes, and `oid` its index blob where one was read."""
+    row = {"path": dest, "role": "adopter-owned", "kit": kit, "version": version,
+           "source": source, "sha256": hashlib.sha256(data).hexdigest()}
+    if oid is not None:
+        row["oid"] = oid
+    row.update({"implements": own["implements"], "why": own["why"], "evidence": "declared"})
+    return row
+
+
+def derive_owned_engine_refusals(rows: list[dict], owned: dict[str, dict]) -> dict[str, str]:
+    """Closing review round 1 M4. An `engine` receipt row at a path the target's `[[own]]` declares.
+
+    `apply` reads the declaration and `update` and `check` read the receipt, so a declaration added
+    after the install left `update --write` merging gov's bytes into the adopter's program. Both
+    verbs call this and refuse the row: `adopt --re-adopt` is what moves the receipt to agree.
+    """
+    return {f["path"]: f"receipt row '{f['path']}' is recorded engine, and the target's deploy.toml declares "
+            f"'{f['path']}' adopter-owned ([[own]] implements '{owned[f['path']]['implements']}'). "
+            f"gov writes nothing there until `govkit adopt --re-adopt --target <this target> "
+            f"--write` records the declaration"
+            for f in rows if f.get("role", "engine") == "engine" and f.get("path") in owned}
 
 
 # ----------------------------------------------------------------------------------- the findings
@@ -3966,6 +4000,16 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
             r.fail(f"[charter] {_k} names a token a selected kit's argv or destination needs. "
                    f"[charter] never reaches an argv, so that value belongs in [answers]")
 
+    # ---- DEPL-aRepatriatedFork-13 S2, closing review round 1 M4. The target's `[[own]]` rows,
+    # ---- through the grader `apply` and `adopt` call, so `check` and `update` cannot answer the
+    # ---- ownership question differently from them.
+    try:
+        _owned_ck = resolve_owned_rows(root, target, deploy, descs)
+        for _msg in derive_owned_engine_refusals(receipt.get("files") or [], _owned_ck).values():
+            r.fail(_msg)
+    except Refusal as e:
+        r.fail(str(e))
+
     # ---- DEPL-dCarriedReceipt-5 S7, call site two of two. The SAME predicate `plan --coverage`
     # ---- runs, so the two verbs cannot disagree about whether a decline is stale. The gap list is
     # ---- computed here rather than passed, because `check` has no plan of its own — and it is what
@@ -6213,11 +6257,16 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 # receipt `adopt` wrote, or, on an apply with none, built in `adopt`'s shape.
                 _prior = next((f for f in (receipt or {}).get("files") or []
                                if f.get("path") == dest and f.get("role") == "adopter-owned"), None)
-                rows.append(_prior or {
-                    "path": dest, "role": "adopter-owned", "kit": eid, "version": vers,
-                    "source": w["src"],
-                    "sha256": hashlib.sha256((target / dest).read_bytes()).hexdigest(),
-                    "implements": _own["implements"], "why": _own["why"], "evidence": "declared"})
+                if _prior is None:
+                    # Mid-write, so a failed index read disposes rather than raises (F4 below).
+                    try:
+                        _oidx, _ = index_read(target, [dest])
+                    except Refusal:
+                        _oidx = {}
+                    _prior = build_owned_row(dest, eid, vers, w["src"], _own,
+                                             (target / dest).read_bytes(),
+                                             (_oidx.get(dest) or (None, None))[1])
+                rows.append(_prior)
                 print(f"govkit apply — SKIPPED [adopter-owned] {dest} <- {eid}: [[own]] implements "
                       f"'{_own['implements']}' — the target owns these bytes")
                 continue
@@ -7675,6 +7724,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
           f"{len(needles)} needle(s), {len(carry_dropped)} fanned-out director(y|ies)")
 
     deploy = load_deploy(target)
+    # ---- DEPL-aRepatriatedFork-13 S2, closing review round 1 M4. The declaration is read here as
+    # ---- `apply` reads it, before any row is dispatched: an `engine` row the target has declared its
+    # ---- own is refused below by name rather than three-way merged into the adopter's program.
+    try:
+        _owned_refusals = derive_owned_engine_refusals(
+            rows_all, resolve_owned_rows(root, target, deploy, descs))
+    except Refusal as e:
+        r.fail(str(e))
+        return r.emit()
 
     # ---- DEPL-dCarriedReceipt-11 S1 + S3. GOV'S OWN RENAMES, once per run, and the resolver that
     # ---- turns one into a destination. PRINTED before the first row is classified, for the reason
@@ -7798,6 +7856,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             r.fail(f"receipt row '{row['path']}' carries role '{role}', which has no row in the "
                    f"update dispatch — refusing rather than classifying it from an absent field")
             continue
+        # Closing review round 1 M4. Never dispatched, so it reaches no write, no rename, no role
+        # move and no `acted` entry; the refusal withholds the re-stamp until `adopt` agrees.
+        if row["path"] in _owned_refusals:
+            r.fail(_owned_refusals[row["path"]])
+            continue
         # DEPL-aRepatriatedFork-13 S2. ABOVE the re-resolution, deliberately: gov's descriptor
         # resolves this path as `engine`, and the role-move branch below would stand the row back as
         # `role-moved`. The role is the TARGET's declaration, which no descriptor can move.
@@ -7848,7 +7911,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # second role routed to the same argv would otherwise silently not follow, and a role
                 # whose disposition is `skip` would fall through and get gov's bytes put back at a
                 # destination gov's own rule says it never supplies.
-                if write and accept_role_moves:
+                # Closing review round 1 M2: ONLY a move whose new disposition writes nothing in this
+                # run. A move into `rendered` is written by the kit's own regenerate later in this
+                # run, so taking the flag there skipped the reconcile below and the edit was lost.
+                if (write and accept_role_moves
+                        and UPDATE_ROLE.get(now) not in KIT_WRITING_DISPOSITIONS):
                     # DEPL-aRepatriatedFork-17 S6. THE MOVE IS RESOLVED WHERE IT IS REPORTED, and
                     # NO BYTE MOVES in this run: `apply` was the named remedy and it writes every
                     # engine destination raw. A move INTO a writing disposition takes `adopt`'s own
@@ -7904,8 +7971,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 r.note(f"row '{row['path']}' landed under role '{role}' and gov's descriptor now "
                        f"declares that destination '{now}', whose own machinery writes it in this "
                        f"run — so it is reconciled as '{role}', the role it landed under, rather "
-                       f"than stood back from. `govkit update --write --accept-role-moves` "
-                       f"re-records the role and writes no byte for it")
+                       f"than stood back from. `--accept-role-moves` does not take this move, "
+                       f"because this run writes that destination either way")
 
         if how == "block":
             # The block's own hash, not the file's. `check` owns the drift verdict; `update` reports
@@ -10660,8 +10727,9 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
         # these bytes are its own, so a vintage inferred for them would be the claim `unattributed`
         # exists to avoid, and one `update` would then write against.
         if _own is not None:
-            row.update({"role": "adopter-owned", "implements": _own["implements"],
-                        "why": _own["why"], "evidence": "declared"})
+            # `resolve_owned_rows` demanded the file and the check above its index entry.
+            row = build_owned_row(dest, p["kit"], p["version"], p["src"], _own,
+                                  (target / dest).read_bytes(), idx[dest][1])
             tally["declared"] = tally.get("declared", 0) + 1
             print(f"  {'declared':<15} [{'adopter-owned':<13}] {dest}")
             rows.append(row)

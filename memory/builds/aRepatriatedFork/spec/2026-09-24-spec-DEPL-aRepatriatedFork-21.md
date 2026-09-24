@@ -1,11 +1,12 @@
 # DEPL-aRepatriatedFork-21 — apply never lands gov's bytes on a file the target owns
 
-**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base 7308f088 · streams deployer · order 3
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base 7308f088 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md) | journal | DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-17 |
 | [2026-09-24-build-DEPL-aRepatriatedFork-21-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-21-1-acceptance-ledger.md) | journal | — |
 | [2026-09-24-prompt-DEPL-aRepatriatedFork-21-build-brief.md](../prompts/2026-09-24-prompt-DEPL-aRepatriatedFork-21-build-brief.md) | journal | — |
 | [2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-21 |
@@ -31,8 +32,9 @@ build introduced. This unit makes `apply` honour the declaration exactly as `upd
   own copy of a stood-in source, and it keeps landing per `DEPL-aRepatriatedFork-13` §8 F2. It
   prints one line per skipped destination naming the path and the `[[own]]` row, and its receipt
   keeps the row `adopter-owned` rather than re-recording it `engine`: carried verbatim from the
-  receipt where that row is already `adopter-owned`, else built in `adopt`'s shape from the
-  declaration. Observed by AC1, AC2.
+  receipt where that row is already `adopter-owned`, else built from the declaration by
+  `build_owned_row`, the one builder `adopt` also calls, so the two rows carry the same keys,
+  `oid` included. Observed by AC1, AC2, AC5.
   **Readers:** by name: `_cmd_apply`'s own write loop is the only reader of the write set it
   filters. by value: `update` and `check` read the receipt row's role, which S2 leaves
   `adopter-owned` exactly as `adopt` wrote it.
@@ -63,8 +65,9 @@ observes the overwrite on `7308f088`'s bytes before anything is changed.
 
 ### Inventory
 
-No new function. `_cmd_apply` gains one call to `resolve_owned_rows` and a filter over its write
-set, both in `tools/govkit/govkit.py`.
+`_cmd_apply` gains one call to `resolve_owned_rows` and a filter over its write set, both in
+`tools/govkit/govkit.py`. `build_owned_row`, a `py.function` with verb `build`, is the one
+`adopter-owned` row shape `apply` and `adopt` both call.
 
 ### Rollout
 
@@ -111,6 +114,10 @@ Additive. A target with no `[[own]]` rows never reaches the new branch, which AC
 - **AC4** — When `apply --resume --write` runs on a fixture with no `[[own]]` rows, its output and
   its receipt are byte-identical to `7308f088`'s.
   Red when: the new branch changes behaviour for a target that never declared ownership.
+- **AC5** — When a FIRST `apply` runs on a fixture whose deploy descriptor declares one `[[own]]`
+  row and which has no receipt, the owned row it records carries exactly the keys `adopt` records
+  for the same file, `oid` included.
+  Red when: a key one builder adds is missing from the other's row.
 
 ## 7. Gates
 
@@ -130,6 +137,9 @@ none
   source, so for a stand-in at another path it names gov's own copy, and skipping every member
   would stop landing the copy §3's second non-goal keeps. Only the owned path is skipped. S2 also
   states where the kept row comes from. AC1-AC4 unchanged.
+- rev-3 · 2026-09-24 · closing review round 1 residual (e). S2: the fallback row is built by
+  `build_owned_row`, shared with `adopt`, and gains the `oid` the literal lacked; AC5 added.
+  Section 4 inventory names the builder.
 
 ## 10. Reuse audit
 

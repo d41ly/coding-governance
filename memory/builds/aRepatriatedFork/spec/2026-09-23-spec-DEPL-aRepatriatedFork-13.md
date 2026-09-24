@@ -1,12 +1,13 @@
 # DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"
 
-**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer+tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer+tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-24-build-DEPL-aRepatriatedFork-13-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-13-1-acceptance-ledger.md) | journal | — |
+| [2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md) | journal | DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-21 |
 | [2026-09-23-prompt-DEPL-aRepatriatedFork-13-build-brief.md](../prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-13-build-brief.md) | journal | — |
 | [2026-09-24-prompt-DEPL-aRepatriatedFork-13-fold-b-brief.md](../prompts/2026-09-24-prompt-DEPL-aRepatriatedFork-13-fold-b-brief.md) | journal | — |
 | [2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
@@ -33,7 +34,10 @@ call, and stands down the holes that only gov's own engine could discharge.
   `forked` source is refused, because each of those already states who owns the bytes, and so is
   a source ANY such rule reaches beside an `engine` one. `adopt` also refuses a row whose entry is
   not in the target's selection, and one whose `path` the target's index does not track, because
-  the row's `oid` is read from there. Observed by AC1, AC2.
+  the row's `oid` is read from there. A `path` that is not already its own
+  `posixpath.normpath` is refused by name, with the canonical spelling: every reader joins on the
+  exact string, so `./x` matched no destination and the owned file was written as `engine`.
+  Observed by AC1, AC2, AC11.
 - **S2** — THE ROLE. `UNLANDED_REASON` (`govkit.py:245-257`) gains `adopter-owned`, and
   `UPDATE_ROLE` (`govkit.py:6186-6207`) maps it to a new disposition, `contract`. `ROLE_KINDS` does
   NOT gain it: that table is the vocabulary a DESCRIPTOR may spell (selfcheck arm 3b), and this role
@@ -44,7 +48,11 @@ call, and stands down the holes that only gov's own engine could discharge.
   `EVIDENCE_STATES` (`govkit.py:9503`) gains `declared`. The row is NOT counted by the
   `unattributed` tally, so it never withholds the `gov_commit` re-stamp. `cmd_check`'s integrity
   arm already skips every role other than `engine` (`govkit.py:3750`) and so skips it
-  unchanged. Observed by AC3, AC4.
+  unchanged. `update` and `check` also read the `[[own]]` declaration through
+  `resolve_owned_rows` before dispatch, as `apply` does: an `engine` receipt row whose path the
+  target declares owned is refused by name with `adopt --re-adopt` as the remedy, and `update`
+  never dispatches it, so nothing is written into it. The receipt then withholds its re-stamp
+  until `adopt` records the declaration. Observed by AC3, AC4, AC12.
 - **S3** — THE CONTRACT. A kit descriptor declares `[[contract]]` per engine source other kits
   depend on: `source`, `id`, and clauses of two kinds. A `probe` clause is an argv containing the
   new token `{own}` plus an `expect` regex over its stdout. An `imports` clause is a list of module
@@ -201,6 +209,10 @@ What the a7c78ad2 table held and this one does not, and why:
 - `measure_contract_parity(target, contract, own_path)` — `py.function`, snake, verb `measure`.
 - `derive_parity_lines(target, receipt, descs, r)` — `py.function`, snake, verb `derive`. The one
   printer both verbs call.
+- `derive_owned_engine_refusals(rows, owned)` — `py.function`, snake, verb `derive`. The one
+  refusal text `update` and `check` both print, keyed by path.
+- `build_owned_row(dest, kit, version, source, own, data, oid)` — `py.function`, snake, verb
+  `build`. The one shape of an `adopter-owned` receipt row, which `adopt` and `apply` both build.
 - `adopter-owned` — a new `UNLANDED_REASON` and `UPDATE_ROLE` key. `contract` — a new disposition.
   `declared` — a new `EVIDENCE_STATES` member. `{own}` — a new token, resolved only inside a
   `[[contract]]` clause.
@@ -307,6 +319,14 @@ requires `--write` and an explicit `--re-adopt`.
 - **AC10** — When `govkit update` and `govkit check` run on a fixture with no `[[own]]` rows, their
   output is byte-identical to a7c78ad2's.
   Red when: the additive table changes behaviour for a target that never used it.
+- **AC11** — When a fixture `[[own]]` row spells its `path` as `./tools/demo/run.py`,
+  `tools//demo/run.py` or `tools/demo/./run.py`, `apply --resume --write` exits 1 naming the row as
+  not canonical, and the owned file's bytes are unchanged.
+  Red when: a second spelling of the owned path escapes the owned-file skip.
+- **AC12** — When a fixture installed with `run.py` as `engine` then declares it in `[[own]]`
+  without re-adopting, and gov moves `run.py`, `update --write` exits 1 naming the row and
+  `adopt --re-adopt` and leaves the file's bytes unchanged, and `check` names the same row.
+  Red when: `update` merges gov's bytes into a file the target declared its own.
 
 ## 7. Gates
 
@@ -356,6 +376,11 @@ New arm: `tools/govkit/selftest.py` · an `[[own]]` fixture per S item, a non-co
   is re-derived.
 - rev-4 · 2026-09-24 · §3 gains the **hands-off** edge to `DEPL-aRepatriatedFork-21`, which closes the
   gap in `apply` this unit's builder reported.
+- rev-5 · 2026-09-24 · closing review round 1 M3 and M4. S1 (M3): a non-canonical `path` is refused
+  by name, AC11 added. S2 (M4): `update` and `check` read the declaration through
+  `resolve_owned_rows` and refuse an `engine` row at a declared owned path, AC12 added. Section 4
+  inventory gains `derive_owned_engine_refusals` and `build_owned_row`, the second for residual (e),
+  which `DEPL-aRepatriatedFork-21` rev-3 records.
 
 ## 10. Reuse audit
 

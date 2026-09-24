@@ -1,11 +1,12 @@
 # DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did
 
-**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer · order 3
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md) | journal | DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-21 |
 | [2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-DEPL-aRepatriatedFork-17-build-brief.md](../prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-17-build-brief.md) | journal | — |
 | [2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
@@ -67,7 +68,10 @@ as the fork it measures, and every report line describes the tree as it is.
   `update` then grades it through the verdict table like any other engine row. Without the flag the
   row falls through on the role it landed under, exactly as today (`govkit.py:7256-7262`). `plan`
   prints `KEEP` for a `seed` destination that already exists, matching `apply`, which leaves one in
-  place (`govkit.py:5704-5710`). Observed by AC10, AC11, AC15.
+  place (`govkit.py:5704-5710`). The flag takes only a move whose new role's disposition is not
+  in `KIT_WRITING_DISPOSITIONS`: a move into `rendered` is written by the kit's own regenerate in
+  the same run, so it falls through to the reconcile-or-refuse path under the recorded role, and
+  the flag records no role for it. Observed by AC10, AC11, AC15, AC16.
 - **S7** — A KIT'S VERSION IS READ FROM THE TARGET'S BYTES. The per-kit delta prints
   `MIXED across rows` whenever receipt rows carry different `version` strings (`govkit.py:7523`),
   and a pinned row carries the version of its BASE vintage (`govkit.py:9811-9826`), so a kit whose
@@ -262,6 +266,11 @@ narrows a destructive or false outcome rather than adding one.
   newer bytes through the verdict table.
   Red when: the move into a writing role is skipped, which a7c78ad2 does, or bytes move in the
   run that re-records it.
+- **AC16** — When a fixture receipt holds an operator-edited `engine` row whose descriptor now
+  declares it `rendered` under a real `[[regenerate]]`, `update --write --accept-role-moves` exits
+  non-zero naming the three-way conflict, prints no `role-recorded`, and the operator's bytes stand
+  in the target's index.
+  Red when: the flag re-records the role and the regenerate overwrites the edit unreported.
 
 ## 7. Gates
 
@@ -303,6 +312,11 @@ New arm: `tools/govkit/selftest.py` · one fixture per scope item, each first ru
   directory with it. Section 4 files touched: no `tools/unattended/kit.toml` edit and no
   `tools/govkit/README.md`. AC13 is observed in the selftest's `-13` gate-leg block, which already
   builds a manifest runner, and that block's older refusal arm now carries a differing argv.
+- rev-3 · 2026-09-24 · closing review round 1 M2. S6: `--accept-role-moves` takes only a move whose
+  new disposition is not in `KIT_WRITING_DISPOSITIONS`, so a move into `rendered` keeps the
+  reconcile-or-refuse path; AC16 added, observed in `tools/govkit/matrix.py`'s role-move block,
+  whose `rr-edited` fixture it reuses. That block's remedy arm now reads `--accept-role-moves`,
+  the remedy S6 put in place of `apply`.
 
 ## 10. Reuse audit
 

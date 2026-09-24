@@ -956,6 +956,9 @@ Then run `govkit adopt --re-adopt --write`. The row is recorded `adopter-owned` 
 `evidence: "declared"` and no gov vintage. After that:
 
 - `update` counts it under `adopter-owned`, writes it in neither direction, and still re-stamps.
+- `update` and `check` read the same `[[own]]` rows. A row declared after the file landed is still
+  recorded `engine` until you re-adopt, so both refuse that row by name, `update --write` writes
+  nothing into it, and the refusal names `adopt --re-adopt` as the step that makes them agree.
 - `apply`, `--resume` included, reads the same `[[own]]` rows before it writes anything. It skips
   the owned path with one `SKIPPED [adopter-owned]` line and keeps the row `adopter-owned`. A
   malformed row stops it at exit 1, the same way it stops `adopt`.
@@ -970,8 +973,9 @@ Then run `govkit adopt --re-adopt --write`. The row is recorded `adopter-owned` 
 - Your file may sit at a different path from gov's copy, as a stand-in. Gov keeps landing its own
   copy, and each run prints one line saying whether any emitted leg runs it.
 
-`adopt` exits 1 and names the row when `path` carries anything outside the strict path class or
-leaves the repository. It does the same when `implements` names a source gov ships as a seed, or
+`adopt` exits 1 and names the row when `path` carries anything outside the strict path class,
+leaves the repository, or is not canonical: `./x`, `a//x` and `a/./x` are refused and the
+canonical spelling is named, because every reader matches the exact path. It does the same when `implements` names a source gov ships as a seed, or
 as rendered, generated, forked or project-owned, because each of those already says who owns the
 bytes. It also exits 1 when the entry is not in your selection, and when your index does not track
 `path`. The declaration is a bridge, not a fork: once your program converges onto gov's, delete the
@@ -1151,7 +1155,9 @@ declares now, prints `role-recorded` for it, and writes no byte; the line then s
 A move INTO `engine` first takes the attribution walk `adopt` runs, so the row is recorded
 `vintage-match` when your bytes descend from a gov vintage and `unattributed` when they do not, and
 the NEXT `update --write` grades it through the verdict table like any other engine row. `apply`
-is not the remedy: it writes every engine destination raw. The flag is opt-in for one release.
+is not the remedy: it writes every engine destination raw. The flag is opt-in for one release,
+and it does not take the exception below: that run writes the destination either way, so the row
+is still reconciled, and refused on a conflict.
 
 **The exception is the move where standing back would protect nothing.** Where the role gov now
 declares is served by that kit's own re-render — the argv an `update` runs for every kit it touches —

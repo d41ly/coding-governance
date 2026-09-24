@@ -768,6 +768,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "build_owned_row",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "build_owner_positions",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -2431,6 +2436,11 @@
       "id": "derive_node_tag",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_owned_engine_refusals",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_parity_lines",
