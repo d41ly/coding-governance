@@ -26,6 +26,23 @@ e2e` (606 s bound; it passed in 158 s serially at the same HEAD) and `unattended
 selftest` (330 s bound). Report whether either is a hang by running its failing-free question the
 smallest way you can; do not change a bound.
 
+## Diagnosed by the first attempt, which --dispatch refused before any write
+
+A first pass reproduced all of the above by slicing, then stopped at a stale dispatch the main loop
+has since closed. Its findings, to re-verify rather than re-derive:
+
+- driver `and so does the checker`: a TEST defect. The arm greps `baseline_units ` in
+  `check-unattended.sh`, and fold E's header comment (about `:2914`) names it, so the comment counts
+  as a second call. Strip comment lines before counting, on both sides; the expectation of 1 stays.
+- shard 8/8 `unexpected: build-brief.md`: a PRODUCT defect in check 34. Its key pattern `/^[^ :]+:/`
+  reads a timestamped row (`2026-08-21T00:00:00Z dispatch · ...`) inside `## Run facts` as the key
+  `2026-08-21T00`. Match `/^[^ :]+: /` and take the key as `substr($0, 1, RLENGTH - 2)`, so check 34
+  grades exactly what `fact`/`fact_of` read. That moves shipped bytes: unattended 1.36 -> 1.37 in
+  every carrier.
+- resume-tick AC1/AC2 and the two killed rows: pool contention. Sliced alone at HEAD and before fold
+  E, AC2 took 3-4 s and AC1 5-7 s; runlog-writer's arms took 13 s and adopter e2e's arm 1 took 6 s. No
+  change owed.
+
 ## How to repair
 
 - Reproduce each failure at HEAD by SLICING its suite (the prologue plus the failing block) or by
