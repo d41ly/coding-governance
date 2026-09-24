@@ -696,7 +696,7 @@ def check_pytest_ini_probe(tmp: pathlib.Path) -> None:
     cmd = next(h for h in tomllib.loads((HERE.parents[1] / "tools" / "pytest-parallel-guardrails" /
                                           "kit.toml").read_text(encoding="utf-8"))["hole"]
                if h["id"] == "pytest-ini-knobs")["discharge"]["command"]
-    q = subprocess.run([sys.executable, *cmd[1:]], cwd=str(t), capture_output=True, text=True)
+    q = subprocess.run([sys.executable, *cmd[1:]], cwd=str(t), capture_output=True, text=True, encoding="utf-8")
     check("[aRF-14 AC2] ...and its probe says no pytest configuration is tracked",
           q.returncode != 0 and "no tracked pyproject.toml carries" in q.stderr, q.stderr)
 
@@ -1424,9 +1424,9 @@ def check_fragment_wiring(tmp: pathlib.Path) -> None:
     def test_wired(n: str) -> bool:
         return subprocess.run([sys.executable, "tools/settings-merge.py", "--check", "--fragment",
                                f"tools/unattended/{n}.fragment.json"], cwd=t,
-                              capture_output=True, text=True).returncode == 0
+                              capture_output=True, text=True, encoding="utf-8").returncode == 0
     subprocess.run([sys.executable, "tools/settings-merge.py", "--fragment",
-                    "tools/unattended/gate-guard.fragment.json"], cwd=t, capture_output=True, text=True)
+                    "tools/unattended/gate-guard.fragment.json"], cwd=t, capture_output=True, text=True, encoding="utf-8")
     check("fragment wiring: the fixture starts with gate-guard alone wired",
           test_wired("gate-guard") and not test_wired("stop-guard"))
     added = gk.run_fragment_merges(t, rows, landed, set(), "update")

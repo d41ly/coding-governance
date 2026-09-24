@@ -2482,7 +2482,7 @@ def read_grammar(conf: str, ids: str, *paths: str) -> dict:
     root, kitdir = make_repo(conf=conf)
     try:
         p = subprocess.run([sys.executable, "-c", _GRAMMAR_PROBE, str(kitdir), ids, *paths],
-                           cwd=str(root), capture_output=True, text=True)
+                           cwd=str(root), capture_output=True, text=True, encoding="utf-8")
         assert p.returncode == 0, f"the probe could not import extract under this conf:\n{p.stderr}"
         return json.loads(p.stdout)
     finally:
@@ -2564,7 +2564,7 @@ def test_build_qid_cutoff_is_read_from_conf():
         root, kitdir = make_repo(conf=CONF + f'RECALL_BUILD_QID_CUTOFF="{value}"\n')
         try:
             out[label] = subprocess.run([sys.executable, "-c", snippet, str(kitdir)],
-                                        cwd=str(root), capture_output=True, text=True)
+                                        cwd=str(root), capture_output=True, text=True, encoding="utf-8")
         finally:
             cleanup(root)
     assert out["pair"].stdout.split() == ["163", "0"], (

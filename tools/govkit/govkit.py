@@ -4057,7 +4057,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
             # filter makes of the file is compared against the blob the row recorded; a real byte
             # change still differs there, so this narrows a false red and hides no content change.
             _cl = subprocess.run(["git", "-C", str(target), "hash-object", f"--path={path}",
-                                  "--", str(dp)], capture_output=True, text=True, check=False)
+                                  "--", str(dp)], capture_output=True, text=True, encoding="utf-8", check=False)
             # `blob_oid(raw) != oid` IS THE HALF THAT KEEPS A TAMPERED `sha256` RED: where the
             # filter changes nothing, the raw bytes ARE the blob and the difference is the receipt's.
             if (row.get("oid") and _cl.returncode == 0 and _cl.stdout.strip() == row["oid"]
@@ -4639,7 +4639,7 @@ def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str]
     for p, kit in frags:
         argv = [sys.executable, sm, settings, "--fragment", p]
         if subprocess.run(argv + ["--check"], cwd=str(target), capture_output=True,
-                          text=True).returncode == 0:
+                          text=True, encoding="utf-8").returncode == 0:
             print(f"govkit {verb} — hooks: {p} already wired")
             continue
         # ABSENT OR STALE, asked of settings-merge itself on a scratch copy: `--check` reds on both,
@@ -4650,9 +4650,9 @@ def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str]
                 probe = pathlib.Path(td) / "settings.json"
                 probe.write_bytes((target / settings).read_bytes())
                 subprocess.run([sys.executable, sm, str(probe), "--unwire", "--fragment", p],
-                               cwd=str(target), capture_output=True, text=True)
+                               cwd=str(target), capture_output=True, text=True, encoding="utf-8")
                 stale = probe.read_bytes() != (target / settings).read_bytes()
-        out = subprocess.run(argv, cwd=str(target), capture_output=True, text=True)
+        out = subprocess.run(argv, cwd=str(target), capture_output=True, text=True, encoding="utf-8")
         if out.returncode != 0:
             print(f"govkit {verb} — hooks: {p} REFUSED by settings-merge (exit {out.returncode}): "
                   + ((out.stderr or out.stdout).strip().splitlines() or ["no output"])[-1])
@@ -4673,7 +4673,7 @@ def remove_wired_fragments(target: pathlib.Path, rows: list[dict], frags: list[s
     settings = os.environ.get("GOV_SETTINGS_JSON") or ".claude/settings.json"
     for p in frags:
         out = subprocess.run([sys.executable, str(sm), settings, "--unwire", "--fragment", p],
-                             cwd=str(target), capture_output=True, text=True) if sm else None
+                             cwd=str(target), capture_output=True, text=True, encoding="utf-8") if sm else None
         print(f"govkit {verb} — hooks: {p} "
               + ("unwired by the rollback" if out is not None and out.returncode == 0 else
                  "could NOT be unwired by the rollback; remove its entry from " + settings + " by hand"))
@@ -10440,7 +10440,7 @@ def derive_nearest_vintage(root: pathlib.Path, src: str, ours: bytes,
     """
     import difflib  # noqa: PLC0415 — only this opt-in walk needs it
     out = subprocess.run(["git", "-C", str(root), "log", "--format=%H", to_commit, "--", src],
-                         capture_output=True, text=True, check=False)
+                         capture_output=True, text=True, encoding="utf-8", check=False)
     mine = ours.decode("utf-8", "replace").splitlines()
     best: tuple[str, int] | None = None
     seen: dict[str, int] = {}
@@ -10482,7 +10482,7 @@ def demand_adopt_index_clean(target: pathlib.Path, planned: set[str] | None = No
     staged = sorted({n for n in out.stdout.split("\0") if n})
     if planned is not None:
         wt = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "-z"],
-                            capture_output=True, text=True, check=False)
+                            capture_output=True, text=True, encoding="utf-8", check=False)
         dirty = sorted({n for n in wt.stdout.split("\0") if n} & planned)
         if dirty:
             raise Refusal(
@@ -10970,7 +10970,7 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     if staged:
         # S5. STAGED WITH THE BYTES IT MEASURED, so the fork edit and its receipt are one commit.
         _ga = subprocess.run(["git", "-C", str(target), "add", "--", *ADOPT_STAGED_RECEIPT],
-                             capture_output=True, text=True, check=False)
+                             capture_output=True, text=True, encoding="utf-8", check=False)
         if _ga.returncode != 0:
             r.fail(f"--staged: the receipt was written and `git add` would not stage it: "
                    f"{_ga.stderr.strip()}")
