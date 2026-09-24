@@ -148,6 +148,9 @@ it.
      `install-guards.ps1:121`.
    - `CLAUDE.md:183` and `.claude/SESSION-KICKOFF.md:236`.
    - Delete `check-docs-hygiene.sh`, its test and `hygiene-parity.test.sh`.
+   - The reader list above came from a search for the file's NAME. A search for its values is
+     still owed: leg counts, testsuite-count rows, and the scope table in `gate-scope.json`. Those
+     can assert on a count of legs or arms without ever spelling the name.
 4. **The rest of S3.**
    - Fold the 18 `STATUS.md` files and the three root memory files. The root files are
      `backend-test-harness.md`, `browser-preview.md` and `review-workflow-protocol.md`.
