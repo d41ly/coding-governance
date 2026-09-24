@@ -9,8 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-witness: 31cdaa009da5118cad4674dffd672a3ab6cc76d8
-phase: BUILDING
+witness: d393c445005dd56210181a7248c0a99fb9d6b947
+phase: VERIFYING
 mode: slug
 run-branch: refs/heads/branch/arepatriated-fork-build-e42158
 anchor-kind: default-branch
