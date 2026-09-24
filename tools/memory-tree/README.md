@@ -187,6 +187,10 @@ kit ships one. Shrink-only, stale-signature and vanished-gate refusals apply to 
 central file, and a branch pinned in both is refused. Delete any row of your own central pin that a
 sidecar now carries.
 
+**A signature drops a `$(...)` command substitution** the way it drops a variable, because no run
+prints the call's source. A pin row of yours whose signature carried one now reads as stale:
+re-key it from the row `--emit-pin` prints.
+
 ## Notes
 
 - Determinism: the scripts export `LC_ALL=C` and emit LF, and the build index normalises CR before it
