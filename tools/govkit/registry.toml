@@ -271,10 +271,6 @@ why = "THIS repository's gate policy, deliberately not shipped. `.githooks/pre-p
 path = ".githooks/pre-commit.test.sh"
 why = "gov's own red/green self-test of the reference branch-guard block. The runbook prescribes copying the BLOCK into the target's own pre-commit, not this file."
 
-[[exempt]]
-path = "skills/session-kickoff/manifest-check.test.sh"
-why = "not prescribed for copy anywhere in the runbook, unlike the check-wiring and push-main self-tests which are. The asymmetry is deliberate here and recorded as an open question in the spec rather than resolved by guessing."
-
 [[exempt_leg]]
 name = "hook destinations (every declared hook path ships)"
 why = "it resolves gov's own descriptors through `tools/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
@@ -357,7 +353,7 @@ the deployer's own arms. Same reason as its selfcheck: the deployer does not tra
 [[exempt_leg]]
 name = "manifest-check self-test"
 why = """
-gov's own red/green proof of the ratchet. The ratchet ITSELF is deployed and is claimed by the kickoff-manifest entry; this self-test is not prescribed for copy anywhere in the runbook, and that asymmetry is deliberate.
+gov's own red/green proof of the ratchet. The ratchet ITSELF is deployed and is claimed by the kickoff-manifest entry; this self-test is not prescribed for copy anywhere in the runbook, and that asymmetry is deliberate. Since TOOL-aRepatriatedFork-18 the FILE ships beside the engine, because every adopter's check-arms reads it for the ratchet's arms; the LEG stays gov's, which is this row.
 """
 
 [[exempt_leg]]
@@ -466,7 +462,7 @@ why = "it runs `selftest.py`, which `tools/drift-audit/kit.toml` withholds with 
 
 [[exempt_leg]]
 name = "line-length gate selftest"
-why = "it runs `check-line-length.test.sh`, which `tools/govkit/entries/check-line-length.kit.toml` withholds with `role = \"project-owned\"`. Two reasons, and the second is the harder one: the suite stages a break into a copy of a checker beside it, so its subject is the checker (owner ruling 2026-08-23, applied to what SHIPS); AND since TOOL-aQuenchedHarness-6 ported it onto `tools/lib/lib-selftest.sh`, which is gov-internal and travels to nobody, a shipped copy would red on arrival with `build_fixture: command not found`. It stays a leg on GOV's bar. TOOL-aQuenchedHarness-6."
+why = "it runs `check-line-length.test.sh`, which `tools/govkit/entries/check-line-length.kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's. Two reasons, and the second is the harder one: the suite stages a break into a copy of a checker beside it, so its subject is the checker (owner ruling 2026-08-23, applied to what SHIPS); AND since TOOL-aQuenchedHarness-6 ported it onto `tools/lib/lib-selftest.sh`, which is gov-internal and travels to nobody, a shipped copy would red on arrival with `build_fixture: command not found`. It stays a leg on GOV's bar. TOOL-aQuenchedHarness-6."
 
 [[exempt_leg]]
 name = "run-selftests self-test"
@@ -498,7 +494,7 @@ why = "it runs `check-verdict-epoch.test.sh`, which `tools/memory-tree/kit.toml`
 
 [[exempt_leg]]
 name = "memory-hygiene self-test"
-why = "it runs `check-memory-hygiene.test.sh`, which `tools/memory-tree/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `check-memory-hygiene.test.sh`, which `tools/memory-tree/kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "row-keyed merge driver replay"
@@ -506,7 +502,7 @@ why = "it runs `merge-rows.test.sh`, which `tools/memory-tree/kit.toml` withhold
 
 [[exempt_leg]]
 name = "method-carriers self-test"
-why = "it runs `check-method-carriers.test.sh`, which `tools/memory-tree/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `check-method-carriers.test.sh`, which `tools/memory-tree/kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "pytest-guardrails self-test"

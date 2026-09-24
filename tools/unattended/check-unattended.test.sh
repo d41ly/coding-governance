@@ -15,8 +15,24 @@ set -u
 # `mutate` and `cp` no-op on a path that does not exist, so the arm asserts against a tree it never
 # changed and passes. The default keeps gov byte-identical; an adopter sets it once, and the arms
 # are run at a foreign prefix to prove the suite still grades.
-KIT_REL="${KIT_REL:-tools/unattended}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-18 S2). It ships beside its gate, so a
+# spelled default resolved only at gov's prefix and nothing ever set it (TOOL-dRetiredFork-39). The
+# block is byte-identical to the canonical copy named on its marker line, gated by the parity table
+# in the resolve-python self-test.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
 
 # ---- THE SHARD CONTRACT — ADOPTED, not reinvented (TOOL-aShardedFloor-3) -------------------------
 # The contract is TOOL-aShardedFloor-2's and its reasoning lives in the head of

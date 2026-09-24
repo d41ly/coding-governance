@@ -39,8 +39,17 @@ role = "engine"
 # copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
+#
+# TOOL-aRepatriatedFork-18 NARROWED THAT TO LEGS (owner, 2026-09-23, section 8 F2 of its spec). The
+# arm-bearing suites -- each the `<stem>.test.sh` sibling of a gate this kit ships -- now ship as
+# `engine`, because `check-arms.py` makes every adopter READ the sibling of every tracked gate for
+# its positive assertions, whether or not they edit the checker. Withheld, each pull shipped gates
+# with new branches and no arms for them, and the adopter's `gate-arms` leg stayed red until someone
+# hand-merged gov's suites. The FILE ships, which check-arms reads; the LEG does not, which is still
+# the ruling, through the `[[exempt_leg]]` rows in govkit's registry. An adopter that
+# forks a gate arms its own branches in `<stem>.local.test.sh`, which no descriptor claims.
 [[files]]
-include = ["check-memory-hygiene.test.sh", "check-method-carriers.test.sh", "check-verdict-epoch.test.sh", "hygiene-parity.test.sh", "merge-rows.test.sh"]
+include = ["check-verdict-epoch.test.sh", "hygiene-parity.test.sh", "merge-rows.test.sh"]
 role = "project-owned"
 
 [[files]]

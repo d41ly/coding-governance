@@ -8,9 +8,28 @@
 #
 # ONE scratch repo, reset between arms. Twenty-six git inits would triple the runtime and buy
 # nothing: every arm's state is reachable from the pristine tree by a checkout and a clean.
-KIT_REL="${KIT_REL:-tools}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-18 S2). It ships beside its gate, so a
+# spelled default resolved only at gov's prefix and nothing ever set it (TOOL-dRetiredFork-39). The
+# block is byte-identical to the canonical copy named on its marker line, gated by the parity table
+# in the resolve-python self-test.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
+# `KIT_REL` used to mean the TOOL ROOT in this one suite and the kit dir in every other; it means
+# the kit dir everywhere now, and the directory holding it is `TOOL_REL`.
+TOOL_REL=$(dirname -- "$KIT_REL")
 SCRIPT="$HERE/unattended.sh"
 # The library is sourced for `read_host_name` and `read_pid_image`: the lease arms compare what
 # `--preflight` recorded against the kit's own probe of this node and this shell's pid, never a
@@ -678,7 +697,7 @@ miss "$out" "preflight OK"
 
 # ...and the remedy it prints names the SCRIPT and its mode, never a bare launcher: the driver's own
 # resolver ban refuses one, and this repo cannot assume a launcher exists on the operator's PATH.
-hit "$out" "the --write mode of $KIT_REL/memory-tree/gen_build_index.py"
+hit "$out" "the --write mode of $TOOL_REL/memory-tree/gen_build_index.py"
 
 # ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
 # that proves the presence test is a grep and not that exit status.
@@ -4569,8 +4588,15 @@ if [ -f "$STC" ]; then
   sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
   git mv memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tRun/spec/one.md
   rm -f tools/check-spec-tokens.py tools/gate-legs.json memory/project/spec-token-waivers.txt .memory-tree.conf
+elif [ -f "$HERE/../govkit/registry.toml" ]; then
+  # A KIT SOURCE, whose govkit registry sits beside this kit: there the checker belongs, and losing
+  # it is a real red. This suite is not a leg in the bar's manifest, so no assertion floor would.
+  echo "FAIL dispatch: check-spec-tokens.py is missing from a kit source at $STC, so the F3 arms have no subject"; st=1
 else
-  echo "FAIL dispatch: the spec-token checker is not beside this kit at $STC, so the F3 arms have no subject"; st=1
+  # TOOL-aRepatriatedFork-18 S4. A gov-only dependency is an ANNOUNCED skip, never a FAIL: this suite
+  # ships to adopters and the checker never does, so a FAIL here was red at every adopter by
+  # construction.
+  echo "skip dispatch: the spec-token checker is not beside this kit at $STC, and govkit's registry exempts check-spec-tokens.py from every adopter ([[exempt]]), so the F3 arms have no subject in this tree and run in gov's"
 fi
 
 echo "MARK brief" >&2
@@ -5282,18 +5308,18 @@ build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # here for TWO reasons and the next arm separates them by declaring the key.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
 build_specced_tree
-printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$KIT_REL" >> .unattended.conf
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$TOOL_REL" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 # ...DECLARED, the index ALONE is still accepted — that is the retraction M6 earned.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $KIT_REL/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $TOOL_REL/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
 # rather than about one declaration.
 build_specced_tree
-printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$KIT_REL" >> .unattended.conf
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$TOOL_REL" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
-run --dispatch tRun --pass ARCH-tRun-1 --writes $KIT_REL/memory-tree/gen_build_index.py >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes $TOOL_REL/memory-tree/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in

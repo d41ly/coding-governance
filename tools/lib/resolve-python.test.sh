@@ -91,11 +91,14 @@ resolve_python|$CANON|tools/lib/resolve-python
 kickoff_region|$ROOT/tools/unattended/check-unattended.sh|tools/unattended/check-unattended
 render_doc|$ROOT/tools/lib/render-doc.sh|tools/lib/render-doc
 resolve_kit_dir|$ROOT/tools/lib/resolve_kit_dir.py|tools/lib/resolve_kit_dir
+derive_self_rel|$ROOT/tools/lib/kit-rel.sh|tools/lib/kit-rel
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
 # resolve_kit_dir (TOOL-aRepatriatedFork-2 S3) is the one row whose copies are Python as well as
 # shell, so the population grep below reads both.
+# derive_self_rel (TOOL-aRepatriatedFork-18 S2) is the shipped suites' own-directory walk: each suite
+# that ships carries it inline because `tools/lib/` travels to nobody.
 blk() { awk -v s="$1" '$0 ~ ("^# >>> " s){f=1} f{print} $0 ~ ("^# <<< " s){if(f)exit}' "$2" | tr -d '\r'; }
 while IFS='|' read -r stem canon excl; do
   [ -n "$stem" ] || continue

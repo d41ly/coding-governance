@@ -2351,6 +2351,22 @@ user_skills = "/tmp/gk-fake-skills"
         check("and is green again once the entry rejoins the default selection",
               _run_selfcheck(gcopy).returncode == 0, "")
 
+        # --- TOOL-aRepatriatedFork-18 S8 (AC1): a shipped gate whose sibling suite is withheld
+        #     again, the state all four arm-bearing kits were in before that unit.
+        uk = gcopy / "tools" / "unattended" / "kit.toml"
+        ukeep = uk.read_text(encoding="utf-8")
+        uk.write_text(ukeep.replace('"stop-guard.test.sh"]', '"stop-guard.test.sh", "unattended.test.sh"]', 1),
+                      encoding="utf-8")
+        r18 = _run_selfcheck(gcopy)
+        check("[aRF-18 AC1] selfcheck reds a shipped gate whose check-arms sibling is project-owned",
+              r18.returncode != 0
+              and "'tools/unattended/unattended.sh' ships and check-arms reads it as a gate, but its "
+                  "sibling suite 'tools/unattended/unattended.test.sh' does not ship"
+              in (r18.stdout + r18.stderr), r18.stdout + r18.stderr)
+        uk.write_text(ukeep, encoding="utf-8")
+        check("[aRF-18 AC1] and is green again once the suite ships",
+              _run_selfcheck(gcopy).returncode == 0, "")
+
         # --- DEPL-aRepatriatedFork-1 AC7: a `stands_down.when_selected` member naming no entry.
         pk = gcopy / "tools" / "govkit" / "entries" / "playbook.kit.toml"
         pkeep = pk.read_text(encoding="utf-8")

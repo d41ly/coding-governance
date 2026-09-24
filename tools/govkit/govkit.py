@@ -2172,6 +2172,43 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     r.note(f"gate policy: {len(policy_files)} file(s) assign GATE_SELFTESTS · "
            f"{len(shipped_owner)} shipped path(s) derived from the descriptors")
 
+    # ---- TOOL-aRepatriatedFork-18 S8. A SHIPPED GATE SHIPS ITS ARMS. The memory-tree kit's
+    # ---- `check-arms.py` runs at every adopter and demands a positive assertion for every `fail`
+    # ---- branch of every tracked gate, read from the gate's sibling `<stem>.test.sh`. A gate that
+    # ---- lands without that sibling is therefore red at every adopter the day it arrives, and was,
+    # ---- for four gates, until TOOL-aRepatriatedFork-18. The PREDICATE is check-arms' own
+    # ---- `discover()`, imported from where the memory-tree descriptor says that kit lives, so this
+    # ---- arm and the gate it protects cannot disagree about what a gate is. The population is every
+    # ---- LANDABLE source, resolved the way `apply` resolves it. WHAT IT DOES NOT CHECK: that the
+    # ---- suite ARMS anything — check-arms' own leg grades that, in gov and at the adopter.
+    import importlib.util
+    _mt = (descs.get("memory-tree", ({}, ""))[0].get("home") or "").rstrip("/")
+    _arms_path = root / _mt / "check-arms.py"
+    _sp = importlib.util.spec_from_file_location("gov_check_arms", str(_arms_path)) if _mt else None
+    if _sp is None or _sp.loader is None or not _arms_path.is_file():
+        r.fail(f"shipped-gate arms: cannot load check-arms.py from the memory-tree entry's home "
+               f"('{_mt}'), so no shipped gate's sibling suite can be graded — refusing rather than "
+               f"reporting a confident zero over nothing")
+    else:
+        _arms = importlib.util.module_from_spec(_sp)
+        _sp.loader.exec_module(_arms)
+        _landed: set[str] = set()
+        for eid, (d, _dpath) in descs.items():
+            _landed |= {w["src"] for w in resolve_entry(root, d, canonical_ctx(eid))["writes"].values()
+                        if w.get("src")}
+        _gates = [(g, t) for g, t in _arms.discover(str(root)) if g in _landed]
+        for g, t in _gates:
+            if t not in _landed:
+                r.fail(f"shipped-gate arms: '{g}' ships and check-arms reads it as a gate, but its "
+                       f"sibling suite '{t}' does not ship — every adopter's `gate-arms` leg reads "
+                       f"that file for the gate's arms, so each of its `fail` branches arrives "
+                       f"unarmed. Ship the suite as `engine` beside the gate (its LEG can stay "
+                       f"withheld, as an [[exempt_leg]] row)")
+        if not _gates:
+            r.fail("shipped-gate arms: check-arms' predicate found NO shipped gate — a dead probe, "
+                   "since the memory-tree kit ships at least its own hygiene gate")
+        r.note(f"shipped-gate arms: {len(_gates)} shipped gate(s), each graded for a shipped sibling suite")
+
     # ---- DEPL-dCarriedReceipt-6 S4. THE GOV-SIDE ARM, and this is where the class is actually
     # ---- gated: `apply`'s bar catches the leg at ONE adopter's install, after the descriptor has
     # ---- already shipped; this catches it here, before any adopter can receive it.

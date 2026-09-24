@@ -36,6 +36,14 @@ WHAT COUNTS AS AN ARM. A POSITIVE assertion naming the branch's OWN failure text
 mention, an ABSENCE assertion and a COMMENT all fail to arm: each is "something in the file mentions
 it", which is not "something exercises it".
 
+WHERE ARMS AND PINS ARE READ (TOOL-aRepatriatedFork-18). Arms come from `<stem>.test.sh` AND, when
+it exists, `<stem>.local.test.sh`: a kit ships the first with its gate, so an adopter that forks the
+gate arms its OWN branches in the second and the shipped suite stays gov's bytes. Pins come from
+`<MEMORY_ROOT>/project/unarmed-branches.txt` AND every tracked `unarmed-branches.txt` elsewhere, a
+SIDECAR whose gate column is relative to its own directory, so gov's pins for a shipped gate travel
+with it at any prefix. A branch pinned in two files is refused. `--report` names the file that armed
+or pinned each branch.
+
 FLOORS ARE PER-GATE. An aggregate total lets one gate's DELETED guard be masked by another gate's
 added one, and it goes slack by a whole gate's branch count the day a third gate lands — a guard that
 gets quieter as the population grows.
@@ -64,7 +72,9 @@ PIN = "project/unarmed-branches.txt"
 
 FAIL_RE = re.compile(r'\bfail (\d+) "(.*)$')
 HELPER_RE = re.compile(r"^\s*fail\(\)\s*\{")
-INTERP_RE = re.compile(r'\$\{?[A-Za-z_][A-Za-z0-9_]*\}?')
+# A COMMAND SUBSTITUTION is an interpolation too (TOOL-aRepatriatedFork-18): `repair with
+# $(derive_index_repair)` kept the call's SOURCE in the signature, which no run can ever print.
+INTERP_RE = re.compile(r'\$\([^()]*\)|\$\{?[A-Za-z_][A-Za-z0-9_]*\}?')
 # A NEGATIVE assertion. `miss` is this kit's absence helper; the `&&` form is the inline one.
 NEGATIVE_RE = re.compile(r"^\s*(miss\b|.*grep -qF .* <<<.*\s&&\s)")
 # A STRANDED prefix: an unarmed branch whose test holds a line carrying the signature's first
@@ -213,18 +223,34 @@ def armed_signatures(root: str, test_rel: str) -> list:
 
 
 def parse_pin(root: str, m: str) -> list:
-    p = os.path.join(root, m, PIN)
+    """Every pin row, from the central file AND every SIDECAR, as (gate, check, ordinal, sig, line, file).
+
+    TOOL-aRepatriatedFork-18 S5. A pin for a SHIPPED gate is a fact about gov's bytes, so it travels
+    with them: a tracked `unarmed-branches.txt` in any directory other than the central one pins the
+    gates of THAT directory, and its gate column is relative to it. So `unattended.sh<TAB>9<TAB>1…`
+    means the same branch at `tools/unattended/` and at `scripts/unattended/`, and no adopter re-keys
+    gov's rows by hand. The sidecar set is every tracked file of that name, not the discovered gates'
+    directories, so a sidecar whose gate vanished is still read and still reds as stale.
+    """
+    central = f"{m}/{PIN}"
+    sidecars = sorted(p for p in run("git", "ls-files", cwd=root).split("\n")
+                      if os.path.basename(p) == os.path.basename(PIN) and p != central)
     rows = []
-    if not os.path.isfile(p):
-        return rows
-    for i, line in enumerate(read(p).split("\n"), 1):
-        if not line.strip() or line.lstrip().startswith("#"):
+    for label in [central] + sidecars:
+        p = os.path.join(root, label)
+        if not os.path.isfile(p):
             continue
-        parts = line.split("\t")
-        if len(parts) != 4:
-            raise Problem(f"{m}/{PIN}:{i}: expected 4 tab-separated fields "
-                          f"(gate<TAB>check<TAB>ordinal<TAB>signature), got {len(parts)}")
-        rows.append((parts[0].strip(), parts[1].strip(), parts[2].strip(), parts[3].strip(), i))
+        base = "" if label == central else os.path.dirname(label)
+        for i, line in enumerate(read(p).split("\n"), 1):
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            parts = line.split("\t")
+            if len(parts) != 4:
+                raise Problem(f"{label}:{i}: expected 4 tab-separated fields "
+                              f"(gate<TAB>check<TAB>ordinal<TAB>signature), got {len(parts)}")
+            gate = parts[0].strip()
+            gate = f"{base}/{gate}" if base else gate
+            rows.append((gate, parts[1].strip(), parts[2].strip(), parts[3].strip(), i, label))
     return rows
 
 
@@ -249,13 +275,19 @@ def classify(root: str, conf: dict, pairs=None) -> dict:
         # and both floors would go unchecked, and a second regression could land under cover.
         try:
             gb = branches(root, gate_rel)
-            numbered = armed_signatures(root, test_rel)
+            numbered = [(test_rel, no, l) for no, l in armed_signatures(root, test_rel)]
+            # S6: an adopter that forks a gate arms ITS branches in `<stem>.local.test.sh`, which no
+            # descriptor claims, so the shipped sibling stays byte-identical to gov's. Optional: an
+            # absent or empty one arms nothing and is not an error.
+            local_rel = test_rel[:-len(".test.sh")] + ".local.test.sh"
+            if os.path.isfile(os.path.join(root, local_rel)):
+                numbered += [(local_rel, no, l) for no, l in armed_signatures(root, local_rel)]
         except Problem as exc:
             errors.append(str(exc))
             continue
-        lines = {l for _, l in numbered}
+        lines = {l for _, _, l in numbered}
         for b in gb:
-            b["armed"] = any(b["sig"] in l for l in lines)
+            b["armed"] = next((f for f, _, l in numbered if b["sig"] in l), None)
         # A STRANDED prefix: the first arm-shaped line holding the signature's opening run but not
         # the whole of it. Diagnosis only — the branch stays unarmed (TOOL-aWokenSentinel-25). A line
         # that arms SOME branch of this gate is that branch's arm, never a sibling's stranded prefix:
@@ -266,9 +298,9 @@ def classify(root: str, conf: dict, pairs=None) -> dict:
             b["stranded"] = None
             if not b["armed"] and len(b["sig"]) >= STRAND_MIN:
                 head = b["sig"][:STRAND_MIN]
-                for no, l in numbered:
+                for f, no, l in numbered:
                     if head in l and l not in arms:
-                        b["stranded"] = (test_rel, no)
+                        b["stranded"] = (f, no)
                         break
         brs.extend(gb)
     return {"branches": brs, "pinned": parse_pin(root, m), "errors": errors,
@@ -279,12 +311,22 @@ def cmd_check(root: str, conf: dict) -> int:
     st = classify(root, conf)
     brs, pinned, m = st["branches"], st["pinned"], st["m"]
     bad = list(st["errors"])
-    pin_keys = {(r[0], r[1], r[2]): r for r in pinned}
+    pin_keys = {}
+    for r in pinned:
+        key = (r[0], r[1], r[2])
+        if key in pin_keys:
+            # S5: ONE branch, ONE pin. Two rows for it means two files can disagree about its
+            # signature and each shrink-only check would read only one of them.
+            bad.append(f"check-arms: {r[5]}:{r[4]} pins {r[0]} check {r[1]} branch {r[2]}, which "
+                       f"{pin_keys[key][5]}:{pin_keys[key][4]} already pins — a branch is pinned in "
+                       f"exactly one file; delete one of the two rows")
+            continue
+        pin_keys[key] = r
     for b in brs:
         key = (b["gate"], str(b["num"]), str(b["ord"]))
         if b["armed"]:
             if key in pin_keys:
-                bad.append(f"check-arms: {m}/{PIN}:{pin_keys[key][4]} pins {b['gate']} check "
+                bad.append(f"check-arms: {pin_keys[key][5]}:{pin_keys[key][4]} pins {b['gate']} check "
                            f"{b['num']} branch {b['ord']}, which IS armed now — delete the row "
                            f"(the pin is shrink-only)")
             continue
@@ -293,17 +335,17 @@ def cmd_check(root: str, conf: dict) -> int:
                     f"the signature; copy the whole row --report prints") if b["stranded"] else ""
             bad.append(f"check-arms: {b['gate']}:{b['line']} check {b['num']} branch {b['ord']} has "
                        f"no POSITIVE assertion naming its own failure text ({b['sig']!r}) and is not "
-                       f"pinned in {m}/{PIN}{hint}")
+                       f"pinned in {m}/{PIN} or a sidecar beside the gate{hint}")
         elif pin_keys[key][3] != b["sig"]:
-            bad.append(f"check-arms: {m}/{PIN}:{pin_keys[key][4]} pins {b['gate']} check {b['num']} "
-                       f"branch {b['ord']} with a stale signature — the message was reworded")
+            bad.append(f"check-arms: {pin_keys[key][5]}:{pin_keys[key][4]} pins {b['gate']} check "
+                       f"{b['num']} branch {b['ord']} with a stale signature — the message was reworded")
     live = {(b["gate"], str(b["num"]), str(b["ord"])) for b in brs}
     scanned = {g for g, _ in st["pairs"]}
-    for r in pinned:
+    for r in pin_keys.values():
         if (r[0], r[1], r[2]) not in live:
             why = ("the gate is no longer in the population" if r[0] not in scanned
                    else "the guard was deleted or renumbered")
-            bad.append(f"check-arms: {m}/{PIN}:{r[4]} pins {r[0]} check {r[1]} branch {r[2]}, which "
+            bad.append(f"check-arms: {r[5]}:{r[4]} pins {r[0]} check {r[1]} branch {r[2]}, which "
                        f"no longer exists — {why}")
     # PER-GATE floors. An aggregate would let one gate's deletion be masked by another's addition.
     floors = parse_floors(conf)
@@ -350,6 +392,7 @@ def cmd_check(root: str, conf: dict) -> int:
 def cmd_report(root: str, conf: dict) -> int:
     st = classify(root, conf)
     floors = parse_floors(conf)
+    pinned = {(r[0], r[1], r[2]): r[5] for r in st["pinned"]}
     for gate_rel, test_rel in st["pairs"]:
         gb = [b for b in st["branches"] if b["gate"] == gate_rel]
         want = floors.get(gate_rel, ("unset", "unset"))
@@ -359,9 +402,13 @@ def cmd_report(root: str, conf: dict) -> int:
         for b in gb:
             # The signature prints WHOLE: this row is what the arm author copies, and a row cut at
             # 72 characters was itself the prefix that stranded every arm over a long message.
+            # ...and the FILE that armed or pinned it follows, since S5 and S6 made that one of several.
+            pin = pinned.get((b["gate"], str(b["num"]), str(b["ord"])))
             tail = f"  STRANDED {b['stranded'][0]}:{b['stranded'][1]}" if b["stranded"] else ""
+            src = (f"  by {b['armed']}" if b["armed"] else f"  in {pin}" if pin else "")
+            flag = "ARMED " if b["armed"] else "PINNED" if pin else "      "
             print(f"      check {b['num']:>2} branch {b['ord']}  line {b['line']:>4}  "
-                  f"{'ARMED ' if b['armed'] else '      '} {b['sig']}{tail}")
+                  f"{flag} {b['sig']}{tail}{src}")
     print(f"pinned rows   : {len(st['pinned'])}")
     for e in st["errors"]:
         print("ERROR " + e)
@@ -488,6 +535,9 @@ def cmd_selftest() -> int:
         arm("branches are keyed on the call site, not the check number", "[rc=0]",
             lambda: 0 if [(b["num"], b["ord"]) for b in branches(root, "tools/gate-a.sh")]
             == [(1, 1), (1, 2), (2, 1)] else 1)
+        arm("a command substitution is dropped from the signature like a variable", "[rc=0]",
+            lambda: 0 if signature(message_of('substituted message here; repair with $(derive_x)"'))
+            == "substituted message here; repair with" else 1)
         arm("the capture stops at the closing quote, not end of line", "[rc=0]",
             lambda: 0 if branches(root, "tools/gate-b.sh")[0]["sig"] == "delta branch message here" else 1)
 
@@ -657,8 +707,60 @@ def cmd_selftest() -> int:
         _capture(cmd_report, root, conf, outs)
         arm("...and the same test quoting the whole signature reads ARMED with no STRANDED token",
             "[rc=0]",
-            lambda: 0 if any("ARMED " in l and l.rstrip().endswith(LONG) for l in outs)
+            lambda: 0 if any("ARMED " in l and f"{LONG}  by tools/gate-c.test.sh" in l for l in outs)
             and not any("STRANDED" in l and "gate-c" in l for l in outs) else 1)
+
+        # TOOL-aRepatriatedFork-18 S5 + S6, in a tree of their own: a SIDECAR pin beside the gate,
+        # keyed relative to its directory, and an adopter's `<stem>.local.test.sh`. Both were
+        # observed red against the a7c78ad2 reader, which read neither file.
+        side = os.path.join(base, "side")
+        os.makedirs(side)
+        run("git", "init", "-q", ".", cwd=side)
+        run("git", "config", "user.email", "t@t.test", cwd=side)
+        run("git", "config", "user.name", "t", cwd=side)
+        _w(os.path.join(side, ".memory-tree.conf"),
+           'MEMORY_ROOT=memory\nARMS_FLOORS="tools/kit/g.sh:2:1"\n')
+        _w(os.path.join(side, "tools", "kit", "g.sh"),
+           HELPER + '[ -n "$a" ] && fail 1 "sidecar pinned branch here"\n'
+                    '[ -n "$b" ] && fail 2 "local arm branch message here"\n')
+        _w(os.path.join(side, "tools", "kit", "g.test.sh"), "# the shipped suite arms neither\n")
+        _w(os.path.join(side, "tools", "kit", "g.local.test.sh"), "hit 'local arm branch message here'\n")
+        _w(os.path.join(side, "tools", "kit", "unarmed-branches.txt"),
+           "g.sh\t1\t1\tsidecar pinned branch here\n")
+        _w(os.path.join(side, "memory", "project", ".keep"), "")
+        run("git", "add", "-A", cwd=side)
+        run("git", "commit", "-q", "-m", "s", "--no-verify", cwd=side)
+        sconf = load_conf(side)
+        spin = os.path.join(side, "memory", "project", "unarmed-branches.txt")
+        arm("S5+S6: a sidecar pin and a local-suite arm leave the gate green", None,
+            lambda: cmd_check(side, sconf))
+        arm("...and --report names the sidecar that pinned the branch",
+            "PINNED sidecar pinned branch here  in tools/kit/unarmed-branches.txt",
+            lambda: cmd_report(side, sconf))
+        arm("...and --report names the local suite that armed the other",
+            "ARMED  local arm branch message here  by tools/kit/g.local.test.sh",
+            lambda: cmd_report(side, sconf))
+        _w(spin, "tools/kit/g.sh\t1\t1\tsidecar pinned branch here\n")
+        run("git", "add", "-A", cwd=side); run("git", "commit", "-q", "-m", "d", "--no-verify", cwd=side)
+        arm("S5: a branch pinned in the central file AND a sidecar is refused, naming both",
+            "tools/kit/unarmed-branches.txt:1 pins tools/kit/g.sh check 1 branch 1, which "
+            "memory/project/unarmed-branches.txt:1 already pins",
+            lambda: cmd_check(side, sconf))
+        _w(spin, "")
+        _w(os.path.join(side, "tools", "kit", "unarmed-branches.txt"),
+           "g.sh\t1\t1\tsidecar pinned branch here\ngone.sh\t1\t1\tvanished sidecar gate here\n")
+        run("git", "add", "-A", cwd=side); run("git", "commit", "-q", "-m", "g", "--no-verify", cwd=side)
+        arm("S5: a sidecar row whose gate left its directory is stale, named at the sidecar",
+            "tools/kit/unarmed-branches.txt:2 pins tools/kit/gone.sh check 1 branch 1, which no longer "
+            "exists — the gate is no longer in the population",
+            lambda: cmd_check(side, sconf))
+        _w(os.path.join(side, "tools", "kit", "unarmed-branches.txt"),
+           "g.sh\t1\t1\tsidecar pinned branch here\n")
+        os.remove(os.path.join(side, "tools", "kit", "g.local.test.sh"))
+        run("git", "add", "-A", cwd=side); run("git", "commit", "-q", "-m", "l", "--no-verify", cwd=side)
+        arm("S6: without the local suite the same branch is named unarmed",
+            "tools/kit/g.sh:3 check 2 branch 1 has no POSITIVE",
+            lambda: cmd_check(side, sconf))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
