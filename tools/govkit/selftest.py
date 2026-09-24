@@ -10732,6 +10732,9 @@ user_skills = "/tmp/gk-fake-skills"
             "exempt_leg": None,          # silent; re-runs a hole probe to decide a leg exemption
             "_cmd_apply": None,          # announces that a baseline WILL run, not which argv
             "read_gate_verdicts": None,  # silent at both spawns; apply prints before the first only
+            # DEPL-aRepatriatedFork-13 S4. Prints one parity line per contract and, for a failing
+            # probe, the argv TEMPLATE with `{own}` unresolved — never the argv it spawned.
+            "measure_contract_parity": None,
             # `_cmd_update` LEFT THIS MAP AND CAME BACK, one unit apart, and both moves were
             # forced rather than chosen. DEPL-dRetiredFork-4 moved its `git rm ... + deleted`
             # BinOp to `git_pathspec` and the row went stale; DEPL-dRetiredFork-3 gave the verb

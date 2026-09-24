@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"
 
-**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer+tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer+tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -383,6 +383,11 @@ New arm: `tools/govkit/selftest.py` · an `[[own]]` fixture per S item, a non-co
   `resolve_owned_rows` and refuse an `engine` row at a declared owned path, AC12 added. Section 4
   inventory gains `derive_owned_engine_refusals` and `build_owned_row`, the second for residual (e),
   which `DEPL-aRepatriatedFork-21` rev-3 records.
+- rev-6 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. S4's
+  `measure_contract_parity` is a declared `target` spawn site and was missing from the selftest's
+  announcement map, which is asserted equal to the declared sites. It is added as unannounced: it
+  prints the probe's argv template with `{own}` unresolved, never the argv it spawned. A stale map;
+  no code change.
 
 ## 10. Reuse audit
 
