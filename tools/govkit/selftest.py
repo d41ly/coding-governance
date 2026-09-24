@@ -12031,6 +12031,13 @@ user_skills = "/tmp/gk-fake-skills"
         # ROUND 4: a file one consumer edits on the very line gov changes at B, so its step 1
         # conflicts on something that is not the harness (W4).
         _pvLOCAL_A = "line one\nline two\nline three\n"
+        # TOOL-aRepatriatedFork-7 made the real kit's review and drift-audit harnesses renders too,
+        # so the real renderer holds five pairs and refuses a kit missing any template. The fixture
+        # ships the three new templates; no install here tracks their renders, so `--tracked-only`
+        # SKIPS each by name. The consumer-edited engine row is `review-step.js` for that reason:
+        # `tier2-review.js` is a render now, and an edited render is not the engine row these arms
+        # grade.
+        _pvCAP_T = "// a fixture harness, fan-out cap {{FANOUT_CAP}}\n"
         _pvLOCAL_B = "line one\nline two, as gov has it at B\nline three\n"
 
         def build_pv_gov():
@@ -12047,7 +12054,10 @@ user_skills = "/tmp/gk-fake-skills"
                 encoding="utf-8", newline="\n")
             for _kd, _files in (("workflows", (("kit.toml", _pvKIT_A), ("unattended-build.js", _pvH_A),
                                                ("REVIEW-PROTOCOL.template.md", _pvPROTO_T),
-                                               ("tier2-review.js", "// the review harness\n"),
+                                               ("review-step.js", "// the review harness\n"),
+                                               ("tier2-review.template.js", _pvCAP_T),
+                                               ("drift-audit-code.template.js", _pvCAP_T),
+                                               ("drift-audit-state.template.js", _pvCAP_T),
                                                ("check-local.sh", _pvLOCAL_A),
                                                ("check-review-join.sh", "echo join\n"),
                                                ("unattended-build.test.sh", "echo suite\n"),
@@ -12065,6 +12075,12 @@ user_skills = "/tmp/gk-fake-skills"
                     (g / "tools" / _kd / _name).write_text(_body, encoding="utf-8", newline="\n")
             shutil.copy2(_pvREAL / "check-protocol-parity.test.sh",
                          g / "tools" / "workflows" / "check-protocol-parity.test.sh")
+            # TOOL-aRepatriatedFork-7 residual b: the renderer asks its sibling gate's `--print-cap`
+            # for FANOUT_CAP, and that gate asks the agent-cap hook, so the real kit's renderer
+            # cannot run without both. The sibling ships in the kit as it does in the real one; the
+            # hook is the target's own, see `seed_pv_hook`.
+            shutil.copy2(_pvREAL / "check-verifier-fanout.sh",
+                         g / "tools" / "workflows" / "check-verifier-fanout.sh")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")
@@ -12080,7 +12096,7 @@ user_skills = "/tmp/gk-fake-skills"
         _pvW = "scripts/workflows"
         _pvH = f"{_pvW}/unattended-build.js"
         _pvT = f"{_pvW}/unattended-build.template.js"
-        _pvD = f"{_pvW}/tier2-review.js"
+        _pvD = f"{_pvW}/review-step.js"
         _pvJ = f"{_pvW}/check-review-join.sh"
         _pvS = f"{_pvW}/unattended-build.test.sh"
         _pvL = f"{_pvW}/review-local.txt"
@@ -12094,6 +12110,13 @@ user_skills = "/tmp/gk-fake-skills"
         _pvSEED = "memory/project/seedy-loops.txt"
         _pvSV = "scripts/seedy/seedy.sh"
 
+        def seed_pv_hook(t):
+            """The agent-cap hook where inCMS core keeps its only copy, `.claude/hooks/`, which the
+            renderer's sibling gate probes third. Both measured consumers hold one; a fixture without
+            it could not render at all since the renderer began asking the hook for FANOUT_CAP."""
+            (t / ".claude" / "hooks").mkdir(parents=True, exist_ok=True)
+            shutil.copy2(HERE.parent / "hooks" / "agent-cap.js", t / ".claude" / "hooks" / "agent-cap.js")
+
         def build_pv_target(g, name, harness_edit=None):
             """An install `apply` wrote at vintage A, with one local delta, which both measured
             consumers carry somewhere, and the checklist script a flat memory-tree install puts where
@@ -12101,6 +12124,7 @@ user_skills = "/tmp/gk-fake-skills"
             t = make_target(tmp / name, _pvDEPLOY.format(kits='["review-harness"]'))
             (t / "scripts").mkdir(exist_ok=True)
             (t / "scripts" / "gotchas.py").write_text("# a stub checklist\n", encoding="utf-8", newline="\n")
+            seed_pv_hook(t)
             settle(t, "the memory-tree kit's checklist, installed flat")
             _ap = run_pv_govkit(g, "apply", "--target", str(t), "--kits", "review-harness")
             check(f"[-PV] the {name} fixture applies GREEN at vintage A, or every arm over it grades a "
@@ -12133,6 +12157,7 @@ user_skills = "/tmp/gk-fake-skills"
                     (t / _dst).mkdir(parents=True, exist_ok=True)
                     shutil.copy2(g / _rel, t / _dst / _name)
             (t / "scripts" / "gotchas.py").write_text("# a stub checklist\n", encoding="utf-8", newline="\n")
+            seed_pv_hook(t)
             with (t / _pvD).open("a", encoding="utf-8", newline="\n") as _fh:
                 _fh.write("// a consumer's own line\n")
             (t / _pvJ).write_text("echo a join this tree wrote for itself\n", encoding="utf-8", newline="\n")
@@ -12922,7 +12947,7 @@ user_skills = "/tmp/gk-fake-skills"
             _pvT_B.replace("harness v2", "harness v3"), encoding="utf-8", newline="\n")
         (_pvd / "unattended-build.js").write_text(
             _pvH_B.replace("harness v2", "harness v3"), encoding="utf-8", newline="\n")
-        (_pvd / "tier2-review.js").write_text("// gov's C header\n// the review harness\n",
+        (_pvd / "review-step.js").write_text("// gov's C header\n// the review harness\n",
                                               encoding="utf-8", newline="\n")
         settle(_pvg, "C: the template and the review harness move again")
         _pvC = gout(_pvg, "rev-parse", "HEAD").strip()

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap
 
-**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -315,6 +315,13 @@ New arm: `tools/workflows/check-verifier-fanout.test.sh` · a BOM-led cap-4 chec
   the hook nor the new templates, so every render refused and each arm graded a harness that was never
   written. The fixture now installs what `requires = ["agent-cap"]` guarantees, and the verbatim
   control fills `{{FANOUT_CAP}}` so it parses. A stale fixture, not a product regression; no design change.
+- rev-6 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. The `[-PV]` fixture runs the
+  real renderer over a small kit that carried neither `check-verifier-fanout.sh`, the hook, nor the
+  three templates S7 added, so every render refused and each `[-PV]` arm after it went red. The
+  fixture kit now ships the gate and the three templates, every target holds the hook at
+  `.claude/hooks/`, and the consumer-edited engine row is `review-step.js`, because
+  `tier2-review.js` is a render now. The rev-5 repair, one suite over. A stale fixture, not a
+  product regression; no design change.
 
 ## 10. Reuse audit
 
