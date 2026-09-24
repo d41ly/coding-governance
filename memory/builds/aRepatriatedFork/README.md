@@ -129,7 +129,7 @@ ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22
 | [DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter](spec/2026-09-23-spec-DEPL-aRepatriatedFork-14.md) | 3 | 1 | CLOSED | rev-2 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did](spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md) | 3 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-21 — apply never lands gov's bytes on a file the target owns](spec/2026-09-24-spec-DEPL-aRepatriatedFork-21.md) | 3 | 2 | CLOSED | rev-3 | 2026-09-24 |
-| [TOOL-aRepatriatedFork-18 — the test suites that arm gov's gates reach adopters](spec/2026-09-23-spec-TOOL-aRepatriatedFork-18.md) | 4 | 2 | CLOSED | rev-3 | 2026-09-24 |
+| [TOOL-aRepatriatedFork-18 — the test suites that arm gov's gates reach adopters](spec/2026-09-23-spec-TOOL-aRepatriatedFork-18.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-19 — check-wiring judges every arm at a relocated layout](spec/2026-09-23-spec-TOOL-aRepatriatedFork-19.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-11 — unattended: build-root pathspecs stop at the build root, and a pull lands its hooks wired and its pins measurable](spec/2026-09-23-spec-TOOL-aRepatriatedFork-11.md) | 6 | 2 | CLOSED | rev-2 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |

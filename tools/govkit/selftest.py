@@ -4514,9 +4514,11 @@ user_skills = "/tmp/gk-fake-skills"
             # TOOL-aWalkedCorpus-6 rather than papered over here.
             # 27 -> 28, TOOL-dLoggedFlight-3: run-gates withheld `run-gates.runlog.test.sh` by the same
             # mechanism, the only row that build added to the default selection.
+            # 28 -> 27, TOOL-aRepatriatedFork-18 S1: check-line-length's self-test ships as `engine`,
+            # the check-arms sibling of its gate, so it left the project-owned ORDER rows.
             check("...and the playbook file previews as a seed WRITE, not as an order",
                   marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 3
-                  and marks.get("ORDER|project-owned") == 28,
+                  and marks.get("ORDER|project-owned") == 27,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
@@ -13278,7 +13280,10 @@ user_skills = "/tmp/gk-fake-skills"
         _qm = run("apply", "--target", str(_qmt), "--kits", "memory-tree")
         if _qm.returncode == 0:
             _qkeep = _qmt / "tools" / "memory-tree" / "kit-dogfood-parity.test.sh"
-            _qdrop = _qmt / "tools" / "memory-tree" / "check-memory-hygiene.test.sh"
+            # check-verdict-epoch.test.sh, not check-memory-hygiene.test.sh: TOOL-aRepatriatedFork-18
+            # S1 ships every self-test that is a shipped gate's check-arms sibling, and the hygiene
+            # gate's is one. This suite arms no shipped gate, so the withholding rule still takes it.
+            _qdrop = _qmt / "tools" / "memory-tree" / "check-verdict-epoch.test.sh"
             check("aQuenchedHarness-3 AC4: kit-dogfood-parity.test.sh STILL SHIPS — its leg is "
                   "subject = repo and is graded on the adopter's own tree",
                   _qkeep.is_file(),

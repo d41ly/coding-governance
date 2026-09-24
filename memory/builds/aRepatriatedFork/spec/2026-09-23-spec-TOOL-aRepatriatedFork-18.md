@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-18 — the test suites that arm gov's gates reach adopters
 
-**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 4
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -340,6 +340,14 @@ execution can verify
 - rev-3 · 2026-09-24 · S1 corrected: rev-2's "no second bump" read the epoch gate over an
   uncommitted tree, and once committed it named all four kits, because it orders a bump after the
   kit's last move. The four bump, and AC9's observation is taken after that.
+- rev-4 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. S8's selfcheck arm refused
+  every scratch gov whose memory-tree entry lands no `check-arms.py`, including one with no
+  memory-tree entry at all, so every selftest control that builds such a gov went red. The arm now
+  stands down by name when no entry lands `check-arms.py`, and still reds a shipped one that will
+  not load: a regression, fixed in `govkit.py`. Two arms pinned the tree before S1 and are updated
+  to it: the default plan's `ORDER|project-owned` count is 27, since check-line-length's self-test
+  ships, and the over-reach arm names `check-verdict-epoch.test.sh`, which S1 still withholds,
+  because `check-memory-hygiene.test.sh` now ships.
 
 ## 10. Reuse audit
 

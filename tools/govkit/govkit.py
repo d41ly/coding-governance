@@ -2215,21 +2215,29 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # ---- arm and the gate it protects cannot disagree about what a gate is. The population is every
     # ---- LANDABLE source, resolved the way `apply` resolves it. WHAT IT DOES NOT CHECK: that the
     # ---- suite ARMS anything — check-arms' own leg grades that, in gov and at the adopter.
+    # ---- A gov whose memory-tree entry does not LAND check-arms.py (a scratch gov, or one with no
+    # ---- memory-tree entry at all) ships no reader of a gate's arms, so there is nothing to grade:
+    # ---- the arm stands down and SAYS so. Only a check-arms.py that ships and will not load reds.
     import importlib.util
     _mt = (descs.get("memory-tree", ({}, ""))[0].get("home") or "").rstrip("/")
     _arms_path = root / _mt / "check-arms.py"
+    _landed: set[str] = set()
+    if _mt and _arms_path.is_file():
+        for eid, (d, _dpath) in descs.items():
+            _landed |= {w["src"] for w in resolve_entry(root, d, canonical_ctx(eid))["writes"].values()
+                        if w.get("src")}
     _sp = importlib.util.spec_from_file_location("gov_check_arms", str(_arms_path)) if _mt else None
-    if _sp is None or _sp.loader is None or not _arms_path.is_file():
+    if f"{_mt}/check-arms.py" not in _landed:
+        r.note("shipped-gate arms: stood down — no entry ships check-arms.py"
+               + (f" from '{_mt}'" if _mt else " (no memory-tree entry)")
+               + ", so no adopter reads a gate's sibling suite")
+    elif _sp is None or _sp.loader is None:
         r.fail(f"shipped-gate arms: cannot load check-arms.py from the memory-tree entry's home "
                f"('{_mt}'), so no shipped gate's sibling suite can be graded — refusing rather than "
                f"reporting a confident zero over nothing")
     else:
         _arms = importlib.util.module_from_spec(_sp)
         _sp.loader.exec_module(_arms)
-        _landed: set[str] = set()
-        for eid, (d, _dpath) in descs.items():
-            _landed |= {w["src"] for w in resolve_entry(root, d, canonical_ctx(eid))["writes"].values()
-                        if w.get("src")}
         _gates = [(g, t) for g, t in _arms.discover(str(root)) if g in _landed]
         for g, t in _gates:
             if t not in _landed:
