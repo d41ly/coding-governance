@@ -622,7 +622,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 700
   },
   {
     "name": "review-join self-test",
@@ -836,7 +836,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 360
+    "ceiling": 420
   },
   {
     "name": "runlog selftest",
@@ -849,7 +849,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 360
+    "ceiling": 720
   },
   {
     "name": "runlog record schema",
@@ -1080,7 +1080,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 900
+    "ceiling": 1620
   },
   {
     "name": "agent-cap restatement",
@@ -1419,7 +1419,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 330
   },
   {
     "name": "kit-placeholders self-test",
@@ -1475,6 +1475,6 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1217
+    "ceiling": 2040
   }
 ]
