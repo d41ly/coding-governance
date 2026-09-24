@@ -90,7 +90,8 @@ conditional is what keeps the runner installable alone.
   requirement rather than tidiness.
 - **The kit's self-tests are withheld from adopters** (`project-owned` in `kit.toml`, `subject = kit`
   on their legs), per the 2026-08-23 owner ruling. An adopter who never edits the checkers has no job
-  for them.
+  for them. Both legs are `[[exempt_leg]]` rows in the govkit registry rather than descriptor legs,
+  because a descriptor leg naming a withheld file printed a `SILENT` row in every adopter's `plan`.
 
 ## Reuse affordance
 
