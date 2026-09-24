@@ -25,7 +25,8 @@ argument is the leg that grades them:
 | `drift-audit-state.js`, beside its template | `drift-audit-state.template.js` | `FANOUT_CAP` |
 
 **`FANOUT_CAP` is the agent-cap hook's own declaration** (TOOL-aRepatriatedFork-7): `FANOUT_CAP=<n>` in
-`.agent-cap.conf` at the checkout root, read with the hook's grammar and default, so a repo that
+`.agent-cap.conf` at the checkout root, ANSWERED by the hook (`agent-cap.js --print-cap`) rather than
+parsed here, so the value rendered is the value enforced and a repo that
 lowers its cap receives harnesses its hook admits. No conf renders the ceiling, byte-identical to the
 harnesses as they shipped before. A value the hook would refuse makes the render refuse too. The
 three harnesses beside the build harness moved from `engine` to `rendered` at review-harness 1.9, and

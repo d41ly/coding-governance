@@ -67,7 +67,7 @@ placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "FANOUT_CAP"]
 # THE REVIEW AND DRIFT-AUDIT HARNESSES ARE RENDERED TOO, since TOOL-aRepatriatedFork-7, and for ONE
 # token: `FANOUT_CAP`. A repo may LOWER the fan-out cap in a tracked `.agent-cap.conf`, and the hook
 # then denies any harness still carrying the ceiling as a literal — so an adopter at a lower cap kept
-# a hand fork of all four. The renderer reads the same conf with the same default, and at no conf
+# a hand fork of all four. The renderer asks the hook for the value (`--print-cap`), and at no conf
 # every render is byte-identical to the file it replaces. The same engine-to-rendered move the build
 # harness made above, and the same adopter migration: the runbook section the kit README points at.
 [[files]]

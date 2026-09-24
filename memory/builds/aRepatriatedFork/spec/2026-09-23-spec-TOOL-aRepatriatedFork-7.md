@@ -135,7 +135,7 @@ LOWER the cap cannot raise anything, so a local edit is at worst stricter than t
 
 `tools/workflows/check-protocol-parity.test.sh` already renders `unattended-build.template.js` into
 `unattended-build.js` with three derived tokens, and its no-argument mode is the leg that grades the
-render. It gains a fourth token, `FANOUT_CAP`, derived from the same conf with the same default, and
+render. It gains a fourth token, `FANOUT_CAP`, answered by the hook for the same conf (S11), and
 three more pairs.
 
 | live copy | template | sites carrying the token today as a literal 5 |
