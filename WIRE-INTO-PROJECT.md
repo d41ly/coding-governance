@@ -1180,8 +1180,9 @@ gov's own resolved argv is `claimed` rather than refused.
 STAGED index, refuses when a planned destination differs between your worktree and the index, and
 stages `.governance/install.json` and `install.sums` beside the bytes, so the fork and its receipt
 are one commit with no `--no-verify`. `adopt --suggest-pins` prints, for each `unattributed` row, the
-gov revision nearest your bytes by changed-line count and a ready `--pin <path>=<rev>` when at most
-half the file's lines changed; past that it names `adopter-owned` as the remedy.
+gov revision nearest your bytes by changed-line count and a ready `--pin <path>=<rev>` when the
+changed share is within `NEAREST_PIN_FRACTION`, which each line prints; past it the line names
+`adopter-owned` as the remedy.
 
 **`update-conflict-*.md` orders are REAPED, and they are the only family that is.** A conflict order
 records a STATE — this row still conflicts — which every run re-derives from scratch, so an order

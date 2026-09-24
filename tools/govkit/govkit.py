@@ -7698,7 +7698,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # second role routed to the same argv would otherwise silently not follow, and a role
                 # whose disposition is `skip` would fall through and get gov's bytes put back at a
                 # destination gov's own rule says it never supplies.
-                if write and accept_role_moves and UPDATE_ROLE.get(now) not in KIT_WRITING_DISPOSITIONS:
+                if write and accept_role_moves:
                     # DEPL-aRepatriatedFork-17 S6. THE MOVE IS RESOLVED WHERE IT IS REPORTED, and
                     # NO BYTE MOVES in this run: `apply` was the named remedy and it writes every
                     # engine destination raw. A move INTO a writing disposition takes `adopt`'s own
@@ -7754,7 +7754,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 r.note(f"row '{row['path']}' landed under role '{role}' and gov's descriptor now "
                        f"declares that destination '{now}', whose own machinery writes it in this "
                        f"run — so it is reconciled as '{role}', the role it landed under, rather "
-                       f"than stood back from. `govkit apply` is the verb that re-records the role")
+                       f"than stood back from. `govkit update --write --accept-role-moves` "
+                       f"re-records the role and writes no byte for it")
 
         if how == "block":
             # The block's own hash, not the file's. `check` owns the drift verdict; `update` reports
@@ -9615,7 +9616,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 if _now_b == _was_b:
                     continue
                 if _was_i is None:
-                    subprocess.run(["git", "-C", str(target), "rm", "-q", "--cached",
+                    subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached",
                                     "--ignore-unmatch", "--", p], capture_output=True, check=False)
                 else:
                     subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
