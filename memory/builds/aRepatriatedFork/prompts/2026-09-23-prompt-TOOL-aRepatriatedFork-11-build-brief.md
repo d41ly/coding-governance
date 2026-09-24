@@ -44,6 +44,12 @@ used.
   `python tools/govkit/govkit.py epoch --base f8fdd873` is the gate that now says so: it exits 1
   naming the kit. Run it after your commit, with `bash tools/check-kit-versions.sh` and
   `python tools/govkit/govkit.py selfcheck`; fold any bump it asks for into a follow-up commit.
+- A CLOSED Tier-2 unit owes an ACCEPTANCE LEDGER in the same commit: a record under
+  `memory/builds/aRepatriatedFork/build/` named `<date>-build-<unit-id>-1-acceptance-ledger.md`, with
+  a `**Serves:** journal <unit-id>` line, a `**Evidences:** <unit-id>` line and one
+  `- ACn — `<token>` — observation` line per criterion, each sharing a backticked token with its
+  criterion. The grammar is `memory/HYGIENE.md` under "Acceptance ledger"; two units in this build
+  closed without one and hygiene check 23 named every criterion.
 
 ## What to return
 
