@@ -79,7 +79,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.20' // gov:kit agent-cap@1.20 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.21' // gov:kit agent-cap@1.21 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5

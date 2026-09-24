@@ -226,3 +226,5 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T05:24:35Z dispatch · item 0255d655 TOOL-aRepatriatedFork-7 · reason tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh tools/hooks/README.md tools/workflows/check-verifier-fanout.sh tools/workflows/check-verifier-fanout.test.sh tools/workflows/check-protocol-parity.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-7.md memory/builds/aRepatriatedFork/build/2026-09-23-build-TOOL-aRepatriatedFork-7-1-acceptance-ledger.md
 
 2026-09-24T05:27:18Z dispatch · item 4d06c42f TOOL-aRepatriatedFork-7 · reason tools/workflows/README.md tools/workflows/kit.toml memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-7.md
+
+2026-09-24T05:29:27Z dispatch · item 1fe5f7bd TOOL-aRepatriatedFork-7 · reason tools/hooks/agent-cap.js tools/hooks/scratch-guard.js tools/workflows/tier2-review.js tools/workflows/tier2-review.template.js
