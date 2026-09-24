@@ -7,7 +7,7 @@ A repair pass under the aRepatriatedFork mandate, at VERIFYING.
 Leg **govkit selftest** (`python tools/govkit/selftest.py`): 68 arms FAILED. The log shows several
 clusters; find each one's cause:
 - many CONTROL/LIVENESS arms print only `govkit: precedence: ...` and expect GREEN: a scratch gov
-  fixture now fails selfcheck, possibly on a new selfcheck arm this build added (TOOL-aRepatriatedFork-14
+  fixture now fails selfcheck, possibly on a new selfcheck arm this build added (DEPL-aRepatriatedFork-14
   7j2/7j3, TOOL-15 epoch, TOOL-16 shipped) or on the fan-out cap relay;
 - `[-5] D1 every function that runs a shell command is DECLARED in SHELL_EXEC_SITES — undeclared
   spawn in: remove_wired_fragments, run_fragment_merges` (TOOL-aRepatriatedFork-11);
