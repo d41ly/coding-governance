@@ -103,7 +103,7 @@ DIR_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^D //p')
 [ -n "$PFX" ] || { echo "hook-dest: REFUSING — the deployer names no canonical prefix"; exit 1; }
 # A ZERO here is a broken selector, not a tree with no flat kits: this repo's own kickoff engine is
 # one, and the arm below would otherwise refuse every `{here}` fragment for a reason that is false.
-[ -n "$FLAT_HOMES" ] || { echo "hook-dest: REFUSING — the descriptors declare NO kind=flat home, so no {here} fragment could be judged"; exit 1; }
+[ -n "$FLAT_HOMES" ] || { echo "hook-dest: REFUSING — the descriptors declare NO kind=flat home, so no flat-kit {here} fragment could be judged"; exit 1; }
 
 echo "hook-dest: $n fragment(s) against $(printf '%s\n' "$DESTS" | grep -c .) declared destination(s), $(printf '%s\n' "$FLAT_HOMES" | grep -c .) flat home(s), prefix $PFX"
 
