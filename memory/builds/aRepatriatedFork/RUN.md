@@ -126,3 +126,5 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T00:10:22Z dispatch · item 569aaa32 DEPL-aRepatriatedFork-14 · reason tools/pytest-parallel-guardrails/aiosqlite-seam-conftest.py tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py tools/pytest-parallel-guardrails/pyproject-snippet.toml tools/process-monitor/README.md tools/process-monitor/adopt-process-monitor.test.sh tools/process-monitor/census.py tools/process-monitor/classify.py tools/process-monitor/procmon-hook.js tools/process-monitor/reap.py tools/process-monitor/scope.py tools/process-monitor/selftest.py memory/guides/SESSION-KICKOFF.md
 
 2026-09-24T00:14:44Z dispatch · item 569aaa32 DEPL-aRepatriatedFork-14 · reason memory/map/generated/symbols.json
+
+2026-09-24T00:16:06Z dispatch · item af690be0 DEPL-aRepatriatedFork-14 · reason tools/playbook/render_playbook.py
