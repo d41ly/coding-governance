@@ -34,7 +34,7 @@
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
-KIT_MANIFEST_VERSION="1.6"   # gov:kit kickoff-manifest@1.6 — the registry id
+KIT_MANIFEST_VERSION="1.7"   # gov:kit kickoff-manifest@1.7 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`

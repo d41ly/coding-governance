@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-18 — the test suites that arm gov's gates reach adopters
 
-**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 4
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -31,10 +31,10 @@ and ships gov's own pins for its unarmable branches, so an update arrives armed.
   adopter bars on 2026-08-23. §4 `### Inventory` names the population. `check-microformats.test.sh`
   is the precedent: its descriptor already ships gate and suite together
   (`tools/govkit/entries/check-microformats.kit.toml`). The memory-tree, unattended and
-  kickoff-manifest kits' version constants have each already moved since this build's base
-  `f8fdd873` (2.91, 1.31 and 1.6), and nothing lands between; `govkit epoch --base f8fdd873` reads
-  all three clean, so an adopter sees one version change for the pull that carries this unit and no
-  second bump is made. Observed by AC1, AC2 and AC9.
+  kickoff-manifest kits move their version constants, to 2.92, 1.32 and 1.7, and playbook-render
+  moves to 1.6 because `tools/govkit/registry.toml` is in its shipped set. `govkit epoch --base
+  f8fdd873` orders a bump after a kit's last move, so an earlier bump in this build does not cover
+  this unit's. Observed by AC1, AC2 and AC9.
 - **S2** — One canonical block, `derive_self_rel`, in a new `tools/lib/kit-rel.sh`: the `.git`
   boundary walk `tools/check-wiring.sh:31-47` and `tools/unattended/adopt-unattended.sh:63-69`
   already carry, printing the file's OWN directory relative to the repo root. Each S1 suite carries
@@ -336,6 +336,9 @@ execution can verify
   a kit-source branch, since the counts floor does not reach that suite. S9 added, the
   command-substitution signature, found red at gov HEAD while building S5. AC8 carried to
   `DEPL-aRepatriatedFork-20`. Section 7's third `New arm:` parked.
+- rev-3 · 2026-09-24 · S1 corrected: rev-2's "no second bump" read the epoch gate over an
+  uncommitted tree, and once committed it named all four kits, because it orders a bump after the
+  kit's last move. The four bump, and AC9's observation is taken after that.
 
 ## 10. Reuse audit
 

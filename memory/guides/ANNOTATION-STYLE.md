@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.91 -->
+<!-- gov:kit memory-tree@2.92 -->
 # Annotation style — what a code comment that cites a record must carry
 
 ## A1 — What this is, and what it is not
