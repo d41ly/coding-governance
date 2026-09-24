@@ -644,6 +644,33 @@ else
   [ -z "${rv_bad//[[:space:]]/}" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers:$rv_bad"
 fi
 
+# PURE BASH, no forks. These were `sed … | head -1 | tr -d '\r'` — THREE processes per call, and they
+# are called per run-state file per check, so the leg paid them dozens of times per invocation and
+# its self-test paid them thousands of times per run. Process spawn dominates on Windows: the suite
+# ran 77s for ~1.4s of CPU, and it was never the git calls (885 of those, ~24s), it was the forks
+# around them. Same semantics: first matching line wins, `key:` followed by any run of spaces, a
+# valueless key yields the empty string, and a trailing CR is stripped.
+# TOOL-aRepatriatedFork-6 L2 - ONLY the `## Run facts` section is read, heading to next `## `
+# heading, which is the scope check 34 grades and the driver's `fact` reads. Over the whole file, a
+# `phase: LANDED` above the heading or a key-shaped line under `## Parked` answered first while
+# check 34 reported clean.
+fact_of() { # file · key
+  local l p="$2:" sec=0
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    case "$l" in
+      "## Run facts"*) sec=1; continue ;;
+      "## "*) sec=0; continue ;;
+    esac
+    [ "$sec" = 1 ] || continue
+    case "$l" in
+      "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
+    esac
+  done < "$1"
+  return 0
+}
+phase_of() { fact_of "$1" phase; }
+
 # ---- THE HALT VOCABULARY: a shrink-only floor, and every aborted record carrying a legal code.
 # ---- The floor behaves like its two siblings — undeclared or malformed is a REFUSAL, never a
 # ---- defaulted value, because a pin that quietly defaults is a pin nobody set.
@@ -670,9 +697,9 @@ if [ -n "$HALT_CODES_CORE" ]; then
   hc_bad=""
   for hcf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$hcf" ] || continue
-    hcp=$(awk -F': ' '/^phase: /{ sub(/\r$/,"",$2); print $2; exit }' "$hcf")
+    hcp=$(phase_of "$hcf")
     [ "$hcp" = ABORTED ] || continue
-    hcv=$(awk -F': ' '/^halt-code: /{ sub(/\r$/,"",$2); print $2; exit }' "$hcf")
+    hcv=$(fact_of "$hcf" halt-code)
     if [ -z "$hcv" ]; then
       hc_bad="$hc_bad
   $hcf (phase ABORTED and no halt-code fact, so the record says a run stopped and never says why)"
@@ -809,23 +836,6 @@ if [ "$POP" = 0 ] && [ "$PRE" -gt 0 ]; then
   fail 4 "a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason: $PRE found"
 fi
 
-# PURE BASH, no forks. These were `sed … | head -1 | tr -d '\r'` — THREE processes per call, and they
-# are called per run-state file per check, so the leg paid them dozens of times per invocation and
-# its self-test paid them thousands of times per run. Process spawn dominates on Windows: the suite
-# ran 77s for ~1.4s of CPU, and it was never the git calls (885 of those, ~24s), it was the forks
-# around them. Same semantics: first matching line wins, `key:` followed by any run of spaces, a
-# valueless key yields the empty string, and a trailing CR is stripped.
-fact_of() { # file · key
-  local l p="$2:"
-  while IFS= read -r l || [ -n "$l" ]; do
-    l=${l%$'\r'}
-    case "$l" in
-      "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
-    esac
-  done < "$1"
-  return 0
-}
-phase_of() { fact_of "$1" phase; }
 # Exactly one open, one close, CLOSE AFTER OPEN. The order clause is not decoration: a transposed
 # pair satisfies a count-only check, and the driver's copy of this function truncated a file on one.
 # A marker line is the marker or it is malformed — the prefix test IDENTIFIES the line, equality
@@ -2838,7 +2848,11 @@ fi
 # ----
 # ---- WHAT THIS DOES NOT CHECK: a hand edit that REPLACES the real line rather than adding a second
 # ---- one is not detectable from the file and is not claimed (TOOL-aBoundedCeiling-11 stays open).
-# ---- A key outside the `## Run facts` section is not read. The count it prints is DERIVED, and a
+# ---- A key outside the `## Run facts` section is not read - by this check, and since closing review
+# ---- round 1 L2 by `fact_of`/`phase_of` and the driver's `fact` either, so a line placed there
+# ---- answers nothing and needs no grading. The kit's OTHER readers (check-brief-recorded.sh,
+# ---- check-pass-order.sh, lib-unattended.sh and the hook scripts) still read the whole file; no verb
+# ---- writes a key-shaped line outside the section any more. The count it prints is DERIVED, and a
 # ---- population of zero is announced rather than passed silently.
 _rf_files=()
 while IFS= read -r _rf_f; do [ -n "$_rf_f" ] && [ -f "$_rf_f" ] && _rf_files+=("$_rf_f"); done <<< "$RUNS"

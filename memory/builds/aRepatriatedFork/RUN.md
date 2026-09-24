@@ -204,3 +204,7 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T04:03:12Z dispatch · item 5983fe70 DEPL-aRepatriatedFork-13 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/matrix.py memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md memory/builds/aRepatriatedFork/spec/2026-09-24-spec-DEPL-aRepatriatedFork-21.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md memory/gotchas/containment-tested-one-way.md memory/map/generated/symbols.json memory/builds/aRepatriatedFork/README.md
 
 2026-09-24T04:07:04Z dispatch · item 5983fe70 DEPL-aRepatriatedFork-13 · reason WIRE-INTO-PROJECT.md
+
+2026-09-24T04:19:12Z dispatch · item 6ddeb7d5 TOOL-aRepatriatedFork-6 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-6.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md
+
+2026-09-24T04:19:17Z brief · item TOOL-aRepatriatedFork-6 · reason cdd93f6d1bf3 memory/builds/aRepatriatedFork/prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-6-fold-c-brief.md

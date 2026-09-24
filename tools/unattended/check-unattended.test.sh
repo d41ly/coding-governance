@@ -166,6 +166,12 @@ cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 # iterates two pairs and check 26 reads this carrier ALONE, so a fixture missing either half
 # models a broken install and every arm below grades that refusal instead of its own subject.
 cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
+# THE REPAIR POINTER'S TARGET (closing review round 1 M5). `derive_index_repair` probes for the
+# memory-tree kit's generator beside this kit, and a fixture holding only the unattended kit made it
+# print its not-found text, so check 21's arm asserted a literal the leg never produced here. The
+# probe tests only that the FILE exists, so a stub at the sibling home is the whole dependency.
+MT_REL=$(dirname "$KIT_REL")/memory-tree; MT_REL=${MT_REL#./}
+mkdir -p "$MT_REL" && printf '# fixture stub: the probe target of derive_index_repair\n' > "$MT_REL/gen_build_index.py"
 SCRIPT="$TMP/$KIT_REL/check-unattended.sh"
 
 mkconf() { cat > .unattended.conf <<EOF
@@ -2295,7 +2301,7 @@ mutate memory/builds/tRun/README.md '/gen:build-units/d'
 # The arm carries the ENTIRE literal signature up to the first interpolation, not a readable prefix:
 # check-arms grades a branch on the whole thing, and a prefix reds. That is also why the remedy is
 # part of THIS assertion rather than a second one - the remedy is inside the same literal.
-hit "$(run)" "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py"
+hit "$(run)" "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of $MT_REL/gen_build_index.py"
 
 # ...a DUPLICATED pair is refused too, not just an absent one. `region` conflates the two statuses, so
 # an arm for only the absent case would leave the malformed half unproven.
@@ -2332,6 +2338,17 @@ mutate memory/builds/tRun/RUN.md '/^## Run facts/a phase: RUNNING'
 out=$(GOV_UNATTENDED_REPORT=1 run)
 miss "$out" "UNATTENDED check 34 FAILED"
 hit "$out" "check 34 graded "
+# ---- L2 (closing review round 1): the readers check 34 protects are scoped to the SAME section it
+# ---- grades. A terminal phase ABOVE the heading was read ahead of the real `phase: RUNNING` while
+# ---- check 34 reported clean. This fixture carries no halt-code, so an ABORTED read surfaces as the
+# ---- halt-vocabulary refusal; the control below is that refusal firing on the in-section phase.
+reset_tree
+mutate memory/builds/tRun/RUN.md '1a phase: ABORTED'
+out=$(run)
+miss "$out" "memory/builds/tRun/RUN.md (phase ABORTED and no halt-code fact"
+reset_tree
+mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: ABORTED/'
+hit "$(run)" "memory/builds/tRun/RUN.md (phase ABORTED and no halt-code fact, so the record says a run stopped and never says why)"
 reset_tree
 
 # ---- check 16 arms D and E: the CONTRACT's two tables joined to the constants the driver enforces.

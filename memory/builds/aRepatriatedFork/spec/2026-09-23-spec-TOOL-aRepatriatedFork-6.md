@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-6 — unattended set_fact refuses a value that can forge a second fact
 
-**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -33,7 +33,15 @@ guard misses, and gates the class at the leg.
   different line is a fact nothing wrote. Observed by AC5 and AC6.
 - **S4** — Every verb that writes a caller-supplied string is driven with both hostile forms, a
   literal newline and a backslash-n, and each is asserted to leave `phase` unchanged. The verb set is
-  the class, not `--attest` alone. Observed by AC3.
+  the class, not `--attest` alone. Observed by AC3. rev-3: the set is DERIVED from the driver's
+  usage table, every verb whose line takes a free-text placeholder, so a verb added there and not to
+  the matrix reds; each verb is graded on the file it writes, the two record verbs on their records
+  file; and `--close --override` and `--abort` refuse a line feed or a carriage return in the reason
+  before anything is written, as the sibling park writers do (closing review round 1 L1).
+- **S7** — rev-3. The driver's `fact` and the leg's `fact_of`/`phase_of` read only the `## Run facts`
+  section, heading to next `## ` heading, which is the scope check 34 grades. The driver's
+  cross-worktree LANDING read and the leg's halt-code readers route through them. Observed by AC9
+  (closing review round 1 L2).
 - **S5** — The DoD refusal at `tools/unattended/unattended.sh:3674-3683` prints the `--override`
   spelling for an item outside `DOD_NO_OVERRIDE` and `gates-green`, and the comment at `:3988-3989`
   that claims fail 13 already prints it becomes true. This is the second half of nc carve-out 21.
@@ -53,6 +61,11 @@ guard misses, and gates the class at the leg.
   record writers use `printf '%s'`, which interprets no escape in its argument, and each already
   refuses a newline (`:1322`, `:4805`, `:4907`, `:4965`, `:5028`, `:5148`, `:5213`, `:5346`). S4
   drives them anyway, because the class is the verb set.
+- rev-3: the kit's OTHER whole-file readers of a run-state file — `check-brief-recorded.sh`'s
+  phase/witness/base reads, `check-pass-order.sh`'s base read, `lib-unattended.sh`'s
+  `baseline_units` phase probe, and the JS hooks' `readFact` — are not re-scoped by S7. After S4 no
+  verb writes a key-shaped line outside `## Run facts`, and `gate-guard.js` reads a heading-less
+  record on purpose. Recorded as a residual for the close.
 
 ### Edges
 
@@ -212,8 +225,15 @@ tracked run-state file in all three trees.
 - **AC3** — When the S4 matrix drives every value-writing verb in `tools/unattended/unattended.sh`,
   `--attest`, `--resume --keepalive-id`, `--park`, `--propose`, `--brief`, `--record-piece`,
   `--record-set`, `--rescope` and `--preflight --waive`, with both hostile forms, no case changes
-  `phase`.
-  Red when: any verb stores either form as a second line.
+  `phase`. rev-3: the set is every verb the driver's usage table gives a free-text placeholder —
+  `--review`, `--dispatch`, `--close --override` and `--abort` join it — and the matrix reds on a
+  usage-table verb it does not drive; `--close` and `--abort` are graded on the count of `phase:`
+  lines, and the two record verbs on the records file they write, with the accepted one-line form
+  asserted present there as liveness. `--abort --reason` and `--close --override --reason` carrying
+  a line feed or a carriage return exit non-zero with their `fail 36` and `fail 12` messages and the
+  run-state file byte-identical.
+  Red when: any verb stores either form as a second line. Observed red at 6ddeb7d5: `--close` and
+  `--abort` each left two `phase:` lines.
 - **AC4** — When a refused fact write returns, `git hash-object` of the run-state file equals its
   pre-call hash.
   Red when: the guard runs after the file is rewritten.
@@ -233,6 +253,12 @@ tracked run-state file in all three trees.
 - **AC8** — After the bump, `bash tools/check-kit-versions.sh` exits `0`, and with one bumped carrier
   reverted it exits non-zero naming it.
   Red when: a carrier was missed.
+- **AC9** — rev-3. When a run-state file carries `phase: LANDED` above `## Run facts` and a
+  `halt-code:` line under `## Parked`, `unattended.sh --status` reports the in-section phase and no
+  halt code, and reports the halt code once the same line sits inside the section; when a record's
+  `phase: ABORTED` sits above the heading, `check-unattended.sh` does not report it as an aborted
+  record, and does once the in-section phase reads ABORTED.
+  Red when: a reader takes the first match across the whole file. Observed red at 6ddeb7d5.
 
 ## 7. Gates
 
@@ -240,6 +266,8 @@ tracked run-state file in all three trees.
 
 New arm: `tools/unattended/unattended.test.sh` · the S4 verb-by-form matrix, run first against the a7c78ad2 driver to observe `phase` read `LANDED` · none
 New arm: `tools/unattended/check-unattended.test.sh` · a fixture with two different `phase` values under `## Run facts`, observed passing against the a7c78ad2 leg first · none
+New arm: `tools/unattended/check-unattended.test.sh` · a `phase: ABORTED` above `## Run facts`, observed reported as an aborted record by the 6ddeb7d5 leg first · none
+New arm: `tools/unattended/unattended.test.sh` · the usage-table population, the `--close`/`--abort` refusals and the section-scoped `--status` read, observed red against the 6ddeb7d5 driver first · none
 
 ## 8. Open questions
 
@@ -260,6 +288,12 @@ New arm: `tools/unattended/check-unattended.test.sh` · a fixture with two diffe
   AC8 grades 1.29 and no carrier moves twice; AC6's pin reads 67, the build's own `RUN.md` added; S3
   is leg check 34; the §5 user-docs line lands in the protocol's §9 "What it closes" paragraph, in both
   copies, because the protocol keeps no check list.
+- rev-3 · 2026-09-24 · closing review round 1 L1 and L2 (with residual c): S4 and AC3 widen the
+  matrix to the usage table's free-text verbs, grade the record verbs on their records file, and add
+  the `--close --override`/`--abort` reason refusal; S7 and AC9 scope the fact readers to
+  `## Run facts`; §3 records the kit's other whole-file readers as a residual. The matrix's CR arms
+  now pass the byte through a variable, because a `$'\r'` spelled inside a command substitution
+  lost it on node a and the attest CR arm drove a value with no CR in it.
 
 ## 10. Reuse audit
 

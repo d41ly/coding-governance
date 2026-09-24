@@ -735,11 +735,21 @@ readme_of() { printf '%s/builds/%s/README.md' "$M" "$1"; }
 # call sites. Process spawn dominates on Windows and it is what made the sibling self-tests cost 77s
 # and 73s for ~1.4s of CPU apiece. Same semantics: first matching line wins, `key:` followed by any
 # run of spaces, a valueless key yields the empty string, a trailing CR is stripped.
+# TOOL-aRepatriatedFork-6 L2 - ONLY the `## Run facts` section is read, from its heading to the next
+# `## ` heading: the scope leg check 34 grades, and the one section `set_fact` writes. A reader over
+# the whole file took a `phase: LANDED` above the heading, or a key-shaped line under `## Parked`,
+# ahead of the real one while check 34 reported clean - one question, two answers. The leg's
+# `fact_of` carries the same scope.
 fact() { # run-state file · key
   [ -f "$1" ] || return 1
-  local l p="$2:"
+  local l p="$2:" sec=0
   while IFS= read -r l || [ -n "$l" ]; do
     l=${l%$'\r'}
+    case "$l" in
+      "## Run facts"*) sec=1; continue ;;
+      "## "*) sec=0; continue ;;
+    esac
+    [ "$sec" = 1 ] || continue
     case "$l" in
       "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
     esac
@@ -2483,7 +2493,7 @@ verb_landed() { # slug
       case "$_wl" in "worktree "*) _wp=${_wl#worktree } ;; *) continue ;; esac
       [ "$_wp" = "$ROOT" ] && continue
       [ -f "$_wp/$rel" ] || continue
-      case "$(sed -n 's/^phase: //p' "$_wp/$rel" 2>/dev/null | head -1)" in
+      case "$(fact "$_wp/$rel" phase)" in
         LANDING) _elsewhere="$_elsewhere $_wp" ;;
       esac
     done <<WTS
@@ -2788,6 +2798,14 @@ verb_abort() { # slug · reason · code
   # and the message says which word to drop.
   if [ -n "$BYPASS_BAN" ] && printf '%s' "$reason" | grep -qF -- "$BYPASS_BAN"; then
     fail 36 "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar on a terminal record nothing can rewrite; say it without the literal flag: $BYPASS_BAN"
+    return 1
+  fi
+  # TOOL-aRepatriatedFork-6 L1 - the sibling writers' line-end refusal, which this park lacked: a
+  # reason carrying a line feed wrote `<key>: <value>` as a line of its own under `## Parked`, a fact
+  # nothing wrote. A carriage return is refused with it, as `set_fact` refuses one, because every
+  # reader here strips the byte as a line end. Checked before anything is written.
+  if [ "$(printf '%s' "$reason" | wc -l)" -ne 0 ] || case "$reason" in *$'\r'*) true ;; *) false ;; esac; then
+    fail 36 "the reason contains a newline or a carriage return, and park() appends ONE line that the gate parses line-wise, so this would forge a second row or a fact nothing wrote"
     return 1
   fi
   # THE CODE IS REQUIRED, and it is validated against the effective vocabulary rather than accepted as
@@ -3647,6 +3665,14 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     # them is acted on, because a guard that fires after the write has not prevented anything.
     if [ -n "$BYPASS_BAN" ] && printf '%s%s' "$ov" "$reason" | grep -qF -- "$BYPASS_BAN"; then
       fail 12 "an override item or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"
+      return 1
+    fi
+    # TOOL-aRepatriatedFork-6 L1 - the line-end refusal every sibling park writer carries, here for
+    # the same reason as --abort's: the override park writes `reason` verbatim, so a line feed in it
+    # forged a `<key>: <value>` line nothing wrote. Validated with the rest of the pair, before any
+    # pair is acted on.
+    if [ "$(printf '%s%s' "$ov" "$reason" | wc -l)" -ne 0 ] || case "$ov$reason" in *$'\r'*) true ;; *) false ;; esac; then
+      fail 12 "an override item or reason contains a newline or a carriage return, and park() appends ONE line that the gate parses line-wise, so this would forge a second row or a fact nothing wrote"
       return 1
     fi
     # THE AUTHORIZATION ITEM IS NOT OVERRIDABLE. The protocol says so in one sentence — "There is no

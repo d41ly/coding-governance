@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -304,6 +304,9 @@ on gov is green and its red-first observation is taken on the parent commit.
   `derive_index_repair` in `tools/unattended/lib-unattended.sh`, which the driver and the gate leg
   both source. `check-unattended.sh` resolved no python, so it gains the inline `resolve_python` block
   and its ban-list row swaps `memory-tree` for `lib` at equal count, justified by hand.
+  The leg's own self-test seeds a stub `gen_build_index.py` at the memory-tree kit's sibling home
+  in its fixture: the probe tests only that the file exists, and a fixture holding only this kit
+  made check 21's arm assert a literal the helper never printed there (closing review round 1 M5).
 - **S2 in `check-verdict-epoch.sh`.** It resolves no python, so the memory-recall delegate is probed
   beside the kit and one level up, and a miss prints a note naming what is not scanned.
 - **S4's pin.** `tools/settings-merge.py`'s selftest pinned the shipped fragment's `hook_path`; the
@@ -434,6 +437,9 @@ New arm: `tools/lib/resolve-python.test.sh` parity table · one extra row per in
   class; §4 The resolver joins the receipt on `source`'s last two segments and gains a shell form;
   §4 gains "What the build found", recording how S2, S3, S4 and S6 met the tree and which lines S8
   marked. AC1-AC10 are unchanged.
+- rev-5 · 2026-09-24 · closing review round 1 M5: §4 "S6 in the unattended kit" gains the
+  fixture rule - `check-unattended.test.sh` seeds the stub `derive_index_repair` resolves, and check
+  21's arm asserts the resolved path at the whole-literal signature. AC1-AC10 are unchanged.
 
 ## 10. Reuse audit
 
