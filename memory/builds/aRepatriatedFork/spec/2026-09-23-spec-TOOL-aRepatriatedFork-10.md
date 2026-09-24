@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts
 
-**Status:** CLOSED · rev-4 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -46,7 +46,12 @@ and writes the configuration route down, so nc runs gov's engine and gov's rende
   `kit-dogfood-parity.test.sh:54` use the parent only, which is empty for a flat install, so nc's
   rendered `TEMPLATE-SPEC.md` names the codebase-map generator and extractors with no prefix while
   they sit under `scripts`, and nc registers both as dead paths in its
-  `corpus-path-unresolved.txt` rows 38 and 39. Observed by AC7.
+  `corpus-path-unresolved.txt` rows 38 and 39. The receipt is read ONCE, by a marked block
+  `derive_kit_paths` whose canonical copy sits in `tools/lib/render-doc.sh` beside `render_doc`: it
+  resolves each `{{TOOL_ROOT}}<home>/<file>` the templates cite through the inline `resolve_kit_dir`,
+  receipt row first, so a per-entry `kit.<entry>.prefix` override renders where its row puts the
+  file, and emits the top-level `prefix` for the rest, read as JSON. Both renderers carry the block
+  inline and the `tools/lib/resolve-python.test.sh` parity table gates the copies. Observed by AC7.
 - **S7** — A class gate: `tools/check-kit-placeholders.py` refuses a `rendered` template that spells
   `KEY=value` for a key its own kit's `[config]` declares, since that is the repo's own value leaking
   into an adopter's doc. The key set is the `[config]` key lists, its `defaults`, and every key the
@@ -165,6 +170,7 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
 - `tools/memory-tree/adopt-memory-tree.sh`
 - `tools/memory-tree/kit-dogfood-parity.test.sh`
 - `tools/lib/render-doc.sh`
+- `tools/lib/resolve-python.test.sh`
 - `tools/memory-tree/.memory-tree.conf.example`
 - `tools/memory-tree/kit.toml`
 - `tools/memory-tree/README.md`
@@ -224,8 +230,10 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
   Red when: the template still spells gov's value.
 - **AC7** — When the same render runs from a kit installed flat at `scripts/` with a receipt whose
   `prefix` is `scripts`, the rendered `memory/TEMPLATE-SPEC.md` names the codebase-map generator
-  under the `scripts` prefix.
-  Red when: `TOOL_ROOT` is still the empty parent of a flat kit directory.
+  under the `scripts` prefix, and a file whose receipt row re-homes it, `codebase-map/reuse_lookup.py`
+  at `lib/cm/`, renders at that row's path.
+  Red when: `TOOL_ROOT` is still the empty parent of a flat kit directory, or the render reads only
+  the top-level `prefix`.
 - **AC8** — `python tools/check-kit-placeholders.py` exits 1 on today's
   `tools/memory-tree/HYGIENE.template.md`, naming `INDEX_CAP_LINES`, and exits 0 after S5.
   Red when: the arm scans no template or skips keys absent from `optional_keys`.
@@ -247,6 +255,8 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
 New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a legacy-listed root `STATUS.md`, a legacy-listed unbound record, an undated `result.json` under each key value, and a tracked `pass-order-waiver.txt` · the hygiene gate's `ARMS_FLOORS` token moves by the branches S3 adds
 New arm: `tools/check-kit-placeholders.test.sh` · a template spelling `INDEX_CAP_LINES=0` under a kit whose conf declares that key · none
 New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a flat `scripts/` install with a receipt, rendered through `--render` · none
+New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · the same receipt re-homing `codebase-map/reuse_lookup.py` to `lib/cm/` · none
+New arm: `tools/lib/resolve-python.test.sh` · a `derive_kit_paths` parity row, two inline copies against `tools/lib/render-doc.sh` · none
 
 ## 8. Open questions
 
@@ -286,6 +296,13 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a flat `scripts/` i
   `amendment-leaves-its-other-half-standing`.
 - rev-4 · 2026-09-23 · §3 gains the **hands-off** edge back to `DEPL-aRepatriatedFork-20`,
   which declared its **consumes-from** here and met no matching edge (hygiene check 12).
+- rev-5 · 2026-09-24 · closing review round 1 L4 (residual a). S6, AC7 and §7 moved: the two grep
+  reads of the receipt's first `"prefix"`, in `adopt-memory-tree.sh` and `kit-dogfood-parity.test.sh`,
+  were two copies nothing compared and both ignored a per-entry prefix. They are replaced by one
+  marked block, `derive_kit_paths`, that resolves each cited sibling file through `resolve_kit_dir`
+  and joins the resolve-python parity table; `render_doc` applies its lines before the
+  parent-derived `TOOL_ROOT`. The adopter's `resolve_python` block moved above the first render,
+  because `--render` now needs a python.
 
 ## 10. Reuse audit
 

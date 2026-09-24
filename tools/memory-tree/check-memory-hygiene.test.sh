@@ -2746,7 +2746,10 @@ _fl=$(mktemp -d)
   git init -q .; git config user.email t@t.test; git config user.name t
   mkdir -p scripts memory .governance
   cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
-  printf '{\n  "schema": 3,\n  "prefix": "scripts",\n  "files": [{"prefix": "decoy"}]\n}\n' > .governance/install.json
+  # The second row RE-HOMES one sibling, as a `kit.codebase-map.prefix` override records it: only
+  # per row. Closing review round 1 L4 — a top-level `prefix` read renders it at `scripts/` anyway.
+  mkdir -p lib/cm; : > lib/cm/reuse_lookup.py
+  printf '{\n  "schema": 3,\n  "prefix": "scripts",\n  "files": [{"prefix": "decoy"}, {"path": "lib/cm/reuse_lookup.py", "source": "%s/codebase-map/reuse_lookup.py", "kit": "codebase-map"}]\n}\n' gov > .governance/install.json
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\nINDEX_CAP_LINES="500"\nENTRY_CAP_UNIT="bytes"\n' > .memory-tree.conf
   printf '<!-- gov:kit memory-tree@0 -->\n' > memory/HYGIENE.md
   git add -A && git -c commit.gpgsign=false commit -q -m flat --no-verify
@@ -2765,6 +2768,12 @@ if grep -qF '`scripts/codebase-map/gen_map.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2
   echo "ok   a flat install renders TOOL_ROOT from the receipt's prefix"
 else
   echo "FAIL a flat install with a receipt prefix of scripts did not render the codebase-map generator under scripts/ — TOOL_ROOT is still the empty parent"; st=1
+fi
+n=$((n+1))
+if grep -qF '`lib/cm/reuse_lookup.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
+  echo "ok   a sibling file the receipt re-homes renders at its row's path, not at the top-level prefix"
+else
+  echo "FAIL the receipt row re-homing the codebase-map lookup to lib/cm/ was ignored — the render read the top-level prefix only"; st=1
 fi
 rm -rf "$_fl"
 

@@ -80,7 +80,7 @@ tools/memory-tree/corpus_ids.py	4	lib,memory-tree
 tools/memory-tree/gen_build_index.py	6	memory-tree,unattended
 tools/memory-tree/gotchas.py	9	memory-tree
 tools/memory-tree/hygiene-parity.test.sh	2	memory-tree
-tools/memory-tree/kit-dogfood-parity.test.sh	5	lib,memory-tree
+tools/memory-tree/kit-dogfood-parity.test.sh	6	lib,memory-tree	RAISED 5 -> 6 BY HAND, TOOL-aRepatriatedFork-10, closing review round 1 L4: the sixth is the `# >>> resolve_python — canonical copy` marker of the resolver block this suite now carries INLINE, because its render resolves sibling paths through python exactly as the adopter's does. The marker is part of the byte-compared block, so the literal cannot be derived away; the same `lib` literal every inline copy carries.
 tools/memory-tree/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/memory-tree/marker-contract.test.sh	1	memory-tree
 tools/memory-tree/merge-rows.py	3	lib,memory-recall,memory-tree
