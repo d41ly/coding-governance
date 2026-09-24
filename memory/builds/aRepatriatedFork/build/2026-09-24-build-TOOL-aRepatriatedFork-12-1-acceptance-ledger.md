@@ -12,7 +12,7 @@ both. The inCMS observation used a `git clone --local --shared` of `C:/projects/
 
 **Evidences:** TOOL-aRepatriatedFork-12
 - AC1 — `extract.DURABLE` — imported at gov's root, it matches memory/archive/architecture/DECISIONS.2026-07-27.md where a7c78ad2's pattern does not, and over `git ls-files memory` it selects 9 files, the same 9 set a7c78ad2's pattern selects
-- AC2 — `NODE_TAG_CLASS=a-f` — the slice arm's scratch repo prints it under the key and `NODE_TAG_CLASS=a-z` without it, and `extract.ID_RE` refuses `TOOL-xFoo-3` under `a-f`; `a-f]` and `f-a` exit 2 naming `RECALL_NODE_TAG_CLASS`. The pre-unit kit printed `a-z` and still matched
+- AC2 — `NODE_TAG_CLASS=a-f` — the slice arm's scratch repo prints it under the key and `NODE_TAG_CLASS=a-z` without it, and `extract.ID_RE` refuses a TOOL id on node tag x under `a-f`; `a-f]` and `f-a` exit 2 naming `RECALL_NODE_TAG_CLASS`. The pre-unit kit printed `a-z` and still matched
 - AC3 — `RECALL_CITED_FAMILIES="PKG"` — `extract.ID_RE` and `grammar_for(root)` both match `PKG-dCandidLodestar-5`, `extract.DURABLE` does not match memory/backlog/PKG.md and still matches memory/backlog/ARCH.md, and `RECALL_CITED_FAMILIES="ARCH"` exits 2. The pre-unit kit did not match the PKG id
 - AC4 — `query.build_cutoff("a")` — returns `163` under `RECALL_BUILD_QID_CUTOFF="a:163"`, `build_cutoff("b")` returns `0`, and `"a163"` exits 2 naming the key. The pre-unit kit returned `0 0`
 - AC5 — `RECALL_EXPORT_DIR="memory/archive/project"` — `query.py --export --tag a` writes recall-traffic-a.md under that directory with a header saying it is inside the worktree. `"../out"` exits 2 and writes neither there nor under the git dir, and absent writes under the common git dir. The pre-unit kit ignored the key
