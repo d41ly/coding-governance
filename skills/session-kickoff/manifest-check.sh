@@ -34,7 +34,7 @@
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
-KIT_MANIFEST_VERSION="1.7"   # gov:kit kickoff-manifest@1.7 — the registry id
+KIT_MANIFEST_VERSION="1.8"   # gov:kit kickoff-manifest@1.8 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -409,16 +409,23 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 
 # The memory-tree kit's id reader, through the sibling resolver (TOOL-aRepatriatedFork-2 S3): the
 # receipt, which is the only record of a flat or renamed install, then the two probes beside this
-# kit. Gov homes THIS kit under skills/, which no probe walks from, and gov keeps no receipt, so
-# gov's own layout is the one named fallback. Empty when nothing answers; the caller says so.
+# kit. Anchored at this script's dir FIRST, then at the repo root: the per-machine junction copy
+# resolves into gov's checkout, where neither rung sees the graded repo (closing review round 1
+# L3). An answer counts only if the file is in THIS repo. Gov homes THIS kit under skills/, which
+# no probe walks from, and gov keeps no receipt, so gov's own layout is a named fallback, then the
+# flat `memory-tree/` for a run with no python. Empty when nothing answers; the caller says so.
 resolve_id_reader() {
-  local d py gov
+  local d py here
   py=$(resolve_python 2>/dev/null) || py=""
-  if [ -n "$py" ] && d=$(resolve_kit_dir "$py" memory-tree corpus_ids.py "$MC_DIR" 2>/dev/null); then
-    printf '%s\n' "$ROOT/$d/corpus_ids.py"; return 0
+  if [ -n "$py" ]; then
+    for here in "$MC_DIR" "$ROOT"; do
+      d=$(resolve_kit_dir "$py" memory-tree corpus_ids.py "$here" 2>/dev/null) || continue
+      [ -f "$ROOT/$d/corpus_ids.py" ] && { printf '%s\n' "$ROOT/$d/corpus_ids.py"; return 0; }
+    done
   fi
-  gov="$ROOT/tools/memory-tree"   # gov:prefix-literal — gov homes this kit under skills/ and keeps no receipt, so neither rung can reach gov's own reader
-  [ -f "$gov/corpus_ids.py" ] && printf '%s\n' "$gov/corpus_ids.py"
+  for d in "$ROOT/tools/memory-tree" "$ROOT/memory-tree"; do   # gov:prefix-literal — gov homes this kit under skills/ and keeps no receipt, so neither rung can reach gov's own reader
+    [ -f "$d/corpus_ids.py" ] && { printf '%s\n' "$d/corpus_ids.py"; return 0; }
+  done
   return 0
 }
 

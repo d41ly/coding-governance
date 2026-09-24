@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -298,7 +298,10 @@ on gov is green and its red-first observation is taken on the parent commit.
 
 - **S3 at gov's own kickoff.** Gov homes the kickoff kit under `skills/`, outside the tool root the
   probes walk, and keeps no receipt, so `manifest-check.sh`'s id reader keeps gov's layout as its one
-  named fallback, marked `gov:prefix-literal`. `drift_report.py`'s two memory-recall lookups
+  named fallback, marked `gov:prefix-literal`. The id reader tries the resolver anchored at its
+  own dir, then at the repo root, and keeps an answer only if it lies in the graded repo, because
+  the per-machine junction copy resolves into gov's checkout; the flat `memory-tree/` probe is the
+  last fallback (closing review round 1 L3). `drift_report.py`'s two memory-recall lookups
   (`_resolve_ident`, `_resolve_anchors`) take the resolver too; they were the same probe.
 - **S6 in the unattended kit.** The seven repair hints go through one helper,
   `derive_index_repair` in `tools/unattended/lib-unattended.sh`, which the driver and the gate leg
@@ -440,6 +443,10 @@ New arm: `tools/lib/resolve-python.test.sh` parity table · one extra row per in
 - rev-5 · 2026-09-24 · closing review round 1 M5: §4 "S6 in the unattended kit" gains the
   fixture rule - `check-unattended.test.sh` seeds the stub `derive_index_repair` resolves, and check
   21's arm asserts the resolved path at the whole-literal signature. AC1-AC10 are unchanged.
+- rev-6 · 2026-09-24 · closing review round 1 L3: §4 "S3 at gov's own kickoff" gains the second
+  anchor - `manifest-check.sh`'s id reader resolves from the repo root after its own dir and keeps
+  the flat `memory-tree/` probe last, so the junction copy grades a flat install's ids; the
+  `manifest-check.test.sh` L3 arm runs the checker from outside the fixture. AC1-AC10 are unchanged.
 
 ## 10. Reuse audit
 

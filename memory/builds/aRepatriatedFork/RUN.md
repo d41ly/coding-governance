@@ -208,3 +208,7 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T04:19:12Z dispatch · item 6ddeb7d5 TOOL-aRepatriatedFork-6 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-6.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md
 
 2026-09-24T04:19:17Z brief · item TOOL-aRepatriatedFork-6 · reason cdd93f6d1bf3 memory/builds/aRepatriatedFork/prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-6-fold-c-brief.md
+
+2026-09-24T04:59:10Z dispatch · item 47fd0bad TOOL-aRepatriatedFork-2 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md memory/guides/SESSION-KICKOFF.md
+
+2026-09-24T04:59:14Z brief · item TOOL-aRepatriatedFork-2 · reason 42197ffe1ba2 memory/builds/aRepatriatedFork/prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-2-fold-d-brief.md

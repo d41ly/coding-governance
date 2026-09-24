@@ -1151,6 +1151,23 @@ run_card "K2 S1 --card --check with no reader announces the skip and is DEAD PRO
 grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 S7 --card --check over a token-free card is DEAD PROBE"; pass=$((pass+1)); } \
   || { echo "FAIL K2 S7 --card --check over a token-free card is DEAD PROBE"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 
+# L3 (aRepatriatedFork closing review, round 1) — the checker run from OUTSIDE the repo it grades,
+# as the per-machine junction copy is, still finds a flat `memory-tree/` reader in that repo: the
+# resolver is tried anchored at the repo root after its own dir. A stub reader defines
+# `TOOL-zFlatReader-1`; the body cites `-2` as well, so graded ids make 2 tokens with 1 miss, and
+# skipped ids make none at all (DEAD PROBE).
+mkrepo flatreader; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+mkdir -p "$R/memory-tree" "$TMP/junction"
+printf 'print("# id-ere: TOOL-zFlatReader-[0-9]+")\nprint("TOOL-zFlatReader-1")\n' > "$R/memory-tree/corpus_ids.py"
+cp "$CHECK" "$TMP/junction/manifest-check.sh"
+L3_CHECK=$CHECK; CHECK="$TMP/junction/manifest-check.sh"
+run_card "L3 setup: a card in a flat-layout tree, from a checker outside it" "$R" 0 - --card --write --session "$NONCE-l3"
+printf '## records\n- TOOL-zFlatReader-2 — cited, undefined\n- TOOL-zFlatReader-1 — defined\n' | (cd "$R" && bash "$CHECK" --card --append --session "$NONCE-l3" > "$CARD_OUT" 2>&1); got=$?
+CHECK=$L3_CHECK
+[ "$got" = 0 ] && grep -q '^UNVERIFIED — TOOL-zFlatReader-2$' "$CARD_OUT" && grep -q ' 2 tokens · 1 unverified ' "$CARD_OUT" \
+  && { echo "ok   L3 a checker outside the repo grades ids through the repo's flat memory-tree reader (exit 0)"; pass=$((pass+1)); } \
+  || { echo "FAIL L3 a checker outside the repo grades ids through the repo's flat memory-tree reader (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+
 # C12 — the manifest carries no CR byte. Round 3's M1: the §B bullet ABOUT raw CR bytes had its own
 # CR eaten twice by text-mode rewrites, leaving a sentence that said a newline becomes a newline.
 # BOTH directions, because a check that has only ever been seen pass is an assertion about nothing,
@@ -1182,7 +1199,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # same commit as those arms: this floor and check-testsuite-counts.sh are both shrink-only, so an
 # unraised floor is the one thing that lets a later edit delete the arms and red nothing.
 # +2: C12's pair, the CR-byte check's green and red cases (round 3 M1's left-shift).
-FLOOR_ASSERTIONS=178
+# +2: L3's pair, the junction-copy setup and its graded-ids arm (aRepatriatedFork round 1 L3).
+FLOOR_ASSERTIONS=180
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
