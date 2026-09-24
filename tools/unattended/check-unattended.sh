@@ -2853,8 +2853,11 @@ fi
 # ---- answers nothing and needs no grading. Since closing review round 2 M1 the kit's OTHER readers
 # ---- read only the section too, and check 36 below reds one that does not. The count it prints is
 # ---- DERIVED, and a population of zero is announced rather than passed silently.
-_rf_files=()
-while IFS= read -r _rf_f; do [ -n "$_rf_f" ] && [ -f "$_rf_f" ] && _rf_files+=("$_rf_f"); done <<< "$RUNS"
+# `mapfile`, not a `read` loop over a here-string of `$RUNS`: that loop is the shape the shell-hygiene
+# leg gates (a loop fed by a variable assigned from a command substitution), and a whole-list read
+# needs no loop at all. Gate repair at VERIFYING, TOOL-aRepatriatedFork-6 rev-5.
+_rf_files=(); mapfile -t _rf_all <<< "$RUNS"
+for _rf_f in "${_rf_all[@]}"; do [ -n "$_rf_f" ] && [ -f "$_rf_f" ] && _rf_files+=("$_rf_f"); done
 if [ "${#_rf_files[@]}" -eq 0 ]; then
   report "check 34 graded NO run-state file — this tree carries none at the selected path, so a duplicate-fact verdict here would be coverage of nothing"
 else

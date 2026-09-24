@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-6 — unattended set_fact refuses a value that can forge a second fact
 
-**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -332,6 +332,11 @@ New arm: `tools/unattended/check-unattended.test.sh` · check 36 on an unscoped 
   class gate. The §3 residual is closed except the heading-less read in `gate-guard.js`. L1 adds S9
   and AC11, which give `set_fact` the section bounds `fact` reads. The unattended kit moves 1.34 to
   1.35, because its shipped bytes moved after the 1.34 bump.
+- rev-5 · 2026-09-24 · gate repair at VERIFYING, leg `shell hygiene`. S3's check 34 read its run-state
+  population with a `read` loop over a here-string of `$RUNS`, a variable assigned from a command
+  substitution, which is the loop shape that leg gates, and `check-unattended.sh` measured 3 such
+  sites against 2 declared. It now reads the list whole with `mapfile` and loops over the array, so
+  the registry's count stands and no row rises.
 
 ## 10. Reuse audit
 
