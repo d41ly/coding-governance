@@ -440,9 +440,10 @@ sum() { git hash-object memory/builds/tRun/RUN.md; }
 # A FACT GOES UNDER `## Run facts`, at the END of that section (TOOL-aRepatriatedFork-6 L2). Every
 # fact reader is scoped to the section, so a fact appended at EOF lands under `## Parked` and reads
 # as absent. The end of the section keeps first-match order exactly as an append did. A file with
-# no such heading is a fixture fault, and it says so rather than dropping the lines.
-add_facts() { # run-state file; the fact lines on stdin
-  local _pf; _pf=$(cat)
+# no such heading is a fixture fault, and it says so rather than dropping the lines. The lines come
+# as ONE argument, never on stdin: a piped call runs this in a subshell and its `st=1` is lost.
+add_facts() { # run-state file · the fact lines
+  local _pf="$2"
   PF="$_pf" awk '
     /^## / && s && !d { print ENVIRON["PF"]; d = 1 }
     /^## / { s = (index($0, "## Run facts") == 1) }
@@ -516,7 +517,7 @@ bcsetup() {
 }
 bcreset() { git reset -q --hard "$BCP"; git clean -qfd; mkconf; }
 bcopen() { bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+           add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
            # The CONVERGED closing round `closing-review-recorded`'s second term wants, written in
            # `park()`'s own line shape. Every close arm below is about a DIFFERENT item, and without
            # this they would all red on this one — which is a fixture answering a question nobody
@@ -612,7 +613,7 @@ hit "$out" "WIRINGPROBE-the-declared-checks-own-remedy"
 # ---- still pass a fixture built with two competitors.
 reset_tree
 readme tTwo; runmd tTwo "other"
-printf 'phase: RUNNING\n' | add_facts memory/builds/tTwo/RUN.md
+add_facts memory/builds/tTwo/RUN.md "$(printf 'phase: RUNNING\n')"
 git add -A && git commit -q -m two --no-verify
 out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "1 concurrent unattended run(s) — this run is NOT blocked by them"
@@ -945,7 +946,7 @@ _rp_esc()   { printf '%s' "$1" | sed 's|/|\\\\|g'; }
 
 reset_tree; git push -q -f origin unit:main
 run --preflight tRun --keepalive-id k1 >/dev/null
-printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
 fixture; git push -q -f origin HEAD:main
 
 # 1. NOT ADOPTED — the fixture conf declares no RECALL_CLI. MET, and it names the key.
@@ -1053,7 +1054,7 @@ reset_tree; git push -q -f origin unit:main
 # which is exactly the discriminator the merge-base cannot express.
 reset_tree; git push -q -f origin unit:main
 run --preflight tRun --keepalive-id k1 >/dev/null
-printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
 fixture
 git push -q -f origin HEAD:main
 out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction")
@@ -1143,7 +1144,7 @@ hit "$out" "an agent-attested DoD item is unmet; the driver can only read back w
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks"
 
 # ...then the machine branch, with both attestations recorded so ONLY the gate command can fail.
-printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
 mkconf "true" "false"
 out=$(run --close tRun)
 hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
@@ -1160,7 +1161,7 @@ same "the phase advanced to LANDING" \
 # ---- TOOL-cBriefedPilot-1: the override REPEATS. The scalar form overwrote the first pair, so
 # ---- verb_close blocked on the second unmet item forever with nobody to read the block.
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
 mkconf "false" "false"
 out=$(run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override gates-green --reason "bar run by hand" --override records-current --reason "index re-rendered by hand")
 hit "$out" "close OK"
@@ -1352,8 +1353,8 @@ hit "$(run --close tRun)" "observing the anchor, then evaluating the Definition 
 # ---- `parked-decisions-surfaced` is read from a line spelled `parked-surfaced:`, so an operator
 # ---- obeying the old refusal wrote a key nothing reads and re-ran forever.
 bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-printf 'keepalive-reaped: yes
-' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes
+')"
 out=$(run --close tRun)
 hit "$out" "an agent-attested DoD item is unmet"
 hit "$out" "write the RECORD KEY, which is not always the item name: parked-surfaced: yes"
@@ -1374,7 +1375,7 @@ bcrestore   # HOISTED: restore main to the shared BASE for the arms below.
 # not shell quoting, and the tail becomes stray argv the driver rejects.
 crbc='--override build-complete --reason fixture-build-is-one-open-unit'
 cropen() { reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+           add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
            # The CONVERGED closing round the item's SECOND term wants. Every arm below is about
            # the FIRST term - the record join - so without this they would all red on the other.
            printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED
@@ -2269,9 +2270,9 @@ miss "$(run --close tRun 2>&1)" "the BASE recorded in the run-state file"
 # cannot otherwise tell a closed hole from an untested one.
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 sed -i '/^base: /d' memory/builds/tRun/RUN.md
-printf 'keepalive-reaped: yes
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes
 parked-surfaced: yes
-' | add_facts memory/builds/tRun/RUN.md
+')"
 git add -A
 out=$(run --close tRun)
 miss "$out" "authorization-reachable"
@@ -2280,10 +2281,10 @@ miss "$out" "authorization-reachable"
 # not at the pinned BASE because the run created it. The close-side twin of check 6.
 reset_tree
 readme tNew; runmd tNew "irrelevant now"
-printf 'phase: RUNNING
+add_facts memory/builds/tNew/RUN.md "$(printf 'phase: RUNNING
 keepalive-reaped: yes
 parked-surfaced: yes
-' | add_facts memory/builds/tNew/RUN.md
+')"
 fixture
 out=$(run --close tNew)
 hit "$out" "a machine-checked DoD item is unmet, so --close blocks"
@@ -2602,7 +2603,7 @@ printf '\nhalt-code: gate-red-out-of-scope\n' >> memory/builds/tRun/RUN.md
 out=$(run --status tRun)
 hit "$out" "tRun · phase RUNNING"
 miss "$out" "halt-code gate-red-out-of-scope"
-printf 'halt-code: gate-red-out-of-scope\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'halt-code: gate-red-out-of-scope\n')"
 hit "$(run --status tRun)" "halt-code gate-red-out-of-scope"
 
 # ---- AC7: a machine-checked item outside DOD_NO_OVERRIDE prints the --override spelling, so the
@@ -3041,7 +3042,7 @@ remove_landed_fixture
 # ---- plumbing, which has arms of its own.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
-printf 'branch-ref: refs/heads/unit\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'branch-ref: refs/heads/unit\n')"
 fixture
 RUNTIP=$(git rev-parse HEAD)
 git checkout -q -B main "$BASE"
@@ -3066,7 +3067,7 @@ git branch -f main "$BASE"
 # ---- unrelated work that the remote has never seen, which is also what makes arm 1 miss.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
-printf 'branch-ref: refs/heads/unit\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'branch-ref: refs/heads/unit\n')"
 fixture
 RUNTIP=$(git rev-parse HEAD)
 git checkout -q -B main "$BASE"
@@ -3096,7 +3097,7 @@ git checkout -q unit; git branch -q -D scratch; git branch -f main "$BASE"
 # tests the wrong anchor.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
-printf 'branch-ref: refs/heads/unit\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'branch-ref: refs/heads/unit\n')"
 fixture
 git checkout -q -B main "$BASE"
 # THE FIXTURE HAS TO EXIST ON MAIN, or the verb refuses for want of a run-state file long before it
@@ -3109,7 +3110,7 @@ git checkout -q unit; git branch -f main "$BASE"
 # ...and a branch ref that does not resolve in this clone is a named refusal, never a silent pass.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
-printf 'branch-ref: refs/heads/no-such-branch\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'branch-ref: refs/heads/no-such-branch\n')"
 fixture
 git checkout -q -B main "$BASE"
 # THE FIXTURE HAS TO EXIST ON MAIN, or the verb refuses for want of a run-state file long before it
@@ -3142,7 +3143,7 @@ hit "$(run --abort tRun --reason "second thoughts")" "the run is already finishe
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # a legal code rides along: the code is required now, and this arm is about something else.
 hit "$(run --abort tRun --code fork-unresolvable --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: keepalive-reaped via keepalive-reaped"
-printf 'keepalive-reaped: yes\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\n')"
 # a legal code rides along: the code is required now, and this arm is about something else.
 hit "$(run --abort tRun --code fork-unresolvable --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: parked-decisions-surfaced via parked-surfaced"
 
@@ -3150,7 +3151,7 @@ hit "$(run --abort tRun --code fork-unresolvable --reason "no anchor")" "an agen
 # hardcoded `park` it would have read "override · item …", and the build method derives the owner's
 # open/parked row from parked entries "plus any recorded DoD override" — so an abort would have
 # arrived in the one turn the owner gets wearing the label of an override that never happened.
-printf 'parked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'parked-surfaced: yes\n')"
 # a legal code rides along: the code is required now, and this arm is about something else.
 out=$(run --abort tRun --code fork-unresolvable --reason "the remote never answered")
 hit "$out" "phase ABORTED"
@@ -3162,7 +3163,7 @@ miss "$(sed -n '/^## Parked/,$p' memory/builds/tRun/RUN.md)" "override"
 # ...and the OTHER caller of the same helper still writes an override entry, or the kind argument
 # has simply relabelled every parked line rather than distinguishing two kinds.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
 run --close tRun --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit with no roster, by construction" --override records-current --reason "records lag" >/dev/null 2>&1
 hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reason records lag"
 
@@ -3449,9 +3450,9 @@ hit "$out" "the BASE recorded in the run-state file is not an ancestor of the ba
 # ---- into the file leg check 11 greps WHOLE — so the honest sentence would red the bar permanently,
 # ---- on a terminal record no verb can rewrite. The control is that an ordinary reason is accepted.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-printf 'keepalive-reaped: yes
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes
 parked-surfaced: yes
-' | add_facts memory/builds/tRun/RUN.md
+')"
 before=$(sum)
 hit "$(run --abort tRun --reason "the lander refused and I would not reach for --no-verify")" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar on a terminal record nothing can rewrite; say it without the literal flag"
 same "the refused abort wrote nothing" "$(sum)" "$before"
@@ -4757,7 +4758,7 @@ echo "MARK park-taxonomy" >&2
 # ---- the count is OPTIONAL, and omitting it must behave exactly as it always did. Without this arm
 # ---- the change is a silent breakage of every record that attested before it landed.
 bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
 fixture
 out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
 miss "$out" "the attested count of surfaced parked decisions does not match the record"
@@ -4768,7 +4769,7 @@ miss "$out" "the attested count of surfaced parked decisions does not match the 
 bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
 run --park tRun --item "q two" --reason "opts two, refused because" >/dev/null
-printf 'keepalive-reaped: yes\nparked-surfaced: yes, 4 surfaced\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes, 4 surfaced\n')"
 fixture
 out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
 hit "$out" "the attested count of surfaced parked decisions does not match the record"
@@ -4778,7 +4779,7 @@ hit "$out" "the attested count of surfaced parked decisions does not match the r
 bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
 run --park tRun --item "q two" --reason "opts two, refused because" >/dev/null
-printf 'keepalive-reaped: yes\nparked-surfaced: yes, 2 surfaced\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes, 2 surfaced\n')"
 fixture
 out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
 miss "$out" "the attested count of surfaced parked decisions does not match the record"
@@ -4796,7 +4797,7 @@ hit  "$out" "unattended: keepalive-reaped: attested; checked at --landed against
 # ---- total must refuse.
 bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
-printf 'keepalive-reaped: yes\nparked-surfaced: yes, 3 surfaced\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes, 3 surfaced\n')"
 fixture
 out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
 hit "$out" "the attested count of surfaced parked decisions does not match the record"
@@ -4809,7 +4810,7 @@ hit "$out" "the attested count of surfaced parked decisions does not match the r
 bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
 printf '\n2026-08-20T00:00:00Z review · item some subject · reason round 1 of a review, which the owner need not adjudicate\n' >> memory/builds/tRun/RUN.md
-printf 'keepalive-reaped: yes\nparked-surfaced: yes, 1 surfaced\n' | add_facts memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes, 1 surfaced\n')"
 fixture
 # --status BEFORE the close, and the ordering is the whole point of putting it here. The close
 # appends one parked line per override, and those lines are `override` kind, which IS surfaced — so
@@ -4848,9 +4849,9 @@ same "a refused code wrote nothing either" "$(grep -c '^halt-code: ' memory/buil
 # ...and the accepted path, which is what makes the two refusals mean something. Both agent-attested
 # items are written first, because an abort owes both and would otherwise refuse for a different reason.
 bcopen
-printf 'keepalive-reaped: yes
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes
 parked-surfaced: yes
-' | add_facts memory/builds/tRun/RUN.md
+')"
 out=$(run --abort tRun --reason "stopped for a stated reason" --code gate-red-out-of-scope)
 hit "$out" "halt-code gate-red-out-of-scope"
 same "the code is an authored FACT, not a substring of the reason" "$(grep -c '^halt-code: gate-red-out-of-scope' memory/builds/tRun/RUN.md)" "1"
@@ -4861,9 +4862,9 @@ hit "$(run --resume tRun)" "this run FINISHED rather than paused: halt-code gate
 bcopen; mkconf; printf 'HALT_CODES_EXTRA="site-specific-halt"
 HALT_FLOOR="7"
 ' >> .unattended.conf
-printf 'keepalive-reaped: yes
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes
 parked-surfaced: yes
-' | add_facts memory/builds/tRun/RUN.md
+')"
 out=$(run --abort tRun --reason "stopped for a stated reason" --code site-specific-halt)
 miss "$out" "not in the effective vocabulary"
 reset_tree
@@ -6610,7 +6611,7 @@ git checkout -qf unit; bcreset
 # ---- tree before authorization is ever reached, which is a fixture answering the wrong question.
 init_sa_tree() { git reset -q --hard "$BCP"; git clean -qfd; mkconf true true "" 3600 "" 1800 7 5400 2026-09-21; }
 init_sa_run() { init_sa_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-             printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' | add_facts memory/builds/tRun/RUN.md
+             add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
              printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' \
                >> memory/builds/tRun/RUN.md; }
 bcreset; git checkout -qf main
