@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.35 -->
+<!-- gov:kit unattended@1.36 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with

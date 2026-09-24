@@ -6,7 +6,7 @@
  * this directory — the conf basename, the conf keys, the record basename and the sidecar dir name
  * are the only literals.
  *
- * gov:kit unattended@1.35 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.36 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aWokenSentinel-3 under the build folder of that slug, §4 "The key".
