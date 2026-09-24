@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-19 — check-wiring judges every arm at a relocated layout
 
-**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 5
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-24-build-TOOL-aRepatriatedFork-19-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-19-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-TOOL-aRepatriatedFork-19-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-19-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -21,14 +22,19 @@ prefix, so inCMS can drop its check-wiring fork and nc can drop carve-out 27.
 
 ## 2. Scope (IN)
 
-- **S1** — A `receipt_path <gov-source>` function in `tools/check-wiring.sh`. It prints the `path`
-  of the `.governance/install.json` row whose `source` equals its argument, and prints nothing when
-  the receipt is absent (gov's own tree) or holds no such row. It is the FIRST candidate in the
+- **S1** — A `resolve_receipt_path <kit-home> <file>` function in `tools/check-wiring.sh`, taking the same
+  pair as the Python `resolve_kit_dir`. It prints the `path` of the `.governance/install.json` row
+  whose `source` ENDS in `<kit-home>/<file>` as whole path segments (a tool-root file such as
+  `settings-merge.py` passes an empty home), skips a row whose `path` is
+  absolute or climbs with `..`, and prints nothing when the receipt is absent (gov's own tree) or
+  holds no such row. The argument is the source's trailing segments rather than the whole gov source
+  because a whole source spells gov's tool root, a literal the install-prefix ban refuses in a
+  shipped file, and because the last two segments are the Python resolver's own join key. It is the FIRST candidate in the
   `first_of` lists of the merge arm (`tools/check-wiring.sh:721`), the recall arm (`:505`), the
   scratch arm (`:455`), the card arm (`:560`), the agent-cap arm (`:391`) and the settings-merge
   default (`:365-366`). Every existing rung stays after it, so gov's tree and a copy-installed
   adopter with no receipt resolve exactly as today. Observed by AC1, AC2 and AC3.
-- **S2** — A skip that the receipt contradicts says so. When `receipt_path` names a row and the
+- **S2** — A skip that the receipt contradicts says so. When `resolve_receipt_path` names a row and the
   file at that path is absent, the arm's `skip` line names the receipt row and the missing path
   instead of "not adopted". It stays a `skip`, because the subject of a missing installed file is
   the receipt leg, not wiring. Observed by AC4.
@@ -48,8 +54,12 @@ prefix, so inCMS can drop its check-wiring fork and nc can drop carve-out 27.
   `tools/lib/resolve-python.test.sh` gates byte-for-byte. `src_of` (`:30`) gains the derived
   `$REPO/$KIT_REL/` rung between its two literal rungs, which is nc carve-out 27's rung with the
   derivation swapped for the boundary walk. Observed by AC6.
+  As found at build time (rev-3): `TOOL-aRepatriatedFork-8` S6 already rewrote `src_of` to
+  `"$HERE/$1" "$REPO/$1"`, and `$HERE` IS `$REPO/$KIT_REL` in the S4 sense, so that rung is absorbed
+  with no change here; the same unit folded the three resolver sources into one guarded source,
+  which this unit replaces with the one inline block.
 - **S5** — New arms in `tools/check-wiring.test.sh` for S1, S2 and S3, each observed red against the
-  a7c78ad2 checker before it lands, plus one arm asserting that `receipt_path` and the Python
+  a7c78ad2 checker before it lands, plus one arm asserting that `resolve_receipt_path` and the Python
   resolver `TOOL-aRepatriatedFork-2` ships give the same answer over one fixture receipt, so a change
   to govkit's receipt format reds instead of silently missing. Observed by AC1 through AC5.
 - **S6** — `KIT_CHECK_WIRING_VERSION` moves one step, from `1.7` to `1.8` (`tools/check-wiring.sh:23`).
@@ -57,6 +67,9 @@ prefix, so inCMS can drop its check-wiring fork and nc can drop carve-out 27.
   answers it: `SMERGE_DEFAULT` has been derived from `KIT_REL` since `TOOL-dRetiredFork-8`
   (`:365-366`), and gov's checker printed `Fix: python3 scripts/settings-merge.py` at inCMS on
   2026-09-23. Observed by AC7.
+  The backlog row is flipped by the main loop's records commit, not by the unit pass: `--dispatch`
+  refuses a unit write set naming `memory/backlog/TOOL.md` (unattended check 49, a shared mutable
+  record), so AC7's backlog half is observed at the close (rev-3).
 
 ## 3. Non-goals (OUT)
 
@@ -82,7 +95,7 @@ prefix, so inCMS can drop its check-wiring fork and nc can drop carve-out 27.
 ### Edges
 
 - **consumes-from** `TOOL-aRepatriatedFork-2` — the rung order of that unit's `resolve_kit_dir`:
-  receipt, then probes, then a named miss. `receipt_path` is its rung 1 spelled for shell, so both
+  receipt, then probes, then a named miss. `resolve_receipt_path` is its rung 1 spelled for shell, so both
   answer "where did this gov file land" from the same row by the same join key.
 - **consumes-from** `TOOL-aRepatriatedFork-18` — the canonical derived-`KIT_REL` block S4 inlines.
   Without it this suite would carry a fourth hand-copied boundary walk.
@@ -104,11 +117,12 @@ The receipt is written by `govkit` with `json.dumps(receipt, indent=2)` (`tools/
       "source": "tools/memory-tree/merge-rows.py",
 ```
 
-`receipt_path` is one awk pass that remembers the last `"path"` value and prints it when a
-`"source"` line equals the argument, resetting at each `{`. The checker's comment at `:240-245`
-records that it executes no python, and that stays true. The join key is the GOV source path, which
-is the one spelling identical at every adopter; the checker already knows it, because it is the path
-the `first_of` rungs are derived from.
+`resolve_receipt_path` is one awk pass that collects each row's `"path"` and `"source"` between its
+`{` and `}` lines, so key order does not matter, and prints the path of the first row whose source
+ends in `<kit-home>/<file>` (rev-3). The checker's comment at `:240-245` records that it executes no
+python, and that stays true. The join key is the source's last two segments, the part of the GOV
+source path that is identical at every adopter and the part `resolve_kit_dir` joins on; the head is
+gov's tool root, which a shipped file may not spell.
 
 What each adopter's receipt answers, read on 2026-09-23 (PINNED):
 
@@ -159,7 +173,7 @@ nc deletes carve-out 27 (`scripts/check-wiring.test.sh:30-35`), which S4 absorbs
 
 ## 5. Production-readiness checklist
 
-- security — `receipt_path` reads a tracked file and prints a repo-relative path that `first_of` then
+- security — `resolve_receipt_path` reads a tracked file and prints a repo-relative path that `first_of` then
   tests with `-f`; nothing from the receipt is executed or evaluated.
 - perf / scale — one awk pass over the receipt per arm that probes, six at most, inside a SessionStart
   hook that already forks more than that.
@@ -188,7 +202,7 @@ nc deletes carve-out 27 (`scripts/check-wiring.test.sh:30-35`), which S4 absorbs
   identical to a7c78ad2's apart from any line the eol arm adds for S3.
   Red when: the receipt rung changes a verdict in a tree that has no receipt.
 - **AC4** — When the fixture's receipt names the flat driver path and that file is deleted, the
-  `merge` line is a `skip` naming the receipt and the missing path, from `receipt_path`'s answer.
+  `merge` line is a `skip` naming the receipt and the missing path, from `resolve_receipt_path`'s answer.
   Red when: it prints the generic "not adopted".
 - **AC5** — When a fixture tracks one script under `.claude/workflows/` with an `eol=lf` pin and the
   worktree copy holds CR bytes, `bash tools/check-wiring.sh --check` prints an `eol` line naming
@@ -254,6 +268,11 @@ on, each run against the a7c78ad2 checker first · none
   `check-wiring.test.sh` row, with nc's checker run read-only for this spec.
 - rev-2 · 2026-09-24 · S6 and its acceptance line move to `1.7` -> `1.8`: `TOOL-aRepatriatedFork-2` and
   `TOOL-aRepatriatedFork-8` each bumped check-wiring in this build before this unit reached it.
+- rev-3 · 2026-09-24 · S1 takes the kit home and file as two arguments and matches their join as a
+  suffix, not the whole gov source, and is named `resolve_receipt_path` (S2's helper
+  `derive_receipt_miss`) because the lexicon's VERBS table holds no `receipt`, so the shipped checker spells no tool root and joins as the Python resolver does; S4's
+  `src_of` rung is recorded as already absorbed by `TOOL-aRepatriatedFork-8`; S6 and AC7's backlog
+  half move to the main loop's records commit, because check 49 refuses the backlog in a unit write set.
 
 ## 10. Reuse audit
 

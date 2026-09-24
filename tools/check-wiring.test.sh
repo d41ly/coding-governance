@@ -1,10 +1,27 @@
 #!/usr/bin/env bash
 # Runnable check for tools/check-wiring.sh. Spins throwaway repos and asserts the wired/unwired
 # detection, the never-clobber auto-fix, and the always-exit-0 --session mode. Run: bash tools/check-wiring.test.sh
-KIT_REL="${KIT_REL:-tools}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"      # safe dir to return to before any rm -rf
+# THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-19 S4, on the canonical block
+# TOOL-aRepatriatedFork-18 S2 ships). It was a spelled gov-prefix default that nothing ever set, so at
+# any prefix but gov's every fixture below laid its kit files where the checker under test does not
+# look. The suite sits beside the checker, so its directory IS the checker's own KIT_REL.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-wiring.test: not inside a git repository"; exit 2; }
+KP=${KIT_REL:+$KIT_REL/}   # the prefix as a path head: empty at a root install, never a bare '/'
 SCRIPT="$HERE/check-wiring.sh"
 SMERGE="$HERE/settings-merge.py"
 pass=0; fail=0
@@ -24,17 +41,43 @@ chk() { bash "$SCRIPT" "$@" 2>/dev/null; }   # run the checker, drop stderr nois
 # that cannot see what it grades. TOOL-dRetiredFork-8.
 chke() { bash "$SCRIPT" "$@" 2>&1; }
 
-# ONE PYTHON, resolved the way the hooks kit's suites resolve it (TOOL-aRepatriatedFork-8 S6): the
-# resolver library when it sits beside this suite, which it does only in gov, else the launcher name.
-# This sourced the resolver library by its gov path at three sites, and that library is gov-internal
-# and ships to no adopter, so the suite could not run anywhere it is installed.
-if [ -f "$HERE/lib/resolve-python.sh" ]; then
-  # shellcheck source=/dev/null
-  . "$HERE/lib/resolve-python.sh"
-  py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
-else
-  py=python3   # gov:literal-python — last-resort fallback when lib/ is absent (adopter layout)
-fi
+# ONE PYTHON, resolved by the resolver carried INLINE (TOOL-aRepatriatedFork-19 S4). This sourced
+# the resolver library beside the suite, which exists only in gov: that library is gov-internal and
+# ships to no adopter, so at an adopter the suite fell back to a bare launcher NAME. The block is
+# byte-identical to the canonical copy its marker line names, gated by the parity table in the
+# resolve-python self-test.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
 
 # A kit file in THIS repo, resolved across both install layouts the way every arm resolves them:
 # beside this suite (`tools/<rel>` here, `scripts/<rel>` at an adopter that installs the kits there),
@@ -121,7 +164,7 @@ cleanup
 
 # AC7 — agent-cap adopted but unwired -> --check UNWIRED (exit 1); --session still exits 0
 if [ -f "$SMERGE" ]; then
-  newrepo; mkdir -p $KIT_REL/hooks .claude/hooks; cp "$SMERGE" tools/settings-merge.py
+  newrepo; mkdir -p $KIT_REL/hooks .claude/hooks; cp "$SMERGE" ${KP}settings-merge.py
   # The stub goes where the FRAGMENT declares the hook, not at `.claude/hooks/`.
   # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
   # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
@@ -198,7 +241,7 @@ fi
 SGFRAG="$HERE/hooks/scratch-guard.fragment.json"
 if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
   newrepo; mkdir -p $KIT_REL/hooks $KIT_REL/memory-recall .claude/hooks
-  cp "$SMERGE" tools/settings-merge.py
+  cp "$SMERGE" ${KP}settings-merge.py
   cp "$SGFRAG" $KIT_REL/hooks/scratch-guard.fragment.json
   git config core.hooksPath .githooks    # isolate: hooks wired, so only scratch-guard can move the exit
 
@@ -253,7 +296,7 @@ JSON
   # 13d — and the declared matcher reads ok. Without this half the arm is satisfied by a checker that
   # denies every matcher there is.
   rm -f .claude/settings.json
-  "$py" tools/settings-merge.py --fragment $KIT_REL/hooks/scratch-guard.fragment.json >/dev/null 2>&1
+  "$py" ${KP}settings-merge.py --fragment $KIT_REL/hooks/scratch-guard.fragment.json >/dev/null 2>&1
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
     && ck "AC13d the fragment's own matcher -> ok, exit 0" 1 \
@@ -274,7 +317,7 @@ done
 if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   newrepo
   git config core.hooksPath .githooks        # isolate: hooks wired, so only the recall arm can be unwired
-  mkdir -p tools memory-recall .claude/hooks; cp "$SMERGE" tools/settings-merge.py
+  mkdir -p ${KIT_REL:-.} memory-recall .claude/hooks; cp "$SMERGE" ${KP}settings-merge.py
 
   # state 1 — kit not adopted (no fragment anywhere) -> skip, exit 0
   out=$(chk --check); rc=$?
@@ -301,14 +344,14 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # state 3b — the SAME state with NO settings-merge.py anywhere: still UNWIRED, still exit 1.
   # This is the adopter layout the runbook produced before the delivery step existed, where the arm
   # used to print `skip … cannot verify` and exit 0 on the state the doc calls the one bad state.
-  rm -f tools/settings-merge.py
+  rm -f ${KP}settings-merge.py
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
     && ck "AC8 recall unmerged, no settings-merge.py -> UNWIRED, exit 1" 1 || ck "AC8 recall unmerged, no settings-merge.py -> UNWIRED, exit 1" 0
-  cp "$SMERGE" tools/settings-merge.py
+  cp "$SMERGE" ${KP}settings-merge.py
 
   # state 4 — merged into settings.json -> ok, exit 0
-  "$py" tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  "$py" ${KP}settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
     && ck "AC8 recall merged -> ok, exit 0" 1 || ck "AC8 recall merged -> ok, exit 0" 0
@@ -1009,6 +1052,107 @@ ck "prefix: the agent-cap remedy names the INSTALL PREFIX's merger" \
    "$(printf '%s' "$out" | grep -q 'scripts/gov/settings-merge.py' && echo 1 || echo 0)"
 ck "prefix: no remedy in that install still names the dead tools/ merger" \
    "$(printf '%s' "$out" | grep -q 'tools/settings-merge' && echo 0 || echo 1)"
+cleanup
+
+# ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------
+# An adopter that homes a kit somewhere no probe spells — the merge driver flat under `scripts/`, the
+# recall kit at `scripts/recall/`, the scratch guard in `.claude/hooks/` — got `skip … not adopted`
+# over a kit that was installed and wired. The receipt records where every file landed, and these
+# arms put each kit ONLY where the receipt says, so a probe cannot be what finds it. The receipt is
+# written with the writer's own call, `json.dumps(indent=2)`, and every `source` carries a head that
+# is not gov's tool root: the join is on the trailing `<kit-home>/<file>`, and a reader keyed on the
+# whole source would miss here exactly as it would at an adopter.
+write_receipt() { # <path>=<kit-home/file> ... -> .governance/install.json in the cwd
+  mkdir -p .governance
+  "$py" -c 'import json, sys
+rows = [{"path": a.split("=", 1)[0], "role": "engine", "kit": "fixture", "source": "upstream/" + a.split("=", 1)[1]} for a in sys.argv[1:]]
+open(".governance/install.json", "w", newline="\n").write(json.dumps({"schema": 3, "prefix": "scripts", "files": rows}, indent=2) + "\n")' "$@"
+}
+if [ -f "$SMERGE" ] && [ -f "$SGFRAG" ] && [ -n "$FRAG" ]; then
+  newrepo; git config core.hooksPath .githooks   # isolate: hooks wired, so only the arms under test move
+  mkdir -p scripts/memory-recall scripts/recall .claude/hooks memory/backlog ${KIT_REL:-.}
+  _flat="memory-tree/merge-rows.py memory-tree/merge-rows.sh"  # gov:root-fixture — src_of keys under the tool root; the scratch repo lays them FLAT under scripts/, where no probe looks
+  _grammar="memory-recall/extract.py memory-recall/recall_conf.py"  # gov:root-fixture — src_of keys under the tool root; the grammar kit the flat driver finds beside itself
+  for rel in $_flat; do cp "$(src_of "$rel")" "scripts/${rel#*/}"; done
+  for rel in $_grammar; do cp "$(src_of "$rel")" "scripts/$rel"; done
+  printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
+  printf '# tooling backlog\n\n- TOOL-001 | a landed row, so the family harvest has a population\n' > memory/backlog/TOOL.md
+  printf 'memory/backlog/*.md merge=rows\n' > .gitattributes
+  cp "$SGFRAG" .claude/hooks/scratch-guard.fragment.json; printf '// stub\n' > .claude/hooks/scratch-guard.js
+  cp "$FRAG" scripts/recall/recall-opened.fragment.json; printf '// stub\n' > scripts/recall/recall-opened.js
+  cp "$SMERGE" ${KP}settings-merge.py
+  _rows="scripts/merge-rows.py=memory-tree/merge-rows.py scripts/merge-rows.sh=memory-tree/merge-rows.sh"  # gov:root-fixture — receipt source suffixes, the join key, not install paths
+  _rows="$_rows .claude/hooks/scratch-guard.fragment.json=hooks/scratch-guard.fragment.json"  # gov:root-fixture — receipt source suffix, the join key, not an install path
+  _rows="$_rows scripts/recall/recall-opened.fragment.json=memory-recall/recall-opened.fragment.json"  # gov:root-fixture — receipt source suffix, the join key, not an install path
+  write_receipt $_rows
+  "$py" ${KP}settings-merge.py --fragment .claude/hooks/scratch-guard.fragment.json >/dev/null 2>&1
+  "$py" ${KP}settings-merge.py --fragment scripts/recall/recall-opened.fragment.json >/dev/null 2>&1
+  git add -A; git commit -q -m receipted
+
+  # AC1 — the flat driver is FOUND through its receipt row, and --fix wires the launcher beside it.
+  # The second half is the positive artifact: `FIXED` is reachable only after the no-op three-way
+  # ran, so the arm proves the driver it found is the one that merges, not merely a line that moved.
+  out=$(chk --check)
+  line=$(printf '%s\n' "$out" | grep -E '^[A-Za-z]+ +merge ' || true)
+  ck "U19 AC1 a receipted flat merge driver is found, not skipped as not adopted" \
+     "$([ -n "$line" ] && ! printf '%s' "$line" | grep -q 'not adopted' && echo 1 || echo 0)"
+  chk --fix >/dev/null; got=$(git config merge.rows.driver 2>/dev/null || true)
+  ck "U19 AC1 ...and --fix wires the flat driver's own launcher" \
+     "$([ "$got" = "bash scripts/merge-rows.sh %O %A %B %P" ] && echo 1 || echo 0)"
+
+  # AC2 — the scratch guard receipted into .claude/hooks/, and the recall kit homed at scripts/recall/.
+  out=$(chk --check)
+  ck "U19 AC2 a receipted, wired scratch guard reads ok" \
+     "$(printf '%s' "$out" | grep -q '^ok       scratch' && echo 1 || echo 0)"
+  ck "U19 AC2 a receipted, wired recall hook at a renamed kit dir reads ok" \
+     "$(printf '%s' "$out" | grep -q '^ok       recall' && echo 1 || echo 0)"
+
+  # S5 parity — the awk rung and the canonical Python reader answer one receipt identically. The
+  # Python side is the `resolve_kit_dir` the merge driver itself carries, so this compares against
+  # the reader that ships rather than a third spelling of it. Each answer must be NON-EMPTY: two
+  # readers agreeing on nothing is the vacuous pass this repo refuses.
+  eval "$(sed -n '/^resolve_receipt_path() {/,/^}/p' "$SCRIPT")"
+  for pair in memory-tree:merge-rows.py hooks:scratch-guard.fragment.json memory-recall:recall-opened.fragment.json; do
+    h=${pair%%:*}; a=${pair#*:}
+    sh_ans=$(resolve_receipt_path "$h" "$a"); sh_ans=${sh_ans%/*}
+    py_ans=$("$py" -c 'import importlib.util, pathlib, sys
+spec = importlib.util.spec_from_file_location("merge_rows", "scripts/merge-rows.py")
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+print(m.resolve_kit_dir(sys.argv[1], sys.argv[2], ".").relative_to(pathlib.Path(".").resolve()).as_posix())' "$h" "$a" 2>/dev/null | tr -d '\r')
+    ck "U19 S5 resolve_receipt_path and resolve_kit_dir agree on $h/$a ($sh_ans)" \
+       "$([ -n "$sh_ans" ] && [ "$sh_ans" = "$py_ans" ] && echo 1 || echo 0)"
+  done
+
+  # AC4 — the receipt names the driver and the file is gone: still a skip (a missing installed file
+  # is the receipt leg's red), but one that names the row and the path instead of "not adopted".
+  rm -f scripts/merge-rows.py
+  _miss_row='install.json row for memory-tree/merge-rows.py names scripts/merge-rows.py, which is absent'  # gov:root-fixture — the receipt key the checker prints, not a path
+  out=$(chk --check)
+  line=$(printf '%s\n' "$out" | grep -E '^skip +merge ' || true)
+  ck "U19 AC4 a receipted-but-missing driver skips naming the receipt and the path" \
+     "$(printf '%s' "$line" | grep -qF "$_miss_row" && echo 1 || echo 0)"
+  cleanup
+else
+  echo "skip receipt cases — settings-merge.py, scratch-guard.fragment.json or recall-opened.fragment.json not found"
+fi
+
+# AC5 — the eol arm's SECOND named glob: a tracked, pinned `.claude/workflows/*.js` holding CR bytes
+# is named. The bound half rides along: a pinned `.claude/hooks/*.js` with the same CR bytes is NOT,
+# because the population is two named globs and never "every eol=lf path under .claude/".
+newrepo; git config core.hooksPath .githooks
+mkdir -p .claude/skills/y .claude/workflows .claude/hooks
+printf '.claude/skills/**/*.md eol=lf\n.claude/workflows/*.js eol=lf\n.claude/hooks/*.js eol=lf\n' > .gitattributes
+printf 'a\nb\n' > .claude/skills/y/SKILL.md
+printf 'x;\n' > .claude/workflows/harness.js
+printf 'x;\n' > .claude/hooks/other.js
+git add -A; git commit -q -m pins
+printf 'x;\r\n' > .claude/workflows/harness.js
+printf 'x;\r\n' > .claude/hooks/other.js
+out=$(chk --check); rc=$?
+ck "U19 AC5 a CR-carrying pinned workflow script is named by the eol arm" \
+   "$([ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'note     eol       — .claude/workflows/harness.js' && echo 1 || echo 0)"
+ck "U19 AC5 ...and a pinned .claude/ file outside both globs is not" \
+   "$(printf '%s' "$out" | grep -q 'other.js' && echo 0 || echo 1)"
 cleanup
 
 echo "---- $pass passed, $fail failed ----"

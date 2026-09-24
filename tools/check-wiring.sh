@@ -9,6 +9,10 @@
 #                              # {kit}/{here} expanded — the value the arms below decide on, twinned
 #                              # on settings-merge.py so the hook-destinations gate can assert parity
 #
+# WHERE A KIT FILE IS: every arm asks the install receipt (`.governance/install.json`, written by
+# govkit) FIRST, through `resolve_receipt_path`, and only then probes gov's own `<prefix>/<kit>/` layout. A
+# tree with no receipt — gov's own — resolves exactly as the probes always did.
+#
 # SEVERITY IS A VOCABULARY, and only `UNWIRED` gates. `ok` / `skip` / `fixed` / `note` do not. `note`
 # is for a condition that is TRUE and worth printing but is not dormant wiring — today only the eol
 # arm, whose subject is a working copy while the committed bytes are already correct. Reusing
@@ -20,7 +24,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.7   # gov:kit check-wiring@1.7 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.8   # gov:kit check-wiring@1.8 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -183,6 +187,42 @@ abspath() { ( cd "$1" 2>/dev/null && pwd ); }
 # that the PREFIXED rung is no longer a literal `tools/` that ships verbatim and resolves to nothing
 # at another prefix; the root-install rung stays, waived as it always was.
 first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
+
+# THE RECEIPT RUNG, FIRST in every list that finds a kit file (TOOL-aRepatriatedFork-19 S1). Every
+# probe above is a guess about gov's own `<prefix>/<kit>/` layout, and an adopter that homed a kit at
+# `scripts/recall/` or put the merge driver flat under `scripts/` defeated all of them: the arm printed
+# `skip … not adopted` over a kit that was installed and wired. `govkit` already recorded where each
+# file landed, so the checker asks that record before guessing.
+#
+# The arguments are the Python `resolve_kit_dir`'s own pair, the kit's HOME and a file in it (a
+# tool-root file passes an empty home), joined and matched as a whole-segment SUFFIX of the row's
+# `source`: the whole source would spell gov's tool root, which ships verbatim and means nothing here,
+# and the last two segments are exactly that reader's join, which the self-test holds this one equal to.
+# ONE awk pass, no python: this runs as a SessionStart hook on a host that may have none. The writer
+# is `json.dumps(indent=2)`, so a row is `{` alone on a line, its keys one per line, `}` alone; the
+# pair is collected per object, so key order does not matter. A row whose path is absolute or climbs
+# with `..` is skipped, as the Python reader skips one that escapes the tree. Absent receipt, or no
+# row: prints nothing, and every rung after it resolves exactly as it did before this one existed.
+resolve_receipt_path() { # <kit-home> <file> -> the repo-relative path the receipt row records ("" if none)
+  [ -f .governance/install.json ] || return 0
+  awk -v want="${1:+$1/}$2" '
+    function val(l) { sub(/^[^:]*:[[:space:]]*"/, "", l); sub(/".*$/, "", l); return l }
+    /^[[:space:]]*\{[[:space:]]*$/          { p = ""; s = ""; next }
+    /^[[:space:]]*"path"[[:space:]]*:/      { p = val($0); next }
+    /^[[:space:]]*"source"[[:space:]]*:/    { s = val($0); next }
+    /^[[:space:]]*\}[[:space:]]*,?[[:space:]]*$/ {
+      if (p != "" && (s == want || (length(s) > length(want) && substr(s, length(s) - length(want)) == "/" want)) \
+          && p !~ /^\// && p !~ /^[A-Za-z]:/ && p !~ /(^|\/)\.\.(\/|$)/) { print p; exit }
+      p = ""; s = ""
+    }' .governance/install.json 2>/dev/null
+}
+# S2: the skip a receipt CONTRADICTS says so. A row naming a file that is not there is the receipt
+# leg's red, not wiring's, so the arm still skips — but "not adopted" would be false, and it names
+# the row and the missing path instead. Prints nothing when the receipt has no row or the file exists.
+derive_receipt_miss() { # <kit-home> <file> -> a skip reason, or ""
+  local p; p=$(resolve_receipt_path "$1" "$2")
+  [ -n "$p" ] && [ ! -f "$p" ] && printf '%s' "the .governance/install.json row for ${1:+$1/}$2 names $p, which is absent (the receipt leg owns a missing installed file)"
+}
 
 # THE wired signal, for every arm: the hook's marker substring present in the RESOLVED settings file —
 # INSIDE A GROUP WHOSE MATCHER IS THE ONE THE FRAGMENT DECLARES. settings-merge.py documents that
@@ -363,7 +403,7 @@ AGENTCAP_MATCHER='Workflow|Agent'
 # time. With the fallback derived, every tail collapses to the bare variable and the literal is
 # deleted rather than repathed, which is what removes the class instead of moving it.
 SMERGE_DEFAULT="${KIT_REL:+$KIT_REL/}settings-merge.py"
-SMERGE=$(first_of "$SMERGE_DEFAULT" settings-merge.py); SMERGE=${SMERGE:-$SMERGE_DEFAULT}
+SMERGE=$(first_of "$(resolve_receipt_path "" settings-merge.py)" "$SMERGE_DEFAULT" settings-merge.py); SMERGE=${SMERGE:-$SMERGE_DEFAULT}
 check_agentcap() {
   local smerge found shipped; smerge=$SMERGE
   # THE ADOPTION TEST PROBES FOR THE HOOK, IT DOES NOT NAME ONE COPY. This used to key on
@@ -388,13 +428,14 @@ check_agentcap() {
   #
   # The guard buys no waiver row: with KIT_REL empty the rung IS the bare spelling, so the
   # form the prefix gate bans never appears in the source.
-  shipped=$(first_of "${KIT_REL:+$KIT_REL/}hooks/agent-cap.js" .claude/hooks/agent-cap.js)
+  shipped=$(first_of "$(resolve_receipt_path hooks agent-cap.js)" "${KIT_REL:+$KIT_REL/}hooks/agent-cap.js" .claude/hooks/agent-cap.js)
   if [ -z "$shipped" ]; then
     # THE MESSAGE NAMES WHAT THE PROBE ACTUALLY TRIED. It used to advertise three locations
     # for a two-rung probe, one of them a hardcoded install-prefix literal in prose that
     # ships verbatim to an adopter at another prefix -- the class this build exists to drain,
     # inside the arm whose own comment is about skips that read as passes.
-    echo "skip     agent-cap — not adopted (no agent-cap.js at ${KIT_REL:+$KIT_REL/}hooks/ or .claude/hooks/)"
+    local miss; miss=$(derive_receipt_miss hooks agent-cap.js)
+    echo "skip     agent-cap — ${miss:-not adopted (no agent-cap.js at ${KIT_REL:+$KIT_REL/}hooks/ or .claude/hooks/)}"
     return
   fi
   # S4: a LEGACY second copy is REPORTED, never redded. An adopter mid-migration has both, and their
@@ -452,9 +493,10 @@ check_agentcap() {
 # Advisory like every other arm: no mode rewrites settings.json.
 check_scratch_guard() {
   local frag smerge marker hookjs smatcher found
-  frag=$(first_of "${KIT_REL:+$KIT_REL/}hooks/scratch-guard.fragment.json" hooks/scratch-guard.fragment.json)
+  frag=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "${KIT_REL:+$KIT_REL/}hooks/scratch-guard.fragment.json" hooks/scratch-guard.fragment.json)
   if [ -z "$frag" ]; then
-    echo "skip     scratch   — hooks kit does not ship scratch-guard.fragment.json here"
+    local miss; miss=$(derive_receipt_miss hooks scratch-guard.fragment.json)
+    echo "skip     scratch   — ${miss:-hooks kit does not ship scratch-guard.fragment.json here}"
     return
   fi
   smerge=$SMERGE
@@ -502,9 +544,10 @@ check_recall_opened() {
   local frag smerge marker hookjs rmatcher
   # Resolved by path because the kit is COPIED: <root>/memory-recall/ in an adopter,
   # <root>/$KIT_REL/memory-recall/ in this repo.
-  frag=$(first_of "${KIT_REL:+$KIT_REL/}memory-recall/recall-opened.fragment.json" memory-recall/recall-opened.fragment.json)
+  frag=$(first_of "$(resolve_receipt_path memory-recall recall-opened.fragment.json)" "${KIT_REL:+$KIT_REL/}memory-recall/recall-opened.fragment.json" memory-recall/recall-opened.fragment.json)
   if [ -z "$frag" ]; then
-    echo "skip     recall    — memory-recall kit not adopted (no recall-opened.fragment.json)"
+    local miss; miss=$(derive_receipt_miss memory-recall recall-opened.fragment.json)
+    echo "skip     recall    — ${miss:-memory-recall kit not adopted (no recall-opened.fragment.json)}"
     return
   fi
   smerge=$SMERGE
@@ -555,11 +598,12 @@ check_recall_opened() {
 # merger re-matches them on apply, and a hand edit or a later narrowing to `startup` passes green
 # (the aReplayedCard closing review, F12). The two card fragments are graded; the count is two.
 check_card() {
-  local name frag marker hooksh cmatcher found nfound=0 nok=0 line=""
+  local name frag marker hooksh cmatcher found miss nfound=0 nok=0 line=""
   for name in orientation-card orientation-replay; do
-    frag=$(first_of "skills/session-kickoff/$name.fragment.json" "${KIT_REL:+$KIT_REL/}$name.fragment.json" "$name.fragment.json")
+    frag=$(first_of "$(resolve_receipt_path session-kickoff "$name.fragment.json")" "skills/session-kickoff/$name.fragment.json" "${KIT_REL:+$KIT_REL/}$name.fragment.json" "$name.fragment.json")
     if [ -z "$frag" ]; then
-      echo "skip     card      — kickoff-manifest kit does not ship $name.fragment.json here"
+      miss=$(derive_receipt_miss session-kickoff "$name.fragment.json")
+      echo "skip     card      — ${miss:-kickoff-manifest kit does not ship $name.fragment.json here}"
       return
     fi
     nfound=$((nfound+1))
@@ -630,12 +674,17 @@ check_eol() {
   # reached `git check-attr` as two nonexistent paths, the population came back empty, and the arm
   # printed a green `skip`. Reproduced — a folder name with a space is an ordinary thing to type. The
   # population is two files; a fork each is not a cost worth a silent collapse.
-  pop=$(git ls-files .claude/skills/ 2>/dev/null | grep -E '\.md$' | while IFS= read -r _p; do
+  # A SECOND NAMED GLOB, not a wider one (TOOL-aRepatriatedFork-19 S3): tracked `.claude/workflows/*.js`
+  # carrying the pin. The review-harness kit pins those scripts because CR bytes made a shipped
+  # harness unlaunchable, and nothing on the wiring side looked at them. It is named beside the Skill
+  # glob, so the "every eol=lf path under .claude/" selector the paragraph above forbids stays unwritten.
+  pop=$(git ls-files .claude/skills/ .claude/workflows/ 2>/dev/null \
+        | grep -E '^\.claude/skills/.*\.md$|^\.claude/workflows/[^/]*\.js$' | while IFS= read -r _p; do
           [ -n "$_p" ] || continue
           git check-attr eol -- "$_p" 2>/dev/null | sed -n 's/^\(.*\): eol: lf$/\1/p'
         done)
   if [ -z "$pop" ]; then
-    echo "skip     eol       — no tracked .claude/skills/**.md carries an eol=lf pin"
+    echo "skip     eol       — no tracked .claude/skills/**.md or .claude/workflows/*.js carries an eol=lf pin"
     return
   fi
   # `while read`, not `for f in $pop`: a Skill directory with a space in its name — ordinary on a
@@ -718,9 +767,10 @@ check_merge_rows() {
   # Resolved by path because the kit is COPIED: <root>/memory-tree/ in an adopter,
   # <root>/$KIT_REL/memory-tree/ here. The remedy string is BUILT from the two resolved paths rather
   # than hand-kept, so it cannot drift from the layout it is describing.
-  drv=$(first_of "${KIT_REL:+$KIT_REL/}memory-tree/merge-rows.py" memory-tree/merge-rows.py)
+  drv=$(first_of "$(resolve_receipt_path memory-tree merge-rows.py)" "${KIT_REL:+$KIT_REL/}memory-tree/merge-rows.py" memory-tree/merge-rows.py)
   if [ -z "$drv" ]; then
-    echo "skip     merge     — memory-tree merge driver not adopted (no merge-rows.py)"
+    local miss; miss=$(derive_receipt_miss memory-tree merge-rows.py)
+    echo "skip     merge     — ${miss:-memory-tree merge driver not adopted (no merge-rows.py)}"
     return
   fi
   # The KIT-INTERNAL launcher first. It travels with the kit, so it is the only one an adopter is

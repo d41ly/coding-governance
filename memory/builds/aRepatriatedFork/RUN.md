@@ -148,3 +148,11 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T01:01:14Z brief · item TOOL-aRepatriatedFork-18 · reason 1ce9920512db memory/builds/aRepatriatedFork/prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-18-build-brief.md
 
 2026-09-24T01:18:01Z decision · item TOOL-aRepatriatedFork-18 section 7 third New arm: the held leg that installs the S1 suites at a scripts/ prefix and RUNS each there · reason options seen: build it in the unit pass, or carry it to the close or a follow-up unit; refused building it here because a unit pass runs no suite, so its red case could not be observed before it landed as the build-level rule requires, and running the suites at a foreign prefix also needs their fixture-internal kit paths repathed (check-playbook.test.sh spells dozens) which only that execution can verify; S2 delivered the derived KIT_REL that leg would exercise
+
+2026-09-24T01:24:43Z brief · item TOOL-aRepatriatedFork-19 · reason ab028f336ed4 memory/builds/aRepatriatedFork/prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-19-build-brief.md
+
+2026-09-24T01:25:35Z dispatch · item 99ed07c8 TOOL-aRepatriatedFork-19 · reason tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-19.md memory/builds/aRepatriatedFork/build/2026-09-24-build-TOOL-aRepatriatedFork-19-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md
+
+2026-09-24T01:36:28Z dispatch · item 99ed07c8 TOOL-aRepatriatedFork-19 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/install-prefix-waivers.txt memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-19.md memory/builds/aRepatriatedFork/build/2026-09-24-build-TOOL-aRepatriatedFork-19-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md
+
+2026-09-24T01:37:30Z dispatch · item 99ed07c8 TOOL-aRepatriatedFork-19 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/install-prefix-waivers.txt tools/install-prefix-carried.txt memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-19.md memory/builds/aRepatriatedFork/build/2026-09-24-build-TOOL-aRepatriatedFork-19-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md

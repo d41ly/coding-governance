@@ -28,7 +28,7 @@ tools/check-placeholders.test.sh	1	(loose)
 tools/check-testsuite-counts.sh	4	(loose),lib	the counts gate names the harness a suite may source, `tools/lib/lib-selftest.sh`, because the second accepted spelling is defined by that path. TOOL-aQuenchedHarness-6.
 tools/check-testsuite-counts.test.sh	3	(loose),lib	its arms build fixtures that source the harness by path, which is what the new spelling requires them to grade. TOOL-aQuenchedHarness-6.
 tools/check-wiring.sh	1	lib
-tools/check-wiring.test.sh	11	(loose),lib,memory-tree
+tools/check-wiring.test.sh	5	(loose),lib,memory-tree
 tools/codebase-map/adopt-codebase-map.sh	3	lib
 tools/codebase-map/adopt-codebase-map.test.sh	3	codebase-map,lib
 tools/codebase-map/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
