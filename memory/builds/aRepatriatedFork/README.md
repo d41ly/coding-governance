@@ -94,8 +94,8 @@ The ones that set build policy:
 | 7 | `DEPL-aRepatriatedFork-20` | 2 | inCMS converges onto gov's memory-tree programs |
 
 The `#` column is the `order` each spec declares, derived from its `### Edges`: a unit's order is one
-past the highest order it consumes from. Order 1 is nine independent units, two of them the security
-fixes.
+past the highest order it consumes from. Order 1 holds the independent units, the two security fixes
+among them.
 
 **The build is done when a `govkit update --write` from gov HEAD at inCMS and at nc lands every row,
 re-stamps `gov_commit`, leaves no conflict order, and both adopters' full bars are green on the result
