@@ -1,11 +1,12 @@
 # DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams deployer · order 3
+**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-DEPL-aRepatriatedFork-17-build-brief.md](../prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-17-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -143,16 +144,20 @@ writes = [".claude/skills/unattended/SKILL.md", "{memory_root}/guides/UNATTENDED
 
 - `write_conflict_candidate(outbox, row, base, ours, theirs, candidate)` — `py.function`, verb `write`.
 - `measure_lone_cr(data)` — `py.function`, verb `measure`.
-- `derive_nearest_vintage(root, src, ours)` — `py.function`, verb `derive`.
+- `derive_nearest_vintage(root, src, ours, to_commit)` — `py.function`, verb `derive`.
 - `read_target_kit_version(target, desc, receipt)` — `py.function`, verb `read`.
-- `check_leg_claimable(leg, runner_leg, ctx)` — `py.function`, verb `check`.
+- `check_leg_claimable(argv, runner_leg)` — `py.function`, verb `check`.
+- `read_worktree_status(target)` — `py.function`, verb `read`; S1's status snapshot.
+- constants `MERGE_FILE_ARGS` (S3), `ADOPT_STAGED_RECEIPT` (S5), `NEAREST_PIN_FRACTION` (S9, §8 F1).
 - flags `--staged` on `adopt`, `--accept-role-moves` on `update`, `--suggest-pins` on `adopt`.
 - `[[regenerate]].writes` — a new optional descriptor key.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `tools/govkit/README.md` · `WIRE-INTO-PROJECT.md` ·
-`tools/unattended/kit.toml`
+`tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `WIRE-INTO-PROJECT.md`. The verb's own
+`USAGE` text carries the flags; this tree has no `tools/govkit/README.md`. No shipped descriptor
+declares `[[regenerate]].writes`: every regenerate output a shipped kit writes is already one of its
+`rendered` or `generated` receipt rows, which S1 snapshots without the key.
 
 ### Adopter deletions this unit enables
 
@@ -287,6 +292,16 @@ New arm: `tools/govkit/selftest.py` · one fixture per scope item, each first ru
 
 - rev-1 · 2026-09-23 · initial draft, grounded at a7c78ad2 on the pull's reported defects, audit-C's
   lone-CR measurement, and read-only `update` and `plan` runs at both adopters on 2026-09-23.
+- rev-2 · 2026-09-24 · build-time divergences, no scope moved. Section 4 inventory: `check_leg_claimable`
+  takes the resolved argv and the runner row, which is all S8 compares; `derive_nearest_vintage`
+  takes the measuring commit, as `derive_attribution` does; `read_worktree_status` is added for S1's
+  undeclared-write naming. S1: a restored path that is no receipt row is printed `reverted` in the
+  rollback order, apart from `restored`, and a path still differing is printed `still differs`.
+  S2: a row passes as `eol-only` only when the target's filter changed the bytes, so a tampered
+  `sha256` over untouched bytes still reds. S3: the reap removes a stale order's candidate
+  directory with it. Section 4 files touched: no `tools/unattended/kit.toml` edit and no
+  `tools/govkit/README.md`. AC13 is observed in the selftest's `-13` gate-leg block, which already
+  builds a manifest runner, and that block's older refusal arm now carries a differing argv.
 
 ## 10. Reuse audit
 

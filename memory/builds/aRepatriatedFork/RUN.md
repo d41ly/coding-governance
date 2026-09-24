@@ -130,3 +130,11 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T00:16:06Z dispatch · item af690be0 DEPL-aRepatriatedFork-14 · reason tools/playbook/render_playbook.py
 
 2026-09-24T00:17:46Z dispatch · item 7173fd1c DEPL-aRepatriatedFork-14 · reason memory/map/features/process-monitor.md
+
+2026-09-24T00:24:45Z dispatch · item 39a80997 DEPL-aRepatriatedFork-17 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md
+
+2026-09-24T00:24:46Z brief · item DEPL-aRepatriatedFork-17 · reason 5077d3ab49b8 memory/builds/aRepatriatedFork/prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-17-build-brief.md
+
+2026-09-24T00:46:04Z dispatch · item 39a80997 DEPL-aRepatriatedFork-17 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md
+
+2026-09-24T00:47:12Z dispatch · item 39a80997 DEPL-aRepatriatedFork-17 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md memory/map/generated/symbols.json

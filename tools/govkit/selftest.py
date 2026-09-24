@@ -163,10 +163,14 @@ def _extract_plan_rows(out: str) -> list[tuple[str, str]]:
     return rows
 
 
-def extract_plan_writes(out: str) -> set[str]:
+def extract_plan_writes(out: str, with_kept: bool = False) -> set[str]:
     """The destinations `plan` promised govkit would WRITE. No role filter — that filter existed
-    only because a non-landable row used to be marked `write`."""
-    return {d for m, d in _extract_plan_rows(out) if m == "write"}
+    only because a non-landable row used to be marked `write`.
+
+    `with_kept` adds the `KEEP` rows (DEPL-aRepatriatedFork-17 S6): a seed the target already holds,
+    which `apply` leaves in place. A receipt still carries its bytes, so an arm comparing a plan
+    over an INSTALLED target with that receipt asks for both."""
+    return {d for m, d in _extract_plan_rows(out) if m == "write" or (with_kept and m == "KEEP")}
 
 
 def measure_plan_marks(out: str) -> dict[str, int]:
@@ -1021,6 +1025,258 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
           "contract 'demo/empty': it has zero clauses" in p.stdout, p.stdout)
 
 
+SAFE_REG = ('[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
+            '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+            '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
+SAFE_DEPLOY = 'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n'
+SAFE_HEAD = 'id = "demo"\nhome = "tools/demo"\n'
+SAFE_TAIL = ('[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+             '[adopt]\nargv = []\nmutates_index = false\n')
+
+
+def check_update_safety(tmp: pathlib.Path) -> None:
+    """DEPL-aRepatriatedFork-17 AC1-AC11, AC14, AC15 — the eight `update` mechanics, over scratch
+    govs whose `govkit.py` is a copy of `GOVKIT` taken at build time. Asserted on bytes, index
+    entries, receipt fields and named lines. AC12 is observed at an adopter clone and AC13 in the
+    `-13` gate-leg block, which already builds a manifest runner."""
+    env = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
+
+    def write_gov17(g: pathlib.Path, kit: str, files: dict, msg: str) -> str:
+        (g / "tools" / "demo").mkdir(parents=True, exist_ok=True)
+        (g / "tools" / "demo" / "kit.toml").write_bytes(kit.encode("utf-8"))
+        for rel, body in files.items():
+            (g / "tools" / "demo" / rel).write_bytes(
+                body if isinstance(body, bytes) else body.encode("utf-8"))
+        git(g, "add", "-A")
+        git(g, "commit", "-qm", msg)
+        return run_gov_git(g, "rev-parse", "HEAD")
+
+    def build_gov17(tag: str, kit: str, files: dict) -> tuple[pathlib.Path, str]:
+        g = tmp / f"{tag}-gov"
+        (g / "tools" / "govkit").mkdir(parents=True)
+        shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+        (g / "tools" / "govkit" / "registry.toml").write_bytes(SAFE_REG.encode("utf-8"))
+        for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
+                  ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
+            git(g, *a)
+        return g, write_gov17(g, kit, files, "A")
+
+    def run_gov17(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+                              capture_output=True, text=True, encoding="utf-8", env=env)
+
+    def build_target17(g: pathlib.Path, tag: str) -> pathlib.Path:
+        t = make_target(tmp / f"{tag}-t", SAFE_DEPLOY)
+        p = run_gov17(g, "apply", "--target", str(t))
+        check(f"[aRF-17] the {tag} fixture installs, or every arm over it grades nothing",
+              p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
+        settle(t, "the install")
+        return t
+
+    def read_bytes17(p: pathlib.Path) -> bytes:
+        return p.read_bytes() if p.is_file() else b""
+
+    def read_row17(t: pathlib.Path, path: str) -> dict:
+        rec = json.loads(read_bytes17(t / ".governance" / "install.json") or b"{}")
+        return next((f for f in rec.get("files", []) if f.get("path") == path), {})
+
+    # ---- S1 — AC1, AC2. The kit's regenerate re-renders `docs/out.md` (a rendered row), one path
+    # ---- its `writes` list declares, and one it does not. Its check reds only on v2 in the render.
+    kit_rb = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n'
+              '[check]\nargv = ["bash", "{kit}/check.sh"]\n\n'
+              '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+              '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+              '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\nwrites = ["docs/declared.txt"]\n\n'
+              '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+    gen = ('d="$(dirname "$0")"\nmkdir -p docs\n'
+           'for f in out.md declared.txt stray.txt; do cat "$d/eng.txt" > "docs/$f"; done\n')
+    g, _a = build_gov17("rb", kit_rb, {"eng.txt": "v1\n", "gen.sh": gen,
+                                       "check.sh": "grep -q v1 docs/out.md\n", "tpl.md": "tpl\n"})
+    t = build_target17(g, "rb")
+    check("[aRF-17 AC1] LIVENESS the install rendered v1 and tracks the rendered row",
+          read_bytes17(t / "docs" / "out.md") == b"v1\n"
+          and read_row17(t, "docs/out.md").get("role") == "rendered", str(read_row17(t, "docs/out.md")))
+    write_gov17(g, kit_rb, {"eng.txt": "v2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    order = read_bytes17(t / ".governance" / "outbox" / "update-rollback-demo.md").decode("utf-8")
+    check("[aRF-17 AC1] LIVENESS the run really rolled the kit back",
+          "ROLLED BACK" in p.stdout and read_bytes17(t / "tools" / "demo" / "eng.txt") == b"v1\n",
+          p.stdout[-1500:])
+    check("[aRF-17 AC1] the re-rendered row is restored, and the rollback order lists it",
+          read_bytes17(t / "docs" / "out.md") == b"v1\n" and "restored  docs/out.md" in order,
+          repr(read_bytes17(t / "docs" / "out.md")) + order)
+    check("[aRF-17 S1] a path the `writes` list declares is reverted and named apart",
+          read_bytes17(t / "docs" / "declared.txt") == b"v1\n"
+          and "reverted  docs/declared.txt" in order, order)
+    check("[aRF-17 AC2] an undeclared regenerate write is NAMED as still differing",
+          read_bytes17(t / "docs" / "stray.txt") == b"v2\n"
+          and "still differs after the rollback: docs/stray.txt" in p.stdout
+          and "still differs docs/stray.txt" in order, p.stdout[-1500:] + order)
+
+    # ---- S3, S4 — AC5, AC6, AC7. One conflicting engine file carrying a lone CR inside an awk
+    # ---- program on its first line, and one engine file whose four lone CRs a target lost.
+    conf_a = b"awk '{ gsub(\"\r\", \"\") }' \"$1\"\nmode=one\ntail\n"
+    lone = b"a\rb\rc\rd\re\n"
+    kit_cf = SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n' + SAFE_TAIL
+    g, _a = build_gov17("cf", kit_cf, {"conf.sh": conf_a, "lone.sh": lone, "plain.txt": "a\nb\n"})
+    t = build_target17(g, "cf")
+    tl = build_target17(g, "lc")
+    (t / "tools" / "demo" / "conf.sh").write_bytes(conf_a.replace(b"mode=one", b"mode=target"))
+    settle(t, "the adopter edits the mode line")
+    (tl / "tools" / "demo" / "lone.sh").write_bytes(b"abcde\n")
+    settle(tl, "a CR-normalising reconstruction")
+    write_gov17(g, kit_cf, {"conf.sh": conf_a.replace(b"mode=one", b"mode=gov")}, "B")
+    before = read_bytes17(t / "tools" / "demo" / "conf.sh")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    slug = govkit_module().render_order_slug("tools/demo/conf.sh")
+    cdir = t / ".governance" / "outbox" / f"update-conflict-{slug}"
+    corder = read_bytes17(cdir.with_name(cdir.name + ".md")).decode("utf-8")
+    cand = read_bytes17(cdir / "candidate")
+    rep = subprocess.run(["git", "merge-file", "-p", "--diff3", "-L", "ours", "-L", "base",
+                          "-L", "theirs", "ours", "base", "theirs"], cwd=str(cdir),
+                         capture_output=True) if cdir.is_dir() else None
+    check("[aRF-17 AC5] LIVENESS the three-way really conflicts",
+          "diverged and the three-way conflicts" in p.stdout, p.stdout[-1200:])
+    check("[aRF-17 AC5] the target file stays byte-identical and the four candidate files exist",
+          read_bytes17(t / "tools" / "demo" / "conf.sh") == before
+          and all((cdir / n).is_file() for n in ("base", "ours", "theirs", "candidate")),
+          str(sorted(q.name for q in cdir.glob("*"))) if cdir.is_dir() else "no candidate dir")
+    check("[aRF-17 AC5] git merge-file -p --diff3 over the written three reproduces candidate",
+          rep is not None and rep.stdout == cand and b"|||||||" in cand, repr(cand[:200]))
+    check("[aRF-17 AC5] ...and the order names the four files and the reproduction line",
+          f"reproduce cd .governance/outbox/update-conflict-{slug} && git merge-file -p --diff3"
+          in corder and f"update-conflict-{slug}/theirs" in corder, corder)
+    check("[aRF-17 AC6] the lone CR inside the awk program sits at the same offset in candidate",
+          cand.count(b"\r") == before.count(b"\r") == 1 and cand.index(b"\r") == before.index(b"\r"),
+          repr(cand[:80]))
+    p = run_gov17(g, "update", "--target", str(tl))
+    check("[aRF-17 AC7] a lost lone CR prints a lone-CR row naming 4 and 0",
+          "lone-CR tools/demo/lone.sh" in p.stdout and "gov 4 · target 0" in p.stdout, p.stdout[-1500:])
+    p = run_gov17(g, "update", "--target", str(tl), "--write")
+    check("[aRF-17 S4] ...and on a --write run it is a finding, which withholds the re-stamp (§8 F3)",
+          p.returncode == 1 and "makes the loss permanent" in p.stdout
+          and "NOT re-stamped" in p.stdout, p.stdout[-1500:])
+
+    # ---- S2 — AC3, AC4. A `core.autocrlf=true` clone of an installed target nobody edited.
+    c = tmp / "eol-clone"
+    te = build_target17(g, "eol")
+    subprocess.run(["git", "clone", "-q", "-c", "core.autocrlf=true", str(te), str(c)],
+                   capture_output=True)
+    check("[aRF-17 AC3] LIVENESS the clone's worktree copy is CRLF",
+          read_bytes17(c / "tools" / "demo" / "plain.txt") == b"a\r\nb\r\n",
+          repr(read_bytes17(c / "tools" / "demo" / "plain.txt")))
+    p = run_gov17(g, "check", "--target", str(c))
+    m = _re.search(r"eol-only (\d+)", p.stdout)
+    check("[aRF-17 AC3] check counts the CRLF copy eol-only and reports no mismatch",
+          m is not None and int(m.group(1)) >= 1 and "does not match the receipt" not in p.stdout,
+          p.stdout[-1500:])
+    (c / "tools" / "demo" / "plain.txt").write_bytes(b"a\r\nX\r\n")
+    p = run_gov17(g, "check", "--target", str(c))
+    check("[aRF-17 AC4] a real byte change still reports the mismatch",
+          "'tools/demo/plain.txt' does not match the receipt" in p.stdout, p.stdout[-1500:])
+    rec = json.loads((te / ".governance" / "install.json").read_text(encoding="utf-8"))
+    for f in rec["files"]:
+        if f.get("path") == "tools/demo/plain.txt":
+            f["sha256"] = "0" * 64
+    (te / ".governance" / "install.json").write_bytes((json.dumps(rec, indent=2) + "\n").encode())
+    p = run_gov17(g, "check", "--target", str(te))
+    check("[aRF-17 S2] a tampered sha256 over untouched LF bytes is still a mismatch, not eol-only",
+          "'tools/demo/plain.txt' does not match the receipt" in p.stdout, p.stdout[-1500:])
+
+    # ---- S5 — AC8, AC9. A staged edit, then an unstaged one, at a planned destination.
+    ts = build_target17(g, "st")
+    (ts / "tools" / "demo" / "plain.txt").write_bytes(b"a\nb\nc\n")
+    git(ts, "add", "--", "tools/demo/plain.txt")
+    p = run_gov17(g, "adopt", "--target", str(ts), "--re-adopt", "--write")
+    check("[aRF-17 AC8] LIVENESS without --staged the staged tree is refused",
+          p.returncode == 2 and "differ from HEAD" in p.stderr, p.stderr)
+    p = run_gov17(g, "adopt", "--target", str(ts), "--re-adopt", "--staged", "--write")
+    staged_oid = run_gov_git(ts, "rev-parse", ":tools/demo/plain.txt")
+    check("[aRF-17 AC8] --staged exits 0 and the row's oid is the staged blob",
+          p.returncode == 0 and read_row17(ts, "tools/demo/plain.txt").get("oid") == staged_oid,
+          p.stdout[-900:] + p.stderr)
+    check("[aRF-17 S5] ...and the receipt is staged beside it",
+          ".governance/install.json" in run_gov_git(ts, "diff", "--cached", "--name-only"),
+          run_gov_git(ts, "diff", "--cached", "--name-only"))
+    (ts / "tools" / "demo" / "plain.txt").write_bytes(b"a\nb\nc\nd\n")
+    p = run_gov17(g, "adopt", "--target", str(ts), "--re-adopt", "--staged", "--write")
+    check("[aRF-17 AC9] an unstaged edit at a planned destination refuses --staged, naming it",
+          p.returncode == 2 and "--staged:" in p.stderr and "tools/demo/plain.txt" in p.stderr,
+          p.stderr)
+
+    # ---- S6, S7 — AC10, AC11, AC15. `s.txt` moves engine -> seed and `p.txt` project-owned ->
+    # ---- engine; the target's own `p.txt` equals gov's vintage A. One row's stored version is
+    # ---- hand-set apart, so the receipt alone reads MIXED.
+    kit_a = (SAFE_HEAD + 'version_from = { file = "ver.sh", pattern = "^DEMO_VERSION=" }\n\n'
+             '[check]\nnone = "fixture"\n\n[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+             '[[files]]\ninclude = ["p.txt"]\nrole = "project-owned"\n\n'
+             '[adopt]\nargv = []\nmutates_index = false\n')
+    kit_b = kit_a.replace('include = ["p.txt"]\nrole = "project-owned"',
+                          'include = ["s.txt"]\nrole = "seed"')
+    g, a_sha = build_gov17("rm", kit_a, {"ver.sh": "DEMO_VERSION=1.0\n", "s.txt": "seed me\n",
+                                         "p.txt": "p v1\n"})
+    t = build_target17(g, "rm")
+    (t / "tools" / "demo" / "p.txt").write_bytes(b"p v1\n")
+    rp = t / ".governance" / "install.json"
+    rec = json.loads(rp.read_text(encoding="utf-8"))
+    for f in rec["files"]:
+        if f.get("path") == "tools/demo/s.txt":
+            f["version"] = "DEMO_VERSION=0.9"
+    rp.write_bytes((json.dumps(rec, indent=2) + "\n").encode("utf-8"))
+    settle(t, "the target writes its own p.txt; one row's version set apart")
+    write_gov17(g, kit_b, {"p.txt": "p v2\n", "ver.sh": "DEMO_VERSION=1.1\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t))
+    check("[aRF-17 AC10] LIVENESS both rows read role-moved before the flag",
+          "role-moved         [engine       ] -> seed          tools/demo/s.txt" in p.stdout
+          and "-> engine        tools/demo/p.txt" in p.stdout, p.stdout[-1500:])
+    dl = next((ln for ln in p.stdout.splitlines() if ln.strip().startswith("demo ")), "")
+    check("[aRF-17 S7] the delta line reads the target's own constant, never MIXED",
+          "MIXED" not in dl and "target has 1.0, gov has 1.1" in dl and "row base versions" in dl, dl)
+    pl = run_gov17(g, "plan", "--target", str(t))
+    check("[aRF-17 AC11] plan prints KEEP for a seed destination that exists",
+          any(ln.startswith("  KEEP") and ln.rstrip().endswith("tools/demo/s.txt   <- demo")
+              for ln in pl.stdout.splitlines()), pl.stdout[-1200:])
+    snap = {q: (read_bytes17(t / q), run_gov_git(t, "rev-parse", f":{q}"))
+            for q in ("tools/demo/s.txt", "tools/demo/p.txt")}
+    p = run_gov17(g, "update", "--target", str(t), "--write", "--accept-role-moves")
+    check("[aRF-17 AC10] --accept-role-moves prints role-recorded for both rows",
+          p.stdout.count("role-recorded") >= 2 and "role-moved         [" not in p.stdout,
+          p.stdout[-1500:])
+    check("[aRF-17 AC10] ...and neither file's bytes nor index entry moved",
+          all(snap[q] == (read_bytes17(t / q), run_gov_git(t, "rev-parse", f":{q}")) for q in snap),
+          str(snap))
+    prow = read_row17(t, "tools/demo/p.txt")
+    check("[aRF-17 AC15] the move into engine is recorded vintage-match at A",
+          read_row17(t, "tools/demo/s.txt").get("role") == "seed" and prow.get("role") == "engine"
+          and prow.get("evidence") == "vintage-match" and prow.get("commit") == a_sha, str(prow))
+    settle(t, "the role move")
+    p = run_gov17(g, "update", "--target", str(t))
+    check("[aRF-17 AC10] the next read-only run prints no role-moved for either row",
+          "role-moved" not in p.stdout, p.stdout[-1200:])
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[aRF-17 AC15] the next update --write lands gov's newer bytes through the verdict table",
+          read_bytes17(t / "tools" / "demo" / "p.txt") == b"p v2\n"
+          and "stale" in next((ln for ln in p.stdout.splitlines()
+                               if ln.rstrip().endswith(" tools/demo/p.txt")), ""), p.stdout[-1500:])
+
+    # ---- S9 — AC14. One row drifted one line from an OLD vintage, one unrelated program.
+    old = "".join(f"line {i}\n" for i in range(20))
+    g, a1 = build_gov17("sp", kit_cf, {"prog.py": old, "other.py": old})
+    write_gov17(g, kit_cf, {"prog.py": "".join(f"mid {i}\n" for i in range(20))}, "A2")
+    t = make_target(tmp / "sp-t", SAFE_DEPLOY)
+    (t / "tools" / "demo").mkdir(parents=True)
+    (t / "tools" / "demo" / "prog.py").write_bytes(old.replace("line 7\n", "line seven\n").encode())
+    (t / "tools" / "demo" / "other.py").write_bytes(
+        "".join(f"unrelated {i}\n" for i in range(10)).encode())
+    settle(t, "a hand-vendored tree")
+    p = run_gov17(g, "adopt", "--target", str(t), "--suggest-pins")
+    check("[aRF-17 AC14] a slightly drifted row gets a --pin at its old vintage",
+          f"--pin tools/demo/prog.py={a1}" in p.stdout, p.stdout[-1500:] + p.stderr)
+    check("[aRF-17 AC14] ...and an unrelated program is offered no pin and named adopter-owned",
+          "no-pin tools/demo/other.py" in p.stdout and "adopter-owned" in p.stdout
+          and "--pin tools/demo/other.py" not in p.stdout, p.stdout[-1500:])
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -1155,6 +1411,7 @@ def main() -> int:
         check_epoch_verb(tmp)
         check_adopter_owned(tmp / "own")
         check_pytest_ini_probe(tmp / "pi")
+        check_update_safety(tmp / "us")
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
@@ -3998,9 +4255,9 @@ user_skills = "/tmp/gk-fake-skills"
             # on the bytes rather than on a role list, so a new non-landing role needs no edit here.
             applied = {f["path"] for f in first_receipt.get("files", []) if "sha256" in f}
             check("plan's write set equals the receipt rows CARRYING BYTES, any role",
-                  extract_plan_writes(plan_out.stdout) == applied,
-                  f"planned-only={sorted(extract_plan_writes(plan_out.stdout) - applied)} "
-                  f"applied-only={sorted(applied - extract_plan_writes(plan_out.stdout))}")
+                  extract_plan_writes(plan_out.stdout, with_kept=True) == applied,
+                  f"planned-only={sorted(extract_plan_writes(plan_out.stdout, True) - applied)} "
+                  f"applied-only={sorted(applied - extract_plan_writes(plan_out.stdout, True))}")
 
             # ...AND OVER THE DEFAULT SELECTION, which is the operand that matters to an operator who
             # types no `--kits`. The `**` kit alone cannot see a divergence that lives in the roles.
@@ -4011,9 +4268,9 @@ user_skills = "/tmp/gk-fake-skills"
             pl2 = run("plan", "--target", str(t2))
             bytes2 = {f["path"] for f in rec2.get("files", []) if "sha256" in f}
             check("plan's write set equals the DEFAULT selection's byte-carrying rows",
-                  extract_plan_writes(pl2.stdout) == bytes2,
-                  f"planned-only={sorted(extract_plan_writes(pl2.stdout) - bytes2)} "
-                  f"applied-only={sorted(bytes2 - extract_plan_writes(pl2.stdout))}")
+                  extract_plan_writes(pl2.stdout, with_kept=True) == bytes2,
+                  f"planned-only={sorted(extract_plan_writes(pl2.stdout, True) - bytes2)} "
+                  f"applied-only={sorted(bytes2 - extract_plan_writes(pl2.stdout, True))}")
 
             # THE MAPPING, PINNED POSITIVELY AND PER ROLE. Set-equality above cannot express this:
             # an implementation emitting every non-landable row under ONE mark satisfies it.
@@ -4039,7 +4296,7 @@ user_skills = "/tmp/gk-fake-skills"
             check("a target's own `kits` list is honoured by a no---kits plan", pl3.returncode == 0,
                   pl3.stdout + pl3.stderr)
             _declared_writes = extract_plan_writes(pl3.stdout)
-            _default_writes = extract_plan_writes(pl2.stdout)
+            _default_writes = extract_plan_writes(pl2.stdout, with_kept=True)
             check("...and it is a STRICT subset of the registry default's write set",
                   _declared_writes and _declared_writes < _default_writes,
                   f"declared={len(_declared_writes)} default={len(_default_writes)} "
@@ -4071,7 +4328,8 @@ user_skills = "/tmp/gk-fake-skills"
             # 27 -> 28, TOOL-dLoggedFlight-3: run-gates withheld `run-gates.runlog.test.sh` by the same
             # mechanism, the only row that build added to the default selection.
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed") == 3 and marks.get("ORDER|project-owned") == 28,
+                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 3
+                  and marks.get("ORDER|project-owned") == 28,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
@@ -12894,7 +13152,8 @@ user_skills = "/tmp/gk-fake-skills"
                     + '[adopt]\nargv = []\nmutates_index = false\n')
 
         def build_gov13(tag: str, leg_engine: str = "demo/engine.sh",
-                        with_check: bool = False, check_rc: int = 0) -> pathlib.Path:
+                        with_check: bool = False, check_rc: int = 0,
+                        leg_name: str = "demo leg") -> pathlib.Path:
             """A scratch gov carrying TWO kits, because every ownership arm needs a second one.
 
             The engine COPY is taken here, at fixture-build time, for the reason the `-10` builder
@@ -12906,7 +13165,7 @@ user_skills = "/tmp/gk-fake-skills"
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
             (g / "tools" / "govkit" / "registry.toml").write_text(M13_REG, encoding="utf-8",
                                                                   newline="\n")
-            for eid, leg, eng, chk in (("demo", "demo leg", leg_engine, with_check),
+            for eid, leg, eng, chk in (("demo", leg_name, leg_engine, with_check),
                                        ("demo2", "demo2 leg", "demo2/engine.sh", False)):
                 (g / "tools" / eid).mkdir(parents=True, exist_ok=True)
                 (g / "tools" / eid / "kit.toml").write_text(build_kit13(eid, leg, eng, chk),
@@ -13181,6 +13440,14 @@ user_skills = "/tmp/gk-fake-skills"
                                               if e.get("name") != "demo leg"]
         (_t13i / ".governance" / "install.json").write_text(
             json.dumps(_rcpt13i, indent=2) + NL13, encoding="utf-8", newline="\n")
+        # DEPL-aRepatriatedFork-17 S8. The runner's row now carries an argv gov never wrote, since
+        # a row with gov's own argv is CLAIMED rather than refused (AC13, the arm after this one).
+        _rows13i = json.loads((_t13i / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))
+        for _e13i in _rows13i:
+            if _e13i.get("name") == "demo leg":
+                _e13i["argv"] = ["bash", "scripts/demo/engine.sh", "--the-targets-own"]
+        (_t13i / "scripts" / "gate-legs.json").write_text(
+            json.dumps(_rows13i, indent=2) + NL13, encoding="utf-8", newline="\n")
         settle(_t13i, "the receipt's claim on one leg dropped by hand")
         write_vintage13(_g13i)
         _u13i = run_gov13(_g13i, "update", "--target", str(_t13i), "--write")
@@ -13196,6 +13463,32 @@ user_skills = "/tmp/gk-fake-skills"
               (_u13i.stdout + _u13i.stderr)[-900:])
         check("[-13] ...and the target's own row is left exactly where the target had it",
               "demo leg" in read_legs13(_t13i), str(read_legs13(_t13i)))
+        check("[aRF-17 AC13] a same-named leg with a DIFFERENT argv refuses, naming both argvs",
+              '"--the-targets-own"' in _u13i.stdout and '["bash", "scripts/demo/engine.sh"]'
+              in _u13i.stdout, _u13i.stdout[-1400:])
+        # AC13's first half. The runner holds the leg with the descriptor's own resolved argv and
+        # the receipt records no emitted legs at all: the leg is gov's by construction.
+        _g13c = build_gov13("claim", leg_name="agent-instructions wiring")
+        _t13c = build_target13("claim")
+        run_gov13(_g13c, "apply", "--target", str(_t13c))
+        settle(_t13c, "after apply")
+        _rcpt13c = read_receipt13(_t13c)
+        _rcpt13c["gate_runner"]["emitted"] = []
+        (_t13c / ".governance" / "install.json").write_text(
+            json.dumps(_rcpt13c, indent=2) + NL13, encoding="utf-8", newline="\n")
+        settle(_t13c, "the receipt records no emitted leg")
+        check("[aRF-17 AC13] LIVENESS the runner carries the leg with gov's resolved argv",
+              ["bash", "scripts/demo/engine.sh"] in [
+                  e.get("argv") for e in json.loads(
+                      (_t13c / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))
+                  if e.get("name") == "agent-instructions wiring"], str(read_legs13(_t13c)))
+        write_vintage13(_g13c)
+        _u13c = run_gov13(_g13c, "update", "--target", str(_t13c), "--write")
+        check("[aRF-17 AC13] update --write CLAIMS the identical leg and records it as emitted",
+              "claimed   leg 'agent-instructions wiring'" in _u13c.stdout
+              and ("agent-instructions wiring", "demo") in read_owned13(_t13c)
+              and "the gate-leg step refused" not in _u13c.stdout,
+              _u13c.stdout[-1400:] + _u13c.stderr[-600:])
 
         # ========= DEPL-cMendedVintage-21 — THE ATOMIC WRITE IS ONE HELPER, AND OBSERVED =========
         # The mitigation above (`-13` S6) was implemented and UNGRADED. `-13` AC6 compares the

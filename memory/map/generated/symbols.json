@@ -1413,6 +1413,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "check_leg_claimable",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "check_line",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -1711,6 +1716,11 @@
       "id": "check_ts_type_position",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "check_update_safety",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_window_invariant",
@@ -2401,6 +2411,11 @@
       "id": "derive_minute",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "derive_nearest_vintage",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_node_tag",
@@ -3628,6 +3643,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "measure_lone_cr",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "measure_orphans",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -4758,6 +4778,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_target_kit_version",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4896,6 +4921,11 @@
       "id": "read_withheld_rows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_worktree_status",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "reconcile",
@@ -8429,6 +8459,11 @@
     },
     {
       "id": "write_block",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "write_conflict_candidate",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },

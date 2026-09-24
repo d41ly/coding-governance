@@ -459,6 +459,36 @@ def resolve_entry_version_at(root: pathlib.Path, desc: dict, commit: str) -> str
     return "(unresolvable)"
 
 
+def read_target_kit_version(target: pathlib.Path, desc: dict, receipt: dict) -> str | None:
+    """DEPL-aRepatriatedFork-17 S7. The kit's version constant as the TARGET's copy spells it.
+
+    The copy is found through the receipt row whose `source` is the kit's `version_from` file, so a
+    relocating prefix is followed rather than guessed. None when no such row, file or line exists:
+    the caller then falls back to the receipt's own row versions and says nothing new.
+    """
+    vf = desc.get("version_from") or {}
+    if "none" in vf or not vf.get("file") or not vf.get("pattern"):
+        return None
+    home = (desc.get("home") or "").rstrip("/")
+    src = f"{home}/{vf['file']}" if home else vf["file"]
+    row = next((f for f in receipt.get("files") or [] if f.get("source") == src), None)
+    try:
+        dp = (target / demand_contained_dest(str(row["path"]), "a receipt row")
+              if row and row.get("path") else None)
+    except Refusal:
+        return None
+    if dp is None or not dp.is_file():
+        return None
+    try:
+        rx = re.compile(vf["pattern"])
+    except re.error:
+        return None
+    for ln in dp.read_text(encoding="utf-8", errors="replace").splitlines():
+        if rx.search(ln):
+            return ln.strip()
+    return None
+
+
 def entry_members(root: pathlib.Path, entry_id: str, desc: dict, desc_path: str) -> set[str]:
     """Every surface path this entry claims.
 
@@ -2932,6 +2962,14 @@ def write_atomic(dest: pathlib.Path, text: str) -> None:
             pass
 
 
+def check_leg_claimable(argv: list[str], runner_leg: object) -> bool:
+    """DEPL-aRepatriatedFork-17 S8. Is the runner's same-named leg gov's own, by its resolved argv?
+
+    EXACT equality over the argv list and nothing looser: a claim is an ownership record, and a
+    near-miss accepted here is a target's command recorded as gov's."""
+    return isinstance(runner_leg, dict) and runner_leg.get("argv") == argv
+
+
 def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     descs: dict[str, tuple[dict, str]], selection: list[str],
                     receipt: dict | None, have: set[str], r: Report,
@@ -3065,9 +3103,22 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     else:
                         guards.append(s)
                 if nm in by_name and nm not in owned:
-                    raise Refusal(f"the target's runner already has a leg named '{nm}' and this "
-                                  f"target's receipt does not claim it — overwriting a leg the "
-                                  f"target wrote silently deletes their own coverage")
+                    # DEPL-aRepatriatedFork-17 S8. A LEG GOV WROTE IS CLAIMED, NOT REFUSED. The same
+                    # name AND the same resolved argv is gov's leg by construction, so ownership is
+                    # recorded rather than the whole emission refused. Anything else still refuses,
+                    # naming both argvs, so a target cannot launder a different command into the
+                    # receipt under gov's name.
+                    if check_leg_claimable(argv, existing[by_name[nm]]):
+                        owned.add(nm)
+                        print(f"  claimed   leg '{nm}' — the target's runner carries it with gov's "
+                              f"own argv, so it is recorded as emitted")
+                    else:
+                        raise Refusal(
+                            f"the target's runner already has a leg named '{nm}' and this target's "
+                            f"receipt does not claim it — overwriting a leg the target wrote "
+                            f"silently deletes their own coverage. The runner's argv is "
+                            f"{json.dumps((existing[by_name[nm]] or {}).get('argv'))} and gov's is "
+                            f"{json.dumps(argv)}")
                 # SUBJECT TRAVELS. Without this the field never reaches an adopter and the whole
                 # mechanism stops at this repo's edge — a target would receive every kit self-test as
                 # an ordinary bar leg, which is the defect the unit exists to remove.
@@ -3621,11 +3672,18 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
           "ORDER = something outside apply must supply it · COVER = a sibling rule writes that same "
           "path · BLOCK = apply refuses the install over it · FORK = gov's copy is a derivative of "
           "the target's, reported and never written · UNRES. = unresolved token, not a path")
+    n_keep = 0
     for row in rows:
         # A destination still carrying a brace is NOT a path, and printing it under `write` would
         # promise a write this tool cannot perform — the row is marked UNRESOLVED so the plan never
         # reads as a file set anyone can rely on.
         mark = "UNRES." if row["missing"] else KIND_MARKS.get(row["kind"], "?????")
+        # DEPL-aRepatriatedFork-17 S6. `apply` leaves a seed that already exists in place, so the
+        # plan says KEEP there rather than promising a write `apply` will not make.
+        if (not row["missing"] and row["kind"] == "write" and row["role"] == "seed"
+                and os.path.lexists(target / row["dest"])):
+            mark = "KEEP  "
+            n_keep += 1
         print(f"  {mark} [{row['role']:<13}] {row['dest']}   <- {row['kit']}")
     # DEPL-dCarriedReceipt-6 S3. The SAME predicate `apply` runs, over the union of what the target
     # already tracks and what THIS PLAN would write — because at plan time nothing has been written
@@ -3659,8 +3717,10 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     named = {"write": "write(s)", "side-effect": "side-effect(s)", "order": "order(s)",
              "covered": "covered", "blocked": "blocked", "forked": "forked"}
     counts = {k: n[k] + (len(holes) if k == "order" else 0) for k in KIND_MARKS}
+    counts["write"] -= n_keep
     print("govkit plan — "
           + ", ".join(f"{counts[k]} {named.get(k, k)}" for k in KIND_MARKS)
+          + (f", {n_keep} seed(s) kept" if n_keep else "")
           + ". NOTHING was written.")
 
     # ---- DEPL-dCarriedReceipt-4 S4. ADDITIVE (§8 F2): the plan rows above are what a reader needs
@@ -3892,7 +3952,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     # ---- were all deleted, whose every recorded commit was rewritten to zeros and whose every hash
     # ---- was rewritten to nonsense, exited 0.
     rows = receipt.get("files") or []
-    n_engine = n_ok = n_prov = n_prov_ok = 0
+    n_engine = n_ok = n_prov = n_prov_ok = n_eol_only = 0
     for row in rows:
         role, path = row.get("role", "engine"), row.get("path")
         dp = target / path
@@ -3910,8 +3970,22 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
         n_engine += 1
         want = row.get("sha256")
         if want and _sha(dp.read_bytes()) != want:
-            r.fail(f"'{path}' does not match the receipt: expected {want[:12]}, "
-                   f"found {_sha(dp.read_bytes())[:12]}")
+            # DEPL-aRepatriatedFork-17 S2. THE TARGET'S OWN FILTERS DECIDE, not raw bytes. Both the
+            # landing and the rollback write through `checkout-index`, so under `core.autocrlf=true`
+            # a file `git status` calls clean hashes differently here. What the target's clean
+            # filter makes of the file is compared against the blob the row recorded; a real byte
+            # change still differs there, so this narrows a false red and hides no content change.
+            _cl = subprocess.run(["git", "-C", str(target), "hash-object", f"--path={path}",
+                                  "--", str(dp)], capture_output=True, text=True, check=False)
+            # `blob_oid(raw) != oid` IS THE HALF THAT KEEPS A TAMPERED `sha256` RED: where the
+            # filter changes nothing, the raw bytes ARE the blob and the difference is the receipt's.
+            if (row.get("oid") and _cl.returncode == 0 and _cl.stdout.strip() == row["oid"]
+                    and blob_oid(dp.read_bytes()) != row["oid"]):
+                n_ok += 1
+                n_eol_only += 1
+            else:
+                r.fail(f"'{path}' does not match the receipt: expected {want[:12]}, "
+                       f"found {_sha(dp.read_bytes())[:12]}")
         else:
             n_ok += 1
         src, commit = row.get("source"), row.get("commit")
@@ -3955,7 +4029,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
 
     # A DERIVED count, and a zero over a population the DESCRIPTORS say is non-empty is itself a
     # finding — a receipt that lost its rows and a target that is clean are otherwise the same output.
-    r.note(f"integrity: {n_ok}/{n_engine} engine row(s) verified · "
+    r.note(f"integrity: {n_ok}/{n_engine} engine row(s) verified · eol-only {n_eol_only} · "
            f"provenance: {n_prov_ok}/{n_prov} resolved")
     if n_prov and n_prov_ok == 0:
         r.fail("DEAD PROBE: every engine row failed to resolve in this gov checkout, so the "
@@ -7026,6 +7100,12 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
     The row-keyed merge driver already hands its structure lines to exactly this call. A wrong
     argument order does NOT error here — it emits a plausible file with one side silently dropped —
     which is why every arm asserts merged CONTENT and never the exit code.
+
+    DEPL-aRepatriatedFork-17 S3. A CONFLICT RETURNS ITS CONFLICT-MARKED BYTES, never None. The pull
+    that motivated it rebuilt 59 hunks by hand from the hashes an order carried. `--diff3` and the
+    three fixed labels are what make the candidate reproducible from the three files
+    `write_conflict_candidate` puts beside it: the default labels are these temp paths, which no
+    later run can spell. Callers branch on the SECOND field.
     """
     import tempfile as _tf
     with _tf.TemporaryDirectory() as td:
@@ -7033,27 +7113,74 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
         (d / "ours").write_bytes(ours)
         (d / "base").write_bytes(base)
         (d / "theirs").write_bytes(theirs)
-        out = subprocess.run(["git", "merge-file", "-p",
+        out = subprocess.run(["git", "merge-file", "-p", *MERGE_FILE_ARGS,
                               str(d / "ours"), str(d / "base"), str(d / "theirs")],
                              capture_output=True, check=False)
-        if out.returncode == 0:
-            return out.stdout, "merged"
-        return None, "conflict"
+        return out.stdout, ("merged" if out.returncode == 0 else "conflict")
+
+
+def read_worktree_status(target: pathlib.Path) -> dict[str, tuple[str, str | None]]:
+    """DEPL-aRepatriatedFork-17 S1. `{path: (XY, sha256 of the worktree bytes)}` for every path
+    `git status` lists. The hash is what tells a second write to an already-dirty path from none."""
+    out = subprocess.run(["git", "-C", str(target), "status", "--porcelain=v1", "-z",
+                          "--untracked-files=all"], capture_output=True, check=False)
+    got: dict[str, tuple[str, str | None]] = {}
+    ents = out.stdout.decode("utf-8", "replace").split("\0")
+    i = 0
+    while i < len(ents):
+        e = ents[i]
+        i += 1
+        if len(e) < 4:
+            continue
+        xy, p = e[:2], e[3:]
+        if "R" in xy or "C" in xy:
+            i += 1                     # a rename's ORIGINAL path rides as the next NUL field
+        dp = target / p
+        got[p] = (xy, _sha(dp.read_bytes()) if dp.is_file() else None)
+    return got
+
+
+def measure_lone_cr(data: bytes | None) -> int:
+    """DEPL-aRepatriatedFork-17 S4. CR bytes NOT followed by LF — the ones a CR-normalising
+    reconstruction strips silently, and which an awk program can carry as a literal."""
+    return 0 if not data else data.count(b"\r") - data.count(b"\r\n")
+
+
+# S3's reproduction line. ONE spelling, read by `three_way` and printed into every conflict order.
+MERGE_FILE_ARGS = ("--diff3", "-L", "ours", "-L", "base", "-L", "theirs")
+
+
+def write_conflict_candidate(outbox: pathlib.Path, row: dict, base: bytes, ours: bytes,
+                             theirs: bytes, candidate: bytes) -> tuple[str, str]:
+    """DEPL-aRepatriatedFork-17 S3. The four byte-exact files an operator resolves a conflict from.
+
+    `write_bytes` and nothing else: the pull that motivated this lost 20 lone CR bytes to a
+    text-mode reconstruction. The directory shares the order's slug, which `render_order_slug`
+    keeps injective and contained. Returns `(directory, reproduction line)` for the order.
+    """
+    rel = f".governance/outbox/update-conflict-{render_order_slug(row['path'])}"
+    d = outbox / pathlib.Path(rel).name
+    d.mkdir(parents=True, exist_ok=True)
+    for name, data in (("base", base), ("ours", ours), ("theirs", theirs),
+                       ("candidate", candidate)):
+        (d / name).write_bytes(data or b"")
+    return rel, (f"cd {rel} && git merge-file -p {' '.join(MERGE_FILE_ARGS)} "
+                 f"ours base theirs > candidate")
 
 
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                write_withdrawals: bool = False,
-               kits: list[str] | None = None) -> int:
+               kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
     """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
     try:
-        return _cmd_update(root, target, to_rev, write, write_withdrawals, kits)
+        return _cmd_update(root, target, to_rev, write, write_withdrawals, kits, accept_role_moves)
     finally:
         release_write_lock()
 
 
 def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                 write_withdrawals: bool = False,
-                kits: list[str] | None = None) -> int:
+                kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -7571,6 +7698,40 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # second role routed to the same argv would otherwise silently not follow, and a role
                 # whose disposition is `skip` would fall through and get gov's bytes put back at a
                 # destination gov's own rule says it never supplies.
+                if write and accept_role_moves and UPDATE_ROLE.get(now) not in KIT_WRITING_DISPOSITIONS:
+                    # DEPL-aRepatriatedFork-17 S6. THE MOVE IS RESOLVED WHERE IT IS REPORTED, and
+                    # NO BYTE MOVES in this run: `apply` was the named remedy and it writes every
+                    # engine destination raw. A move INTO a writing disposition takes `adopt`'s own
+                    # attribution walk, so the next run grades it through the verdict table from a
+                    # vintage the bytes really descend from, or skips it as `unattributed`.
+                    _moved_from = role
+                    row["role"] = now
+                    if UPDATE_ROLE.get(now) in WRITING_DISPOSITIONS:
+                        _src6 = (w or {}).get("src") or row.get("source")
+                        _ent6 = index0.get(row["path"])
+                        _ours6 = index_blob(target, _ent6[1]) if _ent6 else None
+                        _hit6 = (derive_attribution(root, _src6, _ours6, to_commit, needles)
+                                 if (_src6 and _ours6 is not None) else None)
+                        if _src6:
+                            row["source"] = _src6
+                        for _k6 in ("commit", "gov_oid", "carry"):
+                            row.pop(_k6, None)
+                        if _ent6:
+                            row["oid"] = _ent6[1]
+                            _dp6 = target / row["path"]
+                            row["sha256"] = _sha(_dp6.read_bytes() if _dp6.is_file() else _ours6)
+                        if _hit6 is None:
+                            row["evidence"] = "unattributed"
+                        else:
+                            row["commit"], row["gov_oid"], row["carry"] = _hit6
+                            row["evidence"] = "vintage-match"
+                        row.pop("written", None)
+                        row.pop("why", None)
+                    tally["role-recorded"] = tally.get("role-recorded", 0) + 1
+                    print(f"  {'role-recorded':<18} [{_moved_from:<13}] -> {now:<13} "
+                          + (f"evidence {row['evidence']} " if row.get("evidence") else "")
+                          + row["path"])
+                    continue
                 if UPDATE_ROLE.get(now) not in KIT_WRITING_DISPOSITIONS:
                     # S2. A DESCRIPTOR TRANSITION IS NOT A BYTE QUESTION. Nothing is written for this
                     # row, it is not counted as a change, and it never reaches `acted` — so no
@@ -7753,6 +7914,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
         c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed)
 
+        # DEPL-aRepatriatedFork-17 S4. LONE-CR LOSS IS A FINDING. Counted against gov's blob at the
+        # row's own `commit`, on the target's worktree copy. Not a ROW line: this is a second line
+        # about a path whose verdict line is parsed by its trailing path, so it ends in the counts.
+        if how == "table" and c["base"] is not None and (target / row["path"]).is_file():
+            _g_cr = measure_lone_cr(c["base"])
+            _t_cr = measure_lone_cr((target / row["path"]).read_bytes())
+            if _t_cr < _g_cr:
+                _lcr = (f"lone-CR {row['path']}: gov holds {_g_cr} lone CR byte(s) at "
+                        f"{str(row.get('commit'))[:8]}, the target copy holds {_t_cr} · gov {_g_cr} "
+                        f"· target {_t_cr}")
+                if write:
+                    r.fail(_lcr + " — a write over a copy that lost them makes the loss permanent")
+                else:
+                    print(f"govkit update — {_lcr}")
+
         # DEPL-dCarriedReceipt-9 S2. `carry` is OUTPUT. It was recomputed from the blobs one line
         # above and is written back for REPORTING; a stale one left by an older run is DROPPED
         # rather than believed, so the field can never be a claim about bytes that have moved since.
@@ -7824,8 +8000,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"them and their receipt rows are unchanged: the two rules disagree about who owns "
               f"those bytes, and choosing between them is not gov's to do on your behalf. Those "
               f"files are exactly as you left them and there is nothing to undo. "
-              f"`govkit apply --target <this target>` re-records each row under the role its "
-              f"descriptor declares today, which is the verb a role change belongs to")
+              f"`govkit update --target <this target> --write --accept-role-moves` re-records each "
+              f"row under the role its descriptor declares today and writes no byte; a row moved "
+              f"into `engine` takes adopt's attribution walk first")
 
     # DEPL-dGaugedVintage-9 S2/S3/S4. THE PER-KIT VERSION DELTA, which nothing in gov reported.
     # Every row has carried a `version` since schema 2 and no reader ever joined it to gov's own
@@ -7849,6 +8026,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _d = descs.get(_k)
             _live = resolve_entry_version_at(root, _d[0], to_commit) if _d else "(unresolvable)"
             _stored = _by_kit[_k]
+            # DEPL-aRepatriatedFork-17 S7. THE TARGET'S OWN CONSTANT DECIDES, where it can be read. A
+            # pinned row carries its BASE vintage's version, so a kit merged forward read MIXED
+            # while every file held the new constant. Row versions stay as base attribution.
+            _tv = read_target_kit_version(target, _d[0], receipt) if _d else None
+            _bases = sorted(s for s in _stored if s != "__ABSENT__")
+            if _tv is not None:
+                _stored = {_tv}
             if _stored == {"__ABSENT__"}:
                 _verdict = "unknown — this receipt predates the version field"
             elif len(_stored) > 1:
@@ -7873,11 +8057,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     _ms, _ml = _numv.search(_s), _numv.search(_live)
                     if _ms and _ml:
                         _verdict = ("level" if _ms.group(1) == _ml.group(1)
-                                    else f"DIFFERS — stored {_ms.group(1)}, gov has {_ml.group(1)}")
+                                    else f"DIFFERS — {'target has' if _tv is not None else 'stored'} "
+                                         f"{_ms.group(1)}, gov has {_ml.group(1)}")
                     else:
                         _verdict = ("level (whole-line compare: no version number in one side)"
                                     if _s == _live
                                     else f"DIFFERS by whole line — gov has {_live!r}")
+            if _tv is not None:
+                _verdict += f" · read from the target's own copy · row base versions {_bases}"
             print(f"  {_k:<28} {_verdict}")
 
     def derive_unclaimed_candidates(_withdrawn_paths):
@@ -8378,16 +8565,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             if c["carry"] == "verbatim":
                 data = c["theirs_new"]
             else:
-                merged, _how = three_way(
-                    c["ours"],
-                    derive_carried_by_rung(c["carry"], c["base"] or b"",
-                                           resolve_row_needles(needles, row)),
-                    derive_carried_by_rung(c["carry"], c["theirs_new"],
-                                           resolve_row_needles(needles, row)))
-                if merged is None:
+                _b3 = derive_carried_by_rung(c["carry"], c["base"] or b"",
+                                             resolve_row_needles(needles, row))
+                _t3 = derive_carried_by_rung(c["carry"], c["theirs_new"],
+                                             resolve_row_needles(needles, row))
+                merged, _how = three_way(c["ours"], _b3, _t3)
+                if _how == "conflict":
                     conflicts += 1
                     _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
                     _orders_written.add(_order)
+                    _cdir, _cline = write_conflict_candidate(outbox, row, _b3, c["ours"], _t3,
+                                                             merged)
                     _order.write_text(
                         f"# update conflict — {row['path']} (gov RENAMED this file)\n\n"
                         f"gov moved  {row.get('source')} -> {new_src}\n"
@@ -8396,7 +8584,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         f"ours   target index  sha {_sha(c['ours'])} oid {c['ours_oid']}\n"
                         f"theirs {to_commit} sha {_sha(c['theirs_new'])}\n\n"
                         f"NOTHING was moved and the file was left BYTE-IDENTICAL at its old path.\n"
-                        f"Resolve by hand, then re-run `update`.\n",
+                        f"Resolve by hand, then re-run `update`.\n\n"
+                        f"candidate {_cdir}/candidate\n"
+                        f"files     {_cdir}/base {_cdir}/ours {_cdir}/theirs\n"
+                        f"reproduce {_cline}\n",
                         encoding="utf-8", newline="\n")
                     r.fail(f"'{row['path']}' was renamed by gov to '{new_src}' and the three-way "
                            f"conflicts — left untouched at its old path, order written")
@@ -8511,23 +8702,28 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # merged result must come out in. Without this, a `relocate` row hands the merge a base
             # that spells gov's prefix where the target's copy does not, so every line naming a path
             # reads as an operator edit and the whole file conflicts.
-            merged, how = three_way(
-                c["ours"],
-                derive_carried_by_rung(c["carry"], c["base"] or b"",
-                                       resolve_row_needles(needles, row)),
-                derive_carried_by_rung(c["carry"], c["theirs"],
-                                       resolve_row_needles(needles, row)))
-            if merged is None:
+            _b3 = derive_carried_by_rung(c["carry"], c["base"] or b"",
+                                         resolve_row_needles(needles, row))
+            _t3 = derive_carried_by_rung(c["carry"], c["theirs"],
+                                         resolve_row_needles(needles, row))
+            merged, how = three_way(c["ours"], _b3, _t3)
+            if how == "conflict":
                 conflicts += 1
                 _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
                 _orders_written.add(_order)
+                # S3. THE FOUR FILES ARE THE ONES THE MERGE WAS HANDED, carried rung included, so
+                # the printed line reproduces `candidate` byte for byte.
+                _cdir, _cline = write_conflict_candidate(outbox, row, _b3, c["ours"], _t3, merged)
                 _order.write_text(
                     f"# update conflict — {row['path']}\n\n"
                     f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
                     f"base   {base_commit} sha {_sha(c['base'])}\n"
                     f"ours   target index  sha {_sha(c['ours'])} oid {c['ours_oid']}\n"
                     f"theirs {to_commit} sha {_sha(c['theirs'])}\n\n"
-                    f"The file was left BYTE-IDENTICAL. Resolve by hand, then re-run `update`.\n",
+                    f"The file was left BYTE-IDENTICAL. Resolve by hand, then re-run `update`.\n\n"
+                    f"candidate {_cdir}/candidate\n"
+                    f"files     {_cdir}/base {_cdir}/ours {_cdir}/theirs\n"
+                    f"reproduce {_cline}\n",
                     encoding="utf-8", newline="\n")
                 r.fail(f"'{row['path']}' diverged and the three-way conflicts — left untouched, "
                        f"order written")
@@ -8905,6 +9101,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # A DICT RATHER THAN A SET because the order file's first sentence IS the decline string, and
     # re-deriving that prose at the verify site would be a second copy of it.
     _rr_stale: dict[str, str] = {}
+    # DEPL-aRepatriatedFork-17 S1. Per kit whose declared argv ran: the pre-argv index entry and
+    # worktree bytes of every path it is declared to write, and the status it left behind.
+    _rg_snap: dict[str, dict] = {}
     if write:
         for _eid in touched_kits:
             _d, _ = descs[_eid]
@@ -8947,6 +9146,28 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _rr_stale[_eid] = _why_rr
                 continue
             _ctx_rr = target_context(target, deploy, _eid, _d)
+            # DEPL-aRepatriatedFork-17 S1. A ROLLBACK COVERS WHAT THE RE-RENDER WROTE. The argv
+            # below writes outside `written_paths`, so a kit rolled back after it kept its renders.
+            # Snapshotted HERE, before the first argv, from the kit's own `rendered`/`generated`
+            # receipt rows plus every path a block's optional `writes` list names. The worktree
+            # STATUS is taken too, so a path the argv wrote and nothing declared can be named.
+            _rg_set = {str(f.get("path")) for f in receipt.get("files") or []
+                       if f.get("kit") == _eid and f.get("role") in ("rendered", "generated")}
+            for _b in _regen:
+                for _w in (_b.get("writes") or []):
+                    _s, _m = resolve_tokens(str(_w), _ctx_rr)
+                    try:
+                        if not _m:
+                            _rg_set.add(demand_contained_dest(_s, f"kit '{_eid}' [[regenerate]].writes"))
+                    except Refusal as _esc:
+                        r.fail(f"kit '{_eid}': a [[regenerate]].writes path is not snapshotted — {_esc}")
+            _rg_paths = sorted(p for p in _rg_set if p)
+            _rg_index, _ = index_read(target, _rg_paths) if _rg_paths else ({}, set())
+            _rg_snap[_eid] = {
+                "paths": _rg_paths, "index": {p: _rg_index.get(p) for p in _rg_paths},
+                "bytes": {p: ((target / p).read_bytes() if (target / p).is_file() else None)
+                          for p in _rg_paths},
+                "status": read_worktree_status(target)}
             for _blk in list(_regen):
                 _argv = _blk.get("argv") or []
                 if not _argv:
@@ -8988,6 +9209,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                               "This kit declares no [check] argv, so nothing below can roll its "
                               "writes back: they stay staged, and the render has to be repaired "
                               "by hand before the next update"))
+            # S1. What THIS kit's argv changed, by status entry, so an undeclared write has a name.
+            _rg_after = read_worktree_status(target)
+            _rg_before = _rg_snap[_eid]["status"]
+            _rg_snap[_eid]["touched"] = sorted(
+                p for p in set(_rg_after) | set(_rg_before) if _rg_after.get(p) != _rg_before.get(p))
     # THE COUNTS STAY GATED: they are the re-render STEP's own report, and a flag-off run ran
     # nothing, so "0 argv run" would be a report about a step that did not happen.
     if _rerender_on:
@@ -9375,6 +9601,51 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     else:
                         s["row"].pop(k, None)
 
+            # DEPL-aRepatriatedFork-17 S1. THE RE-RENDER'S OUTPUTS COME BACK TOO, through the same
+            # two plumbing calls the loop above makes, plus the snapshot's own worktree bytes: the
+            # argv wrote the worktree, and `checkout-index` would hand back the index's copy rather
+            # than the file the target actually held. A path already equal to its snapshot is left
+            # alone. Afterwards every path this kit's argv changed that still differs is NAMED.
+            _rg = _rg_snap.get(eid) or {}
+            _rg_left: list[str] = []
+            _rg_reverted: list[str] = []
+            for p in _rg.get("paths") or []:
+                _was_b, _was_i = _rg["bytes"].get(p), _rg["index"].get(p)
+                _now_b = (target / p).read_bytes() if (target / p).is_file() else None
+                if _now_b == _was_b:
+                    continue
+                if _was_i is None:
+                    subprocess.run(["git", "-C", str(target), "rm", "-q", "--cached",
+                                    "--ignore-unmatch", "--", p], capture_output=True, check=False)
+                else:
+                    subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
+                                    f"{_was_i[0]},{_was_i[1]},{p}"], capture_output=True, check=False)
+                if _was_b is None:
+                    (target / p).unlink()
+                else:
+                    (target / p).parent.mkdir(parents=True, exist_ok=True)
+                    (target / p).write_bytes(_was_b)
+                # A receipt row is `restored` like every other; a path only `writes` declares is
+                # no receipt row, so it is `reverted`, a verb the order spells apart.
+                if p in _receipt_paths:
+                    if p not in restored:
+                        restored.append(p)
+                elif p not in _rg_reverted:
+                    _rg_reverted.append(p)
+            if _rg:
+                _st_now = read_worktree_status(target)
+                for p in sorted(set(_rg.get("paths") or []) | set(_rg.get("touched") or [])):
+                    if p in _rg["bytes"]:
+                        _still = ((target / p).read_bytes() if (target / p).is_file()
+                                  else None) != _rg["bytes"][p]
+                    else:
+                        _still = _st_now.get(p) != _rg["status"].get(p)
+                    if _still:
+                        _rg_left.append(p)
+                        print(f"govkit update — verify {eid}: still differs after the rollback: {p} "
+                              f"— this kit's [[regenerate]] argv wrote it and no snapshot covered "
+                              f"it; name it in that block's `writes` list")
+
             # The three lists are what the closing line counts, and a rolled-back path is not a
             # write that stands. Both spellings of a restored rename leave `renamed` together, so
             # its `// 2` stays a pair count.
@@ -9434,6 +9705,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                    "written)\n" if not restored and not removed_landed and not unrestored else "")
                 + "".join(f"left alone {p} — this run never wrote it, so there is nothing here to "
                           f"undo\n" for p in untouched)
+                + "".join(f"reverted  {p} — this kit's [[regenerate]] argv wrote it under its "
+                          f"`writes` list, and its pre-run bytes were put back\n"
+                          for p in _rg_reverted)
+                + "".join(f"still differs {p} — this kit's [[regenerate]] argv wrote it and no "
+                          f"snapshot covered it, so the rollback could not return it\n"
+                          for p in _rg_left)
                 + f"\nThe receipt is NOT re-stamped, so the next run re-classifies these rows from "
                   f"the vintage they are actually at. Resolve by hand — most often the clean "
                   f"three-way merge that produced this is plausible and wrong — then re-run "
@@ -9511,6 +9788,16 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _reap_failed.append(f"{_stale.name} ({_reap_err})")
                 continue
             _reap_names.append(_stale.name)
+            # DEPL-aRepatriatedFork-17 S3. The order's candidate directory goes with it: its four
+            # files describe the same conflict, and a live one was rewritten above under this run.
+            _cand = outbox / _stale.stem
+            if _cand.is_dir():
+                for _cf in _cand.iterdir():
+                    _cf.unlink()
+                _cand.rmdir()
+                subprocess.run(["git", "-C", str(target), "rm", "-r", "-q", "-f", "--cached",
+                                "--ignore-unmatch", "--", f".governance/outbox/{_stale.stem}"],
+                               capture_output=True, check=False)
             # THE INDEX IS UNSTAGED WITH THE FILE, for the reason the `update-pins.md` reap above
             # records in full: a target that COMMITS its outbox otherwise hands the renormalize
             # below a pinned path missing from the worktree, and gov refuses over its own deletion.
@@ -9895,7 +10182,45 @@ def derive_attribution(root: pathlib.Path, src: str, ours: bytes, to_commit: str
     return None
 
 
-def demand_adopt_index_clean(target: pathlib.Path) -> None:
+# DEPL-aRepatriatedFork-17 S5. The pair `adopt --staged --write` stages with its result.
+ADOPT_STAGED_RECEIPT = (".governance/install.json", ".governance/install.sums")
+
+
+# DEPL-aRepatriatedFork-17 S9, §8 F1 (owner, 2026-09-23). A nearest vintage is offered as a pin only
+# when at most this fraction of the target file's lines changed; past it the file is the target's
+# own program and `adopter-owned` is the remedy. Printed with every suggestion.
+NEAREST_PIN_FRACTION = 0.5
+
+
+def derive_nearest_vintage(root: pathlib.Path, src: str, ours: bytes,
+                           to_commit: str) -> tuple[str, int] | None:
+    """S9. The gov revision whose blob of `src` is nearest the target bytes, as `(commit, changed)`.
+
+    `changed` counts the added plus removed lines of a zero-context diff, over every revision
+    `git log <to_commit> -- <src>` names, newest first, so a tie keeps the newer revision. Each
+    distinct blob is diffed once. Opt-in, because one row can walk hundreds of revisions.
+    """
+    import difflib  # noqa: PLC0415 — only this opt-in walk needs it
+    out = subprocess.run(["git", "-C", str(root), "log", "--format=%H", to_commit, "--", src],
+                         capture_output=True, text=True, check=False)
+    mine = ours.decode("utf-8", "replace").splitlines()
+    best: tuple[str, int] | None = None
+    seen: dict[str, int] = {}
+    for c in (x for x in out.stdout.split() if x):
+        blob = blob_at(root, c, src)
+        if blob is None:
+            continue
+        key = blob_oid(blob)
+        if key not in seen:
+            seen[key] = sum(1 for ln in difflib.unified_diff(
+                blob.decode("utf-8", "replace").splitlines(), mine, n=0, lineterm="")
+                if ln[:1] in ("+", "-") and not ln.startswith(("+++", "---")))
+        if best is None or seen[key] < best[1]:
+            best = (c, seen[key])
+    return best
+
+
+def demand_adopt_index_clean(target: pathlib.Path, planned: set[str] | None = None) -> None:
     """S8's third refusal, and section 8 F1 decides its WIDTH: the index, never the worktree.
 
     `adopt` reads every identity it records out of the index, so an index that disagrees with HEAD
@@ -9904,6 +10229,11 @@ def demand_adopt_index_clean(target: pathlib.Path) -> None:
     refusing over one is the shape adopters learn to route around. `-12` owns the worktree
     preconditions, on the verbs that write bytes into the target; this verb writes one file under
     `.governance/` and nothing else.
+
+    DEPL-aRepatriatedFork-17 S5. `planned` is `--staged`: the refusal is LIFTED for the planned
+    destinations (and the receipt pair this verb itself stages), so a fork edit and its receipt
+    re-measure land in ONE commit. In exchange a planned destination whose worktree differs from its
+    index is refused, since the receipt would otherwise record bytes the next commit will not carry.
     """
     has_head = subprocess.run(["git", "-C", str(target), "rev-parse", "--verify", "-q", "HEAD"],
                               capture_output=True).returncode == 0
@@ -9912,6 +10242,17 @@ def demand_adopt_index_clean(target: pathlib.Path) -> None:
     out = subprocess.run(["git", "-C", str(target), "diff", "--cached", "--name-only", "-z", "HEAD"],
                          capture_output=True, text=True, check=False)
     staged = sorted({n for n in out.stdout.split("\0") if n})
+    if planned is not None:
+        wt = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "-z"],
+                            capture_output=True, text=True, check=False)
+        dirty = sorted({n for n in wt.stdout.split("\0") if n} & planned)
+        if dirty:
+            raise Refusal(
+                f"--staged: {len(dirty)} planned destination(s) differ between the worktree and the "
+                f"index: " + ", ".join(dirty) + " — the receipt is measured from the INDEX and staged "
+                "beside it, so it would record bytes the next commit will not carry. Stage or "
+                "restore them, then re-run")
+        staged = [n for n in staged if n not in planned and n not in ADOPT_STAGED_RECEIPT]
     if staged:
         raise Refusal(
             f"{len(staged)} path(s) in the target's index differ from HEAD: " + ", ".join(staged)
@@ -9923,7 +10264,8 @@ def demand_adopt_index_clean(target: pathlib.Path) -> None:
 
 
 def cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
-              pins: dict[str, str], re_adopt: bool, write: bool) -> int:
+              pins: dict[str, str], re_adopt: bool, write: bool,
+              staged: bool = False, suggest_pins: bool = False) -> int:
     """The verb. Its BODY is `_cmd_adopt`; see `cmd_apply` for why the split exists.
 
     D5, from this build's closing review: `adopt --write` is the THIRD writer of
@@ -9935,13 +10277,14 @@ def cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     file that governs every future destructive `update --write`.
     """
     try:
-        return _cmd_adopt(root, target, to_rev, pins, re_adopt, write)
+        return _cmd_adopt(root, target, to_rev, pins, re_adopt, write, staged, suggest_pins)
     finally:
         release_write_lock()
 
 
 def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
-               pins: dict[str, str], re_adopt: bool, write: bool) -> int:
+               pins: dict[str, str], re_adopt: bool, write: bool,
+               staged: bool = False, suggest_pins: bool = False) -> int:
     """Write the receipt an already-installed tree never had, by measuring it against gov history.
 
     READ-ONLY WITHOUT `--write`, matching `update` and for the same reason: the muscle-memory
@@ -9972,7 +10315,9 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             f"decision artefact, and `intake` refuses to silently rewrite the descriptor for the "
             f"same reason"
         )
-    demand_adopt_index_clean(target)
+    # S5. Under `--staged` the index is graded AFTER the plan exists, against its destinations.
+    if not staged:
+        demand_adopt_index_clean(target)
 
     deploy = load_deploy(target)
     # TOOL-aScouredKit-31. `deploy` IS PASSED and the list is NOT pre-coerced here. `list(...)` at
@@ -10064,9 +10409,14 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
                          "version": entry_version(root, descs[_o["entry"]][0]),
                          "src": _o["source"], "landable": True, "rule": {}})
 
+    if staged:
+        demand_adopt_index_clean(target, {p["dest"] for p in plan})
+
     # ---- THE INDEX, ONE batched read over every planned destination. A destination the target does
     # ---- not track has no identity to record and gets no row at all.
     idx, _present = index_read(target, [p["dest"] for p in plan]) if plan else ({}, set())
+    # S9. `(dest, source, index bytes)` of every row the walk leaves `unattributed`.
+    _unattr: list[tuple[str, str, bytes]] = []
 
     rows: list[dict] = []
     tally: dict[str, int] = {}
@@ -10179,6 +10529,8 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
                 # and the walk does not get to make it on the descriptor's behalf. No `commit`, no
                 # `gov_oid`, `role` untouched.
                 row["evidence"] = "unattributed"
+                if p["src"] and ours is not None:
+                    _unattr.append((dest, p["src"], ours))
             else:
                 row["commit"], row["gov_oid"], rung = hit
                 row["carry"] = rung
@@ -10222,6 +10574,25 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
              if _seen else "(none — this target tracks no planned destination)"))
     if r.problems:
         return r.emit()
+
+    # ---- DEPL-aRepatriatedFork-17 S9. A SUGGESTED PIN per `unattributed` row, never an applied one:
+    # ---- a pin is the operator's assertion about a base, and this only finds the candidate.
+    if suggest_pins:
+        for _ud, _us, _uo in _unattr:
+            _near = derive_nearest_vintage(root, _us, _uo, commit)
+            _lines = len(_uo.decode("utf-8", "replace").splitlines())
+            if _near is not None and _near[1] <= NEAREST_PIN_FRACTION * _lines:
+                print(f"govkit adopt — suggest-pin {_ud}: nearest gov vintage {_near[0][:8]} at "
+                      f"{_near[1]} changed line(s) of {_lines} (limit {NEAREST_PIN_FRACTION:g} of "
+                      f"the file) · --pin {_ud}={_near[0]}")
+            else:
+                print(f"govkit adopt — no-pin {_ud}: "
+                      + (f"the nearest gov vintage {_near[0][:8]} is {_near[1]} changed line(s) of "
+                         f"{_lines}, past the limit of {NEAREST_PIN_FRACTION:g} of the file"
+                         if _near else "gov has no revision of its source to compare")
+                      + " — this is the target's own program; declare it `adopter-owned` with an "
+                        "[[own]] row in .governance/deploy.toml")
+        print(f"govkit adopt — suggest-pins: {len(_unattr)} unattributed row(s) measured")
 
     # ---- S11. THE TWO CLASSES `resolve_entry` DOES NOT PRODUCE, in `apply`'s own shapes rather
     # ---- than in a second one. Without them `-2`'s `pins` arm never dispatches and `cmd_check`'s
@@ -10357,6 +10728,16 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
         encoding="utf-8", newline="\n")
     print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
           f"schema {RECEIPT_SCHEMA}, gov_commit {commit[:8]}")
+    if staged:
+        # S5. STAGED WITH THE BYTES IT MEASURED, so the fork edit and its receipt are one commit.
+        _ga = subprocess.run(["git", "-C", str(target), "add", "--", *ADOPT_STAGED_RECEIPT],
+                             capture_output=True, text=True, check=False)
+        if _ga.returncode != 0:
+            r.fail(f"--staged: the receipt was written and `git add` would not stage it: "
+                   f"{_ga.stderr.strip()}")
+        else:
+            print("govkit adopt — --staged: the receipt and its sidecar are staged beside the "
+                  "bytes they measure; commit them together")
     return r.emit()
 
 
@@ -10680,8 +11061,9 @@ USAGE = """usage:
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
-  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals] [--accept-role-moves]
   govkit.py adopt  --target <path> [--to <rev>] [--pin <path>=<rev> ...] [--re-adopt] [--write]
+                   [--staged] [--suggest-pins]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
 `plan`, `check`, `update` and `adopt` are READ-ONLY and none writes a byte; `update --write` performs
@@ -10731,6 +11113,9 @@ def parse_args(argv: list[str]) -> tuple:
     # gov-authored. It is a scope flag by the test `-11` and `-12` share: it enables a NARROWER class
     # of action, defaults OFF, and overrides no refusal.
     run_discharge = False
+    # DEPL-aRepatriatedFork-17 S5, S6, S9. All three opt-in scope flags: each enables a narrower
+    # class of action, defaults OFF and overrides no refusal.
+    staged = accept_role_moves = suggest_pins = False
     i = 1
     while i < len(argv):
         a = argv[i]
@@ -10775,6 +11160,15 @@ def parse_args(argv: list[str]) -> tuple:
         elif a == "--run-discharge":
             run_discharge = True
             i += 1
+        elif a == "--staged":
+            staged = True
+            i += 1
+        elif a == "--accept-role-moves":
+            accept_role_moves = True
+            i += 1
+        elif a == "--suggest-pins":
+            suggest_pins = True
+            i += 1
         elif a == "--emit-declines":
             emit_declines = True
             i += 1
@@ -10790,7 +11184,8 @@ def parse_args(argv: list[str]) -> tuple:
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
     return (verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals,
-            pins, re_adopt, coverage, emit_declines, run_discharge)
+            pins, re_adopt, coverage, emit_declines, run_discharge, staged, accept_role_moves,
+            suggest_pins)
 
 
 # ======================= DEPL-dRetiredFork-6 — `contribute` ====================================
@@ -11115,7 +11510,8 @@ def main(argv: list[str]) -> int:
                 raise Refusal("epoch takes no arguments except --base <rev>")
             return cmd_epoch(repo_root(), argv[2] if len(argv) == 3 else None)
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
-         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE) = parse_args(argv)
+         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
+         SUGGEST_PINS) = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
@@ -11153,9 +11549,11 @@ def main(argv: list[str]) -> int:
                 # away here, so `update --kits <one>` classified the WHOLE receipt -- measured
                 # byte-identical to the unscoped run, with nothing saying the scope was ignored.
                 return cmd_update(root, target, TO_REV, write=WRITE,
-                                  write_withdrawals=WRITE_WD, kits=kits)
+                                  write_withdrawals=WRITE_WD, kits=kits,
+                                  accept_role_moves=ACCEPT_ROLE_MOVES)
             if verb == "adopt":
-                return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE)
+                return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE,
+                                 staged=STAGED, suggest_pins=SUGGEST_PINS)
             return cmd_apply(root, target, mode, kits, resume=RESUME)
         sys.stderr.write(f"govkit: unknown subcommand '{verb}'\n\n{USAGE}")
         return 2

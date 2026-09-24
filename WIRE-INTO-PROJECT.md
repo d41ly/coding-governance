@@ -1138,9 +1138,13 @@ and prints `role-moved` naming the role the row landed under, the role gov decla
 path. **Nothing is written for such a row and nothing in your receipt changes**, with one exception
 named below. The two rules disagree about who owns those bytes, so the file on disk is exactly as
 you left it — including a destination you have edited or emptied, which an older gov would have
-restored from its own copy. There is nothing to undo and no order to read. `govkit apply` re-records
-the row under the role the descriptor declares now, which is the verb a role change belongs to, and
-the line stops appearing.
+restored from its own copy. There is nothing to undo and no order to read.
+`govkit update --write --accept-role-moves` re-records the row under the role the descriptor
+declares now, prints `role-recorded` for it, and writes no byte; the line then stops appearing.
+A move INTO `engine` first takes the attribution walk `adopt` runs, so the row is recorded
+`vintage-match` when your bytes descend from a gov vintage and `unattributed` when they do not, and
+the NEXT `update --write` grades it through the verdict table like any other engine row. `apply`
+is not the remedy: it writes every engine destination raw. The flag is opt-in for one release.
 
 **The exception is the move where standing back would protect nothing.** Where the role gov now
 declares is served by that kit's own re-render — the argv an `update` runs for every kit it touches —
@@ -1155,6 +1159,29 @@ back exactly as described above.
 One exception, and it is deliberate: on a receipt still at schema 1 the same disagreement REFUSES
 the row instead. A schema-1 receipt is known to stamp roles its own descriptor contradicts, so
 neither answer can be trusted there and acting on either would be a guess.
+
+**A conflict leaves a byte-exact starting file.** Beside each `update-conflict-<slug>.md` order,
+`update --write` writes `base`, `ours`, `theirs` and `candidate` under
+`.governance/outbox/update-conflict-<slug>/`, each through a binary write, so a lone CR survives.
+`candidate` is `git merge-file -p --diff3` over the other three, and the order prints the one line
+that reproduces it. Your file itself is left byte-identical, as before; resolving is still yours.
+
+**Other things `update` and `check` now say rather than do silently.** `update` prints a `lone-CR`
+line for an engine row whose copy holds fewer CR-not-followed-by-LF bytes than gov's blob at the
+row's commit, and on `--write` that is a finding. `check` grades a file that differs from its
+recorded hash through your own clean filter, so a `core.autocrlf=true` checkout counts `eol-only`
+rather than reporting a mismatch. A rollback also restores what the kit's `[[regenerate]]` argv
+re-rendered (its `rendered` and `generated` rows, and any path that block's optional `writes` list
+names), and names any path it wrote that no snapshot covered. The per-kit version delta reads the
+constant from your own copy of the kit's version file. A gate leg your runner already carries with
+gov's own resolved argv is `claimed` rather than refused.
+
+**Two `adopt` flags for a hand-resolved fork.** `adopt --re-adopt --staged --write` measures from a
+STAGED index, refuses when a planned destination differs between your worktree and the index, and
+stages `.governance/install.json` and `install.sums` beside the bytes, so the fork and its receipt
+are one commit with no `--no-verify`. `adopt --suggest-pins` prints, for each `unattributed` row, the
+gov revision nearest your bytes by changed-line count and a ready `--pin <path>=<rev>` when at most
+half the file's lines changed; past that it names `adopter-owned` as the remedy.
 
 **`update-conflict-*.md` orders are REAPED, and they are the only family that is.** A conflict order
 records a STATE — this row still conflicts — which every run re-derives from scratch, so an order
