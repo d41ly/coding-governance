@@ -4513,6 +4513,11 @@
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
     },
     {
+      "id": "read_grammar",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "read_index_entries",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -6748,6 +6753,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_archive_segment_after_archive_is_durable",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_argv_grammar_and_the_refusal_are_gated",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -6858,6 +6868,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_build_qid_cutoff_is_read_from_conf",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_ceiling_decides_before_any_label",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -6869,6 +6884,11 @@
     },
     {
       "id": "test_chunk_matching",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_cited_families_are_ids_not_homes",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
@@ -6964,6 +6984,11 @@
     },
     {
       "id": "test_digest_covers_kit_version",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_digest_follows_grammar_keys_only",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
@@ -7099,6 +7124,11 @@
     },
     {
       "id": "test_export_day_counts_agree_with_an_independent_count",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_export_dir_is_declared_and_bounded",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
@@ -7646,6 +7676,11 @@
       "id": "test_no_tracked_carrier_still_names_the_old_backlog_destination",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_node_tag_class_is_declared",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_non_killable_descendant_is_withheld_not_signalled",

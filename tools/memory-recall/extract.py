@@ -64,8 +64,10 @@ CONF = recall_conf.resolve()
 #   session       ABL-bSiftedArchive-3  (family, "bSiftedArchive", "3")   ...and its -3b correction
 # The family list is an allowlist on purpose: a bare \b[A-Z]{2,8}- pattern also matches WU, AC, SS,
 # JSON, PII and a dozen other non-id tokens that outnumber several real families. FORKED: the
-# allowlist is the conf's FAMILIES rather than eleven baked-in inCMS tokens.
-FAMILIES = CONF.families
+# allowlist is the conf's FAMILIES rather than eleven baked-in inCMS tokens, plus any family the
+# conf declares CITED (`RECALL_CITED_FAMILIES`): an id this corpus mentions and never homes. Those
+# join this allowlist and never `_IDX` below, so a cited family gains ids and no durable home.
+FAMILIES = CONF.families + CONF.cited_families
 _NODE = CONF.node_tag_class
 
 
@@ -141,11 +143,16 @@ _ROOT = re.escape(CONF.memory_root)  # FORKED: the corpus root is a conf value, 
 #
 # The family alternation is DERIVED from `CONF.families` and is never a literal list: this repo's
 # four prefixes are not an adopter's, and a literal would ship them into every installed kit.
+#
+# The archive arm also admits one optional segment AFTER `archive/` (TOOL-aRepatriatedFork-12 S3):
+# inCMS rotates to `<root>/archive/<discipline>/DECISIONS.<date>.md`. Measured over each tree's
+# `git ls-files` with its own conf: gov 9 -> 9, nc 13 -> 13, inCMS 56 -> 71, the 71 being exactly
+# the set inCMS's own pattern selects. No key: a layout knob with one value is not a decision.
 _IDX = "(?:DECISIONS|BACKLOG|" + "|".join(re.escape(f) for f in CONF.families) + ")"
 DURABLE = re.compile(
     rf"{_ROOT}/(?:[^/]+/)?{_IDX}\.md$"
     rf"|{_ROOT}/(?:[^/]+/)?decisions/[^/]+\.md$"
-    rf"|{_ROOT}/(?:[^/]+/)?archive/{_IDX}\.[^/]+\.md$"
+    rf"|{_ROOT}/(?:[^/]+/)?archive/(?:[^/]+/)?{_IDX}\.[^/]+\.md$"
 )
 
 
@@ -491,7 +498,8 @@ def grammar_for(root=None) -> Grammar:
                        families=FAMILIES, memory_root=CONF.memory_root)
     conf = recall_conf.resolve(pathlib.Path(root))
     eras = _eras(conf.node_tag_class)
-    ident = r"(?:" + "|".join(conf.families) + r")-(?:" + "|".join(eras) + r")"
+    ident = (r"(?:" + "|".join(conf.families + conf.cited_families) + r")-(?:" + "|".join(eras)
+             + r")")
     return Grammar(
         ID=ident,
         ID_RE=re.compile(r"\b" + ident + r"\b"),
@@ -501,7 +509,7 @@ def grammar_for(root=None) -> Grammar:
             re.compile(r"^\|\s*[`*]*(" + ident + r")\b[^|]*\|"),
             re.compile(r"^\s*[-*]\s+[`*]*(" + ident + r")\b[`*]*\s*[·|]"),
         ),
-        families=conf.families,
+        families=conf.families + conf.cited_families,
         memory_root=conf.memory_root,
     )
 

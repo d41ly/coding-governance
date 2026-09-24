@@ -128,11 +128,11 @@ ids TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOO
 | [TOOL-aRepatriatedFork-18 — the test suites that arm gov's gates reach adopters](spec/2026-09-23-spec-TOOL-aRepatriatedFork-18.md) | 4 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-19 — check-wiring judges every arm at a relocated layout](spec/2026-09-23-spec-TOOL-aRepatriatedFork-19.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-11 — unattended: build-root pathspecs stop at the build root, and a pull lands its hooks wired and its pins measurable](spec/2026-09-23-spec-TOOL-aRepatriatedFork-11.md) | 6 | 2 | CLOSED | rev-2 | 2026-09-24 |
-| [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | SPECCED | rev-2 | 2026-09-23 |
+| [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-23 |
 <!-- /gen:build-units -->
 
-Records: 40 bound to this build, across 3 record folder(s).
+Records: 41 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

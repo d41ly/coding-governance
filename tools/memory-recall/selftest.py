@@ -108,7 +108,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 65
+SELFTEST_ARMS = 71
 # 34 -> 58 on 2026-08-24 (contrib/incms-memory-recall): twenty-four arms — twenty-three ported from
 #   inCMS's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -123,6 +123,10 @@ SELFTEST_ARMS = 65
 #   `test_chunk_arm_rolls_up`, `test_empty_spine_is_loud`; ONE from the flag-in-path guard,
 #   `test_extract_rejects_flag_in_path_slot`; and ONE from TOOL-aCollapsedScan-7,
 #   `test_repo_root_linked_worktree`. Main carried no pin, so 34 + 7 + 24 = 65.
+# 65 -> 71 on 2026-09-24 (TOOL-aRepatriatedFork-12): SIX arms, one per corpus-shape fact moved
+#   into the conf, each observed red against the kit before the unit - the archive segment after
+#   `archive/`, `RECALL_NODE_TAG_CLASS`, `RECALL_CITED_FAMILIES`, `RECALL_BUILD_QID_CUTOFF`,
+#   `RECALL_EXPORT_DIR`, and the digest moving with the two grammar keys and only those.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -2456,6 +2460,177 @@ def test_extract_rejects_flag_in_path_slot():
         cleanup(root)
 
 
+# --- TOOL-aRepatriatedFork-12: the corpus shape an adopter declares ------------------------------
+# Each arm below was observed RED against the kit at the commit before this unit, where every one of
+# these keys was ignored and `DURABLE`'s archive arm took no segment after `archive/`.
+_GRAMMAR_PROBE = (
+    "import sys, json, pathlib; sys.dont_write_bytecode = True\n"
+    "sys.path.insert(0, sys.argv[1])\n"
+    "import extract as E\n"
+    "g = E.grammar_for(pathlib.Path.cwd())\n"
+    "ids = sys.argv[2].split()\n"
+    "print(json.dumps({'id': {i: bool(E.ID_RE.fullmatch(i)) for i in ids},\n"
+    "                  'grammar_for': {i: bool(g.ID_RE.fullmatch(i)) for i in ids},\n"
+    "                  'durable': {p: bool(E.DURABLE.search(p)) for p in sys.argv[3:]}}))\n"
+)
+
+
+def read_grammar(conf: str, ids: str, *paths: str) -> dict:
+    """The kit's grammar under `conf`, read out of a throwaway repo: `id` and `grammar_for` map each
+    id to a full match of the module's `ID_RE` and of `grammar_for(root)`'s, `durable` maps each
+    path to `DURABLE.search`. Two id readers, because consumers outside this kit call the second."""
+    root, kitdir = make_repo(conf=conf)
+    try:
+        p = subprocess.run([sys.executable, "-c", _GRAMMAR_PROBE, str(kitdir), ids, *paths],
+                           cwd=str(root), capture_output=True, text=True)
+        assert p.returncode == 0, f"the probe could not import extract under this conf:\n{p.stderr}"
+        return json.loads(p.stdout)
+    finally:
+        cleanup(root)
+
+
+@check("DURABLE admits one segment AFTER archive/, and still refuses a non-index file there")
+def test_archive_segment_after_archive_is_durable():
+    """inCMS rotates to `<root>/archive/<discipline>/DECISIONS.<date>.md`; the pattern took a segment
+    only BEFORE `archive/`, so all fifteen of those files had no durable home (spec AC1)."""
+    after = "memory/archive/architecture/DECISIONS.2026-07-27.md"
+    before = "memory/tooling/archive/DECISIONS.2026-07-27.md"
+    flat = "memory/archive/BACKLOG.2026-07-27.md"
+    notes = "memory/archive/architecture/notes.2026-07-27.md"
+    g = read_grammar(CONF, "", after, before, flat, notes)["durable"]
+    assert g[after], f"{after} has no durable home — the archive arm takes no segment after it"
+    assert g[before] and g[flat], f"the widening lost a layout it matched before: {g}"
+    assert not g[notes], f"{notes} is not an index, yet DURABLE admits it"
+    return "after-, before- and flat archive layouts match; a non-index file does not"
+
+
+@check("RECALL_NODE_TAG_CLASS narrows the id grammar, prints, defaults to a-z, and refuses a bad class")
+def test_node_tag_class_is_declared():
+    """The class was a code constant, so inCMS (`a-f`) could not run the kit verbatim (spec AC2)."""
+    narrow = CONF + 'RECALL_NODE_TAG_CLASS="a-f"\n'
+    g = read_grammar(narrow, "ARCH-xFoo-3 TOOL-xFoo-3 TOOL-aFoo-3")
+    assert not g["id"]["TOOL-xFoo-3"] and not g["grammar_for"]["TOOL-xFoo-3"], (
+        f"node tag `x` is outside a-f and still an id: {g}")
+    assert g["id"]["TOOL-aFoo-3"] and g["grammar_for"]["TOOL-aFoo-3"], f"a-f lost `a`: {g}"
+    wide = read_grammar(CONF, "TOOL-xFoo-3")
+    assert wide["id"]["TOOL-xFoo-3"], f"the absent key no longer means a-z: {wide}"
+    seen = {}
+    for label, conf in (("a-f", narrow), ("absent", CONF),
+                        ("a-f]", CONF + 'RECALL_NODE_TAG_CLASS="a-f]"\n'),
+                        ("f-a", CONF + 'RECALL_NODE_TAG_CLASS="f-a"\n')):
+        root, kitdir = make_repo(conf=conf)
+        try:
+            seen[label] = run(root, kitdir, script="recall_conf.py")
+        finally:
+            cleanup(root)
+    assert "NODE_TAG_CLASS=a-f\n" in seen["a-f"].stdout, seen["a-f"].stdout
+    assert "NODE_TAG_CLASS=a-z\n" in seen["absent"].stdout, seen["absent"].stdout
+    for bad in ("a-f]", "f-a"):
+        assert seen[bad].returncode == 2 and "RECALL_NODE_TAG_CLASS" in seen[bad].stderr, (
+            f"{bad!r} was not refused naming the key: rc={seen[bad].returncode} {seen[bad].stderr}")
+    return "a-f narrows both id readers, absent = a-z, `a-f]` and `f-a` exit 2 naming the key"
+
+
+@check("RECALL_CITED_FAMILIES makes ids and never durable homes, and refuses a homed family")
+def test_cited_families_are_ids_not_homes():
+    """A family a corpus cites and never homes: declaring it in FAMILIES would also give it a
+    rotated-archive and build-folder home in the hygiene engine (spec AC3)."""
+    conf = 'MEMORY_ROOT=memory\nFAMILIES="architecture:ARCH"\nRECALL_CITED_FAMILIES="PKG"\n'
+    g = read_grammar(conf, "PKG-dCandidLodestar-5 ARCH-dCandidLodestar-5",
+                     "memory/backlog/PKG.md", "memory/backlog/ARCH.md")
+    assert g["id"]["PKG-dCandidLodestar-5"] and g["grammar_for"]["PKG-dCandidLodestar-5"], (
+        f"a cited family is not an id: {g}")
+    assert not g["durable"]["memory/backlog/PKG.md"], f"a cited family gained a durable home: {g}"
+    assert g["durable"]["memory/backlog/ARCH.md"], f"the homed family lost its home: {g}"
+    root, kitdir = make_repo(conf='MEMORY_ROOT=memory\nFAMILIES="architecture:ARCH"\n'
+                                  'RECALL_CITED_FAMILIES="ARCH"\n')
+    try:
+        p = run(root, kitdir, script="recall_conf.py")
+    finally:
+        cleanup(root)
+    assert p.returncode == 2 and "RECALL_CITED_FAMILIES" in p.stderr, (
+        f"an overlap with FAMILIES was accepted: rc={p.returncode} {p.stdout}{p.stderr}")
+    return "PKG is an id in both readers, PKG.md is no home, ARCH twice exits 2"
+
+
+@check("RECALL_BUILD_QID_CUTOFF feeds build_cutoff per node, and refuses a malformed pair")
+def test_build_qid_cutoff_is_read_from_conf():
+    """The cut-off was a dict literal in query.py, adopter data in a file every update overwrites
+    (spec AC4)."""
+    snippet = ("import sys; sys.dont_write_bytecode = True\nsys.path.insert(0, sys.argv[1])\n"
+               "import query\nprint(query.build_cutoff('a'), query.build_cutoff('b'))\n")
+    out = {}
+    for label, value in (("pair", "a:163"), ("bad", "a163")):
+        root, kitdir = make_repo(conf=CONF + f'RECALL_BUILD_QID_CUTOFF="{value}"\n')
+        try:
+            out[label] = subprocess.run([sys.executable, "-c", snippet, str(kitdir)],
+                                        cwd=str(root), capture_output=True, text=True)
+        finally:
+            cleanup(root)
+    assert out["pair"].stdout.split() == ["163", "0"], (
+        f"build_cutoff did not read the conf: {out['pair'].stdout}{out['pair'].stderr}")
+    assert out["bad"].returncode == 2 and "RECALL_BUILD_QID_CUTOFF" in out["bad"].stderr, (
+        f"`a163` was not refused naming the key: {out['bad'].returncode} {out['bad'].stderr}")
+    return "a:163 -> 163 for a and 0 for b; `a163` exits 2 naming the key"
+
+
+@check("RECALL_EXPORT_DIR moves --export inside the root, refuses an escape, and defaults to git")
+def test_export_dir_is_declared_and_bounded():
+    """A write destination read from a conf: inside the root it is honoured and the file says where
+    it is; `../out` is refused before any write; absent keeps the common git dir (spec AC5)."""
+    rows = "".join(json.dumps(r) + "\n" for r in build_synthetic_log())
+    seen = {}
+    for label, extra in (("inside", 'RECALL_EXPORT_DIR="memory/archive/project"\n'),
+                         ("escape", 'RECALL_EXPORT_DIR="../out"\n'), ("absent", "")):
+        root, kitdir = make_repo(conf=CONF + extra)
+        try:
+            log = git_common_dir(root) / "recall" / "queries.jsonl"
+            log.parent.mkdir(parents=True, exist_ok=True)
+            log.write_text(rows, encoding="utf-8", newline="\n")
+            # `../out` from the root. Only THIS file is watched: walking the temp dir would cost
+            # seconds per run and grade every other process's scratch.
+            escaped = root.parent / "out" / "recall-traffic-a.md"
+            existed = escaped.exists()
+            p = run(root, kitdir, "--export", "--tag", "a")
+            inside = root / "memory" / "archive" / "project" / "recall-traffic-a.md"
+            seen[label] = (p, inside.is_file() and inside.read_text(encoding="utf-8"),
+                           (log.parent / "recall-traffic-a.md").is_file(),
+                           escaped.exists() and not existed)
+        finally:
+            cleanup(root)
+    p, text, in_git, outside = seen["inside"]
+    assert p.returncode == 0 and text and not in_git, f"not written under the declared dir: {p.stderr}"
+    assert "inside the worktree" in text and "OUTSIDE" not in text, "the header misstates where it is"
+    p, text, in_git, outside = seen["escape"]
+    assert p.returncode == 2 and "RECALL_EXPORT_DIR" in p.stderr, f"`../out` accepted: {p.stderr}"
+    assert not text and not in_git and not outside, f"a refused export still wrote: {outside}"
+    p, text, in_git, outside = seen["absent"]
+    assert p.returncode == 0 and in_git and not text, f"the default moved: {p.stdout}{p.stderr}"
+    return "declared dir honoured with an honest header, `../out` exits 2 writing nothing, absent = git dir"
+
+
+@check("CONF_DIGEST moves with the two grammar keys and ONLY with them")
+def test_digest_follows_grammar_keys_only():
+    """A grammar key must invalidate a warm cache; a non-corpus key must not force a rebuild (AC6)."""
+    confs = {"base": CONF, "tag": CONF + 'RECALL_NODE_TAG_CLASS="a-f"\n',
+             "cited": CONF + 'RECALL_CITED_FAMILIES="PKG"\n',
+             "cutoff": CONF + 'RECALL_BUILD_QID_CUTOFF="a:163"\n',
+             "export": CONF + 'RECALL_EXPORT_DIR="memory/archive/project"\n'}
+    dig = {}
+    for label, conf in confs.items():
+        root, kitdir = make_repo(conf=conf)
+        try:
+            p = run(root, kitdir, script="recall_conf.py")
+        finally:
+            cleanup(root)
+        m = re.search(r"^CONF_DIGEST=(\w+)$", p.stdout, re.M)
+        assert m, f"no CONF_DIGEST under {label}: {p.stdout}{p.stderr}"
+        dig[label] = m.group(1)
+    assert dig["tag"] != dig["base"] and dig["cited"] != dig["base"], f"a grammar key left it: {dig}"
+    assert dig["cutoff"] == dig["base"] == dig["export"], f"a non-corpus key moved it: {dig}"
+    return f"base {dig['base']}; tag and cited move it, cutoff and export do not"
+
+
 def main() -> int:
     # The live log of the repo this kit sits in, hashed before and after: a gate that writes to the
     # instrument it measures is how upstream's log came to be 96% self-inflicted refusals.
@@ -2499,6 +2674,10 @@ def main() -> int:
         test_alias_join_reaches_the_query_index, test_alias_on_versus_none_is_a_differential,
         test_the_selftest_pin_carries_an_unbroken_provenance_chain,
         test_repo_root_linked_worktree, test_extract_rejects_flag_in_path_slot,
+        # TOOL-aRepatriatedFork-12: the four corpus-shape keys and the archive segment
+        test_archive_segment_after_archive_is_durable, test_node_tag_class_is_declared,
+        test_cited_families_are_ids_not_homes, test_build_qid_cutoff_is_read_from_conf,
+        test_export_dir_is_declared_and_bounded, test_digest_follows_grammar_keys_only,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the

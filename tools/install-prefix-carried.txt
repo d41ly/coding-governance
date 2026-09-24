@@ -66,7 +66,6 @@ tools/memory-recall/extract.py	1	(loose)
 tools/memory-recall/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/memory-recall/recall-fixture.json	1	memory-recall
 tools/memory-recall/recall-opened.js	1	memory-recall
-tools/memory-recall/recall_conf.py	1	memory-tree
 tools/memory-tree/README.md	5	(loose),memory-tree
 tools/memory-tree/adopt-memory-tree.sh	5	lib,memory-tree
 tools/memory-tree/build-readme-slot-highwater.txt	1	(loose)
