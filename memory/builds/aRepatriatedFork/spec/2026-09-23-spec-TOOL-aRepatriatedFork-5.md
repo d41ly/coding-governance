@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-5 — pre-push runs only a tracked, unmodified gate command
 
-**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -244,6 +244,12 @@ so no marker moves; the unattended kit bumps for S7's template edit.
   `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt`,
   `tools/run-gates/selftest-budgets.txt`, `memory/map/features/run-gates.md` with its generated map,
   `memory/guides/UNATTENDED-PROTOCOL.md`, and every other `unattended@` marker carrier for 1.29
+- gate repair at VERIFYING (rev-5): `tools/check-spec-tokens.py`, because the ported suite's name
+  met two of its shape rules. Its BAR read a suite FILE as exactly `selftest.py` while gate-guard D4
+  reads any word ENDING `selftest.py`, so the manifest parity arm reddened on
+  `python3 .githooks/pre_push_bar_selftest.py`; BAR now takes D4's reading. Its CODE SYMBOL claim
+  class refused any underscore, so the git-hooks key the run-gates dossier claims read as a symbol;
+  a filename shape now clears it. The suite keeps the name the nc port carries.
 
 ### Alternatives rejected
 
@@ -366,6 +372,10 @@ New arm: `.githooks/pre_push_bar_selftest.py` · rows 12-13 (AC13), all six obse
   hint prints the declared `GATE_CMD`, else the kit's runner, instead of `$GOV_KITROOT/unattended-bar.sh`,
   which is untracked here and which S8's declared arm refuses; §4 Inventory gains `_bar_ok`; AC13
   added, and §7 gains its arm, rows 12-13 of the ported harness, which push each advice back.
+- rev-5 · 2026-09-24 · gate repair at VERIFYING — leg `spec-tokens self-test`: its manifest
+  parity arm and its AC4 live-keys arm refused `pre_push_bar_selftest.py`. §4 Files touched records
+  the two shape rules in `tools/check-spec-tokens.py` that now read the name as a suite and as a
+  filename key. AC1-AC13 are unchanged.
 
 ## 10. Reuse audit
 

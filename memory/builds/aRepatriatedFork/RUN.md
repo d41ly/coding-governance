@@ -254,3 +254,5 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T08:50:14Z brief · item TOOL-aRepatriatedFork-2 · reason 749b71b1546f memory/builds/aRepatriatedFork/prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-2-repair-r3-brief.md
 
 2026-09-24T09:02:21Z dispatch · item 87c35469 TOOL-aRepatriatedFork-2 · reason tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/drift-audit/selftest.py tools/codebase-map/test_codebase_map.py tools/process-monitor/adopt-process-monitor.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md memory/builds/aRepatriatedFork/README.md
+
+2026-09-24T09:04:23Z dispatch · item 3717ee86 TOOL-aRepatriatedFork-5 · reason tools/check-spec-tokens.py memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-5.md memory/builds/aRepatriatedFork/README.md
