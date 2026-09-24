@@ -24,7 +24,7 @@ this is).
 
 ## How to fold
 
-The review record `memory/builds/aRepatriatedFork/reviews/2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md` states each item's location, defect, fix and left-shift. Read the
+The review record `memory/builds/aRepatriatedFork/reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md` states each item's location, defect, fix and left-shift. Read the
 items named above there, whole, before touching code. For each item:
 
 - Reproduce it at HEAD FIRST, then fix it. A finding you cannot reproduce is reported back as such in

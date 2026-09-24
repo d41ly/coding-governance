@@ -1,9 +1,9 @@
-**Serves:** diff-review DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-22
+**Serves:** diff-review DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-10
 
 # aRepatriatedFork: Tier-2 closing diff review, round 2
 
 *Node `a`, 2026-09-24. This round reviews ONLY the fold of round 1's findings. The round-1 record,
-[round 1](2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md), states every item's
+[round 1](2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md), states every item's
 defect and intended fix. Fold A closed B1, H1 and M1 (`.githooks/pre-push`, `tools/push-main.sh` and
 their suites). Fold B closed M2, M3, M4 and residual e (`tools/govkit/`). Fold C closed L1, L2 and M5
 (`tools/unattended/unattended.sh`, `check-unattended.sh` and their suites). Fold D closed L3, L4 and

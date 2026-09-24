@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-24T08:30:58+03:00 @ 33042cb087bbdfc276d94b1be63f434085ef69b4
+last-audit: 2026-09-24T10:28:22+03:00 @ 6ee9be2e0905d6d6717e3a6f913e2fe119a96132
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 894c107aeba7e1ce15f58cfb95a8793bddf2cf96
+last-body-change: 6ee9be2e0905d6d6717e3a6f913e2fe119a96132
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -218,6 +218,11 @@ re-renders them from build front matter); there is no authored ledger to update.
 
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
+
+- 2026-09-24 · `AGENTS.md`'s push-boundary paragraph on `GOV_GATE_CMD` · the hook now also requires
+  it to EQUAL the kit's runner or the `GATE_CMD` a committed `.unattended.conf` declares at the pushed
+  sha, not merely name a tracked, unmodified script (`TOOL-aRepatriatedFork-5`, closing review M1) ·
+  prune when that paragraph says so.
 
 - 2026-09-22 · the unattended kit's self-tests · they are GREEN WHOLE for the first time: 76 failing
   assertions across the gate, driver and cross-component suites were fixtures pinned to texts that had

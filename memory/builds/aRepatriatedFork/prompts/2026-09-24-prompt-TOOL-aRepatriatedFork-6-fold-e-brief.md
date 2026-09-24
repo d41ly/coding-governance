@@ -25,7 +25,7 @@ unscoped. Code: `tools/unattended/gate-guard.js`, `tools/unattended/check-brief-
 
 The review converged at round 2, so these items are FOLDED and never re-reviewed: this pass is the
 last word on them, which is why each fix owes an arm observed failing first. The record
-`memory/builds/aRepatriatedFork/reviews/2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round2.md` states each item's location, defect, fix and left-shift; read the items named above
+`memory/builds/aRepatriatedFork/reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round2.md` states each item's location, defect, fix and left-shift; read the items named above
 there, whole.
 
 - Reproduce each item at HEAD first. A finding you cannot reproduce is reported back as such, with
