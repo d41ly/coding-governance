@@ -31,6 +31,11 @@ drop_blocks = []
 # STATED, not sniffed. A probe reading the environment baked node `a`'s identity into a charter on a
 # shared remote; the registry is fleet data and every node's row is authored.
 machine_a = "daily-agent"
+# ASKED since DEPL-aRepatriatedFork-1 S2: their probes answered from the rendering node. These are
+# the values gov's charter already rendered, so the region does not move.
+project_name = "coding-governance"
+primary_tree_a = "C:/projects/coding-governance"
+worktree_root_a = "C:/projects/coding-governance/.claude/worktrees"
 # CI_FILE derives to nothing here: this repo has no .github/workflows yet, and wiring the bar into
 # CI needs a workflow-scoped push. The answer records that rather than letting a blank ship.
 ci_file = "none yet — .githooks/pre-push decides at the push boundary whether a full bar is owed"

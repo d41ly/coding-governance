@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""record.py — one run's committed record: a closed-schema report and its JSON twin. gov:kit runlog@1.0
+"""record.py — one run's committed record: a closed-schema report and its JSON twin. gov:kit runlog@1.1
 
 A run's model is machine-local, and most runs are made on some other node. This renders the model into
 ONE tracked record in the build folder, under the declared memory root, that every node can read. The

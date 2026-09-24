@@ -46,6 +46,17 @@ arm 'a bounded harness is clean' 'obey the ≤5-verifier rule' bash "$GATE" "$TM
 # Both states over the SAME two files: a gate that only ever reds is not discriminating, it is broken.
 arm 'a mixed set reports only the offender' 'the-incident.js' bash "$GATE" "$TMP/bounded.js" "$TMP/the-incident.js"
 
+# THE CAP IT PRINTS IS THE HOOK'S ANSWER (TOOL-aRepatriatedFork-7, closing review round 1 residual b).
+# This gate used to re-parse `.agent-cap.conf` with its own sed, which matched nothing on a BOM-led
+# line and printed the ceiling over a hook enforcing 4. The fixture is a checkout of its own, because
+# the gate reads the conf at the root it stands in.
+CR="$TMP/caprepo"; mkdir -p "$CR" && git -C "$CR" init -q
+sed 's/= 5$/= 4/; s/), 5)$/), 4)/' "$TMP/bounded.js" > "$CR/bounded4.js"
+printf '\357\273\277FANOUT_CAP=4\r\n' > "$CR/.agent-cap.conf"
+arm 'a BOM-led conf prints the enforced cap' 'obey the ≤4-verifier rule' bash -c 'cd "$1" && bash "$2" bounded4.js' _ "$CR" "$GATE"
+printf 'FANOUT_CAP=4\nFANOUT_CAP=abc\n' > "$CR/.agent-cap.conf"
+arm '--print-cap relays the hook refusal, naming the file' '.agent-cap.conf declares FANOUT_CAP=abc' bash -c 'cd "$1" && bash "$2" --print-cap' _ "$CR" "$GATE"
+
 # The DISCOVERY path — the shipped tree. Every arm above hands the gate explicit files, and the
 # explicit path never touches git, so none of them exercises the population.
 arm 'the shipped tree is clean' 'verifier-fanout: clean' bash "$GATE"
@@ -141,7 +152,21 @@ outC=$(cd "$FIX_C" && bash scripts/workflows/check-verifier-fanout.sh 2>&1)
 if [ "$outA" != "$outC" ]; then printf 'arm ok    the hook is what the fixtures are testing, not the tree shape\n'
 else fails=$((fails+1)); printf 'arm FAIL  identical verdicts with and without the predicate\n'; fi
 
-rm -rf "$FIX_A" "$FIX_B" "$FIX_C"
+# ---- TOOL-aRepatriatedFork-4: the harnesses live under .claude/workflows/ -----------------------
+# Both adopters keep their harnesses there, outside the kit prefix. The a7c78ad2 bytes read this
+# fixture as EMPTY (observed: `the population is empty`); the marker is now the whole selector.
+FIX_D=$(mktemp -d); mkfix "$FIX_D" "scripts/hooks/agent-cap.js"
+rm -f "$FIX_D/scripts/workflows/harness.js"; mkdir -p "$FIX_D/.claude/workflows"
+cp "$TMP/the-incident.js" "$FIX_D/.claude/workflows/incident.js"
+cp "$TMP/not-a-workflow.js" "$FIX_D/.claude/workflows/helper.js"
+out=$(cd "$FIX_D" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
+case "$rc:$out" in 1:*"FAILED — .claude/workflows/incident.js"*) printf 'arm ok    a harness under .claude/workflows/ is judged\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  a harness under .claude/workflows/ was not judged (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+# ...and dropping the prefix did not drop the marker: the unmarked file carries the banned shape.
+case "$out" in *helper.js*) fails=$((fails+1)); printf 'arm FAIL  an unmarked .js was judged\n%s\n' "$out" ;;
+  *) printf 'arm ok    an unmarked .js under .claude/workflows/ is not judged\n' ;; esac
+
+rm -rf "$FIX_A" "$FIX_B" "$FIX_C" "$FIX_D"
 
 if [ "$fails" = 0 ]; then echo "PASS — check-verifier-fanout: all arms held"; exit 0; fi
 echo "FAIL — $fails arm(s) failed"

@@ -39,15 +39,24 @@ role = "engine"
 # copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
+#
+# TOOL-aRepatriatedFork-18 NARROWED THAT TO LEGS (owner, 2026-09-23, section 8 F2 of its spec). The
+# arm-bearing suites -- each the `<stem>.test.sh` sibling of a gate this kit ships -- now ship as
+# `engine`, because `check-arms.py` makes every adopter READ the sibling of every tracked gate for
+# its positive assertions, whether or not they edit the checker. Withheld, each pull shipped gates
+# with new branches and no arms for them, and the adopter's `gate-arms` leg stayed red until someone
+# hand-merged gov's suites. The FILE ships, which check-arms reads; the LEG does not, which is still
+# the ruling, through the `[[exempt_leg]]` rows in govkit's registry. An adopter that
+# forks a gate arms its own branches in `<stem>.local.test.sh`, which no descriptor claims.
 [[files]]
-include = ["check-memory-hygiene.test.sh", "check-method-carriers.test.sh", "check-verdict-epoch.test.sh", "hygiene-parity.test.sh", "merge-rows.test.sh"]
+include = ["check-verdict-epoch.test.sh", "hygiene-parity.test.sh", "merge-rows.test.sh"]
 role = "project-owned"
 
 [[files]]
 include = ["HYGIENE.template.md"]
 role = "rendered"
 to = "{memory_root}/HYGIENE.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "INDEX_CAP_LINES", "ENTRY_CAP_UNIT"]
 
 [[files]]
 include = ["SPEC-TEMPLATE.template.md"]
@@ -72,7 +81,7 @@ file = ".memory-tree.conf"
 owner = "memory-tree"
 required_keys_gate = ["MEMORY_ROOT", "DISCIPLINES", "FAMILIES"]
 required_keys_render = ["MEMORY_ROOT", "READINESS_ROWS"]
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "LIVE_ROW_PIN", "SEVERITY_UNLABELLED_PIN"]
 conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"]
 defaults = { MEMORY_ROOT = "memory" }
 
@@ -177,6 +186,9 @@ kind = "measurement"
 blocks_adopt = false
 blocks_gate = false
 why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-15 are simply OFF, so the hygiene leg exits 0 with that hole wide open. Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the pins say."
+# DEPL-aRepatriatedFork-13 S5. The probe runs `{kit}/corpus_ids.py --check`; at a target that
+# owns that program, it would grade the adopter's own engine against gov's pins.
+stands_down = { when_owned = ["corpus_ids.py"], why = "the probe runs corpus_ids.py, and an adopter-owned corpus_ids.py is the target's program rather than gov's" }
 discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
 
 # THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. This kit owns FOUR `rendered` rows — the
@@ -297,10 +309,67 @@ why = "a sourced conf: a CR reaches the shell as part of the value"
 pattern = "{kit}/.memory-tree.conf.example"
 why = "the adopter copies it verbatim into the line above"
 
-[[hole]]
-id = "stale-header-waiver"
-kind = "measurement"
-blocks_adopt = false
-blocks_gate = false
-why = "stale-header-waiver.txt ships with its header and NO rows, in gov and in every adopter. The rows a tree needs are the headers that actually corrupted in THAT tree, so a list measured on gov's corpus is vacuous anywhere else — the same reason measured-pins and slot-budget-ceilings ship unarmed. EMPTY IS THE EXPECTED STATE and the mechanism is inert until a header rots; a MISSING file stays a refusal, because a file nobody created is a decision nobody made. The generator names how many headers it tolerated on every run, so a tree that never armed this says so rather than reporting a clean bar."
-discharge = { command = ["grep", "-qvE", "^[[:space:]]*(#|$)", "{memory_root}/project/stale-header-waiver.txt"] }
+# NO HOLE FOR stale-header-waiver.txt. DEPL-aRepatriatedFork-14 S2 retired it: its probe demanded a
+# row while an EMPTY file is the expected state, and the one state worth observing, a MISSING file, is
+# already a refusal of `gen_build_index.py --check`, which hygiene check 9 runs on every bar.
+
+# DEPL-aRepatriatedFork-13 S3. THE CONTRACTS OTHER SHIPPED FILES CALL THESE ENGINES BY, so a target that
+# declares one of them `adopter-owned` in its `[[own]]` rows is told, on every `update` and `check`,
+# which clauses its own program keeps. A REPORT, never a red, unless an installed consumer that cannot
+# run sits on a leg the receipt emitted. Every clause cites its consumer; `selfcheck` refuses one that
+# is not a tracked gov file, and a contract with no clause. A consumer is a path relative to this
+# kit's home, or `<entry>:<path>` relative to that entry's home, because this file ships. A probe must be READ-ONLY, because `check`
+# runs it: `gen_build_index.py --write` and the `merge-rows.py` driver are not probed, and
+# `check-wiring.sh` already smoke-tests whatever merge driver a target installed. The re-derivation
+# and every row left out, with its reason, is the spec's section 4.
+[[contract]]
+source = "gen_build_index.py"
+id = "memory-tree/gen-build-index"
+[[contract.clause]]
+probe = ["python3", "{own}", "--check"]
+expect = "(?m)^build-index: "
+consumer = "check-memory-hygiene.sh"
+[[contract.clause]]
+probe = ["python3", "{own}", "--print-bindings"]
+expect = '(?m)^N\t[0-9]+$'
+consumer = "check-memory-hygiene.sh"
+[[contract.clause]]
+imports = ["apply_region", "Problem", "MARK_OPEN", "MARK_CLOSE"]
+consumer = "marker-contract.test.sh"
+
+[[contract]]
+source = "corpus_ids.py"
+id = "memory-tree/corpus-ids"
+[[contract.clause]]
+probe = ["python3", "{own}", "--print-defined-ids"]
+expect = "(?m)^# id-ere: "
+consumer = "kickoff-manifest:manifest-check.sh"
+[[contract.clause]]
+imports = ["ask_shell"]
+consumer = "gotchas.py"
+
+[[contract]]
+source = "gotchas.py"
+id = "memory-tree/gotchas"
+[[contract.clause]]
+probe = ["python3", "{own}", "--for-paths", "{own}"]
+expect = "(?m)^# "
+consumer = "kickoff-manifest:SKILL.md unattended:SKILL.template.md"
+
+# SHAPE-EXACT, and measured: inCMS's own hygiene engine ignores two of these flags and runs its whole
+# check instead, whose failure text a bare `\S` read as a pass. One path per line, and one line.
+[[contract]]
+source = "check-memory-hygiene.sh"
+id = "memory-tree/hygiene-print-modes"
+[[contract.clause]]
+probe = ["bash", "{own}", "--print-index-set"]
+expect = '\A(\S+\r?\n)+\Z'
+consumer = "corpus_ids.py"
+[[contract.clause]]
+probe = ["bash", "{own}", "--print-append-only-ere"]
+expect = '\A[^\n]+\n?\Z'
+consumer = "corpus_ids.py"
+[[contract.clause]]
+probe = ["bash", "{own}", "--print-rotated-archive-ere"]
+expect = '\A[^\n]+\n?\Z'
+consumer = "row_grammar.py"

@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.8   # gov:kit run-gates@1.8
+KIT_RUN_GATES_VERSION=1.10   # gov:kit run-gates@1.10
 # 1.7 -> 1.8: every bar appends one line to the run log under the git common dir, from the EXIT trap
 # (TOOL-dLoggedFlight-3). No manifest key, profile knob or stdout line moves, so neither direction of
 # a skew between the runner and its table or manifest changes a verdict.
@@ -75,6 +75,59 @@ resolve_python() {
   return 1
 }
 # <<< resolve_python
+
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
 PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse the leg manifest"; exit 2; }
 fails=0; n=0; skips=0; ondemands=0
 
@@ -537,11 +590,19 @@ echo "$PROF_LINE"
 # is the one a file-presence test cannot see: the monitor may be installed and still refuse, if its
 # declared roots do not admit this runner. The walk root is a leg process, and every leg is this
 # runner's descendant, so asking whether THIS process is in scope answers it for all of them.
-PROCMON_REAP="$ROOT/tools/process-monitor/reap.py"
-PROCMON_SCOPE="$ROOT/tools/process-monitor/scope.py"
+# The kit is found by the sibling resolver (TOOL-aRepatriatedFork-2 S3), and only once its conf says
+# it is adopted, so a repo without the monitor pays no python spawn for the question.
 PROCMON_OK=0
 PROCMON_WHY="not installed; tree kills use the runner's own depth-8 walk"
-if [ -f "$PROCMON_REAP" ] && [ -f "$PROCMON_SCOPE" ] && [ -f "$ROOT/.process-monitor.conf" ]; then
+PROCMON_REAP=""; PROCMON_SCOPE=""
+if [ -f "$ROOT/.process-monitor.conf" ]; then
+  if _pm_dir=$(resolve_kit_dir "$PYBIN" process-monitor reap.py "$KITDIR" 2>&1); then
+    PROCMON_REAP="$ROOT/$_pm_dir/reap.py"; PROCMON_SCOPE="$ROOT/$_pm_dir/scope.py"
+  else
+    PROCMON_WHY="adopted, but the kit is not found ($_pm_dir); tree kills use the runner's own depth-8 walk"
+  fi
+fi
+if [ -f "$PROCMON_REAP" ] && [ -f "$PROCMON_SCOPE" ]; then
   _pm_win=$(ps -W 2>/dev/null | awk -v p="$$" '$1==p {print $4}')
   if [ -z "$_pm_win" ]; then
     PROCMON_WHY="installed, but this runner has no resolvable winpid; tree kills fall back"

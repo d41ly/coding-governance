@@ -418,7 +418,8 @@ def check_role_move(tmp: pathlib.Path) -> None:
     check("role move: ...and gov does NOT put its bytes back at a path the adopter emptied",
           not (t3 / "tools" / "demo" / "gone.txt").exists(), "the file was restored")
     check("role move: ...and the run says what is now true rather than naming a disposition",
-          "NOTHING was written for them" in out and "govkit apply" in out, out[-800:])
+          # The remedy is `--accept-role-moves` since DEPL-aRepatriatedFork-17 S6 replaced `apply`.
+          "NOTHING was written for them" in out and "--accept-role-moves" in out, out[-800:])
     # AC3 — the receipt is not rewritten, and the row counts as no change.
     after = {w["path"]: w for w in json.loads(
         (t3 / ".governance" / "install.json").read_text(encoding="utf-8")).get("files", [])}
@@ -482,6 +483,25 @@ def check_role_move(tmp: pathlib.Path) -> None:
           (tr / "tools" / "demo" / "moved.txt").read_text(encoding="utf-8")
           == "the regenerate output" + NL,
           repr((tr / "tools" / "demo" / "moved.txt").read_text(encoding="utf-8")))
+
+    # DEPL-aRepatriatedFork-17 S6, closing review round 1 M2. THE SAME EDITED FIXTURE UNDER
+    # `--accept-role-moves`. The flag's branch sat ABOVE the reconciliation this unit built, so for
+    # a move into `rendered` it re-recorded the role, skipped the reconcile and exited 0 while the
+    # regenerate destroyed the edit. The flag takes only a move whose new disposition writes
+    # nothing in this run; this one falls through to the refusal above.
+    ga, ta = build_role_pair(tmp, "rr-accept", schema=3, aged_kit=ROLE_KIT_RENDERED,
+                             aged_blobs=_aged_rr, edits={"moved.txt": OWN})
+    ua = run_in_gov(ga, "update", "--target", str(ta), "--write", "--accept-role-moves")
+    oa = ua.stdout + ua.stderr
+    check("role move to a rendered row under --accept-role-moves: the run still REFUSES, naming "
+          "the three-way conflict, and records no role",
+          ua.returncode != 0 and "role-recorded" not in oa
+          and any("tools/demo/moved.txt" in ln and "diverged and the three-way conflicts" in ln
+                  for ln in oa.splitlines()), oa[-900:])
+    check("role move to a rendered row under --accept-role-moves: ...and the adopter's bytes stand "
+          "in the git directory",
+          git(ta, "show", ":tools/demo/moved.txt").stdout == OWN,
+          repr(git(ta, "show", ":tools/demo/moved.txt").stdout))
 
     # AND THE SAME FIXTURE WITH NO LOCAL EDIT, which is the half the migration runbook's block 1
     # depends on: the row takes the RECORDED role's raw write and gov's bytes are staged for it.

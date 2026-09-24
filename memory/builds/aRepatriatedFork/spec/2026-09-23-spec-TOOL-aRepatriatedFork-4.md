@@ -1,10 +1,15 @@
 # TOOL-aRepatriatedFork-4 — review-harness gates find harnesses where adopters keep them
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-4-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-4-1-acceptance-ledger.md) | journal | — |
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-4-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-4-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -24,8 +29,10 @@ that excludes all 13 live harnesses, and both adopters carry a hand-kept populat
 - **S2** — `check-review-join.sh` keeps its derived prefix and ADDS the harness convention directory,
   so its population is the kit prefix united with `.claude/workflows/`. It applies no marker filter,
   so the prefix cannot simply go. Observed by AC4, AC5 and AC6.
-- **S3** — Both gates name the population they resolved in their empty-population refusal and in
-  `--explain`, so a reader can see that `.claude/workflows/` was consulted. Observed by AC4 and AC7.
+- **S3** — Both gates name the population they resolved in their empty-population refusal, and
+  review-join also in `--explain` and its clean line, so a reader can see that `.claude/workflows/`
+  was consulted. Verifier-fanout has no `--explain`; its refusal alone names the population.
+  Observed by AC4 and AC7.
 - **S4** — Correct the three places that state the old split: the comment at
   `tools/workflows/check-workflow-syntax.js:38-42`, the paragraph at `tools/workflows/README.md:80-83`
   and the population section above it. Each says the other two gates apply no marker filter, which
@@ -203,10 +210,14 @@ New arm: `tools/workflows/check-review-join.test.sh` · a fixture with a ref-key
   would let the prefix go as it does for verifier-fanout. Against it: review-join's arm 2 judges files
   that dispatch agents, and a helper that dispatches without declaring `meta` would leave the arm.
   Recommendation: no, keep the union; the two gates answer different questions.
+  RESOLVED (owner, 2026-09-23): no, keep the union, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, measured against gov a7c78ad2, inCMS 1bc57da27 and nc f69e2ffb.
+- rev-2 · 2026-09-23 · built. S3 moved: verifier-fanout has no `--explain`, so it names its
+  population in the refusal only, and review-join's clean line names the union too, since it
+  otherwise claimed `tools/` alone over a wider population. Review-harness bumped 1.8 to 1.9 (S5).
 
 ## 10. Reuse audit
 

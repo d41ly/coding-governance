@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check-review-join.sh — the retirement gate for the ref-keyed verdict join.
 #
-#   bash tools/workflows/check-review-join.sh          # every *.js under tools/ that git can see
+#   bash tools/workflows/check-review-join.sh          # every *.js under tools/ or .claude/workflows/ git can see
 #   bash tools/workflows/check-review-join.sh <file>…  # explicit files (the self-test's fixtures)
 #
 # Exit 0 = clean · 1 = a ref-keyed join reappeared · 2 = THIS GATE REFUSED.
@@ -61,8 +61,17 @@ SELF_EXCLUDE='(^|/)(check-review-join\.(sh|js|test\.sh)|agent-cap\.js)$'
 HERE="$(cd "$(dirname "$0")" && pwd)"
 KIT_PREFIX="$(cd "$HERE/.." && git rev-parse --show-prefix 2>/dev/null)"
 KIT_PREFIX="${KIT_PREFIX%/}"
-if [ -n "$KIT_PREFIX" ]; then POP_RE="^$KIT_PREFIX/.*\.js$"; else POP_RE='\.js$'; fi
-KIT_SAYS="${KIT_PREFIX:-the repository root}"
+#
+# THE PREFIX PLUS `.claude/workflows/` -- TOOL-aRepatriatedFork-4. Both adopters keep their review
+# harnesses there, so a prefix-only population judged none of them and printed clean. It joins as a
+# literal for the reason rung 3 below is one: the harness's own convention, not an install prefix.
+# NOT `.claude/` wholesale: `.claude/hooks/` holds the ban tables that trip this predicate, and this
+# gate applies no marker filter to keep them out (F1: it keeps the union rather than take one).
+if [ -n "$KIT_PREFIX" ]; then
+  POP_RE="^($KIT_PREFIX|\.claude/workflows)/.*\.js$"; POP_SAYS="$KIT_PREFIX/ or .claude/workflows/"
+else
+  POP_RE='\.js$'; POP_SAYS="the repository root"
+fi
 
 # ---- THE PREDICATE, PROBED -------------------------------------------------------------------
 # Three rungs, and the third is not optional. NicoCares keeps its hooks a directory up from its
@@ -105,7 +114,7 @@ else
 fi
 
 if [ "$EXPLICIT" = 0 ] && [ -z "$FILES" ]; then
-  echo "review-join: no JavaScript under $KIT_SAYS/ — the population is empty, which is not a pass"
+  echo "review-join: no JavaScript under $POP_SAYS — the population is empty, which is not a pass"
   exit 1
 fi
 
@@ -316,7 +325,7 @@ if [ "$EXPLAIN" = 1 ]; then
   # Section 5 observability, behind --explain and NOT in the default run: AC1 requires this gate's
   # ordinary output to stay byte-identical to its pre-change run, so an unconditional new line would
   # fail the very criterion it was added to serve. The resolution is fully visible here instead.
-  echo "review-join: --explain — predicate at $HOOK, population under $KIT_SAYS/"
+  echo "review-join: --explain — predicate at $HOOK, population under $POP_SAYS"
   echo "review-join: --explain — the population, and why each file is or is not judged:"
   printf '%s\n' "$arm2" | sed -n 's/^EXPLAIN /    /p'
 fi
@@ -352,7 +361,7 @@ if [ "$EXPLICIT" = 0 ] && [ "$agentfiles" != 0 ] && [ "$judged" = 0 ]; then
 fi
 
 [ "$st" = 0 ] || exit 1
-echo "review-join: clean — no ref-keyed verdict join under $KIT_SAYS/, and every agent wave that this"
+echo "review-join: clean — no ref-keyed verdict join under $POP_SAYS, and every agent wave that this"
 echo "review-join: scan can judge is counted ($judged file(s) judged by arm 2)."
 echo "review-join: NOT CHECKED HERE (this is a source scan): that the count actually GUARDS the clean"
 echo "review-join: note, and that a SECOND wave is counted too — the counters are tallied per FILE."

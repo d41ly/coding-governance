@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.85 -->
+<!-- gov:kit memory-tree@2.95 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -60,7 +60,8 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
 - **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`,
   `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤
   `ENTRY_CAP_CHARS` (300 by default); a build `README.md` gets its own tier,
-  `BUILD_README_ENTRY_CAP_CHARS` (350). Both are declared in `.memory-tree.conf`. Detail
+  `BUILD_README_ENTRY_CAP_CHARS` (350). Both are declared in `.memory-tree.conf`, and so is the
+  unit they count in; this tree's `ENTRY_CAP_UNIT` is: {{ENTRY_CAP_UNIT}}. Detail
   lives in the build folder or decision file the line points at. `guides/*.md` is exempt from the
   entry budget — a guide is prose, not index rows — and still carries the file caps below. That
   exemption is ONE expression with one base and one optional append for the codebase-map detail
@@ -70,7 +71,7 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
   defaults are 20 KB / 250 lines for a row document, 96 KB / 1200 lines for a guide, 25 KB with no line
   cap for a build README, and 20 KB with no line cap for a codebase-map dossier. `archive/` is wholly
   exempt. A LINE cap of 0 means no independent line cap for that class, which is how a project retires
-  the line axis — this repo has, for row documents.
+  the line axis. This tree's row-document line cap, `INDEX_CAP_LINES`, is: {{INDEX_CAP_LINES}}.
 - **Rotation mode is DECLARED, never assumed.** `.memory-tree.conf` sets `ROTATION_MODE` to one of
   `cut | snapshot`, and a repo that declares neither has not decided rather than defaulted. **`cut`** —
   move only the TERMINAL rows out to `archive/<INDEX>.<date>.md`, leaving every non-terminal row in the
@@ -110,7 +111,9 @@ Spec status headers (check 12) reuse the same seven tokens with spec-lifecycle m
 The plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
 set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file:
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
-  exempt from the recording-file naming check. Should not grow after the initial adoption.
+  exempt from the recording-file naming check, from check 4's build-folder shape (a listed folder
+  name or a listed build-root file) and from check 21's missing-Serves branch. Should not grow after
+  the initial adoption.
 - **`curation-debt.txt`** — index files pending slimming, exempt from the cap / entry-budget / status-vocabulary
   checks while listed. Every curation sweep deletes lines; empty = fully strict. CI fails if a listed path is gone,
   and — since `TOOL-cGradedDebt-1` — if a listed path would PASS all three unwaived, because a row
@@ -125,6 +128,9 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
 - **`substitution-fed-loops.txt`** — the sites `gate-lint`'s shell scan grades, shipped by that kit
   as an EMPTY seed the repo then owns. Rows are this tree's own; gov's would name paths you do not
   have.
+- **`pass-order-waiver.txt`** — the unattended kit's pass-order checker reads it at this default
+  path, so check 3 admits it by name wherever that kit is adopted. A registry a PROJECT adds goes in
+  `PROJECT_REGISTRY_EXTRA` instead.
 - `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
   `guides/BUILD-METHOD.md`, one `<path> · <why>` row each, read by
   `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit
@@ -179,12 +185,12 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    The class is the RESERVED NAME, which rule 4 lets only the run-state file hold, and retirement is
    a rename — so the frozen `RUN.<PHASE>.<8 hex>.md` stays capped and keeps the `ex7` exemption.
 
-   **A row class may retire its line axis, and this repo has.** `TOOL-aRelaxedShard-1` declares
-   `INDEX_CAP_LINES=0` after the owner ratified it, reversing what `TOOL-aWidenedGuide-1` refused. It
-   was a decision, not a tidy-up: at check 7's 300-char entry budget a 250-line row document may hold
-   75,000 B, so the byte figure decided every real case — but the line figure DID bind on 22 of the 29
-   members, every dossier among them, which is why dossiers became their own class rather than
-   inheriting the relaxed index cap.
+   **A row class may retire its line axis** by declaring its line cap as 0; this tree's
+   `INDEX_CAP_LINES` is: {{INDEX_CAP_LINES}}. Retiring it is a decision, not a tidy-up, so record it in
+   the decision log: at check 7's 300-char entry budget a 250-line row document may hold 75,000 B, so
+   the byte figure decides most cases — but a line figure that DOES bind on some members is a real
+   bound, which is why a codebase-map dossier is its own class rather than inheriting a relaxed index
+   cap.
 7. **entry budget** — index entry lines ≤ `ENTRY_CAP_CHARS` (300 by default), a build `README.md`
    ≤ `BUILD_README_ENTRY_CAP_CHARS` (350) (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
@@ -291,6 +297,10 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     ids past a green bar for a month. The count of survivors is pinned shrink-only by
     `ROW_DUPLICATE_PIN`, and an UNDECLARED pin means ZERO — the strictest value, never a refusal and
     never off, because a default that can only TIGHTEN needs no ceremony.
+    The backlog shards carry two more shrink-only ceilings, `SEVERITY_UNLABELLED_PIN` and
+    `LIVE_ROW_PIN`, one `<shard>:<count>` token per shard. Their polarity is the opposite: undeclared
+    means UNARMED, because no default ceiling over an inherited population is honest, and every green
+    run prints one NOT MEASURED line per unarmed shard, which the gate shows rather than swallows.
     Scope is PER FILE deliberately: corpus-wide would red every designed backlog-row-plus-decision-row
     pair. NAMED GAP — the live index and its rotated archive are two files, so a row that rotates out
     and is re-minted is not caught here; the all-time collision grep the index's own header
@@ -298,7 +308,7 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     makes the uniqueness census meaningful: on its own it is a check the corpus cannot fail, over a
     property the merge driver already enforces where it can be violated.
 
-24. **the declared rotation mode is HONOURED** — under `ROTATION_MODE=cut` a rotated archive of a
+24. **the declared rotation mode is HONOURED** — with `ROTATION_MODE` set to `cut` a rotated archive of a
     status-bearing shard holds TERMINAL rows only, and no id sits in both an archive and the live
     index it was cut from. Those two together are what `cut` means: one id, one file. Delegated to
     `row_grammar.py`, which owns the row grammar — a second spelling of it in shell passed a
@@ -315,7 +325,10 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     serves, so the binding is a fact rather than an inference from a filename ordinal. The rule, the
     grammar and the escape are below under "Record bindings". Delegated to `gen_build_index.py`,
     which already reads every record's bytes; the parse RAISES nothing, so an unannotated record can
-    never refuse the render.
+    never refuse the render. A record `legacy-files.txt` lists is not graded for a missing Serves
+    line. `RECORD_UNDATED_ARTIFACTS` set to `exempt` drops an undated non-markdown file (a JSON result, an
+    HTML report) from that branch and prints how many it dropped on every run; blank or `grade`
+    grades them.
 
 22. **review verdict vocabulary** — a review record whose filename date reaches
     `REVIEW_VERDICT_CUTOFF` carries exactly ONE `## Verdict:` line, and its token is a member of the
@@ -459,7 +472,9 @@ catches a deleted guard; the armed floor catches an assertion dropped by WIDENIN
 branch count alone cannot see because the count falls and the pin still holds. Per-gate rather than
 aggregate: a total lets one gate's deletion be masked by another gate's addition, and goes slack by a
 whole gate's branch count the day a third gate lands. A gate that raises a named error does not abort
-the walk, so one bad gate cannot hide every other gate's findings.
+the walk, so one bad gate cannot hide every other gate's findings. A BLANK `ARMS_FLOORS` is refused while any gate
+is discovered, since both floor arms would iterate nothing; `check-arms.py --emit-floors` prints the
+measured line to declare.
 
 `{{KIT_DIR}}/check-arms.py --report` shows every branch, its line, its signature and its state.
 

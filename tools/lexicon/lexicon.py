@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.5
+# gov:kit lexicon@1.7
 """lexicon.py — two naming predicates over a DECLARED vocabulary, plus one self-containment refusal.
 
 THE INVOCATIONS ARE NOT LISTED HERE. Run the file with no recognised mode and it prints them, with
@@ -86,7 +86,7 @@ from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, SURFACES, langs
 from subtokens import (check_convention, classify, leading_verb, read_stem,  # noqa: E402
                        render_convention, subtokens)
 
-KIT_LEXICON_VERSION = "1.5"
+KIT_LEXICON_VERSION = "1.7"
 
 CONF_NAME = ".lexicon.conf"
 WAIVER_FILES = {
@@ -407,7 +407,7 @@ def render_pin_rows(rows: dict) -> list[str]:
 
 
 def tracked_files(root: Path) -> list[str]:
-    out = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True)
+    out = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True, encoding="utf-8")
     if out.returncode != 0:
         raise SystemExit("lexicon: not a git repo, or `git ls-files` failed")
     return [ln for ln in out.stdout.splitlines() if ln.strip()]
@@ -4062,7 +4062,7 @@ def resolve_self_path() -> str:
     here = Path(__file__).resolve()
     try:
         out = subprocess.run(["git", "-C", str(here.parent), "rev-parse", "--show-toplevel"],
-                             capture_output=True, text=True)
+                             capture_output=True, text=True, encoding="utf-8")
         if out.returncode == 0:
             return here.relative_to(Path(out.stdout.strip()).resolve()).as_posix()
     except (OSError, ValueError):
@@ -4111,7 +4111,7 @@ def main(argv: list[str]) -> int:
                              "  --as is REQUIRED: the surface decides which predicates are armed "
                              "and which convention the answer is spelled in.\n")
             return 2
-    out = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    out = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8")
     if out.returncode != 0:
         sys.stderr.write("lexicon: not a git repo\n")
         return 2

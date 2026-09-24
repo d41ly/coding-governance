@@ -136,6 +136,19 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 `§15`'s persona is adjustable per project and is NOT a droppable block: editing the persona is the
 sanctioned change, and its facts-over-wit rules are not adjustable at all.
 
+### Where each value comes from
+
+- **Precedence.** `[charter]`, then `[answers]`, then the probe or the declared default. An answer
+  outranks a probe, and the render prints both, so correct a wrong derivation by answering it rather
+  than by forking the descriptor.
+- **`playbook_path` names the TEMPLATE** when `playbook-render` is selected; the charter is
+  `--charter`, default `AGENTS.md`, and the render refuses when the two are one file. Without the
+  renderer it is the copied charter, and the placeholder hole probes it.
+- **`[charter]`** holds render-only prose that `[answers]` refuses, such as the commit trailer with
+  its angle brackets. govkit never reads it into an argv. A key there must name a declared
+  placeholder and no argv token, and a value may not carry a control character other than a
+  newline, `{{`, or a `gov:playbook` marker.
+
 **Verify:** the renderer's `--check` is the standing verification and it asserts two separate things
 — that the rendered region still matches the template plus the answers, and that no placeholder
 survived. Those are two questions, and a conf that declares nothing for a key renders a region that
@@ -599,7 +612,9 @@ the INVOKING directory, not from its own location — run it with the cwd inside
    session card's `node —` cell. Without it every card the project writes reads `node — UNKNOWN:
    no registry`, and nothing else fails: the key is what the version WARN is now for.
 6. Bump the manifest marker to `kickoff-manifest: v1.4` **LAST** — the bump silences the kit's
-   version WARN, the only standing signal that the body still predates the ratchet.
+   format WARN, the only standing signal that the body still predates the ratchet. The WARN compares
+   the marker with the checker's `MANIFEST_FORMAT`, never with `KIT_MANIFEST_VERSION`: that one is
+   the kit's vintage and moves whenever its bytes do, with no upgrade step owed.
 
 <!-- govkit:entry push-main -->
 ## 5 — Optional: worktree tooling + SessionStart nudge
@@ -644,6 +659,10 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   fresh clone self-heals. The two `orientation-*` fragments ship with the kickoff-manifest kit
   (beside `manifest-check.sh`), and the card they write is what `scratch-guard.js` reads before it
   lets a `git commit` through — read that deny's ceiling in the hooks README before relying on it.
+  **Installed through `govkit`, this step runs itself:** `apply` and `update` wire every fragment
+  they land through your own `settings-merge.py`, before any kit's check runs, and print one line
+  per fragment (`wired`, `already wired`, or why not); a rolled-back kit's new entries are removed
+  with it. The commands above are for a hand copy, or a run with `GOVKIT_RERENDER=0` exported.
 - Add `bash tools/check-wiring.test.sh` as a gate-runner leg. Do NOT run `check-wiring.sh --check` itself
   as a merge-bar leg — it would false-fail in CI, where `core.hooksPath` is correctly never set.
 - **Land the default branch via `tools/push-main.sh`** (TOOL-aLeasedGauntlet-1): it fetch-reconciles
@@ -656,7 +675,9 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 
 - `tools/check-kit-versions.sh` — asserts every kit's version constant and its doc marker agree, which
   is what makes an installed kit's version detectable at all. Edit its `need` list to your kit subset;
-  it is a hardcoded list by design, not an enumeration.
+  it is a hardcoded list by design, not an enumeration. If your project ships kits onward, the rule
+  that goes with it is that **a kit whose shipped bytes move bumps its version**: gov grades it with
+  the deployer's `govkit.py epoch` verb, which reads gov's registry and history and so stays in gov.
 - `tools/gate-lint/` — the gate-authoring lints. It ships no legs of its own; its README hands leg
   wiring to the consuming project.
 - `tools/push-main.sh` + `tools/push-main.test.sh` + `.githooks/pre-push` — §5 already tells you to
@@ -916,6 +937,50 @@ unique and already grep-able), write the registry with one row per id, and repoi
 the registry. Do it BEFORE retiring anything, or the first retirement pays the cost this contract
 exists to remove.
 
+### Saying "this program is ours, not gov's" — the `[[own]]` declaration
+
+A carve-out is gov's file with your edit in it. Some trees hold something else under gov's
+filename: a program written before gov wrote its own, with no gov vintage behind it. `adopt`
+records such a file `unattributed`, and one `unattributed` row withholds the receipt's
+`gov_commit` re-stamp on every `update`. Pinning it to the nearest vintage records a base its bytes
+never came from. Declare it instead:
+
+```toml
+[[own]]
+path = "scripts/gen_build_index.py"          # your file, repo-relative
+implements = "memory-tree:gen_build_index.py" # <entry>:<gov source relative to the kit home>
+why = "written before gov's, a parallel program"
+```
+
+Then run `govkit adopt --re-adopt --write`. The row is recorded `adopter-owned` with
+`evidence: "declared"` and no gov vintage. After that:
+
+- `update` counts it under `adopter-owned`, writes it in neither direction, and still re-stamps.
+- `update` and `check` read the same `[[own]]` rows. A row declared after the file landed is still
+  recorded `engine` until you re-adopt, so both refuse that row by name, `update --write` writes
+  nothing into it, and the refusal names `adopt --re-adopt` as the step that makes them agree.
+- `apply`, `--resume` included, reads the same `[[own]]` rows before it writes anything. It skips
+  the owned path with one `SKIPPED [adopter-owned]` line and keeps the row `adopter-owned`. A
+  malformed row stops it at exit 1, the same way it stops `adopt`.
+- `update` and `check` print one parity line per contract gov declares for that source, such as
+  `contract memory-tree/corpus-ids <- scripts/corpus_ids.py: 1/2 clauses hold`. Each failing clause
+  is listed with the gov file that needs it. A failing clause never reds, because you own the file.
+  Two things change that. When the file that needs the clause is installed in your tree, its line
+  says `INSTALLED CONSUMER CANNOT RUN`. When that installed file is also in the argv of a leg your
+  receipt emitted, `check` reds.
+- A hole whose probe would run gov's program against yours stands down and says so, for example
+  memory-tree's `measured-pins` when you own `corpus_ids.py`.
+- Your file may sit at a different path from gov's copy, as a stand-in. Gov keeps landing its own
+  copy, and each run prints one line saying whether any emitted leg runs it.
+
+`adopt` exits 1 and names the row when `path` carries anything outside the strict path class,
+leaves the repository, or is not canonical: `./x`, `a//x` and `a/./x` are refused and the
+canonical spelling is named, because every reader matches the exact path. It does the same when `implements` names a source gov ships as a seed, or
+as rendered, generated, forked or project-owned, because each of those already says who owns the
+bytes. It also exits 1 when the entry is not in your selection, and when your index does not track
+`path`. The declaration is a bridge, not a fork: once your program converges onto gov's, delete the
+row and re-adopt.
+
 ## 6 — Verify the whole chain, then commit
 
 - Codebase-map (if adopted): `python <kit>/selftest.py` (kit contract) · run the gate file
@@ -1084,9 +1149,15 @@ and prints `role-moved` naming the role the row landed under, the role gov decla
 path. **Nothing is written for such a row and nothing in your receipt changes**, with one exception
 named below. The two rules disagree about who owns those bytes, so the file on disk is exactly as
 you left it — including a destination you have edited or emptied, which an older gov would have
-restored from its own copy. There is nothing to undo and no order to read. `govkit apply` re-records
-the row under the role the descriptor declares now, which is the verb a role change belongs to, and
-the line stops appearing.
+restored from its own copy. There is nothing to undo and no order to read.
+`govkit update --write --accept-role-moves` re-records the row under the role the descriptor
+declares now, prints `role-recorded` for it, and writes no byte; the line then stops appearing.
+A move INTO `engine` first takes the attribution walk `adopt` runs, so the row is recorded
+`vintage-match` when your bytes descend from a gov vintage and `unattributed` when they do not, and
+the NEXT `update --write` grades it through the verdict table like any other engine row. `apply`
+is not the remedy: it writes every engine destination raw. The flag is opt-in for one release,
+and it does not take the exception below: that run writes the destination either way, so the row
+is still reconciled, and refused on a conflict.
 
 **The exception is the move where standing back would protect nothing.** Where the role gov now
 declares is served by that kit's own re-render — the argv an `update` runs for every kit it touches —
@@ -1101,6 +1172,30 @@ back exactly as described above.
 One exception, and it is deliberate: on a receipt still at schema 1 the same disagreement REFUSES
 the row instead. A schema-1 receipt is known to stamp roles its own descriptor contradicts, so
 neither answer can be trusted there and acting on either would be a guess.
+
+**A conflict leaves a byte-exact starting file.** Beside each `update-conflict-<slug>.md` order,
+`update --write` writes `base`, `ours`, `theirs` and `candidate` under
+`.governance/outbox/update-conflict-<slug>/`, each through a binary write, so a lone CR survives.
+`candidate` is `git merge-file -p --diff3` over the other three, and the order prints the one line
+that reproduces it. Your file itself is left byte-identical, as before; resolving is still yours.
+
+**Other things `update` and `check` now say rather than do silently.** `update` prints a `lone-CR`
+line for an engine row whose copy holds fewer CR-not-followed-by-LF bytes than gov's blob at the
+row's commit, and on `--write` that is a finding. `check` grades a file that differs from its
+recorded hash through your own clean filter, so a `core.autocrlf=true` checkout counts `eol-only`
+rather than reporting a mismatch. A rollback also restores what the kit's `[[regenerate]]` argv
+re-rendered (its `rendered` and `generated` rows, and any path that block's optional `writes` list
+names), and names any path it wrote that no snapshot covered. The per-kit version delta reads the
+constant from your own copy of the kit's version file. A gate leg your runner already carries with
+gov's own resolved argv is `claimed` rather than refused.
+
+**Two `adopt` flags for a hand-resolved fork.** `adopt --re-adopt --staged --write` measures from a
+STAGED index, refuses when a planned destination differs between your worktree and the index, and
+stages `.governance/install.json` and `install.sums` beside the bytes, so the fork and its receipt
+are one commit with no `--no-verify`. `adopt --suggest-pins` prints, for each `unattributed` row, the
+gov revision nearest your bytes by changed-line count and a ready `--pin <path>=<rev>` when the
+changed share is within `NEAREST_PIN_FRACTION`, which each line prints; past it the line names
+`adopter-owned` as the remedy.
 
 **`update-conflict-*.md` orders are REAPED, and they are the only family that is.** A conflict order
 records a STATE — this row still conflicts — which every run re-derives from scratch, so an order

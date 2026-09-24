@@ -41,7 +41,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.28   # gov:kit unattended@1.28 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.37   # gov:kit unattended@1.37 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -735,11 +735,21 @@ readme_of() { printf '%s/builds/%s/README.md' "$M" "$1"; }
 # call sites. Process spawn dominates on Windows and it is what made the sibling self-tests cost 77s
 # and 73s for ~1.4s of CPU apiece. Same semantics: first matching line wins, `key:` followed by any
 # run of spaces, a valueless key yields the empty string, a trailing CR is stripped.
+# TOOL-aRepatriatedFork-6 L2 - ONLY the `## Run facts` section is read, from its heading to the next
+# `## ` heading: the scope leg check 34 grades, and the one section `set_fact` writes. A reader over
+# the whole file took a `phase: LANDED` above the heading, or a key-shaped line under `## Parked`,
+# ahead of the real one while check 34 reported clean - one question, two answers. The leg's
+# `fact_of` carries the same scope.
 fact() { # run-state file · key
   [ -f "$1" ] || return 1
-  local l p="$2:"
+  local l p="$2:" sec=0
   while IFS= read -r l || [ -n "$l" ]; do
     l=${l%$'\r'}
+    case "$l" in
+      "## Run facts"*) sec=1; continue ;;
+      "## "*) sec=0; continue ;;
+    esac
+    [ "$sec" = 1 ] || continue
     case "$l" in
       "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
     esac
@@ -1319,7 +1329,9 @@ check_waivers() { # run-state file
       fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
       return 1 ;;
     esac
-    if [ "$(printf '%s' "$r" | wc -l | tr -d ' ')" != "0" ]; then
+    # A CARRIAGE RETURN with it (closing review round 2 M1): park() now refuses one, and it is
+    # reached only after --preflight has written its facts, so the refusal belongs here, before them.
+    if [ "$(printf '%s' "$r" | wc -l | tr -d ' ')" != "0" ] || case "$r" in *$'\r'*) true ;; *) false ;; esac; then
       fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
       return 1
     fi
@@ -1395,7 +1407,7 @@ check_single_live() {
   # no anchor, an unresolvable witness, or any phase but LANDING, the record counts as it always did.
   local anc="${ASHA:-}" w=""
   [ -n "$anc" ] && { GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1 || anc=""; }
-  for f in $(GIT ls-files "$M/builds/*/RUN.md" "$M/builds/*/RUN.*.md" 2>/dev/null); do
+  for f in $(GIT ls-files ":(glob)$M/builds/*/RUN.md" ":(glob)$M/builds/*/RUN.*.md" 2>/dev/null); do
     p=$(fact "$f" phase); [ -n "$p" ] || continue
     is_terminal "$p" && continue
     # THIS RUN'S OWN RECORD IS NOT A CONCURRENT RUN. It is absent at a first preflight — the file
@@ -1702,7 +1714,7 @@ check_authorization() { # slug · base
     # refused every BASE before the cutoff while admitting every one after: the precise inversion
     # the cutoff exists to prevent, and it would have refused the run that built this unit.
     if [ -n "$bdate" ] && printf '%s\n%s\n' "$UNITS_REGION_CUTOFF" "$bdate" | sort -C; then
-      fail 20 "the build README at the pinned BASE carries no units marker pair and this BASE is dated at or after UNITS_REGION_CUTOFF, so an empty set would satisfy the subset test vacuously: $base:$rel · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+      fail 20 "the build README at the pinned BASE carries no units marker pair and this BASE is dated at or after UNITS_REGION_CUTOFF, so an empty set would satisfy the subset test vacuously: $base:$rel · repair: $(derive_index_repair)"
       return 1
     fi
   fi
@@ -2188,7 +2200,7 @@ units_refusal() { # build README path
   # defect the ban exists to stop. Same shape as absence-assertion-over-whole-file-text: the
   # check cannot tell an invocation from a sentence about one, and need not when the sentence
   # is right anyway.
-  printf 'the build README carries no single well-formed %s pair, so the unit list cannot be read (absent, duplicated or transposed): %s\n  repair: the --write mode of tools/memory-tree/gen_build_index.py\n' "$UNITS_OPEN" "$1"
+  printf 'the build README carries no single well-formed %s pair, so the unit list cannot be read (absent, duplicated or transposed): %s\n  repair: %s\n' "$UNITS_OPEN" "$1" "$(derive_index_repair)"
 }
 
 # ONE EMITTER FOR EVERY ROW THAT NAMES A UNIT ID, so the two modes cannot disagree about which rows
@@ -2219,7 +2231,7 @@ verb_plan() { # slug
   # while a MALFORMED one refused - and a silent fall-back restores the divergence this unit removes
   # exactly when the tree is in the state most likely to hide it.
   if ! grep -qF -- "$UNITS_OPEN" "$_rmp" 2>/dev/null; then
-    fail 42 "the build README carries no units marker at all, and this verb takes its unit SET and ORDER from that region: $_rmp · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+    fail 42 "the build README carries no units marker at all, and this verb takes its unit SET and ORDER from that region: $_rmp · repair: $(derive_index_repair)"
     return 1
   fi
   if ! region "$_rmp" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
@@ -2286,7 +2298,7 @@ verb_plan() { # slug
   # the answer.
   local _rows; _rows=$(unit_rows "$_rmp")
   if [ "$_renderable" -gt 0 ] && [ -z "$_rows" ]; then
-    fail 42 "the generated units region carries no unit rows but this build has specs that would render them, so the region is stale: $_rmp · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+    fail 42 "the generated units region carries no unit rows but this build has specs that would render them, so the region is stale: $_rmp · repair: $(derive_index_repair)"
     return 1
   fi
   # S1/S2 - the SET and its ORDER come from the REGION, which is rendered in BUILD ORDER. `--status`
@@ -2483,7 +2495,7 @@ verb_landed() { # slug
       case "$_wl" in "worktree "*) _wp=${_wl#worktree } ;; *) continue ;; esac
       [ "$_wp" = "$ROOT" ] && continue
       [ -f "$_wp/$rel" ] || continue
-      case "$(sed -n 's/^phase: //p' "$_wp/$rel" 2>/dev/null | head -1)" in
+      case "$(fact "$_wp/$rel" phase)" in
         LANDING) _elsewhere="$_elsewhere $_wp" ;;
       esac
     done <<WTS
@@ -2790,6 +2802,14 @@ verb_abort() { # slug · reason · code
     fail 36 "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar on a terminal record nothing can rewrite; say it without the literal flag: $BYPASS_BAN"
     return 1
   fi
+  # TOOL-aRepatriatedFork-6 L1 - the sibling writers' line-end refusal, which this park lacked: a
+  # reason carrying a line feed wrote `<key>: <value>` as a line of its own under `## Parked`, a fact
+  # nothing wrote. A carriage return is refused with it, as `set_fact` refuses one, because every
+  # reader here strips the byte as a line end. Checked before anything is written.
+  if [ "$(printf '%s' "$reason" | wc -l)" -ne 0 ] || case "$reason" in *$'\r'*) true ;; *) false ;; esac; then
+    fail 36 "the reason contains a newline or a carriage return, and park() appends ONE line that the gate parses line-wise, so this would forge a second row or a fact nothing wrote"
+    return 1
+  fi
   # THE CODE IS REQUIRED, and it is validated against the effective vocabulary rather than accepted as
   # free text. A reason is for the owner; a code is for everything else — the status line, the resume
   # path and the gate leg all read it by key. Refusing names the legal set, because a validated
@@ -2830,7 +2850,7 @@ verb_abort() { # slug · reason · code
   # same shape the roster-at-landing fact already has — the in-tree precedent, not an argument by
   # analogy. Append-only history takes a park KIND instead, which is what the review-round unit does.
   set_fact "$rel" halt-code "$code" || return 1
-  park "$rel" abort "$slug" "$reason"
+  park "$rel" abort "$slug" "$reason" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: phase ABORTED · witness $head · halt-code $code · reason recorded as a parked entry"
   return 0
@@ -3061,7 +3081,7 @@ verb_preflight() { # slug · keepalive-id
   if [ "${#WAIVE_ITEMS[@]}" -gt 0 ] && [ -z "$(recorded_waivers "$rel")" ]; then
     _wi=0
     while [ "$_wi" -lt "${#WAIVE_ITEMS[@]}" ]; do
-      park "$rel" waiver "${WAIVE_ITEMS[$_wi]}" "${WAIVE_REASONS[$_wi]}"
+      park "$rel" waiver "${WAIVE_ITEMS[$_wi]}" "${WAIVE_REASONS[$_wi]}" || return 1
       echo "unattended: directive waived — ${WAIVE_ITEMS[$_wi]} (parked with its reason)"
       _wi=$((_wi + 1))
     done
@@ -3110,17 +3130,43 @@ print_spec_audit_line() { # slug · run-state file
 # Rewrite one `key: value` line in place, or append it under the Run facts heading if absent.
 # A key that can be placed NEITHER way is a REFUSAL, not a silent drop: the caller would otherwise
 # report a successful preflight over a file carrying none of the facts it just claimed to record.
+# TOOL-aRepatriatedFork-6 - THE WRITE-GUARD every sibling writer already carries, and the one path
+# none of them needs. The insert branch puts `k: v` directly under `## Run facts`, above every
+# existing fact, and `fact` here plus `fact_of`/`phase_of` in the leg return the FIRST match - so a
+# value carrying a line end, `--attest <item> --value` above all, wrote a forged `phase: LANDED` that
+# driver and leg alike read as the run's phase. Two routes, both reproduced at a7c78ad2:
+#   1. a literal line feed or carriage return in the shell string - refused below with `wc -l`, the
+#      form every sibling uses, NOT a case glob built from a command substitution (which strips the
+#      newline and matches everything; nc paid for that one). A CR is refused because `fact` strips a
+#      trailing one, so this kit reads the byte as a line end.
+#   2. a backslash-n in a ONE-LINE value - `awk -v` processes escape sequences, so awk manufactured the
+#      line feed after any shell-side check had passed. nc's port of the guard missed this; the values
+#      now reach awk through ENVIRON, which has no escape grammar, so the bytes are stored as written.
 set_fact() { # file · key · value
-  local f="$1" k="$2" v="$3" tmp; tmp=$(mktemp) || return 2
-  if grep -q "^$k: " "$f"; then
-    awk -v k="$k" -v v="$v" '{ if (index($0, k ": ") == 1) print k ": " v; else print }' "$f" > "$tmp"
-  elif grep -qF '## Run facts' "$f"; then
-    awk -v k="$k" -v v="$v" '{ print } index($0, "## Run facts") == 1 { print k ": " v }' "$f" > "$tmp"
-  else
-    rm -f "$tmp"
+  local f="$1" k="$2" v="$3" tmp
+  if [ "$(printf '%s' "$k$v" | wc -l)" -ne 0 ]; then
+    fail 17 "a run fact contains a newline, and these files are parsed line-wise with the FIRST match winning, so this would forge a fact nothing wrote: $k in $f"
+    return 1
+  fi
+  case "$k$v" in *$'\r'*)
+    fail 17 "a run fact contains a carriage return, which every reader of this file strips as a line end, so this would forge a fact nothing wrote: $k in $f"
+    return 1 ;;
+  esac
+  # THE WRITER HAS THE READER'S BOUNDS (closing review round 2 L1): `fact` reads only `## Run facts`,
+  # heading to next `## `, so the key is matched and replaced only there, and inserted under the
+  # heading when the SECTION lacks it - even where the same key sits elsewhere. A whole-file match
+  # rewrote a `base:` above the heading, reported success, and left `fact base` empty. Two passes
+  # over the one file: the first asks whether the section holds the key, the second writes.
+  if ! grep -q '^## Run facts' "$f"; then
     fail 17 "cannot record a run fact — the file carries neither that key's line nor a Run facts heading to put one under: $k in $f"
     return 1
   fi
+  tmp=$(mktemp) || return 2
+  K="$k" V="$v" awk '
+    FNR == NR { if ($0 ~ /^## /) s = (index($0, "## Run facts") == 1); else if (s && index($0, ENVIRON["K"] ": ") == 1) has = 1; next }
+    /^## / { sec = (index($0, "## Run facts") == 1); print; if (sec && !has && !ins) { print ENVIRON["K"] ": " ENVIRON["V"]; ins = 1 }; next }
+    sec && index($0, ENVIRON["K"] ": ") == 1 { print ENVIRON["K"] ": " ENVIRON["V"]; next }
+    { print }' "$f" "$f" > "$tmp"
   mv "$tmp" "$f"
 }
 
@@ -3628,6 +3674,14 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
       fail 12 "an override item or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"
       return 1
     fi
+    # TOOL-aRepatriatedFork-6 L1 - the line-end refusal every sibling park writer carries, here for
+    # the same reason as --abort's: the override park writes `reason` verbatim, so a line feed in it
+    # forged a `<key>: <value>` line nothing wrote. Validated with the rest of the pair, before any
+    # pair is acted on.
+    if [ "$(printf '%s%s' "$ov" "$reason" | wc -l)" -ne 0 ] || case "$ov$reason" in *$'\r'*) true ;; *) false ;; esac; then
+      fail 12 "an override item or reason contains a newline or a carriage return, and park() appends ONE line that the gate parses line-wise, so this would forge a second row or a fact nothing wrote"
+      return 1
+    fi
     # THE AUTHORIZATION ITEM IS NOT OVERRIDABLE. The protocol says so in one sentence — "There is no
     # override for this one" — and the generic loop happily accepted it, which makes the override on
     # the authorization check the authorization check. Named here so the refusal cites the rule.
@@ -3681,6 +3735,17 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
         # summary and any stderr all reach the operator while the roll-call does not.
         [ -n "${DOD_OUT:-}" ] && printf '%s\n' "$DOD_OUT" | grep -vE '^(GATE (ok|skip) )' | sed 's/^/    /'
         DOD_OUT=""
+        # TOOL-aRepatriatedFork-6 S5 - THE REMEDY, which this branch did not print while
+        # `build-complete`'s comment claimed it did. A run whose one open unit was honestly BLOCKED
+        # read the bare refusal, concluded no exit existed, and stopped at a non-terminal phase. The
+        # override RECORDS the shortfall and surfaces it in the wrap-up. SUPPRESSED for gates-green
+        # and every DOD_NO_OVERRIDE member: a red bar is not a paperwork problem, and printing the
+        # flag there would make the one move that must never look routine look routine.
+        case " $DOD_NO_OVERRIDE gates-green " in
+          *" $item "*) ;;
+          *) printf '    if that is TRUE rather than merely inconvenient, say so ON THE RECORD instead of stopping:\n'
+             printf '      --close %s --override %s --reason "<why it is unmet, and what would meet it>"\n' "$slug" "$item" ;;
+        esac
       fi
     else
       # the playbook-authoring unit - A MET ITEM WITH SOMETHING TO SAY SAYS IT. The piece-scoped items
@@ -3698,7 +3763,7 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   i=0
   while [ "$i" -lt "$n" ]; do
     ov=${OV_ITEMS[$i]}
-    park "$rel" override "$ov" "${OV_REASONS[$i]}"
+    park "$rel" override "$ov" "${OV_REASONS[$i]}" || return 1
     echo "unattended: override recorded for '$ov' (checker $(checker_of "$ov")) — parked entry written"
     i=$((i + 1))
   done
@@ -3998,7 +4063,7 @@ dod_met() { # slug · run-state file · item · checker
       # only exit was `--override build-complete`, the run authorizing itself past the one item that
       # means the build is done.
       if ! region "$(readme_of "$slug")" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
-        DOD_OUT="the build README carries no well-formed units marker pair, and build-complete reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+        DOD_OUT="the build README carries no well-formed units marker pair, and build-complete reads the roster from that region: $(readme_of "$slug") · repair: $(derive_index_repair)"
         return 1
       fi
       # TOOL-aBoundedVerdict-12 S3 - the four surviving terms are evaluated SEQUENTIALLY so each can
@@ -4276,7 +4341,7 @@ $_bcnon"
         return 0
       fi
       if ! _sa_rows=$(unit_rows "$(readme_of "$slug")"); then
-        DOD_OUT="the build README carries no well-formed units marker pair, and this item reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+        DOD_OUT="the build README carries no well-formed units marker pair, and this item reads the roster from that region: $(readme_of "$slug") · repair: $(derive_index_repair)"
         return 1
       fi
       _sa_ids=$(printf '%s\n' "$_sa_rows" | grep -E '\| CLOSED \|' | row_ids_of)
@@ -4427,7 +4492,7 @@ $_bcnon"
       # only verb after the lander compares the recorded id with the newest post-close line. The
       # predicate is unchanged; the met path says where the check is, through the announcing print
       # verb_close already has, so a green close never reads as the reap having been observed here.
-      grep -qE '^keepalive-reaped: (yes|true)' "$rel" || return 1
+      case "$(fact "$rel" keepalive-reaped)" in yes*|true*) ;; *) return 1 ;; esac
       DOD_OUT="keepalive-reaped: attested; checked at --landed against the stop-guard's last harness listing"
       return 0 ;;
     parked-decisions-surfaced)
@@ -4437,8 +4502,11 @@ $_bcnon"
       # yes-or-true, so a richer value costs no new fact and does not move the authored region's
       # count pin. Omitting the number keeps the old behaviour exactly, so nothing that attested
       # before this landed becomes red.
-      grep -qE '^parked-surfaced: (yes|true)' "$rel" || return 1
+      # Through `fact`, so the section graded is the one --attest writes (closing review round 2
+      # M1): a whole-file grep passed on a line under `## Attestations` that `fact` then read as
+      # empty, and the count comparison below never ran.
       _pv=$(fact "$rel" parked-surfaced)
+      case "$_pv" in yes*|true*) ;; *) return 1 ;; esac
       case "$_pv" in
         *[0-9]*) ;;
         *) return 0 ;;   # no count offered: the attestation stands as it always did
@@ -4461,7 +4529,7 @@ $_bcnon"
       fi
       return 0 ;;
     *)  # a PROJECT item the kit knows nothing about: it is attested unless the project says otherwise
-      grep -qE "^$item: (yes|true)" "$rel" ;;
+      case "$(fact "$rel" "$item")" in yes*|true*) return 0 ;; *) return 1 ;; esac ;;
   esac
 }
 
@@ -4638,6 +4706,17 @@ park() { # file · kind · item · reason · [step]
   # AFTER `reason` would pull it inside both of those matches, so a proposal row could rename the
   # handle a waiver row records. It goes BETWEEN the two fields, where no existing reader looks.
   local step=""
+  # TOOL-aRepatriatedFork-6, closing review round 2 M1 - THE LINE-END REFUSAL LIVES HERE, so every
+  # reason-carrying verb inherits it rather than each caller patching its own. The callers refused a
+  # line feed and not a carriage return, and a CR is a line end to the JS hooks (`m` flag): a reason
+  # carrying `\rrun-branch: ...` was a run-branch fact to gate-guard.js. Refused before the append,
+  # so the file is untouched; the callers' own earlier refusals stay, for their message.
+  # Named, not positional, in the message: check-arms reads `$2` as literal text of the signature.
+  local _pk_rel="$1" _pk_kind="$2"
+  if [ "$(printf '%s' "$2$3$4${5:-}" | wc -l)" -ne 0 ] || case "$2$3$4${5:-}" in *$'\r'*) true ;; *) false ;; esac; then
+    fail 17 "a parked entry contains a newline or a carriage return, and park() appends ONE line that every reader of this file parses line-wise, so this would forge a second row or a fact nothing wrote: $_pk_kind in $_pk_rel"
+    return 1
+  fi
   [ -n "${5:-}" ] && step=" · step $5"
   printf '\n%s %s · item %s%s · reason %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$2" "$3" "$step" "$4" >> "$1"
 }
@@ -4872,7 +4951,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   # the count. No new field, no new grammar, no new authored fact: an append-only history of rounds is
   # what a park KIND is for, and the sibling unit takes the FACT route for a per-run singleton instead.
   disp=""; [ -n "$disposition" ] && disp=" · disposition $disposition"
-  park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note$disp"
+  park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note$disp" || return 1
   stage_or_fail "$rel" || return 1
   case "$state" in
     CONVERGED)      if [ -n "$disposition" ]; then
@@ -4933,7 +5012,7 @@ verb_park() { # slug · item · reason
   done <<PARKED
 $(grep -F -- ' decision · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
 PARKED
-  park "$rel" decision "$item" "$reason"
+  park "$rel" decision "$item" "$reason" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: decision parked — $item"
   return 0
@@ -4984,7 +5063,7 @@ verb_propose() { # slug · item · step · reason
   done <<PROPOSED
 $(grep -F -- ' proposal · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
 PROPOSED
-  park "$rel" proposal "$item" "$reason" "$step"
+  park "$rel" proposal "$item" "$reason" "$step" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: proposal recorded against step $step — $item"
   return 0
@@ -5062,7 +5141,7 @@ verb_brief() { # slug · unit-id · path
   done <<BRIEFED
 $(grep -F -- ' brief · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
 BRIEFED
-  park "$rel" brief "$unit" "$h $path"
+  park "$rel" brief "$unit" "$h $path" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: brief recorded — $unit · $h · $path"
   return 0
@@ -5391,7 +5470,7 @@ RESCOPED
         echo "unattended: LATE record — $unit entered the roster after this run went live and is only being recorded now"
       fi ;;
   esac
-  park "$rel" rescope "$act $unit${succ:+ -> $succ}" "$reason"
+  park "$rel" rescope "$act $unit${succ:+ -> $succ}" "$reason" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: amendment recorded — $act $unit${succ:+ -> $succ}"
   return 0
@@ -5719,7 +5798,7 @@ SIBS
   # more paths declares again; both rows are on the record and a redesign can read them. There is no
   # narrowing refusal, because with grading dark there is nothing for a narrowing to hide from — and a
   # refusal nobody can clear is the stall this build exists to remove.
-  park "$rel" dispatch "$grp $unit" "$want"
+  park "$rel" dispatch "$grp $unit" "$want" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: dispatch declared — $grp $unit · $want"
   return 0

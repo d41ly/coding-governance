@@ -13,9 +13,9 @@ gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring"
   "every held leg is budgeted, every budget row resolves", "run-selftests self-test",
   "selftest harness self-test", "extract-arms self-test",
   "leg ceilings clear their evidenced maximum", "run-gates run-log line",
-  "receipt sync (installed files match the receipt)"]
+  "receipt sync (installed files match the receipt)", "pre-push bar self-test"]
 kits = ["run-gates"]
-git-hooks = []
+git-hooks = ["pre_push_bar_selftest.py"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -29,7 +29,8 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "worktree-crlf-outside-the-gated-population.md",
   "a-new-leg-trips-a-growing-set-of-meta-gates.md",
   "signal-trap-runs-the-exit-handler-twice.md",
-  "async-job-starts-with-sigint-ignored.md"]
+  "async-job-starts-with-sigint-ignored.md",
+  "decision-re-derived-by-a-second-process.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

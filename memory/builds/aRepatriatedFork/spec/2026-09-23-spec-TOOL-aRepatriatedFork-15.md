@@ -1,10 +1,15 @@
 # TOOL-aRepatriatedFork-15 — a kit whose shipped bytes move bumps its version
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-build-TOOL-aRepatriatedFork-15-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-15-1-acceptance-ledger.md) | journal | — |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-15-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-15-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -27,13 +32,26 @@ forgot it.
   with role `engine`, `seed`, `rendered` or `merged`; the value is read by
   `resolve_entry_version_at` (`tools/govkit/govkit.py:432`). The base defaults to the merge-base
   with the default branch, as `tools/memory-tree/check-verdict-epoch.sh:74-78` does, and an
-  unresolvable base is a FAILED exit 1. Observed by AC1, AC2 and AC3.
+  unresolvable base is a FAILED exit 1. Two merge rules (rev-2): a move is a NON-merge commit, and a
+  bump is any commit, merges included, whose value differs from its FIRST parent's, because a value
+  can enter a range only through a merge (check-wiring's 1.4 to 1.5 over `fd240496..a7c78ad2` did);
+  and an entry whose value at the base equals its value at HEAD while its bytes moved is FAILED
+  outright, so a reconcile merge that carries a mainline bump into a branch cannot excuse the
+  branch's own moves. Observed by AC1, AC2 and AC3.
 - **S2** — The two kits inCMS measured are bumped: drift-audit 1.11 to 1.12, over five files and
-  +664/-13; and kickoff-manifest, over four files and +133/-41, under the version split S4 defines.
+  +664/-13, which `TOOL-aRepatriatedFork-7` (f204b537) already did before this unit's pass; and
+  kickoff-manifest 1.4 to 1.5, over four files and +133/-41, under the version split S4 defines.
   Observed by AC4.
-- **S3** — The six further kits S1's own first run names over `fd240496..a7c78ad2` are bumped:
-  lexicon 1.5, memory-recall 1.9, playbook-render 1.0, process-monitor 0.2, review-harness 1.8, and
-  the playbook template's `governance-template: v3.0` marker (§8 F2). Observed by AC4.
+- **S3** — The further kits S1's run names are bumped. Over `fd240496..a7c78ad2` it named six:
+  lexicon 1.5, memory-recall 1.9, playbook-render 1.0 and review-harness 1.8 were already bumped by
+  sibling units before this pass (d50ac91d, b858ce1a, f204b537); process-monitor 0.2 to 0.3; and the
+  playbook template's `governance-template: v3.0` marker to v3.1, with the v3.0 text cut as a
+  `memory/archive/coding-governance-agents.template-v-3-0.md` snapshot, because 84383ffd moved
+  charter TEXT and §8 F2 rules that a snapshot. At this unit's own tip the run names two more,
+  moved by sibling units after their own last bumps: memory-tree 2.88 to 2.89 (7308f088 moved its
+  `kit.toml` after 643cb92c's bump) and unattended 1.29 to 1.30 (68af7553 after ca2c20a0). And
+  playbook-render 1.2 to 1.3, because this unit's own leg exemption moves `tools/govkit/registry.toml`,
+  which that kit ships. Every one is in scope because AC4 reads zero FAILED lines. Observed by AC4.
 - **S4** — kickoff-manifest carries two numbers where it carried one. `KIT_MANIFEST_VERSION`
   (`skills/session-kickoff/manifest-check.sh:37`) stays the kit's vintage and is what bumps; a new
   `MANIFEST_FORMAT` constant holds the manifest format, and it alone is compared with an adopter's
@@ -110,7 +128,7 @@ upgrade a format that did not change, pointing at a recipe with no step for it. 
 epoch: <entry> · clean · <version>
 epoch: <entry> · FAILED · moved in <sha> (<n> files) · no value change in <base>..HEAD (still <version>)
 epoch: <entry> · FAILED · last bump <S> precedes last move <W>
-epoch: <entry> · skip · no declared version · moved: <paths>
+epoch: <entry> · skip · no declared version · moved: <paths|none>
 ```
 
 It exits 1 on any FAILED line, 0 otherwise, and 2 on an unreadable registry.
@@ -157,6 +175,10 @@ before the kickoff bump, so the format warning never fires.
 - `tools/process-monitor/adopt-process-monitor.sh`
 - `tools/playbook/render_playbook.py`
 - `coding-governance-agents.template.md`
+- `AGENTS.md`
+- `memory/archive/coding-governance-agents.template-v-3-0.md`
+- `tools/memory-tree/check-memory-hygiene.sh`
+- `tools/unattended/unattended.sh`
 - `WIRE-INTO-PROJECT.md`
 - `memory/map/features/govkit.md`
 
@@ -234,20 +256,30 @@ observed red on drift-audit · none.
 - **F1 — split kickoff-manifest's number, or bump the format too?** Bumping `KIT_MANIFEST_VERSION`
   alone warns every adopter to upgrade a format that did not move. Recommendation: the split in S4,
   because the warning's whole value is that it fires only when the format changes.
+  RESOLVED (owner, 2026-09-23): the split in S4, as recommended.
 - **F2 — what does bumping the charter template mean?** Its `governance-template: v3.0` marker is
   also the charter's printed version, and the template header says history lives in `…-v-N-N.md`
   snapshots, so a bump implies a snapshot. Recommendation: treat it as a format like the manifest —
   bump the playbook kit's vintage only when rendered output changes, and snapshot on a charter-text
   change — and ask the owner before S3 moves it.
+  RESOLVED (owner, 2026-09-23): a format: the playbook kit's vintage bumps only when rendered output
+  changes, and a `-v-N-N` snapshot is cut on a charter-text change. This is the owner turn S3 waited
+  on; S3 may move the marker under that rule.
 - **F3 — does the memory-tree verdict-epoch leg stay on gov's bar?** The new verb subsumes it for
   memory-tree bytes and is stricter. Recommendation: keep it one release, because it is also the
   adopter-side check for memory-tree, then decide with its adopter behaviour fixed by
   `TOOL-aRepatriatedFork-2`.
+  RESOLVED (owner, 2026-09-23): keep it one release, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, from inCMS's red `kit-versions` leg on the a7c78ad2 pull
   branch and a resolution of every gov registry entry over `fd240496..a7c78ad2`.
+- rev-2 · 2026-09-24 · S1 gains the two merge rules, because check-wiring's bump entered the range
+  only through merges and read as "no value change" without them; S2 and S3 record the four kits
+  sibling units bumped before this pass, and S3 adds memory-tree and unattended, which the verb
+  names at the build tip, and playbook-render, whose shipped registry this unit's leg moves; the
+  data model's skip line reads `moved: none` for an unmoved kit.
 
 ## 10. Reuse audit
 

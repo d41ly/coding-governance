@@ -37,6 +37,13 @@ HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "run-unattended-gates: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
+# THIS KIT'S OWN PATHS ARE DERIVED (TOOL-aRepatriatedFork-2 S2): the `--kit` filter is this kit's
+# repo-relative dir, and the runner sits in the run-gates kit beside it. Both were spelled at gov's
+# prefix, so at another install `--selftests` ran a missing script and the filter matched nothing.
+KIT_REL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || KIT_REL=""
+KIT_REL=${KIT_REL%/}
+RUNNER="$(dirname -- "$HERE")/run-gates/run-selftests.sh"
+SELF="${KIT_REL:+$KIT_REL/}$(basename -- "$0")"
 
 # ---- THE BUDGET, AND IT IS A VERDICT RATHER THAN A COMPLAINT. A check nobody can afford to run is a
 # ---- check nobody runs, and this kit proved it: its suites were pulled off the merge bar for costing
@@ -139,7 +146,7 @@ case "$_arg" in
     [ -z "$MODE" ] || { echo "run-unattended-gates: two modes were given (--$MODE and $_arg); declare ONE" >&2; exit 2; }
     MODE=${_arg#--} ;;
   -h|--help)
-    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--all] (--serial|--pooled) | --checks"
+    echo "usage: bash $SELF [--selftests|--all] (--serial|--pooled) | --checks"
     echo "  --selftests  every suite that stages breaks into this kit, and the only thing that"
     echo "               exercises them since none is a bar leg. The verb when none is given."
     echo "               It REFUSES without a mode: --serial runs each suite alone and grades it"
@@ -299,7 +306,8 @@ run_one "brief-recorded"            checks bash "$HERE/check-brief-recorded.sh"
 # flight, and a typed 6 would have under-reported the population forever without anything
 # noticing. `--list` prints the rows the declaration actually holds for this kit.
 if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
-  _uc=$(bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended --list 2>/dev/null \
+  [ -f "$RUNNER" ] || { echo "run-unattended-gates: the run-gates kit is not beside this one, so no suite can run: $RUNNER is missing" >&2; exit 2; }
+  _uc=$(bash "$RUNNER" --kit "$KIT_REL" --list 2>/dev/null \
         | grep -cE "^  [a-z]" || true)
   case "$_uc" in ''|*[!0-9]*|0) echo "run-unattended-gates: the declaration holds NO unattended row, so this half would grade nothing" >&2; st=1 ;;
     *) ran=$((ran + _uc)) ;;
@@ -317,7 +325,7 @@ if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
   # below reads survives parity — the cost verdict stays withheld — so the parse is unchanged.
   if [ "$MODE" = pooled ]; then
     _pf=$(mktemp) || { echo "run-unattended-gates: cannot create a scratch file for the pooled withheld count" >&2; exit 2; }
-    bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended --pooled | tee "$_pf"
+    bash "$RUNNER" --kit "$KIT_REL" --pooled | tee "$_pf"
     [ "${PIPESTATUS[0]}" -eq 0 ] || st=1
     _k=$(sed -n 's/^run-selftests: \([0-9][0-9]*\) cost verdict(s) WITHHELD .*/\1/p' "$_pf" | head -1)
     rm -f "$_pf"
@@ -326,7 +334,7 @@ if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
     [ -n "$_k" ] || _k="an UNPARSED number of"
     MODE_TOKEN=" · pooled, $_k cost verdicts withheld"
   else
-    bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended --serial || st=1
+    bash "$RUNNER" --kit "$KIT_REL" --serial || st=1
     MODE_TOKEN=" · serial"
   fi
 fi

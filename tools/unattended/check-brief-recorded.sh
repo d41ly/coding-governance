@@ -103,7 +103,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.28   # gov:kit unattended@1.28 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.37   # gov:kit unattended@1.37 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -232,7 +232,9 @@ fi
 # The claim is the record's base, phase and witness, one per line and in that order: each value is one
 # line of the record, so a newline cannot occur inside one and the joined claim cannot be ambiguous.
 # The field grammar is the driver's `fact`: the FIRST line opening with the key and a colon, a trailing
-# CR dropped, leading SPACES dropped and nothing else touched.
+# CR dropped, leading SPACES dropped and nothing else touched - and, since closing review round 2 M1,
+# its SCOPE too: only the `## Run facts` section, heading to next `## `, so a `phase: LANDED` above
+# the heading is not the claim the driver would read. `sec &&` on each key rule is that scope.
 #
 # A DOT CLOSES THE CLAIM, and it is load-bearing. Command substitution strips trailing newlines, so
 # without a terminator a record carrying a base and nothing else collapses to one line, and the phase
@@ -240,9 +242,10 @@ fi
 # draft had exactly that shape and an arm now pins it.
 CLAIM_AWK='
   { sub(/\r$/, "") }
-  !hb && /^base:/    { v = $0; sub(/^base: */, "", v);    b = v; hb = 1 }
-  !hp && /^phase:/   { v = $0; sub(/^phase: */, "", v);   p = v; hp = 1 }
-  !hw && /^witness:/ { v = $0; sub(/^witness: */, "", v); w = v; hw = 1 }
+  /^## / { sec = (index($0, "## Run facts") == 1); next }
+  sec && !hb && /^base:/    { v = $0; sub(/^base: */, "", v);    b = v; hb = 1 }
+  sec && !hp && /^phase:/   { v = $0; sub(/^phase: */, "", v);   p = v; hp = 1 }
+  sec && !hw && /^witness:/ { v = $0; sub(/^witness: */, "", v); w = v; hw = 1 }
   END { printf "%s\n%s\n%s\n.", b, p, w }'
 
 # ------------------------------------------------------------------------------------ THE CUTOFF
@@ -317,7 +320,7 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
   base=""
   _runblob=$(GIT show "HEAD:$run" 2>/dev/null || true)
   if [ -n "$_runblob" ]; then
-    base=$(printf '%s\n' "$_runblob" | sed -n 's/^base:[[:space:]]*//p' | head -1)
+    base=$(printf '%s\n' "$_runblob" | extract_run_facts | sed -n 's/^base:[[:space:]]*//p' | head -1)
     case "$base" in
       [0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) GIT cat-file -e "$base^{commit}" 2>/dev/null || base="" ;;
       *) base="" ;;

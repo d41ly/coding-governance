@@ -15,6 +15,11 @@ bad() { echo "  FAIL — $1"; fail=1; }
 # The scratch repo is `git init`+`remote add` (origin/HEAD unset); pin the default so the hook's
 # fail-CLOSED resolution doesn't refuse the gate cases (case 6 unsets it to test that path).
 export GOV_DEFAULT_BRANCH=main
+# THE DECLARED TEST ESCAPE (TOOL-aRepatriatedFork-5, from NicoCares' PKG-dCandidLodestar-5). Every
+# stub below is an mktemp script, which is untracked by construction, and the hook refuses an
+# untracked merge bar. Without this the whole file would test a refusal path and nothing else.
+# Cases 25-27 unset it deliberately.
+export GOV_GATE_CMD_TEST=1
 
 # Isolate ONLY the pre-push hook (a scratch hooks dir) so the repo's pre-commit branch-guard does not
 # fire on the test's own setup commits. A clone does NOT carry core.hooksPath — set it explicitly.
@@ -267,6 +272,80 @@ case "$(decide)" in
   *) bad "24b the boundary forced with no gate-env.sh present, so arm 24 proves nothing" ;;
 esac
 
+# --- 25-29b: WHICH BAR RAN (TOOL-aRepatriatedFork-5, NicoCares' PKG-dCandidLodestar-5) --------
+# Until this unit `gate` was resolved from GOV_GATE_CMD with no check at all, and the decision line
+# named the SCOPE of the run without naming WHAT ran. `GOV_GATE_CMD=true git push` landed a commit
+# over a bar that never existed, under a line byte-identical to a full run's. THE ESCAPE IS UNSET IN
+# EACH ARM BELOW rather than at the top, because every earlier case in this file depends on it.
+# `.githooks/pre_push_bar_selftest.py` covers the evasions and disables the arms that refuse them.
+cd "$tmp/work" || exit 2
+printf '#!/usr/bin/env bash\nexit 0\n' > tracked-bar.sh
+# DECLARED, since the hook refuses a tracked bar that `.unattended.conf` does not name as GATE_CMD
+# (closing review round 1 M1); `.githooks/pre_push_bar_selftest.py` grades the undeclared case.
+printf 'GATE_CMD="bash tracked-bar.sh"\n' > .unattended.conf
+git add -A >/dev/null 2>&1; git commit -qm "a tracked bar" >/dev/null 2>&1
+
+# 25 — THE CONTROL FIRST: a bar this repo TRACKS is accepted with no escape. Without it, 26 and 27
+#      are satisfied by a hook that refuses every value it is handed, which is its own outage.
+git commit -q --allow-empty -m c25 >/dev/null 2>&1
+if ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main >/dev/null 2>&1 ); then
+  ok "25 control — a TRACKED bar command is accepted with no test escape"
+else
+  bad "25 a tracked bar was refused, so 26-27 prove only that the hook refuses everything"
+fi
+
+# 26 — an UNTRACKED bar is refused. $green lives under mktemp, so it is untracked by construction —
+#      the same shape every stub in this file has. GREEN, not red, deliberately: with a red stub the
+#      push fails either way and the arm cannot tell a refusal from a bar doing its job.
+git commit -q --allow-empty -m c26 >/dev/null 2>&1
+msg=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 1>/dev/null ) )
+case "$msg" in
+  *"does not track"*) ok "26 an UNTRACKED bar command is refused" ;;
+  *) bad "26 expected a refusal naming the untracked bar, got: ${msg:-<push SUCCEEDED over a bar nobody has read>}" ;;
+esac
+
+# 26b — and a tracked name may not merely TRAIL the one that runs. `bash $green tracked-bar.sh`
+#       ends in a tracked script and executes an untracked one, so a rule reading only the LAST
+#       path-shaped token accepts it — gating the instance rather than the class.
+git commit -q --allow-empty -m c26b >/dev/null 2>&1
+msg=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash $green tracked-bar.sh" git push -q origin main 2>&1 1>/dev/null ) )
+case "$msg" in
+  *"does not track"*) ok "26b an untracked token is refused even when a tracked one follows it" ;;
+  *) bad "26b a tracked name trailing an untracked command was accepted: ${msg:-<push SUCCEEDED>}" ;;
+esac
+
+# 27 — a value naming NO script at all is refused outright. `true` is the unit's own reproduction: a
+#      real command that exits 0 and gates nothing.
+git commit -q --allow-empty -m c27 >/dev/null 2>&1
+msg=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD=true git push -q origin main 2>&1 1>/dev/null ) )
+case "$msg" in
+  *"names no script"*) ok "27 GOV_GATE_CMD=true is refused — a no-op bar names nothing" ;;
+  *) bad "27 'true' was accepted as the merge bar, got: ${msg:-<push SUCCEEDED with no bar at all>}" ;;
+esac
+
+# 28 — the escape DECLARES ITSELF. Under GOV_GATE_CMD_TEST the untracked stub is let through, and
+#      the decision line says so. A silent waiver would be the defect wearing a test's name.
+line=$(decide)
+case "$line" in
+  *"bar: STUB "*) ok "28 under the test escape the decision line marks the bar as a STUB" ;;
+  *) bad "28 the test escape waived the check without saying so: ${line:-<no decision line>}" ;;
+esac
+
+# 29 — and the bar is named in BOTH arms. This line is the only durable record of which bar ran, and
+#      a field added to one arm is half a record.
+stamp "$(git rev-parse HEAD)"
+line=$(decide)
+case "$line" in
+  *"scoped gate"*"bar: "*) ok "29 the SCOPED decision line names the bar that ran" ;;
+  *) bad "29 the scoped arm reports a scope without naming the bar: ${line:-<no decision line>}" ;;
+esac
+rm -f "$(git rev-parse --git-dir)/gate-full-green"
+line=$(decide)
+case "$line" in
+  *"FULL gate"*"bar: "*) ok "29b the FULL decision line names the bar that ran" ;;
+  *) bad "29b the full arm reports a scope without naming the bar: ${line:-<no decision line>}" ;;
+esac
+
 # --- 16-18: TOOL-dScrubbedConduit-1 S2/S5. A LINKED WORKTREE, because that is the shape this
 # --- harness could not previously see. Every fixture above is `git init` plus `git init --bare`, and
 # --- neither exports GIT_DIR into a hook — which is exactly why this class went unobserved here
@@ -354,7 +433,19 @@ pfx_home=$PWD
 # 05455c45 is the last commit that touched this hook BEFORE that unit.
 PREPUSH_PRE=05455c45fc0fc32f7de331541daea5c57cb856e0
 git -C "$SRC" show "$PREPUSH_PRE:.githooks/pre-push" > "$tmp/hooks-old-pre-push" 2>/dev/null || true
-[ -s "$tmp/hooks-old-pre-push" ] || bad "AC1 red-first control unavailable — could not read the pre-change hook"
+# THE RED-FIRST CONTROL IS GOV-ONLY, AND THE SKIP SAYS SO OUT LOUD (TOOL-aRepatriatedFork-5 S6, the
+# form of NicoCares' carve-out 25). `PREPUSH_PRE` is a commit in the coding-governance repository.
+# This file ships to every push-main adopter, and no adopter has that object, so the arm cannot
+# resolve there and `bad` reddened the leg over gov's history rather than over anything the adopter
+# did. Substituting an adopter sha does not rescue it: the control has to be a hook that did NOT
+# force in the fixture's layout, which is structurally gov's fix. So it SKIPS, loudly, naming what
+# went unexercised; it is counted as neither a pass nor a failure. The loop below then skips the
+# `old` pass by its own `[ -s ]` guard.
+if [ ! -s "$tmp/hooks-old-pre-push" ]; then
+  echo "  SKIP — AC1 red-first control NOT RUN: $PREPUSH_PRE is a coding-governance commit and"
+  echo "         this repository does not carry it. The AC1/AC2/AC3 arms below still run; what"
+  echo "         is unexercised is the proof that the PRE-fix hook failed where they pass."
+fi
 
 # Build a scratch repo whose kits live at $1, push once so a record can name a real sha, and leave
 # the caller standing in it.
@@ -443,6 +534,121 @@ if GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1; then
   ok "AC3 a tree with no manifest ANYWHERE is left alone, so the refusal is not universal"
 else bad "AC3 the hook refused a tree that simply has no leg manifest"; fi
 
+cd "$pfx_home" || exit 2
+
+# ============================================================================================
+# TOOL-aRepatriatedFork-8 — THE CONTRACTS inCMS's OWN HOOK CARRIED. A fresh fixture whose ONLY
+# remote is named `incms`, as on inCMS's node `d`, with its HEAD set and NO GOV_DEFAULT_BRANCH, so
+# every arm below also proves S1: the pre-S1 hook read `origin/HEAD` and refused each of these
+# pushes with "can't determine the default branch" before any of them reached what it grades.
+fx8="$tmp/fx8"
+mkdir -p "$fx8"
+git init -q --bare "$fx8/incms.git"
+git init -q "$fx8/work"
+cd "$fx8/work" || exit 2
+git config user.email t@example.com; git config user.name t
+git config core.hooksPath "$tmp/hooks"
+git commit -q --allow-empty -m init; git branch -M main
+git remote add incms "$fx8/incms.git"
+git push -q --no-verify incms main
+git -C "$fx8/incms.git" symbolic-ref HEAD refs/heads/main
+git remote set-head incms main >/dev/null 2>&1
+read_token() { cut -f1 "$(git rev-parse --git-dir)/pre-push-refusal" 2>/dev/null; }
+read_tip() { git -C "$fx8/incms.git" rev-parse -q --verify "refs/heads/${1:-main}" 2>/dev/null; }
+
+# AC3 — a raw push is refused by the lander-marker rule, NOT the default-branch lookup, and leaves
+#       the machine token the lander reads.
+git commit -q --allow-empty -m r8
+msg=$( ( unset GOV_DEFAULT_BRANCH; git push -q incms main 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"refusing a raw push"*"|raw-push") ok "AC3 a raw push to a remote named incms is refused as raw-push, with its token" ;;
+  *) bad "AC3 expected the raw-push refusal and token, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+touch "$(git rev-parse --git-dir)/push-main-active"
+
+# AC2 — the same remote, a RED bar: refused AT THE BAR, and the token says the bar ran.
+before=$(read_tip)
+msg=$( ( unset GOV_DEFAULT_BRANCH; GOV_GATE_CMD="bash $red" git push -q incms main 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"gate RED"*"|gate-red") [ "$(read_tip)" = "$before" ] && ok "AC2 a remote named incms reaches the bar, which refuses as gate-red" \
+                            || bad "AC2 the remote moved over a red bar" ;;
+  *) bad "AC2 expected the bar to run and refuse, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+
+# AC9 — the bar is handed the pushed range from git's own ref line, never from the environment.
+pb="$tmp/pushbase.sh"; printf '#!/usr/bin/env bash\necho "PUSH_BASE=[$GATE_PUSH_BASE]"\nexit 0\n' > "$pb"
+before=$(read_tip)
+msg=$( ( unset GOV_DEFAULT_BRANCH; GATE_PUSH_BASE=inherited GOV_GATE_CMD="bash $pb" git push -q incms main 2>&1 ) )
+case "$msg" in
+  *"PUSH_BASE=[$before]"*) ok "AC9 GATE_PUSH_BASE is the remote's pre-push sha, and an inherited value is overwritten" ;;
+  *) bad "AC9 expected PUSH_BASE=[$before], got: ${msg:-<nothing>}" ;;
+esac
+
+# AC8 — a bar that COMMITS while it runs and exits green: the green describes a tree git is no
+#       longer pushing, so the hook refuses as head-moved and the remote stays put.
+mv8="$tmp/moves-head.sh"; printf '#!/usr/bin/env bash\ngit commit -q --allow-empty -m moved-by-the-bar\nexit 0\n' > "$mv8"
+git commit -q --allow-empty -m c8m
+before=$(read_tip)
+msg=$( ( unset GOV_DEFAULT_BRANCH; GOV_GATE_CMD="bash $mv8" git push -q incms main 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"HEAD moved"*"|head-moved") [ "$(read_tip)" = "$before" ] && ok "AC8 a HEAD moved by the bar is refused as head-moved" \
+                               || bad "AC8 the remote moved although HEAD moved under the bar" ;;
+  *) bad "AC8 expected the head-moved refusal, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+
+# AC6 — an untracked superproject file is dirt: the bar would certify a file the push does not carry.
+echo 'x = 1' > brand_new_module.py
+msg=$( ( unset GOV_DEFAULT_BRANCH; GOV_GATE_CMD="bash $green" git push -q incms main 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"working tree is dirty"*"brand_new_module.py"*"|dirty-tree") ok "AC6 an untracked file refuses the push as dirty-tree, naming it" ;;
+  *) bad "AC6 expected the dirty-tree refusal, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+rm -f brand_new_module.py
+# ITS CONTROL, which is also AC3's other half: the clean tree lands, and leaves no token behind.
+if ( unset GOV_DEFAULT_BRANCH; GOV_GATE_CMD="bash $green" git push -q incms main >/dev/null 2>&1 ) \
+   && [ -z "$(read_token)" ]; then
+  ok "AC6 control — the same push from a clean tree lands, and no stale token survives it"
+else
+  bad "AC6 control — a clean push did not land, or left token '$(read_token)'"
+fi
+
+# AC10 — THE BRANCH BAR (S5). Declared in gate-env.sh it gates a feature push; naming an untracked
+#        script it is refused as bar-refused; undeclared the push is ungated. The escape is unset in
+#        each arm, since it would let an untracked bar through. gate-env.sh is COMMITTED in each arm,
+#        since the hook refuses to source an untracked one (closing review round 1 H1).
+git checkout -q -b feat8
+printf '#!/usr/bin/env bash\necho "BRANCH BAR RED"\nexit 1\n' > branch-red.sh
+git add branch-red.sh; git commit -q -m "a tracked branch bar"
+mkdir -p .githooks
+printf 'GOV_BRANCH_GATE_CMD="bash branch-red.sh"\n' > .githooks/gate-env.sh
+git add .githooks/gate-env.sh; git commit -q -m "declare the branch bar"
+msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 2>&1 ) )
+case "$msg|$(read_token)|$(read_tip feat8)" in
+  *"BRANCH BAR RED"*"|gate-red|") ok "AC10 a declared, tracked, red branch bar refuses a feature push" ;;
+  *) bad "AC10 expected the branch bar to run and refuse, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+printf 'GOV_BRANCH_GATE_CMD="bash %s"\n' "$red" > .githooks/gate-env.sh
+git add .githooks/gate-env.sh; git commit -q -m "declare an untracked branch bar"
+msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 2>&1 ) )
+case "$msg|$(read_token)" in
+  *"does not track"*"|bar-refused") ok "AC10 an untracked branch bar is refused as bar-refused" ;;
+  *) bad "AC10 expected an untracked branch bar to be refused, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+# H1 — the policy file itself, UNTRACKED: refused before it is sourced, whatever it declares.
+git rm -q .githooks/gate-env.sh; git commit -q -m "undeclare the branch bar"
+mkdir -p .githooks   # `git rm` took the emptied directory with it
+printf 'GOV_BRANCH_GATE_CMD="bash branch-red.sh"\n' > .githooks/gate-env.sh
+msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 2>&1 ) )
+case "$msg|$(read_token)|$(read_tip feat8)" in
+  *"gate-env.sh is sourced into this hook"*"|bar-refused|") ok "H1 an untracked gate-env.sh is refused as bar-refused, unsourced" ;;
+  *) bad "H1 expected an untracked gate-env.sh to be refused, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+rm -f .githooks/gate-env.sh
+if ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 >/dev/null 2>&1 ) && [ -n "$(read_tip feat8)" ]; then
+  ok "AC10 control — with no branch bar declared, the feature push is ungated"
+else
+  bad "AC10 control — an undeclared branch bar still gated a feature push"
+fi
 cd "$pfx_home" || exit 2
 
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

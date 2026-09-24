@@ -254,6 +254,24 @@ RECALL_CACHE_BUDGET_MB="512"
 # that already has content.
 ROW_DUPLICATE_PIN="0"
 
+# Check 20's backlog-row ratchets: space-separated `<shard-path>:<count>` tokens, one per shard under
+# $MEMORY_ROOT/backlog/, each a shrink-only ceiling for that shard. A malformed token is a named
+# failure. BLANK = UNARMED: the shard is measured and NOT gated, and every green run prints one
+# NOT MEASURED line per shard per blank pin, so an unarmed ratchet says so. They ship blank because a
+# ceiling measured on another corpus is vacuous or permanently red here; `row_grammar.py --emit-pin`
+# prints both tokens measured against this tree.
+#   SEVERITY_UNLABELLED_PIN - live rows whose severity is not one of BLOCKER / HIGH / MED / LOW.
+#   LIVE_ROW_PIN            - live rows, OPEN / SPECCED / INPROGRESS / BLOCKED.
+SEVERITY_UNLABELLED_PIN=""
+LIVE_ROW_PIN=""
+
+# check-arms.py - per-gate floors for the harness meta-gate, one `<gate>:<branches>:<armed>` token
+# per discovered gate: the gate's fail branches, and how many of them its sibling test arms, may not
+# fall below these. BLANK IS REFUSED while any gate is discovered, and installing this kit installs
+# one (check-memory-hygiene.sh), so a fresh adoption reds until this is declared: run
+# `check-arms.py --emit-floors` from the kit directory and paste the line it prints here.
+ARMS_FLOORS=""
+
 # ACCEPTANCE_LEDGER_CUTOFF — the date from which a CLOSED Tier-2 spec owes an acceptance ledger: one
 # line per numbered criterion, in a record whose `**Serves:**` kind is `journal`. The grammar is in
 # HYGIENE.md under "Acceptance ledger", and the check reads SHAPE and COVERAGE only.
@@ -292,6 +310,13 @@ PROJECT_REGISTRY_EXTRA=""
 # date is KEPT: unparseable is not the same answer as old, and only one of them is an exemption.
 # A cutoff dated after today is REFUSED — it would exempt every record and report a clean run.
 RECORD_SERVES_CUTOFF=""
+
+# RECORD_UNDATED_ARTIFACTS — `grade`, `exempt`, or blank (= `grade`). A JSON result, an HTML report
+# or a script kept under build/, prompts/ or reviews/ cannot carry a Serves line at any date. `exempt`
+# drops a file with NO leading ISO date AND no `.md` suffix from check 21's missing-Serves branch,
+# independent of the cutoff above, and prints how many it dropped on every run, zero included. Any
+# other value aborts the engine at exit 2 naming the key.
+RECORD_UNDATED_ARTIFACTS=""
 
 # ENTRY_CAP_UNIT — `chars`, `bytes`, or blank. Blank leaves the counting exactly as your platform
 # does it today, and that is deliberate. The checker's own comment explains why it pins no locale:

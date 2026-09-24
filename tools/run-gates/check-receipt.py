@@ -148,11 +148,11 @@ def check_fixtures():
         base = pathlib.Path(td)
 
         tree = write_fixture(base, "clean", [{"path": "a.txt", "role": "engine", "sha256": None}])
-        findings, graded = check_engine_rows(tree, json.loads((tree / RECEIPT).read_text())["files"])
+        findings, graded = check_engine_rows(tree, json.loads((tree / RECEIPT).read_text(encoding="utf-8"))["files"])
         results.append(("an intact engine row grades clean", not findings and graded == 1))
 
         tree = write_fixture(base, "drifted", [{"path": "a.txt", "sha256": None}])
-        rows = json.loads((tree / RECEIPT).read_text())["files"]
+        rows = json.loads((tree / RECEIPT).read_text(encoding="utf-8"))["files"]
         rows[0]["sha256"] = "0" + rows[0]["sha256"][1:]
         findings, graded = check_engine_rows(tree, rows)
         results.append(("a drifted sha256 is reported, on a row with no role key",
@@ -161,13 +161,13 @@ def check_fixtures():
 
         tree = write_fixture(base, "absent", [{"path": "a.txt", "role": "engine",
                                                "sha256": "0" * 64}], drop_file=True)
-        findings, graded = check_engine_rows(tree, json.loads((tree / RECEIPT).read_text())["files"])
+        findings, graded = check_engine_rows(tree, json.loads((tree / RECEIPT).read_text(encoding="utf-8"))["files"])
         results.append(("a missing file is reported as missing and not as drift",
                         graded == 1 and len(findings) == 1 and findings[0].startswith("MISSING")))
 
         tree = write_fixture(base, "norows", [{"path": "a.txt", "role": "seed", "sha256": "0" * 64},
                                               {"path": "b.txt", "role": "merged"}])
-        findings, graded = check_engine_rows(tree, json.loads((tree / RECEIPT).read_text())["files"])
+        findings, graded = check_engine_rows(tree, json.loads((tree / RECEIPT).read_text(encoding="utf-8"))["files"])
         results.append(("a receipt of seed and merged rows alone grades nothing",
                         not findings and graded == 0))
 
@@ -177,7 +177,7 @@ def check_fixtures():
                                                 {"path": "d.txt"}])
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
-            print_unattributed(json.loads((tree / RECEIPT).read_text())["files"])
+            print_unattributed(json.loads((tree / RECEIPT).read_text(encoding="utf-8"))["files"])
         out = buf.getvalue()
         results.append(("two `unattributed` rows count 2, with `apply` and an ABSENT field ignored",
                         "NOTE" in out and "2 row(s)" in out and "--pin" in out
@@ -187,7 +187,7 @@ def check_fixtures():
                                                   {"path": "b.txt"}])
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
-            print_unattributed(json.loads((tree / RECEIPT).read_text())["files"])
+            print_unattributed(json.loads((tree / RECEIPT).read_text(encoding="utf-8"))["files"])
         results.append(("no `unattributed` row prints nothing at all", buf.getvalue() == ""))
 
     for label, ok in results:
@@ -211,7 +211,7 @@ def main(argv):
         # EMPTY derivation refuses rather than falling back to the working directory — grading the
         # wrong tree silently is worse than grading none.
         out = subprocess.run(["git", "-C", str(pathlib.Path(__file__).resolve().parent),
-                              "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+                              "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8")
         root = out.stdout.strip()
         if out.returncode != 0 or not root:
             print("FAIL  this file is not inside a git work tree, so the tree to grade cannot be "

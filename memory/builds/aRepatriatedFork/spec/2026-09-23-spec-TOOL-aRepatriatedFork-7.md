@@ -1,10 +1,17 @@
 # TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-7-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-7-1-acceptance-ledger.md) | journal | — |
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-7-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-7-build-brief.md) | journal | — |
+| [2026-09-24-prompt-TOOL-aRepatriatedFork-7-repair-r1-brief.md](../prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-7-repair-r1-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round2.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round2.md) | diff-review | DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-10 |
 
 <!-- /gen:spec-records -->
 
@@ -38,12 +45,16 @@ costing a five-file fork.
   call with a message naming the file and the value, the way `AGENT_CAP` is refused today
   (`:1884-1892`). An absent file or key means 5. Observed by AC6.
 - **S6** — Every hook message that prints the cap prints the effective one, and so does
-  `tools/workflows/check-verifier-fanout.sh:121`, which types `≤5`. Observed by AC7.
+  `tools/workflows/check-verifier-fanout.sh:111`, which types `≤5`. Observed by AC7.
 - **S7** — The four shipped harnesses carry the cap as a render token, `{{FANOUT_CAP}}`, rendered from
   the same conf by the kit's existing renderer, so a repo declaring 4 receives harnesses the hook admits.
   Observed by AC8.
 - **S8** — `agent-cap`, `review-harness` and `drift-audit` bump, and `TOOL-dRetiredFork-24` closes
   with its "not live today" paragraph corrected by the measurement in §4. Observed by AC9.
+- **S11** — The hook ANSWERS the effective cap: `agent-cap.js --print-cap` prints it for the checkout
+  it stands in, or exits 2 with the deny message, and denies if a payload arrives on stdin, so a
+  wired copy fails closed. S6's clean line and S7's renderer ask it, the renderer through
+  `check-verifier-fanout.sh --print-cap`, and neither parses `.agent-cap.conf`. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -127,7 +138,7 @@ LOWER the cap cannot raise anything, so a local edit is at worst stricter than t
 
 `tools/workflows/check-protocol-parity.test.sh` already renders `unattended-build.template.js` into
 `unattended-build.js` with three derived tokens, and its no-argument mode is the leg that grades the
-render. It gains a fourth token, `FANOUT_CAP`, derived from the same conf with the same default, and
+render. It gains a fourth token, `FANOUT_CAP`, answered by the hook for the same conf (S11), and
 three more pairs.
 
 | live copy | template | sites carrying the token today as a literal 5 |
@@ -149,6 +160,7 @@ section `tools/workflows/README.md:50-53` points at.
 | `FANOUT_CAP` | conf key and render token |
 | `loadDeclaredCap` | `js.function`; `lexicon.py --suggest` answered OK for it on 2026-09-23 |
 | `EFFECTIVE_CAP` | JS module constant, the value every enforcement site reads |
+| `--print-cap` | hook flag and verifier fan-out gate flag, the effective cap's one answer (S11) |
 | three `*.template.js` files | review-harness and drift-audit templates |
 
 ### Migration
@@ -246,6 +258,11 @@ or its own cap-4 fork is overwritten by a cap-5 render its hook denies.
 - **AC9** — After the bumps, `bash tools/check-kit-versions.sh` exits `0`, and with one bumped carrier
   reverted it exits non-zero naming it.
   Red when: a carrier was missed.
+- **AC10** — With a BOM-led `FANOUT_CAP=4` conf, `tools/hooks/agent-cap.js --print-cap` prints `4`,
+  `tools/workflows/check-verifier-fanout.sh` prints `obey the ≤4` in its clean line, and the
+  renderer's `FANOUT_CAP` is 4; with `FANOUT_CAP=4` followed by `FANOUT_CAP=abc`, `--print-cap`
+  exits 2 naming `.agent-cap.conf`; and a payload on its stdin exits 2.
+  Red when: a shell reader answers a cap the hook does not enforce.
 
 ## 7. Gates
 
@@ -254,22 +271,58 @@ or its own cap-4 fork is overwritten by a cap-5 render its hook denies.
 New arm: `tools/hooks/agent-cap.test.sh` · the nesting matrix, piped first to the a7c78ad2 hook to observe the nested forms admitted at exit 0 · none
 New arm: `tools/hooks/agent-cap.test.sh` · conf fixtures at 4, 6, 0 and a word, observed first against the a7c78ad2 hook admitting a cap-5 helper under a declared 4 · none
 New arm: `tools/workflows/check-protocol-parity.test.sh` · a template with a surviving `{{FANOUT_CAP}}`, observed first to pass the pre-change parity mode · none
+New arm: `tools/hooks/agent-cap.test.sh` · `--print-cap` over no conf, 4, a BOM-led 4, a malformed last line and a stdin payload, observed first against 0255d655 answering nothing · none
+New arm: `tools/workflows/check-verifier-fanout.test.sh` · a BOM-led cap-4 checkout and `--print-cap` relaying a refusal, observed first against 0255d655 printing ≤5 · none
 
 ## 8. Open questions
 
 - **F1 — one key, or one for concurrency and one for the verify-stage total?** The charter states two
   rules. Both adopters that lower the cap lower both to the same number. Recommendation: one key now;
   a second key is additive later.
+  RESOLVED (owner, 2026-09-23): one key for both rules; a second is additive later, as recommended.
+  The declared lower-only cap itself, parked by `dRetiredFork`, is ratified.
 - **F2 — `.agent-cap.conf` as its own file, or a key in an existing conf?** A new file is one more
   root dotfile; `.memory-tree.conf` couples two kits. Recommendation: its own file, documented in the
   hooks README.
+  RESOLVED (owner, 2026-09-23): its own `.agent-cap.conf`, documented in the hooks README, as
+  recommended.
 - **F3 — should the S9 property arm's population gain the nesting matrix?** It would pin that no
   matrix fixture BASE denied is admitted now. Recommendation: yes, it costs only fixture files.
+  RESOLVED (owner, 2026-09-23): yes, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, measured against gov a7c78ad2, inCMS 1bc57da27 and nc f69e2ffb,
   with the nested fail-open reproduced by piping one payload to all three hooks.
+- rev-2 · 2026-09-23 · S6 citation moved from `:121` to `:111`: TOOL-aRepatriatedFork-4 removed the
+  verifier-fanout prefix derivation above that line. Same `≤5` echo, no design change.
+- rev-3 · 2026-09-24 · S8: closing `TOOL-dRetiredFork-24` in `memory/backlog/TOOL.md` moves to the
+  main loop, because `--dispatch` refuses a unit pass that declares a shared mutable record; and
+  review-harness takes no second bump, already at 1.9 in this unlanded build. S7: a `*.template.js`
+  leaves the verifier fan-out and workflow-syntax populations, since its token sits where a number
+  goes and neither gate can judge it; review-harness `version_from` reads the template and
+  drift-audit declares both templates in `marker_carriers`, which `govkit selfcheck` required.
+  The tier2-review meta prose that states the cap renders the token too, so no rendered text types
+  the ceiling over a lowered cap.
+- rev-4 · 2026-09-24 · closing review round 1 residual (b): S6 and S7 re-parsed `.agent-cap.conf`
+  with their own seds, which missed a BOM-led line the hook reads, so the renderer wrote cap-5
+  harnesses under a hook enforcing 4. Adds S11, the hook's `--print-cap` answer (S9 and S10 already
+  name suite arms in S2 and AC3), and AC10, and moves
+  S6's and S7's source from the conf to that answer. The review's own case, a malformed last line,
+  was masked at the fan-out gate by the hook's denial and was already refused by the renderer.
+- rev-5 · 2026-09-24 · gate repair at VERIFYING, leg `unattended-build self-test`: rev-4 made the
+  renderer ask the hook through `check-verifier-fanout.sh --print-cap` and S7 added three template
+  pairs, but the PV-* layouts in `tools/workflows/unattended-build.test.sh` copied neither the gate,
+  the hook nor the new templates, so every render refused and each arm graded a harness that was never
+  written. The fixture now installs what `requires = ["agent-cap"]` guarantees, and the verbatim
+  control fills `{{FANOUT_CAP}}` so it parses. A stale fixture, not a product regression; no design change.
+- rev-6 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. The `[-PV]` fixture runs the
+  real renderer over a small kit that carried neither `check-verifier-fanout.sh`, the hook, nor the
+  three templates S7 added, so every render refused and each `[-PV]` arm after it went red. The
+  fixture kit now ships the gate and the three templates, every target holds the hook at
+  `.claude/hooks/`, and the consumer-edited engine row is `review-step.js`, because
+  `tier2-review.js` is a render now. The rev-5 repair, one suite over. A stale fixture, not a
+  product regression; no design change.
 
 ## 10. Reuse audit
 

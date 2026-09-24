@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""model.py — one unattended run's sources joined into one account of it. gov:kit runlog@1.0
+"""model.py — one unattended run's sources joined into one account of it. gov:kit runlog@1.1
 
 A run's evidence is spread across its run-state file, three journals, git, its build folder and, where
 local, its session extracts. `build_run_model` joins them into ONE model of ONE run: a timeline, a

@@ -13,8 +13,10 @@
 # memory-tree alone would get a gate demanding a file their tree has no reason to contain, and the
 # memory-tree kit would carry knowledge of a kit it does not depend on. Each kit gates its own pairs.
 #
-# THE PAIRS, declared once in `PAIRS` below, and there are TWO. The review protocol this repo RUNS ON,
-# and the unattended BUILD HARNESS. The harness joined this list when it stopped shipping verbatim:
+# THE PAIRS, declared once in `PAIRS` below. The review protocol this repo RUNS ON, the unattended
+# BUILD HARNESS, and — since TOOL-aRepatriatedFork-7 — the review and drift-audit harnesses, which
+# render only so a repo that LOWERS the fan-out cap in `.agent-cap.conf` receives harnesses its own
+# hook admits, instead of a hand-kept fork of each. The build harness joined this list when it stopped shipping verbatim:
 # apply writes an engine file's bytes unchanged, so every install path it spelled arrived in a tree
 # installed at another prefix naming files that tree does not have — the driver, the bug-class
 # checklist, the sub-workflow it awaits and the child it hands the caller. A workflow script has no
@@ -32,10 +34,11 @@
 # purpose, and no line anywhere named the file. Creating a live copy is an install decision, so it
 # stays with the hand `--render` a fresh install runs; `--tracked-only` refreshes and skips out loud.
 #
-# THREE TOKENS, and each one is DERIVED here rather than typed:
+# FOUR TOKENS, and each one is DERIVED here rather than typed:
 #   KIT_DIR          this kit's directory, repo-relative — the harness's own siblings live in it
 #   TOOL_ROOT        the directory the kits sit in, with a trailing slash; empty at a root install
 #   MEMORY_TREE_DIR  the directory holding the memory-tree kit's `gotchas.py`
+#   FANOUT_CAP       the fan-out cap for this checkout, as the agent-cap hook ANSWERS it (`--print-cap`)
 # The third is NOT derivable from the second. Both adopters measured when this was written install
 # the memory-tree kit FLAT, directly in their tool root, so `TOOL_ROOT` plus `memory-tree/` names a
 # file neither of them has. It is PROBED instead: the first TRACKED of the nested and the flat
@@ -86,7 +89,27 @@ TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
 # The pairs: `<live copy>|<template>`, both repo-relative. The render of each template is the live
 # copy's ENTIRE expected content.
 PAIRS="$M/guides/REVIEW-PROTOCOL.md|$KITREL/REVIEW-PROTOCOL.template.md
-$KITREL/unattended-build.js|$KITREL/unattended-build.template.js"
+$KITREL/unattended-build.js|$KITREL/unattended-build.template.js
+$KITREL/tier2-review.js|$KITREL/tier2-review.template.js
+$KITREL/drift-audit-code.js|$KITREL/drift-audit-code.template.js
+$KITREL/drift-audit-state.js|$KITREL/drift-audit-state.template.js"
+
+# FANOUT_CAP, THE FOURTH TOKEN — TOOL-aRepatriatedFork-7 S7. ANSWERED BY THE HOOK, never parsed here
+# (closing review round 1 residual b): this used to re-read `.agent-cap.conf` with a sed of its own,
+# which matched nothing on a BOM-led line and rendered cap-5 harnesses under a hook enforcing 4. The
+# sibling gate's `--print-cap` locates the hook and relays its answer for this checkout, so the value
+# rendered is the value enforced. A refusal stops here as the hook denies there, because a harness
+# rendered at a cap its own hook will not admit is exactly the fork this token retires.
+if ! FANOUT_CAP=$(bash "$HERE/check-verifier-fanout.sh" --print-cap 2>&1); then
+  echo "protocol-parity: the agent-cap hook would not answer the effective fan-out cap:"
+  printf '%s\n' "$FANOUT_CAP" | sed 's/^/  /'
+  echo "  Nothing was rendered or graded."
+  exit 2
+fi
+case "$FANOUT_CAP" in
+  [1-9]) ;;
+  *) echo "protocol-parity: the agent-cap hook answered '$FANOUT_CAP' for the fan-out cap, not a digit 1-9. Nothing was rendered or graded."; exit 2 ;;
+esac
 
 check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
 
@@ -144,6 +167,7 @@ render() { # template -> stdout
   out=${out//\{\{KIT_DIR\}\}/"$KITREL"}
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOLROOT"}
   out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MTD"}
+  out=${out//\{\{FANOUT_CAP\}\}/"$FANOUT_CAP"}
   printf '%s' "$out"
 }
 read_lf() { sed 's/\r$//' "$1"; }

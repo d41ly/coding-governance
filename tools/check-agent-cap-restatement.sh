@@ -48,10 +48,13 @@
 # MEASUREMENT: this corpus records four runaway reviews at "79 / 54 / 48 / 37 agents" and a tier
 # table reading "~22 agents", and none of those becomes wrong when the cap moves.
 set -u
+_self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "agent-cap-restatement: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-WAIVERS=${1:-tools/agent-cap-restatement-waivers.txt}
+# The registry defaults to the sidecar BESIDE this gate, derived (TOOL-aRepatriatedFork-2 S7).
+_self_pre=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || _self_pre=""
+WAIVERS=${1:-${_self_pre}agent-cap-restatement-waivers.txt}
 
 # FROZEN trees, excluded by PATH PREFIX rather than by matched text. These are append-only records
 # of past or pending state: a build record, an archive, a bug-class record and a backlog row each

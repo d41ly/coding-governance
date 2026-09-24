@@ -1,10 +1,16 @@
 # DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams deployer · order 3
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md) | journal | DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-21 |
+| [2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md) | journal | — |
+| [2026-09-23-prompt-DEPL-aRepatriatedFork-17-build-brief.md](../prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-17-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -63,7 +69,10 @@ as the fork it measures, and every report line describes the tree as it is.
   `update` then grades it through the verdict table like any other engine row. Without the flag the
   row falls through on the role it landed under, exactly as today (`govkit.py:7256-7262`). `plan`
   prints `KEEP` for a `seed` destination that already exists, matching `apply`, which leaves one in
-  place (`govkit.py:5704-5710`). Observed by AC10, AC11, AC15.
+  place (`govkit.py:5704-5710`). The flag takes only a move whose new role's disposition is not
+  in `KIT_WRITING_DISPOSITIONS`: a move into `rendered` is written by the kit's own regenerate in
+  the same run, so it falls through to the reconcile-or-refuse path under the recorded role, and
+  the flag records no role for it. Observed by AC10, AC11, AC15, AC16.
 - **S7** — A KIT'S VERSION IS READ FROM THE TARGET'S BYTES. The per-kit delta prints
   `MIXED across rows` whenever receipt rows carry different `version` strings (`govkit.py:7523`),
   and a pinned row carries the version of its BASE vintage (`govkit.py:9811-9826`), so a kit whose
@@ -141,16 +150,20 @@ writes = [".claude/skills/unattended/SKILL.md", "{memory_root}/guides/UNATTENDED
 
 - `write_conflict_candidate(outbox, row, base, ours, theirs, candidate)` — `py.function`, verb `write`.
 - `measure_lone_cr(data)` — `py.function`, verb `measure`.
-- `derive_nearest_vintage(root, src, ours)` — `py.function`, verb `derive`.
+- `derive_nearest_vintage(root, src, ours, to_commit)` — `py.function`, verb `derive`.
 - `read_target_kit_version(target, desc, receipt)` — `py.function`, verb `read`.
-- `check_leg_claimable(leg, runner_leg, ctx)` — `py.function`, verb `check`.
+- `check_leg_claimable(argv, runner_leg)` — `py.function`, verb `check`.
+- `read_worktree_status(target)` — `py.function`, verb `read`; S1's status snapshot.
+- constants `MERGE_FILE_ARGS` (S3), `ADOPT_STAGED_RECEIPT` (S5), `NEAREST_PIN_FRACTION` (S9, §8 F1).
 - flags `--staged` on `adopt`, `--accept-role-moves` on `update`, `--suggest-pins` on `adopt`.
 - `[[regenerate]].writes` — a new optional descriptor key.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `tools/govkit/README.md` · `WIRE-INTO-PROJECT.md` ·
-`tools/unattended/kit.toml`
+`tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `WIRE-INTO-PROJECT.md`. The verb's own
+`USAGE` text carries the flags; this tree has no `tools/govkit/README.md`. No shipped descriptor
+declares `[[regenerate]].writes`: every regenerate output a shipped kit writes is already one of its
+`rendered` or `generated` receipt rows, which S1 snapshots without the key.
 
 ### Adopter deletions this unit enables
 
@@ -254,6 +267,11 @@ narrows a destructive or false outcome rather than adding one.
   newer bytes through the verdict table.
   Red when: the move into a writing role is skipped, which a7c78ad2 does, or bytes move in the
   run that re-records it.
+- **AC16** — When a fixture receipt holds an operator-edited `engine` row whose descriptor now
+  declares it `rendered` under a real `[[regenerate]]`, `update --write --accept-role-moves` exits
+  non-zero naming the three-way conflict, prints no `role-recorded`, and the operator's bytes stand
+  in the target's index.
+  Red when: the flag re-records the role and the regenerate overwrites the edit unreported.
 
 ## 7. Gates
 
@@ -268,18 +286,42 @@ New arm: `tools/govkit/selftest.py` · one fixture per scope item, each first ru
   Recommendation: a pin is suggested when the changed-line count is at most half the target file's
   line count, declared as a constant beside `derive_nearest_vintage` and printed with every
   suggestion.
+  RESOLVED (owner, 2026-09-23): suggest a pin when at most half the target's lines changed, the
+  fraction a constant beside `derive_nearest_vintage`, printed with every suggestion, as
+  recommended.
 - **F2 — should `--accept-role-moves` be the default for a move into a non-writing disposition?**
   Nothing is written, so the only effect is the receipt agreeing with the descriptor.
   Recommendation: keep it opt-in for one release. The existing report says choosing is not gov's to
   do on the operator's behalf, and a release of opt-in use tests that stance.
+  RESOLVED (owner, 2026-09-23): opt-in for one release, as recommended.
 - **F3 — should S4's `lone-CR` row be `r.fail` rather than a report?** Recommendation: `r.fail` on a
   `--write` run and a report on a read-only one. A write run that lands over a damaged program is the
   moment the loss becomes permanent.
+  RESOLVED (owner, 2026-09-23): `r.fail` on `--write`, a report on a read-only run, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, grounded at a7c78ad2 on the pull's reported defects, audit-C's
   lone-CR measurement, and read-only `update` and `plan` runs at both adopters on 2026-09-23.
+- rev-2 · 2026-09-24 · build-time divergences, no scope moved. Section 4 inventory: `check_leg_claimable`
+  takes the resolved argv and the runner row, which is all S8 compares; `derive_nearest_vintage`
+  takes the measuring commit, as `derive_attribution` does; `read_worktree_status` is added for S1's
+  undeclared-write naming. S1: a restored path that is no receipt row is printed `reverted` in the
+  rollback order, apart from `restored`, and a path still differing is printed `still differs`.
+  S2: a row passes as `eol-only` only when the target's filter changed the bytes, so a tampered
+  `sha256` over untouched bytes still reds. S3: the reap removes a stale order's candidate
+  directory with it. Section 4 files touched: no `tools/unattended/kit.toml` edit and no
+  `tools/govkit/README.md`. AC13 is observed in the selftest's `-13` gate-leg block, which already
+  builds a manifest runner, and that block's older refusal arm now carries a differing argv.
+- rev-3 · 2026-09-24 · closing review round 1 M2. S6: `--accept-role-moves` takes only a move whose
+  new disposition is not in `KIT_WRITING_DISPOSITIONS`, so a move into `rendered` keeps the
+  reconcile-or-refuse path; AC16 added, observed in `tools/govkit/matrix.py`'s role-move block,
+  whose `rr-edited` fixture it reuses. That block's remedy arm now reads `--accept-role-moves`,
+  the remedy S6 put in place of `apply`.
+- rev-4 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. Two arms pinned output this
+  unit changed, and are updated to it: the AC4 plan write-set arm reads S6's `KEEP` row as a write,
+  and the `-14` AC8 byte comparison removes the integrity line's ` · eol-only <n>` field, which the
+  pre-extraction engine cannot print. Stale pins; no code change.
 
 ## 10. Reuse audit
 

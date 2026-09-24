@@ -27,7 +27,7 @@ id = "kit-versions-need-list"
 kind = "authoring"
 blocks_adopt = false
 blocks_gate = true
-why = "MEASURED: copied verbatim into a repo holding none of the kits it names, the gate reds immediately. The runbook's own instruction is to edit its need list to the target's kit subset, which makes this a seed-then-own file rather than an engine file."
+why = "MEASURED: copied verbatim into a repo holding none of the kits it names, the gate reds immediately. The runbook's own instruction is to edit its need list to the target's kit subset, which makes this a seed-then-own file rather than an engine file. The probe IS the gate, so it reds on any kit-versions finding and not only on an unedited need list: a kit whose bytes moved without its version reds this hole too (DEPL-aRepatriatedFork-14 S5)."
 discharge = { command = ["bash", "{prefix}/check-kit-versions.sh"] }
 
 [check]

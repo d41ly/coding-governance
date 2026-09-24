@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-23T02:02:44+03:00 @ ad5a0d3c2564f2e43321869483bf5fc76d6b7c36
+last-audit: 2026-09-24T14:34:56+03:00 @ 386f168b4b3e3662941dc37f123eae63b54d5c13
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2ae12086bf7bc70723d6535a24c3b05368b18664
+last-body-change: 6ee9be2e0905d6d6717e3a6f913e2fe119a96132
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -184,6 +184,8 @@ bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand,
 bash tools/unattended/run-unattended-gates.sh --pooled   # the DoD for work touching tools/unattended/: the kit self-tests through the bounded pool, PARITY against the calibrated evidence (twenty rows, node a, 2026-09-22); --serial is the on-demand cost reading. TOOL-aBatchedArm-5
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
+python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
+python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
 ```
 
 The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. No
@@ -216,6 +218,11 @@ re-renders them from build front matter); there is no authored ledger to update.
 
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
+
+- 2026-09-24 · `AGENTS.md`'s push-boundary paragraph on `GOV_GATE_CMD` · the hook now also requires
+  it to EQUAL the kit's runner or the `GATE_CMD` a committed `.unattended.conf` declares at the pushed
+  sha, not merely name a tracked, unmodified script (`TOOL-aRepatriatedFork-5`, closing review M1) ·
+  prune when that paragraph says so.
 
 - 2026-09-22 · the unattended kit's self-tests · they are GREEN WHOLE for the first time: 76 failing
   assertions across the gate, driver and cross-component suites were fixtures pinned to texts that had

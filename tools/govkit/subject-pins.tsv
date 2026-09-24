@@ -33,6 +33,7 @@ dead-path carriers self-test	kit	selftests
 drift-audit records	repo	declarations
 drift-audit selftest	kit	selftests
 drift-audit wiring	repo	wiring
+encoding posture (text IO names its encoding)	repo	product
 every held leg is budgeted, every budget row resolves	repo	declarations
 extract-arms self-test	kit	selftests
 gotchas selftest	kit	selftests
@@ -48,6 +49,7 @@ install-prefix (shipped surface)	repo	product
 install-prefix self-test	kit	selftests
 kickoff engine size <=18KiB	repo	product
 kickoff-manifest ratchet	repo	records
+kit epoch (shipped bytes move, the version moves)	repo	declarations
 kit placeholders (a declared token its adopter substitutes)	repo	declarations
 kit version markers	repo	declarations
 kit-placeholders self-test	kit	selftests
@@ -76,6 +78,7 @@ playbook placeholder catalogue	repo	product
 playbook render selftest	kit	selftests
 playbook render wiring	repo	wiring
 playbook validity gate	repo	declarations
+pre-push bar self-test	repo	selftests
 pre-push run-log line	repo	selftests
 pre-push self-test	repo	selftests
 process-monitor adopter selftest	kit	selftests
@@ -117,6 +120,7 @@ testsuite counts (every bar self-test prints one)	repo	declarations
 testsuite counts self-test	kit	selftests
 tier2-review self-test	kit	selftests
 unattended kit gate	repo	declarations
+unattended protocol size	repo	product
 unattended skill wiring	repo	wiring
 unattended-build self-test	kit	selftests
 verdict epoch (kit version dates the engine)	repo	declarations

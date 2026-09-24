@@ -50,6 +50,16 @@ For any path guard, ask what the ROOT does. If declaring `.` or the repository r
 relation is backwards. The test is cheap, it takes one line in a fixture, and it is the one input
 that separates a containment check from a string comparison wearing its clothes.
 
+## A second shape: graded canonical, joined raw
+
+`tools/govkit/govkit.py`'s `resolve_owned_rows` normalised an `[[own]]` path only inside its
+containment test and returned the raw string, and every reader then joined on that string. So
+`./tools/demo/run.py` passed every grade, matched no destination in `apply`, and gov's bytes were
+written over the file the target had declared its own. The grade and the join asked one question
+about two spellings. The fix refuses any path that is not already its own `posixpath.normpath`.
+Refusing beats re-keying it silently, because the operator learns their spelling was wrong. The arm
+is `[aRF-13 M3]` in `tools/govkit/selftest.py`, over three spellings.
+
 ## Gate
 
 Gated by construction: every path relation in `tools/unattended/unattended.sh` now calls `covers` or

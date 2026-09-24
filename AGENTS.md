@@ -78,13 +78,13 @@ its shards sit frozen under `memory/archive/`.
 <!-- gov:playbook -->
 # Coding Governance — the agent charter template
 
-*Template **v3.0** · 2026-08-18. One file. One line per directive, and a wrapped line is still one
+*Template **v3.1** · 2026-09-24. One file. One line per directive, and a wrapped line is still one
 rule. This file BECOMES a project's `AGENTS.md`: `tools/playbook/adopt-playbook.sh` fills every
 placeholder and drops the blocks a target has no kit for, so filling it is a program's job and not a
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
 `…-v-N-N.md` snapshots and in git.*
 
-<!-- governance-template: v3.0 -->
+<!-- governance-template: v3.1 -->
 
 > **What:** a project-agnostic charter for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** deploy it with the renderer; the rules are
@@ -531,8 +531,15 @@ read the durable summary instead.
 
 **The push boundary is where the bar binds.** The tracked `.githooks/pre-push` hook runs
 `tools/run-gates/run-gates.sh` once on a default-branch push and blocks a red one (it classifies on the remote
-ref, the validated tree must be the pushed tip, `GOV_GATE_CMD` overrides the gate for testing, and
-`--no-verify` bypasses). Earlier runs are diff-scoped and are developer-choice. `core.hooksPath` is
+ref, the validated tree must be the pushed tip, and `--no-verify` bypasses). `GOV_GATE_CMD` may
+name only a script this repo tracks, unmodified, and anything else is refused before a bar runs;
+`GOV_GATE_CMD_TEST=1` is the one test escape, labelled `bar: STUB` and denied a lander marker
+(`TOOL-aRepatriatedFork-5`). The hook reads the default branch from the remote it is pushing to,
+refuses a dirty tree and a `HEAD` the bar moved, hands the bar `GATE_PUSH_BASE` from git's own ref
+line, and leaves each refusal as a token in `<git-dir>/pre-push-refusal`, which the lander reads
+instead of the push's output. A repository may declare a branch bar, `GOV_BRANCH_GATE_CMD`, in
+`.githooks/gate-env.sh`; undeclared, a branch push stays ungated (`TOOL-aRepatriatedFork-8`).
+Earlier runs are diff-scoped and are developer-choice. `core.hooksPath` is
 repo-GLOBAL, so the hook gating your push is the PRIMARY tree's; check H REPORTS a divergence. A tracked pre-commit fast leg sits beside it and also enforces the
 branch guard, refusing a primary-tree commit off the default branch (`GOV_DEFAULT_BRANCH` pins it).
 A SessionStart hook runs `tools/check-wiring.sh --session`, which auto-sets an unset

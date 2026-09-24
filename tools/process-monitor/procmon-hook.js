@@ -2,7 +2,7 @@
 /**
  * procmon-hook — put the process monitor's verdict where a session actually reads it.
  *
- * gov:kit process-monitor@0.2
+ * gov:kit process-monitor@0.5
  *
  * Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md
  *
@@ -115,7 +115,8 @@ function main() {
   try {
     out = execFileSync(
       process.env.PROCMON_PYTHON || 'python',
-      [path.join(root, 'tools', 'process-monitor', 'reap.py'), '--sweep', '--dry-run'],
+      // Beside this hook, derived the way the remedy line below derives it (TOOL-aRepatriatedFork-2 S2).
+      [path.join(__dirname, 'reap.py'), '--sweep', '--dry-run'],
       {
         cwd: root,
         encoding: 'utf8',

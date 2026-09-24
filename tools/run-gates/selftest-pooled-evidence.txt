@@ -34,23 +34,23 @@
 # step calibrates the population `--kit tools/unattended --list` resolves and commits the rows.
 #
 # <row>	<condition>	<node>	<max seconds>	<rc>	<fails>	<executed>	<readings>	<date>
-unattended adopter e2e	pooled@8x1	a	303	0	0	100	3	2026-09-23
-unattended arms-groups selftest	pooled@8x1	a	10	0	0	35	3	2026-09-23
-unattended brief-recorded selftest	pooled@8x1	a	299	0	0	-	3	2026-09-23
-unattended cross-component	pooled@8x1	a	480	0	0	21	3	2026-09-23
-unattended driver selftest	pooled@8x1	a	6300	0	0	1391	3	2026-09-23
-unattended gate selftest shard 1/8	pooled@8x1	a	2516	0	0	86	3	2026-09-23
-unattended gate selftest shard 2/8	pooled@8x1	a	3090	0	0	69	3	2026-09-23
-unattended gate selftest shard 3/8	pooled@8x1	a	2266	0	0	49	3	2026-09-23
-unattended gate selftest shard 4/8	pooled@8x1	a	3768	0	0	102	3	2026-09-23
-unattended gate selftest shard 5/8	pooled@8x1	a	1893	0	0	64	3	2026-09-23
-unattended gate selftest shard 6/8	pooled@8x1	a	2104	0	0	78	3	2026-09-23
-unattended gate selftest shard 7/8	pooled@8x1	a	2247	0	0	95	3	2026-09-23
-unattended gate selftest shard 8/8	pooled@8x1	a	2418	0	0	94	3	2026-09-23
-unattended gate-guard selftest	pooled@8x1	a	201	0	0	165	3	2026-09-23
-unattended pass-order selftest	pooled@8x1	a	400	0	0	-	3	2026-09-23
-unattended playbook selftest	pooled@8x1	a	866	0	0	123	3	2026-09-23
-unattended stall-recorder selftest	pooled@8x1	a	44	0	1	45	2	2026-09-23
-unattended stop-guard selftest	pooled@8x1	a	106	0	1	114	2	2026-09-23
-unattended resume-tick selftest	pooled@8x1	a	550	0	0	163	2	2026-09-23
-unattended runlog-writer selftest	pooled@8x1	a	165	0	0	163	1	2026-09-23
+unattended adopter e2e	pooled@8x1	a	363	0	0	100	4	2026-09-24
+unattended arms-groups selftest	pooled@8x1	a	10	0	0	35	4	2026-09-24
+unattended brief-recorded selftest	pooled@8x1	a	360	0	0	-	4	2026-09-24
+unattended cross-component	pooled@8x1	a	543	0	0	21	4	2026-09-24
+unattended driver selftest	pooled@8x1	a	7161	0	0	1542	4	2026-09-24
+unattended gate selftest shard 1/8	pooled@8x1	a	2829	0	0	86	4	2026-09-24
+unattended gate selftest shard 2/8	pooled@8x1	a	3505	0	0	69	4	2026-09-24
+unattended gate selftest shard 3/8	pooled@8x1	a	2509	0	0	49	4	2026-09-24
+unattended gate selftest shard 4/8	pooled@8x1	a	4460	0	0	123	4	2026-09-24
+unattended gate selftest shard 5/8	pooled@8x1	a	2090	0	0	64	4	2026-09-24
+unattended gate selftest shard 6/8	pooled@8x1	a	2345	0	0	78	4	2026-09-24
+unattended gate selftest shard 7/8	pooled@8x1	a	2510	0	0	95	4	2026-09-24
+unattended gate selftest shard 8/8	pooled@8x1	a	2694	0	0	105	4	2026-09-24
+unattended gate-guard selftest	pooled@8x1	a	234	0	0	168	4	2026-09-24
+unattended pass-order selftest	pooled@8x1	a	496	0	0	-	4	2026-09-24
+unattended playbook selftest	pooled@8x1	a	949	0	0	123	4	2026-09-24
+unattended stall-recorder selftest	pooled@8x1	a	51	0	1	45	3	2026-09-24
+unattended stop-guard selftest	pooled@8x1	a	123	0	1	114	3	2026-09-24
+unattended resume-tick selftest	pooled@8x1	a	666	0	0	163	3	2026-09-24
+unattended runlog-writer selftest	pooled@8x1	a	290	0	0	163	2	2026-09-24

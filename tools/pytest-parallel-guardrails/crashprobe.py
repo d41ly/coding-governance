@@ -51,7 +51,7 @@ except ImportError:  # bare-stdlib import (the kit self-test); hooks never fire 
         return fn
 
 
-KIT_PYTEST_GUARDRAILS_VERSION = "1.0"
+KIT_PYTEST_GUARDRAILS_VERSION = "1.1"
 
 _WID = os.environ.get("PYTEST_XDIST_WORKER", "master")
 _DIR = os.environ.get("CRASHPROBE_DIR") or os.getcwd()

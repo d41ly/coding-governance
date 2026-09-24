@@ -1,6 +1,6 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.11
+gov:kit drift-audit@1.13
 
 Copied from tools/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
 then run `python tools/drift-audit/drift_report.py`.
@@ -26,6 +26,7 @@ Rules, each of which was a wrong number once:
 from __future__ import annotations
 
 import json
+import pathlib
 import re
 
 # --------------------------------------------------------------------------------------------
@@ -60,7 +61,9 @@ SHRINK_ONLY: dict[str, str] = {
 
 def _example_gate_leg_count(ctx) -> tuple[int, int]:
     """Charter prose claims N gate legs; the manifest defines M. Classic hand-kept twin."""
-    legs = json.loads((ctx.root / "tools/gate-legs.json").read_text(encoding="utf-8"))
+    # This file lands beside the kit, and the manifest sits in the kit's parent: derived, not spelled.
+    legs = json.loads((pathlib.Path(__file__).resolve().parent.parent / "gate-legs.json")
+                      .read_text(encoding="utf-8"))
     legs = legs if isinstance(legs, list) else legs.get("legs", legs)
     actual = len(legs)
     charter = (ctx.root / (ctx.charter or "AGENTS.md")).read_text(encoding="utf-8", errors="replace")

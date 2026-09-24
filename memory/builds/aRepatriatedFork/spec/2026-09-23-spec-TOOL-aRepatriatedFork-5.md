@@ -1,10 +1,20 @@
 # TOOL-aRepatriatedFork-5 — pre-push runs only a tracked, unmodified gate command
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-5-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-5-1-acceptance-ledger.md) | journal | — |
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-build-TOOL-aRepatriatedFork-5-2-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-5-2-acceptance-ledger.md) | journal | TOOL-aRepatriatedFork-8 |
+| [2026-09-24-build-TOOL-aRepatriatedFork-5-3-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-5-3-acceptance-ledger.md) | journal | — |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-5-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-5-build-brief.md) | journal | — |
+| [2026-09-24-prompt-TOOL-aRepatriatedFork-5-fold-a-brief.md](../prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-5-fold-a-brief.md) | journal | — |
+| [2026-09-24-prompt-TOOL-aRepatriatedFork-5-fold-f-brief.md](../prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-5-fold-f-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round2.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round2.md) | diff-review | DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-10 |
 
 <!-- /gen:spec-records -->
 
@@ -22,8 +32,14 @@ upstream, arms it, and makes the declared test escape unable to produce a record
   a tracked script or one of the interpreters `bash` or `sh`, and no option word precedes the first
   path-shaped word. Anything else is refused at exit 1 before the bar runs. The rules are nc's
   rev-3 guard (`.githooks/pre-push:556-652` at nc), taken without change. Observed by AC1, AC2 and AC3.
+  Since rev-3 the executed word is pinned by POSITION rather than by shape: it is word 1, or word 2
+  when word 1 is `bash` or `sh`, and it must be path-shaped, so it passes through the tracked and
+  working-copy checks; nothing sits between the interpreter and the script. The vetted value runs
+  with globbing off, as it was vetted. Observed by AC11.
 - **S2** — The decision line names the bar on both arms, as `— bar: <label>`, and the run-log END line
-  carries a `bar` key whose value is `default`, `tracked` or `stub`. Observed by AC4 and AC5.
+  carries a `bar` key whose value is `default`, `tracked` or `stub`. Observed by AC4 and AC5. Since
+  rev-3 a vetted or default bar also carries `bar_path` and `bar_blob`, and push-main's lander marker
+  carries the class, path and blob after the pushed commit. Observed by AC12.
 - **S3** — `GOV_GATE_CMD_TEST=1` is the ONE declared escape. It waives S1, labels the decision line
   `bar: STUB <command>`, and records `bar stub`. Observed by AC4 and AC6.
 - **S4** — `tools/push-main.sh` writes no `LANDER_MARKER` for a push made under `GOV_GATE_CMD_TEST`,
@@ -37,6 +53,9 @@ upstream, arms it, and makes the declared test escape unable to produce a record
 - **S7** — The prose that states the old contract is corrected: `AGENTS.md:534` says `GOV_GATE_CMD`
   "overrides the gate for testing", and `tools/unattended/PROTOCOL.template.md:542-543` lists
   "overriding the gate command" among what the kit does not close. Observed by AC9.
+- **S8** — The value must also equal this kit's own runner, `bash <kit root>/run-gates/run-gates.sh`,
+  or the `GATE_CMD` that `.unattended.conf` declares at the pushed sha, read in a subshell with an
+  inherited `GATE_CMD` unset. Any tracked script that exits 0 passed S1 alone. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -145,10 +164,29 @@ The four hostile values AC2 names, in nc's order. Each landed at rc 0 on some vi
 | `gatepayload scripts/unattended-bar.sh` | a rule reading only path-shaped words (rev-2) |
 | `bash -c gatepayload scripts/unattended-bar.sh` | a rule ignoring an interpreter option (rev-2) |
 | `bash scripts/unattended-bar.sh`, working copy rewritten | a rule reading the blob name, not its bytes (rev-2) |
+| `bash gatepayload scripts/unattended-bar.sh` | a rule constraining word 1 and enumerating shapes for the rest (nc rev-3; closing review round 1 B1) |
+| `sh x.pyc scripts/unattended-bar.sh` | the same, with a word an ignore rule hides (B1) |
+| `bash scripts/other-bar.sh`, tracked, clean, undeclared | a rule accepting any tracked, clean script (closing review round 1 M1) |
 
 Two refusals are added, each writing `RUNLOG_DECISION=refuse-bar` and exiting 1 before the bar:
-a value naming no script, and a value failing any S1 clause. Their messages are nc's, with
-`$GOV_KITROOT` kept in the sanctioned-use hint.
+a value naming no script, and a value failing any S1 clause. Their messages are nc's, except the
+sanctioned-use hint: since rev-4 the option, executed-word and untracked refusals print
+`Sanctioned use: <knob>='<value>'`, where the value is the declared `GATE_CMD` when there is one and
+the kit's own runner otherwise, so the advice is a value the declared arm admits. Observed by AC13. nc's block keeps one exit per S1 clause, so the two
+refusals are FIVE exit sites sharing one code, and the run-log suite's exit table carries that row
+with a count of 5. A refused END carries no `bar` key: the class is set only once the value is vetted.
+
+### The ported harness
+
+`.githooks/pre_push_bar_selftest.py`, Python as nc wrote it, with its functions renamed to the verb
+table (`print_ok`, `print_fail`, `check_refused`, `check_landed`, `run_push`, `read_tip`) and every
+text encoding named. It adds three `bar` checks and one `refuse-bar` check on the run-log END, so it
+observes AC5 as well. Its leg is `pre-push bar self-test`: held with the other hook suites
+(`chunk = selftests`, `subject = repo`), shipped by the push-main entry beside `pre-push.test.sh` with
+its own `[[gate_leg]]` so an adopter can retire its copy, ceiling 600 over one out-of-band proxy
+reading, and claimed, with the file's own `git-hooks` key, by the run-gates dossier. `tools/check-testsuite-counts.sh` grades `*.test.sh`
+only, so a Python leg has no row there; the harness prints `PASS (<n> assertions)` against its own
+`FLOOR_ASSERTIONS` instead.
 
 ### Placement
 
@@ -161,7 +199,10 @@ bar. It runs only on a default-branch push, which is the only push that runs a b
 Identifiers minted, each in the shell-variable cell: `bar_label`, and the loop scratch
 `_bar_tok`, `_bar_bad`, `_bar_first`, `_bar_opt`, `_bar_seen`, `_bar_dirty`, `_w`, `_wt`, `_bl`,
 all nc's spellings. One run-log decision value, `refuse-bar`. One run-log key, `bar`. One
-environment name, `GOV_GATE_CMD_TEST`, which nc already exports.
+environment name, `GOV_GATE_CMD_TEST`, which nc already exports. Rev-3 adds `_bar_prog` (the
+executed word), `_bar_decl` (the declared value), `_n`, `bar_path`, `bar_blob`, `RUNLOG_BAR_PATH`,
+`RUNLOG_BAR_BLOB`, and the run-log keys `bar_path` and `bar_blob`; it retires the first-word arm,
+which the positional arm subsumes. Rev-4 adds `_bar_ok`, the value the refusals advise.
 
 ### Migration
 
@@ -178,7 +219,9 @@ environment name, `GOV_GATE_CMD_TEST`, which nc already exports.
 | inCMS | `.githooks/pre-push`, role `project-owned` (`kits.json` `role_dispositions`) | unchanged by this unit; see the external edge |
 
 nc's `.claude/skills/unattended/SKILL.md:904` names `GOV_GATE_CMD='bash scripts/unattended-bar.sh'`,
-a tracked script, so nc's one sanctioned consumer passes S1 unchanged.
+a tracked script, so nc's one sanctioned consumer passes S1 unchanged. Since rev-3 it passes S8 only
+when nc's `.unattended.conf` declares that same value as `GATE_CMD`; an adopter exporting any bar
+other than the kit's runner declares it there, in the same commit that adopts this hook.
 
 ### Rollout
 
@@ -198,6 +241,16 @@ so no marker moves; the unattended kit bumps for S7's template edit.
 - `tools/unattended/unattended.sh`, `tools/unattended/check-unattended.sh`, `tools/unattended/check-pass-order.sh`, `tools/unattended/check-brief-recorded.sh` (the `KIT_UNATTENDED_VERSION` bump)
 - `AGENTS.md`
 - `tools/gate-legs.json` (a leg for the ported bar self-test, if F2 lands that way)
+- as built, also: `.githooks/pre_push_bar_selftest.py`, `tools/govkit/entries/push-main.kit.toml`,
+  `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt`,
+  `tools/run-gates/selftest-budgets.txt`, `memory/map/features/run-gates.md` with its generated map,
+  `memory/guides/UNATTENDED-PROTOCOL.md`, and every other `unattended@` marker carrier for 1.29
+- gate repair at VERIFYING (rev-5): `tools/check-spec-tokens.py`, because the ported suite's name
+  met two of its shape rules. Its BAR read a suite FILE as exactly `selftest.py` while gate-guard D4
+  reads any word ENDING `selftest.py`, so the manifest parity arm reddened on
+  `python3 .githooks/pre_push_bar_selftest.py`; BAR now takes D4's reading. Its CODE SYMBOL claim
+  class refused any underscore, so the git-hooks key the run-gates dossier claims read as a symbol;
+  a filename shape now clears it. The suite keeps the name the nc port carries.
 
 ### Alternatives rejected
 
@@ -258,6 +311,21 @@ so no marker moves; the unattended kit bumps for S7's template edit.
 - **AC10** — When the ported harness disables the first-word, option and working-copy arms in a copy
   of `.githooks/pre-push`, the three rev-3 evasions of AC2 land, and the unmutated hook refuses them.
   Red when: the mutation anchor is missing or the evasions do not land, so the arms are unproven.
+  Since rev-3 the mutation disables the executed-word, option, working-copy and declared arms, and
+  the AC11 and AC12 evasions land under it too.
+- **AC11** — When the fixture pushes with `bash gatepayload scripts/unattended-bar.sh` or
+  `sh x.pyc scripts/unattended-bar.sh`, each payload on PATH, `.githooks/pre-push` refuses with
+  `would RUN '<word>'` before the payload prints anything.
+  Red when: a bare word between the interpreter and a tracked script runs as the bar.
+- **AC12** — When the fixture pushes with `bash scripts/other-bar.sh`, tracked, clean and green but
+  not the `GATE_CMD` its `.unattended.conf` declares, the hook refuses it; the declared value lands,
+  its run-log END carries `bar_path`, and push-main's marker names `bar tracked <path>`.
+  Red when: any tracked script that exits 0 is accepted as the bar, or nothing records which ran.
+- **AC13** — When the fixture's option, executed-word and untracked refusals each print their
+  `Sanctioned use:` value, with another tracked bar declared and then with none, pushing that value
+  back yields a decision line naming it as the bar and no refusal.
+  Red when: a refusal advises a value the vetting itself refuses, which the round-2 hook did with
+  `bash $GOV_KITROOT/unattended-bar.sh`.
 
 ## 7. Gates
 
@@ -266,23 +334,49 @@ so no marker moves; the unattended kit bumps for S7's template edit.
 New arm: `.githooks/pre-push.test.sh` · nc's arms 25-29b, run first against the a7c78ad2 hook to observe `GOV_GATE_CMD=true` landing · none
 New arm: `tools/push-main.test.sh` · a landing under `GOV_GATE_CMD_TEST=1` with `LANDER_MARKER` declared, observed first to write the marker · none
 New arm: a port of nc's `scripts/pre_push_bar_selftest.py` under `.githooks/`, whose mutation arms M1-M3 observe the evasions landing on every run · none
+New arm: `.githooks/pre_push_bar_selftest.py` · rows 9-11 and 1c, and mutation arms M4-M5, each observed landing against the c6513db0 hook first · none
+New arm: `.githooks/pre_push_bar_selftest.py` · rows 12-13 (AC13), all six observed failing against the 995a5185 hook first · none
 
 ## 8. Open questions
 
 - **F1 — record the full bar command in the run log, or only its class?** The class is enough to tell
   a stub from a gate and keeps the line under `RUNLOG_MAX_BYTES` (`.githooks/pre-push:95`).
   Recommendation: the class.
+  RESOLVED (owner, 2026-09-23): the class, as recommended.
 - **F2 — port nc's python harness as its own leg, or fold its cases into `.githooks/pre-push.test.sh`?**
   Its mutation step re-disables the three arms on every run, which the shell suite does not do.
   Recommendation: port it as a leg beside the hook, since the mutation is the only control that keeps
   observing the arms fail.
+  RESOLVED (owner, 2026-09-23): port it as its own leg beside the hook, as recommended.
 - **F3 — should the guard also refuse `GOV_GATE_CMD_TEST` when `.unattended.conf` declares a live
   run?** S4 already withholds the lander marker. Recommendation: no.
+  RESOLVED (owner, 2026-09-23): no, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, measured against gov a7c78ad2, nc f69e2ffb and inCMS 1bc57da27,
   with the exploit reproduced in a scratch repo under the session scratchpad.
+- rev-2 · 2026-09-23 · built. §4 Data model: the two refusal classes are five exit sites of one
+  code, and a refused END records no `bar`. §4 gains "The ported harness": Python kept, renamed to
+  the verb table, AC5's run-log checks added, shipped with its own leg; it has no testsuite-count row
+  because that leg grades `*.test.sh` only. Unattended kit bumped 1.28 to 1.29 for S7.
+- rev-3 · 2026-09-24 · closing review round 1 B1 and M1 folded. B1: S1 pins the executed word by
+  position (word 1, or word 2 after `bash`/`sh`, path-shaped) and runs the value with globbing off;
+  the evasion table gains two rows; AC11 added; AC10's mutation widened. M1: S8 added, the value
+  must be the kit's runner or `.unattended.conf`'s `GATE_CMD` at the pushed sha; S2 gains
+  `bar_path`/`bar_blob` on END and in the lander marker, which widens F1's "class only" answer by the
+  path and blob the review asked for, still not the full command; AC12 added; §4 Migration gains the
+  adopter declaration. Not taken from M1's left-shift: an `unattended.test.sh` arm in which
+  `--landed` compares the marker's bar with the declared one, since `--landed` does not compare yet
+  and that is an unattended-kit change outside this fold; the marker now carries what it would read.
+- rev-4 · 2026-09-24 · closing review round 2 L2 folded. §4 Data model: the three refusals' sanctioned-use
+  hint prints the declared `GATE_CMD`, else the kit's runner, instead of `$GOV_KITROOT/unattended-bar.sh`,
+  which is untracked here and which S8's declared arm refuses; §4 Inventory gains `_bar_ok`; AC13
+  added, and §7 gains its arm, rows 12-13 of the ported harness, which push each advice back.
+- rev-5 · 2026-09-24 · gate repair at VERIFYING — leg `spec-tokens self-test`: its manifest
+  parity arm and its AC4 live-keys arm refused `pre_push_bar_selftest.py`. §4 Files touched records
+  the two shape rules in `tools/check-spec-tokens.py` that now read the name as a suite and as a
+  filename key. AC1-AC13 are unchanged.
 
 ## 10. Reuse audit
 

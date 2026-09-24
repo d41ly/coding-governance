@@ -8,6 +8,7 @@
 #
 #   bash tools/workflows/check-verifier-fanout.sh          # every workflow script git can see
 #   bash tools/workflows/check-verifier-fanout.sh <file>…  # explicit files (the self-test's fixtures)
+#   ... --print-cap                                         # the hook's effective fan-out cap
 #
 # Exit 0 = clean · 1 = a rule the hook enforces is broken · 2 = misconfigured.
 #
@@ -25,23 +26,13 @@ set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "verifier-fanout: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-# ---- WHERE THIS KIT LIVES, DERIVED -- TOOL-dRetiredFork-10 ------------------------------------
-# This script spells no install prefix. It is `tools/` here, `scripts/` at both measured adopters,
-# and whatever the next one picks. Three carve-outs and three divergence rows existed for a path
-# each script can work out from its own location.
-#
-# GIT COMPUTES THE REPO-RELATIVE PATH. This does NOT subtract `--show-toplevel` from `pwd`, which
-# is the obvious spelling and is broken on MSYS: `pwd` yields /c/projects/... while
-# `--show-toplevel` yields C:/projects/..., so the subtraction leaves the string untouched and the
-# population matches NOTHING. Measured during this unit -- population 0, no error, no diagnostic.
-#
-# An EMPTY prefix is a real layout, not a bug: a kit installed at the repository root has no
-# prefix to strip, and the population is then every *.js the repo holds.
+# ---- THE POPULATION HAS NO PREFIX -- TOOL-aRepatriatedFork-4 ----------------------------------
+# Every `*.js` git lists, then the `export const meta` marker below. The marker IS the selector,
+# as it is in check-workflow-syntax.js, so a harness is judged wherever it lives -- both adopters
+# keep theirs under `.claude/workflows/`, which a kit-prefix filter never reached, and each carried
+# a hand-kept fork to compensate. The prefix TOOL-dRetiredFork-10 derived here was doing nothing
+# the marker does not, except hiding those harnesses.
 HERE="$(cd "$(dirname "$0")" && pwd)"
-KIT_PREFIX="$(cd "$HERE/.." && git rev-parse --show-prefix 2>/dev/null)"
-KIT_PREFIX="${KIT_PREFIX%/}"
-if [ -n "$KIT_PREFIX" ]; then POP_RE="^$KIT_PREFIX/.*\.js$"; else POP_RE='\.js$'; fi
-KIT_SAYS="${KIT_PREFIX:-the repository root}"
 
 # ---- THE PREDICATE, PROBED -------------------------------------------------------------------
 # Three rungs, and the third is not optional. NicoCares keeps its hooks a directory up from its
@@ -59,13 +50,18 @@ done
 [ -n "$HOOK" ] || { echo "verifier-fanout: no agent-cap.js at $HERE/hooks/, $HERE/../hooks/ or $ROOT/.claude/hooks/ — this gate has no predicate to delegate to"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "verifier-fanout: node not found — the predicate is a node hook"; exit 2; }
 
+# `--print-cap` relays the hook's answer for this checkout's effective fan-out cap and judges nothing.
+# It exists so a sibling in this kit (check-protocol-parity.test.sh) asks the hook through the one
+# probe above, instead of locating the hook again or re-parsing `.agent-cap.conf` itself.
+[ "${1:-}" = --print-cap ] && exec node "$HOOK" --print-cap </dev/null
+
 # The gate and its fixtures are outside their own population: the test's RED fixtures spell the banned
 # shape on purpose, and a fixture that lands in the repo would otherwise make the merge bar
 # permanently red. (They live under `mktemp -d`, so this is belt-and-braces — the same shape
 # check-review-join.sh carries for the same reason.)
 SELF_EXCLUDE='(^|/)check-verifier-fanout\.(sh|js|test\.sh)$'
-# BASENAME-anchored for the same reason as the population's derived prefix: an exclusion
-# spelled with a rooted literal is the same class as the filter it scopes.
+# BASENAME-anchored, because the gate is installed under whatever prefix an adopter picks: an
+# exclusion spelled with a rooted literal would name a path that exists only here.
 
 if [ "$#" -gt 0 ]; then
   FILES=$(printf '%s\n' "$@")
@@ -73,8 +69,11 @@ if [ "$#" -gt 0 ]; then
 else
   # tracked AND untracked-but-unignored, matching the other two JavaScript gates: a new harness is
   # judged the moment it exists, not the moment someone remembers to stage it.
+  # A `*.template.js` is a RENDER SOURCE, not a harness (TOOL-aRepatriatedFork-7 S7): its fan-out cap
+  # is the `{{FANOUT_CAP}}` token, which no hook can resolve and no runtime ever sees. What runs is
+  # its render, which IS in this population, and check-protocol-parity.test.sh pins the render to it.
   FILES=$(git ls-files --cached --others --exclude-standard -- '*.js' \
-    | grep -E "$POP_RE" | grep -vE "$SELF_EXCLUDE" | LC_ALL=C sort -u || true)
+    | grep -vE "$SELF_EXCLUDE" | grep -vE '\.template\.js$' | LC_ALL=C sort -u || true)
   EXPLICIT=0
 fi
 
@@ -93,7 +92,7 @@ if [ -z "$SCAN" ]; then
   if [ "$EXPLICIT" = 1 ]; then
     echo "verifier-fanout: none of the named files exist — nothing was scanned, which is not a pass"
   else
-    echo "verifier-fanout: no workflow script under $KIT_SAYS/ — the population is empty, which is not a pass"
+    echo "verifier-fanout: no workflow script (a *.js exporting meta) anywhere git lists, .claude/workflows/ included — the population is empty, which is not a pass"
   fi
   exit 1
 fi
@@ -118,5 +117,9 @@ while IFS= read -r f; do
   fi
 done <<<"$SCAN"
 
-[ "$st" = 0 ] && echo "verifier-fanout: clean — $n workflow script(s) obey the ≤5-verifier rule"
+# THE CAP PRINTED IS THE EFFECTIVE ONE (TOOL-aRepatriatedFork-7 S6), and the HOOK answers it for the
+# root this script stands in (closing review round 1 residual b): the sed this replaced matched
+# nothing on a BOM-led conf and printed the ceiling over a hook enforcing 4. A refusal reds the run.
+CAPN=$(node "$HOOK" --print-cap </dev/null 2>&1) || { printf 'verifier-fanout: %s\n' "$CAPN"; st=1; }
+[ "$st" = 0 ] && echo "verifier-fanout: clean — $n workflow script(s) obey the ≤$CAPN-verifier rule"
 exit "$st"

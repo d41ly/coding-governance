@@ -13,13 +13,26 @@ version under **two** kit ids, and both are paired — see its line 3 and `check
 
 ## What this kit RENDERS, and its one renderer
 
-`check-protocol-parity.test.sh --render` writes both artifacts below, and the same script with no
+`check-protocol-parity.test.sh --render` writes every artifact below, and the same script with no
 argument is the leg that grades them:
 
 | rendered | from | tokens |
 |---|---|---|
 | `<memory root>/guides/REVIEW-PROTOCOL.md` | `REVIEW-PROTOCOL.template.md` | `TOOL_ROOT` |
-| `unattended-build.js`, beside its template | `unattended-build.template.js` | `KIT_DIR`, `TOOL_ROOT`, `MEMORY_TREE_DIR` |
+| `unattended-build.js`, beside its template | `unattended-build.template.js` | `KIT_DIR`, `TOOL_ROOT`, `MEMORY_TREE_DIR`, `FANOUT_CAP` |
+| `tier2-review.js`, beside its template | `tier2-review.template.js` | `FANOUT_CAP` |
+| `drift-audit-code.js`, beside its template | `drift-audit-code.template.js` | `FANOUT_CAP` |
+| `drift-audit-state.js`, beside its template | `drift-audit-state.template.js` | `FANOUT_CAP` |
+
+**`FANOUT_CAP` is the agent-cap hook's own declaration** (TOOL-aRepatriatedFork-7): `FANOUT_CAP=<n>` in
+`.agent-cap.conf` at the checkout root, ANSWERED by the hook (`agent-cap.js --print-cap`) rather than
+parsed here, so the value rendered is the value enforced and a repo that
+lowers its cap receives harnesses its hook admits. No conf renders the ceiling, byte-identical to the
+harnesses as they shipped before. A value the hook would refuse makes the render refuse too. The
+three harnesses beside the build harness moved from `engine` to `rendered` at review-harness 1.9, and
+an install from before that migrates them the way the build harness migrated at 1.8, below. A
+`*.template.js` is a render source, not a harness: the verifier fan-out and syntax gates judge its
+render and skip the template.
 
 **Edit the template, never the render.** The build harness names four install paths: the driver,
 the bug-class checklist, the review sub-workflow it awaits and the child it hands the caller. A
@@ -59,8 +72,8 @@ rendered from review-harness 1.8".
 `TOOL-dRetiredFork-10`, which cost three carve-outs at one adopter and three divergence rows at
 another — six hand-maintained records for a path each script can work out from where it is standing.
 
-**The population.** Each shell gate derives the kit directory from its own location and scopes the
-population to it:
+**The population.** Each shell gate derives the kit directory from its own location — the
+predicate's probe needs it, and `check-review-join.sh` scopes its population to it:
 
 ```sh
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -77,11 +90,15 @@ and there is no error: measured at population 0 during the unit that wrote this.
 *An empty prefix is a real layout.* A kit installed at the repository root has nothing to strip, and
 the population is then every `*.js` the repo holds.
 
-`check-workflow-syntax.js` has no prefix filter at all, and that asymmetry is deliberate rather than
-an oversight. It applies a `meta`-declaration marker to every candidate, so its population is already
-*a file declaring workflow meta* and a prefix was doing nothing but naming a directory. The other two
-apply no marker filter, so removing theirs would widen them into files whose own ban tables trip the
-predicate — measured, and it reds the bar.
+**The population rule, for all three gates** (TOOL-aRepatriatedFork-4):
+
+- `check-workflow-syntax.js` and `check-verifier-fanout.sh` apply NO prefix filter. Each applies a
+  `meta`-declaration marker to every `*.js` git lists, so the population is *a file declaring
+  workflow meta* wherever it lives — including `.claude/workflows/`, where both adopters keep their
+  harnesses and where a prefix filter judged none of them.
+- `check-review-join.sh` applies no marker filter, so dropping its prefix would widen it into files
+  whose own ban tables trip the predicate — measured, and it reds the bar. It keeps the derived prefix
+  and ADDS `.claude/workflows/` as a literal, the harness's own convention. `.claude/hooks/` stays out.
 
 **The predicate.** Three rungs, tried in order, then a refusal:
 

@@ -1,10 +1,16 @@
 # TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-8 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-10-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-10-1-acceptance-ledger.md) | journal | — |
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-10-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-10-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round2.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round2.md) | diff-review | DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 |
 
 <!-- /gen:spec-records -->
 
@@ -42,13 +48,21 @@ and writes the configuration route down, so nc runs gov's engine and gov's rende
   `kit-dogfood-parity.test.sh:54` use the parent only, which is empty for a flat install, so nc's
   rendered `TEMPLATE-SPEC.md` names the codebase-map generator and extractors with no prefix while
   they sit under `scripts`, and nc registers both as dead paths in its
-  `corpus-path-unresolved.txt` rows 38 and 39. Observed by AC7.
+  `corpus-path-unresolved.txt` rows 38 and 39. The receipt is read ONCE, by a marked block
+  `derive_kit_paths` whose canonical copy sits in `tools/lib/render-doc.sh` beside `render_doc`: it
+  resolves each `{{TOOL_ROOT}}<home>/<file>` the templates cite through the inline `resolve_kit_dir`,
+  receipt row first, so a per-entry `kit.<entry>.prefix` override renders where its row puts the
+  file, and emits the top-level `prefix` for the rest, read as JSON. Both renderers carry the block
+  inline and the `tools/lib/resolve-python.test.sh` parity table gates the copies. Observed by AC7.
 - **S7** — A class gate: `tools/check-kit-placeholders.py` refuses a `rendered` template that spells
   `KEY=value` for a key its own kit's `[config]` declares, since that is the repo's own value leaking
-  into an adopter's doc. Observed by AC8.
+  into an adopter's doc. The key set is the `[config]` key lists, its `defaults`, and every key the
+  kit's shipped `<file>.example` assigns; a key any `rendered` rule of that kit declares as a
+  placeholder is exempt, because the kit states the adopter's value through it. Observed by AC8.
 - **S8** — The project-leg seam dRetiredFork-16 ruled for nc's check 90, shipped as a worked,
-  runnable example in `tools/memory-tree/README.md` rather than a JSON fragment and a promise, and
-  its one unobserved claim observed. Observed by AC9.
+  runnable example in `tools/memory-tree/README.md` rather than a JSON fragment and a promise, with
+  the leg's own exit on an absent script observed and the runner half of that claim recorded as
+  unobserved. Observed by AC9.
 - **S9** — `tools/memory-tree/README.md` gains an adopter section mapping each carve-out shape to
   its route, with the carve-out table in §4 as its worked instance. Observed by AC10.
 - **S10** — `KIT_MEMORY_TREE_VERSION` moves and every paired marker moves with it; the two new
@@ -74,6 +88,8 @@ and writes the configuration route down, so nc runs gov's engine and gov's rende
 
 - **hands-off** external — a governing-docs list for check 15, which nc's unnumbered `corpus_ids.py` extension asks for
 - **hands-off** external — NicoCares applies the §4 carve-out table in its own tree, config and data only
+- **hands-off** `DEPL-aRepatriatedFork-20` — the engine's grandfathering, which decides how
+  inCMS's records with no Serves line are graded once it runs gov's engine.
 
 ## 4. Design
 
@@ -156,6 +172,7 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
 - `tools/memory-tree/adopt-memory-tree.sh`
 - `tools/memory-tree/kit-dogfood-parity.test.sh`
 - `tools/lib/render-doc.sh`
+- `tools/lib/resolve-python.test.sh`
 - `tools/memory-tree/.memory-tree.conf.example`
 - `tools/memory-tree/kit.toml`
 - `tools/memory-tree/README.md`
@@ -176,7 +193,7 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
 
 - security — no new write path; the new key is validated against a closed set before any check
   runs, and a conf value reaches the render through the existing quoted parameter substitution.
-- perf / scale — one extra awk pass over check 21's A rows, and one `sed` read of the receipt.
+- perf / scale — one extra awk pass over check 21's A rows, and one python run per render that reads the receipt as JSON and resolves each cited sibling file.
 - error / empty / loading states — blank key means today's behaviour; an unknown value aborts at
   exit 2 naming the key; an undeclared placeholder key renders its explicit undeclared text.
 - observability — the exempted artifact count prints on every run, zero included, and the key
@@ -215,15 +232,17 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
   Red when: the template still spells gov's value.
 - **AC7** — When the same render runs from a kit installed flat at `scripts/` with a receipt whose
   `prefix` is `scripts`, the rendered `memory/TEMPLATE-SPEC.md` names the codebase-map generator
-  under the `scripts` prefix.
-  Red when: `TOOL_ROOT` is still the empty parent of a flat kit directory.
+  under the `scripts` prefix, and a file whose receipt row re-homes it, `codebase-map/reuse_lookup.py`
+  at `lib/cm/`, renders at that row's path.
+  Red when: `TOOL_ROOT` is still the empty parent of a flat kit directory, or the render reads only
+  the top-level `prefix`.
 - **AC8** — `python tools/check-kit-placeholders.py` exits 1 on today's
   `tools/memory-tree/HYGIENE.template.md`, naming `INDEX_CAP_LINES`, and exits 0 after S5.
   Red when: the arm scans no template or skips keys absent from `optional_keys`.
-- **AC9** — When a fixture target's `gate-legs.json` carries one leg, `project build-README comment
-  convention`, whose script is absent, that fixture's gate runner refuses naming the script. This is
-  the claim `TOOL-dRetiredFork-16` recorded as NOT VERIFIED.
-  Red when: the runner skips the leg silently.
+- **AC9** — When the leg's argv, `bash scripts/check-build-readme-comments.sh`, runs in a fixture
+  where the script is absent, it exits 127 naming the script, and `tools/memory-tree/README.md`
+  ships the runnable script and says which half of `TOOL-dRetiredFork-16`'s claim that observes.
+  Red when: the README ships a fragment and a promise, or claims the runner half as observed.
   cost: a fixture runner hung past 300 s the last time this was attempted; the observation needs a
   bounded single-leg manifest.
 - **AC10** — `bash tools/check-kit-versions.sh` exits 0 after the bump, and `tools/memory-tree/README.md`
@@ -233,11 +252,13 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `kit placeholders (a declared token its adopter substitutes)` · `kit-placeholders self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `kit version markers` · `verdict epoch (kit version dates the engine)`
+`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `kit placeholders (a declared token its adopter substitutes)` · `kit-placeholders self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `install-prefix (shipped surface)`
 
 New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a legacy-listed root `STATUS.md`, a legacy-listed unbound record, an undated `result.json` under each key value, and a tracked `pass-order-waiver.txt` · the hygiene gate's `ARMS_FLOORS` token moves by the branches S3 adds
 New arm: `tools/check-kit-placeholders.test.sh` · a template spelling `INDEX_CAP_LINES=0` under a kit whose conf declares that key · none
 New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a flat `scripts/` install with a receipt, rendered through `--render` · none
+New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · the same receipt re-homing `codebase-map/reuse_lookup.py` to `lib/cm/` · none
+New arm: `tools/lib/resolve-python.test.sh` · a `derive_kit_paths` parity row, two inline copies against `tools/lib/render-doc.sh` · none
 
 ## 8. Open questions
 
@@ -246,20 +267,56 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a flat `scripts/` i
   Options: (a) S3 as written, independent of the cutoff; (b) scope it to the cutoff as nc does.
   Recommendation: (a). A JSON file cannot carry a Serves line at any date, so a date is not what
   decides it.
+  RESOLVED (owner, 2026-09-23): (a), independent of the cutoff, as recommended.
 - **F2 — the receipt as the `TOOL_ROOT` source.** A copy-installed adopter has no receipt and keeps
   the parent derivation, which is right for any kit-per-directory layout and wrong only for a flat
   one. Options: (a) receipt then parent; (b) a declared `TOOL_ROOT` key in `.memory-tree.conf`.
   Recommendation: (a), because the receipt already records the prefix and a second declaration of it
   is a second copy.
+  RESOLVED (owner, 2026-09-23): (a), receipt then parent, as recommended.
 - **F3 — does S8 need pre-commit reach?** nc's check 90 ran under `--staged` inside the engine; as a
   project leg it runs at the push bar only, which is a later signal. Gov does not ship
   `.githooks/pre-commit` to adopters, so nc can call its script from its own hook. Recommendation:
   say so in the README example and build nothing.
+  RESOLVED (owner, 2026-09-23): a README note, build nothing, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, from audit-D §6 and §7 and nc's merged tree, with the
   populations re-measured on node a.
+- rev-2 · 2026-09-23 · built. S7 and AC8 moved: the predicate run over the real tree before wiring
+  redded two unattended templates spelling `ANCHOR_SCOPE="published"` as a described value, and
+  rewriting them changes `memory/guides/UNATTENDED-PROTOCOL.md`, a governance carrier; so a key the
+  kit renders as a placeholder is exempt, and the key set also reads the kit's conf example, where
+  `INDEX_CAP_LINES` is declared. The HYGIENE template's `ROTATION_MODE` sentence was reworded to pass.
+  AC9 moved: a unit pass runs no gate runner, so it observes the leg's own exit instead, and the
+  runner half stays recorded as unobserved in the README. S3's count line goes to stderr beside the
+  other configuration notices. S3 adds no `fail` branch, so the hygiene `ARMS_FLOORS` token does not
+  move.
+- rev-3 · 2026-09-23 · S8 moved to match the rev-2 AC9: it no longer claims the runner half of
+  `TOOL-dRetiredFork-16`'s claim is observed. Found by the post-commit bug-class checklist,
+  `amendment-leaves-its-other-half-standing`.
+- rev-4 · 2026-09-23 · §3 gains the **hands-off** edge back to `DEPL-aRepatriatedFork-20`,
+  which declared its **consumes-from** here and met no matching edge (hygiene check 12).
+- rev-5 · 2026-09-24 · closing review round 1 L4 (residual a). S6, AC7 and §7 moved: the two grep
+  reads of the receipt's first `"prefix"`, in `adopt-memory-tree.sh` and `kit-dogfood-parity.test.sh`,
+  were two copies nothing compared and both ignored a per-entry prefix. They are replaced by one
+  marked block, `derive_kit_paths`, that resolves each cited sibling file through `resolve_kit_dir`
+  and joins the resolve-python parity table; `render_doc` applies its lines before the
+  parent-derived `TOOL_ROOT`. The adopter's `resolve_python` block moved above the first render,
+  because `--render` now needs a python.
+- rev-6 · 2026-09-24 · §5 perf and §7 moved, found by the post-commit bug-class checklist
+  (`amendment-leaves-its-other-half-standing`, `hand-named-gate-list-green-while-the-bar-reds`):
+  §5 still priced the retired `sed` read of the receipt, and §7 did not name
+  `install-prefix (shipped surface)`, whose carried-literal list rev-5 raised by hand.
+- rev-7 · 2026-09-24 · S7: gate repair at VERIFYING, leg `kit placeholders`. A value opening with a
+  `<...>` placeholder is a format description, not a conf value; the template's `ARMS_FLOORS` format
+  line, older than this build, read as gov's value once `TOOL-aRepatriatedFork-9` declared the key.
+- rev-8 · 2026-09-24 · S1: gate repair at VERIFYING, leg `dead-path carriers`. `STATUS.md` is a
+  basename this repo deleted, so the prose this unit wrote naming it, two lines of the memory-tree
+  README and one comment in `check-memory-hygiene.sh`, now says "status file", and S1's two check-4
+  arms in `check-memory-hygiene.test.sh` build `NOTES.md`: the arms grade the entry branch's LEG
+  lookup, which no particular filename owns. The waiver file is shrink-only, so no row was added.
 
 ## 10. Reuse audit
 

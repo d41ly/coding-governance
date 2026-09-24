@@ -12,6 +12,11 @@
 # install scaffolded the adopter's own committed `HYGIENE.md` with seven kit paths that resolve to
 # nothing in their tree, and the hygiene gate exited 0 over it.
 #
+# WHAT "SHIPS" MEANS, and where this gate grades nothing. A repo ships what its govkit registry
+# resolves (TOOL-aRepatriatedFork-16). Installed at a repo that carries no registry — a consumer,
+# which ships nothing onward — BOTH arms skip, each printing a SKIP line, and the gate exits 0. It
+# does not grade a consumer's own tree or the gov files that consumer received.
+#
 # THE POPULATION is what a target repo RECEIVES. Tests, selftests and `*.conf.example` are dropped
 # from the glob and then added back IF the descriptors say an adopter receives them (S5). They were
 # excluded outright until TOOL-cWidenedNet-1, for a reason that was half right: those files BUILD
@@ -83,6 +88,30 @@ CARRIED="${SELF_PREFIX}install-prefix-carried.txt"
 MODE="${1:---check}"
 case "$MODE" in --check|--list|--write-ratchet|--rebaseline) ;;
   *) echo "usage: $(basename "$0") [--check|--list|--write-ratchet|--rebaseline]"; exit 2 ;; esac
+
+# TOOL-cWidenedNet-1 S5 made this THE KIT-SOURCE TEST, ONCE; TOOL-aRepatriatedFork-16 S2 hoisted it
+# above BOTH arms. A repo SHIPS what its registry resolves — `govkit apply` writes nothing a registry
+# does not name — so a repo with no registry ships nothing and neither arm has a population. Arm 1
+# used to grade `${SELF_PREFIX}*` regardless, and at a consumer that is the consumer's own tree plus
+# every gov file it received, against waivers keyed on gov's paths: measured at a `scripts/` adopter,
+# nine hits, five of them gov's own waived bytes, and the kit was deselected. The two paths stay
+# literal on purpose: a kit source's registry sits at gov's layout by definition, because the
+# registry's own directory is an exemption that never travels.
+REGISTRY=tools/govkit/registry.toml  # gov:prefix-literal — the kit-source test: a SOURCE's registry sits at gov's layout by definition
+KIT_SOURCE=no
+[ -f "$REGISTRY" ] && [ -f tools/lib/resolve-python.sh ] && KIT_SOURCE=yes  # gov:prefix-literal — the kit-source test: a SOURCE's resolver sits at gov's layout by definition
+if [ "$KIT_SOURCE" != yes ]; then
+  # A SKIP ANNOUNCES ITSELF (§7), and exits 0 (§8 F1, owner): a consumer's bar stays green when it
+  # has nothing to police, and a printed skip cannot be misread as a graded run.
+  echo "install-prefix: root-install arm SKIPPED — this repo is not a kit SOURCE (it carries no"
+  echo "install-prefix: govkit registry, or no python resolver beside it), so it ships nothing and"
+  echo "install-prefix: its files under ${SELF_PREFIX:-the repo root} were NOT graded on this run."
+  echo "install-prefix: carried-prefix arm SKIPPED — this repo is not a kit SOURCE (it carries no"
+  echo "install-prefix: govkit registry, or no python resolver beside it) and so has no"
+  echo "install-prefix: shippable set to grade. Said out loud rather than passed silently: a skip"
+  echo "install-prefix: that looks like a pass is indistinguishable from coverage."
+  exit 0
+fi
 # The python launcher for the carried-prefix arm below, resolved through the repo's ONE resolver and
 # through nothing else. There is deliberately no `PY=python` fallback: the MS-Store `python3` stub
 # answers `command -v` and exits 9009, so a bare launcher name is not an answer — and the idiom ban
@@ -117,36 +146,30 @@ derive_received_files() {
   # alone: arm 1 intersects its own suffix-excluded files with this set, so a received test is graded
   # for the ROOT spelling while an unshipped one is not. The name now says what the set IS rather
   # than which arm happened to ask first.
+  #
+  # TOOL-aRepatriatedFork-16 S1 — the set itself is govkit's `shipped` verb, the ONE derivation of
+  # what this repo ships; this function used to carry its own heredoc over the same calls. The verb
+  # sits beside the registry the kit-source test already found. A verb that fails prints NOTHING
+  # here, not the named addition alone, so the liveness checks below still see a dead probe.
   # shellcheck source=/dev/null
-  . tools/lib/resolve-python.sh
-  CARRIED_SELF="$CARRIED" "$(resolve_python)" - <<'PYEOF'
-import os
-import pathlib, sys
-CARRIED_SELF = os.environ.get("CARRIED_SELF", "")
-sys.path.insert(0, "tools/govkit")
-import govkit
-root = pathlib.Path(".").resolve()
-reg = govkit.load_toml(root / "tools" / "govkit" / "registry.toml")
-srcs = set()
-for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
-    for row in govkit.resolve_entry(root, d, govkit.canonical_ctx(eid))["survivors"]:
-        if row.get("src"):
-            srcs.add(row["src"])
-srcs.add("WIRE-INTO-PROJECT.md")
-# TOOL-dTieredTribunal-27, AND IT DOES REPRODUCE — under epoch 2, which is how it was finally
-# seen. THE RATCHET MUST NOT GRADE ITSELF. Every row in it IS a path, so the file counts its own
-# rows as carried literals: writing it moves its own count, the next --check reds, and no
-# hand-edit settles it because the edit changes the count again. Under epoch 1 the number
-# happened to sit still and the defect read as FIXED — my own brief recorded it as not
-# reproducing, on a one-pass fixed-point measurement. Widening the predicate moved it 96 -> 107
-# and the loop was immediate.
-#
-# A file whose entire content is a list of paths cannot CARRY one: the paths are its data, not a
-# reference that would arrive at a target and resolve to nothing there. Same reason the arm above
-# already drops this script and the waiver registry from its own population.
-srcs.discard(str(CARRIED_SELF))
-print("\n".join(sorted(srcs)))
-PYEOF
+  . tools/lib/resolve-python.sh  # gov:prefix-literal — reached only inside a kit SOURCE, whose layout is gov's by definition
+  local _shipped
+  _shipped=$("$(resolve_python)" "${REGISTRY%/*}/govkit.py" shipped) || return 0
+  [ -n "$_shipped" ] || return 0
+  # TOOL-dTieredTribunal-27, AND IT DOES REPRODUCE — under epoch 2, which is how it was finally
+  # seen. THE RATCHET MUST NOT GRADE ITSELF. Every row in it IS a path, so the file counts its own
+  # rows as carried literals: writing it moves its own count, the next --check reds, and no
+  # hand-edit settles it because the edit changes the count again. Under epoch 1 the number
+  # happened to sit still and the defect read as FIXED — my own brief recorded it as not
+  # reproducing, on a one-pass fixed-point measurement. Widening the predicate moved it 96 -> 107
+  # and the loop was immediate.
+  #
+  # A file whose entire content is a list of paths cannot CARRY one: the paths are its data, not a
+  # reference that would arrive at a target and resolve to nothing there. Same reason the arm above
+  # already drops this script and the waiver registry from its own population. The verb prints
+  # every survivor, this one included; dropping it is this gate's business, so it happens here.
+  { printf '%s\n' "$_shipped" | tr -d '\r' | cut -f3 | grep -vxF "$CARRIED"
+    echo "WIRE-INTO-PROJECT.md"; } | LC_ALL=C sort -u
 }
 
 # The shipped surface: what a target repo receives, plus the file that tells them where to put it.
@@ -174,30 +197,20 @@ files=$(printf '%s\n' "$glob_set" | grep -vE "$SUFFIX_EXCL" || true)
 
 # The suffix-excluded members come back IF AND ONLY IF an adopter RECEIVES them, which is the
 # descriptor-resolved set the ban arm has always used. An unshipped test is still dropped: nobody
-# reads it but us, and its fixtures are none of this arm's business.
-recv_skip=""
-# TOOL-cWidenedNet-1 S5 — THE KIT-SOURCE TEST, ONCE. Two arms ask it now, and the pair of literal
-# paths it needs is exactly the sort of thing this gate exists to stop being retyped. The carried
-# arm below reads this variable rather than repeating the test.
-KIT_SOURCE=no
-[ -f tools/govkit/registry.toml ] && [ -f tools/lib/resolve-python.sh ] && KIT_SOURCE=yes
-
-if [ "$KIT_SOURCE" = yes ]; then
-  _recv=$(derive_received_files | tr -d '\r' | grep -v '^$' | LC_ALL=C sort)
-  if [ -n "$_recv" ]; then
-    _extra=$(printf '%s\n' "$glob_set" | grep -E "$SUFFIX_EXCL" | LC_ALL=C sort \
-             | comm -12 - <(printf '%s\n' "$_recv") || true)
-    [ -n "$_extra" ] && files=$(printf '%s\n%s\n' "$files" "$_extra" | grep -v '^$' | LC_ALL=C sort -u)
-  else
-    # The population DIED rather than being empty. Both other arms already refuse on this, and a
-    # silent narrowing here would be the same defect with a quieter failure mode.
-    echo "install-prefix: the received-set derivation resolved NOTHING, so arm 1 cannot tell a"
-    echo "install-prefix: shipped test from an unshipped one. Refusing to grade a narrowed"
-    echo "install-prefix: population over a probe that cannot move."
-    exit 1
-  fi
+# reads it but us, and its fixtures are none of this arm's business. Only a kit source reaches this
+# line (the test above), so the received set always exists here.
+_recv=$(derive_received_files | tr -d '\r' | grep -v '^$' | LC_ALL=C sort)
+if [ -n "$_recv" ]; then
+  _extra=$(printf '%s\n' "$glob_set" | grep -E "$SUFFIX_EXCL" | LC_ALL=C sort \
+           | comm -12 - <(printf '%s\n' "$_recv") || true)
+  [ -n "$_extra" ] && files=$(printf '%s\n%s\n' "$files" "$_extra" | grep -v '^$' | LC_ALL=C sort -u)
 else
-  recv_skip="yes"
+  # The population DIED rather than being empty. Both other arms already refuse on this, and a
+  # silent narrowing here would be the same defect with a quieter failure mode.
+  echo "install-prefix: the received-set derivation resolved NOTHING, so arm 1 cannot tell a"
+  echo "install-prefix: shipped test from an unshipped one. Refusing to grade a narrowed"
+  echo "install-prefix: population over a probe that cannot move."
+  exit 1
 fi
 
 # TOOL-cWidenedNet-1 S1 — THE EXTENSION CLASS, WRITTEN ONCE. Both arms read this string. Two copies
@@ -287,8 +300,11 @@ while IFS= read -r h; do
   check_marker_reason "$h"; _m=$?
   if [ "$_m" = 0 ]; then marked_n=$((marked_n+1)); continue; fi
   if [ "$bad" = 0 ]; then
-    echo "install-prefix: a SHIPPED file spells a root-install kit path. An adopter installs kits at"
-    echo "install-prefix: tools/<kit>/, so these resolve to nothing in their tree — and nothing else"
+    # TOOL-aRepatriatedFork-16 S4: the prefix is the DERIVED one. This line used to name gov's
+    # default, which is false at every other prefix this gate runs under.
+    echo "install-prefix: a SHIPPED file spells a root-install kit path. Kits install at"
+    echo "install-prefix: ${SELF_PREFIX:-the repo root/}<kit>/ here and at an adopter's own prefix there, so"
+    echo "install-prefix: these resolve to nothing in their tree — and nothing else"
     echo "install-prefix: reds. Fix the path, or mark the line \`gov:root-fixture — <reason>\` when the"
     echo "install-prefix: spelling is a deliberate fixture. (The $WAIVERS registry still holds its"
     echo "install-prefix: existing rows and takes no new ones: it keys on <path>:<line> and unpins.)"
@@ -318,12 +334,210 @@ EOF
 [ "$stale" = 0 ] || exit 1
 
 echo "install-prefix: clean — $(printf '%s\n' "$files" | grep -c .) shipped files, $waived_n declared waiver(s), $marked_n marked fixture line(s), no undeclared root-install spelling"
-# A SKIP ANNOUNCES ITSELF (§7). Without this line a run over a repo that is not a kit source is
-# byte-identical to one that graded every received test, and a green row would be misread as a
-# verified one.
-[ -z "$recv_skip" ] || echo "install-prefix: received-set extension SKIPPED — no govkit registry, so this repo is
-install-prefix: not a kit source and arm 1 cannot tell a shipped test from an unshipped one. The
-install-prefix: suffix-excluded files went UNGRADED for the root spelling on this run."
+fi
+
+# ==================== TOOL-aRepatriatedFork-2 S8 — ARM 3, RUNTIME LITERALS =======================
+# The two arms above grade SPELLINGS in text, prose and code alike, and the ban is shrink-only: a
+# runtime literal rides inside a file's recorded count. This arm grades CODE lines only, with ZERO
+# tolerance, because a path an engine RUNS or READS at run time is a defect the day it lands, not a
+# count to drain. Measured before it was wired: the first carried-prefix-style grep missed every
+# `$ROOT/tools/…` argv and every `"tools" / "<kit>"` join, and those were the forks both adopters
+# carried.
+#
+# THE POPULATION is `govkit shipped` rows with role `engine` or `rendered`, minus the suffix
+# exclusion above. `seed` is out (written once, adopter-owned after), and so is `merged`: no writer
+# lands that role (TOOL-aRepatriatedFork-2 spec rev-4). Of those, only CODE files are read — `.py`,
+# `.sh`, `.js`, an extensionless hook, and a fragment's `hook_path`. A rendered `.md` is prose.
+#
+# CODE IS: in `.py`, every line with its comments and its docstring-shaped strings blanked by
+# `tokenize`; in shell, every line whose first non-blank byte is not `#`, heredoc bodies included
+# because they are printed; in `.js`, text outside `//` and `/* */`. THREE PREDICATES: P1 is gov's
+# `tools/` followed by a tracked kit dir or loose file, after a non-path lead character or a
+# `$VAR/`, `${VAR}/` or `$(…)/`; P2 is a quoted `tools` segment joined by `/` or `,` to a quoted
+# segment P1 would accept (py, js); P3 is a quoted kit HOME name used as a path segment beside `/`
+# outside the resolver's own copy (py). A hit exits 1 naming `<path>:<line>` and its predicate.
+#
+# THE MARKER is `gov:prefix-literal — <reason>` on the line, read in the three states
+# `check_marker_reason` reads `gov:root-fixture` in: none, one with no reason (a refusal), one with.
+#
+# WHAT THIS ARM CANNOT SEE: a path assembled from two variables, a literal inside `eval` or `sh -c`
+# text built at run time, a Python path built by `str.join`, and any file no descriptor resolves.
+# An empty population is a dead probe and refuses; it never reads as clean.
+if [ "$MODE" = --check ] || [ "$MODE" = --list ]; then
+  # shellcheck source=/dev/null
+  . "${REGISTRY%/*}/../lib/resolve-python.sh"   # the resolver beside the registry the kit-source test found
+  _rt_py=$(resolve_python) || { echo "install-prefix: the runtime-literal arm has no usable python"; exit 1; }
+  _rt_pop=$("$_rt_py" "${REGISTRY%/*}/govkit.py" shipped | tr -d '\r' \
+            | awk -F'\t' '$2 == "engine" || $2 == "rendered" { print $3 }' \
+            | grep -vE "$SUFFIX_EXCL" | LC_ALL=C sort -u)
+  IFS= read -r -d '' _rt_src <<'RT' || true
+import io
+import os
+import re
+import sys
+import tokenize
+
+MODE = sys.argv[1]
+files = [f for f in sys.stdin.read().split("\n") if f.strip()]
+tracked = [t for t in os.environ.get("RT_TRACKED", "").split("\n") if t.startswith("tools/")]
+dirs = {t.split("/")[1] for t in tracked if t.count("/") >= 2}
+loose = {t.split("/")[1] for t in tracked if t.count("/") == 1}
+if not files or not dirs:
+    print("install-prefix: runtime-literal arm has an EMPTY population (%d file(s), %d kit dir(s))"
+          " — that is a dead probe, not a pass" % (len(files), len(dirs)))
+    sys.exit(1)
+SEG = "|".join(sorted(map(re.escape, dirs | loose), key=len, reverse=True))
+HOME = "|".join(sorted(map(re.escape, dirs), key=len, reverse=True))
+P1 = re.compile(r"tools/(?:%s)(?![A-Za-z0-9_.-])" % SEG)
+LEAD_VAR = re.compile(r"(\$\{?[A-Za-z_][A-Za-z0-9_]*\}?\"?|\$\([^()]*\)\"?)/$")
+P2 = re.compile(r"""(["'])tools\1\s*[/,]\s*(["'])(?:%s)\2""" % SEG)
+P3 = re.compile(r"""/\s*(["'])(?:%s)\1|(["'])(?:%s)\2\s*/(?!/)""" % (HOME, HOME))
+PATHCH = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_./")
+MARK = "gov:prefix-literal"
+
+
+def check_p1(text):
+    for m in P1.finditer(text):
+        i = m.start()
+        if i == 0 or text[i - 1] not in PATHCH or LEAD_VAR.search(text[:i]):
+            return True
+    return False
+
+
+def read_code_py(src):
+    """Source lines with every COMMENT and every docstring-shaped string blanked."""
+    lines = src.split("\n")
+    blank = []
+    try:
+        toks = list(tokenize.generate_tokens(io.StringIO(src).readline))
+    except (tokenize.TokenError, SyntaxError, IndentationError):
+        return lines
+    skip = {tokenize.NL, tokenize.COMMENT, tokenize.INDENT, tokenize.DEDENT}
+    sig = [t for t in toks if t.type not in skip]
+    for k, t in enumerate(toks):
+        if t.type == tokenize.COMMENT:
+            blank.append((t.start, t.end))
+    for k, t in enumerate(sig):
+        if t.type != tokenize.STRING:
+            continue
+        prev = sig[k - 1].type if k else tokenize.NEWLINE
+        nxt = sig[k + 1].type if k + 1 < len(sig) else tokenize.NEWLINE
+        if prev in (tokenize.NEWLINE, tokenize.ENCODING) and nxt in (tokenize.NEWLINE, tokenize.ENDMARKER):
+            blank.append((t.start, t.end))
+    for (sr, sc), (er, ec) in blank:
+        for r in range(sr, er + 1):
+            ln = lines[r - 1]
+            a = sc if r == sr else 0
+            b = ec if r == er else len(ln)
+            lines[r - 1] = ln[:a] + " " * (b - a) + ln[b:]
+    return lines
+
+
+def read_code_js(src):
+    """Text outside `//` and `/* */`, read by a scanner that knows its strings: a `/*` inside a
+    quoted glob opened a comment the first cut never closed, and every line after it went unread."""
+    out, mode, quote = [], None, None
+    for ln in src.split("\n"):
+        text, i = [], 0
+        while i < len(ln):
+            c, two = ln[i], ln[i:i + 2]
+            if mode == "block":
+                mode, i = (None, i + 2) if two == "*/" else (mode, i + 1)
+                continue
+            if mode == "str":
+                text.append(ln[i:i + 2] if c == "\\" else c)
+                i += 2 if c == "\\" else 1
+                if c == quote:
+                    mode = None
+                continue
+            if two == "/*":
+                mode, i = "block", i + 2
+                continue
+            if two == "//":
+                break
+            if c in "'\"`":
+                mode, quote = "str", c
+            text.append(c)
+            i += 1
+        if mode == "str" and quote != "`":
+            mode = None
+        out.append("".join(text))
+    return out
+
+
+def read_code(path, src):
+    base = os.path.basename(path)
+    if path.endswith(".py"):
+        return read_code_py(src), ("P1", "P2", "P3")
+    if path.endswith(".js"):
+        return read_code_js(src), ("P1", "P2")
+    if base.endswith(".fragment.json"):
+        return [ln if '"hook_path"' in ln else "" for ln in src.split("\n")], ("P1",)
+    if path.endswith(".sh") or "." not in base:
+        return [("" if ln.lstrip().startswith("#") else ln) for ln in src.split("\n")], ("P1",)
+    return None, ()
+
+
+pop = hits = marked = 0
+bad = []
+for f in files:
+    try:
+        src = open(f, encoding="utf-8", errors="replace", newline="").read().replace("\r\n", "\n")
+    except OSError:
+        continue
+    code, preds = read_code(f, src)
+    if code is None:
+        continue
+    pop += 1
+    raw = src.split("\n")
+    in_rkd = False
+    for n, text in enumerate(code, 1):
+        if raw[n - 1].startswith("# >>> resolve_kit_dir"):
+            in_rkd = True
+        if raw[n - 1].startswith("# <<< resolve_kit_dir"):
+            in_rkd = False
+        which = [p for p, test in (("P1", lambda t: check_p1(t)),
+                                   ("P2", lambda t: P2.search(t)),
+                                   ("P3", lambda t: not in_rkd and P3.search(t)))
+                 if p in preds and test(text)]
+        if not which:
+            continue
+        hits += 1
+        line = raw[n - 1]
+        state = "HIT"
+        if MARK in line:
+            why = re.sub(r"^[^A-Za-z0-9]*", "", line.split(MARK, 1)[1])
+            state = "marked" if len(why) >= 3 else "NO REASON"
+        if state == "marked":
+            marked += 1
+        else:
+            bad.append((f, n, which, state, line.strip()[:90]))
+        if MODE == "--list":
+            print("  %-9s %s:%d  %s  %s" % (state, f, n, "+".join(which), line.strip()[:80]))
+
+if pop == 0:
+    print("install-prefix: runtime-literal arm graded NO code file out of %d shipped — a dead probe" % len(files))
+    sys.exit(1)
+if MODE == "--list":
+    print("install-prefix: runtime-literal arm: %d hit line(s) over %d shipped code file(s), %d marked"
+          % (hits, pop, marked))
+    sys.exit(0)
+if bad:
+    print("install-prefix: a SHIPPED engine spells gov's own `tools/` prefix, or a sibling kit's")
+    print("install-prefix: directory, in a string it RUNS or READS at run time. At any other install")
+    print("install-prefix: that resolves to nothing. Derive it from the file's own location, route a")
+    print("install-prefix: sibling kit through resolve_kit_dir, or — when the line is correct by")
+    print("install-prefix: construction — mark it `gov:prefix-literal — <reason>`.")
+    for f, n, which, state, line in bad:
+        tag = "MARKER WITH NO REASON — " if state == "NO REASON" else ""
+        print("  %s:%d  %s  %s%s" % (f, n, "+".join(which), tag, line))
+    sys.exit(1)
+print("install-prefix: runtime literals clean — %d shipped code file(s), %d marked line(s), no unmarked"
+      " runtime literal" % (pop, marked))
+RT
+  printf '%s\n' "$_rt_pop" | RT_TRACKED="$(git ls-files -- 'tools/*')" "$_rt_py" -c "$_rt_src" "$MODE"
+  _rt=$?
+  [ "$MODE" = --check ] && [ "$_rt" != 0 ] && exit 1
 fi
 
 # ---------------------------------------------------------------------------------------------
@@ -476,12 +690,8 @@ carried_rows() {
        | LC_ALL=C sort || true
 }
 
-if [ "$KIT_SOURCE" != yes ]; then
-  echo "install-prefix: carried-prefix arm SKIPPED — this repo is not a kit SOURCE (it carries no"
-  echo "install-prefix: govkit registry, or no python resolver beside it) and so has no"
-  echo "install-prefix: shippable set to grade. Said out loud rather than passed silently: a skip"
-  echo "install-prefix: that looks like a pass is indistinguishable from coverage."
-elif [ "$MODE" = --write-ratchet ]; then
+# A repo that is not a kit source exited at the kit-source test near the top, with this arm's SKIP.
+if [ "$MODE" = --write-ratchet ]; then
   # D3, from the closing review of DEPL-dCarriedReceipt. `carried_rows` ends in a pipe, and this
   # script sets only `set -u` — no `pipefail` — so the status is `sort`'s and a DEAD producer (an
   # unresolvable python, a govkit import error, a `resolve_entry` raise, a traceback out of the

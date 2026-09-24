@@ -1,10 +1,15 @@
 # DEPL-aRepatriatedFork-1 — the charter renderer lets an answer win, and knows which file is its template
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams deployer+playbook · order 1
+**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams deployer+playbook · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-23-build-DEPL-aRepatriatedFork-1-1-acceptance-ledger.md](../build/2026-09-23-build-DEPL-aRepatriatedFork-1-1-acceptance-ledger.md) | journal | — |
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-23-prompt-DEPL-aRepatriatedFork-1-build-brief.md](../prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-1-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -52,7 +57,10 @@ that both adopters take gov's `playbook.kit.toml` verbatim.
   character other than a newline, the `{{` placeholder opener, or a `gov:playbook` region marker. A
   `[charter]` key that names no declared placeholder is refused, and so is one that names a token
   `needed_answers` (`govkit.py:9986-10017`) derives, because that key's value must reach an argv and
-  belongs in `[answers]`. Observed by AC9, AC10.
+  belongs in `[answers]`. That join is made in TWO places, because the renderer ships without govkit:
+  `render()` grades against the tokens of the one descriptor it reads (`read_argv_tokens`, the same
+  walk `needed_answers` makes over one entry), and `govkit check` grades against `needed_answers` over
+  the whole selection. Observed by AC9, AC10.
 - **S6** — `KIT_PLAYBOOK_RENDER_VERSION` moves from `1.0` to `1.1` (`render_playbook.py:621`), because
   the shipped bytes change. `tools/playbook/README.md` and the render section of
   `WIRE-INTO-PROJECT.md` state the precedence, the two modes of `playbook_path` and the `[charter]`
@@ -103,7 +111,11 @@ stands_down = { when_selected = ["playbook-render"], why = "in render mode {play
 
 - `resolve_placeholder_value(row, charter, answers, target)` — `py.function`, snake, verb `resolve`.
   It returns the value and its note line, and it is the one site the three classes share.
-- `read_charter_table(cfg)` — `py.function`, snake, verb `read`. It grades every `[charter]` value.
+- `read_charter_table(cfg, rows, argv_tokens)` — `py.function`, snake, verb `read`. It grades every
+  `[charter]` key and value.
+- `read_argv_tokens(desc)` — `py.function`, snake, verb `read`. The engine-side half of S5's join.
+- `resolve_stand_down(hole, selection)` — `py.function`, snake, verb `resolve`, in govkit. The one
+  predicate `cmd_check` and `exempt_leg` share for S4.
 - `[charter]` — a new `deploy.toml` table.
 - `stands_down.when_selected` — a new optional `[[hole]]` key.
 
@@ -225,9 +237,11 @@ at gov itself. The first adopter render after the pull shows every overriding an
 - **AC10** — When a `[charter]` value carries `{{X}}`, a region marker, or a control byte, or a
   `[charter]` key names a token `needed_answers` returns, the render exits 1 naming the key.
   Red when: any of the four reaches the body or an argv.
-- **AC11** — When `bash tools/check-kit-versions.sh` runs, it reports `playbook-render@1.1`, and
+- **AC11** — When `python tools/govkit/govkit.py selfcheck` runs, it exits 0 with
+  `KIT_PLAYBOOK_RENDER_VERSION = "1.1"` and its same-line marker `playbook-render@1.1`, and
   `grep -c '\[charter\]' tools/playbook/README.md` is at least 1.
-  Red when: the engine moves without its version, or the README omits the table.
+  Red when: the engine moves without its version, the marker and the constant disagree, or the
+  README omits the table.
 
 ## 7. Gates
 
@@ -242,16 +256,25 @@ New arm: `tools/govkit/selftest.py` · a copy-mode and a render-mode fixture for
   prints that the value was not chosen. `asked` matches `MACHINE_A` and costs every adopter one more
   intake question. Recommendation: `defaulted`, because the registry row it fills is the rendering
   node's own and `a` is the fleet's first tag by construction.
+  RESOLVED (owner, 2026-09-23): `defaulted`, as recommended.
 - **F2 — should a redundant answer, equal to its probe, be a finding?** inCMS's `deploy.toml`
   comment calls such an answer a second copy of a value that has a home. Recommendation: a note
   line, never a failure. A finding would red an adopter for being explicit.
+  RESOLVED (owner, 2026-09-23): a note line, never a failure, as recommended.
 - **F3 — does `[charter]` also admit a `derived` override, or only `asked` and `defaulted` keys?**
   Recommendation: all three, per the Data model table. The class is about the consumer, not the key.
+  RESOLVED (owner, 2026-09-23): all three classes, per the Data model table, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, grounded at a7c78ad2 with the render probes, the answer charset
   and the placeholder hole each measured against both adopters on 2026-09-23.
+- rev-2 · 2026-09-23 · built. S5 moved: the `needed_answers` refusal is made by the renderer over its
+  own descriptor's tokens and by `govkit check` over the whole selection, because the renderer ships
+  without govkit and cannot call it. AC11 moved: `check-kit-versions.sh` does not assert this kit and
+  prints nothing on success, so the version is observed by `govkit selfcheck`'s version cross-check,
+  which reds on a marker that disagrees with the constant. Inventory gains `read_argv_tokens` and
+  `resolve_stand_down`. `AGENTS.md` is not touched: AC8 holds with the three new answers alone.
 
 ## 10. Reuse audit
 

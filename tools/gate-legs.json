@@ -125,6 +125,17 @@
     "ceiling": 300
   },
   {
+    "name": "unattended protocol size",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "memory/guides/UNATTENDED-PROTOCOL.md"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "kickoff engine size <=18KiB",
     "argv": [
       "bash",
@@ -158,6 +169,20 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
+    "ceiling": 300
+  },
+  {
+    "name": "encoding posture (text IO names its encoding)",
+    "argv": [
+      "python3",
+      "tools/gate-lint/encoding_posture.py",
+      "memory/project/encoding-posture-sites.txt",
+      ".",
+      "tools",
+      "skills"
+    ],
+    "chunk": "product",
+    "subject": "repo",
     "ceiling": 300
   },
   {
@@ -486,6 +511,19 @@
     "ceiling": 600
   },
   {
+    "name": "pre-push bar self-test",
+    "argv": [
+      "python3",
+      ".githooks/pre_push_bar_selftest.py"
+    ],
+    "guard": [
+      ".githooks/"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 600
+  },
+  {
     "name": "push-main self-test",
     "argv": [
       "bash",
@@ -584,7 +622,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 700
   },
   {
     "name": "review-join self-test",
@@ -798,7 +836,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 360
+    "ceiling": 420
   },
   {
     "name": "runlog selftest",
@@ -811,7 +849,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 360
+    "ceiling": 720
   },
   {
     "name": "runlog record schema",
@@ -1042,7 +1080,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 900
+    "ceiling": 1620
   },
   {
     "name": "agent-cap restatement",
@@ -1111,6 +1149,17 @@
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 310
+  },
+  {
+    "name": "kit epoch (shipped bytes move, the version moves)",
+    "argv": [
+      "python",
+      "tools/govkit/govkit.py",
+      "epoch"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
   },
   {
     "name": "govkit selftest",
@@ -1370,7 +1419,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 330
   },
   {
     "name": "kit-placeholders self-test",
@@ -1426,6 +1475,6 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1217
+    "ceiling": 2040
   }
 ]

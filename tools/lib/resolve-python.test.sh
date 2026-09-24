@@ -90,13 +90,24 @@ PARITY_ROWS="
 resolve_python|$CANON|tools/lib/resolve-python
 kickoff_region|$ROOT/tools/unattended/check-unattended.sh|tools/unattended/check-unattended
 render_doc|$ROOT/tools/lib/render-doc.sh|tools/lib/render-doc
+resolve_kit_dir|$ROOT/tools/lib/resolve_kit_dir.py|tools/lib/resolve_kit_dir
+derive_self_rel|$ROOT/tools/lib/kit-rel.sh|tools/lib/kit-rel
+derive_kit_paths|$ROOT/tools/lib/render-doc.sh|tools/lib/render-doc
 "
-blk() { awk -v s="$1" '$0 ~ ("^# >>> " s){f=1} f{print} $0 ~ ("^# <<< " s){if(f)exit}' "$2"; }
+# CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
+# stores it LF, and the parity asked is of the block, not of a checkout's line endings.
+# resolve_kit_dir (TOOL-aRepatriatedFork-2 S3) is the one row whose copies are Python as well as
+# shell, so the population grep below reads both.
+# derive_self_rel (TOOL-aRepatriatedFork-18 S2) is the shipped suites' own-directory walk: each suite
+# that ships carries it inline because `tools/lib/` travels to nobody.
+# derive_kit_paths (TOOL-aRepatriatedFork-10, closing review round 1 L4) is the receipt read the two
+# memory-tree renderers each used to spell as their own grep, with nothing comparing the two.
+blk() { awk -v s="$1" '$0 ~ ("^# >>> " s){f=1} f{print} $0 ~ ("^# <<< " s){if(f)exit}' "$2" | tr -d '\r'; }
 while IFS='|' read -r stem canon excl; do
   [ -n "$stem" ] || continue
   want=$(blk "$stem" "$canon")
   [ -n "$want" ] || bad "the canonical block for '$stem' is missing from $canon"; ok
-  copies=$(cd "$ROOT" && git grep -l "^# >>> $stem" -- '*.sh' | grep -v "^$excl" || true)
+  copies=$(cd "$ROOT" && git grep -l "^# >>> $stem" -- '*.sh' '*.py' | grep -v "^$excl" || true)
   # NON-EMPTY POPULATION IS ITS OWN ARM, per row. A row whose copies all disappeared would otherwise
   # pass by judging nothing, which is the vacuity this whole file refuses.
   [ -n "$copies" ] || bad "no inline copy of '$stem' found — this row would be judging an empty population"; ok

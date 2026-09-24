@@ -17,7 +17,10 @@ else
   TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
 fi
 check() { # name expected_exit json
-  printf '%s' "$3" | node "$HOOK" >/dev/null 2>"$TMP/err"; local got=$?
+  # FROM "$TMP", not from wherever the suite was launched (TOOL-aRepatriatedFork-7): a payload with no
+  # `cwd` makes the hook read `.agent-cap.conf` at the caller's checkout root, so an adopter that
+  # LOWERS its cap would otherwise move every ceiling arm below. The scratch dir has no checkout.
+  printf '%s' "$3" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; local got=$?
   if [ "$got" = "$2" ]; then echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else echo "FAIL $1 (exit $got, want $2)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 }
@@ -211,7 +214,7 @@ jso() { # name expected_exit flag  (script on stdin)
   local name=$1 want=$2 flag=$3 payload got
   payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
   case "$payload" in *'"script"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
-  printf '%s' "$payload" | node "$HOOK" "$flag" >/dev/null 2>"$TMP/err"; got=$?
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK" "$flag") >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" = "$want" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
   else echo "FAIL $name (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 }
@@ -687,7 +690,7 @@ check_spec_audit() { # name expected_exit needles(;;-joined, empty for an allow)
 g,a,form=sys.argv[1:4]
 args=json.loads(a)
 print(json.dumps({"tool_name":"Workflow","tool_input":{"scriptPath":g,"args":args if form=="object" else json.dumps(args)}}))' "$GOOD" "$args" "$form")
-    printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+    printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
     if [ "$got" != "$want" ]; then
       echo "FAIL $name [args as $form] (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); continue
     fi
@@ -771,7 +774,7 @@ if [ -f "$T2R" ]; then
   for k in '"spec-audit"' '["spec-audit"]' '"diff-review"' '"SPEC-AUDIT"' '{"k":"spec-audit"}' '7'; do
     callee=$(node -e "const a={kind:$k}; $kind_line; console.log(kind==='spec-audit'?2:0)" 2>/dev/null)
     printf '%s' "{\"tool_name\":\"Workflow\",\"tool_input\":{\"scriptPath\":\"$GOOD\",\"args\":{\"kind\":$k,\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}" \
-      | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+      | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
     if [ -n "$callee" ] && [ "$got" = "$callee" ]; then echo "ok   rule0: pair — hook and tier2-review agree on kind $k (exit $got)"; pass=$((pass+1))
     else echo "FAIL rule0: pair — hook exit $got, tier2-review isSpec says exit-equivalent '$callee' for kind $k"; fail=$((fail+1)); fi
   done
@@ -898,7 +901,7 @@ msg() { # name expected_exit needle   (script on stdin)
   local name=$1 want=$2 needle=$3 payload got
   payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
   case "$payload" in *'"script"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
-  printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" != "$want" ]; then
     echo "FAIL $name (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); return
   fi
@@ -1016,18 +1019,18 @@ EOF
 # silently-ignored knob that appears to work is how that survived, so it denies and says why.
 AGENT_CAP=50 printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await agent(1)"}}' \
   > "$TMP/envpayload"
-AGENT_CAP=50 node "$HOOK" < "$TMP/envpayload" >/dev/null 2>"$TMP/env.err"; envrc=$?
+(cd "$TMP" && AGENT_CAP=50 node "$HOOK") < "$TMP/envpayload" >/dev/null 2>"$TMP/env.err"; envrc=$?
 if [ "$envrc" = 2 ] && grep -qF 'AGENT_CAP is set (50) and this guard NO LONGER reads it' "$TMP/env.err"; then
   echo "ok   a set AGENT_CAP is refused with a message"; pass=$((pass+1))
 else
   echo "FAIL a set AGENT_CAP was not refused (exit $envrc)"; sed 's/^/     /' "$TMP/env.err"; fail=$((fail+1))
 fi
-node "$HOOK" < "$TMP/envpayload" >/dev/null 2>&1
+(cd "$TMP" && node "$HOOK") < "$TMP/envpayload" >/dev/null 2>&1
 if [ "$?" = 0 ]; then echo "ok   ...and an UNSET AGENT_CAP changes nothing"; pass=$((pass+1))
 else echo "FAIL an unset AGENT_CAP denied a clean script"; fail=$((fail+1)); fi
 
 # The rule-2 remediation text still names the number it enforces.
-if grep -qF 'verify-stage agents at 5 TOTAL' <(printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await boundedParallel(all.map((f) => () => agent(f.c)), 5)"}}' | node "$HOOK" 2>&1); then
+if grep -qF 'verify-stage agents at 5 TOTAL' <(printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await boundedParallel(all.map((f) => () => agent(f.c)), 5)"}}' | (cd "$TMP" && node "$HOOK") 2>&1); then
   echo "ok   rule-2 deny text names the 5-verifier cap"; pass=$((pass+1))
 else echo "FAIL rule-2 deny text does not name the cap"; fail=$((fail+1)); fi
 
@@ -1052,9 +1055,9 @@ apay() { # session · prompt · tool_use_id
 # unique to this branch and never on the exit code, which all four rules in this file share.
 ok5=1
 for i in 1 2 3 4 5; do
-  printf '%s' "$(apay S1 P1 "u$i")" | node "$HOOK" >/dev/null 2>"$TMP/ag.err" || ok5=0
+  printf '%s' "$(apay S1 P1 "u$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/ag.err" || ok5=0
 done
-printf '%s' "$(apay S1 P1 u6)" | node "$HOOK" >/dev/null 2>"$TMP/ag6.err"; rc6=$?
+printf '%s' "$(apay S1 P1 u6)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/ag6.err"; rc6=$?
 if [ "$ok5" = 1 ] && [ "$rc6" = 2 ] \
    && grep -qF 'direct-Agent spawn budget for this prompt is exhausted' "$TMP/ag6.err"; then
   echo "ok   rule4: six sequential spawns — five allowed, the sixth denied by name"; pass=$((pass+1))
@@ -1064,7 +1067,7 @@ fi
 
 # ...and the SAME tool_use_id re-fed does not spend a second slot. A hook re-invoked for one call
 # would otherwise burn the turn's budget on a single spawn.
-printf '%s' "$(apay S1 P1 u3)" | node "$HOOK" >/dev/null 2>&1; rcdup=$?
+printf '%s' "$(apay S1 P1 u3)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcdup=$?
 [ "$rcdup" = 0 ] && { echo "ok   rule4: a repeated tool_use_id is idempotent"; pass=$((pass+1)); } \
                  || { echo "FAIL rule4: a repeated tool_use_id was charged again (exit $rcdup)"; fail=$((fail+1)); }
 
@@ -1079,7 +1082,7 @@ for round in 1 2 3 4 5 6 7 8; do
   P="Pc$round"
   rm -f "$TMP"/ag.rc.*
   for i in 1 2 3 4 5 6; do
-    ( printf '%s' "$(apay S1 "$P" "c$round-$i")" | node "$HOOK" >/dev/null 2>&1; echo $? > "$TMP/ag.rc.$i" ) &
+    ( printf '%s' "$(apay S1 "$P" "c$round-$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; echo $? > "$TMP/ag.rc.$i" ) &
   done
   wait
   denies=$(cat "$TMP"/ag.rc.* 2>/dev/null | grep -c '^2$')
@@ -1091,7 +1094,7 @@ done
 
 # AC25 — a FRESH prompt resets the budget, with no cleanup step run in between. The budget is keyed
 # per prompt precisely so nothing has to remember to clear it.
-printf '%s' "$(apay S1 Pfresh n1)" | node "$HOOK" >/dev/null 2>&1; rcf=$?
+printf '%s' "$(apay S1 Pfresh n1)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcf=$?
 [ "$rcf" = 0 ] && { echo "ok   rule4: a new prompt resets the budget with no cleanup"; pass=$((pass+1)); } \
                || { echo "FAIL rule4: a new prompt did not reset the budget (exit $rcf)"; fail=$((fail+1)); }
 
@@ -1104,7 +1107,7 @@ printf '%s' "$(apay S1 Pfresh n1)" | node "$HOOK" >/dev/null 2>&1; rcf=$?
 # turn's budget forever — measured, six sequential spawns with distinct tool_use_ids and the sixth
 # denied against five long-idle slots. Revert SLOT_TTL_MS to Infinity and this arm goes red.
 for i in 1 2 3 4 5; do
-  printf '%s' "$(apay Sttl Pttl "t$i")" | node "$HOOK" >/dev/null 2>&1
+  printf '%s' "$(apay Sttl Pttl "t$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
 done
 TURNTTL="$AGROOT/Sttl__Pttl"
 if [ ! -d "$TURNTTL" ]; then
@@ -1113,8 +1116,8 @@ else
   # Age slot-1 only. The remaining four stay fresh, which is what makes the second half a control
   # rather than a restatement of the first.
   touch -d '46 minutes ago' "$TURNTTL/slot-1" 2>/dev/null || touch -A -004600 "$TURNTTL/slot-1" 2>/dev/null
-  printf '%s' "$(apay Sttl Pttl t6)" | node "$HOOK" >/dev/null 2>&1; rcstale=$?
-  printf '%s' "$(apay Sttl Pttl t7)" | node "$HOOK" >/dev/null 2>"$TMP/ttl.err"; rcfresh=$?
+  printf '%s' "$(apay Sttl Pttl t6)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcstale=$?
+  printf '%s' "$(apay Sttl Pttl t7)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/ttl.err"; rcfresh=$?
   if [ "$rcstale" = 0 ] && [ "$rcfresh" = 2 ] \
      && grep -qF 'within the last' "$TMP/ttl.err"; then
     echo "ok   rule4: an idle slot past the TTL is reclaimed; four fresh ones are not"; pass=$((pass+1))
@@ -1127,9 +1130,9 @@ fi
 # ...and the DENY MESSAGE says which rule it is enforcing. It used to read "already spawned in this
 # turn", which described a permanent budget and named the concurrency rule in the same breath. A
 # message that misstates the rule sends the reader to consolidate work that did not need it.
-printf '%s' "$(apay Smsg Pmsg m1)" | node "$HOOK" >/dev/null 2>&1
+printf '%s' "$(apay Smsg Pmsg m1)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
 for i in 2 3 4 5 6; do
-  printf '%s' "$(apay Smsg Pmsg "m$i")" | node "$HOOK" >/dev/null 2>"$TMP/msg.err"
+  printf '%s' "$(apay Smsg Pmsg "m$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/msg.err"
 done
 grep -qF 'claimed in this turn within the last' "$TMP/msg.err" \
   && grep -qF 'is reclaimed on the next spawn' "$TMP/msg.err" \
@@ -1142,7 +1145,7 @@ grep -qF 'claimed in this turn within the last' "$TMP/msg.err" \
 # CREATE is a different fact and denies (the branch above it).
 before=$(ls "$AGROOT" 2>/dev/null | grep -c .)
 printf '{"tool_name":"Agent","cwd":"%s","session_id":"S9","tool_use_id":"x"}' "$AGJ" \
-  | node "$HOOK" >/dev/null 2>&1; rcn=$?
+  | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcn=$?
 after=$(ls "$AGROOT" 2>/dev/null | grep -c .)
 { [ "$rcn" = 0 ] && [ "$before" = "$after" ]; } \
   && { echo "ok   rule4: an unkeyable payload fails OPEN and writes no token"; pass=$((pass+1)); } \
@@ -1665,6 +1668,141 @@ js "no-regress: a DOUBLE-quoted URL in a template does it without an apostrophe 
 const p = `see "http://x" now`; await parallel(all.map(f))
 EOF
 
+# ---- TOOL-aRepatriatedFork-7 S3: the NESTED-INTERPOLATION matrix ---------------------------------
+# A nested `${` zeroed the ONE depth counter the lexed view kept, so a brace open around an inner
+# template -- an object literal, a block, an arrow body -- closed the OUTER interpolation at its own
+# `}` and every fan-out after it left the view. a7c78ad2 admitted four of these five nested forms at
+# exit 0 through the sanctioned helper, where the raw-text rule has no reason to fire. `depth-two`
+# opens no brace and is the class's control. Every nested form and its flat control must be denied
+# BY THE VERIFY-STAGE RULE, asserted on its text: an exit code alone cannot tell rules apart. The
+# files also join the S9 property population below (F3), so no BASE denial among them can be lost.
+mkdir -p "$TMP/nest"
+NEST_HELPER='async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}'
+NEST_FAN='await boundedParallel(findings.map((g) => () => agent(g)), 5)'
+write_nest_pair() { # name nested-script flat-script, FAN standing for the unbounded verify stage
+  printf '%s\n%s\n' "$NEST_HELPER" "${2//FAN/$NEST_FAN}" > "$TMP/nest/$1.js"
+  printf '%s\n%s\n' "$NEST_HELPER" "${3//FAN/$NEST_FAN}" > "$TMP/nest/$1-flat.js"
+}
+write_nest_pair depth-two 'const s = `a ${ `b ${ x } c` + FAN } d`' 'const s = `a ${ 1 + FAN } d`'
+write_nest_pair depth-three 'const s = `a ${ f({ k: `b ${ g({ m: `c ${ y } d` }) } e` }) + FAN } z`' 'const s = `a ${ f({ k: 1 }) + FAN } z`'
+write_nest_pair object-before-inner 'const s = `a ${ f({ k: `b ${ x } c` }) + FAN } d`' 'const s = `a ${ f({ k: 1 }) + FAN } d`'
+write_nest_pair arrow-body 'const s = `a ${ [1].map((v) => { return `b ${ v } c` }).join("") + FAN } d`' 'const s = `a ${ [1].map((v) => { return v }).join("") + FAN } d`'
+write_nest_pair multi-line 'const s = `a ${ f({ k: `b ${ x } c` })
+  + FAN
+} d`' 'const s = `a ${ f({ k: 1 })
+  + FAN
+} d`'
+nest_n=0
+for f in "$TMP"/nest/*.js; do
+  [ -f "$f" ] || continue
+  nest_n=$((nest_n+1))
+  n=$(basename "$f" .js)
+  payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":open(sys.argv[1],encoding="utf-8").read()}}))' "$f")
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; rc=$?
+  if [ "$rc" = 2 ] && grep -qF 'spawns one agent per item' "$TMP/err"; then
+    echo "ok   nesting matrix: $n -> denied by the verify-stage rule"; pass=$((pass+1))
+  else
+    echo "FAIL nesting matrix: $n exited $rc without the verify-stage denial"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+done
+if [ "$nest_n" = 10 ]; then
+  echo "ok   nesting matrix: all 10 fixtures were written and judged"; pass=$((pass+1))
+else
+  echo "FAIL nesting matrix: $nest_n fixture(s) judged, want 10 -- a matrix that judged fewer certifies shapes it never saw"; fail=$((fail+1))
+fi
+
+# ---- TOOL-aRepatriatedFork-7 S4/S5/S6: a DECLARED, lower-only cap ---------------------------------
+# `FANOUT_CAP` in `.agent-cap.conf` at the checkout root lowers the cap at every enforcement site and
+# for the direct-spawn slots; a value outside 1..ceiling denies every call naming the file. The
+# fixture checkout is a bare `.git` DIRECTORY, which is all the root walk looks for, and each call
+# stands in a subdirectory so the walk is exercised rather than assumed.
+CAPREPO="$TMP/caprepo"; mkdir -p "$CAPREPO/.git" "$CAPREPO/sub"
+render_cap_harness() { # K -> a harness whose default parameter AND call site both carry K
+  printf 'async function boundedParallel(thunks, cap = %s) {\n  const out = []\n  for (let i = 0; i < thunks.length; i += cap)\n    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout\n  return out\n}\nconst LENSES = [1, 2, 3]\nawait boundedParallel(LENSES.map((L) => () => agent(L)), %s)\n' "$1" "$1"
+}
+check_cap() { # name expected_exit K [text stderr must carry]
+  local payload got
+  payload=$(render_cap_harness "$3" | "$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":{"script":sys.stdin.read()}}))' "$CAPREPO/sub")
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { [ -z "${4:-}" ] || grep -qF -- "$4" "$TMP/err"; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${4:+, stderr carrying '$4'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+check_spawn() { # name expected_exit prompt_id tool_use_id [text stderr must carry]
+  local got
+  printf '{"tool_name":"Agent","cwd":"%s","session_id":"s7","prompt_id":"%s","tool_use_id":"%s"}' \
+    "$("$TESTPY" -c 'import sys; print(sys.argv[1].replace(chr(92), "/"))' "$CAPREPO/sub")" "$3" "$4" \
+    | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { [ -z "${5:-}" ] || grep -qF -- "$5" "$TMP/err"; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${5:+, stderr carrying '$5'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+# No conf: the ceiling, unchanged.
+check_cap "declared cap: no conf, a cap-5 harness -> allow" 0 5
+check_cap "declared cap: no conf, a cap-4 harness -> allow" 0 4
+# AC4: a declared 4 is READ and ENFORCED at the call site and the default parameter.
+printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
+check_cap "declared cap: FANOUT_CAP=4, a cap-5 harness -> deny naming the effective cap" 2 5 'above the 4-agent cap'
+check_cap "declared cap: FANOUT_CAP=4, the denial names the file that lowered it" 2 5 '.agent-cap.conf'
+check_cap "declared cap: FANOUT_CAP=4, the same harness at 4 -> allow" 0 4
+printf '# the fleet cap\nFANOUT_CAP="4"\r\n' > "$CAPREPO/.agent-cap.conf"
+check_cap "declared cap: quoted value with a CRLF ending still lowers -> deny" 2 5 'above the 4-agent cap'
+printf 'FANOUT_CAP=5\n' > "$CAPREPO/.agent-cap.conf"
+check_cap "declared cap: FANOUT_CAP at the ceiling -> allow" 0 5
+# AC6: out of range or malformed DENIES, naming the file -- never a raise, never ignored.
+for bad in 6 0 four ''; do
+  printf 'FANOUT_CAP=%s\n' "$bad" > "$CAPREPO/.agent-cap.conf"
+  check_cap "declared cap: FANOUT_CAP=${bad:-<empty>} denies a bounded harness, naming the file" 2 4 '.agent-cap.conf declares FANOUT_CAP'
+done
+printf 'FANOUT_CAP=6\n' > "$CAPREPO/.agent-cap.conf"
+check_spawn "declared cap: FANOUT_CAP=6 denies a direct Agent spawn too" 2 p-bad u-bad '.agent-cap.conf declares FANOUT_CAP'
+# AC5: the direct-spawn slots count to the declared value, and to the ceiling without one.
+printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
+for k in 1 2 3 4; do check_spawn "declared cap: FANOUT_CAP=4, direct spawn $k -> allow" 0 p-four "u$k"; done
+check_spawn "declared cap: FANOUT_CAP=4, direct spawn 5 -> deny" 2 p-four u5 '4 of 4 claimed'
+rm -f "$CAPREPO/.agent-cap.conf"
+for k in 1 2 3 4 5; do check_spawn "declared cap: no conf, direct spawn $k -> allow" 0 p-five "u$k"; done
+check_spawn "declared cap: no conf, direct spawn 6 -> deny (control)" 2 p-five u6 '5 of 5 claimed'
+
+# ---- TOOL-aRepatriatedFork-7, closing review round 1 residual (b): the hook ANSWERS the cap ------
+# Two shell readers used to re-parse `.agent-cap.conf` with a sed of their own, and a conf saved with a
+# byte-order mark was the measured divergence: this hook read 4 (JavaScript's `\s` spans U+FEFF) while
+# both seds matched nothing and answered 5, so the parity renderer wrote cap-5 harnesses this hook
+# denies. `--print-cap` is the one answer they now ask for. Each arm pairs the ANSWER with the
+# ENFORCEMENT over the same bytes, so the two cannot be graded apart.
+check_print() { # name expected_exit expected_stdout [text stderr must carry]
+  local out got
+  out=$(cd "$CAPREPO/sub" && node "$HOOK" --print-cap </dev/null 2>"$TMP/err"); got=$?
+  if [ "$got" = "$2" ] && [ "$out" = "$3" ] && { [ -z "${4:-}" ] || grep -qF -- "$4" "$TMP/err"; }; then
+    echo "ok   $1 (exit $got, '$out')"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got '$out', want $2 '$3'${4:+, stderr carrying '$4'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+check_print "print-cap: no conf answers the ceiling" 0 5
+printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
+check_print "print-cap: a declared 4 answers 4" 0 4
+printf '\357\273\277FANOUT_CAP=4\r\n' > "$CAPREPO/.agent-cap.conf"
+check_cap "print-cap: a BOM-led conf still LOWERS the enforced cap" 2 5 'above the 4-agent cap'
+check_print "print-cap: ...and the answer is the enforced 4, not a re-parser's 5" 0 4
+printf 'FANOUT_CAP=4\nFANOUT_CAP=abc\n' > "$CAPREPO/.agent-cap.conf"
+check_print "print-cap: the LAST line wins and a malformed one refuses, naming the file" 2 '' '.agent-cap.conf declares FANOUT_CAP=abc'
+# Fail CLOSED if it is ever WIRED: a payload on stdin is a tool call being judged, and a query mode
+# that exits 0 on it would admit every call with no diff -- the `--only` hazard check-wiring polices.
+rm -f "$CAPREPO/.agent-cap.conf"
+printf '{"tool_name":"Workflow","tool_input":{"script":"x"}}' | (cd "$CAPREPO/sub" && node "$HOOK" --print-cap) >/dev/null 2>"$TMP/err"; got=$?
+if [ "$got" = 2 ] && grep -qF -- 'must not be wired' "$TMP/err"; then echo "ok   print-cap: a payload on stdin is denied, not admitted (exit $got)"; pass=$((pass+1))
+else echo "FAIL print-cap: a payload on stdin (exit $got, want 2 naming 'must not be wired')"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+
 # ---- S10: `verbatim` is CHECKED, not asserted ----------------------------------------------------
 # The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
 # differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.
@@ -1762,6 +1900,9 @@ EOF
   cat > "$TMP/nrfix/template-borne-comment.js" <<'EOF'
 const p = `see 'http://x' now`; await parallel(all.map(f))
 EOF
+  # TOOL-aRepatriatedFork-7 F3: the nesting matrix joins the population, so no fixture of it that BASE
+  # denied -- every flat control, and `depth-two` -- may be admitted now.
+  cp "$TMP"/nest/*.js "$TMP/nrfix/" 2>/dev/null || true
   cat > "$TMP/nr.py" <<'PYEOF'
 import json, subprocess, sys, pathlib
 base_hook, cur_hook, root, fixdir = sys.argv[1:5]
@@ -1832,7 +1973,7 @@ line = 'const x = [' + ','.join(\"f(a%d, 'lit%d')\" % (i, i) for i in range(n)) 
 print(json.dumps({'tool_name':'Workflow','tool_input':{'script': line}}))
 ")
 t0=$(date +%s)
-printf '%s' "$long_one" | node "$HOOK" >/dev/null 2>&1
+printf '%s' "$long_one" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
 t1=$(date +%s)
 if [ $((t1 - t0)) -le 10 ]; then
   echo "ok   quadratic budget: 8000 literals on ONE line in $((t1 - t0))s (<= 10s)"; pass=$((pass+1))
@@ -1849,7 +1990,7 @@ k = ' ? args.big : '.join('c%d' % i for i in range(9000))
 sc = 'const K = ' + k + ' : args.big // gov:fixed-verifiers\nawait boundedParallel(K.map((g) => () => agent(g)), 5)'
 print(json.dumps({'tool_name':'Workflow','tool_input':{'script': sc}}))
 ")
-printf '%s' "$deep" | node "$HOOK" >/dev/null 2>&1; deeprc=$?
+printf '%s' "$deep" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; deeprc=$?
 if [ "$deeprc" = 2 ]; then
   echo "ok   crash posture: a script neither view can scan is DENIED, not admitted at exit 1"; pass=$((pass+1))
 else

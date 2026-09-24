@@ -1,10 +1,17 @@
 # TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-build-TOOL-aRepatriatedFork-5-2-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-5-2-acceptance-ledger.md) | journal | TOOL-aRepatriatedFork-5 |
+| [2026-09-24-build-TOOL-aRepatriatedFork-8-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-8-1-acceptance-ledger.md) | journal | — |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-8-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-8-build-brief.md) | journal | — |
+| [2026-09-24-prompt-TOOL-aRepatriatedFork-8-repair-r4-brief.md](../prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-8-repair-r4-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -38,6 +45,12 @@ branch-push hygiene gate, a declared seam, so inCMS can run gov's bytes.
   derives its kit path from its own location and resolves python through the inline fallback the
   hooks kit uses, never `tools/lib/resolve-python.sh`, which ships to no adopter. Observed by AC11.
 - **S7** — `TOOL-aHonedRuleset-10` closes, since S2 is its fix. Observed by AC4.
+- **S8** — ONE channel for the bar's verdict. The hook clears `pre-push-bar` beside
+  `pre-push-refusal` on every run and, once the bar is vetted and before it runs, writes
+  `<class><TAB><path><TAB><blob>`; the lander clears it before each push and writes its marker only
+  when it reads `default` or `tracked`, never re-deriving the class from its own environment. And
+  `.githooks/gate-env.sh` is sourced only when tracked at the pushed sha (HEAD on a non-default push)
+  with a clean working copy; otherwise the push is refused as `bar-refused`. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -156,16 +169,33 @@ One gov commit. The hook is `core.hooksPath`-resolved from the primary tree, so 
 a clone once its primary tree checks the commit out. A lander that predates S2 reads no token and
 falls back to its prose grep, so an old lander against a new hook is no worse than today.
 
-### Files touched (estimate)
+### As built (rev-2)
+
+- **S2's one function holds the pairing.** `write_refusal <token> <message>` writes the file and maps
+  the token to its run-log decision, so no call site spells both words. `gate-red` and `head-moved`
+  map to no decision: the bar RAN, and the `full` or `scoped` decision it ran under stands.
+- **S3 computes the dirt before the bar is vetted and refuses after it**, so the vetting's own
+  working-copy refusal keeps its message. `.githooks/pre_push_bar_selftest.py`'s mutation clears the
+  dirt as well, since S3 now catches the rewrite its case M3 needs to see land.
+- **S5's branch bar reads git's ref lines on stdin**, the pre-push hook's own input, and runs with
+  `GATE_PUSH_BASE` unset: a non-default push can carry several refs, so one base sha cannot describe
+  it. It is vetted at `HEAD`, the tree it runs from, and its run is the run-log decision `branch-gated`.
+- **S2's lander probes the PUSH URL** with `ls-remote`, since the fetch URL may reach a remote the
+  push cannot.
+- **S7's backlog flip is the main loop's.** `--dispatch` refused `memory/backlog/TOOL.md` as a shared
+  mutable record, so this unit closes the mechanism and the main loop records the row.
+
+### Files touched
 
 - `.githooks/pre-push`
 - `.githooks/pre-push.test.sh`
+- `.githooks/pre-push.runlog.test.sh` (the exit table, and the `refuse-dirty` and `branch-gated` decisions)
+- `.githooks/pre_push_bar_selftest.py` (the mutation also clears S3's dirt)
 - `.githooks/gate-env.sh` (the documented keys, as comments)
 - `tools/push-main.sh`
 - `tools/push-main.test.sh`
 - `tools/check-wiring.test.sh`
-- `AGENTS.md` (the push-boundary paragraph at `:532-537`)
-- `memory/backlog/TOOL.md`
+- `AGENTS.md` (the push-boundary paragraph)
 
 ### Alternatives rejected
 
@@ -232,6 +262,13 @@ falls back to its prose grep, so an old lander against a new hook is no worse th
   returns nothing and each suite resolves its subject.
   Red when: a suite still spells `tools/` or needs a gov-internal library.
   fixture: a scratch install at a `scripts/` prefix; none is tracked today.
+- **AC12** — When a fixture's `.githooks/gate-env.sh` sets `GOV_GATE_CMD_TEST=1` and
+  `GOV_GATE_CMD=true` and `tools/push-main.sh` runs with neither in its environment, a committed copy
+  lands with NO lander marker and push-main names the STUB; an untracked copy hidden by
+  `.git/info/exclude` is refused before it is sourced, so nothing lands; and an untracked copy on a
+  feature push is refused as `bar-refused`.
+  Red when: the lander decides "stub" from an input the hook did not act on, or the hook sources a
+  policy file nobody reviewed.
 
 ## 7. Gates
 
@@ -239,6 +276,8 @@ falls back to its prose grep, so an old lander against a new hook is no worse th
 
 New arm: `tools/push-main.test.sh` · inCMS's arms 1b, 2c, 4c, 11, 12, 13 and 14, each run first against the a7c78ad2 lander to observe it fail · none
 New arm: `.githooks/pre-push.test.sh` · a fixture remote named `incms`, a dirty tree, a HEAD moved by the bar, and a branch bar, each observed first against the a7c78ad2 hook · none
+New arm: `tools/push-main.test.sh` · H1 and H1b, gate-env.sh setting the escape committed and then excluded, each observed writing the marker against the c6513db0 lander and hook first · none
+New arm: `.githooks/pre-push.test.sh` · H1, an untracked gate-env.sh on a feature push, observed sourced against the c6513db0 hook first · none
 
 ## 8. Open questions
 
@@ -246,17 +285,38 @@ New arm: `.githooks/pre-push.test.sh` · a fixture remote named `incms`, a dirty
   docs-only dirty path through (`.githooks/pre-push:139-156` at inCMS). Recommendation: no; the
   bar certifies a tree, and a dirty tree is not the pushed one. An adopter wanting the tolerance
   declares it in its bar.
+  RESOLVED (owner, 2026-09-23): no, as recommended.
 - **F2 — does the lander refuse when the repo has several remotes and none is configured for the
   branch?** Guessing picks a remote nobody chose. Recommendation: refuse and name
   `GOV_REMOTE`.
+  RESOLVED (owner, 2026-09-23): refuse and name `GOV_REMOTE`, as recommended.
 - **F3 — is `GOV_BRANCH_GATE_CMD` worth a key, or should inCMS keep branch-push hygiene in its
   pre-commit?** Without it inCMS cannot run gov's hook verbatim. Recommendation: take the key; it is
   one vetted command and the mechanism `gate-env.sh` exists for.
+  RESOLVED (owner, 2026-09-23): take the key, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, from audit-B and a re-read of gov a7c78ad2, inCMS 1bc57da27
   and nc f69e2ffb.
+- rev-2 · 2026-09-24 · built. §4 gains "As built": S2's refusal function maps token to decision,
+  S3 refuses after the bar is vetted, S5's branch bar reads the ref lines on stdin, the lander probes
+  the push URL, and S7's backlog row moves to the main loop after `--dispatch` refused it. Files
+  touched gains the run-log suite and the bar self-test, and loses `memory/backlog/TOOL.md`.
+- rev-3 · 2026-09-24 · closing review round 1 H1 folded. S8 and AC12 added: the hook writes the bar
+  it vetted to `pre-push-bar` and push-main reads that instead of its own `GOV_GATE_CMD_TEST`, and
+  `gate-env.sh` is vetted before it is sourced, taking the review's "vet it" option over naming it
+  an open class in the protocol, which this fold may not edit. The AC10 fixtures now commit their
+  `gate-env.sh`, and the run-log suite's exit table counts three `bar-refused` sites. The class is
+  recorded as `memory/gotchas/decision-re-derived-by-a-second-process.md`.
+- rev-4 · 2026-09-24 · gate repair at VERIFYING, leg `pre-push run-log line`. S1 read its remote
+  name off `render_push_remote`, a writer function, so the run-log suite's AC7 baseline, which stubs
+  every `*_push_*` function, skipped S1's `git symbolic-ref` and counted one exec the writer never
+  made. The name test is now `resolve_remote_name`, outside the writer, called by S1 and by
+  `render_push_remote`; the arm keeps its expectation.
+- rev-5 · 2026-09-24 · §9 only: gate repair R4, dispatched as this unit, landed its shell-hygiene
+  and dead-path fixes and their version bumps under `TOOL-aRepatriatedFork-6` and
+  `TOOL-aRepatriatedFork-10`, the owners of those lines. This unit's own R4 fix is `201af720`.
 
 ## 10. Reuse audit
 

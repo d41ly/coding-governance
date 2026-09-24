@@ -16,11 +16,11 @@ ARCH-bOrderlyAtlas-1.)
 |---|---|
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
 | `check-memory-hygiene.sh` | the gate — 25 checks (1-12, 21, 22, 23 and 25 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 and 24 to `row_grammar.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
-| `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. |
+| `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. Also the backlog-row grammar other engines import (`parse_row`, `census`), the `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN` shard ratchets (blank = unarmed, announced as NOT MEASURED), `--emit-pin` for all three pins, and `--ages`, row age DERIVED from git. |
 | `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
 | `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 pinned, 16 structural) (`--report` / `--check` / `--measure` / `--print-defined-ids` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none. `--print-defined-ids` prints the id grammar as a POSIX ERE on its first line, then every id the corpus DEFINES, for a caller that must join cited ids against the set without spelling the grammar — the kickoff checker's `--card --append` is that caller. |
 | `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff. |
-| `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. |
+| `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. Arms are read from the gate's `<stem>.test.sh` and an optional `<stem>.local.test.sh`; pins from `<MEMORY_ROOT>/project/unarmed-branches.txt` and a sidecar `unarmed-branches.txt` beside the gate, and `--report` names the file that armed or pinned each branch. Floored per gate by `ARMS_FLOORS`, which is REFUSED blank while any gate is discovered; `--emit-floors` prints the measured line. Its helpers come from `tree_lib.py`, the one module the kit's engines share, so no engine imports a sibling engine. |
 | `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
 | `adopt-memory-tree.sh` | `--scaffold` an empty tree that passes once its conf declares the keys the gate reads from the config (new projects). `--render` re-renders the four rendered documents in a tree that already carries the adoption marker, and writes nothing else — the mode `[[regenerate]]` names, and the only one that refreshes them after adoption. It REFUSES on a tree with no marker, and on a kit directory missing any of the four templates, rather than replacing your committed rule set with a placeholder. |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |
@@ -148,6 +148,49 @@ something to say. And `ROTATION_MODE` is a new `.memory-tree.conf` key (`cut` or
 it undeclared changes nothing and reds nothing, an unrecognised value aborts the engine at exit 2,
 and **no check grades the declared mode** — it is validated and then read by nobody.
 
+## Upgrading to 2.88 — `check-arms.py` refuses a blank `ARMS_FLOORS`, and two backlog-row pins arrive unarmed
+
+**The harness meta-gate reds on arrival if your conf declares no `ARMS_FLOORS`.** A blank value left
+both floor arms iterating an empty mapping, so neither could fire. The refusal applies once any gate
+is discovered, and this kit installs one. Run `python <kit>/check-arms.py --emit-floors` and paste
+the one line it prints into `.memory-tree.conf`; it exits 1 without a usable line if a gate errored.
+
+**`SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN` are new, and blank is UNARMED.** Each takes one
+`<shard-path>:<count>` token per backlog shard and is a shrink-only ceiling for it. Undeclared, check
+20 counts the shard and prints a NOT MEASURED line naming it on every green run, and the hygiene gate
+now shows that line rather than swallowing it. `python <kit>/row_grammar.py --emit-pin` prints both,
+measured. A row that closes lowers its shard's live count, so a declared `LIVE_ROW_PIN` is lowered in
+the same commit.
+
+**`tree_lib.py` is a new engine file.** It holds the conf parser, the fence reader, the status
+vocabulary and `kit_rel`, and `corpus_ids.py` and `gen_build_index.py` re-import them. A tree that
+replaced either of those two with its own program no longer breaks `check-arms.py`, `row_grammar.py`
+or `gotchas.py` on import.
+
+## Arms and pins that travel with their gates — TOOL-aRepatriatedFork-18
+
+**A shipped gate ships its sibling suite.** `check-arms.py` reads `<stem>.test.sh` for the arms of
+every tracked gate, so a kit that withheld its suites shipped gates whose branches arrived unarmed,
+and each pull left `gate-arms` red until someone hand-merged gov's suites. The arm-bearing suites of
+the memory-tree, unattended, kickoff-manifest and line-length kits now land as `engine` files. They
+are still no adopter's LEG: check-arms reads the text and never runs it.
+
+**Fork a gate, arm it locally.** A branch your fork adds is armed in `<stem>.local.test.sh` beside
+the gate, which check-arms reads after `<stem>.test.sh` and which no descriptor claims, so the
+shipped suite stays byte-identical to gov's and an update never conflicts with your arms. An empty
+or absent local suite arms nothing and is not an error.
+
+**Gov's pins arrive beside the gates they pin.** A tracked `unarmed-branches.txt` in any directory
+other than `<MEMORY_ROOT>/project/` is a SIDECAR: the same four tab-separated fields, with the gate
+column relative to that directory, so gov's rows mean the same branch at your prefix. The unattended
+kit ships one. Shrink-only, stale-signature and vanished-gate refusals apply to it exactly as to the
+central file, and a branch pinned in both is refused. Delete any row of your own central pin that a
+sidecar now carries.
+
+**A signature drops a `$(...)` command substitution** the way it drops a variable, because no run
+prints the call's source. A pin row of yours whose signature carried one now reads as stale:
+re-key it from the row `--emit-pin` prints.
+
 ## Notes
 
 - Determinism: the scripts export `LC_ALL=C` and emit LF, and the build index normalises CR before it
@@ -256,6 +299,30 @@ Three to five, primed with the mandate, the build overview and the spec format:
   checked.
 - **prior art** — has a record already decided this? That is the recall probe, M5.
 
+## Running this engine verbatim — the four adopter routes
+
+A carve-out against `check-memory-hygiene.sh` or `HYGIENE.template.md` is a fork, and a fork goes
+stale on every kit bump. Each shape an adopter has needed so far has a route that runs gov's bytes
+unchanged:
+
+| Carve-out shape | Route |
+|---|---|
+| an extra registry under `<MEMORY_ROOT>/project/` | `PROJECT_REGISTRY_EXTRA` in `.memory-tree.conf` |
+| a pre-governance file or folder name — a build-root status file, a free-named record, an unbound old record | a row in `<MEMORY_ROOT>/project/legacy-files.txt`, which checks 4, 5 and 21 all read |
+| undated build artifacts, a JSON result or an HTML report, that cannot carry a Serves line | `RECORD_UNDATED_ARTIFACTS="exempt"`, which prints its exempted count on every run |
+| a rule gov does not have | a project leg in the gate manifest, above |
+
+Two things are not carve-outs at all. A value in the rendered `HYGIENE.md` that states the shipping
+repo's figure is a render gap, and `INDEX_CAP_LINES` and `ENTRY_CAP_UNIT` now render from your conf.
+A registry a KIT ships, such as `pass-order-waiver.txt`, is admitted by name.
+
+**The worked instance is NicoCares**, measured 2026-09-23 by running gov's engine over its tree:
+its registries under `project/` go to `PROJECT_REGISTRY_EXTRA`; its ten build-root status
+files and thirteen run-protocol records go to `legacy-files.txt`; its undated JSON, HTML and Python
+artifacts go to `RECORD_UNDATED_ARTIFACTS`; and its check 90 becomes the project leg worked below.
+The per-carve-out table is the spec for the unit that shipped these routes, `TOOL-aRepatriatedFork-10`
+§4.
+
 ## Adding a check gov does not have — the extension point, and its limits
 
 A project with a rule this kit does not implement does **not** edit the engine. It writes its own
@@ -278,6 +345,46 @@ so it reads the same tree from the same declaration.
 
 **Give it a ceiling.** The runner reds a leg that arrives without one, and finding that out from a
 red bar is a worse first experience than reading it here.
+
+**The worked example, runnable as written.** NicoCares' check 90 is the case this seam was ruled
+for: a `<!-- status derived: … -->` comment justifies a DECLARED `status:` key in a build README,
+and once the key goes the comment is a false claim nothing regenerates. Save this as
+`scripts/check-build-readme-comments.sh` beside the leg above:
+
+```bash
+#!/usr/bin/env bash
+# Project leg: a '<!-- status derived:' comment in a build README whose front matter declares no
+# 'status:' key. Exit 0 clean, 1 on a finding, 2 when it cannot run.
+set -u
+ROOT="$(git rev-parse --show-toplevel)" || exit 2
+cd "$ROOT" || exit 2
+MEMORY_ROOT=memory
+[ -f .memory-tree.conf ] && . ./.memory-tree.conf
+readmes=$(git ls-files "$MEMORY_ROOT/builds/" | grep -E "^$MEMORY_ROOT/builds/[^/]+/README\.md$")
+[ -n "$readmes" ] || { echo "build-readme-comments: no build README under $MEMORY_ROOT/builds/ — graded nothing"; exit 2; }
+bad=""
+for f in $readmes; do
+  grep -q '<!-- status derived:' "$f" || continue
+  grep -q '^status:' "$f" && continue
+  bad="$bad  $f
+"
+done
+[ -z "$bad" ] && { echo "build-readme-comments: clean"; exit 0; }
+printf 'build-readme-comments: a status-derived comment survives with no status: key — delete it:\n%s' "$bad"
+exit 1
+```
+
+It refuses an EMPTY population at exit 2 rather than printing `clean`, for the reason this kit's
+rule 5 gives. Two facts about the seam around it:
+
+- **If the script is missing, the leg reds; it does not skip.** The leg's argv is `bash <path>`, and
+  bash exits 127 naming the path: `bash: scripts/check-build-readme-comments.sh: No such file or
+  directory`. That exit is observed directly. That the runner then reports the leg red rather than
+  holding it is `TOOL-dRetiredFork-16`'s one unobserved claim, and the unit that shipped this
+  example leaves its observation to the merge bar that closes it.
+- **It runs at the push bar, not at pre-commit.** The engine ran nc's check 90 under `--staged`;
+  a project leg does not, and gov ships no pre-commit hook to adopters. To keep the earlier signal,
+  call the script from your own `.githooks/pre-commit`. Nothing in this kit needs to change for that.
 
 ### Two limits, both measured, neither of which is "declines and reports"
 

@@ -1,10 +1,15 @@
 # TOOL-aRepatriatedFork-11 — unattended: build-root pathspecs stop at the build root, and a pull lands its hooks wired and its pins measurable
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling+deployer · order 6
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling+deployer · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-build-TOOL-aRepatriatedFork-11-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-11-1-acceptance-ledger.md) | journal | — |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-11-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-11-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -24,7 +29,7 @@ the install that lands them, adds the measuring verb, and makes protocol growth 
 - **S1** — Every `git ls-files` pathspec in the unattended kit naming a file at a BUILD ROOT carries
   the `:(glob)` magic, so `*` stops at `/`. The sites: `tools/unattended/check-unattended.sh:235`,
   `:445`, `:626` and `:2535`, `tools/unattended/unattended.sh:1398`, and
-  `tools/unattended/resume-tick.sh:370`. inCMS's `awk -F/ 'NF==4'` spelling
+  `tools/unattended/resume-tick.sh:370` and `:377` (a `git grep` pathspec, the same class). inCMS's `awk -F/ 'NF==4'` spelling
   (`scripts/unattended/check-unattended.sh:2588`) is not taken, because it assumes `MEMORY_ROOT` is
   one segment. Observed by AC1.
 - **S2** — The class gate: `check-unattended.sh` refuses any script in its own kit directory that
@@ -223,19 +228,39 @@ The new leg `unattended protocol size` is not an arm; AC6 observes its failing c
 - **F1 — does the wiring step ride `GOVKIT_RERENDER`?** Options: (a) yes, one switch for "this verb
   runs target-side code"; (b) its own switch. Recommendation: (a). A second switch is a second
   channel with no diff, the thing `.memory-tree.conf`'s cutoff history records removing.
+  RESOLVED (owner, 2026-09-23): (a), it rides `GOVKIT_RERENDER`, as recommended.
 - **F2 — what if the target did not select settings-merge?** The step then cannot wire, and a kit
   whose `[check]` grades wiring, as unattended's does, rolls back. Options: (a) add
   `settings-merge` to the unattended kit's `requires`; (b) run gov's own copy of `settings-merge.py`
   against the target. Recommendation: (a), because the target's receipt then names the program that
   wrote its settings file.
+  RESOLVED (owner, 2026-09-23): (a), `settings-merge` joins the unattended kit's `requires`, as
+  recommended.
 - **F3 — the protocol's ceiling value.** Options: (a) the committed render's size at build, PINNED;
   (b) the 96 KB guide default. Recommendation: (a), so the next growth is a line in this repo's diff,
   as `TOOL-dFoldedVerdict-7` asked for the three carriers it found at their caps.
+  RESOLVED (owner, 2026-09-23): (a), the committed render's size, PINNED, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, from audit-C's inCMS check-unattended section, both adopters'
   `.unattended.conf` and `.memory-tree.conf`, and the pathspec census measured on node a.
+- rev-2 · 2026-09-24 · built. S1 adds `resume-tick.sh:377`, a `git grep --cached` pathspec of the same
+  class that S2's predicate reds; the other sites' line numbers had moved since rev-1. S2 is check
+  35, placed beside check 34, and skips comment lines so a header may describe the defect. S4's
+  population is the entries the step ADDED: a stale command it rewrote in place existed before the
+  run, and a rollback that unwired it would remove the adopter's own wiring, so the step asks
+  settings-merge on a scratch copy which case it is. S5's verb exits right after check 23 counts,
+  since everything after it in file order is discarded output. Section 7: the kit gate's
+  `ARMS_FLOORS` token did not move, because it is a minimum and sits at 101:100 against a measured
+  census of 188:180, and the new branch is armed; the govkit selftest arm drives the two helpers
+  `update` calls rather than a whole `update --write` fixture, so AC3's ordering half is by the call
+  site's placement and is owed to that fixture.
+- rev-3 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. S3 and S4's two helpers
+  spawn the target's `settings-merge.py` and no `SHELL_EXEC_SITES` row declared them. Both are
+  declared `target-code`: gov's argv, the target's program, reached only from `apply` and `update`.
+  Each call spells its argv inline, as the source arm requires of an argv that is not routed through
+  `resolve_shell_argv`. A census gap, fixed in `govkit.py`.
 
 ## 10. Reuse audit
 

@@ -187,7 +187,8 @@ AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # the duration slot already took any word, so `timeout "$GATE_BOUND" bash <suite>` was a hit here
 # before round 3 T5 made it one in the hook — or a
 # GATE_FULL= / GATE_SELFTESTS= assignment with a NON-EMPTY value anywhere in the
-# token. A suite is a `.test.sh` file OR a whole-suite `selftest.py` file (closing review F2: six
+# token. A suite is a `.test.sh` file OR a file whose name ENDS `selftest.py`, the word gate-guard's
+# D4 reads (`.githooks/pre_push_bar_selftest.py`, TOOL-aRepatriatedFork-5) (closing review F2: six
 # manifest legs are the latter and both readers had spelled "suite" as the shell convention); a
 # `--selftest` FLAG on some other file is the seconds-long direct check and is not a run. A
 # `path:line` citation fails the trailing lookahead and stays the cites join's; a grep over a suite
@@ -197,7 +198,7 @@ AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 BAR = re.compile(
     r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+(?:(?:-[ks]|--kill-after|--signal)\s+\S+\s+|-\S+\s+)*\S+\s+)?"
     r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)(?:-X\S*(?:\s+\S+)?|-[A-Za-z]+|-\d+(?:\.\d+)?)\s+)?)?(?:\S*/)?"
-    r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|selftest\.py)(?=\s|$)"
+    r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|[^\s/*?]*selftest\.py)(?=\s|$)"
     r"|(?:^|\s)GATE_(?:FULL|SELFTESTS)=[\"']?[^\s\"']")
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "
@@ -243,7 +244,9 @@ CLAIM_ARMS = [(name, re.compile(shape.format(**CLAIM_PARTS), re.I)) for name, sh
 # The refusal set, one row per class, and the FIRST ROW TO MATCH DECIDES. The first row is the shared
 # SPACE CLAUSE, which clears: every live key carrying punctuation also carries a space, so this row is
 # what keeps the three classes disjoint from the key set, and the self-test re-derives that on every
-# run. GLOB is tested before PATH so `tools/*/kit.toml` reports its real shape; both rest on the same
+# run. A FILENAME key is the one exception, and CODE SYMBOL clears it by shape: the git-hooks key
+# `pre_push_bar_selftest.py` carries an underscore and no space (TOOL-aRepatriatedFork-5, gate repair
+# at VERIFYING). GLOB is tested before PATH so `tools/*/kit.toml` reports its real shape; both rest on the same
 # sentence of the map's contract, so the order moves a label and never a verdict.
 CLAIM_REFUSALS = (
     ("", re.compile(r"\s"), "cleared by the space clause: a token carrying a space is never refused"),
@@ -251,7 +254,8 @@ CLAIM_REFUSALS = (
      "(memory/map/README.md, rendered by tools/codebase-map/gen_map.py)"),
     ("PATH", re.compile(r"/"), "the map README rules that path globs are digest-only, never gated "
      "(memory/map/README.md, rendered by tools/codebase-map/gen_map.py)"),
-    ("CODE SYMBOL", re.compile(r"[A-Za-z0-9]_[A-Za-z0-9]|[()]"), "the symbol tier feeds "
+    ("CODE SYMBOL", re.compile(r"^(?![\w.-]+\.(?:py|sh|js|json|toml|md|txt)$).*?(?:[A-Za-z0-9]_[A-Za-z0-9]|[()])"),
+     "the symbol tier feeds "
      "generated/symbols.json only and never the ratchet (tools/codebase-map/map_extractors.py)"),
 )
 CLAIMS_WHY = ("a codebase-map dossier claims EXACT inventory keys and no key is a {cls}: {cite}; name "

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.28 -->
+<!-- gov:kit unattended@1.37 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -74,6 +74,10 @@ unreadable input. Its suite, `gate-guard.test.sh`, is withheld like the others a
 `VERIFYING`; the predicate's coverage over real usage is the corpus probe in the build record of
 `TOOL-aDeferredBar-3`.
 
+`govkit update` and `govkit apply` wire every fragment an install lands, before the kit's own
+`[check]` runs, through the target's `settings-merge.py` (a required kit since 1.33); a verify
+rollback unwires what that run added. `GOVKIT_RERENDER=0` declines the step and says so.
+
 ## Two things the validity gate does not treat as playbooks
 
 `check-playbook.sh` grades every tracked markdown carrying a `step_selector` and a `toml` block,
@@ -132,6 +136,7 @@ never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
 ```
 adopt-unattended.sh --check      # the installed artifacts are in sync, the hook wired
 check-unattended.sh              # the kit gate
+check-unattended.sh --emit-ceiling  # MEASURES .unattended.conf's UNDECLARED_WRITE_CEILING for this tree
 check-playbook.sh                # playbook validity, including the fixture
 check-pass-order.sh              # refuses a unit built before it was specced
 check-brief-recorded.sh          # refuses a closed unit whose build commit records no brief

@@ -14,6 +14,23 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/check-memory-hygiene.sh"
+# THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-18 S2). It ships beside its gate, so a
+# spelled default resolved only at gov's prefix and nothing ever set it (TOOL-dRetiredFork-39). The
+# block is byte-identical to the canonical copy named on its marker line, gated by the parity table
+# in the resolve-python self-test.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does not
@@ -207,20 +224,20 @@ printf '# t54\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · 
 # ---- these fixtures ARE the coverage. Note `good10` yields a §10 reading "No existing seam fits.",
 # ---- which satisfies the PROBE arm and not the TERMS arm — that is fixture 70 and it is why the
 # ---- two arms need separate fixtures rather than one.
-ev()      { good10 | sed "s/2026-08-10/2026-08-25/g; s/base 0123abcd/base 0123abcd · streams architecture/"; }
-evterms() { sed 's|^No existing seam fits\.$|No existing seam fits. Recall terms used: alpha beta gamma delta.|'; }
+build_ev_spec()      { good10 | sed "s/2026-08-10/2026-08-25/g; s/base 0123abcd/base 0123abcd · streams architecture/"; }
+derive_ev_terms() { sed 's|^No existing seam fits\.$|No existing seam fits. Recall terms used: alpha beta gamma delta.|'; }
 # The terms VALUE deliberately carries `reuse-first` and `reuse_lookup`. That is the F4 class from
 # the closing diff review: a terms list is 8-14 words of this corpus's jargon and those words
 # routinely include a probe token, so a single-blob scan let the terms line buy the probe half and
 # the probe arm could not fail. Both specs of the build that added this arm did exactly that. If the
 # probe blob ever stops excluding the terms value, THIS fixture goes silent and the arm below reds.
-evonlyt() { sed 's|^No existing seam fits\.$|Recall terms used: reuse-first reuse_lookup seam recall probe terms alpha beta.|'; }
+derive_ev_only_terms() { sed 's|^No existing seam fits\.$|Recall terms used: reuse-first reuse_lookup seam recall probe terms alpha beta.|'; }
 # The COPYABLE SKELETON's own section 10, which must NOT satisfy either arm. F3: the first cut put
 # the instructional prose inside the skeleton, and every word that satisfies this predicate is a word
 # such prose must contain -- so an author who filled sections 1-9 and left section 10 boilerplate
 # scored both arms and was never told. The rules now live above the fence; this fixture is what stops
 # them moving back.
-evskel()  { sed 's|^No existing seam fits\.$|REPLACE both bullets. Delete this paragraph.|'; }
+derive_ev_skeleton()  { sed 's|^No existing seam fits\.$|REPLACE both bullets. Delete this paragraph.|'; }
 # A terms list that WRAPS, with a probe token on the CONTINUATION line. The first cut of the probe
 # blob cut per LINE, so a continuation carried no marker, was scanned whole, and a token there bought
 # the probe half -- reproduced against the shipped awk, and every spec in the build that wrote it
@@ -229,14 +246,14 @@ evskel()  { sed 's|^No existing seam fits\.$|REPLACE both bullets. Delete this p
 # Built by DELETING the one-line finding and APPENDING two lines, rather than by a sed whose
 # replacement carries an embedded newline: that spelling is fragile across sed builds, and authoring
 # it through a shell heredoc silently turned the escape into a real byte twice in one session.
-evwrap()  { sed 's|^No existing seam fits\.$||'
+derive_ev_wrapped()  { sed 's|^No existing seam fits\.$||'
             printf 'Recall terms used: alpha beta gamma delta epsilon zeta\nreuse_lookup eta theta iota.\n'; }
 
-ev | evonlyt > "$D/spec/2026-08-25-spec-tFixture-80.md"  # post-cutoff, terms only, no probe -> red
-ev           > "$D/spec/2026-08-25-spec-tFixture-81.md"  # post-cutoff, probe only, no terms -> red
-ev | evterms > "$D/spec/2026-08-25-spec-tFixture-82.md"  # post-cutoff, BOTH arms            -> silent
-ev | evskel  > "$D/spec/2026-08-25-spec-tFixture-85.md"  # post-cutoff, SKELETON boilerplate -> red
-ev | evwrap  > "$D/spec/2026-08-25-spec-tFixture-86.md"  # post-cutoff, WRAPPED terms, probe on line 2 -> red
+build_ev_spec | derive_ev_only_terms > "$D/spec/2026-08-25-spec-tFixture-80.md"  # post-cutoff, terms only, no probe -> red
+build_ev_spec           > "$D/spec/2026-08-25-spec-tFixture-81.md"  # post-cutoff, probe only, no terms -> red
+build_ev_spec | derive_ev_terms > "$D/spec/2026-08-25-spec-tFixture-82.md"  # post-cutoff, BOTH arms            -> silent
+build_ev_spec | derive_ev_skeleton  > "$D/spec/2026-08-25-spec-tFixture-85.md"  # post-cutoff, SKELETON boilerplate -> red
+build_ev_spec | derive_ev_wrapped  > "$D/spec/2026-08-25-spec-tFixture-86.md"  # post-cutoff, WRAPPED terms, probe on line 2 -> red
 # PRE-cutoff twin of 70+71 combined: a §10 with neither fact, dated before the cutoff. This is the
 # grandfathering arm, and without it "no landed spec goes retroactively red" is an untested claim.
 good10 | sed "s/base 0123abcd/base 0123abcd · streams architecture/" \
@@ -1835,6 +1852,12 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
 # has no run to record, so there is no precondition that could make its absence a mis-segmentation.
 n=$((n+1))
 [ "$rcy" = 0 ] || { echo "FAIL a freshly scaffolded tree is not clean (rc=$rcy):"; printf '%s\n' "$outy" | sed 's/^/      /'; st=1; }
+# TOOL-aRepatriatedFork-9 S6: check 20's capture reaches the operator on a GREEN run. This tree
+# declares no LIVE_ROW_PIN, so row_grammar.py announces the unarmed shard inside its green output,
+# and a gate that printed the capture only on failure turned that announcement back into silence.
+n=$((n+1))
+grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md has no LIVE_ROW_PIN entry' <<<"$outy" \
+  || { echo "FAIL a green check 20 run swallowed its NOT MEASURED line, so an unarmed live-row pin is silent again"; st=1; }
 
 # ---- (c) A tree carrying a .codebase-map.conf. This is the ONLY place check 7's MAP_SUB branch is
 # ----     reachable: every tree above writes no such conf, so `MAP_SUB` is empty throughout and the
@@ -2082,15 +2105,15 @@ n=$((n+1))
 # stayed green, because a blank ceiling is the legal UNARMED state and a blank one reads the same.
 n=$((n+1))
 B=$TMP/scaffolded-inside
-mkdir -p "$B/tools"
-cp -r "$HERE" "$B/tools/" 2>/dev/null
+mkdir -p "$B/$(dirname -- "$KIT_REL")"
+cp -r "$HERE" "$B/$(dirname -- "$KIT_REL")/" 2>/dev/null
 ( cd "$B" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
   # Declares READINESS_ROWS for the reason the sibling arm above states: it is a
   # `required_keys_render` key, and without it the scaffolder refuses before it reaches the ceiling
   # strip this arm exists to observe.
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nREADINESS_ROWS="security|risks|testing"\n' > .memory-tree.conf
-  bash "tools/$(basename "$HERE")/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 ) || true
-_lim="$B/tools/$(basename "$HERE")/build-readme-slot-limits.txt"
+  bash "$KIT_REL/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 ) || true
+_lim="$B/$KIT_REL/build-readme-slot-limits.txt"
 if [ -f "$_lim" ]; then
   _valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "$_lim")
   _rows=$(grep -c '^## ' "$_lim" || true)
@@ -2509,7 +2532,7 @@ _b1=$(mktemp -d)
 # THIS TREE IS ALSO THE PROJECT-KEY FIXTURE (TOOL-aRatifiedRulings-3), so its conf is written by the
 # one helper the project-key arms rewrite it with: the four base lines plus the retired
 # READ_PATH_CEILING that provokes the notice, then the arm's one key line.
-pk_set() {   # $1 = a conf line, or empty for the fixture's base conf
+write_pk_conf() {   # $1 = a conf line, or empty for the fixture's base conf
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > "$_b1/.memory-tree.conf"
   printf 'READ_PATH_CEILING="135677"\n' >> "$_b1/.memory-tree.conf"
   [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$_b1/.memory-tree.conf"
@@ -2519,7 +2542,7 @@ pk_set() {   # $1 = a conf line, or empty for the fixture's base conf
   cd "$_b1" || exit 1
   git init -q .; git config user.email t@t.test; git config user.name t
   mkdir -p memory/guides memory/builds/tOne/spec memory/project
-  pk_set ""
+  write_pk_conf ""
   printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
   printf '# r\n' > memory/README.md
   printf '# d\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
@@ -2561,7 +2584,7 @@ esac
 #
 # THE ONE RUNNER: stdout and stderr on stdout, the checker's rc as its own. `pk_rc` is gone -- an
 # abort arm used to run the checker twice over the same conf, once for rc and once for text.
-pk_out() { ( cd "$_b1" && bash "$HERE/check-memory-hygiene.sh" 2>&1 ); }
+run_pk_gate() { ( cd "$_b1" && bash "$HERE/check-memory-hygiene.sh" 2>&1 ); }
 
 # BUILD_SLUG_RE
 # THE CONTROL READS THE CLEAN RUN ABOVE, not a run of its own: rc 0 AND the notice, so a clean
@@ -2572,11 +2595,11 @@ case "$_b1rc:$_b1out" in
   *) echo "FAIL project keys: the fixture is not clean unset (rc=$_b1rc), or its clean run never reached check 16 — every arm below is meaningless"; st=1 ;;
 esac
 
-pk_set 'BUILD_SLUG_RE="^[A-Za-z]+$"'; o=$(pk_out); r=$?
+write_pk_conf 'BUILD_SLUG_RE="^[A-Za-z]+$"'; o=$(run_pk_gate); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   BUILD_SLUG_RE: a pattern gov's own slugs satisfy still passes" \
   || { echo "FAIL BUILD_SLUG_RE: a satisfiable pattern redded (rc=$r)"; st=1; }
 
-pk_set 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; o=$(pk_out); r=$?
+write_pk_conf 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; o=$(run_pk_gate); r=$?
 n=$((n+1))
 case "$o" in
   *"HYGIENE check 4 FAILED"*"memory/builds/tOne (bad folder name"*) echo "ok   BUILD_SLUG_RE: a pattern the folders violate REDS (rc=$r)" ;;
@@ -2585,7 +2608,7 @@ esac
 
 # THE INVALID CASES. Each of these would otherwise grade nothing and report clean.
 for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
-  pk_set "BUILD_SLUG_RE=\"$bad_re\""; o=$(pk_out); r=$?
+  write_pk_conf "BUILD_SLUG_RE=\"$bad_re\""; o=$(run_pk_gate); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*BUILD_SLUG_RE*) echo "ok   BUILD_SLUG_RE='$bad_re' ABORTS naming the key" ;;
@@ -2594,12 +2617,12 @@ for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
 done
 
 # RECORD_SERVES_CUTOFF
-pk_set 'RECORD_SERVES_CUTOFF="2020-01-01"'; o=$(pk_out); r=$?
+write_pk_conf 'RECORD_SERVES_CUTOFF="2020-01-01"'; o=$(run_pk_gate); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   RECORD_SERVES_CUTOFF: a past cutoff is accepted" \
   || { echo "FAIL RECORD_SERVES_CUTOFF: a past cutoff redded (rc=$r)"; st=1; }
 
 for bad_cut in '2099-01-01' 'yesterday'; do
-  pk_set "RECORD_SERVES_CUTOFF=\"$bad_cut\""; o=$(pk_out); r=$?
+  write_pk_conf "RECORD_SERVES_CUTOFF=\"$bad_cut\""; o=$(run_pk_gate); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*RECORD_SERVES_CUTOFF*) echo "ok   RECORD_SERVES_CUTOFF='$bad_cut' ABORTS naming the key" ;;
@@ -2609,11 +2632,11 @@ done
 
 # ENTRY_CAP_UNIT
 for unit in chars bytes; do
-  pk_set "ENTRY_CAP_UNIT=\"$unit\""; o=$(pk_out); r=$?
+  write_pk_conf "ENTRY_CAP_UNIT=\"$unit\""; o=$(run_pk_gate); r=$?
   n=$((n+1)); [ "$r" = 0 ] && echo "ok   ENTRY_CAP_UNIT=$unit is accepted" \
     || { echo "FAIL ENTRY_CAP_UNIT=$unit redded (rc=$r)"; st=1; }
 done
-pk_set 'ENTRY_CAP_UNIT="glyphs"'; o=$(pk_out); r=$?
+write_pk_conf 'ENTRY_CAP_UNIT="glyphs"'; o=$(run_pk_gate); r=$?
 n=$((n+1))
 case "$r:$o" in
   2:*ENTRY_CAP_UNIT*) echo "ok   ENTRY_CAP_UNIT='glyphs' ABORTS naming the key" ;;
@@ -2625,14 +2648,14 @@ esac
 # adopter conf predating the key must not red on a kit upgrade, so a missing key has to pass, and an
 # arm that only tested the abort would leave that free to regress silently. TOOL-cSpliceWarden-1.
 for rmode in cut snapshot; do
-  pk_set "ROTATION_MODE=\"$rmode\""; o=$(pk_out); r=$?
+  write_pk_conf "ROTATION_MODE=\"$rmode\""; o=$(run_pk_gate); r=$?
   n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE=$rmode is accepted"     || { echo "FAIL ROTATION_MODE=$rmode redded (rc=$r)"; st=1; }
 done
-pk_set 'ROTATION_MODE=""'; o=$(pk_out); r=$?
+write_pk_conf 'ROTATION_MODE=""'; o=$(run_pk_gate); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE blank is UNDECLARED and passes"   || { echo "FAIL ROTATION_MODE blank redded (rc=$r) — an adopter conf predating the key would red on upgrade"; st=1; }
 # Case matters, and the near-miss is the arm worth having: `Cut` is the typo a human makes.
 for rbad in Cut rotate; do
-  pk_set "ROTATION_MODE=\"$rbad\""; o=$(pk_out); r=$?
+  write_pk_conf "ROTATION_MODE=\"$rbad\""; o=$(run_pk_gate); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*ROTATION_MODE*) echo "ok   ROTATION_MODE='$rbad' ABORTS naming the key" ;;
@@ -2640,17 +2663,131 @@ for rbad in Cut rotate; do
   esac
 done
 
+# ---- TOOL-aRepatriatedFork-10: legacy-files.txt reaches check 4's ENTRY branch and check 21's
+# ---- missing-Serves branch, a KIT registry is admitted by name, and RECORD_UNDATED_ARTIFACTS
+# ---- narrows check 21 OUT LOUD. One commit adds the fixtures; the conf line and the registry decide
+# ---- the rest. RECORD_UNBOUND_PIN is declared on every run here so check 21's pin branch is never
+# ---- the red these arms read, and `zz-probe.txt` is an unlisted registry whose check-3 finding
+# ---- proves check 3 RAN before its silence about `pass-order-waiver.txt` is read as a pass.
+mkdir -p "$_b1/memory/builds/tOne/build"
+printf 'status\n' > "$_b1/memory/builds/tOne/NOTES.md"
+printf '# a build record\n\nno serves line\n' > "$_b1/memory/builds/tOne/build/2026-08-01-build-tOne-1.md"
+printf '{"a": 1}\n' > "$_b1/memory/builds/tOne/build/result.json"
+printf '# pass-order waivers\n' > "$_b1/memory/project/pass-order-waiver.txt"
+printf 'x\n' > "$_b1/memory/project/zz-probe.txt"
+printf '# legacy\n' > "$_b1/memory/project/legacy-files.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10 --no-verify ) >/dev/null 2>&1
+write_pk_conf 'RECORD_UNBOUND_PIN="9"'; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"HYGIENE check 4 FAILED"*"memory/builds/tOne/NOTES.md"*) echo "ok   check 4: an UNLISTED build-root NOTES.md reds" ;;
+  *) echo "FAIL check 4: an unlisted build-root NOTES.md did not red — the entry arm's control is dead"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"memory/builds/tOne/build/2026-08-01-build-tOne-1.md — no Serves line"*) echo "ok   check 21: an UNLISTED unbound record reds" ;;
+  *) echo "FAIL check 21: an unlisted unbound record was not named"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"memory/builds/tOne/build/result.json — no Serves line"*) echo "ok   RECORD_UNDATED_ARTIFACTS blank: an undated result.json is graded" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS blank: an undated result.json was not graded — blank must mean today's behaviour"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"undated non-markdown artifact(s) not graded"*) echo "FAIL RECORD_UNDATED_ARTIFACTS blank: the exemption count printed, so the filter ran with the key blank"; st=1 ;;
+  *) echo "ok   RECORD_UNDATED_ARTIFACTS blank: the filter does not run" ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"memory/project/pass-order-waiver.txt"*) echo "FAIL check 3 named pass-order-waiver.txt, a registry the unattended kit reads at its default path"; st=1 ;;
+  *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registry pass-order-waiver.txt by name" ;;
+  *) echo "FAIL check 3 did not name the unlisted zz-probe.txt, so its silence about pass-order-waiver.txt proves nothing"; st=1 ;;
+esac
+printf '# legacy\nmemory/builds/tOne/NOTES.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10-legacy --no-verify ) >/dev/null 2>&1
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="9"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"memory/builds/tOne/NOTES.md"*) echo "FAIL check 4: a build-root NOTES.md legacy-files.txt lists still reds — the entry branch ignores LEG"; st=1 ;;
+  *) echo "ok   check 4: a legacy-listed build-root NOTES.md is grandfathered" ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"2026-08-01-build-tOne-1.md — no Serves line"*) echo "FAIL check 21: a record legacy-files.txt lists is still graded for its Serves line"; st=1 ;;
+  *) echo "ok   check 21: a legacy-listed unbound record is grandfathered" ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"result.json — no Serves line"*) echo "FAIL RECORD_UNDATED_ARTIFACTS=exempt: result.json is still graded"; st=1 ;;
+  *"check 21: 1 undated non-markdown artifact(s) not graded (RECORD_UNDATED_ARTIFACTS=exempt)"*) echo "ok   RECORD_UNDATED_ARTIFACTS=exempt drops result.json and prints the count" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS=exempt: result.json vanished without the count printing — a silent narrowing"; st=1 ;;
+esac
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="9"\nRECORD_UNDATED_ARTIFACTS="grade"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"result.json — no Serves line"*) echo "ok   RECORD_UNDATED_ARTIFACTS=grade grades result.json" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS=grade did not grade result.json"; st=1 ;;
+esac
+write_pk_conf 'RECORD_UNDATED_ARTIFACTS="Exempt"'; o=$(run_pk_gate); r=$?
+n=$((n+1))
+case "$r:$o" in
+  2:*RECORD_UNDATED_ARTIFACTS*) echo "ok   RECORD_UNDATED_ARTIFACTS='Exempt' ABORTS naming the key" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS='Exempt' did not abort (rc=$r) — an unknown value read as blank"; st=1 ;;
+esac
+
+# ---- TOOL-aRepatriatedFork-10 S5 and S6: a FLAT install at `scripts/` with a govkit receipt,
+# ---- rendered through `--render`. The rendered HYGIENE.md states THIS tree's two conf values, and
+# ---- TEMPLATE-SPEC.md names the codebase-map generator under the receipt's prefix — the kit
+# ---- directory's own parent is empty here, which is the case the receipt exists for.
+_fl=$(mktemp -d)
+(
+  cd "$_fl" || exit 1
+  git init -q .; git config user.email t@t.test; git config user.name t
+  mkdir -p scripts memory .governance
+  cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
+  # The second row RE-HOMES one sibling, as a `kit.codebase-map.prefix` override records it: only
+  # per row. Closing review round 1 L4 — a top-level `prefix` read renders it at `scripts/` anyway.
+  mkdir -p lib/cm; : > lib/cm/reuse_lookup.py
+  printf '{\n  "schema": 3,\n  "prefix": "scripts",\n  "files": [{"prefix": "decoy"}, {"path": "lib/cm/reuse_lookup.py", "source": "%s/codebase-map/reuse_lookup.py", "kit": "codebase-map"}]\n}\n' gov > .governance/install.json
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\nINDEX_CAP_LINES="500"\nENTRY_CAP_UNIT="bytes"\n' > .memory-tree.conf
+  printf '<!-- gov:kit memory-tree@0 -->\n' > memory/HYGIENE.md
+  git add -A && git -c commit.gpgsign=false commit -q -m flat --no-verify
+  bash scripts/adopt-memory-tree.sh --render
+) >/dev/null 2>&1
+n=$((n+1))
+if grep -qF '`INDEX_CAP_LINES`, is: 500.' "$_fl/memory/HYGIENE.md" 2>/dev/null \
+   && grep -qF '`ENTRY_CAP_UNIT` is: bytes.' "$_fl/memory/HYGIENE.md" 2>/dev/null \
+   && ! grep -qF 'INDEX_CAP_LINES=0' "$_fl/memory/HYGIENE.md"; then
+  echo "ok   --render states the adopter's INDEX_CAP_LINES and ENTRY_CAP_UNIT, never gov's"
+else
+  echo "FAIL --render did not state the fixture's own INDEX_CAP_LINES=500 / ENTRY_CAP_UNIT=bytes, or still spells gov's INDEX_CAP_LINES=0"; st=1
+fi
+n=$((n+1))
+if grep -qF '`scripts/codebase-map/gen_map.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
+  echo "ok   a flat install renders TOOL_ROOT from the receipt's prefix"
+else
+  echo "FAIL a flat install with a receipt prefix of scripts did not render the codebase-map generator under scripts/ — TOOL_ROOT is still the empty parent"; st=1
+fi
+n=$((n+1))
+if grep -qF '`lib/cm/reuse_lookup.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
+  echo "ok   a sibling file the receipt re-homes renders at its row's path, not at the top-level prefix"
+else
+  echo "FAIL the receipt row re-homing the codebase-map lookup to lib/cm/ was ignored — the render read the top-level prefix only"; st=1
+fi
+rm -rf "$_fl"
+
 # PROJECT_REGISTRY_EXTRA — it only WIDENS, so the arm that matters is that it does not widen to
 # everything. The first cut of this key sat above the named cases in check 3 and matched all of
 # them, accepting any file under project/ and disabling the check while reporting clean. BOTH
 # files are committed: the registry the key names must be absent from check 3's list and the
 # probe it does not name must be in it, and a `*unlisted-probe*` match alone could not tell the
 # key widening from check 3 listing everything.
-pk_set 'PROJECT_REGISTRY_EXTRA="my-registry.txt"'
+write_pk_conf 'PROJECT_REGISTRY_EXTRA="my-registry.txt"'
 printf 'x\n' > "$_b1/memory/project/my-registry.txt"
 printf 'x\n' > "$_b1/memory/project/unlisted-probe.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m probe --no-verify ) >/dev/null 2>&1
-o=$(pk_out)
+o=$(run_pk_gate)
 rm -rf "$_b1"
 n=$((n+1))
 case "$o" in
@@ -2673,7 +2810,9 @@ esac
 # RAISED 411 -> 434 at the closing diff review of dGatedProse, round 1, to the PRINTED count again:
 # its two R2 chit calls, and the arms the reconcile with main brought in without a raise.
 # RAISED 434 -> 436 at round 2 of that review: the chit calls for fixtures 220 and 221.
-FLOOR_ASSERTIONS=436
+# RAISED 436 -> 448 by TOOL-aRepatriatedFork-10: its ten registry/key arms and two flat-render arms,
+# each one top-level increment of `n`.
+FLOOR_ASSERTIONS=448
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

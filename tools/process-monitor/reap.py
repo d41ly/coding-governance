@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """reap.py — kill a tree and PROVE each member died.
 
-gov:kit process-monitor@0.2
+gov:kit process-monitor@0.5
 
 Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md
 

@@ -3,7 +3,7 @@
 
 Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/
 
-WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. The verbs are `selfcheck`, the read-only `plan`,
+WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. The verbs are `selfcheck`, the read-only `shipped`, `plan`,
 `check`, `update` and `adopt`, the writing `apply` / `apply --resume`, and `intake`. THE COUNT IS
 NOT SPELLED HERE and the list is not a second source: `USAGE` and `main`'s dispatch tuple own it
 between them, a selftest arm joins the two, and the sentence that used to say "all five" was wrong
@@ -253,6 +253,11 @@ UNLANDED_REASON = {
     # without that demand being written a second time: 7g's `known_roles` is built from this table.
     "forked": "gov's copy is a derivative of the target's — gov keeps these bytes for itself and "
               "has no right to send them; reported in both directions, written in neither",
+    # DEPL-aRepatriatedFork-13 S2. A TARGET's claim, never a descriptor's: it reaches a receipt only
+    # through `adopt` reading the target's `[[own]]` rows, and it is deliberately NOT in `ROLE_KINDS`,
+    # so selfcheck arm 3b refuses a descriptor that spells it. Here so arm 7g demands its dispatch row.
+    "adopter-owned": "the target declares it owns these bytes in its deploy.toml [[own]] — gov grades "
+                     "the contract other kits call, never the bytes",
 }
 
 
@@ -452,6 +457,36 @@ def resolve_entry_version_at(root: pathlib.Path, desc: dict, commit: str) -> str
         if rx.search(ln):
             return ln.strip()
     return "(unresolvable)"
+
+
+def read_target_kit_version(target: pathlib.Path, desc: dict, receipt: dict) -> str | None:
+    """DEPL-aRepatriatedFork-17 S7. The kit's version constant as the TARGET's copy spells it.
+
+    The copy is found through the receipt row whose `source` is the kit's `version_from` file, so a
+    relocating prefix is followed rather than guessed. None when no such row, file or line exists:
+    the caller then falls back to the receipt's own row versions and says nothing new.
+    """
+    vf = desc.get("version_from") or {}
+    if "none" in vf or not vf.get("file") or not vf.get("pattern"):
+        return None
+    home = (desc.get("home") or "").rstrip("/")
+    src = f"{home}/{vf['file']}" if home else vf["file"]
+    row = next((f for f in receipt.get("files") or [] if f.get("source") == src), None)
+    try:
+        dp = (target / demand_contained_dest(str(row["path"]), "a receipt row")
+              if row and row.get("path") else None)
+    except Refusal:
+        return None
+    if dp is None or not dp.is_file():
+        return None
+    try:
+        rx = re.compile(vf["pattern"])
+    except re.error:
+        return None
+    for ln in dp.read_text(encoding="utf-8", errors="replace").splitlines():
+        if rx.search(ln):
+            return ln.strip()
+    return None
 
 
 def entry_members(root: pathlib.Path, entry_id: str, desc: dict, desc_path: str) -> set[str]:
@@ -1009,6 +1044,84 @@ def load_deploy(target: pathlib.Path) -> dict:
     return load_toml(p)
 
 
+def resolve_owned_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
+                       descs: dict[str, tuple[dict, str]]) -> dict[str, dict]:
+    """DEPL-aRepatriatedFork-13 S1. The target's `[[own]]` declarations, graded, keyed by `path`.
+
+    `path` becomes a probe argv, so it takes the STRICT class and the containment guard, like
+    `prefix`. `implements` must name a source some rule of that entry ships as `engine` AT THIS
+    TARGET and that no other rule reaches: a seed, rendered, generated, forked or project-owned
+    source already says who owns its bytes, and a declaration overriding that is the thing refused.
+    """
+    own = deploy.get("own") or []
+    if not isinstance(own, list):
+        raise Refusal("the target descriptor's `own` must be an array of [[own]] tables")
+    out: dict[str, dict] = {}
+    for i, o in enumerate(own, 1):
+        where = f"[[own]] row {i} of the target's .governance/deploy.toml"
+        o = o if isinstance(o, dict) else {}
+        path, impl, why = o.get("path"), o.get("implements"), o.get("why")
+        if not (isinstance(path, str) and path and isinstance(impl, str) and ":" in impl
+                and isinstance(why, str) and why.strip()):
+            raise Refusal(f"{where} needs `path`, `implements = \"<entry>:<source>\"` and a `why`")
+        demand_contained_dest(demand_safe_token("own.path", path, where), where)
+        # Closing review round 1 M3. Every reader joins on this exact string, so `./x` or `a//x`
+        # matched no destination and the owned file was written as engine. Refused, never re-keyed:
+        # the operator's spelling is wrong, and a silent re-key would hide that from them.
+        if path != posixpath.normpath(path):
+            raise Refusal(f"{where}: '{path}' is not canonical — spell it "
+                          f"'{posixpath.normpath(path)}', because every reader joins on the exact path")
+        if path in out:
+            raise Refusal(f"{where} declares '{path}' a second time")
+        eid, _, rel = impl.partition(":")
+        if eid not in descs:
+            raise Refusal(f"{where}: `implements = {impl!r}` names no registry entry")
+        d = descs[eid][0]
+        home = (d.get("home") or "").rstrip("/")
+        src = f"{home}/{rel}" if home else rel
+        res = resolve_entry(root, d, target_context(target, deploy, eid, d))
+        others = sorted({x["role"] for x in res["survivors"] if x["src"] == src} - {"engine"})
+        dests = sorted(k for k, w in res["writes"].items() if w["src"] == src and w["role"] == "engine")
+        if others or not dests:
+            raise Refusal(
+                f"{where}: `implements = {impl!r}` " + (
+                    f"names a source gov ships as {', '.join(others)}, which already states who "
+                    f"owns those bytes" if others else
+                    f"names no source a rule of '{eid}' ships as engine"))
+        if not (target / path).is_file():
+            raise Refusal(f"{where}: '{path}' is not a file in the target")
+        out[path] = {"entry": eid, "source": src, "implements": impl, "why": why, "dests": dests}
+    return out
+
+
+def build_owned_row(dest: str, kit: str, version: str, source: str, own: dict, data: bytes,
+                    oid: str | None) -> dict:
+    """DEPL-aRepatriatedFork-13 S2. The ONE shape of an `adopter-owned` receipt row, which `adopt`
+    and `apply` both build (closing review round 1 residual e): a key added to one copy was
+    silently missing from the other. No `commit` or `gov_oid`, because gov never supplied the
+    bytes. `sha256` is the target's own bytes, and `oid` its index blob where one was read."""
+    row = {"path": dest, "role": "adopter-owned", "kit": kit, "version": version,
+           "source": source, "sha256": hashlib.sha256(data).hexdigest()}
+    if oid is not None:
+        row["oid"] = oid
+    row.update({"implements": own["implements"], "why": own["why"], "evidence": "declared"})
+    return row
+
+
+def derive_owned_engine_refusals(rows: list[dict], owned: dict[str, dict]) -> dict[str, str]:
+    """Closing review round 1 M4. An `engine` receipt row at a path the target's `[[own]]` declares.
+
+    `apply` reads the declaration and `update` and `check` read the receipt, so a declaration added
+    after the install left `update --write` merging gov's bytes into the adopter's program. Both
+    verbs call this and refuse the row: `adopt --re-adopt` is what moves the receipt to agree.
+    """
+    return {f["path"]: f"receipt row '{f['path']}' is recorded engine, and the target's deploy.toml declares "
+            f"'{f['path']}' adopter-owned ([[own]] implements '{owned[f['path']]['implements']}'). "
+            f"gov writes nothing there until `govkit adopt --re-adopt --target <this target> "
+            f"--write` records the declaration"
+            for f in rows if f.get("role", "engine") == "engine" and f.get("path") in owned}
+
+
 # ----------------------------------------------------------------------------------- the findings
 class Report:
     def __init__(self) -> None:
@@ -1535,6 +1648,60 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                        f"then undefined, and check has no evaluator for it")
             if not str(h.get("why", "")).strip():
                 r.fail(f"entry '{eid}' hole '{hid}' carries no reason")
+            # DEPL-aRepatriatedFork-1 S4. A `when_selected` member naming no entry never matches a
+            # selection, so the stand-down its author meant never happens and nothing says so.
+            # ONE refusal site for every malformed shape, so the one arm that stages a typo reaches it.
+            # DEPL-aRepatriatedFork-13 S5. `when_owned` is the second trigger, and its members are
+            # sources relative to this entry's home that a rule ships as `engine`; a member naming
+            # anything else could never be `adopter-owned` at a target, so it would never stand down.
+            if "stands_down" in h:
+                sd = h["stands_down"] if isinstance(h["stands_down"], dict) else {}
+                ws, wo = sd.get("when_selected", []), sd.get("when_owned", [])
+                _home = (d.get("home") or "").rstrip("/")
+                _eng = {x["src"] for x in resolve_entry(root, d, canonical_ctx(eid))["survivors"]
+                        if x["role"] == "engine" and x["src"]}
+                stray = ([str(m) for m in ws if m not in descs] if isinstance(ws, list) else []) + (
+                    [str(m) for m in wo if f"{_home}/{m}" not in _eng] if isinstance(wo, list) else [])
+                if (not isinstance(ws, list) or not isinstance(wo, list) or not (ws or wo) or stray
+                        or not str(sd.get("why", "")).strip()):
+                    r.fail(f"entry '{eid}' hole '{hid}' stands_down needs a non-empty "
+                           f"when_selected of registry entry ids or when_owned of engine sources, "
+                           f"and a why; non-entries named: {', '.join(stray) or 'none'}")
+
+        # ---- DEPL-aRepatriatedFork-13 S3. A `[[contract]]` names an engine source, and every clause
+        # ---- cites a TRACKED consumer: a clause nothing calls reports a false gap forever. A contract
+        # ---- with no clause would print `0/0 hold`, which reads as a pass and measured nothing.
+        _eng_c = {x["src"] for x in resolve_entry(root, d, canonical_ctx(eid))["survivors"]
+                  if x["role"] == "engine" and x["src"]} if d.get("contract") else set()
+        _home_c = (d.get("home") or "").rstrip("/")
+        _trk_c = set(tracked(root)) if d.get("contract") else set()
+        for c in d.get("contract", []):
+            cid = c.get("id") or "<unnamed>"
+            cl = c.get("clause") if isinstance(c.get("clause"), list) else []
+            bad = [] if f"{_home_c}/{c.get('source')}" in _eng_c else [
+                f"source '{c.get('source')}' is not an engine source of this entry"]
+            bad += [] if cl else ["it has zero clauses"]
+            for k in cl:
+                probe, imps = k.get("probe"), k.get("imports")
+                if (probe is None) == (imps is None):
+                    bad.append("a clause carries neither or both of `probe` and `imports`")
+                elif probe is not None and not (isinstance(probe, list) and "{own}" in probe
+                                                and isinstance(k.get("expect"), str)):
+                    bad.append(f"probe {probe!r} needs an `{{own}}` argument and an `expect`")
+                elif imps is not None and not (isinstance(imps, list) and imps):
+                    bad.append("an `imports` clause names no module attribute")
+                cons = resolve_consumer_paths(descs, eid, k.get("consumer"))
+                try:
+                    re.compile(k.get("expect") or "")
+                except re.error as e:
+                    bad.append(f"expect {k.get('expect')!r} is not a regex: {e}")
+                if not cons or any(x not in _trk_c for x in cons):
+                    bad.append(f"consumer {', '.join(x for x in cons if x not in _trk_c) or '(none)'}"
+                               f" is not a tracked gov file")
+            if bad:
+                r.fail(f"entry '{eid}' contract '{cid}': " + "; ".join(bad))
+            else:
+                r.note(f"contract {cid} ({eid}:{c.get('source')}): {len(cl)} clause(s)")
 
     # ---- 7: a requires_if condition names keys that resolve in the named kit's config lists, and
     #         names a kit that is a registry entry. PLAIN `requires` gets the same name arm, because
@@ -2039,6 +2206,51 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     r.note(f"gate policy: {len(policy_files)} file(s) assign GATE_SELFTESTS · "
            f"{len(shipped_owner)} shipped path(s) derived from the descriptors")
 
+    # ---- TOOL-aRepatriatedFork-18 S8. A SHIPPED GATE SHIPS ITS ARMS. The memory-tree kit's
+    # ---- `check-arms.py` runs at every adopter and demands a positive assertion for every `fail`
+    # ---- branch of every tracked gate, read from the gate's sibling `<stem>.test.sh`. A gate that
+    # ---- lands without that sibling is therefore red at every adopter the day it arrives, and was,
+    # ---- for four gates, until TOOL-aRepatriatedFork-18. The PREDICATE is check-arms' own
+    # ---- `discover()`, imported from where the memory-tree descriptor says that kit lives, so this
+    # ---- arm and the gate it protects cannot disagree about what a gate is. The population is every
+    # ---- LANDABLE source, resolved the way `apply` resolves it. WHAT IT DOES NOT CHECK: that the
+    # ---- suite ARMS anything — check-arms' own leg grades that, in gov and at the adopter.
+    # ---- A gov whose memory-tree entry does not LAND check-arms.py (a scratch gov, or one with no
+    # ---- memory-tree entry at all) ships no reader of a gate's arms, so there is nothing to grade:
+    # ---- the arm stands down and SAYS so. Only a check-arms.py that ships and will not load reds.
+    import importlib.util
+    _mt = (descs.get("memory-tree", ({}, ""))[0].get("home") or "").rstrip("/")
+    _arms_path = root / _mt / "check-arms.py"
+    _landed: set[str] = set()
+    if _mt and _arms_path.is_file():
+        for eid, (d, _dpath) in descs.items():
+            _landed |= {w["src"] for w in resolve_entry(root, d, canonical_ctx(eid))["writes"].values()
+                        if w.get("src")}
+    _sp = importlib.util.spec_from_file_location("gov_check_arms", str(_arms_path)) if _mt else None
+    if f"{_mt}/check-arms.py" not in _landed:
+        r.note("shipped-gate arms: stood down — no entry ships check-arms.py"
+               + (f" from '{_mt}'" if _mt else " (no memory-tree entry)")
+               + ", so no adopter reads a gate's sibling suite")
+    elif _sp is None or _sp.loader is None:
+        r.fail(f"shipped-gate arms: cannot load check-arms.py from the memory-tree entry's home "
+               f"('{_mt}'), so no shipped gate's sibling suite can be graded — refusing rather than "
+               f"reporting a confident zero over nothing")
+    else:
+        _arms = importlib.util.module_from_spec(_sp)
+        _sp.loader.exec_module(_arms)
+        _gates = [(g, t) for g, t in _arms.discover(str(root)) if g in _landed]
+        for g, t in _gates:
+            if t not in _landed:
+                r.fail(f"shipped-gate arms: '{g}' ships and check-arms reads it as a gate, but its "
+                       f"sibling suite '{t}' does not ship — every adopter's `gate-arms` leg reads "
+                       f"that file for the gate's arms, so each of its `fail` branches arrives "
+                       f"unarmed. Ship the suite as `engine` beside the gate (its LEG can stay "
+                       f"withheld, as an [[exempt_leg]] row)")
+        if not _gates:
+            r.fail("shipped-gate arms: check-arms' predicate found NO shipped gate — a dead probe, "
+                   "since the memory-tree kit ships at least its own hygiene gate")
+        r.note(f"shipped-gate arms: {len(_gates)} shipped gate(s), each graded for a shipped sibling suite")
+
     # ---- DEPL-dCarriedReceipt-6 S4. THE GOV-SIDE ARM, and this is where the class is actually
     # ---- gated: `apply`'s bar catches the leg at ONE adopter's install, after the descriptor has
     # ---- already shipped; this catches it here, before any adopter can receive it.
@@ -2069,6 +2281,9 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # `drift-audit` copies it, both relying on `silenced_legs` to drop the leg with the file — and
     # failing on those would red a design. A leg naming a path NO rule resolves to at ANY role is
     # the defect. Measured before wiring: 3 hits, of which 2 were those withholds and 1 was F1.
+    # DEPL-aRepatriatedFork-14 S4 REVERSED the first half: a withheld leg printed a `SILENT` row in
+    # every adopter's `plan`, so arm 7j3 below now refuses a leg naming its OWN descriptor's
+    # `project-owned` path, and such a leg moves to an `[[exempt_leg]]` row instead.
     #
     # WHAT THIS DOES NOT CHECK. Whether the file gov ships to that path is the RIGHT one, whether
     # the leg passes, or an argv element carrying an UNANSWERED intake token — this fixture answers
@@ -2216,6 +2431,40 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             if wired and not accepts and cand.name in "".join(chk.get("argv") or []):
                 r.fail(f"entry '{eid}': `[check].argv` names {cand.name}, which has no `--check` arm")
     r.note(f"check wiring: {n_scanned} shipped script(s) read")
+
+    # ---- 7j2: DEPL-aRepatriatedFork-14 S3. EVERY ENTRY DECLARES `[check].argv` OR `[check].none`.
+    #          `run_kit_check` already refuses the silence, but only at a target and only after the
+    #          install, which is reporting a gov authoring defect to the one person who cannot fix
+    #          it. Same predicate, lifted here. DOES NOT CHECK that the argv passes or the reason is
+    #          true; 7j above grades the argv's wiring, and nothing can grade a reason.
+    _no_check = sorted(eid for eid, (d, _p) in descs.items()
+                       if not (d.get("check") or {}).get("argv") and "none" not in (d.get("check") or {}))
+    for eid in _no_check:
+        r.fail(f"entry '{eid}' declares neither `[check].argv` nor `[check] = {{ none = \"…\" }}` — "
+               f"`govkit check` reds this at every target selecting it; declare the absence with a "
+               f"reason")
+
+    # ---- 7j3: DEPL-aRepatriatedFork-14 S4. NO `[[gate_leg]]` RUNS A PATH ITS OWN DESCRIPTOR
+    #          WITHHOLDS. A `project-owned` rule means no target ever receives that file, so the leg
+    #          is emitted nowhere and prints a `SILENT` row in every adopter's `plan`. The bare-target
+    #          arm cannot see it, because it counts an `order` row as a produced file. A gov-only leg
+    #          is an `[[exempt_leg]]` row in the registry. DOES NOT CHECK a path withheld by ANOTHER
+    #          descriptor, or an argv element without a `/` (the `silenced_legs` predicate's own gap).
+    _legs_graded = 0
+    for eid, (d, _p) in sorted(descs.items()):
+        _ctx = canonical_ctx(eid)
+        _held = {p for x in resolve_entry(root, d, _ctx)["unlanded"] if x["role"] == "project-owned"
+                 for p in (x["dest"], x["src"]) if p}
+        for leg in d.get("gate_leg", []):
+            _legs_graded += 1
+            for a in leg.get("argv", []):
+                s = resolve_tokens(a, _ctx)[0]
+                if s in _held:
+                    r.fail(f"entry '{eid}' gate leg '{leg.get('name')}' runs {s}, which its own "
+                           f"`project-owned` rule withholds from every target — move the leg to an "
+                           f"`[[exempt_leg]]` row in tools/govkit/registry.toml")
+    r.note(f"declared check: {len(descs)} entries, {len(_no_check)} silent · withheld-path legs: "
+           f"{_legs_graded} descriptor leg(s) graded")
 
     # ---- 7k: entry-level `scope` is DERIVED and asserted against the declared value. Every
     #          descriptor declares one and the engine read only the rule-level spelling, so the
@@ -2792,6 +3041,14 @@ def write_atomic(dest: pathlib.Path, text: str) -> None:
             pass
 
 
+def check_leg_claimable(argv: list[str], runner_leg: object) -> bool:
+    """DEPL-aRepatriatedFork-17 S8. Is the runner's same-named leg gov's own, by its resolved argv?
+
+    EXACT equality over the argv list and nothing looser: a claim is an ownership record, and a
+    near-miss accepted here is a target's command recorded as gov's."""
+    return isinstance(runner_leg, dict) and runner_leg.get("argv") == argv
+
+
 def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     descs: dict[str, tuple[dict, str]], selection: list[str],
                     receipt: dict | None, have: set[str], r: Report,
@@ -2925,9 +3182,22 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     else:
                         guards.append(s)
                 if nm in by_name and nm not in owned:
-                    raise Refusal(f"the target's runner already has a leg named '{nm}' and this "
-                                  f"target's receipt does not claim it — overwriting a leg the "
-                                  f"target wrote silently deletes their own coverage")
+                    # DEPL-aRepatriatedFork-17 S8. A LEG GOV WROTE IS CLAIMED, NOT REFUSED. The same
+                    # name AND the same resolved argv is gov's leg by construction, so ownership is
+                    # recorded rather than the whole emission refused. Anything else still refuses,
+                    # naming both argvs, so a target cannot launder a different command into the
+                    # receipt under gov's name.
+                    if check_leg_claimable(argv, existing[by_name[nm]]):
+                        owned.add(nm)
+                        print(f"  claimed   leg '{nm}' — the target's runner carries it with gov's "
+                              f"own argv, so it is recorded as emitted")
+                    else:
+                        raise Refusal(
+                            f"the target's runner already has a leg named '{nm}' and this target's "
+                            f"receipt does not claim it — overwriting a leg the target wrote "
+                            f"silently deletes their own coverage. The runner's argv is "
+                            f"{json.dumps((existing[by_name[nm]] or {}).get('argv'))} and gov's is "
+                            f"{json.dumps(argv)}")
                 # SUBJECT TRAVELS. Without this the field never reaches an adopter and the whole
                 # mechanism stops at this repo's edge — a target would receive every kit self-test as
                 # an ordinary bar leg, which is the defect the unit exists to remove.
@@ -3201,6 +3471,15 @@ SHELL_EXEC_SITES = {
     "read_gate_verdicts": "target",  # the target's own `[gate_runner].command` — apply-only, printed
     "decline_findings": "target",    # `[[decline]].discharge.command` — opt-in, printed
     "hook_probe": "target-code",     # `git hook run pre-commit` — gov's ARGV, the TARGET's SCRIPT
+    # TOOL-aRepatriatedFork-11 S3/S4. Both run the TARGET's installed `settings-merge.py`, found
+    # through a receipt row, with an argv built from receipt rows: gov's argv, the target's program,
+    # and reached only from `apply` and `update` — the `hook_probe` shape.
+    "run_fragment_merges": "target-code",
+    "remove_wired_fragments": "target-code",
+    # DEPL-aRepatriatedFork-13 S4. A `[[contract]]` probe: gov's argv, the TARGET's program, and one
+    # target value — the receipt row's `path`, re-graded strictly every run — substituted into it.
+    # `target` and not `target-code`, because it is reached from the read-only `check` too.
+    "measure_contract_parity": "target",
     "check_runs": "gov",             # a bash candidate probed with `-c :` — gov's own candidate list
     # ---- ROUND 4's M4 admitted these five. Each is a spawn whose SUBCOMMAND this census cannot
     # ---- resolve from the argv node, which is now a HIT rather than a silent allowlist entry: the
@@ -3477,11 +3756,18 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
           "ORDER = something outside apply must supply it · COVER = a sibling rule writes that same "
           "path · BLOCK = apply refuses the install over it · FORK = gov's copy is a derivative of "
           "the target's, reported and never written · UNRES. = unresolved token, not a path")
+    n_keep = 0
     for row in rows:
         # A destination still carrying a brace is NOT a path, and printing it under `write` would
         # promise a write this tool cannot perform — the row is marked UNRESOLVED so the plan never
         # reads as a file set anyone can rely on.
         mark = "UNRES." if row["missing"] else KIND_MARKS.get(row["kind"], "?????")
+        # DEPL-aRepatriatedFork-17 S6. `apply` leaves a seed that already exists in place, so the
+        # plan says KEEP there rather than promising a write `apply` will not make.
+        if (not row["missing"] and row["kind"] == "write" and row["role"] == "seed"
+                and os.path.lexists(target / row["dest"])):
+            mark = "KEEP  "
+            n_keep += 1
         print(f"  {mark} [{row['role']:<13}] {row['dest']}   <- {row['kit']}")
     # DEPL-dCarriedReceipt-6 S3. The SAME predicate `apply` runs, over the union of what the target
     # already tracks and what THIS PLAN would write — because at plan time nothing has been written
@@ -3515,8 +3801,10 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     named = {"write": "write(s)", "side-effect": "side-effect(s)", "order": "order(s)",
              "covered": "covered", "blocked": "blocked", "forked": "forked"}
     counts = {k: n[k] + (len(holes) if k == "order" else 0) for k in KIND_MARKS}
+    counts["write"] -= n_keep
     print("govkit plan — "
           + ", ".join(f"{counts[k]} {named.get(k, k)}" for k in KIND_MARKS)
+          + (f", {n_keep} seed(s) kept" if n_keep else "")
           + ". NOTHING was written.")
 
     # ---- DEPL-dCarriedReceipt-4 S4. ADDITIVE (§8 F2): the plan rows above are what a reader needs
@@ -3715,6 +4003,26 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     deploy = load_deploy(target)
     selection = receipt.get("kits") or []
 
+    # ---- DEPL-aRepatriatedFork-1 S5. `[charter]` is the render-only value class: `target_context`
+    # ---- never reads it, so a key a selected kit needs as an argv or destination token, answered
+    # ---- there, reaches no argv at all. The renderer grades its own descriptor's tokens; this is the
+    # ---- whole-selection join, which only a verb holding every descriptor can make.
+    _argv_keys = set(needed_answers(descs, [e for e in selection if e in descs]))
+    for _k in sorted(deploy.get("charter") or {}):
+        if _k.lower() in _argv_keys:
+            r.fail(f"[charter] {_k} names a token a selected kit's argv or destination needs. "
+                   f"[charter] never reaches an argv, so that value belongs in [answers]")
+
+    # ---- DEPL-aRepatriatedFork-13 S2, closing review round 1 M4. The target's `[[own]]` rows,
+    # ---- through the grader `apply` and `adopt` call, so `check` and `update` cannot answer the
+    # ---- ownership question differently from them.
+    try:
+        _owned_ck = resolve_owned_rows(root, target, deploy, descs)
+        for _msg in derive_owned_engine_refusals(receipt.get("files") or [], _owned_ck).values():
+            r.fail(_msg)
+    except Refusal as e:
+        r.fail(str(e))
+
     # ---- DEPL-dCarriedReceipt-5 S7, call site two of two. The SAME predicate `plan --coverage`
     # ---- runs, so the two verbs cannot disagree about whether a decline is stale. The gap list is
     # ---- computed here rather than passed, because `check` has no plan of its own — and it is what
@@ -3738,7 +4046,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     # ---- were all deleted, whose every recorded commit was rewritten to zeros and whose every hash
     # ---- was rewritten to nonsense, exited 0.
     rows = receipt.get("files") or []
-    n_engine = n_ok = n_prov = n_prov_ok = 0
+    n_engine = n_ok = n_prov = n_prov_ok = n_eol_only = 0
     for row in rows:
         role, path = row.get("role", "engine"), row.get("path")
         dp = target / path
@@ -3756,8 +4064,22 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
         n_engine += 1
         want = row.get("sha256")
         if want and _sha(dp.read_bytes()) != want:
-            r.fail(f"'{path}' does not match the receipt: expected {want[:12]}, "
-                   f"found {_sha(dp.read_bytes())[:12]}")
+            # DEPL-aRepatriatedFork-17 S2. THE TARGET'S OWN FILTERS DECIDE, not raw bytes. Both the
+            # landing and the rollback write through `checkout-index`, so under `core.autocrlf=true`
+            # a file `git status` calls clean hashes differently here. What the target's clean
+            # filter makes of the file is compared against the blob the row recorded; a real byte
+            # change still differs there, so this narrows a false red and hides no content change.
+            _cl = subprocess.run(["git", "-C", str(target), "hash-object", f"--path={path}",
+                                  "--", str(dp)], capture_output=True, text=True, encoding="utf-8", check=False)
+            # `blob_oid(raw) != oid` IS THE HALF THAT KEEPS A TAMPERED `sha256` RED: where the
+            # filter changes nothing, the raw bytes ARE the blob and the difference is the receipt's.
+            if (row.get("oid") and _cl.returncode == 0 and _cl.stdout.strip() == row["oid"]
+                    and blob_oid(dp.read_bytes()) != row["oid"]):
+                n_ok += 1
+                n_eol_only += 1
+            else:
+                r.fail(f"'{path}' does not match the receipt: expected {want[:12]}, "
+                       f"found {_sha(dp.read_bytes())[:12]}")
         else:
             n_ok += 1
         src, commit = row.get("source"), row.get("commit")
@@ -3801,7 +4123,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
 
     # A DERIVED count, and a zero over a population the DESCRIPTORS say is non-empty is itself a
     # finding — a receipt that lost its rows and a target that is clean are otherwise the same output.
-    r.note(f"integrity: {n_ok}/{n_engine} engine row(s) verified · "
+    r.note(f"integrity: {n_ok}/{n_engine} engine row(s) verified · eol-only {n_eol_only} · "
            f"provenance: {n_prov_ok}/{n_prov} resolved")
     if n_prov and n_prov_ok == 0:
         r.fail("DEAD PROBE: every engine row failed to resolve in this gov checkout, so the "
@@ -3902,6 +4224,12 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     if n_orders:
         r.note(f"outbox: {n_orders} order(s) recorded")
 
+    # ---- DEPL-aRepatriatedFork-13 S4/S5. The contract parity of every `adopter-owned` row, and the
+    # ---- set of gov sources those rows stand for, which is what a hole's `when_owned` reads.
+    for _ln in derive_parity_lines(target, receipt, descs, r):
+        print(f"govkit check — {_ln}")
+    _owned_src = {f.get("source") for f in rows if f.get("role") == "adopter-owned"}
+
     for eid in selection:
         if eid not in descs:
             r.fail(f"the receipt claims kit '{eid}', which is not a registry entry")
@@ -3929,6 +4257,10 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
             if not cmd:
                 r.fail(f"kit '{eid}' hole '{hid}' has no discharge probe, so 'discharged' is "
                        f"undefined for it and this check cannot answer the question")
+                continue
+            by = resolve_stand_down(h, selection, _owned_src, (d.get("home") or "").rstrip("/"))
+            if by:
+                print(f"govkit check — {eid}: hole '{hid}' stood down — {by}")
                 continue
             resolved = []
             unresolved: list[str] = []
@@ -4283,6 +4615,84 @@ def read_inert_kits(deploy: dict) -> set[str]:
     return {str(x) for x in (deploy.get("inert") or [])}
 
 
+def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str],
+                        skip: set[str], verb: str) -> dict[str, list[str]]:
+    """TOOL-aRepatriatedFork-11 S3: wire every hook fragment this run landed, BEFORE verify.
+
+    The population is DERIVED — every receipt row in `landed` whose path ends `.fragment.json`,
+    minus the kits in `skip` (inert, or not this run's) — never declared per kit: six kits ship
+    fragments, and a `[[regenerate]]` line per kit is six places to forget. A kit whose `[check]`
+    grades its wiring used to land a new hook as a bare file, red its own check, and roll back.
+
+    It runs the TARGET's installed `settings-merge.py`, found through the receipt row that kit
+    owns, with an argv built here from receipt rows and never from the target's `deploy.toml`. The
+    settings file resolves as `check-wiring.sh` resolves it: a declared GOV_SETTINGS_JSON, else
+    `.claude/settings.json`. One line per fragment. Returns {kit: [fragment]} for the entries this
+    run ADDED — not the ones it found wired, and not a stale command it rewrote in place — which
+    is exactly what a rollback of that kit may take back out (`remove_wired_fragments`).
+    """
+    frags = sorted((str(f["path"]), str(f.get("kit"))) for f in rows
+                   if str(f.get("path", "")).endswith(".fragment.json")
+                   and f.get("path") in landed and f.get("kit") not in skip)
+    if not frags:
+        return {}
+    sm = next((str(f["path"]) for f in rows if f.get("kit") == "settings-merge"
+               and str(f.get("path", "")).endswith("settings-merge.py")), None)
+    declared = os.environ.get("GOV_SETTINGS_JSON") or ""
+    settings = declared or ".claude/settings.json"
+    why = ("the target's receipt names no settings-merge.py, so nothing here may write its settings "
+           "file; select the settings-merge kit" if not sm or not (target / sm).is_file() else
+           f"GOV_SETTINGS_JSON names {declared}, which is not a file" if declared
+           and not (target / declared).is_file() else "")
+    if why:
+        for p, _k in frags:
+            print(f"govkit {verb} — hooks: {p} landed UNWIRED — {why}")
+        return {}
+    added: dict[str, list[str]] = {}
+    for p, kit in frags:
+        if subprocess.run([sys.executable, sm, settings, "--fragment", p, "--check"],
+                          cwd=str(target), capture_output=True,
+                          text=True, encoding="utf-8").returncode == 0:
+            print(f"govkit {verb} — hooks: {p} already wired")
+            continue
+        # ABSENT OR STALE, asked of settings-merge itself on a scratch copy: `--check` reds on both,
+        # and only an entry this run ADDED is one a rollback may remove.
+        stale = False
+        if (target / settings).is_file():
+            with tempfile.TemporaryDirectory() as td:
+                probe = pathlib.Path(td) / "settings.json"
+                probe.write_bytes((target / settings).read_bytes())
+                subprocess.run([sys.executable, sm, str(probe), "--unwire", "--fragment", p],
+                               cwd=str(target), capture_output=True, text=True, encoding="utf-8")
+                stale = probe.read_bytes() != (target / settings).read_bytes()
+        out = subprocess.run([sys.executable, sm, settings, "--fragment", p],
+                             cwd=str(target), capture_output=True, text=True, encoding="utf-8")
+        if out.returncode != 0:
+            print(f"govkit {verb} — hooks: {p} REFUSED by settings-merge (exit {out.returncode}): "
+                  + ((out.stderr or out.stdout).strip().splitlines() or ["no output"])[-1])
+            continue
+        print(f"govkit {verb} — hooks: {p} wired" + (" (a stale command rewritten)" if stale else ""))
+        if not stale:
+            added.setdefault(kit, []).append(p)
+    return added
+
+
+def remove_wired_fragments(target: pathlib.Path, rows: list[dict], frags: list[str], verb: str) -> None:
+    """TOOL-aRepatriatedFork-11 S4: a rolled-back kit takes back out exactly the settings entries
+    `run_fragment_merges` added for it, through `settings-merge.py --unwire`, so no entry is left
+    pointing at a hook file the rollback removed. Called BEFORE the kit's files are restored,
+    because a landed fragment is deleted by that restore and `--unwire` reads the fragment."""
+    sm = next((str(f["path"]) for f in rows if f.get("kit") == "settings-merge"
+               and str(f.get("path", "")).endswith("settings-merge.py")), None)
+    settings = os.environ.get("GOV_SETTINGS_JSON") or ".claude/settings.json"
+    for p in frags:
+        out = subprocess.run([sys.executable, str(sm), settings, "--unwire", "--fragment", p],
+                             cwd=str(target), capture_output=True, text=True, encoding="utf-8") if sm else None
+        print(f"govkit {verb} — hooks: {p} "
+              + ("unwired by the rollback" if out is not None and out.returncode == 0 else
+                 "could NOT be unwired by the rollback; remove its entry from " + settings + " by hand"))
+
+
 def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     """Parse the target's runner output into leg name -> green|red|skipped.
 
@@ -4312,6 +4722,159 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     return verdicts
 
 
+def resolve_stand_down(hole: dict, selection: list[str], owned: frozenset | set = frozenset(),
+                       home: str = "") -> str:
+    """Why a hole stands down, or '' when its probe runs.
+
+    DEPL-aRepatriatedFork-1 S4. A `[[hole]]` may declare `stands_down = { when_selected = [...],
+    why = "..." }`: when another selected entry observes what the probe observes, and the probe is
+    WRONG in that mode, the probe is not run. The playbook's placeholder probe reads the template in
+    render mode, which always carries placeholders; the render's own `--check` is the observer.
+
+    DEPL-aRepatriatedFork-13 S5. `when_owned = [<source>, ...]`, relative to the entry's `home`: when
+    EVERY listed source is `adopter-owned` at the target, gov's probe would grade the adopter's own
+    program, which is the pressure the role exists to remove. `owned` is the gov source paths of the
+    receipt's `adopter-owned` rows; a caller with no receipt passes none and the probe runs.
+    """
+    sd = hole.get("stands_down") or {}
+    for eid in sd.get("when_selected") or []:
+        if eid in selection:
+            return f"{eid} observes this"
+    wo = sd.get("when_owned") or []
+    if wo and all(f"{home}/{s}" in owned for s in wo):
+        return f"{', '.join(wo)} adopter-owned here, so gov's probe would grade the target's program"
+    return ""
+
+
+def resolve_consumer_paths(descs: dict[str, tuple[dict, str]], eid: str, text) -> list[str]:
+    """DEPL-aRepatriatedFork-13 S3. A clause's `consumer` words, as gov repo paths.
+
+    Each word is a path relative to THIS entry's home, or `<entry>:<path>` relative to that entry's
+    home, and never a repo-root literal: the descriptor SHIPS, and a kit file names nothing outside
+    itself by literal. A word naming no entry comes back as written, so the tracked-file test that
+    reads this refuses it rather than resolving it somewhere plausible.
+    """
+    out: list[str] = []
+    for w in str(text or "").split():
+        e, sep, rel = w.rpartition(":")
+        d = descs.get(e if sep else eid)
+        home = ((d[0].get("home") or "") if d else "").rstrip("/")
+        out.append(w if d is None else (f"{home}/{rel}" if home else rel))
+    return out
+
+
+def measure_contract_parity(target: pathlib.Path, contract: dict,
+                            own_path: str) -> list[tuple[dict, str]]:
+    """DEPL-aRepatriatedFork-13 S4. The FAILING clauses of one contract against the target's file.
+
+    An `imports` clause is graded STATICALLY — the names bound at the file's top level, `if`/`try`
+    bodies included — so nothing of the adopter's is imported to answer it. A `probe` clause RUNS
+    gov's argv with `{own}` replaced, in the target, and holds when `expect` finds a match in its
+    stdout. `own_path` comes off the hand-editable receipt, so it is graded here and not trusted.
+    A probe gets 60 s: every declared one is a print mode, and one still running after a minute is
+    running something else — measured at inCMS, whose hygiene engine ignores two such flags.
+
+    WHAT THIS DOES NOT CHECK: that an imported name has the SIGNATURE its consumer calls, or that a
+    probe's exit code means what gov's does. It measures the surface, which is what a consumer
+    breaks on first, and never the behaviour.
+    """
+    where = f"the adopter-owned row '{own_path}' of the target's receipt"
+    demand_contained_dest(demand_safe_token("own.path", own_path, where), where)
+    fp = target / own_path
+    clauses = contract.get("clause") or []
+    if not fp.is_file():
+        return [(k, "the owned file is not on disk") for k in clauses]
+    fails: list[tuple[dict, str]] = []
+    bound: set[str] | None = None
+    for k in clauses:
+        if "imports" in k:
+            if bound is None:
+                bound = set()
+                try:
+                    todo = list(ast.parse(fp.read_bytes()).body)
+                except (SyntaxError, ValueError):
+                    todo = []
+                while todo:
+                    n = todo.pop()
+                    if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                        bound.add(n.name)
+                    elif isinstance(n, (ast.Assign, ast.AnnAssign)):
+                        for t in (n.targets if isinstance(n, ast.Assign) else [n.target]):
+                            bound.update(x.id for x in ast.walk(t) if isinstance(x, ast.Name))
+                    elif isinstance(n, (ast.Import, ast.ImportFrom)):
+                        bound.update((a.asname or a.name).split(".")[0] for a in n.names)
+                    elif isinstance(n, (ast.If, ast.Try, ast.With)):
+                        todo += list(n.body) + list(getattr(n, "orelse", [])) + list(
+                            getattr(n, "finalbody", [])) + [
+                            s for h in getattr(n, "handlers", []) for s in h.body]
+            miss = [x for x in k["imports"] if x not in bound]
+            if miss:
+                fails.append((k, f"imports {', '.join(miss)}"))
+            continue
+        argv = [a.replace("{own}", own_path) for a in k.get("probe") or []]
+        shown = " ".join(k.get("probe") or [])
+        try:
+            p = subprocess.run(resolve_shell_argv(argv), cwd=str(target), capture_output=True,
+                               text=True, encoding="utf-8", errors="replace", timeout=60)
+            if not re.search(k.get("expect") or "", p.stdout or ""):
+                fails.append((k, f"probe `{shown}` printed nothing matching "
+                                 f"/{k.get('expect')}/ (exit {p.returncode})"))
+        except (OSError, subprocess.TimeoutExpired) as e:
+            fails.append((k, f"probe `{shown}` could not run: {e}"))
+    return fails
+
+
+def derive_parity_lines(target: pathlib.Path, receipt: dict, descs: dict[str, tuple[dict, str]],
+                        r: Report) -> list[str]:
+    """DEPL-aRepatriatedFork-13 S4. One parity line per `[[contract]]` of every `adopter-owned` row.
+
+    Both `update` and `check` print these and neither reds for a clause: the adopter owns the file.
+    A failing clause whose consumer is installed as a receipt `engine` row is marked INSTALLED
+    CONSUMER CANNOT RUN, and reds ONLY when that installed path is in the argv of a leg the receipt
+    records as emitted (§8 F3). A gov `engine` row sharing the owned source at another path gets one
+    line saying it stays installed (§8 F2).
+    """
+    rows = receipt.get("files") or []
+    at: dict[str, list[str]] = {}
+    for f in rows:
+        if f.get("role", "engine") == "engine" and f.get("source"):
+            at.setdefault(f["source"], []).append(f["path"])
+    # WORDS, not substrings: a path is on a leg when one argv word IS it, quotes stripped, so a
+    # `bash -c` string still counts and `x.py` does not match `x.py.orig`.
+    leg_words = {w.strip("'\"") for g in ((receipt.get("gate_runner") or {}).get("emitted") or [])
+                 for a in (g.get("argv") or []) for w in str(a).split()}
+    out: list[str] = []
+    for f in rows:
+        if f.get("role") != "adopter-owned":
+            continue
+        path, src = f.get("path", ""), f.get("source", "")
+        d = (descs.get(f.get("kit")) or ({}, ""))[0]
+        home = (d.get("home") or "").rstrip("/")
+        rel = src[len(home) + 1:] if home and src.startswith(home + "/") else src
+        for p in (x for x in at.get(src, []) if x != path):
+            run_by = p in leg_words
+            out.append(f"{p} stays installed beside {path}, which the target declares stands in for "
+                       f"it; " + ("a leg this receipt emitted runs it" if run_by else
+                                  "no leg this receipt emitted runs it, so it is unwired"))
+        cs = [c for c in d.get("contract", []) if c.get("source") == rel]
+        if not cs:
+            out.append(f"contract (none) <- {path}: gov declares no contract for {src}")
+        for c in cs:
+            fails = measure_contract_parity(target, c, path)
+            n = len(c.get("clause") or [])
+            out.append(f"contract {c.get('id')} <- {path}: {n - len(fails)}/{n} clauses hold")
+            for k, why in fails:
+                cons = resolve_consumer_paths(descs, f.get("kit"), k.get("consumer"))
+                inst = [p for s in cons for p in at.get(s, [])]
+                out.append(f"  FAILS {why} — needed by {', '.join(cons)}"
+                           + (f" · INSTALLED CONSUMER CANNOT RUN: {', '.join(inst)} against {path}"
+                              if inst else ""))
+                for p in (x for x in inst if x in leg_words):
+                    r.fail(f"contract {c.get('id')}: {p} is on a leg this receipt emitted and "
+                           f"cannot run against the adopter-owned {path}: {why}")
+    return out
+
+
 def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: str,
                configure_skipped: set[str], deploy: dict) -> bool:
     """Is a leg that is red AFTER the install exempt? Two ways, and nothing else.
@@ -4330,7 +4893,8 @@ def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: st
             if leg.get("name") != name:
                 continue
             for h in d.get("hole", []):
-                if not h.get("blocks_gate"):
+                # A stood-down hole's probe is not run, so it grants no exemption either.
+                if not h.get("blocks_gate") or resolve_stand_down(h, selection):
                     continue
                 cmd = (h.get("discharge") or {}).get("command")
                 if not cmd:
@@ -5421,6 +5985,19 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- repository must not queue behind a complaint about a kit descriptor.
     demand_writable_target(target, "apply", receipt)
 
+    # ---- DEPL-aRepatriatedFork-21 S1. The target's `[[own]]` rows, through the ONE grader `adopt`
+    # ---- calls, before any write is computed: a malformed declaration is a finding naming the row,
+    # ---- exit 1, exactly as it is there. Read from `deploy.toml`, never the receipt, so a first
+    # ---- apply over an owning target lands nothing on an owned path either.
+    try:
+        owned = resolve_owned_rows(root, target, deploy, descs)
+    except Refusal as e:
+        r.fail(str(e))
+        return r.emit()
+    # S2, rev-2: only an owned path that IS one of gov's destinations for its source. A stand-in at
+    # another path leaves gov's own copy landing, which `-13` §8 F2 ruled.
+    owned_dests = {p: o for p, o in owned.items() if p in o["dests"]}
+
     # ---- validate every merged rule BEFORE writing. A source that cannot yield exactly one pair,
     # ---- or a marker style with no synthesizer, is a refusal — a block gov writes and can never
     # ---- find again is worse than one it never wrote.
@@ -5687,6 +6264,26 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             rule = d.get("files", [])[w["rule"]]
             if rule.get("scope") == "machine" or rule.get("link"):
                 continue
+            _own = owned_dests.get(dest)
+            if _own is not None and _own["entry"] == eid:
+                # DEPL-aRepatriatedFork-21 S2. The target said these bytes are its own program, so
+                # gov writes nothing here. The row stays `adopter-owned`: carried verbatim from the
+                # receipt `adopt` wrote, or, on an apply with none, built in `adopt`'s shape.
+                _prior = next((f for f in (receipt or {}).get("files") or []
+                               if f.get("path") == dest and f.get("role") == "adopter-owned"), None)
+                if _prior is None:
+                    # Mid-write, so a failed index read disposes rather than raises (F4 below).
+                    try:
+                        _oidx, _ = index_read(target, [dest])
+                    except Refusal:
+                        _oidx = {}
+                    _prior = build_owned_row(dest, eid, vers, w["src"], _own,
+                                             (target / dest).read_bytes(),
+                                             (_oidx.get(dest) or (None, None))[1])
+                rows.append(_prior)
+                print(f"govkit apply — SKIPPED [adopter-owned] {dest} <- {eid}: [[own]] implements "
+                      f"'{_own['implements']}' — the target owns these bytes")
+                continue
             data = blob_at(root, commit, w["src"]) if w["src"] else None
             if data is None:
                 r.fail(f"entry '{eid}': {w['src']} does not resolve at {commit[:8]}")
@@ -5863,6 +6460,14 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # says so rather than being interpreted.
             r.fail(f"kit '{eid}': its adopter exited {rc} — unclassified, because no `[[outcome]]` "
                    f"evaluator exists yet to say WHICH declared outcome that code means")
+
+    # ---- TOOL-aRepatriatedFork-11 S3: WIRE the hook fragments this install landed, after every
+    # ---- adopter ran — settings-merge's own adopter included, which is what created the file — and
+    # ---- under `update`'s switch for running target-side code. Kits skipped above stay unwired.
+    if os.environ.get("GOVKIT_RERENDER") != "0":
+        run_fragment_merges(target, rows, {str(f.get("path")) for f in rows},
+                            configure_skipped | {str(f.get("kit")) for f in rows
+                                                 if f.get("kit") not in selection}, "apply")
 
     # ---- OBSERVE. apply does NOT render — the adopters do, and a second renderer would race the
     # ---- real one. What it does is look at what they produced, so `update` and `check` have
@@ -6204,6 +6809,10 @@ UPDATE_ROLE = {
     # NOT `refuse`, which `-2` exists to remove: one forked row would make every future `update` on
     # that target exit non-zero and never re-stamp its receipt.
     "forked": "report",
+    # DEPL-aRepatriatedFork-13 S2. Written in neither direction and graded by NO byte comparison: the
+    # target declared it owns these bytes, so `update` counts the row and reports the contract parity
+    # other kits call it by. Never `r.fail`, so the row never withholds the re-stamp.
+    "adopter-owned": "contract",
 }
 
 # DEPL-cMendedVintage-24 S1. THE DISPOSITIONS A WRITING VERB CAN PUT BYTES AT, declared once, beside
@@ -6704,6 +7313,12 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
     The row-keyed merge driver already hands its structure lines to exactly this call. A wrong
     argument order does NOT error here — it emits a plausible file with one side silently dropped —
     which is why every arm asserts merged CONTENT and never the exit code.
+
+    DEPL-aRepatriatedFork-17 S3. A CONFLICT RETURNS ITS CONFLICT-MARKED BYTES, never None. The pull
+    that motivated it rebuilt 59 hunks by hand from the hashes an order carried. `--diff3` and the
+    three fixed labels are what make the candidate reproducible from the three files
+    `write_conflict_candidate` puts beside it: the default labels are these temp paths, which no
+    later run can spell. Callers branch on the SECOND field.
     """
     import tempfile as _tf
     with _tf.TemporaryDirectory() as td:
@@ -6711,27 +7326,74 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
         (d / "ours").write_bytes(ours)
         (d / "base").write_bytes(base)
         (d / "theirs").write_bytes(theirs)
-        out = subprocess.run(["git", "merge-file", "-p",
+        out = subprocess.run(["git", "merge-file", "-p", *MERGE_FILE_ARGS,
                               str(d / "ours"), str(d / "base"), str(d / "theirs")],
                              capture_output=True, check=False)
-        if out.returncode == 0:
-            return out.stdout, "merged"
-        return None, "conflict"
+        return out.stdout, ("merged" if out.returncode == 0 else "conflict")
+
+
+def read_worktree_status(target: pathlib.Path) -> dict[str, tuple[str, str | None]]:
+    """DEPL-aRepatriatedFork-17 S1. `{path: (XY, sha256 of the worktree bytes)}` for every path
+    `git status` lists. The hash is what tells a second write to an already-dirty path from none."""
+    out = subprocess.run(["git", "-C", str(target), "status", "--porcelain=v1", "-z",
+                          "--untracked-files=all"], capture_output=True, check=False)
+    got: dict[str, tuple[str, str | None]] = {}
+    ents = out.stdout.decode("utf-8", "replace").split("\0")
+    i = 0
+    while i < len(ents):
+        e = ents[i]
+        i += 1
+        if len(e) < 4:
+            continue
+        xy, p = e[:2], e[3:]
+        if "R" in xy or "C" in xy:
+            i += 1                     # a rename's ORIGINAL path rides as the next NUL field
+        dp = target / p
+        got[p] = (xy, _sha(dp.read_bytes()) if dp.is_file() else None)
+    return got
+
+
+def measure_lone_cr(data: bytes | None) -> int:
+    """DEPL-aRepatriatedFork-17 S4. CR bytes NOT followed by LF — the ones a CR-normalising
+    reconstruction strips silently, and which an awk program can carry as a literal."""
+    return 0 if not data else data.count(b"\r") - data.count(b"\r\n")
+
+
+# S3's reproduction line. ONE spelling, read by `three_way` and printed into every conflict order.
+MERGE_FILE_ARGS = ("--diff3", "-L", "ours", "-L", "base", "-L", "theirs")
+
+
+def write_conflict_candidate(outbox: pathlib.Path, row: dict, base: bytes, ours: bytes,
+                             theirs: bytes, candidate: bytes) -> tuple[str, str]:
+    """DEPL-aRepatriatedFork-17 S3. The four byte-exact files an operator resolves a conflict from.
+
+    `write_bytes` and nothing else: the pull that motivated this lost 20 lone CR bytes to a
+    text-mode reconstruction. The directory shares the order's slug, which `render_order_slug`
+    keeps injective and contained. Returns `(directory, reproduction line)` for the order.
+    """
+    rel = f".governance/outbox/update-conflict-{render_order_slug(row['path'])}"
+    d = outbox / pathlib.Path(rel).name
+    d.mkdir(parents=True, exist_ok=True)
+    for name, data in (("base", base), ("ours", ours), ("theirs", theirs),
+                       ("candidate", candidate)):
+        (d / name).write_bytes(data or b"")
+    return rel, (f"cd {rel} && git merge-file -p {' '.join(MERGE_FILE_ARGS)} "
+                 f"ours base theirs > candidate")
 
 
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                write_withdrawals: bool = False,
-               kits: list[str] | None = None) -> int:
+               kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
     """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
     try:
-        return _cmd_update(root, target, to_rev, write, write_withdrawals, kits)
+        return _cmd_update(root, target, to_rev, write, write_withdrawals, kits, accept_role_moves)
     finally:
         release_write_lock()
 
 
 def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                 write_withdrawals: bool = False,
-                kits: list[str] | None = None) -> int:
+                kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -7076,6 +7738,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
           f"{len(needles)} needle(s), {len(carry_dropped)} fanned-out director(y|ies)")
 
     deploy = load_deploy(target)
+    # ---- DEPL-aRepatriatedFork-13 S2, closing review round 1 M4. The declaration is read here as
+    # ---- `apply` reads it, before any row is dispatched: an `engine` row the target has declared its
+    # ---- own is refused below by name rather than three-way merged into the adopter's program.
+    try:
+        _owned_refusals = derive_owned_engine_refusals(
+            rows_all, resolve_owned_rows(root, target, deploy, descs))
+    except Refusal as e:
+        r.fail(str(e))
+        return r.emit()
 
     # ---- DEPL-dCarriedReceipt-11 S1 + S3. GOV'S OWN RENAMES, once per run, and the resolver that
     # ---- turns one into a destination. PRINTED before the first row is classified, for the reason
@@ -7199,6 +7870,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             r.fail(f"receipt row '{row['path']}' carries role '{role}', which has no row in the "
                    f"update dispatch — refusing rather than classifying it from an absent field")
             continue
+        # Closing review round 1 M4. Never dispatched, so it reaches no write, no rename, no role
+        # move and no `acted` entry; the refusal withholds the re-stamp until `adopt` agrees.
+        if row["path"] in _owned_refusals:
+            r.fail(_owned_refusals[row["path"]])
+            continue
+        # DEPL-aRepatriatedFork-13 S2. ABOVE the re-resolution, deliberately: gov's descriptor
+        # resolves this path as `engine`, and the role-move branch below would stand the row back as
+        # `role-moved`. The role is the TARGET's declaration, which no descriptor can move.
+        if how == "contract":
+            tally[role] = tally.get(role, 0) + 1
+            print(f"  {role:<18} [{role:<13}] {row['path']}")
+            continue
 
         # DEPL-cMendedVintage-19 S1. THE RE-RESOLUTION RUNS AT EVERY SCHEMA. It used to be gated on
         # `schema < 2`, so a schema-3 row whose descriptor had since moved its destination to
@@ -7242,6 +7925,44 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # second role routed to the same argv would otherwise silently not follow, and a role
                 # whose disposition is `skip` would fall through and get gov's bytes put back at a
                 # destination gov's own rule says it never supplies.
+                # Closing review round 1 M2: ONLY a move whose new disposition writes nothing in this
+                # run. A move into `rendered` is written by the kit's own regenerate later in this
+                # run, so taking the flag there skipped the reconcile below and the edit was lost.
+                if (write and accept_role_moves
+                        and UPDATE_ROLE.get(now) not in KIT_WRITING_DISPOSITIONS):
+                    # DEPL-aRepatriatedFork-17 S6. THE MOVE IS RESOLVED WHERE IT IS REPORTED, and
+                    # NO BYTE MOVES in this run: `apply` was the named remedy and it writes every
+                    # engine destination raw. A move INTO a writing disposition takes `adopt`'s own
+                    # attribution walk, so the next run grades it through the verdict table from a
+                    # vintage the bytes really descend from, or skips it as `unattributed`.
+                    _moved_from = role
+                    row["role"] = now
+                    if UPDATE_ROLE.get(now) in WRITING_DISPOSITIONS:
+                        _src6 = (w or {}).get("src") or row.get("source")
+                        _ent6 = index0.get(row["path"])
+                        _ours6 = index_blob(target, _ent6[1]) if _ent6 else None
+                        _hit6 = (derive_attribution(root, _src6, _ours6, to_commit, needles)
+                                 if (_src6 and _ours6 is not None) else None)
+                        if _src6:
+                            row["source"] = _src6
+                        for _k6 in ("commit", "gov_oid", "carry"):
+                            row.pop(_k6, None)
+                        if _ent6:
+                            row["oid"] = _ent6[1]
+                            _dp6 = target / row["path"]
+                            row["sha256"] = _sha(_dp6.read_bytes() if _dp6.is_file() else _ours6)
+                        if _hit6 is None:
+                            row["evidence"] = "unattributed"
+                        else:
+                            row["commit"], row["gov_oid"], row["carry"] = _hit6
+                            row["evidence"] = "vintage-match"
+                        row.pop("written", None)
+                        row.pop("why", None)
+                    tally["role-recorded"] = tally.get("role-recorded", 0) + 1
+                    print(f"  {'role-recorded':<18} [{_moved_from:<13}] -> {now:<13} "
+                          + (f"evidence {row['evidence']} " if row.get("evidence") else "")
+                          + row["path"])
+                    continue
                 if UPDATE_ROLE.get(now) not in KIT_WRITING_DISPOSITIONS:
                     # S2. A DESCRIPTOR TRANSITION IS NOT A BYTE QUESTION. Nothing is written for this
                     # row, it is not counted as a change, and it never reaches `acted` — so no
@@ -7264,7 +7985,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 r.note(f"row '{row['path']}' landed under role '{role}' and gov's descriptor now "
                        f"declares that destination '{now}', whose own machinery writes it in this "
                        f"run — so it is reconciled as '{role}', the role it landed under, rather "
-                       f"than stood back from. `govkit apply` is the verb that re-records the role")
+                       f"than stood back from. `--accept-role-moves` does not take this move, "
+                       f"because this run writes that destination either way")
 
         if how == "block":
             # The block's own hash, not the file's. `check` owns the drift verdict; `update` reports
@@ -7424,6 +8146,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
         c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed)
 
+        # DEPL-aRepatriatedFork-17 S4. LONE-CR LOSS IS A FINDING. Counted against gov's blob at the
+        # row's own `commit`, on the target's worktree copy. Not a ROW line: this is a second line
+        # about a path whose verdict line is parsed by its trailing path, so it ends in the counts.
+        if how == "table" and c["base"] is not None and (target / row["path"]).is_file():
+            _g_cr = measure_lone_cr(c["base"])
+            _t_cr = measure_lone_cr((target / row["path"]).read_bytes())
+            if _t_cr < _g_cr:
+                _lcr = (f"lone-CR {row['path']}: gov holds {_g_cr} lone CR byte(s) at "
+                        f"{str(row.get('commit'))[:8]}, the target copy holds {_t_cr} · gov {_g_cr} "
+                        f"· target {_t_cr}")
+                if write:
+                    r.fail(_lcr + " — a write over a copy that lost them makes the loss permanent")
+                else:
+                    print(f"govkit update — {_lcr}")
+
         # DEPL-dCarriedReceipt-9 S2. `carry` is OUTPUT. It was recomputed from the blobs one line
         # above and is written back for REPORTING; a stale one left by an older run is DROPPED
         # rather than believed, so the field can never be a claim about bytes that have moved since.
@@ -7467,6 +8204,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               "`update` does not install them: widening a target's governance surface is an owner "
               "decision, and `--add-kits` is the flag that would")
     print("govkit update — " + " · ".join(f"{k} {v}" for k, v in sorted(tally.items())))
+    if tally.get("adopter-owned"):
+        for _ln in derive_parity_lines(target, receipt, descs, r):
+            print(f"govkit update — {_ln}")
     # DEPL-dCarriedReceipt-13 S7's remedy, said ONCE and only when it applies. An operator who sees
     # `unattributed` rows and no next step concludes the tool is broken; one who sees the sentence
     # repeated per row learns to scroll past the whole block.
@@ -7492,8 +8232,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"them and their receipt rows are unchanged: the two rules disagree about who owns "
               f"those bytes, and choosing between them is not gov's to do on your behalf. Those "
               f"files are exactly as you left them and there is nothing to undo. "
-              f"`govkit apply --target <this target>` re-records each row under the role its "
-              f"descriptor declares today, which is the verb a role change belongs to")
+              f"`govkit update --target <this target> --write --accept-role-moves` re-records each "
+              f"row under the role its descriptor declares today and writes no byte; a row moved "
+              f"into `engine` takes adopt's attribution walk first")
 
     # DEPL-dGaugedVintage-9 S2/S3/S4. THE PER-KIT VERSION DELTA, which nothing in gov reported.
     # Every row has carried a `version` since schema 2 and no reader ever joined it to gov's own
@@ -7517,6 +8258,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _d = descs.get(_k)
             _live = resolve_entry_version_at(root, _d[0], to_commit) if _d else "(unresolvable)"
             _stored = _by_kit[_k]
+            # DEPL-aRepatriatedFork-17 S7. THE TARGET'S OWN CONSTANT DECIDES, where it can be read. A
+            # pinned row carries its BASE vintage's version, so a kit merged forward read MIXED
+            # while every file held the new constant. Row versions stay as base attribution.
+            _tv = read_target_kit_version(target, _d[0], receipt) if _d else None
+            _bases = sorted(s for s in _stored if s != "__ABSENT__")
+            if _tv is not None:
+                _stored = {_tv}
             if _stored == {"__ABSENT__"}:
                 _verdict = "unknown — this receipt predates the version field"
             elif len(_stored) > 1:
@@ -7541,11 +8289,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     _ms, _ml = _numv.search(_s), _numv.search(_live)
                     if _ms and _ml:
                         _verdict = ("level" if _ms.group(1) == _ml.group(1)
-                                    else f"DIFFERS — stored {_ms.group(1)}, gov has {_ml.group(1)}")
+                                    else f"DIFFERS — {'target has' if _tv is not None else 'stored'} "
+                                         f"{_ms.group(1)}, gov has {_ml.group(1)}")
                     else:
                         _verdict = ("level (whole-line compare: no version number in one side)"
                                     if _s == _live
                                     else f"DIFFERS by whole line — gov has {_live!r}")
+            if _tv is not None:
+                _verdict += f" · read from the target's own copy · row base versions {_bases}"
             print(f"  {_k:<28} {_verdict}")
 
     def derive_unclaimed_candidates(_withdrawn_paths):
@@ -8046,16 +8797,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             if c["carry"] == "verbatim":
                 data = c["theirs_new"]
             else:
-                merged, _how = three_way(
-                    c["ours"],
-                    derive_carried_by_rung(c["carry"], c["base"] or b"",
-                                           resolve_row_needles(needles, row)),
-                    derive_carried_by_rung(c["carry"], c["theirs_new"],
-                                           resolve_row_needles(needles, row)))
-                if merged is None:
+                _b3 = derive_carried_by_rung(c["carry"], c["base"] or b"",
+                                             resolve_row_needles(needles, row))
+                _t3 = derive_carried_by_rung(c["carry"], c["theirs_new"],
+                                             resolve_row_needles(needles, row))
+                merged, _how = three_way(c["ours"], _b3, _t3)
+                if _how == "conflict":
                     conflicts += 1
                     _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
                     _orders_written.add(_order)
+                    _cdir, _cline = write_conflict_candidate(outbox, row, _b3, c["ours"], _t3,
+                                                             merged)
                     _order.write_text(
                         f"# update conflict — {row['path']} (gov RENAMED this file)\n\n"
                         f"gov moved  {row.get('source')} -> {new_src}\n"
@@ -8064,7 +8816,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         f"ours   target index  sha {_sha(c['ours'])} oid {c['ours_oid']}\n"
                         f"theirs {to_commit} sha {_sha(c['theirs_new'])}\n\n"
                         f"NOTHING was moved and the file was left BYTE-IDENTICAL at its old path.\n"
-                        f"Resolve by hand, then re-run `update`.\n",
+                        f"Resolve by hand, then re-run `update`.\n\n"
+                        f"candidate {_cdir}/candidate\n"
+                        f"files     {_cdir}/base {_cdir}/ours {_cdir}/theirs\n"
+                        f"reproduce {_cline}\n",
                         encoding="utf-8", newline="\n")
                     r.fail(f"'{row['path']}' was renamed by gov to '{new_src}' and the three-way "
                            f"conflicts — left untouched at its old path, order written")
@@ -8179,23 +8934,28 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # merged result must come out in. Without this, a `relocate` row hands the merge a base
             # that spells gov's prefix where the target's copy does not, so every line naming a path
             # reads as an operator edit and the whole file conflicts.
-            merged, how = three_way(
-                c["ours"],
-                derive_carried_by_rung(c["carry"], c["base"] or b"",
-                                       resolve_row_needles(needles, row)),
-                derive_carried_by_rung(c["carry"], c["theirs"],
-                                       resolve_row_needles(needles, row)))
-            if merged is None:
+            _b3 = derive_carried_by_rung(c["carry"], c["base"] or b"",
+                                         resolve_row_needles(needles, row))
+            _t3 = derive_carried_by_rung(c["carry"], c["theirs"],
+                                         resolve_row_needles(needles, row))
+            merged, how = three_way(c["ours"], _b3, _t3)
+            if how == "conflict":
                 conflicts += 1
                 _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
                 _orders_written.add(_order)
+                # S3. THE FOUR FILES ARE THE ONES THE MERGE WAS HANDED, carried rung included, so
+                # the printed line reproduces `candidate` byte for byte.
+                _cdir, _cline = write_conflict_candidate(outbox, row, _b3, c["ours"], _t3, merged)
                 _order.write_text(
                     f"# update conflict — {row['path']}\n\n"
                     f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
                     f"base   {base_commit} sha {_sha(c['base'])}\n"
                     f"ours   target index  sha {_sha(c['ours'])} oid {c['ours_oid']}\n"
                     f"theirs {to_commit} sha {_sha(c['theirs'])}\n\n"
-                    f"The file was left BYTE-IDENTICAL. Resolve by hand, then re-run `update`.\n",
+                    f"The file was left BYTE-IDENTICAL. Resolve by hand, then re-run `update`.\n\n"
+                    f"candidate {_cdir}/candidate\n"
+                    f"files     {_cdir}/base {_cdir}/ours {_cdir}/theirs\n"
+                    f"reproduce {_cline}\n",
                     encoding="utf-8", newline="\n")
                 r.fail(f"'{row['path']}' diverged and the three-way conflicts — left untouched, "
                        f"order written")
@@ -8573,6 +9333,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # A DICT RATHER THAN A SET because the order file's first sentence IS the decline string, and
     # re-deriving that prose at the verify site would be a second copy of it.
     _rr_stale: dict[str, str] = {}
+    # DEPL-aRepatriatedFork-17 S1. Per kit whose declared argv ran: the pre-argv index entry and
+    # worktree bytes of every path it is declared to write, and the status it left behind.
+    _rg_snap: dict[str, dict] = {}
     if write:
         for _eid in touched_kits:
             _d, _ = descs[_eid]
@@ -8615,6 +9378,28 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _rr_stale[_eid] = _why_rr
                 continue
             _ctx_rr = target_context(target, deploy, _eid, _d)
+            # DEPL-aRepatriatedFork-17 S1. A ROLLBACK COVERS WHAT THE RE-RENDER WROTE. The argv
+            # below writes outside `written_paths`, so a kit rolled back after it kept its renders.
+            # Snapshotted HERE, before the first argv, from the kit's own `rendered`/`generated`
+            # receipt rows plus every path a block's optional `writes` list names. The worktree
+            # STATUS is taken too, so a path the argv wrote and nothing declared can be named.
+            _rg_set = {str(f.get("path")) for f in receipt.get("files") or []
+                       if f.get("kit") == _eid and f.get("role") in ("rendered", "generated")}
+            for _b in _regen:
+                for _w in (_b.get("writes") or []):
+                    _s, _m = resolve_tokens(str(_w), _ctx_rr)
+                    try:
+                        if not _m:
+                            _rg_set.add(demand_contained_dest(_s, f"kit '{_eid}' [[regenerate]].writes"))
+                    except Refusal as _esc:
+                        r.fail(f"kit '{_eid}': a [[regenerate]].writes path is not snapshotted — {_esc}")
+            _rg_paths = sorted(p for p in _rg_set if p)
+            _rg_index, _ = index_read(target, _rg_paths) if _rg_paths else ({}, set())
+            _rg_snap[_eid] = {
+                "paths": _rg_paths, "index": {p: _rg_index.get(p) for p in _rg_paths},
+                "bytes": {p: ((target / p).read_bytes() if (target / p).is_file() else None)
+                          for p in _rg_paths},
+                "status": read_worktree_status(target)}
             for _blk in list(_regen):
                 _argv = _blk.get("argv") or []
                 if not _argv:
@@ -8656,6 +9441,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                               "This kit declares no [check] argv, so nothing below can roll its "
                               "writes back: they stay staged, and the render has to be repaired "
                               "by hand before the next update"))
+            # S1. What THIS kit's argv changed, by status entry, so an undeclared write has a name.
+            _rg_after = read_worktree_status(target)
+            _rg_before = _rg_snap[_eid]["status"]
+            _rg_snap[_eid]["touched"] = sorted(
+                p for p in set(_rg_after) | set(_rg_before) if _rg_after.get(p) != _rg_before.get(p))
     # THE COUNTS STAY GATED: they are the re-render STEP's own report, and a flag-off run ran
     # nothing, so "0 argv run" would be a report about a step that did not happen.
     if _rerender_on:
@@ -8673,6 +9463,24 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # A SKIP THAT LOOKS LIKE A PASS IS THE CLASS THIS BUILD KEEPS CLOSING. Every declined kit is
         # named with its reason, so "nothing re-rendered" is never read as "nothing needed it".
         print(f"govkit update —   DECLINED {_eid}: {_why}")
+
+    # ======================= TOOL-aRepatriatedFork-11 S3 — WIRE THE LANDED HOOK FRAGMENTS ========
+    # AFTER the regenerate and BEFORE verify, because a kit whose `[check]` grades its own wiring
+    # reds on a fragment that landed as a bare file, and the verify pass then rolls the whole kit
+    # back rather than wiring it. It runs target-side code, so it rides the ONE switch this verb
+    # already has for that (section 8 F1): GOVKIT_RERENDER=0 declines it and says so.
+    _wired_new: dict[str, list[str]] = {}
+    if write:
+        _fr_landed = set(changed) | set(renamed) | set(_landed_new)
+        _fr_skip = read_inert_kits(deploy) | {str(f.get("kit")) for f in receipt.get("files") or []
+                                              if f.get("kit") not in touched_kits}
+        if _rerender_on:
+            _wired_new = run_fragment_merges(target, receipt.get("files") or [], _fr_landed,
+                                             _fr_skip, "update")
+        else:
+            for _fp in sorted(p for p in _fr_landed if p.endswith(".fragment.json")):
+                print(f"govkit update — hooks: {_fp} landed UNWIRED — GOVKIT_RERENDER=0 is exported, "
+                      f"and wiring runs the target's own settings-merge.py")
 
     # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
     # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
@@ -8845,6 +9653,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 continue
             n_rolled += 1
             _rolled_kits.add(eid)
+            # TOOL-aRepatriatedFork-11 S4. FIRST, while the landed fragments are still on disk.
+            remove_wired_fragments(target, receipt.get("files") or [], _wired_new.get(eid, []), "update")
             # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
             # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
             # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot
@@ -9043,6 +9853,51 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     else:
                         s["row"].pop(k, None)
 
+            # DEPL-aRepatriatedFork-17 S1. THE RE-RENDER'S OUTPUTS COME BACK TOO, through the same
+            # two plumbing calls the loop above makes, plus the snapshot's own worktree bytes: the
+            # argv wrote the worktree, and `checkout-index` would hand back the index's copy rather
+            # than the file the target actually held. A path already equal to its snapshot is left
+            # alone. Afterwards every path this kit's argv changed that still differs is NAMED.
+            _rg = _rg_snap.get(eid) or {}
+            _rg_left: list[str] = []
+            _rg_reverted: list[str] = []
+            for p in _rg.get("paths") or []:
+                _was_b, _was_i = _rg["bytes"].get(p), _rg["index"].get(p)
+                _now_b = (target / p).read_bytes() if (target / p).is_file() else None
+                if _now_b == _was_b:
+                    continue
+                if _was_i is None:
+                    subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached",
+                                    "--ignore-unmatch", "--", p], capture_output=True, check=False)
+                else:
+                    subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
+                                    f"{_was_i[0]},{_was_i[1]},{p}"], capture_output=True, check=False)
+                if _was_b is None:
+                    (target / p).unlink()
+                else:
+                    (target / p).parent.mkdir(parents=True, exist_ok=True)
+                    (target / p).write_bytes(_was_b)
+                # A receipt row is `restored` like every other; a path only `writes` declares is
+                # no receipt row, so it is `reverted`, a verb the order spells apart.
+                if p in _receipt_paths:
+                    if p not in restored:
+                        restored.append(p)
+                elif p not in _rg_reverted:
+                    _rg_reverted.append(p)
+            if _rg:
+                _st_now = read_worktree_status(target)
+                for p in sorted(set(_rg.get("paths") or []) | set(_rg.get("touched") or [])):
+                    if p in _rg["bytes"]:
+                        _still = ((target / p).read_bytes() if (target / p).is_file()
+                                  else None) != _rg["bytes"][p]
+                    else:
+                        _still = _st_now.get(p) != _rg["status"].get(p)
+                    if _still:
+                        _rg_left.append(p)
+                        print(f"govkit update — verify {eid}: still differs after the rollback: {p} "
+                              f"— this kit's [[regenerate]] argv wrote it and no snapshot covered "
+                              f"it; name it in that block's `writes` list")
+
             # The three lists are what the closing line counts, and a rolled-back path is not a
             # write that stands. Both spellings of a restored rename leave `renamed` together, so
             # its `// 2` stays a pair count.
@@ -9102,6 +9957,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                    "written)\n" if not restored and not removed_landed and not unrestored else "")
                 + "".join(f"left alone {p} — this run never wrote it, so there is nothing here to "
                           f"undo\n" for p in untouched)
+                + "".join(f"reverted  {p} — this kit's [[regenerate]] argv wrote it under its "
+                          f"`writes` list, and its pre-run bytes were put back\n"
+                          for p in _rg_reverted)
+                + "".join(f"still differs {p} — this kit's [[regenerate]] argv wrote it and no "
+                          f"snapshot covered it, so the rollback could not return it\n"
+                          for p in _rg_left)
                 + f"\nThe receipt is NOT re-stamped, so the next run re-classifies these rows from "
                   f"the vintage they are actually at. Resolve by hand — most often the clean "
                   f"three-way merge that produced this is plausible and wrong — then re-run "
@@ -9179,6 +10040,16 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _reap_failed.append(f"{_stale.name} ({_reap_err})")
                 continue
             _reap_names.append(_stale.name)
+            # DEPL-aRepatriatedFork-17 S3. The order's candidate directory goes with it: its four
+            # files describe the same conflict, and a live one was rewritten above under this run.
+            _cand = outbox / _stale.stem
+            if _cand.is_dir():
+                for _cf in _cand.iterdir():
+                    _cf.unlink()
+                _cand.rmdir()
+                subprocess.run(["git", "-C", str(target), "rm", "-r", "-q", "-f", "--cached",
+                                "--ignore-unmatch", "--", f".governance/outbox/{_stale.stem}"],
+                               capture_output=True, check=False)
             # THE INDEX IS UNSTAGED WITH THE FILE, for the reason the `update-pins.md` reap above
             # records in full: a target that COMMITS its outbox otherwise hands the renormalize
             # below a pinned path missing from the worktree, and gov refuses over its own deletion.
@@ -9500,7 +10371,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 # ABSENCE, on S11's two synthesized classes, and it is NOT a synonym for `"unattributed"` — S7's skip
 # keys on the string, so widening it to field-absence would swallow every unlanded row and silently
 # delete four dispositions. That reading was in an earlier rev of the spec and was destructive.
-EVIDENCE_STATES = ("apply", "vintage-match", "pinned", "unattributed")
+# DEPL-aRepatriatedFork-13 S2: `"declared"` is an `adopter-owned` row's — the target SAID it owns the
+# bytes, so no vintage is inferred and none is asserted.
+EVIDENCE_STATES = ("apply", "vintage-match", "pinned", "unattributed", "declared")
 
 
 def carry_matches(rung: str, ours: bytes, base: bytes, needles: dict[str, str]) -> bool:
@@ -9561,7 +10434,45 @@ def derive_attribution(root: pathlib.Path, src: str, ours: bytes, to_commit: str
     return None
 
 
-def demand_adopt_index_clean(target: pathlib.Path) -> None:
+# DEPL-aRepatriatedFork-17 S5. The pair `adopt --staged --write` stages with its result.
+ADOPT_STAGED_RECEIPT = (".governance/install.json", ".governance/install.sums")
+
+
+# DEPL-aRepatriatedFork-17 S9, §8 F1 (owner, 2026-09-23). A nearest vintage is offered as a pin only
+# when at most this fraction of the target file's lines changed; past it the file is the target's
+# own program and `adopter-owned` is the remedy. Printed with every suggestion.
+NEAREST_PIN_FRACTION = 0.5
+
+
+def derive_nearest_vintage(root: pathlib.Path, src: str, ours: bytes,
+                           to_commit: str) -> tuple[str, int] | None:
+    """S9. The gov revision whose blob of `src` is nearest the target bytes, as `(commit, changed)`.
+
+    `changed` counts the added plus removed lines of a zero-context diff, over every revision
+    `git log <to_commit> -- <src>` names, newest first, so a tie keeps the newer revision. Each
+    distinct blob is diffed once. Opt-in, because one row can walk hundreds of revisions.
+    """
+    import difflib  # noqa: PLC0415 — only this opt-in walk needs it
+    out = subprocess.run(["git", "-C", str(root), "log", "--format=%H", to_commit, "--", src],
+                         capture_output=True, text=True, encoding="utf-8", check=False)
+    mine = ours.decode("utf-8", "replace").splitlines()
+    best: tuple[str, int] | None = None
+    seen: dict[str, int] = {}
+    for c in (x for x in out.stdout.split() if x):
+        blob = blob_at(root, c, src)
+        if blob is None:
+            continue
+        key = blob_oid(blob)
+        if key not in seen:
+            seen[key] = sum(1 for ln in difflib.unified_diff(
+                blob.decode("utf-8", "replace").splitlines(), mine, n=0, lineterm="")
+                if ln[:1] in ("+", "-") and not ln.startswith(("+++", "---")))
+        if best is None or seen[key] < best[1]:
+            best = (c, seen[key])
+    return best
+
+
+def demand_adopt_index_clean(target: pathlib.Path, planned: set[str] | None = None) -> None:
     """S8's third refusal, and section 8 F1 decides its WIDTH: the index, never the worktree.
 
     `adopt` reads every identity it records out of the index, so an index that disagrees with HEAD
@@ -9570,6 +10481,11 @@ def demand_adopt_index_clean(target: pathlib.Path) -> None:
     refusing over one is the shape adopters learn to route around. `-12` owns the worktree
     preconditions, on the verbs that write bytes into the target; this verb writes one file under
     `.governance/` and nothing else.
+
+    DEPL-aRepatriatedFork-17 S5. `planned` is `--staged`: the refusal is LIFTED for the planned
+    destinations (and the receipt pair this verb itself stages), so a fork edit and its receipt
+    re-measure land in ONE commit. In exchange a planned destination whose worktree differs from its
+    index is refused, since the receipt would otherwise record bytes the next commit will not carry.
     """
     has_head = subprocess.run(["git", "-C", str(target), "rev-parse", "--verify", "-q", "HEAD"],
                               capture_output=True).returncode == 0
@@ -9578,6 +10494,17 @@ def demand_adopt_index_clean(target: pathlib.Path) -> None:
     out = subprocess.run(["git", "-C", str(target), "diff", "--cached", "--name-only", "-z", "HEAD"],
                          capture_output=True, text=True, check=False)
     staged = sorted({n for n in out.stdout.split("\0") if n})
+    if planned is not None:
+        wt = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "-z"],
+                            capture_output=True, text=True, encoding="utf-8", check=False)
+        dirty = sorted({n for n in wt.stdout.split("\0") if n} & planned)
+        if dirty:
+            raise Refusal(
+                f"--staged: {len(dirty)} planned destination(s) differ between the worktree and the "
+                f"index: " + ", ".join(dirty) + " — the receipt is measured from the INDEX and staged "
+                "beside it, so it would record bytes the next commit will not carry. Stage or "
+                "restore them, then re-run")
+        staged = [n for n in staged if n not in planned and n not in ADOPT_STAGED_RECEIPT]
     if staged:
         raise Refusal(
             f"{len(staged)} path(s) in the target's index differ from HEAD: " + ", ".join(staged)
@@ -9589,7 +10516,8 @@ def demand_adopt_index_clean(target: pathlib.Path) -> None:
 
 
 def cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
-              pins: dict[str, str], re_adopt: bool, write: bool) -> int:
+              pins: dict[str, str], re_adopt: bool, write: bool,
+              staged: bool = False, suggest_pins: bool = False) -> int:
     """The verb. Its BODY is `_cmd_adopt`; see `cmd_apply` for why the split exists.
 
     D5, from this build's closing review: `adopt --write` is the THIRD writer of
@@ -9601,13 +10529,14 @@ def cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     file that governs every future destructive `update --write`.
     """
     try:
-        return _cmd_adopt(root, target, to_rev, pins, re_adopt, write)
+        return _cmd_adopt(root, target, to_rev, pins, re_adopt, write, staged, suggest_pins)
     finally:
         release_write_lock()
 
 
 def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
-               pins: dict[str, str], re_adopt: bool, write: bool) -> int:
+               pins: dict[str, str], re_adopt: bool, write: bool,
+               staged: bool = False, suggest_pins: bool = False) -> int:
     """Write the receipt an already-installed tree never had, by measuring it against gov history.
 
     READ-ONLY WITHOUT `--write`, matching `update` and for the same reason: the muscle-memory
@@ -9638,7 +10567,9 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             f"decision artefact, and `intake` refuses to silently rewrite the descriptor for the "
             f"same reason"
         )
-    demand_adopt_index_clean(target)
+    # S5. Under `--staged` the index is graded AFTER the plan exists, against its destinations.
+    if not staged:
+        demand_adopt_index_clean(target)
 
     deploy = load_deploy(target)
     # TOOL-aScouredKit-31. `deploy` IS PASSED and the list is NOT pre-coerced here. `list(...)` at
@@ -9657,6 +10588,19 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     if out.returncode != 0:
         raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
     commit = out.stdout.strip()
+    # DEPL-aRepatriatedFork-13 S1. A malformed `[[own]]` row is a FINDING naming the row, exit 1,
+    # before anything is measured: the declaration is the operator's, and it is wrong, not hostile.
+    try:
+        owned = resolve_owned_rows(root, target, deploy, descs)
+    except Refusal as e:
+        r.fail(str(e))
+        return r.emit()
+    for _op, _o in owned.items():
+        if _o["entry"] not in selection:
+            r.fail(f"[[own]] '{_op}' implements '{_o['implements']}', and '{_o['entry']}' is not in "
+                   f"this target's selection")
+    if r.problems:
+        return r.emit()
 
     print(f"govkit adopt — target {target.as_posix()} · selection: {', '.join(selection)}")
     print(f"govkit adopt — measuring against gov {commit[:8]} "
@@ -9706,9 +10650,25 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
               f"{len(ds)} target directories ({', '.join(ds)}), so it is no single needle")
     print(f"govkit adopt — needle map: {len(dpairs)} directory pair(s), {len(needles)} needle(s)")
 
+    # ---- DEPL-aRepatriatedFork-13 S1/S2. An owned path that is gov's destination for its source
+    # ---- takes that planned row over. One at ANOTHER path stands in for gov's copy (§8 F2), which
+    # ---- keeps its own row, so it is planned beside it. After the needle map, which a stand-in's
+    # ---- (source, path) pair would otherwise enter as a relocation it is not.
+    _planned = {p["dest"] for p in plan}
+    for _op, _o in sorted(owned.items()):
+        if _op not in _planned:
+            plan.append({"dest": _op, "role": "engine", "kit": _o["entry"],
+                         "version": entry_version(root, descs[_o["entry"]][0]),
+                         "src": _o["source"], "landable": True, "rule": {}})
+
+    if staged:
+        demand_adopt_index_clean(target, {p["dest"] for p in plan})
+
     # ---- THE INDEX, ONE batched read over every planned destination. A destination the target does
     # ---- not track has no identity to record and gets no row at all.
     idx, _present = index_read(target, [p["dest"] for p in plan]) if plan else ({}, set())
+    # S9. `(dest, source, index bytes)` of every row the walk leaves `unattributed`.
+    _unattr: list[tuple[str, str, bytes]] = []
 
     rows: list[dict] = []
     tally: dict[str, int] = {}
@@ -9722,6 +10682,13 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     versions_at: dict[tuple[str, str], str] = {}
     for p in plan:
         dest = p["dest"]
+        _own = owned.get(dest)
+        if _own is not None and (_own["source"] != p["src"] or dest not in idx):
+            r.fail(f"[[own]] '{dest}' implements '{_own['implements']}', and "
+                   + (f"gov lands '{p['src']}' at that path, a different source"
+                      if _own["source"] != p["src"] else
+                      "the target's index does not track it, so there is no identity to record"))
+            continue
         if dest not in idx:
             tally["not-installed"] = tally.get("not-installed", 0) + 1
             print(f"  {'not-installed':<15} [{p['role']:<13}] {dest}")
@@ -9770,6 +10737,18 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             row["sha256"] = hashlib.sha256(_bytes).hexdigest()
             row["oid"] = idx[dest][1]
 
+        # DEPL-aRepatriatedFork-13 S2. NO attribution walk and NO `commit`/`gov_oid`: the target said
+        # these bytes are its own, so a vintage inferred for them would be the claim `unattributed`
+        # exists to avoid, and one `update` would then write against.
+        if _own is not None:
+            # `resolve_owned_rows` demanded the file and the check above its index entry.
+            row = build_owned_row(dest, p["kit"], p["version"], p["src"], _own,
+                                  (target / dest).read_bytes(), idx[dest][1])
+            tally["declared"] = tally.get("declared", 0) + 1
+            print(f"  {'declared':<15} [{'adopter-owned':<13}] {dest}")
+            rows.append(row)
+            continue
+
         # THE RUNG IS A LOCAL, and never read back off the row it was just written to. `-9` S2 says
         # no branch anywhere reads a stored `carry`, and an arm over this file's SOURCE enforces it
         # by NAME: reading `row["carry"]` five lines after writing it is indistinguishable, to that
@@ -9803,6 +10782,8 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
                 # and the walk does not get to make it on the descriptor's behalf. No `commit`, no
                 # `gov_oid`, `role` untouched.
                 row["evidence"] = "unattributed"
+                if p["src"] and ours is not None:
+                    _unattr.append((dest, p["src"], ours))
             else:
                 row["commit"], row["gov_oid"], rung = hit
                 row["carry"] = rung
@@ -9844,6 +10825,27 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             f"names is stuck in. The destinations measured were: " +
             (", ".join(_seen[:12]) + (f" (and {len(_seen) - 12} more)" if len(_seen) > 12 else "")
              if _seen else "(none — this target tracks no planned destination)"))
+    if r.problems:
+        return r.emit()
+
+    # ---- DEPL-aRepatriatedFork-17 S9. A SUGGESTED PIN per `unattributed` row, never an applied one:
+    # ---- a pin is the operator's assertion about a base, and this only finds the candidate.
+    if suggest_pins:
+        for _ud, _us, _uo in _unattr:
+            _near = derive_nearest_vintage(root, _us, _uo, commit)
+            _lines = len(_uo.decode("utf-8", "replace").splitlines())
+            if _near is not None and _near[1] <= NEAREST_PIN_FRACTION * _lines:
+                print(f"govkit adopt — suggest-pin {_ud}: nearest gov vintage {_near[0][:8]} at "
+                      f"{_near[1]} changed line(s) of {_lines} (limit {NEAREST_PIN_FRACTION:g} of "
+                      f"the file) · --pin {_ud}={_near[0]}")
+            else:
+                print(f"govkit adopt — no-pin {_ud}: "
+                      + (f"the nearest gov vintage {_near[0][:8]} is {_near[1]} changed line(s) of "
+                         f"{_lines}, past the limit of {NEAREST_PIN_FRACTION:g} of the file"
+                         if _near else "gov has no revision of its source to compare")
+                      + " — this is the target's own program; declare it `adopter-owned` with an "
+                        "[[own]] row in .governance/deploy.toml")
+        print(f"govkit adopt — suggest-pins: {len(_unattr)} unattributed row(s) measured")
 
     # ---- S11. THE TWO CLASSES `resolve_entry` DOES NOT PRODUCE, in `apply`'s own shapes rather
     # ---- than in a second one. Without them `-2`'s `pins` arm never dispatches and `cmd_check`'s
@@ -9979,6 +10981,16 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
         encoding="utf-8", newline="\n")
     print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
           f"schema {RECEIPT_SCHEMA}, gov_commit {commit[:8]}")
+    if staged:
+        # S5. STAGED WITH THE BYTES IT MEASURED, so the fork edit and its receipt are one commit.
+        _ga = subprocess.run(["git", "-C", str(target), "add", "--", *ADOPT_STAGED_RECEIPT],
+                             capture_output=True, text=True, encoding="utf-8", check=False)
+        if _ga.returncode != 0:
+            r.fail(f"--staged: the receipt was written and `git add` would not stage it: "
+                   f"{_ga.stderr.strip()}")
+        else:
+            print("govkit adopt — --staged: the receipt and its sidecar are staged beside the "
+                  "bytes they measure; commit them together")
     return r.emit()
 
 
@@ -10148,14 +11160,163 @@ def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tupl
     return descs
 
 
+def cmd_shipped(root: pathlib.Path) -> int:
+    """TOOL-aRepatriatedFork-16 S1 — what THIS repo ships, as ONE derivation.
+
+    One `<entry>\\t<role>\\t<src>` row per descriptor survivor carrying a source, sorted. The
+    install-prefix gate used to carry this as its own heredoc over the same calls, and two further
+    readers were about to paste it again. Read-only, no arguments. A registry naming a broken
+    descriptor exits 1 and prints NO row: a reader must not grade a narrowed set as the whole one.
+    """
+    r = Report()
+    descs = read_descriptors(root, load_toml(root / "tools" / "govkit" / "registry.toml"), r)
+    if r.problems:
+        for p in r.problems:
+            sys.stderr.write(f"govkit: {p}\n")
+        return 1
+    rows = {f"{eid}\t{row['role']}\t{row['src']}"
+            for eid, (d, _p) in descs.items()
+            for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"] if row.get("src")}
+    sys.stdout.write("".join(f"{x}\n" for x in sorted(rows)))
+    return 0
+
+
+# The roles whose bytes an adopter RECEIVES from gov. `project-owned` and `forked` are the adopter's,
+# and `generated` is rebuilt in the target, so a move in any of them tells an adopter nothing.
+EPOCH_ROLES = ("engine", "seed", "rendered", "merged")
+
+
+def resolve_version_value_at(root: pathlib.Path, desc: dict, commit: str) -> str:
+    """The VALUE on an entry's version line at a commit, not the line.
+
+    `resolve_entry_version_at` returns the whole line, and a line that carries a comment beside its
+    constant changes when the comment does. A comment reflow is not a bump, the same point
+    `check-verdict-epoch.sh` makes about its own candidates, so the first dotted number after the
+    pattern is the value. A line with none keeps its whole text, which still compares honestly.
+    """
+    line = resolve_entry_version_at(root, desc, commit)
+    m = re.search((desc.get("version_from") or {}).get("pattern") or "^", line)
+    v = re.search(r"\d+(?:\.\d+)+", line[m.end():] if m else line)
+    return v.group(0) if v else line
+
+
+def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
+    """TOOL-aRepatriatedFork-15 S1, S5 — a kit whose shipped bytes move bumps its version.
+
+    `check-verdict-epoch.sh`'s TOPOLOGICAL rule, lifted from one engine to every registry entry.
+    Over `<base>..HEAD`, every commit that changes a byte of the entry's shipped set — the
+    `govkit.py shipped` rows in EPOCH_ROLES — must be an ancestor of, or equal to, a commit that
+    changes the entry's version VALUE. Asked as one `rev-list HEAD ^base ^S...`: whatever is left
+    is a move no bump dates. That is stricter than "the newest move precedes the newest bump" on a
+    branchy range, and identical to it on a line.
+
+    BYTES, NOT BEHAVIOUR. An adopter's comparison reads blob ids, so a comment-only move reds it
+    exactly as a logic change does; counting every shipped byte over-counts on purpose.
+
+    Merges are not moves (`--no-merges`): a merge introduces no byte its parents did not carry.
+    An entry declaring no version is not graded: it prints an announced `skip` naming what moved.
+
+    DOES NOT CHECK: that the bump is the RIGHT size, that every marker carrying the value moved with
+    it (`tools/check-kit-versions.sh` owns that), or files a descriptor withholds from its survivors.
+    Nor a move made inside a merge's own resolution, and a merge that brings a new value in counts
+    as a bump for every move it contains: over a long branchy range that is lenient, and on the
+    push-boundary range the base check above is what closes it.
+    Exit 1 on any FAILED line or an unresolvable base, 2 on an unreadable registry, else 0.
+    """
+    r = Report()
+    descs = read_descriptors(root, load_toml(root / "tools" / "govkit" / "registry.toml"), r)
+    if r.problems:
+        for p in r.problems:
+            sys.stderr.write(f"govkit: {p}\n")
+        return 2
+    if base is None:
+        # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,
+        # the remote's first. No base is a FAILED exit 1 and never a zero-status skip, because
+        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever.
+        dflt = os.environ.get("GOV_DEFAULT_BRANCH") or "main"
+        for ref in (f"origin/{dflt}", dflt):
+            mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
+                                capture_output=True, text=True, encoding="utf-8")
+            if mb.returncode == 0 and mb.stdout.strip():
+                base = mb.stdout.strip()
+                break
+    rb = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
+                         f"{base}^{{commit}}"], capture_output=True, text=True, encoding="utf-8") if base else None
+    if rb is None or rb.returncode != 0:
+        print(f"epoch: FAILED · no base to compare against ({base or 'no merge-base with the default branch'})"
+              " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
+        return 1
+    base = rb.stdout.strip()
+    rng = f"{base}..HEAD"
+    failed = 0
+    for eid in sorted(descs):
+        desc = descs[eid][0]
+        paths = sorted({row["src"] for row in resolve_entry(root, desc, canonical_ctx(eid))["survivors"]
+                        if row.get("src") and row["role"] in EPOCH_ROLES})
+        if not paths:
+            print(f"epoch: {eid} · FAILED · no {'/'.join(EPOCH_ROLES)} source to measure")
+            failed += 1
+            continue
+        vf = desc.get("version_from") or {}
+        if "none" in vf or not vf.get("file"):
+            moved = sorted({p for p in git(root, "-c", "core.quotePath=false", "log", "--format=",
+                                           "--name-only", "--full-history", "--no-merges", rng,
+                                           "--", *paths).splitlines() if p})
+            print(f"epoch: {eid} · skip · no declared version · moved: {' '.join(moved) or 'none'}")
+            continue
+        now = resolve_version_value_at(root, desc, "HEAD")
+        if now.startswith("("):
+            print(f"epoch: {eid} · FAILED · version {now} at HEAD")
+            failed += 1
+            continue
+        movers = git(root, "rev-list", "--full-history", "--no-merges", rng, "--", *paths).split()
+        if not movers:
+            print(f"epoch: {eid} · clean · {now}")
+            continue
+        # THE BASE VOTES FIRST. A branch that moved bytes and then reconciled a mainline that had
+        # bumped the kit carries a merge whose value differs from its first parent, which reads as a
+        # bump below — yet the base already holds the value HEAD holds, with other bytes. Two trees,
+        # one number: the defect itself, so an unchanged value against the base is a FAILED outright.
+        same = resolve_version_value_at(root, desc, base) == now
+        home = (desc.get("home") or "").rstrip("/")
+        vsrc = f"{home}/{vf['file']}" if home else vf["file"]
+        # S is VALIDATED, not matched: `-G` finds commits touching the version line, and only one
+        # whose value differs from its FIRST parent's is a bump. A decoy edit must not launder a
+        # move. Merges are diffed against their first parent, because a value can enter a range
+        # only through a merge — measured: check-wiring's 1.4 -> 1.5 over fd240496..a7c78ad2.
+        bumps = [] if same else [
+            c for c in git(root, "log", "--format=%H", "--no-patch", "--full-history",
+                           "--diff-merges=first-parent", "-G", vf["pattern"], rng, "--", vsrc).split()
+            if resolve_version_value_at(root, desc, c) != resolve_version_value_at(root, desc, c + "^")]
+        loose = movers if not bumps else git(
+            root, "rev-list", "--full-history", "--no-merges", "HEAD", f"^{base}",
+            *(f"^{s}" for s in bumps), "--", *paths).split()
+        if not loose:
+            print(f"epoch: {eid} · clean · {now}")
+            continue
+        failed += 1
+        w = loose[0]
+        if not bumps:
+            n = len([p for p in git(root, "diff-tree", "--no-commit-id", "--name-only", "-r", w,
+                                    "--", *paths).splitlines() if p])
+            print(f"epoch: {eid} · FAILED · moved in {w[:10]} ({n} files) · no value change in "
+                  f"{base[:10]}..HEAD (still {now})")
+        else:
+            print(f"epoch: {eid} · FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}")
+    return 1 if failed else 0
+
+
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
   govkit.py selfcheck
-  govkit.py plan  --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
+  govkit.py shipped
+  govkit.py epoch [--base <rev>]
+  govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
-  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals] [--accept-role-moves]
   govkit.py adopt  --target <path> [--to <rev>] [--pin <path>=<rev> ...] [--re-adopt] [--write]
+                   [--staged] [--suggest-pins]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
 `plan`, `check`, `update` and `adopt` are READ-ONLY and none writes a byte; `update --write` performs
@@ -10205,6 +11366,9 @@ def parse_args(argv: list[str]) -> tuple:
     # gov-authored. It is a scope flag by the test `-11` and `-12` share: it enables a NARROWER class
     # of action, defaults OFF, and overrides no refusal.
     run_discharge = False
+    # DEPL-aRepatriatedFork-17 S5, S6, S9. All three opt-in scope flags: each enables a narrower
+    # class of action, defaults OFF and overrides no refusal.
+    staged = accept_role_moves = suggest_pins = False
     i = 1
     while i < len(argv):
         a = argv[i]
@@ -10249,6 +11413,15 @@ def parse_args(argv: list[str]) -> tuple:
         elif a == "--run-discharge":
             run_discharge = True
             i += 1
+        elif a == "--staged":
+            staged = True
+            i += 1
+        elif a == "--accept-role-moves":
+            accept_role_moves = True
+            i += 1
+        elif a == "--suggest-pins":
+            suggest_pins = True
+            i += 1
         elif a == "--emit-declines":
             emit_declines = True
             i += 1
@@ -10264,7 +11437,8 @@ def parse_args(argv: list[str]) -> tuple:
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
     return (verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals,
-            pins, re_adopt, coverage, emit_declines, run_discharge)
+            pins, re_adopt, coverage, emit_declines, run_discharge, staged, accept_role_moves,
+            suggest_pins)
 
 
 # ======================= DEPL-dRetiredFork-6 — `contribute` ====================================
@@ -10583,8 +11757,14 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
+        if argv[0] == "epoch":
+            # Parsed here and not in `parse_args`: `--base` is this verb's alone.
+            if len(argv) not in (1, 3) or (len(argv) == 3 and argv[1] != "--base"):
+                raise Refusal("epoch takes no arguments except --base <rev>")
+            return cmd_epoch(repo_root(), argv[2] if len(argv) == 3 else None)
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
-         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE) = parse_args(argv)
+         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
+         SUGGEST_PINS) = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
@@ -10593,6 +11773,10 @@ def main(argv: list[str]) -> int:
             if len(argv) > 2 or (len(argv) == 2 and argv[1] != "--write"):
                 raise Refusal("selfcheck takes no arguments except --write")
             return selfcheck(root, write=(len(argv) == 2))
+        if verb == "shipped":
+            if len(argv) > 1:
+                raise Refusal("shipped takes no arguments")
+            return cmd_shipped(root)
         if verb == "contribute":
             if target is None:
                 raise Refusal("contribute needs an explicit --target: the adopter tree to "
@@ -10618,9 +11802,11 @@ def main(argv: list[str]) -> int:
                 # away here, so `update --kits <one>` classified the WHOLE receipt -- measured
                 # byte-identical to the unscoped run, with nothing saying the scope was ignored.
                 return cmd_update(root, target, TO_REV, write=WRITE,
-                                  write_withdrawals=WRITE_WD, kits=kits)
+                                  write_withdrawals=WRITE_WD, kits=kits,
+                                  accept_role_moves=ACCEPT_ROLE_MOVES)
             if verb == "adopt":
-                return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE)
+                return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE,
+                                 staged=STAGED, suggest_pins=SUGGEST_PINS)
             return cmd_apply(root, target, mode, kits, resume=RESUME)
         sys.stderr.write(f"govkit: unknown subcommand '{verb}'\n\n{USAGE}")
         return 2

@@ -22,9 +22,14 @@
 # IT RUNS NOTHING. Executing 27 suites to read their output would re-run the whole bar inside one
 # leg; the shape is asserted by reading the file, which costs milliseconds.
 set -u
+# The manifest sits BESIDE this gate in every install, so its path is derived from this script's own
+# directory (captured before the `cd`) and `GATE_LEGS` outranks it, as it does for the runner. A
+# literal spelled gov's prefix and exited 2 at every adopter (TOOL-aRepatriatedFork-2 S1).
+_self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "testsuite-counts: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-MANIFEST=tools/gate-legs.json
+_self_pre=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "testsuite-counts: cannot derive this gate's own directory from '$_self_dir', so the manifest beside it cannot be found"; exit 2; }
+MANIFEST="${GATE_LEGS:-${_self_pre}gate-legs.json}"
 WAIVERS=memory/project/testsuite-count-waivers.txt
 status=0
 fail() { echo "TESTSUITE-COUNTS FAILED — $1"; status=1; }

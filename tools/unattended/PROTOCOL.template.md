@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.28 -->
+<!-- gov:kit unattended@1.37 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -482,7 +482,7 @@ where this document says it may:
 | `KICKOFF_EXITS` | a shrink-only floor on the interactive exits section 13 of THIS contract enumerates |
 | `HALT_CODES_EXTRA` | project halt codes, appended to the core set |
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
-| `UNDECLARED_WRITE_CEILING` | the shrink-only CEILING on dispatched passes that committed outside the set they declared before dispatch. MANDATORY: undeclared or malformed is a refusal, for the reason `CORE_FLOOR` is. The count may FALL and never RISE, and a fall is ANNOUNCED rather than red — this population is derived from history reachability, not from a file listing, so a clone that cannot reach a group anchor legitimately grades fewer rows. Lowering the pin is a hand edit; an adopter's value is 0 |
+| `UNDECLARED_WRITE_CEILING` | the shrink-only CEILING on dispatched passes that committed outside the set they declared before dispatch. MANDATORY: undeclared or malformed is a refusal, for the reason `CORE_FLOOR` is. The count may FALL and never RISE, and a fall is ANNOUNCED rather than red — this population is derived from history reachability, not from a file listing, so a clone that cannot reach a group anchor legitimately grades fewer rows. Lowering the pin is a hand edit. MEASURE it rather than guess it: `check-unattended.sh --emit-ceiling` prints this line for the tree it runs in, and refuses over a population it could not grade |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
 | `PASS_ORDER_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT predates a conforming spec reds the `pass-order history` leg. Graded on the README's `opened:` date. BLANK turns the term OFF and the leg announces it |
@@ -531,7 +531,11 @@ under a worktree: the resume tick reads leases from the index alone. Two more ar
 this kit's own reads and named where they sit: an object-substitution ref and a graft file, either
 of which rewrites what a sha MEANS at a perfectly honest anchor — and both are ALSO refused by
 their mere PRESENCE, because suppressing them makes only THIS kit's reads honest and binds no other
-tool reading the same objects.
+tool reading the same objects. A run fact whose value forges a second line: `--attest --value`
+carrying a line end, or a backslash-n `awk` used to expand, wrote a `phase: LANDED` every reader
+took as the run's phase. The driver refuses both line ends and stores escapes as written, and the
+leg refuses a `## Run facts` key carried twice with two different values; a hand edit that
+REPLACES the real line is not detectable from the file and is not claimed.
 
 **What the second anchor changes here.** It opens no new class — §1 cost 4 already granted
 successor-authorization — but lowers that price to two commands and widens the leg's BASE check for
@@ -539,8 +543,10 @@ every adopter. Neither is closed; what survives is the leg re-run in a clone the
 
 **What it does not close, stated so no reader has to discover it.** A run that edits this kit and
 commits it: nothing binds the executing code to code an owner approved. A run that shims the
-ordinary tools this kit calls. A run that skips the hook layer, by `--no-verify`, by pointing
-`core.hooksPath` at an empty directory, or by overriding the gate command. A run that relays through
+ordinary tools this kit calls, `BASH_ENV` included, which runs inside the hook's own interpreter.
+A run that skips the hook layer, by `--no-verify` or by pointing `core.hooksPath` at an empty
+directory. The gate command is not a third way: the hook runs only a script the repository tracks
+unmodified, and its declared test escape withholds the lander marker. A run that relays through
 an endpoint it seeded, which satisfies every URL comparison with one URL and one config source. A
 run that simply never creates a run-state file, since every leg check iterates over the tracked ones.
 And a run that gets one push past all of that, after which the remote's advertisement is genuine.

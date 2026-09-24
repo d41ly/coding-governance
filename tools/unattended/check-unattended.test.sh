@@ -15,8 +15,24 @@ set -u
 # `mutate` and `cp` no-op on a path that does not exist, so the arm asserts against a tree it never
 # changed and passes. The default keeps gov byte-identical; an adopter sets it once, and the arms
 # are run at a foreign prefix to prove the suite still grades.
-KIT_REL="${KIT_REL:-tools/unattended}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-18 S2). It ships beside its gate, so a
+# spelled default resolved only at gov's prefix and nothing ever set it (TOOL-dRetiredFork-39). The
+# block is byte-identical to the canonical copy named on its marker line, gated by the parity table
+# in the resolve-python self-test.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
 
 # ---- THE SHARD CONTRACT — ADOPTED, not reinvented (TOOL-aShardedFloor-3) -------------------------
 # The contract is TOOL-aShardedFloor-2's and its reasoning lives in the head of
@@ -150,6 +166,12 @@ cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 # iterates two pairs and check 26 reads this carrier ALONE, so a fixture missing either half
 # models a broken install and every arm below grades that refusal instead of its own subject.
 cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
+# THE REPAIR POINTER'S TARGET (closing review round 1 M5). `derive_index_repair` probes for the
+# memory-tree kit's generator beside this kit, and a fixture holding only the unattended kit made it
+# print its not-found text, so check 21's arm asserted a literal the leg never produced here. The
+# probe tests only that the FILE exists, so a stub at the sibling home is the whole dependency.
+MT_REL=$(dirname "$KIT_REL")/memory-tree; MT_REL=${MT_REL#./}
+mkdir -p "$MT_REL" && printf '# fixture stub: the probe target of derive_index_repair\n' > "$MT_REL/gen_build_index.py"
 SCRIPT="$TMP/$KIT_REL/check-unattended.sh"
 
 mkconf() { cat > .unattended.conf <<EOF
@@ -2271,6 +2293,35 @@ mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT
 miss "$(run)" "counts a captured variable's lines by adding a newline first"
 reset_tree
 
+# ---- 36 (TOOL-aRepatriatedFork-6, closing review round 2 M1): every run-state key read routes
+# ---- through the `## Run facts` section. The staged break is the instance the round found:
+# ---- `baseline_units`' phase probe with its section filter removed, the whole-file first match
+# ---- round 1 L2 left behind. Read RED naming the library's line, then the shipped copy GREEN.
+reset_tree
+mutate $KIT_REL/lib-unattended.sh 's#| extract_run_facts | grep -m1 #| grep -m1 #'
+out=$(run)
+hit "$out" "a run-state key is read over the whole file rather than the Run facts section, so it can answer a line above the heading or under Parked that the driver's fact never reads - route it through fact, fact_of or extract_run_facts: lib-unattended.sh:"
+hit "$out" "UNATTENDED check 36 FAILED"
+reset_tree
+miss "$(run)" "UNATTENDED check 36 FAILED"
+# ...and a STALE exemption: the driver's spec-audit front-matter read removed, so the registry row
+# naming it matches nothing in a file the population holds.
+reset_tree
+mutate $KIT_REL/unattended.sh '/print "spec-audit=" v/d'
+hit "$(run)" "a run-state read exemption matches no read in the kit, and a stale exemption silently widens the surface it was written to narrow; unattended.sh ^spec-audit:"
+reset_tree
+# ...and the two LIVENESS refusals, each reached by removing what it asserts is there. No scoped read
+# at all: both of the fixture kit's section-filtered reads spelled with `cat` instead.
+mutate $KIT_REL/lib-unattended.sh 's#| extract_run_facts | grep -m1 #| cat | grep -m1 #'
+mutate $KIT_REL/check-unattended.sh 's#extract_run_facts < "[$]rvf"#cat < "$rvf"#'
+hit "$(run)" "no key read in the kit carries the Run facts scope, so the scan matched nothing it was written to find and a clean result would be coverage of nothing"
+reset_tree
+# No `phase` key derived: every `fact`/`set_fact`/`fact_of` call naming it respelled.
+mutate $KIT_REL/unattended.sh 's/\(fact[a-z_]* "[^"]*"\) phase/\1 phaze/g'
+mutate $KIT_REL/check-unattended.sh 's/\(fact[a-z_]* "[^"]*"\) phase/\1 phaze/g'
+hit "$(run)" "the run-state key derivation found no phase key, so the read scan grades against nothing: "
+reset_tree
+
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
 # ---- README. The corpus is clean, so a check with no red fixture here proves nothing - it would be
 # ---- silent whether the predicate worked or not, which is the class this kit keeps meeting.
@@ -2279,7 +2330,7 @@ mutate memory/builds/tRun/README.md '/gen:build-units/d'
 # The arm carries the ENTIRE literal signature up to the first interpolation, not a readable prefix:
 # check-arms grades a branch on the whole thing, and a prefix reds. That is also why the remedy is
 # part of THIS assertion rather than a second one - the remedy is inside the same literal.
-hit "$(run)" "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py"
+hit "$(run)" "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of $MT_REL/gen_build_index.py"
 
 # ...a DUPLICATED pair is refused too, not just an absent one. `region` conflates the two statuses, so
 # an arm for only the absent case would leave the malformed half unproven.
@@ -2300,6 +2351,33 @@ miss "$(run)" "well-formed generated-units marker pair"
 reset_tree
 mutate $KIT_REL/SKILL.template.md '2i Invoke /session-kickoff before anything else.'
 same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(run)" ""
+reset_tree
+
+# ---- 34 (TOOL-aRepatriatedFork-6 AC5): a Run facts key carried twice with two DIFFERENT values is a
+# ---- fact nothing wrote, because every reader takes the first match. The forgery's own shape: a
+# ---- `phase: LANDED` inserted directly under the heading, above the real `phase: RUNNING`.
+reset_tree
+mutate memory/builds/tRun/RUN.md '/^## Run facts/a phase: LANDED'
+out=$(run)
+hit "$out" "UNATTENDED check 34 FAILED — a run-state file carries one Run facts key twice with two different values, and every reader takes the first match, so one of them is a fact nothing wrote: memory/builds/tRun/RUN.md: phase is [LANDED] and [RUNNING]"
+# ...the NEAR-MISS control: a SAME-value repeat forges nothing (the first match gives the same
+# answer) and is the shape of the one hand repair in gov's tree, so the rule is not "any repeat".
+reset_tree
+mutate memory/builds/tRun/RUN.md '/^## Run facts/a phase: RUNNING'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "UNATTENDED check 34 FAILED"
+hit "$out" "check 34 graded "
+# ---- L2 (closing review round 1): the readers check 34 protects are scoped to the SAME section it
+# ---- grades. A terminal phase ABOVE the heading was read ahead of the real `phase: RUNNING` while
+# ---- check 34 reported clean. This fixture carries no halt-code, so an ABORTED read surfaces as the
+# ---- halt-vocabulary refusal; the control below is that refusal firing on the in-section phase.
+reset_tree
+mutate memory/builds/tRun/RUN.md '1a phase: ABORTED'
+out=$(run)
+miss "$out" "memory/builds/tRun/RUN.md (phase ABORTED and no halt-code fact"
+reset_tree
+mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: ABORTED/'
+hit "$(run)" "memory/builds/tRun/RUN.md (phase ABORTED and no halt-code fact, so the record says a run stopped and never says why)"
 reset_tree
 
 # ---- check 16 arms D and E: the CONTRACT's two tables joined to the constants the driver enforces.
@@ -3592,6 +3670,48 @@ git add -A
 out=$(run)
 miss "$out" "names no anchor kind while its own first commit is at or after the declared cutoff"
 hit "$out" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+reset_tree
+
+# ---- TOOL-aRepatriatedFork-11 S1 (AC1): check 21 grades the BUILD ROOT's README and no README
+# ---- nested inside a build. Both carry no marker pair; before the `:(glob)` magic the plain
+# ---- pathspec's `*` crossed the slash and the nested file was named too (41 of them at inCMS).
+reset_tree
+mkdir -p memory/builds/tOne/notes
+printf '# tOne\n' > memory/builds/tOne/README.md
+printf '# a nested readme\n' > memory/builds/tOne/notes/README.md
+git add -A
+out=$(run)
+hit  "$out" "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with"
+hit  "$out" " memory/builds/tOne/README.md"
+miss "$out" "memory/builds/tOne/notes/README.md"
+
+# ---- check 35 (S2, AC2): a kit script spelling a build-root pathspec without the magic is refused
+# ---- by file and line; a DESCENDING tail is sub-spec depth on purpose and is not graded.
+reset_tree
+mutate $KIT_REL/unattended.sh 's|":(glob)$M/builds/\*/RUN.md"|"$M/builds/*/RUN.md"|'
+out=$(run)
+hit "$out" "a script in the kit directory names a file at a build root through a pathspec without the :(glob) magic, so its wildcard crosses a slash and every same-named file nested inside a build joins the population"
+hit "$out" " unattended.sh:"
+reset_tree
+printf '_x=$(GIT ls-files "$M/builds/*/spec/*.md")\n' >> $KIT_REL/unattended.sh
+miss "$(run)" "names a file at a build root through a pathspec without the :(glob) magic"
+
+# ---- --emit-ceiling (S5, AC5): two passes that each committed outside their declaration measure
+# ---- as 2, on stdout alone; a tree with no dispatched pass graded prints nothing and exits 1,
+# ---- because a 0 from a probe that saw nothing is the dead-probe shape.
+reset_tree
+gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-2 "work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'x\n' > work/stray1.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+printf 'b\n' > work/two.txt && printf 'y\n' > work/stray2.txt
+git add -A && git commit -q -m "ARCH-tRun-2 builds its lane" --no-verify
+out=$(bash "$SCRIPT" --emit-ceiling 2>/dev/null); rc=$?
+same "--emit-ceiling measures two over-declared passes" "$out" 'UNDECLARED_WRITE_CEILING="2"'
+same "--emit-ceiling exit code on a measured tree" "$rc" "0"
+reset_tree
+out=$(bash "$SCRIPT" --emit-ceiling 2>/dev/null); rc=$?
+same "--emit-ceiling prints nothing over an ungraded population" "$out" ""
+same "--emit-ceiling refuses an ungraded population, exit code" "$rc" "1"
 reset_tree
 
 # RAISED 200 -> 243, then to 251 by TOOL-dUnstalledConvoy-2 by TOOL-dUnstalledConvoy-10. A floor well below the executed count is not a floor,

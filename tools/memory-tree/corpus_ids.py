@@ -42,9 +42,50 @@ import tempfile
 
 HERE = pathlib.Path(__file__).resolve().parent
 HYGIENE = HERE / "check-memory-hygiene.sh"
-# The grammar lives in the sibling kit. Resolved relative to the TOOL ROOT, so an adopter who installs
-# the kits somewhere other than `tools/` still finds it.
-GRAMMAR_DIR = HERE.parent / "memory-recall"
+
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+# The grammar lives in the sibling kit, found by `resolve_kit_dir` (TOOL-aRepatriatedFork-2 S3): the
+# receipt first, which is the only record of a kit dir an adopter RENAMED, then the two probes. On a
+# miss it holds the last place probed, and the two readers below name it as "not installed".
+try:
+    GRAMMAR_DIR = resolve_kit_dir("memory-recall", "extract.py", HERE)
+except LookupError:
+    GRAMMAR_DIR = HERE.parent / "memory-recall"  # gov:prefix-literal — the resolver missed; the last place probed, named by the not-installed message
 
 # TOOL-dSpentCeiling-1 — the two keys this engine no longer reads. A conf that still declares one
 # is ANNOUNCED, never refused: the shipped example declared READ_PATH_CEILING blank, so refusing on
@@ -95,7 +136,7 @@ class Problem(Exception):
 
 
 def run(*argv: str, cwd=None) -> str:
-    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, check=True).stdout
+    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=True).stdout
 
 
 def read(path) -> str:
@@ -103,82 +144,11 @@ def read(path) -> str:
         return fh.read().decode("utf-8", "replace").replace("\r\n", "\n")
 
 
-def parse_conf_line(line: str):
-    """One `.memory-tree.conf` line -> `(key, value)`, or `None` for a line that declares nothing.
-
-    TOOL-aScouredKit-19. SIX readers in this kit held this body and the shell gate SOURCES the same
-    file in bash, so any spelling bash accepts and the python half mis-reads REMOVES coverage while
-    the gate stays green. Reproduced: `MEMORY_ROOT=memory   # note` took `gotchas.py --check` from
-    rc=1 to rc=0 over an identical planted violation, because the python half then walked a directory
-    that does not exist. Coverage removed, not failed closed.
-
-    TWO SPELLINGS BASH ACCEPTS THAT THE OLD BODY DID NOT, both measured against `set -a; . conf`:
-
-        MEMORY_ROOT=memory   # note   ->  memory        (an unquoted inline comment is stripped)
-        export FAMILIES="TOOL DEPL"   ->  TOOL DEPL     (the export prefix is not part of the key)
-
-    AND ONE IT MUST NOT BREAK, which is why the comment strip is not unconditional:
-
-        QUOTED="a # b"                ->  a # b         (a `#` inside quotes is DATA)
-
-    Stripping `#` unconditionally would turn that into `a`, a silent wrong value where today's bug is
-    at least a loud directory miss. So the strip runs BEFORE the quote peel and only on an unquoted
-    `#` that begins a word, which is bash's own rule.
-
-    NOT a general shell grammar, and deliberately: command substitution, parameter expansion, line
-    continuations and quoted whitespace are all legal bash and none is in scope. These two are the
-    spellings an adopter actually writes and the ones the kit's own example neither shows nor forbids.
-    """
-    line = line.strip()
-    if not line or line.startswith("#") or "=" not in line:
-        return None
-    k, _, v = line.partition("=")
-    k = k.strip()
-    if k.startswith("export ") or k.startswith("export\t"):
-        k = k[len("export"):].strip()
-    if not k:
-        return None
-    v = v.strip()
-    # A QUOTED VALUE AND AN UNQUOTED ONE NEED DIFFERENT SCANS, and the first cut of this function
-    # had only the second — so `KEY="v"  # note` kept both the comment AND a stray quote, which is
-    # live on five lines of this kit's own shipped `.memory-tree.conf.example`. Found by the closing
-    # diff review, reproduced against `set -a; . conf`.
-    #
-    # QUOTED: take the text between the opening quote and its MATCH, then treat only the remainder
-    # as comment territory. That is what makes `Q="a # b"` keep its `#` while `Q="a"  # note` loses
-    # its trailing one — the two directions this parser has to get right at once.
-    if v[:1] in ("'", '"'):
-        q = v[0]
-        end = v.find(q, 1)
-        if end >= 0:
-            return k, v[1:end]
-        # An UNTERMINATED quote is not something to guess at. Fall through to the unquoted scan,
-        # which is what the old body did for every value, so this is no worse than before for a
-        # spelling bash itself would reject.
-    # UNQUOTED: a `#` that begins a word starts a comment, including at position 0 — `X=   # note`
-    # is an empty value in bash, not the literal `# note`.
-    cut = -1
-    for i, ch in enumerate(v):
-        if ch == "#" and (i == 0 or v[i - 1].isspace()):
-            cut = i
-            break
-    if cut >= 0:
-        v = v[:cut].strip()
-    return k, v.strip('"').strip("'")
-
-
-def parse_conf(text: str, conf: dict) -> dict:
-    """Merge every declaration in `text` into `conf`, which carries the caller's OWN defaults.
-
-    The defaults stay per-reader on purpose: they differ (`CHARTER` and the pins for this module, the
-    universal budget for gotchas, the arms floors for check-arms), and one merged dict would give
-    every reader keys it has no use for and hide which reader depends on which.
-    """
-    for line in text.split("\n"):
-        kv = parse_conf_line(line)
-        if kv is not None:
-            conf[kv[0]] = kv[1]
-    return conf
+# TOOL-aRepatriatedFork-9 -- the kit's ONE conf parser moved to `tree_lib.py`, so the sibling engines
+# that need it stop importing THIS module (an adopter's own `corpus_ids.py` killed them on import).
+# Re-imported here so every caller reaching it as `corpus_ids.parse_conf` keeps working.
+sys.path.insert(0, str(HERE))
+from tree_lib import parse_conf, parse_conf_line  # noqa: E402,F401  the kit's ONE conf parser
 
 
 def load_conf(root: str) -> dict:
@@ -338,7 +308,7 @@ def ask_shell(flag: str, root: str) -> str:
         raise Problem("corpus_ids: %s is missing — it owns the sets this module asks for" % HYGIENE)
     sh = resolve_bash()
     try:
-        out = subprocess.run([sh, HYGIENE.as_posix(), flag], cwd=root, capture_output=True, text=True)
+        out = subprocess.run([sh, HYGIENE.as_posix(), flag], cwd=root, capture_output=True, text=True, encoding="utf-8")
     except OSError as exc:
         # A bash that cannot be LAUNCHED raises before any return code exists. Left unhandled this is
         # a traceback out of a hygiene gate — every failure here is named, including this one.
@@ -993,7 +963,7 @@ def cmd_selftest() -> int:
         # of it written WITHOUT that prefix.
         tP = os.path.join(base, "prefix"); os.makedirs(tP)
         cP = _scratch(tP, extra={
-            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
+            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
             "memory/HYGIENE.md": "sentinel\n\nRun `memory-tree/check-memory-hygiene.sh` to lint.\n",
         })
         cP["DEAD_PATH_PIN"] = "0"
@@ -1004,8 +974,8 @@ def cmd_selftest() -> int:
         # also pass on a rule that reds every token whose first segment is not a top-level directory.
         tQ = os.path.join(base, "prefix-ok"); os.makedirs(tQ)
         cQ = _scratch(tQ, extra={
-            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
-            "memory/HYGIENE.md": "sentinel\n\nRun `tools/memory-tree/check-memory-hygiene.sh` to lint.\n",
+            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            "memory/HYGIENE.md": "sentinel\n\nRun `tools/memory-tree/check-memory-hygiene.sh` to lint.\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
         })
         cQ["DEAD_PATH_PIN"] = "0"
         arm("...and the correctly-prefixed spelling of it is silent", None,

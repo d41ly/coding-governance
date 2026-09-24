@@ -1,10 +1,15 @@
 # TOOL-aRepatriatedFork-3 — shipped Python names its encoding on every text-IO call
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-1 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-1 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-23-build-TOOL-aRepatriatedFork-3-1-acceptance-ledger.md](../build/2026-09-23-build-TOOL-aRepatriatedFork-3-1-acceptance-ledger.md) | journal | — |
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-3-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-3-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -28,7 +33,10 @@ so a crash cannot read as "does not declare".
   `tools/gate-lint/sh_hygiene.py` already uses. It carries a `--selftest` that proves both arms fire
   and both clear. Observed by AC2 and, red-first, by AC3.
 - **S3** — Gov's bar gains a leg running S2 over `tools/` and `skills/`, with gov's registry holding
-  the gov-internal sites S1 does not reach. Observed by AC4.
+  the gov-internal sites S1 does not reach. Observed by AC4. The scanner's CLI is
+  `[registry] [root] [pathspec ...]`, so the leg narrows the population with the pathspecs `tools`
+  and `skills` rather than a second root. The leg is gov-only (§8 F2), so it is an `[[exempt_leg]]`
+  row in the govkit registry and not a `[[gate_leg]]` in the gate-lint descriptor.
 - **S4** — `tools/memory-tree/gotchas.py --declares` prints `declares: yes` or `declares: no` before
   it exits, reads stdin as bytes decoded UTF-8, and exits 2 with a named message when stdin cannot
   be read. Observed by AC5.
@@ -83,7 +91,9 @@ gov-internal sites below.
 
 Over all of gov's tracked `tools/` Python the scanner reports 180 sites in 30 files, so 151 sites in
 16 files lie outside the landable set: `tools/govkit/govkit.py`, the kit self-tests, the recall
-selftest and floor, and fixtures. PINNED, same run.
+selftest and floor, and fixtures. PINNED, same run. At the build pass's base `85fcb90f` the same
+files carry 153: govkit's self-test gained two `subprocess` sites after a7c78ad2. The registry
+seeds from that measurement, and the landable set's lines have moved but its 29 sites have not.
 
 ### What inCMS carries today
 
@@ -132,9 +142,12 @@ directly, so the line is additive for gov and is the contract an adopter-owned e
 
 ### Rollout
 
-One commit per kit with its version bump, because shipped bytes move in seven kits: codebase-map,
-gate-lint, lexicon, memory-recall, memory-tree, playbook-render and run-gates. gate-lint declares no
-constant. The scanner and its leg land last, so the first run is green.
+One commit, carrying every version bump, because shipped bytes move in seven kits: codebase-map
+1.7 → 1.8, lexicon 1.5 → 1.6, memory-recall 1.9 → 1.10, memory-tree 2.86 → 2.87, playbook-render
+1.1 → 1.2 and run-gates 1.8 → 1.9, each in every carrier. gate-lint declares no constant. The leg's
+red case was observed at a7c78ad2 before the commit, and the leg lands with the fixes and the seeded
+registry, so its first run in the tree is green. The backlog row §8 F1 files is owed by the main
+loop: `--dispatch` refuses a unit pass that declares a write to `memory/backlog/`, a shared record.
 
 ### Files touched (estimate)
 
@@ -221,15 +234,23 @@ and the registry seed · none.
   `tools/govkit/govkit.py` in about fifty places and every kit's self-test. Recommendation: pin them
   in this unit and file one backlog row to drain them, because none reaches an adopter and the
   registry reds on any new one.
+  RESOLVED (owner, 2026-09-23): pin the 151 sites here and file one backlog row to drain them, as
+  recommended.
 - **F2 — does the gate-lint kit declare an adopter leg for the scanner?** A declared leg reds at
   every adopter's next pull until they seed a registry, which is what gate-lint's two existing legs
   already do. Recommendation: not in this unit; ship the file, keep the leg gov-only, and let inCMS
   decide whether gov's scanner replaces its own.
+  RESOLVED (owner, 2026-09-23): no adopter leg in this unit; the scanner stays gov-only, as
+  recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, from audit-A's and audit-B's encoding findings and a run of
   inCMS's scanner over gov a7c78ad2's shipped Python.
+- rev-2 · 2026-09-23 · built. S3 names the scanner's pathspec CLI and the `[[exempt_leg]]` row that
+  keeps the leg gov-only. §4 records the 153 carried sites at the pass base beside the pinned 151,
+  so AC4's registry is measured rather than copied. §4 Rollout is one commit rather than one per kit,
+  and hands §8 F1's backlog row to the main loop because `--dispatch` refuses the shared record.
 
 ## 10. Reuse audit
 

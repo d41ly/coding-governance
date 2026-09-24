@@ -1,10 +1,18 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-7 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-build-TOOL-aRepatriatedFork-2-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-2-1-acceptance-ledger.md) | journal | — |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-2-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-2-build-brief.md) | journal | — |
+| [2026-09-24-prompt-TOOL-aRepatriatedFork-2-fold-d-brief.md](../prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-2-fold-d-brief.md) | journal | — |
+| [2026-09-24-prompt-TOOL-aRepatriatedFork-2-repair-r3-brief.md](../prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-2-repair-r3-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round2.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round2.md) | diff-review | DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-10 |
 
 <!-- /gen:spec-records -->
 
@@ -88,6 +96,8 @@ adds a zero-tolerance arm over CODE lines that the shipped-prefix ban cannot see
   check-unattended fork on it and keeps the C21 narrowing for itself.
 - **hands-off** `TOOL-aRepatriatedFork-19` — `tools/check-wiring.sh`'s recall, scratch and merge
   arms, which locate sibling kits by the same two-layout probe and can move onto S3's resolver.
+- **hands-off** `DEPL-aRepatriatedFork-20` — the sibling-kit resolver, which inCMS's
+  convergence needs so gov's `corpus_ids.py` finds the recall kit under `scripts/recall/`.
 
 ## 4. Design
 
@@ -165,9 +175,17 @@ it is gov-side data. Rung 2 is nc's carve-out 8 order and is what answers in gov
 no receipt. `tools/run-gates/check-receipt.py:48` is the existing engine that already reads the
 receipt at an adopter.
 
+The receipt join (rev-4) compares the last two segments of `source` with `[<home>, <anchor>]`, so the
+resolver spells no prefix of its own. It returns an absolute directory; the shell form,
+`resolve_kit_dir <python> <home> <anchor> <here>`, runs the same block through a quoted heredoc and
+prints the directory repo-relative.
+
 Python consumers carry the function as an inline copy with a canonical source and a parity arm, the
-pattern `resolve_python` already uses (`tools/lib/resolve-python.test.sh`). Shell consumers use
-rungs 2 and 3 only and announce a miss rather than parsing JSON in bash (§8 F1). The one JS
+pattern `resolve_python` already uses (`tools/lib/resolve-python.test.sh`). A shell consumer that
+already resolves a Python gets rung 1 by calling it with a one-line import of the canonical copy,
+and never parses JSON in bash; a miss on every rung is announced, never silent (§8 F1).
+`tools/check-wiring.sh` has no resolved interpreter, so it alone reads the receipt with an awk rung
+and a parity arm against the Python resolver, which `TOOL-aRepatriatedFork-19` owns. The one JS
 consumer, `agent-cap.js`, only needs a message: it derives its own path from `__filename` and names
 the review harness by probing `path.join(path.dirname(__dirname), 'workflows', 'tier2-review.js')`,
 and prints the bare harness name when the probe misses.
@@ -175,8 +193,11 @@ and prints the bare harness name when the probe misses.
 ### The runtime arm
 
 Arm 3 of `tools/check-install-prefix.sh`, run only inside `TOOL-aRepatriatedFork-16`'s kit-source
-branch. Its population is `govkit.py shipped` rows with role `engine`, `rendered` or `merged`, minus
-the gate's existing `SUFFIX_EXCL` (`:164`). A `seed` is out: written once and adopter-owned after.
+branch. Its population is `govkit.py shipped` rows with role `engine` or `rendered`, minus the
+gate's existing `SUFFIX_EXCL`. A `seed` is out: written once and adopter-owned after. So is
+`merged` (rev-4): no writer lands that role (`tools/govkit/govkit.py`'s `UNLANDED_REASON`), which is
+the reason §3 already gives for putting `.githooks/pre-commit` out, and the role's only other member
+is a `.toml` snippet the arm does not read.
 
 It classifies each line as code or prose, then applies three predicates to code only:
 
@@ -190,7 +211,8 @@ Code is: for `.py`, `tokenize` STRING and f-string tokens that are not a docstri
 text of path expressions; for `.sh` and extensionless hooks, every line whose first non-blank byte
 is not `#`, heredoc bodies included because they are printed; for `.js`, text outside `//` and
 `/* */`; for `*.fragment.json`, the `hook_path` value. P1's existence filter is the ban arm's
-epoch-2 filter (`:460-470`), so fixture names like `tools/gate-a.sh` never hit.
+epoch-2 filter (`:460-470`), so fixture names like `tools/gate-a.sh` never hit. P1's non-path lead
+class excludes `-`, as the ban's epoch 4 does, so a `${VAR:-…}` default is a hit (rev-4).
 
 A hit exits 1 and names `<path>:<line>`. The marker is `gov:prefix-literal — <reason>`, with the
 three-state reading `check_marker_reason` already applies to `gov:root-fixture` (`:258-264`): no
@@ -274,6 +296,44 @@ on gov is green and its red-first observation is taken on the parent commit.
   render token in an engine would ship as a literal brace.
 - **A conf key per sibling kit.** It moves the literal into the adopter's conf, where it rots
   against the receipt that already records the answer.
+
+### What the build found (rev-4)
+
+- **S3 at gov's own kickoff.** Gov homes the kickoff kit under `skills/`, outside the tool root the
+  probes walk, and keeps no receipt, so `manifest-check.sh`'s id reader keeps gov's layout as its one
+  named fallback, marked `gov:prefix-literal`. The id reader tries the resolver anchored at its
+  own dir, then at the repo root, and keeps an answer only if it lies in the graded repo, because
+  the per-machine junction copy resolves into gov's checkout; the flat `memory-tree/` probe is the
+  last fallback (closing review round 1 L3). `drift_report.py`'s two memory-recall lookups
+  (`_resolve_ident`, `_resolve_anchors`) take the resolver too; they were the same probe.
+- **S6 in the unattended kit.** The seven repair hints go through one helper,
+  `derive_index_repair` in `tools/unattended/lib-unattended.sh`, which the driver and the gate leg
+  both source. `check-unattended.sh` resolved no python, so it gains the inline `resolve_python` block
+  and its ban-list row swaps `memory-tree` for `lib` at equal count, justified by hand.
+  The leg's own self-test seeds a stub `gen_build_index.py` at the memory-tree kit's sibling home
+  in its fixture: the probe tests only that the file exists, and a fixture holding only this kit
+  made check 21's arm assert a literal the helper never printed there (closing review round 1 M5).
+- **S2 in `check-verdict-epoch.sh`.** It resolves no python, so the memory-recall delegate is probed
+  beside the kit and one level up, and a miss prints a note naming what is not scanned.
+- **S4's pin.** `tools/settings-merge.py`'s selftest pinned the shipped fragment's `hook_path`; the
+  pin follows the fragment to `{here}`.
+- **Arm 3's first run over gov.** Besides §4's marked list, P3 matched ten lines that name no kit
+  path: git-dir sidecars in `tools/codebase-map/map_diff.py` and `reuse_lookup.py`, a session dir's
+  subdir in `tools/runlog/extract.py`, a target's `.github/workflows`, the codebase-map test
+  template's own-kit probe, and settings-merge's loose-engine probes and selftest. Each is marked
+  with its reason. Two check-15 waivers in `tools/install-prefix-waivers.txt` were re-keyed to the
+  lines the inline resolver block moved them to.
+
+- **Gate repair at VERIFYING (rev-7).** S4 met `tools/check-hook-destinations.sh`, which admitted
+  `{here}` only in a kind=flat home. A directory kit ships its tree unchanged, so its fragment lands
+  in the same directory as its engine and `{here}` names that directory at every prefix, a renamed
+  one included; the gate now judges a `{here}` fragment under a directory kit's home at its in-tree
+  resolution, as it judges `{kit}`, and refuses only a directory no descriptor homes. The fragment
+  was right and the gate's rule was too narrow. Three suites pinned the pre-S2/S3 layout and follow
+  it: the drift-audit selftest installs the lexicon kit BESIDE its root-prefix drift-audit kit, the
+  process-monitor adopter selftest runs a copy of the hook beside its sleeping `reap.py`, and the
+  codebase-map installed gate takes the template's `gov:prefix-literal` marker so the two stay
+  byte-identical.
 
 ## 5. Production-readiness checklist
 
@@ -361,22 +421,50 @@ New arm: `tools/lib/resolve-python.test.sh` parity table · one extra row per in
   brittle, and every shell consumer here already resolves a Python. Recommendation: shell consumers
   use the probe rungs and print a named miss; the one that needs the receipt, `manifest-check.sh`'s
   id reader, calls its already-resolved Python with a one-line import of the canonical copy.
+  RESOLVED (owner, 2026-09-23): split by consumer. Shell consumers that already resolve a Python
+  import the canonical reader; `tools/check-wiring.sh` alone takes the awk rung with a parity arm
+  against the Python resolver, owned by `TOOL-aRepatriatedFork-19` (its §8 F2). §4 amended at rev-2.
 - **F2 — does inCMS move its recall hook beside the fragment?** Gov's `{here}` token finds a renamed
   kit dir, but inCMS keeps the hook in `.claude/hooks/` as a project-owned file. Recommendation:
   inCMS keeps its row until it chooses to install the hook at `scripts/recall/`; gov does not model
   a hook living outside its kit.
+  RESOLVED (owner, 2026-09-23): inCMS keeps its row until it installs the hook at `scripts/recall/`,
+  as recommended.
 - **F3 — where does an adopter's preferred review harness come from?** inCMS points the deny text at
   its own `tier2-review-indexed.js`. Recommendation: fold it into `TOOL-aRepatriatedFork-7`'s
   declared agent-cap conf as one optional key; until then inCMS keeps that one pointer as its delta.
+  RESOLVED (owner, 2026-09-23): one optional key in `TOOL-aRepatriatedFork-7`'s `.agent-cap.conf`,
+  as recommended.
 - **F4 — is `tools/settings-merge.py:88`'s name-only fallback a refusal?** The house rule says an
   empty derivation refuses. Recommendation: mark it now and ask the settings-merge owner, because it
   fires only when the script runs from outside the tree it writes into.
+  RESOLVED (owner, 2026-09-23): mark it now and ask the settings-merge owner, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, from audit-C's cross-cutting list, audit-A's sibling-kit
   lookups, and a fresh enumeration over gov a7c78ad2's shipped set that found six sites the brief
   did not list.
+- rev-2 · 2026-09-23 · §8 resolved by the owner. §4's shell-consumer rule disagreed with
+  `TOOL-aRepatriatedFork-19` §8 F2 on whether a shell consumer reads the receipt; it now splits by
+  consumer, and check-wiring's awk rung stays that unit's.
+- rev-3 · 2026-09-23 · §3 gains the **hands-off** edge back to `DEPL-aRepatriatedFork-20`,
+  which declared its **consumes-from** here and met no matching edge (hygiene check 12).
+- rev-4 · 2026-09-24 · §4 The runtime arm drops `merged` from its population and `-` from P1's lead
+  class; §4 The resolver joins the receipt on `source`'s last two segments and gains a shell form;
+  §4 gains "What the build found", recording how S2, S3, S4 and S6 met the tree and which lines S8
+  marked. AC1-AC10 are unchanged.
+- rev-5 · 2026-09-24 · closing review round 1 M5: §4 "S6 in the unattended kit" gains the
+  fixture rule - `check-unattended.test.sh` seeds the stub `derive_index_repair` resolves, and check
+  21's arm asserts the resolved path at the whole-literal signature. AC1-AC10 are unchanged.
+- rev-6 · 2026-09-24 · closing review round 1 L3: §4 "S3 at gov's own kickoff" gains the second
+  anchor - `manifest-check.sh`'s id reader resolves from the repo root after its own dir and keeps
+  the flat `memory-tree/` probe last, so the junction copy grades a flat install's ids; the
+  `manifest-check.test.sh` L3 arm runs the checker from outside the fixture. AC1-AC10 are unchanged.
+- rev-7 · 2026-09-24 · gate repair at VERIFYING — legs `hook destinations (every declared hook
+  path ships)` and its self-test, `drift-audit selftest`, `codebase-map kit selftest` and
+  `process-monitor adopter selftest`: §4 "What the build found" gains the directory-kit `{here}`
+  rule and the three fixtures that followed S2, S3 and S8. AC1-AC10 are unchanged.
 
 ## 10. Reuse audit
 

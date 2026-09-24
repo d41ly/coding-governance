@@ -35,6 +35,9 @@ if [ "$KIT_REL" = "$HERE" ]; then
   echo "memory-tree: the kit dir is outside this repo — printed paths will name the declared '$KIT_REL' prefix." >&2
 fi
 TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
+# THE RECEIPT WINS WHERE ONE EXISTS (TOOL-aRepatriatedFork-10 S6), and it is read by
+# `derive_kit_paths` below, per row, into KIT_PATHS. This line is only the fallback for what no
+# receipt row and no probe answers: a copy-install with no receipt keeps the parent derivation.
 [ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
 MEMORY_ROOT=memory
 # DISCIPLINES is a CLOSED ENUM of stream values, not a directory list (kit 1.5). The tree is flat.
@@ -91,6 +94,129 @@ if [ -z "$READINESS_ROWS" ]; then
 fi
 M="$MEMORY_ROOT"
 
+# The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
+# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
+# and tools/lib/resolve-python.test.sh reds if any copy drifts.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+_PY=$(resolve_python) || exit 2
+
+# CLOSING REVIEW ROUND 1 L4 (TOOL-aRepatriatedFork-10). Every `{{TOOL_ROOT}}<home>/<file>` the
+# templates cite is resolved for THIS install before the render, receipt row first: one sibling
+# an adopter re-homed with `kit.<entry>.prefix` renders where its row says. Only an in-tree kit
+# asks, because an out-of-tree kit dir would resolve the SHIPPING checkout's siblings.
+# >>> derive_kit_paths — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
+# `derive_kit_paths <python> <kit dir> <template>...` prints the KIT_PATHS `render_doc` applies: one
+# `{{TOOL_ROOT}}<home>/<file><TAB><path>` line per such citation in the templates that this install
+# RESOLVES through `resolve_kit_dir`, receipt row first, so a per-entry `prefix` or `kit` override
+# is honoured where govkit records it, per row. Then one bare `{{TOOL_ROOT}}<TAB><prefix>/` line when
+# the receipt carries a top-level `prefix`, read as JSON and never grepped, because a FLAT install's
+# kit directory has an empty parent (TOOL-aRepatriatedFork-10 S6). A citation nothing resolves gets
+# no line and falls through to that prefix, or to the caller's parent-derived `TOOL_ROOT`.
+derive_kit_paths() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import json
+import pathlib
+import re
+import sys
+kit = pathlib.Path(sys.argv[1]).resolve()
+root = next((p for p in (kit, *kit.parents) if (p / ".git").exists()), kit)
+cites = []
+for t in sys.argv[2:]:
+    try:
+        text = pathlib.Path(t).read_text(encoding="utf-8")
+    except OSError:
+        continue
+    for m in re.finditer(r"\{\{TOOL_ROOT\}\}([\w.-]+)/([\w.-]+)", text):
+        if m.group(0) not in cites:
+            cites.append(m.group(0))
+for cite in cites:
+    home, anchor = cite[len("{{TOOL_ROOT}}"):].split("/")
+    try:
+        path = (resolve_kit_dir(home, anchor, kit) / anchor).relative_to(root)
+    except (LookupError, ValueError):
+        continue
+    print("%s\t%s" % (cite, path.as_posix()))
+try:
+    pfx = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8")).get("prefix")
+except (OSError, ValueError, AttributeError):
+    pfx = None
+pfx = str(pfx or "").strip("/")
+if pfx and pfx != ".":
+    print("{{TOOL_ROOT}}\t%s/" % pfx)' "$2" "${@:3}"
+}
+# <<< derive_kit_paths
+KIT_PATHS=""
+if [ "$KIT_INSIDE" = yes ]; then
+  KIT_PATHS=$(derive_kit_paths "$_PY" "$KIT_REL" "$KIT_REL"/*.template.md) || exit 2
+fi
+
 # RENDERED, not copied: these land in the adopter's tree as their committed rule set, so a
 # verbatim copy would stamp whatever prefix the SHIPPING repo used into a document the adopter now
 # owns. Every kit path in them is a placeholder; `render_doc` is what the parity gate grades.
@@ -107,6 +233,14 @@ render_doc() {
   out=${out%X}
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
+  # Closing review round 1 L4: the paths `derive_kit_paths` RESOLVED for this install go first, one
+  # `<placeholder><TAB><path>` line each, so a sibling the receipt re-homes renders where its row
+  # puts it; the parent-derived `TOOL_ROOT` then answers only what no line did. CRs go first: a
+  # Windows python prints CRLF, and a CR kept in a path lands in the rendered doc.
+  local kp kv kpaths=${KIT_PATHS:-}
+  while IFS=$'\t' read -r kp kv; do
+    [ -z "$kp" ] || out=${out//"$kp"/"$kv"}
+  done <<<"${kpaths//$'\r'/}"
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
   # TOOL-aJoinedCanon-9: the §5 row set is DECLARED, not written into the skeleton. The transform
   # sits INSIDE the marked block rather than in the callers, so the parity table already gating this
@@ -116,6 +250,11 @@ render_doc() {
   local rows=${READINESS_ROWS//|/$'
 '- }
   out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
+  # TOOL-aRepatriatedFork-10 S5: two conf FACTS, rendered from the conf this tree declares, so an
+  # adopter's rule set states its own values rather than the shipping repo's. An undeclared key names
+  # the owner of its default instead of retyping a number that lives in the engine's preset block.
+  out=${out//\{\{INDEX_CAP_LINES\}\}/"${INDEX_CAP_LINES:-undeclared — the engine default applies}"}
+  out=${out//\{\{ENTRY_CAP_UNIT\}\}/"${ENTRY_CAP_UNIT:-undeclared — the engine default applies}"}
   printf '%s' "$out"
 }
 # <<< render_doc
@@ -368,41 +507,6 @@ done
 # is what makes the directory tracked. The empty-population guard says so out loud on the first run.
 # Stage the tree FIRST so the generator (git ls-files) sees the files, then render + re-stage.
 git add "$M" >/dev/null 2>&1 || true
-# The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
-# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
-# and tools/lib/resolve-python.test.sh reds if any copy drifts.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
-resolve_python() {
-  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
-  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
-  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
-  _rp_tried=""
-  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
-    [ -n "$_rp_c" ] || continue
-    _rp_tried="$_rp_tried $_rp_c"
-    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
-      printf '%s\n' "$_rp_c"
-      return 0
-    fi
-  done
-  {
-    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
-    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
-    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
-    echo "resolve_python: tried:$_rp_tried"
-    if [ -n "${1:-}" ]; then
-      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
-    fi
-    if [ -n "${GOV_PYTHON:-}" ]; then
-      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
-      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
-      echo "resolve_python: operator believes they chose, and would not have."
-    fi
-  } >&2
-  return 1
-}
-# <<< resolve_python
-_PY=$(resolve_python) || exit 2
 "$_PY" "$HERE/gen_build_index.py" --write
 git add "$M" >/dev/null 2>&1 || true
 
@@ -422,6 +526,9 @@ echo "     STRICTLY AHEAD of every committed spec. From that date on, every acce
 echo "     name a witness in backticks — the command, file or test that makes the observation."
 echo "  7. MEASURE any pin/floor this kit gains against YOUR corpus — never inherit another repo's"
 echo "     numbers. A pin copied from a larger tree is either vacuous or permanently red here."
+echo "     ONE IS OWED NOW: the harness meta-gate refuses a blank ARMS_FLOORS once it discovers a"
+echo "     gate, and this kit installs one, so declare it measured:"
+echo "       $_PY $KIT_REL/check-arms.py --emit-floors    (paste its one line into .memory-tree.conf)"
 echo "  8. Bind your records (hygiene check 21). If $M/builds/*/{build,prompts,reviews}/ already"
 echo "     holds records, THE FIRST RUN IS RED: check 21 names every record carrying no Serves line,"
 echo "     and no pin value changes that — RECORD_UNBOUND_PIN bounds the deliberate 'none' escape,"

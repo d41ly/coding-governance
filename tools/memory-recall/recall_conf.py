@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.9
+gov:kit memory-recall@1.12
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -15,8 +15,19 @@ must not create one: the refusal names the memory-tree kit and prints a two-key 
 is deliberately no --memory-root and no --families flag anywhere in the kit; a second way to declare
 the same values is the hand-kept-second-copy defect the port exists to remove.
 
-The node-tag character class is NOT a conf key. Upstream pins `[a-f]`; the memory-tree kit's own
-hygiene gate admits `node [a-z]`, so the kit takes `a-z` and adds no key.
+Four OPTIONAL `RECALL_*` keys carry facts that belong to the adopter's corpus and not to the kit
+(TOOL-aRepatriatedFork-12); absent, each keeps the kit's previous behaviour exactly:
+
+  RECALL_NODE_TAG_CLASS     the body of the node-tag character class; absent = `a-z`, matching the
+                            memory-tree hygiene gate's own `node [a-z]`
+  RECALL_CITED_FAMILIES     families the id grammar RECOGNISES but the corpus does not HOME: they
+                            join the id alternation and never the durable-home alternation
+  RECALL_BUILD_QID_CUTOFF   `<tag>:<qid>` pairs, each node's build-era boundary in its own log
+  RECALL_EXPORT_DIR         a repo-relative directory for `query.py --export`; absent = beside the
+                            log under the common git dir
+
+A malformed value is a ConfError naming the key, never a silent fallback. Only the first two change
+which strings are ids, so only they enter `digest()`.
 
 The conf PARSER below is a copy of the twenty lines in codebase-map's map_lib.load_conf, not an
 import of it: kits are copied into adopters independently, and importing across kit directories
@@ -36,11 +47,14 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.9"
+KIT_MEMORY_RECALL_VERSION = "1.12"
 
 CONF_NAME = ".memory-tree.conf"
-# a-z, per tools/memory-tree/check-memory-hygiene.sh's own `node [a-z]` (spec Q1 option (b)).
+# The DEFAULT: a-z, per the memory-tree hygiene gate's own `node [a-z]` (spec Q1 option (b)).
+# `RECALL_NODE_TAG_CLASS` narrows it for a corpus whose registry is narrower.
 NODE_TAG_CLASS = "a-z"
+_TAG_CLASS_RE = re.compile(r"^[a-z0-9-]+$")
+_CUTOFF_RE = re.compile(r"^([a-z]):(\d+)$")
 
 
 class ConfError(RuntimeError):
@@ -106,7 +120,7 @@ def repo_root() -> pathlib.Path:
         out = subprocess.run(
             ["git", "-C", str(here), "rev-parse", "--show-toplevel"],
             capture_output=True,
-            text=True,
+            text=True, encoding="utf-8",
             check=True,
         ).stdout.strip()
     except (OSError, subprocess.CalledProcessError) as e:
@@ -183,16 +197,24 @@ class Conf:
     """The RESOLVED values every other module in the kit reads."""
 
     __slots__ = ("root", "path", "memory_root", "families", "node_tag_class", "cache_budget_mb",
-                 "extra_sources")
+                 "extra_sources", "cited_families", "build_qid_cutoff", "export_dir")
 
     def __init__(self, root: pathlib.Path, memory_root: str, families: tuple[str, ...],
                  cache_budget_mb: float | None = DEFAULT_CACHE_BUDGET_MB,
-                 extra_sources: tuple[str, ...] = ()):
+                 extra_sources: tuple[str, ...] = (), node_tag_class: str = NODE_TAG_CLASS,
+                 cited_families: tuple[str, ...] = (),
+                 build_qid_cutoff: dict[str, int] | None = None, export_dir: str | None = None):
         self.root = root
         self.path = root / CONF_NAME
         self.memory_root = memory_root
         self.families = families
-        self.node_tag_class = NODE_TAG_CLASS
+        self.node_tag_class = node_tag_class
+        # Ids, never homes: extract joins these to `ID` and keeps them out of `DURABLE`'s `_IDX`.
+        self.cited_families = cited_families
+        # Neither of these two changes which strings are ids, so neither is in digest() — the same
+        # reasoning the cache budget below carries.
+        self.build_qid_cutoff = dict(build_qid_cutoff or {})
+        self.export_dir = export_dir
         # None = uncapped, which is what a BLANK value means — the same convention as every other
         # measured knob in this tree. It is deliberately NOT part of digest(): a size limit is not a
         # corpus input, and folding it in would rebuild every cache whenever someone raised the cap.
@@ -225,8 +247,10 @@ class Conf:
         # documents exist, so a widened or narrowed list must not read a cache built before it.
         # Measured: without it, editing the declaration left the index warm and the corpus stale,
         # so both arms proving the widening is opt-in were answered by a cached number.
+        # `cited_families` is in the blob beside `node_tag_class`: both change which strings are ids.
         blob = "\0".join((self.memory_root, ",".join(sorted(self.families)), self.node_tag_class,
-                          " ".join(self.extra_sources), KIT_MEMORY_RECALL_VERSION))
+                          " ".join(self.extra_sources), KIT_MEMORY_RECALL_VERSION,
+                          ",".join(sorted(self.cited_families))))
         return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
 
 
@@ -262,8 +286,42 @@ def resolve(root: pathlib.Path | None = None) -> Conf:
         raise ConfError(
             refusal(base, f"{CONF_NAME} declares no usable FAMILIES (want `discipline:FAMILY ...`)")
         )
+    # Each malformed value is refused as `<KEY>=<value> is not <shape>`, one string shape for all four.
+    refused = "refused: " + CONF_NAME + " {}={!r} is not {}"
+    tag_class = conf.get("RECALL_NODE_TAG_CLASS", "").strip() or NODE_TAG_CLASS
+    if not _TAG_CLASS_RE.match(tag_class):
+        raise ConfError(refused.format("RECALL_NODE_TAG_CLASS", tag_class,
+                                       "a character-class body over [a-z0-9-], e.g. a-f"))
+    try:
+        re.compile(f"[{tag_class}]")
+    except re.error as e:  # a reversed range such as `f-a` passes the shape and fails here
+        raise ConfError(refused.format("RECALL_NODE_TAG_CLASS", tag_class,
+                                       f"a valid character class ({e})")) from e
+    cited = tuple(dict.fromkeys(conf.get("RECALL_CITED_FAMILIES", "").split()))
+    for fam in cited:
+        if not _FAMILY_RE.match(fam):
+            raise ConfError(refused.format("RECALL_CITED_FAMILIES", fam, "an uppercase family token"))
+        if fam in families:
+            raise ConfError(refused.format("RECALL_CITED_FAMILIES", fam,
+                                           "a family FAMILIES does not already declare"))
+    cutoff: dict[str, int] = {}
+    for pair in conf.get("RECALL_BUILD_QID_CUTOFF", "").split():
+        m = _CUTOFF_RE.match(pair)
+        if not m:
+            raise ConfError(refused.format("RECALL_BUILD_QID_CUTOFF", pair,
+                                           "a `<tag>:<qid>` pair, e.g. a:163"))
+        cutoff[m.group(1)] = int(m.group(2))
+    # Only the TRAILING slash goes: a leading one is an absolute path and must reach the refusal.
+    export_dir = conf.get("RECALL_EXPORT_DIR", "").strip().rstrip("/") or None
+    if export_dir is not None:
+        # A WRITE destination: refused here, before any caller can open a file under it.
+        dest = (base / export_dir).resolve()
+        if pathlib.PurePath(export_dir).is_absolute() or not dest.is_relative_to(base.resolve()):
+            raise ConfError(refused.format("RECALL_EXPORT_DIR", export_dir,
+                                           "a repo-relative directory inside the root"))
     out = Conf(base, memory_root, families, _budget(conf.get("RECALL_CACHE_BUDGET_MB")),
-               tuple(conf.get("RECALL_EXTRA_SOURCES", "").split()))
+               tuple(conf.get("RECALL_EXTRA_SOURCES", "").split()), tag_class, cited, cutoff,
+               export_dir)
     if root is None:
         _cached = out
     return out
@@ -294,6 +352,9 @@ def main() -> int:
     print(f"MEMORY_ROOT={c.memory_root}")
     print(f"FAMILIES={' '.join(c.families)}")
     print(f"NODE_TAG_CLASS={c.node_tag_class}")
+    print(f"CITED_FAMILIES={' '.join(c.cited_families)}")
+    print(f"BUILD_QID_CUTOFF={' '.join(f'{k}:{v}' for k, v in sorted(c.build_qid_cutoff.items()))}")
+    print(f"EXPORT_DIR={c.export_dir or ''}")
     print(f"CONF_DIGEST={c.digest()}")
     print(f"KIT_VERSION={KIT_MEMORY_RECALL_VERSION}")
     return 0

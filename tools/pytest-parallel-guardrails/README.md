@@ -1,6 +1,6 @@
 # pytest-parallel-guardrails — bounded, attributable parallel test runs
 
-<!-- gov:kit pytest-parallel-guardrails@1.0 -->
+<!-- gov:kit pytest-parallel-guardrails@1.1 -->
 
 Any pytest-xdist suite can wedge forever when a worker dies, and the death leaves no evidence:
 execnet redirects a worker's fd 0/1 to devnull on every platform — on Windows fd 2 as well — so
@@ -24,6 +24,11 @@ records: inCMS `ARCH-eGuidingConcierge-12/-19`, `ARCH-eVigilantCanary-1/-2`.
 | `pytest-parallel-guardrails.test.sh` | Kit self-test (rides the repo gate suite) |
 
 ## The four knobs (what each honestly does)
+
+`govkit check` probes this kit's one hole by reading every TRACKED `pyproject.toml` that carries a
+`[tool.pytest.ini_options]` table, at any depth: it needs at least one, and every one it finds must
+carry the four knobs and `--max-worker-restart=0`. `pytest.ini`, `setup.cfg` and `tox.ini` are not
+read.
 
 Merge `pyproject-snippet.toml` into your ini. **Size `timeout` first**: run `--durations=10`,
 take the slowest legitimate test, multiply by ~7–10. The shipped 300/240/1800 fit a suite whose
@@ -81,7 +86,7 @@ multi-loop pattern entirely at the cost of a suite-wide loop-semantics migration
 
 ## Version
 
-Kit version: `KIT_PYTEST_GUARDRAILS_VERSION = "1.0"` in `crashprobe.py`; the same version rides
-the `gov:kit pytest-parallel-guardrails@1.0` markers in the artifacts adopters keep (this README,
+Kit version: `KIT_PYTEST_GUARDRAILS_VERSION = "1.1"` in `crashprobe.py`; the same version rides
+the `gov:kit pytest-parallel-guardrails@1.1` markers in the artifacts adopters keep (this README,
 the snippet, the seam patch, the test template), because the probe itself is expected to be
 removed after a hunt.

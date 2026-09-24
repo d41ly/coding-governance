@@ -4,7 +4,10 @@ id = "unattended"
 home = "tools/unattended"
 scope = "repo"
 version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
-requires = ["memory-tree", "review-harness"]
+# `settings-merge` since TOOL-aRepatriatedFork-11 (section 8 F2): this kit ships hook fragments and its
+# `[check]` grades their wiring, so the install that lands one wires it through the target's own
+# settings-merge.py, and the target's receipt then names the program that wrote its settings file.
+requires = ["memory-tree", "review-harness", "settings-merge"]
 
 [[files]]
 include = "**"
@@ -33,8 +36,20 @@ role = "engine"
 # driver's run-log writer in THIS directory, so an adopter who never edits the driver gains nothing
 # from it. It is not a gate leg either. `run-unattended-gates.sh` picks it up from its budget row with
 # the rest, and it also runs alone, which is how a build holding the siblings back runs it.
+#
+# TOOL-aRepatriatedFork-18 NARROWED THAT TO LEGS (owner, 2026-09-23, section 8 F2 of its spec). The
+# arm-bearing suites -- each the `<stem>.test.sh` sibling of a gate this kit ships -- now ship as
+# `engine`, because `check-arms.py` makes every adopter READ the sibling of every tracked gate for
+# its positive assertions, whether or not they edit the checker. Withheld, each pull shipped gates
+# with new branches and no arms for them, and the adopter's `gate-arms` leg stayed red until someone
+# hand-merged gov's suites. The FILE ships, which check-arms reads; the LEG does not, which is still
+# the ruling, through the `[[exempt_leg]]` rows in govkit's registry. An adopter that
+# forks a gate arms its own branches in `<stem>.local.test.sh`, which no descriptor claims.
+# The three here are `unattended.test.sh`, `check-unattended.test.sh` and `check-playbook.test.sh`.
+# Gov's pins for the branches no fixture reaches ship beside the gates too, in this directory's
+# `unarmed-branches.txt`, keyed relative to it, through the `**` rule above.
 [[files]]
-include = ["adopt-unattended.test.sh", "check-arms-groups.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh", "unattended.test.sh"]
+include = ["adopt-unattended.test.sh", "check-arms-groups.test.sh", "check-pass-order.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh"]
 role = "project-owned"
 
 # `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's

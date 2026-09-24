@@ -1,10 +1,15 @@
 # TOOL-aRepatriatedFork-18 — the test suites that arm gov's gates reach adopters
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 4
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-build-TOOL-aRepatriatedFork-18-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-18-1-acceptance-ledger.md) | journal | — |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-18-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-18-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -28,16 +33,24 @@ and ships gov's own pins for its unarmable branches, so an update arrives armed.
   adopter bars on 2026-08-23. §4 `### Inventory` names the population. `check-microformats.test.sh`
   is the precedent: its descriptor already ships gate and suite together
   (`tools/govkit/entries/check-microformats.kit.toml`). The memory-tree, unattended and
-  kickoff-manifest kits move their version constants, because their shipped set grows. Observed by
-  AC1, AC2 and AC9.
+  kickoff-manifest kits move their version constants, to 2.92, 1.32 and 1.7, and playbook-render
+  moves to 1.6 because `tools/govkit/registry.toml` is in its shipped set. `govkit epoch --base
+  f8fdd873` orders a bump after a kit's last move, so an earlier bump in this build does not cover
+  this unit's. Observed by AC1, AC2 and AC9.
 - **S2** — One canonical block, `derive_self_rel`, in a new `tools/lib/kit-rel.sh`: the `.git`
   boundary walk `tools/check-wiring.sh:31-47` and `tools/unattended/adopt-unattended.sh:63-69`
   already carry, printing the file's OWN directory relative to the repo root. Each S1 suite carries
-  it inline between `# >>> derive_self_rel` markers, and the same byte-identity scan
-  `tools/lib/resolve-python.test.sh:99` runs for `resolve_python` covers it. Every suite's
-  `${KIT_REL:-tools}` or `${KIT_REL:-tools/<kit>}` default becomes that derived value, which settles
-  `TOOL-dRetiredFork-39` for this population: the variable was "set by nothing" and carried two
-  meanings. Observed by AC5.
+  it inline between `# >>> derive_self_rel` markers where it names its own directory
+  repo-relatively, and the same byte-identity scan `tools/lib/resolve-python.test.sh:99` runs for
+  `resolve_python` covers it. Every suite's `${KIT_REL:-tools}` or `${KIT_REL:-tools/<kit>}` default
+  becomes that derived value, which settles `TOOL-dRetiredFork-39` for this population: the variable
+  was "set by nothing" and carried two meanings. It means the kit's own directory everywhere now;
+  `unattended.test.sh`, where it meant the tool root, derives `TOOL_REL` beside it. Five suites carry
+  the block: the three unattended suites, `check-method-carriers.test.sh`, whose fixture now installs
+  its leg at `$KIT_REL`, and `check-memory-hygiene.test.sh`, whose scaffolded-inside arm does the
+  same. `check-line-length.test.sh` names its gate as `$HERE`'s sibling and
+  `manifest-check.test.sh` finds its readers through its checker's own functions (S3), so neither
+  names its own directory repo-relatively and neither carries a block. Observed by AC5.
 - **S3** — Each S1 suite finds a SIBLING kit's file the way its checker does, never by a second
   spelling. `skills/session-kickoff/manifest-check.test.sh:684-688` clones the host repo and copies
   `tools/memory-tree/corpus_ids.py`, and `:1104-1106` hides `tools/memory-recall/extract.py`; both
@@ -47,8 +60,10 @@ and ships gov's own pins for its unarmable branches, so an update arrives armed.
   measured instance is `tools/unattended/unattended.test.sh:4481-4510`: it FAILs when
   `check-spec-tokens.py` is not beside the kit, while `tools/govkit/registry.toml` exempts that file
   from every adopter, so the arm is red at every adopter by construction. In gov the file is present
-  and the arms run; a gov-side disappearance still reds through the suite's assertion floor in
-  `tools/check-testsuite-counts.sh`. Observed by AC6.
+  and the arms run; a gov-side disappearance still reds, through a branch that FAILs when the suite sits in a kit source,
+  one whose govkit registry is beside the kit. The assertion floor in
+  `tools/check-testsuite-counts.sh` was the rev-1 answer and does not reach this suite, which is no
+  leg in `tools/gate-legs.json`. Observed by AC6.
 - **S5** — Gov's pins for branches no fixture can reach travel with their gates. check-arms reads,
   besides `<MEMORY_ROOT>/project/unarmed-branches.txt` (`check-arms.py:51`, `:203`), a sidecar
   `unarmed-branches.txt` in each gate's own directory, whose gate column is the path RELATIVE TO THAT
@@ -64,6 +79,10 @@ and ships gov's own pins for its unarmable branches, so an update arrives armed.
   are renamed to declared verbs through `python tools/lexicon/lexicon.py --suggest`, and gov's
   `VERB_OFFENDER_PIN` (`.lexicon.conf:195`) moves down by what `--measure` then reports. Observed
   by AC7.
+- **S9** — check-arms drops a command substitution from a signature as it drops a variable. Found
+  while building S5: `check-unattended.sh`'s check 21 branch 1 ends `repair with
+  $(derive_index_repair)`, so its signature kept the call's SOURCE, which no run prints, and gov's
+  own `--check` was red on it before this unit touched a pin. Observed by AC3's `--check` exiting 0.
 - **S8** — The class gate. `python tools/govkit/govkit.py selfcheck` (`tools/govkit/govkit.py:1159`)
   asserts that every landable file check-arms' `discover()` predicate classifies as a gate has a
   landable sibling suite. A new gate shipped without its arms is then red in gov, before any adopter
@@ -248,7 +267,8 @@ of `scripts/check-memory-hygiene.test.sh` into `check-memory-hygiene.local.test.
   fixture without that file names the branch.
   Red when: `armed_signatures` reads only the shipped sibling.
 - **AC5** — When `git grep -nE 'KIT_REL:-tools|cp "\$GOVROOT/tools/memory-tree' -- <each S1 suite>`
-  runs it prints nothing, and `git grep -c '^# >>> derive_self_rel'` counts one block per S1 suite.
+  runs it prints nothing, and `git grep -c '^# >>> derive_self_rel'` counts one block in each of the
+  five S1 suites S2 names as naming their own directory repo-relatively.
   Red when: a suite keeps gov's prefix as its default or copies a sibling kit from gov's layout.
 - **AC6** — When `git grep -n 'the spec-token checker is not beside this kit' -- tools/unattended/`
   runs, the line it prints is a `skip` line naming the registry exemption, and no `FAIL` shares it.
@@ -263,6 +283,9 @@ of `scripts/check-memory-hygiene.test.sh` into `check-memory-hygiene.local.test.
   permission: inCMS is another repository; observed in a scratch clone, editing nothing there.
   fixture: needs `DEPL-aRepatriatedFork-17`'s role-move handling, and inCMS's forked `check-arms.py`
   must read the sidecar too, which is the check-arms convergence unit's work.
+  carried (rev-2): observed by `DEPL-aRepatriatedFork-20`, the unit that converges inCMS's engines
+  onto gov's. Until it lands inCMS's `gate-arms` leg runs inCMS's own fork, which reads neither the
+  sidecar nor a `.local.test.sh`, so no build of this unit can make it pass.
   cost: one update plus one check-arms pass, a few minutes.
 - **AC9** — When `bash tools/check-kit-versions.sh` runs it exits 0 after the memory-tree,
   unattended and kickoff-manifest descriptors change what they ship.
@@ -280,7 +303,10 @@ branch and a `.local.test.sh`-only arm, each against the a7c78ad2 reader · none
 
 New arm: `tools/run-gates/run-selftests.sh` budget row · installs the S1 suites at a `scripts/`
 prefix in a scratch target and runs each there, so S2 to S4 are proven by execution rather than by
-grep · the held-leg budget gains one row
+grep · the held-leg budget gains one row · PARKED at rev-2 in the run-state file: a unit pass runs
+no suite, so this leg's red case could not be observed before it landed, and running the suites at
+a foreign prefix also needs the fixture-internal kit paths inside them repathed, which only that
+execution can verify
 
 ## 8. Open questions
 
@@ -288,19 +314,41 @@ grep · the held-leg budget gains one row
   S1 as specified. Option (b): §4's first rejected alternative. Recommendation: (a) now, because
   both adopters fork these gates today and (b) cannot arm a fork. Revisit (b) once the gates run
   verbatim at both adopters, when it would let S1's files leave again.
+  RESOLVED (owner, 2026-09-23): (a), ship the suites now; revisit (b) once both adopters run the
+  gates verbatim, as recommended.
 - **F2 — does reversing the file half of `TOOL-aQuenchedHarness-3` need an owner ruling?** The
   2026-08-23 ruling withheld the files because a copy-installed adopter "never edits" the checker.
   check-arms makes the adopter READ the suite whether it edits the checker or not, which the ruling
   did not weigh; its spec never mentions check-arms. Recommendation: put S1 to the owner as a
   narrowing of that ruling to legs, not a reversal.
+  RESOLVED (owner, 2026-09-23): S1 is ratified as a NARROWING of `TOOL-aQuenchedHarness-3` to legs
+  only; the files ship, the legs stay withheld.
 - **F3 — should the S1 suites' execution proof be a bar leg or a held leg?** Running
   `unattended.test.sh` and `check-unattended.test.sh` in a scratch adopter is minutes of wall.
   Recommendation: a held leg with a budget row, as the third `New arm:` states, run once per build.
+  RESOLVED (owner, 2026-09-23): a held leg with a budget row, run once per build, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, from the brief's unit 18, audit-D §4, audit-C's nc rows, and
   the check-arms measurement over inCMS's 6ca2d0b38 blobs taken for this spec.
+- rev-2 · 2026-09-24 · built. S1: no second version bump, because all three constants already
+  moved since base `f8fdd873` and the epoch gate reads them clean. S2: five suites carry the block,
+  not seven, and `unattended.test.sh` gains `TOOL_REL`; AC5 moved to match. S4: the gov-side red is
+  a kit-source branch, since the counts floor does not reach that suite. S9 added, the
+  command-substitution signature, found red at gov HEAD while building S5. AC8 carried to
+  `DEPL-aRepatriatedFork-20`. Section 7's third `New arm:` parked.
+- rev-3 · 2026-09-24 · S1 corrected: rev-2's "no second bump" read the epoch gate over an
+  uncommitted tree, and once committed it named all four kits, because it orders a bump after the
+  kit's last move. The four bump, and AC9's observation is taken after that.
+- rev-4 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. S8's selfcheck arm refused
+  every scratch gov whose memory-tree entry lands no `check-arms.py`, including one with no
+  memory-tree entry at all, so every selftest control that builds such a gov went red. The arm now
+  stands down by name when no entry lands `check-arms.py`, and still reds a shipped one that will
+  not load: a regression, fixed in `govkit.py`. Two arms pinned the tree before S1 and are updated
+  to it: the default plan's `ORDER|project-owned` count is 27, since check-line-length's self-test
+  ships, and the over-reach arm names `check-verdict-epoch.test.sh`, which S1 still withholds,
+  because `check-memory-hygiene.test.sh` now ships.
 
 ## 10. Reuse audit
 

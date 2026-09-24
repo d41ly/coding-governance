@@ -22,12 +22,42 @@ It never guesses. Every refusal names what the operator must supply:
 
 - a placeholder the descriptor declares nowhere;
 - an `asked` placeholder with no answer in `deploy.toml`;
-- a `derived` placeholder whose probe returned nothing — it does NOT fall back to a default it
-  never declared, because a probe quietly returning the empty string is how a charter ships with a
-  blank where a branch name belongs;
+- a `derived` placeholder whose probe returned nothing and that nothing answers — it does NOT fall
+  back to a default it never declared, because a probe quietly returning the empty string is how a
+  charter ships with a blank where a branch name belongs;
+- a template that is its own charter: `playbook_path` resolving to the `--charter` file;
+- a `[charter]` entry that fails its grading (below);
 - a `kit:` fence naming something that is not a registry entry;
 - a `when:` fence naming a block the descriptor does not declare;
 - a `drop_blocks` member that matches no fence.
+
+## Where a value comes from
+
+In order: `deploy.toml`'s `[charter]` table, then `[answers]`, then the probe for a `derived`
+placeholder or the declared default for a `defaulted` one. **An answer outranks a probe**, so a probe
+that answers wrongly can be corrected without forking the descriptor. The render prints the answer
+beside what the probe would have derived, and says when the two are equal. That is a note, never a
+failure.
+
+## `playbook_path` has two modes
+
+With `playbook-render` selected, `playbook_path` is where the TEMPLATE lives, and the render writes
+the charter named by `--charter` (default `AGENTS.md`). The two may not be one file. Without
+`playbook-render`, `playbook_path` is the copied charter itself, and the `playbook-placeholders`
+hole probes it for a surviving `{{`. In render mode that hole stands down, because the template
+always carries placeholders and `--check` already reports one that survives.
+
+## The `[charter]` table
+
+`[charter]` holds values whose only consumer is this renderer. govkit's token context never reads
+it, so nothing in it reaches an argv, and it may carry prose `[answers]` refuses: an em dash, a
+backtick, angle brackets. That is where a commit trailer such as
+`Co-Authored-By: Name <address>` belongs. The render refuses, naming the key:
+
+- a key that names no declared placeholder;
+- a key that names a token an argv or destination needs (it belongs in `[answers]`, where the argv
+  can read it; `govkit check` makes the same join over every selected kit);
+- a control character other than a newline, the `{{` opener, or a `gov:playbook` region marker.
 
 ## Two namespaces, and neither reads a boolean
 

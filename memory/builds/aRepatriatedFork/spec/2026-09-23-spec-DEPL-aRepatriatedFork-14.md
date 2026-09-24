@@ -1,10 +1,15 @@
 # DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-1 · base a7c78ad2 · streams deployer · order 3
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-1 · base a7c78ad2 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-build-DEPL-aRepatriatedFork-14-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-14-1-acceptance-ledger.md) | journal | — |
+| [2026-09-23-prompt-DEPL-aRepatriatedFork-14-build-brief.md](../prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-14-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -106,8 +111,9 @@ S1's probe, as the descriptor string would carry it, reformatted here:
 
 ```python
 import subprocess, sys, tomllib
-out = subprocess.run(["git", "ls-files", "--", "*pyproject.toml"], capture_output=True,
-                     text=True, encoding="utf-8").stdout.split()
+out = [f for f in subprocess.run(["git", "ls-files", "-z", "--", "*pyproject.toml"],
+                                 capture_output=True, text=True,
+                                 encoding="utf-8").stdout.split(chr(0)) if f]
 inis = []
 for f in out:
     t = tomllib.load(open(f, "rb")).get("tool", {}).get("pytest", {}).get("ini_options")
@@ -124,7 +130,8 @@ sys.exit(0 if all(ok(i) for _f, i in inis) else 1)
 ### Inventory
 
 No function is minted in govkit's module surface. The two `selfcheck` arms are inline blocks in
-`selfcheck()`, as its existing arms are.
+`selfcheck()`, as its existing arms are, numbered 7j2 (S3) and 7j3 (S4). `selftest.py` gains
+`check_pytest_ini_probe` for AC2.
 
 ### Files touched (estimate)
 
@@ -132,7 +139,9 @@ No function is minted in govkit's module surface. The two `selfcheck` arms are i
 `tools/govkit/entries/check-testsuite-counts.kit.toml` ·
 `tools/govkit/entries/check-kit-versions.kit.toml` ·
 `tools/process-monitor/kit.toml` · `tools/govkit/registry.toml` · `tools/govkit/govkit.py` ·
-`tools/govkit/selftest.py` · `tools/pytest-parallel-guardrails/README.md`
+`tools/govkit/selftest.py` · `tools/pytest-parallel-guardrails/README.md` · and, because the
+epoch rule grades shipped bytes, the version carriers of `pytest-parallel-guardrails` (1.0 to 1.1),
+`process-monitor` (0.4 to 0.5) and `memory-tree` (2.90 to 2.91)
 
 ### Adopter deletions this unit enables
 
@@ -211,14 +220,27 @@ New arm: `tools/govkit/selftest.py` · two pytest fixtures for S1, one unsized a
 - **F1 — retire `stale-header-waiver`, or keep it with an existence probe?** Recommendation: retire,
   per S2. The generator already refuses the missing file on every bar, and a second observer of one
   fact is how the two drift apart.
+  RESOLVED (owner, 2026-09-23): retire `stale-header-waiver`, per S2, as recommended.
 - **F2 — should S1 also read `pytest.ini`, `setup.cfg` and `tox.ini`?** Recommendation: not now. The
   kit ships a `pyproject.toml` snippet and every adopter measured uses that file. Widen it when an
   adopter configures pytest elsewhere.
+  RESOLVED (owner, 2026-09-23): not now; widen when an adopter configures pytest elsewhere, as
+  recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, grounded at a7c78ad2 on read-only `govkit check` and
   `govkit plan` runs at both adopters on 2026-09-23.
+- rev-2 · 2026-09-24 · build-time divergences. Section 4 data model: the S1 probe lists paths with
+  `git ls-files -z` and splits on NUL, so a path with a space or a quoted non-ASCII name is read
+  whole. Section 4 Inventory names the arms 7j2 and 7j3 and the `selftest.py` function. Section 4
+  Files touched adds the three version bumps the epoch rule owes. AC2's no-configuration line is the
+  probe's own stderr, which `check` does not print, so AC2 is observed through `check` for the verdict
+  and by running the descriptor's probe for the line.
+- rev-3 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. Two scratch descriptors in
+  the rendered-row and reserved-prefix controls declared no `[check]`, which S3's refusal, lifted
+  into `selfcheck`, reds, so both controls went red on an arm they do not test. Each declares `[check] none` with a
+  reason. Stale fixtures; no code change.
 
 ## 10. Reuse audit
 

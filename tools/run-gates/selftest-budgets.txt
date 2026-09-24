@@ -75,7 +75,8 @@ micro-format gate selftest	460		worst of 8 readings 303s, x1.5
 placeholder-catalogue self-test	80		worst of 8 readings 50s, x1.5
 playbook parity selftest	150		worst of 7 readings 93s, x1.5
 playbook render selftest	60		worst of 8 readings 10s, x1.5
-pre-push run-log line	60		worst of 3 readings 39s on node d 2026-09-14 by direct invocation, x1.5 floored at this file 60s minimum. TOOL-dLoggedFlight-4, withheld from adopters
+pre-push bar self-test	60		one proxy reading 32.5s on node a 2026-09-23, a scratch fixture making the harness's 18 pushes, x1.5 floored at this file 60s minimum. TOOL-aRepatriatedFork-5
+pre-push run-log line	60	worst of 3 readings 39s on node d 2026-09-14 by direct invocation, x1.5 floored at this file 60s minimum. TOOL-dLoggedFlight-4, withheld from adopters
 pre-push self-test	1020		worst of 8 readings 676s, x1.5
 process-monitor adopter selftest	330		worst of 2 readings 220s, x1.5; the spread is wide (120s and 220s) because one arm waits out a real census bound
 process-monitor census selftest	40		worst of 2 readings 23s, x1.5

@@ -301,6 +301,20 @@ render() { # [template] -> stdout; LF only (the render is pinned eol=lf in .gita
   printf '%s' "$out"
 }
 
+# THE PROTOCOL AGAINST THE TARGET'S GUIDE CAP (TOOL-aRepatriatedFork-11 S7), in BOTH modes. The
+# protocol grows with the kit, and an adopter that declared a guide cap below it learned so from its
+# own hygiene gate after the pull. This ANNOUNCES and never refuses: the render is correct, the cap is
+# the adopter's decision, and the hygiene gate is the grader. Only a DECLARED cap is compared; an
+# undeclared one is the memory-tree kit's default, which is that kit's to spell and not this file's.
+_gc=$( [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf" >/dev/null 2>&1
+       printf '%s %s' "${GUIDE_CAP_BYTES:-}" "${GUIDE_CAP_LINES:-}" )
+_gc_b=${_gc% *}; _gc_l=${_gc#* }
+_gc_hb=$(tr -d '\r' < "$PROTO_SHIP" | wc -c | tr -d ' '); _gc_hl=$(tr -d '\r' < "$PROTO_SHIP" | wc -l | tr -d ' ')
+_gc_over=""
+case "$_gc_b" in ''|*[!0-9]*) ;; *) [ "$_gc_hb" -le "$_gc_b" ] || _gc_over="$_gc_over GUIDE_CAP_BYTES=$_gc_b against $_gc_hb bytes;" ;; esac
+case "$_gc_l" in ''|*[!0-9]*) ;; *) [ "$_gc_hl" -le "$_gc_l" ] || _gc_over="$_gc_over GUIDE_CAP_LINES=$_gc_l against $_gc_hl lines;" ;; esac
+[ -z "$_gc_over" ] || echo "unattended: NOTE — $PROTO_REL renders over the guide cap .memory-tree.conf declares:$_gc_over the hygiene gate will red it until the cap is raised there; the render itself is correct"
+
 if [ "$MODE" = "--check" ]; then
   # An UNRENDERED Skill is a named refusal, never a skip. "The file is not there" and "the file
   # matches" are different answers, and only one of them means the kit is installed.

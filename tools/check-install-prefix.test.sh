@@ -12,23 +12,26 @@
 #    because an empty kit list or an empty file list would otherwise be silent success — the
 #    vacuous-selector class this repo catalogues.
 set -u
+# TOOL-aRepatriatedFork-16 S5 — the gate is the one BESIDE this suite, derived before the `cd`
+# because `$0` may be relative. Spelled at gov's prefix it did not exist at a `scripts/` install,
+# and every arm that ran it exited 127 there.
+GATE="$(cd "$(dirname "$0")" && pwd)/check-install-prefix.sh"
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
-GATE="$ROOT/tools/check-install-prefix.sh"
-# The gate's path INSIDE a fixture, DERIVED from its path here rather than respelled.
-# `mkfix` and `mkfix_source` copy it to the same relative place, so one derivation covers
-# every fixture — and this file is itself in the carried-prefix population, where the ban
-# refuses a new literal. Deriving beats spelling here for exactly the reason the gate exists.
-GATE_REL=${GATE#"$ROOT"/}
+# The gate's path INSIDE a fixture. Every fixture lays its kits out under `tools/` whatever the host
+# prefix, so the gate sits there too: this is the fixture's layout, not the host's, and a path
+# derived from the host would name a directory no fixture has. `mkfix` and `mkfix_source` copy it
+# here, and every arm runs this copy.
+GATE_REL="tools/${GATE##*/}"
 fails=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
 bad()  { fails=$((fails+1)); printf 'arm FAIL  %s\n' "$*"; }
 good() { printf 'arm ok    %s\n' "$*"; }
 # $1 label · $2 expected substring ("" = expect exit 0 and no match test) · $3 expected exit · rest: cwd
-run_arm() { # label · want-substring · want-rc · dir
-  local label="$1" want="$2" wrc="$3" dir="$4" out rc
-  out=$(cd "$dir" && bash "$GATE" 2>&1); rc=$?
+run_arm() { # label · want-substring · want-rc · dir · [gate path inside dir]
+  local label="$1" want="$2" wrc="$3" dir="$4" g="${5:-$GATE_REL}" out rc
+  out=$(cd "$dir" && bash "$g" 2>&1); rc=$?
   if [ "$rc" != "$wrc" ]; then bad "$label (exit $rc, wanted $wrc): $(printf '%s' "$out" | head -2)"; return; fi
   if [ -n "$want" ] && ! printf '%s' "$out" | grep -qF "$want"; then
     bad "$label (message missing '$want'): $(printf '%s' "$out" | head -3)"; return
@@ -36,15 +39,24 @@ run_arm() { # label · want-substring · want-rc · dir
   good "$label"
 }
 
-# A repo shaped like an adopter: one kit under tools/, one shipped file, a waiver registry.
+# A repo shaped like a KIT SOURCE: one kit under tools/, one shipped file, a waiver registry.
+# TOOL-aRepatriatedFork-16 S5 — and a govkit registry, because since S2 a repo without one is a
+# consumer that ships nothing and both arms SKIP. The registry names only the kit's engine file, so
+# the carried arm grades a live, literal-free set against an empty ratchet and stays out of the way
+# of the root-install arms these fixtures exist for. The descriptor sits at the fixture root.
 mkfix() { # $1 = dir · $2 = the line to put in the shipped README
   local d="$1"
-  mkdir -p "$d/tools/memory-tree"
+  mkdir -p "$d/tools/memory-tree" "$d/tools/govkit" "$d/tools/lib"
   git -C "$d" init -q
   git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
   printf '#!/usr/bin/env bash\n' > "$d/tools/memory-tree/check-memory-hygiene.sh"
   printf '%s\n' "$2" > "$d/tools/memory-tree/README.md"
-  cp "$GATE" "$d/tools/check-install-prefix.sh"
+  cp "$GATE" "$d/$GATE_REL"
+  cp "$ROOT/tools/govkit/govkit.py" "$d/tools/govkit/govkit.py"
+  cp "$ROOT/tools/lib/resolve-python.sh" "$d/tools/lib/resolve-python.sh"
+  printf '[[entry]]\nid = "memory-tree"\ndescriptor = "mt.kit.toml"\n' > "$d/tools/govkit/registry.toml"
+  printf 'id = "memory-tree"\nhome = "tools/memory-tree"\n\n[[files]]\ninclude = ["check-memory-hygiene.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n' > "$d/mt.kit.toml"
+  : > "$d/tools/install-prefix-carried.txt"
   printf '# waivers\n' > "$d/tools/install-prefix-waivers.txt"
   git -C "$d" add -A >/dev/null 2>&1
 }
@@ -88,11 +100,10 @@ run_arm "...and the same content in a shipped file IS caught" "spells a root-ins
 
 # 7. POPULATION GUARDS. Both branches say "that is not a pass" out loud; a gate whose selector went
 #    empty would otherwise report success over nothing.
-E="$TMP/nokits"; mkdir -p "$E"; git -C "$E" init -q
-git -C "$E" config user.email t@t.test; git -C "$E" config user.name t
-mkdir -p "$E/tools"; cp "$GATE" "$E/tools/check-install-prefix.sh"
-git -C "$E" add -A >/dev/null 2>&1
-run_arm "no kit directories -> refuses, not a silent pass" "that is not a pass" 1 "$E"
+#    A kit source always has kit directories under `tools/`, so the gate moves to a prefix with none.
+E="$TMP/nokits"; mkfix "$E" 'clean'
+mkdir -p "$E/solo"; git -C "$E" mv "$GATE_REL" solo/
+run_arm "no kit directories -> refuses, not a silent pass" "that is not a pass" 1 "$E" "solo/${GATE##*/}"
 
 # 8. A placeholder-prefixed path is NOT a hit — it is the corrected form this gate exists to produce.
 F="$TMP/placeholder"; mkfix "$F" 'Run `bash {{TOOL_ROOT}}memory-tree/check-memory-hygiene.sh` to lint.'
@@ -122,7 +133,7 @@ mkfix_source() { # $1 = dir · $2 = the line to put in the shipped kit file
   mkdir -p "$d/tools/govkit/entries" "$d/tools/demo" "$d/tools/lib"
   git -C "$d" init -q
   git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
-  cp "$GATE" "$d/tools/check-install-prefix.sh"
+  cp "$GATE" "$d/$GATE_REL"
   cp "$ROOT/tools/govkit/govkit.py" "$d/tools/govkit/govkit.py"
   cp "$ROOT/tools/lib/resolve-python.sh" "$d/tools/lib/resolve-python.sh"
   printf '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo"]\n\n[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n\n[[exempt]]\npath = "tools/lib"\nwhy = "the shared library"\n\n[[exempt]]\npath = "tools/check-install-prefix.sh"\nwhy = "the gate under test"\n' > "$d/tools/govkit/registry.toml"
@@ -151,16 +162,43 @@ carried_arm() { # label · want-substring · want-rc · dir · [extra argv...]
 }
 
 # --- the SKIP branch itself gets an arm, because a skip that looks like a pass is the class ----
-# REUSES the line arm 1 already spells rather than respelling it: this file is itself in the
-# carried-prefix population, and the ratchet is shrink-only by design, so a second copy of a literal
-# is a row that has to rise. Deriving beats spelling here for exactly the reason the gate exists.
-S="$TMP/notsource"; mkfix "$S" "$CLEAN_LINE"
-sout=$(cd "$S" && bash "$GATE_REL" 2>&1); src=$?
-case "$sout" in
-  *"carried-prefix arm SKIPPED"*) good "a non-kit-source repo SKIPS the carried arm and SAYS so" ;;
-  *) bad "a non-kit-source repo does not announce the skip"; printf '%s\n' "$sout" | sed 's/^/      /' | head -8 ;;
+# TOOL-aRepatriatedFork-16 AC3/AC6 — THE CONSUMER, which is where the skip actually happens: gov's
+# kits installed under `scripts/`, a govkit receipt, NO registry. Its files are COPIED from this
+# repo rather than retyped, so they carry gov's own waived dual-spelling probes and legacy literals
+# — the bytes a consumer receives, and the five of them that redded one at nine hits. gov's waiver
+# rows key on gov's paths and never reach them there, so a gate that graded this tree would red.
+build_consumer_fixture() { # $1 = dir
+  local d="$1" f
+  mkdir -p "$d/scripts/codebase-map" "$d/scripts/hooks" "$d/scripts/memory-recall" "$d/.governance"
+  git -C "$d" init -q
+  git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
+  cp "$GATE" "$d/scripts/${GATE##*/}"
+  cp "$ROOT/tools/check-wiring.sh" "$d/scripts/check-wiring.sh"
+  for f in map_lib.py gen_map.py adopt-codebase-map.sh; do
+    cp "$ROOT/tools/codebase-map/$f" "$d/scripts/codebase-map/$f"
+  done
+  printf 'kit\n' > "$d/scripts/hooks/README.md"; printf 'kit\n' > "$d/scripts/memory-recall/README.md"
+  printf '{"schema": 2, "gov_source": "local", "kits": [], "files": []}\n' > "$d/.governance/install.json"
+  git -C "$d" add -A >/dev/null 2>&1
+}
+N="$TMP/consumer"; build_consumer_fixture "$N"
+# LIVENESS: the fixture must carry root spellings of its own kits, or the skip below proves nothing.
+if grep -rqE '(^|[^/{}[:alnum:]._-])(codebase-map|hooks|memory-recall)/[A-Za-z0-9_.-]+\.(sh|py|json)' "$N/scripts"; then
+  good "AC3 the consumer fixture carries root-install spellings a grading gate would red on"
+else
+  bad "AC3 the consumer fixture carries no root-install spelling — the skip arms below prove nothing"
+fi
+nout=$(cd "$N/scripts" && bash "${GATE##*/}" 2>&1); nrc=$?
+[ "$nrc" = 0 ] && good "AC3 a consumer exits 0 — it ships nothing, so there is nothing to red on" \
+  || { bad "AC3 a consumer redded (rc $nrc) on bytes it received"; printf '%s\n' "$nout" | sed 's/^/      /' | head -8; }
+case "$nout" in
+  *"root-install arm SKIPPED"*) good "AC6 a non-kit-source repo SAYS its root-install arm went ungraded" ;;
+  *) bad "AC6 the root-install skip was silent — a skip that looks like a pass is indistinguishable from coverage" ;;
 esac
-[ "$src" = 0 ] || bad "the skip should not red: rc $src"
+case "$nout" in
+  *"carried-prefix arm SKIPPED"*) good "a non-kit-source repo SKIPS the carried arm and SAYS so" ;;
+  *) bad "a non-kit-source repo does not announce the carried skip"; printf '%s\n' "$nout" | sed 's/^/      /' | head -8 ;;
+esac
 
 # --- GREEN control: a kit source whose ratchet matches what is measured -----------------------
 G="$TMP/src-green"; mkfix_source "$G" 'The engine lives at tools/demo/thing.sh in this repo.'
@@ -400,18 +438,29 @@ run_arm "S1 ...and the same sidecar at the declared prefix is clean" "no undecla
 # `vendor/gov/` enumerates `vendor/gov/*/` and a fixture that left its kits under `tools/` handed it
 # an empty population — the refusal, not a verdict. Two segments on purpose: one segment is the
 # shape the walk was first written for and would not have caught the pinned field.
+# TOOL-aRepatriatedFork-16 S5: the registry STAYS at the kit-source layout — that is what makes the
+# fixture a kit source — and only the kit and the gate's sidecars move, with the descriptor's home.
 P="$TMP/prefix"; mkfix "$P" 'Run `bash memory-tree/check-memory-hygiene.sh` to lint.'   # gov:root-fixture — the fixture's own hit, waived below
-mkdir -p "$P/vendor"
-git -C "$P" mv tools vendor/gov
+mkdir -p "$P/vendor/gov"
+(cd "$P/tools" && git mv memory-tree install-prefix-waivers.txt install-prefix-carried.txt "${GATE##*/}" ../vendor/gov/)
+sed -i 's#^home = .*#home = "vendor/gov/memory-tree"#' "$P/mt.kit.toml"
 printf 'vendor/gov/memory-tree/README.md:1  the fixture hit this arm waives\n' > "$P/vendor/gov/install-prefix-waivers.txt"
 git -C "$P" add -A >/dev/null 2>&1
-pout=$(cd "$P" && bash vendor/gov/check-install-prefix.sh 2>&1); prc=$?
+pout=$(cd "$P" && bash "vendor/gov/${GATE##*/}" 2>&1); prc=$?
 if [ "$prc" != 0 ]; then
   bad "S4 the gate resolves its sidecars beside ITSELF, not at tools/ (exit $prc): $(printf '%s' "$pout" | head -3)"
 else
   case "$pout" in *"1 declared waiver"*) good "S4 the gate resolves its sidecars beside ITSELF, not at tools/" ;;
     *) bad "S4 the gate ran at vendor/gov but read no waiver registry: $(printf '%s' "$pout" | head -2)" ;; esac
 fi
+# TOOL-aRepatriatedFork-16 AC5 — with the waiver gone the SAME hit refuses, and the refusal names the
+# prefix this gate derived. It used to name gov's default, which is false here.
+printf '# waivers\n' > "$P/vendor/gov/install-prefix-waivers.txt"
+pout=$(cd "$P" && bash "vendor/gov/${GATE##*/}" 2>&1); prc=$?
+case "$prc:$pout" in
+  1:*"install at"*"vendor/gov/<kit>/"*) good "AC5 the refusal names the DERIVED prefix, vendor/gov/" ;;
+  *) bad "AC5 the refusal does not name vendor/gov/ (rc $prc): $(printf '%s' "$pout" | head -3)" ;;
+esac
 
 # --- S5/S6, the received set and the per-line marker. `arm_received_set` refuses a fixture that took the
 # skip branch, for the same reason `carried_arm` does: an arm reporting on a population it never
@@ -419,7 +468,7 @@ fi
 arm_received_set() { # label · want-substring · want-rc · dir
   local label="$1" want="$2" wrc="$3" d="$4" out rc
   out=$(cd "$d" && bash "$GATE_REL" 2>&1); rc=$?
-  case "$out" in *"received-set extension SKIPPED"*) bad "$label — fixture took the SKIPPED branch, so it graded no received test"; return ;; esac
+  case "$out" in *"root-install arm SKIPPED"*) bad "$label — fixture took the SKIPPED branch, so it graded no received test"; return ;; esac
   if [ "$rc" != "$wrc" ]; then bad "$label — rc $rc, wanted $wrc"; printf '%s\n' "$out" | sed 's/^/      /' | head -8; return; fi
   case "$out" in *"$want"*) good "$label" ;; *) bad "$label — output does not carry '$want'"; printf '%s\n' "$out" | sed 's/^/      /' | head -8 ;; esac
 }
@@ -472,14 +521,54 @@ printf "Copy it from <gov>/tools/demo/thing.sh into your own tree.\n" >> "$E4G/t
 git -C "$E4G" add -A >/dev/null 2>&1
 carried_arm "epoch4 ...and a /-preceded spelling of gov's own checkout is still not one" "carried-prefix clean" 0 "$E4G"
 
-# --- AC6, the skip announces itself. `mkfix` builds a repo with no govkit registry, so arm 1 cannot
-# tell a shipped test from an unshipped one and must SAY so rather than report a clean population.
-K="$TMP/noskip"; mkfix "$K" "$CLEAN_LINE"
-kout=$(cd "$K" && bash "$GATE_REL" 2>&1)
-case "$kout" in
-  *"received-set extension SKIPPED"*) good "AC6 a non-kit-source repo SAYS its received-set extension went ungraded" ;;
-  *) bad "AC6 the received-set skip was silent — a skip that looks like a pass is indistinguishable from coverage" ;;
-esac
+# ==================== TOOL-aRepatriatedFork-2 S8 — ARM 3, RUNTIME LITERALS =====================
+# Three fixtures over one mechanism: an argv spelled `$ROOT/` plus gov's prefix (P1's `$VAR/` lead,
+# which no earlier epoch could see), a Python join of a quoted `tools` segment (P2), and that same
+# join carrying a marker with its reason, which is the green control. `RUNTIME_ARMS` counts the arms
+# whose output proves arm 3 actually ran, so a fixture that stopped reaching it reds the liveness row
+# below rather than passing by grading nothing. `demo` is no kit of this repo, so none of these
+# spellings is a literal the ban list counts here.
+RUNTIME_ARMS=0
+runtime_arm() { # label · want-substring · want-rc · dir
+  local label="$1" want="$2" wrc="$3" d="$4" out rc
+  out=$(cd "$d" && bash "$GATE_REL" --check 2>&1); rc=$?
+  case "$out" in *"runtime literals clean"*|*"SHIPPED engine spells"*) RUNTIME_ARMS=$((RUNTIME_ARMS+1)) ;;
+    *) bad "$label — arm 3 never ran"; printf '%s\n' "$out" | sed 's/^/      /' | head -8; return ;; esac
+  if [ "$rc" != "$wrc" ]; then bad "$label — rc $rc, wanted $wrc"; printf '%s\n' "$out" | sed 's/^/      /' | head -12; return; fi
+  case "$out" in *"$want"*) ;; *) bad "$label — output does not carry '$want'"; printf '%s\n' "$out" | sed 's/^/      /' | head -12; return ;; esac
+  good "$label"
+}
+RT1="$TMP/rt-argv"; mkfix_source "$RT1" 'A demo kit.'
+(cd "$RT1" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+printf 'bash "$ROOT/tools/demo/thing.sh" --go\n' >> "$RT1/tools/demo/thing.sh"
+git -C "$RT1" add -A >/dev/null 2>&1
+runtime_arm 'runtime P1 a $ROOT/-led argv naming a kit path REDS by line' "tools/demo/thing.sh:3  P1" 1 "$RT1"
+
+RT2="$TMP/rt-join"; mkfix_source "$RT2" 'A demo kit.'
+(cd "$RT2" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+printf 'import pathlib\nkit = pathlib.Path(".") / "tools" / "demo"\n' > "$RT2/tools/demo/find.py"
+git -C "$RT2" add -A >/dev/null 2>&1
+runtime_arm 'runtime P2 a "tools" / "<kit>" join REDS by line' "tools/demo/find.py:2  P2" 1 "$RT2"
+
+RT3="$TMP/rt-marked"; mkfix_source "$RT3" 'A demo kit.'
+printf 'import pathlib\nkit = pathlib.Path(".") / "tools" / "demo"  # gov:prefix-literal — a fixture layout, correct by construction\n' > "$RT3/tools/demo/find.py"
+git -C "$RT3" add -A >/dev/null 2>&1
+(cd "$RT3" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+runtime_arm 'runtime ...and the same join, MARKED with a reason, is the green control' "1 marked line(s)" 0 "$RT3"
+
+# The JS reader's comment scanner must know its strings: a quoted glob carrying `/*` opened a block
+# comment in the first cut, and every line after it went unread (a-pair-exists-and-it-is-the-wrong-one).
+RT4="$TMP/rt-js-glob"; mkfix_source "$RT4" 'A demo kit.'
+(cd "$RT4" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
+printf "const g = '*builds/*/README.md'\nconst p = path.join(root, 'tools', 'demo')\n" > "$RT4/tools/demo/find.js"
+git -C "$RT4" add -A >/dev/null 2>&1
+runtime_arm 'runtime a join AFTER a quoted /* glob in JS still REDS by line' "tools/demo/find.js:2  P2" 1 "$RT4"
+
+if [ "$RUNTIME_ARMS" -ge 3 ]; then
+  good "LIVENESS $RUNTIME_ARMS arm(s) reached the runtime-literal arm"
+else
+  bad "LIVENESS only $RUNTIME_ARMS arm(s) reached the runtime-literal arm — the rest stopped short of it, so arm 3 is reported on and not graded"
+fi
 
 if [ "$BAN_ARMS" -ge 5 ]; then
   good "LIVENESS $BAN_ARMS ban arm(s) engaged the real gate"

@@ -1,10 +1,15 @@
 # TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 6
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
+| [2026-09-24-build-TOOL-aRepatriatedFork-12-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-12-1-acceptance-ledger.md) | journal | — |
+| [2026-09-23-prompt-TOOL-aRepatriatedFork-12-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-12-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -45,9 +50,10 @@ and declares its shape in four conf lines.
   cited families, because both change which strings are ids. The cutoff and the export dir stay out
   of it, as the cache budget already does (`:196-199`). `recall_conf.py` prints the four resolved
   values beside the existing KEY=VALUE lines (`:294-298`). Observed by AC6.
-- **S7** — `KIT_MEMORY_RECALL_VERSION` moves from `1.9` to `1.10`, because S1 through S3 change the
-  grammar and the digest carries the version (`recall_conf.py:229`). `tools/memory-recall/README.md`
-  documents the four keys, and its sentence at `:43` saying the node-tag class "is not a conf key"
+- **S7** — `KIT_MEMORY_RECALL_VERSION` moves from `1.11` to `1.12`, because S1 through S3 change the
+  grammar and the digest carries the version (`recall_conf.py:229`). The kit read `1.9` when this
+  spec was drafted; `TOOL-aRepatriatedFork-2` and `-3` took it to `1.11` on this branch first.
+  `tools/memory-recall/README.md` documents the four keys, and its sentence at `:43` saying the node-tag class "is not a conf key"
   is rewritten. Observed by AC7.
 - **S8** — The adopter half, recorded here so the build can observe it: inCMS declares
   `RECALL_NODE_TAG_CLASS="a-f"`, `RECALL_CITED_FAMILIES="PKG"`, `RECALL_BUILD_QID_CUTOFF="a:163"`,
@@ -87,6 +93,8 @@ and declares its shape in four conf lines.
   (`:560`). inCMS cannot take this unit's bytes until it can take gov's `check-wiring.sh`, which
   already reads the conf (`tools/check-wiring.sh:784`). AC8 rests on that.
 - **hands-off** external — inCMS's recall selftest fixture repair, per the second non-goal above.
+- **hands-off** `DEPL-aRepatriatedFork-20` — gov's `extract.py` running at inCMS, which gov's
+  `corpus_ids.py` and `merge-rows.py` import `grammar_for` from after the convergence.
 
 ## 4. Design
 
@@ -227,7 +235,7 @@ nc deletes nothing.
   `RECALL_EXPORT_DIR` changes, it does not.
   Red when: a grammar key leaves a warm cache valid, or a non-corpus key forces a rebuild.
 - **AC7** — When `bash tools/check-kit-versions.sh` runs, it exits 0 with
-  `KIT_MEMORY_RECALL_VERSION = "1.10"`, and `grep -n 'not\*\* a conf key' tools/memory-recall/README.md`
+  `KIT_MEMORY_RECALL_VERSION = "1.12"`, and `grep -n 'not\*\* a conf key' tools/memory-recall/README.md`
   prints nothing.
   Red when: the shipped bytes moved and the version did not, or the README still denies the key.
 - **AC8** — When gov's three recall files and the §2 S8 conf lines are placed in a shared clone of
@@ -237,7 +245,8 @@ nc deletes nothing.
   permission: inCMS is another repository; the observation runs in a `git clone --shared` scratch
   clone, as audit-B's did, and edits nothing in inCMS.
   fixture: the clone also needs gov's `check-wiring.sh` (the Edges consumes-from) or its merge arm
-  reds on the family sed; `PERF-aSwiftHourglass-2` is excluded pending §8 F3.
+  reds on the family sed. Per §8 F3, `corpus_ids.py`'s sieve classes `PERF-aSwiftHourglass-2` as
+  `grammar`, the class inCMS's own `extract.py` gives it.
   cost: about a minute for the clone and one `corpus_ids.py` pass.
 
 ## 7. Gates
@@ -256,20 +265,35 @@ pre-change `resolve()` that ignores it, plus the archive-segment path against th
   a recall-scoped key, as specified. Option (b): a memory-tree `NODE_TAGS` key that both kits read.
   Recommendation: (a). The hygiene engine accepts any letter by design and only the id grammar pays
   for a wide class; (b) is the right move when a second reader appears, not before.
+  RESOLVED (owner, 2026-09-23): (a), a recall-scoped key, as recommended.
 - **F2 — should gov ship a node-tag derivation for `--export`?** Recommendation: no, per §3. If the
   owner wants it, the precondition is ONE registry reader replacing the three gov already has,
   which is its own unit.
+  RESOLVED (owner, 2026-09-23): no, as recommended.
 - **FACT-QUESTION · F3 — why does `PERF-aSwiftHourglass-2` move from `grammar` to `glossed` under
   gov's `extract.py`?** audit-B §9 measured the move and did not explain it. The id sits at inCMS
   `memory/backend-test-harness.md:8` and in `scripts/corpus-id-unresolved.txt:75`. Probe: diff
   inCMS `scripts/corpus_ids.py`'s classification of that one line under both `extract.py` builds.
   Recommendation: answer it before AC8 is observed, because a grammar difference this spec did not
   name is a fifth hardcoded fact.
+  RESOLVED (agent, 2026-09-24, delegated): not a fifth fact; it is S3. The probe was run. That id's
+  one citation in a record home is `memory/archive/performance/DECISIONS.2026-07-27.md:144`, and
+  stage A of the sieve fires only on a `RECORD_HOME` (`extract.DURABLE`) path. gov's `DURABLE` at
+  a7c78ad2 returns no match for that path; inCMS's and the S3-widened one both match. With no stage
+  A hit the id falls to stage B, which `memory/backend-test-harness.md:8` glosses. Liveness: the
+  same probe returns a match for the widened pattern, so it can produce either answer. AC8 stops
+  excluding the id and observes that it classifies `grammar` again.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-23 · initial draft, from the brief's unit 12 and audit-B §9 and §10, with the
   archive-pattern and leading-family measurements taken for this spec.
+- rev-2 · 2026-09-23 · §3 gains the **hands-off** edge back to `DEPL-aRepatriatedFork-20`,
+  which declared its **consumes-from** here and met no matching edge (hygiene check 12).
+- rev-3 · 2026-09-24 · S7 · AC7 · AC8 · §8 F3 · the version target moves from `1.10` to `1.12`,
+  because two earlier units of this build took the kit to `1.11` first. F3 is resolved by its stated
+  probe, and AC8 now includes the id it had excluded. S2 also reaches `extract.grammar_for(root)`,
+  the accessor `corpus_ids.py` and `drift_report.py` call, because it builds its own `ID`.
 
 ## 10. Reuse audit
 
