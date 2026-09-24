@@ -125,6 +125,17 @@
     "ceiling": 300
   },
   {
+    "name": "unattended protocol size",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "memory/guides/UNATTENDED-PROTOCOL.md"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "kickoff engine size <=18KiB",
     "argv": [
       "bash",

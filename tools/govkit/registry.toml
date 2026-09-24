@@ -288,6 +288,10 @@ name = "build-method size"
 why = "it measures THIS repo's own rendered build method against a row in tools/template-size-limits.txt, through check-template-size.sh — which is itself a registry exemption rather than an entry file, for the reason its sibling `charter size` row states. The ASYMMETRY is the whole reason this is not a gate_leg in the memory-tree kit.toml: that kit ships BUILD-METHOD.template.md and ships no size gate, so declaring it there would make `apply` emit an adopter a row running an engine gov never ships — verbatim the defect DEPL-dCarriedReceipt-6 withdrew the kickoff row for."
 
 [[exempt_leg]]
+name = "unattended protocol size"
+why = "it measures THIS repo's own rendered unattended protocol against its row in the template-size limits file, through check-template-size.sh, for `build-method size`'s reason one row up: the unattended kit ships PROTOCOL.template.md and ships no size gate, so a gate_leg in its kit.toml would make `apply` emit an adopter a row running an engine gov never ships. An adopter's own cap on that file is its GUIDE_CAP_BYTES, which the kit's adopter announces against instead (TOOL-aRepatriatedFork-11 S6, S7)."
+
+[[exempt_leg]]
 name = "charter size"
 why = "it measures THIS repo's own rendered charter against a row in tools/template-size-limits.txt. The gate script is itself a registry exemption rather than an entry file, and the subject is a repo-root artifact no kit ships, so there is no descriptor for the leg to be claimed by."
 

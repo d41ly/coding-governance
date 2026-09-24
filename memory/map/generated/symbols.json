@@ -1373,6 +1373,11 @@
       "file": "tools/run-gates/check-receipt.py"
     },
     {
+      "id": "check_fragment_wiring",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_git_split_parses",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -4983,6 +4988,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "remove_entry",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
+    },
+    {
       "id": "remove_fenced",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -4991,6 +5001,11 @@
       "id": "remove_reset_rows",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "remove_wired_fragments",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "render",
@@ -5996,6 +6011,11 @@
       "id": "run_expand_wrapper",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "run_fragment_merges",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "run_fts",

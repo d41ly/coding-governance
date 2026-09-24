@@ -1353,6 +1353,46 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           and "--pin tools/demo/other.py" not in p.stdout, p.stdout[-1500:])
 
 
+def check_fragment_wiring(tmp: pathlib.Path) -> None:
+    """TOOL-aRepatriatedFork-11 S3/S4, driven through the two helpers `update` calls: a target with
+    only gate-guard wired lands stall-recorder and stop-guard, the step wires exactly those two and
+    returns them, a rollback takes exactly those two back out and leaves the baseline entry, and a
+    stale entry the step REWRITES is never claimed as one it added."""
+    gk = govkit_module()
+    t = tmp / "frag"
+    (t / "tools" / "unattended").mkdir(parents=True)
+    shutil.copy(HERE.parent / "settings-merge.py", t / "tools" / "settings-merge.py")
+    names = ["gate-guard", "stall-recorder", "stop-guard"]
+    for n in names:
+        for ext in (".js", ".fragment.json"):
+            shutil.copy(HERE.parent / "unattended" / f"{n}{ext}", t / "tools" / "unattended" / f"{n}{ext}")
+    rows = [{"path": "tools/settings-merge.py", "kit": "settings-merge"}] + \
+           [{"path": f"tools/unattended/{n}.fragment.json", "kit": "unattended"} for n in names]
+    landed = {r["path"] for r in rows}
+
+    def test_wired(n: str) -> bool:
+        return subprocess.run([sys.executable, "tools/settings-merge.py", "--check", "--fragment",
+                               f"tools/unattended/{n}.fragment.json"], cwd=t,
+                              capture_output=True, text=True).returncode == 0
+    subprocess.run([sys.executable, "tools/settings-merge.py", "--fragment",
+                    "tools/unattended/gate-guard.fragment.json"], cwd=t, capture_output=True, text=True)
+    check("fragment wiring: the fixture starts with gate-guard alone wired",
+          test_wired("gate-guard") and not test_wired("stop-guard"))
+    added = gk.run_fragment_merges(t, rows, landed, set(), "update")
+    check("fragment wiring: the step returns exactly the two entries it added",
+          added == {"unattended": ["tools/unattended/stall-recorder.fragment.json",
+                                   "tools/unattended/stop-guard.fragment.json"]}, str(added))
+    check("fragment wiring: every landed fragment is wired after the step", all(test_wired(n) for n in names))
+    gk.remove_wired_fragments(t, rows, added.get("unattended", []), "update")
+    check("fragment wiring: a rollback unwires what the run added",
+          not test_wired("stop-guard") and not test_wired("stall-recorder"))
+    check("fragment wiring: a rollback leaves the baseline entry wired", test_wired("gate-guard"))
+    check("fragment wiring: a kit in the skip set is not wired",
+          gk.run_fragment_merges(t, rows, landed, {"unattended"}, "update") == {} and not test_wired("stop-guard"))
+    check("fragment wiring: no settings-merge row wires nothing",
+          gk.run_fragment_merges(t, rows[1:], landed, set(), "update") == {} and not test_wired("stop-guard"))
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -1369,6 +1409,9 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
+
+        # TOOL-aRepatriatedFork-11 S3/S4. Needs no git and no verb, so it runs first and cheaply.
+        check_fragment_wiring(tmp)
 
         # --- selfcheck runs green in this repo. The positive arm: without it, every negative arm
         # --- below could pass because the tool is broken rather than because the input is bad.

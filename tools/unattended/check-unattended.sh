@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.32   # gov:kit unattended@1.32 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.33   # gov:kit unattended@1.33 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -115,13 +115,24 @@ CONF="$ROOT/.unattended.conf"
 # ---- WHAT THIS DOES NOT DO: scope to an arbitrary check. The checks between 1 and 27 share state
 # ---- freely - a later one reads a count an earlier one computed - so they are one unit until that
 # ---- is untangled, and pretending otherwise would hand back wrong verdicts rather than slow ones.
-SCOPE=""
+SCOPE=""; EMIT_CEILING=0
 case "${1:-}" in
   "")            ;;
   --only)        [ "${2:-}" = 28 ] || { echo "check-unattended: --only takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=only28 ;;
   --skip)        [ "${2:-}" = 28 ] || { echo "check-unattended: --skip takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=skip28 ;;
-  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28] or [--skip 28]"; exit 2 ;;
+  --emit-ceiling) SCOPE=skip28; EMIT_CEILING=1 ;;
+  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28], [--skip 28] or [--emit-ceiling]"; exit 2 ;;
 esac
+# ---- --emit-ceiling (TOOL-aRepatriatedFork-11 S5): MEASURE check 23's pin instead of grading it.
+# ---- Both adopters had measured UNDECLARED_WRITE_CEILING by running this leg at 0 and reading the
+# ---- failure. This runs the skip-28 scope with stdout discarded, so no check line reaches the caller,
+# ---- and prints the one conf line on the saved stdout right after check 23 counts. A run that never
+# ---- reaches that count exits 1 with nothing on stdout, and so does a count over an EMPTY graded
+# ---- population: a dead probe must not hand out a 0 (the EXIT trap is what catches the first case).
+if [ "$EMIT_CEILING" = 1 ]; then
+  exec 3>&1 1>/dev/null
+  trap 'echo "check-unattended: --emit-ceiling took no count, because the run stopped before check 23 graded anything; run the leg bare to see why" >&2; exit 1' EXIT
+fi
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
@@ -266,7 +277,7 @@ _load_rev_table() {
   local -a _revs=() _out=()
   while IFS= read -r _line; do
     [ -n "$_line" ] && _revs+=("$_line")
-  done < <(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null \
+  done < <(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null \
            | xargs -r grep -hoE '[0-9a-f]{7,40}' 2>/dev/null | sort -u)
   _n=${#_revs[@]}
   [ "$_n" -gt 0 ] || return 0
@@ -476,7 +487,7 @@ else
     *) rv_bad="$rv_bad
   (the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none: '$FOLD_CUTOFF')" ;;
   esac
-  for rvf in $(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null); do
+  for rvf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$rvf" ] || continue
     grep -q '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rvf" 2>/dev/null || continue
     rv_readme=${rvf%/RUN*.md}/README.md
@@ -657,7 +668,7 @@ fi
 # ---- a grandfather list that outlives the reason for it.
 if [ -n "$HALT_CODES_CORE" ]; then
   hc_bad=""
-  for hcf in $(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null); do
+  for hcf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$hcf" ] || continue
     hcp=$(awk -F': ' '/^phase: /{ sub(/\r$/,"",$2); print $2; exit }' "$hcf")
     [ "$hcp" = ABORTED ] || continue
@@ -2533,6 +2544,16 @@ elif [ "$ds_over_n" -gt "$UNDECLARED_WRITE_CEILING" ]; then
 elif [ "$ds_over_n" -lt "$UNDECLARED_WRITE_CEILING" ]; then
   report "check 23 - the undeclared-write count sits BELOW its ceiling, $ds_over_n against $UNDECLARED_WRITE_CEILING. Lower the pin in .unattended.conf and say in the commit message what closed; a ceiling nobody lowers stops being a ratchet"
 fi
+if [ "$EMIT_CEILING" = 1 ]; then
+  trap - EXIT
+  if [ "$ds_graded" = 0 ]; then
+    echo "check-unattended: --emit-ceiling graded NO dispatched pass in this tree, so a count here would be a 0 from a probe that saw nothing; the gate accepts 0 over an empty population, so declare that by hand if this tree has never dispatched" >&2
+    exit 1
+  fi
+  echo "check-unattended: --emit-ceiling graded $ds_graded dispatched passes and found $ds_over_n that wrote outside their declaration:${ds_over:- none}" >&2
+  printf 'UNDECLARED_WRITE_CEILING="%s"\n' "$ds_over_n" >&3
+  exit 0
+fi
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
 # ---- `gen:build-units` pair. The driver reads its unit list from that region for four questions -
@@ -2566,7 +2587,7 @@ fi
 # forces the prefix in both cases, and /dev/null contributes a `0` row that names a path no build
 # ever has.
 bad_units=""
-_c21_files=$(GIT ls-files "$M/builds/*/README.md" 2>/dev/null)
+_c21_files=$(GIT ls-files ":(glob)$M/builds/*/README.md" 2>/dev/null)
 if [ -n "$_c21_files" ]; then
   # TWO greps and ONE awk for the whole population — THREE processes, not 2N.
   #
@@ -2836,6 +2857,41 @@ else
   report "check 34 graded ${#_rf_files[@]} run-state files for a Run facts key carried twice with different values"
   [ -z "$_rf_hits" ] || fail 34 "a run-state file carries one Run facts key twice with two different values, and every reader takes the first match, so one of them is a fact nothing wrote: $_rf_hits"
 fi
+
+# ---- 35: a pathspec naming a file AT A BUILD ROOT carries the `:(glob)` magic. TOOL-aRepatriatedFork-11
+# ---- S2. A plain git pathspec's `*` crosses `/`, so the build-root README spelling also matched
+# ---- every README nested inside a build: 41 extra at inCMS, graded by check 21 as build READMEs,
+# ---- which is why inCMS forked this file. The class is every script in THIS kit's directory, test
+# ---- suites excepted because their fixtures spell the defect on purpose.
+# ----
+# ---- A tail that DESCENDS (a `spec/` segment after the wildcard) is not graded: sub-spec depth is
+# ---- intended there, and switching it to glob would drop every sub-spec the kit means to read.
+# ---- WHAT THIS DOES NOT CHECK: a pathspec assembled from variables, which no text scan can see, and
+# ---- comment lines, skipped so a gate header may describe the defect. The two root-file pathspecs
+# ---- outside this kit (drift-audit, hooks) are their kits' to fix and are not read here.
+_ps_files=()
+for _ps_f in "$HERE"/*.sh "$HERE"/*.js "$HERE"/*.py; do
+  case "$_ps_f" in *.test.sh) continue ;; esac
+  [ -f "$_ps_f" ] && _ps_files+=("$_ps_f")
+done
+_ps_hits=""
+if [ "${#_ps_files[@]}" -gt 0 ]; then
+  _ps_hits=$(awk '
+    BEGIN { needle = "builds/" "*" "/" }  # concatenated, so this line is not itself a hit
+    { line = $0; sub(/\r$/, "", line) }
+    line ~ /^[[:space:]]*(#|\/\/|\*)/ { next }
+    {
+      rest = line
+      while ((i = index(rest, needle)) > 0) {
+        pre = substr(rest, 1, i - 1); tail = substr(rest, i + length(needle))
+        t = tail; if (match(t, /["'\'' )]/)) t = substr(t, 1, RSTART - 1)
+        q = pre; if (match(q, /.*["'\'']/)) q = substr(q, RLENGTH + 1)
+        if (index(t, "/") == 0 && index(q, ":(glob)") == 0) { n = FILENAME; sub(/.*\//, "", n); printf " %s:%d", n, FNR; break }
+        rest = tail
+      }
+    }' "${_ps_files[@]}")
+fi
+[ -z "$_ps_hits" ] || fail 35 "a script in the kit directory names a file at a build root through a pathspec without the :(glob) magic, so its wildcard crosses a slash and every same-named file nested inside a build joins the population:$_ps_hits"
 
 # ---- 28: THE INLINED PARSER, one answer in two files. `declared_list` is copy-inlined in the driver
 # ---- and in the playbook leg because each kit script is installed standalone and cannot import — so

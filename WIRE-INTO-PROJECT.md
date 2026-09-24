@@ -659,6 +659,10 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   fresh clone self-heals. The two `orientation-*` fragments ship with the kickoff-manifest kit
   (beside `manifest-check.sh`), and the card they write is what `scratch-guard.js` reads before it
   lets a `git commit` through — read that deny's ceiling in the hooks README before relying on it.
+  **Installed through `govkit`, this step runs itself:** `apply` and `update` wire every fragment
+  they land through your own `settings-merge.py`, before any kit's check runs, and print one line
+  per fragment (`wired`, `already wired`, or why not); a rolled-back kit's new entries are removed
+  with it. The commands above are for a hand copy, or a run with `GOVKIT_RERENDER=0` exported.
 - Add `bash tools/check-wiring.test.sh` as a gate-runner leg. Do NOT run `check-wiring.sh --check` itself
   as a merge-bar leg — it would false-fail in CI, where `core.hooksPath` is correctly never set.
 - **Land the default branch via `tools/push-main.sh`** (TOOL-aLeasedGauntlet-1): it fetch-reconciles

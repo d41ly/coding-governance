@@ -41,7 +41,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.32   # gov:kit unattended@1.32 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.33   # gov:kit unattended@1.33 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1395,7 +1395,7 @@ check_single_live() {
   # no anchor, an unresolvable witness, or any phase but LANDING, the record counts as it always did.
   local anc="${ASHA:-}" w=""
   [ -n "$anc" ] && { GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1 || anc=""; }
-  for f in $(GIT ls-files "$M/builds/*/RUN.md" "$M/builds/*/RUN.*.md" 2>/dev/null); do
+  for f in $(GIT ls-files ":(glob)$M/builds/*/RUN.md" ":(glob)$M/builds/*/RUN.*.md" 2>/dev/null); do
     p=$(fact "$f" phase); [ -n "$p" ] || continue
     is_terminal "$p" && continue
     # THIS RUN'S OWN RECORD IS NOT A CONCURRENT RUN. It is absent at a first preflight — the file

@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.6
+# gov:kit settings-merge@1.7
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 tools/hooks/agent-cap.js verbatim):
@@ -29,6 +29,9 @@ Usage:
                      fragment (matcher "Workflow|Agent")
       --hook-path    override the fragment's hook_path (the copied hook, repo-relative)
       --check        report drift without writing: exit 1 if a merge WOULD change the file
+      --unwire       with --fragment: remove that fragment's entry instead of merging it, from
+                     its event+matcher group only (dropping a group it empties); a foreign
+                     command is kept and an absent entry is exit 0 (TOOL-aRepatriatedFork-11)
       --resolve-fragment  print the fragment's hook_path with `{kit}`/`{here}` expanded, then
                      exit — the value the merge would write; check-wiring.sh carries the same
                      verb and the hook-destinations gate asserts the two agree
@@ -65,7 +68,7 @@ import sys
 import tempfile
 from pathlib import Path, PurePosixPath
 
-KIT_SETTINGS_MERGE_VERSION = "1.6"  # gov:kit settings-merge@1.6 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.7"  # gov:kit settings-merge@1.7 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 
@@ -323,6 +326,29 @@ def merge(obj: dict, hook_path: str, frag: dict = AGENT_CAP, frag_file: str | No
     return obj
 
 
+def remove_entry(obj: dict, hook_path: str, frag: dict, frag_file: str | None = None) -> dict:
+    """`--unwire` (TOOL-aRepatriatedFork-11 S4): the inverse of `merge` for ONE fragment. From the
+    group under the fragment's event AND matcher, drop the entry `check_ours` calls this hook, and
+    the group too if that emptied it. A foreign command beside it is kept, and nothing under any
+    other matcher is read. Absent is not an error: govkit calls this on a rollback, where the entry
+    may never have been written."""
+    hook_path = resolve_hook_path(hook_path, frag_file)
+    pre = obj.get("hooks", {}).get(frag["event"]) if isinstance(obj.get("hooks"), dict) else None
+    if not isinstance(pre, list):
+        return obj
+    kept: list = []
+    for g in pre:
+        if isinstance(g, dict) and g.get("matcher") == frag["matcher"] and isinstance(g.get("hooks"), list):
+            before = g["hooks"]
+            g["hooks"] = [h for h in before
+                          if not (isinstance(h, dict) and check_ours(h.get("command", ""), frag["marker"], hook_path))]
+            if before and not g["hooks"]:
+                continue
+        kept.append(g)
+    pre[:] = kept
+    return obj
+
+
 def _load(path: Path) -> dict:
     if not path.exists():
         return {}
@@ -340,18 +366,26 @@ def _dump(obj: dict) -> str:
 
 
 def run(settings_file: str, hook_path: str, check: bool, frag: dict = AGENT_CAP,
-        frag_file: str | None = None) -> int:
+        frag_file: str | None = None, unwire: bool = False) -> int:
     path = Path(settings_file)
     existed = path.exists()
     what = f"{frag['name']} {frag['matcher']} hook"
     try:
         before = _dump(_load(path))
-        after = _dump(merge(json.loads(before), hook_path, frag, frag_file))
+        after = _dump((remove_entry if unwire else merge)(json.loads(before), hook_path, frag, frag_file))
     except ValueError as e:
         print(f"settings-merge: {e}", file=sys.stderr)
         return 2
     if before == after:
-        print(f"settings-merge: {what} already wired in {settings_file}")
+        print(f"settings-merge: {what} " + ("not wired" if unwire else "already wired") + f" in {settings_file}")
+        return 0
+    if unwire:
+        try:
+            path.write_text(after, encoding="utf-8", newline="\n")
+        except OSError as e:
+            print(f"settings-merge: write failed: {e}", file=sys.stderr)
+            return 2
+        print(f"settings-merge: unwired {what} from {settings_file}")
         return 0
     if check:
         print(f"settings-merge: DRIFT — {settings_file} is missing the {what}", file=sys.stderr)
@@ -414,6 +448,20 @@ def _selftest() -> int:
         # 6) --check on an absent file -> drift (1), and nothing written
         sf5 = root / "sub" / "s5.json"
         assert run(str(sf5), hp, check=True) == 1 and not sf5.exists()
+
+        # 6b) --unwire (TOOL-aRepatriatedFork-11 S4): wired by merge beside a FOREIGN command, then
+        # removed -> the foreign command stays, the entry is gone, --check reports drift again; a
+        # second --unwire is a no-op exit 0; unwiring the only entry drops the group it emptied.
+        sfu = root / "su.json"
+        sfu.write_text(sf3.read_text(encoding="utf-8"), encoding="utf-8")
+        assert run(str(sfu), hp, check=False, unwire=True) == 0
+        gu = json.loads(sfu.read_text(encoding="utf-8"))["hooks"]["PreToolUse"]
+        assert [h["command"] for h in gu[0]["hooks"]] == ["node other.js"], gu
+        assert run(str(sfu), hp, check=True) == 1
+        assert run(str(sfu), hp, check=False, unwire=True) == 0
+        sfu2 = root / "su2.json"
+        assert run(str(sfu2), hp, check=False) == 0 and run(str(sfu2), hp, check=False, unwire=True) == 0
+        assert json.loads(sfu2.read_text(encoding="utf-8"))["hooks"]["PreToolUse"] == []
 
         # --- --fragment: a SECOND hook, on a different event and matcher -----------------------
         recall = {"name": "recall-opened", "event": "PostToolUse", "matcher": "Read",
@@ -716,11 +764,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--fragment", default=None)
     p.add_argument("--hook-path", default=None)
     p.add_argument("--check", action="store_true")
+    p.add_argument("--unwire", action="store_true")
     p.add_argument("--resolve-fragment", default=None, metavar="F")
     p.add_argument("--selftest", action="store_true")
     a = p.parse_args(argv)
     if a.selftest:
         return _selftest()
+    if a.unwire and (a.check or not a.fragment):
+        print("settings-merge: --unwire takes --fragment and not --check; it removes one fragment's "
+              "entry, and the built-in default is never removed by name", file=sys.stderr)
+        return 2
     frag = AGENT_CAP
     try:
         if a.resolve_fragment:
@@ -742,14 +795,15 @@ def main(argv: list[str] | None = None) -> int:
     # on every matching tool call, and check-wiring can only NAME that state, not prevent it.
     # Resolved from the cwd, which the runbook fixes at the target repo root. --check is exempt —
     # it writes nothing, it reports drift, and the hook file is not what it is reporting on.
-    if not a.check and not Path(hook_path).exists():
+    # --unwire is exempt too: a rollback removes the hook file before it unwires the entry.
+    if not a.check and not a.unwire and not Path(hook_path).exists():
         interp = frag.get("interpreter", _DEFAULT_INTERPRETER)
         print(f"settings-merge: refusing to wire {frag['name']} — {hook_path} does not exist "
               f"(from {Path.cwd()}). Copy the hook there first (or pass --hook-path); wiring a "
               f"missing script makes every matching tool call run `{interp}` against nothing.",
               file=sys.stderr)
         return 2
-    return run(a.settings_file, hook_path, a.check, frag, a.fragment)
+    return run(a.settings_file, hook_path, a.check, frag, a.fragment, a.unwire)
 
 
 if __name__ == "__main__":

@@ -93,3 +93,17 @@ AGENTS.md	64512
 # document's LINE half with this row, in the same edit. No checker reads that half (above), so its
 # figure is spelled in the document alone.
 memory/guides/BUILD-METHOD.md	30720
+
+# --- the unattended-run protocol, as rendered -----------------------------------------------------
+# 65692 bytes, CR-stripped: the COMMITTED RENDER'S SIZE, PINNED, and deliberately no headroom
+# (TOOL-aRepatriatedFork-11 S6, section 8 F3 resolved by the owner 2026-09-23 against the 96 KB guide
+# default). The protocol is copied verbatim into every adopter, and an adopter that declared a guide
+# cap below it learned so from its own hygiene gate after a pull. Pinned at the measurement, the next
+# byte of growth is a line in THIS file's diff, which is a decision gov makes where it can be seen —
+# TOOL-dFoldedVerdict-7 asked for exactly that of the carriers it found sitting on their caps.
+#
+# THE LEG IS `unattended protocol size`, an `[[exempt_leg]]` in tools/govkit/registry.toml for
+# `build-method size`'s reason: the kit ships the template and no size gate. What an adopter gets
+# instead is the adopter's own announcement, which compares the render against its GUIDE_CAP_BYTES.
+# WHAT THIS DOES NOT COVER: the file's line count, which only the adopter's GUIDE_CAP_LINES reads.
+memory/guides/UNATTENDED-PROTOCOL.md	65692

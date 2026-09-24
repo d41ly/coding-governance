@@ -3626,6 +3626,48 @@ miss "$out" "names no anchor kind while its own first commit is at or after the 
 hit "$out" "a record claims LANDED with a witness that is not an ancestor of the anchor"
 reset_tree
 
+# ---- TOOL-aRepatriatedFork-11 S1 (AC1): check 21 grades the BUILD ROOT's README and no README
+# ---- nested inside a build. Both carry no marker pair; before the `:(glob)` magic the plain
+# ---- pathspec's `*` crossed the slash and the nested file was named too (41 of them at inCMS).
+reset_tree
+mkdir -p memory/builds/tOne/notes
+printf '# tOne\n' > memory/builds/tOne/README.md
+printf '# a nested readme\n' > memory/builds/tOne/notes/README.md
+git add -A
+out=$(run)
+hit  "$out" "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with"
+hit  "$out" " memory/builds/tOne/README.md"
+miss "$out" "memory/builds/tOne/notes/README.md"
+
+# ---- check 35 (S2, AC2): a kit script spelling a build-root pathspec without the magic is refused
+# ---- by file and line; a DESCENDING tail is sub-spec depth on purpose and is not graded.
+reset_tree
+mutate $KIT_REL/unattended.sh 's|":(glob)$M/builds/\*/RUN.md"|"$M/builds/*/RUN.md"|'
+out=$(run)
+hit "$out" "a script in the kit directory names a file at a build root through a pathspec without the :(glob) magic, so its wildcard crosses a slash and every same-named file nested inside a build joins the population"
+hit "$out" " unattended.sh:"
+reset_tree
+printf '_x=$(GIT ls-files "$M/builds/*/spec/*.md")\n' >> $KIT_REL/unattended.sh
+miss "$(run)" "names a file at a build root through a pathspec without the :(glob) magic"
+
+# ---- --emit-ceiling (S5, AC5): two passes that each committed outside their declaration measure
+# ---- as 2, on stdout alone; a tree with no dispatched pass graded prints nothing and exits 1,
+# ---- because a 0 from a probe that saw nothing is the dead-probe shape.
+reset_tree
+gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-2 "work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'x\n' > work/stray1.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+printf 'b\n' > work/two.txt && printf 'y\n' > work/stray2.txt
+git add -A && git commit -q -m "ARCH-tRun-2 builds its lane" --no-verify
+out=$(bash "$SCRIPT" --emit-ceiling 2>/dev/null); rc=$?
+same "--emit-ceiling measures two over-declared passes" "$out" 'UNDECLARED_WRITE_CEILING="2"'
+same "--emit-ceiling exit code on a measured tree" "$rc" "0"
+reset_tree
+out=$(bash "$SCRIPT" --emit-ceiling 2>/dev/null); rc=$?
+same "--emit-ceiling prints nothing over an ungraded population" "$out" ""
+same "--emit-ceiling refuses an ungraded population, exit code" "$rc" "1"
+reset_tree
+
 # RAISED 200 -> 243, then to 251 by TOOL-dUnstalledConvoy-2 by TOOL-dUnstalledConvoy-10. A floor well below the executed count is not a floor,
 # it is a number: the sibling suite carried a sixty-arm slack and hid FIFTY stranded arms behind it in
 # this same session. Pinned AT the count.

@@ -4558,6 +4558,83 @@ def read_inert_kits(deploy: dict) -> set[str]:
     return {str(x) for x in (deploy.get("inert") or [])}
 
 
+def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str],
+                        skip: set[str], verb: str) -> dict[str, list[str]]:
+    """TOOL-aRepatriatedFork-11 S3: wire every hook fragment this run landed, BEFORE verify.
+
+    The population is DERIVED — every receipt row in `landed` whose path ends `.fragment.json`,
+    minus the kits in `skip` (inert, or not this run's) — never declared per kit: six kits ship
+    fragments, and a `[[regenerate]]` line per kit is six places to forget. A kit whose `[check]`
+    grades its wiring used to land a new hook as a bare file, red its own check, and roll back.
+
+    It runs the TARGET's installed `settings-merge.py`, found through the receipt row that kit
+    owns, with an argv built here from receipt rows and never from the target's `deploy.toml`. The
+    settings file resolves as `check-wiring.sh` resolves it: a declared GOV_SETTINGS_JSON, else
+    `.claude/settings.json`. One line per fragment. Returns {kit: [fragment]} for the entries this
+    run ADDED — not the ones it found wired, and not a stale command it rewrote in place — which
+    is exactly what a rollback of that kit may take back out (`remove_wired_fragments`).
+    """
+    frags = sorted((str(f["path"]), str(f.get("kit"))) for f in rows
+                   if str(f.get("path", "")).endswith(".fragment.json")
+                   and f.get("path") in landed and f.get("kit") not in skip)
+    if not frags:
+        return {}
+    sm = next((str(f["path"]) for f in rows if f.get("kit") == "settings-merge"
+               and str(f.get("path", "")).endswith("settings-merge.py")), None)
+    declared = os.environ.get("GOV_SETTINGS_JSON") or ""
+    settings = declared or ".claude/settings.json"
+    why = ("the target's receipt names no settings-merge.py, so nothing here may write its settings "
+           "file; select the settings-merge kit" if not sm or not (target / sm).is_file() else
+           f"GOV_SETTINGS_JSON names {declared}, which is not a file" if declared
+           and not (target / declared).is_file() else "")
+    if why:
+        for p, _k in frags:
+            print(f"govkit {verb} — hooks: {p} landed UNWIRED — {why}")
+        return {}
+    added: dict[str, list[str]] = {}
+    for p, kit in frags:
+        argv = [sys.executable, sm, settings, "--fragment", p]
+        if subprocess.run(argv + ["--check"], cwd=str(target), capture_output=True,
+                          text=True).returncode == 0:
+            print(f"govkit {verb} — hooks: {p} already wired")
+            continue
+        # ABSENT OR STALE, asked of settings-merge itself on a scratch copy: `--check` reds on both,
+        # and only an entry this run ADDED is one a rollback may remove.
+        stale = False
+        if (target / settings).is_file():
+            with tempfile.TemporaryDirectory() as td:
+                probe = pathlib.Path(td) / "settings.json"
+                probe.write_bytes((target / settings).read_bytes())
+                subprocess.run([sys.executable, sm, str(probe), "--unwire", "--fragment", p],
+                               cwd=str(target), capture_output=True, text=True)
+                stale = probe.read_bytes() != (target / settings).read_bytes()
+        out = subprocess.run(argv, cwd=str(target), capture_output=True, text=True)
+        if out.returncode != 0:
+            print(f"govkit {verb} — hooks: {p} REFUSED by settings-merge (exit {out.returncode}): "
+                  + ((out.stderr or out.stdout).strip().splitlines() or ["no output"])[-1])
+            continue
+        print(f"govkit {verb} — hooks: {p} wired" + (" (a stale command rewritten)" if stale else ""))
+        if not stale:
+            added.setdefault(kit, []).append(p)
+    return added
+
+
+def remove_wired_fragments(target: pathlib.Path, rows: list[dict], frags: list[str], verb: str) -> None:
+    """TOOL-aRepatriatedFork-11 S4: a rolled-back kit takes back out exactly the settings entries
+    `run_fragment_merges` added for it, through `settings-merge.py --unwire`, so no entry is left
+    pointing at a hook file the rollback removed. Called BEFORE the kit's files are restored,
+    because a landed fragment is deleted by that restore and `--unwire` reads the fragment."""
+    sm = next((str(f["path"]) for f in rows if f.get("kit") == "settings-merge"
+               and str(f.get("path", "")).endswith("settings-merge.py")), None)
+    settings = os.environ.get("GOV_SETTINGS_JSON") or ".claude/settings.json"
+    for p in frags:
+        out = subprocess.run([sys.executable, str(sm), settings, "--unwire", "--fragment", p],
+                             cwd=str(target), capture_output=True, text=True) if sm else None
+        print(f"govkit {verb} — hooks: {p} "
+              + ("unwired by the rollback" if out is not None and out.returncode == 0 else
+                 "could NOT be unwired by the rollback; remove its entry from " + settings + " by hand"))
+
+
 def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     """Parse the target's runner output into leg name -> green|red|skipped.
 
@@ -6320,6 +6397,14 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # says so rather than being interpreted.
             r.fail(f"kit '{eid}': its adopter exited {rc} — unclassified, because no `[[outcome]]` "
                    f"evaluator exists yet to say WHICH declared outcome that code means")
+
+    # ---- TOOL-aRepatriatedFork-11 S3: WIRE the hook fragments this install landed, after every
+    # ---- adopter ran — settings-merge's own adopter included, which is what created the file — and
+    # ---- under `update`'s switch for running target-side code. Kits skipped above stay unwired.
+    if os.environ.get("GOVKIT_RERENDER") != "0":
+        run_fragment_merges(target, rows, {str(f.get("path")) for f in rows},
+                            configure_skipped | {str(f.get("kit")) for f in rows
+                                                 if f.get("kit") not in selection}, "apply")
 
     # ---- OBSERVE. apply does NOT render — the adopters do, and a second renderer would race the
     # ---- real one. What it does is look at what they produced, so `update` and `check` have
@@ -9298,6 +9383,24 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # named with its reason, so "nothing re-rendered" is never read as "nothing needed it".
         print(f"govkit update —   DECLINED {_eid}: {_why}")
 
+    # ======================= TOOL-aRepatriatedFork-11 S3 — WIRE THE LANDED HOOK FRAGMENTS ========
+    # AFTER the regenerate and BEFORE verify, because a kit whose `[check]` grades its own wiring
+    # reds on a fragment that landed as a bare file, and the verify pass then rolls the whole kit
+    # back rather than wiring it. It runs target-side code, so it rides the ONE switch this verb
+    # already has for that (section 8 F1): GOVKIT_RERENDER=0 declines it and says so.
+    _wired_new: dict[str, list[str]] = {}
+    if write:
+        _fr_landed = set(changed) | set(renamed) | set(_landed_new)
+        _fr_skip = read_inert_kits(deploy) | {str(f.get("kit")) for f in receipt.get("files") or []
+                                              if f.get("kit") not in touched_kits}
+        if _rerender_on:
+            _wired_new = run_fragment_merges(target, receipt.get("files") or [], _fr_landed,
+                                             _fr_skip, "update")
+        else:
+            for _fp in sorted(p for p in _fr_landed if p.endswith(".fragment.json")):
+                print(f"govkit update — hooks: {_fp} landed UNWIRED — GOVKIT_RERENDER=0 is exported, "
+                      f"and wiring runs the target's own settings-merge.py")
+
     # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
     # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
     # already knows how to answer about itself — its own `[check].argv`, the same declaration
@@ -9469,6 +9572,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 continue
             n_rolled += 1
             _rolled_kits.add(eid)
+            # TOOL-aRepatriatedFork-11 S4. FIRST, while the landed fragments are still on disk.
+            remove_wired_fragments(target, receipt.get("files") or [], _wired_new.get(eid, []), "update")
             # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
             # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
             # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot

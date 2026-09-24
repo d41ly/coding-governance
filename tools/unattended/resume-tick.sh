@@ -367,14 +367,14 @@ scan_worktrees() {
     # records first, each one line; then `<file>:session: <value>` and `<file>:host: <value>` off
     # the INDEX, and the split is on the first `:session:` / `:host:`, which a drive letter's colon
     # precedes but never contains. The first `session:` per file is the one `set_fact` rewrites.
-    GIT -C "$wt" ls-files --others -- "$mr/builds/*/RUN.md" >"$strayf" 2>/dev/null || :
+    GIT -C "$wt" ls-files --others -- ":(glob)$mr/builds/*/RUN.md" >"$strayf" 2>/dev/null || :
     while IFS= read -r -u 8 f; do
       [ -n "$f" ] || continue
       slug=${f%/RUN.md}; slug=${slug##*/}
       ncand=$((ncand + 1))
       print_decision "$slug" "$wt" "skip · RUN.md is not tracked, and the tick launches only on a lease the index holds"
     done 8<"$strayf"
-    GIT -C "$wt" grep --cached -H -E '^(session|host): ' -- "$mr/builds/*/RUN.md" >"$hitsf" 2>/dev/null || :
+    GIT -C "$wt" grep --cached -H -E '^(session|host): ' -- ":(glob)$mr/builds/*/RUN.md" >"$hitsf" 2>/dev/null || :
     # The host lookup below needs the whole answer as a VALUE, so it is read in with no fork at
     # all rather than re-spawned per candidate, which would be one spawn per record again.
     hits=""; IFS= read -r -d '' hits <"$hitsf" || :

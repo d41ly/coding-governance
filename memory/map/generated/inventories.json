@@ -113,6 +113,7 @@
       "testsuite counts self-test",
       "tier2-review self-test",
       "unattended kit gate",
+      "unattended protocol size",
       "unattended skill wiring",
       "unattended-build self-test",
       "verdict epoch (kit version dates the engine)",
