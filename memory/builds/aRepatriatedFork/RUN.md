@@ -256,3 +256,7 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T09:02:21Z dispatch · item 87c35469 TOOL-aRepatriatedFork-2 · reason tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/drift-audit/selftest.py tools/codebase-map/test_codebase_map.py tools/process-monitor/adopt-process-monitor.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md memory/builds/aRepatriatedFork/README.md
 
 2026-09-24T09:04:23Z dispatch · item 3717ee86 TOOL-aRepatriatedFork-5 · reason tools/check-spec-tokens.py memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-5.md memory/builds/aRepatriatedFork/README.md
+
+2026-09-24T09:24:12Z dispatch · item a5b0124a TOOL-aRepatriatedFork-8 · reason .githooks/pre-push memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md tools/unattended/check-unattended.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-6.md tools/memory-tree/README.md tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-10.md
+
+2026-09-24T09:24:18Z brief · item TOOL-aRepatriatedFork-8 · reason a2030117ff07 memory/builds/aRepatriatedFork/prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-8-repair-r4-brief.md

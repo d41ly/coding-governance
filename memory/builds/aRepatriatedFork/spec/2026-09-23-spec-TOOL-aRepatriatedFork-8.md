@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries
 
-**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -308,6 +308,11 @@ New arm: `.githooks/pre-push.test.sh` · H1, an untracked gate-env.sh on a featu
   an open class in the protocol, which this fold may not edit. The AC10 fixtures now commit their
   `gate-env.sh`, and the run-log suite's exit table counts three `bar-refused` sites. The class is
   recorded as `memory/gotchas/decision-re-derived-by-a-second-process.md`.
+- rev-4 · 2026-09-24 · gate repair at VERIFYING, leg `pre-push run-log line`. S1 read its remote
+  name off `render_push_remote`, a writer function, so the run-log suite's AC7 baseline, which stubs
+  every `*_push_*` function, skipped S1's `git symbolic-ref` and counted one exec the writer never
+  made. The name test is now `resolve_remote_name`, outside the writer, called by S1 and by
+  `render_push_remote`; the arm keeps its expectation.
 
 ## 10. Reuse audit
 

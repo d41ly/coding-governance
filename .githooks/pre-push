@@ -153,13 +153,22 @@ resolve_push_dirs() { # work tree -> sets RUNLOG_GITDIR and RUNLOG_DIR; rc 1 whe
 # USERINFO IS READ OFF BOTH ARGUMENTS, since the rewrite that puts a typed URL in $1 leaves $2 a plain
 # path. An authority is the part after `://` up to the next `/`, or for scp-like `user@host:path` the
 # part before the colon; a plain path, a drive-letter one included, has neither and holds no userinfo.
+#
+# THE NAME TEST IS ITS OWN FUNCTION, outside the writer, because S1's default-branch lookup asks the
+# same question and is not the writer's. It used to read the answer off RUNLOG_REMOTE, so the run-log
+# suite's baseline, which stubs every `*_push_*` function, skipped S1's `git symbolic-ref` and counted
+# it as an exec the writer added (gate repair at VERIFYING, TOOL-aRepatriatedFork-8 rev-4).
+resolve_remote_name() { # remote name · url -> sets REMOTE_NAME to the name, or empty when the push names none
+  REMOTE_NAME=""
+  case "${1-}" in ""|*[/\\:@]*) return 0 ;; esac
+  [ "$1" != "${2-}" ] && REMOTE_NAME=$1
+  return 0
+}
 render_push_remote() { # remote name · url -> sets RUNLOG_REMOTE to its key/value pairs
   local a="" u n="${1-}"
   RUNLOG_REMOTE=()
-  case "$n" in
-    ""|*[/\\:@]*) RUNLOG_REMOTE+=(remote_unnamed 1) ;;
-    *) if [ "$n" != "${2-}" ]; then RUNLOG_REMOTE+=(remote "$n"); else RUNLOG_REMOTE+=(remote_unnamed 1); fi ;;
-  esac
+  resolve_remote_name "$n" "${2-}"
+  if [ -n "$REMOTE_NAME" ]; then RUNLOG_REMOTE+=(remote "$REMOTE_NAME"); else RUNLOG_REMOTE+=(remote_unnamed 1); fi
   for u in "$n" "${2-}"; do
     a=""
     case "$u" in
@@ -383,12 +392,12 @@ GATE_RUNNER=$GOV_KITROOT/run-gates/run-gates.sh
 # is named anything else (inCMS's node `d` names it `incms`) nothing was observed, and every
 # default-branch push was refused unless each node exported GOV_DEFAULT_BRANCH. A push to a URL names
 # no remote, so nothing is observable and the environment is the only source, the rule a fresh
-# `git init` already lives by. WHAT IS A NAME is decided once, by `render_push_remote`, which keeps a
-# URL out of the run log by the same test. `.githooks/gate-env.sh` is not sourced until after this,
-# on purpose: a tracked file that could set the default could choose which branch escapes the bar.
-render_push_remote "$RUNLOG_ARG1" "$RUNLOG_ARG2"
-push_remote=""
-[ "${RUNLOG_REMOTE[0]-}" = remote ] && push_remote=${RUNLOG_REMOTE[1]}
+# `git init` already lives by. WHAT IS A NAME is decided once, by `resolve_remote_name`, which
+# `render_push_remote` also calls to keep a URL out of the run log. `.githooks/gate-env.sh` is not
+# sourced until after this, on purpose: a tracked file that could set the default could choose which
+# branch escapes the bar.
+resolve_remote_name "${1-}" "${2-}"
+push_remote=$REMOTE_NAME
 obs=""
 if [ -n "$push_remote" ]; then
   obs=$(git symbolic-ref --short "refs/remotes/$push_remote/HEAD" 2>/dev/null); obs=${obs#"$push_remote"/}
