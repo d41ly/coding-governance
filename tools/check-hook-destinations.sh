@@ -26,11 +26,15 @@
 # it exists for a `kind = "flat"` kit: its engine ships to `{prefix}/<file>`, so the in-tree path
 # (`skills/session-kickoff/manifest-check.sh`) and the shipped path (`tools/manifest-check.sh` under
 # the canonical prefix) DIFFER BY DESIGN, and comparing the in-tree spelling against the declared
-# set would red every correct flat-kit fragment. So the fragment's directory must be the `home` of
-# at least one flat descriptor — else the fragment ships from nowhere and the gate refuses naming
-# the directory — and `{prefix}/<path relative to that directory>` is compared against the WHOLE
-# declared destination set, both spellings printed. A `{kit}` fragment is compared at its in-tree
-# resolution as before, because a directory-shaped kit ships its tree under `{kit}` unchanged.
+# set would red every correct flat-kit fragment. So where the fragment's directory is the `home` of
+# at least one flat descriptor, `{prefix}/<path relative to that directory>` is compared against the
+# WHOLE declared destination set, both spellings printed. Where it is instead the home of a
+# DIRECTORY-shaped descriptor, the kit ships its tree unchanged, the fragment lands in the same
+# directory as its engine, and `{here}` names that directory at every prefix — including a kit
+# directory an adopter RENAMED, which `{kit}/<name>/` cannot follow (inCMS homes memory-recall at
+# `scripts/recall/`; TOOL-aRepatriatedFork-2 S4). That fragment is compared at its in-tree
+# resolution, as a `{kit}` one is. A directory that is the home of NO descriptor ships from nowhere,
+# and the gate refuses naming it.
 set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "hook-dest: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -88,13 +92,14 @@ reg = govkit.load_toml(root / "tools" / "govkit" / "registry.toml")
 print(govkit.canonical_ctx("hook-dest")["prefix"])
 homes = set()
 for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
-    if d.get("kind") == "flat" and d.get("home"):
-        homes.add(d["home"].rstrip("/"))
+    if d.get("home"):
+        homes.add(("F " if d.get("kind") == "flat" else "D ") + d["home"].rstrip("/"))
 print("\n".join(sorted(homes)))
 PYEOF
 ) || { echo "hook-dest: could not read the flat-kit homes — refusing"; exit 2; }
 PFX=$(printf '%s\n' "$FLAT" | head -1)
-FLAT_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | grep . || true)
+FLAT_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^F //p')
+DIR_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^D //p')
 [ -n "$PFX" ] || { echo "hook-dest: REFUSING — the deployer names no canonical prefix"; exit 1; }
 # A ZERO here is a broken selector, not a tree with no flat kits: this repo's own kickoff engine is
 # one, and the arm below would otherwise refuse every `{here}` fragment for a reason that is false.
@@ -136,9 +141,20 @@ for f in $FRAGS; do
     *"{here}"*)
       dir=$(dirname "$f")
       if ! printf '%s\n' "$FLAT_HOMES" | grep -qxF -- "$dir"; then
-        echo "hook-dest: FAIL $f is {here}-shaped but its directory '$dir' is the home of NO kind=flat descriptor,"
+        if printf '%s\n' "$DIR_HOMES" | grep -qxF -- "$dir"; then
+          # A directory kit ships its tree unchanged: the in-tree resolution IS the shipped path.
+          if printf '%s\n' "$DESTS" | grep -qxF -- "$resolved"; then
+            echo "hook-dest: ok   $f -> $resolved (beside its directory kit's engine)"
+          else
+            echo "hook-dest: FAIL $f declares hook_path '$hp' -> '$resolved', which NO kit.toml rule ships"
+            echo "           from the directory kit homed at '$dir'."
+            st=1
+          fi
+          continue
+        fi
+        echo "hook-dest: FAIL $f is {here}-shaped but its directory '$dir' is the home of NO descriptor,"
         echo "           so nothing ships it beside its engine and '$resolved' arrives nowhere. A {here}"
-        echo "           fragment belongs beside the flat kit's engine (flat homes: $(printf '%s\n' "$FLAT_HOMES" | paste -sd, -))."
+        echo "           fragment belongs beside its kit's engine (flat homes: $(printf '%s\n' "$FLAT_HOMES" | paste -sd, -))."
         st=1
         continue
       fi

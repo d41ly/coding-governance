@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** CLOSED · rev-6 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-7 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -323,6 +323,17 @@ on gov is green and its red-first observation is taken on the parent commit.
   with its reason. Two check-15 waivers in `tools/install-prefix-waivers.txt` were re-keyed to the
   lines the inline resolver block moved them to.
 
+- **Gate repair at VERIFYING (rev-7).** S4 met `tools/check-hook-destinations.sh`, which admitted
+  `{here}` only in a kind=flat home. A directory kit ships its tree unchanged, so its fragment lands
+  in the same directory as its engine and `{here}` names that directory at every prefix, a renamed
+  one included; the gate now judges a `{here}` fragment under a directory kit's home at its in-tree
+  resolution, as it judges `{kit}`, and refuses only a directory no descriptor homes. The fragment
+  was right and the gate's rule was too narrow. Three suites pinned the pre-S2/S3 layout and follow
+  it: the drift-audit selftest installs the lexicon kit BESIDE its root-prefix drift-audit kit, the
+  process-monitor adopter selftest runs a copy of the hook beside its sleeping `reap.py`, and the
+  codebase-map installed gate takes the template's `gov:prefix-literal` marker so the two stay
+  byte-identical.
+
 ## 5. Production-readiness checklist
 
 - security — the resolver reads `.governance/install.json` and joins a `path` onto the repo root; a
@@ -449,6 +460,10 @@ New arm: `tools/lib/resolve-python.test.sh` parity table · one extra row per in
   anchor - `manifest-check.sh`'s id reader resolves from the repo root after its own dir and keeps
   the flat `memory-tree/` probe last, so the junction copy grades a flat install's ids; the
   `manifest-check.test.sh` L3 arm runs the checker from outside the fixture. AC1-AC10 are unchanged.
+- rev-7 · 2026-09-24 · gate repair at VERIFYING — legs `hook destinations (every declared hook
+  path ships)` and its self-test, `drift-audit selftest`, `codebase-map kit selftest` and
+  `process-monitor adopter selftest`: §4 "What the build found" gains the directory-kit `{here}`
+  rule and the three fixtures that followed S2, S3 and S8. AC1-AC10 are unchanged.
 
 ## 10. Reuse audit
 

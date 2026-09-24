@@ -259,14 +259,17 @@ rm -f "$GD/procmon-stamp" 2>/dev/null
 # THE HOOK'S CENSUS BOUND, exercised through the real path. A shim on PROCMON_PYTHON cannot do
 # it: node's execFileSync refuses a .cmd without shell:true (CVE-2024-27980), so the shim never
 # ran and the arm passed in 0s over a bound it had not touched. What the hook actually bounds is
-# the reap.py under its own root, so the fixture supplies one that sleeps.
+# the reap.py BESIDE ITSELF (TOOL-aRepatriatedFork-2 S2 derives the census argv from `__dirname`),
+# so the fixture supplies one that sleeps and runs a COPY of the hook next to it. Running gov's own
+# hook here would census gov's real reap.py, answer in seconds and exercise no bound.
 _slowdir="$WORK/slowroot"; mkdir -p "$_slowdir/$KIT_REL"
 git -C "$_slowdir" init -q 2>/dev/null
 cp "$ROOT/.process-monitor.conf" "$_slowdir/.process-monitor.conf"
 printf 'import time\ntime.sleep(600)\n' > "$_slowdir/$KIT_REL/reap.py"
+cp "$HOOK" "$_slowdir/$KIT_REL/procmon-hook.js"
 rm -f "$GD/procmon-stamp" 2>/dev/null
 _t0=$(date +%s)
-_out=$(printf '%s' '{"hook_event_name":"PostToolUse"}' | CLAUDE_PROJECT_DIR="$_slowdir" timeout 200 node "$HOOK" 2>&1); _rc=$?
+_out=$(printf '%s' '{"hook_event_name":"PostToolUse"}' | CLAUDE_PROJECT_DIR="$_slowdir" timeout 200 node "$_slowdir/$KIT_REL/procmon-hook.js" 2>&1); _rc=$?
 _t1=$(date +%s)
 _el=$((_t1 - _t0))
 # It must have actually WAITED — a sub-10s return means the census never started, and a
