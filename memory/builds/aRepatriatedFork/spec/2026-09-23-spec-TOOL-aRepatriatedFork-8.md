@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries
 
-**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -313,6 +313,9 @@ New arm: `.githooks/pre-push.test.sh` · H1, an untracked gate-env.sh on a featu
   every `*_push_*` function, skipped S1's `git symbolic-ref` and counted one exec the writer never
   made. The name test is now `resolve_remote_name`, outside the writer, called by S1 and by
   `render_push_remote`; the arm keeps its expectation.
+- rev-5 · 2026-09-24 · §9 only: gate repair R4, dispatched as this unit, landed its shell-hygiene
+  and dead-path fixes and their version bumps under `TOOL-aRepatriatedFork-6` and
+  `TOOL-aRepatriatedFork-10`, the owners of those lines. This unit's own R4 fix is `201af720`.
 
 ## 10. Reuse audit
 
