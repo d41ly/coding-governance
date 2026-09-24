@@ -52,6 +52,7 @@ Exit 0 = every case ok, and at least FLOOR_ASSERTIONS of them ran.
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -75,7 +76,7 @@ NEUTER = ('  _bar_prog=neutered.sh; _bar_opt=""; _bar_dirty=""; _bar_decl=$cmd; 
 
 # The executed-assertion floor. A case block stranded behind an early return reads as fewer
 # assertions, never as a pass.
-FLOOR_ASSERTIONS = 22
+FLOOR_ASSERTIONS = 28
 
 FAILURES: list[str] = []
 COUNT = [0]
@@ -245,6 +246,49 @@ def check_positional_and_declared(fx: Fixture) -> None:
                   forbid="OTHER BAR RAN")
 
 
+ADVICE = re.compile(r"Sanctioned use: GOV_GATE_CMD='([^']*)'")
+
+
+def check_advice_admitted(fx: Fixture) -> None:
+    """Closing review round 2 L2: the value each refusal advises is one the vetting ADMITS.
+
+    The advice named `unattended-bar.sh` under the kit root, which the declared arm refuses. This asks
+    the arm rather than restating it, so it cannot go stale against it: every refusal's advice is
+    pushed back, and the decision line has to name it as the bar. Admitted is not landed: with no
+    declaration the advice is the default RED runner, which the vetting passes and the bar blocks.
+    Two declarations, so the advice is seen to follow the one in force."""
+    refusals = (("bash -c gatepayload scripts/unattended-bar.sh", "the option refusal"),
+                ("bash gatepayload scripts/unattended-bar.sh", "the executed-word refusal"),
+                (f"bash {fx.untracked}", "the untracked refusal"))
+    conf = os.path.join(fx.work, ".unattended.conf")
+    for n, decl in (("12", 'GATE_CMD="bash scripts/other-bar.sh"\n'), ("13", None)):
+        if decl is None:
+            os.remove(conf)
+        else:
+            write(conf, decl)
+        run(["git", "add", "-A"], cwd=fx.work)
+        run(["git", "commit", "-qm", f"declaration for case {n}"], cwd=fx.work)
+        advised = {}
+        for value, arm in refusals:
+            rc, out, moved = fx.run_push(value)
+            m = ADVICE.search(out)
+            advised[arm] = m.group(1) if m and not moved else None
+        # One push per DISTINCT advice keeps the leg's push count down; the three normally agree.
+        admitted = {}
+        for value in {v for v in advised.values() if v}:
+            rc, out, moved = fx.run_push(value)
+            admitted[value] = f"bar: {value}" in out and "REFUSING" not in out
+        for value, arm in refusals:
+            label = f"{n} {arm} advises a value the vetting admits ({'none' if decl is None else 'another'} declared)"
+            got = advised[arm]
+            if got is None:
+                print_fail(f"{label} — it printed no `Sanctioned use: GOV_GATE_CMD='…'` line")
+            elif not admitted[got]:
+                print_fail(f"{label} — it advised {got!r}, and the hook REFUSED that too")
+            else:
+                print_ok(label)
+
+
 def main() -> int:
     if not os.path.isfile(HOOK):
         print(f"pre-push-bar selftest: {HOOK} is missing")
@@ -307,6 +351,7 @@ def main() -> int:
                      escape=True)
         check_end(fx, "bar", "stub", "8b the run log records the waived bar as `bar=stub`")
         check_positional_and_declared(fx)
+        check_advice_admitted(fx)   # last: it rewrites the fixture's declaration
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-5 — pre-push runs only a tracked, unmodified gate command
 
-**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -167,8 +167,10 @@ The four hostile values AC2 names, in nc's order. Each landed at rc 0 on some vi
 | `bash scripts/other-bar.sh`, tracked, clean, undeclared | a rule accepting any tracked, clean script (closing review round 1 M1) |
 
 Two refusals are added, each writing `RUNLOG_DECISION=refuse-bar` and exiting 1 before the bar:
-a value naming no script, and a value failing any S1 clause. Their messages are nc's, with
-`$GOV_KITROOT` kept in the sanctioned-use hint. nc's block keeps one exit per S1 clause, so the two
+a value naming no script, and a value failing any S1 clause. Their messages are nc's, except the
+sanctioned-use hint: since rev-4 the option, executed-word and untracked refusals print
+`Sanctioned use: <knob>='<value>'`, where the value is the declared `GATE_CMD` when there is one and
+the kit's own runner otherwise, so the advice is a value the declared arm admits. Observed by AC13. nc's block keeps one exit per S1 clause, so the two
 refusals are FIVE exit sites sharing one code, and the run-log suite's exit table carries that row
 with a count of 5. A refused END carries no `bar` key: the class is set only once the value is vetted.
 
@@ -198,7 +200,7 @@ all nc's spellings. One run-log decision value, `refuse-bar`. One run-log key, `
 environment name, `GOV_GATE_CMD_TEST`, which nc already exports. Rev-3 adds `_bar_prog` (the
 executed word), `_bar_decl` (the declared value), `_n`, `bar_path`, `bar_blob`, `RUNLOG_BAR_PATH`,
 `RUNLOG_BAR_BLOB`, and the run-log keys `bar_path` and `bar_blob`; it retires the first-word arm,
-which the positional arm subsumes.
+which the positional arm subsumes. Rev-4 adds `_bar_ok`, the value the refusals advise.
 
 ### Migration
 
@@ -311,6 +313,11 @@ so no marker moves; the unattended kit bumps for S7's template edit.
   not the `GATE_CMD` its `.unattended.conf` declares, the hook refuses it; the declared value lands,
   its run-log END carries `bar_path`, and push-main's marker names `bar tracked <path>`.
   Red when: any tracked script that exits 0 is accepted as the bar, or nothing records which ran.
+- **AC13** — When the fixture's option, executed-word and untracked refusals each print their
+  `Sanctioned use:` value, with another tracked bar declared and then with none, pushing that value
+  back yields a decision line naming it as the bar and no refusal.
+  Red when: a refusal advises a value the vetting itself refuses, which the round-2 hook did with
+  `bash $GOV_KITROOT/unattended-bar.sh`.
 
 ## 7. Gates
 
@@ -320,6 +327,7 @@ New arm: `.githooks/pre-push.test.sh` · nc's arms 25-29b, run first against the
 New arm: `tools/push-main.test.sh` · a landing under `GOV_GATE_CMD_TEST=1` with `LANDER_MARKER` declared, observed first to write the marker · none
 New arm: a port of nc's `scripts/pre_push_bar_selftest.py` under `.githooks/`, whose mutation arms M1-M3 observe the evasions landing on every run · none
 New arm: `.githooks/pre_push_bar_selftest.py` · rows 9-11 and 1c, and mutation arms M4-M5, each observed landing against the c6513db0 hook first · none
+New arm: `.githooks/pre_push_bar_selftest.py` · rows 12-13 (AC13), all six observed failing against the 995a5185 hook first · none
 
 ## 8. Open questions
 
@@ -353,6 +361,10 @@ New arm: `.githooks/pre_push_bar_selftest.py` · rows 9-11 and 1c, and mutation 
   adopter declaration. Not taken from M1's left-shift: an `unattended.test.sh` arm in which
   `--landed` compares the marker's bar with the declared one, since `--landed` does not compare yet
   and that is an unattended-kit change outside this fold; the marker now carries what it would read.
+- rev-4 · 2026-09-24 · closing review round 2 L2 folded. §4 Data model: the three refusals' sanctioned-use
+  hint prints the declared `GATE_CMD`, else the kit's runner, instead of `$GOV_KITROOT/unattended-bar.sh`,
+  which is untracked here and which S8's declared arm refuses; §4 Inventory gains `_bar_ok`; AC13
+  added, and §7 gains its arm, rows 12-13 of the ported harness, which push each advice back.
 
 ## 10. Reuse audit
 

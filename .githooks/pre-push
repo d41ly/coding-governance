@@ -534,8 +534,12 @@ check_bar_command() { # knob name · command · sha its scripts must be tracked 
   # `set +f` line below, spelled exactly once in this file.
   _bar_tok=""; _bar_bad=""; _bar_first=""; _bar_opt=""; _bar_seen=""; _bar_dirty=""; _bar_prog=""
   _bar_decl=$cmd
+  # THE ADVICE a refusal prints is a value this check ADMITS (closing review round 2 L2): the
+  # declared GATE_CMD when there is one, else the kit's own runner. The self-test pushes it back.
+  _bar_ok="bash $GATE_RUNNER"
   if [ "${4-}" = declared ] && [ "$cmd" != "bash $GATE_RUNNER" ]; then
     _bar_decl=$(unset GATE_CMD; eval "$(git show "$at:.unattended.conf" 2>/dev/null)" >/dev/null 2>&1 </dev/null; printf '%s' "${GATE_CMD-}")
+    [ -n "$_bar_decl" ] && _bar_ok=$_bar_decl
   fi
   set -f                       # the value is a command line; glob-expanding it is never wanted
   for _w in $cmd; do
@@ -574,7 +578,7 @@ check_bar_command() { # knob name · command · sha its scripts must be tracked 
     echo "$why" >&2
     echo "  script, so the tracked name need not be what runs at all ('-c' makes the next word the" >&2
     echo "  program and the script name its \$0). Full value: '$cmd'" >&2
-    echo "  Name the script with no interpreter options: $knob='bash $GOV_KITROOT/unattended-bar.sh'." >&2
+    echo "  Name the script with no interpreter options. Sanctioned use: $knob='$_bar_ok'." >&2
     return 1
   fi
   case "$_bar_prog" in
@@ -585,7 +589,7 @@ check_bar_command() { # knob name · command · sha its scripts must be tracked 
       echo "  repository could track. The program that runs has to be a tracked, unmodified script at" >&2
       echo "  word 1, or at word 2 after bash or sh, with nothing between them: a tracked name later in" >&2
       echo "  the value does not make the executed word safe. Full value: '$cmd'" >&2
-      echo "  Sanctioned use: $knob='bash $GOV_KITROOT/unattended-bar.sh'. To test this hook," >&2
+      echo "  Sanctioned use: $knob='$_bar_ok'. To test this hook," >&2
       echo "  export GOV_GATE_CMD_TEST=1, which waives this and marks the decision line 'bar: STUB'." >&2
       return 1
       ;;
@@ -595,7 +599,7 @@ check_bar_command() { # knob name · command · sha its scripts must be tracked 
     echo "$why" >&2
     echo "  at ${at:0:8}. The merge bar has to be a script the repo reviews;" >&2
     echo "  an untracked one is a bar nobody has read. Full value: '$cmd'" >&2
-    echo "  Sanctioned use: $knob='bash $GOV_KITROOT/unattended-bar.sh'. To test this hook," >&2
+    echo "  Sanctioned use: $knob='$_bar_ok'. To test this hook," >&2
     echo "  export GOV_GATE_CMD_TEST=1, which waives this and marks the decision line 'bar: STUB'." >&2
     return 1
   fi
