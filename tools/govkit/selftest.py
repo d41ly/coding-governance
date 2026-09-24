@@ -1745,8 +1745,10 @@ def main() -> int:
             # `KIND_MARKS` does not contain — so the skip half matched nothing and BOTH arms below
             # went vacuous rather than red. Derived from the table so a new kind cannot slip past.
             m = _re.match(r"^  (\S+)\s+\[[^\]]+\]\s+(\S+)", line)
-            if m and m.group(1) in {v.strip() for v in govkit_kind_marks().values()}:
-                (plan_writes if m.group(1) == "write" else plan_skips).add(m.group(2))
+            # `KEEP` is a seed the installed target already holds (DEPL-aRepatriatedFork-17 S6):
+            # `apply` leaves it and the receipt still carries its bytes, so it is on the write side.
+            if m and m.group(1) in {v.strip() for v in govkit_kind_marks().values()} | {"KEEP"}:
+                (plan_writes if m.group(1) in ("write", "KEEP") else plan_skips).add(m.group(2))
         check("plan's write set equals the receipt rows carrying gov bytes",
               plan_writes == {f["path"] for f in rec2b["files"] if "sha256" in f},
               str(sorted(plan_writes ^ {f["path"] for f in rec2b["files"] if "sha256" in f})))
@@ -9015,9 +9017,13 @@ user_skills = "/tmp/gk-fake-skills"
         (_pre_gov / "tools" / "govkit" / "govkit.py").write_bytes(_pe_src)
         _ac8_now = run_in_gov(_g14, "check", "--target", str(_t14))
         _ac8_was = run_in_gov(_pre_gov, "check", "--target", str(_t14))
+        # DEPL-aRepatriatedFork-17 added ONE field to the integrity line, ` · eol-only <n>`, which
+        # the pre-extraction engine cannot print. It is removed from NOW before the byte
+        # comparison, and nothing else is: every other byte still has to match.
+        _ac8_now_cmp = _re.sub(r" · eol-only \d+", "", _ac8_now.stdout, count=1)
         check("[-14] AC8 `check` output is BYTE-IDENTICAL across the S1 extraction, on a fixture "
               "target carrying an argv check, a rolled-back row and a receipt",
-              _ac8_now.stdout == _ac8_was.stdout and _ac8_now.returncode == _ac8_was.returncode,
+              _ac8_now_cmp == _ac8_was.stdout and _ac8_now.returncode == _ac8_was.returncode,
               "NOW:\n" + _ac8_now.stdout[-900:] + "\nWAS:\n" + _ac8_was.stdout[-900:])
         check("[-14] AC8 LIVENESS that comparison ran over a NON-EMPTY report — comparing two "
               "identical empty strings would prove nothing",

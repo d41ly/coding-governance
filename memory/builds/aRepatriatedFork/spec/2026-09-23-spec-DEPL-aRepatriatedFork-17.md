@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did
 
-**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer · order 3
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
@@ -317,6 +317,10 @@ New arm: `tools/govkit/selftest.py` · one fixture per scope item, each first ru
   reconcile-or-refuse path; AC16 added, observed in `tools/govkit/matrix.py`'s role-move block,
   whose `rr-edited` fixture it reuses. That block's remedy arm now reads `--accept-role-moves`,
   the remedy S6 put in place of `apply`.
+- rev-4 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. Two arms pinned output this
+  unit changed, and are updated to it: the AC4 plan write-set arm reads S6's `KEEP` row as a write,
+  and the `-14` AC8 byte comparison removes the integrity line's ` · eol-only <n>` field, which the
+  pre-extraction engine cannot print. Stale pins; no code change.
 
 ## 10. Reuse audit
 
