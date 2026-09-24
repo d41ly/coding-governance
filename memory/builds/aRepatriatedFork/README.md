@@ -126,7 +126,7 @@ ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22
 | [TOOL-aRepatriatedFork-15 — a kit whose shipped bytes move bumps its version](spec/2026-09-23-spec-TOOL-aRepatriatedFork-15.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries](spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-24 |
-| [DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter](spec/2026-09-23-spec-DEPL-aRepatriatedFork-14.md) | 3 | 1 | CLOSED | rev-2 | 2026-09-24 |
+| [DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter](spec/2026-09-23-spec-DEPL-aRepatriatedFork-14.md) | 3 | 1 | CLOSED | rev-3 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did](spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-21 — apply never lands gov's bytes on a file the target owns](spec/2026-09-24-spec-DEPL-aRepatriatedFork-21.md) | 3 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-18 — the test suites that arm gov's gates reach adopters](spec/2026-09-23-spec-TOOL-aRepatriatedFork-18.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-24 |

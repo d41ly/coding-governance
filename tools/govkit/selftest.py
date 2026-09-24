@@ -4695,8 +4695,11 @@ user_skills = "/tmp/gk-fake-skills"
             # The fixture claims its own non-rendered files with a second rule on purpose: without
             # it the tree reds on the per-file claim arm instead, and the control would then be
             # green-by-absence of a passing tree rather than by the block being declared.
+            # `[check]` declared absent, because DEPL-aRepatriatedFork-14 reds a descriptor that
+            # declares neither an argv nor a reason, and this control must be green on its own arm.
             _rr_desc = ('id = "demo"\nhome = "tools/demo"\n'
                         'version_from = { none = "fixture" }\n\n'
+                        '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "rendered"\n'
                         'to = "docs/demo.md"\n\n'
                         '[[files]]\ninclude = ["adopt-demo.sh", "kit.toml"]\nrole = "engine"\n\n'
@@ -4753,6 +4756,7 @@ user_skills = "/tmp/gk-fake-skills"
             # failure that never reached this predicate.
             _mv_desc = ('id = "demo"\nhome = "tools/demo"\n'
                         'version_from = { none = "fixture" }\n\n'
+                        '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "seed"\n'
                         'to = "%s"\n\n'
                         '[[files]]\ninclude = ["adopt-demo.sh", "kit.toml"]\nrole = "engine"\n\n'

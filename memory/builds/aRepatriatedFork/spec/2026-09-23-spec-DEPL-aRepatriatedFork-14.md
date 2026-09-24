@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter
 
-**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-1 · base a7c78ad2 · streams deployer · order 3
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-1 · base a7c78ad2 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
@@ -236,6 +236,10 @@ New arm: `tools/govkit/selftest.py` · two pytest fixtures for S1, one unsized a
   Files touched adds the three version bumps the epoch rule owes. AC2's no-configuration line is the
   probe's own stderr, which `check` does not print, so AC2 is observed through `check` for the verdict
   and by running the descriptor's probe for the line.
+- rev-3 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. Two scratch descriptors in
+  the rendered-row and reserved-prefix controls declared no `[check]`, which S3's refusal, lifted
+  into `selfcheck`, reds, so both controls went red on an arm they do not test. Each declares `[check] none` with a
+  reason. Stale fixtures; no code change.
 
 ## 10. Reuse audit
 
