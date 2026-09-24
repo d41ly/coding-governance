@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** BLOCKED · rev-3 · 2026-09-24 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
+**Status:** BLOCKED · rev-4 · 2026-09-24 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
 
 <!-- gen:spec-records -->
 
@@ -91,6 +91,9 @@ bridge rows go.
   Without them inCMS cannot pull any of the steps before this one verbatim.
 - **consumes-from** `TOOL-aRepatriatedFork-10` — the engine's grandfathering, which decides how the
   1515 inCMS records with no Serves line are graded.
+- **consumes-from** `TOOL-aRepatriatedFork-21` — the build-README population at exactly
+  `builds/<slug>/README.md`. Without it the slot contract grades inCMS's 41 nested legacy READMEs
+  and AC3 cannot pass.
 
 ## 4. Design
 
@@ -262,6 +265,8 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   S2 gains the README layout move and the two seeded registries; without them, gov's
   `--check-format` refused all 326 READMEs. S3 gains `TOMBSTONE_ROOTS`. AC3's figure is re-derived
   as 326.
+- rev-4 · 2026-09-24 · §3 gains the **consumes-from** edge to `TOOL-aRepatriatedFork-21`, the gov fix for
+  the nested-README population this unit's pass measured at inCMS.
 
 ## 10. Reuse audit
 

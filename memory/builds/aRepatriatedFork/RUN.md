@@ -176,3 +176,5 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T02:36:08Z brief · item DEPL-aRepatriatedFork-20 · reason 6143973f0dde memory/builds/aRepatriatedFork/prompts/2026-09-24-prompt-DEPL-aRepatriatedFork-20-build-brief.md
 
 2026-09-24T02:36:57Z dispatch · item 55b82891 DEPL-aRepatriatedFork-20 · reason memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-20-1-acceptance-ledger.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-20-convergence-journal.md memory/builds/aRepatriatedFork/README.md
+
+2026-09-24T03:06:49Z rescope · item add TOOL-aRepatriatedFork-21 · reason DEPL-aRepatriatedFork-20's pass measured gen_build_index.py --check-format failing inCMS on 41 nested legacy README.md files: the slot-contract and survey verbs take a README at any depth under builds/, while the render keys on builds/<slug>/. One shared filter; gov's 128 build READMEs hold none nested, so gov's output is unchanged.
