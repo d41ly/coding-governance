@@ -360,6 +360,9 @@ if [ ! -f "$top/tools/gate-legs.json" ] && [ ! -d "$top/tools/run-gates" ]; then
     GOV_KITROOT=scripts
   fi
 fi
+# The kit's own runner, spelled ONCE: it is the default bar, the one undeclared value the bar check
+# accepts, and the path the default bar's verdict records.
+GATE_RUNNER=$GOV_KITROOT/run-gates/run-gates.sh
 
 # $def decides which pushed ref gets gated, so whoever supplies $def decides whether the gate runs AT
 # ALL. GOV_DEFAULT_BRANCH used to outrank the observed default and was never checked for meaning, which
@@ -531,7 +534,7 @@ check_bar_command() { # knob name · command · sha its scripts must be tracked 
   # `set +f` line below, spelled exactly once in this file.
   _bar_tok=""; _bar_bad=""; _bar_first=""; _bar_opt=""; _bar_seen=""; _bar_dirty=""; _bar_prog=""
   _bar_decl=$cmd
-  if [ "${4-}" = declared ] && [ "$cmd" != "bash $GOV_KITROOT/run-gates/run-gates.sh" ]; then
+  if [ "${4-}" = declared ] && [ "$cmd" != "bash $GATE_RUNNER" ]; then
     _bar_decl=$(unset GATE_CMD; eval "$(git show "$at:.unattended.conf" 2>/dev/null)" >/dev/null 2>&1 </dev/null; printf '%s' "${GATE_CMD-}")
   fi
   set -f                       # the value is a command line; glob-expanding it is never wanted
@@ -816,7 +819,7 @@ if [ -z "$force" ] && [ -n "${GATE_SELFTESTS:-}" ] && [ "$rec_st" != "1" ]; then
 fi
 
 # ---- WHICH BAR RUNS: GOV_GATE_CMD, vetted by `check_bar_command` above, at the pushed tip -----
-gate=${GOV_GATE_CMD:-bash $GOV_KITROOT/run-gates/run-gates.sh}
+gate=${GOV_GATE_CMD:-bash $GATE_RUNNER}
 bar_label="$gate"
 if [ -n "${GOV_GATE_CMD:-}" ]; then
   if ! check_bar_command GOV_GATE_CMD "$gate" "$main_local" declared; then
@@ -825,7 +828,7 @@ if [ -n "${GOV_GATE_CMD:-}" ]; then
   RUNLOG_BAR=$bar_class
   [ "$bar_class" = stub ] && bar_label="STUB $gate"
 else
-  bar_path=$GOV_KITROOT/run-gates/run-gates.sh
+  bar_path=$GATE_RUNNER
   bar_blob=$(git rev-parse -q --verify "$main_local:$bar_path" 2>/dev/null || true)
 fi
 RUNLOG_BAR=${RUNLOG_BAR:-default}   # set only once the value is vetted, so a refusal records no bar

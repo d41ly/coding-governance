@@ -75,7 +75,7 @@ subject = "repo"
 argv = ["bash", ".githooks/pre-push.test.sh"]
 guard = [".githooks/"]
 
-# THE BAR HARNESS, which re-disables the hook's first-word, option and working-copy arms in a copy
+# THE BAR HARNESS, which re-disables the hook's executed-word, option, working-copy and declared arms in a copy
 # on every run and observes the evasions land (TOOL-aRepatriatedFork-5, the owner's F2 ruling). It
 # ships so an adopter can retire its own copy: NicoCares carried the original.
 [[gate_leg]]

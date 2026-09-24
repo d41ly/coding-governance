@@ -35,9 +35,10 @@ why this file drives real `git push` calls against a scratch remote rather than 
 hook's text.
 
 THE MUTATION RUNS EVERY TIME. A guard whose failing case was observed once, by hand, on the day it
-landed, is a guard nobody will ever see fail again. Every run re-disables the program, option,
-working-copy and declared arms in a COPY of the hook and asserts the five hostile values LAND, so if the arms are ever removed,
-weakened or short-circuited, this file stops being able to prove its own mutation and says so.
+landed, is a guard nobody will ever see fail again. Every run re-disables the executed-word,
+option, working-copy and declared arms in a COPY of the hook and asserts the five hostile values
+LAND, so if the arms are ever removed, weakened or short-circuited, this file stops being able to
+prove its own mutation and says so.
 
 WHAT THIS DOES NOT CHECK. `--no-verify`, a `core.hooksPath` pointed elsewhere, and `BASH_ENV`, each
 of which bypasses the hook as a whole (the unit's spec, section 3). The run-log line's other fields,
@@ -66,9 +67,9 @@ ANCHOR = "  set +f\n"
 # Neutralises exactly the rev-4 arms and nothing else: the executed-word check (its value set to a
 # path shape), the option check, the working-copy hash check and the declared-value check. The
 # every-token tracked check (rev-2) keeps working, which is what makes the mutation a test of THESE
-# arms rather than of the whole block. `_tree_dirty` is the
-# hook's dirty-tree refusal (TOOL-aRepatriatedFork-8 S3), measured before this point and refused
-# after it: it catches M3's rewritten bar one layer out, so it is cleared too or M3 could not land.
+# arms rather than of the whole block. `_tree_dirty` is the hook's dirty-tree refusal
+# (TOOL-aRepatriatedFork-8 S3), measured before this point and refused after it: it catches M3's
+# rewritten bar one layer out, so it is cleared too or M3 could not land.
 NEUTER = ('  _bar_prog=neutered.sh; _bar_opt=""; _bar_dirty=""; _bar_decl=$cmd; _tree_dirty=""'
           '   # SELFTEST MUTATION\n')
 
@@ -323,7 +324,7 @@ def main() -> int:
         fx = Fixture(tmp, mutated)
         for value, label, evidence in (
             ("gatepayload scripts/unattended-bar.sh",
-             "M1 without the first-word arm the PATH payload LANDS", "PAYLOAD RAN"),
+             "M1 without the executed-word arm the PATH payload LANDS", "PAYLOAD RAN"),
             ("bash -c gatepayload scripts/unattended-bar.sh",
              "M2 without the option arm the -c payload LANDS", "PAYLOAD RAN"),
             ("bash gatepayload scripts/unattended-bar.sh",
