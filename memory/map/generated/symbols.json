@@ -1248,6 +1248,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_apply_owned",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_argv_of",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

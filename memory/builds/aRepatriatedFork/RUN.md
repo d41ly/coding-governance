@@ -138,3 +138,7 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T00:46:04Z dispatch · item 39a80997 DEPL-aRepatriatedFork-17 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md
 
 2026-09-24T00:47:12Z dispatch · item 39a80997 DEPL-aRepatriatedFork-17 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md memory/map/generated/symbols.json
+
+2026-09-24T00:52:34Z dispatch · item 5e33d983 DEPL-aRepatriatedFork-21 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/aRepatriatedFork/spec/2026-09-24-spec-DEPL-aRepatriatedFork-21.md memory/builds/aRepatriatedFork/build/2026-09-24-build-DEPL-aRepatriatedFork-21-1-acceptance-ledger.md
+
+2026-09-24T00:52:38Z brief · item DEPL-aRepatriatedFork-21 · reason 4861e6d40f7c memory/builds/aRepatriatedFork/prompts/2026-09-24-prompt-DEPL-aRepatriatedFork-21-build-brief.md

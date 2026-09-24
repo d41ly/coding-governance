@@ -1025,6 +1025,82 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
           "contract 'demo/empty': it has zero clauses" in p.stdout, p.stdout)
 
 
+def check_apply_owned(tmp: pathlib.Path) -> None:
+    """DEPL-aRepatriatedFork-21 AC1, AC3, AC4 — `apply --resume` honours `[[own]]`, over a scratch
+    gov carrying the `-13` demo entry. AC2's red-first control and AC4's byte comparison against
+    `7308f088` are one-time observations in the unit's acceptance ledger, not arms: an arm pinned to
+    an old sha's output reds on every later legitimate change to `apply`."""
+    env = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
+    g = tmp / "gov"
+    (g / "tools" / "govkit").mkdir(parents=True)
+    (g / "tools" / "demo").mkdir(parents=True)
+    shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+    (g / "tools" / "govkit" / "registry.toml").write_text(SAFE_REG, encoding="utf-8", newline="\n")
+    for name, body in (("kit.toml", OWN_KIT), ("run.py", OWN_RUN), ("seed.txt", "seed\n"),
+                       ("use.py", "from run import alpha, beta\n"), ("tpl.md", "tpl\n")):
+        (g / "tools" / "demo" / name).write_text(body, encoding="utf-8", newline="\n")
+    for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
+              ("config", "user.name", "t"), ("add", "-A"), ("commit", "-qm", "base")):
+        git(g, *a)
+
+    def run_govkit(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+                              capture_output=True, text=True, encoding="utf-8", env=env)
+
+    # AC1 — adopt records the owned row, then `apply --resume` must leave its bytes and role alone.
+    lacking = "alpha = 1\n\nif __name__ == '__main__':\n    print('hello')\n"
+    t = make_target(tmp / "own", OWN_DEPLOY.format(path="tools/demo/run.py", impl="demo:run.py"))
+    (t / "tools" / "demo").mkdir(parents=True)
+    (t / "docs").mkdir()
+    for f in ("use.py", "seed.txt", "tpl.md"):
+        shutil.copy2(g / "tools" / "demo" / f, t / "tools" / "demo" / f)
+    (t / "docs" / "tpl.md").write_text("tpl\n", encoding="utf-8", newline="\n")
+    (t / "tools" / "demo" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
+    settle(t)
+    p = run_govkit("adopt", "--target", str(t), "--write")
+    settle(t, "adopted")
+    rp = t / ".governance" / "install.json"
+    adopted = next((f for f in json.loads(rp.read_text(encoding="utf-8"))["files"]
+                    if f["path"] == "tools/demo/run.py"), None)
+    p = run_govkit("apply", "--target", str(t), "--resume", "--write")
+    row = next((f for f in json.loads(rp.read_text(encoding="utf-8"))["files"]
+                if f["path"] == "tools/demo/run.py"), {})
+    check("[aRF-21 AC1] apply --resume leaves the owned file's bytes and names it skipped",
+          p.returncode == 0
+          and (t / "tools" / "demo" / "run.py").read_text(encoding="utf-8") == lacking
+          and "SKIPPED [adopter-owned] tools/demo/run.py <- demo" in p.stdout, p.stdout + p.stderr)
+    check("[aRF-21 AC1] ...and its receipt row stays adopter-owned, exactly as adopt wrote it",
+          row.get("role") == "adopter-owned" and row == adopted, json.dumps(row))
+
+    # AC3 — the declaration turns hostile: refused at exit 1 naming the row, nothing written.
+    settle(t, "applied")
+    (t / ".governance" / "deploy.toml").write_text(
+        OWN_DEPLOY.format(path="../run.py", impl="demo:run.py"), encoding="utf-8", newline="\n")
+    (tmp / "own" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
+    settle(t, "hostile")
+    before = rp.read_bytes()
+    p = run_govkit("apply", "--target", str(t), "--resume", "--write")
+    dirty = subprocess.run(["git", "-C", str(t), "status", "--porcelain"], capture_output=True,
+                           text=True, encoding="utf-8").stdout
+    check("[aRF-21 AC3] a `..` [[own]] path refuses apply at exit 1, naming the row, writing nothing",
+          p.returncode == 1 and "[[own]] row 1" in p.stdout and "leaves the target repository"
+          in p.stdout and dirty == "" and rp.read_bytes() == before, p.stdout + p.stderr + dirty)
+
+    # AC4 — no [[own]] rows: gov's run.py lands as `engine` and no owned skip is printed.
+    n = make_target(tmp / "non", SAFE_DEPLOY)
+    run_govkit("apply", "--target", str(n))
+    (n / "docs").mkdir()
+    (n / "docs" / "tpl.md").write_text("tpl\n", encoding="utf-8", newline="\n")
+    settle(n, "applied")
+    p = run_govkit("apply", "--target", str(n), "--resume", "--write")
+    nrow = next((f for f in json.loads((n / ".governance" / "install.json").read_text(
+        encoding="utf-8"))["files"] if f["path"] == "tools/demo/run.py"), {})
+    check("[aRF-21 AC4] a target with no [[own]] rows lands run.py as engine, no owned skip",
+          p.returncode == 0 and "adopter-owned" not in p.stdout and nrow.get("role") == "engine"
+          and (n / "tools" / "demo" / "run.py").read_text(encoding="utf-8") == OWN_RUN,
+          p.stdout + p.stderr + json.dumps(nrow))
+
+
 SAFE_REG = ('[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
             '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
             '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
@@ -1410,6 +1486,7 @@ def main() -> int:
         check_shipped_verb(tmp)
         check_epoch_verb(tmp)
         check_adopter_owned(tmp / "own")
+        check_apply_owned(tmp / "ao")
         check_pytest_ini_probe(tmp / "pi")
         check_update_safety(tmp / "us")
 

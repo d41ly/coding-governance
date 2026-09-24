@@ -5813,6 +5813,19 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- repository must not queue behind a complaint about a kit descriptor.
     demand_writable_target(target, "apply", receipt)
 
+    # ---- DEPL-aRepatriatedFork-21 S1. The target's `[[own]]` rows, through the ONE grader `adopt`
+    # ---- calls, before any write is computed: a malformed declaration is a finding naming the row,
+    # ---- exit 1, exactly as it is there. Read from `deploy.toml`, never the receipt, so a first
+    # ---- apply over an owning target lands nothing on an owned path either.
+    try:
+        owned = resolve_owned_rows(root, target, deploy, descs)
+    except Refusal as e:
+        r.fail(str(e))
+        return r.emit()
+    # S2, rev-2: only an owned path that IS one of gov's destinations for its source. A stand-in at
+    # another path leaves gov's own copy landing, which `-13` §8 F2 ruled.
+    owned_dests = {p: o for p, o in owned.items() if p in o["dests"]}
+
     # ---- validate every merged rule BEFORE writing. A source that cannot yield exactly one pair,
     # ---- or a marker style with no synthesizer, is a refusal — a block gov writes and can never
     # ---- find again is worse than one it never wrote.
@@ -6078,6 +6091,21 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 continue
             rule = d.get("files", [])[w["rule"]]
             if rule.get("scope") == "machine" or rule.get("link"):
+                continue
+            _own = owned_dests.get(dest)
+            if _own is not None and _own["entry"] == eid:
+                # DEPL-aRepatriatedFork-21 S2. The target said these bytes are its own program, so
+                # gov writes nothing here. The row stays `adopter-owned`: carried verbatim from the
+                # receipt `adopt` wrote, or, on an apply with none, built in `adopt`'s shape.
+                _prior = next((f for f in (receipt or {}).get("files") or []
+                               if f.get("path") == dest and f.get("role") == "adopter-owned"), None)
+                rows.append(_prior or {
+                    "path": dest, "role": "adopter-owned", "kit": eid, "version": vers,
+                    "source": w["src"],
+                    "sha256": hashlib.sha256((target / dest).read_bytes()).hexdigest(),
+                    "implements": _own["implements"], "why": _own["why"], "evidence": "declared"})
+                print(f"govkit apply — SKIPPED [adopter-owned] {dest} <- {eid}: [[own]] implements "
+                      f"'{_own['implements']}' — the target owns these bytes")
                 continue
             data = blob_at(root, commit, w["src"]) if w["src"] else None
             if data is None:

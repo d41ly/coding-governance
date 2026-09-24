@@ -1,11 +1,12 @@
 # DEPL-aRepatriatedFork-21 — apply never lands gov's bytes on a file the target owns
 
-**Status:** SPECCED · rev-1 · 2026-09-24 · node a · Tier-2 · base 7308f088 · streams deployer · order 3
+**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base 7308f088 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-21-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-21-1-acceptance-ledger.md) | journal | — |
 | [2026-09-24-prompt-DEPL-aRepatriatedFork-21-build-brief.md](../prompts/2026-09-24-prompt-DEPL-aRepatriatedFork-21-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -24,10 +25,13 @@ build introduced. This unit makes `apply` honour the declaration exactly as `upd
 - **S1** — `apply` reads the target's `[[own]]` rows through `resolve_owned_rows`, the one grader
   `adopt` already calls, before it computes a write, so a malformed declaration refuses there
   exactly as it refuses in `adopt`. Observed by AC3.
-- **S2** — Every destination `resolve_owned_rows` returns under `dests` is removed from `apply`'s
-  write set. It prints one line per skipped destination naming the path and the `[[own]]` row, and
-  its receipt keeps the row `adopter-owned` rather than re-recording it `engine`. Observed by AC1,
-  AC2.
+- **S2** — An owned `path` that is one of the destinations `resolve_owned_rows` returns under
+  `dests` is removed from `apply`'s write set. A `dests` member that is NOT the owned path is gov's
+  own copy of a stood-in source, and it keeps landing per `DEPL-aRepatriatedFork-13` §8 F2. It
+  prints one line per skipped destination naming the path and the `[[own]]` row, and its receipt
+  keeps the row `adopter-owned` rather than re-recording it `engine`: carried verbatim from the
+  receipt where that row is already `adopter-owned`, else built in `adopt`'s shape from the
+  declaration. Observed by AC1, AC2.
   **Readers:** by name: `_cmd_apply`'s own write loop is the only reader of the write set it
   filters. by value: `update` and `check` read the receipt row's role, which S2 leaves
   `adopter-owned` exactly as `adopt` wrote it.
@@ -121,6 +125,10 @@ none
 
 - rev-1 · 2026-09-24 · §2 opened as a discovery adopted under the mandate (protocol §11): the gap
   `DEPL-aRepatriatedFork-13`'s builder reported in `apply`.
+- rev-2 · 2026-09-24 · S2 narrowed at build time: `dests` is gov's destinations for the owned
+  source, so for a stand-in at another path it names gov's own copy, and skipping every member
+  would stop landing the copy §3's second non-goal keeps. Only the owned path is skipped. S2 also
+  states where the kept row comes from. AC1-AC4 unchanged.
 
 ## 10. Reuse audit
 

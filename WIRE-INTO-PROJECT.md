@@ -952,6 +952,9 @@ Then run `govkit adopt --re-adopt --write`. The row is recorded `adopter-owned` 
 `evidence: "declared"` and no gov vintage. After that:
 
 - `update` counts it under `adopter-owned`, writes it in neither direction, and still re-stamps.
+- `apply`, `--resume` included, reads the same `[[own]]` rows before it writes anything. It skips
+  the owned path with one `SKIPPED [adopter-owned]` line and keeps the row `adopter-owned`. A
+  malformed row stops it at exit 1, the same way it stops `adopt`.
 - `update` and `check` print one parity line per contract gov declares for that source, such as
   `contract memory-tree/corpus-ids <- scripts/corpus_ids.py: 1/2 clauses hold`. Each failing clause
   is listed with the gov file that needs it. A failing clause never reds, because you own the file.
