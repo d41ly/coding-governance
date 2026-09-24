@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.34   # gov:kit unattended@1.34 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.35   # gov:kit unattended@1.35 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -497,7 +497,7 @@ else
     # every generated row already. Measured against the real region: the slug, the spec path and a
     # unit id were all silent, and only a fabricated id fired it. Promotion adds a NEW unit id, so
     # what has to be observed is an id present at HEAD and ABSENT at the run's own pinned BASE.
-    rv_base=$(awk -F': ' '/^base: /{ sub(/\r$/,"",$2); print $2; exit }' "$rvf")
+    rv_base=$(extract_run_facts < "$rvf" | awk -F': ' '/^base: /{ sub(/\r$/,"",$2); print $2; exit }')
     rv_new=""; rv_readable=0
     if [ -f "$rv_readme" ]; then
       # NON-WONTDO ONLY. The promotion clause discharges an exited loop by counting NEW unit ids,
@@ -2850,10 +2850,9 @@ fi
 # ---- one is not detectable from the file and is not claimed (TOOL-aBoundedCeiling-11 stays open).
 # ---- A key outside the `## Run facts` section is not read - by this check, and since closing review
 # ---- round 1 L2 by `fact_of`/`phase_of` and the driver's `fact` either, so a line placed there
-# ---- answers nothing and needs no grading. The kit's OTHER readers (check-brief-recorded.sh,
-# ---- check-pass-order.sh, lib-unattended.sh and the hook scripts) still read the whole file; no verb
-# ---- writes a key-shaped line outside the section any more. The count it prints is DERIVED, and a
-# ---- population of zero is announced rather than passed silently.
+# ---- answers nothing and needs no grading. Since closing review round 2 M1 the kit's OTHER readers
+# ---- read only the section too, and check 36 below reds one that does not. The count it prints is
+# ---- DERIVED, and a population of zero is announced rather than passed silently.
 _rf_files=()
 while IFS= read -r _rf_f; do [ -n "$_rf_f" ] && [ -f "$_rf_f" ] && _rf_files+=("$_rf_f"); done <<< "$RUNS"
 if [ "${#_rf_files[@]}" -eq 0 ]; then
@@ -2906,6 +2905,83 @@ if [ "${#_ps_files[@]}" -gt 0 ]; then
     }' "${_ps_files[@]}")
 fi
 [ -z "$_ps_hits" ] || fail 35 "a script in the kit directory names a file at a build root through a pathspec without the :(glob) magic, so its wildcard crosses a slash and every same-named file nested inside a build joins the population:$_ps_hits"
+
+# ---- 36: every read of a run-state key routes through the `## Run facts` section. TOOL-aRepatriatedFork-6,
+# ---- closing review round 2 M1. Round 1 L2 scoped the driver's `fact` and this leg's `fact_of` and
+# ---- left gate-guard.js, CLAIM_AWK, baseline_units and dod_met reading the whole file, so one record
+# ---- answered LANDED to the hook and RUNNING to the driver: the hook admitted the bar it exists to
+# ---- deny. This is the CLASS: a key read in the kit either goes through `fact`/`fact_of` (which
+# ---- anchor no key, so they are no hit) or carries the section on its own line.
+# ----
+# ---- THE KEYS ARE DERIVED: every literal key at a `fact`/`set_fact`/`fact_of` call site in the driver,
+# ---- this leg and the library, every `readFact('<key>')` in the kit's JS, and the agent-attested DoD
+# ---- items. A HIT is a code line of a non-test `*.sh`/`*.js` beside this leg that anchors one of them
+# ---- (`^key:`, or inside `^(a|key)`), or anchors a variable (`^$k:`, `'^' + key + ':`). A hit is SCOPED
+# ---- when its line carries one of four spellings: `extract_run_facts` (the library's filter), an awk
+# ---- `sec &&` guard, a JS `exec(region)`, or a `^(## |` alternation that selects the headings with the
+# ---- keys. Otherwise it must be EXEMPT below, by file and anchored token, with a reason; an exemption
+# ---- that matches no hit in a file the population holds reds, because a stale one silently widens
+# ---- the surface; one naming a file this tree does not carry contributes nothing, as check 32's do.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that the marker on a line is the one doing the scoping - a line carrying
+# ---- `sec &&` for another variable passes - nor a read assembled from pieces no text scan sees, nor a
+# ---- key the derivation missed. An exemption covers its token in its file whole. Comment lines are
+# ---- skipped, so a header may describe the defect. Writers are not graded: `set_fact` holds no
+# ---- anchored key read, and the section bounds it shares with `fact` are the driver suite's arm.
+_fr_self="$HERE/$(basename "$0")"
+_fr_keys=$( { grep -ohE '(^|[^A-Za-z_])(set_fact|fact|fact_of) "[^"]*" [a-z][a-z-]*' "$DRIVER" "$_fr_self" "$_LIB_DIR/lib-unattended.sh" 2>/dev/null | awk '{ print $NF }'
+              cat "$HERE"/*.js 2>/dev/null | grep -oE "readFact[(]'[a-z-]+'[)]" | sed -E "s/readFact[(]'([a-z-]+)'[)]/\1/"
+              printf '%s\n' $DOD_CORE | sed -n 's/:agent$//p'; } | sort -u | tr '\n' ' ')
+_fr_files=()
+for _fr_f in "$HERE"/*.sh "$HERE"/*.js; do
+  case "$_fr_f" in *.test.sh) continue ;; esac
+  [ -f "$_fr_f" ] && _fr_files+=("$_fr_f")
+done
+_fr_out=$(awk -v KEYS="$_fr_keys" -v EXEMPT="$(cat <<'EXEMPT'
+unattended.sh	playbook:	the build README's front matter, a scan its `---` close bounds
+unattended.sh	pieces:	the build README's front matter, a scan its `---` close bounds
+unattended.sh	spec-audit:	the build README's front matter, a scan its `---` close bounds
+check-unattended.sh	playbook:	the build README's front matter, a scan its `---` close bounds
+check-unattended.sh	pieces:	the build README's front matter, a scan its `---` close bounds
+resume-tick.sh	pid: 	the driver's --liveness stdout, not a run-state file
+stop-guard.js	' + key	parseLiveness reads the driver's --liveness stdout, not a run-state file
+EXEMPT
+)" '
+  BEGIN {
+    n = split(KEYS, ka, " "); alt = ""
+    for (i = 1; i <= n; i++) alt = alt (alt == "" ? "" : "|") ka[i]
+    c = "\\^"
+    re_lit = c "[(]?([^|)]*[|])*(" alt ")[|):]"
+    re_var = c "[$][{]?[A-Za-z_][A-Za-z0-9_]*[}]?:"
+    re_js = "[\047\"]" c "[\047\"] *[+] *[A-Za-z_]+ *[+] *[\047\"]:"
+    ne = split(EXEMPT, er, "\n")
+    for (i = 1; i <= ne; i++) { split(er[i], ef, "\t"); ex_f[i] = ef[1]; ex_t[i] = "^" ef[2]; used[i] = 0 }
+    heads = "^" "(## |"
+  }
+  FNR == 1 { f = FILENAME; sub(/.*\//, "", f); present[f] = 1 }
+  { line = $0; sub(/\r$/, "", line) }
+  line ~ /^[[:space:]]*(#|\/\/|\*)/ { next }
+  line ~ re_lit || line ~ re_var || line ~ re_js {
+    base = FILENAME; sub(/.*\//, "", base); hits++
+    if (index(line, "extract_run_facts") || line ~ /(^|[^A-Za-z_])sec *&&/ || index(line, "exec(region)") || index(line, heads)) { scoped++; next }
+    for (i = 1; i <= ne; i++) if (ex_f[i] == base && index(line, ex_t[i])) { used[i]++; exempt++; next }
+    printf "BAD %s:%d\n", base, FNR
+  }
+  END {
+    for (i = 1; i <= ne; i++) if (present[ex_f[i]] && !used[i]) printf "STALE %s %s\n", ex_f[i], ex_t[i]
+    printf "COUNT %d %d %d %d\n", n, hits, scoped, exempt
+  }' "${_fr_files[@]}")
+_fr_count=$(printf '%s\n' "$_fr_out" | sed -n 's/^COUNT //p')
+_fr_bad=$(printf '%s\n' "$_fr_out" | sed -n 's/^BAD / /p' | tr -d '\n')
+_fr_stale=$(printf '%s\n' "$_fr_out" | sed -n 's/^STALE /; /p' | tr -d '\n')
+read -r _fr_n _fr_h _fr_s _fr_e <<< "$_fr_count"
+report "check 36 graded ${#_fr_files[@]} kit files for reads of ${_fr_n:-0} derived run-state keys: ${_fr_h:-0} anchored reads, ${_fr_s:-0} scoped to the Run facts section, ${_fr_e:-0} exempt"
+# LIVENESS: `phase` is the key every reader wants, so a derivation without it read nothing; and the
+# scoped reads this check was written beside exist, so zero means the predicate matches nothing.
+case " $_fr_keys " in *" phase "*) ;; *) fail 36 "the run-state key derivation found no phase key, so the read scan grades against nothing: $_fr_keys" ;; esac
+[ "${_fr_s:-0}" -gt 0 ] || fail 36 "no key read in the kit carries the Run facts scope, so the scan matched nothing it was written to find and a clean result would be coverage of nothing"
+[ -z "$_fr_bad" ] || fail 36 "a run-state key is read over the whole file rather than the Run facts section, so it can answer a line above the heading or under Parked that the driver's fact never reads - route it through fact, fact_of or extract_run_facts:$_fr_bad"
+[ -z "$_fr_stale" ] || fail 36 "a run-state read exemption matches no read in the kit, and a stale exemption silently widens the surface it was written to narrow$_fr_stale"
 
 # ---- 28: THE INLINED PARSER, one answer in two files. `declared_list` is copy-inlined in the driver
 # ---- and in the playbook leg because each kit script is installed standalone and cannot import — so

@@ -245,6 +245,23 @@ F=$(build_fixture BUILDING); printf 'MEMORY_ROOT=../elsewhere\n' > "$F/.unattend
 run "conf: a MEMORY_ROOT escaping the root keys nothing -> allow" 0 "$F" "$D4"
 F=$(build_fixture BUILDING); printf 'phase: BUILDING\nrun-branch: refs/heads/fx\n' > "$F/memory/builds/fx/RUN.md"
 run "AC4 a record with no Run facts heading still keys -> deny" 2 "$F" "$D4"
+# ---- closing review round 2 M1 (TOOL-aRepatriatedFork-6): a record carrying the `## Run facts`
+# ---- heading is read the way the driver's `fact` reads it - that section, heading to next `## `.
+# ---- Read whole, a `phase: LANDED` ABOVE the heading (the driver suite's L2 fixture, `sed '1a
+# ---- phase: LANDED'`) is in PHASES_ALLOW, so the live record was filtered out and the bar ADMITTED
+# ---- while the driver still read BUILDING. The heading-less record above keys on the whole file.
+F=$(build_fixture BUILDING); sed -i '1a phase: LANDED' "$F/memory/builds/fx/RUN.md"
+run "M1 a phase: LANDED above the Run facts heading does not admit the bar -> deny" 2 "$F" "$BAR"
+# ...and a key-shaped line under `## Parked` does not rebind the record. JS reads a CR as a line end
+# under the `m` flag, so a park reason carrying `\rrun-branch: ...` was a run-branch fact, and it beat
+# the genuine branch-ref - all most older records carry - through the `||`. The driver's park() now
+# refuses the byte; this arm is the reader's half, with the row written by hand.
+F=$(build_fixture BUILDING); printf '\n## Parked\n\n2026-09-24T00:00:00Z decision · item x · reason x\rrun-branch: refs/heads/other\n' >> "$F/memory/builds/fx/RUN.md"
+run "M1 a CR-forged run-branch under ## Parked does not move the binding -> deny" 2 "$F" "$BAR"
+# LIVENESS: the same run-branch INSIDE the section does move it, so the deny above is the scope and not
+# a key the reader never looks at.
+F=$(build_fixture BUILDING 'run-branch: refs/heads/other' 'branch-ref: refs/heads/fx')
+run "M1 control: run-branch inside the section binds the record elsewhere -> allow" 0 "$F" "$BAR"
 # THE WORKTREE ARM AND ITS NEGATIVE CONTROL. `.git` is a FILE whose gitdir names a directory under
 # the common dir; the worktree's HEAD is there and the common dir's HEAD is the primary's branch.
 # Swapping the two HEADs must flip the verdict, or the hook is reading the wrong one.

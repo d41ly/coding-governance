@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.34 -->
+<!-- gov:kit unattended@1.35 -->
 # The playbook template — the canon a playbook is written from
 
 A PLAYBOOK is the instruction set for making one KIND of thing repeatedly: articles, images, videos,

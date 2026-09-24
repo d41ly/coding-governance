@@ -3,7 +3,7 @@
  * gate-guard — a PreToolUse guard that refuses the flagged merge bar and every self-test suite
  * while the unattended run on the current branch is in a phase before VERIFYING.
  *
- * gov:kit unattended@1.34 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.35 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aDeferredBar-3 under the build folder of that slug.
@@ -591,8 +591,21 @@ function resolveRunPhase(root, memoryRoot, ref) {
   for (const slug of slugs) {
     let text
     try { text = fs.readFileSync(path.join(buildsDir, slug, RECORD_BASENAME), 'utf8') } catch { continue }
+    // TOOL-aRepatriatedFork-6, closing review round 2 M1: the `## Run facts` section when the record
+    // carries the heading, heading to next `## ` - run-lease.js's slice and the driver's `fact`
+    // scope. Read whole, a `phase: LANDED` above the heading filtered a live record out through
+    // PHASES_ALLOW while the driver still read BUILDING, and a CR-split park row under `## Parked`
+    // (JS reads a CR as a line end under `m`) answered `run-branch` ahead of the real `branch-ref`.
+    // A record with NO heading is still read whole, on purpose: the suite's AC4 keys one.
+    let region = text
+    const h = /^## Run facts/m.exec(text)
+    if (h) {
+      const rest = text.slice(h.index + h[0].length)
+      const j = rest.search(/^## /m)
+      region = j < 0 ? rest : rest.slice(0, j)
+    }
     const readFact = (key) => {
-      const m = new RegExp('^' + key + ': (.*)$', 'm').exec(text)
+      const m = new RegExp('^' + key + ': (.*)$', 'm').exec(region)
       return m ? m[1].trim() : ''
     }
     const branch = readFact('run-branch') || readFact('branch-ref')

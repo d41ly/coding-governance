@@ -674,6 +674,14 @@ pinned_units() {  # commit · build-README-path · [cutoff-date]
   printf '%s\n' "$_pu_was"
 }
 
+# THE `## Run facts` SECTION of a run-state text on stdin, heading to next `## ` heading, CRs kept.
+# TOOL-aRepatriatedFork-6, closing review round 2 M1. The driver's `fact` and the leg's `fact_of`
+# read a FILE, a line at a time; the readers that take a blob (a `git show`, a whole file) through a
+# pipe route through this instead, so every reader of a run fact answers from the one section
+# `set_fact` writes. The first match over the whole file took a `phase: LANDED` above the heading
+# ahead of the real one. The leg's check 36 reds a key-shaped run-state read that routes nowhere.
+extract_run_facts() { awk '/^## /{ sec = (index($0, "## Run facts") == 1); next } sec'; }
+
 baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [fallback-commit]
   _bu_rel=$1; _bu_bre=$2; _bu_cut=${3:-}; _bu_fb=${4:-}
   # IT CALLS `region`, WHICH THIS LIBRARY DOES NOT DEFINE. Both current callers define their own —
@@ -688,7 +696,7 @@ baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [f
   }
   _bu_base=""
   for _bu_c in $(GIT log --reverse --format=%H -- "$_bu_rel" 2>/dev/null); do
-    case "$(GIT show "$_bu_c:$_bu_rel" 2>/dev/null | grep -m1 '^phase:')" in
+    case "$(GIT show "$_bu_c:$_bu_rel" 2>/dev/null | extract_run_facts | grep -m1 '^phase:')" in
       *BUILDING*|*RUNNING*|*VERIFYING*|*LANDING*|*LANDED*) _bu_base="$_bu_c"; break ;;
     esac
   done

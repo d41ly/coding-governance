@@ -2545,7 +2545,12 @@ for _rf_u in $_rf_usage; do
   n=$((n+1)); case " $_rf_matrix " in *" $_rf_u "*) ;;
     *) echo "FAIL --$_rf_u takes free text in the driver's usage table and the hostile-value matrix does not drive it"; st=1 ;; esac
 done
-for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED'; do
+# THE CARRIAGE RETURN is the third form (closing review round 2 M1): a CR is a line end to the JS
+# hooks, so a verb that stores one has written a key-shaped line gate-guard.js reads. Graded on the
+# BYTE, not a phase count - `grep -c '^phase: '` splits on line feeds only and cannot see it. Carried
+# in variables, because a `$'\r'` spelled inside a command substitution loses the byte on this node.
+_rf_crf=$'yes\rphase: LANDED'
+for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
   # ONE open run per form, not one per verb: a preflight costs a process tree, and the property is
   # per-call (phase unchanged by THIS verb), so the verbs share the run. --close and --abort each END
   # the open phase on an accepted value, so each takes a fresh run; --preflight goes last. Two verbs
@@ -2567,11 +2572,15 @@ for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED'; do
       same "phase lines in the records --$_rf_v wrote from a hostile value" "$(grep -c '^phase: ' <<<"$_rf_rec")" 0
       # LIVENESS: the one-line form is ACCEPTED and must land as ONE row in the file read above, or
       # the zero is a read of a file the verb never wrote.
-      case "$_rf_form" in *$'\n'*) ;; *) hit "$_rf_rec" 'leg yes\nphase: LANDED · verdict PASS' ;; esac ;;
+      case "$_rf_form" in 'yes\nphase: LANDED') hit "$_rf_rec" 'leg yes\nphase: LANDED · verdict PASS' ;; esac ;;
     esac
     # A refusal that left no run-state file at all forged nothing: counted as the verdict it is.
     if [ ! -f memory/builds/tRun/RUN.md ]; then n=$((n+1)); continue; fi
     same "phase lines after --$_rf_v with a hostile value" "$(grep -c '^phase: ' memory/builds/tRun/RUN.md)" 1
+    # BYTES, through `tr`: an MSYS grep for a CR can match the line end it reconstructs on an LF file
+    # (memory/gotchas/msys-grep-counts-cr-on-every-line.md).
+    n=$((n+1)); [ "$(tr -dc '\r' < memory/builds/tRun/RUN.md | wc -c)" -eq 0 ] \
+      || { echo "FAIL --$_rf_v stored a carriage return in the run-state file, a line end to every JS reader"; st=1; }
     case "$_rf_v" in
       # Both move the phase HONESTLY on an accepted one-line value, so their property is the line
       # count above: a forged `phase:` line is a second one, wherever in the file it lands.
@@ -2605,6 +2614,24 @@ hit "$out" "tRun · phase RUNNING"
 miss "$out" "halt-code gate-red-out-of-scope"
 add_facts memory/builds/tRun/RUN.md "$(printf 'halt-code: gate-red-out-of-scope\n')"
 hit "$(run --status tRun)" "halt-code gate-red-out-of-scope"
+
+# ---- closing review round 2 M1: the line-end refusal lives IN park(), so every reason-carrying verb
+# ---- inherits it. --park refused a line feed and let a carriage return through, and a CR is a line
+# ---- end to gate-guard.js: `\rrun-branch: ...` under `## Parked` rebound the hook to another branch.
+# ---- Refused before the append, so the file is byte-identical and the binding cannot move.
+bcopen; before=$(sum)
+_rf_crr=$'x\rrun-branch: refs/heads/other'
+hit "$(run --park tRun --item q --reason "$_rf_crr")" "a parked entry contains a newline or a carriage return, and park() appends ONE line that every reader of this file parses line-wise, so this would forge a second row or a fact nothing wrote: decision in memory/builds/tRun/RUN.md"
+n=$((n+1)); [ "$(sum)" = "$before" ] || { echo "FAIL a refused carriage-return park reason rewrote the run-state file, so the run-branch binding could move"; st=1; }
+
+# ---- closing review round 2 L1: `set_fact` writes with the reader's bounds. A `base:` ABOVE the
+# ---- heading was matched whole-file and rewritten in place, --preflight reported success, and the
+# ---- section `fact` reads still carried no base. The fact must land INSIDE the section.
+reset_tree
+sed -i '1a base: 0000000000000000000000000000000000000000' memory/builds/tRun/RUN.md; fixture
+run --preflight tRun --keepalive-id k1 >/dev/null
+_l1_base=$(awk '/^## /{ s = (index($0, "## Run facts") == 1); next } s && /^base: /{ sub(/^base: */, ""); print; exit }' memory/builds/tRun/RUN.md)
+n=$((n+1)); [ -n "$_l1_base" ] || { echo "FAIL --preflight over a record with base: only above the heading left the Run facts section without one"; st=1; }
 
 # ---- AC7: a machine-checked item outside DOD_NO_OVERRIDE prints the --override spelling, so the
 # ---- comment on `build-complete` that says fail 13 prints it is true. `crdrop` leaves exactly one

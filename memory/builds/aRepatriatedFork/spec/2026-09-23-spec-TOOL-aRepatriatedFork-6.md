@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-6 — unattended set_fact refuses a value that can forge a second fact
 
-**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -44,6 +44,19 @@ guard misses, and gates the class at the leg.
   section, heading to next `## ` heading, which is the scope check 34 grades. The driver's
   cross-worktree LANDING read and the leg's halt-code readers route through them. Observed by AC9
   (closing review round 1 L2).
+- **S8** — rev-4. Every OTHER reader of a run fact in the kit is scoped to `## Run facts` the same
+  way: gate-guard.js `readFact` takes run-lease.js's heading slice where the record carries the
+  heading (a heading-less record is still read whole, the hook suite's AC4), `CLAIM_AWK` carries a
+  `sec &&` guard, and `baseline_units`, the two legs' base reads and the leg's review-loop base read
+  pipe through `extract_run_facts` in `lib-unattended.sh`. `resume-tick.sh`'s lease read selects the
+  headings with its keys and keeps the section. `dod_met` reads the agent-attested keys through
+  `fact`. `park()` refuses a line feed or a carriage return in any field before it appends, so every
+  reason-carrying verb inherits it, and `--preflight --waive` refuses a CR reason before any write.
+  Leg check 36 reds a key-shaped run-state read in the kit that routes through none of those, or an
+  exemption that matches no read. Observed by AC10 (closing review round 2 M1).
+- **S9** — rev-4. `set_fact` matches and replaces a key only inside `## Run facts`, and inserts it
+  under the heading when the section lacks it, even where the same key sits elsewhere in the file.
+  Observed by AC11 (closing review round 2 L1).
 - **S5** — The DoD refusal at `tools/unattended/unattended.sh:3674-3683` prints the `--override`
   spelling for an item outside `DOD_NO_OVERRIDE` and `gates-green`, and the comment at `:3988-3989`
   that claims fail 13 already prints it becomes true. This is the second half of nc carve-out 21.
@@ -67,7 +80,8 @@ guard misses, and gates the class at the leg.
   phase/witness/base reads, `check-pass-order.sh`'s base read, `lib-unattended.sh`'s
   `baseline_units` phase probe, and the JS hooks' `readFact` — are not re-scoped by S7. After S4 no
   verb writes a key-shaped line outside `## Run facts`, and `gate-guard.js` reads a heading-less
-  record on purpose. Recorded as a residual for the close.
+  record on purpose. Recorded as a residual for the close. rev-4: closed by S8, which scopes each of
+  them; the heading-less read in `gate-guard.js` stays, on purpose.
 
 ### Edges
 
@@ -261,6 +275,19 @@ tracked run-state file in all three trees.
   `phase: ABORTED` sits above the heading, `check-unattended.sh` does not report it as an aborted
   record, and does once the in-section phase reads ABORTED.
   Red when: a reader takes the first match across the whole file. Observed red at 6ddeb7d5.
+- **AC10** — rev-4. When a record carrying `## Run facts` has `phase: LANDED` inserted above the
+  heading, gate-guard.js still DENIES the bar at BUILDING; when a `## Parked` row carries
+  `\rrun-branch: refs/heads/other`, it still denies, and the same key inside the section rebinds it
+  (the control). `--park` with that reason exits non-zero with park()'s `fail 17` message and the file
+  byte-identical, and the S4 matrix's CR form leaves no CR byte in the run-state file for any verb.
+  `check-unattended.sh` check 36 reds `baseline_units` with its section filter removed, naming
+  `lib-unattended.sh`, and reds a stale exemption.
+  Red when: a reader or writer is whole-file. Observed red at 00c092d4: the hook allowed both records,
+  the matrix's CR form redded from `--park` onward, `--park` wrote the CR row, and check 36 over 00c092d4's readers named
+  twelve unscoped reads.
+- **AC11** — rev-4. When a record carries `base:` only above `## Run facts`, `--preflight` leaves a
+  non-empty `base:` inside the section.
+  Red when: `set_fact` rewrites the line above the heading. Observed red at 00c092d4.
 
 ## 7. Gates
 
@@ -270,6 +297,9 @@ New arm: `tools/unattended/unattended.test.sh` · the S4 verb-by-form matrix, ru
 New arm: `tools/unattended/check-unattended.test.sh` · a fixture with two different `phase` values under `## Run facts`, observed passing against the a7c78ad2 leg first · none
 New arm: `tools/unattended/check-unattended.test.sh` · a `phase: ABORTED` above `## Run facts`, observed reported as an aborted record by the 6ddeb7d5 leg first · none
 New arm: `tools/unattended/unattended.test.sh` · the usage-table population, the `--close`/`--abort` refusals and the section-scoped `--status` read, observed red against the 6ddeb7d5 driver first · none
+New arm: `tools/unattended/gate-guard.test.sh` · the `1a phase: LANDED` record and the CR-forged `## Parked` run-branch, observed allowed by the 00c092d4 hook first · none
+New arm: `tools/unattended/unattended.test.sh` · the matrix's CR form, park()'s CR refusal and the above-heading `base:` preflight, observed red against the 00c092d4 driver first · none
+New arm: `tools/unattended/check-unattended.test.sh` · check 36 on an unscoped `baseline_units` and a stale exemption, observed passing against the 00c092d4 leg first · none
 
 ## 8. Open questions
 
@@ -296,6 +326,11 @@ New arm: `tools/unattended/unattended.test.sh` · the usage-table population, th
   `## Run facts`; §3 records the kit's other whole-file readers as a residual. The matrix's CR arms
   now pass the byte through a variable, because a `$'\r'` spelled inside a command substitution
   lost it on node a and the attest CR arm drove a value with no CR in it.
+- rev-4 · 2026-09-24 · closing review round 2 M1 and L1: M1 adds S8 and AC10, which scope the kit's
+  remaining run-fact readers, move the LF and CR refusal into `park()`, and add leg check 36 as the
+  class gate. The §3 residual is closed except the heading-less read in `gate-guard.js`. L1 adds S9
+  and AC11, which give `set_fact` the section bounds `fact` reads. The unattended kit moves 1.34 to
+  1.35, because its shipped bytes moved after the 1.34 bump.
 
 ## 10. Reuse audit
 

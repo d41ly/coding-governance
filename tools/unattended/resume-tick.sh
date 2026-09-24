@@ -374,7 +374,13 @@ scan_worktrees() {
       ncand=$((ncand + 1))
       print_decision "$slug" "$wt" "skip · RUN.md is not tracked, and the tick launches only on a lease the index holds"
     done 8<"$strayf"
-    GIT -C "$wt" grep --cached -H -E '^(session|host): ' -- ":(glob)$mr/builds/*/RUN.md" >"$hitsf" 2>/dev/null || :
+    # THE HEADINGS RIDE WITH THE KEYS (closing review round 2 M1), so the awk keeps only the lines in
+    # each file's `## Run facts` section, the scope the driver's `fact` reads - a `session:` above the
+    # heading or under `## Parked` is not the lease. One more spawn per tree, not per record.
+    GIT -C "$wt" grep --cached -H -E '^(## |session: |host: )' -- ":(glob)$mr/builds/*/RUN.md" 2>/dev/null \
+      | awk 'match($0, /:(## |session: |host: )/) { f = substr($0, 1, RSTART - 1); r = substr($0, RSTART + 1)
+               if (substr(r, 1, 3) == "## ") { sec[f] = (index(r, "## Run facts") == 1); next }
+               if (sec[f]) print }' >"$hitsf" || :
     # The host lookup below needs the whole answer as a VALUE, so it is read in with no fork at
     # all rather than re-spawned per candidate, which would be one spawn per record again.
     hits=""; IFS= read -r -d '' hits <"$hitsf" || :

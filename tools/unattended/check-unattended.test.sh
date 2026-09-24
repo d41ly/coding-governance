@@ -2293,6 +2293,35 @@ mutate $KIT_REL/unattended.test.sh "/^check_status_one_line() {/r $TMPBIN_PARENT
 miss "$(run)" "counts a captured variable's lines by adding a newline first"
 reset_tree
 
+# ---- 36 (TOOL-aRepatriatedFork-6, closing review round 2 M1): every run-state key read routes
+# ---- through the `## Run facts` section. The staged break is the instance the round found:
+# ---- `baseline_units`' phase probe with its section filter removed, the whole-file first match
+# ---- round 1 L2 left behind. Read RED naming the library's line, then the shipped copy GREEN.
+reset_tree
+mutate $KIT_REL/lib-unattended.sh 's#| extract_run_facts | grep -m1 #| grep -m1 #'
+out=$(run)
+hit "$out" "a run-state key is read over the whole file rather than the Run facts section, so it can answer a line above the heading or under Parked that the driver's fact never reads - route it through fact, fact_of or extract_run_facts: lib-unattended.sh:"
+hit "$out" "UNATTENDED check 36 FAILED"
+reset_tree
+miss "$(run)" "UNATTENDED check 36 FAILED"
+# ...and a STALE exemption: the driver's spec-audit front-matter read removed, so the registry row
+# naming it matches nothing in a file the population holds.
+reset_tree
+mutate $KIT_REL/unattended.sh '/print "spec-audit=" v/d'
+hit "$(run)" "a run-state read exemption matches no read in the kit, and a stale exemption silently widens the surface it was written to narrow; unattended.sh ^spec-audit:"
+reset_tree
+# ...and the two LIVENESS refusals, each reached by removing what it asserts is there. No scoped read
+# at all: both of the fixture kit's section-filtered reads spelled with `cat` instead.
+mutate $KIT_REL/lib-unattended.sh 's#| extract_run_facts | grep -m1 #| cat | grep -m1 #'
+mutate $KIT_REL/check-unattended.sh 's#extract_run_facts < "[$]rvf"#cat < "$rvf"#'
+hit "$(run)" "no key read in the kit carries the Run facts scope, so the scan matched nothing it was written to find and a clean result would be coverage of nothing"
+reset_tree
+# No `phase` key derived: every `fact`/`set_fact`/`fact_of` call naming it respelled.
+mutate $KIT_REL/unattended.sh 's/\(fact[a-z_]* "[^"]*"\) phase/\1 phaze/g'
+mutate $KIT_REL/check-unattended.sh 's/\(fact[a-z_]* "[^"]*"\) phase/\1 phaze/g'
+hit "$(run)" "the run-state key derivation found no phase key, so the read scan grades against nothing: "
+reset_tree
+
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
 # ---- README. The corpus is clean, so a check with no red fixture here proves nothing - it would be
 # ---- silent whether the predicate worked or not, which is the class this kit keeps meeting.
