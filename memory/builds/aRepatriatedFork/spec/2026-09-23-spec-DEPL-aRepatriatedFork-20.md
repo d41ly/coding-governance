@@ -1,12 +1,14 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** SPECCED · rev-2 · 2026-09-23 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
+**Status:** BLOCKED · rev-3 · 2026-09-24 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-23-build-DEPL-aRepatriatedFork-20-incms-convergence-census.md](../build/2026-09-23-build-DEPL-aRepatriatedFork-20-incms-convergence-census.md) | research | — |
+| [2026-09-24-build-DEPL-aRepatriatedFork-20-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-20-1-acceptance-ledger.md) | journal | — |
+| [2026-09-24-build-DEPL-aRepatriatedFork-20-convergence-journal.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-20-convergence-journal.md) | journal | — |
 | [2026-09-24-prompt-DEPL-aRepatriatedFork-20-build-brief.md](../prompts/2026-09-24-prompt-DEPL-aRepatriatedFork-20-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -25,23 +27,29 @@ bridge rows go.
 - **S1** — THE SWAP. inCMS's four programs are replaced by gov's bytes through `govkit update
   --write`, and its `memory-hygiene` leg and three git hooks call gov's `check-memory-hygiene.sh`,
   which is already installed there byte-identical and unwired. `check-docs-hygiene.sh` and its test
-  leg retire. The `[[own]]` rows from `DEPL-aRepatriatedFork-13` S6 are deleted in the same change.
+  leg retire. The `[[own]]` rows from `DEPL-aRepatriatedFork-13` S6 are deleted in the same change,
+  where inCMS carries any. Because the four programs and `check-arms.py` are `unattributed` in the
+  receipt, `update` has no base for them, so they first take gov's bytes at the receipt's own
+  vintage, and their rows are pinned there.
   Observed by AC1, AC2.
   **Readers:** by name: READER NOT IN TREE — every reader that spells `check-docs-hygiene.sh` is
   inCMS's: two legs and three git hooks, each cited in the census record. The bridge rows are read
   by `govkit.py` once `DEPL-aRepatriatedFork-13` builds them. by value: `govkit.py` reads the
   bridge rows' role; inCMS's legs and hooks read only the engine's exit status, which gov's engine
   supplies in the same shape.
-- **S2** — THE FRONT-MATTER MIGRATION. All 324 build READMEs move to gov's syntax: `+`-joined
+- **S2** — THE FRONT-MATTER MIGRATION. Every build README (326 at build time) moves to gov's syntax: `+`-joined
   `streams` and `roster`, space-joined `ids`, `roster` rewritten from session slugs to the families
   of the build's ids. The `BEGIN/END GENERATED` wrapper and the four stray second `gen:build-index`
-  marker pairs are deleted. `status:` is authored where gov requires it, per F1. Then gov's
-  `gen_build_index.py --write` renders every index. Observed by AC3.
+  marker pairs are deleted. `status:` is authored where gov requires it, per F1. Each README's
+  generated regions move below its authored text, and each README gains the authored
+  `roster:units` pair gov's slot contract requires. The README contract and the stale-header waiver
+  are seeded, with every README exempt. Then gov's `gen_build_index.py --write` renders every index.
+  Observed by AC3.
 - **S3** — THE TREE MIGRATION. What gov's engine reds that is inCMS's layout, not its policy, moves:
   the four registries under `scripts/` to `memory/project/`, the dead-path rows rewritten to gov's
   TAB grammar, the three root memory files and 18 `STATUS.md` files folded into sanctioned homes,
   `recurring-bug-classes.md` out of `gotchas/`, and the nested `metadata:` block stripped from every
-  gotcha record. `.memory-tree.conf` declares `CHARTER`, `DISCIPLINES`, `SPEC_FORMAT_CUTOFF`, the pins
+  gotcha record. `.memory-tree.conf` declares `CHARTER`, `DISCIPLINES`, `SPEC_FORMAT_CUTOFF`, `TOMBSTONE_ROOTS`, the pins
   and the caps inCMS keeps as literals today, and re-measures `ARMS_FLOORS` for gov's engine.
   Observed by AC2.
 - **S4** — WHAT RETIRES WITH INCMS'S PROGRAMS. The about 25 `corpus_ids` internals that
@@ -174,7 +182,7 @@ project registries.
 - **AC3** — At inCMS, gov's `gen_build_index.py --check` and `--check-format` exit 0 over all 324
   READMEs.
   Red when: any README keeps list syntax, a slug roster, or a missing status.
-  figure: 324 PINNED from the 2026-09-23 measurement, re-derived at build time.
+  figure: 326, re-derived at build time on 2026-09-24. The 2026-09-23 measurement pinned 324.
 - **AC4** — At inCMS, the `recall-regression` and `lexicon` legs are green after the swap.
   Red when: a recall selftest arm still imports an inCMS-only `corpus_ids` symbol.
 - **AC5** — The journal lists every check `check-docs-hygiene.sh` defines with its disposition, and each check F5 keeps
@@ -245,6 +253,15 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
 - rev-2 · 2026-09-23 · §8 resolved under the aRepatriatedFork mandate (M3, delegated). F4
   keeps inCMS check 19 as a project leg beside F5's checks, which moves its row in §4 from a
   loss to a kept check.
+- rev-3 · 2026-09-24 · the first build pass, and the unit is BLOCKED. The migration is prepared on
+  inCMS branch `converge/aRepatriatedFork-20` at `2b8d9a5cd04089c8416670fe87c9026c01ddb09d`, which
+  is not pushed and not merged. The landing is the owner's. The journal lists the S1, S3, S4 and S5
+  work still owed on that branch before the landing. S1: inCMS has no `[[own]]` rows, because its
+  last pull predates `DEPL-aRepatriatedFork-13`. The four programs and `check-arms.py` were
+  `unattributed`, so they now carry gov's a7c78ad2 bytes, with their rows pinned at that vintage.
+  S2 gains the README layout move and the two seeded registries; without them, gov's
+  `--check-format` refused all 326 READMEs. S3 gains `TOMBSTONE_ROOTS`. AC3's figure is re-derived
+  as 326.
 
 ## 10. Reuse audit
 
