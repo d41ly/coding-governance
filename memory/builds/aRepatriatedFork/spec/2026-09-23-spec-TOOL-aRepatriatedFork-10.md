@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts
 
-**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -191,7 +191,7 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
 
 - security — no new write path; the new key is validated against a closed set before any check
   runs, and a conf value reaches the render through the existing quoted parameter substitution.
-- perf / scale — one extra awk pass over check 21's A rows, and one `sed` read of the receipt.
+- perf / scale — one extra awk pass over check 21's A rows, and one python run per render that reads the receipt as JSON and resolves each cited sibling file.
 - error / empty / loading states — blank key means today's behaviour; an unknown value aborts at
   exit 2 naming the key; an undeclared placeholder key renders its explicit undeclared text.
 - observability — the exempted artifact count prints on every run, zero included, and the key
@@ -250,7 +250,7 @@ forks exist, and the rest of those rows' deltas are inCMS-only.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `kit placeholders (a declared token its adopter substitutes)` · `kit-placeholders self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `kit version markers` · `verdict epoch (kit version dates the engine)`
+`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `kit placeholders (a declared token its adopter substitutes)` · `kit-placeholders self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `install-prefix (shipped surface)`
 
 New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a legacy-listed root `STATUS.md`, a legacy-listed unbound record, an undated `result.json` under each key value, and a tracked `pass-order-waiver.txt` · the hygiene gate's `ARMS_FLOORS` token moves by the branches S3 adds
 New arm: `tools/check-kit-placeholders.test.sh` · a template spelling `INDEX_CAP_LINES=0` under a kit whose conf declares that key · none
@@ -303,6 +303,10 @@ New arm: `tools/lib/resolve-python.test.sh` · a `derive_kit_paths` parity row, 
   and joins the resolve-python parity table; `render_doc` applies its lines before the
   parent-derived `TOOL_ROOT`. The adopter's `resolve_python` block moved above the first render,
   because `--render` now needs a python.
+- rev-6 · 2026-09-24 · §5 perf and §7 moved, found by the post-commit bug-class checklist
+  (`amendment-leaves-its-other-half-standing`, `hand-named-gate-list-green-while-the-bar-reds`):
+  §5 still priced the retired `sed` read of the receipt, and §7 did not name
+  `install-prefix (shipped surface)`, whose carried-literal list rev-5 raised by hand.
 
 ## 10. Reuse audit
 
