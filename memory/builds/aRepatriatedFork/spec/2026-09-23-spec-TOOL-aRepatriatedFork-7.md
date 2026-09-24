@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap
 
-**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -309,6 +309,12 @@ New arm: `tools/workflows/check-verifier-fanout.test.sh` · a BOM-led cap-4 chec
   name suite arms in S2 and AC3), and AC10, and moves
   S6's and S7's source from the conf to that answer. The review's own case, a malformed last line,
   was masked at the fan-out gate by the hook's denial and was already refused by the renderer.
+- rev-5 · 2026-09-24 · gate repair at VERIFYING, leg `unattended-build self-test`: rev-4 made the
+  renderer ask the hook through `check-verifier-fanout.sh --print-cap` and S7 added three template
+  pairs, but the PV-* layouts in `tools/workflows/unattended-build.test.sh` copied neither the gate,
+  the hook nor the new templates, so every render refused and each arm graded a harness that was never
+  written. The fixture now installs what `requires = ["agent-cap"]` guarantees, and the verbatim
+  control fills `{{FANOUT_CAP}}` so it parses. A stale fixture, not a product regression; no design change.
 
 ## 10. Reuse audit
 

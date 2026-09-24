@@ -1327,6 +1327,16 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
       && git config core.autocrlf false )
   cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" \
      "$HERE/REVIEW-PROTOCOL.template.md" "$HERE/tier2-review.js" "$HERE/unattended-unit.js" "$d/$kd/"
+  # THE RENDERER ASKS THE HOOK FOR FANOUT_CAP (TOOL-aRepatriatedFork-7 S11), through the fan-out
+  # gate's `--print-cap`, and refuses to render when nothing answers. `requires = ["agent-cap"]`, so a
+  # real install always has both: the gate beside the parity script, the hook where the gate's rung 2
+  # finds it, a directory up. A layout without them tests an install the kit forbids.
+  cp "$HERE/check-verifier-fanout.sh" "$d/$kd/"
+  # The three pairs S7 made rendered: the renderer refuses a set with a template missing, and
+  # `--tracked-only` would SKIP an absent live copy, so an install carries both halves of each.
+  cp "$HERE/tier2-review.template.js" "$HERE/drift-audit-code.template.js" "$HERE/drift-audit-code.js" \
+     "$HERE/drift-audit-state.template.js" "$HERE/drift-audit-state.js" "$d/$kd/"
+  mkdir -p "$d/$kd/../hooks"; cp "$ROOT/$KIT_REL/hooks/agent-cap.js" "$d/$kd/../hooks/"
   # `-` IS A REVIEW-HARNESS-ONLY INSTALL, which `requires` permits: this kit requires agent-cap and
   # nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
   if [ "$ud" != - ]; then mkdir -p "$d/$ud"; printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"; fi
@@ -1545,8 +1555,10 @@ has "PV-AC5 control: with the render and the pairs restored the leg is green aga
 # three values are this repo's own layout and none of them names a file, so the carried-prefix ban
 # has nothing here to count.
 VB="$LAY/verbatim"; build_layout "$VB" scripts/workflows scripts/unattended scripts/gotchas.py
+# FANOUT_CAP is not a path and the control does not grade it; it is filled so the harness PARSES,
+# because a surviving token is a syntax error and the arm would grade a throw instead of the paths.
 sed -e 's|{{KIT_DIR}}|tools/workflows|g' -e 's|{{TOOL_ROOT}}|tools/|g' -e 's|{{MEMORY_TREE_DIR}}|tools/memory-tree|g' \
-    "$HERE/unattended-build.template.js" > "$VB/scripts/workflows/unattended-build.js"
+    -e 's|{{FANOUT_CAP}}|5|g' "$HERE/unattended-build.template.js" > "$VB/scripts/workflows/unattended-build.js"
 check_layout "PV-AC6 the verbatim spelling:" "$VB" scripts/workflows scripts/ scripts RRRRR
 # The prefix-only half-fix: correct for this repo, and wrong for both measured adopters.
 HF="$LAY/halffix"; build_layout "$HF" scripts/workflows scripts/unattended scripts/gotchas.py
