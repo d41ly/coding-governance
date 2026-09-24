@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-24-build-DEPL-aRepatriatedFork-14-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-14-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-DEPL-aRepatriatedFork-14-build-brief.md](../prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-14-build-brief.md) | journal | — |
+| [2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-1-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
 <!-- /gen:spec-records -->
 
