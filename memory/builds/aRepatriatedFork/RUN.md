@@ -196,3 +196,5 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T03:52:42Z dispatch · item c6513db0 TOOL-aRepatriatedFork-5 · reason memory/builds/aRepatriatedFork/README.md
 
 2026-09-24T03:55:32Z dispatch · item 35b93909 TOOL-aRepatriatedFork-5 · reason tools/govkit/entries/push-main.kit.toml memory/builds/aRepatriatedFork/build/2026-09-24-build-TOOL-aRepatriatedFork-5-2-acceptance-ledger.md
+
+2026-09-24T03:58:17Z decision · item AGENTS.md:534 says GOV_GATE_CMD may name only a script this repo tracks, unmodified. After the closing-review fold (TOOL-aRepatriatedFork-5 rev-3, M1) it must also equal the kit's runner or the GATE_CMD .unattended.conf declares at the pushed sha. Adopters exporting a non-default GOV_GATE_CMD, NicoCares' 'bash scripts/unattended-bar.sh' among them, must declare it as GATE_CMD. · reason Options: (a) amend the charter sentence and its template source; (b) leave it until the owner reads this. Refused (a): AGENTS.md and the charter template are governance carriers, and M3 veto 2 puts a carrier change outside the delegation. The sentence is now incomplete rather than false: every value it admits is still required to be tracked and unmodified.
