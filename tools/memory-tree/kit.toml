@@ -300,14 +300,9 @@ why = "a sourced conf: a CR reaches the shell as part of the value"
 pattern = "{kit}/.memory-tree.conf.example"
 why = "the adopter copies it verbatim into the line above"
 
-[[hole]]
-id = "stale-header-waiver"
-kind = "measurement"
-blocks_adopt = false
-blocks_gate = false
-why = "stale-header-waiver.txt ships with its header and NO rows, in gov and in every adopter. The rows a tree needs are the headers that actually corrupted in THAT tree, so a list measured on gov's corpus is vacuous anywhere else — the same reason measured-pins and slot-budget-ceilings ship unarmed. EMPTY IS THE EXPECTED STATE and the mechanism is inert until a header rots; a MISSING file stays a refusal, because a file nobody created is a decision nobody made. The generator names how many headers it tolerated on every run, so a tree that never armed this says so rather than reporting a clean bar."
-stands_down = { when_owned = ["gen_build_index.py"], why = "only gov's gen_build_index.py reads stale-header-waiver.txt, so at a target that owns that program the file has no reader" }
-discharge = { command = ["grep", "-qvE", "^[[:space:]]*(#|$)", "{memory_root}/project/stale-header-waiver.txt"] }
+# NO HOLE FOR stale-header-waiver.txt. DEPL-aRepatriatedFork-14 S2 retired it: its probe demanded a
+# row while an EMPTY file is the expected state, and the one state worth observing, a MISSING file, is
+# already a refusal of `gen_build_index.py --check`, which hygiene check 9 runs on every bar.
 
 # DEPL-aRepatriatedFork-13 S3. THE CONTRACTS OTHER SHIPPED FILES CALL THESE ENGINES BY, so a target that
 # declares one of them `adopter-owned` in its `[[own]]` rows is told, on every `update` and `check`,

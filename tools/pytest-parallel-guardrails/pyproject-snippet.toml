@@ -1,5 +1,5 @@
 # govkit:pytest-guardrails
-# gov:kit pytest-parallel-guardrails@1.0
+# gov:kit pytest-parallel-guardrails@1.1
 #
 # The four-knob parallel-suite guardrail recipe — merge into your [tool.pytest.ini_options].
 # Requires: pytest-timeout, pytest-xdist. Full rationale + diagnosis playbook: the kit README.

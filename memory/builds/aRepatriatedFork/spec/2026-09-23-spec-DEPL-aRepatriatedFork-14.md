@@ -1,11 +1,12 @@
 # DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter
 
-**Status:** SPECCED · rev-1 · 2026-09-23 · node a · Tier-1 · base a7c78ad2 · streams deployer · order 3
+**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-1 · base a7c78ad2 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-14-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-14-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-DEPL-aRepatriatedFork-14-build-brief.md](../prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-14-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -108,8 +109,9 @@ S1's probe, as the descriptor string would carry it, reformatted here:
 
 ```python
 import subprocess, sys, tomllib
-out = subprocess.run(["git", "ls-files", "--", "*pyproject.toml"], capture_output=True,
-                     text=True, encoding="utf-8").stdout.split()
+out = [f for f in subprocess.run(["git", "ls-files", "-z", "--", "*pyproject.toml"],
+                                 capture_output=True, text=True,
+                                 encoding="utf-8").stdout.split(chr(0)) if f]
 inis = []
 for f in out:
     t = tomllib.load(open(f, "rb")).get("tool", {}).get("pytest", {}).get("ini_options")
@@ -126,7 +128,8 @@ sys.exit(0 if all(ok(i) for _f, i in inis) else 1)
 ### Inventory
 
 No function is minted in govkit's module surface. The two `selfcheck` arms are inline blocks in
-`selfcheck()`, as its existing arms are.
+`selfcheck()`, as its existing arms are, numbered 7j2 (S3) and 7j3 (S4). `selftest.py` gains
+`check_pytest_ini_probe` for AC2.
 
 ### Files touched (estimate)
 
@@ -134,7 +137,9 @@ No function is minted in govkit's module surface. The two `selfcheck` arms are i
 `tools/govkit/entries/check-testsuite-counts.kit.toml` ·
 `tools/govkit/entries/check-kit-versions.kit.toml` ·
 `tools/process-monitor/kit.toml` · `tools/govkit/registry.toml` · `tools/govkit/govkit.py` ·
-`tools/govkit/selftest.py` · `tools/pytest-parallel-guardrails/README.md`
+`tools/govkit/selftest.py` · `tools/pytest-parallel-guardrails/README.md` · and, because the
+epoch rule grades shipped bytes, the version carriers of `pytest-parallel-guardrails` (1.0 to 1.1),
+`process-monitor` (0.4 to 0.5) and `memory-tree` (2.90 to 2.91)
 
 ### Adopter deletions this unit enables
 
@@ -224,6 +229,12 @@ New arm: `tools/govkit/selftest.py` · two pytest fixtures for S1, one unsized a
 
 - rev-1 · 2026-09-23 · initial draft, grounded at a7c78ad2 on read-only `govkit check` and
   `govkit plan` runs at both adopters on 2026-09-23.
+- rev-2 · 2026-09-24 · build-time divergences. Section 4 data model: the S1 probe lists paths with
+  `git ls-files -z` and splits on NUL, so a path with a space or a quoted non-ASCII name is read
+  whole. Section 4 Inventory names the arms 7j2 and 7j3 and the `selftest.py` function. Section 4
+  Files touched adds the three version bumps the epoch rule owes. AC2's no-configuration line is the
+  probe's own stderr, which `check` does not print, so AC2 is observed through `check` for the verdict
+  and by running the descriptor's probe for the line.
 
 ## 10. Reuse audit
 

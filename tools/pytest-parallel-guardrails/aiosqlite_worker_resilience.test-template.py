@@ -1,4 +1,4 @@
-# gov:kit pytest-parallel-guardrails@1.0
+# gov:kit pytest-parallel-guardrails@1.1
 """Forced-race regression gate for the aiosqlite closed-loop seam patch.
 
 COPY into your test suite AND RENAME to `test_aiosqlite_worker_resilience.py` (this file is

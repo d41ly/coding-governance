@@ -32,3 +32,10 @@ name = "testsuite counts self-test"
 subject = "kit"
 argv = ["bash", "{prefix}/check-testsuite-counts.test.sh"]
 guard = ["{prefix}/check-testsuite-counts.sh", "{prefix}/check-testsuite-counts.test.sh"]
+
+[check]
+# Declared absence, not silence. DEPL-aRepatriatedFork-14 S3: `check` redded at every target on the
+# silence, and `selfcheck` arm 7j2 now refuses it here first.
+none = """
+this entry IS a gate: its `testsuite counts` leg reads the adopter's own manifest and waiver registry on every bar, so a separate check arm would re-run that leg under another name
+"""

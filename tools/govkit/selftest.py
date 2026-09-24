@@ -656,6 +656,47 @@ def check_playbook_hole_modes(tmp: pathlib.Path) -> None:
           p.stdout + p.stderr)
 
 
+def check_pytest_ini_probe(tmp: pathlib.Path) -> None:
+    """DEPL-aRepatriatedFork-14 AC2, AC1's class — the `pytest-ini-knobs` hole through `check`.
+
+    The config lives below the root in the first fixture, which is what the root-only probe missed.
+    """
+    sized = ('[tool.pytest.ini_options]\naddopts = "--max-worker-restart=0"\ntimeout = 300\n'
+             'timeout_method = "thread"\nsession_timeout = 1800\nfaulthandler_timeout = 240\n')
+    unsized = sized.replace("faulthandler_timeout = 240\n", "")
+    bare = '[project]\nname = "x"\n'
+    deploy = 'gov_source = "local"\nprefix = "tools"\nkits = ["pytest-parallel-guardrails"]\n'
+    line = "hole 'pytest-ini-knobs' is UNDISCHARGED"
+
+    def run_fixture(name: str, files: dict[str, str]) -> tuple[pathlib.Path, subprocess.CompletedProcess]:
+        t = make_target(tmp / name, deploy)
+        for rel, body in files.items():
+            (t / rel).parent.mkdir(parents=True, exist_ok=True)
+            (t / rel).write_text(body, encoding="utf-8", newline="\n")
+        (t / ".governance" / "install.json").write_text(
+            json.dumps({"schema": 2, "gov_source": "local", "kits": ["pytest-parallel-guardrails"],
+                        "files": [{"path": "tools/pytest-parallel-guardrails/crashprobe.py",
+                                   "role": "engine", "kit": "pytest-parallel-guardrails",
+                                   "written": True}]}, indent=2), encoding="utf-8", newline="\n")
+        settle(t)
+        return t, run("check", "--target", str(t))
+
+    _t, p = run_fixture("pi-sub", {"pyproject.toml": bare, "services/api/pyproject.toml": sized})
+    check("[aRF-14 AC1] a sized config below the root discharges the hole",
+          "pytest-parallel-guardrails: landed" in p.stdout and line not in p.stdout, p.stdout)
+    _t, p = run_fixture("pi-two", {"a/pyproject.toml": sized, "b/pyproject.toml": unsized})
+    check("[aRF-14 AC2] one sized config does not hide an unsized sibling", line in p.stdout, p.stdout)
+    t, p = run_fixture("pi-none", {"pyproject.toml": bare})
+    check("[aRF-14 AC2] no pytest table anywhere is undischarged", line in p.stdout, p.stdout)
+    import tomllib  # noqa: PLC0415
+    cmd = next(h for h in tomllib.loads((HERE.parents[1] / "tools" / "pytest-parallel-guardrails" /
+                                          "kit.toml").read_text(encoding="utf-8"))["hole"]
+               if h["id"] == "pytest-ini-knobs")["discharge"]["command"]
+    q = subprocess.run([sys.executable, *cmd[1:]], cwd=str(t), capture_output=True, text=True)
+    check("[aRF-14 AC2] ...and its probe says no pytest configuration is tracked",
+          q.returncode != 0 and "no tracked pyproject.toml carries" in q.stderr, q.stderr)
+
+
 def check_shipped_verb(tmp: pathlib.Path) -> None:
     """TOOL-aRepatriatedFork-16 S1 — `shipped` over a fixture registry: one entry, two roles.
 
@@ -1113,6 +1154,7 @@ def main() -> int:
         check_shipped_verb(tmp)
         check_epoch_verb(tmp)
         check_adopter_owned(tmp / "own")
+        check_pytest_ini_probe(tmp / "pi")
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
@@ -1985,6 +2027,29 @@ user_skills = "/tmp/gk-fake-skills"
               rsd.returncode != 0
               and "non-entries named: playbook-rendr" in rsd.stdout, rsd.stdout + rsd.stderr)
         pk.write_text(pkeep, encoding="utf-8")
+
+        # --- DEPL-aRepatriatedFork-14 AC4: arm 7j2, an entry declaring no `[check]` table at all.
+        tc = gcopy / "tools" / "govkit" / "entries" / "check-testsuite-counts.kit.toml"
+        tkeep = tc.read_text(encoding="utf-8")
+        tc.write_text(tkeep.split("\n[check]\n", 1)[0] + "\n", encoding="utf-8")
+        r14 = _run_selfcheck(gcopy)
+        check("[aRF-14 AC4] selfcheck refuses an entry declaring neither [check].argv nor none",
+              r14.returncode != 0 and "entry 'check-testsuite-counts' declares neither" in r14.stdout,
+              r14.stdout + r14.stderr)
+        tc.write_text(tkeep, encoding="utf-8")
+
+        # --- DEPL-aRepatriatedFork-14 AC7: arm 7j3, a descriptor leg running its own withheld file.
+        pmk = gcopy / "tools" / "process-monitor" / "kit.toml"
+        pmkeep = pmk.read_text(encoding="utf-8")
+        pmk.write_text(pmkeep + '\n[[gate_leg]]\nname = "pm fixture leg"\nsubject = "kit"\n'
+                       'argv = ["python", "{kit}/selftest.py"]\nguard = []\n', encoding="utf-8")
+        r14 = _run_selfcheck(gcopy)
+        check("[aRF-14 AC7] selfcheck refuses a gate leg naming its own project-owned path",
+              r14.returncode != 0 and "gate leg 'pm fixture leg' runs tools/process-monitor/selftest.py, "
+              "which its own `project-owned` rule withholds" in r14.stdout, r14.stdout + r14.stderr)
+        pmk.write_text(pmkeep, encoding="utf-8")
+        check("[aRF-14] and the gov copy is green again with both descriptors restored",
+              _run_selfcheck(gcopy).returncode == 0, "")
 
         # ===== unit 4: the gate-runner declaration, end to end =====
         # The interpreter is spelled by PATH, never by name. A bare `python` inside the fixture's

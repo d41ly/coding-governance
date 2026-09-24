@@ -453,6 +453,14 @@ name = "codebase-map adopter e2e"
 why = "it runs `adopt-codebase-map.test.sh`, which `tools/codebase-map/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
+name = "process-monitor census selftest"
+why = "it runs `selftest.py`, which the process-monitor descriptor withholds with `role = \"project-owned\"`: the suite's subject is the census checker in that directory, so it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor: there it printed a `SILENT` row in every adopter's `plan`, and selfcheck arm 7j3 now refuses that. DEPL-aRepatriatedFork-14."
+
+[[exempt_leg]]
+name = "process-monitor adopter selftest"
+why = "it runs `adopt-process-monitor.test.sh`, which the process-monitor descriptor withholds with `role = \"project-owned\"`: the suite's subject is the adopter in that directory, so it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor: there it printed a `SILENT` row in every adopter's `plan`, and selfcheck arm 7j3 now refuses that. DEPL-aRepatriatedFork-14."
+
+[[exempt_leg]]
 name = "drift-audit selftest"
 why = "it runs `selftest.py`, which `tools/drift-audit/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 

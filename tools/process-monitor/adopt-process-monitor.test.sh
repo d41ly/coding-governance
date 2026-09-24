@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-process-monitor.test.sh — the adopter's refusals, each staged and observed RED.
 #
-# gov:kit process-monitor@0.4
+# gov:kit process-monitor@0.5
 #
 # Every arm here stages a break into a SCRATCH copy of the conf and asserts the adopter refuses.
 # Nothing is asserted about the shipped tree except by the two arms that say so, because a suite

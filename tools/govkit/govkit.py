@@ -2172,6 +2172,9 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # `drift-audit` copies it, both relying on `silenced_legs` to drop the leg with the file — and
     # failing on those would red a design. A leg naming a path NO rule resolves to at ANY role is
     # the defect. Measured before wiring: 3 hits, of which 2 were those withholds and 1 was F1.
+    # DEPL-aRepatriatedFork-14 S4 REVERSED the first half: a withheld leg printed a `SILENT` row in
+    # every adopter's `plan`, so arm 7j3 below now refuses a leg naming its OWN descriptor's
+    # `project-owned` path, and such a leg moves to an `[[exempt_leg]]` row instead.
     #
     # WHAT THIS DOES NOT CHECK. Whether the file gov ships to that path is the RIGHT one, whether
     # the leg passes, or an argv element carrying an UNANSWERED intake token — this fixture answers
@@ -2319,6 +2322,40 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             if wired and not accepts and cand.name in "".join(chk.get("argv") or []):
                 r.fail(f"entry '{eid}': `[check].argv` names {cand.name}, which has no `--check` arm")
     r.note(f"check wiring: {n_scanned} shipped script(s) read")
+
+    # ---- 7j2: DEPL-aRepatriatedFork-14 S3. EVERY ENTRY DECLARES `[check].argv` OR `[check].none`.
+    #          `run_kit_check` already refuses the silence, but only at a target and only after the
+    #          install, which is reporting a gov authoring defect to the one person who cannot fix
+    #          it. Same predicate, lifted here. DOES NOT CHECK that the argv passes or the reason is
+    #          true; 7j above grades the argv's wiring, and nothing can grade a reason.
+    _no_check = sorted(eid for eid, (d, _p) in descs.items()
+                       if not (d.get("check") or {}).get("argv") and "none" not in (d.get("check") or {}))
+    for eid in _no_check:
+        r.fail(f"entry '{eid}' declares neither `[check].argv` nor `[check] = {{ none = \"…\" }}` — "
+               f"`govkit check` reds this at every target selecting it; declare the absence with a "
+               f"reason")
+
+    # ---- 7j3: DEPL-aRepatriatedFork-14 S4. NO `[[gate_leg]]` RUNS A PATH ITS OWN DESCRIPTOR
+    #          WITHHOLDS. A `project-owned` rule means no target ever receives that file, so the leg
+    #          is emitted nowhere and prints a `SILENT` row in every adopter's `plan`. The bare-target
+    #          arm cannot see it, because it counts an `order` row as a produced file. A gov-only leg
+    #          is an `[[exempt_leg]]` row in the registry. DOES NOT CHECK a path withheld by ANOTHER
+    #          descriptor, or an argv element without a `/` (the `silenced_legs` predicate's own gap).
+    _legs_graded = 0
+    for eid, (d, _p) in sorted(descs.items()):
+        _ctx = canonical_ctx(eid)
+        _held = {p for x in resolve_entry(root, d, _ctx)["unlanded"] if x["role"] == "project-owned"
+                 for p in (x["dest"], x["src"]) if p}
+        for leg in d.get("gate_leg", []):
+            _legs_graded += 1
+            for a in leg.get("argv", []):
+                s = resolve_tokens(a, _ctx)[0]
+                if s in _held:
+                    r.fail(f"entry '{eid}' gate leg '{leg.get('name')}' runs {s}, which its own "
+                           f"`project-owned` rule withholds from every target — move the leg to an "
+                           f"`[[exempt_leg]]` row in tools/govkit/registry.toml")
+    r.note(f"declared check: {len(descs)} entries, {len(_no_check)} silent · withheld-path legs: "
+           f"{_legs_graded} descriptor leg(s) graded")
 
     # ---- 7k: entry-level `scope` is DERIVED and asserted against the declared value. Every
     #          descriptor declares one and the engine read only the rule-level spelling, so the

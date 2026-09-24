@@ -1493,6 +1493,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "check_pytest_ini_probe",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_quiet",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"

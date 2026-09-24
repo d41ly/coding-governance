@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """classify.py — age DECIDES, the CPU rate LABELS.
 
-gov:kit process-monitor@0.4
+gov:kit process-monitor@0.5
 
 Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md
 
