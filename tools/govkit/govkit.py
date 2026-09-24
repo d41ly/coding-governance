@@ -3471,6 +3471,11 @@ SHELL_EXEC_SITES = {
     "read_gate_verdicts": "target",  # the target's own `[gate_runner].command` — apply-only, printed
     "decline_findings": "target",    # `[[decline]].discharge.command` — opt-in, printed
     "hook_probe": "target-code",     # `git hook run pre-commit` — gov's ARGV, the TARGET's SCRIPT
+    # TOOL-aRepatriatedFork-11 S3/S4. Both run the TARGET's installed `settings-merge.py`, found
+    # through a receipt row, with an argv built from receipt rows: gov's argv, the target's program,
+    # and reached only from `apply` and `update` — the `hook_probe` shape.
+    "run_fragment_merges": "target-code",
+    "remove_wired_fragments": "target-code",
     # DEPL-aRepatriatedFork-13 S4. A `[[contract]]` probe: gov's argv, the TARGET's program, and one
     # target value — the receipt row's `path`, re-graded strictly every run — substituted into it.
     # `target` and not `target-code`, because it is reached from the read-only `check` too.
@@ -4645,8 +4650,8 @@ def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str]
         return {}
     added: dict[str, list[str]] = {}
     for p, kit in frags:
-        argv = [sys.executable, sm, settings, "--fragment", p]
-        if subprocess.run(argv + ["--check"], cwd=str(target), capture_output=True,
+        if subprocess.run([sys.executable, sm, settings, "--fragment", p, "--check"],
+                          cwd=str(target), capture_output=True,
                           text=True, encoding="utf-8").returncode == 0:
             print(f"govkit {verb} — hooks: {p} already wired")
             continue
@@ -4660,7 +4665,8 @@ def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str]
                 subprocess.run([sys.executable, sm, str(probe), "--unwire", "--fragment", p],
                                cwd=str(target), capture_output=True, text=True, encoding="utf-8")
                 stale = probe.read_bytes() != (target / settings).read_bytes()
-        out = subprocess.run(argv, cwd=str(target), capture_output=True, text=True, encoding="utf-8")
+        out = subprocess.run([sys.executable, sm, settings, "--fragment", p],
+                             cwd=str(target), capture_output=True, text=True, encoding="utf-8")
         if out.returncode != 0:
             print(f"govkit {verb} — hooks: {p} REFUSED by settings-merge (exit {out.returncode}): "
                   + ((out.stderr or out.stdout).strip().splitlines() or ["no output"])[-1])

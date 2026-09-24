@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-11 — unattended: build-root pathspecs stop at the build root, and a pull lands its hooks wired and its pins measurable
 
-**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling+deployer · order 6
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling+deployer · order 6
 
 <!-- gen:spec-records -->
 
@@ -255,6 +255,11 @@ The new leg `unattended protocol size` is not an arm; AC6 observes its failing c
   census of 188:180, and the new branch is armed; the govkit selftest arm drives the two helpers
   `update` calls rather than a whole `update --write` fixture, so AC3's ordering half is by the call
   site's placement and is owed to that fixture.
+- rev-3 · 2026-09-24 · gate repair at VERIFYING, leg `govkit selftest`. S3 and S4's two helpers
+  spawn the target's `settings-merge.py` and no `SHELL_EXEC_SITES` row declared them. Both are
+  declared `target-code`: gov's argv, the target's program, reached only from `apply` and `update`.
+  Each call spells its argv inline, as the source arm requires of an argv that is not routed through
+  `resolve_shell_argv`. A census gap, fixed in `govkit.py`.
 
 ## 10. Reuse audit
 
