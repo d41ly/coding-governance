@@ -28,3 +28,4 @@ or written: the lowered-cap install is a fixture.
 - AC7 — `tools/workflows/check-verifier-fanout.sh` — in the lowered install it printed `clean — 6 workflow script(s) obey the ≤4-verifier rule`, exit 0
 - AC8 — `FANOUT_CAP=4` — the render wrote 4 at every section 4 site of all four harnesses and the verifier gate judged them clean; restoring the cap-5 `tier2-review.js` there exited 1 naming it
 - AC9 — `bash tools/check-kit-versions.sh` — exit `0` at agent-cap 1.19 and drift-audit 1.12; with the scratch-guard marker reverted to 1.18 it exited 1 naming `tools/hooks/scratch-guard.js`, and with `drift-audit-state.js` reverted to 1.11 it exited 1 naming it
+- AC10 — `--print-cap` — with a BOM-led `FANOUT_CAP=4` conf the hook printed 4, the verifier gate printed `obey the ≤4-verifier rule` and the renderer's token block set 4, where HEAD 0255d655's two seds answered 5; `FANOUT_CAP=4` then `abc` exited 2 naming `.agent-cap.conf`, and a payload on stdin exited 2

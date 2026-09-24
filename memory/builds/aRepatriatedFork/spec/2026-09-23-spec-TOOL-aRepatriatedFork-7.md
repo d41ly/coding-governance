@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap
 
-**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -48,6 +48,10 @@ costing a five-file fork.
   Observed by AC8.
 - **S8** — `agent-cap`, `review-harness` and `drift-audit` bump, and `TOOL-dRetiredFork-24` closes
   with its "not live today" paragraph corrected by the measurement in §4. Observed by AC9.
+- **S11** — The hook ANSWERS the effective cap: `agent-cap.js --print-cap` prints it for the checkout
+  it stands in, or exits 2 with the deny message, and denies if a payload arrives on stdin, so a
+  wired copy fails closed. S6's clean line and S7's renderer ask it, the renderer through
+  `check-verifier-fanout.sh --print-cap`, and neither parses `.agent-cap.conf`. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -153,6 +157,7 @@ section `tools/workflows/README.md:50-53` points at.
 | `FANOUT_CAP` | conf key and render token |
 | `loadDeclaredCap` | `js.function`; `lexicon.py --suggest` answered OK for it on 2026-09-23 |
 | `EFFECTIVE_CAP` | JS module constant, the value every enforcement site reads |
+| `--print-cap` | hook flag and verifier fan-out gate flag, the effective cap's one answer (S11) |
 | three `*.template.js` files | review-harness and drift-audit templates |
 
 ### Migration
@@ -250,6 +255,11 @@ or its own cap-4 fork is overwritten by a cap-5 render its hook denies.
 - **AC9** — After the bumps, `bash tools/check-kit-versions.sh` exits `0`, and with one bumped carrier
   reverted it exits non-zero naming it.
   Red when: a carrier was missed.
+- **AC10** — With a BOM-led `FANOUT_CAP=4` conf, `tools/hooks/agent-cap.js --print-cap` prints `4`,
+  `tools/workflows/check-verifier-fanout.sh` prints `obey the ≤4` in its clean line, and the
+  renderer's `FANOUT_CAP` is 4; with `FANOUT_CAP=4` followed by `FANOUT_CAP=abc`, `--print-cap`
+  exits 2 naming `.agent-cap.conf`; and a payload on its stdin exits 2.
+  Red when: a shell reader answers a cap the hook does not enforce.
 
 ## 7. Gates
 
@@ -258,6 +268,8 @@ or its own cap-4 fork is overwritten by a cap-5 render its hook denies.
 New arm: `tools/hooks/agent-cap.test.sh` · the nesting matrix, piped first to the a7c78ad2 hook to observe the nested forms admitted at exit 0 · none
 New arm: `tools/hooks/agent-cap.test.sh` · conf fixtures at 4, 6, 0 and a word, observed first against the a7c78ad2 hook admitting a cap-5 helper under a declared 4 · none
 New arm: `tools/workflows/check-protocol-parity.test.sh` · a template with a surviving `{{FANOUT_CAP}}`, observed first to pass the pre-change parity mode · none
+New arm: `tools/hooks/agent-cap.test.sh` · `--print-cap` over no conf, 4, a BOM-led 4, a malformed last line and a stdin payload, observed first against 0255d655 answering nothing · none
+New arm: `tools/workflows/check-verifier-fanout.test.sh` · a BOM-led cap-4 checkout and `--print-cap` relaying a refusal, observed first against 0255d655 printing ≤5 · none
 
 ## 8. Open questions
 
@@ -289,6 +301,12 @@ New arm: `tools/workflows/check-protocol-parity.test.sh` · a template with a su
   drift-audit declares both templates in `marker_carriers`, which `govkit selfcheck` required.
   The tier2-review meta prose that states the cap renders the token too, so no rendered text types
   the ceiling over a lowered cap.
+- rev-4 · 2026-09-24 · closing review round 1 residual (b): S6 and S7 re-parsed `.agent-cap.conf`
+  with their own seds, which missed a BOM-led line the hook reads, so the renderer wrote cap-5
+  harnesses under a hook enforcing 4. Adds S11, the hook's `--print-cap` answer (S9 and S10 already
+  name suite arms in S2 and AC3), and AC10, and moves
+  S6's and S7's source from the conf to that answer. The review's own case, a malformed last line,
+  was masked at the fan-out gate by the hook's denial and was already refused by the renderer.
 
 ## 10. Reuse audit
 

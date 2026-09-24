@@ -8,6 +8,7 @@
 #
 #   bash tools/workflows/check-verifier-fanout.sh          # every workflow script git can see
 #   bash tools/workflows/check-verifier-fanout.sh <file>…  # explicit files (the self-test's fixtures)
+#   ... --print-cap                                         # the hook's effective fan-out cap
 #
 # Exit 0 = clean · 1 = a rule the hook enforces is broken · 2 = misconfigured.
 #
@@ -48,6 +49,11 @@ for _cand in "$HERE/hooks/agent-cap.js" "$HERE/../hooks/agent-cap.js" "$ROOT/.cl
 done
 [ -n "$HOOK" ] || { echo "verifier-fanout: no agent-cap.js at $HERE/hooks/, $HERE/../hooks/ or $ROOT/.claude/hooks/ — this gate has no predicate to delegate to"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "verifier-fanout: node not found — the predicate is a node hook"; exit 2; }
+
+# `--print-cap` relays the hook's answer for this checkout's effective fan-out cap and judges nothing.
+# It exists so a sibling in this kit (check-protocol-parity.test.sh) asks the hook through the one
+# probe above, instead of locating the hook again or re-parsing `.agent-cap.conf` itself.
+[ "${1:-}" = --print-cap ] && exec node "$HOOK" --print-cap </dev/null
 
 # The gate and its fixtures are outside their own population: the test's RED fixtures spell the banned
 # shape on purpose, and a fixture that lands in the repo would otherwise make the merge bar
@@ -111,11 +117,9 @@ while IFS= read -r f; do
   fi
 done <<<"$SCAN"
 
-# THE CAP PRINTED IS THE EFFECTIVE ONE (TOOL-aRepatriatedFork-7 S6): `FANOUT_CAP` from `.agent-cap.conf`
-# at the root the hook resolved it from (this script stands there), else the ceiling. DISPLAY ONLY —
-# the hook judged every file above against the same file, and a malformed value already redded them.
-CAPN=$(tr -d '\r' < .agent-cap.conf 2>/dev/null \
-  | sed -n 's/^[[:space:]]*FANOUT_CAP[[:space:]]*=[[:space:]]*"\{0,1\}\([0-9][0-9]*\)"\{0,1\}[[:space:]]*$/\1/p' | tail -1)
-[ -n "$CAPN" ] && CAPN=$((10#$CAPN)) || CAPN=5
+# THE CAP PRINTED IS THE EFFECTIVE ONE (TOOL-aRepatriatedFork-7 S6), and the HOOK answers it for the
+# root this script stands in (closing review round 1 residual b): the sed this replaced matched
+# nothing on a BOM-led conf and printed the ceiling over a hook enforcing 4. A refusal reds the run.
+CAPN=$(node "$HOOK" --print-cap </dev/null 2>&1) || { printf 'verifier-fanout: %s\n' "$CAPN"; st=1; }
 [ "$st" = 0 ] && echo "verifier-fanout: clean — $n workflow script(s) obey the ≤$CAPN-verifier rule"
 exit "$st"

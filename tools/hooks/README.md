@@ -201,6 +201,11 @@ prints the effective cap and names the file that lowered it. The lens allowance 
   tracked file is admissible where the `AGENT_CAP` environment knob is not.
 - **Grammar.** `FANOUT_CAP=4` or `FANOUT_CAP="4"`; the last such line wins, as a shell `.` reads it.
   A linked worktree reads its own checkout's file.
+- **Ask the hook, never parse the file.** `node agent-cap.js --print-cap </dev/null`, run from inside
+  the checkout, prints the effective cap, or exits 2 with the deny message on a malformed
+  declaration. The shell readers that need the number ask it, because a second parser is a second
+  answer: a sed missed a BOM-led line the hook reads. A payload on stdin makes it DENY, so it must
+  never be wired.
 - **One key for both rules.** The charter's concurrency bound and its verify-stage total are two
   rules, and this one number lowers both (TOOL-aRepatriatedFork-7 F1; a second key is additive later).
 - **The shipped harnesses follow it.** The review-harness kit renders `{{FANOUT_CAP}}` from this same

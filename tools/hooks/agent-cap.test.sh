@@ -1773,6 +1773,36 @@ rm -f "$CAPREPO/.agent-cap.conf"
 for k in 1 2 3 4 5; do check_spawn "declared cap: no conf, direct spawn $k -> allow" 0 p-five "u$k"; done
 check_spawn "declared cap: no conf, direct spawn 6 -> deny (control)" 2 p-five u6 '5 of 5 claimed'
 
+# ---- TOOL-aRepatriatedFork-7, closing review round 1 residual (b): the hook ANSWERS the cap ------
+# Two shell readers used to re-parse `.agent-cap.conf` with a sed of their own, and a conf saved with a
+# byte-order mark was the measured divergence: this hook read 4 (JavaScript's `\s` spans U+FEFF) while
+# both seds matched nothing and answered 5, so the parity renderer wrote cap-5 harnesses this hook
+# denies. `--print-cap` is the one answer they now ask for. Each arm pairs the ANSWER with the
+# ENFORCEMENT over the same bytes, so the two cannot be graded apart.
+check_print() { # name expected_exit expected_stdout [text stderr must carry]
+  local out got
+  out=$(cd "$CAPREPO/sub" && node "$HOOK" --print-cap </dev/null 2>"$TMP/err"); got=$?
+  if [ "$got" = "$2" ] && [ "$out" = "$3" ] && { [ -z "${4:-}" ] || grep -qF -- "$4" "$TMP/err"; }; then
+    echo "ok   $1 (exit $got, '$out')"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got '$out', want $2 '$3'${4:+, stderr carrying '$4'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+check_print "print-cap: no conf answers the ceiling" 0 5
+printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
+check_print "print-cap: a declared 4 answers 4" 0 4
+printf '\357\273\277FANOUT_CAP=4\r\n' > "$CAPREPO/.agent-cap.conf"
+check_cap "print-cap: a BOM-led conf still LOWERS the enforced cap" 2 5 'above the 4-agent cap'
+check_print "print-cap: ...and the answer is the enforced 4, not a re-parser's 5" 0 4
+printf 'FANOUT_CAP=4\nFANOUT_CAP=abc\n' > "$CAPREPO/.agent-cap.conf"
+check_print "print-cap: the LAST line wins and a malformed one refuses, naming the file" 2 '' '.agent-cap.conf declares FANOUT_CAP=abc'
+# Fail CLOSED if it is ever WIRED: a payload on stdin is a tool call being judged, and a query mode
+# that exits 0 on it would admit every call with no diff -- the `--only` hazard check-wiring polices.
+rm -f "$CAPREPO/.agent-cap.conf"
+printf '{"tool_name":"Workflow","tool_input":{"script":"x"}}' | (cd "$CAPREPO/sub" && node "$HOOK" --print-cap) >/dev/null 2>"$TMP/err"; got=$?
+if [ "$got" = 2 ] && grep -qF -- 'must not be wired' "$TMP/err"; then echo "ok   print-cap: a payload on stdin is denied, not admitted (exit $got)"; pass=$((pass+1))
+else echo "FAIL print-cap: a payload on stdin (exit $got, want 2 naming 'must not be wired')"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+
 # ---- S10: `verbatim` is CHECKED, not asserted ----------------------------------------------------
 # The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
 # differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.

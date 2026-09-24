@@ -38,7 +38,7 @@
 #   KIT_DIR          this kit's directory, repo-relative — the harness's own siblings live in it
 #   TOOL_ROOT        the directory the kits sit in, with a trailing slash; empty at a root install
 #   MEMORY_TREE_DIR  the directory holding the memory-tree kit's `gotchas.py`
-#   FANOUT_CAP       the fan-out cap, from `.agent-cap.conf` at the root as the agent-cap hook reads it
+#   FANOUT_CAP       the fan-out cap for this checkout, as the agent-cap hook ANSWERS it (`--print-cap`)
 # The third is NOT derivable from the second. Both adopters measured when this was written install
 # the memory-tree kit FLAT, directly in their tool root, so `TOOL_ROOT` plus `memory-tree/` names a
 # file neither of them has. It is PROBED instead: the first TRACKED of the nested and the flat
@@ -94,32 +94,22 @@ $KITREL/tier2-review.js|$KITREL/tier2-review.template.js
 $KITREL/drift-audit-code.js|$KITREL/drift-audit-code.template.js
 $KITREL/drift-audit-state.js|$KITREL/drift-audit-state.template.js"
 
-# FANOUT_CAP, THE FOURTH TOKEN — TOOL-aRepatriatedFork-7 S7. Read from the file the agent-cap hook
-# reads, `.agent-cap.conf` at this checkout's root, with the hook's grammar and the hook's default:
-# the LAST `FANOUT_CAP=<n>` line wins, double quotes are optional, and an absent file or key means
-# the ceiling. A value outside 1..5 REFUSES here as the hook denies it there, because a harness
-# rendered at a cap its own hook will not admit is exactly the fork this token retires. The value
-# is normalized to plain decimal: `05` would render a legacy octal literal that strict mode rejects.
-FANOUT_CAP=5
-if [ -f .agent-cap.conf ]; then
-  _fc=$(tr -d '\r' < .agent-cap.conf | sed -n 's/^[[:space:]]*FANOUT_CAP[[:space:]]*=/=/p' | tail -1)
-  if [ -n "$_fc" ]; then
-    _fc=${_fc#=}
-    _fc=$(printf '%s' "$_fc" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
-    case "$_fc" in \"*\") _fc=${_fc#\"}; _fc=${_fc%\"} ;; esac
-    case "$_fc" in
-      ''|*[!0-9]*) _fc_ok=0 ;;
-      *) if [ "$((10#$_fc))" -ge 1 ] && [ "$((10#$_fc))" -le 5 ]; then _fc_ok=1; else _fc_ok=0; fi ;;
-    esac
-    if [ "$_fc_ok" != 1 ]; then
-      echo "protocol-parity: .agent-cap.conf declares FANOUT_CAP=$_fc, and the declared cap must be an"
-      echo "  integer from 1 to 5 -- the agent-cap hook denies every call over this file, so no harness"
-      echo "  rendered from it could run. Nothing was rendered or graded."
-      exit 2
-    fi
-    FANOUT_CAP=$((10#$_fc))
-  fi
+# FANOUT_CAP, THE FOURTH TOKEN — TOOL-aRepatriatedFork-7 S7. ANSWERED BY THE HOOK, never parsed here
+# (closing review round 1 residual b): this used to re-read `.agent-cap.conf` with a sed of its own,
+# which matched nothing on a BOM-led line and rendered cap-5 harnesses under a hook enforcing 4. The
+# sibling gate's `--print-cap` locates the hook and relays its answer for this checkout, so the value
+# rendered is the value enforced. A refusal stops here as the hook denies there, because a harness
+# rendered at a cap its own hook will not admit is exactly the fork this token retires.
+if ! FANOUT_CAP=$(bash "$HERE/check-verifier-fanout.sh" --print-cap 2>&1); then
+  echo "protocol-parity: the agent-cap hook would not answer the effective fan-out cap:"
+  printf '%s\n' "$FANOUT_CAP" | sed 's/^/  /'
+  echo "  Nothing was rendered or graded."
+  exit 2
 fi
+case "$FANOUT_CAP" in
+  [1-9]) ;;
+  *) echo "protocol-parity: the agent-cap hook answered '$FANOUT_CAP' for the fan-out cap, not a digit 1-9. Nothing was rendered or graded."; exit 2 ;;
+esac
 
 check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
 

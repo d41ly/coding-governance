@@ -1938,6 +1938,28 @@ function checkSpecAuditDeclared(data) {
 }
 
 function main() {
+  // TOOL-aRepatriatedFork-7, closing review round 1 residual (b) — `--print-cap` ANSWERS the effective
+  // cap for the checkout the caller stands in, and judges nothing. The shell readers that need the
+  // number (the verifier fan-out gate's clean line, the review-harness renderer's FANOUT_CAP token)
+  // ask here instead of re-parsing `.agent-cap.conf`: two parsers of one file are two answers to one
+  // question, and a BOM-led conf was the measured case where they disagreed. Exit 0 prints the
+  // integer; a malformed declaration exits 2 with the deny message, as every call would be denied.
+  // FAIL CLOSED IF WIRED: a payload on stdin is a tool call being judged, and a query mode that exited
+  // 0 on it would admit every call with no diff. A caller redirects stdin from /dev/null.
+  if (process.argv.slice(2).includes('--print-cap')) {
+    if (!process.stdin.isTTY && readStdin().trim() !== '') {
+      process.stderr.write('BLOCKED by agent-cap: --print-cap is a query mode and must not be wired — it judges no call. Remove it from the hook command.\n')
+      process.exit(2)
+    }
+    const asked = loadDeclaredCap(process.cwd())
+    if (asked.error) {
+      process.stderr.write(`agent-cap: ${asked.error}.\n`)
+      process.exit(2)
+    }
+    process.stdout.write(`${Math.min(asked.cap, MAX_VERIFIERS)}\n`)
+    process.exit(0)
+  }
+
   // TOOL-dTieredTribunal-14 S4 - a rule selector over a CLOSED set, so a second entry point can ask
   // for ONE rule. Absent runs every rule, which is the wiring's invocation and is unchanged.
   // Anything outside the set REFUSES rather than silently matching nothing, which would be this

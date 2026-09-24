@@ -46,6 +46,17 @@ arm 'a bounded harness is clean' 'obey the ≤5-verifier rule' bash "$GATE" "$TM
 # Both states over the SAME two files: a gate that only ever reds is not discriminating, it is broken.
 arm 'a mixed set reports only the offender' 'the-incident.js' bash "$GATE" "$TMP/bounded.js" "$TMP/the-incident.js"
 
+# THE CAP IT PRINTS IS THE HOOK'S ANSWER (TOOL-aRepatriatedFork-7, closing review round 1 residual b).
+# This gate used to re-parse `.agent-cap.conf` with its own sed, which matched nothing on a BOM-led
+# line and printed the ceiling over a hook enforcing 4. The fixture is a checkout of its own, because
+# the gate reads the conf at the root it stands in.
+CR="$TMP/caprepo"; mkdir -p "$CR" && git -C "$CR" init -q
+sed 's/= 5$/= 4/; s/), 5)$/), 4)/' "$TMP/bounded.js" > "$CR/bounded4.js"
+printf '\357\273\277FANOUT_CAP=4\r\n' > "$CR/.agent-cap.conf"
+arm 'a BOM-led conf prints the enforced cap' 'obey the ≤4-verifier rule' bash -c 'cd "$1" && bash "$2" bounded4.js' _ "$CR" "$GATE"
+printf 'FANOUT_CAP=4\nFANOUT_CAP=abc\n' > "$CR/.agent-cap.conf"
+arm '--print-cap relays the hook refusal, naming the file' '.agent-cap.conf declares FANOUT_CAP=abc' bash -c 'cd "$1" && bash "$2" --print-cap' _ "$CR" "$GATE"
+
 # The DISCOVERY path — the shipped tree. Every arm above hands the gate explicit files, and the
 # explicit path never touches git, so none of them exercises the population.
 arm 'the shipped tree is clean' 'verifier-fanout: clean' bash "$GATE"
