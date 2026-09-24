@@ -9,10 +9,13 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-8 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-20
+unpushed-at-landing: 0
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
-witness: d393c445005dd56210181a7248c0a99fb9d6b947
-phase: LANDING
+witness: b30156bd8afabb611ea1be9581a1e2c76a76e3ca
+phase: LANDED
 mode: slug
 run-branch: refs/heads/branch/arepatriated-fork-build-e42158
 anchor-kind: default-branch
