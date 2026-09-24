@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-10 — the memory-tree engine grandfathers what it says it does, and its rendered docs state the adopter's own facts
 
-**Status:** CLOSED · rev-6 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-7 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -308,6 +308,9 @@ New arm: `tools/lib/resolve-python.test.sh` · a `derive_kit_paths` parity row, 
   (`amendment-leaves-its-other-half-standing`, `hand-named-gate-list-green-while-the-bar-reds`):
   §5 still priced the retired `sed` read of the receipt, and §7 did not name
   `install-prefix (shipped surface)`, whose carried-literal list rev-5 raised by hand.
+- rev-7 · 2026-09-24 · S7: gate repair at VERIFYING, leg `kit placeholders`. A value opening with a
+  `<...>` placeholder is a format description, not a conf value; the template's `ARMS_FLOORS` format
+  line, older than this build, read as gov's value once `TOOL-aRepatriatedFork-9` declared the key.
 
 ## 10. Reuse audit
 

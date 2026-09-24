@@ -193,7 +193,11 @@ def scan_conf_leaks(root):
     """(template, key) for every `KEY=value` a `rendered` template spells for its own kit's key.
 
     A value is anything but whitespace, a backtick or `{` after the `=`: a bare `KEY=` in prose names
-    the key, and `KEY={{...}}` is the render this arm asks for."""
+    the key, and `KEY={{...}}` is the render this arm asks for. A value that OPENS with a `<...>`
+    placeholder, quoted or not, is a format description (`KEY="<gate>:<n>"`) and states no value,
+    so it is not a leak: no real value of a conf key begins with `<`. Gate repair at VERIFYING,
+    TOOL-aRepatriatedFork-10: the build declared ARMS_FLOORS a kit key, and the template's format
+    line for it, older than the build, then read as gov's value."""
     leaks = []
     templates = 0
     for desc in sorted(root.glob(KIT_GLOB)):
@@ -213,7 +217,7 @@ def scan_conf_leaks(root):
                     templates += 1
                     text = read_bytes_as_text(tpl)
                     for key in sorted(rule_keys):
-                        if re.search(r"(?<![A-Za-z0-9_])" + re.escape(key) + r"=[^\s`{]", text):
+                        if re.search(r"(?<![A-Za-z0-9_])" + re.escape(key) + r"=(?!\"?<)[^\s`{]", text):
                             leaks.append((tpl.relative_to(root).as_posix(), key))
     return leaks, templates
 

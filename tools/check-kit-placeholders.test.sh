@@ -15,7 +15,7 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=11
+FLOOR_ASSERTIONS=12
 GATE="$(cd "$(dirname "$0")" && pwd)/check-kit-placeholders.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -116,6 +116,12 @@ arm "a rendered template spelling its own kit's conf value REDS" 1 "$rc7" "$o7" 
 printf 'This tree declares `INDEX_CAP_LINES={{KIT_DIR}}`.\n' > "$T7/tools/demo/t.md"
 o8=$(run "$T7"); rc8=$?
 arm "the same key rendered through a placeholder passes" 0 "$rc8" "$o8" "spell no conf value"
+
+# ...and a FORMAT description of the value is not a value: a quoted `<placeholder>` states no
+# ---- value of gov's, so it passes (gate repair at VERIFYING, TOOL-aRepatriatedFork-10).
+printf 'Pinned per gate, `INDEX_CAP_LINES="<gate>:<n>"`.\n' > "$T7/tools/demo/t.md"
+o9=$(run "$T7"); rc9=$?
+arm "a quoted <placeholder> format description is not a conf value" 0 "$rc9" "$o9" "spell no conf value"
 
 rm -rf "$T" "$T2" "$T3" "$T4" "$T5" "$T6" "$T7"
 total=$((pass+fail))
