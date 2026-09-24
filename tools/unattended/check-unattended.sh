@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.36   # gov:kit unattended@1.36 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.37   # gov:kit unattended@1.37 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -2865,8 +2865,8 @@ else
     FNR == 1 { sec = 0; split("", seen) }
     { sub(/\r$/, "") }
     /^## / { sec = (index($0, "## Run facts") == 1); next }
-    sec && match($0, /^[^ :]+:/) {
-      k = substr($0, 1, RLENGTH - 1); v = substr($0, RLENGTH + 1); sub(/^ +/, "", v)
+    sec && match($0, /^[^ :]+:( |$)/) {
+      k = substr($0, 1, index($0, ":") - 1); v = substr($0, index($0, ":") + 1); sub(/^ +/, "", v)
       if (k in seen) { if (seen[k] != v) printf "%s: %s is [%s] and [%s]\n", FILENAME, k, seen[k], v }
       else seen[k] = v
     }' "${_rf_files[@]}")

@@ -6171,9 +6171,9 @@ hit "$out" "amendment recorded — add ARCH-tRun-2"
 same "baseline_units is defined exactly once, in the shared library" \
   "$(grep -c '^baseline_units()' "$HERE/lib-unattended.sh")" "1"
 same "the driver calls it rather than deciding the same question its own way" \
-  "$(grep -c 'baseline_units ' "$HERE/unattended.sh")" "1"
+  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'baseline_units ')" "1"
 same "and so does the checker" \
-  "$(grep -c 'baseline_units ' "$HERE/check-unattended.sh")" "1"
+  "$(grep -v '^[[:space:]]*#' "$HERE/check-unattended.sh" | grep -c 'baseline_units ')" "1"
 same "and neither defines its own" \
   "$(grep -c '^baseline_units()' "$HERE/unattended.sh" "$HERE/check-unattended.sh" | grep -c ':0$')" "2"
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null

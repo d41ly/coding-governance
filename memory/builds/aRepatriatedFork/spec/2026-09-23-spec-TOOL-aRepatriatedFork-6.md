@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-6 — unattended set_fact refuses a value that can forge a second fact
 
-**Status:** CLOSED · rev-5 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -338,6 +338,12 @@ New arm: `tools/unattended/check-unattended.test.sh` · check 36 on an unscoped 
   substitution, which is the loop shape that leg gates, and `check-unattended.sh` measured 3 such
   sites against 2 declared. It now reads the list whole with `mapfile` and loops over the array, so
   the registry's count stands and no row rises.
+- rev-6 · 2026-09-24 · S3: gate repair at VERIFYING, suites `unattended gate selftest shard 8/8` and
+  `unattended driver selftest`. Check 34 keys only a `key: value` or bare `key:` line, the shape
+  `fact`/`fact_of` read, so a timestamped dispatch or brief row under `## Run facts` is no key. The
+  driver suite's call-count arms skip comment lines, which fold E's header made count twice. Built
+  at the main loop, dispatched as `TOOL-aRepatriatedFork-8`, whose stranded R4 row would refuse
+  this unit's declaration of the same carriers.
 
 ## 10. Reuse audit
 
