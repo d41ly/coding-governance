@@ -132,7 +132,7 @@ ids TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOO
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-23 |
 <!-- /gen:build-units -->
 
-Records: 41 bound to this build, across 3 record folder(s).
+Records: 42 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

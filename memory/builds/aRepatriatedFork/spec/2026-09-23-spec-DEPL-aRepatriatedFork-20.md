@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-23-build-DEPL-aRepatriatedFork-20-incms-convergence-census.md](../build/2026-09-23-build-DEPL-aRepatriatedFork-20-incms-convergence-census.md) | research | — |
+| [2026-09-24-prompt-DEPL-aRepatriatedFork-20-build-brief.md](../prompts/2026-09-24-prompt-DEPL-aRepatriatedFork-20-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
