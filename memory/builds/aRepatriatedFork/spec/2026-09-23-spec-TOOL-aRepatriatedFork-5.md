@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-5 — pre-push runs only a tracked, unmodified gate command
 
-**Status:** CLOSED · rev-2 · 2026-09-23 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -27,8 +27,14 @@ upstream, arms it, and makes the declared test escape unable to produce a record
   a tracked script or one of the interpreters `bash` or `sh`, and no option word precedes the first
   path-shaped word. Anything else is refused at exit 1 before the bar runs. The rules are nc's
   rev-3 guard (`.githooks/pre-push:556-652` at nc), taken without change. Observed by AC1, AC2 and AC3.
+  Since rev-3 the executed word is pinned by POSITION rather than by shape: it is word 1, or word 2
+  when word 1 is `bash` or `sh`, and it must be path-shaped, so it passes through the tracked and
+  working-copy checks; nothing sits between the interpreter and the script. The vetted value runs
+  with globbing off, as it was vetted. Observed by AC11.
 - **S2** — The decision line names the bar on both arms, as `— bar: <label>`, and the run-log END line
-  carries a `bar` key whose value is `default`, `tracked` or `stub`. Observed by AC4 and AC5.
+  carries a `bar` key whose value is `default`, `tracked` or `stub`. Observed by AC4 and AC5. Since
+  rev-3 a vetted or default bar also carries `bar_path` and `bar_blob`, and push-main's lander marker
+  carries the class, path and blob after the pushed commit. Observed by AC12.
 - **S3** — `GOV_GATE_CMD_TEST=1` is the ONE declared escape. It waives S1, labels the decision line
   `bar: STUB <command>`, and records `bar stub`. Observed by AC4 and AC6.
 - **S4** — `tools/push-main.sh` writes no `LANDER_MARKER` for a push made under `GOV_GATE_CMD_TEST`,
@@ -42,6 +48,9 @@ upstream, arms it, and makes the declared test escape unable to produce a record
 - **S7** — The prose that states the old contract is corrected: `AGENTS.md:534` says `GOV_GATE_CMD`
   "overrides the gate for testing", and `tools/unattended/PROTOCOL.template.md:542-543` lists
   "overriding the gate command" among what the kit does not close. Observed by AC9.
+- **S8** — The value must also equal this kit's own runner, `bash <kit root>/run-gates/run-gates.sh`,
+  or the `GATE_CMD` that `.unattended.conf` declares at the pushed sha, read in a subshell with an
+  inherited `GATE_CMD` unset. Any tracked script that exits 0 passed S1 alone. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -150,6 +159,9 @@ The four hostile values AC2 names, in nc's order. Each landed at rc 0 on some vi
 | `gatepayload scripts/unattended-bar.sh` | a rule reading only path-shaped words (rev-2) |
 | `bash -c gatepayload scripts/unattended-bar.sh` | a rule ignoring an interpreter option (rev-2) |
 | `bash scripts/unattended-bar.sh`, working copy rewritten | a rule reading the blob name, not its bytes (rev-2) |
+| `bash gatepayload scripts/unattended-bar.sh` | a rule constraining word 1 and enumerating shapes for the rest (nc rev-3; closing review round 1 B1) |
+| `sh x.pyc scripts/unattended-bar.sh` | the same, with a word an ignore rule hides (B1) |
+| `bash scripts/other-bar.sh`, tracked, clean, undeclared | a rule accepting any tracked, clean script (closing review round 1 M1) |
 
 Two refusals are added, each writing `RUNLOG_DECISION=refuse-bar` and exiting 1 before the bar:
 a value naming no script, and a value failing any S1 clause. Their messages are nc's, with
@@ -180,7 +192,10 @@ bar. It runs only on a default-branch push, which is the only push that runs a b
 Identifiers minted, each in the shell-variable cell: `bar_label`, and the loop scratch
 `_bar_tok`, `_bar_bad`, `_bar_first`, `_bar_opt`, `_bar_seen`, `_bar_dirty`, `_w`, `_wt`, `_bl`,
 all nc's spellings. One run-log decision value, `refuse-bar`. One run-log key, `bar`. One
-environment name, `GOV_GATE_CMD_TEST`, which nc already exports.
+environment name, `GOV_GATE_CMD_TEST`, which nc already exports. Rev-3 adds `_bar_prog` (the
+executed word), `_bar_decl` (the declared value), `_n`, `bar_path`, `bar_blob`, `RUNLOG_BAR_PATH`,
+`RUNLOG_BAR_BLOB`, and the run-log keys `bar_path` and `bar_blob`; it retires the first-word arm,
+which the positional arm subsumes.
 
 ### Migration
 
@@ -197,7 +212,9 @@ environment name, `GOV_GATE_CMD_TEST`, which nc already exports.
 | inCMS | `.githooks/pre-push`, role `project-owned` (`kits.json` `role_dispositions`) | unchanged by this unit; see the external edge |
 
 nc's `.claude/skills/unattended/SKILL.md:904` names `GOV_GATE_CMD='bash scripts/unattended-bar.sh'`,
-a tracked script, so nc's one sanctioned consumer passes S1 unchanged.
+a tracked script, so nc's one sanctioned consumer passes S1 unchanged. Since rev-3 it passes S8 only
+when nc's `.unattended.conf` declares that same value as `GATE_CMD`; an adopter exporting any bar
+other than the kit's runner declares it there, in the same commit that adopts this hook.
 
 ### Rollout
 
@@ -281,6 +298,16 @@ so no marker moves; the unattended kit bumps for S7's template edit.
 - **AC10** — When the ported harness disables the first-word, option and working-copy arms in a copy
   of `.githooks/pre-push`, the three rev-3 evasions of AC2 land, and the unmutated hook refuses them.
   Red when: the mutation anchor is missing or the evasions do not land, so the arms are unproven.
+  Since rev-3 the mutation disables the executed-word, option, working-copy and declared arms, and
+  the AC11 and AC12 evasions land under it too.
+- **AC11** — When the fixture pushes with `bash gatepayload scripts/unattended-bar.sh` or
+  `sh x.pyc scripts/unattended-bar.sh`, each payload on PATH, `.githooks/pre-push` refuses with
+  `would RUN '<word>'` before the payload prints anything.
+  Red when: a bare word between the interpreter and a tracked script runs as the bar.
+- **AC12** — When the fixture pushes with `bash scripts/other-bar.sh`, tracked, clean and green but
+  not the `GATE_CMD` its `.unattended.conf` declares, the hook refuses it; the declared value lands,
+  its run-log END carries `bar_path`, and push-main's marker names `bar tracked <path>`.
+  Red when: any tracked script that exits 0 is accepted as the bar, or nothing records which ran.
 
 ## 7. Gates
 
@@ -289,6 +316,7 @@ so no marker moves; the unattended kit bumps for S7's template edit.
 New arm: `.githooks/pre-push.test.sh` · nc's arms 25-29b, run first against the a7c78ad2 hook to observe `GOV_GATE_CMD=true` landing · none
 New arm: `tools/push-main.test.sh` · a landing under `GOV_GATE_CMD_TEST=1` with `LANDER_MARKER` declared, observed first to write the marker · none
 New arm: a port of nc's `scripts/pre_push_bar_selftest.py` under `.githooks/`, whose mutation arms M1-M3 observe the evasions landing on every run · none
+New arm: `.githooks/pre_push_bar_selftest.py` · rows 9-11 and 1c, and mutation arms M4-M5, each observed landing against the c6513db0 hook first · none
 
 ## 8. Open questions
 
@@ -313,6 +341,15 @@ New arm: a port of nc's `scripts/pre_push_bar_selftest.py` under `.githooks/`, w
   code, and a refused END records no `bar`. §4 gains "The ported harness": Python kept, renamed to
   the verb table, AC5's run-log checks added, shipped with its own leg; it has no testsuite-count row
   because that leg grades `*.test.sh` only. Unattended kit bumped 1.28 to 1.29 for S7.
+- rev-3 · 2026-09-24 · closing review round 1 B1 and M1 folded. B1: S1 pins the executed word by
+  position (word 1, or word 2 after `bash`/`sh`, path-shaped) and runs the value with globbing off;
+  the evasion table gains two rows; AC11 added; AC10's mutation widened. M1: S8 added, the value
+  must be the kit's runner or `.unattended.conf`'s `GATE_CMD` at the pushed sha; S2 gains
+  `bar_path`/`bar_blob` on END and in the lander marker, which widens F1's "class only" answer by the
+  path and blob the review asked for, still not the full command; AC12 added; §4 Migration gains the
+  adopter declaration. Not taken from M1's left-shift: an `unattended.test.sh` arm in which
+  `--landed` compares the marker's bar with the declared one, since `--landed` does not compare yet
+  and that is an unattended-kit change outside this fold; the marker now carries what it would read.
 
 ## 10. Reuse audit
 

@@ -186,3 +186,11 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T03:13:17Z decision · item DEPL-aRepatriatedFork-20: land inCMS's convergence onto gov's memory-tree programs. The branch converge/aRepatriatedFork-20 (tip 2b8d9a5cd, base inCMS main bc7e95589, worktree C:/projects/incms/main/.claude/worktrees/converge-arf20) is prepared, unpushed and unmerged, with S1 wiring, S4, S5, the rest of S3 and F6 still owed. Its journal lists 150 statuses and 63 gotcha gates no evidence decides, each by name. · reason Options seen: (a) finish the owed steps on the branch and land it through inCMS's lander, which needs the owner's ask at inCMS; (b) land gov's side now and keep DEPL-20 BLOCKED until then; (c) abort the whole build. Refused (a): a merge and a push to inCMS's main are outside this gov build's mandate, and the unit's own Rollout says so. Took (b): the 21 gov-side units are done, and none of them depends on DEPL-20. The 213 undecided statuses and gates are the owner's to rule, not a default to invent.
 
 2026-09-24T03:27:33Z review · item aRepatriatedFork · reason verdict BLOCKED · blockers 1
+
+2026-09-24T03:35:50Z dispatch · item c6513db0 TOOL-aRepatriatedFork-5 · reason .githooks/pre-push tools/push-main.sh .githooks/pre_push_bar_selftest.py .githooks/pre-push.test.sh .githooks/pre-push.runlog.test.sh tools/push-main.test.sh .githooks/gate-env.sh memory/gotchas/decision-re-derived-by-a-second-process.md memory/gotchas/INDEX.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-5.md memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md memory/map/generated/symbols.json
+
+2026-09-24T03:35:55Z brief · item TOOL-aRepatriatedFork-5 · reason e8030358f80b memory/builds/aRepatriatedFork/prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-5-fold-a-brief.md
+
+2026-09-24T03:51:40Z dispatch · item c6513db0 TOOL-aRepatriatedFork-5 · reason memory/map/features/run-gates.md memory/map/generated/MAP.md memory/map/generated/inventories.json
+
+2026-09-24T03:52:42Z dispatch · item c6513db0 TOOL-aRepatriatedFork-5 · reason memory/builds/aRepatriatedFork/README.md

@@ -595,7 +595,10 @@ check_dec_rest() {
   # WHICH BAR (TOOL-aRepatriatedFork-5). END names the CLASS of bar the push was gated by, and a
   # value the hook cannot vouch for is refused before any bar, as `refuse-bar`, recording no bar.
   # The escape is emptied per push here, because every other arm in this file depends on it.
-  printf '#!/usr/bin/env bash\nexit 0\n' > tracked-bar.sh && git add tracked-bar.sh && git commit -q -m bar
+  # DECLARED as .unattended.conf's GATE_CMD, since an undeclared tracked bar is refused (closing
+  # review round 1 M1).
+  printf '#!/usr/bin/env bash\nexit 0\n' > tracked-bar.sh && printf 'GATE_CMD="bash tracked-bar.sh"\n' > .unattended.conf \
+    && git add tracked-bar.sh .unattended.conf && git commit -q -m bar
   write_refs "$WORK/refs.bar" "refs/heads/main $(git rev-parse HEAD) refs/heads/main $ZERO"
   run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD="bash $WORK/green.sh"
   l=$(measure_lines)
@@ -615,14 +618,16 @@ check_dec_rest() {
   [ "$(read_field $l decision)" = refuse-bar ] && add_seen refuse-bar
   # THE BRANCH BAR, TOOL-aRepatriatedFork-8 S5: declared in gate-env.sh, run on a non-default push,
   # vetted like the merge bar, and recorded as its own decision with the class of bar it was.
+  # COMMITTED, since the hook refuses to source an untracked gate-env.sh (closing review round 1 H1).
   mkdir -p .githooks && printf 'GOV_BRANCH_GATE_CMD="bash tracked-bar.sh"\n' > .githooks/gate-env.sh
+  git add .githooks/gate-env.sh && git commit -q -m branch-bar
   write_refs "$WORK/refs.feat" "refs/heads/feature $(git rev-parse HEAD) refs/heads/feature $ZERO"
   run_hook "$WORK/refs.feat" origin "$WORK/remote.git" GOV_GATE_CMD_TEST=
   l=$(measure_lines)
   check "DEC branch: a declared branch bar runs, green, recorded as tracked" \
     "$RC|$(read_field $l decision)|$(read_field $l bar)" "0|branch-gated|tracked"
   [ "$(read_field $l decision)" = branch-gated ] && add_seen branch-gated
-  rm -f .githooks/gate-env.sh; rmdir .githooks 2>/dev/null
+  git rm -q .githooks/gate-env.sh && git commit -q -m no-branch-bar
   rm -f "$REPO/.git/push-main-active"
   check_journal DEC
 }
@@ -880,7 +885,7 @@ scan_exit_sites() { # file -> one TAB-separated row per shell exit
   printf '%s\t%s\t%s\n' 'write_refusal raw-push "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-raw
   printf '%s\t%s\t%s\n' 'write_refusal head-mismatch "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-head
   printf '%s\t%s\t%s\n' 'write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-dirty
-  printf '%s\t%s\t%s\n' 'write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1' 2 refuse-bar
+  printf '%s\t%s\t%s\n' 'write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1' 3 refuse-bar
   printf '%s\t%s\t%s\n' 'write_refusal head-moved "$why"; RUNLOG_CLEAN=1; exit 1' 1 'full|scoped'
   printf '%s\t%s\t%s\n' 'RUNLOG_CLEAN=1; exit "$rc"' 2 'full|scoped|branch-gated'
 } > "$WORK/exits.tsv"

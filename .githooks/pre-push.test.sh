@@ -280,6 +280,9 @@ esac
 # `.githooks/pre_push_bar_selftest.py` covers the evasions and disables the arms that refuse them.
 cd "$tmp/work" || exit 2
 printf '#!/usr/bin/env bash\nexit 0\n' > tracked-bar.sh
+# DECLARED, since the hook refuses a tracked bar that `.unattended.conf` does not name as GATE_CMD
+# (closing review round 1 M1); `.githooks/pre_push_bar_selftest.py` grades the undeclared case.
+printf 'GATE_CMD="bash tracked-bar.sh"\n' > .unattended.conf
 git add -A >/dev/null 2>&1; git commit -qm "a tracked bar" >/dev/null 2>&1
 
 # 25 — THE CONTROL FIRST: a bar this repo TRACKS is accepted with no escape. Without it, 26 and 27
@@ -611,22 +614,34 @@ fi
 
 # AC10 — THE BRANCH BAR (S5). Declared in gate-env.sh it gates a feature push; naming an untracked
 #        script it is refused as bar-refused; undeclared the push is ungated. The escape is unset in
-#        each arm, since it would let an untracked bar through.
+#        each arm, since it would let an untracked bar through. gate-env.sh is COMMITTED in each arm,
+#        since the hook refuses to source an untracked one (closing review round 1 H1).
 git checkout -q -b feat8
 printf '#!/usr/bin/env bash\necho "BRANCH BAR RED"\nexit 1\n' > branch-red.sh
 git add branch-red.sh; git commit -q -m "a tracked branch bar"
 mkdir -p .githooks
 printf 'GOV_BRANCH_GATE_CMD="bash branch-red.sh"\n' > .githooks/gate-env.sh
+git add .githooks/gate-env.sh; git commit -q -m "declare the branch bar"
 msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 2>&1 ) )
 case "$msg|$(read_token)|$(read_tip feat8)" in
   *"BRANCH BAR RED"*"|gate-red|") ok "AC10 a declared, tracked, red branch bar refuses a feature push" ;;
   *) bad "AC10 expected the branch bar to run and refuse, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
 esac
 printf 'GOV_BRANCH_GATE_CMD="bash %s"\n' "$red" > .githooks/gate-env.sh
+git add .githooks/gate-env.sh; git commit -q -m "declare an untracked branch bar"
 msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 2>&1 ) )
 case "$msg|$(read_token)" in
   *"does not track"*"|bar-refused") ok "AC10 an untracked branch bar is refused as bar-refused" ;;
   *) bad "AC10 expected an untracked branch bar to be refused, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+esac
+# H1 — the policy file itself, UNTRACKED: refused before it is sourced, whatever it declares.
+git rm -q .githooks/gate-env.sh; git commit -q -m "undeclare the branch bar"
+mkdir -p .githooks   # `git rm` took the emptied directory with it
+printf 'GOV_BRANCH_GATE_CMD="bash branch-red.sh"\n' > .githooks/gate-env.sh
+msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 2>&1 ) )
+case "$msg|$(read_token)|$(read_tip feat8)" in
+  *"gate-env.sh is sourced into this hook"*"|bar-refused|") ok "H1 an untracked gate-env.sh is refused as bar-refused, unsourced" ;;
+  *) bad "H1 expected an untracked gate-env.sh to be refused, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
 esac
 rm -f .githooks/gate-env.sh
 if ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q incms feat8 >/dev/null 2>&1 ) && [ -n "$(read_tip feat8)" ]; then

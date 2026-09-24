@@ -191,6 +191,7 @@
       "conf-value-interpolated-into-a-regex.md",
       "containment-tested-one-way.md",
       "criterion-asserts-what-its-own-command-cannot-show.md",
+      "decision-re-derived-by-a-second-process.md",
       "degradation-known-but-unreported.md",
       "destructive-step-before-its-precondition.md",
       "empty-field-collapses-unless-it-is-last.md",

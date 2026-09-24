@@ -134,14 +134,56 @@ fi
 
 # 9b — ITS CONTROL: the same lander with a TRACKED bar and no escape writes the marker naming the
 #      pushed commit. Without it, 9 passes on a push-main that never writes a marker at all.
+#      The bar is DECLARED as the conf's GATE_CMD, since the hook refuses an undeclared one (closing
+#      review round 1 M1), and the marker names it by class and path after the pushed commit.
 printf '#!/usr/bin/env bash\nexit 0\n' > bar.sh
-git add bar.sh && git commit -q -m tracked-bar
+printf 'GATE_CMD="bash bar.sh"\n' >> .unattended.conf
+git add bar.sh .unattended.conf && git commit -q -m tracked-bar
 out9b=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash bar.sh" bash "$lander" 2>&1 ) ); rc9b=$?
-if [ "$rc9b" -eq 0 ] && grep -q "$(git rev-parse HEAD)" "$gcd/unattended-landed" 2>/dev/null; then
-  ok "9b control — a push gated by a tracked bar writes the lander marker naming the pushed commit"
+if [ "$rc9b" -eq 0 ] && grep -q "$(git rev-parse HEAD) by push-main bar tracked bar.sh " "$gcd/unattended-landed" 2>/dev/null; then
+  ok "9b control — a push gated by a tracked bar writes the lander marker naming the pushed commit and the bar"
 else
-  bad "9b a tracked-bar landing did not write its marker (rc $rc9b): $out9b"
+  bad "9b a tracked-bar landing did not write its marker naming the bar (rc $rc9b): $out9b | $(cat "$gcd/unattended-landed" 2>/dev/null)"
 fi
+
+# H1 — ONE CHANNEL (closing review round 1 H1). The hook and this lander used to answer "was the bar a
+#      stub?" from two environments, and the hook's includes whatever gate-env.sh sets. Here a
+#      COMMITTED gate-env.sh sets the escape and names `true`, over a default bar that would be RED
+#      (this fixture has no runner at all). The lander's own environment carries no escape, and it
+#      must still withhold the marker, because the hook's verdict says `stub`.
+mkdir -p .githooks
+printf 'GOV_GATE_CMD_TEST=1\nGOV_GATE_CMD=true\n' > .githooks/gate-env.sh
+git add .githooks/gate-env.sh && git commit -q -m h1-env
+rm -f "$gcd/unattended-landed"
+outh1=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; bash "$lander" 2>&1 ) ); rch1=$?
+if [ -f "$gcd/unattended-landed" ]; then
+  bad "H1 a stub set by a committed gate-env.sh still got the lander marker: $(cat "$gcd/unattended-landed")"
+else
+  case "$rch1:$outh1" in
+    0:*"STUB"*"NOT writing the lander marker"*) ok "H1 a stub set by gate-env.sh lands with NO marker, read from the hook's verdict" ;;
+    *) bad "H1 expected a landing with the marker withheld as a STUB (rc $rch1): $outh1" ;;
+  esac
+fi
+git rm -q .githooks/gate-env.sh && git commit -q -m h1-env-gone
+
+# H1b — the same file UNTRACKED and hidden by .git/info/exclude, which `git status` never reports, so
+#       neither dirty check sees it. The hook must refuse to source it, so nothing lands and no marker.
+printf 'GOV_GATE_CMD_TEST=1\nGOV_GATE_CMD=true\n' > .githooks/gate-env.sh
+mkdir -p "$gitdir/info"; cp "$gitdir/info/exclude" "$tmp/exclude.keep" 2>/dev/null || : > "$tmp/exclude.keep"
+printf '.githooks/gate-env.sh\n' >> "$gitdir/info/exclude"
+before1b=$(git -C "$tmp/remote.git" rev-parse main)
+outh1b=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; bash "$lander" 2>&1 ) ); rch1b=$?
+if [ -f "$gcd/unattended-landed" ]; then
+  bad "H1b an excluded gate-env.sh setting the escape still got the lander marker: $(cat "$gcd/unattended-landed")"
+elif [ "$before1b" != "$(git -C "$tmp/remote.git" rev-parse main)" ]; then
+  bad "H1b an excluded gate-env.sh was sourced and the push LANDED (rc $rch1b): $outh1b"
+else
+  case "$outh1b" in
+    *"gate-env.sh"*"bar-refused"*) ok "H1b an excluded gate-env.sh is refused before it is sourced: no landing, no marker" ;;
+    *) bad "H1b nothing landed, but not for the stated reason (rc $rch1b): $outh1b" ;;
+  esac
+fi
+rm -f .githooks/gate-env.sh; cp "$tmp/exclude.keep" "$gitdir/info/exclude"
 
 # 11 — an untracked file in the SUPERPROJECT blocks (S3). `-uno`, this lander's old definition of
 #      dirty, passed it, and the bar then certified a file the push did not carry.

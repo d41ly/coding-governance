@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries
 
-**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -42,6 +42,12 @@ branch-push hygiene gate, a declared seam, so inCMS can run gov's bytes.
   derives its kit path from its own location and resolves python through the inline fallback the
   hooks kit uses, never `tools/lib/resolve-python.sh`, which ships to no adopter. Observed by AC11.
 - **S7** — `TOOL-aHonedRuleset-10` closes, since S2 is its fix. Observed by AC4.
+- **S8** — ONE channel for the bar's verdict. The hook clears `pre-push-bar` beside
+  `pre-push-refusal` on every run and, once the bar is vetted and before it runs, writes
+  `<class><TAB><path><TAB><blob>`; the lander clears it before each push and writes its marker only
+  when it reads `default` or `tracked`, never re-deriving the class from its own environment. And
+  `.githooks/gate-env.sh` is sourced only when tracked at the pushed sha (HEAD on a non-default push)
+  with a clean working copy; otherwise the push is refused as `bar-refused`. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -253,6 +259,13 @@ falls back to its prose grep, so an old lander against a new hook is no worse th
   returns nothing and each suite resolves its subject.
   Red when: a suite still spells `tools/` or needs a gov-internal library.
   fixture: a scratch install at a `scripts/` prefix; none is tracked today.
+- **AC12** — When a fixture's `.githooks/gate-env.sh` sets `GOV_GATE_CMD_TEST=1` and
+  `GOV_GATE_CMD=true` and `tools/push-main.sh` runs with neither in its environment, a committed copy
+  lands with NO lander marker and push-main names the STUB; an untracked copy hidden by
+  `.git/info/exclude` is refused before it is sourced, so nothing lands; and an untracked copy on a
+  feature push is refused as `bar-refused`.
+  Red when: the lander decides "stub" from an input the hook did not act on, or the hook sources a
+  policy file nobody reviewed.
 
 ## 7. Gates
 
@@ -260,6 +273,8 @@ falls back to its prose grep, so an old lander against a new hook is no worse th
 
 New arm: `tools/push-main.test.sh` · inCMS's arms 1b, 2c, 4c, 11, 12, 13 and 14, each run first against the a7c78ad2 lander to observe it fail · none
 New arm: `.githooks/pre-push.test.sh` · a fixture remote named `incms`, a dirty tree, a HEAD moved by the bar, and a branch bar, each observed first against the a7c78ad2 hook · none
+New arm: `tools/push-main.test.sh` · H1 and H1b, gate-env.sh setting the escape committed and then excluded, each observed writing the marker against the c6513db0 lander and hook first · none
+New arm: `.githooks/pre-push.test.sh` · H1, an untracked gate-env.sh on a feature push, observed sourced against the c6513db0 hook first · none
 
 ## 8. Open questions
 
@@ -285,6 +300,12 @@ New arm: `.githooks/pre-push.test.sh` · a fixture remote named `incms`, a dirty
   S3 refuses after the bar is vetted, S5's branch bar reads the ref lines on stdin, the lander probes
   the push URL, and S7's backlog row moves to the main loop after `--dispatch` refused it. Files
   touched gains the run-log suite and the bar self-test, and loses `memory/backlog/TOOL.md`.
+- rev-3 · 2026-09-24 · closing review round 1 H1 folded. S8 and AC12 added: the hook writes the bar
+  it vetted to `pre-push-bar` and push-main reads that instead of its own `GOV_GATE_CMD_TEST`, and
+  `gate-env.sh` is vetted before it is sourced, taking the review's "vet it" option over naming it
+  an open class in the protocol, which this fold may not edit. The AC10 fixtures now commit their
+  `gate-env.sh`, and the run-log suite's exit table counts three `bar-refused` sites. The class is
+  recorded as `memory/gotchas/decision-re-derived-by-a-second-process.md`.
 
 ## 10. Reuse audit
 

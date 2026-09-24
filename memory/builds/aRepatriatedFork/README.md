@@ -118,14 +118,14 @@ ids TOOL-aRepatriatedFork-21
 | [TOOL-aRepatriatedFork-21 — a build README is `builds/<slug>/README.md`, at exactly that depth](spec/2026-09-24-spec-TOOL-aRepatriatedFork-21.md) | 1 | 1 | CLOSED | rev-2 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-3 — shipped Python names its encoding on every text-IO call](spec/2026-09-23-spec-TOOL-aRepatriatedFork-3.md) | 1 | 1 | CLOSED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-4 — review-harness gates find harnesses where adopters keep them](spec/2026-09-23-spec-TOOL-aRepatriatedFork-4.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
-| [TOOL-aRepatriatedFork-5 — pre-push runs only a tracked, unmodified gate command](spec/2026-09-23-spec-TOOL-aRepatriatedFork-5.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
+| [TOOL-aRepatriatedFork-5 — pre-push runs only a tracked, unmodified gate command](spec/2026-09-23-spec-TOOL-aRepatriatedFork-5.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-6 — unattended set_fact refuses a value that can forge a second fact](spec/2026-09-23-spec-TOOL-aRepatriatedFork-6.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-23 |
 | [TOOL-aRepatriatedFork-7 — agent-cap: the nested-interpolation fix, and a declared lower cap](spec/2026-09-23-spec-TOOL-aRepatriatedFork-7.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-9 — row_grammar and check-arms take NicoCares' additions, and stop importing sibling engines](spec/2026-09-23-spec-TOOL-aRepatriatedFork-9.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"](spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-15 — a kit whose shipped bytes move bumps its version](spec/2026-09-23-spec-TOOL-aRepatriatedFork-15.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-24 |
-| [TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries](spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-24 |
+| [TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries](spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter](spec/2026-09-23-spec-DEPL-aRepatriatedFork-14.md) | 3 | 1 | CLOSED | rev-2 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did](spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md) | 3 | 2 | CLOSED | rev-2 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-21 — apply never lands gov's bytes on a file the target owns](spec/2026-09-24-spec-DEPL-aRepatriatedFork-21.md) | 3 | 2 | CLOSED | rev-2 | 2026-09-24 |

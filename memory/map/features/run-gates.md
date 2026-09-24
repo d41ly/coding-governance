@@ -29,7 +29,8 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "worktree-crlf-outside-the-gated-population.md",
   "a-new-leg-trips-a-growing-set-of-meta-gates.md",
   "signal-trap-runs-the-exit-handler-twice.md",
-  "async-job-starts-with-sigint-ignored.md"]
+  "async-job-starts-with-sigint-ignored.md",
+  "decision-re-derived-by-a-second-process.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

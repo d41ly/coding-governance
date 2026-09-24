@@ -48,6 +48,10 @@ marker="$gd/push-main-active"
 # THE HOOK'S VERDICT (S2): `<token><TAB><message>`, written by .githooks/pre-push on every refusal and
 # on a red bar, cleared by it on every run and by this script before every push.
 refusal="$gd/pre-push-refusal"
+# THE BAR THE HOOK VETTED (closing review round 1 H1): `<class><TAB><path><TAB><blob>`, written by the
+# hook once it has vetted the bar and before it runs it, cleared by it on every run and by this script
+# before every push. The lander marker is written only when it reads `default` or `tracked`.
+barfile="$gd/pre-push-bar"
 
 # The marker is a SOFT advisory guard: a SIGKILL/OOM/power-loss during the gate can leak it (this
 # trap can't catch those). Worst case a later raw push skips reconcile-before-gate and wastes ONE
@@ -113,7 +117,7 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
-  rm -f "$refusal"
+  rm -f "$refusal" "$barfile"
   touch "$marker"
   echo "push-main: gating + pushing $def (attempt $attempt/$max)..." >&2
   # THE PUSH'S OUTPUT IS SHOWN, NEVER READ (S2). It carries the bar's own output, so classifying on
@@ -140,10 +144,20 @@ while [ "$attempt" -le "$max" ]; do
       # one declared escape: it lets an untracked stub stand in for the bar so the hook can be tested
       # at all. The marker is what `unattended.sh --landed` accepts as a landing through this lander,
       # so writing it here would let a push nobody's bar gated read as a gated landing.
-      if [ -n "$lm" ] && [ -n "${GOV_GATE_CMD_TEST:-}" ]; then
-        echo "push-main: pushed $def under GOV_GATE_CMD_TEST, so the bar was a declared STUB; NOT writing the lander marker ($lm), because a stub-gated push is not a landing." >&2
-        lm=""
-      fi
+      #
+      # READ FROM THE HOOK'S VERDICT, NEVER FROM THIS ENVIRONMENT (closing review round 1 H1). This
+      # tested GOV_GATE_CMD_TEST in its own environment, and the hook also takes it from the
+      # gate-env.sh it sources, so a stub-gated push got the marker. No verdict at all, from a hook
+      # that predates the file or never reached the bar, is not a gated landing either.
+      bar=""; barpath=""; barblob=""
+      [ -f "$barfile" ] && IFS=$'\t' read -r bar barpath barblob < "$barfile"
+      case "$bar" in
+        default|tracked) ;;
+        stub) [ -n "$lm" ] && echo "push-main: pushed $def, and the hook vetted the bar as a declared STUB (GOV_GATE_CMD_TEST); NOT writing the lander marker ($lm), because a stub-gated push is not a landing." >&2
+              lm="" ;;
+        *)    [ -n "$lm" ] && echo "push-main: pushed $def, but the hook recorded no vetted bar in $barfile, so nothing says a bar gated this push; NOT writing the lander marker ($lm)." >&2
+              lm="" ;;
+      esac
       if [ -n "$lm" ]; then
         # RESOLVED AGAINST THE GIT COMMON DIR, which is the only directory both halves agree on. It
         # was tree-relative and wrong twice: each half resolved it against its own cwd, and in a
@@ -158,7 +172,9 @@ while [ "$attempt" -le "$max" ]; do
           echo "push-main: pushed $def, but could not resolve the git common dir to write the lander marker ($lm). The push SUCCEEDED and is not recorded." >&2
           exit 1
         fi
-        if ! printf 'landed %s at %s by push-main\n' "$def" "$(git rev-parse HEAD)" > "$_gcd/$lm"; then
+        # The pushed commit FIRST, since `--landed` reads the line's first sha; then the bar the hook
+        # vetted, by class, path and blob (M1), so a reader can tell the whole bar from a cheap one.
+        if ! printf 'landed %s at %s by push-main bar %s %s %s\n' "$def" "$(git rev-parse HEAD)" "$bar" "$barpath" "$barblob" > "$_gcd/$lm"; then
           echo "push-main: pushed $def, but could not write the lander marker at $_gcd/$lm. The push SUCCEEDED and is not recorded." >&2
           exit 1
         fi

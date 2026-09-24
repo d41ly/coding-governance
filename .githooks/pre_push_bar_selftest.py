@@ -23,14 +23,20 @@ THE DEFECT LINEAGE, each step measured rather than argued:
                                                reads, the working copy is what runs.
   rev-3  constrains the FIRST WORD (a tracked script, or bash/sh with no option word before the
          script) and requires each tracked token's working copy to hash to its blob.
+         `bash gatepayload <tracked>` still landed (closing review round 1 B1): the payload
+         sat BETWEEN the interpreter and the script, where no arm looked.
+  rev-4  constrains the EXECUTED word by POSITION, word 1 or word 2 after bash/sh, and requires
+         it path-shaped, which routes it through the tracked and working-copy arms. And the
+         whole value must be the kit's own runner or the GATE_CMD `.unattended.conf` declares
+         at the pushed sha (M1): every tracked script that exits 0 passed rev-3.
 
 Each of those landings was observed at rc 0 with the bar stubbed RED and the remote MOVED, which is
 why this file drives real `git push` calls against a scratch remote rather than asserting on the
 hook's text.
 
 THE MUTATION RUNS EVERY TIME. A guard whose failing case was observed once, by hand, on the day it
-landed, is a guard nobody will ever see fail again. Every run re-disables the three rev-3 arms in a
-COPY of the hook and asserts the three hostile values LAND, so if the arms are ever removed,
+landed, is a guard nobody will ever see fail again. Every run re-disables the program, option,
+working-copy and declared arms in a COPY of the hook and asserts the five hostile values LAND, so if the arms are ever removed,
 weakened or short-circuited, this file stops being able to prove its own mutation and says so.
 
 WHAT THIS DOES NOT CHECK. `--no-verify`, a `core.hooksPath` pointed elsewhere, and `BASH_ENV`, each
@@ -57,16 +63,18 @@ HOOK = os.path.join(ROOT, ".githooks", "pre-push")
 # `check_bar_command`, so everything the rev-3 arms read is already computed and can be overwritten
 # wholesale.
 ANCHOR = "  set +f\n"
-# Neutralises exactly the three rev-3 arms and nothing else: the first-word case, the option check
-# and the working-copy hash check. The every-token tracked check (rev-2) keeps working, which is
-# what makes the mutation a test of THESE arms rather than of the whole block. `_tree_dirty` is the
+# Neutralises exactly the rev-4 arms and nothing else: the executed-word check (its value set to a
+# path shape), the option check, the working-copy hash check and the declared-value check. The
+# every-token tracked check (rev-2) keeps working, which is what makes the mutation a test of THESE
+# arms rather than of the whole block. `_tree_dirty` is the
 # hook's dirty-tree refusal (TOOL-aRepatriatedFork-8 S3), measured before this point and refused
 # after it: it catches M3's rewritten bar one layer out, so it is cleared too or M3 could not land.
-NEUTER = '  _bar_first=bash; _bar_opt=""; _bar_dirty=""; _tree_dirty=""   # SELFTEST MUTATION\n'
+NEUTER = ('  _bar_prog=neutered.sh; _bar_opt=""; _bar_dirty=""; _bar_decl=$cmd; _tree_dirty=""'
+          '   # SELFTEST MUTATION\n')
 
 # The executed-assertion floor. A case block stranded behind an early return reads as fewer
 # assertions, never as a pass.
-FLOOR_ASSERTIONS = 16
+FLOOR_ASSERTIONS = 22
 
 FAILURES: list[str] = []
 COUNT = [0]
@@ -128,6 +136,12 @@ class Fixture:
         # A tracked bar, GREEN, so an accept case is visible by the bar's own text.
         write(os.path.join(self.work, "scripts", "unattended-bar.sh"),
               '#!/usr/bin/env bash\necho "TRACKED BAR RAN - GREEN"; exit 0\n')
+        # A second tracked bar, GREEN and clean but NOT declared: the M1 shape, any cheap tracked
+        # script that exits 0.
+        write(os.path.join(self.work, "scripts", "other-bar.sh"),
+              '#!/usr/bin/env bash\necho "OTHER BAR RAN"; exit 0\n')
+        # THE DECLARATION the hook reads at the pushed sha (M1), in the unattended driver's own file.
+        write(os.path.join(self.work, ".unattended.conf"), 'GATE_CMD="bash scripts/unattended-bar.sh"\n')
         write(os.path.join(self.work, "f.txt"), "hi\n")
         run(["git", "add", "-A"], cwd=self.work)
         run(["git", "commit", "-qm", "init"], cwd=self.work)
@@ -139,8 +153,10 @@ class Fixture:
         # A PATH command whose name is neither path-shaped nor *.sh. This is the rev-2 evasion.
         self.bindir = os.path.join(tmp, "bin")
         os.makedirs(self.bindir)
-        write(os.path.join(self.bindir, "gatepayload"),
-              '#!/usr/bin/env bash\necho "PAYLOAD RAN"; exit 0\n', executable=True)
+        # `x.pyc` is B1's second shape: a word an ignore rule would hide, sat after `sh`.
+        for name in ("gatepayload", "x.pyc"):
+            write(os.path.join(self.bindir, name),
+                  '#!/usr/bin/env bash\necho "PAYLOAD RAN"; exit 0\n', executable=True)
 
     def read_tip(self) -> str:
         rc, out = run(["git", "--git-dir", self.remote, "rev-parse", "main"], cwd=self.tmp)
@@ -214,6 +230,20 @@ def check_end(fx: Fixture, key: str, want: str, label: str) -> None:
         print_fail(f"{label} — the last run-log END carries {key}={got}, wanted {want}")
 
 
+def check_positional_and_declared(fx: Fixture) -> None:
+    """Closing review round 1 B1 and M1: what sits after the interpreter, and which value is declared."""
+    # 9 — B1: a bare word BETWEEN the interpreter and the tracked script is what bash runs, off PATH.
+    check_refused(fx, "bash gatepayload scripts/unattended-bar.sh", "would RUN 'gatepayload'",
+                  "9 a PATH command after the interpreter is refused", forbid="PAYLOAD RAN")
+    # 10 — B1's second shape, under `sh`.
+    check_refused(fx, "sh x.pyc scripts/unattended-bar.sh", "would RUN 'x.pyc'",
+                  "10 a bare word after `sh` is refused", forbid="PAYLOAD RAN")
+    # 11 — M1: tracked, clean, green and undeclared. Every rev-3 arm passed it.
+    check_refused(fx, "bash scripts/other-bar.sh", "neither this kit's own runner",
+                  "11 a tracked bar that .unattended.conf does not declare is refused",
+                  forbid="OTHER BAR RAN")
+
+
 def main() -> int:
     if not os.path.isfile(HOOK):
         print(f"pre-push-bar selftest: {HOOK} is missing")
@@ -240,6 +270,8 @@ def main() -> int:
                      "bar: bash scripts/unattended-bar.sh",
                      "1 control — a TRACKED, unmodified bar is accepted and named in the decision line")
         check_end(fx, "bar", "tracked", "1b the run log records a vetted bar as `bar=tracked`")
+        check_end(fx, "bar_path", "scripts/unattended-bar.sh",
+                  "1c and names the script it vetted as `bar_path`")
         # 2 — a value naming no script at all.
         check_refused(fx, "true", "names no script at all",
                       "2 'true' is refused — a no-op bar names nothing")
@@ -273,6 +305,7 @@ def main() -> int:
                      "8 under GOV_GATE_CMD_TEST the stub is allowed and the line marks it STUB",
                      escape=True)
         check_end(fx, "bar", "stub", "8b the run log records the waived bar as `bar=stub`")
+        check_positional_and_declared(fx)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -293,12 +326,16 @@ def main() -> int:
              "M1 without the first-word arm the PATH payload LANDS", "PAYLOAD RAN"),
             ("bash -c gatepayload scripts/unattended-bar.sh",
              "M2 without the option arm the -c payload LANDS", "PAYLOAD RAN"),
+            ("bash gatepayload scripts/unattended-bar.sh",
+             "M4 without the executed-word arm the payload after the interpreter LANDS", "PAYLOAD RAN"),
+            ("bash scripts/other-bar.sh",
+             "M5 without the declared arm an undeclared tracked bar LANDS", "OTHER BAR RAN"),
         ):
             rc, out, moved = fx.run_push(value)
             if moved and evidence in out:
                 print_ok(label)
             else:
-                print_fail(f"{label} — but it did NOT land, so case 5/6 above may be passing for "
+                print_fail(f"{label} — but it did NOT land, so cases 5, 6, 9 and 11 may be passing for "
                            f"some other reason and the arm they name is unproven: {out.strip()[:300]}")
         write(os.path.join(fx.work, "scripts", "unattended-bar.sh"),
               '#!/usr/bin/env bash\necho "DIRTY WORKING COPY RAN"; exit 0\n')
