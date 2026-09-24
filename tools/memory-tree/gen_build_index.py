@@ -1715,6 +1715,19 @@ def cmd_check(root: str, conf: dict) -> int:
     return 0
 
 
+def extract_build_readmes(paths: list, memory_root: str) -> list:
+    """TOOL-aRepatriatedFork-21. The build READMEs among `paths`: exactly `<m>/builds/<slug>/README.md`.
+
+    The slot contract and the survey used to keep every tracked path ending in `/README.md`, at any
+    depth, while the render keys on `builds/<slug>/`. An adopter whose legacy records are folders
+    with a README inside (inCMS carried 41) was then graded as 41 malformed builds the render never
+    saw. ONE predicate for both verbs, because two copies of it are two answers to one question.
+    """
+    prefix = memory_root.rstrip("/") + "/builds/"
+    return [p for p in paths if p.startswith(prefix) and p.endswith("/README.md")
+            and p[len(prefix):].count("/") == 1]
+
+
 def cmd_check_format(root: str, conf: dict) -> int:
     """The SLOT CONTRACT verb — deliberately NOT reachable from plan(), --write or --check (S1a).
 
@@ -1731,8 +1744,7 @@ def cmd_check_format(root: str, conf: dict) -> int:
     than one commit and a history predicate would have no green starting state.
     """
     m = conf["MEMORY_ROOT"]
-    tracked = [p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
-               if p.endswith("/README.md")]
+    tracked = extract_build_readmes(run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n"), m)
     check_contract_registry(root, conf, tracked)
     bound = read_contract_registry(root, conf)
     # The declaration is asserted on EVERY run, bound population or not. Its integrity is not
@@ -1834,8 +1846,7 @@ def cmd_survey(root: str, conf: dict) -> int:
     ordinary clean line — which is precisely what this unit's first draft specified.
     """
     m = conf["MEMORY_ROOT"]
-    tracked = sorted(p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
-                     if p.endswith("/README.md"))
+    tracked = sorted(extract_build_readmes(run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n"), m))
     bound = read_contract_registry(root, conf)
     hits = 0
     for rel in tracked:
@@ -2339,6 +2350,11 @@ def cmd_selftest() -> int:
             build_reg_check("exempt-pin: 9\n!memory/builds/tOne/README.md - why\n"))
         arm("a bound row and a matching pin pass", "None",
             lambda: str(build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\n")()))
+        # TOOL-aRepatriatedFork-21: the population is builds/<slug>/README.md and nothing deeper.
+        _pop = ["memory/builds/tOne/README.md", "memory/builds/tOne/build/legacy/README.md",
+                "memory/builds/tOne/spec/x.md", "memory/archive/README.md", ""]
+        arm("a README below the build level is not a build README", "['memory/builds/tOne/README.md']",
+            lambda: str(extract_build_readmes(_pop, "memory")))
         arm("a bound row is BOUND and an exempt row is not",
             "{'memory/builds/tOne/README.md'}",
             lambda: str(read_contract_rows(t18, conf18)[0]))

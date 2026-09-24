@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-21 — a build README is `builds/<slug>/README.md`, at exactly that depth
 
-**Status:** SPECCED · rev-1 · 2026-09-24 · node a · Tier-1 · base 41d2802b · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-24 · node a · Tier-1 · base 41d2802b · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -82,7 +82,7 @@ Additive for gov: the population is unchanged on a tree with no nested README, w
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/memory-tree/gen_build_index.py --selftest` runs, the new arm passes,
-  and it fails when `extract_build_readmes` is replaced by the `endswith("/README.md")` filter.
+  and it fails when `extract_build_readmes` is replaced by the old suffix-only filter.
   Red when: a nested README survives the filter.
 - **AC2** — When `python tools/memory-tree/gen_build_index.py --check-format` runs on gov's tree, it
   exits 0 with the same bound and unbound counts as before the change.
@@ -105,6 +105,8 @@ none
 
 - rev-1 · 2026-09-24 · §2 opened as a discovery adopted under the mandate (protocol §11), from
   `DEPL-aRepatriatedFork-20`'s measurement at inCMS.
+- rev-2 · 2026-09-24 · AC1 names the old filter in prose rather than as a backticked call, which the
+  spec-token leg read as a path. Built: `--selftest` arm held, and failed with the old predicate.
 
 ## 10. Reuse audit
 

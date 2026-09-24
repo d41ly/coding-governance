@@ -2778,6 +2778,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_build_readmes",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "extract_chunks",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
