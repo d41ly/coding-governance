@@ -12,7 +12,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 witness: d393c445005dd56210181a7248c0a99fb9d6b947
-phase: VERIFYING
+phase: LANDING
 mode: slug
 run-branch: refs/heads/branch/arepatriated-fork-build-e42158
 anchor-kind: default-branch
@@ -270,3 +270,5 @@ base: f8fdd873161801c83a5398afaceaaa7c3205ed28
 2026-09-24T16:13:03Z dispatch · item 8f648e73 TOOL-aRepatriatedFork-8 · reason memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md
 
 2026-09-24T16:19:38Z dispatch · item e9980071 TOOL-aRepatriatedFork-8 · reason tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh memory/builds/aRepatriatedFork/spec/2026-09-23-spec-TOOL-aRepatriatedFork-6.md .claude/skills/unattended/SKILL.md memory/guides/PLAYBOOK-TEMPLATE.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md tools/unattended/PLAYBOOK-TEMPLATE.template.md tools/unattended/PROTOCOL.template.md tools/unattended/README.md tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/check-brief-recorded.sh tools/unattended/check-pass-order.sh tools/unattended/check-unattended.sh tools/unattended/fixture-record-one.template.md tools/unattended/fixture-record-two.template.md tools/unattended/fixture-records/tools~unattended~fixture-pieces~one~piece.md.md tools/unattended/fixture-records/tools~unattended~fixture-pieces~two~piece.md.md tools/unattended/gate-guard.js tools/unattended/playbook.fixture.md tools/unattended/playbook.fixture.template.md tools/unattended/run-lease.js tools/unattended/stall-recorder.js tools/unattended/stop-guard.js tools/unattended/unattended.sh
+
+2026-09-24T18:33:58Z override · item build-complete · reason DEPL-aRepatriatedFork-20 is BLOCKED on an external prerequisite: its migration is prepared on the unpushed inCMS branch converge/aRepatriatedFork-20, and landing it in inCMS needs the owner's ask, which this gov mandate does not carry. The other 21 units are CLOSED and none depends on it. The landing is parked for the owner.

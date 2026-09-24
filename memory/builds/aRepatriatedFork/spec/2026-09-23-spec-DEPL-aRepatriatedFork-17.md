@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
 | [2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-13-2-acceptance-ledger.md) | journal | DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-21 |
 | [2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-17-1-acceptance-ledger.md) | journal | — |
 | [2026-09-23-prompt-DEPL-aRepatriatedFork-17-build-brief.md](../prompts/2026-09-23-prompt-DEPL-aRepatriatedFork-17-build-brief.md) | journal | — |
