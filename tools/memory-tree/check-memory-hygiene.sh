@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.97   # gov:kit memory-tree@2.97 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.98   # gov:kit memory-tree@2.98 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -295,7 +295,7 @@ DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
 # Membership via associative arrays, NOT `grep -qxF <<<"$LIST"` — the here-string forks a grep per
 # call, and these run once per scanned file (minutes on a large adopter tree; a fork is ~50-100ms
 # under MSYS/Windows). Exact-key lookup is semantically identical (fixed string, whole line) and
-# costs zero processes. (Upstream: inCMS ARCH-aFencedNamespace-3.)
+# costs zero processes. (Upstream: adopter ic ARCH-aFencedNamespace-3.)
 declare -A LEGACY_SET DEBT_SET
 while IFS= read -r _l; do [ -n "$_l" ] && LEGACY_SET["$_l"]=1; done <<<"$LEGACY"
 while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
@@ -460,7 +460,7 @@ scan2=$(printf '%s\n' "$FILES" | grep -E '\.md$' | grep -vE '/(DECISIONS\.md$|de
 [ "$STAGED" = 1 ] && scan2=$(printf '%s\n' "$scan2" | { grep -xF -f <(printf '%s\n' "$STAGED_MD") || true; })
 # Drop grandfathered files first (fork-free), then extract every candidate link in ONE awk pass over
 # all remaining files — was `_unfenced | grep -oE | sed -E` PER FILE (3 forks × N files; the single
-# biggest cost on a large adopter tree — upstream inCMS ARCH-aFencedNamespace-3). The awk inlines
+# biggest cost on a large adopter tree — upstream adopter ic ARCH-aFencedNamespace-3). The awk inlines
 # _unfenced's exact semantics (CR strip + marker-matched fences, state reset per file) and the
 # grep+sed link shape INCLUDING the sed fall-through (an anchor-only `](#x.md)` stays as-is).
 scan2f=""
@@ -873,7 +873,7 @@ $bad7"
 # `^[[:space:]]*-` slot can only anchor once (caret pattern on the first match, no-caret thereafter),
 # and the trailing `\b` is checked ZERO-WIDTH (next char is end/non-word) so it never consumes a
 # following delimiter. uln counts the UNFENCED stream (== the old grep -n numbering). The two `·` in
-# the patterns are the LITERAL middot byte. Validated per-row against grep over the upstream inCMS
+# the patterns are the LITERAL middot byte. Validated per-row against grep over the upstream adopter ic
 # tree's 589 real rows — 0 mismatches (PERF-eThriftyBellows-1).
 pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)
 pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
@@ -1234,7 +1234,7 @@ SPEC_CANON='## 1. Goal
 SPEC_CANON10="$SPEC_CANON
 ## 10. Reuse audit"
 # ONE awk over the whole population, replacing ~13 forks PER SPEC (measured 42.88s of an 81.77s run
-# here; upstream inCMS measured the same shape at 257.8s of 311s over 356 specs —
+# here; upstream adopter ic measured the same shape at 257.8s of 311s over 356 specs —
 # TOOL-aBatchedLintel-1 ports PERF-aSlothfulCapstan-1). The driver is a tagged path stream built in
 # the SHELL rather than an `ARGIND` switch: ARGIND is gawk-only, and upstream had a byte cap silently
 # not exist under mawk because of it. `M` = tracked and in scope but absent from the worktree,
@@ -2231,7 +2231,7 @@ fi
 
 # grandfather stale-line guards (a listed path that no longer exists fails).
 # One `git ls-files` + set lookups, NOT `git ls-files --error-unmatch` per path — git is a heavyweight
-# fork, so a long grandfather list was one spawn per line (~80s at inCMS's 522 lines). Entries are
+# fork, so a long grandfather list was one spawn per line (~80s at adopter ic's 522 lines). Entries are
 # literal paths, never globs, so exact membership in the tracked set is equivalent.
 if [ -n "$LEGACY$DEBT" ]; then
   declare -A TRACKED_SET

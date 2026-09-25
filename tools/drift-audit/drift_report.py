@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.13
+gov:kit drift-audit@1.14
 
     python tools/drift-audit/drift_report.py            # human table, always exits 0
     python tools/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -85,7 +85,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.13"
+KIT_DRIFT_AUDIT_VERSION = "1.14"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -2169,7 +2169,7 @@ def main(argv: list[str] | None = None) -> int:
         # `encoding="utf-8"` like every other probe in this file. `text=True` ALONE decodes with
         # the platform default, which on a cp125x Windows node mis-decodes a non-ASCII branch name
         # and, under a strict-encoding lint, is a finding in its own right. Fourteen call sites in
-        # this file already carry it; this was the one that did not. Reported by the inCMS adopter,
+        # this file already carry it; this was the one that did not. Reported by adopter ic,
         # whose encoding-posture leg requires it (ARCH-dReadoptedConvoy-1 S7).
         head = subprocess.run(["git", "-C", str(root), "symbolic-ref", "--quiet",
                                "refs/remotes/origin/HEAD"], capture_output=True, text=True,

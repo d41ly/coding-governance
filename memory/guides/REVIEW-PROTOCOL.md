@@ -1,6 +1,6 @@
 # Review + multi-agent Workflow protocol (BINDING — part of the charter)
 
-Read this before ANY multi-agent review or `Workflow` run. Ported from the upstream inCMS charter
+Read this before ANY multi-agent review or `Workflow` run. Ported from adopter ic's charter
 (`ARCH-bWhittledTome-1`, 2026-07-15; hard cap added by the owner 2026-07-29) and re-measured here —
 every number below is either measured on THIS tree or marked as inherited with the reason it travels.
 

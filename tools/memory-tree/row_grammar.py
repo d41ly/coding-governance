@@ -409,10 +409,10 @@ _STATUS_ALT = "|".join(sorted(STATUS_VOCAB, key=len, reverse=True))
 # whose status a census must count. Refusing it here would delete eleven BRAND rows from the answer.
 #
 # ANY NUMBER OF DASH SEGMENTS, not "bare family or family-slug-seq" (TOOL-aRepatriatedFork-9). The
-# two-shape pattern the fork shipped had nothing between them, and inCMS carries FROZEN legacy-era
+# two-shape pattern the fork shipped had nothing between them, and adopter ic carries FROZEN legacy-era
 # ids exactly there — `ABL-015`, `DPL-a012`, `PBL-011` — so 58 of its 796 dash-led backlog rows read
 # as prose, 54 of them live: the under-count this grammar exists to end, moved to the next corpus.
-# Measured 2026-09-23 on node a under this pattern: gov 629 of 629 rows, inCMS 796 of 796, and
+# Measured 2026-09-23 on node a under this pattern: gov 629 of 629 rows, ic 796 of 796, and
 # adopter nc's live count unchanged at 196. `keyed` still means "carries at least one dash".
 _ROW_ID = r"[A-Z][A-Za-z0-9]{1,9}(?:-[A-Za-z0-9]+)*"
 _MIDDOT = "·"
@@ -958,7 +958,7 @@ def derive_first_seen(root, conf):
     THE ID SHAPE IS THE CENSUS'S, behind the DECLARED families (TOOL-aRepatriatedFork-9). A declared
     family followed by ONE OR MORE dash segments, so a frozen legacy id such as `ABL-015` — keyed and
     live under `parse_row` — is dated like any other. With `id_pattern`'s family-slug-seq shape the
-    walk never matched one, and inCMS, which declares `ABL` and its siblings as families, would have
+    walk never matched one, and adopter ic, which declares `ABL` and its siblings as families, would have
     had every live legacy row reported undated at exit 1. The families stay the gate on purpose: a
     families list that recognises nothing still dates nothing, which is the vacuity `cmd_ages` refuses.
     """

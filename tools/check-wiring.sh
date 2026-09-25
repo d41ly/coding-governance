@@ -24,7 +24,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.9   # gov:kit check-wiring@1.9 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.10   # gov:kit check-wiring@1.10 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -53,7 +53,7 @@ done
 KIT_REL=${KIT_REL:-}
 
 # ---- S1: the settings file is RESOLVED, never spelled --------------------------------------------
-# gov hardcoded the settings path at ten sites. inCMS's live settings file sits OUTSIDE the
+# gov hardcoded the settings path at ten sites. adopter ic's live settings file sits OUTSIDE the
 # worktree on every one of its nodes BY DESIGN, so that spelling resolves to nothing there and every
 # arm below passed BY FINDING NO FILE — the worktree false-green recorded at ARCH-dBriskLanyard-1 S10.
 #
@@ -287,7 +287,7 @@ fi
 # TOOL-aWeldedTribunal-7 — WHICH HOOK WILL ACTUALLY RUN. `core.hooksPath` is repo-global and
 # absolute, so in a multi-worktree layout the hooks that gate a commit and a push come from whatever
 # the PRIMARY tree has checked out, NOT from the tree being worked in. Measured at
-# `TOOL-dUnstalledConvoy-26`'s landing: the primary tree sat on `contrib/incms-memory-recall`, so the
+# `TOOL-dUnstalledConvoy-26`'s landing: the primary tree sat on adopter ic's recall contrib branch, so the
 # push ran that branch's `pre-push` — no gate-env sourcing, no predicate 8, and the boundary's own
 # coverage check simply absent. Nothing wrong shipped, because a separate full bar had verified the
 # pushed tree; the BOUNDARY was not the one that shipped.

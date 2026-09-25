@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # push-main.sh — the sanctioned lander for a push to the default branch (TOOL-aLeasedGauntlet-1,
-# ports inCMS ARCH-aLeasedGauntlet-1).
+# ports adopter ic ARCH-aLeasedGauntlet-1).
 #
 # Reconciles the default branch BEFORE the pre-push full gate runs, so the gate never runs on an
 # already-stale tree; if origin advances DURING the gate the push is rejected and this re-reconciles
@@ -17,7 +17,7 @@ cd "$top" || exit 2
 
 # THE REMOTE FIRST, then ITS default branch (TOOL-aRepatriatedFork-8 S1). This read `origin/HEAD`
 # before it knew which remote it would push to, so on a node whose remote is named anything else
-# (inCMS's node `d` names it `incms`) it exited 2 before its first fetch. The remote is GOV_REMOTE,
+# (adopter ic's node `d` names it after the project) it exited 2 before its first fetch. The remote is GOV_REMOTE,
 # else the current branch's configured remote, else the repository's ONLY remote. Several remotes
 # and none configured is a refusal: guessing picks a remote nobody chose.
 branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
@@ -69,7 +69,7 @@ trap 'rm -f "$marker"' EXIT INT TERM
 # adopter's bar, the more certain the failure - and the failure lands on the attempt that did
 # everything right.
 #
-# Measured on an adopter (inCMS, node `a`, 2026-08-27), same objects and same auth throughout: a push
+# Measured on adopter ic (node `a`, 2026-08-27), same objects and same auth throughout: a push
 # to a scratch ref, whose hook ran only a ~4-minute subset, SUCCEEDED; four pushes to main, whose hook
 # ran the 16-to-65-minute full bar, all died this way, two of them after the gate printed PASSED.
 # Setting these three options and changing nothing else landed it first try. That repo's charter had
@@ -93,7 +93,7 @@ fi
 # A dirty tree makes the reconcile merge refuse to START — NOT a merge conflict; catch it here with
 # the real remedy instead of the misleading "reconcile CONFLICT" the merge-failure path would print.
 # ONE definition of dirty, spelled identically in .githooks/pre-push, which refuses the same tree
-# (TOOL-aRepatriatedFork-8 S3, from inCMS's ARCH-dWaryGatepost-1). `-uno`, the spelling this used,
+# (TOOL-aRepatriatedFork-8 S3, from adopter ic's ARCH-dWaryGatepost-1). `-uno`, the spelling this used,
 # passed a brand-new untracked source file that the bar then certified and the push did not carry.
 # `--ignore-submodules=untracked` also refuses a moved submodule pointer and a tracked edit inside a
 # submodule, and ignores a submodule's own untracked files, which no commit here can carry.
@@ -184,7 +184,7 @@ while [ "$attempt" -le "$max" ]; do
     exit 0
   fi
 
-  # THE ORDER OF EVIDENCE is inCMS's: the hook's own verdict; else a probe of the push URL, so that
+  # THE ORDER OF EVIDENCE is adopter ic's: the hook's own verdict; else a probe of the push URL, so that
   # unreachability is OBSERVED rather than inferred; else fetch and ancestry, a race or a failure the
   # hook did not claim. An absent verdict is the cue to probe, never a pass: a hook that predates the
   # channel, or a push that died before the hook ran, writes none.

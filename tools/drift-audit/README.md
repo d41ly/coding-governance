@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.13` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.14` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -43,7 +43,7 @@ resolves the bound and denies that binder form, which is what makes the removal 
 than cosmetic.
 
 Measures whether a repo's own **records** still describe reality, and — at higher tiers — hunts dead,
-unwired and duplicated code. Ported from the inCMS audit that found a repo where 24 of 58 in-flight
+unwired and duplicated code. Ported from adopter ic's audit that found a repo where 24 of 58 in-flight
 ledger rows contradicted git and roughly half of all non-terminal spec headers said "not built" about
 shipped work, with every hygiene check green throughout.
 

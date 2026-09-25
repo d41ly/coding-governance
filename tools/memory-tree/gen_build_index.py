@@ -1724,7 +1724,7 @@ def extract_build_readmes(paths: list, memory_root: str) -> list:
 
     The slot contract and the survey used to keep every tracked path ending in `/README.md`, at any
     depth, while the render keys on `builds/<slug>/`. An adopter whose legacy records are folders
-    with a README inside (inCMS carried 41) was then graded as 41 malformed builds the render never
+    with a README inside (adopter ic carried 41) was then graded as 41 malformed builds the render never
     saw. ONE predicate for both verbs, because two copies of it are two answers to one question.
     """
     prefix = memory_root.rstrip("/") + "/builds/"

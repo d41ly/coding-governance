@@ -3,7 +3,7 @@
 
 TOOL-aRepatriatedFork-9. `check-arms.py`, `row_grammar.py` and `gotchas.py` used to import these from
 `corpus_ids.py` and `gen_build_index.py`, which made those two files a hard prerequisite of every
-engine beside them. At an adopter whose copies of those two are its own programs — inCMS, measured —
+engine beside them. At an adopter whose copies of those two are its own programs — adopter ic, measured —
 both gov engines died on import with an `ImportError`, so a fork of one file forced a fork of three.
 The helpers live here now, and the two modules that defined them re-import them, so every caller
 that reaches them through the old name keeps working.

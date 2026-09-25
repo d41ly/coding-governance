@@ -2,7 +2,7 @@
 /**
  * recall-opened — PostToolUse observer that INFERS which recall hit was read.
  *
- * FORKED from inCMS `.claude/hooks/recall-opened.js` at fd6274d. ONE construct is edited and the
+ * FORKED from adopter ic `.claude/hooks/recall-opened.js` at fd6274d. ONE construct is edited and the
  * rest is upstream's byte for byte, so a re-pull is a three-way merge: the corpus root. Upstream
  * tests a literal `memory/` prefix and then scans for the literal `/memory/` boundary, and both
  * return null for a corpus rooted anywhere else — after which main() bails, indistinguishable from

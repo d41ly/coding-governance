@@ -20,7 +20,7 @@ tools/check-spec-tokens.py	subprocess	2	gov-internal gate, shipped by no descrip
 tools/codebase-map/rank_harness.py	subprocess	1	project-owned harness, withheld from adopters
 tools/codebase-map/replay-phrases.py	subprocess	1	project-owned harness, withheld from adopters
 tools/codebase-map/selftest.py	subprocess	4	project-owned kit self-test, withheld from adopters
-tools/govkit/fixtures/make_incms_receipt.py	subprocess	4	govkit test fixture, shipped by no descriptor
+tools/govkit/fixtures/make_adopter_receipt.py	subprocess	4	govkit test fixture, shipped by no descriptor
 tools/govkit/govkit.py	subprocess	41	gov's deployer, shipped by no descriptor
 tools/govkit/matrix.py	subprocess	4	govkit acceptance matrix, shipped by no descriptor
 tools/govkit/refusal_join.py	subprocess	1	govkit helper, shipped by no descriptor

@@ -219,7 +219,7 @@ BUILD_README_ENTRY_CAP_CHARS="350"  # a build README, whose authored rows were m
 # other project's discipline reports green over rows nobody reconciled.
 # THIS REPO DECLARES cut. The shipped example declares snapshot — the deliberate example/gov
 # divergence READINESS_ROWS above already records — because snapshot is what this kit's prose has
-# always described and what inCMS practises (its scripts/rotate_index.py R1-R6 and carry_backlog.py).
+# always described and what adopter ic practises (its scripts/rotate_index.py R1-R6 and carry_backlog.py).
 # MEASURED, and the reason the key exists: memory/HYGIENE.md stated BOTH procedures in one paragraph
 # — move the whole file AND carry every non-terminal row forward — and the pair writes every live row
 # into a frozen file. memory/archive/TOOL.2026-08-17.md is what that produced: a header promising

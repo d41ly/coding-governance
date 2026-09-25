@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ask the memory tree a question and get the records that answer it.
 
-FORKED from inCMS ``scripts/recall/query.py`` at 5318064 (file last changed fd6274d).
+FORKED from adopter ic ``scripts/recall/query.py`` at 5318064 (file last changed fd6274d).
 Seven constructs are edited and the rest is upstream's byte for byte, so a re-pull is a three-way merge:
 (1) ``corpus_files()`` and the id grammar derive from ``.memory-tree.conf`` via ``recall_conf``;
 (2) ``sys.dont_write_bytecode`` above the ``sys.path`` insert; (3) every printed invocation derives

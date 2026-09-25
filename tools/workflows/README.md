@@ -104,7 +104,7 @@ the population is then every `*.js` the repo holds.
 
 1. `$HERE/hooks/agent-cap.js`
 2. `$HERE/../hooks/agent-cap.js` — gov and adopter nc both resolve here
-3. `$ROOT/.claude/hooks/agent-cap.js` — inCMS has no sibling `hooks/` at all, and this is its only copy
+3. `$ROOT/.claude/hooks/agent-cap.js` — adopter ic has no sibling `hooks/` at all, and this is its only copy
 
 The third rung is not a fallback for tidiness; a two-rung chain strands a real adopter, which was
 found by testing the derivation against both trees rather than by reasoning about one. A gate that

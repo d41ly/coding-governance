@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the retrieval document sets from the tracked corpus under ``$MEMORY_ROOT``.
 
-FORKED from inCMS ``scripts/recall/extract.py`` at 5318064 (file last changed 958bd35c3; fd6274d
+FORKED from adopter ic ``scripts/recall/extract.py`` at 5318064 (file last changed 958bd35c3; fd6274d
 is that revision's tip and never touched this file). The fork is SIX constructs wide, so a future
 re-pull is a three-way merge rather than archaeology: (1) ``FAMILIES``; (2) BOTH halves of the
 session era inside ``ERAS`` -- the node-tag class, and the trailing ``[a-z]*`` that keys this
@@ -64,7 +64,7 @@ CONF = recall_conf.resolve()
 #   session       ABL-bSiftedArchive-3  (family, "bSiftedArchive", "3")   ...and its -3b correction
 # The family list is an allowlist on purpose: a bare \b[A-Z]{2,8}- pattern also matches WU, AC, SS,
 # JSON, PII and a dozen other non-id tokens that outnumber several real families. FORKED: the
-# allowlist is the conf's FAMILIES rather than eleven baked-in inCMS tokens, plus any family the
+# allowlist is the conf's FAMILIES rather than eleven baked-in adopter ic tokens, plus any family the
 # conf declares CITED (`RECALL_CITED_FAMILIES`): an id this corpus mentions and never homes. Those
 # join this allowlist and never `_IDX` below, so a cited family gains ids and no durable home.
 FAMILIES = CONF.families + CONF.cited_families
@@ -145,9 +145,9 @@ _ROOT = re.escape(CONF.memory_root)  # FORKED: the corpus root is a conf value, 
 # four prefixes are not an adopter's, and a literal would ship them into every installed kit.
 #
 # The archive arm also admits one optional segment AFTER `archive/` (TOOL-aRepatriatedFork-12 S3):
-# inCMS rotates to `<root>/archive/<discipline>/DECISIONS.<date>.md`. Measured over each tree's
-# `git ls-files` with its own conf: gov 9 -> 9, nc 13 -> 13, inCMS 56 -> 71, the 71 being exactly
-# the set inCMS's own pattern selects. No key: a layout knob with one value is not a decision.
+# Adopter ic rotates to `<root>/archive/<discipline>/DECISIONS.<date>.md`. Measured over each tree's
+# `git ls-files` with its own conf: gov 9 -> 9, nc 13 -> 13, ic 56 -> 71, the 71 being exactly
+# the set adopter ic's own pattern selects. No key: a layout knob with one value is not a decision.
 _IDX = "(?:DECISIONS|BACKLOG|" + "|".join(re.escape(f) for f in CONF.families) + ")"
 DURABLE = re.compile(
     rf"{_ROOT}/(?:[^/]+/)?{_IDX}\.md$"
@@ -187,7 +187,7 @@ CHUNK_MAX = 2400
 
 # --- the alias layer ------------------------------------------------------------------------------
 # The alias MECHANISM ships; no alias DATA does. Upstream's aliases.json is 915 515 bytes of
-# questions authored against the inCMS corpus and joined by id, and no id in it exists anywhere
+# questions authored against adopter ic's corpus and joined by id, and no id in it exists anywhere
 # else. An absent default is a legal alias-free corpus (see load_aliases), so an adopter runs with
 # every alias cell empty until they author their own; drop an `aliases.json` in THIS directory and
 # it is picked up with no config edit, and the cache rebuilds on the digest change.

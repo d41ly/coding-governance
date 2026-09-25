@@ -10,9 +10,8 @@
 # `key` is the neutral spelling a provenance note uses instead, as in "adopter nc". A row with no key
 # is cited as "an adopter". Never a brand: the key is what the ban lets through.
 #
-# `[adopter.carried]` holds the sites that PREDATE the ban, `"<shipped path>" = <count>`, and is
-# SET-EQUAL with the measurement in both directions and by count: a new site reds, and a drained one
-# reds until its row falls in the same commit. No total is written here; the arm prints it.
+# A PURE BAN, every row alike. TOOL-aRepatriatedFork-35 drained the last carried sites, and the carry
+# table went with them: a shipped site is a red, never a count.
 
 [[adopter]]
 key = "nc"
@@ -21,52 +20,6 @@ names = ["NicoCares"]
 [[adopter]]
 names = ["swydee"]
 
-# Carried, not drained: inCMS's own name reaches nc and swydee through these files, which is the
-# same class. The drain is TOOL-aRepatriatedFork-35 in memory/backlog/TOOL.md.
 [[adopter]]
+key = "ic"
 names = ["inCMS"]
-
-[adopter.carried]
-".githooks/pre-push" = 6
-".githooks/pre-push.test.sh" = 22
-"tools/check-wiring.sh" = 2
-"tools/codebase-map/INVENTORY-DERIVATION.md" = 1
-"tools/codebase-map/README.md" = 1
-"tools/codebase-map/map_diff.py" = 1
-"tools/codebase-map/scen-adversarial.json" = 1
-"tools/codebase-map/selftest.py" = 2
-"tools/drift-audit/README.md" = 1
-"tools/drift-audit/drift_report.py" = 1
-"tools/hooks/agent-cap.js" = 1
-"tools/hooks/scratch-guard.test.sh" = 1
-"tools/lexicon/canon.py" = 1
-"tools/lexicon/scaffold_lexicon.py" = 1
-"tools/lexicon/selftest.py" = 1
-"tools/lexicon/ts-conformance-fixtures.json" = 9
-"tools/memory-recall/README.md" = 1
-"tools/memory-recall/extract.py" = 6
-"tools/memory-recall/kit.toml" = 2
-"tools/memory-recall/query.py" = 1
-"tools/memory-recall/recall-opened.js" = 1
-"tools/memory-recall/selftest.py" = 17
-"tools/memory-tree/.memory-tree.conf.example" = 1
-"tools/memory-tree/README.md" = 3
-"tools/memory-tree/check-memory-hygiene.sh" = 5
-"tools/memory-tree/gen_build_index.py" = 1
-"tools/memory-tree/kit.toml" = 1
-"tools/memory-tree/row_grammar.py" = 3
-"tools/memory-tree/tree_lib.py" = 1
-"tools/push-main.sh" = 6
-"tools/push-main.test.sh" = 14
-"tools/pytest-parallel-guardrails/README.md" = 1
-"tools/run-gates/run-gates.sh" = 1
-"tools/unattended/check-unattended.sh" = 3
-"tools/unattended/check-unattended.test.sh" = 1
-"tools/workflows/README.md" = 1
-"tools/workflows/REVIEW-PROTOCOL.template.md" = 1
-"tools/workflows/check-review-join.sh" = 2
-"tools/workflows/check-review-join.test.sh" = 1
-"tools/workflows/check-verifier-fanout.sh" = 1
-"tools/workflows/check-verifier-fanout.test.sh" = 2
-"tools/workflows/drift-audit-code.template.js" = 1
-"tools/workflows/drift-audit-state.template.js" = 1

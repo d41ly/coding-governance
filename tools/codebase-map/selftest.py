@@ -55,7 +55,7 @@ def claims(**over):
 
 
 class Skipped(Exception):
-    """An arm whose GUARD is unmet. TOOL-dRetiredFork-5, from inCMS's ABL-aFerriedToolkit-4.
+    """An arm whose GUARD is unmet. TOOL-dRetiredFork-5, from adopter ic's ABL-aFerriedToolkit-4.
 
     It is an exception and not a `return` because `check` cannot tell a return from a pass: the
     guarded arms printed an honest `NOT a pass.` and returned, and the next line stamped them `ok`.
@@ -1555,7 +1555,7 @@ def test_identifier_tokens_corpus_recall():
                       "corpus")
     try:
         listing = subprocess.run(
-            # `encoding=` EXPLICITLY (TOOL-dRetiredFork-5, from inCMS's
+            # `encoding=` EXPLICITLY (TOOL-dRetiredFork-5, from adopter ic's
             # KIT_CODEBASE_MAP_SELFTEST_DELTA). `text=True` alone decodes with the locale codec, so
             # a repo path carrying a non-ASCII byte raises UnicodeDecodeError on a Windows console
             # codepage and the arm dies for a reason that has nothing to do with what it measures.

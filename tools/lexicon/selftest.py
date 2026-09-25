@@ -976,7 +976,7 @@ with build_tempdir() as td:
     # A FLAG IS NOT A PATH. This script guarded its argv by ARITY alone, so
     # `scaffold_lexicon.py --help` is a well-formed one-argument call and `--help` became the
     # DESTINATION: the run derived a whole seed and wrote it to a file literally named `--help`.
-    # Measured on a real adopter (incms/main, 2026-08-23), where that file was committed and pushed
+    # Measured on a real adopter (adopter ic's main, 2026-08-23), where that file was committed and pushed
     # and then survived every leg of a 62-leg bar — nothing there enumerates root-level filenames,
     # and this kit's own `--check` looks for `.lexicon.conf` BY NAME, so a stray sibling is invisible
     # to it. The wrapper already refuses an unknown flag; the script it calls did not, and the script

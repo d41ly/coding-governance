@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.7
+# gov:kit lexicon@1.8
 """canon.py — the SHIPPED concept clusters a proposed verb table may draw from.
 
 THE RULE, and it is the whole point of this file:
@@ -33,7 +33,7 @@ THREE MEASUREMENTS SAY THIS IS NOT ONE AGENT'S TASTE, and they are worth keeping
      fetch, read NOT get, write NOT save, parse NOT convert, render NOT format, check NOT validate,
      scan NOT search, init NOT setup, remove NOT delete, set NOT update. The canon reproduces a
      curated table it never saw.
-  2. 55.2% of the 14,659 definitions measured on a real adopter (`incms/main`, 2026-08-24) already
+  2. 55.2% of the 14,659 definitions measured on a real adopter (adopter ic's `main`, 2026-08-24) already
      lead with a verb from this repo's table, in a repo that has never carried a declaration — and
      all six of that corpus's commonest off-table leaders land in a cluster (get, list -> read;
      validate, require -> check; create, make -> build).

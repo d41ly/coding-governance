@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.10   # gov:kit run-gates@1.10
+KIT_RUN_GATES_VERSION=1.11   # gov:kit run-gates@1.11
 # 1.7 -> 1.8: every bar appends one line to the run log under the git common dir, from the EXIT trap
 # (TOOL-dLoggedFlight-3). No manifest key, profile knob or stdout line moves, so neither direction of
 # a skew between the runner and its table or manifest changes a verdict.
@@ -149,7 +149,7 @@ LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
 # ---- durable per-leg evidence (TOOL-dNomadicAtlas-1) --------------------------------------------
 # leg() already holds every leg's merged output in $out and PRINTS it on failure, then keeps only the
 # ROW for the durable summary. The reason is in scope at the exact line the durable record is built,
-# and dropped there -- so a `| tail` still loses the WHY while keeping the WHICH. inCMS hit this for
+# and dropped there -- so a `| tail` still loses the WHY while keeping the WHICH. adopter ic hit this for
 # real: a red leg inside a push piped through `tail -45`, unidentifiable afterwards, and the
 # reflexive re-run passed, so the evidence was gone for good.
 #

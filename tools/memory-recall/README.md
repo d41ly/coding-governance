@@ -1,6 +1,6 @@
 # memory-recall — ask your decision corpus a question, get the records that answer it
 
-<!-- gov:kit memory-recall@1.12 -->
+<!-- gov:kit memory-recall@1.13 -->
 
 A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and
@@ -12,7 +12,7 @@ another kit's gate already enforces. A second declaration would be the hand-kept
 this port exists to remove, which is why there is no `--memory-root` and no `--families` flag: the
 conf is required, and its absence is a refusal that prints a two-key stub rather than scaffolding one.
 
-Ported from the inCMS `scripts/recall/` implementation at `5318064`.
+Ported from adopter ic's `scripts/recall/` implementation at `5318064`.
 
 ## What's here
 

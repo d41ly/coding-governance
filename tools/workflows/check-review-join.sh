@@ -75,7 +75,7 @@ fi
 
 # ---- THE PREDICATE, PROBED -------------------------------------------------------------------
 # Three rungs, and the third is not optional. Adopter nc keeps its hooks a directory up from its
-# harnesses, which rung 2 reaches. inCMS has no such directory AT ALL -- its only copy sits at
+# harnesses, which rung 2 reaches. adopter ic has no such directory AT ALL -- its only copy sits at
 # `.claude/hooks/agent-cap.js` -- so a two-rung chain strands it, and that was found by testing the
 # derivation against both trees rather than by reasoning about one.
 #
@@ -173,7 +173,7 @@ $body
 done
 
 # ---- ARM 2 — the agent wave that silently drops itself -------------------------------------------
-# TOOL-dRetiredFork-7, absorbed from inCMS, whose registry declared these +117 lines a POPULATION
+# TOOL-dRetiredFork-7, absorbed from adopter ic, whose registry declared these +117 lines a POPULATION
 # REPATH. One stage EARLIER than arm 1: a harness fans out to N lens agents and drops the dead ones
 # with a falsy filter. If nothing counts the wave's arity BEFORE that filter, an all-dead wave and an
 # all-clean wave both arrive downstream as `[]`. Observed live in THIS kit's tier2-review:

@@ -7,7 +7,7 @@ index, and a hygiene gate that keeps it that way. The owner reads indexes, not f
 re-deriving what memory already records.
 
 Opt-in. Everything project-specific lives in one repo-root `.memory-tree.conf`; the scripts and rules
-below are identical across repos. (Reference implementation: the inCMS `docs/`→`memory/` reorg,
+below are identical across repos. (Reference implementation: adopter ic's `docs/`→`memory/` reorg,
 ARCH-bOrderlyAtlas-1.)
 
 ## What's here
@@ -48,7 +48,7 @@ Copy `.memory-tree.conf.example` to your repo root as `.memory-tree.conf` and ed
   is a REFUSAL rather than a silent pass, because that combination grades no row at all.
 
 Disciplines are yours to name. A SWEBOK v4 mapping is a reasonable default lens (Software Architecture,
-Construction, Testing, Security, Operations, …), but product streams (as inCMS uses) work equally well —
+Construction, Testing, Security, Operations, …), but product streams (as adopter ic uses) work equally well —
 put the KA tag in each discipline's `README.md`, not in the folder name.
 
 ## Adopt — new project (scaffold)
@@ -63,7 +63,7 @@ git add memory/ .memory-tree.conf && git commit
 ## Adopt — existing tree (migrate)
 
 Migrating an existing docs/notes tree is a ONE-TIME landing, done in your repo (the re-file map is
-project-specific data, so it is not a generic script). The inCMS reorg is the worked reference; the
+project-specific data, so it is not a generic script). Adopter ic's reorg is the worked reference; the
 pattern:
 1. Write a table-driven mover that `git mv`s the whole tree to `MEMORY_ROOT`, then re-files per-feature
    material into `builds/YYYY-MM-DD-<FAMILY>-<slug>/`, with a census-drift guard that hard-fails any

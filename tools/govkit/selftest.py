@@ -6627,7 +6627,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- DEPL-dCarriedReceipt-9 S13 -- THE COMMITTED INCMS FIXTURE, BUILT AT LAST.
         # ---- Deferred when this unit was built on node `d`, where the inCMS checkout is not
         # ---- reachable; reopened by owner ruling 2026-08-26 on node `a`, where it is. Generated
-        # ---- once by `tools/govkit/fixtures/make_incms_receipt.py` from inCMS's own
+        # ---- once by `tools/govkit/fixtures/make_adopter_receipt.py` from inCMS's own
         # ---- `.governance/install.index` at `2cff5855` against gov `ce5dca99`, and committed, so
         # ---- everything below runs with NEITHER live repository present.
         # ----

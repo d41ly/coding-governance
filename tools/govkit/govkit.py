@@ -2669,25 +2669,23 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #          is banned the day it registers. Not `registry.toml`: the playbook renderer ships that
     #          file, so a name declared there would reach every adopter. The population is
     #          `cmd_shipped`'s, every role included: an adopter receives a `project-owned` seed as
-    #          surely as an engine. Sites predating the ban are CARRIED per adopter in
-    #          `[adopter.carried]`, SET-EQUAL in both directions and by count, so a drained site
-    #          forces its row down in the same commit and a new one reds.
+    #          surely as an engine. A PURE BAN: TOOL-aRepatriatedFork-35 drained the last carried
+    #          sites and retired the carry table, so a row still declaring one is refused rather
+    #          than silently ignored.
     #          DOES NOT CHECK: gov's own records, the deployer, or any file no descriptor ships; a
     #          name spelled across a line break; a brand no row declares.
     _adopters = load_toml(root / "tools" / "govkit" / "adopters.toml").get("adopter", [])
-    _anames: list[str] = []
-    _carried: dict[tuple, int] = {}
+    _akey: dict[str, str] = {}
     for _a in _adopters:
         _ns = [str(x).strip() for x in (_a.get("names") or []) if str(x).strip()]
         if not _ns:
             r.fail(f"an adopters.toml row declares no names, so the ban scans for nothing: {_a!r}")
-        _anames += _ns
-        for _cp, _cv in (_a.get("carried") or {}).items():
-            if len(_ns) != 1 or not isinstance(_cv, int) or _cv < 1:
-                r.fail(f"adopters.toml carries '{_cp}' = {_cv!r} under {_ns}: a carried count is a "
-                       f"positive integer, under a row declaring exactly one name")
-                continue
-            _carried[(_cp, _ns[0])] = _cv
+        if "carried" in _a:
+            r.fail(f"adopters.toml row {_ns} declares `carried`, which the ban no longer reads — "
+                   f"drain the sites and delete the table (TOOL-aRepatriatedFork-35)")
+        for _nm in _ns:
+            _akey[_nm] = f"adopter {_a['key']}" if _a.get("key") else "an adopter"
+    _anames = list(_akey)
     if not _anames:
         r.fail("adopters.toml declares no [[adopter]] names — the adopter-name ban would pass "
                "over every shipped file while grading nothing")
@@ -2704,18 +2702,12 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             _c = _low.count(_nm.lower())
             if _c:
                 _measured[(_src, _nm)] = _c
-    for _k in sorted(set(_measured) | set(_carried)):
-        _m, _cv = _measured.get(_k, 0), _carried.get(_k, 0)
-        if _m > _cv:
-            r.fail(f"'{_k[0]}' names the adopter `{_k[1]}` {_m} time(s) against {_cv} carried — a "
-                   f"shipped file reaches every adopter, and one's brand gate reds on another's "
-                   f"name. Cite the record id and the adopter's key (`adopter nc`), or `an adopter`")
-        elif _m < _cv:
-            r.fail(f"adopters.toml carries {_cv} `{_k[1]}` site(s) in '{_k[0]}' and {_m} "
-                   f"remain — lower the row in the same commit, the count can only fall")
+    for (_src, _nm), _m in sorted(_measured.items()):
+        r.fail(f"'{_src}' names the adopter `{_nm}` {_m} time(s) — a shipped file reaches every "
+               f"adopter, and one's brand gate reds on another's name. Cite the record id and "
+               f"`{_akey[_nm]}` instead")
     r.note(f"adopter names: {len(_anames)} from {len(_adopters)} adopters.toml row(s) over "
-           f"{len(_shipped)} shipped file(s) · {sum(_measured.values())} site(s), "
-           f"{sum(_carried.values())} carried")
+           f"{len(_shipped)} shipped file(s) · {sum(_measured.values())} site(s)")
     return r.emit()
 
 

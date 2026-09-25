@@ -37,7 +37,7 @@ exists to prove — so writing it through as `engine` is what lets those rows re
 Mapped rather than passed through, and the count is printed.
 
 RUN IT:
-    python tools/govkit/fixtures/make_incms_receipt.py \
+    python tools/govkit/fixtures/make_adopter_receipt.py \
         --incms C:/projects/incms/main --incms-rev 2cff5855 --gov-rev ce5dca99
 
 The output is committed beside this file so AC1 and AC2 re-run with NEITHER live repository
@@ -222,13 +222,13 @@ def build(incms: pathlib.Path, incms_rev: str, gov_rev: str) -> dict:
     return {
         "schema": 3,
         "gov_commit": gov_rev,
-        "gov_source": "(reconstructed — see make_incms_receipt.py)",
+        "gov_source": "(reconstructed — see make_adopter_receipt.py)",
         "provenance": {
             "adopter": "inCMS",
             "adopter_rev": incms_rev,
             "adopter_record": ".governance/install.index",
             "gov_rev": gov_rev,
-            "generated_by": "tools/govkit/fixtures/make_incms_receipt.py",
+            "generated_by": "tools/govkit/fixtures/make_adopter_receipt.py",
             "index_rows": len(raw),
             "unverified_rows": len(unverified),
             "unresolved": [f"[{k}] {p}" for k, p in unresolved],

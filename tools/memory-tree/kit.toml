@@ -356,7 +356,7 @@ probe = ["python3", "{own}", "--for-paths", "{own}"]
 expect = "(?m)^# "
 consumer = "kickoff-manifest:SKILL.md unattended:SKILL.template.md"
 
-# SHAPE-EXACT, and measured: inCMS's own hygiene engine ignores two of these flags and runs its whole
+# SHAPE-EXACT, and measured: adopter ic's own hygiene engine ignores two of these flags and runs its whole
 # check instead, whose failure text a bare `\S` read as a pass. One path per line, and one line.
 [[contract]]
 source = "check-memory-hygiene.sh"

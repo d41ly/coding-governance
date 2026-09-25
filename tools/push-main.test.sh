@@ -3,7 +3,7 @@
 # against a scratch bare remote with a STUBBED gate (GOV_GATE_CMD). Exit 0 = all cases pass.
 set -u
 # THE SUBJECT IS FOUND FROM THIS FILE'S OWN LOCATION (TOOL-aRepatriatedFork-8 S6). This suite ships
-# beside its lander to whatever prefix an adopter installs the kit at (`scripts/` at inCMS), and it
+# beside its lander to whatever prefix an adopter installs the kit at (`scripts/` at adopter ic), and it
 # used to spell `tools/` for both, so an adopter had to fork it to run it. KIT_REL is where the pair
 # sits relative to the root, as git reports it: `tools/` here, empty at a root install.
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -195,7 +195,7 @@ case "$out11" in
 esac
 rm -f brand_new_module.py
 
-# 12 — no wording in the bar's output can FAKE a race or an outage (S2; inCMS's ABL-aWeighedAssay-2).
+# 12 — no wording in the bar's output can FAKE a race or an outage (S2; adopter ic's ABL-aWeighedAssay-2).
 #      The remote refuses by pre-receive while the stub, GREEN, floods both poison words. The remote
 #      does not move and the hook wrote no verdict, so the one correct reading is "reachable,
 #      unchanged, unclaimed", reported once, after exactly one bar run. A re-gate is the regression.
@@ -232,7 +232,7 @@ case "$rc5u:$out5u" in
   *) bad "AC5 expected the probed-unreachable verdict at rc 1, got rc $rc5u: $out5u" ;;
 esac
 
-# 13 — ONE definition of dirty, in the lander and the hook alike (S3). When they disagreed at inCMS
+# 13 — ONE definition of dirty, in the lander and the hook alike (S3). When they disagreed at adopter ic
 #      (ARCH-dWaryGatepost-1) the lander cleared a push the hook then refused. Compared as a STRING:
 #      the failure this gates is a divergence in the flag.
 DIRTY_PRED='git status --porcelain --ignore-submodules=untracked'
@@ -250,20 +250,20 @@ for f in "$HERE/push-main.sh" "$SRC/.githooks/pre-push"; do
   else ok "14 ${f##*/} carries no retired dirty definition"; fi
 done
 
-# AC1 — a remote NOT named origin (inCMS's node `d` names it `incms`): the lander resolves the remote
+# AC1 — a remote NOT named origin (adopter ic's node `d` names it after the project): the lander resolves the remote
 #       first and reads ITS HEAD, and the hook reads the remote git names in $1. With no
 #       GOV_DEFAULT_BRANCH exported, the pre-S1 lander exited 2 before its first fetch.
-git init -q --bare "$tmp/incms.git"
-setup_repo "$tmp/wi" incms "$tmp/incms.git"
-git push -q --no-verify incms main
-git -C "$tmp/incms.git" symbolic-ref HEAD refs/heads/main
-git remote set-head incms main >/dev/null 2>&1
+git init -q --bare "$tmp/mirror.git"
+setup_repo "$tmp/wi" mirror "$tmp/mirror.git"
+git push -q --no-verify mirror main
+git -C "$tmp/mirror.git" symbolic-ref HEAD refs/heads/main
+git remote set-head mirror main >/dev/null 2>&1
 git commit -q --allow-empty -m ci
 out1i=$( ( unset GOV_DEFAULT_BRANCH; bash "$lander" 2>&1 ) ); rc1i=$?
-if [ "$rc1i" -eq 0 ] && [ "$(git -C "$tmp/incms.git" rev-parse main)" = "$(git rev-parse HEAD)" ]; then
-  ok "AC1 a remote named incms lands with no GOV_DEFAULT_BRANCH"
+if [ "$rc1i" -eq 0 ] && [ "$(git -C "$tmp/mirror.git" rev-parse main)" = "$(git rev-parse HEAD)" ]; then
+  ok "AC1 a remote named mirror lands with no GOV_DEFAULT_BRANCH"
 else
-  bad "AC1 a remote named incms did not land (rc $rc1i): $out1i"
+  bad "AC1 a remote named mirror did not land (rc $rc1i): $out1i"
 fi
 # ...and with SEVERAL remotes and none configured for the branch it refuses rather than guess (F2).
 git remote add second "$tmp/remote.git"
