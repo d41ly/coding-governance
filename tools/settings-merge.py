@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.7
+# gov:kit settings-merge@1.8
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 tools/hooks/agent-cap.js verbatim):
@@ -68,7 +68,7 @@ import sys
 import tempfile
 from pathlib import Path, PurePosixPath
 
-KIT_SETTINGS_MERGE_VERSION = "1.7"  # gov:kit settings-merge@1.7 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.8"  # gov:kit settings-merge@1.8 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 
@@ -242,10 +242,36 @@ def resolve_hook_path(hook_path: str, frag_file: str | None = None) -> str:
         rel = _kit_rel() if here_rel is None else PurePosixPath(here_rel).parent.as_posix()
         if rel == ".":
             rel = ""
-        return hook_path.replace("{kit}/", (rel + "/") if rel else "")
+        return resolve_owned_hook(hook_path.replace("{kit}/", (rel + "/") if rel else ""))
     if "{here}" in hook_path:
         raise ValueError("a {here} hook_path resolves only against a fragment file, and none was given")
     return hook_path.replace("{kit}", _kit_rel())
+
+
+def resolve_owned_hook(path: str) -> str:
+    """TOOL-aRepatriatedFork-36. A hook the target keeps ELSEWHERE, declared rather than guessed.
+
+    A fragment names gov's copy beside its kit. A target running its own copy at another path
+    declares it `[[own]]`, which `govkit adopt` records as an `adopter-owned` receipt row carrying
+    the SAME `source` as gov's engine row at `path`. Joined on that source exactly; with no receipt,
+    no engine row at `path`, or no owned row for its source, `path` comes back unchanged.
+    check-wiring.sh's `resolve_owned_hook` makes the same join and check-hook-destinations compares
+    the two readers' answers.
+    """
+    try:
+        rows = json.loads((Path.cwd() / ".governance" / "install.json").read_text(encoding="utf-8"))
+        rows = [f for f in rows.get("files") or [] if isinstance(f, dict)]
+    except (OSError, ValueError, AttributeError):
+        return path
+    src = next((f.get("source") for f in rows
+                if f.get("path") == path and f.get("role") != "adopter-owned"), None)
+    for f in rows if src else ():
+        p = f.get("path")
+        if (f.get("role") == "adopter-owned" and f.get("source") == src and isinstance(p, str)
+                and not p.startswith("/") and not re.match(r"[A-Za-z]:", p)
+                and ".." not in PurePosixPath(p).parts):
+            return p
+    return path
 
 
 def check_ours(command, marker: str, hook_path: str) -> bool:
@@ -589,6 +615,27 @@ def _selftest() -> int:
             raise AssertionError("{here} resolved with no fragment file to resolve it against")
         except ValueError:
             pass
+        # 13b) TOOL-aRepatriatedFork-36: an `adopter-owned` receipt row carrying the source of gov's
+        #      engine row at the resolved path moves the hook to the target's own copy; the owned
+        #      row alone, with no engine row at that path, joins to nothing.
+        _cwd13 = Path.cwd()
+        try:
+            __import__("os").chdir(root)
+            (root / ".governance").mkdir()
+            (root / "k").mkdir()
+            frag13 = root / "k" / "f.fragment.json"
+            frag13.write_text("{}\n", encoding="utf-8")
+            rows13 = [{"path": "k/h.js", "role": "engine", "source": "g/k/h.js"},
+                      {"path": ".claude/hooks/h.js", "role": "adopter-owned", "source": "g/k/h.js"}]
+            rcpt13 = root / ".governance" / "install.json"
+            rcpt13.write_text(json.dumps({"files": rows13}) + "\n", encoding="utf-8")
+            got13 = resolve_hook_path("{here}/h.js", str(frag13))
+            assert got13 == ".claude/hooks/h.js", got13
+            rcpt13.write_text(json.dumps({"files": rows13[1:]}) + "\n", encoding="utf-8")
+            got13 = resolve_hook_path("{here}/h.js", str(frag13))
+            assert got13 == "k/h.js", got13
+        finally:
+            __import__("os").chdir(_cwd13)
         if card and replay:
             sf13 = root / "s13.json"
             for fr in (card, replay):

@@ -711,6 +711,7 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
     (fx / "tools" / "govkit" / "entries").mkdir(parents=True, exist_ok=True)
     (fx / "tools" / "demo").mkdir(parents=True, exist_ok=True)
     shutil.copy(GOVKIT, fx / "tools" / "govkit" / "govkit.py")
+    shutil.copy2(GOVKIT.parent / "adopters.toml", fx / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
     (fx / "tools" / "govkit" / "registry.toml").write_text(
         '[[entry]]\nid = "demo"\ndescriptor = "tools/govkit/entries/demo.kit.toml"\n',
         encoding="utf-8", newline="\n")
@@ -745,6 +746,7 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
     for d in ("tools/govkit/entries", "tools/vk", "tools/nk"):
         (fx / d).mkdir(parents=True, exist_ok=True)
     shutil.copy(GOVKIT, fx / "tools" / "govkit" / "govkit.py")
+    shutil.copy2(GOVKIT.parent / "adopters.toml", fx / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
     files = {
         "tools/govkit/registry.toml":
             '[[entry]]\nid = "vk"\ndescriptor = "tools/govkit/entries/vk.kit.toml"\n\n'
@@ -871,6 +873,7 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
     (g / "tools" / "govkit").mkdir(parents=True)
     (g / "tools" / "demo").mkdir(parents=True)
     shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+    shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
     (g / "tools" / "govkit" / "registry.toml").write_text(
         '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
         '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
@@ -1039,6 +1042,7 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
     (g / "tools" / "govkit").mkdir(parents=True)
     (g / "tools" / "demo").mkdir(parents=True)
     shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+    shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
     (g / "tools" / "govkit" / "registry.toml").write_text(SAFE_REG, encoding="utf-8", newline="\n")
     for name, body in (("kit.toml", OWN_KIT), ("run.py", OWN_RUN), ("seed.txt", "seed\n"),
                        ("use.py", "from run import alpha, beta\n"), ("tpl.md", "tpl\n")):
@@ -1182,6 +1186,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
         g = tmp / f"{tag}-gov"
         (g / "tools" / "govkit").mkdir(parents=True)
         shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+        shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
         (g / "tools" / "govkit" / "registry.toml").write_bytes(SAFE_REG.encode("utf-8"))
         for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
                   ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
@@ -2920,37 +2925,19 @@ user_skills = "/tmp/gk-fake-skills"
         # makes git report an invalid attribute name on every query in that repo, and leaves the
         # open marker off column 0 -- after which every later apply refuses forever while the
         # receipt claims a block that can never be found again.
-        # --- DEPL-dGaugedVintage-3 S1/S2/S4. AN ENTRY THAT LANDS NO PROGRAM MUST NOT READ AS
-        # --- ADOPTED. `memory-recall` is a registry DEFAULT whose engine files are `forked`, which
-        # --- the derived LANDABLE_ROLES excludes, so `apply` lands its rendered Skill — which tells
-        # --- an agent to run the CLI — and never the CLI. OBSERVED RED on the pre-fix binary over a
-        # --- fresh target: `query.py` absent and zero INCOMPLETE lines.
-        # --- The detection keys on the ROLE, never on the kit id, which is what makes it a class
-        # --- assertion while exactly one `forked` rule ships.
+        # --- TOOL-aRepatriatedFork-36. `memory-recall` is a registry DEFAULT, and it used to ship its
+        # --- CLI, extractor and hook `forked`, so `apply` landed a Skill telling an agent to run a
+        # --- CLI it never wrote (DEPL-dGaugedVintage-3). The kit declares no forked rule now, so a
+        # --- fresh target receives all three. The INCOMPLETE report that existed for that state is
+        # --- graded over the synthetic `demo` fork in the DEPL-dCarriedReceipt-10 block below.
         inc = make_target(tmp / "incomplete", DEPLOY_FULL)
         p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
         out = p.stdout + p.stderr
-        check("[dGV-3] apply reports an entry INCOMPLETE when its forked files are absent",
-              "INCOMPLETE memory-recall" in out, out[-900:])
-        check("[dGV-3] and it names EVERY absent file with the role that withheld it",
-              out.count("absent [forked") >= 3, out[-900:])
-        check("[dGV-3] and it gives UNLANDED_REASON's sentence rather than a bare skip",
-              "derivative of the target's" in out, out[-900:])
-        check("[dGV-3] and it tells the operator gov will not send them",
-              "gov will not send them" in out, out[-900:])
-        check("[dGV-3] the CLI really is absent, so the report is not describing a landed file",
-              not (inc / "tools" / "memory-recall" / "query.py").exists())
         _mr = inc / "tools" / "memory-recall"
-        _mr.mkdir(parents=True, exist_ok=True)
-        (_mr / "query.py").write_text("# the adopter's own" + NLp, encoding="utf-8", newline=NLp)
-        (_mr / "extract.py").write_text("# own" + NLp, encoding="utf-8", newline=NLp)
-        (_mr / "recall-opened.js").write_text("// own" + NLp, encoding="utf-8", newline=NLp)
-        p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
-        check("[dGV-3] a target that ALREADY holds its forked files is not reported incomplete",
-              "INCOMPLETE memory-recall" not in (p.stdout + p.stderr), (p.stdout + p.stderr)[-700:])
-        check("[dGV-3] and apply left the adopter's own bytes alone",
-              (_mr / "query.py").read_text(encoding="utf-8").startswith("# the adopter's own"),
-              (_mr / "query.py").read_text(encoding="utf-8"))
+        check("[aRF-36] apply lands memory-recall's CLI, extractor and hook on a fresh target",
+              all((_mr / f).is_file() for f in ("query.py", "extract.py", "recall-opened.js")),
+              out[-900:])
+        check("[aRF-36] ...and reports no entry INCOMPLETE", "INCOMPLETE" not in out, out[-900:])
 
         pg = pin_target("u6p1", b"*.sh text eol=lf")          # deliberately no trailing newline
         run("apply", "--target", str(pg), "--kits", "memory-recall,memory-tree")
@@ -3942,6 +3929,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -4004,6 +3992,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -5010,6 +4999,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -5798,6 +5788,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -6483,6 +6474,7 @@ user_skills = "/tmp/gk-fake-skills"
             g = tmp / f"{name}-gov"
             (g / "tools" / "govkit").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -6879,6 +6871,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -7016,6 +7009,28 @@ user_skills = "/tmp/gk-fake-skills"
               and _fr[0].get("record") == "DEPL-dCarriedReceipt-10", str(_fr))
         check("[-10] ...and carries NEITHER identity, so `-7`'s S9 preamble passes it over",
               len(_fr) == 1 and "gov_oid" not in _fr[0] and "commit" not in _fr[0], str(_fr))
+        check("[dGV-3] a target that ALREADY holds its forked file is not reported incomplete",
+              "INCOMPLETE demo" not in _ap.stdout + _ap.stderr, (_ap.stdout + _ap.stderr)[-700:])
+
+        # ---- DEPL-dGaugedVintage-3 S1/S2/S4, over a FRESH target. AN ENTRY THAT LANDS NO PROGRAM
+        # ---- MUST NOT READ AS ADOPTED. These arms used the real memory-recall kit until
+        # ---- TOOL-aRepatriatedFork-36 retired its forked rule; the detection keys on the ROLE,
+        # ---- never on the kit id, so this fixture grades the same branch.
+        _gi = fork_gov("incomplete", fork_kit())
+        _ti = make_target(tmp / "fork-incomplete-t",
+                          'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n')
+        _ip = run_in_gov(_gi, "apply", "--target", str(_ti), "--kits", "demo")
+        _io = _ip.stdout + _ip.stderr
+        check("[dGV-3] apply reports an entry INCOMPLETE when its forked files are absent",
+              "INCOMPLETE demo" in _io, _io[-900:])
+        check("[dGV-3] and it names the absent file with the role that withheld it",
+              "absent [forked" in _io and "tools/demo/forked-one.py" in _io, _io[-900:])
+        check("[dGV-3] and it gives UNLANDED_REASON's sentence rather than a bare skip",
+              "derivative of the target's" in _io, _io[-900:])
+        check("[dGV-3] and it tells the operator gov will not send them",
+              "gov will not send them" in _io, _io[-900:])
+        check("[dGV-3] the forked file really is absent, so the report is not describing a landed one",
+              not (_ti / "tools" / "demo" / "forked-one.py").exists())
 
         # Gov moves BOTH files. The engine row must still move — an arm where nothing updates
         # cannot tell "the forked row was skipped" from "the whole run did nothing".
@@ -7170,6 +7185,7 @@ user_skills = "/tmp/gk-fake-skills"
             g = tmp / f"rn-{tag}-gov"
             (g / "tools" / "govkit").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -7696,6 +7712,7 @@ user_skills = "/tmp/gk-fake-skills"
         _gs2 = tmp / "st2-gov"
         (_gs2 / "tools" / "govkit").mkdir(parents=True)
         shutil.copy2(GOVKIT, _gs2 / "tools" / "govkit" / "govkit.py")
+        shutil.copy2(GOVKIT.parent / "adopters.toml", _gs2 / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
         (_gs2 / "tools" / "govkit" / "registry.toml").write_text(
             '[surface]\nglobs = ["tools/*"]\n\n'
             '[selection]\ndefault = ["mvkit"]\n\n'
@@ -7882,6 +7899,7 @@ user_skills = "/tmp/gk-fake-skills"
         _gl = tmp / "st1-gov"
         (_gl / "tools" / "govkit").mkdir(parents=True)
         shutil.copy2(GOVKIT, _gl / "tools" / "govkit" / "govkit.py")
+        shutil.copy2(GOVKIT.parent / "adopters.toml", _gl / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
         (_gl / "tools" / "govkit" / "registry.toml").write_text(
             '[surface]\nglobs = ["tools/*"]\n\n'
             '[selection]\ndefault = ["landkit"]\n\n'
@@ -8100,6 +8118,7 @@ user_skills = "/tmp/gk-fake-skills"
             g = tmp / "rn-carry-gov"
             (g / "tools" / "govkit").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -8276,6 +8295,7 @@ user_skills = "/tmp/gk-fake-skills"
             log = tmp / f"v14-{tag}-runs.txt"
             (g / "tools" / "govkit").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 "[selection]\ndefault = [" + ", ".join(f'"{e}"' for e in kits) + "]\n\n"
@@ -12047,6 +12067,7 @@ user_skills = "/tmp/gk-fake-skills"
             g = tmp / "pv-gov"
             (g / "tools" / "govkit").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["review-harness"]\n\n'
                 '[[entry]]\nid = "review-harness"\ndescriptor = "tools/workflows/kit.toml"\n\n'
@@ -13393,6 +13414,7 @@ user_skills = "/tmp/gk-fake-skills"
             g = tmp / ("m13-gov-" + tag)
             (g / "tools" / "govkit").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(M13_REG, encoding="utf-8",
                                                                   newline="\n")
             for eid, leg, eng, chk in (("demo", leg_name, leg_engine, with_check),

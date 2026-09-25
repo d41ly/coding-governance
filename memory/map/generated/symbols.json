@@ -5718,6 +5718,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "resolve_owned_hook",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
+    },
+    {
       "id": "resolve_owned_rows",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

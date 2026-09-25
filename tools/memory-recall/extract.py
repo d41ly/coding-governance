@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the retrieval document sets from the tracked corpus under ``$MEMORY_ROOT``.
 
-FORKED from adopter ic ``scripts/recall/extract.py`` at 5318064 (file last changed 958bd35c3; fd6274d
+Ported from adopter ic ``scripts/recall/extract.py`` at 5318064 (file last changed 958bd35c3; fd6274d
 is that revision's tip and never touched this file). The fork is SIX constructs wide, so a future
 re-pull is a three-way merge rather than archaeology: (1) ``FAMILIES``; (2) BOTH halves of the
 session era inside ``ERAS`` -- the node-tag class, and the trailing ``[a-z]*`` that keys this

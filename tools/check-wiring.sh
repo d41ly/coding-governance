@@ -24,7 +24,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.10   # gov:kit check-wiring@1.10 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.11   # gov:kit check-wiring@1.11 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -150,7 +150,35 @@ resolve_fragment_hook() { # fragment path -> its hook_path, tokens expanded; rc 
   [ -n "$hp" ] || { echo "check-wiring: $frag declares no hook_path" >&2; return 1; }
   here=$(dirname "$frag"); [ "$here" = . ] && here=""
   kitpfx=$(dirname "${here:-.}"); [ "$kitpfx" = . ] && kitpfx=""
-  printf '%s\n' "$hp" | sed -e "s|{kit}/|${kitpfx:+$kitpfx/}|g" -e "s|{here}/|${here:+$here/}|g"
+  hp=$(printf '%s\n' "$hp" | sed -e "s|{kit}/|${kitpfx:+$kitpfx/}|g" -e "s|{here}/|${here:+$here/}|g")
+  printf '%s\n' "$(resolve_owned_hook "$hp")"
+}
+# A HOOK THE TARGET KEEPS ELSEWHERE — TOOL-aRepatriatedFork-36. The fragment names gov's copy beside
+# the kit; a target that runs its own copy at another path declares it `[[own]]`, and `adopt` records
+# that as an `adopter-owned` receipt row carrying the SAME `source` as gov's engine row at the
+# resolved path. The join is on that source, exactly, so nothing here guesses a layout. No receipt,
+# no engine row at the path, or no owned row for its source: the path comes back unchanged.
+# settings-merge.py's `resolve_hook_path` makes the same join; check-hook-destinations compares them.
+resolve_owned_hook() { # resolved hook path -> the adopter-owned path implementing its source, else itself
+  local got=""
+  [ -f .governance/install.json ] && got=$(awk -v want="$1" '
+    function val(l) { sub(/^[^:]*:[[:space:]]*"/, "", l); sub(/".*$/, "", l); return l }
+    /^[[:space:]]*\{[[:space:]]*$/          { p = ""; s = ""; ro = ""; next }
+    /^[[:space:]]*"path"[[:space:]]*:/      { p = val($0); next }
+    /^[[:space:]]*"source"[[:space:]]*:/    { s = val($0); next }
+    /^[[:space:]]*"role"[[:space:]]*:/      { ro = val($0); next }
+    /^[[:space:]]*\}[[:space:]]*,?[[:space:]]*$/ {
+      if (p != "") { n++; P[n] = p; S[n] = s; R[n] = ro }
+      p = ""; s = ""; ro = ""
+    }
+    END {
+      for (i = 1; i <= n; i++) if (P[i] == want && R[i] != "adopter-owned") src = S[i]
+      if (src == "") exit
+      for (i = 1; i <= n; i++)
+        if (R[i] == "adopter-owned" && S[i] == src && P[i] !~ /^\// && P[i] !~ /^[A-Za-z]:/ \
+            && P[i] !~ /(^|\/)\.\.(\/|$)/) { print P[i]; exit }
+    }' .governance/install.json 2>/dev/null)
+  printf '%s' "${got:-$1}"
 }
 
 MODE=check; FRAG_ARG=""

@@ -1818,7 +1818,8 @@ a `{kit}` token and both the writer and the checker expand it against the fragme
   carries one deliberate delta (`TOOL-dTracedLattice-7`, `run_rm3` made hash-seed-independent), so
   overwriting it reverts that fix and the pin goes green over the revert. `extract.py`, `query.py`
   and `recall-opened.js` are FORKS — each carries a header naming the upstream path and sha it was
-  taken from, so a re-pull is a three-way merge, not archaeology. `recall_conf.py`, `selftest.py`, `SKILL.template.md`, `adopt-memory-recall.sh` and the
+  taken from, so a re-pull is a three-way merge, not archaeology. Gov ships all three as `engine`
+  since TOOL-aRepatriatedFork-36, so an adopter runs them verbatim. `recall_conf.py`, `selftest.py`, `SKILL.template.md`, `adopt-memory-recall.sh` and the
   fragment are this kit's own. Never overwrite the RENDERED `.claude/skills/memory-recall/SKILL.md` by
   hand — re-run `--scaffold`, which is what `--check` grades. After any `FAMILIES`/`MEMORY_ROOT` edit,
   re-run `--scaffold`; the cache invalidates itself on the resolved conf, so no manual purge is needed.

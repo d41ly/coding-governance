@@ -363,6 +363,28 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall' && printf '%s' "$out" | grep -q 'is missing'; } \
     && ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 1 || ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 0
+
+  # state 6 — TOOL-aRepatriatedFork-36: the SAME state, but the target keeps its own hook at
+  # `.claude/hooks/` and declared it `[[own]]`, so the receipt carries an `adopter-owned` row with the
+  # source of gov's engine row at the fragment's path. The fragment resolves to the owned copy, both
+  # readers agree on it, and the arm is ok. Without the seam this is state 5's false UNWIRED.
+  src6="$KIT_REL/memory-recall/recall-opened.js"  # gov:root-fixture — the receipt's gov-side source, any string both rows share
+  mkdir -p .governance; printf '// the target'"'"'s own\n' > .claude/hooks/recall-opened.js
+  printf '{\n  "files": [\n    {\n      "path": "%s",\n      "role": "engine",\n      "source": "%s"\n    },\n    {\n      "path": "%s",\n      "role": "adopter-owned",\n      "source": "%s"\n    }\n  ]\n}\n' \
+    memory-recall/recall-opened.js "$src6" .claude/hooks/recall-opened.js "$src6" > .governance/install.json  # gov:root-fixture — scratch repo built at the ROOT prefix
+  got=$(bash "$SCRIPT" --resolve-fragment memory-recall/recall-opened.fragment.json 2>/dev/null)  # gov:root-fixture — scratch repo built at the ROOT prefix
+  ck "AC8 an adopter-owned receipt row moves the resolved hook to the target's copy" "$([ "$got" = .claude/hooks/recall-opened.js ] && echo 1 || echo 0)"
+  got2=$("$py" ${KP}settings-merge.py --resolve-fragment memory-recall/recall-opened.fragment.json 2>/dev/null)  # gov:root-fixture — scratch repo built at the ROOT prefix
+  ck "AC8 ...and settings-merge.py resolves the same path" "$([ "$got2" = "$got" ] && echo 1 || echo 0)"
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
+    && ck "AC8 recall hook kept elsewhere and declared owned -> ok, exit 0" 1 || ck "AC8 recall hook kept elsewhere and declared owned -> ok, exit 0" 0
+  # its control: the owned row alone, with no engine row at the fragment's path, joins to nothing.
+  printf '{\n  "files": [\n    {\n      "path": "%s",\n      "role": "adopter-owned",\n      "source": "%s"\n    }\n  ]\n}\n' \
+    .claude/hooks/recall-opened.js "$src6" > .governance/install.json
+  got=$(bash "$SCRIPT" --resolve-fragment memory-recall/recall-opened.fragment.json 2>/dev/null)  # gov:root-fixture — scratch repo built at the ROOT prefix
+  ck "AC8 control — with no engine row at the fragment's path the hook stays beside the fragment" "$([ "$got" = memory-recall/recall-opened.js ] && echo 1 || echo 0)"  # gov:root-fixture — scratch repo built at the ROOT prefix
+  rm -rf .governance .claude/hooks/recall-opened.js
   cleanup
 else
   echo "skip recall cases — settings-merge.py or recall-opened.fragment.json not found"

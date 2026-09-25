@@ -1,6 +1,6 @@
 # memory-recall — ask your decision corpus a question, get the records that answer it
 
-<!-- gov:kit memory-recall@1.13 -->
+<!-- gov:kit memory-recall@1.14 -->
 
 A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and
@@ -118,6 +118,9 @@ is indistinguishable from one that was never built.
    PostToolUse hook; skipping it is a supported end state, not a gap. With `--with-hook`, finish
    the wiring:
    `python3 settings-merge.py --fragment tools/memory-recall/recall-opened.fragment.json`.
+   A hook you keep OUTSIDE this directory is declared, not moved: an `[[own]]` row in
+   `.governance/deploy.toml` implementing `memory-recall:recall-opened.js`, after which the
+   fragment resolves to your copy in both `check-wiring.sh` and `settings-merge.py`.
 3. **Wire both legs into your local gate runner AND your CI config**, grep-guarded so a re-run does
    not duplicate them. Without this the skill-drift check silently never runs:
    `python3 tools/memory-recall/selftest.py` and `bash tools/memory-recall/adopt-memory-recall.sh --check`.
