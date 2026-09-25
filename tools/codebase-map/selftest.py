@@ -558,7 +558,8 @@ def test_renders_round_trip_and_determinism():
 def test_conf_grammar(tmp: Path):
     (tmp / ".codebase-map.conf").write_text(
         '# c\nMAP_ROOT=docs/map\nGATE_FILE="tests/test map.py"\n'
-        "export MAP_DIFF_CMD=python\nBAD=docs/map # inline\n",
+        "export MAP_DIFF_CMD=python\nBAD=docs/map # inline\n"
+        'NOTED="a b"   # inline after a quoted value\n',
         encoding="utf-8",
     )
     conf = m.load_conf(tmp)
@@ -566,6 +567,7 @@ def test_conf_grammar(tmp: Path):
     assert conf["GATE_FILE"] == "tests/test map.py"  # quoted value keeps its space
     assert conf["MAP_DIFF_CMD"] == "python"  # export prefix normalized
     assert conf["BAD"] == "docs/map"  # unquoted value ends at whitespace, comment can't leak
+    assert conf["NOTED"] == "a b", conf["NOTED"]  # TOOL-aRepatriatedFork-38: ends at its quote
 
 
 def test_glob_brackets_fail_loud_and_escape_works():

@@ -304,10 +304,12 @@ def test_parser_vs_bash():
             "MEMORY_ROOT=memory   # trailing comment on an unquoted value\n"
             'export FAMILIES="tooling:TOOL playbook:PLAY"\n'
             'SPACED="a value with spaces"\n'
-            "PLAIN=plain\n",
+            "PLAIN=plain\n"
+            # TOOL-aRepatriatedFork-38: a quoted value with a trailing comment read as `"a`.
+            'NOTED="a quoted value"   # trailing comment on a quoted value\n',
             encoding="utf-8", newline="\n",
         )
-        keys = ["MEMORY_ROOT", "FAMILIES", "SPACED", "PLAIN"]
+        keys = ["MEMORY_ROOT", "FAMILIES", "SPACED", "PLAIN", "NOTED"]
         script = ". '%s'; printf '%%s\\n' %s" % (
             (root / ".memory-tree.conf").as_posix(),
             " ".join(f'"${k}"' for k in keys),

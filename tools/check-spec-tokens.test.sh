@@ -143,6 +143,17 @@ sed -i 's|^`real leg`\.|The bar and whatever it drags in.|' "$d/memory/builds/tO
 git -C "$d" add -A >/dev/null
 arm "a post-cutoff section 7 naming no leg REDS" 1 "$d" "contributes no leg name"
 
+# TOOL-aRepatriatedFork-38 — the SAME cutoff with a trailing comment, quoted and then unquoted. The
+# old reader demanded nothing after the closing quote, so the quoted one read as BLANK (arm off).
+d=$base/leglinenote; scratch "$d"
+printf 'SPEC_LEGLINE_CUTOFF="2026-09-01"   # a trailing note\n' > "$d/.memory-tree.conf"
+sed -i 's|^`real leg`\.|The bar and whatever it drags in.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a quoted cutoff with a trailing comment still arms the join" 1 "$d" "contributes no leg name"
+printf 'SPEC_LEGLINE_CUTOFF=2026-09-01   # a trailing note\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "an unquoted cutoff with a trailing comment still arms the join" 1 "$d" "contributes no leg name"
+
 # ...and its PRE-cutoff twin is green, so nothing landed goes retroactively red.
 d=$base/leglinepre; scratch "$d"
 printf 'SPEC_LEGLINE_CUTOFF="2026-09-30"

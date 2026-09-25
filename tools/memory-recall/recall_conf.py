@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.14
+gov:kit memory-recall@1.15
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -47,7 +47,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.14"
+KIT_MEMORY_RECALL_VERSION = "1.15"
 
 CONF_NAME = ".memory-tree.conf"
 # The DEFAULT: a-z, per the memory-tree hygiene gate's own `node [a-z]` (spec Q1 option (b)).
@@ -145,8 +145,11 @@ def load_conf(root: pathlib.Path) -> dict[str, str]:
         key, value = line.split("=", 1)
         key = key.strip().removeprefix("export ").strip()
         value = value.strip()
-        if value[:1] in {'"', "'"} and value[-1:] == value[:1] and len(value) >= 2:
-            value = value[1:-1]
+        # TOOL-aRepatriatedFork-38: a quoted value ends at its MATCHING quote, whatever follows it.
+        # Testing the first and last characters read `K="a b"  # note` as `"a`.
+        close = value.find(value[0], 1) if value[:1] in {'"', "'"} else -1
+        if close >= 0:
+            value = value[1:close]
         else:
             value = value.split()[0] if value.split() else ""
         conf[key] = value

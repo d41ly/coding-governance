@@ -158,9 +158,16 @@ def load_conf(path: str | Path) -> dict:
 
         ms = _SCALAR_RE.match(line)
         if ms:
+            # TOOL-aRepatriatedFork-38. A QUOTED value ends at its matching quote, whatever follows
+            # it, and an UNQUOTED one at a `#` that begins a word, which is bash's rule and the
+            # memory-tree kit's `parse_conf_line`. Testing the value's first and last characters
+            # kept `ratified="2026-09-10 node a"   # note` whole, comment and quotes included.
             val = ms.group(2).strip()
-            if len(val) >= 2 and val[0] == val[-1] and val[0] in "\"'":
-                val = val[1:-1]
+            close = val.find(val[0], 1) if val[:1] in ("'", '"') else -1
+            if close >= 0:
+                val = val[1:close]
+            else:
+                val = re.split(r"(?:^|\s)#", val, maxsplit=1)[0].strip()
             out[ms.group(1)] = val
             i += 1
             continue

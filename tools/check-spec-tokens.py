@@ -453,9 +453,17 @@ def read_conf_key(root, key):
     p = root / ".memory-tree.conf"
     if not p.exists():
         return ""
-    m = re.search(r'^%s="?([^"\n]*)"?\s*$' % re.escape(key),
-                  p.read_bytes().decode("utf-8", "replace"), re.M)
-    return m.group(1).strip() if m else ""
+    m = re.search(r'^%s=(.*)$' % re.escape(key), p.read_bytes().decode("utf-8", "replace"), re.M)
+    if not m:
+        return ""
+    # TOOL-aRepatriatedFork-38: a quoted value ends at its matching quote and an unquoted one at a
+    # `#` beginning a word. The old pattern demanded nothing after the closing quote, so a cutoff
+    # carrying a trailing comment read as BLANK, which switches its check off.
+    v = m.group(1).strip()
+    close = v.find(v[0], 1) if v[:1] in ("'", '"') else -1
+    if close >= 0:
+        return v[1:close].strip()
+    return re.split(r"(?:^|\s)#", v, maxsplit=1)[0].strip()
 
 
 def read_cutoff_key(root, key):

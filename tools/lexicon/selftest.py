@@ -911,6 +911,24 @@ with build_tempdir() as td:
           r.returncode != 0, out)
     check("scaffold: and still names it unratified rather than passing", "ratified" in out, out)
 
+    # TOOL-aRepatriatedFork-38 — a TRAILING COMMENT, both readers. The shell one kept `"   # note`
+    # of `ratified=""   # note`, a NON-EMPTY value, so --check passed an unratified seed.
+    _before38 = (root / ".lexicon.conf").read_bytes()
+    noted = _before38.replace(b"\r\n", b"\n") \
+        .replace(b'ratified=""', b'ratified=""   # not yet curated')
+    (root / ".lexicon.conf").write_bytes(noted)
+    r = subprocess.run(r.args, cwd=root, capture_output=True, text=True, encoding="utf-8")  # the --check above
+    check("scaffold: --check reds on an unratified seed whose key carries a trailing comment",
+          r.returncode != 0 and "EMPTY `ratified` key" in r.stdout + r.stderr, r.stdout + r.stderr)
+    (root / "noted.conf").write_text('ratified="2026-09-10 node a"   # a note\n'
+                                     "expanded=2026-09-10   # a note\n", encoding="utf-8")
+    _nc = _lc.load_conf(root / "noted.conf")
+    check("load_conf: a quoted value ends at its quote and an unquoted one drops its comment",
+          (_nc.get("ratified"), _nc.get("expanded")) == ("2026-09-10 node a", "2026-09-10"),
+          repr((_nc.get("ratified"), _nc.get("expanded"))))
+    (root / "noted.conf").unlink()
+    (root / ".lexicon.conf").write_bytes(_before38)
+
     # ---- B3: THE SCAFFOLDED ADOPTER'S FIRST `--suggest` HAS TO WORK ---------------------------
     #
     # The seed emitted `LANGS`, `VERBS` and both scalar pins and NO `CELLS` block, while `--as
