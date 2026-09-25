@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-25-build-TOOL-aRepatriatedFork-37-1-acceptance-ledger.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-37-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
