@@ -154,9 +154,9 @@ ids TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 T
 | [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 15 | 2 | SPECCED | rev-1 | 2026-09-25 |
 <!-- /gen:build-units -->
 
-Records: 63 bound to this build, across 4 record folder(s).
+Records: 64 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16
 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21

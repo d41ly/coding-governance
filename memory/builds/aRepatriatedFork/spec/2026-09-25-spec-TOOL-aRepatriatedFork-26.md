@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
 
 <!-- /gen:spec-records -->
 
@@ -62,7 +64,7 @@ measured 2026-09-25.
 - Census §4 lists 112 class-C literals over 18 files, 52 of them in WIRE. WIRE also carries 19
   `<project>/tools/…` destinations and 17 `<gov>/tools/…` spellings that no arm counts, and one
   class-F literal at `:1028`, the `contribute` verb.
-- The ownership rule (`pcensus/alloc2.py`) gives this unit 194 literals over 21 files: 115 counted
+- The ownership rule (the census record's section 7) gives this unit 194 literals over 21 files: 115 counted
   today, 72 invisible and 7 in `skills/deploy-governance/SKILL.md`, which no descriptor resolves.
   WIRE holds 112 of them; `tools/lexicon/README.md` 10; `tools/memory-recall/README.md` 8;
   `tools/drift-audit/README.md` and `skills/deploy-governance/SKILL.md` 7 each;
@@ -70,7 +72,7 @@ measured 2026-09-25.
 - `govkit shipped` gives every kit README, `LEXICON.md` and the kickoff `SKILL.md` role `engine`,
   so they land byte for byte. The `SKILL.template.md` files and the workflow templates are
   `rendered`. The charter template, `MANIFEST-TEMPLATE.md` and `drift_signals.template.py` are
-  `seed` (`pcensus/shipped.tsv`).
+  `seed` (the census record).
 - `apply` substitutes into no engine body (census §6), which is why S3 cannot use `{prefix}`.
 
 ### Ownership rule

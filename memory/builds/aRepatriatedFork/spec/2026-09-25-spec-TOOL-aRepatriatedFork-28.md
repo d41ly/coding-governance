@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
 
 <!-- /gen:spec-records -->
 
@@ -70,7 +72,7 @@ measured 2026-09-25.
 - Census §1 counts 154 invisible literals in received tests, and the withheld tests hold most of the
   514 invisible withheld literals. Epoch 2's existence filter drops fixture loose names such as
   `tools/gate-a.sh` (census §1, "What the gate cannot see").
-- The ownership rule (`pcensus/alloc2.py`) gives this unit 1253 literals over 69 files: 256 counted
+- The ownership rule (the census record's section 7) gives this unit 1253 literals over 69 files: 256 counted
   today, 721 invisible and 276 in files no descriptor resolves. The largest are
   `run-gates/run-selftests.test.sh` 150, the inCMS receipt fixture 126, `run-gates/run-gates.test.sh`
   71, `govkit/selftest.py` 68, `memory-tree/check-arms.py` 66, `unattended/gate-guard.test.sh` 63,
@@ -96,7 +98,7 @@ moves is red and is fixed before the next kit starts.
 
 ### Files touched (estimate)
 
-The 69 files `pcensus/alloc2.py` lists for this unit, under `tools/run-gates/`, `tools/govkit/`,
+The 69 files the census record's section 7 lists for this unit, under `tools/run-gates/`, `tools/govkit/`,
 `tools/memory-tree/`, `tools/unattended/`, `tools/runlog/`, `tools/lexicon/`, `tools/workflows/`,
 `tools/codebase-map/`, `tools/hooks/`, `tools/memory-recall/`, `tools/drift-audit/`,
 `tools/process-monitor/`, `tools/pytest-parallel-guardrails/`, `tools/lib/`,

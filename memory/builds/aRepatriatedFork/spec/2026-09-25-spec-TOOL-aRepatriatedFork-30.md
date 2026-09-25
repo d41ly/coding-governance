@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 |
 
 <!-- /gen:spec-records -->
 
@@ -87,7 +89,7 @@ state.
 - From the 2026-09-25 prefix census at `2143b6d6` (session scratchpad, not committed): the ledger
   holds 139 rows and 904 occurrences, the waiver registry 11 rows, and the two markers 32 and 24
   lines (census §0 and §1). The registry's own 10 literals are this unit's under
-  `pcensus/alloc2.py`'s ownership rule.
+  the census record's section 7's ownership rule.
 - `govkit apply` already takes a prefix; `TOOL-aRepatriatedFork-18` AC2 installed the suites at
   `scripts/` through it.
 - The unattended suites alone cost about 2.5 h pooled on node a, per this repo's recorded

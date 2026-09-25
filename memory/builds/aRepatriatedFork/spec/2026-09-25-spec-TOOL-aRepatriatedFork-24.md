@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
 
 <!-- /gen:spec-records -->
 
@@ -92,7 +94,7 @@ unless stated. PINNED, measured 2026-09-25.
 - `codebase-map/selftest.py:1613` skips with a false reason at inCMS, whose lexicon is at
   `scripts/lexicon/`.
 - `govkit.py:5415` means a foreign install at `scripts/` is not detected.
-- The ownership rule this set uses (census working file `pcensus/alloc2.py`) gives this unit 19
+- The ownership rule this set uses (the census record's section 7) gives this unit 19
   literals over 13 files: 9 counted today, 5 invisible and 5 in files no descriptor resolves. It
   also gives it arm 1's five lines at `pre-commit:48` and `check-wiring.sh`, and arm 3's two at
   `pre-push:367` and `manifest-check.sh:426`.
@@ -101,7 +103,7 @@ unless stated. PINNED, measured 2026-09-25.
 
 One literal has one writer. A stranding site or fallback rung is this unit's, even inside a test
 file, and every other literal in those files is its class owner's. The rule is written in
-`TOOL-aRepatriatedFork-23` §8 F3 and applied by `pcensus/alloc2.py`.
+`TOOL-aRepatriatedFork-23` §8 F3 and applied by the census record's section 7.
 
 ### Files touched (estimate)
 

@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-30 |
 
 <!-- /gen:spec-records -->
 
@@ -73,8 +75,8 @@ measured 2026-09-25.
   `govkit/registry.toml` 74, `check-kit-versions.sh` 33, `selftest-budgets.txt` 27, and 27 more
   across twelve files.
 - Census §1 found 57 tracked files no descriptor resolves, holding 562 literals under the arm-2
-  predicate (`pcensus/unres/occ_unres.tsv`). 51 are covered by a registry exemption.
-- The ownership rule (`pcensus/alloc2.py`) gives this unit 740 literals over 61 files: 368 counted
+  predicate (the census record). 51 are covered by a registry exemption.
+- The ownership rule (the census record's section 7) gives this unit 740 literals over 61 files: 368 counted
   today, 100 invisible and 272 in unresolved files. The largest are `scen-adversarial.json` 202,
   `gate-legs.json` 137, `registry.toml` 100, `check-kit-versions.sh` 41, `govkit.py` 35,
   `selftest-budgets.txt` 27, `check-install-prefix.sh` 13 and `map_extractors.py` 13.

@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
 
 <!-- /gen:spec-records -->
 
@@ -62,7 +64,7 @@ measured 2026-09-25.
   (`merge-rows.py:8` twice, `derive-ceilings.py:4`, `map_extractors.py:253`). The rest are read in
   source, and every printed `usage:` line in those files already derives from `$0`, `basename` or
   `$SELF`.
-- The ownership rule (`pcensus/alloc2.py`) gives this unit 59 literals over 33 files: 51 counted
+- The ownership rule (the census record's section 7) gives this unit 59 literals over 33 files: 51 counted
   today and 8 invisible. The largest are `memory-tree/gen_build_index.py` with 5, and
   `check-line-length.sh`, `drift-audit/drift_report.py`, `memory-recall/adopt-memory-recall.sh`,
   `playbook/adopt-playbook.sh`, `settings-merge.py` and `codebase-map/map_lib.py` with 3 each.
@@ -80,7 +82,7 @@ gov-side.
 
 ### Files touched (estimate)
 
-The 33 files `pcensus/alloc2.py` lists for this unit, across `tools/memory-tree/`,
+The 33 files the census record's section 7 lists for this unit, across `tools/memory-tree/`,
 `tools/codebase-map/`, `tools/drift-audit/`, `tools/memory-recall/`, `tools/unattended/`,
 `tools/workflows/`, `tools/lexicon/`, `tools/playbook/`, `tools/process-monitor/`,
 `tools/run-gates/`, `tools/gate-lint/` and `tools/hooks/`, the loose checkers under `tools/`, plus

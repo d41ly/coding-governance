@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
 
 <!-- /gen:spec-records -->
 
@@ -66,21 +68,20 @@ once. Units 24 to 29 then lower it, and `TOOL-aRepatriatedFork-30` deletes it.
 
 ### Evidence
 
-Every count here is from the 2026-09-25 prefix census at `2143b6d6` (`prefix-census.md` and its
-working files `pcensus/*.tsv`, in the session scratchpad and not committed). PINNED, measured on
+Every count here is from the 2026-09-25 prefix census at `2143b6d6` (the census record `2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md`). PINNED, measured on
 2026-09-25.
 
 - Arm 2, the ledger, counts 904 occurrences over 139 files, equal row for row to
   `tools/install-prefix-carried.txt` (census §0).
 - Arm 1 sees 43 root-spelling lines: 11 waived and 32 marked. Arm 3 sees 24 lines, all marked, and
   16 of them are arm-3-only (census §0).
-- 1098 occurrences in shipped files have no counting arm (`pcensus/invisible.tsv`). 168 are inside
+- 1098 occurrences in shipped files have no counting arm (the census record). 168 are inside
   the ledger file itself, which leaves 930: 514 in withheld files and 416 in received ones (census
   §1, "What the gate cannot see").
 - The four causes are the `/` lead, a directory-only reference, a fixture loose name the epoch-2
   existence filter drops, and test or seed files outside arm 3's population (same section).
 - 57 tracked files under the gate's globs are absent from `govkit shipped`. They hold 562 literals
-  under the arm-2 predicate (`pcensus/unres/occ_unres.tsv`). The census did not run its broad
+  under the arm-2 predicate (the census record). The census did not run its broad
   regex over them, so their `/`-led, directory-only and join spellings are UNMEASURED. AC6
   measures them.
 - The census's arm-3 table lists 10 lines that are not prefix literals: four homonyms and six kit

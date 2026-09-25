@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
 
 <!-- /gen:spec-records -->
 
@@ -53,9 +55,9 @@ measured 2026-09-25.
 
 - Census §4 lists 24 class-E literals over 22 files: 22 `resolve_python` markers and 2 `render_doc`
   markers. The two canonical files hold one more each, in the 57 files no descriptor resolves
-  (`pcensus/unres/occ_unres.tsv`).
+  (the census record).
 - Census §4 lists 128 class-G literals over 74 files.
-- The ownership rule (`pcensus/alloc2.py`) gives this unit 120 literals over 57 files: 95 counted
+- The ownership rule (the census record's section 7) gives this unit 120 literals over 57 files: 95 counted
   today, 23 invisible and the 2 canonical markers. The largest are `run-gates/run-gates.sh` with 7,
   `drift-audit/adopt-drift-audit.sh`, `memory-tree/check-memory-hygiene.sh` and
   `memory-tree/merge-rows.sh` with 6 each, and `memory-recall/adopt-memory-recall.sh` and
@@ -72,7 +74,7 @@ literal in a received file that is not a test, not withheld and not gov-side. Th
 
 ### Files touched (estimate)
 
-`tools/lib/resolve-python.sh` · `tools/lib/render-doc.sh` · the 57 files `pcensus/alloc2.py` lists
+`tools/lib/resolve-python.sh` · `tools/lib/render-doc.sh` · the 57 files the census record's section 7 lists
 for this unit, under `tools/run-gates/`, `tools/memory-tree/`, `tools/drift-audit/`,
 `tools/memory-recall/`, `tools/unattended/`, `tools/codebase-map/`, `tools/workflows/`,
 `tools/hooks/`, `tools/lexicon/`, `tools/process-monitor/`, `tools/runlog/` and
