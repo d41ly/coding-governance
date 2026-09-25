@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today
 
-**Status:** SPECCED · rev-1 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -174,6 +174,7 @@ the new arms
   holds a literal. Option (c): a new marker for this class, which survives
   `TOOL-aRepatriatedFork-30`. Recommendation: (a). The owner's end state has no marker and no
   grandfathering, and (b) opens a hole that looks like a pass.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 - **F2 — is a `<gov>/tools/…` spelling a hard-coded prefix?** WIRE carries 17 of them, and
   `adopt-memory-recall.sh:203` prints one. They name gov's own checkout, where the prefix really
   is `tools/`, so each is correct today. Option (a): count them and drain them to a prose token
@@ -182,6 +183,7 @@ the new arms
   adopter's. Option (c): derive where printed, and use (a)'s token in prose. Recommendation: (c).
   The owner ruled that all kit prefixes are relative, and gov relocating its own kits would rot
   every one of them under (b).
+  RESOLVED (owner, 2026-09-25): (c), the recommendation.
 - **F3 — may the drain units run in parallel?** Under the ownership rule in each unit's §4, three
   groups are FILE-disjoint: 24, 25 and 26, then 27 and 29, then 28 after both. But every drain unit
   lowers `tools/install-prefix-carried.txt`, whose SLACK state reds until the fallen count is
@@ -193,6 +195,12 @@ the new arms
   the main loop runs `--write-ratchet` and bumps each moved kit once. That join step is not an M6
   pass kind, so (b) also needs a BUILD-METHOD change. Recommendation: (a). (b) trips M3 veto 2 as
   a governance-carrier change, and the wall clock it saves is spent by passes that run no suite.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
+- **F4 — does the ban see a hard-coded prefix other than gov's own?** Epoch 5 as first specced
+  counts only `tools/`, so a new literal `scripts/<kit>/...` would pass. Option (a): the predicate
+  counts a kit segment under ANY literal install prefix, not only gov's. Option (b): count `tools/`
+  alone. Recommendation: (a). Raised by the orchestrator from the spec set's own gap note.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 
 ## 9. Revision log
 
@@ -201,6 +209,7 @@ the new arms
   covers every class, fixtures and gov-side files included; and the end state is a pure ban with
   no carried list, no waiver file and no marker. This unit is the widening that makes that
   population countable, on the epoch precedent of `TOOL-cMendedVintage-5`.
+- rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation. F4 added and resolved: the ban counts a kit segment under any literal install prefix.
 
 ## 10. Reuse audit
 

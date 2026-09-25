@@ -15,7 +15,7 @@ bad() { echo "  FAIL — $1"; fail=1; }
 # The scratch repo is `git init`+`remote add` (origin/HEAD unset); pin the default so the hook's
 # fail-CLOSED resolution doesn't refuse the gate cases (case 6 unsets it to test that path).
 export GOV_DEFAULT_BRANCH=main
-# THE DECLARED TEST ESCAPE (TOOL-aRepatriatedFork-5, from NicoCares' PKG-dCandidLodestar-5). Every
+# THE DECLARED TEST ESCAPE (TOOL-aRepatriatedFork-5, from adopter nc's PKG-dCandidLodestar-5). Every
 # stub below is an mktemp script, which is untracked by construction, and the hook refuses an
 # untracked merge bar. Without this the whole file would test a refusal path and nothing else.
 # Cases 25-27 unset it deliberately.
@@ -272,7 +272,7 @@ case "$(decide)" in
   *) bad "24b the boundary forced with no gate-env.sh present, so arm 24 proves nothing" ;;
 esac
 
-# --- 25-29b: WHICH BAR RAN (TOOL-aRepatriatedFork-5, NicoCares' PKG-dCandidLodestar-5) --------
+# --- 25-29b: WHICH BAR RAN (TOOL-aRepatriatedFork-5, adopter nc's PKG-dCandidLodestar-5) --------
 # Until this unit `gate` was resolved from GOV_GATE_CMD with no check at all, and the decision line
 # named the SCOPE of the run without naming WHAT ran. `GOV_GATE_CMD=true git push` landed a commit
 # over a bar that never existed, under a line byte-identical to a full run's. THE ESCAPE IS UNSET IN
@@ -434,7 +434,7 @@ pfx_home=$PWD
 PREPUSH_PRE=05455c45fc0fc32f7de331541daea5c57cb856e0
 git -C "$SRC" show "$PREPUSH_PRE:.githooks/pre-push" > "$tmp/hooks-old-pre-push" 2>/dev/null || true
 # THE RED-FIRST CONTROL IS GOV-ONLY, AND THE SKIP SAYS SO OUT LOUD (TOOL-aRepatriatedFork-5 S6, the
-# form of NicoCares' carve-out 25). `PREPUSH_PRE` is a commit in the coding-governance repository.
+# form of adopter nc's carve-out 25). `PREPUSH_PRE` is a commit in the coding-governance repository.
 # This file ships to every push-main adopter, and no adopter has that object, so the arm cannot
 # resolve there and `bad` reddened the leg over gov's history rather than over anything the adopter
 # did. Substituting an adopter sha does not rescue it: the control has to be a hook that did NOT

@@ -31,7 +31,7 @@ cost every hygiene fixture and every freshly scaffolded adopter a red bar.
 CLI: --check (gate), --report (human), --emit-pin (the current counts, for re-pinning), --ages (row
 age DERIVED from git rather than stored), --check-rotation (check 24), --selftest.
 
-PROVENANCE. The backlog-row grammar, the two shard pins and `--ages` were written in NicoCares'
+PROVENANCE. The backlog-row grammar, the two shard pins and `--ages` were written in adopter nc's
 fork of this file and taken upstream by TOOL-aRepatriatedFork-9, with two grammar corrections that
 corpus could not surface (a frozen legacy id, a parenthesised `CLOSED by` clause) and the third pin
 added to `--emit-pin`. Measurements quoted below against `memory/backlog/PKG.md` are that repo's.
@@ -362,7 +362,7 @@ def _parse_shard_pins(conf, key):
 #   drift_report.build_live_backlog_rows              271   counts DEFERRED and both `CLOSED by` rows
 #
 # The truth under this grammar is 268, and none of the three printed it. That is the repo's own
-# `two-answers-to-one-question` class with a third answer bolted on. (NicoCares' corpus throughout
+# `two-answers-to-one-question` class with a third answer bolted on. (Adopter nc's corpus throughout
 # this block; see the module docstring.)
 #
 # THE FOUR DIVERGENCES, each a deliberate ruling rather than an accident:
@@ -413,7 +413,7 @@ _STATUS_ALT = "|".join(sorted(STATUS_VOCAB, key=len, reverse=True))
 # ids exactly there — `ABL-015`, `DPL-a012`, `PBL-011` — so 58 of its 796 dash-led backlog rows read
 # as prose, 54 of them live: the under-count this grammar exists to end, moved to the next corpus.
 # Measured 2026-09-23 on node a under this pattern: gov 629 of 629 rows, inCMS 796 of 796, and
-# NicoCares' live count unchanged at 196. `keyed` still means "carries at least one dash".
+# adopter nc's live count unchanged at 196. `keyed` still means "carries at least one dash".
 _ROW_ID = r"[A-Z][A-Za-z0-9]{1,9}(?:-[A-Za-z0-9]+)*"
 _MIDDOT = "·"
 
@@ -602,7 +602,7 @@ def check_census_floor(rows):
 
 
 
-# The names NicoCares' two importers already call (`check_closed_build_rows.py` and the census floor
+# The names adopter nc's two importers already call (`check_closed_build_rows.py` and the census floor
 # it reads). The definitions above lead with a declared verb, per the unit's section 8 F4; these are
 # ALIASES, not definitions, so that fork's callers run against gov's bytes unchanged until they follow.
 backlog_shards = scan_backlog_shards
@@ -1694,7 +1694,7 @@ def cmd_selftest():
             lambda: repr(derive_first_seen(t19, c19).get("ARCH-015")))
         arm("...so --ages over it exits 0 with nothing undated", "undated         : 0",
             lambda: cap(t19, c19, cmd_ages))
-        arm("the names NicoCares' importers call are the verb-led definitions, not copies", "True",
+        arm("the names adopter nc's importers call are the verb-led definitions, not copies", "True",
             lambda: repr(census is measure_census and census_problems is check_census_floor
                          and backlog_shards is scan_backlog_shards))
         # The split is DERIVED from tree_lib's tuples, so it is asserted against the spec's LITERAL

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-25 — printed and usage strings in received code name no install prefix
 
-**Status:** SPECCED · rev-1 · 2026-09-25 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 10
+**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -136,12 +136,14 @@ The 33 files the census record's section 7 lists for this unit, across `tools/me
   about where the file is. Option (c): no path at all, only the arguments, since the printed
   `usage:` line already derives the name. Recommendation: (a). It keeps the kit segment a reader
   needs to find the file, and it is the one form every doc unit in this set also uses.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-25 · initial draft. Owner rulings of 2026-09-25: drain every hard-coded kit
   prefix before `TOOL-aRepatriatedFork-18`'s held leg, with no class exempted. This unit is census
   class B for received code.
+- rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives
 
-**Status:** SPECCED · rev-1 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
+**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -171,6 +171,7 @@ unchanged
   mapping. Option (c): re-record the fixture once with a prefix token in place of gov's prefix, and
   substitute the token on load. Recommendation: (c). The data stays real, the fixture carries no
   literal, and (b) keeps a literal in the tree.
+  RESOLVED (owner, 2026-09-25): (c), the recommendation.
 
 ## 9. Revision log
 
@@ -179,6 +180,7 @@ unchanged
   prefix variable derived from the kit's own location. The proposed split listed the `corpus_ids.py`
   and `gotchas.py` fixtures under `TOOL-aRepatriatedFork-29`; census §1 classes them D, and this
   unit's mechanism drains them.
+- rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
 
 ## 10. Reuse audit
 

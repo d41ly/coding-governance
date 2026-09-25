@@ -120,7 +120,7 @@ JS
       && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
 }
 
-# AC2 — the NicoCares shape: kit at `scripts/`, hook a directory up from the harnesses. Rung 2.
+# AC2 — the adopter nc shape: kit at `scripts/`, hook a directory up from the harnesses. Rung 2.
 FIX_A=$(mktemp -d); mkfix "$FIX_A" "scripts/hooks/agent-cap.js"
 out=$(cd "$FIX_A" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
 if [ "$rc" = 0 ]; then printf 'arm ok    AC2: resolves at a scripts/ install and exits 0\n'

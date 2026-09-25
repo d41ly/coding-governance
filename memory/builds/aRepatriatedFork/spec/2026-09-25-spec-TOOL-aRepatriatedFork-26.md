@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix
 
-**Status:** SPECCED · rev-1 · 2026-09-25 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 11
+**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -141,17 +141,20 @@ of eleven kits under `tools/` · `tools/lexicon/LEXICON.md` · `tools/lexicon/SK
   value. Option (b): keep a concrete default, `<project>/tools/<kit>`, stated as a default. It is
   still a hard-coded prefix under the owner's ruling. Option (c): drop the manual steps and
   prescribe `govkit intake`/`apply` only, which is §3's rejected alternative. Recommendation: (a).
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 - **F2 — should kit READMEs become `rendered`, so an adopter reads real paths?** Option (a): keep
   role `engine` and use the `<prefix>/` prose token. Option (b): make them `rendered`, so each lands
   with the adopter's real prefix. Every adopter's receipt then carries a `role-moved` row per
   README, which `DEPL-aRepatriatedFork-17` resolves at `update`. Recommendation: (a) now. (b) is a
   deployer change of its own, and the token is correct if less convenient.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-25 · initial draft. Owner rulings of 2026-09-25: drain every hard-coded kit
   prefix, with no class exempted, before `TOOL-aRepatriatedFork-18`'s held leg. This unit is census
   class C, WIRE's destinations first as census §6 recommends.
+- rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
 
 ## 10. Reuse audit
 

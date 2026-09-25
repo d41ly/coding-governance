@@ -1800,7 +1800,7 @@ done
 n=$((n+1))
 grep -qF 'the selector is mis-segmented' <<<"$outh" || { echo "FAIL the empty-population report does not name the cause"; st=1; }
 #
-# (a2) CHECK 6's OWN mis-segmentation — TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out
+# (a2) CHECK 6's OWN mis-segmentation — TOOL-dRetiredFork-1, absorbed from adopter nc `nc carve-out
 #      5/20`. Index-class files EXIST (a guide, at a pre-flatten path) while every flat selector
 #      `index_set` reads matches nothing, so check 6 walked an empty set, printed nothing and was
 #      indistinguishable from a clean tree. Eight sibling checks already carried this guard; 6 did

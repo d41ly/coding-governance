@@ -36,7 +36,7 @@ import tempfile
 sys.dont_write_bytecode = True
 
 # ALSO above it, and process-level rather than per-subprocess. TOOL-dRetiredFork-2, absorbed from
-# NicoCares `nc carve-out 17/20`; the sibling half lives in gen_build_index.py and the list is gov's
+# adopter nc `nc carve-out 17/20`; the sibling half lives in gen_build_index.py and the list is gov's
 # own from `.githooks/pre-push`. Every arm here builds a throwaway git repo, and `git init` under an
 # inherited GIT_DIR does not make a repo at the cwd — it RE-INITIALISES the repo GIT_DIR names. Run
 # from a hook, this suite would rewrite the caller's repository instead of its own fixture.

@@ -82,7 +82,7 @@ py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python
 # A kit file in THIS repo, resolved across both install layouts the way every arm resolves them:
 # beside this suite (`tools/<rel>` here, `scripts/<rel>` at an adopter that installs the kits there),
 # or at the root in a copy-installed adopter. The prefix is this file's own directory, DERIVED
-# (TOOL-aRepatriatedFork-8 S6); it used to be the literal `tools/`, which NicoCares patched with a
+# (TOOL-aRepatriatedFork-8 S6); it used to be the literal `tools/`, which adopter nc patched with a
 # third rung for `scripts/`.
 src_of() { for c in "$HERE/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; return; }; done; }
 

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name
 
-**Status:** SPECCED · rev-1 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
+**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -175,12 +175,14 @@ New arm: `tools/govkit/selftest.py` · a registry and descriptors at a `scripts/
   directory, and the runner sets that directory as the working directory. That breaks every leg
   that expects the repo root. Recommendation: (a). It is one resolution rule in one runner, and it
   matches the token grammar the descriptors already use.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 - **F2 — what does a descriptor's `home` key hold?** Option (a): a kit-relative name, resolved
   against the derived tool root. This works for kit descriptors and for the flat entries under
   `tools/govkit/entries/`, whose `home` is the tool root itself. Option (b): no `home` key for a kit
   descriptor, whose home is derived from its own directory, and a kit-relative `home` for flat
   entries only. Recommendation: (a). One rule for both kinds of entry, and the declaration stays
   explicit.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 - **F3 — what about gov's own renders of shipped templates?** The four `tools/workflows/*.js` files
   gov runs are renders of `{{TOOL_ROOT}}` templates at gov's prefix, so they must carry a concrete
   path. Option (a): the pure ban's population leaves out a tracked file that re-renders
@@ -190,6 +192,7 @@ New arm: `tools/govkit/selftest.py` · a registry and descriptors at a `scripts/
   renders carry a relative path from the repo root that the Workflow runtime resolves; it does not
   resolve one today. Recommendation: (a). A render at gov's prefix is the "rendered at deploy
   time" form the owner's ruling allows, and re-rendering proves it is one.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 
 ## 9. Revision log
 
@@ -198,6 +201,7 @@ New arm: `tools/govkit/selftest.py` · a registry and descriptors at a `scripts/
   a declaration: derive the prefix and keep the kit-relative member names. The proposed split
   listed the `corpus_ids.py` and `gotchas.py` fixtures here; census §1 classes them D, and they
   moved to `TOOL-aRepatriatedFork-28`, whose mechanism drains them.
+- rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
 
 ## 10. Reuse audit
 

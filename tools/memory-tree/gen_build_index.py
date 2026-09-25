@@ -178,7 +178,7 @@ class Problem(Exception):
 class StaleHeader(Problem):
     """A build README header that is PRESENT and does not conform — NOT one that is absent.
 
-    TOOL-dRetiredFork-3, absorbed from NicoCares `nc carve-out 9/20`. Those two states were one
+    TOOL-dRetiredFork-3, absorbed from adopter nc `nc carve-out 9/20`. Those two states were one
     `Problem` here, so a CORRUPTED header read as a MISSING one and the index regenerated around it.
     They are different animals: an absent header is a build nobody wrote front matter for, and a
     corrupt one is front matter that rotted after someone did.
@@ -197,7 +197,7 @@ class StaleHeader(Problem):
 
 # --------------------------------------------------------------------------------------- plumbing
 #: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts.
-#: TOOL-dRetiredFork-2, absorbed from NicoCares `nc carve-out 16/20`. Taken VERBATIM from gov's own
+#: TOOL-dRetiredFork-2, absorbed from adopter nc `nc carve-out 16/20`. Taken VERBATIM from gov's own
 #: hook-side scrub at `.githooks/pre-push` rather than re-derived, because these are two halves of
 #: ONE defect and a second list would be the place they drift apart.
 _GIT_ENV_LEAKS = (

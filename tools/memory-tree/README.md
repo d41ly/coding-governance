@@ -316,7 +316,7 @@ Two things are not carve-outs at all. A value in the rendered `HYGIENE.md` that 
 repo's figure is a render gap, and `INDEX_CAP_LINES` and `ENTRY_CAP_UNIT` now render from your conf.
 A registry a KIT ships, such as `pass-order-waiver.txt`, is admitted by name.
 
-**The worked instance is NicoCares**, measured 2026-09-23 by running gov's engine over its tree:
+**The worked instance is adopter nc**, measured 2026-09-23 by running gov's engine over its tree:
 its registries under `project/` go to `PROJECT_REGISTRY_EXTRA`; its ten build-root status
 files and thirteen run-protocol records go to `legacy-files.txt`; its undated JSON, HTML and Python
 artifacts go to `RECORD_UNDATED_ARTIFACTS`; and its check 90 becomes the project leg worked below.
@@ -346,7 +346,7 @@ so it reads the same tree from the same declaration.
 **Give it a ceiling.** The runner reds a leg that arrives without one, and finding that out from a
 red bar is a worse first experience than reading it here.
 
-**The worked example, runnable as written.** NicoCares' check 90 is the case this seam was ruled
+**The worked example, runnable as written.** Adopter nc's check 90 is the case this seam was ruled
 for: a `<!-- status derived: … -->` comment justifies a DECLARED `status:` key in a build README,
 and once the key goes the comment is a false claim nothing regenerates. Save this as
 `scripts/check-build-readme-comments.sh` beside the leg above:

@@ -74,7 +74,7 @@ else
 fi
 
 # ---- THE PREDICATE, PROBED -------------------------------------------------------------------
-# Three rungs, and the third is not optional. NicoCares keeps its hooks a directory up from its
+# Three rungs, and the third is not optional. Adopter nc keeps its hooks a directory up from its
 # harnesses, which rung 2 reaches. inCMS has no such directory AT ALL -- its only copy sits at
 # `.claude/hooks/agent-cap.js` -- so a two-rung chain strands it, and that was found by testing the
 # derivation against both trees rather than by reasoning about one.

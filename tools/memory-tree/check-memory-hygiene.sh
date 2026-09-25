@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.95   # gov:kit memory-tree@2.95 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.96   # gov:kit memory-tree@2.96 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -105,7 +105,7 @@ DOSSIER_CAP_BYTES=20480       ; DOSSIER_CAP_LINES=0
 ENTRY_CAP_CHARS=300           ; BUILD_README_ENTRY_CAP_CHARS=350
 
 # ---- THE VALUES A PROJECT OWNS — TOOL-dRetiredFork-15, TOOL-aRepatriatedFork-10 -----------------
-# Each was a literal in a check below, which is why NicoCares carries four carve-outs against this
+# Each was a literal in a check below, which is why adopter nc carries four carve-outs against this
 # one file. BLANK MEANS GOV'S CURRENT BEHAVIOUR for every one, so an adopter who never edits
 # .memory-tree.conf sees a byte-identical run.
 #
@@ -552,7 +552,7 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # PROJECT_REGISTRY_EXTRA. TOOL-aRepatriatedFork-10 S4.
   F:pass-order-waiver.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
-  # forking this whitelist, which is what NicoCares carved this file out to do.
+  # forking this whitelist, which is what adopter nc carved this file out to do.
   #
   # PLACED LAST ON PURPOSE. The first cut put this case ABOVE the named ones, where `F:*`
   # matched every one of them and accepted it — check 3 stopped grading anything under
@@ -784,7 +784,7 @@ fi
 derive_waived 6 "$bad6"; bad6="$_UNWAIVED"
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
 $bad6"
-# TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out 5/20`. Eight sibling checks already
+# TOOL-dRetiredFork-1, absorbed from adopter nc `nc carve-out 5/20`. Eight sibling checks already
 # carry this; check 6 reported a clean zero over an empty population instead of refusing.
 pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, map dossiers)" \
   "$(printf '%s\n' "$sel6" | grep -c . || true)" "$PRE_INDEXY"
@@ -1018,7 +1018,7 @@ $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
     in_legacy "$_p21" || printf '%s\n' "$_r21"
   done)
   # S3 — RECORD_SERVES_CUTOFF. A project adopting this kit mid-life has landed records that
-  # predate the Serves grammar; NicoCares measured 549 of them. A cutoff is one value where a
+  # predate the Serves grammar; adopter nc measured 549 of them. A cutoff is one value where a
   # grandfather list would be 549 rows, and it matches the five cutoffs already in the conf.
   #
   # THIS NARROWS A POPULATION, which is why the preset block refuses a cutoff dated after

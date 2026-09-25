@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix
 
-**Status:** SPECCED · rev-1 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
+**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -191,18 +191,21 @@ New arm: `tools/govkit/selftest.py` · a foreign kit at `scripts/` the old probe
   `pre-commit`, whose staged legs are an early signal, and a refusal in `pre-push`, whose bar is the
   merge bar. Recommendation: (c). A commit hook that blocks on an absent kit stops ordinary work,
   while a push that cannot find its bar and passes is the silent skip this unit exists to remove.
+  RESOLVED (owner, 2026-09-25): (c), the recommendation.
 - **F2 — how does an adopter's existing `.unattended.conf` keep keying condition 3?** It was seeded
   with gov's generator path and is adopter-owned after that. Option (a): the driver resolves both
   halves of each pair before comparing, so an old value keys at any prefix. Option (b): stamp at
   adopt only, and let `govkit update` report the stale seed value. Recommendation: (a). It closes
   the defect for adopters who never re-adopt, and (b) leaves the refusal dead until someone reads a
   report.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-25 · initial draft. Owner rulings of 2026-09-25: the remaining hard-coded kit
   prefixes are found and drained before `TOOL-aRepatriatedFork-18`'s held leg, and every one is
   drained. This unit takes the stranding sites first, as census §6 recommends.
+- rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
 
 ## 10. Reuse audit
 

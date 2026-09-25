@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban
 
-**Status:** SPECCED · rev-1 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 15
+**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
@@ -179,17 +179,20 @@ the pure ban, and a clean fixture · the suite's floor moves to its new arm coun
   legal install with its own failure shape, an empty prefix joined as `/<kit>`, and arm 1 existed
   for it. Option (c): `scripts/` only. Recommendation: (b). It costs half as much wall time again
   as (a), once per build, and it is the only run that exercises the empty prefix.
+  RESOLVED (owner, 2026-09-25): (b), the recommendation.
 - **F2 — what is left of the ban's machinery once the ledger is deleted?** Option (a): nothing. The
   modes `--write-ratchet` and `--rebaseline` and the epoch guard are deleted; a future widening
   reds its new hits, and they are drained before the widening lands. Option (b): keep the epoch and
   `--rebaseline`, so a future widening can re-create a ledger. Recommendation: (a). The owner's end
   state is no grandfathering, and (b) keeps the one mechanism that grandfathers.
+  RESOLVED (owner, 2026-09-25): (a), the recommendation.
 - **F3 — which suites does the S1 leg run?** Option (a): the shipped suites, as
   `TOOL-aRepatriatedFork-18` specified. Option (b): every suite, withheld ones included. A
   `cp -r` installer receives withheld files unless it follows WIRE's removal step (census §0), and
   `TOOL-aRepatriatedFork-28` derived them all. Recommendation: (b). Without execution, the
   derivation in a withheld suite is unproven, and proving it is what this leg is for. It costs more
   wall time, once per build.
+  RESOLVED (owner, 2026-09-25): (b), the recommendation.
 
 ## 9. Revision log
 
@@ -197,6 +200,7 @@ the pure ban, and a clean fixture · the suite's floor moves to its new arm coun
   drained first and `TOOL-aRepatriatedFork-18`'s held leg comes after; the carried list, the waiver
   file and both markers end empty and are deleted, and the gate is a pure ban with no
   grandfathering.
+- rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
 
 ## 10. Reuse audit
 

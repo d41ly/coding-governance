@@ -41,7 +41,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.37   # gov:kit unattended@1.37 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.38   # gov:kit unattended@1.38 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -2085,7 +2085,7 @@ load_spec_facts() { # spec paths... -> fills the three maps, replacing whatever 
 # with no `verb_plan` frame above, so a version that read the shared maps would read whatever the
 # process happened to have loaded - which in that path is nothing at all.
 # ---- a `_`-prefixed subfolder under spec/ is NOT a spec (TOOL-dRetiredFork-9) --------------------
-# Absorbed from NicoCares `nc carve-out 20/20`. THE CAUSE IS THE PATHSPEC, not the glob: in
+# Absorbed from adopter nc `nc carve-out 20/20`. THE CAUSE IS THE PATHSPEC, not the glob: in
 # `git ls-files "<dir>/spec/*.md"` the `*` is a GIT pathspec wildcard and crosses `/`, unlike a shell
 # glob. So `spec/_working/notes.md` was enumerated as a spec and produced a `NOT A UNIT` row beside
 # "every tracked spec is terminal". Reproduced here before the fix.

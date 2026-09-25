@@ -115,7 +115,7 @@ check_status_one_line() { # slug -> asserts --status wrote exactly one stdout li
 }
 
 # ---- TOOL-dRetiredFork-9 S3: a `_`-prefixed subfolder under spec/ is NOT a spec -------------------
-# Absorbed from NicoCares `nc carve-out 20/20`. The cause is the PATHSPEC, not a shell glob: in
+# Absorbed from adopter nc `nc carve-out 20/20`. The cause is the PATHSPEC, not a shell glob: in
 # `git ls-files "<dir>/spec/*.md"` the `*` crosses `/`, so `spec/_working/notes.md` was enumerated
 # and produced a `NOT A UNIT` row beside "every tracked spec is terminal". Reproduced on the live
 # tree before the fix, and this arm is what stops it coming back.
