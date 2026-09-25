@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** BLOCKED · rev-4 · 2026-09-24 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
+**Status:** INPROGRESS · rev-5 · 2026-09-25 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
 
 <!-- gen:spec-records -->
 
@@ -250,6 +250,18 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   for the other.
   RESOLVED (agent, 2026-09-23, delegated): (a). (b) trips veto 2: renaming functions consumers
   import changes a public surface.
+- **F7 — the landing, and the 213 entries the first pass parked.** Options: (a) finish the owed items
+  on the branch and land it through inCMS's lander; (b) finish and stop short of the landing; (c)
+  keep it parked; (d) abandon the unit.
+  RESOLVED (owner, 2026-09-25): (a), and the owner rules the parked entries by group.
+  - A build opened in June or July whose slug a first-parent subject on inCMS `main` names is
+    `CLOSED` (91).
+  - One opened in June or July that no such subject names is `DEFERRED` (49).
+  - The ten opened in August or September are researched one by one from their own records and
+    commits, and the owner confirms the list before it is written.
+  - Each of the 63 gotcha records gets one search of inCMS's tests for its gate. A found gate is
+    declared. The rest say in as many words that there is none, and one that really needs a gate
+    files an inCMS backlog row.
 
 ## 9. Revision log
 
@@ -269,6 +281,8 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   as 326.
 - rev-4 · 2026-09-24 · §3 gains the **consumes-from** edge to `TOOL-aRepatriatedFork-21`, the gov fix for
   the nested-README population this unit's pass measured at inCMS.
+- rev-5 · 2026-09-25 · §8 gains F7, the owner's rulings on the landing and on the 213 parked
+  entries. Status BLOCKED -> INPROGRESS: the owner's ask at inCMS is given.
 
 ## 10. Reuse audit
 
