@@ -1,0 +1,215 @@
+# TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix
+
+**Status:** SPECCED · rev-1 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
+
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+The census found 12 sites where a kit path gov spells is EXECUTED or probed, and where an install at
+any prefix but `tools/` silently skips a leg, runs nothing or cannot detect a foreign kit. It found
+six more where a literal fallback rung follows a derived one. These are the only literals in the
+tree that change behaviour, so they go first. Every one derives its kit root at run time or is
+stamped at adopt time; none keeps a `tools`, `scripts` or root candidate list.
+
+## 2. Scope (IN)
+
+- **S1** — `.githooks/pre-commit`'s three `gate_at` calls (the hygiene leg at `:48`, the kickoff
+  manifest leg at `:54`, the template-size leg at `:59`) take their kit root from one ladder:
+  the target's receipt, then `resolve_kit_dir`'s rung, then a `GOV_KITROOT` declared in
+  `.githooks/gate-env.sh`. Their fixed candidate lists go, `scripts/manifest-check.sh` included.
+  An underivable root is handled as §8 F1 resolves. Observed by AC1, AC2.
+- **S2** — `.githooks/pre-push:367-368` sets `GOV_KITROOT` from the same ladder. The `tools` default
+  and the `scripts` fallback go, and so does the marker whose reason promised a derivation the code
+  never did (census §5). Observed by AC3.
+- **S3** — `adopt-unattended.sh` stamps `LANDER`, `GATE_CMD`, `WIRING_CHECK` and
+  `GENERATED_INDEXES` in the seeded `.unattended.conf` with the adopt-time kit root. This is the
+  `MAP_DIFF_CMD` mechanism `adopt-codebase-map.sh:116-131` already uses. The example's four values
+  become the tokens that stamping replaces. Observed by AC4.
+- **S4** — `unattended.sh`'s condition-3 overlap key compares a `GENERATED_INDEXES` generator by the
+  path it resolves to, so a seeded value from an earlier adopt still keys, as §8 F2 resolves.
+  Observed by AC5.
+- **S5** — The three received suites that name their gate as `$ROOT/tools/…`
+  (`check-microformats.test.sh:11`, `check-placeholders.test.sh:14`) or probe the memory-tree
+  README at two fixed prefixes (`check-wiring.test.sh:823`) derive the path from `$HERE`.
+  Observed by AC6.
+- **S6** — `tools/codebase-map/selftest.py:1613` finds the lexicon as a sibling of `map_lib.kit_dir()`,
+  not at `repo_root() / "tools" / "lexicon"`. This closes backlog `TOOL-aProbedToolkit-3`, whose
+  first site `check-verdict-epoch.sh` is already derived (census §5), and with it
+  `TOOL-dPolishedVitrine-6`, which names that same first site. Observed by AC7.
+- **S7** — govkit's `foreign_kit_present` (`tools/govkit/govkit.py:5415`) probes the intake's own
+  prefix instead of the pair `("tools", "")`. The `sentinel =` lines it reads become kit-relative:
+  two kit descriptors and five `tools/govkit/entries/` descriptors. Observed by AC8.
+- **S8** — The literal fallback rungs after a derived rung, at `tools/check-wiring.sh:496, 547, 770,
+  780` and `skills/session-kickoff/manifest-check.sh:426`, give way to an announced skip when the
+  derived rung misses. Their four waiver rows are struck in the same commit, because a stale row
+  reds the arm. Observed by AC9.
+- **S9** — The ledger rows for these files are lowered by `--write-ratchet`, and every kit moved
+  takes its version bump in every carrier. Observed by AC10.
+
+## 3. Non-goals (OUT)
+
+- Any other literal in the files S1 to S8 touch. The fixture literals in `check-wiring.test.sh` and
+  `codebase-map/selftest.py` belong to `TOOL-aRepatriatedFork-28`, and the comments in
+  `.unattended.conf.example` to `TOOL-aRepatriatedFork-27`.
+- `render_playbook.py:204`, the sixth fallback rung in the census. Its candidates name adopter-owned
+  gate scripts rather than kit files, and `TOOL-aRepatriatedFork-29` owns that file.
+- Re-stamping a `.unattended.conf` an adopter already seeded. It is adopter-owned after the first
+  write; S4 makes an old value still work instead.
+
+### Edges
+
+- **consumes-from** `TOOL-aRepatriatedFork-23` — the epoch-5 ledger rows for `pre-commit:54`, the
+  three suite lines and the `"tools"` join. Epoch 4 cannot see them, so without it this unit's
+  lowering has nothing to lower.
+- **hands-off** `TOOL-aRepatriatedFork-28` — the remaining fixture literals in the two test files
+  S5 and S6 edit.
+- **hands-off** `TOOL-aRepatriatedFork-30` — a waiver registry four rows shorter.
+
+## 4. Design
+
+### Evidence
+
+From the 2026-09-25 prefix census at `2143b6d6` (session scratchpad, not committed), census §2
+unless stated. PINNED, measured 2026-09-25.
+
+- `pre-commit:48` probes only gov's prefix and the root, so at `scripts/` or `vendor/gov/` the
+  staged hygiene leg is skipped and the hook exits 0. `:54` has the same shape with a fixed list,
+  and the epoch-2 existence filter hides it from the ledger.
+- `pre-push:367` can only set `GOV_KITROOT` to `tools` or `scripts`, so at a root or `vendor/gov/`
+  install `GATE_RUNNER` names a runner that does not exist.
+- `.unattended.conf.example:268` holds two literals in `GENERATED_INDEXES`, which is not
+  REPLACE-marked. `unattended.sh:5742` uses the generator half as the condition-3 overlap key, so
+  at another prefix the refusal cannot fire. `:18`, `:25` and `:71` are REPLACE-marked and strand
+  only an adopter who keeps the default.
+- `check-microformats.test.sh:11` and `check-placeholders.test.sh:14` name `$ROOT/tools/…`, and at
+  another prefix every arm fails to reach its gate. `check-wiring.test.sh:823` makes the AC12
+  README arms skip with a false reason at `scripts/`.
+- `codebase-map/selftest.py:1613` skips with a false reason at inCMS, whose lexicon is at
+  `scripts/lexicon/`.
+- `govkit.py:5415` means a foreign install at `scripts/` is not detected.
+- The ownership rule this set uses (census working file `pcensus/alloc2.py`) gives this unit 19
+  literals over 13 files: 9 counted today, 5 invisible and 5 in files no descriptor resolves. It
+  also gives it arm 1's five lines at `pre-commit:48` and `check-wiring.sh`, and arm 3's two at
+  `pre-push:367` and `manifest-check.sh:426`.
+
+### Ownership rule
+
+One literal has one writer. A stranding site or fallback rung is this unit's, even inside a test
+file, and every other literal in those files is its class owner's. The rule is written in
+`TOOL-aRepatriatedFork-23` §8 F3 and applied by `pcensus/alloc2.py`.
+
+### Files touched (estimate)
+
+`.githooks/pre-commit` · `.githooks/pre-push` · `.githooks/gate-env.sh` ·
+`tools/unattended/adopt-unattended.sh` · `tools/unattended/.unattended.conf.example` ·
+`tools/unattended/unattended.sh` · `tools/check-microformats.test.sh` ·
+`tools/check-placeholders.test.sh` · `tools/check-wiring.test.sh` · `tools/check-wiring.sh` ·
+`tools/codebase-map/selftest.py` · `tools/govkit/govkit.py` · `tools/govkit/selftest.py` ·
+`skills/session-kickoff/manifest-check.sh` · `tools/install-prefix-waivers.txt` ·
+`tools/install-prefix-carried.txt` · the seven descriptors carrying a `sentinel =` line
+
+### Alternatives rejected
+
+- A new conf key naming the kit root. The build-level rule reserves a new key for an adopter's
+  decision, and the kit root is its layout.
+- Keeping `tools` as the first rung "because gov resolves unchanged". Gov resolves through the
+  receipt-free rung like any source, which AC1 observes at gov's own prefix.
+
+## 5. Production-readiness checklist
+
+- security — `pre-push` is a guarded surface (`TOOL-aRepatriatedFork-5`). The bar command's
+  tracked-and-unmodified check is unchanged; only where the runner is found moves. AC3 observes the
+  refusal path still refuses.
+- perf / scale — one receipt read per hook invocation, which `check-wiring.sh` already pays.
+- error / empty / loading states — an underivable kit root is §8 F1.
+- observability — each announced skip names the rung that missed.
+- risks — a hook that derives the wrong root runs the wrong gate. AC1 runs the ladder at three
+  prefixes.
+- testing — the pre-commit and pre-push self-tests gain a `vendor/gov/` fixture; govkit's self-test
+  gains a foreign install at `scripts/`.
+- migration — an adopter keeps its seeded `.unattended.conf`; S4 is what makes that safe.
+- user docs — `WIRE-INTO-PROJECT.md`'s hook paragraph, which is `TOOL-aRepatriatedFork-26`'s file.
+
+## 6. Acceptance criteria
+
+- **AC1** — When a fixture repo with the hygiene kit at `vendor/gov/memory-tree/` stages a change
+  under `memory/`, `.githooks/pre-commit` runs `check-memory-hygiene.sh --staged` from that path.
+  The same holds at `scripts/` and at the repo root.
+  Red when: the leg is skipped at any of the three prefixes.
+- **AC2** — Red-first control: the `vendor/gov/` fixture under `2143b6d6`'s hook skips the leg and
+  exits 0. Recorded in the acceptance ledger.
+  Red when: the old hook already runs it, so AC1 proves nothing.
+- **AC3** — When `.githooks/pre-push` runs in a fixture whose runner sits at
+  `vendor/gov/run-gates/`, `GATE_RUNNER` names that path. A modified runner is still refused.
+  Red when: `GATE_RUNNER` names `tools/…` or `scripts/…`, or the modified runner passes.
+- **AC4** — When `adopt-unattended.sh` installs at `scripts/unattended/`, the seeded conf's four keys
+  name `scripts/` paths, and `git grep -n 'tools/'` over the seeded conf's values finds none.
+  Red when: any of the four values names gov's prefix.
+- **AC5** — When a run declares a `GENERATED_INDEXES` pair whose generator is spelled at gov's old
+  prefix in a fixture installed at `scripts/`, the condition-3 refusal still fires on an overlap.
+  Red when: the refusal is silent, the `2143b6d6` behaviour.
+- **AC6** — When the microformat and placeholder gates and the wiring checker are copied to
+  `scripts/` in a fixture, `git grep -nE '\$(ROOT|REPO)/tools/'` over their three suites finds
+  nothing, and each suite's gate variable resolves to an existing file.
+  cost: the suites themselves run in the main loop, not in this pass.
+  Red when: a `$ROOT/tools/` spelling survives, or the variable names a missing file.
+- **AC7** — When the codebase-map self-test's lexicon lookup is imported in a fixture whose kit
+  sits at `scripts/codebase-map/` and whose lexicon sits at `scripts/lexicon/`, it resolves the
+  lexicon through `kit_dir()` and the arm runs instead of skipping.
+  Red when: it prints the old "not installed" skip.
+  permission: the self-test as a whole runs in the main loop; this pass observes the lookup alone.
+- **AC8** — When `python tools/govkit/govkit.py intake` targets a fixture with a foreign kit
+  installed at `scripts/`, it refuses with the AC8 refusal of `foreign_kit_present`.
+  Red when: the intake proceeds, which is `2143b6d6`'s behaviour.
+- **AC9** — When the derived rung of `check-wiring.sh` misses, it prints a skip naming the rung,
+  and `bash tools/check-install-prefix.sh` reports no stale waiver row.
+  Red when: a literal `tools/` rung still runs, or a waiver row outlives its line.
+- **AC10** — `bash tools/check-kit-versions.sh` exits 0, and `python tools/govkit/govkit.py epoch
+  --base 2143b6d6` names no kit this unit moved.
+  Red when: a moved kit's carrier was missed.
+
+## 7. Gates
+
+`install-prefix (shipped surface)` · `install-prefix self-test` · `branch-guard self-test` · `pre-push self-test` · `pre-push bar self-test` · `pre-push run-log line` · `push-main self-test` · `check-wiring self-test` · `micro-format gate selftest` · `placeholder-catalogue self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor arms` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `unattended kit gate` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)`
+
+New arm: `.githooks/pre-commit.test.sh` · a `vendor/gov/` fixture whose staged hygiene leg the
+`2143b6d6` hook skips · none
+
+New arm: `tools/govkit/selftest.py` · a foreign kit at `scripts/` the old probe misses · none
+
+## 8. Open questions
+
+- **F1 — what does a hook do when no rung of the ladder yields a kit root?** Option (a): an
+  announced skip in both hooks. Option (b): a refusal in both. Option (c): an announced skip in
+  `pre-commit`, whose staged legs are an early signal, and a refusal in `pre-push`, whose bar is the
+  merge bar. Recommendation: (c). A commit hook that blocks on an absent kit stops ordinary work,
+  while a push that cannot find its bar and passes is the silent skip this unit exists to remove.
+- **F2 — how does an adopter's existing `.unattended.conf` keep keying condition 3?** It was seeded
+  with gov's generator path and is adopter-owned after that. Option (a): the driver resolves both
+  halves of each pair before comparing, so an old value keys at any prefix. Option (b): stamp at
+  adopt only, and let `govkit update` report the stale seed value. Recommendation: (a). It closes
+  the defect for adopters who never re-adopt, and (b) leaves the refusal dead until someone reads a
+  report.
+
+## 9. Revision log
+
+- rev-1 · 2026-09-25 · initial draft. Owner rulings of 2026-09-25: the remaining hard-coded kit
+  prefixes are found and drained before `TOOL-aRepatriatedFork-18`'s held leg, and every one is
+  drained. This unit takes the stranding sites first, as census §6 recommends.
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py "derive a kit directory from the receipt or the script
+location"` ranked `kit_rel` and `kit_dir` in `tools/codebase-map/map_lib.py`; S6 reuses `kit_dir`.
+The probe cannot see shell, so the hook ladder was found by reading: `check-wiring.sh:37-53` already
+walks receipt then `KIT_REL`, and `resolve_kit_dir` is the canonical inline block in
+`tools/lib/render-doc.sh:77`. S1 and S2 reuse those rungs rather than writing a third. S3 reuses
+the `MAP_DIFF_CMD` stamp in `adopt-codebase-map.sh`.
+
+Recall terms used: `install-prefix GOV_KITROOT gate_at resolve_kit_dir KIT_REL receipt stamp
+MAP_DIFF_CMD GENERATED_INDEXES foreign_kit_present sentinel`.
