@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.96   # gov:kit memory-tree@2.96 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.97   # gov:kit memory-tree@2.97 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -1007,25 +1007,27 @@ if [ "$STAGED" = 0 ] && printf '%s\n' "$c21_sel" | grep -q .; then
 $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
     b21=""
   fi
-  miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
-  # The grandfather registry reaches this population as it reaches check 5: a record legacy-files.txt
-  # lists was exempt from the filename grammar and still redded here, so one registry answered two
-  # ways. Builtins only -- `in_legacy` is an array lookup, so this costs no process per row.
-  # TOOL-aRepatriatedFork-10 S2.
-  miss21=$(printf '%s\n' "$miss21" | while IFS= read -r _r21; do
-    [ -n "$_r21" ] || continue
-    _p21=${_r21#"  "}; _p21=${_p21%% *}
-    in_legacy "$_p21" || printf '%s\n' "$_r21"
-  done)
-  # S3 — RECORD_SERVES_CUTOFF. A project adopting this kit mid-life has landed records that
-  # predate the Serves grammar; adopter nc measured 549 of them. A cutoff is one value where a
-  # grandfather list would be 549 rows, and it matches the five cutoffs already in the conf.
+  # ONE POPULATION FILTER FOR EVERY BRANCH (TOOL-aRepatriatedFork-32). A record the grandfather
+  # registry lists, or one dated before RECORD_SERVES_CUTOFF, is exempt from all four branches of
+  # this check, not only the missing-Serves one: an adopter declaring the cutoff still redded 55
+  # legacy names in branch 4 and two reviews in the id branch. Rows are `  <path> — <detail>`.
   #
-  # THIS NARROWS A POPULATION, which is why the preset block refuses a cutoff dated after
-  # today: a future date exempts every record and the check reports clean over nothing.
-  # Blank grades everything, which is what gov does.
-  if [ -n "$RECORD_SERVES_CUTOFF" ]; then
-    miss21=$(printf '%s\n' "$miss21" | awk -v cut="$RECORD_SERVES_CUTOFF" '
+  # The legacy half: the registry reaches this population as it reaches check 5, and costs no
+  # process per row -- `in_legacy` is an array lookup. TOOL-aRepatriatedFork-10 S2.
+  #
+  # The cutoff half, S3 of that unit. A project adopting this kit mid-life has landed records that
+  # predate the Serves grammar; adopter nc measured 549 of them. A cutoff is one value where a
+  # grandfather list would be 549 rows. THIS NARROWS A POPULATION, which is why the preset block
+  # refuses a cutoff dated after today: a future date exempts every record and the check reports
+  # clean over nothing. Blank grades everything, which is what gov does.
+  extract_graded_rows() {
+    local _r21 _p21
+    while IFS= read -r _r21; do
+      [ -n "$_r21" ] || continue
+      _p21=${_r21#"  "}; _p21=${_p21%% *}
+      in_legacy "$_p21" || printf '%s\n' "$_r21"
+    done | if [ -n "$RECORD_SERVES_CUTOFF" ]; then
+      awk -v cut="$RECORD_SERVES_CUTOFF" '
       # the record date is the basename prefix the naming grammar already pins. A row whose
       # name carries no date is KEPT: unparseable is not the same answer as old, and only one
       # of them is an exemption.
@@ -1040,8 +1042,12 @@ $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
           if (d < cut) next
         }
         print
-      }' | grep . || true)
-  fi
+      }'
+    else
+      cat
+    fi
+  }
+  miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
   # RECORD_UNDATED_ARTIFACTS=exempt — a JSON result or an HTML report cannot carry a Serves line at
   # any date, so a DATE is not what decides it (the owner ruled this independent of the cutoff). The
   # class is STRUCTURAL: no leading ISO date AND no .md suffix. A suffix list was rejected because an
@@ -1062,17 +1068,25 @@ $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
   fi
   [ -n "$miss21" ] && fail 21 "records under build/, prompts/ or reviews/ whose head carries no conformant Serves line:
 $miss21"
-  bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
+  bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
   [ -n "$bad21" ] && fail 21 "Serves or Commissions lines naming an id that no spec in this tree defines:
 $bad21"
   # The unbound escape. An UNDECLARED pin is a refusal, not a disabled check: `none` is a deliberate
   # declaration and the number of them is the thing a reader is entitled to see bounded. `n21` was
   # read above, where its absence is the parse's liveness test.
+  # The pin counts the U rows the population filter keeps, so an exempt record no longer spends it;
+  # `n21` stays the liveness total. TOOL-aRepatriatedFork-32.
   pin21=${RECORD_UNBOUND_PIN-}
+  u21=$(printf '%s\n' "$b21" | sed -n 's/^U\t\(.*\)$/  \1 — unbound/p')
+  g21=$(printf '%s\n' "$u21" | extract_graded_rows | grep -c . || true)
+  # A generator predating the U row prints N and no U, which would make the pin unreachable.
+  if [ -n "$b21" ] && [ "$(printf '%s\n' "$u21" | grep -c . || true)" != "${n21:-0}" ]; then
+    fail 21 "the bindings parse printed N ${n21:-0} but $(printf '%s\n' "$u21" | grep -c . || true) U row(s) — a generator without the U row leaves RECORD_UNBOUND_PIN ungraded"
+  fi
   if [ -z "$pin21" ]; then
     fail 21 "RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus"
-  elif [ "${n21:-0}" -gt "$pin21" ]; then
-    over21="  measured ${n21:-0} against the pin $pin21"
+  elif [ "${g21:-0}" -gt "$pin21" ]; then
+    over21="  measured ${g21:-0} against the pin $pin21"
     fail 21 "records carrying the unbound Serves form outnumber their pin — bind them, or move the pin in the same commit recording the old and new values beside it:
 $over21"
   fi
@@ -1108,7 +1122,7 @@ $over21"
       n = split(ids, a, " ")
       for (i = 1; i <= n; i++) if (a[i] == claimed) next
       print "  " p " — the name claims " claimed
-    }')
+    }' | extract_graded_rows)
   [ -n "$proj21" ] && fail 21 "record filenames whose family, slug and ordinal name an id their own Serves line does not list:
 $proj21"
 fi

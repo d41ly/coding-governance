@@ -575,6 +575,10 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
             continue
         if rec["state"] == "unbound":
             unbound += 1
+            # One U row per unbound record, so check 21's pin branch can drop a record its
+            # population filter exempts before it counts. N stays the liveness row and the total.
+            # TOOL-aRepatriatedFork-32.
+            print(f"U\t{rel}")
         # One S row per BOUND record, carrying the resolved SET. A conformant record is not a
         # finding, so the A/B/N rows say nothing about it — and check 21's filename-vs-header
         # branch needs exactly this set to test membership against. Without it that branch would

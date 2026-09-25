@@ -305,7 +305,8 @@ BUILD_SLUG_RE=""
 PROJECT_REGISTRY_EXTRA=""
 
 # RECORD_SERVES_CUTOFF — an ISO date. Records whose filename date falls BEFORE it are exempt from
-# check 21's "every record names the spec it is evidence about". For a tree adopting this kit
+# EVERY branch of check 21: the Serves line, the ids it names, the filename's id and the unbound
+# pin (TOOL-aRepatriatedFork-32). For a tree adopting this kit
 # mid-life with landed records that predate the grammar. A record whose name carries no parseable
 # date is KEPT: unparseable is not the same answer as old, and only one of them is an exemption.
 # A cutoff dated after today is REFUSED — it would exempt every record and report a clean run.

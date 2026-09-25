@@ -2736,6 +2736,60 @@ case "$r:$o" in
   *) echo "FAIL RECORD_UNDATED_ARTIFACTS='Exempt' did not abort (rc=$r) — an unknown value read as blank"; st=1 ;;
 esac
 
+# ---- TOOL-aRepatriatedFork-32: RECORD_SERVES_CUTOFF exempts a record from EVERY check-21 branch.
+# ---- Three pairs of records, one per branch the cutoff used to miss: an id no spec defines, a name
+# ---- with no family-qualified id, and the unbound form the pin counts. Each pair is one record
+# ---- before the cutoff and one after it. The blank-cutoff run is the control: it must name the
+# ---- pre-cutoff half, or the arms below would pass on a branch that never fired.
+for _d32 in 2026-08-02 2026-09-02; do
+  printf '# r\n\n**Serves:** journal ARCH-tOne-9\n' > "$_b1/memory/builds/tOne/build/$_d32-build-ARCH-tOne-9-x.md"
+  printf '# r\n\n**Serves:** journal ARCH-tOne-1\n' > "$_b1/memory/builds/tOne/build/$_d32-build-tOne-1-y.md"
+  printf '# r\n\n**Serves:** none — a fixture that serves nothing\n' > "$_b1/memory/builds/tOne/build/$_d32-build-ARCH-tOne-1-z.md"
+done
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf32 --no-verify ) >/dev/null 2>&1
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="1"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"2026-08-02-build-ARCH-tOne-9-x.md — ARCH-tOne-9 is named"*"measured 2 against the pin 1"*"2026-08-02-build-tOne-1-y.md — bound, but the name carries no family-qualified id"*) echo "ok   check 21 control: with no cutoff the id, filename and pin branches all grade the pre-cutoff records" ;;
+  *) echo "FAIL check 21 control: a blank cutoff did not red all three pre-cutoff records, so the cutoff arms below prove nothing"; st=1 ;;
+esac
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="1"\nRECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"2026-08-02-build-ARCH-tOne-9-x.md"*) echo "FAIL RECORD_SERVES_CUTOFF: the id branch still grades a record dated before the cutoff"; st=1 ;;
+  *"2026-09-02-build-ARCH-tOne-9-x.md — ARCH-tOne-9 is named"*) echo "ok   RECORD_SERVES_CUTOFF: the id branch exempts the pre-cutoff record and grades the later one" ;;
+  *) echo "FAIL RECORD_SERVES_CUTOFF: the id branch stopped grading the record dated after the cutoff"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"2026-08-02-build-tOne-1-y.md"*) echo "FAIL RECORD_SERVES_CUTOFF: the filename branch still grades a record dated before the cutoff"; st=1 ;;
+  *"2026-09-02-build-tOne-1-y.md — bound, but the name carries no family-qualified id"*) echo "ok   RECORD_SERVES_CUTOFF: the filename branch exempts the pre-cutoff record and grades the later one" ;;
+  *) echo "FAIL RECORD_SERVES_CUTOFF: the filename branch stopped grading the record dated after the cutoff"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"measured 2 against the pin 1"*) echo "FAIL RECORD_SERVES_CUTOFF: the pin still counts the unbound record dated before the cutoff"; st=1 ;;
+  *) echo "ok   RECORD_SERVES_CUTOFF: the pin counts only the unbound record at or after the cutoff" ;;
+esac
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nRECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"measured 1 against the pin 0"*) echo "ok   RECORD_SERVES_CUTOFF: the pin still grades the unbound record after the cutoff" ;;
+  *) echo "FAIL RECORD_SERVES_CUTOFF: the pin stopped counting the unbound record dated after the cutoff"; st=1 ;;
+esac
+# A generator that predates the U row prints N and no U, which would leave the pin unreachable. A
+# copy of this kit whose generator lost the line models an adopter's forked one.
+rm -rf "$TMP/kit32"; cp -r "$HERE" "$TMP/kit32"
+sed -i '/print(f"U\\t{rel}")/d' "$TMP/kit32/gen_build_index.py"
+o=$( cd "$_b1" && bash "$TMP/kit32/check-memory-hygiene.sh" 2>&1 )
+n=$((n+1))
+case "$o" in
+  *"the bindings parse printed N 2 but 0 U row(s)"*) echo "ok   check 21: a generator printing N and no U row reds instead of leaving the pin ungraded" ;;
+  *) echo "FAIL check 21: a generator printing no U row left the pin silently ungraded"; st=1 ;;
+esac
+rm -rf "$TMP/kit32"
+( cd "$_b1" && git rm -q memory/builds/tOne/build/2026-0[89]-02-build-* && git -c commit.gpgsign=false commit -q -m rf32-out --no-verify ) >/dev/null 2>&1
+
 # ---- TOOL-aRepatriatedFork-10 S5 and S6: a FLAT install at `scripts/` with a govkit receipt,
 # ---- rendered through `--render`. The rendered HYGIENE.md states THIS tree's two conf values, and
 # ---- TEMPLATE-SPEC.md names the codebase-map generator under the receipt's prefix — the kit
@@ -2812,7 +2866,8 @@ esac
 # RAISED 434 -> 436 at round 2 of that review: the chit calls for fixtures 220 and 221.
 # RAISED 436 -> 448 by TOOL-aRepatriatedFork-10: its ten registry/key arms and two flat-render arms,
 # each one top-level increment of `n`.
-FLOOR_ASSERTIONS=448
+# RAISED 448 -> 454 by TOOL-aRepatriatedFork-32: its control, four cutoff arms and the U-row arm, each top-level.
+FLOOR_ASSERTIONS=454
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
