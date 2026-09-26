@@ -122,7 +122,8 @@ none
 - rev-3 · 2026-09-26 · S1 · S2 · S3 · §3 · §4 · AC1 · AC2 · folds the round-1 closing-diff review's
   C3, C4 and C5: the shell reader peels single quotes, every reader decides the word start on the
   text right after `=` — the three rev-2 controls included, since each split from bash there — and
-  the lexicon arm asserts its fixture. The base moves to the rewritten parent.
+  the lexicon arm asserts its fixture. The base moves to the rewritten parent. Built: the probe
+  clean over eleven readers, every new arm red on the rev-2 bytes.
 
 ## 10. Reuse audit
 
