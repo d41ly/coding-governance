@@ -2438,6 +2438,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_opted_out",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_owned_engine_refusals",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

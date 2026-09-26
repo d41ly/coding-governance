@@ -40,8 +40,9 @@
  * every path including every error. A recall log is worth less than a Read.
  *
  * Wiring: PostToolUse matcher "Read" — `recall-opened.fragment.json` beside this file, merged by
- * `settings-merge.py --fragment`. Lands DARK: `adopt-memory-recall.sh` copies this file only under
- * `--with-hook`, so a project that does not want it has no file and no wiring alarm.
+ * `settings-merge.py --fragment`. Lands DARK: govkit lands this file only where the target set
+ * `[kit.memory-recall] with_hook = "yes"`, and `--with-hook` then prints the merge, so a project
+ * that does not want it has no file and no wiring alarm.
  */
 'use strict'
 

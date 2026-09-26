@@ -2934,10 +2934,31 @@ user_skills = "/tmp/gk-fake-skills"
         p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
         out = p.stdout + p.stderr
         _mr = inc / "tools" / "memory-recall"
-        check("[aRF-36] apply lands memory-recall's CLI, extractor and hook on a fresh target",
-              all((_mr / f).is_file() for f in ("query.py", "extract.py", "recall-opened.js")),
-              out[-900:])
+        check("[aRF-36] apply lands memory-recall's CLI and extractor on a fresh target",
+              all((_mr / f).is_file() for f in ("query.py", "extract.py")), out[-900:])
         check("[aRF-36] ...and reports no entry INCOMPLETE", "INCOMPLETE" not in out, out[-900:])
+        # --- rev-3, the round-1 fold (I4): the hook is an OPT-IN. A target that never asked for it
+        # --- gets no file, and the skip names the key that takes it; one that asked gets the file.
+        check("[aRF-36] rev-3 ...but NOT the recall hook, whose opt-in this target never took",
+              not (_mr / "recall-opened.js").exists(), out[-900:])
+        check("[aRF-36] rev-3 ...and the skip names the key that takes it",
+              "SKIPPED [opt-in       ] tools/memory-recall/recall-opened.js" in out
+              and "with_hook" in out, out[-900:])
+        _optin = make_target(tmp / "optin36", DEPLOY_FULL + "\n[kit.memory-recall]\nwith_hook = \"yes\"\n")
+        _po = run("apply", "--target", str(_optin), "--kits", "memory-recall,memory-tree")
+        check("[aRF-36] rev-3 a target declaring [kit.memory-recall] with_hook = \"yes\" gets the hook",
+              (_optin / "tools" / "memory-recall" / "recall-opened.js").is_file(),
+              (_po.stdout + _po.stderr)[-900:])
+        _all = make_target(tmp / "optall36", DEPLOY_FULL + "\n[kit.memory-recall]\nopt_in_all = \"yes\"\n")
+        _pa = run("apply", "--target", str(_all), "--kits", "memory-recall,memory-tree")
+        check("[aRF-36] rev-3 a target spelling the canonical ctx's reserved key is refused by name",
+              _pa.returncode != 0 and "reserved" in (_pa.stdout + _pa.stderr)
+              and not (_all / "tools" / "memory-recall" / "recall-opened.js").exists(),
+              (_pa.stdout + _pa.stderr)[-900:])
+        _pr = run("plan", "--target", str(inc), "--kits", "memory-recall")
+        check("[aRF-36] rev-3 ...and plan, the preview the operator approves, agrees with apply",
+              "recall-opened.js" not in _pr.stdout and "query.py" in _pr.stdout,
+              (_pr.stdout + _pr.stderr)[-900:])
 
         pg = pin_target("u6p1", b"*.sh text eol=lf")          # deliberately no trailing newline
         run("apply", "--target", str(pg), "--kits", "memory-recall,memory-tree")
@@ -9755,6 +9776,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(HERE / "govkit.py", g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(HERE / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(A13_REG, encoding="utf-8",
                                                                   newline="\n")
             (g / "tools" / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
@@ -10103,6 +10125,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(HERE / "govkit.py", g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(HERE / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(A4_REG, encoding="utf-8",
                                                                   newline="\n")
             (g / "tools" / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
@@ -11196,6 +11219,7 @@ user_skills = "/tmp/gk-fake-skills"
         (_g5sib / "tools" / "demo").mkdir(parents=True)
         (_g5sib / "tools" / "sib").mkdir(parents=True)
         shutil.copy2(HERE / "govkit.py", _g5sib / "tools" / "govkit" / "govkit.py")
+        shutil.copy2(HERE / "adopters.toml", _g5sib / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
         (_g5sib / "tools" / "govkit" / "registry.toml").write_text(
             '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo", "sib"]\n\n'
             '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
@@ -11584,6 +11608,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(HERE / "govkit.py", g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(HERE / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(A6_REG, encoding="utf-8",
                                                                   newline="\n")
             (g / "tools" / "demo" / "kit.toml").write_text(a6_kit(leg_argv), encoding="utf-8",

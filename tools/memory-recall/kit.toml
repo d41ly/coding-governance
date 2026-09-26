@@ -46,6 +46,17 @@ role = "project-owned"
 include = ["recall-fixture.json", "check-recall.py", "test_recall_floor.py"]
 role = "project-owned"
 
+# THE HOOK LANDS ONLY WHERE THE TARGET ASKED FOR IT. TOOL-aRepatriatedFork-36 rev-3, the round-1
+# closing-diff fold (I4). The hook is an OPT-IN — `adopt-memory-recall.sh --with-hook`, and
+# "no `--with-hook`, no file" in three documents — and the `**` rule above shipped it to every
+# adopter, where one that declined read UNWIRED on its own bar. A target takes it with
+# `[kit.memory-recall] with_hook = "yes"` in its deploy.toml; without that, `apply` and `update` land
+# nothing here and say so. This rule claims the destination either way, so the `**` pool never does.
+[[files]]
+include = ["recall-opened.js"]
+role = "engine"
+opt_in = "with_hook"
+
 [[files]]
 include = ["SKILL.template.md"]
 role = "rendered"
@@ -105,6 +116,7 @@ why = "a rendered artifact its own gate byte-compares"
 # `extract.py`, `query.py` and `recall-opened.js` forked because gov's copies import `recall_conf`,
 # which the adopter's tree then lacked, so an `engine` update was a live ModuleNotFoundError.
 # TOOL-aRepatriatedFork-12 S8 has the adopter take gov's recall files byte for byte, `recall_conf.py`
-# among them, so the reason is gone and the `**` engine rule above ships all three. An adopter that
-# keeps its hook outside this directory declares that copy `[[own]]` in its deploy.toml; the
-# fragment's hook path then resolves to it, in check-wiring and in settings-merge alike.
+# among them, so the reason is gone: the `**` engine rule above ships the two programs, and the
+# `opt_in` rule the hook, to a target that asked for it. An adopter that keeps its hook outside this
+# directory declares that copy `[[own]]` in its deploy.toml; the fragment's hook path then resolves
+# to it through settings-merge.py, the one reader check-wiring calls.

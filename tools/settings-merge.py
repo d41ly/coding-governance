@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.8
+# gov:kit settings-merge@1.9
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 tools/hooks/agent-cap.js verbatim):
@@ -35,6 +35,9 @@ Usage:
       --resolve-fragment  print the fragment's hook_path with `{kit}`/`{here}` expanded, then
                      exit — the value the merge would write; check-wiring.sh carries the same
                      verb and the hook-destinations gate asserts the two agree
+      --resolve-hook P  print P, a repo-relative hook path already expanded, or the target's
+                     `adopter-owned` copy of it from `.governance/install.json`; exit 2 on a row
+                     it refuses. check-wiring.sh CALLS this rather than reading the receipt itself
     With neither, agent-cap's copy is located by `[kit.agent-cap] prefix` in the target's
     `.governance/deploy.toml` when one is declared, and by this file's own install prefix
     otherwise — an entry may be installed somewhere other than where settings-merge.py sits.
@@ -63,12 +66,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import posixpath
 import re
 import sys
 import tempfile
 from pathlib import Path, PurePosixPath
 
-KIT_SETTINGS_MERGE_VERSION = "1.8"  # gov:kit settings-merge@1.8 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.9"  # gov:kit settings-merge@1.9 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 
@@ -248,6 +252,14 @@ def resolve_hook_path(hook_path: str, frag_file: str | None = None) -> str:
     return hook_path.replace("{kit}", _kit_rel())
 
 
+# govkit's grade for an `[[own]].path`, carried here because govkit ships to no target: the STRICT
+# token class of its `demand_safe_token`, the containment of its `demand_contained_dest` and the
+# normpath equality `resolve_owned_rows` demands. `measure_contract_parity` re-grades the receipt's
+# copy of that path with the same three before using it, because the receipt is a tracked file anyone
+# can edit. This is that rule, not a third one: the class admits no `\`, `"`, `$`, backtick or space.
+_OWNED_PATH = re.compile(r"\A[A-Za-z0-9_./~@+-]+\Z")
+
+
 def resolve_owned_hook(path: str) -> str:
     """TOOL-aRepatriatedFork-36. A hook the target keeps ELSEWHERE, declared rather than guessed.
 
@@ -255,23 +267,52 @@ def resolve_owned_hook(path: str) -> str:
     declares it `[[own]]`, which `govkit adopt` records as an `adopter-owned` receipt row carrying
     the SAME `source` as gov's engine row at `path`. Joined on that source exactly; with no receipt,
     no engine row at `path`, or no owned row for its source, `path` comes back unchanged.
-    check-wiring.sh's `resolve_owned_hook` makes the same join and check-hook-destinations compares
-    the two readers' answers.
+
+    THE ONLY READER OF THAT JOIN, since the round-1 fold. check-wiring.sh carried a second one in
+    awk, which never decoded JSON: a compact receipt, a `\\u` escape, a backslash or an embedded quote
+    split the two answers, and the parity gate could not see it because gov keeps no receipt. It
+    calls `--resolve-hook` now, so the two readers cannot disagree.
+
+    A JOINED ROW IS GRADED, and a row that fails REFUSES (ValueError) rather than falling back: the
+    owned path lands inside a command Claude Code runs, so a `$(...)` in it is code, and a silent
+    fall-back would wire gov's copy while the operator believes their own runs. Refused too:
+    - an owned file whose NAME differs from the hook's, because `check_ours` joins on that name, so
+      every merge would append a duplicate that `--unwire` can never remove;
+    - an ambiguous join, two sources at `path` or two owned paths for one source, where any pick is
+      a guess about which the operator meant.
     """
     try:
         rows = json.loads((Path.cwd() / ".governance" / "install.json").read_text(encoding="utf-8"))
         rows = [f for f in rows.get("files") or [] if isinstance(f, dict)]
     except (OSError, ValueError, AttributeError):
         return path
-    src = next((f.get("source") for f in rows
-                if f.get("path") == path and f.get("role") != "adopter-owned"), None)
-    for f in rows if src else ():
-        p = f.get("path")
-        if (f.get("role") == "adopter-owned" and f.get("source") == src and isinstance(p, str)
-                and not p.startswith("/") and not re.match(r"[A-Za-z]:", p)
-                and ".." not in PurePosixPath(p).parts):
-            return p
-    return path
+    srcs = {f.get("source") for f in rows
+            if f.get("path") == path and f.get("role") != "adopter-owned" and f.get("source")}
+    if len(srcs) > 1:
+        raise ValueError(f"the receipt carries {len(srcs)} rows at {path} with different sources, "
+                         f"so the adopter-owned join is ambiguous: {sorted(map(str, srcs))}")
+    if not srcs:
+        return path
+    src = srcs.pop()
+    owned = sorted({f.get("path") for f in rows
+                    if f.get("role") == "adopter-owned" and f.get("source") == src}, key=str)
+    if not owned:
+        return path
+    where = f"the receipt's adopter-owned row for {src}"
+    if len(owned) > 1:
+        raise ValueError(f"{where} names {len(owned)} paths, so the join is ambiguous: {owned}")
+    p = owned[0]
+    if not isinstance(p, str) or not _OWNED_PATH.match(p):
+        raise ValueError(f"{where} is {p!r}, outside the class govkit grades an [[own]] path with "
+                         f"({_OWNED_PATH.pattern}); it would land inside a command Claude Code runs")
+    norm = posixpath.normpath(p)
+    if p != norm or norm == ".." or norm.startswith("../") or posixpath.isabs(norm):
+        raise ValueError(f"{where} is {p!r}, which is not a canonical path inside the repository")
+    if PurePosixPath(p).name != PurePosixPath(path).name:
+        raise ValueError(f"{where} is {p!r}, whose file name is not the hook's "
+                         f"{PurePosixPath(path).name!r}; the merge joins on that name, so every run "
+                         f"would append a second entry and --unwire could remove none")
+    return p
 
 
 def check_ours(command, marker: str, hook_path: str) -> bool:
@@ -634,6 +675,59 @@ def _selftest() -> int:
             rcpt13.write_text(json.dumps({"files": rows13[1:]}) + "\n", encoding="utf-8")
             got13 = resolve_hook_path("{here}/h.js", str(frag13))
             assert got13 == "k/h.js", got13
+            # 13c) the round-1 fold: every receipt spelling the retired awk reader split from this
+            #      one, as RAW TEXT so the escapes reach the parser undecoded. A decoded path that
+            #      passes govkit's [[own]] grade resolves; every other owned row REFUSES, and so does
+            #      an ambiguous join or an owned file named differently from the hook (S4).
+            eng = '{"path": "k/h.js", "role": "engine", "source": "g/k/h.js"}'
+            def build_owned_row(p: str, role: str = "adopter-owned") -> str:
+                return '{"path": "%s", "role": "%s", "source": "g/k/h.js"}' % (p, role)
+            accepted = {
+                "compact one-line JSON": '{"files":[%s,%s]}' % (eng, build_owned_row(".claude/hooks/h.js")),
+                "a \\u escape in the role": '{"files": [%s, %s]}' % (eng, build_owned_row(".claude/hooks/h.js", "\\u0061dopter-owned")),
+                "a duplicated identical owned row": '{"files": [%s, %s, %s]}' % (eng, build_owned_row(".claude/hooks/h.js"), build_owned_row(".claude/hooks/h.js")),
+            }
+            refused = {
+                "backslashes": build_owned_row("..\\\\..\\\\other\\\\h.js"),
+                "a \\u escape to a non-ASCII name": build_owned_row(".claude/caf\\u00e9/h.js"),
+                "an embedded quote": build_owned_row('.claude/h\\"x/h.js'),
+                "a climbing path": build_owned_row("../other/h.js"),
+                "a non-canonical path": build_owned_row(".claude/../hooks/h.js"),
+                "an absolute path": build_owned_row("/abs/h.js"),
+                "a drive letter": build_owned_row("C:/abs/h.js"),
+                "a command substitution": build_owned_row("h/$(touch PWNED)/h.js"),
+                "an owned file named differently from the hook": build_owned_row(".claude/hooks/my-h.js"),
+            }
+            for why, text in accepted.items():
+                rcpt13.write_text(text + "\n", encoding="utf-8")
+                assert resolve_hook_path("{here}/h.js", str(frag13)) == ".claude/hooks/h.js", why
+            for why, row in refused.items():
+                rcpt13.write_text('{"files": [%s, %s]}\n' % (eng, row), encoding="utf-8")
+                try:
+                    got13 = resolve_hook_path("{here}/h.js", str(frag13))
+                    raise AssertionError(f"{why}: resolved to {got13!r} instead of refusing")
+                except ValueError:
+                    pass
+            rcpt13.write_text('{"files": [%s, %s, %s]}\n' % (eng, build_owned_row(".claude/hooks/h.js"),
+                                                              build_owned_row("x/h.js")), encoding="utf-8")
+            try:
+                resolve_hook_path("{here}/h.js", str(frag13))
+                raise AssertionError("two owned paths for one source resolved instead of refusing")
+            except ValueError:
+                pass
+            # ...and the refusal reaches the MERGE: S4's owned row used to append one duplicate
+            # entry per run; now the run exits 2 and writes nothing.
+            # Both files EXIST, so the refusal is the only reason the merge can exit 2 here.
+            (root / "mine").mkdir()
+            (root / "mine" / "my-h.js").write_text("//\n", encoding="utf-8")
+            (root / "k" / "h.js").write_text("//\n", encoding="utf-8")
+            frag13.write_text(json.dumps({"name": "h", "event": "PostToolUse", "matcher": "Read",
+                                          "marker": "h.js", "hook_path": "{here}/h.js"}) + "\n",
+                              encoding="utf-8")
+            rcpt13.write_text('{"files": [%s, %s]}\n' % (eng, build_owned_row("mine/my-h.js")), encoding="utf-8")
+            sf13c = root / "s13c.json"
+            assert main([str(sf13c), "--fragment", str(frag13)]) == 2 and not sf13c.exists()
+            assert main(["--resolve-hook", "k/h.js"]) == 2
         finally:
             __import__("os").chdir(_cwd13)
         if card and replay:
@@ -813,6 +907,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--check", action="store_true")
     p.add_argument("--unwire", action="store_true")
     p.add_argument("--resolve-fragment", default=None, metavar="F")
+    p.add_argument("--resolve-hook", default=None, metavar="P")
     p.add_argument("--selftest", action="store_true")
     a = p.parse_args(argv)
     if a.selftest:
@@ -823,6 +918,10 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     frag = AGENT_CAP
     try:
+        if a.resolve_hook:
+            # The owned-hook join's ONE reader, printed for check-wiring.sh (the round-1 fold, S3).
+            print(resolve_owned_hook(a.resolve_hook))
+            return 0
         if a.resolve_fragment:
             # A PRINT VERB, nothing else: the value `merge` would write, so a checker can read the
             # decision instead of re-deriving it beside this file. Twinned on check-wiring.sh.

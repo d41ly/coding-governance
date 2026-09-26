@@ -369,16 +369,64 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # source of gov's engine row at the fragment's path. The fragment resolves to the owned copy, both
   # readers agree on it, and the arm is ok. Without the seam this is state 5's false UNWIRED.
   src6="$KIT_REL/memory-recall/recall-opened.js"  # gov:root-fixture — the receipt's gov-side source, any string both rows share
+  rk=memory-recall  # gov:root-fixture — scratch repo built at the ROOT prefix; every path below is spelled through it
+  write_owned_receipt() {  # <owned path, raw JSON string body> [role] -> a pretty receipt: gov's engine row, then the owned row
+    printf '{\n  "files": [\n    {\n      "path": "%s",\n      "role": "engine",\n      "source": "%s"\n    },\n    {\n      "path": "%s",\n      "role": "%s",\n      "source": "%s"\n    }\n  ]\n}\n' \
+      "$rk/recall-opened.js" "$src6" "$1" "${2:-adopter-owned}" "$src6" > .governance/install.json
+  }
   mkdir -p .governance; printf '// the target'"'"'s own\n' > .claude/hooks/recall-opened.js
-  printf '{\n  "files": [\n    {\n      "path": "%s",\n      "role": "engine",\n      "source": "%s"\n    },\n    {\n      "path": "%s",\n      "role": "adopter-owned",\n      "source": "%s"\n    }\n  ]\n}\n' \
-    memory-recall/recall-opened.js "$src6" .claude/hooks/recall-opened.js "$src6" > .governance/install.json  # gov:root-fixture — scratch repo built at the ROOT prefix
-  got=$(bash "$SCRIPT" --resolve-fragment memory-recall/recall-opened.fragment.json 2>/dev/null)  # gov:root-fixture — scratch repo built at the ROOT prefix
+  write_owned_receipt .claude/hooks/recall-opened.js
+  got=$(bash "$SCRIPT" --resolve-fragment "$rk/recall-opened.fragment.json" 2>/dev/null)
   ck "AC8 an adopter-owned receipt row moves the resolved hook to the target's copy" "$([ "$got" = .claude/hooks/recall-opened.js ] && echo 1 || echo 0)"
-  got2=$("$py" ${KP}settings-merge.py --resolve-fragment memory-recall/recall-opened.fragment.json 2>/dev/null)  # gov:root-fixture — scratch repo built at the ROOT prefix
+  got2=$("$py" ${KP}settings-merge.py --resolve-fragment "$rk/recall-opened.fragment.json" 2>/dev/null)
   ck "AC8 ...and settings-merge.py resolves the same path" "$([ "$got2" = "$got" ] && echo 1 || echo 0)"
+  # I1 (round-1 fold): settings.json still runs the KIT copy state 4 merged, which is not the copy
+  # the declaration resolves to, so the arm names the mismatch instead of reading the marker as ok.
   out=$(chk --check); rc=$?
-  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
-    && ck "AC8 recall hook kept elsewhere and declared owned -> ok, exit 0" 1 || ck "AC8 recall hook kept elsewhere and declared owned -> ok, exit 0" 0
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall    — settings.json runs a recall-opened hook, but not the resolved copy'; } \
+    && ck "AC8 an entry running another copy than the resolved one -> UNWIRED, exit 1" 1 || ck "AC8 an entry running another copy than the resolved one -> UNWIRED, exit 1" 0
+  # ...and one merge REWRITES that entry in place to the owned copy, after which the arm is ok.
+  "$py" ${KP}settings-merge.py --fragment "$rk/recall-opened.fragment.json" >/dev/null 2>&1
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall' \
+      && [ "$(grep -c 'recall-opened.js' .claude/settings.json)" = 1 ]; } \
+    && ck "AC8 recall hook kept elsewhere and declared owned -> ok, exit 0, one entry" 1 || ck "AC8 recall hook kept elsewhere and declared owned -> ok, exit 0, one entry" 0
+  # I1, BOTH COPIES PRESENT: gov's copy lands beside the kit, settings.json runs the out-of-kit one,
+  # and nothing declares it. The retired marker join printed `ok` here, and kept printing it after
+  # the copy that actually runs was deleted.
+  printf '// gov'"'"'s\n' > "$rk/recall-opened.js"
+  printf '{\n  "files": [\n    {\n      "path": "%s",\n      "role": "engine",\n      "source": "%s"\n    }\n  ]\n}\n' \
+    "$rk/recall-opened.js" "$src6" > .governance/install.json
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall    — settings.json runs a recall-opened hook, but not the resolved copy'; } \
+    && ck "AC8 both copies present, the undeclared one wired -> UNWIRED, exit 1" 1 || ck "AC8 both copies present, the undeclared one wired -> UNWIRED, exit 1" 0
+  mv .claude/hooks/recall-opened.js .claude/hooks/held.js
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
+    && ck "AC8 ...and still UNWIRED once the copy that runs is deleted" 1 || ck "AC8 ...and still UNWIRED once the copy that runs is deleted" 0
+  mv .claude/hooks/held.js .claude/hooks/recall-opened.js
+  # S1-S5 (round-1 fold): the receipt spellings the retired awk reader split from settings-merge's.
+  # Each bad owned row is REFUSED by the one reader, and check-wiring reports that refusal; each
+  # good spelling resolves to the owned copy in both CLIs. The rows are RAW JSON bodies, so a
+  # backslash or `\u` reaches the parser undecoded.
+  for bad in '..\\..\\other\\recall-opened.js' '.claude/caf\u00e9/recall-opened.js' '.claude/h\"x/recall-opened.js' \
+             '../other/recall-opened.js' '/abs/recall-opened.js' 'C:/abs/recall-opened.js' \
+             'h/$(touch PWNED)/recall-opened.js' '.claude/hooks/my-recall.js'; do
+    write_owned_receipt "$bad"
+    bash "$SCRIPT" --resolve-fragment "$rk/recall-opened.fragment.json" >/dev/null 2>&1; r1=$?
+    "$py" ${KP}settings-merge.py --resolve-fragment "$rk/recall-opened.fragment.json" >/dev/null 2>&1; r2=$?
+    ck "AC8 an owned row of $bad is refused by both CLIs" "$([ "$r1" != 0 ] && [ "$r2" != 0 ] && echo 1 || echo 0)"
+  done
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q "UNWIRED  recall    — .*refused"; } \
+    && ck "AC8 ...and the recall arm reports the last refusal as UNWIRED, exit 1" 1 || ck "AC8 ...and the recall arm reports the last refusal as UNWIRED, exit 1" 0
+  write_owned_receipt .claude/hooks/recall-opened.js '\u0061dopter-owned'
+  got=$(bash "$SCRIPT" --resolve-fragment "$rk/recall-opened.fragment.json" 2>/dev/null)
+  ck "AC8 a \\u-escaped owned role still joins, through the one reader" "$([ "$got" = .claude/hooks/recall-opened.js ] && echo 1 || echo 0)"
+  write_owned_receipt .claude/hooks/recall-opened.js; tr -d ' \n' < .governance/install.json > .governance/c.json && mv .governance/c.json .governance/install.json
+  got=$(bash "$SCRIPT" --resolve-fragment "$rk/recall-opened.fragment.json" 2>/dev/null)
+  ck "AC8 a compact one-line receipt joins the same" "$([ "$got" = .claude/hooks/recall-opened.js ] && echo 1 || echo 0)"
+  rm -f "$rk/recall-opened.js"
   # its control: the owned row alone, with no engine row at the fragment's path, joins to nothing.
   printf '{\n  "files": [\n    {\n      "path": "%s",\n      "role": "adopter-owned",\n      "source": "%s"\n    }\n  ]\n}\n' \
     .claude/hooks/recall-opened.js "$src6" > .governance/install.json

@@ -1,6 +1,6 @@
 # memory-recall — ask your decision corpus a question, get the records that answer it
 
-<!-- gov:kit memory-recall@1.15 -->
+<!-- gov:kit memory-recall@1.16 -->
 
 A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and
@@ -148,7 +148,9 @@ would suppress the tool at the exact moment it exists for.
 
 The `recall-opened` hook is **opt-in**. It appends one `opened` row per query saying which rank the
 caller actually read, stamped `inferred: true`, and it is the only instrument that can answer
-"did the answer get shown". It ships dark: no `--with-hook`, no file — so `check-wiring.sh` reports
+"did the answer get shown". It ships dark: no opt-in, no file. govkit lands it only where
+`.governance/deploy.toml` sets `[kit.memory-recall] with_hook = "yes"`, and `--with-hook` prints the
+merge that wires it — so `check-wiring.sh` reports
 three honest states (kit not adopted · opt-in not taken · present but unmerged = UNWIRED) instead of
 a permanent false alarm. Membership is decided by the log's `shown_paths` array rather than a
 `memory/` literal, so it works on any `MEMORY_ROOT`.

@@ -14,7 +14,11 @@
 # WHAT THIS DOES NOT CHECK. It does not verify that a settings.json anywhere is wired, that the hook
 # FIRES, or that an adopter's installed copy matches gov's. `check-wiring.sh` owns the first, the
 # hook's own suite the second, and the parity arms the third. This gate answers one question: does
-# every declared hook path name something a descriptor ships.
+# every declared hook path name something a descriptor ships. Nor does it observe a target's
+# `adopter-owned` hook join: gov keeps no install receipt, so both readers below take the no-receipt
+# path here and any comparison of that join would be a probe that cannot move. The join has ONE
+# reader, settings-merge.py, which check-wiring.sh calls, and the recall block of
+# `check-wiring.test.sh` grades it over crafted receipts (the round-1 closing-diff fold, S5).
 #
 # HOW A PATH IS RESOLVED, and by whom. This gate does NOT expand `{kit}` or `{here}` itself. It asks
 # the two readers that decide the value — `check-wiring.sh --resolve-fragment` and
