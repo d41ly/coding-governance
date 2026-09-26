@@ -74,8 +74,11 @@ re-read `deploy.toml` at an adopter, because govkit never travels there.
 These are not review findings; the bar reported them against the same range.
 
 - **verdict epoch** — the memory-tree version was last bumped before a later memory-tree engine
-  change. The fold bumps it at the tip, after its last engine change, in every carrier.
+  change. The fold bumps it to 2.99 in every carrier, in the same commit as its last engine change,
+  and the leg reads clean.
 - **govkit selftest** — the `a6-unshipped` scratch gov, and three sibling builders, lacked
-  `adopters.toml`, which arm 10 refuses. Folded into TOOL-aRepatriatedFork-36 S4.
-- **run-gates evidence** — one arm failed once under heavy contention. The fold runs that leg alone
-  and records whether it reproduces.
+  `adopters.toml`, which arm 10 refuses. Folded into TOOL-aRepatriatedFork-36 S4; the whole suite
+  then ran green on a frozen clone of the TOOL-36 fold, 1642 arms in 36 minutes.
+- **run-gates evidence** — one arm, "a killed run swept 1 record(s)", failed once under heavy
+  contention. Run ALONE on a frozen clone it passed whole, 91 assertions in 9 minutes, that arm
+  included. It did not reproduce, so the fold changes nothing there.

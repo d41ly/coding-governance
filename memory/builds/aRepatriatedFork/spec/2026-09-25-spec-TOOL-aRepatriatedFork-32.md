@@ -139,7 +139,8 @@ none
 - rev-3 · 2026-09-26 · S3 · S6 · §3 · §4 · §5 · AC4 · AC6 · folds the round-1 closing-diff review's
   C1 and C2: check 21 prints graded, total and exempt counts on every run and reds a pin above the
   graded count; the runbook, the adopter hint and the rendered rule name that count; the generator
-  contract demands the `U` rows its consumer reads.
+  contract demands the `U` rows its consumer reads. Built: the whole hygiene suite green, the two
+  new arms red on the rev-2 engine.
 
 ## 10. Reuse audit
 
