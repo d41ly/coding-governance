@@ -255,8 +255,11 @@ on an already-adopted tree, so a rule added after your adoption reaches you here
 2. **One mechanical pass.** Give each `**Serves:** none — <why>`. This needs no judgement about what
    any document was about, which is what makes it mechanical rather than a retrofit, and it is not a
    cutoff: nothing is exempted by date and every record stays visible and countable.
-3. **Then measure.** Set `RECORD_UNBOUND_PIN` to the `N` count that pass leaves. Measured against
-   YOUR corpus — a number copied from another repo is either vacuous or permanently red.
+3. **Then measure.** Set `RECORD_UNBOUND_PIN` to the GRADED count check 21 prints on every run,
+   `graded <g> of N <n>`: the `none` records `RECORD_SERVES_CUTOFF` and `legacy-files.txt` leave,
+   which is `N` when you declare neither. Measured against YOUR corpus — a number copied from
+   another repo is either vacuous or permanently red, and a pin above the graded count is slack,
+   which check 21 reds.
 4. **Drain it.** As you bind records for real, replace `none` with
    `**Serves:** <kind> <id> [<id>…]`, kinds `spec-audit` · `diff-review` · `journal` · `research`.
    The pin is shrink-only, so the ratchet points down from wherever you started.

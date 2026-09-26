@@ -2677,7 +2677,7 @@ printf '# pass-order waivers\n' > "$_b1/memory/project/pass-order-waiver.txt"
 printf 'x\n' > "$_b1/memory/project/zz-probe.txt"
 printf '# legacy\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10 --no-verify ) >/dev/null 2>&1
-write_pk_conf 'RECORD_UNBOUND_PIN="9"'; o=$(run_pk_gate)
+write_pk_conf 'RECORD_UNBOUND_PIN="0"'; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
   *"HYGIENE check 4 FAILED"*"memory/builds/tOne/NOTES.md"*) echo "ok   check 4: an UNLISTED build-root NOTES.md reds" ;;
@@ -2706,7 +2706,7 @@ case "$o" in
 esac
 printf '# legacy\nmemory/builds/tOne/NOTES.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10-legacy --no-verify ) >/dev/null 2>&1
-write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="9"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(run_pk_gate)
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
   *"memory/builds/tOne/NOTES.md"*) echo "FAIL check 4: a build-root NOTES.md legacy-files.txt lists still reds — the entry branch ignores LEG"; st=1 ;;
@@ -2723,7 +2723,7 @@ case "$o" in
   *"check 21: 1 undated non-markdown artifact(s) not graded (RECORD_UNDATED_ARTIFACTS=exempt)"*) echo "ok   RECORD_UNDATED_ARTIFACTS=exempt drops result.json and prints the count" ;;
   *) echo "FAIL RECORD_UNDATED_ARTIFACTS=exempt: result.json vanished without the count printing — a silent narrowing"; st=1 ;;
 esac
-write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="9"\nRECORD_UNDATED_ARTIFACTS="grade"')"; o=$(run_pk_gate)
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nRECORD_UNDATED_ARTIFACTS="grade"')"; o=$(run_pk_gate)
 n=$((n+1))
 case "$o" in
   *"result.json — no Serves line"*) echo "ok   RECORD_UNDATED_ARTIFACTS=grade grades result.json" ;;
@@ -2776,6 +2776,20 @@ n=$((n+1))
 case "$o" in
   *"measured 1 against the pin 0"*) echo "ok   RECORD_SERVES_CUTOFF: the pin still grades the unbound record after the cutoff" ;;
   *) echo "FAIL RECORD_SERVES_CUTOFF: the pin stopped counting the unbound record dated after the cutoff"; st=1 ;;
+esac
+# rev-3 (the closing review's C1): a pin set to N, as the runbook used to say, holds slack equal to
+# the exempt record. The pin is shrink-only, so that slack REDS, naming the value to lower it to, and
+# the measurement it is read against prints on every run with all three numbers.
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="2"\nRECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"RECORD_UNBOUND_PIN carries slack — the pin is shrink-only, and this much headroom lets as many new unbound records land green"*"the pin 2 against a graded count of 1 — lower it to 1"*) echo "ok   check 21: a pin above its graded count reds as slack, naming the value to lower it to" ;;
+  *) echo "FAIL check 21: a pin set to N over a cutoff-exempt record passed with slack"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"check 21: the unbound pin grades 1 of N 2 unbound record(s), 1 exempt by RECORD_SERVES_CUTOFF or legacy-files.txt, against RECORD_UNBOUND_PIN=2"*) echo "ok   check 21: the pin's measurement prints graded, total and exempt counts" ;;
+  *) echo "FAIL check 21: the pin's measurement did not print its three counts"; st=1 ;;
 esac
 # A generator that predates the U row prints N and no U, which would leave the pin unreachable. A
 # copy of this kit whose generator lost the line models an adopter's forked one.
@@ -2867,7 +2881,8 @@ esac
 # RAISED 436 -> 448 by TOOL-aRepatriatedFork-10: its ten registry/key arms and two flat-render arms,
 # each one top-level increment of `n`.
 # RAISED 448 -> 454 by TOOL-aRepatriatedFork-32: its control, four cutoff arms and the U-row arm, each top-level.
-FLOOR_ASSERTIONS=454
+# RAISED 454 -> 456 by its rev-3 fold: the slack arm and the measurement-line arm, both top-level.
+FLOOR_ASSERTIONS=456
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

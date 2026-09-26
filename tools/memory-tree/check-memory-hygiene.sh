@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.98   # gov:kit memory-tree@2.98 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.99   # gov:kit memory-tree@2.99 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -1083,12 +1083,21 @@ $bad21"
   if [ -n "$b21" ] && [ "$(printf '%s\n' "$u21" | grep -c . || true)" != "${n21:-0}" ]; then
     fail 21 "the bindings parse printed N ${n21:-0} but $(printf '%s\n' "$u21" | grep -c . || true) U row(s) — a generator without the U row leaves RECORD_UNBOUND_PIN ungraded"
   fi
+  # THE MEASUREMENT PRINTS ON EVERY RUN, and SLACK REDS (TOOL-aRepatriatedFork-32 rev-3, the closing
+  # review's C1). Since the pin began counting the graded rows, an adopter who set it to `N` as the
+  # runbook said held slack equal to its exempt records, and that many new unbound records then
+  # landed green: a shrink-only pin satisfied vacuously. The line names all three numbers, because
+  # the one to set the pin to is the graded count, and a reader shown only `N` sets the wrong one.
+  [ -n "$b21" ] && echo "memory-hygiene: check 21: the unbound pin grades ${g21:-0} of N ${n21:-0} unbound record(s), $(( ${n21:-0} - ${g21:-0} )) exempt by RECORD_SERVES_CUTOFF or legacy-files.txt, against RECORD_UNBOUND_PIN=${pin21:-<undeclared>}" >&2
   if [ -z "$pin21" ]; then
     fail 21 "RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus"
   elif [ "${g21:-0}" -gt "$pin21" ]; then
     over21="  measured ${g21:-0} against the pin $pin21"
     fail 21 "records carrying the unbound Serves form outnumber their pin — bind them, or move the pin in the same commit recording the old and new values beside it:
 $over21"
+  elif [ -n "$b21" ] && [ "$pin21" -gt "${g21:-0}" ]; then
+    fail 21 "RECORD_UNBOUND_PIN carries slack — the pin is shrink-only, and this much headroom lets as many new unbound records land green:
+  the pin $pin21 against a graded count of ${g21:-0} — lower it to ${g21:-0} in .memory-tree.conf"
   fi
   # Branch 4 — the filename PROJECTS the header. Its input is the S row, because a conformant record
   # is not a finding and nothing else in the mode's output describes one. The projection is a WHOLE
