@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.14
+gov:kit drift-audit@1.15
 
     python tools/drift-audit/drift_report.py            # human table, always exits 0
     python tools/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -85,7 +85,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.14"
+KIT_DRIFT_AUDIT_VERSION = "1.15"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -143,6 +143,11 @@ def load_conf(root: pathlib.Path) -> dict[str, str]:
             continue
         k, _, v = line.partition("=")
         k = k.strip().removeprefix("export ").strip()
+        # TOOL-aRepatriatedFork-38 rev-3 (the closing review's C4): whitespace right after `=`
+        # ends the assignment, so `K=   # note` is empty in bash, not the word `#`.
+        if v[:1].isspace():
+            conf[k] = ""
+            continue
         v = v.strip().strip("\r")
         # Bash sourcing semantics for the restricted grammar the conf documents: a quoted value
         # is the text up to its MATCHING quote, whatever follows it; an UNQUOTED value ends at

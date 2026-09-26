@@ -916,6 +916,10 @@ with build_tempdir() as td:
     _before38 = (root / ".lexicon.conf").read_bytes()
     noted = _before38.replace(b"\r\n", b"\n") \
         .replace(b'ratified=""', b'ratified=""   # not yet curated')
+    # rev-3 (the closing review's C5): the edit must LAND, or the arm below reds for the plain empty
+    # key and never reaches the trailing-comment path it exists for.
+    check("scaffold: the fixture carries the trailing comment this arm is about",
+          b'ratified=""   # not yet curated' in noted, repr(noted[:200]))
     (root / ".lexicon.conf").write_bytes(noted)
     r = subprocess.run(r.args, cwd=root, capture_output=True, text=True, encoding="utf-8")  # the --check above
     check("scaffold: --check reds on an unratified seed whose key carries a trailing comment",
@@ -928,6 +932,34 @@ with build_tempdir() as td:
           repr((_nc.get("ratified"), _nc.get("expanded"))))
     (root / "noted.conf").unlink()
     (root / ".lexicon.conf").write_bytes(_before38)
+    # rev-3 (the closing review's C3, C4): both readers against BASH sourcing the same file, over
+    # the spellings they split on — single quotes, a `#` opening the word, a blank value.
+    (root / "spell.conf").write_text("A='a # b'\nB='a' # c\nC=#x\nD=   # note\nE=\"q\"   # n\n",
+                                     encoding="utf-8", newline="\n")
+    _fn = re.search(r"^read_conf_scalar\(\) \{.*?^\}",
+                    (root / "tools" / "lexicon" / "adopt-lexicon.sh").read_text(encoding="utf-8"),
+                    re.S | re.M)
+    check("scaffold: adopt-lexicon.sh still defines the read_conf_scalar this arm lifts", _fn is not None)
+    if _fn:
+        (root / "spell.sh").write_text(
+            _fn.group(0) + "\nCONF=spell.conf\nfor k in A B C D E; do printf '%s|' \"$(read_conf_scalar $k)\"; done\n",
+            encoding="utf-8", newline="\n")
+        # A FILE, not `bash -c`: on Windows the argv string is re-quoted on its way in and the
+        # embedded quotes do not survive, which read every reference value as empty.
+        (root / "ref.sh").write_text("set -a; . ./spell.conf; printf '%s|' \"$A\" \"$B\" \"$C\" \"$D\" \"$E\"\n",
+                                     encoding="utf-8", newline="\n")
+        _ref = subprocess.run(["bash", "ref.sh"], cwd=root, capture_output=True, text=True,
+                              encoding="utf-8").stdout
+        (root / "ref.sh").unlink()
+        _got = subprocess.run(["bash", "spell.sh"], cwd=root, capture_output=True, text=True,
+                              encoding="utf-8").stdout
+        check("read_conf_scalar reads single quotes, `K=#x` and a blank value as bash sourcing does",
+              _got == _ref == "a # b|a|#x||q|", f"sh={_got!r} bash={_ref!r}")
+        _sc = _lc.load_conf(root / "spell.conf")
+        check("load_conf reads the same spellings as bash sourcing does",
+              "".join(f"{_sc.get(k, '<unset>')}|" for k in "ABCDE") == _ref, repr(_sc))
+        (root / "spell.sh").unlink()
+    (root / "spell.conf").unlink()
 
     # ---- B3: THE SCAFFOLDED ADOPTER'S FIRST `--suggest` HAS TO WORK ---------------------------
     #

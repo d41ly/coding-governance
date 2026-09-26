@@ -44,9 +44,9 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map@1.11 — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.12 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.11"
+KIT_CODEBASE_MAP_VERSION = "1.12"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -191,6 +191,11 @@ def load_conf(root: Path | None = None) -> dict[str, str]:
             continue
         key, value = line.split("=", 1)
         key = key.strip().removeprefix("export ").strip()
+        # TOOL-aRepatriatedFork-38 rev-3 (the closing review's C4): whitespace right after `=`
+        # ends the assignment, so `K=   # note` is empty in bash, not the word `#`.
+        if value[:1].isspace():
+            conf[key] = ""
+            continue
         value = value.strip()
         # match bash sourcing semantics for the restricted grammar the conf documents:
         # quoted values keep everything inside the quotes; unquoted values end at whitespace

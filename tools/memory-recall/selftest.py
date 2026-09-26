@@ -306,10 +306,14 @@ def test_parser_vs_bash():
             'SPACED="a value with spaces"\n'
             "PLAIN=plain\n"
             # TOOL-aRepatriatedFork-38: a quoted value with a trailing comment read as `"a`.
-            'NOTED="a quoted value"   # trailing comment on a quoted value\n',
+            'NOTED="a quoted value"   # trailing comment on a quoted value\n'
+            # rev-3 (C4): a `#` opening the word is data; whitespace after `=` ends the assignment.
+            "HASHED=#x\n"
+            "BLANKED=   # blank on purpose\n",
             encoding="utf-8", newline="\n",
         )
-        keys = ["MEMORY_ROOT", "FAMILIES", "SPACED", "PLAIN", "NOTED"]
+        # An empty value is never LAST: the `rstrip` of the reply below would drop it.
+        keys = ["MEMORY_ROOT", "FAMILIES", "SPACED", "BLANKED", "PLAIN", "NOTED", "HASHED"]
         script = ". '%s'; printf '%%s\\n' %s" % (
             (root / ".memory-tree.conf").as_posix(),
             " ".join(f'"${k}"' for k in keys),

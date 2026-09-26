@@ -148,11 +148,15 @@ def read_conf(root: Path, name: str, key: str) -> str:
         if line.startswith(f'{key}='):
             # TOOL-aRepatriatedFork-38: a quoted value ends at its matching quote, an unquoted one
             # at a `#` beginning a word; `.strip('"')` kept a trailing comment and a stray quote.
+            # rev-3 (C4): whitespace right after `=` ends the assignment; `#` begins a comment only
+            # after whitespace, so `K=#x` keeps `#x` and `K= # note` is blank, as bash reads them.
+            if line[len(key) + 1:][:1].isspace():
+                return ''
             v = line[len(key) + 1:].strip()
             close = v.find(v[0], 1) if v[:1] in ('"', "'") else -1
             if close >= 0:
                 return v[1:close]
-            return re.split(r'(?:^|\s)#', v, maxsplit=1)[0].strip()
+            return re.split(r'\s#', v, maxsplit=1)[0].strip()
     return ''
 
 
@@ -774,10 +778,12 @@ def run_selftest() -> int:
     # TOOL-aRepatriatedFork-38 — a conf value keeps no trailing comment, quoted or not.
     with tempfile.TemporaryDirectory() as td:
         (Path(td) / '.memory-tree.conf').write_text(
-            'MEMORY_ROOT="mem ory"   # note\nFAMILIES=TOOL   # note\n', encoding='utf-8')
-        got = (read_conf(Path(td), '.memory-tree.conf', 'MEMORY_ROOT'),
-               read_conf(Path(td), '.memory-tree.conf', 'FAMILIES'))
-    if got == ('mem ory', 'TOOL'):
+            'MEMORY_ROOT="mem ory"   # note\nFAMILIES=TOOL   # note\n'
+            # rev-3 (C4): a `#` opening the word is data; whitespace after `=` ends it.
+            'HASHED=#x\nBLANKED=   # note\n', encoding='utf-8')
+        got = tuple(read_conf(Path(td), '.memory-tree.conf', k)
+                    for k in ('MEMORY_ROOT', 'FAMILIES', 'HASHED', 'BLANKED'))
+    if got == ('mem ory', 'TOOL', '#x', ''):
         passed += 1
     else:
         failed += 1
@@ -868,4 +874,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.8"  # gov:kit playbook-render@1.8
+KIT_PLAYBOOK_RENDER_VERSION = "1.9"  # gov:kit playbook-render@1.9

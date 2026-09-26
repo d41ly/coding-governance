@@ -86,6 +86,11 @@ def parse_conf_line(line: str):
         k = k[len("export"):].strip()
     if not k:
         return None
+    # TOOL-aRepatriatedFork-38 rev-3 (the closing review's C4): the WORD rule, decided on the text
+    # right after `=`. Whitespace there ends the assignment, so `K= x` and `K=   # note` are empty in
+    # bash; a `#` begins a comment only AFTER whitespace, so `K=#x` keeps `#x`.
+    if v[:1].isspace():
+        return k, ""
     v = v.strip()
     # A QUOTED VALUE AND AN UNQUOTED ONE NEED DIFFERENT SCANS, and the first cut of this function
     # had only the second — so `KEY="v"  # note` kept both the comment AND a stray quote, which is
@@ -103,11 +108,11 @@ def parse_conf_line(line: str):
         # An UNTERMINATED quote is not something to guess at. Fall through to the unquoted scan,
         # which is what the old body did for every value, so this is no worse than before for a
         # spelling bash itself would reject.
-    # UNQUOTED: a `#` that begins a word starts a comment, including at position 0 — `X=   # note`
-    # is an empty value in bash, not the literal `# note`.
+    # UNQUOTED: a `#` that FOLLOWS whitespace starts a comment. Position 0 is not one: the
+    # leading-whitespace case returned above, so a `#` there is the first character of the word.
     cut = -1
     for i, ch in enumerate(v):
-        if ch == "#" and (i == 0 or v[i - 1].isspace()):
+        if ch == "#" and i > 0 and v[i - 1].isspace():
             cut = i
             break
     if cut >= 0:

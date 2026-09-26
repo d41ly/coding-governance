@@ -459,11 +459,15 @@ def read_conf_key(root, key):
     # TOOL-aRepatriatedFork-38: a quoted value ends at its matching quote and an unquoted one at a
     # `#` beginning a word. The old pattern demanded nothing after the closing quote, so a cutoff
     # carrying a trailing comment read as BLANK, which switches its check off.
+    # rev-3 (C4): whitespace right after `=` ends the assignment, and a `#` begins a comment only
+    # after whitespace, so `K=#x` keeps `#x` and `K= # note` is blank, as bash reads them.
+    if m.group(1)[:1].isspace():
+        return ""
     v = m.group(1).strip()
     close = v.find(v[0], 1) if v[:1] in ("'", '"') else -1
     if close >= 0:
         return v[1:close].strip()
-    return re.split(r"(?:^|\s)#", v, maxsplit=1)[0].strip()
+    return re.split(r"\s#", v, maxsplit=1)[0].strip()
 
 
 def read_cutoff_key(root, key):
