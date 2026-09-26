@@ -159,11 +159,11 @@ ids TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 T
 | [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | SPECCED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 15 | 2 | SPECCED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-31 — gov's shipped files carry no adopter name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-31.md) | 16 | 1 | CLOSED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-32 — every branch of hygiene check 21 honours `RECORD_SERVES_CUTOFF`](spec/2026-09-25-spec-TOOL-aRepatriatedFork-32.md) | 17 | 1 | CLOSED | rev-2 | 2026-09-25 |
+| [TOOL-aRepatriatedFork-32 — every branch of hygiene check 21 honours `RECORD_SERVES_CUTOFF`](spec/2026-09-25-spec-TOOL-aRepatriatedFork-32.md) | 17 | 1 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-35 — gov's shipped files name no adopter, inCMS included](spec/2026-09-25-spec-TOOL-aRepatriatedFork-35.md) | 18 | 1 | CLOSED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-36 — the recall kit converges at adopters](spec/2026-09-25-spec-TOOL-aRepatriatedFork-36.md) | 19 | 2 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-37 — the unattended suite derives the repair pointer it asserts](spec/2026-09-25-spec-TOOL-aRepatriatedFork-37.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-38 — every conf reader drops a trailing comment the way bash does](spec/2026-09-25-spec-TOOL-aRepatriatedFork-38.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-25 |
+| [TOOL-aRepatriatedFork-38 — every conf reader drops a trailing comment the way bash does](spec/2026-09-25-spec-TOOL-aRepatriatedFork-38.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-26 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | INPROGRESS | rev-7 | 2026-09-25 |
 <!-- /gen:build-units -->
 
