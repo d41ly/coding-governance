@@ -1,12 +1,13 @@
 # TOOL-aRepatriatedFork-35 — gov's shipped files name no adopter, inCMS included
 
-**Status:** CLOSED · rev-2 · 2026-09-25 · node a · Tier-1 · base a84e0e66 · streams tooling · order 18
+**Status:** CLOSED · rev-2 · 2026-09-25 · node a · Tier-1 · base b8dae8ab · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-35-1-acceptance-ledger.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-35-1-acceptance-ledger.md) | journal | — |
+| [2026-09-26-review-TOOL-aRepatriatedFork-36-closing-diff-round1.md](../reviews/2026-09-26-review-TOOL-aRepatriatedFork-36-closing-diff-round1.md) | diff-review | TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-36 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 |
 
 <!-- /gen:spec-records -->
 
