@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** INPROGRESS · rev-5 · 2026-09-25 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
+**Status:** INPROGRESS · rev-6 · 2026-09-25 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
 
 <!-- gen:spec-records -->
 
@@ -96,6 +96,10 @@ bridge rows go.
 - **consumes-from** `TOOL-aRepatriatedFork-21` — the build-README population at exactly
   `builds/<slug>/README.md`. Without it the slot contract grades inCMS's 41 nested legacy READMEs
   and AC3 cannot pass.
+- **consumes-from** `TOOL-aRepatriatedFork-31` — gov's shipped files carry no adopter name. Without
+  it inCMS's brand gate reds on six vendored files.
+- **consumes-from** `TOOL-aRepatriatedFork-32` — every check-21 branch honours
+  `RECORD_SERVES_CUTOFF`. Without it gov's engine reds 55 legacy inCMS records and two reviews.
 
 ## 4. Design
 
@@ -262,6 +266,19 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   - Each of the 63 gotcha records gets one search of inCMS's tests for its gate. A found gate is
     declared. The rest say in as many words that there is none, and one that really needs a gate
     files an inCMS backlog row.
+  - Later the same day: all ten August/September builds `CLOSED`; the seven one-sentence gotcha
+    stubs fold into their parents; the brand gate exempts `memory/project/readme-contract.txt`; and
+    all 14 generic slugs the merge-subject rule matched are hand-checked.
+- **F8 — what the update pass found that no key gov's engine reads can settle.** Four items.
+  RESOLVED (owner, 2026-09-25):
+  - Gov's shipped files name an adopter in provenance comments, which inCMS's brand gate reds. Gov
+    scrubs them (`TOOL-aRepatriatedFork-31`). inCMS ratifies no exemption for them.
+  - Check 21 reds legacy records no gov key grandfathers. Every check-21 branch honours
+    `RECORD_SERVES_CUTOFF` (`TOOL-aRepatriatedFork-32`). inCMS renames nothing.
+  - inCMS's curation debt: `INDEX_CAP_LINES=0` for backlogs, gov's own ratified choice, and the 8
+    build READMEs over gov's caps are trimmed, so the debt returns to 0.
+  - `SPEC_FORMAT_CUTOFF` stays at 2026-09-14, against the recommendation to restore 2026-07-15. Checks
+    12 and 25 grade only specs written after it.
 
 ## 9. Revision log
 
@@ -283,6 +300,9 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   the nested-README population this unit's pass measured at inCMS.
 - rev-5 · 2026-09-25 · §8 gains F7, the owner's rulings on the landing and on the 213 parked
   entries. Status BLOCKED -> INPROGRESS: the owner's ask at inCMS is given.
+- rev-6 · 2026-09-25 · §8 F7 gains the owner's later rulings, and F8 is added. The branch was rebuilt
+  on inCMS main `4cc2b451f`; the update to gov `3cf05f29` and the migration are committed on it. §3
+  gains the **consumes-from** edges to `TOOL-aRepatriatedFork-31` and `TOOL-aRepatriatedFork-32`.
 
 ## 10. Reuse audit
 
