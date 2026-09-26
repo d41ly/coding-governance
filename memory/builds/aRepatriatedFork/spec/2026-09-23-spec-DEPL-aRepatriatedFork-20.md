@@ -107,6 +107,9 @@ bridge rows go.
   fragment that resolves to a hook inCMS declares `[[own]]` in `.claude/hooks/`. Without it
   `corpus_ids.py --measure` and `merge-rows.py` fail on the forked copies and `check-wiring.sh`
   reads the hook UNWIRED.
+- **consumes-from** `TOOL-aRepatriatedFork-37` — the unattended suite's repair-pointer arm derived
+  from the install. Without it the suite leg inCMS runs reds on `scripts/gen_build_index.py`,
+  where its generator sits.
 
 ## 4. Design
 
@@ -311,7 +314,8 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   on inCMS main `4cc2b451f`; the update to gov `3cf05f29` and the migration are committed on it. §3
   gains the **consumes-from** edges to `TOOL-aRepatriatedFork-31` and `TOOL-aRepatriatedFork-32`.
 - rev-7 · 2026-09-25 · §3 gains the **consumes-from** edges to `TOOL-aRepatriatedFork-35`, the drain
-  of the carried inCMS sites, and `TOOL-aRepatriatedFork-36`, the recall kit's convergence. The order moves
+  of the carried inCMS sites, `TOOL-aRepatriatedFork-36`, the recall kit's convergence, and `TOOL-aRepatriatedFork-37`, the
+  suite's derived repair pointer. The order moves
   7 -> 20, one past the highest order it consumes from, as the build rule states.
 
 ## 10. Reuse audit
