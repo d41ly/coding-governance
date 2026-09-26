@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-23
 streams: tooling+deployer+playbook
 roster: TOOL+DEPL
-ids: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20 TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35
+ids: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20 TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36
 ---
 
 # aRepatriatedFork — what the a7c78ad2 pull proved gov still does not carry, specced as gov's to fix
@@ -93,7 +93,6 @@ The ones that set build policy:
 | 5 | `TOOL-aRepatriatedFork-19` | 2 | check-wiring judges every arm at a relocated layout |
 | 6 | `TOOL-aRepatriatedFork-11` | 2 | unattended: pathspecs stop at the build root; a pull lands hooks wired and pins measurable |
 | 6 | `TOOL-aRepatriatedFork-12` | 2 | memory-recall reads the adopter's corpus shape from conf |
-| 7 | `DEPL-aRepatriatedFork-20` | 2 | inCMS converges onto gov's memory-tree programs |
 | 8 | `TOOL-aRepatriatedFork-23` | 2 | the install-prefix ban counts every kit path it cannot see today |
 | 9 | `TOOL-aRepatriatedFork-24` | 2 | no line that executes strands an adopter at another prefix |
 | 10 | `TOOL-aRepatriatedFork-25` | 1 | printed and usage strings in received code name no install prefix |
@@ -105,6 +104,8 @@ The ones that set build policy:
 | 16 | `TOOL-aRepatriatedFork-31` | 1 | gov's shipped files carry no adopter name |
 | 17 | `TOOL-aRepatriatedFork-32` | 1 | every branch of hygiene check 21 honours RECORD_SERVES_CUTOFF |
 | 18 | `TOOL-aRepatriatedFork-35` | 1 | gov's shipped files name no adopter, inCMS included |
+| 19 | `TOOL-aRepatriatedFork-36` | 2 | the recall kit converges at adopters: no forked rule, and an owned hook is declared |
+| 20 | `DEPL-aRepatriatedFork-20` | 2 | inCMS converges onto gov's memory-tree programs |
 
 The `#` column is the `order` each spec declares, derived from its `### Edges`: a unit's order is one
 past the highest order it consumes from. Order 1 holds the independent units, the two security fixes
@@ -117,11 +118,11 @@ with no hand edit between the update and the bar.** One observation at each adop
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 33 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
+**Build status:** INPROGRESS · 34 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
 ids DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6
 ids TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20 TOOL-aRepatriatedFork-21
 ids TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32
-ids TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35
+ids TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -147,7 +148,6 @@ ids TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35
 | [TOOL-aRepatriatedFork-19 — check-wiring judges every arm at a relocated layout](spec/2026-09-23-spec-TOOL-aRepatriatedFork-19.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-11 — unattended: build-root pathspecs stop at the build root, and a pull lands its hooks wired and its pins measurable](spec/2026-09-23-spec-TOOL-aRepatriatedFork-11.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
-| [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 7 | 2 | INPROGRESS | rev-7 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today](spec/2026-09-25-spec-TOOL-aRepatriatedFork-23.md) | 8 | 2 | SPECCED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | SPECCED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-25 — printed and usage strings in received code name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-25.md) | 10 | 1 | SPECCED | rev-2 | 2026-09-25 |
@@ -159,15 +159,17 @@ ids TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35
 | [TOOL-aRepatriatedFork-31 — gov's shipped files carry no adopter name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-31.md) | 16 | 1 | CLOSED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-32 — every branch of hygiene check 21 honours `RECORD_SERVES_CUTOFF`](spec/2026-09-25-spec-TOOL-aRepatriatedFork-32.md) | 17 | 1 | CLOSED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-35 — gov's shipped files name no adopter, inCMS included](spec/2026-09-25-spec-TOOL-aRepatriatedFork-35.md) | 18 | 1 | CLOSED | rev-2 | 2026-09-25 |
+| [TOOL-aRepatriatedFork-36 — the recall kit converges at adopters](spec/2026-09-25-spec-TOOL-aRepatriatedFork-36.md) | 19 | 2 | CLOSED | rev-2 | 2026-09-25 |
+| [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | INPROGRESS | rev-7 | 2026-09-25 |
 <!-- /gen:build-units -->
 
 Records: 67 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aRepatriatedFork-36.
 
 Ids no `spec-audit` record has ever named: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16
 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21
-TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-35.
+TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -180,7 +182,6 @@ TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-
 | 4 | `TOOL-aRepatriatedFork-18` | no |
 | 5 | `TOOL-aRepatriatedFork-19` | no |
 | 6 | `TOOL-aRepatriatedFork-11`, `TOOL-aRepatriatedFork-12` | yes |
-| 7 | `DEPL-aRepatriatedFork-20` | no |
 | 8 | `TOOL-aRepatriatedFork-23` | no |
 | 9 | `TOOL-aRepatriatedFork-24` | no |
 | 10 | `TOOL-aRepatriatedFork-25` | no |
@@ -192,6 +193,8 @@ TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-
 | 16 | `TOOL-aRepatriatedFork-31` | no |
 | 17 | `TOOL-aRepatriatedFork-32` | no |
 | 18 | `TOOL-aRepatriatedFork-35` | no |
+| 19 | `TOOL-aRepatriatedFork-36` | no |
+| 20 | `DEPL-aRepatriatedFork-20` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

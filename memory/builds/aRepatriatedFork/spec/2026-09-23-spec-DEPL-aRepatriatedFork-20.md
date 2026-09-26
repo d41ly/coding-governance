@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** INPROGRESS · rev-7 · 2026-09-25 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
+**Status:** INPROGRESS · rev-7 · 2026-09-25 · node a · Tier-2 · base f8fdd873 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 
@@ -103,6 +103,10 @@ bridge rows go.
 - **consumes-from** `TOOL-aRepatriatedFork-35` — gov's shipped files name no adopter at all, the
   carried inCMS sites drained. Without it the update lands provenance naming inCMS that nc and
   swydee then receive from the same bytes.
+- **consumes-from** `TOOL-aRepatriatedFork-36` — gov's recall sources shipped as `engine`, and a
+  fragment that resolves to a hook inCMS declares `[[own]]` in `.claude/hooks/`. Without it
+  `corpus_ids.py --measure` and `merge-rows.py` fail on the forked copies and `check-wiring.sh`
+  reads the hook UNWIRED.
 
 ## 4. Design
 
@@ -306,8 +310,9 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
 - rev-6 · 2026-09-25 · §8 F7 gains the owner's later rulings, and F8 is added. The branch was rebuilt
   on inCMS main `4cc2b451f`; the update to gov `3cf05f29` and the migration are committed on it. §3
   gains the **consumes-from** edges to `TOOL-aRepatriatedFork-31` and `TOOL-aRepatriatedFork-32`.
-- rev-7 · 2026-09-25 · §3 gains the **consumes-from** edge to `TOOL-aRepatriatedFork-35`, the drain
-  of the carried inCMS sites.
+- rev-7 · 2026-09-25 · §3 gains the **consumes-from** edges to `TOOL-aRepatriatedFork-35`, the drain
+  of the carried inCMS sites, and `TOOL-aRepatriatedFork-36`, the recall kit's convergence. The order moves
+  7 -> 20, one past the highest order it consumes from, as the build rule states.
 
 ## 10. Reuse audit
 
