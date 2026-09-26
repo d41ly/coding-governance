@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** INPROGRESS · rev-6 · 2026-09-25 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
+**Status:** INPROGRESS · rev-7 · 2026-09-25 · node a · Tier-2 · base f8fdd873 · streams deployer · order 7
 
 <!-- gen:spec-records -->
 
@@ -100,6 +100,9 @@ bridge rows go.
   it inCMS's brand gate reds on six vendored files.
 - **consumes-from** `TOOL-aRepatriatedFork-32` — every check-21 branch honours
   `RECORD_SERVES_CUTOFF`. Without it gov's engine reds 55 legacy inCMS records and two reviews.
+- **consumes-from** `TOOL-aRepatriatedFork-35` — gov's shipped files name no adopter at all, the
+  carried inCMS sites drained. Without it the update lands provenance naming inCMS that nc and
+  swydee then receive from the same bytes.
 
 ## 4. Design
 
@@ -303,6 +306,8 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
 - rev-6 · 2026-09-25 · §8 F7 gains the owner's later rulings, and F8 is added. The branch was rebuilt
   on inCMS main `4cc2b451f`; the update to gov `3cf05f29` and the migration are committed on it. §3
   gains the **consumes-from** edges to `TOOL-aRepatriatedFork-31` and `TOOL-aRepatriatedFork-32`.
+- rev-7 · 2026-09-25 · §3 gains the **consumes-from** edge to `TOOL-aRepatriatedFork-35`, the drain
+  of the carried inCMS sites.
 
 ## 10. Reuse audit
 
