@@ -188,6 +188,7 @@ New arm: `tools/check-wiring.test.sh` · an adopter-owned receipt row for the re
   moves to one reader that grades and refuses; the wiring join reads the command's path; the hook
   becomes an opt-in rule; the four remaining scratch-gov builders take `adopters.toml`; the §3
   hand-off gains inCMS's real route and nc's backlog row. The base moves to the rewritten parent.
+  Built: every new arm green, each red on the rev-2 bytes.
 
 ## 10. Reuse audit
 
