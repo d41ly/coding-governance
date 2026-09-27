@@ -9,10 +9,10 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-lease-utc: 2026-09-22T18:31:27Z
+lease-utc: 2026-09-27T14:17:19Z
 pid-image: claude.exe
 host: compeeto
-pid: 22380
+pid: 37484
 session: 2588f719-5358-4984-93bc-1f908a71e0ab
 hold-run: 
 hold-streak: 1 · at 4c842945
@@ -307,3 +307,5 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-22T18:34:34Z dispatch · item e03d8fe8 TOOL-dDerivedDocket-31 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/marker-contract.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-pass-order.sh tools/unattended/check-pass-order.test.sh tools/unattended/lib-unattended.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md .memory-tree.conf tools/memory-tree/.memory-tree.conf.example memory/project/unarmed-branches.txt memory/map/features/memory-tree-hygiene.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-31.md
 
 2026-09-22T18:34:35Z brief · item TOOL-dDerivedDocket-31 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T14:17:19Z resume · item dDerivedDocket · reason working · keepalive 3575a45e · manual
