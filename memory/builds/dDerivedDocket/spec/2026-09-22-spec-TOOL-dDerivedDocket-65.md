@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-65 — a session waiting on its own sub-agents, a move the liveness clock sees
 
-**Status:** SPECCED · rev-2 · 2026-09-27 · node d · Tier-2 · base 67d2ccfc · streams tooling · order 35
+**Status:** CLOSED · rev-2 · 2026-09-27 · node d · Tier-2 · base 67d2ccfc · streams tooling · order 35
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-27-build-TOOL-dDerivedDocket-65-1-acceptance-ledger.md](../build/2026-09-27-build-TOOL-dDerivedDocket-65-1-acceptance-ledger.md) | journal | — |
 | [2026-09-22-review-TOOL-dDerivedDocket-65-spec-audit-g10-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-65-spec-audit-g10-round1.md) | spec-audit | TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64 |
 
 <!-- /gen:spec-records -->

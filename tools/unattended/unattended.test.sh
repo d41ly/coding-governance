@@ -6089,6 +6089,51 @@ out=$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>&1)
 hit "$out" "transcript: $ORIGIN_DIR/cfg/projects/$ENC/fixture-session.jsonl"
 hit "$out" "last-move-source: transcript"
 hit "$out" "verdict: LIVE"
+# ---- U65 (TOOL-dDerivedDocket-65) AC1: a session WAITING on its own Workflow writes nothing to its
+# ---- transcript, and each sub-agent transcript under `<sid>/subagents/` is its move. Planted by
+# ---- hand, so no Workflow runs, beside the transcript above dated past the bound. One fresh
+# ---- `agent-a1.jsonl` under `workflows/wf_x/` names `subagent` and reads LIVE with the same keys in
+# ---- the same order, and so it does directly under `subagents/` and one directory deeper; dated past
+# ---- the bound, or fresh under another session's directory, it reads STALE; and a `stat` dating one
+# ---- matched path of two is check 52's dead probe naming the directory, with no verdict line. RED
+# ---- against a driver copy whose `derive_last_move` lacks the sub-agent term: the fresh file reads
+# ---- `stale: yes` and names the commit, and the partial reading prints a verdict.
+U65_P="$ORIGIN_DIR/cfg/projects/$ENC"; U65_SD="$U65_P/fixture-session/subagents"
+touch -d '2000-01-01T00:00:00Z' "$U65_P/fixture-session.jsonl"
+mkdir -p "$U65_SD/workflows/wf_x" && touch "$U65_SD/workflows/wf_x/agent-a1.jsonl"
+out=$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>&1)
+hit  "$out" "last-move-source: subagent"
+hit  "$out" "stale: no"
+hit  "$out" "verdict: LIVE"
+same "U65 AC1 the sub-agent term adds no key and moves none" "$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>/dev/null | sed 's/:.*//' | tr '\n' ' ')" \
+  "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict stale-bound holder-ref "
+rm -rf "$U65_SD"; mkdir -p "$U65_SD" && touch "$U65_SD/agent-a1.jsonl"
+hit  "$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>&1)" "last-move-source: subagent"
+rm -rf "$U65_SD"; mkdir -p "$U65_SD/workflows/wf_x/deeper" && touch "$U65_SD/workflows/wf_x/deeper/agent-a1.jsonl"
+hit  "$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>&1)" "last-move-source: subagent"
+touch -d '2000-01-01T00:00:00Z' "$U65_SD/workflows/wf_x/deeper/agent-a1.jsonl"
+out=$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>&1)
+hit  "$out" "last-move-source: commit"
+hit  "$out" "stale: yes"
+hit  "$out" "verdict: STALE"
+rm -rf "$U65_SD"; mkdir -p "$U65_P/T/subagents/workflows/wf_x" && touch "$U65_P/T/subagents/workflows/wf_x/agent-a1.jsonl"
+out=$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>&1)
+hit  "$out" "stale: yes"
+hit  "$out" "verdict: STALE"
+rm -rf "$U65_P/T"
+# ...the stub drops the LAST path of the one call naming `subagents` and hands every other call to
+# the real `stat` whole, so two matched paths come back as one reading and every other probe lives.
+# Its directory is re-spelled by `pwd`, for the drive-colon reason the U64 stub above gives.
+mkdir -p "$U65_SD/workflows/wf_x" && touch "$U65_SD/workflows/wf_x/agent-a1.jsonl" "$U65_SD/workflows/wf_x/agent-a2.jsonl"
+U65_STAT=$(command -v stat); U65_STUB=$(mkdir -p "$ORIGIN_DIR/stubstat65" && cd "$ORIGIN_DIR/stubstat65" && pwd)
+printf '#!/bin/sh\ncase "$*" in *subagents*) ;; *) exec "%s" "$@" ;; esac\nn=$#; i=0\nfor a do i=$((i+1)); [ "$i" -eq "$n" ] || set -- "$@" "$a"; done\nshift "$n"\nexec "%s" "$@"\n' "$U65_STAT" "$U65_STAT" > "$U65_STUB/stat"
+chmod +x "$U65_STUB/stat"
+out=$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" PATH="$U65_STUB:$PATH" bash "$SCRIPT" --liveness tRun 2>&1); rc=$?
+same "U65 AC1 a partial sub-agent reading exits 1" "$rc" "1"
+hit  "$out" "UNATTENDED check 52 FAILED"
+hit  "$out" "stat -c %Y over $U65_SD"
+miss "$out" "verdict:"
+rm -rf "$U65_STUB" "$U65_P/fixture-session"
 rm -rf "$ORIGIN_DIR/cfg"
 touch scratch.txt
 out=$(run --liveness tRun)
@@ -7774,6 +7819,30 @@ touch -d '2000-01-01T00:00:00Z' "$DD_QHB"
 hit  "$(run --status tRun)" "presumed-stopped"
 hit  "$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)" "taken over — phase RUNNING · keepalive C"
 rm -f "$DD_QHB"
+
+# ---- U65 (TOOL-dDerivedDocket-65) AC2: AC20's aged record with its orchestrator WAITING on its own
+# ---- Workflow, one sub-agent transcript of the recorded session in place of the gate log and the
+# ---- session's own transcript dated past the bound beside it. `--status` presumes nothing, and
+# ---- another session's take-over refuses at 58 and writes nothing; dated past the bound, `--status`
+# ---- presumes the holder gone and the same call takes the run over. RED against a driver copy whose
+# ---- `derive_last_move` lacks the sub-agent term, under which the waiting orchestrator is taken over.
+build_hold_fixture; write_aged_commit
+DD_SCFG="$ORIGIN_DIR/cfg-dd65"; DD_SP="$DD_SCFG/projects/$(git rev-parse --show-toplevel | tr ':\\/.' '----')"
+DD_SA="$DD_SP/fixture-session/subagents/workflows/wf_x/agent-a1.jsonl"
+mkdir -p "${DD_SA%/*}" && touch "$DD_SA" && touch -d '2000-01-01T00:00:00Z' "$DD_SP/fixture-session.jsonl"
+out=$(CLAUDE_CONFIG_DIR="$DD_SCFG" bash "$SCRIPT" --liveness tRun 2>&1)
+hit  "$out" "last-move-source: subagent"
+hit  "$out" "verdict: LIVE"
+miss "$(CLAUDE_CONFIG_DIR="$DD_SCFG" run --status tRun)" "presumed-stopped"
+before=$(sum)
+out=$(CLAUDE_CONFIG_DIR="$DD_SCFG" CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)
+hit  "$out" "UNATTENDED check 58 FAILED"
+hit  "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder"
+same "U65 AC2 the take-over refused on a waiting orchestrator wrote nothing" "$(sum)" "$before"
+touch -d '2000-01-01T00:00:00Z' "$DD_SA"
+hit  "$(CLAUDE_CONFIG_DIR="$DD_SCFG" run --status tRun)" "presumed-stopped"
+hit  "$(CLAUDE_CONFIG_DIR="$DD_SCFG" CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)" "taken over — phase RUNNING · keepalive C"
+rm -rf "$DD_SCFG"
 
 # ---- AC21: a dead clock on a LEASED record reads UNKNOWN, announced, and declines the take-over: 58
 # ---- with an id, 59 with none, and `--status` says UNKNOWN and never presumed-stopped. RED against a
@@ -10849,7 +10918,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # blocks' own `hit`/`miss`/`same` lines, every one unconditional. Both blocks were run alone
 # behind a replica of this prologue by hand, green, and red under a driver copy whose
 # `derive_last_move` lacks the queue term; no suite ran.
-FLOOR_ASSERTIONS=1736
+# RAISED 1736 -> 1759 by TOOL-dDerivedDocket-65: the sub-agent arms' 23 assertions, all in
+# region two: 15 in the `--liveness` signals block after its transcript arm and 8 after unit 64's
+# AC2 arm, so FLOOR_SHARD_2 carries the same +23 and FLOOR_SHARD_1 is untouched. COUNTED off the
+# blocks' own `hit`/`miss`/`same` lines, every one unconditional. Both blocks were run alone
+# behind a replica of this prologue by hand, green, and red under a driver copy whose
+# `derive_last_move` lacks the sub-agent term; no suite ran.
+FLOOR_ASSERTIONS=1759
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -10974,7 +11049,8 @@ FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1540
+FLOOR_SHARD_2=1563
+# +23 for the TOOL-dDerivedDocket-65 sub-agent arms, all in region two - see FLOOR_ASSERTIONS.
 # +19 for the TOOL-dDerivedDocket-64 queue-heartbeat arms, all in region two - see FLOOR_ASSERTIONS.
 # +40 for the TOOL-dDerivedDocket-63 holder's-own-`--replaces` arms, all in region two - see FLOOR_ASSERTIONS.
 # +39 for the TOOL-dDerivedDocket-62 one-worktree arms, all in region two - see FLOOR_ASSERTIONS.

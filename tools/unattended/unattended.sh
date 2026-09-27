@@ -5789,20 +5789,26 @@ resolve_transcript_path() { # session -> the transcript path when it exists, or 
 # grades a lease with it, and `--status` announces presumed-stopped with it, so the tick and the
 # matrix cannot read one record two ways. The newest of its signals: the two tree clocks of
 # `read_tree_clocks`, the newest gate log under this worktree's git dir, the gate runner's queue
-# heartbeat beside those logs (TOOL-dDerivedDocket-64), and the recorded session's transcript when
-# its path derives. An ABSENT gate-logs directory or heartbeat contributes nothing and is not a
-# dead probe — a repo that has never run the bar has neither — but a file there that `stat` cannot
-# date is one. Globals, never a return value, for `read_tree_clocks`'s reason: a `$( )` capture
-# would lose the dead-probe name beside the numbers. `LM_DEAD` names the probe that answered
-# nothing, and each caller decides what that costs.
+# heartbeat beside those logs (TOOL-dDerivedDocket-64), the recorded session's transcript when
+# its path derives, and the newest sub-agent transcript of that session (TOOL-dDerivedDocket-65),
+# because a session waiting on its own Workflow writes under `<sid>/subagents/` and never to
+# `<sid>.jsonl`. An ABSENT gate-logs directory, heartbeat or sub-agent directory contributes nothing
+# and is not a dead probe — a repo that has never run the bar has none of them — but a file there
+# that `stat` cannot date is one. Every term is graded against the one RESUME_STALE_BOUND. A
+# Workflow's agents run inside their session's process, so once the holder dies none of its
+# sub-agents moves again, and the term keeps a dead holder fresh for at most one bound after its
+# last sub-agent turn, the window the transcript term already gives after its own. Globals, never
+# a return value, for `read_tree_clocks`'s reason: a `$( )` capture would lose the dead-probe name
+# beside the numbers. `LM_DEAD` names the probe that answered nothing, and each caller decides
+# what that costs.
 #
-# WHAT IT DOES NOT READ: another worktree's moves, and a Workflow's sub-agents, which write under
-# `<sid>/subagents/` and never to `<sid>.jsonl`. A holder waiting on either with no move of its own
-# reads stale here, and so does a bar running one leg past the bound: once the queue is behind it
-# only a leg's completion moves the clock.
+# WHAT IT DOES NOT READ: another worktree's moves, and another session's sub-agents. A holder with
+# no move of its own and no sub-agent writing reads stale here — one tool call longer than the
+# bound, or a wait on a background shell task — and so does a bar running one leg past the bound:
+# once the queue is behind it only a leg's completion moves the clock.
 LM_NEWEST=""; LM_SOURCE=""; LM_DEAD=""; LM_TRANSCRIPT=""
 derive_last_move() { # session -> LM_NEWEST, LM_SOURCE, LM_TRANSCRIPT, and LM_DEAD on a dead probe
-  local sidecar gl hb f m
+  local sidecar gl hb f m sd fs g ms k
   LM_NEWEST=""; LM_SOURCE=""; LM_DEAD=""; LM_TRANSCRIPT=""
   read_tree_clocks
   LM_DEAD="$TC_DEAD"; LM_NEWEST="$TC_LASTC"; LM_SOURCE=commit
@@ -5834,6 +5840,31 @@ derive_last_move() { # session -> LM_NEWEST, LM_SOURCE, LM_TRANSCRIPT, and LM_DE
     m=$(stat -c %Y -- "$LM_TRANSCRIPT" 2>/dev/null) || m=""
     case "$m" in ""|*[!0-9]*) LM_DEAD="stat -c %Y on $LM_TRANSCRIPT" ;; esac
     if [ -z "$LM_DEAD" ] && [ "$m" -gt "$LM_NEWEST" ]; then LM_NEWEST=$m; LM_SOURCE=transcript; fi
+  fi
+  # THE SESSION'S SUB-AGENTS (TOOL-dDerivedDocket-65). A session waiting on its own Workflow or
+  # `Agent` spawn writes nothing to its transcript, while each sub-agent transcript it spawned is
+  # appended once per turn: every `agent-*.jsonl` at any depth under `subagents/` in the directory
+  # the transcript path names once `.jsonl` is stripped, the population the run-log kit's session
+  # reader walks. Found through the transcript term's one derivation of the encoded root, so no
+  # transcript means no sub-agent either, and a sibling worktree reads none. ONE `stat` dates the
+  # whole list, whatever its size: the glob, the tests and the loop are builtins, and the readings
+  # are split by default word splitting, never a here-string. No directory and no match contribute
+  # nothing; fewer readings than matched paths is a dead probe, so a partial reading is never a
+  # silently smaller population. Source `subagent`, graded against RESUME_STALE_BOUND like every
+  # term, and `globstar` is restored to the state it was found in.
+  if [ -z "$LM_DEAD" ] && [ -n "$LM_TRANSCRIPT" ]; then
+    sd="${LM_TRANSCRIPT%.jsonl}/subagents"; fs=(); g=""
+    shopt -q globstar && g=1; shopt -s globstar
+    for f in "$sd"/**/agent-*.jsonl; do [ -f "$f" ] && fs+=("$f"); done
+    [ -n "$g" ] || shopt -u globstar
+    if [ "${#fs[@]}" -gt 0 ]; then
+      ms=$(stat -c %Y -- "${fs[@]}" 2>/dev/null) || true; k=0
+      for m in $ms; do
+        case "$m" in *[!0-9]*) continue ;; esac
+        k=$((k+1)); if [ "$m" -gt "$LM_NEWEST" ]; then LM_NEWEST=$m; LM_SOURCE=subagent; fi
+      done
+      [ "$k" -eq "${#fs[@]}" ] || LM_DEAD="stat -c %Y over $sd"
+    fi
   fi
   return 0
 }
@@ -5900,10 +5931,13 @@ resolve_holder_worktree() { # run-state file -> 0 holds, 1 not here, 2 no run br
 # names reads `terminal`. `last-move` is the seconds since the NEWEST of `derive_last_move`'s
 # signals: the last commit, the newest dirty or untracked write, the newest gate log under
 # `<git-dir>/gate-logs/`, the `gate-queue-heartbeat` a bar waiting in the gate runner's turnstile
-# rewrites beside them on every tick, and the session transcript when its path derives — because
-# during a healthy 26-minute bar neither the transcript nor the commit moves and the per-leg logs
-# do, and before its first leg a queued bar moves only its heartbeat. `last-move-source` names the
-# one that won: `commit`, `write`, `gate-log`, `gate-queue` or `transcript`. `stale`
+# rewrites beside them on every tick, the session transcript when its path derives, and the newest
+# sub-agent transcript of that session — every `agent-*.jsonl` at any depth under `subagents/` in
+# the directory the transcript path names, the population the run-log kit's session reader walks —
+# because during a healthy 26-minute bar neither the transcript nor the commit moves and the per-leg
+# logs do, before its first leg a queued bar moves only its heartbeat, and a session waiting on its
+# own Workflow moves only its agents' transcripts. `last-move-source` names the one that won:
+# `commit`, `write`, `gate-log`, `gate-queue`, `transcript` or `subagent`. `stale`
 # is `last-move` over RESUME_STALE_BOUND, and `stale-bound` is that number, printed so the tick
 # bounds its own reads by it; `holder-ref` is the branch a worktree must have checked out to hold
 # the slug (`resolve_holder_worktree`), or `absent`. The verdict is the first that holds: TERMINAL,
@@ -5966,9 +6000,10 @@ print_liveness() { # slug
   # number a reboot recycled reads `no` here rather than `yes` whatever image took it, and the
   # tick's kill is not aimed at the owner's next process (closing review id 2; round 2, defect E).
   alive=$(check_pid_alive "$pid" "$(fact "$rel" pid-image)" "$(fact "$rel" lease-utc)")
-  # THE SIGNALS are `derive_last_move`'s — commit, write, gate log, the queue's heartbeat and the
-  # transcript — the one clock this verb, `check_lease_fresh` and `--status` share, so a bar queued
-  # at the turnstile reads LIVE here and in the matrix at once. The stall log below still needs the
+  # THE SIGNALS are `derive_last_move`'s — commit, write, gate log, the queue's heartbeat, the
+  # transcript and the session's sub-agent transcripts — the one clock this verb,
+  # `check_lease_fresh` and `--status` share, so a bar queued at the turnstile and a session waiting
+  # on its Workflow read LIVE here and in the matrix at once. The stall log below still needs the
   # sidecar root, derived again here: a dead derivation is already named by the clock, so this one
   # only has to be empty.
   derive_last_move "$sid"

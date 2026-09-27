@@ -736,6 +736,26 @@ touch -d '2000-01-01T00:00:00Z' "$FX_GITDIR/gate-queue-heartbeat"
 run_tick_over "$TICK" --dry-run
 check_hit  "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "U64 the same heartbeat dated past the bound is resumed"
 
+# ---- U65 (TOOL-dDerivedDocket-65) AC3: an orchestrator WAITING on its own Workflow. A BUILDING
+# ---- record whose commit and session transcript are past the bound and whose only fresh signal is a
+# ---- sub-agent transcript under that session's `subagents/workflows/wf_x/` is skipped LIVE and never
+# ---- resumed; the same file dated past the bound is resumed. The bound is 1800 s, because the
+# ---- fixture's declared 1 s is shorter than one tick call, and the hour-old commit is still past it.
+# ---- The transcript root is this arm's own, so no later arm reads the files. RED against a driver
+# ---- copy whose `derive_last_move` lacks the sub-agent term: the fresh file decides `resumed ·
+# ---- attempt 1`, which on a node with a registered tick kills the waiting orchestrator.
+CONF_EXTRA='RESUME_STALE_BOUND="1800"' build_fixture 999999999
+U65_CFG="$TMP/cfg-u65"; U65_P="$U65_CFG/projects/$(printf '%s' "$FX" | tr ':\\/.' '----')"
+mkdir -p "$U65_P/$SID/subagents/workflows/wf_x" && touch -d '2000-01-01T00:00:00Z' "$U65_P/$SID.jsonl"
+touch "$U65_P/$SID/subagents/workflows/wf_x/agent-a1.jsonl"
+CLAUDE_CONFIG_DIR="$U65_CFG" run_tick_over "$TICK" --dry-run
+check_hit  "$OUT" "resume-tick: tRun · $FX · skip · verdict LIVE" "U65 a record whose only fresh signal is a sub-agent transcript is skipped LIVE"
+check_miss "$OUT" "resumed ·" "U65 ...and is never resumed"
+touch -d '2000-01-01T00:00:00Z' "$U65_P/$SID/subagents/workflows/wf_x/agent-a1.jsonl"
+CLAUDE_CONFIG_DIR="$U65_CFG" run_tick_over "$TICK" --dry-run
+check_hit  "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "U65 the same sub-agent transcript dated past the bound is resumed"
+rm -rf "$U65_CFG"
+
 # ---- AC12: the two announced skips of the walk. A driver whose --liveness exits non-zero is a dead
 # ---- probe: the run is skipped naming its first line, nothing launches, no line is written. A
 # ---- second worktree with no conf is skipped by name while the first tree's run still gets its
@@ -899,7 +919,11 @@ n=$((pass+fail))
 # block, COUNTED off its own `check_*` lines, every one unconditional. The pass that wrote it ran no
 # suite; the arm was run alone over a replica of this prologue, against the kit and against a
 # driver copy without the queue term.
-FLOOR_ASSERTIONS=176
+# RAISED 176 -> 179 by TOOL-dDerivedDocket-65: the waiting-orchestrator arm's 3 assertions, after
+# the U64 block, COUNTED off its own `check_*` lines, every one unconditional. The pass that wrote
+# it ran no suite; the arm was run alone over a replica of this prologue, against the kit and
+# against a driver copy without the sub-agent term.
+FLOOR_ASSERTIONS=179
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
