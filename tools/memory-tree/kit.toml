@@ -333,6 +333,13 @@ consumer = "check-memory-hygiene.sh"
 probe = ["python3", "{own}", "--print-bindings"]
 expect = '(?m)^N\t[0-9]+$'
 consumer = "check-memory-hygiene.sh"
+# TOOL-aRepatriatedFork-32 rev-3 (the closing review's C2). The consumer reds when N and the count of
+# U rows disagree, so a generator printing N without its U rows breaks it. Held by a U row, or by
+# N 0, the one corpus that owes none — the consumer's own guard, stated where the fork is graded.
+[[contract.clause]]
+probe = ["python3", "{own}", "--print-bindings"]
+expect = '(?m)^U\t|^N\t0$'
+consumer = "check-memory-hygiene.sh"
 [[contract.clause]]
 imports = ["apply_region", "Problem", "MARK_OPEN", "MARK_CLOSE"]
 consumer = "marker-contract.test.sh"
@@ -356,7 +363,7 @@ probe = ["python3", "{own}", "--for-paths", "{own}"]
 expect = "(?m)^# "
 consumer = "kickoff-manifest:SKILL.md unattended:SKILL.template.md"
 
-# SHAPE-EXACT, and measured: inCMS's own hygiene engine ignores two of these flags and runs its whole
+# SHAPE-EXACT, and measured: adopter ic's own hygiene engine ignores two of these flags and runs its whole
 # check instead, whose failure text a bare `\S` read as a pass. One path per line, and one line.
 [[contract]]
 source = "check-memory-hygiene.sh"

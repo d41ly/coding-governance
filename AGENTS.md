@@ -532,7 +532,8 @@ read the durable summary instead.
 **The push boundary is where the bar binds.** The tracked `.githooks/pre-push` hook runs
 `tools/run-gates/run-gates.sh` once on a default-branch push and blocks a red one (it classifies on the remote
 ref, the validated tree must be the pushed tip, and `--no-verify` bypasses). `GOV_GATE_CMD` may
-name only a script this repo tracks, unmodified, and anything else is refused before a bar runs;
+name only a script this repo tracks, unmodified, and it must also EQUAL the kit's own runner or the
+`GATE_CMD` a committed `.unattended.conf` declares at the pushed sha. Anything else is refused before a bar runs;
 `GOV_GATE_CMD_TEST=1` is the one test escape, labelled `bar: STUB` and denied a lander marker
 (`TOOL-aRepatriatedFork-5`). The hook reads the default branch from the remote it is pushing to,
 refuses a dirty tree and a `HEAD` the bar moved, hands the bar `GATE_PUSH_BASE` from git's own ref

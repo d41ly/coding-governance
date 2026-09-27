@@ -3674,7 +3674,7 @@ reset_tree
 
 # ---- TOOL-aRepatriatedFork-11 S1 (AC1): check 21 grades the BUILD ROOT's README and no README
 # ---- nested inside a build. Both carry no marker pair; before the `:(glob)` magic the plain
-# ---- pathspec's `*` crossed the slash and the nested file was named too (41 of them at inCMS).
+# ---- pathspec's `*` crossed the slash and the nested file was named too (41 of them at adopter ic).
 reset_tree
 mkdir -p memory/builds/tOne/notes
 printf '# tOne\n' > memory/builds/tOne/README.md

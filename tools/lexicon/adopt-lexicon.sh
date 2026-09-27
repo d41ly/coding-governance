@@ -248,7 +248,15 @@ read_conf_scalar() {
   # before `sed` ever sees it, so removing this `tr` changes NOTHING here: measured on node `a`,
   # both forms red identically on a wholly-CRLF conf. On a GNU-coreutils node the CR survives grep
   # and the `tr` is the whole mechanism. Kept for that node; unexercisable on this one.
-  tr -d '\r' < "$CONF" | grep -E "^$1=" | head -1 | sed -E "s/^$1=//; s/^\"//; s/\"\$//"
+  # TOOL-aRepatriatedFork-38: a QUOTED value ends at its matching quote whatever follows it, and an
+  # UNQUOTED one at a `#` that begins a word, bash's rule. The bare quote strip kept a trailing
+  # comment, so `ratified="2026-09-10 node a"   # note` read as non-empty junk. rev-3 (the closing
+  # review's C3, C4): single quotes peel like double ones, whitespace right after `=` ends the
+  # assignment, and a `#` begins a comment only AFTER whitespace, so `K=#x` keeps `#x`.
+  tr -d '\r' < "$CONF" | grep -E "^$1=" | head -1 \
+    | sed -E -e "s/^$1=//" -e 't unq' -e ':unq' -e 's/^[[:space:]].*//' -e 't' \
+             -e 's/^"([^"]*)".*/\1/' -e 't' -e "s/^'([^']*)'.*/\1/" -e 't' \
+             -e 's/[[:space:]]#.*//' -e 's/[[:space:]]+$//' -e 's/^"//' -e 's/"$//'
 }
 
 MODE="${1:---check}"

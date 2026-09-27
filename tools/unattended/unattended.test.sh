@@ -115,7 +115,7 @@ check_status_one_line() { # slug -> asserts --status wrote exactly one stdout li
 }
 
 # ---- TOOL-dRetiredFork-9 S3: a `_`-prefixed subfolder under spec/ is NOT a spec -------------------
-# Absorbed from NicoCares `nc carve-out 20/20`. The cause is the PATHSPEC, not a shell glob: in
+# Absorbed from adopter nc `nc carve-out 20/20`. The cause is the PATHSPEC, not a shell glob: in
 # `git ls-files "<dir>/spec/*.md"` the `*` crosses `/`, so `spec/_working/notes.md` was enumerated
 # and produced a `NOT A UNIT` row beside "every tracked spec is terminal". Reproduced on the live
 # tree before the fix, and this arm is what stops it coming back.
@@ -711,7 +711,14 @@ miss "$out" "preflight OK"
 
 # ...and the remedy it prints names the SCRIPT and its mode, never a bare launcher: the driver's own
 # resolver ban refuses one, and this repo cannot assume a launcher exists on the operator's PATH.
-hit "$out" "the --write mode of $TOOL_REL/memory-tree/gen_build_index.py"
+# WHICH script is derived, never spelled (TOOL-aRepatriatedFork-37): `derive_index_repair` names the
+# generator THIS install holds, which at an adopter need not sit under a `memory-tree/` segment, so
+# the arm asserts the named path is a tracked `gen_build_index.py` in the tree this kit runs from.
+hit "$out" "the --write mode of "
+ir=$(printf '%s\n' "$out" | sed -n 's/.*the --write mode of \([^ ,]*gen_build_index\.py\).*/\1/p' | head -1)
+same "the repair pointer names a tracked gen_build_index.py in this install" \
+  "$( [ -n "$ir" ] && git -C "${HERE%/"$KIT_REL"}" ls-files --error-unmatch -- "$ir" >/dev/null 2>&1 \
+      && echo tracked || echo "not tracked: ${ir:-no generator path in the message}")" tracked
 
 # ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
 # that proves the presence test is a grep and not that exit status.

@@ -1,0 +1,25 @@
+# adopters.toml — the trees gov ships INTO, as a declaration. GOV-INTERNAL: it sits under the
+# registry's `tools/govkit` exemption and no descriptor ships it. `registry.toml` is the wrong home
+# for it, because the playbook renderer ships that file to every adopter.
+#
+# TOOL-aRepatriatedFork-31. `govkit.py selfcheck` arm 10 bans every `names` spelling,
+# case-insensitively, from every file `govkit.py shipped` lists, so an adopter is covered the day its
+# row lands here. The class it closes: an adopter's brand gate reds on ANOTHER adopter's name, and a
+# shipped provenance comment is how one reached it.
+#
+# `key` is the neutral spelling a provenance note uses instead, as in "adopter nc". A row with no key
+# is cited as "an adopter". Never a brand: the key is what the ban lets through.
+#
+# A PURE BAN, every row alike. TOOL-aRepatriatedFork-35 drained the last carried sites, and the carry
+# table went with them: a shipped site is a red, never a count.
+
+[[adopter]]
+key = "nc"
+names = ["NicoCares"]
+
+[[adopter]]
+names = ["swydee"]
+
+[[adopter]]
+key = "ic"
+names = ["inCMS"]

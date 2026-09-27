@@ -36,7 +36,7 @@ import tempfile
 sys.dont_write_bytecode = True
 
 # ALSO above it, and process-level rather than per-subprocess. TOOL-dRetiredFork-2, absorbed from
-# NicoCares `nc carve-out 17/20`; the sibling half lives in gen_build_index.py and the list is gov's
+# adopter nc `nc carve-out 17/20`; the sibling half lives in gen_build_index.py and the list is gov's
 # own from `.githooks/pre-push`. Every arm here builds a throwaway git repo, and `git init` under an
 # inherited GIT_DIR does not make a repo at the cwd — it RE-INITIALISES the repo GIT_DIR names. Run
 # from a hook, this suite would rewrite the caller's repository instead of its own fixture.
@@ -109,15 +109,15 @@ def resolve_memory_root() -> str:
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
 SELFTEST_ARMS = 71
-# 34 -> 58 on 2026-08-24 (contrib/incms-memory-recall): twenty-four arms — twenty-three ported from
-#   inCMS's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
+# 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
+#   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
-#   `query.py` that diffs to zero changed lines against inCMS's copy; THREE over the alias join,
+#   `query.py` that diffs to zero changed lines against adopter ic's copy; THREE over the alias join,
 #   one of which covers the query-side call site a recall floor structurally cannot see; and ONE
 #   that is this pin's own arm, `test_the_selftest_pin_carries_an_unbroken_provenance_chain`.
 #   The first draft of this line read "ten / eleven / three" and omitted the fourth term — which
 #   is the exact defect this comment exists to prevent, found by review before it landed.
-# 58 -> 65 on 2026-09-22 (merge of main 955d348e into contrib/incms-memory-recall): SEVEN arms
+# 58 -> 65 on 2026-09-22 (merge of main 955d348e into adopter ic's recall contrib branch): SEVEN arms
 #   main gained after this branch's base, none of them new here. FIVE from aTunedCompass —
 #   `test_spine_flat_layout`, `test_spine_nested_layout`, `test_durable_derives_families`,
 #   `test_chunk_arm_rolls_up`, `test_empty_spine_is_loud`; ONE from the flag-in-path guard,
@@ -132,7 +132,7 @@ SELFTEST_ARMS = 71
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
     """`SELFTEST_ARMS` must be the END of an unbroken `N -> M` chain of comment lines.
 
-    Ported from inCMS `scripts/check_recall.py`. Upstream's pin had been bumped six times over
+    Ported from adopter ic `scripts/check_recall.py`. Upstream's pin had been bumped six times over
     35 -> 62, and once more over 83 -> 92, with no line recorded. A session that has to re-derive
     the pin then cannot tell which arms the missing ones were — which is exactly the state where a
     quiet DELETION reads as a legitimate re-pin. Writing the lines is the fix; this is what keeps
@@ -304,10 +304,16 @@ def test_parser_vs_bash():
             "MEMORY_ROOT=memory   # trailing comment on an unquoted value\n"
             'export FAMILIES="tooling:TOOL playbook:PLAY"\n'
             'SPACED="a value with spaces"\n'
-            "PLAIN=plain\n",
+            "PLAIN=plain\n"
+            # TOOL-aRepatriatedFork-38: a quoted value with a trailing comment read as `"a`.
+            'NOTED="a quoted value"   # trailing comment on a quoted value\n'
+            # rev-3 (C4): a `#` opening the word is data; whitespace after `=` ends the assignment.
+            "HASHED=#x\n"
+            "BLANKED=   # blank on purpose\n",
             encoding="utf-8", newline="\n",
         )
-        keys = ["MEMORY_ROOT", "FAMILIES", "SPACED", "PLAIN"]
+        # An empty value is never LAST: the `rstrip` of the reply below would drop it.
+        keys = ["MEMORY_ROOT", "FAMILIES", "SPACED", "BLANKED", "PLAIN", "NOTED", "HASHED"]
         script = ". '%s'; printf '%%s\\n' %s" % (
             (root / ".memory-tree.conf").as_posix(),
             " ".join(f'"${k}"' for k in keys),
@@ -1577,31 +1583,31 @@ def test_one_walk_two_callers():
 
 
 # ==================================================================================================
-# THE INSTRUMENT'S OWN BEHAVIOUR — ported from inCMS `scripts/recall/selftest.py` (2026-08-24).
+# THE INSTRUMENT'S OWN BEHAVIOUR — ported from adopter ic `scripts/recall/selftest.py` (2026-08-24).
 #
 # WHY THIS BLOCK EXISTS. `bench.py` and `union.py` are byte-identical between the two trees and
 # `verbatim.json` pins both by digest, so `t_verbatim_files` proves the bytes have not moved and
 # NOTHING here proved they still behave. Same for the half of `query.py` that has not forked:
-# `emit`, `parse`, `query_expr`, `rrf` and `render` diff to ZERO changed lines against inCMS's copy.
+# `emit`, `parse`, `query_expr`, `rrf` and `render` diff to ZERO changed lines against adopter ic's copy.
 # A digest is not a check of behaviour; these are. Every arm below either drives a verbatim file or
 # drives a query.py function that is byte-identical to the one it was written against.
 #
-# WHAT WAS REPATHED, and it is only ever one of three things: inCMS's `_throwaway_repo()` becomes
+# WHAT WAS REPATHED, and it is only ever one of three things: adopter ic's `_throwaway_repo()` becomes
 # gov's `make_repo()` plus `run()` over the fixture's own copy of the kit, for every arm that drives
 # `query.main` (the note where `run_in_repo()` used to be says why it is not a chdir any more); an
 # `ARCH-` id becomes a `TOOL-` id from this repo's conf;
 # and a `memory/architecture/...` path becomes a `<MEMORY_ROOT>/tooling/...` one. No assertion was
 # weakened and no measurement re-derived — the figures quoted in these docstrings were measured on
-# inCMS's corpus and are cited as PROVENANCE for why an arm exists, never asserted here.
+# adopter ic's corpus and are cited as PROVENANCE for why an arm exists, never asserted here.
 #
 # ONE EDIT THAT IS NOT A REPATH, disclosed because the sentence above would otherwise hide it:
-# `test_rrf_is_rank_based_not_score_based`'s docstring is REWRITTEN, not repathed. inCMS's reads
+# `test_rrf_is_rank_based_not_score_based`'s docstring is REWRITTEN, not repathed. adopter ic's reads
 # "a document ranked 1 by the small set and absent from the large one must beat one ranked 3 by
 # both", which is the opposite of what its own assertions check. Gov's wording matches the arm.
 # The upstream copy is the one to fix; this is noted rather than silently carried.
 #
 # AND ONE PRECISION ON "BYTE-IDENTICAL": `bench.py` and `union.py` are identical after CRLF
-# normalisation, not raw. Gov's worktree copies are CRLF and inCMS's are LF, so their raw sha256
+# normalisation, not raw. Gov's worktree copies are CRLF and adopter ic's are LF, so their raw sha256
 # differs; `diff --strip-trailing-cr` reports zero in both directions, and `t_verbatim_files`
 # strips CRLF before hashing, so the kit's own arm and this claim agree. A reader who checks with
 # `sha256sum` alone will not reproduce it, which is why the qualifier is here.
@@ -1612,12 +1618,12 @@ def test_one_walk_two_callers():
 #
 # WHAT WAS DELIBERATELY LEFT UPSTREAM: the id-grammar and anchor-shape arms. Those are precisely the
 # arms this kit's four anchor regexes and its H1-is-not-an-anchor rule still lack — but every one of
-# their fixtures is an inCMS id embedded in an inCMS row shape, and rewriting them in this
+# their fixtures is an adopter ic id embedded in its row shape, and rewriting them in this
 # conf's vocabulary is authoring a new arm rather than moving one. They are worth purpose-writing
 # here as separate work.
 #
 # One more piece of this contribution does not live in this block: `SELFTEST_ARMS` and
-# `check_provenance_chain`, up beside the harness, ported from inCMS's `scripts/check_recall.py`.
+# `check_provenance_chain`, up beside the harness, ported from adopter ic's `scripts/check_recall.py`.
 # ==================================================================================================
 
 
@@ -2491,7 +2497,7 @@ def read_grammar(conf: str, ids: str, *paths: str) -> dict:
 
 @check("DURABLE admits one segment AFTER archive/, and still refuses a non-index file there")
 def test_archive_segment_after_archive_is_durable():
-    """inCMS rotates to `<root>/archive/<discipline>/DECISIONS.<date>.md`; the pattern took a segment
+    """Adopter ic rotates to `<root>/archive/<discipline>/DECISIONS.<date>.md`; the pattern took a segment
     only BEFORE `archive/`, so all fifteen of those files had no durable home (spec AC1)."""
     after = "memory/archive/architecture/DECISIONS.2026-07-27.md"
     before = "memory/tooling/archive/DECISIONS.2026-07-27.md"
@@ -2506,7 +2512,7 @@ def test_archive_segment_after_archive_is_durable():
 
 @check("RECALL_NODE_TAG_CLASS narrows the id grammar, prints, defaults to a-z, and refuses a bad class")
 def test_node_tag_class_is_declared():
-    """The class was a code constant, so inCMS (`a-f`) could not run the kit verbatim (spec AC2)."""
+    """The class was a code constant, so adopter ic (`a-f`) could not run the kit verbatim (spec AC2)."""
     narrow = CONF + 'RECALL_NODE_TAG_CLASS="a-f"\n'
     g = read_grammar(narrow, "ARCH-xFoo-3 TOOL-xFoo-3 TOOL-aFoo-3")
     assert not g["id"]["TOOL-xFoo-3"] and not g["grammar_for"]["TOOL-xFoo-3"], (
@@ -2656,7 +2662,7 @@ def main() -> int:
         test_version_marker, test_verbatim_files, test_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
         test_undeclared_file_stays_out, test_one_walk_two_callers,
-        # ported from inCMS scripts/recall/selftest.py — the two verbatim files, the unforked half
+        # ported from adopter ic scripts/recall/selftest.py — the two verbatim files, the unforked half
         # of query.py, and the alias join
         test_chunk_matching, test_scoring, test_full_at_k_counts_targets_not_documents,
         test_fts_query_safety, test_alias_column_is_separate_and_downweighted,

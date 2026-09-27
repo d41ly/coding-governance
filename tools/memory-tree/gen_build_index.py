@@ -178,7 +178,7 @@ class Problem(Exception):
 class StaleHeader(Problem):
     """A build README header that is PRESENT and does not conform — NOT one that is absent.
 
-    TOOL-dRetiredFork-3, absorbed from NicoCares `nc carve-out 9/20`. Those two states were one
+    TOOL-dRetiredFork-3, absorbed from adopter nc `nc carve-out 9/20`. Those two states were one
     `Problem` here, so a CORRUPTED header read as a MISSING one and the index regenerated around it.
     They are different animals: an absent header is a build nobody wrote front matter for, and a
     corrupt one is front matter that rotted after someone did.
@@ -197,7 +197,7 @@ class StaleHeader(Problem):
 
 # --------------------------------------------------------------------------------------- plumbing
 #: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts.
-#: TOOL-dRetiredFork-2, absorbed from NicoCares `nc carve-out 16/20`. Taken VERBATIM from gov's own
+#: TOOL-dRetiredFork-2, absorbed from adopter nc `nc carve-out 16/20`. Taken VERBATIM from gov's own
 #: hook-side scrub at `.githooks/pre-push` rather than re-derived, because these are two halves of
 #: ONE defect and a second list would be the place they drift apart.
 _GIT_ENV_LEAKS = (
@@ -575,6 +575,10 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
             continue
         if rec["state"] == "unbound":
             unbound += 1
+            # One U row per unbound record, so check 21's pin branch can drop a record its
+            # population filter exempts before it counts. N stays the liveness row and the total.
+            # TOOL-aRepatriatedFork-32.
+            print(f"U\t{rel}")
         # One S row per BOUND record, carrying the resolved SET. A conformant record is not a
         # finding, so the A/B/N rows say nothing about it — and check 21's filename-vs-header
         # branch needs exactly this set to test membership against. Without it that branch would
@@ -1720,7 +1724,7 @@ def extract_build_readmes(paths: list, memory_root: str) -> list:
 
     The slot contract and the survey used to keep every tracked path ending in `/README.md`, at any
     depth, while the render keys on `builds/<slug>/`. An adopter whose legacy records are folders
-    with a README inside (inCMS carried 41) was then graded as 41 malformed builds the render never
+    with a README inside (adopter ic carried 41) was then graded as 41 malformed builds the render never
     saw. ONE predicate for both verbs, because two copies of it are two answers to one question.
     """
     prefix = memory_root.rstrip("/") + "/builds/"

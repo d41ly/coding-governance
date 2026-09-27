@@ -7,7 +7,9 @@
 #   check-wiring.sh --session  # like --fix but ALWAYS exit 0 — the SessionStart hook mode
 #   check-wiring.sh --resolve-fragment <f.fragment.json>   # print the fragment's hook path with
 #                              # {kit}/{here} expanded — the value the arms below decide on, twinned
-#                              # on settings-merge.py so the hook-destinations gate can assert parity
+#                              # on settings-merge.py so the hook-destinations gate can assert parity.
+#                              # A target's `adopter-owned` copy is NOT twinned: settings-merge.py is
+#                              # its one reader, and this script calls it (`--resolve-hook`)
 #
 # WHERE A KIT FILE IS: every arm asks the install receipt (`.governance/install.json`, written by
 # govkit) FIRST, through `resolve_receipt_path`, and only then probes gov's own `<prefix>/<kit>/` layout. A
@@ -24,7 +26,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.8   # gov:kit check-wiring@1.8 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.12   # gov:kit check-wiring@1.12 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -53,7 +55,7 @@ done
 KIT_REL=${KIT_REL:-}
 
 # ---- S1: the settings file is RESOLVED, never spelled --------------------------------------------
-# gov hardcoded the settings path at ten sites. inCMS's live settings file sits OUTSIDE the
+# gov hardcoded the settings path at ten sites. adopter ic's live settings file sits OUTSIDE the
 # worktree on every one of its nodes BY DESIGN, so that spelling resolves to nothing there and every
 # arm below passed BY FINDING NO FILE — the worktree false-green recorded at ARCH-dBriskLanyard-1 S10.
 #
@@ -150,7 +152,41 @@ resolve_fragment_hook() { # fragment path -> its hook_path, tokens expanded; rc 
   [ -n "$hp" ] || { echo "check-wiring: $frag declares no hook_path" >&2; return 1; }
   here=$(dirname "$frag"); [ "$here" = . ] && here=""
   kitpfx=$(dirname "${here:-.}"); [ "$kitpfx" = . ] && kitpfx=""
-  printf '%s\n' "$hp" | sed -e "s|{kit}/|${kitpfx:+$kitpfx/}|g" -e "s|{here}/|${here:+$here/}|g"
+  hp=$(printf '%s\n' "$hp" | sed -e "s|{kit}/|${kitpfx:+$kitpfx/}|g" -e "s|{here}/|${here:+$here/}|g")
+  resolve_owned_hook "$hp"
+}
+# A HOOK THE TARGET KEEPS ELSEWHERE — TOOL-aRepatriatedFork-36. The fragment names gov's copy beside
+# the kit; a target that runs its own copy at another path declares it `[[own]]`, and `adopt` records
+# that as an `adopter-owned` receipt row carrying the SAME `source` as gov's engine row at the
+# resolved path.
+#
+# ONE READER, AND IT IS NOT THIS FILE (the round-1 closing-diff fold). This used to be an awk parser
+# beside settings-merge.py's `json.loads`, and the two split on every receipt that was not
+# pretty-printed ASCII: a `\u` escape, a backslash, an embedded quote, compact JSON. The writer wired
+# one path while this graded another, and the parity gate never saw it because gov keeps no receipt.
+# So the question goes to settings-merge.py `--resolve-hook`, which also GRADES the owned path the
+# way govkit grades an `[[own]]` path and refuses one it cannot trust; a refusal here is rc 1 with
+# its reason on stderr, which the arms report as UNWIRED.
+#
+# THE PRE-FILTER IS EXACT, not a second reader: a JSON string can decode to `adopter-owned` only by
+# spelling those letters or by carrying a `\u` escape, so a receipt holding neither has no owned row
+# and needs no python. That keeps gov's own tree, and every adopter that owns no hook, as fast as it
+# was on a host with no python at session start.
+resolve_owned_hook() { # resolved hook path -> the adopter-owned path implementing its source, else itself
+  if [ ! -f .governance/install.json ] || ! grep -q -e 'adopter-owned' -e '\\u' .governance/install.json; then
+    printf '%s\n' "$1"; return 0
+  fi
+  if [ ! -f "$SMERGE" ]; then
+    echo "check-wiring: the receipt may carry an adopter-owned row, and settings-merge.py, its one reader, is not installed at $SMERGE" >&2
+    return 1
+  fi
+  local got why
+  got=$("$PY" "$SMERGE" --resolve-hook "$1" 2>/dev/null) && { printf '%s\n' "$got"; return 0; }
+  # Re-asked for the REASON only on the refusal path: stderr also carries import-time notes on a
+  # clean run, so it cannot share the capture that yields the path.
+  why=$("$PY" "$SMERGE" --resolve-hook "$1" 2>&1 >/dev/null | tail -1)
+  echo "check-wiring: ${why:-settings-merge.py did not run under '$PY'} — the owned-hook join for $1 refused" >&2
+  return 1
 }
 
 MODE=check; FRAG_ARG=""
@@ -166,12 +202,6 @@ esac
 # Not a git repo → nothing to wire; never an error (and never break session start).
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "skip     — not a git repo"; exit 0; }
 cd "$ROOT" || { [ "$MODE" = session ] && exit 0; exit 0; }
-
-# The print verb answers and leaves BEFORE the settings resolver and the arms run: it is a reader
-# of one fragment, and its output is compared byte-for-byte against settings-merge.py's.
-if [ "$MODE" = resolve ]; then
-  resolve_fragment_hook "$FRAG_ARG"; exit $?
-fi
 
 DO_FIX=0; case "$MODE" in fix|session) DO_FIX=1 ;; esac
 unwired=0
@@ -264,30 +294,75 @@ matchers_of() { # marker [hook-basename] -> the matcher of each group carrying B
     | grep -F -e "${2:-$1}" \
     | sed -n 's/^{"matcher":"\([^"]*\)".*/\1/p'
 }
-wired() { # marker · the matcher the fragment declares · [hook-basename]
-  [ -n "$2" ] && matchers_of "$1" "${3:-}" | grep -qxF "$2"
+# THE THIRD KEY IS THE HOOK'S RESOLVED PATH, as the command names it (the round-1 fold, I1). The
+# basename could not tell two copies of one hook apart: with gov's copy landed beside the kit and
+# settings.json still running an out-of-kit copy, the recall arm printed `ok` for the copy that runs
+# nothing — and kept printing it after the running copy was deleted. The key is the path behind
+# `${CLAUDE_PROJECT_DIR}/` up to the closing escaped quote, the one spelling settings-merge.py
+# renders, so a path that is a suffix of another cannot match it. Absent, the marker alone joins.
+wired() { # marker · the matcher the fragment declares · [the hook's resolved path]
+  [ -n "$2" ] && matchers_of "$1" "${3:+{CLAUDE_PROJECT_DIR\}/$3\\\"}" | grep -qxF "$2"
 }
 
-# The launcher named in a remedy string. It is PRINTED rather than run, which is exactly why it
-# must be resolved by running: a remedy line naming a launcher that cannot execute is a wrong
-# answer that looks like a right one. A host with no usable python still gets a remedy — the
-# fallback name is honest about being a guess.
-# Resolved relative to THIS SCRIPT, never to the repo being checked. `$ROOT` is the tree under
-# inspection, which in the self-test is a throwaway repo with no kits in it at all — sourcing from
-# there printed "No such file or directory" and then "resolve_python: command not found" on every
-# scratch run, and the arms downstream went green anyway.
-_CW_HERE="$(cd "$(dirname "$0")" && pwd)"
-if [ -f "$_CW_HERE/lib/resolve-python.sh" ]; then
-  . "$_CW_HERE/lib/resolve-python.sh"
-  PY=$(resolve_python) || PY=python3   # gov:literal-python — a NAME for a remedy string; nothing here is executed
-else
-  PY=python3   # gov:literal-python — printed in a remedy string, never executed; the resolver is not installed beside this script
+# THE LAUNCHER, resolved by RUNNING each candidate — the block below is the canonical resolver,
+# inline because the shared copy ships to no adopter. It named a remedy string only, until the
+# round-1 fold made settings-merge.py the one reader of an adopter-owned hook: `resolve_owned_hook`
+# above RUNS it now, so a name that cannot execute refuses every owned hook, never a stale hint.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+PY=$(resolve_python 2>/dev/null) || PY=python3   # gov:literal-python — a NAME a remedy prints when no launcher runs; the owned-hook call then refuses by name
+
+# The merger every remedy names, resolved ONCE across both install layouts. Four arms used to
+# resolve it each; one spelling is one fewer carried literal per arm that names it.
+# DERIVED, and NEVER EMPTY. This file sits directly under the tool root, so its own KIT_REL IS that
+# root. The remedies below used to fall back to the merger under a literal `tools/` prefix, which names
+# nothing at any install prefix but gov's own — an operator at `scripts/gov/` was handed a command
+# that cannot start, and TOOL-cMendedVintage-3 made a root install REACH that line for the first
+# time. With the fallback derived, every tail collapses to the bare variable and the literal is
+# deleted rather than repathed, which is what removes the class instead of moving it.
+# Resolved HERE, above the print verb, since the round-1 fold: `resolve_owned_hook` calls it.
+SMERGE_DEFAULT="${KIT_REL:+$KIT_REL/}settings-merge.py"
+SMERGE=$(first_of "$(resolve_receipt_path "" settings-merge.py)" "$SMERGE_DEFAULT" settings-merge.py); SMERGE=${SMERGE:-$SMERGE_DEFAULT}
+
+# The print verb answers and leaves BEFORE the settings resolver and the arms run: it is a reader
+# of one fragment, and its output is compared byte-for-byte against settings-merge.py's.
+if [ "$MODE" = resolve ]; then
+  resolve_fragment_hook "$FRAG_ARG"; exit $?
 fi
 
 # TOOL-aWeldedTribunal-7 — WHICH HOOK WILL ACTUALLY RUN. `core.hooksPath` is repo-global and
 # absolute, so in a multi-worktree layout the hooks that gate a commit and a push come from whatever
 # the PRIMARY tree has checked out, NOT from the tree being worked in. Measured at
-# `TOOL-dUnstalledConvoy-26`'s landing: the primary tree sat on `contrib/incms-memory-recall`, so the
+# `TOOL-dUnstalledConvoy-26`'s landing: the primary tree sat on adopter ic's recall contrib branch, so the
 # push ran that branch's `pre-push` — no gate-env sourcing, no predicate 8, and the boundary's own
 # coverage check simply absent. Nothing wrong shipped, because a separate full bar had verified the
 # pushed tree; the BOUNDARY was not the one that shipped.
@@ -394,16 +469,6 @@ rm -f "$_sj_err"
 # value found rather than reported as a generic miss — an operator who is told "unwired" about a
 # hook that is plainly in the file will conclude the checker is broken.
 AGENTCAP_MATCHER='Workflow|Agent'
-# The merger every remedy names, resolved ONCE across both install layouts. Four arms used to
-# resolve it each; one spelling is one fewer carried literal per arm that names it.
-# DERIVED, and NEVER EMPTY. This file sits directly under the tool root, so its own KIT_REL IS that
-# root. The remedies below used to fall back to the merger under a literal `tools/` prefix, which names
-# nothing at any install prefix but gov's own — an operator at `scripts/gov/` was handed a command
-# that cannot start, and TOOL-cMendedVintage-3 made a root install REACH that line for the first
-# time. With the fallback derived, every tail collapses to the bare variable and the literal is
-# deleted rather than repathed, which is what removes the class instead of moving it.
-SMERGE_DEFAULT="${KIT_REL:+$KIT_REL/}settings-merge.py"
-SMERGE=$(first_of "$(resolve_receipt_path "" settings-merge.py)" "$SMERGE_DEFAULT" settings-merge.py); SMERGE=${SMERGE:-$SMERGE_DEFAULT}
 check_agentcap() {
   local smerge found shipped; smerge=$SMERGE
   # THE ADOPTION TEST PROBES FOR THE HOOK, IT DOES NOT NAME ONE COPY. This used to key on
@@ -501,7 +566,12 @@ check_scratch_guard() {
   fi
   smerge=$SMERGE
   marker=$(json_str "$frag" marker)
-  hookjs=$(resolve_fragment_hook "$frag" 2>/dev/null)
+  # A REFUSED owned-hook join is UNWIRED naming its reason, never a blank path read as a bad fragment.
+  if ! hookjs=$(resolve_fragment_hook "$frag" 2>&1); then
+    echo "UNWIRED  scratch   — ${hookjs##*check-wiring: }"
+    unwired=$((unwired+1))
+    return
+  fi
   smatcher=$(json_str "$frag" matcher)
   if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$smatcher" ]; then
     echo "UNWIRED  scratch   — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
@@ -517,8 +587,13 @@ check_scratch_guard() {
     fi
     return
   fi
-  if wired "$marker" "$smatcher"; then
+  if wired "$marker" "$smatcher" "$hookjs"; then
     echo "ok       scratch   — PreToolUse guard wired in $(render_settings_path) (matcher '$smatcher')"
+    return
+  fi
+  if wired "$marker" "$smatcher"; then
+    echo "UNWIRED  scratch   — settings.json dispatches a guard under '$smatcher', but not the resolved copy $hookjs. Fix: $PY $smerge --fragment $frag"
+    unwired=$((unwired+1))
     return
   fi
   # Name the value FOUND rather than reporting a generic miss: an operator told "unwired" about a
@@ -552,7 +627,12 @@ check_recall_opened() {
   fi
   smerge=$SMERGE
   marker=$(json_str "$frag" marker)
-  hookjs=$(resolve_fragment_hook "$frag" 2>/dev/null)
+  # A REFUSED owned-hook join is UNWIRED naming its reason, never a blank path read as a bad fragment.
+  if ! hookjs=$(resolve_fragment_hook "$frag" 2>&1); then
+    echo "UNWIRED  recall    — ${hookjs##*check-wiring: }"
+    unwired=$((unwired+1))
+    return
+  fi
   # The MATCHER comes from the fragment too, so this arm still asserts nothing the shipped kit does
   # not itself declare — the same rule the marker already followed, applied to the half that decides
   # whether the hook fires at all.
@@ -571,8 +651,14 @@ check_recall_opened() {
     fi
     return
   fi
-  if wired "$marker" "$rmatcher"; then
-    echo "ok       recall    — recall-opened PostToolUse hook wired in $(render_settings_path)"
+  # THE PATH IS GRADED, not the marker alone (the round-1 fold, I1): gov's copy beside the kit and a
+  # target's own copy elsewhere share the marker AND the basename, so only the path in the command
+  # says which one runs. An entry running another copy is named, with both ways to reconcile it.
+  if wired "$marker" "$rmatcher" "$hookjs"; then
+    echo "ok       recall    — recall-opened PostToolUse hook wired in $(render_settings_path) at $hookjs"
+  elif wired "$marker" "$rmatcher"; then
+    echo "UNWIRED  recall    — settings.json runs a recall-opened hook, but not the resolved copy $hookjs; the copy it runs is graded by nothing. Fix: declare that copy [[own]] in .governance/deploy.toml and run govkit adopt --re-adopt --write, or rewire with $PY $smerge --fragment $frag"
+    unwired=$((unwired+1))
   else
     echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY $smerge --fragment $frag"
     unwired=$((unwired+1))
@@ -608,7 +694,11 @@ check_card() {
     fi
     nfound=$((nfound+1))
     marker=$(json_str "$frag" marker)
-    hooksh=$(resolve_fragment_hook "$frag" 2>/dev/null)
+    if ! hooksh=$(resolve_fragment_hook "$frag" 2>&1); then
+      echo "UNWIRED  card      — ${hooksh##*check-wiring: }"
+      unwired=$((unwired+1))
+      return
+    fi
     cmatcher=$(json_str "$frag" matcher)
     if [ -z "$marker" ] || [ -z "$hooksh" ] || [ -z "$cmatcher" ]; then
       echo "UNWIRED  card      — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
@@ -616,7 +706,7 @@ check_card() {
       return
     fi
     if [ ! -f "$hooksh" ]; then
-      if wired "$marker" "$cmatcher" "$(basename "$hooksh")"; then
+      if matchers_of "$marker" "$(basename "$hooksh")" | grep -qxF "$cmatcher"; then
         echo "UNWIRED  card      — settings.json dispatches $marker but $hooksh is missing; every session start runs bash against nothing. Fix: re-copy the kickoff-manifest kit beside $frag"
         unwired=$((unwired+1))
       else
@@ -624,8 +714,13 @@ check_card() {
       fi
       return
     fi
-    if wired "$marker" "$cmatcher" "$(basename "$hooksh")"; then
+    if wired "$marker" "$cmatcher" "$hooksh"; then
       nok=$((nok+1)); line="$line${line:+, }$marker at '$cmatcher'"
+      continue
+    fi
+    if matchers_of "$marker" "$(basename "$hooksh")" | grep -qxF "$cmatcher"; then
+      echo "UNWIRED  card      — the $name entry ($marker) is wired under '$cmatcher', but not at the resolved $hooksh. Fix: $PY $SMERGE --fragment $frag"
+      unwired=$((unwired+1))
       continue
     fi
     # Name the value FOUND rather than a generic miss, and the matcher EXPECTED beside it: the

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.13
+gov:kit drift-audit@1.15
 
     python <kit>/selftest.py
 
@@ -125,6 +125,10 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
         'INLINE=value   # a trailing comment bash does not put in the value\n'
         'QUOTED_NOTE="noted"  # a note after a quoted value\n'
         "SINGLE_NOTE='single' # a note after a single-quoted value\n"
+        # TOOL-aRepatriatedFork-38 rev-3 (C4): whitespace after `=` ends the assignment, so this is
+        # empty, never the word `#`; a `#` opening the word is data.
+        'BLANKED=   # blank on purpose\n'
+        'HASHED=#x\n'
     )
     p = tmp / ".memory-tree.conf"
     p.write_text(body, encoding="utf-8", newline="\n")
@@ -140,7 +144,7 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
     # TOOL-dLoggedFlight-13 R2-L5 — QUOTED_NOTE and SINGLE_NOTE: a quoted value followed by a comment
     # kept its quotes, because the parser told quoted from unquoted by the value's last character.
     for key in ("MEMORY_ROOT", "DISCIPLINES", "QUOTED_SINGLE", "TRAILING",
-                "EXPORTED", "INLINE", "QUOTED_NOTE", "SINGLE_NOTE"):
+                "EXPORTED", "INLINE", "QUOTED_NOTE", "SINGLE_NOTE", "BLANKED", "HASHED"):
         res = run([sh, "-c", f'set -a; . ./.memory-tree.conf; printf "%s" "${key}"'], tmp)
         if res.returncode != 0:
             check(f"{sh} could source the conf for {key}", False, res.stderr.strip()[:120])

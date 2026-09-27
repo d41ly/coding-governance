@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.95 -->
+<!-- gov:kit memory-tree@2.99 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -401,8 +401,10 @@ carry it too:
 - Ids resolve against the set DEFINED BY A SPEC H1 — never against a build README's `ids:` roster,
   which is a reservation range that admits backlog and decision rows as if they were units.
 - The `none` form's REASON is mandatory; a bare `none` is malformed. The kind is optional there and
-  required otherwise, because an unbound record names no ids for a kind to describe. The count of
-  `none` records is bounded shrink-only by `RECORD_UNBOUND_PIN`, measured against YOUR corpus.
+  required otherwise, because an unbound record names no ids for a kind to describe. The GRADED
+  count of `none` records — those `RECORD_SERVES_CUTOFF` and `legacy-files.txt` leave — is bounded
+  shrink-only by `RECORD_UNBOUND_PIN`, measured against YOUR corpus. Check 21 prints that count
+  beside `N` on every run, and a pin above it is slack, which reds.
 - `gen_build_index.py --print-bindings` is the read-only report: it classifies every record, writes
   nothing, and always exits 0. It is both the migration checklist and the gate's own predicate, so a
   seed list and a gate that disagree is structurally impossible.

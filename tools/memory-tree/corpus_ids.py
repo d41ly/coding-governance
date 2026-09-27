@@ -853,6 +853,8 @@ def cmd_selftest() -> int:
             ("Q=\"a # b\"", ("Q", "a # b")),
             ("R=\"v\"  # note", ("R", "v")),
             ("T=   # empty", ("T", "")),
+            # TOOL-aRepatriatedFork-38 rev-3 (C4): a `#` OPENING the word is data, as bash reads it.
+            ("H=#x", ("H", "#x")),
             ("S=plain", ("S", "plain")),
         ]:
             arm("conf parse agrees with bash: %s" % _line, repr(_want),

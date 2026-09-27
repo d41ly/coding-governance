@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """scope.py — which census rows are OURS. The safety property the whole kit rests on.
 
-gov:kit process-monitor@0.5
+gov:kit process-monitor@0.7
 
 Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md
 
@@ -230,7 +230,17 @@ def read_roots(conf_text):
             % len(hits))
     if not hits:
         return []
-    return hits[0].split("=", 1)[1].strip().strip("\"'").split()
+    # TOOL-aRepatriatedFork-38: a quoted value ends at its matching quote, an unquoted one at a `#`
+    # beginning a word, as the shell that sources this conf reads it.
+    # rev-3 (C4): whitespace right after `=` ends the assignment; `#` begins a comment only after
+    # whitespace, so `PROCMON_ROOTS=#x` keeps `#x` and `PROCMON_ROOTS= # note` declares no root.
+    if hits[0].split("=", 1)[1][:1].isspace():
+        return []
+    v = hits[0].split("=", 1)[1].strip()
+    close = v.find(v[0], 1) if v[:1] in ("'", '"') else -1
+    if close >= 0:
+        return v[1:close].split()
+    return re.split(r"\s#", v, maxsplit=1)[0].split()
 
 
 def load_conf(root_dir):

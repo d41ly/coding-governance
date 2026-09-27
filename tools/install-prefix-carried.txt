@@ -27,7 +27,7 @@ tools/check-placeholders.sh	2	(loose)
 tools/check-placeholders.test.sh	1	(loose)
 tools/check-testsuite-counts.sh	4	(loose),lib	the counts gate names the harness a suite may source, `tools/lib/lib-selftest.sh`, because the second accepted spelling is defined by that path. TOOL-aQuenchedHarness-6.
 tools/check-testsuite-counts.test.sh	3	(loose),lib	its arms build fixtures that source the harness by path, which is what the new spelling requires them to grade. TOOL-aQuenchedHarness-6.
-tools/check-wiring.sh	1	lib
+tools/check-wiring.sh	2	lib	RAISED 1 -> 2 BY HAND, TOOL-aRepatriatedFork-36 rev-3: the second is the `# >>> resolve_python — canonical copy` marker of the resolver block this file now carries INLINE, because it RUNS settings-merge.py for an adopter-owned hook and the shared copy ships to no adopter. The marker is part of the byte-compared block, so the literal cannot be derived away; the same `lib` literal every inline copy carries.
 tools/check-wiring.test.sh	5	(loose),lib,memory-tree
 tools/codebase-map/adopt-codebase-map.sh	3	lib
 tools/codebase-map/adopt-codebase-map.test.sh	3	codebase-map,lib

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Does .githooks/pre-push refuse a merge bar it cannot vouch for? TOOL-aRepatriatedFork-5.
 
-Ported from NicoCares' `scripts/pre_push_bar_selftest.py` (PKG-dCandidLodestar-5), which carried
+Ported from adopter nc's `scripts/pre_push_bar_selftest.py` (PKG-dCandidLodestar-5), which carried
 the guard this hook now ships. Its cases and its three-arm mutation are kept; the port renames its
 functions to this repository's verb table, names every text encoding, and reads the run-log `bar`
 key the hook's END line gained here.

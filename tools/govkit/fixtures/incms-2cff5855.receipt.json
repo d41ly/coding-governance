@@ -920,12 +920,12 @@
   }
  ],
  "gov_commit": "ce5dca99",
- "gov_source": "(reconstructed \u2014 see make_incms_receipt.py)",
+ "gov_source": "(reconstructed \u2014 see make_adopter_receipt.py)",
  "provenance": {
   "adopter": "inCMS",
   "adopter_record": ".governance/install.index",
   "adopter_rev": "2cff5855",
-  "generated_by": "tools/govkit/fixtures/make_incms_receipt.py",
+  "generated_by": "tools/govkit/fixtures/make_adopter_receipt.py",
   "gov_rev": "ce5dca99",
   "index_rows": 92,
   "unresolved": [

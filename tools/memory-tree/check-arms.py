@@ -49,7 +49,7 @@ added one, and it goes slack by a whole gate's branch count the day a third gate
 gets quieter as the population grows.
 
 AND THEY ARE REQUIRED, once a single gate is discovered (TOOL-aRepatriatedFork-9, ported from
-NicoCares). `ARMS_FLOORS` defaulted to the empty string, so a tree that never declared it had both
+adopter nc). `ARMS_FLOORS` defaulted to the empty string, so a tree that never declared it had both
 floor arms iterating an EMPTY mapping and neither could ever fire — a guard whose population is
 supplied by a key nobody set, which is the could-not-fail shape this file exists to detect, one level
 up. `--check` refuses an empty or undeclared value while any gate is discovered, and `--emit-floors`

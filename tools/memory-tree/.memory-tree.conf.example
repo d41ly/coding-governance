@@ -219,7 +219,7 @@ BUILD_README_ENTRY_CAP_CHARS="350"  # a build README, whose authored rows were m
 # other project's discipline reports green over rows nobody reconciled.
 # THIS REPO DECLARES cut. The shipped example declares snapshot — the deliberate example/gov
 # divergence READINESS_ROWS above already records — because snapshot is what this kit's prose has
-# always described and what inCMS practises (its scripts/rotate_index.py R1-R6 and carry_backlog.py).
+# always described and what adopter ic practises (its scripts/rotate_index.py R1-R6 and carry_backlog.py).
 # MEASURED, and the reason the key exists: memory/HYGIENE.md stated BOTH procedures in one paragraph
 # — move the whole file AND carry every non-terminal row forward — and the pair writes every live row
 # into a frozen file. memory/archive/TOOL.2026-08-17.md is what that produced: a header promising
@@ -305,7 +305,8 @@ BUILD_SLUG_RE=""
 PROJECT_REGISTRY_EXTRA=""
 
 # RECORD_SERVES_CUTOFF — an ISO date. Records whose filename date falls BEFORE it are exempt from
-# check 21's "every record names the spec it is evidence about". For a tree adopting this kit
+# EVERY branch of check 21: the Serves line, the ids it names, the filename's id and the unbound
+# pin (TOOL-aRepatriatedFork-32). For a tree adopting this kit
 # mid-life with landed records that predate the grammar. A record whose name carries no parseable
 # date is KEPT: unparseable is not the same answer as old, and only one of them is an exemption.
 # A cutoff dated after today is REFUSED — it would exempt every record and report a clean run.

@@ -189,7 +189,7 @@ def main(argv: list[str]) -> int:
     # A FLAG IS NOT A PATH, and the guard here used to be an ARITY check alone.
     # `scaffold_lexicon.py --help` is a well-formed one-argument call, so `--help` became the
     # DESTINATION: this script derived a whole seed and wrote it to a file literally named
-    # `--help`. Measured on a real adopter (incms/main, 2026-08-23), where that file was
+    # `--help`. Measured on a real adopter (adopter ic's main, 2026-08-23), where that file was
     # committed, pushed, and then survived every leg of a 62-leg bar. Nothing downstream can
     # see it -- `adopt-lexicon.sh --check` looks for `.lexicon.conf` BY NAME, so a stray sibling
     # is invisible to it -- and a file whose name is a flag breaks every unquoted glob in its

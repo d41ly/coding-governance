@@ -79,7 +79,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.21' // gov:kit agent-cap@1.21 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.22' // gov:kit agent-cap@1.22 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -703,7 +703,7 @@ function renderLexedView(script) {
   // opens and restored when it closes. One scalar zeroed on every `${` lost the outer depth, so in
   // `${ f({ k: `b ${ x } c` }) + fan }` the object's own `}` closed the OUTER interpolation and the
   // fan-out after it left the view: measured admitted at exit 0 by a7c78ad2, through a sanctioned
-  // helper the raw-text rule has no reason to fire on. inCMS's D1, absorbed.
+  // helper the raw-text rule has no reason to fire on. adopter ic's D1, absorbed.
   const interpDepths = []
   for (const raw of script.split(/\r?\n/)) {
     let res = ''

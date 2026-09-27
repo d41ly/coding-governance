@@ -278,6 +278,8 @@ def expand_rules(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> list[di
         # landed and recorded, so this defers to it — and their pool already excludes a source whose
         # DESTINATION another rule claims, which is the same protection this function's carve-out
         # provides and measurably reaches further.
+        if derive_opted_out(rule, ctx):
+            continue      # neither its sources nor a source-less destination: the target declined
         for src in resolve_rule_pool(root, desc, rule, ctx, home):
             for dest, miss in resolve_dests(desc, rule, src, ctx, home):
                 out.append({"rule": i, "src": src, "dest": dest, "role": role, "miss": miss})
@@ -334,8 +336,33 @@ def resolve_entry(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> dict:
 
 
 def canonical_ctx(eid: str) -> dict[str, str]:
-    """A ctx for reasoning about a descriptor with no target in hand — `selfcheck`'s only need."""
-    return {"prefix": "tools", "kit_id": eid, "kit": f"tools/{eid}", "memory_root": "memory"}
+    """A ctx for reasoning about a descriptor with no target in hand — `selfcheck`'s only need.
+
+    EVERY OPT-IN COUNTS AS TAKEN here: this ctx answers what gov CAN ship, so the shipped surface,
+    the version epoch and every ban graded over it keep reading a file only some targets choose."""
+    return {"prefix": "tools", "kit_id": eid, "kit": f"tools/{eid}", "memory_root": "memory",
+            OPT_IN_ALL: "yes"}
+
+
+#: The canonical ctx's marker that every `opt_in` rule lands. Reserved: `target_context` refuses a
+#: target that spells it, because it would take every opt-in of that kit without naming one.
+OPT_IN_ALL = "opt_in_all"
+
+
+def derive_opted_out(rule: dict, ctx: dict[str, str]) -> bool:
+    """TOOL-aRepatriatedFork-36 rev-3 (the round-1 fold, I4). A file rule declaring `opt_in = "<key>"`
+    lands only where the target's `[kit.<eid>]` table sets that key to "yes".
+
+    Kit SELECTION could not say it: selection is per entry, and the one file that must wait for an
+    ask ships inside a kit every adopter takes. `recall-opened.js` promised "no `--with-hook`, no
+    file", and the `**` engine rule shipped it to every adopter; one that declined then read UNWIRED
+    on its own bar for a supported end state. ONE predicate, read by `expand_rules` and
+    `resolve_rule_pool`, so plan, apply, update and check agree about the file, and a rule whose
+    target declined contributes nothing — not even the source-less destination row."""
+    key = rule.get("opt_in")
+    if not key:
+        return False
+    return ctx.get(str(key)) != "yes" and ctx.get(OPT_IN_ALL) != "yes"
 
 
 def entry_version(root: pathlib.Path, desc: dict) -> str:
@@ -1027,6 +1054,10 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
         if isinstance(v, str):
             ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
     for k, v in per_kit.items():
+        if k == OPT_IN_ALL:
+            raise Refusal(f"the target descriptor supplies 'kit.{eid}.{k}', which is reserved: it would "
+                          f"take every opt-in of that entry without naming one. Set each rule's own "
+                          f"`opt_in` key instead")
         if isinstance(v, str) and k not in PER_KIT_PATH_TOKENS:
             ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'", prose=True)
     ctx.setdefault("memory_root", "memory")
@@ -1464,6 +1495,23 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                            f"its own claims ({', '.join(sorted(claims))}) — one rule spelling one "
                            f"destination two ways, which is the shape that landed a bare basename "
                            f"at a target root while the claims named the real path")
+
+    # ---- 4c: an `opt_in` names ONE key a target can set in its `[kit.<eid>]` table, on a rule
+    #          that lands. TOOL-aRepatriatedFork-36 rev-3. A value that is not an identifier would
+    #          never match anything a target writes, so its files would ship to nobody, silently;
+    #          on a role that never lands it would claim a choice the target cannot make.
+    for eid, (d, _dpath) in descs.items():
+        for rule in d.get("files", []):
+            if "opt_in" not in rule:
+                continue
+            _oi = rule.get("opt_in")
+            if not (isinstance(_oi, str) and re.fullmatch(r"[a-z][a-z0-9_]*", _oi)) \
+                    or _oi in SEEDED_TOKENS or _oi == OPT_IN_ALL:
+                r.fail(f"entry '{eid}' declares opt_in {_oi!r}, which is not a key a target can "
+                       f"set in its [kit.{eid}] table")
+            elif rule.get("role", "engine") not in LANDABLE_ROLES:
+                r.fail(f"entry '{eid}' declares opt_in {_oi!r} on a '{rule.get('role')}' rule, which "
+                       f"never lands, so the target's choice would change nothing")
 
     # ---- 5: version_from resolves to EXACTLY one line, or declares an explicit `none` with a reason.
     for eid, (d, _dpath) in descs.items():
@@ -2662,6 +2710,52 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                f"operator named. Grade it with `demand_contained_dest` before the join, or resolve "
                f"and compare against the target root before the write")
     r.note(f"root-join writes on receipt-supplied values: {len(_escapes)} ungraded")
+
+    # ---- 10: TOOL-aRepatriatedFork-31. NO SHIPPED FILE NAMES AN ADOPTER. An adopter's brand gate
+    #          reds on another adopter's name, and gov's provenance comments carried one into it. The
+    #          names are `adopters.toml`'s `[[adopter]]` rows, never a literal here, so a new adopter
+    #          is banned the day it registers. Not `registry.toml`: the playbook renderer ships that
+    #          file, so a name declared there would reach every adopter. The population is
+    #          `cmd_shipped`'s, every role included: an adopter receives a `project-owned` seed as
+    #          surely as an engine. A PURE BAN: TOOL-aRepatriatedFork-35 drained the last carried
+    #          sites and retired the carry table, so a row still declaring one is refused rather
+    #          than silently ignored.
+    #          DOES NOT CHECK: gov's own records, the deployer, or any file no descriptor ships; a
+    #          name spelled across a line break; a brand no row declares.
+    _adopters = load_toml(root / "tools" / "govkit" / "adopters.toml").get("adopter", [])
+    _akey: dict[str, str] = {}
+    for _a in _adopters:
+        _ns = [str(x).strip() for x in (_a.get("names") or []) if str(x).strip()]
+        if not _ns:
+            r.fail(f"an adopters.toml row declares no names, so the ban scans for nothing: {_a!r}")
+        if "carried" in _a:
+            r.fail(f"adopters.toml row {_ns} declares `carried`, which the ban no longer reads — "
+                   f"drain the sites and delete the table (TOOL-aRepatriatedFork-35)")
+        for _nm in _ns:
+            _akey[_nm] = f"adopter {_a['key']}" if _a.get("key") else "an adopter"
+    _anames = list(_akey)
+    if not _anames:
+        r.fail("adopters.toml declares no [[adopter]] names — the adopter-name ban would pass "
+               "over every shipped file while grading nothing")
+    _shipped = sorted({row["src"] for eid, (d, _p) in descs.items()
+                       for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"]
+                       if row.get("src")})
+    _measured: dict[tuple, int] = {}
+    for _src in _shipped:
+        try:
+            _low = (root / _src).read_bytes().decode("utf-8", "replace").lower()
+        except OSError:
+            continue
+        for _nm in _anames:
+            _c = _low.count(_nm.lower())
+            if _c:
+                _measured[(_src, _nm)] = _c
+    for (_src, _nm), _m in sorted(_measured.items()):
+        r.fail(f"'{_src}' names the adopter `{_nm}` {_m} time(s) — a shipped file reaches every "
+               f"adopter, and one's brand gate reds on another's name. Cite the record id and "
+               f"`{_akey[_nm]}` instead")
+    r.note(f"adopter names: {len(_anames)} from {len(_adopters)} adopters.toml row(s) over "
+           f"{len(_shipped)} shipped file(s) · {sum(_measured.values())} site(s)")
     return r.emit()
 
 
@@ -5124,6 +5218,8 @@ def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, hom
     A deployer whose preview disagrees with its action is worse than one that simply does the wrong
     thing, because the wrong thing is at least visible.
     """
+    if derive_opted_out(rule, ctx):
+        return []
     inc = rule.get("include")
     srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
     if any(s == "**" for s in srcs):
@@ -6140,6 +6236,15 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         produced_here = scan_produced_destinations(d, ctx)
         for rule in d.get("files", []):
             role = rule.get("role", "engine")
+            if derive_opted_out(rule, ctx):
+                # AN OPT-IN NOT TAKEN is a skip like the ones below, and says so with the key that
+                # takes it (TOOL-aRepatriatedFork-36 rev-3).
+                for _s in rule_sources(d, rule):
+                    for dest, _miss in resolve_dests(d, rule, _s, ctx, home):
+                        print(f"govkit apply — SKIPPED [{'opt-in':<13}] {dest} <- {eid}: the target "
+                              f"has not opted in; `[kit.{eid}] {rule['opt_in']} = \"yes\"` in "
+                              f".governance/deploy.toml lands it")
+                continue
             if role not in LANDABLE_ROLES or rule.get("scope") == "machine" or rule.get("link"):
                 # A SKIP IS AN OUTCOME, NOT HOUSEKEEPING. This used to be a bare `continue`, so a
                 # `plan` promising two playbook files was followed by `landed 0 file(s)` and exit 0
@@ -9089,11 +9194,24 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # ADOPTER's files against gov's descriptor and declared nothing new, and the
             # landing silently found zero on every run. `_cmd_apply` at its own call site
             # spells it `resolve_entry(root, ...)`, which is the line I should have copied.
-            _res0 = resolve_entry(root, _dd, target_context(target, deploy, _eid, _dd))
+            _ctx0 = target_context(target, deploy, _eid, _dd)
+            _res0 = resolve_entry(root, _dd, _ctx0)
         except Refusal:
             # A descriptor that cannot resolve for this target is ALREADY reported by the row walk
             # above; re-reporting it here would be the second answer this block exists to avoid.
             continue
+        # AN OPT-IN NOT TAKEN lands nothing new, and says so rather than going quiet
+        # (TOOL-aRepatriatedFork-36 rev-3). A destination the receipt already holds is the row
+        # walk's to report, so it is not repeated here.
+        for _rule0 in _dd.get("files", []):
+            if derive_opted_out(_rule0, _ctx0):
+                for _s0 in rule_sources(_dd, _rule0):
+                    for _dp0, _m0 in resolve_dests(_dd, _rule0, _s0, _ctx0,
+                                                   (_dd.get("home") or "").rstrip("/")):
+                        if _dp0 not in _claimed_paths:
+                            print(f"govkit update — not landed [opt-in] {_dp0} <- {_eid}: "
+                                  f"`[kit.{_eid}] {_rule0['opt_in']} = \"yes\"` in "
+                                  f".governance/deploy.toml lands it")
         for _dest, _row0 in sorted((_res0.get("writes") or {}).items()):
             if _dest in _claimed_paths or _dest in _decided:
                 continue

@@ -911,6 +911,56 @@ with build_tempdir() as td:
           r.returncode != 0, out)
     check("scaffold: and still names it unratified rather than passing", "ratified" in out, out)
 
+    # TOOL-aRepatriatedFork-38 — a TRAILING COMMENT, both readers. The shell one kept `"   # note`
+    # of `ratified=""   # note`, a NON-EMPTY value, so --check passed an unratified seed.
+    _before38 = (root / ".lexicon.conf").read_bytes()
+    noted = _before38.replace(b"\r\n", b"\n") \
+        .replace(b'ratified=""', b'ratified=""   # not yet curated')
+    # rev-3 (the closing review's C5): the edit must LAND, or the arm below reds for the plain empty
+    # key and never reaches the trailing-comment path it exists for.
+    check("scaffold: the fixture carries the trailing comment this arm is about",
+          b'ratified=""   # not yet curated' in noted, repr(noted[:200]))
+    (root / ".lexicon.conf").write_bytes(noted)
+    r = subprocess.run(r.args, cwd=root, capture_output=True, text=True, encoding="utf-8")  # the --check above
+    check("scaffold: --check reds on an unratified seed whose key carries a trailing comment",
+          r.returncode != 0 and "EMPTY `ratified` key" in r.stdout + r.stderr, r.stdout + r.stderr)
+    (root / "noted.conf").write_text('ratified="2026-09-10 node a"   # a note\n'
+                                     "expanded=2026-09-10   # a note\n", encoding="utf-8")
+    _nc = _lc.load_conf(root / "noted.conf")
+    check("load_conf: a quoted value ends at its quote and an unquoted one drops its comment",
+          (_nc.get("ratified"), _nc.get("expanded")) == ("2026-09-10 node a", "2026-09-10"),
+          repr((_nc.get("ratified"), _nc.get("expanded"))))
+    (root / "noted.conf").unlink()
+    (root / ".lexicon.conf").write_bytes(_before38)
+    # rev-3 (the closing review's C3, C4): both readers against BASH sourcing the same file, over
+    # the spellings they split on — single quotes, a `#` opening the word, a blank value.
+    (root / "spell.conf").write_text("A='a # b'\nB='a' # c\nC=#x\nD=   # note\nE=\"q\"   # n\n",
+                                     encoding="utf-8", newline="\n")
+    _fn = re.search(r"^read_conf_scalar\(\) \{.*?^\}",
+                    (root / "tools" / "lexicon" / "adopt-lexicon.sh").read_text(encoding="utf-8"),
+                    re.S | re.M)
+    check("scaffold: adopt-lexicon.sh still defines the read_conf_scalar this arm lifts", _fn is not None)
+    if _fn:
+        (root / "spell.sh").write_text(
+            _fn.group(0) + "\nCONF=spell.conf\nfor k in A B C D E; do printf '%s|' \"$(read_conf_scalar $k)\"; done\n",
+            encoding="utf-8", newline="\n")
+        # A FILE, not `bash -c`: on Windows the argv string is re-quoted on its way in and the
+        # embedded quotes do not survive, which read every reference value as empty.
+        (root / "ref.sh").write_text("set -a; . ./spell.conf; printf '%s|' \"$A\" \"$B\" \"$C\" \"$D\" \"$E\"\n",
+                                     encoding="utf-8", newline="\n")
+        _ref = subprocess.run(["bash", "ref.sh"], cwd=root, capture_output=True, text=True,
+                              encoding="utf-8").stdout
+        (root / "ref.sh").unlink()
+        _got = subprocess.run(["bash", "spell.sh"], cwd=root, capture_output=True, text=True,
+                              encoding="utf-8").stdout
+        check("read_conf_scalar reads single quotes, `K=#x` and a blank value as bash sourcing does",
+              _got == _ref == "a # b|a|#x||q|", f"sh={_got!r} bash={_ref!r}")
+        _sc = _lc.load_conf(root / "spell.conf")
+        check("load_conf reads the same spellings as bash sourcing does",
+              "".join(f"{_sc.get(k, '<unset>')}|" for k in "ABCDE") == _ref, repr(_sc))
+        (root / "spell.sh").unlink()
+    (root / "spell.conf").unlink()
+
     # ---- B3: THE SCAFFOLDED ADOPTER'S FIRST `--suggest` HAS TO WORK ---------------------------
     #
     # The seed emitted `LANGS`, `VERBS` and both scalar pins and NO `CELLS` block, while `--as
@@ -976,7 +1026,7 @@ with build_tempdir() as td:
     # A FLAG IS NOT A PATH. This script guarded its argv by ARITY alone, so
     # `scaffold_lexicon.py --help` is a well-formed one-argument call and `--help` became the
     # DESTINATION: the run derived a whole seed and wrote it to a file literally named `--help`.
-    # Measured on a real adopter (incms/main, 2026-08-23), where that file was committed and pushed
+    # Measured on a real adopter (adopter ic's main, 2026-08-23), where that file was committed and pushed
     # and then survived every leg of a 62-leg bar — nothing there enumerates root-level filenames,
     # and this kit's own `--check` looks for `.lexicon.conf` BY NAME, so a stray sibling is invisible
     # to it. The wrapper already refuses an unknown flag; the script it calls did not, and the script
