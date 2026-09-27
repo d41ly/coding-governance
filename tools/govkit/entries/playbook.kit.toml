@@ -37,6 +37,11 @@ blocks_adopt = false
 blocks_gate = false
 why = "nothing in a target observes the placeholders — no leg reads the deployed charter. The probe names the ONE file this entry ships, at {playbook_path}. History, kept because it is the reason this hole is armed at all rather than a reason to widen it back: when the charter deployed as two files, a probe naming only the main one was MEASURED going false-green while the companion sat unfilled. The second file is gone as of v3.0; a probe that names it again would be checking a path no target has."
 discharge = { command = ["bash", "-c", "! grep -qE '\\{\\{[A-Z]' \"$1\"", "--", "{playbook_path}"] }
+# In RENDER mode `{playbook_path}` is the TEMPLATE, which always carries placeholders, so this probe
+# reds forever there (measured at both adopters, 2026-09-23). The render's own `--check` reports a
+# surviving placeholder, so the hole stands down when `playbook-render` is selected. In COPY mode it
+# is the only placeholder observer and runs exactly as before. DEPL-aRepatriatedFork-1 S4.
+stands_down = { when_selected = ["playbook-render"], why = "in render mode {playbook_path} is the template, and the render's own --check reports a surviving placeholder" }
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -66,11 +71,14 @@ why = "under a strict byte gate"
 # refuses on a placeholder no row declares, so the population is derived on every run. Two revisions
 # of the spec stated a figure and both were wrong when read.
 
+# PROJECT_NAME, PRIMARY_TREE_A and WORKTREE_ROOT_A are ASKED, for MACHINE_A's reason below: their
+# probes answer from the RENDERING node, and measured 2026-09-23 they answered `vendor` and a
+# `.git/modules/vendor` path at a submodule adopter. Both adopters forked this file to say so;
+# DEPL-aRepatriatedFork-1 S2 retires that fork. An answer outranks any probe now as well (S1).
 [[placeholder]]
 key = "PROJECT_NAME"
-class = "derived"
-probe = "project_name"
-why = "the repo this charter governs"
+class = "asked"
+why = "the repo this charter governs. ASKED, not derived: the probe names the primary checkout's directory, which is a node's layout rather than the product's name — a submodule adopter derived `vendor`"
 
 [[placeholder]]
 key = "DEFAULT_BRANCH"
@@ -117,9 +125,9 @@ why = "the naming declaration's path; only reachable when the lexicon block surv
 
 [[placeholder]]
 key = "TAG_A"
-class = "derived"
-probe = "node_tag"
-why = "this node's registry tag"
+class = "defaulted"
+default = "a"
+why = "this node's registry tag. DEFAULTED, not derived: its probe returned the constant `a` at every node, so `derived` claimed a measurement nobody made (F1, RESOLVED 2026-09-23)"
 
 [[placeholder]]
 key = "MACHINE_A"
@@ -128,15 +136,13 @@ why = "this node's machine and user, which is how a node identifies itself. ASKE
 
 [[placeholder]]
 key = "PRIMARY_TREE_A"
-class = "derived"
-probe = "primary_tree"
-why = "where the default branch lives on this node"
+class = "asked"
+why = "where the default branch lives on this node. ASKED for MACHINE_A's reason: a probe answers from whichever node renders, and a submodule adopter's probe derived its `.git/modules/<name>` directory"
 
 [[placeholder]]
 key = "WORKTREE_ROOT_A"
-class = "derived"
-probe = "worktree_root"
-why = "where this node's per-unit worktrees are rooted"
+class = "asked"
+why = "where this node's per-unit worktrees are rooted. ASKED for the same reason as PRIMARY_TREE_A, from whose probe it was derived"
 
 # --- asked. The renderer refuses rather than guessing; that posture is govkit's, inherited here.
 

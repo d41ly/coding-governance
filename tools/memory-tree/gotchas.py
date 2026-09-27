@@ -6,7 +6,7 @@
     python tools/memory-tree/gotchas.py --report                # the counts the budget is measured on
     python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # STDOUT IS THE CHECKLIST
     python tools/memory-tree/gotchas.py --for-paths <path>...       # the same checklist, no diff yet
-    python tools/memory-tree/gotchas.py --declares < record.md   # rc 0 declares, 1 does not
+    python tools/memory-tree/gotchas.py --declares < record.md   # prints `declares: yes|no`; rc 0 / 1, 2 unreadable
     python tools/memory-tree/gotchas.py --selftest
 
 `--for-diff`'s STDOUT IS THE CHECKLIST. That is the point: a reviewer is handed the classes their
@@ -64,7 +64,7 @@ class Problem(Exception):
 
 
 def run(*argv, cwd=None):
-    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, check=True).stdout
+    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=True).stdout
 
 
 def read(path) -> str:
@@ -82,11 +82,10 @@ def write(path, text):
 
 # TOOL-aWeldedTribunal-5 -- ONE `.memory-tree.conf` parser for the whole kit. Six readers held an
 # identical naive body while the shell gate SOURCES the same file, so a legal spelling bash accepts
-# and the python half mis-read REMOVED coverage with the gate still green. `row_grammar.py` already
-# used this sys.path pattern to reach a sibling; the edges are new and are priced in the unit's
-# section 4, against a backlog row that claimed reuse here was free.
+# and the python half mis-read REMOVED coverage with the gate still green. TOOL-aRepatriatedFork-9
+# moved it into `tree_lib.py`, so this engine no longer needs a sibling ENGINE to import.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from corpus_ids import parse_conf  # noqa: E402  the kit's ONE conf parser
+from tree_lib import kit_rel, parse_conf  # noqa: E402  the kit's ONE conf parser
 
 def load_conf(root: str) -> dict:
     conf = {"MEMORY_ROOT": "memory", "UNIVERSAL_BUDGET": ""}
@@ -223,8 +222,9 @@ def render(recs: list, m: str) -> str:
         "Hand a reviewer the classes their diff can hit:",
         "",
         "```bash",
-        "python tools/memory-tree/gotchas.py --for-diff <base>..<head>",
-        "python tools/memory-tree/gotchas.py --for-paths <path>...",
+        # THIS install's path, derived, because INDEX.md is committed in the adopter's tree (S5).
+        f"python {kit_rel()}/gotchas.py --for-diff <base>..<head>",
+        f"python {kit_rel()}/gotchas.py --for-paths <path>...",
         "```",
         "",
         BEGIN,
@@ -518,12 +518,12 @@ def cmd_selftest() -> int:
         # written that way was silently unanchored. Here the tail may be empty, the directory token
         # IS harvested, and it selects everything beneath it. The arm pins the DIFFERENCE, so a
         # future tightening of the pattern reintroduces the upstream defect loudly.
-        d2 = ANCHOR_RE.findall("a directory `tools/memory-tree/` reference\n")
+        d2 = ANCHOR_RE.findall("a directory `tools/memory-tree/` reference\n")  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
         arm("harvest defect 2 does NOT apply here: a trailing slash harvests the directory", "[rc=0]",
-            lambda: 0 if d2 == ["tools/memory-tree/"] else 1)
+            lambda: 0 if d2 == ["tools/memory-tree/"] else 1)  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
         arm("...and that directory anchor selects everything beneath it", "[rc=0]",
-            lambda: 0 if selectable("tools/memory-tree/", ["tools/memory-tree/gotchas.py"], "memory")
-            == {"tools/memory-tree/gotchas.py"} else 1)
+            lambda: 0 if selectable("tools/memory-tree/", ["tools/memory-tree/gotchas.py"], "memory")  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            == {"tools/memory-tree/gotchas.py"} else 1)  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
         paths = ["tools/some-gate.sh", "deep/nested/some-gate.sh", "memory/README.md"]
         sel = selectable("some-gate.sh", paths, "memory")
         arm("harvest defect 3: a basename selects tree-wide", "[rc=0]",
@@ -612,7 +612,18 @@ def main(argv: list) -> int:
     if mode == "--selftest":
         return cmd_selftest()
     if mode == "--declares":
-        return 0 if declares(sys.stdin.read()) else 1
+        # rc ALONE cannot carry the verdict: an uncaught exception also exits 1 and would read as
+        # "this record names no gate". So the verdict is PRINTED as a completion probe, and a
+        # consumer refuses a run that did not print one. The record is read as BYTES decoded UTF-8,
+        # never through the locale's text stdin.
+        try:
+            text = sys.stdin.buffer.read().decode("utf-8", "replace")
+        except OSError as exc:
+            print(f"gotchas --declares: could not read the record on stdin: {exc}", file=sys.stderr)
+            return 2
+        verdict = declares(text)
+        print(f"declares: {'yes' if verdict else 'no'}")
+        return 0 if verdict else 1
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
     except Exception:  # noqa: BLE001

@@ -8,7 +8,7 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded"]
+gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded", "unattended protocol size"]
 kits = ["unattended"]
 git-hooks = []
 workflow-scripts = ["unattended-build.js", "unattended-unit.js"]
@@ -141,11 +141,11 @@ never a DoD item and never a gate.
 
 **Every remote observation is BOUNDED, and the bound is a file constant.** The kit makes remote
 round-trips on the authorization path — the default-branch HEAD advertisement, the per-branch tip
-under the published anchor, and the leg's own two — and until 2026-08-20 not one of them had a
-deadline. A partitioned endpoint therefore turned `--close` into an indefinite silent wait, and the
+under the published anchor, and the leg's own two — and until 2026-08-20 none had a
+deadline. A partitioned endpoint therefore turned `--close` into a silent wait, and the
 same calls inside the leg turned a `git push` into a HUNG push rather than a red one, because the leg
 runs under `.githooks/pre-push`. The tracked incident is a driver selftest that produced zero output
-at 240 s and wedged the whole bar.
+at 240 s and wedged the bar.
 
 Three bounds, because no single mechanism covers every transport: an outer wall clock for blackholed
 packets, `http.lowSpeed{Limit,Time}` for a server that ACCEPTS and then stalls — which no wall clock
@@ -219,9 +219,9 @@ as a note.
   reused verbatim.
 - `tools/drift-audit/drift_report.py` — the judgeability discipline, reused for witness RESOLUTION,
   not for witness PRESENCE (its own refusal here).
-- `tools/settings-merge.py --fragment` + `tools/check-hook-destinations.sh` — wire `gate-guard.js`,
-  this kit's `PreToolUse` hook denying the flagged bar and every suite before `VERIFYING`, keyed to
-  the branch by `run-branch:`. Its `buildCommandView` is COPIED from `tools/hooks/scratch-guard.js`:
+- `tools/settings-merge.py --fragment` + `tools/check-hook-destinations.sh` — wire `gate-guard.js`
+  (govkit wires each landed fragment, `TOOL-aRepatriatedFork-11`), the hook denying the flagged bar
+  and every suite before `VERIFYING`. Its `buildCommandView` is COPIED from `tools/hooks/scratch-guard.js`:
   a `require` of a sibling kit is a literal the install-prefix ban refuses (`TOOL-aDeferredBar-3`).
 
 ## Reuse affordance

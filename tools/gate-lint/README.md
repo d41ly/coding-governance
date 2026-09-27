@@ -80,6 +80,28 @@ with no carried sites needs no file at all, and an empty file says the same thin
 No count is written here or in the registry. The scanner derives the site and row totals and prints
 both on every run, green included; a number typed beside them would be wrong on the next commit.
 
+## encoding_posture.py
+
+```bash
+python3 <tool-root>/gate-lint/encoding_posture.py [registry-path] [root] [pathspec ...]   # exit 0 clean, 1 findings, 2 refusal
+python3 <tool-root>/gate-lint/encoding_posture.py --selftest
+```
+
+Scans **every tracked** `*.py` under the root, narrowed by any pathspecs, for text IO that names no
+encoding: `open` / `.read_text` / `.write_text` / a provably-Path `.open` in text mode, and
+`subprocess.*` with `text=True` or `universal_newlines=True`, each with no `encoding=`. Such a call
+decodes with the platform default — cp1251 or cp1252 on a Windows node, UTF-8 in CI — so it
+crashes on one machine and passes on the other, and a session or hook running the script directly
+never sees the runner's environment. It reads the AST, because a line grep cannot see a call split
+across continuation lines. Its header states what it does NOT check.
+
+The registry is the shell scanner's shape keyed on the ARM instead of the delimiter:
+`<path>\t<arm>\t<count>\t<why it is carried>`, where the arm is `file-io` or `subprocess`. Same
+optional argument, same both-directions set equality, same refusal of a supplied path that does
+not resolve. The clean line prints the graded file count, and a run over an empty population exits
+1 rather than reading as coverage. No leg ships for it: wiring it, and seeding a registry, is the
+consuming project's choice.
+
 ## Wiring it into a host project
 
 Add it as a gate leg wherever that project enumerates them, e.g. an entry in a leg manifest, a CI

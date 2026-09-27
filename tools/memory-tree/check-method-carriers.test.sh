@@ -6,9 +6,25 @@
 # Every arm runs against a SCRATCH repo, never this tree: the leg reads `git ls-files`, so a fixture
 # built in place would either see gov's real population or need this repo mutated to fail. The green
 # control comes FIRST — a leg that reds on everything arms every branch and checks nothing.
-KIT_REL="${KIT_REL:-tools/memory-tree}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-18 S2). It ships beside its gate, so a
+# spelled default resolved only at gov's prefix and nothing ever set it (TOOL-dRetiredFork-39). The
+# block is byte-identical to the canonical copy named on its marker line, gated by the parity table
+# in the resolve-python self-test.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
 LEG="$HERE/check-method-carriers.sh"
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
@@ -17,8 +33,8 @@ hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
 
 seed() { # dir -> a git repo with the kit, a conf, a memory tree and ONE declared carrier
-  rm -rf "$1"; mkdir -p "$1/tools/memory-tree" "$1/memory/project" "$1/memory/guides"
-  cp "$LEG" "$1/tools/memory-tree/"
+  rm -rf "$1"; mkdir -p "$1/$KIT_REL" "$1/memory/project" "$1/memory/guides"
+  cp "$LEG" "$1/$KIT_REL/"
   ( cd "$1" && git init -q -b main . && git config user.email t@t.test && git config user.name t )
   printf 'MEMORY_ROOT=memory\n' > "$1/.memory-tree.conf"
   printf '# the method\n' > "$1/memory/guides/BUILD-METHOD.md"
@@ -90,7 +106,7 @@ hit "$out" "a carrier holds a '## M<n>' heading, the method's own section gramma
 # ---- The exclusions are real, not decorative: a *.test.sh mentioning the method must NOT red, or
 # ---- this very file would red the leg it tests. Same for the memory tree's own records.
 seed "$R"
-printf 'fixture mentioning memory/guides/BUILD-METHOD.md on purpose\n' > "$R/tools/memory-tree/some.test.sh"
+printf 'fixture mentioning memory/guides/BUILD-METHOD.md on purpose\n' > "$R/$KIT_REL/some.test.sh"
 printf 'a spec discussing memory/guides/BUILD-METHOD.md at length\n' > "$R/memory/builds-note.md"
 ( cd "$R" && git add -A >/dev/null 2>&1 )
 out=$(run "$R"); rc=$?

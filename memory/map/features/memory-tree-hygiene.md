@@ -1,4 +1,4 @@
-# memory-tree hygiene engine — the numbered gate over the memory tree
+# memory-tree hygiene engine — the gate over the memory tree
 
 ```toml
 feature = "memory-tree-hygiene"
@@ -90,7 +90,7 @@ Check 6 is the part that moves most, so it is the part worth writing down.
 
 | class | byte bound | line bound |
 |---|---|---|
-| `guides/*.md` | 60 KB (hardcoded) | 750 |
+| `guides/*.md` | `GUIDE_CAP_BYTES`, 96 KB (98304) by default | `GUIDE_CAP_LINES`, 1200 by default |
 | `builds/*/README.md` | 25 KB (hardcoded) | none |
 | `<MAP_ROOT>/features/*.md` | `DOSSIER_CAP_BYTES` | none |
 | every other row document | `ROW_DOC_CAP_BYTES` | none |

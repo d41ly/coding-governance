@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 118 · kits: 17 · git-hooks: 6 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 87 · guides: 9 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 122 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 88 · guides: 9 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -34,6 +34,7 @@ Inventories: gate-legs: 118 · kits: 17 · git-hooks: 6 · workflow-scripts: 8 �
 | `drift-audit records` | baseline |
 | `drift-audit selftest` | baseline |
 | `drift-audit wiring` | baseline |
+| `encoding posture (text IO names its encoding)` | gate-lint |
 | `every held leg is budgeted, every budget row resolves` | run-gates |
 | `extract-arms self-test` | run-gates |
 | `gotchas selftest` | baseline |
@@ -49,6 +50,7 @@ Inventories: gate-legs: 118 · kits: 17 · git-hooks: 6 · workflow-scripts: 8 �
 | `install-prefix self-test` | install-prefix |
 | `kickoff engine size <=18KiB` | session-kickoff |
 | `kickoff-manifest ratchet` | baseline |
+| `kit epoch (shipped bytes move, the version moves)` | govkit |
 | `kit placeholders (a declared token its adopter substitutes)` | kit-placeholders |
 | `kit version markers` | memory-tree-hygiene |
 | `kit-placeholders self-test` | kit-placeholders |
@@ -77,6 +79,7 @@ Inventories: gate-legs: 118 · kits: 17 · git-hooks: 6 · workflow-scripts: 8 �
 | `playbook render selftest` | playbook |
 | `playbook render wiring` | playbook |
 | `playbook validity gate` | playbook-mode |
+| `pre-push bar self-test` | run-gates |
 | `pre-push run-log line` | runlog |
 | `pre-push self-test` | baseline |
 | `process-monitor adopter selftest` | process-monitor |
@@ -121,6 +124,7 @@ Inventories: gate-legs: 118 · kits: 17 · git-hooks: 6 · workflow-scripts: 8 �
 | `tier2-review self-test` | review-harnesses |
 | `transition-audit arms` | memory-tree-hygiene |
 | `unattended kit gate` | unattended |
+| `unattended protocol size` | unattended |
 | `unattended skill wiring` | unattended |
 | `unattended-build self-test` | review-harnesses |
 | `verdict epoch (kit version dates the engine)` | memory-tree-hygiene |
@@ -160,6 +164,7 @@ Inventories: gate-legs: 118 · kits: 17 · git-hooks: 6 · workflow-scripts: 8 �
 | `pre-commit` | baseline |
 | `pre-push` | baseline |
 | `pre-rebase` | memory-tree-hygiene |
+| `pre_push_bar_selftest.py` | run-gates |
 | `straggler-guard.sh` | memory-tree-hygiene |
 
 ## workflow-scripts
@@ -168,9 +173,12 @@ Inventories: gate-legs: 118 · kits: 17 · git-hooks: 6 · workflow-scripts: 8 �
 |---|---|
 | `check-workflow-syntax.js` | review-harnesses |
 | `drift-audit-code.js` | review-harnesses |
+| `drift-audit-code.template.js` | review-harnesses |
 | `drift-audit-state.js` | review-harnesses |
+| `drift-audit-state.template.js` | review-harnesses |
 | `orient-counterfactual.js` | review-harnesses |
 | `tier2-review.js` | review-harnesses |
+| `tier2-review.template.js` | review-harnesses |
 | `unattended-build.js` | unattended |
 | `unattended-build.template.js` | review-harnesses |
 | `unattended-unit.js` | unattended |
@@ -215,6 +223,7 @@ Inventories: gate-legs: 118 · kits: 17 · git-hooks: 6 · workflow-scripts: 8 �
 | `conf-value-interpolated-into-a-regex.md` | agent-cap |
 | `containment-tested-one-way.md` | unattended |
 | `criterion-asserts-what-its-own-command-cannot-show.md` | build-method |
+| `decision-re-derived-by-a-second-process.md` | run-gates |
 | `degradation-known-but-unreported.md` | review-harnesses |
 | `destructive-step-before-its-precondition.md` | unattended |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |

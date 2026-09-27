@@ -30,7 +30,7 @@ ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
 cd "$ROOT" || exit 2
 . "$HERE/lib/lib-selftest.sh"
 
-GATE="$ROOT/tools/check-line-length.sh"
+GATE="$HERE/check-line-length.sh"
 [ -f "$GATE" ] || { echo "check-line-length.test: no gate at $GATE"; exit 2; }
 
 # THE SUITE STILL DECLARES ITS OWN ARM COUNT. The floor moved into the harness so eighteen ported

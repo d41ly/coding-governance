@@ -52,6 +52,13 @@ fixture() {
     | sed 's/<=/≤/' > "$d/coding-governance-agents.template.md"
   printf 'runbook {{MEMORY_ROOT}}\nadopt tools/memory-tree/ into the target repo\n' > "$d/WIRE-INTO-PROJECT.md"
   printf '# waivers\nhooks   not adopter-facing as a kit.\n' > "$d/tools/playbook-kit-waivers.txt"
+  # The stamp-rule pair (TOOL-aHonedRuleset-5) is the one row whose two homes both sit OUTSIDE
+  # tools/: the manifest template states the expression and manifest-check.sh owns it. The control
+  # redded on a missing owning source from the day that row landed, because this fixture built no
+  # skills/ tree at all.
+  mkdir -p "$d/skills/session-kickoff"
+  printf -- '- Stamp rule: sha = `HEAD` on any branch; the datetime always advances.\n' > "$d/skills/session-kickoff/MANIFEST-TEMPLATE.md"
+  printf 'STAMP_SHA_RULE="sha = HEAD on any branch"\n' > "$d/skills/session-kickoff/manifest-check.sh"
   git -C "$d" add -A >/dev/null 2>&1
   git -C "$d" commit -qm f >/dev/null 2>&1
 }

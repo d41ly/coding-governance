@@ -50,13 +50,23 @@ done
 # key the shipped template did not carry, with the full bar green. That is the same hole this file's
 # own header describes for the doc templates, which went three bumps behind and shipped the wrong
 # number into every adopting tree.
-mv_c=$(grep -oE "^KIT_MANIFEST_VERSION=\"$V\"" skills/session-kickoff/manifest-check.sh | head -1 | grep -oE "$V")
+# TOOL-aRepatriatedFork-15 S4: the seed is compared with MANIFEST_FORMAT, not with the kit vintage.
+# The two were one number, so a vintage bump forced a seed marker bump and told every adopter their
+# manifest format was stale when only the kit's bytes had moved. Both are still required to parse.
+need "MANIFEST_FORMAT"            skills/session-kickoff/manifest-check.sh  "^MANIFEST_FORMAT=\"$V\""
+mv_c=$(grep -oE "^MANIFEST_FORMAT=\"$V\"" skills/session-kickoff/manifest-check.sh | head -1 | grep -oE "$V")
 mv_t=$(grep -oE "kickoff-manifest: v$V" skills/session-kickoff/MANIFEST-TEMPLATE.md | head -1 | grep -oE "$V")
 if [ -z "$mv_c" ]; then
-  echo "kit-versions: KIT_MANIFEST_VERSION is unreadable, so the shipped manifest seed cannot be compared against it"
+  echo "kit-versions: MANIFEST_FORMAT is unreadable, so the shipped manifest seed cannot be compared against it"
   fails=$((fails+1))
 elif [ "$mv_c" != "$mv_t" ]; then
-  echo "kit-versions: MANIFEST-TEMPLATE.md marker (${mv_t:-unreadable}) != KIT_MANIFEST_VERSION ($mv_c) — an adopter would instantiate a seed the checker rejects"
+  echo "kit-versions: MANIFEST-TEMPLATE.md marker (${mv_t:-unreadable}) != MANIFEST_FORMAT ($mv_c) — an adopter would instantiate a seed the checker rejects"
+  fails=$((fails+1))
+fi
+# ...and the vintage's same-line marker agrees with the vintage. Same line is not same value.
+mv_k=$(grep -oE "^KIT_MANIFEST_VERSION=\"$V\"" skills/session-kickoff/manifest-check.sh | head -1 | grep -oE "$V")
+if [ -z "$mv_k" ] || ! grep -qE "gov:kit kickoff-manifest@$mv_k([^0-9.]|\$)" skills/session-kickoff/manifest-check.sh; then
+  echo "kit-versions: manifest-check.sh gov:kit kickoff-manifest@ marker != KIT_MANIFEST_VERSION (${mv_k:-unreadable})"
   fails=$((fails+1))
 fi
 

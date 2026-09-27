@@ -21,6 +21,7 @@ lexicon-verbs = []
 [paths]
 globs = [
   "tools/memory-tree/row_grammar.py",
+  "tools/memory-tree/tree_lib.py",
 ]
 ```
 
@@ -57,7 +58,27 @@ TWO PREDICATES, DELIBERATELY. The row grammar admits a revision suffix (`-9b`); 
 in `gen_build_index.py` excludes it. A roster answers "which ids belong to this build", where an
 amendment is not a member; a row answers "what is on this line", where it is.
 
+THE BACKLOG-ROW GRAMMAR IS EXPORTED, and it is a second question on purpose. `scan()` asks "is
+this line keyable and unique in its file" over every row document; `parse_row` asks "what are this
+row's fields" over the backlog shards, which alone carry a status. NicoCares wrote it because three
+predicates over one shard printed three live counts and none was right; `TOOL-aRepatriatedFork-9`
+took it upstream with two corrections that corpus could not surface. The row id admits any number of
+dash segments, because inCMS's frozen legacy ids (`ABL-015`) sat between the fork's two shapes and
+58 of its rows read as prose. A `CLOSED by` clause admits a parenthetical, because gov's own TOOL
+shard closes a row that way. The age walk keys on the same shape behind the declared families, so
+every row the census calls live and keyed is one it can date.
+
+THE TWO SHARD PINS POINT THE OTHER WAY from `ROW_DUPLICATE_PIN`. Zero is honest for a young tree's
+duplicate count; no default ceiling is honest over an inherited backlog, so `SEVERITY_UNLABELLED_PIN`
+and `LIVE_ROW_PIN` are UNARMED when blank and say so in every green run. The hygiene gate prints
+check 20's capture on green for that reason, since swallowing it would silence the announcement.
+
 ## Shared seams
+
+- `tree_lib.py` — the conf parser, the fence reader, the status vocabulary and `kit_rel`, shared by
+  every engine in the kit. This module and `check-arms.py` used to import them from `corpus_ids.py`
+  and `gen_build_index.py`, and at inCMS, whose copies of those are its own programs, both died on
+  import. The selftest's import-graph arm reds on any sibling re-import.
 
 - `.memory-tree.conf` — `FAMILIES` is the one declaration both this module and the index generator
   build their id patterns from, so neither copies the other.

@@ -621,29 +621,37 @@ has    "V5 attended: the main return carries the stage's counts" "$o" '"promoted
 # below against the unchanged render and callee, GREEN after.
 MT_T2="$HERE/tier2-review.js"
 MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"s1","blob":"abc1234"}],"round":1,"reviewDir":"r/"}'
-# `build_merged_returns <items-json|absent> [judged]`: four lenses of twelve findings each are ids 1-48;
-# the skeptic double judges ids 1 to `judged` (default 48), confirming the thirteen below and refuting
-# the rest, so an id above `judged` comes back UNVERIFIED; the synthesis double returns the given
-# items, or no `items` key at all for `absent`.
+# `build_merged_returns <items-json|absent> [judged] [shape-json]`: four lenses of twelve findings each
+# are ids 1-48; the skeptic double judges ids 1 to `judged` (default 48), confirming the thirteen below
+# and refuting the rest, so an id above `judged` comes back UNVERIFIED; the synthesis double returns
+# the given items, or no `items` key at all for `absent`. `shape` replaces the measured audit the
+# double replays: `confirmed` ids, `lenses` as label prefix to finding count in the order the double
+# matches them, `typed` as the blockers and highs that audit's synthesis typed, and its `summary`.
 # `run_merged_review <returns>` runs the callee with its doubles answering as their SCHEMAS allow, so
 # a synthesis schema that stopped requiring `items` drops the key and reds the counting arms.
 build_merged_returns() {
   node -e '
-    const confirmed = new Set([1, 4, 7, 9, 11, 14, 16, 20, 22, 26, 30, 33, 40])
+    const shape = process.argv[3] ? JSON.parse(process.argv[3]) : {
+      confirmed: [1, 4, 7, 9, 11, 14, 16, 20, 22, 26, 30, 33, 40],
+      lenses: { "find:": 12 }, typed: [1, 5], summary: "13 confirmed in 10 items" }
+    const confirmed = new Set(shape.confirmed)
     const finding = { file: "s1", where: "section 2", severity: "high", claim: "c", impact: "i", fix: "f" }
     const verdicts = Array.from({ length: Number(process.argv[2]) }, (_, i) =>
       ({ id: i + 1, verdict: confirmed.has(i + 1) ? "confirmed" : "refuted", reason: "r" }))
-    console.log(JSON.stringify({
-      "find:": { lens: "l", findings: Array.from({ length: 12 }, () => finding) },
-      "verify:": { verdicts },
-      synth: { path: "r/merged.md", summary: "13 confirmed in 10 items", blockers: 1, highs: 5,
-        items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]) },
-    }))
-  ' "$1" "${2:-48}"
+    const out = {}
+    for (const [prefix, count] of Object.entries(shape.lenses))
+      out[prefix] = { lens: "l", findings: Array.from({ length: count }, () => finding) }
+    out["verify:"] = { verdicts }
+    out.synth = { path: "r/merged.md", summary: shape.summary, blockers: shape.typed[0], highs: shape.typed[1],
+      items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]) }
+    console.log(JSON.stringify(out))
+  ' "$1" "${2:-48}" "${3:-}"
 }
 # The measured record's two merges are B1 (14, 26, 40) and H2 (16, 4); every other item holds one id.
 MT_MERGED='[{"severity":"BLOCKER","ids":[14,26,40]},{"severity":"HIGH","ids":[1]},{"severity":"HIGH","ids":[16,4]},{"severity":"HIGH","ids":[7]},{"severity":"HIGH","ids":[9]},{"severity":"HIGH","ids":[11]},{"severity":"MEDIUM","ids":[20]},{"severity":"MEDIUM","ids":[22]},{"severity":"MEDIUM","ids":[30]},{"severity":"MEDIUM","ids":[33]}]'
-MT_DISPOSE='{"disposed":true,"standing":[],"promoted":9,"folded":4,"refuted":0,"promotedIds":["A-tB-16","A-tB-17","A-tB-18","A-tB-19"],"summary":"9 promoted into 4 units, 4 folded"}'
+# Every promoted unit is PLACED (TOOL-cMendedVintage-19): `A-tB-3` is the last roster unit at order 2,
+# so a repair of it sits at 3 — the doubles below were written before that rule and never re-fed it.
+MT_DISPOSE='{"disposed":true,"standing":[],"promoted":9,"folded":4,"refuted":0,"promotedIds":["A-tB-16","A-tB-17","A-tB-18","A-tB-19"],"edges":[],"placements":[{"unit":"A-tB-16","repairs":"A-tB-3","order":3},{"unit":"A-tB-17","repairs":"A-tB-3","order":3},{"unit":"A-tB-18","repairs":"A-tB-3","order":3},{"unit":"A-tB-19","repairs":"A-tB-3","order":3}],"summary":"9 promoted into 4 units, 4 folded"}'
 run_merged_review() { RUN_WF_SCHEMA=strict run_wf "$MT_ARGS" "$1" "$MT_T2"; }
 run_merged_build() { # callee RESULT json · [driver token] · [disposal double] -> the build harness run over it
   run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
@@ -705,8 +713,43 @@ t2=$(run_merged_review "$(build_merged_returns '[]' 0)")
 au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
 has    "MT zero confirmed and 48 unverified reaches the synthesis" "$au" '"confirmed":0,"refuted":0,"unverified":48'
 has    "MT ...and an empty item list counts 0 and 0, not null" "$au" '"blockers":0,"highs":0'
-o=$(run_merged_build "$au" CONVERGED '{"disposed":true,"standing":[],"promoted":0,"folded":48,"refuted":0,"promotedIds":[],"summary":"s"}')
+o=$(run_merged_build "$au" CONVERGED '{"disposed":true,"standing":[],"promoted":0,"folded":48,"refuted":0,"promotedIds":[],"edges":[],"placements":[],"summary":"s"}')
 has    "MT ...and the harness disposes the unverified population" "$o" "disposal: done — promoted 0 · folded 48"
+# THE SECOND MEASURED AUDIT, dLoggedFlight's round-1 spec audit of units 14, 16 and 20, ran on the
+# unfixed harness and failed the same way with a wider gap. 46 raw, 16 confirmed, merged into 9 items:
+# 2 BLOCKER, 3 HIGH, 3 MEDIUM and 1 LOW by item, 4, 6, 5 and 1 by raw finding. The synthesis typed
+# blockers 2 and highs 3, so the guard demanded 11 folds where only 6 raw findings sit at MEDIUM or
+# LOW, and no honest disposal passed, by raw id (10 and 6) or by item (5 and 4). The arms below replay
+# that record's own merges, B1 (38, 29), B2 (39, 30), H1 (1, 20, 43), H3 (40, 31), M1 (25, 9) and
+# M2 (41, 6), with H2, M3 and L1 one id each. One lens returns 10 findings and three return 12.
+MT20_SHAPE='{"confirmed":[1,2,6,9,10,16,20,25,29,30,31,38,39,40,41,43],"lenses":{"find:underspecification":10,"find:":12},"typed":[2,3],"summary":"16 confirmed in 9 items"}'
+MT20_MERGED='[{"severity":"BLOCKER","ids":[38,29]},{"severity":"BLOCKER","ids":[39,30]},{"severity":"HIGH","ids":[1,20,43]},{"severity":"HIGH","ids":[2]},{"severity":"HIGH","ids":[40,31]},{"severity":"MEDIUM","ids":[25,9]},{"severity":"MEDIUM","ids":[41,6]},{"severity":"MEDIUM","ids":[16]},{"severity":"LOW","ids":[10]}]'
+# Every promoted unit is PLACED (TOOL-cMendedVintage-19), as MT_DISPOSE is: this double predates that
+# rule, and without a placement the accepted disposal never prints and no roster is handed out.
+MT20_DISPOSE='{"disposed":true,"standing":[],"promoted":10,"folded":6,"refuted":0,"promotedIds":["A-tB-21","A-tB-22","A-tB-23","A-tB-24"],"edges":[],"placements":[{"unit":"A-tB-21","repairs":"A-tB-3","order":3},{"unit":"A-tB-22","repairs":"A-tB-3","order":3},{"unit":"A-tB-23","repairs":"A-tB-3","order":3},{"unit":"A-tB-24","repairs":"A-tB-3","order":3}],"summary":"10 promoted into 4 units, 6 folded"}'
+t2=$(run_merged_review "$(build_merged_returns "$MT20_MERGED" 46 "$MT20_SHAPE")")
+au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
+# LIVENESS, and the MERGE is part of it: a double that put one id in each item would count 4 and 6
+# too, and would reproduce nothing the record measured.
+has    "MT20 the callee ran over the measured shape — 46 raw, 16 confirmed, 30 refuted" "$au" '"raw":46,"confirmed":16,"refuted":30,"unverified":0'
+has    "MT20 ...over nine items that split differently by item and by raw finding" "$t2" "by item 2/3/3/1, by raw confirmed finding 4/6/5/1"
+has    "MT20 the callee counts blockers and highs over RAW confirmed findings, not over items" "$au" '"blockers":4,"highs":6'
+# THE MEASURED REFUSAL, reproduced as a control: the same RESULT carrying the integers that audit's
+# synthesis typed refuses the raw-id disposal, so the arms after it can tell the counts apart.
+o=$(run_merged_build "$(printf '%s' "$au" | sed 's/"blockers":4,"highs":6/"blockers":2,"highs":3/')" BOUNDED "$MT20_DISPOSE")
+has    "MT20 control: item-typed counts refuse the raw-id disposal, as measured" "$o" "folded 6 is below the 11 confirmed at MEDIUM or LOW"
+o=$(run_merged_build "$au" BOUNDED "$MT20_DISPOSE")
+has    "MT20 the disposal stage RAN over the callee's counts" "$o" "agent:dispose:tB"
+has    "MT20 promoted 10 and folded 6, by raw id, is ACCEPTED" "$o" "disposal: done — promoted 10 · folded 6"
+hasnt_ "MT20 ...and is not refused as a bad severity split" "$o" "do not split by severity"
+has    "MT20 ...and the roster is handed out" "$o" '"roster":[{'
+# ONE BASIS BOTH WAYS. A disposal counted by ITEM no longer reconciles, and one that promotes the item
+# count while folding the rest has folded raw HIGH or BLOCKER findings into prose.
+o=$(run_merged_build "$au" BOUNDED '{"disposed":true,"standing":[],"promoted":5,"folded":4,"refuted":0,"promotedIds":["A-tB-21"],"summary":"by item"}')
+has    "MT20 a disposal counted by item is REFUSED" "$o" "promoted 5 + folded 4 + refuted 0 + standing 0 is not confirmed 16 + unverified 0"
+o=$(run_merged_build "$au" BOUNDED '{"disposed":true,"standing":[],"promoted":5,"folded":11,"refuted":0,"promotedIds":["A-tB-21"],"summary":"item promotions"}')
+has    "MT20 promoting only the item count is REFUSED by the raw floor" "$o" "promoted 5 is below blockers 4 + highs 6"
+hasnt_ "MT20 ...and hands out no roster" "$o" '"roster":[{'
 
 # ---- AC5: a disposal that did NOT finish hands out NO roster. There is no partial hand-out: a
 # ---- roster minus the units a blocker touches is a judgement this runtime cannot make, having no
@@ -1327,6 +1370,16 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
       && git config core.autocrlf false )
   cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" \
      "$HERE/REVIEW-PROTOCOL.template.md" "$HERE/tier2-review.js" "$HERE/unattended-unit.js" "$d/$kd/"
+  # THE RENDERER ASKS THE HOOK FOR FANOUT_CAP (TOOL-aRepatriatedFork-7 S11), through the fan-out
+  # gate's `--print-cap`, and refuses to render when nothing answers. `requires = ["agent-cap"]`, so a
+  # real install always has both: the gate beside the parity script, the hook where the gate's rung 2
+  # finds it, a directory up. A layout without them tests an install the kit forbids.
+  cp "$HERE/check-verifier-fanout.sh" "$d/$kd/"
+  # The three pairs S7 made rendered: the renderer refuses a set with a template missing, and
+  # `--tracked-only` would SKIP an absent live copy, so an install carries both halves of each.
+  cp "$HERE/tier2-review.template.js" "$HERE/drift-audit-code.template.js" "$HERE/drift-audit-code.js" \
+     "$HERE/drift-audit-state.template.js" "$HERE/drift-audit-state.js" "$d/$kd/"
+  mkdir -p "$d/$kd/../hooks"; cp "$ROOT/$KIT_REL/hooks/agent-cap.js" "$d/$kd/../hooks/"
   # `-` IS A REVIEW-HARNESS-ONLY INSTALL, which `requires` permits: this kit requires agent-cap and
   # nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
   if [ "$ud" != - ]; then mkdir -p "$d/$ud"; printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"; fi
@@ -1545,8 +1598,10 @@ has "PV-AC5 control: with the render and the pairs restored the leg is green aga
 # three values are this repo's own layout and none of them names a file, so the carried-prefix ban
 # has nothing here to count.
 VB="$LAY/verbatim"; build_layout "$VB" scripts/workflows scripts/unattended scripts/gotchas.py
+# FANOUT_CAP is not a path and the control does not grade it; it is filled so the harness PARSES,
+# because a surviving token is a syntax error and the arm would grade a throw instead of the paths.
 sed -e 's|{{KIT_DIR}}|tools/workflows|g' -e 's|{{TOOL_ROOT}}|tools/|g' -e 's|{{MEMORY_TREE_DIR}}|tools/memory-tree|g' \
-    "$HERE/unattended-build.template.js" > "$VB/scripts/workflows/unattended-build.js"
+    -e 's|{{FANOUT_CAP}}|5|g' "$HERE/unattended-build.template.js" > "$VB/scripts/workflows/unattended-build.js"
 check_layout "PV-AC6 the verbatim spelling:" "$VB" scripts/workflows scripts/ scripts RRRRR
 # The prefix-only half-fix: correct for this repo, and wrong for both measured adopters.
 HF="$LAY/halffix"; build_layout "$HF" scripts/workflows scripts/unattended scripts/gotchas.py

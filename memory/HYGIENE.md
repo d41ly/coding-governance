@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.82 -->
+<!-- gov:kit memory-tree@2.99 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -62,17 +62,18 @@ folder holding nothing but `BACKLOG.md`, which is a FILING HOME for asks nobody 
 - **Entry budget:** every entry in an index (`DECISIONS.md`, `backlog/<FAMILY>.md`,
   `LIVE.md`, `ledger/<month>.md`, root `README.md` lists) is ONE physical line, ≤
   `ENTRY_CAP_CHARS` (300 by default); a build `README.md` gets its own tier,
-  `BUILD_README_ENTRY_CAP_CHARS` (350). Both are declared in `.memory-tree.conf`. Detail
+  `BUILD_README_ENTRY_CAP_CHARS` (350). Both are declared in `.memory-tree.conf`, and so is the
+  unit they count in; this tree's `ENTRY_CAP_UNIT` is: undeclared — the engine default applies. Detail
   lives in the build folder or decision file the line points at. `guides/*.md` is exempt from the
   entry budget — a guide is prose, not index rows — and still carries the file caps below. That
   exemption is ONE expression with one base and one optional append for the codebase-map detail
   files; a second full spelling of it is how the `guides/` half went missing once.
 - **File caps:** index and generated files are capped BY CLASS, and every cap is declared in
   `.memory-tree.conf` (`INDEX_CAP_*`, `GUIDE_CAP_*`, `BUILD_README_CAP_*`, `DOSSIER_CAP_*`). The shipped
-  defaults are 20 KB / 250 lines for a row document, 60 KB / 750 lines for a guide, 25 KB with no line
+  defaults are 20 KB / 250 lines for a row document, 96 KB / 1200 lines for a guide, 25 KB with no line
   cap for a build README, and 20 KB with no line cap for a codebase-map dossier. `archive/` is wholly
   exempt. A LINE cap of 0 means no independent line cap for that class, which is how a project retires
-  the line axis — this repo has, for row documents.
+  the line axis. This tree's row-document line cap, `INDEX_CAP_LINES`, is: 0.
 - **Rotation mode is DECLARED, never assumed.** `.memory-tree.conf` sets `ROTATION_MODE` to one of
   `cut | snapshot`, and a repo that declares neither has not decided rather than defaulted. **`cut`** —
   move only the TERMINAL rows out to `archive/<INDEX>.<date>.md`, leaving every non-terminal row in the
@@ -133,7 +134,9 @@ there is no UNDECLARED third state, because every check below has to grade some 
 The plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
 set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file:
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
-  exempt from the recording-file naming check. Should not grow after the initial adoption.
+  exempt from the recording-file naming check, from check 4's build-folder shape (a listed folder
+  name or a listed build-root file) and from check 21's missing-Serves branch. Should not grow after
+  the initial adoption.
 - **`curation-debt.txt`** — index files pending slimming, exempt from the cap / entry-budget / status-vocabulary
   checks while listed. Every curation sweep deletes lines; empty = fully strict. CI fails if a listed path is gone,
   and — since `TOOL-cGradedDebt-1` — if a listed path would PASS all three unwaived, because a row
@@ -148,6 +151,9 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
 - **`substitution-fed-loops.txt`** — the sites `gate-lint`'s shell scan grades, shipped by that kit
   as an EMPTY seed the repo then owns. Rows are this tree's own; gov's would name paths you do not
   have.
+- **`pass-order-waiver.txt`** — the unattended kit's pass-order checker reads it at this default
+  path, so check 3 admits it by name wherever that kit is adopted. A registry a PROJECT adds goes in
+  `PROJECT_REGISTRY_EXTRA` instead.
 - `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
   `guides/BUILD-METHOD.md`, one `<path> · <why>` row each, read by
   `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit
@@ -186,7 +192,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 6. **index size caps** — FOUR classes, because prose, rows, a generated surface and a map dossier
    fail for different reasons. Row
    documents ≤ `INDEX_CAP_BYTES` / `INDEX_CAP_LINES` (20 KB / 250 by default); `guides/*.md` ≤
-   `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (60 KB / 750); a build `README.md` ≤
+   `GUIDE_CAP_BYTES` / `GUIDE_CAP_LINES` (96 KB / 1200); a build `README.md` ≤
    `BUILD_README_CAP_BYTES` (25 KB) with `BUILD_README_CAP_LINES` at 0, which means NO independent
    line cap for that class; and a codebase-map dossier ≤ `DOSSIER_CAP_BYTES` (20 KB) with no line cap,
    reached only where a map is adopted and guarded on a non-empty prefix, because an unguarded selector
@@ -204,12 +210,12 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    The class is the RESERVED NAME, which rule 4 lets only the run-state file hold, and retirement is
    a rename — so the frozen `RUN.<PHASE>.<8 hex>.md` stays capped and keeps the `ex7` exemption.
 
-   **A row class may retire its line axis, and this repo has.** `TOOL-aRelaxedShard-1` declares
-   `INDEX_CAP_LINES=0` after the owner ratified it, reversing what `TOOL-aWidenedGuide-1` refused. It
-   was a decision, not a tidy-up: at check 7's 300-char entry budget a 250-line row document may hold
-   75,000 B, so the byte figure decided every real case — but the line figure DID bind on 22 of the 29
-   members, every dossier among them, which is why dossiers became their own class rather than
-   inheriting the relaxed index cap.
+   **A row class may retire its line axis** by declaring its line cap as 0; this tree's
+   `INDEX_CAP_LINES` is: 0. Retiring it is a decision, not a tidy-up, so record it in
+   the decision log: at check 7's 300-char entry budget a 250-line row document may hold 75,000 B, so
+   the byte figure decides most cases — but a line figure that DOES bind on some members is a real
+   bound, which is why a codebase-map dossier is its own class rather than inheriting a relaxed index
+   cap.
 
    **Under `BACKLOG_MODE=builds` the population swaps one member for another.** Each
    `builds/*/BACKLOG.md` joins the row class, and the family VIEWS leave it: a view is generated, so
@@ -350,6 +356,10 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     ids past a green bar for a month. The count of survivors is pinned shrink-only by
     `ROW_DUPLICATE_PIN`, and an UNDECLARED pin means ZERO — the strictest value, never a refusal and
     never off, because a default that can only TIGHTEN needs no ceremony.
+    The backlog shards carry two more shrink-only ceilings, `SEVERITY_UNLABELLED_PIN` and
+    `LIVE_ROW_PIN`, one `<shard>:<count>` token per shard. Their polarity is the opposite: undeclared
+    means UNARMED, because no default ceiling over an inherited population is honest, and every green
+    run prints one NOT MEASURED line per unarmed shard, which the gate shows rather than swallows.
     Scope is PER FILE deliberately: corpus-wide would red every designed backlog-row-plus-decision-row
     pair. NAMED GAP — the live index and its rotated archive are two files, so a row that rotates out
     and is re-minted is not caught here; the all-time collision grep the index's own header
@@ -361,7 +371,7 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     document would report a mis-segmented grammar against text no author wrote, and ask uniqueness
     is the fold's corpus-wide verdict rather than a per-file one.
 
-24. **the declared rotation mode is HONOURED** — under `ROTATION_MODE=cut` a rotated archive of a
+24. **the declared rotation mode is HONOURED** — with `ROTATION_MODE` set to `cut` a rotated archive of a
     status-bearing shard holds TERMINAL rows only, and no id sits in both an archive and the live
     index it was cut from. Those two together are what `cut` means: one id, one file. Delegated to
     `row_grammar.py`, which owns the row grammar — a second spelling of it in shell passed a
@@ -407,7 +417,10 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     serves, so the binding is a fact rather than an inference from a filename ordinal. The rule, the
     grammar and the escape are below under "Record bindings". Delegated to `gen_build_index.py`,
     which already reads every record's bytes; the parse RAISES nothing, so an unannotated record can
-    never refuse the render.
+    never refuse the render. A record `legacy-files.txt` lists is not graded for a missing Serves
+    line. `RECORD_UNDATED_ARTIFACTS` set to `exempt` drops an undated non-markdown file (a JSON result, an
+    HTML report) from that branch and prints how many it dropped on every run; blank or `grade`
+    grades them.
 
 22. **review verdict vocabulary** — a review record whose filename date reaches
     `REVIEW_VERDICT_CUTOFF` carries exactly ONE `## Verdict:` line, and its token is a member of the
@@ -420,6 +433,44 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     **What it does NOT check:** whether the verdict is TRUE. It grades the token and never the
     judgement behind it, exactly as the acceptance-witness rule grades a backticked name and never the
     thing that name points at.
+
+25. **a retirement answers for its readers** — a §2 scope item of a LIVE spec that retires a named
+    thing carries a `**Readers:**` clause, then the literal `by name:`, then the literal `by value:`,
+    on the item's opening line or any line beneath it. LIVE is a status header that is not `CLOSED`
+    or `WONTDO`, and the check has no cutoff key of its own. Its population is check 12's selection,
+    so a blank `SPEC_FORMAT_CUTOFF` disarms this check whatever else is true, and the engine says so
+    at exit 0 rather than going quiet.
+    **The trigger.** A verb from the closed list in the arm is matched ignoring case, over the item
+    with its whitespace squeezed, and reaches the past tense beside the present and the imperative;
+    it must sit beside a backticked token of an identifier shape, which is an underscore, a slash, a
+    dotted word tail, a lowercase letter then an uppercase one, or two dashes then a letter. A
+    markdown path counts as an identifier with or without a slash, because `.md` is a dotted tail
+    like any other. A family-slug-seq id, a token of dashes and digits and a token carrying a space
+    never count, and a `:<line>` tail is stripped before any shape is tried. A bare backticked word
+    counts only beside one of the six declared kind nouns, which are ONE literal in the arm, beside
+    the verb list, and are not restated here.
+    **Which half is graded how.** The `by value:` half is graded by presence: a backticked token, or
+    `NO VALUE READERS` followed by a reason. The `by name:` half is graded by resolution: every
+    backticked name it lists must resolve, or the half carries `READER NOT IN TREE` followed by a
+    reason, and every name that escape covers is printed, so the skip announces itself. Neither half
+    is graded for completeness. The control is `TOOL-dLoggedFlight-22` at rev-3, whose inventory
+    missed three readers while every name it did list resolves, so it passes this check. Both
+    escapes are taken on trust: the check cannot tell a true escape from a false one, and once
+    written a false one passes for good. A clause is graded wherever it appears, not only where the
+    trigger fired.
+    **What a name resolves against.** A name resolves where a reader spells it as a whole word, and
+    never where a record merely quotes it. A reader is every tracked file outside the memory root, plus `guides/`,
+    `map/`, `HYGIENE.md`, `TEMPLATE-SPEC.md` and `README.md` inside it. Every other file under the
+    root is a record, such as a build record, the archive, the decision log, a backlog, a gotcha note
+    or a waiver registry, which quotes a name and so resolves nothing by content. A name also resolves when it is a tracked path, or the part of
+    one after a `/`, anywhere in the tree. A `:<line>` tail and a trailing `()` are stripped before
+    either test. A whole word means that at each end of the name that is a letter, digit or
+    underscore, the character beside it in the reader is none of those, and a name carrying a
+    hyphen counts the hyphen among them. So a name spelled only inside a longer identifier
+    resolves nothing, a hyphenated name inside a longer hyphenated one included.
+    **Not reached, and named rather than implied away:** a retirement whose backticked tokens hold no
+    identifier shape, and a retirement carrying no backticked token at all. The author of either is
+    never asked, and the remedy is to name the withdrawn thing in backticks.
 
 ## Record bindings — how a record names its spec
 
@@ -442,8 +493,10 @@ carry it too:
 - Ids resolve against the set DEFINED BY A SPEC H1 — never against a build README's `ids:` roster,
   which is a reservation range that admits backlog and decision rows as if they were units.
 - The `none` form's REASON is mandatory; a bare `none` is malformed. The kind is optional there and
-  required otherwise, because an unbound record names no ids for a kind to describe. The count of
-  `none` records is bounded shrink-only by `RECORD_UNBOUND_PIN`, measured against YOUR corpus.
+  required otherwise, because an unbound record names no ids for a kind to describe. The GRADED
+  count of `none` records — those `RECORD_SERVES_CUTOFF` and `legacy-files.txt` leave — is bounded
+  shrink-only by `RECORD_UNBOUND_PIN`, measured against YOUR corpus. Check 21 prints that count
+  beside `N` on every run, and a pin above it is slack, which reds.
 - `gen_build_index.py --print-bindings` is the read-only report: it classifies every record, writes
   nothing, and always exits 0. It is both the migration checklist and the gate's own predicate, so a
   seed list and a gate that disagree is structurally impossible.
@@ -513,7 +566,9 @@ catches a deleted guard; the armed floor catches an assertion dropped by WIDENIN
 branch count alone cannot see because the count falls and the pin still holds. Per-gate rather than
 aggregate: a total lets one gate's deletion be masked by another gate's addition, and goes slack by a
 whole gate's branch count the day a third gate lands. A gate that raises a named error does not abort
-the walk, so one bad gate cannot hide every other gate's findings.
+the walk, so one bad gate cannot hide every other gate's findings. A BLANK `ARMS_FLOORS` is refused while any gate
+is discovered, since both floor arms would iterate nothing; `check-arms.py --emit-floors` prints the
+measured line to declare.
 
 `tools/memory-tree/check-arms.py --report` shows every branch, its line, its signature and its state.
 

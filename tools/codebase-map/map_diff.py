@@ -101,7 +101,7 @@ def _symbols_at_ref(root: Path, ref: str, rel: str) -> list[dict] | None:
     """symbols.json rows at a git ref (POSIX rel path), or ``None`` when that ref carries no such
     file at all.
 
-    THE None IS THE POINT (ABL-bCandidLoupe-2, ported from inCMS). This used to fail open to ``[]``
+    THE None IS THE POINT (ABL-bCandidLoupe-2, ported from adopter ic). This used to fail open to ``[]``
     for both the absent file and a present-but-empty one, and ``_converge`` cannot tell those apart
     from a list: with no baseline no seam reaches the fan-in threshold, so ``collision_flags``
     printed ``0`` on every range whose base predates the SYMBOL tier. Measured on the adopting repo:
@@ -178,14 +178,14 @@ def derive_backlog_path(root: Path) -> Path:
     """
     try:
         raw = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
-                             capture_output=True, text=True, check=True).stdout.strip()
+                             capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError, OSError):
         return m.map_root(root) / "reinvention-backlog.md"
     if not raw:
         return m.map_root(root) / "reinvention-backlog.md"
     gd = Path(raw)
     gd = gd if gd.is_absolute() else (root / raw)
-    return gd.resolve() / "codebase-map" / "reinvention-backlog.md"
+    return gd.resolve() / "codebase-map" / "reinvention-backlog.md"  # gov:prefix-literal — a sidecar dir inside the git dir, named for the kit, not the kit's install path
 
 
 def _new_clones(root: Path, conf: dict[str, str]) -> int | None:

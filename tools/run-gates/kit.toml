@@ -76,6 +76,16 @@ role = "project-owned"
 include = ["selftest-budgets.txt"]
 role = "project-owned"
 
+# AND SO IS ITS POOLED EVIDENCE. `selftest-pooled-evidence.txt` carries the worst seconds and
+# the (rc, FAIL, executed) parity baseline `run-selftests.sh --pooled --calibrate` observed for
+# THIS repo's rows on THIS repo's registered nodes; an adopter receiving it would inherit bounds
+# measured on a population and a box they do not have. The runner ships, refuses every
+# uncalibrated row by name, and names `--calibrate` as the remedy — the announced-unarmed state.
+# TOOL-aBatchedArm-5 S3.
+[[files]]
+include = ["selftest-pooled-evidence.txt"]
+role = "project-owned"
+
 [adopt]
 argv = ["bash", "{kit}/adopt-run-gates.sh"]
 mutates_index = false

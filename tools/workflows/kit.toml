@@ -3,7 +3,9 @@
 id = "review-harness"
 home = "tools/workflows"
 scope = "repo"
-version_from = { file = "tier2-review.js", pattern = "version: " }
+# The TEMPLATE, since TOOL-aRepatriatedFork-7: `tier2-review.js` is a render now, and a version constant
+# the [[files]] rules do not land is one an adopter cannot pin against. Both carry the same line.
+version_from = { file = "tier2-review.template.js", pattern = "version: " }
 requires = ["agent-cap"]
 why_two_ids = "this directory versions its files under TWO kit ids — the review harness and the drift-audit workflows — so a single version_from cannot describe it. The drift-audit workflow scripts travel with the drift-audit entry."
 
@@ -60,15 +62,39 @@ placeholders = ["TOOL_ROOT"]
 include = ["unattended-build.template.js"]
 role = "rendered"
 to = "{kit}/unattended-build.js"
-placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "FANOUT_CAP"]
+
+# THE REVIEW AND DRIFT-AUDIT HARNESSES ARE RENDERED TOO, since TOOL-aRepatriatedFork-7, and for ONE
+# token: `FANOUT_CAP`. A repo may LOWER the fan-out cap in a tracked `.agent-cap.conf`, and the hook
+# then denies any harness still carrying the ceiling as a literal — so an adopter at a lower cap kept
+# a hand fork of all four. The renderer asks the hook for the value (`--print-cap`), and at no conf
+# every render is byte-identical to the file it replaces. The same engine-to-rendered move the build
+# harness made above, and the same adopter migration: the runbook section the kit README points at.
+[[files]]
+include = ["tier2-review.template.js"]
+role = "rendered"
+to = "{kit}/tier2-review.js"
+placeholders = ["FANOUT_CAP"]
+
+[[files]]
+include = ["drift-audit-code.template.js"]
+role = "rendered"
+to = "{kit}/drift-audit-code.js"
+placeholders = ["FANOUT_CAP"]
+
+[[files]]
+include = ["drift-audit-state.template.js"]
+role = "rendered"
+to = "{kit}/drift-audit-state.js"
+placeholders = ["FANOUT_CAP"]
 
 [adopt]
 argv = []
 mutates_index = false
-why_no_adopter = "both rendered artifacts, the review protocol and the build harness, are written by the parity gate's own --render mode rather than by a separate adopter; the [[regenerate]] block below runs that mode, so an update re-renders them by default, and only GOVKIT_RERENDER=0 declines it"
+why_no_adopter = "every rendered artifact, the review protocol and the four harnesses, is written by the parity gate's own --render mode rather than by a separate adopter; the [[regenerate]] block below runs that mode, so an update re-renders them by default, and only GOVKIT_RERENDER=0 declines it"
 
 # THE RE-RENDER an update runs by default; GOVKIT_RERENDER=0 declines it. With GOVKIT_RERENDER=0
-# exported `update` lands a new template, NAMES the decline on stdout, and so leaves both renders one
+# exported `update` lands a new template, NAMES the decline on stdout, and so leaves every render one
 # vintage stale, while its verdict loop still prints each moved render's row as `re-rendered`
 # although no render ran; where a bar wires the parity leg, it reds them there. The argv is this
 # kit's own gate in its render mode, so the renderer and the leg that grades its output are one file

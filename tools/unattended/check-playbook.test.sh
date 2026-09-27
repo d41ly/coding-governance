@@ -8,9 +8,25 @@
 # EVERY ARM IS A STAGED BREAK WITH AN EXPECTED CHECK NUMBER. Asserting only that the leg RED would
 # pass whenever anything at all was wrong, which is the shape that lets a predicate drift onto a
 # different population and still look armed. The arms assert WHICH check spoke.
-KIT_REL="${KIT_REL:-tools/unattended}"
 set -u
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-18 S2). It ships beside its gate, so a
+# spelled default resolved only at gov's prefix and nothing ever set it (TOOL-dRetiredFork-39). The
+# block is byte-identical to the canonical copy named on its marker line, gated by the parity table
+# in the resolve-python self-test.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
 n=0; st=0
@@ -790,5 +806,8 @@ cp "$KEEP" "$F"
 # same absolute headroom as the pin it replaces. RE-MEASURED again at the round-4 fold: 86 executed, and at the round-5 fold: 90.
 FLOOR_ASSERTIONS=82
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+# THE TRAILER IS UNCONDITIONAL: a red-but-complete run must still carry one, or the pooled runner
+# reads it as untrailed and writes no reading (aBatchedArm closing D4).
+echo "  ($n assertions executed)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

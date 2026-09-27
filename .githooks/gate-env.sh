@@ -23,11 +23,13 @@
 # WHAT THIS COSTS, said plainly rather than discovered later. Nothing exercises the kit self-tests
 # automatically any more, at any boundary. A change under a kit directory that guts a check lands
 # green. The compensating check is a person running them, and the DoD for work touching a kit is
-# this: `--attribute` against the build's BASE reads `verdict clean` — no NEW FAIL, no DEAD PROBE at
-# L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or a DEAD PROBE at R is
-# named by a filed backlog record.
-#     bash tools/run-gates/run-selftests.sh --attribute <BASE>
-#     bash tools/unattended/run-unattended-gates.sh --selftests --attribute <BASE>
+# this: `--serial --attribute` against the build's BASE reads `verdict clean` — no NEW FAIL, no DEAD
+# PROBE at L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or a DEAD PROBE at
+# R is named by a filed backlog record. Beside it, for the unattended kit, a GREEN parity verdict
+# pasted into the landing report (the pooled evidence bound, TOOL-aBatchedArm-5):
+#     bash tools/run-gates/run-selftests.sh --serial --attribute <BASE>
+#     bash tools/unattended/run-unattended-gates.sh --selftests --serial --attribute <BASE>
+#     bash tools/unattended/run-unattended-gates.sh --selftests --pooled
 #     GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh
 # The wording was a bare GREEN until `TOOL-dDerivedDocket-1`, and that was unreachable: several of
 # the held suites are red at any base for causes filed against other units, so the DoD named a state
@@ -42,6 +44,24 @@
 #
 # The `export` line is DELETED rather than commented out. A commented assignment is a line somebody
 # uncomments without reading the paragraph above it.
+#
+# THE KEYS THIS FILE MAY DECLARE, as documentation only; gov declares none of them today.
+#   GATE_SELFTESTS=1          run the kit self-tests on every default-branch push (the switch above).
+#   GOV_GATE_CMD=<cmd>        the merge bar, when it is not `run-gates.sh`. It must run a script this
+#                             repo tracks, unmodified in the working tree, at word 1 or after bash/sh,
+#                             AND equal the GATE_CMD `.unattended.conf` declares at the pushed sha; the
+#                             hook refuses anything else. An adopter's bar may read GATE_PUSH_BASE,
+#                             the remote's sha for the default branch before the push, which the hook
+#                             sets from git's own ref line and never inherits (TOOL-aRepatriatedFork-8
+#                             S5).
+#   GOV_BRANCH_GATE_CMD=<cmd> a bar for a push that does NOT touch the default branch, vetted by the
+#                             same rule at HEAD and fed git's pre-push ref lines on stdin. Unset, such
+#                             a push is ungated. It can only add a refusal, never remove one.
+# THIS FILE IS VETTED BEFORE IT IS SOURCED (TOOL-aRepatriatedFork-5, closing review round 1 H1): the
+# hook sources it only when it is tracked at the pushed sha and its working copy matches, and refuses
+# the push otherwise, so an ignored or excluded copy cannot set the test escape or `exit 0`.
+# The default branch is deliberately NOT a key here: this file is sourced after the hook has decided
+# which ref is the default, so a tracked file cannot choose which branch escapes the bar.
 
 # ---- THE INHERITED-RED POLICY, by owner ruling D12-i4 (2026-09-13). TOOL-dDerivedDocket-24 -------
 # Gov LANDS over a red its default branch already carries, when every red leg reads INHERITED against

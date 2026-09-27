@@ -55,7 +55,7 @@ def claims(**over):
 
 
 class Skipped(Exception):
-    """An arm whose GUARD is unmet. TOOL-dRetiredFork-5, from inCMS's ABL-aFerriedToolkit-4.
+    """An arm whose GUARD is unmet. TOOL-dRetiredFork-5, from adopter ic's ABL-aFerriedToolkit-4.
 
     It is an exception and not a `return` because `check` cannot tell a return from a pass: the
     guarded arms printed an honest `NOT a pass.` and returned, and the next line stamped them `ok`.
@@ -558,7 +558,9 @@ def test_renders_round_trip_and_determinism():
 def test_conf_grammar(tmp: Path):
     (tmp / ".codebase-map.conf").write_text(
         '# c\nMAP_ROOT=docs/map\nGATE_FILE="tests/test map.py"\n'
-        "export MAP_DIFF_CMD=python\nBAD=docs/map # inline\n",
+        "export MAP_DIFF_CMD=python\nBAD=docs/map # inline\n"
+        'NOTED="a b"   # inline after a quoted value\n'
+        "HASHED=#x\nBLANKED=   # blank on purpose\n",
         encoding="utf-8",
     )
     conf = m.load_conf(tmp)
@@ -566,6 +568,10 @@ def test_conf_grammar(tmp: Path):
     assert conf["GATE_FILE"] == "tests/test map.py"  # quoted value keeps its space
     assert conf["MAP_DIFF_CMD"] == "python"  # export prefix normalized
     assert conf["BAD"] == "docs/map"  # unquoted value ends at whitespace, comment can't leak
+    assert conf["NOTED"] == "a b", conf["NOTED"]  # TOOL-aRepatriatedFork-38: ends at its quote
+    # rev-3 (C4): bash reads `K=#x` as `#x`, and `K=   # note` as empty, never as the word `#`.
+    assert conf["HASHED"] == "#x", conf["HASHED"]
+    assert conf["BLANKED"] == "", conf["BLANKED"]
 
 
 def test_glob_brackets_fail_loud_and_escape_works():
@@ -1555,7 +1561,7 @@ def test_identifier_tokens_corpus_recall():
                       "corpus")
     try:
         listing = subprocess.run(
-            # `encoding=` EXPLICITLY (TOOL-dRetiredFork-5, from inCMS's
+            # `encoding=` EXPLICITLY (TOOL-dRetiredFork-5, from adopter ic's
             # KIT_CODEBASE_MAP_SELFTEST_DELTA). `text=True` alone decodes with the locale codec, so
             # a repo path carrying a non-ASCII byte raises UnicodeDecodeError on a Windows console
             # codepage and the arm dies for a reason that has nothing to do with what it measures.

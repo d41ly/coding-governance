@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live
 
-**Status:** INPROGRESS · rev-4 · 2026-09-14 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
+**Status:** INPROGRESS · rev-5 · 2026-09-22 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -32,6 +32,9 @@ exactly as before.
   the same base, phase and witness. That record is the run-state file itself, or a retired
   `RUN.<phase>.<8hex>.md` that was not yet tracked at the build commit. A claim HEAD does not bear
   out is announced, counted, and the unit is graded exactly as before. Observed by AC5, AC6 and AC7.
+  - **Readers:** by name: nothing is withdrawn; the past tense names a run-state record the driver's
+    preflight renames and this item reads. by value: NO VALUE READERS — the item adds a condition on
+    a record it reads as corroboration, and withdraws nothing.
 - **S3** — the terminal set is READ from the driver's declaration, and a set the leg cannot read as
   phase tokens is a DEAD PROBE refusal. Observed by AC8.
 - **S4** — the leg's header states the predicate, its boundary, the corroboration, the rejected
@@ -354,6 +357,9 @@ New arm: `tools/unattended/check-brief-recorded.test.sh` · the leg at `c9bc0b2a
   pulled this branch at `5cea0dfd`, as did inCMS core, and both carry its `unattended@1.20`, which
   gov main's history holds beside `main`'s own once the merge lands. Their routine pull to 1.21 is
   `TOOL-dPolishedVitrine-16`. AC12 now reads 1.21.
+- rev-5 · 2026-09-22 · S2 · a reader clause is added on S2 by the corpus pass of
+  `TOOL-dGatedProse-5`, which the owner ruled on 2026-09-21 is written on every node before check
+  25 exists. The clause is additive; no other sentence of this spec moves.
 
 ## 10. Reuse audit
 

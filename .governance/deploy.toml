@@ -31,6 +31,11 @@ drop_blocks = []
 # STATED, not sniffed. A probe reading the environment baked node `a`'s identity into a charter on a
 # shared remote; the registry is fleet data and every node's row is authored.
 machine_a = "daily-agent"
+# ASKED since DEPL-aRepatriatedFork-1 S2: their probes answered from the rendering node. These are
+# the values gov's charter already rendered, so the region does not move.
+project_name = "coding-governance"
+primary_tree_a = "C:/projects/coding-governance"
+worktree_root_a = "C:/projects/coding-governance/.claude/worktrees"
 # NO `ci_file` ANSWER, deliberately. CI_FILE derives from .github/workflows since
 # TOOL-dDerivedDocket-32, and an answer here would silently revive "none yet" the day the workflow
 # is deleted, where its absence makes the render refuse.

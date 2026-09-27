@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""selftest.py — the runlog kit's arms. gov:kit runlog@1.0
+"""selftest.py — the runlog kit's arms. gov:kit runlog@1.2
 
     python <this kit>/selftest.py
 
@@ -793,6 +793,8 @@ CONF_SPELLINGS = (
     ("a # inside quotes", 'MEMORY_ROOT="docs/a # b"\n'),
     ("a # inside a word", "MEMORY_ROOT=docs/p#10\n"),
     ("a comment where the value would be", "MEMORY_ROOT=   # only a note\n"),
+    # TOOL-aRepatriatedFork-38 rev-3 (C4): a `#` opening the word is data, not a comment.
+    ("a # opening the word", "MEMORY_ROOT=#p15\n"),
     ("an empty quote, then a comment", 'MEMORY_ROOT=""  # a note\n'),
     ("set twice", 'MEMORY_ROOT=first\nMEMORY_ROOT="second"  # a note\n'),
     ("indented, under a commented-out one", "# MEMORY_ROOT=nope\n  MEMORY_ROOT='yes'\n"),
@@ -2066,8 +2068,8 @@ def build_runstate(slug):
     return (f"# {slug} - run state\n\n"
             "Created by `unattended.sh --preflight`. The unit list is NOT copied here — it is DERIVED\n"
             "from the build README on every read, so it cannot go stale between them. This file holds\n"
-            "only what nothing else does: the phase and its witness, the keepalive id, the pinned BASE\n"
-            "with its anchor evidence, and the parked decisions.\n\n"
+            "only what nothing else does: the phase and its witness, the keepalive id and the lease — the\n"
+            "session and pid holding the run — the pinned BASE with its anchor evidence, and the parked decisions.\n\n"
             "<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\n\n## Parked\n")
 
 

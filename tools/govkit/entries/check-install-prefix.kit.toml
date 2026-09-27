@@ -5,7 +5,7 @@ scope = "repo"
 kind = "flat"
 home = "tools"
 selectable = "conditional"
-why_conditional = "the runbook prescribes it only for a target that itself ships kits onward; a target that merely consumes them has nothing for it to police"
+why_conditional = "the runbook prescribes it only for a target that itself ships kits onward; a target that merely consumes them has nothing for it to police. Installed at such a target anyway, it grades nothing and says so: with no govkit registry both arms print a SKIP line and the gate exits 0 (TOOL-aRepatriatedFork-16)"
 version_from = { none = "no version constant exists; measured 2026-08-11." }
 requires = []
 sentinel = "tools/check-install-prefix.sh"

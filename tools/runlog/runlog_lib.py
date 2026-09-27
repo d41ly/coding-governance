@@ -24,7 +24,7 @@ import re
 import subprocess
 from dataclasses import dataclass, field
 
-KIT_RUNLOG_VERSION = "1.0"  # gov:kit runlog@1.0
+KIT_RUNLOG_VERSION = "1.2"  # gov:kit runlog@1.2
 
 # The grammar versions this reader knows. A set, so a v2 reader can keep reading v1 lines.
 GRAMMAR_VERSIONS = frozenset({"1"})
@@ -370,15 +370,20 @@ def _read_conf_key(path: pathlib.Path, key: str) -> str | None:
             k = k[len("export"):].strip()
         if k != key:
             continue
+        # TOOL-aRepatriatedFork-38 rev-3 (the closing review's C4): whitespace right after `=` ends
+        # the assignment, so `K= x` is empty, and a `#` only after whitespace begins a comment.
+        if v[:1].isspace():
+            found = ""
+            continue
         v = v.strip()
         if v[:1] in ("'", '"'):
             close = v.find(v[0], 1)
             if close >= 0:
                 found = v[1:close]
                 continue
-        # Unquoted, or a quote never closed, which bash itself refuses: a `#` that begins a word,
-        # position 0 included, starts a comment, and a `#` inside a word is data.
-        cut = next((i for i, ch in enumerate(v) if ch == "#" and (i == 0 or v[i - 1].isspace())), None)
+        # Unquoted, or a quote never closed, which bash itself refuses: a `#` after whitespace starts
+        # a comment, and a `#` inside a word, the first character included, is data.
+        cut = next((i for i, ch in enumerate(v) if ch == "#" and i > 0 and v[i - 1].isspace()), None)
         if cut is not None:
             v = v[:cut].strip()
         found = v.strip('"').strip("'")

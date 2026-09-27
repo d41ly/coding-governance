@@ -90,7 +90,9 @@ floor on the merge bar.
 - `recall_conf.resolve()` / `recall_conf.load_conf()` — the project layer every module reads. The
   floor gate takes `RECALL_FLOOR` through `load_conf` rather than a `Conf` slot, so `Conf.digest()`,
   the `KEY=VALUE` protocol `adopt-memory-recall.sh` parses, and the rendered Skill are all untouched
-  by a value only the gate reads.
+  by a value only the gate reads. The four corpus-shape keys (`RECALL_NODE_TAG_CLASS`,
+  `RECALL_CITED_FAMILIES`, `RECALL_BUILD_QID_CUTOFF`, `RECALL_EXPORT_DIR`) ARE `Conf` slots, because
+  `extract` and `query` read them; only the first two enter `digest()`.
 - `extract.corpus_files()` — the ONE corpus walk, for both the measurement path (`rev`-pinnable) and
   the query path (which also takes untracked-not-ignored files). There used to be two, and every
   widening had to teach both.

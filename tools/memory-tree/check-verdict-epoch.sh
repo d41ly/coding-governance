@@ -41,6 +41,7 @@
 # the stale constant in the first place. A line whose first non-space character is `#` cannot change
 # what `sh` or `awk` does, so the exemption cannot hide a behaviour change.
 set -u
+_self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "verdict-epoch: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
@@ -65,8 +66,23 @@ cd "$ROOT" || exit 2
 # not a check — its "verdict" is the file it writes — and that is the reason it belongs here rather
 # than an argument against it: an adopter reading `memory-tree@2.0` is being told which merge
 # semantics their indexes were merged under.
-ENGINE=tools/memory-tree/check-memory-hygiene.sh
-DELEGATES="tools/memory-tree/row_grammar.py tools/memory-tree/gen_build_index.py tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py tools/memory-recall/extract.py tools/memory-tree/merge-rows.py"
+#
+# AND `tree_lib.py` (TOOL-aRepatriatedFork-9): the conf parser, the fence reader and the status
+# vocabulary every delegate above reads moved there, so a change to any of them moves a verdict. It
+# is spelled off ENGINE's own directory, because the carried-prefix ban takes no new literal.
+#
+# THE ENGINE IS THIS SCRIPT'S NEIGHBOUR, derived (TOOL-aRepatriatedFork-2 S2): both lines spelled
+# gov's prefix, so at both adopters this gate exited 2 naming an engine that sat beside it. The
+# memory-recall delegate is a SIBLING kit, probed beside this kit and one level up; this script
+# resolves no python, so the receipt rung is not read here and a miss is SAID, never skipped.
+_kit=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "verdict-epoch: cannot derive this gate's own directory from '$_self_dir'"; exit 2; }
+ENGINE="${_kit}check-memory-hygiene.sh"
+_recall=""
+for _c in "${_kit}memory-recall/extract.py" "$(dirname "${_kit%/}")/memory-recall/extract.py"; do
+  [ -z "$_recall" ] && [ -f "${_c#./}" ] && _recall="${_c#./}"
+done
+[ -n "$_recall" ] || echo "verdict-epoch: note — the memory-recall kit's extract.py is not beside this kit, so its lines are not in the scan set"
+DELEGATES="${_kit}tree_lib.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py $_recall ${_kit}merge-rows.py"
 [ -f "$ENGINE" ] || { echo "verdict-epoch: $ENGINE is missing — this gate reads the engine's own source"; exit 2; }
 SCAN="$ENGINE"
 for _d in $DELEGATES; do [ -f "$_d" ] && SCAN="$SCAN $_d"; done
@@ -161,8 +177,8 @@ remedy() {
   echo "verdict-epoch: Bump it in ALL THREE places, which must move together, in a commit at or after"
   echo "verdict-epoch: ${W}:"
   echo "verdict-epoch:   $ENGINE (the constant AND the gov:kit marker on that same line)"
-  echo "verdict-epoch:   tools/memory-tree/HYGIENE.template.md (line 1)"
-  echo "verdict-epoch:   memory/HYGIENE.md (line 1) — then: bash tools/memory-tree/kit-dogfood-parity.test.sh --render"
+  echo "verdict-epoch:   ${_kit}HYGIENE.template.md (line 1)"
+  echo "verdict-epoch:   memory/HYGIENE.md (line 1) — then: bash ${_kit}kit-dogfood-parity.test.sh --render"
 }
 
 if [ -z "$S" ]; then

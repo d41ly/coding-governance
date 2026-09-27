@@ -682,10 +682,21 @@ run "C11 does not police bullets outside the traps section" "$R" 0 -
 # arms append from the second.
 NONCE="mfc$$"
 GOVROOT=$(git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
+# THE READER IS FOUND THE WAY THE CHECKER FINDS IT (TOOL-aRepatriatedFork-18 S3): the checker's own
+# `resolve_id_reader` and `resolve_kit_dir`, read out of it and run here, never a second spelling of
+# where the memory-tree and memory-recall kits live. This suite ships beside the checker, and a
+# spelled kit path resolved at gov's prefix only. An empty answer is the checker's own "id
+# citations unchecked" state, and the fixture below then fails naming the clone step.
+eval "$(awk '/^resolve_kit_dir\(\) \{$/,/^}$/' "$CHECK")"
+eval "$(awk '/^resolve_id_reader\(\) \{$/,/^}$/' "$CHECK")"
+MC_PY=$(resolve_python 2>/dev/null) || MC_PY=""
+READER=$(ROOT="$GOVROOT" MC_DIR="$(dirname "$CHECK")" resolve_id_reader)
+READER_REL=${READER#"$GOVROOT"/}
+RECALL_REL=$(resolve_kit_dir "$MC_PY" memory-recall extract.py "$GOVROOT/$(dirname -- "$READER_REL")" 2>/dev/null) || RECALL_REL=""
 CCLONE="$TMP/card-clone"; CWT="$TMP/card-wt"; CWT2="$TMP/card-wt2"
 git clone -q --local "$GOVROOT" "$CCLONE" \
   && git -C "$CCLONE" config user.email t@test && git -C "$CCLONE" config user.name t && git -C "$CCLONE" config commit.gpgsign false \
-  && cp "$GOVROOT/tools/memory-tree/corpus_ids.py" "$CCLONE/tools/memory-tree/corpus_ids.py" \
+  && [ -n "$READER" ] && cp "$READER" "$CCLONE/$READER_REL" \
   && mkdir -p "$CCLONE/memory/builds/zCardFixture/spec" \
   && printf '# TOOL-zCardFixture-10 — a fixture unit, defined by this H1 alone\n\n**Status:** SPECCED · rev-1 · 2026-09-14 · node z · Tier-1\n\nThis prose CITES TOOL-zCardFixture-11 and nothing defines it.\n' \
        > "$CCLONE/memory/builds/zCardFixture/spec/2026-09-14-spec-TOOL-zCardFixture-10.md" \
@@ -899,7 +910,7 @@ run_card "AC10 --card --write with no .memory-tree.conf exits 0" "$R" 0 "live �
 
 # ---- KICK-aReplayedCard-2: --card --append and --card --check ------------------------------------
 # Every arm runs in the clone's linked worktrees, whose common dir holds the cards. The reader the
-# append spawns is the clone's `tools/memory-tree/corpus_ids.py`, which the fixture commit above
+# append spawns is the clone's copy of the memory-tree id reader, which the fixture commit above
 # made the working tree's; `TOOL-zCardFixture-10` is defined there by a spec H1 alone and
 # `TOOL-zCardFixture-11` is cited by its prose and defined nowhere.
 K2A="$NONCE-k2a"; K2CARD="$CARD_HOME/$K2A.md"
@@ -1101,9 +1112,9 @@ check_eq "K2 AC10 ...and the card holds one READY line, one task section, the se
 # hidden in the worktree for the one arm and restored after it.
 K2E="$NONCE-k2e"; K2ECARD="$CARD_HOME/$K2E.md"
 run_card "F1 setup: a card for the no-grammar arm" "$CWT" 0 - --card --write --session "$K2E"
-mv "$CWT/tools/memory-recall/extract.py" "$CWT/tools/memory-recall/extract.py.hid"
+mv "$CWT/$RECALL_REL/extract.py" "$CWT/$RECALL_REL/extract.py.hid"
 printf '## task\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
-mv "$CWT/tools/memory-recall/extract.py.hid" "$CWT/tools/memory-recall/extract.py"
+mv "$CWT/$RECALL_REL/extract.py.hid" "$CWT/$RECALL_REL/extract.py"
 [ "$got" = 0 ] && grep -q '^NOTE: id citations unchecked — .*the id grammar lives in the memory-recall kit' "$CARD_OUT" && grep -q ' 1 tokens · 0 unverified ' "$CARD_OUT" \
   && { echo "ok   F1 a reader with no memory-recall kit degrades to the NOTE, the path is judged, the append lands (exit 0)"; pass=$((pass+1)); } \
   || { echo "FAIL F1 a reader with no memory-recall kit degrades to the NOTE, the path is judged, the append lands (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
@@ -1140,6 +1151,23 @@ run_card "K2 S1 --card --check with no reader announces the skip and is DEAD PRO
 grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 S7 --card --check over a token-free card is DEAD PROBE"; pass=$((pass+1)); } \
   || { echo "FAIL K2 S7 --card --check over a token-free card is DEAD PROBE"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 
+# L3 (aRepatriatedFork closing review, round 1) — the checker run from OUTSIDE the repo it grades,
+# as the per-machine junction copy is, still finds a flat `memory-tree/` reader in that repo: the
+# resolver is tried anchored at the repo root after its own dir. A stub reader defines
+# `TOOL-zFlatReader-1`; the body cites `-2` as well, so graded ids make 2 tokens with 1 miss, and
+# skipped ids make none at all (DEAD PROBE).
+mkrepo flatreader; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+mkdir -p "$R/memory-tree" "$TMP/junction"
+printf 'print("# id-ere: TOOL-zFlatReader-[0-9]+")\nprint("TOOL-zFlatReader-1")\n' > "$R/memory-tree/corpus_ids.py"
+cp "$CHECK" "$TMP/junction/manifest-check.sh"
+L3_CHECK=$CHECK; CHECK="$TMP/junction/manifest-check.sh"
+run_card "L3 setup: a card in a flat-layout tree, from a checker outside it" "$R" 0 - --card --write --session "$NONCE-l3"
+printf '## records\n- TOOL-zFlatReader-2 — cited, undefined\n- TOOL-zFlatReader-1 — defined\n' | (cd "$R" && bash "$CHECK" --card --append --session "$NONCE-l3" > "$CARD_OUT" 2>&1); got=$?
+CHECK=$L3_CHECK
+[ "$got" = 0 ] && grep -q '^UNVERIFIED — TOOL-zFlatReader-2$' "$CARD_OUT" && grep -q ' 2 tokens · 1 unverified ' "$CARD_OUT" \
+  && { echo "ok   L3 a checker outside the repo grades ids through the repo's flat memory-tree reader (exit 0)"; pass=$((pass+1)); } \
+  || { echo "FAIL L3 a checker outside the repo grades ids through the repo's flat memory-tree reader (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+
 # C12 — the manifest carries no CR byte. Round 3's M1: the §B bullet ABOUT raw CR bytes had its own
 # CR eaten twice by text-mode rewrites, leaving a sentence that said a newline becomes a newline.
 # BOTH directions, because a check that has only ever been seen pass is an assertion about nothing,
@@ -1171,7 +1199,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # same commit as those arms: this floor and check-testsuite-counts.sh are both shrink-only, so an
 # unraised floor is the one thing that lets a later edit delete the arms and red nothing.
 # +2: C12's pair, the CR-byte check's green and red cases (round 3 M1's left-shift).
-FLOOR_ASSERTIONS=178
+# +2: L3's pair, the junction-copy setup and its graded-ids arm (aRepatriatedFork round 1 L3).
+FLOOR_ASSERTIONS=180
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

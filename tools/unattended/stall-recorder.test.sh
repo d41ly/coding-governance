@@ -215,5 +215,10 @@ n=$((pass+fail))
 FLOOR_ASSERTIONS=40
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
+# THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer
+# (SWEEP_TRAILER_RX); a red-but-complete run that prints only a green-gated `PASS (` is UNTRAILED
+# there, writes no calibrate reading, and refuses every later pooled run (aBatchedArm closing D4,
+# applied at the merge that brought this suite in).
+echo "  ($n assertions executed)"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ]

@@ -4,7 +4,10 @@ id = "unattended"
 home = "tools/unattended"
 scope = "repo"
 version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
-requires = ["memory-tree", "review-harness"]
+# `settings-merge` since TOOL-aRepatriatedFork-11 (section 8 F2): this kit ships hook fragments and its
+# `[check]` grades their wiring, so the install that lands one wires it through the target's own
+# settings-merge.py, and the target's receipt then names the program that wrote its settings file.
+requires = ["memory-tree", "review-harness", "settings-merge"]
 
 [[files]]
 include = "**"
@@ -33,8 +36,20 @@ role = "engine"
 # driver's run-log writer in THIS directory, so an adopter who never edits the driver gains nothing
 # from it. It is not a gate leg either. `run-unattended-gates.sh` picks it up from its budget row with
 # the rest, and it also runs alone, which is how a build holding the siblings back runs it.
+#
+# TOOL-aRepatriatedFork-18 NARROWED THAT TO LEGS (owner, 2026-09-23, section 8 F2 of its spec). The
+# arm-bearing suites -- each the `<stem>.test.sh` sibling of a gate this kit ships -- now ship as
+# `engine`, because `check-arms.py` makes every adopter READ the sibling of every tracked gate for
+# its positive assertions, whether or not they edit the checker. Withheld, each pull shipped gates
+# with new branches and no arms for them, and the adopter's `gate-arms` leg stayed red until someone
+# hand-merged gov's suites. The FILE ships, which check-arms reads; the LEG does not, which is still
+# the ruling, through the `[[exempt_leg]]` rows in govkit's registry. An adopter that
+# forks a gate arms its own branches in `<stem>.local.test.sh`, which no descriptor claims.
+# The three here are `unattended.test.sh`, `check-unattended.test.sh` and `check-playbook.test.sh`.
+# Gov's pins for the branches no fixture reaches ship beside the gates too, in this directory's
+# `unarmed-branches.txt`, keyed relative to it, through the `**` rule above.
 [[files]]
-include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh", "unattended.test.sh"]
+include = ["adopt-unattended.test.sh", "check-arms-groups.test.sh", "check-pass-order.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "resume-tick.test.sh", "runlog-writer.test.sh", "stall-recorder.test.sh", "stop-guard.test.sh"]
 role = "project-owned"
 
 # `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
@@ -200,12 +215,23 @@ means = "render-failed-half-stamped"
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
-# `tools/unattended/` is not done until `--attribute` against the build's BASE reads
-# `verdict clean` — no NEW FAIL, no DEAD PROBE at L and no OVER BUDGET at L — and every suite
-# reporting an INHERITED FAIL or a DEAD PROBE at R is named by a filed backlog record:
+# `tools/unattended/` is not done until ONE of two verdicts is in the landing report: parity GREEN
+# from the pooled self-tests, or `--attribute` against the build's BASE reading `verdict clean` —
+# no NEW FAIL, no DEAD PROBE at L and no OVER BUDGET at L — with every suite reporting an INHERITED
+# FAIL or a DEAD PROBE at R named by a filed backlog record:
 #
-#     bash tools/unattended/run-unattended-gates.sh --attribute <BASE>   # the self-tests, attributed
-#     bash tools/unattended/run-unattended-gates.sh --all                # and the legs beside them
+#     bash tools/unattended/run-unattended-gates.sh --pooled        # the self-tests through the bounded pool, parity graded
+#     bash tools/unattended/run-unattended-gates.sh --checks        # and the legs beside them, which take no mode
+#
+# ...or, in place of the pooled line, the same runner with `--serial --attribute <BASE>`: the
+# self-tests one at a time, each run at this tree AND at BASE, attributed.
+#
+# The mode is DECLARED and never defaulted (TOOL-aBatchedArm-4): a route reaching the self-tests
+# with neither `--serial` nor `--pooled` refuses. `--pooled` runs them through the shared runner's
+# bounded pool, withholds every cost verdict and grades PARITY against the runner's calibrated
+# pooled evidence, taken on node a 2026-09-15 (`TOOL-aBatchedArm-5`); the on-demand cost reading
+# is the serial mode, which grades each suite against its budget, and the only one `--attribute`
+# composes with.
 #
 # THE ATTRIBUTION IS NOT CEREMONY. This kit's suites are red at their base for causes filed against
 # other units (`TOOL-aHoistedPass-36`, `TOOL-aHoistedPass-38`), so the bare GREEN this block used to
@@ -260,6 +286,12 @@ subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
+
+# the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
+# bar like every `subject = kit` row. This kit declares NO self-test as a leg: the arms-groups
+# linter had one, and the owner's 2026-08-23 ruling takes every `tools/unattended/*.test.sh` leg
+# off the manifest without exception — which main's runlog-writer AC9 asserts. The linter's suite
+# runs through `run-unattended-gates.sh` with the rest, from its budget row.
 
 [[hole]]
 id = "keepalive-tool-names"

@@ -62,7 +62,7 @@ def _kit_dir() -> Path:
     probed: list[str] = []
     here = Path(os.path.abspath(__file__))
     for parent in here.parents:
-        candidates = [parent, parent / "codebase-map"]
+        candidates = [parent, parent / "codebase-map"]  # gov:prefix-literal — this kit's OWN dir, probed from the test's install dir in either layout
         candidates += sorted(p for p in parent.glob("*/codebase-map") if p.is_dir())
         for candidate in candidates:
             if (candidate / "map_lib.py").is_file():

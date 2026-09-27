@@ -43,6 +43,12 @@ upward, and already inside the limit. There was no merge-bar crisis. There was a
   reasoned about first. Each suite's declared hoist set (`check-unattended.test.sh` names
   `anchor_break` and `anchor_restore`) is the first place to look when one does break. **Ordered
   AFTER S4 at rev-3, on S3's answer.**
+  - **Readers:** by name: `tools/unattended/check-unattended.test.sh` and
+    `tools/unattended/unattended.test.sh` each declare the pin, and
+    `tools/run-gates/run-gates.gov.test.sh` reads both declarations against the manifest's shard
+    callers. by value: `tools/unattended/check-unattended.test.sh` and
+    `tools/unattended/unattended.test.sh` compare a caller's shard count against the value, bound
+    the shard index by it, and carry per-shard floor arms for two shards only.
 - **S3** — BUILT. The gating measurement this spec refused to design past. Recorded in
   `build/2026-08-29-build-TOOL-aGradedDoorway-7-1-s3-cost-split.md`.
 - **S4** — batch arms by tree state where the mutations are provably independent: one `run()`, many

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # push-main.sh — the sanctioned lander for a push to the default branch (TOOL-aLeasedGauntlet-1,
-# ports inCMS ARCH-aLeasedGauntlet-1).
+# ports adopter ic ARCH-aLeasedGauntlet-1).
 #
 # Reconciles the default branch BEFORE the pre-push full gate runs, so the gate never runs on an
 # already-stale tree; if origin advances DURING the gate the push is rejected and this re-reconciles
@@ -88,18 +88,43 @@ obs=2
 top=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "push-main: not a git repo" >&2; exit "$obs"; }
 cd "$top" || exit "$obs"
 
-# Resolve the default branch, GOV_DEFAULT_BRANCH first then origin/HEAD. Fail CLOSED if neither is
-# set — silently assuming 'main' would let a push to a real 'develop'/'master' default run un-gated.
-def=${GOV_DEFAULT_BRANCH:-$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)}
-def=${def#origin/}
+# THE REMOTE FIRST, then ITS default branch (TOOL-aRepatriatedFork-8 S1). This read `origin/HEAD`
+# before it knew which remote it would push to, so on a node whose remote is named anything else
+# (adopter ic's node `d` names it after the project) it exited 2 before its first fetch. The remote is GOV_REMOTE,
+# else the current branch's configured remote, else the repository's ONLY remote. Several remotes
+# and none configured is a refusal: guessing picks a remote nobody chose.
+branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
+remote=${GOV_REMOTE:-}
+[ -n "$remote" ] || remote=$(git config "branch.$branch.remote" 2>/dev/null || true)
+if [ -z "$remote" ]; then
+  remotes=$(git remote 2>/dev/null)
+  case "$remotes" in *$'\n'*|"") ;; *) remote=$remotes ;; esac
+  if [ -z "$remote" ]; then
+    echo "push-main: can't determine which remote to land on — GOV_REMOTE is unset, '$branch' has no configured remote, and this repository has $(printf '%s' "$remotes" | grep -c .) remotes." >&2
+    echo "  Name it: export GOV_REMOTE=<remote>." >&2
+    exit "$obs"
+  fi
+fi
+
+# Resolve the default branch, GOV_DEFAULT_BRANCH first then that remote's HEAD. Fail CLOSED if neither
+# is set — silently assuming 'main' would let a push to a real 'develop'/'master' default run un-gated.
+def=${GOV_DEFAULT_BRANCH:-$(git symbolic-ref --short "refs/remotes/$remote/HEAD" 2>/dev/null)}
+def=${def#"$remote"/}
 if [ -z "$def" ]; then
-  echo "push-main: can't determine the default branch (origin/HEAD unset, GOV_DEFAULT_BRANCH unset) —" >&2
-  echo "  set it with 'git remote set-head origin -a', or export GOV_DEFAULT_BRANCH=<branch>." >&2
+  echo "push-main: can't determine the default branch ($remote/HEAD unset, GOV_DEFAULT_BRANCH unset) —" >&2
+  echo "  set it with 'git remote set-head $remote -a', or export GOV_DEFAULT_BRANCH=<branch>." >&2
   exit "$obs"
 fi
-remote=${GOV_REMOTE:-$(git config "branch.$def.remote" 2>/dev/null || echo origin)}
 max=${GOV_PUSH_MAIN_MAX_RETRIES:-3}
-marker="$(git rev-parse --git-dir)/push-main-active"
+gd=$(git rev-parse --git-dir)
+marker="$gd/push-main-active"
+# THE HOOK'S VERDICT (S2): `<token><TAB><message>`, written by .githooks/pre-push on every refusal and
+# on a red bar, cleared by it on every run and by this script before every push.
+refusal="$gd/pre-push-refusal"
+# THE BAR THE HOOK VETTED (closing review round 1 H1): `<class><TAB><path><TAB><blob>`, written by the
+# hook once it has vetted the bar and before it runs it, cleared by it on every run and by this script
+# before every push. The lander marker is written only when it reads `default` or `tracked`.
+barfile="$gd/pre-push-bar"
 
 # The marker is a SOFT advisory guard: a SIGKILL/OOM/power-loss during the gate can leak it (this
 # trap can't catch those). Worst case a later raw push skips reconcile-before-gate and wastes ONE
@@ -124,7 +149,7 @@ esac
 # adopter's bar, the more certain the failure - and the failure lands on the attempt that did
 # everything right.
 #
-# Measured on an adopter (inCMS, node `a`, 2026-08-27), same objects and same auth throughout: a push
+# Measured on adopter ic (node `a`, 2026-08-27), same objects and same auth throughout: a push
 # to a scratch ref, whose hook ran only a ~4-minute subset, SUCCEEDED; four pushes to main, whose hook
 # ran the 16-to-65-minute full bar, all died this way, two of them after the gate printed PASSED.
 # Setting these three options and changing nothing else landed it first try. That repo's charter had
@@ -143,18 +168,40 @@ export GIT_SSH_COMMAND
 # ---- SHARED BY BOTH PATHS -----------------------------------------------------------------------
 # Lifted out of the attended path by TOOL-dDerivedDocket-2 so the in-place landing writes the same
 # record and classifies a failure by the same reading. Two spellings of either would be two answers
-# to one question, and the copy is always the one that drifts.
+# to one question, and the copy is always the one that drifts. What each one READS is
+# TOOL-aRepatriatedFork-5 and -8's: the hook's own verdict and the bar it vetted, never the push's words.
 
-# Classify a push failure on what git SAID (streamed live via tee, also captured), not on whether
-# origin moved (a guard on the wrong signal calls a gate-passed-but-network-failed push "RED", and
-# loops a still-RED commit as a race when a peer advanced origin during the gate).
-parse_push_class() {  # captured-output-file -> race | unreachable | red
-  if grep -qiE 'rejected|fetch first|non-fast-forward|stale info' "$1"; then echo race; return 0; fi
-  if grep -qiE 'unable to access|could not resolve host|could not read from remote|connection|timed out' "$1"; then
+# THE ORDER OF EVIDENCE is adopter ic's: the hook's own verdict; else a probe of the push URL, so that
+# unreachability is OBSERVED rather than inferred; else fetch and ancestry, a race or a failure the
+# hook did not claim. An absent verdict is the cue to probe, never a pass: a hook that predates the
+# channel, or a push that died before the hook ran, writes none. The push's own output is never an
+# input here (the attended push says why, S2). Every class but `race` has already said why on
+# stderr; a caller retries on `race` and exits 1 otherwise.
+derive_push_failure() {  # -> refused | unreachable | unchanged | race on stdout
+  local tok msg
+  tok=""; msg=""
+  [ -f "$refusal" ] && IFS=$'\t' read -r tok msg < "$refusal"
+  case "$tok" in
+    gate-red)
+      echo "push-main: the bar RAN and is RED, so nothing was pushed — read $gd/gate-last-summary.txt, fix it, and re-run push-main." >&2
+      echo refused; return 0 ;;
+    head-moved)
+      echo "push-main: the bar ran GREEN but HEAD moved while it ran, so the green does not describe the pushed tree — re-run push-main. ($msg)" >&2
+      echo refused; return 0 ;;
+    ?*)
+      echo "push-main: pre-push refused the push ($tok) — a precondition; no leg ran: $msg" >&2
+      echo refused; return 0 ;;
+  esac
+  if ! git ls-remote "$(git remote get-url --push "$remote" 2>/dev/null || printf '%s' "$remote")" "refs/heads/$def" >/dev/null 2>&1; then
+    echo "push-main: could not reach $remote — a probe of its push URL failed after the push did, and the hook left no verdict; retry when the remote is reachable." >&2
     echo unreachable; return 0
   fi
   git fetch "$remote" "$def" 2>/dev/null || true
-  if git merge-base --is-ancestor "$remote/$def" HEAD 2>/dev/null; then echo red; else echo race; fi
+  if git merge-base --is-ancestor "$remote/$def" HEAD 2>/dev/null; then
+    echo "push-main: the push failed, $remote/$def is unchanged and reachable, and the hook left no verdict — the remote refused it or the hook predates its refusal channel; read the push output above." >&2
+    echo unchanged; return 0
+  fi
+  echo race
 }
 
 # THE LANDER MARKER, when the project declares one. It carries the pushed COMMIT, not just its own
@@ -169,9 +216,27 @@ parse_push_class() {  # captured-output-file -> race | unreachable | red
 # or single-quoted declaration - one half honouring a key the other could not see. A subshell
 # source is the driver's exact semantics without polluting this script's namespace.
 write_lander_marker() {  # -> 1 when the push landed but the record could not be written
-  local lm _gcd
+  local lm _gcd bar barpath barblob
   [ -f .unattended.conf ] || return 0
   lm=$(. ./.unattended.conf 2>/dev/null; printf '%s' "${LANDER_MARKER:-}")
+  # A STUB-GATED PUSH IS NOT A LANDING (TOOL-aRepatriatedFork-5). GOV_GATE_CMD_TEST is the hook's
+  # one declared escape: it lets an untracked stub stand in for the bar so the hook can be tested
+  # at all. The marker is what `unattended.sh --landed` accepts as a landing through this lander,
+  # so writing it here would let a push nobody's bar gated read as a gated landing.
+  #
+  # READ FROM THE HOOK'S VERDICT, NEVER FROM THIS ENVIRONMENT (closing review round 1 H1). This
+  # tested GOV_GATE_CMD_TEST in its own environment, and the hook also takes it from the
+  # gate-env.sh it sources, so a stub-gated push got the marker. No verdict at all, from a hook
+  # that predates the file or never reached the bar, is not a gated landing either.
+  bar=""; barpath=""; barblob=""
+  [ -f "$barfile" ] && IFS=$'\t' read -r bar barpath barblob < "$barfile"
+  case "$bar" in
+    default|tracked) ;;
+    stub) [ -n "$lm" ] && echo "push-main: pushed $def, and the hook vetted the bar as a declared STUB (GOV_GATE_CMD_TEST); NOT writing the lander marker ($lm), because a stub-gated push is not a landing." >&2
+          lm="" ;;
+    *)    [ -n "$lm" ] && echo "push-main: pushed $def, but the hook recorded no vetted bar in $barfile, so nothing says a bar gated this push; NOT writing the lander marker ($lm)." >&2
+          lm="" ;;
+  esac
   [ -n "$lm" ] || return 0
   # RESOLVED AGAINST THE GIT COMMON DIR, which is the only directory both halves agree on. It
   # was tree-relative and wrong twice: each half resolved it against its own cwd, and in a
@@ -186,7 +251,9 @@ write_lander_marker() {  # -> 1 when the push landed but the record could not be
     echo "push-main: pushed $def, but could not resolve the git common dir to write the lander marker ($lm). The push SUCCEEDED and is not recorded." >&2
     return 1
   fi
-  if ! printf 'landed %s at %s by push-main\n' "$def" "$(git rev-parse HEAD)" > "$_gcd/$lm"; then
+  # The pushed commit FIRST, since `--landed` reads the line's first sha; then the bar the hook
+  # vetted, by class, path and blob (M1), so a reader can tell the whole bar from a cheap one.
+  if ! printf 'landed %s at %s by push-main bar %s %s %s\n' "$def" "$(git rev-parse HEAD)" "$bar" "$barpath" "$barblob" > "$_gcd/$lm"; then
     echo "push-main: pushed $def, but could not write the lander marker at $_gcd/$lm. The push SUCCEEDED and is not recorded." >&2
     return 1
   fi
@@ -351,7 +418,7 @@ check_carry_set() {  # R -> 1 when a member belongs to another build
 # a unit by the unit id as a whole token in its subject, so a unit id here would make the landing
 # merge that unit's build commit and move every verdict derived from it.
 cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing could be observed
-  local branch oldb R t
+  local branch oldb R t dirt
   branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
   if [ -z "$branch" ]; then
     echo "push-main: HEAD is detached, and preparing a landing moves the branch it is made on — check the run's branch out first." >&2
@@ -362,9 +429,14 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     return 1
   fi
   # A dirty tree makes the merge refuse to START — NOT a merge conflict; catch it here with the real
-  # remedy instead of the misleading "CONFLICT" the merge-failure path would print.
-  if [ -n "$(git status --porcelain -uno 2>/dev/null)" ]; then
-    echo "push-main: the working tree has uncommitted changes — commit or stash before landing $def." >&2
+  # remedy instead of the misleading "CONFLICT" the merge-failure path would print. The ONE definition
+  # of dirty the attended path and .githooks/pre-push spell (TOOL-aRepatriatedFork-8 S3): the hook
+  # refuses an untracked file at `--land` anyway, so the retired `-uno` here only moved that refusal
+  # past a merge it had already made.
+  dirt=$(git status --porcelain --ignore-submodules=untracked 2>/dev/null) || dirt="(git status failed)"
+  if [ -n "$dirt" ]; then
+    echo "push-main: the working tree has uncommitted changes or untracked files — commit, stash or remove them before landing $def:" >&2
+    printf '%s\n' "$dirt" | sed 's/^/    /' >&2
     return 1
   fi
   R=$(resolve_tip) || return 3
@@ -413,7 +485,7 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
 
 # `--land`: push the prepared merge, and only it, as the default branch.
 cmd_land() {
-  local attempt R t pout rc cls
+  local attempt R t rc cls
   attempt=1
   while [ "$attempt" -le "$max" ]; do
     R=$(resolve_tip) || exit 3
@@ -423,25 +495,25 @@ cmd_land() {
       exit 1
     fi
     check_carry_set "$R" || exit 1
+    # The hook's verdict and the bar it vetted are cleared before every push, as the attended path
+    # clears them, so a file an earlier push's hook wrote cannot be read as this one's answer.
+    rm -f "$refusal" "$barfile"
     # IN THIS WORKTREE'S OWN GIT DIR, which is the one the pre-push hook reads when the push is
     # issued from here. The lander marker below is the one resolved against the COMMON dir; the two
     # files answer different questions and live in different places on purpose.
     touch "$marker"
     echo "push-main: gating + pushing ${t:0:8} to $def (attempt $attempt/$max)..." >&2
-    pout=$(mktemp)
     # HEAD, never refs/heads/<def>: the local default branch is shared by every build on this node,
-    # and publishing it is the defect these flags close.
-    git push "$remote" "HEAD:refs/heads/$def" 2>&1 | tee "$pout" >&2
-    rc=${PIPESTATUS[0]}
+    # and publishing it is the defect these flags close. Its output is SHOWN and never read (S2).
+    git push "$remote" "HEAD:refs/heads/$def" >&2
+    rc=$?
     rm -f "$marker"
     if [ "$rc" -eq 0 ]; then
-      rm -f "$pout"
       write_lander_marker || exit 1
       echo "push-main: landed $def on $remote." >&2
       exit 0
     fi
-    cls=$(parse_push_class "$pout")
-    rm -f "$pout"
+    cls=$(derive_push_failure)
     case "$cls" in
       race)
         # RE-PREPARE, rather than merging the new tip INTO the branch. That reconcile makes a merge
@@ -452,11 +524,8 @@ cmd_land() {
         echo "push-main: push rejected — $remote/$def advanced during the gate; re-preparing onto the new tip and re-gating..." >&2
         cmd_prepare || exit $?
         attempt=$((attempt + 1)) ;;
-      unreachable)
-        echo "push-main: could not reach $remote — the gate ran but nothing was pushed; retry when the remote is reachable." >&2
-        exit 1 ;;
-      red)
-        echo "push-main: push failed and $remote/$def is unchanged — the gate is RED (output above). Fix it and re-run." >&2
+      *)
+        # refused, unreachable or unchanged: derive_push_failure has said which, and why.
         exit 1 ;;
     esac
   done
@@ -496,7 +565,7 @@ case "$MODE" in
 esac
 
 # ---- THE ATTENDED LANDING, from the primary tree with the default branch checked out -------------
-branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
+# `branch` was read at the top, where the remote is resolved from it (TOOL-aRepatriatedFork-8 S1).
 if [ "$branch" != "$def" ]; then
   echo "push-main: on '$branch', not '$def' — land $def from the primary tree on $def." >&2
   exit 2
@@ -504,8 +573,15 @@ fi
 
 # A dirty tree makes the reconcile merge refuse to START — NOT a merge conflict; catch it here with
 # the real remedy instead of the misleading "reconcile CONFLICT" the merge-failure path would print.
-if [ -n "$(git status --porcelain -uno 2>/dev/null)" ]; then
-  echo "push-main: the working tree has uncommitted changes — commit or stash before landing $def." >&2
+# ONE definition of dirty, spelled identically in .githooks/pre-push, which refuses the same tree
+# (TOOL-aRepatriatedFork-8 S3, from adopter ic's ARCH-dWaryGatepost-1). `-uno`, the spelling this used,
+# passed a brand-new untracked source file that the bar then certified and the push did not carry.
+# `--ignore-submodules=untracked` also refuses a moved submodule pointer and a tracked edit inside a
+# submodule, and ignores a submodule's own untracked files, which no commit here can carry.
+dirt=$(git status --porcelain --ignore-submodules=untracked 2>/dev/null) || dirt="(git status failed)"
+if [ -n "$dirt" ]; then
+  echo "push-main: the working tree has uncommitted changes or untracked files — commit, stash or remove them before landing $def:" >&2
+  printf '%s\n' "$dirt" | sed 's/^/    /' >&2
   exit 2
 fi
 
@@ -522,31 +598,28 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
+  rm -f "$refusal" "$barfile"
   touch "$marker"
   echo "push-main: gating + pushing $def (attempt $attempt/$max)..." >&2
-  pout=$(mktemp)
-  git push "$remote" "$def" 2>&1 | tee "$pout" >&2
-  rc=${PIPESTATUS[0]}
+  # THE PUSH'S OUTPUT IS SHOWN, NEVER READ (S2). It carries the bar's own output, so classifying on
+  # its words let any leg that printed `connection` report a red bar as an unreachable remote
+  # (TOOL-aHonedRuleset-10), and any leg that printed `rejected` fake a race and re-run the bar.
+  git push "$remote" "$def" >&2
+  rc=$?
   rm -f "$marker"
   if [ "$rc" -eq 0 ]; then
-    rm -f "$pout"
     write_lander_marker || exit 1
     echo "push-main: landed $def on $remote." >&2
     exit 0
   fi
 
-  cls=$(parse_push_class "$pout")
-  rm -f "$pout"
-
+  # The hook's verdict first, then a probe, then ancestry: derive_push_failure, shared with --land.
+  cls=$(derive_push_failure)
   case "$cls" in
     race)
       echo "push-main: push rejected — $remote/$def advanced during the gate; re-reconciling and re-gating..." >&2
       attempt=$((attempt + 1)) ;;
-    unreachable)
-      echo "push-main: could not reach $remote — the gate ran but nothing was pushed; retry when the remote is reachable." >&2
-      exit 1 ;;
-    red)
-      echo "push-main: push failed and $remote/$def is unchanged — the gate is RED (output above). Fix it and re-run push-main." >&2
+    *)
       exit 1 ;;
   esac
 done

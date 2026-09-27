@@ -31,14 +31,15 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [check-format-grades-two-populations](check-format-grades-two-populations.md) | class | 3 |  | the build README slot gate binds every tracked README on one axis and only the declared ones on the other, so a new folder can red on a rule its author never opted into |
 | [concurrency-is-not-a-budget](concurrency-is-not-a-budget.md) | class | 6 |  | a per-item verify fan-out passes a concurrency cap and still spawns one agent per finding |
 | [conf-value-interpolated-into-a-regex](conf-value-interpolated-into-a-regex.md) | class | 10 |  | a config value spliced into a regex must be VALIDATED as a plain path, not escaped — a quoted value matches nothing and a value with a pipe swallows a subtree, both silently |
-| [containment-tested-one-way](containment-tested-one-way.md) | class | 5 |  | a guard asking only "is this path under the protected one" refuses the narrow declarations and admits the one that claims everything |
+| [containment-tested-one-way](containment-tested-one-way.md) | class | 8 |  | a guard asking only "is this path under the protected one" refuses the narrow declarations and admits the one that claims everything |
 | [criterion-asserts-what-its-own-command-cannot-show](criterion-asserts-what-its-own-command-cannot-show.md) | class | 2 |  | an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, or a state that holds when the scope item is skipped |
+| [decision-re-derived-by-a-second-process](decision-re-derived-by-a-second-process.md) | class | 6 |  | a second process that re-derives a decision the first one already acted on, from its OWN inputs, answers a different question whenever those inputs differ, and the gap is exactly where an attacker stands |
 | [degradation-known-but-unreported](degradation-known-but-unreported.md) | class | 5 |  | a pipeline computes how badly its own run degraded and then fails to say so where it matters, so a degraded run produces a clean bill |
 | [destructive-step-before-its-precondition](destructive-step-before-its-precondition.md) | class | 6 |  | a destructive step ordered before the probe for the precondition that makes it useful runs on exactly the case where nothing can follow it, so the harm lands and the benefit never does |
 | [empty-field-collapses-unless-it-is-last](empty-field-collapses-unless-it-is-last.md) | class | 4 |  | `IFS=$'\t' read -r a b c d` collapses a run of tabs because tab is IFS whitespace, so a field that can be empty silently shifts every field after it and the branch reading them is dead |
 | [fallback-fabricates-the-passing-value](fallback-fabricates-the-passing-value.md) | class | 1 |  | a degraded-mode substitute spelled with the value some assertion reads as clean turns a broken subject into a silent green |
 | [fixed-sleep-does-not-place-a-signal](fixed-sleep-does-not-place-a-signal.md) | class | 2 |  | a test that sleeps a fixed time and then signals assumes the child it means to interrupt is already running; under load the signal lands before that child exists or after it ended |
-| [fixture-inherits-ambient-machine-state](fixture-inherits-ambient-machine-state.md) | class | 4 |  | a hermetic-looking fixture silently reads machine-global config, so it passes everywhere it was written and fails where it was not |
+| [fixture-inherits-ambient-machine-state](fixture-inherits-ambient-machine-state.md) | class | 8 |  | a hermetic-looking fixture silently reads machine-global config, so it passes everywhere it was written and fails where it was not |
 | [fixture-lacks-a-gate-the-consumer-has](fixture-lacks-a-gate-the-consumer-has.md) | class | 2 |  | a runbook's fixture passes because it lacks a commit-time gate the consumer runs, and the consumer refuses the step the fixture let through |
 | [fixture-passes-by-finding-nothing](fixture-passes-by-finding-nothing.md) | class | 1 | yes | a test arm whose fixture never triggers the rule passes, and proves nothing |
 | [fixture-removes-the-path-under-test](fixture-removes-the-path-under-test.md) | class | 1 |  | a fixture stabilised by DELETING a dependency stops the branch under test from executing, so both A/B arms run the other code twice and agree |
@@ -93,7 +94,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [trace-profile-measures-itself](trace-profile-measures-itself.md) | class | 1 |  | a per-line set -x profile charges its own write overhead to the next line, so its seconds rank by call count and an optimisation aimed at them moves nothing |
 | [trailing-comma-counted-as-an-element](trailing-comma-counted-as-an-element.md) | class | 5 |  | a counter scoring one-plus-every-top-level-comma reads a trailing comma as a real item, so every multi-line literal measures one too many |
 | [trapped-signal-waits-for-the-foreground-child](trapped-signal-waits-for-the-foreground-child.md) | class | 2 |  | a bash script that TRAPS TERM, HUP or INT runs the handler only after its foreground child returns, so a killed script outlives the kill for as long as that child runs |
-| [two-answers-to-one-question](two-answers-to-one-question.md) | class | 10 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
+| [two-answers-to-one-question](two-answers-to-one-question.md) | class | 18 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
 | [two-guards-one-question-two-answers](two-guards-one-question-two-answers.md) | class | 3 |  | two guards that ask one question different ways become jointly unsatisfiable, and the tree they wedge has no legal move left |
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
@@ -102,6 +103,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-87 record(s): 87 class, 0 note, 0 superseded · 6 universal · 0 unanchored
+88 record(s): 88 class, 0 note, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

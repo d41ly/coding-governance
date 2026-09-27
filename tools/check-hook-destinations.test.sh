@@ -82,20 +82,36 @@ b=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" >/dev/null 2>&1; echo 
                               || bad "the gate does not discriminate (clean=$a broken=$b)"
 rm -rf "$d"
 
-# ---- ARM 6: a {here} fragment in a directory NO flat descriptor homes REFUSES (AC6) --------------
-# TOOL-aReplayedCard-2. `{here}` means "beside a flat kit's engine"; a fragment carrying it under a
-# directory-shaped kit's home ships from nowhere, and the leg must say which directory rather than
-# pass because the flat-kit rule found nothing to compare.
+# ---- ARM 6: a {here} fragment in a directory NO descriptor homes REFUSES (AC6) -------------------
+# TOOL-aReplayedCard-2, narrowed by TOOL-aRepatriatedFork-2 (gate repair at VERIFYING): a fragment
+# under a directory NO descriptor homes ships from nowhere, and the leg must say which directory.
+# Under a DIRECTORY kit's home, `{here}` is the kit dir at every prefix, so a shipped file passes
+# and an unshipped one reds — the memory-recall fragment is that shape in the shipped tree.
 d=$(scratch)
+mkdir -p "$d/$KIT_REL/nohome"
 printf '{"name": "orphan", "event": "E", "matcher": "M", "marker": "agent-cap.js", "hook_path": "{here}/agent-cap.js"}\n' \
-  > "$d/$KIT_REL/hooks/orphan.fragment.json"
+  > "$d/$KIT_REL/nohome/orphan.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m orphan --no-verify ) >/dev/null 2>&1
 out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
-[ "$rc" != 0 ] && ok "a {here} fragment under a non-flat home REDS (rc=$rc)" \
-               || bad "a {here} fragment under a non-flat home was accepted"
-case "$out" in *"orphan.fragment.json"*"'$KIT_REL/hooks' is the home of NO kind=flat"*)
-  ok "and the refusal names the directory and the flat-kit rule" ;;
+[ "$rc" != 0 ] && ok "a {here} fragment under no descriptor's home REDS (rc=$rc)" \
+               || bad "a {here} fragment under no descriptor's home was accepted"
+case "$out" in *"orphan.fragment.json"*"'$KIT_REL/nohome' is the home of NO descriptor"*)
+  ok "and the refusal names the directory" ;;
   *) bad "the refusal does not name the directory: $(printf '%s' "$out" | grep orphan | head -2)" ;; esac
+rm -rf "$d"
+d=$(scratch)
+printf '{"name": "dirkit", "event": "E", "matcher": "M", "marker": "agent-cap.js", "hook_path": "{here}/agent-cap.js"}\n' \
+  > "$d/$KIT_REL/hooks/dirkit.fragment.json"
+( cd "$d" && git add -A && git commit -q -m dirkit --no-verify ) >/dev/null 2>&1
+out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+[ "$rc" = 0 ] && ok "a {here} fragment under a directory kit's home naming a shipped file passes" \
+              || bad "a {here} fragment under a directory kit's home was refused: $(printf '%s' "$out" | grep -E 'FAIL|REFUS' | head -2)"
+printf '{"name": "dirkit", "event": "E", "matcher": "M", "marker": "nobody.js", "hook_path": "{here}/nobody.js"}\n' \
+  > "$d/$KIT_REL/hooks/dirkit.fragment.json"
+( cd "$d" && git add -A && git commit -q -m dirkit-unshipped --no-verify ) >/dev/null 2>&1
+out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+[ "$rc" != 0 ] && ok "a {here} fragment under a directory kit's home naming an unshipped file REDS (rc=$rc)" \
+               || bad "a {here} fragment naming an unshipped file under a directory kit's home was accepted"
 rm -rf "$d"
 
 # ---- ARM 7: a {here} fragment under a SHARED flat home is judged at its adopter path (AC6) --------
@@ -144,7 +160,7 @@ rm -rf "$d"
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not the written one. An arm stranded
 # past an early exit disappears silently; the floor is what turns that into a failure instead of a
 # smaller green number nobody reads.
-FLOOR_ASSERTIONS=16
+FLOOR_ASSERTIONS=18
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # The AGREED shape, anchored: check-testsuite-counts.sh matches this line to prove the count is
 # actually printed rather than merely computed.

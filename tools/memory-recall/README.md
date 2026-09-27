@@ -1,6 +1,6 @@
 # memory-recall — ask your decision corpus a question, get the records that answer it
 
-<!-- gov:kit memory-recall@1.9 -->
+<!-- gov:kit memory-recall@1.17 -->
 
 A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and
@@ -12,7 +12,7 @@ another kit's gate already enforces. A second declaration would be the hand-kept
 this port exists to remove, which is why there is no `--memory-root` and no `--families` flag: the
 conf is required, and its absence is a refusal that prints a two-key stub rather than scaffolding one.
 
-Ported from the inCMS `scripts/recall/` implementation at `5318064`.
+Ported from adopter ic's `scripts/recall/` implementation at `5318064`.
 
 ## What's here
 
@@ -33,15 +33,27 @@ Ported from the inCMS `scripts/recall/` implementation at `5318064`.
 
 ## Configure
 
-Nothing to configure. Adopt the **memory-tree** kit first; this kit reads its `.memory-tree.conf`:
+Adopt the **memory-tree** kit first; this kit reads its `.memory-tree.conf` and declares no config
+file of its own. Two keys are required:
 
 | Key | Used for |
 |---|---|
 | `MEMORY_ROOT` | the corpus root passed to `git ls-files`, and folded into the durable-home regex |
 | `FAMILIES` | the `discipline:FAMILY` pairs; the uppercase FAMILY tokens are the id allowlist |
 
-The node-tag character class is **not** a conf key: it is `a-z`, matching the memory-tree gate's own
-`node [a-z]`. Non-letter node tags are unsupported.
+Four more keys are optional and recall-scoped. Each one is a fact about YOUR corpus, and absent,
+each keeps the kit's default exactly. A malformed value is refused with exit 2, naming the key; it
+never falls back silently. Running this kit's `recall_conf.py` prints what each resolved to.
+
+| Key | Absent means | Used for |
+|---|---|---|
+| `RECALL_NODE_TAG_CLASS` | `a-z` | the node-tag character class of the id grammar, as a class body over `[a-z0-9-]` (`a-f`) |
+| `RECALL_CITED_FAMILIES` | none | families your corpus CITES and never homes: they become ids, and gain no durable home. A token `FAMILIES` already declares is refused |
+| `RECALL_BUILD_QID_CUTOFF` | no boundary | `<tag>:<qid>` pairs; each node's build-era boundary in its own query log, which `--export` labels |
+| `RECALL_EXPORT_DIR` | the common git dir | a repo-relative directory for `--export`'s aggregate; one that resolves outside the root is refused |
+
+`RECALL_NODE_TAG_CLASS` and `RECALL_CITED_FAMILIES` change which strings are ids, so they are in
+`Conf.digest()` and editing one rebuilds the cache. The other two do not, and are not.
 
 ## Use
 
@@ -63,7 +75,8 @@ un-rewritten baseline deliberately and is logged as such.
 The cache (`records.db`, `chunks.db`, `manifest.json`) and the append-only query log
 (`queries.jsonl`) live under `<common-git-dir>/recall/`, keyed by a digest of the worktree path.
 `--export`'s aggregate is written beside the log, not into the tree, so no free-text question ever
-reaches a tracked file.
+reaches a tracked file. The one exception is one you declare: `RECALL_EXPORT_DIR` puts it in the
+tree, and the file carries counts only.
 
 That property is asserted **by path**, not by a clean `git status`: a status is also clean when a
 write was merely hidden by an ignore rule. `sys.dont_write_bytecode = True` sits above the
@@ -105,6 +118,9 @@ is indistinguishable from one that was never built.
    PostToolUse hook; skipping it is a supported end state, not a gap. With `--with-hook`, finish
    the wiring:
    `python3 settings-merge.py --fragment tools/memory-recall/recall-opened.fragment.json`.
+   A hook you keep OUTSIDE this directory is declared, not moved: an `[[own]]` row in
+   `.governance/deploy.toml` implementing `memory-recall:recall-opened.js`, after which the
+   fragment resolves to your copy in both `check-wiring.sh` and `settings-merge.py`.
 3. **Wire both legs into your local gate runner AND your CI config**, grep-guarded so a re-run does
    not duplicate them. Without this the skill-drift check silently never runs:
    `python3 tools/memory-recall/selftest.py` and `bash tools/memory-recall/adopt-memory-recall.sh --check`.
@@ -132,7 +148,9 @@ would suppress the tool at the exact moment it exists for.
 
 The `recall-opened` hook is **opt-in**. It appends one `opened` row per query saying which rank the
 caller actually read, stamped `inferred: true`, and it is the only instrument that can answer
-"did the answer get shown". It ships dark: no `--with-hook`, no file — so `check-wiring.sh` reports
+"did the answer get shown". It ships dark: no opt-in, no file. govkit lands it only where
+`.governance/deploy.toml` sets `[kit.memory-recall] with_hook = "yes"`, and `--with-hook` prints the
+merge that wires it — so `check-wiring.sh` reports
 three honest states (kit not adopted · opt-in not taken · present but unmerged = UNWIRED) instead of
 a permanent false alarm. Membership is decided by the log's `shown_paths` array rather than a
 `memory/` literal, so it works on any `MEMORY_ROOT`.

@@ -273,7 +273,7 @@ def scan_tree(root: pathlib.Path) -> tuple[dict[str, list[tuple[str, int, str]]]
     """
     listing = subprocess.run(
         ["git", "ls-files", "-z", "*.sh"],
-        cwd=str(root), capture_output=True, text=True,
+        cwd=str(root), capture_output=True, text=True, encoding="utf-8",
     )
     if listing.returncode != 0:
         # A DEAD PROBE, and it must not be spelled the same way as an empty tree. Both yield

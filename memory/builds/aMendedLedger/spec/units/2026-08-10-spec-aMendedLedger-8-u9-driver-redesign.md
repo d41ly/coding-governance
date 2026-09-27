@@ -31,6 +31,10 @@ bar did not see, so this unit redesigns rather than repairs.
 - **S2** Delete the machinery the redesign retires, named in §4 Migration, rather than leaving it
   unreachable: `split_regions`, `rows`, `lead` and its two dedup regimes, the `%B`-only splice with
   its `%A`-only skip, and the emit-site audit counters.
+  - **Readers:** by name: `tools/check-wiring.sh` describes what the retired splitter did to three
+    unkeyable lines, and `memory/map/features/memory-tree-merge-driver.md` records the withdrawn
+    seam and what replaced it. by value: NO VALUE READERS — the three-region model was the seam's
+    whole content, and nothing read a number out of it.
 - **S3** Add the row-conservation postcondition: for every key, the COUNT of that key's row lines in
   the written file equals the count the row plane resolved to, multiplicity counted on both sides.
   This is the assertion that makes "the driver never drops a row" a checked property on every merge
@@ -62,6 +66,11 @@ bar did not see, so this unit redesigns rather than repairs.
   exists for (§4 The conflict-style hazard). The requirement is that the region shape reaching rules
   3 and 4 cannot be changed by an adopter's git config; the MECHANISM is §8 F8 and is not the
   builder's to pick alone.
+  - **Readers:** by name: `tools/memory-tree/merge-rows.py` pins `merge.conflictStyle` at its one
+    merge-file call and says why, `tools/memory-tree/merge-rows.test.sh` spells the key, and
+    `memory/map/features/memory-tree-merge-driver.md` records the pin and its price. by value:
+    `tools/memory-tree/merge-rows.test.sh` sets the config to each of the two three-way styles and
+    asserts the driver's exit code, headings, rows and markers under each.
 
 ## 3. Non-goals (OUT)
 

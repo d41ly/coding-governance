@@ -48,6 +48,43 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 KIT_DRIFT_AUDIT_VERSION = "1.12"
 
 CONF_NAME = ".memory-tree.conf"
@@ -106,6 +143,11 @@ def load_conf(root: pathlib.Path) -> dict[str, str]:
             continue
         k, _, v = line.partition("=")
         k = k.strip().removeprefix("export ").strip()
+        # TOOL-aRepatriatedFork-38 rev-3 (the closing review's C4): whitespace right after `=`
+        # ends the assignment, so `K=   # note` is empty in bash, not the word `#`.
+        if v[:1].isspace():
+            conf[k] = ""
+            continue
         v = v.strip().strip("\r")
         # Bash sourcing semantics for the restricted grammar the conf documents: a quoted value
         # is the text up to its MATCHING quote, whatever follows it; an UNQUOTED value ends at
@@ -478,8 +520,9 @@ def _build_local_ident(families) -> str:
 
 def _resolve_ident(root, families) -> str:
     """The shipped alternation for THIS tree, from the recall extractor where it is importable."""
-    kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
-    if not (kit / "extract.py").exists():
+    try:
+        kit = resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
         return _build_local_ident(families)
     added = str(kit)
     sys.path.insert(0, added)
@@ -525,8 +568,9 @@ def _build_local_anchors(ident: str):
 
 def _resolve_anchors(root, families):
     """The anchor patterns for THIS tree, from the recall extractor where it is importable."""
-    kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
-    if not (kit / "extract.py").exists():
+    try:
+        kit = resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
         return _build_local_anchors(_build_local_ident(families))
     added = str(kit)
     sys.path.insert(0, added)
@@ -936,7 +980,10 @@ def _load_lexicon(ctx):
     promised "never a raise and never a red"; this is what keeps that true.
     """
     import sys as _sys
-    kit = str(ctx.root / "tools" / "lexicon")
+    try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon_conf.py", pathlib.Path(__file__).resolve().parent))
+    except LookupError:
+        return None
     if kit not in _sys.path:
         _sys.path.insert(0, kit)
     try:
@@ -1000,7 +1047,10 @@ def signal_lexicon_verbs_unused(ctx) -> dict:
         return _build_not_asked(name, ".lexicon.conf is present but its kit is not importable here "
                                       "(root-prefix install, mid-teardown, or an unparseable conf)")
     import sys as _sys
-    kit = str(ctx.root / "tools" / "lexicon")
+    try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon.py", pathlib.Path(__file__).resolve().parent))
+    except LookupError as e:
+        return _build_not_asked(name, str(e))
     if kit not in _sys.path:
         _sys.path.insert(0, kit)
     try:
@@ -1199,7 +1249,10 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     if loaded is None:
         return _build_not_asked(name, ".lexicon.conf is present but its kit is not importable here")
     import sys as _sys
-    kit = str(ctx.root / "tools" / "lexicon")
+    try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon.py", pathlib.Path(__file__).resolve().parent))
+    except LookupError as e:
+        return _build_not_asked(name, str(e))
     if kit not in _sys.path:
         _sys.path.insert(0, kit)
     try:
@@ -1818,15 +1871,19 @@ def build_source_cited_ids_with_no_record(ctx) -> dict:
 
 
 def _resolve_relocation_engine():
-    """The memory-tree kit's relocation engine, by a directory BESIDE this one.
+    """The memory-tree kit's relocation engine, through `resolve_kit_dir` like every sibling lookup.
 
     The resolution `_resolve_ident` makes for the recall kit, for the same reason: the kit that owns
     the answer is a sibling of this one at whatever prefix a tree installs them at, and the sibling
     is optional. Returns None rather than raising — `main()` evaluates every signal in one unguarded
-    comprehension, so a raise here takes the whole report down.
+    comprehension, so a raise here takes the whole report down. The receipt rung finds a kit an
+    adopter RENAMED, which the old `parent.parent / <home>` probe could not (TOOL-aRepatriatedFork-2).
     """
-    engine = pathlib.Path(__file__).resolve().parent.parent / "memory-tree" / "migrate_backlog.py"
-    return engine if engine.is_file() else None
+    try:
+        kit = resolve_kit_dir("memory-tree", "migrate_backlog.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
+        return None
+    return kit / "migrate_backlog.py"
 
 
 def build_backlog_stragglers(ctx) -> dict:
@@ -2309,8 +2366,8 @@ def resolve_base_ref(root: pathlib.Path, explicit: str | None) -> str:
     if not name:
         # `encoding="utf-8"` like every other probe in this file. `text=True` ALONE decodes with
         # the platform default, which on a cp125x Windows node mis-decodes a non-ASCII branch name
-        # and, under a strict-encoding lint, is a finding in its own right. Reported by the inCMS
-        # adopter, whose encoding-posture leg requires it (ARCH-dReadoptedConvoy-1 S7).
+        # and, under a strict-encoding lint, is a finding in its own right. Reported by adopter ic,
+        # whose encoding-posture leg requires it (ARCH-dReadoptedConvoy-1 S7).
         head = subprocess.run(["git", "-C", str(root), "symbolic-ref", "--quiet",
                                "refs/remotes/origin/HEAD"], capture_output=True, text=True,
                               encoding="utf-8", errors="replace")

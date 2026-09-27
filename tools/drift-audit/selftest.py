@@ -126,6 +126,10 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
         'INLINE=value   # a trailing comment bash does not put in the value\n'
         'QUOTED_NOTE="noted"  # a note after a quoted value\n'
         "SINGLE_NOTE='single' # a note after a single-quoted value\n"
+        # TOOL-aRepatriatedFork-38 rev-3 (C4): whitespace after `=` ends the assignment, so this is
+        # empty, never the word `#`; a `#` opening the word is data.
+        'BLANKED=   # blank on purpose\n'
+        'HASHED=#x\n'
     )
     p = tmp / ".memory-tree.conf"
     p.write_text(body, encoding="utf-8", newline="\n")
@@ -141,7 +145,7 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
     # TOOL-dLoggedFlight-13 R2-L5 — QUOTED_NOTE and SINGLE_NOTE: a quoted value followed by a comment
     # kept its quotes, because the parser told quoted from unquoted by the value's last character.
     for key in ("MEMORY_ROOT", "DISCIPLINES", "QUOTED_SINGLE", "TRAILING",
-                "EXPORTED", "INLINE", "QUOTED_NOTE", "SINGLE_NOTE"):
+                "EXPORTED", "INLINE", "QUOTED_NOTE", "SINGLE_NOTE", "BLANKED", "HASHED"):
         res = run([sh, "-c", f'set -a; . ./.memory-tree.conf; printf "%s" "${key}"'], tmp)
         if res.returncode != 0:
             check(f"{sh} could source the conf for {key}", False, res.stderr.strip()[:120])
@@ -789,9 +793,11 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
               f"{s['detail']}")
 
     # Adopt the kit INTO the fixture: the engine reaches it by `sys.path`, so the reader has to be
-    # present exactly where an installed kit puts it.
+    # present exactly where an installed kit puts it -- BESIDE the drift-audit kit, which this fixture
+    # installs at the root prefix, because the engine resolves its sibling through `resolve_kit_dir`
+    # (TOOL-aRepatriatedFork-2 S3), not at the graded root's `tools/`.
     kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
-    shutil.copytree(kit_src, r / "tools" / "lexicon",
+    shutil.copytree(kit_src, r / "lexicon",
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     src = r / "src" / "thing.py"
     src.write_text("def build_thing():\n    pass\n", encoding="utf-8", newline="\n")
@@ -928,7 +934,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     check("no .lexicon.conf: it says why", "not adopted" in str(absent["detail"]), f"{absent['detail']}")
 
     kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
-    shutil.copytree(kit_src, r / "tools" / "lexicon",
+    shutil.copytree(kit_src, r / "lexicon",
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (r / ".lexicon.conf").write_text(
         'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
@@ -1036,7 +1042,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     # carried an `or of > 0` escape to paper over that, which made it satisfiable by the very
     # population it was supposed to exclude -- observed staying green with the guard reverted.
     b = make_repo(tmp, "lexblind")
-    shutil.copytree(kit_src, b / "tools" / "lexicon",
+    shutil.copytree(kit_src, b / "lexicon",
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (b / ".lexicon.conf").write_text(
         'BANNED_SUFFIXES="Manager"' + chr(10) + 'LANGS="py:python-ast:parser"' + chr(10)

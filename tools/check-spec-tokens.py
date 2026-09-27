@@ -9,16 +9,28 @@ tracked files, and hand-verifying them is what this replaces.
 WHAT IT DOES NOT CHECK, stated here because a structural check reads as a semantic one to everybody
 who did not write it. It resolves EXISTENCE and RANGE. It does not read the cited line and does not
 know whether it says what the spec claims; a citation naming a real line that argues the opposite
-passes. It does not grade prose, scope, acceptance or tier. The bar join reads an INVOCATION as a
+passes. It does not grade scope, acceptance or tier, and grades prose only where the claims join
+grades a dossier-claim sentence's SHAPE. The bar join reads an INVOCATION as a
 spec spells it inside backticks, and nothing else: it cannot see a path built at runtime,
 a runner spelled inside a sh -c string,
 a suite run written as the body of a fenced block,
 or a suite named in prose.
 Each of those is the ACT, and the act is refused by the hook of TOOL-aDeferredBar-3, not here.
+The claims join (TOOL-dGatedProse-2) grades the SHAPE of a claimed object and resolves nothing, and
+six things are invisible to it by construction: (1) an unbackticked dossier subject, because the
+look-back window that would read one scored precision 0.00 over this corpus; (2) an unbackticked
+claimed object, because every arm grades a run of backticked objects; (3) a claim inside a fenced
+block, backtick or tilde, blanked so a spec may exhibit the refused sentence as a worked example; (4) a key-shaped
+object that is not a key, a typo included, which the map's own both-directions ratchet fails once a
+dossier claims it; (5) a claim in the wrong dossier, because no dossier's claims table is read; and
+(6) a filler run longer than the closed arm admits, such as four words between the subject and the
+noun arm's verb where that arm admits three. A zero from it is the corpus's normal state, and
+CLAIM_CANARY is what separates that zero from a dead arm.
 
 THE JOINS KEEP THEIR POPULATIONS APART, the correction rev-2 folded from round 3. The fourth join,
 `bar`, reads two of the three rather than minting a fourth; the fifth, `guards`, reads the legs
-population plus one of its own, the declared write set.
+population plus one of its own, the declared write set; the sixth, `claims`, reads none of them,
+being a grammar over the spec's own prose outside its fenced blocks.
 
   legs   backticked tokens on a `## 7. Gates` LINE THAT IS THE LIST -> a `name` in the manifest.
          A section 7 line carrying prose is not graded: measured, that predicate produced 270
@@ -91,6 +103,23 @@ population plus one of its own, the declared write set.
          ABSENCE IS NOT DISAGREEMENT, check 12's own rule: a bullet whose target names no live spec
          in its build is handing to a terminal or Tier-1 sibling, both legitimate, so it is SKIPPED
          AND COUNTED like the citation arm's untracked half, and the count rides every run.
+  claims every backticked OBJECT a dossier-claim SENTENCE names, in a LIVE spec, outside fenced
+         blocks, with no cutoff key (owner, 2026-09-21) -> a hit when the object is a PATH (a
+         `/`), a GLOB (a `*` or `?`) or a CODE SYMBOL (an underscore between two letters or
+         digits, either case, or a parenthesis), none of which the map can hold as a key
+         (TOOL-dGatedProse-2). A sentence is one of four arms anchored on a backticked dossier
+         subject — a features dossier, the foundation dossier or a bare `.md` basename — built
+         from CLOSED word lists and named active, passive, noun and fronted. Each yields the
+         MAXIMAL run of objects a comma, `and`, `or`, `plus` or the middle dot joins, so a
+         conjunction cannot hide its second object. A token carrying a space is never refused:
+         every live key carrying punctuation also carries a space, and that clause is what keeps
+         the refusal set disjoint from the key set. Every cleared object is listed by --list as
+         NEAR, and the join's line prints on every run, because it has no key to branch on.
+         LIVE here is `LIVE` below, OPEN, SPECCED, INPROGRESS or BLOCKED, so a DEFERRED spec is
+         counted terminal and not graded, where hygiene check 25 grades every spec that is not
+         CLOSED or WONTDO. A hit's token is `claims <- <object>`, the guards join's composite
+         spelling, so a `[path]` waiver row keyed on the same bare string neither swallows a
+         claims refusal nor is kept from reading stale by one; waive a claim by that token.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
@@ -172,7 +201,8 @@ AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # the duration slot already took any word, so `timeout "$GATE_BOUND" bash <suite>` was a hit here
 # before round 3 T5 made it one in the hook — or a
 # GATE_FULL= / GATE_SELFTESTS= assignment with a NON-EMPTY value anywhere in the
-# token. A suite is a `.test.sh` file OR a whole-suite `selftest.py` file (closing review F2: six
+# token. A suite is a `.test.sh` file OR a file whose name ENDS `selftest.py`, the word gate-guard's
+# D4 reads (`.githooks/pre_push_bar_selftest.py`, TOOL-aRepatriatedFork-5) (closing review F2: six
 # manifest legs are the latter and both readers had spelled "suite" as the shell convention); a
 # `--selftest` FLAG on some other file is the seconds-long direct check and is not a run. A
 # `path:line` citation fails the trailing lookahead and stays the cites join's; a grep over a suite
@@ -182,7 +212,7 @@ AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 BAR = re.compile(
     r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+(?:(?:-[ks]|--kill-after|--signal)\s+\S+\s+|-\S+\s+)*\S+\s+)?"
     r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)(?:-X\S*(?:\s+\S+)?|-[A-Za-z]+|-\d+(?:\.\d+)?)\s+)?)?(?:\S*/)?"
-    r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|selftest\.py)(?=\s|$)"
+    r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|[^\s/*?]*selftest\.py)(?=\s|$)"
     r"|(?:^|\s)GATE_(?:FULL|SELFTESTS)=[\"']?[^\s\"']")
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "
@@ -213,6 +243,76 @@ UNIT_ID = re.compile(r"^[A-Z][A-Za-z0-9]*-[A-Za-z]+-[0-9]+$")
 HANDOFF_WHY = ("this bullet hands the token to that sibling and the sibling's own spec never names "
                "it: name it there, or correct the bullet — the join proves the sibling NAMES the "
                "token, never that it does the work")
+
+# TOOL-dGatedProse-2: THE CLAIMS JOIN. A codebase-map dossier claims EXACT inventory keys and nothing
+# else, so a spec sentence saying a dossier claims a path, a glob or a code symbol books a grader that
+# does not exist. It is a GRAMMAR over the spec's prose plus a closed refusal set over the object it
+# names; nothing resolves, so nothing goes stale and nothing resolves by coincidence. Every filler is a
+# CLOSED word list: an open `\w+` filler is what walked the dry run's broad predicate out of one clause
+# and into the next. The fragments are named once here and composed into the four arms below.
+CLAIM_PARTS = {
+    # A backticked dossier SUBJECT: a features dossier, the foundation dossier, or a bare basename.
+    "subj": r"`(?:memory/map/features/[A-Za-z0-9._-]+|memory/map/FOUNDATION|[A-Za-z0-9._-]+)\.md`",
+    # A backticked OBJECT. A full dossier path is never one: it is the next clause's subject, and
+    # reading it as claimed would red it as a PATH.
+    "obj": r"`(?!(?:memory/map/features/[A-Za-z0-9._-]+|memory/map/FOUNDATION)\.md`)[^`\n]+`",
+    # The one dash or colon a subject may carry before its verb, the way a list row writes it.
+    "gap": r"(?:\s*[\u2014\u2013:-])?",
+    # No negation is a modal, so "does not claim" is no claim; `to` is one, so "to claim" is.
+    "modal": r"(?:will|would|shall|should|must|may|might|can|could|does|do|did|to|now|also|still"
+             r"|then|thus|already|only|newly|explicitly|deliberately|therefore)",
+    "verb": r"claim(?:s|ed|ing)?",
+    # `that` is no determiner, so a that-clause after the verb reaches nothing.
+    "det": r"(?:the|a|an|its|their|this|these|those|both|each|every|all|one|two|three|new|same"
+           r"|exact|existing)",
+    "copula": r"(?:is|are|was|were|be|been|being|gets?|got|stays?|remains?)",
+    "rel": r"(?:which|that)",
+    "word": r"[A-Za-z][\w'\u2019-]*",
+}
+# The run: a MAXIMAL chain of objects joined by nothing but a comma, `and`, `or`, `plus` or the middle
+# dot, so a conjunction cannot hide its second object.
+CLAIM_PARTS["run"] = (r"(?P<run>{obj}(?:(?:\s*[,\u00b7]\s*(?:(?:and|or|plus)\s+)?|\s+(?:and|or|plus)\s+)"
+                      r"{obj})*)").format(**CLAIM_PARTS)
+# The four arms, in the order the report names them, each MATCHED at a token start and never searched.
+CLAIM_ARMS = [(name, re.compile(shape.format(**CLAIM_PARTS), re.I)) for name, shape in (
+    ("active", r"{subj}{gap}(?:\s+{modal}){{0,2}}\s+{verb}(?:\s+{det}){{0,3}}\s+{run}"),
+    ("passive", r"{run}(?:\s+{modal}){{0,2}}\s+{copula}(?:\s+{modal})?\s+claimed\s+by(?:\s+{det})?\s+{subj}"),
+    ("noun", r"{subj}(?:['\u2019]s)?{gap}(?:\s+{word}){{0,3}}?\s+claims?\s+(?:on|over|to|under|as)"
+             r"(?:\s+{det}){{0,3}}\s+{run}"),
+    ("fronted", r"{run}(?:\s*,\s*{rel}|\s+{rel})?\s+{subj}(?:\s+dossier)?(?:\s+{modal}){{0,2}}\s+{verb}\b"),
+)]
+# The refusal set, one row per class, and the FIRST ROW TO MATCH DECIDES. The first row is the shared
+# SPACE CLAUSE, which clears: every live key carrying punctuation also carries a space, so this row is
+# what keeps the three classes disjoint from the key set, and the self-test re-derives that on every
+# run. A FILENAME key is the one exception, and CODE SYMBOL clears it by shape: the git-hooks key
+# `pre_push_bar_selftest.py` carries an underscore and no space (TOOL-aRepatriatedFork-5, gate repair
+# at VERIFYING). GLOB is tested before PATH so `tools/*/kit.toml` reports its real shape; both rest on the same
+# sentence of the map's contract, so the order moves a label and never a verdict.
+CLAIM_REFUSALS = (
+    ("", re.compile(r"\s"), "cleared by the space clause: a token carrying a space is never refused"),
+    ("GLOB", re.compile(r"[*?]"), "the map README rules that path globs are digest-only, never gated "
+     "(memory/map/README.md, rendered by tools/codebase-map/gen_map.py)"),
+    ("PATH", re.compile(r"/"), "the map README rules that path globs are digest-only, never gated "
+     "(memory/map/README.md, rendered by tools/codebase-map/gen_map.py)"),
+    ("CODE SYMBOL", re.compile(r"^(?![\w.-]+\.(?:py|sh|js|json|toml|md|txt)$).*?(?:[A-Za-z0-9]_[A-Za-z0-9]|[()])"),
+     "the symbol tier feeds "
+     "generated/symbols.json only and never the ratchet (tools/codebase-map/map_extractors.py)"),
+)
+CLAIMS_WHY = ("a codebase-map dossier claims EXACT inventory keys and no key is a {cls}: {cite}; name "
+              "the key the dossier will claim, or describe the thing in prose")
+# THE LIVENESS ASSERTION (charter §7). A zero from this join is the corpus's measured normal state, so a
+# dead arm would report exactly what a clean corpus reports. One refused claim per arm, each verb in
+# UPPERCASE so the case fold is load-bearing on every arm, between them covering all three classes,
+# plus one claim on a real parenthesised leg name that must CLEAR, which is what pins the space clause.
+# `check_claim_canary` tests the entries STRUCTURALLY and never against a typed total.
+CLAIM_CANARY = [
+    ("`memory/map/features/runlog.md` CLAIMS `derive_window_closer`.", "active", "CODE SYMBOL"),
+    ("`tools/runlog/*.py` is CLAIMED BY `runlog.md`.", "passive", "GLOB"),
+    ("`runlog.md`'s CLAIM on `tools/runlog/runlog.py` stands.", "noun", "PATH"),
+    ("`read_window()`, which `memory/map/features/runlog.md` CLAIMS, stays.", "fronted", "CODE SYMBOL"),
+    ("`memory/map/features/spec-tokens.md` CLAIMS `spec tokens (a spec's own names resolve)`.",
+     "active", ""),
+]
 
 
 def run(*args):
@@ -393,9 +493,21 @@ def read_conf_key(root, key):
     p = root / ".memory-tree.conf"
     if not p.exists():
         return ""
-    m = re.search(r'^%s="?([^"\n]*)"?\s*$' % re.escape(key),
-                  p.read_bytes().decode("utf-8", "replace"), re.M)
-    return m.group(1).strip() if m else ""
+    m = re.search(r'^%s=(.*)$' % re.escape(key), p.read_bytes().decode("utf-8", "replace"), re.M)
+    if not m:
+        return ""
+    # TOOL-aRepatriatedFork-38: a quoted value ends at its matching quote and an unquoted one at a
+    # `#` beginning a word. The old pattern demanded nothing after the closing quote, so a cutoff
+    # carrying a trailing comment read as BLANK, which switches its check off.
+    # rev-3 (C4): whitespace right after `=` ends the assignment, and a `#` begins a comment only
+    # after whitespace, so `K=#x` keeps `#x` and `K= # note` is blank, as bash reads them.
+    if m.group(1)[:1].isspace():
+        return ""
+    v = m.group(1).strip()
+    close = v.find(v[0], 1) if v[:1] in ("'", '"') else -1
+    if close >= 0:
+        return v[1:close].strip()
+    return re.split(r"\s#", v, maxsplit=1)[0].strip()
 
 
 def read_cutoff_key(root, key):
@@ -527,6 +639,87 @@ def check_path_shaped(tok, files):
     return ("/" in tok and "." in tok.rsplit("/", 1)[1]) or tok in files
 
 
+def scan_claims(text):
+    """The claims join over one spec's text (TOOL-dGatedProse-2). Returns `(runs, hits, clears)`:
+    `runs` counts the distinct matched runs, each hit is `(line, object, class, arms, cite)` and each
+    clear is `(line, object, arms, why)`, where `arms` names every arm that reached the object's run,
+    so a run two arms reach is ONE run carrying both. Fenced blocks are blanked line for line first,
+    by the machine the hygiene engine's `_unfenced` reads a spec with: a backtick or a tilde marker
+    opens a fence, only the marker that opened it closes it, and the other marker inside is content.
+    A spec may therefore exhibit the refused sentence as a worked example, in either fence, and every
+    line number still holds. A private boolean toggle was the first spelling, and it answered the
+    fence question differently from the engine in both directions (closing review, round 1, R3).
+    """
+    lines, fence = [], ""
+    for ln in text.split("\n"):
+        head = ln.rstrip("\r").lstrip()
+        mark = "```" if head.startswith("```") else "~~~" if head.startswith("~~~") else ""
+        if mark and (not fence or mark == fence):
+            fence = "" if fence else mark
+            lines.append("")
+            continue
+        lines.append("" if fence else ln)
+    body = "\n".join(lines)
+    starts = [m.start() for m in TICK.finditer(body)]
+    found = {}
+    for name, arm in CLAIM_ARMS:
+        for s in starts:
+            m = arm.match(body, s)
+            if m:
+                found.setdefault(m.span("run"), set()).add(name)
+    # A passive or fronted arm matched at a token INSIDE a chain yields a tail of the run it already
+    # matched from the chain's head; the tail's arms fold into the run that contains it.
+    runs = {}
+    for span in sorted(found, key=lambda sp: (sp[0], -sp[1])):
+        outer = next((o for o in runs if o[0] <= span[0] and span[1] <= o[1]), None)
+        runs.setdefault(outer or span, set()).update(found[span])
+    hits, clears = [], []
+    for (a, b), names in sorted(runs.items()):
+        arms = tuple(n for n, _ in CLAIM_ARMS if n in names)
+        for om in TICK.finditer(body, a, b):
+            obj, line = om.group(1), body.count("\n", 0, om.start()) + 1
+            row = next((r for r in CLAIM_REFUSALS if r[1].search(obj)), None)
+            if row and row[0]:
+                hits.append((line, obj, row[0], arms, row[2]))
+            else:
+                clears.append((line, obj, arms, row[2] if row else "cleared: no path, glob or "
+                               "code-symbol shape"))
+    return len(runs), hits, clears
+
+
+def check_claim_canary():
+    """Assert `CLAIM_CANARY` STRUCTURALLY (TOOL-dGatedProse-2, S3). Returns None when it holds, else
+    the first failure as a sentence: every arm is the designated arm of a refused entry, every class
+    appears, a clearing entry exists, no entry spells its verb in lowercase, and each entry's scan
+    carries its designated arm and its expected verdict. An arm added without an entry refuses here,
+    at startup, and so does a dead arm, a lost case fold or a lost space clause.
+    """
+    arms = [n for n, _ in CLAIM_ARMS]
+    refused = [e for e in CLAIM_CANARY if e[2]]
+    for n in arms:
+        if not any(e[1] == n for e in refused):
+            return f"arm {n!r} is the designated arm of no refused entry"
+    for cls in (r[0] for r in CLAIM_REFUSALS if r[0]):
+        if not any(e[2] == cls for e in refused):
+            return f"class {cls!r} appears in no refused entry"
+    if len(refused) == len(CLAIM_CANARY):
+        return "no entry must clear, so nothing pins the space clause"
+    for sentence, arm, cls in CLAIM_CANARY:
+        if arm not in arms:
+            return f"entry {sentence!r} names {arm!r}, which is not an arm"
+        if re.search(r"claim", sentence):
+            return f"entry {sentence!r} spells its verb in lowercase, so the case fold is not load-bearing"
+        _, hits, clears = scan_claims(sentence)
+        if cls:
+            if len(hits) != 1 or hits[0][2] != cls or arm not in hits[0][3]:
+                return (f"entry {sentence!r} expected one {cls} hit through arm {arm!r}, got "
+                        f"{[(h[1], h[2], h[3]) for h in hits]}")
+        elif hits or not any(arm in c[2] for c in clears):
+            return (f"entry {sentence!r} expected to clear through arm {arm!r}, got hits "
+                    f"{[(h[1], h[2]) for h in hits]} and clears {[(c[1], c[2]) for c in clears]}")
+    return None
+
+
 def read_waivers(root):
     p = root / WAIVERS
     if not p.exists():
@@ -593,10 +786,19 @@ def main(argv):
     grelation = check_cutoff_relation(root, GUARDS_KEY, guards_cut) if guards_cut else ""
     if relation is None or grelation is None:
         return 1
+    # The claims join's LIVENESS ASSERTION, before the population loop: an entry that does not hold
+    # means an arm, the case fold or the space clause is broken, and the loop's zero would then be
+    # indistinguishable from a clean corpus.
+    canary = check_claim_canary()
+    if canary:
+        print(f"spec-tokens: REFUSING — CLAIM_CANARY does not hold: {canary}; the claims join would "
+              "report a broken arm as a clean corpus")
+        return 1
     hits, skipped, graded, seen_waived = [], 0, 0, set()
     ungraded, noheading = 0, 0
     bar_examined, bar_specs, bar_carriers, near = 0, 0, 0, []
     g_examined, g_specs, g_carriers, g_nosubhead, g_nogates = 0, 0, 0, 0, 0
+    c_runs, c_specs, c_cleared = 0, 0, 0
     for f in specs:
         text = (root / f).read_bytes().decode("utf-8", "replace")
         m = SPEC_DATE.search("/" + f)
@@ -727,8 +929,19 @@ def main(argv):
             n = len((root / path).read_bytes().decode("utf-8", "replace").splitlines())
             if int(line) > n:
                 hits.append((f, "cite", f"{path}:{line}", f"file has {n} lines"))
+        # THE CLAIMS JOIN (TOOL-dGatedProse-2): every live spec, and no cutoff (owner, 2026-09-21).
+        runs, c_hits, c_clears = scan_claims(text)
+        c_runs += runs
+        c_specs += 1 if runs else 0
+        c_cleared += len(c_clears)
+        # The composite token keeps a `[path]` waiver on the bare string out of this join's key space
+        # in both directions, as the guards join's does (closing review, round 1, R1).
+        hits += [(f, "claims", f"claims <- {obj}", f"{cls} at line {line}, arm(s) {'+'.join(arms)} — "
+                  + CLAIMS_WHY.format(cls=cls, cite=cite)) for line, obj, cls, arms, cite in c_hits]
+        near += [(f, "claims", f"claims <- {obj}", f"line {line}, arm(s) {'+'.join(arms)} — {why}")
+                 for line, obj, arms, why in c_clears]
 
-    # The sixth join, over a population the five above never build: one uid map over the live specs,
+    # The seventh join, over a population the six above never build: one uid map over the live specs,
     # then one read per graded target. It is folded into `hits` before the waiver pass, so a handoff
     # hit takes a row of the same registry and a stale row naming one reds like any other.
     ho_uids = read_spec_uids(root, specs) if handoff_cut else {}
@@ -780,6 +993,10 @@ def main(argv):
     else:
         print(f"spec-tokens: guards join · {GUARDS_KEY} blank (arm off) · {g_carriers} live spec(s) "
               f"carry a missing guarded leg{g_tail}")
+    # The claims join's line, on EVERY run and on no branch: it has no key, and a zero is its normal
+    # state, so this line is what keeps that zero from reading as coverage.
+    print(f"spec-tokens: claims join · {c_runs} dossier-claim sentence(s) examined · {c_specs} live "
+          f"spec(s) carry one · {c_cleared} object(s) cleared · canary held over {len(CLAIM_ARMS)} arm(s)")
     # THE UNGRADED POPULATION, which the report used to leave out entirely. A leg join that reads N
     # specs and grades a leg name in far fewer of them looks identical to one that graded them all
     # and found nothing wrong. These two numbers are what separate the cases, and they are kept

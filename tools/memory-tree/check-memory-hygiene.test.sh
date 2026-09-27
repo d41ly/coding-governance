@@ -14,6 +14,23 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/check-memory-hygiene.sh"
+# THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-18 S2). It ships beside its gate, so a
+# spelled default resolved only at gov's prefix and nothing ever set it (TOOL-dRetiredFork-39). The
+# block is byte-identical to the canonical copy named on its marker line, gated by the parity table
+# in the resolve-python self-test.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does not
@@ -207,20 +224,20 @@ printf '# t54\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · 
 # ---- these fixtures ARE the coverage. Note `good10` yields a §10 reading "No existing seam fits.",
 # ---- which satisfies the PROBE arm and not the TERMS arm — that is fixture 70 and it is why the
 # ---- two arms need separate fixtures rather than one.
-ev()      { good10 | sed "s/2026-08-10/2026-08-25/g; s/base 0123abcd/base 0123abcd · streams architecture/"; }
-evterms() { sed 's|^No existing seam fits\.$|No existing seam fits. Recall terms used: alpha beta gamma delta.|'; }
+build_ev_spec()      { good10 | sed "s/2026-08-10/2026-08-25/g; s/base 0123abcd/base 0123abcd · streams architecture/"; }
+derive_ev_terms() { sed 's|^No existing seam fits\.$|No existing seam fits. Recall terms used: alpha beta gamma delta.|'; }
 # The terms VALUE deliberately carries `reuse-first` and `reuse_lookup`. That is the F4 class from
 # the closing diff review: a terms list is 8-14 words of this corpus's jargon and those words
 # routinely include a probe token, so a single-blob scan let the terms line buy the probe half and
 # the probe arm could not fail. Both specs of the build that added this arm did exactly that. If the
 # probe blob ever stops excluding the terms value, THIS fixture goes silent and the arm below reds.
-evonlyt() { sed 's|^No existing seam fits\.$|Recall terms used: reuse-first reuse_lookup seam recall probe terms alpha beta.|'; }
+derive_ev_only_terms() { sed 's|^No existing seam fits\.$|Recall terms used: reuse-first reuse_lookup seam recall probe terms alpha beta.|'; }
 # The COPYABLE SKELETON's own section 10, which must NOT satisfy either arm. F3: the first cut put
 # the instructional prose inside the skeleton, and every word that satisfies this predicate is a word
 # such prose must contain -- so an author who filled sections 1-9 and left section 10 boilerplate
 # scored both arms and was never told. The rules now live above the fence; this fixture is what stops
 # them moving back.
-evskel()  { sed 's|^No existing seam fits\.$|REPLACE both bullets. Delete this paragraph.|'; }
+derive_ev_skeleton()  { sed 's|^No existing seam fits\.$|REPLACE both bullets. Delete this paragraph.|'; }
 # A terms list that WRAPS, with a probe token on the CONTINUATION line. The first cut of the probe
 # blob cut per LINE, so a continuation carried no marker, was scanned whole, and a token there bought
 # the probe half -- reproduced against the shipped awk, and every spec in the build that wrote it
@@ -229,14 +246,14 @@ evskel()  { sed 's|^No existing seam fits\.$|REPLACE both bullets. Delete this p
 # Built by DELETING the one-line finding and APPENDING two lines, rather than by a sed whose
 # replacement carries an embedded newline: that spelling is fragile across sed builds, and authoring
 # it through a shell heredoc silently turned the escape into a real byte twice in one session.
-evwrap()  { sed 's|^No existing seam fits\.$||'
+derive_ev_wrapped()  { sed 's|^No existing seam fits\.$||'
             printf 'Recall terms used: alpha beta gamma delta epsilon zeta\nreuse_lookup eta theta iota.\n'; }
 
-ev | evonlyt > "$D/spec/2026-08-25-spec-tFixture-80.md"  # post-cutoff, terms only, no probe -> red
-ev           > "$D/spec/2026-08-25-spec-tFixture-81.md"  # post-cutoff, probe only, no terms -> red
-ev | evterms > "$D/spec/2026-08-25-spec-tFixture-82.md"  # post-cutoff, BOTH arms            -> silent
-ev | evskel  > "$D/spec/2026-08-25-spec-tFixture-85.md"  # post-cutoff, SKELETON boilerplate -> red
-ev | evwrap  > "$D/spec/2026-08-25-spec-tFixture-86.md"  # post-cutoff, WRAPPED terms, probe on line 2 -> red
+build_ev_spec | derive_ev_only_terms > "$D/spec/2026-08-25-spec-tFixture-80.md"  # post-cutoff, terms only, no probe -> red
+build_ev_spec           > "$D/spec/2026-08-25-spec-tFixture-81.md"  # post-cutoff, probe only, no terms -> red
+build_ev_spec | derive_ev_terms > "$D/spec/2026-08-25-spec-tFixture-82.md"  # post-cutoff, BOTH arms            -> silent
+build_ev_spec | derive_ev_skeleton  > "$D/spec/2026-08-25-spec-tFixture-85.md"  # post-cutoff, SKELETON boilerplate -> red
+build_ev_spec | derive_ev_wrapped  > "$D/spec/2026-08-25-spec-tFixture-86.md"  # post-cutoff, WRAPPED terms, probe on line 2 -> red
 # PRE-cutoff twin of 70+71 combined: a §10 with neither fact, dated before the cutoff. This is the
 # grandfathering arm, and without it "no landed spec goes retroactively red" is an untested claim.
 good10 | sed "s/base 0123abcd/base 0123abcd · streams architecture/" \
@@ -541,12 +558,12 @@ printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the 
 # ---- this file carries no other assertion, so growing it past 250 lines trips exactly one branch and
 # ---- nothing else. It is entry-budget exempt (check 7), which the codebase-map tree below pins from
 # ---- the other side: that exemption is the alternative the MAP_SUB branch used to overwrite.
-{ printf '# tfixture guide\n'; i=1; while [ "$i" -le 760 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
+{ printf '# tfixture guide\n'; i=1; while [ "$i" -le 1210 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
   > memory/guides/tfixture.md
 # ---- ...and its GREEN counterpart, which is the arm that proves the guide cap actually widened.
-# ---- 400 lines is OVER the row-document cap of 250 and UNDER the guide cap of 750, so it is named
+# ---- 400 lines is OVER the row-document cap of 250 and UNDER the guide cap of 1200, so it is named
 # ---- by neither. Without this file the widening is unobservable: `tfixture.md` above would red at
-# ---- 760 lines whether the guide cap were 750 or the original 250.
+# ---- 1210 lines whether the guide cap were 1200 or the original 250.
 { printf '# twide guide\n'; i=1; while [ "$i" -le 400 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } \
   > memory/guides/twide.md
 
@@ -843,6 +860,110 @@ write_base_spec 190 26 OPEN 1 0123abcd
 write_base_spec 192 26 CLOSED 2 0123abcd
 # 193 — PRE-cutoff twin of 190. Nothing landed goes retroactively red.
 write_base_spec 193 10 OPEN 2 0123abcd
+
+# ---- TOOL-dGatedProse-1: CHECK 25's fixtures, from tFixture-200 upward. Every one is
+# ---- Tier-1, dated 2026-08-25 and carries NO acceptance heading: past every check-12 rule cutoff the
+# ---- shared conf declares and before BASE_RESOLVE_CUTOFF, with check 12's scope-join arm silent on
+# ---- each by construction, so a red here can only be check 25. All LIVE except 210, the CLOSED twin
+# ---- of 200, the later ones the closing review's reds included, and all carry the section-8 none a terminal status needs. They sit ABOVE the commit for
+# ---- the reason check 22's do: the engine selects by `git ls-files`, so an untracked fixture is graded
+# ---- by nothing. The assertions are one block further down, after the conf-shaped observations.
+write_readers_spec() { # $1 = num, $2 = status, $3 = the section-2 body
+  { printf '# t%s\n\n**Status:** %s · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n%s\n\n' "$1" "$2" "$3"
+    printf '## 8. Open questions\n\nnone\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · initial draft.\n\n## 10. Reuse audit\n\nNothing here.\n'
+  } > "$D/spec/2026-08-25-spec-tFixture-$1.md"; }
+# The READER the green fixtures resolve against: a guide is a reader by class. Nothing else in this
+# tree spells either of its two tokens, and its path is what 201 names by identity, with a line tail.
+printf '# treaders guide\n\nThe shard reader is `count_shard_rows`, which compares a row count against the pin.\nThis guide is the one file in the tree that spells `tSpelledInGuide`.\nIts last line spells `tRerunAll` and the flag `--dry-run`, and nothing shorter.\n' > memory/guides/treaders.md
+# 200 -- a retirement verb and an underscore identifier, no clause -> RED, named by its S label
+write_readers_spec 200 SPECCED '- **S1** — retire the `shard_arity` pin and the rows it carried.'
+# 201 -- a conforming clause: a tracked path cited with a line tail and a symbol written with a call
+#        suffix both resolve, and a backticked `:12` and `()` standing alone are prose -> silent
+write_readers_spec 201 SPECCED '- **S1** — retire the `shard_arity` pin and the rows it carried.
+  - **Readers:** by name: `memory/guides/treaders.md:3` reads the pin and `count_shard_rows()` spells
+    it, where `:12` and `()` alone are prose. by value: `count_shard_rows` compares against it.'
+# 202 -- the by-value escape WITH a reason -> silent
+write_readers_spec 202 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `count_shard_rows` spells it. by value: NO VALUE READERS — the pin was
+    only ever printed, never compared.'
+# 203 -- the bare escape with nothing after it answers nothing -> RED
+write_readers_spec 203 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `count_shard_rows` spells it. by value: NO VALUE READERS'
+# 204 -- the only tokens are bare words and no kind noun is near -> silent
+write_readers_spec 204 SPECCED '- **S1** — retire the `phase` and `commit` columns from the report.'
+# 205 -- a family-slug-seq id and an elided `-24` are never identifiers -> silent
+write_readers_spec 205 SPECCED '- **S1** — retire what `TOOL-dLoggedFlight-21` and `-24` recorded.'
+# 206 -- a clause with a by-name half and no by-value marker at all -> RED, naming the missing half
+write_readers_spec 206 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `count_shard_rows` spells it.'
+# 207 -- a bare word beside a declared kind noun is the sixth shape -> RED
+write_readers_spec 207 SPECCED '- **S1** — retire the `drafted` status value from the lifecycle.'
+# 208 -- a by-name token no reader spells and no tracked path is -> RED, printing the escape spelling
+write_readers_spec 208 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `tAbsentReader` spells it. by value: `count_shard_rows` compares against it.'
+# 209 -- the same token under READER NOT IN TREE and a reason -> silent, and the covered name PRINTED
+write_readers_spec 209 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `tAbsentReader` spells it, READER NOT IN TREE because it lives in an adopter
+    tree. by value: `count_shard_rows` compares against it.'
+# 210 -- 200 under a CLOSED header: a frozen record is not graded -> silent
+write_readers_spec 210 CLOSED '- **S1** — retire the `shard_arity` pin and the rows it carried.'
+# 211 -- the only candidate token carries a space, a code fragment and not a name -> silent
+write_readers_spec 211 SPECCED '- **S1** — retire the `body=$(_unfenced "$f")` line from the loop.'
+# 212 -- the owner's O6: a markdown path with a slash, and a bare markdown name behind a line tail
+write_readers_spec 212 SPECCED '- **S1** — remove the paragraph `notes/ledger.md` carried.
+- **S2** — drop the table `WIRE-NOTES.md:14` held.'
+# 213 -- a clause on an item the trigger does NOT fire on is graded all the same -> RED
+write_readers_spec 213 SPECCED '- **S1** — build the `shard_arity` report.
+  - **Readers:** by name: `count_shard_rows` spells it. by value: nothing reads it.'
+# 214 -- the case ruling: a strict phrase in capitals, and a stem opening an imperative
+write_readers_spec 214 SPECCED '- **S1** — the report DROPS the `shard_arity` column.
+- **S2** — Retire the `shardArity` alias.'
+# 215 -- the owner's O5: each past form alone, and a slug that holds one only as a substring
+write_readers_spec 215 SPECCED '- **S1** — the `shard_arity` pin is RETIRED.
+- **S2** — the `shard_arity` pin was replaced last week.
+- **S3** — the `shard_arity` pin was removed from the conf.
+- **S4** — the `shard_arity` pin was deleted outright.
+- **S5** — the `shard_arity` pin was dropped quietly.
+- **S6** — the `shard_arity` pin is described in `dRetiredFork-9`.'
+# 216 -- the reader corpus against every record class: six names only a RECORD spells, one a guide
+#        spells, and the bare filename of a tracked file that nothing spells
+write_readers_spec 216 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `tQuotedInReview`, `tQuotedInArchive`, `tQuotedInDecisions`,
+    `tQuotedInBacklog`, `tQuotedInGotcha`, `tQuotedInWaiver`, `tSpelledInGuide` and
+    `DECISIONS.2026-08-01.md`. by value: `count_shard_rows` compares against it.'
+# ...and the six records, each legal under checks 3 and 5 and each the one place its name is spelled:
+# a conforming review, the referenced archive, the decision log, the backlog shard below its numbered
+# rows, a gotcha note with its index rendered, and a waiver registry, as a comment line.
+mkdir -p "$D/reviews" memory/gotchas
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: CLEAN\n\nQuoted here and nowhere else: `tQuotedInReview`.\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-7.md"
+printf '\nQuoted here and nowhere else: `tQuotedInArchive`.\n' >> memory/archive/DECISIONS.2026-08-02.md
+printf '\nQuoted here and nowhere else: `tQuotedInDecisions`.\n' >> memory/DECISIONS.md
+printf '\nQuoted here and nowhere else: `tQuotedInBacklog`.\n' >> memory/backlog/ARCH.md
+printf -- '---\nname: treader-quote\ndescription: a fixture note that quotes one name\nkind: note\n---\n\nQuoted here and nowhere else: `tQuotedInGotcha`.\n' \
+  > memory/gotchas/treader-quote.md
+printf '# quoted here and nowhere else: tQuotedInWaiver\n' >> memory/project/id-orphan-waiver.txt
+"$_PY" "$HERE/gotchas.py" --write >/dev/null 2>&1
+# 217 -- a strict phrase and a kind noun, each wrapped across a line inside one item
+write_readers_spec 217 SPECCED '- **S1** — the `shard_arity` pin no longer
+  exists anywhere a reader looks.
+- **S2** — the report retires `drafted`, the vocabulary
+  member nobody uses.'
+# 218 -- the closing review's R2: a name a reader spells only INSIDE a longer identifier does not
+#        resolve, so a deleted helper whose longer sibling survives still reds -> RED
+write_readers_spec 218 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `count_shard` spells it. by value: `count_shard_rows` compares against it.'
+# 219 -- ...and the same after the call-suffix strip, where the short name is the whole risk -> RED
+write_readers_spec 219 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `tRerun()` spells it. by value: `count_shard_rows` compares against it.'
+# 220 -- round 2's F4: the LEADING boundary, a name the reader spells only as the tail of a longer
+#        identifier -> RED. 218 and 219 fail on the trailing byte, so neither can see this half.
+write_readers_spec 220 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `shard_rows` spells it. by value: `count_shard_rows` compares against it.'
+# 221 -- round 2's F2: a hyphenated name counts the hyphen as a word character, so a flag the reader
+#        spells only inside a longer flag does not resolve -> RED
+write_readers_spec 221 SPECCED '- **S1** — retire the `shard_arity` pin.
+  - **Readers:** by name: `--dry` spells it. by value: `count_shard_rows` compares against it.'
 
 git add -A && git commit -q -m fixtures --no-verify
 # 191 — the green twin, and it can only be written HERE: its base must name a commit that exists,
@@ -1158,7 +1279,7 @@ cnot 6 'memory/backlog/ARCH.md'
 # ---- BOTH figures. The likeliest slip in the per-class message is dropping the line half from the
 # ---- shared format for every class, which would name a guide for a LINE breach while printing only a
 # ---- byte count under its own byte cap. TOOL-aRelaxedShard-1.
-chit 6 '761L > 61440B/750L'
+chit 6 '1211L > 98304B/1200L'
 # ---- THE TWO HALVES OF THE PER-CLASS CAP. A guide between the row cap and the guide cap is silent;
 # ---- a guide past the guide cap is named. Asserting only the second would pass identically under
 # ---- one shared 250-line cap, which is the state this change moved away from.
@@ -1461,6 +1582,92 @@ out6d=$(bash "$SCRIPT" 2>/dev/null)
 if grep -qE 'ARCH-tFixture-140/AC9|ARCH-tFixture-142/AC1' <<<"$out6d"; then echo "FAIL: a ledger-join arm fired with ACCEPTANCE_LEDGER_CUTOFF blank — the arms are not nested in check 23"; st=1; fi
 n=$((n+1))
 if grep -qF 'HYGIENE check 23' <<<"$out6d"; then echo "FAIL: check 23 ran at all with a blank ACCEPTANCE_LEDGER_CUTOFF"; st=1; fi
+
+# ---- TOOL-dGatedProse-1: CHECK 25's arms, ONE block, and every assertion in it is a helper call, so
+# ---- the FLOOR_ASSERTIONS raise below is the count of hit, miss, hitl, chit and cnot calls between
+# ---- this line and the end marker, read rather than guessed. The fixtures are above the commit.
+# The branch's own failure text, which is what the harness meta-gate signs it with, and the tag byte,
+# which must never reach the output.
+hit  '§2 scope items of LIVE specs that retire a named thing, and every **Readers:** clause, must answer by name: with names a reader spells and by value: with a reader or NO VALUE READERS and a reason'
+miss $'\004'
+# AC1 and AC14: named with its S label and the escape spelling, while check 12's scope-join arm, which
+# reads only a spec carrying an Acceptance heading, stays silent on the same file.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-200.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1'
+miss 'tFixture-200.md (scope items naming neither'
+# AC2, AC3, AC7, AC8, AC9 and AC12: the silent six. Global, because a check-25 finding, a by-name
+# finding and a covered-name notice all name the file.
+miss 'tFixture-201'
+miss 'tFixture-202'
+miss 'tFixture-204'
+miss 'tFixture-205'
+miss 'tFixture-211'
+miss 'tFixture-210'
+# AC3, AC6, AC23: the halves.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-203.md (§2 items whose **Readers:** by value: half names no backticked reader and carries no NO VALUE READERS followed by a reason): S1'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-206.md (§2 items whose **Readers:** clause carries no by value: half after its by name:; write by value: and the readers of the value, or NO VALUE READERS and a reason): S1'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-213.md (§2 items whose **Readers:** by value: half names no backticked reader and carries no NO VALUE READERS followed by a reason): S1'
+# AC11: the sixth shape.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-207.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1'
+# AC4 and AC5: an unresolved name reds with its remedy; the same name under the escape is PRINTED.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-208.md (§2 item S1: by name: lists `tAbsentReader`, which no reader spells and no tracked path is or ends with; name a reader that spells it, or write READER NOT IN TREE and a reason on that half)'
+cnot 25 'tFixture-209'
+hitl 'memory-hygiene: check 25 did not grade `tAbsentReader` — READER NOT IN TREE covers it, on '"$D"'/spec/2026-08-25-spec-tFixture-209.md S1'
+# AC10, AC24, AC25, AC27: exact LINES, so an extra label reds as surely as a missing one.
+hitl "$D"'/spec/2026-08-25-spec-tFixture-212.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1, S2'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-214.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1, S2'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-215.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1, S2, S3, S4, S5'
+hitl "$D"'/spec/2026-08-25-spec-tFixture-217.md (§2 items that retire a named thing carry no **Readers:** clause; write **Readers:** then by name: and the readers that spell the name, then by value: and the readers of its value, or NO VALUE READERS and a reason): S1, S2'
+# AC26: six names only a record spells red; the guide's name and the bare filename do not.
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInReview`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInArchive`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInDecisions`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInBacklog`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInGotcha`'
+chit 25 'tFixture-216.md (§2 item S1: by name: lists `tQuotedInWaiver`'
+cnot 25 'tSpelledInGuide'
+cnot 25 'DECISIONS.2026-08-01.md'
+# R2 of the closing review: resolution is a WHOLE-WORD spelling at each identifier end, so neither a
+# prefix of a longer name nor a short name inside a longer word resolves.
+chit 25 'tFixture-218.md (§2 item S1: by name: lists `count_shard`, which no reader spells'
+chit 25 'tFixture-219.md (§2 item S1: by name: lists `tRerun`, which no reader spells'
+chit 25 'tFixture-220.md (§2 item S1: by name: lists `shard_rows`, which no reader spells'
+chit 25 'tFixture-221.md (§2 item S1: by name: lists `--dry`, which no reader spells'
+# AC13: the declared dependency is ONE key. Blank SPEC_FORMAT_CUTOFF: nothing is named and exactly one
+# line says so, without the failure prefix. Armed, with SCOPE_JOIN_CUTOFF BLANK: 200 is named, which is
+# the arm proving check 25 is in the accumulator's union guard, and the disarmed line is gone.
+_out25=$out
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+out=$(bash "$SCRIPT" 2>/dev/null)
+miss 'tFixture-200'
+hitl 'memory-hygiene: check 25, the §2 reader-inventory arm, is DISARMED — SPEC_FORMAT_CUTOFF is blank, and check 25 grades check 12'\''s selection, so it graded nothing. Declare SPEC_FORMAT_CUTOFF in .memory-tree.conf to arm it.'
+out="lines naming check 25 and the key: $(grep -F 'check 25' <<<"$out" | grep -cF 'SPEC_FORMAT_CUTOFF')"
+hitl 'lines naming check 25 and the key: 1'
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
+out=$(bash "$SCRIPT" 2>/dev/null)
+chit 25 'tFixture-200.md ('
+miss 'reader-inventory arm, is DISARMED'
+# AC16: a tree whose one spec is CLOSED says the arm graded nothing, and exits 0. Its item WOULD red
+# were the liveness filter gone, so the notice is not the only thing this tree can show.
+RT=$TMP/readersclosed
+mkdir -p "$RT"
+( cd "$RT" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
+  mkdir -p memory/backlog memory/project memory/builds/tDone/spec
+  printf '# r\n' > memory/README.md
+  printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
+  for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
+  printf -- '---\nslug: tDone\nnode: a\nopened: 2026-08-25\nstreams: architecture\nroster: ARCH\nids: ARCH-tDone-1\n---\n\n# tDone\n' > memory/builds/tDone/README.md
+  printf '# ARCH-tDone-1 — a landed unit\n\n**Status:** CLOSED · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n- **S1** — retire the `shard_arity` pin.\n\n## 8. Open questions\n\nnone\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · initial draft.\n' \
+    > memory/builds/tDone/spec/2026-08-25-spec-tDone-1.md
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
+  git commit -q -m readersclosed --no-verify )
+out=$(cd "$RT" && bash "$SCRIPT" 2>/dev/null; echo "exit=$?")
+hit  'memory-hygiene: the §2 reader-inventory arm, check 25, graded NO spec — no spec in check 12'\''s selection is LIVE by its test, a status header that is not CLOSED|WONTDO.'
+cnot 25 'tDone'
+hitl 'exit=0'
+out=$_out25
+# ---- end of TOOL-dGatedProse-1's check-25 arms.
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 
 # ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector
@@ -1605,7 +1812,7 @@ done
 n=$((n+1))
 grep -qF 'the selector is mis-segmented' <<<"$outh" || { echo "FAIL the empty-population report does not name the cause"; st=1; }
 #
-# (a2) CHECK 6's OWN mis-segmentation — TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out
+# (a2) CHECK 6's OWN mis-segmentation — TOOL-dRetiredFork-1, absorbed from adopter nc `nc carve-out
 #      5/20`. Index-class files EXIST (a guide, at a pre-flatten path) while every flat selector
 #      `index_set` reads matches nothing, so check 6 walked an empty set, printed nothing and was
 #      indistinguishable from a clean tree. Eight sibling checks already carried this guard; 6 did
@@ -1657,6 +1864,12 @@ grep -qF 'selected an EMPTY population' <<<"$outy" \
 # has no run to record, so there is no precondition that could make its absence a mis-segmentation.
 n=$((n+1))
 [ "$rcy" = 0 ] || { echo "FAIL a freshly scaffolded tree is not clean (rc=$rcy):"; printf '%s\n' "$outy" | sed 's/^/      /'; st=1; }
+# TOOL-aRepatriatedFork-9 S6: check 20's capture reaches the operator on a GREEN run. This tree
+# declares no LIVE_ROW_PIN, so row_grammar.py announces the unarmed shard inside its green output,
+# and a gate that printed the capture only on failure turned that announcement back into silence.
+n=$((n+1))
+grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md has no LIVE_ROW_PIN entry' <<<"$outy" \
+  || { echo "FAIL a green check 20 run swallowed its NOT MEASURED line, so an unarmed live-row pin is silent again"; st=1; }
 
 # ---- (c) A tree carrying a .codebase-map.conf. This is the ONLY place check 7's MAP_SUB branch is
 # ----     reachable: every tree above writes no such conf, so `MAP_SUB` is empty throughout and the
@@ -1904,15 +2117,15 @@ n=$((n+1))
 # stayed green, because a blank ceiling is the legal UNARMED state and a blank one reads the same.
 n=$((n+1))
 B=$TMP/scaffolded-inside
-mkdir -p "$B/tools"
-cp -r "$HERE" "$B/tools/" 2>/dev/null
+mkdir -p "$B/$(dirname -- "$KIT_REL")"
+cp -r "$HERE" "$B/$(dirname -- "$KIT_REL")/" 2>/dev/null
 ( cd "$B" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
   # Declares READINESS_ROWS for the reason the sibling arm above states: it is a
   # `required_keys_render` key, and without it the scaffolder refuses before it reaches the ceiling
   # strip this arm exists to observe.
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nREADINESS_ROWS="security|risks|testing"\n' > .memory-tree.conf
-  bash "tools/$(basename "$HERE")/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 ) || true
-_lim="$B/tools/$(basename "$HERE")/build-readme-slot-limits.txt"
+  bash "$KIT_REL/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 ) || true
+_lim="$B/$KIT_REL/build-readme-slot-limits.txt"
 if [ -f "$_lim" ]; then
   _valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "$_lim")
   _rows=$(grep -c '^## ' "$_lim" || true)
@@ -2380,12 +2593,14 @@ n=$((n+1))
 # ---- the thing it counts is exactly the shape no check ever looks at.
 #
 # ---- The population is every site that can EMIT a check id: `fail <n>` in the shell, `check <n>:`
-# ---- in the two delegated pythons, and row_grammar's `CHECK = <n>` module constant, which is the
-# ---- one spelling the other two greps miss and the reason check 20 was invisible.
+# ---- in the two delegated pythons, and row_grammar's `CHECK = <n>` and `ROTATION_CHECK = <n>`
+# ---- module constants, the spelling the other two greps miss. It hid check 20 first, and then
+# ---- check 24, whose `ROTATION_CHECK` the first anchor `^CHECK =` could not see: the README said
+# ---- 23 over 24 checks and this arm agreed, until check 25 made the README true and the arm red.
 n=$((n+1))
 _hy_ids=$( { grep -oE 'fail [0-9]+' "$HERE/check-memory-hygiene.sh" | grep -oE '[0-9]+'
              grep -rhoE 'check [0-9]+:' "$HERE/corpus_ids.py" "$HERE/gotchas.py" | grep -oE '[0-9]+'
-             grep -oE '^CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
+             grep -oE '^[A-Z_]*CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
 _hy_derived=$(printf '%s\n' "$_hy_ids" | grep -c .)
 
 
@@ -2421,7 +2636,7 @@ _b1=$(mktemp -d)
 # THIS TREE IS ALSO THE PROJECT-KEY FIXTURE (TOOL-aRatifiedRulings-3), so its conf is written by the
 # one helper the project-key arms rewrite it with: the four base lines plus the retired
 # READ_PATH_CEILING that provokes the notice, then the arm's one key line.
-pk_set() {   # $1 = a conf line, or empty for the fixture's base conf
+write_pk_conf() {   # $1 = a conf line, or empty for the fixture's base conf
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > "$_b1/.memory-tree.conf"
   printf 'READ_PATH_CEILING="135677"\n' >> "$_b1/.memory-tree.conf"
   [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$_b1/.memory-tree.conf"
@@ -2431,7 +2646,7 @@ pk_set() {   # $1 = a conf line, or empty for the fixture's base conf
   cd "$_b1" || exit 1
   git init -q .; git config user.email t@t.test; git config user.name t
   mkdir -p memory/guides memory/builds/tOne/spec memory/project
-  pk_set ""
+  write_pk_conf ""
   printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
   printf '# r\n' > memory/README.md
   printf '# d\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
@@ -2473,7 +2688,7 @@ esac
 #
 # THE ONE RUNNER: stdout and stderr on stdout, the checker's rc as its own. `pk_rc` is gone -- an
 # abort arm used to run the checker twice over the same conf, once for rc and once for text.
-pk_out() { ( cd "$_b1" && bash "$HERE/check-memory-hygiene.sh" 2>&1 ); }
+run_pk_gate() { ( cd "$_b1" && bash "$HERE/check-memory-hygiene.sh" 2>&1 ); }
 
 # BUILD_SLUG_RE
 # THE CONTROL READS THE CLEAN RUN ABOVE, not a run of its own: rc 0 AND the notice, so a clean
@@ -2484,11 +2699,11 @@ case "$_b1rc:$_b1out" in
   *) echo "FAIL project keys: the fixture is not clean unset (rc=$_b1rc), or its clean run never reached check 16 — every arm below is meaningless"; st=1 ;;
 esac
 
-pk_set 'BUILD_SLUG_RE="^[A-Za-z]+$"'; o=$(pk_out); r=$?
+write_pk_conf 'BUILD_SLUG_RE="^[A-Za-z]+$"'; o=$(run_pk_gate); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   BUILD_SLUG_RE: a pattern gov's own slugs satisfy still passes" \
   || { echo "FAIL BUILD_SLUG_RE: a satisfiable pattern redded (rc=$r)"; st=1; }
 
-pk_set 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; o=$(pk_out); r=$?
+write_pk_conf 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; o=$(run_pk_gate); r=$?
 n=$((n+1))
 case "$o" in
   *"HYGIENE check 4 FAILED"*"memory/builds/tOne (bad folder name"*) echo "ok   BUILD_SLUG_RE: a pattern the folders violate REDS (rc=$r)" ;;
@@ -2497,7 +2712,7 @@ esac
 
 # THE INVALID CASES. Each of these would otherwise grade nothing and report clean.
 for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
-  pk_set "BUILD_SLUG_RE=\"$bad_re\""; o=$(pk_out); r=$?
+  write_pk_conf "BUILD_SLUG_RE=\"$bad_re\""; o=$(run_pk_gate); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*BUILD_SLUG_RE*) echo "ok   BUILD_SLUG_RE='$bad_re' ABORTS naming the key" ;;
@@ -2506,12 +2721,12 @@ for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
 done
 
 # RECORD_SERVES_CUTOFF
-pk_set 'RECORD_SERVES_CUTOFF="2020-01-01"'; o=$(pk_out); r=$?
+write_pk_conf 'RECORD_SERVES_CUTOFF="2020-01-01"'; o=$(run_pk_gate); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   RECORD_SERVES_CUTOFF: a past cutoff is accepted" \
   || { echo "FAIL RECORD_SERVES_CUTOFF: a past cutoff redded (rc=$r)"; st=1; }
 
 for bad_cut in '2099-01-01' 'yesterday'; do
-  pk_set "RECORD_SERVES_CUTOFF=\"$bad_cut\""; o=$(pk_out); r=$?
+  write_pk_conf "RECORD_SERVES_CUTOFF=\"$bad_cut\""; o=$(run_pk_gate); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*RECORD_SERVES_CUTOFF*) echo "ok   RECORD_SERVES_CUTOFF='$bad_cut' ABORTS naming the key" ;;
@@ -2521,11 +2736,11 @@ done
 
 # ENTRY_CAP_UNIT
 for unit in chars bytes; do
-  pk_set "ENTRY_CAP_UNIT=\"$unit\""; o=$(pk_out); r=$?
+  write_pk_conf "ENTRY_CAP_UNIT=\"$unit\""; o=$(run_pk_gate); r=$?
   n=$((n+1)); [ "$r" = 0 ] && echo "ok   ENTRY_CAP_UNIT=$unit is accepted" \
     || { echo "FAIL ENTRY_CAP_UNIT=$unit redded (rc=$r)"; st=1; }
 done
-pk_set 'ENTRY_CAP_UNIT="glyphs"'; o=$(pk_out); r=$?
+write_pk_conf 'ENTRY_CAP_UNIT="glyphs"'; o=$(run_pk_gate); r=$?
 n=$((n+1))
 case "$r:$o" in
   2:*ENTRY_CAP_UNIT*) echo "ok   ENTRY_CAP_UNIT='glyphs' ABORTS naming the key" ;;
@@ -2537,14 +2752,14 @@ esac
 # adopter conf predating the key must not red on a kit upgrade, so a missing key has to pass, and an
 # arm that only tested the abort would leave that free to regress silently. TOOL-cSpliceWarden-1.
 for rmode in cut snapshot; do
-  pk_set "ROTATION_MODE=\"$rmode\""; o=$(pk_out); r=$?
+  write_pk_conf "ROTATION_MODE=\"$rmode\""; o=$(run_pk_gate); r=$?
   n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE=$rmode is accepted"     || { echo "FAIL ROTATION_MODE=$rmode redded (rc=$r)"; st=1; }
 done
-pk_set 'ROTATION_MODE=""'; o=$(pk_out); r=$?
+write_pk_conf 'ROTATION_MODE=""'; o=$(run_pk_gate); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE blank is UNDECLARED and passes"   || { echo "FAIL ROTATION_MODE blank redded (rc=$r) — an adopter conf predating the key would red on upgrade"; st=1; }
 # Case matters, and the near-miss is the arm worth having: `Cut` is the typo a human makes.
 for rbad in Cut rotate; do
-  pk_set "ROTATION_MODE=\"$rbad\""; o=$(pk_out); r=$?
+  write_pk_conf "ROTATION_MODE=\"$rbad\""; o=$(run_pk_gate); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*ROTATION_MODE*) echo "ok   ROTATION_MODE='$rbad' ABORTS naming the key" ;;
@@ -2552,17 +2767,199 @@ for rbad in Cut rotate; do
   esac
 done
 
+# ---- TOOL-aRepatriatedFork-10: legacy-files.txt reaches check 4's ENTRY branch and check 21's
+# ---- missing-Serves branch, a KIT registry is admitted by name, and RECORD_UNDATED_ARTIFACTS
+# ---- narrows check 21 OUT LOUD. One commit adds the fixtures; the conf line and the registry decide
+# ---- the rest. RECORD_UNBOUND_PIN is declared on every run here so check 21's pin branch is never
+# ---- the red these arms read, and `zz-probe.txt` is an unlisted registry whose check-3 finding
+# ---- proves check 3 RAN before its silence about `pass-order-waiver.txt` is read as a pass.
+mkdir -p "$_b1/memory/builds/tOne/build"
+printf 'status\n' > "$_b1/memory/builds/tOne/NOTES.md"
+printf '# a build record\n\nno serves line\n' > "$_b1/memory/builds/tOne/build/2026-08-01-build-tOne-1.md"
+printf '{"a": 1}\n' > "$_b1/memory/builds/tOne/build/result.json"
+printf '# pass-order waivers\n' > "$_b1/memory/project/pass-order-waiver.txt"
+printf 'x\n' > "$_b1/memory/project/zz-probe.txt"
+printf '# legacy\n' > "$_b1/memory/project/legacy-files.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10 --no-verify ) >/dev/null 2>&1
+write_pk_conf 'RECORD_UNBOUND_PIN="0"'; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"HYGIENE check 4 FAILED"*"memory/builds/tOne/NOTES.md"*) echo "ok   check 4: an UNLISTED build-root NOTES.md reds" ;;
+  *) echo "FAIL check 4: an unlisted build-root NOTES.md did not red — the entry arm's control is dead"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"memory/builds/tOne/build/2026-08-01-build-tOne-1.md — no Serves line"*) echo "ok   check 21: an UNLISTED unbound record reds" ;;
+  *) echo "FAIL check 21: an unlisted unbound record was not named"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"memory/builds/tOne/build/result.json — no Serves line"*) echo "ok   RECORD_UNDATED_ARTIFACTS blank: an undated result.json is graded" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS blank: an undated result.json was not graded — blank must mean today's behaviour"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"undated non-markdown artifact(s) not graded"*) echo "FAIL RECORD_UNDATED_ARTIFACTS blank: the exemption count printed, so the filter ran with the key blank"; st=1 ;;
+  *) echo "ok   RECORD_UNDATED_ARTIFACTS blank: the filter does not run" ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"memory/project/pass-order-waiver.txt"*) echo "FAIL check 3 named pass-order-waiver.txt, a registry the unattended kit reads at its default path"; st=1 ;;
+  *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registry pass-order-waiver.txt by name" ;;
+  *) echo "FAIL check 3 did not name the unlisted zz-probe.txt, so its silence about pass-order-waiver.txt proves nothing"; st=1 ;;
+esac
+printf '# legacy\nmemory/builds/tOne/NOTES.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10-legacy --no-verify ) >/dev/null 2>&1
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"memory/builds/tOne/NOTES.md"*) echo "FAIL check 4: a build-root NOTES.md legacy-files.txt lists still reds — the entry branch ignores LEG"; st=1 ;;
+  *) echo "ok   check 4: a legacy-listed build-root NOTES.md is grandfathered" ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"2026-08-01-build-tOne-1.md — no Serves line"*) echo "FAIL check 21: a record legacy-files.txt lists is still graded for its Serves line"; st=1 ;;
+  *) echo "ok   check 21: a legacy-listed unbound record is grandfathered" ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"result.json — no Serves line"*) echo "FAIL RECORD_UNDATED_ARTIFACTS=exempt: result.json is still graded"; st=1 ;;
+  *"check 21: 1 undated non-markdown artifact(s) not graded (RECORD_UNDATED_ARTIFACTS=exempt)"*) echo "ok   RECORD_UNDATED_ARTIFACTS=exempt drops result.json and prints the count" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS=exempt: result.json vanished without the count printing — a silent narrowing"; st=1 ;;
+esac
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nRECORD_UNDATED_ARTIFACTS="grade"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"result.json — no Serves line"*) echo "ok   RECORD_UNDATED_ARTIFACTS=grade grades result.json" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS=grade did not grade result.json"; st=1 ;;
+esac
+write_pk_conf 'RECORD_UNDATED_ARTIFACTS="Exempt"'; o=$(run_pk_gate); r=$?
+n=$((n+1))
+case "$r:$o" in
+  2:*RECORD_UNDATED_ARTIFACTS*) echo "ok   RECORD_UNDATED_ARTIFACTS='Exempt' ABORTS naming the key" ;;
+  *) echo "FAIL RECORD_UNDATED_ARTIFACTS='Exempt' did not abort (rc=$r) — an unknown value read as blank"; st=1 ;;
+esac
+
+# ---- TOOL-aRepatriatedFork-32: RECORD_SERVES_CUTOFF exempts a record from EVERY check-21 branch.
+# ---- Three pairs of records, one per branch the cutoff used to miss: an id no spec defines, a name
+# ---- with no family-qualified id, and the unbound form the pin counts. Each pair is one record
+# ---- before the cutoff and one after it. The blank-cutoff run is the control: it must name the
+# ---- pre-cutoff half, or the arms below would pass on a branch that never fired.
+for _d32 in 2026-08-02 2026-09-02; do
+  printf '# r\n\n**Serves:** journal ARCH-tOne-9\n' > "$_b1/memory/builds/tOne/build/$_d32-build-ARCH-tOne-9-x.md"
+  printf '# r\n\n**Serves:** journal ARCH-tOne-1\n' > "$_b1/memory/builds/tOne/build/$_d32-build-tOne-1-y.md"
+  printf '# r\n\n**Serves:** none — a fixture that serves nothing\n' > "$_b1/memory/builds/tOne/build/$_d32-build-ARCH-tOne-1-z.md"
+done
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf32 --no-verify ) >/dev/null 2>&1
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="1"\nRECORD_UNDATED_ARTIFACTS="exempt"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"2026-08-02-build-ARCH-tOne-9-x.md — ARCH-tOne-9 is named"*"measured 2 against the pin 1"*"2026-08-02-build-tOne-1-y.md — bound, but the name carries no family-qualified id"*) echo "ok   check 21 control: with no cutoff the id, filename and pin branches all grade the pre-cutoff records" ;;
+  *) echo "FAIL check 21 control: a blank cutoff did not red all three pre-cutoff records, so the cutoff arms below prove nothing"; st=1 ;;
+esac
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="1"\nRECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"2026-08-02-build-ARCH-tOne-9-x.md"*) echo "FAIL RECORD_SERVES_CUTOFF: the id branch still grades a record dated before the cutoff"; st=1 ;;
+  *"2026-09-02-build-ARCH-tOne-9-x.md — ARCH-tOne-9 is named"*) echo "ok   RECORD_SERVES_CUTOFF: the id branch exempts the pre-cutoff record and grades the later one" ;;
+  *) echo "FAIL RECORD_SERVES_CUTOFF: the id branch stopped grading the record dated after the cutoff"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"2026-08-02-build-tOne-1-y.md"*) echo "FAIL RECORD_SERVES_CUTOFF: the filename branch still grades a record dated before the cutoff"; st=1 ;;
+  *"2026-09-02-build-tOne-1-y.md — bound, but the name carries no family-qualified id"*) echo "ok   RECORD_SERVES_CUTOFF: the filename branch exempts the pre-cutoff record and grades the later one" ;;
+  *) echo "FAIL RECORD_SERVES_CUTOFF: the filename branch stopped grading the record dated after the cutoff"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"measured 2 against the pin 1"*) echo "FAIL RECORD_SERVES_CUTOFF: the pin still counts the unbound record dated before the cutoff"; st=1 ;;
+  *) echo "ok   RECORD_SERVES_CUTOFF: the pin counts only the unbound record at or after the cutoff" ;;
+esac
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nRECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"measured 1 against the pin 0"*) echo "ok   RECORD_SERVES_CUTOFF: the pin still grades the unbound record after the cutoff" ;;
+  *) echo "FAIL RECORD_SERVES_CUTOFF: the pin stopped counting the unbound record dated after the cutoff"; st=1 ;;
+esac
+# rev-3 (the closing review's C1): a pin set to N, as the runbook used to say, holds slack equal to
+# the exempt record. The pin is shrink-only, so that slack REDS, naming the value to lower it to, and
+# the measurement it is read against prints on every run with all three numbers.
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="2"\nRECORD_UNDATED_ARTIFACTS="exempt"\nRECORD_SERVES_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"RECORD_UNBOUND_PIN carries slack — the pin is shrink-only, and this much headroom lets as many new unbound records land green"*"the pin 2 against a graded count of 1 — lower it to 1"*) echo "ok   check 21: a pin above its graded count reds as slack, naming the value to lower it to" ;;
+  *) echo "FAIL check 21: a pin set to N over a cutoff-exempt record passed with slack"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"check 21: the unbound pin grades 1 of N 2 unbound record(s), 1 exempt by RECORD_SERVES_CUTOFF or legacy-files.txt, against RECORD_UNBOUND_PIN=2"*) echo "ok   check 21: the pin's measurement prints graded, total and exempt counts" ;;
+  *) echo "FAIL check 21: the pin's measurement did not print its three counts"; st=1 ;;
+esac
+# A generator that predates the U row prints N and no U, which would leave the pin unreachable. A
+# copy of this kit whose generator lost the line models an adopter's forked one.
+rm -rf "$TMP/kit32"; cp -r "$HERE" "$TMP/kit32"
+sed -i '/print(f"U\\t{rel}")/d' "$TMP/kit32/gen_build_index.py"
+o=$( cd "$_b1" && bash "$TMP/kit32/check-memory-hygiene.sh" 2>&1 )
+n=$((n+1))
+case "$o" in
+  *"the bindings parse printed N 2 but 0 U row(s)"*) echo "ok   check 21: a generator printing N and no U row reds instead of leaving the pin ungraded" ;;
+  *) echo "FAIL check 21: a generator printing no U row left the pin silently ungraded"; st=1 ;;
+esac
+rm -rf "$TMP/kit32"
+( cd "$_b1" && git rm -q memory/builds/tOne/build/2026-0[89]-02-build-* && git -c commit.gpgsign=false commit -q -m rf32-out --no-verify ) >/dev/null 2>&1
+
+# ---- TOOL-aRepatriatedFork-10 S5 and S6: a FLAT install at `scripts/` with a govkit receipt,
+# ---- rendered through `--render`. The rendered HYGIENE.md states THIS tree's two conf values, and
+# ---- TEMPLATE-SPEC.md names the codebase-map generator under the receipt's prefix — the kit
+# ---- directory's own parent is empty here, which is the case the receipt exists for.
+_fl=$(mktemp -d)
+(
+  cd "$_fl" || exit 1
+  git init -q .; git config user.email t@t.test; git config user.name t
+  mkdir -p scripts memory .governance
+  cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
+  # The second row RE-HOMES one sibling, as a `kit.codebase-map.prefix` override records it: only
+  # per row. Closing review round 1 L4 — a top-level `prefix` read renders it at `scripts/` anyway.
+  mkdir -p lib/cm; : > lib/cm/reuse_lookup.py
+  printf '{\n  "schema": 3,\n  "prefix": "scripts",\n  "files": [{"prefix": "decoy"}, {"path": "lib/cm/reuse_lookup.py", "source": "%s/codebase-map/reuse_lookup.py", "kit": "codebase-map"}]\n}\n' gov > .governance/install.json
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\nINDEX_CAP_LINES="500"\nENTRY_CAP_UNIT="bytes"\n' > .memory-tree.conf
+  printf '<!-- gov:kit memory-tree@0 -->\n' > memory/HYGIENE.md
+  git add -A && git -c commit.gpgsign=false commit -q -m flat --no-verify
+  bash scripts/adopt-memory-tree.sh --render
+) >/dev/null 2>&1
+n=$((n+1))
+if grep -qF '`INDEX_CAP_LINES`, is: 500.' "$_fl/memory/HYGIENE.md" 2>/dev/null \
+   && grep -qF '`ENTRY_CAP_UNIT` is: bytes.' "$_fl/memory/HYGIENE.md" 2>/dev/null \
+   && ! grep -qF 'INDEX_CAP_LINES=0' "$_fl/memory/HYGIENE.md"; then
+  echo "ok   --render states the adopter's INDEX_CAP_LINES and ENTRY_CAP_UNIT, never gov's"
+else
+  echo "FAIL --render did not state the fixture's own INDEX_CAP_LINES=500 / ENTRY_CAP_UNIT=bytes, or still spells gov's INDEX_CAP_LINES=0"; st=1
+fi
+n=$((n+1))
+if grep -qF '`scripts/codebase-map/gen_map.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
+  echo "ok   a flat install renders TOOL_ROOT from the receipt's prefix"
+else
+  echo "FAIL a flat install with a receipt prefix of scripts did not render the codebase-map generator under scripts/ — TOOL_ROOT is still the empty parent"; st=1
+fi
+n=$((n+1))
+if grep -qF '`lib/cm/reuse_lookup.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
+  echo "ok   a sibling file the receipt re-homes renders at its row's path, not at the top-level prefix"
+else
+  echo "FAIL the receipt row re-homing the codebase-map lookup to lib/cm/ was ignored — the render read the top-level prefix only"; st=1
+fi
+rm -rf "$_fl"
+
 # PROJECT_REGISTRY_EXTRA — it only WIDENS, so the arm that matters is that it does not widen to
 # everything. The first cut of this key sat above the named cases in check 3 and matched all of
 # them, accepting any file under project/ and disabling the check while reporting clean. BOTH
 # files are committed: the registry the key names must be absent from check 3's list and the
 # probe it does not name must be in it, and a `*unlisted-probe*` match alone could not tell the
 # key widening from check 3 listing everything.
-pk_set 'PROJECT_REGISTRY_EXTRA="my-registry.txt"'
+write_pk_conf 'PROJECT_REGISTRY_EXTRA="my-registry.txt"'
 printf 'x\n' > "$_b1/memory/project/my-registry.txt"
 printf 'x\n' > "$_b1/memory/project/unlisted-probe.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m probe --no-verify ) >/dev/null 2>&1
-o=$(pk_out)
+o=$(run_pk_gate)
 rm -rf "$_b1"
 n=$((n+1))
 case "$o" in
@@ -2767,6 +3164,16 @@ grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape ar
 # (TOOL-aRatifiedRulings-3): it used to be graded BEFORE the project-key section, so it read `n`
 # thirteen short of what the PASS line prints, and a pin read off that line would have redded
 # the suite on its first run. The pinned number is now the printed number, exactly.
+# TOOL-dGatedProse-1 RAISED this by 37, from 374: the hit, miss, hitl, chit and cnot calls in its
+# check-25 block, counted between that block's two marker comments. Every one runs at top level,
+# never in a subshell, so each is one increment of `n` and the pin stays the printed number.
+# RAISED 411 -> 434 at the closing diff review of dGatedProse, round 1, to the PRINTED count again:
+# its two R2 chit calls, and the arms the reconcile with main brought in without a raise.
+# RAISED 434 -> 436 at round 2 of that review: the chit calls for fixtures 220 and 221.
+# RAISED 436 -> 448 by TOOL-aRepatriatedFork-10: its ten registry/key arms and two flat-render arms,
+# each one top-level increment of `n`.
+# RAISED 448 -> 454 by TOOL-aRepatriatedFork-32: its control, four cutoff arms and the U-row arm, each top-level.
+# RAISED 454 -> 456 by its rev-3 fold: the slack arm and the measurement-line arm, both top-level.
 # RAISED 374 -> 416 by TOOL-dDerivedDocket-8, which adds 42 executed assertions: 28 outside its two
 # loops (16 chit/cnot, 10 written out, 2 inside `bm_run`) plus 4x2 and 3x2 inside them. DERIVED from
 # the block rather than read off a PASS line, because that suite run is a held leg the unit's pass
@@ -2776,7 +3183,9 @@ grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape ar
 # beside the main block's. Derived from the block, for the reason the paragraph above gives.
 # RAISED 431 -> 434 by TOOL-dDerivedDocket-31, whose F-item shape block adds three executed
 # assertions, none inside a loop. Derived from the block, for the same reason.
-FLOOR_ASSERTIONS=434
+# MERGED at the dDerivedDocket x origin/main reconcile: base 374 + ours' 60 (374 -> 434 above) + theirs'
+# 82 (374 -> 456 above) = 516, each side's raise counting only the arms that side added.
+FLOOR_ASSERTIONS=516
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

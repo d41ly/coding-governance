@@ -118,7 +118,7 @@ BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed
 # before the guard was written. Armed by four arms on `plan` and `apply`, and its failing case was
 # observed: neutering the guard puts all 29 escaping rows back.
 # NOTE the FILE count also moved, 2 -> 3, and that is the second pin doing its job rather than a
-# surprise: `tools/govkit/fixtures/make_incms_receipt.py` is tracked Python under the deployer's own
+# surprise: `tools/govkit/fixtures/make_adopter_receipt.py` is tracked Python under the deployer's own
 # directory, so the DISCOVERED population picked it up. It contributes no refusal branches.
 # 212 -> 214 at ROUND 2's fold. Two new refusals, both from confirmed blockers: the
 # token-value guard `demand_safe_token` (a target-supplied `prefix` or answer outside
@@ -180,7 +180,7 @@ BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed
                     # floor that trails the population stops catching the matcher going blind.
 FILE_PIN = 4        # 1 -> 4 at DEPL-cMendedVintage-9. MEASURED at the same run: the discovered
 # population is four modules — the engine, `census.py`, `check_runbook_parity.py` and
-# `fixtures/make_incms_receipt.py` — and only the engine contributes a refusal branch, which is
+# `fixtures/make_adopter_receipt.py` — and only the engine contributes a refusal branch, which is
 # exactly the scenario this pin exists for and the branch count cannot see. It sat at 1 while three
 # modules had already joined the scan, so a module dropping out of the glob was ungraded by both
 # pins at once. Shrink-only: a refactor may only grow this.

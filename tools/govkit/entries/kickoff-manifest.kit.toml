@@ -12,6 +12,14 @@ include = ["manifest-check.sh"]
 role = "engine"
 to = "{prefix}/manifest-check.sh"
 
+# The engine's check-arms sibling. TOOL-aRepatriatedFork-18 S1: every adopter's `gate-arms` leg
+# reads it for the arms of `manifest-check.sh`, so it ships beside the engine as a FILE. It is no
+# leg at an adopter; its leg is gov's, held with the other self-tests.
+[[files]]
+include = ["manifest-check.test.sh"]
+role = "engine"
+to = "{prefix}/manifest-check.test.sh"
+
 [[files]]
 include = ["MANIFEST-TEMPLATE.md"]
 role = "seed"

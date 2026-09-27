@@ -43,7 +43,7 @@ resolves the bound and denies that binder form, which is what makes the removal 
 than cosmetic.
 
 Measures whether a repo's own **records** still describe reality, and — at higher tiers — hunts dead,
-unwired and duplicated code. Ported from the inCMS audit that found a repo where 24 of 58 in-flight
+unwired and duplicated code. Ported from adopter ic's audit that found a repo where 24 of 58 in-flight
 ledger rows contradicted git and roughly half of all non-terminal spec headers said "not built" about
 shipped work, with every hygiene check green throughout.
 

@@ -2,7 +2,7 @@
 
 The map's coverage is exactly as good as the inventory set in `map_extractors.py`. This
 checklist is distilled from a full ground-truth mapping pass + two adversarial reviews of the
-reference implementation (inCMS, ARCH-dWovenAtlas-1); every rule below was a shipped bug or a
+reference implementation (adopter ic, ARCH-dWovenAtlas-1); every rule below was a shipped bug or a
 confirmed review finding once. Work through it ONCE at adoption; revisit when the stack grows
 a new registry.
 

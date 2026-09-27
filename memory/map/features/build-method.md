@@ -78,10 +78,10 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   not. The caps are declared on the method's own line 8; compare with
   `awk 'END{print NR}' memory/guides/BUILD-METHOD.md` and `wc -c`. Which axis binds first is M1's to
   state, and only the byte axis has a leg — `build-method size`, reading the
-  `tools/template-size-limits.txt` row. **`TOOL-aHonedRuleset-6` ruled that declaration DELETED
-  rather than made enforceable, and it is in the tree anyway:** `TOOL-aHoistedPass-3` gave the byte
-  half a leg the day before that ruling was built, and the merge landing `aHonedRuleset` restored the
-  passage without restoring the bullet that described its absence. Measure before citing either record.
+  `tools/template-size-limits.txt` row. **The owner ruled on 2026-09-21 that the budget STANDS and
+  moves**, settling `TOOL-dLoggedFlight-35`, which recorded `TOOL-aHonedRuleset-6` deleting the
+  declaration and `TOOL-aHoistedPass-3` making it enforceable. `TOOL-dGatedProse-4` moved both
+  halves to the figures the owner ruled on 2026-09-22, and the reason sits beside the row.
 - **The carrier check is STRUCTURAL, not semantic.** `check-method-carriers.sh` catches an
   undeclared carrier, a stale row and a copied `## M<n>` section. A fluent paraphrase that invents
   its own headings passes, and the leg says so rather than implying a comprehension it lacks.
@@ -102,7 +102,10 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   instrumented step, because nothing yet asserts that a spec audit HAPPENED. Since
   `TOOL-aBlindedTrial-6` it is also OPT-IN: M4 owes the audit only where the build README's front
   matter declares `spec-audit: <date>`, and undeclared it says none is owed — the blinded trial
-  measured no quality the audit bought on one-context units at 12× the tokens.
+  measured no quality the audit bought on one-context units at 12× the tokens. Since
+  `TOOL-dGatedProse-4` the CHAIN of promotions is bounded by review precision: a promoting round
+  below the review protocol's floor ends it. No checker enforces that bound, because the precision
+  lives only in the review record and never on the run record's `--review` row.
 - **The `Decided:` trailer M10 routes a choice to is ungated, by design.** Whether a choice was made
   is not observable, so nothing refuses a run that left none. M10's own example went through git's
   trailer parser once, in the pass that wrote it (`TOOL-dLoggedFlight-7` AC3), and nothing grades a

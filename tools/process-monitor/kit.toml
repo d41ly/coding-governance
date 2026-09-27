@@ -21,8 +21,9 @@ role = "engine"
 # suite whose subject is a checker in THIS directory has no job in a tree that copy-installs the kit
 # and never edits it. Withheld by CLAIMING THE DESTINATION — govkit has no `exclude` key, a `**`
 # rule's pool drops only what another rule owns, and `project-owned` is absent from LANDABLE_ROLES
-# so `apply` never writes it. `silenced_legs` then refuses to emit any gate leg whose argv names a
-# path the target does not hold, so the leg goes with the file and needs no deployer change.
+# so `apply` never writes it. THEIR TWO LEGS ARE NOT DECLARED HERE: a descriptor leg naming a
+# withheld file printed a `SILENT` row in every adopter's `plan`, so both are `[[exempt_leg]]` rows in
+# gov's registry and stay legs on gov's bar. DEPL-aRepatriatedFork-14 S4.
 [[files]]
 include = ["adopt-process-monitor.test.sh"]
 role = "project-owned"
@@ -30,22 +31,6 @@ role = "project-owned"
 [[files]]
 include = ["selftest.py"]
 role = "project-owned"
-
-# The engine's own gate leg. `subject = "kit"` and `chunk = "selftests"`, so it is HELD by default
-# per the 2026-08-23 owner ruling: a suite whose subject is a checker in this directory has a job
-# only when that checker's source changes. Guarded on the engine and the suite together, so a
-# records-only commit does not run it.
-[[gate_leg]]
-name = "process-monitor census selftest"
-subject = "kit"
-argv = ["python", "{kit}/selftest.py"]
-guard = ["{kit}/census.py", "{kit}/selftest.py"]
-
-[[gate_leg]]
-name = "process-monitor adopter selftest"
-subject = "kit"
-argv = ["bash", "{kit}/adopt-process-monitor.test.sh"]
-guard = ["{kit}/adopt-process-monitor.sh", "{kit}/adopt-process-monitor.test.sh"]
 
 # The conf is the ADOPTER'S to write and this kit may not create it: the roots are that adopter's
 # own paths and a seeded conf carrying a placeholder root is worse than an absent one, because it

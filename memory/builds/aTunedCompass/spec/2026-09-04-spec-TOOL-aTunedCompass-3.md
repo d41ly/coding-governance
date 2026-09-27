@@ -27,6 +27,10 @@ a half it never scores.
 - **S2** — the set and substrate vocabularies come from `union.SETS` and `union.SUBS`, and
   `check-recall.py`'s own byte-identical copies of those two tuples are deleted. One vocabulary, one
   place, and the import is the first line of code in this repo that reads `union.py` at all.
+  - **Readers:** by name: `tools/memory-recall/check-recall.py` spells both copies in its pin
+    branch. by value: that branch of `tools/memory-recall/check-recall.py` refuses a pin whose set
+    or substrate is outside the tuples, and `test_out_of_vocabulary_pin_reds` in
+    `tools/memory-recall/test_recall_floor.py` asserts the refusal.
 - **S3** — precondition 3 applies to EVERY member set. A member absent from the data dir, or present
   and empty, refuses and names that member. Without it a member contributing nothing leaves the pin
   reading as satisfied, which is `memory/gotchas/vacuous-selector-empty-population.md` arriving

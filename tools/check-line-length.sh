@@ -43,10 +43,13 @@
 #
 # Exit 0 = every subject within its limit, or not adopted · 1 = an offender or a stale row · 2 = could not run.
 set -u
+_self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "check-line-length: not a git tree"; exit 2; }
 cd "$ROOT" || exit 2
 
-DECL=${DECL:-tools/line-length-limits.txt}
+# The declaration defaults to the sidecar BESIDE this gate, derived (TOOL-aRepatriatedFork-2 S7).
+_self_pre=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || _self_pre=""
+DECL=${DECL:-${_self_pre}line-length-limits.txt}
 HARD_DEFAULT=450
 status=0
 fail() { printf 'LINE-LENGTH check %s FAILED — %s\n' "$1" "$2"; status=1; }

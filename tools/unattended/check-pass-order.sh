@@ -330,7 +330,7 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
   base=""; norun=1
   _runblob=$(GIT show "HEAD:$run" 2>/dev/null || true)
   if [ -n "$_runblob" ]; then
-    base=$(printf '%s\n' "$_runblob" | sed -n 's/^base:[[:space:]]*//p' | head -1)
+    base=$(printf '%s\n' "$_runblob" | extract_run_facts | sed -n 's/^base:[[:space:]]*//p' | head -1)
     case "$base" in
       [0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) GIT cat-file -e "$base^{commit}" 2>/dev/null && norun=0 || base="" ;;
       *) base="" ;;

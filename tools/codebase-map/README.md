@@ -7,7 +7,7 @@ dead keys fail too), a **shrink-only baseline** so adoption never blocks work, d
 (`map_diff`) that answers "what did that merge touch, feature-wise". Operationalizes the
 playbook's §5/§6 documentation-currency goals with machine enforcement.
 
-Reference implementation extracted from inCMS (ARCH-dWovenAtlas-1) after a ground-truth mapping
+Reference implementation extracted from adopter ic (ARCH-dWovenAtlas-1) after a ground-truth mapping
 pass and two adversarial reviews; the portable engine (`map_lib.py`) is identical across repos —
 project specifics live in exactly two files the adopting repo owns.
 

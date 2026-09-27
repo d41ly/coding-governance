@@ -70,6 +70,10 @@ and a pinned merge-bar leg. Ship both.
   it" from "the data was never there". The leg prints both; only the retrieval half is pinned,
   because a fixture naming a record that has been legitimately archived should tell a reader why it
   dropped rather than red the bar for the wrong reason.
+  - **Readers:** by name: `measure_run` computes the ceiling from the unresolved targets it lists.
+    by value: `tools/memory-recall/check-recall.py` reds per id on a fixture naming an archived
+    record and divides the gated cell by the ceiling, and `tools/memory-recall/test_recall_floor.py`
+    retires a target and asserts both the per-id red and the normalised score.
 
 ## 3. Non-goals (OUT)
 

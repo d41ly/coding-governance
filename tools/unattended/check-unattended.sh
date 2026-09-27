@@ -28,7 +28,7 @@
 # deleted shape unit 4 exists to prevent; routing them to stdout without amending this paragraph
 # would leave the header asserting something the code disproves. TOOL-aPrimedKeepalive-4.
 #
-# THREE: check 35's LANDER_MODE and SELFTESTS_OWED_PATHS lines print on the DEFAULT channel too, and
+# THREE: check 45's LANDER_MODE and SELFTESTS_OWED_PATHS lines print on the DEFAULT channel too, and
 # for TWO's reason rather than by a second concession. They are not skips: they are the effective
 # landing shape and the declared self-test surface, and those decide WHICH COMMIT the landing bar
 # graded and whether a kit-work landing is ever told the flagged bar is owed. A reader of a green bar
@@ -69,6 +69,40 @@ _LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 }
 # shellcheck source=lib-unattended.sh
 . "$_LIB_DIR/lib-unattended.sh"
+# The python launcher, INLINED byte-identically from the canonical copy named on its marker line
+# (this kit is copy-installed and has no shared lib to source). Check 21's repair hint runs the
+# sibling resolver with it, which reads the receipt in Python; nothing else here spawns one.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended-check: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -93,15 +127,26 @@ CONF="$ROOT/.unattended.conf"
 # ---- skip naming itself, on the report channel, off the check headers themselves (see the guard
 # ---- that follows the 28 region). The parser below sits between a bare argv sentinel pair so that
 # ---- check 26 can join every flag it accepts to an arm in this leg's own suite. TOOL-dDerivedDocket-30.
-SCOPE=""
+SCOPE=""; EMIT_CEILING=0
 # gov:argv-begin
 case "${1:-}" in
   "")            ;;
   --only)        [ "${2:-}" = 28 ] || { echo "check-unattended: --only takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=only28 ;;
   --skip)        [ "${2:-}" = 28 ] || { echo "check-unattended: --skip takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=skip28 ;;
-  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28] or [--skip 28]"; exit 2 ;;
+  --emit-ceiling) SCOPE=skip28; EMIT_CEILING=1 ;;
+  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28], [--skip 28] or [--emit-ceiling]"; exit 2 ;;
 esac
 # gov:argv-end
+# ---- --emit-ceiling (TOOL-aRepatriatedFork-11 S5): MEASURE check 23's pin instead of grading it.
+# ---- Both adopters had measured UNDECLARED_WRITE_CEILING by running this leg at 0 and reading the
+# ---- failure. This runs the skip-28 scope with stdout discarded, so no check line reaches the caller,
+# ---- and prints the one conf line on the saved stdout right after check 23 counts. A run that never
+# ---- reaches that count exits 1 with nothing on stdout, and so does a count over an EMPTY graded
+# ---- population: a dead probe must not hand out a 0 (the EXIT trap is what catches the first case).
+if [ "$EMIT_CEILING" = 1 ]; then
+  exec 3>&1 1>/dev/null
+  trap 'echo "check-unattended: --emit-ceiling took no count, because the run stopped before check 23 graded anything; run the leg bare to see why" >&2; exit 1' EXIT
+fi
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
@@ -301,7 +346,7 @@ _load_rev_table() {
   local -a _revs=() _out=()
   while IFS= read -r _line; do
     [ -n "$_line" ] && _revs+=("$_line")
-  done < <(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null \
+  done < <(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null \
            | xargs -r grep -hoE '[0-9a-f]{7,40}' 2>/dev/null | sort -u)
   _n=${#_revs[@]}
   [ "$_n" -gt 0 ] || return 0
@@ -593,7 +638,7 @@ else
     *) rv_bad="$rv_bad
   (the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none: '$FOLD_CUTOFF')" ;;
   esac
-  for rvf in $(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null); do
+  for rvf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$rvf" ] || continue
     grep -q '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rvf" 2>/dev/null || continue
     rv_readme=${rvf%/RUN*.md}/README.md
@@ -603,7 +648,7 @@ else
     # every generated row already. Measured against the real region: the slug, the spec path and a
     # unit id were all silent, and only a fabricated id fired it. Promotion adds a NEW unit id, so
     # what has to be observed is an id present at HEAD and ABSENT at the run's own pinned BASE.
-    rv_base=$(awk -F': ' '/^base: /{ sub(/\r$/,"",$2); print $2; exit }' "$rvf")
+    rv_base=$(extract_run_facts < "$rvf" | awk -F': ' '/^base: /{ sub(/\r$/,"",$2); print $2; exit }')
     rv_new=""; rv_readable=0
     if [ -f "$rv_readme" ]; then
       # NON-WONTDO ONLY. The promotion clause discharges an exited loop by counting NEW unit ids,
@@ -750,6 +795,33 @@ else
   [ -z "${rv_bad//[[:space:]]/}" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers:$rv_bad"
 fi
 
+# PURE BASH, no forks. These were `sed … | head -1 | tr -d '\r'` — THREE processes per call, and they
+# are called per run-state file per check, so the leg paid them dozens of times per invocation and
+# its self-test paid them thousands of times per run. Process spawn dominates on Windows: the suite
+# ran 77s for ~1.4s of CPU, and it was never the git calls (885 of those, ~24s), it was the forks
+# around them. Same semantics: first matching line wins, `key:` followed by any run of spaces, a
+# valueless key yields the empty string, and a trailing CR is stripped.
+# TOOL-aRepatriatedFork-6 L2 - ONLY the `## Run facts` section is read, heading to next `## `
+# heading, which is the scope check 34 grades and the driver's `fact` reads. Over the whole file, a
+# `phase: LANDED` above the heading or a key-shaped line under `## Parked` answered first while
+# check 34 reported clean.
+fact_of() { # file · key
+  local l p="$2:" sec=0
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    case "$l" in
+      "## Run facts"*) sec=1; continue ;;
+      "## "*) sec=0; continue ;;
+    esac
+    [ "$sec" = 1 ] || continue
+    case "$l" in
+      "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
+    esac
+  done < "$1"
+  return 0
+}
+phase_of() { fact_of "$1" phase; }
+
 # ---- THE HALT VOCABULARY: a shrink-only floor, and every aborted record carrying a legal code.
 # ---- The floor behaves like its two siblings — undeclared or malformed is a REFUSAL, never a
 # ---- defaulted value, because a pin that quietly defaults is a pin nobody set.
@@ -791,11 +863,11 @@ fi
 # ---- a grandfather list that outlives the reason for it.
 if [ -n "$HALT_CODES_CORE" ]; then
   hc_bad=""
-  for hcf in $(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null); do
+  for hcf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$hcf" ] || continue
-    hcp=$(awk -F': ' '/^phase: /{ sub(/\r$/,"",$2); print $2; exit }' "$hcf")
+    hcp=$(phase_of "$hcf")
     [ "$hcp" = ABORTED ] || continue
-    hcv=$(awk -F': ' '/^halt-code: /{ sub(/\r$/,"",$2); print $2; exit }' "$hcf")
+    hcv=$(fact_of "$hcf" halt-code)
     if [ -z "$hcv" ]; then
       hc_bad="$hc_bad
   $hcf (phase ABORTED and no halt-code fact, so the record says a run stopped and never says why)"
@@ -932,23 +1004,6 @@ if [ "$POP" = 0 ] && [ "$PRE" -gt 0 ]; then
   fail 4 "a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason: $PRE found"
 fi
 
-# PURE BASH, no forks. These were `sed … | head -1 | tr -d '\r'` — THREE processes per call, and they
-# are called per run-state file per check, so the leg paid them dozens of times per invocation and
-# its self-test paid them thousands of times per run. Process spawn dominates on Windows: the suite
-# ran 77s for ~1.4s of CPU, and it was never the git calls (885 of those, ~24s), it was the forks
-# around them. Same semantics: first matching line wins, `key:` followed by any run of spaces, a
-# valueless key yields the empty string, and a trailing CR is stripped.
-fact_of() { # file · key
-  local l p="$2:"
-  while IFS= read -r l || [ -n "$l" ]; do
-    l=${l%$'\r'}
-    case "$l" in
-      "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
-    esac
-  done < "$1"
-  return 0
-}
-phase_of() { fact_of "$1" phase; }
 # Exactly one open, one close, CLOSE AFTER OPEN. The order clause is not decoration: a transposed
 # pair satisfies a count-only check, and the driver's copy of this function truncated a file on one.
 # A marker line is the marker or it is malformed — the prefix test IDENTIFIES the line, equality
@@ -1537,7 +1592,7 @@ read_may_of() { # README blob text -> `may=<value>` when the front matter carrie
 scan_grant_writes() { # stdin: commit ids -> `<commit> <README>` per commit that writes a may: line into one
   local _sg_c _sg_p _sg_new _sg_par _sg_hit
   GIT diff-tree --stdin -r -p --cc --no-renames --no-ext-diff --no-textconv --format='commit %H %P' \
-      -- "$M/builds/*/README.md" 2>/dev/null \
+      -- ":(glob)$M/builds/*/README.md" 2>/dev/null \
     | awk -v pre="$M/builds/" '
         /^commit [0-9a-f]+/ { c = $2; np = NF - 2; f = ""; inh = 0; next }
         /^diff --git / { f = $NF; sub(/^b\//, "", f); inh = 0; next }
@@ -1829,7 +1884,7 @@ while IFS= read -r f; do
   if [ "$LFC_ON" = 1 ]; then
     lfc_pop=""
     case "$ph" in
-      LANDED) if grep -q '^landed-derived:' "$f" 2>/dev/null; then lfc_pop=derived; else lfc_pop=landed; fi ;;
+      LANDED) if { extract_run_facts < "$f"; } 2>/dev/null | grep -q '^landed-derived:'; then lfc_pop=derived; else lfc_pop=landed; fi ;;
       LANDING)
         if lfc_c=$(read_landing_commit "$f"); then
           if [ "$LFC_MODE" = in-place ]; then
@@ -2843,7 +2898,7 @@ if [ -f "$EXAMPLE_CONF" ]; then
   fi
 fi
 
-# ---- 35: THE LANDING SHAPE, GRADED AND ANNOUNCED. TOOL-dDerivedDocket-3 S1. The announcement is as
+# ---- 45: THE LANDING SHAPE, GRADED AND ANNOUNCED. TOOL-dDerivedDocket-3 S1. The announcement is as
 # ---- load-bearing as the refusals beside it: `LANDER_MODE` decides which commit the landing bar
 # ---- grades and which verb commits the record, so a reader of a green bar who cannot tell
 # ---- `in-place` from a blank line is reading a verdict about a different landing.
@@ -2852,63 +2907,63 @@ fi
 # ---- here. That is this file's own header rule for the phase and DoD sets, and a landing mode is
 # ---- the same kind of thing. A marker that stops resolving is a REFUSAL, because a set read as
 # ---- empty would make every declared value legal.
-_c35_line=$(grep -A1 -F 'gov:lander-mode-set' "$DRIVER" 2>/dev/null | tail -1)
-_c35_set=$(printf '%s' "$_c35_line" | sed 's/[^a-z|-]//g' | tr '|' ' ')
-_c35_def=$(grep -F 'gov:lander-mode-default' "$DRIVER" 2>/dev/null | sed -n 's/.*LANDER_MODE=\([a-z-]*\).*/\1/p' | head -1)
-if [ -z "${_c35_set// /}" ] || [ -z "$_c35_def" ]; then
-  fail 35 "this leg cannot read the closed LANDER_MODE set and its default off the driver's own marked lines, so the declared mode would be graded against an empty set and every value, including a misspelling, would read as legal: $DRIVER"
+_c45_line=$(grep -A1 -F 'gov:lander-mode-set' "$DRIVER" 2>/dev/null | tail -1)
+_c45_set=$(printf '%s' "$_c45_line" | sed 's/[^a-z|-]//g' | tr '|' ' ')
+_c45_def=$(grep -F 'gov:lander-mode-default' "$DRIVER" 2>/dev/null | sed -n 's/.*LANDER_MODE=\([a-z-]*\).*/\1/p' | head -1)
+if [ -z "${_c45_set// /}" ] || [ -z "$_c45_def" ]; then
+  fail 45 "this leg cannot read the closed LANDER_MODE set and its default off the driver's own marked lines, so the declared mode would be graded against an empty set and every value, including a misspelling, would read as legal: $DRIVER"
 else
-  _c35_eff="$LANDER_MODE"; _c35_src=declared
-  [ -n "$_c35_eff" ] || { _c35_eff="$_c35_def"; _c35_src=defaulted; }
-  case " $_c35_set " in
-    *" $_c35_eff "*)
-      echo "unattended: LANDER_MODE $_c35_eff ($_c35_src) — the landing shape every run in this project takes, graded against the driver's own set: $_c35_set" ;;
+  _c45_eff="$LANDER_MODE"; _c45_src=declared
+  [ -n "$_c45_eff" ] || { _c45_eff="$_c45_def"; _c45_src=defaulted; }
+  case " $_c45_set " in
+    *" $_c45_eff "*)
+      echo "unattended: LANDER_MODE $_c45_eff ($_c45_src) — the landing shape every run in this project takes, graded against the driver's own set: $_c45_set" ;;
     *)
-      fail 35 "LANDER_MODE is declared outside the driver's closed set, so every run in this project refuses at conf load and no landing is reachable at all, declared $LANDER_MODE against the set $_c35_set" ;;
+      fail 45 "LANDER_MODE is declared outside the driver's closed set, so every run in this project refuses at conf load and no landing is reachable at all, declared $LANDER_MODE against the set $_c45_set" ;;
   esac
 fi
-# ---- 36: THE DURABLE RESTART CARRIER, GRADED AND ANNOUNCED. TOOL-dDerivedDocket-5 S1 and S2.
+# ---- 46: THE DURABLE RESTART CARRIER, GRADED AND ANNOUNCED. TOOL-dDerivedDocket-5 S1 and S2.
 # ---- Three questions, and the first is the one a project gets wrong silently: the switch's value.
 # ----
 # ---- THE CLOSED SET AND THE DEFAULT COME FROM THE DRIVER, off its two marked lines, never retyped
-# ---- here — check 35's own rule for LANDER_MODE, applied to the sibling switch beside it. A marker
+# ---- here — check 45's own rule for LANDER_MODE, applied to the sibling switch beside it. A marker
 # ---- that stops resolving is a REFUSAL, because a set read as empty makes every value legal.
 # ----
 # ---- WHAT THIS DOES NOT CHECK: that the declared tools EXIST, that the carrier is really durable,
 # ---- or that any restart was ever filed. No script reaches a harness scheduler store — that is the
 # ---- premise the whole feature rests on — so filing and reaping stay agent-attested, exactly as the
 # ---- keepalive's are. This grades the DECLARATION and nothing beyond it.
-_c36_line=$(grep -A1 -F 'gov:resume-schedule-set' "$DRIVER" 2>/dev/null | tail -1)
-_c36_set=$(printf '%s' "$_c36_line" | sed 's/[^a-z|]//g' | tr '|' ' ')
-_c36_def=$(grep -F 'gov:resume-schedule-default' "$DRIVER" 2>/dev/null | sed -n 's/.*RESUME_SCHEDULE=\([a-z]*\).*/\1/p' | head -1)
-if [ -z "${_c36_set// /}" ] || [ -z "$_c36_def" ]; then
-  fail 36 "this leg cannot read the closed RESUME_SCHEDULE set and its default off the driver's own marked lines, so the declared switch would be graded against an empty set and every value, a misspelling included, would read as legal: $DRIVER"
+_c46_line=$(grep -A1 -F 'gov:resume-schedule-set' "$DRIVER" 2>/dev/null | tail -1)
+_c46_set=$(printf '%s' "$_c46_line" | sed 's/[^a-z|]//g' | tr '|' ' ')
+_c46_def=$(grep -F 'gov:resume-schedule-default' "$DRIVER" 2>/dev/null | sed -n 's/.*RESUME_SCHEDULE=\([a-z]*\).*/\1/p' | head -1)
+if [ -z "${_c46_set// /}" ] || [ -z "$_c46_def" ]; then
+  fail 46 "this leg cannot read the closed RESUME_SCHEDULE set and its default off the driver's own marked lines, so the declared switch would be graded against an empty set and every value, a misspelling included, would read as legal: $DRIVER"
 else
-  _c36_eff="$RESUME_SCHEDULE"; _c36_src=declared
-  [ -n "$_c36_eff" ] || { _c36_eff="$_c36_def"; _c36_src=defaulted; }
-  case " $_c36_set " in
-    *" $_c36_eff "*)
-      echo "unattended: RESUME_SCHEDULE $_c36_eff ($_c36_src) — whether a hold that owes a restart prints one for the agent to file, graded against the driver's own set: $_c36_set" ;;
+  _c46_eff="$RESUME_SCHEDULE"; _c46_src=declared
+  [ -n "$_c46_eff" ] || { _c46_eff="$_c46_def"; _c46_src=defaulted; }
+  case " $_c46_set " in
+    *" $_c46_eff "*)
+      echo "unattended: RESUME_SCHEDULE $_c46_eff ($_c46_src) — whether a hold that owes a restart prints one for the agent to file, graded against the driver's own set: $_c46_set" ;;
     *)
-      fail 36 "RESUME_SCHEDULE is declared outside the driver's closed set, so every run in this project refuses at conf load and no verb is reachable at all, declared $RESUME_SCHEDULE against the set $_c36_set"
-      _c36_eff=refused ;;
+      fail 46 "RESUME_SCHEDULE is declared outside the driver's closed set, so every run in this project refuses at conf load and no verb is reachable at all, declared $RESUME_SCHEDULE against the set $_c46_set"
+      _c46_eff=refused ;;
   esac
-  if [ "$_c36_eff" = on ]; then
+  if [ "$_c46_eff" = on ]; then
     # ---- THE PAIR IS REQUIRED WHILE THE SWITCH IS ON, and undeclared is not defaulted: a hold then
     # ---- records `none · no carrier` and the run pauses with nothing filed to restart it. --hold
     # ---- itself never refuses for this — the hold is the safe state — so the refusal lives here.
-    for _c36_k in RESUME_SCHEDULE_CREATE RESUME_SCHEDULE_DELETE; do
-      eval "_c36_v=\${$_c36_k}"
-      [ -n "$_c36_v" ] || fail 36 "RESUME_SCHEDULE is $_c36_eff ($_c36_src) and this key is undeclared, so every hold this project takes records 'none · no carrier' and pauses with nothing filed to restart it; declare the pair, or write RESUME_SCHEDULE=\"off\": $_c36_k"
+    for _c46_k in RESUME_SCHEDULE_CREATE RESUME_SCHEDULE_DELETE; do
+      eval "_c46_v=\${$_c46_k}"
+      [ -n "$_c46_v" ] || fail 46 "RESUME_SCHEDULE is $_c46_eff ($_c46_src) and this key is undeclared, so every hold this project takes records 'none · no carrier' and pauses with nothing filed to restart it; declare the pair, or write RESUME_SCHEDULE=\"off\": $_c46_k"
     done
     # ---- THE CARRIER MAY NOT BE THE KEEPALIVE'S. Graded on the CREATE half, which is the one that
     # ---- files the task: this project's own conf declares that store session-scoped, so a restart
     # ---- filed there dies with the session it exists to outlive and every hold then reads as owing
     # ---- a restart that can never fire.
     if [ -n "$RESUME_SCHEDULE_CREATE" ] && [ "$RESUME_SCHEDULE_CREATE" = "$KEEPALIVE_CREATE" ]; then
-      fail 36 "the declared durable restart carrier is the keepalive's own create tool, and that store is session-scoped, so every restart filed there dies with the session it exists to outlive: RESUME_SCHEDULE_CREATE and KEEPALIVE_CREATE are both $RESUME_SCHEDULE_CREATE"
+      fail 46 "the declared durable restart carrier is the keepalive's own create tool, and that store is session-scoped, so every restart filed there dies with the session it exists to outlive: RESUME_SCHEDULE_CREATE and KEEPALIVE_CREATE are both $RESUME_SCHEDULE_CREATE"
     fi
-  elif [ "$_c36_eff" = off ]; then
+  elif [ "$_c46_eff" = off ]; then
     echo "unattended: RESUME_SCHEDULE is off — no hold in this project owes a durable restart, and every held run waits for a person to type --resume"
   fi
 fi
@@ -2922,16 +2977,16 @@ fi
 if [ -z "$SELFTESTS_OWED_PATHS" ]; then
   echo "unattended: SELFTESTS_OWED_PATHS is blank — no landing range in this project can ever be told the kit Definition of Done owes the flagged bar, so that clause has no declared surface to be read against"
 else
-  _c35_dead=""
-  for _c35_p in $SELFTESTS_OWED_PATHS; do
-    if [ -n "$(GIT ls-files -- "$_c35_p" 2>/dev/null | head -1)" ]; then
-      echo "unattended: SELFTESTS_OWED_PATHS entry $_c35_p — resolves to tracked paths"
+  _c45_dead=""
+  for _c45_p in $SELFTESTS_OWED_PATHS; do
+    if [ -n "$(GIT ls-files -- "$_c45_p" 2>/dev/null | head -1)" ]; then
+      echo "unattended: SELFTESTS_OWED_PATHS entry $_c45_p — resolves to tracked paths"
     else
-      _c35_dead="$_c35_dead $_c35_p"
+      _c45_dead="$_c45_dead $_c45_p"
     fi
   done
-  [ -z "${_c35_dead// /}" ] \
-    || fail 35 "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and an in-place landing of kit work under it would never be told the flagged bar is owed:$_c35_dead"
+  [ -z "${_c45_dead// /}" ] \
+    || fail 45 "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and an in-place landing of kit work under it would never be told the flagged bar is owed:$_c45_dead"
 fi
 
 # ---- 12: the kickoff engine's hand-back. BLANK KICKOFF_ENGINE turns this off — an adopter may not
@@ -3366,7 +3421,7 @@ if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
   fi
 fi
 
-# ---- 34: THE LAND SECTION CARRIES BOTH LANDING SHAPES. TOOL-dDerivedDocket-3 S6, AC4. The Skill is
+# ---- 44: THE LAND SECTION CARRIES BOTH LANDING SHAPES. TOOL-dDerivedDocket-3 S6, AC4. The Skill is
 # ---- ONE render shared by every adopter and the mode is a conf value, so this section is graded
 # ---- unconditionally rather than under `LANDER_MODE`: an adopter who switches the key must not have
 # ---- to re-render a document that never described the mode they switched to.
@@ -3380,22 +3435,22 @@ fi
 # ---- It grades presence of the two verbs and ABSENCE of a merge into the node's own default branch.
 # ---- The order is protocol section 6's sentence and a reader's job.
 if [ -f "$tmpl" ]; then
-  _c34_land=$(tr -d '\r' < "$tmpl" | awk '/^## Land[ \t]*$/ { f = 1; next } f && /^## / { f = 0 } f')
-  if [ -z "${_c34_land//[[:space:]]/}" ]; then
-    fail 34 "the Skill template carries no Land section body, so every assertion about the landing an agent is told to perform would be graded over nothing and would pass by finding nothing: $tmpl"
+  _c44_land=$(tr -d '\r' < "$tmpl" | awk '/^## Land[ \t]*$/ { f = 1; next } f && /^## / { f = 0 } f')
+  if [ -z "${_c44_land//[[:space:]]/}" ]; then
+    fail 44 "the Skill template carries no Land section body, so every assertion about the landing an agent is told to perform would be graded over nothing and would pass by finding nothing: $tmpl"
   else
-    _c34_miss=""
-    for _c34_f in "--prepare" "--land"; do
-      printf '%s\n' "$_c34_land" | grep -qF -- "$_c34_f" || _c34_miss="$_c34_miss $_c34_f"
+    _c44_miss=""
+    for _c44_f in "--prepare" "--land"; do
+      printf '%s\n' "$_c44_land" | grep -qF -- "$_c44_f" || _c44_miss="$_c44_miss $_c44_f"
     done
-    [ -z "${_c34_miss// /}" ] \
-      || fail 34 "the Skill's Land section names neither landing shape in full - an in-place landing prepares the merge and then pushes exactly it, and a section missing either verb sends an agent to a landing it cannot complete:$_c34_miss in $tmpl"
+    [ -z "${_c44_miss// /}" ] \
+      || fail 44 "the Skill's Land section names neither landing shape in full - an in-place landing prepares the merge and then pushes exactly it, and a section missing either verb sends an agent to a landing it cannot complete:$_c44_miss in $tmpl"
     # A MERGE INTO THE NODE'S OWN DEFAULT BRANCH is the primary path's fallback text, and it is what
     # survives a half-finished edit of this section. In `in-place` it is wrong twice over: that ref
     # is one this session can move, and it carries whatever else on this node has not been pushed.
-    _c34_local=$(printf '%s\n' "$_c34_land" | grep -niE '(merge|merged|merging|merges)[^.]*(local main|local default branch|into main)' || true)
-    [ -z "$_c34_local" ] \
-      || fail 34 "the Skill's Land section directs a merge into the node's own default branch, which is a ref this session can move and which carries whatever else here is unpushed, so the landing it describes is not the one the bar graded: $_c34_local"
+    _c44_local=$(printf '%s\n' "$_c44_land" | grep -niE '(merge|merged|merging|merges)[^.]*(local main|local default branch|into main)' || true)
+    [ -z "$_c44_local" ] \
+      || fail 44 "the Skill's Land section directs a merge into the node's own default branch, which is a ref this session can move and which carries whatever else here is unpushed, so the landing it describes is not the one the bar graded: $_c44_local"
   fi
 fi
 # ---- 22 runs in its OWN loop over the run population, NOT inside the BASE-blob block. That block
@@ -3778,6 +3833,16 @@ elif [ "$ds_over_n" -gt "$UNDECLARED_WRITE_CEILING" ]; then
 elif [ "$ds_over_n" -lt "$UNDECLARED_WRITE_CEILING" ]; then
   report "check 23 - the undeclared-write count sits BELOW its ceiling, $ds_over_n against $UNDECLARED_WRITE_CEILING. Lower the pin in .unattended.conf and say in the commit message what closed; a ceiling nobody lowers stops being a ratchet"
 fi
+if [ "$EMIT_CEILING" = 1 ]; then
+  trap - EXIT
+  if [ "$ds_graded" = 0 ]; then
+    echo "check-unattended: --emit-ceiling graded NO dispatched pass in this tree, so a count here would be a 0 from a probe that saw nothing; the gate accepts 0 over an empty population, so declare that by hand if this tree has never dispatched" >&2
+    exit 1
+  fi
+  echo "check-unattended: --emit-ceiling graded $ds_graded dispatched passes and found $ds_over_n that wrote outside their declaration:${ds_over:- none}" >&2
+  printf 'UNDECLARED_WRITE_CEILING="%s"\n' "$ds_over_n" >&3
+  exit 0
+fi
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
 # ---- `gen:build-units` pair. The driver reads its unit list from that region for four questions -
@@ -3800,7 +3865,7 @@ fi
 # ---- The generator CREATES a missing pair on --write, so the repair is one render and the refusal
 # ---- names it: the SCRIPT and its mode, never a launcher, because this repo cannot assume a bare
 # ---- `python` exists and the driver's own resolver ban refuses one in source.
-# BATCHED: two greps over the whole population, not two per file. Absorbed from inCMS, which
+# BATCHED: two greps over the whole population, not two per file. Absorbed from adopter ic, which
 # measured 132.2 s -> 2.795 s on its own corpus with the verdict asserted IDENTICAL. The verdict is
 # what matters and the equality is fixtured, because a speed-up that changes a verdict is not an
 # optimisation.
@@ -3811,7 +3876,7 @@ fi
 # forces the prefix in both cases, and /dev/null contributes a `0` row that names a path no build
 # ever has.
 bad_units=""
-_c21_files=$(GIT ls-files "$M/builds/*/README.md" 2>/dev/null)
+_c21_files=$(GIT ls-files ":(glob)$M/builds/*/README.md" 2>/dev/null)
 if [ -n "$_c21_files" ]; then
   # TWO greps and ONE awk for the whole population — THREE processes, not 2N.
   #
@@ -3836,7 +3901,7 @@ if [ -n "$_c21_files" ]; then
         }')
 fi
 if [ -n "$bad_units" ]; then
-  fail 21 "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py:$bad_units"
+  fail 21 "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with $(derive_index_repair):$bad_units"
 fi
 
 # ---- 20: the PROMPT path's own ordering, PER PATH. TOOL-aPromptedMandate-5.
@@ -4103,6 +4168,163 @@ if [ -f "$tmpl" ]; then
       || fail 25 "the Skill's playbook-run path does not say what this mode is NOT for, so the one refusal it is supposed to carry in prose is absent from the prose: $tmpl"
   fi
 fi
+
+# ---- 34: a `## Run facts` key carried twice with two DIFFERENT values. TOOL-aRepatriatedFork-6 S3.
+# ---- The driver's `fact` and this leg's `fact_of`/`phase_of` all take the FIRST match, and the
+# ---- driver's insert branch writes a new key directly under the heading, above every existing fact,
+# ---- so a second, different line for one key is a fact nothing wrote - a forged `phase: LANDED`
+# ---- above the real `phase: RUNNING` is the instance, and the driver's write-guard closes its verb
+# ---- route. This is the class, over every tracked run-state file, live and archived.
+# ----
+# ---- A SAME-VALUE repeat passes: the first match gives the same answer, so it forges nothing, and
+# ---- the one near-miss in this tree is exactly that - a hand repair carrying `landed-anchor: remote`
+# ---- twice. The section ends at the next `## ` heading; a key is a line's text up to its first
+# ---- colon, with no space in it. ONE awk over the whole population, never one per file.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: a hand edit that REPLACES the real line rather than adding a second
+# ---- one is not detectable from the file and is not claimed (TOOL-aBoundedCeiling-11 stays open).
+# ---- A key outside the `## Run facts` section is not read - by this check, and since closing review
+# ---- round 1 L2 by `fact_of`/`phase_of` and the driver's `fact` either, so a line placed there
+# ---- answers nothing and needs no grading. Since closing review round 2 M1 the kit's OTHER readers
+# ---- read only the section too, and check 36 below reds one that does not. The count it prints is
+# ---- DERIVED, and a population of zero is announced rather than passed silently.
+# `mapfile`, not a `read` loop over a here-string of `$RUNS`: that loop is the shape the shell-hygiene
+# leg gates (a loop fed by a variable assigned from a command substitution), and a whole-list read
+# needs no loop at all. Gate repair at VERIFYING, TOOL-aRepatriatedFork-6 rev-5.
+_rf_files=(); mapfile -t _rf_all <<< "$RUNS"
+for _rf_f in "${_rf_all[@]}"; do [ -n "$_rf_f" ] && [ -f "$_rf_f" ] && _rf_files+=("$_rf_f"); done
+if [ "${#_rf_files[@]}" -eq 0 ]; then
+  report "check 34 graded NO run-state file — this tree carries none at the selected path, so a duplicate-fact verdict here would be coverage of nothing"
+else
+  _rf_hits=$(awk '
+    FNR == 1 { sec = 0; split("", seen) }
+    { sub(/\r$/, "") }
+    /^## / { sec = (index($0, "## Run facts") == 1); next }
+    sec && match($0, /^[^ :]+:( |$)/) {
+      k = substr($0, 1, index($0, ":") - 1); v = substr($0, index($0, ":") + 1); sub(/^ +/, "", v)
+      if (k in seen) { if (seen[k] != v) printf "%s: %s is [%s] and [%s]\n", FILENAME, k, seen[k], v }
+      else seen[k] = v
+    }' "${_rf_files[@]}")
+  report "check 34 graded ${#_rf_files[@]} run-state files for a Run facts key carried twice with different values"
+  [ -z "$_rf_hits" ] || fail 34 "a run-state file carries one Run facts key twice with two different values, and every reader takes the first match, so one of them is a fact nothing wrote: $_rf_hits"
+fi
+
+# ---- 35: a pathspec naming a file AT A BUILD ROOT carries the `:(glob)` magic. TOOL-aRepatriatedFork-11
+# ---- S2. A plain git pathspec's `*` crosses `/`, so the build-root README spelling also matched
+# ---- every README nested inside a build: 41 extra at adopter ic, graded by check 21 as build READMEs,
+# ---- which is why adopter ic forked this file. The class is every script in THIS kit's directory, test
+# ---- suites excepted because their fixtures spell the defect on purpose.
+# ----
+# ---- A tail that DESCENDS (a `spec/` segment after the wildcard) is not graded: sub-spec depth is
+# ---- intended there, and switching it to glob would drop every sub-spec the kit means to read.
+# ---- WHAT THIS DOES NOT CHECK: a pathspec assembled from variables, which no text scan can see, and
+# ---- comment lines, skipped so a gate header may describe the defect. The two root-file pathspecs
+# ---- outside this kit (drift-audit, hooks) are their kits' to fix and are not read here.
+_ps_files=()
+for _ps_f in "$HERE"/*.sh "$HERE"/*.js "$HERE"/*.py; do
+  case "$_ps_f" in *.test.sh) continue ;; esac
+  [ -f "$_ps_f" ] && _ps_files+=("$_ps_f")
+done
+_ps_hits=""
+if [ "${#_ps_files[@]}" -gt 0 ]; then
+  _ps_hits=$(awk '
+    BEGIN { needle = "builds/" "*" "/" }  # concatenated, so this line is not itself a hit
+    { line = $0; sub(/\r$/, "", line) }
+    line ~ /^[[:space:]]*(#|\/\/|\*)/ { next }
+    {
+      rest = line
+      while ((i = index(rest, needle)) > 0) {
+        pre = substr(rest, 1, i - 1); tail = substr(rest, i + length(needle))
+        t = tail; if (match(t, /["'\'' )]/)) t = substr(t, 1, RSTART - 1)
+        q = pre; if (match(q, /.*["'\'']/)) q = substr(q, RLENGTH + 1)
+        if (index(t, "/") == 0 && index(q, ":(glob)") == 0) { n = FILENAME; sub(/.*\//, "", n); printf " %s:%d", n, FNR; break }
+        rest = tail
+      }
+    }' "${_ps_files[@]}")
+fi
+[ -z "$_ps_hits" ] || fail 35 "a script in the kit directory names a file at a build root through a pathspec without the :(glob) magic, so its wildcard crosses a slash and every same-named file nested inside a build joins the population:$_ps_hits"
+
+# ---- 36: every read of a run-state key routes through the `## Run facts` section. TOOL-aRepatriatedFork-6,
+# ---- closing review round 2 M1. Round 1 L2 scoped the driver's `fact` and this leg's `fact_of` and
+# ---- left gate-guard.js, CLAIM_AWK, baseline_units and dod_met reading the whole file, so one record
+# ---- answered LANDED to the hook and RUNNING to the driver: the hook admitted the bar it exists to
+# ---- deny. This is the CLASS: a key read in the kit either goes through `fact`/`fact_of` (which
+# ---- anchor no key, so they are no hit) or carries the section on its own line.
+# ----
+# ---- THE KEYS ARE DERIVED: every literal key at a `fact`/`set_fact`/`fact_of` call site in the driver,
+# ---- this leg and the library, every `readFact('<key>')` in the kit's JS, and the agent-attested DoD
+# ---- items. A HIT is a code line of a non-test `*.sh`/`*.js` beside this leg that anchors one of them
+# ---- (`^key:`, or inside `^(a|key)`), or anchors a variable (`^$k:`, `'^' + key + ':`). A hit is SCOPED
+# ---- when its line carries one of four spellings: `extract_run_facts` (the library's filter), an awk
+# ---- `sec &&` guard, a JS `exec(region)`, or a `^(## |` alternation that selects the headings with the
+# ---- keys. Otherwise it must be EXEMPT below, by file and anchored token, with a reason; an exemption
+# ---- that matches no hit in a file the population holds reds, because a stale one silently widens
+# ---- the surface; one naming a file this tree does not carry contributes nothing, as check 32's do.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that the marker on a line is the one doing the scoping - a line carrying
+# ---- `sec &&` for another variable passes - nor a read assembled from pieces no text scan sees, nor a
+# ---- key the derivation missed. An exemption covers its token in its file whole. Comment lines are
+# ---- skipped, so a header may describe the defect. Writers are not graded: `set_fact` holds no
+# ---- anchored key read, and the section bounds it shares with `fact` are the driver suite's arm.
+_fr_self="$HERE/$(basename "$0")"
+_fr_keys=$( { grep -ohE '(^|[^A-Za-z_])(set_fact|fact|fact_of) "[^"]*" [a-z][a-z-]*' "$DRIVER" "$_fr_self" "$_LIB_DIR/lib-unattended.sh" 2>/dev/null | awk '{ print $NF }'
+              cat "$HERE"/*.js 2>/dev/null | grep -oE "readFact[(]'[a-z-]+'[)]" | sed -E "s/readFact[(]'([a-z-]+)'[)]/\1/"
+              printf '%s\n' $DOD_CORE | sed -n 's/:agent$//p'; } | sort -u | tr '\n' ' ')
+_fr_files=()
+for _fr_f in "$HERE"/*.sh "$HERE"/*.js; do
+  case "$_fr_f" in *.test.sh) continue ;; esac
+  [ -f "$_fr_f" ] && _fr_files+=("$_fr_f")
+done
+_fr_out=$(awk -v KEYS="$_fr_keys" -v EXEMPT="$(cat <<'EXEMPT'
+unattended.sh	playbook:	the build README's front matter, a scan its `---` close bounds
+unattended.sh	pieces:	the build README's front matter, a scan its `---` close bounds
+unattended.sh	spec-audit:	the build README's front matter, a scan its `---` close bounds
+check-unattended.sh	playbook:	the build README's front matter, a scan its `---` close bounds
+check-unattended.sh	pieces:	the build README's front matter, a scan its `---` close bounds
+unattended.sh	asks:	the build README's front matter, a scan its `---` close bounds
+unattended.sh	may:	the build README's front matter, a scan its `---` close bounds
+check-unattended.sh	asks:	the build README's front matter, a scan its `---` close bounds
+check-unattended.sh	may:	the build README's front matter or a commit's diff of it, never a run-state file
+lib-unattended.sh	(keepalive|	check_lease_only_diff grades git diff -U0 hunk lines, which carry no section to scope to
+resume-tick.sh	pid: 	the driver's --liveness stdout, not a run-state file
+stop-guard.js	' + key	parseLiveness reads the driver's --liveness stdout, not a run-state file
+EXEMPT
+)" '
+  BEGIN {
+    n = split(KEYS, ka, " "); alt = ""
+    for (i = 1; i <= n; i++) alt = alt (alt == "" ? "" : "|") ka[i]
+    c = "\\^"
+    re_lit = c "[(]?([^|)]*[|])*(" alt ")[|):]"
+    re_var = c "[$][{]?[A-Za-z_][A-Za-z0-9_]*[}]?:"
+    re_js = "[\047\"]" c "[\047\"] *[+] *[A-Za-z_]+ *[+] *[\047\"]:"
+    ne = split(EXEMPT, er, "\n")
+    for (i = 1; i <= ne; i++) { split(er[i], ef, "\t"); ex_f[i] = ef[1]; ex_t[i] = "^" ef[2]; used[i] = 0 }
+    heads = "^" "(## |"
+  }
+  FNR == 1 { f = FILENAME; sub(/.*\//, "", f); present[f] = 1 }
+  { line = $0; sub(/\r$/, "", line) }
+  line ~ /^[[:space:]]*(#|\/\/|\*)/ { next }
+  line ~ re_lit || line ~ re_var || line ~ re_js {
+    base = FILENAME; sub(/.*\//, "", base); hits++
+    if (index(line, "extract_run_facts") || line ~ /(^|[^A-Za-z_])sec *&&/ || index(line, "exec(region)") || index(line, heads)) { scoped++; next }
+    for (i = 1; i <= ne; i++) if (ex_f[i] == base && index(line, ex_t[i])) { used[i]++; exempt++; next }
+    printf "BAD %s:%d\n", base, FNR
+  }
+  END {
+    for (i = 1; i <= ne; i++) if (present[ex_f[i]] && !used[i]) printf "STALE %s %s\n", ex_f[i], ex_t[i]
+    printf "COUNT %d %d %d %d\n", n, hits, scoped, exempt
+  }' "${_fr_files[@]}")
+_fr_count=$(printf '%s\n' "$_fr_out" | sed -n 's/^COUNT //p')
+_fr_bad=$(printf '%s\n' "$_fr_out" | sed -n 's/^BAD / /p' | tr -d '\n')
+_fr_stale=$(printf '%s\n' "$_fr_out" | sed -n 's/^STALE /; /p' | tr -d '\n')
+read -r _fr_n _fr_h _fr_s _fr_e <<< "$_fr_count"
+report "check 36 graded ${#_fr_files[@]} kit files for reads of ${_fr_n:-0} derived run-state keys: ${_fr_h:-0} anchored reads, ${_fr_s:-0} scoped to the Run facts section, ${_fr_e:-0} exempt"
+# LIVENESS: `phase` is the key every reader wants, so a derivation without it read nothing; and the
+# scoped reads this check was written beside exist, so zero means the predicate matches nothing.
+case " $_fr_keys " in *" phase "*) ;; *) fail 36 "the run-state key derivation found no phase key, so the read scan grades against nothing: $_fr_keys" ;; esac
+[ "${_fr_s:-0}" -gt 0 ] || fail 36 "no key read in the kit carries the Run facts scope, so the scan matched nothing it was written to find and a clean result would be coverage of nothing"
+[ -z "$_fr_bad" ] || fail 36 "a run-state key is read over the whole file rather than the Run facts section, so it can answer a line above the heading or under Parked that the driver's fact never reads - route it through fact, fact_of or extract_run_facts:$_fr_bad"
+[ -z "$_fr_stale" ] || fail 36 "a run-state read exemption matches no read in the kit, and a stale exemption silently widens the surface it was written to narrow$_fr_stale"
 
 # ---- 28: THE INLINED PARSER, one answer in two files. `declared_list` is copy-inlined in the driver
 # ---- and in the playbook leg because each kit script is installed standalone and cannot import — so
@@ -5066,7 +5288,7 @@ else
     {
       ln = $0; sub(/\r$/, "", ln)
       isread = (ln ~ /(^|[^A-Za-z0-9_])fact[ \t]+[^ \t]+[ \t]+phase([^A-Za-z0-9_-]|$)/) \
-            || (ln ~ /s\/\^phase: \/\/p/)
+            || (ln ~ /s\/\^phase[:] \/\/p/)
       iswrite = (ln ~ /set_fact[ \t]+[^ \t]+[ \t]+phase([^A-Za-z0-9_-]|$)/)
       if (isread && !iswrite && fn != "read_derived_phase" && fn != "read_recorded_phase")
         printf "\n  %s:%d reads the phase fact directly inside %s(), which is neither reader", FILENAME, NR, fn

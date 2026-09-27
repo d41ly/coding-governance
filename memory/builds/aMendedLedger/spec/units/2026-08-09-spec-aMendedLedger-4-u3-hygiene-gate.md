@@ -31,10 +31,19 @@ verdicts.
   states verbatim in its §4 Design, copied byte for byte.
 - **S3** Drop the two session-ledger lines from `index_set()` at `:307-308`, so the index-cap and
   entry-budget populations stop naming files the tree no longer has.
+  - **Readers:** by name: `tools/memory-tree/check-memory-hygiene.sh` defines the function and
+    computes its set once for checks 6 and 7, `tools/memory-tree/corpus_ids.py` reasons about what
+    it filters, `tools/memory-tree/hygiene-parity.test.sh` asserts a check-7 row inside a real
+    member, and `memory/map/features/memory-tree-hygiene.md` records the behaviour. by value:
+    `tools/memory-tree/check-memory-hygiene.sh` computes check 6's caps and check 7's exemption over
+    that membership, so which files are capped is the value.
 - **S4** Drop the `IN-FLIGHT` / `in-flight` alternatives from BOTH spellings of `ex7` at `:345` and
   `:346`, and fix the `MAP_SUB` spelling so it APPENDS to the base rather than rewriting it — the
   live F6 defect that silently drops the `guides/` exemption on any repo carrying a
   `.codebase-map.conf`, which this repo now does.
+  - **Readers:** by name: `tools/memory-tree/check-memory-hygiene.sh` spells both forms of the
+    selector. by value: `tools/memory-tree/check-memory-hygiene.sh` filters check 7's index set
+    through that regex, so its value decides check 7's population outright.
 - **S5** Re-fixture `tools/memory-tree/check-memory-hygiene.test.sh`: repoint `kickoff-prompt.md`
   (`:199`) and `links.md` (`:203`) out of `memory/project/`, and replace check 6's sole arm
   `memory/project/in-flight/tnode.md` (`:212-216`, asserted `:330`) with an over-cap
@@ -52,6 +61,10 @@ verdicts.
   `:74-88`, `:93`, `:94`) and close master F4 by scaffolding all five registries, not two. Assert
   scaffolder and gate together, inside the hygiene self-test, by running the real scaffolder into a
   throwaway repo and running the gate over its output.
+  - **Readers:** by name: `WIRE-INTO-PROJECT.md`, `README.md`, `memory/HYGIENE.md` and
+    `memory/map/features/annotation-style.md` each name the scaffolder. by value:
+    `tools/memory-tree/check-memory-hygiene.sh` grades what the scaffolder writes, counting the
+    registries it scaffolds under check 3.
 - **S8** Move `KIT_MEMORY_TREE_VERSION` 1.7 → 1.8 in all three places
   (`check-memory-hygiene.sh:13` carries two of them — the constant and the `gov:kit` marker on the
   same line — and `memory/HYGIENE.md:1` is the third, rendered into the shipped template).

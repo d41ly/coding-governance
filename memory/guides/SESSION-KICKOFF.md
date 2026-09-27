@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-27T22:37:54+03:00 @ e8fce76d5ee27d685c8cda8807f84ee2c3483529
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
+last-audit: 2026-09-26T13:29:28+03:00 @ 2ab8887944cf89dad8c33757fafe7101184884a0
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: cd4127f4ceca62a360211b5690afa08c20175db9
+last-body-change: 6ee9be2e0905d6d6717e3a6f913e2fe119a96132
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -60,7 +60,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   verbatim after a compaction). Step 1 consumes it; Step 5 appends the READY card through
   `--card --append`. A main-loop `git commit` in a session whose startup card still reads
   `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js` with the remedy in stderr; an
-  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`.
+  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`. A commit from
+  any tree the card does not name is refused too, so a scratch worktree cannot commit: carry its diff
+  back as a patch (hit by `dBackdatedFixture`).
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
@@ -107,6 +109,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   `memory/HYGIENE.md` under "Acceptance ledger" and the gate reads shape and coverage only. The
   cutoff is a `.memory-tree.conf` date, so units that closed before the grammar existed are outside
   it; anything this session closes is inside it.
+
+- **A LIVE spec's §2 item that retires a named thing owes a `**Readers:**` clause**: `by name:` with
+  names a reader spells, then `by value:` with a reader or `NO VALUE READERS` and a reason. Hygiene
+  check 25, with no cutoff. The trigger, both escapes and what counts as a reader are
+  `memory/HYGIENE.md` item 25; the author's line is in the spec template's §2. `TOOL-dGatedProse-1`.
 
 - **A CLOSED unit whose spec grades THIN blocks `build-complete`** — an empty Scope, Acceptance
   criteria or Gates section, keyed on the heading TITLE and NOT the ordinal, which on a Tier-1 spec
@@ -176,9 +183,12 @@ GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test 
 # Every leg declares a `ceiling` in tools/gate-legs.json; one outliving it gets ONE serial retry (a pass is green); all-HOST exits 4. TOOL-aBoundedCeiling-1
 # The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1
 GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
-bash tools/run-gates/run-selftests.sh  # the HELD population on demand, budget-timed. TOOL-aQuenchedHarness-4
+bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES any row with no calibrated reading until --pooled --calibrate has run (TOOL-aBatchedArm-5); bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
+bash tools/unattended/run-unattended-gates.sh --pooled   # the DoD for work touching tools/unattended/: the kit self-tests through the bounded pool, PARITY against the calibrated evidence (twenty rows, node a, 2026-09-22); --serial is the on-demand cost reading. TOOL-aBatchedArm-5
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
+python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
+python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
 ```
 
 The repo HAS a codebase map (`memory/map/`), so the kickoff skill's map steps are live. No
@@ -212,12 +222,12 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
+- 2026-09-22 · the unattended kit's self-tests · they are GREEN WHOLE at last: 76 failing
+  assertions in the gate, driver and cross-component suites were fixtures pinned to moved texts,
+  fixed at the aBatchedArm landing · prune when a run finds one red again.
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
-  `--selftests` only when they ask · prune when a bar runs them automatically.
-- 2026-09-17 · a leg ceiling read as a bound somebody measured · on node `c` two were BELOW the
-  leg's real cost and killed a healthy suite; a killed leg records no reading, so
-  `derive-ceilings.py --write` can never raise exactly the ones that need it · prune when
-  that checker accepts a reading taken outside the runner.
+  `--selftests --serial` only when they ask. The cost is process creation, not logic:
+  `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
 
 
 ### Environment traps worth front-loading

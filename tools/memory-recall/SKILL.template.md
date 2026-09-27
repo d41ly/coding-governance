@@ -83,8 +83,8 @@ does write, so a hand record is never lost or double-counted.
   counts, corpus digest, alias digest, build seconds, build timestamp). It does not read the
   query log.
 - `--export --tag <letter>` — aggregate the query log into a readable table **beside the log,
-  under the common git dir**, never into the worktree. `--tag` is required: the log is per node
-  and so is its aggregate.
+  under the common git dir**, never into the worktree unless `.memory-tree.conf` declares
+  `RECALL_EXPORT_DIR`. `--tag` is required: the log is per node and so is its aggregate.
 
 ## When the CLI cannot run
 

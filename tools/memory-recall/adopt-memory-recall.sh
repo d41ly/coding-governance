@@ -17,7 +17,8 @@
 # The `[ -s ]` refusal above it belongs to the same seam: without it an empty render compared to an
 # equally empty Skill is a PASS, which is the green-by-absence shape this kit refuses.
 #
-# `--with-hook` is the ONLY way the `recall-opened` PostToolUse hook is installed. Skipping it is a
+# `--with-hook` is the ONLY way the `recall-opened` PostToolUse hook is wired, and govkit lands the
+# file only for a target that declared `[kit.memory-recall] with_hook = "yes"`. Skipping both is a
 # supported end state: a hook file copied in but never merged into settings.json reads as UNWIRED
 # forever, which is the fastest way to train every node to ignore the wiring verifier.
 #
@@ -180,7 +181,8 @@ echo "rendered $SKILL (FAMILIES: $families, corpus: $memory_root)"
 
 if [ "$with_hook" = 1 ]; then
   if [ ! -f "$HERE/recall-opened.js" ]; then
-    echo "memory-recall: --with-hook asked for, but $REL/recall-opened.js is not installed"; exit 1
+    echo "memory-recall: --with-hook asked for, but $REL/recall-opened.js is not installed. govkit lands it"
+    echo "  once .governance/deploy.toml declares [kit.memory-recall] with_hook = \"yes\" (then: govkit update --write)"; exit 1
   fi
   # NOTHING IS COPIED ANY MORE. The hook SHIPS at $REL/recall-opened.js and is wired there.
   #

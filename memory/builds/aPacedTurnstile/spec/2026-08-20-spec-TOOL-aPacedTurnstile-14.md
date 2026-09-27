@@ -68,6 +68,10 @@ build a roster the plan verb can read.
   on both halves, since it reads the generated region and the copy was removed. The one derived
   figure in that Gaps bullet is DELETED rather than decremented, because the population is
   derivable and a corrected count is the next commit's stale count.
+  - **Readers:** by name: `unattended.md` and `build-readme-surface.md` are the two dossiers whose
+    lines this item corrects. by value: `tools/memory-tree/check-memory-hygiene.sh` compares each
+    dossier's bytes against the dossier cap in `.memory-tree.conf` on every run, and the deleted
+    figure moves that count.
 - **S10** — the backlog row is closed with a note carrying its residual. The row's trailing
   suggestion to check the rest of the corpus is DECLINED by the first non-goal, not fixed, so the
   closure states that or the residual vanishes silently. Hygiene check 8 grades that a row carries
