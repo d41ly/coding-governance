@@ -5898,7 +5898,7 @@ same "AC2 the withheld pid is absent" "$(grep -c '^pid: absent$' memory/builds/t
 reset_tree
 
 # ---- TOOL-aWokenSentinel-2: `--liveness`, the one predicate every out-of-session reader shares.
-# ---- Fourteen `key: value` lines and ONE verdict over the run-state file, the tree's clocks, the
+# ---- Fifteen `key: value` lines and ONE verdict over the run-state file, the tree's clocks, the
 # ---- gate logs, the transcript and the recorded pid. Every arm is the driver over the `--audit`
 # ---- fixture; the stale bound rides mkconf's EIGHTH positional, at the derived default so no
 # ---- fixture above sees a NOTE it did not see before. The transcript root is pointed at a scratch
@@ -5914,15 +5914,15 @@ out=$(run --liveness tRun); rc=$?
 same "AC2 a TERMINAL verdict exits 0" "$rc" "0"
 hit "$out" "state: terminal"
 hit "$out" "verdict: TERMINAL"
-same "AC2 fourteen key: value lines on a terminal record" "$(printf '%s\n' "$out" | grep -c ':')" "14"
+same "AC2 fifteen key: value lines on a terminal record" "$(printf '%s\n' "$out" | grep -c ':')" "15"
 same "AC2 no line that is not key: value" "$(printf '%s\n' "$out" | grep -cvE '^[a-z-]+: ')" "0"
-same "AC2 the keys in S2's order" "$(printf '%s\n' "$out" | sed 's/:.*//' | tr '\n' ' ')" "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict stale-bound "
+same "AC2 the keys in S2's order" "$(printf '%s\n' "$out" | sed 's/:.*//' | tr '\n' ' ')" "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict stale-bound holder-ref "
 # ...the fourteenth line is the bound the verdict was graded against (closing review round 2,
 # defect D): the fixture's declared 5400, printed so the resume tick bounds its in-flight skip by
 # the driver's number and never reads RESUME_STALE_BOUND itself. RED against a driver copy
 # printing thirteen lines.
 same "AC2 the fourteenth line prints the declared stale bound" "$(printf '%s\n' "$out" | sed -n '14p')" "stale-bound: 5400"
-# ...and the same fourteen on a BUILDING record, so a reader never learns which state omits what.
+# ...and the same fifteen on a BUILDING record, so a reader never learns which state omits what.
 build_audit_fixture
 mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: BUILDING/'
 out=$(run --liveness tRun); rc=$?
@@ -5931,7 +5931,7 @@ hit "$out" "state: live"
 hit "$out" "session: fixture-session"
 hit "$out" "keepalive: k1"
 hit "$out" "verdict: LIVE"
-same "AC2 fourteen key: value lines on a BUILDING record" "$(printf '%s\n' "$out" | grep -c ':')" "14"
+same "AC2 fifteen key: value lines on a BUILDING record" "$(printf '%s\n' "$out" | grep -c ':')" "15"
 # AC3 — FINISHED-UNSTAMPED: LANDING with a witness on the fixture's main, offline, against the
 # remote-tracking ref; the witness moved to the unit branch's HEAD reads live; and with no
 # GOV_DEFAULT_BRANCH and no origin/HEAD the ref is announced `unresolved` rather than fabricated.
@@ -7532,7 +7532,7 @@ hit "$out" "state: held"
 hit "$out" "stale: yes"
 hit "$out" "verdict: HELD"
 same "AC5 every key still prints, in order" "$(printf '%s\n' "$out" | sed -n 's/^\([a-z-]*\): .*/\1/p' | tr '\n' ' ')" \
-  "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict stale-bound "
+  "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict stale-bound holder-ref "
 
 # ---- AC3: the SAME-SESSION relaunch. The resume tick relaunches `claude -p --resume <session>`, whose
 # ---- first turn moves the transcript `--liveness` reads, so the session the record names, under a new
@@ -7800,6 +7800,139 @@ restore_dd_origin
 # common dir.
 n=$((n+1)); [ -z "$(find "$DD_CD" -name '*.lease' 2>/dev/null)" ] || { echo "FAIL AC1 a verb wrote a lease file: $(find "$DD_CD" -name '*.lease')"; st=1; }
 reset_tree
+
+# ==================================================================================================
+# TOOL-dDerivedDocket-62 — ONE WORKTREE ANSWERS FOR A SLUG. The run-state file is one tracked copy
+# per worktree and every clock belongs to the calling one, so a linked worktree added on `wave` after
+# the record commit carries a copy graded on its own clocks. For a record carrying a lease, the
+# matrix's HELD and working rows answer only where HEAD is the run's branch and refuse elsewhere at
+# 58, naming where the run is driven from and writing nothing. The derived-terminal branch, the
+# observed landing and a record carrying no lease stay unit 61's. The wave worktree lives outside
+# the tree, where `reset_tree`'s clean cannot reach it, and every arm that makes it removes it.
+# ==================================================================================================
+G62_W="$ORIGIN_DIR/g62-wave"
+G62_LEDGER="$DD_CD/unattended/tRun.procs"
+add_wave_worktree() { rm -rf "$G62_W"; git worktree add -q -b wave "$G62_W" >/dev/null 2>&1 || { echo "FAIL fixture: git worktree add failed under $G62_W"; st=1; }; }
+remove_wave_worktree() { git worktree remove --force "$G62_W" >/dev/null 2>&1; git worktree prune; rm -rf "$G62_W"; git branch -q -D wave 2>/dev/null; }
+run_wave() { ( cd "$G62_W" && bash "$SCRIPT" "$@" 2>&1 ); }
+G62_MAIN=$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)
+
+# ---- AC4: from the sibling, the take-over and the no-id resume are refused at 58 naming the run's
+# ---- branch and the run worktree's path, the no-id one after the status block; neither worktree is
+# ---- written and unit 28's ledger is byte-unchanged. Aged past the bound the sibling is still
+# ---- refused, and the run worktree takes the run over. RED against a driver copy whose
+# ---- `check_holder_worktree` always returns 0: aged, the sibling takes the run over and reaps.
+build_hold_fixture
+mkdir -p "${G62_LEDGER%/*}"; ( true & printf '%s - %s - k1 2026-09-22T00:00:00Z true\n' "$!" "$!" > "$G62_LEDGER"; wait )
+G62_LH=$(git hash-object "$G62_LEDGER")
+add_wave_worktree
+out=$(CLAUDE_CODE_SESSION_ID=T run_wave --resume tRun --keepalive-id C)
+hit  "$out" "UNATTENDED check 58 FAILED — this worktree is not on the run's branch, so its copy of the record is not the run's, and resuming or taking over from it would drive one slug from a stale copy; the run is driven from the worktree that has refs/heads/unit checked out: $G62_MAIN. Nothing was written. This worktree: refs/heads/wave"
+out=$(run_wave --resume tRun)
+hit  "$out" "unattended: tRun · phase RUNNING"
+hit  "$out" "the run is driven from the worktree that has refs/heads/unit checked out: $G62_MAIN. Nothing was written."
+same "AC4 the no-id refusal prints the status block first" "$(printf '%s\n' "$out" | grep -m1 -oE 'phase RUNNING|UNATTENDED check 58')" "phase RUNNING"
+same "AC4 the refused calls wrote nothing in the sibling" "$(git -C "$G62_W" status --porcelain)" ""
+same "AC4 ...nor in the run worktree" "$(git status --porcelain)" ""
+remove_wave_worktree
+write_aged_commit; add_wave_worktree
+hit  "$(CLAUDE_CODE_SESSION_ID=T run_wave --resume tRun --keepalive-id C)" "the run is driven from the worktree that has refs/heads/unit checked out: $G62_MAIN. Nothing was written. This worktree: refs/heads/wave"
+same "AC4 the aged sibling's refusal wrote nothing there" "$(git -C "$G62_W" status --porcelain)" ""
+same "AC4 unit 28's ledger is byte-unchanged after every refused call" "$(git hash-object "$G62_LEDGER" 2>/dev/null)" "$G62_LH"
+out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)
+hit  "$out" "unattended: presumed-stopped — the newest move this node can see for this run is"
+hit  "$out" "taken over — phase RUNNING · keepalive C"
+remove_wave_worktree; rm -f "$G62_LEDGER"
+# ...AC4's HELD arm: a HELD copy with its condition met, committed on `unit` before the sibling is
+# added, reads ELSEWHERE there and its take-over is refused at 58, writing nothing in either
+# worktree; from the run worktree the same call takes the run over, unit 61's AC12. RED against a
+# driver copy calling `check_holder_worktree` only inside the working branch: the sibling takes the
+# run over through `run_takeover`.
+build_hold_fixture
+run --phase tRun BUILDING --witness deadbeef >/dev/null; fixture
+run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null; fixture
+add_wave_worktree
+hit  "$(run_wave --liveness tRun)" "verdict: ELSEWHERE"
+out=$(CLAUDE_CODE_SESSION_ID=T run_wave --resume tRun --keepalive-id C)
+hit  "$out" "the run is driven from the worktree that has refs/heads/unit checked out: $G62_MAIN. Nothing was written. This worktree: refs/heads/wave"
+same "AC4 the HELD sibling's refusal wrote nothing there" "$(git -C "$G62_W" status --porcelain)" ""
+same "AC4 ...nor in the run worktree" "$(git status --porcelain)" ""
+hit  "$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)" "taken over — phase BUILDING · keepalive C"
+remove_wave_worktree
+
+# ---- AC5: the refusal names a place a caller can go. Detached, the sibling says so; with the run
+# ---- worktree moved to `parked`, no worktree has `unit` checked out; with `unit` deleted, no such
+# ---- branch exists and the remedy is to create it; re-created and checked out in the run worktree,
+# ---- the same call reaches unit 61's rows there. RED against the always-0 copy.
+build_hold_fixture; add_wave_worktree
+git -C "$G62_W" checkout -q --detach
+hit  "$(CLAUDE_CODE_SESSION_ID=T run_wave --resume tRun --keepalive-id C)" "checked out: $G62_MAIN. Nothing was written. This worktree: a detached HEAD"
+git checkout -q -b parked
+hit  "$(CLAUDE_CODE_SESSION_ID=T run_wave --resume tRun --keepalive-id C)" "the worktree that has refs/heads/unit checked out: no worktree on this node has it checked out, so check it out first. Nothing was written."
+git branch -q -D unit
+hit  "$(CLAUDE_CODE_SESSION_ID=T run_wave --resume tRun --keepalive-id C)" "the worktree that has refs/heads/unit checked out: no branch of that name exists on this node, so create it at a commit that carries this record and check it out. Nothing was written."
+git checkout -q -b unit parked; git branch -q -D parked
+out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)
+hit  "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder"
+miss "$out" "this worktree is not on the run's branch"
+remove_wave_worktree
+
+# ---- AC8: a record naming neither branch fact is announced and let through: from the sibling the
+# ---- holder's own resume prints the announcement and then the matrix's holder row. RED against the
+# ---- always-0 copy, which announces nothing.
+build_hold_fixture; sed -i '/^run-branch: /d; /^branch-ref: /d' memory/builds/tRun/RUN.md; fixture
+add_wave_worktree
+out=$(run_wave --resume tRun --keepalive-id k1)
+hit  "$out" "unattended: this record names no run branch (neither run-branch nor branch-ref), so which worktree drives it cannot be shown and this worktree's copy is graded on its own clocks"
+hit  "$out" "resume at phase RUNNING"
+same "AC8 the announcement precedes the holder row" "$(printf '%s\n' "$out" | grep -m1 -oE 'names no run branch|resume at phase RUNNING')" "names no run branch"
+remove_wave_worktree
+
+# ---- AC14: a record carrying NO lease is unit 61's whatever branch it names. Leaseless, its run
+# ---- branch rewritten to one no ref names and committed past the bound, the run worktree's take-over
+# ---- is announced as a record with no lease; committed inside the bound, the no-id call is unit 61's
+# ---- check 59. RED against a driver copy calling the guard for every record: both refuse at 58.
+build_hold_fixture; drop_lease_facts
+sed -i 's|^run-branch: .*|run-branch: refs/heads/gone|' memory/builds/tRun/RUN.md
+git add -A >/dev/null; GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q -m gone --no-verify
+out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)
+hit  "$out" "presumed-stopped — this record has NO lease"
+miss "$out" "this worktree is not on the run's branch"
+build_hold_fixture; drop_lease_facts
+sed -i 's|^run-branch: .*|run-branch: refs/heads/gone|' memory/builds/tRun/RUN.md; fixture
+out=$(run --resume tRun)
+hit  "$out" "unattended: tRun · phase RUNNING"
+hit  "$out" "this record has no lease and its build folder was committed to"
+miss "$out" "this worktree is not on the run's branch"
+
+# ---- AC6: the derived-terminal branch and the observed landing stay unit 61's. On a new branch at a
+# ---- pushed in-place landing, unobserved and then observed, and on the default branch under
+# ---- `primary`, `--resume` meets no check 58. RED against a driver copy that also calls
+# ---- `check_holder_worktree` at the head of the derived-terminal branch; the observed row read with
+# ---- the remote gone is RED against one that calls it ahead of that row.
+build_dd_landing in-place
+hit  "$(run --status tRun)" "phase LANDED (derived:"
+git checkout -q -b g62-rerun
+out=$(run --resume tRun --keepalive-id k9)
+hit  "$out" "nothing to resume — this landing is on the remote and --landed has not observed it"
+miss "$out" "this worktree is not on the run's branch"
+same "AC6 the unobserved landing's resume wrote nothing on the re-run branch" "$(git status --porcelain)" ""
+mkdir -p "${DD_LOG%/*}"; printf '2026-09-27T00:00:00Z landed %s on refs/heads/main at %s\n' "$DD_C" "$DD_C" > "$DD_LOG"
+out=$(run --resume tRun --keepalive-id k9)
+hit  "$out" "nothing to resume"
+miss "$out" "this worktree is not on the run's branch"
+git remote set-url origin "$ORIGIN_DIR/nope.git"
+out=$(run --resume tRun --keepalive-id k9)
+hit  "$out" "nothing to resume — --landed observed this record on the remote at"
+miss "$out" "this worktree is not on the run's branch"
+git remote set-url origin "$ORIGIN"
+git checkout -q unit; git branch -q -D g62-rerun; restore_dd_origin
+build_dd_landing primary
+git checkout -q -B main "$DD_C"
+out=$(run --resume tRun --keepalive-id k9)
+hit  "$out" "landing re-bound · keepalive k1 -> k9"
+miss "$out" "this worktree is not on the run's branch"
+git reset -q --hard "$DD_C"; restore_dd_origin; reset_tree
 
 # ---- TOOL-dDerivedDocket-3 — LANDER_MODE, the in-place landing and the committing close -----------
 # ---- SELF-CONTAINED, in its own scratch repository with its own bare origin, because every arm here
@@ -10559,7 +10692,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # whole count moved by exactly that figure against its parent: every lease-file assertion that unit
 # retargeted onto the run-state facts or the landed log is one for one and moves no floor. The block
 # was run alone behind a replica of this prologue by hand, n 20 -> 118 and green; no suite ran.
-FLOOR_ASSERTIONS=1638
+# RAISED 1638 -> 1677 by TOOL-dDerivedDocket-62: the one-worktree block's 39 assertions, all in
+# region two directly after unit 61's block, so FLOOR_SHARD_2 carries the same +39 and FLOOR_SHARD_1
+# is untouched. COUNTED off the block's own `hit`/`miss`/`same` lines, every one unconditional; the
+# four `--liveness` key arms that now expect fifteen keys are retargeted one for one and move
+# nothing. The block was run alone behind a replica of this prologue by hand, n 20 -> 59 and green,
+# and red under each of its five staged driver copies; no suite ran.
+FLOOR_ASSERTIONS=1677
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -10684,7 +10823,8 @@ FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1442
+FLOOR_SHARD_2=1481
+# +39 for the TOOL-dDerivedDocket-62 one-worktree arms, all in region two - see FLOOR_ASSERTIONS.
 # +98 for the TOOL-dDerivedDocket-61 one-lease-record arms, all in region two - see FLOOR_ASSERTIONS.
 # +56 for the TOOL-dDerivedDocket-27 backstop, MIXED and NOCONF arms, all in region two - see FLOOR_ASSERTIONS.
 # +66 for the TOOL-dDerivedDocket-24 inherited-red arms, all in region two - see FLOOR_ASSERTIONS.

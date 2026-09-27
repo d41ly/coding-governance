@@ -30,7 +30,9 @@ CronCreate  ->  keep the id
 the run's record; before that the tick does nothing. A slug can be known earlier, and a tick issued
 then meets a refusal that is expected before `--preflight` and is never a signal to reap the
 keepalive `--preflight` is about to need: `--resume` refuses with check 10 when no run-state file
-exists, or with check 26 on a re-run build whose previous record is recorded terminal; under
+exists, or with check 26 on a re-run build whose previous record is recorded terminal, or
+check 58 naming another branch, where this worktree's copy is a HELD or working record carrying a
+lease and this worktree is not on its run branch; under
 `in-place`, where a landed record stays LANDING until the next `--preflight` retires it, `--resume`
 prints nothing to resume and `--audit` then refuses with check 51. FIRST,
 `bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <your own id>`. For the holder it
@@ -74,8 +76,9 @@ that ended, and there is no run-state file for a later reader to find it through
 ## What wakes a stalled run
 
 The idle-wake above fires only while the session is idle, so it cannot wake a stalled one. Three
-actors outside the session's turn can, and all three read one predicate: the stop-guard refuses a
-turn end while the run is non-terminal and not HELD, up to `STOP_GUARD_BLOCKS` times, and says
+actors outside the session's turn can, and all three read one predicate: the stop-guard,
+reading the run's own worktree, refuses a turn end while the run is non-terminal and not HELD, up
+to `STOP_GUARD_BLOCKS` times, and says
 what to run instead; the stall-recorder writes an API-error end to the `stall` sidecar; the resume-tick,
 registered by the owner on the OS scheduler, resumes a run from another process on the verdicts
 the protocol's section 5 names as acting — not `STALE` alone. The
@@ -848,7 +851,9 @@ recorded job and read the result back, schedule a new one, then run
 prints `still held`, reap only the job you just scheduled, read your scheduler's listing back to
 confirm it is gone, and stop — remove nothing else, because a durable restart filed under this
 slug's name is deleted only after a take-over's `--resume` succeeds, and deleting it here would
-leave a held run with nothing to restart it. Replace your OWN job only through
+leave a held run with nothing to restart it. A check-58 refusal that names the run's branch
+means this worktree is not the run's: reap only the job you just scheduled, and resume from the
+worktree the refusal names. Replace your OWN job only through
 `--resume <slug> --keepalive-id <new> --replaces <old>`.
 
 **If a durable scheduled task woke you, pass `--scheduled <held-at>`** — the value is in the prompt

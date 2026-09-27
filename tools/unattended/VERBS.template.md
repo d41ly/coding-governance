@@ -96,12 +96,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   the unit is doing or whether a process is stuck — its figures are properties of the tree.
 - `--liveness` — key: value lines and one verdict for an OUT-OF-SESSION reader: the phase, the
   lease, whether the recorded pid exists AND is the leased process (image and start time, not the
-  number alone), seconds since anything moved, the last recorded stall, `TERMINAL`,
-  `FINISHED-UNSTAMPED`, `HELD`, `UNBOUND`, `STALE` or `LIVE`, and last the `stale-bound` the verdict
-  was graded against, so the tick bounds its own reads by this reader's number. Read-only; the
-  stop-guard, the stall-recorder's readers and the resume tick call it rather than deciding for
-  themselves. It cannot see what the session is doing or whether a process is hung — existence is
-  not progress.
+  number alone), seconds since anything moved, the last recorded stall, `TERMINAL`, `ELSEWHERE`,
+  `FINISHED-UNSTAMPED`, `HELD`, `UNBOUND`, `STALE` or `LIVE`, then the `stale-bound` it was graded
+  against and the `holder-ref` a worktree must have checked out. Read-only; the stop-guard, the
+  stall-recorder's readers and the resume tick call it rather than deciding for themselves. It
+  cannot see what the session is doing or whether a process is hung — existence is not progress.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`. With
   `--keepalive-id <id>` it applies the resume matrix: the holder's own id writes nothing, while a
   take-over, `--replaces`, the holder's restarted process and a pushed landing not yet observed

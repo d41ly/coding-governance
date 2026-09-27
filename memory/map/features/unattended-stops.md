@@ -41,6 +41,14 @@ orientation from take-over. Every `phase` read routes through `read_derived_phas
 (`--pending-run`, fact `hold-run`), and the take-over prints the relaunch
 (`TOOL-dDerivedDocket-29`). See `UNATTENDED-STOPS.md`.
 
+**One worktree answers for a slug.** The record is one tracked copy per worktree and every clock
+belongs to the calling one, so the worktree whose HEAD is the run's branch — `run-branch`, else
+`branch-ref`, the gate-guard's key — is the only one that acts: git checks a branch out in one
+worktree at most. Elsewhere `--liveness` reads `ELSEWHERE`, second after `TERMINAL`; the tick skips it
+by name, the stop-guard allows, and the matrix's HELD and working rows refuse a leased record at check
+58, naming where the run is driven from (`TOOL-dDerivedDocket-62`). A record naming no branch is
+graded where it is read, and the tick acts on none of its copies.
+
 **A process not in the ledger is never killed.** Every command the driver starts through
 `run_bounded` is recorded by identity, pid and procfs start token beside the driver's own, in a
 per-slug ledger, and only a recorded process alive with its token while its driver is gone is reaped

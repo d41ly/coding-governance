@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE
 
-**Status:** SPECCED · rev-6 · 2026-09-27 · node d · Tier-2 · base 07997375 · streams tooling · order 32
+**Status:** CLOSED · rev-7 · 2026-09-27 · node d · Tier-2 · base 07997375 · streams tooling · order 32
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-27-build-TOOL-dDerivedDocket-62-1-acceptance-ledger.md](../build/2026-09-27-build-TOOL-dDerivedDocket-62-1-acceptance-ledger.md) | journal | — |
 | [2026-09-22-review-TOOL-dDerivedDocket-62-spec-audit-g9-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-62-spec-audit-g9-round1.md) | spec-audit | TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64 TOOL-dDerivedDocket-61 |
 | [2026-09-22-review-TOOL-dDerivedDocket-65-spec-audit-g10-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-65-spec-audit-g10-round1.md) | spec-audit | TOOL-dDerivedDocket-65 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64 |
 
@@ -668,7 +669,7 @@ undo.
 `unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/unattended.test.sh` · a linked worktree added on `wave` after the record commit, with the take-over and no-id calls refused there and the ledger read back, the detached, no-holder and no-such-branch message variants, and the no-run-branch announcement, staged RED by a driver copy whose `check_holder_worktree` always returns 0; a HELD copy committed before the linked worktree is added, refused there, staged RED by a driver copy that calls `check_holder_worktree` only inside the working branch; a record with no lease whose run branch exists nowhere, answered as unit 61 answers it, staged RED by a driver copy that calls the guard for every record; and the derived-terminal branch and the observed landing left to unit 61, on a new branch under `in-place` with and without the observation and on the default branch under `primary`, staged RED by a driver copy that also calls `check_holder_worktree` at the head of the derived-terminal branch · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks
-New arm: `tools/unattended/resume-tick.test.sh` · `add_sibling_worktree` over a live run whose gate log is dated five minutes ahead, as the suite's own AC2 arm dates its log, a stale run, a HELD run beside a stale BUILDING copy whose recorded pid is a live `sleep`, and a record naming no run branch, staged RED by a driver copy whose verdict chain drops the ELSEWHERE row; and an unobserved in-place LANDING record aged past the bound beside a sibling copy, staged RED by a driver copy whose verdict chain places ELSEWHERE after FINISHED-UNSTAMPED · `FLOOR_ASSERTIONS`, raised by exactly the new arms' assertions, counted off their blocks
+New arm: `tools/unattended/resume-tick.test.sh` · `add_sibling_worktree` over a live run whose gate log is dated five minutes ahead, as the suite's own AC2 arm dates its log, a stale run, and a HELD run beside a stale BUILDING copy whose recorded pid is a live `sleep`, staged RED by a driver copy whose verdict chain drops the ELSEWHERE row; a record naming no run branch, staged RED by a tick copy without the NO RUN BRANCH row; and an unobserved in-place LANDING record aged past the bound beside a sibling copy, staged RED by a driver copy whose verdict chain places ELSEWHERE after FINISHED-UNSTAMPED · `FLOOR_ASSERTIONS`, raised by exactly the new arms' assertions, counted off their blocks
 New arm: `tools/unattended/stop-guard.test.sh` · a stubbed `verdict: ELSEWHERE` bound to the payload's session; staged RED by a hook copy without the `elsewhere` row · `FLOOR_ASSERTIONS`, raised by exactly the new arm's assertions, counted off its block
 
 The driver suite's key arms at `tools/unattended/unattended.test.sh:5880`, `:5882` and `:5897`
@@ -862,6 +863,11 @@ read off a run, which this pass does not make. The driver's new arms are written
   run branch and UNBOUND on it, both skipped by the tick. L3: AC1's gate log, which AC2 reuses, and
   the tick arm §7 names are dated five minutes ahead, as the tick suite's own AC2 fixture is. No
   row, order or edge moved.
+- rev-7 · 2026-09-27 · §7 · the build pass. The tick arm over a record naming no run branch is
+  staged RED by a tick copy without the NO RUN BRANCH row: under the driver copy that drops the
+  ELSEWHERE row, such a record still prints `holder-ref: absent`, so the tick skips it by name and
+  that arm stays green, measured over a replica of the suite's prologue. No design, criterion, row,
+  order or edge moved.
 
 ## 10. Reuse audit
 

@@ -387,13 +387,13 @@ Presume a job you did not schedule ALIVE until a delete says so (`TOOL-aPrompted
 asserted dead fired). A hold may owe a DURABLE restart too; `UNATTENDED-STOPS.md` carries that
 contract.
 
-**The KEEPALIVE** is what wakes a run from outside its own turn: the stop-guard refuses a turn end
-while the run is non-terminal and not `HELD`, writing `stop`; the stall-recorder writes an API-error
-end to `stall`; the resume-tick, an OS-scheduled task, resumes from another process a run
-`--liveness` reads `STALE`, or `FINISHED-UNSTAMPED` with `stale: yes`, writing `resume` — three
-sidecar kinds under `<git-dir>/unattended/`. Registering the tick is the owner's, one line per OS in
-the kit README; `--check` reports it as INFO. The tick acts only on a lease the INDEX holds, on the
-node that took it.
+**The KEEPALIVE** is what wakes a run from outside its own turn: the stop-guard,
+reading the run's own worktree, refuses a turn end while the run is non-terminal and not `HELD`,
+writing `stop`; the stall-recorder writes an API-error end to `stall`; the resume-tick, an
+OS-scheduled task, resumes from another process a run `--liveness` reads `STALE`, or
+`FINISHED-UNSTAMPED` with `stale: yes`, writing `resume` — three sidecar kinds under
+`<git-dir>/unattended/`. The tick acts only on a lease the INDEX holds, on the node that took it,
+in the worktree on the run's branch.
 
 **The actors.** The AGENT schedules and reaps the idle-wake and, on resume, runs
 `--resume <slug> --keepalive-id <id>`, re-recording the lease. The DRIVER records the lease (§2,

@@ -106,7 +106,7 @@ remove_leftovers() {
   remove_stubs
   [ -n "${SLEEP_PID:-}" ] && kill "$SLEEP_PID" 2>/dev/null
   rm -rf "$TMP"
-  [ "$GITTMP" = "$TMP" ] || rm -rf "$GITTMP/rt-fx"
+  [ "$GITTMP" = "$TMP" ] || rm -rf "$GITTMP/rt-fx" "$GITTMP/rt-sib"
   return 0
 }
 trap remove_leftovers EXIT
@@ -115,7 +115,10 @@ trap remove_leftovers EXIT
 # plus RESUME_STALE_BOUND="1" and NEITHER resume knob (the NOTE arm wants the default announced),
 # a tRun build README, a RUN.md at BUILDING carrying the session and the pid, ONE commit dated an
 # hour ago so a clean tree reads STALE against the one-second bound and a "line newer than the
-# last move" is any line dated now. Null global and system git config, the kit's seed idiom.
+# last move" is any line dated now. Null global and system git config, the kit's seed idiom. The
+# record names `run-branch: refs/heads/main`, the branch the fixture's HEAD has checked out, so this
+# worktree holds it; a record naming no branch is the tick's NO RUN BRANCH skip, and every record
+# an arm writes by hand names the branch its worktree is on (TOOL-dDerivedDocket-62).
 # CONF_EXTRA, when set, is appended to the conf BEFORE the commit: a declared knob rides the
 # hour-old commit, because a conf edited after it is a write dated now and the tree reads LIVE.
 CONF_EXTRA=""
@@ -144,13 +147,22 @@ DOD_EXTRA=""
 EOF
   [ -z "$CONF_EXTRA" ] || printf '%s\n' "$CONF_EXTRA" >> "$FX/.unattended.conf"
   printf -- '---\nslug: tRun\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRun-1\n---\n\n# tRun\n' > "$FX/memory/builds/tRun/README.md"
-  printf '# tRun — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: %s\n\n## Parked\n' "${2:-$SID}" "$1" > "$FX/memory/builds/tRun/RUN.md"
+  printf '# tRun — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: %s\nrun-branch: refs/heads/main\n\n## Parked\n' "${2:-$SID}" "$1" > "$FX/memory/builds/tRun/RUN.md"
   ( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
       && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" \
          git commit -q -m fixture ) || { echo "FAIL fixture: the commit did not land in $FX"; exit 2; }
   remove_stubs
   FX_GITDIR=$( cd "$FX" && git rev-parse --absolute-git-dir )
   SIDECAR="$FX_GITDIR/unattended"
+}
+# add_sibling_worktree [branch] -> SIB, a linked worktree of FX on a new branch, `wave` unless named,
+# added AFTER the fixture's commits so its copy of the record is the one they froze, re-spelled by
+# git as the tick prints it. Nothing in it is written after the add: its copy is graded on its own
+# clocks by any tick that ignores the run's branch, and that is the reading the arms stage RED.
+add_sibling_worktree() {
+  SIB="$GITTMP/rt-sib"; rm -rf "$SIB"
+  ( cd "$FX" && git worktree add -q -b "${1:-wave}" "$SIB" ) >/dev/null 2>&1 || { print_bad "fixture: git worktree add failed under $SIB"; return 1; }
+  SIB=$( cd "$SIB" && git rev-parse --show-toplevel )
 }
 # run_tick_over <tick> [args] — OUT, ERR, RC and SECS are what the tick did; SECS is the wall it took.
 run_tick_over() {
@@ -492,7 +504,7 @@ esac
 build_fixture 999999999 absent
 mkdir -p "$FX/memory/builds/tDrop"
 printf -- '---\nslug: tDrop\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tDrop-1\n---\n\n# tDrop\n' > "$FX/memory/builds/tDrop/README.md"
-printf '# tDrop — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: 999999999\n\n## Parked\n' "$SID" > "$FX/memory/builds/tDrop/RUN.md"
+printf '# tDrop — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: 999999999\nrun-branch: refs/heads/main\n\n## Parked\n' "$SID" > "$FX/memory/builds/tDrop/RUN.md"
 touch -d '-1 hour' "$FX/memory/builds/tDrop/README.md" "$FX/memory/builds/tDrop/RUN.md"
 run_tick_over "$TICK"
 check_same "AC14 an untracked record exits 0" "$RC" "0"
@@ -630,8 +642,83 @@ check_hit  "$OUT" "resume-tick: tRun · $W61 · skip · verdict TERMINAL" "U61 t
 check_miss "$OUT" "resumed ·" "U61 no worktree relaunches an observed landing"
 rm -f "$FX_GITDIR/unattended/landed.tRun.log"; remove_stubs
 GOV_DEFAULT_BRANCH=main run_tick_over "$TICK" --dry-run
-check_hit  "$OUT" "resume-tick: tRun · $W61 · resumed · attempt 1" "U61 without the log line the same worktree would be resumed"
+# RETARGETED ONTO THE RUN'S BRANCH by TOOL-dDerivedDocket-62, one for one: W2 is detached, so its
+# copy now reads ELSEWHERE whatever the log says, and the worktree whose relaunch the log line
+# alone prevents is the one on the run's branch.
+check_hit  "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "U61 without the log line the run's own worktree would be resumed"
 ( cd "$FX" && git worktree remove --force "$W61" ) >/dev/null 2>&1; rm -rf "$W61"
+
+# ---- TOOL-dDerivedDocket-62: ONE WORKTREE ANSWERS FOR A SLUG. A sibling worktree added on `wave`
+# ---- after the record commit carries a copy of it graded on that worktree's own clocks, and only
+# ---- the worktree on the run's branch acts: the sibling is skipped ELSEWHERE, naming the branch,
+# ---- whether the run reads LIVE or STALE. RED against a driver copy whose verdict chain drops the
+# ---- ELSEWHERE row: the sibling's stale copy is resumed beside, or instead of, the run's own.
+build_fixture 999999999; add_sibling_worktree
+mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/leg.log"
+run_tick_over "$TICK" --dry-run
+check_hit  "$OUT" "resume-tick: tRun · $FX · skip · verdict LIVE (dry-run)" "U62 the run's own worktree reads LIVE"
+check_hit  "$OUT" "resume-tick: tRun · $SIB · skip · ELSEWHERE · the run's branch is refs/heads/main, and this worktree is not on it, so nothing is killed or launched from this copy (dry-run)" "U62 the sibling copy is skipped ELSEWHERE, naming the run's branch"
+check_miss "$OUT" "resumed ·" "U62 no copy of a live run is resumed"
+rm -f "$FX_GITDIR/gate-logs/leg.log"
+run_tick_over "$TICK" --dry-run
+check_same "U62 a stale run is resumed exactly once" "$(printf '%s\n' "$OUT" | grep -c 'resumed · attempt 1')" "1"
+check_hit  "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "U62 ...from the run's own worktree"
+check_hit  "$OUT" "resume-tick: tRun · $SIB · skip · ELSEWHERE" "U62 ...and never from the sibling copy"
+( cd "$FX" && git worktree remove --force "$SIB" ) >/dev/null 2>&1; rm -rf "$SIB"
+# ...B1's first case: the run worktree moved its record to HELD, and the sibling still carries the
+# stale BUILDING copy whose recorded pid is a live `sleep`. No --dry-run: the tick kills nothing,
+# launches nothing, and the sleep outlives it. RED against the same driver copy: the sleep is killed
+# and the stub launched from the sibling's copy.
+sleep 300 & SLEEP_PID=$!
+WPID=$(derive_winpid "$SLEEP_PID")
+if [ -n "$WPID" ]; then
+  build_fixture "$WPID"; add_sibling_worktree
+  sed -i "s/^phase: .*/phase: HELD/" "$FX/memory/builds/tRun/RUN.md"
+  ( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+      && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m held )
+  run_tick_over "$TICK"
+  check_hit  "$OUT" "resume-tick: tRun · $FX · skip · HELD" "U62 the run's own HELD copy is skipped HELD"
+  check_hit  "$OUT" "resume-tick: tRun · $SIB · skip · ELSEWHERE" "U62 the sibling's stale BUILDING copy is skipped ELSEWHERE"
+  check_same "U62 the sibling's copy invokes nothing" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) check_same "U62 the holder's pid is still listed by tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'sleep.exe')" "1" ;;
+    *) check_same "U62 the holder's pid is still alive" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "alive" ;;
+  esac
+  ( cd "$FX" && git worktree remove --force "$SIB" ) >/dev/null 2>&1; rm -rf "$SIB"
+else
+  print_bad "U62 fixture: no pid for the background sleep, so the HELD-beside-a-stale-copy arm would probe an empty value and prove nothing"
+fi
+kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
+# ...a record naming NEITHER branch fact: no one worktree can be shown to hold it, so no copy of it
+# is acted on, in either worktree. RED against a tick copy without the NO RUN BRANCH row: both
+# stale copies are resumed.
+build_fixture 999999999
+sed -i '/^run-branch: /d' "$FX/memory/builds/tRun/RUN.md"
+( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+    && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m nobranch )
+add_sibling_worktree
+run_tick_over "$TICK" --dry-run
+check_hit  "$OUT" "resume-tick: tRun · $FX · skip · NO RUN BRANCH · the record names neither run-branch nor branch-ref, so no one worktree holds it and no copy of it is acted on (dry-run)" "U62 a record naming no branch is skipped by name"
+check_same "U62 ...in both worktrees" "$(printf '%s\n' "$OUT" | grep -c 'skip · NO RUN BRANCH')" "2"
+check_miss "$OUT" "resumed ·" "U62 ...and neither copy is resumed"
+( cd "$FX" && git worktree remove --force "$SIB" ) >/dev/null 2>&1; rm -rf "$SIB"
+# ...and the one acting verdict other than STALE: an unobserved in-place LANDING aged past the bound,
+# the sibling added after it. The run's own worktree reads FINISHED-UNSTAMPED and is resumed once;
+# the sibling reads ELSEWHERE. RED against a driver copy placing ELSEWHERE after FINISHED-UNSTAMPED:
+# both copies read FINISHED-UNSTAMPED and the tick decides two resumes.
+build_fixture 999999999
+FIRST=$( cd "$FX" && git rev-parse HEAD )
+sed -i "s/^phase: .*/phase: LANDING/; s/^witness: .*/witness: $FIRST/" "$FX/memory/builds/tRun/RUN.md"
+( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+    && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m landing )
+add_sibling_worktree
+check_same "U62 the sibling copy of an unobserved landing reads ELSEWHERE" "$( cd "$SIB" && GOV_DEFAULT_BRANCH=main bash "$KIT/unattended.sh" --liveness tRun 2>/dev/null | sed -n 's/^verdict: //p')" "ELSEWHERE"
+check_same "U62 ...and the run's own copy FINISHED-UNSTAMPED" "$( cd "$FX" && GOV_DEFAULT_BRANCH=main bash "$KIT/unattended.sh" --liveness tRun 2>/dev/null | sed -n 's/^verdict: //p')" "FINISHED-UNSTAMPED"
+GOV_DEFAULT_BRANCH=main run_tick_over "$TICK" --dry-run
+check_same "U62 the unobserved landing is resumed exactly once" "$(printf '%s\n' "$OUT" | grep -c 'resumed · attempt 1')" "1"
+check_hit  "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "U62 ...from the run's own worktree"
+check_hit  "$OUT" "resume-tick: tRun · $SIB · skip · ELSEWHERE" "U62 ...and never from the sibling copy"
+( cd "$FX" && git worktree remove --force "$SIB" ) >/dev/null 2>&1; rm -rf "$SIB"
 
 # ---- AC12: the two announced skips of the walk. A driver whose --liveness exits non-zero is a dead
 # ---- probe: the run is skipped naming its first line, nothing launches, no line is written. A
@@ -715,7 +802,7 @@ WT4=$( cd "$FX" && git worktree list --porcelain | sed -n 's/^worktree //p' | se
 sed -e 's/^MEMORY_ROOT=.*/MEMORY_ROOT=mem2/' -e 's/^RESUME_ATTEMPTS=.*/RESUME_ATTEMPTS="6"/' "$FX/.unattended.conf" > "$WT4/.unattended.conf"
 mkdir -p "$WT4/mem2/builds/tWt"
 printf -- '---\nslug: tWt\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tWt-1\n---\n\n# tWt\n' > "$WT4/mem2/builds/tWt/README.md"
-printf '# tWt — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: 999999999\n\n## Parked\n' "$SID" > "$WT4/mem2/builds/tWt/RUN.md"
+printf '# tWt — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: 999999999\nrun-branch: refs/heads/wt4\n\n## Parked\n' "$SID" > "$WT4/mem2/builds/tWt/RUN.md"
 touch -d '-1 hour' "$WT4/.unattended.conf" "$WT4/mem2/builds/tWt/README.md" "$WT4/mem2/builds/tWt/RUN.md"
 # STAGED, because the tick reads a lease from the index and announces an untracked record without
 # probing it (AC14); staging leaves the mtimes alone, so the tree still reads an hour old.
@@ -787,7 +874,12 @@ n=$((pass+fail))
 # RAISED 145 -> 155 by TOOL-dDerivedDocket-61: the HELD arm's 6 assertions and the observed-landing
 # arm's 4, beside AC16, COUNTED off their own `check_*` lines, every one unconditional; the pass
 # that wrote them ran no suite, and both blocks were run alone over a replica of this prologue.
-FLOOR_ASSERTIONS=155
+# RAISED 155 -> 173 by TOOL-dDerivedDocket-62: the sibling-worktree arms' 18 assertions beside the
+# observed-landing arm — the live-and-stale pair 6, the HELD-beside-a-stale-copy arm 4 on a host
+# that yields the sleep's pid, the no-run-branch arm 3 and the unobserved-landing arm 5 — COUNTED
+# off their own `check_*` lines; the retargeted U61 line is one for one and moves nothing. The pass
+# that wrote them ran no suite, and each arm was run alone over a replica of this prologue.
+FLOOR_ASSERTIONS=173
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

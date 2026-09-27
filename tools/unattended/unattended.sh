@@ -5838,6 +5838,32 @@ check_lease_fresh() { # run-state file -> 0 fresh, 1 stale, 2 unknown; LM_* and 
   return 0
 }
 
+# ONE WORKTREE ANSWERS FOR A SLUG (TOOL-dDerivedDocket-62 S1). The run-state file is one tracked copy
+# per worktree, and every clock above belongs to the calling one, so two worktrees carrying one
+# record would each grade their own copy and each act. The run's branch is `run-branch`, else
+# `branch-ref` for a record older than fact 13 — the key `resolveRunPhase` in the gate-guard hook
+# applies — and the worktree whose own HEAD names that ref holds the slug. Git checks a branch out
+# in one worktree at most, so on one node at most one worktree holds it, and the checkout decides
+# which, never a clock. HW_REF is the run's branch, empty when the record names neither fact;
+# HW_HEAD is this worktree's `symbolic-ref`, `detached` on that command's exit 1, `unreadable` on
+# any other failure. 0 = this worktree holds · 1 = it does not · 2 = the record names no branch.
+# Globals, so no caller runs it through a substitution; it writes nothing and prints nothing.
+HW_REF=""; HW_HEAD=""
+resolve_holder_worktree() { # run-state file -> 0 holds, 1 not here, 2 no run branch; HW_REF, HW_HEAD
+  local rc
+  HW_REF=$(fact "$1" run-branch); [ -n "$HW_REF" ] || HW_REF=$(fact "$1" branch-ref)
+  HW_HEAD=""
+  [ -n "$HW_REF" ] || return 2
+  HW_HEAD=$(GIT symbolic-ref -q HEAD 2>/dev/null); rc=$?
+  case "$rc" in
+    0) [ -n "$HW_HEAD" ] || HW_HEAD=unreadable ;;
+    1) HW_HEAD=detached ;;
+    *) HW_HEAD=unreadable ;;
+  esac
+  [ "$HW_HEAD" = "$HW_REF" ] && return 0
+  return 1
+}
+
 # --liveness: THE ONE PREDICATE EVERY OUT-OF-SESSION READER SHARES. TOOL-aWokenSentinel-2. "Is this
 # run alive" had no single answer: `--status` is prose for a human, `--audit` grades dispatched
 # UNITS and says nothing about the session holding the run, and only `--preflight` knew that a
@@ -5854,7 +5880,7 @@ check_lease_fresh() { # run-state file -> 0 fresh, 1 stale, 2 unknown; LM_* and 
 # process-monitor kit's.
 #
 #   phase · state · default-branch · session · pid · keepalive · pid-alive · last-move ·
-#   last-move-source · transcript · last-stall · stale · verdict · stale-bound
+#   last-move-source · transcript · last-stall · stale · verdict · stale-bound · holder-ref
 #
 # `state` is `terminal`, `finished-unstamped`, `held` or `live`, and a LANDING the node's landed log
 # names reads `terminal`. `last-move` is the seconds since the NEWEST of four signals —
@@ -5862,9 +5888,11 @@ check_lease_fresh() { # run-state file -> 0 fresh, 1 stale, 2 unknown; LM_* and 
 # `<git-dir>/gate-logs/`, and the session transcript when its path derives — because during a
 # healthy 26-minute bar neither the transcript nor the commit moves and the per-leg logs do. `stale`
 # is `last-move` over RESUME_STALE_BOUND, and `stale-bound` is that number, printed so the tick
-# bounds its own reads by it. The verdict is the first that holds: TERMINAL,
-# FINISHED-UNSTAMPED, HELD, UNBOUND (no session to bind to), STALE, LIVE, so HELD is never STALE,
-# and the resume matrix grades a leased record's staleness with this same clock and bound
+# bounds its own reads by it; `holder-ref` is the branch a worktree must have checked out to hold
+# the slug (`resolve_holder_worktree`), or `absent`. The verdict is the first that holds: TERMINAL,
+# ELSEWHERE (this worktree is not on the run's branch, TOOL-dDerivedDocket-62), FINISHED-UNSTAMPED,
+# HELD, UNBOUND (no session to bind to), STALE, LIVE, so HELD is never STALE, a sibling copy never
+# acts, and the resume matrix grades a leased record's staleness with this same clock and bound
 # (`check_lease_fresh`). Every key prints on every run
 # that reaches the verdict, a terminal record included, so a reader never has to know which keys a
 # state omits. A terminal phase, an absent session and an unresolvable default branch are VALUES;
@@ -5872,7 +5900,7 @@ check_lease_fresh() { # run-state file -> 0 fresh, 1 stale, 2 unknown; LM_* and 
 # because a zero from it would read as moved-just-now — the reassuring-zero class `--audit` refuses
 # the same way.
 print_liveness() { # slug
-  local slug="$1" rel ph state d dref w sid pid kid alive newest src dead sidecar f tp last stale verdict lc
+  local slug="$1" rel ph state d dref w sid pid kid alive newest src dead sidecar f tp last stale verdict lc hw
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 52 "no run-state file, so there is no run whose liveness can be graded: $rel"; return 1; }
@@ -5927,6 +5955,11 @@ print_liveness() { # slug
   derive_last_move "$sid"
   dead="$LM_DEAD"; newest="$LM_NEWEST"; src="$LM_SOURCE"; tp="$LM_TRANSCRIPT"
   sidecar=$(resolve_sidecar_dir) || sidecar=""
+  # TOOL-dDerivedDocket-62 S2 - WHICH WORKTREE HOLDS THE SLUG. A HEAD this worktree cannot read is a
+  # dead probe like the clocks' own: whether this copy is the run's is then unanswerable, and a
+  # verdict printed over it would be a guess an actor that kills then acts on.
+  hw=0; resolve_holder_worktree "$rel" || hw=$?
+  if [ "$hw" = 1 ] && [ "$HW_HEAD" = unreadable ] && [ -z "$dead" ]; then dead="git symbolic-ref -q HEAD"; fi
   if [ -n "$dead" ]; then
     fail 52 "the liveness cannot be measured on this node, because a probe it needs answered nothing, so no verdict is answerable and a zero from a dead probe would read as moved-just-now: $dead"; return 1
   fi
@@ -5935,17 +5968,23 @@ print_liveness() { # slug
   last=none; f="$sidecar/stall.$slug.log"
   if [ -s "$f" ]; then last=$(tail -n 1 -- "$f"); last=${last%$'\r'}; fi
   stale=no; [ $((TC_NOW - newest)) -gt "$RESUME_STALE_BOUND" ] && stale=yes
+  # ELSEWHERE SECOND, after TERMINAL alone: a recorded or observed terminal reads the same in every
+  # copy, while a sibling copy of an acting verdict is B1's double drive, and a sibling copy holds
+  # whatever phase the record had when that worktree branched, so it cannot tell HELD from working.
   if [ "$state" = terminal ]; then verdict=TERMINAL
+  elif [ "$hw" = 1 ]; then verdict=ELSEWHERE
   elif [ "$state" = finished-unstamped ]; then verdict=FINISHED-UNSTAMPED
   elif [ "$state" = held ]; then verdict=HELD
   elif [ "$sid" = absent ]; then verdict=UNBOUND
   elif [ "$stale" = yes ]; then verdict=STALE
   else verdict=LIVE; fi
-  # `stale-bound` LAST, after the verdict: the number `stale` was graded against, printed so the
+  # `stale-bound` after the verdict: the number `stale` was graded against, printed so the
   # resume tick bounds its in-flight skip by THIS reader's bound instead of reading the key itself
   # — a second reader would be a second copy of its default (closing review round 2, defect D).
-  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\nstale-bound: %s\n' \
-    "$ph" "$state" "$dref" "$sid" "$pid" "$kid" "$alive" "$((TC_NOW - newest))" "$src" "${tp:-absent}" "$last" "$stale" "$verdict" "$RESUME_STALE_BOUND"
+  # `holder-ref` LAST, the fifteenth key: the branch ELSEWHERE was keyed on, so the tick names it
+  # and skips a record naming none without a second spelling of the key.
+  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\nstale-bound: %s\nholder-ref: %s\n' \
+    "$ph" "$state" "$dref" "$sid" "$pid" "$kid" "$alive" "$((TC_NOW - newest))" "$src" "${tp:-absent}" "$last" "$stale" "$verdict" "$RESUME_STALE_BOUND" "${HW_REF:-absent}"
   return 0
 }
 
@@ -6029,6 +6068,42 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
     print_resume_orientation "$rel" "$ph"
   fi
   return 0
+}
+
+# THE MATRIX ANSWERS ONLY IN THE RUN'S OWN WORKTREE (TOOL-dDerivedDocket-62 S4). A sibling worktree
+# carries a copy of the record frozen where it branched, graded on that worktree's clocks, so its
+# HELD and working rows would take a live run over, or reap the common-dir ledger, from a stale
+# copy. `verb_resume` calls this once, for a record carrying `lease-utc`, after the observed-landing
+# row and ahead of the first HELD row. The holder worktree is the one `resolve_holder_worktree`
+# names; everywhere else this refuses, numbered, before any write, and names where the run is
+# driven from: the worktree `git worktree list` shows with the run's branch checked out, else that
+# none does, else that no such branch exists here, so the remedy is one a caller can follow. A
+# record naming no branch is announced and passed: refusing it would wedge for ever the holder of a
+# run preflighted on a detached HEAD, which `check_branch` admits.
+check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own refusal printed
+  local slug="$1" rel="$2" hw=0 wp where here
+  resolve_holder_worktree "$rel" || hw=$?
+  [ "$hw" = 0 ] && return 0
+  if [ "$hw" = 2 ]; then
+    echo "unattended: this record names no run branch (neither run-branch nor branch-ref), so which worktree drives it cannot be shown and this worktree's copy is graded on its own clocks"
+    return 0
+  fi
+  if [ -z "$KID" ]; then verb_status "$slug" || true; fi
+  wp=$(GIT worktree list --porcelain 2>/dev/null | awk -v b="branch $HW_REF" '/^worktree /{ p = substr($0, 10) } $0 == b { print p; exit }')
+  if [ -n "$wp" ]; then
+    where="$wp"
+  elif GIT rev-parse --verify -q "$HW_REF" >/dev/null 2>&1; then
+    where="no worktree on this node has it checked out, so check it out first"
+  else
+    where="no branch of that name exists on this node, so create it at a commit that carries this record and check it out"
+  fi
+  case "$HW_HEAD" in
+    detached) here="a detached HEAD" ;;
+    unreadable) here="an unreadable HEAD" ;;
+    *) here="$HW_HEAD" ;;
+  esac
+  fail 58 "this worktree is not on the run's branch, so its copy of the record is not the run's, and resuming or taking over from it would drive one slug from a stale copy; the run is driven from the worktree that has $HW_REF checked out: $where. Nothing was written. This worktree: $here"
+  return 1
 }
 
 # --resume IS TWO VERBS IN ONE — orientation and take-over — and the lease is what separates them.
@@ -6146,6 +6221,12 @@ verb_resume() { # slug
     echo "unattended: nothing to resume — --landed observed this record on the remote at $LO_UTC, so the run is landed; the rotation waits for the advertised tip, which the next --preflight of $slug reads"
     return 0
   fi
+  # TOOL-dDerivedDocket-62 S4 - ONE WORKTREE DRIVES A LEASED RECORD. Every HELD and working row below
+  # grades this worktree's copy on this worktree's clocks, so they answer only where HEAD is the
+  # run's branch. Above this line every row writes nothing but unit 61's re-bind, which scopes itself
+  # to the branches where its landing's `--landed` runs. A record with no `lease-utc` passes: its
+  # rows grade the run's build folder, not this worktree's clocks (§8 F10 of this unit's spec).
+  if [ -n "$ls_utc" ]; then check_holder_worktree "$slug" "$rel" || return 1; fi
   if [ "$p" = HELD ]; then
     cond=$(fact "$rel" hold-until)
     if ! check_hold_condition_met "$cond"; then

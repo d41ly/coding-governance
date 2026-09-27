@@ -21,8 +21,10 @@
 #   RUN.md on disk differs from the index -> skip · RUN.md differs from the index (nothing probed, nothing launched)
 #   host: names another node              -> skip · leased on <host>, not this node <me>
 #   verdict HELD                          -> skip · HELD · its restart is the durable schedule --hold printed, never this tick
+#   verdict ELSEWHERE                     -> skip · ELSEWHERE · the run's branch is <ref>, and this worktree is not on it ...
 #   verdict not STALE, and not            -> skip · verdict <V>
 #     FINISHED-UNSTAMPED with stale: yes
+#   holder-ref absent                     -> skip · NO RUN BRANCH · the record names neither run-branch nor branch-ref ...
 #   STALE, RESUME_ATTEMPTS or more since  -> skip · ATTEMPTS EXHAUSTED · last <utc> · out <path>
 #     the run's last move
 #   STALE, newest attempt's launched pid  -> skip · IN-FLIGHT · launched <pid> alive since <utc>
@@ -232,7 +234,11 @@ derive_attempts() { # log · last-move-seconds
 # and the scheduler log kept that instead of the check (the closing review's id 16). RL_BOUND is
 # the driver's `stale-bound`, the seconds `stale` was graded against; a verdict with no bound
 # beside it is a driver this tick cannot bound its own reads by, and is skipped naming that.
-RL_RC=0; RL_FIRST=""; RL_VERDICT=""; RL_PID=""; RL_ALIVE=""; RL_MOVE=""; RL_STALE=""; RL_BOUND=""
+# RL_HOLDER is the driver's `holder-ref`, the run's branch, and a missing line reads `absent`: a
+# driver older than the key names no branch, which is the side that acts nowhere
+# (TOOL-dDerivedDocket-62 S3). Which worktree holds the slug is `--liveness`'s ELSEWHERE, never
+# re-derived here from the worktree list this file walks.
+RL_RC=0; RL_FIRST=""; RL_VERDICT=""; RL_PID=""; RL_ALIVE=""; RL_MOVE=""; RL_STALE=""; RL_BOUND=""; RL_HOLDER=""
 read_liveness() { # worktree · slug
   local out
   out=$(cd "$1" && bash "$DRIVER" --liveness "$2" 2>&1 </dev/null); RL_RC=$?
@@ -245,6 +251,7 @@ read_liveness() { # worktree · slug
   RL_MOVE=$(printf '%s\n' "$out" | sed -n 's/^last-move: //p' | head -n 1)
   RL_STALE=$(printf '%s\n' "$out" | sed -n 's/^stale: //p' | head -n 1)
   RL_BOUND=$(printf '%s\n' "$out" | sed -n 's/^stale-bound: //p' | head -n 1)
+  RL_HOLDER=$(printf '%s\n' "$out" | sed -n 's/^holder-ref: //p' | head -n 1); [ -n "$RL_HOLDER" ] || RL_HOLDER=absent
   [ "$RL_RC" = 0 ] && [ -n "$RL_VERDICT" ] || { [ "$RL_RC" = 0 ] && RL_RC=1; return 1; }
   case "$RL_BOUND" in ""|*[!0-9]*) RL_RC=1; RL_FIRST="the driver printed a verdict and no stale-bound line, so the in-flight read cannot be bounded"; return 1 ;; esac
   return 0
@@ -273,7 +280,19 @@ run_tick() { # worktree · slug · session · host
   if [ "$RL_VERDICT" = HELD ]; then
     print_decision "$slug" "$wt" "skip · HELD · its restart is the durable schedule --hold printed, never this tick"; return 0
   fi
+  # ELSEWHERE IS NAMED too (TOOL-dDerivedDocket-62 S3): another branch than the run's is checked out
+  # here, so this copy of the record is not the run's, and a kill and relaunch from it would drive
+  # one slug from two worktrees while the run's own copy is graded in its own.
+  if [ "$RL_VERDICT" = ELSEWHERE ]; then
+    print_decision "$slug" "$wt" "skip · ELSEWHERE · the run's branch is $RL_HOLDER, and this worktree is not on it, so nothing is killed or launched from this copy"; return 0
+  fi
   case "$RL_VERDICT:$RL_STALE" in STALE:*|FINISHED-UNSTAMPED:yes) ;; *) print_decision "$slug" "$wt" "skip · verdict $RL_VERDICT"; return 0 ;; esac
+  # A VERDICT THAT WOULD ACT, ON A RECORD NAMING NO BRANCH: no one worktree can be shown to hold it,
+  # so every copy of it would be graded alone, and this tick, the one actor that kills with nobody
+  # watching, acts on none of them.
+  if [ "$RL_HOLDER" = absent ]; then
+    print_decision "$slug" "$wt" "skip · NO RUN BRANCH · the record names neither run-branch nor branch-ref, so no one worktree holds it and no copy of it is acted on"; return 0
+  fi
   sidecar=$(cd "$wt" && resolve_sidecar_dir) || { echo "resume-tick: $slug · $wt · liveness probe failed: the sidecar root cannot be derived in this worktree"; return 0; }
   case "$sidecar" in /*|[A-Za-z]:*) ;; *) sidecar="$wt/$sidecar" ;; esac
   log="$sidecar/resume.$slug.log"

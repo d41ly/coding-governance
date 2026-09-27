@@ -170,6 +170,7 @@ announced, and declines the take-over.
 | LANDING derived LANDED, not observed | an id | RE-BIND: `write_lease`, staged, never committed, whatever the clock or session; a record naming neither branch fact re-binds anywhere, announced as not scoped |
 | LANDING derived LANDED, not observed | no id | nothing to resume |
 | LANDING, observed in the landed log | any | nothing to resume, never the lander, never `presumed-stopped` |
+| any other carrying lease-utc | from a worktree not on the run's branch | refuses, numbered, naming the branch and its worktree; writes nothing |
 | HELD, condition unmet | any | `still held`, writes nothing |
 | HELD, `lease-utc` after `held-at`, clock fresh, another session and keepalive | an id | refuses 58: a take-over recorded its lease and has not moved the phase |
 | HELD, otherwise | an id, or none | take-over; no id, the status block then check 59 |
@@ -189,7 +190,8 @@ no-id spelling reads its phase and witness before it is told to pass the keepali
 scheduler lists. The re-bind stays uncommitted, since a commit would move HEAD off the pushed
 tip: a difference confined to the six lease-fact lines reads as none to the landing commit and to
 `--landed`'s `primary` clean check, and to no other clean check. `presumed-stopped` is ANNOUNCED,
-never a refusal.
+never a refusal. The run's branch is `run-branch`, else `branch-ref`, and git checks a branch out in
+one worktree at most; a record naming neither is graded where it is read.
 
 ## 9. The take-over
 
@@ -213,9 +215,7 @@ lease is taken, so a refused take-over writes nothing at all:
 not schedule the job the run-state file names and cannot assume it died with the process that did.
 So a take-over REAPS that recorded id first, reads the result back and reports it, and only THEN
 schedules a replacement: the reverse leaves the run holding two jobs and a record naming neither
-correctly. What changed is the sentence that followed it — `--keepalive-id` was once accepted by
-`--preflight` alone, so the new id could not be recorded and the `keepalive` fact kept naming the old
-job. A take-over now records the new id, and a holder replacing its own job records it with
+correctly. A take-over records the new id, and a holder replacing its own job records it with
 `--replaces`.
 
 If that `--resume` refuses or prints `still held`, the session reaps only the job it just scheduled,
@@ -230,8 +230,7 @@ A cross-node take-over cannot reap a job in another node's session, so `--hold` 
 
 *Protocol section 6 states the ordered `in-place` sequence in four verbs. This section carries what
 that order is FOR, what a reconcile may not go through, and what a run does when the landing cannot
-be completed at all. It is here rather than there because the protocol is at its cap and this is the
-half a run reads only when something stops.*
+be completed at all.*
 
 **Why the order is forced, and not merely recommended.** The merge bar writes its full-green stamp
 only for a clean, unmoved run, and the push boundary reuses that stamp instead of paying a second

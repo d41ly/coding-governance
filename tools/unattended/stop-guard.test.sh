@@ -162,6 +162,19 @@ check_same "U61 the same record at BUILDING is blocked run-open" "$(read_field "
 check_same "U61 REASONS carries held directly after terminal" \
   "$(node -e 'const m=require(process.argv[1]);console.log(m.REASONS.slice(0,2).join(" "))' "$(resolve_native "$HOOK")")" "terminal held"
 
+# ---- TOOL-dDerivedDocket-62 AC7: an ELSEWHERE verdict ALLOWS with reason `elsewhere` and spends no
+# ---- block: the payload's cwd is a worktree not on the run's branch, whose copy cannot say whether
+# ---- the run is open, and a `run-open` block would send the session to --plan from a stale copy.
+# ---- RED against a hook copy without the `elsewhere` row: the stop is blocked `run-open`.
+F=$(build_fixture BUILDING "$SID"); set_liveness BUILDING ELSEWHERE
+run_hook "$(build_payload "$F")"
+check_same "U62 elsewhere rc" "$RC" "0"
+check_same "U62 elsewhere stdout empty" "$OUT" ""
+check_same "U62 line reason is elsewhere" "$(read_field "$(derive_sidecar "$F")" reason)" "elsewhere"
+check_same "U62 line blocks" "$(read_field "$(derive_sidecar "$F")" blocks)" "0"
+check_same "U62 REASONS carries elsewhere directly after held" \
+  "$(node -e 'const m=require(process.argv[1]);console.log(m.REASONS.slice(1,3).join(" "))' "$(resolve_native "$HOOK")")" "held elsewhere"
+
 # ---- AC4: a pending background task allows — the harness re-invokes the session when it ends.
 F=$(build_fixture BUILDING "$SID"); set_liveness BUILDING LIVE
 run_hook "$(build_payload "$F" '{"background_tasks":[{"id":"t1"},{"id":"t2"}]}')"
@@ -411,7 +424,10 @@ n=$((pass+fail))
 # observed-landing arm's 5 inside the real-driver block, COUNTED off their own `check_*` lines, every
 # one unconditional within its block; the pass that wrote them ran no suite, and each was observed
 # by hand over a replica of this prologue.
-FLOOR_ASSERTIONS=116
+# RAISED 116 -> 121 by TOOL-dDerivedDocket-62: the ELSEWHERE arm's 5 assertions beside the HELD arm,
+# COUNTED off its own `check_*` lines, every one unconditional; the pass that wrote it ran no suite,
+# and it was run alone over a replica of this prologue against the hook and a copy without the row.
+FLOOR_ASSERTIONS=121
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
