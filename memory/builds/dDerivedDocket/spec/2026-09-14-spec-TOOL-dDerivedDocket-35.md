@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-35 — arming and the real-tree staged reds
 
-**Status:** SPECCED · rev-9 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling · order 37
+**Status:** CLOSED · rev-10 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling · order 37
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-28-build-TOOL-dDerivedDocket-35-1-acceptance-ledger.md](../build/2026-09-28-build-TOOL-dDerivedDocket-35-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
@@ -54,8 +55,8 @@ against the fixture.
   is used; the ledger records that order. The two `--no-verify` uses in S7 are the procedure's only
   bypasses. Observed by AC7 and AC10.
 - **S3** The ask driver's RED: a scratch build README landed on the scratch remote's default branch,
-  whose `asks:` names an id no `BACKLOG.md` files; `unattended.sh --preflight` on it refuses naming
-  property P5 and the id. Observed by AC2.
+  whose `asks:` names an id no `BACKLOG.md` files; `unattended.sh --preflight` on it refuses at
+  check 72, property P5's refusal, naming the id. Observed by AC2.
 - **S4** The `asks-disposed` RED: a scratch mandated run whose one mandated ask is filed and carries
   no disposition and no closing spec; `unattended.sh --close` on it refuses naming `asks-disposed`
   and the ask among its unmet items. `--close` evaluates every item and `gates-green` runs
@@ -184,7 +185,7 @@ instead of an empty fixture.
 
 | Unit | Break | Command | The RED must name |
 |---|---|---|---|
-| ask driver | `asks:` names an id no `BACKLOG.md` files | `unattended.sh --preflight <scratch-slug> --keepalive-id <id>` | P5 and the id |
+| ask driver | `asks:` names an id no `BACKLOG.md` files | `unattended.sh --preflight <scratch-slug> --keepalive-id <id>` | P5, as check 72, and the id |
 | asks-disposed | a mandated ask filed, undisposed, unclosed | `unattended.sh --close <scratch-slug>` | `asks-disposed` and the ask |
 | leg second opinions | a table row whose backticked first cell is a foreign ask id | `bash tools/unattended/check-unattended.sh` | the anchor ban and the id |
 | straggler hook | a pre-switch branch, in a linked worktree, staging a shard edit | `git commit` in the linked worktree on the pre-switch branch | the recipe's `--relocate` line, or the recorded inertness and the `--session` note S6 names |
@@ -311,15 +312,17 @@ under `memory/builds/dDerivedDocket/build/`.
   permission: the command is the `unattended kit gate` leg over the real tree and runs at the one
   post-build bar; in the pass the conf value and the protocol row are read directly.
 - **AC2** — When `unattended.sh --preflight` runs in the scratch clone on a landed README whose
-  `asks:` names an unfiled id, it refuses naming P5 and that id, and the refusal names its term by
-  label, P5, never a DEAD PROBE; where the READY witness ran, it returned one row per scoped id.
+  `asks:` names an unfiled id, it refuses at check 72, the P5 refusal, naming that id. The driver
+  prints no term label, so the term is read off the check number and the property's statement, and
+  it is never a DEAD PROBE; where the READY witness ran, it returned one row per scoped id.
   Red when: the refusal is the authorization refusal, because the README never reached the scratch
   remote's default branch, and P5 was never asked; or a parse refusal or a DEAD PROBE satisfies the
   RED, which is what `TOOL-dDerivedDocket-49` or `TOOL-dDerivedDocket-50` standing would produce —
   the two units the driver minted from the G3 round-2 record's H1 and H2.
 - **AC3** — When `unattended.sh --close` runs on the scratch mandated run, it refuses, and among its
-  unmet items it names `asks-disposed` and the undisposed ask, and the refusal names its term by
-  label, T3, never a DEAD PROBE, and the witness returned one row per scoped id.
+  unmet items it names `asks-disposed` and the undisposed ask in term T3's statement for a mandated
+  ask, which the driver prints without the label, never a DEAD PROBE, and the witness returned one
+  row per scoped id.
   Red when: the item reads T0, not adopted, because the scratch clone's conf was not the armed one;
   or a parse refusal or a DEAD PROBE satisfies the RED, which is what `TOOL-dDerivedDocket-49` or
   `TOOL-dDerivedDocket-50` standing would produce — the two units the driver minted from the G3
@@ -598,6 +601,20 @@ observes them on real content.
   `313cc478`. S9 adds the same grep's size at `313cc478`, sixteen, as a second size and not a list,
   which AC8 already re-measures at the commit. AC6 and AC7, which observe S7 and S8, name no check
   number and keep their wording. §10 records the reading.
+- rev-10 · 2026-09-28 · §2 §4 §6 · S3 · AC2 AC3 · the build pass. The driver prints no protocol term label: its
+  P5 refusal is `UNATTENDED check 72 FAILED` with the property's statement and the id, and its T3
+  refusal for a mandated ask is the `asks-disposed` statement that the ask ended in none of the
+  admitted states. AC2 and AC3 asked for the label by name, which no run of the shipped driver can
+  print, so both now read the term off the check number and statement, and S3 and §4's breaks
+  table name check 72 beside P5 so no clause still asks for a label. The assertion that the RED
+  is the term's own, and never a parse refusal or a DEAD PROBE, is unchanged. Four procedure facts
+  the spec leaves open are recorded here, not as divergences. The in-pass runs sit in LINKED worktrees
+  of the clone, one per scratch build, because a clone is a primary tree and its branch guard refuses a
+  commit off its default branch. The `EXMP` family is declared with its `example` discipline. The
+  self-filing scratch build's README comes from the kit's own `--new-build` renderer, called directly,
+  because the command refuses a slug whose folder already files an ask. And `--close` is reached as a
+  run reaches it: after the record is committed (check 62) and after `push-main.sh --prepare` (check
+  63). No hook was bypassed.
 
 ## 10. Reuse audit
 
