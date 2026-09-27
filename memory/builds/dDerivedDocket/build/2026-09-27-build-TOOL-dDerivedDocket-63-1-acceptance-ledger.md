@@ -35,6 +35,13 @@ and the executed count moved by exactly 40 (322 -> 362). The pass also ran the g
 AC6 name. `cmp` of the contract and its render printed nothing. The template reads 35301 bytes in
 517 lines against 35303 in 517 at the parent. Every zero-count read 0 now and 1 at the parent.
 
+Acting on the bug-class checklist over `fb07ca25..HEAD`, the amendment-leaves-its-other-half-standing
+class found four spec sentences rev-6 had left standing. They counted one edited arm, two code
+edits, one comment line and no minted identifier of any kind, and now say what this pass changed.
+The other classes the unit's own files select were read against this diff and found nothing to fix.
+The two pid guards differ on purpose, as the spec's F5 decides: the holder row reads `absent` against
+an unexposed pid as a match, and the restart row reads it as no match.
+
 All seven criteria carry `permission:` lines, so none gets an observed line here. The orchestrator
 writes those after its attributed VERIFYING run. AC4 was changed at rev-6, so it takes the amended
 form.

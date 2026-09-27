@@ -58,12 +58,12 @@ pid its prologue exports.
   are not this unit's. Unit 61 keeps `build_folder_age` and its leaseless rows (its §8 F13) and makes
   those fixtures leaseless under its S13, and a record carrying no lease carries no `session`, so
   they reach none of the rows this unit moves and keep their check-59 and check-57 texts; any
-  re-assertion they owe is unit 61's. The one arm this unit edits is unit 61's same-session
-  relaunch, whose call it moves to a `CLAUDE_PID` the record does not name, the shape the tick's
-  relaunch has, keeping every assertion unit 61 wrote. Rev-6: unit 61's build pass asked the four
-  arms of §4's first table from another session so that each held under its order, and this unit
-  returns those calls to the prologue's session and pid, F1's (a), moving the one lease-fact line
-  that read the moved session (§4). §4 lists every member. Observed by AC4.
+  re-assertion they owe is unit 61's. This unit edits unit 61's same-session relaunch, whose calls
+  it moves to a `CLAUDE_PID` the record does not name, the shape the tick's relaunch has, keeping
+  every assertion unit 61 wrote. Rev-6: it also edits the four arms of §4's first table, which unit
+  61's build pass asked from another session so that each held under its order; this unit returns
+  those calls to the prologue's session and pid, F1's (a), moving the one lease-fact line that read
+  the moved session (§4). §4 lists every member. Observed by AC4.
 - **S5** The stop contract's §8 table, template and render, records S1 and S2 in four rows: the
   `--replaces` row above the same-session row, reading "clock fresh or unknown"; the same-session
   row's caller cell carrying the pid clause and its refusal losing the clause that moved; the
@@ -72,7 +72,8 @@ pid its prologue exports.
   above it. The net is −15 bytes and no line against unit 61's rows, so the contract does not grow.
   Rev-6: the rows unit 61's pass wrote are shorter than its §4 states them, so the four edits are
   made on those rows and funded by two trims in the same rows (§4). Observed by AC5.
-- **S6** The unit's hygiene: no function or other identifier is minted, no `fail` branch is added or
+- **S6** The unit's hygiene: no function, global, reason, verdict, file or conf key is minted (the one
+  local rev-6 adds is none of these, §4 Inventory), no `fail` branch is added or
   removed, no row of `memory/project/unarmed-branches.txt` moves, no kit version moves, no added kit
   line spells a kit path literal, and no conf key is added or removed, so no protocol key-table row
   is owed. Observed by AC6.
@@ -199,7 +200,8 @@ above it whose caller cell also matches its callers.
   under another pid, the tick's relaunch. A `--replaces` call and the recorded process each meet
   row 6, as a `--replaces` call does at `07997375`.
 
-In code the change is two edits inside unit 61's working branch. Its `--replaces` block moves above
+In code the change is two edits inside unit 61's working branch, and the clock they need moves with
+them (rev-6, below). Its `--replaces` block moves above
 its same-session block, under the fresh-or-unknown condition. Unit 61 writes no second `--replaces`
 branch: its N2 row enters that same block from the no-lease rows, so the move keeps that entry, and
 a record with no lease inside the bound still reaches the block through N2 and never through the
@@ -266,8 +268,8 @@ three. Unit 61's N3 text names `--replaces` and the recorded keepalive beside wh
 and if that rewording moves a hit, re-asserting it is unit 61's under its S13 and AC22, never this
 unit's.
 
-One arm changes its call and not its expectation: unit 61's same-session relaunch, its AC3 first
-call among them. The tick's relaunch is a new process, so the arm must run under a `CLAUDE_PID` the
+Unit 61's same-session relaunch changes its call and not its expectation, its AC3 first call among
+them, and rev-6 below adds the four arms above. The tick's relaunch is a new process, so the arm must run under a `CLAUDE_PID` the
 record does not name. Where unit 61's pass wrote that call under the prologue's pid, which the
 record names, this unit's pass sets that call's `CLAUDE_PID` to another dead pid and keeps every
 assertion unit 61 wrote. Unit 61 owns the arm and its assertions, this unit owns that one value, and
@@ -326,8 +328,8 @@ The first row gains 15 bytes and moves above the second. The second gains the pi
 it ends where it began. The no-lease row trades "below" for "above". The last loses 17 bytes. The
 contract nets −2 bytes and no line, which AC5 reads at the build commit against its parent.
 
-The driver is not a capped carrier. It gains the pid clause, the block move, and one comment line
-citing this unit's id and H1.
+The driver is not a capped carrier. It gains the pid clause, the block move with the clock it
+reads, one local, and comments citing this unit's id and H1.
 
 ### Inventory
 
@@ -599,7 +601,7 @@ guard the estimate trips is broad and leaves the join.
   unit agent runs `--resume` there, citing `tools/workflows/unattended-unit.js` as unit 62's
   Rollout does, which hands unit agents `--dispatch` and `--brief` only. No row, order, criterion
   or edge moved.
-- rev-6 · 2026-09-27 · §2 S4 S5 · §4 · §6 AC4 · the build pass, re-read on the tree at `5751d264`.
+- rev-6 · 2026-09-27 · §2 S4 S5 S6 · §4 · §6 AC4 · the build pass, re-read on the tree at `5751d264`.
   Unit 61's build pass asked the four second-driver arms of §4's first table from another session,
   `sOther` (its rev-10 S13), so S4, §4 and AC4 now say this unit returns those calls to the
   prologue's session and pid, which is F1's (a), and moves AC20's lease-fact line, which read the
@@ -610,7 +612,10 @@ guard the estimate trips is broad and leaves the join.
   caller test is held in one local, and its live-pid refusal drops the `CLAUDE_PID` inequality the
   clause now guarantees. S5 and §4 record that the contract rows on the tree are unit 61's compact
   ones, edited as they stand and funded by two trims, for a net of −2 bytes; AC5's greps and its
-  not-greater test are unchanged. No row, order or edge moved.
+  not-greater test are unchanged. S6, and the §4 sentences that counted one edited arm, two code
+  edits and one comment line, now say what this pass changed, the one local included, after the
+  build commit's bug-class checklist named the amendment-leaves-its-other-half-standing class. No
+  row, order or edge moved.
 
 ## 10. Reuse audit
 
