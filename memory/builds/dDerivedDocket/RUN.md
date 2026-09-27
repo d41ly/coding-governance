@@ -311,3 +311,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-27T14:17:19Z resume · item dDerivedDocket · reason working · keepalive 3575a45e · manual
 
 2026-09-27T14:48:26Z review · item dDerivedDocket-specs-g10 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-27T15:13:46Z dispatch · item 6136f764 TOOL-dDerivedDocket-32 · reason .github/workflows/remote-ci.yml .gitattributes .lexicon.conf .governance/deploy.toml AGENTS.md tools/unattended/README.md tools/run-gates/run-selftests.sh tools/unattended/run-unattended-gates.sh memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-32.md
+
+2026-09-27T15:13:47Z brief · item TOOL-dDerivedDocket-32 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
