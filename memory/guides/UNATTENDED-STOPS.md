@@ -175,13 +175,13 @@ announced, and declines the take-over.
 | HELD, `lease-utc` after `held-at`, clock fresh, another session and keepalive | an id | refuses 58: a take-over recorded its lease and has not moved the phase |
 | HELD, otherwise | an id, or none | take-over; no id, the status block then check 59 |
 | working | the recorded keepalive | the holder: writes nothing unless the record lacks `lease-utc` or names another session or pid than the harness exposes, then records and stages; reaps orphans (§14) |
-| working | a new id, the recorded session, which is not `absent` | the holder's process restarted: take-over; refuses 58 first while the recorded pid is alive and is not `CLAUDE_PID` |
+| working, clock fresh or unknown | a new id with `--replaces` the recorded keepalive | the holder replaces its job: `write_lease`, staged; another `--replaces` id refuses 58 |
+| working | a new id, the recorded session (not `absent`), under a pid the record does not name | the holder's process restarted: take-over; refuses 58 first if the recorded pid lives |
 | working, no lease, age unanswerable | a new id, or none | the status block, then check 57 |
-| working, no lease, inside the bound | a new id, `--replaces` the recorded keepalive | the holder replaces its job, through the `--replaces` block of the leased row below |
+| working, no lease, inside the bound | a new id, `--replaces` the recorded keepalive | the holder replaces its job, through the `--replaces` block of the leased row above |
 | working, no lease, inside the bound | any other new id, or none | the status block, then check 59 naming the folder's age and `--replaces` with the recorded keepalive |
 | working, no lease, past the bound | an id, or none | `presumed-stopped`, announced: take-over |
-| working, clock fresh | a new id, `--replaces` the recorded keepalive | the holder replaces its job: `write_lease`, staged; another `--replaces` id refuses 58 |
-| working, clock fresh or unknown | a new id, another session | refuses 58: a live session drives this slug |
+| working, clock fresh or unknown | a new id | refuses 58: a live session drives this slug |
 | working, clock fresh or unknown | no id | the status block, then check 59 |
 | working, clock stale | an id, or none | `presumed-stopped`, announced: take-over; no id, the status block then check 59 |
 

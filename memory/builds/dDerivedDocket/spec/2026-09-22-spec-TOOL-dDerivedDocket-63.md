@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix
 
-**Status:** SPECCED · rev-5 · 2026-09-27 · node d · Tier-2 · base 07997375 · streams tooling · order 33
+**Status:** CLOSED · rev-6 · 2026-09-27 · node d · Tier-2 · base 07997375 · streams tooling · order 33
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-27-build-TOOL-dDerivedDocket-63-1-acceptance-ledger.md](../build/2026-09-27-build-TOOL-dDerivedDocket-63-1-acceptance-ledger.md) | journal | — |
 | [2026-09-22-review-TOOL-dDerivedDocket-62-spec-audit-g9-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-62-spec-audit-g9-round1.md) | spec-audit | TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-64 TOOL-dDerivedDocket-61 |
 | [2026-09-22-review-TOOL-dDerivedDocket-65-spec-audit-g10-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-65-spec-audit-g10-round1.md) | spec-audit | TOOL-dDerivedDocket-65 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-64 |
 
@@ -59,14 +60,18 @@ pid its prologue exports.
   they reach none of the rows this unit moves and keep their check-59 and check-57 texts; any
   re-assertion they owe is unit 61's. The one arm this unit edits is unit 61's same-session
   relaunch, whose call it moves to a `CLAUDE_PID` the record does not name, the shape the tick's
-  relaunch has, keeping every assertion unit 61 wrote. §4 lists every member. Observed by AC4.
+  relaunch has, keeping every assertion unit 61 wrote. Rev-6: unit 61's build pass asked the four
+  arms of §4's first table from another session so that each held under its order, and this unit
+  returns those calls to the prologue's session and pid, F1's (a), moving the one lease-fact line
+  that read the moved session (§4). §4 lists every member. Observed by AC4.
 - **S5** The stop contract's §8 table, template and render, records S1 and S2 in four rows: the
   `--replaces` row above the same-session row, reading "clock fresh or unknown"; the same-session
   row's caller cell carrying the pid clause and its refusal losing the clause that moved; the
   catch-all's caller cell reading "a new id"; and unit 61's no-lease `--replaces` row, whose pointer
   at the block of the leased row reads "above" where unit 61 wrote "below", since that row now sits
   above it. The net is −15 bytes and no line against unit 61's rows, so the contract does not grow.
-  Observed by AC5.
+  Rev-6: the rows unit 61's pass wrote are shorter than its §4 states them, so the four edits are
+  made on those rows and funded by two trims in the same rows (§4). Observed by AC5.
 - **S6** The unit's hygiene: no function or other identifier is minted, no `fail` branch is added or
   removed, no row of `memory/project/unarmed-branches.txt` moves, no kit version moves, no added kit
   line spells a kit path literal, and no conf key is added or removed, so no protocol key-table row
@@ -201,6 +206,15 @@ a record with no lease inside the bound still reaches the block through N2 and n
 clock condition. The same-session condition gains the pid clause below. Row 4 needs no edit in
 code, because the catch-all is whatever falls past the rows above it.
 
+Rev-6, re-read on the tree at `5751d264`: unit 61 reads the clock BELOW its same-session block, so
+the clock moves up with the block that reads it. It is read for every call but row 3's caller
+with no `--replaces`, which row 3 answers without a clock as unit 61's does. Row 3 therefore gains
+no probe, and never prints unit 61's UNKNOWN announcement, which says the lease is read as fresh
+rather than as an invitation to take the slug over, before it takes the run over. Row 3's caller
+test is computed once, above the clock, into one local of `verb_resume`, which both the clock's
+guard and row 3 read. Row 3's live-pid refusal drops its inequality with `CLAUDE_PID`, which the
+pid clause now guarantees, as the contract row drops it.
+
 ### What "a pid the record names" means
 
 The record names the caller's pid when `CLAUDE_PID` is set, the `pid` fact is present and is not
@@ -259,6 +273,18 @@ record names, this unit's pass sets that call's `CLAUDE_PID` to another dead pid
 assertion unit 61 wrote. Unit 61 owns the arm and its assertions, this unit owns that one value, and
 neither unit asserts the arm twice.
 
+Rev-6, measured on the tree at `5751d264`. The relaunch arm makes two such calls, one over a clock a
+fresh transcript keeps live and one over an aged commit, and both move. Unit 61's build pass did not
+leave the four arms of the first table under the prologue's session: its rev-10 S13 asked each
+from another session, `CLAUDE_CODE_SESSION_ID=sOther`, so that each held under its order. This
+unit's pass returns those four calls to the prologue's session and pid, which is F1's (a). It is the
+one shape a holder's sub-agent has, and under this unit's order each meets its verdict again, row 4
+or row 2 as the table says. One assertion moves with them: unit 61's retarget of AC20's lease-file
+line read `session: sOther`, and under one session that fact cannot move, so the line reads
+`lease-utc` re-stamped beside the new id instead, one for one. Unit 4's AC7 take-over keeps
+`sOther`: it is not in the table, a stale clock takes the run over from any session, and its session
+assertion is unit 61's.
+
 ### Where the text goes
 
 The stop contract's §8 table becomes unit 61's matrix, and this unit edits four of its rows in
@@ -283,6 +309,23 @@ and `TOOL-dDerivedDocket-62`, whose one worktree row moves no row and touches no
 move that before this unit builds, so AC5 reads the build commit against its parent rather than
 against either figure.
 
+Rev-6, re-read on the tree at `5751d264`: unit 61's pass wrote these rows shorter than its §4
+states them, and without "through `run_takeover`", whose removal funded the figure above. The four
+edits are made on the rows as they stand, keeping their compact wording, in the table's new order:
+
+```
+| working, clock fresh or unknown | a new id with `--replaces` the recorded keepalive | the holder replaces its job: `write_lease`, staged; another `--replaces` id refuses 58 |
+| working | a new id, the recorded session (not `absent`), under a pid the record does not name | the holder's process restarted: take-over; refuses 58 first if the recorded pid lives |
+| working, no lease, inside the bound | a new id, `--replaces` the recorded keepalive | the holder replaces its job, through the `--replaces` block of the leased row above |
+| working, clock fresh or unknown | a new id | refuses 58: a live session drives this slug |
+```
+
+The first row gains 15 bytes and moves above the second. The second gains the pid clause and drops
+"and is not `CLAUDE_PID`", and two trims in the same row fund the rest, "(not `absent`)" for
+", which is not `absent`" and "if the recorded pid lives" for "while the recorded pid is alive", so
+it ends where it began. The no-lease row trades "below" for "above". The last loses 17 bytes. The
+contract nets −2 bytes and no line, which AC5 reads at the build commit against its parent.
+
 The driver is not a capped carrier. It gains the pid clause, the block move, and one comment line
 citing this unit's id and H1.
 
@@ -290,6 +333,8 @@ citing this unit's id and H1.
 
 This unit mints no identifier: no function, global, reason, verdict, file or conf key. The pid
 comparison is an inline test in `verb_resume`'s same-session condition, so no lexicon cell is asked.
+Rev-6: that condition is held in one local of `verb_resume` (§4), a shell variable, which is none
+of those kinds and which no lexicon cell grades.
 
 ### Migration
 
@@ -320,7 +365,8 @@ window harm named above, and unit 61's Rollout waits for this unit before it mak
 ### Files touched (estimate)
 
 `tools/unattended/unattended.sh` · `tools/unattended/unattended.test.sh` ·
-`tools/unattended/STOPS.template.md` · `memory/guides/UNATTENDED-STOPS.md`
+`tools/unattended/STOPS.template.md` · `memory/guides/UNATTENDED-STOPS.md` ·
+`memory/map/features/unattended-stops.md`
 
 ### Alternatives rejected
 
@@ -410,7 +456,10 @@ window harm named above, and unit 61's Rollout waits for this unit before it mak
   `grep -c 'export CLAUDE_CODE_SESSION_ID=fixture-session' tools/unattended/unattended.test.sh` and
   `grep -c 'export CLAUDE_PID=999999999' tools/unattended/unattended.test.sh` each print 1; the
   suite's diff against the parent adds no `CLAUDE_CODE_SESSION_ID=` assignment and removes no
-  `hit`, `miss` or `same` line, so no existing assertion is rewritten; and `FLOOR_ASSERTIONS` and
+  `hit`, `miss` or `same` line, so no verdict assertion is rewritten, and the one lease-fact line it
+  rewrites is AC20's, the `sOther` session read that §4 moves onto `lease-utc` (rev-6);
+  `grep -c 'CLAUDE_CODE_SESSION_ID=sOther' tools/unattended/unattended.test.sh` prints 1 at the
+  build commit, unit 4's AC7 take-over, and 5 at its first parent; and `FLOOR_ASSERTIONS` and
   `FLOOR_SHARD_2` each read their first-parent figure plus exactly the assertions S3's blocks carry,
   read with `git show` at both, while `FLOOR_SHARD_1` is unchanged.
   Red when: an arm keeps its verdict only because it was handed a session of its own, so the suite
@@ -550,6 +599,18 @@ guard the estimate trips is broad and leaves the join.
   unit agent runs `--resume` there, citing `tools/workflows/unattended-unit.js` as unit 62's
   Rollout does, which hands unit agents `--dispatch` and `--brief` only. No row, order, criterion
   or edge moved.
+- rev-6 · 2026-09-27 · §2 S4 S5 · §4 · §6 AC4 · the build pass, re-read on the tree at `5751d264`.
+  Unit 61's build pass asked the four second-driver arms of §4's first table from another session,
+  `sOther` (its rev-10 S13), so S4, §4 and AC4 now say this unit returns those calls to the
+  prologue's session and pid, which is F1's (a), and moves AC20's lease-fact line, which read the
+  moved session, onto `lease-utc` re-stamped; AC4 gains the `sOther` count, 5 at the parent and 1
+  after, and says the one line rewritten. The relaunch arm's two calls both move to another pid. §4
+  says the clock moves up with the `--replaces` block, read for every call but row 3's caller with
+  no `--replaces`, so row 3 gains no probe and no UNKNOWN announcement before a take-over; row 3's
+  caller test is held in one local, and its live-pid refusal drops the `CLAUDE_PID` inequality the
+  clause now guarantees. S5 and §4 record that the contract rows on the tree are unit 61's compact
+  ones, edited as they stand and funded by two trims, for a net of −2 bytes; AC5's greps and its
+  not-greater test are unchanged. No row, order or edge moved.
 
 ## 10. Reuse audit
 

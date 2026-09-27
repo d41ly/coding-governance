@@ -163,7 +163,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [TOOL-dDerivedDocket-32 — remote CI on every push](spec/2026-09-14-spec-TOOL-dDerivedDocket-32.md) | 30 | 2 | CLOSED | rev-7 | 2026-09-27 |
 | [TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor](spec/2026-09-22-spec-TOOL-dDerivedDocket-61.md) | 31 | 2 | CLOSED | rev-10 | 2026-09-27 |
 | [TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE](spec/2026-09-22-spec-TOOL-dDerivedDocket-62.md) | 32 | 2 | CLOSED | rev-7 | 2026-09-27 |
-| [TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix](spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md) | 33 | 2 | SPECCED | rev-5 | 2026-09-27 |
+| [TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix](spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md) | 33 | 2 | CLOSED | rev-6 | 2026-09-27 |
 | [TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-64.md) | 34 | 2 | SPECCED | rev-5 | 2026-09-27 |
 | [TOOL-dDerivedDocket-65 — a session waiting on its own sub-agents, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-65.md) | 35 | 2 | SPECCED | rev-2 | 2026-09-27 |
 | [TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered](spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md) | 36 | 2 | SPECCED | rev-9 | 2026-09-22 |
@@ -173,7 +173,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 40 | 1 | SPECCED | rev-8 | 2026-09-22 |
 <!-- /gen:build-units -->
 
-Records: 73 bound to this build, across 4 record folder(s).
+Records: 74 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -7219,8 +7219,9 @@ same "AC21 a no-id resume over a stale lease left the lease alone" "$(read_lease
 
 # ---- AC6: a fresh lease is a live session, and the three rows that say so. The HELD one is the
 # ---- take-over's CRASH WINDOW: a record still HELD whose `lease-utc` follows `held-at`, recorded by
-# ---- another session under another keepalive. The working ones are asked from another session,
-# ---- because the session the record names under a new id is its relaunch and takes the run over.
+# ---- another session under another keepalive. The working ones are asked under the prologue's one
+# ---- session and pid, which the record names, so the caller is the holder's own process or its
+# ---- sub-agent and not its relaunch (TOOL-dDerivedDocket-63).
 build_hold_fixture
 run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null
 git add -A >/dev/null && git commit -q -m held --no-verify
@@ -7232,7 +7233,7 @@ hit "$out" "another session already resumed this held run and recorded its lease
 same "AC6 a take-over over a fresh lease wrote nothing" "$(sum)" "$before"
 same "AC6 a take-over over a fresh lease left the lease alone" "$(read_lease_hash)" "$lb"
 build_hold_fixture; before=$(sum); lb=$(read_lease_hash)
-out=$(CLAUDE_CODE_SESSION_ID=sOther run --resume tRun --keepalive-id kB)
+out=$(run --resume tRun --keepalive-id kB)
 hit "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder; a holder replacing its own job says so with --replaces, and the lease's id is"
 same "AC6 a foreign-id resume over a fresh working lease wrote nothing" "$(sum)" "$before"
 out=$(run --resume tRun)
@@ -7286,13 +7287,14 @@ hit "$out" "s ago, inside the staleness bound, so a session is most likely still
 same "AC22 a second session's leaseless resume inside the bound wrote nothing" "$(sum)" "$before"
 n=$((n+1)); ! grep -q '^lease-utc: ' memory/builds/tRun/RUN.md || { echo "FAIL AC22 a refused leaseless resume recorded a lease"; st=1; }
 
-# ---- AC20: a holder replaces its OWN job in place, and --reaped then names the live one. Asked from
-# ---- another session: from the session the record names, a new id meets the same-session row first
-# ---- (TOOL-dDerivedDocket-61, G8 H1), which TOOL-dDerivedDocket-63 re-orders.
-build_hold_fixture
-out=$(CLAUDE_CODE_SESSION_ID=sOther run --resume tRun --keepalive-id kB --replaces k1)
+# ---- AC20: a holder replaces its OWN job in place, and --reaped then names the live one. Asked under
+# ---- the prologue's one session and pid, which the record names: `--replaces` is read above the
+# ---- same-session row (TOOL-dDerivedDocket-63, G8 H1), so this is the holder's own replacement. The
+# ---- session cannot move under one session, so the re-recorded lease facts show as `lease-utc` moving.
+build_hold_fixture; lutc=$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md); sleep 1
+out=$(run --resume tRun --keepalive-id kB --replaces k1)
 hit "$out" "keepalive replaced"
-n=$((n+1)); grep -q '^session: sOther$' memory/builds/tRun/RUN.md || { echo "FAIL AC20 --replaces did not re-record the lease facts beside the new id"; st=1; }
+n=$((n+1)); [ "$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)" != "$lutc" ] || { echo "FAIL AC20 --replaces did not re-record the lease facts beside the new id"; st=1; }
 n=$((n+1)); grep -q '^keepalive: kB$' memory/builds/tRun/RUN.md || { echo "FAIL AC20 --replaces did not record the new id in the record"; st=1; }
 git add -A >/dev/null && git commit -q -m repl --no-verify
 out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1)
@@ -7300,10 +7302,92 @@ hit "$out" "--reaped names an id that is not the keepalive this slug currently r
 out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped kB)
 hit "$out" "phase HELD · code platform-limit"
 build_hold_fixture; before=$(sum); lb=$(read_lease_hash)
-out=$(CLAUDE_CODE_SESSION_ID=sOther run --resume tRun --keepalive-id kB --replaces kX)
+out=$(run --resume tRun --keepalive-id kB --replaces kX)
 hit "$out" "--replaces names an id this slug's lease does not hold, so it would record a replacement for a job that is not the one driving this run; the lease's own id is"
 same "AC20 a --replaces naming a foreign id wrote nothing" "$(sum)" "$before"
 same "AC20 a --replaces naming a foreign id left the lease alone" "$(read_lease_hash)" "$lb"
+
+# ---- TOOL-dDerivedDocket-63: THE HOLDER KEEPS ITS OWN `--replaces`. Every call here runs under the
+# ---- prologue's one session over a record preflighted under it, so the recorded pid is the holder's
+# ---- own process or a sub-agent inside it, and only a pid the record does not name is its restart.
+# ---- `--replaces` is read ABOVE the same-session row: the holder's replacement never runs
+# ---- `run_takeover`, at a fresh clock or an unknown one, under the recorded pid or another. The
+# ---- recorded process's new id meets the clock rows, refused at 58 while fresh and `presumed-stopped`
+# ---- once stale. RED against the driver carrying unit 61's row order, and AC7's pair against a moved
+# ---- block that tests the fresh return alone, which reads an unknown clock as no `--replaces` at all.
+# ---- AC1: the recorded session's `--replaces` naming the recorded keepalive, under the recorded pid and
+# ---- under another dead one, replaces the job and writes no history row.
+build_hold_fixture; u63_h=$(grep -c ' resume · item tRun · ' memory/builds/tRun/RUN.md)
+out=$(run --resume tRun --keepalive-id kB --replaces k1)
+hit  "$out" "keepalive replaced — the run-state file now names kB in place of k1"
+miss "$out" "taken over"
+same "U63 AC1 the recorded pid's replacement records the new keepalive" "$(sed -n 's/^keepalive: //p' memory/builds/tRun/RUN.md)" "kB"
+same "U63 AC1 ...and stages the record" "$(git diff --cached --name-only)" "memory/builds/tRun/RUN.md"
+same "U63 AC1 ...and writes no history row" "$(grep -c ' resume · item tRun · ' memory/builds/tRun/RUN.md)" "$u63_h"
+build_hold_fixture; u63_h=$(grep -c ' resume · item tRun · ' memory/builds/tRun/RUN.md)
+out=$(CLAUDE_PID=999999998 run --resume tRun --keepalive-id kB --replaces k1)
+hit  "$out" "keepalive replaced — the run-state file now names kB in place of k1"
+miss "$out" "taken over"
+same "U63 AC1 another pid's replacement records the new keepalive" "$(sed -n 's/^keepalive: //p' memory/builds/tRun/RUN.md)" "kB"
+same "U63 AC1 ...and stages the record" "$(git diff --cached --name-only)" "memory/builds/tRun/RUN.md"
+same "U63 AC1 ...and writes no history row" "$(grep -c ' resume · item tRun · ' memory/builds/tRun/RUN.md)" "$u63_h"
+# ---- AC2: the same naming another id refuses at 58 under both pids, and writes and stages nothing.
+build_hold_fixture; before=$(sum)
+out=$(run --resume tRun --keepalive-id kB --replaces kX)
+hit  "$out" "--replaces names an id this slug's lease does not hold, so it would record a replacement for a job that is not the one driving this run; the lease's own id is: k1"
+same "U63 AC2 the recorded pid's foreign --replaces wrote nothing" "$(sum)" "$before"
+same "U63 AC2 ...and staged nothing" "$(git diff --cached --name-only)" ""
+out=$(CLAUDE_PID=999999998 run --resume tRun --keepalive-id kB --replaces kX)
+hit  "$out" "--replaces names an id this slug's lease does not hold, so it would record a replacement for a job that is not the one driving this run; the lease's own id is: k1"
+same "U63 AC2 another pid's foreign --replaces wrote nothing" "$(sum)" "$before"
+same "U63 AC2 ...and staged nothing" "$(git diff --cached --name-only)" ""
+# ---- AC3: the recorded process's new id with no `--replaces` refuses at 58 on a fresh clock, dead and
+# ---- live, the live pid being this shell's own as a sub-agent's is; aged past the bound it takes the
+# ---- run over as `presumed-stopped`; and a pid the record does not name is the restart, taking over.
+build_hold_fixture; before=$(sum)
+out=$(run --resume tRun --keepalive-id kB)
+hit  "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder; a holder replacing its own job says so with --replaces, and the lease's id is: k1"
+same "U63 AC3 the recorded dead pid's new id wrote nothing" "$(sum)" "$before"
+reset_tree; CLAUDE_PID=$OWN_PID run --preflight tRun --keepalive-id k1 >/dev/null; fixture
+same "U63 AC3 the live-pid fixture records this shell's pid" "$(sed -n 's/^pid: //p' memory/builds/tRun/RUN.md)" "$OWN_PID"
+before=$(sum)
+out=$(CLAUDE_PID=$OWN_PID run --resume tRun --keepalive-id kB)
+hit  "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder; a holder replacing its own job says so with --replaces, and the lease's id is: k1"
+same "U63 AC3 the recorded live pid's new id wrote nothing" "$(sum)" "$before"
+build_hold_fixture; write_aged_commit
+out=$(run --resume tRun --keepalive-id kB)
+hit  "$out" "presumed-stopped — the newest move this node can see for this run is"
+hit  "$out" "taken over — phase RUNNING · keepalive kB"
+build_hold_fixture
+out=$(CLAUDE_PID=999999998 run --resume tRun --keepalive-id kB)
+hit  "$out" "the session this record names resumes under a new keepalive, so its process restarted and this resume TAKES THE RUN OVER in its place"
+hit  "$out" "lease replaced · keepalive k1 -> kB"
+miss "$out" "UNATTENDED check 58"
+# ---- AC7: `--replaces` at an UNKNOWN clock. The `date` stub fails the one `+%s` probe the clock reads
+# ---- and hands every other call to the real `date`, so `write_lease` still stamps `lease-utc`; a stub
+# ---- answering nothing to any call would let a broken record print `keepalive replaced` as well.
+U63_STUB=$(mktemp -d)
+printf '#!/bin/sh\nfor a in "$@"; do [ "$a" = "+%%s" ] && exit 1; done\nexec "%s" "$@"\n' "$(command -v date)" > "$U63_STUB/date"
+chmod +x "$U63_STUB/date"
+build_hold_fixture; u63_h=$(grep -c ' resume · item tRun · ' memory/builds/tRun/RUN.md)
+out=$(PATH="$U63_STUB:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id kB --replaces k1 2>&1)
+hit  "$out" "the lease age is UNKNOWN on this node"
+hit  "$out" "keepalive replaced — the run-state file now names kB in place of k1"
+miss "$out" "taken over"
+same "U63 AC7 the recorded pid's replacement at an unknown clock records the new keepalive" "$(sed -n 's/^keepalive: //p' memory/builds/tRun/RUN.md)" "kB"
+same "U63 AC7 ...beside a well-formed lease-utc" "$(grep -cE '^lease-utc: [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' memory/builds/tRun/RUN.md)" "1"
+same "U63 AC7 ...and stages the record" "$(git diff --cached --name-only)" "memory/builds/tRun/RUN.md"
+same "U63 AC7 ...and writes no history row" "$(grep -c ' resume · item tRun · ' memory/builds/tRun/RUN.md)" "$u63_h"
+build_hold_fixture; u63_h=$(grep -c ' resume · item tRun · ' memory/builds/tRun/RUN.md)
+out=$(CLAUDE_PID=999999998 PATH="$U63_STUB:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id kB --replaces k1 2>&1)
+hit  "$out" "the lease age is UNKNOWN on this node"
+hit  "$out" "keepalive replaced — the run-state file now names kB in place of k1"
+miss "$out" "taken over"
+same "U63 AC7 another pid's replacement at an unknown clock records the new keepalive" "$(sed -n 's/^keepalive: //p' memory/builds/tRun/RUN.md)" "kB"
+same "U63 AC7 ...beside a well-formed lease-utc" "$(grep -cE '^lease-utc: [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' memory/builds/tRun/RUN.md)" "1"
+same "U63 AC7 ...and stages the record" "$(git diff --cached --name-only)" "memory/builds/tRun/RUN.md"
+same "U63 AC7 ...and writes no history row" "$(grep -c ' resume · item tRun · ' memory/builds/tRun/RUN.md)" "$u63_h"
+rm -rf "$U63_STUB"
 
 # ---- AC5: HELD blocks the three verbs that would otherwise write past it. Each tests HELD by name
 # ---- rather than `is_terminal`, which a non-terminal HELD passes.
@@ -7539,19 +7623,21 @@ same "AC5 every key still prints, in order" "$(printf '%s\n' "$out" | sed -n 's/
 # ---- keepalive, takes the run over through `run_takeover` whatever the clock says: once reading LIVE
 # ---- through that transcript, once stale. A live recorded pid that is not CLAUDE_PID is two processes
 # ---- of one session and refuses at 58 naming both, writing nothing; another session on the same fresh
-# ---- clock refuses at 58. RED against the retired matrix, where the fresh relaunch met check 58.
+# ---- clock refuses at 58. RED against the retired matrix, where the fresh relaunch met check 58. The
+# ---- relaunch is a new process, so its two calls run under a pid the record does not name
+# ---- (TOOL-dDerivedDocket-63): under the recorded one the caller is the holder's own process.
 build_hold_fixture
 DD_ENC=$(git rev-parse --show-toplevel | tr ':\\/.' '----'); DD_CFG="$ORIGIN_DIR/cfg-dd61"
 mkdir -p "$DD_CFG/projects/$DD_ENC" && touch "$DD_CFG/projects/$DD_ENC/fixture-session.jsonl"
 write_aged_commit
 hit "$(CLAUDE_CONFIG_DIR="$DD_CFG" bash "$SCRIPT" --liveness tRun 2>&1)" "verdict: LIVE"
-out=$(CLAUDE_CONFIG_DIR="$DD_CFG" run --resume tRun --keepalive-id k2)
+out=$(CLAUDE_CONFIG_DIR="$DD_CFG" CLAUDE_PID=999999998 run --resume tRun --keepalive-id k2)
 hit  "$out" "lease replaced · keepalive k1 -> k2"
 miss "$out" "UNATTENDED check 58"
 same "AC3 the relaunch over a fresh clock recorded its new keepalive" "$(sed -n 's/^keepalive: //p' memory/builds/tRun/RUN.md)" "k2"
 rm -rf "$DD_CFG"
 build_hold_fixture; write_aged_commit
-out=$(run --resume tRun --keepalive-id k2)
+out=$(CLAUDE_PID=999999998 run --resume tRun --keepalive-id k2)
 hit "$out" "the session this record names resumes under a new keepalive, so its process restarted and this resume TAKES THE RUN OVER in its place"
 hit "$out" "taken over — phase RUNNING · keepalive k2"
 build_hold_fixture
@@ -10296,9 +10382,9 @@ same "AC5 --status left the ledger byte-unchanged" "$(read_pl_sum "$PL_LEDGER")"
 out=$(run_pl --resume tRun)
 hit  "$out" "a live session drives this slug, and a second driver is exactly what the lease exists to stop, so this refuses before any write"
 hit  "$out" "· orphans 1"
-# From ANOTHER session: the session the record names under a new id is its own relaunch and takes
-# the run over (TOOL-dDerivedDocket-61 S7), which holds the lease and reaps.
-out=$(CLAUDE_CODE_SESSION_ID=sOther run_pl --resume tRun --keepalive-id kB)
+# Under the prologue's one session and pid, which the record names: the holder's own process under
+# a new id meets the fresh clock's refusal and reaps nothing (TOOL-dDerivedDocket-63).
+out=$(run_pl --resume tRun --keepalive-id kB)
 hit  "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder"
 same "AC9 the two refused resumes left the ledger byte-unchanged" "$(read_pl_sum "$PL_LEDGER")" "$pl_pb"
 same "AC9 the two refused resumes left the lease byte-unchanged" "$(read_pl_facts)" "$pl_lb"
@@ -10698,7 +10784,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # four `--liveness` key arms that now expect fifteen keys are retargeted one for one and move
 # nothing. The block was run alone behind a replica of this prologue by hand, n 20 -> 59 and green,
 # and red under each of its five staged driver copies; no suite ran.
-FLOOR_ASSERTIONS=1677
+# RAISED 1677 -> 1717 by TOOL-dDerivedDocket-63: the holder's-own-`--replaces` block's 40 assertions,
+# all in region two directly after unit 4's AC20 arms, so FLOOR_SHARD_2 carries the same +40 and
+# FLOOR_SHARD_1 is untouched. COUNTED off the block's own `hit`/`miss`/`same` lines, every one
+# unconditional; the four second-driver calls returned to the prologue's session, the relaunch's two
+# calls moved to a pid the record does not name, and AC20's lease-fact line retargeted onto
+# `lease-utc` are one for one and move nothing. No suite ran.
+FLOOR_ASSERTIONS=1717
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -10823,7 +10915,8 @@ FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1481
+FLOOR_SHARD_2=1521
+# +40 for the TOOL-dDerivedDocket-63 holder's-own-`--replaces` arms, all in region two - see FLOOR_ASSERTIONS.
 # +39 for the TOOL-dDerivedDocket-62 one-worktree arms, all in region two - see FLOOR_ASSERTIONS.
 # +98 for the TOOL-dDerivedDocket-61 one-lease-record arms, all in region two - see FLOOR_ASSERTIONS.
 # +56 for the TOOL-dDerivedDocket-27 backstop, MIXED and NOCONF arms, all in region two - see FLOOR_ASSERTIONS.

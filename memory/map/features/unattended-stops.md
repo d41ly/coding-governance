@@ -49,6 +49,12 @@ by name, the stop-guard allows, and the matrix's HELD and working rows refuse a 
 58, naming where the run is driven from (`TOOL-dDerivedDocket-62`). A record naming no branch is
 graded where it is read, and the tick acts on none of its copies.
 
+**The holder keeps its own `--replaces`.** The matrix reads `--replaces` above the same-session row,
+and that row takes only a caller under a pid the record does not name, because a restart is a new
+process. The holder's own process, or a sub-agent inside it, carries both the recorded session and
+the recorded pid, so its new id meets the clock rows: refused at 58 while the clock is fresh or
+unknown, taken over as `presumed-stopped` once stale (`TOOL-dDerivedDocket-63`).
+
 **A process not in the ledger is never killed.** Every command the driver starts through
 `run_bounded` is recorded by identity, pid and procfs start token beside the driver's own, in a
 per-slug ledger, and only a recorded process alive with its token while its driver is gone is reaped

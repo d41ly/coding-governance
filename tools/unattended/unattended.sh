@@ -6113,12 +6113,13 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
 # method's no-id spelling still reads its phase and witness before it is told what to pass.
 #
 # THE LEASE IS THE RUN-STATE FACTS (TOOL-dDerivedDocket-61 S7). Identity is the `keepalive` fact, or
-# the `session` fact against CLAUDE_CODE_SESSION_ID for the same-session row; freshness is
+# the `session` fact against CLAUDE_CODE_SESSION_ID for the same-session row, whose caller is under
+# a pid the `pid` fact does not name (TOOL-dDerivedDocket-63); freshness is
 # `check_lease_fresh`, `--liveness`'s own clock and bound; a record with no `lease-utc` predates the
 # run-state lease and keeps its build folder's clock against the same bound (§8 F13).
 verb_resume() { # slug
   local slug="$1" rel p cond age bound rhc rc ka _rs_at _rs_bt _rs_rc ok os op
-  local ls_utc ls_sid ls_pid ls_hat live me rb cur
+  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
@@ -6277,26 +6278,22 @@ verb_resume() { # slug
     print_resume_orientation "$rel" "$p"
     return 0
   fi
-  # THE SAME SESSION UNDER A NEW KEEPALIVE: the holder's process restarted — the resume tick's
-  # relaunch is `claude -p --resume <session>`, whose first turn moves the very transcript this clock
-  # reads, so no freshness test is taken here. It goes through `run_takeover`, because an unwatched
-  # relaunch is where the mandate is re-verified and interrupted acts are named. Two live processes of
-  # one session are what it refuses: the tick kills the recorded pid's tree before it launches, so its
-  # relaunch passes, and a second copy started by hand while the first still runs does not.
-  if [ -n "$KID" ] && [ -n "$me" ] && [ -n "$ls_sid" ] && [ "$ls_sid" != absent ] && [ "$ls_sid" = "$me" ]; then
-    if [ -n "$ls_pid" ] && [ "$ls_pid" != absent ] && [ "$ls_pid" != "${CLAUDE_PID:-}" ] \
-       && [ "$(check_pid_alive "$ls_pid" "$(fact "$rel" pid-image)" "$ls_utc")" = yes ]; then
-      fail 58 "this session is the one the record names, and the process the record names for it is still alive and is not this one, so a take-over here would drive one slug from two processes of one session; stop that process, or resume from it: recorded pid $ls_pid, this CLAUDE_PID ${CLAUDE_PID:-unset}"
-      return 1
-    fi
-    echo "unattended: the session this record names resumes under a new keepalive, so its process restarted and this resume TAKES THE RUN OVER in its place"
-    run_takeover "$slug" "$rel" "$KID" working "$p" || return 1
-    return 0
+  # THE SAME SESSION'S RESTART is the recorded session under a pid the record does NOT name: a
+  # restart is a new process, and what shares both the recorded session and the recorded pid is the
+  # holder's own process or a sub-agent inside it, which meets the clock rows below instead
+  # (TOOL-dDerivedDocket-63, G8 H1). A pid either side leaves unexposed or `absent` names nothing.
+  restart=""
+  if [ -n "$KID" ] && [ -n "$me" ] && [ -n "$ls_sid" ] && [ "$ls_sid" != absent ] && [ "$ls_sid" = "$me" ] \
+     && ! { [ -n "${CLAUDE_PID:-}" ] && [ -n "$ls_pid" ] && [ "$ls_pid" != absent ] && [ "$ls_pid" = "$CLAUDE_PID" ]; }; then
+    restart=1
   fi
   # THE CLOCK. A leased record reads `check_lease_fresh`; a record with no lease reads its build
-  # folder's age against the same bound (§8 F13), and an unanswerable age is its own refusal.
+  # folder's age against the same bound (§8 F13), and an unanswerable age is its own refusal. Read
+  # for every call but the restart with no `--replaces`, which its row answers with no clock.
   live=0
-  if [ -n "$ls_utc" ]; then
+  if [ -n "$restart" ] && [ -z "$RS_REPLACES" ]; then
+    :
+  elif [ -n "$ls_utc" ]; then
     check_lease_fresh "$rel"; rc=$?
     case "$rc" in
       0) live=1 ;;
@@ -6314,8 +6311,9 @@ verb_resume() { # slug
     [ "$age" -gt "$bound" ] || live=1
   fi
   # THE HOLDER REPLACES ITS OWN JOB, on a live record with or without a lease: the one block both
-  # enter. A holder whose scheduler lists another job than the record names retires that one by
-  # naming it, and `write_lease` records all six facts beside the new id.
+  # enter, ABOVE the restart below, so `--replaces` from the recorded session is the holder's own
+  # replacement and never a take-over. A holder whose scheduler lists another job than the record
+  # names retires that one by naming it, and `write_lease` records all six facts beside the new id.
   if [ "$live" = 1 ] && [ -n "$RS_REPLACES" ]; then
     if [ "$RS_REPLACES" != "$ka" ]; then
       fail 58 "--replaces names an id this slug's lease does not hold, so it would record a replacement for a job that is not the one driving this run; the lease's own id is: $ka"
@@ -6333,6 +6331,23 @@ verb_resume() { # slug
     echo "unattended: keepalive replaced — the run-state file now names $KID in place of $RS_REPLACES"
     verb_status "$slug" || return 1
     print_resume_orientation "$rel" "$p"
+    return 0
+  fi
+  # THE RESTART: the holder's process restarted — the resume tick's relaunch is
+  # `claude -p --resume <session>`, whose first turn moves the very transcript this clock reads, so
+  # no freshness test is taken here. It goes through `run_takeover`, because an unwatched relaunch is
+  # where the mandate is re-verified and interrupted acts are named. Two live processes of one session
+  # are what it refuses: the tick kills the recorded pid's tree before it launches, so its relaunch
+  # passes, and a second copy started by hand while the first still runs does not. The recorded pid
+  # is not CLAUDE_PID here, which the caller test above already holds.
+  if [ -n "$restart" ]; then
+    if [ -n "$ls_pid" ] && [ "$ls_pid" != absent ] \
+       && [ "$(check_pid_alive "$ls_pid" "$(fact "$rel" pid-image)" "$ls_utc")" = yes ]; then
+      fail 58 "this session is the one the record names, and the process the record names for it is still alive and is not this one, so a take-over here would drive one slug from two processes of one session; stop that process, or resume from it: recorded pid $ls_pid, this CLAUDE_PID ${CLAUDE_PID:-unset}"
+      return 1
+    fi
+    echo "unattended: the session this record names resumes under a new keepalive, so its process restarted and this resume TAKES THE RUN OVER in its place"
+    run_takeover "$slug" "$rel" "$KID" working "$p" || return 1
     return 0
   fi
   if [ "$live" = 1 ] && [ -z "$ls_utc" ]; then

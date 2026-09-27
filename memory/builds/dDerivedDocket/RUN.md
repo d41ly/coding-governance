@@ -323,3 +323,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-27T18:10:25Z dispatch · item 6c26f05a TOOL-dDerivedDocket-62 · reason tools/unattended memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md memory/map/features/unattended.md memory/map/features/unattended-mandate.md memory/map/features/unattended-stops.md memory/project/unarmed-branches.txt memory/builds/dDerivedDocket/spec/2026-09-22-spec-TOOL-dDerivedDocket-62.md memory/builds/dDerivedDocket/build/2026-09-27-build-TOOL-dDerivedDocket-62-1-acceptance-ledger.md
 
 2026-09-27T18:10:29Z brief · item TOOL-dDerivedDocket-62 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T18:52:32Z dispatch · item 5751d264 TOOL-dDerivedDocket-63 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/features/unattended-stops.md memory/builds/dDerivedDocket/spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md memory/builds/dDerivedDocket/build/2026-09-27-build-TOOL-dDerivedDocket-63-1-acceptance-ledger.md
+
+2026-09-27T18:52:36Z brief · item TOOL-dDerivedDocket-63 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
