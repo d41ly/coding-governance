@@ -249,7 +249,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   until a declaration claims it, and an exemption naming a path that no longer exists reds too,
   because a stale one silently widens the surface it was written to narrow.
 - Keep the automated suite green at the push boundary: `bash tools/run-gates/run-gates.sh — the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
-- Wire the suite into remote CI as machine-required checks (`none yet — .githooks/pre-push decides at the push boundary whether a full bar is owed`) — convention is not enforcement.
+- Wire the suite into remote CI as machine-required checks (`.github/workflows/remote-ci.yml`) — convention is not enforcement.
 - Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `bash tools/run-gates/run-gates.sh`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.
 - Single source of truth → generated artifacts → parity gate, for every contract duplicated across languages/layers; a new shared contract gets ONE source, generation, and a drift test — never a hand-kept second copy.
@@ -503,10 +503,8 @@ scheduled longest-first from a timing cache the runner resolves and NAMES on its
 while REPORTING is
 always manifest order, so output is byte-stable whatever the width and a corrupt cache costs wall
 clock only. **A KIT'S SELF-TESTS ARE NOT ON THIS BAR.** Owner ruling, 2026-08-23, and the first kit to take it is
-`unattended`: a suite that stages breaks into a copy of a checker has a job only when that checker's
-source changes, and none at all in an adopter's repo that copy-installs the kit and never edits it.
-Its `*.test.sh` legs left both `tools/gate-legs.json` and the kit's own `kit.toml`, so adopters
-stop receiving them too. What stayed are the legs whose subject is the REPOSITORY rather than the
+`unattended`: why, and what left its descriptor, is `tools/unattended/README.md`.
+What stayed are the legs whose subject is the REPOSITORY rather than the
 kit, because those go stale with nobody editing it; which, and how many, are its
 `tools/unattended/` rows in `tools/gate-legs.json`. On demand:
 `bash tools/unattended/run-unattended-gates.sh`. The compensating check is written into that kit's
@@ -537,7 +535,9 @@ repo-GLOBAL, so the hook gating your push is the PRIMARY tree's; check H REPORTS
 branch guard, refusing a primary-tree commit off the default branch (`GOV_DEFAULT_BRANCH` pins it).
 A SessionStart hook runs `tools/check-wiring.sh --session`, which auto-sets an unset
 `core.hooksPath` and never clobbers a set one, so a fresh clone self-heals rather than running with
-dormant gates. Wiring the bar into remote CI needs a `workflow`-scoped push and is a follow-up.
+dormant gates. Remote CI is `.github/workflows/remote-ci.yml`: `history-audit` and `bar` on every
+push to main, `held-plan` and `held` running the held self-tests daily. It detects after landing,
+since landing stays a direct push, and no job is a required check.
 
 **Two protocols are BINDING, and they are rules rather than leg descriptions.**
 

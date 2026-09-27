@@ -120,6 +120,10 @@ skills/session-kickoff/SKILL.md text eol=lf
 # core.autocrlf smudged every unpinned path on the way out.
 tools/hooks/*.js text eol=lf
 tools/workflows/*.js text eol=lf
+# The remote-CI workflow, TOOL-dDerivedDocket-32. GitHub runs the committed blob, whose `run:` bodies
+# are bash; the pin keeps this fleet's working copy LF too, so the bytes a person verifies before
+# staging are the bytes GitHub runs. A CLASS, so a second workflow file lands LF without an edit.
+.github/workflows/*.yml text eol=lf
 # The unattended kit's hooks and their shared module, pinned for the same reason as the two lines
 # above: they run under node from a settings.json command, and the index already holds them LF.
 tools/unattended/*.js text eol=lf

@@ -10,9 +10,12 @@
 # for every kit, which is what the ruling always implied and nobody had built.
 #
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
-# nothing runs these automatically. A change under a kit that guts a check lands green. The
-# compensating check is a person invoking this script, and the Definition of Done for any work
-# touching a kit is this, pasted into the landing report: `--attribute` against the build's BASE
+# no merge bar and no push runs these. In gov itself the daily schedule in
+# `.github/workflows/remote-ci.yml` runs each one AFTER landing, under its hang bound and with no
+# cost verdict (TOOL-dDerivedDocket-32); an adopter's tree has that schedule only if it writes one.
+# So a change under a kit that guts a check still lands green. The compensating check is a person
+# invoking this script, and the Definition of Done for any work touching a kit is this, pasted
+# into the landing report: `--attribute` against the build's BASE
 # reads `verdict clean` — no NEW FAIL, no DEAD PROBE at L and no OVER BUDGET at L — and every suite
 # reporting an INHERITED FAIL or a DEAD PROBE at R is named by a filed backlog record.
 #

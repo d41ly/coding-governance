@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-32 — remote CI on every push
 
-**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 30
+**Status:** CLOSED · rev-6 · 2026-09-27 · node d · Tier-2 · base fb07ca25 · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-27-build-TOOL-dDerivedDocket-32-1-acceptance-ledger.md](../build/2026-09-27-build-TOOL-dDerivedDocket-32-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
@@ -59,10 +60,10 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   refuses — red, naming the row — when a row does not parse, when the parsed count differs from the
   `row(s)` figure `--list` prints, when `run-selftests.sh --kit "<argv>" --list` selects anything but
   that one row, or when the entries exceed the platform's 256-entry matrix limit. Each `held` job runs
-  its one suite as the sweep runs a suite (`tools/run-gates/run-selftests.sh:571`), without calling
+  its one suite as the sweep runs a suite (`tools/run-gates/run-selftests.sh:625`), without calling
   `--sweep`, whose scratch root holds each suite's output and is deleted on exit: it resolves a
   launcher by sourcing `tools/lib/resolve-python.sh`, rewrites a leading `python` or `python3` in the
-  argv to it as the bar runner does for a leg (`tools/run-gates/run-gates.sh:1369`), and runs
+  argv to it as the bar runner does for a leg (`tools/run-gates/run-gates.sh:1934`), and runs
   `timeout -k 5 <bound> bash -c "<argv>"` under a private `TMPDIR` with `set -o pipefail`, its
   combined output piped through `tee` into the workspace file its upload names. The step's exit
   status is the suite's verdict, 124 or 137 read as a kill at its bound. It uploads that file as
@@ -188,7 +189,7 @@ The runner is not a node. Every recorded green was also earned in a clone at
 `C:/projects/coding-governance`, with an `origin/HEAD` that `git clone` set, on a machine with no job
 limit. `PRIMARY_TREE_A` and `WORKTREE_ROOT_A` are `derived` placeholders filled from the parent of
 `--git-common-dir`, and an answer overrides one only when its probe finds nothing
-(`tools/playbook/render_playbook.py:405-419`), so a bar run from `actions/checkout`'s workspace
+(`tools/playbook/render_playbook.py:400-419`), so a bar run from `actions/checkout`'s workspace
 renders a different region and the unguarded `playbook render wiring` leg prints DRIFT on every push.
 The bar job therefore clones to that path, which `actions/checkout`'s `path` cannot leave the
 workspace to reach.
@@ -210,8 +211,8 @@ were measured on this repo's nodes, and a runner with a different clock would re
 nothing wrong in the tree. It keeps the sweep's hang bound, the budget times the
 `sweep-ceiling-factor` the budget file declares, and runs each suite as `--sweep` does, without
 calling it: the sweep writes each suite's output under a `mktemp -d` root its EXIT trap deletes and
-prints only verdict lines, at most four for a FAIL (`tools/run-gates/run-selftests.sh:492-493` and
-`:681`), so a `tee` of the sweep captures a header and not what ran (§8 F7). One suite's bound exceeds
+prints only verdict lines, at most four for a FAIL (`tools/run-gates/run-selftests.sh:546-547` and
+`:735`), so a `tee` of the sweep captures a header and not what ran (§8 F7). One suite's bound exceeds
 the hosted job's 21600 s: `unattended gate selftest`, 13600 s times 2 is 27200 s (PINNED,
 re-measured at BASE 2026-09-20, and still the only one). Such a suite runs under the cap S9 states,
 so its kill is named and its partial output is published.
@@ -221,7 +222,10 @@ at BASE declares 63 rows and 55930 leg-seconds, with one suite budgeted at 13600
 job's 360-minute limit. PINNED as measured on 2026-09-20. At `abac6d59` the same command read 62 rows
 and 55710 s; the one arrival is `unattended gate-guard selftest` at 220 s, declared alongside the
 hook `TOOL-aDeferredBar-3` landed, and its derived bound of 440 s crosses no threshold this unit
-states. Deriving one entry per suite from `--list`,
+states. At `17841e72`, after the origin/main merge and units 23 to 31, it reads 72 rows and 56793 s,
+and `unattended gate selftest` is still the only suite whose bound passes the 21000 s cap S9
+states: the next largest, `unattended driver selftest` at 3860 s, derives 7720 s. Deriving one
+entry per suite from `--list`,
 the runner's own resolved output — the budget file's argv column is blank on most rows, which read
 their argv from `tools/gate-legs.json`, and `--kit` is a substring filter, so directories do not
 partition the population (G5 H4, measured 2026-09-14) — at run time means a new suite joins the
@@ -472,14 +476,15 @@ S7) · `tools/run-gates/run-selftests.sh` (header) ·
   run in it prints `render-playbook: DRIFT — the charter region differs from a fresh render`;
   `python tools/playbook/render_playbook.py --target .` run in the same clone, without `--check`,
   prints `derived   PRIMARY_TREE_A = <second path>`, and `git diff AGENTS.md` there shows changed
-  lines only where they carry the second path; `python tools/drift-audit/drift_report.py --check`
+  lines only where they carry the second path or its final segment, which `derive_project_name`
+  reads as the project name; `python tools/drift-audit/drift_report.py --check`
   exits 2 naming the unresolved default branch; and after `git remote set-head origin main` the
   report no longer refuses on its base ref. The journal records the four readings, and the
   workflow's `bar` job clones to `C:/projects/coding-governance`.
   Red when: the bar job runs in `actions/checkout`'s workspace, so the per-sha verdict is red on
   every push for a host reason and reads as noise; or a node fact other than the clone path also
   drifts on the runner, which the bare DRIFT line cannot tell apart and the write-mode diff shows as a
-  changed line that does not carry the second path.
+  changed line that carries neither the second path nor its final segment.
 - **AC13** — When the workflow file's `on:` block and each job's `if:` are read, `on:` names `push`
   with `branches: [main]`, `schedule` and `workflow_dispatch`, and no event whose name begins
   `pull_request`; `history-audit` and `bar` run only on `push`, and `held-plan` and `held` only on
@@ -678,13 +683,29 @@ its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
 - rev-5 · 2026-09-21 · order re-declared from 32 to 30 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 30, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
+- rev-6 · 2026-09-27 · regrounded at `17841e72` before the code, which carries the origin/main merge
+  at `c23d5701` and units 23 to 31. Six citations moved: S4's sweep line reads `:625` and the bar's
+  launcher rewrite `:1934`; §4's renderer block reads `:400-419` and the sweep's scratch root and
+  verdict tail `:546-547` and `:735`; §10's `GATE_WALL` read reads `:473`. §4 re-measures the held
+  population at 72 rows and 56793 s, still with one suite over the cap; S9, AC5 and AC11 read
+  `--list` at run time and needed no edit, and AC5's "63 rows" names the population its Red-when was
+  written against rather than a bound. S7's three movements re-measure as written — the follow-up
+  sentence 80 bytes before its separating space, the trim 307, the render's saving 56 — and
+  `AGENTS.md` reads 63691 at this unit's parent, so AC8's parent read is the binding one. AC4's
+  lower bound, `ceiling_max`, reads 16040 when the verb's own predicate is run over
+  `tools/gate-legs.json` directly. One criterion moved, found by running it: AC12's write-mode diff
+  at a second path changes TWO lines, the node-registry row carrying the whole path and the
+  preamble's project name carrying its final segment, because `derive_project_name` is the primary
+  tree's basename (`tools/playbook/render_playbook.py:101-107`). Both are the clone path; AC12 now
+  says so, and the bar job's clone to `C:/projects/coding-governance` renders both as committed. No
+  scope item or design choice moved.
 
 ## 10. Reuse audit
 
 Nothing here builds a gate engine: every job runs a command the bar already owns. The history audit is
 `tools/memory-tree/check-memory-hygiene.sh` as the `memory hygiene` leg runs it; the per-sha verdict is
 `tools/run-gates/run-gates.sh` with `GATE_FULL=1` and its existing `GATE_WALL` override at
-`tools/run-gates/run-gates.sh:422`; the held run is each suite's own argv, run the way
+`tools/run-gates/run-gates.sh:473`; the held run is each suite's own argv, run the way
 `tools/run-gates/run-selftests.sh --sweep` runs one suite and with the launcher rewrite
 `tools/run-gates/run-gates.sh` applies to a leg, without calling the sweep, whose scratch root
 deletes the output the held job exists to publish (§8 F7). The charter line is derived by

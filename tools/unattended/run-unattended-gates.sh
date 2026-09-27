@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-unattended-gates.sh — this kit's SELF-TESTS, run on demand and nowhere else.
+# run-unattended-gates.sh — this kit's SELF-TESTS, run on demand and never on the merge bar.
 #
 # THE SPLIT, which is the whole point of this file. Two kinds of check live in this directory and they
 # have different subjects:
@@ -22,11 +22,14 @@
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
-# nothing runs the self-tests automatically. A change under this directory that guts a check lands
-# green. The compensating check is a person invoking this script, and the DoD for any work touching
-# `tools/unattended/` is this: `--attribute` against the build's BASE reads `verdict clean` — no NEW
-# FAIL, no DEAD PROBE at L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or
-# a DEAD PROBE at R is named by a filed backlog record.
+# no merge bar and no push runs the self-tests. In gov itself the daily schedule in
+# `.github/workflows/remote-ci.yml` runs each one AFTER landing, under its hang bound and with no
+# cost verdict (TOOL-dDerivedDocket-32); an adopter's tree has that schedule only if it writes one.
+# So a change under this directory that guts a check still lands green. The compensating check is
+# a person invoking this script, and the DoD for any work touching `tools/unattended/` is this:
+# `--attribute` against the build's BASE reads `verdict clean` — no NEW FAIL, no DEAD PROBE at L and
+# no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or a DEAD PROBE at R is named by
+# a filed backlog record.
 #
 # WHY NOT A BARE GREEN, which is what this line demanded until `TOOL-dDerivedDocket-1`: this kit's
 # own suites are red at their base for causes filed elsewhere (`TOOL-aHoistedPass-36`,
