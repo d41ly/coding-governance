@@ -65,7 +65,7 @@ to = "{memory_root}/guides/UNATTENDED-VERBS.md"
 placeholders = []
 
 # the stop contract, the verb carrier's twin. HELD, the hold codes, the release conditions, the
-# per-slug lease and the resume matrix live here so the protocol — which stood 1,116 bytes under
+# lease and the resume matrix live here so the protocol — which stood 1,116 bytes under
 # its cap — keeps two pointers instead of a contract. Placeholder-free like the three above it.
 [[files]]
 include = ["STOPS.template.md"]
@@ -154,7 +154,7 @@ file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS", "LEASE_STALE_AFTER", "RESUME_SCHEDULE", "RESUME_SCHEDULE_CREATE", "RESUME_SCHEDULE_DELETE", "RESUME_SCHEDULE_DELAY", "RESUME_SCHEDULE_LIMIT", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS", "RESUME_SCHEDULE", "RESUME_SCHEDULE_CREATE", "RESUME_SCHEDULE_DELETE", "RESUME_SCHEDULE_DELAY", "RESUME_SCHEDULE_LIMIT", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]

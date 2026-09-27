@@ -24,6 +24,8 @@
  *
  * THE DECISION on a bound session, in this order (spec §4 table, amended by TOOL-aWokenSentinel-8):
  *   verdict TERMINAL              allow   `terminal`
+ *   verdict HELD                  allow   `held` — a paused run's restart is the durable schedule
+ *                                         `--hold` printed, so its session stops with nothing to do
  *   no verdict, non-zero exit,
  *     or the liveness bound       allow   `liveness-unreadable`
  *   background_tasks non-empty    allow   `background-tasks` — the harness re-invokes the session
@@ -91,7 +93,7 @@ const BLOCKS_DEFAULT = 6
 // The driver's startup is seconds; sixty is the ceiling past which a hung liveness reads as
 // unreadable and allows. STOP_GUARD_LIVENESS_BOUND_MS overrides it — the fixture's seam.
 const LIVENESS_BOUND_MS = 60000
-const REASONS = ['terminal', 'liveness-unreadable', 'background-tasks', 'knob-malformed',
+const REASONS = ['terminal', 'held', 'liveness-unreadable', 'background-tasks', 'knob-malformed',
                  'blocks-exhausted', 'landing-unstamped', 'run-open']
 
 /**
@@ -135,6 +137,10 @@ function measureBlocks(sidecar, sessionId) {
 function checkStop(liveness, backgroundTasks, knob, blocks) {
   if (!liveness) return { decision: 'allow', reason: 'liveness-unreadable' }
   if (liveness.verdict === 'TERMINAL') return { decision: 'allow', reason: 'terminal' }
+  // TOOL-dDerivedDocket-61 S5: a HELD run is paused on purpose and its session was told to file
+  // nothing and stop, so the stop is allowed before `background-tasks` is consulted and no block is
+  // spent on it. `--liveness` reads HELD ahead of STALE, so a silent paused run never reaches run-open.
+  if (liveness.verdict === 'HELD') return { decision: 'allow', reason: 'held' }
   if (backgroundTasks > 0) return { decision: 'allow', reason: 'background-tasks' }
   if (knob.source === 'malformed') return { decision: 'allow', reason: 'knob-malformed' }
   if (blocks >= knob.value) return { decision: 'allow', reason: 'blocks-exhausted' }

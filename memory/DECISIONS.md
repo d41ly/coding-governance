@@ -119,6 +119,7 @@
 - **TOOL-dDerivedDocket-33** — **D2 and D6 signed by rule, under delegation**: `builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signed-same-id.md`, `builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signed-triage.md`; the rules are its spec's §4.
 - **TOOL-dDerivedDocket-24** — **gov lands over an inherited-only red** (D12-i4, bound 10 landings; the kit default parks): departs from the charter's 'blocks a red one' and 'green at the push boundary' and from the protocol's `gates-green`. Contract `guides/UNATTENDED-STOPS.md` §13.
 - **TOOL-dDerivedDocket-31** — **M6's parallel MUST binds DELEGATED passes only** (D12-i10): an inline author may sequence proven-disjoint passes and says so in the brief; narrows TOOL-aHoistedPass-10's parallel-on-proof. Rule `guides/BUILD-METHOD.md` M6.
+- **TOOL-dDerivedDocket-61** — **one lease record, the run-state facts** (owner ruling 2026-09-22, as relayed): the per-slug lease file retires, `RESUME_STALE_BOUND` is the one bound, and HELD is carved out of the stop-guard, `--liveness` and the tick. Contract `guides/UNATTENDED-STOPS.md` §7.
 
 ## DEPL — deployer
 

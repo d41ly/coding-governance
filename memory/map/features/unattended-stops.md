@@ -2,7 +2,7 @@
 
 ```toml
 feature = "unattended-stops"
-title = "The unattended run's stops: HELD, the per-slug lease and the process ledger"
+title = "The unattended run's stops: HELD, the lease and the process ledger"
 status = "building"
 streams = ["tooling"]
 decisions = ["TOOL-dDerivedDocket-4", "TOOL-dDerivedDocket-28"]
@@ -33,28 +33,28 @@ proceeds, this one is how it pauses, which session drives it, and which processe
 
 ## Constraints & why
 
-**A stop the run cannot fix is a PAUSE, not an ending.** `HELD` is non-terminal: entered by
-`--hold` with a code, a condition and a witness, left by `--resume` alone. A per-slug LEASE
-under the git common dir keys on the session-scoped keepalive id, so a resume tells orientation
-from take-over. Every `phase` read routes through `read_derived_phase` or `read_recorded_phase`.
-A hold on a review that deferred twice records its Workflow runId (`--pending-run`, fact
-`hold-run`), and the take-over prints the relaunch (`TOOL-dDerivedDocket-29`).
-See `UNATTENDED-STOPS.md`.
+**A stop the run cannot fix is a PAUSE, not an ending.** `HELD` is non-terminal: entered by `--hold`
+with a code, a condition and a witness, left by `--resume` alone. The LEASE is the run-state file's
+facts, judged fresh by `--liveness`, which reads `HELD` as its own verdict, so a resume tells
+orientation from take-over. Every `phase` read routes through `read_derived_phase` or
+`read_recorded_phase`. A hold on a review that deferred twice records its Workflow runId
+(`--pending-run`, fact `hold-run`), and the take-over prints the relaunch
+(`TOOL-dDerivedDocket-29`). See `UNATTENDED-STOPS.md`.
 
 **A process not in the ledger is never killed.** Every command the driver starts through
 `run_bounded` is recorded by identity, pid and procfs start token beside the driver's own, in a
-per-slug ledger beside the lease, and only a recorded process alive with its token while its driver
-is gone is reaped (`TOOL-dDerivedDocket-28`). Only the verbs that hold the lease reap, one orphan at
-a time through `PROCMON_CMD --kill-msys <pid>`, and success is read back from the pid rather than
-from the reaper's exit. The runner's wrapper carries the repository root as its `$0`, which is what
-lets the process-monitor fence admit a tree whose parent is gone. Matching by command line was ruled
-out by the run that found five of six same-named processes to be another repository's.
+per-slug ledger, and only a recorded process alive with its token while its driver is gone is reaped
+(`TOOL-dDerivedDocket-28`). Only the verbs that hold the lease reap, one orphan at a time through
+`PROCMON_CMD --kill-msys <pid>`, and success is read back from the pid rather than from the reaper's
+exit. The runner's wrapper carries the repository root as its `$0`, which is what lets the
+process-monitor fence admit a tree whose parent is gone. Matching by command line was ruled out by
+the run that found five of six same-named processes to be another repository's.
 
 ## Shared seams
 
 - `reap.py --kill-msys` — process-monitor's fenced, leaves-first kill, which `PROCMON_CMD` names.
   The driver calls it and reimplements neither the fence nor the walk.
-- `resolve_lease_path` — the one derivation of the lease's directory; the ledger's path is derived
+- `resolve_landed_log` — the one derivation of the log's directory; the ledger's path is derived
   from it, so the two files cannot drift apart.
 
 ## Reuse affordance

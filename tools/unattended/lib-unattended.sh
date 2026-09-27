@@ -69,8 +69,8 @@ resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir c
 }
 
 # ------------------------------------------------------------------------------ bounds, once
-# MOVED from the driver by TOOL-aWokenSentinel-5, body unchanged: the resume tick reads its two
-# knobs through this function, and the driver its four, so it lives where both source it. THE
+# MOVED from the driver by TOOL-aWokenSentinel-5, body unchanged: the resume tick reads its knobs
+# through this function, and the driver its bound keys, so it lives where both source it. THE
 # CALLING-SHELL CONTRACT, on the function line and ASSERTED by its first line (TOOL-aWokenSentinel-18):
 # `${!name}` reads the calling shell, and the NOTE interpolates `$CONF`, so a caller that named no
 # conf would be handed a default announced with nowhere to change it — `Declare one in  to change
@@ -953,14 +953,39 @@ read_run_exclusions() { # witness · base · run-state path -> the exclusion tip
 # history back to the newest LANDING copy passes a staged, uncommitted LANDING and finds an EARLIER
 # run's landing commit - which is on the remote, and would derive the new run landed.
 #
-# So: the record must be byte-identical to HEAD's copy, and HEAD's copy must read `phase: LANDING`;
-# then the answer is the commit that last changed the path, as HEAD's history simplifies it. A staged
-# LANDING has no landing commit and cannot derive, which is right: no history a remote could carry
-# holds it. An unreadable HEAD copy is NOT LANDING, never read as one. Status 1 prints nothing.
+# So: the record must match HEAD's copy, and HEAD's copy must read `phase: LANDING`; then the answer
+# is the commit that last changed the path, as HEAD's history simplifies it. A staged LANDING has no
+# landing commit and cannot derive, which is right: no history a remote could carry holds it. An
+# unreadable HEAD copy is NOT LANDING, never read as one. Status 1 prints nothing.
+#
+# THE SIX LEASE-FACT LINES, and nothing else, may differ. `keepalive`, `session`, `pid`, `host`,
+# `pid-image` and `lease-utc` are the lines `write_lease` writes together; a difference that adds,
+# removes or rewrites only those holds, and an equal file holds trivially. The header lines before
+# the first hunk are git's, never the file's, so the scan starts at the first `@@`. Two callers and
+# no third: `read_landing_commit` below, and `--landed`'s `primary` clean check in the driver.
+check_lease_only_diff() { # run-state file -> 0 when it differs from HEAD in lease-fact lines alone
+  local _ld_f="${1:-}" _ld_d
+  [ -n "$_ld_f" ] || return 1
+  _ld_d=$(GIT diff -U0 HEAD -- "$_ld_f" 2>/dev/null) || return 1
+  [ -n "$_ld_d" ] || return 0
+  printf '%s\n' "$_ld_d" | awk '
+    /^@@ / { h = 1; next }
+    !h { next }
+    /^\\/ { next }
+    /^[+-]/ { l = substr($0, 2); sub(/\r$/, "", l)
+              if (l !~ /^(keepalive|session|pid|host|pid-image|lease-utc):( |$)/) bad = 1 }
+    END { exit bad ? 1 : 0 }'
+}
+
+# "MATCH" IS `check_lease_only_diff`, not byte equality (TOOL-dDerivedDocket-61 S8). `--resume
+# --keepalive-id` re-binds a pushed landing `--landed` has not yet observed, and that re-bind rewrites
+# the six lease-fact lines of a record the push already carried. Committing it would move HEAD off
+# the pushed tip, so it stays a working-copy difference, and a difference confined to those six lines
+# is read as none. Every other byte, the phase line among them, must still match.
 read_landing_commit() { # run-state file -> the commit that carries it at LANDING, or status 1
   local _lc_f="${1:-}" _lc_ph _lc_c
   [ -n "$_lc_f" ] || return 1
-  GIT diff --quiet HEAD -- "$_lc_f" 2>/dev/null || return 1
+  check_lease_only_diff "$_lc_f" || return 1
   _lc_ph=$(GIT show "HEAD:$_lc_f" 2>/dev/null | sed -n 's/^phase: *//p' | head -1 | tr -d '\r')
   [ "$_lc_ph" = LANDING ] || return 1
   _lc_c=$(GIT log -1 --format=%H HEAD -- "$_lc_f" 2>/dev/null)

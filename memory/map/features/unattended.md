@@ -81,22 +81,22 @@ the stated boundary and the ask mandate are `unattended-mandate`.
 
 **Nothing in a script can reach the scheduler.** The job the agent schedules there is the IDLE-WAKE:
 it fires only while the session is idle, so it cannot wake a stalled one; its prompt runs
-`--resume --keepalive-id`, which refreshes the lease, then `--audit`, the unit stall probe. What
-wakes a run is the keepalive — the stop-guard at turn end, the stall-recorder at error end, the
-resume tick from the OS scheduler — three actors outside the session, reading one predicate,
-`--liveness`. The tick launches only on a lease the INDEX holds, on the node that took it; the
-reap is read back at `--landed` against the stop-guard's listing.
+`--resume --keepalive-id`, then `--audit`, the unit stall probe. What wakes a run is the keepalive —
+the stop-guard at turn end, the stall-recorder at error end, the resume tick from the OS scheduler —
+three actors outside the session, reading one predicate, `--liveness`. The tick launches only on a
+lease the INDEX holds, on the node that took it; the reap is read back at `--landed` against the
+stop-guard's listing.
 
-**How a run stops, who drives it and which processes are its own has its own dossier.** HELD,
-the per-slug lease and the process ledger are `unattended-stops`.
+**How a run stops, who drives it and which processes are its own has its own dossier.** HELD, the
+lease and the process ledger are `unattended-stops`.
 
 **LANDED is DERIVED, not written after the push (TOOL-dDerivedDocket-22, ruling D12-i2).** A
 committed `LANDING` record whose own commit the advertised tip holds reads landed, found by CONTENT
 through the library's `read_landing_commit`, so the driver's readers and the leg's check 7, fact-set
 arm and grant arm agree about one record; the committed LIVE index never derives. In-place
-`--landed` only observes and keeps that in the lease; `--preflight` writes a derived record `LANDED`
-in a scratch copy, names and stages it, and only then moves it. The dating residual is
-`--follow` following a COPY at a record's first commit — toward grandfathering on a real history.
+`--landed` only observes, and logs that; `--preflight` writes a derived record `LANDED` in a scratch
+copy, names and stages it, and only then moves it. The dating residual is `--follow` following a
+COPY at a record's first commit — toward grandfathering on a real history.
 
 **Declarations, not constants.** The phase vocabulary, the Definition-of-Done set, the lander, the
 bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and

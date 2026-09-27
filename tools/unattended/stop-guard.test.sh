@@ -146,6 +146,22 @@ check_same "AC3 line decision" "$(read_field "$(derive_sidecar "$F")" decision)"
 check_same "AC3 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "terminal"
 check_same "AC3 line blocks" "$(read_field "$(derive_sidecar "$F")" blocks)" "0"
 
+# ---- TOOL-dDerivedDocket-61 AC6: a HELD verdict ALLOWS with reason `held`, ahead of the pending
+# ---- background task this payload carries, and spends no block: a session that held correctly and
+# ---- stops is never told to --plan or --abort. The same record read BUILDING is blocked `run-open`.
+F=$(build_fixture HELD "$SID"); set_liveness HELD HELD
+run_hook "$(build_payload "$F" '{"background_tasks":[{"id":"t1"}]}')"
+check_same "U61 held rc" "$RC" "0"
+check_same "U61 held stdout empty" "$OUT" ""
+check_same "U61 line decision" "$(read_field "$(derive_sidecar "$F")" decision)" "allow"
+check_same "U61 line reason is held, ahead of background-tasks" "$(read_field "$(derive_sidecar "$F")" reason)" "held"
+check_same "U61 line blocks" "$(read_field "$(derive_sidecar "$F")" blocks)" "0"
+set_liveness BUILDING LIVE
+run_hook "$(build_payload "$F")"
+check_same "U61 the same record at BUILDING is blocked run-open" "$(read_field "$(derive_sidecar "$F")" reason)" "run-open"
+check_same "U61 REASONS carries held directly after terminal" \
+  "$(node -e 'const m=require(process.argv[1]);console.log(m.REASONS.slice(0,2).join(" "))' "$(resolve_native "$HOOK")")" "terminal held"
+
 # ---- AC4: a pending background task allows — the harness re-invokes the session when it ends.
 F=$(build_fixture BUILDING "$SID"); set_liveness BUILDING LIVE
 run_hook "$(build_payload "$F" '{"background_tasks":[{"id":"t1"},{"id":"t2"}]}')"
@@ -351,6 +367,29 @@ if [ -f "$FR/$KIT_REL/stop-guard.js" ] && [ -f "$FR/$KIT_REL/unattended.sh" ]; t
   check_hit "$(extract_reason "$OUT")" "block 1/6" "AC11 the real driver's open run blocks"
   check_same "AC11 line verdict is the driver's own" "$(read_field "$(derive_sidecar "$FR")" verdict)" "$REAL_VERDICT"
   check_same "AC11 line phase" "$(read_field "$(derive_sidecar "$FR")" phase)" "BUILDING"
+  # ---- TOOL-dDerivedDocket-61 AC10: an OBSERVED in-place landing, read from a LINKED worktree other
+  # ---- than the one that landed it, is TERMINAL to the real driver and its stop is allowed
+  # ---- `terminal`; without the line in the COMMON dir's landed log the same stop is not. The line is
+  # ---- planted where the in-place `--landed` in another worktree writes it; the driver suite grades
+  # ---- that write. A per-worktree log would read nothing here, because W2's git dir is its own.
+  sed -i 's/^phase: .*/phase: LANDING/' "$FR/memory/builds/fx/RUN.md"
+  ( cd "$FR" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+      && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git commit -q -m close ) >/dev/null 2>&1
+  FRC=$(git -C "$FR" rev-parse HEAD); FW2="$TMP/real-w2"
+  git -C "$FR" worktree add -q --detach "$FW2" "$FRC" >/dev/null 2>&1
+  FCD=$(cd "$FR" && cd "$(git rev-parse --git-common-dir)" && pwd); mkdir -p "$FCD/unattended"
+  printf '2026-09-27T00:00:00Z landed %s on refs/heads/main at %s\n' "$FRC" "$FRC" > "$FCD/unattended/landed.fx.log"
+  FW2S="$(cd "$FW2" && cd "$(git rev-parse --git-dir)" && pwd)/unattended/stop.fx.log"
+  check_same "U61 the real driver reads the observed landing TERMINAL from W2" \
+    "$( cd "$FW2" && bash "$FR/$KIT_REL/unattended.sh" --liveness fx 2>/dev/null | sed -n 's/^verdict: //p' )" "TERMINAL"
+  OUT=$(printf '%s' "$(build_payload "$FW2")" | node "$FR/$KIT_REL/stop-guard.js" 2>"$TMP/err"); RC=$?
+  check_same "U61 the observed landing's stop exits 0" "$RC" "0"
+  check_same "U61 ...is allowed" "$OUT" ""
+  check_same "U61 ...with reason terminal" "$(read_field "$FW2S" reason)" "terminal"
+  rm -f "$FCD/unattended/landed.fx.log"
+  printf '%s' "$(build_payload "$FW2")" | node "$FR/$KIT_REL/stop-guard.js" >/dev/null 2>&1
+  check_miss "$(read_field "$FW2S" reason)" "terminal" "U61 with no line in the landed log the same stop is not terminal"
+  git -C "$FR" worktree remove --force "$FW2" >/dev/null 2>&1
 else
   print_bad "AC11 the seed did not place the hook and the driver under $FR/$KIT_REL"
 fi
@@ -368,7 +407,11 @@ n=$((pass+fail))
 # RAISED 80 -> 104 by TOOL-aWokenSentinel-8: the `landing-unstamped` block run ALONE from the sourced
 # prologue on node a, 2026-09-20, executed 24 (13 5 3 3), green against the tip and 10 RED against
 # the hook at its base 6bb7ac75, where the stop was allowed with `finished-unstamped`.
-FLOOR_ASSERTIONS=104
+# RAISED 104 -> 116 by TOOL-dDerivedDocket-61: the HELD arm's 7 assertions beside AC3 and the
+# observed-landing arm's 5 inside the real-driver block, COUNTED off their own `check_*` lines, every
+# one unconditional within its block; the pass that wrote them ran no suite, and each was observed
+# by hand over a replica of this prologue.
+FLOOR_ASSERTIONS=116
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

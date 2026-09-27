@@ -119,7 +119,7 @@ row alongside the code.
 
 ## The process ledger — why the driver's death defines an orphan
 
-Every command the driver starts is recorded by identity beside the slug's lease, and only a recorded
+Every command the driver starts is recorded by identity in a per-slug ledger, and only a recorded
 process whose driver is gone is reaped (`UNATTENDED-STOPS.md` §14 is the rule). Two narrower
 definitions were rejected. "Any recorded process alive" kills the bar a background `--close` is
 still waiting on. "Recorded under a different keepalive id" never reaps a same-session orphan, which
