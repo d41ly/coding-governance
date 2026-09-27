@@ -173,7 +173,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 40 | 1 | SPECCED | rev-8 | 2026-09-22 |
 <!-- /gen:build-units -->
 
-Records: 69 bound to this build, across 4 record folder(s).
+Records: 70 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
