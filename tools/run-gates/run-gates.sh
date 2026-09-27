@@ -29,7 +29,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.9   # gov:kit run-gates@1.9
+KIT_RUN_GATES_VERSION=1.12   # gov:kit run-gates@1.12
 # 1.8 -> 1.9: both sides of the origin/main merge into dDerivedDocket shipped a 1.8 - theirs the
 # run log below, ours red attribution (GATE_ATTRIBUTE, lib-attribute.sh and the manifest's eighth
 # field `signature`, TOOL-dDerivedDocket-23). 1.9 carries both, and neither moves a verdict.
