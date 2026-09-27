@@ -22,14 +22,18 @@ schedule and still carry the compensating-check wording. The unattended header's
 been split across two lines, so it is re-flowed onto one.
 
 The spec moved to rev-6 before the code: six line citations moved on the tree. AC12 was amended at
-the same rev after running it, as its line below says.
+the same rev after running it, as its line below says. Rev-7 followed the bug-class checklist over
+the built unit, which named `bounded-through-a-pipe-is-unbounded`: `timeout` bounds the suite and
+not `tee`, which reads until its last writer closes. So the held run step now declares a per-entry
+step timeout that the plan derives from the run bound. S9 and AC11 say so, and every reading below
+was taken again over the rev-7 workflow.
 
 No merge bar, no gate leg and no suite ran in this pass. The direct checks, and what each stands in for:
 
-- a scratch reader of the workflow file, run on the real file and then on 22 scratch copies, one
-  staged break each for every AC1, AC2, AC4, AC10 and AC13 break the spec names. Every break reddened
-  the read written for it, and the copy was deleted after each run. This stands in for the absent
-  permanent gate (§8 F2).
+- a scratch reader of the workflow file, run on the real file and then on 23 scratch copies, one
+  staged break each for every AC1, AC2, AC4, AC10 and AC13 break the spec names plus AC11's step
+  timeout. Every break reddened the read written for it, and the copy was deleted after each run.
+  This stands in for the absent permanent gate (§8 F2).
 - the `held-plan` step's own body, extracted from the workflow and run by hand over the real
   `--list`. It took 72 rows and ran 72 one-row checks, then was re-run under four staged arms.
 - the `held` step's own body over two synthetic entries, with a `python3` stub on `PATH`.
@@ -87,7 +91,9 @@ does not touch.
 - AC11 — `platform-bounded` — every bound equals budget times `sweep-ceiling-factor` 2. The cap is
   21000 s, from `timeout-minutes: 360` in the `held` job. The one marked suite,
   `unattended gate selftest`, is the only row over the cap and runs at 21000. Every other row runs
-  at its own bound.
+  at its own bound. Every `step_minutes` equals the run bound plus 65 s rounded up to minutes, the
+  largest 352 against the job's 360. The run step declares it, and a copy with that line deleted
+  reddened the read.
 - AC12 — amended rev-6 — the write-mode diff at a second path changed two lines, the registry row
   carrying the whole path and the preamble's project name carrying its final segment, so the
   criterion now names both. The other readings: --check printed the DRIFT line and exited 1; write

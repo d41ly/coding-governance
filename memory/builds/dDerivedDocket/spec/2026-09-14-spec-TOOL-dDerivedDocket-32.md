@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-32 — remote CI on every push
 
-**Status:** CLOSED · rev-6 · 2026-09-27 · node d · Tier-2 · base fb07ca25 · streams tooling · order 30
+**Status:** CLOSED · rev-7 · 2026-09-27 · node d · Tier-2 · base fb07ca25 · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
@@ -133,8 +133,11 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   `platform-bounded` every suite whose bound exceeds the cap, `timeout-minutes` times 60 less 600
   seconds, so no suite runs uncapped between the cap and the job limit. A `platform-bounded` suite
   runs under the cap instead of its bound, so `timeout` kills it by name with ten minutes left for
-  its upload step, and its partial output is published as a named kill (§8 F7). Observed by AC11 and
-  AC14.
+  its upload step, and its partial output is published as a named kill (§8 F7). The plan also
+  emits each entry's step timeout, its run bound plus 65 seconds rounded up to whole minutes, and
+  the run step declares it: a pipe ends only when its last writer closes, so a grandchild that
+  outlives the kill would hold `tee` open to the job limit, and the step timeout ends it with the
+  upload still inside that limit. Observed by AC11 and AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -188,9 +191,10 @@ row absorbs: a four-core runner resolves to the `modest` row in `tools/run-gates
 The runner is not a node. Every recorded green was also earned in a clone at
 `C:/projects/coding-governance`, with an `origin/HEAD` that `git clone` set, on a machine with no job
 limit. `PRIMARY_TREE_A` and `WORKTREE_ROOT_A` are `derived` placeholders filled from the parent of
-`--git-common-dir`, and an answer overrides one only when its probe finds nothing
-(`tools/playbook/render_playbook.py:400-419`), so a bar run from `actions/checkout`'s workspace
-renders a different region and the unguarded `playbook render wiring` leg prints DRIFT on every push.
+`--git-common-dir`, `PROJECT_NAME` is that parent's basename, and an answer overrides one only
+when its probe finds nothing (`tools/playbook/render_playbook.py:400-419`), so a bar run from
+`actions/checkout`'s workspace renders a different region and the unguarded
+`playbook render wiring` leg prints DRIFT on every push.
 The bar job therefore clones to that path, which `actions/checkout`'s `path` cannot leave the
 workspace to reach.
 
@@ -465,12 +469,15 @@ S7) · `tools/run-gates/run-selftests.sh` (header) ·
 - **AC11** — When the plan job's derivation runs by hand, each printed bound equals the suite's
   `--list` budget times the `sweep-ceiling-factor` line of `tools/run-gates/selftest-budgets.txt`,
   the `platform-bounded` set equals the suites whose bound exceeds the 21000 s cap, and each of those
-  is emitted with a run bound of 21000 s; every `held` job in the workflow declares
-  `timeout-minutes: 360`.
+  is emitted with a run bound of 21000 s; each entry's `step_minutes` is its run bound plus 65 s
+  rounded up to whole minutes; every `held` job in the workflow declares `timeout-minutes: 360`,
+  and its run step declares the entry's `step_minutes` as its own.
   Red when: a suite whose bound exceeds the job limit is left unmarked or uncapped, so the platform
   cancels it unnamed and whether its output uploads rests on an unverified platform behaviour; or a
   suite whose bound lies between 21000 s and 21600 s runs uncapped, leaving its upload step no time;
-  or a held job runs at the platform's default limit.
+  or a held job runs at the platform's default limit; or the run step carries no step timeout, so a
+  grandchild holding `tee`'s pipe after the kill keeps the step alive until the platform cancels
+  the job, which is the unverified behaviour the cap exists to avoid.
 - **AC12** — When a runner-shaped clone of the branch is made at a second path — `git clone` there,
   then `git remote set-head origin --delete` — `bash tools/playbook/adopt-playbook.sh --target . --check`
   run in it prints `render-playbook: DRIFT — the charter region differs from a fresh render`;
@@ -699,6 +706,15 @@ its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
   tree's basename (`tools/playbook/render_playbook.py:101-107`). Both are the clone path; AC12 now
   says so, and the bar job's clone to `C:/projects/coding-governance` renders both as committed. No
   scope item or design choice moved.
+- rev-7 · 2026-09-27 · S9 · AC11 · §4 — the bug-class checklist over the built unit named
+  `bounded-through-a-pipe-is-unbounded`, and the held run step had an instance: `timeout` bounds
+  the suite, but `tee` reads until its last writer closes, so a grandchild that escapes the kill —
+  a native process the MSYS layer does not track — holds the step open to the job limit, the step
+  never prints its named kill, and the upload then races the platform's cancel, the one behaviour
+  S9's cap exists not to rely on. S9 adds a per-entry step timeout the plan derives from the run
+  bound, and AC11 reads it and names that break; the held job's `timeout-minutes` stays the one
+  source, since the cap and the step timeout both derive from it. §4's renderer sentence now also
+  names `PROJECT_NAME`, the other half of rev-6's AC12 amendment. No other criterion moved.
 
 ## 10. Reuse audit
 

@@ -156,7 +156,7 @@ jobs:
             tools/run-gates/selftest-budgets.txt | head -1) || factor=""
           wf=${GITHUB_WORKFLOW_REF#*/*/}; wf=${wf%%@*}
           minutes=$(awk '/^  [A-Za-z0-9_-]+:[[:space:]]*$/ { held = ($1 == "held:") }
-                         held && $1 == "timeout-minutes:" { print $2; exit }' "$wf") || minutes=""
+                         held && /^    timeout-minutes:[[:space:]]/ { print $2; exit }' "$wf") || minutes=""
           "$PY" - "$scratch/list.txt" "${factor:-}" "${minutes:-}" "$(cygpath -w "$BASH")" \
             tools/run-gates/run-selftests.sh <<'PY'
           import json, os, re, subprocess, sys
@@ -207,8 +207,11 @@ jobs:
           entries = []
           for (name, budget, argv), safe in zip(population, safes):
               bound = budget * factor
+              run_bound = min(bound, cap)
+              # The run step's own timeout: the run bound, timeout's 5 s kill-after and a minute
+              # for tee to drain, in whole minutes. The cap keeps it inside the job's limit.
               entries.append({"name": name, "safe": safe, "budget": budget, "bound": bound,
-                              "run_bound": min(bound, cap),
+                              "run_bound": run_bound, "step_minutes": -(-(run_bound + 65) // 60),
                               "platform_bounded": "yes" if bound > cap else "no", "argv": argv})
 
           # THE ONE-ROW CHECK. A key is a key only when the runner itself selects exactly its own
@@ -235,7 +238,7 @@ jobs:
           for e in entries:
               mark = "  platform-bounded" if e["platform_bounded"] == "yes" else ""
               print(f"held-plan: {e['name']:<46} budget {e['budget']:>6}s  bound {e['bound']:>6}s  "
-                    f"run {e['run_bound']:>6}s{mark}")
+                    f"run {e['run_bound']:>6}s  step {e['step_minutes']:>3}m{mark}")
           print(f"held-plan: {len(entries)} entries, factor {factor}, cap {cap}s "
                 f"(timeout-minutes {minutes_arg} x 60 less 600)")
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8", newline="\n") as out:
@@ -271,6 +274,10 @@ jobs:
         run: git symbolic-ref refs/remotes/origin/HEAD
       - name: run the suite as the sweep runs one, its output written as it runs
         working-directory: tree
+        # `timeout` bounds the suite and not the pipe: `tee` reads until its LAST writer closes, so a
+        # grandchild that escapes the kill would hold this step open to the job limit. The step
+        # timeout, derived by the plan from the same run bound, ends it with the upload still inside.
+        timeout-minutes: ${{ matrix.step_minutes }}
         env:
           HELD_NAME: ${{ matrix.name }}
           HELD_ARGV: ${{ matrix.argv }}
