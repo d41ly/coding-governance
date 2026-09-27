@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-lease-utc: 2026-09-27T14:17:19Z
+lease-utc: 2026-09-27T22:11:55Z
 pid-image: claude.exe
 host: compeeto
 pid: 37484
@@ -28,7 +28,7 @@ branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
 anchor-kind: run-branch
-keepalive: 3575a45e
+keepalive: 6ed4075c
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 7484d8d7b107c0357943345e11d9b1d9bc337bea
 anchor-ref: refs/heads/main
