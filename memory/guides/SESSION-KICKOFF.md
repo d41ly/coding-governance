@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-22T12:12:07+03:00 @ 67d2ccfcc36015df40c2db7c09db90f6670432b9
+last-audit: 2026-09-27T17:48:53+03:00 @ 663a0dec891d35716e8376480784ed01f5131977
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 5c33fd5ab2d96a8929efd6e185768560f92def3f
@@ -47,11 +47,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   rule, the pass loop, regrounding, the closing review, the README re-read and the wrap-up
   derivation. It is rendered by the memory-tree kit and is in `watch:`, so editing it forces this
   manifest to be re-audited.
-- **A build MAY restructure itself, and MUST parallelise what it can prove disjoint.** Both are
+- **A build MAY restructure itself, and MUST parallelise delegated disjoint passes.** Both are
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
-  build's stated goal rather than stalling on a spec that turned out wrong, and M6's default is now
-  parallel-where-proven with sequence as the fallback. Conditions and bounds are M3's and M6's. What
+  build's stated goal rather than stalling on a spec that turned out wrong, and M6's parallel default
+  now binds delegated passes only. Conditions and bounds are M3's and M6's. What
   is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
   comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
 

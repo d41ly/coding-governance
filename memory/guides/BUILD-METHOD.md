@@ -194,9 +194,9 @@ change commits nothing and says so.
 build's authored record. A bare "parked" is indistinguishable from "forgotten", and M9 is where the owner gets the
 turn you did not take.
 
-**`parallel-when-disjoint`: parallelism is REQUIRED where disjointness is PROVEN; sequence is the
-fallback.** Two passes MUST run
-concurrently when, and may only when: (1) their WRITE sets — actual paths, written down before dispatch — do
+**`parallel-when-disjoint`: two DELEGATED passes MUST run concurrently (an inline author may
+sequence its own and says so in the unit's brief) when, and only when: (1) their WRITE sets —
+actual paths, written down before dispatch — do
 not intersect; (2) neither writes a file the other reads as a contract (conf, template, interface, generator
 input) or as an acceptance input, and neither depends on the other's output either way; (3) neither touches a
 shared mutable record — `memory/DECISIONS.md`, an authored backlog shard, the run-state file, or a generated index

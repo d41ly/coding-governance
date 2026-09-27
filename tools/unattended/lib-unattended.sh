@@ -20,7 +20,8 @@
 #
 # WHAT IT HOLDS: `GIT` and its two pins; `resolve_sidecar_dir`, the one derivation of the sidecar
 # root the driver and the resume tick both read; `read_bound_key`, the one reader of a bound conf
-# key both of them call; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
+# key both of them call; `read_fork_cutoff`, the one TEXT read of the memory kit's FORK_ITEM_CUTOFF
+# the driver and the pass-order leg share; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
 # of "which node, which process" the lease writer and both pid probes share; `parse_gate_profile` and
 # `check_gate_wall`, the one reading of the gate runner's profile the driver and the leg both ask; the
 # anchored id tests; path containment; and "has this pass committed yet". The same rule admits the
@@ -104,6 +105,70 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the 
         echo "unattended: REFUSING - $_bk_name is declared as '$_bk_val', which is not a positive integer of $_bk_unit. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
         RUNLOG_CLEAN=1; exit 2 ;;
   esac
+}
+
+# ------------------------------------------------------------ the fork-item cutoff, read as TEXT
+# TOOL-dDerivedDocket-31 S5. `FORK_ITEM_CUTOFF` is declared ONCE, in the memory kit's conf, and two
+# readers grade section 8 by it: the hygiene engine, which SOURCES that file, and `plan_state`, whose
+# callers must not execute a second kit's conf (M3 veto 3). So this is a deliberate RE-PARSE, and the
+# two-readers gotcha sanctions one only beside guards, which are NAMED here rather than claimed: the
+# marker-contract harness compares this reader with a subshell `.` of the same fixture conf at TEST
+# time, and a line this reader does not model REFUSES instead of resolving blank. Blank is the
+# declared OFF state, so a spelling that fell through to blank would turn per-item grading off on the
+# planning side alone while the hygiene side kept it on, and nothing would red.
+#
+# WHAT RESOLVES: a column-0 `FORK_ITEM_CUTOFF=` whose value is double-quoted, single-quoted or bare,
+# followed by nothing but whitespace and a comment. The LAST such line wins, as sourcing does. WHAT
+# REFUSES: any other non-comment line naming the key as a word — an `export` prefix, an indent, an
+# assignment inside a conditional, a value followed by a command — and a resolved value that is
+# neither blank nor a date. An absent file, or one that never names the key, resolves blank.
+# It takes the conf PATH, so the memory kit's file name is spelled by each caller, not here.
+read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 with the reason on stdout
+  [ -f "$1" ] || return 0
+  awk -v sq="'" -v conf="$1" '
+    BEGIN { key = "FORK_ITEM_CUTOFF"; kl = length(key); val = ""; bad = 0; badtxt = "" }
+    { line = $0 }
+    line ~ /^[ \t]*#/ { next }
+    substr(line, 1, kl + 1) == key "=" {
+      v = substr(line, kl + 2); q = substr(v, 1, 1)
+      if (q == "\"" || q == sq) {
+        e = index(substr(v, 2), q)
+        if (e == 0) { if (!bad) { bad = NR; badtxt = line }; next }
+        got = substr(v, 2, e - 1); tail = substr(v, e + 2)
+      } else {
+        # A BARE value ends at the first blank or shell metacharacter; what follows is the tail.
+        m = 0
+        while (m < length(v)) { c = substr(v, m + 1, 1); if (c ~ /[ \t;&|<>()$`\\"]/ || c == sq) break; m++ }
+        got = substr(v, 1, m); tail = substr(v, m + 1)
+      }
+      # Only blanks and a comment may follow, the comment opened by a blank: `x# y` is one word.
+      if (tail !~ /^([ \t]+#.*)?[ \t]*$/) { if (!bad) { bad = NR; badtxt = line }; next }
+      val = got; next
+    }
+    {
+      # Any OTHER line naming the key as a word, its trailing comment set aside first.
+      scan = line
+      if (match(scan, /[ \t]#/)) scan = substr(scan, 1, RSTART)
+      off = 0
+      while ((p = index(substr(scan, off + 1), key)) > 0) {
+        at = off + p
+        pre = (at > 1) ? substr(scan, at - 1, 1) : ""
+        post = substr(scan, at + kl, 1)
+        if (pre !~ /[A-Za-z0-9_]/ && post !~ /[A-Za-z0-9_]/) { if (!bad) { bad = NR; badtxt = line }; break }
+        off = at + kl - 1
+      }
+    }
+    END {
+      if (bad) {
+        printf "%s names %s on line %d in a spelling this text reader does not resolve: %s -- resolving it blank would turn per-item fork grading OFF on the planning side while the hygiene engine, which sources the file, keeps its own value\n", conf, key, bad, badtxt
+        exit 2
+      }
+      if (val != "" && val !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/) {
+        printf "%s declares %s as %s, which is neither blank nor a zero-padded ISO date, so no spec filename date can be compared with it\n", conf, key, val
+        exit 2
+      }
+      printf "%s", val
+    }' "$1"
 }
 
 # ------------------------------------------------------------------------ the gate profile, once

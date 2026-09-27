@@ -5,7 +5,7 @@ feature = "memory-tree-hygiene"
 title = "check-memory-hygiene.sh: the memory tree's structural gate, its per-class size caps, and the epoch that dates its verdicts"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-aRelaxedShard-1", "TOOL-aWidenedGuide-1"]
+decisions = ["TOOL-aRelaxedShard-1", "TOOL-aWidenedGuide-1", "TOOL-dDerivedDocket-31"]
 
 [claims]
 gate-legs = ["memory hygiene", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest", "straggler-guard arms"]
@@ -176,6 +176,12 @@ The merge bar's red attribution grades this leg with it as a SET. `TOOL-dDerived
   engine's reading is observable through `--print-backlog-mode`, which exists because the
   project-key stderr line prints only a value that was SET — without it, "blank reads `shards`" is a
   claim nothing can check. `TOOL-dDerivedDocket-8`.
+- `FORK_ITEM_CUTOFF` — one declaration, two readers of §8 (`TOOL-dDerivedDocket-31`). Past it the
+  engine grades each F-item's span at a terminal status and reds a Tier-2 §8 of any other shape at
+  any status; the unattended planning verb prints FORKED for the same bytes. The engine SOURCES the
+  key, the planning side reads the line as TEXT through its own kit library and refuses a spelling it
+  does not model rather than resolving blank, and the marker-contract harness compares the two
+  readings at test time beside the shared case table, because the readers cannot share code.
 
 ## Reuse affordance
 

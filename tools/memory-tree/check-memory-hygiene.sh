@@ -44,6 +44,10 @@ SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEM
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
 SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
 FORK_MARK_CUTOFF=""   # date; at/after it a terminal spec's §8 SECTION must carry the SHAPED resolution mark somewhere (check 12) - not per ITEM, see TEMPLATE-SPEC; blank = never required
+# TOOL-dDerivedDocket-31, same RULE semantics as the siblings and preset for the same adopter argument.
+# At/after it §8 is F-item shaped and each F-item carries its own mark; it SUPERSEDES the key above for
+# the specs it reaches. The unattended planning verb reads this ONE declaration as text.
+FORK_ITEM_CUTOFF=""   # date; specs dated >= this grade §8 PER F-ITEM, and a Tier-2 §8 must be F-item shaped (check 12); blank = never required
 REVIEW_VERDICT_CUTOFF="" # date; review records whose filename date >= this MUST carry one `## Verdict: <member>` line from the closed set (check 22); blank = never required
 # The FOURTH cutoff, and the only one that ships WITH a value. Its three siblings above are rules
 # that can be absent, so blank turns each of them off; this one SELECTS between two section canons
@@ -1290,6 +1294,9 @@ done
 # section canon ("ceremony is conditional"). Pre-cutoff specs are grandfathered by FILENAME date;
 # legacy-named files never match the glob. NOTE (shared idiom with checks 6/7/8): reads WORKTREE
 # content in --staged mode, not the staged blob — CI's full run is the tree-wide truth.
+# FORK_ITEM_CUTOFF (TOOL-dDerivedDocket-31) grades §8 PER F-ITEM from its date and makes a Tier-2 §8
+# F-item shaped. What it does NOT check: a fork written as a plain bullet inside another F-item's
+# span belongs to that span, so the shape grades a DECLARED fork and cannot find an undeclared one.
 # TOOL-aJoinedCanon-9: an armed READINESS_ROWS_CUTOFF with NO declared row set grades nothing and
 # reports the same zero a clean tree does. There is one literal row set and it is the conf, so a
 # blank here is a misconfiguration rather than a default to fall back on.
@@ -1341,7 +1348,15 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v stg="$STAGED" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v icut="$FORK_ITEM_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v stg="$STAGED" '
+  # ---- The §8 grammar, ONCE for this program (TOOL-dDerivedDocket-31): the documented mark, the
+  # ---- F-item opener, and a span resolved by its own mark. Removing code spans and double-quoted
+  # ---- spans only DELETES text, so a stray delimiter pairing with a later one can hide a real mark,
+  # ---- a false red naming its F-item, and can never forge one. The planning verb spells the same
+  # ---- three in its own kit; the marker-contract table is what proves the two agree.
+  function check_mark(s) { return (s ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) }
+  function check_fitem_open(s) { return (s ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || s ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) }
+  function check_span_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return check_mark(s) }
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1670,9 +1685,44 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       # every line as it reads, which is why it did not need this; squeezing here makes the two
       # provably agree instead of agreeing by coincidence.
       gsub(/[[:space:]]+/, " ", bblob)
-      bmark = (bblob ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/)
+      bmark = check_mark(bblob)
       if (q == 0)
         print f " (terminal Status and no Open questions section found — silence and a resolved fork are the same byte without this)"
+      # ---- TOOL-dDerivedDocket-31: THE PER-ITEM READING, forward-only behind FORK_ITEM_CUTOFF, and it
+      # ---- supersedes the section-wide one above for every spec it reaches. The regular shape is what
+      # ---- the withdrawn walk lacked: an F-item OPENS on a column-0 `- **F<n>` bullet or a `### F<n>`
+      # ---- sub-head, the FACT-QUESTION prefix admitted before the id, and its SPAN runs to the next
+      # ---- F-item, so option bullets belong to their fork and never demand a mark of their own. Each
+      # ---- span is matched as ONE squeezed string, so a wrapped mark still counts, and code spans and
+      # ---- double-quoted spans are removed first, so a mark QUOTED as an example resolves nothing.
+      # ---- On a Tier-1 spec the shape is graded HERE, because the shape arm below the Tier-1 cut is
+      # ---- Tier-2 only and the planning verb grades both tiers the same way.
+      # ---- NOT SEEN: a fork written as a plain bullet INSIDE another F-item span is part of that span.
+      else if (icut != "" && fdate != "" && fdate >= icut) {
+        fi_n = 0; fi_plain = 0; fi_nb = 0; fi_bad = ""
+        for (i = 2; i <= q - 1; i++) {
+          L = rng[i]
+          if (L ~ /^[[:space:]]*$/) continue
+          if (check_fitem_open(L)) {
+            fi_n++; fi_sp[fi_n] = L; fi_id[fi_n] = "F-item " fi_n
+            if (match(L, /F[0-9]+/)) fi_id[fi_n] = substr(L, RSTART, RLENGTH)
+            continue
+          }
+          if (fi_n == 0) { if (L ~ /^[-*][[:space:]]/ || L ~ /^###[[:space:]]/) fi_plain++ }
+          else fi_sp[fi_n] = fi_sp[fi_n] " " L
+        }
+        if (fi_n == 0 && bitems == 0) {
+          if (q8 !~ /^none/ && q8 !~ /^n\/a/)
+            print f " (terminal Status and a §8 carrying neither an item nor a none form, at/after FORK_ITEM_CUTOFF " icut "; a hollow section and a resolved one are the same byte)"
+        } else {
+          if ((fi_n == 0 || fi_plain > 0) && hdr ~ /Tier-1/)
+            print f " (terminal Status and a §8 whose forks are not all F-items, at/after FORK_ITEM_CUTOFF " icut "; a bullet or sub-head outside every F-item span is graded by nothing)"
+          for (k = 1; k <= fi_n; k++)
+            if (!check_span_mark(fi_sp[k])) { fi_nb++; fi_bad = (fi_nb == 1) ? fi_id[k] : fi_bad ", " fi_id[k] }
+          if (fi_nb > 0)
+            print f " (terminal Status, §8 F-items carrying no conforming resolution mark in their own span, at/after FORK_ITEM_CUTOFF " icut "): " fi_bad
+        }
+      }
       else if (fcut != "" && fdate != "" && fdate >= fcut) {
         # ---- A §8 with NO items and NO none form REFUSES, which the owner ratified: it is the only
         # ---- genuinely undecided population, it is reached through the empty-first-line branch, and
@@ -1691,6 +1741,27 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     }
 
     if (hdr ~ /Tier-1/) next
+    # ---- TOOL-dDerivedDocket-31 S4: THE F-ITEM SHAPE, on a Tier-2 spec at ANY status, because a live
+    # ---- spec that never opens an F-item would otherwise escape per-item grading until the day it
+    # ---- closes. It reads one file and is no join, so it runs under --staged like the other shape
+    # ---- arms. A none form is a section carrying no item, and it passes; items with no F-item, or a
+    # ---- column-0 bullet or sub-head before the first F-item, is the finding. Guarded by its own
+    # ---- icut test and nested in nothing else. The planning verb prints FORKED for the same bytes.
+    if (icut != "" && fdate != "" && fdate >= icut) {
+      sh_in = 0; sh_fi = 0; sh_plain = 0; sh_items = 0
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (L ~ /^## /) { sh_in = (L ~ /^## [0-9]+[.] Open questions/); continue }
+        if (!sh_in || L ~ /^[[:space:]]*$/) continue
+        if (check_fitem_open(L)) { sh_fi++; continue }
+        if (L ~ /^[[:space:]]*[-*][[:space:]]/ || L ~ /^###[[:space:]]/) sh_items++
+        if (sh_fi == 0 && (L ~ /^[-*][[:space:]]/ || L ~ /^###[[:space:]]/)) sh_plain++
+      }
+      if (sh_fi == 0 && sh_items > 0)
+        print f " (§8 is not F-item shaped, required of a Tier-2 spec at/after FORK_ITEM_CUTOFF " icut ": it carries items and no F-item, so no fork in it can be graded)"
+      else if (sh_plain > 0)
+        print f " (§8 is not F-item shaped, required of a Tier-2 spec at/after FORK_ITEM_CUTOFF " icut ": a bullet or sub-head sits before the first F-item, outside every F-item span)"
+    }
     # ---- TOOL-aJoinedCanon-8: SIBLING EDGES. A `### Edges` sub-head inside §3, one bullet per edge
     # ---- or the single word `none`. 94% of specs sit in multi-spec builds and the ONE cross-unit field the format has
     # ---- is the optional `order`, which expresses SEQUENCE and never an EDGE — so
@@ -2030,6 +2101,13 @@ if [ "$STAGED" = 0 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
   _eg_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_EDGES_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_eg_n:-0}" -gt 0 ] || echo "memory-hygiene: the §3 edge arms graded NO spec — SPEC_EDGES_CUTOFF is $SPEC_EDGES_CUTOFF and every tracked spec predates it. That is the intended state at adoption; their coverage is the self-test fixtures, not this corpus."
+fi
+# Same notice, same footing, for the §8 F-item arms (TOOL-dDerivedDocket-31): the terminal per-item
+# reading and the Tier-2 shape. Its declared value sits past every tracked spec date at adoption.
+if [ "$STAGED" = 0 ] && [ -n "$FORK_ITEM_CUTOFF" ]; then
+  _fi_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$FORK_ITEM_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_fi_n:-0}" -gt 0 ] || echo "memory-hygiene: the §8 F-item arms graded NO spec — FORK_ITEM_CUTOFF is $FORK_ITEM_CUTOFF and every tracked spec predates it. That is the intended state at adoption; their coverage is the self-test fixtures and the marker-contract table, not this corpus."
 fi
 fi
 
