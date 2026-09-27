@@ -91,7 +91,7 @@ extract_next() { # status-line -> the `next` field's value, cut at the next sepa
 # loses its verdict, and the line it prints is for the caller to read back from that file.
 check_status_one_line() { # slug -> asserts --status wrote exactly one stdout line; prints it
   local _o; _o=$(bash "$SCRIPT" --status "$1" 2>/dev/null)
-  same "--status $1 is one stdout line" "$(printf '%s' "$_o" | grep -v '^unattended: LEASE — ' | grep -c '')" "1"
+  same "--status $1 is one stdout line" "$(printf '%s' "$_o" | grep -c '')" "1"
   printf '%s\n' "$_o"
 }
 
@@ -172,7 +172,6 @@ RESUME_SCHEDULE_CREATE="TheScheduleCreate"
 RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 RESUME_SCHEDULE_DELAY="${10-1800}"
 RESUME_SCHEDULE_LIMIT="${11-6}"
-LEASE_STALE_AFTER="7200"
 PHASES_EXTRA=""
 DOD_EXTRA=""
 EOF
@@ -2010,7 +2009,7 @@ rt_before=$(run --status tRun)
 RT_SIDECAR="$(git rev-parse --git-dir)/unattended"; mkdir -p "$RT_SIDECAR"
 printf '2026-09-20T10:00:00Z attempt 1 session s pid 1 pid-alive no out o1\n2026-09-20T10:10:00Z attempt 2 session s pid 1 pid-alive no out o2\n' > "$RT_SIDECAR/resume.tRun.log"
 out=$(run --status tRun)
-same "AC9 --status is still one line with the sidecar present" "$(printf '%s\n' "$out" | grep -v '^unattended: LEASE — ' | grep -c '')" "1"
+same "AC9 --status is still one line with the sidecar present" "$(printf '%s\n' "$out" | grep -c '')" "1"
 hit "$out" " · resume-tick 2 attempt(s), last 2026-09-20T10:10:00Z"
 same "AC9 --resume's first line carries the same field" "$(run --resume tRun | head -n 1 | grep -c 'resume-tick 2 attempt(s), last 2026-09-20T10:10:00Z')" "1"
 rm -f "$RT_SIDECAR/resume.tRun.log"
@@ -6251,14 +6250,12 @@ sed -n '/^run_bounded() {/,/^}$/p' "$SCRIPT" > "$rb_fn"
 # PASS line, with the stranded-arm floor never reached. Caught by this build's closing review.
 GATE_BOUND_LIVE=1
 GATE_BOUND=2
-# ...and the four names the extracted function reaches that are not ITS OWN, for the same `set -u`
-# reason. The lease pair and its refresh are the lease unit's, `ROOT` and the recorder the process
-# ledger's (TOOL-dDerivedDocket-28): the wrapper carries the root as its `$0`, and the recorder is
-# graded by that unit's own arms rather than through a copy of the function outside its driver.
-RB_LEASE_SLUG=""
-RB_LEASE_ID=""
+# ...and the two names the extracted function reaches that are not ITS OWN, for the same `set -u`
+# reason: `ROOT` and the recorder are the process ledger's (TOOL-dDerivedDocket-28). The wrapper
+# carries the root as its `$0`, and the recorder is graded by that unit's own arms rather than
+# through a copy of the function outside its driver. The lease pair and its refresh that used to
+# stand here left the driver with the lease file (TOOL-dDerivedDocket-61).
 ROOT="$TMP"
-write_lease_refreshed() { :; }
 write_proc_record() { :; }
 # shellcheck disable=SC1090
 . "$rb_fn"
@@ -6383,12 +6380,9 @@ n=$((n+1))
 n=$((n+1))
 [ "$(grep -c '^RB_TAIL_' "$sp_fn")" = 3 ] \
   || { echo "FAIL could not extract the three RB_TAIL_ pins from $SCRIPT — the tail arms would grade this file's own copy of them"; st=1; }
-RB_LEASE_SLUG=""
-RB_LEASE_ID=""
 GATE_BOUND_LIVE=0
 GATE_BOUND=0
 ROOT="$TMP"
-write_lease_refreshed() { :; }
 write_proc_record() { :; }
 # shellcheck disable=SC1090
 . "$sp_fn"
@@ -7041,12 +7035,18 @@ miss "$out" "grades THIN"
 reset_tree
 
 
-# ================ TOOL-dDerivedDocket-4: HELD, the per-slug lease, and the two phase readers ======
-# The lease is per-NODE runtime state under the git common dir, never in the tree, so these arms read
-# it by path rather than through git. `read_lease_hash` answers NONE for an absent one, which is a THIRD state
-# and not a synonym for released: several arms below turn on exactly that distinction.
+# ================ TOOL-dDerivedDocket-4: HELD, the lease, and the two phase readers ===============
+# THE LEASE IS THE RUN-STATE FACTS (TOOL-dDerivedDocket-61): six of them, written together by
+# `write_lease`. The per-slug lease FILE these arms read under the git common dir is retired, so
+# `read_lease_hash` hashes the record's six lease-fact lines and every "left the lease alone" arm
+# reads the one lease record there is. `LEASE` names the retired file's path for the arms that plant
+# a LEFTOVER one, which nothing reads. `drop_lease_facts` makes a record pre-lease the way one is:
+# the five facts other than `keepalive` go and `keepalive` stays. `write_aged_commit` puts an empty
+# commit dated past every bound on HEAD, so the one clock reads stale with no clock faked.
 LEASE="$TMP/.git/unattended/tRun.lease"
-read_lease_hash() { if [ -f "$LEASE" ]; then git hash-object "$LEASE"; else echo NONE; fi; }
+read_lease_hash() { grep -E '^(keepalive|session|pid|host|pid-image|lease-utc): ' memory/builds/tRun/RUN.md | git hash-object --stdin; }
+drop_lease_facts() { sed -i '/^session: /d; /^pid: /d; /^host: /d; /^pid-image: /d; /^lease-utc: /d' memory/builds/tRun/RUN.md; }
+write_aged_commit() { GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m aged --no-verify; }
 # A preflighted, COMMITTED, clean fixture at RUNNING whose lease is held by k1. Committed because
 # `--hold` refuses a dirty tree, so an uncommitted fixture would take the dirty refusal while
 # claiming to test something else — the shape this file's `fixture()` comment already records.
@@ -7056,33 +7056,32 @@ build_hold_fixture() { reset_tree
 write_published_conf() { printf 'ANCHOR_SCOPE="published"\n' >> .unattended.conf
             git add -A >/dev/null && git commit -q -m write_published_conf --no-verify; }
 
-# ---- AC17: the lease lifecycle, in order, across the four verbs that write it. The FIRST step is
-# ---- the one staged RED by dropping the refresh from the matching-id row: without it a live
-# ---- working-phase record reads as released to a second session, which takes the slug over while
-# ---- its holder is alive.
+# ---- AC17: the lease lifecycle, in order, across the verbs that used to write a lease file. NOTHING
+# ---- REFRESHES THE LEASE (TOOL-dDerivedDocket-61): the holder's matching-id resume writes and stages
+# ---- nothing, `--phase` leaves `lease-utc` where it was, a hold reads HELD to `--liveness`, and no
+# ---- verb in the lifecycle writes a lease file under the git dir.
 build_hold_fixture
-n=$((n+1)); grep -q '^taken .* keepalive k1 host ' "$LEASE" || { echo "FAIL AC17 --preflight did not take the lease naming its own keepalive"; st=1; }
-before=$(sum); ltak=$(sed -n '1p' "$LEASE"); lref=$(sed -n '2p' "$LEASE")
+n=$((n+1)); { grep -q '^keepalive: k1$' memory/builds/tRun/RUN.md && grep -q '^lease-utc: ' memory/builds/tRun/RUN.md; } || { echo "FAIL AC17 --preflight did not record the lease facts naming its own keepalive"; st=1; }
+before=$(sum); lutc=$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)
 sleep 1
 out=$(run --resume tRun --keepalive-id k1); rc=$?
 same "AC17 the matching-id resume exits 0" "$rc" "0"
 same "AC17 the matching-id resume wrote nothing to the record" "$(sum)" "$before"
-same "AC17 the matching-id resume left the taken line alone" "$(sed -n '1p' "$LEASE")" "$ltak"
-n=$((n+1)); [ "$(sed -n '2p' "$LEASE")" != "$lref" ] || { echo "FAIL AC17 the matching-id resume did not advance the refreshed line"; st=1; }
+same "AC17 the matching-id resume left lease-utc alone" "$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)" "$lutc"
+n=$((n+1)); [ -z "$(git status --porcelain)" ] || { echo "FAIL AC17 the matching-id resume wrote or staged something: $(git status --porcelain)"; st=1; }
 sleep 1
-lref=$(sed -n '2p' "$LEASE")
 run --phase tRun BUILDING --witness deadbeef >/dev/null
-n=$((n+1)); [ "$(sed -n '2p' "$LEASE")" != "$lref" ] || { echo "FAIL AC17 --phase did not refresh the lease past its own write gate"; st=1; }
+n=$((n+1)); [ "$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)" = "$lutc" ] || { echo "FAIL AC17 --phase moved lease-utc, so a writing verb still refreshes the lease"; st=1; }
 git add -A >/dev/null && git commit -q -m ph --no-verify
 out=$(run --hold tRun --code platform-limit --until owner --reason "the api is rate limited" --reaped k1)
 hit "$out" "phase HELD · code platform-limit"
-n=$((n+1)); grep -q '^released .* held$' "$LEASE" || { echo "FAIL AC17 --hold did not release the lease"; st=1; }
+n=$((n+1)); run --liveness tRun | grep -q '^verdict: HELD$' || { echo "FAIL AC17 a held record does not read HELD to --liveness"; st=1; }
 git add -A >/dev/null && git commit -q -m held --no-verify
 run --resume tRun --keepalive-id k2 >/dev/null
 run --attest tRun --item keepalive-reaped >/dev/null
 run --attest tRun --item parked-decisions-surfaced >/dev/null
 run --abort tRun --code external-prerequisite --reason "nothing left to try" >/dev/null
-n=$((n+1)); [ ! -f "$LEASE" ] || { echo "FAIL AC17 --abort left a lease behind on a terminal record"; st=1; }
+n=$((n+1)); [ -z "$(find "$TMP/.git" -name '*.lease' 2>/dev/null)" ] || { echo "FAIL AC17 a verb in the lifecycle wrote a lease file under the git dir"; st=1; }
 
 # ---- AC2: a dirty tree. The clean check runs BEFORE the phase write, so a refusal here leaves no
 # ---- HELD record standing over uncommitted work with a witness naming a commit that is not it.
@@ -7210,7 +7209,7 @@ hit "$out" "unattended: tRun · phase HELD"
 same "AC21 a no-id take-over of a HELD record wrote nothing" "$(sum)" "$before"
 same "AC21 a no-id take-over of a HELD record left the lease alone" "$(read_lease_hash)" "$lb"
 build_hold_fixture
-printf 'taken 2000-01-01T00:00:00Z keepalive kOld host h\nrefreshed 2000-01-01T00:00:00Z\n' > "$LEASE"
+write_aged_commit
 before=$(sum); lb=$(read_lease_hash)
 out=$(run --resume tRun)
 hit "$out" "presumed-stopped"
@@ -7218,43 +7217,48 @@ hit "$out" "a take-over is a change of driver and the new driver has to name its
 same "AC21 a no-id resume over a stale lease wrote nothing" "$(sum)" "$before"
 same "AC21 a no-id resume over a stale lease left the lease alone" "$(read_lease_hash)" "$lb"
 
-# ---- AC6: a fresh lease is a live session, and the three rows that say so.
+# ---- AC6: a fresh lease is a live session, and the three rows that say so. The HELD one is the
+# ---- take-over's CRASH WINDOW: a record still HELD whose `lease-utc` follows `held-at`, recorded by
+# ---- another session under another keepalive. The working ones are asked from another session,
+# ---- because the session the record names under a new id is its relaunch and takes the run over.
 build_hold_fixture
 run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null
 git add -A >/dev/null && git commit -q -m held --no-verify
-printf 'taken %s keepalive kOther host h\nrefreshed %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$LEASE"
+sed -i 's/^lease-utc: .*/lease-utc: 2099-01-01T00:00:00Z/; s/^keepalive: .*/keepalive: kOther/; s/^session: .*/session: sOther/' memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m crash-window --no-verify
 before=$(sum); lb=$(read_lease_hash)
 out=$(run --resume tRun --keepalive-id kC)
-hit "$out" "another session already resumed this held run and holds its lease, so a second take-over would drive one slug from two sessions; the lease names its keepalive and when it was last refreshed"
+hit "$out" "another session already resumed this held run and recorded its lease, so a second take-over would drive one slug from two sessions; the record names that session's keepalive and when its lease was recorded: "
 same "AC6 a take-over over a fresh lease wrote nothing" "$(sum)" "$before"
 same "AC6 a take-over over a fresh lease left the lease alone" "$(read_lease_hash)" "$lb"
 build_hold_fixture; before=$(sum); lb=$(read_lease_hash)
-out=$(run --resume tRun --keepalive-id kB)
+out=$(CLAUDE_CODE_SESSION_ID=sOther run --resume tRun --keepalive-id kB)
 hit "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder; a holder replacing its own job says so with --replaces, and the lease's id is"
 same "AC6 a foreign-id resume over a fresh working lease wrote nothing" "$(sum)" "$before"
 out=$(run --resume tRun)
-hit "$out" "a live session drives this slug, and a second driver is exactly what the lease exists to stop, so this refuses before any write; a session whose own scheduler lists the keepalive the LEASE line names says so with --keepalive-id"
+hit "$out" "a live session drives this slug, and a second driver is exactly what the lease exists to stop, so this refuses before any write; a session whose own scheduler lists the job id this record's keepalive fact names says so with --keepalive-id"
 hit "$out" "unattended: tRun · phase RUNNING"
 same "AC6 a no-id resume over a fresh working lease wrote nothing" "$(sum)" "$before"
 same "AC6 a no-id resume over a fresh working lease left the lease alone" "$(read_lease_hash)" "$lb"
 
-# ---- AC7: staleness is read from the LEASE, for a record that has one, and the take-over NAMES the
-# ---- acts it inherits rather than repairing them.
+# ---- AC7: staleness is read from `--liveness`'s own clock and bound, for a record that has a lease,
+# ---- and the take-over NAMES the acts it inherits rather than repairing them. The staged file is
+# ---- dated past the bound too, because a dirty write is one of the clock's four signals.
 build_hold_fixture
-printf 'taken 2000-01-01T00:00:00Z keepalive kOld host h\nrefreshed 2000-01-01T00:00:00Z\n' > "$LEASE"
+write_aged_commit
 out=$(run --status tRun)
 hit "$out" "presumed-stopped"
-hit "$out" "LEASE — taken 2000-01-01T00:00:00Z · keepalive kOld"
-printf 'staged\n' > staged.txt; git add staged.txt >/dev/null
-out=$(run --resume tRun --keepalive-id kC)
+hit "$out" "against the 5400s bound, so the session holding the lease is presumed gone"
+printf 'staged\n' > staged.txt; touch -d '2000-01-01T00:00:00Z' staged.txt; git add staged.txt >/dev/null
+out=$(CLAUDE_CODE_SESSION_ID=sOther run --resume tRun --keepalive-id kC)
 hit "$out" "INTERRUPTED — a non-empty index is staged"
 hit "$out" "staged.txt"
 n=$((n+1)); grep -q '^keepalive: kC$' memory/builds/tRun/RUN.md || { echo "FAIL AC7 the take-over did not record the new keepalive"; st=1; }
-n=$((n+1)); grep -q '^taken .* keepalive kC host ' "$LEASE" || { echo "FAIL AC7 the take-over did not take the lease"; st=1; }
+n=$((n+1)); grep -q '^session: sOther$' memory/builds/tRun/RUN.md || { echo "FAIL AC7 the take-over did not record its session in the lease facts"; st=1; }
 
 # ---- AC19: a LEASELESS working record is surfaced by the age of the newest commit touching its
 # ---- build folder — the population TOOL-aReapedTicket-5 records, which nothing surfaced at all.
-build_hold_fixture; rm -f "$LEASE"
+build_hold_fixture; drop_lease_facts
 run --phase tRun BUILDING --witness deadbeef >/dev/null
 GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" \
   git commit -q -m oldbuild --no-verify
@@ -7263,30 +7267,32 @@ hit "$out" "presumed-stopped"
 hit "$out" "this record has NO LEASE"
 out=$(run --resume tRun --keepalive-id kC)
 n=$((n+1)); grep -q '^keepalive: kC$' memory/builds/tRun/RUN.md || { echo "FAIL AC19 a leaseless take-over did not record the new keepalive"; st=1; }
-build_hold_fixture; rm -f "$LEASE"; before=$(sum)
+build_hold_fixture; drop_lease_facts; before=$(sum)
 out=$(run --resume tRun --keepalive-id kC)
-hit "$out" "s ago, inside the staleness bound, so a session is most likely still driving it; its holder passes the keepalive the record names and everyone else waits out the bound: pass --keepalive-id"
+hit "$out" "s ago, inside the staleness bound, so a session is most likely still driving it; its holder passes the keepalive the record names, a holder whose scheduler lists another job retires it with --replaces, and everyone else waits out the bound: pass --keepalive-id, and --replaces "
 same "AC19 a leaseless resume inside the bound wrote nothing" "$(sum)" "$before"
 
 # ---- AC22: the holder of a run that PREDATES the lease. Without this row every run in flight when
 # ---- the lease landed stalls for the whole bound, and the Resume rule sends its own holder down the
 # ---- take-over path to reap its own keepalive.
-build_hold_fixture; rm -f "$LEASE"
+build_hold_fixture; drop_lease_facts
 out=$(run --resume tRun --keepalive-id k1); rc=$?
 same "AC22 the holder's leaseless resume exits 0" "$rc" "0"
-n=$((n+1)); grep -q '^taken .* keepalive k1 host ' "$LEASE" || { echo "FAIL AC22 the leaseless holder did not take the lease"; st=1; }
-build_hold_fixture; rm -f "$LEASE"; before=$(sum)
+n=$((n+1)); grep -q '^lease-utc: ' memory/builds/tRun/RUN.md || { echo "FAIL AC22 the leaseless holder did not record the lease facts"; st=1; }
+build_hold_fixture; drop_lease_facts; before=$(sum)
 out=$(run --resume tRun --keepalive-id kB)
 hit "$out" "unattended: tRun · phase RUNNING"
-hit "$out" "s ago, inside the staleness bound, so a session is most likely still driving it; its holder passes the keepalive the record names and everyone else waits out the bound: pass --keepalive-id"
+hit "$out" "s ago, inside the staleness bound, so a session is most likely still driving it; its holder passes the keepalive the record names, a holder whose scheduler lists another job retires it with --replaces, and everyone else waits out the bound: pass --keepalive-id, and --replaces "
 same "AC22 a second session's leaseless resume inside the bound wrote nothing" "$(sum)" "$before"
-n=$((n+1)); [ ! -f "$LEASE" ] || { echo "FAIL AC22 a refused leaseless resume created a lease"; st=1; }
+n=$((n+1)); ! grep -q '^lease-utc: ' memory/builds/tRun/RUN.md || { echo "FAIL AC22 a refused leaseless resume recorded a lease"; st=1; }
 
-# ---- AC20: a holder replaces its OWN job in place, and --reaped then names the live one.
+# ---- AC20: a holder replaces its OWN job in place, and --reaped then names the live one. Asked from
+# ---- another session: from the session the record names, a new id meets the same-session row first
+# ---- (TOOL-dDerivedDocket-61, G8 H1), which TOOL-dDerivedDocket-63 re-orders.
 build_hold_fixture
-out=$(run --resume tRun --keepalive-id kB --replaces k1)
+out=$(CLAUDE_CODE_SESSION_ID=sOther run --resume tRun --keepalive-id kB --replaces k1)
 hit "$out" "keepalive replaced"
-n=$((n+1)); grep -q '^taken .* keepalive kB host ' "$LEASE" || { echo "FAIL AC20 --replaces did not record the new id in the lease"; st=1; }
+n=$((n+1)); grep -q '^session: sOther$' memory/builds/tRun/RUN.md || { echo "FAIL AC20 --replaces did not re-record the lease facts beside the new id"; st=1; }
 n=$((n+1)); grep -q '^keepalive: kB$' memory/builds/tRun/RUN.md || { echo "FAIL AC20 --replaces did not record the new id in the record"; st=1; }
 git add -A >/dev/null && git commit -q -m repl --no-verify
 out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1)
@@ -7294,7 +7300,7 @@ hit "$out" "--reaped names an id that is not the keepalive this slug currently r
 out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped kB)
 hit "$out" "phase HELD · code platform-limit"
 build_hold_fixture; before=$(sum); lb=$(read_lease_hash)
-out=$(run --resume tRun --keepalive-id kB --replaces kX)
+out=$(CLAUDE_CODE_SESSION_ID=sOther run --resume tRun --keepalive-id kB --replaces kX)
 hit "$out" "--replaces names an id this slug's lease does not hold, so it would record a replacement for a job that is not the one driving this run; the lease's own id is"
 same "AC20 a --replaces naming a foreign id wrote nothing" "$(sum)" "$before"
 same "AC20 a --replaces naming a foreign id left the lease alone" "$(read_lease_hash)" "$lb"
@@ -7443,25 +7449,27 @@ out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped 
 hit "$out" "this run's branch tip cannot be confirmed on its remote, so a hold would record a witness nothing off this node can reach; the run is not on a named branch, or the advertised tip is one this clone does not have"
 git checkout -q unit
 
-# ---- a lease the node cannot WRITE. Staged by making the lease DIRECTORY a regular file, which is
-# ---- the one shape `mkdir -p` cannot repair, so the holder's own take-of-an-absent-lease refuses.
-build_hold_fixture; rm -f "$LEASE"
+# ---- a common dir whose `unattended` directory cannot be made — a regular file in its place, the one
+# ---- shape `mkdir -p` cannot repair. The lease no longer lives there, so the pre-lease holder still
+# ---- records the one lease record, which is what the retired lease file's write refusal cost.
+build_hold_fixture; drop_lease_facts
 rm -rf "$TMP/.git/unattended"; printf 'x' > "$TMP/.git/unattended"
 out=$(run --resume tRun --keepalive-id k1)
-hit "$out" "cannot write this slug's lease file, and an unwritten lease leaves the run readable as undriven by the next session that asks"
+hit "$out" "lease recorded · keepalive k1 · session none -> fixture-session"
 rm -f "$TMP/.git/unattended"
 
 out=$(run --resume tNoSuchBuild --keepalive-id kC)
 hit "$out" "no run-state file, so there is no run to resume"
 
-# ---- a MALFORMED lease is its own state. Read as absent it would hand the slug to whoever asked
-# ---- next, which is the one outcome the file exists to prevent.
+# ---- a LEFTOVER lease file, malformed or not, is never read (TOOL-dDerivedDocket-61 §4 Migration):
+# ---- the holder resumes on the run-state facts and writes nothing.
 build_hold_fixture
-printf 'this is not a lease at all\n' > "$LEASE"
+mkdir -p "${LEASE%/*}"; printf 'this is not a lease at all\n' > "$LEASE"
 before=$(sum)
-out=$(run --resume tRun --keepalive-id kC)
-hit "$out" "this slug's lease file cannot be parsed, and a lease nothing can read must not be treated as an absent one, because absent is the state that ADMITS a take-over; repair or delete it by hand"
-same "a malformed lease wrote nothing" "$(sum)" "$before"
+out=$(run --resume tRun --keepalive-id k1)
+hit "$out" "resume at phase RUNNING"
+same "a malformed leftover lease file wrote nothing" "$(sum)" "$before"
+rm -f "$LEASE"
 
 # ---- THE TWO DEAD-CLOCK REFUSALS, staged with a `date` that answers nothing. A zero from a dead
 # ---- clock would read as released on one path and as written-just-now on the other, which is the
@@ -7473,7 +7481,7 @@ run --hold tRun --code platform-limit --until "after 2000-01-01T00:00:00Z" --rea
 git add -A >/dev/null && git commit -q -m held --no-verify
 out=$(PATH="$DSTUB:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id kC 2>&1)
 hit "$out" "the release condition cannot be evaluated on this node, because a clock probe it needs answered nothing, so whether the hold is over is unanswerable rather than no and a zero from a dead clock would read as released"
-build_hold_fixture; rm -f "$LEASE"
+build_hold_fixture; drop_lease_facts
 out=$(PATH="$DSTUB:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id kC 2>&1)
 hit "$out" "this record has no lease and the age of the newest commit touching its build folder is unanswerable on this node, so whether its holder is gone cannot be decided and a take-over here would be a guess wearing a verdict's clothes"
 rm -rf "$DSTUB"
@@ -7483,6 +7491,314 @@ rm -rf "$DSTUB"
 build_hold_fixture
 out=$(run --resume tRun --replaces k1)
 hit "$out" "--replaces says which job is being retired and --keepalive-id says which one takes it on, so a replacement with no new id would leave the lease naming a job that has been reaped: pass --keepalive-id"
+reset_tree
+
+# ==================================================================================================
+# TOOL-dDerivedDocket-61 — ONE LEASE RECORD, and HELD known to every out-of-session actor. The lease
+# is the run-state facts; the matrix reads them through `--liveness`'s own clock and bound; a pushed
+# landing `--landed` has not observed is re-bound; in-place `--landed` reads the reap back and logs
+# its observation under the git COMMON dir. Every arm is the driver over this suite's fixture. The
+# landing arms push to its origin and put it back; the linked worktrees live outside the tree, where
+# `reset_tree`'s clean cannot reach them, and the arm that made them removes them.
+# ==================================================================================================
+DD_CD=$(cd "$(git rev-parse --git-common-dir)" && pwd)
+DD_LOG="$DD_CD/unattended/landed.tRun.log"
+set_lease_fact() { sed -i "s/^$1: .*/$1: $2/" memory/builds/tRun/RUN.md; }
+restore_dd_origin() { git checkout -q -f unit 2>/dev/null; git branch -f main "$BASE"; git push -q -f origin "$BASE":main; rm -f "$STOP7" "$DD_LOG"; }
+# A committed LANDING record on the run branch `unit`, pushed to origin's main, under the landing
+# mode named. The conf edit is committed FIRST, because `--preflight` refuses a dirty tree.
+build_dd_landing() { # primary|in-place -> DD_C, the landing commit
+  reset_tree; rm -f "$STOP7" "$DD_LOG"
+  sed -i "s/^LANDER_MODE=.*/LANDER_MODE=\"$1\"/" .unattended.conf
+  git add -A >/dev/null; git commit -q -m lander-mode --no-verify >/dev/null 2>&1
+  run --preflight tRun --keepalive-id k1 >/dev/null
+  sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+  fixture; DD_C=$(git rev-parse HEAD); git push -q -f origin HEAD:main
+}
+# The shell's own pid as the record would name it — the Windows pid under MSYS, as `claude.exe`'s is —
+# alive for the whole suite and started long before any lease this block records.
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) DD_PID=$(ps -p $$ | awk -v p=$$ 'NR>1 && $1==p {print $4}') ;;
+  *) DD_PID=$$ ;;
+esac
+n=$((n+1)); [ -n "$DD_PID" ] || { echo "FAIL fixture: no pid for this shell, so the two-process arm would probe an empty value"; st=1; }
+
+# ---- AC5: `--liveness` over an aged HELD record reads `state: held` and `verdict: HELD`, never the
+# ---- STALE the resume tick acts on, and prints every key it printed before, in the same order.
+build_hold_fixture
+run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null; fixture; write_aged_commit
+out=$(bash "$SCRIPT" --liveness tRun 2>/dev/null)
+hit "$out" "state: held"
+hit "$out" "stale: yes"
+hit "$out" "verdict: HELD"
+same "AC5 every key still prints, in order" "$(printf '%s\n' "$out" | sed -n 's/^\([a-z-]*\): .*/\1/p' | tr '\n' ' ')" \
+  "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict stale-bound "
+
+# ---- AC3: the SAME-SESSION relaunch. The resume tick relaunches `claude -p --resume <session>`, whose
+# ---- first turn moves the transcript `--liveness` reads, so the session the record names, under a new
+# ---- keepalive, takes the run over through `run_takeover` whatever the clock says: once reading LIVE
+# ---- through that transcript, once stale. A live recorded pid that is not CLAUDE_PID is two processes
+# ---- of one session and refuses at 58 naming both, writing nothing; another session on the same fresh
+# ---- clock refuses at 58. RED against the retired matrix, where the fresh relaunch met check 58.
+build_hold_fixture
+DD_ENC=$(git rev-parse --show-toplevel | tr ':\\/.' '----'); DD_CFG="$ORIGIN_DIR/cfg-dd61"
+mkdir -p "$DD_CFG/projects/$DD_ENC" && touch "$DD_CFG/projects/$DD_ENC/fixture-session.jsonl"
+write_aged_commit
+hit "$(CLAUDE_CONFIG_DIR="$DD_CFG" bash "$SCRIPT" --liveness tRun 2>&1)" "verdict: LIVE"
+out=$(CLAUDE_CONFIG_DIR="$DD_CFG" run --resume tRun --keepalive-id k2)
+hit  "$out" "lease replaced · keepalive k1 -> k2"
+miss "$out" "UNATTENDED check 58"
+same "AC3 the relaunch over a fresh clock recorded its new keepalive" "$(sed -n 's/^keepalive: //p' memory/builds/tRun/RUN.md)" "k2"
+rm -rf "$DD_CFG"
+build_hold_fixture; write_aged_commit
+out=$(run --resume tRun --keepalive-id k2)
+hit "$out" "the session this record names resumes under a new keepalive, so its process restarted and this resume TAKES THE RUN OVER in its place"
+hit "$out" "taken over — phase RUNNING · keepalive k2"
+build_hold_fixture
+set_lease_fact pid "$DD_PID"; set_lease_fact pid-image absent; fixture
+before=$(sum)
+out=$(run --resume tRun --keepalive-id k2)
+hit  "$out" "this session is the one the record names, and the process the record names for it is still alive and is not this one, so a take-over here would drive one slug from two processes of one session; stop that process, or resume from it: recorded pid "
+hit  "$out" "recorded pid $DD_PID, this CLAUDE_PID 999999999"
+same "AC3 two live processes of one session wrote nothing" "$(sum)" "$before"
+out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id k2)
+hit  "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder"
+same "AC3 another session on a fresh clock wrote nothing" "$(sum)" "$before"
+
+# ---- AC11: the HOLDER writes nothing while the record names the session and pid the harness exposes,
+# ---- and re-records the lease, staged and `keepalive` unchanged, when either moved; a pre-lease record,
+# ---- `keepalive` alone of the six, gains the other five at its holder's first resume. RED against a
+# ---- holder row that re-records on every call, which restages the record at every tick.
+build_hold_fixture
+out=$(run --resume tRun --keepalive-id k1); rc=$?
+same "AC11 the holder's resume exits 0" "$rc" "0"
+same "AC11 the holder's resume leaves the tree clean" "$(git status --porcelain)" ""
+out=$(CLAUDE_PID=4242 run --resume tRun --keepalive-id k1)
+hit  "$out" "lease recorded · keepalive k1 · session fixture-session -> fixture-session · pid 999999999 -> 4242"
+same "AC11 a moved pid is staged" "$(git diff --cached --name-only)" "memory/builds/tRun/RUN.md"
+git checkout -q HEAD -- memory/builds/tRun/RUN.md
+out=$(CLAUDE_CODE_SESSION_ID=S2 run --resume tRun --keepalive-id k1)
+same "AC11 a moved session is recorded" "$(sed -n 's/^session: //p' memory/builds/tRun/RUN.md)" "S2"
+same "AC11 ...beside the unmoved pid" "$(sed -n 's/^pid: //p' memory/builds/tRun/RUN.md)" "999999999"
+same "AC11 ...and staged" "$(git diff --cached --name-only)" "memory/builds/tRun/RUN.md"
+git checkout -q HEAD -- memory/builds/tRun/RUN.md
+drop_lease_facts; fixture
+run --resume tRun --keepalive-id k1 >/dev/null
+same "AC11 the pre-lease holder's record carries all six lease facts" \
+  "$(grep -cE '^(keepalive|session|pid|host|pid-image|lease-utc): ' memory/builds/tRun/RUN.md)" "6"
+
+# ---- AC12: a HELD record whose condition is met is taken over from another session and returns to its
+# ---- held-from; its crash window is AC6's arm above. THE MIGRATION CASE: a leftover lease file from
+# ---- before the retirement names k9 and is never read, so `--reaped k9` is refused naming the record's
+# ---- k1, the holder's resume writes nothing, and the leftover is byte-unchanged.
+build_hold_fixture
+run --phase tRun BUILDING --witness deadbeef >/dev/null; fixture
+run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null; fixture
+out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)
+hit  "$out" "taken over — phase BUILDING · keepalive C"
+same "AC12 the take-over records the new session" "$(sed -n 's/^session: //p' memory/builds/tRun/RUN.md)" "T"
+build_hold_fixture
+mkdir -p "${LEASE%/*}"; printf 'taken 2000-01-01T00:00:00Z keepalive k9 host h\nrefreshed 2000-01-01T00:00:00Z\n' > "$LEASE"
+DD_LH=$(git hash-object "$LEASE"); before=$(sum)
+hit  "$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k9)" "--reaped names an id that is not the keepalive this slug currently runs under, so the job that keeps firing into this run is not the one that was stopped; the live id is: k1"
+hit  "$(run --resume tRun --keepalive-id k1)" "resume at phase RUNNING"
+same "AC12 the holder's resume over a leftover lease wrote nothing" "$(sum)" "$before"
+same "AC12 the leftover lease file is byte-unchanged" "$(git hash-object "$LEASE")" "$DD_LH"
+rm -f "$LEASE"
+
+# ---- AC4: ONE clock and ONE bound. Aged past RESUME_STALE_BOUND, `--liveness` reads stale, `--status`
+# ---- says presumed-stopped naming the number `--liveness` prints as `stale-bound`, and another session
+# ---- takes the run over; inside the bound the same call refuses at 58.
+build_hold_fixture; write_aged_commit
+DD_SB=$(bash "$SCRIPT" --liveness tRun 2>/dev/null | sed -n 's/^stale-bound: //p')
+hit "$(run --liveness tRun)" "stale: yes"
+hit "$(run --status tRun)" "against the ${DD_SB}s bound, so the session holding the lease is presumed gone"
+hit "$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)" "taken over — phase RUNNING · keepalive C"
+build_hold_fixture
+hit "$(run --liveness tRun)" "stale: no"
+hit "$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)" "UNATTENDED check 58 FAILED"
+
+# ---- AC20: a bar whose legs keep landing in the run's own worktree keeps an otherwise aged record out
+# ---- of STALE through its gate logs, and the matrix refuses a take-over on that clock; a gate log
+# ---- dated past the bound as well reads stale again. RED against a `derive_last_move` with its
+# ---- gate-log term cut, under which the planted log changes nothing.
+build_hold_fixture; write_aged_commit
+DD_GL="$(git rev-parse --git-dir)/gate-logs"; mkdir -p "$DD_GL"; touch "$DD_GL/leg-1.txt"
+out=$(run --liveness tRun)
+hit  "$out" "stale: no"
+hit  "$out" "last-move-source: gate-log"
+hit  "$out" "verdict: LIVE"
+miss "$(run --status tRun)" "presumed-stopped"
+before=$(sum)
+hit  "$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder"
+same "AC20 the refused take-over wrote nothing" "$(sum)" "$before"
+touch -d '2000-01-01T00:00:00Z' "$DD_GL/leg-1.txt"
+hit  "$(run --liveness tRun)" "stale: yes"
+rm -rf "$DD_GL"
+
+# ---- AC21: a dead clock on a LEASED record reads UNKNOWN, announced, and declines the take-over: 58
+# ---- with an id, 59 with none, and `--status` says UNKNOWN and never presumed-stopped. RED against a
+# ---- `check_lease_fresh` that returns stale on a dead probe, under which the first call takes over.
+DSTUB=$(mktemp -d); printf '#!/bin/sh\nexit 1\n' > "$DSTUB/date"; chmod +x "$DSTUB/date"
+build_hold_fixture; before=$(sum)
+out=$(CLAUDE_CODE_SESSION_ID=T PATH="$DSTUB:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id C 2>&1)
+hit  "$out" "the lease age is UNKNOWN on this node"
+hit  "$out" "UNATTENDED check 58 FAILED"
+same "AC21 a dead clock declined the take-over and wrote nothing" "$(sum)" "$before"
+hit  "$(CLAUDE_CODE_SESSION_ID=T PATH="$DSTUB:$PATH" bash "$SCRIPT" --resume tRun 2>&1)" "UNATTENDED check 59 FAILED"
+out=$(PATH="$DSTUB:$PATH" bash "$SCRIPT" --status tRun 2>&1)
+hit  "$out" "the lease age is UNKNOWN on this node, because a clock probe it needs answered nothing, so staleness here is unanswerable rather than no"
+miss "$out" "presumed-stopped"
+rm -rf "$DSTUB"
+
+# ---- AC22: a record with NO LEASE, `keepalive` alone of the six as a pre-lease record carries it, is
+# ---- graded by its build folder's age against the one bound and never by the calling worktree's
+# ---- unrelated commits; its holder whose scheduler lists another job takes the one lease record
+# ---- through `--replaces`, and every other id waits out the bound.
+build_hold_fixture; drop_lease_facts; git add -A >/dev/null
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q -m unlease --no-verify
+printf 'x\n' > unrelated.txt; fixture
+hit "$(run --status tRun)" "presumed-stopped — this record has NO LEASE"
+out=$(run --resume tRun --keepalive-id C)
+hit "$out" "presumed-stopped — this record has NO lease"
+hit "$out" "taken over — phase RUNNING · keepalive C"
+build_hold_fixture; drop_lease_facts; fixture; before=$(sum)
+out=$(run --resume tRun --keepalive-id k2)
+hit  "$out" "unattended: tRun · phase RUNNING"
+hit  "$out" "and everyone else waits out the bound: pass --keepalive-id, and --replaces k1"
+same "AC22 a new id inside the bound wrote nothing" "$(sum)" "$before"
+hit  "$(run --resume tRun --keepalive-id k3 --replaces k9)" "--replaces names an id this slug's lease does not hold"
+same "AC22 a --replaces naming another id wrote nothing" "$(sum)" "$before"
+hit  "$(run --resume tRun --keepalive-id k2 --replaces k1)" "keepalive replaced"
+same "AC22 the replacement records all six lease facts" "$(grep -cE '^(keepalive|session|pid|host|pid-image|lease-utc): ' memory/builds/tRun/RUN.md)" "6"
+same "AC22 ...under the new keepalive" "$(sed -n 's/^keepalive: //p' memory/builds/tRun/RUN.md)" "k2"
+same "AC22 ...staged" "$(git diff --cached --name-only)" "memory/builds/tRun/RUN.md"
+reset_tree
+
+# ---- AC8: a pushed LANDING `--landed` has not observed is RE-BOUND by `--resume --keepalive-id` from
+# ---- any session, staged and never committed, and it still derives LANDED, so `fail 55`'s remedy
+# ---- writes. The tolerance is the six lease-fact lines at its two sites and nowhere else: `--preflight`
+# ---- over the re-bound record and `--hold` over a record whose one moved line is `session` both
+# ---- refuse at check 2, and a hand-edited witness keeps the landing unfound and `--landed` refused.
+build_dd_landing primary
+out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id k2)
+hit  "$out" "landing re-bound · keepalive k1 -> k2 · session fixture-session -> T"
+same "AC8 the re-bound record is staged" "$(git diff --cached --name-only)" "memory/builds/tRun/RUN.md"
+same "AC8 ...and not committed" "$(git rev-parse HEAD)" "$DD_C"
+hit  "$(run --status tRun)" "phase LANDED (derived: ${DD_C:0:8}"
+hit  "$(run --preflight tRun --keepalive-id k2)" "the working tree is dirty, so the pinned BASE would name a state that is not what runs"
+cp memory/builds/tRun/RUN.md "$ORIGIN_DIR/dd-rebound.md"
+out=$(CLAUDE_CODE_SESSION_ID=T run --landed tRun)
+miss "$out" "UNATTENDED check 2 FAILED"
+miss "$out" "UNATTENDED check 55 FAILED"
+hit  "$out" "phase LANDED · witness"
+git reset -q --hard "$DD_C"; cp "$ORIGIN_DIR/dd-rebound.md" memory/builds/tRun/RUN.md
+sed -i 's/^witness: .*/witness: 1111111111111111111111111111111111111111/' memory/builds/tRun/RUN.md
+hit  "$(CLAUDE_CODE_SESSION_ID=T run --landed tRun)" "UNATTENDED check 2 FAILED"
+git checkout -q HEAD -- memory/builds/tRun/RUN.md
+sed -i 's/^witness: .*/witness: 1111111111111111111111111111111111111111/' memory/builds/tRun/RUN.md
+hit  "$(run --status tRun)" "phase LANDING (not on the remote: the LANDING record is not committed as it stands"
+rm -f "$ORIGIN_DIR/dd-rebound.md"; restore_dd_origin
+build_hold_fixture; set_lease_fact session Snew
+hit  "$(run --hold tRun --code platform-limit --until owner --reason x --reaped k1)" "the working tree is dirty, so the pinned BASE would name a state that is not what runs"
+reset_tree
+
+# ---- AC9: under `in-place` the keepalive reap is READ BACK before the anchor round-trip: a listing that
+# ---- still names the recorded keepalive refuses at 53, one free of it reads `checked` BEFORE the
+# ---- derivation, and a session the record does not name refuses at 55. The stop line is younger than
+# ---- `lease-utc`, the only kind the read-back grades. RED against the branch that returned first.
+build_dd_landing in-place
+mkdir -p "${STOP7%/*}"
+printf '%s\n' '{"utc":"2099-01-01T00:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
+hit  "$(run --landed tRun)" "the keepalive attestation is contradicted by the harness's own listing"
+printf '%s\n' '{"utc":"2099-01-01T00:00:00Z","phase":"LANDING","session_crons":[]}' > "$STOP7"
+out=$(run --landed tRun)
+DD_RL=$(printf '%s\n' "$out" | grep -n 'keepalive-reaped: checked' | cut -d: -f1 | head -1)
+DD_DL=$(printf '%s\n' "$out" | grep -n 'phase LANDED (derived' | cut -d: -f1 | head -1)
+same "AC9 the read-back precedes the derivation" "$([ -n "$DD_RL" ] && [ -n "$DD_DL" ] && [ "$DD_RL" -lt "$DD_DL" ] && echo before || echo "read-back line [$DD_RL], derivation line [$DD_DL]")" "before"
+rm -f "$DD_LOG"
+hit  "$(CLAUDE_CODE_SESSION_ID=T run --landed tRun)" "the stop-guard binds by the lease and this session is not the one the record names"
+restore_dd_origin; reset_tree
+
+# ---- AC23: the re-bind writes only where that landing's own `--landed` runs. From a new branch at the
+# ---- pushed tip, a re-run build's fresh worktree, it names the run branch and writes nothing, and
+# ---- `--audit` then refuses at 51; on the run branch it re-binds; under `primary` it re-binds on the
+# ---- default branch too; and a record naming NEITHER branch fact re-binds anywhere, announced as not
+# ---- scoped.
+build_dd_landing in-place
+git checkout -q -b dd-rerun
+hit  "$(run --resume tRun --keepalive-id k3)" "nothing to resume — this landing is on the remote and --landed has not observed it, and its --landed runs on the record's run branch refs/heads/unit"
+same "AC23 the out-of-scope resume wrote nothing" "$(git status --porcelain)" ""
+hit  "$(run --audit tRun)" "UNATTENDED check 51 FAILED"
+git checkout -q unit
+hit  "$(run --resume tRun --keepalive-id k3)" "landing re-bound · keepalive k1 -> k3"
+git reset -q --hard "$DD_C"; git branch -q -D dd-rerun; restore_dd_origin
+build_dd_landing primary
+git checkout -q -B main "$DD_C"
+hit  "$(run --resume tRun --keepalive-id k3)" "landing re-bound · keepalive k1 -> k3"
+git reset -q --hard "$DD_C"; restore_dd_origin
+build_dd_landing in-place
+sed -i '/^run-branch: /d; /^branch-ref: /d' memory/builds/tRun/RUN.md; fixture; git push -q -f origin HEAD:main
+git checkout -q -b dd-rerun
+out=$(run --resume tRun --keepalive-id k3)
+hit  "$out" "landing re-bound · keepalive k1 -> k3"
+hit  "$out" "this record names neither a run-branch nor a branch-ref fact, so this re-bind was NOT SCOPED"
+same "AC23 the unscoped re-bind is staged" "$(git diff --cached --name-only)" "memory/builds/tRun/RUN.md"
+git reset -q --hard HEAD; git checkout -q unit; git branch -q -D dd-rerun; restore_dd_origin; reset_tree
+
+# ---- AC24 and AC10 over two LINKED worktrees, because in a main worktree `--git-dir` and
+# ---- `--git-common-dir` answer one directory and a per-worktree path would pass there unseen. From W1,
+# ---- on the run branch, a same-id re-preflight writes unit 28's ledger line into the COMMON dir with
+# ---- the record's keepalive; the in-place observation lands in the common dir's landed log and removes
+# ---- a ledger of exited processes. From W2, detached at the landing commit: TERMINAL, `--status`
+# ---- names the observation and, with the remote gone and the commits aged, is never presumed-stopped,
+# ---- and `--resume` writes nothing. A LATER landing in W1 whose log names only the earlier one stays
+# ---- unstamped. RED against a driver whose `resolve_procs_path` derives from `resolve_sidecar_dir`.
+reset_tree; rm -f "$STOP7" "$DD_LOG" "$DD_CD/unattended/tRun.procs"
+export DD_SNAP="$ORIGIN_DIR/dd-snap"; rm -f "$DD_SNAP"
+mkdir -p bin; printf '#!/usr/bin/env bash\nsleep 1\ncat "$(git rev-parse --git-common-dir)/unattended/tRun.procs" > "$DD_SNAP" 2>/dev/null\nexit 0\n' > bin/dd-wire.sh
+mkconf "bash bin/dd-wire.sh"; sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' .unattended.conf; fixture
+run --preflight tRun --keepalive-id k1 >/dev/null; fixture
+git checkout -q --detach
+DD_W1="$ORIGIN_DIR/dd-w1"; DD_W2="$ORIGIN_DIR/dd-w2"; rm -rf "$DD_W1" "$DD_W2"
+git worktree add -q "$DD_W1" unit >/dev/null 2>&1
+rm -f "$DD_SNAP"
+( cd "$DD_W1" && bash "$SCRIPT" --preflight tRun --keepalive-id k1 ) >/dev/null 2>&1
+same "AC24 the ledger line the re-preflight wrote carries the record's keepalive" "$(awk '{ print $5 }' "$DD_SNAP" 2>/dev/null | head -1)" "k1"
+DD_W1G=$(cd "$DD_W1" && cd "$(git rev-parse --git-dir)" && pwd)
+n=$((n+1)); [ ! -e "$DD_W1G/unattended/tRun.procs" ] || { echo "FAIL AC24 the ledger landed in W1's own git dir, one ledger per worktree"; st=1; }
+( cd "$DD_W1" && git add -A && git commit -q -m rp --no-verify \
+    && sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md \
+    && git add -A && git commit -q -m close --no-verify && git push -q -f origin HEAD:main ) >/dev/null 2>&1
+DD_C=$(git -C "$DD_W1" rev-parse HEAD)
+( true & printf '%s - %s - k1 2026-09-22T00:00:00Z true\n' "$!" "$!" >> "$DD_CD/unattended/tRun.procs"; wait )
+n=$((n+1)); [ -f "$DD_CD/unattended/tRun.procs" ] || { echo "FAIL AC24 the planted ledger is absent, so its removal proves nothing"; st=1; }
+hit  "$(cd "$DD_W1" && bash "$SCRIPT" --landed tRun 2>&1)" "phase LANDED (derived: ${DD_C:0:8}"
+n=$((n+1)); [ ! -f "$DD_CD/unattended/tRun.procs" ] || { echo "FAIL AC24 the in-place observation from W1 left the ledger of exited processes behind"; st=1; }
+n=$((n+1)); grep -q " landed $DD_C on refs/heads/main at " "$DD_LOG" 2>/dev/null || { echo "FAIL AC10 the observation is not in the common dir's landed log: $(cat "$DD_LOG" 2>/dev/null)"; st=1; }
+n=$((n+1)); [ ! -e "$DD_W1G/unattended/landed.tRun.log" ] || { echo "FAIL AC10 the landed log was written under W1's own git dir"; st=1; }
+git worktree add -q --detach "$DD_W2" "$DD_C" >/dev/null 2>&1
+out=$(cd "$DD_W2" && bash "$SCRIPT" --liveness tRun 2>&1)
+hit  "$out" "state: terminal"
+hit  "$out" "verdict: TERMINAL"
+hit  "$(cd "$DD_W2" && bash "$SCRIPT" --status tRun 2>&1)" "landed · observed by --landed at"
+git remote set-url origin "$ORIGIN_DIR/nope.git"
+( cd "$DD_W2" && GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m aged --no-verify )
+out=$(cd "$DD_W2" && bash "$SCRIPT" --status tRun 2>&1)
+miss "$out" "presumed-stopped"
+hit  "$out" "landed · observed by --landed at"
+hit  "$(cd "$DD_W2" && bash "$SCRIPT" --resume tRun --keepalive-id C 2>&1)" "nothing to resume — --landed observed this record on the remote at"
+same "AC10 the observed landing's resume wrote nothing" "$(git -C "$DD_W2" status --porcelain)" ""
+git remote set-url origin "$ORIGIN"
+( cd "$DD_W1" && sed -i "s/^witness: .*/witness: $DD_C/" memory/builds/tRun/RUN.md && printf 'later: yes\n' >> memory/builds/tRun/RUN.md \
+    && git add -A && git commit -q -m later-close --no-verify && git fetch -q origin ) >/dev/null 2>&1
+hit  "$(cd "$DD_W1" && bash "$SCRIPT" --liveness tRun 2>&1)" "verdict: FINISHED-UNSTAMPED"
+git worktree remove --force "$DD_W1" >/dev/null 2>&1; git worktree remove --force "$DD_W2" >/dev/null 2>&1; git worktree prune
+rm -rf "$DD_W1" "$DD_W2" "$DD_SNAP"; unset DD_SNAP
+restore_dd_origin
+# AC1's own reading, taken once over every arm above: no verb wrote a lease file anywhere in the
+# common dir.
+n=$((n+1)); [ -z "$(find "$DD_CD" -name '*.lease' 2>/dev/null)" ] || { echo "FAIL AC1 a verb wrote a lease file: $(find "$DD_CD" -name '*.lease')"; st=1; }
 reset_tree
 
 # ---- TOOL-dDerivedDocket-3 — LANDER_MODE, the in-place landing and the committing close -----------
@@ -7536,7 +7852,6 @@ GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-LEASE_STALE_AFTER="7200"
 REVIEW_ROUNDS="7"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
@@ -8878,7 +9193,6 @@ GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-LEASE_STALE_AFTER="7200"
 REVIEW_ROUNDS="7"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
@@ -8925,7 +9239,9 @@ DLR
 dl_unit=$(git -C "$dl_dir" rev-parse unit)
 dl_base=$(git -C "$dl_dir" rev-parse main)
 DL_R=memory/builds/tRun/RUN.md
-DL_LEASE="$dl_dir/.git/unattended/tRun.lease"
+# The node's LANDED LOG, where in-place `--landed` keeps its observation (TOOL-dDerivedDocket-61 S10);
+# it replaced the retired per-slug lease file this fixture used to reset.
+DL_LOG="$dl_dir/.git/unattended/landed.tRun.log"
 run_dl() { ( cd "$dl_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main DLOUT="$dl_out" bash "$SCRIPT" "$@" 2>&1 ); }
 run_dl_git() { git -C "$dl_dir" "$@"; }
 read_dl_sum() { run_dl_git hash-object "$DL_R"; }
@@ -8935,7 +9251,7 @@ init_dl_fixture() {
   run_dl_git reset -q --hard "$dl_unit"; run_dl_git clean -qfd
   run_dl_git remote set-url origin "$dl_origin"
   run_dl_git update-ref refs/heads/main "$dl_base"; run_dl_git push -q -f origin "$dl_base":main; run_dl_git fetch -q origin main
-  rm -f "$dl_out/lander.log" "$DL_LEASE"
+  rm -f "$dl_out/lander.log" "$DL_LOG"
 }
 # A LANDING record committed by hand on the run branch, with any extra fact lines appended.
 write_dl_landing() { # [extra fact lines, printf %b] -> DL_C, the landing commit
@@ -8987,7 +9303,7 @@ out=$(run_dl --status tRun)
 hit "$out" "phase LANDED (derived: ${DL_C:0:8}"
 
 # ---- AC4 + AC15: in-place `--landed` OBSERVES. It exits 0, prints the derivation, writes nothing to
-# ---- the tree, and keeps the observation in the lease; the record commit was already on the tip, and
+# ---- the tree, and keeps the observation in the landed log; the record commit was already on the tip, and
 # ---- the guard that reads the RECORDED phase does not refuse it as finished.
 write_dl_landing ""
 run_dl_git push -q origin HEAD:main
@@ -8995,7 +9311,7 @@ dl_h=$(run_dl_git rev-parse HEAD)
 # TOOL-dDerivedDocket-28 AC12, the in-place half: the observation removes a process ledger that
 # records only exited processes. One such record is PLANTED, so the ledger is asserted to exist
 # before the verb and an absent one cannot pass for a removed one.
-dl_pl="${DL_LEASE%.lease}.procs"
+dl_pl="$dl_dir/.git/unattended/tRun.procs"
 ( true & printf '%s - %s - k1 2026-09-22T00:00:00Z true\n' "$!" "$!" >> "$dl_pl"; wait )
 n=$((n+1)); [ -f "$dl_pl" ] || { echo "FAIL AC12 the in-place fixture carries no ledger, so its removal proves nothing"; st=1; }
 out=$(run_dl --landed tRun); rc=$?
@@ -9006,15 +9322,16 @@ miss "$out" "the run is already finished"
 same "in-place --landed wrote nothing to the tree" "$(run_dl_git status --porcelain)" ""
 same "in-place --landed made no commit" "$(run_dl_git rev-parse HEAD)" "$dl_h"
 same "the record still says LANDING in its own bytes" "$(sed -n 's/^phase: //p' "$dl_dir/$DL_R")" "LANDING"
-n=$((n+1)); grep -q '^released .* landed$' "$DL_LEASE" 2>/dev/null \
-  || { echo "FAIL in-place --landed did not keep its observation as a released-landed lease: $(cat "$DL_LEASE" 2>/dev/null)"; st=1; }
-# ...and the READER that lease exists for: the remote stops answering and the record's commits are
-# older than any lease bound, which is exactly the state that reads presumed-stopped without the row.
+n=$((n+1)); grep -q " landed $DL_C on refs/heads/main at $DL_C\$" "$DL_LOG" 2>/dev/null \
+  || { echo "FAIL in-place --landed did not keep its observation in the landed log: $(cat "$DL_LOG" 2>/dev/null)"; st=1; }
+# ...and the READER that log exists for: the remote stops answering and the tree is older than any
+# lease bound, which is exactly the state that reads presumed-stopped without the row. Aged by an EMPTY
+# commit on top, never by amending: the log names the landing commit, and an amend is another one.
 write_dl_landing ""
 run_dl_git push -q origin HEAD:main
 run_dl --landed tRun >/dev/null
 ( cd "$dl_dir" && GIT_COMMITTER_DATE="2020-01-01T00:00:00Z" GIT_AUTHOR_DATE="2020-01-01T00:00:00Z" \
-    git commit -q --amend --no-edit --no-verify ) >/dev/null 2>&1
+    git commit -q --allow-empty -m aged --no-verify ) >/dev/null 2>&1
 run_dl_git remote set-url origin "$dl_oroot/nope.git"
 out=$(run_dl --status tRun)
 hit  "$out" "landed · observed by --landed at"
@@ -9120,7 +9437,9 @@ build_dl_rotation() { # "owner" or "run" -> DL_C, the landing commit, pushed; th
 }
 build_dl_rotation owner
 rm -f "$dl_out/lander.log"
-out=$(run_dl --resume tRun --keepalive-id k1)
+# NO ID: with one, a derived LANDED that `--landed` has not observed is RE-BOUND on its run branch
+# (TOOL-dDerivedDocket-61 S8), which that unit's own arms grade; this arm is about the lander.
+out=$(run_dl --resume tRun)
 hit  "$out" "nothing to resume — phase LANDED is terminal"
 n=$((n+1)); [ ! -s "$dl_out/lander.log" ] || { echo "FAIL --resume on a derived-LANDED record invoked the lander: $(cat "$dl_out/lander.log")"; st=1; }
 out=$(run_dl --preflight tRun --keepalive-id k2)
@@ -9336,7 +9655,6 @@ GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-LEASE_STALE_AFTER="7200"
 REVIEW_ROUNDS="7"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
@@ -9686,7 +10004,6 @@ GATE_CMD="bash bin/bar.sh"
 GATE_BOUND="600"
 GATE_WALL="21600"
 UNIT_STALL_BOUND="1800"
-LEASE_STALE_AFTER="7200"
 REVIEW_ROUNDS="7"
 RESUME_STALE_BOUND="5400"
 WIRING_CHECK="bash bin/wire.sh"
@@ -9710,7 +10027,8 @@ PLC
 ) >/dev/null 2>&1
 pl_unit=$(git -C "$pl_dir" rev-parse unit)
 PL_LEDGER="$pl_dir/.git/unattended/tRun.procs"
-PL_LEASE="$pl_dir/.git/unattended/tRun.lease"
+# The one lease record is the run-state facts (TOOL-dDerivedDocket-61): its six lines, hashed.
+read_pl_facts() { grep -E '^(keepalive|session|pid|host|pid-image|lease-utc): ' "$pl_dir/memory/builds/tRun/RUN.md" | git hash-object --stdin; }
 PL_PROCFS=""
 run_pl() { ( cd "$pl_dir" && env -u GATE_SELFTESTS -u UNATTENDED_PROCFS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" \
                ${PL_PROCFS:+UNATTENDED_PROCFS="$PL_PROCFS"} bash "$SCRIPT" "$@" 2>&1 ); }
@@ -9736,7 +10054,7 @@ run_pl_kill() { local k; for k in $(read_pl_kids "$1"); do kill -9 "$k" 2>/dev/n
 # A preflighted, committed, clean RUNNING fixture whose lease k1 holds, with NO ledger and no log.
 init_pl_fixture() {
   run_pl_git checkout -qf unit >/dev/null 2>&1; run_pl_git reset -q --hard "$pl_unit"; run_pl_git clean -qfd
-  rm -f "$PL_LEDGER" "$PL_LEASE" "$pl_out/order.log"
+  rm -f "$PL_LEDGER" "$pl_out/order.log"
   run_pl --preflight tRun --keepalive-id k1 >/dev/null
   run_pl_git add -A >/dev/null; run_pl_git commit -q -m pl-fixture --no-verify
   rm -f "$PL_LEDGER" "$pl_out/order.log"
@@ -9838,17 +10156,19 @@ run_pl_kill "$PL_ORPH"
 # ---- that do not hold the fresh lease k1 refuse, reap nothing and write neither the ledger nor the lease.
 init_pl_fixture
 write_pl_orphan 47
-pl_pb=$(read_pl_sum "$PL_LEDGER"); pl_lb=$(read_pl_sum "$PL_LEASE")
+pl_pb=$(read_pl_sum "$PL_LEDGER"); pl_lb=$(read_pl_facts)
 out=$(run_pl --status tRun)
 hit  "$out" "· orphans 1"
 same "AC5 --status left the ledger byte-unchanged" "$(read_pl_sum "$PL_LEDGER")" "$pl_pb"
 out=$(run_pl --resume tRun)
 hit  "$out" "a live session drives this slug, and a second driver is exactly what the lease exists to stop, so this refuses before any write"
 hit  "$out" "· orphans 1"
-out=$(run_pl --resume tRun --keepalive-id kB)
+# From ANOTHER session: the session the record names under a new id is its own relaunch and takes
+# the run over (TOOL-dDerivedDocket-61 S7), which holds the lease and reaps.
+out=$(CLAUDE_CODE_SESSION_ID=sOther run_pl --resume tRun --keepalive-id kB)
 hit  "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder"
 same "AC9 the two refused resumes left the ledger byte-unchanged" "$(read_pl_sum "$PL_LEDGER")" "$pl_pb"
-same "AC9 the two refused resumes left the lease byte-unchanged" "$(read_pl_sum "$PL_LEASE")" "$pl_lb"
+same "AC9 the two refused resumes left the lease byte-unchanged" "$(read_pl_facts)" "$pl_lb"
 n=$((n+1)); kill -0 "$PL_ORPH" 2>/dev/null || { echo "FAIL AC5/AC9 a verb that does not hold the lease killed the orphan"; st=1; }
 n=$((n+1)); grep -q '^reap ' "$pl_out/order.log" 2>/dev/null && { echo "FAIL AC5/AC9 a verb that does not hold the lease called the reaper"; st=1; }
 run_pl_kill "$PL_ORPH"
@@ -10014,7 +10334,6 @@ GATE_BOUND="$3"
 GATE_WALL="$1"
 GATE_PROFILE_CMD="$2"
 UNIT_STALL_BOUND="1800"
-LEASE_STALE_AFTER="7200"
 REVIEW_ROUNDS="7"
 RESUME_STALE_BOUND="5400"
 WIRING_CHECK="true"
@@ -10234,7 +10553,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # arm one, all in region two. COUNTED by running the backstop block and the MIXED arm behind a
 # replica of this prologue by hand over their own fixtures, n 0 -> 50 and 0 -> 5, green, and red
 # under twelve staged breaks; this pass runs no suite.
-FLOOR_ASSERTIONS=1540
+# RAISED 1540 -> 1638 by TOOL-dDerivedDocket-61: the one-lease-record block's 98 assertions, all in
+# region two beside the HELD arms they extend, so FLOOR_SHARD_2 carries the same +98 and FLOOR_SHARD_1
+# is untouched. COUNTED off the block's own `hit`/`miss`/`same`/`n=$((n+1))` lines, and the file's
+# whole count moved by exactly that figure against its parent: every lease-file assertion that unit
+# retargeted onto the run-state facts or the landed log is one for one and moves no floor. The block
+# was run alone behind a replica of this prologue by hand, n 20 -> 118 and green; no suite ran.
+FLOOR_ASSERTIONS=1638
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -10359,7 +10684,8 @@ FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1344
+FLOOR_SHARD_2=1442
+# +98 for the TOOL-dDerivedDocket-61 one-lease-record arms, all in region two - see FLOOR_ASSERTIONS.
 # +56 for the TOOL-dDerivedDocket-27 backstop, MIXED and NOCONF arms, all in region two - see FLOOR_ASSERTIONS.
 # +66 for the TOOL-dDerivedDocket-24 inherited-red arms, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the TOOL-dDerivedDocket-30 `--framed` and `--version` arms, in region two - see FLOOR_ASSERTIONS.

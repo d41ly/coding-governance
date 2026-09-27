@@ -97,21 +97,20 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 - `--liveness` — key: value lines and one verdict for an OUT-OF-SESSION reader: the phase, the
   lease, whether the recorded pid exists AND is the leased process (image and start time, not the
   number alone), seconds since anything moved, the last recorded stall, `TERMINAL`,
-  `FINISHED-UNSTAMPED`, `UNBOUND`, `STALE` or `LIVE`, and last the `stale-bound` the verdict was
-  graded against, so the tick bounds its own reads by this reader's number. Read-only; the
+  `FINISHED-UNSTAMPED`, `HELD`, `UNBOUND`, `STALE` or `LIVE`, and last the `stale-bound` the verdict
+  was graded against, so the tick bounds its own reads by this reader's number. Read-only; the
   stop-guard, the stall-recorder's readers and the resume tick call it rather than deciding for
   themselves. It cannot see what the session is doing or whether a process is hung — existence is
   not progress.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`. With
-  `--keepalive-id <id>` it REPLACES the lease — keepalive, session, pid — so a resumed session's
-  record names the session that now holds it; refused on a terminal record.
-  `--scheduled <held-at>` marks it as the restart a DURABLE schedule issued, and is the only
-  restart one may issue. It refuses, numbered and before any write, unless the record is HELD, its
-  `held-at` equals the value passed, and — under `ANCHOR_SCOPE=published` — the tip the remote
-  advertises for the run branch is HEAD or an ancestor of it; an unreachable remote refuses too.
-  On success the take-over runs unchanged and still requires the session's own `--keepalive-id`,
-  and its history row carries `scheduled` rather than `manual`. `UNATTENDED-STOPS.md` is the
-  contract; the rules are not restated here.
+  `--keepalive-id <id>` it applies the resume matrix: the holder's own id writes nothing, while a
+  take-over, `--replaces`, the holder's restarted process and a pushed landing not yet observed
+  re-record keepalive, session and pid and stage the record; refused on a recorded terminal.
+  `--scheduled <held-at>` marks it as the restart a DURABLE schedule issued. It refuses, numbered
+  and before any write, unless the exact hold that schedule was filed for is still the record's
+  state, and on success the take-over runs unchanged, still requires the session's own
+  `--keepalive-id`, and writes `scheduled` rather than `manual` on its history row.
+  `UNATTENDED-STOPS.md` §8 and §11 are the contract.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one. Its bar is
   bounded by the pinned backstop, and `gates-green` names each other way a bar ends as what it is: a

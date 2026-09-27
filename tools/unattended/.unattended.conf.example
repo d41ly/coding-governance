@@ -339,12 +339,6 @@ HALT_FLOOR="7"
 HOLD_CODES_EXTRA=""
 HOLD_FLOOR="5"
 
-# How long a per-slug lease may go unrefreshed before a second session may take the run over. The
-# EFFECTIVE bound is max(GATE_BOUND, LEASE_STALE_AFTER): a live bar holds a session silent for the
-# whole bar, so a bound under GATE_BOUND would hand the slug away mid-gate. Optional — leave it out
-# and the kit default is announced on every run rather than applied silently.
-LEASE_STALE_AFTER="7200"
-
 # The UNDECLARED-WRITE CEILING. A concurrently dispatched pass declares its write set before it
 # starts, and that declaration is the disjointness proof two passes rest on. Check 23 compares the
 # declaration against what the pass actually committed and grades the COUNT against this pin, which

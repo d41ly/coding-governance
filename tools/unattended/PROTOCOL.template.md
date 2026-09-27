@@ -380,20 +380,20 @@ scheduled job shares all three, so it is demoted, not fixed.
 **The IDLE-WAKE** is that job. The AGENT schedules it as the run's first act, before orienting, on
 every start path, and reaps it last — a run that never starts still owns it. It is recorded under
 the `keepalive` fact and attested as `keepalive-reaped`; that fact, that DoD item, `--keepalive-id`
-and the `KEEPALIVE_*` keys keep their names: each has readers. Its limits, 2026-09-13: it fires
-only while the session is idle (documented) and, owner-reported, unmeasured, stays silent while a
-background task is pending. Its prompt is `--resume --keepalive-id` with its own id, refreshing the
-lease, then `--audit`. Presume a job you did not schedule ALIVE until a delete says so
-(`TOOL-aPromptedMandate-11`: two asserted dead fired). A hold may owe a DURABLE restart too;
-`UNATTENDED-STOPS.md` carries that contract.
+and the `KEEPALIVE_*` keys keep their names: each has readers. Its limits, 2026-09-13: it fires only
+while the session is idle (documented) and, owner-reported, unmeasured, stays silent while a
+background task is pending. Its prompt is `--resume --keepalive-id` with its own id, then `--audit`.
+Presume a job you did not schedule ALIVE until a delete says so (`TOOL-aPromptedMandate-11`: two
+asserted dead fired). A hold may owe a DURABLE restart too; `UNATTENDED-STOPS.md` carries that
+contract.
 
 **The KEEPALIVE** is what wakes a run from outside its own turn: the stop-guard refuses a turn end
-while the run is non-terminal, writing `stop`; the stall-recorder writes an API-error end to
-`stall`; the resume-tick, an OS-scheduled task, resumes from another process a run `--liveness`
-reads `STALE`, or `FINISHED-UNSTAMPED` with `stale: yes`, writing `resume` — three sidecar kinds
-under `<git-dir>/unattended/`. Registering the tick is the owner's, one line per OS in the kit
-README; `--check` reports it as INFO. The tick acts only on a lease the INDEX holds, on the node
-that took it.
+while the run is non-terminal and not `HELD`, writing `stop`; the stall-recorder writes an API-error
+end to `stall`; the resume-tick, an OS-scheduled task, resumes from another process a run
+`--liveness` reads `STALE`, or `FINISHED-UNSTAMPED` with `stale: yes`, writing `resume` — three
+sidecar kinds under `<git-dir>/unattended/`. Registering the tick is the owner's, one line per OS in
+the kit README; `--check` reports it as INFO. The tick acts only on a lease the INDEX holds, on the
+node that took it.
 
 **The actors.** The AGENT schedules and reaps the idle-wake and, on resume, runs
 `--resume <slug> --keepalive-id <id>`, re-recording the lease. The DRIVER records the lease (§2,
@@ -402,10 +402,10 @@ the reap at `--landed` against the harness's own listing. The HOOKS and the TICK
 and resume.
 
 **The absent-owner default.** A session bound to a non-terminal run never ends its turn by asking:
-it runs `--plan` and builds the next READY unit, or aborts with a code. A resumed session never
-parks a question the protocol lets it decide: it takes the option that makes no measured observable
-worse and records why. The tick's CONTINUE payload is this rule and nothing more; its text lives
-there.
+it runs `--plan` and builds the next READY unit, aborts with a code, or holds with `--hold`. A
+resumed session never parks a question the protocol lets it decide: it takes the option that makes
+no measured observable worse and records why. The tick's CONTINUE payload is this rule and nothing
+more; its text lives there.
 
 **RESUME.** A take-over reaps the recorded id first, reads the result back, schedules the
 replacement and records it with `--resume --keepalive-id`; the reverse order leaves two jobs and a
@@ -439,11 +439,11 @@ distinction that matters most.
 
 ## 7. The verbs
 
-The nineteen verb entries live in `UNATTENDED-VERBS.md`, installed beside this file from the kit's
+The verb entries live in `UNATTENDED-VERBS.md`, installed beside this file from the kit's
 `VERBS.template.md` and byte-compared against it by the same leg that compares this pair. Read them
 there. Nothing about any verb changed in the move, and section 4's attested-item paragraph moved
-into `--attest` the same way. The stop contract is `UNATTENDED-STOPS.md`, installed and compared
-the same way.
+into `--attest` the same way. The stop contract is `UNATTENDED-STOPS.md`, installed and compared the
+same way.
 
 ## 8. What a project declares
 
@@ -480,7 +480,6 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `HOLD_CODES_EXTRA` | project hold codes, appended to the core set |
 | `HOLD_FLOOR` | the shrink-only SIZE of the kit's core hold-code set. MANDATORY, for the reason `CORE_FLOOR` is |
-| `LEASE_STALE_AFTER` | seconds a lease may go unrefreshed before a take-over; the bound is the larger of it and `GATE_BOUND`. OPTIONAL |
 | `UNDECLARED_WRITE_CEILING` | the shrink-only CEILING on dispatched passes that committed outside the set they declared before dispatch. MANDATORY: undeclared or malformed is a refusal, for the reason `CORE_FLOOR` is. The count may FALL and never RISE, and a fall is ANNOUNCED rather than red — this population is derived from history reachability, not from a file listing, so a clone that cannot reach a group anchor legitimately grades fewer rows. Lowering the pin is a hand edit; an adopter's value is 0 |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |

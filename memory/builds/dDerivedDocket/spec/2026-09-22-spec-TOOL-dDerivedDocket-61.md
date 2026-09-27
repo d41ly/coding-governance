@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor
 
-**Status:** SPECCED · rev-9 · 2026-09-27 · node d · Tier-2 · base 285701d5 · streams tooling · order 31
+**Status:** CLOSED · rev-10 · 2026-09-27 · node d · Tier-2 · base 285701d5 · streams tooling · order 31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-27-build-TOOL-dDerivedDocket-61-1-acceptance-ledger.md](../build/2026-09-27-build-TOOL-dDerivedDocket-61-1-acceptance-ledger.md) | journal | — |
 | [2026-09-22-review-TOOL-dDerivedDocket-61-spec-audit-g8-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-61-spec-audit-g8-round1.md) | spec-audit | TOOL-dDerivedDocket-27 |
 | [2026-09-22-review-TOOL-dDerivedDocket-62-spec-audit-g9-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-62-spec-audit-g9-round1.md) | spec-audit | TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64 |
 | [2026-09-22-review-TOOL-dDerivedDocket-65-spec-audit-g10-round1.md](../reviews/2026-09-22-review-TOOL-dDerivedDocket-65-spec-audit-g10-round1.md) | spec-audit | TOOL-dDerivedDocket-65 TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64 |
@@ -134,6 +135,11 @@ bound, with HELD carved out of the stop-guard, `--liveness` and the resume tick.
   `tools/unattended/unattended.test.sh:8978`, takes the path `resolve_procs_path` derives, and the
   fixture at `:9692` keeps `PL_LEDGER` and drops `PL_LEASE`, whose file nothing writes, from its
   reset, which moves no assertion; the new arms §7 names are written and each is staged RED.
+  Existing arms the re-keyed matrix reaches follow it one for one, moving no floor: an arm whose
+  new id came from the record's own session is asked from another session, because that call is
+  now the same-session row; unit 22's derived-LANDED resume arm drops its id, because an
+  id there is now the re-bind row; and unit 22's observed-landing reader ages its tree with an
+  empty commit, because an amend makes another landing commit than the one the log names.
   Each suite's executed-assertion floor rises by exactly the assertions its new arms carry, counted
   off their blocks and never read off a run: the driver suite's `FLOOR_ASSERTIONS` and
   `FLOOR_SHARD_2`, its new arms written in region two beside the arms they extend, and the
@@ -1252,6 +1258,11 @@ is the post-merge audit this build already takes after each wave, as `c361e347` 
   §4, AC14 and Files touched add that dossier with four edits, the seam line among them (M2), AC13
   retargets that witness there and adds zero-counts for the retired text in both dossiers, and the
   dossier figures are re-pinned. No matrix row, order or other edge moved.
+- rev-10 · 2026-09-27 · §2 S13 · the build pass. S13 names the existing driver-suite arms the
+  re-keyed matrix reaches beyond the lease-file assertions, each retargeted one for one: arms
+  whose new id came from the record's own session are asked from another session, unit 22's
+  derived-LANDED resume drops its id, and unit 22's observed-landing reader ages its tree with an
+  empty commit. No criterion, row, order or edge moved.
 
 ## 10. Reuse audit
 

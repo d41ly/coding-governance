@@ -27,14 +27,16 @@ before ORIENTING. Use `{{KEEPALIVE_CREATE}}`, at the cadence this project declar
 ```
 
 **What the tick runs.** TWO acts, in order, and only once this session's `--preflight` has written
-the run's record; before that the tick does nothing. A slug can be known earlier, and a probe issued
-then refuses with check 51, or on a re-run build says the keepalive should have been reaped: both are
-expected before `--preflight`, and neither is a signal to reap the keepalive `--preflight` is about
-to need. FIRST,
-`bash {{KIT_DIR}}/unattended.sh --resume <slug> --keepalive-id <your own id>`. That is how this
-session's lease is refreshed: the driver cannot observe a harness tick, so the refresh has to
-arrive through a verb, and the matching-id row of the resume matrix is the one that does it
-without writing anything else. SECOND, and ONLY when that first act neither refuses nor prints
+the run's record; before that the tick does nothing. A slug can be known earlier, and a tick issued
+then meets a refusal that is expected before `--preflight` and is never a signal to reap the
+keepalive `--preflight` is about to need: `--resume` refuses with check 10 when no run-state file
+exists, or with check 26 on a re-run build whose previous record is recorded terminal; under
+`in-place`, where a landed record stays LANDING until the next `--preflight` retires it, `--resume`
+prints nothing to resume and `--audit` then refuses with check 51. FIRST,
+`bash {{KIT_DIR}}/unattended.sh --resume <slug> --keepalive-id <your own id>`. For the holder it
+writes nothing, because whether a run is live is derived from what `--liveness` reads, which this
+very tick moves; the act is there to refuse a session that no longer holds the slug before the
+second act runs. SECOND, and ONLY when that first act neither refuses nor prints
 `still held`, `bash {{KIT_DIR}}/unattended.sh --audit <slug>`. After either of those two outcomes
 this session does not drive the slug, and acting on a `STALLED` verdict would re-dispatch units a
 live holder is driving, or a held run's units — the double drive the lease exists to stop. The verb prints one line per dispatched-and-open unit with how long the TREE has
@@ -73,8 +75,8 @@ that ended, and there is no run-state file for a later reader to find it through
 
 The idle-wake above fires only while the session is idle, so it cannot wake a stalled one. Three
 actors outside the session's turn can, and all three read one predicate: the stop-guard refuses a
-turn end while the run is non-terminal, up to `STOP_GUARD_BLOCKS` times, and says what to run
-instead; the stall-recorder writes an API-error end to the `stall` sidecar; the resume-tick,
+turn end while the run is non-terminal and not HELD, up to `STOP_GUARD_BLOCKS` times, and says
+what to run instead; the stall-recorder writes an API-error end to the `stall` sidecar; the resume-tick,
 registered by the owner on the OS scheduler, resumes a run from another process on the verdicts
 the protocol's section 5 names as acting — not `STALE` alone. The
 predicate is `bash {{KIT_DIR}}/unattended.sh --liveness <slug>`, the one to run by hand when you
@@ -837,10 +839,11 @@ Read the run-state file before doing anything else. It survived compaction and p
 context did not.
 
 **Run `--status <slug>` first, because who you are decides everything below.** If your own
-scheduler lists the keepalive its `LEASE` line names — or, when no `LEASE` line prints, the
-keepalive the record's `keepalive` fact names — you HOLD the lease: resume with
-`--resume <slug> --keepalive-id <that id>` and do not reap any job. Otherwise you are TAKING
-OVER: reap the recorded job and read the result back, schedule a new one, then run
+scheduler lists the keepalive the record's `keepalive` fact names, you HOLD the lease: resume with
+`--resume <slug> --keepalive-id <that id>` and do not reap any job. If you are the session the
+`session` fact names — relaunched by the tick or restarted by hand — and your scheduler no longer
+lists that job, schedule a new one and resume with its id. Otherwise you are TAKING OVER: reap the
+recorded job and read the result back, schedule a new one, then run
 `--resume <slug> --keepalive-id <new id>`, which records the new id. If that resume REFUSES or
 prints `still held`, reap only the job you just scheduled, read your scheduler's listing back to
 confirm it is gone, and stop — remove nothing else, because a durable restart filed under this
@@ -878,11 +881,10 @@ Then schedule the new one, with the stall-probe prompt the keepalive section giv
 already has its slug and its run-state file. This is the only exception to "read the record
 first": read it, reap, schedule, resume, kick off, and then do the work.
 
-**Then record the new id, so the record names the session that now holds the run.** After the reap
-and the re-schedule, run `bash {{KIT_DIR}}/unattended.sh --resume <slug> --keepalive-id <id>` with
-the new id: it re-records `keepalive`, `session` and `pid`, prints what it replaced and stages the
-file, and the close attestation then covers one job. Re-preflighting is NOT the remedy: it refuses
-on a dirty tree and re-pins the anchor.
+**What that `--resume` records.** The take-over `--resume` above re-records `keepalive`, `session`
+and `pid`, prints what it replaced and stages the file, so the record names the session that now
+holds the run and the close attestation covers one job. Re-preflighting is NOT the remedy: it
+refuses on a dirty tree and re-pins the anchor.
 
 **Then, if this project ships `/session-kickoff`, invoke it — after the `--resume` that neither
 refused nor printed `still held`, before the first pass.** Its unattended hand-back fires because the run-state file exists in a
@@ -1033,17 +1035,22 @@ everything the index rewrote, and let them ride the commit named below. A run th
 spec-defined unit gets the command's own no-record line and no file. That line is the answer, not a
 failure.
 
-**Three placements, and each rides a commit the run already makes**, so no path gains a commit it did
-not have. Each is the commit that carries the run-state file the verb just staged:
+**Three placements under `primary`, and each rides a commit the run already makes**, so under
+`primary` no path gains a commit it did not have. Each is the commit that carries the run-state file
+the verb just staged:
 
 1. **After `--abort`**, in the ABORTED record commit. Render, re-index and stage before you commit it.
-2. **After `--close` and before the merge, on every run that lands**, in the close's records commit:
-   the one `--close` tells you to make before you land. The record then travels with the merge, and
-   the bar at the push boundary grades it.
-3. **After `--landed`**, in the LANDED record commit. Render AGAIN: `record --write` finds the run's
-   existing file by its run key, so it rewrites the SAME file rather than adding a second one. The
-   landing push joins this run by what it pushed, so the re-render adds that push and the landing
-   bar's verdict.
+2. **Under `primary`, after `--close` and before the merge, on every run that lands**, in the close's
+   records commit: the one `--close` tells you to make before you land. The record then travels
+   with the merge, and the bar at the push boundary grades it.
+3. **Under `primary`, after `--landed`**, in the LANDED record commit. Render AGAIN: `record --write`
+   finds the run's existing file by its run key, so it rewrites the SAME file rather than adding a
+   second one. The landing push joins this run by what it pushed, so the re-render adds that push
+   and the landing bar's verdict.
+
+**Under `in-place`, render before the lander's `--prepare`**, and commit the record on the run branch
+in a records commit of its own. The in-place order commits nothing after the push and `--landed`
+writes no LANDED record there, so this is the one placement that travels with the landing.
 
 **Never between the lander's push and `--landed`.** Where the project declares a lander marker, a
 commit there moves HEAD off the commit the marker names, and `--landed` refuses it at check 34 — the

@@ -1,5 +1,5 @@
 <!-- gov:kit unattended@1.29 -->
-# The unattended stop contract — HELD, the hold codes and the per-slug lease
+# The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
 shipped template by the same leg that compares that pair. The protocol is still the contract; this
@@ -80,9 +80,8 @@ that is not what the tree holds — and the take-over would re-verify a mandate 
    not spell the declared bypass flag, which the gate greps this file whole for.
 3. Exactly one of `--reaped <id>` and `--keepalive-unreachable <node>`. A keepalive still firing into
    a HELD run re-dispatches its units at the next tick. The driver cannot reap a job in a session
-   store it cannot see; it can only record that somebody did. `--reaped` must name the keepalive the
-   slug currently runs under — the lease's id when there is one, the record's `keepalive` fact
-   otherwise — because a holder that replaced its own job records the new id in the lease first.
+   store it cannot see; it can only record that somebody did. `--reaped` must name the record's
+   `keepalive` fact, which a holder that replaced its own job re-recorded.
 4. The tree must be clean and committed.
 5. Under `ANCHOR_SCOPE=published`, the branch tip must be on its remote.
 6. An optional `--pending-run <runId>` must be 1 to 64 letters, digits, `_` and `-`. It becomes a fact
@@ -144,64 +143,53 @@ once stated a gate verdict and a reader took it for one.
 
 ## 7. The lease
 
-One file per slug, under the git COMMON dir so every worktree on the node reads the same one:
-
-```
-taken <iso> keepalive <id> host <hostname>
-refreshed <iso>
-```
-
-or a single `released <iso> held|landed` line. It is deliberately NOT in the tree: it is per-node
-runtime state, it must be writable while the tree is clean, and a tracked lease would make taking
-one a commit.
+The lease is the run-state facts `write_lease` writes together, `keepalive`, `session`, `pid`,
+`host`, `pid-image` and `lease-utc`. `lease-utc` says a record carries one: a
+record without it predates the run-state lease and is graded by the newest commit touching its build
+folder. The holder is the `keepalive` fact; freshness is `--liveness`'s clock against
+`RESUME_STALE_BOUND`; `HELD` is the released lease. A leftover lease file is never read.
 
 **The identity is the keepalive id**, because the scheduler store is SESSION-scoped: a session can
 list its own jobs and no other session's, so a resume passing an id its own scheduler lists IS the
 session that holds the lease. It prevents an accidental second driver, not a malicious one.
 
-ABSENT is a third state and not a synonym for released. On a working phase it means the run predates
-the lease, or its holder never took one.
-
-**The staleness bound** is the larger of `GATE_BOUND` and `LEASE_STALE_AFTER`. The first term exists
-because a live bar holds a session silent for the whole bar, and a bound under it would hand the slug
-away mid-gate. A clock that cannot answer reports the age as UNKNOWN and the lease is read as FRESH,
-which declines the take-over rather than inviting one.
-
-Taken by `--preflight`, by a take-over, and by a leaseless record's own holder resuming with the
-keepalive the record names. Refreshed by every writing verb past its own write gate, by a bounded
-command run under a lease this verb's own keepalive holds, and by a `--resume` passing the lease's
-own id. Released by `--hold`, and by an `in-place` `--landed` that observed the landing, as
-`released <iso> landed` (§12); removed at a terminal the driver writes.
-
-A refresh is a WRITE and obeys the rule every other write obeys: it happens only when the lease reads
-`taken` naming the keepalive the CALLING verb acts for. A released, absent or foreign lease is never
-written by a bounded command, so a refused preflight cannot renew a lease it does not hold — which
-would lock that lease's own holder out for the whole bound.
+**Nothing refreshes it**: a refresh in the tracked record would restage it every tick and move
+`lease-utc`, which `--landed` grades stop lines against. A clock that cannot answer reads UNKNOWN,
+announced, and declines the take-over.
 
 ## 8. The resume matrix
 
-`--resume` is two verbs in one, orientation and take-over, and the lease is what separates them.
+`--resume` is orientation or take-over, and the lease separates them. Rows apply in order, after the
+`--scheduled` refusals (§11). "Working" is any non-terminal phase but HELD; "no lease" lacks
+`lease-utc`.
 
-| Record | Lease | `--resume` |
+| Record | Caller and clock | `--resume` |
 |---|---|---|
-| HELD | released, stale or absent | take-over; with no `--keepalive-id`, prints the `--status` block, then refuses, numbered, and writes nothing |
-| HELD | fresh and taken | refuses, numbered: another session already resumed it |
-| working | fresh, taker equals the `--keepalive-id` passed | orientation; refreshes the lease and reaps the run's orphans (§14) |
-| working | fresh, a different `--keepalive-id` passed | refuses, numbered — unless `--replaces <old>` names the lease's id, which records the new id in the lease and the `keepalive` fact |
-| working | fresh, no id passed | prints the `--status` block, then refuses, numbered; writes nothing |
-| working | stale | `presumed-stopped`: take-over, refusing a missing id as the first row does |
-| working | absent, and the id passed equals the record's `keepalive` fact | orientation that TAKES the lease: the holder of a run that predates one |
-| working | absent, any other id or none | `presumed-stopped` once the newest commit touching the build folder is older than the bound, and taken over; inside the bound, prints the `--status` block and refuses, naming that commit's age |
-| LANDING | `released … landed` | nothing to resume and never the lander: `--landed` observed it on the remote, and the rotation waits for the advertised tip. Never `presumed-stopped` |
-| terminal, recorded or derived | any | unchanged: nothing to resume, and never a re-drive of the lander |
+| recorded terminal | any | nothing to resume; with an id, check 26 |
+| LANDING derived LANDED, not observed | an id, on a branch where that landing's `--landed` does not run, the record naming a branch fact | nothing to resume, naming the record's run branch; writes nothing |
+| LANDING derived LANDED, not observed | an id | RE-BIND: `write_lease`, staged, never committed, whatever the clock or session; a record naming neither branch fact re-binds anywhere, announced as not scoped |
+| LANDING derived LANDED, not observed | no id | nothing to resume |
+| LANDING, observed in the landed log | any | nothing to resume, never the lander, never `presumed-stopped` |
+| HELD, condition unmet | any | `still held`, writes nothing |
+| HELD, `lease-utc` after `held-at`, clock fresh, another session and keepalive | an id | refuses 58: a take-over recorded its lease and has not moved the phase |
+| HELD, otherwise | an id, or none | take-over; no id, the status block then check 59 |
+| working | the recorded keepalive | the holder: writes nothing unless the record lacks `lease-utc` or names another session or pid than the harness exposes, then records and stages; reaps orphans (§14) |
+| working | a new id, the recorded session, which is not `absent` | the holder's process restarted: take-over; refuses 58 first while the recorded pid is alive and is not `CLAUDE_PID` |
+| working, no lease, age unanswerable | a new id, or none | the status block, then check 57 |
+| working, no lease, inside the bound | a new id, `--replaces` the recorded keepalive | the holder replaces its job, through the `--replaces` block of the leased row below |
+| working, no lease, inside the bound | any other new id, or none | the status block, then check 59 naming the folder's age and `--replaces` with the recorded keepalive |
+| working, no lease, past the bound | an id, or none | `presumed-stopped`, announced: take-over |
+| working, clock fresh | a new id, `--replaces` the recorded keepalive | the holder replaces its job: `write_lease`, staged; another `--replaces` id refuses 58 |
+| working, clock fresh or unknown | a new id, another session | refuses 58: a live session drives this slug |
+| working, clock fresh or unknown | no id | the status block, then check 59 |
+| working, clock stale | an id, or none | `presumed-stopped`, announced: take-over; no id, the status block then check 59 |
 
-The no-id rows refuse rather than orienting, because `--resume` is the only point at which a second
-session can be stopped at all. They print the `--status` block FIRST, so a session regrounding by the
-build method's no-id spelling still reads its phase and witness before it is told what to pass. It
-then resumes with its own keepalive id, taken from its own scheduler's listing and never from the
-`LEASE` line.
-
-`presumed-stopped` is ANNOUNCED, never a refusal.
+The no-id rows print the `--status` block FIRST, so a session regrounding by the build method's
+no-id spelling reads its phase and witness before it is told to pass the keepalive id its own
+scheduler lists. The re-bind stays uncommitted, since a commit would move HEAD off the pushed
+tip: a difference confined to the six lease-fact lines reads as none to the landing commit and to
+`--landed`'s `primary` clean check, and to no other clean check. `presumed-stopped` is ANNOUNCED,
+never a refusal.
 
 ## 9. The take-over
 
@@ -214,9 +202,9 @@ lease is taken, so a refused take-over writes nothing at all:
    two verbs cannot disagree about which base authorizes this run;
 4. interrupted acts are NAMED — a non-empty index, the newest gate window with no verdict, a
    turnstile ticket whose pid is dead — and never repaired;
-5. the lease is taken, naming the new id;
-6. the run's own orphaned processes are reaped (§14);
-7. the new id is recorded in the `keepalive` fact;
+5. the run's own orphaned processes are reaped (§14);
+6. the lease facts are recorded, the new id in the `keepalive` fact;
+7. the history row is written;
 8. a HELD record returns to its `held-from` phase, and one carrying `hold-run` prints the relaunch of
    that deferred review FIRST: re-run it with identical args, which reuses every lens and skeptic
    file it wrote and dispatches only what did not return.
@@ -412,8 +400,8 @@ RECORDED phase, because its postcondition is the terminal. The remote is observe
 `--status` prints the reason.
 
 **Under `in-place`, `--landed` is an OBSERVATION.** It writes nothing to the tree, prints the
-derivation, and keeps what it saw in the lease, `released <iso> landed`, so a later reader that
-cannot see the remote still does not presume the run stopped. It refuses, numbered, when no
+derivation, and logs it, per landing commit, to `landed.<slug>.log` under the git common dir, so no
+reader in any worktree presumes the run stopped. It reads the keepalive reap back first. It refuses, numbered, when no
 `LANDING` record is committed, when the landing commit reached only the LOCAL default branch, and
 when the push has not carried it. Under `primary` it writes `LANDED` as before, and its lander
 marker check is ANCESTRY: the marker's commit is on the advertised tip, and the witness is that
@@ -490,7 +478,7 @@ found six abandoned processes matching this kit's commands, and five were anothe
 **A process not in the ledger is never killed**, whatever its command line says: it is reported, by
 the process-monitor kit where one is adopted, and left to a person. The ledger is what makes a
 process this run's. Every command the driver starts through its bounded runner is appended, by
-identity, to `<git-common-dir>/unattended/<slug>.procs`, beside the lease (§7):
+identity, to `<git-common-dir>/unattended/<slug>.procs`, beside the landed log (§12):
 
 ```
 <msys pid> <start token|-> <driver pid> <driver token|-> <keepalive|-> <iso-utc> <argv0> [argv1] [argv2]
@@ -505,8 +493,8 @@ The driver waits on every command it starts, so a live driver is a live consumer
 by another process reads as alive and withholds the reap, so the error direction is a process left
 running, never one killed.
 
-**Who reaps**: `--preflight` once its lease is held, `gates-green` before it starts a bar, `--hold`
-before it releases the lease, and the two `--resume` rows that hold it — the take-over and the holder
+**Who reaps**: `--preflight` once its lease is recorded, `gates-green` before it starts a bar, `--hold`
+before it moves the phase, and the two `--resume` rows that hold it — the take-over and the holder
 passing the lease's own id. Every other `--resume` row only counts. Each orphan goes through
 `PROCMON_CMD --kill-msys <pid>`, one at a time, and success is read back from the recorded pid,
 never from the reaper's exit. One line per record acted on:

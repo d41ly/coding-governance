@@ -593,6 +593,46 @@ mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/l
 GOV_DEFAULT_BRANCH=main run_tick_over "$TICK"
 check_hit "$OUT" "resume-tick: tRun · $FX · skip · verdict FINISHED-UNSTAMPED" "AC16 a live FINISHED-UNSTAMPED record is still skipped"
 
+# ---- TOOL-dDerivedDocket-61 AC7: a HELD record with a stale clock is SKIPPED BY NAME — its restart is
+# ---- the durable one-shot `--hold` printed — with no attempt line and no launcher; the driver reads
+# ---- it HELD, never the STALE this tick acts on. The same record at BUILDING is AC1's resumed row.
+build_fixture 999999999
+sed -i "s/^phase: .*/phase: HELD/" "$FX/memory/builds/tRun/RUN.md"
+( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+    && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m held )
+check_same "U61 the driver reads the stale HELD record HELD" "$( cd "$FX" && bash "$KIT/unattended.sh" --liveness tRun 2>/dev/null | sed -n 's/^verdict: //p')" "HELD"
+run_tick_over "$TICK" --dry-run
+check_hit  "$OUT" "resume-tick: tRun · $FX · skip · HELD · its restart is the durable schedule --hold printed, never this tick (dry-run)" "U61 the dry run names the HELD skip"
+run_tick_over "$TICK"
+check_same "U61 a HELD run exits 0" "$RC" "0"
+check_hit  "$OUT" "resume-tick: tRun · $FX · skip · HELD · its restart is the durable schedule --hold printed, never this tick" "U61 HELD is skipped by name"
+check_miss "$OUT" "resumed ·" "U61 a HELD run is never resumed"
+check_same "U61 no attempt line and no launcher" "$([ -s "$SIDECAR/resume.tRun.log" ] && echo log || echo nolog) · $(ls "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "nolog · 0"
+
+# ---- TOOL-dDerivedDocket-61 AC10: an OBSERVED in-place landing, read in a LINKED worktree other than
+# ---- the one that landed it, is TERMINAL there however stale its clock, so the tick skips it by
+# ---- verdict and relaunches nothing. The line sits in the COMMON dir's landed log, where the in-place
+# ---- `--landed` of any worktree writes it. Without it the same worktree reads FINISHED-UNSTAMPED with
+# ---- `stale: yes`, which the tick acts on (AC16).
+build_fixture 999999999
+FIRST=$( cd "$FX" && git rev-parse HEAD )
+sed -i "s/^phase: .*/phase: LANDING/; s/^witness: .*/witness: $FIRST/" "$FX/memory/builds/tRun/RUN.md"
+( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+    && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m landing )
+LC61=$( cd "$FX" && git rev-parse HEAD ); W61="$GITTMP/rt-w61"; rm -rf "$W61"
+( cd "$FX" && git worktree add -q --detach "$W61" "$LC61" ) >/dev/null 2>&1
+W61=$( cd "$W61" && git rev-parse --show-toplevel )
+mkdir -p "$FX_GITDIR/unattended"
+printf '2026-09-27T00:00:00Z landed %s on refs/heads/main at %s\n' "$LC61" "$LC61" > "$FX_GITDIR/unattended/landed.tRun.log"
+check_same "U61 the driver reads the observed landing TERMINAL in W2" "$( cd "$W61" && GOV_DEFAULT_BRANCH=main bash "$KIT/unattended.sh" --liveness tRun 2>/dev/null | sed -n 's/^verdict: //p')" "TERMINAL"
+GOV_DEFAULT_BRANCH=main run_tick_over "$TICK"
+check_hit  "$OUT" "resume-tick: tRun · $W61 · skip · verdict TERMINAL" "U61 the observed landing is skipped in a worktree that did not land it"
+check_miss "$OUT" "resumed ·" "U61 no worktree relaunches an observed landing"
+rm -f "$FX_GITDIR/unattended/landed.tRun.log"; remove_stubs
+GOV_DEFAULT_BRANCH=main run_tick_over "$TICK" --dry-run
+check_hit  "$OUT" "resume-tick: tRun · $W61 · resumed · attempt 1" "U61 without the log line the same worktree would be resumed"
+( cd "$FX" && git worktree remove --force "$W61" ) >/dev/null 2>&1; rm -rf "$W61"
+
 # ---- AC12: the two announced skips of the walk. A driver whose --liveness exits non-zero is a dead
 # ---- probe: the run is skipped naming its first line, nothing launches, no line is written. A
 # ---- second worktree with no conf is skipped by name while the first tree's run still gets its
@@ -744,7 +784,10 @@ n=$((pass+fail))
 # block 8 (its last row the class arm over the kit's call sites), AC13's in-flight-bound block 4,
 # AC17 6, AC14 10 -> 15 (the drifted working copy and the aimed kill) — 163 executed, pinned at ~10% headroom. AC17 is MSYS-only and announces its
 # skip elsewhere, so a POSIX run reaches 157 against the same floor.
-FLOOR_ASSERTIONS=145
+# RAISED 145 -> 155 by TOOL-dDerivedDocket-61: the HELD arm's 6 assertions and the observed-landing
+# arm's 4, beside AC16, COUNTED off their own `check_*` lines, every one unconditional; the pass
+# that wrote them ran no suite, and both blocks were run alone over a replica of this prologue.
+FLOOR_ASSERTIONS=155
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

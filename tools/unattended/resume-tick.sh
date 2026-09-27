@@ -20,6 +20,7 @@
 #   RUN.md not in the index               -> skip · RUN.md is not tracked (nothing probed, nothing launched)
 #   RUN.md on disk differs from the index -> skip · RUN.md differs from the index (nothing probed, nothing launched)
 #   host: names another node              -> skip · leased on <host>, not this node <me>
+#   verdict HELD                          -> skip · HELD · its restart is the durable schedule --hold printed, never this tick
 #   verdict not STALE, and not            -> skip · verdict <V>
 #     FINISHED-UNSTAMPED with stale: yes
 #   STALE, RESUME_ATTEMPTS or more since  -> skip · ATTEMPTS EXHAUSTED · last <utc> · out <path>
@@ -73,7 +74,7 @@
 #
 # THE TWO KNOBS are ROOT-SCOPED: this file sources the root's `.unattended.conf` into its own shell
 # and reads RESUME_ATTEMPTS and RESUME_TURNS through the library's `read_bound_key`, exactly as the
-# driver reads its four — one repo, one pair of bounds, and a NOTE that names the file
+# driver reads its bound keys — one repo, one pair of bounds, and a NOTE that names the file
 # (TOOL-aWokenSentinel-13). RESUME_STALE_BOUND is `--liveness`'s number and is not read here: the
 # driver prints it as `stale-bound`, and the in-flight read is bounded by that line.
 #
@@ -266,6 +267,12 @@ run_tick() { # worktree · slug · session · host
   # lander's push and `--landed` outranks STALE in the verdict order and nothing else stamps it,
   # the B1 wedge for a dead session (closing review id 5); the payload's "continue from the phase
   # the run-state file names" is `--landed` there.
+  # HELD IS NAMED, before the generic skip it would otherwise fall to (TOOL-dDerivedDocket-61 S6):
+  # `--liveness` reads HELD ahead of STALE, and a paused run's restart is the durable one-shot
+  # `--hold` printed under RESUME_SCHEDULE, so the scheduler's log says why this tick left it alone.
+  if [ "$RL_VERDICT" = HELD ]; then
+    print_decision "$slug" "$wt" "skip · HELD · its restart is the durable schedule --hold printed, never this tick"; return 0
+  fi
   case "$RL_VERDICT:$RL_STALE" in STALE:*|FINISHED-UNSTAMPED:yes) ;; *) print_decision "$slug" "$wt" "skip · verdict $RL_VERDICT"; return 0 ;; esac
   sidecar=$(cd "$wt" && resolve_sidecar_dir) || { echo "resume-tick: $slug · $wt · liveness probe failed: the sidecar root cannot be derived in this worktree"; return 0; }
   case "$sidecar" in /*|[A-Za-z]:*) ;; *) sidecar="$wt/$sidecar" ;; esac
