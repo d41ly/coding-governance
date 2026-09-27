@@ -56,6 +56,9 @@ U=$(git -C "$ROOT" ls-files --full-name -- '*run-unattended-gates.sh' | head -1)
 UDIR=$(dirname -- "$U")
 # This script's own repo-relative path, derived the same way the runner derives its own.
 RUNNER_REL="$(git -C "$(dirname -- "$RUNNER")" rev-parse --show-prefix 2>/dev/null)$(basename -- "$RUNNER")"
+# Where the fixture parks the BASE runner for the byte-parity arm: beside the runner, derived from
+# RUNNER_REL rather than spelled, so it adds no carried literal. The build step says why it sits there.
+BASE_RUNNER="$(dirname -- "$RUNNER_REL")/base-runner.sh"
 
 # ---- THE BASE THE DEFAULT MODE IS PINNED TO, an immutable sha rather than a moving ref.
 # ---- `TOOL-dDerivedDocket-1` added `--attribute` on the promise that the no-flag mode's stdout and
@@ -295,20 +298,23 @@ build_repo() {
   cp "$ROOT/$U" "$U" || return 2
 
   # THE RUNNER AS OF BASE, for the byte-parity arm. An unreachable sha writes nothing and the arm's
-  # own liveness line refuses rather than comparing against an empty file.
-  git -C "$ROOT" show "$ATTR_BASE:$RUNNER_REL" > tools/attr/base-runner.sh 2>/dev/null || : > tools/attr/base-runner.sh
+  # own liveness line refuses rather than comparing against an empty file. It is written BESIDE the
+  # runner, at `$BASE_RUNNER`, because it derives its declaration from its OWN directory: parked in
+  # `tools/attr/` it found no declaration there and exited 2 while `--serial` exited 0, so the arm
+  # compared a refusal with a run and could never pass (merge-2 skeptic F3).
+  git -C "$ROOT" show "$ATTR_BASE:$RUNNER_REL" > "$BASE_RUNNER" 2>/dev/null || : > "$BASE_RUNNER"
 
   {
     printf '#!/usr/bin/env bash\n'
     printf 'set -u\n'
     # AN ABSENT BASE RUNNER IS A REFUSAL, not a comparison against an empty file: two empty strings
     # are equal, which would certify byte-parity while measuring nothing at all.
-    printf '[ -s tools/attr/base-runner.sh ] || { echo "nope: no BASE runner in the fixture"; exit 1; }\n'
+    printf '[ -s %s ] || { echo "nope: no BASE runner in the fixture"; exit 1; }\n' "$BASE_RUNNER"
     # DURATIONS NORMALISED ON BOTH SIDES. The serial mode prints each suite's seconds, so an
     # unnormalised comparison is a coin flip on a loaded box and would red for the clock.
     printf 'norm() { sed -E "s/[0-9]+s/Ns/g"; }\n'
     printf 'a=$(%s --serial --kit tools/suite-ok.sh 2>&1); ra=$?\n' "$R"
-    printf 'b=$(bash tools/attr/base-runner.sh --kit tools/suite-ok.sh 2>&1); rb=$?\n'
+    printf 'b=$(bash %s --kit tools/suite-ok.sh 2>&1); rb=$?\n' "$BASE_RUNNER"
     printf '[ "$ra" = "$rb" ] || { echo "nope: exit $ra against $rb"; exit 1; }\n'
     printf 'if [ "$(printf "%%s\\n" "$a" | norm)" = "$(printf "%%s\\n" "$b" | norm)" ]; then\n'
     printf '  echo "default mode matches the BASE runner, exit $ra"\n'

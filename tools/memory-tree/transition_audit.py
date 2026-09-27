@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""transition_audit.py — hygiene check 25: the transition-merge audit.
+"""transition_audit.py — hygiene check 26: the transition-merge audit.
 
 A merge that joins a lineage still editing AUTHORED backlog shards to a lineage already rendering
 them from build folders can lose a row change with nobody watching. The shards side's edit touches a
@@ -56,7 +56,7 @@ CACHE_EPOCH = 1
 # ONE PREFIX ON EVERY LINE THIS CHECK PRINTS — the liveness line, the dormant announcement and each
 # refusal. A consumer (remote CI's history-audit step, an operator's grep) then greps one string and
 # cannot miss a class of line it did not know to look for.
-SAY = "memory-hygiene: check 25 "
+SAY = "memory-hygiene: check 26 "
 
 NEW, CHANGED, REMOVED = "new", "changed", "removed"
 # The pseudo-rev for the staged tree. Carries a byte no sha can, so it cannot collide with one.
@@ -111,20 +111,59 @@ def resolve_root() -> pathlib.Path:
                   f"no declaration to read the watched paths from")
 
 
-def resolve_recall_kit(root: pathlib.Path) -> pathlib.Path:
-    """The memory-recall kit directory, in either install layout.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-    Tools-first, the order `merge-rows.py` and `check-wiring.sh` already use. THERE IS NO DEGRADED
-    MODE: keying rows by anything but the declared anchor grammar grades a different population
-    under a rule nobody configured, which is worse than refusing and harder to notice.
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
     """
-    tried = [root / "tools" / "memory-recall", root / "memory-recall"]
-    for cand in tried:
-        if cand.is_dir() and (cand / "extract.py").is_file():
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
             return cand
-    looked = " and ".join(c.as_posix() for c in tried)
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+def resolve_recall_kit() -> pathlib.Path:
+    """The memory-recall kit directory of THIS install, through the one resolver.
+
+    The same call `merge-rows.py` makes (TOOL-aRepatriatedFork-2 S3): the install receipt first,
+    which is the only record of a kit dir an adopter RENAMED, then the two probes beside this kit.
+    The CODE comes from this install and the grammar from the audited tree's conf, which is the
+    split `merge-rows.py` already keeps. THERE IS NO DEGRADED MODE: keying rows by anything but the
+    declared anchor grammar grades a different population under a rule nobody configured, which is
+    worse than refusing and harder to notice.
+    """
+    try:
+        return resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError as exc:
+        looked = str(exc)
     raise Problem(
-        f"the `memory-recall` kit is not installed beside this one (looked in {looked}). Check 25 "
+        f"the `memory-recall` kit is not installed beside this one ({looked}). Check 26 "
         f"keys every delta row through that kit's anchor grammar and there is no degraded mode: a "
         f"second row grammar spelled here would be two answers to one question. "
         f"Remedy: install the memory-recall kit")
@@ -137,7 +176,7 @@ def resolve_anchor(root: pathlib.Path):
     would kill the commit-msg hook before it could name what is missing, and a hook that dies with a
     traceback reads as a broken repository rather than as a missing kit.
     """
-    kit = resolve_recall_kit(root)
+    kit = resolve_recall_kit()
     # APPEND, never `insert(0, ...)`: prepending puts the kit dir ahead of the stdlib, so any module
     # name it ever gains shadows the real one.
     if str(kit) not in sys.path:
@@ -154,12 +193,18 @@ def add_kit_to_path() -> None:
 
 
 def load_kit_conf(root: pathlib.Path) -> dict:
-    """This tree's `.memory-tree.conf`, through the kit's ONE parser and never a second one."""
+    """This tree's `.memory-tree.conf`, through the kit's ONE parser and never a second one.
+
+    The parser is `tree_lib`'s, reached directly and never through `corpus_ids`, which only
+    re-exports it: no sibling module imports an engine (TOOL-aRepatriatedFork-9, the invariant
+    `row_grammar.scan_engine_imports` grades), so an adopter's own copy of `corpus_ids` cannot kill
+    this module on import.
+    """
     add_kit_to_path()
-    import corpus_ids   # noqa: PLC0415 — sibling module, same kit directory
+    from tree_lib import parse_conf   # noqa: PLC0415 — sibling module, same kit directory
 
     conf: dict = {}
-    corpus_ids.parse_conf((root / ".memory-tree.conf").read_text(encoding="utf-8"), conf)
+    parse_conf((root / ".memory-tree.conf").read_text(encoding="utf-8"), conf)
     return conf
 
 
@@ -173,11 +218,11 @@ def read_mode(text: str) -> str:
     """
     add_kit_to_path()
     import backlog        # noqa: PLC0415 — sibling module, same kit directory
-    import corpus_ids     # noqa: PLC0415 — sibling module, same kit directory
+    from tree_lib import parse_conf   # noqa: PLC0415 — the parser itself, never an engine's re-export
 
     conf: dict = {}
     try:
-        corpus_ids.parse_conf(text, conf)
+        parse_conf(text, conf)
         return backlog.read_conf(conf).mode
     except Exception:
         return "shards"
@@ -599,7 +644,7 @@ def delta(ours: str, theirs, root=None) -> list:
 
     THE ONE TRANSITION RULE, as a callable. The per-merge delta is this same function applied to a
     merge's shards-side parent against its other parents, so the relocation tools, the hooks and
-    check 25 reach one rule rather than three spellings of it. `theirs` is one rev or several.
+    check 26 reach one rule rather than three spellings of it. `theirs` is one rev or several.
     """
     base = pathlib.Path(root) if root else resolve_root()
     sides = [theirs] if isinstance(theirs, str) else list(theirs)

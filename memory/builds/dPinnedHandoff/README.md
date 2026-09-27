@@ -77,7 +77,7 @@ ids TOOL-dPinnedHandoff-1 TOOL-dPinnedHandoff-2 TOOL-dPinnedHandoff-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPinnedHandoff-1 — an external precondition says what the builder does when it is false](spec/2026-09-22-spec-TOOL-dPinnedHandoff-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-22 |
+| [TOOL-dPinnedHandoff-1 — an external precondition says what the builder does when it is false](spec/2026-09-22-spec-TOOL-dPinnedHandoff-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-28 |
 | [TOOL-dPinnedHandoff-2 — a commit naming a unit touches no path its spec froze](spec/2026-09-22-spec-TOOL-dPinnedHandoff-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-22 |
 | [TOOL-dPinnedHandoff-3 — an acceptance grep runs, and cannot already hold at the spec's base](spec/2026-09-22-spec-TOOL-dPinnedHandoff-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-22 |
 <!-- /gen:build-units -->

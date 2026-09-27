@@ -151,7 +151,7 @@ ids TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 T
 | [TOOL-aRepatriatedFork-11 — unattended: build-root pathspecs stop at the build root, and a pull lands its hooks wired and its pins measurable](spec/2026-09-23-spec-TOOL-aRepatriatedFork-11.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today](spec/2026-09-25-spec-TOOL-aRepatriatedFork-23.md) | 8 | 2 | SPECCED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | SPECCED | rev-2 | 2026-09-25 |
+| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | SPECCED | rev-3 | 2026-09-28 |
 | [TOOL-aRepatriatedFork-25 — printed and usage strings in received code name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-25.md) | 10 | 1 | SPECCED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-26.md) | 11 | 1 | SPECCED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-27 — canonical-copy markers and comment prose name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-27.md) | 12 | 1 | SPECCED | rev-1 | 2026-09-25 |

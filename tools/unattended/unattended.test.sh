@@ -2748,7 +2748,7 @@ for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
   for _rf_v in $_rf_matrix; do
     case "$_rf_v" in
       close|abort) bcopen ;;
-      # --hold refuses a DIRTY tree before it reads --reason, and bcopen leaves its attestations
+      # --hold refuses a DIRTY tree before it writes anything, and bcopen leaves its attestations
       # uncommitted, so the hold takes a committed RUNNING record of its own (build_hold_fixture's
       # shape, spelled here because that helper is defined further down this file).
       hold) reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -2774,9 +2774,16 @@ for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
     n=$((n+1)); [ "$(tr -dc '\r' < memory/builds/tRun/RUN.md | wc -c)" -eq 0 ] \
       || { echo "FAIL --$_rf_v stored a carriage return in the run-state file, a line end to every JS reader"; st=1; }
     case "$_rf_v" in
-      # All three move the phase HONESTLY on an accepted one-line value, so their property is the
-      # line count above: a forged `phase:` line is a second one, wherever in the file it lands.
-      close|abort|hold) ;;
+      # Both move the phase HONESTLY on an accepted one-line value, so their property is the line
+      # count above: a forged `phase:` line is a second one, wherever in the file it lands.
+      close|abort) ;;
+      # --hold moves it too, on the one-line form alone. The line-feed and carriage-return forms are
+      # REFUSED before anything is written, so the phase is the one the run held before the call:
+      # the line count cannot see a refusal that wrote `phase: HELD` in place first.
+      hold) case "$_rf_form" in
+              'yes\nphase: LANDED') ;;
+              *) same "phase after --hold with a hostile value" "$(read_phase)" "$_rf_p0" ;;
+            esac ;;
       preflight) n=$((n+1)); [ "$(read_phase)" != LANDED ] || { echo "FAIL --preflight recorded a hostile waiver reason as a LANDED phase"; st=1; } ;;
       *) same "phase after --$_rf_v with a hostile value" "$(read_phase)" "$_rf_p0" ;;
     esac
@@ -2791,7 +2798,13 @@ hit "$(run --abort tRun --code fork-unresolvable --reason "$_rf_lf")" "the reaso
 hit "$(run --abort tRun --code fork-unresolvable --reason "$_rf_cr")" "the reason contains a newline or a carriage return"
 hit "$(run --close tRun --override closing-review-recorded --reason "$_rf_lf")" "an override item or reason contains a newline or a carriage return, and park() appends ONE line that the gate parses line-wise, so this would forge a second row or a fact nothing wrote"
 hit "$(run --close tRun --override closing-review-recorded --reason "$_rf_cr")" "an override item or reason contains a newline or a carriage return"
-n=$((n+1)); [ "$(sum)" = "$before" ] || { echo "FAIL a refused --abort or --close reason rewrote the run-state file, so the guard ran after the damage"; st=1; }
+# --hold's two free-text values, refused BEFORE the dirty-tree refusal this uncommitted record would
+# otherwise take, and before `phase: HELD` is written: the reason in both forms, and the unreachable
+# node in the carriage-return form, the byte no line count sees.
+hit "$(run --hold tRun --code platform-limit --until owner --reason "$_rf_lf" --reaped k1)" "the reason or the unreachable node contains a newline or a carriage return, and the hold writes each as one line every reader parses line-wise, so this would forge a second row or a fact nothing wrote; nothing was written"
+hit "$(run --hold tRun --code platform-limit --until owner --reason "$_rf_cr" --reaped k1)" "the reason or the unreachable node contains a newline or a carriage return"
+hit "$(run --hold tRun --code platform-limit --until owner --reason "the node is gone" --keepalive-unreachable "$_rf_cr")" "the reason or the unreachable node contains a newline or a carriage return"
+n=$((n+1)); [ "$(sum)" = "$before" ] || { echo "FAIL a refused --abort, --close or --hold value rewrote the run-state file, so the guard ran after the damage"; st=1; }
 
 # ---- L2 (closing review round 1): every fact reader is scoped to `## Run facts`, the section leg
 # ---- check 34 grades. A `phase: LANDED` ABOVE the heading was read ahead of the real one, and a
@@ -9101,7 +9114,7 @@ askmode ok; askrows ''
 askreset
 out=$(run --preflight EXMP-aFoo-3 --keepalive-id KA-1)
 hit "$out" "this verb is addressed by SLUG and was given ids, or a slug mixed with them; a run may not write the folder that authorizes it, so an id list becomes a build through the scaffold the OWNER lands, and a mixed value has no honest reading because a run cannot extend a committed mandate"
-hit "$out" "recipe: tools/memory-tree/gen_build_index.py --new-build <new-slug> --asks EXMP-aFoo-3"
+hit "$out" "recipe: $TOOL_REL/memory-tree/gen_build_index.py --new-build <new-slug> --asks EXMP-aFoo-3"
 miss "$out" "no build README at the pinned BASE"
 miss "$out" "the slug is not a build-folder name"
 same "an ids invocation writes nothing" "$(git status --porcelain | grep -c . || true)" "0"
@@ -9117,7 +9130,7 @@ hit "$out" "this verb is addressed by SLUG and was given ids, or a slug mixed wi
 # ---- AC2: a FILING HOME under the same two scopes.
 out=$(run --preflight aFoo --keepalive-id KA-1)
 hit "$out" "this slug names a FILING HOME and not a build — at the first anchor's merge-base its folder holds a BACKLOG.md and nothing else, so there is no committed README to authorize a run and writing one into another build's records is what ruling D12-f refuses"
-hit "$out" "recipe: tools/memory-tree/gen_build_index.py --new-build <new-slug> --asks"
+hit "$out" "recipe: $TOOL_REL/memory-tree/gen_build_index.py --new-build <new-slug> --asks"
 same "a filing-home refusal writes nothing" "$(git status --porcelain | grep -c . || true)" "0"
 git checkout -q unit; git branch -qD unpushed-asks
 askreset
@@ -9664,6 +9677,10 @@ dispreset
 # the grant is read from the README at BASE, so one authored on the unit branch would test the
 # authorization refusal instead of the grant.
 #
+# THE GRANTED PATH IS A FIXTURE NAME, not this repo's lander: a grant is graded by its SHAPE and
+# never by the file existing, so no arm needs a real tool, and naming one would spell gov's own
+# install prefix in a suite that ships.
+#
 # THE BACKSLASH TOKEN IS BUILT, NOT TYPED. A backslash inside a `sed a` text or an `awk -v` value is
 # an escape to both, so the fixture line is handed to awk through ENVIRON - the one channel that
 # passes it through untouched - and `printf '\134'` spells the byte without a backslash pair a
@@ -9671,18 +9688,18 @@ dispreset
 MAY_BS=$(printf '\134')
 maysetup() {
   git checkout -qf main
-  readme tMaySlug; mutate memory/builds/tMaySlug/README.md '/^slug: tMaySlug$/a may: `tools/push-main.sh` TOOL-aStandingWrit-1'
+  readme tMaySlug; mutate memory/builds/tMaySlug/README.md '/^slug: tMaySlug$/a may: `tools/lander-granted.sh` TOOL-aStandingWrit-1'
   readme tMayNone
-  readme tMayTick; mutate memory/builds/tMayTick/README.md '/^slug: tMayTick$/a may: `tools/push-main.sh`'
-  readme tMayBare; mutate memory/builds/tMayBare/README.md '/^slug: tMayBare$/a may: tools/push-main.sh'
-  readme tMayP;    mutate memory/builds/tMayP/README.md '/^slug: tMayP$/a authorized-by: prompt\nmay: tools/push-main.sh'
+  readme tMayTick; mutate memory/builds/tMayTick/README.md '/^slug: tMayTick$/a may: `tools/lander-granted.sh`'
+  readme tMayBare; mutate memory/builds/tMayBare/README.md '/^slug: tMayBare$/a may: tools/lander-granted.sh'
+  readme tMayP;    mutate memory/builds/tMayP/README.md '/^slug: tMayP$/a authorized-by: prompt\nmay: tools/lander-granted.sh'
   readme tMayR;    mutate memory/builds/tMayR/README.md '/^slug: tMayR$/a authorized-by: recipe\nmay: none'
   readme tMayId;   mutate memory/builds/tMayId/README.md '/^slug: tMayId$/a may: EXMP-aFoo3'
-  readme tMayAbs;  mutate memory/builds/tMayAbs/README.md '/^slug: tMayAbs$/a may: /tools/push-main.sh'
-  readme tMayDots; mutate memory/builds/tMayDots/README.md '/^slug: tMayDots$/a may: ../tools/push-main.sh'
+  readme tMayAbs;  mutate memory/builds/tMayAbs/README.md '/^slug: tMayAbs$/a may: /tools/lander-granted.sh'
+  readme tMayDots; mutate memory/builds/tMayDots/README.md '/^slug: tMayDots$/a may: ../tools/lander-granted.sh'
   readme tMayLeaf; mutate memory/builds/tMayLeaf/README.md '/^slug: tMayLeaf$/a may: pushmain'
   readme tMaySlash
-  MAY_LINE="may: tools${MAY_BS}push-main.sh" awk '{ print } /^slug: tMaySlash$/ { print ENVIRON["MAY_LINE"] }' \
+  MAY_LINE="may: tools${MAY_BS}lander-granted.sh" awk '{ print } /^slug: tMaySlash$/ { print ENVIRON["MAY_LINE"] }' \
     memory/builds/tMaySlash/README.md > memory/builds/tMaySlash/README.tmp \
     && mv memory/builds/tMaySlash/README.tmp memory/builds/tMaySlash/README.md
   git add -A >/dev/null && git commit -q -m may-fixture --no-verify && git push -q -f origin main
@@ -9695,14 +9712,14 @@ maysetup
 # THE BACKSLASH FIXTURE MUST CARRY ITS BYTE, or the backslash arm below grades a README that is
 # simply missing the key.
 same "fixture: the backslash README carries the byte it is named for" \
-  "$(grep -c "^may: tools${MAY_BS}${MAY_BS}push-main.sh$" memory/builds/tMaySlash/README.md)" "1"
+  "$(grep -c "^may: tools${MAY_BS}${MAY_BS}lander-granted.sh$" memory/builds/tMaySlash/README.md)" "1"
 
 # ---- AC1: a `slug` README's grants are pinned, normalised and in order; no key pins `none`.
 mayreset
 out=$(run --preflight tMaySlug --keepalive-id KA-1)
-hit "$out" "grant pinned as may: tools/push-main.sh TOOL-aStandingWrit-1"
+hit "$out" "grant pinned as may: tools/lander-granted.sh TOOL-aStandingWrit-1"
 same "a slug README's grants are pinned bare, in the order written" "$(maypin tMaySlug)" \
-  "tools/push-main.sh TOOL-aStandingWrit-1"
+  "tools/lander-granted.sh TOOL-aStandingWrit-1"
 mayreset
 out=$(run --preflight tMayNone --keepalive-id KA-1)
 hit "$out" "grant pinned as may: none"
@@ -9711,10 +9728,10 @@ same "a README with no may: key pins none" "$(maypin tMayNone)" "none"
 # ---- AC3, the positive half: the backticked and the bare spelling pin ONE fact.
 mayreset
 run --preflight tMayTick --keepalive-id KA-1 >/dev/null
-same "the backticked spelling pins the bare path" "$(maypin tMayTick)" "tools/push-main.sh"
+same "the backticked spelling pins the bare path" "$(maypin tMayTick)" "tools/lander-granted.sh"
 mayreset
 run --preflight tMayBare --keepalive-id KA-1 >/dev/null
-same "the bare spelling pins the same bytes" "$(maypin tMayBare)" "tools/push-main.sh"
+same "the bare spelling pins the same bytes" "$(maypin tMayBare)" "tools/lander-granted.sh"
 
 # ---- AC2: a grant under `prompt`, and under `recipe` even saying `none`, is refused and pins nothing.
 mayreset
@@ -9730,8 +9747,8 @@ same "a recipe-mode grant writes nothing" "$(git status --porcelain | grep -c . 
 # ---- AC3, the negative half: ONE fixture per refusal shape S3 declares, each naming its token. The
 # ---- shapes are an id prefix failing the id grammar, a leading `/`, a `..` segment, a backslash,
 # ---- and a bare token with neither a `/` nor a file extension - five, the number S3 declares.
-for may_case in "tMayId EXMP-aFoo3" "tMayAbs /tools/push-main.sh" "tMayDots ../tools/push-main.sh" \
-                "tMaySlash tools${MAY_BS}push-main.sh" "tMayLeaf pushmain"; do
+for may_case in "tMayId EXMP-aFoo3" "tMayAbs /tools/lander-granted.sh" "tMayDots ../tools/lander-granted.sh" \
+                "tMaySlash tools${MAY_BS}lander-granted.sh" "tMayLeaf pushmain"; do
   may_slug=${may_case%% *}; may_tok=${may_case#* }
   mayreset
   out=$(run --preflight "$may_slug" --keepalive-id KA-1)
@@ -9848,12 +9865,13 @@ init_dl_fixture() {
   run_dl_git update-ref refs/heads/main "$dl_base"; run_dl_git push -q -f origin "$dl_base":main; run_dl_git fetch -q origin main
   rm -f "$dl_out/lander.log" "$DL_LOG"
 }
-# A LANDING record committed by hand on the run branch, with any extra fact lines appended.
+# A LANDING record committed by hand on the run branch, with any extra fact lines placed under
+# `## Run facts` by `add_facts`. An EOF append lands under `## Parked`, where no fact reader looks.
 write_dl_landing() { # [extra fact lines, printf %b] -> DL_C, the landing commit
   init_dl_fixture
   run_dl --preflight tRun --keepalive-id k1 >/dev/null
   sed -i 's/^phase: .*/phase: LANDING/' "$dl_dir/$DL_R"
-  [ -z "${1:-}" ] || printf '%b' "$1" >> "$dl_dir/$DL_R"
+  [ -z "${1:-}" ] || add_facts "$dl_dir/$DL_R" "$(printf '%b' "$1")"
   run_dl_git add -A >/dev/null && run_dl_git commit -q -m "records(tRun): close — LANDING" --no-verify
   DL_C=$(run_dl_git rev-parse HEAD)
 }
@@ -10193,12 +10211,15 @@ ih_dir=$(mktemp -d); ih_oroot=$(mktemp -d); ih_origin="$ih_oroot/origin.git"; ih
   git init -q --bare "$ih_origin"
   git --git-dir="$ih_origin" symbolic-ref HEAD refs/heads/main
   git remote add origin "$ih_origin"
-  mkdir -p bin fx .githooks memory/guides memory/builds/tRun tools
+  mkdir -p bin fx .githooks memory/guides memory/builds/tRun "$TOOL_REL"
   printf '# build method\n' > memory/guides/BUILD-METHOD.md
   # RED ONLY ONCE `fx/red` EXISTS, which only AC19's commit adds: that arm ages the leg against
   # this fixture's first-parent line, and a leg red since the root would read aged there.
   printf '#!/usr/bin/env bash\n[ -f fx/red ] || exit 0\necho "FAIL x"\nexit 1\n' > fx/x.sh
-  printf '[\n  {"name": "x leg", "argv": ["bash", "fx/x.sh"]}\n]\n' > tools/gate-legs.json
+  # THE LEG MANIFEST SITS AT THE TOOL ROOT, derived from this suite's own kit home rather than
+  # spelled: AC19's real runner reads it beside its own kit directory, and the stub bar's header
+  # names the same path through IHMAN, which `run_ih` hands it.
+  printf '[\n  {"name": "x leg", "argv": ["bash", "fx/x.sh"]}\n]\n' > "$TOOL_REL/gate-legs.json"
   printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n' > .githooks/gate-env.sh
   cat > bin/bar.sh <<'IHB'
 #!/usr/bin/env bash
@@ -10208,7 +10229,7 @@ ih_dir=$(mktemp -d); ih_oroot=$(mktemp -d); ih_origin="$ih_oroot/origin.git"; ih
   printf 'GATE_RUN_ID=%s\n' "${GATE_RUN_ID-<unset>}"; } > "$IHOUT/barenv.txt"
 [ "${IH_RC:-1}" = 0 ] && exit 0
 d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
-printf 'head\t%s\ntree_clean\t%s\nmanifest\ttools/gate-legs.json\n' "$(git rev-parse HEAD)" "${IH_CLEAN:-yes}" > "$d/header"
+printf 'head\t%s\ntree_clean\t%s\nmanifest\t%s\n' "$(git rev-parse HEAD)" "${IH_CLEAN:-yes}" "$IHMAN" > "$d/header"
 ih_f=1; [ -n "${IH_SECOND:-}" ] && ih_f=2
 printf 'verdict\tRED\nfailed\t%s\ntree_moved\t%s\n' "$ih_f" "${IH_MOVED:-no}" > "$d/verdict"
 printf 'x leg\t%s\t1\t0\t%s\t%s\t%s\t%s\tstub\n' "${IH_VERDICT:-INHERITED}" "${GATE_ATTRIBUTE:--}" \
@@ -10303,7 +10324,7 @@ IHS
   git add -A >/dev/null && git commit -q -m base --no-verify
   git push -q origin main
 ) >/dev/null 2>&1
-run_ih() { ( cd "$ih_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_ih() { ( cd "$ih_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" bash "$SCRIPT" "$@" 2>&1 ); }
 run_ih_repo() { git -C "$ih_dir" "$@"; }
 IHOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
 # R's policy body on main, pushed; a fresh unit branch on top of it, preflighted and attested; sets
@@ -11178,7 +11199,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # blocks' own `hit`/`miss`/`same` lines, every one unconditional. Both blocks were run alone
 # behind a replica of this prologue by hand, green, and red under a driver copy whose
 # `derive_last_move` lacks the sub-agent term; no suite ran.
-FLOOR_ASSERTIONS=1759
+# RAISED 1759 -> 1764 at the second origin/main reconcile of dDerivedDocket: --hold now refuses a line
+# end in its reason or unreachable node before it writes, and the hostile-value matrix grades that
+# (2: the phase after the line-feed and carriage-return forms) beside three named refusal arms (3),
+# all in region two, so FLOOR_SHARD_2 carries the same +5 and FLOOR_SHARD_1 is untouched. COUNTED
+# off the block's own `hit`/`same` lines; each refusal was observed over a replica of this prologue,
+# and the phase moving to HELD under a driver copy without the refusal; no suite ran.
+FLOOR_ASSERTIONS=1764
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -11303,7 +11330,8 @@ FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1563
+FLOOR_SHARD_2=1568
+# +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
 # +23 for the TOOL-dDerivedDocket-65 sub-agent arms, all in region two - see FLOOR_ASSERTIONS.
 # +19 for the TOOL-dDerivedDocket-64 queue-heartbeat arms, all in region two - see FLOOR_ASSERTIONS.
 # +40 for the TOOL-dDerivedDocket-63 holder's-own-`--replaces` arms, all in region two - see FLOOR_ASSERTIONS.

@@ -601,6 +601,42 @@ _rn=$(printf '%s\n' "$rout" | awk -F'\t' 'NF == 3 && $2 == "carried" { n++ } END
   && good "--offenders keys a ROSE file once per carried literal, the repeat carrying its ordinal" \
   || { bad "--offenders did not key the ROSE file per literal (rc $rrc, $_rn carried key(s))"; printf '%s\n' "$rout" | sed 's/^/      /' | head -6; }
 
+# --- --offenders over ARM 3 (merge-2 skeptic F6/F7) ---------------------------------------------
+# The runtime arm's keys come out of a python program. Compared BYTE-FOR-BYTE, because on Windows a
+# text-mode stdout ended every key but the last in CR and only an exact reader sees that; TWO keys,
+# because the last one never carried it. Observed RED against the gate before the fix.
+OK3="$TMP/offenders-runtime"; mkfix_source "$OK3" 'A demo kit.'
+printf 'bash "$ROOT/tools/demo/thing.sh" --go\nbash "$ROOT/tools/demo/thing.sh" --again\n' >> "$OK3/tools/demo/thing.sh"
+git -C "$OK3" add -A >/dev/null 2>&1
+(cd "$OK3" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1); git -C "$OK3" add -A >/dev/null 2>&1
+_k3f=$(git -C "$OK3" ls-files -- '*/thing.sh' | head -1); _k3s=$(dirname -- "$_k3f")
+_k3want=$(printf '%s\truntime\t%s\n%s\truntime\t%s#2' "$_k3f" "$_k3s" "$_k3f" "$_k3s")
+k3out=$(cd "$OK3" && bash "$GATE_REL" --offenders 2>/dev/null); k3rc=$?
+{ [ "$k3out" = "$_k3want" ] && [ "$k3rc" = 1 ]; } \
+  && good "--offenders keys arm 3's runtime literals, LF-terminated, the repeat carrying its ordinal" \
+  || { bad "--offenders printed a different arm-3 key set (rc $k3rc)"; printf '%s\n' "$k3out" | od -c | sed 's/^/      /' | head -8; }
+# A DEAD arm 3 beside an arm-1 hit. Arm 1's key has already streamed when arm 3 refuses, so a keyless
+# exit left a set that is a SUBSET of any tree carrying the same hit, and the bar read that INHERITED
+# while --check redded on the dead probe. The probe key is what makes the set say so. No code file
+# ships here, so arm 3 grades nothing. Observed RED against the gate before the fix.
+ODP="$TMP/offenders-deadprobe"; mkfix_source "$ODP" 'Run `bash demo/kit.toml` to read it.'
+rm -f "$ODP/$_k3f"; git -C "$ODP" add -A >/dev/null 2>&1
+(cd "$ODP" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1); git -C "$ODP" add -A >/dev/null 2>&1
+_dprm=$(git -C "$ODP" ls-files -- '*README.md' | head -1)
+_dp1=$(printf '%s\troot\t%s' "$_dprm" "demo/kit.toml")
+dpout=$(cd "$ODP" && bash "$GATE_REL" --offenders 2>/dev/null); dprc=$?
+{ [ "$dpout" = "$(printf '%s\n-\truntime-dead-probe\t-' "$_dp1")" ] && [ "$dprc" = 1 ]; } \
+  && good "--offenders keys a DEAD arm 3 beside arm 1's streamed key, so the set is no subset" \
+  || { bad "--offenders left a dead arm 3 keyless beside arm 1's key (rc $dprc)"; printf '%s\n' "$dpout" | sed 's/^/      /' | head -6; }
+# ...and its GREEN CONTROL over the same fixture: a shipped code file brings arm 3 back to life, so
+# the probe key goes and arm 1's key stands alone. Without this the arm above would also pass for a
+# gate that printed the probe key on every run.
+printf '#!/usr/bin/env bash\necho a demo engine\n' > "$ODP/$_k3f"; git -C "$ODP" add -A >/dev/null 2>&1
+dcout=$(cd "$ODP" && bash "$GATE_REL" --offenders 2>/dev/null); dcrc=$?
+{ [ "$dcout" = "$_dp1" ] && [ "$dcrc" = 1 ]; } \
+  && good "...and with a live arm 3 the same fixture prints arm 1's key and no probe key" \
+  || { bad "a live arm 3 still printed something beyond arm 1's key (rc $dcrc)"; printf '%s\n' "$dcout" | sed 's/^/      /' | head -6; }
+
 # --- THE LIVENESS ASSERTION ON THE SUITE ITSELF ------------------------------------------------
 # A self-test whose every fixture takes one branch is `fixture-passes-by-finding-nothing` applied to
 # the grader, and it needs the same treatment as any other probe that cannot move. This is the arm

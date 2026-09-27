@@ -1585,7 +1585,8 @@ done < "$TMP/recipe"
 # it — the incoming rows simply absent, nothing saying so.
 S=$(mkscratch); cp .memory-tree.conf "$S/"
 cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$S/tools/memory-recall/"
-cp $KIT_REL/memory-tree/backlog.py $KIT_REL/memory-tree/corpus_ids.py "$S/tools/memory-tree/"
+cp $KIT_REL/memory-tree/backlog.py $KIT_REL/memory-tree/corpus_ids.py $KIT_REL/memory-tree/tree_lib.py \
+   "$S/tools/memory-tree/"
 # `git init` AND NOT A TIDY-UP: `recall_conf.resolve` refuses a root that is not inside a git
 # repository, so without this the liveness control below fails for that reason and the broken-import
 # arm after it would be graded against a tree that never worked.
@@ -1697,17 +1698,19 @@ WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 
 # ONE FIXTURE REPOSITORY BUILDER for every group below, wired exactly the way a node is: the
 # SHIPPED `merge-rows.sh` wrapper through `git config merge.rows.driver`, never `pyrun.sh` and never
-# a direct python call. The four sibling modules travel with it because the refusal reads the view
+# a direct python call. The five sibling modules travel with it because the refusal reads the view
 # layer and the `--check` probe reads the generated header, and a fixture missing one of them would
-# fail closed for a reason that has nothing to do with the arm.
+# fail closed for a reason that has nothing to do with the arm. `tree_lib.py` is the fifth: the
+# driver's conf read, `corpus_ids` and the generator all import the kit's one conf parser from it,
+# and without it `--check` died on ModuleNotFoundError in every fixture this builder made.
 mkfixrepo() {  # $1 = a directory -> a git repo on `main` with this kit wired as the row driver
-  local d=$1 mt=tools/memory-tree mr=tools/memory-recall lib=tools/lib
-  mkdir -p "$d/$mt" "$d/$mr" "$d/$lib" "$d/memory/backlog"
+  local d=$1 mt=tools/memory-tree mr=tools/memory-recall lb=tools/lib
+  mkdir -p "$d/$mt" "$d/$mr" "$d/$lb" "$d/memory/backlog"
   cp "$ROOT/.memory-tree.conf" "$d/"
   cp "$ROOT/$mt/merge-rows.py" "$ROOT/$mt/merge-rows.sh" "$ROOT/$mt/backlog.py" \
-     "$ROOT/$mt/corpus_ids.py" "$ROOT/$mt/gen_build_index.py" "$d/$mt/"
+     "$ROOT/$mt/corpus_ids.py" "$ROOT/$mt/gen_build_index.py" "$ROOT/$mt/tree_lib.py" "$d/$mt/"
   cp "$ROOT/$mr/extract.py" "$ROOT/$mr/recall_conf.py" "$d/$mr/"
-  cp "$ROOT/$lib/pyrun.sh" "$ROOT/$lib/resolve-python.sh" "$d/$lib/"
+  cp "$ROOT/$lb/pyrun.sh" "$ROOT/$lb/resolve-python.sh" "$d/$lb/"
   git -C "$d" init -q -b main
   git -C "$d" config user.email t@e
   git -C "$d" config user.name t

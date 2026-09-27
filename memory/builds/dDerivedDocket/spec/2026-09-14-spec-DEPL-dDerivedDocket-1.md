@@ -1,6 +1,6 @@
 # DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 40
+**Status:** SPECCED · rev-9 · 2026-09-28 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 40
 
 <!-- gen:spec-records -->
 
@@ -31,7 +31,7 @@ status token" wording is where one adopter's status-first rows came from.
   merged into a generated view. Its sentence on who appends names a build's `BACKLOG.md` beside a
   backlog shard. Observed by AC1.
 - **S2** A new `### 3a-asks` section between §3 step 4 and the `<!-- govkit:entry drift-audit -->`
-  anchor at `WIRE-INTO-PROJECT.md:215`. It states the absent-key default, routes the switch to the
+  anchor at `WIRE-INTO-PROJECT.md:240`. It states the absent-key default, routes the switch to the
   adopter's own deployer build, gives the switch as six ordered steps by command, the fourth deleting
   the family backlog archives builds mode refuses and the sixth landing the switch when the default
   branch moved, points at the memory-tree kit README for grammar and verdicts, names the
@@ -44,7 +44,7 @@ status token" wording is where one adopter's status-first rows came from.
   charter's `kit:unattended` blocks carry after the charter unit: the explicit-ask substitute, the
   pointer to the protocol's landing rule, and the protocol contract. It states no count of blocks.
   Observed by AC5.
-- **S5** The scaffold's shard header at `tools/memory-tree/adopt-memory-tree.sh:281` quotes the row
+- **S5** The scaffold's shard header at `tools/memory-tree/adopt-memory-tree.sh:503` quotes the row
   shape with the id first and exactly one status token after it, instead of saying a row leads with
   a status token. Observed by AC6.
 - **S6** §2's kit list gains a bullet for the kickoff manifest, the `kickoff-manifest` kit: keeping
@@ -107,15 +107,15 @@ status token" wording is where one adopter's status-first rows came from.
 
 ### The edits, by location
 
-| Where, at `fb07ca25`, every citation unmoved from `abac6d59` | Now | After |
+| Where, at `313cc478`; §10 names the rows rev-9 moved | Now | After |
 |---|---|---|
 | `WIRE-INTO-PROJECT.md:123`, after the lexicon bullet | no kickoff-manifest bullet in §2's kit list | the S6 bullet |
 | `WIRE-INTO-PROJECT.md:124`-`:126` | "keeps the `kit:unattended` block in `§1`, which is the ONE substitute…" | names the substitute, the landing pointer and the contract |
-| `WIRE-INTO-PROJECT.md:172`-`:175` | "The scaffold writes `memory/` with `builds/`, `backlog/<FAMILY>.md`, …" | the shards named as the `shards`-mode default, with a pointer to §3a-asks |
-| `WIRE-INTO-PROJECT.md:198`-`:201` | "two nodes appending to `DECISIONS.md` or a backlog shard" | the same, plus a build's `BACKLOG.md` |
-| `WIRE-INTO-PROJECT.md:206`-`:209` | two attribute lines | three, and one sentence on keeping the backlog line |
-| after `WIRE-INTO-PROJECT.md:213` | the drift-audit anchor follows | `### 3a-asks`, then the anchor |
-| `tools/memory-tree/adopt-memory-tree.sh:281` | "> Mutable. Each row leads with one status token (OPEN…WONTDO)." | the id-first shape |
+| `WIRE-INTO-PROJECT.md:197`-`:200` | "The scaffold writes `memory/` with `builds/`, `backlog/<FAMILY>.md`, …" | the shards named as the `shards`-mode default, with a pointer to §3a-asks |
+| `WIRE-INTO-PROJECT.md:223`-`:226` | "two nodes appending to `DECISIONS.md` or a backlog shard" | the same, plus a build's `BACKLOG.md` |
+| `WIRE-INTO-PROJECT.md:231`-`:234` | two attribute lines | three, and one sentence on keeping the backlog line |
+| after `WIRE-INTO-PROJECT.md:238` | the drift-audit anchor follows | `### 3a-asks`, then the anchor |
+| `tools/memory-tree/adopt-memory-tree.sh:503` | "> Mutable. Each row leads with one status token (OPEN…WONTDO)." | the id-first shape |
 | `tools/install-prefix-carried.txt:11`, the `WIRE-INTO-PROJECT.md` row | pinned at 53 | raised by hand to the count once §3a-asks lands, with a dated reason (S7) |
 
 ### Proposed text for §3a-asks
@@ -271,7 +271,8 @@ The scaffold header, inside the existing `printf` format string:
 - **AC3** — When every command §3a-asks names is compared with its tool's `--help` usage, each flag
   it names is listed and every argument the usage marks required for that verb appears in the step,
   except `merge-rows.py --check`, whose usage prints the merge driver's four positional arguments
-  (`tools/memory-tree/merge-rows.py:1098-1104`) and which is resolved by running it below; every
+  (the usage branch of `main()` in `tools/memory-tree/merge-rows.py`) and which is resolved by
+  running it below; every
   repository path the section names, the three reference hooks and the switch-over spec step 6 cites
   among them, is in `git ls-files`; in AC6's scaffolded fixture, with one legacy row appended to a
   scaffolded shard and one rotated backlog archive named for a declared family committed beside it,
@@ -292,7 +293,7 @@ The scaffold header, inside the existing `printf` format string:
   `--check` and marks three paths required, so AC3 reds on a correct driver or is waved through; or
   a step names neither a command nor a README row, so an adopter reaches it with no command and no
   format; or step 4 drops the memory-recall prerequisite, so an adopter's first builds-mode hygiene
-  run refuses check 25 by name after its switch commit has landed.
+  run refuses check 26, the transition audit, by name after its switch commit has landed.
   figure: the flag and path sets are DERIVED from the section at observation time.
 - **AC4** — When `grep -n 'BACKLOG_MODE' WIRE-INTO-PROJECT.md` runs, every hit sits inside §3a-asks,
   one of them states that an absent key reads as `shards`, and §3 step 2 carries a pointer to
@@ -475,10 +476,21 @@ is kit work; `GATE_FULL=1` alone would still hold it. Every other leg in the lis
 - rev-8 · 2026-09-22 · order re-declared from 39 to 40 in the status header only, derived from the §3
   edges: the G9 exit promoted TOOL-dDerivedDocket-65 to run at 35, after 64. No criterion, design or
   edge moved.
+- rev-9 · 2026-09-28 · §2 §4 §6 §10 · S2 S5 · AC3 · re-grounded on the second origin/main merge,
+  `e2e840d0`, and its kit sweep `313cc478`; the base stays `fb07ca25` and no scope, design or
+  criterion moved. Between `fb07ca25` and `313cc478` `WIRE-INTO-PROJECT.md` gained 302 lines and
+  lost 23, and 25 of the gained sit in §2 after its kit list, so every runbook line §2 and §4 cite
+  past line 136 moved: the drift-audit anchor S2 names to `:240`, and §4's rows to `:197`-`:200`,
+  `:223`-`:226`, `:231`-`:234` and after `:238`; §2's kit-list lines `:123`-`:126` did not. The
+  scaffold header S5 and §4 cite moved from `:281` to `:503` with its text unchanged. AC3 now names
+  the merge driver's usage branch by function rather than by line, because
+  `tools/memory-tree/merge-rows.py` is being edited in the same reconcile, and its Red when names
+  the transition audit as check 26, the number it carries since main's `TOOL-dGatedProse-1` took 25.
+  §10 records the reading.
 
 ## 10. Reuse audit
 
-The seams are the runbook's own: §3a, `WIRE-INTO-PROJECT.md:299`, is the shape for a breaking
+The seams are the runbook's own: §3a, `WIRE-INTO-PROJECT.md:327`, is the shape for a breaking
 memory-tree migration an adopter meets on upgrade, and §3a-bind is the shape for an opt-in
 sub-section headed by the kit version that brings it. The attribute block and the scaffold's
 `printf` header are extended in place. `python tools/codebase-map/reuse_lookup.py "adopter runbook
@@ -510,5 +522,15 @@ Where the design and the source disagree at `abac6d59`, re-verified here:
   `tools/memory-tree/merge-rows.py:1098-1104` and the replica count are unchanged. No landed build
   adds a backlog mode, a `BACKLOG_MODE` key or a runbook switch section, and `.githooks/` holds no
   `straggler-guard.sh`, `pre-rebase` or `commit-msg` yet.
+
+RE-GROUNDED ON THE SECOND MERGE WITH MAIN, read 2026-09-28 at `313cc478`. The runbook is no longer
+unchanged before line 535: additions to §2 since `fb07ca25` moved every line §2 and §4 cite past
+line 136, and rev-9 re-points them; §3a now opens at `:327`. §2's kit list still ends at the
+unattended bullet with no kickoff-manifest bullet, and §3 step 4 still carries the two attribute
+lines S1 extends. The `WIRE-INTO-PROJECT.md` row of `tools/install-prefix-carried.txt` still reads
+53 at line 11. The scaffold header moved to `tools/memory-tree/adopt-memory-tree.sh:503` with its
+text unchanged, and the three fixture replicas §3 keeps are still three. The three reference hooks
+step 5 names, `.githooks/straggler-guard.sh`, `.githooks/pre-rebase` and `.githooks/commit-msg`, are
+tracked now, which AC3's `git ls-files` read needs.
 
 Recall terms used: `WIRE-INTO-PROJECT runbook migrate adopter shards scaffold header merge=rows attribute ledger retired status-first`

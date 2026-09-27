@@ -1141,9 +1141,16 @@ check_backlog_stragglers() {
     return
   fi
   kit=memory-tree; eng=migrate_backlog.py
-  path=$(first_of "${KIT_REL:+$KIT_REL/}$kit/$eng" "$kit/$eng")
+  # THE RECEIPT RUNG FIRST, as in every other arm that finds a kit file (TOOL-aRepatriatedFork-19):
+  # the two probes after it are guesses about gov's layout, and an adopter that homed the kit where
+  # neither spells it read `not installed` over an installed kit (merge-2 skeptic F4).
+  path=$(first_of "$(resolve_receipt_path "$kit" "$eng")" "${KIT_REL:+$KIT_REL/}$kit/$eng" "$kit/$eng")
   if [ -z "$path" ]; then
-    echo "skip     straggler — the memory-tree kit's $eng is not installed here, so no inventory ran"
+    local miss; miss=$(derive_receipt_miss "$kit" "$eng")
+    # The default reason sits in its own assignment: an apostrophe inside `${miss:-…}` within double
+    # quotes opens a quote bash never closes.
+    [ -n "$miss" ] || miss="the memory-tree kit's $eng is not installed here, so no inventory ran"
+    echo "skip     straggler — $miss"
     return
   fi
   if ! command -v resolve_python >/dev/null 2>&1 || ! py=$(resolve_python 2>/dev/null); then

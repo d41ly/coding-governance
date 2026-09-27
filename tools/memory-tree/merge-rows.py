@@ -309,11 +309,13 @@ def read_kit_conf() -> dict:
     if _KIT_CONF is None:
         root = _anchor_root()
         sys.path.append(str(pathlib.Path(__file__).resolve().parent))
-        import corpus_ids as CI  # noqa: PLC0415 — deliberately deferred; see above
+        # The parser is `tree_lib`'s and is reached directly, never through `corpus_ids`, which
+        # only re-exports it: no sibling imports an engine (TOOL-aRepatriatedFork-9).
+        from tree_lib import parse_conf  # noqa: PLC0415 — deliberately deferred; see above
         conf = {"MEMORY_ROOT": "memory", "BACKLOG_MODE": ""}
         with open(root / ".memory-tree.conf", "r", encoding="utf-8",
                   errors="surrogateescape") as fh:
-            CI.parse_conf(fh.read(), conf)
+            parse_conf(fh.read(), conf)
         _KIT_CONF = conf
     return _KIT_CONF
 
@@ -1389,6 +1391,23 @@ def _git(root: pathlib.Path, *args: str, stdin: bytes = b"") -> bytes:
     return done.stdout
 
 
+def load_generator():
+    """`gen_build_index`, LOADED BY PATH from beside this driver and never imported by name.
+
+    Only `--check` needs it, for the generated header the view probe renders with. No sibling module
+    in this kit imports an engine (TOOL-aRepatriatedFork-9, graded by
+    `row_grammar.scan_engine_imports`), so an adopter's own copy of the generator cannot kill the
+    driver on import; a generator that will not load fails this probe exactly as the import it
+    replaces did, and never reaches a merge.
+    """
+    import importlib.util  # noqa: PLC0415 — only on the --check path
+    src = pathlib.Path(__file__).resolve().parent / "gen_build_index.py"
+    spec = importlib.util.spec_from_file_location("gen_build_index", src)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def cmd_check(argv: list[str]) -> int:
     """The repo-subject arm: the attribute is still declared, and the refusal still fires.
 
@@ -1400,7 +1419,7 @@ def cmd_check(argv: list[str]) -> int:
     header change in the view layer reds here rather than in a suite nobody ran.
 
     WHAT IT DOES NOT CHECK, stated in the mode rather than left to be inferred: whether any node
-    configured `merge.rows.driver` (`tools/check-wiring.sh` owns that, and it is the half a commit
+    configured `merge.rows.driver` (gov's wiring checker owns that, and it is the half a commit
     cannot break), whether a straggler branch's own OLD driver conflicts (it does not run here at
     all), and whether anyone later resolves a refused conflict by discarding rows.
 
@@ -1456,10 +1475,8 @@ def cmd_check(argv: list[str]) -> int:
     # family-agnostic.
     shards = [p for p in governed if p.startswith(f"{memory_root}/backlog/")]
     family = pathlib.Path(shards[0]).stem if shards else "PROBE"
-    sys.path.append(str(pathlib.Path(__file__).resolve().parent))
-    import gen_build_index as GB  # noqa: PLC0415 — only on this path; it owns the generated header
     view = bk.render_family_view(family, (), bk.Fold({}, {}, {}, {}), memory_root,
-                                 derive_kit_prefix(), GB.GEN_HEADER)
+                                 derive_kit_prefix(), load_generator().GEN_HEADER)
     shard = (f"# {family} backlog\n\n- {family}-zProbe-1 · OPEN · an authored shard row\n")
     # ONE failure branch and not two. "It merged" and "it raised something else" are the same
     # verdict — the refusal did not fire — and splitting them puts a `return 1` on a path no staged

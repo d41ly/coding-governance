@@ -615,7 +615,8 @@ if [ -n "$_two_key" ]; then
   echo "unattended: REFUSING - a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch would answer it by whichever of condition 3's two rules it reached first and the other declaration would mean nothing. Declare each path under one key in $CONF:" >&2
   while IFS=$'\t' read -r _tk_s _tk_i; do
     echo "  SHARED_RECORDS $_tk_s overlaps the GENERATED_INDEXES index $_tk_i" >&2
-  done <<<"$_two_key"
+  done < <(printf '%s
+' "$_two_key")
   RUNLOG_CLEAN=1; exit 2
 fi
 
@@ -630,7 +631,7 @@ fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; RUNLOG_CHECKS+=("$1
 # core membership against a shrink-only floor, because a deletable core member is a silent,
 # reason-free override of everything keyed on it.
 # HELD SITS AFTER RUNNING AND BEFORE VERIFYING, and the position is a decision rather than a
-# reading order. `tools/unattended/gate-guard.js` RESTATES the tail of this list from VERIFYING as
+# reading order. This kit's `gate-guard.js` RESTATES the tail of this list from VERIFYING as
 # the phases it admits the flagged bar and the self-test suites in, and its own suite pins that
 # restatement to this line. Placed after LANDING, HELD would join that tail and a run held from
 # BUILDING would regain the bar the hook exists to refuse it. Placed here, a run held from
@@ -3495,9 +3496,13 @@ is_ids_value() { # value -> 0 when it is id-shaped, or carries whitespace
 # The three lines the refusal prints, written once because both refusals below print them: the
 # recipe carrying the tokens EXACTLY as typed, the rule about who lands what it writes, and the
 # second legal form. `<new-slug>` is left standing on purpose — minting a slug is section 2's act
-# and belongs to the session that will own the ids, not to a refusal message.
+# and belongs to the session that will own the ids, not to a refusal message. The generator is the
+# one THIS install holds, off the library's `resolve_index_generator`, never a spelled sibling-kit
+# home; a miss names what was not found in the recipe's own place.
 print_scaffold_recipe() { # the tokens, verbatim
-  printf '  recipe: tools/memory-tree/gen_build_index.py --new-build <new-slug> --asks %s\n' "$1"
+  local _gen
+  _gen=$(resolve_index_generator) || _gen="<the memory-tree kit's gen_build_index.py, which neither the receipt nor a probe beside this kit located>"
+  printf '  recipe: %s --new-build <new-slug> --asks %s\n' "$_gen" "$1"
   printf '  the scaffold writes the folder and stages it; the OWNER commits and lands it, which is what makes it an authorization rather than something this run wrote for itself\n'
   printf '  then the second legal form: --preflight <slug> naming that landed folder\n'
 }
@@ -4811,6 +4816,15 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   fi
   if [ -n "$BYPASS_BAN" ] && printf '%s' "$reason" | grep -qF -- "$BYPASS_BAN"; then
     fail 55 "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar for as long as the hold lasts; say it without the literal flag: $BYPASS_BAN"
+    return 1
+  fi
+  # THE LINE-END REFUSAL, before anything is written: `--abort`'s rule for its reason, applied to the
+  # hold's two free-text values. `set_fact` and park() refuse a line feed or a carriage return only
+  # at write time, and this verb writes `phase: HELD` first, so a refusal there left a HELD record
+  # with no held-at, no resume-owed and no history row, which a retry then refused as already HELD.
+  # A carriage return is refused with the line feed because every reader strips it as a line end.
+  if [ "$(printf '%s' "$reason$unreach" | wc -l)" -ne 0 ] || case "$reason$unreach" in *$'\r'*) true ;; *) false ;; esac; then
+    fail 55 "the reason or the unreachable node contains a newline or a carriage return, and the hold writes each as one line every reader parses line-wise, so this would forge a second row or a fact nothing wrote; nothing was written"
     return 1
   fi
   # TOOL-dDerivedDocket-29 S7 - THE PENDING RUN, optional, and validated here with the other arguments
@@ -6865,7 +6879,9 @@ write_inherited_asks() { # slug · R · run dir
 check_inherited_override() { # run-state file · the verb as the refusal names it -> 0 when admitted
   local rel=$1 verb=$2 f id gd head d hh htc tm why="" n=0 leg ver
   f=$(fact "$rel" gates-run); id=${f%% *}
-  gd=$(GIT rev-parse --git-dir 2>/dev/null); head=$(GIT rev-parse HEAD 2>/dev/null)
+  # The git dir comes off the sidecar root's ONE derivation in the library (check 32), never a
+  # second spelling of it here.
+  gd=$(resolve_sidecar_dir) && gd=${gd%/unattended} || gd=""; head=$(GIT rev-parse HEAD 2>/dev/null)
   d="$gd/gate-run/$id"
   if [ -z "$f" ]; then
     why="no gates-run fact in this record names a bar"
@@ -6914,7 +6930,7 @@ is_overridden() { # item -> 0 when it appears in OV_ITEMS
 # both REFUSALS and neither an unmet item, for the reason GG_HARD's comment gives.
 #
 # THE TREE FIRST, and in `git status --porcelain`'s FULL sense with untracked files included.
-# `tools/run-gates/run-gates.sh` writes its full-green stamp only over an EMPTY porcelain listing
+# The run-gates kit's `run-gates.sh` writes its full-green stamp only over an EMPTY porcelain listing
 # (its `TREE_CLEAN` term, beside the at-a-rev fingerprint the push later reproduces), while
 # `--prepare`'s own cleanliness check passes `-uno`. A tree carrying nothing but an untracked file
 # therefore prepares cleanly, greens the bar and stamps NOTHING - and the push then pays a second
@@ -6966,9 +6982,8 @@ print_selftests_owed() { # -> announces when the landing range owes the flagged 
         "$_q"*) case " $_hit " in *" $_q "*) ;; *) _hit="$_hit $_q" ;; esac ;;
       esac
     done
-  done <<RANGE
-$_touched
-RANGE
+  done < <(printf '%s
+' "$_touched")
   [ -n "$_hit" ] || return 0
   echo "unattended: close - the landing range HEAD^1..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar. This close does NOT run it and does NOT set the flag, which the charter reserves to a person: run it BY HAND at VERIFYING as 'GATE_FULL=1 GATE_SELFTESTS=1 $GATE_CMD' and name the command you ran in the run's record."
 }
@@ -7306,7 +7321,8 @@ dod_met() { # slug · run-state file · item · checker
         else echo "unattended: the merge bar is bounded at GATE_BOUND, ${GATE_BOUND}s, and its turnstile queue is charged to that bound — $GB_WHY"; fi
       fi
       if [ "$_gbs" = 1 ]; then _gbound=$GB_SUM; else _gbound=${GATE_BOUND:-0}; fi
-      _ggd=$(GIT rev-parse --git-dir 2>/dev/null)
+      # The git dir comes off the sidecar root's ONE derivation in the library (check 32).
+      _ggd=$(resolve_sidecar_dir) && _ggd=${_ggd%/unattended} || _ggd=""
       # S5 - EXIT 3, TREE MOVED, RUNS THE BAR ONCE MORE, and only once. The re-run pins a FRESH run id,
       # so the record the decision table below reads is the re-run's and never the moved one's.
       while :; do

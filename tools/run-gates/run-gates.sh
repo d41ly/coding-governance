@@ -2598,7 +2598,12 @@ derive_comparator() {
       case "$tok" in ''|-*) continue ;; esac
       if [ "$(git ls-files --full-name -- "$tok" 2>/dev/null | head -1)" = "$tok" ] \
          || [ "$(git cat-file -t "$ATTR_RSHA:$tok" 2>/dev/null)" = blob ]; then
-        files="$files$tok"$'\n'; dirs="$dirs$(dirname -- "$tok")"$'\n'
+        # The directory by EXPANSION, not `$(dirname …)`: `dirs` feeds a here-string loop below, and
+        # a value assembled from a substitution is the shell-hygiene leg's class one hop away. `tok`
+        # is a tracked FILE path (it passed one of the two tests above), so it has no trailing `/`
+        # and the two spellings agree; a bare name is `.`, as dirname says.
+        d=${tok%/*}; [ "$d" = "$tok" ] && d=.
+        files="$files$tok"$'\n'; dirs="$dirs$d"$'\n'
       fi
     done
   done

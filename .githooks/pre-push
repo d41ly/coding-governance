@@ -506,11 +506,11 @@ if [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 
       continue
     fi
     if [ -z "$_sg_module" ]; then
-      echo "pre-push: the transition audit did NOT run over $_ref — the memory-tree kit is installed neither under '$top' nor beside this hook, so the straggler question was not asked. Check 25 still binds at the merge bar."
+      echo "pre-push: the transition audit did NOT run over $_ref — the memory-tree kit is installed neither under '$top' nor beside this hook, so the straggler question was not asked. Check 26 still binds at the merge bar."
       continue
     fi
     if [ -z "$_sg_py" ]; then
-      echo "pre-push: the transition audit did NOT run over $_ref — no usable python launcher resolved, so the straggler question was not asked. Check 25 still binds at the merge bar."
+      echo "pre-push: the transition audit did NOT run over $_ref — no usable python launcher resolved, so the straggler question was not asked. Check 26 still binds at the merge bar."
       continue
     fi
     _sg_out=$("$_sg_py" "$_sg_module" --at "$_sha" --expect-builds 2>&1); _sg_rc=$?

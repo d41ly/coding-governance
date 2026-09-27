@@ -194,7 +194,7 @@ The base used to be the bare branch name, which git resolves to the LOCAL branch
 read differently on a node whose local `main` was stale: a pin raise already on origin read as a
 weakened ratchet on that node alone. The report never fetches — it is a leg that must run offline,
 and a fetch would move the ref it is grading — so a node wanting a fresher answer fetches first.
-TOOL-dDerivedDocket-21; shipped under 1.12. A CI checkout that fetches branches without
+TOOL-dDerivedDocket-21. A CI checkout that fetches branches without
 `refs/remotes/origin/HEAD` still needs `GOV_DEFAULT_BRANCH`, as before.
 
 ## Why pins rather than a perfect oracle

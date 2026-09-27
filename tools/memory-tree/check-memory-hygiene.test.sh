@@ -2597,10 +2597,14 @@ n=$((n+1))
 # ---- module constants, the spelling the other two greps miss. It hid check 20 first, and then
 # ---- check 24, whose `ROTATION_CHECK` the first anchor `^CHECK =` could not see: the README said
 # ---- 23 over 24 checks and this arm agreed, until check 25 made the README true and the arm red.
+# ---- And `transition_audit.py`'s `SAY` prefix, the fourth spelling: check 26 prints through it and
+# ---- the engine calls no `fail 26`, so it was invisible here while it shared the number 25 with the
+# ---- reader inventory, and would have stayed invisible under its own number.
 n=$((n+1))
 _hy_ids=$( { grep -oE 'fail [0-9]+' "$HERE/check-memory-hygiene.sh" | grep -oE '[0-9]+'
              grep -rhoE 'check [0-9]+:' "$HERE/corpus_ids.py" "$HERE/gotchas.py" | grep -oE '[0-9]+'
-             grep -oE '^[A-Z_]*CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
+             grep -oE '^[A-Z_]*CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'
+             grep -oE '^SAY = "memory-hygiene: check [0-9]+ ' "$HERE/transition_audit.py" | grep -oE '[0-9]+'; } | sort -n -u )
 _hy_derived=$(printf '%s\n' "$_hy_ids" | grep -c .)
 
 

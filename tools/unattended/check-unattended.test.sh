@@ -205,6 +205,13 @@ HALT_CODES_EXTRA=""
 HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
 HOLD_CODES_EXTRA=""
 HOLD_FLOOR="${HDFLOOR_OVERRIDE:-$HOLD_FLOOR_DERIVED}"
+# THE DURABLE RESTART CARRIER, DECLARED (TOOL-dDerivedDocket-5 S1). RESUME_SCHEDULE is absent, so it
+# defaults to on, and check 46 requires the pair while it is on: without these two lines every run
+# over this fixture printed two check 46 FAILED lines, which every batched group read as a branch
+# nobody asserted. Spelled apart from KEEPALIVE_CREATE, or check 46's carrier refusal fires instead.
+# The driver suite's fixture declares the same pair for the same reason.
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 # DECLARED HERE, AND THAT IS A FIXTURE FIX RATHER THAN A PRODUCT ONE (TOOL-dFoldedVerdict-2 fallout).
 # The key was absent from this block, so the DEFAULT fixture took check 2's blank branch and the leg
 # announced it on stdout once per run. That announcement is CORRECT for a blank cutoff and wrong for
@@ -367,6 +374,14 @@ reset_tree() {
   printf 'delete refs/heads/ahead\ndelete refs/heads/trunk\n' | git --git-dir="$ORIGIN" update-ref --stdin
 }
 run() { bash "$SCRIPT" 2>&1; }
+# THE WHOLE-OUTPUT GREEN CONTROLS GRADE "NOTHING ELSE PRINTED", NOT "NOTHING PRINTED". Checks 45 and
+# 46 announce the effective LANDER_MODE, RESUME_SCHEDULE and SELFTESTS_OWED_PATHS on the DEFAULT
+# channel by design (the checker's header, THREE), so a control comparing the whole output to empty
+# reds on every tree once those checks exist. This removes exactly those announcement shapes and
+# nothing else; the lm_dir arms assert the announcements themselves, so the pair grades both halves.
+remove_announcements() { # leg output -> the same output without the check-45/46 announcement lines
+  printf '%s\n' "$1" | grep -v -E '^unattended: (LANDER_MODE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE is off — |SELFTESTS_OWED_PATHS is blank — |SELFTESTS_OWED_PATHS entry [^ ]+ — resolves to tracked paths$)'
+}
 # A scratch dir for STUBBED BINARIES, prepended to PATH by the arms that need one. Used to fire a
 # code path whose real trigger is a network partition, which no fixture can arrange.
 # ITS PARENT IS TRAPPED, not just the stub inside it. `$(mktemp -d)/bin` leaked one scratch directory
@@ -595,7 +610,7 @@ if in_shard 1; then
 # ---- a leg that reds on everything arms every branch and checks nothing.
 out=$(run); rc=$?
 same "a conforming tree exits 0" "$rc" "0"
-same "a conforming tree prints nothing" "$out" ""
+same "a conforming tree prints nothing" "$(remove_announcements "$out")" ""
 
 # ---- check 1, all three branches: no conf, a key undeclared, and the driver's core sets unreadable.
 # ---- ROUND 9's BLOCKER: the conf could no longer END this leg and could still HIJACK it, because the
@@ -966,7 +981,7 @@ miss "$out" "the driver declares no PARK_KINDS_OWED taxonomy"
 reset_tree; mkconf "PARKED" ""
 out=$(run)
 miss "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
-same "a project phase EXTENSION is green" "$(run)" ""
+same "a project phase EXTENSION is green" "$(remove_announcements "$(run)")" ""
 
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
@@ -978,7 +993,7 @@ hit "$out" "the kit's CORE Definition-of-Done set has shrunk below its floor, an
 hit "$out" "$((ndod-1)) against $ndod"
 
 reset_tree; mkconf "" "project-item:machine"
-same "a project DoD EXTENSION is green" "$(run)" ""
+same "a project DoD EXTENSION is green" "$(remove_announcements "$(run)")" ""
 
 # ---- ...and the floor itself must be DECLARED. Omitting the key is the quietest way to disarm a
 # ---- shrink-only pin, so the omission is its own refusal rather than a skipped check.
@@ -1006,7 +1021,7 @@ reset_tree; git rm -q memory/builds/tRun/RUN.md && git commit -q -m young --no-v
 out=$(run); rc=$?
 miss "$out" "the selector is mis-segmented"
 same "a young tree with no run-state file anywhere exits 0" "$rc" "0"
-same "a young tree prints nothing" "$out" ""
+same "a young tree prints nothing" "$(remove_announcements "$out")" ""
 
 # ---- check 4 branches 2 and 3: no phase, and a phase outside the vocabulary.
 
@@ -1457,7 +1472,7 @@ control back: *"Ready — say go and I'll start, or adjust any field."* Do not s
 ENG
 printf 'KICKOFF_ENGINE="skills/session-kickoff/SKILL.md"\nKICKOFF_EXITS="6"\n' >> .unattended.conf
 git add -A && git commit -q -m engine --no-verify
-same "a conforming kickoff engine is green" "$(run)" ""
+same "a conforming kickoff engine is green" "$(remove_announcements "$(run)")" ""
 
 # ...the hand-back deleted: a mandated run halts at the card with nobody to answer it.
 sed -i '/^## Step 5b/d' skills/session-kickoff/SKILL.md
@@ -1521,7 +1536,7 @@ hit "$(run)" "KICKOFF_ENGINE names a file that does not exist, so the hand-back 
 
 # ...blank turns it off, which is what lets an adopter without the kickoff skill stay green.
 sed -i 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' .unattended.conf
-same "a blank KICKOFF_ENGINE turns the check off" "$(run)" ""
+same "a blank KICKOFF_ENGINE turns the check off" "$(remove_announcements "$(run)")" ""
 
 # ---- check 1 branch 5: a MALFORMED floor is a refusal, not a skip. Only the wholly UNDECLARED case
 # ---- was caught, so `CORE_FLOOR="6"` left BOTH shrink-only pins unenforced while the conf still
@@ -1685,7 +1700,7 @@ git checkout -q main && git merge -q --no-ff unit -m "land the run"
 # which is what the predicate now reads.
 git push -q -f origin main
 out=$(run); rc=$?
-same "a LANDED run-state record leaves the bar green" "$out" ""
+same "a LANDED run-state record leaves the bar green" "$(remove_announcements "$out")" ""
 same "a LANDED run-state record exits 0" "$rc" "0"
 git checkout -q unit; reset_tree
 
@@ -2035,7 +2050,7 @@ git checkout -q main; git reset -q --hard "$ANCHOR0"; git push -q -f origin main
 
 # GREEN CONTROL: the template this kit actually ships orders the two correctly.
 reset_tree; kick_engine
-same "the shipped Skill template orders kickoff after preflight" "$(run)" ""
+same "the shipped Skill template orders kickoff after preflight" "$(remove_announcements "$(run)")" ""
 
 # ...TRANSPOSED. The deadlock: kickoff invoked first halts at its READY card with nobody under a
 # mandate to answer it. Judged on the FIRST occurrence of each, which is the one the agent reads.
@@ -2397,7 +2412,7 @@ miss "$(run)" "well-formed generated-units marker pair"
 # silent because the project ships no kickoff skill, not because the template is conforming.
 reset_tree
 mutate $KIT_REL/SKILL.template.md '2i Invoke /session-kickoff before anything else.'
-same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(run)" ""
+same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(remove_announcements "$(run)")" ""
 reset_tree
 
 # ---- 34 (TOOL-aRepatriatedFork-6 AC5): a Run facts key carried twice with two DIFFERENT values is a
@@ -2441,7 +2456,7 @@ fi   # ---- end REGION 4 -------------------------------------------------------
 if in_shard 5; then
 read_topo 5
 reset_tree
-same "the shipped protocol's two tables join clean" "$(run)" ""
+same "the shipped protocol's two tables join clean" "$(remove_announcements "$(run)")" ""
 
 # D, driver -> protocol: a core phase the contract never publishes.
 reset_tree; pedit 's/`SPECCING` · //'   # mid-line: VERIFYING ends a line, so it has no trailing space to match
@@ -2545,7 +2560,7 @@ reset_tree
 # GREEN CONTROL: undeclared is the empty set, which is every adopter today, and is what keeps this
 # change from reddening anyone who uses no extras.
 reset_tree
-same "an undeclared row source changes nothing" "$(run)" ""
+same "an undeclared row source changes nothing" "$(remove_announcements "$(run)")" ""
 
 # ...an extra handle with NO row source is REFUSED now, where it was silently waivable.
 reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9"/'
@@ -2555,7 +2570,7 @@ hit "$(run)" "a directive is declared in the registry and absent from the Skill'
 mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
 mkdir -p memory/project
 printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
-same "declared + shown is silent" "$(run)" ""
+same "declared + shown is silent" "$(remove_announcements "$(run)")" ""
 
 # ...a row source naming a handle the registry does NOT declare reds the other way, so the join stays
 # two-directional across the union rather than one-directional over it.
@@ -4011,30 +4026,34 @@ lm_dir=$(mktemp -d)
   cd "$lm_dir" || exit 2
   git init -q -b main . && git config user.email t@t.test && git config user.name t \
     && git config core.autocrlf false
-  mkdir -p tools/unattended memory/guides
+  # THE KIT HOME IS THE SUITE'S OWN `$KIT_REL`, never a spelled prefix: the kit is installed and
+  # run here at the same derived path the shared fixture uses, so the block grades at any prefix.
+  mkdir -p "$KIT_REL" memory/guides
   cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" \
      "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" "$HERE/VERBS.template.md" \
      "$HERE/STOPS.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" \
-     "$HERE/.unattended.conf.example" tools/unattended/
+     "$HERE/.unattended.conf.example" "$KIT_REL/"
   cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
   cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
-  cp "$HERE/ASKS.template.md" tools/unattended/
+  cp "$HERE/ASKS.template.md" "$KIT_REL/"
   cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
   cp "$HERE/STOPS.template.md" memory/guides/UNATTENDED-STOPS.md
+  # LANDER is graded for presence only (check 1), so it carries the shared fixture's inert value.
   cat > .unattended.conf <<'LMC'
 MEMORY_ROOT=memory
-LANDER="bash tools/push-main.sh"
+LANDER="echo land"
 LANDER_MODE="in-place"
-SELFTESTS_OWED_PATHS="tools/"
 BYPASS_BAN="--no-verify"
 GATE_CMD="true"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
 LMC
+  # The owed surface is the kit home this block installs, so it resolves to tracked paths here.
+  printf 'SELFTESTS_OWED_PATHS="%s/"\n' "$KIT_REL" >> .unattended.conf
   git add -A >/dev/null && git commit -q -m seed --no-verify
 ) >/dev/null 2>&1
-lmrun() { ( cd "$lm_dir" && bash tools/unattended/check-unattended.sh 2>&1 ); }
+lmrun() { ( cd "$lm_dir" && bash "$KIT_REL/check-unattended.sh" 2>&1 ); }
 lmrestore() { git -C "$lm_dir" checkout -q -- "$1"; }
 # The Land SECTION alone, rewritten in place. A file-wide edit would also move the Close section,
 # which names `--prepare` too, so an arm made that way could not tell the two apart.
@@ -4045,8 +4064,8 @@ lmland() { # python-expression-free: awk over the section boundaries
     inl && mode == "empty" { next }
     inl && mode == "sub" { gsub(ENVIRON["LMFROM"], ENVIRON["LMREPL"]) }
     { print }
-    END { }' "$lm_dir/tools/unattended/SKILL.template.md" > "$lm_dir/.land.tmp" \
-    && mv "$lm_dir/.land.tmp" "$lm_dir/tools/unattended/SKILL.template.md"
+    END { }' "$lm_dir/$KIT_REL/SKILL.template.md" > "$lm_dir/.land.tmp" \
+    && mv "$lm_dir/.land.tmp" "$lm_dir/$KIT_REL/SKILL.template.md"
 }
 
 # ---- GREEN CONTROLS: the shipped Land section passes, and both announcements are on the DEFAULT
@@ -4054,34 +4073,37 @@ lmland() { # python-expression-free: awk over the section boundaries
 out=$(lmrun)
 miss "$out" "check 44 FAILED"
 hit  "$out" "LANDER_MODE in-place (declared)"
-hit  "$out" "SELFTESTS_OWED_PATHS entry tools/ — resolves to tracked paths"
+hit  "$out" "SELFTESTS_OWED_PATHS entry $KIT_REL/ — resolves to tracked paths"
 
 # ---- 44: the Land section without `--prepare`, and without `--land`. Two arms, because a section
 # ---- missing either one sends an agent to a landing it cannot complete and the messages differ.
 LMFROM="--prepare" lmland "--ready" sub
 out=$(lmrun)
 hit "$out" "the Skill's Land section names neither landing shape in full - an in-place landing prepares the merge and then pushes exactly it, and a section missing either verb sends an agent to a landing it cannot complete"
-lmrestore tools/unattended/SKILL.template.md
+lmrestore "$KIT_REL/SKILL.template.md"
 LMFROM="--land" lmland "--ship" sub
 out=$(lmrun)
 hit "$out" "and a section missing either verb sends an agent to a landing it cannot complete"
-lmrestore tools/unattended/SKILL.template.md
+lmrestore "$KIT_REL/SKILL.template.md"
 
 # ---- 44: the primary path's fallback text surviving into the Land section. It is wrong twice over
 # ---- under `in-place`: that ref is one the session can move, and it carries whatever else on the
-# ---- node is unpushed.
-printf '\nIf the push fails, merge the branch into local main and land from the primary tree.\n' \
-  >> "$lm_dir/tools/unattended/SKILL.template.md"
+# ---- node is unpushed. PLACED UNDER THE LAND HEADING, never appended: Land is not the template's
+# ---- last section, so an EOF append lands in whichever section closes the file and the
+# ---- section-scoped check never reads it.
+awk '{ print } /^## Land[ \t]*$/ { print ""; print "If the push fails, merge the branch into local main and land from the primary tree." }' \
+  "$lm_dir/$KIT_REL/SKILL.template.md" > "$lm_dir/.land.tmp" \
+  && mv "$lm_dir/.land.tmp" "$lm_dir/$KIT_REL/SKILL.template.md"
 out=$(lmrun)
 hit "$out" "the Skill's Land section directs a merge into the node's own default branch, which is a ref this session can move and which carries whatever else here is unpushed, so the landing it describes is not the one the bar graded"
-lmrestore tools/unattended/SKILL.template.md
+lmrestore "$KIT_REL/SKILL.template.md"
 
 # ---- 44: an EMPTY section. Without this arm the two above would pass over nothing the day the
 # ---- section is renamed, which is this leg's own could-not-fail shape one level up.
 lmland "" empty
 out=$(lmrun)
 hit "$out" "the Skill template carries no Land section body, so every assertion about the landing an agent is told to perform would be graded over nothing and would pass by finding nothing"
-lmrestore tools/unattended/SKILL.template.md
+lmrestore "$KIT_REL/SKILL.template.md"
 
 # ---- 45: a declared mode outside the DRIVER's own closed set. Every run in such a project refuses
 # ---- at conf load, so the bar must say so rather than leave it to the next invocation.
@@ -4092,7 +4114,7 @@ lmrestore .unattended.conf
 
 # ---- 45: a declared self-test prefix that matches no tracked path reads as coverage of a surface
 # ---- that is not there. A BLANK key is not a fault and is announced instead.
-sed -i 's|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS="tools/ nosuchdir/"|' "$lm_dir/.unattended.conf"
+sed -i "s|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS=\"$KIT_REL/ nosuchdir/\"|" "$lm_dir/.unattended.conf"
 out=$(lmrun)
 hit "$out" "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and an in-place landing of kit work under it would never be told the flagged bar is owed"
 lmrestore .unattended.conf
@@ -4105,18 +4127,23 @@ lmrestore .unattended.conf
 # ---- 45: the DRIVER's marker removed. The closed set is read off the driver's own line rather than
 # ---- retyped here, so a marker that stops resolving must REFUSE: a set read as empty would make
 # ---- every declared value, including a misspelling, read as legal.
-sed -i '/gov:lander-mode-set/d' "$lm_dir/tools/unattended/unattended.sh"
+sed -i '/gov:lander-mode-set/d' "$lm_dir/$KIT_REL/unattended.sh"
 out=$(lmrun)
 hit "$out" "this leg cannot read the closed LANDER_MODE set and its default off the driver's own marked lines, so the declared mode would be graded against an empty set and every value, including a misspelling, would read as legal"
-lmrestore tools/unattended/unattended.sh
+lmrestore "$KIT_REL/unattended.sh"
 
 
 # ---- 46: the DURABLE restart carrier, TOOL-dDerivedDocket-5. GREEN CONTROL first: this conf
 # ---- declares no switch at all, which is the population every upgrading adopter is in, and the
-# ---- effective value has to be ANNOUNCED rather than silently applied.
+# ---- effective value has to be ANNOUNCED rather than silently applied. AC1 says the default does
+# ---- not red ON THAT ACCOUNT, and S1 requires the carrier pair while the value is on, so the control
+# ---- declares the pair (apart from the keepalive's tools) and leaves the switch alone: without the
+# ---- pair the switch-on-no-carrier refusal below fires here, and the control grades that instead.
+printf 'RESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\n' >> "$lm_dir/.unattended.conf"
 out=$(lmrun)
 hit  "$out" "RESUME_SCHEDULE on (defaulted)"
 miss "$out" "check 46 FAILED"
+lmrestore .unattended.conf
 
 # ---- 46: an unrecognised spelling. The driver refuses it at conf load, so every verb in such a
 # ---- project is unreachable and a leg that resolved it silently to either value would be reporting
@@ -4152,10 +4179,10 @@ lmrestore .unattended.conf
 
 # ---- 46: the DRIVER's marker removed, on check 45's own terms. A set read as empty would make
 # ---- every declared value, a misspelling included, read as legal.
-sed -i '/gov:resume-schedule-set/d' "$lm_dir/tools/unattended/unattended.sh"
+sed -i '/gov:resume-schedule-set/d' "$lm_dir/$KIT_REL/unattended.sh"
 out=$(lmrun)
 hit "$out" "this leg cannot read the closed RESUME_SCHEDULE set and its default off the driver's own marked lines, so the declared switch would be graded against an empty set and every value, a misspelling included, would read as legal"
-lmrestore tools/unattended/unattended.sh
+lmrestore "$KIT_REL/unattended.sh"
 
 rm -rf "$lm_dir"
 
@@ -4175,7 +4202,7 @@ rm -rf "$lm_dir"
 #
 # COST: eight repositories, about sixty commits and forty resolver calls, measured at 13 s on node d
 # 2026-09-21 running this block standalone. Process creation is this suite's cost centre and its
-# budget row is in `tools/run-gates/selftest-budgets.txt`; 13 s against that row needs no raise.
+# budget row is in the run-gates kit's selftest-budgets.txt; 13 s against that row needs no raise.
 # PRISTINE FIRST. Every arm above that mutates the fixture's copy of the kit restores it, but the
 # extraction below reads that copy, and an arm that graded a leg some earlier block left mutated
 # would be grading someone else's break. This costs a reset and removes the question.
@@ -4268,7 +4295,7 @@ same "AC4 control: the add search answers nothing there, plain" \
 same "AC4 control: and nothing with --full-history either" \
   "$(git -C "$ric_b" log --full-history --diff-filter=A --format=%H -- $ric_d/RUN.LANDED.deadbeef.md)" ""
 
-# ---- FIXTURE C: an `-s ours` merge, the shape `tools/drift-audit/drift_report.py` reproduced for
+# ---- FIXTURE C: an `-s ours` merge, the shape the drift-audit kit's drift_report.py reproduced for
 # ---- this same flag. The commit that introduced the line is TREESAME-pruned out of a simplified
 # ---- walk, so the simplified spelling answers nothing at all — an absent answer wearing the face
 # ---- of a clean one.
@@ -4906,12 +4933,12 @@ cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/$KIT_REL/"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/memory/guides/UNATTENDED-ASKS.md"
 cp "$TMP/.unattended.conf" "$ma0/.unattended.conf"
 ma_readme "$ma0" tRun
-ma_readme "$ma0" tTick 'may: `tools/push-main.sh`'
-ma_readme "$ma0" tBare 'may: tools/push-main.sh'
+ma_readme "$ma0" tTick 'may: `tools/lander-granted.sh`'
+ma_readme "$ma0" tBare 'may: tools/lander-granted.sh'
 ma_readme "$ma0" tPrompt 'authorized-by: prompt'
 for ma_s in tRun tTick tBare tPrompt; do ma_run "$ma0" "$ma_s"; done
 sed -i 's/^mode: slug$/mode: prompt/' "$ma0/memory/builds/tPrompt/RUN.md"
-sed -i 's/^may: none$/may: tools\/push-main.sh/' "$ma0/memory/builds/tTick/RUN.md" "$ma0/memory/builds/tBare/RUN.md"
+sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tTick/RUN.md" "$ma0/memory/builds/tBare/RUN.md"
 ( cd "$ma0" || exit 2
   git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
   git add -A >/dev/null && git commit -q -m base --no-verify
@@ -4921,8 +4948,8 @@ sed -i 's/^may: none$/may: tools\/push-main.sh/' "$ma0/memory/builds/tTick/RUN.m
 for ma_s in tRun tTick tBare tPrompt; do ma_facts "$ma0" "$ma_s" RUNNING unit main; done
 ma_commit "$ma0" facts
 MA0_PRISTINE=$(ma_sha "$ma0" HEAD)
-n=$((n+1)); { [ -n "$MA0_PRISTINE" ] && grep -q '^may: tools/push-main.sh$' "$ma0/memory/builds/tTick/RUN.md" \
-  && grep -q '^may: `tools/push-main.sh`$' "$ma0/memory/builds/tTick/README.md"; } \
+n=$((n+1)); { [ -n "$MA0_PRISTINE" ] && grep -q '^may: tools/lander-granted.sh$' "$ma0/memory/builds/tTick/RUN.md" \
+  && grep -q '^may: `tools/lander-granted.sh`$' "$ma0/memory/builds/tTick/README.md"; } \
   || { echo "FAIL the TOOL-dDerivedDocket-19 G0 fixture did not build its four records, so every arm below would grade a missing one"; st=1; }
 ma0_reset() { ( cd "$ma0" && git reset -q --hard "$MA0_PRISTINE" && git clean -qfd ); }
 
@@ -4934,18 +4961,18 @@ miss "$out" "pins a may: grant while recording an authorization mode that resolv
 miss "$out" "$MA_WRITES"
 hit  "$out" "the ask-mandate second opinions (checks 19, 15 and 37) are VACUOUS on this tree"
 # AC4: a fact that differs from the README's line at BASE reds, naming both values
-ma0_reset; sed -i 's/^may: none$/may: tools\/push-main.sh/' "$ma0/memory/builds/tRun/RUN.md"; ma_commit "$ma0" forged
+ma0_reset; sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tRun/RUN.md"; ma_commit "$ma0" forged
 out=$(ma_leg "$ma0")
 hit "$out" "a run-state file pins a may: grant the build README at its own recorded BASE does not declare, so the authority the run says its owner committed is not the authority that README carries - pinned against declared follow: ["
-hit "$out" "pinned against declared follow: [tools/push-main.sh] against [none] in memory/builds/tRun/RUN.md"
+hit "$out" "pinned against declared follow: [tools/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
 # ...and against BASE, never HEAD: the README edited on the run branch to match the fact still reds
-ma_grant "$ma0" tRun tools/push-main.sh; ma_commit "$ma0" "matched at head"
+ma_grant "$ma0" tRun tools/lander-granted.sh; ma_commit "$ma0" "matched at head"
 out=$(ma_leg "$ma0")
-hit "$out" "pinned against declared follow: [tools/push-main.sh] against [none] in memory/builds/tRun/RUN.md"
+hit "$out" "pinned against declared follow: [tools/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
 # AC5: a `prompt` record carrying a grant reds by its mode, whatever its README says
-ma0_reset; sed -i 's/^may: none$/may: tools\/push-main.sh/' "$ma0/memory/builds/tPrompt/RUN.md"; ma_commit "$ma0" "prompt grant"
+ma0_reset; sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tPrompt/RUN.md"; ma_commit "$ma0" "prompt grant"
 out=$(ma_leg "$ma0")
-hit "$out" "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [prompt], may: [tools/push-main.sh] in memory/builds/tPrompt/RUN.md"
+hit "$out" "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [prompt], may: [tools/lander-granted.sh] in memory/builds/tPrompt/RUN.md"
 
 # ---- G1: A LIVE RECORD, AND AN IN-PLACE TERMINAL ONE, over unit 2's prepared merge T - first parent
 # ---- the advertised tip, which carries the owner's grant, second parent the run branch.

@@ -10,9 +10,9 @@
 #   <this script> --offenders                            # one `check <n><TAB><key>` per offender, nothing else
 #
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
-# CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm and 23 all skip, and the
-# full run at the push boundary is where they bind. Check 22 is NOT among them and still walks
-# every tracked review record here, and neither is check 25: its verdict is per spec, and its by-name
+# CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm, 23 and 26 (whose
+# population is the commit GRAPH) all skip, and the full run at the push boundary is where they
+# bind. Check 22 is NOT among them and still walks every tracked review record here, and neither is check 25: its verdict is per spec, and its by-name
 # resolution reads the whole tracked tree whichever files are staged. This line used to read "set-checks tree-wide", which was
 # already false of 13-19 — one rule returning two verdicts, the
 # `amendment-leaves-its-other-half-standing` class this repo catalogues.
@@ -594,7 +594,7 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # other than this one.
   F:spec-token-waivers.txt|F:readme-contract.txt) ;;
   F:stale-header-waiver.txt) ;;
-  # TOOL-dDerivedDocket-9 — check 25's pinned transition registry. APPEND-ONLY: a transition in
+  # TOOL-dDerivedDocket-9 — check 26's pinned transition registry. APPEND-ONLY: a transition in
   # history is permanent, so its row is too, and an unlisted transition is COUNTED rather than
   # refused, because a merge cannot list its own sha.
   F:transition-audit.txt) ;;
@@ -1332,9 +1332,16 @@ if [ "$STAGED" = 0 ]; then
   fi
 fi
 
-# 25 — the TRANSITION-MERGE audit. Delegated to transition_audit.py for the reason 24 is: the
+# 26 — the TRANSITION-MERGE audit. Delegated to transition_audit.py for the reason 24 is: the
 # assertion is a walk over the commit GRAPH keyed by the anchor grammar, and this file must not
 # spell a second row grammar or a second ancestry rule.
+#
+# NUMBERED 25 UNTIL THE SECOND MERGE WITH MAIN (e2e840d0). Both lineages minted a check 25 within a
+# day of each other: this one (TOOL-dDerivedDocket-9, 2026-09-21) and main's reader inventory
+# (TOOL-dGatedProse-1, 2026-09-22, the `fail 25` below). Main's landed first and keeps the number;
+# this one moved to the next free id. The collision was FUNCTIONAL, not cosmetic: remote CI's
+# liveness grep for this audit's line prefix was satisfied by the reader inventory's own
+# `check 25 did not grade` line, and `--offenders` keyed both checks under one label.
 #
 # THE SHELL'S OWN READING OF THE MODE IS PASSED IN. `BMODE` is resolved above, from the conf this
 # script sources; the module reads the mode a SECOND way, from each commit's own conf BLOB. A guard
@@ -1353,7 +1360,7 @@ if [ "$STAGED" = 0 ]; then
   fi
   [ -n "$tam" ] && printf '%s\n' "$tam"
   [ "$_tarc" -ne 0 ] && status=1
-  [ "$_tarc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 25 $'\n'"$tam"
+  [ "$_tarc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 26 $'\n'"$tam"
 fi
 
 # 11 — old-tree tombstone (only if TOMBSTONE_ROOTS is configured; never grandfathered).

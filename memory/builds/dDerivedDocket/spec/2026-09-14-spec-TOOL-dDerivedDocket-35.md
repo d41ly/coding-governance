@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-35 — arming and the real-tree staged reds
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 37
+**Status:** SPECCED · rev-9 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling · order 37
 
 <!-- gen:spec-records -->
 
@@ -82,18 +82,24 @@ against the fixture.
   primary scratch tree. The row driver stops the merge
   on the shard-into-view conflict; the scratch resolution takes the default branch's view and runs
   `git commit`, which `.githooks/commit-msg` refuses. Concluded with `--no-verify`, the merge makes
-  `bash tools/memory-tree/check-memory-hygiene.sh` fail check 25 naming the merge, the id and the
-  change commit. Observed by AC6.
+  `bash tools/memory-tree/check-memory-hygiene.sh` fail check 26, the transition audit, naming the
+  merge, the id and the change commit; it was check 25 until the second merge with main gave that
+  number to `TOOL-dGatedProse-1`'s reader inventory. Observed by AC6.
 - **S8** Every RED is copied verbatim into this unit's acceptance ledger, and the scratch clone is
   removed afterwards with its read-only git objects cleared first — afterwards meaning after the
   deferred staging of S6 and S7 at the VERIFYING run (S2), because the linked worktree those two
   need lives inside that clone, so the pass leaves it in place. The ledger is COMMITTED before any
   check reads it, in two commits matching the two copying moments (Rollout step 6):
   `tools/memory-tree/check-memory-hygiene.sh` enumerates its corpus from the index —
-  `git ls-files` at `tools/memory-tree/check-memory-hygiene.sh:219`, `:1902` and `:2015` — so an
-  uncommitted and unstaged ledger is invisible to check 14, and a reading taken over one is the
-  could-not-fail shape rather than coverage. The real tree carries only this
+  `git ls-files` at `tools/memory-tree/check-memory-hygiene.sh:275`, `:2482` and `:2598` at
+  `313cc478` — so an uncommitted and unstaged ledger is invisible to check 14, and a reading taken
+  over one is the could-not-fail shape rather than coverage. The real tree carries only this
   unit's declared writes. Observed by AC7.
+  - **Readers:** by name: READER NOT IN TREE, because the one thing S8 takes away is the scratch
+    clone, a directory outside this repository that no tracked file spells; the engine path the item
+    cites reads the ledger, which stays. by value: NO VALUE READERS, because every RED the clone
+    produced is copied into the committed ledger before the clone goes, so nothing in the tree reads a
+    value that leaves with it.
 - **S9** This build's own asks after arming. Its close is the first one graded with `ASKS_CMD` set,
   so every ask homed in `memory/builds/dDerivedDocket/BACKLOG.md` must be terminal or carry a
   disposition row there. The unit reads the folder's asks through
@@ -112,7 +118,10 @@ against the fixture.
   `grep -n 'dDerivedDocket-[0-9]* · OPEN' memory/backlog/*.md` returns nine rows,
   TOOL-dDerivedDocket-38 through TOOL-dDerivedDocket-46 — the round-1 fold's two and the seven the
   round-2 fold filed at `f3ab70ca` — each recording its decline under the protocol's section 11, and
-  that reading is a size, not the list the unit writes from (§8 F6).
+  that reading is a size, not the list the unit writes from (§8 F6). The same grep at `313cc478`
+  returns sixteen, TOOL-dDerivedDocket-38 through TOOL-dDerivedDocket-47 and TOOL-dDerivedDocket-55
+  through TOOL-dDerivedDocket-60, each recording that decline, which is a second size and still not
+  the list.
   Observed by AC7 and AC8.
 - **S10** The kickoff manifest's `last-audit` is re-stamped in the same commit, with a delta line in
   the commit message, because `.unattended.conf` is in its `watch:` list and the staged leg refuses a
@@ -147,7 +156,8 @@ against the fixture.
   S6 stages, and the linked-worktree topology helper, `straggler-guard.test.sh` in its `--topology`
   mode (unit 13 S8), the hooks-path value that unit's rev-2 settles, which
   `tools/check-wiring.sh --fix` writes, and the `hooks own-tree` note `--session` prints (its S5).
-- **consumes-from** `TOOL-dDerivedDocket-9` — check 25 and the `commit-msg` carrier, which S7
+- **consumes-from** `TOOL-dDerivedDocket-9` — the transition audit, hygiene check 26 since the
+  second merge with main and check 25 before it, and the `commit-msg` carrier, which S7
   stages. Added by this spec; the brief's roster note for this unit names it.
 - **hands-off** external — the first ask-driven pilot: the owner lands a README with
   `gen_build_index.py --new-build <slug> --asks <ids>` and starts `/unattended <slug>`.
@@ -578,19 +588,29 @@ observes them on real content.
 - rev-8 · 2026-09-22 · order re-declared from 36 to 37 in the status header only, derived from the §3
   edges: the G9 exit promoted TOOL-dDerivedDocket-65 to run at 35, after 64. No criterion, design or
   edge moved.
+- rev-9 · 2026-09-28 · §2 §3 §10 · S7 S8 S9 · AC6 AC7 AC8 · re-grounded on the second origin/main
+  merge, `e2e840d0`, and its kit sweep `313cc478`; the base stays `fb07ca25` and no criterion's
+  assertion moved. Main's hygiene check 25, the reader inventory of `TOOL-dGatedProse-1`, grades
+  every live spec's §2 retirement items with no cutoff and fired on S8, whose scratch-clone removal
+  reads to its trigger as a retirement; S8 now carries a Readers clause with both escapes and their
+  reasons. The transition audit S7 and AC6 stage is check 26 since the same reconcile, so S7, the
+  consumes-from edge to unit 9 and §10 say 26. S8's three `git ls-files` citations are re-read at
+  `313cc478`. S9 adds the same grep's size at `313cc478`, sixteen, as a second size and not a list,
+  which AC8 already re-measures at the commit. AC6 and AC7, which observe S7 and S8, name no check
+  number and keep their wording. §10 records the reading.
 
 ## 10. Reuse audit
 
 Nothing is built, so the reuse is of methods and verdicts. The scratch-repository-with-bare-remote
 method is D12-h's route (b), which the driver and lander specs of this build already use for their
-own cases; this unit points it at a clone of real content. Each verdict is the owning unit's:
-P5 in the ask driver, the `asks-disposed` terms, the folder-wide anchor ban, the pre-commit refusal
-and check 25. `python tools/codebase-map/reuse_lookup.py "stage a break on a scratch clone of the
-real tree and confirm the gate turns red"` returned name-stem neighbours only, `tree` in the recall
-selftest and `load_map_tree` among them, and it reports `.sh` as an unscanned layer; no seam stages
-breaks for another unit. Recall returned DR §18.6's original assignment of the straggler RED to the
-switch-over, the straggler-hook unit's hand-off here, and `TOOL-aBranchedMandate-6` on scratch
-repositories leaking on Windows, which S8 answers.
+own cases; this unit points it at a clone of real content. Each verdict is the owning unit's: P5 in
+the ask driver, the `asks-disposed` terms, the folder-wide anchor ban, the pre-commit refusal and
+check 26, the transition audit. `python tools/codebase-map/reuse_lookup.py "stage a break on a
+scratch clone of the real tree and confirm the gate turns red"` returned name-stem neighbours only,
+`tree` in the recall selftest and `load_map_tree` among them, and it reports `.sh` as an unscanned
+layer; no seam stages breaks for another unit. Recall returned DR §18.6's original assignment of the
+straggler RED to the switch-over, the straggler-hook unit's hand-off here, and
+`TOOL-aBranchedMandate-6` on scratch repositories leaking on Windows, which S8 answers.
 
 Where DR and this build's specs disagree: DR §19.8 lists three breaks and gives U15 a pilot; the
 brief adds two breaks and D12-a moves the pilot to the owner (§8 F2, F3).
@@ -627,6 +647,16 @@ subject is the REAL TREE rather than the scratch clone, AC1 and AC9, and AC7 wit
 gains a `permission:` line deferring its leg verdict to the one post-build bar while keeping its
 direct reads in the pass. AC4's and AC6's runs are inside the scratch clone and keep their in-pass
 observation.
+
+RE-GROUNDED ON THE SECOND MERGE WITH MAIN, read 2026-09-28 at `313cc478`. Main landed one thing this
+spec reads: its own hygiene check 25, the reader inventory, which asks a §2 retirement item for a
+Readers clause, which S8 now carries, and which took the number the transition audit carried, so the
+audit S7 stages now prints `memory-hygiene: check 26`. Re-verified present at `313cc478`:
+`.githooks/commit-msg`, `.githooks/straggler-guard.sh` and its `--topology` mode, the
+`push-main-active` marker in `.githooks/pre-push`, the `hooks own-tree` note in
+`tools/check-wiring.sh`, `tools/hooks/scratch-guard.js`, `tools/unattended/gate-guard.js`, the blank
+`ASKS_CMD` in the kit's conf example and the blank `PROBE_ALLOW` in `.memory-tree.conf`, and the
+four §7 legs in `tools/gate-legs.json`, none of them `subject = kit`.
 
 Recall terms used: `staged RED real tree arm dark default-OFF flag flip scratch clone bare remote
 unstage checkout`

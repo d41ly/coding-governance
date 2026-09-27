@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# transition-audit.test.sh — the arms for hygiene check 25 and its commit-time carrier.
+# transition-audit.test.sh — the arms for hygiene check 26 and its commit-time carrier.
 #
 #   bash <tool-root>/memory-tree/transition-audit.test.sh   # "PASS (n assertions)" + exit 0 = good — <tool-root> is `tools` here
 #
@@ -18,8 +18,8 @@
 # WHAT IT DOES NOT GRADE, said out loud because a structural check reads as a semantic one. It never
 # asserts the hygiene engine's OVERALL exit status over a fixture: a scratch tree is not a conforming
 # memory tree and two dozen other checks have opinions about it. Where an arm needs the engine it
-# greps for check 25's own line prefix, which is exactly the delegation being asserted. It does not
-# grade the module's cost, and it does not reach the classes check 25 itself declares out of scope —
+# greps for check 26's own line prefix, which is exactly the delegation being asserted. It does not
+# grade the module's cost, and it does not reach the classes check 26 itself declares out of scope —
 # a rebase or a squash that drops rows leaves no merge, and arm 6 pins that as absence rather than
 # closing it.
 #
@@ -38,7 +38,7 @@ KIT_MT="$(git -C "$(dirname "$0")" rev-parse --show-prefix)"; KIT_MT="${KIT_MT%/
 TOOL_ROOT="$(dirname "$KIT_MT")"
 KIT_MR="$TOOL_ROOT/memory-recall"
 KIT_LIB="$TOOL_ROOT/lib"
-[ -f "$KIT_MR/extract.py" ] || { echo "FAIL the memory-recall sibling is not beside this kit at $KIT_MR, and check 25 keys every row through its grammar — there is nothing to grade"; exit 2; }
+[ -f "$KIT_MR/extract.py" ] || { echo "FAIL the memory-recall sibling is not beside this kit at $KIT_MR, and check 26 keys every row through its grammar — there is nothing to grade"; exit 2; }
 # shellcheck source=/dev/null
 . "$KIT_LIB/resolve-python.sh"
 PY=$(resolve_python) || { echo "FAIL no usable python launcher"; exit 2; }
@@ -159,8 +159,8 @@ has "$out" "transitions examined 1" || bad "AC5: the liveness line does not repo
 # status: a scratch tree is not a conforming memory tree, and grading its overall verdict would
 # grade every other check at the same time.
 eout=$(engine "$F1")
-has "$eout" "memory-hygiene: check 25 UNACCOUNTED" || bad "AC1: the hygiene engine does not carry check 25's refusal"; ok
-has "$eout" "$F1_MERGE" || bad "AC1: the engine's check 25 line does not name the merge"; ok
+has "$eout" "memory-hygiene: check 26 UNACCOUNTED" || bad "AC1: the hygiene engine does not carry check 26's refusal"; ok
+has "$eout" "$F1_MERGE" || bad "AC1: the engine's check 26 line does not name the merge"; ok
 
 # --- AC2 — accounting is EXACTLY ONE row, keyed on the id AND the sha ----------------------------
 write_relocated "$F1" aFlip TOOL-aSeed-1 "$F1_STRAG"
@@ -287,9 +287,9 @@ nout=$(audit "$NR" --expect-builds)
 # ================================================================== F5 — a shards-mode tree is DARK
 F5="$TMP/f5"; new_repo "$F5"
 e5=$(engine "$F5")
-has "$e5" "memory-hygiene: check 25 is DORMANT" || bad "AC5: a shards-mode tree does not announce that check 25 is dormant"; ok
-printf '%s\n' "$e5" | grep -F 'memory-hygiene: check 25 ' | grep -qv 'is DORMANT' \
-  && bad "AC5: a shards-mode tree printed a check 25 line other than the dormant announcement"; ok
+has "$e5" "memory-hygiene: check 26 is DORMANT" || bad "AC5: a shards-mode tree does not announce that check 26 is dormant"; ok
+printf '%s\n' "$e5" | grep -F 'memory-hygiene: check 26 ' | grep -qv 'is DORMANT' \
+  && bad "AC5: a shards-mode tree printed a check 26 line other than the dormant announcement"; ok
 rm -rf "$F5/$KIT_MR"
 [ "$(audit_rc "$F5")" = 0 ] || bad "AC15: a shards-mode tree with no memory-recall kit did not stay dormant at exit 0"; ok
 

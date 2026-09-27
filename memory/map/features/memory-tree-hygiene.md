@@ -58,7 +58,7 @@ unit pass may run by hand.
 
 **The engine's relationship to the transition audit this dossier DOES own is one direction only**
 (`TOOL-dDerivedDocket-12`). `migrate_backlog.py --relocate`, `--repair` and `--ingest` move a
-pre-flip branch's row changes into the per-build files and write the `RELOCATED` rows check 25
+pre-flip branch's row changes into the per-build files and write the `RELOCATED` rows check 26
 reads; `--stragglers` lists the refs that still owe one and `--recipe` prints the one relocation
 recipe every carrier quotes. All three writing verbs CALL `transition_audit.delta` and
 `transition_audit.accounted` and spell no second transition rule, so the audit and the repair that
@@ -198,7 +198,10 @@ seam: the DELEGATE-STATUS idiom — reuse for any check that hands its parse to 
 capture keeps `$?`, and a row the delegate prints on every run is the liveness test, so a delegate
 that exited 0 having done nothing is refused too. Check 21's `_b21rc` and `n21` are the worked case.
 
-## Check 25 — the transition-merge audit
+## Check 26 — the transition-merge audit
+
+Numbered 25 until the second merge with main, where the reader inventory (`TOOL-dGatedProse-1`)
+had landed under 25 first.
 
 `transition_audit.py` is the one delegate whose population is the commit GRAPH rather than the
 tracked tree, and the one that is DARK until a project sets `BACKLOG_MODE=builds`. It classifies a
@@ -228,15 +231,15 @@ a commit when the kit or a python launcher is missing.
 
 ## The straggler layer — instructing a branch before its merge
 
-Check 25 finds a lost row AFTER a pre-flip branch has merged. `.githooks/straggler-guard.sh` is the
+Check 26 finds a lost row AFTER a pre-flip branch has merged. `.githooks/straggler-guard.sh` is the
 layer that reaches that branch beforehand, sourced by `pre-commit`, the new `pre-rebase` and
 `pre-push` through the CALLING HOOK's own directory rather than through the committing tree — a
 pre-flip branch carries the old kit, so a rule resolved through `$top` could never reach it. It
 reads git objects only and decides three predicates: FLIPPED (the default branch's committed conf
 declares `builds`), PRE-FLIP (every merge base with the default is still in shards mode, never the
-subject's own tip conf, for the reason check 25 above states), and HAS-DELTA (the lineage holds a
+subject's own tip conf, for the reason check 26 above states), and HAS-DELTA (the lineage holds a
 shards-mode commit touching the backlog shards or a family-named archive — the same watched
-population check 25 reads, so the two layers are not two answers). It carries the relocation recipe
+population check 26 reads, so the two layers are not two answers). It carries the relocation recipe
 rendered at the tree's own derived prefix, and `straggler-guard.test.sh` grades that rendering
 against the bytes `migrate_backlog.py --recipe` prints.
 
@@ -245,7 +248,7 @@ a worktree's config.worktree sets its own, and only an ABSOLUTE value makes a li
 another checkout's hooks. Under the relative `.githooks` that `check-wiring.sh` writes, a straggler
 in a linked worktree runs its OWN pre-flip hook files and none of these refusals fire there. That
 case is documented rather than closed: `check-wiring.sh`'s session step marks such a branch
-`hooks own-tree`, the drift signal `backlog_stragglers` lists it from any node's run, and check 25
+`hooks own-tree`, the drift signal `backlog_stragglers` lists it from any node's run, and check 26
 at the merge bar is what guarantees. These layers instruct; the bar decides.
 
 ## Gaps

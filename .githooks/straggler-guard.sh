@@ -5,7 +5,7 @@
 # A STRAGGLER is a branch that predates the per-build backlog and still edits the authored shards.
 # Merging one after the default branch has flipped can lose a row change with nobody watching: the
 # shards side edits a file the builds side no longer authors, so a clean three-way merge takes
-# either side and neither outcome is a conflict. The transition audit (hygiene check 25) finds that
+# either side and neither outcome is a conflict. The transition audit (hygiene check 26) finds that
 # AFTERWARDS. These hooks are the layer that instructs the branch BEFORE the merge, at each moment
 # its own node can see it — a commit, a rebase, a push.
 #
@@ -21,7 +21,7 @@
 # this library reaches a straggler checked out in a linked worktree only under an ABSOLUTE value.
 # Under the relative one that worktree runs its own pre-flip hook files and this layer is inert
 # there — the documented inert case. `tools/check-wiring.sh` marks such a straggler `hooks own-tree`
-# from any post-flip session tree, the drift signal lists it from any node, and hygiene check 25 at
+# from any post-flip session tree, the drift signal lists it from any node, and hygiene check 26 at
 # the merge bar is what GUARANTEES. These layers instruct; the bar decides.
 #
 # WHAT IT READS. Git objects and the staged name list, and nothing else. No python, no kit module,
@@ -80,14 +80,6 @@ read_conf_value() { # $1 = conf blob text · $2 = key -> its value, quotes and e
   printf '%s' "$line" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
 
-read_families() { # $1 = conf blob text -> one FAMILY token per line, from `<stream>:<FAMILY>` pairs
-  local raw
-  raw=$(read_conf_value "$1" FAMILIES) || return 1
-  # Deliberately unquoted: the declaration is a space-separated list and the split is the parse.
-  # shellcheck disable=SC2086
-  printf '%s\n' $raw | sed -n 's/^[^:]*:\(.*\)$/\1/p'
-}
-
 read_conf_modes() { # $@ = commits -> one mode token per DISTINCT conf blob among them
   # ONE `cat-file --batch-check` for every commit, then one read per DISTINCT blob. A history
   # re-uses one conf blob for hundreds of commits at a time, so this costs a handful of objects
@@ -122,7 +114,7 @@ init_straggler_guard() { # 0 = FLIPPED and the globals are set · 1 = nothing to
   # primary-tree branch guard by naming a branch nobody was pushing.
   STRAGGLER_READY=0
   STRAGGLER_WATCHED=()
-  local text="" ref="" def="" mode="" fam obs
+  local text="" ref="" def="" mode="" fam famdecl pair obs
   if text=$(read_blob_at "refs/remotes/origin/HEAD:$STRAGGLER_CONF_REL"); then
     ref=refs/remotes/origin/HEAD
   else
@@ -156,12 +148,20 @@ init_straggler_guard() { # 0 = FLIPPED and the globals are set · 1 = nothing to
   # archive directory as a whole. `archive/` also holds the rotated decision log, the retired
   # ledger shards and the frozen charter snapshots; rotating the decision log is routine and has
   # NOTHING to relocate, so a branch that only rotated one must never draw a relocation recipe.
-  # Unit 9's check 25 was narrowed to this same population, so the two layers read one archive set.
+  # Unit 9's check 26 was narrowed to this same population, so the two layers read one archive set.
   STRAGGLER_WATCHED=("$STRAGGLER_MEMORY_ROOT/backlog/")
-  while read -r fam; do
-    [ -n "$fam" ] || continue
+  # THE FAMILIES ARE SPLIT IN THIS SHELL, word by word, and never read back out of a here-string over
+  # a function's substitution: that feed waits on a grandchild's pipe under MSYS, the shell-hygiene
+  # leg's class. A `<stream>:<FAMILY>` pair yields what follows its first colon; a word with nothing
+  # there yields nothing, as the sed this replaces printed an empty line the loop then skipped.
+  famdecl=$(read_conf_value "$text" FAMILIES 2>/dev/null || true)
+  # Deliberately unquoted: the declaration is a space-separated list and the split is the parse.
+  # shellcheck disable=SC2086
+  for pair in $famdecl; do
+    case "$pair" in *:?*) ;; *) continue ;; esac
+    fam=${pair#*:}
     STRAGGLER_WATCHED+=("$STRAGGLER_MEMORY_ROOT/archive/$fam.*.md")
-  done <<< "$(read_families "$text" 2>/dev/null || true)"
+  done
 
   if [ -n "${GOV_DEFAULT_BRANCH:-}" ] && [ "$ref" = refs/remotes/origin/HEAD ]; then
     obs=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || true); obs=${obs#origin/}

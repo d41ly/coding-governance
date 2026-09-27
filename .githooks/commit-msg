@@ -26,7 +26,7 @@
 # merges only: a rebase, a squash or a cherry-pick that drops a row never reaches it. It cannot run
 # without a python launcher or without the kit, and in both cases it SAYS SO and lets the commit
 # through — a commit-time carrier that blocks work because an interpreter is missing gets disabled,
-# and the same audit binds again at the push boundary, where check 25 runs over the whole history.
+# and the same audit binds again at the push boundary, where check 26 runs over the whole history.
 set -u
 
 git_dir=$(git rev-parse --git-dir 2>/dev/null) || exit 0
@@ -44,7 +44,7 @@ for base in "$top/$tool_root/$kit_name" "$top/$kit_name"; do
 done
 if [ -z "$module" ]; then
   echo "commit-msg: the memory-tree kit is not installed under '$top', so the transition audit did"
-  echo "commit-msg: NOT run over this merge. Check 25 still binds at the push boundary."
+  echo "commit-msg: NOT run over this merge. Check 26 still binds at the push boundary."
   exit 0
 fi
 
@@ -57,14 +57,14 @@ for base in "$top/$tool_root/lib" "$top/lib"; do
 done
 if [ -z "$resolver" ]; then
   echo "commit-msg: the python-launcher resolver is not beside this tree, so the transition audit"
-  echo "commit-msg: did NOT run over this merge. Check 25 still binds at the push boundary."
+  echo "commit-msg: did NOT run over this merge. Check 26 still binds at the push boundary."
   exit 0
 fi
 # shellcheck source=/dev/null
 . "$resolver"
 if ! py=$(resolve_python); then
   echo "commit-msg: no usable python launcher, so the transition audit did NOT run over this merge."
-  echo "commit-msg: Check 25 still binds at the push boundary."
+  echo "commit-msg: Check 26 still binds at the push boundary."
   exit 0
 fi
 

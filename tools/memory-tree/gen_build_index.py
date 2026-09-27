@@ -2778,8 +2778,8 @@ def run_probe(root: str, argv: tuple, timeout: int) -> tuple:
     run did not earn.
     """
     try:
-        done = subprocess.run(argv, cwd=root, capture_output=True, text=True, timeout=timeout,
-                              shell=False)
+        done = subprocess.run(argv, cwd=root, capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", timeout=timeout, shell=False)
     except subprocess.TimeoutExpired:
         return None, "", False
     except OSError as exc:
@@ -3030,7 +3030,7 @@ def read_git_lines(root: str, *argv: str) -> list:
     answer.
     """
     done = subprocess.run(("git",) + argv, cwd=root, capture_output=True, text=True,
-                          env=_build_git_env())
+                          encoding="utf-8", env=_build_git_env())
     if done.returncode > 1:
         raise Problem(f"git {' '.join(argv)} failed ({done.returncode}): "
                       f"{(done.stderr or '').strip()[:200]}")
@@ -4266,7 +4266,7 @@ def cmd_selftest() -> int:
             lambda: str(all(("> " + line) in _probe.split("\n")
                             for line in backlog.render_relocation_recipe("KIT/HERE", "memory"))))
         arm("the view header spells no kit literal of its own", "False",
-            lambda: str("tools/memory-tree/" in _probe))
+            lambda: str("tools/memory-tree/" in _probe))  # gov:prefix-literal — the arm asserts this literal is ABSENT from the render, so it names it
         arm("an empty kit prefix REFUSES rather than rendering a command that cannot run",
             "empty derivation", lambda: backlog.render_relocation_recipe("", "memory"))
         arm("the view predicate's header SHAPE matches this install's own GEN_HEADER", "True",
@@ -4557,13 +4557,13 @@ def cmd_selftest() -> int:
     # AC1 — the tail, read right to left, with the collision that makes a misread LOUD.
     _ac1_row = backlog.extract_row(backlog.render_ask_row(
         "EXMP-aFoo-3", "2026-09-15", "push-main.sh reports a gate RED as a network failure",
-        pointer="`tools/push-main.sh`",
-        clauses=(("seen", "`tools/push-main.sh`@7484d8d7:23"),
+        pointer="`tools/lander-granted.sh`",
+        clauses=(("seen", "`tools/lander-granted.sh`@7484d8d7:23"),
                  ("accept", "a RED bar prints GATE FAIL and exits non-zero"),
                  ("out", "retry policy"))), _g15)
     arm("the §4 example ask yields its three clauses, its pointer and its text",
-        "clauses=3 seen=['`tools/push-main.sh`@7484d8d7:23'] "
-        "pointer=`tools/push-main.sh` text=push-main.sh reports a gate RED as a network failure",
+        "clauses=3 seen=['`tools/lander-granted.sh`@7484d8d7:23'] "
+        "pointer=`tools/lander-granted.sh` text=push-main.sh reports a gate RED as a network failure",
         lambda: f"clauses={len(_ac1_row.extra['clauses'])} "
                 f"seen={backlog.read_clause_values(_ac1_row.extra['clauses'], 'seen')} "
                 f"pointer={_ac1_row.extra['pointer']} text={_ac1_row.why}")
@@ -4647,7 +4647,7 @@ def cmd_selftest() -> int:
         _ac2c = _build_env_tree(
             foo_asks=[backlog.render_ask_row(
                 "EXMP-aFoo-1", "2026-09-01", "granted",
-                clauses=(_SEEN_HERE, _ACCEPT, ("may", "`tools/push-main.sh`")))],
+                clauses=(_SEEN_HERE, _ACCEPT, ("may", "`tools/lander-granted.sh`")))],
             foo_rows=[backlog.render_scope_row("EXMP-aFoo-1", (("may", "none"),))])
         _c2c = _build_backlog_fixture(et, _ac2c)
         _rc, _so3, _se = _read_asks_run(et, _c2c, ["--tsv", "--all"])
@@ -4655,7 +4655,7 @@ def cmd_selftest() -> int:
         # only the grant passed over a field reading `<grant>,none` — measured, by staging the
         # break that stops absorbing `none` and watching this arm stay green.
         arm("a SCOPE row's `may none` is ABSORBED and leaves the ask's grant unchanged",
-            "grant=[`tools/push-main.sh`]",
+            "grant=[`tools/lander-granted.sh`]",
             lambda: "grant=[" + [x for x in _so3.split("\n")
                                  if x.startswith("ask\t")][0].split("\t")[9] + "]")
 
@@ -5176,7 +5176,7 @@ def cmd_selftest() -> int:
             lambda: _read_refusal("zUngradedDocket", ["EXMP-aFoo-3", "-4"]))
         _sc_conf4 = _build_backlog_fixture(sc, _build_sc_tree(
             [_build_sc_ask(3, "granted", clauses=(_SEEN_HERE, _ACCEPT,
-                                                  ("may", "`tools/push-main.sh`")))]))
+                                                  ("may", "`tools/lander-granted.sh`")))]))
         run("git", "commit", "-q", "-m", "granted", "--no-verify", cwd=sc)
         _rc11, _out11 = _read_mode(cmd_new_build, sc, _sc_conf4,
                                    {"slug": "zGrantedDocket", "asks": ["EXMP-aFoo-3"]})

@@ -2086,6 +2086,10 @@ for l in json.load(open(sys.argv[1])):
     if isinstance(l.get("signature"), list) and l["signature"]:
         sys.stdout.buffer.write(("\x1f".join(l["signature"]) + "\n").encode())
 ' "$LEGS_FILE")
+# BOTH LOOPS BELOW READ A FILE, never a here-string over `_sigrows`: a loop fed by a value that took
+# its bytes from a command substitution is the shell-hygiene leg's class one hop away. `SCRATCH` is
+# the run's own and lives until EXIT.
+printf '%s\n' "$_sigrows" > "$SCRATCH/sigrows"
 n=$((n+1))
 if [ -z "$_sigrows" ]; then
   echo "canary: SKIP AC12 — this manifest declares no \`signature\`, so there is no signature to grade (reported, not a pass)"
@@ -2096,7 +2100,7 @@ else
     case "${_sv[0]}" in python|python3) _sv[0]=$PYBIN ;; esac
     _bad=$(check_signature_shape "$("${_sv[@]}" 2>/dev/null </dev/null)")
     [ -z "$_bad" ] || { echo "canary: signature \`${_sr//$'\x1f'/ }\` printed a line that is not a bare key: $_bad"; fail=1; }
-  done <<<"$_sigrows"
+  done < "$SCRATCH/sigrows"
 fi
 # ...and its STAGED BREAK: a `--list`-shaped output, with its `path:line:` locators, its colon-ended
 # header and its `… and N more` cut, must red the same predicate. Without this the loop above is a
@@ -2119,7 +2123,7 @@ while IFS= read -r _sr; do
   case "${_sv[0]}" in python|python3) _sv[0]=$PYBIN ;; esac
   _listrun=$("${_sv[@]}" 2>/dev/null </dev/null)
   [ -n "$_listrun" ] && break
-done <<<"$_sigrows"
+done < "$SCRATCH/sigrows"
 if [ -z "$_listrun" ]; then
   echo "canary: SKIP AC12's shipped staged break — no declared signature has a --list sibling that prints anything here (reported, not a pass)"
 elif [ -z "$(check_signature_shape "$_listrun")" ]; then

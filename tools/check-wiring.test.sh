@@ -1066,7 +1066,7 @@ out=$(bash "$SCRIPT" --check 2>&1); rc=$?
 ck "hooks: the pre-commit half is reported too" \
    "$(printf '%s' "$out" | grep -q 'pre-commit DIVERGES' && echo 1 || echo 0)"
 ck "hooks: two divergences still exit 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
-# TOOL-dDerivedDocket-9 — THE THIRD HOOK. `commit-msg` carries hygiene check 25 at the moment
+# TOOL-dDerivedDocket-9 — THE THIRD HOOK. `commit-msg` carries hygiene check 26 at the moment
 # a merge is CONCLUDED, so a sibling checkout supplying somebody else's copy of it is exactly
 # the divergence this check exists to report — and until `commit-msg` joined
 # `GOV_WIRING_HOOKS` it could never report one. A FIXTURE arm, because an adopter's hook
@@ -1292,6 +1292,31 @@ print(m.resolve_kit_dir(sys.argv[1], sys.argv[2], ".").relative_to(pathlib.Path(
   cleanup
 else
   echo "skip receipt cases — settings-merge.py, scratch-guard.fragment.json or recall-opened.fragment.json not found"
+fi
+
+# ---- merge-2 skeptic F4: the STRAGGLER arm takes the receipt rung too ------------------------------
+# It auto-merged without it, the one arm left finding its kit file by gov's layout alone, so an engine
+# homed where no probe spells it read `not installed here` over an installed kit. The engine sits ONLY
+# where the receipt says. Whether it then RUNS in this bare fixture is not this arm's question, so the
+# first arm asserts only that the line stops calling it missing. Observed RED against the arm without
+# the rung, on a scratch copy.
+_tk=memory-tree; _te=migrate_backlog.py
+if [ -n "$(src_of "$_tk/$_te")" ]; then
+  newrepo; mkdir -p scripts
+  cp "$(src_of "$_tk/$_te")" "scripts/$_te"
+  write_receipt "scripts/$_te=$_tk/$_te"
+  printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="builds"\n' > .memory-tree.conf
+  git add -A; git commit -q -m "a receipted straggler engine"
+  line=$(chk --check | grep -E '^[A-Za-z]+ +straggler ' || true)
+  ck "F4 a receipted straggler engine is found, not skipped as not installed" \
+     "$([ -n "$line" ] && ! printf '%s' "$line" | grep -q 'is not installed here' && echo 1 || echo 0)"
+  rm -f "scripts/$_te"
+  line=$(chk --check | grep -E '^skip +straggler ' || true)
+  ck "F4 ...and a receipted-but-missing engine skips naming the receipt row and the path" \
+     "$(printf '%s' "$line" | grep -qF "install.json row for $_tk/$_te names scripts/$_te, which is absent" && echo 1 || echo 0)"
+  cleanup
+else
+  echo "skip F4 straggler receipt cases — no $_te beside this suite"
 fi
 
 # AC5 — the eol arm's SECOND named glob: a tracked, pinned `.claude/workflows/*.js` holding CR bytes

@@ -54,6 +54,7 @@ status rule are two answers to one question, and the copy is always the one that
 from __future__ import annotations
 
 import collections
+import importlib.util
 import io
 import os
 import pathlib
@@ -67,7 +68,6 @@ if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
 import backlog                      # noqa: E402  — a sibling of this file, never a spelled path
-import gen_build_index as index     # noqa: E402
 import transition_audit as audit    # noqa: E402  — the delta and the accounting predicate
 
 # --------------------------------------------------------------------------------- the constants
@@ -131,7 +131,8 @@ RECORD_KINDS = {"prompts": "prompt", "spec": "spec", "build": "build", "reviews"
 #: exactly what a floor catches and a green line does not. It moved from 71 to 205 when the
 #: relocation engine's arms landed; the figure is the count the suite executes, and it is RAISED in
 #: the same commit as the arms, because a floor left behind is a floor that stops measuring.
-FLOOR_ASSERTIONS = 205
+#: RAISED 205 -> 206 with the one arm that sees `load_generator` refuse a generator it cannot load.
+FLOOR_ASSERTIONS = 206
 
 NEWLINE = chr(10)
 
@@ -152,6 +153,36 @@ class Refusal(Problem):
     """
 
     code = 2
+
+
+# ------------------------------------------------------------------------------ the generator seam
+_GENERATOR = {}
+
+
+def load_generator(src=None):
+    """`gen_build_index`, LOADED BY PATH from beside this file and never imported by name.
+
+    TOOL-aRepatriatedFork-9's invariant, which `row_grammar.scan_engine_imports` grades: no sibling
+    module in this kit imports an engine, so an adopter's own copy of the generator cannot kill this
+    module on import. The planner still NEEDS the generator — the conf reader, the spec index, the
+    build statuses and the generated header are its — so it is loaded at first use and once, and a
+    generator that will not load is a missing condition that REFUSES by name, exit 2, rather than a
+    traceback. `src` exists for the self-test's arm, which points it at a file that is not there.
+    """
+    path = pathlib.Path(src) if src else pathlib.Path(_HERE) / "gen_build_index.py"
+    key = str(path)
+    if key not in _GENERATOR:
+        try:
+            spec = importlib.util.spec_from_file_location("gen_build_index", path)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+        except Exception as exc:  # noqa: BLE001 — any failure to load is the one refusal below
+            raise Refusal(f"migrate-backlog: the generator at {path.as_posix()} could not be loaded "
+                          f"({type(exc).__name__}: {exc}). The conf reader, the spec index, the "
+                          f"build statuses and the generated header are its, and there is no "
+                          f"degraded mode") from None
+        _GENERATOR[key] = mod
+    return _GENERATOR[key]
 
 
 # ------------------------------------------------------------------------------- the process seam
@@ -934,13 +965,13 @@ def read_index(fn, *argv):
     """
     try:
         return fn(*argv)
-    except index.Problem as exc:
+    except load_generator().Problem as exc:
         raise Problem(f"migrate-backlog: {exc}") from None
 
 
 def build_plan(root: str, design_named=(), signed=None) -> Plan:
     """The whole read-only pass. Raises `Problem` on every refusal; writes nothing."""
-    conf = read_index(index.load_conf, root)
+    conf = read_index(load_generator().load_conf, root)
     memory_root = conf["MEMORY_ROOT"]
     families = derive_families(conf)
     grammar = backlog.build_grammar(families)
@@ -981,7 +1012,7 @@ def build_plan(root: str, design_named=(), signed=None) -> Plan:
         if flipped:
             recovered.add(ident)
 
-    builds = read_index(index.collect, root, conf)
+    builds = read_index(load_generator().collect, root, conf)
     specs: dict = {}
     for build in builds:
         for unit in build["units"]:
@@ -1094,10 +1125,10 @@ def build_summary(conf, chosen, live_paths, archive_names, archive_count, copies
     asks = [a for rel, text in sorted(texts.items())
             for a in backlog.parse_file(rel, text,
                                         backlog.build_grammar(families)).asks]
-    kit = index.kit_rel()
+    kit = load_generator().kit_rel()
     for family in families:
         views[family] = len(backlog.render_family_view(
-            family, asks, fold, memory_root, kit, index.GEN_HEADER,
+            family, asks, fold, memory_root, kit, load_generator().GEN_HEADER,
             backlog.read_excerpt_chars(conf)).encode("utf-8"))
 
     citations = []
@@ -1254,8 +1285,8 @@ def read_recipe(root: str, conf=None) -> list:
     a comparison rather than two spellings agreeing by luck.
     """
     if conf is None:
-        conf = read_index(index.load_conf, root)
-    return backlog.render_relocation_recipe(index.kit_rel(), conf["MEMORY_ROOT"])
+        conf = read_index(load_generator().load_conf, root)
+    return backlog.render_relocation_recipe(load_generator().kit_rel(), conf["MEMORY_ROOT"])
 
 
 def build_recipe_refusal(root: str, why: str, conf=None):
@@ -1424,7 +1455,7 @@ def read_target_texts(root: str, conf: dict) -> dict:
 
 def read_target_specs(root: str, conf: dict) -> tuple:
     """`(specs, build statuses)` — the fold's two non-row inputs, through the generator's collect."""
-    builds = read_index(index.collect, root, conf)
+    builds = read_index(load_generator().collect, root, conf)
     specs = {}
     for build in builds:
         for unit in build["units"]:
@@ -1676,7 +1707,7 @@ def build_relocation(root: str, form: Form, ours: str, theirs: list, args: dict,
     PLAN THEN WRITE, ALL OR NOTHING (section 8 F2). Everything here returns; the caller writes only
     when the NEEDS-HUMAN and CONFIRM lists are both empty.
     """
-    conf = conf or read_index(index.load_conf, root)
+    conf = conf or read_index(load_generator().load_conf, root)
     memory_root = conf["MEMORY_ROOT"]
     grammar = backlog.build_grammar(derive_families(conf))
     entries = audit.delta(ours, theirs, root) if args.get("entries") is None else args["entries"]
@@ -2001,7 +2032,7 @@ def print_plan_lines(plan: Relocation, root: str, args: dict) -> None:
 
 def build_rerun(args: dict, plan: Relocation) -> str:
     """The exact command that re-runs this plan with every refusal answered."""
-    head = f"python {index.kit_rel()}/migrate_backlog.py {args['mode']}"
+    head = f"python {load_generator().kit_rel()}/migrate_backlog.py {args['mode']}"
     if args["ref"]:
         head += f" {args['ref']}"
     if args["from"]:
@@ -2022,7 +2053,7 @@ def cmd_relocate(root: str, args: dict) -> int:
     exactly as the merge left it (AC2) — a verb that repaired the views and then refused would hand
     the operator a half-acted tree and tell them nothing was written.
     """
-    conf = read_index(index.load_conf, root)
+    conf = read_index(load_generator().load_conf, root)
     if not backlog.SLUG_RE.match(args["as_slug"] or ""):
         raise Refusal(f"migrate-backlog: --as takes a build slug — a node tag and a CamelCase "
                       f"adjective-noun, `[A-Za-z0-9]` with at least one capital — not "
@@ -2065,7 +2096,7 @@ def cmd_relocate(root: str, args: dict) -> int:
     bad = check_accounted(root, plan, conf)
     if bad:
         print("migrate-backlog: the records are written but the accounting re-read does not "
-              "accept them, so this merge would still red check 25:")
+              "accept them, so this merge would still red check 26:")
         print(NEWLINE.join(bad))
         return 1
     print_plan_lines(plan, root, args)
@@ -2095,7 +2126,7 @@ def cmd_stragglers(root: str, args: dict) -> int:
         return 1
     name, tip = resolve_default_tip(root)
     flagged, graph = scan_candidates(root, refs, tip)
-    conf = read_index(index.load_conf, root)
+    conf = read_index(load_generator().load_conf, root)
     listed = []
     for ref in refs:
         sha = read_rev(root, ref)
@@ -2136,7 +2167,7 @@ def scan_candidates(root: str, refs: list, tip: str) -> tuple:
     `--source` is NOT used: it labels each commit with the first ref that reached it, so a pushed
     copy or a fork of a straggler would never be a candidate.
     """
-    conf = read_index(index.load_conf, root)
+    conf = read_index(load_generator().load_conf, root)
     m = conf["MEMORY_ROOT"]
     flagged = {line.strip() for line in run(
         "git", "log", "--format=%H", *refs, "--not", tip, "--",
@@ -2286,12 +2317,12 @@ def read_kit_root() -> str:
 def seed_recall_kit(tree: str) -> None:
     """The memory-recall sibling, inside the fixture, because unit 9 keys every row through it.
 
-    The SOURCE is resolved by that unit's own resolver from this repository's root, so nothing here
+    The SOURCE is resolved by that unit's own resolver beside this install, so nothing here
     spells a sibling kit's install path; the destination is its own basename at the fixture root,
     which is the second layout that resolver accepts.
     """
     import shutil
-    src = audit.resolve_recall_kit(pathlib.Path(read_kit_root()))
+    src = audit.resolve_recall_kit()
     dst = os.path.join(tree, src.name)
     os.makedirs(dst, exist_ok=True)
     for name in ("extract.py", "recall_conf.py"):
@@ -2441,7 +2472,7 @@ def run_engine(tree: str, argv: list) -> tuple:
 
 
 def run_audit(tree: str, staged: bool = False) -> int:
-    """Hygiene check 25's own module over a fixture, IN PROCESS and against an explicit root.
+    """Hygiene check 26's own module over a fixture, IN PROCESS and against an explicit root.
 
     NOT the CLI. That entry point resolves its repository from the module's own location, so a
     subprocess launched with `cwd=<fixture>` would audit THIS repository instead and return a
@@ -2579,6 +2610,11 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
 
     base = tempfile.mkdtemp(prefix="migplan")
     try:
+        # ---- the generator seam: loaded by path, so a generator that will not load is a NAMED
+        # refusal carrying exit 2, never an import error that kills this module before it can say so.
+        arm("a generator that will not load REFUSES by name, as a missing condition",
+            "PROBLEM migrate-backlog: the generator at",
+            lambda: load_generator(os.path.join(base, "absent", "gen_build_index.py")))
         main_tree = os.path.join(base, "corpus")
         seed_corpus(main_tree)
         plan = run_plan(main_tree)
@@ -2951,7 +2987,7 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
         run("git", "checkout", "main", "--", "memory/backlog/EXMP.md", cwd=fg)
         run("git", "commit", "-q", "-m", "merge the default branch", "--no-verify", cwd=fg)
         fg_merge = run("git", "rev-parse", "HEAD", cwd=fg).strip()
-        arm("a transition committed unaccounted reds check 25's own module",
+        arm("a transition committed unaccounted reds check 26's own module",
             1, lambda: run_audit(fg))
         rc_g, _out_g = run_engine(fg, ["--repair", fg_merge, "--as", "aWho",
                                          "--confirm", "EXMP-aFoo-1"])
@@ -3110,8 +3146,8 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
         view_path = os.path.join(base, "mr_view.md")
         empty_path = os.path.join(base, "mr_base.md")
         write_file(view_path, backlog.render_family_view(
-            "EXMP", (), backlog.Fold({}, {}, {}, {}), "memory", index.kit_rel(),
-            index.GEN_HEADER))
+            "EXMP", (), backlog.Fold({}, {}, {}, {}), "memory", load_generator().kit_rel(),
+            load_generator().GEN_HEADER))
         write_file(shard_path, render_shard("EXMP", ["- EXMP-aFoo-1 · OPEN · an authored row"]))
         write_file(empty_path, "")
         _rc, mr_out = run_unchecked(sys.executable, os.path.join(_HERE, "merge-rows.py"), empty_path,

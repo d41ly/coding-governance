@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier
 
-**Status:** SPECCED · rev-6 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 39
+**Status:** SPECCED · rev-7 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling · order 39
 
 <!-- gen:spec-records -->
 
@@ -43,12 +43,15 @@ one section the adopter runbook points at, and gate the part of it that can drif
   stays. Its M6 clause-3 section agrees with the build-method render at this unit's commit. An
   upgrade note says an upgrade changes nothing until `BACKLOG_MODE` is set. Observed by AC3.
 - **S4** Five agent carriers read both modes. The prior-art lens in
-  `tools/workflows/tier2-review.js`, the memory-rot lens in `tools/workflows/drift-audit-state.js`,
-  `tools/drift-audit/SKILL.template.md`, `tools/workflows/REVIEW-PROTOCOL.template.md` and
-  `tools/memory-recall/SKILL.template.md` each tell an agent to read the open asks through the build
-  index generator's `--asks --json` and, when its `mode` field says `shards`, the backlog shards.
-  None names a sibling kit's path by literal. Each rendered copy is regenerated. Observed by AC4 and
-  AC5.
+  `tools/workflows/tier2-review.template.js`, the memory-rot lens in
+  `tools/workflows/drift-audit-state.template.js`, `tools/drift-audit/SKILL.template.md`,
+  `tools/workflows/REVIEW-PROTOCOL.template.md` and `tools/memory-recall/SKILL.template.md` each tell
+  an agent to read the open asks through the build index generator's `--asks --json` and, when its
+  `mode` field says `shards`, the backlog shards. The two harness lenses are written in their
+  templates because main's `TOOL-aRepatriatedFork-7` made `tools/workflows/tier2-review.js` and
+  `tools/workflows/drift-audit-state.js` renders of them. None names a sibling kit's path by
+  literal. Each rendered copy is regenerated, the two harness renders among them. Observed by AC4
+  and AC5.
 - **S5** `memory/README.md`'s backlog line says the family files are generated views of asks filed
   in `builds/<slug>/BACKLOG.md`. Observed by AC6.
 - **S6** The map. A new dossier, `memory/map/features/memory-tree-backlog.md`, claims the four
@@ -64,33 +67,41 @@ one section the adopter runbook points at, and gate the part of it that can drif
   unit's, the build's one exception to that rule, because
   `tools/memory-tree/check-verdict-epoch.sh`'s topological rule puts the one bump at or after the
   range's last engine change, and no later unit moves an engine line. The constant at
-  `tools/memory-tree/check-memory-hygiene.sh:20` and the `gov:kit memory-tree@` marker on every
+  `tools/memory-tree/check-memory-hygiene.sh:33` and the `gov:kit memory-tree@` marker on every
   tracked `tools/memory-tree/*.template.md` and its render
   move together, to a value strictly greater than both the value at `fb07ca25` and the value the
-  advertised tip carries at this unit's pass. THERE ARE FOUR PAIRS, not one: at `fb07ca25` the glob
-  resolves to four templates and their four renders are `memory/HYGIENE.md`,
-  `memory/TEMPLATE-SPEC.md`, `memory/guides/ANNOTATION-STYLE.md` and
+  advertised tip carries at this unit's pass. READ AT `313cc478`, THAT VALUE IS 2.100: the tip, main's
+  `869209ed`, carries 2.99, which the second merge brought in, and 2.100 is the next value above it
+  in the order every reader of these carriers uses. `tools/check-kit-versions.sh` admits any two-part
+  `[0-9]+\.[0-9]+` and compares carriers only with each other; govkit's epoch check compares a kit's
+  value at two commits for equality; and where govkit orders a kit version it reads a tuple of
+  integers, as its run-gates subject floor `(1, 1)` does. So `(2, 100)` sorts above `(2, 99)`, where a
+  decimal reading would put 2.100 below 2.99, the reading `TOOL-dDerivedDocket-34` AC29 names as a
+  failure. The pass re-reads the tip and moves above whatever it then carries. THERE ARE FOUR PAIRS,
+  not one: at `fb07ca25` and at `313cc478` the glob resolves to four templates and their four
+  renders are `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`, `memory/guides/ANNOTATION-STYLE.md` and
   `memory/guides/BUILD-METHOD.md`, all carrying the same marker at the same value, and the
   `kit/dogfood doc parity` leg byte-compares each rendered template against its live copy with the
   marker line included. All four move here. §3's non-goals hand the hygiene-engine unit the PROSE
   of the first two and nothing hands away their MARKER, and the third is withheld by no non-goal at
   all, so a raise that stops at one render reds that leg at the post-build bar.
   One of those markers renders into a CAPPED carrier,
-  `memory/guides/BUILD-METHOD.md`, which `tools/template-size-limits.txt` declares at 27648 bytes
-  and whose own budget line declares 350 lines; it measures 27264 bytes and 347 lines at `fb07ca25`
-  and at HEAD, and 26439 and 336 at `abac6d59`, before the aDeferredBar and aProbedUnit landings
-  wrote the no-bar-inside-a-pass rule into it. NO
-  CAP IS RAISED AND NO FREE BYTE IS SPENT: this unit lands NET ZERO on that render. The move
-  rewrites the digits of one `<!-- gov:kit memory-tree@<version> -->` comment on line 1 of the
-  render and of its template, and the value at `fb07ca25` spells in four characters, so the delta is 0
-  bytes and 0 lines. A value needing a LONGER spelling would ADD to a capped carrier whose free
-  space this build's other units are already claiming, which this unit may not do; §8 F4 records
-  that case as a fork for the owner rather than a byte spent here. THREE FURTHER CARRIERS THIS UNIT
+  `memory/guides/BUILD-METHOD.md`, which `tools/template-size-limits.txt` declares at 30720 bytes,
+  raised from 27648 by main's `TOOL-dGatedProse-4`, and whose own budget line declares 400 lines; it
+  measures 27559 bytes and 349 lines at `313cc478`, and 27264 and 347 at `fb07ca25`. NO CAP IS
+  RAISED. The move rewrites the digits of one `<!-- gov:kit memory-tree@<version> -->` comment on
+  line 1 of the render and of its template. The value at `fb07ca25` and the one at `313cc478` each
+  spell in four characters, while 2.100 spells in five, so the move ADDS ONE BYTE to that render,
+  to each of the other seven marker lines, and two to the constant's line, whose trailing comment
+  repeats the value. That is §8 F4's case, live at `313cc478`, and F4 resolves it by spending the
+  byte: the render has 3161 bytes free under its row there, so one byte starves no later unit and
+  this pass writes 2.100. THREE FURTHER CARRIERS THIS UNIT
   WRITES ARE CAPPED, and by a class cap rather than a `tools/template-size-limits.txt` row:
-  `memory/guides/REVIEW-PROTOCOL.md` at 17479 bytes and 236 lines and
-  `memory/guides/SESSION-KICKOFF.md` at 20057 and 248 sit under the guide class's 61440 and 750,
-  and `memory/README.md` at 2483 sits under the index class's 61440 with its line half declared
-  off, all measured at `fb07ca25` and unmoved at HEAD. Each has tens of thousands of bytes free,
+  `memory/guides/REVIEW-PROTOCOL.md` at 18062 bytes and 244 lines and
+  `memory/guides/SESSION-KICKOFF.md` at 25595 and 305 sit under the guide class's 98304 and 1200,
+  which main's `TOOL-dGatedProse-3` raised from 61440 and 750, and `memory/README.md` at 2483 sits
+  under the index class's 61440 with its line half declared off, all measured at `313cc478`. Each
+  has tens of thousands of bytes free,
   so net zero does not bind them and this unit does not claim it: the `mode`-fallback sentence in
   the protocol and the backlog line in the index are DECLARED at no more than 300 bytes per
   carrier, and the kickoff re-stamp rewrites one line in place. AC4 reads all three sizes at this
@@ -165,15 +176,19 @@ At `abac6d59`, and unchanged at `fb07ca25`, the five carriers say "the backlog s
 (`tools/drift-audit/SKILL.template.md:109`), "the open backlog"
 (`tools/workflows/REVIEW-PROTOCOL.template.md:188`) and "`DECISIONS.md` / `BACKLOG.md` index"
 (`tools/memory-recall/SKILL.template.md:91`). DR cites the review protocol at `:179`; the sentence
-sits at `:188` at `abac6d59` and at `fb07ca25`.
+sits at `:188` at `abac6d59` and at `fb07ca25`. At `313cc478` the five phrases are unchanged, and the
+two harness sentences sit in templates: `tools/workflows/tier2-review.template.js:370` and
+`tools/workflows/drift-audit-state.template.js:198`, each rendered at the same line of its `.js`;
+the other three sit where they sat.
 
 Under `builds` the family file an agent would open is a view of live asks only, so "search the
 backlog" there silently omits every terminal ask and its reason. Under `shards`, which every adopter
 runs until its own switch, `--asks --json` prints the mode notice and an empty set. So each carrier
 names the generator's `--asks --json` and tells the agent to read the shards when the output's
-`mode` field says `shards`. The two workflow scripts are deployed verbatim and carry no render
-tokens, so they name the generator by its file name and never by a path with an install prefix,
-which the install-prefix gate would refuse.
+`mode` field says `shards`. The two workflow scripts were deployed verbatim when this was written;
+since main's `TOOL-aRepatriatedFork-7` each is rendered from a template carrying render tokens, and
+the lens sentence still names the generator by its file name and never by a path with an install
+prefix, which the install-prefix gate would refuse.
 
 ### The map
 
@@ -195,7 +210,8 @@ generated views by mode.
 ### Files touched (estimate)
 
 `tools/memory-tree/README.md` · `tools/memory-tree/gen_build_index.py` (the arm) ·
-`tools/workflows/tier2-review.js` · `tools/workflows/drift-audit-state.js` ·
+`tools/workflows/tier2-review.template.js` and its render `tools/workflows/tier2-review.js` ·
+`tools/workflows/drift-audit-state.template.js` and its render `tools/workflows/drift-audit-state.js` ·
 `tools/drift-audit/SKILL.template.md` and its render · `tools/workflows/REVIEW-PROTOCOL.template.md`
 and `memory/guides/REVIEW-PROTOCOL.md` · `tools/memory-recall/SKILL.template.md` and its render ·
 `memory/README.md` · `memory/map/features/memory-tree-backlog.md` (new) ·
@@ -258,24 +274,24 @@ marker in each `tools/memory-tree/*.template.md` and in its render under `memory
   or the README's M6 explanation disagrees with the build-method render while every other criterion
   stays green.
 - **AC4** — When `grep -n -- '--asks --json'` runs over each of the five carriers —
-  `tools/workflows/tier2-review.js`, `tools/workflows/drift-audit-state.js`,
+  `tools/workflows/tier2-review.template.js`, `tools/workflows/drift-audit-state.template.js`,
   `tools/drift-audit/SKILL.template.md`, `tools/workflows/REVIEW-PROTOCOL.template.md` and
   `tools/memory-recall/SKILL.template.md` — each prints a hit inside the sentence naming the `mode`
-  fallback, and each carrier's `fb07ca25` phrase — `the backlog shards`
-  (`tools/workflows/tier2-review.js:315`), `the backlog rows`
-  (`tools/workflows/drift-audit-state.js:198`), `the OPEN backlog rows`
+  fallback, and each carrier's `fb07ca25` phrase, at its line at `313cc478` — `the backlog shards`
+  (`tools/workflows/tier2-review.template.js:370`), `the backlog rows`
+  (`tools/workflows/drift-audit-state.template.js:198`), `the OPEN backlog rows`
   (`tools/drift-audit/SKILL.template.md:109`), `the open backlog`
   (`tools/workflows/REVIEW-PROTOCOL.template.md:188`) and `DECISIONS.md` / `BACKLOG.md` index
   (`tools/memory-recall/SKILL.template.md:91`) — occurs only inside that sentence;
   `bash tools/check-install-prefix.sh` passes; and, at this unit's commit,
   `tr -d '\r' < memory/guides/REVIEW-PROTOCOL.md | wc -c` and
   `tr -d '\r' < memory/README.md | wc -c` each read at most 300 bytes above what the same
-  command reads at this unit's PARENT, those two and
-  `tr -d '\r' < memory/guides/SESSION-KICKOFF.md | wc -c` each read below 61440, and
-  `wc -l < memory/guides/REVIEW-PROTOCOL.md` and `wc -l < memory/guides/SESSION-KICKOFF.md`
-  each read below 750.
+  command reads at this unit's PARENT; the REVIEW-PROTOCOL count and
+  `tr -d '\r' < memory/guides/SESSION-KICKOFF.md | wc -c` each read below the guide class's 98304,
+  and the README count below the index class's 61440; and `wc -l < memory/guides/REVIEW-PROTOCOL.md`
+  and `wc -l < memory/guides/SESSION-KICKOFF.md` each read below 1200.
   Red when: one carrier keeps its `fb07ca25` wording, so after the switch its agents read a view of live
-  asks only and miss every terminal ask and its reason, or a verbatim-deployed script names the
+  asks only and miss every terminal ask and its reason, or a harness template names the
   generator by a prefixed path; or the `mode` sentence is written long enough to carry a class-capped
   carrier past its cap, which this size read catches in the pass and which check 6 of
   `tools/memory-tree/check-memory-hygiene.sh` would otherwise red at the post-build bar, where no
@@ -285,7 +301,8 @@ marker in each `tools/memory-tree/*.template.md` and in its render under `memory
 - **AC5** — When `bash tools/workflows/check-protocol-parity.test.sh`,
   `bash tools/memory-recall/adopt-memory-recall.sh --check` and
   `bash tools/drift-audit/adopt-drift-audit.sh --check` run, each rendered carrier matches its
-  template.
+  template; since main's `TOOL-aRepatriatedFork-7` the first command pairs the two harness templates
+  S4 writes with their renders as well as the review protocol.
   Red when: a template moves and its render is left behind.
   permission: the three commands are the `review-protocol parity (kit vs dogfood)`,
   `memory-recall skill wiring` and `drift-audit wiring` legs and run at the one post-build bar; the
@@ -314,10 +331,11 @@ marker in each `tools/memory-tree/*.template.md` and in its render under `memory
   `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`, `memory/guides/ANNOTATION-STYLE.md` and
   `memory/guides/BUILD-METHOD.md`, the set the `kit/dogfood doc parity` leg pairs with them — prints
   that value and no other too, so NO render is left behind the templates it is rendered from, and
-  `tr -d '\r' < memory/guides/BUILD-METHOD.md | wc -c` reads at most
-  27264 while `wc -l` over the same render reads at most 347 — the `fb07ca25` byte and line counts S7
-  holds this unit to, 384 bytes below the ceiling `tools/template-size-limits.txt` declares — so a
-  capped carrier this unit only re-marks did not grow. When
+  `tr -d '\r' < memory/guides/BUILD-METHOD.md | wc -c` reads exactly what the same command reads at
+  this unit's PARENT plus the spelling difference between the value written and the value it
+  replaces, one byte for 2.100 over 2.99, while `wc -l` over the same render reads its parent's
+  count, so a capped carrier this unit only re-marks grew by its marker's digits and nothing else,
+  and by those only, as §8 F4 resolves. When
   `bash tools/check-kit-versions.sh` runs, and the verdict-epoch check
   `tools/memory-tree/check-verdict-epoch.sh` runs over the build's range, every kit whose bytes this
   unit moved carries an agreeing constant and marker, and the memory-tree constant's last bump is at
@@ -330,10 +348,9 @@ marker in each `tools/memory-tree/*.template.md` and in its render under `memory
   byte-identical and which only the `kit/dogfood doc parity` leg would otherwise catch, at the
   post-build bar — a read over `memory/guides/BUILD-METHOD.md` alone certifies one instance of four,
   which is the same could-not-fail shape one level up; or the marker edit in
-  `memory/guides/BUILD-METHOD.md` arrives as a prose edit, or as a longer value spelling (§8 F4), so
-  a render this unit owes nothing GROWS — a read against the ceiling alone passes while the headroom
-  the units after this one were promised is gone, and the `build-method size` leg reds at the
-  post-build bar where no pass is left to trim it.
+  `memory/guides/BUILD-METHOD.md` arrives with a prose edit, so a render this unit owes nothing
+  GROWS past its marker's digits — a read against the ceiling alone passes either way, because that render has 3161 bytes free under
+  its row at `313cc478`, so only the parent comparison sees it.
   permission: the fetch, the reads and the grep are `git` observations in the pass;
   `check-kit-versions.sh` and `check-verdict-epoch.sh` are the `kit version markers` and
   `verdict epoch (kit version dates the engine)` legs and run at the one post-build bar.
@@ -374,10 +391,18 @@ is `subject = repo` and runs on any bar.
   move is 0 bytes only while the value keeps the four-character spelling it carries at `fb07ca25`, and the
   capped render that holds the marker has no free bytes to give this unit (S7). Options: (a) spend
   the byte out of that render's remaining space; (b) trim a byte of its prose in the same commit;
-  (c) stop and ask the owner. RESOLVED (agent, 2026-09-20, delegated), decided by the orchestrator:
-  (c), under the build-wide rule that a unit adding bytes to a capped carrier lands net zero or
-  forks rather than spending headroom another unit is counting on. AC8's byte read reds first in
-  either case. The case is not live at `fb07ca25` or at the advertised tip.
+  (c) stop and ask the owner. RESOLVED (agent, 2026-09-28, delegated), decided by the orchestrator:
+  (a), spend the byte. The fork was first resolved (c) on 2026-09-20, under the build-wide rule that
+  a unit adding bytes to a capped carrier lands net zero or forks rather than spending headroom
+  another unit is counting on, while the render had 384 bytes free and the case was live nowhere.
+  It is live at `313cc478` (read 2026-09-28): the second merge brought in main's 2.99, the one value
+  above it in component order is 2.100, five characters against four, and S7 states the byte it
+  adds. The premise of (c) no longer holds, because the render has 3161 bytes free under a
+  30720-byte row main's `TOOL-dGatedProse-4` raised, so one byte starves no later unit. 3.0 is the
+  one two-part value above 2.99 that spells no longer, and it is declined: it moves the major
+  component for one byte, and `tools/check-kit-versions.sh` gives the major no meaning beyond order
+  while every human reader takes it for a break. AC8's byte read still reds on any growth past the
+  marker's digits.
 
 ## 9. Revision log
 
@@ -488,6 +513,21 @@ is `subject = repo` and runs on any bar.
 - rev-6 · 2026-09-22 · order re-declared from 38 to 39 in the status header only, derived from the §3
   edges: the G9 exit promoted TOOL-dDerivedDocket-65 to run at 35, after 64. No criterion, design or
   edge moved.
+- rev-7 · 2026-09-28 · §2 §4 §6 §8 §10 · S4 S7 · AC4 AC5 AC8 · re-grounded on the second origin/main
+  merge, `e2e840d0`, and its kit sweep `313cc478`; the base stays `fb07ca25`. The memory-tree move
+  this unit owns must now clear main's 2.99, which the second merge brought in, and S7 states the
+  value, 2.100, with the reason both comparators order it above 2.99 and a decimal reading would
+  not. That value spells one character longer than 2.99, so S7 and AC8 stop claiming a zero-byte
+  move: AC8 reads the capped render against its PARENT plus the spelling difference instead of
+  `fb07ca25`'s 27264 bytes and 347 lines, which the render already exceeds at `313cc478`, and §8 F4
+  is recorded as live and re-resolved from (c) to (a) by the orchestrator, because its premise, a
+  render with no bytes to give, fell with main's raised row. Main's `TOOL-dGatedProse-4` raised the
+  render's row to 30720 and `TOOL-dGatedProse-3` the guide class to 98304 bytes and 1200 lines; S7
+  and AC4 read those caps and the carriers' sizes at `313cc478`. Main's `TOOL-aRepatriatedFork-7`
+  made the review and drift-audit harnesses renders of templates, so S4, §4's carrier paragraph and
+  Files touched, AC4 and AC5 name the two templates beside their renders, and AC4's phrase
+  citations read at `313cc478`. The constant's citation moves from `:20` to `:33`. §10 records the
+  reading.
 
 ## 10. Reuse audit
 
@@ -523,6 +563,16 @@ read `3bc78ff6`, six commits ahead, carrying `KIT_MEMORY_TREE_VERSION` 2.79 agai
 `TOOL-dDerivedDocket-34`'s landing reconcile re-checks the landed value against the tip again at the
 landing. It is recorded because it is the difference between a move this unit's own criterion passes
 and one the tip has already spent: 2.79 satisfies `tools/check-kit-versions.sh` and still collides.
+
+RE-GROUNDED ON THE SECOND MERGE WITH MAIN, read 2026-09-28 at `313cc478`, the kit sweep over
+`e2e840d0`, whose second parent `869209ed` is the remote's default tip at that reading and carries
+`KIT_MEMORY_TREE_VERSION` 2.99; the sweep left memory-tree at main's value because the move above
+it is this unit's. At `313cc478` the five carrier phrases are unchanged, two of them now in harness
+templates; `memory/README.md`, `memory/map/baseline.toml`'s three shard keys, govkit's `DEPL.md`
+claim and the `backlog-shards` extractor are unchanged; the kit README gained main's upgrade and
+adopter-route sections and still carries the two attribute lines and the M6 clause-3 section this
+unit edits; the four templates and their four renders still pair one-for-one; and the thirteen §7
+legs all resolve in `tools/gate-legs.json`, `build-index selftest` alone `subject = kit`.
 
 Recall terms used: `backlog shards carriers dossier baseline backlog-shards map_extractors README
 merge driver asks view prior-art lens`

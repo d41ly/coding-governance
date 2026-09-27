@@ -45,7 +45,8 @@
 # The `export` line is DELETED rather than commented out. A commented assignment is a line somebody
 # uncomments without reading the paragraph above it.
 #
-# THE KEYS THIS FILE MAY DECLARE, as documentation only; gov declares none of them today.
+# THE KEYS THIS FILE MAY DECLARE, as documentation only; gov declares only the inherited-red pair
+# below.
 #   GATE_SELFTESTS=1          run the kit self-tests on every default-branch push (the switch above).
 #   GOV_GATE_CMD=<cmd>        the merge bar, when it is not `run-gates.sh`. It must run a script this
 #                             repo tracks, unmodified in the working tree, at word 1 or after bash/sh,
@@ -57,6 +58,12 @@
 #   GOV_BRANCH_GATE_CMD=<cmd> a bar for a push that does NOT touch the default branch, vetted by the
 #                             same rule at HEAD and fed git's pre-push ref lines on stdin. Unset, such
 #                             a push is ungated. It can only add a refusal, never remove one.
+#   INHERITED_RED=park|land   whether a push may land over a red its default branch already carries.
+#                             PARSED at the remote's tip by the hook and the unattended driver, never
+#                             read from the sourced value; see the policy block below.
+#   INHERITED_RED_MAX_AGE=<n> the age bound, in first-parent landings, that `land` needs beside it.
+#                             PARSED at the remote's tip by the hook and the unattended driver, never
+#                             read from the sourced value; see the policy block below.
 # THIS FILE IS VETTED BEFORE IT IS SOURCED (TOOL-aRepatriatedFork-5, closing review round 1 H1): the
 # hook sources it only when it is tracked at the pushed sha and its working copy matches, and refuses
 # the push otherwise, so an ignored or excluded copy cannot set the test escape or `exit 0`.

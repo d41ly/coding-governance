@@ -30,7 +30,9 @@ CLAIM_CANARY is what separates that zero from a dead arm.
 THE JOINS KEEP THEIR POPULATIONS APART, the correction rev-2 folded from round 3. The fourth join,
 `bar`, reads two of the three rather than minting a fourth; the fifth, `guards`, reads the legs
 population plus one of its own, the declared write set; the sixth, `claims`, reads none of them,
-being a grammar over the spec's own prose outside its fenced blocks.
+being a grammar over the spec's own prose outside its fenced blocks; and the seventh, `handoff`,
+reads none of them either and mints a fifth population of its own, the backticked payloads of a
+spec's hands-off bullets, joined to the text of the sibling each one names.
 
   legs   backticked tokens on a `## 7. Gates` LINE THAT IS THE LIST -> a `name` in the manifest.
          A section 7 line carrying prose is not graded: measured, that predicate produced 270

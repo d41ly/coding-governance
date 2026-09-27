@@ -590,8 +590,8 @@ build_ir_fixture() { # tag · gate-env body (printf %b) -> a pushed main whose R
   cd "$d/work" || return 1
   git config user.email t@example.com; git config user.name t
   git config core.hooksPath "$d/hooks"
-  mkdir -p .githooks tools
-  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > tools/gate-legs.json
+  mkdir -p .githooks "$KIT_REL"
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
   printf '%b' "$body" > .githooks/gate-env.sh
   git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
   git remote add origin "$d/remote.git"

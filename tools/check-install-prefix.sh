@@ -16,6 +16,10 @@
 # or `runtime-marker` for a marker with no reason). No line number, no count, no cut; a key repeating
 # inside one file carries `#<k>`, its occurrence ordinal there. Every other line this script prints
 # goes to /dev/null, so a refusal that exits without a key reads as a probe that could not answer.
+# THAT HOLDS ONLY BEFORE THE FIRST KEY. Keys stream, so a refusal reached AFTER arm 1 has printed
+# would leave a set that is a SUBSET of the other tree's, which the bar reads as INHERITED while
+# `--check` reds on the refusal. Every refusal from arm 3 onward therefore prints a PROBE key first,
+# `-` TAB `<arm>-dead-probe` (or `carried-no-ratchet`) TAB `-`, and never counts or names a file.
 #
 # WHY. Kits install at `tools/<kit>/` in a target repo (one segment; the codebase-map gate template
 # resolves no deeper). Every ENGINE already derives its own prefix, so what actually strands an
@@ -109,6 +113,10 @@ print_offender_key() { # key -> one line on fd 3; a key already printed carries 
   OFF_SEEN["$1"]=$(( ${OFF_SEEN["$1"]:-0} + 1 ))
   if [ "${OFF_SEEN["$1"]}" = 1 ]; then printf '%s\n' "$1" >&3
   else printf '%s#%s\n' "$1" "${OFF_SEEN["$1"]}" >&3; fi
+}
+print_probe_key() { # kind -> under --offenders, the one key a refusal prints before it exits (header)
+  [ "$MODE" = --offenders ] && print_offender_key "-"$'\t'"$1"$'\t'-
+  return 0
 }
 
 # TOOL-cWidenedNet-1 S5 made this THE KIT-SOURCE TEST, ONCE; TOOL-aRepatriatedFork-16 S2 hoisted it
@@ -312,20 +320,24 @@ if [ "$MODE" = --offenders ]; then
   # ARM 1 AND ITS STALE WAIVERS, as keys, by the same waiver and marker tests `--check` applies.
   # `--check` stops at the first failing section; this mode carries on to the carried-prefix arm,
   # because a key set that stopped early would read a new offender further down as inherited.
+  # FED FROM FILES, never from a heredoc over a command substitution: that shape can wait forever on
+  # a grandchild's pipe under MSYS (the shell-hygiene leg's class), and a file keeps each loop in
+  # this shell, where `off_rc` and the ordinals have to land. Removed before the block ends.
+  _off_tmp=$(mktemp -d) || { echo "install-prefix: no scratch dir for the --offenders walk"; exit 1; }
+  trap 'rm -rf "$_off_tmp"' EXIT
+  printf '%s\n' "$hits" > "$_off_tmp/hits"
   while IFS= read -r h; do
     [ -n "$h" ] || continue
     printf '%s\n' "$waived_rows" | grep -qxF "$h" && continue
     check_marker_reason "$h"; _m=$?
     [ "$_m" = 0 ] && continue
     off_rc=1; _kind=root; [ "$_m" = 2 ] && _kind=marker
+    sed -n "${h##*:}p" "${h%:*}" | grep -oE "$RE" | sed -E 's/^[^A-Za-z0-9_.-]//' > "$_off_tmp/spellings"
     while IFS= read -r _sp; do
       [ -n "$_sp" ] && print_offender_key "${h%:*}"$'\t'"$_kind"$'\t'"$_sp"
-    done <<EOF2
-$(sed -n "${h##*:}p" "${h%:*}" | grep -oE "$RE" | sed -E 's/^[^A-Za-z0-9_.-]//')
-EOF2
-  done <<EOF
-$hits
-EOF
+    done < "$_off_tmp/spellings"
+  done < "$_off_tmp/hits"
+  rm -rf "$_off_tmp"; trap - EXIT
   while IFS= read -r w; do
     [ -n "$w" ] || continue
     printf '%s\n' "$hits" | grep -qxF "$w" && continue
@@ -418,7 +430,8 @@ fi
 if [ "$MODE" = --check ] || [ "$MODE" = --list ] || [ "$MODE" = --offenders ]; then
   # shellcheck source=/dev/null
   . "${REGISTRY%/*}/../lib/resolve-python.sh"   # the resolver beside the registry the kit-source test found
-  _rt_py=$(resolve_python) || { echo "install-prefix: the runtime-literal arm has no usable python"; exit 1; }
+  _rt_py=$(resolve_python) || { echo "install-prefix: the runtime-literal arm has no usable python"
+                                print_probe_key runtime-dead-probe; exit 1; }
   _rt_pop=$("$_rt_py" "${REGISTRY%/*}/govkit.py" shipped | tr -d '\r' \
             | awk -F'\t' '$2 == "engine" || $2 == "rendered" { print $3 }' \
             | grep -vE "$SUFFIX_EXCL" | LC_ALL=C sort -u)
@@ -431,6 +444,22 @@ import tokenize
 
 MODE = sys.argv[1]
 KEYS = MODE == "--offenders"
+# THE PROBE KEY every refusal from here prints under --offenders: arm 1's keys have already streamed,
+# so a refusal that printed nothing would leave a subset of the other tree's set (the header).
+DEAD_KEY = "-\truntime-dead-probe\t-"
+
+
+def print_crash_key(kind, value, tb):
+    """A traceback is a dead probe too: key it, then let the default hook print it to stderr."""
+    print(DEAD_KEY, flush=True)
+    sys.__excepthook__(kind, value, tb)
+
+
+if KEYS:
+    sys.excepthook = print_crash_key
+# LF ONLY. On Windows a text-mode stdout ends every line but the last in CR, and the shell reads
+# these keys with nothing that strips one, so an exact-match reader of --offenders met `<key>CR`.
+sys.stdout.reconfigure(newline="")
 
 
 def print_prose(msg):
@@ -446,6 +475,8 @@ loose = {t.split("/")[1] for t in tracked if t.count("/") == 1}
 if not files or not dirs:
     print_prose("install-prefix: runtime-literal arm has an EMPTY population (%d file(s), %d kit dir(s))"
         " — that is a dead probe, not a pass" % (len(files), len(dirs)))
+    if KEYS:
+        print(DEAD_KEY)
     sys.exit(1)
 SEG = "|".join(sorted(map(re.escape, dirs | loose), key=len, reverse=True))
 HOME = "|".join(sorted(map(re.escape, dirs), key=len, reverse=True))
@@ -599,6 +630,8 @@ for f in files:
 
 if pop == 0:
     print_prose("install-prefix: runtime-literal arm graded NO code file out of %d shipped — a dead probe" % len(files))
+    if KEYS:
+        print(DEAD_KEY)
     sys.exit(1)
 if KEYS:
     sys.exit(1 if bad else 0)
@@ -622,13 +655,17 @@ RT
   if [ "$MODE" = --offenders ]; then
     # Keys come back on the python's stdout, ordinals already applied by print_offender_key's rule
     # (its kinds are this arm's own, so no key here can repeat one another arm printed), and go
-    # out on fd 3 in one write. A non-zero exit with NO key is the dead-probe refusal: exit without
-    # a key, which reads as a probe that could not answer, exactly as `--check` exits.
+    # out on fd 3 in one write. The program keys its own dead probes and its own tracebacks
+    # (`runtime-dead-probe`), so a non-zero exit with NO key is a python that never got that far;
+    # it takes the same probe key here. Exiting keyless instead would leave arm 1's streamed keys
+    # as the whole set, a subset of the other tree's that reads INHERITED (merge-2 skeptic F6).
     _rt_keys=$(printf '%s\n' "$_rt_pop" | RT_TRACKED="$(git ls-files -- 'tools/*')" "$_rt_py" -c "$_rt_src" "$MODE")
     _rt=$?
-    [ "$_rt" = 0 ] || [ -n "$_rt_keys" ] || exit 1
     [ -z "$_rt_keys" ] || printf '%s\n' "$_rt_keys" >&3
-    [ "$_rt" = 0 ] || off_rc=1
+    if [ "$_rt" != 0 ]; then
+      off_rc=1
+      [ -n "$_rt_keys" ] || print_probe_key runtime-dead-probe
+    fi
   else
     printf '%s\n' "$_rt_pop" | RT_TRACKED="$(git ls-files -- 'tools/*')" "$_rt_py" -c "$_rt_src" "$MODE"
     _rt=$?
@@ -909,9 +946,12 @@ else
   # D3's other half: the same liveness assertion on the CHECK path, so a dead derivation cannot
   # report a clean empty population against an empty ratchet either. It is FIRST because everything
   # below reads a population this proves can move.
+  # Under --offenders each refusal in this block prints its PROBE key first: arms 1 and 3 have
+  # already streamed theirs, and a keyless exit here would leave a subset that reads as inherited.
   [ "$(carried_live)" -gt 0 ] || { echo "install-prefix: the carried-prefix POPULATION is empty — that is not a pass.
 install-prefix: the derivation resolved no shippable sources, which means it DIED rather than that
-install-prefix: this repo ships nothing. A zero HIT count is fine; a zero population is a dead probe."; exit 1; }
+install-prefix: this repo ships nothing. A zero HIT count is fine; a zero population is a dead probe."
+    print_probe_key carried-dead-probe; exit 1; }
   rows=$(carried_rows)
   # `-s` not `-f` (D4): an empty-but-present file passed an existence check and then met the awk.
   # L1's other half: once the hit set legitimately reaches zero, an EMPTY ratchet is the correct
@@ -927,13 +967,13 @@ install-prefix: this repo ships nothing. A zero HIT count is fine; a zero popula
   if [ ! -e "$CARRIED" ]; then
     echo "install-prefix: no $CARRIED — run --write-ratchet once and commit it. A missing ratchet is"
     echo "install-prefix: not a clean one."
-    exit 1
+    print_probe_key carried-no-ratchet; exit 1
   fi
   if [ ! -s "$CARRIED" ] && [ -n "$rows" ]; then
     echo "install-prefix: $CARRIED is EMPTY while $(printf '%s
 ' "$rows" | grep -c .) file(s) still"
     echo "install-prefix: carry a literal — run --write-ratchet once and commit it."
-    exit 1
+    print_probe_key carried-no-ratchet; exit 1
   fi
   # SHRINK-ONLY, PER FILE. The existing arm's `<path>:<line>` shape goes stale on every edit above a
   # waived line, and one row per hit line would rot within a week; per file trades swap-blindness for
@@ -943,7 +983,8 @@ install-prefix: this repo ships nothing. A zero HIT count is fine; a zero popula
   # trap. `gate-fingerprint.sh` folds untracked files into the working-tree fingerprint, so a
   # leftover forced an unnecessary full bar at the push boundary — and it broke the hermetic-leg
   # rule while grading the tree it dirtied. `mktemp` plus a trap, and the rows are already in hand.
-  _now=$(mktemp); trap 'rm -f "$_now"' EXIT
+  # The three siblings are --offenders' walk files, below; removing one never written costs nothing.
+  _now=$(mktemp); trap 'rm -f "$_now" "$_now.cv" "$_now.lits" "$_now.at"' EXIT
   printf '%s
 ' "$rows" > "$_now"
   _keys=""; [ "$MODE" = --offenders ] && _keys=1
@@ -977,18 +1018,18 @@ install-prefix: this repo ships nothing. A zero HIT count is fine; a zero popula
   # CAPTURED, then printed: the same bytes `--check` always printed, and nothing in `--offenders`.
   [ -n "$_keys" ] || { [ -z "$_cv" ] || printf '%s\n' "$_cv"; }
   if [ -n "$_keys" ]; then
-    _lits=$(scan_carried_hits)
+    # FED FROM FILES beside `_now`, never from a heredoc over a command substitution, for the reason
+    # arm 1's walk gives: the shell-hygiene leg's class, and the loop has to stay in this shell.
+    printf '%s\n' "$_cv" > "$_now.cv"
+    scan_carried_hits > "$_now.lits"
     while IFS=$'\t' read -r _cvv _cvp _cvk; do
       [ -n "$_cvp" ] || continue
       if [ "$_cvv" = SLACK ]; then print_offender_key "$_cvp"$'\t'carried-slack$'\t'"$_cvk"; continue; fi
+      AT_P="$_cvp" awk -F'\t' '$1 == ENVIRON["AT_P"] { print $3 }' "$_now.lits" > "$_now.at"
       while IFS= read -r _cl; do
         [ -n "$_cl" ] && print_offender_key "$_cvp"$'\t'carried$'\t'"$_cl"
-      done <<EOF2
-$(printf '%s\n' "$_lits" | AT_P="$_cvp" awk -F'\t' '$1 == ENVIRON["AT_P"] { print $3 }')
-EOF2
-    done <<EOF
-$_cv
-EOF
+      done < "$_now.at"
+    done < "$_now.cv"
     [ "$cstat" = 0 ] || off_rc=1
     exit "$off_rc"
   fi

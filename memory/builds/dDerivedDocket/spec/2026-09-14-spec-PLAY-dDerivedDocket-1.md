@@ -1,6 +1,6 @@
 # PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams playbook · order 38
+**Status:** SPECCED · rev-9 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams playbook · order 38
 
 <!-- gen:spec-records -->
 
@@ -58,7 +58,7 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
 - **S7** The net byte budget, on BOTH capped carriers and read against this unit's PARENT rather
   than against a ceiling: the CR-stripped size of `coding-governance-agents.template.md` falls at
   this unit's commit, and so does `AGENTS.md`'s. This unit adds bytes to neither and raises no cap,
-  which is what lets a unit at order 37 land on a parent whose free space earlier units have already
+  which is what lets a unit at order 38 land on a parent whose free space earlier units have already
   spent down. Observed by AC1 and AC4.
 - **S8** §1 Landing's explicit-ask substitute bullet, inside the first `kit:unattended` fence, says
   the build folder the run did not create is the DEFAULT-BRANCH anchor's property and that the
@@ -105,7 +105,7 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
 
 ### The edits, by location
 
-| Where, at `fb07ca25`, every citation unmoved from `abac6d59` | Now | After |
+| Where, at `313cc478`; §10 names the rows rev-9 moved | Now | After |
 |---|---|---|
 | `coding-governance-agents.template.md:55`-`:57`, the `kit:unattended` fence | one bullet: the explicit-ask substitute | that bullet, then the S1 landing bullet |
 | `coding-governance-agents.template.md:56`, the substitute bullet | "a committed build folder the run did not create", unqualified | qualified to the default-branch anchor (S8) |
@@ -113,12 +113,12 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
 | `coding-governance-agents.template.md:66`-`:68`, the kickoff-manifest exception | its heading and bullet, unfenced | the same heading and bullet inside a `kit:kickoff-manifest` fence (S2) |
 | `coding-governance-agents.template.md:70`-`:77` | "**Unattended runs** *(kit-conditional — drop this block…)*" and its bullet, unfenced | "**Unattended runs.**" and the same bullet, inside a `kit:unattended` fence |
 | `coding-governance-agents.template.md:148` | "the backlog is mutable (stable ids, status updated in place; gaps fine)" | the S3 wording |
-| `AGENTS.md:78`-`:472`, the `gov:playbook` region | the `fb07ca25` render | a fresh render |
+| `AGENTS.md:78`-`:466`, the `gov:playbook` region | the `313cc478` render | a fresh render |
 | `AGENTS.md:52`-`:53`, the layout line | `backlog/<FAMILY>.md` listed after the GENERATED pair | listed as the third GENERATED member |
 | `AGENTS.md:70`-`:71`, the node-registry paragraph | "backlogs shard per family at `memory/backlog/<FAMILY>.md`" | asks filed per build, and the family file their generated view |
 | `AGENTS.md:36`-`:38`, the `unattended/` entry under What ships here | "a committed standing mandate it ASSERTS and cannot have written" | "a committed standing mandate, §1 Landing's one substitute" (S8) |
-| `AGENTS.md:558`-`:559`, the protocol bullet under Two protocols are BINDING | the same clause | the same replacement (S8) |
-| `AGENTS.md:575`-`:576`, the Conventions bullet on merging and pushing | "— or a committed build folder the run did not create" | "— or §1 Landing's one substitute" (S8) |
+| `AGENTS.md:560`-`:561`, the protocol bullet under Two protocols are BINDING | the same clause | the same replacement (S8) |
+| `AGENTS.md:583`-`:584`, the Conventions bullet on merging and pushing | "— or a committed build folder the run did not create" | "— or §1 Landing's one substitute" (S8) |
 | `memory/DECISIONS.md`, `## PLAY — playbook` | one row | a second row, this unit's |
 | `memory/guides/SESSION-KICKOFF.md` audit block | the switch-over's stamp | re-stamped |
 
@@ -186,7 +186,7 @@ markers are stripped, and was not rendered.
 | S2 unattended fence markers | +49 | 0, because a surviving block loses its markers |
 | S2 kickoff-manifest fence markers | +61 | 0 for a target selecting the kit, as gov does |
 | S3 §6 bullet | +34 | +34 |
-| total | −45, so 48,822 of 49,152 from `fb07ca25`'s 48,867 | −155 |
+| total | −45, so 48,184 of 49,152 from `313cc478`'s 48,229 | −155 |
 
 Re-read at `fb07ca25`: the lexicon bullet in §12 lost 18 bytes in both the template and the region,
 on no line this table measures, so every delta above stands and only the starting sizes moved, from
@@ -197,6 +197,12 @@ remote-CI unit may change `AGENTS.md` before this unit runs, but neither may gro
 this build that writes a capped carrier lands net zero or negative on it — so the parent this unit
 subtracts from is at or below the figure above. AC1 and AC4 grade the commit against that parent
 rather than trusting this sum.
+
+Re-read at `313cc478`, after the second merge with main: main's v3.1 edits took 638 bytes out of the
+template, in its header, the kickoff-manifest bullet's text, §8 and §16, on no line this table
+measures and not in the bullet S2 fences, so every delta above stands and the template starts at
+48,229. `AGENTS.md` reads 64,333, so the charter moves from 64,333 to about 64,210 of its 64,512
+ceiling.
 
 ### Why the fence is safe to add
 
@@ -241,11 +247,13 @@ selects it, so gov's region keeps the exception.
 - observability — the size gate's `template-size OK` line for both subjects, the render check's
   `region matches a fresh render` line, and the manifest check's check 5.
 - risks — the template's high-water record reads 48,378 at `fb07ca25` against 48,867, so the size
-  gate already prints an advisory WARN; this unit shrinks the file by less than that gap and leaves
-  the WARN standing. `AGENTS.md` carries a standing WARN of its own, 60,930 against 64,329, which
+  gate printed an advisory WARN there; at `313cc478` the template reads 48,229, under that record,
+  so no WARN prints and this unit's shrink keeps it under. `AGENTS.md` carries a standing WARN of
+  its own, 60,930 against 64,333 at `313cc478`, which
   this unit also leaves standing: it shrinks that file too, §8 F6 records no high-water bump, and
-  the advisory never moves an exit code. `AGENTS.md` has 183 bytes free at `fb07ca25`, and no unit of this build
-  may spend them: the remote-CI unit at order 32 lands NET ZERO OR NEGATIVE on the charter, funding
+  the advisory never moves an exit code. `AGENTS.md` has 183 bytes free at `fb07ca25` and 179 at
+  `313cc478`, and no unit of this build
+  may spend them: the remote-CI unit at order 30 lands NET ZERO OR NEGATIVE on the charter, funding
   its new sentence by trimming a passage the unattended kit README already owns, which its S7 states
   and its AC8 reads. So this unit's parent is at or below `fb07ca25`'s count rather than at the
   ceiling, and this unit shrinks it further. AC4 reads both counts at the commit rather than
@@ -265,8 +273,8 @@ selects it, so gov's region keeps the exception.
   Red when: the landing bullet lands without the §1 deletions, which grows the file while it stays
   under its ceiling, so the size gate stays green and only the parent comparison catches it.
   figure: DERIVED at the commit. `abac6d59`'s 48,885 and the −45 projection are PINNED, measured
-  2026-09-14, and `fb07ca25`'s 48,867 is PINNED, measured 2026-09-16; design §11's 49,032 was
-  measured at `09a22d2b`.
+  2026-09-14, `fb07ca25`'s 48,867 is PINNED, measured 2026-09-16, and `313cc478`'s 48,229 is
+  PINNED, measured 2026-09-28; design §11's 49,032 was measured at `09a22d2b`.
   permission: the two counts are the pass's observation; `check-template-size.sh` is the
   `template size <=48KiB` leg, which no pass runs, and it runs at the one post-build bar.
 - **AC2** — When `python tools/playbook/render_playbook.py --target <scratch>` renders the template
@@ -298,7 +306,8 @@ selects it, so gov's region keeps the exception.
   Red when: the authored passages grow and the region is not re-rendered, so bytes are spent out of
   free space this unit's parent no longer has — a ceiling read passes on a file that grew, and only
   the parent comparison catches it, which is the whole reason this unit reads both.
-  figure: 64,347 at `abac6d59` and 64,329 at `fb07ca25` are PINNED, measured 2026-09-14 and 2026-09-16;
+  figure: 64,347 at `abac6d59`, 64,329 at `fb07ca25` and 64,333 at `313cc478` are PINNED, measured
+  2026-09-14, 2026-09-16 and 2026-09-28;
   the parent's count and the verdict are DERIVED at the commit.
   permission: the two counts are the pass's observation; `check-template-size.sh` is the
   `charter size` leg, which no pass runs, and it runs at the one post-build bar.
@@ -308,7 +317,7 @@ selects it, so gov's region keeps the exception.
   Red when: the design's builds-mode sentence is written into the template, which
   `grep -c 'BACKLOG.md' coding-governance-agents.template.md` reports as non-zero, and a shards-mode
   adopter's re-render then instructs a file its check 4 refuses at
-  `tools/memory-tree/check-memory-hygiene.sh:611`.
+  `tools/memory-tree/check-memory-hygiene.sh:705`.
 - **AC6** — When `grep -n 'backlogs shard per family' AGENTS.md` runs it prints nothing, and the
   node-registry paragraph names `memory/builds/*/BACKLOG.md` as where asks are filed and
   `memory/backlog/*.md` as their generated view; and the layout line lists the family views,
@@ -332,7 +341,8 @@ selects it, so gov's region keeps the exception.
 - **AC9** — When `bash tools/check-line-length.sh` runs, both declared subjects pass at 450
   characters.
   Red when: the landing sentence is appended to the explicit-ask bullet, a 391-character line at
-  `coding-governance-agents.template.md:56` at `abac6d59` and at `fb07ca25`, and 392 after S8, which makes
+  `coding-governance-agents.template.md:56` at `abac6d59`, at `fb07ca25` and at `313cc478`, and 392
+  after S8, which makes
   it about 480.
   permission: the command is the `line length` leg and runs at the one post-build bar; in the pass
   the character count of each line this unit writes is read directly against 450.
@@ -347,9 +357,10 @@ selects it, so gov's region keeps the exception.
   prints 0.
   Red when: the bullet keeps "a committed build folder the run did not create" unqualified, which is
   false for every run the second anchor authorizes, this build's own prompt-mode run among them; or
-  the Conventions bullet keeps restating it, which the grep finds at `AGENTS.md:576`; or the
+  the Conventions bullet keeps restating it, which the grep finds at `AGENTS.md:584`; or the
   `unattended/` entry or the protocol bullet keeps "a committed standing mandate it ASSERTS and
-  cannot have written", which the last grep finds at `fb07ca25`'s `AGENTS.md:38` and `:559`.
+  cannot have written", which the last grep finds at `fb07ca25`'s `AGENTS.md:38` and `:559`, and
+  at `313cc478`'s `:38` and `:561`.
 
 ## 7. Gates
 
@@ -389,7 +400,9 @@ an observation made once in the unit pass. The bar runs once, after every unit i
 - **F6** — Version and high-water. (a) Bump the template to v3.1 and re-record its high-water. (b)
   Neither. `git log -S'Template **v3.0**'` shows the string set once, at the convergence commit, and
   every later rule change kept it; a high-water bump records growth, and this unit shrinks the file.
-  RESOLVED (agent, 2026-09-14, delegated): (b).
+  RESOLVED (agent, 2026-09-14, delegated): (b). Main has since set v3.1 itself, on 2026-09-24,
+  which the second merge brought in, so (a) would now read v3.2; the answer stands, since this unit
+  still bumps neither.
 - **F7** — Which authored lines stop stating the unqualified authorization property? (a) The
   `AGENTS.md` Conventions bullet only, as rev-2. (b) All three authored `AGENTS.md` lines that state
   it: the Conventions bullet, the `unattended/` entry under What ships here and the protocol bullet
@@ -498,6 +511,17 @@ an observation made once in the unit pass. The bar runs once, after every unit i
 - rev-8 · 2026-09-22 · order re-declared from 37 to 38 in the status header only, derived from the §3
   edges: the G9 exit promoted TOOL-dDerivedDocket-65 to run at 35, after 64. No criterion, design or
   edge moved.
+- rev-9 · 2026-09-28 · §2 §4 §5 §6 §8 §10 · S7 · AC1 AC4 AC5 AC9 AC11 · re-grounded on the second
+  origin/main merge, `e2e840d0`, and its kit sweep `313cc478`; the base stays `fb07ca25` and no
+  scope item, criterion or byte delta moved. Main's v3.1 edits left every template line §4 cites
+  in place and took 638 bytes out of the template elsewhere, so §4's accounting starts at 48,229
+  and ends near 48,184, and §5 risks records that the template now sits under its 48,378 high-water
+  with no WARN. `AGENTS.md` reads 64,333 with 179 bytes free; its region now closes at `:466`, the
+  protocol bullet sits at `:560`-`:561` and the Conventions bullet at `:583`-`:584`, which §4's
+  table and AC11 now cite. AC1's and AC4's figures gain the `313cc478` readings, AC5's check-4
+  citation moves from `:611` to `:705`, and AC9's 391-character line holds there too. §8 F6 notes
+  that main set v3.1 itself and that its answer stands. S7 and §5 name the orders the status header
+  and unit 32's own header carry, 38 and 30. §10 records the reading.
 
 ## 10. Reuse audit
 
@@ -550,6 +574,15 @@ Where the design and the source disagree at `abac6d59`, re-verified here:
   unattended block — is F2 of
   `memory/builds/aScouredKit/reviews/2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-behaviour.md`
   (S2).
+
+RE-GROUNDED ON THE SECOND MERGE WITH MAIN, read 2026-09-28 at `313cc478`. The template's §1 lines
+55 to 77 and its §6 line 148 are where §4 cites them, line 56 still 391 characters, and the
+template carries v3.1, 48,229 bytes, 923 under its 49,152 ceiling. In `AGENTS.md` the layout line,
+the node-registry paragraph, the `unattended/` entry and `:129`'s substitute bullet are where §4 and
+AC11 cite them; the region's close, the protocol bullet and the Conventions bullet moved to `:466`,
+`:560`-`:561` and `:583`-`:584`, the rows rev-9 moved. `README.md:56` is unchanged, the runbook's
+§2 kit list still has no kickoff-manifest bullet, `memory/DECISIONS.md`'s PLAY group still holds
+one row, and the ten §7 legs all resolve in `tools/gate-legs.json`, none of them `subject = kit`.
 
 M12 was not reached: the owner's ruling and the design chose the mechanism, and each fork above is
 wording or placement decided by a measurement or a veto.

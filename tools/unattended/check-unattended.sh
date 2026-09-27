@@ -70,8 +70,12 @@ _LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # shellcheck source=lib-unattended.sh
 . "$_LIB_DIR/lib-unattended.sh"
 # The python launcher, INLINED byte-identically from the canonical copy named on its marker line
-# (this kit is copy-installed and has no shared lib to source). Check 21's repair hint runs the
-# sibling resolver with it, which reads the receipt in Python; nothing else here spawns one.
+# (this kit is copy-installed and has no shared lib to source). Two callers spawn one: check 21's
+# repair hint runs the sibling resolver with it, which reads the receipt in Python, and the folder-wide
+# anchor ban (TOOL-dDerivedDocket-18) reaches the recall kit's own extractor through it. ONE copy
+# serves both, since a second would be a second block for the parity gate to miss. A resolver that
+# finds no usable launcher is a NAMED SKIP at the arm that asked, never a silent pass: being on PATH
+# is not evidence, so the candidate is RUN.
 # >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
@@ -542,46 +546,6 @@ read_ask_tsv_contract() {
   ASK_TSV_EXAMINED=$(core_of ASK_TSV_EXAMINED)
   ASK_TSV_FIELDS=$(read_bare_const ASK_TSV_FIELDS)
 }
-
-# ---- TOOL-dDerivedDocket-18 — THE PYTHON LAUNCHER, RESOLVED. The anchor ban below reaches the
-# ---- recall kit's own extractor through an interpreter, and this leg is the first thing in the kit
-# ---- to spawn one. The block between the markers is byte-identical to the canonical copy its own
-# ---- marker line names, and its parity gate reds if it drifts; it is carried INLINE because a
-# ---- copy-installed kit has
-# ---- no shared library to source, which is the same reason the driver has carried it since
-# ---- aDeferredBar. A resolver that finds no usable launcher is a NAMED SKIP at the arm, never a
-# ---- silent pass: being on PATH is not evidence, so the candidate is RUN.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
-resolve_python() {
-  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
-  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
-  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
-  _rp_tried=""
-  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
-    [ -n "$_rp_c" ] || continue
-    _rp_tried="$_rp_tried $_rp_c"
-    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
-      printf '%s\n' "$_rp_c"
-      return 0
-    fi
-  done
-  {
-    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
-    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
-    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
-    echo "resolve_python: tried:$_rp_tried"
-    if [ -n "${1:-}" ]; then
-      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
-    fi
-    if [ -n "${GOV_PYTHON:-}" ]; then
-      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
-      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
-      echo "resolve_python: operator believes they chose, and would not have."
-    fi
-  } >&2
-  return 1
-}
-# <<< resolve_python
 
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
   fail 1 "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set: $DRIVER"
@@ -1353,15 +1317,15 @@ is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a 
 # so the newest ADD at a path is the FIRST run's add and not the current tenant's. Worse, and
 # measured in a scratch repo on 2026-09-21: when the rotation lands inside a MERGE commit, an add
 # search over the archived path answers NOTHING, under the plain spelling AND under
-# `--full-history`, because git computes no diff for a merge. That is the class
-# `tools/memory-tree/row_grammar.py:335-340` records for two of this repo's own archives. Both ends
+# `--full-history`, because git computes no diff for a merge. That is the class the memory-tree
+# kit's `row_grammar.py` records at 335-340 for two of this repo's own archives. Both ends
 # of the window are therefore resolved by FIRST TOUCH, which a merge cannot hide.
 #
 # WHY `--full-history` EVERYWHERE. A path-restricted walk drops a commit TREESAME with a parent, and
 # a merge that resolves the record to its first parent's side prunes the whole branch that touched
 # it. Measured in a scratch repo on 2026-09-21 with an `-s ours` merge: the plain walk loses the
 # commit that introduced the line and answers nothing at all; the unsimplified walk keeps it.
-# `tools/drift-audit/drift_report.py:806-818` reproduced the same class for the same flag.
+# The drift-audit kit's `drift_report.py` reproduced the same class for the same flag, at 806-818.
 #
 # THE TENANCY FLOOR IS THE MECHANISM, not a refinement. Two runs share one path, and their records
 # share whole lines - `memory/builds/aBoundedVerdict/RUN.md` and its ABORTED sibling carry thirteen
@@ -1375,7 +1339,7 @@ is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a 
 # THE CAP DETECTS A WINDOW, it never SELECTS one, and the direction is why. The answer sits at the
 # OLDEST end, while `--max-count` applies during a newest-first traversal - so `--reverse
 # --max-count=N` keeps the N NEWEST commits and discards the only end that can hold the answer. That
-# is the defect `tools/unattended/lib-unattended.sh:266-279` records against its own sibling walk.
+# is the defect this kit's `lib-unattended.sh` records in `build_commit` against its own sibling walk.
 # So `cap+1` is FETCHED, the verdict is reached from the whole emitted list BEFORE any candidate is
 # graded, and a window deeper than the cap is announced rather than answered. A sentinel met
 # mid-walk would return a RE-introduction among the retained newest commits, which is a wrong sha
@@ -2334,9 +2298,8 @@ while IFS= read -r f; do
       while read -r maysha mayrd; do
         [ -n "$maysha" ] || continue
         fail 19 "a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow: $maysha in $mayrd, run $f"
-      done <<MAYWRITES
-$maywr
-MAYWRITES
+      done < <(printf '%s
+' "$maywr")
     fi
   fi
 

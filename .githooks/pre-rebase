@@ -13,7 +13,7 @@
 #
 # WHAT THIS DOES NOT CHECK. It sees `git rebase`. It does not see a squash-merge made elsewhere, a
 # cherry-pick, or a rebase run with `--no-verify`, which is the deliberate bypass. It decides
-# nothing about whether a row is accounted: that is hygiene check 25's judgement at the merge bar,
+# nothing about whether a row is accounted: that is hygiene check 26's judgement at the merge bar,
 # which is what GUARANTEES while these layers instruct.
 set -u
 

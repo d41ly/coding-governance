@@ -121,19 +121,31 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 
-# The REPAIR POINTER for a missing or stale units region (TOOL-aRepatriatedFork-2 S6): the
-# memory-tree generator where THIS install put it. Both the driver and the gate leg print it, so it
-# is spelled once, here, with the caller's own inline `resolve_python`. -> the hint text; a miss
-# says what was not found, never a guess.
-derive_index_repair() {
+# THE MEMORY-TREE GENERATOR where THIS install put it, repo-relative, resolved with the caller's own
+# inline `resolve_python`. Two texts name it — the repair pointer below and the driver's scaffold
+# recipe — so it is derived once, here, and neither spells the sibling kit's home. -> the path, or
+# status 1 with nothing printed, which each caller turns into its own named miss, never a guess.
+resolve_index_generator() {
   local d="" py=""
   declare -F resolve_python >/dev/null && py=$(resolve_python 2>/dev/null) || py=""
   [ -n "$py" ] && d=$(resolve_kit_dir "$py" memory-tree gen_build_index.py "$(dirname -- "${BASH_SOURCE[0]}")" 2>/dev/null)
   case "$d" in
-    '') printf '%s' "the --write mode of the memory-tree kit's gen_build_index.py, which neither the receipt nor a probe beside this kit located" ;;
-    .) printf '%s' "the --write mode of gen_build_index.py" ;;
-    *) printf '%s' "the --write mode of $d/gen_build_index.py" ;;
+    '') return 1 ;;
+    .) printf '%s\n' "gen_build_index.py" ;;
+    *) printf '%s\n' "$d/gen_build_index.py" ;;
   esac
+}
+
+# The REPAIR POINTER for a missing or stale units region (TOOL-aRepatriatedFork-2 S6): the
+# generator's `--write` mode. Both the driver and the gate leg print it, so it is spelled once, here.
+# -> the hint text; a miss says what was not found, never a guess.
+derive_index_repair() {
+  local g
+  if g=$(resolve_index_generator); then
+    printf '%s' "the --write mode of $g"
+  else
+    printf '%s' "the --write mode of the memory-tree kit's gen_build_index.py, which neither the receipt nor a probe beside this kit located"
+  fi
 }
 
 # ------------------------------------------------------------------------------ bounds, once
@@ -1054,7 +1066,7 @@ read_landing_commit() { # run-state file -> the commit that carries it at LANDIN
   local _lc_f="${1:-}" _lc_ph _lc_c
   [ -n "$_lc_f" ] || return 1
   check_lease_only_diff "$_lc_f" || return 1
-  _lc_ph=$(GIT show "HEAD:$_lc_f" 2>/dev/null | sed -n 's/^phase: *//p' | head -1 | tr -d '\r')
+  _lc_ph=$(GIT show "HEAD:$_lc_f" 2>/dev/null | extract_run_facts | sed -n 's/^phase: *//p' | head -1 | tr -d '\r')
   [ "$_lc_ph" = LANDING ] || return 1
   _lc_c=$(GIT log -1 --format=%H HEAD -- "$_lc_f" 2>/dev/null)
   [ -n "$_lc_c" ] || return 1
@@ -1099,9 +1111,7 @@ read_first_commit_date() { # record path · [nofloor] -> YYYY-MM-DD, or nothing
       _fd_t=$(GIT log --full-history --format=%cs -- "$_fd_s" 2>/dev/null | tail -1)
       [ -n "$_fd_t" ] || continue
       if [ -z "$_fd_floor" ] || [[ "$_fd_t" > "$_fd_floor" ]]; then _fd_floor=$_fd_t; fi
-    done <<SIBLINGS
-$(GIT ls-files -- "${_fd_p%/*}/RUN.*.md" 2>/dev/null)
-SIBLINGS
+    done < <(GIT ls-files -- "${_fd_p%/*}/RUN.*.md" 2>/dev/null)
   fi
   if [ -n "$_fd_floor" ] && { [ -z "$_fd_d" ] || [[ "$_fd_floor" > "$_fd_d" ]]; }; then _fd_d=$_fd_floor; fi
   printf '%s' "$_fd_d"
@@ -1148,7 +1158,7 @@ read_missing_landed_facts() { # record file · landed|derived|landing -> the mis
     *) return 2 ;;
   esac
   for _mf_k in $_mf_want; do
-    grep -q "^$_mf_k:" "$_mf_f" 2>/dev/null || _mf_out="$_mf_out${_mf_out:+ }$_mf_k"
+    { extract_run_facts < "$_mf_f"; } 2>/dev/null | grep -q "^$_mf_k:" || _mf_out="$_mf_out${_mf_out:+ }$_mf_k"
   done
   printf '%s' "$_mf_out"
 }
