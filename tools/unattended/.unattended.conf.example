@@ -80,8 +80,8 @@ UNIT_STALL_BOUND="1800"
 # the stop-guard blocks a bound session's turn end at most this many times per run and session, then allows and says so; the harness itself ends a turn after 8 consecutive blocks, so a value above 8 is unreachable inside one turn
 STOP_GUARD_BLOCKS="6"
 
-# The bound, in seconds, past which `--liveness` reads a RUN as STALE when none of its four signals
-# has moved: the last commit, the newest dirty write, the newest gate log, the session transcript.
+# The bound, in seconds, past which `--liveness` reads a RUN as STALE when no signal it reads has
+# moved within it; its header in the driver names them, and `last-move-source` the newest.
 # OPTIONAL: absent takes the DERIVED default GATE_BOUND + UNIT_STALL_BOUND and says so on stderr;
 # non-numeric or zero is a refusal; a value BELOW that sum is accepted with a NOTE, because under it
 # a full bar's silence reads STALE and an out-of-process resumer may kill a healthy bar.

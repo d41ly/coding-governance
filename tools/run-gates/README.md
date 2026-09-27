@@ -161,6 +161,14 @@ and `unresolved` (the common dir did not resolve). The last two record a DASH ra
 because a zero for a probe that never ran is a reassuring number about nothing. `unresolved` is
 UNARMED and the suite header says why.
 
+A waiter also rewrites `gate-queue-heartbeat` under its OWN worktree's git dir, beside `gate-logs/`,
+on every tick that does not acquire, holding `waited<TAB><seconds>`. It is for an out-of-process
+liveness reader that dates a worktree by its newest write: the ticket, the beacon and the status file
+move nothing while a bar waits, and a gate log lands only when a leg finishes, so without it a
+healthy queued bar reads as silent and a resumer may kill it. Readers go by its mtime and never
+parse it. Unlike the status file it is NEVER removed: a leftover ages out as an old gate log does,
+and a removal at the acquire would drop the newest move just before the first leg lands.
+
 A holder is reaped on either of two signals: a dead PID, or a heartbeat older than the TTL. The TTL
 is DERIVED from the profile row's per-leg `timeout=` when it sets one, because the heartbeat
 refreshes when a leg COMPLETES — so "can the holder still be holding" and "has a leg finished

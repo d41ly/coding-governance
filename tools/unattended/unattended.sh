@@ -5787,20 +5787,22 @@ resolve_transcript_path() { # session -> the transcript path when it exists, or 
 # THE ONE CLOCK OF A RUN, extracted verbatim from `print_liveness` by TOOL-dDerivedDocket-61 S3 when
 # the resume matrix became its third reader: `--liveness` grades STALE with it, `check_lease_fresh`
 # grades a lease with it, and `--status` announces presumed-stopped with it, so the tick and the
-# matrix cannot read one record two ways. The newest of four signals: the two tree clocks of
-# `read_tree_clocks`, the newest gate log under this worktree's git dir, and the recorded session's
-# transcript when its path derives. An ABSENT gate-logs directory contributes nothing and is not a
-# dead probe — a repo that has never run the bar has none — but a file under it that `stat` cannot
+# matrix cannot read one record two ways. The newest of its signals: the two tree clocks of
+# `read_tree_clocks`, the newest gate log under this worktree's git dir, the gate runner's queue
+# heartbeat beside those logs (TOOL-dDerivedDocket-64), and the recorded session's transcript when
+# its path derives. An ABSENT gate-logs directory or heartbeat contributes nothing and is not a
+# dead probe — a repo that has never run the bar has neither — but a file there that `stat` cannot
 # date is one. Globals, never a return value, for `read_tree_clocks`'s reason: a `$( )` capture
 # would lose the dead-probe name beside the numbers. `LM_DEAD` names the probe that answered
 # nothing, and each caller decides what that costs.
 #
 # WHAT IT DOES NOT READ: another worktree's moves, and a Workflow's sub-agents, which write under
 # `<sid>/subagents/` and never to `<sid>.jsonl`. A holder waiting on either with no move of its own
-# reads stale here, and so does a bar queued at the turnstile, which writes no gate log.
+# reads stale here, and so does a bar running one leg past the bound: once the queue is behind it
+# only a leg's completion moves the clock.
 LM_NEWEST=""; LM_SOURCE=""; LM_DEAD=""; LM_TRANSCRIPT=""
 derive_last_move() { # session -> LM_NEWEST, LM_SOURCE, LM_TRANSCRIPT, and LM_DEAD on a dead probe
-  local sidecar gl f m
+  local sidecar gl hb f m
   LM_NEWEST=""; LM_SOURCE=""; LM_DEAD=""; LM_TRANSCRIPT=""
   read_tree_clocks
   LM_DEAD="$TC_DEAD"; LM_NEWEST="$TC_LASTC"; LM_SOURCE=commit
@@ -5814,6 +5816,18 @@ derive_last_move() { # session -> LM_NEWEST, LM_SOURCE, LM_TRANSCRIPT, and LM_DE
       case "$m" in ""|*[!0-9]*) LM_DEAD="stat -c %Y on $f"; break ;; esac
       if [ "$m" -gt "$LM_NEWEST" ]; then LM_NEWEST=$m; LM_SOURCE=gate-log; fi
     done
+  fi
+  # THE QUEUE'S HEARTBEAT (TOOL-dDerivedDocket-64). A bar waiting in the gate runner's turnstile
+  # lands no gate log, so the runner rewrites this one file beside `gate-logs/` on every tick it
+  # waits and never removes it; its mtime is the move, its content is never read, and a leftover
+  # ages out as an old gate log does. Absent contributes nothing; present and undatable is a dead
+  # probe, named as the gate-log term names one. Source `gate-queue`, so a queued bar is told apart
+  # from a landing leg; a tie keeps the earlier source, as for every term.
+  hb="${sidecar%/unattended}/gate-queue-heartbeat"
+  if [ -z "$LM_DEAD" ] && [ -f "$hb" ]; then
+    m=$(stat -c %Y -- "$hb" 2>/dev/null) || m=""
+    case "$m" in ""|*[!0-9]*) LM_DEAD="stat -c %Y on $hb" ;; esac
+    if [ -z "$LM_DEAD" ] && [ "$m" -gt "$LM_NEWEST" ]; then LM_NEWEST=$m; LM_SOURCE=gate-queue; fi
   fi
   LM_TRANSCRIPT=$(resolve_transcript_path "${1:-}") || LM_TRANSCRIPT=""
   if [ -z "$LM_DEAD" ] && [ -n "$LM_TRANSCRIPT" ]; then
@@ -5883,10 +5897,13 @@ resolve_holder_worktree() { # run-state file -> 0 holds, 1 not here, 2 no run br
 #   last-move-source · transcript · last-stall · stale · verdict · stale-bound · holder-ref
 #
 # `state` is `terminal`, `finished-unstamped`, `held` or `live`, and a LANDING the node's landed log
-# names reads `terminal`. `last-move` is the seconds since the NEWEST of four signals —
-# `derive_last_move`: the last commit, the newest dirty or untracked write, the newest gate log under
-# `<git-dir>/gate-logs/`, and the session transcript when its path derives — because during a
-# healthy 26-minute bar neither the transcript nor the commit moves and the per-leg logs do. `stale`
+# names reads `terminal`. `last-move` is the seconds since the NEWEST of `derive_last_move`'s
+# signals: the last commit, the newest dirty or untracked write, the newest gate log under
+# `<git-dir>/gate-logs/`, the `gate-queue-heartbeat` a bar waiting in the gate runner's turnstile
+# rewrites beside them on every tick, and the session transcript when its path derives — because
+# during a healthy 26-minute bar neither the transcript nor the commit moves and the per-leg logs
+# do, and before its first leg a queued bar moves only its heartbeat. `last-move-source` names the
+# one that won: `commit`, `write`, `gate-log`, `gate-queue` or `transcript`. `stale`
 # is `last-move` over RESUME_STALE_BOUND, and `stale-bound` is that number, printed so the tick
 # bounds its own reads by it; `holder-ref` is the branch a worktree must have checked out to hold
 # the slug (`resolve_holder_worktree`), or `absent`. The verdict is the first that holds: TERMINAL,
@@ -5949,9 +5966,11 @@ print_liveness() { # slug
   # number a reboot recycled reads `no` here rather than `yes` whatever image took it, and the
   # tick's kill is not aimed at the owner's next process (closing review id 2; round 2, defect E).
   alive=$(check_pid_alive "$pid" "$(fact "$rel" pid-image)" "$(fact "$rel" lease-utc)")
-  # THE FOUR SIGNALS are `derive_last_move`'s, the one clock this verb, `check_lease_fresh` and
-  # `--status` share. The stall log below still needs the sidecar root, derived again here: a dead
-  # derivation is already named by the clock, so this one only has to be empty.
+  # THE SIGNALS are `derive_last_move`'s — commit, write, gate log, the queue's heartbeat and the
+  # transcript — the one clock this verb, `check_lease_fresh` and `--status` share, so a bar queued
+  # at the turnstile reads LIVE here and in the matrix at once. The stall log below still needs the
+  # sidecar root, derived again here: a dead derivation is already named by the clock, so this one
+  # only has to be empty.
   derive_last_move "$sid"
   dead="$LM_DEAD"; newest="$LM_NEWEST"; src="$LM_SOURCE"; tp="$LM_TRANSCRIPT"
   sidecar=$(resolve_sidecar_dir) || sidecar=""

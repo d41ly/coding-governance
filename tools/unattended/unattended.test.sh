@@ -6022,7 +6022,7 @@ case "$(uname -s)" in
     hit "$out" "pid-alive: unknown"
     rm -rf "$TMP/stubtl" ;;
 esac
-# AC5 — the four signals. An hour-old commit over a clean tree with no gate logs and no transcript
+# AC5 — the signals. An hour-old commit over a clean tree with no gate logs and no transcript
 # is STALE against a 60s bound and names the commit; one gate log flips it LIVE and names the log;
 # a transcript at the derived path names the transcript; one untracked write names the write. The
 # 60s bound is below the fixture's declared sum, which is AC6's NOTE, asserted here once.
@@ -6044,6 +6044,38 @@ hit "$out" "last-move-source: gate-log"
 hit "$out" "stale: no"
 hit "$out" "verdict: LIVE"
 rm -rf "$GATE_LOGS"
+# ---- U64 (TOOL-dDerivedDocket-64) AC1: a bar WAITING in the gate runner's turnstile lands no gate
+# ---- log; the heartbeat the runner rewrites beside `gate-logs/` on every tick it waits is its move.
+# ---- Planted by hand, so no bar runs. Fresh, it names `gate-queue` and reads LIVE with the same
+# ---- keys in the same order; dated past the bound it reads STALE; and a `stat` that cannot date that
+# ---- one path is check 52's dead probe, with no verdict line. RED against a driver copy whose
+# ---- `derive_last_move` lacks the queue term: the fresh heartbeat reads `stale: yes` and names the
+# ---- commit. The file is removed at the end, because `reset_tree` never cleans the git dir.
+U64_HB="$(git rev-parse --git-dir)/gate-queue-heartbeat"
+printf 'waited\t4\n' > "$U64_HB"
+out=$(run --liveness tRun)
+hit  "$out" "last-move-source: gate-queue"
+hit  "$out" "stale: no"
+hit  "$out" "verdict: LIVE"
+same "U64 AC1 the heartbeat adds no key and moves none" "$(bash "$SCRIPT" --liveness tRun 2>/dev/null | sed 's/:.*//' | tr '\n' ' ')" \
+  "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict stale-bound holder-ref "
+touch -d '2000-01-01T00:00:00Z' "$U64_HB"
+out=$(run --liveness tRun)
+hit  "$out" "last-move-source: commit"
+hit  "$out" "stale: yes"
+hit  "$out" "verdict: STALE"
+# ...the stub answers nothing for the heartbeat alone and hands every other path to the real `stat`,
+# so the only probe that dies is the one under test. Its directory is re-spelled by `pwd`, because a
+# PATH element spelled `C:/...` splits at the drive colon and the real `stat` would win unseen.
+U64_STAT=$(command -v stat); U64_STUB=$(mkdir -p "$ORIGIN_DIR/stubstat" && cd "$ORIGIN_DIR/stubstat" && pwd)
+printf '#!/bin/sh\ncase "$*" in *gate-queue-heartbeat*) exit 1 ;; esac\nexec "%s" "$@"\n' "$U64_STAT" > "$U64_STUB/stat"
+chmod +x "$U64_STUB/stat"
+out=$(PATH="$U64_STUB:$PATH" bash "$SCRIPT" --liveness tRun 2>&1); rc=$?
+same "U64 AC1 an undatable heartbeat exits 1" "$rc" "1"
+hit  "$out" "UNATTENDED check 52 FAILED"
+hit  "$out" "stat -c %Y on $U64_HB"
+miss "$out" "verdict:"
+rm -rf "$U64_STUB"; rm -f "$U64_HB"
 # ...the transcript: the worktree root with `:`, `\`, `/` and `.` each replaced by `-`, under the
 # override's `projects/`, named by the session the prologue pinned.
 ENC=$(git rev-parse --show-toplevel | tr ':\\/.' '----')
@@ -7721,6 +7753,27 @@ same "AC20 the refused take-over wrote nothing" "$(sum)" "$before"
 touch -d '2000-01-01T00:00:00Z' "$DD_GL/leg-1.txt"
 hit  "$(run --liveness tRun)" "stale: yes"
 rm -rf "$DD_GL"
+
+# ---- U64 (TOOL-dDerivedDocket-64) AC2: AC20's aged record with a bar QUEUED instead of landing legs,
+# ---- the gate runner's heartbeat in place of the gate log. `--status` presumes nothing, and another
+# ---- session's take-over refuses at 58 and writes nothing; dated past the bound, `--status` presumes
+# ---- the holder gone and the same call takes the run over. RED against a driver copy whose
+# ---- `derive_last_move` lacks the queue term, under which the fresh heartbeat is taken over.
+build_hold_fixture; write_aged_commit
+DD_QHB="$(git rev-parse --git-dir)/gate-queue-heartbeat"; printf 'waited\t4\n' > "$DD_QHB"
+out=$(run --liveness tRun)
+hit  "$out" "last-move-source: gate-queue"
+hit  "$out" "verdict: LIVE"
+miss "$(run --status tRun)" "presumed-stopped"
+before=$(sum)
+out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)
+hit  "$out" "UNATTENDED check 58 FAILED"
+hit  "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder"
+same "U64 AC2 the take-over refused on a queued bar wrote nothing" "$(sum)" "$before"
+touch -d '2000-01-01T00:00:00Z' "$DD_QHB"
+hit  "$(run --status tRun)" "presumed-stopped"
+hit  "$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id C)" "taken over — phase RUNNING · keepalive C"
+rm -f "$DD_QHB"
 
 # ---- AC21: a dead clock on a LEASED record reads UNKNOWN, announced, and declines the take-over: 58
 # ---- with an id, 59 with none, and `--status` says UNKNOWN and never presumed-stopped. RED against a
@@ -10790,7 +10843,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # unconditional; the four second-driver calls returned to the prologue's session, the relaunch's two
 # calls moved to a pid the record does not name, and AC20's lease-fact line retargeted onto
 # `lease-utc` are one for one and move nothing. No suite ran.
-FLOOR_ASSERTIONS=1717
+# RAISED 1717 -> 1736 by TOOL-dDerivedDocket-64: the queue-heartbeat arms' 19 assertions, all in
+# region two: 11 in the `--liveness` signals block after its gate-log arm and 8 after unit 61's
+# AC20 arm, so FLOOR_SHARD_2 carries the same +19 and FLOOR_SHARD_1 is untouched. COUNTED off the
+# blocks' own `hit`/`miss`/`same` lines, every one unconditional. Both blocks were run alone
+# behind a replica of this prologue by hand, green, and red under a driver copy whose
+# `derive_last_move` lacks the queue term; no suite ran.
+FLOOR_ASSERTIONS=1736
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -10915,7 +10974,8 @@ FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1521
+FLOOR_SHARD_2=1540
+# +19 for the TOOL-dDerivedDocket-64 queue-heartbeat arms, all in region two - see FLOOR_ASSERTIONS.
 # +40 for the TOOL-dDerivedDocket-63 holder's-own-`--replaces` arms, all in region two - see FLOOR_ASSERTIONS.
 # +39 for the TOOL-dDerivedDocket-62 one-worktree arms, all in region two - see FLOOR_ASSERTIONS.
 # +98 for the TOOL-dDerivedDocket-61 one-lease-record arms, all in region two - see FLOOR_ASSERTIONS.

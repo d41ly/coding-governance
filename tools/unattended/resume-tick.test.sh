@@ -720,6 +720,22 @@ check_hit  "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "U62 ...fro
 check_hit  "$OUT" "resume-tick: tRun · $SIB · skip · ELSEWHERE" "U62 ...and never from the sibling copy"
 ( cd "$FX" && git worktree remove --force "$SIB" ) >/dev/null 2>&1; rm -rf "$SIB"
 
+# ---- U64 (TOOL-dDerivedDocket-64) AC3: a QUEUED close. A BUILDING record whose commit is past the
+# ---- bound and whose only fresh signal is the heartbeat the gate runner rewrites beside `gate-logs/`
+# ---- while its bar waits in the turnstile is skipped LIVE and never resumed; the same heartbeat
+# ---- dated past the bound is resumed. Dated five minutes AHEAD, for AC2's reason above. The record
+# ---- names the branch its HEAD has checked out, so the aged half reaches a resume rather than NO RUN
+# ---- BRANCH. RED against a driver copy whose `derive_last_move` lacks the queue term: the fresh
+# ---- heartbeat decides `resumed · attempt 1`, which on a live node kills a bar waiting to acquire.
+build_fixture 999999999
+printf 'waited\t4\n' > "$FX_GITDIR/gate-queue-heartbeat"; touch -d '+5 minutes' "$FX_GITDIR/gate-queue-heartbeat"
+run_tick_over "$TICK" --dry-run
+check_hit  "$OUT" "resume-tick: tRun · $FX · skip · verdict LIVE" "U64 a record whose only fresh signal is the queue heartbeat is skipped LIVE"
+check_miss "$OUT" "resumed ·" "U64 ...and is never resumed"
+touch -d '2000-01-01T00:00:00Z' "$FX_GITDIR/gate-queue-heartbeat"
+run_tick_over "$TICK" --dry-run
+check_hit  "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "U64 the same heartbeat dated past the bound is resumed"
+
 # ---- AC12: the two announced skips of the walk. A driver whose --liveness exits non-zero is a dead
 # ---- probe: the run is skipped naming its first line, nothing launches, no line is written. A
 # ---- second worktree with no conf is skipped by name while the first tree's run still gets its
@@ -879,7 +895,11 @@ n=$((pass+fail))
 # that yields the sleep's pid, the no-run-branch arm 3 and the unobserved-landing arm 5 — COUNTED
 # off their own `check_*` lines; the retargeted U61 line is one for one and moves nothing. The pass
 # that wrote them ran no suite, and each arm was run alone over a replica of this prologue.
-FLOOR_ASSERTIONS=173
+# RAISED 173 -> 176 by TOOL-dDerivedDocket-64: the queued-close arm's 3 assertions, after the U62
+# block, COUNTED off its own `check_*` lines, every one unconditional. The pass that wrote it ran no
+# suite; the arm was run alone over a replica of this prologue, against the kit and against a
+# driver copy without the queue term.
+FLOOR_ASSERTIONS=176
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

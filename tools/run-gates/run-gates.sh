@@ -1024,6 +1024,18 @@ if [ -n "$TS_COMMON" ]; then
     # EXISTING, which is precisely the guard that made it unable to see the wedge.
     { ts_try_reap || ts_sweep_queue; } && continue
     TS_WAITED=$(( $(ts_now) - ts_start ))
+    # THE WAIT BEATS (TOOL-dDerivedDocket-64). Nothing else a waiter writes moves while it waits:
+    # the ticket is created once, the status file below is rewritten only when the position changes,
+    # and a gate log lands only when a leg finishes, which no waiter reaches. An out-of-process
+    # liveness reader dating a worktree by its newest write therefore read a healthy queued bar as
+    # silent, and a resumer acting on that verdict killed it. This write, on every tick that neither
+    # acquires nor makes reap or sweep progress, is the move such a reader sees: a file under THIS
+    # worktree's git dir, beside `gate-logs/`, read by its mtime and never parsed. It sits above the
+    # bound test so the tick that fails open still beats. It is NEVER REMOVED — not at the acquire,
+    # not by a trap: a removal would drop the newest move just before the first leg lands, and a
+    # leftover ages out by its mtime exactly as an old gate log does. No spawn: `printf` and the
+    # redirect are builtins, and `TS_WAITED` is already computed.
+    [ -n "$gd" ] && printf 'waited\t%s\n' "$TS_WAITED" > "$gd/gate-queue-heartbeat" 2>/dev/null || true
     if [ "$TS_WAITED" -ge "$TS_MAXWAIT" ]; then
       # FAILS OPEN, LOUDLY. A turnstile that can wedge a bar is worse than two bars: the run drops
       # its ticket and proceeds unqueued rather than becoming the outage. It contributes nothing to

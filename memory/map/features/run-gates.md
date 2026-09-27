@@ -216,6 +216,8 @@ world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDo
 
 **`--print-profile` carries a backstop's two terms.** `queue` is `TS_MAXWAIT`, derived above the verb's exit so it never reads 0, and `ceiling_max` the manifest's largest positive ceiling by the parse's own predicate: `-` for none, absent for a manifest that will not parse. The unattended driver sizes its bar's backstop from them. `TOOL-dDerivedDocket-27`.
 
+**A waiting bar beats.** On every tick it waits, the turnstile rewrites `gate-queue-heartbeat` under its own worktree's git dir, beside `gate-logs/`, and never removes it, so an out-of-process liveness reader sees a queued bar move before its first leg lands; the unattended driver's clock reads its mtime. `TOOL-dDerivedDocket-64`.
+
 ## Shared seams
 
 **The inlined `resolve_python` block.** Between the `>>> resolve_python` / `<<< resolve_python`

@@ -83,9 +83,10 @@ the stated boundary and the ask mandate are `unattended-mandate`.
 it fires only while the session is idle, so it cannot wake a stalled one; its prompt runs
 `--resume --keepalive-id`, then `--audit`, the unit stall probe. What wakes a run is the keepalive —
 the stop-guard at turn end, the stall-recorder at error end, the resume tick from the OS scheduler —
-three actors outside the session, reading one predicate, `--liveness`. The tick launches only on a
-lease the INDEX holds, on the node that took it; the reap is read back at `--landed` against the
-stop-guard's listing.
+three actors outside the session, reading one predicate, `--liveness`, whose clock counts a bar
+queued at the turnstile by the runner's heartbeat (`TOOL-dDerivedDocket-64`). The tick launches
+only on a lease the INDEX holds, on the node that took it; the reap is read back at `--landed`
+against the stop-guard's listing.
 
 **How a run stops, who drives it and which processes are its own has its own dossier.** HELD, the
 lease and the process ledger are `unattended-stops`.

@@ -33,7 +33,9 @@ bad=0
 # paper: 11 of the 20 are RED against the runner at that build's BASE and all 20 green after it.
 # Raised from 66 to 71 by TOOL-dDerivedDocket-25, which adds arm 22: five assertions, the same five
 # counted on the branch where the first bar never establishes (one FAIL and four SKIPs).
-FLOOR_ASSERTIONS=71
+# Raised from 71 to 74 by TOOL-dDerivedDocket-64, which adds arm 6c inside the position fixture:
+# three assertions, every one unconditional, counted off the block rather than read off a run.
+FLOOR_ASSERTIONS=74
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -333,9 +335,34 @@ done
              || nope "no durable queue-status file while waiting"
 grep -q 'queued at position' "$tmp/pos.out" && ok "a waiter announces its queue position on entry" \
                                             || nope "a waiter printed no position line"
+# ---- 6c (TOOL-dDerivedDocket-64): the waiter BEATS. `gate-queue-heartbeat` sits under the git dir the
+# ---- runner resolves while the waiter waits, and its mtime ADVANCES at one unchanged position — the
+# ---- silence a status file rewritten only on a position change would leave an out-of-process
+# ---- liveness reader. Polled, never slept a fixed time: under a loaded bar one loop iteration can
+# ---- outlast a fixed sleep. RED against a runner copy with the write line deleted (no file), and one
+# ---- writing it only when the position changes (no advance).
+qh="$R8/.git/gate-queue-heartbeat"
+qh1=$(stat -c %Y "$qh" 2>/dev/null) || qh1=""
+qh2=$qh1
+for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do
+  [ -n "$qh1" ] || break
+  sleep 1
+  qh2=$(stat -c %Y "$qh" 2>/dev/null) || qh2=""
+  { [ -n "$qh2" ] && [ "$qh2" -gt "$qh1" ]; } && break
+done
+[ -n "$qh1" ] && ok "a waiter writes gate-queue-heartbeat under its own git dir" \
+              || nope "no gate-queue-heartbeat under the git dir while waiting"
+{ [ -n "$qh1" ] && [ -n "$qh2" ] && [ "$qh2" -gt "$qh1" ]; } \
+  && ok "the heartbeat's mtime advances while the waiter waits at one position ($qh1 -> $qh2)" \
+  || nope "the heartbeat did not advance while the waiter waited (${qh1:-absent} -> ${qh2:-absent})"
 # release the holder we planted; the waiter must claim and then clean up after itself
 rm -rf "$B8"; wait "$w8" 2>/dev/null
 [ -f "$qs" ] && nope "the queue-status file survived the wait" || ok "the queue-status file is gone once the waiter stops waiting"
+# ...and the heartbeat is NOT cleaned up with it: a reader goes by its mtime, so a leftover ages out,
+# while a removal at the acquire would drop the newest move before the first leg lands. RED against a
+# runner copy removing it beside `gate-queue-status`.
+[ -f "$qh" ] && ok "the heartbeat outlives the wait, so the move nearest the first leg is kept" \
+             || nope "the runner removed gate-queue-heartbeat when the wait ended"
 
 # ---- 6b: the wait REACHES THE RUN RECORD, and is not merely printed ---------------------------
 # The status file above is deleted the moment the wait ends, the stdout line is not durable, and
