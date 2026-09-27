@@ -341,3 +341,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-27T22:25:54Z brief · item TOOL-dDerivedDocket-34 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-27T23:01:41Z dispatch · item 411fac91 TOOL-dDerivedDocket-34 · reason memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-33.md
+
+2026-09-27T23:17:53Z dispatch · item c2fd68d6 TOOL-dDerivedDocket-35 · reason .unattended.conf memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/BACKLOG.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/backlog memory/map/features/unattended-mandate.md memory/map/generated
+
+2026-09-27T23:17:58Z brief · item TOOL-dDerivedDocket-35 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md

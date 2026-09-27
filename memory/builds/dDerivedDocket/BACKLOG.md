@@ -395,3 +395,19 @@
 - KEEP · TOOL-dUnstalledConvoy-38 · signed triage verdict
 - KEEP · TOOL-dDerivedDocket-66 · awaits the owner's triage of 5 legacy holds that named no id
 - WONTDO · TOOL-aWeighedCompass-3 · superseded by TOOL-dDerivedDocket-34: its split-or-shorten call on the TOOL shard dissolves with the shard, now a generated view (design section 14)
+- KEEP · TOOL-dDerivedDocket-38 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-39 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-40 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-41 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-42 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-43 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-44 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-45 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-46 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-47 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-55 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-56 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-57 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-58 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-59 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- KEEP · TOOL-dDerivedDocket-60 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal

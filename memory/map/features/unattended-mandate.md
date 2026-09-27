@@ -119,6 +119,9 @@ seam: `asks:` — reuse for pointing a run at filed asks rather than a roster it
   on the advertised tip the range is empty and the leg announces that; `TOOL-dDerivedDocket-22`'s
   `landing_commit_of` supplies the endpoint.
 
-- **The mandate is inert in gov until `ASKS_CMD` is declared.** This repo's `.unattended.conf`
-  declares none, so an `asks:` line here refuses under check 70, and the one criterion that needs the
-  real producer skips with a named skip. `TOOL-dDerivedDocket-35` arms the key.
+- **The suite's real-producer arm names the producer and runs nothing.** `TOOL-dDerivedDocket-35`
+  armed gov's `ASKS_CMD` as the memory-tree generator's `--asks` mode, so an `asks:` line here is
+  graded rather than refused under check 70, and `asks-disposed` grades this repo's own closes. The
+  unit-16 arm in `unattended.test.sh` that reads that declaration only echoes it once it is set, so
+  the two parsed call shapes meet the real producer in `TOOL-dDerivedDocket-35`'s staged REDs on a
+  scratch clone of real content and nowhere on the bar.
