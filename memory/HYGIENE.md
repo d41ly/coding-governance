@@ -276,6 +276,10 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     ENTRY with continuation lines folded in, because this corpus wraps §9 and puts the detail in the
     wrap; rev-1 is exempt, and the engine announces a zero population rather than passing silently
     while the cutoff sits ahead of the corpus.
+    §8 is graded PER F-ITEM once the filename date reaches `FORK_ITEM_CUTOFF`, which supersedes the
+    section-wide reading there: at a terminal status, on either tier, each F-item's span carries its
+    own mark, quoted marks not counting; a Tier-2 §8 of any other shape reds at ANY status and under
+    `--staged`. The grammar is `TEMPLATE-SPEC.md`'s, and a zero population is announced likewise.
 
 13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
     and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so

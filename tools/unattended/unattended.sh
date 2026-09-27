@@ -2776,8 +2776,24 @@ refuse_if_terminal() { # run-state file · verb · [--recorded]
 # this repo catalogues, one delimiter over. A single-quoted `/.../` literal has no escape level to
 # lose, and it also keeps this function SLICEABLE: the sibling kit's conformance harness lifts this
 # body out of the shipped bytes and evaluates it, so a constant defined outside it would arrive empty.
-plan_state() { # spec file -> prints the M2 state
-  awk '
+#
+# TOOL-dDerivedDocket-31 - PER F-ITEM, FORWARD-ONLY. The second argument is the memory kit's
+# FORK_ITEM_CUTOFF, and every caller passes it from `load_fork_cutoff`. For a spec whose FILENAME
+# date is at or after it, section 8 has a regular shape and each fork is graded on its own: an F-item
+# opens on a column-0 `- **F<n>` bullet or a `### F<n>` sub-head, the `FACT-QUESTION` prefix
+# admitted before the id, and spans every line up to the next one, so its option bullets are its own.
+# Each span needs its own mark, matched with code spans and double-quoted spans removed, so a mark
+# quoted as an example resolves nothing. A column-0 bullet or sub-head before the first F-item, or
+# items and no F-item at all, is FORKED: that shape is what hid an open fork under a resolved one.
+# WHAT IT STILL CANNOT SEE: a fork written as a plain bullet INSIDE another F-item span belongs to
+# that span. The shape makes a declared fork gradeable; it cannot find an undeclared one. Blank, an
+# absent key, or an earlier date keeps the section-wide reading below, byte for byte.
+# The cutoff is passed IN rather than read here, so the function stays pure and sliceable.
+plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 state
+  local _psb="${1##*/}"
+  awk -v icut="${2:-}" -v fbase="$_psb" '
+    BEGIN { fdate = ""
+            if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH) }
     # TOOL-dBriefedPass-1 - KEYED ON THE HEADING TITLE, NOT ON THE ORDINAL. A TIER-1 SPEC LEGITIMATELY
     # DROPS `## 5. Production-readiness checklist`, so every section from five onward renumbers: the
     # ordinal form read a Tier-1 spec`s GATES as its acceptance criteria, its OPEN QUESTIONS as its
@@ -2809,10 +2825,10 @@ plan_state() { # spec file -> prints the M2 state
              if (sec != "") bound[sec] = 1
              cur = sec; next }
     cur == "" { next }
-    { line = $0; sub(/\r$/, "", line); gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
+    { raw = $0; sub(/\r$/, "", raw); line = raw; gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
     line == "" { next }
     { seen[cur] = seen[cur] 1
-      if (cur == "forks") { fl[++nf] = line; if (forkline == "") forkline = line } }
+      if (cur == "forks") { fl[++nf] = line; fr[nf] = raw; if (forkline == "") forkline = line } }
     END {
       thin = (seen["scope"] == "" || seen["acc"] == "" || seen["gates"] == "")
       # M2 orders the checks and the FIRST match wins, so THIN is decided before FORKED.
@@ -2842,6 +2858,26 @@ plan_state() { # spec file -> prints the M2 state
       # line; that needs section 8 to have a regular shape, and making it regular is a scope change
       # rather than a predicate change. Parked, not implied away.
       lf = tolower(forkline)
+      # TOOL-dDerivedDocket-31 - THAT SCOPE CHANGE, forward-only: at or after the cutoff the shape is
+      # regular and each F-item span is graded alone. `fr` holds the UNTRIMMED lines, because an
+      # F-item and the shape rule are both column-0 facts; `fl` feeds the span text.
+      if (icut != "" && fdate != "" && fdate >= icut) {
+        nfi = 0; plain = 0
+        for (i = 1; i <= nf; i++) {
+          if (fr[i] ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || fr[i] ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) { span[++nfi] = fl[i]; continue }
+          if (nfi == 0) { if (fr[i] ~ /^[-*][[:space:]]/ || fr[i] ~ /^###[[:space:]]/) plain++ }
+          else span[nfi] = span[nfi] " " fl[i]
+        }
+        # A none form is a section carrying NO item; one carrying items and no F-item is the shape
+        # finding, and so is any bullet or sub-head before the first F-item.
+        if (nfi == 0 && items == 0) { if (lf ~ /^none/ || lf ~ /^n\/a/) print "READY"; else print "FORKED"; exit }
+        if (nfi == 0 || plain > 0) { print "FORKED"; exit }
+        for (k = 1; k <= nfi; k++) {
+          s = span[k]; gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s)
+          if (s !~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) { print "FORKED"; exit }
+        }
+        print "READY"; exit
+      }
       # AN EMPTY SECTION IS A REFUSAL, not a pass — the ratified fork, and TEMPLATE-SPEC names both
       # readers: "A section 8 with neither an item nor a `none` form is a refusal, not a pass." The
       # hygiene reader already refused it; this one printed READY, so the two readers the spec pairs
@@ -2859,6 +2895,20 @@ plan_state() { # spec file -> prints the M2 state
         if (any_mark) print "READY"; else print "FORKED"
       }
     }' "$1"
+}
+# TOOL-dDerivedDocket-31 S5 - the planning side's ONE read of the memory kit's FORK_ITEM_CUTOFF, and
+# its one numbered refusal. The reader is the library's, shared with the pass-order leg, and it reads
+# the file as TEXT: this driver never sources a second kit's conf. Every `plan_state` caller here
+# passes FORK_CUTOFF, so a caller that forgot the load would pass blank and grade section-wide, which
+# the marker-contract harness's call-site count is there to catch.
+FORK_CUTOFF=""
+load_fork_cutoff() { # -> sets FORK_CUTOFF; rc 1 after a numbered refusal
+  local _fc
+  if ! _fc=$(read_fork_cutoff "$ROOT/.memory-tree.conf"); then
+    fail 86 "the memory tree's FORK_ITEM_CUTOFF cannot be read as text, so section 8 would be graded here under a cutoff the hygiene gate does not use: $_fc"
+    return 1
+  fi
+  FORK_CUTOFF="$_fc"
 }
 
 # TOOL-cBriefedPilot-6 - the roster join. M2 makes the README's authored Units table the roster and
@@ -3906,6 +3956,7 @@ verb_plan() { # slug
   # No branch of this verb assigns the printed line any more.
   local _live="" _miss1="" _ask1=""
   check_slug "$slug" || return 1
+  load_fork_cutoff || return 1
   dir="$M/builds/$slug"
   # A malformed pair is a NAMED refusal, never a silent fall-through to the no-roster path. `region`
   # exits 3 for ABSENT and for MALFORMED alike, and treating that one status as "absent" is the
@@ -4039,7 +4090,7 @@ verb_plan() { # slug
     # the S6 pass above and cannot reach here: a row exists in the region only for a spec whose status
     # header parsed, so this branch grades a file already known to be a unit.
     st="${SPEC_ST[$spec]:-}"
-    state=$(plan_state "$spec")
+    state=$(plan_state "$spec" "$FORK_CUTOFF")
     # The grade is printed BESIDE `DONE`, never in place of it. This line USED to overwrite it, so a
     # unit closed against a spec stating no acceptance criterion read exactly like one closed against
     # a complete spec, and the one predicate that knew otherwise was discarded at the moment the
@@ -5134,6 +5185,9 @@ verb_preflight() { # slug · keepalive-id
   # run-state file is unchanged and be telling the truth.
   check_ask_mandate "$slug" "$rel" || true
   check_backlog_mode_shift || true
+  # TOOL-dDerivedDocket-31 - the cutoff the spec-audit line below grades FORKED with, loaded here so
+  # an unreadable one refuses while the tree is still untouched.
+  load_fork_cutoff || true
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
   [ "$status" = 0 ] || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
@@ -5388,7 +5442,7 @@ print_spec_audit_line() { # slug · run-state file
   n=$(unit_rows "$(readme_of "$1")" 2>/dev/null | row_ids_of | grep -c .)
   [ "${n:-0}" -ge 2 ] && why="$n units in the generated region"
   for _sp in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
-    [ "$(plan_state "$_sp")" = FORKED ] || continue
+    [ "$(plan_state "$_sp" "$FORK_CUTOFF")" = FORKED ] || continue
     why="${why:+$why, }a spec grading FORKED"; break
   done
   echo "unattended: spec-audit — not owed (opt-in)${why:+; recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: $why}"
@@ -7424,6 +7478,7 @@ $_bcnon"
       # cutoff grandfathers — and a term that passes over any of them silently is indistinguishable
       # from a term that graded them clean.
       local _bcskip=""
+      load_fork_cutoff || return 1
       if ! load_spec_facts $(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1; then
         _bcskip="$_bcskip · the spec-fact reader refused, so no unit could be graded"
       fi
@@ -7439,7 +7494,7 @@ $_bcnon"
         if ! printf '%s\n%s\n' "$SPEC_THIN_CUTOFF" "$_bcdate" | sort -C; then
           _bcskip="$_bcskip · $_bcid (dated $_bcdate, before the declared cutoff $SPEC_THIN_CUTOFF)"; continue
         fi
-        [ "$(plan_state "$_bcsp")" = THIN ] && _bcthin="$_bcthin $_bcid"
+        [ "$(plan_state "$_bcsp" "$FORK_CUTOFF")" = THIN ] && _bcthin="$_bcthin $_bcid"
       done
       if [ -n "$_bcthin" ]; then
         DOD_OUT="a unit is CLOSED against a spec the kit's own predicate grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing ever stated what done meant for it:$_bcthin"
@@ -9086,7 +9141,8 @@ verb_dispatch() { # slug · unit · writes...
     fail 49 "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: $unit"
     return 1
   fi
-  _d_state=$(plan_state "$_d_spec")
+  load_fork_cutoff || return 1
+  _d_state=$(plan_state "$_d_spec" "$FORK_CUTOFF")
   case "$_d_state" in
     THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
   esac

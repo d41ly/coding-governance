@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-31 — fork items and delegated-pass carriers
 
-**Status:** SPECCED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 29
+**Status:** CLOSED · rev-6 · 2026-09-27 · node d · Tier-2 · base fb07ca25 · streams tooling · order 29
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-27-build-TOOL-dDerivedDocket-31-1-acceptance-ledger.md](../build/2026-09-27-build-TOOL-dDerivedDocket-31-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 |
@@ -34,8 +35,10 @@ and make M6 bind delegated passes only, with the rule carried into the tracked r
   cutoff: every F-item span must carry its own conforming mark, matched over the span with whitespace
   squeezed, so a wrapped mark still counts. The hygiene reader in
   `tools/memory-tree/check-memory-hygiene.sh` applies it where it grades section 8 today, at a
-  terminal status on a Tier-2 spec. `plan_state` in `tools/unattended/unattended.sh` applies it to
-  any spec it grades. Observed by AC1, AC2 and AC4.
+  terminal status on either tier, since `TOOL-cSettledDocket-3` hoisted that block above the Tier-1
+  cut; there a Tier-1 spec breaking S4's shape reds too, because the shape arm itself is Tier-2
+  only. `plan_state` in `tools/unattended/unattended.sh` applies it to any spec it grades. Observed
+  by AC1, AC2 and AC4.
 - **S3** A quoted mark does not count. Inside an F-item span, a backticked code span and a
   double-quoted span are removed before the mark is matched. Observed by AC3.
 - **S4** The shape. For a spec dated at or after the cutoff whose section 8 is not a none-form, a
@@ -44,13 +47,16 @@ and make M6 bind delegated passes only, with the rule carried into the tracked r
   as its other shape arms do; `plan_state` prints FORKED for it. Observed by AC6 and AC14.
 - **S5** One declaration. `FORK_ITEM_CUTOFF` is declared once, in `.memory-tree.conf`, and blank
   means off. The hygiene engine reads it with its sibling cutoffs. `plan_state` takes it as a second
-  argument, and every caller passes it: `--plan`, the `build-complete` term and `--dispatch` in the
-  driver, and `tools/unattended/check-pass-order.sh`, which slices the function. Each caller reads
+  argument, and every caller passes it: `--plan`, the preflight spec-audit line
+  (`print_spec_audit_line`), the `build-complete` term and `--dispatch` in the driver, and
+  `tools/unattended/check-pass-order.sh`, which slices the function. Each caller reads
   the one key through ONE text reader in `tools/unattended/lib-unattended.sh`, never by sourcing the
   conf: the last assignment wins, one layer of matching quotes is stripped, and a trailing comment
   outside quotes is dropped, which is what the hygiene engine's `.` of the same file yields; a
   resolved value that is neither blank nor a date matching `[0-9]{4}-[0-9]{2}-[0-9]{2}` refuses,
-  numbered; and a file that assigns the key on a line the reader's own pattern does NOT match — an
+  numbered — driver check 86, raised once by `load_fork_cutoff`, while `check-pass-order.sh` exits 2
+  with the reader's reason as its other conf refusals do; and a file that assigns the key on a line
+  the reader's own pattern does NOT match — an
   `export` prefix, a leading indent, an assignment inside a conditional — refuses, numbered and
   naming that line, rather than falling through to blank. An assignment the reader DOES match whose
   value is empty is the declared off state and resolves blank, which is the adopter default; it is
@@ -180,7 +186,7 @@ That refusal is what closes the hole a fixture table cannot. Blank is the declar
 legal sourced spelling the text reader does not model — `export FORK_ITEM_CUTOFF="2026-09-15"`, the
 same assignment indented, an assignment inside a conditional — would otherwise resolve to blank,
 turn per-item grading off on the planning side, and leave the hygiene side ON, which takes its value from the engine's own `.` of the same
-file (`tools/memory-tree/check-memory-hygiene.sh:113`). Two readers, one corpus, two cutoffs,
+file (`tools/memory-tree/check-memory-hygiene.sh:132`). Two readers, one corpus, two cutoffs,
 nothing red: the exact class the gotcha records, from `.unattended.conf`'s `BYPASS_BAN` going RC=1
 to RC=0 while the leg printed that the scan ran. The in-tree precedent for the refusal is the leg's
 own name reader at `tools/unattended/check-unattended.sh:147`, which models the `export` prefix and
@@ -397,9 +403,10 @@ NO CAP IS RAISED here.
 - **AC13** — When `bash tools/memory-tree/marker-contract.test.sh` enumerates every `plan_state` call
   site in `tools/unattended/unattended.sh` and `tools/unattended/check-pass-order.sh` by grep, each
   passes two arguments and the count is printed; and in a scratch fixture build holding a post-cutoff
-  spec whose F2 is unmarked below a marked F1, `unattended.sh --plan`, `--dispatch`, the
-  build-complete term and `check-pass-order.sh` each report FORKED or refuse.
-  Red when: one caller still passes one argument, so it keeps section-level grading and dispatches
+  spec whose F2 is unmarked below a marked F1, `unattended.sh --plan` reports FORKED. `--dispatch`,
+  the build-complete term and `check-pass-order.sh` act on MISSING and THIN alone, at BASE and
+  after, so they admit a FORKED spec either way; their half is the structural count.
+  Red when: one caller still passes one argument, so it keeps section-level grading and plans
   READY on an unmarked F2 below a marked F1, the defect S2 fixes.
   permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, NOT a
   held one, so the build's one post-build bar covers its half; the file invocation is denied in
@@ -440,6 +447,7 @@ NO CAP IS RAISED here.
 New arm: `tools/memory-tree/marker-contract.test.sh` · post-cutoff F-item documents with an unmarked sibling, a quoted mark, a wrapped mark, option bullets, a leading plain bullet, the none-line case, a blank cutoff, an absent cutoff key, and the three sourced spellings the text reader must resolve or refuse · the harness's case count
 New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a post-cutoff Tier-2 fixture with a plain bullet before its first F-item · the engine suite's executed-assertion floor, by the assertions its new arm executes, and the engine's arms floor, by any branch the new arm adds
 New arm: `tools/memory-tree/marker-contract.test.sh` · every plan_state call site, enumerated and counted · the harness's case count
+New arm: `tools/unattended/unattended.test.sh` · a fixture conf whose cutoff is not a date, and one assigning it behind `export` · none; the new check-86 branch is armed rather than pinned
 
 ## 8. Open questions
 
@@ -598,13 +606,27 @@ New arm: `tools/memory-tree/marker-contract.test.sh` · every plan_state call si
 - rev-5 · 2026-09-21 · order re-declared from 31 to 29 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 29, alone, because M6 condition 3 or the flip keeps it off any shared wave. No criterion, design or edge moved.
+- rev-6 · 2026-09-27 · §2 §4 §6 §7 §10 · S2 S5 · AC13 · regrounded at the build pass on c60e3109,
+  after the origin/main merge. The hygiene section-8 block sits at
+  `tools/memory-tree/check-memory-hygiene.sh:1599-1691` and runs for EVERY tier since
+  `TOOL-cSettledDocket-3` hoisted it above the Tier-1 cut, so S2 says so, and a Tier-1 terminal
+  spec breaking the shape reds in that block because the S4 arm is Tier-2 only; the engine's `.` of
+  the conf moved to `:132`. `plan_state` sits at `tools/unattended/unattended.sh:2779` and has a
+  FOURTH driver caller the regrounding missed, the preflight spec-audit line, which is the one caller
+  besides `--plan` that reads FORKED; S5 names it. S5's numbered refusal is now spelled: driver
+  check 86, raised once by `load_fork_cutoff`, and a plain exit 2 in the pass-order leg, which also
+  writes each historical spec blob under its own basename so the filename date reaches the
+  classifier. AC13's fixture half is AMENDED: `--dispatch`, the build-complete term and the
+  pass-order leg act on MISSING and THIN alone at BASE and after, so none of them can report FORKED
+  and their half is the structural count. §7 names the driver suite's new arm; §10's citations are
+  re-measured.
 
 ## 10. Reuse audit
 
 Both readers already exist, and this unit changes their predicate rather than adding a third. The
 hygiene side is the tightened section-8 block in `tools/memory-tree/check-memory-hygiene.sh` at
-`:1455-1512`, gated today by `FORK_MARK_CUTOFF`; the planning side is `plan_state` in
-`tools/unattended/unattended.sh`, whose section-8 branch runs from `:1790`. The agreement proof is the
+`:1599-1691` at the build pass, gated today by `FORK_MARK_CUTOFF`; the planning side is `plan_state` in
+`tools/unattended/unattended.sh`, whose section-8 branch runs from `:2820`. The agreement proof is the
 case table in `tools/memory-tree/marker-contract.test.sh`, which slices `plan_state` out of the
 shipped bytes and already pins the gap this unit closes. `python tools/codebase-map/reuse_lookup.py
 "grade each open question fork in a spec section individually by its resolution mark"` returned
@@ -622,8 +644,9 @@ rejected.
 
 BASE is `fb07ca25`, origin/main 210 commits past the `abac6d59` this spec was first audited at.
 `tools/memory-tree/check-memory-hygiene.sh` differs only in its version line, and `plan_state` only
-in position. Its callers are the same four: `verb_plan` at `tools/unattended/unattended.sh:2244`,
-the build-complete term at `:3611`, `--dispatch` at `:4947`, and `check-pass-order.sh` at
+in position. At the build pass, on c60e3109, its callers are `verb_plan` at
+`tools/unattended/unattended.sh:4042`, `print_spec_audit_line` at `:5391`, the build-complete term
+at `:7442`, `--dispatch` at `:9089`, and `check-pass-order.sh` at
 `tools/unattended/check-pass-order.sh:150` and `:441`; aProbedUnit's `--audit` calls none. The
 unattended kit library gained `read_brief_paths` and no conf reader, and the driver's new
 `read_bound_key` validates values already sourced from `.unattended.conf`, so S5's text reader has

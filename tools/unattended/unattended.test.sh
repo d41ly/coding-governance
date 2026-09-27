@@ -1860,6 +1860,26 @@ reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it
 hit "$(run --plan tPlan)" "FORKED"
 git reset -q --hard HEAD~1; git clean -qfd
 
+# ---- TOOL-dDerivedDocket-31 - the memory kit's FORK_ITEM_CUTOFF reaches --plan, read as TEXT. Past
+# ---- it, section 8 is graded per F-item, so an unmarked F2 below a marked F1 is FORKED where the
+# ---- section-wide reading says READY; blank is the declared off state; and a cutoff the reader cannot
+# ---- resolve is check 86 naming why, never a silent blank. The conf is rewritten in the working
+# ---- tree between runs, because the driver reads it from disk, as the hygiene engine does.
+reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "- **F1 — a?** options.
+  RESOLVED (owner, 2026-08-01): a.
+- **F2 — b?** still open, and carrying no mark."
+printf 'MEMORY_ROOT=memory\nFORK_ITEM_CUTOFF="2026-07-01"\n' > .memory-tree.conf; fixture
+hit "$(run --plan tPlan)" "next: ARCH-tPlan-1 (FORKED)"
+printf 'MEMORY_ROOT=memory\nFORK_ITEM_CUTOFF=""\n' > .memory-tree.conf
+hit "$(run --plan tPlan)" "next: ARCH-tPlan-1 (READY - build it)"
+printf 'MEMORY_ROOT=memory\nFORK_ITEM_CUTOFF="2026-07-01x"\n' > .memory-tree.conf
+out=$(run --plan tPlan)
+hit "$out" "the memory tree's FORK_ITEM_CUTOFF cannot be read as text, so section 8 would be graded here under a cutoff the hygiene gate does not use"
+hit "$out" "which is neither blank nor a zero-padded ISO date"
+printf 'MEMORY_ROOT=memory\nexport FORK_ITEM_CUTOFF="2026-07-01"\n' > .memory-tree.conf
+hit "$(run --plan tPlan)" "in a spelling this text reader does not resolve: export FORK_ITEM_CUTOFF"
+git reset -q --hard HEAD~1; git clean -qfd
+
 # ...and THIN wins over FORKED, because M2 orders the checks and the first match wins. Without this
 # arm the two are indistinguishable whenever a spec is both.
 reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 SPECCED "" "AC1 it works" "the bar" "F1 which way?"; fixture

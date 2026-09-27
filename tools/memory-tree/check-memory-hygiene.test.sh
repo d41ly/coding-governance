@@ -2725,6 +2725,40 @@ for bmbad in buildz Builds ' builds'; do
     || { echo "FAIL the BACKLOG_MODE abort did not name its legal values"; st=1; }
 done
 
+# ---- TOOL-dDerivedDocket-31 AC6 — THE F-ITEM SHAPE ARM, under --staged, in a tree of its own so no
+# ---- verdict above moves. A LIVE Tier-2 spec dated past FORK_ITEM_CUTOFF whose §8 carries a plain
+# ---- bullet before its first F-item is the finding: a shape arm that ran only at a terminal status
+# ---- would let a live spec escape per-item grading by never writing an F-item. The same bytes dated
+# ---- BEFORE the cutoff, and the same bytes with the key BLANK, are the two controls, so the silence
+# ---- they assert is an observation of the guard and not the absence of a run.
+FI=$TMP/fitem
+mkdir -p "$FI"
+write_fork_spec() { # filename date -> a live Tier-2 spec, the only one in the tree, staged
+  rm -rf "$FI/memory/builds/tFork"; mkdir -p "$FI/memory/builds/tFork/spec"
+  good10 | sed 's/^none$/- an early note written as a bullet\n- **F1 — which way?** options, and no mark yet./' \
+    > "$FI/memory/builds/tFork/spec/$1-spec-ARCH-tFork-1.md"
+  ( cd "$FI" && git add -A ) >/dev/null 2>&1
+}
+( cd "$FI" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md
+  git add -A && git commit -q -m fitem --no-verify ) >/dev/null 2>&1
+FI_CONF='MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n'
+printf "${FI_CONF}FORK_ITEM_CUTOFF=\"2026-09-10\"\n" > "$FI/.memory-tree.conf"
+write_fork_spec 2026-09-20
+out_fi=$(cd "$FI" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF '2026-09-20-spec-ARCH-tFork-1.md (§8 is not F-item shaped, required of a Tier-2 spec at/after FORK_ITEM_CUTOFF 2026-09-10: a bullet or sub-head sits before the first F-item' <<<"$out_fi" \
+  || { echo "FAIL the F-item shape arm did not name a LIVE Tier-2 spec whose §8 opens with a bullet before its first F-item, under --staged"; st=1; }
+write_fork_spec 2026-09-01
+out_fi=$(cd "$FI" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape arm fired on a spec dated BEFORE FORK_ITEM_CUTOFF, which reds frozen specs"; st=1; }
+printf "${FI_CONF}FORK_ITEM_CUTOFF=\"\"\n" > "$FI/.memory-tree.conf"
+write_fork_spec 2026-09-20
+out_fi=$(cd "$FI" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape arm fired with FORK_ITEM_CUTOFF BLANK, the declared off state every adopter ships with"; st=1; }
+
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
 # 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
 # shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
@@ -2740,7 +2774,9 @@ done
 # still catches a block stranded past an exit, which is what the pin is for.
 # RAISED 425 -> 431 by TOOL-dDerivedDocket-23, which adds six executed `--offenders` assertions
 # beside the main block's. Derived from the block, for the reason the paragraph above gives.
-FLOOR_ASSERTIONS=431
+# RAISED 431 -> 434 by TOOL-dDerivedDocket-31, whose F-item shape block adds three executed
+# assertions, none inside a loop. Derived from the block, for the same reason.
+FLOOR_ASSERTIONS=434
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

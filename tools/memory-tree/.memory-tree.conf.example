@@ -158,6 +158,13 @@ SPEC_GUARD_LEGS_CUTOFF=""
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.
 FORK_MARK_CUTOFF=""
 
+# F-item ratchet (check 12): at or after this date a spec's §8 is F-item shaped — each fork opens on a
+# column-0 `- **F<n>` bullet or a `### F<n>` sub-head and carries its own resolution mark in its span —
+# and it supersedes the key above for the specs it reaches. A Tier-2 §8 of any other shape reds at
+# any status. Blank = never required. The unattended kit's planning verb reads this same line as
+# TEXT, so keep it a plain column-0 assignment: an `export` prefix or an indent is refused there.
+FORK_ITEM_CUTOFF=""
+
 # Review-verdict ratchet (check 22): a review record whose FILENAME date is on or after this must
 # open with one `## Verdict: <member>` line from the closed set. Blank = never required. Same
 # grandfathering rule; the wrap-up derivation reads these verdicts, so a corpus without them makes

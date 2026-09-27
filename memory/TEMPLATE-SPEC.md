@@ -130,11 +130,12 @@ an absent region cannot be told from a spec nobody has recorded against.
   `### Inventory` (name every identifier the unit will MINT, and where this repo declares naming
   cells, name each one beside the cell that grades it) · `### Migration` · `### Rollout` ·
   `### Files touched (estimate)` · `### Alternatives rejected`.
-- **Resolved forks:** mark each fork in §8 in place, naming the RESOLVER — `RESOLVED (owner,
+- **Resolved forks:** mark each fork in §8 in place — from `FORK_ITEM_CUTOFF`, each F-item in its
+  own span — naming the RESOLVER: `RESOLVED (owner,
   <date>): <pick>` for the owner's own decision, `RESOLVED (agent, <date>, delegated): <pick>` when a
   standing mandate delegated the resolver authority. Never sign as the owner for a decision the owner
-  did not make; the two are indistinguishable afterwards otherwise. The mark is prose — the hygiene
-  gate reads only §8's first non-blank line —
+  did not make; the two are indistinguishable afterwards otherwise. The mark is a SHAPE both §8
+  readers grade (the skeleton's §8 says how),
   and add the `ratified <date>` pointer to the header tail. §8 must read `none` or be fully
   RESOLVED before the status may go CLOSED/WONTDO (machine-checked).
 
@@ -272,6 +273,32 @@ that the fold actually touched what it names, exactly as the acceptance-witness 
 backticked token and not the thing the token points at. What it buys is that a resumed session, or
 the next round's folder, can re-read what a fold invalidated instead of re-reading the whole spec.
 
+## FORK_ITEM_CUTOFF — §8 is F-item shaped, and each fork is graded alone
+
+Required on a spec of EITHER tier whose FILENAME date is on or after `FORK_ITEM_CUTOFF`
+(`.memory-tree.conf`; blank turns it off). It supersedes the section-wide reading
+`FORK_MARK_CUTOFF` gives the specs it reaches, so no landed spec changes verdict.
+
+```
+F-item open = "- **" [ "FACT-QUESTION · " ] "F" <digits> ( "**" | " " )  |  "### " [ "FACT-QUESTION · " ] "F" <digits>
+F-item span = its open line + every line after it, up to the next F-item open or the end of §8
+resolved    = the span, code spans and double-quoted spans removed, whitespace squeezed, carries the mark
+```
+
+Both spellings in use are admitted, `- **F1** — <question>` and `- **F1 — <question>**`: the fork id
+at the head of the bold label is the discriminator. An option bullet's label does not begin with one,
+so it belongs to the span above it and never needs a mark of its own. A mark may wrap; a mark QUOTED
+in backticks or double quotes resolves nothing.
+
+A §8 carrying no item and opening with `none` or `n/a` is the none form. Any other §8 opens its first
+item as an F-item: a column-0 bullet or sub-head before the first F-item, or items with no F-item at
+all, is a finding. Check 12 reports that shape on a Tier-2 spec at ANY status, `--staged` included,
+and grades each F-item's mark at a terminal status on either tier. The unattended planning verb
+prints FORKED for the same bytes, reading this one declaration as text.
+
+**What it cannot see.** A fork written as a plain bullet INSIDE another F-item's span belongs to that
+span. The shape makes a declared fork gradeable; it cannot find an undeclared one.
+
 ## The skeleton (copy everything below this line)
 
 ```markdown
@@ -399,16 +426,17 @@ this unit adds or moves. The rules are the §7 section above this skeleton.
 
 ## 8. Open questions
 
-One fork per bullet or ### sub-head; options and tradeoffs may span lines. Each fork carries a
+One fork per F-item, a `- **F<n> — <question>**` bullet or a `### F<n>` sub-head at column 0 (the
+FORK_ITEM_CUTOFF section above); options and tradeoffs span the lines under it. Each fork carries a
 recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick>, or
 RESOLVED (agent, <date>, delegated): <pick> under a mandate. Write `none`
 when clear.
 
 **Mark it in place**, naming resolver and authority, never `(owner, …)` for a decision the owner
 did not make. The mark must be the documented SHAPE — the word, then
-`(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each
-item: with any item present ONLY a conforming mark resolves it, the first line does not vote, and
-the paragraphs below say what that cannot see.
+`(<owner|agent>, <date>[, delegated])` — and it may WRAP. From `FORK_ITEM_CUTOFF` both readers grade
+each F-item's span alone. Before it they grade the SECTION: with any item present ONLY a conforming
+mark resolves it, the first line does not vote, and the paragraphs below say what that cannot see.
 
 **The mark is a SHAPE a machine reads.** Two readers grade it — the
 hygiene gate for a spec at a terminal status, and the planning verb for a live build — and both
@@ -422,15 +450,16 @@ is the section as one whitespace-squeezed string: a section carrying items and n
 anywhere is unresolved, and a first line that merely CONTAINS the word no longer resolves it. A §8
 with neither an item nor a `none` form is a refusal, not a pass.
 
-**What they do NOT grade, stated because the obvious tightening is wrong here.** They do not grade
-PER ITEM. That needs a fork bullet to be distinguishable from an OPTION bullet, and this corpus does
+**What they do NOT grade before that cutoff, stated because the obvious tightening was wrong
+there.** They do not grade PER ITEM. That needs a fork bullet to be distinguishable from an OPTION
+bullet, and that corpus does
 not distinguish them — measured: of 287 §8 bullets, 69 carry descriptive labels, and among those are
 both resolved forks and genuinely open ones. So a label-shape discriminator UNDER-counts and lets a
 real open fork pass, which is worse than the over-counting it would replace; the over-counting was
 measured too, calling a RESOLVED fork unresolved on a live tracked spec whose three option bullets
 each demanded their own mark. The consequence to know: an unresolved fork sitting below an honest
 `none` opening line is NOT detectable, and is pinned as a gap in both readers' fixtures rather than
-implied away. Closing it needs §8 to have a regular shape, which is a scope change.
+implied away. The F-item shape is the regular shape that closes it, forward from its cutoff.
 
 A fork that a stated PROBE decides, rather than a judgment call, may carry `FACT-QUESTION · ` at the
 head of its bolded label, before the fork id. The prefix is transparent to resolution: it never marks
