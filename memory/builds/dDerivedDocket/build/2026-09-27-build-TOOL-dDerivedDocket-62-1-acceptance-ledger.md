@@ -27,7 +27,10 @@ head of the derived-terminal branch (AC6, 6) and one ahead of the observed-landi
 observed read, 2); the tick arms against a driver whose verdict chain drops ELSEWHERE (10), one
 placing it after FINISHED-UNSTAMPED (3) and a tick without the NO RUN BRANCH row (3); the stop-guard
 arm against a hook without the `elsewhere` row (3). Spec rev-7 records that the no-run-branch tick
-arm is RED against the tick copy, not the driver one.
+arm is RED against the tick copy, not the driver one. Acting on the bug-class checklist's
+two-answers class, unit 61's re-bind row now reads the run's branch and this worktree's HEAD
+through `resolve_holder_worktree` rather than a second spelling of the same key, with its behaviour
+unchanged: its AC23 arm ran green beside this unit's block behind the same replica, 47 of 47.
 
 AC3, AC9, AC11, AC12, AC13 and AC14 carry `permission:` lines, so none gets a line here; their direct
 checks ran all the same. AC3's dry-run printed `skip · HELD` for the run worktree and
@@ -56,11 +59,11 @@ with digits folded and `git status --porcelain` alike.
   still refused, and the run worktree printed `presumed-stopped` and took the run over. HELD arm: a
   HELD record committed before the sibling was added read `verdict: ELSEWHERE` there and its
   take-over refused at 58, writing nothing in either worktree, while the run worktree took it over.
-- AC5 — `a detached HEAD` — detached, the linked worktree's refusal ended `This worktree: a detached
-  HEAD`; with the run worktree on `parked` it said no worktree on this node has `refs/heads/unit`
-  checked out; with `unit` deleted it said no branch of that name exists and named creating it at a
-  commit carrying the record; re-created and checked out, the run worktree's call met unit 61's
-  live-session row at 58 with no holder message.
+- AC5 — `a detached HEAD` — detached, the linked worktree's refusal ended
+  `This worktree: a detached HEAD`; with the run worktree on `parked` it said no worktree on this
+  node has `refs/heads/unit` checked out; with `unit` deleted it said no branch of that name exists
+  and named creating it at a commit carrying the record; re-created and checked out, the run
+  worktree's call met unit 61's live-session row at 58 with no holder message.
 - AC6 — `this worktree is not on the run's branch` — under `in-place`, `--status` printed
   `phase LANDED (derived:`; on a new `rerun` branch `--resume tRun --keepalive-id k9` printed unit
   61's out-of-scope row unobserved, `nothing to resume` observed, and the observed-landing row with

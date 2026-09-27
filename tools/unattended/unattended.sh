@@ -6187,8 +6187,11 @@ verb_resume() { # slug
     # other branch — a re-run build's fresh worktree, whose keepalive tick runs before its
     # `--preflight` — it writes nothing, or that `--preflight` would meet a staged previous record.
     if [ -n "$KID" ] && [ -n "$DP_LANDING" ] && ! read_landed_observation "$slug" "$DP_LANDING"; then
-      rb=$(fact "$rel" run-branch); [ -n "$rb" ] || rb=$(fact "$rel" branch-ref)
-      cur=$(GIT symbolic-ref -q HEAD 2>/dev/null) || cur=""
+      # The run's branch and this worktree's HEAD through the one derivation of both
+      # (TOOL-dDerivedDocket-62), so this scope and the holder rule cannot key one record two ways.
+      resolve_holder_worktree "$rel" || true
+      rb=$HW_REF; cur=$HW_HEAD
+      case "$cur" in detached|unreadable) cur="" ;; esac
       if [ -n "$rb" ] && [ "$cur" != "$rb" ] && { [ "$LANDER_MODE" = in-place ] || [ "$cur" != "$DP_AREF" ]; }; then
         verb_status "$slug" || true
         echo "unattended: nothing to resume — this landing is on the remote and --landed has not observed it, and its --landed runs on the record's run branch $rb, not on ${cur:-a detached HEAD}, so nothing was written"
