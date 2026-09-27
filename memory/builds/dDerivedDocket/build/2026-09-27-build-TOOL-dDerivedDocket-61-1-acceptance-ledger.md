@@ -36,8 +36,9 @@ and process-ledger blocks were re-run the same way: the HELD block's executed co
 parent and now, and the whole file's static count moved by exactly the 98 new assertions.
 
 Four reds that exist at the parent and are not this unit's surfaced on those replicas, each
-reproduced against the parent's driver and suite unchanged: the HELD block's `AC4 the history row
-does not record the unreachable node` (the row gained `· resume` in unit 5), the `--status` field
+reproduced against the parent's driver and suite unchanged: the HELD block's unreachable-node arm,
+`AC4 the history row does not record the unreachable node` (the row gained `· resume` in unit 5),
+the `--status` field
 arm's `· parked 1` over a derived-LANDED fixture, and in region one the `--status`/`--resume`
 agreement arm and `resume names the directive table`, plus the conf-default arm naming `CORE_FLOOR`.
 
@@ -62,9 +63,9 @@ line spells a kit path, every new name answered `OK` to `lexicon.py --suggest`, 
   `verdict: HELD` with `stale: yes`, and its fourteen keys in their order.
 - AC6 — `"reason":"held"` — the hook fed the HELD fixture's session exited 0, printed nothing, and
   its sidecar line carried `"reason":"held"`; the same fixture at BUILDING was blocked `run-open`.
-- AC7 — `skip · HELD` — the tick's `--dry-run` over the HELD fixture printed `skip · HELD · its
-  restart is the durable schedule --hold printed, never this tick` and no `resumed ·`; at BUILDING it
-  printed `resumed · attempt 1`.
+- AC7 — `skip · HELD` — the tick's `--dry-run` over the HELD fixture printed its `skip · HELD`
+  decision, naming the durable schedule `--hold` printed as the restart, and no `resumed ·`; at
+  BUILDING it printed `resumed · attempt 1`.
 - AC8 — `phase LANDED (derived:` — `T`'s `--resume --keepalive-id k2` over a pushed LANDING recorded
   session `T` and keepalive `k2`, printed both, staged the record and left it deriving LANDED;
   `primary` `--landed` from `T` passed checks 2 and 55 and wrote `LANDED`, `in-place` reached the
