@@ -1267,7 +1267,7 @@ fi
 # TWO MORE, unfiled until TOOL-cSpliceWarden-2, and the second was found only by running the
 # candidate over the real tree before wiring it:
 #   * the name may carry a same-day DISAMBIGUATOR after the date — two builds rotated to 2026-08-17
-#     and the second is `TOOL.2026-08-17b.md` — and the old `<date>\.md$` anchor did not enumerate it.
+#     and the second carried a `b` after the date — and the old `<date>\.md$` anchor did not enumerate it.
 #   * the note is read from the index PREAMBLE, never a fixed `head -3`. This repo's own shard carries
 #     its rotation notes on lines 4 and 5, so widening the path resolution WITHOUT widening the window
 #     manufactures two false reds against notes that are plainly there.

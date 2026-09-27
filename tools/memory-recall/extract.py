@@ -148,11 +148,19 @@ _ROOT = re.escape(CONF.memory_root)  # FORKED: the corpus root is a conf value, 
 # Adopter ic rotates to `<root>/archive/<discipline>/DECISIONS.<date>.md`. Measured over each tree's
 # `git ls-files` with its own conf: gov 9 -> 9, nc 13 -> 13, ic 56 -> 71, the 71 being exactly
 # the set adopter ic's own pattern selects. No key: a layout knob with one value is not a decision.
+#
+# The per-build ask file `builds/<slug>/BACKLOG.md` is the fourth arm (TOOL-dDerivedDocket-34 S9).
+# Under `BACKLOG_MODE="builds"` an ask's ONE authored home is that file, TWO levels below the root,
+# which the first arm's single optional segment cannot reach: without this arm every migrated ask
+# loses its durable home the moment the shards become generated views, and the `records` floor
+# cannot see it because `DURABLE` selects only the spine. Spelled as the exact basename under
+# `builds/`, never a second optional segment, so no other file two levels down joins the spine.
 _IDX = "(?:DECISIONS|BACKLOG|" + "|".join(re.escape(f) for f in CONF.families) + ")"
 DURABLE = re.compile(
     rf"{_ROOT}/(?:[^/]+/)?{_IDX}\.md$"
     rf"|{_ROOT}/(?:[^/]+/)?decisions/[^/]+\.md$"
     rf"|{_ROOT}/(?:[^/]+/)?archive/(?:[^/]+/)?{_IDX}\.[^/]+\.md$"
+    rf"|{_ROOT}/builds/[^/]+/BACKLOG\.md$"
 )
 
 

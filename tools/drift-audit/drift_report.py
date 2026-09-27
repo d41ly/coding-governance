@@ -1385,8 +1385,88 @@ _TERMINAL_STATUSES = ("CLOSED", "WONTDO")
 # grandfathered debt that `TOOL-aWiredReckoning-1` will curate. A new definition can be named right for
 # free, and adding a ninth offender to spare a symmetry break would be paying the debt down in the wrong
 # direction. `build` is the declared verb for "create a new value and return it", which is what this does.
+def read_backlog_mode(ctx) -> str:
+    """`BACKLOG_MODE` as the memory-tree kit reads it: blank or absent is `shards`."""
+    return (ctx.conf.get("BACKLOG_MODE") or "").strip() or "shards"
+
+
+def _resolve_index_generator():
+    """The memory-tree kit's index generator, through `resolve_kit_dir` like every sibling lookup."""
+    try:
+        kit = resolve_kit_dir("memory-tree", "gen_build_index.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
+        return None
+    return kit / "gen_build_index.py"
+
+
+def read_asks_projection(ctx, all_rows: bool):
+    """`(rows, examined, note)` from `gen_build_index.py --asks [--all] --json`, run ONCE per shape.
+
+    THE GENERATOR'S FOLD AND NOBODY ELSE'S (TOOL-dDerivedDocket-34 section 8 F14). Every builds-mode
+    backlog signal reads this projection and implements no second liveness or status rule: the live
+    shape is the generator's own filter, the `--all` shape its whole corpus. Cached on the context,
+    because four signals read two shapes and each read is a process. `rows` is None when the
+    projection could not be read, and `note` says why.
+    """
+    cache = ctx.__dict__.setdefault("_asks_projection", {})
+    if all_rows in cache:
+        return cache[all_rows]
+    gen = _resolve_index_generator()
+    if gen is None:
+        cache[all_rows] = (None, 0, "the memory-tree kit is not installed beside this one")
+        return cache[all_rows]
+    argv = [sys.executable, str(gen), "--asks", "--json"] + (["--all"] if all_rows else [])
+    try:
+        out = subprocess.run(argv, cwd=str(ctx.root), capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=600)
+        doc = json.loads(out.stdout) if out.returncode == 0 else None
+    except (OSError, subprocess.SubprocessError, ValueError) as exc:
+        cache[all_rows] = (None, 0, f"the ask projection could not be read: {exc}")
+        return cache[all_rows]
+    if not isinstance(doc, dict) or not isinstance(doc.get("asks"), list):
+        said = ((out.stderr or "").strip().splitlines() or [f"exit {out.returncode}"])[-1]
+        cache[all_rows] = (None, 0, f"the ask projection printed no ask list: {said[:240]}")
+        return cache[all_rows]
+    cache[all_rows] = (doc["asks"], int(doc.get("examined") or 0), "")
+    return cache[all_rows]
+
+
+def read_tracked_asks(ctx) -> list:
+    """Every tracked per-build `BACKLOG.md`. None tracked is NOT ASKED, never a clean zero."""
+    return [ln for ln in ctx.git.run("ls-files", f"{ctx.memory_root}/builds/*/BACKLOG.md")
+            .stdout.splitlines() if ln.strip()]
+
+
 def build_live_backlog_rows(ctx) -> dict:
-    """Live (non-terminal) rows per backlog shard, reported per shard and never gated."""
+    """Live asks: per backlog shard under `shards`, from the ask projection under `builds`.
+
+    NEVER GATED either way. Under `builds` the reading is the length of `--asks --json`, the
+    generator's LIVE projection, with no status filter of this kit's own: `_TERMINAL_STATUSES` below
+    stays the shards reading's filter and is never applied to a derived status (section 8 F14 of
+    TOOL-dDerivedDocket-34). The detail carries one row per family, so a total cannot hide one
+    family growing inside another.
+    """
+    if read_backlog_mode(ctx) == "builds":
+        rows, examined, note = read_asks_projection(ctx, all_rows=False)
+        if rows is None:
+            return {"signal": "live_backlog_rows_per_shard", "value": 0, "of": 0,
+                    "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
+                    "gateable": False, "live": False, "detail": [{"note": note}]}
+        per: dict = {}
+        for row in rows:
+            fam = str(row.get("id", "")).split("-")[0]
+            per[fam] = per.get(fam, 0) + 1
+        return {
+            "signal": "live_backlog_rows_per_shard",
+            "value": len(rows),
+            "of": examined,
+            "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
+            "gateable": False,
+            # LIVENESS FROM THE FILES THE PROJECTION READ. A builds-mode tree whose projection
+            # examined no ask file cannot move this count.
+            "live": examined > 0,
+            "detail": [{"family": f, "live": n} for f, n in sorted(per.items())],
+        }
     shard_dir = f"{ctx.memory_root}/backlog"
     tracked = [ln for ln in ctx.git.run("ls-files", f"{shard_dir}/").stdout.splitlines() if ln.strip()]
     rows = []
@@ -1685,66 +1765,106 @@ def build_readme_mechanism_drift(ctx) -> dict:
     }
 
 
-def build_backlog_rows_outliving_specs(ctx) -> dict:
-    """A backlog row still non-terminal while the spec bearing its id reads CLOSED or WONTDO.
+# `backlog_rows_outliving_closed_specs` RETIRED at the backlog switch-over (TOOL-dDerivedDocket-34
+# S10). It compared an AUTHORED shard row's token with its same-id spec's status, and under
+# `BACKLOG_MODE="builds"` no status is authored: a signed `unit` ask derives its spec's status, and
+# every other ask is a separate subject by ruling D2. The stance it counted — DEPL-dGaugedVintage-13,
+# "COUNTED, NEVER REFUSED" — is superseded by the `unit` and `advances` model (design section 4.4),
+# recorded in `memory/DECISIONS.md` under this unit's id. Its pin left `drift_signals.py` with it.
 
-    DEPL-dGaugedVintage-13, filed by `-2` S3 after that unit swept sixteen such rows BY HAND:
-    `DEPL-dCarriedReceipt-1..15` all read SPECCED while every one of their specs read CLOSED, and
-    `DEPL-aFerriedDossier-1` sat OPEN six days after its own declared closer shipped. Nothing
-    measured the class, so it accumulated silently until somebody happened to look.
 
-    COUNTED, NEVER REFUSED, and that is the whole design decision. A row's ask can be legitimately
-    WIDER than the unit that partly served it -- `-2` section 8 F1 resolved exactly that -- so a gate
-    reading every such row as a defect would push an operator to close a row that should stay open,
-    which is worse than the drift. A pin holds the honest residue; it only falls.
+# --------------------------------------------------------------------------------------------
+# Three builds-mode backlog signals (TOOL-dDerivedDocket-34 S10). REPORT-ONLY, each `gateable:
+# False`: each counts a population a human reads and none is a merge refusal. Each reads the
+# generator's ask projection and implements no second fold, and each is NOT ASKED under `shards`
+# and while no per-build `BACKLOG.md` is tracked, which is the state right after an adopter sets
+# the mode — three DEAD PROBE lines there would be alarms nobody staged.
+#
+# LIVENESS IS OVER THE FIELD, not the file: an ask row lacking the field a signal reads is not
+# examined, so a projection that stopped emitting it reports DEAD PROBE rather than a clean zero.
+# --------------------------------------------------------------------------------------------
+def read_asks_or_skip(ctx, name: str, all_rows: bool):
+    """`(rows, None)` for a builds-mode signal, or `(None, record)` naming why it cannot read."""
+    if read_backlog_mode(ctx) != "builds":
+        return None, _build_not_asked(name, "BACKLOG_MODE is shards: asks live in the authored "
+                                            "shards and there is no ask projection to read")
+    if not read_tracked_asks(ctx):
+        return None, _build_not_asked(name, "BACKLOG_MODE is builds but no per-build BACKLOG.md "
+                                            "is tracked yet; there is no ask to judge")
+    rows, _examined, note = read_asks_projection(ctx, all_rows)
+    if rows is None:
+        return None, {"signal": name, "value": 0, "of": 0, "tolerance": ctx.pins.get(name, 0),
+                      "gateable": False, "live": False, "detail": [{"note": note}]}
+    return rows, None
 
-    A spec whose id appears in NO backlog row is NOT a finding: an id can be a unit without ever
-    having been an ask, which is the common case for a unit a build minted for itself.
-    """
-    shard_dir = f"{ctx.memory_root}/backlog"
-    rows: dict[str, tuple[str, str]] = {}
-    for rel in sorted(ln for ln in ctx.git.run("ls-files", f"{shard_dir}/").stdout.splitlines()
-                      if ln.strip().endswith(".md")):
-        try:
-            text = (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        for ln in text.splitlines():
-            m = re.match(r"^- ([A-Z]+-[a-zA-Z]+-\d+)\s*\u00b7\s*([A-Z]+)\s*\u00b7", ln)
-            if m:
-                rows.setdefault(m.group(1), (rel, m.group(2)))
 
-    suspect, checked = [], 0
-    for sp in sorted(ctx.root.glob(f"{ctx.memory_root}/builds/*/spec/**/*.md")):
-        head = sp.read_text(encoding="utf-8", errors="replace")[:4000]
-        st, own = _STATUS.search(head), ctx.own_id_re.search(head)
-        if not st or not own:
+def build_backlog_asks_contested(ctx) -> dict:
+    """Asks with BOTH closing and declining evidence, and asks whose terminal evidence sits beside a
+    LIVE spec — the two shapes in which the fold decided something a reader would dispute."""
+    name = "backlog_asks_contested"
+    rows, skip = read_asks_or_skip(ctx, name, all_rows=True)
+    if skip:
+        return skip
+    fields = ("closing", "declining", "live_specs")
+    judged = [r for r in rows if all(isinstance(r.get(f), list) for f in fields)]
+    hits = [{"id": r.get("id"), "status": r.get("status"),
+             "why": ("closing and declining" if r["closing"] and r["declining"]
+                     else "terminal evidence beside a live spec")}
+            for r in judged
+            if (r["closing"] and r["declining"])
+            or ((r["closing"] or r["declining"]) and r["live_specs"])]
+    return {"signal": name, "value": len(hits), "of": len(judged),
+            "tolerance": ctx.pins.get(name, 0), "gateable": False,
+            "live": len(judged) > 0, "detail": hits[:20]}
+
+
+def build_backlog_evidence_sha(ctx) -> dict:
+    """`by <sha>` closing evidence the object database does not resolve to a commit."""
+    name = "backlog_evidence_sha"
+    rows, skip = read_asks_or_skip(ctx, name, all_rows=True)
+    if skip:
+        return skip
+    shas: dict = {}
+    for r in rows:
+        if not isinstance(r.get("closing"), list):
             continue
-        if st.group(1).upper() not in _TERMINAL_STATUSES:
-            continue
-        checked += 1
-        hit = rows.get(own.group(1))
-        if hit is None:
-            continue                      # never an ask; see the docstring
-        shard, token = hit
-        if token in _TERMINAL_STATUSES:
-            continue
-        suspect.append({
-            "id": own.group(1), "row": shard, "row_status": token,
-            "spec": str(sp.relative_to(ctx.root)).replace("\\", "/"),
-            "spec_status": st.group(1).upper(),
-        })
-    return {
-        "signal": "backlog_rows_outliving_closed_specs",
-        "value": len(suspect),
-        "of": checked,
-        "tolerance": 0,
-        "gateable": True,
-        # LIVENESS from what was actually examined. A corpus with no terminal spec must say the probe
-        # could not move rather than print a reassuring zero.
-        "live": checked > 0,
-        "detail": suspect,
-    }
+        for value in r["closing"]:
+            if re.fullmatch(r"[0-9a-f]{7,40}", str(value)):
+                shas.setdefault(str(value), []).append(r.get("id"))
+    missing = []
+    ordered = sorted(shas)
+    if ordered:
+        # ONE process for every sha. `--batch-check` answers `<name> missing` for a name it cannot
+        # resolve and a three-field object line for one it can, in input order.
+        proc = subprocess.run(["git", "cat-file", "--batch-check"], cwd=str(ctx.root),
+                              input="".join(sha + "^{commit}\n" for sha in ordered),
+                              capture_output=True, text=True, encoding="utf-8", errors="replace")
+        lines = (proc.stdout or "").splitlines()
+        if len(lines) != len(ordered):
+            return {"signal": name, "value": 0, "of": 0, "tolerance": ctx.pins.get(name, 0),
+                    "gateable": False, "live": False,
+                    "detail": [{"note": "git cat-file answered a different number of lines than "
+                                        "it was asked, so no sha can be judged"}]}
+        for sha, line in zip(ordered, lines):
+            if len(line.split()) != 3:
+                missing.append({"sha": sha, "asks": sorted(shas[sha])[:5]})
+    return {"signal": name, "value": len(missing), "of": len(ordered),
+            "tolerance": ctx.pins.get(name, 0), "gateable": False,
+            "live": len(ordered) > 0, "detail": missing[:20]}
+
+
+def build_backlog_asks_unlabelled(ctx) -> dict:
+    """LIVE asks carrying no severity row. Read from the generator's live projection, so the kit
+    applies no status filter of its own."""
+    name = "backlog_asks_unlabelled"
+    rows, skip = read_asks_or_skip(ctx, name, all_rows=False)
+    if skip:
+        return skip
+    judged = [r for r in rows if isinstance(r.get("sev"), str)]
+    hits = [r.get("id") for r in judged if r["sev"] == "unlabelled"]
+    return {"signal": name, "value": len(hits), "of": len(judged),
+            "tolerance": ctx.pins.get(name, 0), "gateable": False,
+            "live": len(judged) > 0, "detail": [{"id": i} for i in hits[:20]]}
 
 
 
@@ -2258,7 +2378,8 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
            build_live_backlog_rows, build_asks_disposed_overrides,
            build_readme_mechanism_drift,
-           build_backlog_rows_outliving_specs,
+           build_backlog_asks_contested, build_backlog_evidence_sha,
+           build_backlog_asks_unlabelled,
            build_source_cited_ids_with_no_record,
            build_backlog_stragglers,
            build_nonterminal_merged_runs,

@@ -43,8 +43,10 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 267
+CHECK_FLOOR = 277
 # 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
+# 267 -> 277, TOOL-dDerivedDocket-34: the five checks of the retired dGV-13 signal leave, one
+# retirement check and the fourteen of `test_backlog_ask_signals` arrive.
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
@@ -428,46 +430,10 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     check("shrink-only signal goes quiet once the list actually shrinks", s3b["value"] == 0,
           str(s3b["detail"]))
 
-    # --- DEPL-dGaugedVintage-13: a backlog row that outlived its own CLOSED spec ---
-    print("backlog rows outliving closed specs (dGV-13)")
-    b13 = report(r)["backlog_rows_outliving_closed_specs"]
-    check("[dGV-13] a spec whose id is in NO backlog row is not a finding",
-          b13["value"] == 0, f"got {b13['value']} detail={b13['detail']}")
-    check("[dGV-13] ...and the signal is LIVE, so a zero means it looked",
-          b13["live"] is True and b13["of"] >= 1, f"live={b13['live']} of={b13['of']}")
-    _shard = r / "memory" / "backlog"
-    _shard.mkdir(parents=True, exist_ok=True)
-    _ids = [x["id"] for x in report(r)["spec_status_terminal_ids"]["detail"]] \
-        if "spec_status_terminal_ids" in report(r) else []
-    _sp = sorted((r / SPEC_DIR_FOR_FIXTURE).glob("*.md"))
-    _own = None
-    for _f in _sp:
-        _m = re.search(r"^#\s+([A-Z]+-[a-zA-Z]+-\d+)\b", _f.read_text(encoding="utf-8"), re.M)
-        _s = re.search(r"^\*\*Status:\*\*\s*([A-Za-z]+)", _f.read_text(encoding="utf-8"), re.M)
-        if _m and _s and _s.group(1).upper() in ("CLOSED", "WONTDO"):
-            _own = _m.group(1)
-            break
-    if _own is None:
-        skip("[dGV-13] the row arms", "this fixture carries no terminal spec to key a row on")
-    else:
-        _fam = _own.split("-", 1)[0]
-        _row = _shard / f"{_fam}.md"
-        _row.write_text(f"# fixture backlog\n\n- {_own} \u00b7 OPEN \u00b7 a row that outlived its spec\n",
-                        encoding="utf-8", newline="\n")
-        run(["git", "add", "-A"], r); run(["git", "commit", "-qm", "dgv13 open row"], r)
-        b13o = report(r)["backlog_rows_outliving_closed_specs"]
-        check("[dGV-13] a NON-terminal row under a CLOSED spec is counted",
-              b13o["value"] == 1, f"got {b13o['value']} detail={b13o['detail']}")
-        check("[dGV-13] ...and the detail names the id, the row's token and the spec's",
-              bool(b13o["detail"]) and b13o["detail"][0]["id"] == _own
-              and b13o["detail"][0]["row_status"] == "OPEN",
-              str(b13o["detail"][:1]))
-        _row.write_text(f"# fixture backlog\n\n- {_own} \u00b7 CLOSED \u00b7 reconciled\n",
-                        encoding="utf-8", newline="\n")
-        run(["git", "add", "-A"], r); run(["git", "commit", "-qm", "dgv13 closed row"], r)
-        b13c = report(r)["backlog_rows_outliving_closed_specs"]
-        check("[dGV-13] a TERMINAL row under the same spec is not counted",
-              b13c["value"] == 0, f"got {b13c['value']} detail={b13c['detail']}")
+    # --- DEPL-dGaugedVintage-13's signal RETIRED at the backlog switch-over (TOOL-dDerivedDocket-34
+    # --- S10). Its arms went with it; this one keeps the retirement from being undone by a merge.
+    check("[dDD-34] the retired backlog_rows_outliving_closed_specs is absent from the report",
+          "backlog_rows_outliving_closed_specs" not in report(r))
 
     # --- signal 6: a CLOSED spec must be backed by a commit that names it AND changed product ---
     print("closed-spec traceability (signal 6)")
@@ -1241,6 +1207,89 @@ def test_live_backlog_rows(tmp: pathlib.Path) -> None:
     dead = report(r2)["live_backlog_rows_per_shard"]
     check("no shards at all reports DEAD rather than 0",
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+
+
+# The stub generator the builds-mode arms install as a sibling `memory-tree` kit. It prints the ask
+# projection a fixture file holds, so an arm can take ONE field away and watch its signal go DEAD.
+_STUB_GENERATOR = """import json, pathlib, sys
+rows = json.loads(pathlib.Path('projection.json').read_text(encoding='utf-8'))
+if '--all' not in sys.argv:
+    rows = [r for r in rows if r.get('status') not in ('CLOSED', 'WONTDO')]
+print(json.dumps({'mode': 'builds', 'examined': 1, 'asks': rows}))
+"""
+_ASK_SIGNALS = ("backlog_asks_contested", "backlog_evidence_sha", "backlog_asks_unlabelled")
+
+
+def test_backlog_ask_signals(tmp: pathlib.Path) -> None:
+    """TOOL-dDerivedDocket-34 AC21: the builds-mode backlog signals, NOT ASKED, live, and DEAD.
+
+    THREE STATES, EACH STAGED. Under `shards` the three report NOT ASKED and the live-row count
+    still reads the shards; under `builds` with no `BACKLOG.md` tracked they are NOT ASKED too, the
+    state right after an adopter sets the mode; and with a projection that lacks the field a signal
+    reads, that signal alone prints DEAD PROBE — a projection that stopped emitting it is a probe
+    that cannot move, and a clean zero there is the reassurance this kit refuses.
+    """
+    import json
+
+    print("builds-mode backlog signals (TOOL-dDerivedDocket-34)")
+    r = make_repo(tmp, name="asksignals")
+    bl = r / "memory" / "backlog"
+    bl.mkdir(parents=True, exist_ok=True)
+    (bl / "ARCH.md").write_text("# ARCH backlog\n- ARCH-tLive-1 · OPEN · one\n",
+                                encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "one shard", "--no-verify"], r)
+    got = report(r)
+    for name in _ASK_SIGNALS:
+        check(f"[dDD-34] shards mode: {name} is NOT ASKED, never DEAD",
+              got[name].get("not_asked") is True and got[name]["value"] == 0, f"{got[name]}")
+    check("[dDD-34] shards mode: the live-row count still reads the shards",
+          got["live_backlog_rows_per_shard"]["value"] == 1
+          and got["live_backlog_rows_per_shard"]["live"] is True,
+          f"{got['live_backlog_rows_per_shard']}")
+
+    conf = (r / ".memory-tree.conf").read_text(encoding="utf-8")
+    (r / ".memory-tree.conf").write_text(conf + 'BACKLOG_MODE="builds"\n',
+                                         encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "builds mode, no ask file yet", "--no-verify"], r)
+    got = report(r)
+    for name in _ASK_SIGNALS:
+        check(f"[dDD-34] builds mode, no BACKLOG.md: {name} is NOT ASKED, never DEAD",
+              got[name].get("not_asked") is True, f"{got[name]}")
+
+    (r / "memory-tree").mkdir()
+    (r / "memory-tree" / "gen_build_index.py").write_text(_STUB_GENERATOR, encoding="utf-8",
+                                                          newline="\n")
+    home = r / "memory" / "builds" / "aFoo"
+    home.mkdir(parents=True, exist_ok=True)
+    (home / "BACKLOG.md").write_text("# aFoo\n\n## Asks\n", encoding="utf-8", newline="\n")
+    full = [{"id": "ARCH-aFoo-1", "status": "CLOSED", "closing": ["deadbeefdeadbeef"],
+             "declining": ["aBar"], "live_specs": [], "sev": "unlabelled"},
+            {"id": "ARCH-aFoo-2", "status": "OPEN", "closing": [], "declining": [],
+             "live_specs": [], "sev": "unlabelled"}]
+    (r / "projection.json").write_text(json.dumps(full), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "an ask file and a stub projection", "--no-verify"], r)
+    got = report(r)
+    check("[dDD-34] contested: closing AND declining evidence on one ask is counted",
+          got["backlog_asks_contested"]["value"] == 1 and got["backlog_asks_contested"]["live"],
+          f"{got['backlog_asks_contested']}")
+    check("[dDD-34] evidence sha: a `by` sha the object database cannot resolve is counted",
+          got["backlog_evidence_sha"]["value"] == 1 and got["backlog_evidence_sha"]["live"],
+          f"{got['backlog_evidence_sha']}")
+    check("[dDD-34] unlabelled: a LIVE ask with no severity is counted, the terminal one not",
+          got["backlog_asks_unlabelled"]["value"] == 1 and got["backlog_asks_unlabelled"]["live"],
+          f"{got['backlog_asks_unlabelled']}")
+    check("[dDD-34] builds mode: the live-row count is the LIVE projection's length",
+          got["live_backlog_rows_per_shard"]["value"] == 1, f"{got['live_backlog_rows_per_shard']}")
+    for name, field in (("backlog_asks_contested", "declining"), ("backlog_evidence_sha", "closing"),
+                        ("backlog_asks_unlabelled", "sev")):
+        rows = [{k: v for k, v in row.items() if k != field} for row in full]
+        (r / "projection.json").write_text(json.dumps(rows), encoding="utf-8", newline="\n")
+        dead = report(r)[name]
+        check(f"[dDD-34] a projection lacking `{field}` makes {name} a DEAD PROBE, not a 0",
+              dead["live"] is False and not dead.get("not_asked"), f"{dead}")
 
 
 NL_ = chr(10)
@@ -2824,6 +2873,7 @@ def main() -> int:
         test_lexicon_marginal_rate(tmp)
         test_no_signal_hardcodes_live(tmp)
         test_live_backlog_rows(tmp)
+        test_backlog_ask_signals(tmp)
         test_asks_disposed_overrides(tmp)
         test_legs_retried_after_timeout(tmp)
         test_backlog_stragglers(tmp)

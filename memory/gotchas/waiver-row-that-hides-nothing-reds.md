@@ -13,6 +13,9 @@ fault it covered was fixed or its cap was raised past it. The hygiene leg reds o
 passes checks 6, 7 and 8 unwaived, so the registry has stopped shrinking and the row hides nothing.
 The remedy is to delete the row, not to re-justify it.
 
+The check-8 half holds under `BACKLOG_MODE="shards"` only: from the switch-over
+(TOOL-dDerivedDocket-34) the shards are generated views and the backlog status check retires.
+
 The second half is a population fact that misleads the same reader: check 8 grades the backlog
 shards under `memory/backlog/` ALONE, and PRINTS its graded-row count on every run. A build README
 is structurally outside check 8's population and a run-state file outside check 7's, so a row listed

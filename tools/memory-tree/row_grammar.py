@@ -182,7 +182,7 @@ GENERIC_ID = re.compile(r"[A-Z][A-Z0-9]{1,9}-[A-Za-z0-9]+-[0-9]+[a-z]*")
 # The date half and the STEM half are a conjunction and each carries the other's weight — the date
 # keeps a family-named file that is not a rotation out, the stem keeps a dated file that is not a row
 # document out. The optional trailing `[a-z0-9]*` is a same-day DISAMBIGUATOR: two builds rotated to
-# one date on 2026-08-17 and the second is `TOOL.2026-08-17b.md`.
+# one date on 2026-08-17 and the second carried a `b` after the date.
 #
 # ONE FULLMATCH, not startswith-plus-search. The first cut tested the stem with `startswith` and the
 # date with `search`, which admits a date ANYWHERE after the stem: `TOOL.notes.2026-01-01.md` passed
@@ -1281,7 +1281,7 @@ def cmd_selftest():
                               "ARCH.2026-02-02.md": "- ARCH-tYes-1 · a real rotation, selected\n",
                               # THE SAME-DAY DISAMBIGUATOR, which nothing else exercises: delete
                               # `[a-z0-9]*` from either reader and every other arm stays green.
-                              # `TOOL.2026-08-17b.md` in the dogfood repo is why it exists.
+                              # The dogfood repo's second rotation of 2026-08-17 is why it exists.
                               "ARCH.2026-02-02b.md": "- ARCH-tYes-2 · the second rotation of one day\n"})
         arm("a frozen non-row file under archive/ is NOT scanned, and a same-day disambiguated one IS",
             "row-grammar: clean (3 row(s)", lambda: cap(t11, c11))

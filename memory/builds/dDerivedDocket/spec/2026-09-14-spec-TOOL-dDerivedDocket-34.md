@@ -1,12 +1,16 @@
 # TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered
 
-**Status:** SPECCED · rev-10 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 36
+**Status:** SPECCED · rev-11 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 36
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-28-build-TOOL-dDerivedDocket-34-census.md](../build/2026-09-28-build-TOOL-dDerivedDocket-34-census.md) | journal | — |
+| [2026-09-28-build-TOOL-dDerivedDocket-34-same-id.tsv](../build/2026-09-28-build-TOOL-dDerivedDocket-34-same-id.tsv) | journal | — |
+| [2026-09-28-build-TOOL-dDerivedDocket-34-status.tsv](../build/2026-09-28-build-TOOL-dDerivedDocket-34-status.tsv) | journal | — |
+| [2026-09-28-build-TOOL-dDerivedDocket-34-triage.tsv](../build/2026-09-28-build-TOOL-dDerivedDocket-34-triage.tsv) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
@@ -38,8 +42,10 @@ necessary, so no gate reads a half-switched tree.
   authored shard files from the worktree and the index, so the first builds-mode render writes the
   views into absent paths (§4 Rollout, §8 F9). Its refusals are §5's, each observed by AC17. The
   worksheets it applies are re-planned at rollout step 5 with only the recorded design-named ids
-  still in the triage population (§8 F16). Observed by AC1, AC2, AC3, AC16, AC18, AC19, AC26 and
-  AC28.
+  still in the triage population (§8 F16). The records are named as the planner already parses
+  them, `--signed same-id=<path> --signed triage=<path>`; every signed verdict is written, a KEEP
+  included, and an id no commit dates refuses rather than taking a placeholder `filed` (rev-11).
+  Observed by AC1, AC2, AC3, AC16, AC18, AC19, AC26 and AC28.
   - **Readers:** by name: the shard paths stay spelled where they are, because the views are
     rendered at the same paths in the same commit — `.gitattributes`, `.memory-tree.conf`,
     `.unattended.conf`, `.githooks/straggler-guard.sh`, `tools/memory-tree/row_grammar.py`,
@@ -264,7 +270,7 @@ necessary, so no gate reads a half-switched tree.
 | Group | Change | Why it cannot wait for a later commit |
 |---|---|---|
 | records | every `builds/<slug>/BACKLOG.md`, the rendered views, the regenerated README regions; the authored shard bodies removed by the writer before the views are rendered at their paths; rollout step 5's re-planned census and worksheets and its two `-switch` signed records | the views are check 9's byte-compare subject from this commit |
-| deletions | `memory/archive/TOOL.2026-08-14.md`, `TOOL.2026-08-17.md`, `TOOL.2026-08-17b.md`; the curation-debt row at `memory/project/curation-debt.txt:59` | the archives are second definitions of migrated ids; the debt row would red its stale guard |
+| deletions | `memory/archive/TOOL.2026-08-14.md`, `TOOL.2026-08-17.md`, `TOOL.2026-08-17b.md`; the curation-debt row for `memory/backlog/TOOL.md` in `memory/project/curation-debt.txt`, line 59 at `313cc478` | the archives are second definitions of migrated ids; the debt row would red its stale guard |
 | carriers of the deletion | the archive basenames at `.memory-tree.conf:473`, `tools/memory-tree/.memory-tree.conf.example:232`, `tools/memory-tree/check-memory-hygiene.sh:1270`, `tools/memory-tree/README.md:141`, `tools/memory-tree/row_grammar.py:185` and `:1284`, reworded to describe the same-day suffix without naming a deleted file | `tools/check-dead-paths.sh` derives its needles from git and reds any carrier outside `memory/` naming them |
 | conf | `BACKLOG_MODE`, `ASK_CUTOFF`; `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN` re-derived over the views with `row_grammar.py --emit-pin` (S4); the two `.unattended.conf` lines at `.unattended.conf:359` and `:360`; the added attribute line beside `.gitattributes:72` | the mode is what every builds-mode verdict keys on, and check 20 compares both pins with a census that reads each view as zero rows |
 | recall | the durable-home alternative beside `tools/memory-recall/extract.py:151`; `CACHE_VERSION` at `tools/memory-recall/query.py:135`; `KIT_MEMORY_RECALL_VERSION` at `tools/memory-recall/recall_conf.py:50` with BOTH its `gov:kit memory-recall@` markers, the one in `tools/memory-recall/README.md` and the one in that module's own docstring at `tools/memory-recall/recall_conf.py:4`, moved once here as the earliest unit to change that kit's shipped bytes | an old cache would serve anchors from files this commit deletes |
@@ -312,7 +318,9 @@ the switch-over commit to the landing, for asks filed on main or on this branch 
 | `backlog_evidence_sha` | `by <sha>` evidence the object database does not resolve | shas examined > 0 |
 | `backlog_asks_unlabelled` | live asks with no severity row | asks examined > 0 |
 
-Each reads `gen_build_index.py --asks --all --json` and implements no second fold, and each is
+Each reads the generator's projection and implements no second fold — contested and evidence-sha
+the `--asks --all --json` corpus, unlabelled the live `--asks --json`, so "live" is the generator's
+filter and not a second one (§8 F14, rev-11) — and each is
 report-only. Under `shards` the live-rows signal keeps reading the authored shards, and the three new
 signals report not-asked with `gateable: False`, as `signal_closed_specs_untraceable` does; they also
 report not-asked while no `BACKLOG.md` is tracked (S10, AC21).
@@ -1331,6 +1339,25 @@ its guard names the four renders step 6 re-renders, so the merge commit triggers
   Every moved `path:line` in §2, §4 and §6 was re-read at `313cc478`, as were the figures in §4's
   fifth normalization, §5, AC19 and AC23; AC17 and §7 read `backlog migration selftest` as the held
   `subject = kit` leg unit 11 made it. §10 records the reading.
+- rev-11 · 2026-09-28 · S1 · §4 · built. Five divergences the build found, each folded before
+  the code that needed it. (1) The CLI spelling: `--signed` takes `<kind>=<path>` once per record,
+  as the planner and the engine already parse it; the spec's `--signed <same-id record> <triage
+  record>` is shorthand for that and the runbook's handed-off shape is the same pair. (2) KEEP is
+  WRITTEN: the engine's P4 read its verdicts through the planner's `read_signed_verdicts`, which
+  drops KEEP because a KEEP moves no prediction, so a writer over it left every KEEP-signed ask on
+  a finished build with no status row — V10 on 366 asks. `read_signed_keeps` adds them on the
+  engine's side only; the planner's prediction and worksheets are untouched. (3) `filed` is unit
+  12's rule over the whole history of the shard and archive directories, a merge read against its
+  first parent: the first run refused, by the new no-placeholder refusal, on two rows born in merge
+  resolutions that a merge-skipping walk dates nowhere. (4) `backlog_asks_unlabelled` reads the
+  live projection, so the live filter is the generator's, per F14. (5) A relative `--signed` path
+  resolves against the repository being written when the caller's directory does not hold it.
+  None moves a criterion. §4's deletions row no longer cites the curation-debt row by `path:line`:
+  the row is gone from the file this commit shrinks, so the citation names its sha instead. And
+  S12's size read met a cap it did not name: `skills/session-kickoff/manifest-check.sh` check 7
+  holds the manifest itself to 25600 bytes, 5 above its parent, so the four claims and the
+  re-stamp land at net minus 4 bytes, the drift-report command line losing its copy of the
+  charter's before-theorizing instruction. AC12's reads all still hold.
 
 ## 10. Reuse audit
 

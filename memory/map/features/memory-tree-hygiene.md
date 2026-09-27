@@ -65,7 +65,9 @@ recipe every carrier quotes. All three writing verbs CALL `transition_audit.delt
 answers it cannot disagree about what a row change is. That module's CLI resolves its repository
 from its own file location, which is why the engine's fixture arms call it in process against an
 explicit root — a subprocess launched inside a fixture audits THIS tree instead and returns a clean
-verdict about the wrong one.
+verdict about the wrong one. `--write` (`TOOL-dDerivedDocket-34`) is the switch-over: it feeds the
+same engine the whole legacy corpus as new entries from an empty base, files the triage ask,
+re-reads what it wrote to prove conservation, and only then removes the authored shards.
 
 The self-test's project-key arms run the engine over
 the suite's own scratch tree, one invocation per arm, never over an archive of this repository

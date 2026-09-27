@@ -8,6 +8,8 @@
     python migrate_backlog.py --relocate --as <slug> [--from <ref>]   # after merging the default
     python migrate_backlog.py --repair <merge-sha> --as <slug>       # a transition already landed
     python migrate_backlog.py --ingest <ref> --as <slug>             # a ref nobody will revisit
+    python migrate_backlog.py --write --as <slug> --signed same-id=<path> --signed triage=<path>
+                              [--triage-ask <id>]                    # the switch-over itself
     python migrate_backlog.py --stragglers [--local] [--tsv]         # who still owes a relocation
     python migrate_backlog.py --recipe                               # the one relocation recipe
     python migrate_backlog.py --selftest
@@ -54,6 +56,7 @@ status rule are two answers to one question, and the copy is always the one that
 from __future__ import annotations
 
 import collections
+import difflib
 import importlib.util
 import io
 import os
@@ -132,7 +135,9 @@ RECORD_KINDS = {"prompts": "prompt", "spec": "spec", "build": "build", "reviews"
 #: relocation engine's arms landed; the figure is the count the suite executes, and it is RAISED in
 #: the same commit as the arms, because a floor left behind is a floor that stops measuring.
 #: RAISED 205 -> 206 with the one arm that sees `load_generator` refuse a generator it cannot load.
-FLOOR_ASSERTIONS = 206
+#: RAISED 206 -> 250 with the switch-over writer's 44 arms (TOOL-dDerivedDocket-34 AC17): eight
+#: refusals graded three ways each, the named holds, the zero-holds filing, the dry run, the write.
+FLOOR_ASSERTIONS = 250
 
 NEWLINE = chr(10)
 
@@ -840,6 +845,17 @@ def read_signed_verdicts(signed: dict) -> tuple:
     return units, triage
 
 
+def read_signed_keeps(signed: dict) -> dict:
+    """`{ask: Disposition}` for every KEEP the signed triage record carries — the WRITER's half.
+
+    Kept apart from `read_signed_verdicts`, whose readers are the planner's prediction and its
+    status worksheet: a KEEP changes no status, so leaving it out there is right, and adding it
+    there would move a worksheet column the signer's records were computed against.
+    """
+    return {ask: Disposition("KEEP", ask, "", "signed triage verdict", False)
+            for ask, cells in (signed.get("triage") or {}).items() if cells["Verdict"] == "KEEP"}
+
+
 # ---------------------------------------------------------------------------------- the status sheet
 def derive_status_class(ident: str, legacy: str, predicted: str, chosen: dict, specs: dict,
                         units: set, signed_triage: dict, dispositions: dict,
@@ -954,7 +970,11 @@ def write_records(root: str, record_dir: str, unit_id: str, day: str, head: str,
 
 
 # ------------------------------------------------------------------------------------- the planner
-Plan = collections.namedtuple("Plan", "sheets summary counts head day census normalized")
+#: `history` and `specs` ride along for the switch-over's `--write`, which drives the relocation
+#: engine over this plan's census: the CLOSED `by` slot is the history walk's, and a triage ask id
+#: equal to a spec H1 is refused against this plan's own spec index rather than a second read.
+Plan = collections.namedtuple("Plan", "sheets summary counts head day census normalized history "
+                                      "specs")
 
 
 def read_index(fn, *argv):
@@ -1090,7 +1110,7 @@ def build_plan(root: str, design_named=(), signed=None) -> Plan:
                 f"{'+'.join(sorted(signed)) if signed else 'none'} · design-named "
                 f"{' '.join(sorted(design_named)) if design_named else 'none'}")
     sheets = {"same-id": same_rows, "triage": triage_rows, "status": status_rows}
-    return Plan(sheets, summary, counts, headline, day, chosen, normalized)
+    return Plan(sheets, summary, counts, headline, day, chosen, normalized, history, specs)
 
 
 def build_spec_index(specs: dict) -> dict:
@@ -1235,7 +1255,8 @@ Form = collections.namedtuple("Form", "verb name policy provenance confirm")
 Classified = collections.namedtuple("Classified", "ident kind classification records disposal why")
 
 Relocation = collections.namedtuple(
-    "Relocation", "form entries verdicts records human confirm before after cutoff table")
+    "Relocation", "form entries verdicts records human confirm before after cutoff table specs "
+                  "builds")
 
 
 def run_unchecked(*argv, cwd=None) -> tuple:
@@ -1725,6 +1746,12 @@ def build_relocation(root: str, form: Form, ours: str, theirs: list, args: dict,
 
     signed = {kind: read_signed_record(kind, path) for kind, path in args["signed"]}
     units, signed_triage = read_signed_verdicts(signed)
+    # P4 WRITES EVERY SIGNED VERDICT, KEEP INCLUDED. `read_signed_verdicts` drops KEEP because the
+    # planner's PREDICTION reads statuses and a KEEP moves none; a WRITER that drops it leaves every
+    # KEEP-signed ask on a finished build with no status row anywhere, which is exactly the V10
+    # closeout the signature existed to answer. Found by the switch-over's first real run, where
+    # every signed triage row but a handful is a KEEP.
+    signed_triage.update(read_signed_keeps(signed))
     if form.policy != MIGRATION_SET:
         units, signed_triage = set(), {}
 
@@ -1739,7 +1766,11 @@ def build_relocation(root: str, form: Form, ours: str, theirs: list, args: dict,
     human = [(v.ident, v.why) for v in verdicts if v.classification == HUMAN]
 
     new_ids = {v.ident for v in verdicts if any(r[0] == "ask" for r in v.records)}
-    filed = read_filed_days(root, ours, theirs, new_ids)
+    # `--write` SUPPLIES ITS OWN, as it supplies its own entries: its delta is the whole corpus from
+    # an empty base, so there is no `theirs` for the lineage walk to stop at, and the rule — the
+    # author day of the oldest commit holding the row — is applied over the full history instead.
+    filed = (read_filed_days(root, ours, theirs, new_ids) if args.get("filed") is None
+             else args["filed"])
     records = build_records(verdicts, form, args["as_slug"], memory_root, filed, units, texts,
                             grammar, planned)
     records += build_triage_records(signed_triage, texts, args["as_slug"], memory_root, grammar)
@@ -1756,7 +1787,7 @@ def build_relocation(root: str, form: Form, ours: str, theirs: list, args: dict,
     cutoff = build_cutoff(conf, filed, records) if form.name == "ingest (landing)" else ""
     table = build_table(verdicts, records, before, after)
     return Relocation(form, entries, verdicts, records, human, confirm, before, after, cutoff,
-                      table)
+                      table, specs, build_status)
 
 
 def build_records(verdicts: list, form: Form, as_slug: str, memory_root: str, filed: dict,
@@ -2102,6 +2133,360 @@ def cmd_relocate(root: str, args: dict) -> int:
     print_plan_lines(plan, root, args)
     print(f"migrate-backlog: wrote {len(plan.records)} record(s) into "
           f"{len(written)} file(s) — {' '.join(written) if written else 'none'}")
+    return 0
+
+
+# ------------------------------------------------------------------------ the switch-over writer
+#: The line a signed record names each worksheet on. The signer writes it and a record an adopter
+#: signs by hand must carry it too: it is the only place a signature says WHICH worksheet bytes it
+#: signed, so `--write` can refuse a record whose worksheet moved after signing (section 5).
+SIGNED_WORKSHEET_RE = re.compile(r"the (same-id|triage) worksheet: `([^`]+)` · blob `([0-9a-f]{40})`")
+#: A worksheet's own provenance line: the `--design-named` ids it was planned with, which the
+#: staleness re-plan must pass again or it computes a different worksheet and refuses a fresh one.
+WORKSHEET_DESIGN_RE = re.compile(r"^# (same-id|triage) worksheet · .* · design-named (.+)$")
+#: The two worksheets a signature covers, with the columns the planner renders them in.
+SIGNED_SHEETS = (("same-id", SAME_ID_COLUMNS), ("triage", TRIAGE_COLUMNS))
+
+
+def read_signed_worksheets(path: str) -> dict:
+    """`{worksheet kind: (repo-relative path, blob sha)}` for every worksheet a record names."""
+    return {hit.group(1): (hit.group(2), hit.group(3))
+            for hit in SIGNED_WORKSHEET_RE.finditer(read_text(path))}
+
+
+def check_worksheets_signed(root: str, signed_paths: dict) -> dict:
+    """Refusal 1 of section 5: each record names the TRACKED worksheet's CURRENT blob.
+
+    -> `{worksheet kind: path}`. KIT-LOCAL on purpose: the signer's own `--check` is a build-folder
+    script an adopter does not have, so the staleness an adopter's record can carry is judged here,
+    by bytes, the same way for everybody.
+    """
+    named: dict = {}
+    for kind, path in sorted(signed_paths.items()):
+        sheets = read_signed_worksheets(path)
+        if kind not in sheets:
+            raise Problem(f"migrate-backlog: the signed {kind} record {path} names no {kind} "
+                          f"worksheet by blob, so nothing says which worksheet bytes it signed — "
+                          f"a record that cannot be tied to a worksheet cannot be applied")
+        for wkind, (wpath, blob) in sorted(sheets.items()):
+            code, _out = run_unchecked("git", "ls-files", "--error-unmatch", "--", wpath, cwd=root)
+            if code != 0:
+                raise Problem(f"migrate-backlog: the signed {kind} record {path} names the {wkind} "
+                              f"worksheet {wpath}, which this repository does not track, so the "
+                              f"signature points at bytes nobody can re-read")
+            now = run("git", "hash-object", "--", wpath, cwd=root).strip()
+            if now != blob:
+                raise Problem(f"migrate-backlog: the signed {kind} record {path} signed the {wkind} "
+                              f"worksheet {wpath} at blob {blob[:12]}, and the tracked worksheet is "
+                              f"now {now[:12]}: it was edited after signing. Re-sign it, or re-plan "
+                              f"and re-sign both.")
+            if named.get(wkind, wpath) != wpath:
+                raise Problem(f"migrate-backlog: the two signed records name two different {wkind} "
+                              f"worksheets, {named[wkind]} and {wpath}")
+            named[wkind] = wpath
+    for wkind, _cols in SIGNED_SHEETS:
+        if wkind not in named:
+            raise Problem(f"migrate-backlog: no signed record names the {wkind} worksheet, so its "
+                          f"rows reach the writer unsigned")
+    return named
+
+
+def read_worksheet_design(root: str, sheets: dict) -> tuple:
+    """The `--design-named` ids the signed worksheets were planned with — one set, or refuse."""
+    found: dict = {}
+    for wkind, wpath in sorted(sheets.items()):
+        for line in read_text(os.path.join(root, wpath)).split(NEWLINE):
+            hit = WORKSHEET_DESIGN_RE.match(line.rstrip(chr(13)))
+            if hit:
+                ids = hit.group(2).strip()
+                found[wkind] = () if ids == "none" else tuple(sorted(ids.split()))
+                break
+        else:
+            raise Problem(f"migrate-backlog: the {wkind} worksheet {wpath} carries no provenance "
+                          f"line naming the design-named ids it was planned with, so a re-plan "
+                          f"cannot reproduce it and its freshness cannot be judged")
+    if len(set(found.values())) != 1:
+        raise Problem(f"migrate-backlog: the signed worksheets were planned with different "
+                      f"design-named sets ({found}), so they are not one plan")
+    return next(iter(found.values()))
+
+
+def check_worksheets_fresh(root: str, sheets: dict, plan: Plan) -> None:
+    """Refusal 2 of section 5: the signed worksheets' DATA rows are what `--plan` computes here.
+
+    The provenance lines are left out of the comparison: they carry the sha the worksheet was
+    computed at, which is an ancestor of this tree by construction and says nothing about its rows.
+    A shard line that moved, a filed row that joined the census or a commit that now names an ask
+    all move a data row, and a signature over the old rows is a signature over a different plan.
+    """
+    for wkind, columns in SIGNED_SHEETS:
+        want = [ln for ln in render_worksheet(wkind, columns, plan.sheets[wkind], "", "").split(
+            NEWLINE) if not ln.startswith("#")]
+        got = [ln.rstrip(chr(13)) for ln in read_text(os.path.join(root, sheets[wkind])).split(
+            NEWLINE) if not ln.startswith("#")]
+        if want != got:
+            diff = build_diff_lines(got, want)[:8]
+            raise Problem(f"migrate-backlog: the signed {wkind} worksheet {sheets[wkind]} is STALE "
+                          f"against this tree — its rows differ from what --plan computes here, so "
+                          f"its signature is over a different plan. Re-plan with --record, re-sign, "
+                          f"then write. First differences:{NEWLINE}"
+                          + NEWLINE.join("  " + ln for ln in diff))
+
+
+def build_diff_lines(got: list, want: list) -> list:
+    """The changed lines alone, `-` for the signed worksheet and `+` for this tree's plan."""
+    return [ln for ln in difflib.unified_diff(got, want, "signed", "computed here", n=0,
+                                              lineterm="")
+            if not ln.startswith(("---", "+++", "@@"))]
+
+
+def scan_filed_days(root: str, memory_root: str, families: tuple, grammar, ids: set) -> dict:
+    """`{id: YYYY-MM-DD}` — the author day of the OLDEST commit that added the id's row.
+
+    Unit 12's rule, over the WHOLE history of the shard and backlog-archive paths rather than a
+    lineage: the switch-over's delta runs from an empty base, so there is no other side to stop
+    at. ONE process. A MERGE IS READ AGAINST ITS FIRST PARENT, as the planner's history walk reads
+    it: a row a conflict resolution wrote exists in no other commit, and a walk that skipped merges
+    found no day for it at all — measured on this repository's own switch-over, where two rows were
+    born in merge resolutions. A row a merge merely carried in from its branch is dated by the
+    branch commit that wrote it, which the oldest-first walk meets before the merge. A deleted
+    archive is still walked — the directories are the pathspec — so a row first filed in a file this
+    commit deletes keeps its day.
+    """
+    rot = build_rotated_archive_re(memory_root, families)
+    out = run("git", "log", "--reverse", "--format=%x01%H %ad", "--date=format:%Y-%m-%d", "-p",
+              "-U0", "--no-renames", "--diff-merges=first-parent", "--",
+              f"{memory_root}/backlog", f"{memory_root}/archive", cwd=root)
+    filed: dict = {}
+    day, watched = "", False
+    shard = re.compile(re.escape(memory_root) + r"/backlog/[^/]+\.md\Z")
+    for line in out.split(NEWLINE):
+        if line.startswith("\x01"):
+            bits = line[1:].split()
+            day = bits[1] if len(bits) > 1 else ""
+            continue
+        if line.startswith("+++ "):
+            path = line[6:].rstrip(chr(13)) if line.startswith("+++ b/") else ""
+            watched = bool(shard.fullmatch(path) or rot.fullmatch(path))
+            continue
+        if not watched or not line.startswith("+- "):
+            continue
+        leg = backlog.read_legacy_row(line[1:].rstrip(chr(13)), grammar)
+        if leg.id in ids and leg.id not in filed and day:
+            filed[leg.id] = day
+    return filed
+
+
+def build_write_entries(plan: Plan, grammar) -> list:
+    """One NEW delta entry per census id, from an EMPTY base — the whole corpus as the delta.
+
+    The row version is the chosen copy re-spelled with its NORMALIZED text, so every ask row the
+    engine renders carries the declared normalizations and nothing else; the re-read below is what
+    keeps that claim honest rather than assumed. The change commit is the history walk's own
+    closing evidence, which is where the engine takes a `by` value a legacy row does not name.
+    """
+    entries, bad = [], []
+    for ident in sorted(plan.census, key=build_id_sort_key):
+        copy = plan.census[ident]
+        text = plan.normalized[ident]
+        line = f"- {ident}{backlog.SEP}{copy.token}" + (f"{backlog.SEP}{text}" if text else "")
+        leg = backlog.read_legacy_row(line, grammar)
+        if leg.id != ident or leg.status != copy.token or leg.body != text:
+            bad.append(f"  {ident}: {copy.path}:{copy.line}")
+            continue
+        change = plan.history.terminal.get(ident) or plan.history.added.get(ident) or ""
+        entries.append(audit.build_entry("", ident, audit.NEW, change, {}, line))
+    if bad:
+        raise Problem(f"migrate-backlog: {len(bad)} row(s) do not read back as themselves once "
+                      f"normalized, and a row the writer cannot key is a row it would drop:"
+                      f"{NEWLINE}{NEWLINE.join(bad)}")
+    return entries
+
+
+def read_unnamed_holds(plan: Relocation) -> list:
+    """The NEEDS-HUMAN entries that are holds naming no id — the population `--triage-ask` owns."""
+    return sorted(v.ident for v in plan.verdicts
+                  if v.classification == HUMAN and v.why == build_unnamed_why(v.ident))
+
+
+def build_triage_filing(plan: Relocation, triage_ask: str, as_home: str, day: str,
+                        grammar) -> tuple:
+    """S17 — the triage ask and its KEEP, or nothing when no hold is on it. -> `(records, held)`."""
+    held = []
+    for rec in plan.records:
+        row = backlog.extract_row(rec.text, grammar)
+        if (row is not None and row.cls == "status" and row.verb in ("BLOCKED", "DEFERRED")
+                and row.value == triage_ask):
+            held.append(row.target)
+    held = sorted(set(held), key=build_id_sort_key)
+    if not held:
+        return [], []
+    text = ("the owner's triage of the legacy holds that named no id, each held on this ask: "
+            + ", ".join(held))
+    return [Record(as_home, backlog.H_ASKS, backlog.render_ask_row(triage_ask, day, text),
+                   triage_ask, ""),
+            Record(as_home, backlog.H_DISPOSITIONS, backlog.render_status_row(
+                "KEEP", triage_ask,
+                f"awaits the owner's triage of {len(held)} legacy holds that named no id"),
+                triage_ask, "")], held
+
+
+def check_written_asks(texts: dict, plan: Plan, extra: set, grammar) -> list:
+    """S2 — every census id has EXACTLY ONE ask row, and its text is its normalized legacy text.
+
+    Read back from the per-build files themselves, parsed by the parser unit's own reader, so what
+    is asserted is what a later reader will see rather than what this writer meant to write.
+    """
+    seen: dict = collections.defaultdict(list)
+    bad = []
+    for rel, text in sorted(texts.items()):
+        for num, raw in enumerate(text.split(NEWLINE), 1):
+            row = backlog.extract_row(raw.rstrip(chr(13)), grammar)
+            if row is None or row.cls != "ask":
+                continue
+            seen[row.target].append(f"{rel}:{num}")
+            if row.target in plan.normalized:
+                got = row.why + (backlog.ARROW + row.extra["pointer"]
+                                 if row.extra["pointer"] else "")
+                if got != plan.normalized[row.target]:
+                    bad.append(f"  {row.target}: the written text is not its normalized text")
+    for ident in sorted(set(plan.census) | extra, key=build_id_sort_key):
+        if len(seen.get(ident, [])) != 1:
+            bad.append(f"  {ident}: {len(seen.get(ident, []))} ask row(s) "
+                       f"{' '.join(seen.get(ident, []))}")
+    for ident in sorted(set(seen) - set(plan.census) - extra):
+        bad.append(f"  {ident}: an ask row no census id and no triage ask accounts for")
+    return bad
+
+
+def cmd_write(root: str, args: dict) -> int:
+    """`--write` — the switch-over: the whole legacy corpus into per-build files, in one pass.
+
+    A THIN DRIVER OVER THE RELOCATION ENGINE in its migration set (unit 12 section 4): the planner
+    supplies the census and the normalized text, this function turns them into a delta from an
+    empty base, and the engine classifies and renders every record. What is this function's own is
+    section 5's refusals, the triage ask (S17), the conservation re-read and the shard removal.
+
+    NOTHING IS WRITTEN UNTIL EVERY REFUSAL HAS BEEN ASKED, and then the order is fixed: rows first,
+    the re-read of what was written, and only once that proof passes the authored shards leave the
+    worktree and the index — so the first builds-mode render writes the views into absent paths and
+    the generator's data-loss guard has nothing to protect. The archives, the conf and the render
+    are the operator's next steps, printed at the end.
+    """
+    conf = read_index(load_generator().load_conf, root)
+    memory_root = conf["MEMORY_ROOT"]
+    families = derive_families(conf)
+    grammar = backlog.build_grammar(families)
+    as_slug = args["as_slug"]
+    if not backlog.SLUG_RE.match(as_slug or ""):
+        raise Refusal(f"migrate-backlog: --write needs --as <slug>, a build slug with at least one "
+                      f"capital, and got '{as_slug}'")
+    # A RELATIVE RECORD PATH IS READ FROM THE REPOSITORY BEING WRITTEN when the caller's own
+    # directory does not hold it, which is the same repo-relative spelling the worksheets carry.
+    signed_paths = {kind: (path if os.path.isabs(path) or os.path.exists(path)
+                           else os.path.join(root, path)) for kind, path in args["signed"]}
+    missing = [k for k in ("same-id", "triage") if k not in signed_paths]
+    if missing:
+        raise Refusal(f"migrate-backlog: --write applies BOTH signed records and was given no "
+                      f"{' '.join(missing)} record (--signed <kind>=<path>)")
+    triage_ask = args["triage_ask"]
+    if triage_ask:
+        if not backlog.check_id(triage_ask, grammar):
+            raise Refusal(f"migrate-backlog: --triage-ask '{triage_ask}' is not an id of a declared "
+                          f"family, so every hold written on it would derive UNRESOLVED")
+        if read_slug(triage_ask) != as_slug:
+            raise Refusal(f"migrate-backlog: --triage-ask {triage_ask} is minted under slug "
+                          f"`{read_slug(triage_ask)}`, not --as `{as_slug}`: the triage ask is filed "
+                          f"in the --as folder, and an id filed outside its own slug's folder is V1")
+    signed = {kind: read_signed_record(kind, path) for kind, path in sorted(signed_paths.items())}
+    sheets = check_worksheets_signed(root, signed_paths)
+    design = read_worksheet_design(root, sheets)
+    buf = io.StringIO()
+    with redirect_stdout(buf):
+        plan = build_plan(root, design_named=design, signed=signed)
+    if triage_ask and triage_ask in plan.specs:
+        raise Refusal(f"migrate-backlog: --triage-ask {triage_ask} is a spec H1 at "
+                      f"{plan.specs[triage_ask]['path']}, and an ask filed under a unit's id "
+                      f"would read that unit's status as its own")
+    check_worksheets_fresh(root, sheets, plan)
+
+    entries = build_write_entries(plan, grammar)
+    ids = {e["id"] for e in entries}
+    filed = scan_filed_days(root, memory_root, families, grammar, ids)
+    undated = sorted(ids - set(filed), key=build_id_sort_key)
+    if undated:
+        raise Problem(f"migrate-backlog: {len(undated)} id(s) have no commit that added their row "
+                      f"under {memory_root}/backlog or {memory_root}/archive, so no `filed` day can "
+                      f"be derived and a placeholder would be written instead: "
+                      f"{' '.join(undated[:12])}")
+    head = read_rev(root, "HEAD")
+    form = Form("--write", "write", MIGRATION_SET, False, False)
+    relocation = build_relocation(root, form, head, [],
+                                  dict(args, entries=entries, filed=filed,
+                                       signed=sorted(signed_paths.items())), conf)
+    unnamed = read_unnamed_holds(relocation)
+    if unnamed:
+        raise Problem(f"migrate-backlog: {len(unnamed)} legacy hold(s) name no id, and without "
+                      f"--triage-ask there is no ask to hold them on — mint one under --as and pass "
+                      f"it: {' '.join(unnamed)}")
+    if relocation.human:
+        raise Problem(f"migrate-backlog: {len(relocation.human)} row(s) no rule can write, and the "
+                      f"writer never drops a row:{NEWLINE}"
+                      + NEWLINE.join(f"  {HUMAN} {i}: {why}" for i, why in relocation.human))
+
+    import datetime
+    day = datetime.date.today().isoformat()
+    as_home = read_slug_home(memory_root, as_slug)
+    extra, held = (build_triage_filing(relocation, triage_ask, as_home, day, grammar)
+                   if triage_ask else ([], []))
+    records = list(relocation.records) + extra
+    final = build_texts_with(read_target_texts(root, conf), records, memory_root)
+    bad = check_written_asks(final, plan, {triage_ask} if extra else set(), grammar)
+    if bad:
+        raise Problem(f"migrate-backlog: the conservation proof fails before anything is written:"
+                      f"{NEWLINE}{NEWLINE.join(bad)}")
+    # THE FIRST DAY STRICTLY AFTER EVERY `filed` THIS RUN WRITES, the triage ask's included —
+    # never the flip date, which reds a row first seen on the flip day under V12 (section 8 F2).
+    wrote = [filed[i] for i in ids] + ([day] if extra else [])
+    cutoff = (datetime.date.fromisoformat(max(wrote)) + datetime.timedelta(days=1)).isoformat()
+    # THE TABLE IS RE-FOLDED WITH THE TRIAGE ASK FILED, so a hold on it prints the status it will
+    # derive rather than the UNRESOLVED the engine's own fold saw before this writer filed the ask.
+    after = derive_fold(final, relocation.specs, relocation.builds, grammar)
+    plan_all = relocation._replace(records=records, after=after,
+                                   table=build_table(relocation.verdicts, records,
+                                                     relocation.before, after))
+
+    for line in plan_all.table:
+        print(line)
+    for name in NORMALIZATIONS:
+        print(f"migrate-backlog: conservation · {name}: {plan.counts[name]}")
+    print(f"migrate-backlog: conservation · {len(plan.census)} census id(s) · "
+          f"{len(plan.census) + (1 if extra else 0)} ask row(s) planned · "
+          f"{len([r for r in records if r.section == backlog.H_DISPOSITIONS])} status row(s) · "
+          f"{len({r.path for r in records})} file(s)")
+    print(f"triage ask: {len(held)} holds" + (f" · {triage_ask}" if held else ""))
+    if args["dry_run"]:
+        print(f"ASK_CUTOFF={cutoff}")
+        print("migrate-backlog: DRY RUN — nothing written")
+        return 0
+
+    written = write_relocation(root, plan_all, conf)
+    bad = check_written_asks(read_target_texts(root, conf), plan,
+                             {triage_ask} if extra else set(), grammar)
+    if bad:
+        print("migrate-backlog: the per-build files are written but the re-read does not conserve "
+              "every row, so the shards are LEFT IN PLACE for a human to compare:")
+        print(NEWLINE.join(bad))
+        return 1
+    live, _archives, _tracked = resolve_row_docs(root, conf, families)
+    if live:
+        run("git", "rm", "-q", "--", *live, cwd=root)
+    print(f"migrate-backlog: wrote {len(records)} record(s) into {len(written)} file(s); removed "
+          f"the authored shard(s) {' '.join(live) if live else 'none'}")
+    print(f"ASK_CUTOFF={cutoff}")
+    print(f"migrate-backlog: next — delete every tracked backlog archive of a declared family, set "
+          f"{backlog.MODE_KEY}=\"builds\" and {backlog.CUTOFF_KEY}=\"{cutoff}\", then run "
+          f"gen_build_index.py --write")
     return 0
 
 
@@ -2486,6 +2871,76 @@ def run_audit(tree: str, staged: bool = False) -> int:
             return audit.cmd_staged(root)
         tip = run("git", "rev-parse", "HEAD", cwd=tree).strip()
         return audit.print_report(audit.scan_history(root, [tip], False, tip), False)
+
+
+# ------------------------------------------------------------- the switch-over writer's fixtures
+#: The `--write` corpus: an OPEN ask on a finished build the signer KEEPs, a CLOSED row, a hold
+#: naming nothing, and an ask on a live build. Four rows is every record class `--write` files.
+WRITE_ROWS = (
+    "- EXMP-aFoo-1 · OPEN · an open ask on a finished build",
+    "- EXMP-aFoo-2 · CLOSED · a closed ask carrying its own reason",
+    "- EXMP-aFoo-3 · DEFERRED · only on the owner's word, naming nothing",
+    "- EXMP-aBar-1 · OPEN · an ask on a live build, held by nothing",
+)
+WRITE_RECORDS = "memory/builds/aWho/build"
+WRITE_SIGNED = WRITE_RECORDS + "/2026-04-02-build-EXMP-aWho-2-signed-"
+WRITE_TRIAGE_HEAD = "| Rule | Ask | Verdict | Field | Evidence |"
+
+
+def render_write_signature(tree: str, kind: str, table_head: str, rows=()) -> str:
+    """A signed record as the signer writes one: both worksheets named BY BLOB, then its table."""
+    lines = [f"# the fixture's signed {kind} record", ""]
+    for wkind in ("same-id", "triage"):
+        rel = f"{WRITE_RECORDS}/{DAY_SEED}-build-EXMP-aWho-1-{wkind}.tsv"
+        blob = run("git", "hash-object", "--", rel, cwd=tree).strip()
+        lines.append(f"- the {wkind} worksheet: `{rel}` · blob `{blob}` · computed at `x`")
+    cols = table_head.count("|") - 1
+    lines += ["", table_head, "|" + "---|" * cols] + list(rows)
+    return NEWLINE.join(lines) + NEWLINE
+
+
+def seed_write_fixture(base: str, name: str, rows=WRITE_ROWS) -> str:
+    """A shards-mode tree planned with `--record` and signed, the state `--write` meets at a flip."""
+    tree = os.path.join(base, name)
+    init_repo(tree)
+    seed_recall_kit(tree)
+    files = {".memory-tree.conf": render_transition_conf("shards"),
+             "README.md": "fixture" + NEWLINE,
+             "memory/backlog/EXMP.md": render_shard("EXMP", list(rows)),
+             "memory/backlog/OTHR.md": render_shard("OTHR", []),
+             "memory/project/stale-header-waiver.txt": WAIVER,
+             "memory/builds/aFoo/README.md": render_readme("aFoo", status="CLOSED"),
+             "memory/builds/aBar/README.md": render_readme("aBar", status="OPEN"),
+             "memory/builds/aWho/README.md": render_readme("aWho", status="OPEN")}
+    run_commit_on(tree, "seed: the pre-flip corpus", files, day=DAY_SEED)
+    with redirect_stdout(io.StringIO()):
+        cmd_plan(tree, read_args(["--plan", "--record", WRITE_RECORDS,
+                                  "--record-as", "EXMP-aWho-1"]))
+    run_commit_on(tree, "records: the plan", {}, day=DAY_SEED)
+    keep = ["| T6 | EXMP-aFoo-1 | KEEP | - | no evidence |"] if "EXMP-aFoo-1" in NEWLINE.join(
+        rows) else []
+    run_commit_on(tree, "records: the two signatures", {
+        WRITE_SIGNED + "same-id.md": render_write_signature(
+            tree, "same-id", "| Rule | Ask | Spec | Verdict | Evidence |"),
+        WRITE_SIGNED + "triage.md": render_write_signature(tree, "triage", WRITE_TRIAGE_HEAD, keep),
+    }, day=DAY_STRAG)
+    return tree
+
+
+def run_writer(tree: str, extra=()) -> tuple:
+    """`--write` in-process over a fixture. -> `(exit code, printed, porcelain before, after)`."""
+    argv = ["--write", "--as", "aWho", "--signed", "same-id=" + WRITE_SIGNED + "same-id.md",
+            "--signed", "triage=" + WRITE_SIGNED + "triage.md", *extra]
+    before = run("git", "status", "--porcelain", cwd=tree)
+    buf = io.StringIO()
+    code = 0
+    try:
+        with redirect_stdout(buf):
+            code = cmd_write(tree, read_args(argv))
+    except Problem as exc:
+        code, printed = getattr(exc, "code", 1), buf.getvalue() + str(exc)
+        return code, printed, before, run("git", "status", "--porcelain", cwd=tree)
+    return code, buf.getvalue(), before, run("git", "status", "--porcelain", cwd=tree)
 
 
 def seed_corpus(tmp: str) -> None:
@@ -3433,6 +3888,128 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
         arm("and nothing is written", True,
             lambda: hold_line + ", and the receiving branch edited this wording"
             in read_backlogs(fza).get("aFoo", ""))
+
+        # ---- unit 34 AC17: `--write`, one fixture per section 5 refusal, then the write itself.
+        # EVERY REFUSAL IS GRADED THREE WAYS: a non-zero exit, a message naming its cause, and a
+        # porcelain that did not move — a refusal that half-wrote the tree is the failure it exists
+        # to prevent, and only the third arm can see one.
+        wbase = seed_write_fixture(base, "write_base")
+
+        def run_refusal(label: str, tree: str, extra, cause: str) -> None:
+            rc_w, out_w, before_w, after_w = run_writer(tree, extra)
+            arm(f"--write refuses {label}, exiting non-zero", True, lambda: rc_w != 0)
+            arm(f"naming the cause when it refuses {label}", cause, lambda: out_w)
+            arm(f"and writing nothing when it refuses {label}", True,
+                lambda: before_w == after_w and not read_backlogs(tree))
+
+        wedit = os.path.join(base, "write_edited")
+        shutil.copytree(wbase, wedit)
+        sheet = f"{WRITE_RECORDS}/{DAY_SEED}-build-EXMP-aWho-1-triage.tsv"
+        run_commit_on(wedit, "records: the worksheet edited after signing",
+                      {sheet: read_text(os.path.join(wedit, sheet)).replace("\tOPEN\t", "\tBLOCKED\t", 1)})
+        run_refusal("a worksheet edited after signing", wedit, ["--triage-ask", "EXMP-aWho-9"],
+                    "edited after signing")
+
+        wstale = os.path.join(base, "write_stale")
+        shutil.copytree(wbase, wstale)
+        run_commit_on(wstale, "records: a row filed after planning", {
+            "memory/backlog/EXMP.md": render_shard("EXMP", list(WRITE_ROWS) + [
+                "- EXMP-aFoo-4 · OPEN · a second ask on the finished build, filed after planning"])})
+        run_refusal("a worksheet stale against a shard that gained a row", wstale,
+                    ["--triage-ask", "EXMP-aWho-9"], "is STALE against this tree")
+
+        wcell = os.path.join(base, "write_cell")
+        shutil.copytree(wbase, wcell)
+        run_commit_on(wcell, "records: a signature with no Field cell", {
+            WRITE_SIGNED + "triage.md": render_write_signature(
+                wcell, "triage", "| Rule | Ask | Verdict | Evidence |",
+                ["| T6 | EXMP-aFoo-1 | KEEP | no evidence |"])})
+        run_refusal("a signed record missing its Field header cell", wcell,
+                    ["--triage-ask", "EXMP-aWho-9"], "lacks the cell(s) Field")
+
+        wtwo = os.path.join(base, "write_two_live")
+        shutil.copytree(wbase, wtwo)
+        run_commit_on(wtwo, "records: a second live copy", {
+            "memory/backlog/OTHR.md": render_shard(
+                "OTHR", ["- EXMP-aBar-1 · OPEN · the second live copy of one id"])})
+        run_refusal("two live copies of one id", wtwo, ["--triage-ask", "EXMP-aWho-9"],
+                    "carry TWO live copies")
+
+        wbad = os.path.join(base, "write_unparseable")
+        shutil.copytree(wbase, wbad)
+        run_commit_on(wbad, "records: a line that reads as nothing", {
+            "memory/backlog/OTHR.md": render_shard("OTHR", ["- not an id · OPEN · nothing keys"])})
+        run_refusal("one row it cannot parse", wbad, ["--triage-ask", "EXMP-aWho-9"],
+                    "read as nothing")
+
+        run_refusal("a hold naming no id with --triage-ask absent", wbase, [],
+                    "without --triage-ask there is no ask to hold them on")
+        _rc, out_nt, _b, _a = run_writer(wbase, [])
+        arm("and it names each such hold", "EXMP-aFoo-3", lambda: out_nt.split("pass it:")[-1])
+        run_refusal("a --triage-ask minted under another slug than --as", wbase,
+                    ["--triage-ask", "EXMP-aBar-9"], "not --as `aWho`")
+
+        wspec = os.path.join(base, "write_spec")
+        shutil.copytree(wbase, wspec)
+        # The README loses its `status:` key in the same commit: a build carrying a spec DERIVES its
+        # status, and the generator refuses a front matter that states it beside one.
+        run_commit_on(wspec, "records: a unit whose H1 the triage ask would reuse", {
+            "memory/builds/aWho/README.md": render_readme("aWho"),
+            "memory/builds/aWho/spec/2026-04-02-spec-EXMP-aWho-7.md": render_spec(
+                "EXMP-aWho-7", "OPEN", "a unit of the writing build")})
+        run_refusal("a --triage-ask equal to a spec H1", wspec, ["--triage-ask", "EXMP-aWho-7"],
+                    "is a spec H1")
+
+        wzero = seed_write_fixture(base, "write_zero",
+                                   rows=[r for r in WRITE_ROWS if "DEFERRED" not in r])
+        rc_z0, out_z0, _b, _a = run_writer(wzero, ["--triage-ask", "EXMP-aWho-9"])
+        arm("with no hold naming no id, --triage-ask given still writes", 0, lambda: rc_z0)
+        arm("and says so in the one line S17 pins", "triage ask: 0 holds", lambda: out_z0)
+        arm("filing no triage ask at all", False,
+            lambda: "EXMP-aWho-9" in "".join(read_backlogs(wzero).values()))
+
+        wdry = os.path.join(base, "write_dry")
+        shutil.copytree(wbase, wdry)
+        rc_wd, out_wd, before_wd, after_wd = run_writer(wdry, ["--triage-ask", "EXMP-aWho-9",
+                                                             "--dry-run"])
+        arm("a --dry-run of a clean plan exits 0", 0, lambda: rc_wd)
+        arm("and touches nothing", True, lambda: before_wd == after_wd and not read_backlogs(wdry))
+
+        wok = os.path.join(base, "write_ok")
+        shutil.copytree(wbase, wok)
+        rc_wo, out_wo, _b, porcelain_wo = run_writer(wok, ["--triage-ask", "EXMP-aWho-9"])
+        books = read_backlogs(wok)
+        arm("--write over a signed, fresh plan exits 0", 0, lambda: rc_wo)
+        arm("each ask lands in its own id's folder, filed on the day its row was first added",
+            "- EXMP-aFoo-1 · filed " + DAY_SEED + " · an open ask on a finished build",
+            lambda: books.get("aFoo", ""))
+        arm("an ask on a live build lands in that build's folder", "- EXMP-aBar-1 · filed ",
+            lambda: books.get("aBar", ""))
+        arm("a legacy CLOSED lands as a disposition in the ask OWNER's folder",
+            "- CLOSED · EXMP-aFoo-2 · by ", lambda: books.get("aFoo", ""))
+        arm("a hold naming nothing is held on the triage ask, in the owner's folder",
+            "- DEFERRED · EXMP-aFoo-3 · until EXMP-aWho-9 · ", lambda: books.get("aFoo", ""))
+        arm("the triage ask is filed in the --as folder", "- EXMP-aWho-9 · filed ",
+            lambda: books.get("aWho", ""))
+        arm("naming every hold that named no id", "each held on this ask: EXMP-aFoo-3",
+            lambda: books.get("aWho", ""))
+        arm("beside the KEEP S17 pins, counting them",
+            "- KEEP · EXMP-aWho-9 · awaits the owner's triage of 1 legacy holds that named no id",
+            lambda: books.get("aWho", ""))
+        arm("a signed KEEP is WRITTEN, in the --as folder and never the owner's",
+            "- KEEP · EXMP-aFoo-1 · ", lambda: books.get("aWho", ""))
+        arm("so the owner's folder carries no KEEP of it", False,
+            lambda: "KEEP · EXMP-aFoo-1" in books.get("aFoo", ""))
+        arm("the authored shards leave the worktree", False,
+            lambda: os.path.isfile(os.path.join(wok, "memory", "backlog", "EXMP.md")))
+        arm("and the index, so the first render writes the views into absent paths",
+            "D  memory/backlog/EXMP.md", lambda: porcelain_wo)
+        arm("it prints the cutoff: the first day strictly after every filed day it wrote",
+            "ASK_CUTOFF=", lambda: out_wo)
+        arm("and each id holds exactly one ask row across every file", True,
+            lambda: all("".join(books.values()).count(f"- {i} · filed ") == 1
+                        for i in ("EXMP-aFoo-1", "EXMP-aFoo-2", "EXMP-aFoo-3", "EXMP-aBar-1",
+                                  "EXMP-aWho-9")))
         if prior_default is not None:
             os.environ["GOV_DEFAULT_BRANCH"] = prior_default
     finally:
@@ -3498,10 +4075,13 @@ USAGE = ("usage: migrate_backlog.py --plan [--record <dir> --record-as <unit-id>
          "[--triage-ask <id>] [--confirm <id>] [--drop <id>=<why>] [--dry-run]\n"
          "       migrate_backlog.py --repair <merge-sha> --as <slug> [--confirm <id>] "
          "[--drop <id>=<why>] [--dry-run]\n"
+         "       migrate_backlog.py --write --as <slug> --signed same-id=<path> "
+         "--signed triage=<path> [--triage-ask <id>] [--dry-run]\n"
          "       migrate_backlog.py --stragglers [--local] [--tsv] | --recipe | --selftest")
 
 #: The three WRITING verbs of the relocation engine. `--write`, the switch-over's whole-corpus
-#: migration, is a thin driver over the same engine and is NOT a mode of this file.
+#: migration, is a mode of this file but not one of these: it is a thin driver that builds its own
+#: delta from an empty base and calls the same engine, so it resolves no sides.
 WRITING_MODES = ("--relocate", "--ingest", "--repair")
 #: The two verbs that take a positional value straight after them.
 VALUED_MODES = ("--ingest", "--repair")
@@ -3514,7 +4094,7 @@ def read_args(argv: list) -> dict:
     rest = list(argv)
     while rest:
         token = rest.pop(0)
-        if token in ("--plan", "--selftest", "--relocate", "--stragglers", "--recipe"):
+        if token in ("--plan", "--selftest", "--relocate", "--stragglers", "--recipe", "--write"):
             args["mode"] = token
         elif token in VALUED_MODES:
             args["mode"] = token
@@ -3573,6 +4153,8 @@ def main(argv: list) -> int:
         return cmd_recipe(resolve_root())
     if args["mode"] == "--stragglers":
         return cmd_stragglers(resolve_root(), args)
+    if args["mode"] == "--write":
+        return cmd_write(resolve_root(), args)
     if args["mode"] in WRITING_MODES:
         return cmd_relocate(resolve_root(), args)
     if args["mode"] != "--plan":

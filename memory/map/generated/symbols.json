@@ -563,7 +563,17 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
-      "id": "build_backlog_rows_outliving_specs",
+      "id": "build_backlog_asks_contested",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "build_backlog_asks_unlabelled",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "build_backlog_evidence_sha",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
     },
@@ -666,6 +676,11 @@
       "id": "build_dense",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "build_diff_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "build_discovered_fixture",
@@ -1243,6 +1258,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "build_triage_filing",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "build_triage_records",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -1311,6 +1331,11 @@
       "id": "build_withheld_template",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "build_write_entries",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "cache_dir",
@@ -2078,6 +2103,21 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "check_worksheets_fresh",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_worksheets_signed",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_written_asks",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "checks",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -2451,6 +2491,11 @@
       "id": "cmd_write",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "cmd_write",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "cmd_write",
@@ -5073,6 +5118,16 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_asks_or_skip",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_asks_projection",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_backlog",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -5091,6 +5146,11 @@
       "id": "read_backlog_files",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_backlog_mode",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "read_backlog_mode",
@@ -5673,12 +5733,22 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_signed_keeps",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "read_signed_record",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "read_signed_verdicts",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_signed_worksheets",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
     },
@@ -5808,6 +5878,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "read_tracked_asks",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_tree_paths",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -5883,6 +5958,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "read_unnamed_holds",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "read_verdict",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
@@ -5941,6 +6021,11 @@
       "id": "read_withheld_rows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_worksheet_design",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "read_worktree_status",
@@ -6569,6 +6654,11 @@
     },
     {
       "id": "render_worksheet",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "render_write_signature",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
     },
@@ -7448,6 +7538,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "run_writer",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
       "id": "scan",
       "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
@@ -7581,6 +7676,11 @@
       "id": "scan_file_stems",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_filed_days",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "scan_forbidden",
@@ -7881,6 +7981,11 @@
       "id": "seed_witness",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "seed_write_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "selectable",
@@ -8211,6 +8316,11 @@
       "id": "test_audit_reds_on_unresolved_target",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_backlog_ask_signals",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_backlog_path_follows_the_common_dir_not_the_git_dir",

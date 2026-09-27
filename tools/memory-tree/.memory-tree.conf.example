@@ -229,9 +229,10 @@ BUILD_README_ENTRY_CAP_CHARS="350"  # a build README, whose authored rows were m
 # always described and what adopter ic practises (its scripts/rotate_index.py R1-R6 and carry_backlog.py).
 # MEASURED, and the reason the key exists: memory/HYGIENE.md stated BOTH procedures in one paragraph
 # — move the whole file AND carry every non-terminal row forward — and the pair writes every live row
-# into a frozen file. memory/archive/TOOL.2026-08-17.md is what that produced: a header promising
-# terminal rows only over 90 rows of which 66 were not, 49 ids also live in the shard and 7 of those
-# disagreeing about status. TOOL-cSpliceWarden-1, owner-ratified 2026-09-12.
+# into a frozen file. The TOOL backlog archive rotated on 2026-08-17 is what that produced: a header
+# promising terminal rows only over 90 rows of which 66 were not, 49 ids also live in the shard and 7
+# of those disagreeing about status. TOOL-cSpliceWarden-1, owner-ratified 2026-09-12. That archive
+# was deleted at the backlog switch-over (TOOL-dDerivedDocket-34), its rows migrated first.
 # BLANK IS UNDECLARED, and nothing refuses it today. That is the honest cost of not breaking every
 # adopter tree on a kit upgrade, and it is weaker than this comment's "no default" reads: an adopter
 # can run forever undeclared. An UNRECOGNISED value is a different answer from a blank one and does

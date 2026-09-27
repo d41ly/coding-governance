@@ -138,7 +138,7 @@ running `--fix` in a fixture of each layout, so a stray third spelling in this f
 Before 2.71, hygiene check 20 admitted a rotated archive only when its basename began `DECISIONS.`,
 so **every rotated BACKLOG shard went unscanned**. From 2.73 an archive is recognised by the name of
 the document it ROTATED — `DECISIONS` or a value declared in `FAMILIES`, plus a date and an optional
-same-day disambiguator such as the `b` in `TOOL.2026-08-17b.md`.
+same-day disambiguator: a lower-case `b` after the date for the second rotation of one day.
 
 **Your `ROW_DUPLICATE_PIN` may red on the first upgraded bar, with no change of your own.** A
 duplicate id that has always been sitting in a rotated shard becomes visible, and the pin is an
