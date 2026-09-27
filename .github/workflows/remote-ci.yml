@@ -1,0 +1,312 @@
+# remote-ci.yml — this repo's remote CI, the one layer of the straggler guard no node can skip.
+# TOOL-dDerivedDocket-32, on the owner's rulings D11-b, D11-c and D12-i12 (2026-09-13).
+#
+# WHAT RUNS. On every push to main: `history-audit`, the memory-tree hygiene engine over the full
+# history, which carries check 9 and check 25's transition audit; and `bar`, the merge bar with
+# every leg guard ignored, whose conclusion is this sha's verdict. Daily and on a manual dispatch:
+# `held-plan`, which derives one matrix entry per declared self-test from the runner's own resolved
+# population, and `held`, which runs each suite the way the sweep runs one and publishes its output.
+#
+# WHAT THIS DOES NOT DO, said here because a green run reads as more than it is:
+#   - it blocks nothing. Landing stays a direct push, so a push that skipped every local hook lands
+#     first and CI reds after it. Making a job a required check is a repository setting, the owner's.
+#   - the held run issues no cost verdict. The budgets were measured on this repo's own nodes, and a
+#     hosted runner's clock would red them with nothing wrong in the tree; it keeps the hang bound.
+#   - no permanent gate grades this file's text. Its contract was observed before landing by staged
+#     breaks on a scratch copy, recorded in the unit's acceptance ledger.
+#   - it runs on no event a fork can trigger, reads no secret and writes nothing to the repository.
+#
+# WHY WINDOWS UNDER GIT-BASH: every recorded green was earned there, so a Linux runner's first reds
+# would measure the host rather than the tree. WHY THE BAR CLONES TO THE PRIMARY-TREE PATH instead of
+# running in the checkout workspace: the charter renders that path from wherever the clone sits, so a
+# bar run anywhere else reads its own charter as drifted on every push.
+#
+# Every action is GitHub-owned and pinned by a full commit sha, its tag in the comment beside it.
+name: remote-ci
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  history-audit:
+    if: github.event_name == 'push'
+    runs-on: windows-latest
+    timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: core.autocrlf off at GLOBAL scope, before any checkout
+        # Global, never repo-local: no repository exists in the workspace yet, and a repo-scoped
+        # write there prints `fatal: not in a git directory` and exits 128.
+        run: git config --global core.autocrlf false
+      - name: checkout, full history, no token left behind
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          path: tree
+          fetch-depth: 0
+          persist-credentials: false
+      - name: point origin/HEAD at main, which the checkout leaves unset
+        working-directory: tree
+        run: git remote set-head origin main
+      - name: origin/HEAD resolves before any bar command runs
+        working-directory: tree
+        run: git symbolic-ref refs/remotes/origin/HEAD
+      - name: the history audit, check 9 and check 25, over the full history
+        working-directory: tree
+        run: |
+          set -o pipefail
+          bash tools/memory-tree/check-memory-hygiene.sh 2>&1 | tee ../history-audit.out
+      - name: liveness, the engine reached check 25
+        working-directory: tree
+        run: |
+          if ! grep '^memory-hygiene: check 25 ' ../history-audit.out; then
+            echo "history-audit: the engine printed no line beginning 'memory-hygiene: check 25 '," >&2
+            echo "history-audit: so it never reached the transition audit and this run proves nothing" >&2
+            exit 1
+          fi
+
+  bar:
+    if: github.event_name == 'push'
+    runs-on: windows-latest
+    timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash
+    env:
+      # The path every recorded green was earned at, and the one the rendered charter records.
+      PRIMARY_TREE: C:/projects/coding-governance
+    steps:
+      - name: core.autocrlf off at GLOBAL scope, before the clone
+        run: git config --global core.autocrlf false
+      - name: anonymous clone to the primary-tree path, which also sets origin/HEAD
+        run: git clone "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$PRIMARY_TREE"
+      - name: pin the pushed sha, the one step that makes this verdict per-sha
+        working-directory: ${{ env.PRIMARY_TREE }}
+        run: git checkout -B main "$GITHUB_SHA"
+      - name: origin/HEAD resolves before any bar command runs
+        working-directory: ${{ env.PRIMARY_TREE }}
+        run: git symbolic-ref refs/remotes/origin/HEAD
+      - name: the merge bar, every leg guard ignored, walled inside the job limit
+        working-directory: ${{ env.PRIMARY_TREE }}
+        run: GATE_FULL=1 GATE_WALL=20400 bash tools/run-gates/run-gates.sh
+      - name: copy the run record into the workspace, after a red bar too
+        if: always()
+        run: |
+          gitdir=$(git -C "$PRIMARY_TREE" rev-parse --absolute-git-dir)
+          mkdir -p bar-record
+          cp -R "$gitdir/gate-logs" bar-record/
+          if [ -f "$gitdir/gate-last-failure.txt" ]; then
+            cp "$gitdir/gate-last-failure.txt" bar-record/
+          fi
+      - name: publish the run record
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: bar-${{ github.sha }}
+          path: bar-record/
+          if-no-files-found: error
+
+  held-plan:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - name: core.autocrlf off at GLOBAL scope, before any checkout
+        run: git config --global core.autocrlf false
+      - name: checkout, full history, no token left behind
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          path: tree
+          fetch-depth: 0
+          persist-credentials: false
+      - name: point origin/HEAD at main, which the checkout leaves unset
+        working-directory: tree
+        run: git remote set-head origin main
+      - name: origin/HEAD resolves before any bar command runs
+        working-directory: tree
+        run: git symbolic-ref refs/remotes/origin/HEAD
+      - name: one matrix entry per declared self-test, derived from the runner's own --list
+        id: plan
+        working-directory: tree
+        # The population is the runner's RESOLVED output: most budget rows leave their argv blank
+        # and inherit it from the leg manifest, and `--kit` is a substring filter, so neither the
+        # budget file nor a directory partitions it. The cap is read from the `held` job's own
+        # timeout-minutes below rather than typed a second time here.
+        run: |
+          set -o pipefail
+          . tools/lib/resolve-python.sh
+          PY=$(resolve_python) || { echo "held-plan: no python the resolver can run" >&2; exit 1; }
+          scratch=$(mktemp -d)
+          bash tools/run-gates/run-selftests.sh --list > "$scratch/list.txt"
+          # An unreadable source leaves its value blank, and the program below refuses it by name.
+          factor=$(sed -n 's/^#[[:space:]]*sweep-ceiling-factor:[[:space:]]*\([0-9][0-9]*\).*/\1/p' \
+            tools/run-gates/selftest-budgets.txt | head -1) || factor=""
+          wf=${GITHUB_WORKFLOW_REF#*/*/}; wf=${wf%%@*}
+          minutes=$(awk '/^  [A-Za-z0-9_-]+:[[:space:]]*$/ { held = ($1 == "held:") }
+                         held && /^    timeout-minutes:[[:space:]]/ { print $2; exit }' "$wf") || minutes=""
+          "$PY" - "$scratch/list.txt" "${factor:-}" "${minutes:-}" "$(cygpath -w "$BASH")" \
+            tools/run-gates/run-selftests.sh <<'PY'
+          import json, os, re, subprocess, sys
+
+          list_path, factor_arg, minutes_arg, bash_exe, runner = sys.argv[1:6]
+          MATRIX_LIMIT = 256  # the platform's own ceiling on one job's matrix
+          ROW = re.compile(r"^  (\S.*?) +([0-9]+)s  (\S.*)$")
+          TAIL = re.compile(r"^run-selftests: ([0-9]+) row\(s\), ")
+          refused = []
+
+          if not factor_arg.isdigit() or int(factor_arg) < 1:
+              refused.append(f"the budget file declares no sweep-ceiling-factor ({factor_arg!r})")
+          if not minutes_arg.isdigit() or int(minutes_arg) * 60 <= 600:
+              refused.append(f"the held job declares no usable timeout-minutes ({minutes_arg!r})")
+
+          population, declared = [], None
+          for line in open(list_path, encoding="utf-8").read().splitlines():
+              tail = TAIL.match(line)
+              if tail:
+                  declared = int(tail.group(1))
+                  continue
+              row = ROW.match(line)
+              if row is None:
+                  refused.append(f"a --list row the plan cannot parse, so it emits nothing: {line!r}")
+                  continue
+              population.append((row.group(1), int(row.group(2)), row.group(3)))
+
+          if declared is None:
+              refused.append("--list printed no 'run-selftests: <n> row(s)' line to count against")
+          elif declared != len(population):
+              refused.append(f"--list declares {declared} row(s) and the plan parsed {len(population)}")
+          if not population:
+              refused.append("the population is empty, so a green schedule would have run nothing")
+          if len(population) > MATRIX_LIMIT:
+              refused.append(f"{len(population)} suites exceed the platform's {MATRIX_LIMIT}-entry "
+                             f"matrix limit, so the held job could not expand at all")
+          names = [name for name, _budget, _argv in population]
+          safes = [re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-") for name in names]
+          for label, seq in (("name", names), ("artifact name", safes)):
+              for dup in sorted({x for x in seq if seq.count(x) > 1}):
+                  refused.append(f"two rows share the {label} {dup!r}, so their entries collide")
+          if refused:
+              for why in refused:
+                  print(f"held-plan: REFUSED: {why}", file=sys.stderr)
+              sys.exit(1)
+
+          factor, cap = int(factor_arg), int(minutes_arg) * 60 - 600
+          entries = []
+          for (name, budget, argv), safe in zip(population, safes):
+              bound = budget * factor
+              run_bound = min(bound, cap)
+              # The run step's own timeout: the run bound, timeout's 5 s kill-after and a minute
+              # for tee to drain, in whole minutes. The cap keeps it inside the job's limit.
+              entries.append({"name": name, "safe": safe, "budget": budget, "bound": bound,
+                              "run_bound": run_bound, "step_minutes": -(-(run_bound + 65) // 60),
+                              "platform_bounded": "yes" if bound > cap else "no", "argv": argv})
+
+          # THE ONE-ROW CHECK. A key is a key only when the runner itself selects exactly its own
+          # row with it; a key selecting several suites keeps the union whole and runs them twice.
+          for e in entries:
+              got = subprocess.run([bash_exe, runner, "--kit", e["argv"], "--list"],
+                                   capture_output=True, text=True)
+              hits = [m.group(1) for m in map(ROW.match, got.stdout.splitlines()) if m]
+              if got.returncode != 0 or hits != [e["name"]]:
+                  refused.append(f"the key {e['argv']!r} selects {hits} (exit {got.returncode}), "
+                                 f"not exactly {e['name']!r}")
+
+          # THE UNION CHECK, against the population as parsed and never against the entries' own list.
+          emitted = sorted(e["name"] for e in entries)
+          if emitted != sorted(names):
+              refused.append(f"the entries do not equal the population: missing "
+                             f"{sorted(set(names) - set(emitted))}, extra or doubled "
+                             f"{sorted(n for n in set(emitted) if emitted.count(n) != names.count(n))}")
+          if refused:
+              for why in refused:
+                  print(f"held-plan: REFUSED: {why}", file=sys.stderr)
+              sys.exit(1)
+
+          for e in entries:
+              mark = "  platform-bounded" if e["platform_bounded"] == "yes" else ""
+              print(f"held-plan: {e['name']:<46} budget {e['budget']:>6}s  bound {e['bound']:>6}s  "
+                    f"run {e['run_bound']:>6}s  step {e['step_minutes']:>3}m{mark}")
+          print(f"held-plan: {len(entries)} entries, factor {factor}, cap {cap}s "
+                f"(timeout-minutes {minutes_arg} x 60 less 600)")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8", newline="\n") as out:
+              out.write("matrix=" + json.dumps({"include": entries}, separators=(",", ":")) + "\n")
+          PY
+
+  held:
+    needs: held-plan
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    name: held ${{ matrix.name }}
+    runs-on: windows-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.held-plan.outputs.matrix) }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: core.autocrlf off at GLOBAL scope, before any checkout
+        run: git config --global core.autocrlf false
+      - name: checkout, full history, no token left behind
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          path: tree
+          fetch-depth: 0
+          persist-credentials: false
+      - name: point origin/HEAD at main, which the checkout leaves unset
+        working-directory: tree
+        run: git remote set-head origin main
+      - name: origin/HEAD resolves before any bar command runs
+        working-directory: tree
+        run: git symbolic-ref refs/remotes/origin/HEAD
+      - name: run the suite as the sweep runs one, its output written as it runs
+        working-directory: tree
+        # `timeout` bounds the suite and not the pipe: `tee` reads until its LAST writer closes, so a
+        # grandchild that escapes the kill would hold this step open to the job limit. The step
+        # timeout, derived by the plan from the same run bound, ends it with the upload still inside.
+        timeout-minutes: ${{ matrix.step_minutes }}
+        env:
+          HELD_NAME: ${{ matrix.name }}
+          HELD_ARGV: ${{ matrix.argv }}
+          HELD_BOUND: ${{ matrix.run_bound }}
+          HELD_OUT: ../held-${{ matrix.safe }}.log
+        # Exit 124 or 137 is a kill at the bound, named below. A platform-bounded suite runs under
+        # the cap the plan derived, ten minutes inside the job limit, so its upload still runs.
+        run: |
+          set -o pipefail
+          [ -n "$HELD_ARGV" ] || { echo "held: '$HELD_NAME' carries an empty argv, nothing to run" >&2; exit 1; }
+          timeout --version >/dev/null 2>&1 || { echo "held: no coreutils timeout on PATH" >&2; exit 1; }
+          . tools/lib/resolve-python.sh
+          PY=$(resolve_python) || { echo "held: no python the resolver can run" >&2; exit 1; }
+          argv=$HELD_ARGV
+          case "$argv" in python\ *|python3\ *) argv="$PY ${argv#* }" ;; esac
+          scratch=$(mktemp -d)
+          echo "held: $HELD_NAME, bound ${HELD_BOUND}s: $argv"
+          rc=0
+          TMPDIR="$scratch" timeout -k 5 "$HELD_BOUND" bash -c "$argv" < /dev/null 2>&1 | tee "$HELD_OUT" || rc=$?
+          case "$rc" in
+            0) echo "held: $HELD_NAME PASS" ;;
+            124|137) echo "held: $HELD_NAME KILLED at its ${HELD_BOUND}s bound, exit $rc" >&2 ;;
+            *) echo "held: $HELD_NAME FAIL, exit $rc" >&2 ;;
+          esac
+          exit "$rc"
+      - name: publish what ran
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: held-${{ github.sha }}-${{ matrix.safe }}
+          path: held-${{ matrix.safe }}.log
+          if-no-files-found: error

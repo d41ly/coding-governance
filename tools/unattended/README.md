@@ -250,5 +250,7 @@ run-unattended-gates.sh          # the kit's self-tests, ON DEMAND ONLY
 
 The self-tests are deliberately **not** on the merge bar. A suite that stages breaks into a copy of
 a checker has a job only when that checker's source changes, and none at all in an adopter's repo
-that copy-installs this kit and never edits it. The legs whose subject is the *repository* stayed on
-the bar, because those go stale with nobody editing the kit; `<prefix>/gate-legs.json` names which.
+that copy-installs this kit and never edits it. So those suites left both the merge bar's leg
+manifest and this kit's own `kit.toml`, and adopters stop receiving them too. The legs whose
+subject is the *repository* stayed on the bar, because those go stale with nobody editing the kit;
+`<prefix>/gate-legs.json` names which.
