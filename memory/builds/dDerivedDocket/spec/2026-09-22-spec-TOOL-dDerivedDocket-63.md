@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix
 
-**Status:** SPECCED · rev-4 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 33
+**Status:** SPECCED · rev-5 · 2026-09-27 · node d · Tier-2 · base 07997375 · streams tooling · order 33
 
 <!-- gen:spec-records -->
 
@@ -302,10 +302,20 @@ The unit lands inside this build's own run, after unit 61. Between unit 61's mer
 orchestrator's driver carries unit 61's order. In that window a sub-agent of the orchestrating
 session that ran `--resume <slug> --keepalive-id <new>` would take the run over, and the
 orchestrator's own `--replaces` would run a take-over rather than a replacement. The orchestrator's
-ordinary resume passes its recorded keepalive and meets row 1, which neither order changes. A unit
-agent that runs the driver does so over a scratch fixture of its own and never over this run's
-record. Unit 61's own Rollout call, a `--replaces` resume of this build's record while it still
-carries no lease, meets N2 or N4, which neither order changes either.
+ordinary resume passes its recorded keepalive and meets row 1, which neither order changes. No unit
+agent runs `--resume` on this run's record: `tools/workflows/unattended-unit.js`, the file unit
+62's Rollout checks for the same claim, names neither `--resume` nor a keepalive id. It does hand
+every unit agent `--dispatch` and `--brief` over this run's record, run under the orchestrating
+session's id as §4 measured, and neither verb reaches a matrix row. Unit 61's Rollout replace is
+not the no-lease call this spec's earlier revisions read. Re-read at `2f62eb5f`, this build's
+record has carried all six lease facts since `d5ae776b`, where the merged driver recorded them at
+the owner's resume, so a
+`--resume <slug> --keepalive-id <live id> --replaces <recorded id>` from the recorded session meets
+unit 61's same-session row until this unit lands: a take-over through `run_takeover` with unit 28's
+reap, or a check-58 refusal when the recorded pid is alive and is not `CLAUDE_PID`. That is the
+window harm named above, and unit 61's Rollout waits for this unit before it makes that call (its
+§4 Rollout). Once this unit lands, the same call at a fresh or unknown clock meets row 2 and prints
+`keepalive replaced`.
 
 ### Files touched (estimate)
 
@@ -531,6 +541,15 @@ guard the estimate trips is broad and leaves the join.
   block that tests the fresh return alone, and S1, S3 and §7 name it. M7: AC5's two zero-counts
   also read 1 at the first parent, so neither is green before this unit acts, beside the positive
   witnesses unit 61's AC13 now carries for the rows this unit edits. No row, order or edge moved.
+- rev-5 · 2026-09-27 · §4 · G10 spec audit round 1 fold of this spec's half of M1 and of L2, in
+  one edit of §4 Rollout, re-read at `2f62eb5f`. M1: the Rollout's last sentence said unit 61's
+  Rollout replace, on a record still carrying no lease, meets N2 or N4; this build's record has
+  carried all six lease facts since the merged driver's resume at `d5ae776b`, so that call meets
+  unit 61's same-session row until this unit lands, and unit 61's Rollout waits for this unit. L2:
+  the Rollout no longer says a unit agent never runs the driver over this run's record; it says no
+  unit agent runs `--resume` there, citing `tools/workflows/unattended-unit.js` as unit 62's
+  Rollout does, which hands unit agents `--dispatch` and `--brief` only. No row, order, criterion
+  or edge moved.
 
 ## 10. Reuse audit
 

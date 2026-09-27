@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-65 — a session waiting on its own sub-agents, a move the liveness clock sees
 
-**Status:** SPECCED · rev-1 · 2026-09-22 · node d · Tier-2 · base 67d2ccfc · streams tooling · order 35
+**Status:** SPECCED · rev-2 · 2026-09-27 · node d · Tier-2 · base 67d2ccfc · streams tooling · order 35
 
 <!-- gen:spec-records -->
 
@@ -14,10 +14,11 @@
 
 While an orchestrating session waits on a background Workflow, no signal `--liveness` reads moves in
 its run worktree. Its own transcript sits still, and its sub-agents append to transcripts under
-`<sid>/subagents/`, which the transcript term never reads. Once unit 61's Rollout records this
-build's session, a wave that outlasts `RESUME_STALE_BOUND`, 5400 s in gov, with no orchestrator
-commit reads STALE in the one worktree `TOOL-dDerivedDocket-62` lets act, and the resume tick would
-kill the orchestrator with its Workflow. That is H1 of
+`<sid>/subagents/`, which the transcript term never reads. This build's record has named its
+session since `d5ae776b`, where the merged driver recorded it at the owner's resume, and not from
+unit 61's Rollout. So a wave that outlasts `RESUME_STALE_BOUND`, 5400 s in gov, with no
+orchestrator commit reads STALE in the run worktree, the one worktree `TOOL-dDerivedDocket-62`
+lets act, and a registered resume tick would kill the orchestrator with its Workflow. That is H1 of
 `memory/builds/dDerivedDocket/reviews/2026-09-22-review-TOOL-dDerivedDocket-62-spec-audit-g9-round1.md`.
 Here `derive_last_move` gains one term, the newest sub-agent transcript of the recorded session, so
 a session waiting on its own sub-agents is a move.
@@ -44,7 +45,8 @@ a session waiting on its own sub-agents is a move.
   counted off their blocks and never read off a run; the driver arms are written in region two, so
   `FLOOR_SHARD_1` does not move. Observed by AC5.
 - **S4** The unit's hygiene: no kit version moves, no added line in a shipped kit file spells a
-  `tools/<kit>/` literal, no function is minted and no `fail` branch is added. Observed by AC6.
+  `tools/<kit>/` literal, no function is minted, no `fail` branch is added, and no loop the
+  shell-hygiene leg gates is added (§4). Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -145,10 +147,10 @@ declared local:
     [ -n "$g" ] || shopt -u globstar
     if [ "${#fs[@]}" -gt 0 ]; then
       ms=$(stat -c %Y -- "${fs[@]}" 2>/dev/null) || true; k=0
-      while IFS= read -r m; do
-        case "$m" in ""|*[!0-9]*) continue ;; esac
+      for m in $ms; do
+        case "$m" in *[!0-9]*) continue ;; esac
         k=$((k+1)); if [ "$m" -gt "$LM_NEWEST" ]; then LM_NEWEST=$m; LM_SOURCE=subagent; fi
-      done <<<"$ms"
+      done
       [ "$k" -eq "${#fs[@]}" ] || LM_DEAD="stat -c %Y over $sd"
     fi
   fi
@@ -156,10 +158,18 @@ declared local:
 
 The glob, the `-f` tests, `shopt` and the loop are builtins, so the term costs one spawn whatever
 the count. A path list of 431 entries, about 92 KB, reached one `stat` on node `d` and returned 431
-readings. The loop takes the shape `read_tree_clocks` already uses, a variable fed through a
-here-string. `globstar` is restored to the state it was found in, and nothing else in the driver
-spells `**`. A `stat` that dates some paths and not others still prints the rest, so the count test
-is what makes a partial reading a dead probe rather than a silently smaller population.
+readings. The loop reads the readings by default word splitting, with no redirect. Every reading is
+a digit string, which neither splits nor globs, and a non-digit word is skipped, so the split is
+exact. A loop fed by a here-string over a variable assigned from a substitution is the class the
+`shell hygiene (a loop fed by a command substitution)` leg gates (§7), and its registry,
+`memory/project/substitution-fed-loops.txt`, holds each count equal to the scan, so a count falls
+only with its sites and a new site is never admitted by raising one. This term adds no site, and
+that file is not touched. `read_tree_clocks`'s here-string is one of the legacy sites that
+registry drains, not a model. Run through that leg's own `scan_file` on 2026-09-27, the block above
+reports no gated site, and the rev-1 block reported one `<<<` (G10 M4). `globstar` is restored to
+the state it was found in, and nothing else in the driver spells `**`. A `stat` that dates some
+paths and not others still prints the rest, so the count test is what makes a partial reading a dead
+probe rather than a silently smaller population.
 
 ### Why the term is this run's, and what can move it
 
@@ -206,12 +216,15 @@ sub-agent reads exactly as it does on unit 64's driver.
 
 The unit lands after unit 64 in this build's own run, in the serial order of the promoted units, and
 ships live: its only effect is to withhold a kill and a take-over from a session whose sub-agents
-are writing. From unit 61's Rollout, which records this build's session, until this unit's build
-commit is in the run worktree, a wave that outlasts the bound with no orchestrator commit reads
-STALE there. Measured on node `d` 2026-09-22 (PINNED), `schtasks /query` lists 416 tasks and none
-matches `resume`, `unattended` or `tick`, so the kill is latent. The resume tick stays unregistered
-on node `d` until this unit has landed. The take-over half of that window needs another session's
-`--resume --keepalive-id` in the run worktree, which nothing in this build issues.
+are writing. The window opened at `d5ae776b`, where the merged driver recorded this build's session
+at the owner's resume, and not at unit 61's Rollout: re-read at `2f62eb5f`, the run-state file
+carries all six lease facts. From that commit until this unit's build commit is in the run
+worktree, a wave that outlasts the bound with no orchestrator commit reads STALE there. Measured on
+node `d` 2026-09-22 (PINNED), `schtasks /query` lists 416 tasks and none matches `resume`,
+`unattended` or `tick`; the G10 audit re-measured 415 and none on 2026-09-27, so the kill is
+latent. The resume tick stays unregistered on node `d` from now until this unit has landed: the
+rule binds today, not from unit 61's Rollout. The take-over half of that window needs another
+session's `--resume --keepalive-id` in the run worktree, which nothing in this build issues.
 
 ### Files touched (estimate)
 
@@ -246,9 +259,10 @@ on node `d` until this unit has landed. The take-over half of that window needs 
   one, so a file the CLI prunes mid-read errs toward the live verdict.
 - observability — `last-move-source: subagent` while a session waits on its agents; the `transcript`
   key still names the session's own file, whose directory holds them.
-- risks — (1) Between unit 61's Rollout and this unit's landing the kill is armed for any wave past
-  the bound (§4 Rollout). (2) The layout is spelled in two kits, this term's glob and
-  `build_session_tree` in `tools/runlog/extract.py`, and no gate joins them; a CLI that moves
+- risks — (1) From `d5ae776b` until this unit's landing the kill is armed for any wave past the
+  bound wherever a resume tick is registered, and none is on node `d` (§4 Rollout). (2) The
+  layout is spelled in two kits, this term's glob and `build_session_tree` in
+  `tools/runlog/extract.py`, and no gate joins them; a CLI that moves
   sub-agent transcripts silences the term in the kill direction, and the driver suite's literal
   paths pin the layout measured in §4. (3) An agent inside one tool call longer than the bound, on a
   tool with no ceiling, still reads stale. (4) A harness that ran agents out of process would let
@@ -326,14 +340,21 @@ on node `d` until this unit has landed. The take-over half of that window needs 
   `grep -cE '^[^#]*\bfail [0-9]+'` over the driver print what they printed at the parent.
   `grep -cE '^ *#.*sub-agent transcript'` over the driver prints at least 2, and `git diff
   --name-only` of the build commit names none of the protocol, stop contract or verb carrier, as
-  template or render.
+  template or render. The `<<<` sites that `scan_file` of `tools/gate-lint/sh_hygiene.py` reports
+  under a gated class for the driver, read with `git show` at the build commit and at its first
+  parent, number no more at the first than at the second.
   Red when: the unit moves a version the unreleased kit does not owe; or an added line spells a path
   the install-prefix ban forbids; or a function or a `fail` branch arrives unpriced; or the comment
   that lists the signals omits the term, so a reader sizing the bound is told a waiting session is
-  silent; or a capped carrier is edited to say so instead.
+  silent; or a capped carrier is edited to say so instead; or the term feeds its loop from a
+  here-string over the `stat` output, the class the shell-hygiene leg gates, which would hide inside
+  that leg's red at `407038a3`, where the driver already measured 3 such sites against its
+  registry's 2 (G10 M4).
   permission: the ban's verdict is the `install-prefix (shipped surface)` leg, and the
   armed-or-pinned verdict is the `harness arms (fail branches armed or pinned)` leg, both observed
-  at VERIFYING.
+  at VERIFYING. The `shell hygiene (a loop fed by a command substitution)` leg's own verdict is
+  observed there too, and it reds for sites this unit does not own until they are drained, so the
+  count above is what sees this unit's share of the class.
 
 ## 7. Gates
 
@@ -390,6 +411,17 @@ broad `tools/` one, so the legs above are named by choice.
   `67d2ccfc` and on `TOOL-dDerivedDocket-61` at rev-6 and `TOOL-dDerivedDocket-64` at rev-2 as
   specified, with the current behaviour measured over a scratch fixture and the session layout
   measured over this build's own orchestrating session.
+- rev-2 · 2026-09-27 · §1 · §2 S4 · §4 · §5 · §6 AC6 · G10 spec audit round 1 fold of M4 and of
+  this spec's half of M1, re-read at `2f62eb5f`. M4: §4's term fed its `stat` readings to a loop
+  through a here-string over a substituted variable, the class the shell-hygiene leg §7 names gates;
+  it now reads them with `for m in $ms`, one `stat` spawn still, the count test unchanged, and §4
+  no longer presents `read_tree_clocks`'s here-string as the model; `scan_file` reports no gated
+  site in the new block and one `<<<` in the old. S4 and AC6 add that no gated loop is added, AC6
+  counting the driver's gated `<<<` sites against the first parent, because the leg reds at HEAD
+  for older sites. M1: this build's record has carried its session since the merged driver's resume
+  at `d5ae776b`, so §1, the Rollout and §5 risk (1) date the kill window from that commit rather
+  than from unit 61's Rollout, and the resume tick stays unregistered from now until this unit
+  lands. No order or edge moved, and no criterion but AC6 changed.
 
 ## 10. Reuse audit
 

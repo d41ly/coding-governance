@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees
 
-**Status:** SPECCED · rev-4 · 2026-09-22 · node d · Tier-2 · base 07997375 · streams tooling · order 34
+**Status:** SPECCED · rev-5 · 2026-09-27 · node d · Tier-2 · base 07997375 · streams tooling · order 34
 
 <!-- gen:spec-records -->
 
@@ -224,8 +224,9 @@ but four `hit` arms of the driver suite, from `tools/unattended/unattended.test.
   queue, exactly as its legs already keep it LIVE while they land, because the verdict chain does not
   consult `pid-alive`.
 - A record carrying no lease. Unit 61 keeps its matrix rows on `build_folder_age` rather than on
-  this clock (its §8 F13), and `--liveness` grades it UNBOUND, so the tick never acts on it and the
-  heartbeat changes no answer the matrix gives it.
+  this clock (its §8 F13), and `--liveness` reads it UNBOUND on its run branch and ELSEWHERE off
+  it, under `TOOL-dDerivedDocket-62`, which lands before this unit. The tick skips both verdicts, so
+  it never acts on such a record, and the heartbeat changes no answer the matrix gives it.
 - A holder waiting on a background Workflow with no commit of its own. Its sub-agents write under
   the session's own transcript directory and its units in wave worktrees, neither of which this
   clock reads, so the run worktree can read STALE while it waits; the heartbeat beats only while a
@@ -489,6 +490,11 @@ suite carries AC4's arm, and both canaries run the edited runner.
   holder waiting on a Workflow as G9 H1, promoted to `TOOL-dDerivedDocket-65`. No order moved.
 - rev-4 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-65`, answering that unit's
   consumes-from. Edges only; nothing this unit specifies moved.
+- rev-5 · 2026-09-27 · §4 · G10 spec audit round 1, the class of its L1 found in this spec by the
+  fold's grep: §4's bullet on a record carrying no lease said `--liveness` grades it UNBOUND, where
+  under `TOOL-dDerivedDocket-62`, which builds before this unit, a copy off its run branch reads
+  ELSEWHERE; the bullet now names both verdicts, which the tick skips, so its conclusion stands. No
+  criterion, row, order or edge moved.
 
 ## 10. Reuse audit
 

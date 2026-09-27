@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor
 
-**Status:** SPECCED · rev-8 · 2026-09-22 · node d · Tier-2 · base 285701d5 · streams tooling · order 31
+**Status:** SPECCED · rev-9 · 2026-09-27 · node d · Tier-2 · base 285701d5 · streams tooling · order 31
 
 <!-- gen:spec-records -->
 
@@ -33,7 +33,18 @@ bound, with HELD carved out of the stop-guard, `--liveness` and the resume tick.
   `run_takeover`'s `write_lease_taken`; the `remove_lease` calls in `verb_landed` and `verb_abort`;
   `run_hold`'s `read_lease` and `write_lease_released`; and `verb_status`'s `LEASE —` line. No verb
   reads or writes a `.lease` file. `build_folder_age` STAYS, as the clock of a record that carries
-  no lease (§8 F13). Observed by AC1 and AC22.
+  no lease (§8 F13). Unit 28's process ledger, landed at `1acce23d` after this spec's base, reads
+  two of the names deleted here, and each reader moves to a named target.
+  `resolve_procs_path <slug>` prints `<slug>.procs` in the directory of the path
+  `resolve_landed_log <slug>` prints, the one common-dir derivation (§4), and never the
+  per-worktree `resolve_sidecar_dir`. `write_proc_record`'s fifth field reads the record's
+  `keepalive` fact, through `fact` over `runmd_of "$SLUG"`, or `-` when the record or the fact is
+  absent, in place of `RB_LEASE_ID`. A verb run before the record carries that fact, a first
+  `--preflight`'s probes among them, stamps `-`, and no reader consults the field:
+  `derive_proc_state` reads the pid, token, driver pid, time and argv fields only. The
+  `remove_procs_ledger` calls in `verb_landed`'s terminal write and in `verb_abort` stay where they
+  are, and the in-place one moves with S10's observation. Unit 28's two ledger fixtures are S13's.
+  Observed by AC1, AC22 and AC24.
 - **S2** ONE staleness bound. `LEASE_STALE_AFTER` leaves the driver (its default constant, its
   initialiser and its `read_bound_key` call), `tools/unattended/check-unattended.sh` (initialiser and
   conf allow-list), `tools/unattended/kit.toml`'s `optional_keys`, the example conf, gov's
@@ -96,11 +107,14 @@ bound, with HELD carved out of the stop-guard, `--liveness` and the resume tick.
   paragraph names checks 10, 26 and 51 for a tick issued before `--preflight` and drops the refresh
   claim, its what-wakes paragraph carves HELD out, its Resume section loses the `LEASE` line rule and
   the doubled `--resume`, and its Record-the-run placements are scoped by landing mode; the
-  `unattended` dossier's three lease sentences, the driver's `--resume` usage line and its two
+  `unattended` dossier's three lease sentences, the `unattended-stops` dossier's title, lease
+  sentence, ledger clause and `resolve_lease_path` seam line, which unit 28 split out of the first
+  (§4), the driver's `--resume` usage line and its two
   refusal texts that name the retired file, and the library's and the tick's "its four" comments
   follow, in the texts §4 quotes. Every render is re-rendered. Observed by AC13.
 - **S12** NO capped carrier grows: the protocol template and render, the stop contract and the verb
-  carrier with their renders, the `unattended` dossier and `memory/guides/SESSION-KICKOFF.md` each
+  carrier with their renders, the `unattended` and `unattended-stops` dossiers and
+  `memory/guides/SESSION-KICKOFF.md` each
   end the pass no larger in bytes or in lines than they began it, funded by the trims §4 names.
   Observed by AC14.
 - **S13** The suite arms follow the code. Every assertion in the driver suite that reads or writes a
@@ -108,12 +122,18 @@ bound, with HELD carved out of the stop-guard, `--liveness` and the resume tick.
   count does not fall; a fixture the suite makes leaseless by deleting the lease file is made
   leaseless instead by deleting the five lease-fact lines other than `keepalive`, which are
   `session`, `pid`, `host`, `pid-image` and `lease-utc`, and keeping its `keepalive` line, the
-  shape of a pre-lease record such as this build's own run-state file (§4), so the leaseless arms
+  shape of a pre-lease record, which this build's own run-state file had until `d5ae776b` (§4,
+  §10), so the leaseless arms
   keep their expected texts, the dead-clock `fail 57` one included, and the leaseless holder arm
   still resumes with the `keepalive` its fixture kept, `k1`; the one-line `--status` counts stop
   filtering the retired `LEASE —` line; the two hits that read a refusal text naming the retired
   lease, at `tools/unattended/unattended.test.sh:7177` and `:7185` at `285701d5`, are retargeted one
-  for one onto the texts §4 quotes; the new arms §7 names are written and each is staged RED.
+  for one onto the texts §4 quotes; unit 28's two ledger fixtures, which landed after this spec's
+  base and name the lease file beside the ledger, are retargeted with them, measured at
+  `2f62eb5f`: the AC12 arm's `dl_pl`, built from `DL_LEASE` at
+  `tools/unattended/unattended.test.sh:8978`, takes the path `resolve_procs_path` derives, and the
+  fixture at `:9692` keeps `PL_LEDGER` and drops `PL_LEASE`, whose file nothing writes, from its
+  reset, which moves no assertion; the new arms §7 names are written and each is staged RED.
   Each suite's executed-assertion floor rises by exactly the assertions its new arms carry, counted
   off their blocks and never read off a run: the driver suite's `FLOOR_ASSERTIONS` and
   `FLOOR_SHARD_2`, its new arms written in region two beside the arms they extend, and the
@@ -167,11 +187,14 @@ bound, with HELD carved out of the stop-guard, `--liveness` and the resume tick.
   is committed after the push, against which S11 scopes the Record-the-run placements.
 - **consumes-from** `TOOL-dDerivedDocket-1` — the attributed criterion `verdict clean` over the
   unattended suites at VERIFYING, which AC15 reads.
-- **consumes-from** `TOOL-dDerivedDocket-28` — ordered 27, before this unit. If it lands first: its
-  reap step in `run_takeover` and on the holder rows of `verb_resume`, and its ledger beside the lease
-  under the git common dir. This unit keeps each reap on the re-keyed row that holds the lease and
-  leaves that directory in place. Whether that unit's prune-race argument survives one lease copy
-  per worktree is G8 B1's, promoted (§8), and is not examined here.
+- **consumes-from** `TOOL-dDerivedDocket-28` — CLOSED, landed at `1acce23d`, after this spec's base
+  and before this unit builds: its reap step in `run_takeover` and on the holder rows of
+  `verb_resume`, and its per-slug ledger under the git common dir, whose path `resolve_procs_path`
+  derives from `resolve_lease_path` and whose lines `write_proc_record` stamps with `RB_LEASE_ID`.
+  This unit keeps each reap on the re-keyed row that holds the lease, moves both readers of what S1
+  deletes to the targets S1 names, retargets that unit's two ledger fixtures (S13), and observes the
+  ledger from a linked worktree (AC24). Whether that unit's prune-race argument survives one lease
+  copy per worktree is G8 B1's, promoted (§8), and is not examined here.
 - **hands-off** `TOOL-dDerivedDocket-62` — the re-keyed resume matrix, whose observed-landing row
   places that unit's one `check_holder_worktree` call in `verb_resume`, ahead of the HELD and
   working rows of a record carrying `lease-utc`, while the no-lease rows stay this unit's (§8 F13)
@@ -230,7 +253,8 @@ The lease IS the run-state facts `write_lease` (`tools/unattended/unattended.sh:
 Those facts are six: `keepalive`, `session`, `pid`, `host`, `pid-image` and `lease-utc`, and "the
 six lease facts" in this spec always means all six, `keepalive` included. A record preflighted
 before the lease facts existed carries `keepalive` alone of them, as this build's own run-state
-file does (§10). So a fixture is made leaseless by deleting the other five and keeping its
+file did until the merged driver recorded the other five at `d5ae776b` (§10). So a fixture is
+made leaseless by deleting the other five and keeping its
 `keepalive` line (S13, AC22), never by deleting all six: the no-lease holder and `--replaces` rows
 key on that fact.
 
@@ -290,7 +314,8 @@ its run, rather than to whichever worktree calls, is the newest commit touching 
 which unit 4 §8 F8 chose. Only the bound moves, from the retired `resolve_lease_bound` to
 `RESUME_STALE_BOUND`. Its holder is still the first working row. The no-lease `--replaces` row is
 new: it is how a holder whose scheduler lists another job than the record names takes the one lease
-record, which is this build's own Rollout (G8 M2). No second `--replaces` branch is written, so the
+record, the case G8 M2 found in this build's own record before the merged driver re-leased it at
+`d5ae776b` (§10). No second `--replaces` branch is written, so the
 row adds no `fail` branch. "Observed" is `read_landed_observation` naming the commit
 `read_landing_commit` returns for this record, so an observation left by an earlier run of the same
 slug never marks a new landing.
@@ -394,8 +419,14 @@ On a derived LANDED the in-place branch appends `<utc> landed <landing sha> on <
 to `landed.<slug>.log` in the `unattended` directory under the git common dir, where the retired file
 lived, so every worktree on the node reads it. The tick walks every worktree, and a worktree whose
 HEAD carries the landed record is any that later merged the default branch. The directory is resolved
-by `resolve_landed_log` with `rev-parse --git-common-dir`, the derivation `resolve_lease_path` used,
-which therefore moves rather than multiplies; `check 32` counts the per-worktree `rev-parse --git-dir`
+by `resolve_landed_log` with `rev-parse --git-common-dir`, the derivation `resolve_lease_path` used.
+That derivation has a second consumer at `2f62eb5f`: unit 28's `resolve_procs_path` derives the
+process ledger's path from `resolve_lease_path`. So `resolve_procs_path` takes its directory from
+`resolve_landed_log` (S1), and the derivation moves with both of its consumers rather than
+multiplying. Rewired to the per-worktree `resolve_sidecar_dir` most of the driver uses, it would
+split one ledger per slug into one per worktree, the premise unit 28's prune-race argument rests
+on, and a main worktree, where both directories are one, would not show it, so AC24 writes the
+ledger from a linked worktree; `check 32` counts the per-worktree `rev-parse --git-dir`
 literal, and its header states it cannot see this spelling
 (`tools/unattended/check-unattended.sh:4938`). An unwritable log is a NOTE, as the file rewrite was,
 and leaves the landing FINISHED-UNSTAMPED until `--landed` is re-run. AC10 lands from one linked
@@ -405,7 +436,8 @@ worktree and reads from a second, because in a main worktree `rev-parse --git-di
 ### Where the text goes
 
 Every figure below is PINNED, measured at `285701d5` on node `d` with a greedy re-wrap at 100 columns
-of each touched paragraph.
+of each touched paragraph, except the two dossier rows, re-measured the same way at `2f62eb5f`,
+after unit 28 split the `unattended-stops` dossier out of the `unattended` one (G10 M3).
 
 | Carrier | Edit | Bytes | Lines |
 |---|---|---|---|
@@ -416,7 +448,8 @@ of each touched paragraph.
 | protocol | the absent-owner default: "…builds the next READY unit, aborts with a code, or holds with `--hold`.", at `:408` | +21 | 0 |
 | verb carrier, template and render | `--liveness` gains `HELD` in its verdict list | +8 | 0 |
 | verb carrier | `--resume` rewritten as quoted below, dropping the refusal list `UNATTENDED-STOPS.md` §11 already carries and the "only restart" clause the merge resolver flagged as readable against the tick | −93 | −1 |
-| dossier | the three lease sentences at `memory/map/features/unattended.md:84`, `:91` and `:102`, below | −13 | 0 |
+| dossier | the three lease sentences at `memory/map/features/unattended.md:84`, `:91` and `:97`, below | −49 | 0 |
+| stops dossier | the title, lease sentence, ledger clause and seam line at `memory/map/features/unattended-stops.md:5`, `:37`, `:46` and `:57`, below | −1 | 0 |
 | kickoff manifest | the correction at `memory/guides/SESSION-KICKOFF.md:219`, pruned | negative | −4 |
 | stop contract, template and render | §7 and §8 rewritten, below | not greater | not greater |
 
@@ -433,10 +466,16 @@ The `--resume` entry, at 800 bytes in 9 lines against 893 in 10:
 >   `--keepalive-id`, and writes `scheduled` rather than `manual` on its history row.
 >   `UNATTENDED-STOPS.md` §8 and §11 are the contract.
 
-The dossier's three edits read: "its prompt runs `--resume --keepalive-id`, then `--audit`"; "The
-LEASE is the run-state file's facts, judged fresh by `--liveness`, which reads `HELD` as its own
-verdict, so a resume tells orientation from take-over."; and "In-place `--landed` only observes, and
-logs that;". The dossier stands at 20234 of its 20480-byte cap, so these are the whole of its change.
+The `unattended` dossier's three edits read: "its prompt runs `--resume --keepalive-id`, then
+`--audit`"; "HELD, the lease and the process ledger are `unattended-stops`."; and "In-place
+`--landed` only observes, and logs that;". It stands at 20296 of its 20480-byte cap at
+`2f62eb5f`, so these are the whole of its change. Its per-slug LEASE sentence is no longer there:
+unit 28 moved it into `memory/map/features/unattended-stops.md`, whose four edits read: the title
+"The unattended run's stops: HELD, the lease and the process ledger"; "The LEASE is the run-state
+file's facts, judged fresh by `--liveness`, which reads `HELD` as its own verdict, so a resume
+tells orientation from take-over.", in place of that sentence; "in a per-slug ledger,", dropping
+"beside the lease"; and the seam line "`resolve_landed_log` — the one derivation of the log's
+directory; the ledger's path is derived from it, so the two files cannot drift apart." (S1).
 
 The two "its four" comments stop counting the driver's bound keys, a count unit 27's `GATE_WALL`
 moves again. The library's, at `tools/unattended/lib-unattended.sh:71`, reads "the resume tick
@@ -494,51 +533,70 @@ them moves no pin row.
 
 ### Migration
 
-The population holding a lease file is MEASURED EMPTY on the only node that runs this branch's
-driver: on node `d`, 2026-09-22, the git common dir holds no `unattended` directory at all. The kit is
-unreleased, so no adopter holds one either. A file left anywhere else is inert, because nothing reads
-it, and no shim ships (§8 F12). A run that held one keeps what every `--preflight` on the merged
-driver also wrote, the run-state facts, and a record with neither, carrying `keepalive` alone of
-the six, is a pre-lease record whose holder takes the one lease record at its first matching-id
-resume, or at its first `--replaces` resume when
-its scheduler lists another job than the record names. This build's own run is such a record, and
-it is the second case (§4 Rollout, §10).
+The population holding a lease file is ONE FILE on the only node that runs this branch's driver.
+It was measured empty on node `d` on 2026-09-22, before the merged driver first leased this run.
+Re-read on 2026-09-27 at `2f62eb5f`, the git common dir's `unattended` directory holds
+`dDerivedDocket.lease`, this build's own, which the merged driver has written since the owner's
+resume at `d5ae776b`, beside unit 28's `dDerivedDocket.procs` ledger (§10). The kit is
+unreleased, so no adopter holds one. Once this unit lands nothing reads that file, so it is inert,
+which AC12's migration case observes over a leftover lease naming another id; no shim ships (§8
+F12), and the Rollout leaves it in place, because deleting it is a write no verb owes and no reader
+would see. The ledger beside it is not a lease file and stays (S1). A run that held a lease file
+keeps what every `--preflight` on the merged driver also wrote, the run-state facts, which this
+build's record carries. A record with neither, carrying `keepalive` alone of the six, is a
+pre-lease record whose holder takes the one lease record at its first matching-id resume, or at its
+first `--replaces` resume when its scheduler lists another job than the record names. This build's
+own record was one until `d5ae776b` and is not one now (§4 Rollout, §10).
 
 ### Rollout
 
-The unit lands inside this build's own run, and the Rollout does not assume that the record names
-the job the run holds. Measured on node `d` on 2026-09-22 (§10), the run-state file records
-`keepalive: 00c7d786` and no `session`, `pid` or `lease-utc`, while the scheduler lists `b5b0b444`
-as the run's live keepalive. So once the unit lands, the orchestrator reads its scheduler's listing,
-compares it with the record's `keepalive` fact, and makes one of two calls.
+The unit lands inside this build's own run, and the Rollout keys on the record as it stands when
+the unit lands, never on a state measured earlier. Measured on node `d` on 2026-09-27 at
+`2f62eb5f` (§10), the run-state file carries all six lease facts, `keepalive: 3575a45e` among
+them. The merged driver first wrote the five facts other than `keepalive` at `d5ae776b`, when the
+owner resumed the run, recording `3575a45e` in place of `00c7d786`, and refreshed them at
+`407038a3`; the G10 audit read the recorded keepalive as the one the scheduler lists. Before
+acting, the orchestrator runs
+`git log --oneline 2f62eb5f..HEAD -- memory/builds/dDerivedDocket/RUN.md` and re-reads the facts
+from the record whenever a listed commit moved one. It then reads its scheduler's listing, compares
+it with the record's `keepalive` fact, and makes one of two calls.
 
-- When the two match, `--resume <slug> --keepalive-id <that id>` takes the holder row and records
-  all six lease facts, its `keepalive` unchanged.
-- When they differ, as they do at writing, the call is
-  `--resume <slug> --keepalive-id <live id> --replaces <recorded id>`. It takes the no-lease
-  `--replaces` row while the build folder is inside the bound, and the no-lease take-over row past
-  it, and either records all six lease facts, the live id as `keepalive`. The same call without
-  `--replaces` is
-  refused at check 59 inside the bound, naming `--replaces` and the recorded id.
+- When the two match, `--resume <slug> --keepalive-id <that id>` takes the holder row. It writes
+  nothing, unless the record names another session or pid than the harness exposes, when it
+  re-records them and stages the record, its `keepalive` unchanged (AC11).
+- When they differ, the orchestrator waits for `TOOL-dDerivedDocket-63`. Until that unit lands,
+  `--resume <slug> --keepalive-id <live id> --replaces <recorded id>` from the recorded session
+  meets this unit's same-session row before its `--replaces` row, because the record now carries
+  `lease-utc` and a session: a take-over through `run_takeover` with unit 28's reap, or a check-58
+  refusal when the recorded pid is alive and is not `CLAUDE_PID`. That is G8 H1 (§8). Once unit 63
+  has landed, the same call takes its moved `--replaces` row and records the live id as
+  `keepalive` with no take-over. A resume that cannot wait for it is announced as the take-over it
+  is. The no-lease rows this Rollout named before the record was re-leased no longer apply to it.
 
 This is the orchestrator's own act, made because it knows it holds the run. The Skill's Resume
-section cannot know that: it sends a session whose scheduler does not list the recorded job down the
-take-over path, which inside the bound meets that check-59 refusal and stops. So the Rollout does
-not rely on that section for its first resume.
+section, as S11 rewrites it, has a session whose scheduler no longer lists the recorded job schedule
+a new one and resume with its id, which from the recorded session is the same-session take-over. So
+the Rollout does not rely on that section for its first resume.
 
-Either way the run-state file is staged and rides the next records commit. From then on the
-stop-guard and the tick bind that session, which is main's dark landing lighting up as its contract
-says it should (§8 F9). Gov's take-over bound moves from the retired 7200 seconds to
-`RESUME_STALE_BOUND`'s declared 5400. That records commit also gives every worktree branched after
-it a copy of those facts, which the tick grades on that worktree's own clocks until
-`TOOL-dDerivedDocket-62` lands (G8 B1, §8). This Rollout claims nothing about those copies.
+Whatever the call writes is staged and rides the next records commit. The binding this Rollout used
+to date was made at `d5ae776b`, not here: the merged driver recorded this build's session then, and
+the Stop hook is wired (`.claude/settings.json`, `tools/unattended/stop-guard.js`), so the
+stop-guard has bound this session since, and a resume tick would bind it wherever one is registered
+(§8 F9). Until this unit lands, that stop-guard answers a HELD record carrying a session with
+`run-open`, as §4 measured, so a `--hold` of this run meets that block: §5 risk (7). Gov's take-over
+bound moves from the retired 7200 seconds to `RESUME_STALE_BOUND`'s declared 5400 when this unit
+lands. Every worktree branched after `d5ae776b` carries a copy of those facts, the wave worktree
+`wf_e3d346a8-3c6-1` at `c60e3109` among them, which the tick grades on that worktree's own clocks
+until `TOOL-dDerivedDocket-62` lands (G8 B1, §8). This Rollout claims nothing about those copies.
 
-That binding is also where G9 H1 bites (§8). Once the facts are recorded, a wave or review Workflow
-that the orchestrator waits on and that outlasts `RESUME_STALE_BOUND` with no commit of the
-orchestrator's own reads STALE in the run worktree, because the units write in wave worktrees and
-the sub-agents under the session's own directory, and neither moves this clock (§4). No resume tick
-is registered on node `d`, measured by the G9 audit on 2026-09-22, and this Rollout registers none;
-the gap is `TOOL-dDerivedDocket-65`'s, promoted at the G9 exit.
+The window G9 H1 names (§8) opened at `d5ae776b` too, and not at this Rollout. Since then a wave or
+review Workflow that the orchestrator waits on and that outlasts `RESUME_STALE_BOUND` with no commit
+of the orchestrator's own reads STALE in the run worktree, because the units write in wave
+worktrees and the sub-agents under the session's own directory, and neither moves this clock (§4).
+No resume tick is registered on node `d`: the G9 audit measured none on 2026-09-22, and the G10
+audit found none among 415 scheduled tasks on 2026-09-27. None is registered from now until
+`TOOL-dDerivedDocket-65` has landed, and this Rollout registers none; the gap is that unit's,
+promoted at the G9 exit.
 
 ### Files touched (estimate)
 
@@ -550,7 +608,8 @@ the gap is `TOOL-dDerivedDocket-65`'s, promoted at the G9 exit.
 `tools/unattended/STOPS.template.md` · `memory/guides/UNATTENDED-STOPS.md` ·
 `tools/unattended/VERBS.template.md` · `memory/guides/UNATTENDED-VERBS.md` ·
 `tools/unattended/SKILL.template.md` · `.claude/skills/unattended/SKILL.md` ·
-`memory/map/features/unattended.md` · `memory/guides/SESSION-KICKOFF.md` · `memory/DECISIONS.md` ·
+`memory/map/features/unattended.md` · `memory/map/features/unattended-stops.md` ·
+`memory/guides/SESSION-KICKOFF.md` · `memory/DECISIONS.md` ·
 `tools/unattended/unattended.test.sh` · `tools/unattended/stop-guard.test.sh` ·
 `tools/unattended/resume-tick.test.sh`
 
@@ -608,22 +667,31 @@ the gap is `TOOL-dDerivedDocket-65`'s, promoted at the G9 exit.
   worktree's, so a dead holder whose worktree other work keeps moving reads fresh until that work
   stops, and a live holder whose work lands in other worktrees or in sub-agent transcripts reads
   stale (G9 H1). The no-lease rows keep the build-folder scope (§8 F13), and the leased clock's
-  reach across worktrees is G8 B1's (§8).
+  reach across worktrees is G8 B1's (§8). (7) Until this unit lands, the merged driver's stop-guard
+  answers a HELD record carrying a session with `run-open`, as §4 measured, and this build's own
+  record has carried a session since `d5ae776b`. So a `--hold` of this run before this unit lands
+  is refused its stop and told to `--plan` or `--abort`, and a registered resume tick would kill
+  and relaunch it; none is registered on node `d` (§4 Rollout). This unit's S5 and S6 close it
+  when it lands, and nothing closes it before.
 - testing — The arms §7 names, each staged RED in the pass and executed once at VERIFYING under
   attribution; the direct observations in §6 are fixture runs of the driver, the hook and the tick.
-- migration — §4 Migration: a population measured empty, no shim, and a pre-lease record taking the
-  one lease record at its holder's first matching-id or `--replaces` resume.
+- migration — §4 Migration: one leftover lease file, this build's own, inert once this unit lands
+  and left in place, no shim, and a pre-lease record taking the one lease record at its holder's
+  first matching-id or `--replaces` resume.
 - user docs — The stop contract's §7, §8, §9 and §12, the verb carrier's two entries, the protocol's
-  §5 and §7 lines, the Skill's tick, what-wakes, Resume and Record-the-run text, and the dossier.
+  §5 and §7 lines, the Skill's tick, what-wakes, Resume and Record-the-run text, and the
+  `unattended` and `unattended-stops` dossiers.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -cE '^[^#]*(resolve_lease_path|read_lease|write_lease_taken|write_lease_refreshed|write_lease_released|remove_lease|resolve_lease_bound|write_lease_for_record|RB_LEASE_)' tools/unattended/unattended.sh`
   runs at the build commit it prints 0, counting code lines only so a comment recording the retirement
-  is not a reader, and after every fixture run of AC3 to AC11 and AC21 to AC23,
+  is not a reader, and after every fixture run of AC3 to AC11 and AC21 to AC24,
   `find "$(git rev-parse --git-common-dir)" -name '*.lease'` inside the fixture prints nothing.
   Red when: a reader or a writer of the file survives, so a second record answers who drives the slug
-  beside the run-state facts; or a verb still writes one.
+  beside the run-state facts; or a verb still writes one. This count stays green under a rewire of
+  unit 28's ledger, which read two of these names, to the per-worktree sidecar directory, so AC24
+  observes where that ledger lands and what it records.
 - **AC2** — When `grep -c 'LEASE_STALE_AFTER'` runs over `tools/unattended/unattended.sh`,
   `tools/unattended/check-unattended.sh`, `tools/unattended/kit.toml`,
   `tools/unattended/.unattended.conf.example`, `.unattended.conf`,
@@ -746,8 +814,9 @@ the gap is `TOOL-dDerivedDocket-65`'s, promoted at the G9 exit.
   `tools/unattended/STOPS.template.md` for `per-slug`, `released <iso>`, `released … landed`,
   `| Record | Lease |`, `refreshes the lease`, `in the lease first` and
   `keeps what it saw in the lease`; `grep -c` over
-  `memory/map/features/unattended.md` for `refreshes the lease`, `per-slug LEASE` and
-  `in the lease`;
+  `memory/map/features/unattended.md` for `refreshes the lease`, `per-slug lease` and
+  `in the lease`; `grep -c` over `memory/map/features/unattended-stops.md` for `per-slug LEASE`,
+  `per-slug lease`, `beside the lease` and `resolve_lease_path`;
   `grep -c 'its four' tools/unattended/lib-unattended.sh tools/unattended/resume-tick.sh`; and
   `grep -c` over `tools/unattended/unattended.sh` for `with the id, the lease is replaced`,
   `LEASE line names`, `last refreshed` and `been refreshed since`. Beside those, `grep -c` over
@@ -769,23 +838,33 @@ the gap is `TOOL-dDerivedDocket-65`'s, promoted at the G9 exit.
   check-51 case, which gov's in-place landing makes true (AC23); or a refusal text still points a
   refused session at the `LEASE —` line `--status` no longer prints, or at a refresh nothing
   performs (G9 L4); or a row a later unit keys on is missing, so that unit's criteria red for want
-  of this unit's text or read green before that unit acts (G9 M7).
+  of this unit's text or read green before that unit acts (G9 M7); or a dossier sentence unit 28
+  moved into `memory/map/features/unattended-stops.md` keeps the retired file's text there, which a
+  witness over the `unattended` dossier alone reads 0 at any first parent and so could never pass
+  (G10 M3).
   permission: that each render is byte-identical to its template is the `unattended skill wiring` and
   `unattended kit gate` legs over the real tree, observed at the VERIFYING bar.
+  figure: every zero-count string above was run at `2f62eb5f` and counted at least 1 there; the
+  builder re-runs them at the pass's parent, and a 0 there is a sentence that moved under this spec,
+  re-measured before the pass edits it.
 - **AC14** — When `git cat-file -s` and `wc -l` read `tools/unattended/PROTOCOL.template.md`,
   `memory/guides/UNATTENDED-PROTOCOL.md`, `tools/unattended/STOPS.template.md`,
   `memory/guides/UNATTENDED-STOPS.md`, `tools/unattended/VERBS.template.md`,
-  `memory/guides/UNATTENDED-VERBS.md`, `memory/map/features/unattended.md` and
+  `memory/guides/UNATTENDED-VERBS.md`, `memory/map/features/unattended.md`,
+  `memory/map/features/unattended-stops.md` and
   `memory/guides/SESSION-KICKOFF.md` at the build commit and at its first parent, no build-commit
   figure is greater than its parent's; the guide and dossier caps are resolved from the lines of
   `tools/memory-tree/check-memory-hygiene.sh` that declare `GUIDE_CAP_BYTES` and
   `DOSSIER_CAP_BYTES`, never retyped; and the protocol's delta is −133 bytes and −1 line.
   Red when: an addition is written without its trim, so a carrier already under a curation-debt
   waiver grows; or the reading is taken against the figures in this spec instead of the parent commit.
-  figure: the −133 is PINNED at `285701d5`; the not-greater test is derived at the build commit.
+  figure: the −133 is PINNED at `285701d5`, and the two dossiers' −49 and −1 at `2f62eb5f`; the
+  not-greater test is derived at the build commit.
 - **AC15** — When the orchestrator's attributed unattended run at VERIFYING reports on the driver,
   stop-guard and resume-tick suites, it reads `verdict clean`, with the new arms §7 names among the
-  executed ones and every retargeted lease-file assertion executed; and each floor S13 names reads,
+  executed ones and every retargeted lease-file assertion executed, unit 28's two ledger fixtures
+  S13 names among them, whose AC12 arm still asserts the in-place removal of a planted ledger; and
+  each floor S13 names reads,
   at the build commit, its figure at the first parent plus exactly the assertions this unit's new
   blocks carry, read with `git show` at both.
   Red when: an arm this unit added fails, or an existing arm newly fails because of it; or a
@@ -876,7 +955,8 @@ the gap is `TOOL-dDerivedDocket-65`'s, promoted at the G9 exit.
   abandoned pre-lease run, the population backlog row `TOOL-aReapedTicket-5` names, is refused as
   live for as long as that worktree stays busy, which unit 4 §8 F8 decided against; or a pre-lease
   holder whose scheduler lists another job than the record names has no path but waiting out the
-  bound, which is this build's own Rollout (§4).
+  bound, which this build's own record met before the merged driver re-leased it at `d5ae776b`
+  (§4, §10).
   fixture: AC3's authorized record, its five lease facts other than `keepalive` removed and the
   build-folder commit dated by `GIT_COMMITTER_DATE`, so no clock is faked.
   permission: the direct fixture runs above are this pass's check; the arm that repeats them is
@@ -902,12 +982,34 @@ the gap is `TOOL-dDerivedDocket-65`'s, promoted at the G9 exit.
   permission: the direct fixture runs above are this pass's check; the arm that repeats them is
   written and staged RED in the pass, and the driver suite that executes it is a held kit suite on no
   bar leg, so it runs in the orchestrator's attributed VERIFYING run beside AC15's arms.
+- **AC24** — Take AC3's authorized record, committed with `keepalive` `k1`, and a LINKED worktree
+  `W1` made on the record's run branch once the main worktree is moved off it, as AC10 makes one.
+  From `W1`, a same-id re-preflight, `--preflight <slug> --keepalive-id k1`, the bounded run unit
+  28's ledger arms start, appends one line to `<slug>.procs` in the `unattended` directory under
+  the path `git -C W1 rev-parse --git-common-dir` prints, and that line's fifth field is `k1`; no
+  file of that name exists under the path `git -C W1 rev-parse --git-dir` prints. On AC10's
+  fixture, with one line of an exited process planted in the ledger `resolve_procs_path` derives,
+  AC10's passing in-place `--landed` from `W1` removes that ledger.
+  Red when: the ledger's path is rewired through the per-worktree `resolve_sidecar_dir`, so one
+  ledger per slug becomes one per worktree, unit 28's prune-race argument loses the single ledger
+  it rests on, and every arm run in a main worktree stays green; or the path drops the slug, so two
+  runs share one ledger; or the fifth field reads `-` for a verb acting on a record whose
+  `keepalive` fact names `k1`, because `RB_LEASE_ID` was deleted with nothing reading the fact in
+  its place; or the in-place observation stops removing a ledger of exited processes, unit 28's
+  AC12 (G10 M2).
+  fixture: AC3's authorized record and AC10's linked worktree `W1`; the planted line has the shape
+  unit 28's AC12 arm plants.
+  permission: the direct fixture runs above are this pass's check; the arm that repeats them is
+  written and staged RED in the pass, against a driver copy whose `resolve_procs_path` derives from
+  `resolve_sidecar_dir` and one whose `write_proc_record` stamps `-`, and the driver suite that
+  executes it is a held kit suite on no bar leg, so it runs in the orchestrator's attributed
+  VERIFYING run beside AC15's arms.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `kickoff-manifest ratchet` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · the same-session relaunch over a fresh and a stale clock, two live processes of one session, another session on a fresh clock, the holder with and without a moved pid or session, a pre-lease holder, the HELD crash window, the pushed unobserved landing under both modes with its witness-edit and clean-check controls, the re-bind from another branch, and from any branch for a record naming neither branch fact with its not-scoped announcement, the in-place read-back's three refusals and its pass, the observation written in one linked worktree and read from a second, with an unanswered remote, and with an earlier run's line read in the landing worktree, a fresh gate log keeping an otherwise aged run out of STALE, a dead clock on a leased record, and a record with no lease beside an unrelated fresh commit, with its replaces path; every lease-file assertion, and the two refusal-text hits S13 names, retargeted one for one · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks; a retargeted assertion moves neither
+New arm: `tools/unattended/unattended.test.sh` · the same-session relaunch over a fresh and a stale clock, two live processes of one session, another session on a fresh clock, the holder with and without a moved pid or session, a pre-lease holder, the HELD crash window, the pushed unobserved landing under both modes with its witness-edit and clean-check controls, the re-bind from another branch, and from any branch for a record naming neither branch fact with its not-scoped announcement, the in-place read-back's three refusals and its pass, the observation written in one linked worktree and read from a second, with an unanswered remote, and with an earlier run's line read in the landing worktree, a fresh gate log keeping an otherwise aged run out of STALE, a dead clock on a leased record, a record with no lease beside an unrelated fresh commit, with its replaces path, and unit 28's ledger written from a linked worktree into the common dir with the record's keepalive, staged RED by a driver copy whose `resolve_procs_path` derives from `resolve_sidecar_dir`; every lease-file assertion, the two refusal-text hits and unit 28's two ledger fixtures S13 names, retargeted one for one · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2`, each raised by exactly the new arms' assertions, counted off their blocks; a retargeted assertion moves neither
 New arm: `tools/unattended/stop-guard.test.sh` · a HELD record bound to the payload's session, and an observed in-place landing read from a linked worktree other than the one that landed it · `FLOOR_ASSERTIONS`, raised by exactly the new arms' assertions, counted off their blocks
 New arm: `tools/unattended/resume-tick.test.sh` · a HELD record with a stale clock, and an observed in-place landing with a stale clock, in a worktree other than the one that landed it · `FLOOR_ASSERTIONS`, raised by exactly the new arms' assertions, counted off their blocks
 
@@ -975,9 +1077,11 @@ is the post-merge audit this build already takes after each wave, as `c361e347` 
   no row it reaches needs.
 - **F9 — does a pre-lease holder's resume record the facts.** RESOLVED (agent, 2026-09-22,
   delegated): yes, which is main's contract that `--resume --keepalive-id` re-records the lease. The
-  consequence is §4 Rollout: this build's own orchestrator becomes bound to the stop-guard and the
-  tick at its first resume after the merge. Which resume that is, matching-id or `--replaces`, is
-  read from the scheduler at the time and never assumed (G8 M2).
+  consequence arrived before this unit: the merged driver's resume at `d5ae776b` recorded this
+  build's session, so its orchestrator has been bound to the stop-guard since, and to the tick
+  wherever one is registered (§4 Rollout). Which resume the Rollout makes, the holder's matching id
+  or a differing id that waits for `TOOL-dDerivedDocket-63`, is read from the scheduler at the time
+  and never assumed (G8 M2).
 - **F10 — the in-place Record-the-run placement.** Options: (a) a records commit on the run branch
   before `--prepare`; (b) none. RESOLVED (agent, 2026-09-22, delegated): (a), the merge skeptic's
   proposal, because the in-place order forbids every later commit.
@@ -987,7 +1091,10 @@ is the post-merge audit this build already takes after each wave, as `c361e347` 
   alone, at rev-4, which answers G8 M9. This spec does not move its own order: the orchestrator
   re-declares the orders, as it did for `TOOL-dDerivedDocket-27` at that spec's rev-7.
 - **F12 — a shim for leftover lease files.** RESOLVED (agent, 2026-09-22, delegated): none. The
-  population is measured empty on the node that runs this driver, and a leftover file is inert.
+  population, measured empty on 2026-09-22, is one file on 2026-09-27: this build's own
+  `dDerivedDocket.lease` under the git common dir, which the merged driver has written since
+  `d5ae776b`. Once this unit lands nothing reads it, so it is inert, which AC12's migration case
+  observes, and the Rollout leaves it in place (§4 Migration).
 - **F13 — the clock of a record with no lease.** Options: (a) keep unit 4 §8 F8's clock, the age of
   the newest commit touching the record's build folder, with its leaseless rows, against
   `RESUME_STALE_BOUND`; (b) collapse those rows into `check_lease_fresh`'s clock, superseding F8 and
@@ -1007,14 +1114,16 @@ is the post-merge audit this build already takes after each wave, as `c361e347` 
   and builds after it. Nothing in this unit closes it. Every criterion here runs in one worktree,
   except AC10, which crosses two only for the landed log and the terminal readings it produces; the
   re-bind's branch scope (§4, G8 M5) is that one row's. Until that unit lands, a sibling worktree
-  whose HEAD carries a copy of this build's record with the Rollout's facts is graded on its own
-  clocks by the tick, `--liveness` and the matrix.
+  whose HEAD carries a copy of this build's record with the lease facts the merged driver recorded
+  at `d5ae776b` is graded on its own clocks by the tick, `--liveness` and the matrix.
 - **G8 H1 — the same-session row shadows `--replaces`, so the holder can no longer replace its own
   job.** Promoted at the G8 bounded exit to `TOOL-dDerivedDocket-63`, which consumes from this unit
   and builds after it. Nothing in this unit closes it: the matrix keeps the row order rev-2 wrote,
   S13's retarget reaches lease-file assertions only, and AC15 is read at VERIFYING, after that unit
   has built. The no-lease `--replaces` row (§4, G8 M2) is not shadowed, because a record with no
-  lease carries no `session` for the same-session row to match.
+  lease carries no `session` for the same-session row to match. This build's own record carries one
+  since `d5ae776b`, so the Rollout's differing-id call meets the shadowing row, and the Rollout
+  waits for that unit before it makes that call (§4 Rollout).
 - **G8 H2 — the turnstile queue writes no gate log, so F1's premise is false and a healthy queued
   bar reads STALE.** Promoted at the G8 bounded exit to `TOOL-dDerivedDocket-64`, which consumes from
   this unit and builds after it, with the re-opening of F1 on the corrected premise. Nothing in this
@@ -1026,12 +1135,14 @@ is the post-merge audit this build already takes after each wave, as `c361e347` 
   retired file's refresh reached every worktree through `stage_or_fail`, while the clock that
   replaces it reads the calling worktree's moves and the session's `<sid>.jsonl` alone (§4). A
   wave's unit agents write in wave worktrees and a Workflow's sub-agents under `<sid>/subagents/`,
-  so neither moves what the run worktree reads. Once the Rollout records this build's session, a
-  Workflow that outlasts `RESUME_STALE_BOUND` with no orchestrator commit reads STALE in the one
-  worktree `TOOL-dDerivedDocket-62` lets act: a registered resume tick would kill the orchestrator
-  and its Workflow there, and another session's `--resume --keepalive-id` meets the take-over row.
-  No resume tick is registered on node `d`, measured by the G9 audit on 2026-09-22, so the harm is
-  latent. §4, §5 risks (1) and (6), the Rollout and AC20 name it, and no criterion here claims it.
+  so neither moves what the run worktree reads. Since the merged driver recorded this build's
+  session at `d5ae776b`, a Workflow that outlasts `RESUME_STALE_BOUND` with no orchestrator commit
+  reads STALE in the run worktree, the one worktree `TOOL-dDerivedDocket-62` lets act once it lands:
+  a registered resume tick would kill the orchestrator and its Workflow there, and another
+  session's `--resume --keepalive-id` meets the take-over row. No resume tick is registered on node
+  `d`, measured by the G9 audit on 2026-09-22 and the G10 audit on 2026-09-27, so the harm is
+  latent, and none is registered until `TOOL-dDerivedDocket-65` has landed. §4, §5 risks (1) and
+  (6), the Rollout and AC20 name it, and no criterion here claims it.
 
 ## 9. Revision log
 
@@ -1123,6 +1234,24 @@ is the post-merge audit this build already takes after each wave, as `c361e347` 
     or removed.
 - rev-8 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-65`, answering that unit's
   consumes-from. Edges only; nothing this unit specifies moved.
+- rev-9 · 2026-09-27 · §2 S1 S11 S12 S13 · §3 · §4 · §5 · §6 AC1 AC13 AC14 AC15 AC22 AC24 · §7 ·
+  §8 F9 F12 · §10 · G10 spec audit round 1 fold of this spec's halves of M1, M2 and M3, each
+  re-measured at `2f62eb5f`. M1: the run-state file has carried all six lease facts since the
+  merged driver's resume at `d5ae776b`, so Migration and F12 count one leftover lease file, inert
+  once this unit lands and left in place; the Rollout keys on the record as it stands, a matching
+  keepalive taking the holder row and a differing one waiting for `TOOL-dDerivedDocket-63`, because
+  until then it meets the same-session take-over; F9, the Rollout, G8 B1, G8 H1 and G9 H1 date the
+  stop-guard binding and the G9 H1 window from `d5ae776b`, and the resume tick stays unregistered
+  until unit 65 lands; new §5 risk (7) names the stop-guard's HELD gap until this unit lands; S13,
+  §4 and AC22 say the record was pre-lease only until then. M2: S1 names unit 28's two readers of
+  what it deletes, `resolve_procs_path` deriving from `resolve_landed_log` and `write_proc_record`
+  reading the `keepalive` fact, S13 retargets that unit's two ledger fixtures, §3's edge says it has
+  landed, §4 corrects "moves rather than multiplies", AC1, AC15 and §7 point at them, and new AC24
+  writes the ledger from a linked worktree and reds when it loses its slug or keepalive. M3: unit
+  28 moved the per-slug LEASE sentence into `memory/map/features/unattended-stops.md`, so S11, S12,
+  §4, AC14 and Files touched add that dossier with four edits, the seam line among them (M2), AC13
+  retargets that witness there and adds zero-counts for the retired text in both dossiers, and the
+  dossier figures are re-pinned. No matrix row, order or other edge moved.
 
 ## 10. Reuse audit
 
@@ -1149,3 +1278,13 @@ same day, is `b5b0b444`. The two ids differ, so the Rollout's `--replaces` call 
 applies at writing. Re-read at `68942eb0`, the record carries no `host` or `pid-image` fact
 either, so `keepalive` is the only lease fact it has, the shape S13 and AC22 give a leaseless
 fixture.
+
+That state is history. Re-measured for the G10 fold on node `d` on 2026-09-27 at `2f62eb5f`, the
+record carries all six lease facts: keepalive `3575a45e`, session `2588f719…`, pid `37484`, host,
+pid-image `claude.exe` and lease-utc `2026-09-27T14:17:19Z`. The five facts other than
+`keepalive` first arrived at `d5ae776b`, written by the merged driver when the owner resumed the
+run, after this spec's G9 fold, with `3575a45e` in place of `00c7d786`, and `407038a3` refreshed
+them; the G10 audit read the recorded keepalive as the scheduler's live one. The git common dir's
+`unattended` directory holds `dDerivedDocket.lease` and `dDerivedDocket.procs`. §4's Migration and
+Rollout, S13's rationale, AC22 and §8 F9, F12, G8 B1, G8 H1 and G9 H1 are grounded on this reading.
+Unit 28's ledger code and fixtures, which S1 and S13 name, were read at the same sha.
