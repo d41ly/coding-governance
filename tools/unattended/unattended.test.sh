@@ -7276,7 +7276,7 @@ same "AC6 a no-id resume over a fresh working lease left the lease alone" "$(rea
 
 # ---- AC7: staleness is read from `--liveness`'s own clock and bound, for a record that has a lease,
 # ---- and the take-over NAMES the acts it inherits rather than repairing them. The staged file is
-# ---- dated past the bound too, because a dirty write is one of the clock's four signals.
+# ---- dated past the bound too, because a dirty write is one of the clock's signals.
 build_hold_fixture
 write_aged_commit
 out=$(run --status tRun)

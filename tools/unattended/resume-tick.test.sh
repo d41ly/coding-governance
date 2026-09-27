@@ -62,7 +62,7 @@ TICK="$KIT/resume-tick.sh"
 . "$KIT/lib-unattended.sh"
 SID="11111111-2222-3333-4444-555555555555"
 # THE TRANSCRIPT ROOT is pointed at an empty scratch directory for the whole suite, so the box's
-# real transcripts are never one of `--liveness`'s four signals and `HOME` is untouched.
+# real transcripts are never one of `--liveness`'s signals and `HOME` is untouched.
 mkdir -p "$TMP/cfg-empty"; export CLAUDE_CONFIG_DIR="$TMP/cfg-empty"
 
 # THE STUB `claude`, first on PATH: writes its argv and its own pid to STUB_LOG, answers

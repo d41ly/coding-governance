@@ -42,14 +42,15 @@ edited kit file carry no `tools/<kit>/` literal. The unit names no function, so 
 owed.
 
 **Evidences:** TOOL-dDerivedDocket-64
-- AC1 — `last-move-source: gate-queue` — over §4's fixture, 5400 s bound and `run-branch:
-  refs/heads/main`, `--liveness` printed `last-move-source: commit`, `stale: yes`, `verdict: STALE`
-  with no heartbeat. With one written just now it printed `gate-queue`, `stale: no`, `verdict: LIVE`,
-  on the same fifteen keys in the same order. Dated 2001-01-01, past the bound and newer than the
-  commit, it read `gate-queue`, `stale: yes`, `verdict: STALE`. With a `stat` stub failing on that
-  path alone, the call exited 1 at check 52 naming `stat -c %Y on .git/gate-queue-heartbeat`, with no
-  `verdict:` line. The term-less copy read `commit`, `stale: yes` with the fresh file, and `verdict:
-  STALE` rather than a refusal under the stub.
+- AC1 — `last-move-source: gate-queue` — over §4's fixture, with a 5400 s bound and
+  `run-branch: refs/heads/main`, `--liveness` printed `last-move-source: commit`, `stale: yes` and
+  `verdict: STALE` with no heartbeat. With one written just now it printed `gate-queue`,
+  `stale: no` and `verdict: LIVE`, on the same keys in the same order. Dated 2001-01-01, past the
+  bound and newer than the commit, it read `gate-queue`, `stale: yes` and `verdict: STALE`. With a
+  `stat` stub failing on that path alone, the call exited 1 at check 52 naming
+  `stat -c %Y on .git/gate-queue-heartbeat`, with no `verdict:` line. The term-less copy read
+  `commit` and `stale: yes` with the fresh file, and `verdict: STALE` rather than a refusal under
+  the stub.
 - AC5 — `tools/unattended/unattended.sh` — `grep -cE '^[^#]*gate-queue-heartbeat'` printed 1 over it
   and 1 over the gate runner; the loop-scoped `awk` count printed 1; and the `-nE` grep printed the
   heartbeat at line 1038, above the `TS_MAXWAIT` test at 1039.
