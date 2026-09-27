@@ -2480,7 +2480,11 @@ def cmd_write(root: str, args: dict) -> int:
         return 1
     live, _archives, _tracked = resolve_row_docs(root, conf, families)
     if live:
-        run("git", "rm", "-q", "--", *live, cwd=root)
+        # `-f` ON PURPOSE. Without it `git rm` refuses a shard carrying local edits, AFTER every
+        # per-build file is written — a half-switched tree. The census read these exact worktree
+        # bytes and the proof above conserved every row of them, so forcing the removal loses
+        # nothing the per-build files do not already hold.
+        run("git", "rm", "-q", "-f", "--", *live, cwd=root)
     print(f"migrate-backlog: wrote {len(records)} record(s) into {len(written)} file(s); removed "
           f"the authored shard(s) {' '.join(live) if live else 'none'}")
     print(f"ASK_CUTOFF={cutoff}")
