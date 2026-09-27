@@ -2794,6 +2794,12 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 sta
   awk -v icut="${2:-}" -v fbase="$_psb" '
     BEGIN { fdate = ""
             if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH) }
+    # THE SECTION-8 GRAMMAR, ONCE for this program: the documented mark, the F-item opener, and a
+    # span resolved by its own mark. Removing code spans and double-quoted spans only DELETES text,
+    # so a stray delimiter pairing with a later one can hide a real mark and never forge one.
+    function check_mark(s) { return (s ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) }
+    function check_fitem_open(s) { return (s ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || s ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) }
+    function check_span_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return check_mark(s) }
     # TOOL-dBriefedPass-1 - KEYED ON THE HEADING TITLE, NOT ON THE ORDINAL. A TIER-1 SPEC LEGITIMATELY
     # DROPS `## 5. Production-readiness checklist`, so every section from five onward renumbers: the
     # ordinal form read a Tier-1 spec`s GATES as its acceptance criteria, its OPEN QUESTIONS as its
@@ -2839,7 +2845,7 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 sta
       blob = ""
       for (i = 1; i <= nf; i++) blob = blob " " fl[i]
       gsub(/[[:space:]]+/, " ", blob)   # the squeeze the hygiene reader does, so the two agree by construction
-      any_mark = (blob ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/)
+      any_mark = check_mark(blob)
       items = 0
       for (i = 1; i <= nf; i++)
         if (fl[i] ~ /^[-*][[:space:]]/ || fl[i] ~ /^###[[:space:]]/) items++
@@ -2864,7 +2870,7 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 sta
       if (icut != "" && fdate != "" && fdate >= icut) {
         nfi = 0; plain = 0
         for (i = 1; i <= nf; i++) {
-          if (fr[i] ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || fr[i] ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) { span[++nfi] = fl[i]; continue }
+          if (check_fitem_open(fr[i])) { span[++nfi] = fl[i]; continue }
           if (nfi == 0) { if (fr[i] ~ /^[-*][[:space:]]/ || fr[i] ~ /^###[[:space:]]/) plain++ }
           else span[nfi] = span[nfi] " " fl[i]
         }
@@ -2872,10 +2878,7 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 sta
         # finding, and so is any bullet or sub-head before the first F-item.
         if (nfi == 0 && items == 0) { if (lf ~ /^none/ || lf ~ /^n\/a/) print "READY"; else print "FORKED"; exit }
         if (nfi == 0 || plain > 0) { print "FORKED"; exit }
-        for (k = 1; k <= nfi; k++) {
-          s = span[k]; gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s)
-          if (s !~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) { print "FORKED"; exit }
-        }
+        for (k = 1; k <= nfi; k++) if (!check_span_mark(span[k])) { print "FORKED"; exit }
         print "READY"; exit
       }
       # AN EMPTY SECTION IS A REFUSAL, not a pass — the ratified fork, and TEMPLATE-SPEC names both

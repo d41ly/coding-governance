@@ -1349,6 +1349,14 @@ if [ -n "$c12_sel" ]; then
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
 bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v icut="$FORK_ITEM_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v stg="$STAGED" '
+  # ---- The §8 grammar, ONCE for this program (TOOL-dDerivedDocket-31): the documented mark, the
+  # ---- F-item opener, and a span resolved by its own mark. Removing code spans and double-quoted
+  # ---- spans only DELETES text, so a stray delimiter pairing with a later one can hide a real mark,
+  # ---- a false red naming its F-item, and can never forge one. The planning verb spells the same
+  # ---- three in its own kit; the marker-contract table is what proves the two agree.
+  function check_mark(s) { return (s ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) }
+  function check_fitem_open(s) { return (s ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || s ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) }
+  function check_span_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return check_mark(s) }
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1677,7 +1685,7 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       # every line as it reads, which is why it did not need this; squeezing here makes the two
       # provably agree instead of agreeing by coincidence.
       gsub(/[[:space:]]+/, " ", bblob)
-      bmark = (bblob ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/)
+      bmark = check_mark(bblob)
       if (q == 0)
         print f " (terminal Status and no Open questions section found — silence and a resolved fork are the same byte without this)"
       # ---- TOOL-dDerivedDocket-31: THE PER-ITEM READING, forward-only behind FORK_ITEM_CUTOFF, and it
@@ -1695,7 +1703,7 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         for (i = 2; i <= q - 1; i++) {
           L = rng[i]
           if (L ~ /^[[:space:]]*$/) continue
-          if (L ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || L ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) {
+          if (check_fitem_open(L)) {
             fi_n++; fi_sp[fi_n] = L; fi_id[fi_n] = "F-item " fi_n
             if (match(L, /F[0-9]+/)) fi_id[fi_n] = substr(L, RSTART, RLENGTH)
             continue
@@ -1709,12 +1717,8 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         } else {
           if ((fi_n == 0 || fi_plain > 0) && hdr ~ /Tier-1/)
             print f " (terminal Status and a §8 whose forks are not all F-items, at/after FORK_ITEM_CUTOFF " icut "; a bullet or sub-head outside every F-item span is graded by nothing)"
-          for (k = 1; k <= fi_n; k++) {
-            s = fi_sp[k]; gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s)
-            if (s !~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) {
-              fi_nb++; fi_bad = (fi_nb == 1) ? fi_id[k] : fi_bad ", " fi_id[k]
-            }
-          }
+          for (k = 1; k <= fi_n; k++)
+            if (!check_span_mark(fi_sp[k])) { fi_nb++; fi_bad = (fi_nb == 1) ? fi_id[k] : fi_bad ", " fi_id[k] }
           if (fi_nb > 0)
             print f " (terminal Status, §8 F-items carrying no conforming resolution mark in their own span, at/after FORK_ITEM_CUTOFF " icut "): " fi_bad
         }
@@ -1749,7 +1753,7 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         L = body[i]
         if (L ~ /^## /) { sh_in = (L ~ /^## [0-9]+[.] Open questions/); continue }
         if (!sh_in || L ~ /^[[:space:]]*$/) continue
-        if (L ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || L ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) { sh_fi++; continue }
+        if (check_fitem_open(L)) { sh_fi++; continue }
         if (L ~ /^[[:space:]]*[-*][[:space:]]/ || L ~ /^###[[:space:]]/) sh_items++
         if (sh_fi == 0 && (L ~ /^[-*][[:space:]]/ || L ~ /^###[[:space:]]/)) sh_plain++
       }
