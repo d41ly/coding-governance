@@ -113,6 +113,10 @@ RETIRED_SOURCES = {"verb": "driver", "push": "pushes", "push-refused": "pushes",
                    "compact": "transcripts", "limit": "transcripts", "idle": "idle",
                    "workflow": "transcripts"}
 EXCLUDED_KINDS = tuple(k for k in mdl.PARK_KINDS if k not in mdl.PARK_KINDS_OWED)
+# The set a record committed BEFORE the driver parked `hold` and `resume` rows (dDerivedDocket) was
+# rendered with. A committed record is never rewritten, so its `excluded rows` fact is still read
+# against the set it was written under; a new record renders the full set, the first template.
+EXCLUDED_KINDS_BEFORE_HOLD = tuple(k for k in EXCLUDED_KINDS if k not in ("hold", "resume"))
 USAGE_FIELDS = ("requests", "in", "out", "cache_read", "cache_write")
 # The coverage states under which a count the model derives from a source is KNOWN (spec S4). It read
 # the transcripts alone until TOOL-dLoggedFlight-27 declared a source per count slot; it is the same
@@ -277,7 +281,8 @@ RECORD_SCHEMA = {
                 ("decision-log rows the owner's", ("{int}",)),
                 ("spec marks", ("owner-before {int} · owner-inside {int} · agent-before {int} · "
                                 "agent-inside {int}",)),
-                ("excluded rows", (" · ".join(f"{k} {{int}}" for k in EXCLUDED_KINDS),)),
+                ("excluded rows", (" · ".join(f"{k} {{int}}" for k in EXCLUDED_KINDS),
+                                   " · ".join(f"{k} {{int}}" for k in EXCLUDED_KINDS_BEFORE_HOLD))),
                 ("review rounds", ("{int} · shown {int} · aggregated {yes-no}",)),
             ),
             "tables": (
