@@ -1,6 +1,6 @@
 # TOOL-dHashedPrelude-2 — two arms red when the live-log guard stops bracketing the arms
 
-**Status:** CLOSED · rev-5 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -24,9 +24,11 @@ signal saying so.
 ## 2. Scope (IN)
 
 - **S1** — An ordering arm, `test_the_live_log_baseline_is_taken_before_any_arm_runs`, asserts from
-  source text that the module-scope baseline appears before the first decorated arm, that the body
-  of `main()` reads it rather than recomputing one, and that `main()` appends the guard's row
-  unconditionally. Observed by AC1, AC2 and AC3.
+  source that exactly one module-level `main` exists and carries no decorator, that the
+  module-scope baseline appears before the first decorated arm, that `main()` appends the guard's
+  row exactly once among its REACHABLE direct body statements and with no arguments, and that
+  `_read_live_log_verdict` is defined above the arms with the prelude pair as its defaults.
+  Observed by AC1, AC2, AC3 and AC9.
 - **S2** — That arm takes its source as a parameter, defaulting to this file, so every failure
   direction is reachable from a synthetic string. This is the shape `check_provenance_chain(src,
   pinned)` already uses in this file, and its docstring states the same reason. Observed by AC5.
@@ -34,8 +36,8 @@ signal saying so.
   source it was given: the baseline anchor exactly once, the `main()` anchor exactly once, the
   decorator anchor at least once. A count outside that reds naming the anchor, so a later duplicate
   at column 0 is caught here instead of silently re-pointing a comparison. Observed by AC6.
-- **S4** — A state arm, `test_the_build_live_log_row_is_total_over_its_four_states`, drives
-  `_build_live_log_row` over all four states of unit 1's S2 table, asserts the state token of each, and
+- **S4** — A state arm, `test_the_live_log_verdict_is_total_over_its_states`, drives
+  `_read_live_log_verdict` and `_build_live_log_row` over all five states of unit 1's S2 table, asserts the state token of each, and
   asserts the differing-digest row's detail carries both digests. Observed by AC4.
 - **S5** — Both arms are registered in `main()`'s `order` list so the declared-versus-ran assertion
   counts them, and `SELFTEST_ARMS` moves from 71 to 73 with the one provenance line its chain
@@ -76,7 +78,7 @@ can see what was compared.
 
 Two new module-level functions in this file's `test_*` cell:
 `test_the_live_log_baseline_is_taken_before_any_arm_runs` and
-`test_the_build_live_log_row_is_total_over_its_four_states`. Both follow the convention of
+`test_the_live_log_verdict_is_total_over_its_states`. Both follow the convention of
 `test_the_selftest_pin_carries_an_unbroken_provenance_chain`, the file's existing self-referential
 arm. Three module-level anchor constants are minted beside them. One pinned constant moves rather
 than being minted: `SELFTEST_ARMS`, 71 to 73.
@@ -130,9 +132,10 @@ that keeps unit 1's module-scope assignment AND the old conditional append emits
 twice, prints a green summary one row longer than it should be, and no other criterion in this set
 reaches that.
 
-The state arm calls `_build_live_log_row` directly with each of the four inputs. Two of the four states
-cannot be produced by running the suite in this repository at all, which is why unit 1 makes the
-verdict a function rather than an inline branch.
+The state arm calls `_build_live_log_row` directly with each of the five inputs, and calls
+`_read_live_log_verdict()` once to confirm the def-time binding answers for this run. Three of the
+five states cannot be produced by running the suite in a repository that has a readable log, which
+is why unit 1 makes the verdict a function rather than an inline branch.
 
 ### Files touched (estimate)
 
@@ -161,7 +164,7 @@ an `ast` scan of `main()`'s DIRECT body statements — never `ast.walk`, because
 nesting IS the property — plus a check that the arguments are the module-scope pair and that
 nothing rebinds the baseline inside the function.
 
-Driving the four states by running a patched copy of the suite in a subprocess was considered for
+Driving the five states by running a patched copy of the suite in a subprocess was considered for
 the state arm and rejected: it costs a full nested run per state to observe a three-field return
 value that a direct call gives for nothing.
 
@@ -196,10 +199,19 @@ criterion resting on one couples a merge-bar leg to the current wording of an un
 - **AC2** — When the ordering arm is given a source whose module-scope baseline is present but whose
   `main()` body does not mention `_LIVE_LOG_BEFORE`, it reports FAIL.
   Red when: the arm asserts only the ordering, in which case a baseline that is never read passes.
-- **AC3** — When the ordering arm is given a source whose `main()` still appends the guard's row
-  under a conditional on the log path being set, it reports FAIL naming the surviving conditional.
-  Red when: the arm checks only that the append exists, which both the correct build and the
-  double-append build satisfy.
+- **AC3** — When the ordering arm is given a source whose `main()` appends the guard's row under a
+  conditional, inside a `try`, twice, below the `return`, or with arguments at the call site, it
+  reports FAIL in each case, and against the shipped file it reports ok.
+  figure: the mutation set is DERIVED by driving the extracted arm. Thirteen shapes were driven on
+  2026-09-28 and ten redded; the three that pass are ones the def-time binding makes harmless, each
+  confirmed harmless by running it rather than by argument.
+  Red when: the clause is a substring test over `main()`'s raw text. That is what it was, and it
+  greened on seven of those shapes including the original defect restored.
+- **AC9** — When the ordering arm is given a source in which `_read_live_log_verdict` takes literal
+  defaults instead of the prelude pair, or is defined below the first decorated arm, or in which a
+  second module-level `main` is defined, it reports FAIL naming which.
+  Red when: the arm asserts the call site alone. A correct call site against a verdict bound to the
+  wrong values still compares the wrong values.
 - **AC4** — When the state arm runs, it asserts `_build_live_log_row` returns state `skip` for an
   unresolvable repository, `ok` for equal digests, `ok` for a log absent at both readings, and
   `FAIL` for differing digests, and that the differing-digest detail contains both digest prefixes.
@@ -227,7 +239,7 @@ criterion resting on one couples a merge-bar leg to the current wording of an un
   Red when: an arm is defined but not added to `order`, which the arity assertion catches, or
   `SELFTEST_ARMS` is bumped without its provenance line, which `check_provenance_chain()` catches.
 - **AC8** — When the docstrings of `test_the_live_log_baseline_is_taken_before_any_arm_runs` and
-  `test_the_build_live_log_row_is_total_over_its_four_states` are read, each states that a behavioural
+  `test_the_live_log_verdict_is_total_over_its_states` are read, each states that a behavioural
   test of its property would write to the real query log, and that this is why it reads source or
   calls `_build_live_log_row` directly.
   Red when: a docstring describes only what its arm does, leaving the next reader to re-derive why
@@ -280,6 +292,14 @@ none
   including a local-shadow case the old clause was never driven against. The state arm is
   renamed `test_the_live_log_verdict_is_total_over_its_states`; its previous name was an
   accident of the rev-4 blanket rename and said four states where there are five.
+- rev-6 · 2026-09-28 · §2 S1 · §4 · AC3 · AC9 · folded the round-2 closing review, whose subject
+  was rev-5's own fix. Two more shapes restored the original defect with the arm green — a
+  `globals()` write, whose Store is a Subscript so no Name is ever in Store ctx, and a
+  module-scope re-derive below the arms, which a scan of `main()` alone never sees — and two
+  rebound `_LIVE_LOG`, which the ban did not cover. S1 follows the new clauses, AC3 states the
+  mutation set as derived rather than naming one shape, and AC9 is new for the binding itself.
+  §4's state-arm paragraph still described the four-state version. The dead arm name from the
+  rev-4 blanket rename survived in three places and made AC8 unexecutable.
 
 ## 10. Reuse audit
 

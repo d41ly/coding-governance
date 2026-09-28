@@ -39,17 +39,33 @@ minutes. `tools/run-gates/run-gates.sh` was not run by any unit pass; the close 
 - AC6 — `_checks.append(_build_live_log_row(` — present in the body of `main()`, and neither
   `if live is not None` nor `if _LIVE_LOG is not None` survives anywhere in it
 
+- AC7 — `_derive_live_log_digest` — given a path that exists and cannot be read, it returns
+  `(unreadable)` and raises nothing; `_build_live_log_row` returns `skip` for that value at either
+  end. The sentinel compares unequal to `(absent)`, which is what stops two unreadable readings
+  from matching and announcing a protected log
+- AC8 — `_read_live_log_verdict` — called with no arguments after `_LIVE_LOG_BEFORE` is rebound at
+  module scope, it returns the prelude pair; the same rebind under a call-time lookup returns the
+  post-arm values. Driven as a two-arm differential, so the claim rests on the contrast rather than
+  on one green
+
 **Evidences:** TOOL-dHashedPrelude-2
 - AC1 — `main()` — the ordering arm driven over the shipped source with its one baseline line
   indented reports FAIL: `'\n_LIVE_LOG_BEFORE = ' occurs 0 time(s) at column 0, expected exactly 1`.
   Against the shipped file it reports ok
 - AC2 — `_LIVE_LOG_BEFORE` — driven over a source whose `main()` recomputes its own digest, the arm
   reports FAIL: `main() does not read the module-scope baseline`
-- AC3 — `main()` — driven over a source carrying a surviving conditional, the arm reports FAIL:
+- AC3 — `main()` — thirteen mutation shapes were driven through the extracted arm and ten red:
+  a conditional, a `try`, a comment-out, a duplicate, a deletion and a relocation below the
+  `return` all report `0` or `2` unconditional `_read_live_log_verdict` append(s) in main();
+  arguments at the call site report that the verdict takes none; literal defaults report the
+  defaults are not the prelude pair; and the verdict defined below the arms reports its anchor
+  occurs 0 times. The three that pass — a `globals()` write, a `global _LIVE_LOG` rebind and a
+  module-scope re-derive below the arms — were each RUN to confirm the def-time binding makes them
+  harmless. Superseded text follows, from before the binding landed:
   ``main() still guards the append with `if _LIVE_LOG is not None`; with the module-scope baseline in
   place that emits the row twice and both copies are green``
 - AC4 — `_build_live_log_row` — the state arm returns
-  `skip / ok / ok / FAIL, and the FAIL names both digests` and reports ok in the suite
+  `skip / skip / ok / ok / FAIL, and the FAIL names both digests` and reports ok in the suite
 - AC5 — `_LIVE_LOG_BEFORE` — driven over the synthetic source `nothing here at all\nnot one anchor`,
   the arm reports FAIL naming the anchor rather than an ordering complaint. The default argument
   still reads `__file__` and reports ok
@@ -64,6 +80,12 @@ minutes. `tools/run-gates/run-gates.sh` was not run by any unit pass; the close 
   `test_the_live_log_verdict_is_total_over_its_states` both name the real query log as the reason
   the arm is not behavioural. The ordering arm's did not on first writing and was corrected before
   the unit was committed; the checking predicate found it
+
+- AC9 — `_read_live_log_verdict` — the ordering arm reds on literal defaults with `the verdict's
+  defaults are ['Constant', 'Constant'], not the prelude pair`, on the verdict defined below the
+  arms with its anchor occurring 0 times, and on a second module-level `main` with
+  `'
+def main() -> int:' occurs 2 time(s) at column 0, expected exactly 1`
 
 **Evidences:** TOOL-dHashedPrelude-3
 - AC1 — `grep -c "18 checks" tools/memory-recall/README.md` — prints 0, and line 26 now points at

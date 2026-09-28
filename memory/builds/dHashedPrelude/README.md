@@ -74,7 +74,7 @@ queries reached the real log as qids 592-595 and the row still reported ok.
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-dHashedPrelude-1` | 2 | the live-log baseline is captured at module scope above the first decorated arm, and the guard's comment states what it does not check |
-| 2 | `TOOL-dHashedPrelude-2` | 2 | two arms: one reads the suite's own source and reds when the baseline does not precede the first decorated arm, when `main()` does not read it, or when the append is still conditional; the other drives `_build_live_log_row` over its four states. The arm-count pin moves 71 to 73 |
+| 2 | `TOOL-dHashedPrelude-2` | 2 | two arms: one reads the suite's own source and reds when the baseline does not precede the first decorated arm, when `main()` does not read it, or when the append is still conditional; the other drives the verdict over its five states. The arm-count pin moves 71 to 73 |
 | 3 | `TOOL-dHashedPrelude-3` | 1 | the kit's published facts are re-derived: the README stops stating a selftest count, the kit version moves with the shipped bytes, and the build's two deferrals get backlog rows |
 
 <!-- /roster:units -->
@@ -86,8 +86,8 @@ ids TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 TOOL-dHashedPrelude-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dHashedPrelude-1 — the live-log baseline is captured above the first decorated arm](spec/2026-09-28-spec-TOOL-dHashedPrelude-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-09-28 |
-| [TOOL-dHashedPrelude-2 — two arms red when the live-log guard stops bracketing the arms](spec/2026-09-28-spec-TOOL-dHashedPrelude-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-28 |
+| [TOOL-dHashedPrelude-1 — the live-log baseline is captured above the first decorated arm](spec/2026-09-28-spec-TOOL-dHashedPrelude-1.md) | 1 | 2 | CLOSED | rev-6 | 2026-09-28 |
+| [TOOL-dHashedPrelude-2 — two arms red when the live-log guard stops bracketing the arms](spec/2026-09-28-spec-TOOL-dHashedPrelude-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-28 |
 | [TOOL-dHashedPrelude-3 — the kit's published facts stop being a typed count, and its version moves](spec/2026-09-28-spec-TOOL-dHashedPrelude-3.md) | 3 | 1 | CLOSED | rev-3 | 2026-09-28 |
 <!-- /gen:build-units -->
 

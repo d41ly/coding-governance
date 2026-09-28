@@ -1,6 +1,6 @@
 # TOOL-dHashedPrelude-1 — the live-log baseline is captured above the first decorated arm
 
-**Status:** CLOSED · rev-5 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -25,8 +25,10 @@ ok whatever the arms did to the log.
 - **S1** — The live-log path and its `before` digest are assigned at MODULE scope, textually above
   the first decorated arm. Observed by AC1.
 - **S2** — The guard's verdict becomes a function, `_build_live_log_row(live, before)`, returning the
-  `(state, name, detail)` triple `_checks` holds. It is TOTAL over the four states the code can
-  actually be in, which the rev-1 draft of this item got wrong:
+  `(state, name, detail)` triple `_checks` holds, reached through `_read_live_log_verdict()`, whose
+  DEFAULT ARGUMENTS bind the prelude's pair at def time so nothing running later can substitute
+  either. It is TOTAL over the five states the code can actually be in, which the rev-1 draft of
+  this item got wrong in both the count and the contents:
 
   | state | today | after this unit |
   |---|---|---|
@@ -174,6 +176,18 @@ wrong state gets preserved, and the charter already rules that a skip must annou
   quoting requirement exists because this log is shared by every session on this node: rows 596 and
   597 arrived during this build's own kickoff from a query it did not issue, so equal digests cannot
   be assumed and unequal ones do not by themselves convict the suite.
+- **AC7** — When `_derive_live_log_digest` is given a path that exists and cannot be read, it
+  returns the `(unreadable)` sentinel rather than raising, and `_build_live_log_row` returns a
+  `skip` when either reading is unreadable.
+  Red when: the digest raises, which takes the guard out through `main()` and kills the suite, the
+  one outcome a guard must never have. Also red when the sentinel is spelled `(absent)`: two
+  unreadable readings would then compare equal and announce a protected log.
+- **AC8** — When `_read_live_log_verdict` is called with no arguments after `_LIVE_LOG_BEFORE` has
+  been rebound at module scope, it still reports over the prelude's pair.
+  figure: DERIVED by driving both shapes. The def-time binding returned the prelude pair and a
+  call-time lookup returned the post-arm values, measured 2026-09-28.
+  Red when: the verdict looks its pair up at call time, which is what puts a rebind back in reach —
+  three rebind shapes were GREEN against the arm that policed spellings inside `main()`.
 - **AC5** — When `_build_live_log_row` is called with the path argument set to the none-value, it returns
   a triple whose state is `skip` and whose detail names the unresolvable repository; called with a
   path that does not exist and the absent-sentinel as the baseline, it returns an `ok` triple; and
@@ -232,6 +246,11 @@ none
   a protected log nobody could read. The review recorded this as a residual it did not raise as
   a finding, since the pre-unit code carried the same exposure. AC6 now says the guarantee is
   STRUCTURAL, which is the blocker's fix in unit 2.
+- rev-6 · 2026-09-28 · §2 S2 · AC7 · AC8 · folded the round-2 closing review. S2 now reaches the
+  verdict through `_read_live_log_verdict`, whose default arguments bind the prelude pair at def
+  time, and says five states rather than four. AC7 and AC8 are new: the fifth state had no
+  criterion on either spec, and nothing observed that a rebind cannot reach the compared pair —
+  which is the property the whole fix rests on.
 
 ## 10. Reuse audit
 
