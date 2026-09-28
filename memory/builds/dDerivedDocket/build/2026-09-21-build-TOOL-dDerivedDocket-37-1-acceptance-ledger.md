@@ -26,6 +26,10 @@
   `1 waiver(s)`; the same row exits 1 printing `STALE WAIVER` once the target names `--frob`; and,
   that naming reverted, a third spec's edge exits 1 printing `EXMP-tOne-3>EXMP-tOne-2:--frob`
   with `STALE WAIVER` forbidden in its output.
+- AC6 — amended rev-6 — the criterion spelled `SPEC_HANDOFF_CUTOFF 2026-09-22`, and the second
+  merge of main moved the declared date to 2026-09-29. At 364278a8 the `spec tokens (a spec's own
+  names resolve)` leg exited 0 and its hands-off line read 0 bullets, 0 payload tokens and 0 silent
+  at `SPEC_HANDOFF_CUTOFF 2026-09-29`, the arm armed and reporting; section 9 rev-6 logs it.
 - AC7 — `grep -c '^arm "' tools/check-spec-tokens.test.sh` — prints 51 at the build commit, and
   `grep -m1 '^FLOOR_ASSERTIONS=' tools/check-spec-tokens.test.sh` prints `FLOOR_ASSERTIONS=55`.
   Both are the criterion's figures: 38 `arm` calls at `fb07ca25` plus the 13 this unit adds over
@@ -46,6 +50,9 @@
   with `PASS (112 assertions)`. Its AC9 arm printed ok: a family-less source and a tailed target
   in a `units` sub-folder of `spec`, both dated at the scratch repo's own key, exit 1 printing
   `[handoff]` and that key, the target joined by its H1 rather than its filename.
+- AC10 — amended rev-6 — the criterion spelled `PASS (55 assertions)`, and later units grew the
+  suite. At 364278a8 the `spec-tokens self-test` leg printed `PASS (112 assertions)` against
+  `FLOOR_ASSERTIONS=109`, inside its ceiling; section 9 rev-6 logs the amendment.
 - AC11 — `wc -c < memory/guides/SESSION-KICKOFF.md` — reads 20057 at this unit's commit and 20057
   at its parent, so the carrier is no larger; and `git diff --numstat` over that path between the
   same two commits reports `1	1`, one line added and one removed. The whole edit to that file is

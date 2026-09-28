@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-37 — a hands-off's payload tokens are named by the sibling it names
 
-**Status:** CLOSED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
+**Status:** CLOSED · rev-6 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -420,7 +420,8 @@ retires another row. The shipped example conf is not touched (§8 F5).
   unit's pass.
 - **AC6** — When the orchestrator's run of `python tools/check-spec-tokens.py` over the tree follows
   this unit's commit and any fix S6 makes, it exits 0, and S4's report line names
-  `SPEC_HANDOFF_CUTOFF 2026-09-22` with its bullet, token and silent counts. That bullet count is
+  `SPEC_HANDOFF_CUTOFF` with the date `.memory-tree.conf` declares, 2026-09-22 when this unit
+  closed, and its bullet, token and silent counts. That bullet count is
   ZERO on landing day and this criterion does not require otherwise: every spec of this build is
   dated before the relation-derived key (S3), so what the live run observes is that the arm is ARMED
   and REPORTING, and the arm's coverage on landing day is the self-test fixtures AC1 to AC5, AC9 and
@@ -477,7 +478,8 @@ retires another row. The shipped example conf is not touched (§8 F5).
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
   unit's pass.
 - **AC10** — When the post-build bar runs `tools/check-spec-tokens.test.sh` with `GATE_SELFTESTS=1`,
-  the suite prints `PASS (55 assertions)` inside the self-test leg's declared ceiling in
+  the suite prints `PASS` with at least the 55 assertions this unit brought, and never below the
+  suite's own `FLOOR_ASSERTIONS`, inside the self-test leg's declared ceiling in
   `tools/gate-legs.json`.
   Red when: an arm is stranded past an exit or never reaches the checker, so fewer than 55 execute
   while AC7's static count still reads 51; or the new arms run the suite past that ceiling, which
@@ -779,6 +781,12 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   subject, the day-one zero population is unaffected because the key still postdates every spec of
   this build, and §5 risks reads the same. The relation is re-derived once more AT LANDING.
   Recorded as its own entry with a single bump, the form rev-4 settled.
+- rev-6 · 2026-09-28 · §6 · AC6 AC10 · both criteria named a value later work moved, so
+  neither could be observed as written at VERIFYING. AC6 spelled the cutoff date: the second merge
+  of main moved `SPEC_HANDOFF_CUTOFF` to 2026-09-29 so main's live specs stay outside the join,
+  and the criterion now names the declared date. AC10 spelled an exact count: later units added
+  arms to the same suite, so it now asks for at least this unit's 55 and the suite's floor. The
+  unit stays CLOSED and nothing it built moved.
 
 ## 10. Reuse audit
 
