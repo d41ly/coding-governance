@@ -5249,10 +5249,14 @@ _lc_hits=${_lc_hits%$'\n'}
 # print_liveness arrived with origin/main (aWokenSentinel); it reads the RECORDED phase because it
 # takes no network.
 PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness"
-if [ ! -f "$DRIVER" ]; then
-  fail 39 "the driver is not where this leg reads it, so the phase-read routing below would be graded over no lines at all and would pass by finding nothing: $DRIVER"
-else
-  _c39=$(PRF="$PHASE_RECORDED_FNS" awk '
+# ---- LIVENESS: the classifier must RECOGNISE the readers' own reads. The two readers are the one
+# ---- place a read of the fact is certain to exist, so each must hold a line the read predicate
+# ---- matches, or the driver reads the fact in a spelling this check no longer sees and the routing
+# ---- is graded over no read at all. The awk prints its marker only after seeing both, so a driver
+# ---- it cannot open lands here too. This REPLACES a driver-is-absent guard that could never fire:
+# ---- check 1 refuses and EXITS on an unreadable driver before any check below it runs, so that
+# ---- branch was unreachable and the arm written for it never passed.
+_c39=$(PRF="$PHASE_RECORDED_FNS" awk '
     BEGIN { n = split(ENVIRON["PRF"], a, /[ \t]+/); for (i = 1; i <= n; i++) if (a[i] != "") allow[a[i]] = 1 }
     /^[a-z_][A-Za-z0-9_]*\(\)/ { fn = $0; sub(/\(\).*/, "", fn) }
     /^[ \t]*#/ { next }
@@ -5261,6 +5265,7 @@ else
       isread = (ln ~ /(^|[^A-Za-z0-9_])fact[ \t]+[^ \t]+[ \t]+phase([^A-Za-z0-9_-]|$)/) \
             || (ln ~ /s\/\^phase[:] \/\/p/)
       iswrite = (ln ~ /set_fact[ \t]+[^ \t]+[ \t]+phase([^A-Za-z0-9_-]|$)/)
+      if (isread && (fn == "read_derived_phase" || fn == "read_recorded_phase")) own[fn] = 1
       if (isread && !iswrite && fn != "read_derived_phase" && fn != "read_recorded_phase")
         printf "\n  %s:%d reads the phase fact directly inside %s(), which is neither reader", FILENAME, NR, fn
       if (ln ~ /(^|[^A-Za-z0-9_])read_recorded_phase[ \t]+"/) {
@@ -5269,11 +5274,19 @@ else
           printf "\n  %s:%d calls read_recorded_phase() inside %s(), which the allow-list does not name", FILENAME, NR, fn
       }
     }
-    END { for (k in allow) if (!(k in seen)) printf "\n  the allow-list names %s(), which no longer calls read_recorded_phase()", k }
+    END {
+      for (k in allow) if (!(k in seen)) printf "\n  the allow-list names %s(), which no longer calls read_recorded_phase()", k
+      if (("read_derived_phase" in own) && ("read_recorded_phase" in own)) printf "\nC39-READERS-SEEN"
+    }
   ' "$DRIVER")
-  [ -z "${_c39//[[:space:]]/}" ] \
-    || fail 39 "the phase fact is read outside the two readers, or the recorded-phase allow-list disagrees with the source, so the effective phase and the recorded one can differ at a call site nobody classified:$_c39"
-fi
+case "$_c39" in
+  *C39-READERS-SEEN)
+    _c39=${_c39%$'\n'C39-READERS-SEEN}
+    [ -z "${_c39//[[:space:]]/}" ] \
+      || fail 39 "the phase fact is read outside the two readers, or the recorded-phase allow-list disagrees with the source, so the effective phase and the recorded one can differ at a call site nobody classified:$_c39" ;;
+  *)
+    fail 39 "a phase reader holds no read the classifier recognises, so its predicate no longer matches how the driver reads the fact and the routing below would be graded over no lines at all and would pass by finding nothing: $DRIVER" ;;
+esac
 
 # ---- check 40 - A PHASE ANOTHER VERB PRODUCES IS NOT REACHABLE THROUGH `--phase`. Vocabulary membership is
 # ---- not permission: every literal phase a `set_fact … phase` site writes is a PRODUCER's, written

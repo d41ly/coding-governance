@@ -357,6 +357,7 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-60](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-21 | A DECISION ROW FORCES A PASS TO RUN ALONE. M6 condition 3 names… |
 | [TOOL-dDerivedDocket-66](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-28 | the owner's triage of the legacy holds that named no id, each held on… |
 | [TOOL-dDerivedDocket-67](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-28 | 89 FUNCTION NAMES THIS BUILD WROTE LEAD WITH NO DECLARED VERB. python… |
+| [TOOL-dDerivedDocket-68](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-29 | THE DRIVER READS A LANDER THAT CANNOT RUN AS AN OUTAGE.… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | OPEN | — | — | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |
 | [TOOL-dFoldedVerdict-9](../builds/dFoldedVerdict/BACKLOG.md) | OPEN | — | — | 2026-09-02 | RETIRING ANOTHER BUILD'S UNIT LEFT TWO CONSEQUENCES ON THAT BUILD'S OWN… |
 | [TOOL-dGatedProse-6](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | the join count in memory/map/features/spec-tokens.md is typed prose… |

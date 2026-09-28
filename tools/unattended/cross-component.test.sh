@@ -17,6 +17,16 @@ st=0; n=0
 hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
+# THE LEG'S ANNOUNCEMENTS ARE NOT OUTPUT A SILENT LEG WITHHOLDS. Checks 45 and 46 print the effective
+# LANDER_MODE, RESUME_SCHEDULE and SELFTESTS_OWED_PATHS on the DEFAULT channel on every run, by
+# design - the checker header's THREE, TOOL-dDerivedDocket-3 S1 and TOOL-dDerivedDocket-5 S1/S2 - so
+# every whole-output control below that expects nothing compares through this filter, which removes
+# exactly those shapes and nothing else: a FAILED line, or any other line, still reaches the arm. It
+# was copied from the filter of the same name in the leg's own suite beside this file, and the two
+# suites share no sourced helper, so a new announcement shape in the leg is owed to both.
+remove_announcements() { # leg output -> the same output without the check-45/46 announcement lines
+  printf '%s\n' "$1" | grep -v -E '^unattended: (LANDER_MODE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE is off — |SELFTESTS_OWED_PATHS is blank — |SELFTESTS_OWED_PATHS entry [^ ]+ — resolves to tracked paths$)'
+}
 
 # ---- THE KIT RUNNER'S PARSER, before the fixture because it needs none: --checks takes no mode,
 # ---- and a mode given beside it is REFUSED by name rather than dropped silently — it used to set
@@ -82,9 +92,18 @@ fi
 # the declared-but-absent file before reaching the driver/leg seam these arms exist to cross. The
 # announced skip is what the driver prints for a blank key; the checker itself is armed in the
 # driver suite's F3 block, over a fixture that copies it in. (aDeferredBar closing fold, F3.)
+# LANDER_MODE PRIMARY and GATE_PROFILE_CMD BLANK, for that same reason. The real conf declares
+# `in-place` (TOOL-dDerivedDocket-3 S1), whose `--preflight` probes the declared lander with `--carry`
+# and `--prepared` (S2); this tree hosts no lander, so bash's 127 refused every preflight below as
+# check 61 and seven arms graded that refusal instead of the seam. The profile command
+# (TOOL-dDerivedDocket-27 S2) names a runner this tree does not host either, and blank is the state
+# the driver reads as "no profile", exactly as it reads a profile that exits non-zero. `primary` is
+# DECLARED, not blanked: a blank mode announces its default on stderr, which drive() merges into
+# every output an arm reads. The in-place probes are the driver suite's, over a stub lander.
 sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CMD="true"|' \
     -e 's|^WIRING_CHECK=.*|WIRING_CHECK="true"|' -e 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' \
     -e 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' \
+    -e 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' -e 's|^GATE_PROFILE_CMD=.*|GATE_PROFILE_CMD=""|' \
     -e 's|^UNDECLARED_WRITE_CEILING=.*|UNDECLARED_WRITE_CEILING="0"|' \
     "$HERE/../../.unattended.conf" > .unattended.conf
 git add -A >/dev/null && git commit -q -m base --no-verify
@@ -138,7 +157,7 @@ none
 # ---- half-built tree tests the fixture, not the kit, and reports it as a kit verdict.
 git checkout -q -b unit
 out=$(leg)
-same "fixture precondition: the leg is silent over the untouched fixture" "$out" ""
+same "fixture precondition: the leg is silent over the untouched fixture" "$(remove_announcements "$out")" ""
 
 # ---- ARM 1: a build folder the RUN authored, branch NOT pushed. Nothing published authorizes it.
 # DECLARES A MODE (TOOL-dNarrowedAnchor-1). This whole suite runs under ANCHOR_SCOPE="published"
@@ -165,7 +184,7 @@ hit "$(cat memory/builds/tRun/RUN.md)" "anchor-kind: run-branch"
 git add -A >/dev/null && git commit -q -m runstate --no-verify && git push -qf origin unit
 out=$(leg); rc=$?
 same "arm 3: the leg accepts a run-branch anchor, exit code" "$rc" "0"
-same "arm 3: the leg accepts a run-branch anchor, output" "$out" ""
+same "arm 3: the leg accepts a run-branch anchor, output" "$(remove_announcements "$out")" ""
 
 # ---- ARM 3b: THE DRIVER MUST NOT REFUSE WHAT ITS OWN LEG CALLS LEGAL. This is the class that produced
 # ---- a terminal stall: `check-unattended.sh` states in capitals that it is keyed on (group, unit)
@@ -198,7 +217,7 @@ git add -A >/dev/null && git commit -q -m "ARCH-tRun-1 builds its unit" --no-ver
 git push -qf origin unit
 out=$(leg); rc=$?
 same "arm 3b: the leg is silent over what the driver produced, exit code" "$rc" "0"
-same "arm 3b: the leg is silent over what the driver produced, output" "$out" ""
+same "arm 3b: the leg is silent over what the driver produced, output" "$(remove_announcements "$out")" ""
 
 
 # ---- ARM 4a/4b: the SCOPE-INTEGRITY seam, RE-AIMED by the aBoundedVerdict merge. These arms were
@@ -242,7 +261,7 @@ hit "$out" "preflight OK"
 hit "$(cat memory/builds/tPrompt/RUN.md)" "mode: prompt"
 git add -A >/dev/null && git commit -q -m runstate2 --no-verify && git push -qf origin unit2
 out=$(leg)
-same "arm 5: the leg's own re-derivation agrees with the recorded mode" "$out" ""
+same "arm 5: the leg's own re-derivation agrees with the recorded mode" "$(remove_announcements "$out")" ""
 
 # ---- ARM 5b: the record CLAIMS a mode its own BASE does not grant. It breaks the RECORD, not the
 # ---- anchor - and it has to, because `mode:` and `base:` are both PINNED ONCE: a re-preflight after

@@ -1160,7 +1160,11 @@ git checkout -q -- memory/builds/tRun/RUN.md
 
 # ---- --status and --resume must AGREE. Two answers to one question is the class this whole build
 # ---- exists to remove, so the arm compares the shared line rather than each verb's own wording.
-sout=$(run --status tRun); rout=$(run --resume tRun)
+# ---- The resume is the HOLDER's, under the keepalive preflight just recorded (TOOL-dDerivedDocket-4
+# ---- §4 resume matrix, AC6; kept by TOOL-dDerivedDocket-61): a no-id `--resume` over this fresh
+# ---- working-phase lease prints the status block and refuses at check 59, which region two arms,
+# ---- so only the matching-id row still orients.
+sout=$(run --status tRun); rout=$(run --resume tRun --keepalive-id KA-1234)
 same "resume reproduces the status line" \
   "$(grep -c "$(printf '%s' "$sout" | head -1)" <<<"$rout")" "1"
 hit "$sout" "phase RUNNING"
@@ -1675,8 +1679,10 @@ same "no registry entry declares a scope the driver does not publish" "$nscope" 
 
 # ---- S5, the resume pointer. Armed because S2 taught this unit what an unarmed scope item costs:
 # ---- it can silently not ship while the suite stays green.
+# ---- The holder's resume, under the recorded keepalive: TOOL-dDerivedDocket-4 §4 AC6 made a no-id
+# ---- `--resume` over a fresh lease refuse at check 59, so it never reaches the orientation lines.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-same "resume names the directive table" "$(run --resume tRun | grep -c 'the directives and their waivers')" "1"
+same "resume names the directive table" "$(run --resume tRun --keepalive-id k1 | grep -c 'the directives and their waivers')" "1"
 
 # ---- S2, the ACCESSOR exists and composes core plus extra. This arm is here because its absence
 # ---- was invisible: the accessor edit silently no-opped, the suite stayed green at 192, and the

@@ -106,6 +106,15 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 # ---- the run named beside the group. `"?"` is refused BY NAME — one FAIL line per group, so the
 # ---- converted file cannot pass in the window — and `out` is still stripped, so the `hit` lines
 # ---- below it read exactly what they will read once the set exists. AC3's recipe counts these.
+# ---- TWO REPORT SHAPES ARE NOT SKIPS, and dDerivedDocket put both on every run over this fixture,
+# ---- so read as skips each turned a group's own coverage into a dark branch. A COVERAGE COUNT,
+# ---- `check <n> byte-compared|compared|graded <count> …` - check 10's pair count is one
+# ---- (TOOL-dDerivedDocket-20 S4, AC4) - says what a check graded; a half it could not grade is a
+# ---- failure line or a skip line of its own, which the dark scan still reads. And check 26's
+# ---- SUITE-ABSENT skip (TOOL-dDerivedDocket-30 S6, AC8), printed on every run because this fixture
+# ---- carries neither suite, as no adopter tree does, so no group-mate can have pushed check 26
+# ---- onto it. WHAT THIS DOES NOT CHECK: a count reading zero, which is its check's own liveness.
+CE_STANDING='^unattended-report: check [0-9]+ (byte-compared|compared|graded) [0-9]+ |^unattended-report: check 26 skipped for .*/(check-)?unattended[.]test[.]sh .* this tree does not carry the suite, which is withheld from every adopter install'
 check_emitted() { # signatures · output
   local _s _l _num _ok _exp _miss="" _extra="" _dark="" _nums=" " _skips
   n=$((n+1))
@@ -139,6 +148,7 @@ check_emitted() { # signatures · output
   printf '%s\n' "$_skips" > "$_ced/skips"
   while IFS= read -r _l; do
     [ -n "$_l" ] || continue
+    [[ $_l =~ $CE_STANDING ]] && continue
     _num=${_l#*check }; _num=${_num%%[!0-9]*}
     [ -n "$_num" ] || continue
     case "$_nums" in *" $_num "*) _dark="$_dark [$_l]" ;; esac
@@ -820,7 +830,13 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # pre-existing reds: `--unit` is a flag of `--brief` and `--disposition` one of `--review`, both
 # dispatched as case arms and both documented by the verb they belong to, so both are denied and
 # the floor below is re-derived over the population they were inflating.
-_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths --unit --disposition'
+#
+# FIVE MORE FLAGS, from dDerivedDocket, each a case arm that assigns and documented on its verb's
+# header line: `--asks` is an output mode of `--plan` as `--paths` is (TOOL-dDerivedDocket-16 S8);
+# `--until` and `--reaped` are arguments of `--hold` (TOOL-dDerivedDocket-4 S2); `--replaces` and
+# `--scheduled` are arguments of `--resume` (TOOL-dDerivedDocket-4 S6, TOOL-dDerivedDocket-5 S6).
+# Undenied, each demanded a Skill section, a synopsis line and a VERBS_ entry of its own.
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths --unit --disposition --asks --until --reaped --replaces --scheduled'
 for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)
@@ -836,7 +852,10 @@ _nverbs=$(printf '%s
 # `--disposition`, the two flags the line above now denies. It was 14 against a polluted population
 # of 20, so six verbs could have stopped being dispatched with the floor still green. A floor set
 # against a polluted population pins nothing.
-n=$((n+1)); [ "$_nverbs" -ge 18 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 18, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
+# NINETEEN since dDerivedDocket, re-derived the same way: `--hold` is a verb it added
+# (TOOL-dDerivedDocket-4 S2), and the five flags it added are denied above. The assertion count is
+# unchanged; only the number it compares against moved.
+n=$((n+1)); [ "$_nverbs" -ge 19 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 19, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
 # ...and every DENYLIST entry must really be a flag, or a stale exemption silently narrows the
 # population the join covers. A name is a flag when it is dispatched but assigns rather than acting;
 # the cheap proxy is that it must still appear as a case arm in the driver.
@@ -1379,7 +1398,10 @@ mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: ABORTED/'
 sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md
 out=$(run)
 miss "$out" "a run-state file's generated region carries a COPY of the unit list"
-same "a terminal record carrying a copy leaves the leg green" "$(run; echo $?)" "0"
+# NOTHING ELSE PRINTED AND EXIT 0, through the announcement filter: checks 45 and 46 announce
+# LANDER_MODE, RESUME_SCHEDULE and SELFTESTS_OWED_PATHS on every run (the checker's header, THREE;
+# TOOL-dDerivedDocket-3 S1, TOOL-dDerivedDocket-5 S1), so the output is never the status line alone.
+same "a terminal record carrying a copy leaves the leg green" "$(remove_announcements "$(run; echo $?)")" "0"
 
 # ---- check 9: a recorded BASE the run could quietly move is not a pin.
 reset_tree; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
@@ -1779,8 +1801,13 @@ reset_tree
 # ---- from the mktemp assignments means the exemption shrinks and grows with the code it describes.
 reset_tree
 # the variables this file assigns from mktemp — the only legal redirect targets
-mkt=$(grep -oE '^[[:space:]]*(local +)?[A-Za-z_][A-Za-z0-9_]*=\$\(mktemp' "$HERE/check-unattended.sh" \
-      | sed -E 's/^[[:space:]]*(local +)?//; s/=\$\(mktemp$//' | sort -u)
+# AN ASSIGNMENT IN A CONDITION COUNTS TOO. Check 42 (TOOL-dDerivedDocket-27) creates its capture dir
+# as `elif ! _c42_d=$(mktemp -d …); then`, and a derivation anchored at the line start missed it, so
+# the redirect into that scratch read as a write into the tree. Comment lines are dropped first, or a
+# header quoting the shape would bless a name nothing assigns.
+mkt=$(grep -vE '^[[:space:]]*#' "$HERE/check-unattended.sh" \
+      | grep -oE '(^[[:space:]]*|(^|[;&|[:space:]])(if|elif|while|until)[[:space:]]+(![[:space:]]+)?)(local +)?[A-Za-z_][A-Za-z0-9_]*=\$\(mktemp' \
+      | sed -E 's/=\$\(mktemp$//; s/^.*[[:space:]!;&|]//' | sort -u)
 # ONE PATTERN VARIABLE, shared by this arm and by the BOUND on its exemption below. They used to
 # carry two different regexes: this one ends with a LITERAL dollar, matching a redirect into a
 # variable; the bound ended with a bare dollar, an end-of-line anchor, and dropped the leading
@@ -2373,10 +2400,18 @@ mutate $KIT_REL/unattended.sh '/print "spec-audit=" v/d'
 hit "$(run)" "a run-state read exemption matches no read in the kit, and a stale exemption silently widens the surface it was written to narrow; unattended.sh ^spec-audit:"
 reset_tree
 # ...and the two LIVENESS refusals, each reached by removing what it asserts is there. No scoped read
-# at all: both of the fixture kit's section-filtered reads spelled with `cat` instead.
-mutate $KIT_REL/lib-unattended.sh 's#| extract_run_facts | grep -m1 #| cat | grep -m1 #'
-mutate $KIT_REL/check-unattended.sh 's#extract_run_facts < "[$]rvf"#cat < "$rvf"#'
-hit "$(run)" "no key read in the kit carries the Run facts scope, so the scan matched nothing it was written to find and a clean result would be coverage of nothing"
+# at all: EVERY section-filtered read in the fixture kit respelled unscoped, `extract_run_facts`
+# before a pipe or a redirect as `cat` and an awk `sec && /…/` guard without its `sec &&`. This arm
+# named the kit's two such reads one by one; dDerivedDocket took the fixture kit to six, across the
+# library, this leg and the driver, so the four it did not name kept the scan live and the refusal
+# never fired. The report's count is read first, so a scoped read the respelling misses reds here
+# as a count, not as a missing refusal. RAISED the floors by 2: one `mutate` more and that `hit`.
+for _sf in lib-unattended.sh check-unattended.sh unattended.sh; do
+  mutate $KIT_REL/$_sf '/^[[:space:]]*#/!{s/extract_run_facts\([[:space:]]*[|<]\)/cat\1/g; s/\([^A-Za-z_]\)sec *&& *\//\1\//g;}'
+done
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit "$out" " anchored reads, 0 scoped to the Run facts section, "
+hit "$out" "no key read in the kit carries the Run facts scope, so the scan matched nothing it was written to find and a clean result would be coverage of nothing"
 reset_tree
 # No `phase` key derived: every `fact`/`set_fact`/`fact_of` call naming it respelled.
 mutate $KIT_REL/unattended.sh 's/\(fact[a-z_]* "[^"]*"\) phase/\1 phaze/g'
@@ -2641,7 +2676,8 @@ reset_tree; frozen
 mutate memory/builds/tRun/RUN.md '/<!-- run:generated -->/a | [ARCH-tRun-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
 out=$(run)
 miss "$out" "a run-state file's generated region carries a COPY of the unit list"
-same "move 1 leaves a terminal record green" "$(run; echo $?)" "0"
+# Through the announcement filter, for the reason the terminal-copy control in check 8's block gives.
+same "move 1 leaves a terminal record green" "$(remove_announcements "$(run; echo $?)")" "0"
 
 # ...LIVE control. Without it, move 1's silence is satisfiable by deleting check 8 altogether.
 reset_tree
@@ -2946,7 +2982,9 @@ reset_tree; mutate $KIT_REL/unattended.sh '/^#   unattended[.]sh --propose /d'
 mutate $KIT_REL/VERBS.template.md '/^- .--propose. — writes a PROPOSAL/d'
 mutate memory/guides/UNATTENDED-VERBS.md '/^- .--propose. — writes a PROPOSAL/d'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks|a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 6/8 at 72f54937 (aBatchedArm landing step 0)
+# THE THIRD SIGNATURE is check 26's flag join (TOOL-dDerivedDocket-30 S5): the deleted header line
+# was the only one naming `--propose` and `--step`, so both are now parsed and documented nowhere.
+check_emitted "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks|a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call|the driver's parser accepts a flag no header line documents, and the usage text is rendered from that header, so the argument reaches no reader" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 6/8 at 72f54937 (aBatchedArm landing step 0); third signature OBSERVED 2026-09-29 node d, attributed run of shard 6/8 at 8331469c
 hit "$out" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
 hit "$out" "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call:"
 
@@ -3941,6 +3979,9 @@ reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 out=$(run)
 miss "$out" "the phase fact is read outside the two readers"
+# ...and the liveness refusal below is silent over the shipped readers, or it could be passing
+# because it reds on every driver.
+miss "$out" "a phase reader holds no read the classifier recognises"
 
 # ---- CHECK 1's CORE_FLOOR, over the PHASE half: deleting HELD reds against a floor of 13:12.
 reset_tree
@@ -4004,13 +4045,18 @@ mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_CORE=.*/HOLD_CODES_CORE=""/'
 out=$(run)
 hit "$out" "the driver declares no HOLD_CODES_CORE vocabulary, so the hold verb would validate against an empty set and record a pause under any word at all"
 
-# ---- ...and check 39's own liveness refusal. A driver this leg cannot read is a population of no
-# ---- lines, and grading no lines is how a structural arm passes by finding nothing.
+# ---- ...and check 39's own liveness refusal. A read predicate that matches nothing classifies
+# ---- nothing, and grading no read is how a structural arm passes by finding nothing. Staged by
+# ---- quoting the key in ONE reader's own read, `fact "$1" "phase"`: the same read to bash, a
+# ---- spelling the predicate does not match, so every direct read spelled that way would be
+# ---- invisible to it too. This arm used to REMOVE the driver, a state check 1 refuses and exits on
+# ---- before check 39 runs, so it never passed; the leg's guard now asserts what can fail. One
+# ---- `mutate` more than that arm, and the check-39 control above gained a `miss`: floors +2.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
-rm -f $KIT_REL/unattended.sh
+mutate $KIT_REL/unattended.sh 's/^  fact "\$1" phase$/  fact "$1" "phase"/'
 out=$(run)
-hit "$out" "the driver is not where this leg reads it, so the phase-read routing below would be graded over no lines at all and would pass by finding nothing"
+hit "$out" "a phase reader holds no read the classifier recognises, so its predicate no longer matches how the driver reads the fact and the routing below would be graded over no lines at all and would pass by finding nothing"
 reset_tree
 
 # ---- TOOL-dDerivedDocket-3 — checks 44 and 45 (this build's 34 and 35, renumbered above main's 34 to 36) ----
@@ -5586,19 +5632,24 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- region 8, so FLOOR_SHARD_8 carries the same +4 and the other seven are untouched. MEASURED by
 # ---- running that block alone behind a replica of this prologue by hand, n 64 -> 68, green on the
 # ---- fold and red on HEAD's kit for all but the `miss`, which is the control; this pass runs no suite.
-FLOOR_ASSERTIONS=923
+# ---- RAISED 923 -> 932 by exactly the arms dDerivedDocket's VERIFYING suite fix added, 2026-09-29:
+# ---- region 1 +5, the five flags the dispatched-verb denylist gained, each one pass of its stale-
+# ---- exemption loop; region 4 +2, check 36's scope liveness arm respelling all three fixture files
+# ---- and reading the report's count; region 8 +2, check 39's liveness arm staging its break with a
+# ---- `mutate` and the check-39 control's new `miss`. FLOOR_SHARD_1, _4 and _8 carry the same.
+FLOOR_ASSERTIONS=932
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
-FLOOR_SHARD_1=83
+FLOOR_SHARD_1=88
 FLOOR_SHARD_2=66
 FLOOR_SHARD_3=58
-FLOOR_SHARD_4=98
+FLOOR_SHARD_4=100
 FLOOR_SHARD_5=67
 FLOOR_SHARD_6=75
 FLOOR_SHARD_7=92
-FLOOR_SHARD_8=381
+FLOOR_SHARD_8=383
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;
