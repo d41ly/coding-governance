@@ -22,8 +22,8 @@ hold-reason: Paused at the owner's instruction near the weekly usage limit, afte
 hold-until: owner
 hold-code: platform-limit
 held-from: BUILDING
-witness: e0c5f470d692ab78d2997484296e2bcfb7b36bad
-phase: BUILDING
+witness: 25026497d1f6ce9aebed76210d64ad6f29d4228a
+phase: VERIFYING
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
