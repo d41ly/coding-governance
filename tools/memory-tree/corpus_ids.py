@@ -25,7 +25,7 @@ absent is a NAMED error — you armed a check whose grammar is not installed. Ne
 never the silent pass a bare `try: import` would produce.
 
   13  id-definition collision   one id claimed by two different build folders
-  14  orphan ids                cited but never defined; waiver + shrink-only pin + stale guard
+  14  orphan ids                cited in the present tense but never defined; waiver + pin + stale guard
   15  dead repo-path citations  registry + four rules, keyed on (file, path), NEVER on a line number
   16  read-path accounting      the charter's own read set: every member byte-capped, and present
 """
@@ -350,9 +350,17 @@ def walk(root: str, conf: dict) -> dict:
     cites: dict = {}         # id -> set(paths)
     dead: dict = {}          # (citing file, cited path) -> [count, first line]
 
+    waiver = m + "/" + WAIVER
     for p in corpus:
         text = read(os.path.join(root, p))
         b = build_re.match(p)
+        # A citation is a claim about NOW only in the present-tense corpus. `builds/` is a record of
+        # a moment — a spec proposing to write a file is a plan, not a broken pointer — and an
+        # append-only area cannot legally be repaired anyway. ONE test, decided here once per file,
+        # and read by BOTH check 14 (ids) and check 15 (paths): TOOL-aRepatriatedFork-39. Check 14
+        # used to count ids cited anywhere, so an adopter's rotated archives and historical builds
+        # produced 330 orphans where the present-tense corpus held 4 — two answers to one question.
+        now = bool(present.match(p)) and not append_only.match(p)
         for lineno, line in enumerate(text.split("\n"), 1):
             anchor = _anchor(E, line)
             if anchor is None:
@@ -362,13 +370,13 @@ def walk(root: str, conf: dict) -> dict:
                 defs.setdefault(anchor, set()).add(p)
                 if b:
                     def_builds.setdefault(anchor, set()).add(b.group(1))
-            for mm in E.ID_RE.finditer(line):
-                cites.setdefault(mm.group(0), set()).add(p)
-            # A citation is a claim about NOW only in the present-tense corpus. `builds/` is a record
-            # of a moment — a spec proposing to write a file is a plan, not a broken pointer — and an
-            # append-only area cannot legally be repaired anyway.
-            if not present.match(p) or append_only.match(p):
+            if not now:
                 continue
+            # The waiver is check 14's INPUT, not a citation: counted as one, every row kept its own
+            # id alive and the stale guard could never fire for an id nothing else cites.
+            if p != waiver:
+                for mm in E.ID_RE.finditer(line):
+                    cites.setdefault(mm.group(0), set()).add(p)
             for tok in list(BACKTICKED.findall(line)) + list(MD_LINK_TARGET.findall(line)):
                 cited = tok.rstrip("/")
                 if any(e in cited for e in ELISION) or "/" not in cited:
@@ -597,7 +605,9 @@ def checks(w: dict) -> list:
         if len(slugs) > 1:
             bad.append(f"check 13: id {i} is claimed by {len(slugs)} build folders: {', '.join(sorted(slugs))}")
 
-    # 14 — orphan ids, with a waiver, a shrink-only pin, and a stale-entry guard.
+    # 14 — orphan ids, with a waiver, a shrink-only pin, and a stale-entry guard. `cites` holds the
+    # PRESENT-tense citations only, the population check 15 grades (walk()'s `now`), so this set,
+    # `--report`'s and the pin `--measure` prints are one number.
     if conf["ORPHAN_ID_PIN"]:
         waived = parse_waiver(root, m)
         orphans = sorted(set(w["cites"]) - set(w["defs"]))
@@ -605,8 +615,10 @@ def checks(w: dict) -> list:
             if i not in waived:
                 bad.append(f"check 14: id {i} is cited but never defined, and is not in {m}/{WAIVER}")
         for i in waived:
-            if i not in orphans:
+            if i in w["defs"]:
                 bad.append(f"check 14: {m}/{WAIVER} waives {i}, which now resolves — stale row")
+            elif i not in orphans:
+                bad.append(f"check 14: {m}/{WAIVER} waives {i}, which no present-tense file cites — stale row")
         pin = _parse_conf_int(conf, "ORPHAN_ID_PIN")
         if len(waived) > pin:
             bad.append(f"check 14: the orphan waiver holds {len(waived)} rows, pinned at {pin} (shrink-only)")
@@ -891,6 +903,37 @@ def cmd_selftest() -> int:
         c4["ORPHAN_ID_PIN"] = "1"
         arm("a waiver row that now resolves is stale", "which now resolves — stale row",
             lambda: "\n".join(checks(walk(t4, c4))))
+
+        # TOOL-aRepatriatedFork-39: check 14 grades the PRESENT-tense corpus only, check 15's
+        # population. An archive and the append-only decision log each cite an undefined id AND a
+        # dead path on one line; neither check may see either. The 869209ed engine reds both ids
+        # here. The present-tense control is the README arm above, which reds on both engines.
+        tN = os.path.join(base, "tense"); os.makedirs(tN)
+        cN = _scratch(tN, extra={
+            "memory/archive/DECISIONS.2026-08-01.md":
+                "# rotated\n\nUpstream ARCH-tPast-7 lived at `memory/gone/archived.md`.\n",
+            "memory/DECISIONS.md":
+                "# d\n\n- ARCH-tOne-1 · a decision\n\nIt cites ARCH-tPast-8 at `memory/gone/logged.md`.\n"})
+        arm("check 14 grades present-tense citations only, as check 15 does", None,
+            lambda: checks(walk(tN, cN)))
+        arm("...and the pin --measure prints is the count check 14 grades", 'ORPHAN_ID_PIN="0"',
+            lambda: _measure_lines(tN, cN)[0])
+        # The waiver is not a citation: a row whose id only the waiver and an archive cite is stale.
+        # The 869209ed engine read the waiver's own row as a citation and passed this.
+        _w(tN, "memory/project/id-orphan-waiver.txt", "ARCH-tPast-7\n")
+        run("git", "add", "-A", cwd=tN); run("git", "commit", "-q", "-m", "w", "--no-verify", cwd=tN)
+        cN["ORPHAN_ID_PIN"] = "1"
+        arm("a waiver row no present-tense file cites is stale", "which no present-tense file cites — stale row",
+            lambda: "\n".join(checks(walk(tN, cN))))
+        # AC3's other half: one present-tense orphan beside one past-tense citation. The measured pin
+        # and the graded count are both 1; the 869209ed engine made them both 2.
+        tM = os.path.join(base, "tense-pin"); os.makedirs(tM)
+        cM = _scratch(tM, extra={
+            "memory/README.md": "# r\n\nContext lives in ARCH-tGhost-9 upstream.\n",
+            "memory/archive/DECISIONS.2026-08-01.md": "# rotated\n\nUpstream ARCH-tPast-7.\n"})
+        arm("--measure's pin equals check 14's orphan count", "1 == 1",
+            lambda: "%s == %d" % (_measure_lines(tM, cM)[0].split('"')[1],
+                                  sum("never defined" in l for l in checks(walk(tM, cM)))))
 
         # 15 — the four rules.
         DEAD = "# r\n\nSee `memory/gone/never-existed.md` for detail.\n"

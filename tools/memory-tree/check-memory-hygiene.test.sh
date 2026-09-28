@@ -1968,7 +1968,10 @@ mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$
   # stem resolves to ZERO live indexes. That branch is the one whose `continue` made check 10 inert
   # for every backlog archive, and until this fixture existed it shipped unobserved.
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH deployer:DEPL"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
-  printf '# r\n' > memory/README.md
+  # The PRESENT-tense citation of the moved id. Check 14 grades present-tense files only
+  # (TOOL-aRepatriatedFork-39), so the spec's citation below alone would leave the unstaged-archive
+  # arm with no citation to orphan and it would pass by finding nothing.
+  printf '# r\n\nThe rotated row ARCH-tMoved-1 is cited from here.\n' > memory/README.md
   printf '# legacy\n' > memory/project/legacy-files.txt
   printf -- '---\nslug: tRot\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRot-1\n---\n\n# tRot\n' > memory/builds/tRot/README.md
   printf '# ARCH-tRot-1 — the owning unit\n\nIt cites ARCH-tMoved-1 in prose, so the moved id is CITED from outside the archive.\n' > memory/builds/tRot/spec/2026-08-01-spec-tRot-1.md

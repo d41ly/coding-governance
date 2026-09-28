@@ -1,10 +1,12 @@
 # TOOL-aRepatriatedFork-39 — hygiene check 14 counts present-tense citations only, as check 15 does
 
-**Status:** SPECCED · rev-1 · 2026-09-28 · node a · Tier-1 · base 869209ed · streams tooling · order 19
+**Status:** CLOSED · rev-2 · 2026-09-28 · node a · Tier-1 · base 869209ed · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-28-build-TOOL-aRepatriatedFork-39-1-acceptance-ledger.md](../build/2026-09-28-build-TOOL-aRepatriatedFork-39-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -110,6 +112,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-28 · initial draft, from the owner's ruling.
+- rev-2 · 2026-09-28 · S1 · S2 · S3 · S4 · AC1 · AC2 · AC3 · AC4 · built. Every new arm red on the
+  869209ed engine, the present-tense control red on both, and the rotation fixture's old spelling
+  red on the new engine. Gov's pin stays 0.
 
 ## 10. Reuse audit
 
