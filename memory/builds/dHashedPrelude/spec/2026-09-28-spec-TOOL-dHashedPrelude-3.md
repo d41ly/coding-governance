@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-28-build-TOOL-dHashedPrelude-1-1-acceptance-ledger.md](../build/2026-09-28-build-TOOL-dHashedPrelude-1-1-acceptance-ledger.md) | journal | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 |
+| [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-closing-diff-round2.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-closing-diff-round2.md) | diff-review | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 |
 | [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-closing-diff.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-closing-diff.md) | diff-review | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 |
 | [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 |
 | [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md) | spec-audit | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 |

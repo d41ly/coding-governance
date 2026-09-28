@@ -304,6 +304,14 @@ def cleanup(root: pathlib.Path) -> None:
 #     reports exactly like a tree whose log was protected.
 #   * A WRITE THAT IS REVERTED. Only the endpoints are read. An arm that appends a row and removes
 #     it again before `main()` reaches the compare leaves nothing for this to see.
+#   * A LOG THAT BECOMES UNREADABLE. Either reading can come back `(unreadable)`, and the verdict is
+#     then a skip rather than a comparison, so a write followed by a permission change is not caught.
+#
+# AND THE LIMIT THAT IS NOT A GAP BUT A CEILING: everything above is enforced from inside this
+# module, so an author editing this module can defeat any of it. The arm below catches ACCIDENTS —
+# a conditional reintroduced, a baseline moved, a helper rewritten — and it does not pretend to
+# withstand someone who is trying. That is why the pair is bound at DEF TIME below rather than
+# looked up at call time: it removes the accidents from reach instead of policing their spellings.
 
 
 def _resolve_live_log():
@@ -339,6 +347,21 @@ def _derive_live_log_digest(live):
 _LIVE_LOG = _resolve_live_log()
 _LIVE_LOG_BEFORE = _derive_live_log_digest(_LIVE_LOG)
 _LIVE_LOG_ROW = "the live query log is byte-identical after this run"
+
+
+def _read_live_log_verdict(_live=_LIVE_LOG, _before=_LIVE_LOG_BEFORE) -> tuple[str, str, str]:
+    """The guard's row for THIS run, over the prelude's pair, bound HERE at def time.
+
+    THE DEFAULT ARGUMENTS ARE THE MECHANISM, not a shorthand. They are evaluated once, at this
+    point in the module, above the first `@check`. Nothing that runs later can change what this
+    compares: not an assignment inside `main()`, not `global`, not `globals()[...] = `, and not a
+    second module-scope assignment placed below the arms. All four of those were GREEN against the
+    arm that policed spellings inside `main()`, and three of them restore the original defect
+    exactly — the baseline taken after every arm has already run.
+
+    `main()` calls this with NO arguments, so there is nothing for a local to shadow either.
+    """
+    return _build_live_log_row(_live, _before)
 
 
 def _build_live_log_row(live, before) -> tuple[str, str, str]:
@@ -2704,6 +2727,8 @@ def test_export_dir_is_declared_and_bounded():
 _ANCHOR_ARM = "\n@check("
 _ANCHOR_BASELINE = "\n_LIVE_LOG_BEFORE = "
 _ANCHOR_MAIN = "\ndef main() -> int:"
+_ANCHOR_LOG = "\n_LIVE_LOG = "
+_ANCHOR_VERDICT = "\ndef _read_live_log_verdict("
 
 
 @check("the live-log baseline precedes every arm, and main() appends its row unconditionally")
@@ -2724,7 +2749,7 @@ def test_the_live_log_baseline_is_taken_before_any_arm_runs(src: str | None = No
 
     # COUNTS FIRST. A second column-0 spelling of either unique anchor would silently re-point the
     # offset compare below, so it reds here instead, naming the anchor that moved.
-    for anchor in (_ANCHOR_BASELINE, _ANCHOR_MAIN):
+    for anchor in (_ANCHOR_BASELINE, _ANCHOR_LOG, _ANCHOR_MAIN, _ANCHOR_VERDICT):
         n = src.count(anchor)
         assert n == 1, f"{anchor!r} occurs {n} time(s) at column 0, expected exactly 1"
     arms = src.count(_ANCHOR_ARM)
@@ -2747,14 +2772,21 @@ def test_the_live_log_baseline_is_taken_before_any_arm_runs(src: str | None = No
         tree = ast.parse(src)
     except SyntaxError as exc:
         raise AssertionError(f"the source does not parse, so no structural claim is available: {exc}")
-    fn = next((n for n in tree.body
-               if isinstance(n, ast.FunctionDef) and n.name == "main"), None)
-    assert fn is not None, "no module-level `main` to inspect"
+    mains = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main"]
+    # EXACTLY one, not the first: a second `main` defined below shadows the first at runtime
+    # while `next(...)` would keep inspecting the one that no longer runs.
+    assert len(mains) == 1, f"{len(mains)} module-level `main` definitions, expected exactly 1"
+    fn = mains[0]
+    assert not fn.decorator_list, (
+        "`main` carries a decorator, so what runs is not the function this arm inspected")
 
     # DIRECT body statements, never `ast.walk`: an append nested under `if`, `try` or `for` is
     # invisible here and therefore reds, which IS the unconditionality claim.
+    # Statements after a `return` are still in `fn.body`, so position is its own claim: an append
+    # relocated below the return is unreachable, the row vanishes, and the summary silently drops.
+    stop = next((i for i, s in enumerate(fn.body) if isinstance(s, ast.Return)), len(fn.body))
     rows = []
-    for stmt in fn.body:
+    for stmt in fn.body[:stop]:
         if not (isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call)):
             continue
         call = stmt.value
@@ -2763,26 +2795,30 @@ def test_the_live_log_baseline_is_taken_before_any_arm_runs(src: str | None = No
             continue
         if (call.args and isinstance(call.args[0], ast.Call)
                 and isinstance(call.args[0].func, ast.Name)
-                and call.args[0].func.id == "_build_live_log_row"):
+                and call.args[0].func.id == "_read_live_log_verdict"):
             rows.append(call.args[0])
     assert len(rows) == 1, (
-        f"{len(rows)} unconditional `_build_live_log_row` append(s) in main(), expected 1 — a "
-        "conditional, a try, a comment-out, a duplicate and a deletion all land here")
+        f"{len(rows)} unconditional `_read_live_log_verdict` append(s) in main(), expected 1 — a "
+        "conditional, a try, a comment-out, a duplicate, a relocation below the return and a "
+        "deletion all land here")
+    assert not rows[0].args and not rows[0].keywords, (
+        "the verdict is called with arguments; it takes none precisely so that nothing at the call "
+        "site can substitute the pair it was bound with")
 
-    names = [a.id if isinstance(a, ast.Name) else type(a).__name__ for a in rows[0].args]
-    assert names == ["_LIVE_LOG", "_LIVE_LOG_BEFORE"], (
-        f"the row is built from {names}, not the module-scope pair — a local shadow means the "
-        "comparison is against something this run computed, not against the prelude")
-
-    for node in ast.walk(fn):
-        assert not (isinstance(node, ast.Global) and "_LIVE_LOG_BEFORE" in node.names), (
-            "main() declares `global _LIVE_LOG_BEFORE`; re-deriving the baseline there brackets "
-            "post-arm state against post-arm state, which is the original defect exactly")
-        assert not (isinstance(node, ast.Name) and node.id == "_LIVE_LOG_BEFORE"
-                    and isinstance(node.ctx, ast.Store)), (
-            "main() assigns `_LIVE_LOG_BEFORE`, so the value it compares is not the prelude's")
+    # THE BINDING ITSELF, asserted rather than assumed. Its defaults are what make a later rebind
+    # unreachable, so an edit that turns them into call-time lookups has to red here.
+    vfn = next((n for n in tree.body
+                if isinstance(n, ast.FunctionDef) and n.name == "_read_live_log_verdict"), None)
+    assert vfn is not None, "no module-level `_read_live_log_verdict` to inspect"
+    defaults = [d.id if isinstance(d, ast.Name) else type(d).__name__ for d in vfn.args.defaults]
+    assert defaults == ["_LIVE_LOG", "_LIVE_LOG_BEFORE"], (
+        f"the verdict's defaults are {defaults}, not the prelude pair — bound at def time is the "
+        "whole mechanism, and a call-time lookup puts a rebind back in reach")
+    assert src.find(_ANCHOR_VERDICT) < first, (
+        "`_read_live_log_verdict` is defined below the first decorated arm, so its defaults capture "
+        "post-arm state")
     return (f"baseline {base} < first arm {first}, {arms} arm(s), main() at {mn}; "
-            f"1 unconditional append over {names}")
+            f"1 argument-free append, defaults {defaults}")
 
 
 @check("the live-log verdict is total over its five states")
@@ -2801,6 +2837,10 @@ def test_the_live_log_verdict_is_total_over_its_states():
     assert _build_live_log_row(pathlib.Path(__file__), "(unreadable)")[0] == "skip", (
         "an unreadable log reported a verdict; two unreadable readings compare EQUAL, so the only "
         "honest answer is a skip")
+
+    bound = _read_live_log_verdict()
+    assert bound[1] == _LIVE_LOG_ROW and bound[0] in ("ok", "skip"), (
+        f"the def-time-bound verdict did not answer for this run: {bound}")
 
     root = pathlib.Path(tempfile.mkdtemp(prefix="recall-row-"))
     try:
@@ -2907,7 +2947,7 @@ def main() -> int:
 
     # UNCONDITIONAL. A row that is absent reads as a clean run, so every state gets a row and the
     # count of appended run-property rows stops depending on the environment.
-    _checks.append(_build_live_log_row(_LIVE_LOG, _LIVE_LOG_BEFORE))
+    _checks.append(_read_live_log_verdict())
 
     # TOOL-dRetiredFork-2 — the git-environment scrub at the top of this file, asserted rather than
     # trusted. Appended here for the same reason the sweep below is: it is a property of the RUN.
