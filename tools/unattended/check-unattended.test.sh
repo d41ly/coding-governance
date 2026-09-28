@@ -5239,8 +5239,11 @@ git push -q -f origin "$ANCHOR0":main
 
 # ---- THE DATING SELF-SCAN: a first-commit DATE read with --diff-filter=A and no --follow anywhere in
 # ---- the kit's shell reds, naming the file and line; the same read with --follow does not.
+# The flag rides a variable so no single line of THIS suite spells the offending read: check 15 scans
+# every `*.sh` beside the checker, this suite included, and a literal here reds the real-tree leg.
 reset_tree
-printf '#!/usr/bin/env bash\nd=$(git log --diff-filter=A --format=%%cs -- x | tail -1)\n' > "$TMP/$KIT_REL/probe-date.sh"
+_c15_dfa='--diff-filter=A'
+printf '#!/usr/bin/env bash\nd=$(git log %s --format=%%cs -- x | tail -1)\n' "$_c15_dfa" > "$TMP/$KIT_REL/probe-date.sh"
 out=$(run_lg_leg)
 hit  "$out" "a first-commit DATE is read with --diff-filter=A and no --follow in this kit's own shell, so a rotation re-dates an archived record to the commit that added its name and a cutoff grades a record it was written to grandfather"
 hit  "$out" "probe-date.sh:2"
