@@ -18,6 +18,7 @@ hard rule here, and the last arm re-hashes the live log to prove this run did no
 
 from __future__ import annotations
 
+import ast
 import datetime
 import hashlib
 import inspect
@@ -319,11 +320,20 @@ def _resolve_live_log():
 
 
 def _derive_live_log_digest(live):
-    """The digest of `live`, or the absent-sentinel. Raises for neither a missing repo nor a
-    missing file, because both are states the guard reports rather than crashes on."""
-    if live is None:
+    """The digest of `live`, or a sentinel. RAISES FOR NOTHING.
+
+    `exists()` then `read_bytes()` is a TOCTOU pair and the second half can fail on its own — a
+    permission bit, a lock, a file replaced between the two calls. The old code let that escape into
+    `main()`, so the guard crashed the suite instead of reporting, which is the one outcome a guard
+    must never have. `(unreadable)` is its own sentinel and NOT `(absent)`: two unreadable readings
+    would otherwise compare equal and report a protected log nobody could read.
+    """
+    if live is None or not live.exists():
         return "(absent)"
-    return hashlib.sha256(live.read_bytes()).hexdigest() if live.exists() else "(absent)"
+    try:
+        return hashlib.sha256(live.read_bytes()).hexdigest()
+    except OSError:
+        return "(unreadable)"
 
 
 _LIVE_LOG = _resolve_live_log()
@@ -345,6 +355,8 @@ def _build_live_log_row(live, before) -> tuple[str, str, str]:
     if live is None:
         return ("skip", _LIVE_LOG_ROW, "the repository did not resolve, so nothing was bracketed")
     after = _derive_live_log_digest(live)
+    if "(unreadable)" in (before, after):
+        return ("skip", _LIVE_LOG_ROW, "the log exists and could not be read, so nothing was compared")
     if after == before:
         return ("ok", _LIVE_LOG_ROW, before[:12])
     return ("FAIL", _LIVE_LOG_ROW, f"the gate wrote to it: {before[:12]} -> {after[:12]}")
@@ -2725,18 +2737,56 @@ def test_the_live_log_baseline_is_taken_before_any_arm_runs(src: str | None = No
         f"the baseline is assigned at offset {base}, after the first decorated arm at {first} — "
         "every arm runs at decoration time, so a baseline below them brackets nothing")
 
-    body = src[mn:]
-    assert "_LIVE_LOG_BEFORE" in body, "main() does not read the module-scope baseline"
-    assert "_checks.append(_build_live_log_row(" in body, "main() does not append the guard's row"
-    for dead in ("if live is not None", "if _LIVE_LOG is not None"):
-        assert dead not in body, (
-            f"main() still guards the append with `{dead}`; with the module-scope baseline in "
-            "place that emits the row twice and both copies are green")
-    return f"baseline {base} < first arm {first}, {arms} arm(s), main() at {mn}"
+    # THE APPEND CLAUSE IS STRUCTURAL, and the three substring tests it replaces are the reason.
+    # Those tests greened on SEVEN ways of disabling the guard -- commenting the append out (which
+    # preserves its text by definition), an `if _LIVE_LOG:` wrapper, a try/except, a renamed local,
+    # a duplicate, and `global _LIVE_LOG_BEFORE` plus a re-derive inside main(), which restores the
+    # exact defect this build closed. Only outright deletion redded. Measured, closing review of
+    # TOOL-dHashedPrelude-2. A text search cannot see structure, so it cannot see this property.
+    try:
+        tree = ast.parse(src)
+    except SyntaxError as exc:
+        raise AssertionError(f"the source does not parse, so no structural claim is available: {exc}")
+    fn = next((n for n in tree.body
+               if isinstance(n, ast.FunctionDef) and n.name == "main"), None)
+    assert fn is not None, "no module-level `main` to inspect"
+
+    # DIRECT body statements, never `ast.walk`: an append nested under `if`, `try` or `for` is
+    # invisible here and therefore reds, which IS the unconditionality claim.
+    rows = []
+    for stmt in fn.body:
+        if not (isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call)):
+            continue
+        call = stmt.value
+        if not (isinstance(call.func, ast.Attribute) and call.func.attr == "append"
+                and isinstance(call.func.value, ast.Name) and call.func.value.id == "_checks"):
+            continue
+        if (call.args and isinstance(call.args[0], ast.Call)
+                and isinstance(call.args[0].func, ast.Name)
+                and call.args[0].func.id == "_build_live_log_row"):
+            rows.append(call.args[0])
+    assert len(rows) == 1, (
+        f"{len(rows)} unconditional `_build_live_log_row` append(s) in main(), expected 1 — a "
+        "conditional, a try, a comment-out, a duplicate and a deletion all land here")
+
+    names = [a.id if isinstance(a, ast.Name) else type(a).__name__ for a in rows[0].args]
+    assert names == ["_LIVE_LOG", "_LIVE_LOG_BEFORE"], (
+        f"the row is built from {names}, not the module-scope pair — a local shadow means the "
+        "comparison is against something this run computed, not against the prelude")
+
+    for node in ast.walk(fn):
+        assert not (isinstance(node, ast.Global) and "_LIVE_LOG_BEFORE" in node.names), (
+            "main() declares `global _LIVE_LOG_BEFORE`; re-deriving the baseline there brackets "
+            "post-arm state against post-arm state, which is the original defect exactly")
+        assert not (isinstance(node, ast.Name) and node.id == "_LIVE_LOG_BEFORE"
+                    and isinstance(node.ctx, ast.Store)), (
+            "main() assigns `_LIVE_LOG_BEFORE`, so the value it compares is not the prelude's")
+    return (f"baseline {base} < first arm {first}, {arms} arm(s), main() at {mn}; "
+            f"1 unconditional append over {names}")
 
 
-@check("the live-log row is total over its four states")
-def test_the_build_live_log_row_is_total_over_its_four_states():
+@check("the live-log verdict is total over its five states")
+def test_the_live_log_verdict_is_total_over_its_states():
     """`_build_live_log_row` answers for every state, including two no run in this repo can produce.
 
     DRIVEN DIRECTLY rather than by running the suite: an unresolvable repository and a missing log
@@ -2747,6 +2797,10 @@ def test_the_build_live_log_row_is_total_over_its_four_states():
     state, name, detail = _build_live_log_row(None, "(absent)")
     assert state == "skip", f"an unresolvable repository reported {state!r}, not a skip"
     assert name == _LIVE_LOG_ROW and "resolve" in detail, f"the skip does not say why: {detail!r}"
+
+    assert _build_live_log_row(pathlib.Path(__file__), "(unreadable)")[0] == "skip", (
+        "an unreadable log reported a verdict; two unreadable readings compare EQUAL, so the only "
+        "honest answer is a skip")
 
     root = pathlib.Path(tempfile.mkdtemp(prefix="recall-row-"))
     try:
@@ -2762,7 +2816,7 @@ def test_the_build_live_log_row_is_total_over_its_four_states():
             f"the FAIL detail names only one digest, so it says nothing about what changed: {detail!r}")
     finally:
         cleanup(root)
-    return "skip / ok / ok / FAIL, and the FAIL names both digests"
+    return "skip / skip / ok / ok / FAIL, and the FAIL names both digests"
 
 
 @check("CONF_DIGEST moves with the two grammar keys and ONLY with them")
@@ -2831,7 +2885,7 @@ def main() -> int:
         test_export_dir_is_declared_and_bounded, test_digest_follows_grammar_keys_only,
         # TOOL-dHashedPrelude-2: the guard that brackets this suite, gated
         test_the_live_log_baseline_is_taken_before_any_arm_runs,
-        test_the_build_live_log_row_is_total_over_its_four_states,
+        test_the_live_log_verdict_is_total_over_its_states,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the

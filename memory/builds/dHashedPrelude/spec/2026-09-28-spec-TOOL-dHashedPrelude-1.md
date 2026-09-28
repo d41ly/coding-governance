@@ -1,12 +1,13 @@
 # TOOL-dHashedPrelude-1 — the live-log baseline is captured above the first decorated arm
 
-**Status:** CLOSED · rev-4 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-28-build-TOOL-dHashedPrelude-1-1-acceptance-ledger.md](../build/2026-09-28-build-TOOL-dHashedPrelude-1-1-acceptance-ledger.md) | journal | TOOL-dHashedPrelude-2 TOOL-dHashedPrelude-3 |
+| [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-closing-diff.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-closing-diff.md) | diff-review | TOOL-dHashedPrelude-2 TOOL-dHashedPrelude-3 |
 | [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-dHashedPrelude-2 TOOL-dHashedPrelude-3 |
 | [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md) | spec-audit | TOOL-dHashedPrelude-2 TOOL-dHashedPrelude-3 |
 
@@ -32,10 +33,15 @@ ok whatever the arms did to the log.
   | repo reachable, log present, digests differ | `FAIL`, detail `the gate wrote to it` | `FAIL`, detail carries BOTH digests |
   | repo reachable, no log file at either reading | `ok`, both ends the absent-sentinel | unchanged |
   | repository unresolvable | NO ROW AT ALL — `main()` guards the append on the path being set | `skip`, naming why it could not run |
+  | log present but unreadable | RAISES out of the guard and kills the suite | `skip`, naming that nothing was compared |
 
   The fourth row is a ruling, not a preservation: a skip that looks like an absence is the
-  green-by-absence class this build exists to close, showing up on the guard's own row. Observed by
-  AC2 and AC5.
+  green-by-absence class this build exists to close, showing up on the guard's own row. The FIFTH
+  row was found by the closing diff review as a residual, not by this spec: `exists()` then
+  `read_bytes()` is a TOCTOU pair whose second half can fail alone, and the old code let that
+  escape into `main()` — a guard that crashes the suite rather than reporting. `(unreadable)` is
+  its own sentinel and not `(absent)`, because two unreadable readings would otherwise compare
+  equal and announce a protected log nobody could read. Observed by AC2 and AC5.
 - **S3** — The assignment carries a comment stating what the guard does NOT check: that it is a
   whole-file digest and cannot tell an arm's write from a concurrent one by another session sharing
   this repository, that it covers one path and says nothing about the cache directory beside it,
@@ -180,7 +186,9 @@ wrong state gets preserved, and the charter already rules that a skip must annou
   being set survives anywhere in it.
   Red when: the module-scope assignment lands but the old conditional append is left in place, in
   which case the row is emitted twice, the summary prints one row more than the suite has, and
-  both copies are green. Unit 2's ordering arm is what keeps this true afterwards.
+  both copies are green. Unit 2's ordering arm is what keeps this true afterwards, and it keeps
+  it STRUCTURALLY: the text-search version of that clause greened on seven ways of disabling the
+  guard, including the original defect restored through `global`.
 
 ## 7. Gates
 
@@ -215,6 +223,14 @@ none
   `_build_live_log_row`. The originals led with `live`, which is not in the VERBS table, and
   `tools/lexicon/lexicon.py` reds on a shrink-only offender pin the three of them moved 982
   to 985. Names chosen with `--suggest`, not by guess. Behaviour is unchanged.
+- rev-5 · 2026-09-28 · §2 S2 · AC6 · folded the closing diff review. S2's state table gains a
+  FIFTH row: `exists()` then `read_bytes()` is a TOCTOU pair whose second half can fail alone,
+  and the old code let that raise out of the guard and kill the suite, which is the one outcome
+  a guard must never have. It now returns a `skip` under its own `(unreadable)` sentinel,
+  deliberately not `(absent)`, because two unreadable readings would compare equal and announce
+  a protected log nobody could read. The review recorded this as a residual it did not raise as
+  a finding, since the pre-unit code carried the same exposure. AC6 now says the guarantee is
+  STRUCTURAL, which is the blocker's fix in unit 2.
 
 ## 10. Reuse audit
 

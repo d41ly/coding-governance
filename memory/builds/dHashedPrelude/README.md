@@ -59,8 +59,8 @@ queries reached the real log as qids 592-595 and the row still reported ok.
 - **`tools/lexicon/README`'s half of `TOOL-aProbedToolkit-14` stays open.** Unit 3 closes only the
   memory-recall half, because that is the file this build already edits. The row is updated to say
   which half drained.
-- **The selftest summary line still counts rows, not arms.** It prints `len(_checks)`, which is 76
-  against 71 declared arms; the declared count lives only in the pin row's detail. Two spec
+- **The selftest summary line still counts rows, not arms.** It prints `len(_checks)`, which is 78
+  against 73 declared arms; the declared count lives only in the pin row's detail. Two spec
   criteria reached for the summary line and had to be corrected. Option seen: print both figures.
   Refused here because it changes an output line the upstream fork's own gate leg parses, which is
   a fourth unit's worth of blast radius. `TOOL-dHashedPrelude-2` §3.
@@ -86,12 +86,12 @@ ids TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 TOOL-dHashedPrelude-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dHashedPrelude-1 — the live-log baseline is captured above the first decorated arm](spec/2026-09-28-spec-TOOL-dHashedPrelude-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-28 |
-| [TOOL-dHashedPrelude-2 — two arms red when the live-log guard stops bracketing the arms](spec/2026-09-28-spec-TOOL-dHashedPrelude-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-28 |
+| [TOOL-dHashedPrelude-1 — the live-log baseline is captured above the first decorated arm](spec/2026-09-28-spec-TOOL-dHashedPrelude-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-09-28 |
+| [TOOL-dHashedPrelude-2 — two arms red when the live-log guard stops bracketing the arms](spec/2026-09-28-spec-TOOL-dHashedPrelude-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-28 |
 | [TOOL-dHashedPrelude-3 — the kit's published facts stop being a typed count, and its version moves](spec/2026-09-28-spec-TOOL-dHashedPrelude-3.md) | 3 | 1 | CLOSED | rev-3 | 2026-09-28 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,12 +1,13 @@
 # TOOL-dHashedPrelude-2 — two arms red when the live-log guard stops bracketing the arms
 
-**Status:** CLOSED · rev-4 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-28-build-TOOL-dHashedPrelude-1-1-acceptance-ledger.md](../build/2026-09-28-build-TOOL-dHashedPrelude-1-1-acceptance-ledger.md) | journal | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-3 |
+| [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-closing-diff.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-closing-diff.md) | diff-review | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-3 |
 | [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-3 |
 | [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md) | spec-audit | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-3 |
 
@@ -44,8 +45,9 @@ signal saying so.
 
 ## 3. Non-goals (OUT)
 
-No behavioural arm, for the reason S6 records. No parser and no AST walk: substring searches answer
-the question, and an AST import would be the only one in this file. No generalisation to the sibling
+No behavioural arm, for the reason S6 records. Substring searches answer the ORDERING question and
+`ast` answers the APPEND question; the split is in §4, and the draft that rejected `ast` outright
+was wrong about the second half. No generalisation to the sibling
 selftests — a kickoff sweep found that eight of them run arms at decoration time and none takes a
 run-level baseline of a real file, so there is no second instance to cover. No change to `check()`
 itself, and no change to the summary line. That deferral and one other are PARKED in this build's
@@ -144,9 +146,19 @@ log instead does not work either, because the guard resolves its path from `repo
 anchors on the kit file and ignores any directory an arm chdirs to.
 
 Parsing the module with `ast` and comparing line numbers is more precise about what "before" means.
-Rejected: it imports a module nothing else here imports, and it cannot see the case that matters
-more — an assignment moved into `main()` is still an assignment, and the column-0 anchor catches it
-with a count.
+Rejected FOR THE ORDERING CLAUSE ONLY: it cannot see the case that matters more — an assignment
+moved into `main()` is still an assignment, and the column-0 anchor catches it with a count.
+
+For the APPEND clause the same rejection was wrong, and the closing diff review measured how wrong.
+Three substring tests over `main()`'s raw text greened on seven ways of disabling the guard:
+commenting the append out, which preserves its text by definition; an `if _LIVE_LOG:` wrapper; a
+`try`/`except`; a renamed local; a duplicate; and `global _LIVE_LOG_BEFORE` plus a re-derive inside
+`main()`, which restores the original defect exactly. Only outright deletion redded, and every
+passing row returned a byte-identical detail string. A text search cannot see structure, so it
+cannot see unconditionality, singleness, or which values the row is built from. The clause is now
+an `ast` scan of `main()`'s DIRECT body statements — never `ast.walk`, because invisibility under
+nesting IS the property — plus a check that the arguments are the module-scope pair and that
+nothing rebinds the baseline inside the function.
 
 Driving the four states by running a patched copy of the suite in a subprocess was considered for
 the state arm and rejected: it costs a full nested run per state to observe a three-field return
@@ -257,6 +269,16 @@ none
 - rev-4 · 2026-09-28 · §2 S4 · §4 · AC4 · the helper rename of unit 1 carried through here:
   the state arm drives `_build_live_log_row` and the ordering arm's source literal moves
   with it. Behaviour is unchanged.
+- rev-5 · 2026-09-28 · §3 · §4 · AC3 · folded the closing diff review's BLOCKER. The append
+  clause was three substring tests over `main()`'s raw text and greened on seven ways of
+  disabling the guard, the original defect restored through `global` among them; only deletion
+  redded, and every passing row printed a byte-identical detail. It is now an `ast` scan of
+  `main()`'s direct body statements, so §3's blanket no-AST non-goal is amended to the ordering
+  clause alone and §4 records why the first rejection was right for one half and wrong for the
+  other. Observed: the new predicate passes the shipped file and reds all eight mutations,
+  including a local-shadow case the old clause was never driven against. The state arm is
+  renamed `test_the_live_log_verdict_is_total_over_its_states`; its previous name was an
+  accident of the rev-4 blanket rename and said four states where there are five.
 
 ## 10. Reuse audit
 

@@ -61,7 +61,7 @@ minutes. `tools/run-gates/run-gates.sh` was not run by any unit pass; the close 
   `the arm-count pin ends an unbroken provenance chain` reports ok ending at 73. The suite summary
   reads 78/78, which is 73 arms plus five appended run-property rows
 - AC8 — `test_the_live_log_baseline_is_taken_before_any_arm_runs` — this docstring and that of
-  `test_the_live_log_row_is_total_over_its_four_states` both name the real query log as the reason
+  `test_the_live_log_verdict_is_total_over_its_states` both name the real query log as the reason
   the arm is not behavioural. The ordering arm's did not on first writing and was corrected before
   the unit was committed; the checking predicate found it
 
